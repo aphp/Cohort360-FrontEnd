@@ -991,3 +991,22 @@ export type AccessExpiration = {
   profile: string
   perimeter: string
 }
+
+export type ExpandScopeElementParamsType = {
+  rowId: number
+  scopesList?: ScopeTreeRow[]
+  selectedItems?: ScopeTreeRow[]
+  openPopulation?: number[]
+  type?: ScopeType
+  signal?: AbortSignal
+}
+export type ExpandScopeElementReturnType = {
+  scopesList: ScopeTreeRow[]
+  selectedItems: ScopeTreeRow[]
+  openPopulation: number[]
+  aborted?: boolean
+}
+export type prebuiltStateType = {
+  scopesList?: ScopeTreeRow[]
+  openPopulation?: ScopeTreeRow[]
+}

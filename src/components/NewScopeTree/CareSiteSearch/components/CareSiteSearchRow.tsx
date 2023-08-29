@@ -13,7 +13,7 @@ type CareSiteSearchResultRowProps = {
   openPopulation: number[]
   labelId: string
   onExpand: (rowId: number) => Promise<void>
-  onSelect: (row: ScopeTreeRow) => ScopeTreeRow[]
+  onSelect: (row: ScopeTreeRow) => Promise<ScopeTreeRow[]>
   isIndeterminated: (row: ScopeTreeRow) => boolean | undefined
   isSelected: (row: ScopeTreeRow) => boolean
   executiveUnitType?: ScopeType

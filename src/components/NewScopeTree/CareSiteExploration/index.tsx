@@ -20,17 +20,18 @@ import {
   displayCareSiteExplorationRow,
   getHeadCells,
   init,
-  isIndeterminated,
-  isSelected,
+  isSearchIndeterminate,
+  isSearchSelected,
   onExpand,
-  onSelect,
-  onSelectAll
+  onExplorationSelectAll,
+  onSearchSelect,
+  onSearchSelectAll
 } from '../commons/scopeTreeUtils'
 import { ScopeState } from 'state/scope'
 import { CareSiteExplorationProps } from '../index'
 
 const Index = (props: CareSiteExplorationProps) => {
-  const { selectedItems, setSelectedItems, openPopulation, setOpenPopulations, executiveUnitType } = props
+  const { selectedItems, setSelectedItems, searchedRows, setSearchedRows, executiveUnitType } = props
 
   const { classes } = useStyles()
   const dispatch: AppDispatch = useAppDispatch()
@@ -46,23 +47,19 @@ const Index = (props: CareSiteExplorationProps) => {
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
   const [isEmpty, setIsEmpty] = useState<boolean>(!rootRows || rootRows.length === 0)
+  const [openPopulation, setOpenPopulations] = useState<number[]>([])
 
-  const explorationSelectedItems = rootRows.filter((item) => selectedItems.map(({ id }) => id).includes(item.id))
-  const isHeadChecked: boolean =
-    rootRows
-      .map((rootRow) => rootRow.id)
-      .every((rootRowId) => explorationSelectedItems.map((selected) => selected.id).includes(rootRowId)) &&
-    rootRows.length > 0
+  // const explorationSelectedItems = rootRows.filter((item) => selectedItems.map(({ id }) => id).includes(item.id))
+  const isHeadChecked: boolean = rootRows.length > 0 && rootRows.every((item) => isSearchSelected(item, selectedItems))
   const isHeadIndeterminate: boolean =
-    (explorationSelectedItems?.length > 0 && rootRows?.length > 0 && !isHeadChecked) ||
-    (!isHeadChecked && selectedItems?.length > 0)
+    !isHeadChecked && rootRows.length > 0 && !!rootRows.find((item) => isSearchIndeterminate(item, selectedItems))
 
   const controllerRef = useRef<AbortController | null>(null)
 
   const headCells = getHeadCells(
     isHeadChecked,
     isHeadIndeterminate,
-    () => onSelectAll(scopesList, selectedItems, setSelectedItems),
+    () => onExplorationSelectAll(rootRows, setSelectedItems, isHeadChecked),
     executiveUnitType
   )
 
@@ -75,7 +72,6 @@ const Index = (props: CareSiteExplorationProps) => {
       setOpenPopulations,
       setCount,
       setIsEmpty,
-      selectedItems,
       dispatch,
       executiveUnitType
     )
@@ -133,9 +129,10 @@ const Index = (props: CareSiteExplorationProps) => {
                         dispatch,
                         executiveUnitType
                       ),
-                    (row: ScopeTreeRow) => onSelect(row, selectedItems, setSelectedItems, scopesList),
-                    (row: ScopeTreeRow) => isIndeterminated(row, selectedItems),
-                    (row: ScopeTreeRow) => isSelected(row, selectedItems, rootRows),
+                    (row: ScopeTreeRow) =>
+                      onSearchSelect(row, selectedItems, searchedRows, scopesList, setSelectedItems),
+                    (row: ScopeTreeRow) => isSearchIndeterminate(row, selectedItems),
+                    (row: ScopeTreeRow) => isSearchSelected(row, selectedItems),
                     executiveUnitType
                   )
                 }}

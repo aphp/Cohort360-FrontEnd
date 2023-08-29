@@ -1,4 +1,13 @@
-import { ScopeTreeRow } from 'types'
+import {
+  ExpandScopeElementParamsType,
+  ExpandScopeElementReturnType,
+  prebuiltStateType,
+  ScopeTreeRow,
+  ScopeType
+} from 'types'
+import services from '../services/aphp'
+import { getStoredState } from 'redux-persist'
+import { RootState } from '../state'
 
 /**
  * This function is called when a user click on checkbox
@@ -134,4 +143,60 @@ export const sortByQuantityAndName = (scopeRows: ScopeTreeRow[]) => {
     return 0
   })
   return scopeRows
+}
+
+export const expandScopeTree = async (params: ExpandScopeElementParamsType, getState?: () => RootState) => {
+  let scopesList: ScopeTreeRow[] = []
+  let openPopulation: number[] = []
+  if (params.scopesList && params.openPopulation) {
+    scopesList = params.scopesList
+    openPopulation = params.openPopulation
+  } else if (getState) {
+    const state = getState().scope
+    scopesList = state.scopesList
+    openPopulation = state.openPopulation
+  }
+  let _rootRows = scopesList ? [...scopesList] : []
+  const savedSelectedItems = params.selectedItems ? [...params.selectedItems] : []
+  let _openPopulation = openPopulation ? [...openPopulation] : []
+
+  const index = _openPopulation.indexOf(params.rowId)
+  if (index !== -1) {
+    _openPopulation = _openPopulation.filter((id) => id !== params.rowId)
+  } else {
+    _openPopulation = [..._openPopulation, params.rowId]
+
+    const replaceSubItems = async (items: ScopeTreeRow[], type?: ScopeType) => {
+      let _items: ScopeTreeRow[] = []
+      for (let item of items) {
+        // Replace sub items element by response of back-end
+        if (+item.id === +params.rowId) {
+          const foundItem = item.subItems ? item.subItems.find((i) => i.id === 'loading') : true
+          if (foundItem) {
+            const subItems: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(
+              item.inferior_levels_ids,
+              false,
+              true,
+              type,
+              params.signal
+            )
+            item = { ...item, subItems: subItems }
+          }
+        } else if (item.subItems && item.subItems.length !== 0) {
+          item = { ...item, subItems: await replaceSubItems(item.subItems, type) }
+        }
+        _items = [..._items, item]
+      }
+      return _items
+    }
+
+    _rootRows = await replaceSubItems(scopesList, params.type)
+  }
+
+  return {
+    scopesList: _rootRows,
+    selectedItems: savedSelectedItems,
+    openPopulation: _openPopulation,
+    aborted: params.signal?.aborted
+  }
 }

@@ -5,11 +5,11 @@ import EnhancedTable from '../../ScopeTree/ScopeTreeTable'
 import {
   displayCareSiteSearchResultRow,
   getHeadCells,
-  isIndeterminated,
-  isSelected,
+  isSearchIndeterminate,
+  isSearchSelected,
   onExpand,
-  onSelect,
-  onSelectAll,
+  onSearchSelect,
+  onSearchSelectAll,
   searchInPerimeters
 } from '../commons/scopeTreeUtils'
 import useStyles from '../commons/styles'
@@ -19,7 +19,7 @@ import { ScopeTreeRow } from 'types'
 import { CareSiteSearchProps } from '../index'
 
 const Index: React.FC<CareSiteSearchProps> = (props) => {
-  const { searchInput, selectedItems, setSelectedItems, executiveUnitType } = props
+  const { searchInput, selectedItems, setSelectedItems, searchedRows, setSearchedRows, executiveUnitType } = props
 
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
@@ -32,26 +32,23 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
 
   const { scopesList = [] } = scopeState
   const [openPopulation, setOpenPopulations] = useState<number[]>(scopeState.openPopulation)
+  // const [searchedRows, setSearchedRows] = useState<ScopeTreeRow[]>([...scopesList])
   const [rootRows, setRootRows] = useState<ScopeTreeRow[]>([])
   const controllerRef = useRef<AbortController | null>(null)
   const [isEmpty, setIsEmpty] = useState<boolean>(true)
-  const [debouncedSearchTerm] = useDebounce(700, searchInput)
-  const [page, setPage] = useState(1)
+  const debouncedSearchTerm = useDebounce(700, searchInput)
+  const [page, setPage] = useState(0)
   const [count, setCount] = useState(0)
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false)
-  const searchSelectedItems = rootRows.filter((item) => selectedItems.map(({ id }) => id).includes(item.id))
 
-  const isHeadChecked: boolean =
-    rootRows
-      .map((rootRow) => rootRow.id)
-      .every((rootRowId) => searchSelectedItems.map((selected) => selected.id).includes(rootRowId)) &&
-    rootRows.length > 0
-  const isHeadIndeterminate: boolean = rootRows?.length > 0 && !isHeadChecked && searchSelectedItems?.length > 0
+  const isHeadChecked: boolean = rootRows.length > 0 && rootRows.every((item) => isSearchSelected(item, selectedItems))
+  const isHeadIndeterminate: boolean =
+    !isHeadChecked && rootRows.length > 0 && !!rootRows.find((item) => isSearchIndeterminate(item, selectedItems))
 
   const headCells = getHeadCells(
     isHeadChecked,
     isHeadIndeterminate,
-    () => onSelectAll(rootRows, selectedItems, setSelectedItems),
+    () => onSearchSelectAll(rootRows, selectedItems, setSelectedItems, isHeadChecked, searchedRows, scopesList),
     executiveUnitType
   )
 
@@ -63,33 +60,31 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
       setIsSearchLoading,
       setIsEmpty,
       setCount,
-      scopesList,
       setRootRows,
+      searchedRows,
+      setSearchedRows,
       setOpenPopulations,
-      dispatch,
       executiveUnitType
     )
 
   useEffect(() => {
-    // let delayTimer: string | number | NodeJS.Timeout | undefined = undefined
+    let delayTimer: string | number | NodeJS.Timeout | undefined = undefined
     if (debouncedSearchTerm) {
-      search()
-      // delayTimer = setTimeout(search, 700)
-      // return () => clearTimeout(delayTimer)
+      delayTimer = setTimeout(search, 600)
     } else {
       setRootRows([])
     }
     return () => {
       controllerRef.current?.abort()
-      // clearTimeout(delayTimer)
+      clearTimeout(delayTimer)
     }
   }, [debouncedSearchTerm])
 
-  useEffect(() => {
-    if (debouncedSearchTerm) {
-      search()
-    }
-  }, [page])
+  // useEffect(() => {
+  //   if (debouncedSearchTerm) {
+  //     search()
+  //   }
+  // }, [page])
 
   return (
     <div className={classes.container}>
@@ -134,9 +129,10 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
                         dispatch,
                         executiveUnitType
                       ),
-                    (row: ScopeTreeRow) => onSelect(row, selectedItems, setSelectedItems, rootRows),
-                    (row: ScopeTreeRow) => isIndeterminated(row, selectedItems),
-                    (row: ScopeTreeRow) => isSelected(row, selectedItems, scopesList),
+                    (row: ScopeTreeRow) =>
+                      onSearchSelect(row, selectedItems, searchedRows, scopesList, setSelectedItems),
+                    (row: ScopeTreeRow) => isSearchIndeterminate(row, selectedItems),
+                    (row: ScopeTreeRow) => isSearchSelected(row, selectedItems),
                     executiveUnitType
                   )
                 }}
