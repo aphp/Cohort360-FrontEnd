@@ -23,7 +23,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchBiology } from 'state/biology'
-import { CriteriaName, HierarchyTree } from 'types'
+import { Comparators, CriteriaName, HierarchyTree, ObservationDataType } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
@@ -31,7 +31,7 @@ type BiologyFormProps = {
   isOpen: boolean
   isEdition: boolean
   criteria: any
-  selectedCriteria: any
+  selectedCriteria: ObservationDataType
   onChangeValue: (key: string, value: any) => void
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
@@ -45,7 +45,9 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const currentState = { ...selectedCriteria, ...initialState }
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
-  const [allowSearchByValue, setAllowSearchByValue] = useState(false)
+  const [allowSearchByValue, setAllowSearchByValue] = useState(
+    typeof currentState.valueMin === 'number' || typeof currentState.valueMax === 'number'
+  )
 
   const _onSubmit = () => {
     onChangeSelectedCriteria(currentState)
@@ -67,7 +69,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   useEffect(() => {
     const checkChildren = async () => {
       try {
-        const getChildrenResp = await criteria.fetch.fetchBiologyHierarchy(currentState.code[0].id)
+        const getChildrenResp = await criteria.fetch.fetchBiologyHierarchy(currentState.code?.[0].id)
 
         if (getChildrenResp.length > 0) {
           if (currentState.isLeaf !== false) {
@@ -83,7 +85,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       }
     }
 
-    if (currentState?.code.length === 1 && currentState?.code[0].id !== '*') {
+    if (currentState?.code?.length === 1 && currentState?.code[0].id !== '*') {
       checkChildren()
     } else {
       if (currentState.isLeaf !== false) {
@@ -207,30 +209,36 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             <Grid
               style={{
                 display: 'grid',
-                gridTemplateColumns: currentState.valueComparator === '<x>' ? '50px 1fr 1fr 1fr' : '50px 1fr 1fr',
+                gridTemplateColumns:
+                  currentState.valueComparator === Comparators.BETWEEN ? '50px 1fr 1fr 1fr' : '50px 1fr 1fr',
                 alignItems: 'center',
                 marginTop: '1em'
               }}
             >
               <Checkbox
                 checked={allowSearchByValue}
-                onClick={() => setAllowSearchByValue(!allowSearchByValue)}
+                onClick={() => {
+                  if (allowSearchByValue) {
+                    onChangeValue('valueMin', undefined)
+                    onChangeValue('valueMin', undefined)
+                  }
+                  setAllowSearchByValue(!allowSearchByValue)
+                }}
                 disabled={!currentState.isLeaf}
               />
 
               <Select
                 style={{ marginRight: '1em' }}
                 id="biology-value-comparator-select"
-                value={currentState.valueComparator}
-                onChange={(event) => onChangeValue('valueComparator', event.target.value as string)}
+                value={currentState.valueComparator ?? Comparators.GREATER_OR_EQUAL}
+                onChange={(event) => onChangeValue('valueComparator', event.target.value)}
                 disabled={!allowSearchByValue}
               >
-                <MenuItem value={'<='}>{'<='}</MenuItem>
-                <MenuItem value={'<'}>{'<'}</MenuItem>
-                <MenuItem value={'='}>{'='}</MenuItem>
-                <MenuItem value={'>'}>{'>'}</MenuItem>
-                <MenuItem value={'>='}>{'>='}</MenuItem>
-                <MenuItem value={'<x>'}>{'< X >'}</MenuItem>
+                {(Object.keys(Comparators) as (keyof typeof Comparators)[]).map((key, index) => (
+                  <MenuItem key={index} value={Comparators[key]}>
+                    {Comparators[key]}
+                  </MenuItem>
+                ))}
               </Select>
 
               <TextField
@@ -242,11 +250,11 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 id="criteria-value"
                 variant="outlined"
                 value={currentState.valueMin}
-                onChange={(e) => onChangeValue('valueMin', e.target.value)}
-                placeholder={currentState.valueComparator === '<x>' ? 'Valeur minimale' : ''}
+                onChange={(e) => onChangeValue('valueMin', parseInt(e.target.value))}
+                placeholder={currentState.valueComparator === Comparators.BETWEEN ? 'Valeur minimale' : '0'}
                 disabled={!allowSearchByValue}
               />
-              {currentState.valueComparator === '<x>' && (
+              {currentState.valueComparator === Comparators.BETWEEN && (
                 <TextField
                   required
                   inputProps={{
@@ -256,7 +264,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                   id="criteria-value"
                   variant="outlined"
                   value={currentState.valueMax}
-                  onChange={(e) => onChangeValue('valueMax', e.target.value)}
+                  onChange={(e) => onChangeValue('valueMax', parseInt(e.target.value))}
                   placeholder="Valeur maximale"
                   disabled={!allowSearchByValue}
                 />

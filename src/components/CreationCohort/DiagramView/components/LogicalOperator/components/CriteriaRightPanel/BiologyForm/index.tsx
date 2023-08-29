@@ -10,15 +10,14 @@ import { initSyncHierarchyTableEffect, OBSERVATION, syncOnChangeFormValue } from
 import { PmsiListType } from 'state/pmsi'
 import { fetchBiology } from 'state/biology'
 import { useAppDispatch, useAppSelector } from 'state'
+import { Comparators } from 'types'
 
 export const defaultBiology = {
   type: OBSERVATION,
   title: 'Critères de biologie',
   code: [],
   isLeaf: false,
-  valueMin: 0,
-  valueMax: 0,
-  valueComparator: '>=',
+  valueComparator: Comparators.GREATER_OR_EQUAL,
   occurrence: 1,
   occurrenceComparator: '>=',
   startOccurrence: '',

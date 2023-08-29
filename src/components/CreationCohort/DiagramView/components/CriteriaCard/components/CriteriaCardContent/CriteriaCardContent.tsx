@@ -16,7 +16,8 @@ import {
   SearchByTypes,
   SelectedCriteriaType,
   CriteriaItemType,
-  CalendarRequestLabel
+  CalendarRequestLabel,
+  Comparators
 } from 'types'
 
 import docTypes from 'assets/docTypes.json'
@@ -806,12 +807,12 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             _currentCriteria &&
               _currentCriteria.isLeaf &&
               _currentCriteria?.valueComparator &&
-              (_currentCriteria?.valueMin || _currentCriteria?.valueMax) && (
+              (typeof _currentCriteria?.valueMin === 'number' || typeof _currentCriteria?.valueMax === 'number') && (
                 <Chip
                   className={classes.criteriaChip}
                   label={
                     <Typography>
-                      {_currentCriteria?.valueComparator === '<x>'
+                      {_currentCriteria?.valueComparator === Comparators.BETWEEN
                         ? `Valeur comprise entre ${_currentCriteria.valueMin} et ${_currentCriteria.valueMax}`
                         : `Valeur ${_currentCriteria.valueComparator} ${_currentCriteria.valueMin}`}
                     </Typography>
