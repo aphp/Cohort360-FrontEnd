@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
-import { Tab, Tabs } from '@mui/material'
 import CareSiteSearch from './CareSiteSearch/./index'
 import CareSiteExploration from './CareSiteExploration'
 import { ScopeTreeRow, ScopeType } from 'types'
 import ScopeSearchBar from '../Inputs/ScopeSearchBar/ScopeSearchBar'
 import useStyles from './styles'
 import CareSiteChipsets from './CareSiteChipsets/CareSiteChipsets'
-import { onSelect } from './commons/scopeTreeUtils'
+import { onSelect } from './utils/scopeTreeUtils'
 import { useAppSelector } from 'state'
 import { ScopeState } from 'state/scope'
 
@@ -16,6 +15,8 @@ export type CareSiteSearchProps = {
   setSelectedItems: (selectedItems: ScopeTreeRow[]) => void
   searchRootRows: ScopeTreeRow[]
   setSearchRootRows: (selectedItems: ScopeTreeRow[]) => void
+  isSelectionLoading: boolean
+  setIsSelectionLoading: (isSelectionLoading: boolean) => void
   executiveUnitType?: ScopeType
 }
 
@@ -26,6 +27,8 @@ export type CareSiteExplorationProps = {
   setSearchRootRows: (selectedItems: ScopeTreeRow[]) => void
   openPopulation: number[]
   setOpenPopulations: (openPopulation: number[]) => void
+  isSelectionLoading: boolean
+  setIsSelectionLoading: (isSelectionLoading: boolean) => void
   executiveUnitType?: ScopeType
 }
 
@@ -33,6 +36,8 @@ type ScopeTreeExcludedProps = {
   searchInput: string
   searchRootRows: ScopeTreeRow[]
   setSearchRootRows: (selectedItems: ScopeTreeRow[]) => void
+  isSelectionLoading: boolean
+  setIsSelectionLoading: (isSelectionLoading: boolean) => void
 }
 type ScopeTreeProps = {
   [K in Exclude<
@@ -56,6 +61,8 @@ const Index = (props: ScopeTreeProps) => {
   const { scopesList = [] } = scopeState
   const [searchInput, setSearchInput] = useState('')
   const [searchRootRows, setSearchRootRows] = useState<ScopeTreeRow[]>([...scopesList])
+  const [isSelectionLoading, setIsSelectionLoading] = useState<boolean>(false)
+
   const { classes } = useStyles()
 
   return (
@@ -63,7 +70,9 @@ const Index = (props: ScopeTreeProps) => {
       <div>
         <CareSiteChipsets
           selectedItems={selectedItems}
-          onDelete={(item) => onSelect(item, selectedItems, setSelectedItems, scopesList)}
+          onDelete={(item) =>
+            onSelect(item, selectedItems, setSelectedItems, scopesList, isSelectionLoading, setIsSelectionLoading)
+          }
         />
         <div className={classes.searchBar}>
           <ScopeSearchBar searchInput={searchInput} setSearchInput={setSearchInput} />
@@ -76,6 +85,8 @@ const Index = (props: ScopeTreeProps) => {
             searchRootRows={searchRootRows}
             setSearchRootRows={setSearchRootRows}
             executiveUnitType={executiveUnitType}
+            isSelectionLoading={isSelectionLoading}
+            setIsSelectionLoading={setIsSelectionLoading}
           />
         ) : (
           <CareSiteExploration
@@ -86,6 +97,8 @@ const Index = (props: ScopeTreeProps) => {
             openPopulation={openPopulation}
             setOpenPopulations={setOpenPopulations}
             executiveUnitType={executiveUnitType}
+            isSelectionLoading={isSelectionLoading}
+            setIsSelectionLoading={setIsSelectionLoading}
           />
         )}
       </div>

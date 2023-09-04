@@ -1,6 +1,6 @@
 import { ScopeTreeRow, ScopeType } from 'types'
 import React from 'react'
-import useStyles from '../../commons/styles'
+import useStyles from '../../utils/styles'
 import { Checkbox, IconButton, Skeleton, TableCell, TableRow, Typography } from '@mui/material'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'

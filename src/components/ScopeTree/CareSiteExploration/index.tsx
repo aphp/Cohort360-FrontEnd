@@ -14,7 +14,7 @@ import {
   Typography
 } from '@mui/material'
 import EnhancedTable from '../ScopeTreeTable'
-import useStyles from '../commons/styles'
+import useStyles from '../utils/styles'
 import { AppDispatch, useAppDispatch, useAppSelector } from 'state'
 import {
   displayCareSiteExplorationRow,
@@ -25,12 +25,19 @@ import {
   onExpand,
   onExplorationSelectAll,
   onSearchSelect
-} from '../commons/scopeTreeUtils'
+} from '../utils/scopeTreeUtils'
 import { ScopeState } from 'state/scope'
 import { CareSiteExplorationProps } from '../index'
 
 const Index = (props: CareSiteExplorationProps) => {
-  const { selectedItems, setSelectedItems, searchRootRows, executiveUnitType } = props
+  const {
+    selectedItems,
+    setSelectedItems,
+    searchRootRows,
+    executiveUnitType,
+    isSelectionLoading,
+    setIsSelectionLoading
+  } = props
 
   const { classes } = useStyles()
   const dispatch: AppDispatch = useAppDispatch()
@@ -57,7 +64,7 @@ const Index = (props: CareSiteExplorationProps) => {
   const headCells = getHeadCells(
     isHeadChecked,
     isHeadIndeterminate,
-    () => onExplorationSelectAll(rootRows, setSelectedItems, isHeadChecked),
+    () => onExplorationSelectAll(rootRows, setSelectedItems, isHeadChecked, isSelectionLoading, setIsSelectionLoading),
     executiveUnitType
   )
 
@@ -128,7 +135,15 @@ const Index = (props: CareSiteExplorationProps) => {
                         executiveUnitType
                       ),
                     (row: ScopeTreeRow) =>
-                      onSearchSelect(row, selectedItems, searchRootRows, scopesList, setSelectedItems),
+                      onSearchSelect(
+                        row,
+                        selectedItems,
+                        searchRootRows,
+                        scopesList,
+                        isSelectionLoading,
+                        setIsSelectionLoading,
+                        setSelectedItems
+                      ),
                     (row: ScopeTreeRow) => isSearchIndeterminate(row, selectedItems),
                     (row: ScopeTreeRow) => isSearchSelected(row, selectedItems),
                     executiveUnitType

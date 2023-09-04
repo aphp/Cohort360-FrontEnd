@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { CircularProgress, Grid, Pagination } from '@mui/material'
+import { CircularProgress, Grid, LinearProgress, Pagination } from '@mui/material'
 import { useDebounce } from 'utils/debounce'
 import EnhancedTable from '../ScopeTreeTable'
 import {
@@ -11,15 +11,24 @@ import {
   onSearchSelect,
   onSearchSelectAll,
   searchInPerimeters
-} from '../commons/scopeTreeUtils'
-import useStyles from '../commons/styles'
+} from '../utils/scopeTreeUtils'
+import useStyles from '../utils/styles'
 import { useAppSelector } from 'state'
 import { ScopeState } from 'state/scope'
 import { ScopeTreeRow } from 'types'
 import { CareSiteSearchProps } from '../index'
 
 const Index: React.FC<CareSiteSearchProps> = (props) => {
-  const { searchInput, selectedItems, setSelectedItems, searchRootRows, setSearchRootRows, executiveUnitType } = props
+  const {
+    searchInput,
+    selectedItems,
+    setSelectedItems,
+    searchRootRows,
+    setSearchRootRows,
+    executiveUnitType,
+    isSelectionLoading,
+    setIsSelectionLoading
+  } = props
 
   const { classes } = useStyles()
 
@@ -46,7 +55,17 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
   const headCells = getHeadCells(
     isHeadChecked,
     isHeadIndeterminate,
-    () => onSearchSelectAll(rootRows, selectedItems, setSelectedItems, isHeadChecked, searchRootRows, scopesList),
+    () =>
+      onSearchSelectAll(
+        rootRows,
+        selectedItems,
+        setSelectedItems,
+        isHeadChecked,
+        searchRootRows,
+        scopesList,
+        isSelectionLoading,
+        setIsSelectionLoading
+      ),
     executiveUnitType
   )
 
@@ -66,26 +85,17 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
     )
 
   useEffect(() => {
-    let delayTimer: string | number | NodeJS.Timeout | undefined = undefined
-    if (debouncedSearchTerm) {
-      delayTimer = setTimeout(search, 600)
-    } else {
-      setRootRows([])
-    }
-    return () => {
-      controllerRef.current?.abort()
-      clearTimeout(delayTimer)
-    }
-  }, [debouncedSearchTerm])
-
-  useEffect(() => {
     if (debouncedSearchTerm) {
       search()
     }
-  }, [page])
+    return () => {
+      controllerRef.current?.abort()
+    }
+  }, [debouncedSearchTerm, page])
 
   return (
     <div className={classes.container}>
+      {!isSearchLoading && <div className={classes.linearProgress}>{isSelectionLoading && <LinearProgress />}</div>}
       {isSearchLoading ? (
         <Grid container justifyContent="center">
           <CircularProgress size={50} />
@@ -133,6 +143,8 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
                         selectedItems,
                         searchRootRows,
                         scopesList,
+                        isSelectionLoading,
+                        setIsSelectionLoading,
                         setSelectedItems,
                         setSearchRootRows
                       ),

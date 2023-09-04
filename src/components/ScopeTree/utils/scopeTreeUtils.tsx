@@ -302,12 +302,17 @@ export const onSelect = (
   row: ScopeTreeRow,
   selectedItems: ScopeTreeRow[],
   setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void,
-  scopesList: ScopeTreeRow[]
+  scopesList: ScopeTreeRow[],
+  isSelectionLoading: boolean,
+  setIsSelectionLoading: (isSelectionLoading: boolean) => void
 ): ScopeTreeRow[] => {
+  if (isSelectionLoading) return selectedItems
+  else setIsSelectionLoading(true)
   const hierarchySelection: ScopeTreeRow[] = getHierarchySelection(row, selectedItems, scopesList)
   const optimizedHierarchySelection: ScopeTreeRow[] = optimizeHierarchySelection(hierarchySelection, scopesList)
 
   setSelectedItems(optimizedHierarchySelection)
+  setIsSelectionLoading(false)
   return optimizedHierarchySelection
 }
 
@@ -483,9 +488,13 @@ export const onSearchSelect = async (
   selectedItems: ScopeTreeRow[],
   searchRootRows: ScopeTreeRow[],
   explorationRootRows: ScopeTreeRow[],
+  isSelectionLoading: boolean,
+  setIsSelectionLoading: (isSelectionLoading: boolean) => void,
   setSelectedItems?: (newSelectedItems: ScopeTreeRow[]) => void,
   setSearchedRows?: (newSelectedItems: ScopeTreeRow[]) => void
 ): Promise<ScopeTreeRow[]> => {
+  if (isSelectionLoading) return selectedItems
+  else setIsSelectionLoading(true)
   const rowsToDelete: string[] = []
   const rowsToAdd: ScopeTreeRow[] = []
   const equivalentSelectedItems: ScopeTreeRow[] = selectedItems.map(
@@ -543,19 +552,25 @@ export const onSearchSelect = async (
 
   if (setSelectedItems) setSelectedItems(newSelectedItems)
   if (setSearchedRows) setSearchedRows(searchRootRows)
+  setIsSelectionLoading(false)
   return newSelectedItems
 }
 
 export const onExplorationSelectAll = async (
   rootRows: ScopeTreeRow[],
   setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void,
-  isHeaderSelected: boolean
+  isHeaderSelected: boolean,
+  isSelectionLoading: boolean,
+  setIsSelectionLoading: (isSelectionLoading: boolean) => void
 ) => {
+  if (isSelectionLoading) return
+  else setIsSelectionLoading(true)
   if (isHeaderSelected) {
     setSelectedItems([])
   } else {
     setSelectedItems(rootRows)
   }
+  setIsSelectionLoading(false)
 }
 const squashItems = (rootRows: ScopeTreeRow[]) => {
   let uniqueRows: ScopeTreeRow[] = []
@@ -574,17 +589,35 @@ export const onSearchSelectAll = async (
   setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void,
   isHeaderSelected: boolean,
   searchRootRows: ScopeTreeRow[],
-  explorationRootRows: ScopeTreeRow[]
+  explorationRootRows: ScopeTreeRow[],
+  isSelectionLoading: boolean,
+  setIsSelectionLoading: (isSelectionLoading: boolean) => void
 ) => {
   const uniqueRootRows: ScopeTreeRow[] = squashItems(rootRows)
   let newSelectedItems: ScopeTreeRow[] = [...selectedItems]
   for (const rootRow of uniqueRootRows) {
     if (!isHeaderSelected && isIncludedInListAndSubItems(rootRow, newSelectedItems)) {
-      newSelectedItems = await onSearchSelect(rootRow, newSelectedItems, searchRootRows, explorationRootRows, undefined)
+      newSelectedItems = await onSearchSelect(
+        rootRow,
+        newSelectedItems,
+        searchRootRows,
+        explorationRootRows,
+        isSelectionLoading,
+        setIsSelectionLoading,
+        undefined
+      )
     }
   }
   for (const rootRow of uniqueRootRows) {
-    newSelectedItems = await onSearchSelect(rootRow, newSelectedItems, searchRootRows, explorationRootRows, undefined)
+    newSelectedItems = await onSearchSelect(
+      rootRow,
+      newSelectedItems,
+      searchRootRows,
+      explorationRootRows,
+      isSelectionLoading,
+      setIsSelectionLoading,
+      undefined
+    )
   }
 
   setSelectedItems(newSelectedItems)
