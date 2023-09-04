@@ -11,7 +11,7 @@ import { ScopeTreeRow } from '../../types'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
 import CareSiteChipsets from '../../components/ScopeTree/CareSiteChipsets/CareSiteChipsets'
-import { onSelect } from '../../components/ScopeTree/commons/scopeTreeUtils'
+import { onSelect } from '../../components/ScopeTree/utils/scopeTreeUtils'
 import ScopeTree from '../../components/ScopeTree'
 
 const CareSiteView = () => {
