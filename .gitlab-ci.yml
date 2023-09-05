@@ -15,10 +15,7 @@ build-job:
     expire_in: 1 day
   only:
     - tags
-    - develop
-    - /^feat_deploy_(\w*|\d*)/
-    - /^release_(\w*|\d*|-*|_*|\.*)+$/
-    - /^hotfix_(\w*|\d*|-*|_*|\.*)+$/
+    - main
 
   cache:
     key: cohort360_nodemodules_cache
@@ -56,7 +53,4 @@ deploy-job:
       --destination ${CI_REGISTRY_IMAGE}:${VERSION}
   only:
     - tags
-    - develop
-    - /^feat_deploy_(\w*|\d*)/
-    - /^release_(\w*|\d*|-*|_*|\.*)+$/
-    - /^hotfix_(\w*|\d*|-*|_*|\.*)+$/
+    - main
