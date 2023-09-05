@@ -13,7 +13,7 @@
 
 Cohort360 consists of a React front-end and a Django back-end (REST API).
 
-This repository hosts the front-end, while the back-end is available here: [github.com/aphp/Cohort360-Back-end](https://github.com/aphp/Cohort360-Back-end).
+This repository hosts the front-end, while the back-end will be available soon.
 
 Both the front-end and the back-end depend on a third, possibly custom, party: an endpoint to query medical data and to create cohorts.
 This third endpoint can be a FHIR API for example. This is the case for the first creators of Cohort360.
