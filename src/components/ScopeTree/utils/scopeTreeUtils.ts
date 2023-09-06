@@ -1,13 +1,10 @@
-import React from 'react'
-import CareSiteExplorationRow from '../CareSiteExploration/components/CareSiteExplorationRow'
+import React, { ReactElement } from 'react'
 import { ExpandScopeElementParamsType, ScopeTreeRow, ScopeType, TreeElement } from 'types'
-import CareSiteSearchRow from '../CareSiteSearch/components/CareSiteSearchRow'
 import { expandScopeElement, fetchScopesList, updateScopeList } from 'state/scope'
 import { AppDispatch } from 'state'
 import { findEquivalentRowInItemAndSubItems, getHierarchySelection, optimizeHierarchySelection } from 'utils/pmsi'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import servicesPerimeters, { LOADING } from 'services/aphp/servicePerimeters'
-import { Checkbox } from '@mui/material'
 import { cancelPendingRequest } from 'utils/abortController'
 import { expandScopeTree } from 'utils/scopeTree'
 
@@ -155,106 +152,6 @@ export const init = async (
   setIsSearchLoading(false)
 }
 
-export const displayCareSiteExplorationRow = (
-  row: ScopeTreeRow,
-  level: number,
-  parentAccess: string,
-  selectedItems: ScopeTreeRow[],
-  rootRows: ScopeTreeRow[],
-  openPopulation: number[],
-  labelId: string,
-  onExpand: (rowId: number) => Promise<void>,
-  onSelect: (row: ScopeTreeRow) => Promise<ScopeTreeRow[]>,
-  isIndeterminated: (row: ScopeTreeRow) => boolean | undefined,
-  isSelected: (row: ScopeTreeRow) => boolean,
-  executiveUnitType?: ScopeType
-) => {
-  return (
-    <React.Fragment key={Math.random()}>
-      <CareSiteExplorationRow
-        row={row}
-        level={level}
-        parentAccess={parentAccess}
-        openPopulation={openPopulation}
-        labelId={labelId}
-        onExpand={onExpand}
-        onSelect={onSelect}
-        isIndeterminate={isIndeterminated}
-        isSelected={isSelected}
-        executiveUnitType={executiveUnitType}
-      />
-      {openPopulation.find((id) => Number(row.id) === id) &&
-        row.subItems &&
-        row.subItems.map((subItem: ScopeTreeRow) =>
-          displayCareSiteExplorationRow(
-            subItem,
-            level + 1,
-            parentAccess,
-            selectedItems,
-            rootRows,
-            openPopulation,
-            labelId,
-            onExpand,
-            onSelect,
-            isIndeterminated,
-            isSelected,
-            executiveUnitType
-          )
-        )}
-    </React.Fragment>
-  )
-}
-
-export const displayCareSiteSearchResultRow = (
-  row: ScopeTreeRow,
-  level: number,
-  parentAccess: string,
-  selectedItems: ScopeTreeRow[],
-  rootRows: ScopeTreeRow[],
-  openPopulation: number[],
-  labelId: string,
-  onExpand: (rowId: number) => Promise<void>,
-  onSelect: (row: ScopeTreeRow) => Promise<ScopeTreeRow[]>,
-  isIndeterminated: (row: ScopeTreeRow) => boolean | undefined,
-  isSelected: (row: ScopeTreeRow) => boolean,
-  executiveUnitType?: ScopeType
-) => {
-  return (
-    <React.Fragment key={Math.random()}>
-      <CareSiteSearchRow
-        row={row}
-        level={level}
-        parentAccess={parentAccess}
-        openPopulation={openPopulation}
-        labelId={labelId}
-        onExpand={onExpand}
-        onSelect={onSelect}
-        isIndeterminate={isIndeterminated}
-        isSelected={isSelected}
-        executiveUnitType={executiveUnitType}
-      />
-      {openPopulation.find((id) => +row.id === id) &&
-        row.subItems &&
-        row.subItems.map((subItem: ScopeTreeRow) =>
-          displayCareSiteSearchResultRow(
-            subItem,
-            level + 1,
-            parentAccess,
-            selectedItems,
-            rootRows,
-            openPopulation,
-            labelId,
-            onExpand,
-            onSelect,
-            isIndeterminated,
-            isSelected,
-            executiveUnitType
-          )
-        )}
-    </React.Fragment>
-  )
-}
-
 export const onExpand = async (
   rowId: number,
   controllerRef: React.MutableRefObject<AbortController | null | undefined>,
@@ -302,12 +199,17 @@ export const onSelect = (
   row: ScopeTreeRow,
   selectedItems: ScopeTreeRow[],
   setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void,
-  scopesList: ScopeTreeRow[]
+  scopesList: ScopeTreeRow[],
+  isSelectionLoading: boolean,
+  setIsSelectionLoading: (isSelectionLoading: boolean) => void
 ): ScopeTreeRow[] => {
+  if (isSelectionLoading) return selectedItems
+  else setIsSelectionLoading(true)
   const hierarchySelection: ScopeTreeRow[] = getHierarchySelection(row, selectedItems, scopesList)
   const optimizedHierarchySelection: ScopeTreeRow[] = optimizeHierarchySelection(hierarchySelection, scopesList)
 
   setSelectedItems(optimizedHierarchySelection)
+  setIsSelectionLoading(false)
   return optimizedHierarchySelection
 }
 
@@ -483,9 +385,13 @@ export const onSearchSelect = async (
   selectedItems: ScopeTreeRow[],
   searchRootRows: ScopeTreeRow[],
   explorationRootRows: ScopeTreeRow[],
+  isSelectionLoading: boolean,
+  setIsSelectionLoading: (isSelectionLoading: boolean) => void,
   setSelectedItems?: (newSelectedItems: ScopeTreeRow[]) => void,
   setSearchedRows?: (newSelectedItems: ScopeTreeRow[]) => void
 ): Promise<ScopeTreeRow[]> => {
+  if (isSelectionLoading) return selectedItems
+  else setIsSelectionLoading(true)
   const rowsToDelete: string[] = []
   const rowsToAdd: ScopeTreeRow[] = []
   const equivalentSelectedItems: ScopeTreeRow[] = selectedItems.map(
@@ -543,19 +449,25 @@ export const onSearchSelect = async (
 
   if (setSelectedItems) setSelectedItems(newSelectedItems)
   if (setSearchedRows) setSearchedRows(searchRootRows)
+  setIsSelectionLoading(false)
   return newSelectedItems
 }
 
 export const onExplorationSelectAll = async (
   rootRows: ScopeTreeRow[],
   setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void,
-  isHeaderSelected: boolean
+  isHeaderSelected: boolean,
+  isSelectionLoading: boolean,
+  setIsSelectionLoading: (isSelectionLoading: boolean) => void
 ) => {
+  if (isSelectionLoading) return
+  else setIsSelectionLoading(true)
   if (isHeaderSelected) {
     setSelectedItems([])
   } else {
     setSelectedItems(rootRows)
   }
+  setIsSelectionLoading(false)
 }
 const squashItems = (rootRows: ScopeTreeRow[]) => {
   let uniqueRows: ScopeTreeRow[] = []
@@ -574,17 +486,35 @@ export const onSearchSelectAll = async (
   setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void,
   isHeaderSelected: boolean,
   searchRootRows: ScopeTreeRow[],
-  explorationRootRows: ScopeTreeRow[]
+  explorationRootRows: ScopeTreeRow[],
+  isSelectionLoading: boolean,
+  setIsSelectionLoading: (isSelectionLoading: boolean) => void
 ) => {
   const uniqueRootRows: ScopeTreeRow[] = squashItems(rootRows)
   let newSelectedItems: ScopeTreeRow[] = [...selectedItems]
   for (const rootRow of uniqueRootRows) {
     if (!isHeaderSelected && isIncludedInListAndSubItems(rootRow, newSelectedItems)) {
-      newSelectedItems = await onSearchSelect(rootRow, newSelectedItems, searchRootRows, explorationRootRows, undefined)
+      newSelectedItems = await onSearchSelect(
+        rootRow,
+        newSelectedItems,
+        searchRootRows,
+        explorationRootRows,
+        isSelectionLoading,
+        setIsSelectionLoading,
+        undefined
+      )
     }
   }
   for (const rootRow of uniqueRootRows) {
-    newSelectedItems = await onSearchSelect(rootRow, newSelectedItems, searchRootRows, explorationRootRows, undefined)
+    newSelectedItems = await onSearchSelect(
+      rootRow,
+      newSelectedItems,
+      searchRootRows,
+      explorationRootRows,
+      isSelectionLoading,
+      setIsSelectionLoading,
+      undefined
+    )
   }
 
   setSelectedItems(newSelectedItems)
@@ -660,23 +590,14 @@ export const searchInPerimeters = async (
   return newRootRows
 }
 
-export const getHeadCells = (
-  isHeadChecked: boolean,
-  isHeadIndeterminate: boolean,
-  onSelectAll?: () => void,
-  executiveUnitType?: ScopeType
-) => [
+export const getHeadCells = (headCheckbox: ReactElement, executiveUnitType?: ScopeType) => [
   { id: '', align: 'left', disablePadding: true, disableOrderBy: true, label: '' },
-  !!onSelectAll && {
+  !!headCheckbox && {
     id: '',
     align: 'left',
     disablePadding: true,
     disableOrderBy: true,
-    label: (
-      <div style={{ padding: '0 0 0 4px' }}>
-        <Checkbox color="secondary" checked={isHeadChecked} indeterminate={isHeadIndeterminate} onClick={onSelectAll} />
-      </div>
-    )
+    label: headCheckbox
   },
   { id: 'name', align: 'left', disablePadding: false, disableOrderBy: true, label: 'Nom' },
   { id: 'quantity', align: 'center', disablePadding: false, disableOrderBy: true, label: 'Nombre de patients' },
