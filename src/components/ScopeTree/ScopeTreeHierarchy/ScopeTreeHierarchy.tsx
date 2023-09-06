@@ -1,6 +1,6 @@
 import { ScopeTreeRow, ScopeType } from 'types'
 import React from 'react'
-import CareSiteRow from './components/CareSiteRow'
+import ScopeTreeTableRow from './components/ScopeTreeTableRow'
 
 type CareSiteHierarchyProps = {
   row: ScopeTreeRow
@@ -16,7 +16,7 @@ type CareSiteHierarchyProps = {
   executiveUnitType?: ScopeType
 }
 
-const CareSiteHierarchy = (props: CareSiteHierarchyProps) => {
+const ScopeTreeHierarchy = (props: CareSiteHierarchyProps) => {
   const {
     row,
     level,
@@ -32,7 +32,7 @@ const CareSiteHierarchy = (props: CareSiteHierarchyProps) => {
   } = props
   return (
     <React.Fragment key={Math.random()}>
-      <CareSiteRow
+      <ScopeTreeTableRow
         row={row}
         level={level}
         parentAccess={parentAccess}
@@ -48,7 +48,7 @@ const CareSiteHierarchy = (props: CareSiteHierarchyProps) => {
       {openPopulation.find((id) => +row.id === id) &&
         row.subItems &&
         row.subItems.map((subItem: ScopeTreeRow) => (
-          <CareSiteRow
+          <ScopeTreeTableRow
             key={Math.random()}
             row={subItem}
             level={level + 1}
@@ -66,4 +66,4 @@ const CareSiteHierarchy = (props: CareSiteHierarchyProps) => {
     </React.Fragment>
   )
 }
-export default CareSiteHierarchy
+export default ScopeTreeHierarchy

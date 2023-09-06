@@ -57,7 +57,7 @@ export interface IServicePerimeters {
    *   - perimeterId: ID du périmètre
    *
    * Retour:
-   *   - ScopeTreeRow | undefined
+   *   - ScopeTreeTableRow | undefined
    */
   fetchPerimeterInfoForRequeteur: (perimeterId: string) => Promise<ScopeTreeRow | undefined>
 
@@ -81,13 +81,13 @@ export interface IServicePerimeters {
   getAccessExpirations: (accessExpirationsProps: AccessExpirationsProps) => Promise<AccessExpiration[]>
 
   /**
-   * Cette fonction se base sur la fonction `getPerimeters` du service, et ré-organise la donnée sous forme d'un ScopeTreeRow[]
+   * Cette fonction se base sur la fonction `getPerimeters` du service, et ré-organise la donnée sous forme d'un ScopeTreeTableRow[]
    *
    * Argument:
    *   - practitionerId: Identifiant technique du practitioner
    *
    * Retour:
-   *   - ScopeTreeRow[]
+   *   - ScopeTreeTableRow[]
    */
   getScopePerimeters: (practitionerId: string, type?: ScopeType, signal?: AbortSignal) => Promise<ScopeTreeRow[]>
 
@@ -99,7 +99,7 @@ export interface IServicePerimeters {
    *   - getSubItem: = true si on demande à avoir les enfants des enfants
    *
    * Retour:
-   *   - ScopeTreeRow[]
+   *   - ScopeTreeTableRow[]
    */
   getScopesWithSubItems: (
     subScopesIds: string | null | undefined,
@@ -126,7 +126,7 @@ export interface IServicePerimeters {
     scopeType?: ScopeType
   ) => Promise<any>
   /**
-   * construire une liste de ScopeTreeRow à travers une liste de ScopePage
+   * construire une liste de ScopeTreeTableRow à travers une liste de ScopePage
    */
   buildScopeTreeRowList: (
     subScopes: ScopePage[],

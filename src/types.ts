@@ -1049,7 +1049,11 @@ export type ExpandScopeElementReturnType = {
   openPopulation: number[]
   aborted?: boolean
 }
-export type prebuiltStateType = {
-  scopesList?: ScopeTreeRow[]
-  openPopulation?: ScopeTreeRow[]
+
+export type ScopeTreeTableHeadCellsType = {
+  id: string
+  align: string
+  disablePadding: boolean
+  disableOrderBy: boolean
+  label: string | ReactElement
 }

@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react'
-import { ExpandScopeElementParamsType, ScopeTreeRow, ScopeType, TreeElement } from 'types'
+import { ExpandScopeElementParamsType, ScopeTreeRow, ScopeTreeTableHeadCellsType, ScopeType, TreeElement } from 'types'
 import { expandScopeElement, fetchScopesList, updateScopeList } from 'state/scope'
 import { AppDispatch } from 'state'
 import { findEquivalentRowInItemAndSubItems, getHierarchySelection, optimizeHierarchySelection } from 'utils/pmsi'
@@ -7,15 +7,6 @@ import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import servicesPerimeters, { LOADING } from 'services/aphp/servicePerimeters'
 import { cancelPendingRequest } from 'utils/abortController'
 import { expandScopeTree } from 'utils/scopeTree'
-
-const fetchScopeTree = async (
-  dispatch: AppDispatch,
-  isScopeList?: boolean,
-  signal?: AbortSignal,
-  executiveUnitType?: ScopeType
-) => {
-  return dispatch(fetchScopesList({ isScopeList: isScopeList, type: executiveUnitType, signal: signal })).unwrap()
-}
 
 const getAllParentsIds = async (selectedItems: ScopeTreeRow[]) => {
   const allParentsIds: string[] = selectedItems
@@ -131,16 +122,13 @@ export const init = async (
   executiveUnitType?: ScopeType
 ) => {
   setIsSearchLoading(true)
-  cancelPendingRequestByRef(controllerRef)
+  cancelPendingRequest(controllerRef.current)
 
   let newPerimetersList: ScopeTreeRow[] = rootRows
   if (rootRows?.length <= 0) {
-    const fetchScopeTreeResponse = await fetchScopeTree(
-      dispatch,
-      true,
-      controllerRef.current?.signal,
-      executiveUnitType
-    )
+    const fetchScopeTreeResponse = await dispatch(
+      fetchScopesList({ isScopeList: true, type: executiveUnitType, signal: controllerRef.current?.signal })
+    ).unwrap()
     if (fetchScopeTreeResponse && !fetchScopeTreeResponse.aborted) {
       newPerimetersList = fetchScopeTreeResponse.scopesList
       setRootRows(newPerimetersList)
@@ -548,10 +536,6 @@ export const isSelected = (searchedItem: TreeElement, selectedItems: TreeElement
   return findSelectedInListAndSubItems(selectedItems, searchedItem, allItems)
 }
 
-export const cancelPendingRequestByRef = (controllerRef: React.MutableRefObject<AbortController | null>) => {
-  controllerRef.current = cancelPendingRequest(controllerRef.current)
-}
-
 export const searchInPerimeters = async (
   searchInput: string,
   page: number,
@@ -566,7 +550,7 @@ export const searchInPerimeters = async (
   executiveUnitType?: ScopeType
 ) => {
   setIsSearchLoading(true)
-  cancelPendingRequestByRef(controllerRef)
+  cancelPendingRequest(controllerRef.current)
   const {
     scopeTreeRows: newPerimetersList,
     count: newCount,
@@ -590,30 +574,38 @@ export const searchInPerimeters = async (
   return newRootRows
 }
 
-export const getHeadCells = (headCheckbox: ReactElement, executiveUnitType?: ScopeType) => [
-  { id: '', align: 'left', disablePadding: true, disableOrderBy: true, label: '' },
-  !!headCheckbox && {
-    id: '',
-    align: 'left',
-    disablePadding: true,
-    disableOrderBy: true,
-    label: headCheckbox
-  },
-  { id: 'name', align: 'left', disablePadding: false, disableOrderBy: true, label: 'Nom' },
-  { id: 'quantity', align: 'center', disablePadding: false, disableOrderBy: true, label: 'Nombre de patients' },
-  executiveUnitType
-    ? {
-        id: 'deidentified',
-        align: 'center',
-        disablePadding: false,
-        disableOrderBy: true,
-        label: 'Type'
-      }
-    : {
-        id: 'type',
-        align: 'center',
-        disablePadding: false,
-        disableOrderBy: true,
-        label: 'Accès'
-      }
-]
+export const getHeadCells = (
+  headCheckbox?: ReactElement,
+  executiveUnitType?: ScopeType
+): ScopeTreeTableHeadCellsType[] => {
+  const headCells = [
+    { id: '', align: 'left', disablePadding: true, disableOrderBy: true, label: '' },
+    !!headCheckbox
+      ? {
+          id: '',
+          align: 'left',
+          disablePadding: true,
+          disableOrderBy: true,
+          label: headCheckbox
+        }
+      : undefined,
+    { id: 'name', align: 'left', disablePadding: false, disableOrderBy: true, label: 'Nom' },
+    { id: 'quantity', align: 'center', disablePadding: false, disableOrderBy: true, label: 'Nombre de patients' },
+    executiveUnitType
+      ? {
+          id: 'deidentified',
+          align: 'center',
+          disablePadding: false,
+          disableOrderBy: true,
+          label: 'Type'
+        }
+      : {
+          id: 'type',
+          align: 'center',
+          disablePadding: false,
+          disableOrderBy: true,
+          label: 'Accès'
+        }
+  ]
+  return headCells.filter((cell) => cell !== undefined) as ScopeTreeTableHeadCellsType[]
+}

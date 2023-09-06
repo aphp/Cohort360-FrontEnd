@@ -7,7 +7,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'
 import displayDigit from 'utils/displayDigit'
 import { LOADING } from 'services/aphp/servicePerimeters'
 
-type CareSiteRowProps = {
+type ScopeTreeTableRowProps = {
   row: ScopeTreeRow
   level: number
   parentAccess: string
@@ -21,7 +21,7 @@ type CareSiteRowProps = {
   executiveUnitType?: ScopeType
 }
 
-const CareSiteRow: React.FC<CareSiteRowProps> = (props: CareSiteRowProps) => {
+const ScopeTreeTableRow: React.FC<ScopeTreeTableRowProps> = (props: ScopeTreeTableRowProps) => {
   const {
     row,
     level,
@@ -57,8 +57,8 @@ const CareSiteRow: React.FC<CareSiteRowProps> = (props: CareSiteRowProps) => {
             root: level % 2 === 0 ? classes.mainRow : classes.secondRow
           }}
         >
-          <TableCell>
-            {row.subItems && row.subItems.length > 0 && (!isSearchMode || row.type !== executiveUnitType) && (
+          {row.subItems?.length > 0 && (!isSearchMode || row.type !== executiveUnitType) && (
+            <TableCell>
               <IconButton
                 onClick={() => onExpand(Number(row.id))}
                 style={{ marginLeft: level * 35, padding: 0, marginRight: -30 }}
@@ -69,8 +69,8 @@ const CareSiteRow: React.FC<CareSiteRowProps> = (props: CareSiteRowProps) => {
                   <KeyboardArrowRightIcon />
                 )}
               </IconButton>
-            )}
-          </TableCell>
+            </TableCell>
+          )}
 
           <TableCell align="center" padding="checkbox">
             <Checkbox
@@ -104,18 +104,12 @@ const CareSiteRow: React.FC<CareSiteRowProps> = (props: CareSiteRowProps) => {
           <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
             <Typography>{displayDigit(row.quantity)}</Typography>
           </TableCell>
-          {executiveUnitType ? (
-            <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
-              <Typography>{row.type ?? '-'}</Typography>
-            </TableCell>
-          ) : (
-            <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
-              <Typography>{row.access ?? parentAccess}</Typography>
-            </TableCell>
-          )}
+          <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
+            <Typography>{executiveUnitType ? row.type ?? '-' : row.access ?? parentAccess}</Typography>
+          </TableCell>
         </TableRow>
       )}
     </>
   )
 }
-export default CareSiteRow
+export default ScopeTreeTableRow

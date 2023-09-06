@@ -1,56 +1,66 @@
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
-import { Checkbox, CircularProgress, Grid, LinearProgress, Pagination } from '@mui/material'
-import { useDebounce } from 'utils/debounce'
+import { ScopeTreeRow } from 'types'
+import {
+  Checkbox,
+  CircularProgress,
+  Grid,
+  Pagination,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
+} from '@mui/material'
 import EnhancedTable from '../ScopeTreeTable'
+import useStyles from '../utils/styles'
+import { AppDispatch, useAppDispatch, useAppSelector } from 'state'
 import {
   getHeadCells,
+  init,
   isSearchIndeterminate,
   isSearchSelected,
   onExpand,
-  onSearchSelect,
-  onSearchSelectAll,
-  searchInPerimeters
+  onExplorationSelectAll,
+  onSearchSelect
 } from '../utils/scopeTreeUtils'
-import useStyles from '../utils/styles'
-import { useAppSelector } from 'state'
 import { ScopeState } from 'state/scope'
-import { ScopeTreeRow } from 'types'
-import { CareSiteSearchProps } from '../index'
-import CareSiteHierarchy from '../CareSiteHierarchy/CareSiteHierarchy'
+import { ScopeTreeExplorationProps } from '../index'
+import ScopeTreeHierarchy from '../ScopeTreeHierarchy/ScopeTreeHierarchy'
 
-const Index: React.FC<CareSiteSearchProps> = (props) => {
+const Index = (props: ScopeTreeExplorationProps) => {
   const {
-    searchInput,
     selectedItems,
     setSelectedItems,
     searchRootRows,
-    setSearchRootRows,
     executiveUnitType,
     isSelectionLoading,
     setIsSelectionLoading
   } = props
 
   const { classes } = useStyles()
+  const dispatch: AppDispatch = useAppDispatch()
 
   const { scopeState } = useAppSelector<{
     scopeState: ScopeState
   }>((state) => ({
     scopeState: state.scope || {}
   }))
-
   const { scopesList = [] } = scopeState
-  const [openPopulation, setOpenPopulations] = useState<number[]>(scopeState.openPopulation)
-  const [rootRows, setRootRows] = useState<ScopeTreeRow[]>([])
-  const controllerRef = useRef<AbortController | null>(null)
-  const [isEmpty, setIsEmpty] = useState<boolean>(true)
-  const debouncedSearchTerm = useDebounce(700, searchInput)
-  const [page, setPage] = useState(0)
-  const [count, setCount] = useState(0)
+  const [rootRows, setRootRows] = useState<ScopeTreeRow[]>(scopesList)
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false)
+  const [page, setPage] = useState(1)
+  const [count, setCount] = useState(0)
+  const [isEmpty, setIsEmpty] = useState<boolean>(!rootRows || rootRows.length === 0)
+  const [openPopulation, setOpenPopulations] = useState<number[]>([])
 
   const isHeadChecked: boolean = rootRows.length > 0 && rootRows.every((item) => isSearchSelected(item, selectedItems))
   const isHeadIndeterminate: boolean =
     !isHeadChecked && rootRows.length > 0 && !!rootRows.find((item) => isSearchIndeterminate(item, selectedItems))
+
+  const controllerRef: React.MutableRefObject<AbortController | null> = useRef<AbortController | null>(null)
 
   const headCheckbox: ReactElement = (
     <div style={{ padding: '0 0 0 4px' }}>
@@ -59,63 +69,52 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
         checked={isHeadChecked}
         indeterminate={isHeadIndeterminate}
         onClick={() =>
-          onSearchSelectAll(
-            rootRows,
-            selectedItems,
-            setSelectedItems,
-            isHeadChecked,
-            searchRootRows,
-            scopesList,
-            isSelectionLoading,
-            setIsSelectionLoading
-          )
+          onExplorationSelectAll(rootRows, setSelectedItems, isHeadChecked, isSelectionLoading, setIsSelectionLoading)
         }
       />
     </div>
   )
   const headCells = getHeadCells(headCheckbox, executiveUnitType)
 
-  const search = async () =>
-    await searchInPerimeters(
-      debouncedSearchTerm,
-      page,
-      controllerRef,
+  useEffect(() => {
+    init(
       setIsSearchLoading,
-      setIsEmpty,
-      setCount,
+      controllerRef,
+      rootRows,
       setRootRows,
-      searchRootRows,
-      setSearchRootRows,
       setOpenPopulations,
+      setCount,
+      setIsEmpty,
+      dispatch,
       executiveUnitType
     )
-
-  useEffect(() => {
-    if (debouncedSearchTerm) {
-      search()
-    }
-    return () => {
-      controllerRef.current?.abort()
-    }
-  }, [debouncedSearchTerm, page])
+  }, [])
 
   return (
     <div className={classes.container}>
-      {!isSearchLoading && <div className={classes.linearProgress}>{isSelectionLoading && <LinearProgress />}</div>}
       {isSearchLoading ? (
         <Grid container justifyContent="center">
           <CircularProgress size={50} />
         </Grid>
       ) : (
         <>
-          {!debouncedSearchTerm || isEmpty ? (
-            <EnhancedTable
-              noCheckbox
-              noPagination
-              rows={rootRows}
-              headCells={headCells}
-              emptyRowsMessage={'Aucun résultat à afficher'}
-            />
+          {isEmpty ? (
+            <TableContainer component={Paper}>
+              <Table className={classes.table}>
+                <TableHead>
+                  <TableRow className={classes.tableHead}>
+                    <TableCell align="center" className={classes.tableHeadCell} />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell colSpan={7}>
+                      <Typography className={classes.loadingSpinnerContainer}>Aucun résultat à afficher</Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
           ) : (
             <>
               <EnhancedTable noCheckbox noPagination rows={rootRows} headCells={headCells}>
@@ -124,7 +123,7 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
                   const labelId = `enhanced-table-checkbox-${index}`
 
                   return (
-                    <CareSiteHierarchy
+                    <ScopeTreeHierarchy
                       row={row}
                       level={0}
                       parentAccess={row.access ?? '-'}
@@ -139,7 +138,7 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
                           rootRows,
                           setRootRows,
                           selectedItems,
-                          undefined,
+                          dispatch,
                           executiveUnitType
                         )
                       }
@@ -151,13 +150,11 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
                           scopesList,
                           isSelectionLoading,
                           setIsSelectionLoading,
-                          setSelectedItems,
-                          setSearchRootRows
+                          setSelectedItems
                         )
                       }
                       isIndeterminate={(row: ScopeTreeRow) => isSearchIndeterminate(row, selectedItems)}
                       isSelected={(row: ScopeTreeRow) => isSearchSelected(row, selectedItems)}
-                      isSearchMode={true}
                       executiveUnitType={executiveUnitType}
                     />
                   )
