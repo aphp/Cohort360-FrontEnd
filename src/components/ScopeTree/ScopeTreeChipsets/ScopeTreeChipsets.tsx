@@ -3,11 +3,11 @@ import { Chip, List, ListItem } from '@mui/material'
 import React from 'react'
 import useStyles from './styles'
 
-type CareSiteChipsetsType = {
+type ScopeTreeChipsetsType = {
   selectedItems: ScopeTreeRow[]
   onDelete: (item: ScopeTreeRow) => void
 }
-const CareSiteChipsets: React.FC<CareSiteChipsetsType> = (props) => {
+const ScopeTreeChipsets: React.FC<ScopeTreeChipsetsType> = (props) => {
   const { selectedItems, onDelete } = props
 
   const { classes } = useStyles()
@@ -32,4 +32,4 @@ const CareSiteChipsets: React.FC<CareSiteChipsetsType> = (props) => {
     </>
   )
 }
-export default CareSiteChipsets
+export default ScopeTreeChipsets

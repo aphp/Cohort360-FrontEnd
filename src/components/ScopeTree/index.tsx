@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
-import CareSiteSearch from './CareSiteSearch/./index'
-import CareSiteExploration from './CareSiteExploration'
+import ScopeTreeSearch from './ScopeTreeSearch/./index'
+import ScopeTreeExploration from './ScopeTreeExploration'
 import { ScopeTreeRow, ScopeType } from 'types'
 import ScopeSearchBar from '../Inputs/ScopeSearchBar/ScopeSearchBar'
 import useStyles from './styles'
-import CareSiteChipsets from './CareSiteChipsets/CareSiteChipsets'
+import ScopeTreeChipsets from './ScopeTreeChipsets/ScopeTreeChipsets'
 import { onSelect } from './utils/scopeTreeUtils'
 import { useAppSelector } from 'state'
 import { ScopeState } from 'state/scope'
 
-export type CareSiteSearchProps = {
+export type ScopeTreeSearchProps = {
   searchInput: string
   selectedItems: ScopeTreeRow[]
   setSelectedItems: (selectedItems: ScopeTreeRow[]) => void
@@ -20,7 +20,7 @@ export type CareSiteSearchProps = {
   executiveUnitType?: ScopeType
 }
 
-export type CareSiteExplorationProps = {
+export type ScopeTreeExplorationProps = {
   selectedItems: ScopeTreeRow[]
   setSelectedItems: (selectedItems: ScopeTreeRow[]) => void
   searchRootRows: ScopeTreeRow[]
@@ -41,12 +41,12 @@ type ScopeTreeExcludedProps = {
 }
 type ScopeTreeProps = {
   [K in Exclude<
-    keyof CareSiteExplorationProps | keyof CareSiteSearchProps,
+    keyof ScopeTreeExplorationProps | keyof ScopeTreeSearchProps,
     keyof ScopeTreeExcludedProps
-  >]: K extends keyof CareSiteExplorationProps
-    ? CareSiteExplorationProps[K]
-    : K extends keyof CareSiteSearchProps
-    ? CareSiteSearchProps[K]
+  >]: K extends keyof ScopeTreeExplorationProps
+    ? ScopeTreeExplorationProps[K]
+    : K extends keyof ScopeTreeSearchProps
+    ? ScopeTreeSearchProps[K]
     : never
 }
 
@@ -68,7 +68,7 @@ const Index = (props: ScopeTreeProps) => {
   return (
     <>
       <div>
-        <CareSiteChipsets
+        <ScopeTreeChipsets
           selectedItems={selectedItems}
           onDelete={(item) =>
             onSelect(item, selectedItems, setSelectedItems, scopesList, isSelectionLoading, setIsSelectionLoading)
@@ -78,7 +78,7 @@ const Index = (props: ScopeTreeProps) => {
           <ScopeSearchBar searchInput={searchInput} setSearchInput={setSearchInput} />
         </div>
         {searchInput ? (
-          <CareSiteSearch
+          <ScopeTreeSearch
             searchInput={searchInput}
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
@@ -89,7 +89,7 @@ const Index = (props: ScopeTreeProps) => {
             setIsSelectionLoading={setIsSelectionLoading}
           />
         ) : (
-          <CareSiteExploration
+          <ScopeTreeExploration
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
             searchRootRows={searchRootRows}
