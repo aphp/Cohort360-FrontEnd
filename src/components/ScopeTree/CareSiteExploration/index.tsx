@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { ScopeTreeRow } from 'types'
 import {
+  Checkbox,
   CircularProgress,
   Grid,
   Pagination,
@@ -14,10 +15,9 @@ import {
   Typography
 } from '@mui/material'
 import EnhancedTable from '../ScopeTreeTable'
-import useStyles from '../commons/styles'
+import useStyles from '../utils/styles'
 import { AppDispatch, useAppDispatch, useAppSelector } from 'state'
 import {
-  displayCareSiteExplorationRow,
   getHeadCells,
   init,
   isSearchIndeterminate,
@@ -25,12 +25,20 @@ import {
   onExpand,
   onExplorationSelectAll,
   onSearchSelect
-} from '../commons/scopeTreeUtils'
+} from '../utils/scopeTreeUtils'
 import { ScopeState } from 'state/scope'
 import { CareSiteExplorationProps } from '../index'
+import CareSiteHierarchy from '../CareSiteHierarchy/CareSiteHierarchy'
 
 const Index = (props: CareSiteExplorationProps) => {
-  const { selectedItems, setSelectedItems, searchRootRows, executiveUnitType } = props
+  const {
+    selectedItems,
+    setSelectedItems,
+    searchRootRows,
+    executiveUnitType,
+    isSelectionLoading,
+    setIsSelectionLoading
+  } = props
 
   const { classes } = useStyles()
   const dispatch: AppDispatch = useAppDispatch()
@@ -54,12 +62,19 @@ const Index = (props: CareSiteExplorationProps) => {
 
   const controllerRef: React.MutableRefObject<AbortController | null> = useRef<AbortController | null>(null)
 
-  const headCells = getHeadCells(
-    isHeadChecked,
-    isHeadIndeterminate,
-    () => onExplorationSelectAll(rootRows, setSelectedItems, isHeadChecked),
-    executiveUnitType
+  const headCheckbox: ReactElement = (
+    <div style={{ padding: '0 0 0 4px' }}>
+      <Checkbox
+        color="secondary"
+        checked={isHeadChecked}
+        indeterminate={isHeadIndeterminate}
+        onClick={() =>
+          onExplorationSelectAll(rootRows, setSelectedItems, isHeadChecked, isSelectionLoading, setIsSelectionLoading)
+        }
+      />
+    </div>
   )
+  const headCells = getHeadCells(headCheckbox, executiveUnitType)
 
   useEffect(() => {
     init(
@@ -107,31 +122,41 @@ const Index = (props: CareSiteExplorationProps) => {
                   if (!row) return <></>
                   const labelId = `enhanced-table-checkbox-${index}`
 
-                  return displayCareSiteExplorationRow(
-                    row,
-                    0,
-                    row.access ?? '-',
-                    selectedItems,
-                    rootRows,
-                    openPopulation,
-                    labelId,
-                    (rowId: number) =>
-                      onExpand(
-                        rowId,
-                        controllerRef,
-                        openPopulation,
-                        setOpenPopulations,
-                        rootRows,
-                        setRootRows,
-                        selectedItems,
-                        dispatch,
-                        executiveUnitType
-                      ),
-                    (row: ScopeTreeRow) =>
-                      onSearchSelect(row, selectedItems, searchRootRows, scopesList, setSelectedItems),
-                    (row: ScopeTreeRow) => isSearchIndeterminate(row, selectedItems),
-                    (row: ScopeTreeRow) => isSearchSelected(row, selectedItems),
-                    executiveUnitType
+                  return (
+                    <CareSiteHierarchy
+                      row={row}
+                      level={0}
+                      parentAccess={row.access ?? '-'}
+                      openPopulation={openPopulation}
+                      labelId={labelId}
+                      onExpand={(rowId: number) =>
+                        onExpand(
+                          rowId,
+                          controllerRef,
+                          openPopulation,
+                          setOpenPopulations,
+                          rootRows,
+                          setRootRows,
+                          selectedItems,
+                          dispatch,
+                          executiveUnitType
+                        )
+                      }
+                      onSelect={(row: ScopeTreeRow) =>
+                        onSearchSelect(
+                          row,
+                          selectedItems,
+                          searchRootRows,
+                          scopesList,
+                          isSelectionLoading,
+                          setIsSelectionLoading,
+                          setSelectedItems
+                        )
+                      }
+                      isIndeterminate={(row: ScopeTreeRow) => isSearchIndeterminate(row, selectedItems)}
+                      isSelected={(row: ScopeTreeRow) => isSearchSelected(row, selectedItems)}
+                      executiveUnitType={executiveUnitType}
+                    />
                   )
                 }}
               </EnhancedTable>

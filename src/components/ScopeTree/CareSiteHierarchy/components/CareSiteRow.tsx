@@ -1,13 +1,13 @@
 import { ScopeTreeRow, ScopeType } from 'types'
 import React from 'react'
-import useStyles from '../../commons/styles'
+import useStyles from '../../utils/styles'
 import { Breadcrumbs, Checkbox, IconButton, Skeleton, TableCell, TableRow, Typography } from '@mui/material'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'
 import displayDigit from 'utils/displayDigit'
 import { LOADING } from 'services/aphp/servicePerimeters'
 
-type CareSiteSearchResultRowProps = {
+type CareSiteRowProps = {
   row: ScopeTreeRow
   level: number
   parentAccess: string
@@ -17,10 +17,11 @@ type CareSiteSearchResultRowProps = {
   onSelect: (row: ScopeTreeRow) => Promise<ScopeTreeRow[]>
   isIndeterminate: (row: ScopeTreeRow) => boolean | undefined
   isSelected: (row: ScopeTreeRow) => boolean
+  isSearchMode?: boolean
   executiveUnitType?: ScopeType
 }
 
-const CareSiteSearchRow: React.FC<CareSiteSearchResultRowProps> = (props: CareSiteSearchResultRowProps) => {
+const CareSiteRow: React.FC<CareSiteRowProps> = (props: CareSiteRowProps) => {
   const {
     row,
     level,
@@ -31,10 +32,14 @@ const CareSiteSearchRow: React.FC<CareSiteSearchResultRowProps> = (props: CareSi
     onSelect,
     isIndeterminate,
     isSelected,
+    isSearchMode,
     executiveUnitType
   } = props
 
   const { classes } = useStyles()
+
+  const _isSelected = isSelected(row)
+  const _isIndeterminate = !_isSelected && isIndeterminate(row)
 
   return (
     <>
@@ -53,7 +58,7 @@ const CareSiteSearchRow: React.FC<CareSiteSearchResultRowProps> = (props: CareSi
           }}
         >
           <TableCell>
-            {row.subItems && row.subItems.length > 0 && row.type !== executiveUnitType && (
+            {row.subItems && row.subItems.length > 0 && (!isSearchMode || row.type !== executiveUnitType) && (
               <IconButton
                 onClick={() => onExpand(Number(row.id))}
                 style={{ marginLeft: level * 35, padding: 0, marginRight: -30 }}
@@ -73,13 +78,15 @@ const CareSiteSearchRow: React.FC<CareSiteSearchResultRowProps> = (props: CareSi
               onClick={() => {
                 onSelect(row)
               }}
-              indeterminate={isIndeterminate(row)}
-              checked={isSelected(row) ? true : false}
+              indeterminate={_isIndeterminate}
+              checked={_isSelected}
               inputProps={{ 'aria-labelledby': labelId }}
             />
           </TableCell>
           <TableCell>
-            {row.full_path ? (
+            {!isSearchMode ? (
+              <Typography>{row.name}</Typography>
+            ) : row.full_path ? (
               <Breadcrumbs maxItems={2}>
                 {(row.full_path.split('/').length > 1
                   ? row.full_path.split('/').slice(1)
@@ -111,4 +118,4 @@ const CareSiteSearchRow: React.FC<CareSiteSearchResultRowProps> = (props: CareSi
     </>
   )
 }
-export default CareSiteSearchRow
+export default CareSiteRow

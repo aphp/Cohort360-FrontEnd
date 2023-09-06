@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { CircularProgress, Grid, Pagination } from '@mui/material'
+import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import { Checkbox, CircularProgress, Grid, LinearProgress, Pagination } from '@mui/material'
 import { useDebounce } from 'utils/debounce'
 import EnhancedTable from '../ScopeTreeTable'
 import {
-  displayCareSiteSearchResultRow,
   getHeadCells,
   isSearchIndeterminate,
   isSearchSelected,
@@ -11,15 +10,25 @@ import {
   onSearchSelect,
   onSearchSelectAll,
   searchInPerimeters
-} from '../commons/scopeTreeUtils'
-import useStyles from '../commons/styles'
+} from '../utils/scopeTreeUtils'
+import useStyles from '../utils/styles'
 import { useAppSelector } from 'state'
 import { ScopeState } from 'state/scope'
 import { ScopeTreeRow } from 'types'
 import { CareSiteSearchProps } from '../index'
+import CareSiteHierarchy from '../CareSiteHierarchy/CareSiteHierarchy'
 
 const Index: React.FC<CareSiteSearchProps> = (props) => {
-  const { searchInput, selectedItems, setSelectedItems, searchRootRows, setSearchRootRows, executiveUnitType } = props
+  const {
+    searchInput,
+    selectedItems,
+    setSelectedItems,
+    searchRootRows,
+    setSearchRootRows,
+    executiveUnitType,
+    isSelectionLoading,
+    setIsSelectionLoading
+  } = props
 
   const { classes } = useStyles()
 
@@ -43,12 +52,28 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
   const isHeadIndeterminate: boolean =
     !isHeadChecked && rootRows.length > 0 && !!rootRows.find((item) => isSearchIndeterminate(item, selectedItems))
 
-  const headCells = getHeadCells(
-    isHeadChecked,
-    isHeadIndeterminate,
-    () => onSearchSelectAll(rootRows, selectedItems, setSelectedItems, isHeadChecked, searchRootRows, scopesList),
-    executiveUnitType
+  const headCheckbox: ReactElement = (
+    <div style={{ padding: '0 0 0 4px' }}>
+      <Checkbox
+        color="secondary"
+        checked={isHeadChecked}
+        indeterminate={isHeadIndeterminate}
+        onClick={() =>
+          onSearchSelectAll(
+            rootRows,
+            selectedItems,
+            setSelectedItems,
+            isHeadChecked,
+            searchRootRows,
+            scopesList,
+            isSelectionLoading,
+            setIsSelectionLoading
+          )
+        }
+      />
+    </div>
   )
+  const headCells = getHeadCells(headCheckbox, executiveUnitType)
 
   const search = async () =>
     await searchInPerimeters(
@@ -66,26 +91,17 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
     )
 
   useEffect(() => {
-    let delayTimer: string | number | NodeJS.Timeout | undefined = undefined
-    if (debouncedSearchTerm) {
-      delayTimer = setTimeout(search, 600)
-    } else {
-      setRootRows([])
-    }
-    return () => {
-      controllerRef.current?.abort()
-      clearTimeout(delayTimer)
-    }
-  }, [debouncedSearchTerm])
-
-  useEffect(() => {
     if (debouncedSearchTerm) {
       search()
     }
-  }, [page])
+    return () => {
+      controllerRef.current?.abort()
+    }
+  }, [debouncedSearchTerm, page])
 
   return (
     <div className={classes.container}>
+      {!isSearchLoading && <div className={classes.linearProgress}>{isSelectionLoading && <LinearProgress />}</div>}
       {isSearchLoading ? (
         <Grid container justifyContent="center">
           <CircularProgress size={50} />
@@ -107,38 +123,43 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
                   if (!row) return <></>
                   const labelId = `enhanced-table-checkbox-${index}`
 
-                  return displayCareSiteSearchResultRow(
-                    row,
-                    0,
-                    row.access ?? '-',
-                    selectedItems,
-                    rootRows,
-                    openPopulation,
-                    labelId,
-                    (rowId: number) =>
-                      onExpand(
-                        rowId,
-                        controllerRef,
-                        openPopulation,
-                        setOpenPopulations,
-                        rootRows,
-                        setRootRows,
-                        selectedItems,
-                        undefined,
-                        executiveUnitType
-                      ),
-                    (row: ScopeTreeRow) =>
-                      onSearchSelect(
-                        row,
-                        selectedItems,
-                        searchRootRows,
-                        scopesList,
-                        setSelectedItems,
-                        setSearchRootRows
-                      ),
-                    (row: ScopeTreeRow) => isSearchIndeterminate(row, selectedItems),
-                    (row: ScopeTreeRow) => isSearchSelected(row, selectedItems),
-                    executiveUnitType
+                  return (
+                    <CareSiteHierarchy
+                      row={row}
+                      level={0}
+                      parentAccess={row.access ?? '-'}
+                      openPopulation={openPopulation}
+                      labelId={labelId}
+                      onExpand={(rowId: number) =>
+                        onExpand(
+                          rowId,
+                          controllerRef,
+                          openPopulation,
+                          setOpenPopulations,
+                          rootRows,
+                          setRootRows,
+                          selectedItems,
+                          undefined,
+                          executiveUnitType
+                        )
+                      }
+                      onSelect={(row: ScopeTreeRow) =>
+                        onSearchSelect(
+                          row,
+                          selectedItems,
+                          searchRootRows,
+                          scopesList,
+                          isSelectionLoading,
+                          setIsSelectionLoading,
+                          setSelectedItems,
+                          setSearchRootRows
+                        )
+                      }
+                      isIndeterminate={(row: ScopeTreeRow) => isSearchIndeterminate(row, selectedItems)}
+                      isSelected={(row: ScopeTreeRow) => isSearchSelected(row, selectedItems)}
+                      isSearchMode={true}
+                      executiveUnitType={executiveUnitType}
+                    />
                   )
                 }}
               </EnhancedTable>
