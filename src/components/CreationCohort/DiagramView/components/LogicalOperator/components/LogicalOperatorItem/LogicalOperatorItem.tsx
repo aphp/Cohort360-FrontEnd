@@ -31,7 +31,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
   const [openConfirmationDialog, setOpenConfirmationDialog] = useState<boolean>(false)
 
   const { request } = useAppSelector((state) => state.cohortCreation || {})
-  const { criteriaGroup } = request
+  const { criteriaGroup, temporalConstraints } = request
 
   useEffect(() => {
     const currentLogicalOperator = criteriaGroup.find(({ id }) => id === itemId)
@@ -170,6 +170,19 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
     _buildCohortCreation()
   }
 
+  const deleteInvalidConstraints = () => {
+    const currentLogicalOperatorCriteriaIds: number[] = criteriaGroup.find(({ id }) => id === itemId)?.criteriaIds ?? []
+
+    const correctConstraints = temporalConstraints.filter(
+      (constraint) =>
+        !(constraint.idList as number[]).every((criteriaId: number) =>
+          currentLogicalOperatorCriteriaIds.includes(criteriaId)
+        )
+    )
+
+    dispatch(updateTemporalConstraints(correctConstraints))
+  }
+
   return (
     <>
       {isOpen && <div className={classes.backDrop} onClick={() => setOpen(false)} />}
@@ -207,7 +220,6 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
             <Typography variant="h5" className={classes.descriptionText}>
               les patients validant
             </Typography>
-
             <Select
               labelId="inclusive-simple-select-label"
               id="inclusive-select"
@@ -215,11 +227,14 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               classes={{ icon: classes.selectIcon }}
               className={classes.inputSelect}
               onChange={(event) => {
-                if (isMainOperator && event.target.value !== 'andGroup') {
-                  setOpenConfirmationDialog(true)
-                } else {
-                  _handleChangeLogicalOperatorProps('groupType', event.target.value)
+                if (event.target.value !== 'andGroup') {
+                  if (isMainOperator) {
+                    setOpenConfirmationDialog(true)
+                  } else {
+                    deleteInvalidConstraints()
+                  }
                 }
+                _handleChangeLogicalOperatorProps('groupType', event.target.value)
               }}
               style={{ color: 'currentColor' }}
               variant="standard"
