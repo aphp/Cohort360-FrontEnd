@@ -28,18 +28,18 @@ import { InputSearchDocumentSimple } from 'components/Inputs'
 
 import useStyles from './styles'
 
+import {
+  CriteriaName,
+  DocType,
+  DocumentDataType,
+  ErrorDetails,
+  SearchInputError,
+  CriteriaDrawerComponentProps
+} from 'types'
 import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
 import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import { SearchByTypes } from 'types/searchCriterias'
-import {
-  CriteriaDrawerComponentProps,
-  CriteriaName,
-  DocType,
-  DocumentDataType,
-  errorDetails,
-  searchInputError
-} from 'types'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 const defaultComposition: DocumentDataType = {
@@ -64,7 +64,7 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const [searchCheckingLoading, setSearchCheckingLoading] = useState(false)
-  const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
+  const [searchInputError, setSearchInputError] = useState<SearchInputError | undefined>(undefined)
   const debouncedSearchItem = useDebounce(500, defaultValues.search)
 
   const isEdition = selectedCriteria !== null ? true : false
@@ -198,7 +198,7 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
                   <Typography>Vérifiez que le champ de recherche contient au moins une lettre.</Typography>
                 )}
                 {searchInputError.errorsDetails &&
-                  searchInputError.errorsDetails.map((detail: errorDetails, count: number) => (
+                  searchInputError.errorsDetails.map((detail: ErrorDetails, count: number) => (
                     <Typography key={count}>
                       {`- ${
                         detail.errorPositions && detail.errorPositions.length > 0

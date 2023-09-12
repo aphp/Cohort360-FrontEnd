@@ -643,14 +643,14 @@ type fetchMedicationRequestProps = {
   id?: string
   size?: number
   offset?: number
-  _sort?: string
-  sortDirection?: 'asc' | 'desc'
+  _sort?: Order
+  sortDirection?: Direction
   _text?: string
   encounter?: string
   subject?: string
   type?: string
-  minDate?: string
-  maxDate?: string
+  minDate: string | null
+  maxDate: string | null
   _list?: string[]
   signal?: AbortSignal
   executiveUnits?: string[]
@@ -715,8 +715,8 @@ type fetchMedicationAdministrationProps = {
   encounter?: string
   subject?: string
   route?: string
-  minDate?: string
-  maxDate?: string
+  minDate: string | null
+  maxDate: string | null
   _list?: string[]
   signal?: AbortSignal
   executiveUnits?: string[]

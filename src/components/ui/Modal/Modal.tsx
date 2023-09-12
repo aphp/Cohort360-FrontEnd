@@ -1,42 +1,50 @@
-import React, { ReactElement, useState } from 'react'
+import React, { PropsWithChildren, ReactElement, ReactNode, createContext, useState } from 'react'
 
 import { Button, Dialog, DialogActions, DialogTitle } from '@mui/material'
 import { DialogContentWrapper } from './style'
+import { FormContextType } from 'types/form'
 
-type ModalProps<T> = {
-  children: ReactElement
+export const FormContext = createContext<FormContextType | null>(null)
+
+type ModalProps = {
   open: boolean
-  title: string
-  data: T
+  title?: string
   width?: string
-  onSubmit: (value: T) => void
-  onClose: () => void
+  onSubmit?: (value: any) => void
+  onClose?: () => void
 }
 
-const Modal = <T,>({ children, data, title, open, width = '400px', onSubmit, onClose }: ModalProps<T>) => {
-  const [_data, setData] = useState<T>(data)
+const Modal = ({ children, title, open, width = '400px', onSubmit, onClose }: PropsWithChildren<ModalProps>) => {
+  const [formData, setFormData] = useState<Record<string, any>>({})
+
+  const updateFormData = (name: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+  const handleSubmit = () => {
+    if (onSubmit) onSubmit(formData)
+  }
   return (
-    <>
-      {open && (
-        <Dialog open onClose={onClose}>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogContentWrapper width={width}>
-            {React.cloneElement(children, { onChange: setData, data: _data })}
-          </DialogContentWrapper>
+    <FormContext.Provider value={{ updateFormData }}>
+      <Dialog open={open} onClose={onClose}>
+        {title && <DialogTitle>{title}</DialogTitle>}
+        <DialogContentWrapper width={width}>{children}</DialogContentWrapper>
+        {(onSubmit || onClose) && (
           <DialogActions>
-            <Button onClick={onClose}>Annuler</Button>
-            <Button
-              onClick={() => {
-                onSubmit(_data)
-                onClose()
-              }} /*disabled={error}*/
-            >
-              Valider
-            </Button>
+            {onClose && <Button onClick={onClose}>Annuler</Button>}
+            {onSubmit && Object.keys(formData).length > 0 && (
+              <Button
+                onClick={() => {
+                  handleSubmit()
+                  if (onClose) onClose()
+                }}
+              >
+                Valider
+              </Button>
+            )}
           </DialogActions>
-        </Dialog>
-      )}
-    </>
+        )}
+      </Dialog>
+    </FormContext.Provider>
   )
 }
 

@@ -12,7 +12,7 @@ import {
 import { ageName } from './age'
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
-import { ScopeTreeRow } from 'types'
+import { ScopeTreeRow, SimpleCodeType } from 'types'
 
 export const isChecked = <T>(value: T, arr: T[]): boolean => {
   return arr.includes(value)
@@ -39,10 +39,15 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.VITAL_STATUSES:
       case FilterKeys.DIAGNOSTIC_TYPES:
       case FilterKeys.EXECUTIVE_UNITS:
+      case FilterKeys.ADMINISTRATION_ROUTES:
+      case FilterKeys.PRESCRIPTION_TYPES:
+      case FilterKeys.DOC_TYPES:
         castedFilters[key] = removeElementInArray(castedFilters[key], value)
         break
       case FilterKeys.CODE:
       case FilterKeys.NDA:
+      case FilterKeys.ANABIO:
+      case FilterKeys.LOINC:
         castedFilters[key] = removeElementInArray((castedFilters[key] as string).split(','), value as string).join(',')
         break
       case FilterKeys.BIRTHDATES:
@@ -59,7 +64,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
 
 export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.BIRTHDATES) {
-    return ageName(value as DateRange) || ''
+    return ageName(value as DateRange)
   }
   if (key === FilterKeys.GENDERS) {
     return GenderStatusLabel[value as GenderStatus]
@@ -82,8 +87,23 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.EXECUTIVE_UNITS) {
     return `Unité exécutrice : ${(value as ScopeTreeRow).name}`
   }
+  if (key === FilterKeys.DOC_TYPES) {
+    return (value as SimpleCodeType).label
+  }
   if (key === FilterKeys.DIAGNOSTIC_TYPES) {
     return `Type : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
+  }
+  if (key === FilterKeys.ADMINISTRATION_ROUTES) {
+    return `Voie d'administration : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
+  }
+  if (key === FilterKeys.PRESCRIPTION_TYPES) {
+    return `Type de prescription : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
+  }
+  if (key === FilterKeys.ANABIO) {
+    return `Code ANABIO : ${value}`
+  }
+  if (key === FilterKeys.LOINC) {
+    return `Code LOINC : ${value}`
   }
   return ''
 }
@@ -98,6 +118,9 @@ export const selectFiltersAsArray = (filters: Filters) => {
         case FilterKeys.GENDERS:
         case FilterKeys.VITAL_STATUSES:
         case FilterKeys.DIAGNOSTIC_TYPES:
+        case FilterKeys.ADMINISTRATION_ROUTES:
+        case FilterKeys.PRESCRIPTION_TYPES:
+        case FilterKeys.DOC_TYPES:
         case FilterKeys.EXECUTIVE_UNITS:
           ;(value as []).forEach((elem) =>
             result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
@@ -122,6 +145,8 @@ export const selectFiltersAsArray = (filters: Filters) => {
           break
         case FilterKeys.NDA:
         case FilterKeys.CODE:
+        case FilterKeys.ANABIO:
+        case FilterKeys.LOINC:
           ;(value as string).split(',').forEach((elem) =>
             result.push({
               category: key,
@@ -130,12 +155,6 @@ export const selectFiltersAsArray = (filters: Filters) => {
             })
           )
           break
-        default:
-          result.push({
-            category: key as FilterKeys,
-            label: getFilterLabel(key as FilterKeys, value),
-            value: null
-          })
       }
     }
   }

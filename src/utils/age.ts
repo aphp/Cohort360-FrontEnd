@@ -1,5 +1,6 @@
 import { AgeRangeType, CohortPatient } from 'types'
 import moment from 'moment'
+import { DateRange } from 'types/searchCriterias'
 
 export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'months'): string => {
   if (ageValue === 0 && momentUnit === 'months') return '< 1 mois'
@@ -38,7 +39,7 @@ export const getAge = (patient: CohortPatient): string => {
   return 'Âge inconnu'
 }
 
-export const ageName = (dates: [string, string]) => {
+export const ageName = (dates: DateRange) => {
   const minDate: AgeRangeType = convertStringToAgeRangeType(dates[1]) ?? { year: 0, month: 0, days: 0 }
   const maxDate: AgeRangeType = convertStringToAgeRangeType(dates[0]) ?? { year: 0, month: 0, days: 0 }
 
@@ -50,7 +51,7 @@ export const ageName = (dates: [string, string]) => {
     !maxDate.month &&
     !maxDate.days
   ) {
-    return null
+    return ''
   }
 
   return `Age entre
@@ -86,7 +87,7 @@ export const substructAgeString = (range: string): Date => {
   return substructAgeRangeType(ageRangeType)
 }
 
-export const convertStringToAgeRangeType = (age: string): AgeRangeType | undefined => {
+export const convertStringToAgeRangeType = (age: string | null): AgeRangeType | undefined => {
   if (!age) return undefined
   const newAge: AgeRangeType = {
     year: Number(age.split('/')[2]),

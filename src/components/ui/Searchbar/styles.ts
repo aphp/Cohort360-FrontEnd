@@ -1,7 +1,8 @@
 import { styled } from '@mui/material/styles'
 
 type CustomProps = {
-  width: string
+  width?: string
+  error?: boolean
 }
 
 export const StyledSearchbar = styled('div')(() => ({
@@ -34,15 +35,22 @@ export const SelectInput = styled('div')(() => ({
   }
 }))
 
-export const SearchInputWrapper = styled('div')<CustomProps>(({ width }) => ({
+export const SearchInputWrapper = styled('div')<CustomProps>(({ width, error }) => ({
+  flex: 1,
   width: width,
   height: 30,
   backgroundColor: '#FFF',
-  border: '1px solid #D0D7D8',
+  border: error ? '1px solid #F44336' : '1px solid #D0D7D8',
   boxShadow: '0px 1px 16px #0000000A',
   borderRadius: 25,
   '.MuiInputBase-root': {
-    marginLeft: '5%',
-    width: '95%'
+    marginLeft: 10,
+    width: '100%'
   }
+}))
+
+export const ErrorWrapper = styled('div')(() => ({
+  color: '#f44336',
+  width: '100%',
+  padding: '0 16px'
 }))
