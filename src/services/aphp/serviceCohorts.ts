@@ -7,8 +7,8 @@ import {
   Cohort,
   AgeRepartitionType,
   GenderRepartitionType,
-  searchInputError,
-  errorDetails,
+  SearchInputError,
+  ErrorDetails,
   ChartCode
 } from 'types'
 import {
@@ -159,7 +159,7 @@ export interface IServiceCohorts {
    * Retourne:
    *   - searchInputError: objet décrivant la ou les erreurs du champ de recherche s'il y en a
    */
-  checkDocumentSearchInput: (searchInput: string, signal?: AbortSignal) => Promise<searchInputError>
+  checkDocumentSearchInput: (searchInput: string, signal?: AbortSignal) => Promise<SearchInputError>
 
   /**
    * Permet de récupérer le contenu d'un document
@@ -504,7 +504,7 @@ const servicesCohorts: IServiceCohorts = {
     if (checkDocumentSearchInput) {
       const errors = checkDocumentSearchInput.find((parameter) => parameter.name === 'WARNING')?.part ?? []
 
-      const parsedErrors: errorDetails[] = []
+      const parsedErrors: ErrorDetails[] = []
 
       errors.forEach((error: ParametersParameter) => {
         try {

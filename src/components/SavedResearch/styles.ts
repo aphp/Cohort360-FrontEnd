@@ -31,7 +31,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
     marginLeft: 8
   },
   chips: {
-    margin: '12px 6px',
+    marginRight: '6px',
+    marginBottom: '12px',
     '&:last-child': {
       marginRight: 0
     }

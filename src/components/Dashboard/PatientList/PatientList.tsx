@@ -27,13 +27,15 @@ import Select from 'components/ui/Searchbar/Select'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import { CircularProgress } from '@mui/material'
-import { ActionTypes, searchByList, SearchByTypes } from 'types/searchCriterias'
+import { ActionTypes, FilterKeys, searchByListPatients, SearchByTypes } from 'types/searchCriterias'
 import Chip from 'components/ui/Chips/Chip'
-import FiltersModal from 'components/Filters/FiltersModal'
 import Button from 'components/ui/Button/Button'
 import Modal from 'components/ui/Modal/Modal'
-import useSearchCriterias, { initPatientsSearchCriterias } from 'hooks/searchCriterias'
+import useSearchCriterias, { initPatientsSearchCriterias } from 'hooks/useSearchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
+import GendersFilter from 'components/Filters/GendersFilter/GenderFilter'
+import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter.tsx/VitalStatusesFilter'
+import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters/BirthdatesRangesFilter'
 
 type PatientListProps = {
   total: number
@@ -60,6 +62,7 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
       orderBy,
       searchBy,
       searchInput,
+      filters,
       filters: { genders, birthdatesRanges, vitalStatuses }
     },
     dispatch
@@ -159,7 +162,7 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
               selectedValue={searchBy || SearchByTypes.TEXT}
               label="Rechercher dans :"
               width={'25%'}
-              items={searchByList}
+              items={searchByListPatients}
               onchange={(newValue: SearchByTypes) =>
                 dispatch({ type: ActionTypes.CHANGE_SEARCH_BY, payload: newValue })
               }
@@ -173,19 +176,19 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
             <Button width={'25%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
               Filtrer
             </Button>
-            {toggleModal && (
-              <Modal
-                data={{ genders, vitalStatuses, birthdatesRanges }}
-                title="Filtrer les patients"
-                open={toggleModal}
-                onClose={() => setToggleModal(false)}
-                onSubmit={(newFilters) => {
-                  dispatch({ type: ActionTypes.ADD_FILTERS, payload: newFilters })
-                }}
-              >
-                <FiltersModal />
-              </Modal>
-            )}
+
+            <Modal
+              title="Filtrer les patients"
+              open={toggleModal}
+              onClose={() => setToggleModal(false)}
+              onSubmit={(newFilters) => {
+                dispatch({ type: ActionTypes.ADD_FILTERS, payload: { ...filters, ...newFilters } })
+              }}
+            >
+              <GendersFilter name={FilterKeys.GENDERS} value={genders} />
+              <VitalStatusesFilter name={FilterKeys.VITAL_STATUSES} value={vitalStatuses} />
+              <BirthdatesRangesFilter name={FilterKeys.BIRTHDATES} value={birthdatesRanges} />
+            </Modal>
           </Grid>
         </Searchbar>
       </Grid>
@@ -206,8 +209,8 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
           groupId={groupId}
           deidentified={deidentified ?? false}
           patientsList={patientsList ?? []}
-          order={orderBy}
-          setOrder={(order) => dispatch({ type: ActionTypes.CHANGE_ORDER_BY, payload: order })}
+          orderBy={orderBy}
+          setOrderBy={(orderBy) => dispatch({ type: ActionTypes.CHANGE_ORDER_BY, payload: orderBy })}
           page={page}
           setPage={(newPage) => setPage(newPage)}
           total={patientsResult.nb}

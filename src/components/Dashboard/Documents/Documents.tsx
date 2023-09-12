@@ -9,7 +9,7 @@ import MasterChips from 'components/ui/Chips/Chips'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import { CohortComposition, DocumentFilters, DTTB_ResultsType as ResultsType, searchInputError } from 'types'
+import { CohortComposition, DocumentFilters, DTTB_ResultsType as ResultsType, SearchInputError } from 'types'
 
 import services from 'services/aphp'
 
@@ -55,7 +55,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     orderDirection: Direction.DESC
   })
 
-  const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
+  const [searchInputError, setSearchInputError] = useState<SearchInputError | undefined>(undefined)
   const controllerRef = useRef<AbortController>(new AbortController())
   const debouncedSearchInput = useDebounce(500, searchInput)
 
@@ -280,8 +280,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
           searchMode={searchMode}
           groupId={groupId}
           documentsList={documents ?? []}
-          order={order}
-          setOrder={setOrder}
+          orderBy={order}
+          setOrderBy={setOrder}
           page={page}
           setPage={(newPage: number) => handleChangePage(newPage)}
           total={documentsResult.nb}

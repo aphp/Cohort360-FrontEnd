@@ -6,11 +6,11 @@ type SelectProps<T> = {
   selectedValue: T
   label: string
   items: { id: T; label: string }[]
-  width: string
+  width?: string
   onchange: (value: T) => void
 }
 
-const Select = <T,>({ selectedValue, label, items, width, onchange }: SelectProps<T>) => {
+const Select = <T,>({ selectedValue, label, items, width = '100%', onchange }: SelectProps<T>) => {
   return (
     <SelectWrapper width={width}>
       <FormControl variant="outlined">
