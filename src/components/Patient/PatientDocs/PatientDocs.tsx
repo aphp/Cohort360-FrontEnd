@@ -1,88 +1,86 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useMemo } from 'react'
 
-import { Alert, Checkbox, Grid, Typography } from '@mui/material'
+import { Alert, Checkbox, CircularProgress, Grid, Typography } from '@mui/material'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
-import DataTableTopBar from 'components/DataTable/DataTableTopBar'
-import MasterChips from 'components/ui/Chips/Chips'
 
-import { DocumentFilters, LoadingStatus } from 'types'
+import { CriteriaName, LoadingStatus } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'
 
-import { buildDocumentFiltersChips } from 'utils/chips'
-import docTypes from 'assets/docTypes.json'
-import { useDebounce } from 'utils/debounce'
+import allDocTypesList from 'assets/docTypes.json'
 
 import useStyles from './styles'
 import { _cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
-import { Direction, Order, OrderBy, SearchByTypes } from 'types/searchCriterias'
+import { ActionTypes, FilterKeys, SearchByTypes, searchByListDocuments } from 'types/searchCriterias'
+import { PatientTypes } from 'types/patient'
+import useSearchCriterias, { initDocsSearchCriterias } from 'hooks/useSearchCriterias'
+import Modal from 'components/ui/Modal/Modal'
+import Button from 'components/ui/Button/Button'
+import NdaFilter from 'components/Filters/NdaFilter/NdaFilter'
+import Searchbar from 'components/ui/Searchbar/Searchbar'
+import Chip from 'components/ui/Chips/Chip'
+import { selectFiltersAsArray } from 'utils/filters'
+import SearchInput from 'components/ui/Searchbar/SearchInput'
+import Select from 'components/ui/Searchbar/Select'
+import DisplayDigits from 'components/ui/Display/DisplayDigits'
+import DocTypesFilter from 'components/Filters/DocTypesFilter/DocTypesFilter'
+import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilter'
+import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/ExecutiveUnitsFilter'
 
-type PatientDocsProps = {
-  groupId?: string
-}
-const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
+const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
+  const [toggleModal, setToggleModal] = useState(false)
   const { patient } = useAppSelector((state) => ({
     patient: state.patient
   }))
-
-  const deidentified = patient?.deidentified ?? true
-
-  const totalDocs = patient?.documents?.count ?? 0
-  const totalAllDoc = patient?.documents?.total ?? 0
-  const searchInputError = patient?.documents?.searchInputError ?? undefined
-  const patientDocumentsList = patient?.documents?.list ?? []
+  const searchResults = {
+    deidentified: patient?.deidentified || false,
+    totalDocs: patient?.documents?.count ?? 0,
+    totalAllDoc: patient?.documents?.total ?? 0,
+    patientDocumentsList: patient?.documents?.list ?? [],
+    searchInputError: patient?.documents?.searchInputError ?? undefined,
+    label: 'document(s)'
+  }
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [page, setPage] = useState(1)
-  const [filters, setFilters] = useState<DocumentFilters>({
-    nda: '',
-    selectedDocTypes: [],
-    startDate: null,
-    endDate: null,
-    onlyPdfAvailable: deidentified ? false : true,
-    executiveUnits: []
-  })
-  const [searchInput, setSearchInput] = useState('')
-  const [order, setOrder] = useState<OrderBy>({
-    orderBy: Order.DATE,
-    orderDirection: Direction.DESC
-  })
-  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.TEXT)
-  const [open, setOpen] = useState<'filter' | null>(null)
-  const debouncedSearchInput = useDebounce(500, searchInput)
+  const [
+    {
+      orderBy,
+      searchInput,
+      searchBy,
+      filters,
+      filters: { nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate }
+    },
+    dispatchSearchCriteriasAction
+  ] = useSearchCriterias(initDocsSearchCriterias)
+  const filtersAsArray = useMemo(() => {
+    return selectFiltersAsArray({ nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate })
+  }, [nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate])
 
   const controllerRef = useRef<AbortController>(new AbortController())
 
   const fetchDocumentsList = async () => {
     try {
-      const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
       setLoadingStatus(LoadingStatus.FETCHING)
       const response = await dispatch(
         fetchDocuments({
-          signal: controllerRef.current?.signal,
-          groupId,
           options: {
             page,
-            searchBy: searchBy,
-            sort: {
-              by: order.orderBy,
-              direction: order.orderDirection
-            },
-            filters: {
-              ...filters,
-              searchInput: debouncedSearchInput,
-              selectedDocTypes: selectedDocTypesCodes,
-              executiveUnits: filters.executiveUnits.map((executiveUnit) => executiveUnit.id)
+            searchCriterias: {
+              orderBy,
+              searchInput,
+              filters: { nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate }
             }
-          }
+          },
+          groupId,
+          signal: controllerRef.current?.signal
         })
       )
       if (response.payload.error) {
@@ -96,65 +94,10 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     }
   }
 
-  const onChangeOptions = (key: string, value: any) => {
-    setFilters((prevState) => ({
-      ...prevState,
-      [key]: value
-    }))
-  }
-
-  const handleDeleteChip = (filterName: string, value?: string) => {
-    switch (filterName) {
-      case 'nda':
-        onChangeOptions(filterName, value)
-        break
-      case 'selectedDocTypes': {
-        const typesName = docTypes.docTypes
-          .map((docType: any) => docType.type)
-          .filter((item, index, array) => array.indexOf(item) === index)
-        const isGroupItem = typesName.find((typeName) => typeName === value)
-
-        if (!isGroupItem) {
-          onChangeOptions(
-            filterName,
-            filters.selectedDocTypes.filter((item) => item.label !== value)
-          )
-        } else {
-          onChangeOptions(
-            filterName,
-            filters.selectedDocTypes.filter((item) => item.type !== value)
-          )
-        }
-        break
-      }
-      case 'executiveUnits':
-        onChangeOptions(
-          filterName,
-          filters.executiveUnits.filter((executiveUnit) => executiveUnit.name !== value)
-        )
-        break
-      case 'startDate':
-      case 'endDate':
-        onChangeOptions(filterName, null)
-        break
-    }
-  }
-
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [
-    debouncedSearchInput,
-    filters.onlyPdfAvailable,
-    filters.nda,
-    filters.selectedDocTypes,
-    filters.startDate,
-    filters.endDate,
-    filters.executiveUnits,
-    order.orderBy,
-    order.orderDirection,
-    searchBy
-  ])
+  }, [onlyPdfAvailable, nda, docTypes, startDate, endDate, executiveUnits, orderBy, searchBy, searchInput])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -169,64 +112,118 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
-      <DataTableTopBar
-        loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
-        results={{ nb: totalDocs, total: totalAllDoc, label: 'document(s)' }}
-        searchBar={{
-          type: 'document',
-          value: searchInput ? searchInput.replace(/^\/\(\.\)\*|\(\.\)\*\/$/gi, '') : '',
-          error: searchInputError,
-          searchBy: searchBy,
-          onSearch: (newSearchInput: string, newSearchBy: SearchByTypes) => {
-            setSearchInput(newSearchInput)
-            setSearchBy(newSearchBy)
-          }
-        }}
-        buttons={[
-          {
-            label: 'Filtrer',
-            icon: <FilterList height="15px" fill="#FFF" />,
-            onClick: () => setOpen('filter')
-          }
-        ]}
-      />
+      <Grid item xs={12}>
+        <Alert
+          severity="info"
+          style={{ backgroundColor: 'transparent', fontSize: 13, padding: 0, fontWeight: 'bold', color: '#0288d1' }}
+        >
+          Attention : La recherche est pseudonymisée pour la prévisualisation des documents. Vous pouvez donc trouver
+          des incohérences entre les informations de votre patient et celles du document prévisualisé.
+        </Alert>
+      </Grid>
+      <Grid item xs={12}>
+        <Searchbar>
+          <Grid container>
+            <Select
+              selectedValue={searchBy || SearchByTypes.TEXT}
+              label="Rechercher dans :"
+              width={'170px'}
+              items={searchByListDocuments}
+              onchange={(newValue) =>
+                dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_BY, payload: newValue })
+              }
+            />
+            <SearchInput
+              value={searchInput}
+              placeholder={'Rechercher dans les documents'}
+              displayHelpIcon
+              error={searchResults.searchInputError}
+              onchange={(newValue) =>
+                dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })
+              }
+            />
+          </Grid>
+          <Grid container item xs={12} justifyContent="flex-end">
+            <Button
+              width={'150px'}
+              icon={<FilterList height="15px" fill="#FFF" />}
+              onClick={() => setToggleModal(true)}
+            >
+              Filtrer
+            </Button>
+            <Modal
+              title="Filtrer par :"
+              open={toggleModal}
+              width={'600px'}
+              onClose={() => setToggleModal(false)}
+              onSubmit={(newFilters) => {
+                dispatchSearchCriteriasAction({ type: ActionTypes.ADD_FILTERS, payload: { ...filters, ...newFilters } })
+              }}
+            >
+              {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+              <DocTypesFilter allDocTypesList={allDocTypesList.docTypes} value={docTypes} name={FilterKeys.DOC_TYPES} />
+              <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
+              <ExecutiveUnitsFilter
+                value={executiveUnits}
+                name={FilterKeys.EXECUTIVE_UNITS}
+                criteriaName={CriteriaName.Document}
+              />
+            </Modal>
+          </Grid>
+        </Searchbar>
+      </Grid>
 
-      <MasterChips chips={buildDocumentFiltersChips(filters, handleDeleteChip)} />
-
-      <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
-        Attention : La recherche est pseudonymisée pour la prévisualisation des documents. Vous pouvez donc trouver des
-        incohérences entre les informations de votre patient et celles du document prévisualisé.
-      </Alert>
-
-      {!deidentified && (
-        <Grid container item alignItems="center" justifyContent="flex-end">
-          <Checkbox
-            checked={filters.onlyPdfAvailable}
-            onChange={() => onChangeOptions('onlyPdfAvailable', !filters.onlyPdfAvailable)}
+      <Grid item xs={12}>
+        {filtersAsArray.map((filter, index) => (
+          <Chip
+            key={index}
+            label={filter.label}
+            onDelete={() => {
+              dispatchSearchCriteriasAction({
+                type: ActionTypes.REMOVE_FILTER,
+                payload: { key: filter.category, value: filter.value }
+              })
+            }}
           />
-          <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
+        ))}
+      </Grid>
+
+      <Grid container justifyContent="space-between" alignItems="center">
+        <Grid item xs={12} md={3}>
+          {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && <CircularProgress />}
+          {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
+            <DisplayDigits nb={searchResults.totalDocs} total={searchResults.totalAllDoc} label={searchResults.label} />
+          )}
         </Grid>
-      )}
+        <Grid item xs={12} md={8}>
+          {!searchResults.deidentified && (
+            <Grid container alignItems="center" justifyContent="flex-end">
+              <Checkbox
+                checked={onlyPdfAvailable}
+                onChange={() =>
+                  dispatchSearchCriteriasAction({
+                    type: ActionTypes.ADD_FILTERS,
+                    payload: { nda, executiveUnits, docTypes, startDate, endDate, onlyPdfAvailable: !onlyPdfAvailable }
+                  })
+                }
+              />
+              <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
+            </Grid>
+          )}
+        </Grid>
+      </Grid>
 
       <DataTableComposition
         loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
-        deidentified={deidentified}
-        searchMode={!!debouncedSearchInput && searchBy === SearchByTypes.TEXT}
+        deidentified={patient?.deidentified || false}
+        searchMode={!!searchInput && searchBy === SearchByTypes.TEXT}
         groupId={groupId}
-        documentsList={patientDocumentsList}
-        order={order}
-        setOrder={setOrder}
+        documentsList={searchResults.patientDocumentsList}
+        orderBy={orderBy}
+        setOrderBy={(orderBy) => dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_ORDER_BY, payload: orderBy })}
         page={page}
         setPage={(newPage: number) => setPage(newPage)}
-        total={totalDocs}
-      />
-
-      <ModalDocumentFilters
-        open={open === 'filter'}
-        onClose={() => setOpen(null)}
-        filters={filters}
-        onChangeFilters={setFilters}
-        deidentified={deidentified}
+        total={searchResults.totalDocs}
       />
     </Grid>
   )

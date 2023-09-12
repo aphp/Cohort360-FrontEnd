@@ -29,8 +29,17 @@ import {
   Procedure
 } from 'fhir/r4'
 import { CanceledError } from 'axios'
-import { Direction, MedicationFilters, Order, PMSIFilters, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
-import { PMSI } from 'types/patient'
+import {
+  BiologyFilters,
+  Direction,
+  DocumentsFilters,
+  MedicationFilters,
+  Order,
+  PMSIFilters,
+  SearchByTypes,
+  SearchCriterias
+} from 'types/searchCriterias'
+import { Medication, PMSI } from 'types/patient'
 
 export type PatientState = null | {
   loading: boolean
@@ -156,30 +165,17 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
  *
  */
 export type FetchBiologyParams = {
-  groupId?: string
-  rowStatus: boolean
-  signal?: AbortSignal
-  options?: {
-    page?: number
-    searchInput: string
-    filters?: {
-      nda: string
-      loinc: string
-      anabio: string
-      startDate: string | null
-      endDate: string | null
-      executiveUnits?: string[]
-    }
-    sort?: {
-      by: string
-      direction: string
-    }
+  options: {
+    page: number
+    searchCriterias: SearchCriterias<BiologyFilters>
   }
+  groupId?: string
+  signal?: AbortSignal
 }
 type FetchBiologyReturn = undefined | { biology: IPatientObservation<CohortObservation> }
 const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { state: RootState; rejectValue: any }>(
   'patient/fetchBiology',
-  async ({ groupId, options, rowStatus, signal }, thunkApi) => {
+  async ({ groupId, options, options: { page, searchCriterias }, signal }, thunkApi) => {
     try {
       const patientState = thunkApi.getState().patient
 
@@ -191,16 +187,16 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
       const deidentified = patientState?.deidentified ?? true
       const hospits = patientState?.hospits?.list ?? []
 
-      const sortBy = options?.sort?.by ?? ''
-      const sortDirection = options?.sort?.direction ?? ''
-      const page = options?.page ?? 1
-      const searchInput = options?.searchInput ?? ''
-      const nda = options?.filters?.nda ?? ''
-      const loinc = options?.filters?.loinc ?? ''
-      const anabio = options?.filters?.anabio ?? ''
-      const startDate = options?.filters?.startDate ?? null
-      const endDate = options?.filters?.endDate ?? null
-      const executiveUnits = options?.filters?.executiveUnits
+      const sortBy = searchCriterias.orderBy.orderBy
+      const sortDirection = searchCriterias.orderBy.orderDirection
+      const searchInput = searchCriterias.searchInput
+      const nda = searchCriterias.filters.nda
+      const loinc = searchCriterias.filters.loinc
+      const anabio = searchCriterias.filters.anabio
+      const startDate = searchCriterias.filters.startDate
+      const endDate = searchCriterias.filters.endDate
+      const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
+      const rowStatus = searchCriterias.filters.validatedStatus
 
       const biologyResponse = await services.patients.fetchObservation(
         sortBy,
@@ -247,17 +243,12 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
  *
  */
 type FetchMedicationParams = {
-  selectedTab: 'prescription' | 'administration'
-  groupId?: string
-  options?: {
-    page?: number
-    searchInput: string
-    filters: MedicationFilters
-    sort?: {
-      by: string
-      direction: string
-    }
+  options: {
+    selectedTab: Medication
+    page: number
+    searchCriterias: SearchCriterias<MedicationFilters>
   }
+  groupId?: string
   signal?: AbortSignal
 }
 type FetchMedicationReturn =
@@ -268,112 +259,100 @@ const fetchMedication = createAsyncThunk<
   FetchMedicationReturn,
   FetchMedicationParams,
   { state: RootState; rejectValue: any }
->('patient/fetchMedication', async ({ selectedTab, groupId, options, signal }, thunkApi) => {
-  try {
-    const patientState = thunkApi.getState().patient
-    const currentMedicationState = patientState?.medication
-      ? patientState?.medication[selectedTab] ?? { total: null }
-      : { total: null }
+>(
+  'patient/fetchMedication',
+  async ({ options, options: { selectedTab, page, searchCriterias }, groupId, signal }, thunkApi) => {
+    try {
+      const patientState = thunkApi.getState().patient
+      const currentMedicationState = patientState?.medication
+        ? patientState?.medication[selectedTab] ?? { total: null }
+        : { total: null }
 
-    const patientId = patientState?.patientInfo?.id ?? ''
-    if (!patientId) {
-      throw new Error('Patient Error: patient is required')
-    }
-    const deidentified = patientState?.deidentified ?? true
-    const hospits = patientState?.hospits?.list ?? []
+      const patientId = patientState?.patientInfo?.id ?? ''
+      if (!patientId) {
+        throw new Error('Patient Error: patient is required')
+      }
+      const deidentified = patientState?.deidentified ?? true
+      const hospits = patientState?.hospits?.list ?? []
 
-    const sortBy = options?.sort?.by ?? ''
-    const sortDirection = options?.sort?.direction ?? ''
-    const page = options?.page ?? 1
-    const searchInput = options?.searchInput ?? ''
-    const prescriptionTypes = options?.filters?.selectedPrescriptionTypes?.map(({ id }) => id).join(',') ?? ''
-    const administrationRoutes = options?.filters?.selectedAdministrationRoutes?.map(({ id }) => id).join(',') ?? ''
-    const nda = options?.filters?.nda ?? ''
-    const startDate = options?.filters?.startDate ?? null
-    const endDate = options?.filters?.endDate ?? null
-    const executiveUnits = options?.filters?.executiveUnits?.map((unit) => unit.id)
+      const sortBy = searchCriterias.orderBy.orderBy
+      const sortDirection = searchCriterias.orderBy.orderDirection
+      const searchInput = searchCriterias.searchInput
+      const prescriptionTypes = searchCriterias.filters.prescriptionTypes.map(({ id }) => id).join(',') ?? ''
+      const administrationRoutes = searchCriterias.filters.administrationRoutes.map(({ id }) => id).join(',') ?? ''
+      const nda = searchCriterias.filters.nda
+      const startDate = searchCriterias.filters?.startDate
+      const endDate = searchCriterias.filters.endDate
+      const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
 
-    const medicationResponse = await services.patients.fetchMedication(
-      page,
-      patientId,
-      selectedTab,
-      sortBy,
-      sortDirection,
-      searchInput,
-      nda,
-      prescriptionTypes,
-      administrationRoutes,
-      groupId,
-      startDate ? startDate : undefined,
-      endDate ? endDate : undefined,
-      signal,
-      executiveUnits
-    )
+      const medicationResponse = await services.patients.fetchMedication(
+        page,
+        patientId,
+        selectedTab,
+        sortBy,
+        sortDirection,
+        searchInput,
+        nda,
+        prescriptionTypes,
+        administrationRoutes,
+        startDate,
+        endDate,
+        executiveUnits,
+        groupId,
+        signal
+      )
 
-    if (medicationResponse.medicationData === undefined) return undefined
+      if (medicationResponse.medicationData === undefined) return undefined
 
-    const medicationList: any[] = linkElementWithEncounter(
-      medicationResponse.medicationData as (MedicationRequest | MedicationAdministration)[],
-      hospits,
-      deidentified
-    )
+      const medicationList: any[] = linkElementWithEncounter(
+        medicationResponse.medicationData as (MedicationRequest | MedicationAdministration)[],
+        hospits,
+        deidentified
+      )
 
-    const medicationReturn = {
-      loading: false,
-      count: medicationResponse.medicationTotal ?? 0,
-      total: currentMedicationState?.total ?? medicationResponse.medicationTotal ?? 0,
-      list: medicationList,
-      page,
-      options
-    }
+      const medicationReturn = {
+        loading: false,
+        count: medicationResponse.medicationTotal ?? 0,
+        total: currentMedicationState?.total ?? medicationResponse.medicationTotal ?? 0,
+        list: medicationList,
+        page,
+        options
+      }
 
-    switch (selectedTab) {
-      case 'prescription':
-        return { prescription: medicationReturn as IPatientMedication<MedicationRequest> }
-      case 'administration':
-        return { administration: medicationReturn as IPatientMedication<MedicationAdministration> }
-    }
-  } catch (error) {
-    console.error(error)
-    if (error instanceof CanceledError) {
-      return thunkApi.rejectWithValue({ error })
-    } else {
+      switch (selectedTab) {
+        case Medication.PRESCRIPTION:
+          return { prescription: medicationReturn as IPatientMedication<MedicationRequest> }
+        case Medication.ADMINISTRATION:
+          return { administration: medicationReturn as IPatientMedication<MedicationAdministration> }
+      }
+    } catch (error) {
+      console.error(error)
+      if (error instanceof CanceledError) {
+        return thunkApi.rejectWithValue({ error })
+      }
       throw error
     }
   }
-})
+)
 
 /**
  * fetchDocument
  *
  */
 type FetchDocumentsParams = {
-  signal?: AbortSignal
-  groupId?: string
-  options?: {
-    page?: number
-    searchBy?: SearchByTypes
-    filters?: {
-      searchInput: string
-      nda: string
-      selectedDocTypes: string[]
-      startDate: string | null
-      endDate: string | null
-      onlyPdfAvailable: boolean
-      executiveUnits?: string[]
-    }
-    sort?: {
-      by: string
-      direction: string
-    }
+  options: {
+    page: number
+    searchCriterias: SearchCriterias<DocumentsFilters>
   }
+  groupId?: string
+  signal?: AbortSignal
 }
 type FetchDocumentsReturn = { documents?: IPatientDocuments } | undefined
 const fetchDocuments = createAsyncThunk<
   FetchDocumentsReturn,
   FetchDocumentsParams,
   { state: RootState; rejectValue: any }
->('patient/fetchDocuments', async ({ signal, groupId, options }, thunkApi) => {
+>('patient/fetchDocuments', async ({ signal, groupId, options, options: { page, searchCriterias } }, thunkApi) => {
   try {
     const patientState = thunkApi.getState().patient
 
@@ -384,17 +363,16 @@ const fetchDocuments = createAsyncThunk<
     const deidentified = patientState?.deidentified ?? true
     const hospits = patientState?.hospits?.list ?? []
 
-    const sortBy = options?.sort?.by ?? ''
-    const sortDirection = options?.sort?.direction ?? ''
-    const page = options?.page ?? 1
-    const searchInput = options?.filters?.searchInput ?? ''
-    const searchBy = options?.searchBy ?? SearchByTypes.TEXT
-    const selectedDocTypes = options?.filters?.selectedDocTypes ?? []
-    const nda = options?.filters?.nda ?? ''
-    const startDate = options?.filters?.startDate ?? null
-    const endDate = options?.filters?.endDate ?? null
-    const onlyPdfAvailable = options?.filters?.onlyPdfAvailable ?? false
-    const executiveUnits = options?.filters?.executiveUnits
+    const sortBy = searchCriterias.orderBy.orderBy
+    const sortDirection = searchCriterias.orderBy.orderDirection
+    const searchInput = searchCriterias.searchInput
+    const nda = searchCriterias.filters.nda
+    const searchBy = searchCriterias.searchBy || SearchByTypes.TEXT
+    const selectedDocTypes = searchCriterias.filters.docTypes.map((docType) => docType.code)
+    const startDate = searchCriterias.filters.startDate
+    const endDate = searchCriterias.filters.endDate
+    const onlyPdfAvailable = searchCriterias.filters.onlyPdfAvailable
+    const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
 
     if (searchInput) {
       const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)

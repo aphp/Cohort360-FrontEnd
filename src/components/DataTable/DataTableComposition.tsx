@@ -20,10 +20,11 @@ import Watermark from 'assets/images/watermark_pseudo.svg'
 
 import { getDocumentStatus } from 'utils/documentsFormatter'
 
-import { Column, Order, CohortComposition, CompositionStatusKind, DocumentReferenceStatusKind } from 'types'
+import { Column, CohortComposition, CompositionStatusKind, DocumentReferenceStatusKind } from 'types'
 
 import useStyles from './styles'
 import { Visibility } from '@mui/icons-material'
+import { Order, OrderBy } from 'types/searchCriterias'
 
 type DataTableCompositionProps = {
   loading: boolean
@@ -32,8 +33,8 @@ type DataTableCompositionProps = {
   searchMode: boolean
   groupId?: string
   documentsList: CohortComposition[]
-  order?: Order
-  setOrder?: (order: Order) => void
+  orderBy?: OrderBy
+  setOrderBy?: (order: OrderBy) => void
   page?: number
   setPage?: (page: number) => void
   total?: number
@@ -45,8 +46,8 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
   searchMode,
   groupId,
   documentsList,
-  order,
-  setOrder,
+  orderBy,
+  setOrderBy,
   page,
   setPage,
   total
@@ -57,7 +58,7 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
     {
       multiple: [
         { label: 'Nom', code: '', align: 'center', sortableColumn: false },
-        { label: 'Date', code: 'date', align: 'center', sortableColumn: true }
+        { label: 'Date', code: Order.DATE, align: 'center', sortableColumn: true }
       ]
     },
     showIpp
@@ -75,15 +76,15 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
       sortableColumn: false
     },
     { label: 'Unité exécutrice', code: '', align: 'center', sortableColumn: false },
-    { label: 'Type de document', code: 'type-name', align: 'center', sortableColumn: true },
+    { label: 'Type de document', code: Order.TYPE, align: 'center', sortableColumn: true },
     { label: 'Aperçu', code: '', align: 'center', sortableColumn: false }
   ].filter((elem) => elem !== null) as Column[]
 
   return (
     <DataTable
       columns={columns}
-      order={order}
-      setOrder={setOrder}
+      order={orderBy}
+      setOrder={setOrderBy}
       rowsPerPage={20}
       page={page}
       setPage={setPage}

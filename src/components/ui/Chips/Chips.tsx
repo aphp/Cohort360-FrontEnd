@@ -3,7 +3,7 @@ import React from 'react'
 import Grid from '@mui/material/Grid'
 import Chip from '@mui/material/Chip'
 
-import useStyles from './styles'
+import { useStyles } from './styles'
 
 export type ChipsProps<T, TL> = {
   value: {

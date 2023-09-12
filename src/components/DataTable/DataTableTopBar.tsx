@@ -23,11 +23,11 @@ import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import InputSearchDocumentSimple from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentSimple'
 
 import {
-  TabType,
   DTTB_ResultsType as ResultsType,
   DTTB_SearchBarType as SearchBarType,
   DTTB_ButtonType as ButtonType,
-  errorDetails
+  ErrorDetails,
+  TabType
 } from 'types'
 
 import displayDigit from 'utils/displayDigit'
@@ -250,7 +250,7 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
         <Grid className={classes.errorContainer}>
           <Typography style={{ fontWeight: 'bold' }}>Des erreurs ont été détectées dans votre recherche :</Typography>
           {searchBar.error?.errorsDetails &&
-            searchBar.error?.errorsDetails.map((detail: errorDetails, count: number) => (
+            searchBar.error?.errorsDetails.map((detail: ErrorDetails, count: number) => (
               <Typography key={count}>
                 {`- ${
                   detail.errorPositions && detail.errorPositions.length > 0

@@ -6,10 +6,11 @@ import { Grid, TextField, Typography } from '@mui/material'
 import useStyles from './styles'
 import { AgeRangeType, ErrorType } from 'types'
 import { convertAgeRangeTypeToString, convertStringToAgeRangeType, substructAgeRangeType } from 'utils/age'
+import { DateRange } from 'types/searchCriterias'
 
 type InputAgeRangeAdvancedProps = {
-  birthdatesRanges: [string, string]
-  onChangeBirthdatesRanges: (newAge: [string, string]) => void
+  birthdatesRanges: DateRange
+  onChangeBirthdatesRanges: (newAge: DateRange) => void
   error: ErrorType
   onError: (isError: boolean, errorMessage?: string) => void
 }

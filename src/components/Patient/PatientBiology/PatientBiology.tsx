@@ -1,51 +1,46 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 import { Alert, CircularProgress, Grid, Typography } from '@mui/material'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import DataTableObservation from 'components/DataTable/DataTableObservation'
-import MasterChips from 'components/ui/Chips/Chips'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchBiology } from 'state/patient'
-import { LoadingStatus } from 'types'
-
-import { buildObservationFiltersChips } from 'utils/chips'
+import { CriteriaName, LoadingStatus } from 'types'
 
 import useStyles from './styles'
 import { Checkbox } from '@mui/material'
-import { useDebounce } from 'utils/debounce'
 import { _cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Searchbar from 'components/ui/Searchbar/Searchbar'
-import { Filters, OrderBy, Order, Direction } from 'types/searchCriterias'
+import { ActionTypes, FilterKeys } from 'types/searchCriterias'
+import useSearchCriterias, { initBioSearchCriterias } from 'hooks/useSearchCriterias'
+import { selectFiltersAsArray } from 'utils/filters'
+import { PatientTypes } from 'types/patient'
+import Button from 'components/ui/Button/Button'
+import Modal from 'components/ui/Modal/Modal'
+import Chip from 'components/ui/Chips/Chip'
+import NdaFilter from 'components/Filters/NdaFilter/NdaFilter'
+import AnabioFilter from 'components/Filters/AnabioFilter/AnabioFilter'
+import LoincFilter from 'components/Filters/LoincFilter/LoincFilter'
+import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/ExecutiveUnitsFilter'
+import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilter'
 
-type PatientBiologyTypes = {
-  groupId?: string
-}
-
-const filtersDefault: Filters = {
-  nda: '',
-  loinc: '',
-  anabio: '',
-  startDate: null,
-  endDate: null,
-  executiveUnits: []
-}
-
-const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
+const PatientBiology: React.FC<PatientTypes> = ({ groupId }) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const { patient } = useAppSelector((state) => ({
     patient: state.patient
   }))
+  const [toggleModal, setToggleModal] = useState(false)
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
-  const deidentifiedBoolean = patient?.deidentified ?? false
   const searchResults = {
+    deidentified: patient?.deidentified || false,
     list: patient?.biology?.list ?? [],
     nb: patient?.biology?.count ?? 0,
     total: patient?.biology?.total ?? 0,
@@ -53,14 +48,19 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   }
 
   const [page, setPage] = useState(1)
-  const [searchInput, setSearchInput] = useState('')
-  const debouncedSearchValue = useDebounce(500, searchInput)
-  const [filters, setFilters] = useState<Filters>(filtersDefault)
-  const [validatedStatus] = useState(true)
-  const [order, setOrder] = useState<OrderBy>({
-    orderBy: Order.DATE,
-    orderDirection: Direction.ASC
-  })
+  const [
+    {
+      orderBy,
+      searchInput,
+      filters,
+      filters: { nda, loinc, anabio, startDate, endDate, executiveUnits, validatedStatus }
+    },
+    dispatchSearchCriteriasAction
+  ] = useSearchCriterias(initBioSearchCriterias)
+  const filtersAsArray = useMemo(() => {
+    return selectFiltersAsArray({ nda, validatedStatus, loinc, anabio, startDate, endDate, executiveUnits })
+  }, [nda, loinc, anabio, startDate, endDate, executiveUnits])
+
   const controllerRef = useRef<AbortController | null>(null)
 
   const _fetchBiology = async () => {
@@ -68,17 +68,15 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
       setLoadingStatus(LoadingStatus.FETCHING)
       const response = await dispatch(
         fetchBiology({
-          groupId,
-          rowStatus: validatedStatus,
           options: {
             page,
-            sort: {
-              by: order.orderBy,
-              direction: order.orderDirection
-            },
-            filters: filters,
-            searchInput
+            searchCriterias: {
+              orderBy,
+              searchInput,
+              filters: { validatedStatus, nda, loinc, anabio, startDate, endDate, executiveUnits }
+            }
           },
+          groupId,
           signal: controllerRef.current?.signal
         })
       )
@@ -95,38 +93,10 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     }
   }
 
-  const handleDeleteChip = (filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate') => {
-    switch (filterName) {
-      case 'nda':
-      case 'loinc':
-      case 'anabio':
-        setFilters((prevState) => ({ ...prevState, [filterName]: null }))
-        break
-      case 'startDate':
-      case 'endDate':
-        setFilters((prevState) => ({ ...prevState, [filterName]: null }))
-        break
-      case 'executiveUnits':
-        {
-          const newExecutiveUnits = filters.executiveUnits.filter((executiveUnit) => executiveUnit.name !== value)
-          setFilters((prevFilters) => ({ ...prevFilters, executiveUnits: newExecutiveUnits }))
-        }
-        break
-    }
-  }
-
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [
-    debouncedSearchValue,
-    filters.anabio,
-    filters.nda,
-    filters.endDate,
-    filters.startDate,
-    order.orderBy,
-    order.orderDirection
-  ])
+  }, [nda, loinc, anabio, startDate, endDate, executiveUnits, validatedStatus, orderBy, searchInput])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -156,12 +126,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
               <CircularProgress />
             )}
             {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
-              <DisplayDigits
-                nb={searchResults.nb}
-                total={searchResults.total}
-                label={searchResults.label as string}
-                color="#5BC5F2"
-              />
+              <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label as string} />
             )}
           </Grid>
           <Grid container item xs={12} lg={9} justifyContent="flex-end" style={{ maxWidth: 900 }}>
@@ -169,21 +134,49 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
               value={searchInput}
               placeholder="Rechercher"
               width={'70%'}
-              onchange={(newValue) => setSearchInput(newValue)}
+              onchange={(newValue) =>
+                dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })
+              }
             />
-            {/*<Filters
-              label="Filtrer"
-              filters={filters}
-              width={'30%'}
-              icon={<FilterList height="15px" fill="#FFF" />}
-              onChange={setFilters}
-            />*/}
+            <Button width={'25%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
+              Filtrer
+            </Button>
+            <Modal
+              title="Filtrer par :"
+              open={toggleModal}
+              width={'600px'}
+              onClose={() => setToggleModal(false)}
+              onSubmit={(newFilters) => {
+                dispatchSearchCriteriasAction({ type: ActionTypes.ADD_FILTERS, payload: { ...filters, ...newFilters } })
+              }}
+            >
+              {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+              <AnabioFilter name={FilterKeys.ANABIO} value={anabio} />
+              <LoincFilter name={FilterKeys.LOINC} value={loinc} />
+              <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
+              <ExecutiveUnitsFilter
+                value={executiveUnits}
+                name={FilterKeys.EXECUTIVE_UNITS}
+                criteriaName={CriteriaName.Biology}
+              />
+            </Modal>
           </Grid>
         </Searchbar>
       </Grid>
 
       <Grid item xs={12}>
-        <MasterChips chips={buildObservationFiltersChips(filters, handleDeleteChip)} />
+        {filtersAsArray.map((filter, index) => (
+          <Chip
+            key={index}
+            label={filter.label}
+            onDelete={() => {
+              dispatchSearchCriteriasAction({
+                type: ActionTypes.REMOVE_FILTER,
+                payload: { key: filter.category, value: filter.value }
+              })
+            }}
+          />
+        ))}
       </Grid>
 
       <Grid container item xs={12} style={{ marginBottom: 8 }}>
@@ -197,23 +190,17 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
       <Grid item xs={12}>
         <DataTableObservation
           loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
-          deidentified={deidentifiedBoolean}
+          deidentified={searchResults.deidentified}
           observationsList={searchResults.list}
-          order={order}
-          setOrder={setOrder}
+          orderBy={orderBy}
+          setOrderBy={(orderBy) =>
+            dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_ORDER_BY, payload: orderBy })
+          }
           page={page}
           setPage={(newPage) => setPage(newPage)}
           total={searchResults.total}
         />
       </Grid>
-
-      {/*<BiologyFilters
-        open={open === 'filter'}
-        onClose={() => setOpen(null)}
-        filters={filters}
-        onChangeFilters={setFilters}
-        deidentified={deidentifiedBoolean}
-            />*/}
     </Grid>
   )
 }
