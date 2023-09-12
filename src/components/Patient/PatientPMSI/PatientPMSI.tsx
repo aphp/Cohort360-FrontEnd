@@ -18,17 +18,21 @@ import Searchbar from 'components/ui/Searchbar/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import Tabs from 'components/ui/Tabs/Tabs'
-import { ActionTypes, PMSIFilters } from 'types/searchCriterias'
+import { ActionTypes, FilterKeys } from 'types/searchCriterias'
 import Button from 'components/ui/Button/Button'
 import Modal from 'components/ui/Modal/Modal'
-import FiltersModal from 'components/Filters/FiltersModal'
 import services from 'services/aphp'
 import { mapToCriteriaName } from 'utils/mappers'
-import { PatientPMSITypes, PMSI, PMSILabel } from 'types/patient'
-import useSearchCriterias, { initPmsisSearchCriterias } from 'hooks/searchCriterias'
+import { PatientTypes, PMSI, PMSILabel } from 'types/patient'
+import useSearchCriterias, { initPmsiSearchCriterias } from 'hooks/useSearchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
+import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilter'
+import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/ExecutiveUnitsFilter'
+import NdaFilter from 'components/Filters/NdaFilter/NdaFilter'
+import CodeFilter from 'components/Filters/CodeFilter/CodeFilter'
+import DiagnosticTypesFilter from 'components/Filters/DiagnosticTypesFilter/DiagnosticTypesFilter'
 
-const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
+const PatientPMSI: React.FC<PatientTypes> = ({ groupId }) => {
   const { classes } = useStyles()
   const theme = useTheme()
   const isMd = useMediaQuery(theme.breakpoints.between('sm', 'lg'))
@@ -51,10 +55,11 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
     {
       orderBy,
       searchInput,
+      filters,
       filters: { code, nda, diagnosticTypes, startDate, endDate, executiveUnits }
     },
     dispatchSearchCriteriasAction
-  ] = useSearchCriterias(initPmsisSearchCriterias)
+  ] = useSearchCriterias(initPmsiSearchCriterias)
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ code, nda, diagnosticTypes, startDate, endDate, executiveUnits })
   }, [code, nda, diagnosticTypes, startDate, endDate, executiveUnits])
@@ -66,8 +71,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   const { patient } = useAppSelector((state) => ({
     patient: state.patient
   }))
-  const deidentifiedBoolean = patient?.deidentified ?? false
   const searchResults = {
+    deidentified: patient?.deidentified || false,
     list: patient?.pmsi?.[selectedTab.id]?.list || [],
     nb: patient?.pmsi?.[selectedTab.id]?.count ?? 0,
     total: patient?.pmsi?.[selectedTab.id]?.total ?? 0,
@@ -164,12 +169,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
                 <CircularProgress />
               )}
               {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
-                <DisplayDigits
-                  nb={searchResults.nb}
-                  total={searchResults.total}
-                  label={searchResults.label}
-                  color="#5BC5F2"
-                />
+                <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label} />
               )}
             </Grid>
           </Grid>
@@ -186,23 +186,31 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
             <Button width={'30%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
               Filtrer
             </Button>
-            {toggleModal && (
-              <Modal
-                data={{ nda, code, startDate, endDate, executiveUnits, diagnosticTypes }}
-                title="Filtrer les patients"
-                open={toggleModal}
-                width={'600px'}
-                onClose={() => setToggleModal(false)}
-                onSubmit={(newFilters: PMSIFilters) => {
-                  dispatchSearchCriteriasAction({ type: ActionTypes.ADD_FILTERS, payload: newFilters })
-                }}
-              >
-                <FiltersModal
+            <Modal
+              title="Filtrer par :"
+              open={toggleModal}
+              width={'600px'}
+              onClose={() => setToggleModal(false)}
+              onSubmit={(newFilters) => {
+                dispatchSearchCriteriasAction({ type: ActionTypes.ADD_FILTERS, payload: { ...filters, ...newFilters } })
+              }}
+            >
+              {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+              <CodeFilter name={FilterKeys.CODE} value={code} />
+              {selectedTab.id === PMSI.DIAGNOSTIC && (
+                <DiagnosticTypesFilter
+                  name={FilterKeys.DIAGNOSTIC_TYPES}
+                  value={diagnosticTypes}
                   allDiagnosticTypesList={allDiagnosticTypesList}
-                  pmsiType={mapToCriteriaName(selectedTab.id)}
                 />
-              </Modal>
-            )}
+              )}
+              <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
+              <ExecutiveUnitsFilter
+                value={executiveUnits}
+                name={FilterKeys.EXECUTIVE_UNITS}
+                criteriaName={mapToCriteriaName(selectedTab.id)}
+              />
+            </Modal>
           </Grid>
         </Searchbar>
       </Grid>
@@ -225,9 +233,11 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
           loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
           selectedTab={selectedTab.id}
           pmsiList={searchResults.list}
-          deidentified={deidentifiedBoolean}
-          order={orderBy}
-          setOrder={(order) => dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_ORDER_BY, payload: order })}
+          deidentified={searchResults.deidentified}
+          orderBy={orderBy}
+          setOrderBy={(orderBy) =>
+            dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_ORDER_BY, payload: orderBy })
+          }
           page={page}
           setPage={(newPage) => setPage(newPage)}
           total={searchResults.nb}

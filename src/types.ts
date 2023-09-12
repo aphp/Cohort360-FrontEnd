@@ -757,7 +757,7 @@ export type IPatientDocuments = {
       direction: string
     }
   }
-  searchInputError?: searchInputError
+  searchInputError?: SearchInputError
 }
 
 export type IPatientPmsi<T extends Procedure | Condition | Claim> = {
@@ -841,12 +841,12 @@ export type IPatientObservation<T extends CohortObservation> = {
   }
 }
 
-export type searchInputError = {
+export type SearchInputError = {
   isError: boolean
-  errorsDetails?: errorDetails[]
+  errorsDetails?: ErrorDetails[]
 }
 
-export type errorDetails = {
+export type ErrorDetails = {
   errorName?: string
   errorPositions?: number[]
   errorSolution?: string
@@ -869,7 +869,7 @@ export type DTTB_SearchBarType = {
   value: string | undefined
   onSearch: (newSearch: string, newSearchBy: SearchByTypes) => void
   searchBy?: any
-  error?: searchInputError
+  error?: SearchInputError
   fullWidth?: boolean
 }
 export type DTTB_ButtonType = {

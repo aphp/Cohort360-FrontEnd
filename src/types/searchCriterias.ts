@@ -1,4 +1,4 @@
-import { ScopeTreeRow } from 'types'
+import { ScopeTreeRow, SimpleCodeType } from 'types'
 
 export enum GenderStatus {
   MALE = 'MALE',
@@ -37,7 +37,10 @@ export enum Order {
   EFFECTIVE_DATETIME = 'effectiveDatetime',
   PERIOD_START = 'Period-start',
   CREATED = 'created',
-  DIAGNOSIS = 'diagnosis'
+  DIAGNOSIS = 'diagnosis',
+  ANABIO = 'code-anabio',
+  LOINC = 'code-loinc',
+  TYPE = 'type'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -46,27 +49,36 @@ export enum SearchByTypes {
   IDENTIFIER = 'identifier',
   DESCRIPTION = 'description'
 }
-export enum SearchByTypesLabel {
+export enum SearchByTypesLabelPatients {
   TEXT = 'Tous les champs',
   FAMILY = 'Nom',
   GIVEN = 'Prénom',
   IDENTIFIER = 'IPP',
   DESCRIPTION = 'Description'
 }
+export enum SearchByTypesLabelDocuments {
+  TEXT = 'Corps du document',
+  DESCRIPTION = 'Titre du document'
+}
 export enum FilterKeys {
   GENDERS = 'genders',
   VITAL_STATUSES = 'vitalStatuses',
   BIRTHDATES = 'birthdatesRanges',
+  ADMINISTRATION_ROUTES = 'administrationRoutes',
+  PRESCRIPTION_TYPES = 'prescriptionTypes',
   CODE = 'code',
   NDA = 'nda',
+  ANABIO = 'anabio',
+  LOINC = 'loinc',
   DIAGNOSTIC_TYPES = 'diagnosticTypes',
   START_DATE = 'startDate',
   END_DATE = 'endDate',
-  EXECUTIVE_UNITS = 'executiveUnits'
+  EXECUTIVE_UNITS = 'executiveUnits',
+  DOC_TYPES = 'docTypes'
 }
 
 export type SearchBy = SearchByTypes
-export type DateRange = [string, string]
+export type DateRange = [string | null, string | null]
 export type LabelObject = {
   id: string
   label: string
@@ -89,9 +101,11 @@ export type FilterValue =
   | VitalStatus[]
   | ScopeTreeRow
   | ScopeTreeRow[]
+  | SimpleCodeType
+  | SimpleCodeType[]
   | null
 
-export type Filters = PatientsFilters | PMSIFilters | MedicationFilters | BiologyFilters
+export type Filters = PatientsFilters | PMSIFilters | MedicationFilters | BiologyFilters | DocumentsFilters
 
 export interface PatientsFilters {
   genders: GenderStatus[]
@@ -109,22 +123,31 @@ export type PMSIFilters = {
 }
 
 export type MedicationFilters = {
-  nda?: string
-  selectedPrescriptionTypes?: LabelObject[]
-  selectedAdministrationRoutes?: LabelObject[]
-  code?: string
-  startDate?: string | null
-  endDate?: string | null
-  executiveUnits?: ScopeTreeRow[]
+  nda: string
+  prescriptionTypes: LabelObject[]
+  administrationRoutes: LabelObject[]
+  startDate: string | null
+  endDate: string | null
+  executiveUnits: ScopeTreeRow[]
 }
 
 export type BiologyFilters = {
-  nda?: string
-  loinc?: string
-  anabio?: string
-  startDate?: string | null
-  endDate?: string | null
-  executiveUnits?: ScopeTreeRow[]
+  nda: string
+  loinc: string
+  anabio: string
+  startDate: string | null
+  endDate: string | null
+  executiveUnits: ScopeTreeRow[]
+  validatedStatus: boolean
+}
+
+export type DocumentsFilters = {
+  nda: string
+  docTypes: SimpleCodeType[]
+  onlyPdfAvailable: boolean
+  startDate: string | null
+  endDate: string | null
+  executiveUnits: ScopeTreeRow[]
 }
 
 export type SearchCriterias<F> = {
@@ -166,21 +189,32 @@ export type ActionFilters<F> =
   | ActionRemoveFilter
   | ActionRemoveSearchCriterias
 
-export const searchByList = [
+export const searchByListPatients = [
   {
     id: SearchByTypes.TEXT,
-    label: SearchByTypesLabel.TEXT
+    label: SearchByTypesLabelPatients.TEXT
   },
   {
     id: SearchByTypes.FAMILY,
-    label: SearchByTypesLabel.FAMILY
+    label: SearchByTypesLabelPatients.FAMILY
   },
   {
     id: SearchByTypes.GIVEN,
-    label: SearchByTypesLabel.GIVEN
+    label: SearchByTypesLabelPatients.GIVEN
   },
   {
     id: SearchByTypes.IDENTIFIER,
-    label: SearchByTypesLabel.IDENTIFIER
+    label: SearchByTypesLabelPatients.IDENTIFIER
+  }
+]
+
+export const searchByListDocuments = [
+  {
+    id: SearchByTypes.TEXT,
+    label: SearchByTypesLabelDocuments.TEXT
+  },
+  {
+    id: SearchByTypes.DESCRIPTION,
+    label: SearchByTypesLabelDocuments.DESCRIPTION
   }
 ]

@@ -23,8 +23,8 @@ type DataTablePatientProps = {
   search?: string
   deidentified: boolean
   patientsList: CohortPatient[]
-  order: OrderBy
-  setOrder?: (order: OrderBy) => void
+  orderBy: OrderBy
+  setOrderBy?: (order: OrderBy) => void
   page?: number
   setPage?: (page: number) => void
   total?: number
@@ -35,8 +35,8 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
   search,
   deidentified,
   patientsList,
-  order,
-  setOrder,
+  orderBy,
+  setOrderBy,
   page,
   setPage,
   total
@@ -66,8 +66,8 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
   return (
     <DataTable
       columns={columns}
-      order={order}
-      setOrder={setOrder}
+      order={orderBy}
+      setOrder={setOrderBy}
       rowsPerPage={20}
       page={page}
       setPage={setPage}

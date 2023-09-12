@@ -1,4 +1,4 @@
-export type PatientPMSITypes = {
+export type PatientTypes = {
   groupId?: string
 }
 
@@ -12,4 +12,14 @@ export enum PMSILabel {
   DIAGNOSTIC = 'Diagnostics CIM10',
   GMH = 'GHM',
   CCAM = 'Actes CCAM'
+}
+
+export enum Medication {
+  PRESCRIPTION = 'prescription',
+  ADMINISTRATION = 'administration'
+}
+
+export enum MedicationLabel {
+  PRESCRIPTION = 'Prescription',
+  ADMINISTRATION = 'Administration'
 }

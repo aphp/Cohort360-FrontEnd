@@ -16,8 +16,8 @@ type DataTablePmsiProps = {
   deidentified: boolean
   selectedTab: PMSI
   pmsiList: PMSIEntry<Procedure | Condition | Claim>[]
-  order: OrderBy
-  setOrder?: (order: OrderBy) => void
+  orderBy: OrderBy
+  setOrderBy?: (order: OrderBy) => void
   page?: number
   setPage?: (page: number) => void
   total?: number
@@ -27,8 +27,8 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
   deidentified,
   selectedTab,
   pmsiList,
-  order,
-  setOrder,
+  orderBy,
+  setOrderBy,
   page,
   setPage,
   total
@@ -47,8 +47,8 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
   return (
     <DataTable
       columns={columns}
-      order={order}
-      setOrder={setOrder}
+      order={orderBy}
+      setOrder={setOrderBy}
       rowsPerPage={20}
       page={page}
       setPage={setPage}

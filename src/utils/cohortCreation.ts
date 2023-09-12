@@ -1076,11 +1076,11 @@ export async function unbuildRequest(_json: string): Promise<any> {
             switch (key) {
               case COMPOSITION_TITLE:
                 currentCriterion.search = value ? decodeURIComponent(value) : ''
-                currentCriterion.searchBy = SearchByTypes.description
+                currentCriterion.searchBy = SearchByTypes.DESCRIPTION
                 break
               case COMPOSITION_TEXT: {
                 currentCriterion.search = value ? decodeURIComponent(value) : ''
-                currentCriterion.searchBy = SearchByTypes.text
+                currentCriterion.searchBy = SearchByTypes.TEXT
                 break
               }
               case COMPOSITION_TYPE: {
