@@ -10,7 +10,7 @@ export const FormWrapper = styled('div')(() => ({
 export const InputWrapper = styled('div')(() => ({
   padding: 0,
   '& > div': {
-    margin: '10px 0px'
+    margin: '15px 0px'
   }
 }))
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
-import { Checkbox, CircularProgress, Grid, Typography, Alert } from '@mui/material'
+import { Checkbox, CircularProgress, Grid, Typography } from '@mui/material'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 

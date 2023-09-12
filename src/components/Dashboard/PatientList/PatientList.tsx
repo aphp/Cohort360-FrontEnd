@@ -30,13 +30,13 @@ import { FilterKeys, searchByListPatients, SearchByTypes } from 'types/searchCri
 import Chip from 'components/ui/Chips/Chip'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
-import GendersFilter from 'components/Filters/GendersFilter/GenderFilter'
-import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter/VitalStatusesFilter'
-import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters/BirthdatesRangesFilter'
 import { BlockWrapper } from 'components/ui/Layout'
 import DisplayLocked from 'components/ui/Display/DisplayLocked'
 import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/searchCriteriasReducer'
 import { selectFiltersAsArray } from 'utils/filters'
+import GendersFilter from 'components/Filters/GendersFilter/GenderFilter'
+import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter.tsx/VitalStatusesFilter'
+import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters/BirthdatesRangesFilter'
 
 type PatientListProps = {
   total: number
