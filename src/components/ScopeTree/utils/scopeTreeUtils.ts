@@ -4,11 +4,11 @@ import { expandScopeElement, fetchScopesList, updateScopeList } from 'state/scop
 import { AppDispatch } from 'state'
 import { findEquivalentRowInItemAndSubItems, getHierarchySelection, optimizeHierarchySelection } from 'utils/pmsi'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
-import servicesPerimeters, { LOADING } from 'services/aphp/servicePerimeters'
+import servicesPerimeters from 'services/aphp/servicePerimeters'
 import { cancelPendingRequest } from 'utils/abortController'
-import { expandScopeTree } from 'utils/scopeTree'
+import { expandScopeTree, LOADING } from 'utils/scopeTree'
 
-const getAllParentsIds = async (selectedItems: ScopeTreeRow[]) => {
+export const getAllParentsIds = async (selectedItems: ScopeTreeRow[]) => {
   const allParentsIds: string[] = selectedItems
     .map((item: ScopeTreeRow) => (item?.above_levels_ids ?? '').split(','))
     .flat()
@@ -18,7 +18,7 @@ const getAllParentsIds = async (selectedItems: ScopeTreeRow[]) => {
   return allParentsIds
 }
 
-const getParents = async (allParentsIds: string[], rootRows: ScopeTreeRow[]) => {
+export const getParents = async (allParentsIds: string[], rootRows: ScopeTreeRow[]) => {
   const fetchedParents: ScopeTreeRow[] = []
   const notFetchedSubItemsIds: string[] = []
   const notFetchedParentsIds: string[] = allParentsIds.filter((parentId) => {
@@ -44,7 +44,7 @@ const getParents = async (allParentsIds: string[], rootRows: ScopeTreeRow[]) => 
   return [...fetchedParents, ...notFetchedParents]
 }
 
-const expandSelectedItems = async (
+export const expandSelectedItems = async (
   rootRows: ScopeTreeRow[],
   selectedItems: ScopeTreeRow[],
   dispatch?: AppDispatch,
@@ -66,7 +66,7 @@ const expandSelectedItems = async (
   return newRootRows
 }
 
-const updateRootRows = async (
+export const updateRootRows = async (
   newRootRows: ScopeTreeRow[],
   parentsAndSelectedItems: ScopeTreeRow[],
   parents: ScopeTreeRow[],
@@ -95,6 +95,7 @@ const updateRootRows = async (
       await updateRootRows(newRootRows[i].subItems, parentsAndSelectedItems, parents)
     }
   }
+  return newRootRows
 }
 
 export const removeDuplicates = (arr: ScopeTreeRow[]) => {

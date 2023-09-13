@@ -5,7 +5,7 @@ import { Breadcrumbs, Checkbox, IconButton, Skeleton, TableCell, TableRow, Typog
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'
 import displayDigit from 'utils/displayDigit'
-import { LOADING } from 'services/aphp/servicePerimeters'
+import { LOADING } from '../../../../utils/scopeTree'
 
 type ScopeTreeTableRowProps = {
   row: ScopeTreeRow

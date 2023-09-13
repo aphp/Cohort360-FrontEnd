@@ -2,6 +2,7 @@ import { ExpandScopeElementParamsType, ScopeTreeRow, ScopeType } from 'types'
 import services from 'services/aphp'
 import { RootState } from 'state'
 
+export const LOADING: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 /**
  * This function is called when a user click on checkbox
  * return selected items that should be saved
