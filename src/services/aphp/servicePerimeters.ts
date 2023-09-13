@@ -19,12 +19,10 @@ import { getApiResponseResources } from 'utils/apiHelpers'
 import { fetchAccessExpirations, fetchEncounter, fetchGroup, fetchPatient, fetchScope } from './callApi'
 
 import apiBackend from '../apiBackend'
-import { sortByQuantityAndName } from 'utils/scopeTree'
+import { LOADING, sortByQuantityAndName } from 'utils/scopeTree'
 import { AxiosResponse } from 'axios'
 import { Group } from 'fhir/r4'
 import scopeTypes from '../../data/scope_type.json'
-
-export const LOADING: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
 export interface IServicePerimeters {
   /**
