@@ -116,7 +116,7 @@ const DataTablePmsiLine: React.FC<{
       ? pmsi.diagnosis?.[0].packageCode?.coding?.[0].display
       : // @ts-ignore TODO: There is no class member in Conditon or Procedure FHIR types
         pmsi.class?.code || pmsi.code?.coding?.[0].display
-  const type = pmsi.extension ? pmsi.extension[0].valueString?.toUpperCase() : '-'
+  const type = pmsi.extension ? pmsi.extension[0].valueCodeableConcept?.coding?.[0].code?.toUpperCase() : '-'
   const serviceProvider = pmsi.serviceProvider ?? 'Non renseigné'
 
   return (

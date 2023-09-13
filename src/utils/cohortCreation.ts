@@ -17,7 +17,7 @@ import {
 import docTypes from 'assets/docTypes.json'
 import { BIOLOGY_HIERARCHY_ITM_ANABIO, CLAIM_HIERARCHY, CONDITION_HIERARCHY, PROCEDURE_HIERARCHY } from '../constants'
 
-const REQUETEUR_VERSION = 'v1.3.0'
+const REQUETEUR_VERSION = 'v1.4.0'
 
 const RESSOURCE_TYPE_IPP_LIST: 'IPPList' = 'IPPList'
 const IPP_LIST_FHIR = 'identifier.value'
@@ -43,15 +43,15 @@ const ENCOUNTER_PROVENANCE = 'admit-source'
 const ENCOUNTER_ADMISSION = 'admission-type'
 
 export const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
-const CLAIM_CODE = 'codeList'
-const CLAIM_CODE_ALL_HIERARCHY = 'code'
+const CLAIM_CODE = 'diagnosis-hierarchy'
+const CLAIM_CODE_ALL_HIERARCHY = 'diagnosis'
 
 export const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
-const PROCEDURE_CODE = 'codeList'
+const PROCEDURE_CODE = 'code-hierarchy'
 const PROCEDURE_CODE_ALL_HIERARCHY = 'code'
 
 export const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition'
-const CONDITION_CODE = 'codeList'
+const CONDITION_CODE = 'code-hierarchy'
 const CONDITION_CODE_ALL_HIERARCHY = 'code'
 const CONDITION_TYPE = 'type'
 
@@ -63,18 +63,18 @@ const COMPOSITION_STATUS = 'docstatus'
 
 const RESSOURCE_TYPE_MEDICATION_REQUEST: 'MedicationRequest' = 'MedicationRequest' // = Prescription
 const RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: 'MedicationAdministration' = 'MedicationAdministration' // = Administration
-const MEDICATION_CODE = 'hierarchy-ATC'
-const MEDICATION_CODE_ALL_HIERARCHY = 'medication-simple'
+const MEDICATION_CODE = 'medication-hierarchy'
+const MEDICATION_CODE_ALL_HIERARCHY = 'medication'
 // const MEDICATION_UCD = 'code_id'
 const MEDICATION_PRESCRIPTION_TYPE = 'type'
 const MEDICATION_ADMINISTRATION = 'route'
 
 const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
-const OBSERVATION_CODE = 'part-of'
+const OBSERVATION_CODE = 'code-hierarchy'
 const OBSERVATION_CODE_ALL_HIERARCHY = 'code'
-const OBSERVATION_VALUE = 'value-quantity-value'
-const OBSERVATION_STATUS = 'row_status'
-const ENCOUNTER_SERVICE_PROVIDER = 'encounter-service-provider'
+const OBSERVATION_VALUE = 'value-quantity'
+const OBSERVATION_STATUS = 'status'
+const ENCOUNTER_SERVICE_PROVIDER = 'encounter.encounter-care-site'
 const SERVICE_PROVIDER = 'service-provider'
 
 export const UNITE_EXECUTRICE = 'Unité exécutrice'
@@ -124,7 +124,7 @@ type RequeteurCriteriaType = {
   dateRangeList?: {
     minDate?: string // YYYY-MM-DD
     maxDate?: string // YYYY-MM-DD
-    datePreference?: 'event_date' | 'encounter_end-date' | 'encounter_start-date'
+    datePreference?: 'event_date' | 'encounter_end_date' | 'encounter_start_date'
     dateIsNotNull?: boolean
   }[]
   encounterDateRange?: {
@@ -222,7 +222,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       // Ignore TypeScript because we need to check if array is not empty
       // @ts-ignore
       filterFhir = [
-        '_has:Patient:encounter:active=true',
+        'subject.active=true',
         `${
           criterion.admissionMode && criterion.admissionMode.length > 0
             ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode
@@ -330,7 +330,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
     case RESSOURCE_TYPE_COMPOSITION: {
       const unreducedFilterFhir = [
-        `${COMPOSITION_STATUS}=final&type:not=doc-impor&empty=false&patient-active=true`,
+        `${COMPOSITION_STATUS}=final&type:not=doc-impor&contenttype=${encodeURIComponent(
+          'http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain'
+        )}&subject.active=true`,
         `${
           criterion.search
             ? `${criterion.searchBy === SearchByTypes.text ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
@@ -358,7 +360,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
     case RESSOURCE_TYPE_CONDITION: {
       const unreducedFilterFhir = [
-        'patient-active=true',
+        'subject.active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -388,7 +390,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
     case RESSOURCE_TYPE_PROCEDURE: {
       const unreducedFilterFhir = [
-        'patient-active=true',
+        'subject.active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -413,7 +415,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
     case RESSOURCE_TYPE_CLAIM: {
       const unreducedFilterFhir = [
-        'patient-active=true',
+        'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -437,7 +439,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
     case RESSOURCE_TYPE_MEDICATION_REQUEST:
     case RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: {
       const unreducedFilterFhir = [
-        'patient-active=true',
+        'subject.active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -502,7 +504,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       }
 
       const unreducedFilterFhir = [
-        `patient-active=true&${OBSERVATION_STATUS}=Validé`,
+        `subject.active=true&${OBSERVATION_STATUS}=Val`,
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -1015,7 +1017,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   : newAdmissionIds
                 break
               }
-              case '_has:Patient:encounter:active':
+              case 'subject.active':
                 break
               case SERVICE_PROVIDER: {
                 if (!value) continue
@@ -1104,9 +1106,9 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 break
               }
               case COMPOSITION_STATUS:
-              case 'patient-active':
+              case 'subject.active':
               case 'type:not':
-              case 'empty':
+              case 'contenttype':
                 break
               default:
                 currentCriterion.error = true
@@ -1178,7 +1180,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 break
               }
 
-              case 'patient-active':
+              case 'subject.active':
                 break
 
               default:
@@ -1241,7 +1243,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
 
                 break
               }
-              case 'patient-active':
+              case 'subject.active':
                 break
               default:
                 currentCriterion.error = true
@@ -1301,7 +1303,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   : updatedEncounterServices
                 break
               }
-              case 'patient-active':
+              case 'patient.active':
                 break
               default:
                 currentCriterion.error = true
@@ -1375,7 +1377,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   : newAdministration
                 break
               }
-              case 'patient-active':
+              case 'subject.active':
                 break
               case ENCOUNTER_SERVICE_PROVIDER: {
                 if (!value) continue
@@ -1504,7 +1506,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 break
               }
               case OBSERVATION_STATUS:
-              case 'patient-active':
+              case 'subject.active':
                 break
               default:
                 currentCriterion.error = true

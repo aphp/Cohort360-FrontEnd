@@ -20,20 +20,29 @@ import {
   getAgeRepartitionMapAphp,
   getVisitRepartitionMapAphp
 } from 'utils/graphUtils'
-import { getApiResponseResources } from 'utils/apiHelpers'
+import { getApiResponseResource, getApiResponseResources } from 'utils/apiHelpers'
 
 import {
   fetchGroup,
   fetchPatient,
   fetchEncounter,
-  fetchComposition,
-  fetchCompositionContent,
+  fetchDocumentReference,
+  fetchDocumentReferenceContent,
   fetchBinary,
   fetchCheckDocumentSearchInput
 } from './callApi'
 
 import apiBackend from '../apiBackend'
-import { BundleEntry, DocumentReference, Encounter, Extension, Identifier, ParametersParameter, Patient } from 'fhir/r4'
+import {
+  Binary,
+  BundleEntry,
+  DocumentReference,
+  Encounter,
+  Extension,
+  Identifier,
+  ParametersParameter,
+  Patient
+} from 'fhir/r4'
 import { CanceledError } from 'axios'
 
 export interface IServiceCohorts {
@@ -167,7 +176,7 @@ export interface IServiceCohorts {
    * Retourne:
    *   - IComposition_Section: Contenu du document
    */
-  fetchDocumentContent: (compositionId: string) => Promise<DocumentReference>
+  fetchDocumentContent: (compositionId: string) => Promise<DocumentReference | undefined>
 
   /**
    * Permet de récupérer le contenu d'un document (/Binary)
@@ -178,7 +187,7 @@ export interface IServiceCohorts {
    * Retourne:
    *   - IComposition_Section: Contenu du document
    */
-  fetchBinary: (documentId: string, list?: string[]) => Promise<any>
+  fetchBinary: (documentId: string) => Promise<Binary | undefined>
 
   /**
    * Permet la récupération des droits liés à plusieurs cohortes
@@ -374,7 +383,7 @@ const servicesCohorts: IServiceCohorts = {
       const agePyramidData =
         patientsResp.data.resourceType === 'Bundle'
           ? getAgeRepartitionMapAphp(
-              patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === 'facet-extension.age-month')
+              patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === 'facet-extension.ageMonth')
                 ?.extension
             )
           : undefined
@@ -418,29 +427,14 @@ const servicesCohorts: IServiceCohorts = {
     executiveUnits
   ) => {
     const [docsList, allDocsList] = await Promise.all([
-      fetchComposition({
+      fetchDocumentReference({
         size: 20,
         offset: page ? (page - 1) * 20 : 0,
         searchBy: searchBy,
         _sort: sortBy,
         sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
         status: 'final',
-        _elements: searchInput
-          ? []
-          : [
-              'docstatus',
-              'status',
-              'type',
-              'subject',
-              'encounter',
-              'date',
-              'title',
-              'event',
-              'context',
-              'content',
-              'text',
-              'description'
-            ],
+        _elements: searchInput ? [] : undefined,
         _list: groupId ? [groupId] : [],
         _text: searchInput,
         highlight_search_results: true,
@@ -451,16 +445,16 @@ const servicesCohorts: IServiceCohorts = {
         signal: signal,
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
-        uniqueFacet: ['patient'],
+        uniqueFacet: ['subject'],
         executiveUnits
       }),
       !!searchInput || selectedDocTypes.length > 0 || !!nda || !!ipp || !!startDate || !!endDate
-        ? fetchComposition({
+        ? fetchDocumentReference({
             signal: signal,
             status: 'final',
             _list: groupId ? [groupId] : [],
             size: 0,
-            uniqueFacet: ['patient']
+            uniqueFacet: ['subject']
           })
         : null
     ])
@@ -472,7 +466,7 @@ const servicesCohorts: IServiceCohorts = {
     const totalPatientDocs =
       docsList?.data?.resourceType === 'Bundle'
         ? (
-            docsList?.data?.meta?.extension?.find((extension) => extension.url === 'unique-patient') || {
+            docsList?.data?.meta?.extension?.find((extension) => extension.url === 'unique-subject') || {
               valueDecimal: 0
             }
           ).valueDecimal
@@ -480,7 +474,7 @@ const servicesCohorts: IServiceCohorts = {
     const totalAllPatientDocs =
       allDocsList !== null
         ? (
-            allDocsList?.data?.meta?.extension?.find((extension) => extension.url === 'unique-patient') || {
+            allDocsList?.data?.meta?.extension?.find((extension) => extension.url === 'unique-subject') || {
               valueDecimal: 0
             }
           ).valueDecimal
@@ -566,15 +560,14 @@ const servicesCohorts: IServiceCohorts = {
   },
 
   fetchDocumentContent: async (compositionId) => {
-    const documentContent = await fetchCompositionContent(compositionId)
-    return documentContent
+    const documentContent = await fetchDocumentReferenceContent(compositionId)
+    return getApiResponseResource(documentContent)
   },
 
-  fetchBinary: async (documentId, list) => {
-    const documentBinary = await fetchBinary({ _id: documentId, _list: list })
-
-    // @ts-ignore
-    return documentBinary && documentBinary.entry && documentBinary.entry[0] && documentBinary.entry[0].resource
+  fetchBinary: async (documentId) => {
+    const documentBinaryResponse = await fetchBinary({ _id: documentId })
+    const documentBinaries = getApiResponseResources(documentBinaryResponse)
+    return documentBinaries && documentBinaries.length > 0 ? documentBinaries[0] : undefined
   },
 
   fetchCohortsRights: async (cohorts) => {
