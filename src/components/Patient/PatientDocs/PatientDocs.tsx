@@ -168,7 +168,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
         </Grid>
       </BlockWrapper>
 
-      <BlockWrapper container justifyContent="space-between" alignItems="flex-end" margin={'0px 0px 5px 0px'}>
+      <BlockWrapper container justifyContent="space-between" alignItems="center" margin={'0px 0px 5px 0px'}>
         <Grid item xs={12} md={3}>
           {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && <CircularProgress />}
           {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
