@@ -9,7 +9,7 @@ export const TabsWrapper = styled(Tabs)(() => ({
   minHeight: 32,
   borderRadius: 8,
   '.MuiTabs-indicator': {
-    backgroundColor: '#ED6D91',
+    backgroundColor: '#FFF',
     height: '4px'
   }
 }))
