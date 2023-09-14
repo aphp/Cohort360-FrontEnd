@@ -1,6 +1,6 @@
 import React from 'react'
 import { FormControl, InputLabel, MenuItem, Select as SelectMui } from '@mui/material'
-import { SelectInput, SelectWrapper } from './styles'
+import { SelectInputWrapper, SelectWrapper } from './styles'
 
 type SelectProps<T> = {
   selectedValue: T
@@ -15,7 +15,7 @@ const Select = <T,>({ selectedValue, label, items, width = '100%', onchange }: S
     <SelectWrapper width={width}>
       <FormControl variant="outlined">
         <InputLabel>{label}</InputLabel>
-        <SelectInput>
+        <SelectInputWrapper>
           <SelectMui
             value={selectedValue}
             onChange={(event) => onchange(event.target.value as T)}
@@ -28,7 +28,7 @@ const Select = <T,>({ selectedValue, label, items, width = '100%', onchange }: S
               </MenuItem>
             ))}
           </SelectMui>
-        </SelectInput>
+        </SelectInputWrapper>
       </FormControl>
     </SelectWrapper>
   )
