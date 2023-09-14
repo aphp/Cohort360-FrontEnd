@@ -9,7 +9,7 @@ import { useDebounce } from 'utils/debounce'
 import InfoIcon from '@mui/icons-material/Info'
 import DocumentSearchHelp from 'components/Inputs/InputSearchDocument/components/DocumentSearchHelp/DocumentSearchHelp'
 import Modal from '../Modal/Modal'
-import { ErrorDetails, SearchInputError } from 'types'
+import { ErrorDetails, SearchInputError } from 'types/error'
 
 type SearchInputProps = {
   placeholder: string

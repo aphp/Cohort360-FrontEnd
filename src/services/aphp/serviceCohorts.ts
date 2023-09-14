@@ -7,9 +7,8 @@ import {
   Cohort,
   AgeRepartitionType,
   GenderRepartitionType,
-  SearchInputError,
-  ErrorDetails,
-  ChartCode
+  ChartCode,
+  DocumentsData
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -41,7 +40,9 @@ import {
   Patient
 } from 'fhir/r4'
 import { CanceledError } from 'axios'
-import { SearchByTypes, VitalStatus, SearchCriterias, PatientsFilters } from 'types/searchCriterias'
+import { VitalStatus, SearchCriterias, PatientsFilters, AllDocumentsFilters } from 'types/searchCriterias'
+import services from '.'
+import { ErrorDetails, SearchInputError } from 'types/error'
 
 export interface IServiceCohorts {
   /**
@@ -126,29 +127,16 @@ export interface IServiceCohorts {
    *   - groupId: (optionnel) Périmètre auquel la cohorte est liée
    *   - signal: (optionnel) paramètre permettant d'identifier si une requête est déjà en cours et de l'annuler si besoin
    */
+
   fetchDocuments: (
-    deidentifiedBoolean: boolean,
-    searchBy: SearchByTypes,
-    sortBy: string,
-    sortDirection: string,
-    page: number,
-    searchInput: string,
-    selectedDocTypes: string[],
-    nda: string,
-    ipp: string,
-    onlyPdfAvailable: boolean,
-    signal?: AbortSignal,
-    startDate?: string | null,
-    endDate?: string | null,
+    options: {
+      deidentified: boolean
+      page: number
+      searchCriterias: SearchCriterias<AllDocumentsFilters>
+    },
     groupId?: string,
-    executiveUnits?: string[]
-  ) => Promise<{
-    totalDocs: number
-    totalAllDocs: number
-    totalPatientDocs: number
-    totalAllPatientDocs: number
-    documentsList: DocumentReference[]
-  }>
+    signal?: AbortSignal
+  ) => Promise<DocumentsData> | Promise<SearchInputError> | Promise<CanceledError<any>>
 
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
@@ -409,36 +397,37 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
-  fetchDocuments: async (
-    deidentifiedBoolean,
-    searchBy,
-    sortBy,
-    sortDirection,
-    page,
-    searchInput,
-    selectedDocTypes,
-    nda,
-    ipp,
-    onlyPdfAvailable,
-    signal,
-    startDate,
-    endDate,
-    groupId,
-    executiveUnits
-  ) => {
+  fetchDocuments: async (options, groupId, signal) => {
+    const {
+      deidentified,
+      page,
+      searchCriterias: {
+        orderBy,
+        searchInput,
+        searchBy,
+        filters: { docTypes, endDate, executiveUnits, ipp, nda, onlyPdfAvailable, startDate }
+      }
+    } = options
+    if (searchInput) {
+      const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)
+      if (searchInputError && searchInputError.isError) {
+        throw searchInputError
+      }
+    }
     const [docsList, allDocsList] = await Promise.all([
       fetchDocumentReference({
         size: 20,
         offset: page ? (page - 1) * 20 : 0,
         searchBy: searchBy,
-        _sort: sortBy,
-        sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+        _sort: orderBy.orderBy,
+        sortDirection: orderBy.orderDirection,
         status: 'final',
         _elements: searchInput ? [] : undefined,
         _list: groupId ? [groupId] : [],
         _text: searchInput,
         highlight_search_results: true,
-        type: selectedDocTypes.length > 0 ? selectedDocTypes.join(',') : '',
+        type:
+          docTypes.map((docType) => docType.code).length > 0 ? docTypes.map((docType) => docType.code).join(',') : '',
         'encounter-identifier': nda,
         'patient-identifier': ipp,
         onlyPdfAvailable: onlyPdfAvailable,
@@ -446,9 +435,9 @@ const servicesCohorts: IServiceCohorts = {
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
         uniqueFacet: ['subject'],
-        executiveUnits
+        executiveUnits: executiveUnits.map((eu) => eu.id)
       }),
-      !!searchInput || selectedDocTypes.length > 0 || !!nda || !!ipp || !!startDate || !!endDate
+      !!searchInput || docTypes.length > 0 || !!nda || !!ipp || !!startDate || !!endDate
         ? fetchDocumentReference({
             signal: signal,
             status: 'final',
@@ -480,12 +469,7 @@ const servicesCohorts: IServiceCohorts = {
           ).valueDecimal
         : totalPatientDocs
 
-    const documentsList = await getDocumentInfos(
-      deidentifiedBoolean,
-      getApiResponseResources(docsList),
-      groupId,
-      signal
-    )
+    const documentsList = await getDocumentInfos(deidentified, getApiResponseResources(docsList), groupId, signal)
 
     return {
       totalDocs: totalDocs ?? 0,

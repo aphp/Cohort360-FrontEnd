@@ -17,6 +17,7 @@ import {
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
 import { SearchByTypes } from 'types/searchCriterias'
+import { SearchInputError } from 'types/error'
 
 export enum CohortJobStatus {
   _long_pending = 'long_pending',
@@ -316,6 +317,14 @@ export type CohortData = {
   requestId?: string
   favorite?: boolean
   uuid?: string
+}
+
+export type DocumentsData = {
+  totalDocs: number
+  totalAllDocs: number
+  totalPatientDocs: number
+  totalAllPatientDocs: number
+  documentsList: DocumentReference[]
 }
 
 export type PatientData = {
@@ -852,17 +861,6 @@ export type IPatientObservation<T extends CohortObservation> = {
       direction: string
     }
   }
-}
-
-export type SearchInputError = {
-  isError: boolean
-  errorsDetails?: ErrorDetails[]
-}
-
-export type ErrorDetails = {
-  errorName?: string
-  errorPositions?: number[]
-  errorSolution?: string
 }
 
 export type TabType<T, TL> = {
