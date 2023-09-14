@@ -36,6 +36,7 @@ import { selectFiltersAsArray } from 'utils/filters'
 import GendersFilter from 'components/Filters/GendersFilter/GenderFilter'
 import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter.tsx/VitalStatusesFilter'
 import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters/BirthdatesRangesFilter'
+import { BlockWrapper } from 'components/ui/Layout/styles'
 
 type PatientListProps = {
   total: number
@@ -143,7 +144,7 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
           loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
         />
       </Grid>
-      <Grid item xs={12}>
+      <BlockWrapper item xs={12} margin={'20px 0px 10px 0px'}>
         <Searchbar>
           <Grid item xs={12} lg={3}>
             {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && (
@@ -191,7 +192,7 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
             </Modal>
           </Grid>
         </Searchbar>
-      </Grid>
+      </BlockWrapper>
       <Grid item xs={12}>
         {filtersAsArray.map((filter, index) => (
           <Chip

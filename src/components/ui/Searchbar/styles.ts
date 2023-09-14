@@ -10,9 +10,8 @@ export const StyledSearchbar = styled('div')(() => ({
   flexWrap: 'wrap-reverse',
   justifyContent: 'space-between',
   alignItems: 'center',
-  marginTop: 20,
   '& > div': {
-    marginBottom: 20
+    marginBottom: 10
   }
 }))
 
