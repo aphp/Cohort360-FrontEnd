@@ -113,14 +113,14 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
 
   return (
     <Grid container alignItems="center">
-      <BlockWrapper item xs={12} margin={'20px 0px'}>
+      <BlockWrapper item xs={12}>
         {searchResults.deidentified ? (
-          <AlertWrapper severity="info">
+          <AlertWrapper severity="warning">
             Attention : Les données identifiantes des patients sont remplacées par des informations fictives dans les
             résultats de la recherche et dans les documents prévisualisés.
           </AlertWrapper>
         ) : (
-          <AlertWrapper severity="info">
+          <AlertWrapper severity="warning">
             Attention : La recherche textuelle est pseudonymisée (les données identifiantes des patients sont remplacées
             par des informations fictives). Vous retrouverez les données personnelles de votre patient en cliquant sur
             l'aperçu.

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
-import { Alert, CircularProgress, Grid, Typography } from '@mui/material'
+import { Checkbox, CircularProgress, Grid, Typography } from '@mui/material'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
@@ -11,7 +11,6 @@ import { fetchBiology } from 'state/patient'
 import { CriteriaName, LoadingStatus } from 'types'
 
 import useStyles from './styles'
-import { Checkbox } from '@mui/material'
 import { _cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
@@ -29,6 +28,8 @@ import AnabioFilter from 'components/Filters/AnabioFilter/AnabioFilter'
 import LoincFilter from 'components/Filters/LoincFilter/LoincFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/ExecutiveUnitsFilter'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilter'
+import { BlockWrapper } from 'components/ui/Layout/styles'
+import { AlertWrapper } from 'components/ui/Alert/styles'
 
 const PatientBiology: React.FC<PatientTypes> = ({ groupId }) => {
   const { classes } = useStyles()
@@ -109,6 +110,14 @@ const PatientBiology: React.FC<PatientTypes> = ({ groupId }) => {
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
+      <BlockWrapper item xs={12}>
+        <AlertWrapper severity="warning">
+          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondants aux analyses les
+          plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses
+          quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020.
+        </AlertWrapper>
+      </BlockWrapper>
+
       <Grid item xs={12}>
         <Grid container item xs={12} alignItems="center" justifyContent="flex-end">
           <Checkbox checked={validatedStatus} disabled />
@@ -175,14 +184,6 @@ const PatientBiology: React.FC<PatientTypes> = ({ groupId }) => {
             }}
           />
         ))}
-      </Grid>
-
-      <Grid container item xs={12} style={{ marginBottom: 8 }}>
-        <Alert severity="warning">
-          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondants aux analyses les
-          plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses
-          quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020.
-        </Alert>
       </Grid>
 
       <Grid item xs={12}>
