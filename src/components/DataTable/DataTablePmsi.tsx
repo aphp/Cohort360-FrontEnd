@@ -65,13 +65,9 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
         <TableRow className={classes.emptyTableRow}>
           <TableCell colSpan={6} align="left">
             <Grid container justifyContent="center">
-              {loading ? (
-                <CircularProgress />
-              ) : (
-                <Typography variant="button">{`Aucun ${
-                  selectedTab !== PMSI.DIAGNOSTIC ? (selectedTab !== PMSI.CCAM ? PMSI.GMH : 'acte') : PMSI.DIAGNOSTIC
-                } à afficher`}</Typography>
-              )}
+              <Typography variant="button">{`Aucun ${
+                selectedTab !== PMSI.DIAGNOSTIC ? (selectedTab !== PMSI.CCAM ? PMSI.GMH : 'acte') : PMSI.DIAGNOSTIC
+              } à afficher`}</Typography>
             </Grid>
           </TableCell>
         </TableRow>
@@ -81,9 +77,6 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
           <TableCell colSpan={6} align="left">
             <Grid container justifyContent="center">
               <CircularProgress />
-              <Typography variant="button">{`Aucun ${
-                selectedTab !== PMSI.DIAGNOSTIC ? (selectedTab !== PMSI.CCAM ? PMSI.GMH : 'acte') : PMSI.DIAGNOSTIC
-              } à afficher`}</Typography>
             </Grid>
           </TableCell>
         </TableRow>
