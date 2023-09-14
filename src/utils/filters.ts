@@ -48,6 +48,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.NDA:
       case FilterKeys.ANABIO:
       case FilterKeys.LOINC:
+      case FilterKeys.IPP:
         castedFilters[key] = removeElementInArray((castedFilters[key] as string).split(','), value as string).join(',')
         break
       case FilterKeys.BIRTHDATES:
@@ -80,6 +81,9 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   }
   if (key === FilterKeys.NDA) {
     return `NDA : ${value}`
+  }
+  if (key === FilterKeys.IPP) {
+    return `IPP : ${value}`
   }
   if (key === FilterKeys.CODE) {
     return `Code : ${value}`
@@ -147,6 +151,7 @@ export const selectFiltersAsArray = (filters: Filters) => {
         case FilterKeys.CODE:
         case FilterKeys.ANABIO:
         case FilterKeys.LOINC:
+        case FilterKeys.IPP:
           ;(value as string).split(',').forEach((elem) =>
             result.push({
               category: key,
