@@ -22,10 +22,10 @@ const DocTypesFilter = ({ name, value, allDocTypesList }: DocTypesFilterProps) =
 
     const onClick = () => {
       if (currentDocTypeList.length === currentSelectedDocTypeList.length) {
-        setSelectedDocTypes(allDocTypesList.filter((doc: any) => doc.type !== docType.group))
+        setSelectedDocTypes(selectedDocTypes.filter((doc: any) => doc.type !== docType.group))
       } else {
         setSelectedDocTypes(
-          [...allDocTypesList, ...currentDocTypeList].filter((item, index, array) => array.indexOf(item) === index)
+          [...selectedDocTypes, ...currentDocTypeList].filter((item, index, array) => array.indexOf(item) === index)
         )
       }
     }
