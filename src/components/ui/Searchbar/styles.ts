@@ -5,7 +5,7 @@ type CustomProps = {
   error?: boolean
 }
 
-export const StyledSearchbar = styled('div')(() => ({
+export const SearchbarWrapper = styled('div')(() => ({
   display: 'flex',
   flexWrap: 'wrap-reverse',
   justifyContent: 'space-between',
@@ -23,7 +23,7 @@ export const SelectWrapper = styled('div')<CustomProps>(({ width }) => ({
   }
 }))
 
-export const SelectInput = styled('div')(() => ({
+export const SelectInputWrapper = styled('div')(() => ({
   width: '100%',
   height: 'inherit',
   '.MuiInputBase-root': {
