@@ -32,6 +32,7 @@ import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/Execut
 import NdaFilter from 'components/Filters/NdaFilter/NdaFilter'
 import PrescriptionTypesFilter from 'components/Filters/PrescriptionTypesFilter/PrescriptionTypesFilter'
 import AdministrationTypesFilter from 'components/Filters/AdministrationTypesFilter/AdministrationTypesFilter'
+import { BlockWrapper } from 'components/ui/Layout/styles'
 
 const PatientMedication: React.FC<PatientTypes> = ({ groupId }) => {
   const { classes } = useStyles()
@@ -158,7 +159,7 @@ const PatientMedication: React.FC<PatientTypes> = ({ groupId }) => {
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
-      <Grid item xs={12}>
+      <BlockWrapper item xs={12} margin={'20px 0px 10px 0px'}>
         <Searchbar>
           <Grid container item xs={12} md={12} lg={8} xl={8} style={isSm ? { flexWrap: 'wrap-reverse' } : {}}>
             <Grid item xs={12} md={6} lg={6} xl={6}>
@@ -233,7 +234,7 @@ const PatientMedication: React.FC<PatientTypes> = ({ groupId }) => {
             </Modal>
           </Grid>
         </Searchbar>
-      </Grid>
+      </BlockWrapper>
       <Grid item xs={12}>
         {filtersAsArray.map((filter, index) => (
           <Chip

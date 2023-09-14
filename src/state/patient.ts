@@ -32,10 +32,10 @@ import { CanceledError } from 'axios'
 import {
   BiologyFilters,
   Direction,
-  DocumentsFilters,
   MedicationFilters,
   Order,
   PMSIFilters,
+  PatientDocumentsFilters,
   SearchByTypes,
   SearchCriterias
 } from 'types/searchCriterias'
@@ -343,7 +343,7 @@ const fetchMedication = createAsyncThunk<
 type FetchDocumentsParams = {
   options: {
     page: number
-    searchCriterias: SearchCriterias<DocumentsFilters>
+    searchCriterias: SearchCriterias<PatientDocumentsFilters>
   }
   groupId?: string
   signal?: AbortSignal

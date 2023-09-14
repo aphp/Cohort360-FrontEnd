@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react'
 
-import { Alert, Checkbox, CircularProgress, Grid, Typography } from '@mui/material'
+import { Checkbox, CircularProgress, Grid, Typography } from '@mui/material'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
@@ -13,12 +13,11 @@ import { fetchDocuments } from 'state/patient'
 
 import allDocTypesList from 'assets/docTypes.json'
 
-import useStyles from './styles'
 import { _cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
 import { ActionTypes, FilterKeys, SearchByTypes, searchByListDocuments } from 'types/searchCriterias'
 import { PatientTypes } from 'types/patient'
-import useSearchCriterias, { initDocsSearchCriterias } from 'hooks/useSearchCriterias'
+import useSearchCriterias, { initPatientDocsSearchCriterias } from 'hooks/useSearchCriterias'
 import Modal from 'components/ui/Modal/Modal'
 import Button from 'components/ui/Button/Button'
 import NdaFilter from 'components/Filters/NdaFilter/NdaFilter'
@@ -31,9 +30,10 @@ import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import DocTypesFilter from 'components/Filters/DocTypesFilter/DocTypesFilter'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/ExecutiveUnitsFilter'
+import { AlertWrapper } from 'components/ui/Alert/styles'
+import { BlockWrapper } from 'components/ui/Layout/styles'
 
 const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
-  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const [toggleModal, setToggleModal] = useState(false)
   const { patient } = useAppSelector((state) => ({
@@ -59,7 +59,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
       filters: { nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate }
     },
     dispatchSearchCriteriasAction
-  ] = useSearchCriterias(initDocsSearchCriterias)
+  ] = useSearchCriterias(initPatientDocsSearchCriterias)
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate })
   }, [nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate])
@@ -75,6 +75,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
             page,
             searchCriterias: {
               orderBy,
+              searchBy,
               searchInput,
               filters: { nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate }
             }
@@ -111,91 +112,70 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   }, [loadingStatus])
 
   return (
-    <Grid container justifyContent="flex-end" className={classes.documentTable}>
-      <Grid item xs={12}>
-        <Alert
-          severity="info"
-          style={{ backgroundColor: 'transparent', fontSize: 13, padding: 0, fontWeight: 'bold', color: '#0288d1' }}
-        >
-          Attention : La recherche est pseudonymisée pour la prévisualisation des documents. Vous pouvez donc trouver
-          des incohérences entre les informations de votre patient et celles du document prévisualisé.
-        </Alert>
-      </Grid>
-      <Grid item xs={12}>
+    <Grid container alignItems="center">
+      <BlockWrapper item xs={12} margin={'20px 0px'}>
+        {searchResults.deidentified ? (
+          <AlertWrapper severity="info">
+            Attention : Les données identifiantes des patients sont remplacées par des informations fictives dans les
+            résultats de la recherche et dans les documents prévisualisés.
+          </AlertWrapper>
+        ) : (
+          <AlertWrapper severity="info">
+            Attention : La recherche textuelle est pseudonymisée (les données identifiantes des patients sont remplacées
+            par des informations fictives). Vous retrouverez les données personnelles de votre patient en cliquant sur
+            l'aperçu.
+          </AlertWrapper>
+        )}
+      </BlockWrapper>
+
+      <BlockWrapper item xs={12} margin={'20px 0px 10px 0px'}>
         <Searchbar>
-          <Grid container>
-            <Select
-              selectedValue={searchBy || SearchByTypes.TEXT}
-              label="Rechercher dans :"
-              width={'170px'}
-              items={searchByListDocuments}
-              onchange={(newValue) =>
-                dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_BY, payload: newValue })
-              }
-            />
-            <SearchInput
-              value={searchInput}
-              placeholder={'Rechercher dans les documents'}
-              displayHelpIcon
-              error={searchResults.searchInputError}
-              onchange={(newValue) =>
-                dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })
-              }
-            />
-          </Grid>
-          <Grid container item xs={12} justifyContent="flex-end">
-            <Button
-              width={'150px'}
-              icon={<FilterList height="15px" fill="#FFF" />}
-              onClick={() => setToggleModal(true)}
-            >
-              Filtrer
-            </Button>
-            <Modal
-              title="Filtrer par :"
-              open={toggleModal}
-              width={'600px'}
-              onClose={() => setToggleModal(false)}
-              onSubmit={(newFilters) => {
-                dispatchSearchCriteriasAction({ type: ActionTypes.ADD_FILTERS, payload: { ...filters, ...newFilters } })
-              }}
-            >
-              {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-              <DocTypesFilter allDocTypesList={allDocTypesList.docTypes} value={docTypes} name={FilterKeys.DOC_TYPES} />
-              <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
-              <ExecutiveUnitsFilter
-                value={executiveUnits}
-                name={FilterKeys.EXECUTIVE_UNITS}
-                criteriaName={CriteriaName.Document}
-              />
-            </Modal>
-          </Grid>
-        </Searchbar>
-      </Grid>
-
-      <Grid item xs={12}>
-        {filtersAsArray.map((filter, index) => (
-          <Chip
-            key={index}
-            label={filter.label}
-            onDelete={() => {
-              dispatchSearchCriteriasAction({
-                type: ActionTypes.REMOVE_FILTER,
-                payload: { key: filter.category, value: filter.value }
-              })
-            }}
+          <Select
+            selectedValue={searchBy || SearchByTypes.TEXT}
+            label="Rechercher dans :"
+            width={'170px'}
+            items={searchByListDocuments}
+            onchange={(newValue) =>
+              dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_BY, payload: newValue })
+            }
           />
-        ))}
-      </Grid>
+          <SearchInput
+            value={searchInput}
+            placeholder={'Rechercher dans les documents'}
+            displayHelpIcon
+            error={searchResults.searchInputError}
+            onchange={(newValue) =>
+              dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })
+            }
+          />
+          <Button width={'150px'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
+            Filtrer
+          </Button>
+        </Searchbar>
+        <Grid item xs={12}>
+          {filtersAsArray.map((filter, index) => (
+            <Chip
+              key={index}
+              label={filter.label}
+              onDelete={() => {
+                dispatchSearchCriteriasAction({
+                  type: ActionTypes.REMOVE_FILTER,
+                  payload: { key: filter.category, value: filter.value }
+                })
+              }}
+            />
+          ))}
+        </Grid>
+      </BlockWrapper>
 
-      <Grid container justifyContent="space-between" alignItems="center">
+      <BlockWrapper container justifyContent="space-between" alignItems="flex-end" margin={'0px 0px 5px 0px'}>
         <Grid item xs={12} md={3}>
           {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && <CircularProgress />}
           {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
             <DisplayDigits nb={searchResults.totalDocs} total={searchResults.totalAllDoc} label={searchResults.label} />
           )}
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} lg={6}>
           {!searchResults.deidentified && (
             <Grid container alignItems="center" justifyContent="flex-end">
               <Checkbox
@@ -203,16 +183,24 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
                 onChange={() =>
                   dispatchSearchCriteriasAction({
                     type: ActionTypes.ADD_FILTERS,
-                    payload: { nda, executiveUnits, docTypes, startDate, endDate, onlyPdfAvailable: !onlyPdfAvailable }
+                    payload: {
+                      nda,
+                      executiveUnits,
+                      docTypes,
+                      startDate,
+                      endDate,
+                      onlyPdfAvailable: !onlyPdfAvailable
+                    }
                   })
                 }
               />
-              <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
+              <Typography style={{ color: '#000' }}>
+                N'afficher que les documents dont les PDF sont disponibles
+              </Typography>
             </Grid>
           )}
         </Grid>
-      </Grid>
-
+      </BlockWrapper>
       <DataTableComposition
         loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
         deidentified={patient?.deidentified || false}
@@ -225,6 +213,27 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
         setPage={(newPage: number) => setPage(newPage)}
         total={searchResults.totalDocs}
       />
+      <Modal
+        title="Filtrer par :"
+        open={toggleModal}
+        width={'600px'}
+        onClose={() => setToggleModal(false)}
+        onSubmit={(newFilters) => {
+          dispatchSearchCriteriasAction({
+            type: ActionTypes.ADD_FILTERS,
+            payload: { ...filters, ...newFilters }
+          })
+        }}
+      >
+        {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+        <DocTypesFilter allDocTypesList={allDocTypesList.docTypes} value={docTypes} name={FilterKeys.DOC_TYPES} />
+        <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
+        <ExecutiveUnitsFilter
+          value={executiveUnits}
+          name={FilterKeys.EXECUTIVE_UNITS}
+          criteriaName={CriteriaName.Document}
+        />
+      </Modal>
     </Grid>
   )
 }

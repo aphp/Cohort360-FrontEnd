@@ -61,6 +61,7 @@ export enum SearchByTypesLabelDocuments {
   DESCRIPTION = 'Titre du document'
 }
 export enum FilterKeys {
+  IPP = 'ipp',
   GENDERS = 'genders',
   VITAL_STATUSES = 'vitalStatuses',
   BIRTHDATES = 'birthdatesRanges',
@@ -105,7 +106,13 @@ export type FilterValue =
   | SimpleCodeType[]
   | null
 
-export type Filters = PatientsFilters | PMSIFilters | MedicationFilters | BiologyFilters | DocumentsFilters
+export type Filters =
+  | PatientsFilters
+  | PMSIFilters
+  | MedicationFilters
+  | BiologyFilters
+  | PatientDocumentsFilters
+  | AllDocumentsFilters
 
 export interface PatientsFilters {
   genders: GenderStatus[]
@@ -141,8 +148,18 @@ export type BiologyFilters = {
   validatedStatus: boolean
 }
 
-export type DocumentsFilters = {
+export type PatientDocumentsFilters = {
   nda: string
+  docTypes: SimpleCodeType[]
+  onlyPdfAvailable: boolean
+  startDate: string | null
+  endDate: string | null
+  executiveUnits: ScopeTreeRow[]
+}
+
+export type AllDocumentsFilters = {
+  nda: string
+  ipp: string
   docTypes: SimpleCodeType[]
   onlyPdfAvailable: boolean
   startDate: string | null
