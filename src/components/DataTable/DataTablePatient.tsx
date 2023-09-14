@@ -121,7 +121,9 @@ const DataTablePatientLine: React.FC<{
       }
     >
       <TableCell align="center">
-        {patient.gender && <PatientGender gender={patient.gender as GenderStatus} className={classes.genderIcon} />}
+        {patient.gender && (
+          <PatientGender gender={patient.gender.toLocaleUpperCase() as GenderStatus} className={classes.genderIcon} />
+        )}
       </TableCell>
       <TableCell>{deidentified ? 'Prénom' : capitalizeFirstLetter(patient.name?.[0].given?.[0])}</TableCell>
       <TableCell>{deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ')}</TableCell>
