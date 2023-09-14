@@ -38,10 +38,16 @@ const GendersFilter = ({ name, value }: GendersFilterProps) => {
           label={GenderStatusLabel.MALE}
         />
         <FormControlLabel
-          checked={isChecked(GenderStatus.OTHER_UNKNOWN, genders)}
-          value={GenderStatus.OTHER_UNKNOWN}
+          checked={isChecked(GenderStatus.OTHER, genders)}
+          value={GenderStatus.OTHER}
           control={<Checkbox color="secondary" />}
-          label={GenderStatusLabel.OTHER_UNKNOWN}
+          label={GenderStatusLabel.OTHER}
+        />
+        <FormControlLabel
+          checked={isChecked(GenderStatus.UNKNOWN, genders)}
+          value={GenderStatus.UNKNOWN}
+          control={<Checkbox color="secondary" />}
+          label={GenderStatusLabel.UNKNOWN}
         />
       </FormGroup>
     </InputWrapper>
