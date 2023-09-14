@@ -10,7 +10,8 @@ import {
   PMSIFilters,
   MedicationFilters,
   BiologyFilters,
-  DocumentsFilters
+  PatientDocumentsFilters,
+  AllDocumentsFilters
 } from 'types/searchCriterias'
 
 export const initPatientsSearchCriterias: SearchCriterias<PatientsFilters> = {
@@ -79,7 +80,7 @@ export const initBioSearchCriterias: SearchCriterias<BiologyFilters> = {
   }
 }
 
-export const initDocsSearchCriterias: SearchCriterias<DocumentsFilters> = {
+export const initPatientDocsSearchCriterias: SearchCriterias<PatientDocumentsFilters> = {
   orderBy: {
     orderBy: Order.DATE,
     orderDirection: Direction.DESC
@@ -87,6 +88,24 @@ export const initDocsSearchCriterias: SearchCriterias<DocumentsFilters> = {
   searchInput: '',
   searchBy: SearchByTypes.TEXT,
   filters: {
+    nda: '',
+    docTypes: [],
+    onlyPdfAvailable: true,
+    startDate: null,
+    endDate: null,
+    executiveUnits: []
+  }
+}
+
+export const initAllDocsSearchCriterias: SearchCriterias<AllDocumentsFilters> = {
+  orderBy: {
+    orderBy: Order.DATE,
+    orderDirection: Direction.DESC
+  },
+  searchInput: '',
+  searchBy: SearchByTypes.TEXT,
+  filters: {
+    ipp: '',
     nda: '',
     docTypes: [],
     onlyPdfAvailable: true,

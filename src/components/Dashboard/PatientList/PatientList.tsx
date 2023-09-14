@@ -45,7 +45,7 @@ type PatientListProps = {
   loading?: boolean
 }
 
-const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified }) => {
+const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   const [toggleModal, setToggleModal] = useState(false)
   const [page, setPage] = useState(1)
   const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total, label: 'patient(s)' })
