@@ -13,8 +13,8 @@ export type ScopeTreeSearchProps = {
   searchInput: string
   selectedItems: ScopeTreeRow[]
   setSelectedItems: (selectedItems: ScopeTreeRow[]) => void
-  searchRootRows: ScopeTreeRow[]
-  setSearchRootRows: (selectedItems: ScopeTreeRow[]) => void
+  searchSavedRootRows: ScopeTreeRow[]
+  setSearchSavedRootRows: (selectedItems: ScopeTreeRow[]) => void
   isSelectionLoading: boolean
   setIsSelectionLoading: (isSelectionLoading: boolean) => void
   executiveUnitType?: ScopeType
@@ -23,8 +23,8 @@ export type ScopeTreeSearchProps = {
 export type ScopeTreeExplorationProps = {
   selectedItems: ScopeTreeRow[]
   setSelectedItems: (selectedItems: ScopeTreeRow[]) => void
-  searchRootRows: ScopeTreeRow[]
-  setSearchRootRows: (selectedItems: ScopeTreeRow[]) => void
+  searchSavedRootRows: ScopeTreeRow[]
+  setSearchSavedRootRows: (selectedItems: ScopeTreeRow[]) => void
   openPopulation: number[]
   setOpenPopulations: (openPopulation: number[]) => void
   isSelectionLoading: boolean
@@ -60,7 +60,7 @@ const Index = (props: ScopeTreeProps) => {
   }))
   const { scopesList = [] } = scopeState
   const [searchInput, setSearchInput] = useState('')
-  const [searchRootRows, setSearchRootRows] = useState<ScopeTreeRow[]>([...scopesList])
+  const [searchSavedRootRows, setSearchSavedRootRows] = useState<ScopeTreeRow[]>([...scopesList])
   const [isSelectionLoading, setIsSelectionLoading] = useState<boolean>(false)
 
   const { classes } = useStyles()
@@ -82,8 +82,8 @@ const Index = (props: ScopeTreeProps) => {
             searchInput={searchInput}
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
-            searchRootRows={searchRootRows}
-            setSearchRootRows={setSearchRootRows}
+            searchSavedRootRows={searchSavedRootRows}
+            setSearchSavedRootRows={setSearchSavedRootRows}
             executiveUnitType={executiveUnitType}
             isSelectionLoading={isSelectionLoading}
             setIsSelectionLoading={setIsSelectionLoading}
@@ -92,8 +92,8 @@ const Index = (props: ScopeTreeProps) => {
           <ScopeTreeExploration
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
-            searchRootRows={searchRootRows}
-            setSearchRootRows={setSearchRootRows}
+            searchSavedRootRows={searchSavedRootRows}
+            setSearchSavedRootRows={setSearchSavedRootRows}
             openPopulation={openPopulation}
             setOpenPopulations={setOpenPopulations}
             executiveUnitType={executiveUnitType}
