@@ -4,6 +4,7 @@ import {
   Checkbox,
   CircularProgress,
   Grid,
+  LinearProgress,
   Pagination,
   Paper,
   Table,
@@ -92,6 +93,7 @@ const Index = (props: ScopeTreeExplorationProps) => {
 
   return (
     <div className={classes.container}>
+      {!isSearchLoading && <div className={classes.linearProgress}>{isSelectionLoading && <LinearProgress />}</div>}
       {isSearchLoading ? (
         <Grid container justifyContent="center">
           <CircularProgress size={50} />

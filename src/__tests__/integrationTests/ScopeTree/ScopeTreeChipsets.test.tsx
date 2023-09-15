@@ -3,8 +3,6 @@ import { fireEvent, render } from '@testing-library/react'
 import ScopeTreeChipsets from '../../../components/ScopeTree/ScopeTreeChipsets/ScopeTreeChipsets'
 import { ScopeTreeRow } from '../../../types'
 import { vi } from 'vitest'
-import { store } from '../../../state/store'
-import { Provider } from 'react-redux'
 
 describe('ScopeTreeChipsets', () => {
   test('renders selected items', () => {
