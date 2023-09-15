@@ -545,33 +545,38 @@ export const searchInPerimeters = async (
   setIsEmpty: (isEmpty: boolean) => void,
   setCount: (count: number) => void,
   setRootRows: (newRootRows: ScopeTreeRow[]) => void,
-  searchedRows: ScopeTreeRow[],
-  setSearchedRows: (newRootRows: ScopeTreeRow[]) => void,
+  searchRootRows: ScopeTreeRow[],
+  setSearchRootRows: (newRootRows: ScopeTreeRow[]) => void,
   setOpenPopulations: (newOpenPopulation: number[]) => void,
   executiveUnitType?: ScopeType
 ) => {
   setIsSearchLoading(true)
-  cancelPendingRequest(controllerRef.current)
-  const {
-    scopeTreeRows: newPerimetersList,
-    count: newCount,
-    aborted: aborted
-  } = await servicesPerimeters.findScope(searchInput, page, controllerRef.current?.signal, executiveUnitType)
+  let newRootRows: ScopeTreeRow[] = []
+  try {
+    cancelPendingRequest(controllerRef.current)
+    const {
+      scopeTreeRows: newPerimetersList,
+      count: newCount,
+      aborted: aborted
+    } = await servicesPerimeters.findScope(searchInput, page, controllerRef.current?.signal, executiveUnitType)
 
-  if (!aborted) {
-    if (!newPerimetersList || newPerimetersList.length < 1) {
-      setIsEmpty(true)
-    } else {
-      setIsEmpty(false)
+    if (!aborted) {
+      if (!newPerimetersList || newPerimetersList.length < 1) {
+        setIsEmpty(true)
+      } else {
+        setIsEmpty(false)
+      }
+      setRootRows(newPerimetersList)
+      setOpenPopulations([])
+      setCount(newCount)
+      setIsSearchLoading(false)
     }
-    setRootRows(newPerimetersList)
-    setOpenPopulations([])
-    setCount(newCount)
+    newRootRows = (await expandSelectedItems(searchRootRows, newPerimetersList, undefined, undefined)) ?? searchRootRows
+  } catch (error) {
+    console.error('An error has been occured while searching data')
     setIsSearchLoading(false)
   }
-  const newRootRows: ScopeTreeRow[] =
-    (await expandSelectedItems(searchedRows, newPerimetersList, undefined, undefined)) ?? searchedRows
-  setSearchedRows(newRootRows)
+  setSearchRootRows(newRootRows)
   return newRootRows
 }
 

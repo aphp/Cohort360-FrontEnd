@@ -35,7 +35,7 @@ const Index = (props: ScopeTreeExplorationProps) => {
   const {
     selectedItems,
     setSelectedItems,
-    searchRootRows,
+    searchSavedRootRows,
     executiveUnitType,
     isSelectionLoading,
     setIsSelectionLoading
@@ -148,7 +148,7 @@ const Index = (props: ScopeTreeExplorationProps) => {
                         onSearchSelect(
                           row,
                           selectedItems,
-                          searchRootRows,
+                          searchSavedRootRows,
                           scopesList,
                           isSelectionLoading,
                           setIsSelectionLoading,

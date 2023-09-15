@@ -23,8 +23,8 @@ const Index: React.FC<ScopeTreeSearchProps> = (props) => {
     searchInput,
     selectedItems,
     setSelectedItems,
-    searchRootRows,
-    setSearchRootRows,
+    searchSavedRootRows,
+    setSearchSavedRootRows,
     executiveUnitType,
     isSelectionLoading,
     setIsSelectionLoading
@@ -64,7 +64,7 @@ const Index: React.FC<ScopeTreeSearchProps> = (props) => {
             selectedItems,
             setSelectedItems,
             isHeadChecked,
-            searchRootRows,
+            searchSavedRootRows,
             scopesList,
             isSelectionLoading,
             setIsSelectionLoading
@@ -84,8 +84,8 @@ const Index: React.FC<ScopeTreeSearchProps> = (props) => {
       setIsEmpty,
       setCount,
       setRootRows,
-      searchRootRows,
-      setSearchRootRows,
+      searchSavedRootRows,
+      setSearchSavedRootRows,
       setOpenPopulations,
       executiveUnitType
     )
@@ -147,12 +147,12 @@ const Index: React.FC<ScopeTreeSearchProps> = (props) => {
                         onSearchSelect(
                           row,
                           selectedItems,
-                          searchRootRows,
+                          searchSavedRootRows,
                           scopesList,
                           isSelectionLoading,
                           setIsSelectionLoading,
                           setSelectedItems,
-                          setSearchRootRows
+                          setSearchSavedRootRows
                         )
                       }
                       isIndeterminate={(row: ScopeTreeRow) => isSearchIndeterminate(row, selectedItems)}
