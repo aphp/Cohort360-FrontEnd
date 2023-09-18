@@ -50,12 +50,10 @@ const ModalCohortTitle: React.FC<{
     onChangeTitle(title)
     if (!title || title.length > 255) {
       setError(CohortCreationError.ERROR_TITLE)
+    } else if (title && BLANK_REGEX.test(title)) {
+      setError(CohortCreationError.ERROR_REGEX)
     } else {
       setError(null)
-    }
-
-    if (title && BLANK_REGEX.test(title)) {
-      setError(CohortCreationError.ERROR_REGEX)
     }
   }
 
