@@ -36,16 +36,10 @@ const ModalCohortTitle: React.FC<{
   const handleClose = () => onClose()
 
   const handleConfirm = () => {
+    if (error !== null) {
+      return
+    }
     setLoading(true)
-    if (!title || (title && title.length > 255)) {
-      setLoading(false)
-      return setError(CohortCreationError.ERROR_TITLE)
-    }
-
-    if (title && BLANK_REGEX.test(title)) {
-      setLoading(false)
-      return setError(CohortCreationError.ERROR_REGEX)
-    }
 
     if (onExecute) {
       onExecute(title, description, globalCount)
@@ -54,10 +48,14 @@ const ModalCohortTitle: React.FC<{
 
   const handleTitleChange = (title: string) => {
     onChangeTitle(title)
-    if (title.length > 250) {
+    if (!title || title.length > 255) {
       setError(CohortCreationError.ERROR_TITLE)
     } else {
       setError(null)
+    }
+
+    if (title && BLANK_REGEX.test(title)) {
+      setError(CohortCreationError.ERROR_REGEX)
     }
   }
 
