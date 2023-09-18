@@ -153,17 +153,7 @@ export const onExpand = async (
   executiveUnitType?: ScopeType
 ) => {
   controllerRef.current = new AbortController()
-  let _openPopulation: number[] = openPopulation ? openPopulation : []
   const _rootRows = rootRows ? [...rootRows] : []
-  const index = _openPopulation.indexOf(rowId)
-
-  if (index !== -1) {
-    _openPopulation = _openPopulation.filter((perimeter_id) => perimeter_id !== rowId)
-    setOpenPopulations(_openPopulation)
-  } else {
-    _openPopulation = [..._openPopulation, rowId]
-    setOpenPopulations(_openPopulation)
-  }
 
   let expandResponse
   const params: ExpandScopeElementParamsType = {
@@ -181,6 +171,7 @@ export const onExpand = async (
   }
   if (expandResponse && !expandResponse.aborted) {
     setRootRows(expandResponse.scopesList ?? [])
+    setOpenPopulations(expandResponse.openPopulation)
   }
 }
 
