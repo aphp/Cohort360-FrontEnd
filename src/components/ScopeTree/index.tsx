@@ -38,6 +38,8 @@ type ScopeTreeExcludedProps = {
   setSearchRootRows: (selectedItems: ScopeTreeRow[]) => void
   isSelectionLoading: boolean
   setIsSelectionLoading: (isSelectionLoading: boolean) => void
+  searchSavedRootRows: ScopeTreeRow[]
+  setSearchSavedRootRows: (selectedItems: ScopeTreeRow[]) => void
 }
 type ScopeTreeProps = {
   [K in Exclude<
