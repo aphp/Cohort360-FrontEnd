@@ -1477,7 +1477,6 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   } else {
                     valueComparator = Comparators.GREATER_OR_EQUAL
                     valueMin = parseInt(value?.replace('ge', ''))
-                    console.log('valueMin', valueMin)
                   }
                 } else if (value?.search('gt') === 0) {
                   valueComparator = Comparators.GREATER

@@ -2,6 +2,7 @@ import { AgeRangeType, CohortPatient } from 'types'
 import moment from 'moment'
 
 export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'months'): string => {
+  if (ageValue === 0 && momentUnit === 'months') return '< 1 mois'
   if (!ageValue) return 'Âge inconnu'
   let ageUnit: 'year' | 'month' | 'day' = 'year'
   let ageUnitDisplay = ''

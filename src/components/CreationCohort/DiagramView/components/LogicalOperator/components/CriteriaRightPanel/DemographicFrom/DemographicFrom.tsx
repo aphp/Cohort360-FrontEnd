@@ -78,7 +78,6 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
   const _onSubmit = () => {
     const errorType = _onCheckError()
     setError(errorType)
-    console.log('defaultValues', defaultValues)
     if (errorType === Error.NO_ERROR) return onChangeSelectedCriteria(defaultValues)
   }
 
