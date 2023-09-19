@@ -214,7 +214,7 @@ export const buildMedicationFiltersChips = (
 export const buildPmsiFiltersChips = (
   filters: PMSIFiltersType,
   handleDeleteChip: (
-    filterName: 'nda' | 'code' | 'selectedDiagnosticTypes' | 'startDate' | 'endDate' | 'executiveUnits',
+    filterName: 'nda' | 'code' | 'diagnosticTypes' | 'startDate' | 'endDate' | 'executiveUnits',
     value?: any
   ) => void
 ): MasterChipsProps['chips'] => {
@@ -247,7 +247,7 @@ export const buildPmsiFiltersChips = (
       filters.diagnosticTypes?.length > 0 &&
         filters.diagnosticTypes.map(({ label, ...diagnosticType }) => ({
           label: label ? `Type : ${capitalizeFirstLetter(label)}` : '',
-          onDelete: () => handleDeleteChip('selectedDiagnosticTypes', diagnosticType)
+          onDelete: () => handleDeleteChip('diagnosticTypes', diagnosticType)
         })),
       filters.executiveUnits?.length > 0 &&
         filters.executiveUnits.map((executiveUnit) => ({
