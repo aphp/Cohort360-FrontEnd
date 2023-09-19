@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios'
 import {
   CohortData,
-  FHIR_API_Response,
+  FHIR_Bundle_Response,
   CohortEncounter,
   CohortComposition,
   SearchByTypes,
@@ -22,7 +22,7 @@ import {
   fetchClaim,
   fetchCondition,
   fetchProcedure,
-  fetchComposition,
+  fetchDocumentReference,
   fetchMedicationRequest,
   fetchMedicationAdministration,
   fetchObservation
@@ -397,7 +397,7 @@ const servicesPatients: IServicePatients = {
     signal,
     executiveUnits
   ) => {
-    let pmsiResp: AxiosResponse<FHIR_API_Response<Condition | Procedure | Claim>> | null = null
+    let pmsiResp: AxiosResponse<FHIR_Bundle_Response<Condition | Procedure | Claim>> | null = null
 
     switch (selectedTab) {
       case 'diagnostic':
@@ -405,7 +405,7 @@ const servicesPatients: IServicePatients = {
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
           _list: groupId ? [groupId] : [],
-          patient: patientId,
+          subject: patientId,
           _text: searchInput,
           _sort: sortBy === 'code' ? 'code' : 'recorded-date',
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
@@ -423,7 +423,7 @@ const servicesPatients: IServicePatients = {
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
           _list: groupId ? [groupId] : [],
-          patient: patientId,
+          subject: patientId,
           _text: searchInput,
           _sort: sortBy === 'code' ? 'code' : 'date',
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
@@ -473,7 +473,7 @@ const servicesPatients: IServicePatients = {
       offset: 20,
       size,
       _list: groupId ? [groupId] : [],
-      patient: patientId,
+      subject: patientId,
       _sort: 'date',
       sortDirection: 'desc'
     })
@@ -487,7 +487,7 @@ const servicesPatients: IServicePatients = {
       offset: 20,
       size,
       _list: groupId ? [groupId] : [],
-      patient: patientId,
+      subject: patientId,
       _sort: 'recorded-date',
       sortDirection: 'desc'
     })
@@ -512,7 +512,7 @@ const servicesPatients: IServicePatients = {
     signal,
     executiveUnits
   ) => {
-    let medicationResp: AxiosResponse<FHIR_API_Response<MedicationRequest | MedicationAdministration>> | null = null
+    let medicationResp: AxiosResponse<FHIR_Bundle_Response<MedicationRequest | MedicationAdministration>> | null = null
 
     switch (selectedTab) {
       case 'prescription':
@@ -521,7 +521,7 @@ const servicesPatients: IServicePatients = {
           size: 20,
           _list: groupId ? [groupId] : [],
           encounter: nda,
-          patient: patientId,
+          subject: patientId,
           _text: searchInput,
           _sort: sortBy,
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
@@ -538,7 +538,7 @@ const servicesPatients: IServicePatients = {
           size: 20,
           _list: groupId ? [groupId] : [],
           encounter: nda,
-          patient: patientId,
+          subject: patientId,
           _text: searchInput,
           _sort: sortBy,
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
@@ -580,7 +580,7 @@ const servicesPatients: IServicePatients = {
     executiveUnits?: string[]
   ) => {
     const observationResp = await fetchObservation({
-      patient: patientId,
+      subject: patientId,
       _list: groupId ? [groupId] : [],
       _sort: sortBy,
       sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
@@ -623,7 +623,7 @@ const servicesPatients: IServicePatients = {
   ) => {
     const documentLines = 20 // Number of desired lines in the document array
 
-    const docsList = await fetchComposition({
+    const docsList = await fetchDocumentReference({
       patient: patientId,
       _list: groupId ? [groupId] : [],
       searchBy: searchBy,
@@ -632,21 +632,6 @@ const servicesPatients: IServicePatients = {
       size: documentLines,
       offset: page ? (page - 1) * documentLines : 0,
       status: 'final',
-      _elements: !searchInput
-        ? [
-            'docstatus',
-            'status',
-            'type',
-            'encounter',
-            'date',
-            'title',
-            'event',
-            'content',
-            'context',
-            'text',
-            'description'
-          ]
-        : [],
       _text: searchInput,
       highlight_search_results: true,
       type: selectedDocTypes.join(','),
@@ -796,23 +781,8 @@ export const getEncounterDocuments = async (
     encountersIdList.push(encounter.id)
   })
 
-  const documentsResp = await fetchComposition({
+  const documentsResp = await fetchDocumentReference({
     encounter: encountersIdList.join(','),
-    _elements: [
-      'docstatus',
-      'status',
-      'type',
-      'subject',
-      'encounter',
-      'date',
-      'title',
-      'event',
-      'content',
-      'context',
-      'text',
-      'description',
-      'title'
-    ],
     status: 'final',
     _list: groupId ? groupId.split(',') : []
   })

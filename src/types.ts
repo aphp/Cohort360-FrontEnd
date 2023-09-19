@@ -12,8 +12,10 @@ import {
   Observation,
   OperationOutcome,
   Patient,
-  Procedure
+  Procedure,
+  Resource
 } from 'fhir/r4'
+import { AxiosResponse } from 'axios'
 
 export enum CohortJobStatus {
   _long_pending = 'long_pending',
@@ -67,7 +69,10 @@ export enum CohortCreationError {
   ERROR_REGEX = 'error_regex'
 }
 
-export type FHIR_API_Response<T extends FhirResource> = Bundle<T> | OperationOutcome
+export type FHIR_API_Response<T extends Resource> = T | OperationOutcome
+export type FHIR_Bundle_Response<T extends FhirResource> = FHIR_API_Response<Bundle<T>>
+export type FHIR_API_Promise_Response<T extends Resource> = Promise<AxiosResponse<FHIR_API_Response<T>>>
+export type FHIR_Bundle_Promise_Response<T extends FhirResource> = FHIR_API_Promise_Response<Bundle<T>>
 
 export type Back_API_Response<T> = {
   results?: T[]
@@ -272,9 +277,9 @@ export type ScopeTreeRow = AbstractTree<{
 }>
 
 export enum ChartCode {
-  agePyramid = 'facet-extension.age-month',
+  agePyramid = 'facet-extension.ageMonth',
   genderRepartition = 'facet-deceased',
-  monthlyVisits = 'facet-facet.period.start-gender',
+  monthlyVisits = 'facet-_facet.period.startGender',
   visitTypeRepartition = 'facet-class.coding.display'
 }
 
@@ -830,7 +835,7 @@ export type IPatientMedication<T extends MedicationRequest | MedicationAdministr
 }
 
 export enum BiologyStatus {
-  VALIDATED = 'Validé'
+  VALIDATED = 'Val'
 }
 
 export type CohortObservation = Observation & {
@@ -907,7 +912,7 @@ export type HierarchyTree = null | {
 export type HierarchyElement = {
   id: string
   label: string
-  subItems?: any[]
+  subItems?: HierarchyElement[]
 }
 export type TreeElement = { id: string; subItems: TreeElement[] }
 export type ScopeElement = {
