@@ -62,6 +62,11 @@ export enum CompositionStatusKind {
   _enteredInError = 'entered-in-error'
 }
 
+export enum CohortCreationError {
+  ERROR_TITLE = 'error_title',
+  ERROR_REGEX = 'error_regex'
+}
+
 export type FHIR_API_Response<T extends FhirResource> = Bundle<T> | OperationOutcome
 
 export type Back_API_Response<T> = {
