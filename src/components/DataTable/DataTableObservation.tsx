@@ -7,6 +7,7 @@ import DataTable from 'components/DataTable/DataTable'
 import { Column, Order, CohortObservation } from 'types'
 
 import useStyles from './styles'
+import { BIOLOGY_HIERARCHY_ITM_LOINC, BIOLOGY_HIERARCHY_ITM_ANABIO } from '../../constants'
 
 type DataTableObservationProps = {
   loading: boolean
@@ -32,7 +33,7 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
 
   const columns: Column[] = [
     { label: `NDA${deidentified ? ' chiffré' : ''}`, code: '', align: 'left', sortableColumn: false },
-    { label: 'Date de prélèvement', code: 'effectiveDatetime', align: 'center', sortableColumn: true },
+    { label: 'Date de prélèvement', code: 'effectiveDateTime', align: 'center', sortableColumn: true },
     { label: 'ANABIO', code: 'codeSimple-anabio', align: 'center', sortableColumn: true },
     { label: 'LOINC', code: 'codeSimple-loinc', align: 'center', sortableColumn: true },
     { label: 'Résultat', code: '', align: 'center', sortableColumn: false },
@@ -79,6 +80,13 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
   )
 }
 
+const formatValueRange = (value?: string | number, valueUnit?: string): string => {
+  if (value) {
+    return `${value} ${valueUnit || ''}`
+  }
+  return '_'
+}
+
 const DataTableObservationLine: React.FC<{
   observation: CohortObservation
 }> = ({ observation }) => {
@@ -86,22 +94,27 @@ const DataTableObservationLine: React.FC<{
 
   const nda = observation.NDA
   const date = observation.effectiveDateTime
-  const libelleANABIO = observation.code?.coding?.find((code) => code.id === 'CODE ANABIO')?.display
-  const codeLOINC = observation.code?.coding?.find((code) => code.id === 'CODE LOINC')?.code
-  const libelleLOINC = observation.code?.coding?.find((code) => code.id === 'CODE LOINC')?.display
-  const result = observation.valueQuantity
-    ? observation.valueQuantity.code
-      ? observation.valueQuantity.code
-      : observation.valueQuantity.value
-      ? `${observation.valueQuantity.value} ${observation.valueQuantity.unit}`
-      : '-'
+  const libelleANABIO = observation.code?.coding?.find(
+    (code) => code.id === 'CODE ANABIO' || code.system === BIOLOGY_HIERARCHY_ITM_ANABIO
+  )?.display
+  const codeLOINC = observation.code?.coding?.find(
+    (code) => code.id === 'CODE LOINC' || code.system === BIOLOGY_HIERARCHY_ITM_LOINC
+  )?.code
+  const libelleLOINC = observation.code?.coding?.find(
+    (code) => code.id === 'CODE LOINC' || code.system === BIOLOGY_HIERARCHY_ITM_LOINC
+  )?.display
+  const result = observation.valueQuantity?.value
+    ? `${observation.valueQuantity.value} ${observation.valueQuantity?.unit || ''}`
     : '-'
   const valueUnit = observation.valueQuantity?.unit ?? ''
   const serviceProvider = observation.serviceProvider
   const referenceRangeArray = observation.referenceRange?.[0]
-  const referenceRange = `${referenceRangeArray?.low?.value ?? '-'}${valueUnit} - ${
-    referenceRangeArray?.high?.value ?? '-'
-  }${valueUnit}`
+  const referenceRange = referenceRangeArray
+    ? `${formatValueRange(referenceRangeArray?.low?.value, valueUnit)} - ${formatValueRange(
+        referenceRangeArray?.high?.value,
+        valueUnit
+      )}`
+    : '-'
 
   return (
     <TableRow className={classes.tableBodyRows} key={observation.id}>

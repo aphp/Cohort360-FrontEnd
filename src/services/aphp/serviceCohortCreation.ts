@@ -2,38 +2,33 @@ import { AxiosResponse } from 'axios'
 import apiBack from '../apiBackend'
 
 import { DatedMeasure, DocType, QuerySnapshotInfo, RequestType, Snapshot } from 'types'
-
+import docTypes from 'assets/docTypes.json'
+import { fetchSignleCode } from './cohortCreation/fetchMedication'
+import { fetchBiologySearch } from './cohortCreation/fetchObservation'
 import {
-  fetchAdmissionModes,
-  fetchEntryModes,
-  fetchExitModes,
-  fetchPriseEnChargeType,
-  fetchTypeDeSejour,
-  fetchFileStatus,
-  fetchReason,
-  fetchDestination,
-  fetchProvenance,
-  fetchAdmission
-} from './cohortCreation/fetchEncounter'
-import { fetchGender, fetchStatus } from './cohortCreation/fetchDemographic'
-import {
-  fetchStatusDiagnostic,
-  fetchDiagnosticTypes,
-  fetchCim10Diagnostic,
-  fetchCim10Hierarchy
-} from './cohortCreation/fetchCondition'
-import { fetchCcamData, fetchCcamHierarchy } from './cohortCreation/fetchProcedure'
-import { fetchGhmData, fetchGhmHierarchy } from './cohortCreation/fetchClaim'
-import { fetchDocTypes } from './cohortCreation/fetchComposition'
-import {
-  fetchAtcData,
-  fetchAtcHierarchy,
-  fetchPrescriptionTypes,
-  fetchAdministrations,
-  fetchSignleCode
-} from './cohortCreation/fetchMedication'
-import { fetchBiologySearch, fetchBiologyData, fetchBiologyHierarchy } from './cohortCreation/fetchObservation'
-import { SHORT_COHORT_LIMIT } from '../../constants'
+  BIOLOGY_HIERARCHY_ITM_ANABIO,
+  BIOLOGY_HIERARCHY_ITM_LOINC,
+  CLAIM_HIERARCHY,
+  CONDITION_HIERARCHY,
+  CONDITION_STATUS,
+  DEMOGRAPHIC_GENDER,
+  ENCOUNTER_ADMISSION,
+  ENCOUNTER_ADMISSION_MODE,
+  ENCOUNTER_DESTINATION,
+  ENCOUNTER_ENTRY_MODE,
+  ENCOUNTER_EXIT_MODE,
+  ENCOUNTER_EXIT_TYPE,
+  ENCOUNTER_FILE_STATUS,
+  ENCOUNTER_PROVENANCE,
+  ENCOUNTER_SEJOUR_TYPE,
+  ENCOUNTER_VISIT_TYPE,
+  MEDICATION_ADMINISTRATIONS,
+  MEDICATION_ATC,
+  MEDICATION_PRESCRIPTION_TYPES,
+  PROCEDURE_HIERARCHY,
+  SHORT_COHORT_LIMIT
+} from '../../constants'
+import { fetchValueSet } from './callApi'
 
 export interface IServiceCohortCreation {
   /**
@@ -81,7 +76,7 @@ export interface IServiceCohortCreation {
   fetchStatusDiagnostic: () => Promise<any>
   fetchDiagnosticTypes: () => Promise<any>
   fetchCim10Diagnostic: () => Promise<any>
-  fetchCim10Hierarchy: (cim10Parent: string) => Promise<any>
+  fetchCim10Hierarchy: (cim10Parent?: string) => Promise<any>
   fetchCcamData: () => Promise<any>
   fetchCcamHierarchy: (ccamParent: string) => Promise<any>
   fetchGhmData: () => Promise<any>
@@ -220,34 +215,106 @@ const servicesCohortCreation: IServiceCohortCreation = {
     return snapshotResponse.data || {}
   },
 
-  fetchAdmissionModes: fetchAdmissionModes,
-  fetchEntryModes: fetchEntryModes,
-  fetchExitModes: fetchExitModes,
-  fetchPriseEnChargeType: fetchPriseEnChargeType,
-  fetchTypeDeSejour: fetchTypeDeSejour,
-  fetchFileStatus: fetchFileStatus,
-  fetchReason: fetchReason,
-  fetchDestination: fetchDestination,
-  fetchProvenance: fetchProvenance,
-  fetchAdmission: fetchAdmission,
-  fetchGender: fetchGender,
-  fetchStatus: fetchStatus,
-  fetchStatusDiagnostic: fetchStatusDiagnostic,
-  fetchDiagnosticTypes: fetchDiagnosticTypes,
-  fetchCim10Diagnostic: fetchCim10Diagnostic,
-  fetchCim10Hierarchy: fetchCim10Hierarchy,
-  fetchCcamData: fetchCcamData,
-  fetchCcamHierarchy: fetchCcamHierarchy,
-  fetchGhmData: fetchGhmData,
-  fetchGhmHierarchy: fetchGhmHierarchy,
-  fetchDocTypes: fetchDocTypes,
-  fetchAtcData: fetchAtcData,
+  fetchAdmissionModes: async () =>
+    fetchValueSet(ENCOUNTER_ADMISSION_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchEntryModes: async () => fetchValueSet(ENCOUNTER_ENTRY_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchExitModes: async () => fetchValueSet(ENCOUNTER_EXIT_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchPriseEnChargeType: async () =>
+    fetchValueSet(ENCOUNTER_VISIT_TYPE, {
+      joinDisplayWithCode: false,
+      filterOut: (value) => value.id === 'nachstationär' || value.id === 'z.zt. verlegt'
+    }),
+  fetchTypeDeSejour: async () => fetchValueSet(ENCOUNTER_SEJOUR_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchFileStatus: async () => fetchValueSet(ENCOUNTER_FILE_STATUS, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchReason: async () => fetchValueSet(ENCOUNTER_EXIT_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchDestination: async () => fetchValueSet(ENCOUNTER_DESTINATION, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchProvenance: async () => fetchValueSet(ENCOUNTER_PROVENANCE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchAdmission: async () => fetchValueSet(ENCOUNTER_ADMISSION, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchGender: async () => fetchValueSet(DEMOGRAPHIC_GENDER, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchStatus: async () => {
+    return [
+      {
+        id: false,
+        label: 'Vivant(e)'
+      },
+      {
+        id: true,
+        label: 'Décédé(e)'
+      }
+    ]
+  },
+  fetchStatusDiagnostic: async () => {
+    return [
+      {
+        id: 'actif',
+        label: 'Actif'
+      },
+      {
+        id: 'supp',
+        label: 'Supprimé'
+      }
+    ]
+  },
+  fetchDiagnosticTypes: async () => fetchValueSet(CONDITION_STATUS),
+  fetchCim10Diagnostic: async (searchValue?: string, noStar?: boolean) =>
+    fetchValueSet(CONDITION_HIERARCHY, {
+      valueSetTitle: 'Toute la hiérarchie',
+      search: searchValue || '',
+      noStar
+    }),
+  fetchCim10Hierarchy: async (cim10Parent?: string) =>
+    fetchValueSet(CONDITION_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie CIM10', code: cim10Parent }),
+  fetchCcamData: async (searchValue?: string, noStar?: boolean) =>
+    fetchValueSet(PROCEDURE_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', noStar }),
+  fetchCcamHierarchy: async (ccamParent?: string) =>
+    fetchValueSet(PROCEDURE_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie CCAM', code: ccamParent }),
+  fetchGhmData: async (searchValue?: string, noStar?: boolean) =>
+    fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', noStar }),
+  fetchGhmHierarchy: async (ghmParent?: string) =>
+    fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie GHM', code: ghmParent }),
+  fetchDocTypes: () => (docTypes && docTypes.docTypes.length > 0 ? docTypes.docTypes : []),
+  fetchAtcData: async (searchValue?: string, noStar?: boolean) =>
+    fetchValueSet(MEDICATION_ATC, {
+      valueSetTitle: 'Toute la hiérarchie',
+      search: searchValue || '',
+      noStar
+    }),
   fetchSingleMedication: fetchSignleCode,
-  fetchAtcHierarchy: fetchAtcHierarchy,
-  fetchPrescriptionTypes: fetchPrescriptionTypes,
-  fetchAdministrations: fetchAdministrations,
-  fetchBiologyData: fetchBiologyData,
-  fetchBiologyHierarchy: fetchBiologyHierarchy,
+  fetchAtcHierarchy: async (atcParent?: string) =>
+    fetchValueSet(MEDICATION_ATC, {
+      valueSetTitle: 'Toute la hiérarchie Médicament',
+      code: atcParent,
+      sortingKey: 'id',
+      filterRoots: (atcData) =>
+        // V--[ @TODO: This is a hot fix, remove this after a clean of data ]--V
+        atcData.label.search(new RegExp(/^[A-Z] - /, 'gi')) !== -1 &&
+        atcData.label.search(new RegExp(/^[X-Y] - /, 'gi')) !== 0
+    }),
+  fetchPrescriptionTypes: async () => fetchValueSet(MEDICATION_PRESCRIPTION_TYPES, { joinDisplayWithCode: false }),
+  fetchAdministrations: async () => fetchValueSet(MEDICATION_ADMINISTRATIONS, { joinDisplayWithCode: false }),
+  fetchBiologyData: async (searchValue?: string, noStar?: boolean) =>
+    fetchValueSet(`${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}`, {
+      valueSetTitle: 'Toute la hiérarchie',
+      search: searchValue || '',
+      noStar,
+      joinDisplayWithCode: false
+    }),
+  fetchBiologyHierarchy: async (biologyParent?: string) =>
+    fetchValueSet(BIOLOGY_HIERARCHY_ITM_ANABIO, {
+      valueSetTitle: 'Toute la hiérarchie de Biologie',
+      code: biologyParent,
+      joinDisplayWithCode: false,
+      filterRoots: (biologyItem) =>
+        biologyItem.id !== '527941' &&
+        biologyItem.id !== '547289' &&
+        biologyItem.id !== '528247' &&
+        biologyItem.id !== '981945' &&
+        biologyItem.id !== '834019' &&
+        biologyItem.id !== '528310' &&
+        biologyItem.id !== '528049' &&
+        biologyItem.id !== '527570' &&
+        biologyItem.id !== '527614'
+    }),
   fetchBiologySearch: fetchBiologySearch
 }
 
