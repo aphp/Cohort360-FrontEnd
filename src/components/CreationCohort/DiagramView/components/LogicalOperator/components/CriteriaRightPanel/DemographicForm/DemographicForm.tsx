@@ -19,12 +19,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import useStyles from './styles'
 
 import { Calendar, CalendarLabel, CalendarRequestLabel, DemographicDataType } from 'types'
-import {
-  VitalStatusOptions,
-  VitalStatusOptionsLabel,
-  VitalStatusLabel,
-  VitalStatus as VitalStatusType
-} from 'types/searchCriterias'
+import { VitalStatusOptions, VitalStatusOptionsLabel, VitalStatusLabel, VitalStatus } from 'types/searchCriterias'
 
 enum Error {
   EMPTY_FORM,
@@ -66,7 +61,7 @@ const DemographicForm = (props: DemographicFormProps) => {
   const [ageError, setAgeError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const [vitalStatus, setVitalStatus] = useState({
-    id: VitalStatusType.ALL,
+    id: VitalStatus.ALL,
     label: VitalStatusLabel.all,
     options: [
       { id: VitalStatusOptions.age, label: VitalStatusOptionsLabel.age, checked: false },
@@ -253,7 +248,7 @@ const DemographicForm = (props: DemographicFormProps) => {
               criteria?.data?.status !== 'loading'
                 ? [
                     {
-                      id: VitalStatusType.ALL,
+                      id: VitalStatus.ALL,
                       label: VitalStatusLabel.all,
                       options: [
                         { id: VitalStatusOptions.age, label: VitalStatusOptionsLabel.age, checked: false },
@@ -271,7 +266,7 @@ const DemographicForm = (props: DemographicFormProps) => {
                       ]
                     },
                     {
-                      id: VitalStatusType.ALIVE,
+                      id: VitalStatus.ALIVE,
                       label: VitalStatusLabel.alive,
                       options: [
                         { id: VitalStatusOptions.age, label: VitalStatusOptionsLabel.age, checked: false },
@@ -279,7 +274,7 @@ const DemographicForm = (props: DemographicFormProps) => {
                       ]
                     },
                     {
-                      id: VitalStatusType.DECEASED,
+                      id: VitalStatus.DECEASED,
                       label: VitalStatusLabel.deceased,
 
                       options: [
@@ -309,7 +304,7 @@ const DemographicForm = (props: DemographicFormProps) => {
             renderInput={(params) => <TextField {...params} label="Statut vital" />}
           />
 
-          {vitalStatus.id === VitalStatusType.ALL && (
+          {vitalStatus.id === VitalStatus.ALL && (
             <Autocomplete
               multiple
               id="criteria-vitalStatus-multiple"
@@ -321,7 +316,7 @@ const DemographicForm = (props: DemographicFormProps) => {
             />
           )}
 
-          {vitalStatus.id === VitalStatusType.ALIVE && (
+          {vitalStatus.id === VitalStatus.ALIVE && (
             <Autocomplete
               multiple
               id="criteria-vitalStatus-multiple"
@@ -333,7 +328,7 @@ const DemographicForm = (props: DemographicFormProps) => {
             />
           )}
 
-          {vitalStatus.id === VitalStatusType.DECEASED && (
+          {vitalStatus.id === VitalStatus.DECEASED && (
             <Autocomplete
               multiple
               id="criteria-vitalStatus-multiple"
