@@ -2,6 +2,7 @@ import { AgeRangeType, CohortPatient } from 'types'
 import moment from 'moment'
 
 export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'months'): string => {
+  if (ageValue === 0 && momentUnit === 'months') return '< 1 mois'
   if (!ageValue) return 'Âge inconnu'
   let ageUnit: 'year' | 'month' | 'day' = 'year'
   let ageUnitDisplay = ''
@@ -26,11 +27,14 @@ export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'm
 
 export const getAge = (patient: CohortPatient): string => {
   if (patient.extension) {
+    console.log('patient.extension', patient.extension)
     const totalDays = patient.extension.find((item) => item.url?.includes('total-age-day'))
     const totalMonths = patient.extension.find((item) => item.url?.includes('total-age-month'))
+    console.log('totalMonths', totalMonths)
     if (totalDays) {
       return getAgeAphp(totalDays.valueInteger, 'days')
     } else if (totalMonths) {
+      console.log('je passe par la')
       return getAgeAphp(totalMonths.valueInteger, 'months')
     }
   }
