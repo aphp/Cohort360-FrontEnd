@@ -4,116 +4,129 @@ import { useParams } from 'react-router'
 
 import { Grid, Typography } from '@mui/material'
 
-import DataTableTopBar from 'components/DataTable/DataTableTopBar'
 import DataTablePatient from 'components/DataTable/DataTablePatient'
 
 import services from 'services/aphp'
 
-import useStyles from './styles'
 import { Patient } from 'fhir/r4'
-import { useDebounce } from 'utils/debounce'
 import { _cancelPendingRequest } from 'utils/abortController'
-import { Direction, Order, OrderBy, SearchByTypes } from 'types/searchCriterias'
+import { ActionTypes, SearchByTypes, searchByListPatients } from 'types/searchCriterias'
+import { BlockWrapper } from 'components/ui/Layout/styles'
+import Searchbar from 'components/ui/Searchbar/Searchbar'
+import { DTTB_ResultsType as ResultsType, LoadingStatus } from 'types'
+import Select from 'components/ui/Searchbar/Select'
+import SearchInput from 'components/ui/Searchbar/SearchInput'
+import useSearchCriterias from 'hooks/useSearchCriterias'
+import { initPatientsSearchCriterias } from 'hooks/useSearchCriterias'
+import { CanceledError } from 'axios'
+import useStyles from './styles'
 
 const SearchPatient: React.FC<{}> = () => {
   const { classes, cx } = useStyles()
   const practitioner = useAppSelector((state) => state.me)
   const { search } = useParams<{ search: string }>()
 
-  const [loading, setLoading] = useState(false)
-  const [patientResults, setPatientResults] = useState<Patient[]>([])
-  const [total, setTotal] = useState(0)
+  const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
+  const [patientsList, setPatientsList] = useState<Patient[]>([])
+  const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total: 0, label: 'patient(s)' })
+
   const [page, setPage] = useState(1)
 
-  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.TEXT)
-  const [searchInput, setSearchInput] = useState(search ?? '')
+  const [{ orderBy, searchBy, searchInput }, dispatch] = useSearchCriterias(initPatientsSearchCriterias)
 
-  const [order, setOrder] = useState<OrderBy>({
-    orderBy: Order.FAMILY,
-    orderDirection: Direction.ASC
-  })
+  const controllerRef = useRef<AbortController | null>(null)
 
-  const debouncedSearchInput = useDebounce(500, searchInput)
-  const controllerRef = useRef<AbortController>(new AbortController())
+  const nominativeGroupsIds =
+    practitioner && practitioner.nominativeGroupsIds ? practitioner.nominativeGroupsIds.join() : ''
 
-  const performQueries = async (page: number) => {
-    const nominativeGroupsIds = practitioner ? practitioner.nominativeGroupsIds : []
-
-    setLoading(true)
-    if (typeof services?.patients?.searchPatient === 'function') {
-      const results = await services.patients.searchPatient(
+  const fetchPatients = async () => {
+    try {
+      setLoadingStatus(LoadingStatus.FETCHING)
+      const result = await services.cohorts.fetchPatientList(
+        {
+          page,
+          searchCriterias: { orderBy, searchInput, searchBy, filters: null }
+        },
+        false,
         nominativeGroupsIds,
-        page,
-        order.orderBy,
-        order.orderDirection,
-        searchInput,
-        searchBy,
-        controllerRef.current.signal
+        false,
+        controllerRef.current?.signal
       )
-      if (results) {
-        setPatientResults(results.patientList ?? [])
-        setTotal(results.totalPatients ?? 0)
+
+      if (result) {
+        const { totalPatients, originalPatients } = result
+        if (originalPatients) setPatientsList(originalPatients)
+        setPatientsResult((ps) => ({ ...ps, nb: totalPatients, label: 'patient(s)' }))
+      }
+      setLoadingStatus(LoadingStatus.SUCCESS)
+    } catch (error) {
+      if (error instanceof CanceledError) {
+        setLoadingStatus(LoadingStatus.FETCHING)
       }
     }
-    setLoading(false)
-  }
-
-  const handleChangePage = (page: number) => {
-    setPage(page)
-    performQueries(page)
-  }
-
-  const onSearchPatient = (inputSearch?: string, searchBy?: SearchByTypes) => {
-    setSearchInput(inputSearch ?? '')
-    setSearchBy(searchBy ?? SearchByTypes.TEXT)
   }
 
   useEffect(() => {
-    controllerRef.current = _cancelPendingRequest(controllerRef.current)
+    if (search) {
+      dispatch({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: search })
+    }
+  }, [])
+
+  useEffect(() => {
+    setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-    performQueries(1)
-  }, [order, searchBy, debouncedSearchInput, controllerRef])
+  }, [orderBy, searchBy, searchInput])
+
+  useEffect(() => {
+    setLoadingStatus(LoadingStatus.IDDLE)
+  }, [page])
+
+  useEffect(() => {
+    if (loadingStatus === LoadingStatus.IDDLE) {
+      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      fetchPatients()
+    }
+  }, [loadingStatus])
 
   const open = useAppSelector((state) => state.drawer)
 
   return (
-    <Grid
-      container
-      direction="column"
-      className={cx(classes.appBar, {
-        [classes.appBarShift]: open
-      })}
-    >
+    <Grid container direction="column" className={cx(classes.appBar, { [classes.appBarShift]: open })}>
       <Grid container justifyContent="center" alignItems="center">
-        <Grid container item xs={11}>
+        <BlockWrapper item xs={11} margin={'20px 0px 10px 0px'}>
           <Typography variant="h1" color="primary" className={classes.title}>
             Rechercher un patient
           </Typography>
-          <Grid container style={{ marginBottom: 8 }}>
-            <DataTableTopBar
-              loading={false}
-              searchBar={{
-                type: 'patient',
-                value: searchInput,
-                searchBy: searchBy,
-                fullWidth: true,
-                onSearch: (newSearchInput: string, newSearchBy?: SearchByTypes) =>
-                  onSearchPatient(newSearchInput, newSearchBy)
-              }}
-            />
-          </Grid>
-
+          <Searchbar>
+            <Grid container item xs={12} justifyContent="flex-end">
+              <Select
+                selectedValue={searchBy || SearchByTypes.TEXT}
+                label="Rechercher dans :"
+                width={'20%'}
+                items={searchByListPatients}
+                onchange={(newValue: SearchByTypes) =>
+                  dispatch({ type: ActionTypes.CHANGE_SEARCH_BY, payload: newValue })
+                }
+              />
+              <SearchInput
+                value={searchInput}
+                placeholder="Rechercher"
+                onchange={(newValue) => dispatch({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })}
+              />
+            </Grid>
+          </Searchbar>
+        </BlockWrapper>
+        <Grid item xs={11}>
           <DataTablePatient
-            loading={loading}
-            groupId={practitioner?.nominativeGroupsIds ? practitioner?.nominativeGroupsIds.join(',') : undefined}
-            search={searchInput}
-            deidentified={practitioner?.deidentified ?? true}
-            patientsList={patientResults ?? []}
-            order={order}
-            setOrder={setOrder}
+            loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
+            groupId={nominativeGroupsIds}
+            deidentified={false}
+            patientsList={patientsList}
+            orderBy={orderBy}
+            setOrderBy={(orderBy) => dispatch({ type: ActionTypes.CHANGE_ORDER_BY, payload: orderBy })}
             page={page}
-            setPage={(newPage) => handleChangePage(newPage)}
-            total={total}
+            setPage={(newPage) => setPage(newPage)}
+            total={patientsResult.nb}
           />
         </Grid>
       </Grid>

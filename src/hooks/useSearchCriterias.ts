@@ -14,6 +14,16 @@ import {
   AllDocumentsFilters
 } from 'types/searchCriterias'
 
+export const initSearchPatientsSearchCriterias: SearchCriterias<null> = {
+  orderBy: {
+    orderBy: Order.FAMILY,
+    orderDirection: Direction.ASC
+  },
+  searchInput: '',
+  searchBy: SearchByTypes.TEXT,
+  filters: null
+}
+
 export const initPatientsSearchCriterias: SearchCriterias<PatientsFilters> = {
   orderBy: {
     orderBy: Order.FAMILY,
