@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import moment from 'moment'
 
-import Grid from '@mui/material/Grid'
+import { CircularProgress, Grid } from '@mui/material'
 
 import DataTablePatient from 'components/DataTable/DataTablePatient'
 
@@ -26,7 +26,6 @@ import Searchbar from 'components/ui/Searchbar/Searchbar'
 import Select from 'components/ui/Searchbar/Select'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
-import { CircularProgress } from '@mui/material'
 import { ActionTypes, FilterKeys, searchByListPatients, SearchByTypes } from 'types/searchCriterias'
 import Chip from 'components/ui/Chips/Chip'
 import Button from 'components/ui/Button/Button'
