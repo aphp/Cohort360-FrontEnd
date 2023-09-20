@@ -259,34 +259,6 @@ export interface IServicePatients {
     docsTotal: number
   }>
 
-  /*
-   ** Cette fonction permet de chercher un patient grâce à une barre de recherche
-   **
-   ** Argument:
-   **   - nominativeGroupsIds: permet certaine anonymisation de la donnée
-   **   - page: permet la pagination des éléments
-   **   - sortBy: permet le tri
-   **   - sortDirection: permet le tri dans l'ordre croissant ou décroissant
-   **   - input: permet la recherche d'un patient
-   **   - searchBy: permet la recherche sur un élément précis (nom, prénom ou indeterminé)
-   **
-   ** Retour:
-   **   - patientList: Liste de 20 patients liée à la recherche
-   **   - totalPatients: Nombre d'élément totale par rapport au filtre indiqué
-   */
-  searchPatient: (
-    nominativeGroupsIds: string[] | undefined,
-    page: number,
-    sortBy: string,
-    sortDirection: string,
-    input: string,
-    searchBy: SearchByTypes,
-    signal?: AbortSignal
-  ) => Promise<{
-    patientList: Patient[]
-    totalPatients: number
-  }>
-
   /**
    * Retourne le droit de la vue d'un patient
    *
@@ -687,45 +659,6 @@ const servicesPatients: IServicePatients = {
     return {
       patientInfo,
       hospits
-    }
-  },
-
-  searchPatient: async (nominativeGroupsIds, page, sortBy, sortDirection, input, searchBy, signal) => {
-    let search = ''
-    // if (input.trim() !== '') {
-    if (searchBy === '_text') {
-      const searches = input
-        .trim() // Remove space before/after search
-        .split(' ') // Split by space (= ['mot1', 'mot2' ...])
-        .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
-
-      for (const _search of searches) {
-        search = search ? `${search} AND "${_search}"` : `"${_search}"`
-      }
-    } else {
-      search = input.trim()
-    }
-    // }
-
-    const patientResp = await fetchPatient({
-      _list: nominativeGroupsIds,
-      size: 20,
-      offset: page ? (page - 1) * 20 : 0,
-      _sort: sortBy,
-      sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
-      searchBy: searchBy,
-      _text: search,
-      _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension'],
-      signal
-    })
-
-    const patientList = getApiResponseResources(patientResp)
-
-    const totalPatients = patientResp.data.resourceType === 'Bundle' ? patientResp.data.total : 0
-
-    return {
-      patientList: patientList ?? [],
-      totalPatients: totalPatients ?? 0
     }
   },
 

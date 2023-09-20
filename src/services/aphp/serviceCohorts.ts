@@ -93,7 +93,7 @@ export interface IServiceCohorts {
   fetchPatientList: (
     options: {
       page: number
-      searchCriterias: SearchCriterias<PatientsFilters>
+      searchCriterias: SearchCriterias<PatientsFilters | null>
     },
     deidentified: boolean,
     groupId?: string,
@@ -314,15 +314,7 @@ const servicesCohorts: IServiceCohorts = {
   },
 
   fetchPatientList: async (
-    {
-      page,
-      searchCriterias: {
-        orderBy,
-        searchBy,
-        searchInput,
-        filters: { genders, birthdatesRanges, vitalStatuses }
-      }
-    },
+    { page, searchCriterias: { orderBy, searchBy, searchInput, filters } },
     deidentified,
     groupId,
     includeFacets,
@@ -344,8 +336,12 @@ const servicesCohorts: IServiceCohorts = {
       }
 
       // convert birthdates into days or months depending of if it's a deidentified perimeter or not
-      const minBirthdate = Math.abs(moment(birthdatesRanges[0]).diff(moment(), deidentified ? 'months' : 'days'))
-      const maxBirthdate = Math.abs(moment(birthdatesRanges[1]).diff(moment(), deidentified ? 'months' : 'days'))
+      const minBirthdate =
+        filters?.birthdatesRanges &&
+        Math.abs(moment(filters.birthdatesRanges[0]).diff(moment(), deidentified ? 'months' : 'days'))
+      const maxBirthdate =
+        filters?.birthdatesRanges &&
+        Math.abs(moment(filters.birthdatesRanges[1]).diff(moment(), deidentified ? 'months' : 'days'))
       const patientsResp = await fetchPatient({
         size: 20,
         offset: page ? (page - 1) * 20 : 0,
@@ -353,13 +349,17 @@ const servicesCohorts: IServiceCohorts = {
         sortDirection: orderBy.orderDirection,
         pivotFacet: includeFacets ? ['age-month_gender', 'deceased_gender'] : [],
         _list: groupId ? [groupId] : [],
-        gender: genders.join(',') + ``,
+        gender: filters && filters.genders.join(','),
         searchBy,
         _text: _searchInput,
         minBirthdate: minBirthdate,
         maxBirthdate: maxBirthdate,
         deceased:
-          vitalStatuses.length === 1 ? (vitalStatuses.includes(VitalStatus.DECEASED) ? true : false) : undefined,
+          filters && filters.vitalStatuses && filters.vitalStatuses.length === 1
+            ? filters.vitalStatuses.includes(VitalStatus.DECEASED)
+              ? true
+              : false
+            : undefined,
         deidentified: deidentified,
         signal: signal
       })
