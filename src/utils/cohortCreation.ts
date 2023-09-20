@@ -528,7 +528,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
           criterion.valueComparator &&
           (typeof criterion.valueMin === 'number' || typeof criterion.valueMax === 'number')
             ? criterion.valueComparator === Comparators.BETWEEN && criterion.valueMax
-              ? `${OBSERVATION_VALUE}=le${criterion.valueMin}&${OBSERVATION_VALUE}=ge${criterion.valueMax}`
+              ? `${OBSERVATION_VALUE}=le${criterion.valueMax}&${OBSERVATION_VALUE}=ge${criterion.valueMin}`
               : `${OBSERVATION_VALUE}=${valueComparatorFilter}${criterion.valueMin}`
             : ''
         }`
