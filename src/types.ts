@@ -18,6 +18,7 @@ import {
 import { AxiosResponse } from 'axios'
 import { SearchByTypes } from 'types/searchCriterias'
 import { SearchInputError } from 'types/error'
+import { Calendar, CalendarLabel, CalendarRequestLabel } from 'types/dates'
 
 export enum CohortJobStatus {
   _long_pending = 'long_pending',
@@ -511,25 +512,6 @@ export type GhmDataType = {
   endOccurrence: Date | ''
   isInclusive?: boolean
 }
-
-export enum Calendar {
-  YEAR = 'year',
-  MONTH = 'month',
-  DAY = 'day'
-}
-
-export enum CalendarLabel {
-  YEAR = 'années',
-  MONTH = 'mois',
-  DAY = 'jours'
-}
-
-export enum CalendarRequestLabel {
-  YEAR = 'an(s)',
-  MONTH = 'mois',
-  DAY = 'jour(s)'
-}
-
 export enum Comparators {
   LESS_OR_EQUAL = '<=',
   LESS = '<',
@@ -932,13 +914,6 @@ export type GroupRights = {
   export_jupyter_pseudo?: boolean
   read_patient_nomi?: boolean
   read_patient_pseudo?: boolean
-}
-
-export type ErrorType = { isError: boolean; errorMessage?: string }
-export type AgeRangeType = {
-  year?: number
-  month?: number
-  days?: number
 }
 
 export type ScopeType =

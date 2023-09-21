@@ -73,7 +73,6 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   }, [genders, vitalStatuses, birthdatesRanges])
 
   const controllerRef = useRef<AbortController | null>(null)
-
   const fetchPatients = async () => {
     try {
       const includeFacets = page === 1
@@ -190,7 +189,11 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
             >
               <GendersFilter name={FilterKeys.GENDERS} value={genders} />
               <VitalStatusesFilter name={FilterKeys.VITAL_STATUSES} value={vitalStatuses} />
-              <BirthdatesRangesFilter name={FilterKeys.BIRTHDATES} value={birthdatesRanges} />
+              <BirthdatesRangesFilter
+                name={FilterKeys.BIRTHDATES}
+                value={birthdatesRanges}
+                deidentified={deidentified || false}
+              />
             </Modal>
           </Grid>
         </Searchbar>

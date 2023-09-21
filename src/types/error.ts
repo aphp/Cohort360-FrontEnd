@@ -8,3 +8,5 @@ export type ErrorDetails = {
   errorPositions?: number[]
   errorSolution?: string
 }
+
+export type ErrorType = { isError: boolean; errorMessage?: string }

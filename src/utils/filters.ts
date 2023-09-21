@@ -52,7 +52,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
         castedFilters[key] = removeElementInArray((castedFilters[key] as string).split(','), value as string).join(',')
         break
       case FilterKeys.BIRTHDATES:
-        castedFilters[key] = ['', '']
+        castedFilters[key] = [null, null]
         break
       case FilterKeys.START_DATE:
       case FilterKeys.END_DATE:
@@ -131,7 +131,7 @@ export const selectFiltersAsArray = (filters: Filters) => {
           )
           break
         case FilterKeys.BIRTHDATES:
-          if (value[0] && value[1]) {
+          if (value[0] || value[1]) {
             result.push({
               category: key,
               label: getFilterLabel(key, value),

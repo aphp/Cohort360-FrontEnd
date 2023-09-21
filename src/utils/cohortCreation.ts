@@ -7,9 +7,6 @@ import {
   CriteriaGroupType,
   TemporalConstraintsType,
   DocType,
-  Calendar,
-  CalendarRequestLabel,
-  CalendarLabel,
   Comparators,
   CriteriaItemType
 } from 'types'
@@ -17,6 +14,7 @@ import {
 import docTypes from 'assets/docTypes.json'
 import { BIOLOGY_HIERARCHY_ITM_ANABIO, CLAIM_HIERARCHY, CONDITION_HIERARCHY, PROCEDURE_HIERARCHY } from '../constants'
 import { SearchByTypes } from 'types/searchCriterias'
+import { Calendar, CalendarLabel, CalendarRequestLabel } from 'types/dates'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
