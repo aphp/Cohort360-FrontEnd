@@ -7,9 +7,6 @@ import {
   CriteriaGroupType,
   TemporalConstraintsType,
   DocType,
-  Calendar,
-  CalendarRequestLabel,
-  CalendarLabel,
   Comparators,
   CriteriaItemType
 } from 'types'
@@ -23,6 +20,7 @@ import {
   PROCEDURE_HIERARCHY
 } from '../constants'
 import { SearchByTypes } from 'types/searchCriterias'
+import { Calendar, CalendarLabel, CalendarRequestLabel } from 'types/dates'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 

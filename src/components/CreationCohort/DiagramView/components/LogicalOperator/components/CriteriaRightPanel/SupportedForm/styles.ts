@@ -28,15 +28,6 @@ const useStyles = makeStyles()(() => ({
   categoryTitle: {
     padding: '1em'
   },
-  inputItem: {
-    margin: '0px 1em 0px 1em',
-    width: 'calc(100% - 2em)'
-  },
-  textField: {
-    '& input': {
-      padding: '2px 4px 3px 0'
-    }
-  },
   criteriaActionContainer: {
     display: 'flex',
     alignItems: 'center',
@@ -54,12 +45,6 @@ const useStyles = makeStyles()(() => ({
   },
   durationContainer: {
     marginBottom: 20
-  },
-  durationLegend: {
-    color: '#5B5E63',
-    fontWeight: 900,
-    fontSize: 12,
-    textAlign: 'center'
   },
   durationTitle: {
     padding: '1em',

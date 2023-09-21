@@ -23,19 +23,12 @@ import OtherInputs from './SupportedInputs/OtherInputs'
 
 import useStyles from './styles'
 
-import {
-  CriteriaName,
-  EncounterDataType,
-  ScopeTreeRow,
-  CalendarLabel,
-  Calendar,
-  CalendarRequestLabel,
-  CriteriaDrawerComponentProps
-} from 'types'
+import { CriteriaDrawerComponentProps, CriteriaName, EncounterDataType, ScopeTreeRow } from 'types'
 import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import PopulationCard from '../../../../PopulationCard/PopulationCard'
 import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE, getCalendarMultiplicator } from 'utils/cohortCreation'
 import VisitInputs from '../AdvancedInputs/VisitInputs/VisitInputs'
+import { Calendar, CalendarLabel, CalendarRequestLabel } from 'types/dates'
 
 enum Error {
   EMPTY_FORM,

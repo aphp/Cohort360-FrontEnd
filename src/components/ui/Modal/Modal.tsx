@@ -25,15 +25,21 @@ const Modal = ({
   onClose
 }: PropsWithChildren<ModalProps>) => {
   const [formData, setFormData] = useState<Record<string, any>>({})
+  const [isError, setIsError] = useState(false)
 
   const updateFormData = (name: string, value: any) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
+
+  const updateError = (isError: boolean) => {
+    setIsError(isError)
+  }
+
   const handleSubmit = () => {
     if (onSubmit) onSubmit(formData)
   }
   return (
-    <FormContext.Provider value={{ updateFormData }}>
+    <FormContext.Provider value={{ updateFormData, updateError }}>
       <Dialog open={open} onClose={onClose}>
         {title && <DialogTitle>{title}</DialogTitle>}
         <DialogContentWrapper width={width}>{children}</DialogContentWrapper>
@@ -43,6 +49,7 @@ const Modal = ({
               Annuler
             </Button>
             <Button
+              disabled={isError}
               onClick={() => {
                 handleSubmit()
                 if (onClose) onClose()

@@ -18,8 +18,9 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
 
-import { Calendar, CalendarLabel, CalendarRequestLabel, DemographicDataType } from 'types'
+import { DemographicDataType } from 'types'
 import { VitalStatusOptions, VitalStatusOptionsLabel, VitalStatusLabel, VitalStatus } from 'types/searchCriterias'
+import { Calendar, CalendarLabel, CalendarRequestLabel } from 'types/dates'
 
 enum Error {
   EMPTY_FORM,
