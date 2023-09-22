@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
 import moment from 'moment'
+import React, { useEffect, useState } from 'react'
 
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
@@ -24,12 +24,12 @@ import {
 import ClearIcon from '@mui/icons-material/Clear'
 import InfoIcon from '@mui/icons-material/Info'
 
-import scopeType from 'data/scope_type.json'
 import docTypes from 'assets/docTypes.json'
+import scopeType from 'data/scope_type.json'
 import { CriteriaName, DocumentFilters, ScopeTreeRow } from 'types'
 
-import useStyles from './styles'
 import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
+import useStyles from './styles'
 
 type DocumentFiltersProps = {
   open: boolean
@@ -202,13 +202,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
                 onChange={(date) => setStartDate(date ?? null)}
                 value={_startDate}
                 renderInput={(params: any) => (
-                  <TextField
-                    {...params}
-                    variant="standard"
-                    error={dateError}
-                    helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
-                    style={{ width: 'calc(100% - 120px)' }}
-                  />
+                  <TextField {...params} variant="standard" error={dateError} style={{ width: 'calc(100% - 120px)' }} />
                 )}
               />
             </LocalizationProvider>
@@ -228,13 +222,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
                 onChange={(date) => setEndDate(date ?? null)}
                 value={_endDate}
                 renderInput={(params: any) => (
-                  <TextField
-                    {...params}
-                    variant="standard"
-                    error={dateError}
-                    helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
-                    style={{ width: 'calc(100% - 120px)' }}
-                  />
+                  <TextField {...params} variant="standard" error={dateError} style={{ width: 'calc(100% - 120px)' }} />
                 )}
               />
             </LocalizationProvider>
@@ -242,6 +230,16 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
               <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setEndDate(null)}>
                 <ClearIcon />
               </IconButton>
+            )}
+            {dateError && (
+              <Typography className={classes.dateError}>
+                <>
+                  <ul>
+                    <li>Vous ne pouvez pas sélectionner de date de début supérieure à la date de fin.</li>
+                    <li>La date doit être au format "JJ/MM/AAAA".</li>
+                  </ul>
+                </>
+              </Typography>
             )}
           </Grid>
           <FormLabel style={{ padding: '1em 1em 0 1em', display: 'flex', alignItems: 'center' }} component="legend">
@@ -272,11 +270,6 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
               onChangeExecutiveUnits={setExecutiveUnits}
             />
           </Grid>
-          {dateError && (
-            <Typography className={classes.dateError}>
-              Vous ne pouvez pas sélectionner de date de début supérieure à la date de fin.
-            </Typography>
-          )}
         </Grid>
       </DialogContent>
       <DialogActions>
