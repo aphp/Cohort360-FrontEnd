@@ -220,7 +220,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 onClick={() => {
                   if (allowSearchByValue) {
                     onChangeValue('valueMin', undefined)
-                    onChangeValue('valueMin', undefined)
+                    onChangeValue('valueMax', undefined)
                   }
                   setAllowSearchByValue(!allowSearchByValue)
                 }}
