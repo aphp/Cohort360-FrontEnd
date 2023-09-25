@@ -398,15 +398,23 @@ export type TemporalConstraintsType = {
   }
 }
 
+export type CriteriaDrawerComponentProps<T = any> = {
+  parentId: number | null
+  criteria: CriteriaItemType | null
+  selectedCriteria: SelectedCriteriaType & T
+  onChangeSelectedCriteria: (newCriteria: SelectedCriteriaType & T) => void
+  goBack: () => void
+}
+
 export type CriteriaItemType = {
   id: string
   title: string
   color: string
   fontWeight?: string
-  components: any
+  components: React.FC<CriteriaDrawerComponentProps> | null
   disabled?: boolean
   data?: any
-  fetch?: any
+  fetch?: { [fetchKey: string]: (...args: any[]) => Promise<any> }
   valueSet?: any
   subItems?: CriteriaItemType[]
 }

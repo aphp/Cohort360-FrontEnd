@@ -10,7 +10,7 @@ import { initSyncHierarchyTableEffect, OBSERVATION, syncOnChangeFormValue } from
 import { PmsiListType } from 'state/pmsi'
 import { fetchBiology } from 'state/biology'
 import { useAppDispatch, useAppSelector } from 'state'
-import { Comparators } from 'types'
+import { Comparators, CriteriaDrawerComponentProps } from 'types'
 
 export const defaultBiology = {
   type: OBSERVATION,
@@ -25,7 +25,7 @@ export const defaultBiology = {
   isInclusive: true
 }
 
-const Index = (props: any) => {
+const Index = (props: CriteriaDrawerComponentProps) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()

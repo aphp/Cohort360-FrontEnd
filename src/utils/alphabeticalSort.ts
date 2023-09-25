@@ -27,7 +27,7 @@ export const getComparator = (
     : (a: any, b: any): number => -descendingComparator(a, b, orderBy)
 }
 
-export const targetDisplaySort = getComparator('desc', (obj: any) => obj.target?.[0].display)
+export const targetDisplaySort = getComparator('asc', (obj: any) => obj.target?.[0].display)
 
 export const idSort = getComparator('asc', (obj: any) => obj.id)
 

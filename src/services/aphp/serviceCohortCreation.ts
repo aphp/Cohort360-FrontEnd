@@ -3,7 +3,6 @@ import apiBack from '../apiBackend'
 
 import { DatedMeasure, DocType, QuerySnapshotInfo, RequestType, Snapshot } from 'types'
 import docTypes from 'assets/docTypes.json'
-import { fetchSignleCode } from './cohortCreation/fetchMedication'
 import { fetchBiologySearch } from './cohortCreation/fetchObservation'
 import {
   BIOLOGY_HIERARCHY_ITM_ANABIO,
@@ -28,7 +27,7 @@ import {
   PROCEDURE_HIERARCHY,
   SHORT_COHORT_LIMIT
 } from '../../constants'
-import { fetchValueSet } from './callApi'
+import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
 
 export interface IServiceCohortCreation {
   /**
@@ -81,9 +80,9 @@ export interface IServiceCohortCreation {
   fetchCcamHierarchy: (ccamParent: string) => Promise<any>
   fetchGhmData: () => Promise<any>
   fetchGhmHierarchy: (ghmParent: string) => Promise<any>
-  fetchDocTypes: () => DocType[]
+  fetchDocTypes: () => Promise<DocType[]>
   fetchAtcData: () => Promise<any>
-  fetchSingleMedication: (code: string) => Promise<string[]>
+  fetchSingleCodeHierarchy: (resourceType: string, code: string) => Promise<string[]>
   fetchAtcHierarchy: (atcParent: string) => Promise<any>
   fetchPrescriptionTypes: () => Promise<any>
   fetchAdministrations: () => Promise<any>
@@ -272,14 +271,28 @@ const servicesCohortCreation: IServiceCohortCreation = {
     fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', noStar }),
   fetchGhmHierarchy: async (ghmParent?: string) =>
     fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie GHM', code: ghmParent }),
-  fetchDocTypes: () => (docTypes && docTypes.docTypes.length > 0 ? docTypes.docTypes : []),
+  fetchDocTypes: () => Promise.resolve(docTypes && docTypes.docTypes.length > 0 ? docTypes.docTypes : []),
   fetchAtcData: async (searchValue?: string, noStar?: boolean) =>
     fetchValueSet(MEDICATION_ATC, {
       valueSetTitle: 'Toute la hiérarchie',
       search: searchValue || '',
       noStar
     }),
-  fetchSingleMedication: fetchSignleCode,
+  fetchSingleCodeHierarchy: async (resourceType: string, code: string) => {
+    const codeSystemPerResourceType: { [type: string]: string } = {
+      Claim: CLAIM_HIERARCHY,
+      Condition: CONDITION_HIERARCHY,
+      MedicationAdministration: MEDICATION_ATC,
+      MedicationRequest: MEDICATION_ATC,
+      Observation: `${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}`,
+      Procedure: PROCEDURE_HIERARCHY
+    }
+    if (!(resourceType in codeSystemPerResourceType)) {
+      // TODO log error
+      return Promise.resolve([] as string[])
+    }
+    return fetchSingleCodeHierarchy(codeSystemPerResourceType[resourceType], code)
+  },
   fetchAtcHierarchy: async (atcParent?: string) =>
     fetchValueSet(MEDICATION_ATC, {
       valueSetTitle: 'Toute la hiérarchie Médicament',

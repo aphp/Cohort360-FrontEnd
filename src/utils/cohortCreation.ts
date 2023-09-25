@@ -11,7 +11,8 @@ import {
   Calendar,
   CalendarRequestLabel,
   CalendarLabel,
-  Comparators
+  Comparators,
+  CriteriaItemType
 } from 'types'
 
 import docTypes from 'assets/docTypes.json'
@@ -1659,7 +1660,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
  *
  */
 export const getDataFromFetch = async (
-  _criteria: any,
+  _criteria: readonly CriteriaItemType[],
   selectedCriteria: SelectedCriteriaType[],
   oldCriteriaList?: any
 ): Promise<any> => {

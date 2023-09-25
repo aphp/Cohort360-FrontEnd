@@ -26,12 +26,13 @@ import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
 import useStyles from './styles'
 import { useDebounce } from 'utils/debounce'
+import { ValueSet } from 'types'
 
 type BiologySearchListItemProps = {
   label: string
-  biologyItem: any
-  selectedItems?: any[] | null
-  handleClick: (biologyItem: any) => void
+  biologyItem: ValueSet
+  selectedItems?: ValueSet[] | null
+  handleClick: (biologyItem: ValueSet[]) => void
 }
 
 const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
@@ -39,13 +40,11 @@ const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
 
   const { classes, cx } = useStyles()
 
-  const isSelected = selectedItems
-    ? selectedItems.find((item) => item.target[0].code === biologyItem.target[0].code)
-    : false
+  const isSelected = selectedItems ? !!selectedItems.find((item) => item.code === biologyItem.code) : false
 
-  const handleClickOnList = (biologyItem: any) => {
+  const handleClickOnList = (biologyItem: ValueSet) => {
     const _selectedItems = selectedItems ? [...selectedItems] : []
-    const foundItem = _selectedItems?.find(({ target }) => target[0].code === biologyItem.target[0].code)
+    const foundItem = _selectedItems?.find(({ code }) => code === biologyItem.code)
     const isAlreadySelected = foundItem ? _selectedItems?.indexOf(foundItem) : -1
     if (isAlreadySelected === -1) {
       handleClick([..._selectedItems, biologyItem])
@@ -98,11 +97,11 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
   const [selectedTab, setSelectedTab] = useState<'anabio' | 'loinc'>('anabio')
   const [searchInput, setSearchInput] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
-  const [biologySearchResults, setBiologySearchResults] = useState<{ anabio: any[]; loinc: any[] }>({
+  const [biologySearchResults, setBiologySearchResults] = useState<{ anabio: ValueSet[]; loinc: ValueSet[] }>({
     anabio: [],
     loinc: []
   })
-  const [selectedItems, setSelectedItems] = useState<[]>([])
+  const [selectedItems, setSelectedItems] = useState<ValueSet[]>([])
 
   const debouncedSearchItem = useDebounce(500, searchInput)
 
@@ -114,24 +113,9 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
   }
 
   const _onNext = () => {
-    // ici, conversion des data en BiologyListType
-    const formattedData = selectedItems?.map((item: any) => {
-      if (item.code === item.target[0].code) {
-        return {
-          id: item.code,
-          label: item.display
-        }
-      } else {
-        return {
-          id: item.target[0].code,
-          label: item.target[0].display
-        }
-      }
-    })
-
     const formattedSelectedItems =
-      formattedData && formattedData.length > 0
-        ? [...selectedCriteria.code, formattedData].flat()
+      selectedItems && selectedItems.length > 0
+        ? [...selectedCriteria.code, selectedItems.map((v) => ({ id: v.code, label: v.display }))].flat()
         : [...selectedCriteria.code]
 
     onChangeSelectedCriteria(formattedSelectedItems)
@@ -233,7 +217,7 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
             {selectedTab === 'anabio' &&
               biologySearchResults.anabio.length > 0 &&
               biologySearchResults.anabio.map((anabioItem, index) => {
-                const label = anabioItem?.target?.[0].display
+                const label = anabioItem.display
 
                 return (
                   <BiologySearchListItem
@@ -249,8 +233,7 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
             {selectedTab === 'loinc' &&
               biologySearchResults.loinc.length > 0 &&
               biologySearchResults.loinc.map((loincItem, index) => {
-                const loincObject = loincItem?.target?.[0]
-                const label = `${loincObject?.code} - ${loincObject?.display}`
+                const label = `${loincItem.code} - ${loincItem.display}`
 
                 return (
                   <BiologySearchListItem

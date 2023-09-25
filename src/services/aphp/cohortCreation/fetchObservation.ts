@@ -1,9 +1,15 @@
-import { BIOLOGY_HIERARCHY_ITM_ANABIO, BIOLOGY_HIERARCHY_ITM_LOINC } from '../../../constants'
+import {
+  BIOLOGY_HIERARCHY_ITM_ANABIO,
+  BIOLOGY_HIERARCHY_ITM_LOINC,
+  CONCEPT_MAP_HIERARCHY_EXTENSION_NAME
+} from '../../../constants'
 import { targetDisplaySort } from 'utils/alphabeticalSort'
 import apiFhir from 'services/apiFhir'
 import { getApiResponseResources } from 'utils/apiHelpers'
+import { FHIR_Bundle_Response, ValueSet } from 'types'
+import { ConceptMap } from 'fhir/r4'
 
-export const fetchBiologySearch = async (searchInput: string) => {
+export const fetchBiologySearch = async (searchInput: string): Promise<{ anabio: ValueSet[]; loinc: ValueSet[] }> => {
   if (!searchInput) {
     return {
       anabio: [],
@@ -13,8 +19,8 @@ export const fetchBiologySearch = async (searchInput: string) => {
 
   const lowerCaseTrimmedSearchInput = searchInput.toLowerCase().trim()
 
-  const res = await apiFhir.get<any>(
-    `/ConceptMap?_count=2000&context=Maps%20to,Hierarchy%20Concat%20Parents&source-system=${BIOLOGY_HIERARCHY_ITM_ANABIO}&target-system=${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}&_text=${encodeURIComponent(
+  const res = await apiFhir.get<FHIR_Bundle_Response<ConceptMap>>(
+    `/ConceptMap?_count=2000&name=Maps%20to,Concept%20Fhir%20Maps%20To&source-system=${BIOLOGY_HIERARCHY_ITM_ANABIO}&target-system=${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}&_text=${encodeURIComponent(
       lowerCaseTrimmedSearchInput.replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') // eslint-disable-line
     )},${encodeURIComponent(
       `/(.)*${lowerCaseTrimmedSearchInput.replace(/[/"]/g, function (m) {
@@ -31,9 +37,9 @@ export const fetchBiologySearch = async (searchInput: string) => {
 
   const data = getApiResponseResources(res)
 
-  const loincResults = getSourceData('Maps to', data).sort(targetDisplaySort)
+  const loincResults = getSourceData(BIOLOGY_HIERARCHY_ITM_LOINC, data).sort(targetDisplaySort)
   const uniqueLoincResults = getUniqueLoincResults(loincResults)
-  const anabioResults = getSourceData('Hierarchy Concat Parents', data).sort(targetDisplaySort)
+  const anabioResults = getSourceData(BIOLOGY_HIERARCHY_ITM_ANABIO, data).sort(targetDisplaySort)
   const cleanAnabioResults = getCleanAnabioResults(anabioResults)
 
   return {
@@ -42,45 +48,48 @@ export const fetchBiologySearch = async (searchInput: string) => {
   }
 }
 
-// TODO: change type any
-const getSourceData = (context: string, data: any) => {
-  if (data.length === 0) {
+type ValueSetWithHierarchy = ValueSet & { hierarchyDisplay: string }
+
+const getSourceData = (codeSystem: string, data?: ConceptMap[]): Array<ValueSetWithHierarchy> => {
+  if (!data || data.length === 0) {
     return []
   }
 
   return (
     data
-      .filter((element: any) => element.description === context)
-      .map((element: any) => element.group?.[0].element?.[0]) ?? []
+      .filter((element) => element.group?.[0].target === codeSystem)
+      .map(
+        (element) =>
+          ({
+            code: element.group?.[0].element?.[0].target?.[0].code,
+            display: element.group?.[0].element?.[0].target?.[0].display,
+            hierarchyDisplay: element.extension
+              ?.find((e) => e.url === CONCEPT_MAP_HIERARCHY_EXTENSION_NAME)
+              ?.valueString?.replaceAll(/\d+-|\w\d+-/g, '')
+          } as ValueSetWithHierarchy)
+      )
+      .filter((el) => !!el) ?? []
   )
 }
 
-// TODO: change type any
-const getUniqueLoincResults = (loincResults: any[]) => {
+const getUniqueLoincResults = (loincResults: ValueSetWithHierarchy[]) => {
   if (loincResults.length === 0) {
     return []
   }
 
   return loincResults.filter(
     (
-      (set) => (f: any) =>
-        !set.has(f.target[0].code) && set.add(f.target[0].code)
+      (set) => (f) =>
+        !set.has(f.code) && set.add(f.code)
     )(new Set())
   )
 }
 
-const getCleanAnabioResults = (anabioResults: any[]) => {
+const getCleanAnabioResults = (anabioResults: ValueSetWithHierarchy[]) => {
   return anabioResults.map((anabioResult) => {
-    const cleanAnabioHierarchy = anabioResult.target?.[0]?.display.replaceAll(/\d+-|\w\d+-/g, '')
-
     return {
-      ...anabioResult,
-      target: [
-        {
-          code: anabioResult.target[0].code,
-          display: cleanAnabioHierarchy
-        }
-      ]
+      code: anabioResult.code,
+      display: anabioResult.hierarchyDisplay
     }
   })
 }

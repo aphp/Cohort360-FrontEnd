@@ -18,9 +18,8 @@ import ContactPageIcon from '@mui/icons-material/ContactPage'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import ScienceIcon from '@mui/icons-material/Science'
 import CoronavirusIcon from '@mui/icons-material/Coronavirus'
-import { IdType } from 'types'
 
-import { CriteriaItemType, SelectedCriteriaType } from 'types'
+import { CriteriaItemType, IdType, SelectedCriteriaType } from 'types'
 import useStyles from './styles'
 
 type CriteriaListItemProps = {
