@@ -3,10 +3,6 @@ import moment from 'moment'
 
 import { CircularProgress, Grid, TableCell, TableRow, Typography, Chip } from '@mui/material'
 
-import { ReactComponent as FemaleIcon } from 'assets/icones/venus.svg'
-import { ReactComponent as MaleIcon } from 'assets/icones/mars.svg'
-import { ReactComponent as UnknownIcon } from 'assets/icones/autre-inconnu.svg'
-
 import DataTable from 'components/DataTable/DataTable'
 
 import { CohortPatient, Column } from 'types'
@@ -17,6 +13,7 @@ import { capitalizeFirstLetter } from 'utils/capitalize'
 import useStyles from './styles'
 import { GenderStatus, Order, OrderBy } from 'types/searchCriterias'
 import { PatientTableLabels } from 'types/patient'
+import GenderIcon from 'components/ui/GenderIcon/GenderIcon'
 
 type DataTablePatientProps = {
   loading: boolean
@@ -123,7 +120,7 @@ const DataTablePatientLine: React.FC<{
     >
       <TableCell align="center">
         {patient.gender && (
-          <PatientGender gender={patient.gender.toLocaleUpperCase() as GenderStatus} className={classes.genderIcon} />
+          <GenderIcon gender={patient.gender.toLocaleUpperCase() as GenderStatus} className={classes.genderIcon} />
         )}
       </TableCell>
       <TableCell>{deidentified ? 'Prénom' : capitalizeFirstLetter(patient.name?.[0].given?.[0])}</TableCell>
@@ -161,24 +158,6 @@ const DataTablePatientLine: React.FC<{
 }
 
 export default DataTablePatient
-
-type PatientGenderProps = {
-  gender?: GenderStatus
-  className?: string
-}
-
-const PatientGender: React.FC<PatientGenderProps> = ({ gender, className }) => {
-  switch (gender) {
-    case GenderStatus.MALE:
-      return <MaleIcon className={className} />
-
-    case GenderStatus.FEMALE:
-      return <FemaleIcon className={className} />
-
-    default:
-      return <UnknownIcon className={className} />
-  }
-}
 
 type StatusShipProps = {
   type: 'Vivant' | 'Décédé'
