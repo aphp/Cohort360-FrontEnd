@@ -2,10 +2,6 @@ import React from 'react'
 
 import { Chip, CircularProgress, Grid, ListItemIcon, ListItemText, Pagination, Typography } from '@mui/material'
 
-import { ReactComponent as FemaleIcon } from 'assets/icones/venus.svg'
-import { ReactComponent as MaleIcon } from 'assets/icones/mars.svg'
-import { ReactComponent as UnknownIcon } from 'assets/icones/autre-inconnu.svg'
-
 import { CohortPatient } from 'types'
 
 import { getAge } from 'utils/age'
@@ -16,6 +12,7 @@ import { GenderStatus } from 'types/searchCriterias'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ListItemWrapper } from 'components/ui/ListItem/styles'
 import { ListWrapper } from 'components/ui/ListWrapper/styles'
+import GenderIcon from 'components/ui/GenderIcon/GenderIcon'
 
 type ListPatientProps = {
   loading: boolean
@@ -110,7 +107,7 @@ const ListPatientLine: React.FC<{
       }}
     >
       <ListItemIcon style={{ minWidth: '32px' }}>
-        <PatientGender gender={patient.gender?.toLocaleUpperCase() as GenderStatus} className={classes.genderIcon} />
+        <GenderIcon gender={patient.gender?.toLocaleUpperCase() as GenderStatus} className={classes.genderIcon} />
       </ListItemIcon>
       <ListItemText primary={`${capitalizeFirstLetter(firstName)} ${lastName}`} secondary={`${age} - ${ipp}`} />
       <StatusShip type={patient.deceasedDateTime || patient.deceasedBoolean ? 'D.' : 'V.'} />
@@ -119,24 +116,6 @@ const ListPatientLine: React.FC<{
 }
 
 export default ListPatient
-
-type PatientGenderProps = {
-  gender?: GenderStatus
-  className?: string
-}
-
-const PatientGender: React.FC<PatientGenderProps> = ({ gender, className }) => {
-  switch (gender) {
-    case GenderStatus.MALE:
-      return <MaleIcon className={className} />
-
-    case GenderStatus.FEMALE:
-      return <FemaleIcon className={className} />
-
-    default:
-      return <UnknownIcon className={className} />
-  }
-}
 
 type StatusShipProps = {
   type: 'V.' | 'D.'
