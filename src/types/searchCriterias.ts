@@ -237,7 +237,7 @@ export const searchByListPatients = [
 
 export const orderByListPatients = [
   {
-    id: Order.GENDER,
+    id: `${Order.GENDER},${Order.ID}` as Order,
     label: PatientTableLabels.GENDER
   },
   {
@@ -249,7 +249,7 @@ export const orderByListPatients = [
     label: PatientTableLabels.LASTNAME
   },
   {
-    id: Order.BIRTHDATE,
+    id: `${Order.BIRTHDATE},${Order.ID}` as Order,
     label: PatientTableLabels.BIRTHDATE
   }
 ]
