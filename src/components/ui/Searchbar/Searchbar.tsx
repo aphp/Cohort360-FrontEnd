@@ -4,10 +4,11 @@ import { SearchbarWrapper } from './styles'
 
 type SearchbarProps = {
   children: ReactNode
+  wrap?: boolean
 }
 
-const Searchbar = ({ children }: PropsWithChildren<SearchbarProps>) => {
-  return <SearchbarWrapper>{children}</SearchbarWrapper>
+const Searchbar = ({ children, wrap }: PropsWithChildren<SearchbarProps>) => {
+  return <SearchbarWrapper wrap={wrap}>{children}</SearchbarWrapper>
 }
 
 export default Searchbar

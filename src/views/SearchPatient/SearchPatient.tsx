@@ -28,7 +28,7 @@ const SearchPatient: React.FC<{}> = () => {
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [patientsList, setPatientsList] = useState<Patient[]>([])
-  const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total: 0, label: 'patient(s)' })
+  const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total: 0 })
 
   const [page, setPage] = useState(1)
 
@@ -41,15 +41,18 @@ const SearchPatient: React.FC<{}> = () => {
 
   const fetchPatients = async () => {
     try {
+      const deidentified = false
+      const includeFacets = false
+
       setLoadingStatus(LoadingStatus.FETCHING)
       const result = await services.cohorts.fetchPatientList(
         {
           page,
           searchCriterias: { orderBy, searchInput, searchBy, filters: null }
         },
-        false,
+        deidentified,
         nominativeGroupsIds,
-        false,
+        includeFacets,
         controllerRef.current?.signal
       )
 

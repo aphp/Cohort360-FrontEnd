@@ -33,7 +33,7 @@ import Modal from 'components/ui/Modal/Modal'
 import useSearchCriterias, { initPatientsSearchCriterias } from 'hooks/useSearchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
 import GendersFilter from 'components/Filters/GendersFilter/GenderFilter'
-import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter.tsx/VitalStatusesFilter'
+import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter/VitalStatusesFilter'
 import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters/BirthdatesRangesFilter'
 import { BlockWrapper } from 'components/ui/Layout/styles'
 
@@ -62,7 +62,6 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
       orderBy,
       searchBy,
       searchInput,
-      filters,
       filters: { genders, birthdatesRanges, vitalStatuses }
     },
     dispatch
@@ -111,6 +110,7 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
       if (error instanceof CanceledError) {
         setLoadingStatus(LoadingStatus.FETCHING)
       }
+      setLoadingStatus(LoadingStatus.SUCCESS)
     }
   }
 
@@ -182,7 +182,10 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
               open={toggleModal}
               onClose={() => setToggleModal(false)}
               onSubmit={(newFilters) => {
-                dispatch({ type: ActionTypes.ADD_FILTERS, payload: { ...filters, ...newFilters } })
+                dispatch({
+                  type: ActionTypes.ADD_FILTERS,
+                  payload: { genders, birthdatesRanges, vitalStatuses, ...newFilters }
+                })
               }}
             >
               <GendersFilter name={FilterKeys.GENDERS} value={genders} />

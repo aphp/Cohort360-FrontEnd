@@ -43,6 +43,7 @@ import { CanceledError } from 'axios'
 import { VitalStatus, SearchCriterias, PatientsFilters, AllDocumentsFilters } from 'types/searchCriterias'
 import services from '.'
 import { ErrorDetails, SearchInputError } from 'types/error'
+import { SearchByTypes } from 'types/searchCriterias'
 
 export interface IServiceCohorts {
   /**
@@ -327,7 +328,7 @@ const servicesCohorts: IServiceCohorts = {
         .split(' ') // Split by space (= ['mot1', 'mot2' ...])
         .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
 
-      if (searchBy === SearchByTypes.identifier) {
+      if (searchBy === SearchByTypes.IDENTIFIER) {
         _searchInput = searches.join()
       } else {
         for (const _search of searches) {
