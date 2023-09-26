@@ -15,7 +15,8 @@ import { getAge } from 'utils/age'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
-import { GenderStatus, OrderBy } from 'types/searchCriterias'
+import { GenderStatus, Order, OrderBy } from 'types/searchCriterias'
+import { PatientTableLabels } from 'types/patient'
 
 type DataTablePatientProps = {
   loading: boolean
@@ -44,20 +45,20 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
   const { classes } = useStyles()
 
   const columns: Column[] = [
-    { label: `Sexe`, code: 'gender,id', align: 'center', sortableColumn: true },
-    { label: 'Prénom', code: 'name', align: 'center', sortableColumn: !deidentified },
-    { label: 'Nom', code: 'family', align: 'left', sortableColumn: !deidentified },
+    { label: PatientTableLabels.GENDER, code: `${Order.GENDER},id`, align: 'center', sortableColumn: true },
+    { label: PatientTableLabels.FIRSTNAME, code: Order.FIRSTNAME, align: 'center', sortableColumn: !deidentified },
+    { label: PatientTableLabels.LASTNAME, code: Order.LASTNAME, align: 'left', sortableColumn: !deidentified },
     {
-      label: !deidentified ? 'Date de naissance' : 'Âge',
-      code: 'birthdate,id',
+      label: !deidentified ? PatientTableLabels.BIRTHDATE : PatientTableLabels.AGE,
+      code: `${Order.BIRTHDATE},id`,
       align: 'center',
       sortableColumn: !deidentified
     },
-    { label: 'Dernier lieu de prise en charge', code: '', align: 'left', sortableColumn: false },
-    { label: 'Statut vital', code: '', align: 'left', sortableColumn: false },
+    { label: PatientTableLabels.LAST_ENCOUNTER, align: 'left', sortableColumn: false },
+    { label: PatientTableLabels.VITAL_STATUS, align: 'left', sortableColumn: false },
     {
-      label: `IPP${!deidentified ? '' : ' chiffré'}`,
-      code: 'identifier',
+      label: `${PatientTableLabels.IPP}${!deidentified ? '' : ' chiffré'}`,
+      code: Order.IPP,
       align: 'center',
       sortableColumn: !deidentified
     }

@@ -16,7 +16,7 @@ import {
 
 export const initSearchPatientsSearchCriterias: SearchCriterias<null> = {
   orderBy: {
-    orderBy: Order.FAMILY,
+    orderBy: Order.LASTNAME,
     orderDirection: Direction.ASC
   },
   searchInput: '',
@@ -26,7 +26,7 @@ export const initSearchPatientsSearchCriterias: SearchCriterias<null> = {
 
 export const initPatientsSearchCriterias: SearchCriterias<PatientsFilters> = {
   orderBy: {
-    orderBy: Order.FAMILY,
+    orderBy: Order.LASTNAME,
     orderDirection: Direction.ASC
   },
   searchInput: '',
