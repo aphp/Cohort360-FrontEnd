@@ -1,7 +1,7 @@
 import React from 'react'
 import moment from 'moment'
 
-import { CircularProgress, Grid, TableCell, TableRow, Typography, Chip } from '@mui/material'
+import { CircularProgress, Grid, TableCell, TableRow, Typography } from '@mui/material'
 
 import DataTable from 'components/DataTable/DataTable'
 
@@ -12,8 +12,9 @@ import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
 import { GenderStatus, Order, OrderBy } from 'types/searchCriterias'
-import { PatientTableLabels } from 'types/patient'
+import { PatientTableLabels, PatientVitalStatus } from 'types/patient'
 import GenderIcon from 'components/ui/GenderIcon/GenderIcon'
+import StatusChip from 'components/ui/StatusChip/StatusChip'
 
 type DataTablePatientProps = {
   loading: boolean
@@ -141,7 +142,7 @@ const DataTablePatientLine: React.FC<{
           : 'Non renseigné'}
       </TableCell>
       <TableCell align="center">
-        <StatusShip type={patient.deceasedDateTime ? 'Décédé' : 'Vivant'} />
+        <StatusChip vitalStatus={patient.deceasedDateTime ? PatientVitalStatus.DECEASED : PatientVitalStatus.ALIVE} />
       </TableCell>
 
       <TableCell align="center">
@@ -158,16 +159,3 @@ const DataTablePatientLine: React.FC<{
 }
 
 export default DataTablePatient
-
-type StatusShipProps = {
-  type: 'Vivant' | 'Décédé'
-}
-
-const StatusShip: React.FC<StatusShipProps> = ({ type }) => {
-  const { classes } = useStyles()
-  if (type === 'Vivant') {
-    return <Chip className={classes.validChip} label={type} />
-  } else {
-    return <Chip className={classes.cancelledChip} label={type} />
-  }
-}
