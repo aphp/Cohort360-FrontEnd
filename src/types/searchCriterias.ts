@@ -1,4 +1,5 @@
 import { ScopeTreeRow, SimpleCodeType } from 'types'
+import { PatientTableLabels } from './patient'
 
 export enum GenderStatus {
   MALE = 'MALE',
@@ -29,10 +30,13 @@ export enum Direction {
   ASC = 'asc',
   DESC = 'desc'
 }
+export enum DirectionLabel {
+  ASC = 'Croissant',
+  DESC = 'Décroissant'
+}
 export enum Order {
   CODE = 'code',
   RECORDED_DATE = 'recorded-date',
-  FAMILY = 'family',
   DATE = 'date',
   EFFECTIVE_DATETIME = 'effectiveDatetime',
   PERIOD_START = 'Period-start',
@@ -40,7 +44,12 @@ export enum Order {
   DIAGNOSIS = 'diagnosis',
   ANABIO = 'code-anabio',
   LOINC = 'code-loinc',
-  TYPE = 'type'
+  TYPE = 'type',
+  GENDER = 'gender',
+  FIRSTNAME = 'name',
+  LASTNAME = 'family',
+  BIRTHDATE = 'birthdate',
+  IPP = 'identifier'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -225,6 +234,25 @@ export const searchByListPatients = [
   }
 ]
 
+export const orderByListPatients = [
+  {
+    id: Order.GENDER,
+    label: PatientTableLabels.GENDER
+  },
+  {
+    id: Order.FIRSTNAME,
+    label: PatientTableLabels.FIRSTNAME
+  },
+  {
+    id: Order.LASTNAME,
+    label: PatientTableLabels.LASTNAME
+  },
+  {
+    id: Order.BIRTHDATE,
+    label: PatientTableLabels.BIRTHDATE
+  }
+]
+
 export const searchByListDocuments = [
   {
     id: SearchByTypes.TEXT,
@@ -233,5 +261,16 @@ export const searchByListDocuments = [
   {
     id: SearchByTypes.DESCRIPTION,
     label: SearchByTypesLabelDocuments.DESCRIPTION
+  }
+]
+
+export const orderDirection = [
+  {
+    id: Direction.ASC,
+    label: DirectionLabel.ASC
+  },
+  {
+    id: Direction.DESC,
+    label: DirectionLabel.DESC
   }
 ]
