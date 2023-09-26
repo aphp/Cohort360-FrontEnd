@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Chip, CircularProgress, Grid, ListItemIcon, ListItemText, Pagination, Typography } from '@mui/material'
+import { CircularProgress, Grid, ListItemIcon, ListItemText, Pagination, Typography } from '@mui/material'
 
 import { CohortPatient } from 'types'
 
@@ -13,6 +13,8 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ListItemWrapper } from 'components/ui/ListItem/styles'
 import { ListWrapper } from 'components/ui/ListWrapper/styles'
 import GenderIcon from 'components/ui/GenderIcon/GenderIcon'
+import StatusChip from 'components/ui/StatusChip/StatusChip'
+import { PatientVitalStatus } from 'types/patient'
 
 type ListPatientProps = {
   loading: boolean
@@ -110,22 +112,13 @@ const ListPatientLine: React.FC<{
         <GenderIcon gender={patient.gender?.toLocaleUpperCase() as GenderStatus} className={classes.genderIcon} />
       </ListItemIcon>
       <ListItemText primary={`${capitalizeFirstLetter(firstName)} ${lastName}`} secondary={`${age} - ${ipp}`} />
-      <StatusShip type={patient.deceasedDateTime || patient.deceasedBoolean ? 'D.' : 'V.'} />
+      <StatusChip
+        vitalStatus={
+          patient.deceasedDateTime || patient.deceasedBoolean ? PatientVitalStatus.DECEASED : PatientVitalStatus.ALIVE
+        }
+      />
     </ListItemWrapper>
   )
 }
 
 export default ListPatient
-
-type StatusShipProps = {
-  type: 'V.' | 'D.'
-}
-
-const StatusShip: React.FC<StatusShipProps> = ({ type }) => {
-  const { classes } = useStyles()
-  if (type === 'V.') {
-    return <Chip className={classes.validChip} label={type} />
-  } else {
-    return <Chip className={classes.cancelledChip} label={type} />
-  }
-}
