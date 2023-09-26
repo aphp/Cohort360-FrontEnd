@@ -297,6 +297,10 @@ const Login = () => {
       `scope=${OIDC_SCOPE}` // eslint-disable-line
   }
 
+  const onKeyDown = (event) => {
+    event.key === 'Enter' ? _onSubmit(event) : null
+  }
+
   if (noRights === true) return <NoRights />
 
   return code ? (
@@ -344,6 +348,7 @@ const Login = () => {
                 autoComplete="Identifiant"
                 autoFocus
                 onChange={(event) => setUsername(event.target.value)}
+                onKeyDown={onKeyDown}
               />
 
               <TextField
@@ -356,6 +361,7 @@ const Login = () => {
                 id="password"
                 autoComplete="current-password"
                 onChange={(event) => setPassword(event.target.value)}
+                onKeyDown={onKeyDown}
               />
 
               <Typography align="center" className={classes.mention}>
