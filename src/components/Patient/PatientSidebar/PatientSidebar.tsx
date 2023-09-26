@@ -17,9 +17,9 @@ import {
   Direction,
   FilterKeys,
   Order,
+  OrderBy,
+  OrderByKeys,
   SearchByTypes,
-  orderByListPatients,
-  orderDirection,
   searchByListPatients
 } from 'types/searchCriterias'
 
@@ -29,7 +29,6 @@ import Button from 'components/ui/Button/Button'
 import Chip from 'components/ui/Chips/Chip'
 import { BlockWrapper } from 'components/ui/Layout/styles'
 import Modal from 'components/ui/Modal/Modal'
-import RadioGroup from 'components/ui/RadioGroup/RadioGroup'
 import Searchbar from 'components/ui/Searchbar/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Select from 'components/ui/Searchbar/Select'
@@ -42,6 +41,8 @@ import { CanceledError } from 'axios'
 
 import useStyles from './styles'
 import ListPatient from 'components/DataTable/ListPatient'
+import OrderByFilter from 'components/Filters/OrderByFilter/OrderByFilter'
+import OrderDirectionFilter from 'components/Filters/OrderDirectionFilter/OrderDirectionFilter'
 
 type PatientSidebarTypes = {
   total: number
@@ -125,6 +126,8 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
     }
   }
 
+  console.log('orderBy', orderBy)
+
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
@@ -204,34 +207,16 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
               open={toggleSortModal}
               onClose={() => setToggleSortModal(false)}
               width="600px"
+              onSubmit={(newOrder: OrderBy) => {
+                dispatch({ type: ActionTypes.CHANGE_ORDER_BY, payload: newOrder })
+              }}
             >
               <Grid container direction="row" justifyContent="space-between" alignItems="center">
-                <Select
-                  selectedValue={orderBy.orderBy || Order.LASTNAME}
-                  width="200px"
-                  label="Trier par :"
-                  items={orderByListPatients}
-                  onchange={(newOrderBy) =>
-                    dispatch({
-                      type: ActionTypes.CHANGE_ORDER_BY,
-                      payload: { ...orderBy, orderBy: newOrderBy }
-                    })
-                  }
+                <OrderByFilter orderByValue={orderBy.orderBy || Order.LASTNAME} name={OrderByKeys.ORDER_BY} />
+                <OrderDirectionFilter
+                  orderDirectionValue={orderBy.orderDirection || Direction.ASC}
+                  name={OrderByKeys.ORDER_DIRECTION}
                 />
-                <Grid container item justifyContent="space-around" alignItems="center" xs={7}>
-                  <Typography variant="button">Ordre :</Typography>
-                  <RadioGroup
-                    row
-                    selectedValue={orderBy.orderDirection || Direction.ASC}
-                    items={orderDirection}
-                    onchange={(newOrderDirection) =>
-                      dispatch({
-                        type: ActionTypes.CHANGE_ORDER_BY,
-                        payload: { ...orderBy, orderDirection: newOrderDirection }
-                      })
-                    }
-                  />
-                </Grid>
               </Grid>
             </Modal>
           </Grid>
