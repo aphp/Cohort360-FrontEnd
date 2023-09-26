@@ -51,17 +51,17 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
     ) : id === IdType.Condition ? (
       <ArticleIcon />
     ) : id === IdType.Procedure ? (
-      <ContactPageIcon />
-    ) : id === IdType.Claim ? (
       <LocalHospitalIcon />
+    ) : id === IdType.Claim ? (
+      <ContactPageIcon />
     ) : id === IdType.Medication ? (
       <VaccinesIcon />
     ) : id === IdType.Biologie_microbiologie ? (
       <BiotechIcon />
     ) : id === IdType.Observation ? (
-      <CoronavirusIcon />
-    ) : id === IdType.Microbiologie ? (
       <ScienceIcon />
+    ) : id === IdType.Microbiologie ? (
+      <CoronavirusIcon />
     ) : id === IdType.Physiologie ? (
       <MonitorHeartIcon />
     ) : (
