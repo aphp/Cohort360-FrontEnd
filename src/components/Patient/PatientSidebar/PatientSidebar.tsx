@@ -237,7 +237,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
           </Grid>
         </Searchbar>
       </BlockWrapper>
-      <Grid item xs={12} style={{ margin: '0 4px' }}>
+      <Grid item style={{ margin: '0 4px' }}>
         {filtersAsArray.map((filter, index) => (
           <Chip
             key={index}
