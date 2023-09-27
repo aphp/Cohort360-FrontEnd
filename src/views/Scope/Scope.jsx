@@ -9,14 +9,11 @@ import Typography from '@mui/material/Typography'
 import ScopeTree from 'components/ScopeTree/ScopeTree'
 import Searchbar from 'components/ui/Searchbar/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import { BlockWrapper } from 'components/ui/Layout/styles'
-import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { closeAllOpenedPopulation } from 'state/scope'
 
 import useStyles from './styles'
-import { Grid4x4 } from '@mui/icons-material'
 
 const Scope = () => {
   const { classes, cx } = useStyles()
