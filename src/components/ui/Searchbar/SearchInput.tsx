@@ -48,7 +48,16 @@ const SearchInput = ({
       <InputBase
         placeholder={placeholder}
         value={searchInput}
-        onChange={(event) => setSearchInput(event.target.value)}
+        onChange={(event) => {
+          if (!searchInput && event.target.value === ' ') setSearchInput('')
+          else setSearchInput(event.target.value)
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault()
+            onchange(searchInput)
+          }
+        }}
         startAdornment={<InputAdornment position="start"></InputAdornment>}
         endAdornment={
           <InputAdornment position="end" style={{ padding: '0px 25px' }}>
