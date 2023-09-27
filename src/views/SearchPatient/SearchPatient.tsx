@@ -96,7 +96,7 @@ const SearchPatient: React.FC<{}> = () => {
   return (
     <Grid container direction="column" className={cx(classes.appBar, { [classes.appBarShift]: open })}>
       <Grid container justifyContent="center" alignItems="center">
-        <BlockWrapper item xs={11} margin={'20px 0px 10px 0px'}>
+        <BlockWrapper item xs={11} margin={'20px 0px'}>
           <Typography variant="h1" color="primary" className={classes.title}>
             Rechercher un patient
           </Typography>
