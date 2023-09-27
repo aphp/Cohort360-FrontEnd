@@ -20,6 +20,8 @@ import {
   OrderBy,
   OrderByKeys,
   SearchByTypes,
+  orderByListPatients,
+  orderByListPatientsDeidentified,
   searchByListPatients
 } from 'types/searchCriterias'
 
@@ -126,8 +128,6 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
     }
   }
 
-  console.log('orderBy', orderBy)
-
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
@@ -157,15 +157,17 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
             Rechercher par :
           </Typography>
           <Grid container item justifyContent="flex-end">
-            <Select
-              selectedValue={searchBy || SearchByTypes.TEXT}
-              label="Rechercher dans :"
-              width={'40%'}
-              items={searchByListPatients}
-              onchange={(newValue: SearchByTypes) =>
-                dispatch({ type: ActionTypes.CHANGE_SEARCH_BY, payload: newValue })
-              }
-            />
+            {!deidentifiedBoolean && (
+              <Select
+                selectedValue={searchBy || SearchByTypes.TEXT}
+                label="Rechercher dans :"
+                width={'40%'}
+                items={searchByListPatients}
+                onchange={(newValue: SearchByTypes) =>
+                  dispatch({ type: ActionTypes.CHANGE_SEARCH_BY, payload: newValue })
+                }
+              />
+            )}
             <SearchInput
               value={searchInput}
               placeholder="Rechercher"
@@ -212,7 +214,11 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
               }}
             >
               <Grid container direction="row" justifyContent="space-between" alignItems="center">
-                <OrderByFilter orderByValue={orderBy.orderBy || Order.LASTNAME} name={OrderByKeys.ORDER_BY} />
+                <OrderByFilter
+                  orderByValue={orderBy.orderBy || Order.LASTNAME}
+                  name={OrderByKeys.ORDER_BY}
+                  items={deidentifiedBoolean ? orderByListPatientsDeidentified : orderByListPatients}
+                />
                 <OrderDirectionFilter
                   orderDirectionValue={orderBy.orderDirection || Direction.ASC}
                   name={OrderByKeys.ORDER_DIRECTION}

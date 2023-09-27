@@ -1,14 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { FormContext } from 'components/ui/Modal/Modal'
 import Select from 'components/ui/Searchbar/Select'
-import { Order, orderByListPatients } from 'types/searchCriterias'
+import { Order } from 'types/searchCriterias'
+import { PatientTableLabels } from 'types/patient'
 
 type OrderByFilterProps = {
   orderByValue: Order
   name: string
+  items: {
+    id: Order
+    label: PatientTableLabels
+  }[]
 }
 
-const OrderByFilter = ({ orderByValue, name }: OrderByFilterProps) => {
+const OrderByFilter = ({ orderByValue, name, items }: OrderByFilterProps) => {
   const context = useContext(FormContext)
   const [orderBy, setOrderBy] = useState(orderByValue)
 
@@ -21,7 +26,7 @@ const OrderByFilter = ({ orderByValue, name }: OrderByFilterProps) => {
       selectedValue={orderBy}
       width={'200px'}
       label="Trier par :"
-      items={orderByListPatients}
+      items={items}
       onchange={(newOrderBy) => setOrderBy(newOrderBy)}
     />
   )

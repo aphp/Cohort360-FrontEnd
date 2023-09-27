@@ -258,6 +258,16 @@ export const orderByListPatients = [
     label: PatientTableLabels.BIRTHDATE
   }
 ]
+export const orderByListPatientsDeidentified = [
+  {
+    id: Order.GENDER,
+    label: PatientTableLabels.GENDER
+  },
+  {
+    id: Order.BIRTHDATE,
+    label: PatientTableLabels.BIRTHDATE
+  }
+]
 
 export const searchByListDocuments = [
   {
