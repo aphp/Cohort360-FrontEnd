@@ -23,6 +23,7 @@ import {
   ENCOUNTER_VISIT_TYPE,
   MEDICATION_ADMINISTRATIONS,
   MEDICATION_ATC,
+  MEDICATION_UCD,
   MEDICATION_PRESCRIPTION_TYPES,
   PROCEDURE_HIERARCHY,
   SHORT_COHORT_LIMIT
@@ -83,7 +84,9 @@ export interface IServiceCohortCreation {
   fetchDocTypes: () => Promise<DocType[]>
   fetchAtcData: () => Promise<any>
   fetchSingleCodeHierarchy: (resourceType: string, code: string) => Promise<string[]>
+  fetchUcdData: () => Promise<any>
   fetchAtcHierarchy: (atcParent: string) => Promise<any>
+  fetchUCDList: (ucd?: string) => Promise<any>
   fetchPrescriptionTypes: () => Promise<any>
   fetchAdministrations: () => Promise<any>
   fetchBiologyData: () => Promise<any>
@@ -293,6 +296,12 @@ const servicesCohortCreation: IServiceCohortCreation = {
     }
     return fetchSingleCodeHierarchy(codeSystemPerResourceType[resourceType], code)
   },
+  fetchUcdData: async (searchValue?: string, noStar?: boolean) =>
+    fetchValueSet(MEDICATION_UCD, {
+      valueSetTitle: 'Toute la hiérarchie',
+      search: searchValue || '',
+      noStar
+    }),
   fetchAtcHierarchy: async (atcParent?: string) =>
     fetchValueSet(MEDICATION_ATC, {
       valueSetTitle: 'Toute la hiérarchie Médicament',
@@ -303,6 +312,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
         atcData.label.search(new RegExp(/^[A-Z] - /, 'gi')) !== -1 &&
         atcData.label.search(new RegExp(/^[X-Y] - /, 'gi')) !== 0
     }),
+  fetchUCDList: async (ucd?: string) => fetchValueSet(MEDICATION_UCD, { code: ucd }),
   fetchPrescriptionTypes: async () => fetchValueSet(MEDICATION_PRESCRIPTION_TYPES, { joinDisplayWithCode: false }),
   fetchAdministrations: async () => fetchValueSet(MEDICATION_ADMINISTRATIONS, { joinDisplayWithCode: false }),
   fetchBiologyData: async (searchValue?: string, noStar?: boolean) =>

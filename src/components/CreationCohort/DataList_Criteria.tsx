@@ -160,6 +160,7 @@ const criteriaList: CriteriaItemType[] = [
     data: { atcData: 'loading', atcHierarchy: 'loading', prescriptionTypes: 'loading', administrations: 'loading' },
     fetch: {
       fetchAtcData: services.cohortCreation.fetchAtcData,
+      fetchUcdData: services.cohortCreation.fetchUcdData,
       fetchAtcHierarchy: services.cohortCreation.fetchAtcHierarchy,
       fetchPrescriptionTypes: services.cohortCreation.fetchPrescriptionTypes,
       fetchAdministrations: services.cohortCreation.fetchAdministrations

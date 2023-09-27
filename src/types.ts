@@ -234,7 +234,7 @@ export enum SearchByTypes {
 
 export type AbstractTree<T> = T & {
   id: string
-  subItems: AbstractTree<T>[]
+  subItems?: AbstractTree<T>[]
 }
 
 export enum VitalStatus {

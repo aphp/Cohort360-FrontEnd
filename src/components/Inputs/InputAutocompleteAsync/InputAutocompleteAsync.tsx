@@ -49,6 +49,7 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
       setLoading(true)
       if (!getAutocompleteOptions) return
       const response = (await getAutocompleteOptions(searchValue)) || []
+      console.log('response', response)
 
       if (active) {
         setOptions(response)

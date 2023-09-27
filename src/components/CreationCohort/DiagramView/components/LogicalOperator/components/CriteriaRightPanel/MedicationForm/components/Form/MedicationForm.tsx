@@ -50,6 +50,12 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const getAtcOptions = async (searchValue: string) => await criteria.fetch.fetchAtcData(searchValue, false)
+  const getUCDOptions = async (searchValue: string) => await criteria.fetch.fetchUcdData(searchValue, false)
+  const onSearch = async (searchValue: string) =>
+    await Promise.all([getAtcOptions(searchValue), getUCDOptions(searchValue)])
+
+  console.log('onResearch', onSearch)
+
   const _onSubmit = () => {
     onChangeSelectedCriteria(currentState)
     dispatch(fetchMedication())
@@ -190,13 +196,13 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
 
           <AutocompleteAsync
             multiple
-            label="Codes ATC / UCD"
+            label="Code(s) sélectionné(s)"
             variant="outlined"
-            noOptionsText="Veuillez entrer un code ou un critère ATC / UCD"
+            noOptionsText="Veuillez entrer un code de médicament"
             className={classes.inputItem}
             autocompleteValue={defaultValuesCode}
             autocompleteOptions={criteria?.data?.atcData || []}
-            getAutocompleteOptions={getAtcOptions}
+            getAutocompleteOptions={onSearch}
             onChange={(e, value) => {
               onChangeValue('code', value)
             }}

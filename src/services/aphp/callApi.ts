@@ -809,6 +809,7 @@ export const fetchValueSet = async (
     filterRoots = () => true,
     filterOut = (value: HierarchyElement) => value.id === 'APHP generated'
   } = options || {}
+  console.log('options', options)
   const codeList = await getCodeList(codeSystem, code, search, noStar)
   const sortingFunc = sortingKey === 'id' ? idSort : labelSort
   const formattedCodeList =
