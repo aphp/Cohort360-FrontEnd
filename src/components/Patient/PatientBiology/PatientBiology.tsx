@@ -54,7 +54,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   const [filters, setFilters] = useState<ObservationFilters>(filtersDefault)
   const [validatedStatus] = useState(true)
   const [order, setOrder] = useState<Order>({
-    orderBy: 'effectiveDateTime',
+    orderBy: 'date',
     orderDirection: 'asc'
   })
   const controllerRef = useRef<AbortController | null>(null)

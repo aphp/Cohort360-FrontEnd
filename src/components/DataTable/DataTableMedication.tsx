@@ -51,8 +51,8 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
       align: 'center',
       sortableColumn: true
     },
-    { label: 'Code ATC', code: 'class-simple', align: 'center', sortableColumn: true },
-    { label: 'Code UCD', code: 'code', align: 'center', sortableColumn: true },
+    { label: 'Code ATC', code: 'medication-atc', align: 'center', sortableColumn: true },
+    { label: 'Code UCD', code: 'medication-ucd', align: 'center', sortableColumn: true },
     selectedTab === 'prescription'
       ? { label: 'Type de prescription', code: 'type', align: 'center', sortableColumn: true }
       : null,
