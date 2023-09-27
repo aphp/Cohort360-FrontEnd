@@ -8,6 +8,7 @@ import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { CLAIM, initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchClaim, PmsiListType } from 'state/pmsi'
+import { EXPLORATION } from 'utils/constants'
 
 export const defaultDemographic = {
   type: CLAIM,
@@ -72,7 +73,7 @@ const Index = (props: any) => {
         value={selectedTab}
         onChange={(e, tab) => setSelectedTab(tab)}
       >
-        <Tab label="Hiérarchie" value="hierarchy" />
+        <Tab label={EXPLORATION} value="hierarchy" />
         <Tab label="Formulaire" value="form" />
       </Tabs>
 

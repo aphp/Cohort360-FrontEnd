@@ -8,6 +8,7 @@ import useStyles from './styles'
 import { CONDITION, initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition, PmsiListType } from 'state/pmsi'
+import { EXPLORATION } from 'utils/constants'
 
 export const defaultCondition = {
   type: CONDITION,
@@ -70,7 +71,7 @@ const Index = (props: any) => {
         value={selectedTab}
         onChange={(e, tab) => setSelectedTab(tab)}
       >
-        <Tab label="Hiérarchie" value="hierarchy" />
+        <Tab label={EXPLORATION} value="hierarchy" />
         <Tab label="Formulaire" value="form" />
       </Tabs>
 

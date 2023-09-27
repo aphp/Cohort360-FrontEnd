@@ -11,6 +11,7 @@ import { PmsiListType } from 'state/pmsi'
 import { fetchBiology } from 'state/biology'
 import { useAppDispatch, useAppSelector } from 'state'
 import { Comparators } from 'types'
+import { EXPLORATION } from 'utils/constants'
 
 export const defaultBiology = {
   type: OBSERVATION,
@@ -73,7 +74,7 @@ const Index = (props: any) => {
         value={selectedTab}
         onChange={(e, tab) => setSelectedTab(tab)}
       >
-        <Tab label="Hiérarchie" value="hierarchy" />
+        <Tab label={EXPLORATION} value="hierarchy" />
         <Tab label="Recherche" value="search" />
         <Tab label="Formulaire" value="form" />
       </Tabs>
