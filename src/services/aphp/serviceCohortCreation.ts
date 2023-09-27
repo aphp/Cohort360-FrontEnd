@@ -1,9 +1,17 @@
 import { AxiosResponse } from 'axios'
 import apiBack from '../apiBackend'
 
-import { DatedMeasure, DocType, QuerySnapshotInfo, RequestType, Snapshot } from 'types'
+import {
+  DatedMeasure,
+  DocType,
+  HierarchyElement,
+  HierarchyElementWithSystem,
+  QuerySnapshotInfo,
+  RequestType,
+  Snapshot
+} from 'types'
 import docTypes from 'assets/docTypes.json'
-import { fetchBiologySearch } from './cohortCreation/fetchObservation'
+import { ValueSetWithHierarchy, fetchBiologySearch } from './cohortCreation/fetchObservation'
 import {
   BIOLOGY_HIERARCHY_ITM_ANABIO,
   BIOLOGY_HIERARCHY_ITM_LOINC,
@@ -61,37 +69,39 @@ export interface IServiceCohortCreation {
 
   fetchSnapshot: (snapshotId: string) => Promise<Snapshot>
 
-  fetchAdmissionModes: () => Promise<any>
-  fetchEntryModes: () => Promise<any>
-  fetchExitModes: () => Promise<any>
-  fetchPriseEnChargeType: () => Promise<any>
-  fetchTypeDeSejour: () => Promise<any>
-  fetchFileStatus: () => Promise<any>
-  fetchReason: () => Promise<any>
-  fetchDestination: () => Promise<any>
-  fetchProvenance: () => Promise<any>
-  fetchAdmission: () => Promise<any>
-  fetchGender: () => Promise<any>
-  fetchStatus: () => Promise<any>
-  fetchStatusDiagnostic: () => Promise<any>
-  fetchDiagnosticTypes: () => Promise<any>
-  fetchCim10Diagnostic: () => Promise<any>
-  fetchCim10Hierarchy: (cim10Parent?: string) => Promise<any>
-  fetchCcamData: () => Promise<any>
-  fetchCcamHierarchy: (ccamParent: string) => Promise<any>
-  fetchGhmData: () => Promise<any>
-  fetchGhmHierarchy: (ghmParent: string) => Promise<any>
+  fetchAdmissionModes: () => Promise<Array<HierarchyElement>>
+  fetchEntryModes: () => Promise<Array<HierarchyElement>>
+  fetchExitModes: () => Promise<Array<HierarchyElement>>
+  fetchPriseEnChargeType: () => Promise<Array<HierarchyElement>>
+  fetchTypeDeSejour: () => Promise<Array<HierarchyElement>>
+  fetchFileStatus: () => Promise<Array<HierarchyElement>>
+  fetchReason: () => Promise<Array<HierarchyElement>>
+  fetchDestination: () => Promise<Array<HierarchyElement>>
+  fetchProvenance: () => Promise<Array<HierarchyElement>>
+  fetchAdmission: () => Promise<Array<HierarchyElement>>
+  fetchGender: () => Promise<Array<HierarchyElement>>
+  fetchStatus: () => Promise<Array<{ id: boolean; label: string }>>
+  fetchStatusDiagnostic: () => Promise<Array<HierarchyElement>>
+  fetchDiagnosticTypes: () => Promise<Array<HierarchyElement>>
+  fetchCim10Diagnostic: () => Promise<Array<HierarchyElement>>
+  fetchCim10Hierarchy: (cim10Parent?: string) => Promise<Array<HierarchyElement>>
+  fetchCcamData: () => Promise<Array<HierarchyElement>>
+  fetchCcamHierarchy: (ccamParent: string) => Promise<Array<HierarchyElement>>
+  fetchGhmData: () => Promise<Array<HierarchyElement>>
+  fetchGhmHierarchy: (ghmParent: string) => Promise<Array<HierarchyElement>>
   fetchDocTypes: () => Promise<DocType[]>
-  fetchAtcData: () => Promise<any>
+  fetchAtcData: () => Promise<Array<HierarchyElementWithSystem>>
   fetchSingleCodeHierarchy: (resourceType: string, code: string) => Promise<string[]>
-  fetchUcdData: () => Promise<any>
-  fetchAtcHierarchy: (atcParent: string) => Promise<any>
-  fetchUCDList: (ucd?: string) => Promise<any>
-  fetchPrescriptionTypes: () => Promise<any>
-  fetchAdministrations: () => Promise<any>
-  fetchBiologyData: () => Promise<any>
-  fetchBiologyHierarchy: (biologyParent?: string) => Promise<any>
-  fetchBiologySearch: (searchInput: string) => Promise<{ anabio: any; loinc: any }>
+  fetchUcdData: () => Promise<Array<HierarchyElementWithSystem>>
+  fetchAtcHierarchy: (atcParent: string) => Promise<Array<HierarchyElement>>
+  fetchUCDList: (ucd?: string) => Promise<Array<HierarchyElement>>
+  fetchPrescriptionTypes: () => Promise<Array<HierarchyElement>>
+  fetchAdministrations: () => Promise<Array<HierarchyElement>>
+  fetchBiologyData: () => Promise<Array<HierarchyElement>>
+  fetchBiologyHierarchy: (biologyParent?: string) => Promise<Array<HierarchyElement>>
+  fetchBiologySearch: (
+    searchInput: string
+  ) => Promise<{ anabio: ValueSetWithHierarchy[]; loinc: ValueSetWithHierarchy[] }>
 }
 
 const servicesCohortCreation: IServiceCohortCreation = {

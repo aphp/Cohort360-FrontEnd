@@ -4,7 +4,8 @@ import {
   FHIR_API_Promise_Response,
   FHIR_API_Response,
   FHIR_Bundle_Promise_Response,
-  HierarchyElement
+  HierarchyElement,
+  HierarchyElementWithSystem
 } from 'types'
 
 import { SearchByTypes, FHIR_Bundle_Response, IScope, AccessExpiration, AccessExpirationsProps } from 'types'
@@ -744,7 +745,7 @@ const getCodeList = async (
   expandCode?: string,
   search?: string,
   noStar = true
-): Promise<{ code?: string; display?: string; extension?: Extension[] }[] | undefined> => {
+): Promise<{ code?: string; display?: string; extension?: Extension[]; codeSystem?: string }[] | undefined> => {
   if (!expandCode) {
     if (search !== undefined && !search.trim()) {
       return []
@@ -760,7 +761,14 @@ const getCodeList = async (
     // TODO test if it returns all the codes without specifying the count
     const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}${searchParam}`)
     const valueSetBundle = getApiResponseResourcesOrThrow(res)
-    return valueSetBundle.length > 0 ? valueSetBundle[0].compose?.include?.[0].concept : []
+    return valueSetBundle.length > 0
+      ? valueSetBundle[0].compose?.include
+          .map((valueSetPerSystem) => {
+            return valueSetPerSystem.concept?.map((code) => ({ ...code, codeSystem: valueSetPerSystem.system })) || []
+          })
+          .filter((valueSetPerSystem) => !!valueSetPerSystem)
+          .reduce((acc, val) => acc.concat(val), [])
+      : []
   } else {
     const json = {
       resourceType: 'ValueSet',
@@ -798,7 +806,7 @@ export type FetchValueSetOptions = {
 export const fetchValueSet = async (
   codeSystem: string,
   options?: FetchValueSetOptions
-): Promise<Array<HierarchyElement>> => {
+): Promise<Array<HierarchyElementWithSystem>> => {
   const {
     code,
     valueSetTitle,
@@ -819,6 +827,7 @@ export const fetchValueSet = async (
         label: joinDisplayWithCode
           ? `${code.code} - ${capitalizeFirstLetter(code.display)}`
           : capitalizeFirstLetter(code.display),
+        system: code.codeSystem,
         subItems: [{ id: 'loading', label: 'loading', subItems: [] as HierarchyElement[] }]
       }))
       .filter((code) => !filterOut(code))

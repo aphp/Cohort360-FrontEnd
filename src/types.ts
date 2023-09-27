@@ -917,11 +917,14 @@ export type HierarchyTree = null | {
   code?: HierarchyElement[]
   loading?: number
 }
-export type HierarchyElement = {
+export type HierarchyElement<E = {}> = E & {
   id: string
   label: string
   subItems?: HierarchyElement[]
 }
+
+export type HierarchyElementWithSystem = HierarchyElement<{ system?: string }>
+
 export type TreeElement = { id: string; subItems: TreeElement[] }
 export type ScopeElement = {
   id: number
