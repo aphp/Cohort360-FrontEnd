@@ -535,6 +535,11 @@ export type GhmDataType = {
   isInclusive?: boolean
 }
 
+export enum MedicationSystem {
+  ATC = 'ATC',
+  UCD = 'UCD'
+}
+
 export enum Calendar {
   YEAR = 'year',
   MONTH = 'month',

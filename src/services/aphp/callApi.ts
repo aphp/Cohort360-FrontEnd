@@ -762,9 +762,9 @@ const getCodeList = async (
     const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}${searchParam}`)
     const valueSetBundle = getApiResponseResourcesOrThrow(res)
     return valueSetBundle.length > 0
-      ? valueSetBundle[0].compose?.include
-          .map((valueSetPerSystem) => {
-            return valueSetPerSystem.concept?.map((code) => ({ ...code, codeSystem: valueSetPerSystem.system })) || []
+      ? valueSetBundle
+          .map((entry) => {
+            return entry.compose?.include[0].concept?.map((code) => ({ ...code, codeSystem: entry.compose?.include[0].system })) || [] //eslint-disable-line
           })
           .filter((valueSetPerSystem) => !!valueSetPerSystem)
           .reduce((acc, val) => acc.concat(val), [])

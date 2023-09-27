@@ -90,9 +90,8 @@ export interface IServiceCohortCreation {
   fetchGhmData: () => Promise<Array<HierarchyElement>>
   fetchGhmHierarchy: (ghmParent: string) => Promise<Array<HierarchyElement>>
   fetchDocTypes: () => Promise<DocType[]>
-  fetchAtcData: () => Promise<Array<HierarchyElementWithSystem>>
+  fetchMedicationData: () => Promise<Array<HierarchyElementWithSystem>>
   fetchSingleCodeHierarchy: (resourceType: string, code: string) => Promise<string[]>
-  fetchUcdData: () => Promise<Array<HierarchyElementWithSystem>>
   fetchAtcHierarchy: (atcParent: string) => Promise<Array<HierarchyElement>>
   fetchUCDList: (ucd?: string) => Promise<Array<HierarchyElement>>
   fetchPrescriptionTypes: () => Promise<Array<HierarchyElement>>
@@ -285,8 +284,8 @@ const servicesCohortCreation: IServiceCohortCreation = {
   fetchGhmHierarchy: async (ghmParent?: string) =>
     fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie GHM', code: ghmParent }),
   fetchDocTypes: () => Promise.resolve(docTypes && docTypes.docTypes.length > 0 ? docTypes.docTypes : []),
-  fetchAtcData: async (searchValue?: string, noStar?: boolean) =>
-    fetchValueSet(MEDICATION_ATC, {
+  fetchMedicationData: async (searchValue?: string, noStar?: boolean) =>
+    fetchValueSet(`${MEDICATION_ATC},${MEDICATION_UCD}`, {
       valueSetTitle: 'Toute la hiérarchie',
       search: searchValue || '',
       noStar
@@ -306,12 +305,6 @@ const servicesCohortCreation: IServiceCohortCreation = {
     }
     return fetchSingleCodeHierarchy(codeSystemPerResourceType[resourceType], code)
   },
-  fetchUcdData: async (searchValue?: string, noStar?: boolean) =>
-    fetchValueSet(MEDICATION_UCD, {
-      valueSetTitle: 'Toute la hiérarchie',
-      search: searchValue || '',
-      noStar
-    }),
   fetchAtcHierarchy: async (atcParent?: string) =>
     fetchValueSet(MEDICATION_ATC, {
       valueSetTitle: 'Toute la hiérarchie Médicament',

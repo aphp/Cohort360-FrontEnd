@@ -49,12 +49,8 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
   const currentState = { ...selectedCriteria, ...initialState }
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
-  const getAtcOptions = async (searchValue: string) => await criteria.fetch.fetchAtcData(searchValue, false)
-  const getUCDOptions = async (searchValue: string) => await criteria.fetch.fetchUcdData(searchValue, false)
-  const onSearch = async (searchValue: string) =>
-    await Promise.all([getAtcOptions(searchValue), getUCDOptions(searchValue)])
-
-  console.log('onResearch', onSearch)
+  const getMedicationOptions = async (searchValue: string) =>
+    await criteria.fetch.fetchMedicationData(searchValue, false)
 
   const _onSubmit = () => {
     onChangeSelectedCriteria(currentState)
@@ -142,7 +138,6 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
 
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">Médicaments</Typography>
-
           <TextField
             required
             className={classes.inputItem}
@@ -152,7 +147,6 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             value={currentState.title}
             onChange={(e) => onChangeValue('title', e.target.value)}
           />
-
           <Grid style={{ display: 'flex' }}>
             <FormLabel
               onClick={() => onChangeValue('isInclusive', !currentState.isInclusive)}
@@ -168,13 +162,11 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               color="secondary"
             />
           </Grid>
-
           <OccurrencesNumberInputs
             form={CriteriaName.Medication}
             selectedCriteria={currentState}
             onChangeValue={onChangeValue}
           />
-
           <Grid style={{ display: 'flex' }}>
             <RadioGroup
               row
@@ -193,7 +185,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               />
             </RadioGroup>
           </Grid>
-
+          <>{console.log('criteria?.data?.atcData', criteria?.data?.atcData)}</>
           <AutocompleteAsync
             multiple
             label="Code(s) sélectionné(s)"
@@ -202,12 +194,11 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             className={classes.inputItem}
             autocompleteValue={defaultValuesCode}
             autocompleteOptions={criteria?.data?.atcData || []}
-            getAutocompleteOptions={onSearch}
+            getAutocompleteOptions={getMedicationOptions}
             onChange={(e, value) => {
               onChangeValue('code', value)
             }}
           />
-
           {currentState.type === 'MedicationRequest' && (
             <Autocomplete
               multiple
@@ -221,7 +212,6 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               renderInput={(params) => <TextField {...params} label="Type de prescription" />}
             />
           )}
-
           <Autocomplete
             multiple
             id="criteria-prescription-type-autocomplete"
@@ -233,7 +223,6 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             onChange={(e, value) => onChangeValue('administration', value)}
             renderInput={(params) => <TextField {...params} label="Voie d'administration" />}
           />
-
           <AdvancedInputs
             form={CriteriaName.Medication}
             selectedCriteria={currentState}
