@@ -16,6 +16,7 @@ import {
   Condition,
   DocumentReference,
   Encounter,
+  Extension,
   Group,
   MedicationAdministration,
   MedicationRequest,
@@ -30,6 +31,7 @@ import { Observation } from 'fhir/r4'
 import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 import { idSort, labelSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
+import { CODE_HIERARCHY_EXTENSION_NAME } from '../../constants'
 
 const paramValuesReducerWithPrefix =
   (prefix: string): ((accumulator: string, currentValue: string) => string) =>
@@ -742,7 +744,7 @@ const getCodeList = async (
   expandCode?: string,
   search?: string,
   noStar = true
-): Promise<{ code?: string; display?: string }[] | undefined> => {
+): Promise<{ code?: string; display?: string; extension?: Extension[] }[] | undefined> => {
   if (!expandCode) {
     if (search !== undefined && !search.trim()) {
       return []
@@ -820,11 +822,24 @@ export const fetchValueSet = async (
       }))
       .filter((code) => !filterOut(code))
       .sort(sortingFunc) || []
-  if ((!code || search === '*') && valueSetTitle) {
+  if (!code && (search === undefined || search === '*') && valueSetTitle) {
     return [{ id: '*', label: valueSetTitle, subItems: formattedCodeList.filter((code) => filterRoots(code)) }]
   } else {
     return formattedCodeList
   }
+}
+
+export const fetchSingleCodeHierarchy = async (codeSystem: string, code: string): Promise<string[]> => {
+  const codeList = await getCodeList(codeSystem, undefined, code)
+  if (!codeList || codeList.length === 0) {
+    return []
+  }
+  return (
+    codeList[0].extension
+      ?.find((e) => e.url === CODE_HIERARCHY_EXTENSION_NAME)
+      ?.valueCodeableConcept?.coding?.map((c) => c.code || '')
+      .filter((c) => !!c) || []
+  )
 }
 
 type fetchScopeProps = {

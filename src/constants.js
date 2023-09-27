@@ -23,6 +23,11 @@ export const AUTH_API_URL = import.meta.env.DEV ? import.meta.env.VITE_AUTH_API_
 
 export const SHORT_COHORT_LIMIT = 20000
 
+export const CODE_HIERARCHY_EXTENSION_NAME =
+  'https://terminology.eds.aphp.fr/fhir/profile/valueSet/extension/hierarchy-path-id'
+export const CONCEPT_MAP_HIERARCHY_EXTENSION_NAME =
+  'https://terminology.eds.aphp.fr/fhir/profile/conceptMap/extension/group-source-hierarchy-path'
+
 export const CLAIM_HIERARCHY = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_CLAIM_HIERARCHY
   : '{VITE_VALUE_SET_URL_CLAIM_HIERARCHY}'

@@ -18,19 +18,12 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
 
-import { Calendar, CalendarLabel, CalendarRequestLabel, DemographicDataType } from 'types'
+import { Calendar, CalendarLabel, CalendarRequestLabel, CriteriaDrawerComponentProps, DemographicDataType } from 'types'
 
 enum Error {
   EMPTY_FORM,
   INCOHERENT_AGE_ERROR,
   NO_ERROR
-}
-
-type DemographicFormProps = {
-  criteria: any
-  selectedCriteria: any
-  goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
 }
 
 const defaultDemographic: DemographicDataType = {
@@ -43,7 +36,7 @@ const defaultDemographic: DemographicDataType = {
   isInclusive: true
 }
 
-const DemographicForm: React.FC<DemographicFormProps> = (props) => {
+const DemographicForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultDemographic)
 
@@ -88,7 +81,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
   }
 
   const defaultValuesGender =
-    defaultValues.gender && criteria.data.gender !== 'loading'
+    defaultValues.gender && criteria && criteria.data.gender !== 'loading'
       ? defaultValues.gender.map((gender: any) => {
           const criteriaGender = criteria.data.gender ? criteria.data.gender.find((g: any) => g.id === gender.id) : null
           return {
@@ -98,7 +91,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
         })
       : []
   const defaultValuesVitalStatus =
-    defaultValues.vitalStatus && criteria.data.status !== 'loading'
+    defaultValues.vitalStatus && criteria && criteria.data.status !== 'loading'
       ? defaultValues.vitalStatus.map((vitalStatus: any) => {
           const criteriaStatus = criteria.data.status
             ? criteria.data.status.find((s: any) => s.id === vitalStatus.id)

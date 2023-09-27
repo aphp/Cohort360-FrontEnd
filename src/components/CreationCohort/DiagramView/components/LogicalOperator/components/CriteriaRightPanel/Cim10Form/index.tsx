@@ -8,6 +8,7 @@ import useStyles from './styles'
 import { CONDITION, initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition, PmsiListType } from 'state/pmsi'
+import { CriteriaDrawerComponentProps } from 'types'
 
 export const defaultCondition = {
   type: CONDITION,
@@ -21,7 +22,7 @@ export const defaultCondition = {
   isInclusive: true
 }
 
-const Index = (props: any) => {
+const Index = (props: CriteriaDrawerComponentProps) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
   const [defaultCriteria, setDefaultCriteria] = useState(selectedCriteria || defaultCondition)

@@ -9,8 +9,8 @@ import {
 } from '../state/syncHierarchyTable'
 import { AbstractTree, SelectedCriteriaType } from '../types'
 import { expandMedicationElement } from '../state/medication'
-import { fetchSignleCode } from '../services/aphp/cohortCreation/fetchMedication'
 import { expandBiologyElement } from '../state/biology'
+import services from 'services/aphp'
 
 /**
  * This function is called when a user select an element of pmsi hierarchy
@@ -456,7 +456,7 @@ const expandSingleResourceItem = async (
     if (higherParentCode) {
       return { higherParentCode: higherParentCode, parentsList: parentsListByAlreadyFetched }
     } else if (!higherParentCode) {
-      const response = await fetchSignleCode(code.id)
+      const response = await services.cohortCreation.fetchSingleCodeHierarchy(resourceType, code.id)
       const parentsListByFetch = response
         ? response.map((item) => {
             return { id: item, label: 'loading', subItems: [] }

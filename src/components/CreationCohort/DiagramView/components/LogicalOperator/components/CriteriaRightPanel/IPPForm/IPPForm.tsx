@@ -6,15 +6,9 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import InputSearchDocumentSimple from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentSimple'
 
-import { IPPListDataType } from 'types'
+import { CriteriaDrawerComponentProps, IPPListDataType } from 'types'
 
 import useStyles from './styles'
-
-type IPPFormProps = {
-  selectedCriteria: any
-  goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
-}
 
 const defaultIPPList: IPPListDataType = {
   title: "Liste d'IPP",
@@ -23,7 +17,7 @@ const defaultIPPList: IPPListDataType = {
   isInclusive: true
 }
 
-const IPPForm: React.FC<IPPFormProps> = (props) => {
+const IPPForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const { selectedCriteria, goBack, onChangeSelectedCriteria } = props
 
   const { classes } = useStyles()

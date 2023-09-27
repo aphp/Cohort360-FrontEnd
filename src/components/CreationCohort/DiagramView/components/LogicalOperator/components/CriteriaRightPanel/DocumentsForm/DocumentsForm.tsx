@@ -28,17 +28,18 @@ import { InputSearchDocumentSimple } from 'components/Inputs'
 
 import useStyles from './styles'
 
-import { CriteriaName, DocType, DocumentDataType, errorDetails, SearchByTypes, searchInputError } from 'types'
+import {
+  CriteriaDrawerComponentProps,
+  CriteriaName,
+  DocType,
+  DocumentDataType,
+  errorDetails,
+  SearchByTypes,
+  searchInputError
+} from 'types'
 import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
 import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
-
-type TestGeneratedFormProps = {
-  criteria: any
-  selectedCriteria: any
-  goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
-}
 
 const defaultComposition: DocumentDataType = {
   type: 'DocumentReference',
@@ -55,7 +56,7 @@ const defaultComposition: DocumentDataType = {
   isInclusive: true
 }
 
-const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
+const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()
