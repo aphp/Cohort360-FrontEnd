@@ -1,17 +1,23 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useEffect } from 'react'
 import { useAppSelector } from 'state'
 
 import { Divider, Grid, Typography } from '@mui/material'
-
-import PatientSearchBar from 'components/Inputs/PatientSearchBar/PatientSearchBar'
-
 import LockIcon from '@mui/icons-material/Lock'
 
 import useStyles from './styles'
+import Searchbar from 'components/ui/Searchbar/Searchbar'
+import SearchInput from 'components/ui/Searchbar/SearchInput'
+import { useNavigate } from 'react-router-dom'
 
 const SearchPatientCard = () => {
   const { classes } = useStyles()
   const deidentifiedBoolean = useAppSelector((state) => state.me?.deidentified ?? true)
+  const [searchInput, setSearchInput] = React.useState('')
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (searchInput) navigate(`/patient-search/${searchInput}`)
+  }, [searchInput])
 
   return (
     <>
@@ -30,7 +36,15 @@ const SearchPatientCard = () => {
         </Grid>
       ) : (
         <Grid container direction="column" justifyContent="space-evenly" style={{ height: '100%', marginTop: 8 }}>
-          <PatientSearchBar />
+          <Searchbar>
+            <SearchInput
+              value={searchInput}
+              searchOnClick
+              width={'100%'}
+              placeholder="Cherchez un ipp, nom et/ou prénom"
+              onchange={(newValue) => setSearchInput(newValue)}
+            />
+          </Searchbar>
         </Grid>
       )}
     </>
