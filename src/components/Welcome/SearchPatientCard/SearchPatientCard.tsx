@@ -40,7 +40,6 @@ const SearchPatientCard = () => {
             <SearchInput
               value={searchInput}
               searchOnClick
-              width={'100%'}
               placeholder="Cherchez un ipp, nom et/ou prénom"
               onchange={(newValue) => setSearchInput(newValue)}
             />

@@ -7,12 +7,16 @@ import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 
 import ScopeTree from 'components/ScopeTree/ScopeTree'
+import Searchbar from 'components/ui/Searchbar/Searchbar'
+import SearchInput from 'components/ui/Searchbar/SearchInput'
+import { BlockWrapper } from 'components/ui/Layout/styles'
 import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { closeAllOpenedPopulation } from 'state/scope'
 
 import useStyles from './styles'
+import { Grid4x4 } from '@mui/icons-material'
 
 const Scope = () => {
   const { classes, cx } = useStyles()
@@ -48,20 +52,32 @@ const Scope = () => {
       style={{ height: '100%', overflow: 'auto' }}
     >
       <Grid container justifyContent="center" alignItems="center">
-        <Grid container item xs={11} direction="column">
+        <Grid container item xs={11}>
           <Typography variant="h1" color="primary" className={classes.title}>
             Explorer un perimètre
           </Typography>
-          <Grid container direction="row">
-            <ScopeSearchBar searchInput={searchInput} onChangeInput={setSearchInput} />
+          <Grid item xs={12}>
+            <Searchbar>
+              <Grid container justifyContent="flex-end">
+                <Grid item xs={6} margin="20px 0px">
+                  <SearchInput
+                    value={searchInput}
+                    placeholder="Rechercher"
+                    onchange={(newValue) => setSearchInput(newValue)}
+                  />
+                </Grid>
+              </Grid>
+            </Searchbar>
           </Grid>
-          <Paper className={classes.paper}>
-            <ScopeTree
-              searchInput={searchInput}
-              defaultSelectedItems={selectedItems}
-              onChangeSelectedItem={onChangeSelectedItem}
-            />
-          </Paper>
+          <Grid item xs={12}>
+            <Paper className={classes.paper}>
+              <ScopeTree
+                searchInput={searchInput}
+                defaultSelectedItems={selectedItems}
+                onChangeSelectedItem={onChangeSelectedItem}
+              />
+            </Paper>
+          </Grid>
         </Grid>
         <Grid
           container
