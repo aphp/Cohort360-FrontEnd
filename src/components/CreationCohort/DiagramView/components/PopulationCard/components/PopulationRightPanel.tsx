@@ -8,7 +8,10 @@ import ScopeTree from 'components/ScopeTree/ScopeTree'
 import { ScopeType, ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
-import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
+import Searchbar from 'components/ui/Searchbar/Searchbar'
+import SearchInput from 'components/ui/Searchbar/SearchInput'
+import { Grid } from '@mui/material'
+import { BlockWrapper } from 'components/ui/Layout/styles'
 
 type PopulationRightPanelProps = {
   open: boolean
@@ -39,9 +42,17 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
         </div>
 
         <div className={classes.drawerContentContainer}>
-          <div className={classes.searchBar}>
-            <ScopeSearchBar searchInput={searchInput} onChangeInput={setSearchInput} />
-          </div>
+          <Searchbar>
+            <BlockWrapper container justifyContent="center">
+              <Grid item xs={8} margin="20px 0px">
+                <SearchInput
+                  value={searchInput}
+                  placeholder="Rechercher"
+                  onchange={(newValue) => setSearchInput(newValue)}
+                />
+              </Grid>
+            </BlockWrapper>
+          </Searchbar>
           <ScopeTree
             executiveUnitType={executiveUnitType}
             searchInput={searchInput}
