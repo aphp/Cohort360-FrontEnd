@@ -27,6 +27,7 @@ import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import useStyles from './styles'
 import { useDebounce } from 'utils/debounce'
 import { ValueSet } from 'types'
+import { ValueSetWithHierarchy } from 'services/aphp/cohortCreation/fetchObservation'
 
 type BiologySearchListItemProps = {
   label: string
@@ -97,7 +98,10 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
   const [selectedTab, setSelectedTab] = useState<'anabio' | 'loinc'>('anabio')
   const [searchInput, setSearchInput] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
-  const [biologySearchResults, setBiologySearchResults] = useState<{ anabio: ValueSet[]; loinc: ValueSet[] }>({
+  const [biologySearchResults, setBiologySearchResults] = useState<{
+    anabio: ValueSetWithHierarchy[]
+    loinc: ValueSetWithHierarchy[]
+  }>({
     anabio: [],
     loinc: []
   })
@@ -217,8 +221,7 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
             {selectedTab === 'anabio' &&
               biologySearchResults.anabio.length > 0 &&
               biologySearchResults.anabio.map((anabioItem, index) => {
-                const label = anabioItem.display
-
+                const label = anabioItem.hierarchyDisplay
                 return (
                   <BiologySearchListItem
                     key={index}

@@ -754,7 +754,7 @@ const getCodeList = async (
     if (search !== '*' && search !== undefined) {
       // if noStar is true then we search for the code, else we search for the display
       searchParam = noStar
-        ? `&only-roots=false&code=${search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
+        ? `&only-roots=false&code=${search.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
         : `&only-roots=false&_text=${encodeURIComponent(search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line  
     }
     // TODO test if it returns all the codes without specifying the count
