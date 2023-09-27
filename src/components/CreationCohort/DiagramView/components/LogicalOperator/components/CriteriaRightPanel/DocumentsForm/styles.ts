@@ -50,6 +50,14 @@ const useStyles = makeStyles()(() => ({
     color: '#f44336',
     width: '100%',
     padding: '0 16px'
+  },
+  searchInput: {
+    margin: '0px !important',
+    '& > div': {
+      borderRadius: 5,
+      height: 50,
+      padding: '10px 0px'
+    }
   }
 }))
 

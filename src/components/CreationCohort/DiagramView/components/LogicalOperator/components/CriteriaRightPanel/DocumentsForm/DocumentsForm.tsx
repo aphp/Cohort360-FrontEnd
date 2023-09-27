@@ -24,23 +24,17 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
-import { InputSearchDocumentSimple } from 'components/Inputs'
-
 import useStyles from './styles'
 
-import {
-  CriteriaName,
-  DocType,
-  DocumentDataType,
-  ErrorDetails,
-  SearchInputError,
-  CriteriaDrawerComponentProps
-} from 'types'
+import { CriteriaName, DocType, DocumentDataType, CriteriaDrawerComponentProps } from 'types'
 import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
 import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import { SearchByTypes } from 'types/searchCriterias'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
+import Searchbar from 'components/ui/Searchbar/Searchbar'
+import SearchInput from 'components/ui/Searchbar/SearchInput'
+import { SearchInputError } from 'types/error'
 
 const defaultComposition: DocumentDataType = {
   type: 'DocumentReference',
@@ -160,7 +154,7 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             onChangeValue={_onChangeValue}
           />
 
-          <FormControl variant="outlined" className={classes.inputItem} style={{ marginBottom: 0 }}>
+          <FormControl variant="outlined" className={classes.inputItem}>
             <InputLabel>Rechercher dans :</InputLabel>
             <Select
               value={defaultValues.searchBy}
@@ -174,43 +168,21 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
           </FormControl>
 
           <Grid className={classes.inputItem}>
-            <InputSearchDocumentSimple
-              placeholder="Recherche dans les documents"
-              defaultSearchInput={defaultValues.search}
-              setDefaultSearchInput={(newSearchInput: string) => _onChangeValue('search', newSearchInput)}
-              onSearchDocument={() => null}
-              noClearIcon
-              noSearchIcon
-              squareInput
-            />
+            <Searchbar>
+              <Grid item xs={12} className={classes.searchInput}>
+                <SearchInput
+                  value={defaultValues.search}
+                  displayHelpIcon
+                  placeholder="Rechercher dans les documents"
+                  error={searchInputError?.isError ? searchInputError : undefined}
+                  onchange={(newValue) => _onChangeValue('search', newValue)}
+                />
+              </Grid>
+            </Searchbar>
             {searchCheckingLoading && (
               <Grid container item alignItems="center" direction="column" justifyContent="center">
                 <CircularProgress />
                 <Typography>Vérification du champ de recherche en cours...</Typography>
-              </Grid>
-            )}
-            {!searchCheckingLoading && searchInputError && searchInputError.isError && (
-              <Grid className={classes.errorContainer}>
-                <Typography style={{ fontWeight: 'bold' }}>
-                  Des erreurs ont été détectées dans votre recherche :
-                </Typography>
-                {!searchInputError.errorsDetails && (
-                  <Typography>Vérifiez que le champ de recherche contient au moins une lettre.</Typography>
-                )}
-                {searchInputError.errorsDetails &&
-                  searchInputError.errorsDetails.map((detail: ErrorDetails, count: number) => (
-                    <Typography key={count}>
-                      {`- ${
-                        detail.errorPositions && detail.errorPositions.length > 0
-                          ? detail.errorPositions.length === 1
-                            ? `Au caractère ${detail.errorPositions[0]} : `
-                            : `Aux caractères ${detail.errorPositions.join(', ')} : `
-                          : ''
-                      }
-              ${detail.errorName ? `${detail.errorName}.` : ''}
-              ${detail.errorSolution ? `${detail.errorSolution}.` : ''}`}
-                    </Typography>
-                  ))}
               </Grid>
             )}
           </Grid>
