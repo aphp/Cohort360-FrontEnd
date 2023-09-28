@@ -1,13 +1,13 @@
-import React, { Fragment, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useAppSelector } from 'state'
 
 import { Divider, Grid, Typography } from '@mui/material'
-import LockIcon from '@mui/icons-material/Lock'
 
 import useStyles from './styles'
 import Searchbar from 'components/ui/Searchbar/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { useNavigate } from 'react-router-dom'
+import DisplayLocked from 'components/ui/Display/DisplayLocked/DisplayLocked'
 
 const SearchPatientCard = () => {
   const { classes } = useStyles()
@@ -28,12 +28,7 @@ const SearchPatientCard = () => {
       </div>
       <Divider className={classes.divider} />
       {deidentifiedBoolean ? (
-        <Grid container item justifyContent="center">
-          <LockIcon className={classes.lockIcon} />
-          <Typography variant="h6" align="center">
-            Fonctionnalité désactivée en mode pseudonymisé.
-          </Typography>
-        </Grid>
+        <DisplayLocked />
       ) : (
         <Grid container direction="column" justifyContent="space-evenly" style={{ height: '100%', marginTop: 8 }}>
           <Searchbar>

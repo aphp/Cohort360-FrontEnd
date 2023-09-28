@@ -45,6 +45,7 @@ import useStyles from './styles'
 import ListPatient from 'components/DataTable/ListPatient'
 import OrderByFilter from 'components/Filters/OrderByFilter/OrderByFilter'
 import OrderDirectionFilter from 'components/Filters/OrderDirectionFilter/OrderDirectionFilter'
+import DisplayLocked from 'components/ui/Display/DisplayLocked/DisplayLocked'
 
 type PatientSidebarTypes = {
   total: number
@@ -168,17 +169,21 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
                 }
               />
             )}
-            <SearchInput
-              value={searchInput}
-              placeholder="Rechercher"
-              width="60%"
-              onchange={(newValue) =>
-                dispatch({
-                  type: ActionTypes.CHANGE_SEARCH_INPUT,
-                  payload: newValue
-                })
-              }
-            />
+            {deidentifiedBoolean ? (
+              <DisplayLocked />
+            ) : (
+              <SearchInput
+                value={searchInput}
+                placeholder="Rechercher"
+                width="60%"
+                onchange={(newValue) =>
+                  dispatch({
+                    type: ActionTypes.CHANGE_SEARCH_INPUT,
+                    payload: newValue
+                  })
+                }
+              />
+            )}
           </Grid>
           <Grid container item alignItems="center" justifyContent="space-between">
             <Button

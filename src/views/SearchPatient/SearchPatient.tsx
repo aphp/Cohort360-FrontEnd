@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useAppSelector } from 'state'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 
 import { Grid, Typography } from '@mui/material'
 
@@ -25,6 +25,7 @@ const SearchPatient: React.FC<{}> = () => {
   const { classes, cx } = useStyles()
   const practitioner = useAppSelector((state) => state.me)
   const { search } = useParams<{ search: string }>()
+  const navigate = useNavigate()
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [patientsList, setPatientsList] = useState<Patient[]>([])
@@ -38,6 +39,11 @@ const SearchPatient: React.FC<{}> = () => {
 
   const nominativeGroupsIds =
     practitioner && practitioner.nominativeGroupsIds ? practitioner.nominativeGroupsIds.join() : ''
+
+  const { deidentified, open } = useAppSelector((state) => ({
+    deidentified: state.me?.deidentified,
+    open: state.drawer
+  }))
 
   const fetchPatients = async () => {
     try {
@@ -76,6 +82,10 @@ const SearchPatient: React.FC<{}> = () => {
   }, [])
 
   useEffect(() => {
+    if (deidentified) navigate(`/home`)
+  }, [deidentified])
+
+  useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
   }, [orderBy, searchBy, searchInput])
@@ -90,8 +100,6 @@ const SearchPatient: React.FC<{}> = () => {
       fetchPatients()
     }
   }, [loadingStatus])
-
-  const open = useAppSelector((state) => state.drawer)
 
   return (
     <Grid container direction="column" className={cx(classes.appBar, { [classes.appBarShift]: open })}>
