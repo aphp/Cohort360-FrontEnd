@@ -8,6 +8,8 @@ import { MeState } from 'state/me'
 import TemporalConstraintModal from './components/TemporalConstraintModal/TemporalConstraintModal'
 
 import useStyles from './styles'
+import { TemporalConstraintsKind } from 'types'
+import { getSelectableGroups } from 'utils/temporalConstraints'
 
 const TemporalConstraint: React.FC = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -25,16 +27,12 @@ const TemporalConstraint: React.FC = () => {
 
   const findInitialStateRadio = temporalConstraints.find(({ idList }) => idList[0] === 'All')
   const temporalConstraintsNumber =
-    findInitialStateRadio?.constraintType === 'none' ? temporalConstraints.length - 1 : temporalConstraints.length
+    findInitialStateRadio?.constraintType === TemporalConstraintsKind.NONE
+      ? temporalConstraints.length - 1
+      : temporalConstraints.length
 
   const dispatch = useAppDispatch()
   const { classes } = useStyles()
-
-  const mainGroupCriteriaIds = criteriaGroup[0].criteriaIds
-  const selectableCriteria = selectedCriteria.filter(
-    (criteria) =>
-      mainGroupCriteriaIds.includes(criteria.id) && criteria.type !== 'Patient' && criteria.type !== 'IPPList'
-  )
 
   useEffect(() => {
     if (temporalConstraints?.length > 0) {
@@ -45,20 +43,16 @@ const TemporalConstraint: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    if (criteriaGroup && criteriaGroup.length > 0) {
-      const mainCriteriaGroup = criteriaGroup.find(({ id }) => id === 0)
-      if (
-        (!disableTemporalConstraint && mainCriteriaGroup && mainCriteriaGroup.type !== 'andGroup') ||
-        selectableCriteria.length < 2
-      ) {
-        if (temporalConstraints && temporalConstraints.length > 1) {
-          temporalConstraints?.map((temporalConstraint) => {
-            dispatch(deleteTemporalConstraint(temporalConstraint))
-            dispatch(buildCohortCreation({}))
-          })
-        }
-        setDisableTemporalConstraint(true)
+    const selectableGroups = getSelectableGroups(selectedCriteria, criteriaGroup)
+
+    if (selectableGroups.length === 0) {
+      if (temporalConstraints && temporalConstraints.length > 1) {
+        temporalConstraints?.map((temporalConstraint) => {
+          dispatch(deleteTemporalConstraint(temporalConstraint))
+          dispatch(buildCohortCreation({}))
+        })
       }
+      setDisableTemporalConstraint(true)
     }
   }, [])
 
@@ -89,7 +83,7 @@ const TemporalConstraint: React.FC = () => {
           </Button>
         </Badge>
       ) : (
-        <Tooltip title="Les contraintes temporelles ne peuvent être ajoutées que sur les critères simples du groupe ET principal, hors critères démographiques et d'IPP.">
+        <Tooltip title="Les contraintes temporelles ne peuvent être ajoutées que s'il y a au moins un groupe de critères de type ET et au moins deux critères hors critères démographiques et d'IPP.">
           <span>
             <Button
               onClick={handleOnClick}

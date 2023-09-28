@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 
-import { ButtonGroup, Button, IconButton, CircularProgress } from '@mui/material'
+import { ButtonGroup, Button, IconButton, CircularProgress, Grid } from '@mui/material'
 
 import AddIcon from '@mui/icons-material/Add'
 
 import LogicalOperatorItem from './components/LogicalOperatorItem/LogicalOperatorItem'
 import CriteriaRightPanel from './components/CriteriaRightPanel/CriteriaRightPanel'
 import CriteriaCardItem from '../CriteriaCard/CriteriaCard'
+import Avatar from 'components/ui/Avatar/Avatar'
 
 import { CriteriaGroupType, SelectedCriteriaType } from 'types'
 
@@ -63,7 +64,15 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
       <LogicalOperatorItem itemId={itemId} />
 
-      <div className={classes.operatorChild} style={{ height: 12, marginBottom: -12 }} />
+      <Grid
+        container
+        direction="column"
+        justifyContent="center"
+        className={classes.operatorChild}
+        style={{ height: 30, marginBottom: -12, paddingLeft: 0 }}
+      >
+        <Avatar content={Math.abs(itemId) + 1} backgroundColor="#FFE2A9" color="#153D8A" marginLeft={'-14px'} bold />
+      </Grid>
       <div className={classes.operatorChild}>
         {displayingItem &&
           displayingItem.map(({ criteriaIds }) => {
@@ -207,7 +216,7 @@ const LogicalOperator: React.FC = () => {
     const nextGroupId = request.nextGroupId
     const newOperator: CriteriaGroupType = {
       id: nextGroupId,
-      title: `Nouveau opérateur logique ${nextGroupId * -1}`,
+      title: 'Groupe de critères',
       type: currentParent.type === 'orGroup' ? 'andGroup' : 'orGroup',
       criteriaIds: [],
       isSubGroup: parentId === 0 ? false : true,

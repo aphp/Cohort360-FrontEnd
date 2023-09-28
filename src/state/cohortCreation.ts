@@ -6,6 +6,7 @@ import {
   SelectedCriteriaType,
   CriteriaGroupType,
   TemporalConstraintsType,
+  TemporalConstraintsKind,
   QuerySnapshotInfo,
   CurrentSnapshot
 } from 'types'
@@ -75,7 +76,7 @@ const defaultInitialState: CohortCreationState = {
   temporalConstraints: [
     {
       idList: ['All'],
-      constraintType: 'none'
+      constraintType: TemporalConstraintsKind.NONE
     }
   ],
   nextCriteriaId: 1,
@@ -512,7 +513,24 @@ const cohortCreationSlice = createSlice({
 
       // Delete temporalConstraints containing deletedCriteria and reassign criteriaIds
       const remainingConstraints = state.temporalConstraints
-        .filter((constraint) => !constraint.idList.includes(criteriaId as never))
+        .filter(
+          (constraint) =>
+            !(
+              constraint.idList.includes(criteriaId as never) &&
+              (constraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING ||
+                (constraint.constraintType === TemporalConstraintsKind.SAME_ENCOUNTER && constraint.idList.length <= 2))
+            )
+        )
+        .map((constraint) => {
+          if (
+            constraint.idList.includes(criteriaId as never) &&
+            constraint.constraintType === TemporalConstraintsKind.SAME_ENCOUNTER
+          ) {
+            const findIndex = constraint.idList.findIndex((id) => id === criteriaId)
+            constraint.idList.splice(findIndex, 1)
+          }
+          return constraint
+        })
         .map((constraint) => {
           const oldIds = constraint.idList as number[]
           const newIds = oldIds.map((id) => idMap[id] ?? id)
@@ -529,6 +547,17 @@ const cohortCreationSlice = createSlice({
           id: item.id,
           criteriaIds: [...item.criteriaIds]
         }))
+
+      // delete constraints containing criteria from this group
+      const deletedGroupCriteriaIds = state.criteriaGroup.find((group) => group.id === action.payload)?.criteriaIds
+
+      if (deletedGroupCriteriaIds) {
+        const remainingConstraints = state.temporalConstraints.filter(
+          (constraint) => !constraint.idList.some((r) => deletedGroupCriteriaIds.includes(r as number))
+        )
+        state.temporalConstraints = remainingConstraints
+      }
+
       // Reset Group criteriaIds
       state.criteriaGroup = state.criteriaGroup
         .filter(({ id }) => id !== groupId)
@@ -634,7 +663,7 @@ const cohortCreationSlice = createSlice({
       state.nextCriteriaId += 1
     },
     deleteTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
-      state.temporalConstraints = state.temporalConstraints.filter((constraint) => constraint.id !== action.payload.id)
+      state.temporalConstraints = state.temporalConstraints.filter((constraint) => constraint !== action.payload)
     },
     updateTemporalConstraints: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType[]>) => {
       state.temporalConstraints = action.payload

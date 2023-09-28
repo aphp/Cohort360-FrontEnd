@@ -64,6 +64,14 @@ export enum CompositionStatusKind {
   _enteredInError = 'entered-in-error'
 }
 
+export enum TemporalConstraintsKind {
+  NONE = 'none',
+  SAME_ENCOUNTER = 'sameEncounter',
+  DIFFERENT_ENCOUNTER = 'differentEncounter',
+  PARTIAL_CONSTRAINT = 'partialConstraint',
+  DIRECT_CHRONOLOGICAL_ORDERING = 'directChronologicalOrdering'
+}
+
 export enum CohortCreationError {
   ERROR_TITLE = 'error_title',
   ERROR_REGEX = 'error_regex'
@@ -362,7 +370,7 @@ export type PatientData = {
 export type CriteriaGroupType = {
   id: number
   title: string
-  criteriaIds: number[] // = [SelectedCriteriaType.id | CriteriaGroupType.id, ...]
+  criteriaIds: number[]
   isSubGroup?: boolean
   isInclusive?: boolean
 } & (
@@ -383,7 +391,7 @@ export type CriteriaGroupType = {
 export type TemporalConstraintsType = {
   id?: number
   idList: ['All'] | number[]
-  constraintType: 'none' | 'sameEncounter' | 'differentEncounter' | 'directChronologicalOrdering'
+  constraintType: TemporalConstraintsKind
   timeRelationMinDuration?: {
     years?: number
     months?: number
