@@ -1,13 +1,19 @@
-import React from 'react'
-import { PatientVitalStatus } from 'types/patient'
+import React, { ReactElement } from 'react'
 import { ChipWrapper } from './styles'
 
-type StatusChipProps = {
-  vitalStatus: PatientVitalStatus
+export enum ChipStyles {
+  VALID = 'valid',
+  CANCELLED = 'cancelled'
 }
 
-const StatusChip = ({ vitalStatus }: StatusChipProps) => {
-  return <ChipWrapper label={vitalStatus} alive={vitalStatus === PatientVitalStatus.ALIVE} />
+type StatusChipProps = {
+  label: string
+  status?: ChipStyles
+  icon?: ReactElement
+}
+
+const StatusChip = ({ label, status = ChipStyles.VALID, icon = <></> }: StatusChipProps) => {
+  return <ChipWrapper label={label} status={status} icon={icon} />
 }
 
 export default StatusChip

@@ -14,7 +14,7 @@ import useStyles from './styles'
 import { GenderStatus, Order, OrderBy } from 'types/searchCriterias'
 import { PatientTableLabels, PatientVitalStatus } from 'types/patient'
 import GenderIcon from 'components/ui/GenderIcon/GenderIcon'
-import StatusChip from 'components/ui/StatusChip/StatusChip'
+import StatusChip, { ChipStyles } from 'components/ui/StatusChip/StatusChip'
 
 type DataTablePatientProps = {
   loading: boolean
@@ -142,7 +142,10 @@ const DataTablePatientLine: React.FC<{
           : 'Non renseigné'}
       </TableCell>
       <TableCell align="center">
-        <StatusChip vitalStatus={patient.deceasedDateTime ? PatientVitalStatus.DECEASED : PatientVitalStatus.ALIVE} />
+        <StatusChip
+          status={patient.deceasedDateTime ? ChipStyles.CANCELLED : ChipStyles.VALID}
+          label={patient.deceasedDateTime ? PatientVitalStatus.DECEASED : PatientVitalStatus.ALIVE}
+        />
       </TableCell>
 
       <TableCell align="center">
