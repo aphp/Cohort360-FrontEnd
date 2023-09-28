@@ -13,7 +13,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ListItemWrapper } from 'components/ui/ListItem/styles'
 import { ListWrapper } from 'components/ui/ListWrapper/styles'
 import GenderIcon from 'components/ui/GenderIcon/GenderIcon'
-import StatusChip from 'components/ui/StatusChip/StatusChip'
+import StatusChip, { ChipStyles } from 'components/ui/StatusChip/StatusChip'
 import { PatientVitalStatus } from 'types/patient'
 
 type ListPatientProps = {
@@ -113,9 +113,8 @@ const ListPatientLine: React.FC<{
       </ListItemIcon>
       <ListItemText primary={`${capitalizeFirstLetter(firstName)} ${lastName}`} secondary={`${age} - ${ipp}`} />
       <StatusChip
-        vitalStatus={
-          patient.deceasedDateTime || patient.deceasedBoolean ? PatientVitalStatus.DECEASED : PatientVitalStatus.ALIVE
-        }
+        status={patient.deceasedDateTime ? ChipStyles.CANCELLED : ChipStyles.VALID}
+        label={patient.deceasedDateTime ? PatientVitalStatus.DECEASED : PatientVitalStatus.ALIVE}
       />
     </ListItemWrapper>
   )
