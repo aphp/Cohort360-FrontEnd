@@ -1,5 +1,5 @@
 import {
-  DateRange,
+  DurationRangeType,
   FilterKeys,
   FilterValue,
   Filters,
@@ -65,7 +65,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
 
 export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.BIRTHDATES) {
-    return ageName(value as DateRange)
+    return ageName(value as DurationRangeType)
   }
   if (key === FilterKeys.GENDERS) {
     return GenderStatusLabel[value as GenderStatus]

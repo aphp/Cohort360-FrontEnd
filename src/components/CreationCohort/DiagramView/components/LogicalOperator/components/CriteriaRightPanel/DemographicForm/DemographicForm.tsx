@@ -10,17 +10,20 @@ import {
   IconButton,
   Typography,
   TextField,
-  Switch,
-  Slider
+  Switch
 } from '@mui/material'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
 
-import { DemographicDataType } from 'types'
-import { VitalStatusOptions, VitalStatusOptionsLabel, VitalStatusLabel, VitalStatus } from 'types/searchCriterias'
+import { SelectedCriteriaType } from 'types'
+import { VitalStatusLabel, VitalStatus, DurationRangeType } from 'types/searchCriterias'
 import { Calendar, CalendarLabel, CalendarRequestLabel } from 'types/dates'
+import CalendarRange from 'components/ui/Inputs/Calendar/CalendarRange'
+import DurationRange from 'components/ui/Inputs/Duration/DurationRange'
+import { BlockWrapper } from 'components/ui/Layout'
+import { RESSOURCE_TYPE_PATIENT } from 'utils/cohortCreation'
 
 enum Error {
   EMPTY_FORM,
@@ -31,90 +34,98 @@ type DemographicFormProps = {
   criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
+  onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
-type Option = {
-  id: VitalStatusOptions
-  label: VitalStatusOptionsLabel
-  checked: boolean
-}
-
-type Options = Option[]
-
+const allVitalStatuses = [
+  {
+    id: VitalStatus.ALL,
+    label: VitalStatusLabel.ALL
+  },
+  {
+    id: VitalStatus.ALIVE,
+    label: VitalStatusLabel.ALIVE
+  },
+  {
+    id: VitalStatus.DECEASED,
+    label: VitalStatusLabel.DECEASED
+  }
+]
+/* 
 const defaultDemographic: DemographicDataType = {
   type: 'Patient',
   title: 'Critère démographique',
   vitalStatus: [],
-  gender: [],
-  ageType: { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR },
-  years: [0, 130],
+  genders: [],
+  age: [null, null],
+  birthdates: [null, null],
+  deathDates: [null, null],
+  // ageType: { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR },
+  //years: [0, 130],
   isInclusive: true
 }
-
+ */
 const DemographicForm = (props: DemographicFormProps) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultDemographic)
+  const [birthdates, setBirthdates] = useState<DurationRangeType>(selectedCriteria?.birthdates || [null, null])
+  const [deathDates, setDeathDates] = useState<DurationRangeType>(selectedCriteria?.deathDates || [null, null])
+  const [age, setAge] = useState<DurationRangeType>(selectedCriteria?.age || [null, null])
+  const [vitalStatus, setVitalStatus] = useState(selectedCriteria?.age || VitalStatus.ALL)
+  const [genders, setGenders] = useState(selectedCriteria?.genders || [])
+  const [title, setTitle] = useState(selectedCriteria?.title || 'Critère démographique')
+  const [isInclusive, setIsInclusive] = useState(selectedCriteria?.isInclusive || true)
 
   const { classes } = useStyles()
 
   const [error, setError] = useState(Error.NO_ERROR)
-  const [ageError, setAgeError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
-  const [vitalStatus, setVitalStatus] = useState({
-    id: VitalStatus.ALL,
-    label: VitalStatusLabel.all,
-    options: [
-      { id: VitalStatusOptions.age, label: VitalStatusOptionsLabel.age, checked: false },
-      { id: VitalStatusOptions.birth, label: VitalStatusOptionsLabel.birth, checked: false },
-      { id: VitalStatusOptions.deceasedDate, label: VitalStatusOptionsLabel.deceasedDate, checked: false }
-    ]
-  })
-
   const isEdition = selectedCriteria !== null ? true : false
 
-  const _onCheckError = () => {
+  useEffect(() => {
+    setError(Error.NO_ERROR)
     if (
-      defaultValues &&
-      defaultValues.vitalStatus &&
-      defaultValues.vitalStatus.length === 0 &&
-      defaultValues.gender &&
-      defaultValues.gender.length === 0 &&
-      defaultValues.years &&
-      defaultValues.ageType &&
-      +defaultValues.years[0] === null &&
-      +defaultValues.years[1] === null
+      vitalStatus === VitalStatus.ALL &&
+      genders.length === 0 &&
+      birthdates[0] === null &&
+      birthdates[1] === null &&
+      age[0] === null &&
+      age[1] === null &&
+      deathDates[0] === null &&
+      deathDates[1] === null
     ) {
-      return Error.EMPTY_FORM
+      setError(Error.EMPTY_FORM)
     }
-    if (defaultValues.years[0] > defaultValues.years[1]) {
-      return Error.INCOHERENT_AGE_ERROR
-    }
-    return Error.NO_ERROR
-  }
+  }, [vitalStatus, genders, birthdates, age, deathDates])
 
   const _onSubmit = () => {
-    const errorType = _onCheckError()
-    setError(errorType)
-    if (errorType === Error.NO_ERROR) return onChangeSelectedCriteria(defaultValues)
+    onChangeSelectedCriteria({
+      age,
+      birthdates,
+      deathDates,
+      genders,
+      isInclusive,
+      vitalStatus,
+      title,
+      type: RESSOURCE_TYPE_PATIENT
+    })
   }
 
-  const _onChangeValue = (key: string, value: any) => {
+  /*const _onChangeValue = (key: string, value: any) => {
     const _defaultValues = defaultValues ? { ...defaultValues } : {}
     _defaultValues[key] = value
     setDefaultValues(_defaultValues)
-  }
+  }*/
 
-  const defaultValuesGender =
-    defaultValues.gender && criteria && criteria.data.gender !== 'loading'
-      ? defaultValues.gender.map((gender: any) => {
+  /*const defaultValuesGender =
+    genders && criteria.data.gender !== 'loading'
+      ? genders.map((gender: any) => {
           const criteriaGender = criteria.data.gender ? criteria.data.gender.find((g: any) => g.id === gender.id) : null
           return {
             id: gender.id,
             label: gender.label ? gender.label : criteriaGender?.label ?? '?'
           }
         })
-      : []
+      : []*/
   /*const defaultValuesVitalStatus =
     defaultValues.vitalStatus && criteria.data.status !== 'loading'
       ? defaultValues.vitalStatus.map((vitalStatus: any) => {
@@ -144,15 +155,15 @@ const DemographicForm = (props: DemographicFormProps) => {
        : []
   }, [defaultValues, criteria])*/
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (!Number.isInteger(defaultValues.years[0]) || !Number.isInteger(defaultValues.years[1])) {
       setAgeError(true)
     } else {
       setAgeError(false)
     }
-  }, [defaultValues.years])
+  }, [defaultValues.years])*/
 
-  const handleOptionsChange = (values: Options) => {
+  /* const handleOptionsChange = (values: Options) => {
     setVitalStatus({
       ...vitalStatus,
       options: vitalStatus.options.map((option) => {
@@ -164,7 +175,7 @@ const DemographicForm = (props: DemographicFormProps) => {
         return option
       })
     })
-  }
+  }*/
 
   return (
     <Grid className={classes.root}>
@@ -183,14 +194,7 @@ const DemographicForm = (props: DemographicFormProps) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error === Error.EMPTY_FORM && <Alert severity="error">Merci de renseigner un champ</Alert>}
-        {error === Error.INCOHERENT_AGE_ERROR && (
-          <Alert severity="error">
-            L'âge minimum <b>doit être inférieur</b> à l'âge maximum.
-          </Alert>
-        )}
-
-        {!error && !multiFields && (
+        {error === Error.NO_ERROR && !multiFields && (
           <Alert
             severity="info"
             onClose={() => {
@@ -210,22 +214,18 @@ const DemographicForm = (props: DemographicFormProps) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            value={defaultValues.title}
-            onChange={(e) => _onChangeValue('title', e.target.value)}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
 
           <Grid style={{ display: 'flex' }}>
-            <FormLabel
-              onClick={() => _onChangeValue('isInclusive', !defaultValues.isInclusive)}
-              style={{ margin: 'auto 1em' }}
-              component="legend"
-            >
+            <FormLabel style={{ margin: 'auto 1em' }} component="legend">
               Exclure les patients qui suivent les règles suivantes
             </FormLabel>
             <Switch
               id="criteria-inclusive"
-              checked={!defaultValues.isInclusive}
-              onChange={(event) => _onChangeValue('isInclusive', !event.target.checked)}
+              checked={!isInclusive}
+              onChange={(event) => setIsInclusive(!event.target.checked)}
               color="secondary"
             />
           </Grid>
@@ -234,186 +234,61 @@ const DemographicForm = (props: DemographicFormProps) => {
             multiple
             id="criteria-gender-autocomplete"
             className={classes.inputItem}
-            options={criteria?.data?.gender !== 'loading' ? criteria?.data?.gender : []}
+            options={criteria?.data?.gender || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
-            value={defaultValuesGender}
-            onChange={(e, value) => _onChangeValue('gender', value)}
+            value={genders}
+            onChange={(e, value) => setGenders(value)}
             renderInput={(params) => <TextField {...params} label="Genre" />}
           />
 
           <Autocomplete
             id="criteria-vitalStatus-autocomplete"
             className={classes.inputItem}
-            options={
-              criteria?.data?.status !== 'loading'
-                ? [
-                    {
-                      id: VitalStatus.ALL,
-                      label: VitalStatusLabel.all,
-                      options: [
-                        { id: VitalStatusOptions.age, label: VitalStatusOptionsLabel.age, checked: false },
-                        { id: VitalStatusOptions.birth, label: VitalStatusOptionsLabel.birth, checked: false },
-                        {
-                          id: VitalStatusOptions.deceasedDate,
-                          label: VitalStatusOptionsLabel.deceasedDate,
-                          checked: false
-                        },
-                        {
-                          id: VitalStatusOptions.deceasedAge,
-                          label: VitalStatusOptionsLabel.deceasedAge,
-                          checked: false
-                        }
-                      ]
-                    },
-                    {
-                      id: VitalStatus.ALIVE,
-                      label: VitalStatusLabel.alive,
-                      options: [
-                        { id: VitalStatusOptions.age, label: VitalStatusOptionsLabel.age, checked: false },
-                        { id: VitalStatusOptions.birth, label: VitalStatusOptionsLabel.birth, checked: false }
-                      ]
-                    },
-                    {
-                      id: VitalStatus.DECEASED,
-                      label: VitalStatusLabel.deceased,
-
-                      options: [
-                        { id: VitalStatusOptions.birth, label: VitalStatusOptionsLabel.birth, checked: false },
-                        {
-                          id: VitalStatusOptions.deceasedDate,
-                          label: VitalStatusOptionsLabel.deceasedDate,
-                          checked: false
-                        },
-                        {
-                          id: VitalStatusOptions.deceasedAge,
-                          label: VitalStatusOptionsLabel.deceasedAge,
-                          checked: false
-                        }
-                      ]
-                    }
-                  ]
-                : []
+            options={allVitalStatuses}
+            getOptionLabel={(option) =>
+              option.label || VitalStatusLabel[option?.toUpperCase() as keyof typeof VitalStatusLabel]
             }
-            getOptionLabel={(option) => option.label}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value}
             value={vitalStatus}
             onChange={(e, value) => {
-              _onChangeValue('vitalStatus', value)
-              if (value) setVitalStatus(value)
+              setVitalStatus(value.id)
             }}
             renderInput={(params) => <TextField {...params} label="Statut vital" />}
           />
 
-          {vitalStatus.id === VitalStatus.ALL && (
-            <Autocomplete
-              multiple
-              id="criteria-vitalStatus-multiple"
-              className={classes.inputItem}
-              options={vitalStatus.options}
-              getOptionLabel={(option) => option.label}
-              onChange={(e, values) => handleOptionsChange(values)}
-              renderInput={(params) => <TextField {...params} label="Critères supplémentaires" />}
+          <BlockWrapper margin="1em">
+            <CalendarRange
+              inline
+              disabled={age[0] !== null || age[1] !== null}
+              value={birthdates}
+              label={'Date de naissance'}
+              onChange={(value) => setBirthdates(value)}
+              onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
             />
-          )}
+          </BlockWrapper>
 
-          {vitalStatus.id === VitalStatus.ALIVE && (
-            <Autocomplete
-              multiple
-              id="criteria-vitalStatus-multiple"
-              className={classes.inputItem}
-              options={vitalStatus.options}
-              getOptionLabel={(option) => option.label}
-              onChange={(e, values) => handleOptionsChange(values)}
-              renderInput={(params) => <TextField {...params} label="Critères supplémentaires" />}
+          <BlockWrapper margin="1em">
+            <DurationRange
+              value={age}
+              disabled={birthdates[0] !== null || birthdates[1] !== null}
+              label={vitalStatus === VitalStatus.DECEASED ? 'Âge au décès' : 'Âge actuel'}
+              onChange={(value) => setAge(value)}
+              onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
             />
-          )}
+          </BlockWrapper>
 
-          {vitalStatus.id === VitalStatus.DECEASED && (
-            <Autocomplete
-              multiple
-              id="criteria-vitalStatus-multiple"
-              className={classes.inputItem}
-              options={vitalStatus.options}
-              getOptionLabel={(option) => option.label}
-              onChange={(e, values) => handleOptionsChange(values)}
-              renderInput={(params) => <TextField {...params} label="Critères supplémentaires" />}
-            />
-          )}
-
-          {vitalStatus.options.map((option) => (
-            <>
-              {option.id === VitalStatusOptions.age && option.checked && <h1>Age</h1>}
-              {option.id === VitalStatusOptions.birth && option.checked && <h1>Date</h1>}
-              {option.id === VitalStatusOptions.deceasedAge && option.checked && <h1>Age décès</h1>}
-              {option.id === VitalStatusOptions.deceasedDate && option.checked && <h1>Date décès</h1>}
-            </>
-          ))}
-
-          <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
-            Fourchette d'âge :
-          </FormLabel>
-
-          <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 180px', alignItems: 'center', margin: '0 1em' }}>
-            <Grid>
-              <Slider
-                value={defaultValues.years}
-                onChange={(e, value) => _onChangeValue('years', value)}
-                aria-labelledby="range-slider"
-                valueLabelDisplay="off"
-                valueLabelFormat={(value) => (value === 130 ? '130+' : value)}
-                min={0}
-                max={130}
-                size="small"
+          {(vitalStatus === VitalStatus.DECEASED || vitalStatus === VitalStatus.ALL) && (
+            <BlockWrapper margin="1em">
+              <CalendarRange
+                inline
+                value={deathDates}
+                label={'Date de décès'}
+                onChange={(value) => setDeathDates(value)}
+                onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
               />
-              <Grid container justifyContent="space-around">
-                <Grid item>
-                  <TextField
-                    value={defaultValues.years[0]}
-                    type="number"
-                    onChange={(e) =>
-                      _onChangeValue('years', [
-                        +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : defaultValues.years[0],
-                        defaultValues.years[1]
-                      ])
-                    }
-                    error={!Number.isInteger(defaultValues.years[0])}
-                    helperText={!Number.isInteger(defaultValues.years[0]) && 'Pas de valeur décimale autorisée.'}
-                  />
-                </Grid>
-                <Grid item>
-                  <TextField
-                    value={defaultValues.years[1]}
-                    type="number"
-                    onChange={(e) =>
-                      _onChangeValue('years', [
-                        defaultValues.years[0],
-                        +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : defaultValues.years[1]
-                      ])
-                    }
-                    error={!Number.isInteger(defaultValues.years[1])}
-                    helperText={!Number.isInteger(defaultValues.years[1]) && 'Pas de valeur décimale autorisée.'}
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Autocomplete
-              id="criteria-ageType-autocomplete"
-              disableClearable
-              className={classes.inputItem}
-              options={[
-                { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR },
-                { id: Calendar.MONTH, criteriaLabel: CalendarLabel.MONTH, requestLabel: CalendarRequestLabel.MONTH },
-                { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
-              ]}
-              getOptionLabel={(option) => option.criteriaLabel}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={defaultValues.ageType}
-              onChange={(e, value) => _onChangeValue('ageType', value)}
-              renderInput={(params) => <TextField {...params} />}
-            />
-          </Grid>
+            </BlockWrapper>
+          )}
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
@@ -422,7 +297,13 @@ const DemographicForm = (props: DemographicFormProps) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="demographic-form" variant="contained" disabled={ageError}>
+          <Button
+            onClick={_onSubmit}
+            type="submit"
+            form="demographic-form"
+            variant="contained"
+            disabled={error === Error.INCOHERENT_AGE_ERROR || error === Error.EMPTY_FORM}
+          >
             Confirmer
           </Button>
         </Grid>

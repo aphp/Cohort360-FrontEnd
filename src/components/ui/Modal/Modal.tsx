@@ -19,7 +19,7 @@ const Modal = ({
   children,
   title,
   open,
-  width = '400px',
+  width = '450px',
   noActions = false,
   onSubmit,
   onClose

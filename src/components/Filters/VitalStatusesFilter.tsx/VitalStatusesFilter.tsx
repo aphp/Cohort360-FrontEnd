@@ -1,5 +1,5 @@
 import { Checkbox, FormControlLabel, FormGroup, Typography } from '@mui/material'
-import { InputWrapper } from 'components/ui/Inputs/styles'
+import { InputWrapper } from 'components/ui/Layout/styles'
 import { FormContext } from 'components/ui/Modal/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import { VitalStatus } from 'types/searchCriterias'

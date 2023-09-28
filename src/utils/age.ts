@@ -1,7 +1,7 @@
 import { CohortPatient } from 'types'
 import moment from 'moment'
-import { DateRange } from 'types/searchCriterias'
-import { AgeRangeType, Calendar } from 'types/dates'
+import { DurationType, Calendar } from 'types/dates'
+import { DurationRangeType } from 'types/searchCriterias'
 
 export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'months'): string => {
   if (ageValue === 0 && momentUnit === 'months') return '< 1 mois'
@@ -40,9 +40,9 @@ export const getAge = (patient: CohortPatient): string => {
   return 'Âge inconnu'
 }
 
-export const ageName = (dates: DateRange) => {
-  const minDate: AgeRangeType = convertStringToAgeRangeType(dates[0]) ?? { year: 0, month: 0, day: 0 }
-  const maxDate: AgeRangeType = convertStringToAgeRangeType(dates[1]) ?? { year: 130, month: 0, day: 0 }
+export const ageName = (dates: DurationRangeType) => {
+  const minDate: DurationType = convertStringToDuration(dates[0]) ?? { year: 0, month: 0, day: 0 }
+  const maxDate: DurationType = convertStringToDuration(dates[1]) ?? { year: 130, month: 0, day: 0 }
 
   if (
     !minDate.year &&
@@ -69,7 +69,7 @@ export const ageName = (dates: DateRange) => {
     ${(maxDate.day ?? 0) > 0 ? `${maxDate.day} jour(s) ` : ``}`
 }
 
-export const substructAgeRangeType = (ageDate: AgeRangeType): Date => {
+export const substructDurationType = (ageDate: DurationType): Date => {
   if (!ageDate) return new Date()
   const today: Date = new Date()
   const newDate: Date = new Date(
@@ -84,13 +84,13 @@ export const substructAgeRangeType = (ageDate: AgeRangeType): Date => {
 }
 
 export const substructAgeString = (range: string): Date => {
-  const ageRangeType: AgeRangeType = convertStringToAgeRangeType(range) ?? { year: 0, month: 0, day: 0 }
-  return substructAgeRangeType(ageRangeType)
+  const DurationType: DurationType = convertStringToDuration(range) ?? { year: 0, month: 0, day: 0 }
+  return substructDurationType(DurationType)
 }
 
-export const convertStringToAgeRangeType = (age: string | null): AgeRangeType | null => {
+export const convertStringToDuration = (age: string | null): DurationType | null => {
   if (!age) return null
-  const newAge: AgeRangeType = {
+  const newAge: DurationType = {
     year: Number(age.split('/')[2]),
     month: Number(age.split('/')[1]),
     day: Number(age.split('/')[0])
@@ -98,7 +98,7 @@ export const convertStringToAgeRangeType = (age: string | null): AgeRangeType | 
   return newAge
 }
 
-export const convertAgeRangeTypeToString = (ageDate: AgeRangeType): string | null => {
+export const convertDurationToString = (ageDate: DurationType): string | null => {
   if ((ageDate.year === 130 || ageDate.year === 0) && !ageDate.month && !ageDate.day) return null
   return `${ageDate.day || 0}/${ageDate.month || 0}/${ageDate.year || 0}`
 }
@@ -114,10 +114,17 @@ export const checkRange = (key: string, value: number) => {
   return false
 }
 
-export const checkMinMaxValue = (min: AgeRangeType, max: AgeRangeType) => {
-  const maxDate: Date = substructAgeRangeType(min)
-  const minDate: Date = substructAgeRangeType(max)
+export const checkMinMaxValue = (min: DurationType, max: DurationType) => {
+  const maxDate: Date = substructDurationType(min)
+  const minDate: Date = substructDurationType(max)
 
   if (minDate > maxDate) return false
   return true
+}
+
+export const convertDurationToTimestamp = (duration: DurationType): number => {
+  const year = duration.year ?? 0
+  const month = duration.month ?? 0
+  const day = duration.day ?? 0
+  return year * 365 + month * 30 + day
 }

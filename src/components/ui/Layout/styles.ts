@@ -9,3 +9,10 @@ export const BlockWrapper = styled(Grid)<CustomProps>(({ padding = 0, margin = 0
   padding: typeof padding === 'string' ? padding : `${padding}px`,
   margin: typeof padding === 'string' ? margin : `${margin}px`
 }))
+
+export const InputWrapper = styled('div')(() => ({
+  padding: 0,
+  '& > div': {
+    margin: '15px 0px'
+  }
+}))

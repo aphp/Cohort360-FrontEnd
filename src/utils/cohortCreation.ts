@@ -19,8 +19,9 @@ import {
   MEDICATION_ATC,
   PROCEDURE_HIERARCHY
 } from '../constants'
-import { SearchByTypes } from 'types/searchCriterias'
+import { SearchByTypes, VitalStatus } from 'types/searchCriterias'
 import { Calendar, CalendarLabel, CalendarRequestLabel } from 'types/dates'
+import { convertDurationToTimestamp, convertStringToDuration } from './age'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
@@ -29,7 +30,9 @@ const IPP_LIST_FHIR = 'identifier.value'
 
 export const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
 const PATIENT_GENDER = 'gender'
-const PATIENT_BIRTHDATE = 'age-day'
+const PATIENT_BIRTHDATE = 'birthdate'
+const PATIENT_AGE = 'age-day'
+const PATIENT_DEATHDATE = 'death-date'
 const PATIENT_DECEASED = 'deceased'
 
 const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
@@ -90,10 +93,11 @@ const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   isInclusive: false,
   type: 'Patient',
   title: '',
-  gender: [],
-  vitalStatus: [],
-  years: [0, 130],
-  ageType: { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR }
+  genders: [],
+  vitalStatus: VitalStatus.ALL,
+  birthdates: [null, null],
+  deathDates: [null, null],
+  age: [null, null]
 }
 
 const DEFAULT_GROUP_ERROR: CriteriaGroupType = {
@@ -126,13 +130,13 @@ type RequeteurCriteriaType = {
     timeDelayMin?: number
     timeDelayMax?: number
   }
-  dateRangeList?: {
+  DurationRangeList?: {
     minDate?: string // YYYY-MM-DD
     maxDate?: string // YYYY-MM-DD
     datePreference?: 'event_date' | 'encounter_end_date' | 'encounter_start_date'
     dateIsNotNull?: boolean
   }[]
-  encounterDateRange?: {
+  encounterDurationRange?: {
     minDate?: string // YYYY-MM-DD
     maxDate?: string // YYYY-MM-DD
     dateIsNotNull?: boolean
@@ -187,7 +191,7 @@ export const getCalendarMultiplicator = (type: Calendar): number => {
 
 const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
   let filterFhir = ''
-
+  console.log('criterionTest', criterion)
   const filterReducer = (accumulator: any, currentValue: any): string =>
     accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
   const searchReducer = (accumulator: any, currentValue: any): string =>
@@ -195,28 +199,29 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
   switch (criterion.type) {
     case RESSOURCE_TYPE_PATIENT: {
-      let ageMin = ''
-      let ageMax = ''
+      const ageMin = convertDurationToTimestamp(
+        convertStringToDuration(criterion.age?.[0]) || { year: 0, month: 0, day: 0 }
+      )
+      const ageMax = convertDurationToTimestamp(
+        convertStringToDuration(criterion.age?.[1]) || { year: 130, month: 0, day: 0 }
+      )
 
-      ageMin = `${PATIENT_BIRTHDATE}=ge${+criterion.years[0] * getCalendarMultiplicator(criterion.ageType?.id)}`
-      ageMax = `${PATIENT_BIRTHDATE}=le${+criterion.years[1] * getCalendarMultiplicator(criterion.ageType?.id)}`
+      const ageMinCriterion = `${PATIENT_AGE}=ge${ageMin}`
+      const ageMaxCriterion = `${PATIENT_AGE}=le${ageMax}`
+      console.log('ageMin ageMax', ageMin, ageMax)
+
+      //"filterFhir":"active=true&gender=f&deceased=true&age-day=ge0&age-day=le47450"
 
       filterFhir = [
         'active=true',
         `${
-          criterion.gender && criterion.gender.length > 0
-            ? `${PATIENT_GENDER}=${criterion.gender.map((gender: any) => gender.id).reduce(searchReducer)}`
+          criterion.genders && criterion.genders.length > 0
+            ? `${PATIENT_GENDER}=${criterion.genders.map((gender: any) => gender.id).reduce(searchReducer)}`
             : ''
         }`,
-        `${
-          criterion.vitalStatus && criterion.vitalStatus.length > 0
-            ? `${PATIENT_DECEASED}=${criterion.vitalStatus
-                .map((vitalStatus: any) => vitalStatus.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`,
-        `${ageMin ? `${ageMin}` : ''}`,
-        `${ageMax ? `${ageMax}` : ''}`
+        `${PATIENT_DECEASED}=${criterion.vitalStatus === VitalStatus.DECEASED ? 'true' : 'false'}`,
+        `${ageMinCriterion}`,
+        `${ageMaxCriterion}`
       ]
         .filter((elem) => elem)
         .reduce(filterReducer)
@@ -559,7 +564,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
     default:
       break
   }
-
+  console.log('criterionTest', filterFhir)
   return filterFhir
 }
 
@@ -595,7 +600,7 @@ export function buildRequest(
                   operator: item?.occurrenceComparator
                 }
               : undefined,
-          dateRangeList:
+          DurationRangeList:
             !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_IPP_LIST) &&
             (item.startOccurrence || item.endOccurrence)
               ? [
@@ -609,7 +614,7 @@ export function buildRequest(
                   }
                 ]
               : undefined,
-          encounterDateRange:
+          encounterDurationRange:
             !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_IPP_LIST) &&
             (item.encounterStartDate || item.encounterEndDate)
               ? {
@@ -681,7 +686,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
   let temporalConstraints: TemporalConstraintsType[] = []
-
+  console.log('criterionTest unbuild')
   if (!_json) {
     return {
       population: null,
@@ -773,19 +778,22 @@ export async function unbuildRequest(_json: string): Promise<any> {
       isInclusive: element.isInclusive,
       title: ''
     }
+    console.log('criterionTest new')
 
     switch (element.resourceType) {
       case RESSOURCE_TYPE_PATIENT: {
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+          console.log('criterionTest new', currentCriterion)
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             currentCriterion.title = 'Critère démographique'
-            currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
-            currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
             currentCriterion.gender = currentCriterion.gender ? currentCriterion.gender : []
             currentCriterion.vitalStatus = currentCriterion.vitalStatus ? currentCriterion.vitalStatus : []
+            currentCriterion.age = currentCriterion.age ? currentCriterion.age : null
+            currentCriterion.birthdates = currentCriterion.birthdates ? currentCriterion.birthdates : [0, 130]
+            currentCriterion.deathDates = currentCriterion.deathDates ? currentCriterion.deathDates : [0, 130]
             switch (key) {
               case PATIENT_BIRTHDATE: {
                 currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
@@ -876,9 +884,11 @@ export async function unbuildRequest(_json: string): Promise<any> {
             currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
           }
 
-          if (element.encounterDateRange) {
-            currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-            currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+          if (element.encounterDurationRange) {
+            currentCriterion.encounterStartDate =
+              element.encounterDurationRange.minDate?.replace('T00:00:00Z', '') ?? null
+            currentCriterion.encounterEndDate =
+              element.encounterDurationRange.maxDate?.replace('T00:00:00Z', '') ?? null
           }
 
           for (const filter of filters) {
@@ -1062,14 +1072,15 @@ export async function unbuildRequest(_json: string): Promise<any> {
           currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
         }
 
-        if (element.dateRangeList) {
-          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.DurationRangeList) {
+          currentCriterion.startOccurrence = element.DurationRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.DurationRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
-        if (element.encounterDateRange) {
-          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.encounterDurationRange) {
+          currentCriterion.encounterStartDate =
+            element.encounterDurationRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDurationRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -1140,14 +1151,15 @@ export async function unbuildRequest(_json: string): Promise<any> {
           currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
         }
 
-        if (element.dateRangeList) {
-          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.DurationRangeList) {
+          currentCriterion.startOccurrence = element.DurationRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.DurationRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
-        if (element.encounterDateRange) {
-          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.encounterDurationRange) {
+          currentCriterion.encounterStartDate =
+            element.encounterDurationRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDurationRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -1216,14 +1228,15 @@ export async function unbuildRequest(_json: string): Promise<any> {
           currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
         }
 
-        if (element.dateRangeList) {
-          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.DurationRangeList) {
+          currentCriterion.startOccurrence = element.DurationRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.DurationRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
-        if (element.encounterDateRange) {
-          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.encounterDurationRange) {
+          currentCriterion.encounterStartDate =
+            element.encounterDurationRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDurationRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -1280,14 +1293,15 @@ export async function unbuildRequest(_json: string): Promise<any> {
           currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
         }
 
-        if (element.dateRangeList) {
-          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.DurationRangeList) {
+          currentCriterion.startOccurrence = element.DurationRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.DurationRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
-        if (element.encounterDateRange) {
-          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.encounterDurationRange) {
+          currentCriterion.encounterStartDate =
+            element.encounterDurationRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDurationRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -1347,14 +1361,15 @@ export async function unbuildRequest(_json: string): Promise<any> {
           currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
         }
 
-        if (element.dateRangeList) {
-          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.DurationRangeList) {
+          currentCriterion.startOccurrence = element.DurationRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.DurationRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
-        if (element.encounterDateRange) {
-          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.encounterDurationRange) {
+          currentCriterion.encounterStartDate =
+            element.encounterDurationRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDurationRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -1432,14 +1447,15 @@ export async function unbuildRequest(_json: string): Promise<any> {
           currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
         }
 
-        if (element.dateRangeList) {
-          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.DurationRangeList) {
+          currentCriterion.startOccurrence = element.DurationRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.DurationRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
-        if (element.encounterDateRange) {
-          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.encounterDurationRange) {
+          currentCriterion.encounterStartDate =
+            element.encounterDurationRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDurationRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
