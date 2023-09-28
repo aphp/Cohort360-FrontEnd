@@ -36,6 +36,6 @@ export enum MedicationLabel {
 }
 
 export enum PatientVitalStatus {
-  ALIVE = 'Vivant',
-  DECEASED = 'Décédé'
+  ALIVE = 'Vivant(e)',
+  DECEASED = 'Décédé(e)'
 }

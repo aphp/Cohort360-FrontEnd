@@ -25,7 +25,7 @@ import { CanceledError } from 'axios'
 import Searchbar from 'components/ui/Searchbar/Searchbar'
 import Select from 'components/ui/Searchbar/Select'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import DisplayDigits from 'components/ui/Display/DisplayDigits'
+import DisplayDigits from 'components/ui/Display/DisplayDigits/DisplayDigits'
 import { ActionTypes, FilterKeys, searchByListPatients, SearchByTypes } from 'types/searchCriterias'
 import Chip from 'components/ui/Chips/Chip'
 import Button from 'components/ui/Button/Button'
@@ -36,6 +36,7 @@ import GendersFilter from 'components/Filters/GendersFilter/GenderFilter'
 import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter/VitalStatusesFilter'
 import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters/BirthdatesRangesFilter'
 import { BlockWrapper } from 'components/ui/Layout/styles'
+import DisplayLocked from 'components/ui/Display/DisplayLocked/DisplayLocked'
 
 type PatientListProps = {
   total: number
@@ -169,12 +170,16 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
                 }
               />
             )}
-            <SearchInput
-              value={searchInput}
-              placeholder="Rechercher"
-              width={'50%'}
-              onchange={(newValue) => dispatch({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })}
-            />
+            {deidentified ? (
+              <DisplayLocked />
+            ) : (
+              <SearchInput
+                value={searchInput}
+                placeholder="Rechercher"
+                width={'50%'}
+                onchange={(newValue) => dispatch({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })}
+              />
+            )}
             <Button width={'25%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
               Filtrer
             </Button>

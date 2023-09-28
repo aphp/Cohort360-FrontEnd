@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Buffer } from 'buffer'
 import Parse from 'html-react-parser'
 
-import { CircularProgress, Chip, Grid, IconButton, Typography, TableRow, TableCell } from '@mui/material'
+import { CircularProgress, Grid, IconButton, Typography, TableRow, TableCell } from '@mui/material'
 
 import FolderSharedIcon from '@mui/icons-material/FolderShared'
 import DescriptionIcon from '@mui/icons-material/Description'
@@ -25,6 +25,7 @@ import { Column, CohortComposition, CompositionStatusKind, DocumentReferenceStat
 import useStyles from './styles'
 import { Visibility } from '@mui/icons-material'
 import { Order, OrderBy } from 'types/searchCriterias'
+import StatusChip, { ChipStyles } from 'components/ui/StatusChip/StatusChip'
 
 type DataTableCompositionProps = {
   loading: boolean
@@ -237,28 +238,12 @@ const DataTableCompositionLine: React.FC<{
 }
 
 const getStatusShip = (type?: CompositionStatusKind | DocumentReferenceStatusKind) => {
-  const { classes } = useStyles()
-
   if (type === 'final' || type === 'current') {
-    return (
-      <Chip
-        className={classes.validChip}
-        style={{
-          width: 95,
-          height: 20
-        }}
-        icon={<CheckIcon height="15px" fill="#FFF" />}
-        label={getDocumentStatus(type)}
-      />
-    )
+    return <StatusChip icon={<CheckIcon height="15px" fill="#FFF" />} label={getDocumentStatus(type)} />
   } else if (type === 'entered-in-error') {
     return (
-      <Chip
-        className={classes.cancelledChip}
-        style={{
-          width: 95,
-          height: 20
-        }}
+      <StatusChip
+        status={ChipStyles.CANCELLED}
         icon={<CancelIcon height="15px" fill="#FFF" />}
         label={getDocumentStatus(type)}
       />
