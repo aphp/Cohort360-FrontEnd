@@ -158,15 +158,17 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
             )}
           </Grid>
           <Grid container item xs={12} lg={9} justifyContent="flex-end" style={{ maxWidth: 900 }}>
-            <Select
-              selectedValue={searchBy || SearchByTypes.TEXT}
-              label="Rechercher dans :"
-              width={'25%'}
-              items={searchByListPatients}
-              onchange={(newValue: SearchByTypes) =>
-                dispatch({ type: ActionTypes.CHANGE_SEARCH_BY, payload: newValue })
-              }
-            />
+            {!deidentified && (
+              <Select
+                selectedValue={searchBy || SearchByTypes.TEXT}
+                label="Rechercher dans :"
+                width={'25%'}
+                items={searchByListPatients}
+                onchange={(newValue: SearchByTypes) =>
+                  dispatch({ type: ActionTypes.CHANGE_SEARCH_BY, payload: newValue })
+                }
+              />
+            )}
             <SearchInput
               value={searchInput}
               placeholder="Rechercher"
