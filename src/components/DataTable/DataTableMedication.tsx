@@ -13,6 +13,7 @@ import { Column, Order, CohortMedication } from 'types'
 
 import useStyles from './styles'
 import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
+import { MEDICATION_ATC, MEDICATION_UCD } from '../../constants'
 
 type DataTableMedicationProps = {
   loading: boolean
@@ -97,6 +98,13 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
   )
 }
 
+const getCodes = (medication: CohortMedication<MedicationRequest | MedicationAdministration>, codeSystem: string) => {
+  const atcCoding = medication.medicationCodeableConcept?.coding?.find(
+    (code) => code.userSelected && code.system === codeSystem
+  )
+  return [atcCoding ? atcCoding.code : 'Non Renseigné', atcCoding ? atcCoding.display : 'Non Renseigné']
+}
+
 const DataTableMedicationLine: React.FC<{
   medication: CohortMedication<MedicationRequest | MedicationAdministration>
   deidentified: boolean
@@ -110,22 +118,15 @@ const DataTableMedicationLine: React.FC<{
     medication.resourceType === 'MedicationRequest'
       ? medication.dispenseRequest?.validityPeriod?.start
       : medication.effectivePeriod?.start
-  const codeATC =
-    medication.resourceType === 'MedicationRequest' ? medication.category?.[0]?.id : medication.category?.id
-  const displayATC =
-    medication.resourceType === 'MedicationRequest' ? medication.category?.[0]?.text : medication.category?.text
 
-  // @ts-ignore
-  const codeUCD = medication.contained?.[0]?.code?.coding?.[0]?.id
-  // @ts-ignore
-  const displayUCD = medication.contained?.[0]?.code?.coding?.[0]?.display
+  const [codeATC, displayATC] = getCodes(medication, MEDICATION_ATC)
+  const [codeUCD, displayUCD] = getCodes(medication, MEDICATION_UCD)
 
   const prescriptionType =
-    medication.resourceType === 'MedicationRequest' &&
-    (medication.extension?.find((extension) => extension.url === 'type') || {}).valueString
+    medication.resourceType === 'MedicationRequest' && medication.category?.[0].coding?.[0].display
   const administrationRoute =
     medication.resourceType === 'MedicationRequest'
-      ? medication.dosageInstruction?.[0]?.route?.text
+      ? medication.dosageInstruction?.[0]?.route?.coding?.[0]?.display
       : medication.dosage?.route?.coding?.[0]?.display
   const dose = medication.resourceType === 'MedicationAdministration' && displayDigit(medication?.dosage?.dose?.value)
   const unit = medication.resourceType === 'MedicationAdministration' && medication.dosage?.dose?.unit
