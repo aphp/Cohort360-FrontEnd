@@ -1675,7 +1675,7 @@ export const getDataFromFetch = async (
       for (const fetchKey of fetchKeys) {
         const dataKey = fetchKey.replace('fetch', '').replace(/(\b[A-Z])(?![A-Z])/g, ($1) => $1.toLowerCase())
         switch (dataKey) {
-          case 'MedicationData':
+          case 'medicationData':
           case 'biologyData':
           case 'ghmData':
           case 'ccamData':

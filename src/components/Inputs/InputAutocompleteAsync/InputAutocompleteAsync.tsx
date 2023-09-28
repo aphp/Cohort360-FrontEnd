@@ -75,6 +75,17 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
     }
   }, [open])
 
+  const displaySystem = (system: MedicationSystem) => {
+    switch (system) {
+      case MEDICATION_ATC:
+        return 'ATC'
+      case MEDICATION_UCD:
+        return 'UCD'
+      default:
+        return ''
+    }
+  }
+
   return (
     <Autocomplete
       onOpen={() => {
@@ -93,9 +104,7 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
       onChange={onChange}
       options={options ?? []}
       isOptionEqualToValue={(option, value) => option.id === value.id}
-      getOptionLabel={(option) =>
-        `${option.system === MEDICATION_ATC ? 'ATC' : option.system === MEDICATION_UCD ? 'UCD' : ''} : ${option.label} `
-      }
+      getOptionLabel={(option) => `${displaySystem(option.system)} : ${option.label} `}
       renderInput={(params) => (
         <>
           {console.log('options', options)}
