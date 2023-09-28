@@ -1,11 +1,11 @@
 import { Grid, Tooltip, Typography } from '@mui/material'
 import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
-import { InputWrapper } from 'components/ui/Inputs'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import { CriteriaNameType, ScopeTreeRow } from 'types'
 import InfoIcon from '@mui/icons-material/Info'
 import scopeType from 'data/scope_type.json'
+import { InputWrapper } from 'components/ui/Layout/styles'
 
 type ExecutiveUnitsFilterProps = {
   value: ScopeTreeRow[]

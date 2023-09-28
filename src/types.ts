@@ -16,7 +16,7 @@ import {
   Resource
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
-import { SearchByTypes } from 'types/searchCriterias'
+import { DurationRangeType, GenderStatus, SearchByTypes, VitalStatus } from 'types/searchCriterias'
 import { SearchInputError } from 'types/error'
 import { Calendar, CalendarLabel, CalendarRequestLabel } from 'types/dates'
 
@@ -415,7 +415,7 @@ export enum IdType {
 }
 
 export type SelectedCriteriaType = {
-  id: number
+  id?: number
   error?: boolean
   encounterService?: ScopeTreeRow[]
 } & (
@@ -464,10 +464,11 @@ export type Cim10DataType = {
 export type DemographicDataType = {
   title: string
   type: 'Patient'
-  gender: { id: string; label: string }[] | null
-  vitalStatus: { id: string; label: string }[] | null
-  ageType: { id: Calendar; criteriaLabel: CalendarLabel; requestLabel: CalendarRequestLabel }
-  years: [number, number]
+  genders: GenderStatus[] | null
+  vitalStatus: VitalStatus | null
+  age: DurationRangeType
+  birthdates: DurationRangeType
+  deathDates: DurationRangeType
   isInclusive?: boolean
 }
 

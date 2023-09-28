@@ -16,7 +16,7 @@ export enum CalendarRequestLabel {
   DAY = 'jour(s)'
 }
 
-export type AgeRangeType = {
+export type DurationType = {
   year: number | null
   month: number | null
   day: number | null

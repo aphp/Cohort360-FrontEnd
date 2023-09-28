@@ -18,7 +18,7 @@ export enum GenderStatusLabel {
 export enum VitalStatusLabel {
   ALIVE = 'Patients vivants',
   DECEASED = 'Patients décédés',
-  ALL = 'ALL'
+  ALL = 'Tous les patients'
 }
 
 export enum VitalStatusOptions {
@@ -41,11 +41,11 @@ export enum VitalStatus {
   ALL = 'all'
 }
 
-export enum VitalStatusLabel {
-  alive = 'Vivant(e)',
-  deceased = 'Décédé(e)',
-  all = 'Tous les patients'
-}
+/*export enum VitalStatusLabel {
+  ALIVE = 'Vivant(e)',
+  DECEASED = 'Décédé(e)',
+  ALL = 'Tous les patients'
+}*/
 export enum Direction {
   ASC = 'asc',
   DESC = 'desc'
@@ -109,7 +109,7 @@ export enum FilterKeys {
 }
 
 export type SearchBy = SearchByTypes
-export type DateRange = [string | null, string | null]
+export type DurationRangeType = [string | null, string | null]
 export type LabelObject = {
   id: string
   label: string
@@ -124,8 +124,8 @@ export type FilterValue =
   | string[]
   | LabelObject
   | LabelObject[]
-  | DateRange
-  | DateRange[]
+  | DurationRangeType
+  | DurationRangeType[]
   | GenderStatus
   | GenderStatus[]
   | VitalStatus
@@ -146,7 +146,7 @@ export type Filters =
 
 export interface PatientsFilters {
   genders: GenderStatus[]
-  birthdatesRanges: DateRange
+  birthdatesRanges: DurationRangeType
   vitalStatuses: VitalStatus[]
 }
 
