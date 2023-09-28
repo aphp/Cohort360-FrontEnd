@@ -49,8 +49,6 @@ type MedicationListItemProps = {
 const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
   const { medicationItem, selectedItems, handleClick, setLoading } = props
   const { id, label, subItems } = medicationItem
-  // console.log('props', props)
-  // console.log('medicationItem', medicationItem)
 
   const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
@@ -92,34 +90,30 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
     return (
-      <>
-        {/* {console.log('je passe dans le if')} */}
-        <ListItem className={classes.medicationItem}>
-          <ListItemIcon>
-            <div
-              onClick={() => handleClickOnHierarchy(medicationItem)}
-              className={cx(classes.indicator, {
-                [classes.selectedIndicator]: isSelected,
-                [classes.indeterminateIndicator]: isSelected ? false : isIndeterminated
-              })}
-              style={{ color: '#0063af', cursor: 'pointer' }}
-            />
-          </ListItemIcon>
-          <Tooltip title={label} enterDelay={2500}>
-            <ListItemText
-              onClick={() => handleClickOnHierarchy(medicationItem)}
-              className={classes.label}
-              primary={label}
-            />
-          </Tooltip>
-        </ListItem>
-      </>
+      <ListItem className={classes.medicationItem}>
+        <ListItemIcon>
+          <div
+            onClick={() => handleClickOnHierarchy(medicationItem)}
+            className={cx(classes.indicator, {
+              [classes.selectedIndicator]: isSelected,
+              [classes.indeterminateIndicator]: isSelected ? false : isIndeterminated
+            })}
+            style={{ color: '#0063af', cursor: 'pointer' }}
+          />
+        </ListItemIcon>
+        <Tooltip title={label} enterDelay={2500}>
+          <ListItemText
+            onClick={() => handleClickOnHierarchy(medicationItem)}
+            className={classes.label}
+            primary={label}
+          />
+        </Tooltip>
+      </ListItem>
     )
   }
 
   return (
     <>
-      {/* {console.log('je passe pas dans le if')} */}
       <ListItem className={classes.medicationItem}>
         <ListItemIcon>
           <div
@@ -186,8 +180,6 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
   const [selectState, setSelectState] = useState<'ATC' | 'UCD'>('ATC')
   const medicationHierarchy = useAppSelector((state) => state.medication.list || {})
   const medicationUCDTEST = useAppSelector((state) => state.medication.ucdList || {})
-  // console.log('medicationUCDTEST', medicationUCDTEST)
-  // console.log('medicationHierarchy', medicationHierarchy)
 
   const _handleClick = async (newSelectedItems: PmsiListType[] | null | undefined, hierarchy?: PmsiListType[]) => {
     onChangeSelectedHierarchy(newSelectedItems, hierarchy)

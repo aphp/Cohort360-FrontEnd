@@ -185,7 +185,6 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               />
             </RadioGroup>
           </Grid>
-          <>{console.log('criteria?.data?.atcData', criteria?.data?.atcData)}</>
           <AutocompleteAsync
             multiple
             label="Code(s) sélectionné(s)"

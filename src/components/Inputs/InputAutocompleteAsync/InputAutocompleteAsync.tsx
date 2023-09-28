@@ -47,13 +47,10 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
   const [options, setOptions] = useState<ElementType[]>(autocompleteOptions)
   const [loading, setLoading] = useState(false)
 
-  console.log('loading', loading)
-
   useEffect(() => {
     let active = true
 
     ;(async () => {
-      console.log('je passe dans le useEffect de inputAutocompleteAsync')
       setLoading(true)
       if (!getAutocompleteOptions) return
       const response = (await getAutocompleteOptions(searchValue)) || []
@@ -106,28 +103,25 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
       isOptionEqualToValue={(option, value) => option.id === value.id}
       getOptionLabel={(option) => `${displaySystem(option.system)} : ${option.label} `}
       renderInput={(params) => (
-        <>
-          {console.log('options', options)}
-          <TextField
-            {...params}
-            label={label}
-            variant={variant}
-            value={searchValue}
-            helperText={helperText}
-            onChange={(e) => {
-              setSearchValue(e.target.value)
-            }}
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <Fragment>
-                  {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                  {params.InputProps.endAdornment}
-                </Fragment>
-              )
-            }}
-          />
-        </>
+        <TextField
+          {...params}
+          label={label}
+          variant={variant}
+          value={searchValue}
+          helperText={helperText}
+          onChange={(e) => {
+            setSearchValue(e.target.value)
+          }}
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <Fragment>
+                {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                {params.InputProps.endAdornment}
+              </Fragment>
+            )
+          }}
+        />
       )}
     />
   )
