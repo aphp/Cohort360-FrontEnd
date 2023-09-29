@@ -185,6 +185,12 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
     onChangeSelectedHierarchy(newSelectedItems, hierarchy)
   }
 
+  const pagination = (array: any[], page_size: number, page_number: number) => {
+    return array.slice((page_number - 1) * page_size, page_number * page_size)
+  }
+
+  const medicationPaginated = pagination(medicationUCDTEST, 10, 1)
+
   useEffect(() => {
     const newList = { ...selectedCriteria, ...initialState } ?? {}
     if (!newList.code) {
@@ -221,7 +227,7 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
       </Grid>
 
       <div className={classes.loader}>{loading && <LinearProgress />}</div>
-      <Grid>
+      <Grid container>
         <Typography>Référentiel : </Typography>
         <Select
           style={{ marginRight: '1em' }}
@@ -236,7 +242,7 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
       <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
         {selectState === 'ATC' &&
           medicationHierarchy &&
-          medicationHierarchy.map((medicationItem: any, index) => (
+          medicationHierarchy.map((medicationItem, index) => (
             <MedicationListItem
               key={index}
               medicationItem={medicationItem}
@@ -246,8 +252,8 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
             />
           ))}
         {selectState === 'UCD' &&
-          medicationUCDTEST &&
-          medicationUCDTEST.map((medicationItem, index) => (
+          medicationPaginated &&
+          medicationPaginated.map((medicationItem, index) => (
             <MedicationListItem
               key={index}
               medicationItem={medicationItem}

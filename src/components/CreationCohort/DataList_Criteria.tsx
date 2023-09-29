@@ -157,7 +157,12 @@ const criteriaList: CriteriaItemType[] = [
     fontWeight: 'bold',
     components: ODD_MEDICATION ? MedicationForm : null,
     disabled: !ODD_MEDICATION ?? false,
-    data: { atcData: 'loading', atcHierarchy: 'loading', prescriptionTypes: 'loading', administrations: 'loading' },
+    data: {
+      medicationData: 'loading',
+      atcHierarchy: 'loading',
+      prescriptionTypes: 'loading',
+      administrations: 'loading'
+    },
     fetch: {
       fetchMedicationData: services.cohortCreation.fetchMedicationData,
       fetchAtcHierarchy: services.cohortCreation.fetchAtcHierarchy,

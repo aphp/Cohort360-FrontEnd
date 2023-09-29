@@ -87,7 +87,10 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
 
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code: any) => {
-        const criteriaCode = criteria.data.atcData ? criteria.data.atcData.find((g: any) => g.id === code.id) : null
+        const criteriaCode =
+          criteria.data.atcData && criteria.atcData !== 'loading'
+            ? criteria.atcData.find((g: any) => g.id === code.id)
+            : null
         return {
           id: code.id,
           label: code.label ? code.label : criteriaCode?.label ?? '?'
@@ -192,7 +195,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             noOptionsText="Veuillez entrer un code de médicament"
             className={classes.inputItem}
             autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteria?.data?.atcData || []}
+            autocompleteOptions={criteria?.data?.medicationData || []}
             getAutocompleteOptions={getMedicationOptions}
             onChange={(e, value) => {
               onChangeValue('code', value)

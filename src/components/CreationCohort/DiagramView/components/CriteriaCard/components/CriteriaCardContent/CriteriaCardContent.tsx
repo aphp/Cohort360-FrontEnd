@@ -688,8 +688,8 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           } else {
             for (const code of codes) {
               const selectedCodeData =
-                data?.atcData && data?.atcData !== 'loading'
-                  ? data.atcData.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                data?.medicationData && data?.medicationData !== 'loading'
+                  ? data.medicationData.find((codeElement: any) => codeElement && codeElement.id === code.id)
                   : null
               currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
             }
