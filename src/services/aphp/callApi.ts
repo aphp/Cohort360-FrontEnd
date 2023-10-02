@@ -855,12 +855,13 @@ type fetchScopeProps = {
   search?: string
   page?: number
   type: string[]
+  isExecutiveUnit?: boolean
 }
 export const fetchScope: (
   args: fetchScopeProps,
   signal?: AbortSignal
 ) => Promise<AxiosResponse<IScope | unknown>> = async (args: fetchScopeProps, signal?: AbortSignal) => {
-  const { perimetersIds, cohortIds, search, page, type } = args
+  const { perimetersIds, cohortIds, search, page, type, isExecutiveUnit } = args
 
   let options: string[] = []
   if (search) options = [...options, `search=${search}`] // eslint-disable-line
@@ -870,10 +871,10 @@ export const fetchScope: (
   if (cohortIds && cohortIds.length > 0) options = [...options, `cohort_id=${cohortIds.join(',')}`] // eslint-disable-line
   if (type && type.length > 0) options = [...options, `type_source_value=${type.join(',')}`] // eslint-disable-line
 
-  const response: AxiosResponse<IScope | unknown> = await apiBackend.get(
-    `accesses/perimeters/read-patient/?${options.reduce(paramsReducer)}`,
-    { signal: signal }
-  )
+  const url: string = isExecutiveUnit ? 'accesses/perimeters/?' : 'accesses/perimeters/read-patient/?'
+  const response: AxiosResponse<IScope | unknown> = await apiBackend.get(`${url}${options.reduce(paramsReducer)}`, {
+    signal: signal
+  })
   return response
 }
 

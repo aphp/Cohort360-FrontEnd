@@ -171,6 +171,7 @@ export const expandScopeTree = async (params: ExpandScopeElementParamsType, getS
               item.inferior_levels_ids,
               false,
               type,
+              params.isExecutiveUnit,
               params.signal
             )
             item = { ...item, subItems: subItems }
@@ -183,7 +184,7 @@ export const expandScopeTree = async (params: ExpandScopeElementParamsType, getS
       return _items
     }
 
-    _rootRows = await replaceSubItems(scopesList, params.type)
+    _rootRows = await replaceSubItems(scopesList, params.executiveUnitType)
   }
 
   return {

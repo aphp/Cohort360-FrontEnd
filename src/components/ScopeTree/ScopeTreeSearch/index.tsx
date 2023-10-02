@@ -87,7 +87,8 @@ const Index: React.FC<ScopeTreeSearchProps> = (props) => {
       searchSavedRootRows,
       setSearchSavedRootRows,
       setOpenPopulations,
-      executiveUnitType
+      executiveUnitType,
+      !!executiveUnitType
     )
 
   useEffect(() => {
@@ -140,7 +141,8 @@ const Index: React.FC<ScopeTreeSearchProps> = (props) => {
                           setRootRows,
                           selectedItems,
                           undefined,
-                          executiveUnitType
+                          executiveUnitType,
+                          !!executiveUnitType
                         )
                       }
                       onSelect={(row: ScopeTreeRow) =>

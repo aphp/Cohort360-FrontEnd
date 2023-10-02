@@ -57,7 +57,7 @@ const ScopeTreeTableRow: React.FC<ScopeTreeTableRowProps> = (props: ScopeTreeTab
             root: level % 2 === 0 ? classes.mainRow : classes.secondRow
           }}
         >
-          {row.subItems?.length > 0 && (!isSearchMode || row.type !== executiveUnitType) && (
+          {(row.subItems?.length ?? -1) > 0 && (!isSearchMode || row.type !== executiveUnitType) && (
             <TableCell>
               <IconButton
                 onClick={() => onExpand(Number(row.id))}

@@ -82,7 +82,7 @@ export const updateRootRows = async (
       if (parentsAndSelectedItems[j].parentId === newRootRows[i].id) {
         if (
           !newRootRows[i].subItems ||
-          (newRootRows[i].subItems.length === 1 && newRootRows[i].subItems[0].id === LOADING.id)
+          (newRootRows[i]?.subItems?.length === 1 && newRootRows[i]?.subItems[0]?.id === LOADING.id)
         ) {
           newRootRows[i] = { ...newRootRows[i], subItems: [] }
         }
@@ -120,7 +120,8 @@ export const init = async (
   setCount: (newCount: number) => void,
   setIsEmpty: (isEmpty: boolean) => void,
   dispatch: AppDispatch,
-  executiveUnitType?: ScopeType
+  executiveUnitType?: ScopeType,
+  isExecutiveUnit?: boolean
 ) => {
   setIsSearchLoading(true)
   cancelPendingRequest(controllerRef.current)
@@ -128,7 +129,12 @@ export const init = async (
   let newPerimetersList: ScopeTreeRow[] = rootRows
   if (rootRows?.length <= 0) {
     const fetchScopeTreeResponse = await dispatch(
-      fetchScopesList({ isScopeList: true, type: executiveUnitType, signal: controllerRef.current?.signal })
+      fetchScopesList({
+        isScopeList: true,
+        type: executiveUnitType,
+        isExecutiveUnit: isExecutiveUnit,
+        signal: controllerRef.current?.signal
+      })
     ).unwrap()
     if (fetchScopeTreeResponse && !fetchScopeTreeResponse.aborted) {
       newPerimetersList = fetchScopeTreeResponse.scopesList
@@ -150,7 +156,8 @@ export const onExpand = async (
   setRootRows: (newRootRows: ScopeTreeRow[]) => void,
   selectedItems: ScopeTreeRow[],
   dispatch?: AppDispatch,
-  executiveUnitType?: ScopeType
+  executiveUnitType?: ScopeType,
+  isExecutiveUnit?: boolean
 ) => {
   controllerRef.current = new AbortController()
   const _rootRows = rootRows ? [...rootRows] : []
@@ -161,7 +168,8 @@ export const onExpand = async (
     selectedItems: selectedItems,
     scopesList: _rootRows,
     openPopulation: openPopulation,
-    type: executiveUnitType,
+    executiveUnitType: executiveUnitType,
+    isExecutiveUnit: isExecutiveUnit,
     signal: controllerRef.current?.signal
   }
   if (dispatch) {
@@ -539,7 +547,8 @@ export const searchInPerimeters = async (
   searchRootRows: ScopeTreeRow[],
   setSearchRootRows: (newRootRows: ScopeTreeRow[]) => void,
   setOpenPopulations: (newOpenPopulation: number[]) => void,
-  executiveUnitType?: ScopeType
+  executiveUnitType?: ScopeType,
+  isExecutiveUnit?: boolean
 ) => {
   setIsSearchLoading(true)
   let newRootRows: ScopeTreeRow[] = []
@@ -549,7 +558,13 @@ export const searchInPerimeters = async (
       scopeTreeRows: newPerimetersList,
       count: newCount,
       aborted: aborted
-    } = await servicesPerimeters.findScope(searchInput, page, controllerRef.current?.signal, executiveUnitType)
+    } = await servicesPerimeters.findScope(
+      searchInput,
+      page,
+      controllerRef.current?.signal,
+      executiveUnitType,
+      isExecutiveUnit
+    )
 
     if (!aborted) {
       if (!newPerimetersList || newPerimetersList.length < 1) {

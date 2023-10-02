@@ -30,23 +30,24 @@ type FetchScopeListReturn = {
 type FetchScopeListArgs = {
   isScopeList?: boolean
   type?: ScopeType
+  isExecutiveUnit?: boolean
   signal?: AbortSignal | undefined
 }
 
 const fetchScopesList = createAsyncThunk<FetchScopeListReturn, FetchScopeListArgs, { state: RootState }>(
   'scope/fetchScopesList',
-  async ({ isScopeList, type, signal }, { getState, dispatch }) => {
+  async ({ isScopeList, type, isExecutiveUnit, signal }, { getState, dispatch }) => {
     try {
       const state = getState()
       const { me, scope } = state
       const { scopesList } = scope
 
       if (scopesList.length && !isScopeList) {
-        dispatch(fetchScopesListinBackground({ type, signal }))
+        dispatch(fetchScopesListinBackground({ type, isExecutiveUnit, signal }))
         return { scopesList: scopesList, aborted: signal?.aborted }
       } else {
         if (!me) return { scopesList: [], aborted: signal?.aborted }
-        const scopes = (await services.perimeters.getScopePerimeters(me.id, type, signal)) || []
+        const scopes = (await services.perimeters.getScopePerimeters(me.id, type, isExecutiveUnit, signal)) || []
         if (signal?.aborted) {
           return { scopesList: scopesList, aborted: signal?.aborted }
         } else {
@@ -62,19 +63,20 @@ const fetchScopesList = createAsyncThunk<FetchScopeListReturn, FetchScopeListArg
 type fetchScopesListinBackgroundArgs = {
   type?: ScopeType
   signal?: AbortSignal | undefined
+  isExecutiveUnit?: boolean
 }
 const fetchScopesListinBackground = createAsyncThunk<
   FetchScopeListReturn,
   fetchScopesListinBackgroundArgs,
   { state: RootState }
->('scope/fetchScopesListinBackground', async ({ type, signal }, { getState }) => {
+>('scope/fetchScopesListinBackground', async ({ type, isExecutiveUnit, signal }, { getState }) => {
   try {
     const state = getState()
     const { me, scope } = state
     const { scopesList } = scope
 
     if (!me) return { scopesList: [], aborted: signal?.aborted }
-    const scopes = (await services.perimeters.getScopePerimeters(me.id, type, signal)) || []
+    const scopes = (await services.perimeters.getScopePerimeters(me.id, type, isExecutiveUnit, signal)) || []
     return {
       scopesList: scopes.map((scope) => ({
         ...scope,

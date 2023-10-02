@@ -1040,7 +1040,8 @@ export type ExpandScopeElementParamsType = {
   scopesList?: ScopeTreeRow[]
   selectedItems?: ScopeTreeRow[]
   openPopulation?: number[]
-  type?: ScopeType
+  executiveUnitType?: ScopeType
+  isExecutiveUnit?: boolean
   signal?: AbortSignal
 }
 export type ExpandScopeElementReturnType = {

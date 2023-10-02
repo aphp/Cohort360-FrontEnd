@@ -87,7 +87,8 @@ const Index = (props: ScopeTreeExplorationProps) => {
       setCount,
       setIsEmpty,
       dispatch,
-      executiveUnitType
+      executiveUnitType,
+      !!executiveUnitType
     )
   }, [])
 
@@ -141,7 +142,8 @@ const Index = (props: ScopeTreeExplorationProps) => {
                           setRootRows,
                           selectedItems,
                           dispatch,
-                          executiveUnitType
+                          executiveUnitType,
+                          !!executiveUnitType
                         )
                       }
                       onSelect={(row: ScopeTreeRow) =>
