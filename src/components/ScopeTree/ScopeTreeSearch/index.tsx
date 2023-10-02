@@ -17,6 +17,7 @@ import { ScopeState } from 'state/scope'
 import { ScopeTreeRow } from 'types'
 import { ScopeTreeSearchProps } from '../index'
 import ScopeTreeHierarchy from '../ScopeTreeHierarchy/ScopeTreeHierarchy'
+import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 const Index: React.FC<ScopeTreeSearchProps> = (props) => {
   const {
@@ -58,6 +59,7 @@ const Index: React.FC<ScopeTreeSearchProps> = (props) => {
         color="secondary"
         checked={isHeadChecked}
         indeterminate={isHeadIndeterminate}
+        indeterminateIcon={<IndeterminateCheckBoxOutlined />}
         onClick={() =>
           onSearchSelectAll(
             rootRows,

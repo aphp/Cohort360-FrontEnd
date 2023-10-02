@@ -30,6 +30,7 @@ import {
 import { ScopeState } from 'state/scope'
 import { ScopeTreeExplorationProps } from '../index'
 import ScopeTreeHierarchy from '../ScopeTreeHierarchy/ScopeTreeHierarchy'
+import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 const Index = (props: ScopeTreeExplorationProps) => {
   const {
@@ -69,6 +70,7 @@ const Index = (props: ScopeTreeExplorationProps) => {
         color="secondary"
         checked={isHeadChecked}
         indeterminate={isHeadIndeterminate}
+        indeterminateIcon={<IndeterminateCheckBoxOutlined />}
         onClick={() =>
           onExplorationSelectAll(rootRows, setSelectedItems, isHeadChecked, isSelectionLoading, setIsSelectionLoading)
         }

@@ -6,6 +6,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'
 import displayDigit from 'utils/displayDigit'
 import { LOADING } from '../../../../utils/scopeTree'
+import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 type ScopeTreeTableRowProps = {
   row: ScopeTreeRow
@@ -79,6 +80,7 @@ const ScopeTreeTableRow: React.FC<ScopeTreeTableRowProps> = (props: ScopeTreeTab
                 onSelect(row)
               }}
               indeterminate={_isIndeterminate}
+              indeterminateIcon={<IndeterminateCheckBoxOutlined />}
               checked={_isSelected}
               inputProps={{ 'aria-labelledby': labelId }}
             />

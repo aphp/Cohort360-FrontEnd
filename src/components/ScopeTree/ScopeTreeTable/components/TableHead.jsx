@@ -22,10 +22,10 @@ function EnhancedTableHead(props) {
           <TableCell align="center" padding="checkbox">
             <Checkbox
               indeterminate={numSelected > 0 && numSelected < rowCount}
+              indeterminateIcon={<IndeterminateCheckBoxOutlined />}
               checked={rowCount > 0 && numSelected === rowCount}
               onChange={onSelectAllClick}
               inputProps={{ 'aria-label': 'select all desserts' }}
-              indeterminateIcon={<IndeterminateCheckBoxOutlined />}
             />
           </TableCell>
         )}
