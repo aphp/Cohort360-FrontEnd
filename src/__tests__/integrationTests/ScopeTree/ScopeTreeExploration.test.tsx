@@ -1,14 +1,13 @@
-import React from 'react'
-import { render } from '@testing-library/react'
+import { Reducer, configureStore } from '@reduxjs/toolkit'
 import '@testing-library/jest-dom/extend-expect'
+import { render } from '@testing-library/react'
+import { Provider } from 'react-redux'
+import { combineReducers } from 'redux'
+import thunk from 'redux-thunk'
 import { describe, test, vi } from 'vitest'
 import ScopeTreeExploration from '../../../components/ScopeTree/ScopeTreeExploration'
-import { ScopeTreeRow, ScopeType } from '../../../types'
-import { Provider } from 'react-redux'
-import thunk from 'redux-thunk'
-import { configureStore, Reducer } from '@reduxjs/toolkit'
 import scope from '../../../state/scope'
-import { combineReducers } from 'redux'
+import { ScopeTreeRow, ScopeType } from '../../../types'
 
 describe('ScopeTreeExploration', () => {
   test('renders table for scope tree exploration with header and given data', () => {

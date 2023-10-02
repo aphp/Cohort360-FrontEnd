@@ -1,15 +1,14 @@
-import React from 'react'
-import { getByText, render, waitForElementToBeRemoved } from '@testing-library/react'
+import { Reducer, configureStore } from '@reduxjs/toolkit'
 import '@testing-library/jest-dom/extend-expect'
-import { describe, test, vi } from 'vitest'
-import { ScopeTreeRow, ScopeType } from '../../../types'
+import { getByText, render, waitForElementToBeRemoved } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import thunk from 'redux-thunk'
-import { configureStore, Reducer } from '@reduxjs/toolkit'
-import scope from '../../../state/scope'
 import { combineReducers } from 'redux'
+import thunk from 'redux-thunk'
+import { describe, test, vi } from 'vitest'
 import ScopeTreeSearch from '../../../components/ScopeTree/ScopeTreeSearch'
 import servicesPerimeters from '../../../services/aphp/servicePerimeters'
+import scope from '../../../state/scope'
+import { ScopeTreeRow, ScopeType } from '../../../types'
 
 describe('ScopeTreeSearch.test.tsx', () => {
   vi.clearAllMocks()

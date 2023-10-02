@@ -1,8 +1,7 @@
-import React from 'react'
 import { fireEvent, render } from '@testing-library/react'
+import { vi } from 'vitest'
 import ScopeTreeChipsets from '../../../components/ScopeTree/ScopeTreeChipsets/ScopeTreeChipsets'
 import { ScopeTreeRow } from '../../../types'
-import { vi } from 'vitest'
 
 describe('ScopeTreeChipsets', () => {
   test('renders selected items', () => {

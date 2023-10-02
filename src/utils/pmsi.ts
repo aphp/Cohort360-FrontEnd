@@ -111,10 +111,15 @@ export const getHierarchySelection = (row: any, selectedItems: any[] | undefined
   return savedSelectedItems
 }
 
-export const optimizeHierarchySelection = (
-  selectedItems: PmsiListType[],
-  rootRows: AbstractTree<unknown>[]
-): PmsiListType[] => {
+export const optimizeHierarchySelection = <
+  T extends {
+    id: string
+    subItems?: AbstractTree<T>[]
+  }
+>(
+  selectedItems: T[],
+  rootRows: T[]
+): T[] => {
   // If you chenge this code, change it too inside: PopulationCard.tsx:31 and Scope.jsx:25
   selectedItems = selectedItems.map(
     (selectedItem) => findEquivalentRowInItemAndSubItems(selectedItem, rootRows).equivalentRow ?? selectedItem

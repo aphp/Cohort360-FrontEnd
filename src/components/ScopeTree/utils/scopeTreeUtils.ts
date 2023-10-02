@@ -86,13 +86,13 @@ export const updateRootRows = async (
         ) {
           newRootRows[i] = { ...newRootRows[i], subItems: [] }
         }
-        if (!newRootRows[i].subItems.map((subItem) => subItem.id).includes(parentsAndSelectedItems[j].id)) {
-          newRootRows[i].subItems.push(parentsAndSelectedItems[j])
+        if (!newRootRows[i]?.subItems?.map((subItem) => subItem.id).includes(parentsAndSelectedItems[j].id)) {
+          newRootRows[i]?.subItems?.push(parentsAndSelectedItems[j])
         }
       }
     }
-    if (newRootRows[i]?.subItems?.length > 0 && newRootRows[i]?.subItems[0]?.id !== LOADING.id) {
-      await updateRootRows(newRootRows[i].subItems, parentsAndSelectedItems, parents)
+    if (newRootRows[i]?.subItems?.length && newRootRows[i]?.subItems[0]?.id !== LOADING.id) {
+      await updateRootRows(newRootRows[i]?.subItems ?? [], parentsAndSelectedItems, parents)
     }
   }
   return newRootRows
