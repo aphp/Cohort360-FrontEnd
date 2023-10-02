@@ -77,7 +77,7 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
 
   return (
     <>
-      {row.id === 'loading' ? (
+      {row?.id === 'loading' ? (
         <TableRow hover key={Math.random()}>
           <TableCell colSpan={5}>
             <Skeleton animation="wave" />
@@ -94,7 +94,7 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
           <TableCell>
             {row.subItems && row.subItems.length > 0 && row.type !== executiveUnitType && (
               <IconButton
-                onClick={() => onExpand(row.id)}
+                onClick={() => onExpand(row?.id)}
                 style={{ marginLeft: level * 35, padding: 0, marginRight: -30 }}
               >
                 {openPopulation.find((id) => row.id === id) ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
@@ -190,8 +190,10 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
   const isHeadIndetermined: boolean =
     !isAllSelected && selectedItems && selectedItems.length > 0 && rootRows && !isHeadChecked
 
-  const fetchScopeTree = async (executiveUnitType?: ScopeType, signal?: AbortSignal) => {
-    return dispatch(fetchScopesList({ signal, type: executiveUnitType })).unwrap()
+  const fetchScopeTree = async (executiveUnitType?: ScopeType, isExecutiveUnit?: boolean, signal?: AbortSignal) => {
+    return dispatch(
+      fetchScopesList({ type: executiveUnitType, isExecutiveUnit: isExecutiveUnit, signal: signal })
+    ).unwrap()
   }
 
   const _init = async () => {
@@ -199,7 +201,11 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
     controllerRef.current = _cancelPendingRequest(controllerRef.current)
 
     let newPerimetersList: ScopeTreeRow[] = []
-    const fetchScopeTreeResponse = await fetchScopeTree(executiveUnitType, controllerRef.current?.signal)
+    const fetchScopeTreeResponse = await fetchScopeTree(
+      executiveUnitType,
+      !!executiveUnitType,
+      controllerRef.current?.signal
+    )
     if (fetchScopeTreeResponse && !fetchScopeTreeResponse.aborted) {
       newPerimetersList = fetchScopeTreeResponse.scopesList
       setRootRows(newPerimetersList)
@@ -306,7 +312,13 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
       scopeTreeRows: newPerimetersList,
       count: newCount,
       aborted: aborted
-    } = await servicesPerimeters.findScope(searchInput, page, controllerRef.current?.signal, executiveUnitType)
+    } = await servicesPerimeters.findScope(
+      searchInput,
+      page,
+      controllerRef.current?.signal,
+      executiveUnitType,
+      !!executiveUnitType
+    )
 
     if (!aborted) {
       if (!newPerimetersList || newPerimetersList.length < 1) {
@@ -350,6 +362,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
         scopesList: _rootRows,
         openPopulation: openPopulation,
         type: executiveUnitType,
+        isExecutiveUnit: !!executiveUnitType,
         signal: controllerRef.current?.signal
       })
     ).unwrap()

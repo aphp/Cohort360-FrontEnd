@@ -28,23 +28,24 @@ type FetchScopeListReturn = {
 
 type FetchScopeListArgs = {
   type?: ScopeType
+  isExecutiveUnit?: boolean
   signal?: AbortSignal | undefined
 }
 
 const fetchScopesList = createAsyncThunk<FetchScopeListReturn, FetchScopeListArgs, { state: RootState }>(
   'scope/fetchScopesList',
-  async ({ type, signal }, { getState, dispatch }) => {
+  async ({ type, isExecutiveUnit, signal }, { getState, dispatch }) => {
     try {
       const state = getState()
       const { me, scope } = state
       const { scopesList } = scope
 
       if (scopesList.length) {
-        dispatch(fetchScopesListinBackground({ type, signal }))
+        dispatch(fetchScopesListinBackground({ type, isExecutiveUnit, signal }))
         return { scopesList: scopesList, aborted: signal?.aborted }
       } else {
         if (!me) return { scopesList: [], aborted: signal?.aborted }
-        const scopes = (await services.perimeters.getScopePerimeters(me.id, type, signal)) || []
+        const scopes = (await services.perimeters.getScopePerimeters(me.id, type, isExecutiveUnit, signal)) || []
         if (signal?.aborted) {
           return { scopesList: scopesList, aborted: signal?.aborted }
         } else {
@@ -60,19 +61,20 @@ const fetchScopesList = createAsyncThunk<FetchScopeListReturn, FetchScopeListArg
 type fetchScopesListinBackgroundArgs = {
   type?: ScopeType
   signal?: AbortSignal | undefined
+  isExecutiveUnit?: boolean
 }
 const fetchScopesListinBackground = createAsyncThunk<
   FetchScopeListReturn,
   fetchScopesListinBackgroundArgs,
   { state: RootState }
->('scope/fetchScopesListinBackground', async ({ type, signal }, { getState }) => {
+>('scope/fetchScopesListinBackground', async ({ type, isExecutiveUnit, signal }, { getState }) => {
   try {
     const state = getState()
     const { me, scope } = state
     const { scopesList } = scope
 
     if (!me) return { scopesList: [], aborted: signal?.aborted }
-    const scopes = (await services.perimeters.getScopePerimeters(me.id, type, signal)) || []
+    const scopes = (await services.perimeters.getScopePerimeters(me.id, type, isExecutiveUnit, signal)) || []
     return {
       scopesList: scopes.map((scope) => ({
         ...scope,
@@ -103,6 +105,7 @@ type ExpandScopeElementParams = {
   selectedItems?: ScopeTreeRow[]
   openPopulation?: number[]
   type?: ScopeType
+  isExecutiveUnit?: boolean
   signal?: AbortSignal
 }
 type ExpandScopeElementReturn = {
@@ -146,6 +149,7 @@ const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScop
                 item.inferior_levels_ids,
                 false,
                 type,
+                params.isExecutiveUnit,
                 params.signal
               )
               item = { ...item, subItems: subItems }
