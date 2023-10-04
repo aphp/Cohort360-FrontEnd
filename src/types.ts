@@ -535,7 +535,7 @@ export type GhmDataType = {
   isInclusive?: boolean
 }
 
-export enum MedicationSystem {
+export enum ValueSetSystem {
   ATC = 'ATC',
   UCD = 'UCD'
 }

@@ -294,8 +294,8 @@ const servicesCohortCreation: IServiceCohortCreation = {
     const codeSystemPerResourceType: { [type: string]: string } = {
       Claim: CLAIM_HIERARCHY,
       Condition: CONDITION_HIERARCHY,
-      MedicationAdministration: MEDICATION_ATC,
-      MedicationRequest: MEDICATION_ATC,
+      MedicationAdministration: `${MEDICATION_ATC},${MEDICATION_UCD}`,
+      MedicationRequest: `${MEDICATION_ATC},${MEDICATION_UCD}`,
       Observation: `${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}`,
       Procedure: PROCEDURE_HIERARCHY
     }

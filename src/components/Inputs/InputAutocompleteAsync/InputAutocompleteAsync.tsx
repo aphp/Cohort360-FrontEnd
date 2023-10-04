@@ -2,14 +2,14 @@ import React, { FC, useEffect, useState, Fragment } from 'react'
 
 import { Autocomplete, CircularProgress, TextField } from '@mui/material'
 
-import { MEDICATION_ATC, MEDICATION_UCD } from '../../../constants'
+import { displaySystem } from 'utils/displayValueSetSystem'
 
-import { MedicationSystem } from 'types'
+import { ValueSetSystem } from 'types'
 
 interface ElementType {
   id: string
   label: string
-  system: MedicationSystem
+  system: ValueSetSystem
 }
 
 type InputAutocompleteAsyncProps = {
@@ -71,17 +71,6 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
       setOptions([])
     }
   }, [open])
-
-  const displaySystem = (system: MedicationSystem) => {
-    switch (system) {
-      case MEDICATION_ATC:
-        return 'ATC: '
-      case MEDICATION_UCD:
-        return 'UCD: '
-      default:
-        return ''
-    }
-  }
 
   return (
     <Autocomplete

@@ -88,12 +88,13 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code: any) => {
         const criteriaCode =
-          criteria.data.atcData && criteria.atcData !== 'loading'
-            ? criteria.atcData.find((g: any) => g.id === code.id)
+          criteria.data.medicationData && criteria.medicationData !== 'loading'
+            ? criteria.data.medicationData.find((g: any) => g.id === code.id)
             : null
         return {
           id: code.id,
-          label: code.label ? code.label : criteriaCode?.label ?? '?'
+          label: code.label ? code.label : criteriaCode?.label ?? '?',
+          system: code.system ? code.system : criteriaCode?.system ?? '?'
         }
       })
     : []

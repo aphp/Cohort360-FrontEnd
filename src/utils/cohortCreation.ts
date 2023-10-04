@@ -76,7 +76,7 @@ const OBSERVATION_CODE_ALL_HIERARCHY = 'code'
 const OBSERVATION_VALUE = 'value-quantity'
 const OBSERVATION_STATUS = 'status'
 const ENCOUNTER_SERVICE_PROVIDER = 'encounter.encounter-care-site'
-const SERVICE_PROVIDER = 'service-provider'
+const SERVICE_PROVIDER = 'encounter.encounter-care-site'
 
 export const UNITE_EXECUTRICE = 'Unité exécutrice'
 export const STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE = 'Structure hospitalière de prise en charge'
@@ -331,9 +331,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
     case RESSOURCE_TYPE_COMPOSITION: {
       const unreducedFilterFhir = [
-        `${COMPOSITION_STATUS}=final&type:not=doc-impor&contenttype=${encodeURIComponent(
-          'http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain'
-        )}&subject.active=true`,
+        `${COMPOSITION_STATUS}=final&type:not=doc-impor&contenttype='http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain'&subject.active=true`,
         `${
           criterion.search
             ? `${criterion.searchBy === SearchByTypes.text ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
