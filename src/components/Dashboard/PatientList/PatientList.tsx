@@ -198,7 +198,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
           </Grid>
         </Searchbar>
       </BlockWrapper>
-      <Grid item xs={12}>
+      <Grid item xs={12} container marginBottom={1}>
         {filtersAsArray.map((filter, index) => (
           <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
         ))}
