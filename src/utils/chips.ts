@@ -3,7 +3,7 @@ import moment from 'moment'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { getDisplayingSelectedDocTypes } from 'utils/documentsFormatter'
 import { genderName, vitalStatusName } from 'utils/patient'
-import { ageName } from 'utils/age'
+import { getDurationRangeLabel } from 'utils/age'
 
 import {
   DocumentFilters as DocumentFiltersType,
@@ -75,7 +75,10 @@ export const buildPatientFiltersChips = (
   const gender = filters.gender.map((elem) => {
     return { label: genderName(elem), onDelete: () => handleDeleteChip('gender', elem) }
   })
-  const birthdates = { label: ageName(filters.birthdatesRanges), onDelete: () => handleDeleteChip('birthdatesRanges') }
+  const birthdates = {
+    label: getDurationRangeLabel(filters.birthdatesRanges),
+    onDelete: () => handleDeleteChip('birthdatesRanges')
+  }
   const vitalStatus = filters.vitalStatus.map((elem) => {
     return { label: vitalStatusName(elem), onDelete: () => handleDeleteChip('vitalStatus', elem) }
   })

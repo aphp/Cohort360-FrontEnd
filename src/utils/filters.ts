@@ -9,10 +9,10 @@ import {
   VitalStatus,
   VitalStatusLabel
 } from 'types/searchCriterias'
-import { ageName } from './age'
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
 import { ScopeTreeRow, SimpleCodeType } from 'types'
+import { getDurationRangeLabel } from './age'
 
 export const isChecked = <T>(value: T, arr: T[]): boolean => {
   return arr.includes(value)
@@ -65,7 +65,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
 
 export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.BIRTHDATES) {
-    return ageName(value as DurationRangeType)
+    return getDurationRangeLabel(value as DurationRangeType)
   }
   if (key === FilterKeys.GENDERS) {
     return GenderStatusLabel[value as GenderStatus]

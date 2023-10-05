@@ -10,7 +10,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import { useAppSelector } from 'state'
-import { DocType, ScopeTreeRow, SelectedCriteriaType, CriteriaItemType, CalendarRequestLabel, Comparators } from 'types'
+import { DocType, ScopeTreeRow, SelectedCriteriaType, CriteriaItemType, Comparators } from 'types'
 
 import docTypes from 'assets/docTypes.json'
 import { displaySystem } from 'utils/displayValueSetSystem'
@@ -237,7 +237,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         break
       }
 
-      case 'Patient': {
+      /* case 'Patient': {
         const displaySelectedGender = (genders: { id: string; label: string }[]) => {
           let currentGender: string[] = []
           for (const gender of genders) {
@@ -300,7 +300,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           )
         ]
         break
-      }
+      }*/
 
       case 'DocumentReference': {
         const displaySelectedDocType = (selectedDocTypes: DocType[]) => {
@@ -927,32 +927,31 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
   const containerRef = useRef(null)
   const elementsRef = useRef(criteriaContents.map(() => React.createRef()))
 
-  const [refresh, setRefresh] = useState(false)
-  const [hasCollapse, needCollapse] = useState(false)
+  const [needCollapse, setNeedCollapse] = useState(false)
   const [openCollapse, setOpenCollapse] = useState(false)
 
-  const checkIfCardNeedCollapse = () => {
-    setRefresh(true)
+  const checkIfCardNeedCollapse = (): boolean => {
     const element = elementsRef.current
-    if (elementsRef.current.length === 0) return
+    if (elementsRef.current.length === 0) return false
     // @ts-ignore
     const elemWidth = element ? element.map((e) => e?.current?.offsetWidth ?? 0) : [0, 0]
     const maxWidth = elemWidth.reduce((a, b) => a + b)
     // @ts-ignore
     const containerWidth = containerRef ? containerRef?.current?.offsetWidth : 0
-    needCollapse(maxWidth >= containerWidth)
+    return maxWidth >= containerWidth
   }
 
   useEffect(() => {
-    function handleResize() {
-      checkIfCardNeedCollapse()
+    const handleResize = () => {
+      setNeedCollapse(checkIfCardNeedCollapse())
     }
-    window.addEventListener('resize', handleResize)
-  })
 
-  useEffect(() => {
-    checkIfCardNeedCollapse()
-  }, [elementsRef, refresh])
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [elementsRef])
 
   return (
     <div ref={containerRef} style={{ height: openCollapse ? '' : 40 }} className={classes.cardContent}>
@@ -963,7 +962,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             <div key={index} ref={elementsRef.current[index]}>
               {criteriaContent}
             </div>
-            {hasCollapse && (
+            {needCollapse && (
               <IconButton onClick={() => setOpenCollapse(!openCollapse)} className={classes.chevronIcon} size="small">
                 {openCollapse ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
               </IconButton>

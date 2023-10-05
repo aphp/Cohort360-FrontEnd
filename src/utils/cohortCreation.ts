@@ -191,7 +191,6 @@ export const getCalendarMultiplicator = (type: Calendar): number => {
 
 const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
   let filterFhir = ''
-  console.log('criterionTest', criterion)
   const filterReducer = (accumulator: any, currentValue: any): string =>
     accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
   const searchReducer = (accumulator: any, currentValue: any): string =>
@@ -208,7 +207,6 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
       const ageMinCriterion = `${PATIENT_AGE}=ge${ageMin}`
       const ageMaxCriterion = `${PATIENT_AGE}=le${ageMax}`
-      console.log('ageMin ageMax', ageMin, ageMax)
 
       //"filterFhir":"active=true&gender=f&deceased=true&age-day=ge0&age-day=le47450"
 
@@ -564,7 +562,6 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
     default:
       break
   }
-  console.log('criterionTest', filterFhir)
   return filterFhir
 }
 
@@ -686,7 +683,6 @@ export async function unbuildRequest(_json: string): Promise<any> {
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
   let temporalConstraints: TemporalConstraintsType[] = []
-  console.log('criterionTest unbuild')
   if (!_json) {
     return {
       population: null,
@@ -778,13 +774,11 @@ export async function unbuildRequest(_json: string): Promise<any> {
       isInclusive: element.isInclusive,
       title: ''
     }
-    console.log('criterionTest new')
 
     switch (element.resourceType) {
       case RESSOURCE_TYPE_PATIENT: {
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-          console.log('criterionTest new', currentCriterion)
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null

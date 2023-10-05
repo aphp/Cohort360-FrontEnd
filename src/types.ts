@@ -423,7 +423,7 @@ export enum IdType {
 }
 
 export type SelectedCriteriaType = {
-  id?: number
+  id: number
   error?: boolean
   encounterService?: ScopeTreeRow[]
 } & (
