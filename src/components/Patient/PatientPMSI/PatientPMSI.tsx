@@ -217,7 +217,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
           </Grid>
         </Searchbar>
       </BlockWrapper>
-      <Grid item xs={12}>
+      <Grid item xs={12} container marginBottom={2}>
         {filtersAsArray.map((filter, index) => (
           <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
         ))}

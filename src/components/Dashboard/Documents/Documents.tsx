@@ -131,7 +131,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
         )}
       </BlockWrapper>
 
-      <BlockWrapper item xs={12} margin={'20px 0px 10px 0px'}>
+      <BlockWrapper item xs={12} margin="20px 0px">
         <Searchbar>
           <Select
             selectedValue={searchBy || SearchByTypes.TEXT}
