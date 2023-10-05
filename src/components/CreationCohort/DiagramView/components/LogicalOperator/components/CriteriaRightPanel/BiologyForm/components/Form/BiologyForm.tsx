@@ -92,7 +92,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
         onChangeValue('isLeaf', false)
       }
     }
-  }, [currentState])
+  }, [currentState.isLeaf, currentState?.code])
 
   return isOpen ? (
     <Grid className={classes.root}>
