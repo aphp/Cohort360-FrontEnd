@@ -9,12 +9,7 @@ type CustomProps = {
 export const ChipWrapper = styled(Chip)<CustomProps>(({ color = '#0063AF', backgroundColor = '#FFF' }) => ({
   color: color,
   backgroundColor: backgroundColor,
-  fontSize: 12,
-  marginRight: 6,
-  marginBottom: 12,
-  '&:last-child': {
-    marginLeft: 0
-  }
+  fontSize: 12
 }))
 
 export const useStyles = makeStyles()(() => ({

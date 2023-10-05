@@ -43,7 +43,7 @@ export const getAge = (patient: CohortPatient): string => {
 export const getDurationRangeLabel = (dates: DurationRangeType) => {
   const minDate: DurationType = convertStringToDuration(dates[0]) ?? { year: 0, month: 0, day: 0 }
   const maxDate: DurationType = convertStringToDuration(dates[1]) ?? { year: 130, month: 0, day: 0 }
-  return `Âge entre
+  return `Âge / Prise en charge entre
     ${
       minDate.year || minDate.month || minDate.day
         ? `${(minDate.year ?? 0) > 0 ? `${minDate.year} an(s) ` : ``}
