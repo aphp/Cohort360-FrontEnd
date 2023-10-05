@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 
 import { IconButton, Typography, Avatar } from '@mui/material'
 
@@ -14,6 +14,8 @@ import { MeState } from 'state/me'
 
 import useStyles from './styles'
 import { SelectedCriteriaType } from 'types'
+import { checkIfCardNeedsCollapse } from 'utils/screen'
+import Criterias from './components/Criterias'
 
 type CriteriaCardProps = {
   itemId: number
@@ -28,10 +30,30 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active
 
+  /* à améliorer => inutile et peut être passé en props */
   const { selectedCriteria = [] } = useAppSelector((state) => state.cohortCreation.request || {})
 
   const currentCriterion = selectedCriteria.find((criteria) => criteria.id === itemId)
+
+  /*const [needCollapse, setNeedCollapse] = useState(false)
+  const [openCollapse, setOpenCollapse] = useState(false)*/
+
+  /*const containerRef = useRef(null)
+  const elementsRef = useRef(currentCriterion?.map(() => React.createRef()))*/
+
   if (!currentCriterion) return <></> // Bug, not possible ... The current item is not a criteria
+
+  /*useEffect(() => {
+    const handleResize = () => {
+      setNeedCollapse(checkIfCardNeedsCollapse(containerRef, elementsRef))
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [elementsRef])*/
 
   return (
     <div
@@ -43,10 +65,20 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
           {currentCriterion.id}
         </Avatar>
         <Typography className={classes.title}>- {currentCriterion.title} :</Typography>
-        <CriteriaCardContent currentCriteria={currentCriterion} />
+        <div /*ref={containerRef}*/ /*style={{ height: openCollapse ? '' : 40 }} className={classes.cardContent}*/>
+          <div /*ref={elementsRef.current[index]}*/>
+            <Criterias value={currentCriterion} />
+          </div>
+          {/*needCollapse && (
+                <IconButton onClick={() => setOpenCollapse(!openCollapse)} className={classes.chevronIcon} size="small">
+                  {openCollapse ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                </IconButton>
+              )*/}
+        </div>
+        {/*<CriteriaCardContent currentCriteria={currentCriterion} />*/}
       </div>
       <div className={classes.actionContainer}>
-        {currentCriterion.error ? (
+        {currentCriterion.error && (
           <IconButton
             size="small"
             onClick={() => editCriteria(currentCriterion)}
@@ -55,8 +87,6 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
           >
             <WarningIcon />
           </IconButton>
-        ) : (
-          <></>
         )}
         <IconButton
           size="small"

@@ -40,21 +40,9 @@ export const getAge = (patient: CohortPatient): string => {
   return 'Âge inconnu'
 }
 
-export const ageName = (dates: DurationRangeType) => {
+export const getDurationRangeLabel = (dates: DurationRangeType) => {
   const minDate: DurationType = convertStringToDuration(dates[0]) ?? { year: 0, month: 0, day: 0 }
   const maxDate: DurationType = convertStringToDuration(dates[1]) ?? { year: 130, month: 0, day: 0 }
-
-  if (
-    !minDate.year &&
-    !minDate.month &&
-    !minDate.day &&
-    (maxDate.year === 130 || !maxDate.year) &&
-    !maxDate.month &&
-    !maxDate.day
-  ) {
-    return ''
-  }
-
   return `Âge entre
     ${
       minDate.year || minDate.month || minDate.day

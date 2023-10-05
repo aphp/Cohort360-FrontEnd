@@ -41,11 +41,6 @@ export enum VitalStatus {
   ALL = 'all'
 }
 
-/*export enum VitalStatusLabel {
-  ALIVE = 'Vivant(e)',
-  DECEASED = 'Décédé(e)',
-  ALL = 'Tous les patients'
-}*/
 export enum Direction {
   ASC = 'asc',
   DESC = 'desc'

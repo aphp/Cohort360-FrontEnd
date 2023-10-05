@@ -10,7 +10,9 @@ import {
   IconButton,
   Typography,
   TextField,
-  Switch
+  Switch,
+  Select,
+  MenuItem
 } from '@mui/material'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
@@ -19,7 +21,6 @@ import useStyles from './styles'
 
 import { SelectedCriteriaType } from 'types'
 import { VitalStatusLabel, VitalStatus, DurationRangeType } from 'types/searchCriterias'
-import { Calendar, CalendarLabel, CalendarRequestLabel } from 'types/dates'
 import CalendarRange from 'components/ui/Inputs/Calendar/CalendarRange'
 import DurationRange from 'components/ui/Inputs/Duration/DurationRange'
 import { BlockWrapper } from 'components/ui/Layout'
@@ -51,26 +52,13 @@ const allVitalStatuses = [
     label: VitalStatusLabel.DECEASED
   }
 ]
-/* 
-const defaultDemographic: DemographicDataType = {
-  type: 'Patient',
-  title: 'Critère démographique',
-  vitalStatus: [],
-  genders: [],
-  age: [null, null],
-  birthdates: [null, null],
-  deathDates: [null, null],
-  // ageType: { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR },
-  //years: [0, 130],
-  isInclusive: true
-}
- */
+
 const DemographicForm = (props: DemographicFormProps) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [birthdates, setBirthdates] = useState<DurationRangeType>(selectedCriteria?.birthdates || [null, null])
   const [deathDates, setDeathDates] = useState<DurationRangeType>(selectedCriteria?.deathDates || [null, null])
   const [age, setAge] = useState<DurationRangeType>(selectedCriteria?.age || [null, null])
-  const [vitalStatus, setVitalStatus] = useState(selectedCriteria?.age || VitalStatus.ALL)
+  const [vitalStatus, setVitalStatus] = useState(selectedCriteria?.vitalStatus || VitalStatus.ALL)
   const [genders, setGenders] = useState(selectedCriteria?.genders || [])
   const [title, setTitle] = useState(selectedCriteria?.title || 'Critère démographique')
   const [isInclusive, setIsInclusive] = useState(selectedCriteria?.isInclusive || true)
@@ -99,6 +87,7 @@ const DemographicForm = (props: DemographicFormProps) => {
 
   const _onSubmit = () => {
     onChangeSelectedCriteria({
+      id: selectedCriteria?.id,
       age,
       birthdates,
       deathDates,
@@ -109,73 +98,6 @@ const DemographicForm = (props: DemographicFormProps) => {
       type: RESSOURCE_TYPE_PATIENT
     })
   }
-
-  /*const _onChangeValue = (key: string, value: any) => {
-    const _defaultValues = defaultValues ? { ...defaultValues } : {}
-    _defaultValues[key] = value
-    setDefaultValues(_defaultValues)
-  }*/
-
-  /*const defaultValuesGender =
-    genders && criteria.data.gender !== 'loading'
-      ? genders.map((gender: any) => {
-          const criteriaGender = criteria.data.gender ? criteria.data.gender.find((g: any) => g.id === gender.id) : null
-          return {
-            id: gender.id,
-            label: gender.label ? gender.label : criteriaGender?.label ?? '?'
-          }
-        })
-      : []*/
-  /*const defaultValuesVitalStatus =
-    defaultValues.vitalStatus && criteria.data.status !== 'loading'
-      ? defaultValues.vitalStatus.map((vitalStatus: any) => {
-          const criteriaStatus = criteria.data.status
-            ? criteria.data.status.find((s: any) => s.id === vitalStatus.id)
-            : null
-          return {
-            id: vitalStatus.id,
-            label: vitalStatus.label ? vitalStatus.label : criteriaStatus?.label ?? '?'
-          }
-        })
-      : []*/
-
-  /*useEffect(() => {
-     if (criteria.data.status !== 'loading') {
-      let status = defaultValues.find((vitalStatus) => )
-     }
-       ? defaultValues.vitalStatus.map((vitalStatus: any) => {
-           const criteriaStatus = criteria.data.status
-             ? criteria.data.status.find((s: any) => s.id === vitalStatus.id)
-             : null
-           return {
-             id: vitalStatus.id,
-             label: vitalStatus.label ? vitalStatus.label : criteriaStatus?.label ?? '?'
-           }
-         })
-       : []
-  }, [defaultValues, criteria])*/
-
-  /*useEffect(() => {
-    if (!Number.isInteger(defaultValues.years[0]) || !Number.isInteger(defaultValues.years[1])) {
-      setAgeError(true)
-    } else {
-      setAgeError(false)
-    }
-  }, [defaultValues.years])*/
-
-  /* const handleOptionsChange = (values: Options) => {
-    setVitalStatus({
-      ...vitalStatus,
-      options: vitalStatus.options.map((option) => {
-        if (values.find((value) => option.id === value.id)) {
-          option.checked = true
-        } else {
-          option.checked = false
-        }
-        return option
-      })
-    })
-  }*/
 
   return (
     <Grid className={classes.root}>
@@ -241,21 +163,19 @@ const DemographicForm = (props: DemographicFormProps) => {
             onChange={(e, value) => setGenders(value)}
             renderInput={(params) => <TextField {...params} label="Genre" />}
           />
-
-          <Autocomplete
-            id="criteria-vitalStatus-autocomplete"
+          <Select
             className={classes.inputItem}
-            options={allVitalStatuses}
-            getOptionLabel={(option) =>
-              option.label || VitalStatusLabel[option?.toUpperCase() as keyof typeof VitalStatusLabel]
-            }
-            isOptionEqualToValue={(option, value) => option.id === value}
+            id="vitalStatus"
             value={vitalStatus}
-            onChange={(e, value) => {
-              setVitalStatus(value.id)
-            }}
-            renderInput={(params) => <TextField {...params} label="Statut vital" />}
-          />
+            onChange={(event) => setVitalStatus(event.target.value as VitalStatus)}
+            label="Statut vital"
+          >
+            {allVitalStatuses.map((status) => (
+              <MenuItem key={status.id} value={status.id}>
+                {status.label}
+              </MenuItem>
+            ))}
+          </Select>
 
           <BlockWrapper margin="1em">
             <CalendarRange
