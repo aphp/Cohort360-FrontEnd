@@ -43,6 +43,21 @@ const useStyles = makeStyles()(() => ({
       margin: '12px 8px'
     }
   },
+  inputItem: {
+    margin: '1em',
+    width: 'calc(100% - 2em)'
+  },
+  durationLegend: {
+    color: '#5B5E63',
+    fontWeight: 900,
+    fontSize: 12,
+    textAlign: 'center'
+  },
+  textField: {
+    '& input': {
+      padding: '2px 4px 3px 0'
+    }
+  },
   durationContainer: {
     marginBottom: 20
   },

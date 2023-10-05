@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react'
 
-import { IconButton, Typography, Avatar } from '@mui/material'
+import { IconButton, Typography, Avatar, Grid } from '@mui/material'
 
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
@@ -56,28 +56,34 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
   }, [elementsRef])*/
 
   return (
-    <div
+    <Grid
+      container
+      justifyContent={'space-between'}
+      alignItems={'center'}
       className={classes.criteriaItem}
       style={{ backgroundColor: currentCriterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
     >
-      <div className={classes.criteriaTitleAndChips}>
+      <Grid container alignItems="center" item xs={12} lg={3}>
         <Avatar style={{ backgroundColor: '#5bc5f2', width: 24, height: 24, fontSize: 14 }}>
           {currentCriterion.id}
         </Avatar>
         <Typography className={classes.title}>- {currentCriterion.title} :</Typography>
-        <div /*ref={containerRef}*/ /*style={{ height: openCollapse ? '' : 40 }} className={classes.cardContent}*/>
-          <div /*ref={elementsRef.current[index]}*/>
-            <Criterias value={currentCriterion} />
-          </div>
-          {/*needCollapse && (
+      </Grid>
+      <Grid
+        container
+        spacing={1}
+        xs={12}
+        lg={7} /*ref={containerRef}*/ /*style={{ height: openCollapse ? '' : 40 }} className={classes.cardContent}*/
+      >
+        <Criterias value={currentCriterion} />
+        {/*needCollapse && (
                 <IconButton onClick={() => setOpenCollapse(!openCollapse)} className={classes.chevronIcon} size="small">
                   {openCollapse ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                 </IconButton>
               )*/}
-        </div>
         {/*<CriteriaCardContent currentCriteria={currentCriterion} />*/}
-      </div>
-      <div className={classes.actionContainer}>
+      </Grid>
+      <Grid item xs={12} lg={2} container justifyContent="flex-end">
         {currentCriterion.error && (
           <IconButton
             size="small"
@@ -112,8 +118,8 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
         >
           <DeleteIcon />
         </IconButton>
-      </div>
-    </div>
+      </Grid>
+    </Grid>
   )
 }
 

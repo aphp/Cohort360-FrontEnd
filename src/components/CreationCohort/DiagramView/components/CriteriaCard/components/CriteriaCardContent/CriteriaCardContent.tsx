@@ -301,7 +301,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         break
       }*/
 
-      case 'DocumentReference': {
+      /*case 'DocumentReference': {
         const displaySelectedDocType = (selectedDocTypes: DocType[]) => {
           let displayingSelectedDocTypes: any[] = []
           const allTypes = docTypes.docTypes.map((docType: DocType) => docType.type)
@@ -362,7 +362,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           )
         ]
         break
-      }
+      }*/
 
       case 'Encounter': {
         const displaySelectedEntryModes = (entryModes: { id: string; label: string }[]) => {

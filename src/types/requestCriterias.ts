@@ -11,3 +11,20 @@ export enum VitalStatusLabel {
   DECEASED = 'Décédé(e)',
   ALL = 'Tous les patients'
 }
+
+export enum MedicationType {
+  Request = 'MedicationRequest',
+  Administration = 'MedicationAdministration'
+}
+
+export enum MedicationTypeLabel {
+  Request = 'Prescription',
+  Administration = 'Administration'
+}
+
+export enum RequestCriteriasTypes {
+  Request = 'MedicationRequest',
+  Administration = 'MedicationAdministration',
+  Documents = 'DocumentReference',
+  IPPList = 'IPPList'
+}
