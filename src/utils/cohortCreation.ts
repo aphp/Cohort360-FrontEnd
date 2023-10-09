@@ -445,11 +445,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         'subject.active=true',
         `${
           criterion.code && criterion.code.length > 0
-            ? criterion.code.find((code) => code.id === '*')
-              ? `${MEDICATION_CODE}=${MEDICATION_ATC}|*`
-              : `${MEDICATION_CODE}=${criterion.code
-                  .map((diagnosticType: any) => `${diagnosticType.system}|${diagnosticType.id}`)
-                  .reduce(searchReducer)}`
+            ? `${MEDICATION_CODE}=${criterion.code
+                .map((diagnosticType: any) =>
+                  diagnosticType.id === '*' ? `${MEDICATION_ATC}|*` : `${diagnosticType.system}|${diagnosticType.id}`
+                )
+                .reduce(searchReducer)}`
             : ''
         }`,
         `${
@@ -1817,12 +1817,13 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
 export const findSelectedInListAndSubItems = (
   selectedItems: any[],
   searchedItem: any,
-  pmsiHierarchy: any[]
+  pmsiHierarchy: any[],
+  valueSetSystem?: string
 ): boolean => {
   if (!searchedItem || !selectedItems || selectedItems.length === 0) return false
   selectedItems = selectedItems?.filter(({ id }) => id !== 'loading')
   const foundItem = selectedItems.find((selectedItem) => {
-    if (selectedItem.id === searchedItem.id || selectedItem.id == '*') {
+    if (selectedItem.id === searchedItem.id || (selectedItem.id == '*' && valueSetSystem !== 'UCD')) {
       return true
     }
     return selectedItem.subItems

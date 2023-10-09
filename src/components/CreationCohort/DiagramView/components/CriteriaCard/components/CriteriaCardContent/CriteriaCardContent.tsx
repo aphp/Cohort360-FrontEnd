@@ -684,21 +684,18 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
         const displaySelectedCode = (codes: { id: string; label: string }[], tooltip?: boolean) => {
           let currentCode: string[] = []
-          if (codes && codes.find((code) => code.id === '*')) {
-            return 'Toute la hiérarchie'
-          } else {
-            for (const code of codes) {
-              const selectedCodeData =
-                data?.medicationData && data?.medicationData !== 'loading'
-                  ? data.medicationData.find((codeElement: any) => codeElement && codeElement.id === code.id)
-                  : null
-              currentCode = selectedCodeData
-                ? [...currentCode, displaySystem(selectedCodeData.system), selectedCodeData.label]
-                : currentCode
-            }
 
-            return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltip ? tooltipReducer : reducer) : ''
+          for (const code of codes) {
+            const selectedCodeData =
+              data?.medicationData && data?.medicationData !== 'loading'
+                ? data.medicationData.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                : null
+            currentCode = selectedCodeData
+              ? [...currentCode, displaySystem(selectedCodeData.system), selectedCodeData.label]
+              : currentCode
           }
+
+          return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltip ? tooltipReducer : reducer) : ''
         }
 
         const displaySelectedPrescriptionType = (prescriptionTypes: { id: string; label: string }[]) => {
