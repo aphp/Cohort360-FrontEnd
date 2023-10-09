@@ -193,7 +193,6 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
 
   const fetchPaginateData = () => {
     const nextPaginateData = medicationListUCD.slice((page - 1) * page_size, page * page_size)
-    console.log('nextPaginateData', nextPaginateData)
     setPaginateData([...paginateData, ...nextPaginateData])
     setPage(page + 1)
   }
