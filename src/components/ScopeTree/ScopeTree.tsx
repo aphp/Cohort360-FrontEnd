@@ -39,6 +39,7 @@ import {
 import servicesPerimeters, { loadingItem } from '../../services/aphp/servicePerimeters'
 import { findSelectedInListAndSubItems } from '../../utils/cohortCreation'
 import { _cancelPendingRequest } from 'utils/abortController'
+import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 type ScopeTreeListItemProps = {
   row: any
@@ -111,6 +112,7 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
               indeterminate={isIndeterminated(row)}
               checked={isSelected(row, selectedItems, rootRows) ? true : false}
               inputProps={{ 'aria-labelledby': labelId }}
+              indeterminateIcon={<IndeterminateCheckBoxOutlined />}
             />
           </TableCell>
           <TableCell>
@@ -448,6 +450,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
             checked={isHeadChecked}
             indeterminate={isHeadIndetermined}
             onClick={_onSelectAll}
+            indeterminateIcon={<IndeterminateCheckBoxOutlined />}
           />
         </div>
       )

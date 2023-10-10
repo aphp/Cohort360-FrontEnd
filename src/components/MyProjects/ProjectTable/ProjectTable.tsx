@@ -23,6 +23,7 @@ import { RequestState } from 'state/request'
 import { CohortState } from 'state/cohort'
 
 import useStyles from './styles'
+import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 type ProjectTableProps = {
   searchInput?: string
@@ -171,6 +172,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, setSelectedReq
                   }
                 }}
                 color="secondary"
+                indeterminateIcon={<IndeterminateCheckBoxOutlined />}
               />
             </TableCell>
             <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62 }} />
