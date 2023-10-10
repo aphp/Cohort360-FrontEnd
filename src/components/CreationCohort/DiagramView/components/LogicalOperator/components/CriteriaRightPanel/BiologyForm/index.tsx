@@ -78,7 +78,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         <Tab label="Formulaire" value="form" />
       </Tabs>
 
-      {selectedTab === 'form' && (
+      {
         <BiologyForm
           isOpen={selectedTab === 'form'}
           isEdition={isEdition}
@@ -88,7 +88,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
           onChangeSelectedCriteria={onChangeSelectedCriteria}
           goBack={goBack}
         />
-      )}
+      }
       {selectedTab === 'search' && (
         <BiologySearch
           isEdition={isEdition}
