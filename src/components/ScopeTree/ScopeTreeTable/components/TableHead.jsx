@@ -5,7 +5,6 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import TableSortLabel from '@mui/material/TableSortLabel'
 import Checkbox from '@mui/material/Checkbox'
-import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 function EnhancedTableHead(props) {
