@@ -185,7 +185,7 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
   const medicationListUCD = useAppSelector((state) => state.medication.ucdList || {})
   const [paginateData, setPaginateData] = useState<MedicationListType[]>([])
   const [page, setPage] = useState<number>(1)
-  const page_size = 100
+  const page_size = 30
 
   const _handleClick = async (newSelectedItems: PmsiListType[] | null | undefined, hierarchy?: PmsiListType[]) => {
     onChangeSelectedHierarchy(newSelectedItems, hierarchy)
@@ -276,6 +276,7 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
             dataLength={paginateData.length}
             next={fetchPaginateData}
             hasMore={paginateData.length < medicationListUCD.length}
+            scrollThreshold={1}
             loader={<div>Loading...</div>}
           >
             {paginateData.map((medicationItem, index) => (
