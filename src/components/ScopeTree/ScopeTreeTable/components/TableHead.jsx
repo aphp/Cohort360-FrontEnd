@@ -5,7 +5,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import TableSortLabel from '@mui/material/TableSortLabel'
 import Checkbox from '@mui/material/Checkbox'
-import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox'
+import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 function EnhancedTableHead(props) {
   const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props
@@ -22,10 +22,10 @@ function EnhancedTableHead(props) {
           <TableCell align="center" padding="checkbox">
             <Checkbox
               indeterminate={numSelected > 0 && numSelected < rowCount}
-              indeterminateIcon={<IndeterminateCheckBoxIcon color="primary" />}
               checked={rowCount > 0 && numSelected === rowCount}
               onChange={onSelectAllClick}
               inputProps={{ 'aria-label': 'select all desserts' }}
+              indeterminateIcon={<IndeterminateCheckBoxOutlined />}
             />
           </TableCell>
         )}

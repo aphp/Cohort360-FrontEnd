@@ -40,6 +40,7 @@ import {
 import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
 import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
+import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 const defaultComposition: DocumentDataType = {
   type: 'DocumentReference',
@@ -256,6 +257,7 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
                       }
                       checked={currentDocTypeList.length === currentSelectedDocTypeList.length}
                       onClick={onClick}
+                      indeterminateIcon={<IndeterminateCheckBoxOutlined />}
                     />
                     <Typography onClick={onClick} noWrap style={{ cursor: 'pointer', width: 'calc(100% - 150px' }}>
                       {docType.group}
