@@ -90,6 +90,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
     handleClick(newSelectedItems)
     dispatch(decrementLoadingSyncHierarchyTable())
   }
+  console.log('subitems', subItems)
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
     return (
@@ -129,9 +130,15 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
           />
         </ListItemIcon>
         <Tooltip title={label} enterDelay={2500}>
-          <ListItemText onClick={() => _onExpand(id)} className={classes.label} primary={label} />
+          <ListItemText
+            onClick={valueSetSystem === 'UCD' ? undefined : () => _onExpand(id)}
+            className={classes.label}
+            primary={label}
+          />
         </Tooltip>
         {id !== '*' &&
+          subItems?.length > 0 &&
+          subItems[0]?.label !== 'loading' &&
           (open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => _onExpand(id)} />)}
       </ListItem>
       <Collapse in={id === '*' ? true : open} timeout="auto" unmountOnExit>
