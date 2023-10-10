@@ -90,7 +90,6 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
     handleClick(newSelectedItems)
     dispatch(decrementLoadingSyncHierarchyTable())
   }
-  console.log('subitems', subItems)
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
     return (
@@ -137,8 +136,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
           />
         </Tooltip>
         {id !== '*' &&
-          subItems?.length > 0 &&
-          subItems[0]?.label !== 'loading' &&
+          valueSetSystem !== 'UCD' &&
           (open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => _onExpand(id)} />)}
       </ListItem>
       <Collapse in={id === '*' ? true : open} timeout="auto" unmountOnExit>
@@ -244,10 +242,11 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
       </Grid>
 
       <div className={classes.loader}>{loading && <LinearProgress />}</div>
-      <Grid container>
-        <Typography>Référentiel : </Typography>
+      <Grid container className={classes.referentielContainer}>
+        <Typography variant="h3">Référentiel : </Typography>
         <Select
-          style={{ marginRight: '1em' }}
+          className={classes.select}
+          style={{ height: 32 }}
           id="criteria-occurrenceComparator-select"
           value={selectState}
           onChange={(event) => setSelectState(event.target.value as 'ATC' | 'UCD')}

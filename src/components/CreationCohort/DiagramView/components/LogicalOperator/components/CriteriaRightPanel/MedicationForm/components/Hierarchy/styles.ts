@@ -25,6 +25,7 @@ const useStyles = makeStyles()(() => ({
     justifyContent: 'center',
     flexWrap: 'wrap',
     borderTop: '1px solid grey',
+    backgroundColor: 'white',
     position: 'absolute',
     width: '100%',
     bottom: 0,
@@ -72,7 +73,7 @@ const useStyles = makeStyles()(() => ({
     borderRadius: 10
   },
   drawerContentContainer: {
-    height: 'calc(100vh - 207px)',
+    maxHeight: 'calc(100vh - 250px)',
     overflow: 'auto',
     margin: 12
   },
@@ -95,6 +96,19 @@ const useStyles = makeStyles()(() => ({
     height: 2,
     marginTop: 14.5,
     background: '#D0D7D8'
+  },
+  referentielContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  select: {
+    marginLeft: 8,
+    borderRadius: 25,
+    backgroundColor: '#FFF',
+    '& .MuiSelect-select': {
+      borderRadius: 25
+    }
   }
 }))
 
