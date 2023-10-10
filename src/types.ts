@@ -242,7 +242,7 @@ export enum SearchByTypes {
 
 export type AbstractTree<T> = T & {
   id: string
-  subItems: AbstractTree<T>[]
+  subItems?: AbstractTree<T>[]
 }
 
 export enum VitalStatus {
@@ -541,6 +541,11 @@ export type GhmDataType = {
   startOccurrence: Date | ''
   endOccurrence: Date | ''
   isInclusive?: boolean
+}
+
+export enum ValueSetSystem {
+  ATC = 'ATC',
+  UCD = 'UCD'
 }
 
 export enum Calendar {
@@ -925,11 +930,14 @@ export type HierarchyTree = null | {
   code?: HierarchyElement[]
   loading?: number
 }
-export type HierarchyElement = {
+export type HierarchyElement<E = {}> = E & {
   id: string
   label: string
   subItems?: HierarchyElement[]
 }
+
+export type HierarchyElementWithSystem = HierarchyElement<{ system?: string }>
+
 export type TreeElement = { id: string; subItems: TreeElement[] }
 export type ScopeElement = {
   id: number

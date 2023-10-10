@@ -11,6 +11,7 @@ import ModalCreateNewRequest from './Modals/ModalCreateNewRequest/ModalCreateNew
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchRequestCohortCreation, resetCohortCreation, unbuildCohortCreation } from 'state/cohortCreation'
 import { setCriteriaList } from 'state/criteria'
+import { setSelectedRequest } from 'state/request'
 
 import { CurrentSnapshot } from 'types'
 
@@ -202,7 +203,7 @@ const Requeteur = () => {
         onRedo={_canRedo() ? _onRedo : undefined}
       />
 
-      {!requestIdFromUrl && !requestId && <ModalCreateNewRequest />}
+      {!requestIdFromUrl && !requestId && <ModalCreateNewRequest onClose={() => dispatch(setSelectedRequest(null))} />}
     </>
   )
 }

@@ -13,12 +13,14 @@ export type MedicationState = {
   loading: boolean
   list: MedicationListType[]
   openedElement: string[]
+  ucdList: MedicationListType[]
 }
 
 const defaultInitialState: MedicationState = {
   loading: false,
   list: [],
-  openedElement: []
+  openedElement: [],
+  ucdList: []
 }
 
 const initMedicationHierarchy = createAsyncThunk<MedicationState, void, { state: RootState }>(
@@ -31,10 +33,13 @@ const initMedicationHierarchy = createAsyncThunk<MedicationState, void, { state:
       const medicationList: MedicationListType[] =
         list.length === 0 ? await services.cohortCreation.fetchAtcHierarchy('') : list
 
+      const medicationUCDList: MedicationListType[] = await services.cohortCreation.fetchUCDList('')
+
       return {
         ...state,
         loading: false,
-        list: medicationList
+        list: medicationList,
+        ucdList: medicationUCDList
       }
     } catch (error) {
       console.error(error)
@@ -48,11 +53,13 @@ const fetchMedication = createAsyncThunk<MedicationState, void, { state: RootSta
   async (DO_NOT_USE, { getState }) => {
     const state = getState().medication
     const medicationList: MedicationListType[] = await services.cohortCreation.fetchAtcHierarchy('')
+    const medicationUCDList: MedicationListType[] = await services.cohortCreation.fetchUCDList('')
 
     return {
       ...state,
       list: medicationList,
       openedElement: [],
+      ucdList: medicationUCDList,
       loading: false
     }
   }
@@ -129,7 +136,8 @@ const medicationSlice = createSlice({
       return {
         loading: false,
         list: [],
-        openedElement: []
+        openedElement: [],
+        ucdList: []
       }
     }
   },

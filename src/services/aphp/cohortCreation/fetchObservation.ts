@@ -3,13 +3,17 @@ import {
   BIOLOGY_HIERARCHY_ITM_LOINC,
   CONCEPT_MAP_HIERARCHY_EXTENSION_NAME
 } from '../../../constants'
-import { targetDisplaySort } from 'utils/alphabeticalSort'
+import { displaySort } from 'utils/alphabeticalSort'
 import apiFhir from 'services/apiFhir'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import { FHIR_Bundle_Response, ValueSet } from 'types'
 import { ConceptMap } from 'fhir/r4'
 
-export const fetchBiologySearch = async (searchInput: string): Promise<{ anabio: ValueSet[]; loinc: ValueSet[] }> => {
+export type ValueSetWithHierarchy = ValueSet & { hierarchyDisplay: string }
+
+export const fetchBiologySearch = async (
+  searchInput: string
+): Promise<{ anabio: ValueSetWithHierarchy[]; loinc: ValueSetWithHierarchy[] }> => {
   if (!searchInput) {
     return {
       anabio: [],
@@ -37,18 +41,15 @@ export const fetchBiologySearch = async (searchInput: string): Promise<{ anabio:
 
   const data = getApiResponseResources(res)
 
-  const loincResults = getSourceData(BIOLOGY_HIERARCHY_ITM_LOINC, data).sort(targetDisplaySort)
+  const loincResults = getSourceData(BIOLOGY_HIERARCHY_ITM_LOINC, data).sort(displaySort)
   const uniqueLoincResults = getUniqueLoincResults(loincResults)
-  const anabioResults = getSourceData(BIOLOGY_HIERARCHY_ITM_ANABIO, data).sort(targetDisplaySort)
-  const cleanAnabioResults = getCleanAnabioResults(anabioResults)
+  const anabioResults = getSourceData(BIOLOGY_HIERARCHY_ITM_ANABIO, data).sort(displaySort)
 
   return {
-    anabio: cleanAnabioResults ?? [],
+    anabio: anabioResults ?? [],
     loinc: uniqueLoincResults ?? []
   }
 }
-
-type ValueSetWithHierarchy = ValueSet & { hierarchyDisplay: string }
 
 const getSourceData = (codeSystem: string, data?: ConceptMap[]): Array<ValueSetWithHierarchy> => {
   if (!data || data.length === 0) {
@@ -83,13 +84,4 @@ const getUniqueLoincResults = (loincResults: ValueSetWithHierarchy[]) => {
         !set.has(f.code) && set.add(f.code)
     )(new Set())
   )
-}
-
-const getCleanAnabioResults = (anabioResults: ValueSetWithHierarchy[]) => {
-  return anabioResults.map((anabioResult) => {
-    return {
-      code: anabioResult.code,
-      display: anabioResult.hierarchyDisplay
-    }
-  })
 }

@@ -148,8 +148,12 @@ const DataTableCompositionLine: React.FC<{
     ({ code }) => code === (document?.type?.coding?.[0] ? document.type.coding[0].code : '-')
   )
 
-  const documentContent = document?.content?.[1]?.attachment?.data
-    ? Buffer.from(document.content[1].attachment.data, 'base64').toString('utf-8')
+  const findContent = document?.content?.find(
+    (content) => content.attachment?.contentType === 'http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain'
+  )
+
+  const documentContent = findContent?.attachment?.data
+    ? Buffer.from(findContent?.attachment.data, 'base64').toString('utf-8')
     : ''
 
   const date = document.date ? new Date(document.date).toLocaleDateString('fr-FR') : ''

@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 import {
   Button,
@@ -13,7 +14,9 @@ import {
   ListItemText,
   Skeleton,
   Tooltip,
-  Typography
+  Typography,
+  Select,
+  MenuItem
 } from '@mui/material'
 
 import ExpandLess from '@mui/icons-material/ExpandLess'
@@ -42,10 +45,11 @@ type MedicationListItemProps = {
   selectedItems?: MedicationListType[] | null
   handleClick: (medicationItem: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
   setLoading: (isLoading: boolean) => void
+  valueSetSystem?: 'ATC' | 'UCD'
 }
 
 const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
-  const { medicationItem, selectedItems, handleClick, setLoading } = props
+  const { medicationItem, selectedItems, handleClick, setLoading, valueSetSystem } = props
   const { id, label, subItems } = medicationItem
 
   const { classes, cx } = useStyles()
@@ -59,7 +63,8 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
   const isSelected = findSelectedInListAndSubItems(
     selectedItems ? selectedItems : [],
     medicationItem,
-    medicationHierarchy
+    medicationHierarchy,
+    valueSetSystem
   )
   const isIndeterminated = checkIfIndeterminated(medicationItem, selectedItems)
 
@@ -124,9 +129,14 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
           />
         </ListItemIcon>
         <Tooltip title={label} enterDelay={2500}>
-          <ListItemText onClick={() => _onExpand(id)} className={classes.label} primary={label} />
+          <ListItemText
+            onClick={valueSetSystem === 'UCD' ? undefined : () => _onExpand(id)}
+            className={classes.label}
+            primary={label}
+          />
         </Tooltip>
         {id !== '*' &&
+          valueSetSystem !== 'UCD' &&
           (open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => _onExpand(id)} />)}
       </ListItem>
       <Collapse in={id === '*' ? true : open} timeout="auto" unmountOnExit>
@@ -157,7 +167,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
   )
 }
 
-type MedicationHierarchyProps = {
+type MedicationExplorationProps = {
   isOpen: boolean
   selectedCriteria: any
   goBack: (data: any) => void
@@ -166,7 +176,7 @@ type MedicationHierarchyProps = {
   isEdition?: boolean
 }
 
-const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
+const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
   const { isOpen = false, selectedCriteria, onChangeSelectedHierarchy, onConfirm, goBack, isEdition } = props
 
   const { classes } = useStyles()
@@ -175,11 +185,26 @@ const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
   const isLoadingMedication: number = useAppSelector((state) => state.medication.syncLoading || 0)
   const [currentState, setCurrentState] = useState({ ...selectedCriteria, ...initialState })
   const [loading, setLoading] = useState(isLoadingSyncHierarchyTable > 0 || isLoadingMedication > 0)
+  const [selectState, setSelectState] = useState<'ATC' | 'UCD'>('ATC')
   const medicationHierarchy = useAppSelector((state) => state.medication.list || {})
+  const medicationListUCD = useAppSelector((state) => state.medication.ucdList || {})
+  const [paginateData, setPaginateData] = useState<MedicationListType[]>([])
+  const [page, setPage] = useState<number>(1)
+  const page_size = 30
 
   const _handleClick = async (newSelectedItems: PmsiListType[] | null | undefined, hierarchy?: PmsiListType[]) => {
     onChangeSelectedHierarchy(newSelectedItems, hierarchy)
   }
+
+  const fetchPaginateData = () => {
+    const nextPaginateData = medicationListUCD.slice((page - 1) * page_size, page * page_size)
+    setPaginateData([...paginateData, ...nextPaginateData])
+    setPage(page + 1)
+  }
+
+  useEffect(() => {
+    fetchPaginateData()
+  }, [])
 
   useEffect(() => {
     const newList = { ...selectedCriteria, ...initialState } ?? {}
@@ -217,18 +242,62 @@ const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
       </Grid>
 
       <div className={classes.loader}>{loading && <LinearProgress />}</div>
-      <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-        {medicationHierarchy &&
-          medicationHierarchy.map((medicationItem, index) => (
+      <Grid container className={classes.referentielContainer}>
+        <Typography variant="h3">Référentiel : </Typography>
+        <Select
+          className={classes.select}
+          style={{ height: 32 }}
+          id="criteria-occurrenceComparator-select"
+          value={selectState}
+          onChange={(event) => setSelectState(event.target.value as 'ATC' | 'UCD')}
+        >
+          <MenuItem value={'ATC'}>{'Médicament ATC'}</MenuItem>
+          <MenuItem value={'UCD'}>{'SMT - Médicament - UCD'}</MenuItem>
+        </Select>
+      </Grid>
+      {selectState === 'ATC' && medicationHierarchy && (
+        <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
+          {medicationHierarchy.map((medicationItem, index) => (
             <MedicationListItem
               key={index}
               medicationItem={medicationItem}
               selectedItems={currentState.code}
               handleClick={_handleClick}
               setLoading={setLoading}
+              valueSetSystem={selectState}
             />
           ))}
-      </List>
+        </List>
+      )}
+
+      {selectState === 'UCD' && paginateData && (
+        <List
+          id="scrollableDiv"
+          component="nav"
+          aria-labelledby="nested-list-subheader"
+          className={classes.drawerContentContainer}
+        >
+          <InfiniteScroll
+            scrollableTarget="scrollableDiv"
+            dataLength={paginateData.length}
+            next={fetchPaginateData}
+            hasMore={paginateData.length < medicationListUCD.length}
+            scrollThreshold={1}
+            loader={<div>Loading...</div>}
+          >
+            {paginateData.map((medicationItem, index) => (
+              <MedicationListItem
+                key={index}
+                medicationItem={medicationItem}
+                selectedItems={currentState.code}
+                handleClick={_handleClick}
+                setLoading={setLoading}
+                valueSetSystem={selectState}
+              />
+            ))}
+          </InfiniteScroll>
+        </List>
+      )}
 
       <Grid className={classes.medicationHierarchyActionContainer}>
         {!isEdition && (
@@ -246,4 +315,4 @@ const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
   )
 }
 
-export default MedicationHierarchy
+export default MedicationExploration

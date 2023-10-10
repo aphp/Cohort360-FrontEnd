@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Tabs, Tab } from '@mui/material'
 
 import MedicationForm from './components/Form/MedicationForm'
-import MedicationHierarchy from './components/Hierarchy/MedicationHierarchy'
+import MedicationExploration from './components/Hierarchy/MedicationHierarchy'
 
 import { CriteriaDrawerComponentProps, MedicationDataType } from 'types'
 
@@ -29,7 +29,7 @@ export const defaultMedication: MedicationDataType = {
 
 const Index = (props: CriteriaDrawerComponentProps) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
+  const [selectedTab, setSelectedTab] = useState<'form' | 'exploration'>(selectedCriteria ? 'form' : 'exploration')
   const [defaultCriteria, setDefaultCriteria] = useState(selectedCriteria || defaultMedication)
 
   const isEdition = selectedCriteria !== null
@@ -76,7 +76,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         value={selectedTab}
         onChange={(e, tab) => setSelectedTab(tab)}
       >
-        <Tab label="Hiérarchie" value="hierarchy" />
+        <Tab label="Exploration" value="exploration" />
         <Tab label="Formulaire" value="form" />
       </Tabs>
 
@@ -92,8 +92,8 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         />
       }
       {
-        <MedicationHierarchy
-          isOpen={selectedTab === 'hierarchy'}
+        <MedicationExploration
+          isOpen={selectedTab === 'exploration'}
           isEdition={isEdition}
           selectedCriteria={defaultCriteria}
           onChangeSelectedHierarchy={_onChangeSelectedHierarchy}

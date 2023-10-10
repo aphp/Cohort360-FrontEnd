@@ -66,7 +66,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
   }
 
   const findContent = documentContent?.content?.find(
-    (content) => content.attachment?.contentType === 'Document Data (Base64 Encoded)'
+    (content) => content.attachment?.contentType === 'http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain'
   )
 
   const documentContentDecode =
