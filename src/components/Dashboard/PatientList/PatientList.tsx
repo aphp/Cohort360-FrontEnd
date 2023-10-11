@@ -22,21 +22,21 @@ import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import { substructAgeString } from 'utils/age'
 import { _cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
-import Searchbar from 'components/ui/Searchbar/Searchbar'
+import Searchbar from 'components/ui/Searchbar'
 import Select from 'components/ui/Searchbar/Select'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import DisplayDigits from 'components/ui/Display/DisplayDigits/DisplayDigits'
-import { ActionTypes, FilterKeys, searchByListPatients, SearchByTypes } from 'types/searchCriterias'
+import DisplayDigits from 'components/ui/Display/DisplayDigits'
+import { FilterKeys, searchByListPatients, SearchByTypes } from 'types/searchCriterias'
 import Chip from 'components/ui/Chips/Chip'
-import Button from 'components/ui/Button/Button'
-import Modal from 'components/ui/Modal/Modal'
-import useSearchCriterias, { initPatientsSearchCriterias } from 'hooks/useSearchCriterias'
+import Button from 'components/ui/Button'
+import Modal from 'components/ui/Modal'
 import { selectFiltersAsArray } from 'utils/filters'
 import GendersFilter from 'components/Filters/GendersFilter/GenderFilter'
 import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter/VitalStatusesFilter'
 import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters/BirthdatesRangesFilter'
-import { BlockWrapper } from 'components/ui/Layout/styles'
-import DisplayLocked from 'components/ui/Display/DisplayLocked/DisplayLocked'
+import { BlockWrapper } from 'components/ui/Layout'
+import DisplayLocked from 'components/ui/Display/DisplayLocked'
+import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/searchCriteriasReducer'
 
 type PatientListProps = {
   total: number
@@ -65,7 +65,7 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
       searchInput,
       filters: { genders, birthdatesRanges, vitalStatuses }
     },
-    dispatch
+    { changeOrderBy, changeSearchBy, changeSearchInput, addFilters, removeFilter }
   ] = useSearchCriterias(initPatientsSearchCriterias)
 
   const filtersAsArray = useMemo(() => {
@@ -165,9 +165,7 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
                 label="Rechercher dans :"
                 width={'25%'}
                 items={searchByListPatients}
-                onchange={(newValue: SearchByTypes) =>
-                  dispatch({ type: ActionTypes.CHANGE_SEARCH_BY, payload: newValue })
-                }
+                onchange={(newValue: SearchByTypes) => changeSearchBy(newValue)}
               />
             )}
             {deidentified ? (
@@ -177,7 +175,7 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
                 value={searchInput}
                 placeholder="Rechercher"
                 width={'50%'}
-                onchange={(newValue) => dispatch({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })}
+                onchange={(newValue) => changeSearchInput(newValue)}
               />
             )}
             <Button width={'25%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
@@ -188,12 +186,7 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
               title="Filtrer les patients"
               open={toggleModal}
               onClose={() => setToggleModal(false)}
-              onSubmit={(newFilters) => {
-                dispatch({
-                  type: ActionTypes.ADD_FILTERS,
-                  payload: { genders, birthdatesRanges, vitalStatuses, ...newFilters }
-                })
-              }}
+              onSubmit={(newFilters) => addFilters({ genders, birthdatesRanges, vitalStatuses, ...newFilters })}
             >
               <GendersFilter name={FilterKeys.GENDERS} value={genders} />
               <VitalStatusesFilter name={FilterKeys.VITAL_STATUSES} value={vitalStatuses} />
@@ -204,13 +197,7 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
       </BlockWrapper>
       <Grid item xs={12}>
         {filtersAsArray.map((filter, index) => (
-          <Chip
-            key={index}
-            label={filter.label}
-            onDelete={() => {
-              dispatch({ type: ActionTypes.REMOVE_FILTER, payload: { key: filter.category, value: filter.value } })
-            }}
-          />
+          <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
         ))}
       </Grid>
       <Grid item xs={12}>
@@ -220,7 +207,7 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
           deidentified={deidentified ?? false}
           patientsList={patientsList ?? []}
           orderBy={orderBy}
-          setOrderBy={(orderBy) => dispatch({ type: ActionTypes.CHANGE_ORDER_BY, payload: orderBy })}
+          setOrderBy={(orderBy) => changeOrderBy(orderBy)}
           page={page}
           setPage={(newPage) => setPage(newPage)}
           total={patientsResult.nb}

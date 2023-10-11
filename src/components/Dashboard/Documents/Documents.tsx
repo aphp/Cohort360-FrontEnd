@@ -4,26 +4,26 @@ import DataTableComposition from 'components/DataTable/DataTableComposition'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 import { CohortComposition, CriteriaName, DocumentsData, LoadingStatus, DTTB_ResultsType as ResultsType } from 'types'
 import services from 'services/aphp'
-import { ActionTypes, FilterKeys, SearchByTypes, searchByListDocuments } from 'types/searchCriterias'
+import { FilterKeys, SearchByTypes, searchByListDocuments } from 'types/searchCriterias'
 import allDocTypesList from 'assets/docTypes.json'
-import useSearchCriterias, { initAllDocsSearchCriterias } from 'hooks/useSearchCriterias'
 import { SearchInputError } from 'types/error'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilter'
 import DocTypesFilter from 'components/Filters/DocTypesFilter/DocTypesFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/ExecutiveUnitsFilter'
 import NdaFilter from 'components/Filters/NdaFilter/NdaFilter'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import Searchbar from 'components/ui/Searchbar/Searchbar'
+import Searchbar from 'components/ui/Searchbar'
 import Select from 'components/ui/Searchbar/Select'
-import Button from 'components/ui/Button/Button'
-import Modal from 'components/ui/Modal/Modal'
-import DisplayDigits from 'components/ui/Display/DisplayDigits/DisplayDigits'
+import Button from 'components/ui/Button'
+import Modal from 'components/ui/Modal'
+import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import IppFilter from 'components/Filters/IppFilter/IppFilter'
 import { selectFiltersAsArray } from 'utils/filters'
 import Chip from 'components/ui/Chips/Chip'
-import { AlertWrapper } from 'components/ui/Alert/styles'
+import { AlertWrapper } from 'components/ui/Alert'
 import { _cancelPendingRequest } from 'utils/abortController'
-import { BlockWrapper } from 'components/ui/Layout/styles'
+import { BlockWrapper } from 'components/ui/Layout'
+import useSearchCriterias, { initAllDocsSearchCriterias } from 'reducers/searchCriteriasReducer'
 
 type DocumentsProps = {
   groupId?: string
@@ -47,7 +47,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
       filters,
       filters: { nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate, ipp }
     },
-    dispatchSearchCriteriasAction
+    { changeOrderBy, changeSearchInput, changeSearchBy, addFilters, removeFilter }
   ] = useSearchCriterias(initAllDocsSearchCriterias)
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate, ipp })
@@ -138,18 +138,14 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
             label="Rechercher dans :"
             width={'170px'}
             items={searchByListDocuments}
-            onchange={(newValue) =>
-              dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_BY, payload: newValue })
-            }
+            onchange={(newValue) => changeSearchBy(newValue)}
           />
           <SearchInput
             value={searchInput}
             placeholder={'Rechercher dans les documents'}
             displayHelpIcon
             error={searchInputError}
-            onchange={(newValue) =>
-              dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })
-            }
+            onchange={(newValue) => changeSearchInput(newValue)}
           />
           <Button width={'150px'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
             Filtrer
@@ -157,16 +153,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
         </Searchbar>
         <Grid item xs={12}>
           {filtersAsArray.map((filter, index) => (
-            <Chip
-              key={index}
-              label={filter.label}
-              onDelete={() => {
-                dispatchSearchCriteriasAction({
-                  type: ActionTypes.REMOVE_FILTER,
-                  payload: { key: filter.category, value: filter.value }
-                })
-              }}
-            />
+            <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
           ))}
         </Grid>
       </BlockWrapper>
@@ -196,17 +183,14 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
               <Checkbox
                 checked={onlyPdfAvailable}
                 onChange={() =>
-                  dispatchSearchCriteriasAction({
-                    type: ActionTypes.ADD_FILTERS,
-                    payload: {
-                      nda,
-                      ipp,
-                      executiveUnits,
-                      docTypes,
-                      startDate,
-                      endDate,
-                      onlyPdfAvailable: !onlyPdfAvailable
-                    }
+                  addFilters({
+                    nda,
+                    ipp,
+                    executiveUnits,
+                    docTypes,
+                    startDate,
+                    endDate,
+                    onlyPdfAvailable: !onlyPdfAvailable
                   })
                 }
               />
@@ -225,7 +209,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
         groupId={groupId}
         documentsList={documents ?? []}
         orderBy={orderBy}
-        setOrderBy={(orderBy) => dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_ORDER_BY, payload: orderBy })}
+        setOrderBy={(orderBy) => changeOrderBy(orderBy)}
         page={page}
         setPage={(newPage: number) => setPage(newPage)}
         total={documentsResult.nb}
@@ -235,12 +219,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
         open={toggleModal}
         width={'600px'}
         onClose={() => setToggleModal(false)}
-        onSubmit={(newFilters) => {
-          dispatchSearchCriteriasAction({
-            type: ActionTypes.ADD_FILTERS,
-            payload: { ...filters, ...newFilters }
-          })
-        }}
+        onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
       >
         {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
         {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp} />}

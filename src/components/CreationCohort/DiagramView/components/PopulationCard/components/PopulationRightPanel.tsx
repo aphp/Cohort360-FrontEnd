@@ -8,10 +8,10 @@ import ScopeTree from 'components/ScopeTree/ScopeTree'
 import { ScopeType, ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
-import Searchbar from 'components/ui/Searchbar/Searchbar'
+import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { Grid } from '@mui/material'
-import { BlockWrapper } from 'components/ui/Layout/styles'
+import { BlockWrapper } from 'components/ui/Layout'
 
 type PopulationRightPanelProps = {
   open: boolean

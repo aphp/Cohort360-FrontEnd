@@ -13,7 +13,6 @@ import services from 'services/aphp'
 import { CohortPatient, DTTB_ResultsType as ResultsType, LoadingStatus } from 'types'
 
 import {
-  ActionTypes,
   Direction,
   FilterKeys,
   Order,
@@ -27,25 +26,25 @@ import {
 
 import GendersFilter from 'components/Filters/GendersFilter/GenderFilter'
 
-import Button from 'components/ui/Button/Button'
+import Button from 'components/ui/Button'
 import Chip from 'components/ui/Chips/Chip'
-import { BlockWrapper } from 'components/ui/Layout/styles'
-import Modal from 'components/ui/Modal/Modal'
-import Searchbar from 'components/ui/Searchbar/Searchbar'
+import { BlockWrapper } from 'components/ui/Layout'
+import Modal from 'components/ui/Modal'
+import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Select from 'components/ui/Searchbar/Select'
 
 import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter/VitalStatusesFilter'
 import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters/BirthdatesRangesFilter'
 
-import useSearchCriterias, { initPatientsSearchCriterias } from 'hooks/useSearchCriterias'
 import { CanceledError } from 'axios'
 
 import useStyles from './styles'
 import ListPatient from 'components/DataTable/ListPatient'
 import OrderByFilter from 'components/Filters/OrderByFilter/OrderByFilter'
 import OrderDirectionFilter from 'components/Filters/OrderDirectionFilter/OrderDirectionFilter'
-import DisplayLocked from 'components/ui/Display/DisplayLocked/DisplayLocked'
+import DisplayLocked from 'components/ui/Display/DisplayLocked'
+import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/searchCriteriasReducer'
 
 type PatientSidebarTypes = {
   total: number
@@ -78,7 +77,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       filters,
       filters: { genders, birthdatesRanges, vitalStatuses }
     },
-    dispatch
+    { changeOrderBy, changeSearchInput, changeSearchBy, addFilters, removeFilter }
   ] = useSearchCriterias(initPatientsSearchCriterias)
 
   const filtersAsArray = useMemo(() => {
@@ -164,9 +163,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
                 label="Rechercher dans :"
                 width={'40%'}
                 items={searchByListPatients}
-                onchange={(newValue: SearchByTypes) =>
-                  dispatch({ type: ActionTypes.CHANGE_SEARCH_BY, payload: newValue })
-                }
+                onchange={(newValue: SearchByTypes) => changeSearchBy(newValue)}
               />
             )}
             {deidentifiedBoolean ? (
@@ -176,12 +173,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
                 value={searchInput}
                 placeholder="Rechercher"
                 width="60%"
-                onchange={(newValue) =>
-                  dispatch({
-                    type: ActionTypes.CHANGE_SEARCH_INPUT,
-                    payload: newValue
-                  })
-                }
+                onchange={(newValue) => changeSearchInput(newValue)}
               />
             )}
           </Grid>
@@ -197,9 +189,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
               title="Filtrer les patients"
               open={toggleFiltersModal}
               onClose={() => setToggleFiltersModal(false)}
-              onSubmit={(newFilters) => {
-                dispatch({ type: ActionTypes.ADD_FILTERS, payload: { ...filters, ...newFilters } })
-              }}
+              onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
             >
               <GendersFilter name={FilterKeys.GENDERS} value={genders} />
               <VitalStatusesFilter name={FilterKeys.VITAL_STATUSES} value={vitalStatuses} />
@@ -214,9 +204,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
               open={toggleSortModal}
               onClose={() => setToggleSortModal(false)}
               width="600px"
-              onSubmit={(newOrder: OrderBy) => {
-                dispatch({ type: ActionTypes.CHANGE_ORDER_BY, payload: newOrder })
-              }}
+              onSubmit={(newOrder: OrderBy) => changeOrderBy(newOrder)}
             >
               <Grid container direction="row" justifyContent="space-between" alignItems="center">
                 <OrderByFilter
@@ -235,13 +223,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       </BlockWrapper>
       <Grid item style={{ margin: '0 4px' }}>
         {filtersAsArray.map((filter, index) => (
-          <Chip
-            key={index}
-            label={filter.label}
-            onDelete={() => {
-              dispatch({ type: ActionTypes.REMOVE_FILTER, payload: { key: filter.category, value: filter.value } })
-            }}
-          />
+          <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
         ))}
       </Grid>
       <Divider />
