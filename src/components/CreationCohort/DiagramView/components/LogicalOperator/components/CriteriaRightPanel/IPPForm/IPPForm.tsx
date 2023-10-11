@@ -54,6 +54,8 @@ const IPPForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
 
     if (ippList.length > 0) {
       setError(false)
+    } else {
+      setError(true)
     }
   }, [defaultValues.search])
 
