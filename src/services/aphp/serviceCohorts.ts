@@ -572,11 +572,8 @@ const servicesCohorts: IServiceCohorts = {
 
   fetchCohortsRights: async (cohorts) => {
     try {
-      const ids = cohorts
-        .map((cohort) => {
-          return cohort.fhir_group_id
-        })
-        .filter((id) => id !== '')
+      const ids = cohorts.map((cohort) => cohort.fhir_group_id).filter((id) => id !== '')
+      if (ids.length === 0) return []
       const rightsResponse = await apiBackend.get(`cohort/cohorts/cohort-rights/?fhir_group_id=${ids}`)
       return cohorts.map((cohort) => {
         return {

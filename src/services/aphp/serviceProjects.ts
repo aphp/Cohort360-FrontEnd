@@ -430,6 +430,7 @@ const servicesProjects: IServiceProjects = {
 
     // Récupère les droits
     const cohortList = await servicesCohorts.fetchCohortsRights(data.results)
+    if (cohortList.length === 0) return data
     return {
       ...data,
       results: cohortList

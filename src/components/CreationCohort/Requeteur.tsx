@@ -203,7 +203,14 @@ const Requeteur = () => {
         onRedo={_canRedo() ? _onRedo : undefined}
       />
 
-      {!requestIdFromUrl && !requestId && <ModalCreateNewRequest onClose={() => dispatch(setSelectedRequest(null))} />}
+      {!requestIdFromUrl && !requestId && (
+        <ModalCreateNewRequest
+          onClose={() => {
+            dispatch(setSelectedRequest(null))
+            navigate('/home')
+          }}
+        />
+      )}
     </>
   )
 }

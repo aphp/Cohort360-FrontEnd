@@ -788,7 +788,7 @@ const getCodeList = async (
     }
     const res = await apiFhir.post<FHIR_API_Response<ValueSet>>(`/ValueSet/$expand`, JSON.stringify(json))
     const valueSetExpansion = getApiResponseResourceOrThrow(res).expansion
-    return valueSetExpansion?.contains
+    return valueSetExpansion?.contains?.map((code) => ({ ...code, codeSystem: codeSystem }))
   }
 }
 
