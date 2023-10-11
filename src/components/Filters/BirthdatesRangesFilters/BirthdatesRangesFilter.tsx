@@ -1,6 +1,6 @@
 import { InputAgeRange } from 'components/Inputs'
-import { InputWrapper } from 'components/ui/Inputs/styles'
-import { FormContext } from 'components/ui/Modal/Modal'
+import { InputWrapper } from 'components/ui/Inputs'
+import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import { DateRange } from 'types/searchCriterias'
 

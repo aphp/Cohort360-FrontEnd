@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { FormContext } from 'components/ui/Modal/Modal'
+import { FormContext } from 'components/ui/Modal'
 import Select from 'components/ui/Searchbar/Select'
 import { Order } from 'types/searchCriterias'
 import { PatientTableLabels } from 'types/patient'

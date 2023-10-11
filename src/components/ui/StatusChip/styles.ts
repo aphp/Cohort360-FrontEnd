@@ -1,5 +1,5 @@
 import { Chip, styled } from '@mui/material'
-import { ChipStyles } from './StatusChip'
+import { ChipStyles } from '.'
 
 type CustomProps = {
   status?: ChipStyles

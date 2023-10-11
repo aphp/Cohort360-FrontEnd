@@ -21,7 +21,12 @@ import {
 
 import useStyles from './styles.js'
 
-const DocumentSearchHelp = ({ open, onClose }) => {
+interface DocumentSearchHelpProps {
+  open: boolean
+  onClose: () => void
+}
+
+const DocumentSearchHelp = ({ open, onClose }: DocumentSearchHelpProps) => {
   const { classes } = useStyles()
 
   return (
@@ -35,7 +40,7 @@ const DocumentSearchHelp = ({ open, onClose }) => {
             Rappel :
           </Typography>
 
-          <TableContainer component={Paper} className={classes.tableContainer}>
+          <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="customized table">
               <TableHead>
                 <TableRow className={classes.tableHead}>
@@ -169,7 +174,7 @@ const DocumentSearchHelp = ({ open, onClose }) => {
             Les opérateurs logiques ne fonctionnent qu'en majuscule
           </Typography>
 
-          <TableContainer component={Paper} className={classes.tableContainer}>
+          <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="customized table">
               <TableHead>
                 <TableRow className={classes.tableHead}>
@@ -469,7 +474,7 @@ const DocumentSearchHelp = ({ open, onClose }) => {
             Recherche textuelle avancée
           </Typography>
 
-          <TableContainer component={Paper} className={classes.tableContainer}>
+          <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="customized table">
               <TableHead>
                 <TableRow className={classes.tableHead}>
