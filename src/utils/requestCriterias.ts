@@ -1,8 +1,9 @@
 import moment from 'moment'
 import { Comparators, DocType, ScopeTreeRow } from 'types'
-import { MedicationType, MedicationTypeLabel, VitalStatusLabel } from 'types/requestCriterias'
+import { MedicationType, MedicationTypeLabel, RequestCriteriasKeys, VitalStatusLabel } from 'types/requestCriterias'
 import { DurationRangeType, SearchByTypes, VitalStatus } from 'types/searchCriterias'
 import allDocTypes from 'assets/docTypes.json'
+import { getDurationRangeLabel } from './age'
 
 export const getVitalStatusLabel = (value: VitalStatus) => {
   switch (value) {
@@ -15,81 +16,46 @@ export const getVitalStatusLabel = (value: VitalStatus) => {
   }
 }
 
+const getMedicationTypeLabel = (type: MedicationType) => {
+  switch (type) {
+    case MedicationType.Request:
+      return MedicationTypeLabel.Request
+    case MedicationType.Administration:
+      return MedicationTypeLabel.Administration
+  }
+}
+
 export const getLabelFromObject = (values: { id: string; label: string }[]) => {
-  const labels = values.map((value) => value.label)
-  const concatenatedLabels = labels.join(' - ')
-  return concatenatedLabels
+  const labels = values.map((value) => value.label).join(' - ')
+  return labels
 }
 
-export const getBirthdates = (values: DurationRangeType) => {
-  if (values[0] && values[1]) {
-    return `Naissance entre le ${moment(values[0]).format('DD/MM/YYYY')} et le ${moment(values[1]).format(
-      'DD/MM/YYYY'
-    )}`
-  }
-  if (values[0] && !values[1]) {
-    return `Naissance à partir du ${moment(values[0]).format('DD/MM/YYYY')}`
-  }
-  if (!values[0] && values[1]) {
-    return `Naissance jusqu'au ${moment(values[1]).format('DD/MM/YYYY')}`
-  }
+export const getLabelFromName = (values: ScopeTreeRow[]) => {
+  const labels = values.map((value) => value.name).join(' - ')
+  return labels
 }
 
-export const getDeathDates = (values: DurationRangeType) => {
+export const getDatesLabel = (values: DurationRangeType, word?: string) => {
   if (values[0] && values[1]) {
-    return `Décès entre le ${moment(values[0]).format('DD/MM/YYYY')} et le ${moment(values[1]).format('DD/MM/YYYY')}`
+    return `${word ? word + ' entre' : 'Entre'} le ${moment(values[0]).format('DD/MM/YYYY')} et le ${moment(
+      values[1]
+    ).format('DD/MM/YYYY')}`
   }
   if (values[0] && !values[1]) {
-    return `Décès à partir du ${moment(values[0]).format('DD/MM/YYYY')}`
+    return `${word ? word + ' à' : 'À'} partir du ${moment(values[0]).format('DD/MM/YYYY')}`
   }
   if (!values[0] && values[1]) {
-    return `Décès jusqu'au ${moment(values[1]).format('DD/MM/YYYY')}`
+    return `${word ? word + " jusqu'au" : "jusqu'au"}  ${moment(values[1]).format('DD/MM/YYYY')}`
   }
-}
-export const getEncounterDatesLabel = (values: DurationRangeType) => {
-  if (values[0] && values[1]) {
-    return `Prise en charge entre le ${moment(values[0]).format('DD/MM/YYYY')} et le ${moment(values[1]).format(
-      'DD/MM/YYYY'
-    )}`
-  }
-  if (values[0] && !values[1]) {
-    return `Prise en charge à partir du ${moment(values[0]).format('DD/MM/YYYY')}`
-  }
-  if (!values[0] && values[1]) {
-    return `Prise en charge jusqu'au ${moment(values[1]).format('DD/MM/YYYY')}`
-  }
+  return ''
 }
 
-export const getOccurenceDatesLabel = (values: DurationRangeType) => {
-  if (values[0] && values[1]) {
-    return `Entre le ${moment(values[0]).format('DD/MM/YYYY')} et le ${moment(values[1]).format('DD/MM/YYYY')}`
-  }
-  if (values[0] && !values[1]) {
-    return `À partir du ${moment(values[0]).format('DD/MM/YYYY')}`
-  }
-  if (!values[0] && values[1]) {
-    return `Jusqu'au ${moment(values[1]).format('DD/MM/YYYY')}`
-  }
-}
-
-export const getSearchDocumentLabel = (value: string, searchBy: SearchByTypes) => {
+const getSearchDocumentLabel = (value: string, searchBy: SearchByTypes) => {
   const loc = searchBy === SearchByTypes.TEXT ? 'document' : 'titre du document'
   return `Contient "${value}" dans le ${loc}`
 }
 
-export const getExecutiveUnitsLabel = (values: ScopeTreeRow[]) => {
-  const labels = values.map((value) => value.name)
-  const concatenatedLabels = labels.join(' - ')
-  return concatenatedLabels
-}
-
-export const getDiagnosticType = (values: ScopeTreeRow[]) => {
-  const labels = values.map((value) => value.name)
-  const concatenatedLabels = labels.join(' - ')
-  return concatenatedLabels
-}
-
-export const getDocumentTypesLabel = (values: DocType[]) => {
+const getDocumentTypesLabel = (values: DocType[]) => {
   const allTypes = new Set(allDocTypes.docTypes.map((docType: DocType) => docType.type))
 
   const displayingSelectedDocTypes = values.reduce((acc, selectedDocType) => {
@@ -103,33 +69,102 @@ export const getDocumentTypesLabel = (values: DocType[]) => {
     }
   }, [] as DocType[])
 
-  const currentDocTypes = displayingSelectedDocTypes.map(({ label }) => label)
+  const currentDocTypes = displayingSelectedDocTypes.map(({ label }) => label).join(' - ')
 
-  return currentDocTypes.join(' - ')
+  return currentDocTypes
 }
 
-export const getNbOccurencesLabel = (value: number, comparator: string) => {
+const getNbOccurencesLabel = (value: number, comparator: string) => {
   return `Nombre d'occurrences ${comparator} ${+value}`
 }
 
-export const getMedicationTypeLabel = (type: MedicationType) => {
-  switch (type) {
-    case MedicationType.Request:
-      return MedicationTypeLabel.Request
-    case MedicationType.Administration:
-      return MedicationTypeLabel.Administration
-    default:
-      return '?'
-  }
-}
-
-export const getBiologyValuesLabel = (comparator: string, valueMin: number, valueMax: number) => {
+const getBiologyValuesLabel = (comparator: string, valueMin: number, valueMax: number) => {
+  if (isNaN(valueMin) && isNaN(valueMax)) return null
   return comparator === Comparators.BETWEEN
     ? `Valeur comprise entre ${valueMin} et ${isNaN(valueMax) ? '?' : valueMax}`
     : `Valeur ${comparator} ${valueMin}`
 }
 
-export const getIppListLabel = (values: string) => {
+const getIppListLabel = (values: string) => {
   const labels = values.split(',').join(' - ')
   return `Contient les patients : ${labels}`
+}
+
+export const criteriasAsArray = (criterias: any, type: RequestCriteriasKeys): string[] => {
+  const labels: string[] = []
+
+  switch (type) {
+    case RequestCriteriasKeys.CONDITION:
+    case RequestCriteriasKeys.PROCEDURE:
+    case RequestCriteriasKeys.CLAIM:
+    case RequestCriteriasKeys.MEDICATION_REQUEST:
+    case RequestCriteriasKeys.MEDICATION_ADMINISTRATION:
+    case RequestCriteriasKeys.OBSERVATION:
+      if (criterias.code.length > 0) labels.push(getLabelFromObject(criterias.code))
+      break
+  }
+  switch (type) {
+    case RequestCriteriasKeys.IPP_LIST:
+      labels.push(getIppListLabel(criterias.search))
+      break
+
+    case RequestCriteriasKeys.PATIENT:
+      if (criterias.genders.length > 0) labels.push(getLabelFromObject(criterias.genders))
+      labels.push(getVitalStatusLabel(criterias.vitalStatus))
+      labels.push(getDurationRangeLabel(criterias.age, 'Âge'))
+      if (criterias.birthdates[0] || criterias.birthdates[1])
+        labels.push(getDatesLabel(criterias.birthdates, 'Naissance'))
+      if (criterias.deathDates[0] || criterias.deathDates[1]) labels.push(getDatesLabel(criterias.deathDates, 'Décès'))
+      break
+    /* ajouter durée de prise en charge + age de prise en charge */
+    case RequestCriteriasKeys.ENCOUNTER:
+      if (criterias.priseEnChargeType.length > 0) labels.push(getLabelFromObject(criterias.priseEnChargeType))
+      if (criterias.typeDeSejour.length > 0) labels.push(getLabelFromObject(criterias.typeDeSejour))
+      if (criterias.fileStatus.length > 0) labels.push(getLabelFromObject(criterias.fileStatus))
+      if (criterias.admissionMode.length > 0) labels.push(getLabelFromObject(criterias.admissionMode))
+      if (criterias.admission.length > 0) labels.push(getLabelFromObject(criterias.admission))
+      if (criterias.entryMode.length > 0) labels.push(getLabelFromObject(criterias.entryMode))
+      if (criterias.exitMode.length > 0) labels.push(getLabelFromObject(criterias.exitMode))
+      if (criterias.reason.length > 0) labels.push(getLabelFromObject(criterias.reason))
+      if (criterias.destination.length > 0) labels.push(getLabelFromObject(criterias.destination))
+      if (criterias.provenance.length > 0) labels.push(getLabelFromObject(criterias.provenance))
+      break
+
+    case RequestCriteriasKeys.DOCUMENTS:
+      labels.push(getSearchDocumentLabel(criterias.search, criterias.searchBy))
+      if (criterias.docType.length > 0) labels.push(getDocumentTypesLabel(criterias.docType))
+      break
+
+    case RequestCriteriasKeys.CONDITION:
+      if (criterias.diagnosticType.length > 0) labels.push(getLabelFromObject(criterias.diagnosticType))
+      break
+
+    case RequestCriteriasKeys.MEDICATION_REQUEST:
+    case RequestCriteriasKeys.MEDICATION_ADMINISTRATION:
+      labels.push(getMedicationTypeLabel(criterias.type))
+      if (criterias.prescriptionType.length > 0) labels.push(getLabelFromObject(criterias.prescriptionType))
+      if (criterias.administration.length > 0) labels.push(getLabelFromObject(criterias.administration))
+      break
+
+    case RequestCriteriasKeys.OBSERVATION:
+      if (criterias.valueComparator && (!isNaN(criterias.valueMin) || !isNaN(criterias.valueMax)))
+        getBiologyValuesLabel(criterias.valueComparator, criterias.valueMin, criterias.valueMax)
+  }
+  switch (type) {
+    case RequestCriteriasKeys.DOCUMENTS:
+    case RequestCriteriasKeys.CONDITION:
+    case RequestCriteriasKeys.PROCEDURE:
+    case RequestCriteriasKeys.MEDICATION_REQUEST:
+    case RequestCriteriasKeys.MEDICATION_ADMINISTRATION:
+    case RequestCriteriasKeys.OBSERVATION:
+      if (criterias.encounterStartDate || criterias.encounterEndDate)
+        labels.push(getDatesLabel([criterias.encounterStartDate, criterias.encounterEndDate], 'Prise en charge'))
+      if (criterias.occurrence && criterias.occurrenceComparator)
+        labels.push(getNbOccurencesLabel(criterias.occurrence, criterias.occurrenceComparator))
+      if (criterias.encounterStartDate || criterias.encounterEndDate)
+        labels.push(getDatesLabel([criterias.startOccurrence, criterias.endOccurrence], 'Occurence'))
+      if (criterias.encounterService?.length > 0) labels.push(getLabelFromName(criterias.encounterService))
+  }
+
+  return labels
 }

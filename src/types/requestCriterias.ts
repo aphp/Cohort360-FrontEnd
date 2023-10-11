@@ -1,17 +1,3 @@
-export enum RequestCriteriasKeys {
-  GENDERS = 'genders',
-  VITAL_STATUS = 'vitalStatus',
-  BIRTHDATES = 'birthdates',
-  DEATH_DATES = 'deathDates',
-  AGE = 'age'
-}
-
-export enum VitalStatusLabel {
-  ALIVE = 'Vivant(e)',
-  DECEASED = 'Décédé(e)',
-  ALL = 'Tous les patients'
-}
-
 export enum MedicationType {
   Request = 'MedicationRequest',
   Administration = 'MedicationAdministration'
@@ -22,9 +8,21 @@ export enum MedicationTypeLabel {
   Administration = 'Administration'
 }
 
-export enum RequestCriteriasTypes {
-  Request = 'MedicationRequest',
-  Administration = 'MedicationAdministration',
-  Documents = 'DocumentReference',
-  IPPList = 'IPPList'
+export enum RequestCriteriasKeys {
+  PATIENT = 'Patient',
+  IPP_LIST = 'IPPList',
+  ENCOUNTER = 'Encounter',
+  DOCUMENTS = 'DocumentReference',
+  CONDITION = 'Condition',
+  PROCEDURE = 'Procedure',
+  CLAIM = 'Claim',
+  MEDICATION_REQUEST = MedicationType.Request,
+  MEDICATION_ADMINISTRATION = MedicationType.Administration,
+  OBSERVATION = 'Observation'
+}
+
+export enum VitalStatusLabel {
+  ALIVE = 'Vivant(e)',
+  DECEASED = 'Décédé(e)',
+  ALL = 'Tous les patients'
 }

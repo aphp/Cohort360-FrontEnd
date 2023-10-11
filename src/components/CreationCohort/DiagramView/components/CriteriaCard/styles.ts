@@ -31,6 +31,14 @@ const useStyles = makeStyles()((theme: Theme) => ({
   actionContainer: {
     display: 'flex',
     flexWrap: 'nowrap'
+  },
+  secondItem: {
+    flexBasis: 'auto',
+    order: 1,
+    '@media (max-width: 768px)': {
+      flexBasis: '100%',
+      order: 2
+    }
   }
 }))
 
