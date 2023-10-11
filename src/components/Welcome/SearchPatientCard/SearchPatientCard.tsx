@@ -4,10 +4,10 @@ import { useAppSelector } from 'state'
 import { Divider, Grid, Typography } from '@mui/material'
 
 import useStyles from './styles'
-import Searchbar from 'components/ui/Searchbar/Searchbar'
+import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { useNavigate } from 'react-router-dom'
-import DisplayLocked from 'components/ui/Display/DisplayLocked/DisplayLocked'
+import DisplayLocked from 'components/ui/Display/DisplayLocked'
 
 const SearchPatientCard = () => {
   const { classes } = useStyles()

@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 
 import ScopeTree from 'components/ScopeTree/ScopeTree'
-import Searchbar from 'components/ui/Searchbar/Searchbar'
+import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 
 import { useAppDispatch, useAppSelector } from 'state'

@@ -14,24 +14,24 @@ import { LoadingStatus, TabType } from 'types'
 import useStyles from './styles'
 import { _cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
-import Searchbar from 'components/ui/Searchbar/Searchbar'
+import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import DisplayDigits from 'components/ui/Display/DisplayDigits/DisplayDigits'
-import Tabs from 'components/ui/Tabs/Tabs'
-import { ActionTypes, FilterKeys } from 'types/searchCriterias'
-import Button from 'components/ui/Button/Button'
-import Modal from 'components/ui/Modal/Modal'
+import DisplayDigits from 'components/ui/Display/DisplayDigits'
+import Tabs from 'components/ui/Tabs'
+import { FilterKeys } from 'types/searchCriterias'
+import Button from 'components/ui/Button'
+import Modal from 'components/ui/Modal'
 import services from 'services/aphp'
 import { mapToCriteriaName } from 'utils/mappers'
 import { PatientTypes, PMSI, PMSILabel } from 'types/patient'
-import useSearchCriterias, { initPmsiSearchCriterias } from 'hooks/useSearchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/ExecutiveUnitsFilter'
 import NdaFilter from 'components/Filters/NdaFilter/NdaFilter'
 import CodeFilter from 'components/Filters/CodeFilter/CodeFilter'
 import DiagnosticTypesFilter from 'components/Filters/DiagnosticTypesFilter/DiagnosticTypesFilter'
-import { BlockWrapper } from 'components/ui/Layout/styles'
+import { BlockWrapper } from 'components/ui/Layout'
+import useSearchCriterias, { initPmsiSearchCriterias } from 'reducers/searchCriteriasReducer'
 
 const PatientPMSI: React.FC<PatientTypes> = ({ groupId }) => {
   const { classes } = useStyles()
@@ -59,7 +59,7 @@ const PatientPMSI: React.FC<PatientTypes> = ({ groupId }) => {
       filters,
       filters: { code, nda, diagnosticTypes, startDate, endDate, executiveUnits }
     },
-    dispatchSearchCriteriasAction
+    { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias }
   ] = useSearchCriterias(initPmsiSearchCriterias)
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ code, nda, diagnosticTypes, startDate, endDate, executiveUnits })
@@ -139,7 +139,7 @@ const PatientPMSI: React.FC<PatientTypes> = ({ groupId }) => {
 
   useEffect(() => {
     setPage(1)
-    dispatchSearchCriteriasAction({ type: ActionTypes.REMOVE_SEARCH_CRITERIAS, payload: null })
+    removeSearchCriterias()
     setLoadingStatus(LoadingStatus.IDDLE)
   }, [selectedTab])
 
@@ -180,9 +180,7 @@ const PatientPMSI: React.FC<PatientTypes> = ({ groupId }) => {
               value={searchInput}
               placeholder={'Rechercher'}
               width="70%"
-              onchange={(newValue) =>
-                dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })
-              }
+              onchange={(newValue) => changeSearchInput(newValue)}
             />
             <Button width={'30%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
               Filtrer
@@ -192,9 +190,7 @@ const PatientPMSI: React.FC<PatientTypes> = ({ groupId }) => {
               open={toggleModal}
               width={'600px'}
               onClose={() => setToggleModal(false)}
-              onSubmit={(newFilters) => {
-                dispatchSearchCriteriasAction({ type: ActionTypes.ADD_FILTERS, payload: { ...filters, ...newFilters } })
-              }}
+              onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
             >
               {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
               <CodeFilter name={FilterKeys.CODE} value={code} />
@@ -217,16 +213,7 @@ const PatientPMSI: React.FC<PatientTypes> = ({ groupId }) => {
       </BlockWrapper>
       <Grid item xs={12}>
         {filtersAsArray.map((filter, index) => (
-          <Chip
-            key={index}
-            label={filter.label}
-            onDelete={() => {
-              dispatchSearchCriteriasAction({
-                type: ActionTypes.REMOVE_FILTER,
-                payload: { key: filter.category, value: filter.value }
-              })
-            }}
-          />
+          <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
         ))}
       </Grid>
       <Grid item xs={12}>
@@ -236,9 +223,7 @@ const PatientPMSI: React.FC<PatientTypes> = ({ groupId }) => {
           pmsiList={searchResults.list}
           deidentified={searchResults.deidentified}
           orderBy={orderBy}
-          setOrderBy={(orderBy) =>
-            dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_ORDER_BY, payload: orderBy })
-          }
+          setOrderBy={(orderBy) => changeOrderBy(orderBy)}
           page={page}
           setPage={(newPage) => setPage(newPage)}
           total={searchResults.nb}

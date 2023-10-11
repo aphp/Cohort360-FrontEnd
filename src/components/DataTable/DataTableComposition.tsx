@@ -25,7 +25,7 @@ import { Column, CohortComposition, CompositionStatusKind, DocumentReferenceStat
 import useStyles from './styles'
 import { Visibility } from '@mui/icons-material'
 import { Order, OrderBy } from 'types/searchCriterias'
-import StatusChip, { ChipStyles } from 'components/ui/StatusChip/StatusChip'
+import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
 
 type DataTableCompositionProps = {
   loading: boolean

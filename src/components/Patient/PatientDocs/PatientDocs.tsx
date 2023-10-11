@@ -15,23 +15,23 @@ import allDocTypesList from 'assets/docTypes.json'
 
 import { _cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
-import { ActionTypes, FilterKeys, SearchByTypes, searchByListDocuments } from 'types/searchCriterias'
+import { FilterKeys, SearchByTypes, searchByListDocuments } from 'types/searchCriterias'
 import { PatientTypes } from 'types/patient'
-import useSearchCriterias, { initPatientDocsSearchCriterias } from 'hooks/useSearchCriterias'
-import Modal from 'components/ui/Modal/Modal'
-import Button from 'components/ui/Button/Button'
+import Modal from 'components/ui/Modal'
+import Button from 'components/ui/Button'
 import NdaFilter from 'components/Filters/NdaFilter/NdaFilter'
-import Searchbar from 'components/ui/Searchbar/Searchbar'
+import Searchbar from 'components/ui/Searchbar'
 import Chip from 'components/ui/Chips/Chip'
 import { selectFiltersAsArray } from 'utils/filters'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Select from 'components/ui/Searchbar/Select'
-import DisplayDigits from 'components/ui/Display/DisplayDigits/DisplayDigits'
 import DocTypesFilter from 'components/Filters/DocTypesFilter/DocTypesFilter'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/ExecutiveUnitsFilter'
-import { AlertWrapper } from 'components/ui/Alert/styles'
-import { BlockWrapper } from 'components/ui/Layout/styles'
+import { AlertWrapper } from 'components/ui/Alert'
+import { BlockWrapper } from 'components/ui/Layout'
+import DisplayDigits from 'components/ui/Display/DisplayDigits'
+import useSearchCriterias, { initPatientDocsSearchCriterias } from 'reducers/searchCriteriasReducer'
 
 const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
@@ -58,7 +58,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
       filters,
       filters: { nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate }
     },
-    dispatchSearchCriteriasAction
+    { changeOrderBy, changeSearchInput, changeSearchBy, addFilters, removeFilter }
   ] = useSearchCriterias(initPatientDocsSearchCriterias)
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate })
@@ -135,18 +135,14 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
             label="Rechercher dans :"
             width={'170px'}
             items={searchByListDocuments}
-            onchange={(newValue) =>
-              dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_BY, payload: newValue })
-            }
+            onchange={(newValue) => changeSearchBy(newValue)}
           />
           <SearchInput
             value={searchInput}
             placeholder={'Rechercher dans les documents'}
             displayHelpIcon
             error={searchResults.searchInputError}
-            onchange={(newValue) =>
-              dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })
-            }
+            onchange={(newValue) => changeSearchInput(newValue)}
           />
           <Button width={'150px'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
             Filtrer
@@ -154,16 +150,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
         </Searchbar>
         <Grid item xs={12}>
           {filtersAsArray.map((filter, index) => (
-            <Chip
-              key={index}
-              label={filter.label}
-              onDelete={() => {
-                dispatchSearchCriteriasAction({
-                  type: ActionTypes.REMOVE_FILTER,
-                  payload: { key: filter.category, value: filter.value }
-                })
-              }}
-            />
+            <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
           ))}
         </Grid>
       </BlockWrapper>
@@ -181,16 +168,13 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
               <Checkbox
                 checked={onlyPdfAvailable}
                 onChange={() =>
-                  dispatchSearchCriteriasAction({
-                    type: ActionTypes.ADD_FILTERS,
-                    payload: {
-                      nda,
-                      executiveUnits,
-                      docTypes,
-                      startDate,
-                      endDate,
-                      onlyPdfAvailable: !onlyPdfAvailable
-                    }
+                  addFilters({
+                    nda,
+                    executiveUnits,
+                    docTypes,
+                    startDate,
+                    endDate,
+                    onlyPdfAvailable: !onlyPdfAvailable
                   })
                 }
               />
@@ -208,7 +192,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
         groupId={groupId}
         documentsList={searchResults.patientDocumentsList}
         orderBy={orderBy}
-        setOrderBy={(orderBy) => dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_ORDER_BY, payload: orderBy })}
+        setOrderBy={(orderBy) => changeOrderBy(orderBy)}
         page={page}
         setPage={(newPage: number) => setPage(newPage)}
         total={searchResults.totalDocs}
@@ -218,12 +202,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
         open={toggleModal}
         width={'600px'}
         onClose={() => setToggleModal(false)}
-        onSubmit={(newFilters) => {
-          dispatchSearchCriteriasAction({
-            type: ActionTypes.ADD_FILTERS,
-            payload: { ...filters, ...newFilters }
-          })
-        }}
+        onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
       >
         {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
         <DocTypesFilter allDocTypesList={allDocTypesList.docTypes} value={docTypes} name={FilterKeys.DOC_TYPES} />
