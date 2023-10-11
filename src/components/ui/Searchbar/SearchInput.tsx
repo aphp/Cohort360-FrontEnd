@@ -7,8 +7,8 @@ import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ErrorWrapper, SearchInputWrapper } from './styles'
 import { useDebounce } from 'utils/debounce'
 import InfoIcon from '@mui/icons-material/Info'
-import DocumentSearchHelp from 'components/ui/Helpers/DocumentSearchHelp/DocumentSearchHelp'
-import Modal from '../Modal/Modal'
+import DocumentSearchHelp from 'components/ui/Helpers/DocumentSearchHelp'
+import Modal from '../Modal'
 import { ErrorDetails, SearchInputError } from 'types/error'
 
 type SearchInputProps = {

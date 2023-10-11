@@ -13,8 +13,8 @@ import { capitalizeFirstLetter } from 'utils/capitalize'
 import useStyles from './styles'
 import { GenderStatus, Order, OrderBy } from 'types/searchCriterias'
 import { PatientTableLabels, PatientVitalStatus } from 'types/patient'
-import GenderIcon from 'components/ui/GenderIcon/GenderIcon'
-import StatusChip, { ChipStyles } from 'components/ui/StatusChip/StatusChip'
+import GenderIcon from 'components/ui/GenderIcon'
+import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
 
 type DataTablePatientProps = {
   loading: boolean

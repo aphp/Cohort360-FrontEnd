@@ -11,15 +11,14 @@ import services from 'services/aphp'
 import { Patient } from 'fhir/r4'
 import { _cancelPendingRequest } from 'utils/abortController'
 import { ActionTypes, SearchByTypes, searchByListPatients } from 'types/searchCriterias'
-import { BlockWrapper } from 'components/ui/Layout/styles'
-import Searchbar from 'components/ui/Searchbar/Searchbar'
+import { BlockWrapper } from 'components/ui/Layout'
+import Searchbar from 'components/ui/Searchbar'
 import { DTTB_ResultsType as ResultsType, LoadingStatus } from 'types'
 import Select from 'components/ui/Searchbar/Select'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import useSearchCriterias from 'hooks/useSearchCriterias'
-import { initPatientsSearchCriterias } from 'hooks/useSearchCriterias'
 import { CanceledError } from 'axios'
 import useStyles from './styles'
+import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/searchCriteriasReducer'
 
 const SearchPatient: React.FC<{}> = () => {
   const { classes, cx } = useStyles()
@@ -33,7 +32,8 @@ const SearchPatient: React.FC<{}> = () => {
 
   const [page, setPage] = useState(1)
 
-  const [{ orderBy, searchBy, searchInput }, dispatch] = useSearchCriterias(initPatientsSearchCriterias)
+  const [{ orderBy, searchBy, searchInput }, { changeOrderBy, changeSearchBy, changeSearchInput }] =
+    useSearchCriterias(initPatientsSearchCriterias)
 
   const controllerRef = useRef<AbortController | null>(null)
 
@@ -77,7 +77,7 @@ const SearchPatient: React.FC<{}> = () => {
 
   useEffect(() => {
     if (search) {
-      dispatch({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: search })
+      changeSearchInput(search)
     }
   }, [])
 
@@ -115,14 +115,12 @@ const SearchPatient: React.FC<{}> = () => {
                 label="Rechercher dans :"
                 width={'20%'}
                 items={searchByListPatients}
-                onchange={(newValue: SearchByTypes) =>
-                  dispatch({ type: ActionTypes.CHANGE_SEARCH_BY, payload: newValue })
-                }
+                onchange={(newValue: SearchByTypes) => changeSearchBy(newValue)}
               />
               <SearchInput
                 value={searchInput}
                 placeholder="Rechercher"
-                onchange={(newValue) => dispatch({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })}
+                onchange={(newValue) => changeSearchInput(newValue)}
               />
             </Grid>
           </Searchbar>
@@ -134,7 +132,7 @@ const SearchPatient: React.FC<{}> = () => {
             deidentified={false}
             patientsList={patientsList}
             orderBy={orderBy}
-            setOrderBy={(orderBy) => dispatch({ type: ActionTypes.CHANGE_ORDER_BY, payload: orderBy })}
+            setOrderBy={(orderBy) => changeOrderBy(orderBy)}
             page={page}
             setPage={(newPage) => setPage(newPage)}
             total={patientsResult.nb}

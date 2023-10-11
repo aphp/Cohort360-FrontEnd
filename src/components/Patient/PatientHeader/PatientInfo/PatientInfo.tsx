@@ -4,7 +4,7 @@ import { Grid, Typography } from '@mui/material'
 
 import useStyles from './styles'
 import { GenderStatus } from 'types/searchCriterias'
-import GenderIcon from 'components/ui/GenderIcon/GenderIcon'
+import GenderIcon from 'components/ui/GenderIcon'
 
 type PatientInfoTypes = {
   gender?: GenderStatus
