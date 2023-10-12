@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
 import { Buffer } from 'buffer'
 import Parse from 'html-react-parser'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -11,13 +11,13 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
 import { Document, Page, pdfjs } from 'react-pdf'
-import { FHIR_API_URL } from '../../constants'
 import services from 'services/aphp'
+import { FHIR_API_URL } from '../../constants'
 
+import { Tab, Tabs } from '@mui/material'
 import Watermark from 'assets/images/watermark_pseudo.svg'
 import { DocumentReference } from 'fhir/r4'
 import { getAuthorizationMethod } from 'services/apiFhir'
-import { Tabs, Tab } from '@mui/material'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 
@@ -34,6 +34,8 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
   const [numPages, setNumPages] = useState(1)
   const [loading, setLoading] = useState(false)
   const [selectedTab, setSelectedValue] = useState<'pdf' | 'raw'>(!deidentified ? (documentId ? 'pdf' : 'raw') : 'raw')
+  const gridRef: React.RefObject<HTMLDivElement> = useRef(null)
+  const [gridWidth, setGridWidth] = useState(0)
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: 'pdf' | 'raw') => {
     setSelectedValue(newValue)
@@ -58,6 +60,25 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
       setNumPages(1)
     }
   }, [open, documentId])
+
+  const handleResize = () => {
+    if (gridRef.current) {
+      setGridWidth(gridRef.current?.offsetWidth)
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize)
+    handleResize()
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
+  useLayoutEffect(() => {
+    handleResize()
+  }, [gridRef.current])
 
   const pdfViewerContainerStyle = {
     width: '75%',
@@ -100,7 +121,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
             </>
             <>
               {selectedTab === 'pdf' && (
-                <Grid style={pdfViewerContainerStyle}>
+                <Grid ref={gridRef} style={pdfViewerContainerStyle}>
                   <Document
                     error={'Le document est introuvable.'}
                     loading={'PDF en cours de chargement...'}
@@ -116,7 +137,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
                   >
                     {Array.from(new Array(numPages), (el, index) => (
                       <Page
-                        width={window.innerWidth * 0.9}
+                        width={gridWidth}
                         key={`page_${index + 1}`}
                         pageNumber={index + 1}
                         loading={'Pages en cours de chargement...'}
