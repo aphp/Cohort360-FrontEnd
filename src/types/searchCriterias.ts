@@ -70,7 +70,10 @@ export enum Order {
   IPP = 'identifier',
   ID = 'id',
   MODIFIED = 'modified_at',
-  NAME = 'name'
+  NAME = 'name',
+  MODALITY = 'modality',
+  DESCRIPTION = 'description',
+  PROCEDURE = 'procedureCode'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -109,12 +112,25 @@ export enum FilterKeys {
   FAVORITE = 'favorite',
   STATUS = 'status',
   MIN_PATIENTS = 'minPatients',
-  MAX_PATIENTS = 'maxPatients'
+  MAX_PATIENTS = 'maxPatients',
+  MODALITY = 'modality'
 }
 
 export enum OrderByKeys {
   ORDER_BY = 'orderBy',
   ORDER_DIRECTION = 'orderDirection'
+}
+
+export enum DocumentAttachmentMethod {
+  NONE = 'NONE',
+  ACCESS_NUMBER = 'ACCESS_NUMBER',
+  INFERENCE_TEMPOREL = 'INFERENCE_TEMPOREL'
+}
+
+export enum DocumentAttachmentMethodLabel {
+  NONE = 'Aucune',
+  ACCESS_NUMBER = "Numéro d'accession",
+  INFERENCE_TEMPOREL = 'Inférence temporelle'
 }
 
 export type SearchBy = SearchByTypes
@@ -155,6 +171,7 @@ export type Filters =
   | PatientDocumentsFilters
   | AllDocumentsFilters
   | CohortsFilters
+  | ImagingFilters
 
 export interface PatientsFilters {
   genders: GenderStatus[]
@@ -188,6 +205,14 @@ export type BiologyFilters = {
   endDate: string | null
   executiveUnits: ScopeTreeRow[]
   validatedStatus: boolean
+}
+
+export type ImagingFilters = {
+  nda: string
+  startDate: string | null
+  endDate: string | null
+  executiveUnits: ScopeTreeRow[]
+  modality: LabelObject[]
 }
 
 export type PatientDocumentsFilters = {

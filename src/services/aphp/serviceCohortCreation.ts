@@ -28,6 +28,7 @@ import {
   ENCOUNTER_PROVENANCE,
   ENCOUNTER_SEJOUR_TYPE,
   ENCOUNTER_VISIT_TYPE,
+  IMAGING_MODALITIES,
   MEDICATION_ADMINISTRATIONS,
   MEDICATION_ATC,
   MEDICATION_UCD,
@@ -102,6 +103,7 @@ export interface IServiceCohortCreation {
   fetchBiologySearch: (
     searchInput: string
   ) => Promise<{ anabio: ValueSetWithHierarchy[]; loinc: ValueSetWithHierarchy[] }>
+  fetchModalities: () => Promise<any>
 }
 
 const servicesCohortCreation: IServiceCohortCreation = {
@@ -346,7 +348,8 @@ const servicesCohortCreation: IServiceCohortCreation = {
         biologyItem.id !== '527570' &&
         biologyItem.id !== '527614'
     }),
-  fetchBiologySearch: fetchBiologySearch
+  fetchBiologySearch: fetchBiologySearch,
+  fetchModalities: async () => fetchValueSet(IMAGING_MODALITIES, { joinDisplayWithCode: false })
 }
 
 export default servicesCohortCreation

@@ -17,7 +17,8 @@ import {
   fetchDocumentReference,
   fetchMedicationRequest,
   fetchMedicationAdministration,
-  fetchObservation
+  fetchObservation,
+  fetchImaging
 } from './callApi'
 
 import servicesPerimeters from './servicePerimeters'
@@ -28,6 +29,7 @@ import {
   DocumentReference,
   Encounter,
   Identifier,
+  ImagingStudy,
   MedicationAdministration,
   MedicationRequest,
   Observation,
@@ -214,6 +216,45 @@ export interface IServicePatients {
   ) => Promise<{
     biologyList: Observation[]
     biologyTotal: number
+  }>
+
+  /*
+   ** Cette fonction permet de récupérer les élèments de ImagingStudy liés à un patient
+   **
+   ** Arguments:
+   **   - orderBy: permet le tri
+   **   - orderDirection: permet le tri dans l'ordre croissant ou décroissant
+   **   - page: permet la pagination des éléments
+   **   - patientId: identifiant technique d'un patient
+   **   - deidentified: permet certaines anonymisations de la donnée
+   **   - nda: permet de filtrer sur un NDA précis
+   **   - searchInput (optionnel): permet la recherche textuelle
+   **   - startDate: (optionnel) permet le filtre par date
+   **   - endDate: (optionnel) permet le filtre par date
+   **   - groupId: (optionnel) périmètre auquel le patient est lié
+   **   - signal: (optionnel) permet de savoir si une requête est déjà en cours pour l'interrompre
+   **   - executiveUnits: (optionnel) permet de filtrer par unité exécutrice
+   **
+   ** Retour:
+   **   - imagingList: Liste de 20 éléments de ImagingStudy liés à un patient
+   **   - imagingTotal: Nombre d'élément total par rapport au(x) filtre(s) indiqué(s)
+   */
+  fetchImaging: (
+    orderBy: Order,
+    orderDirection: Direction,
+    page: number,
+    patientId: string,
+    nda: string,
+    searchInput?: string,
+    startDate?: string | null,
+    endDate?: string | null,
+    groupId?: string,
+    signal?: AbortSignal,
+    modalities?: string,
+    executiveUnits?: string[]
+  ) => Promise<{
+    imagingList: ImagingStudy[]
+    imagingTotal: number
   }>
 
   /*
@@ -568,6 +609,44 @@ const servicesPatients: IServicePatients = {
     return {
       biologyList: getApiResponseResources(observationResp) ?? [],
       biologyTotal: biologyTotal ?? 0
+    }
+  },
+
+  fetchImaging: async (
+    orderBy: Order,
+    orderDirection: Direction,
+    page: number,
+    patientId: string,
+    nda: string,
+    searchInput?: string,
+    startDate?: string | null,
+    endDate?: string | null,
+    groupId?: string,
+    signal?: AbortSignal,
+    modalities?: string,
+    executiveUnits?: string[]
+  ) => {
+    const imagingResp = await fetchImaging({
+      patient: patientId,
+      size: 20,
+      offset: page ? (page - 1) * 20 : 0,
+      order: orderBy,
+      orderDirection,
+      _text: searchInput,
+      encounter: nda,
+      minDate: startDate ?? '',
+      maxDate: endDate ?? '',
+      _list: groupId ? [groupId] : [],
+      signal,
+      modalities,
+      executiveUnits
+    })
+
+    const imagingTotal = imagingResp.data.resourceType === 'Bundle' ? imagingResp.data.total : 0
+
+    return {
+      imagingList: getApiResponseResources(imagingResp) ?? [],
+      imagingTotal: imagingTotal ?? 0
     }
   },
 

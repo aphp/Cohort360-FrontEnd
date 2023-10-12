@@ -19,7 +19,6 @@ import { useAppSelector } from 'state'
 import { RequestState } from 'state/request'
 
 import RequestShareForm from './components/RequestShareForm'
-import useStyles from './styles'
 import services from 'services/aphp'
 
 const ERROR_TITLE = 'error_title'
@@ -33,7 +32,6 @@ const ModalShareRequest: React.FC<{
 }> = ({ requestShare, onClose, parentStateSetter }) => {
   const { requestState } = useAppSelector<{ requestState: RequestState }>((state) => ({ requestState: state.request }))
   const navigate = useNavigate()
-  const { classes } = useStyles()
   const { selectedRequestShare } = requestState
 
   const selectedCurrentRequest = selectedRequestShare || requestShare
@@ -102,13 +100,7 @@ const ModalShareRequest: React.FC<{
       <DialogTitle>Partager une requête</DialogTitle>
       <DialogContent>
         {currentRequest === null ? (
-          <Grid
-            container
-            direction="column"
-            justifyContent="center"
-            alignItems="center"
-            className={classes.inputContainer}
-          >
+          <Grid container direction="column" justifyContent="center" alignItems="center" marginBottom={3}>
             <CircularProgress />
           </Grid>
         ) : (

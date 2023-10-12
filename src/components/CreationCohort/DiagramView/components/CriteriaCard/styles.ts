@@ -18,19 +18,9 @@ const useStyles = makeStyles()((theme: Theme) => ({
       marginLeft: -46
     }
   },
-  criteriaTitleAndChips: {
-    width: 'calc(100% - 80px)',
-    [theme.breakpoints.down('md')]: {
-      flexWrap: 'wrap'
-    }
-  },
   title: {
     whiteSpace: 'nowrap',
     marginLeft: 4
-  },
-  actionContainer: {
-    display: 'flex',
-    flexWrap: 'nowrap'
   },
   secondItem: {
     overflow: 'hidden',

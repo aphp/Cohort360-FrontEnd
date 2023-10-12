@@ -134,7 +134,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
       <DialogTitle>Filtrer par :</DialogTitle>
       <DialogContent className={classes.dialog}>
         {!deidentified && (
-          <Grid container direction="column" className={classes.filter}>
+          <Grid container direction="column" marginBottom={3}>
             <Typography variant="h3">NDA :</Typography>
             <TextField
               margin="normal"
@@ -148,7 +148,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
         )}
 
         {showAdministrationRoutes && (
-          <Grid container direction="column" className={classes.filter}>
+          <Grid container direction="column" marginBottom={3}>
             <Typography variant="h3">Voie d'administration :</Typography>
             <Autocomplete
               multiple
@@ -173,7 +173,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
         )}
 
         {showPrescriptionTypes && (
-          <Grid container direction="column" className={classes.filter}>
+          <Grid container direction="column" marginBottom={3}>
             <Typography variant="h3">Type de prescriptions :</Typography>
             <Autocomplete
               multiple

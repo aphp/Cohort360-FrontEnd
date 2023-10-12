@@ -44,7 +44,7 @@ const OccurrenceDateInputs: React.FC<OccurrenceDateInputsProps> = (props) => {
           <Input
             id="date-start-occurrence"
             type="date"
-            value={selectedCriteria.startOccurrence}
+            value={selectedCriteria?.startOccurrence}
             endAdornment={
               <IconButton size="small" onClick={() => onChangeValue('startOccurrence', '')}>
                 <ClearIcon />
@@ -61,7 +61,7 @@ const OccurrenceDateInputs: React.FC<OccurrenceDateInputsProps> = (props) => {
           <Input
             id="date-end-occurrence"
             type="date"
-            value={selectedCriteria.endOccurrence}
+            value={selectedCriteria?.endOccurrence}
             endAdornment={
               <IconButton size="small" onClick={() => onChangeValue('endOccurrence', '')}>
                 <ClearIcon />

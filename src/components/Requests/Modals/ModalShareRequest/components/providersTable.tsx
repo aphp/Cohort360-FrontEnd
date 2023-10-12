@@ -4,7 +4,6 @@ import {
   IconButton,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
   TableRow,
@@ -13,6 +12,7 @@ import {
   Tooltip,
   CircularProgress
 } from '@mui/material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import DeleteIcon from '@mui/icons-material/Delete'
 
@@ -73,37 +73,37 @@ const ProvidersTable: React.FC<ProvidersTableProps> = ({
         <TableHead>
           <TableRow className={classes.tableHead}>
             {columns.map((column, index: number) => (
-              <TableCell key={index} align="center" className={classes.tableHeadCell}>
+              <TableCellWrapper key={index} className={classes.tableHeadCell}>
                 {column.label}
-              </TableCell>
+              </TableCellWrapper>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={7}>
+              <TableCellWrapper colSpan={7}>
                 <div className={classes.loadingSpinnerContainer}>
                   <CircularProgress size={50} />
                 </div>
-              </TableCell>
+              </TableCellWrapper>
             </TableRow>
           ) : !providersList || providersList?.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7}>
+              <TableCellWrapper colSpan={7}>
                 <Typography className={classes.loadingSpinnerContainer}>Aucun résultat à afficher</Typography>
-              </TableCell>
+              </TableCellWrapper>
             </TableRow>
           ) : (
             providersList.map((provider: Provider) => {
               return (
                 provider && (
                   <TableRow key={provider.provider_id} className={classes.tableBodyRows} hover>
-                    <TableCell align="center">{provider.provider_source_value}</TableCell>
-                    <TableCell align="center">{provider.lastname?.toLocaleUpperCase()}</TableCell>
-                    <TableCell align="center">{provider.firstname}</TableCell>
-                    <TableCell align="center">{provider.email ?? '-'}</TableCell>
-                    <TableCell align="center">
+                    <TableCellWrapper>{provider.provider_source_value}</TableCellWrapper>
+                    <TableCellWrapper>{provider.lastname?.toLocaleUpperCase()}</TableCellWrapper>
+                    <TableCellWrapper>{provider.firstname}</TableCellWrapper>
+                    <TableCellWrapper>{provider.email ?? '-'}</TableCellWrapper>
+                    <TableCellWrapper>
                       <Tooltip title="Supprimer l'utilisateur" style={{ padding: '0 12px' }}>
                         <IconButton
                           onClick={(event) => {
@@ -114,7 +114,7 @@ const ProvidersTable: React.FC<ProvidersTableProps> = ({
                           <DeleteIcon />
                         </IconButton>
                       </Tooltip>
-                    </TableCell>
+                    </TableCellWrapper>
                   </TableRow>
                 )
               )

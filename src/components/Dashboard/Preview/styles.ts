@@ -5,12 +5,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
   root: {
     backgroundColor: '#E6F1FD'
   },
-  header: {
-    backgroundColor: '#F3F8FE',
-    minHeight: '100px',
-    padding: theme.spacing(1),
-    overflowY: 'scroll'
-  },
   progressContainer: {
     height: '100%',
     display: 'flex',
@@ -63,27 +57,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
   chartTitle: {
     borderBottom: '2px inset #E6F1FD',
     paddingBottom: '10px'
-  },
-  perimetersChipsDiv: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    listStyle: 'none',
-    padding: 0,
-    marginTop: 4,
-    marginBottom: 0
-  },
-  item: {
-    margin: theme.spacing(0.5)
-  },
-  perimetersChip: {
-    backgroundColor: '#0063AF',
-    color: '#FFF',
-    fontStyle: 'italic',
-    fontSize: '12px'
-  },
-  populationLabel: {
-    color: '#0063AF',
-    textDecoration: 'underline'
   }
 }))
 

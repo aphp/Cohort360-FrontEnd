@@ -1,37 +1,6 @@
 import { makeStyles } from 'tss-react/mui'
 import { smallDrawerWidth, largeDrawerWidth } from 'components/Routes/LeftSideBar/LeftSideBar'
 
-export const itemStyles = {
-  group: {
-    backgroundColor: 'gray',
-    color: 'white',
-    '&:hover': {
-      backgroundColor: 'lightgray'
-    }
-  },
-  hospital: {
-    backgroundColor: 'darkgray',
-    color: 'white',
-    '&:hover': {
-      backgroundColor: 'lightgray'
-    }
-  },
-  service: {
-    backgroundColor: 'lightgray',
-    color: 'black',
-    '&:hover': {
-      backgroundColor: 'white'
-    }
-  },
-  unit: {
-    backgroundColor: 'white',
-    color: 'black',
-    '&:hover': {
-      backgroundColor: 'lightgray'
-    }
-  }
-}
-
 export default makeStyles()((theme) => ({
   appBar: {
     marginLeft: smallDrawerWidth,
@@ -94,9 +63,5 @@ export default makeStyles()((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
     })
-  },
-  searchBar: {
-    marginBottom: '12px',
-    minWidth: '250px'
   }
 }))
