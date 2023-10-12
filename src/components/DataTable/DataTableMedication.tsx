@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { CircularProgress, Grid, IconButton, Typography, TableRow, TableCell } from '@mui/material'
+import { CircularProgress, Grid, IconButton, Typography, TableRow, TableCell, Tooltip } from '@mui/material'
 
 import CommentIcon from '@mui/icons-material/Comment'
 
@@ -13,7 +13,7 @@ import { Column, Order, CohortMedication } from 'types'
 
 import useStyles from './styles'
 import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
-import { MEDICATION_ATC, MEDICATION_UCD } from '../../constants'
+import { MEDICATION_ATC, MEDICATION_ATC_ORBIS, MEDICATION_UCD } from '../../constants'
 
 type DataTableMedicationProps = {
   loading: boolean
@@ -98,11 +98,26 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
   )
 }
 
-const getCodes = (medication: CohortMedication<MedicationRequest | MedicationAdministration>, codeSystem: string) => {
-  const atcCoding = medication.medicationCodeableConcept?.coding?.find(
+const getCodes = (
+  medication: CohortMedication<MedicationRequest | MedicationAdministration>,
+  codeSystem: string,
+  altCodeSystemRegex?: string
+): [string, string, boolean, string | undefined] => {
+  const standardCoding = medication.medicationCodeableConcept?.coding?.find(
     (code) => code.userSelected && code.system === codeSystem
   )
-  return [atcCoding ? atcCoding.code : 'Non Renseigné', atcCoding ? atcCoding.display : 'Non Renseigné']
+  const coding =
+    standardCoding ||
+    medication.medicationCodeableConcept?.coding?.find(
+      (code) => altCodeSystemRegex && code.system?.match(altCodeSystemRegex)
+    )
+
+  return [
+    coding && coding.code ? coding.code : 'Non Renseigné',
+    coding && coding.display ? coding.display : 'Non Renseigné',
+    !!standardCoding,
+    coding?.system
+  ]
 }
 
 const DataTableMedicationLine: React.FC<{
@@ -119,8 +134,8 @@ const DataTableMedicationLine: React.FC<{
       ? medication.dispenseRequest?.validityPeriod?.start
       : medication.effectivePeriod?.start
 
-  const [codeATC, displayATC] = getCodes(medication, MEDICATION_ATC)
-  const [codeUCD, displayUCD] = getCodes(medication, MEDICATION_UCD)
+  const [codeATC, displayATC, isATCStandard, codeATCSystem] = getCodes(medication, MEDICATION_ATC, MEDICATION_ATC_ORBIS)
+  const [codeUCD, displayUCD, isUCDStandard, codeUCDSystem] = getCodes(medication, MEDICATION_UCD, '.*-ucd')
 
   const prescriptionType =
     medication.resourceType === 'MedicationRequest' && medication.category?.[0].coding?.[0].display
@@ -139,13 +154,21 @@ const DataTableMedicationLine: React.FC<{
       <TableCell align="left">{nda ?? 'Inconnu'}</TableCell>
       <TableCell align="center">{date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}</TableCell>
       <TableCell align="center">
-        <Typography>{codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : codeATC ?? ''}</Typography>
+        <Tooltip title={codeATCSystem}>
+          <Typography style={{ fontStyle: isATCStandard ? 'normal' : 'italic' }}>
+            {codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : codeATC ?? ''}
+          </Typography>
+        </Tooltip>
         <Typography className={classes.libelle}>
           {displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}
         </Typography>
       </TableCell>
       <TableCell align="center">
-        <Typography>{codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : codeUCD ?? ''}</Typography>
+        <Tooltip title={codeUCDSystem}>
+          <Typography style={{ fontStyle: isUCDStandard ? 'normal' : 'italic' }}>
+            {codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : codeUCD ?? ''}
+          </Typography>
+        </Tooltip>
         <Typography className={classes.libelle}>
           {displayUCD === 'No matching concept' ? '-' : displayUCD ?? '-'}
         </Typography>

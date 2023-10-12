@@ -84,6 +84,8 @@ export const ENCOUNTER_ADMISSION = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_ADMISSION
   : '{VITE_VALUE_SET_URL_ENCOUNTER_ADMISSION}'
 
+export const MEDICATION_ATC_ORBIS = 'https://terminology.eds.aphp.fr/aphp-orbis-medicament-atc-article'
+
 export const MEDICATION_ATC = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_MEDICATION_ATC
   : '{VITE_VALUE_SET_URL_MEDICATION_ATC}'
