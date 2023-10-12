@@ -3,7 +3,6 @@ import {
   CircularProgress,
   Grid,
   Paper,
-  TableCell,
   TableRow,
   TableHead,
   Table,
@@ -11,6 +10,7 @@ import {
   TableContainer,
   Typography
 } from '@mui/material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import PieChart from './Charts/PieChart'
 import BarChart from './Charts/BarChart'
@@ -58,37 +58,25 @@ const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMa
       <Table aria-label="simple table">
         <TableHead>
           <TableRow className={classes.tableHead}>
-            <TableCell variant="head" />
-            <TableCell align="center" className={classes.tableHeadCell}>
-              Vivant
-            </TableCell>
-            <TableCell align="center" className={classes.tableHeadCell}>
-              Décédé
-            </TableCell>
+            <TableCellWrapper variant="head" />
+            <TableCellWrapper className={classes.tableHeadCell}>Vivant</TableCellWrapper>
+            <TableCellWrapper className={classes.tableHeadCell}>Décédé</TableCellWrapper>
           </TableRow>
         </TableHead>
         <TableBody>
           <TableRow>
-            <TableCell component="th" scope="row" className={classes.tableHeadCell}>
+            <TableCellWrapper align="left" component="th" scope="row" className={classes.tableHeadCell}>
               Femmes
-            </TableCell>
-            <TableCell id="female-alive-cell" align="center">
-              {displayDigit(femaleAlive)}
-            </TableCell>
-            <TableCell id="female-deceased-cell" align="center">
-              {displayDigit(femaleDeceased)}
-            </TableCell>
+            </TableCellWrapper>
+            <TableCellWrapper id="female-alive-cell">{displayDigit(femaleAlive)}</TableCellWrapper>
+            <TableCellWrapper id="female-deceased-cell">{displayDigit(femaleDeceased)}</TableCellWrapper>
           </TableRow>
           <TableRow>
-            <TableCell component="th" scope="row" className={classes.tableHeadCell}>
+            <TableCellWrapper align="left" component="th" scope="row" className={classes.tableHeadCell}>
               Hommes
-            </TableCell>
-            <TableCell id="male-alive-cell" align="center">
-              {displayDigit(maleAlive)}
-            </TableCell>
-            <TableCell id="male-deceased-cell" align="center">
-              {displayDigit(maleDeceased)}
-            </TableCell>
+            </TableCellWrapper>
+            <TableCellWrapper id="male-alive-cell">{displayDigit(maleAlive)}</TableCellWrapper>
+            <TableCellWrapper id="male-deceased-cell">{displayDigit(maleDeceased)}</TableCellWrapper>
           </TableRow>
         </TableBody>
       </Table>

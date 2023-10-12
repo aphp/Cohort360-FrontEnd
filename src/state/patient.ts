@@ -9,7 +9,9 @@ import {
   IPatientDocuments,
   IPatientPmsi,
   IPatientMedication,
-  IPatientObservation
+  IPatientObservation,
+  IPatientImaging,
+  CohortImaging
 } from 'types'
 
 import { logout } from './me'
@@ -22,6 +24,7 @@ import {
   DocumentReference,
   Encounter,
   Identifier,
+  ImagingStudy,
   MedicationAdministration,
   MedicationRequest,
   Observation,
@@ -32,6 +35,7 @@ import { CanceledError } from 'axios'
 import {
   BiologyFilters,
   Direction,
+  ImagingFilters,
   MedicationFilters,
   Order,
   PMSIFilters,
@@ -60,6 +64,7 @@ export type PatientState = null | {
     prescription?: IPatientMedication<MedicationRequest>
   }
   biology?: IPatientObservation<CohortObservation>
+  imaging?: IPatientImaging<CohortImaging>
 }
 
 /**
@@ -338,6 +343,77 @@ const fetchMedication = createAsyncThunk<
   }
 )
 
+/**
+ * fetchImaging
+ *
+ */
+type FetchImagingParams = {
+  options: {
+    page: number
+    searchCriterias: SearchCriterias<ImagingFilters>
+  }
+  groupId?: string
+  signal?: AbortSignal
+}
+type FetchImagingReturn = undefined | { imaging: IPatientImaging<CohortImaging> }
+const fetchImaging = createAsyncThunk<FetchImagingReturn, FetchImagingParams, { state: RootState; rejectValue: any }>(
+  'patient/fetchImaging',
+  async ({ options: { page, searchCriterias }, options, groupId, signal }, thunkApi) => {
+    try {
+      const patientState = thunkApi.getState().patient
+
+      const patientId = patientState?.patientInfo?.id ?? ''
+      if (!patientId) {
+        throw new Error('Patient Error: patient is required')
+      }
+
+      const deidentified = patientState?.deidentified ?? true
+      const hospits = patientState?.hospits?.list ?? []
+
+      const orderBy = searchCriterias.orderBy.orderBy
+      const orderDirection = searchCriterias.orderBy.orderDirection
+      const nda = searchCriterias.filters.nda
+      const searchInput = searchCriterias.searchInput
+      const startDate = searchCriterias.filters.startDate
+      const endDate = searchCriterias.filters.endDate
+      const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
+      const modalities = searchCriterias.filters.modality.map(({ id }) => id).join(',') ?? ''
+
+      const imagingResponse = await services.patients.fetchImaging(
+        orderBy,
+        orderDirection,
+        page,
+        patientId,
+        nda,
+        searchInput,
+        startDate,
+        endDate,
+        groupId,
+        signal,
+        modalities,
+        executiveUnits
+      )
+
+      const imagingList: any[] = linkElementWithEncounter(imagingResponse.imagingList, hospits, deidentified)
+
+      return {
+        imaging: {
+          loading: false,
+          count: imagingResponse.imagingTotal,
+          total: patientState?.imaging?.total ? patientState?.imaging?.total : imagingResponse.imagingTotal,
+          list: imagingList,
+          page,
+          options
+        } as IPatientImaging<CohortImaging>
+      }
+    } catch (error) {
+      console.error(error)
+      if (error instanceof CanceledError) {
+        return thunkApi.rejectWithValue({ error })
+      }
+    }
+  }
+)
 /**
  * fetchDocument
  *
@@ -1143,6 +1219,45 @@ const patientSlice = createSlice({
             biology: action.payload?.biology
           }
     )
+    builder.addCase(fetchImaging.rejected, (state) => ({
+      ...state,
+      loading: false,
+      imaging: {
+        loading: false,
+        count: 0,
+        total: 0,
+        list: [],
+        page: 0
+      }
+    }))
+    builder.addCase(fetchImaging.pending, (state) =>
+      state === null
+        ? null
+        : {
+            ...state,
+            imaging: state.imaging
+              ? {
+                  ...state.imaging,
+                  loading: true
+                }
+              : {
+                  loading: true,
+                  count: 0,
+                  total: 0,
+                  list: [],
+                  page: 1
+                }
+          }
+    )
+    builder.addCase(fetchImaging.fulfilled, (state, action) =>
+      action.payload === undefined
+        ? null
+        : {
+            ...state,
+            loading: false,
+            imaging: action.payload?.imaging
+          }
+    )
   }
 })
 
@@ -1154,7 +1269,8 @@ export {
   fetchDocuments,
   fetchPmsi,
   fetchMedication,
-  fetchBiology
+  fetchBiology,
+  fetchImaging
 }
 export const { clearPatient } = patientSlice.actions
 
@@ -1167,6 +1283,7 @@ function linkElementWithEncounter<
     | MedicationRequest
     | MedicationAdministration
     | Observation
+    | ImagingStudy
 >(elementEntries: T[], encounterList: any[], deidentifiedBoolean: any) {
   let elementList: (T & {
     serviceProvider?: string
@@ -1233,6 +1350,7 @@ function fillElementInformation<
     | MedicationRequest
     | MedicationAdministration
     | Observation
+    | ImagingStudy
 >(deidentifiedBoolean: boolean, element: T, encounter: any, encounterId: string, resourceType: string) {
   const newElement = element as T & {
     serviceProvider?: string

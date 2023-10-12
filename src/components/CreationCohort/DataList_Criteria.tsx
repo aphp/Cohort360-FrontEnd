@@ -10,11 +10,12 @@ import Cim10Form from './DiagramView/components/LogicalOperator/components/Crite
 import GhmForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/GHM'
 import MedicationForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/MedicationForm'
 import BiologyForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/BiologyForm'
+import DemographicForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicForm'
+import ImagingForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/ImagingForm'
 
 import services from 'services/aphp'
 
-import { ODD_BIOLOGY, ODD_MEDICATION } from '../../constants'
-import DemographicForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicForm'
+import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION } from '../../constants'
 
 // ├── Mes requêtes
 // ├── Liste d'IPP
@@ -30,6 +31,7 @@ import DemographicForm from './DiagramView/components/LogicalOperator/components
 // ├── Biologie/Microbiologie
 // │   ├── Biologie
 // │   ├── Microbiologie
+// ├── Imagerie
 // ├── Physiologie
 
 const criteriaList: CriteriaItemType[] = [
@@ -201,6 +203,18 @@ const criteriaList: CriteriaItemType[] = [
         data: null
       }
     ]
+  },
+  {
+    id: 'Imaging',
+    title: 'Imagerie',
+    color: ODD_IMAGING ? '#0063AF' : '#808080',
+    fontWeight: 'bold',
+    components: ODD_IMAGING ? ImagingForm : null,
+    disabled: !ODD_IMAGING ?? false,
+    data: { modalities: 'loading' },
+    fetch: {
+      fetchModalities: services.cohortCreation.fetchModalities
+    }
   },
   {
     id: 'physiologie',

@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react'
 
-import { Breadcrumbs, Grid, Typography } from '@mui/material'
+import { Breadcrumbs, Grid, Typography, useTheme } from '@mui/material'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchProjects as fetchProjectsList } from 'state/project'
 import { fetchRequests as fetchRequestsList } from 'state/request'
 
-import useStyles from './styles'
-
 const CohortCreationBreadcrumbs: React.FC = () => {
-  const { classes } = useStyles()
+  const theme = useTheme()
   const dispatch = useAppDispatch()
 
   const {
@@ -49,7 +47,7 @@ const CohortCreationBreadcrumbs: React.FC = () => {
   }, [projects, requests])
 
   return (
-    <Grid container className={classes.root}>
+    <Grid container marginBottom={theme.spacing(2)}>
       <Breadcrumbs separator=">" aria-label="breadcrumb">
         <Typography>{projectName}</Typography>
         <Typography>{requestName}</Typography>

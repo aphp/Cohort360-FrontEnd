@@ -10,25 +10,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     [theme.breakpoints.down('lg')]: {
       alignSelf: 'flex-end'
     }
-  },
-  temporalConstraintSelect: {
-    height: '25px',
-    marginTop: '4px',
-    marginRight: '2px',
-    fontSize: 11,
-    color: 'black',
-    '&::after': {
-      borderBottom: 'none'
-    },
-    '&::before': {
-      borderBottom: 'none'
-    },
-    '&:hover:not($disabled):not($focused):not($error):before': {
-      borderBottom: `none !important`
-    }
-  },
-  selectIcon: {
-    color: 'black'
   }
 }))
 

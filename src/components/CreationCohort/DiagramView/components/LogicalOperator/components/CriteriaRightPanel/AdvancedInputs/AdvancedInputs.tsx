@@ -24,15 +24,13 @@ type AdvancedInputsProps = {
 const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
   const { form, selectedCriteria = {}, onChangeValue } = props
   const optionsIsUsed =
-    +selectedCriteria.occurrence !== 1 ||
-    selectedCriteria.occurrenceComparator !== '>=' ||
-    !!selectedCriteria.startOccurrence ||
-    !!selectedCriteria.endOccurrence ||
-    !!selectedCriteria.encounterStartDate ||
-    !!selectedCriteria.encounterEndDate
+    !!selectedCriteria?.startOccurrence ||
+    !!selectedCriteria?.endOccurrence ||
+    !!selectedCriteria?.encounterStartDate ||
+    !!selectedCriteria?.encounterEndDate
 
   const [checked, setCheck] = useState(optionsIsUsed)
-  const label = 'Séléctionnez une unité exécutrice'
+  const label = 'Sélectionnez une unité exécutrice'
 
   const _onSubmitExecutiveUnits = (_selectedExecutiveUnits: ScopeTreeRow[] | undefined) => {
     onChangeValue('encounterService', _selectedExecutiveUnits)

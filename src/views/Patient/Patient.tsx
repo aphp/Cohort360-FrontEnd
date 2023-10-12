@@ -14,12 +14,13 @@ import PatientTimeline from 'components/Patient/PatientTimeline/PatientTimeline'
 import PatientPMSI from 'components/Patient/PatientPMSI/PatientPMSI'
 import PatientMedication from 'components/Patient/PatientMedication/PatientMedication'
 import PatientBiology from 'components/Patient/PatientBiology/PatientBiology'
+import PatientImaging from 'components/Patient/PatientImaging/PatientImaging'
 import TopBar from 'components/TopBar/TopBar'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPatientInfo } from 'state/patient'
 
-import { ODD_BIOLOGY, ODD_MEDICATION } from '../../constants'
+import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION } from '../../constants'
 
 import useStyles from './styles'
 
@@ -150,6 +151,15 @@ const Patient = () => {
                 to={`/patients/${patientId}/biology${groupId ? `?groupId=${groupId}` : ''}`}
               />
             )}
+            {ODD_IMAGING && (
+              <Tab
+                className={classes.tabTitle}
+                label="Imagerie"
+                value="imaging"
+                component={Link}
+                to={`/patients/${patientId}/imaging${groupId ? `?groupId=${groupId}` : ''}`}
+              />
+            )}
           </Tabs>
         </Grid>
         <Grid container sm={11} className={classes.tabContainer}>
@@ -170,6 +180,7 @@ const Patient = () => {
           {selectedTab === 'pmsi' && <PatientPMSI groupId={groupId} />}
           {ODD_MEDICATION && selectedTab === 'medication' && <PatientMedication groupId={groupId} />}
           {ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology groupId={groupId} />}
+          {ODD_IMAGING && selectedTab === 'imaging' && <PatientImaging groupId={groupId} />}
         </Grid>
 
         <PatientSidebar

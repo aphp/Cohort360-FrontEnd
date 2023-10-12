@@ -14,7 +14,6 @@ import {
   Alert
 } from '@mui/material'
 
-import useStyles from './styles'
 import { CohortCreationError } from 'types'
 
 const BLANK_REGEX = /^\s*$/
@@ -25,8 +24,6 @@ const ModalCohortTitle: React.FC<{
   longCohort: boolean
   cohortLimit: number
 }> = ({ onExecute, onClose, longCohort, cohortLimit }) => {
-  const { classes } = useStyles()
-
   const [title, onChangeTitle] = useState('')
   const [description, onChangeDescription] = useState('')
   const [globalCount, onCheckGlobalCount] = useState(false)
@@ -61,7 +58,7 @@ const ModalCohortTitle: React.FC<{
     <Dialog fullWidth maxWidth="sm" open onClose={handleClose} aria-labelledby="form-dialog-title">
       <DialogTitle>Création de la cohorte</DialogTitle>
       <DialogContent style={{ overflowY: 'unset' }}>
-        <Grid container direction="column" className={classes.inputContainer}>
+        <Grid container direction="column" marginBottom={3}>
           <Typography variant="h3">Nom de la cohorte :</Typography>
           <TextField
             placeholder="Nom de la cohorte"
@@ -84,7 +81,7 @@ const ModalCohortTitle: React.FC<{
           />
         </Grid>
 
-        <Grid container direction="column" className={classes.inputContainer}>
+        <Grid container direction="column" marginBottom={3}>
           <Typography variant="h3">Description :</Typography>
           <TextField
             placeholder="Description"

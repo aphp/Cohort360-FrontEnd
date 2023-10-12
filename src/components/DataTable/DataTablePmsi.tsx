@@ -1,6 +1,7 @@
 import React from 'react'
 
-import { CircularProgress, Grid, Typography, TableRow, TableCell } from '@mui/material'
+import { CircularProgress, Grid, Typography, TableRow } from '@mui/material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import DataTable from 'components/DataTable/DataTable'
 
@@ -36,25 +37,17 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
   const { classes } = useStyles()
 
   const columns = [
-    { label: `NDA${deidentified ? ' chiffré' : ''}`, code: '', align: 'left', sortableColumn: false },
-    { label: 'Codage le', code: Order.DATE, align: 'center', sortableColumn: true },
-    { label: 'source', code: '', align: 'center', sortableColumn: false },
-    { label: 'Code', code: Order.CODE, align: 'center', sortableColumn: true },
-    { label: 'Libellé', code: '', align: 'center', sortableColumn: false },
-    selectedTab === PMSI.DIAGNOSTIC ? { label: 'Type', code: '', align: 'center', sortableColumn: false } : null,
-    { label: 'Unité exécutrice', code: '', align: 'center', sortableColumn: false }
+    { label: `NDA${deidentified ? ' chiffré' : ''}`, align: 'left' },
+    { label: 'Codage le', code: Order.DATE },
+    { label: 'source' },
+    { label: 'Code', code: Order.CODE },
+    { label: 'Libellé' },
+    selectedTab === PMSI.DIAGNOSTIC ? { label: 'Type' } : null,
+    { label: 'Unité exécutrice' }
   ].filter((elem) => elem !== null) as Column[]
 
   return (
-    <DataTable
-      columns={columns}
-      order={orderBy}
-      setOrder={setOrderBy}
-      rowsPerPage={20}
-      page={page}
-      setPage={setPage}
-      total={total}
-    >
+    <DataTable columns={columns} order={orderBy} setOrder={setOrderBy} page={page} setPage={setPage} total={total}>
       {!loading && pmsiList?.length > 0 && (
         <>
           {pmsiList.map((pmsi) => {
@@ -64,22 +57,22 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
       )}
       {!loading && pmsiList?.length < 1 && (
         <TableRow className={classes.emptyTableRow}>
-          <TableCell colSpan={6} align="left">
+          <TableCellWrapper colSpan={6} align="left">
             <Grid container justifyContent="center">
               <Typography variant="button">{`Aucun ${
                 selectedTab !== PMSI.DIAGNOSTIC ? (selectedTab !== PMSI.CCAM ? PMSI.GHM : 'acte') : PMSI.DIAGNOSTIC
               } à afficher`}</Typography>
             </Grid>
-          </TableCell>
+          </TableCellWrapper>
         </TableRow>
       )}
       {loading && (
         <TableRow className={classes.emptyTableRow}>
-          <TableCell colSpan={6} align="left">
+          <TableCellWrapper colSpan={6} align="left">
             <Grid container justifyContent="center">
               <CircularProgress />
             </Grid>
-          </TableCell>
+          </TableCellWrapper>
         </TableRow>
       )}
     </DataTable>
@@ -113,19 +106,19 @@ const DataTablePmsiLine: React.FC<{
 
   return (
     <TableRow className={classes.tableBodyRows} key={pmsi.id}>
-      <TableCell align="left">{nda ?? 'Inconnu'}</TableCell>
-      <TableCell align="center">{date}</TableCell>
-      <TableCell align="center">
+      <TableCellWrapper align="left">{nda ?? 'Inconnu'}</TableCellWrapper>
+      <TableCellWrapper>{date}</TableCellWrapper>
+      <TableCellWrapper>
         <Typography className={classes.libelle}>{source}</Typography>
-      </TableCell>
-      <TableCell align="center">
+      </TableCellWrapper>
+      <TableCellWrapper>
         <Typography className={classes.libelle}>{codeToDisplay?.code}</Typography>
-      </TableCell>
-      <TableCell align="center">
+      </TableCellWrapper>
+      <TableCellWrapper>
         <Typography className={classes.libelle}>{codeToDisplay?.display}</Typography>
-      </TableCell>
-      {selectedTab === PMSI.DIAGNOSTIC && <TableCell align="center">{type}</TableCell>}
-      <TableCell align="center">{serviceProvider ?? '-'}</TableCell>
+      </TableCellWrapper>
+      {selectedTab === PMSI.DIAGNOSTIC && <TableCellWrapper>{type}</TableCellWrapper>}
+      <TableCellWrapper>{serviceProvider ?? '-'}</TableCellWrapper>
     </TableRow>
   )
 }

@@ -21,11 +21,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
   backButton: { color: 'white' },
   divider: { background: 'white' },
   titleLabel: { marginLeft: '1em' },
-  tabTitle: {
-    minWidth: 0,
-    color: 'rgba(0, 99, 175, 0.4)',
-    borderBottom: '#CFE4FD 2px inset'
-  },
   indicator: {
     width: 20,
     height: 20,
@@ -37,15 +32,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     height: 20,
     backgroundColor: 'currentColor',
     boxShadow: 'inset 0 0 0 2px white',
-    border: '2px solid currentColor',
-    borderRadius: 10
-  },
-  indeterminateIndicator: {
-    color: '#555 !important',
-    width: 20,
-    height: 20,
-    backgroundColor: 'currentColor',
-    boxShadow: 'inset 0 0 0 4px white',
     border: '2px solid currentColor',
     borderRadius: 10
   },

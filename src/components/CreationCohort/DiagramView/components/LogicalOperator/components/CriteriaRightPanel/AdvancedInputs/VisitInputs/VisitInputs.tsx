@@ -30,7 +30,7 @@ const VisitInputs: React.FC<VisitInputsProps> = (props) => {
           <Input
             id="date-start-occurrence"
             type="date"
-            value={selectedCriteria.encounterStartDate}
+            value={selectedCriteria?.encounterStartDate}
             endAdornment={
               <IconButton size="small" onClick={() => onChangeValue('encounterStartDate', '')}>
                 <ClearIcon />
@@ -47,7 +47,7 @@ const VisitInputs: React.FC<VisitInputsProps> = (props) => {
           <Input
             id="date-end-occurrence"
             type="date"
-            value={selectedCriteria.encounterEndDate}
+            value={selectedCriteria?.encounterEndDate}
             endAdornment={
               <IconButton size="small" onClick={() => onChangeValue('encounterEndDate', '')}>
                 <ClearIcon />

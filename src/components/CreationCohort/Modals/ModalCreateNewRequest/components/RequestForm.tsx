@@ -2,8 +2,6 @@ import React from 'react'
 
 import { Grid, MenuItem, Select, TextField, Typography } from '@mui/material'
 
-import useStyles from '../styles'
-
 import { ProjectType, RequestType } from 'types'
 
 const ERROR_TITLE = 'error_title'
@@ -30,11 +28,9 @@ const RequestForm: React.FC<RequestFormProps> = ({
   onChangeProjectName,
   projectList
 }) => {
-  const { classes } = useStyles()
-
   return (
     <>
-      <Grid container direction="column" className={classes.inputContainer}>
+      <Grid container direction="column" marginBottom={3}>
         <Typography variant="h3">Nom de la requête :</Typography>
         <TextField
           placeholder="Nom de la requête"
@@ -57,7 +53,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
         />
       </Grid>
 
-      <Grid container direction="column" className={classes.inputContainer}>
+      <Grid container direction="column" marginBottom={3}>
         <Typography variant="h3">Projet :</Typography>
 
         <Select
@@ -88,7 +84,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
         )}
       </Grid>
 
-      <Grid container direction="column" className={classes.inputContainer}>
+      <Grid container direction="column" marginBottom={3}>
         <Typography variant="h3">Description :</Typography>
         <TextField
           placeholder="Description"

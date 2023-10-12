@@ -27,10 +27,6 @@ const useStyles = makeStyles()(() => ({
     flex: '1 1 0%',
     flexDirection: 'column'
   },
-  inputItem: {
-    margin: '1em',
-    width: 'calc(100% - 2em)'
-  },
   criteriaActionContainer: {
     display: 'flex',
     alignItems: 'center',

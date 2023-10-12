@@ -97,7 +97,7 @@ const ModalEditCohort: React.FC<{
         <DialogTitle>{isEdition ? 'Modifier ' : 'Créer '} une cohorte</DialogTitle>
 
         <DialogContent>
-          <Grid container direction="column" className={classes.inputContainer}>
+          <Grid container direction="column" marginBottom={3}>
             <Typography variant="h3">Nom de la cohorte :</Typography>
             <TextField
               placeholder="Nom de la cohorte"

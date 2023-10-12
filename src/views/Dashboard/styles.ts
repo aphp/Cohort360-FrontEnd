@@ -25,7 +25,6 @@ export default makeStyles()((theme: Theme) => ({
     minWidth: 0,
     fontWeight: 900,
     color: '#5BC5F2',
-    // border: `3px solid currentColor`,
     borderRadius: 4,
     marginRight: 12,
     padding: '4px 8px',
