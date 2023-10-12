@@ -107,6 +107,8 @@ export const BIOLOGY_HIERARCHY_ITM_LOINC = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_BIOLOGY_LOINC
   : '{VITE_VALUE_SET_URL_BIOLOGY_LOINC}'
 
+export const CODE_DISPLAY_JWT = import.meta.env.DEV ? import.meta.env.VITE_CODE_DISPLAY_JWT : '{VITE_CODE_DISPLAY_JWT}'
+
 export const ODD_BIOLOGY = import.meta.env.DEV
   ? import.meta.env.VITE_ODD_BIOLOGY == `${BOOLEANTRUE}`
   : '{VITE_ODD_BIOLOGY}' == `${BOOLEANTRUE}`
