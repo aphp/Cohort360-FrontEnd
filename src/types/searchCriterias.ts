@@ -49,7 +49,10 @@ export enum Order {
   FIRSTNAME = 'name',
   LASTNAME = 'family',
   BIRTHDATE = 'birthdate',
-  IPP = 'identifier'
+  IPP = 'identifier',
+  MODALITY = 'modality',
+  DESCRIPTION = 'description',
+  PROCEDURE = 'procedureCode'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -160,6 +163,13 @@ export type BiologyFilters = {
   endDate: string | null
   executiveUnits: ScopeTreeRow[]
   validatedStatus: boolean
+}
+
+export type ImagingFilters = {
+  nda: string
+  startDate: string | null
+  endDate: string | null
+  executiveUnits: ScopeTreeRow[]
 }
 
 export type PatientDocumentsFilters = {

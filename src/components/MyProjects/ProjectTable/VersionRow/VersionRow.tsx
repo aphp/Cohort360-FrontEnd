@@ -10,12 +10,12 @@ import {
   Link,
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableRow,
   Tooltip,
   Typography
 } from '@mui/material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import EditIcon from '@mui/icons-material/Edit'
 import ExportIcon from '@mui/icons-material/GetApp'
@@ -64,26 +64,16 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
       <Table size="small" aria-label="versions">
         <TableHead>
           <TableRow>
-            <TableCell>Nom</TableCell>
-            <TableCell align="center">Favoris</TableCell>
-            <TableCell align="center" style={{ width: 125 }}>
-              Statut
-            </TableCell>
-            <TableCell align="center" style={{ width: 125 }}>
-              Version
-            </TableCell>
-            <TableCell align="center" style={{ width: 125 }}>
-              Nombre de patients
-            </TableCell>
+            <TableCellWrapper align="left">Nom</TableCellWrapper>
+            <TableCellWrapper>Favoris</TableCellWrapper>
+            <TableCellWrapper style={{ width: 125 }}>Statut</TableCellWrapper>
+            <TableCellWrapper style={{ width: 125 }}>Version</TableCellWrapper>
+            <TableCellWrapper style={{ width: 125 }}>Nombre de patients</TableCellWrapper>
             <Hidden lgDown>
-              <TableCell align="center" style={{ width: 175 }}>
-                Date
-              </TableCell>
+              <TableCellWrapper style={{ width: 175 }}>Date</TableCellWrapper>
             </Hidden>
 
-            <TableCell align="center" style={{ width: 66 }}>
-              Exporter
-            </TableCell>
+            <TableCellWrapper style={{ width: 66 }}>Exporter</TableCellWrapper>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -101,7 +91,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
 
               return (
                 <TableRow key={historyRow.uuid}>
-                  <TableCell className={classes.tdName}>
+                  <TableCellWrapper align="left" className={classes.tdName}>
                     {historyRow.fhir_group_id ? (
                       <Link onClick={() => navigate(`/cohort/${historyRow.fhir_group_id}`)} underline="hover">
                         {historyRow.name}
@@ -118,13 +108,13 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                     >
                       <EditIcon />
                     </IconButton>
-                  </TableCell>
-                  <TableCell align="center">
+                  </TableCellWrapper>
+                  <TableCellWrapper>
                     <IconButton onClick={() => onSetCohortFavorite(historyRow)}>
                       <FavStar favorite={historyRow.favorite} />
                     </IconButton>
-                  </TableCell>
-                  <TableCell align="center">
+                  </TableCellWrapper>
+                  <TableCellWrapper>
                     {historyRow.fhir_group_id ? (
                       <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
                     ) : historyRow.request_job_status === JobStatus.pending ||
@@ -137,23 +127,21 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                     ) : (
                       <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
                     )}
-                  </TableCell>
-                  <TableCell align="center">
+                  </TableCellWrapper>
+                  <TableCellWrapper>
                     <Link
                       className={classes.versionLabel}
                       onClick={() => navigate(`/cohort/new/${requestId}/${historyRow.request_query_snapshot}`)}
                     >
                       {historyRow.request_query_snapshot?.split('-')[0]}
                     </Link>
-                  </TableCell>
-                  <TableCell align="center">{displayDigit(historyRow.result_size)}</TableCell>
+                  </TableCellWrapper>
+                  <TableCellWrapper>{displayDigit(historyRow.result_size)}</TableCellWrapper>
                   <Hidden lgDown>
-                    <TableCell align="center">
-                      {moment(historyRow.modified_at).format('DD/MM/YYYY [à] HH:mm')}
-                    </TableCell>
+                    <TableCellWrapper>{moment(historyRow.modified_at).format('DD/MM/YYYY [à] HH:mm')}</TableCellWrapper>
                   </Hidden>
 
-                  <TableCell align="center">
+                  <TableCellWrapper>
                     <IconButton
                       disabled={!canExportThisCohort}
                       onClick={
@@ -164,13 +152,13 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                     >
                       <ExportIcon />
                     </IconButton>
-                  </TableCell>
+                  </TableCellWrapper>
                 </TableRow>
               )
             })
           ) : (
             <TableRow>
-              <TableCell colSpan={6}>
+              <TableCellWrapper colSpan={6}>
                 <Typography className={classes.emptyRequestRow}>
                   Aucune cohorte n'est liée à cette requête
                   <br />
@@ -183,7 +171,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                   </Link>{' '}
                   et appuyer sur le bouton "Créer la cohorte"
                 </Typography>
-              </TableCell>
+              </TableCellWrapper>
             </TableRow>
           )}
         </TableBody>

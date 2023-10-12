@@ -2,7 +2,8 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 
-import { Checkbox, Collapse, IconButton, Link, Table, TableBody, TableCell, TableRow, Tooltip } from '@mui/material'
+import { Checkbox, Collapse, IconButton, Link, Table, TableBody, TableRow, Tooltip } from '@mui/material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
@@ -61,7 +62,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
     <Table>
       <TableBody>
         <TableRow style={{ background: '#FAF9F9' }}>
-          <TableCell style={{ width: 62 }}>
+          <TableCellWrapper align="left" style={{ width: 62 }}>
             <Checkbox
               size="small"
               checked={!!rowIsSelected}
@@ -74,13 +75,13 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
               }}
               color="secondary"
             />
-          </TableCell>
-          <TableCell style={{ width: 62 }}>
+          </TableCellWrapper>
+          <TableCellWrapper align="left" style={{ width: 62 }}>
             <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
               {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
             </IconButton>
-          </TableCell>
-          <TableCell className={classes.tdName}>
+          </TableCellWrapper>
+          <TableCellWrapper align="left" className={classes.tdName}>
             {row?.shared_by?.displayed_name ? (
               <Link onClick={() => navigate(`/cohort/new/${row.uuid}`)} underline="hover" style={{ cursor: 'pointer' }}>
                 {`${row.name} - Envoyée par : ${row?.shared_by?.firstname} ${row?.shared_by?.lastname?.toUpperCase()}`}
@@ -111,19 +112,19 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
                 <ShareIcon />
               </IconButton>
             </Tooltip>
-          </TableCell>
+          </TableCellWrapper>
 
-          <TableCell className={classes.dateCell} align="center">
+          <TableCellWrapper className={classes.dateCell}>
             {moment(row.modified_at).format('DD/MM/YYYY [à] HH:mm')}
-          </TableCell>
+          </TableCellWrapper>
         </TableRow>
 
         <TableRow>
-          <TableCell style={{ padding: 0, borderBottomWidth: open ? 1 : 0 }} colSpan={5}>
+          <TableCellWrapper align="left" style={{ padding: 0, borderBottomWidth: open ? 1 : 0 }} colSpan={5}>
             <Collapse in={open} timeout="auto" unmountOnExit style={{ width: '100%' }}>
               <VersionRow requestId={row.uuid} cohortsList={cohortsList} />
             </Collapse>
-          </TableCell>
+          </TableCellWrapper>
         </TableRow>
       </TableBody>
     </Table>

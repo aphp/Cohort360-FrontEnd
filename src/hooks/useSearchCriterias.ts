@@ -11,7 +11,8 @@ import {
   MedicationFilters,
   BiologyFilters,
   PatientDocumentsFilters,
-  AllDocumentsFilters
+  AllDocumentsFilters,
+  ImagingFilters
 } from 'types/searchCriterias'
 
 export const initSearchPatientsSearchCriterias: SearchCriterias<null> = {
@@ -84,6 +85,21 @@ export const initBioSearchCriterias: SearchCriterias<BiologyFilters> = {
     nda: '',
     loinc: '',
     anabio: '',
+    startDate: null,
+    endDate: null,
+    executiveUnits: []
+  }
+}
+
+export const initImagingCriterias: SearchCriterias<ImagingFilters> = {
+  orderBy: {
+    orderBy: Order.IPP,
+    orderDirection: Direction.ASC
+  },
+  searchInput: '',
+  searchBy: SearchByTypes.TEXT,
+  filters: {
+    nda: '',
     startDate: null,
     endDate: null,
     executiveUnits: []

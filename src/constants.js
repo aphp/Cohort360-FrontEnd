@@ -107,6 +107,10 @@ export const ODD_BIOLOGY = import.meta.env.DEV
   ? import.meta.env.VITE_ODD_BIOLOGY == `${BOOLEANTRUE}`
   : '{VITE_ODD_BIOLOGY}' == `${BOOLEANTRUE}`
 
+export const ODD_IMAGING = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_IMAGING == `${BOOLEANTRUE}`
+  : '{VITE_ODD_IMAGING}' == `${BOOLEANTRUE}`
+
 export const ODD_COMPOSITION = import.meta.env.DEV
   ? import.meta.env.VITE_ODD_COMPOSITION == `${BOOLEANTRUE}`
   : '{VITE_ODD_COMPOSITION}' == `${BOOLEANTRUE}`

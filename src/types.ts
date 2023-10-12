@@ -7,6 +7,7 @@ import {
   Encounter,
   FhirResource,
   Group,
+  ImagingStudy,
   MedicationAdministration,
   MedicationRequest,
   Observation,
@@ -221,8 +222,7 @@ export type Column =
   | {
       label: string | ReactNode
       code?: string
-      align: 'inherit' | 'left' | 'center' | 'right' | 'justify'
-      sortableColumn?: boolean
+      align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
       multiple?: undefined
     }
   | {
@@ -848,6 +848,18 @@ export type IPatientObservation<T extends CohortObservation> = {
       direction: string
     }
   }
+}
+
+export type CohortImaging = ImagingStudy & {
+  serviceProvider?: string
+  NDA?: string
+}
+export type IPatientImaging<T extends CohortImaging> = {
+  loading: boolean
+  count: number
+  total: number
+  list: T[]
+  page: number
 }
 
 export type TabType<T, TL> = {

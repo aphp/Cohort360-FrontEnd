@@ -16,7 +16,6 @@ import {
   MenuItem,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
   TableSortLabel,
@@ -24,6 +23,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import InfoIcon from '@mui/icons-material/Info'
@@ -160,7 +160,8 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
                 <TableRow className={classes.tableHead}>
-                  <TableCell
+                  <TableCellWrapper
+                    align="left"
                     className={classes.tableHeadCell}
                     sortDirection={sortBy === 'name' ? sortDirection : false}
                   >
@@ -175,10 +176,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                     ) : (
                       'Titre'
                     )}
-                  </TableCell>
-                  <TableCell
+                  </TableCellWrapper>
+                  <TableCellWrapper
                     className={classes.tableHeadCell}
-                    align="center"
                     sortDirection={sortBy === 'favorite' ? sortDirection : false}
                   >
                     {sortDirection ? (
@@ -192,12 +192,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                     ) : (
                       'Favoris'
                     )}
-                  </TableCell>
-                  <TableCell className={classes.tableHeadCell} align="center">
-                    Statut
-                  </TableCell>
-                  <TableCell
-                    align="center"
+                  </TableCellWrapper>
+                  <TableCellWrapper className={classes.tableHeadCell}>Statut</TableCellWrapper>
+                  <TableCellWrapper
                     className={classes.tableHeadCell}
                     sortDirection={sortBy === 'result_size' ? sortDirection : false}
                   >
@@ -212,17 +209,16 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                     ) : (
                       'Nombre de patients'
                     )}
-                  </TableCell>
-                  <TableCell className={classes.tableHeadCell} align="center">
+                  </TableCellWrapper>
+                  <TableCellWrapper className={classes.tableHeadCell}>
                     Estimation du nombre de patients APHP
                     <Tooltip title="Cet intervalle correspond à une estimation du nombre de patients correspondant aux critères de votre requête avec comme population source tous les hôpitaux de l'APHP.">
                       <IconButton size="small" className={classes.infoButton}>
                         <InfoIcon />
                       </IconButton>
                     </Tooltip>
-                  </TableCell>
-                  <TableCell
-                    align="center"
+                  </TableCellWrapper>
+                  <TableCellWrapper
                     className={classes.tableHeadCell}
                     sortDirection={sortBy === 'modified_at' ? sortDirection : false}
                   >
@@ -237,10 +233,8 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                     ) : (
                       'Date de modification'
                     )}
-                  </TableCell>
-                  <TableCell align="center" className={classes.tableHeadCell}>
-                    Actions
-                  </TableCell>
+                  </TableCellWrapper>
+                  <TableCellWrapper className={classes.tableHeadCell}>Actions</TableCellWrapper>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -258,8 +252,10 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       hover
                       key={row.uuid}
                     >
-                      <TableCell onClick={() => _onClickRow(row)}>{row.name}</TableCell>
-                      <TableCell align="center">
+                      <TableCellWrapper align="left" onClick={() => _onClickRow(row)}>
+                        {row.name}
+                      </TableCellWrapper>
+                      <TableCellWrapper>
                         <IconButton
                           onClick={(event) => {
                             event.stopPropagation()
@@ -273,8 +269,8 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                             <FavStar favorite={row.favorite} />
                           )}
                         </IconButton>
-                      </TableCell>
-                      <TableCell onClick={() => _onClickRow(row)} align="center">
+                      </TableCellWrapper>
+                      <TableCellWrapper onClick={() => _onClickRow(row)}>
                         {row.request_job_status === CohortJobStatus._finished ? (
                           <Chip label="Terminé" size="small" style={{ backgroundColor: '#28a745', color: 'white' }} />
                         ) : row.request_job_status === CohortJobStatus._pending ||
@@ -296,11 +292,11 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                         ) : (
                           <Chip label="Erreur" size="small" style={{ backgroundColor: '#dc3545', color: 'black' }} />
                         )}
-                      </TableCell>
-                      <TableCell onClick={() => _onClickRow(row)} align="center">
+                      </TableCellWrapper>
+                      <TableCellWrapper onClick={() => _onClickRow(row)}>
                         {displayDigit(row.result_size)}
-                      </TableCell>
-                      <TableCell onClick={() => _onClickRow(row)} align="center">
+                      </TableCellWrapper>
+                      <TableCellWrapper onClick={() => _onClickRow(row)}>
                         {row.dated_measure_global
                           ? row.dated_measure_global?.measure_min === null ||
                             row.dated_measure_global?.measure_max === null
@@ -309,8 +305,8 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                 row.dated_measure_global?.measure_max
                               )}`
                           : '-'}
-                      </TableCell>
-                      <TableCell onClick={() => _onClickRow(row)} align="center">
+                      </TableCellWrapper>
+                      <TableCellWrapper onClick={() => _onClickRow(row)}>
                         {row.modified_at ? (
                           <>
                             {new Date(row.modified_at).toLocaleDateString('fr-FR')} {'à'}{' '}
@@ -322,8 +318,8 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                         ) : (
                           '-'
                         )}
-                      </TableCell>
-                      <TableCell align="center">
+                      </TableCellWrapper>
+                      <TableCellWrapper>
                         <Hidden lgDown>
                           <Grid
                             container
@@ -476,7 +472,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                             </MenuItem>
                           </Menu>
                         </Hidden>
-                      </TableCell>
+                      </TableCellWrapper>
                     </TableRow>
                   )
                 })}
