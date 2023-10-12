@@ -44,8 +44,8 @@ const ENCOUNTER_PRISENCHARGETYPE = 'class'
 const ENCOUNTER_TYPEDESEJOUR = 'stay'
 const ENCOUNTER_FILESTATUS = 'status'
 const ENCOUNTER_ADMISSIONMODE = 'reason-code'
-const ENCOUNTER_REASON = 'destination-type'
-const ENCOUNTER_DESTINATION = 'destination'
+const ENCOUNTER_REASON = 'admission-destination-type'
+const ENCOUNTER_DESTINATION = 'discharge-disposition'
 const ENCOUNTER_PROVENANCE = 'admit-source'
 const ENCOUNTER_ADMISSION = 'admission-type'
 
@@ -60,7 +60,7 @@ const PROCEDURE_CODE_ALL_HIERARCHY = 'code'
 export const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition'
 const CONDITION_CODE = 'code'
 const CONDITION_CODE_ALL_HIERARCHY = 'code'
-const CONDITION_TYPE = 'type'
+const CONDITION_TYPE = 'orbis-status'
 
 const RESSOURCE_TYPE_COMPOSITION: 'DocumentReference' = 'DocumentReference'
 const COMPOSITION_TEXT = '_text'
@@ -71,8 +71,9 @@ const COMPOSITION_STATUS = 'docstatus'
 const RESSOURCE_TYPE_MEDICATION_REQUEST: 'MedicationRequest' = 'MedicationRequest' // = Prescription
 const RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: 'MedicationAdministration' = 'MedicationAdministration' // = Administration
 const MEDICATION_CODE = 'medication'
-const MEDICATION_PRESCRIPTION_TYPE = 'type'
-const MEDICATION_ADMINISTRATION = 'dosage-route'
+const MEDICATION_PRESCRIPTION_TYPE = 'category'
+const MEDICATION_ADMINISTRATION_ROUTE = 'dosage-route'
+const MEDICATION_REQUEST_ROUTE = 'dosage-instruction-route'
 
 const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
 const OBSERVATION_CODE = 'code'
@@ -80,6 +81,7 @@ const OBSERVATION_CODE_ALL_HIERARCHY = 'code'
 const OBSERVATION_VALUE = 'value-quantity'
 const OBSERVATION_STATUS = 'status'
 const ENCOUNTER_SERVICE_PROVIDER = 'encounter.encounter-care-site'
+const ENCOUNTER_CONTEXT_SERVICE_PROVIDER = 'context.encounter-care-site'
 const SERVICE_PROVIDER = 'encounter-care-site'
 
 export const UNITE_EXECUTRICE = 'Unité exécutrice'
@@ -463,14 +465,20 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         }`,
         `${
           criterion.administration && criterion.administration.length > 0
-            ? `${MEDICATION_ADMINISTRATION}=${criterion.administration
-                .map((administration: any) => administration.id)
-                .reduce(searchReducer)}`
+            ? `${
+                criterion.type === RESSOURCE_TYPE_MEDICATION_REQUEST
+                  ? MEDICATION_REQUEST_ROUTE
+                  : MEDICATION_ADMINISTRATION_ROUTE
+              }=${criterion.administration.map((administration: any) => administration.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.encounterService && criterion.encounterService.length > 0
-            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
+            ? `${
+                criterion.type === RESSOURCE_TYPE_MEDICATION_REQUEST
+                  ? ENCOUNTER_SERVICE_PROVIDER
+                  : ENCOUNTER_CONTEXT_SERVICE_PROVIDER
+              }=${criterion.encounterService
                 .map((encounterServiceItem: any) => encounterServiceItem.id)
                 .reduce(searchReducer)}`
             : ''
@@ -1372,7 +1380,8 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   : newPrescription
                 break
               }
-              case MEDICATION_ADMINISTRATION: {
+              case MEDICATION_REQUEST_ROUTE:
+              case MEDICATION_ADMINISTRATION_ROUTE: {
                 const administrationIds = value?.split(',')
                 const newAdministration = administrationIds?.map((administrationId: any) => ({ id: administrationId }))
                 if (!newAdministration) continue
@@ -1384,6 +1393,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case 'subject.active':
                 break
+              case ENCOUNTER_CONTEXT_SERVICE_PROVIDER:
               case ENCOUNTER_SERVICE_PROVIDER: {
                 if (!value) continue
 
