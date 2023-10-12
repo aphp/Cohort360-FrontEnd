@@ -21,6 +21,7 @@ import {
   Encounter,
   Extension,
   Group,
+  ImagingStudy,
   MedicationAdministration,
   MedicationRequest,
   OperationOutcome,
@@ -770,6 +771,51 @@ export const fetchMedicationAdministration = async (
 
   const response = await apiFhir.get<FHIR_Bundle_Response<MedicationAdministration>>(
     `/MedicationAdministration?${options.reduce(paramsReducer)}`,
+    {
+      signal: signal
+    }
+  )
+
+  return response
+}
+
+type fetchImagingProps = {
+  patient?: string
+  size?: number
+  offset?: number
+  order?: Order
+  orderDirection?: Direction
+  _text?: string
+  encounter?: string
+  minDate?: string
+  maxDate?: string
+  _list?: string[]
+  signal?: AbortSignal
+  executiveUnits?: string[]
+}
+export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise_Response<ImagingStudy> => {
+  const { patient, size, offset, order, orderDirection, _text, encounter, minDate, maxDate, signal, executiveUnits } =
+    args
+  const _orderDirection = orderDirection === Direction.DESC ? '-' : ''
+  let { _list } = args
+  _list = _list ? _list.filter(uniq) : []
+
+  // By default, all the calls to `/ImagingStudy` will have 'patient.active=true' in parameter
+  let options: string[] = ['patient.active=true']
+  if (patient) options = [...options, `patient=${patient}`]
+  if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset) options = [...options, `offset=${offset}`]
+  if (order) options = [...options, `_sort=${_orderDirection}${order}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
+  if (encounter) options = [...options, `encounter.identifier=${encounter}`]
+  if (minDate) options = [...options, `date=ge${minDate}`]
+  if (maxDate) options = [...options, `date=le${maxDate}`]
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
+
+  const response = await apiFhir.get<FHIR_Bundle_Response<ImagingStudy>>(
+    `/ImagingStudy?${options.reduce(paramsReducer)}`,
     {
       signal: signal
     }

@@ -6,13 +6,13 @@ import {
   Paper,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
   TableRow,
   TableSortLabel,
   Typography
 } from '@mui/material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import useStyles from './styles'
 import { Column } from 'types'
@@ -58,13 +58,13 @@ const DataTable: React.FC<DataTableProps> = ({
             <TableRow className={classes.tableHead}>
               {columns.map((column, index) =>
                 column.multiple === undefined ? (
-                  <TableCell
+                  <TableCellWrapper
                     key={index}
                     sortDirection={order?.orderBy === column.code ? order?.orderDirection : false}
                     align={column.align}
                     className={classes.tableHeadCell}
                   >
-                    {column.sortableColumn ? (
+                    {column.code ? (
                       <TableSortLabel
                         active={order?.orderBy === column.code}
                         direction={order?.orderBy === column.code ? order?.orderDirection : 'asc'}
@@ -75,14 +75,14 @@ const DataTable: React.FC<DataTableProps> = ({
                     ) : (
                       column.label
                     )}
-                  </TableCell>
+                  </TableCellWrapper>
                 ) : (
-                  <TableCell key={index} className={classes.tableHeadCell}>
+                  <TableCellWrapper align="left" key={index} className={classes.tableHeadCell}>
                     {column.multiple.map(
                       (subColumn, index) =>
                         subColumn.multiple === undefined && (
                           <React.Fragment key={index}>
-                            {subColumn.sortableColumn ? (
+                            {subColumn.code ? (
                               <TableSortLabel
                                 className={classes.multiple}
                                 active={order?.orderBy === subColumn.code}
@@ -101,7 +101,7 @@ const DataTable: React.FC<DataTableProps> = ({
                           </React.Fragment>
                         )
                     )}
-                  </TableCell>
+                  </TableCellWrapper>
                 )
               )}
             </TableRow>
@@ -113,7 +113,7 @@ const DataTable: React.FC<DataTableProps> = ({
       {props.noPagination !== true && (
         <Pagination
           className={classes.pagination}
-          count={Math.ceil((total ?? 0) / (rowsPerPage ?? 100))}
+          count={Math.ceil((total ?? 0) / (rowsPerPage ?? 20))}
           shape="circular"
           onChange={(event, page: number) => setPage && setPage(page)}
           page={page}

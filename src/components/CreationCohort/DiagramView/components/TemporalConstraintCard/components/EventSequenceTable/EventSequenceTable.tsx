@@ -6,7 +6,6 @@ import {
   Paper,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
   TableRow,
@@ -14,6 +13,7 @@ import {
   Typography
 } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import { useAppSelector } from 'state'
 
@@ -125,9 +125,9 @@ const EventSequenceTable: React.FC<{
         <TableHead>
           <TableRow className={classes.tableHead}>
             {columns.map((column, index: number) => (
-              <TableCell key={index} align="center" className={classes.tableHeadCell}>
+              <TableCellWrapper key={index} className={classes.tableHeadCell}>
                 {column.label}
-              </TableCell>
+              </TableCellWrapper>
             ))}
           </TableRow>
         </TableHead>
@@ -135,11 +135,11 @@ const EventSequenceTable: React.FC<{
           {!temporalConstraints ||
           temporalConstraints.filter((constraints) => !constraints.idList.includes('All' as never)).length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7}>
+              <TableCellWrapper colSpan={7}>
                 <Typography className={classes.loadingSpinnerContainer}>
                   Aucune séquence d'évènements à afficher
                 </Typography>
-              </TableCell>
+              </TableCellWrapper>
             </TableRow>
           ) : (
             temporalConstraints.map((temporalConstraint: TemporalConstraintsType, index) => {
@@ -150,18 +150,18 @@ const EventSequenceTable: React.FC<{
               return (
                 temporalConstraint.constraintType === 'directChronologicalOrdering' && (
                   <TableRow key={index} className={classes.tableBodyRows} hover>
-                    <TableCell align="center" className={classes.flexCenter}>
+                    <TableCellWrapper className={classes.flexCenter}>
                       <Avatar className={classes.avatar}>{temporalConstraint.idList[0]}</Avatar>
                       <Typography style={{ width: 'fit-content', marginLeft: 4 }}> - {criteriaTitle1}</Typography>
-                    </TableCell>
-                    <TableCell align="center">s'est produit avant</TableCell>
-                    <TableCell align="center" className={classes.flexCenter}>
+                    </TableCellWrapper>
+                    <TableCellWrapper>s'est produit avant</TableCellWrapper>
+                    <TableCellWrapper className={classes.flexCenter}>
                       <Avatar className={classes.avatar}>{temporalConstraint.idList[1]}</Avatar>
                       <Typography style={{ width: 'fit-content', marginLeft: 4 }}> - {criteriaTitle2}</Typography>
-                    </TableCell>
-                    <TableCell align="center">{`${minDuration.values ?? '-'} ${minDuration.keys ?? ''}`}</TableCell>
-                    <TableCell align="center">{`${maxDuration.values ?? '-'} ${maxDuration.keys ?? ''}`}</TableCell>
-                    <TableCell align="center">
+                    </TableCellWrapper>
+                    <TableCellWrapper>{`${minDuration.values ?? '-'} ${minDuration.keys ?? ''}`}</TableCellWrapper>
+                    <TableCellWrapper>{`${maxDuration.values ?? '-'} ${maxDuration.keys ?? ''}`}</TableCellWrapper>
+                    <TableCellWrapper>
                       <Tooltip title="Supprimer la séquence temporelle" style={{ padding: '0 12px' }}>
                         <IconButton
                           onClick={(event) => {
@@ -172,7 +172,7 @@ const EventSequenceTable: React.FC<{
                           <DeleteIcon />
                         </IconButton>
                       </Tooltip>
-                    </TableCell>
+                    </TableCellWrapper>
                   </TableRow>
                 )
               )

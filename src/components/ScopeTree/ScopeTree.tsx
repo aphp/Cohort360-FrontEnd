@@ -11,7 +11,6 @@ import {
   Skeleton,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
   TableRow,
@@ -21,6 +20,7 @@ import {
 import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import EnhancedTable from 'components/ScopeTree/ScopeTreeTable'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 import { ScopeType, ScopeTreeRow, TreeElement } from 'types'
 
 import { useAppDispatch, useAppSelector } from 'state'
@@ -79,9 +79,9 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
     <>
       {row.id === 'loading' ? (
         <TableRow hover key={Math.random()}>
-          <TableCell colSpan={5}>
+          <TableCellWrapper align="left" colSpan={5}>
             <Skeleton animation="wave" />
-          </TableCell>
+          </TableCellWrapper>
         </TableRow>
       ) : (
         <TableRow
@@ -91,7 +91,7 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
             root: level % 2 === 0 ? classes.mainRow : classes.secondRow
           }}
         >
-          <TableCell>
+          <TableCellWrapper align="left">
             {row.subItems && row.subItems.length > 0 && row.type !== executiveUnitType && (
               <IconButton
                 onClick={() => onExpand(row.id)}
@@ -100,9 +100,9 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
                 {openPopulation.find((id) => row.id === id) ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
               </IconButton>
             )}
-          </TableCell>
+          </TableCellWrapper>
 
-          <TableCell align="center" padding="checkbox">
+          <TableCellWrapper padding="checkbox">
             <Checkbox
               color="secondary"
               onClick={() => {
@@ -112,8 +112,8 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
               checked={isSelected(row, selectedItems, rootRows) ? true : false}
               inputProps={{ 'aria-labelledby': labelId }}
             />
-          </TableCell>
-          <TableCell>
+          </TableCellWrapper>
+          <TableCellWrapper align="left">
             {debouncedSearchTerm && row.full_path ? (
               <Breadcrumbs maxItems={2}>
                 {(row.full_path.split('/').length > 1
@@ -128,18 +128,18 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
             ) : (
               <Typography>{row.name}</Typography>
             )}
-          </TableCell>
-          <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
+          </TableCellWrapper>
+          <TableCellWrapper style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
             <Typography>{displayDigit(row.quantity)}</Typography>
-          </TableCell>
+          </TableCellWrapper>
           {executiveUnitType ? (
-            <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
+            <TableCellWrapper style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
               <Typography>{row.type ?? '-'}</Typography>
-            </TableCell>
+            </TableCellWrapper>
           ) : (
-            <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
+            <TableCellWrapper style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
               <Typography>{row.access ?? parentAccess}</Typography>
-            </TableCell>
+            </TableCellWrapper>
           )}
         </TableRow>
       )}
@@ -484,14 +484,14 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
               <Table className={classes.table}>
                 <TableHead>
                   <TableRow className={classes.tableHead}>
-                    <TableCell align="center" className={classes.tableHeadCell} />
+                    <TableCellWrapper className={classes.tableHeadCell} />
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   <TableRow>
-                    <TableCell colSpan={7}>
+                    <TableCellWrapper colSpan={7}>
                       <Typography className={classes.loadingSpinnerContainer}>Aucun résultat à afficher</Typography>
-                    </TableCell>
+                    </TableCellWrapper>
                   </TableRow>
                 </TableBody>
               </Table>

@@ -16,7 +16,6 @@ import {
   MenuItem,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
   TableSortLabel,
@@ -34,6 +33,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 
 import ModalAddOrEditRequest from 'components/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 import ModalShareRequest from 'components/MyProjects/Modals/ModalShareRequest/ModalShareRequest'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import {
@@ -124,7 +124,8 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
                 <TableRow className={classes.tableHead}>
-                  <TableCell
+                  <TableCellWrapper
+                    align="left"
                     className={classes.tableHeadCell}
                     sortDirection={sortBy === 'name' ? sortDirection : false}
                   >
@@ -139,10 +140,9 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                     ) : (
                       'Titre'
                     )}
-                  </TableCell>
-                  <TableCell
+                  </TableCellWrapper>
+                  <TableCellWrapper
                     className={classes.tableHeadCell}
-                    align="center"
                     sortDirection={sortBy === 'modified_at' ? sortDirection : false}
                   >
                     {sortDirection ? (
@@ -156,16 +156,14 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                     ) : (
                       'Date de modification'
                     )}
-                  </TableCell>
-                  <TableCell align="center" className={classes.tableHeadCell}>
-                    Actions
-                  </TableCell>
+                  </TableCellWrapper>
+                  <TableCellWrapper className={classes.tableHeadCell}>Actions</TableCellWrapper>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {researchData?.map((row: RequestType) => (
                   <TableRow className={classes.pointerHover} hover key={row.uuid}>
-                    <TableCell onClick={() => _onClickRow(row)}>
+                    <TableCellWrapper align="left" onClick={() => _onClickRow(row)}>
                       {row.shared_by?.displayed_name ? (
                         <>
                           {row.name} - Envoyée par : {row.shared_by.firstname} {row.shared_by.lastname?.toUpperCase()}
@@ -173,11 +171,11 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                       ) : (
                         <>{row.name}</>
                       )}
-                    </TableCell>
-                    <TableCell onClick={() => _onClickRow(row)} align="center">
+                    </TableCellWrapper>
+                    <TableCellWrapper onClick={() => _onClickRow(row)}>
                       {moment(row.modified_at).format('DD/MM/YYYY [à] HH:mm')}
-                    </TableCell>
-                    <TableCell align="center">
+                    </TableCellWrapper>
+                    <TableCellWrapper>
                       <Hidden lgDown>
                         <Grid
                           container
@@ -273,7 +271,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                           </MenuItem>
                         </Menu>
                       </Hidden>
-                    </TableCell>
+                    </TableCellWrapper>
                   </TableRow>
                 ))}
               </TableBody>

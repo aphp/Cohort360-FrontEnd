@@ -1,7 +1,8 @@
 import React from 'react'
 import moment from 'moment'
 
-import { CircularProgress, Grid, TableCell, TableRow, Typography } from '@mui/material'
+import { CircularProgress, Grid, TableRow, Typography } from '@mui/material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import DataTable from 'components/DataTable/DataTable'
 
@@ -44,35 +45,23 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
   const { classes } = useStyles()
 
   const columns: Column[] = [
-    { label: PatientTableLabels.GENDER, code: Order.GENDER, align: 'center', sortableColumn: true },
-    { label: PatientTableLabels.FIRSTNAME, code: Order.FIRSTNAME, align: 'center', sortableColumn: !deidentified },
-    { label: PatientTableLabels.LASTNAME, code: Order.LASTNAME, align: 'left', sortableColumn: !deidentified },
+    { label: PatientTableLabels.GENDER, code: Order.GENDER },
+    { label: PatientTableLabels.FIRSTNAME, code: !deidentified ? Order.FIRSTNAME : undefined },
+    { label: PatientTableLabels.LASTNAME, code: !deidentified ? Order.LASTNAME : undefined, align: 'left' },
     {
       label: !deidentified ? PatientTableLabels.BIRTHDATE : PatientTableLabels.AGE,
-      code: Order.BIRTHDATE,
-      align: 'center',
-      sortableColumn: !deidentified
+      code: !deidentified ? Order.BIRTHDATE : undefined
     },
-    { label: PatientTableLabels.LAST_ENCOUNTER, align: 'left', sortableColumn: false },
-    { label: PatientTableLabels.VITAL_STATUS, align: 'left', sortableColumn: false },
+    { label: PatientTableLabels.LAST_ENCOUNTER, align: 'left' },
+    { label: PatientTableLabels.VITAL_STATUS },
     {
       label: `${PatientTableLabels.IPP}${!deidentified ? '' : ' chiffré'}`,
-      code: Order.IPP,
-      align: 'center',
-      sortableColumn: !deidentified
+      code: !deidentified ? Order.IPP : undefined
     }
   ]
 
   return (
-    <DataTable
-      columns={columns}
-      order={orderBy}
-      setOrder={setOrderBy}
-      rowsPerPage={20}
-      page={page}
-      setPage={setPage}
-      total={total}
-    >
+    <DataTable columns={columns} order={orderBy} setOrder={setOrderBy} page={page} setPage={setPage} total={total}>
       {!loading && patientsList && patientsList.length > 0 ? (
         <>
           {patientsList.map((patient) => {
@@ -89,11 +78,11 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
         </>
       ) : (
         <TableRow className={classes.emptyTableRow}>
-          <TableCell colSpan={7} align="left">
+          <TableCellWrapper colSpan={7} align="left">
             <Grid container justifyContent="center">
               {loading ? <CircularProgress /> : <Typography variant="button">Aucun patient à afficher</Typography>}
             </Grid>
-          </TableCell>
+          </TableCellWrapper>
         </TableRow>
       )}
     </DataTable>
@@ -119,14 +108,18 @@ const DataTablePatientLine: React.FC<{
         )
       }
     >
-      <TableCell align="center">
+      <TableCellWrapper>
         {patient.gender && (
           <GenderIcon gender={patient.gender.toLocaleUpperCase() as GenderStatus} className={classes.genderIcon} />
         )}
-      </TableCell>
-      <TableCell>{deidentified ? 'Prénom' : capitalizeFirstLetter(patient.name?.[0].given?.[0])}</TableCell>
-      <TableCell>{deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ')}</TableCell>
-      <TableCell align="center">
+      </TableCellWrapper>
+      <TableCellWrapper align="left">
+        {deidentified ? 'Prénom' : capitalizeFirstLetter(patient.name?.[0].given?.[0])}
+      </TableCellWrapper>
+      <TableCellWrapper align="left">
+        {deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ')}
+      </TableCellWrapper>
+      <TableCellWrapper>
         {deidentified ? (
           <Typography>{getAge(patient)}</Typography>
         ) : (
@@ -135,22 +128,22 @@ const DataTablePatientLine: React.FC<{
             <Typography>{`(${getAge(patient)})`}</Typography>
           </>
         )}
-      </TableCell>
-      <TableCell>
+      </TableCellWrapper>
+      <TableCellWrapper align="left">
         {patient.extension && patient.extension.find((extension) => extension.url.includes('last-encounter'))
           ? patient.extension.find((extension) => extension.url.includes('last-encounter'))?.valueReference?.display
           : 'Non renseigné'}
-      </TableCell>
-      <TableCell align="center">
+      </TableCellWrapper>
+      <TableCellWrapper>
         <StatusChip
           status={patient.deceasedDateTime || patient.deceasedBoolean ? ChipStyles.CANCELLED : ChipStyles.VALID}
           label={
             patient.deceasedDateTime || patient.deceasedBoolean ? VitalStatusLabel.DECEASED : VitalStatusLabel.ALIVE
           }
         />
-      </TableCell>
+      </TableCellWrapper>
 
-      <TableCell align="center">
+      <TableCellWrapper>
         <Typography onClick={(event) => event.stopPropagation()}>
           {deidentified
             ? patient.id
@@ -158,7 +151,7 @@ const DataTablePatientLine: React.FC<{
               patient.identifier?.[0].value ??
               'IPP inconnnu'}
         </Typography>
-      </TableCell>
+      </TableCellWrapper>
     </TableRow>
   )
 }
