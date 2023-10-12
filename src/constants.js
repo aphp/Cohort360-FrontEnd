@@ -84,6 +84,10 @@ export const ENCOUNTER_ADMISSION = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_ADMISSION
   : '{VITE_VALUE_SET_URL_ENCOUNTER_ADMISSION}'
 
+export const MEDICATION_ATC_ORBIS = import.meta.env.DEV
+  ? import.meta.env.VITE_MEDICATION_ATC_ORBIS
+  : '{VITE_MEDICATION_ATC_ORBIS}'
+
 export const MEDICATION_ATC = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_MEDICATION_ATC
   : '{VITE_VALUE_SET_URL_MEDICATION_ATC}'
