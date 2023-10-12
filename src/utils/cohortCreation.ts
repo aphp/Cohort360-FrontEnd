@@ -72,7 +72,7 @@ const RESSOURCE_TYPE_MEDICATION_REQUEST: 'MedicationRequest' = 'MedicationReques
 const RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: 'MedicationAdministration' = 'MedicationAdministration' // = Administration
 const MEDICATION_CODE = 'medication'
 const MEDICATION_PRESCRIPTION_TYPE = 'type'
-const MEDICATION_ADMINISTRATION = 'route'
+const MEDICATION_ADMINISTRATION = 'dosage-route'
 
 const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
 const OBSERVATION_CODE = 'code'
