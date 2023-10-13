@@ -26,7 +26,7 @@ const PATIENT_AGE = 'age-day'
 const PATIENT_DEATHDATE = 'death-date'
 const PATIENT_DECEASED = 'deceased'
 
-const ENCOUNTER_LENGTH = 'length'
+const ENCOUNTER_DURATION = 'length'
 const ENCOUNTER_MIN_BIRTHDATE = 'start-age-visit'
 const ENCOUNTER_MAX_BIRTHDATE = 'end-age-visit'
 const ENCOUNTER_ENTRYMODE = 'admission-mode'
@@ -196,7 +196,19 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         }`,
         `${PATIENT_DECEASED}=${criterion.vitalStatus === VitalStatus.DECEASED ? 'true' : 'false'}`,
         `${ageMinCriterion}`,
-        `${ageMaxCriterion}`
+        `${ageMaxCriterion}`,
+        criterion.birthdates[0]
+          ? `${PATIENT_BIRTHDATE}=ge${moment(criterion.birthdates[0]).format('YYYY-MM-DD[T00:00:00Z]')}`
+          : '',
+        criterion.birthdates[1]
+          ? `${PATIENT_BIRTHDATE}=le${moment(criterion.birthdates[1]).format('YYYY-MM-DD[T00:00:00Z]')}`
+          : '',
+        criterion.deathDates[0]
+          ? `${PATIENT_DEATHDATE}=ge${moment(criterion.deathDates[0]).format('YYYY-MM-DD[T00:00:00Z]')}`
+          : '',
+        criterion.deathDates[1]
+          ? `${PATIENT_DEATHDATE}=le${moment(criterion.deathDates[1]).format('YYYY-MM-DD[T00:00:00Z]')}`
+          : ''
       ]
         .filter((elem) => elem)
         .reduce(filterReducer)
@@ -281,12 +293,12 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         }`,
         `${
           criterion.duration?.[0]
-            ? `${ENCOUNTER_LENGTH}=ge${convertDurationToTimestamp(convertStringToDuration(criterion.duration?.[0]))}`
+            ? `${ENCOUNTER_DURATION}=ge${convertDurationToTimestamp(convertStringToDuration(criterion.duration?.[0]))}`
             : ''
         }`,
         `${
           criterion.duration?.[1]
-            ? `${ENCOUNTER_LENGTH}=le${convertDurationToTimestamp(convertStringToDuration(criterion.duration?.[1]))}`
+            ? `${ENCOUNTER_DURATION}=le${convertDurationToTimestamp(convertStringToDuration(criterion.duration?.[1]))}`
             : ''
         }`,
         `${
