@@ -351,8 +351,13 @@ const servicesCohorts: IServiceCohorts = {
         .trim() // Remove space before/after search
         .split(' ') // Split by space (= ['mot1', 'mot2' ...])
         .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
-      for (const _search of searches) {
-        _searchInput = _searchInput ? `${_searchInput} AND "${_search}"` : `"${_search}"`
+
+      if (searchBy === SearchByTypes.identifier) {
+        _searchInput = searches.join()
+      } else {
+        for (const _search of searches) {
+          _searchInput = _searchInput ? `${_searchInput} AND "${_search}"` : `"${_search}"`
+        }
       }
 
       // convert birthdates into days or months depending of if it's a deidentified perimeter or not

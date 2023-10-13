@@ -151,9 +151,10 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
           return { ghm: pmsiReturn as IPatientPmsi<Claim> }
       }
     } catch (error) {
-      console.error(error)
       if (error instanceof CanceledError) {
         return thunkApi.rejectWithValue({ error })
+      } else {
+        throw error
       }
     }
   }
@@ -243,6 +244,8 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
       console.error(error)
       if (error instanceof CanceledError) {
         return thunkApi.rejectWithValue({ error })
+      } else {
+        throw error
       }
     }
   }
@@ -350,6 +353,8 @@ const fetchMedication = createAsyncThunk<
     console.error(error)
     if (error instanceof CanceledError) {
       return thunkApi.rejectWithValue({ error })
+    } else {
+      throw error
     }
   }
 })
