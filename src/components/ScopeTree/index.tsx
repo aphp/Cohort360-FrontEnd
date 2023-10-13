@@ -1,13 +1,14 @@
-import React, { useState } from 'react'
-import ScopeTreeSearch from './ScopeTreeSearch/./index'
-import ScopeTreeExploration from './ScopeTreeExploration'
-import { ScopeTreeRow, ScopeType } from 'types'
-import ScopeSearchBar from '../Inputs/ScopeSearchBar/ScopeSearchBar'
-import useStyles from './styles'
-import ScopeTreeChipsets from './ScopeTreeChipsets/ScopeTreeChipsets'
-import { onSelect } from './utils/scopeTreeUtils'
+import React from 'react'
+import { useState } from 'react'
 import { useAppSelector } from 'state'
 import { ScopeState } from 'state/scope'
+import { ScopeTreeRow, ScopeType } from 'types'
+import ScopeSearchBar from '../Inputs/ScopeSearchBar/ScopeSearchBar'
+import ScopeTreeChipsets from './ScopeTreeChipsets/ScopeTreeChipsets'
+import ScopeTreeExploration from './ScopeTreeExploration'
+import ScopeTreeSearch from './ScopeTreeSearch/./index'
+import useStyles from './styles'
+import { onSelect } from './utils/scopeTreeUtils'
 
 export type ScopeTreeSearchProps = {
   searchInput: string

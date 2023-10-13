@@ -125,15 +125,13 @@ const Index = (props: ScopeTreeExplorationProps) => {
               <EnhancedTable noCheckbox noPagination rows={rootRows} headCells={headCells}>
                 {(row: ScopeTreeRow, index: number) => {
                   if (!row) return <></>
-                  const labelId = `enhanced-table-checkbox-${index}`
-
                   return (
                     <ScopeTreeHierarchy
                       row={row}
                       level={0}
                       parentAccess={row.access ?? '-'}
                       openPopulation={openPopulation}
-                      labelId={labelId}
+                      labelId={`enhanced-table-checkbox-${index}`}
                       onExpand={(rowId: number) =>
                         onExpand(
                           rowId,

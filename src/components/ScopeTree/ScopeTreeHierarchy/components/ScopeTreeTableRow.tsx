@@ -58,8 +58,8 @@ const ScopeTreeTableRow: React.FC<ScopeTreeTableRowProps> = (props: ScopeTreeTab
             root: level % 2 === 0 ? classes.mainRow : classes.secondRow
           }}
         >
-          {row.subItems?.length && (!isSearchMode || row.type !== executiveUnitType) && (
-            <TableCell>
+          <TableCell>
+            {(row.subItems?.length ?? 0) > 0 && (!isSearchMode || row.type !== executiveUnitType) && (
               <IconButton
                 onClick={() => onExpand(Number(row.id))}
                 style={{ marginLeft: level * 35, padding: 0, marginRight: -30 }}
@@ -70,8 +70,8 @@ const ScopeTreeTableRow: React.FC<ScopeTreeTableRowProps> = (props: ScopeTreeTab
                   <KeyboardArrowRightIcon />
                 )}
               </IconButton>
-            </TableCell>
-          )}
+            )}
+          </TableCell>
 
           <TableCell align="center" padding="checkbox">
             <Checkbox

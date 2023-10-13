@@ -18,7 +18,7 @@ export const getAllParentsIds = async (selectedItems: ScopeTreeRow[]) => {
   return allParentsIds
 }
 
-export const getParents = async (allParentsIds: string[], rootRows: ScopeTreeRow[]) => {
+export const getParents = async (allParentsIds: string[], rootRows: ScopeTreeRow[], isExecutiveUnit?: boolean) => {
   const fetchedParents: ScopeTreeRow[] = []
   const notFetchedSubItemsIds: string[] = []
   const notFetchedParentsIds: string[] = allParentsIds.filter((parentId) => {
@@ -38,7 +38,14 @@ export const getParents = async (allParentsIds: string[], rootRows: ScopeTreeRow
   const notFetchedParents: ScopeTreeRow[] =
     notFetchedItems?.length > 0
       ? await servicesPerimeters.buildScopeTreeRowList(
-          await servicesPerimeters.getPerimeters(notFetchedItems, undefined, undefined)
+          await servicesPerimeters.getPerimeters(
+            notFetchedItems,
+            undefined,
+            undefined,
+            undefined,
+            isExecutiveUnit,
+            undefined
+          )
         )
       : []
   return [...fetchedParents, ...notFetchedParents]
@@ -48,13 +55,14 @@ export const expandSelectedItems = async (
   rootRows: ScopeTreeRow[],
   selectedItems: ScopeTreeRow[],
   dispatch?: AppDispatch,
-  setRootRows?: (newRootRows: ScopeTreeRow[]) => void
+  setRootRows?: (newRootRows: ScopeTreeRow[]) => void,
+  isExecutiveUnit?: boolean
 ) => {
   if (!selectedItems || selectedItems.length < 1) return
 
   const allParentsIds: string[] = await getAllParentsIds(selectedItems)
 
-  const parents: ScopeTreeRow[] = await getParents(allParentsIds, rootRows)
+  const parents: ScopeTreeRow[] = await getParents(allParentsIds, rootRows, isExecutiveUnit)
 
   const newRootRows: ScopeTreeRow[] = [...rootRows]
 
@@ -127,7 +135,7 @@ export const init = async (
   cancelPendingRequest(controllerRef.current)
 
   let newPerimetersList: ScopeTreeRow[] = rootRows
-  if (rootRows?.length <= 0) {
+  if (rootRows?.length <= 0 || isExecutiveUnit) {
     const fetchScopeTreeResponse = await dispatch(
       fetchScopesList({
         isScopeList: true,
@@ -577,7 +585,9 @@ export const searchInPerimeters = async (
       setCount(newCount)
       setIsSearchLoading(false)
     }
-    newRootRows = (await expandSelectedItems(searchRootRows, newPerimetersList, undefined, undefined)) ?? searchRootRows
+    newRootRows =
+      (await expandSelectedItems(searchRootRows, newPerimetersList, undefined, undefined, isExecutiveUnit)) ??
+      searchRootRows
   } catch (error) {
     console.error('An error has been occured while searching data')
     setIsSearchLoading(false)
