@@ -760,16 +760,32 @@ export async function unbuildRequest(_json: string): Promise<any> {
       case RessourceType.PATIENT: {
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+          console.log('currentRetrievedInformation', filters)
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
-            currentCriterion.title = 'Critère démographique'
+            currentCriterion.title = currentCriterion.title ? currentCriterion.title : 'Critère démographique'
             currentCriterion.gender = currentCriterion.gender ? currentCriterion.gender : []
             currentCriterion.vitalStatus = currentCriterion.vitalStatus ? currentCriterion.vitalStatus : []
-            currentCriterion.age = currentCriterion.age ? currentCriterion.age : null
-            currentCriterion.birthdates = currentCriterion.birthdates ? currentCriterion.birthdates : [0, 130]
-            currentCriterion.deathDates = currentCriterion.deathDates ? currentCriterion.deathDates : [0, 130]
+            currentCriterion.age = currentCriterion.age ? currentCriterion.age : ['0-0-0', '0-0-130']
+            currentCriterion.birthdates = currentCriterion.birthdates ? currentCriterion.birthdates : [null, null]
+            currentCriterion.deathDates = currentCriterion.deathDates ? currentCriterion.deathDates : [null, null]
             switch (key) {
+              case PATIENT_AGE: {
+                currentCriterion.age = currentCriterion.ageType ? currentCriterion.ageType : null
+                currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
+
+                if (value?.includes('ge')) {
+                  const ageMin = value?.replace('ge', '')
+                  currentCriterion.ageType = getCalendarType(+ageMin)
+                  currentCriterion.years[0] = getValueFromCalendarType(currentCriterion.ageType?.id, +ageMin)
+                } else if (value?.includes('le')) {
+                  const ageMax = value?.replace('le', '')
+                  currentCriterion.ageType = getCalendarType(+ageMax)
+                  currentCriterion.years[1] = getValueFromCalendarType(currentCriterion.ageType?.id, +ageMax)
+                }
+                break
+              }
               case PATIENT_BIRTHDATE: {
                 currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
                 currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
@@ -870,7 +886,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const key = filter[0]
             const value = filter[1]
             switch (key) {
-              case ENCOUNTER_LENGTH: {
+              case ENCOUNTER_DURATION: {
                 if (value.includes('ge')) {
                   const min = value?.replace('ge', '') ?? 0
                   currentCriterion.durationType[0] = getCalendarType(+min)
