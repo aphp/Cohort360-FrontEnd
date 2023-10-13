@@ -110,7 +110,8 @@ export const checkMinMaxValue = (min: DurationType, max: DurationType) => {
   return true
 }
 
-export const convertDurationToTimestamp = (duration: DurationType): number => {
+export const convertDurationToTimestamp = (duration: DurationType | null): number => {
+  if (!duration) return 0
   const year = duration.year ?? 0
   const month = duration.month ?? 0
   const day = duration.day ?? 0

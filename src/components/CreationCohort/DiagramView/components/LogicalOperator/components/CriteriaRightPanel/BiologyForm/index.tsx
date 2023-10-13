@@ -10,7 +10,8 @@ import { initSyncHierarchyTableEffect, OBSERVATION, syncOnChangeFormValue } from
 import { PmsiListType } from 'state/pmsi'
 import { fetchBiology } from 'state/biology'
 import { useAppDispatch, useAppSelector } from 'state'
-import { Comparators, CriteriaDrawerComponentProps } from 'types'
+import { Comparators } from 'types/requestCriterias'
+import { CriteriaDrawerComponentProps } from 'types'
 
 export const defaultBiology = {
   type: OBSERVATION,

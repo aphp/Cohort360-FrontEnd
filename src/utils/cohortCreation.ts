@@ -1,35 +1,25 @@
 import moment from 'moment'
 
 import services from 'services/aphp'
-import {
-  ScopeTreeRow,
-  SelectedCriteriaType,
-  CriteriaGroupType,
-  TemporalConstraintsType,
-  DocType,
-  Comparators,
-  CriteriaItemType
-} from 'types'
+import { ScopeTreeRow, CriteriaGroupType, TemporalConstraintsType, CriteriaItemType } from 'types'
 
 import docTypes from 'assets/docTypes.json'
 import { BIOLOGY_HIERARCHY_ITM_ANABIO, CLAIM_HIERARCHY, CONDITION_HIERARCHY, PROCEDURE_HIERARCHY } from '../constants'
 import { SearchByTypes, VitalStatus } from 'types/searchCriterias'
 import { Calendar, CalendarLabel, CalendarRequestLabel } from 'types/dates'
 import { convertDurationToTimestamp, convertStringToDuration } from './age'
+import { Comparators, DocType, RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
-const RESSOURCE_TYPE_IPP_LIST: 'IPPList' = 'IPPList'
 const IPP_LIST_FHIR = 'identifier.value'
 
-export const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
 const PATIENT_GENDER = 'gender'
 const PATIENT_BIRTHDATE = 'birthdate'
 const PATIENT_AGE = 'age-day'
 const PATIENT_DEATHDATE = 'death-date'
 const PATIENT_DECEASED = 'deceased'
 
-const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
 const ENCOUNTER_LENGTH = 'length'
 const ENCOUNTER_MIN_BIRTHDATE = 'start-age-visit'
 const ENCOUNTER_MAX_BIRTHDATE = 'end-age-visit'
@@ -44,35 +34,28 @@ const ENCOUNTER_DESTINATION = 'destination'
 const ENCOUNTER_PROVENANCE = 'admit-source'
 const ENCOUNTER_ADMISSION = 'admission-type'
 
-export const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
-const CLAIM_CODE = 'diagnosis-hierarchy'
-const CLAIM_CODE_ALL_HIERARCHY = 'diagnosis'
+const CLAIM_CODE = 'codeList'
+const CLAIM_CODE_ALL_HIERARCHY = 'code'
 
-export const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
-const PROCEDURE_CODE = 'code-hierarchy'
+const PROCEDURE_CODE = 'codeList'
 const PROCEDURE_CODE_ALL_HIERARCHY = 'code'
 
-export const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition'
-const CONDITION_CODE = 'code-hierarchy'
+const CONDITION_CODE = 'codeList'
 const CONDITION_CODE_ALL_HIERARCHY = 'code'
 const CONDITION_TYPE = 'type'
 
-const RESSOURCE_TYPE_COMPOSITION: 'DocumentReference' = 'DocumentReference'
 const COMPOSITION_TEXT = '_text'
 const COMPOSITION_TITLE = 'description'
 const COMPOSITION_TYPE = 'type'
 const COMPOSITION_STATUS = 'docstatus'
 
-const RESSOURCE_TYPE_MEDICATION_REQUEST: 'MedicationRequest' = 'MedicationRequest' // = Prescription
-const RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: 'MedicationAdministration' = 'MedicationAdministration' // = Administration
-const MEDICATION_CODE = 'medication-hierarchy'
-const MEDICATION_CODE_ALL_HIERARCHY = 'medication'
+const MEDICATION_CODE = 'hierarchy-ATC'
+const MEDICATION_CODE_ALL_HIERARCHY = 'medication-simple'
 // const MEDICATION_UCD = 'code_id'
 const MEDICATION_PRESCRIPTION_TYPE = 'type'
 const MEDICATION_ADMINISTRATION = 'route'
 
-const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
-const OBSERVATION_CODE = 'code-hierarchy'
+const OBSERVATION_CODE = 'part-of'
 const OBSERVATION_CODE_ALL_HIERARCHY = 'code'
 const OBSERVATION_VALUE = 'value-quantity'
 const OBSERVATION_STATUS = 'status'
@@ -85,7 +68,7 @@ export const STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE = 'Structure hospitalière
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   id: 0,
   isInclusive: false,
-  type: 'Patient',
+  type: RessourceType.PATIENT,
   title: '',
   genders: [],
   vitalStatus: VitalStatus.ALL,
@@ -106,21 +89,11 @@ type RequeteurCriteriaType = {
   _type: string
   _id: number
   isInclusive: boolean
-  resourceType:
-    | typeof RESSOURCE_TYPE_PATIENT
-    | typeof RESSOURCE_TYPE_ENCOUNTER
-    | typeof RESSOURCE_TYPE_CLAIM
-    | typeof RESSOURCE_TYPE_PROCEDURE
-    | typeof RESSOURCE_TYPE_CONDITION
-    | typeof RESSOURCE_TYPE_COMPOSITION
-    | typeof RESSOURCE_TYPE_MEDICATION_REQUEST
-    | typeof RESSOURCE_TYPE_MEDICATION_ADMINISTRATION
-    | typeof RESSOURCE_TYPE_OBSERVATION
-    | typeof RESSOURCE_TYPE_IPP_LIST
+  resourceType: RessourceType
   filterFhir: string
   occurrence?: {
     n: number
-    operator?: '<=' | '<' | '=' | '>' | '>='
+    operator?: Comparators
     timeDelayMin?: number
     timeDelayMax?: number
   }
@@ -155,7 +128,7 @@ type RequeteurGroupType =
       criteria: (RequeteurCriteriaType | RequeteurGroupType)[]
       nAmongMOptions: {
         n: number
-        operator?: '<=' | '<' | '=' | '>=' | '>'
+        operator?: Comparators
         timeDelayMin?: number
         timeDelayMax?: number
       }
@@ -191,7 +164,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
     accumulator || accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 
   switch (criterion.type) {
-    case RESSOURCE_TYPE_PATIENT: {
+    case RessourceType.PATIENT: {
       const ageMin = convertDurationToTimestamp(
         convertStringToDuration(criterion.age?.[0]) || { year: 0, month: 0, day: 0 }
       )
@@ -201,8 +174,6 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
       const ageMinCriterion = `${PATIENT_AGE}=ge${ageMin}`
       const ageMaxCriterion = `${PATIENT_AGE}=le${ageMax}`
-
-      //"filterFhir":"active=true&gender=f&deceased=true&age-day=ge0&age-day=le47450"
 
       filterFhir = [
         'active=true',
@@ -220,9 +191,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       break
     }
 
-    case RESSOURCE_TYPE_ENCOUNTER: {
-      // Ignore TypeScript because we need to check if array is not empty
-      // @ts-ignore
+    case RessourceType.ENCOUNTER: {
       filterFhir = [
         'subject.active=true',
         `${
@@ -299,38 +268,32 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
             : ''
         }`,
         `${
-          criterion?.duration?.[0] !== null && criterion?.durationType?.[0] !== null
-            ? `${ENCOUNTER_LENGTH}=ge${+criterion.duration[0] * getCalendarMultiplicator(criterion.durationType[0].id)}`
+          criterion.duration?.[0]
+            ? `${ENCOUNTER_LENGTH}=ge${convertDurationToTimestamp(convertStringToDuration(criterion.duration?.[0]))}`
             : ''
         }`,
         `${
-          criterion?.duration?.[1] !== null && criterion?.durationType?.[1] !== null
-            ? `${ENCOUNTER_LENGTH}=le${+criterion.duration[1] * getCalendarMultiplicator(criterion.durationType[1].id)}`
+          criterion.duration?.[1]
+            ? `${ENCOUNTER_LENGTH}=le${convertDurationToTimestamp(convertStringToDuration(criterion.duration?.[1]))}`
             : ''
         }`,
         `${
-          criterion?.age?.[0] !== null && criterion?.ageType?.[0] !== null
-            ? `${ENCOUNTER_MIN_BIRTHDATE}=ge${+criterion.age[0] * getCalendarMultiplicator(criterion.ageType[0].id)}`
+          criterion.age?.[0]
+            ? `${ENCOUNTER_MIN_BIRTHDATE}=ge${convertDurationToTimestamp(convertStringToDuration(criterion.age?.[0]))}`
             : ''
         }`,
         `${
-          criterion?.age?.[1] !== null && criterion?.ageType?.[1] !== null
-            ? `${ENCOUNTER_MAX_BIRTHDATE}=le${+criterion.age[1] * getCalendarMultiplicator(criterion.ageType[1].id)}`
+          criterion.age?.[1]
+            ? `${ENCOUNTER_MAX_BIRTHDATE}=le${convertDurationToTimestamp(convertStringToDuration(criterion.age?.[1]))}`
             : ''
         }`
-      ].filter((elem) => elem)
-
-      if (filterFhir && filterFhir.length > 0) {
-        // Ignore TypeScript because we need to check if array is not empty
-        // @ts-ignore
-        filterFhir = filterFhir.reduce(filterReducer)
-      } else {
-        filterFhir = ''
-      }
+      ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
       break
     }
 
-    case RESSOURCE_TYPE_COMPOSITION: {
+    case RessourceType.DOCUMENTS: {
       const unreducedFilterFhir = [
         `${COMPOSITION_STATUS}=final&type:not=doc-impor&contenttype=${encodeURIComponent(
           'http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain'
@@ -360,7 +323,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       break
     }
 
-    case RESSOURCE_TYPE_CONDITION: {
+    case RessourceType.CONDITION: {
       const unreducedFilterFhir = [
         'subject.active=true',
         `${
@@ -390,7 +353,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       break
     }
 
-    case RESSOURCE_TYPE_PROCEDURE: {
+    case RessourceType.PROCEDURE: {
       const unreducedFilterFhir = [
         'subject.active=true',
         `${
@@ -415,7 +378,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       break
     }
 
-    case RESSOURCE_TYPE_CLAIM: {
+    case RessourceType.CLAIM: {
       const unreducedFilterFhir = [
         'patient.active=true',
         `${
@@ -438,8 +401,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       break
     }
 
-    case RESSOURCE_TYPE_MEDICATION_REQUEST:
-    case RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: {
+    case RessourceType.MEDICATION_REQUEST:
+    case RessourceType.MEDICATION_ADMINISTRATION: {
       const unreducedFilterFhir = [
         'subject.active=true',
         `${
@@ -452,7 +415,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
             : ''
         }`,
         `${
-          criterion.type === RESSOURCE_TYPE_MEDICATION_REQUEST &&
+          criterion.type === RessourceType.MEDICATION_REQUEST &&
           criterion.prescriptionType &&
           criterion.prescriptionType.length > 0
             ? `${MEDICATION_PRESCRIPTION_TYPE}=${criterion.prescriptionType
@@ -480,7 +443,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       break
     }
 
-    case RESSOURCE_TYPE_OBSERVATION: {
+    case RessourceType.OBSERVATION: {
       let valueComparatorFilter = ''
       if (criterion.valueComparator) {
         switch (criterion.valueComparator) {
@@ -540,7 +503,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       break
     }
 
-    case RESSOURCE_TYPE_IPP_LIST: {
+    case RessourceType.IPP_LIST: {
       const unreducedFilterFhir = [`${criterion.search ? `${IPP_LIST_FHIR}=${criterion.search}` : ''}`].filter(
         (elem) => elem
       )
@@ -578,17 +541,17 @@ export function buildRequest(
           _type: 'basicResource',
           _id: item.id ?? 0,
           isInclusive: item.isInclusive ?? true,
-          resourceType: item.type ?? RESSOURCE_TYPE_PATIENT,
+          resourceType: item.type ?? RessourceType.PATIENT,
           filterFhir: constructFilterFhir(item),
           occurrence:
-            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_IPP_LIST) && item.occurrence
+            !(item.type === RessourceType.PATIENT || item.type === RessourceType.IPP_LIST) && item.occurrence
               ? {
                   n: item.occurrence,
-                  operator: item?.occurrenceComparator
+                  operator: item?.occurrenceComparator || undefined
                 }
               : undefined,
           DurationRangeList:
-            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_IPP_LIST) &&
+            !(item.type === RessourceType.PATIENT || item.type === RessourceType.IPP_LIST) &&
             (item.startOccurrence || item.endOccurrence)
               ? [
                   {
@@ -602,7 +565,7 @@ export function buildRequest(
                 ]
               : undefined,
           encounterDurationRange:
-            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_IPP_LIST) &&
+            !(item.type === RessourceType.PATIENT || item.type === RessourceType.IPP_LIST) &&
             (item.encounterStartDate || item.encounterEndDate)
               ? {
                   minDate: item.encounterStartDate
@@ -766,7 +729,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
     }
 
     switch (element.resourceType) {
-      case RESSOURCE_TYPE_PATIENT: {
+      case RessourceType.PATIENT: {
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
           for (const filter of filters) {
@@ -828,7 +791,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         }
         break
       }
-      case RESSOURCE_TYPE_ENCOUNTER: {
+      case RessourceType.ENCOUNTER: {
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
           currentCriterion.title = 'Critère de prise en charge'
@@ -1040,7 +1003,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         }
         break
       }
-      case RESSOURCE_TYPE_COMPOSITION: {
+      case RessourceType.DOCUMENTS: {
         currentCriterion.title = 'Critère de document'
         currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
         currentCriterion.docType = currentCriterion.docType ? currentCriterion.docType : []
@@ -1122,7 +1085,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         }
         break
       }
-      case RESSOURCE_TYPE_CONDITION: {
+      case RessourceType.CONDITION: {
         currentCriterion.title = 'Critère de diagnostic'
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
         currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : []
@@ -1196,7 +1159,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         }
         break
       }
-      case RESSOURCE_TYPE_PROCEDURE: {
+      case RessourceType.PROCEDURE: {
         currentCriterion.title = "Critères d'actes CCAM"
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
         currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : []
@@ -1259,7 +1222,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         }
         break
       }
-      case RESSOURCE_TYPE_CLAIM: {
+      case RessourceType.CLAIM: {
         currentCriterion.title = 'Critère de GHM'
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
@@ -1320,8 +1283,8 @@ export async function unbuildRequest(_json: string): Promise<any> {
         }
         break
       }
-      case RESSOURCE_TYPE_MEDICATION_REQUEST:
-      case RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: {
+      case RessourceType.MEDICATION_REQUEST:
+      case RessourceType.MEDICATION_ADMINISTRATION: {
         currentCriterion.title = 'Critère de médicament'
         currentCriterion.mode = currentCriterion.mode ? currentCriterion.mode : []
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
@@ -1405,7 +1368,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         }
         break
       }
-      case RESSOURCE_TYPE_OBSERVATION: {
+      case RessourceType.OBSERVATION: {
         currentCriterion.title = 'Critère de biologie'
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
         currentCriterion.isLeaf = currentCriterion.isLeaf ? currentCriterion.isLeaf : false
@@ -1524,7 +1487,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         }
         break
       }
-      case RESSOURCE_TYPE_IPP_LIST: {
+      case RessourceType.IPP_LIST: {
         currentCriterion.title = 'Critère de liste IPP'
         currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
 
@@ -1694,8 +1657,8 @@ export const getDataFromFetch = async (
                 criterion.type === _criterion.id ||
                 // V-- [ Link with Medication and `MedicationAdministration` or `MedicationRequest` ]
                 (_criterion.id === 'Medication' &&
-                  (criterion.type === RESSOURCE_TYPE_MEDICATION_REQUEST ||
-                    criterion.type === RESSOURCE_TYPE_MEDICATION_ADMINISTRATION))
+                  (criterion.type === RessourceType.MEDICATION_REQUEST ||
+                    criterion.type === RessourceType.MEDICATION_ADMINISTRATION))
             )
 
             if (currentSelectedCriteria) {
@@ -1703,10 +1666,10 @@ export const getDataFromFetch = async (
                 if (
                   currentcriterion &&
                   !(
-                    currentcriterion.type === RESSOURCE_TYPE_PATIENT ||
-                    currentcriterion.type === RESSOURCE_TYPE_ENCOUNTER ||
-                    currentcriterion.type === RESSOURCE_TYPE_IPP_LIST ||
-                    currentcriterion.type === RESSOURCE_TYPE_COMPOSITION
+                    currentcriterion.type === RessourceType.PATIENT ||
+                    currentcriterion.type === RessourceType.ENCOUNTER ||
+                    currentcriterion.type === RessourceType.IPP_LIST ||
+                    currentcriterion.type === RessourceType.DOCUMENTS
                   ) &&
                   currentcriterion.code &&
                   currentcriterion.code.length > 0

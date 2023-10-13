@@ -23,9 +23,10 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchBiology } from 'state/biology'
-import { Comparators, CriteriaName, HierarchyTree, ObservationDataType } from 'types'
+import { CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
+import { ObservationDataType, Comparators } from 'types/requestCriterias'
 
 type BiologyFormProps = {
   isOpen: boolean

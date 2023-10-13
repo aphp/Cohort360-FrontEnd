@@ -11,7 +11,7 @@ import { DurationLabel } from './styles'
 
 type DurationRangeProps = {
   value: DurationRangeType
-  label: string
+  label?: string
   deidentified?: boolean
   disabled?: boolean
   onChange: (newDuration: DurationRangeType) => void
@@ -55,16 +55,20 @@ const DurationRange: React.FC<DurationRangeProps> = ({
 
   return (
     <BlockWrapper>
-      <DurationLabel variant="h3" disabled={disabled}>
-        {label} :
-      </DurationLabel>
-      <DurationInput
-        disabled={disabled}
-        value={minDuration}
-        deidentified={deidentified}
-        label=" Âge minimum"
-        onChange={(newDuration) => setMinDuration(newDuration)}
-      />
+      {label && (
+        <DurationLabel variant="h3" disabled={disabled}>
+          {label} :
+        </DurationLabel>
+      )}
+      <BlockWrapper margin="0px 0px 10px 0px">
+        <DurationInput
+          disabled={disabled}
+          value={minDuration}
+          deidentified={deidentified}
+          label=" Âge minimum"
+          onChange={(newDuration) => setMinDuration(newDuration)}
+        />
+      </BlockWrapper>
       <DurationInput
         disabled={disabled}
         value={maxDuration}

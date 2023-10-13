@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { IconButton, Typography, Avatar, Grid } from '@mui/material'
 
@@ -13,44 +13,35 @@ import { useAppSelector } from 'state'
 import { MeState } from 'state/me'
 
 import useStyles from './styles'
-import { SelectedCriteriaType } from 'types'
-import { checkIfCardNeedsCollapse } from 'utils/screen'
 import { criteriasAsArray } from 'utils/requestCriterias'
 import { ChipWrapper } from 'components/ui/Chips/styles'
-import { RequestCriteriasKeys } from 'types/requestCriterias'
+import { RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
 
 type CriteriaCardProps = {
-  itemId: number
+  criterion: SelectedCriteriaType
   duplicateCriteria: (criteriaId: number) => void
   deleteCriteria: (criteriaId: number) => void
   editCriteria: (criteria: SelectedCriteriaType) => void
 }
 
-const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, editCriteria, deleteCriteria }) => {
+const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriteria }: CriteriaCardProps) => {
   const { classes } = useStyles()
 
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active
 
-  /* à améliorer => inutile et peut être passé en props */
-  const { selectedCriteria = [] } = useAppSelector((state) => state.cohortCreation.request || {})
-
-  const currentCriterion = selectedCriteria.find((criteria) => criteria.id === itemId)
-
   const [needCollapse, setNeedCollapse] = useState(false)
   const [openCollapse, setOpenCollapse] = useState(false)
 
-  const containerRef = useRef(null)
-  const childrenRef = useRef(null)
-
-  if (!currentCriterion) return <></> // Bug, not possible ... The current item is not a criteria
+  const containerRef = useRef<HTMLDivElement>(null)
+  const childrenRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    console.log('overflowTest', containerRef)
-    console.log('overflowTest', childrenRef)
-    if (childrenRef.current?.clientHeight > containerRef.current?.clientHeight) setNeedCollapse(true)
+    const containerHeight = containerRef.current?.clientHeight || 0
+    const childrenHeight = childrenRef.current?.clientHeight || 0
+    if (childrenHeight > containerHeight) setNeedCollapse(true)
     else setNeedCollapse(false)
-  }, [containerRef])
+  }, [containerRef.current?.clientWidth])
 
   return (
     <Grid
@@ -58,29 +49,27 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
       justifyContent={'space-between'}
       alignItems={'flex-start'}
       className={classes.criteriaItem}
-      style={{ backgroundColor: currentCriterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
+      style={{ backgroundColor: criterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
     >
-      <Grid container alignItems="center" item xs={12} md={4} lg={3} padding={'5px'}>
-        <Grid item xs={1}>
-          <Avatar style={{ backgroundColor: '#5bc5f2', width: 24, height: 24, fontSize: 14 }}>
-            {currentCriterion.id}
-          </Avatar>
-        </Grid>
-        <Grid item xs={11}>
-          <Typography className={classes.title}>- {currentCriterion.title} :</Typography>
-        </Grid>
+      <Grid container alignItems="center" item xs={7} xl={4} padding={'5px'}>
+        <Avatar style={{ backgroundColor: '#5bc5f2', width: 21, height: 21, fontSize: 15, marginRight: 5 }}>
+          {criterion.id}
+        </Avatar>
+        <Typography className={classes.title} fontWeight={700}>
+          {criterion.title} :
+        </Typography>
       </Grid>
       <Grid
         container
         item
         xs={12}
-        md={6}
-        lg={7}
+        xl={6}
         ref={containerRef}
-        style={{ height: openCollapse ? '' : 42, overflow: 'hidden' }}
+        style={{ height: openCollapse ? '' : 42 }}
+        className={classes.secondItem}
       >
-        <Grid item xs={11} container ref={childrenRef} className={classes.secondItem}>
-          {criteriasAsArray(currentCriterion, currentCriterion.type as RequestCriteriasKeys).map((label, index) => (
+        <Grid item xs={11} container ref={childrenRef} style={{ overflow: 'hidden' }}>
+          {criteriasAsArray(criterion, criterion.type as RessourceType).map((label, index) => (
             <Grid key={index} margin={'5px'}>
               <ChipWrapper label={label} />
             </Grid>
@@ -94,11 +83,11 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
           )}
         </Grid>
       </Grid>
-      <Grid item xs={12} lg={2} container justifyContent="flex-end" gridColumn={2}>
-        {currentCriterion.error && (
+      <Grid item xs={5} xl={2} container justifyContent="flex-end">
+        {criterion.error && (
           <IconButton
             size="small"
-            onClick={() => editCriteria(currentCriterion)}
+            onClick={() => editCriteria(criterion)}
             color="secondary"
             disabled={maintenanceIsActive}
           >
@@ -107,7 +96,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
         )}
         <IconButton
           size="small"
-          onClick={() => duplicateCriteria(currentCriterion.id)}
+          onClick={() => duplicateCriteria(criterion.id)}
           style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
           disabled={maintenanceIsActive}
         >
@@ -115,7 +104,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
         </IconButton>
         <IconButton
           size="small"
-          onClick={() => editCriteria(currentCriterion)}
+          onClick={() => editCriteria(criterion)}
           style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
           disabled={maintenanceIsActive}
         >
@@ -123,7 +112,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
         </IconButton>
         <IconButton
           size="small"
-          onClick={() => deleteCriteria(currentCriterion.id)}
+          onClick={() => deleteCriteria(criterion.id)}
           style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
           disabled={maintenanceIsActive}
         >

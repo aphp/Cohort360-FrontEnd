@@ -26,23 +26,24 @@ import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
 
-import { CriteriaName, DocType, DocumentDataType, CriteriaDrawerComponentProps } from 'types'
+import { CriteriaDrawerComponentProps, CriteriaName } from 'types'
 import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
 import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import { SearchByTypes } from 'types/searchCriterias'
+import { SearchInputError } from 'types/error'
+import { Comparators, DocType, DocumentDataType, RessourceType } from 'types/requestCriterias'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import { SearchInputError } from 'types/error'
 
 const defaultComposition: DocumentDataType = {
-  type: 'DocumentReference',
+  type: RessourceType.DOCUMENTS,
   title: 'Critère de document',
   search: '',
   searchBy: SearchByTypes.TEXT,
   docType: [],
   occurrence: 1,
-  occurrenceComparator: '>=',
+  occurrenceComparator: Comparators.GREATER_OR_EQUAL,
   encounterEndDate: '',
   encounterStartDate: '',
   startOccurrence: '',

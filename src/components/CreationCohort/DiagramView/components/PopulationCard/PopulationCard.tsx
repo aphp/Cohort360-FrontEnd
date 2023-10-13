@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import { Button, Chip, CircularProgress, IconButton, Typography } from '@mui/material'
+import { Button, Chip, CircularProgress, Grid, IconButton, Typography } from '@mui/material'
 
 import EditIcon from '@mui/icons-material/Edit'
 import CloseIcon from '@mui/icons-material/Close'
@@ -135,7 +135,7 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
           </div>
         </div>
       ) : selectionAndPopulationWithRightError?.length !== 0 || form ? (
-        <div className={classes.populationCard}>
+        <Grid container justifyContent="space-between" alignItems="center" className={classes.populationCard}>
           <div className={classes.leftDiv}>
             <Typography className={classes.typography} variant={form ? undefined : 'h6'} align="left">
               {label ?? 'Population source :'}
@@ -200,7 +200,7 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
           >
             <EditIcon />
           </IconButton>
-        </div>
+        </Grid>
       ) : (
         <div className={classes.centerContainer}>
           <Button className={classes.actionButton} onClick={() => onChangeOpenDrawer(true)}>
