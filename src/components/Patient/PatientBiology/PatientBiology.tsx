@@ -92,6 +92,8 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     } catch (error) {
       if (error instanceof CanceledError) {
         setLoadingStatus(LoadingStatus.FETCHING)
+      } else {
+        setLoadingStatus(LoadingStatus.SUCCESS)
       }
     }
   }

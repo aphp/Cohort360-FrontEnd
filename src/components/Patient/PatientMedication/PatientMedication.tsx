@@ -81,6 +81,8 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
     } catch (error) {
       if (error instanceof CanceledError) {
         setLoadingStatus(LoadingStatus.FETCHING)
+      } else {
+        setLoadingStatus(LoadingStatus.SUCCESS)
       }
     }
   }
