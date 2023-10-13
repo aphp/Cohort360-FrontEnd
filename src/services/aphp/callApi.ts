@@ -649,7 +649,7 @@ export const fetchMedicationRequest = async (
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (encounter) options = [...options, `encounter.identifier=${encounter}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (type) options = [...options, `medication=*${encodeURIComponent('|')}${type}`] // eslint-disable-line
+  if (type) options = [...options, `category=*${encodeURIComponent('|')}${type}`] // eslint-disable-line
   if (minDate) options = [...options, `validity-period-start=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `validity-period-start=le${maxDate}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0) options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
