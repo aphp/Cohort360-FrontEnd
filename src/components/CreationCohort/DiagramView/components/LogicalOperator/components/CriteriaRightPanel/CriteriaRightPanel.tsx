@@ -19,8 +19,9 @@ import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import ScienceIcon from '@mui/icons-material/Science'
 import CoronavirusIcon from '@mui/icons-material/Coronavirus'
 
-import { CriteriaItemType, IdType, SelectedCriteriaType } from 'types'
+import { CriteriaItemType } from 'types'
 import useStyles from './styles'
+import { RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
 
 type CriteriaListItemProps = {
   criteriaItem: CriteriaItemType
@@ -35,33 +36,33 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
   const [open, setOpen] = useState(true)
 
   const svgIcone =
-    id === IdType.Request ? (
+    id === RessourceType.REQUEST ? (
       <SavedSearchIcon />
-    ) : id === IdType.IPPList ? (
+    ) : id === RessourceType.IPP_LIST ? (
       <PersonSearchIcon />
-    ) : id === IdType.Patient ? (
+    ) : id === RessourceType.PATIENT ? (
       <BarChartIcon />
-    ) : id === IdType.Encounter ? (
+    ) : id === RessourceType.ENCOUNTER ? (
       <EventIcon />
-    ) : id === IdType.DocumentReference ? (
+    ) : id === RessourceType.DOCUMENTS ? (
       <DescriptionIcon />
-    ) : id === IdType.Pmsi ? (
+    ) : id === RessourceType.PMSI ? (
       <MedicalInformationIcon />
-    ) : id === IdType.Condition ? (
+    ) : id === RessourceType.CONDITION ? (
       <ArticleIcon />
-    ) : id === IdType.Procedure ? (
-      <LocalHospitalIcon />
-    ) : id === IdType.Claim ? (
+    ) : id === RessourceType.PROCEDURE ? (
       <ContactPageIcon />
-    ) : id === IdType.Medication ? (
+    ) : id === RessourceType.CLAIM ? (
+      <LocalHospitalIcon />
+    ) : id === RessourceType.MEDICATION ? (
       <VaccinesIcon />
-    ) : id === IdType.Biologie_microbiologie ? (
+    ) : id === RessourceType.BIO_MICRO ? (
       <BiotechIcon />
-    ) : id === IdType.Observation ? (
-      <ScienceIcon />
-    ) : id === IdType.Microbiologie ? (
+    ) : id === RessourceType.OBSERVATION ? (
       <CoronavirusIcon />
-    ) : id === IdType.Physiologie ? (
+    ) : id === RessourceType.MICROBIOLOGIE ? (
+      <ScienceIcon />
+    ) : id === RessourceType.PHYSIOLOGIE ? (
       <MonitorHeartIcon />
     ) : (
       <></>

@@ -19,12 +19,11 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
 
-import { SelectedCriteriaType } from 'types'
-import { VitalStatusLabel, VitalStatus, DurationRangeType } from 'types/searchCriterias'
+import { DurationRangeType, VitalStatus, VitalStatusLabel } from 'types/searchCriterias'
 import CalendarRange from 'components/ui/Inputs/Calendar/CalendarRange'
+import { BlockWrapper } from 'components/ui/Layout/styles'
 import DurationRange from 'components/ui/Inputs/Duration/DurationRange'
-import { BlockWrapper } from 'components/ui/Layout'
-import { RESSOURCE_TYPE_PATIENT } from 'utils/cohortCreation'
+import { RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
 
 enum Error {
   EMPTY_FORM,
@@ -61,7 +60,7 @@ const DemographicForm = (props: DemographicFormProps) => {
   const [vitalStatus, setVitalStatus] = useState(selectedCriteria?.vitalStatus || VitalStatus.ALL)
   const [genders, setGenders] = useState(selectedCriteria?.genders || [])
   const [title, setTitle] = useState(selectedCriteria?.title || 'Critère démographique')
-  const [isInclusive, setIsInclusive] = useState(selectedCriteria?.isInclusive || true)
+  const [isInclusive, setIsInclusive] = useState<boolean>(selectedCriteria?.isInclusive || true)
 
   const { classes } = useStyles()
 
@@ -85,7 +84,7 @@ const DemographicForm = (props: DemographicFormProps) => {
     }
   }, [vitalStatus, genders, birthdates, age, deathDates])
 
-  const _onSubmit = () => {
+  const onSubmit = () => {
     onChangeSelectedCriteria({
       id: selectedCriteria?.id,
       age,
@@ -95,7 +94,7 @@ const DemographicForm = (props: DemographicFormProps) => {
       isInclusive,
       vitalStatus,
       title,
-      type: RESSOURCE_TYPE_PATIENT
+      type: RessourceType.PATIENT
     })
   }
 
@@ -147,7 +146,7 @@ const DemographicForm = (props: DemographicFormProps) => {
             <Switch
               id="criteria-inclusive"
               checked={!isInclusive}
-              onChange={(event) => setIsInclusive(!event.target.checked)}
+              onChange={(event) => setIsInclusive(!event.target.checked as boolean)}
               color="secondary"
             />
           </Grid>
@@ -218,7 +217,7 @@ const DemographicForm = (props: DemographicFormProps) => {
             </Button>
           )}
           <Button
-            onClick={_onSubmit}
+            onClick={onSubmit}
             type="submit"
             form="demographic-form"
             variant="contained"

@@ -33,10 +33,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
     flexWrap: 'nowrap'
   },
   secondItem: {
-    flexBasis: 'auto',
-    order: 1,
-    '@media (max-width: 768px)': {
-      flexBasis: '100%',
+    overflow: 'hidden',
+    [theme.breakpoints.down('xl')]: {
       order: 2
     }
   }

@@ -21,7 +21,7 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
   }, [duration])
 
   return (
-    <BlockWrapper container justifyContent="space-between" xs={12} alignItems="flex-end" margin={'15px 0px 0px 0px'}>
+    <BlockWrapper container justifyContent="space-between" xs={12} alignItems="flex-end">
       <Grid item xs={deidentified ? 4 : 3} container alignItems="flex-start">
         <DurationLegendWrapper variant="h5">{label}</DurationLegendWrapper>
       </Grid>

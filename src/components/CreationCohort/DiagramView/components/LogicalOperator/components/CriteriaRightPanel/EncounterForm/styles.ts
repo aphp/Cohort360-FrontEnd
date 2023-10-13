@@ -25,9 +25,6 @@ const useStyles = makeStyles()(() => ({
     flexDirection: 'column',
     padding: '1em'
   },
-  categoryTitle: {
-    padding: '1em'
-  },
   criteriaActionContainer: {
     display: 'flex',
     alignItems: 'center',
@@ -48,27 +45,14 @@ const useStyles = makeStyles()(() => ({
     width: 'calc(100% - 2em)'
   },
   durationLegend: {
-    color: '#5B5E63',
-    fontWeight: 900,
+    color: '#153D8A',
+    fontWeight: 600,
     fontSize: 12,
-    textAlign: 'center'
+    paddingBottom: 10
   },
   textField: {
     '& input': {
       padding: '2px 4px 3px 0'
-    }
-  },
-  durationContainer: {
-    marginBottom: 20
-  },
-  durationTitle: {
-    padding: '1em',
-    display: 'flex',
-    alignItems: 'center'
-  },
-  supportedInputsRoot: {
-    '& div': {
-      marginBottom: 3
     }
   }
 }))

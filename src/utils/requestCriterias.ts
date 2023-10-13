@@ -1,11 +1,18 @@
 import moment from 'moment'
-import { Comparators, DocType, ScopeTreeRow } from 'types'
-import { MedicationType, MedicationTypeLabel, RequestCriteriasKeys, VitalStatusLabel } from 'types/requestCriterias'
-import { DurationRangeType, SearchByTypes, VitalStatus } from 'types/searchCriterias'
+import { ScopeTreeRow } from 'types'
+import {
+  Comparators,
+  DocType,
+  MedicationType,
+  MedicationTypeLabel,
+  RessourceType,
+  VitalStatusLabel
+} from 'types/requestCriterias'
+import { DurationRangeType, LabelObject, SearchByTypes, VitalStatus } from 'types/searchCriterias'
 import allDocTypes from 'assets/docTypes.json'
 import { getDurationRangeLabel } from './age'
 
-export const getVitalStatusLabel = (value: VitalStatus) => {
+const getVitalStatusLabel = (value: VitalStatus) => {
   switch (value) {
     case VitalStatus.ALIVE:
       return VitalStatusLabel.ALIVE
@@ -25,17 +32,17 @@ const getMedicationTypeLabel = (type: MedicationType) => {
   }
 }
 
-export const getLabelFromObject = (values: { id: string; label: string }[]) => {
+const getLabelFromObject = (values: LabelObject[]) => {
   const labels = values.map((value) => value.label).join(' - ')
   return labels
 }
 
-export const getLabelFromName = (values: ScopeTreeRow[]) => {
+const getLabelFromName = (values: ScopeTreeRow[]) => {
   const labels = values.map((value) => value.name).join(' - ')
   return labels
 }
 
-export const getDatesLabel = (values: DurationRangeType, word?: string) => {
+const getDatesLabel = (values: DurationRangeType, word?: string) => {
   if (values[0] && values[1]) {
     return `${word ? word + ' entre' : 'Entre'} le ${moment(values[0]).format('DD/MM/YYYY')} et le ${moment(
       values[1]
@@ -90,25 +97,25 @@ const getIppListLabel = (values: string) => {
   return `Contient les patients : ${labels}`
 }
 
-export const criteriasAsArray = (criterias: any, type: RequestCriteriasKeys): string[] => {
+export const criteriasAsArray = (criterias: any, type: RessourceType): string[] => {
   const labels: string[] = []
 
   switch (type) {
-    case RequestCriteriasKeys.CONDITION:
-    case RequestCriteriasKeys.PROCEDURE:
-    case RequestCriteriasKeys.CLAIM:
-    case RequestCriteriasKeys.MEDICATION_REQUEST:
-    case RequestCriteriasKeys.MEDICATION_ADMINISTRATION:
-    case RequestCriteriasKeys.OBSERVATION:
+    case RessourceType.CONDITION:
+    case RessourceType.PROCEDURE:
+    case RessourceType.CLAIM:
+    case RessourceType.MEDICATION_REQUEST:
+    case RessourceType.MEDICATION_ADMINISTRATION:
+    case RessourceType.OBSERVATION:
       if (criterias.code.length > 0) labels.push(getLabelFromObject(criterias.code))
       break
   }
   switch (type) {
-    case RequestCriteriasKeys.IPP_LIST:
+    case RessourceType.IPP_LIST:
       labels.push(getIppListLabel(criterias.search))
       break
 
-    case RequestCriteriasKeys.PATIENT:
+    case RessourceType.PATIENT:
       if (criterias.genders.length > 0) labels.push(getLabelFromObject(criterias.genders))
       labels.push(getVitalStatusLabel(criterias.vitalStatus))
       labels.push(getDurationRangeLabel(criterias.age, 'Âge'))
@@ -116,8 +123,10 @@ export const criteriasAsArray = (criterias: any, type: RequestCriteriasKeys): st
         labels.push(getDatesLabel(criterias.birthdates, 'Naissance'))
       if (criterias.deathDates[0] || criterias.deathDates[1]) labels.push(getDatesLabel(criterias.deathDates, 'Décès'))
       break
-    /* ajouter durée de prise en charge + age de prise en charge */
-    case RequestCriteriasKeys.ENCOUNTER:
+    case RessourceType.ENCOUNTER:
+      if (criterias.age[0] || criterias.age[1]) labels.push(getDurationRangeLabel(criterias.age, 'Âge : '))
+      if (criterias.duration[0] || criterias.duration[1])
+        labels.push(getDurationRangeLabel(criterias.age, 'Prise en charge : '))
       if (criterias.priseEnChargeType.length > 0) labels.push(getLabelFromObject(criterias.priseEnChargeType))
       if (criterias.typeDeSejour.length > 0) labels.push(getLabelFromObject(criterias.typeDeSejour))
       if (criterias.fileStatus.length > 0) labels.push(getLabelFromObject(criterias.fileStatus))
@@ -130,38 +139,39 @@ export const criteriasAsArray = (criterias: any, type: RequestCriteriasKeys): st
       if (criterias.provenance.length > 0) labels.push(getLabelFromObject(criterias.provenance))
       break
 
-    case RequestCriteriasKeys.DOCUMENTS:
+    case RessourceType.DOCUMENTS:
       labels.push(getSearchDocumentLabel(criterias.search, criterias.searchBy))
       if (criterias.docType.length > 0) labels.push(getDocumentTypesLabel(criterias.docType))
       break
 
-    case RequestCriteriasKeys.CONDITION:
+    case RessourceType.CONDITION:
       if (criterias.diagnosticType.length > 0) labels.push(getLabelFromObject(criterias.diagnosticType))
       break
 
-    case RequestCriteriasKeys.MEDICATION_REQUEST:
-    case RequestCriteriasKeys.MEDICATION_ADMINISTRATION:
+    case RessourceType.MEDICATION_REQUEST:
+    case RessourceType.MEDICATION_ADMINISTRATION:
       labels.push(getMedicationTypeLabel(criterias.type))
       if (criterias.prescriptionType.length > 0) labels.push(getLabelFromObject(criterias.prescriptionType))
       if (criterias.administration.length > 0) labels.push(getLabelFromObject(criterias.administration))
       break
 
-    case RequestCriteriasKeys.OBSERVATION:
+    case RessourceType.OBSERVATION:
       if (criterias.valueComparator && (!isNaN(criterias.valueMin) || !isNaN(criterias.valueMax)))
         getBiologyValuesLabel(criterias.valueComparator, criterias.valueMin, criterias.valueMax)
   }
   switch (type) {
-    case RequestCriteriasKeys.DOCUMENTS:
-    case RequestCriteriasKeys.CONDITION:
-    case RequestCriteriasKeys.PROCEDURE:
-    case RequestCriteriasKeys.MEDICATION_REQUEST:
-    case RequestCriteriasKeys.MEDICATION_ADMINISTRATION:
-    case RequestCriteriasKeys.OBSERVATION:
+    case RessourceType.DOCUMENTS:
+    case RessourceType.CONDITION:
+    case RessourceType.PROCEDURE:
+    case RessourceType.MEDICATION_REQUEST:
+    case RessourceType.MEDICATION_ADMINISTRATION:
+    case RessourceType.OBSERVATION:
+    case RessourceType.ENCOUNTER:
       if (criterias.encounterStartDate || criterias.encounterEndDate)
         labels.push(getDatesLabel([criterias.encounterStartDate, criterias.encounterEndDate], 'Prise en charge'))
-      if (criterias.occurrence && criterias.occurrenceComparator)
+      if (!isNaN(criterias.occurrence) && criterias.occurrenceComparator)
         labels.push(getNbOccurencesLabel(criterias.occurrence, criterias.occurrenceComparator))
-      if (criterias.encounterStartDate || criterias.encounterEndDate)
+      if (criterias.startOccurrence || criterias.endOccurrence)
         labels.push(getDatesLabel([criterias.startOccurrence, criterias.endOccurrence], 'Occurence'))
       if (criterias.encounterService?.length > 0) labels.push(getLabelFromName(criterias.encounterService))
   }

@@ -11,7 +11,7 @@ import { CalendarLabel } from './styles'
 
 interface CalendarRangeProps {
   value: DurationRangeType
-  label: string
+  label?: string
   inline?: boolean
   disabled?: boolean
   onChange: (newDuration: DurationRangeType) => void
@@ -36,11 +36,13 @@ const CalendarRange = ({ value, label, inline = false, onError, disabled = false
 
   return (
     <BlockWrapper>
-      <BlockWrapper item xs={12} margin="0px 0px 10px 0px">
-        <CalendarLabel disabled={disabled} variant="h3">
-          {label} :
-        </CalendarLabel>
-      </BlockWrapper>
+      {label && (
+        <BlockWrapper item xs={12} margin="0px 0px 10px 0px">
+          <CalendarLabel disabled={disabled} variant="h3">
+            {label} :
+          </CalendarLabel>
+        </BlockWrapper>
+      )}
       <Grid item xs={12} container spacing={2}>
         <Grid item xs={12} md={inline ? 6 : 12}>
           <CalendarInput

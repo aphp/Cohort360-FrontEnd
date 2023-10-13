@@ -16,9 +16,9 @@ import {
   Resource
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
-import { DurationRangeType, GenderStatus, SearchByTypes, VitalStatus } from 'types/searchCriterias'
+import { SearchByTypes } from 'types/searchCriterias'
 import { SearchInputError } from 'types/error'
-import { Calendar, CalendarLabel, CalendarRequestLabel } from 'types/dates'
+import { Comparators, SelectedCriteriaType } from 'types/requestCriterias'
 
 export enum CohortJobStatus {
   _long_pending = 'long_pending',
@@ -358,7 +358,7 @@ export type CriteriaGroupType = {
   | {
       type: 'NamongM'
       options: {
-        operator: '=' | '<' | '>' | '<=' | '>='
+        operator: Comparators
         number: number
         timeDelayMin: number
         timeDelayMax: number
@@ -405,210 +405,14 @@ export type CriteriaItemType = {
   subItems?: CriteriaItemType[]
 }
 
-export enum IdType {
-  Request = 'Request',
-  IPPList = 'IPPList',
-  Patient = 'Patient',
-  Encounter = 'Encounter',
-  DocumentReference = 'DocumentReference',
-  Pmsi = 'pmsi',
-  Condition = 'Condition',
-  Procedure = 'Procedure',
-  Claim = 'Claim',
-  Medication = 'Medication',
-  Biologie_microbiologie = 'biologie_microbiologie',
-  Observation = 'Observation',
-  Microbiologie = 'microbiologie',
-  Physiologie = 'physiologie'
-}
-
-export type SelectedCriteriaType = {
-  id: number
-  error?: boolean
-  encounterService?: ScopeTreeRow[]
-} & (
-  | CcamDataType
-  | Cim10DataType
-  | DemographicDataType
-  | GhmDataType
-  | EncounterDataType
-  | DocumentDataType
-  | MedicationDataType
-  | ObservationDataType
-  | IPPListDataType
-  | EncounterDataType
-)
-
-export type CcamDataType = {
-  title: string
-  type: 'Procedure'
-  hierarchy: undefined
-  code: { id: string; label: string }[] | null
-  encounterEndDate: Date | null
-  encounterStartDate: Date | null
-  occurrence: number
-  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
-  label: undefined
-  startOccurrence: Date | ''
-  endOccurrence: Date | ''
-  isInclusive?: boolean
-}
-
-export type Cim10DataType = {
-  title: string
-  type: 'Condition'
-  code: { id: string; label: string }[] | null
-  diagnosticType: { id: string; label: string }[] | null
-  encounterEndDate: Date | null
-  encounterStartDate: Date | null
-  occurrence: number
-  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
-  label: undefined
-  startOccurrence: Date | ''
-  endOccurrence: Date | ''
-  isInclusive?: boolean
-}
-
-export type DemographicDataType = {
-  title: string
-  type: 'Patient'
-  genders: GenderStatus[] | null
-  vitalStatus: VitalStatus | null
-  age: DurationRangeType
-  birthdates: DurationRangeType
-  deathDates: DurationRangeType
-  isInclusive?: boolean
-}
-
-export type IPPListDataType = {
-  title: string
-  type: 'IPPList'
-  search: string
-  isInclusive?: boolean
-}
-
-export type DocType = {
+export type ValueSet = {
   code: string
-  label: string
-  type: string
-}
-
-export type DocumentDataType = {
-  title: string
-  type: 'DocumentReference'
-  search: string
-  searchBy: SearchByTypes.TEXT | SearchByTypes.DESCRIPTION
-  docType: DocType[] | null
-  encounterEndDate: Date | ''
-  encounterStartDate: Date | ''
-  occurrence: number
-  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
-  startOccurrence: Date | ''
-  endOccurrence: Date | ''
-  isInclusive?: boolean
-}
-
-export type GhmDataType = {
-  title: string
-  type: 'Claim'
-  code: { id: string; label: string }[] | null
-  encounterEndDate: Date | null
-  encounterStartDate: Date | null
-  occurrence: number
-  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
-  label: undefined
-  startOccurrence: Date | ''
-  endOccurrence: Date | ''
-  isInclusive?: boolean
+  display: string
 }
 
 export enum ValueSetSystem {
   ATC = 'ATC',
   UCD = 'UCD'
-}
-
-export enum Comparators {
-  LESS_OR_EQUAL = '<=',
-  LESS = '<',
-  EQUAL = '=',
-  GREATER = '>',
-  GREATER_OR_EQUAL = '>=',
-  BETWEEN = '<x>'
-}
-
-export type EncounterDataType = {
-  type: 'Encounter'
-  title: string
-  age: [number | null, number | null]
-  ageType: [
-    { id: Calendar; criteriaLabel?: CalendarLabel; requestLabel: CalendarRequestLabel },
-    { id: Calendar; criteriaLabel?: CalendarLabel; requestLabel: CalendarRequestLabel }
-  ]
-  duration: [number | null, number | null]
-  durationType: [
-    { id: Calendar; criteriaLabel?: CalendarLabel; requestLabel: CalendarRequestLabel },
-    { id: Calendar; criteriaLabel?: CalendarLabel; requestLabel: CalendarRequestLabel }
-  ]
-  admissionMode: { id: string; label: string }[] | null
-  entryMode: { id: string; label: string }[] | null
-  exitMode: { id: string; label: string }[] | null
-  priseEnChargeType: { id: string; label: string }[] | null
-  typeDeSejour: { id: string; label: string }[] | null
-  fileStatus: { id: string; label: string }[] | null
-  discharge: { id: string; label: string }[] | null
-  reason: { id: string; label: string }[] | null
-  destination: { id: string; label: string }[] | null
-  provenance: { id: string; label: string }[] | null
-  admission: { id: string; label: string }[] | null
-  encounterStartDate: Date | ''
-  encounterEndDate: Date | ''
-  occurrence: number
-  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
-  startOccurrence: Date | ''
-  endOccurrence: Date | ''
-  isInclusive?: boolean
-}
-
-export type MedicationDataType = {
-  title: string
-  code: { id: string; label: string }[] | null
-  prescriptionType: { id: string; label: string }[] | null
-  administration: { id: string; label: string }[] | null
-  occurrence: number
-  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
-  startOccurrence: Date | ''
-  endOccurrence: Date | ''
-  encounterEndDate: Date | null
-  encounterStartDate: Date | null
-  isInclusive?: boolean
-} & (
-  | {
-      type: 'MedicationRequest'
-      prescriptionType: { id: string; label: string }[] | null
-    }
-  | { type: 'MedicationAdministration' }
-)
-
-export type ObservationDataType = {
-  title: string
-  type: 'Observation'
-  code: { id: string; label: string }[] | null
-  isLeaf: boolean
-  valueMin?: number
-  valueMax?: number
-  valueComparator: Comparators
-  occurrence: number
-  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
-  startOccurrence: Date | null
-  endOccurrence: Date | null
-  isInclusive?: boolean
-  encounterStartDate: Date | null
-  encounterEndDate: Date | null
-}
-
-export type ValueSet = {
-  code: string
-  display: string
 }
 
 export type ProjectType = {

@@ -4,7 +4,7 @@ import { CriteriaItemType } from 'types'
 import RequestForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/RequestForm/RequestForm'
 import IPPForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/IPPForm/IPPForm'
 import DocumentsForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DocumentsForm/DocumentsForm'
-import SupportedForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/SupportedForm/SupportedForm'
+import EncounterForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/EncounterForm'
 import CCAMForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CCAM'
 import Cim10Form from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/Cim10Form'
 import GhmForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/GHM'
@@ -14,7 +14,7 @@ import BiologyForm from './DiagramView/components/LogicalOperator/components/Cri
 import services from 'services/aphp'
 
 import { ODD_BIOLOGY, ODD_MEDICATION } from '../../constants'
-import DemographicForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicForm/DemographicForm'
+import DemographicForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicForm'
 
 // ├── Mes requêtes
 // ├── Liste d'IPP
@@ -62,7 +62,7 @@ const criteriaList: CriteriaItemType[] = [
     title: 'Prise en charge',
     color: '#0063AF',
     fontWeight: 'bold',
-    components: SupportedForm,
+    components: EncounterForm,
     data: {
       admissionModes: 'loading',
       entryModes: 'loading',

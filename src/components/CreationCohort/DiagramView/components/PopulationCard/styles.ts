@@ -4,9 +4,6 @@ import { PopulationCardPropsType } from './PopulationCard'
 
 const useStyles = makeStyles<PopulationCardPropsType>()((theme: Theme, params) => ({
   populationCard: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     borderRadius: 4,
     backgroundColor: '#FFFFFF',
     padding: '8px 16px',
@@ -15,7 +12,6 @@ const useStyles = makeStyles<PopulationCardPropsType>()((theme: Theme, params) =
       borderColor: params.form ? 'rgb(21,61,138)' : ''
     },
     flex: 1,
-    margin: '12px 0',
     position: 'relative'
   },
   typography: {

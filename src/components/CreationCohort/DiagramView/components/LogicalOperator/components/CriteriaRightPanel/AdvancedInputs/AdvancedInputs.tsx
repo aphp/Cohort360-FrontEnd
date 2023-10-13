@@ -73,7 +73,7 @@ const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
             <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
           </Tooltip>
         </FormLabel>
-        <Grid item container direction="row" alignItems="center">
+        <Grid item container direction="row" alignItems="center" margin="1em">
           <PopulationCard
             form={form}
             label={label}
