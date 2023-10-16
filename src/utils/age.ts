@@ -117,3 +117,14 @@ export const convertDurationToTimestamp = (duration: DurationType | null): numbe
   const day = duration.day ?? 0
   return year * 365 + month * 30 + day
 }
+
+export const convertTimestampToDuration = (timestamp: number | null): DurationType => {
+  const duration: DurationType = { year: 130, month: 0, day: 0 }
+  if (!timestamp) return duration
+  duration.year = Math.floor(timestamp / 365)
+  timestamp = timestamp % 365
+  duration.month = Math.floor(timestamp / 30)
+  timestamp = timestamp % 30
+  duration.day = timestamp
+  return duration
+}
