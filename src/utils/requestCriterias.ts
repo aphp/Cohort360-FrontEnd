@@ -99,7 +99,6 @@ const getIppListLabel = (values: string) => {
 
 export const criteriasAsArray = (criterias: any, type: RessourceType): string[] => {
   const labels: string[] = []
-
   switch (type) {
     case RessourceType.CONDITION:
     case RessourceType.PROCEDURE:
@@ -116,7 +115,7 @@ export const criteriasAsArray = (criterias: any, type: RessourceType): string[] 
       break
 
     case RessourceType.PATIENT:
-      if (criterias.genders.length > 0) labels.push(getLabelFromObject(criterias.genders))
+      if (criterias.genders?.length > 0) labels.push(getLabelFromObject(criterias.genders))
       labels.push(getVitalStatusLabel(criterias.vitalStatus))
       labels.push(getDurationRangeLabel(criterias.age, 'Âge'))
       if (criterias.birthdates[0] || criterias.birthdates[1])
@@ -126,7 +125,7 @@ export const criteriasAsArray = (criterias: any, type: RessourceType): string[] 
     case RessourceType.ENCOUNTER:
       if (criterias.age[0] || criterias.age[1]) labels.push(getDurationRangeLabel(criterias.age, 'Âge : '))
       if (criterias.duration[0] || criterias.duration[1])
-        labels.push(getDurationRangeLabel(criterias.age, 'Prise en charge : '))
+        labels.push(getDurationRangeLabel(criterias.duration, 'Prise en charge : '))
       if (criterias.priseEnChargeType.length > 0) labels.push(getLabelFromObject(criterias.priseEnChargeType))
       if (criterias.typeDeSejour.length > 0) labels.push(getLabelFromObject(criterias.typeDeSejour))
       if (criterias.fileStatus.length > 0) labels.push(getLabelFromObject(criterias.fileStatus))

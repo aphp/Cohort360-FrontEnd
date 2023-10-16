@@ -12,9 +12,16 @@ import {
   PROCEDURE_HIERARCHY
 } from '../constants'
 import { SearchByTypes, VitalStatus } from 'types/searchCriterias'
-import { Calendar, CalendarLabel, CalendarRequestLabel } from 'types/dates'
-import { convertDurationToTimestamp, convertStringToDuration } from './age'
+import { Calendar } from 'types/dates'
+import {
+  convertDurationToString,
+  convertDurationToTimestamp,
+  convertStringToDuration,
+  convertTimestampToDuration
+} from './age'
 import { Comparators, DocType, RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import { intersectionWith } from 'lodash'
+import { allGendersStatuses } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicForm'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
@@ -194,7 +201,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
             ? `${PATIENT_GENDER}=${criterion.genders.map((gender: any) => gender.id).reduce(searchReducer)}`
             : ''
         }`,
-        `${PATIENT_DECEASED}=${criterion.vitalStatus === VitalStatus.DECEASED ? 'true' : 'false'}`,
+        criterion.vitalStatus === VitalStatus.ALL
+          ? ''
+          : `${PATIENT_DECEASED}=${criterion.vitalStatus === VitalStatus.DECEASED ? 'true' : 'false'}`,
         `${ageMinCriterion}`,
         `${ageMaxCriterion}`,
         criterion.birthdates[0]
@@ -728,26 +737,6 @@ export async function unbuildRequest(_json: string): Promise<any> {
     return { population, criteria: [], criteriaGroup: [] }
   }
 
-  const getValueFromCalendarType = (type: Calendar, value: number): number => {
-    if (type === Calendar.YEAR) {
-      return value / 365
-    }
-    if (type === Calendar.MONTH) {
-      return value / 31
-    }
-    return value
-  }
-
-  const getCalendarType = (value: number) => {
-    if (value % 365 === 0) {
-      return { id: Calendar.YEAR, requestLabel: CalendarRequestLabel.YEAR, criteriaLabel: CalendarLabel.YEAR }
-    }
-    if (value % 31 === 0) {
-      return { id: Calendar.MONTH, requestLabel: CalendarRequestLabel.MONTH, criteriaLabel: CalendarLabel.MONTH }
-    }
-    return { id: Calendar.DAY, requestLabel: CalendarRequestLabel.DAY, criteriaLabel: CalendarLabel.DAY }
-  }
-
   const _retrieveInformationFromJson = async (element: RequeteurCriteriaType): Promise<any> => {
     const currentCriterion: any = {
       id: element._id,
@@ -760,73 +749,55 @@ export async function unbuildRequest(_json: string): Promise<any> {
       case RessourceType.PATIENT: {
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-          console.log('currentRetrievedInformation', filters)
+          currentCriterion.title = 'Critère démographique'
+          currentCriterion.genders = []
+          currentCriterion.vitalStatus = VitalStatus.ALL
+          currentCriterion.age = [null, null]
+          currentCriterion.birthdates = [null, null]
+          currentCriterion.deathDates = [null, null]
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
-            currentCriterion.title = currentCriterion.title ? currentCriterion.title : 'Critère démographique'
-            currentCriterion.gender = currentCriterion.gender ? currentCriterion.gender : []
-            currentCriterion.vitalStatus = currentCriterion.vitalStatus ? currentCriterion.vitalStatus : []
-            currentCriterion.age = currentCriterion.age ? currentCriterion.age : ['0-0-0', '0-0-130']
-            currentCriterion.birthdates = currentCriterion.birthdates ? currentCriterion.birthdates : [null, null]
-            currentCriterion.deathDates = currentCriterion.deathDates ? currentCriterion.deathDates : [null, null]
+
             switch (key) {
               case PATIENT_AGE: {
-                currentCriterion.age = currentCriterion.ageType ? currentCriterion.ageType : null
-                currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
-
                 if (value?.includes('ge')) {
                   const ageMin = value?.replace('ge', '')
-                  currentCriterion.ageType = getCalendarType(+ageMin)
-                  currentCriterion.years[0] = getValueFromCalendarType(currentCriterion.ageType?.id, +ageMin)
+                  currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin))
                 } else if (value?.includes('le')) {
                   const ageMax = value?.replace('le', '')
-                  currentCriterion.ageType = getCalendarType(+ageMax)
-                  currentCriterion.years[1] = getValueFromCalendarType(currentCriterion.ageType?.id, +ageMax)
+                  currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax))
                 }
                 break
               }
               case PATIENT_BIRTHDATE: {
-                currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
-                currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
-
                 if (value?.includes('ge')) {
-                  const ageMin = value?.replace('ge', '')
-                  currentCriterion.ageType = getCalendarType(+ageMin)
-                  currentCriterion.years[0] = getValueFromCalendarType(currentCriterion.ageType?.id, +ageMin)
+                  currentCriterion.birthdates[0] = value.replace('T00:00:00Z', '').replace('ge', '')
                 } else if (value?.includes('le')) {
-                  const ageMax = value?.replace('le', '')
-                  currentCriterion.ageType = getCalendarType(+ageMax)
-                  currentCriterion.years[1] = getValueFromCalendarType(currentCriterion.ageType?.id, +ageMax)
+                  currentCriterion.birthdates[1] = value.replace('T00:00:00Z', '').replace('le', '')
+                }
+                break
+              }
+              case PATIENT_DEATHDATE: {
+                if (value?.includes('ge')) {
+                  currentCriterion.deathDates[0] = value.replace('T00:00:00Z', '').replace('ge', '')
+                } else if (value?.includes('le')) {
+                  currentCriterion.deathDates[1] = value.replace('T00:00:00Z', '').replace('le', '')
                 }
                 break
               }
               case PATIENT_GENDER: {
-                const genderIds = value?.split(',')
-                const newGenderIds = genderIds?.map((docTypeId: any) => ({ id: docTypeId }))
-                if (!newGenderIds) continue
-
-                currentCriterion.gender = currentCriterion.gender
-                  ? [...currentCriterion.gender, ...newGenderIds]
-                  : newGenderIds
+                const genders = value?.split(',') || []
+                const combinedArray = intersectionWith(allGendersStatuses, genders, (allGender: any, gender: any) => {
+                  return gender === allGender.id
+                })
+                currentCriterion.genders = combinedArray
                 break
               }
               case PATIENT_DECEASED: {
-                const vitalStatusIds = value?.split(',')
-
-                // Warning with `id: vitalStatusId === 'true'` ....
-                const newVitalStatusIds = vitalStatusIds?.map((vitalStatusId: any) => ({
-                  id: vitalStatusId === 'true'
-                }))
-                if (!newVitalStatusIds) continue
-
-                currentCriterion.vitalStatus = currentCriterion.vitalStatus
-                  ? [...currentCriterion.vitalStatus, ...newVitalStatusIds]
-                  : newVitalStatusIds
+                currentCriterion.vitalStatus = value === 'true' ? VitalStatus.DECEASED : VitalStatus.ALIVE
                 break
               }
-              case 'active':
-                break
               default:
                 currentCriterion.error = true
                 break
@@ -839,36 +810,22 @@ export async function unbuildRequest(_json: string): Promise<any> {
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
           currentCriterion.title = 'Critère de prise en charge'
-          currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [null, null]
-          currentCriterion.durationType = currentCriterion.durationType
-            ? currentCriterion.durationType
-            : [
-                { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY },
-                { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
-              ]
-          currentCriterion.ageType = currentCriterion.ageType
-            ? currentCriterion.ageType
-            : [
-                { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR },
-                { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR }
-              ]
-          currentCriterion.age = currentCriterion.age ? currentCriterion.age : [null, null]
-          currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : []
-          currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : []
-          currentCriterion.exitMode = currentCriterion.exitMode ? currentCriterion.exitMode : []
-          currentCriterion.priseEnChargeType = currentCriterion.priseEnChargeType
-            ? currentCriterion.priseEnChargeType
-            : []
-          currentCriterion.typeDeSejour = currentCriterion.typeDeSejour ? currentCriterion.typeDeSejour : []
-          currentCriterion.fileStatus = currentCriterion.fileStatus ? currentCriterion.fileStatus : []
-          currentCriterion.reason = currentCriterion.reason ? currentCriterion.reason : []
-          currentCriterion.destination = currentCriterion.destination ? currentCriterion.destination : []
-          currentCriterion.provenance = currentCriterion.provenance ? currentCriterion.provenance : []
-          currentCriterion.admission = currentCriterion.admission ? currentCriterion.admission : []
-          currentCriterion.discharge = currentCriterion.discharge ? currentCriterion.discharge : []
-          currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
-          currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
-          currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+          currentCriterion.duration = [null, null]
+          currentCriterion.age = [null, null]
+          currentCriterion.admissionMode = []
+          currentCriterion.entryMode = []
+          currentCriterion.exitMode = []
+          currentCriterion.priseEnChargeType = []
+          currentCriterion.typeDeSejour = []
+          currentCriterion.fileStatus = []
+          currentCriterion.reason = []
+          currentCriterion.destination = []
+          currentCriterion.provenance = []
+          currentCriterion.admission = []
+          currentCriterion.discharge = []
+          currentCriterion.occurrence = null
+          currentCriterion.startOccurrence = null
+          currentCriterion.endOccurrence = null
 
           if (element.occurrence) {
             currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
@@ -888,27 +845,22 @@ export async function unbuildRequest(_json: string): Promise<any> {
             switch (key) {
               case ENCOUNTER_DURATION: {
                 if (value.includes('ge')) {
-                  const min = value?.replace('ge', '') ?? 0
-                  currentCriterion.durationType[0] = getCalendarType(+min)
-                  currentCriterion.duration[0] = getValueFromCalendarType(currentCriterion.durationType[0].id, +min)
+                  const durationMin = value?.replace('ge', '')
+                  currentCriterion.duration[0] = convertDurationToString(convertTimestampToDuration(+durationMin))
                 } else if (value.includes('le')) {
-                  const max = value?.replace('le', '') ?? 0
-                  currentCriterion.durationType[1] = getCalendarType(+max)
-                  currentCriterion.duration[1] = getValueFromCalendarType(currentCriterion.durationType[1].id, +max)
+                  const durationMax = value?.replace('le', '')
+                  currentCriterion.duration[1] = convertDurationToString(convertTimestampToDuration(+durationMax))
                 }
                 break
               }
               case ENCOUNTER_MIN_BIRTHDATE: {
-                const min = value?.replace('ge', '') ?? 130
-                currentCriterion.ageType[0] = getCalendarType(+min)
-                currentCriterion.age[0] = getValueFromCalendarType(currentCriterion.ageType[0].id, +min)
-
+                const ageMin = value?.replace('ge', '')
+                currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin))
                 break
               }
               case ENCOUNTER_MAX_BIRTHDATE: {
-                const max = value?.replace('le', '') ?? 130
-                currentCriterion.ageType[1] = getCalendarType(+max)
-                currentCriterion.age[1] = getValueFromCalendarType(currentCriterion.ageType[1].id, +max)
+                const ageMax = value?.replace('le', '')
+                currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax))
                 break
               }
               case ENCOUNTER_ENTRYMODE: {
@@ -1575,7 +1527,6 @@ export async function unbuildRequest(_json: string): Promise<any> {
       default:
         break
     }
-
     return currentCriterion
   }
 

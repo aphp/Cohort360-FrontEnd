@@ -37,6 +37,33 @@ type DemographicFormProps = {
   onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
+export const allGendersStatuses = [
+  {
+    id: 'NON RENSEIGNE',
+    label: 'Non renseigné'
+  },
+  {
+    id: 'INCONNU',
+    label: 'Inconnu'
+  },
+  {
+    id: 'a',
+    label: 'Autre'
+  },
+  {
+    id: 'i',
+    label: 'Indeterminé'
+  },
+  {
+    id: 'f',
+    label: 'Féminin'
+  },
+  {
+    id: 'm',
+    label: 'Masculin'
+  }
+]
+
 const allVitalStatuses = [
   {
     id: VitalStatus.ALL,
@@ -53,12 +80,12 @@ const allVitalStatuses = [
 ]
 
 const DemographicForm = (props: DemographicFormProps) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [birthdates, setBirthdates] = useState<DurationRangeType>(selectedCriteria?.birthdates || [null, null])
   const [deathDates, setDeathDates] = useState<DurationRangeType>(selectedCriteria?.deathDates || [null, null])
   const [age, setAge] = useState<DurationRangeType>(selectedCriteria?.age || [null, null])
   const [vitalStatus, setVitalStatus] = useState(selectedCriteria?.vitalStatus || VitalStatus.ALL)
-  const [genders, setGenders] = useState(selectedCriteria?.genders || [])
+  const [genders, setGenders] = useState(selectedCriteria?.genders) || []
   const [title, setTitle] = useState(selectedCriteria?.title || 'Critère démographique')
   const [isInclusive, setIsInclusive] = useState<boolean>(selectedCriteria?.isInclusive || true)
 
@@ -72,7 +99,7 @@ const DemographicForm = (props: DemographicFormProps) => {
     setError(Error.NO_ERROR)
     if (
       vitalStatus === VitalStatus.ALL &&
-      genders.length === 0 &&
+      genders?.length === 0 &&
       birthdates[0] === null &&
       birthdates[1] === null &&
       age[0] === null &&
@@ -155,7 +182,7 @@ const DemographicForm = (props: DemographicFormProps) => {
             multiple
             id="criteria-gender-autocomplete"
             className={classes.inputItem}
-            options={criteria?.data?.gender || []}
+            options={allGendersStatuses || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={genders}
