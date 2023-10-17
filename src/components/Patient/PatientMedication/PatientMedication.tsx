@@ -23,7 +23,6 @@ import { FilterKeys } from 'types/searchCriterias'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
 import services from 'services/aphp'
-import Chip from 'components/ui/Chips/Chip'
 import { selectFiltersAsArray } from 'utils/filters'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/ExecutiveUnitsFilter'
@@ -32,6 +31,7 @@ import PrescriptionTypesFilter from 'components/Filters/PrescriptionTypesFilter/
 import AdministrationTypesFilter from 'components/Filters/AdministrationTypesFilter/AdministrationTypesFilter'
 import { BlockWrapper } from 'components/ui/Layout'
 import useSearchCriterias, { initMedSearchCriterias } from 'reducers/searchCriteriasReducer'
+import Chip from 'components/ui/Chip'
 
 type PatientMedicationProps = {
   groupId?: string

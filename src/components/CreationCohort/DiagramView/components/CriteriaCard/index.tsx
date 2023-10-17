@@ -14,7 +14,7 @@ import { MeState } from 'state/me'
 
 import useStyles from './styles'
 import { criteriasAsArray } from 'utils/requestCriterias'
-import { ChipWrapper } from 'components/ui/Chips/styles'
+import { ChipWrapper } from 'components/ui/Chip/styles'
 import { RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
 
 type CriteriaCardProps = {

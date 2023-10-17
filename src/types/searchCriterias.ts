@@ -103,6 +103,11 @@ export enum FilterKeys {
   DOC_TYPES = 'docTypes'
 }
 
+export enum OrderByKeys {
+  ORDER_BY = 'orderBy',
+  ORDER_DIRECTION = 'orderDirection'
+}
+
 export type SearchBy = SearchByTypes
 export type DurationRangeType = [string | null, string | null]
 export type LabelObject = {

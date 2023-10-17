@@ -14,7 +14,7 @@ import { ListItemWrapper } from 'components/ui/ListItem'
 import { ListWrapper } from 'components/ui/ListWrapper'
 import GenderIcon from 'components/ui/GenderIcon'
 import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
-import { PatientVitalStatus } from 'types/patient'
+import { VitalStatusLabel } from 'types/requestCriterias'
 
 type ListPatientProps = {
   loading: boolean
@@ -114,7 +114,7 @@ const ListPatientLine: React.FC<{
       <ListItemText primary={`${capitalizeFirstLetter(firstName)} ${lastName}`} secondary={`${age} - ${ipp}`} />
       <StatusChip
         status={patient.deceasedDateTime ? ChipStyles.CANCELLED : ChipStyles.VALID}
-        label={patient.deceasedDateTime ? PatientVitalStatus.DECEASED : PatientVitalStatus.ALIVE}
+        label={patient.deceasedDateTime ? VitalStatusLabel.DECEASED : VitalStatusLabel.ALIVE}
       />
     </ListItemWrapper>
   )

@@ -23,11 +23,11 @@ import PopulationCard from '../../../../PopulationCard/PopulationCard'
 import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE } from 'utils/cohortCreation'
 import { DurationRangeType, LabelObject } from 'types/searchCriterias'
 import { Comparators, RessourceType } from 'types/requestCriterias'
-import CalendarRange from 'components/ui/Inputs/Calendar/CalendarRange'
-import DurationRange from 'components/ui/Inputs/Duration/DurationRange'
 import { BlockWrapper } from 'components/ui/Layout/styles'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import Collapse from 'components/ui/Collapse'
+import CalendarRange from 'components/ui/Inputs/CalendarRange'
+import DurationRange from 'components/ui/Inputs/DurationRange'
 
 type EncounterFormProps = {
   criteria: any

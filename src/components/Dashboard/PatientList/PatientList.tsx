@@ -27,7 +27,6 @@ import Select from 'components/ui/Searchbar/Select'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import { FilterKeys, searchByListPatients, SearchByTypes } from 'types/searchCriterias'
-import Chip from 'components/ui/Chips/Chip'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
 import { BlockWrapper } from 'components/ui/Layout'
@@ -37,6 +36,7 @@ import { selectFiltersAsArray } from 'utils/filters'
 import GendersFilter from 'components/Filters/GendersFilter/GenderFilter'
 import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter.tsx/VitalStatusesFilter'
 import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters/BirthdatesRangesFilter'
+import Chip from 'components/ui/Chip'
 
 type PatientListProps = {
   total: number

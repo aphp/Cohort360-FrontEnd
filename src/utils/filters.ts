@@ -65,13 +65,13 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
 
 export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.BIRTHDATES) {
-    return getDurationRangeLabel(value as DurationRangeType)
+    return getDurationRangeLabel(value as DurationRangeType, 'Âge')
   }
   if (key === FilterKeys.GENDERS) {
     return GenderStatusLabel[value as GenderStatus]
   }
   if (key === FilterKeys.VITAL_STATUSES) {
-    return VitalStatusLabel[value as VitalStatus]
+    return VitalStatusLabel[value?.toString().toUpperCase()]
   }
   if (key === FilterKeys.START_DATE) {
     return `Après le : ${moment(value as string).format('DD/MM/YYYY')}`

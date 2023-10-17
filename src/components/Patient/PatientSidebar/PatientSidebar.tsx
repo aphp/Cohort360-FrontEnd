@@ -27,7 +27,7 @@ import {
 import GendersFilter from 'components/Filters/GendersFilter/GenderFilter'
 
 import Button from 'components/ui/Button'
-import Chip from 'components/ui/Chips/Chip'
+import Chip from 'components/ui/Chip'
 import { BlockWrapper } from 'components/ui/Layout'
 import Modal from 'components/ui/Modal'
 import Searchbar from 'components/ui/Searchbar'

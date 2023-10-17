@@ -1,5 +1,5 @@
 import { InputWrapper } from 'components/ui/Inputs'
-import DurationRange from 'components/ui/Inputs/Duration/DurationRange'
+import DurationRange from 'components/ui/Inputs/DurationRange'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import { DurationRangeType } from 'types/searchCriterias'
@@ -15,11 +15,11 @@ const BirthdatesRangesFilter = ({ name, value, deidentified = false }: Birthdate
   const [birthdatesRanges, setBirthdatesRanges] = useState(value)
 
   const onError = (isError: boolean) => {
-    context?.updateError(isError)
+    if (context?.updateError) context?.updateError(isError)
   }
 
   useEffect(() => {
-    context?.updateFormData(name, birthdatesRanges)
+    if (context?.updateFormData) context?.updateFormData(name, birthdatesRanges)
   }, [birthdatesRanges[0], birthdatesRanges[1]])
 
   return (

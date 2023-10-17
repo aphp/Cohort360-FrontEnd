@@ -20,10 +20,10 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import useStyles from './styles'
 
 import { DurationRangeType, VitalStatus, VitalStatusLabel } from 'types/searchCriterias'
-import CalendarRange from 'components/ui/Inputs/Calendar/CalendarRange'
 import { BlockWrapper } from 'components/ui/Layout/styles'
-import DurationRange from 'components/ui/Inputs/Duration/DurationRange'
-import { RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import CalendarRange from 'components/ui/Inputs/CalendarRange'
+import DurationRange from 'components/ui/Inputs/DurationRange'
+import { SelectedCriteriaType, RessourceType } from 'types/requestCriterias'
 
 enum Error {
   EMPTY_FORM,
