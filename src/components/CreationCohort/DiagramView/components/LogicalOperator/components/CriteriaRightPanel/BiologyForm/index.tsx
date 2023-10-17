@@ -10,7 +10,11 @@ import { initSyncHierarchyTableEffect, OBSERVATION, syncOnChangeFormValue } from
 import { PmsiListType } from 'state/pmsi'
 import { fetchBiology } from 'state/biology'
 import { useAppDispatch, useAppSelector } from 'state'
+import { Comparators } from 'types'
+import { EXPLORATION } from 'utils/constants'
+
 import { Comparators, CriteriaDrawerComponentProps } from 'types'
+
 
 export const defaultBiology = {
   type: OBSERVATION,
@@ -73,7 +77,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         value={selectedTab}
         onChange={(e, tab) => setSelectedTab(tab)}
       >
-        <Tab label="Hiérarchie" value="hierarchy" />
+        <Tab label={EXPLORATION} value="hierarchy" />
         <Tab label="Recherche" value="search" />
         <Tab label="Formulaire" value="form" />
       </Tabs>

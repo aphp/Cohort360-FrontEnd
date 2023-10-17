@@ -8,7 +8,10 @@ import CcamHierarchy from './components/Hierarchy/CCAMHierarchy'
 import { initSyncHierarchyTableEffect, PROCEDURE, syncOnChangeFormValue } from 'utils/pmsi'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProcedure, PmsiListType } from 'state/pmsi'
+import { EXPLORATION } from 'utils/constants'
+
 import { CriteriaDrawerComponentProps } from 'types'
+
 
 export const defaultProcedure = {
   type: PROCEDURE,
@@ -70,7 +73,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         value={selectedTab}
         onChange={(e, tab) => setSelectedTab(tab)}
       >
-        <Tab label="Hiérarchie" value="hierarchy" />
+        <Tab label={EXPLORATION} value="hierarchy" />
         <Tab label="Formulaire" value="form" />
       </Tabs>
 

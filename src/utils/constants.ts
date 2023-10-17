@@ -3,3 +3,5 @@ export enum JobStatus {
   pending = 'pending',
   suspended = 'suspended'
 }
+
+export const EXPLORATION = 'Exploration'

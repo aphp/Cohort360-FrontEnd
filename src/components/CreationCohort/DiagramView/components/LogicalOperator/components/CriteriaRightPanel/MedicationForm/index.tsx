@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { initSyncHierarchyTableEffect, MEDICATION_REQUEST, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchMedication } from 'state/medication'
 import { PmsiListType } from 'state/pmsi'
+import { EXPLORATION } from 'utils/constants'
 
 export const defaultMedication: MedicationDataType = {
   type: MEDICATION_REQUEST,
@@ -76,7 +77,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         value={selectedTab}
         onChange={(e, tab) => setSelectedTab(tab)}
       >
-        <Tab label="Exploration" value="exploration" />
+        <Tab label={EXPLORATION} value="hierarchy" />
         <Tab label="Formulaire" value="form" />
       </Tabs>
 
