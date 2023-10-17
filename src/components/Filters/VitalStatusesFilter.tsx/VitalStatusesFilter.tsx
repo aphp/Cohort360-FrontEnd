@@ -1,7 +1,8 @@
 import { Checkbox, FormControlLabel, FormGroup, Typography } from '@mui/material'
 import { InputWrapper } from 'components/ui/Layout/styles'
-import { FormContext } from 'components/ui/Modal/Modal'
+import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
+import { VitalStatusLabel } from 'types/searchCriterias'
 import { VitalStatus } from 'types/searchCriterias'
 import { isChecked, toggleFilter } from 'utils/filters'
 
@@ -31,13 +32,13 @@ const VitalStatusesFilter = ({ name, value }: VitalStatusesFilterProps) => {
           checked={isChecked(VitalStatus.ALIVE, vitalStatuses)}
           value={VitalStatus.ALIVE}
           control={<Checkbox color="secondary" />}
-          label="Patients vivants"
+          label={VitalStatusLabel.ALIVE}
         />
         <FormControlLabel
           checked={isChecked(VitalStatus.DECEASED, vitalStatuses)}
           value={VitalStatus.DECEASED}
           control={<Checkbox color="secondary" />}
-          label="Patients décédés"
+          label={VitalStatusLabel.DECEASED}
         />
       </FormGroup>
     </InputWrapper>

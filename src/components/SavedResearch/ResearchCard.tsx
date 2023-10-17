@@ -18,13 +18,11 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import ResearchTable from './ResearchTable/ResearchTable'
 import CohortsFilter from 'components/Filters/CohortsFilters/CohortsFilters'
-import MasterChips from 'components/ui/Chips'
 
 import useStyles from './styles'
 import { Cohort, CohortFilters, Sort } from 'types'
 
 import displayDigit from 'utils/displayDigit'
-import { buildCohortFiltersChips } from 'utils/chips'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { deleteCohort, editCohort, fetchCohorts } from 'state/cohort'
@@ -130,28 +128,6 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
     setSort({ sortBy: property, sortDirection: _sortDirection })
   }
 
-  const handleDeleteChip = (filterName: string, value?: any) => {
-    switch (filterName) {
-      case 'status':
-        value &&
-          setFilters({
-            ...filters,
-            status: filters.status.filter((item) => item.code !== value.code)
-          })
-        break
-      case 'favorite':
-        setFilters({ ...filters, [filterName]: 'all' })
-        navigate({ pathname: location.pathname })
-        break
-      case 'minPatients':
-      case 'maxPatients':
-      case 'startDate':
-      case 'endDate':
-        setFilters({ ...filters, [filterName]: null })
-        break
-    }
-  }
-
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
       <Grid item container justifyContent="space-between" alignItems="center">
@@ -193,7 +169,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
         </div>
       </Grid>
 
-      <MasterChips chips={buildCohortFiltersChips(filters, handleDeleteChip)} />
+      {/*<MasterChips chips={buildCohortFiltersChips(filters, handleDeleteChip)} />*/}
 
       {loadingStatus ? (
         <Grid container justifyContent="center">

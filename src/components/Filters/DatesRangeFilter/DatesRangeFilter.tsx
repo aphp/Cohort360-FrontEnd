@@ -1,7 +1,7 @@
+import CalendarRange from 'components/ui/Inputs/CalendarRange'
+import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import { DurationRangeType } from 'types/searchCriterias'
-import CalendarRange from 'components/ui/Inputs/Calendar/CalendarRange'
-import { FormContext } from 'components/ui/Modal/Modal'
 
 type DatesRangeFilterProps = {
   values: DurationRangeType

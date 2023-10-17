@@ -20,7 +20,6 @@ import { FilterKeys } from 'types/searchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
-import Chip from 'components/ui/Chips/Chip'
 import NdaFilter from 'components/Filters/NdaFilter/NdaFilter'
 import AnabioFilter from 'components/Filters/AnabioFilter/AnabioFilter'
 import LoincFilter from 'components/Filters/LoincFilter/LoincFilter'
@@ -29,6 +28,7 @@ import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilt
 import { BlockWrapper } from 'components/ui/Layout'
 import { AlertWrapper } from 'components/ui/Alert'
 import useSearchCriterias, { initBioSearchCriterias } from 'reducers/searchCriteriasReducer'
+import Chip from 'components/ui/Chip'
 
 type PatientBiologyProps = {
   groupId?: string

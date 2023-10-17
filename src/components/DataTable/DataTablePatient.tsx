@@ -12,9 +12,10 @@ import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
 import { GenderStatus, Order, OrderBy } from 'types/searchCriterias'
-import { PatientTableLabels, PatientVitalStatus } from 'types/patient'
+import { PatientTableLabels } from 'types/patient'
 import GenderIcon from 'components/ui/GenderIcon'
 import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
+import { VitalStatusLabel } from 'types/requestCriterias'
 
 type DataTablePatientProps = {
   loading: boolean
@@ -106,7 +107,6 @@ const DataTablePatientLine: React.FC<{
   search?: string
 }> = ({ deidentified, patient, groupId, search }) => {
   const { classes } = useStyles()
-
   return (
     <TableRow
       key={patient.id}
@@ -143,8 +143,10 @@ const DataTablePatientLine: React.FC<{
       </TableCell>
       <TableCell align="center">
         <StatusChip
-          status={patient.deceasedDateTime ? ChipStyles.CANCELLED : ChipStyles.VALID}
-          label={patient.deceasedDateTime ? PatientVitalStatus.DECEASED : PatientVitalStatus.ALIVE}
+          status={patient.deceasedDateTime || patient.deceasedBoolean ? ChipStyles.CANCELLED : ChipStyles.VALID}
+          label={
+            patient.deceasedDateTime || patient.deceasedBoolean ? VitalStatusLabel.DECEASED : VitalStatusLabel.ALIVE
+          }
         />
       </TableCell>
 
