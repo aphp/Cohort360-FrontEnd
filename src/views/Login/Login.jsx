@@ -33,7 +33,8 @@ import {
   OIDC_REDIRECT_URI,
   OIDC_RESPONSE_TYPE,
   OIDC_SCOPE,
-  OIDC_STATE
+  OIDC_STATE,
+  CODE_DISPLAY_JWT
 } from '../../constants'
 
 import services from 'services/aphp'
@@ -110,6 +111,7 @@ const Login = () => {
   const [open, setOpen] = useState(false)
   const [authCode, setAuthCode] = useState(undefined)
   const urlParams = new URLSearchParams(window.location.search)
+  const [display_jwt_form, setDisplay_jwt_form] = useState(false)
   const code = urlParams.get('code')
 
   useEffect(() => {
@@ -301,6 +303,25 @@ const Login = () => {
     event.key === 'Enter' ? _onSubmit(event) : null
   }
 
+  useEffect(() => {
+    const code_display_jwt = CODE_DISPLAY_JWT.split(',')
+    let code_display_jwtPosition = 0
+
+    const keyHandler = (e) => {
+      if (e.key === code_display_jwt[code_display_jwtPosition]) {
+        code_display_jwtPosition++
+      } else {
+        code_display_jwtPosition = 0
+      }
+      if (code_display_jwtPosition === code_display_jwt.length) {
+        setDisplay_jwt_form(!display_jwt_form)
+        code_display_jwtPosition = 0
+      }
+    }
+    document.addEventListener('keydown', keyHandler)
+    return () => document.removeEventListener('keydown', keyHandler)
+  }, [display_jwt_form])
+
   if (noRights === true) return <NoRights />
 
   return code ? (
@@ -336,63 +357,64 @@ const Login = () => {
             <Typography color="primary" className={classes.bienvenue}>
               Bienvenue ! Connectez-vous.
             </Typography>
+            {display_jwt_form && (
+              <Grid container direction="column" alignItems="center" justifyContent="center" className={classes.form}>
+                <TextField
+                  margin="normal"
+                  required
+                  style={{ width: '50%' }}
+                  id="identifiant"
+                  label="Identifiant"
+                  name="Identifiant"
+                  autoComplete="Identifiant"
+                  autoFocus
+                  onChange={(event) => setUsername(event.target.value)}
+                  onKeyDown={onKeyDown}
+                />
 
-            <Grid container direction="column" alignItems="center" justifyContent="center" className={classes.form}>
-              <TextField
-                margin="normal"
-                required
-                style={{ width: '50%' }}
-                id="identifiant"
-                label="Identifiant"
-                name="Identifiant"
-                autoComplete="Identifiant"
-                autoFocus
-                onChange={(event) => setUsername(event.target.value)}
-                onKeyDown={onKeyDown}
-              />
+                <TextField
+                  margin="normal"
+                  required
+                  style={{ width: '50%' }}
+                  name="Votre mot de passe"
+                  label="Votre mot de passe"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                  onChange={(event) => setPassword(event.target.value)}
+                  onKeyDown={onKeyDown}
+                />
 
-              <TextField
-                margin="normal"
-                required
-                style={{ width: '50%' }}
-                name="Votre mot de passe"
-                label="Votre mot de passe"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                onChange={(event) => setPassword(event.target.value)}
-                onKeyDown={onKeyDown}
-              />
+                <Typography align="center" className={classes.mention}>
+                  <Link href="#" onClick={() => setOpen(true)} underline="hover">
+                    En cliquant sur &quot;connexion&quot;, vous acceptez la mention légale.
+                  </Link>
+                </Typography>
 
-              <Typography align="center" className={classes.mention}>
-                <Link href="#" onClick={() => setOpen(true)} underline="hover">
-                  En cliquant sur &quot;connexion&quot;, vous acceptez la mention légale.
-                </Link>
-              </Typography>
+                <Button
+                  type="submit"
+                  onClick={_onSubmit}
+                  variant="contained"
+                  className={classes.submit}
+                  id="connection-button-submit"
+                >
+                  {loading ? <CircularProgress /> : 'Connexion'}
+                </Button>
+              </Grid>
+            )}
 
-              <Button
-                type="submit"
-                onClick={_onSubmit}
-                variant="contained"
-                className={classes.submit}
-                id="connection-button-submit"
-              >
-                {loading ? <CircularProgress /> : 'Connexion'}
-              </Button>
-              <Button
-                type="submit"
-                onClick={oidcLogin}
-                variant="contained"
-                className={cx(classes.submit, classes.oidcButton)}
-                style={{ marginBottom: 40 }}
-                id="oidc-login"
-                startIcon={<Keycloak height="25px" />}
-              >
-                Connexion via Keycloak
-              </Button>
-            </Grid>
+            <Button
+              type="submit"
+              onClick={oidcLogin}
+              variant="contained"
+              className={cx(classes.submit, classes.oidcButton)}
+              style={{ marginBottom: 40 }}
+              id="oidc-login"
+              startIcon={<Keycloak height="25px" />}
+            >
+              Connexion via Keycloak
+            </Button>
           </Grid>
-          {/* <Grid container justifyContent="center"> */}
           <Link href="https://eds.aphp.fr">
             <img className={classes.logoAPHP} src={logoAPHP} alt="Footer" />
           </Link>

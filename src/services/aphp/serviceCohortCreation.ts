@@ -1,10 +1,17 @@
 import { AxiosResponse } from 'axios'
 import apiBack from '../apiBackend'
 
-import { DatedMeasure, DocType, QuerySnapshotInfo, RequestType, Snapshot } from 'types'
+import {
+  DatedMeasure,
+  DocType,
+  HierarchyElement,
+  HierarchyElementWithSystem,
+  QuerySnapshotInfo,
+  RequestType,
+  Snapshot
+} from 'types'
 import docTypes from 'assets/docTypes.json'
-import { fetchSignleCode } from './cohortCreation/fetchMedication'
-import { fetchBiologySearch } from './cohortCreation/fetchObservation'
+import { ValueSetWithHierarchy, fetchBiologySearch } from './cohortCreation/fetchObservation'
 import {
   BIOLOGY_HIERARCHY_ITM_ANABIO,
   BIOLOGY_HIERARCHY_ITM_LOINC,
@@ -24,11 +31,12 @@ import {
   ENCOUNTER_VISIT_TYPE,
   MEDICATION_ADMINISTRATIONS,
   MEDICATION_ATC,
+  MEDICATION_UCD,
   MEDICATION_PRESCRIPTION_TYPES,
   PROCEDURE_HIERARCHY,
   SHORT_COHORT_LIMIT
 } from '../../constants'
-import { fetchValueSet } from './callApi'
+import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
 
 export interface IServiceCohortCreation {
   /**
@@ -61,35 +69,38 @@ export interface IServiceCohortCreation {
 
   fetchSnapshot: (snapshotId: string) => Promise<Snapshot>
 
-  fetchAdmissionModes: () => Promise<any>
-  fetchEntryModes: () => Promise<any>
-  fetchExitModes: () => Promise<any>
-  fetchPriseEnChargeType: () => Promise<any>
-  fetchTypeDeSejour: () => Promise<any>
-  fetchFileStatus: () => Promise<any>
-  fetchReason: () => Promise<any>
-  fetchDestination: () => Promise<any>
-  fetchProvenance: () => Promise<any>
-  fetchAdmission: () => Promise<any>
-  fetchGender: () => Promise<any>
-  fetchStatus: () => Promise<any>
-  fetchStatusDiagnostic: () => Promise<any>
-  fetchDiagnosticTypes: () => Promise<any>
-  fetchCim10Diagnostic: () => Promise<any>
-  fetchCim10Hierarchy: (cim10Parent?: string) => Promise<any>
-  fetchCcamData: () => Promise<any>
-  fetchCcamHierarchy: (ccamParent: string) => Promise<any>
-  fetchGhmData: () => Promise<any>
-  fetchGhmHierarchy: (ghmParent: string) => Promise<any>
-  fetchDocTypes: () => DocType[]
-  fetchAtcData: () => Promise<any>
-  fetchSingleMedication: (code: string) => Promise<string[]>
-  fetchAtcHierarchy: (atcParent: string) => Promise<any>
-  fetchPrescriptionTypes: () => Promise<any>
-  fetchAdministrations: () => Promise<any>
-  fetchBiologyData: () => Promise<any>
-  fetchBiologyHierarchy: (biologyParent?: string) => Promise<any>
-  fetchBiologySearch: (searchInput: string) => Promise<{ anabio: any; loinc: any }>
+  fetchAdmissionModes: () => Promise<Array<HierarchyElement>>
+  fetchEntryModes: () => Promise<Array<HierarchyElement>>
+  fetchExitModes: () => Promise<Array<HierarchyElement>>
+  fetchPriseEnChargeType: () => Promise<Array<HierarchyElement>>
+  fetchTypeDeSejour: () => Promise<Array<HierarchyElement>>
+  fetchFileStatus: () => Promise<Array<HierarchyElement>>
+  fetchReason: () => Promise<Array<HierarchyElement>>
+  fetchDestination: () => Promise<Array<HierarchyElement>>
+  fetchProvenance: () => Promise<Array<HierarchyElement>>
+  fetchAdmission: () => Promise<Array<HierarchyElement>>
+  fetchGender: () => Promise<Array<HierarchyElement>>
+  fetchStatus: () => Promise<Array<{ id: boolean; label: string }>>
+  fetchStatusDiagnostic: () => Promise<Array<HierarchyElement>>
+  fetchDiagnosticTypes: () => Promise<Array<HierarchyElement>>
+  fetchCim10Diagnostic: () => Promise<Array<HierarchyElement>>
+  fetchCim10Hierarchy: (cim10Parent?: string) => Promise<Array<HierarchyElement>>
+  fetchCcamData: () => Promise<Array<HierarchyElement>>
+  fetchCcamHierarchy: (ccamParent: string) => Promise<Array<HierarchyElement>>
+  fetchGhmData: () => Promise<Array<HierarchyElement>>
+  fetchGhmHierarchy: (ghmParent: string) => Promise<Array<HierarchyElement>>
+  fetchDocTypes: () => Promise<DocType[]>
+  fetchMedicationData: () => Promise<Array<HierarchyElementWithSystem>>
+  fetchSingleCodeHierarchy: (resourceType: string, code: string) => Promise<string[]>
+  fetchAtcHierarchy: (atcParent: string) => Promise<Array<HierarchyElement>>
+  fetchUCDList: (ucd?: string) => Promise<Array<HierarchyElement>>
+  fetchPrescriptionTypes: () => Promise<Array<HierarchyElement>>
+  fetchAdministrations: () => Promise<Array<HierarchyElement>>
+  fetchBiologyData: () => Promise<Array<HierarchyElement>>
+  fetchBiologyHierarchy: (biologyParent?: string) => Promise<Array<HierarchyElement>>
+  fetchBiologySearch: (
+    searchInput: string
+  ) => Promise<{ anabio: ValueSetWithHierarchy[]; loinc: ValueSetWithHierarchy[] }>
 }
 
 const servicesCohortCreation: IServiceCohortCreation = {
@@ -272,14 +283,28 @@ const servicesCohortCreation: IServiceCohortCreation = {
     fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', noStar }),
   fetchGhmHierarchy: async (ghmParent?: string) =>
     fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie GHM', code: ghmParent }),
-  fetchDocTypes: () => (docTypes && docTypes.docTypes.length > 0 ? docTypes.docTypes : []),
-  fetchAtcData: async (searchValue?: string, noStar?: boolean) =>
-    fetchValueSet(MEDICATION_ATC, {
+  fetchDocTypes: () => Promise.resolve(docTypes && docTypes.docTypes.length > 0 ? docTypes.docTypes : []),
+  fetchMedicationData: async (searchValue?: string, noStar?: boolean) =>
+    fetchValueSet(`${MEDICATION_ATC},${MEDICATION_UCD}`, {
       valueSetTitle: 'Toute la hiérarchie',
       search: searchValue || '',
       noStar
     }),
-  fetchSingleMedication: fetchSignleCode,
+  fetchSingleCodeHierarchy: async (resourceType: string, code: string) => {
+    const codeSystemPerResourceType: { [type: string]: string } = {
+      Claim: CLAIM_HIERARCHY,
+      Condition: CONDITION_HIERARCHY,
+      MedicationAdministration: `${MEDICATION_ATC},${MEDICATION_UCD}`,
+      MedicationRequest: `${MEDICATION_ATC},${MEDICATION_UCD}`,
+      Observation: `${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}`,
+      Procedure: PROCEDURE_HIERARCHY
+    }
+    if (!(resourceType in codeSystemPerResourceType)) {
+      // TODO log error
+      return Promise.resolve([] as string[])
+    }
+    return fetchSingleCodeHierarchy(codeSystemPerResourceType[resourceType], code)
+  },
   fetchAtcHierarchy: async (atcParent?: string) =>
     fetchValueSet(MEDICATION_ATC, {
       valueSetTitle: 'Toute la hiérarchie Médicament',
@@ -290,6 +315,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
         atcData.label.search(new RegExp(/^[A-Z] - /, 'gi')) !== -1 &&
         atcData.label.search(new RegExp(/^[X-Y] - /, 'gi')) !== 0
     }),
+  fetchUCDList: async (ucd?: string) => fetchValueSet(MEDICATION_UCD, { code: ucd }),
   fetchPrescriptionTypes: async () => fetchValueSet(MEDICATION_PRESCRIPTION_TYPES, { joinDisplayWithCode: false }),
   fetchAdministrations: async () => fetchValueSet(MEDICATION_ADMINISTRATIONS, { joinDisplayWithCode: false }),
   fetchBiologyData: async (searchValue?: string, noStar?: boolean) =>

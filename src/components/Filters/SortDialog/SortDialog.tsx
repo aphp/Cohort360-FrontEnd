@@ -28,10 +28,10 @@ type SortDialogProps = {
 }
 
 const sortOptions = [
-  { label: 'Sexe', code: 'gender' },
+  { label: 'Sexe', code: 'gender,id' },
   { label: 'Prénom', code: 'name' },
   { label: 'Nom', code: 'family' },
-  { label: 'Date de Naissance', code: 'birthdate' }
+  { label: 'Date de Naissance', code: 'birthdate,id' }
 ]
 
 const SortDialog: React.FC<SortDialogProps> = ({ open, onClose, sort, onChangeSort }) => {

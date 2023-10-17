@@ -10,13 +10,9 @@ import { useAppSelector, useAppDispatch } from 'state'
 import { addRequestToCohortCreation } from 'state/cohortCreation'
 
 import useStyles from './styles'
+import { CriteriaDrawerComponentProps } from 'types'
 
-type RequestFormProps = {
-  parentId: number | null
-  goBack: (data: any) => void
-}
-
-const RequestForm: React.FC<RequestFormProps> = ({ parentId, goBack }) => {
+const RequestForm: React.FC<CriteriaDrawerComponentProps> = ({ parentId, goBack }) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
 

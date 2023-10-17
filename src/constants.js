@@ -23,6 +23,11 @@ export const AUTH_API_URL = import.meta.env.DEV ? import.meta.env.VITE_AUTH_API_
 
 export const SHORT_COHORT_LIMIT = 20000
 
+export const CODE_HIERARCHY_EXTENSION_NAME =
+  'https://terminology.eds.aphp.fr/fhir/profile/valueSet/extension/hierarchy-path-id'
+export const CONCEPT_MAP_HIERARCHY_EXTENSION_NAME =
+  'https://terminology.eds.aphp.fr/fhir/profile/conceptMap/extension/group-source-hierarchy-path'
+
 export const CLAIM_HIERARCHY = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_CLAIM_HIERARCHY
   : '{VITE_VALUE_SET_URL_CLAIM_HIERARCHY}'
@@ -79,9 +84,17 @@ export const ENCOUNTER_ADMISSION = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_ADMISSION
   : '{VITE_VALUE_SET_URL_ENCOUNTER_ADMISSION}'
 
+export const MEDICATION_ATC_ORBIS = import.meta.env.DEV
+  ? import.meta.env.VITE_MEDICATION_ATC_ORBIS
+  : '{VITE_MEDICATION_ATC_ORBIS}'
+
 export const MEDICATION_ATC = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_MEDICATION_ATC
   : '{VITE_VALUE_SET_URL_MEDICATION_ATC}'
+
+export const MEDICATION_UCD = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_MEDICATION_UCD
+  : '{VITE_VALUE_SET_URL_MEDICATION_UCD}'
 
 export const MEDICATION_PRESCRIPTION_TYPES = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_MEDICATION_PRESCRIPTION_TYPES
@@ -97,6 +110,8 @@ export const BIOLOGY_HIERARCHY_ITM_ANABIO = import.meta.env.DEV
 export const BIOLOGY_HIERARCHY_ITM_LOINC = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_BIOLOGY_LOINC
   : '{VITE_VALUE_SET_URL_BIOLOGY_LOINC}'
+
+export const CODE_DISPLAY_JWT = import.meta.env.DEV ? import.meta.env.VITE_CODE_DISPLAY_JWT : '{VITE_CODE_DISPLAY_JWT}'
 
 export const ODD_BIOLOGY = import.meta.env.DEV
   ? import.meta.env.VITE_ODD_BIOLOGY == `${BOOLEANTRUE}`

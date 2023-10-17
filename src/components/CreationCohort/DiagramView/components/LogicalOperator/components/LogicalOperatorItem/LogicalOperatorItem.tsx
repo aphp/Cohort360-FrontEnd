@@ -1,20 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import {
-  Box,
-  IconButton,
-  MenuItem,
-  Select,
-  Typography,
-  TextField,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent
-} from '@mui/material'
-
-import WarningIcon from '@mui/icons-material/Warning'
-
+import { Box, IconButton, MenuItem, Select, Typography, TextField } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 
 import { useAppSelector, useAppDispatch } from 'state'
@@ -26,6 +12,7 @@ import {
 } from 'state/cohortCreation'
 
 import useStyles from './styles'
+import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
 
 type LogicalOperatorItemProps = {
   itemId: number
@@ -44,7 +31,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
   const [openConfirmationDialog, setOpenConfirmationDialog] = useState<boolean>(false)
 
   const { request } = useAppSelector((state) => state.cohortCreation || {})
-  const { criteriaGroup } = request
+  const { criteriaGroup, temporalConstraints } = request
 
   useEffect(() => {
     const currentLogicalOperator = criteriaGroup.find(({ id }) => id === itemId)
@@ -183,6 +170,19 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
     _buildCohortCreation()
   }
 
+  const deleteInvalidConstraints = () => {
+    const currentLogicalOperatorCriteriaIds: number[] = criteriaGroup.find(({ id }) => id === itemId)?.criteriaIds ?? []
+
+    const correctConstraints = temporalConstraints.filter(
+      (constraint) =>
+        !(constraint.idList as number[]).every((criteriaId: number) =>
+          currentLogicalOperatorCriteriaIds.includes(criteriaId)
+        )
+    )
+
+    dispatch(updateTemporalConstraints(correctConstraints))
+  }
+
   return (
     <>
       {isOpen && <div className={classes.backDrop} onClick={() => setOpen(false)} />}
@@ -220,7 +220,6 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
             <Typography variant="h5" className={classes.descriptionText}>
               les patients validant
             </Typography>
-
             <Select
               labelId="inclusive-simple-select-label"
               id="inclusive-select"
@@ -228,11 +227,14 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               classes={{ icon: classes.selectIcon }}
               className={classes.inputSelect}
               onChange={(event) => {
-                if (isMainOperator && event.target.value !== 'andGroup') {
-                  setOpenConfirmationDialog(true)
-                } else {
-                  _handleChangeLogicalOperatorProps('groupType', event.target.value)
+                if (event.target.value !== 'andGroup') {
+                  if (isMainOperator) {
+                    setOpenConfirmationDialog(true)
+                  } else {
+                    deleteInvalidConstraints()
+                  }
                 }
+                _handleChangeLogicalOperatorProps('groupType', event.target.value)
               }}
               style={{ color: 'currentColor' }}
               variant="standard"
@@ -280,31 +282,18 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         )}
       </Box>
 
-      <Dialog open={openConfirmationDialog} onClose={() => setOpenConfirmationDialog(false)}>
-        <DialogContent
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}
-        >
-          <WarningIcon style={{ fontSize: 40, color: '#ff9800', margin: 12 }} />
-          <Typography>
-            L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères <strong>ET</strong>,
-            passer sur un groupe de critères <strong>OU</strong> vous fera perdre toutes vos précédentes contraintes
-            temporelles.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button style={{ color: '#ED6D91' }} onClick={() => setOpenConfirmationDialog(false)}>
-            Annuler
-          </Button>
-          <Button
-            onClick={() => {
-              dispatch(updateTemporalConstraints([]))
-              _handleChangeLogicalOperatorProps('groupType', 'orGroup')
-            }}
-          >
-            Confirmer
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmationDialog
+        open={openConfirmationDialog}
+        onCancel={() => setOpenConfirmationDialog(false)}
+        onClose={() => setOpenConfirmationDialog(false)}
+        onConfirm={() => {
+          dispatch(updateTemporalConstraints([]))
+          _handleChangeLogicalOperatorProps('groupType', 'orGroup')
+        }}
+        message={
+          "L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères ET, passer sur un groupe de critères OU vous fera perdre toutes vos précédentes contraintes temporelles."
+        }
+      />
     </>
   )
 }

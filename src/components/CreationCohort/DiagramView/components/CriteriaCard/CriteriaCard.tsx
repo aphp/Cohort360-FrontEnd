@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { IconButton, Typography, Avatar } from '@mui/material'
+import { IconButton, Typography } from '@mui/material'
 
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
@@ -8,6 +8,7 @@ import WarningIcon from '@mui/icons-material/Warning'
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd'
 
 import CriteriaCardContent from './components/CriteriaCardContent/CriteriaCardContent'
+import Avatar from 'components/ui/Avatar/Avatar'
 
 import { useAppSelector } from 'state'
 import { MeState } from 'state/me'
@@ -39,9 +40,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
       style={{ backgroundColor: currentCriterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
     >
       <div className={classes.criteriaTitleAndChips}>
-        <Avatar style={{ backgroundColor: '#5bc5f2', width: 24, height: 24, fontSize: 14 }}>
-          {currentCriterion.id}
-        </Avatar>
+        <Avatar content={currentCriterion.id} />
         <Typography className={classes.title}>- {currentCriterion.title} :</Typography>
         <CriteriaCardContent currentCriteria={currentCriterion} />
       </div>

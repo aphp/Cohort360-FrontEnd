@@ -11,11 +11,18 @@ import {
   Calendar,
   CalendarRequestLabel,
   CalendarLabel,
-  Comparators
+  Comparators,
+  CriteriaItemType
 } from 'types'
 
 import docTypes from 'assets/docTypes.json'
-import { BIOLOGY_HIERARCHY_ITM_ANABIO, CLAIM_HIERARCHY, CONDITION_HIERARCHY, PROCEDURE_HIERARCHY } from '../constants'
+import {
+  BIOLOGY_HIERARCHY_ITM_ANABIO,
+  CLAIM_HIERARCHY,
+  CONDITION_HIERARCHY,
+  MEDICATION_ATC,
+  PROCEDURE_HIERARCHY
+} from '../constants'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
@@ -37,23 +44,23 @@ const ENCOUNTER_PRISENCHARGETYPE = 'class'
 const ENCOUNTER_TYPEDESEJOUR = 'stay'
 const ENCOUNTER_FILESTATUS = 'status'
 const ENCOUNTER_ADMISSIONMODE = 'reason-code'
-const ENCOUNTER_REASON = 'destination-type'
-const ENCOUNTER_DESTINATION = 'destination'
+const ENCOUNTER_REASON = 'admission-destination-type'
+const ENCOUNTER_DESTINATION = 'discharge-disposition'
 const ENCOUNTER_PROVENANCE = 'admit-source'
 const ENCOUNTER_ADMISSION = 'admission-type'
 
 export const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
-const CLAIM_CODE = 'diagnosis-hierarchy'
+const CLAIM_CODE = 'diagnosis'
 const CLAIM_CODE_ALL_HIERARCHY = 'diagnosis'
 
 export const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
-const PROCEDURE_CODE = 'code-hierarchy'
+const PROCEDURE_CODE = 'code'
 const PROCEDURE_CODE_ALL_HIERARCHY = 'code'
 
 export const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition'
-const CONDITION_CODE = 'code-hierarchy'
+const CONDITION_CODE = 'code'
 const CONDITION_CODE_ALL_HIERARCHY = 'code'
-const CONDITION_TYPE = 'type'
+const CONDITION_TYPE = 'orbis-status'
 
 const RESSOURCE_TYPE_COMPOSITION: 'DocumentReference' = 'DocumentReference'
 const COMPOSITION_TEXT = '_text'
@@ -63,19 +70,19 @@ const COMPOSITION_STATUS = 'docstatus'
 
 const RESSOURCE_TYPE_MEDICATION_REQUEST: 'MedicationRequest' = 'MedicationRequest' // = Prescription
 const RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: 'MedicationAdministration' = 'MedicationAdministration' // = Administration
-const MEDICATION_CODE = 'medication-hierarchy'
-const MEDICATION_CODE_ALL_HIERARCHY = 'medication'
-// const MEDICATION_UCD = 'code_id'
-const MEDICATION_PRESCRIPTION_TYPE = 'type'
-const MEDICATION_ADMINISTRATION = 'route'
+const MEDICATION_CODE = 'medication'
+const MEDICATION_PRESCRIPTION_TYPE = 'category'
+const MEDICATION_ADMINISTRATION_ROUTE = 'dosage-route'
+const MEDICATION_REQUEST_ROUTE = 'dosage-instruction-route'
 
 const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
-const OBSERVATION_CODE = 'code-hierarchy'
+const OBSERVATION_CODE = 'code'
 const OBSERVATION_CODE_ALL_HIERARCHY = 'code'
 const OBSERVATION_VALUE = 'value-quantity'
 const OBSERVATION_STATUS = 'status'
 const ENCOUNTER_SERVICE_PROVIDER = 'encounter.encounter-care-site'
-const SERVICE_PROVIDER = 'service-provider'
+const ENCOUNTER_CONTEXT_SERVICE_PROVIDER = 'context.encounter-care-site'
+const SERVICE_PROVIDER = 'encounter-care-site'
 
 export const UNITE_EXECUTRICE = 'Unité exécutrice'
 export const STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE = 'Structure hospitalière de prise en charge'
@@ -141,7 +148,7 @@ type RequeteurGroupType =
       _id: number
       isInclusive: boolean
       criteria: (RequeteurCriteriaType | RequeteurGroupType)[]
-      temporalConstraints?: TemporalConstraintsType[] // NOT IMPLEMENTED
+      temporalConstraints?: TemporalConstraintsType[]
     }
   // NOT IMPLEMENTED
   | {
@@ -330,9 +337,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
     case RESSOURCE_TYPE_COMPOSITION: {
       const unreducedFilterFhir = [
-        `${COMPOSITION_STATUS}=final&type:not=doc-impor&contenttype=${encodeURIComponent(
-          'http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain'
-        )}&subject.active=true`,
+        `${COMPOSITION_STATUS}=final&type:not=doc-impor&contenttype='http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain'&subject.active=true`,
         `${
           criterion.search
             ? `${criterion.searchBy === SearchByTypes.text ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
@@ -442,11 +447,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         'subject.active=true',
         `${
           criterion.code && criterion.code.length > 0
-            ? criterion.code.find((code) => code.id === '*')
-              ? `${MEDICATION_CODE_ALL_HIERARCHY}=*`
-              : `${MEDICATION_CODE}=${criterion.code
-                  .map((diagnosticType: any) => diagnosticType.id)
-                  .reduce(searchReducer)}`
+            ? `${MEDICATION_CODE}=${criterion.code
+                .map((diagnosticType: any) =>
+                  diagnosticType.id === '*' ? `${MEDICATION_ATC}|*` : `${diagnosticType.system}|${diagnosticType.id}`
+                )
+                .reduce(searchReducer)}`
             : ''
         }`,
         `${
@@ -460,14 +465,20 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         }`,
         `${
           criterion.administration && criterion.administration.length > 0
-            ? `${MEDICATION_ADMINISTRATION}=${criterion.administration
-                .map((administration: any) => administration.id)
-                .reduce(searchReducer)}`
+            ? `${
+                criterion.type === RESSOURCE_TYPE_MEDICATION_REQUEST
+                  ? MEDICATION_REQUEST_ROUTE
+                  : MEDICATION_ADMINISTRATION_ROUTE
+              }=${criterion.administration.map((administration: any) => administration.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.encounterService && criterion.encounterService.length > 0
-            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
+            ? `${
+                criterion.type === RESSOURCE_TYPE_MEDICATION_REQUEST
+                  ? ENCOUNTER_SERVICE_PROVIDER
+                  : ENCOUNTER_CONTEXT_SERVICE_PROVIDER
+              }=${criterion.encounterService
                 .map((encounterServiceItem: any) => encounterServiceItem.id)
                 .reduce(searchReducer)}`
             : ''
@@ -1346,9 +1357,11 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
-              case MEDICATION_CODE_ALL_HIERARCHY:
               case MEDICATION_CODE: {
-                const codeIds = value?.split(',')
+                const codeIds = value?.split(',').map((codeId) => {
+                  codeId = codeId.split('|')[1]
+                  return codeId
+                })
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
                 if (!newCode) continue
 
@@ -1367,7 +1380,8 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   : newPrescription
                 break
               }
-              case MEDICATION_ADMINISTRATION: {
+              case MEDICATION_REQUEST_ROUTE:
+              case MEDICATION_ADMINISTRATION_ROUTE: {
                 const administrationIds = value?.split(',')
                 const newAdministration = administrationIds?.map((administrationId: any) => ({ id: administrationId }))
                 if (!newAdministration) continue
@@ -1379,6 +1393,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case 'subject.active':
                 break
+              case ENCOUNTER_CONTEXT_SERVICE_PROVIDER:
               case ENCOUNTER_SERVICE_PROVIDER: {
                 if (!value) continue
 
@@ -1566,7 +1581,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
       ? _criteriaGroup
           .map((groupItem: any) => ({
             id: groupItem._id,
-            title: 'Groupe de critère',
+            title: 'Groupe de critères',
             criteriaIds:
               groupItem.criteria && groupItem.criteria.length > 0
                 ? groupItem.criteria.map((criteria: RequeteurCriteriaType | RequeteurGroupType) => criteria._id)
@@ -1659,7 +1674,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
  *
  */
 export const getDataFromFetch = async (
-  _criteria: any,
+  _criteria: readonly CriteriaItemType[],
   selectedCriteria: SelectedCriteriaType[],
   oldCriteriaList?: any
 ): Promise<any> => {
@@ -1674,7 +1689,7 @@ export const getDataFromFetch = async (
       for (const fetchKey of fetchKeys) {
         const dataKey = fetchKey.replace('fetch', '').replace(/(\b[A-Z])(?![A-Z])/g, ($1) => $1.toLowerCase())
         switch (dataKey) {
-          case 'atcData':
+          case 'medicationData':
           case 'biologyData':
           case 'ghmData':
           case 'ccamData':
@@ -1812,12 +1827,13 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
 export const findSelectedInListAndSubItems = (
   selectedItems: any[],
   searchedItem: any,
-  pmsiHierarchy: any[]
+  pmsiHierarchy: any[],
+  valueSetSystem?: string
 ): boolean => {
   if (!searchedItem || !selectedItems || selectedItems.length === 0) return false
   selectedItems = selectedItems?.filter(({ id }) => id !== 'loading')
   const foundItem = selectedItems.find((selectedItem) => {
-    if (selectedItem.id === searchedItem.id || selectedItem.id == '*') {
+    if (selectedItem.id === searchedItem.id || (selectedItem.id == '*' && valueSetSystem !== 'UCD')) {
       return true
     }
     return selectedItem.subItems

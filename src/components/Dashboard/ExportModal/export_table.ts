@@ -44,7 +44,7 @@ const exportTable: ExportTableType[] = [
   },
   {
     id: 'cohort_definition',
-    table_name: 'Cohorte - Information',
+    table_name: 'Cohorte - Information (requête)',
     table_id: 'cohort_definition'
   },
   {

@@ -346,13 +346,14 @@ const servicesCohorts: IServiceCohorts = {
     signal
   ) => {
     try {
-      let _searchInput = ''
-      const searches = searchInput
+      let _searchInput: string | string[] = ''
+      _searchInput = searchInput
         .trim() // Remove space before/after search
         .split(' ') // Split by space (= ['mot1', 'mot2' ...])
         .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
-      for (const _search of searches) {
-        _searchInput = _searchInput ? `${_searchInput} AND "${_search}"` : `"${_search}"`
+
+      if (searchBy === SearchByTypes.identifier) {
+        _searchInput = _searchInput.join()
       }
 
       // convert birthdates into days or months depending of if it's a deidentified perimeter or not
@@ -572,11 +573,8 @@ const servicesCohorts: IServiceCohorts = {
 
   fetchCohortsRights: async (cohorts) => {
     try {
-      const ids = cohorts
-        .map((cohort) => {
-          return cohort.fhir_group_id
-        })
-        .filter((id) => id !== '')
+      const ids = cohorts.map((cohort) => cohort.fhir_group_id).filter((id) => id !== '')
+      if (ids.length === 0) return []
       const rightsResponse = await apiBackend.get(`cohort/cohorts/cohort-rights/?fhir_group_id=${ids}`)
       return cohorts.map((cohort) => {
         return {

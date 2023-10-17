@@ -49,7 +49,9 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
   const currentState = { ...selectedCriteria, ...initialState }
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
-  const getAtcOptions = async (searchValue: string) => await criteria.fetch.fetchAtcData(searchValue, false)
+  const getMedicationOptions = async (searchValue: string) =>
+    await criteria.fetch.fetchMedicationData(searchValue, false)
+
   const _onSubmit = () => {
     onChangeSelectedCriteria(currentState)
     dispatch(fetchMedication())
@@ -85,10 +87,14 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
 
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code: any) => {
-        const criteriaCode = criteria.data.atcData ? criteria.data.atcData.find((g: any) => g.id === code.id) : null
+        const criteriaCode =
+          criteria.data.medicationData && criteria.medicationData !== 'loading'
+            ? criteria.data.medicationData.find((g: any) => g.id === code.id)
+            : null
         return {
           id: code.id,
-          label: code.label ? code.label : criteriaCode?.label ?? '?'
+          label: code.label ? code.label : criteriaCode?.label ?? '?',
+          system: code.system ? code.system : criteriaCode?.system ?? '?'
         }
       })
     : []
@@ -136,7 +142,6 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
 
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">Médicaments</Typography>
-
           <TextField
             required
             className={classes.inputItem}
@@ -146,7 +151,6 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             value={currentState.title}
             onChange={(e) => onChangeValue('title', e.target.value)}
           />
-
           <Grid style={{ display: 'flex' }}>
             <FormLabel
               onClick={() => onChangeValue('isInclusive', !currentState.isInclusive)}
@@ -162,13 +166,11 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               color="secondary"
             />
           </Grid>
-
           <OccurrencesNumberInputs
             form={CriteriaName.Medication}
             selectedCriteria={currentState}
             onChangeValue={onChangeValue}
           />
-
           <Grid style={{ display: 'flex' }}>
             <RadioGroup
               row
@@ -187,21 +189,19 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               />
             </RadioGroup>
           </Grid>
-
           <AutocompleteAsync
             multiple
-            label="Codes ATC / UCD"
+            label="Code(s) sélectionné(s)"
             variant="outlined"
-            noOptionsText="Veuillez entrer un code ou un critère ATC / UCD"
+            noOptionsText="Veuillez entrer un code de médicament"
             className={classes.inputItem}
             autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteria?.data?.atcData || []}
-            getAutocompleteOptions={getAtcOptions}
+            autocompleteOptions={criteria?.data?.medicationData || []}
+            getAutocompleteOptions={getMedicationOptions}
             onChange={(e, value) => {
               onChangeValue('code', value)
             }}
           />
-
           {currentState.type === 'MedicationRequest' && (
             <Autocomplete
               multiple
@@ -215,7 +215,6 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               renderInput={(params) => <TextField {...params} label="Type de prescription" />}
             />
           )}
-
           <Autocomplete
             multiple
             id="criteria-prescription-type-autocomplete"
@@ -227,7 +226,6 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             onChange={(e, value) => onChangeValue('administration', value)}
             renderInput={(params) => <TextField {...params} label="Voie d'administration" />}
           />
-
           <AdvancedInputs
             form={CriteriaName.Medication}
             selectedCriteria={currentState}

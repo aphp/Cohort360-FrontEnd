@@ -1,7 +1,6 @@
 import React from 'react'
 
 import {
-  Avatar,
   IconButton,
   Paper,
   Table,
@@ -17,9 +16,10 @@ import DeleteIcon from '@mui/icons-material/Delete'
 
 import { useAppSelector } from 'state'
 
-import { TemporalConstraintsType } from 'types'
+import { TemporalConstraintsKind, TemporalConstraintsType } from 'types'
 
 import useStyles from './styles'
+import Avatar from 'components/ui/Avatar/Avatar'
 
 const columns = [
   {
@@ -85,7 +85,7 @@ const EventSequenceTable: React.FC<{
     const minDuration = temporalConstraint.timeRelationMinDuration
     let nonZeroMinDuration: { keys?: string; values?: number } = {}
 
-    if (temporalConstraint.constraintType === 'directChronologicalOrdering' && minDuration) {
+    if (temporalConstraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING && minDuration) {
       for (const [key, value] of Object.entries(minDuration)) {
         if (value !== 0) {
           const keys = durationMeasurementInFrench(key)
@@ -104,7 +104,7 @@ const EventSequenceTable: React.FC<{
     const maxDuration = temporalConstraint.timeRelationMaxDuration
     let nonZeroMaxDuration: { keys?: string; values?: number } = {}
 
-    if (temporalConstraint.constraintType === 'directChronologicalOrdering' && maxDuration) {
+    if (temporalConstraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING && maxDuration) {
       for (const [key, value] of Object.entries(maxDuration)) {
         if (value !== 0) {
           const keys = durationMeasurementInFrench(key)
@@ -133,7 +133,9 @@ const EventSequenceTable: React.FC<{
         </TableHead>
         <TableBody>
           {!temporalConstraints ||
-          temporalConstraints.filter((constraints) => !constraints.idList.includes('All' as never)).length === 0 ? (
+          temporalConstraints.filter(
+            (constraints) => constraints.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING
+          ).length === 0 ? (
             <TableRow>
               <TableCell colSpan={7}>
                 <Typography className={classes.loadingSpinnerContainer}>
@@ -148,15 +150,15 @@ const EventSequenceTable: React.FC<{
               const minDuration = storeNonZeroMinDuration(temporalConstraint)
               const maxDuration = storeNonZeroMaxDuration(temporalConstraint)
               return (
-                temporalConstraint.constraintType === 'directChronologicalOrdering' && (
+                temporalConstraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING && (
                   <TableRow key={index} className={classes.tableBodyRows} hover>
                     <TableCell align="center" className={classes.flexCenter}>
-                      <Avatar className={classes.avatar}>{temporalConstraint.idList[0]}</Avatar>
+                      <Avatar content={temporalConstraint.idList[0]} />
                       <Typography style={{ width: 'fit-content', marginLeft: 4 }}> - {criteriaTitle1}</Typography>
                     </TableCell>
                     <TableCell align="center">s'est produit avant</TableCell>
                     <TableCell align="center" className={classes.flexCenter}>
-                      <Avatar className={classes.avatar}>{temporalConstraint.idList[1]}</Avatar>
+                      <Avatar content={temporalConstraint.idList[1]} />
                       <Typography style={{ width: 'fit-content', marginLeft: 4 }}> - {criteriaTitle2}</Typography>
                     </TableCell>
                     <TableCell align="center">{`${minDuration.values ?? '-'} ${minDuration.keys ?? ''}`}</TableCell>

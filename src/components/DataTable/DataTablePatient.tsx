@@ -43,12 +43,12 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
   const { classes } = useStyles()
 
   const columns: Column[] = [
-    { label: `Sexe`, code: 'gender', align: 'center', sortableColumn: true },
+    { label: `Sexe`, code: 'gender,id', align: 'center', sortableColumn: true },
     { label: 'Prénom', code: 'name', align: 'center', sortableColumn: !deidentified },
     { label: 'Nom', code: 'family', align: 'left', sortableColumn: !deidentified },
     {
       label: !deidentified ? 'Date de naissance' : 'Âge',
-      code: 'birthdate',
+      code: 'birthdate,id',
       align: 'center',
       sortableColumn: !deidentified
     },

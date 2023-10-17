@@ -20,13 +20,6 @@ const useStyles = makeStyles()(() => ({
       backgroundColor: '#499cbf'
     }
   },
-  avatar: {
-    backgroundColor: '#5BC5F2',
-    width: 20,
-    height: 20,
-    fontSize: 12,
-    marginRight: 4
-  },
   flexBaseline: {
     display: 'flex !important',
     marginTop: '8px !important'

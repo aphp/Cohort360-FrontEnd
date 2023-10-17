@@ -35,12 +35,6 @@ const useStyles = makeStyles()(() => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
-  },
-  avatar: {
-    backgroundColor: '#5BC5F2',
-    width: 24,
-    height: 24,
-    fontSize: 14
   }
 }))
 

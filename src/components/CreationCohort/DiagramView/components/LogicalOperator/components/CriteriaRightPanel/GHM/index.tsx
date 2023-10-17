@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { CLAIM, initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchClaim, PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
+import { CriteriaDrawerComponentProps } from 'types'
 
 export const defaultDemographic = {
   type: CLAIM,
@@ -21,7 +22,7 @@ export const defaultDemographic = {
   isInclusive: true
 }
 
-const Index = (props: any) => {
+const Index = (props: CriteriaDrawerComponentProps) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
   const [defaultCriteria, setDefaultCriteria] = useState(selectedCriteria || defaultDemographic)

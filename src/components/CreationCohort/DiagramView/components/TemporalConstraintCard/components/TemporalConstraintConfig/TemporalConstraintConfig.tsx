@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
 import {
-  Avatar,
   Button,
   Checkbox,
   FormControl,
@@ -17,9 +16,10 @@ import {
 } from '@mui/material'
 
 import { useAppSelector } from 'state'
-import { TemporalConstraintsType } from 'types'
+import { TemporalConstraintsKind, TemporalConstraintsType } from 'types'
 
 import useStyles from './styles'
+import Avatar from 'components/ui/Avatar/Avatar'
 
 const timeMeasurements = [
   {
@@ -72,8 +72,10 @@ const TemporalConstraintConfig: React.FC<{
     )
 
     // get constraints that contain the firstCriteriaSelected
-    const constraintsWithCriteriaSelected = newConstraintsList.filter((constraint) =>
-      constraint.idList.includes(firstCriteriaSelected as never)
+    const constraintsWithCriteriaSelected = newConstraintsList.filter(
+      (constraint) =>
+        constraint.idList.includes(firstCriteriaSelected as never) &&
+        constraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING
     )
 
     // get an array with all the ids that are already in a constraint with the firstCriteriaSelected
@@ -122,7 +124,7 @@ const TemporalConstraintConfig: React.FC<{
 
       const newConstraint: TemporalConstraintsType = {
         idList: [firstCriteriaValue, secondCriteriaValue],
-        constraintType: 'directChronologicalOrdering',
+        constraintType: TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING,
         ...(isFirstTimeValueChecked && {
           timeRelationMinDuration: {
             [minTimeMeasurement]: minTime
@@ -159,7 +161,7 @@ const TemporalConstraintConfig: React.FC<{
       container
       justifyContent="center"
       alignItems="center"
-      style={{ margin: '1em', backgroundColor: '#F6F9FD', padding: '1em' }}
+      style={{ margin: '1em', backgroundColor: '#F6F9FD', padding: '1em', width: 'auto' }}
     >
       <Grid container alignItems="baseline" justifyContent="center">
         <FormControl
@@ -178,7 +180,7 @@ const TemporalConstraintConfig: React.FC<{
           >
             {selectableCriteria1.map((selectValue, index) => (
               <MenuItem key={index} value={selectValue.id}>
-                <Avatar className={classes.avatar}>{selectValue.id}</Avatar>
+                <Avatar content={selectValue.id} size={20} fontSize={12} marginRight={0.5} />
                 {` - ${selectValue.title}`}
               </MenuItem>
             ))}
@@ -204,7 +206,7 @@ const TemporalConstraintConfig: React.FC<{
           >
             {selectableCriteria2.map((selectValue, index) => (
               <MenuItem key={index} value={selectValue.id}>
-                <Avatar className={classes.avatar}>{selectValue.id}</Avatar>
+                <Avatar content={selectValue.id} size={20} fontSize={12} marginRight={0.5} />
                 {` - ${selectValue.title}`}
               </MenuItem>
             ))}

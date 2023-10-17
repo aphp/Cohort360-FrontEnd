@@ -30,6 +30,7 @@ import { CriteriaName, DocumentFilters, ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
 import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
+import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 type DocumentFiltersProps = {
   open: boolean
@@ -151,6 +152,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
                       }
                       checked={currentDocTypeList.length === currentSelectedDocTypeList.length}
                       onClick={onClick}
+                      indeterminateIcon={<IndeterminateCheckBoxOutlined />}
                     />
                     <Typography onClick={onClick} noWrap style={{ cursor: 'pointer', width: 'calc(100% - 150px' }}>
                       {docType.group}

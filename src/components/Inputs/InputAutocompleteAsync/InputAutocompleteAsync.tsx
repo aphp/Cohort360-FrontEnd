@@ -2,9 +2,14 @@ import React, { FC, useEffect, useState, Fragment } from 'react'
 
 import { Autocomplete, CircularProgress, TextField } from '@mui/material'
 
+import { displaySystem } from 'utils/displayValueSetSystem'
+
+import { ValueSetSystem } from 'types'
+
 interface ElementType {
   id: string
   label: string
+  system: ValueSetSystem
 }
 
 type InputAutocompleteAsyncProps = {
@@ -85,7 +90,7 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
       onChange={onChange}
       options={options ?? []}
       isOptionEqualToValue={(option, value) => option.id === value.id}
-      getOptionLabel={(option) => option.label}
+      getOptionLabel={(option) => `${displaySystem(option.system)}${option.label} `}
       renderInput={(params) => (
         <TextField
           {...params}

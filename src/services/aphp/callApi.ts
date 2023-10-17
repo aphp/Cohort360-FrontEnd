@@ -4,7 +4,8 @@ import {
   FHIR_API_Promise_Response,
   FHIR_API_Response,
   FHIR_Bundle_Promise_Response,
-  HierarchyElement
+  HierarchyElement,
+  HierarchyElementWithSystem
 } from 'types'
 
 import { SearchByTypes, FHIR_Bundle_Response, IScope, AccessExpiration, AccessExpirationsProps } from 'types'
@@ -16,6 +17,7 @@ import {
   Condition,
   DocumentReference,
   Encounter,
+  Extension,
   Group,
   MedicationAdministration,
   MedicationRequest,
@@ -30,6 +32,7 @@ import { Observation } from 'fhir/r4'
 import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 import { idSort, labelSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
+import { CODE_HIERARCHY_EXTENSION_NAME } from '../../constants'
 
 const paramValuesReducerWithPrefix =
   (prefix: string): ((accumulator: string, currentValue: string) => string) =>
@@ -85,10 +88,7 @@ type fetchPatientProps = {
   minBirthdate?: number
   maxBirthdate?: number
   searchBy?: string
-  _text?: string
-  family?: string
-  given?: string
-  identifier?: string
+  _text?: string | string[]
   deceased?: boolean
   pivotFacet?: ('age-month_gender' | 'deceased_gender')[]
   _elements?: ('id' | 'gender' | 'name' | 'birthDate' | 'deceased' | 'identifier' | 'extension')[]
@@ -105,9 +105,6 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
     gender,
     _text,
     searchBy,
-    family,
-    given,
-    identifier,
     deceased,
     minBirthdate,
     maxBirthdate,
@@ -128,10 +125,14 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
   if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`] // eslint-disable-line
   if (gender) options = [...options, `gender=${gender}`] // eslint-disable-line
-  if (_text) options = [...options, `${searchBy ? searchBy : '_text'}=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (family) options = [...options, `family=${family}`] // eslint-disable-line
-  if (given) options = [...options, `given=${given}`] // eslint-disable-line
-  if (identifier) options = [...options, `identifier=${identifier}`] // eslint-disable-line
+  if (_text) {
+    if (Array.isArray(_text)) {
+      const searchInput = _text.map((text) => `${searchBy}=${encodeURIComponent(`"${text}"`)}`).join('&')
+      options = [...options, searchInput]
+    } else {
+      options = [...options, `${searchBy}=${_text}`] // eslint-disable-line
+    }
+  }
   if (deceased !== undefined) options = [...options, `deceased=${deceased}`] // eslint-disable-line
   if (minBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=le${minBirthdate}`] // eslint-disable-line
   if (maxBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=ge${maxBirthdate}`] // eslint-disable-line
@@ -646,7 +647,7 @@ export const fetchMedicationRequest = async (
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (encounter) options = [...options, `encounter.identifier=${encounter}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (type) options = [...options, `medication=*${encodeURIComponent('|')}${type}`] // eslint-disable-line
+  if (type) options = [...options, `category=*${encodeURIComponent('|')}${type}`] // eslint-disable-line
   if (minDate) options = [...options, `validity-period-start=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `validity-period-start=le${maxDate}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0) options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
@@ -709,12 +710,12 @@ export const fetchMedicationAdministration = async (
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (encounter) options = [...options, `encounter.identifier=${encounter}`] // eslint-disable-line
+  if (encounter) options = [...options, `context.identifier=${encounter}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (route) options = [...options, `dosage-route=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-medicament-voie-administration|') + route}`] // eslint-disable-line
   if (minDate) options = [...options, `effective-time=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `effective-time=le${maxDate}`] // eslint-disable-line
-  if (executiveUnits && executiveUnits.length > 0) options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+  if (executiveUnits && executiveUnits.length > 0) options = [...options, `context.encounter-care-site=${executiveUnits}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
 
@@ -742,7 +743,7 @@ const getCodeList = async (
   expandCode?: string,
   search?: string,
   noStar = true
-): Promise<{ code?: string; display?: string }[] | undefined> => {
+): Promise<{ code?: string; display?: string; extension?: Extension[]; codeSystem?: string }[] | undefined> => {
   if (!expandCode) {
     if (search !== undefined && !search.trim()) {
       return []
@@ -752,13 +753,20 @@ const getCodeList = async (
     if (search !== '*' && search !== undefined) {
       // if noStar is true then we search for the code, else we search for the display
       searchParam = noStar
-        ? `&only-roots=false&code=${search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
+        ? `&only-roots=false&code=${search.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
         : `&only-roots=false&_text=${encodeURIComponent(search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line  
     }
     // TODO test if it returns all the codes without specifying the count
     const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}${searchParam}`)
     const valueSetBundle = getApiResponseResourcesOrThrow(res)
-    return valueSetBundle.length > 0 ? valueSetBundle[0].compose?.include?.[0].concept : []
+    return valueSetBundle.length > 0
+      ? valueSetBundle
+          .map((entry) => {
+            return entry.compose?.include[0].concept?.map((code) => ({ ...code, codeSystem: entry.compose?.include[0].system })) || [] //eslint-disable-line
+          })
+          .filter((valueSetPerSystem) => !!valueSetPerSystem)
+          .reduce((acc, val) => acc.concat(val), [])
+      : []
   } else {
     const json = {
       resourceType: 'ValueSet',
@@ -778,7 +786,7 @@ const getCodeList = async (
     }
     const res = await apiFhir.post<FHIR_API_Response<ValueSet>>(`/ValueSet/$expand`, JSON.stringify(json))
     const valueSetExpansion = getApiResponseResourceOrThrow(res).expansion
-    return valueSetExpansion?.contains
+    return valueSetExpansion?.contains?.map((code) => ({ ...code, codeSystem: codeSystem }))
   }
 }
 
@@ -796,7 +804,7 @@ export type FetchValueSetOptions = {
 export const fetchValueSet = async (
   codeSystem: string,
   options?: FetchValueSetOptions
-): Promise<Array<HierarchyElement>> => {
+): Promise<Array<HierarchyElementWithSystem>> => {
   const {
     code,
     valueSetTitle,
@@ -816,15 +824,29 @@ export const fetchValueSet = async (
         label: joinDisplayWithCode
           ? `${code.code} - ${capitalizeFirstLetter(code.display)}`
           : capitalizeFirstLetter(code.display),
+        system: code.codeSystem,
         subItems: [{ id: 'loading', label: 'loading', subItems: [] as HierarchyElement[] }]
       }))
       .filter((code) => !filterOut(code))
       .sort(sortingFunc) || []
-  if ((!code || search === '*') && valueSetTitle) {
+  if (!code && (search === undefined || search === '*') && valueSetTitle) {
     return [{ id: '*', label: valueSetTitle, subItems: formattedCodeList.filter((code) => filterRoots(code)) }]
   } else {
     return formattedCodeList
   }
+}
+
+export const fetchSingleCodeHierarchy = async (codeSystem: string, code: string): Promise<string[]> => {
+  const codeList = await getCodeList(codeSystem, undefined, code)
+  if (!codeList || codeList.length === 0) {
+    return []
+  }
+  return (
+    codeList[0].extension
+      ?.find((e) => e.url === CODE_HIERARCHY_EXTENSION_NAME)
+      ?.valueCodeableConcept?.coding?.map((c) => c.code || '')
+      .filter((c) => !!c) || []
+  )
 }
 
 type fetchScopeProps = {

@@ -64,6 +64,14 @@ export enum CompositionStatusKind {
   _enteredInError = 'entered-in-error'
 }
 
+export enum TemporalConstraintsKind {
+  NONE = 'none',
+  SAME_ENCOUNTER = 'sameEncounter',
+  DIFFERENT_ENCOUNTER = 'differentEncounter',
+  PARTIAL_CONSTRAINT = 'partialConstraint',
+  DIRECT_CHRONOLOGICAL_ORDERING = 'directChronologicalOrdering'
+}
+
 export enum CohortCreationError {
   ERROR_TITLE = 'error_title',
   ERROR_REGEX = 'error_regex'
@@ -234,7 +242,7 @@ export enum SearchByTypes {
 
 export type AbstractTree<T> = T & {
   id: string
-  subItems: AbstractTree<T>[]
+  subItems?: AbstractTree<T>[]
 }
 
 export enum VitalStatus {
@@ -362,7 +370,7 @@ export type PatientData = {
 export type CriteriaGroupType = {
   id: number
   title: string
-  criteriaIds: number[] // = [SelectedCriteriaType.id | CriteriaGroupType.id, ...]
+  criteriaIds: number[]
   isSubGroup?: boolean
   isInclusive?: boolean
 } & (
@@ -383,7 +391,7 @@ export type CriteriaGroupType = {
 export type TemporalConstraintsType = {
   id?: number
   idList: ['All'] | number[]
-  constraintType: 'none' | 'sameEncounter' | 'differentEncounter' | 'directChronologicalOrdering'
+  constraintType: TemporalConstraintsKind
   timeRelationMinDuration?: {
     years?: number
     months?: number
@@ -398,15 +406,23 @@ export type TemporalConstraintsType = {
   }
 }
 
+export type CriteriaDrawerComponentProps<T = any> = {
+  parentId: number | null
+  criteria: CriteriaItemType | null
+  selectedCriteria: SelectedCriteriaType & T
+  onChangeSelectedCriteria: (newCriteria: SelectedCriteriaType & T) => void
+  goBack: () => void
+}
+
 export type CriteriaItemType = {
   id: string
   title: string
   color: string
   fontWeight?: string
-  components: any
+  components: React.FC<CriteriaDrawerComponentProps> | null
   disabled?: boolean
   data?: any
-  fetch?: any
+  fetch?: { [fetchKey: string]: (...args: any[]) => Promise<any> }
   valueSet?: any
   subItems?: CriteriaItemType[]
 }
@@ -525,6 +541,11 @@ export type GhmDataType = {
   startOccurrence: Date | ''
   endOccurrence: Date | ''
   isInclusive?: boolean
+}
+
+export enum ValueSetSystem {
+  ATC = 'ATC',
+  UCD = 'UCD'
 }
 
 export enum Calendar {
@@ -909,11 +930,14 @@ export type HierarchyTree = null | {
   code?: HierarchyElement[]
   loading?: number
 }
-export type HierarchyElement = {
+export type HierarchyElement<E = {}> = E & {
   id: string
   label: string
   subItems?: HierarchyElement[]
 }
+
+export type HierarchyElementWithSystem = HierarchyElement<{ system?: string }>
+
 export type TreeElement = { id: string; subItems: TreeElement[] }
 export type ScopeElement = {
   id: number

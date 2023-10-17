@@ -13,6 +13,9 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { Comparators } from 'types'
 import { EXPLORATION } from 'utils/constants'
 
+import { Comparators, CriteriaDrawerComponentProps } from 'types'
+
+
 export const defaultBiology = {
   type: OBSERVATION,
   title: 'Critères de biologie',
@@ -26,7 +29,7 @@ export const defaultBiology = {
   isInclusive: true
 }
 
-const Index = (props: any) => {
+const Index = (props: CriteriaDrawerComponentProps) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()
@@ -79,7 +82,7 @@ const Index = (props: any) => {
         <Tab label="Formulaire" value="form" />
       </Tabs>
 
-      {selectedTab === 'form' && (
+      {
         <BiologyForm
           isOpen={selectedTab === 'form'}
           isEdition={isEdition}
@@ -89,7 +92,7 @@ const Index = (props: any) => {
           onChangeSelectedCriteria={onChangeSelectedCriteria}
           goBack={goBack}
         />
-      )}
+      }
       {selectedTab === 'search' && (
         <BiologySearch
           isEdition={isEdition}

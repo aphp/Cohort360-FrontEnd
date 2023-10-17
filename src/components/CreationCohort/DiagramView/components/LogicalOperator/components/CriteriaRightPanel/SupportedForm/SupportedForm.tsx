@@ -23,18 +23,19 @@ import OtherInputs from './SupportedInputs/OtherInputs'
 
 import useStyles from './styles'
 
-import { CriteriaName, EncounterDataType, ScopeTreeRow, CalendarLabel, Calendar, CalendarRequestLabel } from 'types'
+import {
+  CriteriaName,
+  EncounterDataType,
+  ScopeTreeRow,
+  CalendarLabel,
+  Calendar,
+  CalendarRequestLabel,
+  CriteriaDrawerComponentProps
+} from 'types'
 import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import PopulationCard from '../../../../PopulationCard/PopulationCard'
 import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE, getCalendarMultiplicator } from 'utils/cohortCreation'
 import VisitInputs from '../AdvancedInputs/VisitInputs/VisitInputs'
-
-type SupportedFormProps = {
-  criteria: any
-  selectedCriteria: any
-  goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
-}
 
 enum Error {
   EMPTY_FORM,
@@ -81,7 +82,7 @@ const defaultEncounter: EncounterDataType = {
   isInclusive: true
 }
 
-const SupportedForm: React.FC<SupportedFormProps> = (props) => {
+const SupportedForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultEncounter)
