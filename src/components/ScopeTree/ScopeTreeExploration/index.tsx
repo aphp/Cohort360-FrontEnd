@@ -29,7 +29,7 @@ import {
 } from '../utils/scopeTreeUtils'
 import { ScopeState } from 'state/scope'
 import { ScopeTreeExplorationProps } from '../index'
-import ScopeTreeHierarchy from '../ScopeTreeHierarchy/ScopeTreeHierarchy'
+import ScopeTreeHierarchy from '../ScopeTreeHierarchy'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 const Index = (props: ScopeTreeExplorationProps) => {

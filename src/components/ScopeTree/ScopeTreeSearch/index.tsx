@@ -16,7 +16,7 @@ import { useAppSelector } from 'state'
 import { ScopeState } from 'state/scope'
 import { ScopeTreeRow } from 'types'
 import { ScopeTreeSearchProps } from '../index'
-import ScopeTreeHierarchy from '../ScopeTreeHierarchy/ScopeTreeHierarchy'
+import ScopeTreeHierarchy from '../ScopeTreeHierarchy'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 const Index: React.FC<ScopeTreeSearchProps> = (props) => {

@@ -88,10 +88,7 @@ export const updateRootRows = async (
 
     for (let j = 0; j < parentsAndSelectedItems.length; j++) {
       if (parentsAndSelectedItems[j].parentId === newRootRows[i].id) {
-        if (
-          !newRootRows[i].subItems ||
-          (newRootRows[i]?.subItems?.length === 1 && newRootRows[i]?.subItems[0]?.id === LOADING.id)
-        ) {
+        if (newRootRows[i]?.subItems?.length === 1 && newRootRows[i]?.subItems?.[0]?.id === LOADING.id) {
           newRootRows[i] = { ...newRootRows[i], subItems: [] }
         }
         if (!newRootRows[i]?.subItems?.map((subItem) => subItem.id).includes(parentsAndSelectedItems[j].id)) {
@@ -99,7 +96,7 @@ export const updateRootRows = async (
         }
       }
     }
-    if (newRootRows[i]?.subItems?.length && newRootRows[i]?.subItems[0]?.id !== LOADING.id) {
+    if (newRootRows[i]?.subItems?.[0]?.id !== LOADING.id) {
       await updateRootRows(newRootRows[i]?.subItems ?? [], parentsAndSelectedItems, parents)
     }
   }
