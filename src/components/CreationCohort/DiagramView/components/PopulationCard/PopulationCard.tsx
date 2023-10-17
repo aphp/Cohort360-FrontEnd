@@ -15,10 +15,10 @@ import { fetchScopesList, ScopeState } from 'state/scope'
 import { MeState } from 'state/me'
 
 import { CriteriaNameType, ScopeType, ScopeTreeRow } from 'types'
-import { getSelectedScopes } from 'utils/scopeTree'
 import scopeTypes from 'data/scope_type.json'
 
 import useStyles from './styles'
+import { findEquivalentRowInItemAndSubItems } from 'utils/pmsi'
 
 export type populationCardPropsType = {
   label?: string
@@ -109,6 +109,8 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
     setRightError(_rightError)
   }, [selectedItems])
 
+  console.log('test scopesList avant useEffect', scopesList)
+
   useEffect(() => {
     if (
       !isRendered.current &&
@@ -118,13 +120,20 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
       requestState?.requestId &&
       (selectedPopulation === null || selectedPopulation?.length === 0)
     ) {
-      const savedSelectedItems: ScopeTreeRow[] = getSelectedScopes(scopesList[0], [], scopesList)
+      console.log('test scopesList avant', scopesList)
+      const savedSelectedItems: ScopeTreeRow[] = [
+        findEquivalentRowInItemAndSubItems(scopeState.scopesList[0], scopesList).equivalentRow
+      ]
+      console.log('test scopesList apres', scopesList)
+      console.log('test savedSelectedItems', savedSelectedItems)
       _onSubmit(savedSelectedItems)
       isRendered.current = true
     } else {
       isRendered.current = false
     }
   }, [scopesList, requestState])
+
+  console.log('test scopesList apres useEffect', scopesList)
 
   return (
     <>
