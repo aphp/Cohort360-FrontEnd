@@ -697,21 +697,15 @@ const servicesPatients: IServicePatients = {
   },
 
   searchPatient: async (nominativeGroupsIds, page, sortBy, sortDirection, input, searchBy, signal) => {
-    let search = ''
-    // if (input.trim() !== '') {
-    if (searchBy === '_text') {
-      const searches = input
-        .trim() // Remove space before/after search
-        .split(' ') // Split by space (= ['mot1', 'mot2' ...])
-        .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
+    let _searchInput: string | string[] = ''
+    _searchInput = input
+      .trim() // Remove space before/after search
+      .split(' ') // Split by space (= ['mot1', 'mot2' ...])
+      .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
 
-      for (const _search of searches) {
-        search = search ? `${search} AND "${_search}"` : `"${_search}"`
-      }
-    } else {
-      search = input.trim()
+    if (searchBy === SearchByTypes.identifier) {
+      _searchInput = _searchInput.join()
     }
-    // }
 
     const patientResp = await fetchPatient({
       _list: nominativeGroupsIds,
@@ -720,7 +714,7 @@ const servicesPatients: IServicePatients = {
       _sort: sortBy,
       sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
       searchBy: searchBy,
-      _text: search,
+      _text: _searchInput,
       _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension'],
       signal
     })

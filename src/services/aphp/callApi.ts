@@ -88,10 +88,7 @@ type fetchPatientProps = {
   minBirthdate?: number
   maxBirthdate?: number
   searchBy?: string
-  _text?: string
-  family?: string
-  given?: string
-  identifier?: string
+  _text?: string | string[]
   deceased?: boolean
   pivotFacet?: ('age-month_gender' | 'deceased_gender')[]
   _elements?: ('id' | 'gender' | 'name' | 'birthDate' | 'deceased' | 'identifier' | 'extension')[]
@@ -108,9 +105,6 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
     gender,
     _text,
     searchBy,
-    family,
-    given,
-    identifier,
     deceased,
     minBirthdate,
     maxBirthdate,
@@ -131,10 +125,14 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
   if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`] // eslint-disable-line
   if (gender) options = [...options, `gender=${gender}`] // eslint-disable-line
-  if (_text) options = [...options, `${searchBy ? searchBy : '_text'}=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (family) options = [...options, `family=${family}`] // eslint-disable-line
-  if (given) options = [...options, `given=${given}`] // eslint-disable-line
-  if (identifier) options = [...options, `identifier=${identifier}`] // eslint-disable-line
+  if (_text) {
+    if (Array.isArray(_text)) {
+      const searchInput = _text.map((text) => `${searchBy}=${encodeURIComponent(`"${text}"`)}`).join('&')
+      options = [...options, searchInput]
+    } else {
+      options = [...options, `${searchBy}=${_text}`] // eslint-disable-line
+    }
+  }
   if (deceased !== undefined) options = [...options, `deceased=${deceased}`] // eslint-disable-line
   if (minBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=le${minBirthdate}`] // eslint-disable-line
   if (maxBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=ge${maxBirthdate}`] // eslint-disable-line
