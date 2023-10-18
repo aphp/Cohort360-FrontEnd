@@ -71,8 +71,10 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
   }
 
   const setUpdatedItems = (updatedSelection: ScopeTreeRow[]) => {
-    setSelectedItems(updatedSelection)
-    onChangeExecutiveUnits ? onChangeExecutiveUnits(updatedSelection) : _onChangePopulation(updatedSelection)
+    let _updatedSelection = updatedSelection
+    _updatedSelection = _updatedSelection.filter((item) => item.id)
+    setSelectedItems(_updatedSelection)
+    onChangeExecutiveUnits ? onChangeExecutiveUnits(_updatedSelection) : _onChangePopulation(_updatedSelection)
   }
 
   const _onSubmit = async (updatedSelection: ScopeTreeRow[] | null) => {
@@ -109,8 +111,6 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
     setRightError(_rightError)
   }, [selectedItems])
 
-  console.log('test scopesList avant useEffect', scopesList)
-
   useEffect(() => {
     if (
       !isRendered.current &&
@@ -120,20 +120,15 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
       requestState?.requestId &&
       (selectedPopulation === null || selectedPopulation?.length === 0)
     ) {
-      console.log('test scopesList avant', scopesList)
       const savedSelectedItems: ScopeTreeRow[] = [
-        findEquivalentRowInItemAndSubItems(scopeState.scopesList[0], scopesList).equivalentRow
+        findEquivalentRowInItemAndSubItems(scopesList[0], scopesList).equivalentRow
       ]
-      console.log('test scopesList apres', scopesList)
-      console.log('test savedSelectedItems', savedSelectedItems)
       _onSubmit(savedSelectedItems)
       isRendered.current = true
     } else {
       isRendered.current = false
     }
   }, [scopesList, requestState])
-
-  console.log('test scopesList apres useEffect', scopesList)
 
   return (
     <>

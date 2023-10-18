@@ -154,7 +154,9 @@ const Index = (props: ScopeTreeExplorationProps) => {
                           scopesList,
                           isSelectionLoading,
                           setIsSelectionLoading,
-                          setSelectedItems
+                          setSelectedItems,
+                          undefined,
+                          !!executiveUnitType
                         )
                       }
                       isIndeterminate={(row: ScopeTreeRow) => isSearchIndeterminate(row, selectedItems)}

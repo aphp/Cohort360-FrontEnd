@@ -247,7 +247,8 @@ const getScopeTree = async (
   id: string | null | undefined,
   searchRootRows: ScopeTreeRow[],
   explorationRootRows: ScopeTreeRow[],
-  isNoLoading?: boolean
+  isNoLoading?: boolean,
+  isExecutiveUnit?: boolean
 ): Promise<ScopeTreeRow | undefined> => {
   if (!id) return undefined
   let equivalentRow = findEquivalentRowInItemAndSubItems({ id: id }, searchRootRows).equivalentRow
@@ -255,23 +256,34 @@ const getScopeTree = async (
     equivalentRow = findEquivalentRowInItemAndSubItems({ id: id }, explorationRootRows).equivalentRow
     if (!equivalentRow && !isNoLoading) {
       equivalentRow = await servicesPerimeters.buildScopeTreeRowList(
-        await servicesPerimeters.getPerimeters([id], undefined, undefined)
+        await servicesPerimeters.getPerimeters([id], undefined, undefined, undefined, isExecutiveUnit),
+        undefined,
+        undefined,
+        isExecutiveUnit
       )
       await updateRootRows(searchRootRows, [equivalentRow], [])
     }
   }
   return equivalentRow
 }
+
 const getScopeTreeList = async (
   ids: string[],
   searchRootRows: ScopeTreeRow[],
-  explorationRootRows: ScopeTreeRow[]
+  explorationRootRows: ScopeTreeRow[],
+  isExecutiveUnit?: boolean
 ): Promise<ScopeTreeRow[]> => {
   const scopeTreeList: ScopeTreeRow[] = []
   const postLoadedIds: string[] = []
 
   for (const id of ids) {
-    const equivalentRow: ScopeTreeRow | undefined = await getScopeTree(id, searchRootRows, explorationRootRows, true)
+    const equivalentRow: ScopeTreeRow | undefined = await getScopeTree(
+      id,
+      searchRootRows,
+      explorationRootRows,
+      true,
+      isExecutiveUnit
+    )
     if (equivalentRow) {
       scopeTreeList.push({ ...equivalentRow })
     } else {
@@ -280,7 +292,10 @@ const getScopeTreeList = async (
   }
   if (postLoadedIds?.length > 0) {
     const postLoadedRows: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
-      await servicesPerimeters.getPerimeters(postLoadedIds, undefined, undefined)
+      await servicesPerimeters.getPerimeters(postLoadedIds, undefined, undefined, undefined, isExecutiveUnit),
+      undefined,
+      undefined,
+      isExecutiveUnit
     )
     await updateRootRows(searchRootRows, postLoadedRows, [])
     scopeTreeList.push(...postLoadedRows)
@@ -294,11 +309,22 @@ const addToSelectedItems = async (
   rowsToAdd: ScopeTreeRow[],
   rowsToDelete: string[],
   searchRootRows: ScopeTreeRow[],
-  explorationRootRows: ScopeTreeRow[]
+  explorationRootRows: ScopeTreeRow[],
+  isExecutiveUnit?: boolean
 ) => {
-  const parent: ScopeTreeRow | undefined = await getScopeTree(rowToAdd.parentId, searchRootRows, explorationRootRows)
+  const parent: ScopeTreeRow | undefined = await getScopeTree(
+    rowToAdd.parentId,
+    searchRootRows,
+    explorationRootRows,
+    isExecutiveUnit
+  )
   const inferiorLevelsIds: string[] = parent?.inferior_levels_ids?.split(',') ?? []
-  const parentSubItems: ScopeTreeRow[] = await getScopeTreeList(inferiorLevelsIds, searchRootRows, explorationRootRows)
+  const parentSubItems: ScopeTreeRow[] = await getScopeTreeList(
+    inferiorLevelsIds,
+    searchRootRows,
+    explorationRootRows,
+    isExecutiveUnit
+  )
   const updatedSelectedItems: ScopeTreeRow[] = [
     ...selectedItems,
     ...rowsToAdd.filter((rowToAdd) => rowsToDelete.includes(rowToAdd.id))
@@ -312,7 +338,15 @@ const addToSelectedItems = async (
   if (parent && isAllInferiorLevelsSelected) {
     rowsToDelete.push(...inferiorLevelsIds)
     rowsToAdd.push({ ...parent })
-    await addToSelectedItems(parent, selectedItems, rowsToAdd, rowsToDelete, searchRootRows, explorationRootRows)
+    await addToSelectedItems(
+      parent,
+      selectedItems,
+      rowsToAdd,
+      rowsToDelete,
+      searchRootRows,
+      explorationRootRows,
+      isExecutiveUnit
+    )
   }
 }
 
@@ -324,7 +358,8 @@ const selectOrUnSelectParent = async (
   rowsToAdd: ScopeTreeRow[],
   selectedItems: ScopeTreeRow[],
   searchRootRows: ScopeTreeRow[],
-  explorationRootRows: ScopeTreeRow[]
+  explorationRootRows: ScopeTreeRow[],
+  isExecutiveUnit?: boolean
 ): Promise<boolean> => {
   if (!selectedItem) return false
   if (
@@ -336,21 +371,29 @@ const selectOrUnSelectParent = async (
     const inferiorLevelsIds: string[] = selectedItem.inferior_levels_ids?.split(',') ?? []
     if (selectedItem.id === row.parentId) {
       if (inferiorLevelsIds.length > 1) {
-        rowsToAdd.push(...(await getScopeTreeList(inferiorLevelsIds, searchRootRows, explorationRootRows)))
+        rowsToAdd.push(
+          ...(await getScopeTreeList(inferiorLevelsIds, searchRootRows, explorationRootRows, isExecutiveUnit))
+        )
       } else {
         await selectOrUnSelectParent(
           selectedItem.above_levels_ids?.split(',') ?? [],
-          await getScopeTree(selectedItem.parentId, searchRootRows, explorationRootRows),
+          await getScopeTree(selectedItem.parentId, searchRootRows, explorationRootRows, isExecutiveUnit),
           rowsToDelete,
           selectedItem,
           rowsToAdd,
           selectedItems,
           searchRootRows,
-          explorationRootRows
+          explorationRootRows,
+          isExecutiveUnit
         )
       }
     } else {
-      const subItems: ScopeTreeRow[] = await getScopeTreeList(inferiorLevelsIds, searchRootRows, explorationRootRows)
+      const subItems: ScopeTreeRow[] = await getScopeTreeList(
+        inferiorLevelsIds,
+        searchRootRows,
+        explorationRootRows,
+        isExecutiveUnit
+      )
       for (const subItem of subItems) {
         if (
           !(await selectOrUnSelectParent(
@@ -361,7 +404,8 @@ const selectOrUnSelectParent = async (
             rowsToAdd,
             selectedItems,
             searchRootRows,
-            explorationRootRows
+            explorationRootRows,
+            isExecutiveUnit
           ))
         ) {
           rowsToAdd.push(subItem)
@@ -381,7 +425,8 @@ export const onSearchSelect = async (
   isSelectionLoading: boolean,
   setIsSelectionLoading: (isSelectionLoading: boolean) => void,
   setSelectedItems?: (newSelectedItems: ScopeTreeRow[]) => void,
-  setSearchedRows?: (newSelectedItems: ScopeTreeRow[]) => void
+  setSearchedRows?: (newSelectedItems: ScopeTreeRow[]) => void,
+  isExecutiveUnit?: boolean
 ): Promise<ScopeTreeRow[]> => {
   if (isSelectionLoading) return selectedItems
   else setIsSelectionLoading(true)
@@ -407,7 +452,8 @@ export const onSearchSelect = async (
             rowsToAdd,
             equivalentSelectedItems,
             searchRootRows,
-            explorationRootRows
+            explorationRootRows,
+            isExecutiveUnit
           )
         ) {
           break
@@ -432,7 +478,8 @@ export const onSearchSelect = async (
       uniqueRowsToAdd,
       uniqueRowsToDelete,
       searchRootRows,
-      explorationRootRows
+      explorationRootRows,
+      isExecutiveUnit
     )
   }
   uniqueRowsToDelete = [...new Set(uniqueRowsToDelete)]
