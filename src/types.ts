@@ -1037,7 +1037,7 @@ export type AccessExpiration = {
 
 export type ExpandScopeElementParamsType = {
   rowId: number
-  scopesList?: ScopeTreeRow[]
+  scopesList?: ScopeListType
   selectedItems?: ScopeTreeRow[]
   openPopulation?: number[]
   executiveUnitType?: ScopeType
@@ -1045,7 +1045,7 @@ export type ExpandScopeElementParamsType = {
   signal?: AbortSignal
 }
 export type ExpandScopeElementReturnType = {
-  scopesList: ScopeTreeRow[]
+  scopesList: ScopeListType
   selectedItems: ScopeTreeRow[]
   openPopulation: number[]
   aborted?: boolean
@@ -1057,4 +1057,9 @@ export type ScopeTreeTableHeadCellsType = {
   disablePadding: boolean
   disableOrderBy: boolean
   label: string | ReactElement
+}
+
+export type ScopeListType = {
+  perimeters: ScopeTreeRow[]
+  executiveUnits: ScopeTreeRow[]
 }

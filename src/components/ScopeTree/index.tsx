@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useAppSelector } from 'state'
 import { ScopeState } from 'state/scope'
 import { ScopeTreeRow, ScopeType } from 'types'
+import { getCurrentScopeList } from 'utils/scopeTree'
 import ScopeSearchBar from '../Inputs/ScopeSearchBar/ScopeSearchBar'
 import ScopeTreeChipsets from './ScopeTreeChipsets'
 import ScopeTreeExploration from './ScopeTreeExploration'
@@ -60,7 +61,8 @@ const Index = (props: ScopeTreeProps) => {
   }>((state) => ({
     scopeState: state.scope || {}
   }))
-  const { scopesList = [] } = scopeState
+  const isExecutiveUnit: boolean = !!executiveUnitType
+  const scopesList: ScopeTreeRow[] = getCurrentScopeList(scopeState.scopesList, isExecutiveUnit) ?? []
   const [searchInput, setSearchInput] = useState('')
   const [searchSavedRootRows, setSearchSavedRootRows] = useState<ScopeTreeRow[]>([...scopesList])
   const [isSelectionLoading, setIsSelectionLoading] = useState<boolean>(false)

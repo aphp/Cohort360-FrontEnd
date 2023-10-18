@@ -19,6 +19,7 @@ import scopeTypes from 'data/scope_type.json'
 
 import useStyles from './styles'
 import { findEquivalentRowInItemAndSubItems } from 'utils/pmsi'
+import { getCurrentScopeList } from 'utils/scopeTree'
 
 export type populationCardPropsType = {
   label?: string
@@ -52,7 +53,8 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
 
   const maintenanceIsActive = meState?.maintenance?.active
 
-  const { scopesList = [] } = scopeState
+  const isExecutiveUnit: boolean = !!(form ? (scopeTypes.criteriaType[form] as ScopeType) : undefined)
+  const scopesList = getCurrentScopeList(scopeState.scopesList, isExecutiveUnit) ?? []
   const loading = requestState.loading || scopeState.loading
 
   const [isExtended, onExtend] = useState(false)

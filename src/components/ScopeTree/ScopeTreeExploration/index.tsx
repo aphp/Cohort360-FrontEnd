@@ -1,5 +1,4 @@
-import React, { ReactElement, useEffect, useRef, useState } from 'react'
-import { ScopeTreeRow } from 'types'
+import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 import {
   Checkbox,
   CircularProgress,
@@ -15,9 +14,14 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
-import EnhancedTable from '../ScopeTreeTable'
-import useStyles from '../utils/styles'
+import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { AppDispatch, useAppDispatch, useAppSelector } from 'state'
+import { ScopeState } from 'state/scope'
+import { ScopeTreeRow } from 'types'
+import { getCurrentScopeList } from 'utils/scopeTree'
+import ScopeTreeHierarchy from '../ScopeTreeHierarchy'
+import EnhancedTable from '../ScopeTreeTable'
+import { ScopeTreeExplorationProps } from '../index'
 import {
   getHeadCells,
   init,
@@ -27,10 +31,7 @@ import {
   onExplorationSelectAll,
   onSearchSelect
 } from '../utils/scopeTreeUtils'
-import { ScopeState } from 'state/scope'
-import { ScopeTreeExplorationProps } from '../index'
-import ScopeTreeHierarchy from '../ScopeTreeHierarchy'
-import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
+import useStyles from '../utils/styles'
 
 const Index = (props: ScopeTreeExplorationProps) => {
   const {
@@ -50,7 +51,8 @@ const Index = (props: ScopeTreeExplorationProps) => {
   }>((state) => ({
     scopeState: state.scope || {}
   }))
-  const { scopesList = [] } = scopeState
+  const isExecutiveUnit: boolean = !!executiveUnitType
+  const scopesList: ScopeTreeRow[] = getCurrentScopeList(scopeState.scopesList, isExecutiveUnit) ?? []
   const [rootRows, setRootRows] = useState<ScopeTreeRow[]>(scopesList)
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false)
   const [page, setPage] = useState(1)

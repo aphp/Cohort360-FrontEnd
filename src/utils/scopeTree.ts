@@ -1,8 +1,20 @@
-import { ExpandScopeElementParamsType, ScopeTreeRow, ScopeType } from 'types'
 import services from 'services/aphp'
 import { RootState } from 'state'
+import { ExpandScopeElementParamsType, ScopeListType, ScopeTreeRow, ScopeType } from 'types'
 
 export const LOADING: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
+
+export const buildScopeList = (
+  oldScopeList: ScopeListType,
+  newScopes: ScopeTreeRow[],
+  isExecutiveUnit?: boolean
+): ScopeListType => {
+  const newScopeList: ScopeListType = {
+    perimeters: isExecutiveUnit ? oldScopeList.perimeters : newScopes,
+    executiveUnits: isExecutiveUnit ? newScopes : oldScopeList.executiveUnits
+  }
+  return newScopeList
+}
 
 export const sortByQuantityAndName = (scopeRows: ScopeTreeRow[]) => {
   // Sort by quantity
@@ -30,12 +42,15 @@ export const sortByQuantityAndName = (scopeRows: ScopeTreeRow[]) => {
 export const expandScopeTree = async (params: ExpandScopeElementParamsType, getState?: () => RootState) => {
   let scopesList: ScopeTreeRow[] = []
   let openPopulation: number[] = []
+  let oldScopeList: ScopeListType = { perimeters: [], executiveUnits: [] }
   if (params.scopesList && params.openPopulation) {
-    scopesList = params.scopesList
+    oldScopeList = params.scopesList
+    scopesList = getCurrentScopeList(oldScopeList, params.isExecutiveUnit)
     openPopulation = params.openPopulation
   } else if (getState) {
     const state = getState().scope
-    scopesList = state.scopesList
+    oldScopeList = state.scopesList
+    scopesList = getCurrentScopeList(oldScopeList, params.isExecutiveUnit)
     openPopulation = state.openPopulation
   }
   let _rootRows = scopesList ? [...scopesList] : []
@@ -76,9 +91,21 @@ export const expandScopeTree = async (params: ExpandScopeElementParamsType, getS
   }
 
   return {
-    scopesList: _rootRows,
+    scopesList: buildScopeList(oldScopeList, _rootRows, params.isExecutiveUnit),
     selectedItems: savedSelectedItems,
     openPopulation: _openPopulation,
     aborted: params.signal?.aborted
   }
+}
+
+export const getCurrentScopeList = (scopeList: ScopeListType, isExecutiveUnit?: boolean): ScopeTreeRow[] => {
+  return isExecutiveUnit ? scopeList.executiveUnits : scopeList.perimeters
+}
+
+export const buildScopeListType = (scopes: ScopeTreeRow[], isExecutiveUnit?: boolean): ScopeListType => {
+  const newScopeList: ScopeListType = {
+    perimeters: !isExecutiveUnit ? scopes : [],
+    executiveUnits: isExecutiveUnit ? scopes : []
+  }
+  return newScopeList
 }

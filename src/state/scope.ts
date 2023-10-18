@@ -1,29 +1,39 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 
-import { logout, login } from './me'
+import { login, logout } from './me'
 
 import services from 'services/aphp'
 
-import { ScopeType, ScopeTreeRow, ExpandScopeElementReturnType, ExpandScopeElementParamsType } from 'types'
-import { expandScopeTree } from '../utils/scopeTree'
+import {
+  ExpandScopeElementParamsType,
+  ExpandScopeElementReturnType,
+  ScopeListType,
+  ScopeTreeRow,
+  ScopeType
+} from 'types'
+import { buildScopeList, expandScopeTree, getCurrentScopeList } from '../utils/scopeTree'
 
 export type ScopeState = {
   loading: boolean
-  scopesList: ScopeTreeRow[]
+  scopesList: ScopeListType
   openPopulation: number[]
   aborted?: boolean
 }
 
+const initialScopeList: ScopeListType = {
+  perimeters: [],
+  executiveUnits: []
+}
 const defaultInitialState: ScopeState = {
   loading: false,
-  scopesList: [],
+  scopesList: initialScopeList,
   openPopulation: [],
   aborted: false
 }
 
 type FetchScopeListReturn = {
-  scopesList: ScopeTreeRow[]
+  scopesList: ScopeListType
   aborted?: boolean
 }
 
@@ -40,18 +50,28 @@ const fetchScopesList = createAsyncThunk<FetchScopeListReturn, FetchScopeListArg
     try {
       const state = getState()
       const { me, scope } = state
-      const { scopesList } = scope
+      const scopeListFromState = getCurrentScopeList(scope.scopesList, isExecutiveUnit)
 
-      if (scopesList.length && !isScopeList) {
+      if (scopeListFromState.length && !isScopeList) {
         dispatch(fetchScopesListinBackground({ type, isExecutiveUnit, signal }))
-        return { scopesList: scopesList, aborted: signal?.aborted }
+        return {
+          scopesList: buildScopeList(scope.scopesList, scopeListFromState, isExecutiveUnit),
+          aborted: signal?.aborted
+        }
       } else {
-        if (!me) return { scopesList: [], aborted: signal?.aborted }
-        const scopes = (await services.perimeters.getScopePerimeters(me.id, type, isExecutiveUnit, signal)) || []
+        if (!me) return { scopesList: initialScopeList, aborted: signal?.aborted }
+        const scopeListFromFetch =
+          (await services.perimeters.getScopePerimeters(me.id, type, isExecutiveUnit, signal)) || []
         if (signal?.aborted) {
-          return { scopesList: scopesList, aborted: signal?.aborted }
+          return {
+            scopesList: buildScopeList(scope.scopesList, scopeListFromState, isExecutiveUnit),
+            aborted: signal?.aborted
+          }
         } else {
-          return { scopesList: scopes, aborted: signal?.aborted }
+          return {
+            scopesList: buildScopeList(scope.scopesList, scopeListFromFetch, isExecutiveUnit),
+            aborted: signal?.aborted
+          }
         }
       }
     } catch (error) {
@@ -73,26 +93,29 @@ const fetchScopesListinBackground = createAsyncThunk<
   try {
     const state = getState()
     const { me, scope } = state
-    const { scopesList } = scope
+    const scopeListFromState = getCurrentScopeList(scope.scopesList, isExecutiveUnit)
 
-    if (!me) return { scopesList: [], aborted: signal?.aborted }
-    const scopes = (await services.perimeters.getScopePerimeters(me.id, type, isExecutiveUnit, signal)) || []
+    if (!me) return { scopesList: initialScopeList, aborted: signal?.aborted }
+    const scopeListFromFetch =
+      (await services.perimeters.getScopePerimeters(me.id, type, isExecutiveUnit, signal)) || []
+    const newScopeList = scopeListFromFetch.map((scope) => ({
+      ...scope,
+      subItems: (
+        scopeListFromState.find((item) => item.id === scope.id && item.subItems?.length) ?? {
+          subItems: [
+            {
+              id: 'loading',
+              name: 'loading',
+              quantity: 0,
+              subItems: []
+            }
+          ]
+        }
+      ).subItems
+    }))
+
     return {
-      scopesList: scopes.map((scope) => ({
-        ...scope,
-        subItems: (
-          scopesList.find((item) => item.id === scope.id && item.subItems?.length) ?? {
-            subItems: [
-              {
-                id: 'loading',
-                name: 'loading',
-                quantity: 0,
-                subItems: []
-              }
-            ]
-          }
-        ).subItems
-      })),
+      scopesList: buildScopeList(scope.scopesList, newScopeList, isExecutiveUnit),
       aborted: signal?.aborted
     }
   } catch (error) {
@@ -122,10 +145,10 @@ const scopeSlice = createSlice({
         openPopulation: []
       }
     },
-    updateScopeList: (state, action: PayloadAction<ScopeTreeRow[]>) => {
+    updateScopeList: (state, action: PayloadAction<{ newScopes: ScopeTreeRow[]; isExecutiveUnit?: Boolean }>) => {
       return {
         ...state,
-        scopesList: action.payload
+        scopesList: buildScopeList(state.scopesList, action.payload.newScopes, !!action.payload.isExecutiveUnit)
       }
     }
   },
@@ -160,5 +183,5 @@ const scopeSlice = createSlice({
 })
 
 export default scopeSlice.reducer
-export { fetchScopesList, expandScopeElement }
+export { expandScopeElement, fetchScopesList }
 export const { clearScope, closeAllOpenedPopulation, updateScopeList } = scopeSlice.actions

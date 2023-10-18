@@ -6,7 +6,7 @@ import { findEquivalentRowInItemAndSubItems, getHierarchySelection, optimizeHier
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import { cancelPendingRequest } from 'utils/abortController'
-import { expandScopeTree, LOADING } from 'utils/scopeTree'
+import { buildScopeListType, expandScopeTree, getCurrentScopeList, LOADING } from 'utils/scopeTree'
 
 export const getAllParentsIds = async (selectedItems: ScopeTreeRow[]) => {
   const allParentsIds: string[] = selectedItems
@@ -68,7 +68,7 @@ export const expandSelectedItems = async (
 
   await updateRootRows(newRootRows, [...parents, ...selectedItems], parents)
   if (dispatch) {
-    dispatch(updateScopeList(newRootRows))
+    dispatch(updateScopeList({ newScopes: newRootRows, isExecutiveUnit: isExecutiveUnit }))
   }
   if (setRootRows) setRootRows(newRootRows)
   return newRootRows
@@ -142,7 +142,7 @@ export const init = async (
       })
     ).unwrap()
     if (fetchScopeTreeResponse && !fetchScopeTreeResponse.aborted) {
-      newPerimetersList = fetchScopeTreeResponse.scopesList
+      newPerimetersList = getCurrentScopeList(fetchScopeTreeResponse.scopesList, isExecutiveUnit)
       setRootRows(newPerimetersList)
       setOpenPopulations([])
       setCount(newPerimetersList?.length)
@@ -171,7 +171,7 @@ export const onExpand = async (
   const params: ExpandScopeElementParamsType = {
     rowId: rowId,
     selectedItems: selectedItems,
-    scopesList: _rootRows,
+    scopesList: buildScopeListType(_rootRows, isExecutiveUnit),
     openPopulation: openPopulation,
     executiveUnitType: executiveUnitType,
     isExecutiveUnit: isExecutiveUnit,
@@ -183,7 +183,7 @@ export const onExpand = async (
     expandResponse = await expandScopeTree(params)
   }
   if (expandResponse && !expandResponse.aborted) {
-    setRootRows(expandResponse.scopesList ?? [])
+    setRootRows(getCurrentScopeList(expandResponse.scopesList, isExecutiveUnit) ?? [])
     setOpenPopulations(expandResponse.openPopulation)
   }
 }
