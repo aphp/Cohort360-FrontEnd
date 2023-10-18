@@ -250,6 +250,7 @@ export interface IServicePatients {
     endDate?: string | null,
     groupId?: string,
     signal?: AbortSignal,
+    modalities?: string,
     executiveUnits?: string[]
   ) => Promise<{
     imagingList: ImagingStudy[]
@@ -622,6 +623,7 @@ const servicesPatients: IServicePatients = {
     endDate?: string | null,
     groupId?: string,
     signal?: AbortSignal,
+    modalities?: string,
     executiveUnits?: string[]
   ) => {
     const imagingResp = await fetchImaging({
@@ -636,6 +638,7 @@ const servicesPatients: IServicePatients = {
       maxDate: endDate ?? '',
       _list: groupId ? [groupId] : [],
       signal,
+      modalities,
       executiveUnits
     })
 

@@ -92,7 +92,8 @@ export const initImagingCriterias: SearchCriterias<ImagingFilters> = {
     nda: '',
     startDate: null,
     endDate: null,
-    executiveUnits: []
+    executiveUnits: [],
+    modality: []
   }
 }
 

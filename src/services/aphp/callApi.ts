@@ -791,11 +791,24 @@ type fetchImagingProps = {
   maxDate?: string
   _list?: string[]
   signal?: AbortSignal
+  modalities?: string
   executiveUnits?: string[]
 }
 export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise_Response<ImagingStudy> => {
-  const { patient, size, offset, order, orderDirection, _text, encounter, minDate, maxDate, signal, executiveUnits } =
-    args
+  const {
+    patient,
+    size,
+    offset,
+    order,
+    orderDirection,
+    _text,
+    encounter,
+    minDate,
+    maxDate,
+    signal,
+    modalities,
+    executiveUnits
+  } = args
   const _orderDirection = orderDirection === Direction.DESC ? '-' : ''
   let { _list } = args
   _list = _list ? _list.filter(uniq) : []
@@ -808,8 +821,9 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   if (order) options = [...options, `_sort=${_orderDirection}${order}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
   if (encounter) options = [...options, `encounter.identifier=${encounter}`]
-  if (minDate) options = [...options, `date=ge${minDate}`]
-  if (maxDate) options = [...options, `date=le${maxDate}`]
+  if (minDate) options = [...options, `started=ge${minDate}`]
+  if (maxDate) options = [...options, `started=le${maxDate}`]
+  if (modalities) options = [...options, `modality=*${encodeURIComponent('|')}${modalities}`]
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
@@ -850,8 +864,8 @@ const getCodeList = async (
       searchParam = noStar
         ? `&only-roots=false&code=${search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
         : `&only-roots=false&_text=${encodeURIComponent(
-            search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')
-          )}*` //eslint-disable-line
+            search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') //eslint-disable-line
+          )}*`
     }
     // TODO test if it returns all the codes without specifying the count
     const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}${searchParam}`)

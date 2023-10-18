@@ -749,7 +749,8 @@ export enum CriteriaName {
   Document = 'document',
   Medication = 'medication',
   Biology = 'biology',
-  VisitSupport = 'supported'
+  VisitSupport = 'supported',
+  Imaging = 'imaging'
 }
 export type CriteriaNameType =
   | CriteriaName.Cim10
@@ -759,6 +760,7 @@ export type CriteriaNameType =
   | CriteriaName.Medication
   | CriteriaName.Biology
   | CriteriaName.VisitSupport
+  | CriteriaName.Imaging
 
 export type AccessExpirationsProps = {
   expiring?: boolean

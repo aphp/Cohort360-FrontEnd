@@ -11,8 +11,9 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
+import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
-import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
+import { KeyboardArrowDown, KeyboardArrowUp, Visibility } from '@mui/icons-material'
 
 import DataTable from './DataTable'
 
@@ -45,8 +46,8 @@ const DataTableImaging: React.FC<DataTableImagingProps> = ({
     { label: 'Description' },
     { label: 'Procédure' },
     { label: 'Nombre de séries' },
-    { label: "Nombre d'instances" },
     { label: 'Access number' },
+    { label: 'Unité exécutrice' },
     { label: 'Document' }
   ]
 
@@ -59,9 +60,7 @@ const DataTableImaging: React.FC<DataTableImagingProps> = ({
           })}
         </>
       ) : (
-        <TableRow
-        // className={classes.emptyTableRow}
-        >
+        <TableRow>
           <TableCellWrapper colSpan={10} align="left">
             <Grid container justifyContent="center">
               {loading ? <CircularProgress /> : <Typography variant="button">Aucun résultat à afficher</Typography>}
@@ -79,16 +78,18 @@ const DataTableImagingLine: React.FC<{
 }> = ({ deidentified, imagingItem }) => {
   const { classes } = useStyles()
   const [open, setOpen] = useState(false)
+  const [openDoc, setOpenDoc] = useState(false)
 
-  const nda = imagingItem.NDA
+  const nda = imagingItem.NDA ?? '-'
   const date = imagingItem.started ? new Date(imagingItem.started).toLocaleDateString('fr-FR') : 'Date inconnue'
-  const modality = imagingItem.modality?.map((modality) => modality.code).join(' / ')
-  const description = imagingItem.description
-  const procedure = imagingItem.procedureCode?.[0].coding?.[0].code
-  const nbSeries = imagingItem.numberOfSeries
-  const nbInstances = imagingItem.numberOfInstances
-  const accessNumber = imagingItem.identifier?.find((identifier) => identifier.system?.includes('accessNumber'))?.value
-  const doc = ''
+  const modality = imagingItem.modality?.map((modality) => modality.code).join(' / ') ?? '-'
+  const description = imagingItem.description ?? '-'
+  const procedure = imagingItem.procedureCode?.[0]?.coding?.[0]?.code ?? '-'
+  const nbSeries = imagingItem.numberOfSeries ?? '-'
+  const accessNumber =
+    imagingItem.identifier?.find((identifier) => identifier.system?.includes('accessNumber'))?.value ?? '-'
+  const documentId = imagingItem.extension?.find((extension) => extension.url.includes('docId'))?.valueString
+  const serviceProvider = imagingItem.serviceProvider
 
   return (
     <>
@@ -104,9 +105,20 @@ const DataTableImagingLine: React.FC<{
         <TableCellWrapper className={classes.libelle}>{description}</TableCellWrapper>
         <TableCellWrapper className={classes.libelle}>{procedure}</TableCellWrapper>
         <TableCellWrapper>{nbSeries}</TableCellWrapper>
-        <TableCellWrapper>{nbInstances}</TableCellWrapper>
         {!deidentified && <TableCellWrapper>{accessNumber}</TableCellWrapper>}
-        <TableCellWrapper>{doc}</TableCellWrapper>
+        <TableCellWrapper>{serviceProvider}</TableCellWrapper>
+        <TableCellWrapper>
+          <IconButton onClick={() => setOpenDoc(!!documentId)} disabled={!documentId}>
+            <Visibility height="30px" />
+          </IconButton>
+
+          <DocumentViewer
+            deidentified={deidentified ?? false}
+            open={openDoc}
+            handleClose={() => setOpenDoc(false)}
+            documentId={documentId ?? ''}
+          />
+        </TableCellWrapper>
       </TableRow>
       <TableRow>
         <TableCellWrapper colSpan={10} style={{ padding: 0, borderBottom: 0, backgroundColor: '#e6f1fd66' }}>
@@ -128,8 +140,12 @@ const InnerDataTableImaging: React.FC<{
     { label: 'Modalité' },
     { label: 'Description' },
     { label: 'Protocole' },
+    { label: "Nombre d'instances" },
     { label: 'Partie du corps' }
   ]
+
+  const series = imagingItem.series?.slice()
+  const sortedSeries = series?.sort((a, b) => (a.number ?? 0) - (b.number ?? 0))
 
   return (
     <Table size="small">
@@ -145,17 +161,18 @@ const InnerDataTableImaging: React.FC<{
           )}
         </TableRow>
       </TableHead>
-      <TableBody>
-        {imagingItem.series?.map((serie, index) => (
+      <TableBody style={{ backgroundColor: '#FFF' }}>
+        {sortedSeries?.map((serie) => (
           <TableRow key={serie.uid}>
-            <TableCellWrapper>{index + 1}</TableCellWrapper>
+            <TableCellWrapper>{serie.number ?? '-'}</TableCellWrapper>
             <TableCellWrapper>
               {serie.started ? new Date(serie.started).toLocaleDateString('fr-FR') : 'Date inconnue'}
             </TableCellWrapper>
-            <TableCellWrapper>{serie.modality.code}</TableCellWrapper>
-            <TableCellWrapper>{serie.description}</TableCellWrapper>
-            <TableCellWrapper>{'-'}</TableCellWrapper>
-            <TableCellWrapper>{serie.bodySite?.display}</TableCellWrapper>
+            <TableCellWrapper>{serie.modality?.code ?? '-'}</TableCellWrapper>
+            <TableCellWrapper>{serie.description ?? '-'}</TableCellWrapper>
+            <TableCellWrapper>{serie.extension?.[0].valueString ?? '-'}</TableCellWrapper>
+            <TableCellWrapper>{serie.numberOfInstances ?? '-'}</TableCellWrapper>
+            <TableCellWrapper>{serie.bodySite?.display ?? '-'}</TableCellWrapper>
           </TableRow>
         ))}
       </TableBody>
