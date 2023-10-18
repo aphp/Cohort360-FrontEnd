@@ -87,7 +87,8 @@ export enum FilterKeys {
   START_DATE = 'startDate',
   END_DATE = 'endDate',
   EXECUTIVE_UNITS = 'executiveUnits',
-  DOC_TYPES = 'docTypes'
+  DOC_TYPES = 'docTypes',
+  MODALITY = 'modality'
 }
 
 export enum OrderByKeys {
@@ -130,6 +131,7 @@ export type Filters =
   | BiologyFilters
   | PatientDocumentsFilters
   | AllDocumentsFilters
+  | ImagingFilters
 
 export interface PatientsFilters {
   genders: GenderStatus[]
@@ -170,6 +172,7 @@ export type ImagingFilters = {
   startDate: string | null
   endDate: string | null
   executiveUnits: ScopeTreeRow[]
+  modality: LabelObject[]
 }
 
 export type PatientDocumentsFilters = {

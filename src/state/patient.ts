@@ -370,6 +370,7 @@ const fetchImaging = createAsyncThunk<FetchImagingReturn, FetchImagingParams, { 
       const startDate = searchCriterias.filters.startDate
       const endDate = searchCriterias.filters.endDate
       const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
+      const modalities = searchCriterias.filters.modality.map(({ id }) => id).join(',') ?? ''
 
       const imagingResponse = await services.patients.fetchImaging(
         orderBy,
@@ -382,6 +383,7 @@ const fetchImaging = createAsyncThunk<FetchImagingReturn, FetchImagingParams, { 
         endDate,
         groupId,
         signal,
+        modalities,
         executiveUnits
       )
 

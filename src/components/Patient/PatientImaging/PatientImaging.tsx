@@ -1,21 +1,40 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { CanceledError } from 'axios'
+import { useAppDispatch, useAppSelector } from 'state'
+import { fetchImaging } from 'state/patient'
+import useSearchCriterias, { initImagingCriterias } from 'hooks/useSearchCriterias'
+import services from 'services/aphp'
 
 import { CircularProgress, Grid } from '@mui/material'
+import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
+
+import { BlockWrapper } from 'components/ui/Layout/styles'
+import Button from 'components/ui/Button/Button'
+import Chip from 'components/ui/Chips/Chip'
 import DataTableImaging from 'components/DataTable/DataTableImaging'
-import { PatientTypes } from 'types/patient'
-import { LoadingStatus } from 'types'
+import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilter'
 import DisplayDigits from 'components/ui/Display/DisplayDigits/DisplayDigits'
-import { useAppDispatch, useAppSelector } from 'state'
-import useSearchCriterias, { initImagingCriterias } from 'hooks/useSearchCriterias'
-import { selectFiltersAsArray } from 'utils/filters'
-import { fetchImaging } from 'state/patient'
-import { CanceledError } from 'axios'
+import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/ExecutiveUnitsFilter'
+import Modal from 'components/ui/Modal/Modal'
+import ModalityFilter from 'components/Filters/ModalityFilter/ModalityFilter'
+import NdaFilter from 'components/Filters/NdaFilter/NdaFilter'
+import Searchbar from 'components/ui/Searchbar/Searchbar'
+import SearchInput from 'components/ui/Searchbar/SearchInput'
+
 import { _cancelPendingRequest } from 'utils/abortController'
+import { selectFiltersAsArray } from 'utils/filters'
+import { CriteriaName, LoadingStatus } from 'types'
+import { PatientTypes } from 'types/patient'
+import { ActionTypes, FilterKeys } from 'types/searchCriterias'
 
 const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
+
   const { patient } = useAppSelector((state) => ({ patient: state.patient }))
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
+  const [toggleModal, setToggleModal] = useState(false)
+  const [modalitiesList, setModalitiesList] = useState([])
+
   const searchResults = {
     deidentified: patient?.deidentified || false,
     list: patient?.imaging?.list,
@@ -29,13 +48,14 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
     {
       orderBy,
       searchInput,
-      filters: { nda, startDate, endDate, executiveUnits }
+      filters,
+      filters: { nda, startDate, endDate, executiveUnits, modality }
     },
     dispatchSearchCriteriasAction
   ] = useSearchCriterias(initImagingCriterias)
   const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({ nda, startDate, endDate, executiveUnits })
-  }, [nda, startDate, endDate, executiveUnits])
+    return selectFiltersAsArray({ nda, startDate, endDate, executiveUnits, modality })
+  }, [nda, startDate, endDate, executiveUnits, modality])
 
   const controllerRef = useRef<AbortController | null>(null)
 
@@ -49,7 +69,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
             searchCriterias: {
               orderBy,
               searchInput,
-              filters: { nda, startDate, endDate, executiveUnits }
+              filters: { nda, startDate, endDate, executiveUnits, modality }
             }
           },
           groupId,
@@ -68,9 +88,23 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   }
 
   useEffect(() => {
+    const _fetchModalities = async () => {
+      try {
+        const _modalitiesList = await services.cohortCreation.fetchModalities()
+
+        setModalitiesList(_modalitiesList)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    _fetchModalities()
+  }, [])
+
+  useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [nda, startDate, endDate, executiveUnits, orderBy, searchInput])
+  }, [nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -85,12 +119,65 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
 
   return (
     <Grid container justifyContent="flex-end">
+      <BlockWrapper item xs={12} margin={'20px 0px 10px 0px'}>
+        <Searchbar>
+          <Grid container item xs={12} lg={3}>
+            {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && (
+              <CircularProgress />
+            )}
+            {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
+              <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label as string} />
+            )}
+          </Grid>
+
+          <Grid container item xs={12} lg={4} justifyContent="flex-end">
+            <SearchInput
+              value={searchInput}
+              placeholder={'Rechercher'}
+              width="70%"
+              onchange={(newValue: string) =>
+                dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })
+              }
+            />
+            <Button width={'30%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
+              Filtrer
+            </Button>
+            <Modal
+              title="Filtrer par :"
+              open={toggleModal}
+              width={'600px'}
+              onClose={() => setToggleModal(false)}
+              onSubmit={(newFilters) => {
+                dispatchSearchCriteriasAction({ type: ActionTypes.ADD_FILTERS, payload: { ...filters, ...newFilters } })
+              }}
+            >
+              {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+              <ModalityFilter value={modality} name={FilterKeys.MODALITY} modalitiesList={modalitiesList} />
+              <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
+              <ExecutiveUnitsFilter
+                value={executiveUnits}
+                name={FilterKeys.EXECUTIVE_UNITS}
+                criteriaName={CriteriaName.Imaging}
+              />
+            </Modal>
+          </Grid>
+        </Searchbar>
+      </BlockWrapper>
       <Grid item xs={12}>
-        {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && <CircularProgress />}
-        {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
-          <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label as string} />
-        )}
+        {filtersAsArray.map((filter, index) => (
+          <Chip
+            key={index}
+            label={filter.label}
+            onDelete={() => {
+              dispatchSearchCriteriasAction({
+                type: ActionTypes.REMOVE_FILTER,
+                payload: { key: filter.category, value: filter.value }
+              })
+            }}
+          />
+        ))}
       </Grid>
+
       <Grid item xs={12}>
         <DataTableImaging
           loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
