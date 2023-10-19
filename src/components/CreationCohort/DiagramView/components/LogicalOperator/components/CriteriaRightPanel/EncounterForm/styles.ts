@@ -49,11 +49,6 @@ const useStyles = makeStyles()(() => ({
     fontWeight: 600,
     fontSize: 12,
     paddingBottom: 10
-  },
-  textField: {
-    '& input': {
-      padding: '2px 4px 3px 0'
-    }
   }
 }))
 

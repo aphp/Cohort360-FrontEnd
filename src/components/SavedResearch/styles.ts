@@ -30,13 +30,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     borderRadius: '25px',
     marginLeft: 8
   },
-  chips: {
-    marginRight: '6px',
-    marginBottom: '12px',
-    '&:last-child': {
-      marginRight: 0
-    }
-  },
   pagination: {
     float: 'right',
     '& button': {

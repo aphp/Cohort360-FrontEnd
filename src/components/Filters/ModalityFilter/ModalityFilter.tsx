@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Autocomplete, TextField, Typography } from '@mui/material'
-import { FormContext } from 'components/ui/Modal/Modal'
+import { FormContext } from 'components/ui/Modal'
 import { LabelObject } from 'types/searchCriterias'
-import { InputWrapper } from 'components/ui/Inputs/styles'
+import { InputWrapper } from 'components/ui/Inputs'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 type ModalityFilterProps = {

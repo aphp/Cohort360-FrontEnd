@@ -15,13 +15,6 @@ const useStyles = makeStyles()(() => ({
   root: {
     width: '100%'
   },
-  head: {
-    background: 'rgb(209, 226, 244)',
-    color: 'rgb(0, 99, 175)',
-    fontSize: 11,
-    fontWeight: 'bold',
-    textTransform: 'uppercase'
-  },
   visuallyHidden: {
     border: 0,
     clip: 'rect(0 0 0 0)',

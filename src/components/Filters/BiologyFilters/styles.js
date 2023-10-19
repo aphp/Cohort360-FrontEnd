@@ -4,9 +4,6 @@ const useStyles = makeStyles()(() => ({
   dialog: {
     width: '600px'
   },
-  filter: {
-    marginBottom: '24px'
-  },
   datePickers: {
     margin: '1em 0 1em 1em'
   },
@@ -22,9 +19,6 @@ const useStyles = makeStyles()(() => ({
     minWidth: 34,
     width: 34,
     maxWidth: 34
-  },
-  buttonLabel: {
-    display: 'inline'
   }
 }))
 

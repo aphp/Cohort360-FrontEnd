@@ -2,30 +2,30 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { CanceledError } from 'axios'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchImaging } from 'state/patient'
-import useSearchCriterias, { initImagingCriterias } from 'hooks/useSearchCriterias'
 import services from 'services/aphp'
+import useSearchCriterias, { initImagingCriterias } from 'reducers/searchCriteriasReducer'
 
 import { CircularProgress, Grid } from '@mui/material'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import { BlockWrapper } from 'components/ui/Layout/styles'
-import Button from 'components/ui/Button/Button'
-import Chip from 'components/ui/Chips/Chip'
+import Button from 'components/ui/Button'
+import Chip from 'components/ui/Chip/'
 import DataTableImaging from 'components/DataTable/DataTableImaging'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilter'
-import DisplayDigits from 'components/ui/Display/DisplayDigits/DisplayDigits'
+import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/ExecutiveUnitsFilter'
-import Modal from 'components/ui/Modal/Modal'
+import Modal from 'components/ui/Modal'
 import ModalityFilter from 'components/Filters/ModalityFilter/ModalityFilter'
 import NdaFilter from 'components/Filters/NdaFilter/NdaFilter'
-import Searchbar from 'components/ui/Searchbar/Searchbar'
+import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 
 import { _cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { CriteriaName, LoadingStatus } from 'types'
 import { PatientTypes } from 'types/patient'
-import { ActionTypes, FilterKeys } from 'types/searchCriterias'
+import { FilterKeys } from 'types/searchCriterias'
 
 const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
@@ -51,7 +51,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
       filters,
       filters: { nda, startDate, endDate, executiveUnits, modality }
     },
-    dispatchSearchCriteriasAction
+    { changeSearchInput, addFilters, removeFilter }
   ] = useSearchCriterias(initImagingCriterias)
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ nda, startDate, endDate, executiveUnits, modality })
@@ -135,9 +135,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
               value={searchInput}
               placeholder={'Rechercher'}
               width="70%"
-              onchange={(newValue: string) =>
-                dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })
-              }
+              onchange={(newValue: string) => changeSearchInput(newValue)}
             />
             <Button width={'30%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
               Filtrer
@@ -147,9 +145,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
               open={toggleModal}
               width={'600px'}
               onClose={() => setToggleModal(false)}
-              onSubmit={(newFilters) => {
-                dispatchSearchCriteriasAction({ type: ActionTypes.ADD_FILTERS, payload: { ...filters, ...newFilters } })
-              }}
+              onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
             >
               {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
               <ModalityFilter value={modality} name={FilterKeys.MODALITY} modalitiesList={modalitiesList} />
@@ -165,16 +161,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
       </BlockWrapper>
       <Grid item xs={12}>
         {filtersAsArray.map((filter, index) => (
-          <Chip
-            key={index}
-            label={filter.label}
-            onDelete={() => {
-              dispatchSearchCriteriasAction({
-                type: ActionTypes.REMOVE_FILTER,
-                payload: { key: filter.category, value: filter.value }
-              })
-            }}
-          />
+          <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
         ))}
       </Grid>
 

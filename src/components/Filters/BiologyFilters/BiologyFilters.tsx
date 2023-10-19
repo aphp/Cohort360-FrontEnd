@@ -97,7 +97,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
       <DialogTitle>Filtrer par :</DialogTitle>
       <DialogContent className={classes.dialog}>
         {!deidentified && (
-          <Grid container direction="column" className={classes.filter}>
+          <Grid container direction="column" marginBottom={3}>
             <Typography variant="h3">NDA :</Typography>
             <TextField
               margin="normal"
@@ -110,7 +110,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
           </Grid>
         )}
 
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column" marginBottom={3}>
           <Typography variant="h3">Code ANABIO :</Typography>
           <TextField
             margin="normal"
@@ -122,7 +122,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
           />
         </Grid>
 
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column" marginBottom={3}>
           <Typography variant="h3">Code LOINC :</Typography>
           <TextField
             margin="normal"

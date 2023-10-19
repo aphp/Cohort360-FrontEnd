@@ -218,15 +218,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                                 <Chip className={classes.perimetersChip} label={perimeter} />
                               </ListItem>
                             ))}
-                          <IconButton
-                            size="small"
-                            classes={
-                              {
-                                /*label: classes.populationLabel*/
-                              }
-                            }
-                            onClick={() => onExtend(false)}
-                          >
+                          <IconButton size="small" onClick={() => onExtend(false)}>
                             <CloseIcon />
                           </IconButton>
                         </>
@@ -239,15 +231,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                               </ListItem>
                             ))}
                           {cohort.perimeters && cohort.perimeters.length > 4 && (
-                            <IconButton
-                              size="small"
-                              classes={
-                                {
-                                  /*label: classes.populationLabel*/
-                                }
-                              }
-                              onClick={() => onExtend(true)}
-                            >
+                            <IconButton size="small" onClick={() => onExtend(true)}>
                               <MoreHorizIcon />
                             </IconButton>
                           )}

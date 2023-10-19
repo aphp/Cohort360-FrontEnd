@@ -26,7 +26,7 @@ import { CriteriaName, DocumentFilters, ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
 import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
-import InputCalendar from 'components/Inputs/InputCalendar/InputCalendar'
+import CalendarRange from 'components/ui/Inputs/CalendarRange'
 
 type DocumentFiltersProps = {
   open: boolean
@@ -108,7 +108,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Filtrer par :</DialogTitle>
       <DialogContent className={classes.dialog}>
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column" marginBottom={3}>
           <Typography variant="h3">Type de documents :</Typography>
           <Autocomplete
             multiple
@@ -163,7 +163,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
           />
         </Grid>
         {!deidentified && (
-          <Grid container direction="column" className={classes.filter}>
+          <Grid container direction="column" marginBottom={3}>
             <Typography variant="h3">NDA :</Typography>
             <TextField
               margin="normal"
@@ -176,7 +176,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
           </Grid>
         )}
         {!deidentified && showIpp && (
-          <Grid container direction="column" className={classes.filter}>
+          <Grid container direction="column" marginBottom={3}>
             <Typography variant="h3">IPP :</Typography>
             <TextField
               margin="normal"
@@ -191,11 +191,11 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
         <Grid container direction="column">
           <Typography variant="h3">Date :</Typography>
           <Grid container alignItems="center" className={classes.datePickers}>
-            <InputCalendar label="Après le :" date={_startDate} error={dateError} onclick={setStartDate} />
+            <CalendarRange label="Après le :" date={_startDate} error={dateError} onclick={setStartDate} />
           </Grid>
 
           <Grid container alignItems="center" className={classes.datePickers}>
-            <InputCalendar label="Avant le :" date={_endDate} error={dateError} onclick={setEndDate} />
+            <CalendarRange label="Avant le :" date={_endDate} error={dateError} onclick={setEndDate} />
           </Grid>
           <FormLabel style={{ padding: '1em 1em 0 1em', display: 'flex', alignItems: 'center' }} component="legend">
             Unité exécutrice

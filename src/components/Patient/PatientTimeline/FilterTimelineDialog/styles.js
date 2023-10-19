@@ -6,9 +6,6 @@ const useStyles = makeStyles()(() => ({
   },
   autocomplete: {
     marginTop: '16px'
-  },
-  buttonLabel: {
-    display: 'inline'
   }
 }))
 

@@ -128,7 +128,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Filtrer par :</DialogTitle>
       <DialogContent className={classes.dialog}>
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column" marginBottom={3}>
           <Typography variant="h3">Statut :</Typography>
           <Autocomplete
             multiple
@@ -143,7 +143,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
           />
         </Grid>
 
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column" marginBottom={3}>
           <Typography variant="h3">Favoris :</Typography>
           <RadioGroup name="favorite" value={_favorite} onChange={_onChangeFavorite} row={true}>
             <FormControlLabel value="all" control={<Radio color="secondary" />} label="Toutes les cohortes" />
@@ -152,7 +152,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
           </RadioGroup>
         </Grid>
 
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column" marginBottom={3}>
           <Typography variant="h3">Nombre de patients :</Typography>
           <Grid container alignItems="baseline" className={classes.datePickers}>
             <FormLabel component="legend" className={classes.label}>

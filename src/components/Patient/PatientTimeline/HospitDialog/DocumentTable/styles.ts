@@ -1,7 +1,6 @@
 import { makeStyles } from 'tss-react/mui'
-import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles()((theme: Theme) => ({
+const useStyles = makeStyles()(() => ({
   table: {
     minWidth: 650
   },
@@ -22,16 +21,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
       backgroundColor: '#FAF9F9'
     }
   },
-  iconSize: {
-    fontSize: '30px'
-  },
-  searchIcon: {
-    padding: 0,
-    marginLeft: 4
-  },
-  iconMargin: {
-    margin: `0 ${theme.spacing(1)}`
-  },
   description: {
     fontWeight: 'bold'
   },
@@ -48,14 +37,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     width: 95,
     color: '#FFF',
     fontWeight: 'bold'
-  },
-  loadingDialog: {
-    position: 'absolute',
-    left: '50%'
-  },
-  dialogContent: {
-    minWidth: 650,
-    minHeight: 45
   }
 }))
 

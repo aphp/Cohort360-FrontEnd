@@ -180,11 +180,7 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
                         )
                       )}
                   {selectionAndPopulationWithRightError && selectionAndPopulationWithRightError.length > 4 && (
-                    <IconButton
-                      size="small"
-                      /*classes={{ label: classes.populationLabel }}*/
-                      onClick={() => onExtend(true)}
-                    >
+                    <IconButton size="small" onClick={() => onExtend(true)}>
                       <MoreHorizIcon />
                     </IconButton>
                   )}
