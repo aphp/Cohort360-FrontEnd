@@ -289,7 +289,7 @@ export const fetchDocumentReference = async (
   if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
-  if (type) options = [...options, `type=${type}`] // eslint-disable-line
+  if (type) options = [...options, `type-name=${type}`] // eslint-disable-line
   if (_text)
     options = [...options, `${searchBy === SearchByTypes.text ? `_text` : 'description'}=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (highlight_search_results)
