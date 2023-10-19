@@ -3,11 +3,14 @@ import { useAppSelector } from 'state'
 
 import { CssBaseline, Grid, Typography } from '@mui/material'
 
-import Research from 'components/SavedResearch/ResearchCard'
-
 import useStyles from './styles'
+import CohortsList from 'components/CohortsList'
 
-const SavedResearches = () => {
+type MyCohortsProps = {
+  favoriteUrl?: boolean
+}
+
+const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
   const { classes, cx } = useStyles()
   const open = useAppSelector((state) => state.drawer)
 
@@ -22,15 +25,23 @@ const SavedResearches = () => {
       <Grid container justifyContent="center" alignItems="center">
         <CssBaseline />
         <Grid container item xs={11}>
-          <Typography id="cohortSaved-title" variant="h1" color="primary" className={classes.title}>
-            Mes cohortes
-          </Typography>
+          <Grid item xs={12} margin="60px 0">
+            <Typography
+              id="cohortSaved-title"
+              variant="h1"
+              color="primary"
+              padding="20px 0"
+              borderBottom="1px solid #D0D7D8"
+            >
+              Mes cohortes
+            </Typography>
+          </Grid>
 
-          <Research />
+          <CohortsList favoriteUrl={favoriteUrl} />
         </Grid>
       </Grid>
     </Grid>
   )
 }
 
-export default SavedResearches
+export default MyCohorts

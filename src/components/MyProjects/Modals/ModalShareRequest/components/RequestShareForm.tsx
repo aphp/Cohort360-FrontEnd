@@ -2,18 +2,19 @@ import React, { useState, useEffect, Fragment, PropsWithChildren } from 'react'
 
 import { Autocomplete, CircularProgress, Grid, TextField, Typography } from '@mui/material'
 
-import { RequestType, Provider, Order } from 'types'
+import { RequestType, Provider } from 'types'
 
 import { getProviders } from 'services/aphp/serviceProviders'
 
 import ProvidersTable from './providersTable'
 import useStyles from '../styles'
 import { useDebounce } from 'utils/debounce'
+import { Direction, Order, OrderBy } from 'types/searchCriterias'
 
 const ERROR_TITLE = 'error_title'
 const ERROR_USER_SHARE_LIST = 'error_user_share_list'
 
-const orderDefault = { orderBy: 'lastname', orderDirection: 'asc' } as Order
+const orderDefault: OrderBy = { orderBy: Order.LASTNAME, orderDirection: Direction.ASC }
 
 type RequestShareFormProps = {
   currentRequest: RequestType | undefined

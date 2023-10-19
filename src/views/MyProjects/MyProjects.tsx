@@ -80,7 +80,13 @@ const MyProjects: React.FC<{}> = () => {
   }
 
   const _fetchCohortsList = async () => {
-    dispatch(fetchCohortsList({ limit: 100 }))
+    dispatch(
+      fetchCohortsList({
+        options: {
+          limit: 100
+        }
+      })
+    )
   }
 
   const _fetch = async () => {

@@ -1,10 +1,12 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
-import { Cohort, CohortFilters, Sort } from 'types'
+import { Cohort } from 'types'
 
 import { logout, login } from './me'
 import services from 'services/aphp'
 import { JobStatus } from '../utils/constants'
+import { CohortsFilters, Direction, Order, OrderBy, SearchCriterias } from 'types/searchCriterias'
+import { CohortsType } from 'types/cohorts'
 
 export type CohortState = {
   loading: boolean
@@ -33,35 +35,39 @@ type FetchCohortListReturn = {
 }
 
 type FetchCohortsParams = {
-  listType?: 'AllCohorts' | 'FavoriteCohorts' | 'LastCohorts'
-  sort?: Sort
-  filters?: CohortFilters
-  searchInput?: string
-  limit?: number
-  page?: number
+  options?: {
+    page?: number
+    limit?: number
+    searchCriterias?: SearchCriterias<CohortsFilters | null>
+  }
+  signal?: AbortSignal
 }
 
 const fetchCohorts = createAsyncThunk<FetchCohortListReturn, FetchCohortsParams, { state: RootState }>(
   'cohort/fetchCohorts',
-  async ({ listType = 'AllCohorts', sort, filters, searchInput = '', limit = 20, page = 1 }, { dispatch }) => {
+  async ({ options, signal }, { dispatch }) => {
     try {
-      const _sort: Sort = sort ? sort : { sortBy: 'modified_at', sortDirection: 'desc' }
-      const _filters = filters
-        ? filters
-        : {
-            status: [],
-            favorite: 'all',
-            minPatients: null,
-            maxPatients: null,
-            startDate: null,
-            endDate: null
-          }
+      const cohortsType = options?.searchCriterias?.filters?.favorite || CohortsType.ALL
+      const orderBy = options?.searchCriterias?.orderBy || {
+        orderBy: Order.MODIFIED,
+        orderDirection: Direction.DESC
+      }
+      const filters = options?.searchCriterias?.filters || {
+        status: [],
+        favorite: cohortsType,
+        minPatients: null,
+        maxPatients: null,
+        startDate: null,
+        endDate: null
+      }
+      const limit = options?.limit || 0
+      const offset = ((options?.page ?? 1) - 1) * limit
+      const searchInput = options?.searchCriterias?.searchInput || ''
 
-      const offset = ((page ?? 1) - 1) * limit ?? 0
+      const cohorts =
+        (await services.projects.fetchCohortsList(filters, searchInput, orderBy, limit, offset, signal)) || {}
 
-      const cohorts = (await services.projects.fetchCohortsList(_filters, searchInput, _sort, limit, offset)) || {}
-
-      const cohortList: Cohort[] = cohorts.results || []
+      const cohortsList: Cohort[] = cohorts.results || []
 
       const forceRefresh = cohorts?.results?.some(
         (cohortList) =>
@@ -72,23 +78,22 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, FetchCohortsParams,
       if (forceRefresh) {
         dispatch(
           fetchCohortInBackGround({
-            listType,
-            oldCohortsList: cohortList,
-            filters: _filters,
+            cohortsType: cohortsType,
+            oldCohortsList: cohortsList,
+            filters: filters,
             searchInput: searchInput,
-            sort: _sort,
+            sort: orderBy,
             limit: limit,
             offset: offset
           })
         )
       }
-
       return {
-        ...(listType === 'AllCohorts' && { cohortsList: cohortList }),
-        ...(listType === 'FavoriteCohorts' && { favoriteCohortsList: cohortList }),
-        ...(listType === 'LastCohorts' && { lastCohorts: cohortList }),
         count: cohorts.count,
-        selectedCohort: null
+        selectedCohort: null,
+        ...(cohortsType === CohortsType.ALL && { cohortsList: cohortsList }),
+        ...(cohortsType === CohortsType.FAVORITE && { favoriteCohortsList: cohortsList }),
+        ...(cohortsType === CohortsType.LAST && { lastCohorts: cohortsList })
       }
     } catch (error) {
       console.error(error)
@@ -100,11 +105,11 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, FetchCohortsParams,
 const sleep = (m: any) => new Promise((r: any) => setTimeout(r, m))
 
 type FetchCohortInBackGroundParams = {
-  listType?: 'AllCohorts' | 'FavoriteCohorts' | 'LastCohorts'
+  cohortsType?: CohortsType
   oldCohortsList: Cohort[]
-  filters: CohortFilters
+  filters: CohortsFilters
   searchInput: string
-  sort: Sort
+  sort: OrderBy
   limit: number
   offset: number
 }
@@ -114,7 +119,7 @@ const fetchCohortInBackGround = createAsyncThunk<
   { state: RootState }
 >(
   'cohort/fetchCohortInBackGround',
-  async ({ listType = 'AllCohorts', oldCohortsList, filters, searchInput, sort, limit, offset }) => {
+  async ({ cohortsType = CohortsType.ALL, oldCohortsList, filters, searchInput, sort, limit, offset }) => {
     try {
       let count = 0
       let cohortsList = oldCohortsList
@@ -136,9 +141,9 @@ const fetchCohortInBackGround = createAsyncThunk<
 
       return {
         count,
-        ...(listType === 'AllCohorts' && { cohortsList: cohortsList }),
-        ...(listType === 'FavoriteCohorts' && { favoriteCohortsList: cohortsList }),
-        ...(listType === 'LastCohorts' && { lastCohorts: cohortsList })
+        ...(cohortsType === CohortsType.ALL && { cohortsList: cohortsList }),
+        ...(cohortsType === CohortsType.FAVORITE && { favoriteCohortsList: cohortsList }),
+        ...(cohortsType === CohortsType.LAST && { lastCohorts: cohortsList })
       }
     } catch (error) {
       console.error(error)

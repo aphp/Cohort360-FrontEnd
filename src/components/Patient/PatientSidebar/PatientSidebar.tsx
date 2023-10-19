@@ -202,7 +202,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
             >
               <Grid container direction="row" justifyContent="space-between" alignItems="center">
                 <OrderByFilter
-                  orderByValue={orderBy.orderBy || Order.LASTNAME}
+                  orderByValue={orderBy.orderBy || Order.FAMILY}
                   name={OrderByKeys.ORDER_BY}
                   items={deidentifiedBoolean ? orderByListPatientsDeidentified : orderByListPatients}
                 />

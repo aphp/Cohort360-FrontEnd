@@ -19,12 +19,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
     })
-  },
-  title: {
-    paddingTop: '80px',
-    paddingBottom: '20px',
-    width: '100%',
-    borderBottom: '1px solid #D0D7D8'
   }
 }))
 

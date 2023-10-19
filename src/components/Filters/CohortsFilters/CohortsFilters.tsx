@@ -24,15 +24,16 @@ import {
 
 import ClearIcon from '@mui/icons-material/Clear'
 
-import { CohortFilters, ValueSet } from 'types'
+import { ValueSet } from 'types'
 
 import useStyles from './styles'
+import { CohortsFilters } from 'types/searchCriterias'
 
 type CohortsFiltersProps = {
   open: boolean
   onClose: () => void
-  filters: CohortFilters
-  onChangeFilters: (filters: CohortFilters) => void
+  filters: CohortsFilters
+  onChangeFilters: (filters: CohortsFilters) => void
 }
 const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters, onChangeFilters }) => {
   const { classes } = useStyles()

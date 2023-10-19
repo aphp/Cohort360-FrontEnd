@@ -47,7 +47,7 @@ import { MeState } from 'state/me'
 
 import { RequestType, SimpleStatus } from 'types'
 
-import useStyles from './styles'
+import useStyles from '../../CohortsList/ResearchTable/styles'
 
 type RequestsTableProps = {
   simplified?: boolean

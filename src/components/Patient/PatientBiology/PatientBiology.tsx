@@ -26,9 +26,9 @@ import LoincFilter from 'components/Filters/LoincFilter/LoincFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/ExecutiveUnitsFilter'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilter'
 import { BlockWrapper } from 'components/ui/Layout'
-import { AlertWrapper } from 'components/ui/Alert'
 import useSearchCriterias, { initBioSearchCriterias } from 'reducers/searchCriteriasReducer'
 import Chip from 'components/ui/Chip'
+import { AlertWrapper } from 'components/ui/Alert'
 
 type PatientBiologyProps = {
   groupId?: string

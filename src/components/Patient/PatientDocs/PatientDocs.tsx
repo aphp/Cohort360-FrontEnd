@@ -21,7 +21,6 @@ import Modal from 'components/ui/Modal'
 import Button from 'components/ui/Button'
 import NdaFilter from 'components/Filters/NdaFilter/NdaFilter'
 import Searchbar from 'components/ui/Searchbar'
-import Chip from 'components/ui/Chip'
 import { selectFiltersAsArray } from 'utils/filters'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Select from 'components/ui/Searchbar/Select'
@@ -32,6 +31,7 @@ import { AlertWrapper } from 'components/ui/Alert'
 import { BlockWrapper } from 'components/ui/Layout'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import useSearchCriterias, { initPatientDocsSearchCriterias } from 'reducers/searchCriteriasReducer'
+import Chip from 'components/ui/Chip'
 
 const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()

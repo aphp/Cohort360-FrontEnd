@@ -17,10 +17,27 @@ import {
   FilterKeys,
   FilterValue
 } from 'types/searchCriterias'
+import { CohortsType } from 'types/cohorts'
+
+export const initCohortsSearchCriterias = {
+  orderBy: {
+    orderBy: Order.MODIFIED,
+    orderDirection: Direction.DESC
+  },
+  searchInput: '',
+  filters: {
+    status: [],
+    startDate: null,
+    endDate: null,
+    favorite: CohortsType.ALL,
+    minPatients: null,
+    maxPatients: null
+  }
+}
 
 export const initSearchPatientsSearchCriterias: SearchCriterias<null> = {
   orderBy: {
-    orderBy: Order.LASTNAME,
+    orderBy: Order.FAMILY,
     orderDirection: Direction.ASC
   },
   searchInput: '',

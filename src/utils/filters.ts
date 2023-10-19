@@ -6,13 +6,25 @@ import {
   GenderStatus,
   GenderStatusLabel,
   LabelObject,
-  VitalStatus,
   VitalStatusLabel
 } from 'types/searchCriterias'
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
 import { ScopeTreeRow, SimpleCodeType } from 'types'
 import { getDurationRangeLabel } from './age'
+import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
+
+export const getCohortsTypeLabel = (type: CohortsType): string => {
+  switch (type) {
+    case CohortsType.FAVORITE:
+      return CohortsTypeLabel.FAVORITE
+    case CohortsType.LAST:
+      return CohortsTypeLabel.LAST
+    case CohortsType.NOT_FAVORITE:
+      return CohortsTypeLabel.NOT_FAVORITE
+  }
+  return CohortsTypeLabel.ALL
+}
 
 export const isChecked = <T>(value: T, arr: T[]): boolean => {
   return arr.includes(value)
@@ -58,12 +70,18 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.END_DATE:
         castedFilters[key] = null
         break
+      case FilterKeys.FAVORITE:
+        castedFilters[key] = CohortsType.ALL
+        break
     }
   }
   return castedFilters
 }
 
 export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
+  if (key === FilterKeys.FAVORITE) {
+    return getCohortsTypeLabel(value as CohortsType)
+  }
   if (key === FilterKeys.BIRTHDATES) {
     return getDurationRangeLabel(value as DurationRangeType, 'Âge')
   }
@@ -131,6 +149,8 @@ export const selectFiltersAsArray = (filters: Filters) => {
           )
           break
         case FilterKeys.BIRTHDATES:
+        case FilterKeys.START_DATE:
+        case FilterKeys.END_DATE:
           if (value[0] || value[1]) {
             result.push({
               category: key,
@@ -138,14 +158,6 @@ export const selectFiltersAsArray = (filters: Filters) => {
               value: value as FilterValue
             })
           }
-          break
-        case FilterKeys.START_DATE:
-        case FilterKeys.END_DATE:
-          result.push({
-            category: key,
-            label: getFilterLabel(key, value),
-            value: value as FilterValue
-          })
           break
         case FilterKeys.NDA:
         case FilterKeys.CODE:
@@ -160,6 +172,14 @@ export const selectFiltersAsArray = (filters: Filters) => {
             })
           )
           break
+        case FilterKeys.FAVORITE:
+          if (value !== CohortsType.ALL) {
+            result.push({
+              category: key,
+              label: getFilterLabel(key, value),
+              value: value as FilterValue
+            })
+          }
       }
     }
   }

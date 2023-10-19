@@ -1,5 +1,6 @@
-import { ScopeTreeRow, SimpleCodeType } from 'types'
+import { ScopeTreeRow, SimpleCodeType, ValueSet } from 'types'
 import { PatientTableLabels } from './patient'
+import { CohortsType } from './cohorts'
 
 export enum GenderStatus {
   MALE = 'MALE',
@@ -51,6 +52,8 @@ export enum DirectionLabel {
 }
 export enum Order {
   CODE = 'code',
+  RESULT_SIZE = 'result_size',
+  FAVORITE = 'favorite',
   RECORDED_DATE = 'recorded-date',
   FAMILY = 'family',
   DATE = 'date',
@@ -63,10 +66,12 @@ export enum Order {
   TYPE = 'type-name',
   GENDER = 'gender',
   FIRSTNAME = 'name',
-  LASTNAME = 'family',
+  LASTNAME = 'lastname',
   BIRTHDATE = 'birthdate',
   IPP = 'identifier',
-  ID = 'id'
+  ID = 'id',
+  MODIFIED = 'modified_at',
+  NAME = 'name'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -101,7 +106,8 @@ export enum FilterKeys {
   START_DATE = 'startDate',
   END_DATE = 'endDate',
   EXECUTIVE_UNITS = 'executiveUnits',
-  DOC_TYPES = 'docTypes'
+  DOC_TYPES = 'docTypes',
+  FAVORITE = 'favorite'
 }
 
 export enum OrderByKeys {
@@ -144,6 +150,7 @@ export type Filters =
   | BiologyFilters
   | PatientDocumentsFilters
   | AllDocumentsFilters
+  | CohortsFilters
 
 export interface PatientsFilters {
   genders: GenderStatus[]
@@ -196,6 +203,14 @@ export type AllDocumentsFilters = {
   startDate: string | null
   endDate: string | null
   executiveUnits: ScopeTreeRow[]
+}
+export type CohortsFilters = {
+  status: ValueSet[]
+  favorite: CohortsType
+  minPatients: null | string
+  maxPatients: null | string
+  startDate: null | string
+  endDate: null | string
 }
 
 export type SearchCriterias<F> = {
@@ -266,7 +281,7 @@ export const orderByListPatients = [
     label: PatientTableLabels.FIRSTNAME
   },
   {
-    id: Order.LASTNAME,
+    id: Order.FAMILY,
     label: PatientTableLabels.LASTNAME
   },
   {

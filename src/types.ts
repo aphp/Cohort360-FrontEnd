@@ -154,15 +154,6 @@ export type MedicationEntry<T extends MedicationRequest | MedicationAdministrati
   NDA?: string
 }
 
-export type CohortFilters = {
-  status: ValueSet[]
-  favorite: string
-  minPatients: null | string
-  maxPatients: null | string
-  startDate: null | string
-  endDate: null | string
-}
-
 export type SimpleCodeType = { code: string; label: string; type: string }
 
 type GenericFilter = {

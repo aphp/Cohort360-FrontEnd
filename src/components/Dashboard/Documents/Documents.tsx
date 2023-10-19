@@ -20,10 +20,10 @@ import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import IppFilter from 'components/Filters/IppFilter/IppFilter'
 import { selectFiltersAsArray } from 'utils/filters'
 import Chip from 'components/ui/Chip'
-import { AlertWrapper } from 'components/ui/Alert'
 import { _cancelPendingRequest } from 'utils/abortController'
 import { BlockWrapper } from 'components/ui/Layout'
 import useSearchCriterias, { initAllDocsSearchCriterias } from 'reducers/searchCriteriasReducer'
+import { AlertWrapper } from 'components/ui/Alert'
 
 type DocumentsProps = {
   groupId?: string

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Grid } from '@mui/material'
 import { DurationUnitWrapper, DurationLegendWrapper, TextFieldWrapper } from './styles'
 import { DurationType, CalendarRequestLabel } from 'types/dates'
-import { BlockWrapper } from 'components/ui/Layout/styles'
+import { BlockWrapper } from 'components/ui/Layout'
 
 type DurationProps = {
   value: DurationType
