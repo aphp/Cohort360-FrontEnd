@@ -80,7 +80,7 @@ export const updateRootRows = async (
   parents: ScopeTreeRow[],
   isOnlyParentsUpdate?: boolean
 ) => {
-  for (let i = 0; i < newRootRows.length; i++) {
+  for (let i = 0; i < newRootRows.length - 1; i++) {
     if (isOnlyParentsUpdate) {
       const isParent: boolean = parents.map((parent) => parent.id).includes(newRootRows[i].id)
       if (!isParent) continue
