@@ -51,7 +51,7 @@ const Index = (props: ScopeTreeExplorationProps) => {
   }>((state) => ({
     scopeState: state.scope || {}
   }))
-  const isExecutiveUnit: boolean = !!executiveUnitType
+  const isExecutiveUnit: boolean = !!executiveUnitType ?? false
   const scopesList: ScopeTreeRow[] = getCurrentScopeList(scopeState.scopesList, isExecutiveUnit) ?? []
   const [rootRows, setRootRows] = useState<ScopeTreeRow[]>(scopesList)
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false)

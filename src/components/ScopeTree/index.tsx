@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useAppSelector } from 'state'
 import { ScopeState } from 'state/scope'
 import { ScopeTreeRow, ScopeType } from 'types'
@@ -61,7 +61,7 @@ const Index = (props: ScopeTreeProps) => {
   }>((state) => ({
     scopeState: state.scope || {}
   }))
-  const isExecutiveUnit: boolean = !!executiveUnitType
+  const isExecutiveUnit: boolean = !!executiveUnitType ?? false
   const scopesList: ScopeTreeRow[] = getCurrentScopeList(scopeState.scopesList, isExecutiveUnit) ?? []
   const [searchInput, setSearchInput] = useState('')
   const [searchSavedRootRows, setSearchSavedRootRows] = useState<ScopeTreeRow[]>([...scopesList])

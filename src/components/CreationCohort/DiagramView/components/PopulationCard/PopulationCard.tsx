@@ -53,7 +53,7 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
 
   const maintenanceIsActive = meState?.maintenance?.active
 
-  const isExecutiveUnit: boolean = !!(form ? (scopeTypes.criteriaType[form] as ScopeType) : undefined)
+  const isExecutiveUnit: boolean = !!(form ? (scopeTypes.criteriaType[form] as ScopeType) : undefined) ?? false
   const scopesList = getCurrentScopeList(scopeState.scopesList, isExecutiveUnit) ?? []
   const loading = requestState.loading || scopeState.loading
 
