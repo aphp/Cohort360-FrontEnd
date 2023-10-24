@@ -254,6 +254,7 @@ export const findEquivalentRowInItemAndSubItems: (
       equivalentRow = row
       break
     } else {
+      if (row?.inferior_levels_ids && !row?.inferior_levels_ids.split(',').includes(item.id)) break
       const { equivalentRow: lastNode, parentsList: newParentsList } = findEquivalentRowInItemAndSubItems(
         item,
         row.subItems

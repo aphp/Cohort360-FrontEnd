@@ -510,15 +510,15 @@ const servicesPerimeters: IServicePerimeters = {
 
   buildScopeTreeRowItem: (scopeElement: ScopeElement) => {
     const scopeRowItem: ScopeTreeRow = { id: '', name: '', quantity: 0, subItems: [LOADING] }
-    scopeRowItem.id = '' + scopeElement.id
-    scopeRowItem.cohort_id = scopeElement.cohort_id
+    scopeRowItem.id = scopeElement.id?.toString()
+    scopeRowItem.cohort_id = scopeElement.cohort_id?.replace('/ /g', '')
     scopeRowItem.name = servicesPerimeters.getScopeName(scopeElement)
     scopeRowItem.full_path = scopeElement.full_path
     scopeRowItem.quantity = +scopeElement.cohort_size
-    scopeRowItem.above_levels_ids = scopeElement.above_levels_ids
-    scopeRowItem.inferior_levels_ids = scopeElement.inferior_levels_ids
+    scopeRowItem.above_levels_ids = scopeElement.above_levels_ids?.replace('/ /g', '')
+    scopeRowItem.inferior_levels_ids = scopeElement.inferior_levels_ids?.replace('/ /g', '')
     scopeRowItem.type = scopeElement.type
-    scopeRowItem.parentId = scopeElement.parent_id
+    scopeRowItem.parentId = scopeElement.parent_id?.replace('/ /g', '')
     return scopeRowItem
   },
 
