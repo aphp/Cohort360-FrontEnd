@@ -97,8 +97,8 @@ export const expandScopeTree = async (params: ExpandScopeElementParamsType, getS
     aborted: params.signal?.aborted
   }
 }
-export const getCurrentScopeList = (scopeList: ScopeListType, isExecutiveUnit?: boolean): ScopeTreeRow[] => {
 
+export const getCurrentScopeList = (scopeList: ScopeListType, isExecutiveUnit?: boolean): ScopeTreeRow[] => {
   return isExecutiveUnit ? scopeList.executiveUnits : scopeList.perimeters
 }
 
