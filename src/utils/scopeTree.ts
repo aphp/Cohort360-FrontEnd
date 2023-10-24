@@ -1,6 +1,6 @@
 import services from 'services/aphp'
 import { RootState } from 'state'
-import { ExpandScopeElementParamsType, ScopeListType, ScopeTreeRow, ScopeType } from 'types'
+import { ExpandScopeElementParamsType, ScopeElement, ScopeListType, ScopePage, ScopeTreeRow, ScopeType } from 'types'
 
 export const LOADING: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
@@ -108,4 +108,14 @@ export const buildScopeListType = (scopes: ScopeTreeRow[], isExecutiveUnit?: boo
     executiveUnits: isExecutiveUnit ? scopes : []
   }
   return newScopeList
+}
+
+export const removeSpace = (scopes: ScopeElement[]) => {
+  return scopes.map((scope) => {
+    scope.cohort_id = scope.cohort_id?.replace(/\s/g, '')
+    scope.above_levels_ids = scope.above_levels_ids?.replace(/\s/g, '')
+    scope.inferior_levels_ids = scope.inferior_levels_ids?.replace(/\s/g, '')
+    scope.parent_id = scope.parent_id?.replace(/\s/g, '') ?? null
+    return scope
+  })
 }

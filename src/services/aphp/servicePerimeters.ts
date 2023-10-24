@@ -8,21 +8,21 @@ import {
   ScopeTreeRow,
   ScopeType
 } from 'types'
+import { getApiResponseResources } from 'utils/apiHelpers'
 import {
   getAgeRepartitionMapAphp,
   getEncounterRepartitionMapAphp,
   getGenderRepartitionMapAphp,
   getVisitRepartitionMapAphp
 } from 'utils/graphUtils'
-import { getApiResponseResources } from 'utils/apiHelpers'
 
 import { fetchAccessExpirations, fetchEncounter, fetchGroup, fetchPatient, fetchScope } from './callApi'
 
-import apiBackend from '../apiBackend'
-import { LOADING, sortByQuantityAndName } from 'utils/scopeTree'
 import { AxiosResponse } from 'axios'
 import { Group } from 'fhir/r4'
+import { LOADING, removeSpace, sortByQuantityAndName } from 'utils/scopeTree'
 import scopeTypes from '../../data/scope_type.json'
+import apiBackend from '../apiBackend'
 
 export interface IServicePerimeters {
   /**
@@ -275,7 +275,7 @@ const servicesPerimeters: IServicePerimeters = {
     try {
       const noRightsMessage = 'No accesses with read patient right found'
       let perimetersIds: string[] | undefined = []
-      let perimetersList: ScopePage[] = []
+      let perimetersList: ScopeElement[] = []
       let rightsData: any = []
       if (!defaultPerimetersIds && !noPerimetersIdsFetch) {
         const url: string = isExecutiveUnit
@@ -333,6 +333,7 @@ const servicesPerimeters: IServicePerimeters = {
         const export_access = 'DATA_PSEUDOANONYMISED' // Impossible de faire un export de donnée sur un périmètre
         return { ...perimeterItem, ...{ read_access: read_access, export_access: export_access } }
       })
+      perimetersList = removeSpace(perimetersList)
       return perimetersList
     } catch (error: any) {
       const fhirError: any = {
@@ -510,15 +511,15 @@ const servicesPerimeters: IServicePerimeters = {
 
   buildScopeTreeRowItem: (scopeElement: ScopeElement) => {
     const scopeRowItem: ScopeTreeRow = { id: '', name: '', quantity: 0, subItems: [LOADING] }
-    scopeRowItem.id = scopeElement.id?.toString().trim()
-    scopeRowItem.cohort_id = scopeElement.cohort_id?.trim()
+    scopeRowItem.id = scopeElement.id?.toString().replace(/\s/g, '')
+    scopeRowItem.cohort_id = scopeElement.cohort_id?.replace(/\s/g, '')
     scopeRowItem.name = servicesPerimeters.getScopeName(scopeElement)
     scopeRowItem.full_path = scopeElement.full_path
     scopeRowItem.quantity = +scopeElement.cohort_size
-    scopeRowItem.above_levels_ids = scopeElement.above_levels_ids?.trim()
-    scopeRowItem.inferior_levels_ids = scopeElement.inferior_levels_ids?.trim()
+    scopeRowItem.above_levels_ids = scopeElement.above_levels_ids?.replace(/\s/g, '')
+    scopeRowItem.inferior_levels_ids = scopeElement.inferior_levels_ids?.replace(/\s/g, '')
     scopeRowItem.type = scopeElement.type
-    scopeRowItem.parentId = scopeElement.parent_id?.trim()
+    scopeRowItem.parentId = scopeElement.parent_id?.replace(/\s/g, '')
     return scopeRowItem
   },
 
