@@ -89,8 +89,12 @@ export const getGenderRepartitionMapAphp = (facet?: Extension[]): GenderRepartit
           case 'male':
             repartitionMap.male.deceased = gender.valueDecimal ?? 0
             break
-          default:
-            repartitionMap.other.deceased = gender?.valueDecimal ?? 0
+          case 'other':
+            repartitionMap.other.deceased = gender.valueDecimal ?? 0
+            break
+          case 'unknown':
+            repartitionMap.unknown.deceased = gender.valueDecimal ?? 0
+            break
         }
       })
     } else if (isDeceased === 'false') {
@@ -102,8 +106,12 @@ export const getGenderRepartitionMapAphp = (facet?: Extension[]): GenderRepartit
           case 'male':
             repartitionMap.male.alive = gender.valueDecimal ?? 0
             break
-          default:
-            repartitionMap.other.alive = gender?.valueDecimal ?? 0
+          case 'other':
+            repartitionMap.other.alive = gender.valueDecimal ?? 0
+            break
+          case 'unknown':
+            repartitionMap.unknown.alive = gender.valueDecimal ?? 0
+            break
         }
       })
     }
