@@ -75,7 +75,7 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
       sortableColumn: false
     },
     { label: 'Unité exécutrice', code: '', align: 'center', sortableColumn: false },
-    { label: 'Type de document', code: 'type', align: 'center', sortableColumn: true },
+    { label: 'Type de document', code: 'type-name', align: 'center', sortableColumn: true },
     { label: 'Aperçu', code: '', align: 'center', sortableColumn: false }
   ].filter((elem) => elem !== null) as Column[]
 
