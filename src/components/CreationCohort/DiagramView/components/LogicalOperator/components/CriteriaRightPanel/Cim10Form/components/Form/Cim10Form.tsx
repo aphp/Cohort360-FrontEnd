@@ -16,8 +16,6 @@ import {
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
-import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
-
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
@@ -25,6 +23,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition } from 'state/pmsi'
 import { CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
+import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
 
 type Cim10FormProps = {
   isOpen: boolean
@@ -157,8 +156,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             onChangeValue={onChangeValue}
           />
 
-          <AutocompleteAsync
-            multiple
+          <InputAutocompleteAsync
             label="Code CIM10"
             variant="outlined"
             noOptionsText="Veuillez entrer un code ou un diagnostic CIM10"

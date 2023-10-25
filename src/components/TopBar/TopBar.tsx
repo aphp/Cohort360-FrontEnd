@@ -33,11 +33,11 @@ import MoreButton from '@mui/icons-material/MoreVert'
 
 import Avatar from 'components/ui/Avatar/Avatar'
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
-import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
+import ModalEditCohort from 'components/Requests/Modals/ModalEditCohort/ModalEditCohort'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { favoriteExploredCohort } from 'state/exploredCohort'
-import { deleteCohort, fetchCohorts as fetchCohortsList, setSelectedCohort } from 'state/cohort'
+import { deleteCohort, setSelectedCohort } from 'state/cohort'
 import { MeState } from 'state/me'
 
 import services from 'services/aphp'

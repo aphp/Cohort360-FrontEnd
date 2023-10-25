@@ -33,10 +33,10 @@ import { BlockWrapper } from 'components/ui/Layout'
 import DisplayLocked from 'components/ui/Display/DisplayLocked'
 import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/searchCriteriasReducer'
 import { selectFiltersAsArray } from 'utils/filters'
-import GendersFilter from 'components/Filters/GendersFilter/GenderFilter'
-import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter.tsx/VitalStatusesFilter'
-import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters/BirthdatesRangesFilter'
 import Chip from 'components/ui/Chip'
+import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters'
+import GendersFilter from 'components/Filters/GendersFilter'
+import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter'
 
 type PatientListProps = {
   total: number

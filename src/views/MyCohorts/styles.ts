@@ -19,6 +19,18 @@ const useStyles = makeStyles()((theme: Theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
     })
+  },
+  pagination: {
+    float: 'right',
+    '& button': {
+      backgroundColor: '#fff',
+      color: '#5BC5F2'
+    },
+    '& .MuiPaginationItem-page.Mui-selected': {
+      color: '#0063AF',
+      backgroundColor: '#FFF'
+    },
+    margin: '12px 0'
   }
 }))
 

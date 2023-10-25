@@ -5,13 +5,13 @@ import Login from 'views/Login/Login'
 import HealthCheck from 'views/HealthCheck/HealthCheck'
 import Welcome from 'views/Welcome/Welcome'
 import SearchPatient from 'views/SearchPatient/SearchPatient'
-import MyProjects from 'views/MyProjects/MyProjects'
 import Patient from 'views/Patient/Patient'
 import Scope from 'views/Scope/Scope'
 import Dashboard from 'views/Dashboard/Dashboard'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 import PageNotFound from 'views/PageNotFound/PageNotFound'
 import MyCohorts from 'views/MyCohorts'
+import MyRequests from 'views/MyRequests'
 
 // import { ODD_CONTACT } from '../../../constants'
 
@@ -109,7 +109,7 @@ const configRoutes: configRoute[] = [
     path: '/my-requests',
     name: 'my-requests',
     isPrivate: true,
-    element: <MyProjects />
+    element: <MyRequests />
   },
   /**
    * Cohort360: Cohorts Creation Page

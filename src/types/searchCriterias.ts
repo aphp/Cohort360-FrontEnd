@@ -107,7 +107,10 @@ export enum FilterKeys {
   END_DATE = 'endDate',
   EXECUTIVE_UNITS = 'executiveUnits',
   DOC_TYPES = 'docTypes',
-  FAVORITE = 'favorite'
+  FAVORITE = 'favorite',
+  STATUS = 'status',
+  MIN_PATIENTS = 'minPatients',
+  MAX_PATIENTS = 'maxPatients'
 }
 
 export enum OrderByKeys {
@@ -131,6 +134,8 @@ export type FilterValue =
   | string[]
   | LabelObject
   | LabelObject[]
+  | ValueSet
+  | ValueSet[]
   | DurationRangeType
   | DurationRangeType[]
   | GenderStatus

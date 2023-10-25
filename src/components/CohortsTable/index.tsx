@@ -22,7 +22,8 @@ import {
   TableSortLabel,
   TableRow,
   Tooltip,
-  Typography
+  Typography,
+  CircularProgress
 } from '@mui/material'
 
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
@@ -35,11 +36,11 @@ import ExportIcon from '@mui/icons-material/GetApp'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import UpdateIcon from '@mui/icons-material/Update'
 
-import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
+import ModalEditCohort from 'components/Requests/Modals/ModalEditCohort/ModalEditCohort'
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { CohortState, setSelectedCohort as setSelectedCohortState } from 'state/cohort'
+import { CohortState, deleteCohort, editCohort, setSelectedCohort as setSelectedCohortState } from 'state/cohort'
 
 import { MeState } from 'state/me'
 
@@ -47,7 +48,7 @@ import { Cohort, CohortJobStatus } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
-import { ODD_EXPORT } from '../../../constants'
+import { ODD_EXPORT } from '../../constants'
 
 import useStyles from './styles'
 import { Direction, Order, OrderBy } from 'types/searchCriterias'
@@ -71,25 +72,21 @@ const DisabledFavStar: React.FC<FavStarProps> = ({ favorite }) => {
 
 type ResearchTableProps = {
   simplified?: boolean
-  onClickRow?: Function
-  data?: Cohort[]
-  onSetFavorite: (cohort: Cohort) => void
-  onDelete: Function
+  data: Cohort[]
   orderBy?: Order
   orderDirection?: Direction
+  loading: boolean
   onChangeOrder?: (order: OrderBy) => void
-  onEdit: () => void
+  onUpdate: () => void
 }
 const ResearchTable: React.FC<ResearchTableProps> = ({
   simplified,
-  onClickRow,
   data,
-  onSetFavorite,
-  onDelete,
   orderBy,
   orderDirection,
+  loading,
   onChangeOrder,
-  onEdit
+  onUpdate
 }) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
@@ -116,18 +113,14 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
 
   const maintenanceIsActive = meState?.maintenance?.active
 
-  const _onClickRow = (row: any) => {
-    return row.request_job_status === CohortJobStatus._pending ||
+  const onClickRow = (row: any) => {
+    if (
+      row.request_job_status === CohortJobStatus._pending ||
       row.request_job_status === CohortJobStatus._long_pending ||
       row.request_job_status === CohortJobStatus._failed
-      ? null
-      : onClickRow
-      ? onClickRow(row)
-      : navigate(`/cohort/${row.fhir_group_id}`)
-  }
-
-  const removeCohort = () => {
-    onDelete(selectedCohort)
+    )
+      return
+    navigate(`/cohort/${row.fhir_group_id}`)
   }
 
   const handleClickOpenDialog = () => {
@@ -138,18 +131,33 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
     setOpenDialog(false)
   }
 
-  const editCohort = async () => {
-    await dispatch(setSelectedCohortState(null))
-    onEdit()
+  const onEditCohort = () => {
+    onUpdate()
+  }
+
+  const onDeleteCohort = async (cohort: Cohort) => {
+    await dispatch(deleteCohort({ deletedCohort: cohort }))
+    onUpdate()
+  }
+
+  const onSetCohortFavorite = async (cohort: Cohort) => {
+    await dispatch(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
+    onUpdate()
   }
 
   return (
     <>
-      {!data || data.length < 1 ? (
+      {loading && (
+        <Grid container justifyContent="center">
+          <CircularProgress />
+        </Grid>
+      )}
+      {!loading && data.length < 1 && (
         <Grid container justifyContent="center">
           <Typography variant="button"> Aucune cohorte à afficher </Typography>
         </Grid>
-      ) : (
+      )}
+      {!loading && data.length > 0 && (
         <TableContainer component={Paper}>
           <Table className={classes.table} aria-label="simple table">
             <TableHead>
@@ -276,12 +284,12 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                     hover
                     key={row.uuid}
                   >
-                    <TableCell onClick={() => _onClickRow(row)}>{row.name}</TableCell>
+                    <TableCell onClick={() => onClickRow(row)}>{row.name}</TableCell>
                     <TableCell align="center">
                       <IconButton
                         onClick={(event) => {
                           event.stopPropagation()
-                          onSetFavorite(row)
+                          onSetCohortFavorite(row)
                         }}
                         disabled={maintenanceIsActive || !row.fhir_group_id}
                       >
@@ -292,7 +300,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                         )}
                       </IconButton>
                     </TableCell>
-                    <TableCell onClick={() => _onClickRow(row)} align="center">
+                    <TableCell onClick={() => onClickRow(row)} align="center">
                       {row.request_job_status === CohortJobStatus._finished ? (
                         <Chip label="Terminé" size="small" style={{ backgroundColor: '#28a745', color: 'white' }} />
                       ) : row.request_job_status === CohortJobStatus._pending ||
@@ -315,10 +323,10 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                         <Chip label="Erreur" size="small" style={{ backgroundColor: '#dc3545', color: 'black' }} />
                       )}
                     </TableCell>
-                    <TableCell onClick={() => _onClickRow(row)} align="center">
+                    <TableCell onClick={() => onClickRow(row)} align="center">
                       {displayDigit(row.result_size)}
                     </TableCell>
-                    <TableCell onClick={() => _onClickRow(row)} align="center">
+                    <TableCell onClick={() => onClickRow(row)} align="center">
                       {row.dated_measure_global
                         ? row.dated_measure_global?.measure_min === null ||
                           row.dated_measure_global?.measure_max === null
@@ -328,7 +336,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                             )}`
                         : '-'}
                     </TableCell>
-                    <TableCell onClick={() => _onClickRow(row)} align="center">
+                    <TableCell onClick={() => onClickRow(row)} align="center">
                       {row.modified_at ? (
                         <>
                           {new Date(row.modified_at).toLocaleDateString('fr-FR')} {'à'}{' '}
@@ -503,32 +511,30 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
         </TableContainer>
       )}
 
-      {!simplified && (
-        <Dialog
-          open={dialogOpen}
-          onClose={handleCloseDialog}
-          aria-labelledby="alert-dialog-slide-title"
-          aria-describedby="alert-dialog-slide-description"
-        >
-          <DialogTitle id="alert-dialog-slide-title">Supprimer une cohorte</DialogTitle>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title">Supprimer une cohorte</DialogTitle>
 
-          <DialogContent>Êtes-vous sûr(e) de vouloir supprimer la cohorte ?</DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Non</Button>
-            <Button
-              onClick={() => {
-                handleCloseDialog()
-                removeCohort()
-              }}
-              color="secondary"
-            >
-              Oui
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
+        <DialogContent>Êtes-vous sûr(e) de vouloir supprimer la cohorte ?</DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Non</Button>
+          <Button
+            onClick={() => {
+              handleCloseDialog()
+              onDeleteCohort(selectedCohort!)
+            }}
+            color="secondary"
+          >
+            Oui
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-      <ModalEditCohort open={selectedCohortState !== null} onClose={editCohort} />
+      <ModalEditCohort open={selectedCohortState !== null} onClose={onEditCohort} />
 
       {!!ODD_EXPORT && (
         <ExportModal

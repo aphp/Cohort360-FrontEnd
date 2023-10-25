@@ -9,7 +9,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import EditIcon from '@mui/icons-material/Edit'
 import ShareIcon from '@mui/icons-material/Share'
 
-import VersionRow from '../VersionRow/VersionRow'
+import VersionRow from '../VersionRow'
 
 import { RequestType, Cohort } from 'types'
 

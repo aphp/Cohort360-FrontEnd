@@ -8,7 +8,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import EditIcon from '@mui/icons-material/Edit'
 import AddIcon from '@mui/icons-material/Add'
 
-import RequestRow from '../RequestRow/RequestRow'
+import RequestRow from '../RequestRow'
 
 import { ProjectType, RequestType, Cohort } from 'types'
 

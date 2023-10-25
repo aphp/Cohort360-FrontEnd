@@ -10,10 +10,12 @@ import {
   TableRow,
   TableSortLabel,
   Paper,
-  Typography
+  Typography,
+  CircularProgress,
+  Grid
 } from '@mui/material'
 
-import ProjectRow from './ProjectRow/ProjectRow'
+import ProjectRow from './ProjectRow'
 
 import { ProjectType, RequestType } from 'types'
 
@@ -24,14 +26,16 @@ import { CohortState } from 'state/cohort'
 
 import useStyles from './styles'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
+import { Direction, Order } from 'types/searchCriterias'
 
 type ProjectTableProps = {
   searchInput?: string
   selectedRequests: RequestType[]
+  loading: boolean
   setSelectedRequests: (selectedRequests: RequestType[]) => void
 }
 
-const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, setSelectedRequests, selectedRequests }) => {
+const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSelectedRequests, selectedRequests }) => {
   const { classes } = useStyles()
   const { projectState, requestState, cohortState } = useAppSelector<{
     projectState: ProjectState
@@ -154,71 +158,80 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, setSelectedReq
   const allRequestsSelected = selectedRequests.length === currentRequestList.length
 
   return (
-    <TableContainer component={Paper} className={classes.grid}>
-      <Table aria-label="projects table" id="projects_table" className={classes.table}>
-        <TableHead>
-          <TableRow className={classes.tableHead}>
-            <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62, padding: '0 16px' }}>
-              <Checkbox
-                size="small"
-                checked={allRequestsSelected}
-                indeterminate={allRequestsSelected ? false : selectedRequests.length !== 0}
-                onChange={() => {
-                  const _selectedRequests = currentRequestList
-                  if (selectedRequests.length === 0) {
-                    setSelectedRequests(_selectedRequests)
-                  } else {
-                    setSelectedRequests([])
-                  }
-                }}
-                color="secondary"
-                indeterminateIcon={<IndeterminateCheckBoxOutlined />}
-              />
-            </TableCell>
-            <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62 }} />
-            <TableCell className={classes.tableHeadCell} style={{ width: 'calc(100% - 300px' }}>
-              <TableSortLabel
-                active={sortBy === 'name'}
-                direction={sortDirection || 'asc'}
-                onClick={() => handleRequestSort('name')}
-              >
-                Titre
-              </TableSortLabel>
-            </TableCell>
-            <TableCell className={classes.tableHeadCell} align="center" style={{ width: 175 }}>
-              <TableSortLabel
-                active={sortBy === 'modified_at'}
-                direction={sortDirection || 'asc'}
-                onClick={() => handleRequestSort('modified_at')}
-              >
-                Date
-              </TableSortLabel>
-            </TableCell>
-          </TableRow>
-        </TableHead>
+    <>
+      {loading && (
+        <Grid container justifyContent="center">
+          <CircularProgress />
+        </Grid>
+      )}
+      {!loading && (
+        <TableContainer component={Paper} className={classes.grid}>
+          <Table aria-label="projects table" id="projects_table" className={classes.table}>
+            <TableHead>
+              <TableRow className={classes.tableHead}>
+                <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62, padding: '0 16px' }}>
+                  <Checkbox
+                    size="small"
+                    checked={allRequestsSelected}
+                    indeterminate={allRequestsSelected ? false : selectedRequests.length !== 0}
+                    indeterminateIcon={<IndeterminateCheckBoxOutlined />}
+                    onChange={() => {
+                      const _selectedRequests = currentRequestList
+                      if (selectedRequests.length === 0) {
+                        setSelectedRequests(_selectedRequests)
+                      } else {
+                        setSelectedRequests([])
+                      }
+                    }}
+                    color="secondary"
+                  />
+                </TableCell>
+                <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62 }} />
+                <TableCell className={classes.tableHeadCell} style={{ width: 'calc(100% - 300px' }}>
+                  <TableSortLabel
+                    active={sortBy === Order.NAME}
+                    direction={sortDirection || Direction.ASC}
+                    onClick={() => handleRequestSort(Order.NAME)}
+                  >
+                    Titre
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell className={classes.tableHeadCell} align="center" style={{ width: 175 }}>
+                  <TableSortLabel
+                    active={sortBy === Order.MODIFIED}
+                    direction={sortDirection || Direction.ASC}
+                    onClick={() => handleRequestSort(Order.MODIFIED)}
+                  >
+                    Date
+                  </TableSortLabel>
+                </TableCell>
+              </TableRow>
+            </TableHead>
 
-        <TableBody>
-          {searchProjectList.length === 0 && (
-            <TableRow>
-              <TableCell style={{ textAlign: 'center', height: '40vh' }} colSpan={4}>
-                <Typography>Aucun projet de recherche {!!searchInput && 'trouvé'}</Typography>
-              </TableCell>
-            </TableRow>
-          )}
-          {searchProjectList.map((project: ProjectType) => (
-            <ProjectRow
-              key={project.uuid}
-              row={project}
-              searchInput={searchInput}
-              requestOfProject={currentRequestList.filter(({ parent_folder }) => parent_folder === project.uuid)}
-              cohortsList={searchCohortList && searchCohortList.length > 0 ? searchCohortList : cohortsList}
-              selectedRequests={selectedRequests}
-              onSelectedRow={_onSelectedRow}
-            />
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+            <TableBody>
+              {searchProjectList.length === 0 && (
+                <TableRow>
+                  <TableCell style={{ textAlign: 'center', height: '40vh' }} colSpan={4}>
+                    <Typography>Aucun projet de recherche {!!searchInput && 'trouvé'}</Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+              {searchProjectList.map((project: ProjectType) => (
+                <ProjectRow
+                  key={project.uuid}
+                  row={project}
+                  searchInput={searchInput}
+                  requestOfProject={currentRequestList.filter(({ parent_folder }) => parent_folder === project.uuid)}
+                  cohortsList={searchCohortList && searchCohortList.length > 0 ? searchCohortList : cohortsList}
+                  selectedRequests={selectedRequests}
+                  onSelectedRow={_onSelectedRow}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </>
   )
 }
 

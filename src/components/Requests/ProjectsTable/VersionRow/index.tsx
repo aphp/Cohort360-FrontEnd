@@ -31,10 +31,9 @@ import { Cohort } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
-import { ODD_EXPORT } from '../../../../constants'
-
 import useStyles from '../styles'
-import { JobStatus } from '../../../../utils/constants'
+import { JobStatus } from 'utils/constants'
+import { ODD_EXPORT } from '../../../../constants'
 
 const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
   const { classes } = useStyles()

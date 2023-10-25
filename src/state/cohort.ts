@@ -93,6 +93,7 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, FetchCohortsParams,
         selectedCohort: null,
         ...(cohortsType === CohortsType.ALL && { cohortsList: cohortsList }),
         ...(cohortsType === CohortsType.FAVORITE && { favoriteCohortsList: cohortsList }),
+        ...(cohortsType === CohortsType.NOT_FAVORITE && { favoriteCohortsList: cohortsList }),
         ...(cohortsType === CohortsType.LAST && { lastCohorts: cohortsList })
       }
     } catch (error) {

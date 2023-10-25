@@ -10,7 +10,7 @@ import {
 } from 'types/searchCriterias'
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
-import { ScopeTreeRow, SimpleCodeType } from 'types'
+import { ScopeTreeRow, SimpleCodeType, ValueSet } from 'types'
 import { getDurationRangeLabel } from './age'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
 
@@ -54,6 +54,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.ADMINISTRATION_ROUTES:
       case FilterKeys.PRESCRIPTION_TYPES:
       case FilterKeys.DOC_TYPES:
+      case FilterKeys.STATUS:
         castedFilters[key] = removeElementInArray(castedFilters[key], value)
         break
       case FilterKeys.CODE:
@@ -68,6 +69,8 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
         break
       case FilterKeys.START_DATE:
       case FilterKeys.END_DATE:
+      case FilterKeys.MIN_PATIENTS:
+      case FilterKeys.MAX_PATIENTS:
         castedFilters[key] = null
         break
       case FilterKeys.FAVORITE:
@@ -127,6 +130,15 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.LOINC) {
     return `Code LOINC : ${value}`
   }
+  if (key === FilterKeys.STATUS) {
+    return `Statut : ${(value as ValueSet)?.display}`
+  }
+  if (key === FilterKeys.MIN_PATIENTS) {
+    return `Au moins ${value} patients`
+  }
+  if (key === FilterKeys.MAX_PATIENTS) {
+    return `Jusqu'à ${value} patients`
+  }
   return ''
 }
 
@@ -144,13 +156,12 @@ export const selectFiltersAsArray = (filters: Filters) => {
         case FilterKeys.PRESCRIPTION_TYPES:
         case FilterKeys.DOC_TYPES:
         case FilterKeys.EXECUTIVE_UNITS:
+        case FilterKeys.STATUS:
           ;(value as []).forEach((elem) =>
             result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
           )
           break
         case FilterKeys.BIRTHDATES:
-        case FilterKeys.START_DATE:
-        case FilterKeys.END_DATE:
           if (value[0] || value[1]) {
             result.push({
               category: key,
@@ -159,6 +170,17 @@ export const selectFiltersAsArray = (filters: Filters) => {
             })
           }
           break
+        case FilterKeys.START_DATE:
+        case FilterKeys.END_DATE:
+        case FilterKeys.MIN_PATIENTS:
+        case FilterKeys.MAX_PATIENTS:
+          result.push({
+            category: key,
+            label: getFilterLabel(key, value),
+            value: value as FilterValue
+          })
+          break
+
         case FilterKeys.NDA:
         case FilterKeys.CODE:
         case FilterKeys.ANABIO:

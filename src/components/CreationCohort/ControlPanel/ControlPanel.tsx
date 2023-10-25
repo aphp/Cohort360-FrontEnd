@@ -24,7 +24,7 @@ import ShareIcon from '@mui/icons-material/Share'
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
-import ModalShareRequest from 'components/MyProjects/Modals/ModalShareRequest/ModalShareRequest'
+import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import {

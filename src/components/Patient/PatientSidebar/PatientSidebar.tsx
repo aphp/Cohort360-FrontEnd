@@ -24,8 +24,6 @@ import {
   searchByListPatients
 } from 'types/searchCriterias'
 
-import GendersFilter from 'components/Filters/GendersFilter/GenderFilter'
-
 import Button from 'components/ui/Button'
 import Chip from 'components/ui/Chip'
 import { BlockWrapper } from 'components/ui/Layout'
@@ -34,17 +32,17 @@ import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Select from 'components/ui/Searchbar/Select'
 
-import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter/VitalStatusesFilter'
-import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters/BirthdatesRangesFilter'
-
 import { CanceledError } from 'axios'
 
 import useStyles from './styles'
 import ListPatient from 'components/DataTable/ListPatient'
-import OrderByFilter from 'components/Filters/OrderByFilter/OrderByFilter'
-import OrderDirectionFilter from 'components/Filters/OrderDirectionFilter/OrderDirectionFilter'
 import DisplayLocked from 'components/ui/Display/DisplayLocked'
 import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/searchCriteriasReducer'
+import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters'
+import GendersFilter from 'components/Filters/GendersFilter'
+import OrderByFilter from 'components/Filters/OrderByFilter'
+import OrderDirectionFilter from 'components/Filters/OrderDirectionFilter'
+import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter'
 
 type PatientSidebarProps = {
   total: number

@@ -15,11 +15,12 @@ import {
   AllDocumentsFilters,
   OrderBy,
   FilterKeys,
-  FilterValue
+  FilterValue,
+  CohortsFilters
 } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
 
-export const initCohortsSearchCriterias = {
+export const initCohortsSearchCriterias: SearchCriterias<CohortsFilters> = {
   orderBy: {
     orderBy: Order.MODIFIED,
     orderDirection: Direction.DESC
