@@ -1159,12 +1159,15 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
-              case CONDITION_CODE_ALL_HIERARCHY:
-                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, { id: '*' }] : { id: '*' }
-                break
               case CONDITION_CODE: {
                 const codeIds = value?.split(',')
-                const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
+                const newCode = codeIds?.map((codeId: any) => {
+                  codeId = codeId.split('|')
+                  if (codeId.length > 1) {
+                    return { id: codeId[1] }
+                  }
+                  return { id: codeId[0] }
+                })
                 if (!newCode) continue
 
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
@@ -1232,12 +1235,15 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
-              case PROCEDURE_CODE_ALL_HIERARCHY:
-                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, { id: '*' }] : { id: '*' }
-                break
               case PROCEDURE_CODE: {
                 const codeIds = value?.split(',')
-                const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
+                const newCode = codeIds?.map((codeId: any) => {
+                  codeId = codeId.split('|')
+                  if (codeId.length > 1) {
+                    return { id: codeId[1] }
+                  }
+                  return { id: codeId[0] }
+                })
                 if (!newCode) continue
 
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
@@ -1293,12 +1299,15 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
-              case CLAIM_CODE_ALL_HIERARCHY:
-                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, { id: '*' }] : { id: '*' }
-                break
               case CLAIM_CODE: {
                 const codeIds = value?.split(',')
-                const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
+                const newCode = codeIds?.map((codeId: any) => {
+                  codeId = codeId.split('|')
+                  if (codeId.length > 1) {
+                    return { id: codeId[1] }
+                  }
+                  return { id: codeId[0] }
+                })
                 if (!newCode) continue
 
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
@@ -1446,12 +1455,15 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const value = filter ? filter[1] : null
 
             switch (key) {
-              case OBSERVATION_CODE_ALL_HIERARCHY:
-                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, { id: '*' }] : { id: '*' }
-                break
               case OBSERVATION_CODE: {
                 const codeIds = value?.split(',')
-                const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
+                const newCode = codeIds?.map((codeId: any) => {
+                  codeId = codeId.split('|')
+                  if (codeId.length > 1) {
+                    return { id: codeId[1] }
+                  }
+                  return { id: codeId[0] }
+                })
                 if (!newCode) continue
 
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
