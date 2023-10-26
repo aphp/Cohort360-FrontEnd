@@ -7,7 +7,6 @@ import EditIcon from '@mui/icons-material/Edit'
 import WarningIcon from '@mui/icons-material/Warning'
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd'
 
-import CriteriaCardContent from './components/CriteriaCardContent/CriteriaCardContent'
 import Avatar from 'components/ui/Avatar/Avatar'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'

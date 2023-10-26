@@ -1,4 +1,4 @@
-import { ScopeTreeRow } from 'types'
+import { ScopeTreeRow, ValueSetSystem } from 'types'
 import { DurationRangeType, GenderStatus, LabelObject, SearchByTypes, VitalStatus } from './searchCriterias'
 
 export enum MedicationType {
@@ -9,6 +9,12 @@ export enum MedicationType {
 export enum MedicationTypeLabel {
   Request = 'Prescription',
   Administration = 'Administration'
+}
+
+export type LabelCriteriaObject = {
+  id: string
+  label: string
+  system?: ValueSetSystem
 }
 
 export enum RessourceType {
