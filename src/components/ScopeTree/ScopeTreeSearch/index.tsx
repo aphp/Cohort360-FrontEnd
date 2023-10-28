@@ -67,7 +67,7 @@ const Index: React.FC<ScopeTreeSearchProps> = (props) => {
             setSelectedItems,
             isHeadChecked,
             searchSavedRootRows,
-            scopesList,
+            scopesList as ScopeTreeRow[],
             isSelectionLoading,
             setIsSelectionLoading
           )
@@ -152,7 +152,7 @@ const Index: React.FC<ScopeTreeSearchProps> = (props) => {
                           row,
                           selectedItems,
                           searchSavedRootRows,
-                          scopesList,
+                          scopesList as ScopeTreeRow[],
                           isSelectionLoading,
                           setIsSelectionLoading,
                           setSelectedItems,
