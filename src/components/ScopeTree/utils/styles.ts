@@ -38,5 +38,10 @@ export default makeStyles()(() => ({
       backgroundColor: '#FFF'
     },
     margin: '12px 0'
+  },
+  linearProgress: {
+    height: '4px',
+    marginTop: '2px',
+    background: 'rgb(209, 226, 244)'
   }
 }))

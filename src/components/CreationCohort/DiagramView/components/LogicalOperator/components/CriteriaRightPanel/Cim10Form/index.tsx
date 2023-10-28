@@ -11,7 +11,6 @@ import { fetchCondition, PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
 import { CriteriaDrawerComponentProps } from 'types'
 
-
 export const defaultCondition = {
   type: CONDITION,
   title: 'Critère de diagnostic',

@@ -8,11 +8,11 @@ import SearchPatient from 'views/SearchPatient/SearchPatient'
 import SavedResearch from 'views/SavedResearch/SavedResearch'
 import MyProjects from 'views/MyProjects/MyProjects'
 import Patient from 'views/Patient/Patient'
-import Scope from 'views/Scope/Scope'
 import Dashboard from 'views/Dashboard/Dashboard'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 // import Contact from 'views/Contact/Contact'
 import PageNotFound from 'views/PageNotFound/PageNotFound'
+import CareSiteView from 'views/Scope/CareSiteView'
 
 // import { ODD_CONTACT } from '../../../constants'
 
@@ -80,7 +80,7 @@ const configRoutes: configRoute[] = [
     path: '/perimeter',
     name: 'perimeter',
     isPrivate: true,
-    element: <Scope />
+    element: <CareSiteView />
   },
   /**
    * Cohort360: Saved Cohorts Page

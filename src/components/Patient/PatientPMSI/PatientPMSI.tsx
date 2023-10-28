@@ -18,7 +18,7 @@ import { PMSIFilters, Order, LoadingStatus } from 'types'
 
 import useStyles from './styles'
 import { useDebounce } from 'utils/debounce'
-import { _cancelPendingRequest } from 'utils/abortController'
+import { cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
 
 type PatientPMSITypes = {
@@ -153,7 +153,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
 
   useEffect(() => {
     if (loadingStatus === LoadingStatus.IDDLE) {
-      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      controllerRef.current = cancelPendingRequest(controllerRef.current)
       _fetchPMSI()
     }
   }, [loadingStatus])

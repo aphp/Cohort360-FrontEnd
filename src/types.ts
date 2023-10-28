@@ -1034,3 +1034,32 @@ export type AccessExpiration = {
   profile: string
   perimeter: string
 }
+
+export type ExpandScopeElementParamsType = {
+  rowId: number
+  scopesList?: ScopeListType
+  selectedItems?: ScopeTreeRow[]
+  openPopulation?: number[]
+  executiveUnitType?: ScopeType
+  isExecutiveUnit?: boolean
+  signal?: AbortSignal
+}
+export type ExpandScopeElementReturnType = {
+  scopesList: ScopeListType
+  selectedItems: ScopeTreeRow[]
+  openPopulation: number[]
+  aborted?: boolean
+}
+
+export type ScopeTreeTableHeadCellsType = {
+  id: string
+  align: string
+  disablePadding: boolean
+  disableOrderBy: boolean
+  label: string | ReactElement
+}
+
+export type ScopeListType = {
+  perimeters: ScopeTreeRow[]
+  executiveUnits: ScopeTreeRow[]
+}

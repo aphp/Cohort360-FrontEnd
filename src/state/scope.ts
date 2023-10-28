@@ -1,54 +1,77 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 
-import { logout, login } from './me'
+import { login, logout } from './me'
 
 import services from 'services/aphp'
 
-import { ScopeType, ScopeTreeRow } from 'types'
+import {
+  ExpandScopeElementParamsType,
+  ExpandScopeElementReturnType,
+  ScopeListType,
+  ScopeTreeRow,
+  ScopeType
+} from 'types'
+import { buildScopeList, expandScopeTree, getCurrentScopeList } from '../utils/scopeTree'
 
 export type ScopeState = {
   loading: boolean
-  scopesList: ScopeTreeRow[]
+  scopesList: ScopeListType
   openPopulation: number[]
   aborted?: boolean
 }
 
+const initialScopeList: ScopeListType = {
+  perimeters: [],
+  executiveUnits: []
+}
 const defaultInitialState: ScopeState = {
   loading: false,
-  scopesList: [],
+  scopesList: initialScopeList,
   openPopulation: [],
   aborted: false
 }
 
 type FetchScopeListReturn = {
-  scopesList: ScopeTreeRow[]
+  scopesList: ScopeListType
   aborted?: boolean
 }
 
 type FetchScopeListArgs = {
+  isScopeList?: boolean
   type?: ScopeType
+  isExecutiveUnit?: boolean
   signal?: AbortSignal | undefined
 }
 
 const fetchScopesList = createAsyncThunk<FetchScopeListReturn, FetchScopeListArgs, { state: RootState }>(
   'scope/fetchScopesList',
-  async ({ type, signal }, { getState, dispatch }) => {
+  async ({ isScopeList, type, isExecutiveUnit, signal }, { getState, dispatch }) => {
     try {
       const state = getState()
       const { me, scope } = state
-      const { scopesList } = scope
+      const scopeListFromState = getCurrentScopeList(scope.scopesList, isExecutiveUnit)
 
-      if (scopesList.length) {
-        dispatch(fetchScopesListinBackground({ type, signal }))
-        return { scopesList: scopesList, aborted: signal?.aborted }
+      if (scopeListFromState.length && !isScopeList) {
+        dispatch(fetchScopesListinBackground({ type, isExecutiveUnit, signal }))
+        return {
+          scopesList: buildScopeList(scope.scopesList, scopeListFromState, isExecutiveUnit),
+          aborted: signal?.aborted
+        }
       } else {
-        if (!me) return { scopesList: [], aborted: signal?.aborted }
-        const scopes = (await services.perimeters.getScopePerimeters(me.id, type, signal)) || []
+        if (!me) return { scopesList: initialScopeList, aborted: signal?.aborted }
+        const scopeListFromFetch =
+          (await services.perimeters.getScopePerimeters(me.id, type, isExecutiveUnit, signal)) || []
         if (signal?.aborted) {
-          return { scopesList: scopesList, aborted: signal?.aborted }
+          return {
+            scopesList: buildScopeList(scope.scopesList, scopeListFromState, isExecutiveUnit),
+            aborted: signal?.aborted
+          }
         } else {
-          return { scopesList: scopes, aborted: signal?.aborted }
+          return {
+            scopesList: buildScopeList(scope.scopesList, scopeListFromFetch, isExecutiveUnit),
+            aborted: signal?.aborted
+          }
         }
       }
     } catch (error) {
@@ -60,35 +83,39 @@ const fetchScopesList = createAsyncThunk<FetchScopeListReturn, FetchScopeListArg
 type fetchScopesListinBackgroundArgs = {
   type?: ScopeType
   signal?: AbortSignal | undefined
+  isExecutiveUnit?: boolean
 }
 const fetchScopesListinBackground = createAsyncThunk<
   FetchScopeListReturn,
   fetchScopesListinBackgroundArgs,
   { state: RootState }
->('scope/fetchScopesListinBackground', async ({ type, signal }, { getState }) => {
+>('scope/fetchScopesListinBackground', async ({ type, isExecutiveUnit, signal }, { getState }) => {
   try {
     const state = getState()
     const { me, scope } = state
-    const { scopesList } = scope
+    const scopeListFromState = getCurrentScopeList(scope.scopesList, isExecutiveUnit)
 
-    if (!me) return { scopesList: [], aborted: signal?.aborted }
-    const scopes = (await services.perimeters.getScopePerimeters(me.id, type, signal)) || []
+    if (!me) return { scopesList: initialScopeList, aborted: signal?.aborted }
+    const scopeListFromFetch =
+      (await services.perimeters.getScopePerimeters(me.id, type, isExecutiveUnit, signal)) || []
+    const newScopeList = scopeListFromFetch.map((scope) => ({
+      ...scope,
+      subItems: (
+        scopeListFromState.find((item) => item.id === scope.id && item.subItems?.length) ?? {
+          subItems: [
+            {
+              id: 'loading',
+              name: 'loading',
+              quantity: 0,
+              subItems: []
+            }
+          ]
+        }
+      ).subItems
+    }))
+
     return {
-      scopesList: scopes.map((scope) => ({
-        ...scope,
-        subItems: (
-          scopesList.find((item) => item.id === scope.id && item.subItems?.length) ?? {
-            subItems: [
-              {
-                id: 'loading',
-                name: 'loading',
-                quantity: 0,
-                subItems: []
-              }
-            ]
-          }
-        ).subItems
-      })),
+      scopesList: buildScopeList(scope.scopesList, newScopeList, isExecutiveUnit),
       aborted: signal?.aborted
     }
   } catch (error) {
@@ -97,78 +124,13 @@ const fetchScopesListinBackground = createAsyncThunk<
   }
 })
 
-type ExpandScopeElementParams = {
-  rowId: number
-  scopesList?: ScopeTreeRow[]
-  selectedItems?: ScopeTreeRow[]
-  openPopulation?: number[]
-  type?: ScopeType
-  signal?: AbortSignal
-}
-type ExpandScopeElementReturn = {
-  scopesList: ScopeTreeRow[]
-  selectedItems: ScopeTreeRow[]
-  openPopulation: number[]
-  aborted?: boolean
-}
-
-const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScopeElementParams, { state: RootState }>(
-  'scope/expandScopeElement',
-  async (params, { getState }) => {
-    let scopesList
-    let openPopulation
-    if (params.scopesList && params.openPopulation) {
-      scopesList = params.scopesList
-      openPopulation = params.openPopulation
-    } else {
-      const state = getState().scope
-      scopesList = state.scopesList
-      openPopulation = state.openPopulation
-    }
-    let _rootRows = scopesList ? [...scopesList] : []
-    const savedSelectedItems = params.selectedItems ? [...params.selectedItems] : []
-    let _openPopulation = openPopulation ? [...openPopulation] : []
-
-    const index = _openPopulation.indexOf(params.rowId)
-    if (index !== -1) {
-      _openPopulation = _openPopulation.filter((id) => id !== params.rowId)
-    } else {
-      _openPopulation = [..._openPopulation, params.rowId]
-
-      const replaceSubItems = async (items: ScopeTreeRow[], type?: ScopeType) => {
-        let _items: ScopeTreeRow[] = []
-        for (let item of items) {
-          // Replace sub items element by response of back-end
-          if (+item.id === +params.rowId) {
-            const foundItem = item.subItems ? item.subItems.find((i) => i.id === 'loading') : true
-            if (foundItem) {
-              const subItems: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(
-                item.inferior_levels_ids,
-                false,
-                type,
-                params.signal
-              )
-              item = { ...item, subItems: subItems }
-            }
-          } else if (item.subItems && item.subItems.length !== 0) {
-            item = { ...item, subItems: await replaceSubItems(item.subItems, type) }
-          }
-          _items = [..._items, item]
-        }
-        return _items
-      }
-
-      _rootRows = await replaceSubItems(scopesList, params.type)
-    }
-
-    return {
-      scopesList: _rootRows,
-      selectedItems: savedSelectedItems,
-      openPopulation: _openPopulation,
-      aborted: params.signal?.aborted
-    }
-  }
-)
+const expandScopeElement = createAsyncThunk<
+  ExpandScopeElementReturnType,
+  ExpandScopeElementParamsType,
+  { state: RootState }
+>('scope/expandScopeElement', async (params, { getState }) => {
+  return await expandScopeTree(params, getState)
+})
 
 const scopeSlice = createSlice({
   name: 'scope',
@@ -183,10 +145,10 @@ const scopeSlice = createSlice({
         openPopulation: []
       }
     },
-    updateScopeList: (state, action: PayloadAction<ScopeTreeRow[]>) => {
+    updateScopeList: (state, action: PayloadAction<{ newScopes: ScopeTreeRow[]; isExecutiveUnit?: boolean }>) => {
       return {
         ...state,
-        scopesList: action.payload
+        scopesList: buildScopeList(state.scopesList, action.payload.newScopes, !!action.payload.isExecutiveUnit)
       }
     }
   },
@@ -221,5 +183,5 @@ const scopeSlice = createSlice({
 })
 
 export default scopeSlice.reducer
-export { fetchScopesList, expandScopeElement }
+export { expandScopeElement, fetchScopesList }
 export const { clearScope, closeAllOpenedPopulation, updateScopeList } = scopeSlice.actions

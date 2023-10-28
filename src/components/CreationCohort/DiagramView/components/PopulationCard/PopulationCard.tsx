@@ -15,10 +15,11 @@ import { fetchScopesList, ScopeState } from 'state/scope'
 import { MeState } from 'state/me'
 
 import { CriteriaNameType, ScopeType, ScopeTreeRow } from 'types'
-import { getSelectedScopes } from 'utils/scopeTree'
 import scopeTypes from 'data/scope_type.json'
 
 import useStyles from './styles'
+import { findEquivalentRowInItemAndSubItems } from 'utils/pmsi'
+import { getCurrentScopeList } from 'utils/scopeTree'
 
 export type populationCardPropsType = {
   label?: string
@@ -52,7 +53,8 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
 
   const maintenanceIsActive = meState?.maintenance?.active
 
-  const { scopesList = [] } = scopeState
+  const isExecutiveUnit: boolean = !!(form ? (scopeTypes.criteriaType[form] as ScopeType) : undefined) ?? false
+  const scopesList = getCurrentScopeList(scopeState.scopesList, isExecutiveUnit) ?? []
   const loading = requestState.loading || scopeState.loading
 
   const [isExtended, onExtend] = useState(false)
@@ -71,8 +73,10 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
   }
 
   const setUpdatedItems = (updatedSelection: ScopeTreeRow[]) => {
-    setSelectedItems(updatedSelection)
-    onChangeExecutiveUnits ? onChangeExecutiveUnits(updatedSelection) : _onChangePopulation(updatedSelection)
+    let _updatedSelection = updatedSelection
+    _updatedSelection = _updatedSelection.filter((item) => item.id)
+    setSelectedItems(_updatedSelection)
+    onChangeExecutiveUnits ? onChangeExecutiveUnits(_updatedSelection) : _onChangePopulation(_updatedSelection)
   }
 
   const _onSubmit = async (updatedSelection: ScopeTreeRow[] | null) => {
@@ -118,7 +122,9 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
       requestState?.requestId &&
       (selectedPopulation === null || selectedPopulation?.length === 0)
     ) {
-      const savedSelectedItems: ScopeTreeRow[] = getSelectedScopes(scopesList[0], [], scopesList)
+      const savedSelectedItems: ScopeTreeRow[] = [
+        findEquivalentRowInItemAndSubItems(scopesList[0], scopesList).equivalentRow
+      ]
       _onSubmit(savedSelectedItems)
       isRendered.current = true
     } else {

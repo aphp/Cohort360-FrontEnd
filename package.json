@@ -53,7 +53,7 @@
     "build": "vite build",
     "serve": "vite preview",
     "lint": "eslint --ext .jsx,.js,.ts,.tsx src/",
-    "test": "wdio wdio.conf.js --suite Generics --suite HomePage --suite MyPatients --suite Requests"
+    "test": "vitest"
   },
   "browserslist": {
     "production": [
@@ -69,7 +69,7 @@
   },
   "devDependencies": {
     "@testing-library/dom": "^8.20.0",
-    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",
     "@types/d3": "^7.4.0",
@@ -104,7 +104,8 @@
     "typescript": "^4.9.5",
     "vite": "^4.3.5",
     "vite-plugin-svgr": "^3.2.0",
-    "vite-tsconfig-paths": "^4.2.0"
+    "vite-tsconfig-paths": "^4.2.0",
+    "vitest": "^0.34.4"
   },
   "jest": {
     "clearMocks": true

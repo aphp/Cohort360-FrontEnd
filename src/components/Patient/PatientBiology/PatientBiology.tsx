@@ -18,7 +18,7 @@ import { buildObservationFiltersChips } from 'utils/chips'
 import useStyles from './styles'
 import { Checkbox } from '@mui/material'
 import { useDebounce } from 'utils/debounce'
-import { _cancelPendingRequest } from 'utils/abortController'
+import { cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
 
 type PatientBiologyTypes = {
@@ -141,7 +141,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
 
   useEffect(() => {
     if (loadingStatus === LoadingStatus.IDDLE) {
-      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      controllerRef.current = cancelPendingRequest(controllerRef.current)
       _fetchBiology()
     }
   }, [loadingStatus])

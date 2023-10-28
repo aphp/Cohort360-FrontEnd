@@ -1,41 +1,31 @@
 import React, { useEffect, useState } from 'react'
+import { Button, Grid } from '@mui/material'
+import useStyles from './styles'
 import { useNavigate } from 'react-router-dom'
-
-import Button from '@mui/material/Button'
-import Grid from '@mui/material/Grid'
-import Paper from '@mui/material/Paper'
-import Typography from '@mui/material/Typography'
-
-import ScopeTree from 'components/ScopeTree/ScopeTree'
-import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
-
 import { useAppDispatch, useAppSelector } from 'state'
 import { closeAllOpenedPopulation } from 'state/scope'
+import { ScopeTreeRow } from 'types'
+import Typography from '@mui/material/Typography'
+import ScopeTree from 'components/ScopeTree'
 
-import useStyles from './styles'
-
-const Scope = () => {
+const CareSiteView = () => {
   const { classes, cx } = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
-  const [selectedItems, setSelectedItem] = useState([])
-  const [searchInput, setSearchInput] = useState('')
+  const [selectedItems, setSelectedItems] = useState<ScopeTreeRow[]>([])
+  const [openPopulation, setOpenPopulations] = useState<number[]>([])
   const open = useAppSelector((state) => state.drawer)
-
-  useEffect(() => {
-    dispatch(closeAllOpenedPopulation())
-  }, [])
-
-  const onChangeSelectedItem = (newSelectedItems) => {
-    setSelectedItem(newSelectedItems)
-  }
   const trimItems = () => {
-    let _selectedItems = selectedItems ? selectedItems : []
+    const _selectedItems = selectedItems ? selectedItems : []
 
     const perimetresIds = _selectedItems.map((_selected) => _selected.cohort_id ?? null)
     navigate(`/perimeters?${perimetresIds}`)
   }
+
+  useEffect(() => {
+    dispatch(closeAllOpenedPopulation())
+  }, [])
 
   return (
     <Grid
@@ -50,18 +40,15 @@ const Scope = () => {
       <Grid container justifyContent="center" alignItems="center">
         <Grid container item xs={11} direction="column">
           <Typography variant="h1" color="primary" className={classes.title}>
-            Explorer un perimètre
+            Explorer un périmètre
           </Typography>
-          <Grid container direction="row">
-            <ScopeSearchBar searchInput={searchInput} onChangeInput={setSearchInput} />
-          </Grid>
-          <Paper className={classes.paper}>
-            <ScopeTree
-              searchInput={searchInput}
-              defaultSelectedItems={selectedItems}
-              onChangeSelectedItem={onChangeSelectedItem}
-            />
-          </Paper>
+          <ScopeTree
+            selectedItems={selectedItems}
+            setSelectedItems={setSelectedItems}
+            openPopulation={openPopulation}
+            setOpenPopulations={setOpenPopulations}
+            executiveUnitType={undefined}
+          />
         </Grid>
         <Grid
           container
@@ -76,7 +63,7 @@ const Scope = () => {
             <Button
               variant="contained"
               disableElevation
-              onClick={() => onChangeSelectedItem([])}
+              onClick={() => setSelectedItems([])}
               disabled={!selectedItems.length}
               className={classes.cancelButton}
             >
@@ -98,4 +85,4 @@ const Scope = () => {
   )
 }
 
-export default Scope
+export default CareSiteView
