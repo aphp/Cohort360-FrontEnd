@@ -145,7 +145,7 @@ const scopeSlice = createSlice({
         openPopulation: []
       }
     },
-    updateScopeList: (state, action: PayloadAction<{ newScopes: ScopeTreeRow[]; isExecutiveUnit?: Boolean }>) => {
+    updateScopeList: (state, action: PayloadAction<{ newScopes: ScopeTreeRow[]; isExecutiveUnit?: boolean }>) => {
       return {
         ...state,
         scopesList: buildScopeList(state.scopesList, action.payload.newScopes, !!action.payload.isExecutiveUnit)

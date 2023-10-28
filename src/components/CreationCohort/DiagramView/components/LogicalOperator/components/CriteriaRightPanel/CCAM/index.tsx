@@ -12,7 +12,6 @@ import { EXPLORATION } from 'utils/constants'
 
 import { CriteriaDrawerComponentProps } from 'types'
 
-
 export const defaultProcedure = {
   type: PROCEDURE,
   title: "Critères d'actes CCAM",

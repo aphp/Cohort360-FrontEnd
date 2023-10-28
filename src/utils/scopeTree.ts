@@ -1,6 +1,6 @@
 import services from 'services/aphp'
 import { RootState } from 'state'
-import { ExpandScopeElementParamsType, ScopeElement, ScopeListType, ScopePage, ScopeTreeRow, ScopeType } from 'types'
+import { ExpandScopeElementParamsType, ScopeElement, ScopeListType, ScopeTreeRow, ScopeType } from 'types'
 
 export const LOADING: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
