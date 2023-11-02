@@ -38,7 +38,8 @@ import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'u
 import { idSort, labelSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { CODE_HIERARCHY_EXTENSION_NAME, PROCEDURE_HIERARCHY } from '../../constants'
-import { Direction, Order, SearchByTypes } from 'types/searchCriterias'
+import { Direction, Order, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
+import { RessourceType } from 'types/requestCriterias'
 
 const paramValuesReducerWithPrefix =
   (prefix: string): ((accumulator: string, currentValue: string) => string) =>
@@ -331,6 +332,66 @@ export const fetchDocumentReferenceContent = async (docId: string): FHIR_API_Pro
   const documentResp = await apiFhir.get<FHIR_API_Response<DocumentReference>>(`/DocumentReference/${docId}`)
 
   return documentResp
+}
+
+/**
+ * Fhir_Filters
+ */
+
+export const postFilters = async (
+  fhir_resource: RessourceType,
+  name: string,
+  filter: string
+): Promise<AxiosResponse<SavedFilter>> => {
+  const res = await apiBackend.post('/cohort/fhir-filters/', {
+    fhir_resource,
+    fhir_version: '4.0',
+    name,
+    filter
+  })
+  return res
+}
+
+export const getFilters = async (
+  fhir_resource: RessourceType,
+  limit: number,
+  offset: number,
+  next?: string | null
+): Promise<AxiosResponse<SavedFiltersResults>> => {
+  const urlParams = next ? new URLSearchParams(next) : null
+
+  let options: string[] = []
+  options = [...options, `fhir_resource=${urlParams?.get('fhir_resource') || fhir_resource}`]
+  options = [...options, `ordering=${urlParams?.get('ordering') || '-' + Order.CREATED_AT}`]
+  options = [...options, `limit=${urlParams?.get('limit') || limit}`]
+  options = [...options, `offset=${urlParams?.get('offset') || offset}`]
+  const res = await apiBackend.get(`/cohort/fhir-filters/?${options.reduce(paramsReducer)}`)
+  return res
+}
+
+export const deleteFilter = async (fhir_resource_uuid: string): Promise<AxiosResponse<void>> => {
+  const res = await apiBackend.delete(`/cohort/fhir-filters/${fhir_resource_uuid}/`)
+  return res
+}
+
+export const deleteFilters = async (fhir_resource_uuids: string[]): Promise<AxiosResponse<void>> => {
+  const res = await apiBackend.delete(`/cohort/fhir-filters/delete_multiple/`, { data: { uuids: fhir_resource_uuids } })
+  return res
+}
+
+export const patchFilters = async (
+  fhir_resource: RessourceType,
+  uuid: string,
+  name: string,
+  filter: string
+): Promise<AxiosResponse<SavedFilter>> => {
+  const res = await apiBackend.patch(`/cohort/fhir-filters/${uuid}/`, {
+    fhir_resource,
+    fhir_version: '4.0',
+    name,
+    filter
+  })
+  return res
 }
 
 /**
@@ -739,7 +800,8 @@ export const fetchMedicationAdministration = async (
     ] // eslint-disable-line
   if (minDate) options = [...options, `effective-time=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `effective-time=le${maxDate}`] // eslint-disable-line
-  if (executiveUnits && executiveUnits.length > 0) options = [...options, `context.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `context.encounter-care-site=${executiveUnits}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
 
@@ -840,7 +902,9 @@ const getCodeList = async (
       // if noStar is true then we search for the code, else we search for the display
       searchParam = noStar
         ? `&only-roots=false&code=${search.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
-        : `&only-roots=false&_text=${encodeURIComponent(search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line  
+        : `&only-roots=false&_text=${encodeURIComponent(
+            search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') //eslint-disable-line
+          )}*`
     }
     // TODO test if it returns all the codes without specifying the count
     const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}${searchParam}`)
@@ -848,7 +912,12 @@ const getCodeList = async (
     return valueSetBundle.length > 0
       ? valueSetBundle
           .map((entry) => {
-            return entry.compose?.include[0].concept?.map((code) => ({ ...code, codeSystem: entry.compose?.include[0].system })) || [] //eslint-disable-line
+            return (
+              entry.compose?.include[0].concept?.map((code) => ({
+                ...code,
+                codeSystem: entry.compose?.include[0].system
+              })) || []
+            ) //eslint-disable-line
           })
           .filter((valueSetPerSystem) => !!valueSetPerSystem)
           .reduce((acc, val) => acc.concat(val), [])

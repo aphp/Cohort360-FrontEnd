@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, createContext, useState } from 'react'
 
-import { Button, Dialog, DialogActions, DialogTitle } from '@mui/material'
-import { DialogContentWrapper } from './style'
+import { Button, Dialog, DialogActions, DialogTitle, Typography } from '@mui/material'
+import { DialogContentWrapper } from './styles'
 import { FormContextType } from 'types/form'
 
 export const FormContext = createContext<FormContextType | null>(null)
@@ -11,6 +11,8 @@ type ModalProps = {
   title?: string
   width?: string
   noActions?: boolean
+  readonly?: boolean
+  validationText?: string
   onSubmit?: (value: any) => void
   onClose?: () => void
 }
@@ -21,6 +23,8 @@ const Modal = ({
   open,
   width = '450px',
   noActions = false,
+  readonly = false,
+  validationText = 'Valider',
   onSubmit,
   onClose
 }: PropsWithChildren<ModalProps>) => {
@@ -35,30 +39,45 @@ const Modal = ({
     setIsError(isError)
   }
 
-  const handleSubmit = () => {
-    if (onSubmit) onSubmit(formData)
+  const submit = async () => {
+    try {
+      if (onSubmit) await onSubmit(formData)
+      if (onClose) onClose()
+    } catch {
+      // Nothing to do if reaching here
+    }
   }
+
   return (
     <FormContext.Provider value={{ updateFormData, updateError }}>
       <Dialog open={open} onClose={onClose}>
-        {title && <DialogTitle>{title}</DialogTitle>}
-        <DialogContentWrapper width={width}>{children}</DialogContentWrapper>
-        {!noActions && (
-          <DialogActions>
-            <Button color="info" onClick={onClose}>
-              Annuler
-            </Button>
-            <Button
-              disabled={isError}
-              onClick={() => {
-                handleSubmit()
-                if (onClose) onClose()
-              }}
-            >
-              Valider
-            </Button>
-          </DialogActions>
+        {title && (
+          <DialogTitle sx={{ color: '#FC2E8F', textTransform: 'uppercase', fontSize: 20 }}>{title}</DialogTitle>
         )}
+        <DialogContentWrapper width={width}>{children}</DialogContentWrapper>
+        {!noActions &&
+          (!readonly ? (
+            <DialogActions>
+              <Button color="info" onClick={onClose}>
+                <Typography fontSize="15px" fontWeight="500">
+                  Annuler
+                </Typography>
+              </Button>
+              <Button disabled={isError} color="secondary" onClick={submit}>
+                <Typography fontSize="15px" fontWeight="900">
+                  {validationText}
+                </Typography>
+              </Button>
+            </DialogActions>
+          ) : (
+            <DialogActions>
+              <Button color="primary" onClick={onClose}>
+                <Typography fontSize="15px" fontWeight="900">
+                  Retour
+                </Typography>
+              </Button>
+            </DialogActions>
+          ))}
       </Dialog>
     </FormContext.Provider>
   )

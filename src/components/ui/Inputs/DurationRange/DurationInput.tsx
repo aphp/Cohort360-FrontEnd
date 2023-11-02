@@ -30,12 +30,12 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
         <Grid container item xs={deidentified ? 5 : 3} alignItems="center">
           <Grid item xs={6}>
             <TextFieldWrapper
-              active={!!duration.year}
+              active={!disabled && !!duration.year}
               disabled={disabled}
               placeholder={duration.year ? undefined : name === 'max' ? '130' : '0'}
               value={duration.year}
               variant="standard"
-              type="number"
+              type={disabled || !!duration.year ? 'text' : 'number'}
               InputProps={{
                 inputProps: {
                   min: 0
@@ -50,18 +50,18 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
             />
           </Grid>
           <Grid item xs={6}>
-            <DurationUnitWrapper active={!!duration.year}>{CalendarRequestLabel.YEAR}</DurationUnitWrapper>
+            <DurationUnitWrapper active={!disabled && !!duration.year}>{CalendarRequestLabel.YEAR}</DurationUnitWrapper>
           </Grid>
         </Grid>
         <Grid container item xs={deidentified ? 5 : 3} alignItems="center">
           <Grid item xs={6}>
             <TextFieldWrapper
-              active={!!duration.month}
+              active={!disabled && !!duration.month}
               disabled={disabled}
               value={duration.month ? duration.month : undefined}
               placeholder={duration.month ? undefined : '0'}
               variant="standard"
-              type="number"
+              type={disabled || !!duration.month ? 'text' : 'number'}
               InputProps={{
                 inputProps: {
                   min: 0
@@ -76,19 +76,21 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
             />
           </Grid>
           <Grid item xs={6}>
-            <DurationUnitWrapper active={!!duration.month}>{CalendarRequestLabel.MONTH}</DurationUnitWrapper>
+            <DurationUnitWrapper active={!disabled && !!duration.month}>
+              {CalendarRequestLabel.MONTH}
+            </DurationUnitWrapper>
           </Grid>
         </Grid>
         {!deidentified && (
           <Grid container item xs={3} alignItems="center">
             <Grid item xs={6}>
               <TextFieldWrapper
-                active={!!duration.day}
+                active={!disabled && !!duration.day}
                 disabled={disabled}
                 value={duration.day ? duration.day : undefined}
                 placeholder={duration.day ? undefined : '0'}
                 variant="standard"
-                type="number"
+                type={disabled || !!duration.day ? 'text' : 'number'}
                 InputProps={{
                   inputProps: {
                     min: 0
@@ -103,7 +105,7 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
               />
             </Grid>
             <Grid item xs={6}>
-              <DurationUnitWrapper active={!!duration.day}>{CalendarRequestLabel.DAY}</DurationUnitWrapper>
+              <DurationUnitWrapper active={!disabled && !!duration.day}>{CalendarRequestLabel.DAY}</DurationUnitWrapper>
             </Grid>
           </Grid>
         )}
