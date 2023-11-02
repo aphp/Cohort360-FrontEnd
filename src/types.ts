@@ -157,7 +157,7 @@ export type MedicationEntry<T extends MedicationRequest | MedicationAdministrati
 
 export type SimpleCodeType = { code: string; label: string; type: string }
 
-type GenericFilter = {
+export type GenericFilter = {
   nda: string
   startDate: string | null
   endDate: string | null

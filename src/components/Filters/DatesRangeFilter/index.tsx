@@ -6,9 +6,10 @@ import { DurationRangeType } from 'types/searchCriterias'
 type DatesRangeFilterProps = {
   values: DurationRangeType
   names: string[]
+  disabled?: boolean
 }
 
-const DatesRangeFilter = ({ names, values }: DatesRangeFilterProps) => {
+const DatesRangeFilter = ({ names, values, disabled }: DatesRangeFilterProps) => {
   const context = useContext(FormContext)
   const [startDate, setStartDate] = useState(values[0])
   const [endDate, setEndDate] = useState(values[1])
@@ -27,6 +28,7 @@ const DatesRangeFilter = ({ names, values }: DatesRangeFilterProps) => {
 
   return (
     <CalendarRange
+      disabled={disabled}
       label="Date"
       value={[startDate, endDate]}
       onChange={(value) => {

@@ -14,6 +14,14 @@ const useStyles = makeStyles<PopulationCardPropsType>()((theme: Theme, params) =
     flex: 1,
     position: 'relative'
   },
+  disabledPopulationCard: {
+    borderRadius: 4,
+    backgroundColor: '#FFFFFF',
+    padding: '8px 16px',
+    border: params.form ? '1px solid #D0D7D8' : '3px solid #D3DEE8',
+    flex: 1,
+    position: 'relative'
+  },
   typography: {
     padding: params.form ? '0px' : '0 1em',
     display: 'flex',
@@ -26,17 +34,12 @@ const useStyles = makeStyles<PopulationCardPropsType>()((theme: Theme, params) =
     justifyContent: 'center'
   },
   leftDiv: {
-    display: 'flex',
-    alignItems: 'center',
     [theme.breakpoints.down('lg')]: {
       flexWrap: 'wrap'
     }
   },
   editButton: {
     color: 'currentcolor'
-  },
-  chipContainer: {
-    marginLeft: 12
   },
   populationChip: {
     margin: 4,

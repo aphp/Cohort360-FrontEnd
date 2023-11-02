@@ -1,5 +1,27 @@
 import { makeStyles } from 'tss-react/mui'
-import { Theme } from '@mui/material/styles'
+import { Theme, styled } from '@mui/material/styles'
+import { List, ListItem } from '@mui/material'
+
+type CustomProps = {
+  selected?: boolean
+}
+export const ListWrapper = styled(List)<CustomProps>(() => ({
+  width: '100%',
+  padding: 0
+}))
+
+export const ListItemWrapper = styled(ListItem)<CustomProps>(({ selected }) => ({
+  ...(selected && {
+    backgroundColor: '#FAF9F9',
+    cursor: 'default'
+  }),
+  ...(!selected && {
+    '&:hover': {
+      cursor: 'pointer',
+      backgroundColor: '#FAF9F9'
+    }
+  })
+}))
 
 const useStyles = makeStyles()((theme: Theme) => ({
   table: {

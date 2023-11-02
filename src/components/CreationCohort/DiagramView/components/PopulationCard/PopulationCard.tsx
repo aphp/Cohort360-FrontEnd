@@ -25,13 +25,23 @@ export type PopulationCardPropsType = {
   title?: string
   form?: CriteriaNameType
   executiveUnits?: ScopeTreeRow[]
+  disabled?: boolean
   isAcceptEmptySelection?: boolean
   isDeleteIcon?: boolean
   onChangeExecutiveUnits?: (_selectedPopulations: ScopeTreeRow[]) => void
 }
 
 const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
-  const { label, title, form, executiveUnits, onChangeExecutiveUnits, isAcceptEmptySelection, isDeleteIcon } = props
+  const {
+    label,
+    title,
+    form,
+    executiveUnits,
+    onChangeExecutiveUnits,
+    disabled = false,
+    isAcceptEmptySelection,
+    isDeleteIcon
+  } = props
   const { classes } = useStyles(props)
   const dispatch = useAppDispatch()
   const isRendered = useRef<boolean>(false)
@@ -101,6 +111,10 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
   }, [selectedItems])
 
   useEffect(() => {
+    setSelectedItems(selection.filter((item): item is ScopeTreeRow => item !== undefined))
+  }, [executiveUnits])
+
+  useEffect(() => {
     if (
       !isRendered.current &&
       !executiveUnits &&
@@ -122,28 +136,40 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
   return (
     <>
       {loading ? (
-        <div className={classes.populationCard}>
+        <div className={disabled ? classes.disabledPopulationCard : classes.populationCard}>
           <div className={classes.centerContainer}>
             <CircularProgress />
           </div>
         </div>
       ) : selectionAndPopulationWithRightError?.length !== 0 || form ? (
-        <Grid container justifyContent="space-between" alignItems="center" className={classes.populationCard}>
-          <div className={classes.leftDiv}>
-            <Typography className={classes.typography} variant={form ? undefined : 'h6'} align="left">
-              {label ?? 'Population source :'}
-            </Typography>
-
-            <div className={classes.chipContainer}>
+        <Grid
+          container
+          alignItems="center"
+          className={disabled ? classes.disabledPopulationCard : classes.populationCard}
+        >
+          <Grid item xs container alignItems="center" justifyContent="flex-start" gap="8px" className={classes.leftDiv}>
+            <Grid item>
+              {!disabled ? (
+                <Typography className={classes.typography} variant={form ? undefined : 'h6'} align="left">
+                  {label ?? 'Population source :'}
+                </Typography>
+              ) : (
+                <Typography className={classes.typography} variant={form ? undefined : 'h6'} align="left">
+                  {selectedItems.length ? 'Sélectionnées: ' : 'Aucune unité exécutrice sélectionnée'}
+                </Typography>
+              )}
+            </Grid>
+            <Grid item>
               {isExtended ? (
                 <>
                   {selectionAndPopulationWithRightError &&
                     selectionAndPopulationWithRightError.map((pop, index: number) => (
                       <Chip
+                        disabled={disabled}
                         className={classes.populationChip}
                         key={`${index}-${pop?.name}`}
                         label={pop?.name}
-                        onDelete={isDeleteIcon ? () => _onDelete(index) : undefined}
+                        onDelete={isDeleteIcon && !disabled ? () => _onDelete(index) : undefined}
                       />
                     ))}
                   <IconButton size="small" onClick={() => onExtend(false)}>
@@ -158,17 +184,19 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
                       .map((pop, index: number) =>
                         pop ? (
                           <Chip
+                            disabled={disabled}
                             className={classes.populationChip}
                             key={`${index}-${pop.name}`}
                             label={pop.name}
-                            onDelete={isDeleteIcon ? () => _onDelete(index) : undefined}
+                            onDelete={isDeleteIcon && !disabled ? () => _onDelete(index) : undefined}
                           />
                         ) : (
                           <Chip
+                            disabled={disabled}
                             className={classes.populationChip}
                             key={index}
                             label={'?'}
-                            onDelete={isDeleteIcon ? () => _onDelete(index) : undefined}
+                            onDelete={isDeleteIcon && !disabled ? () => _onDelete(index) : undefined}
                           />
                         )
                       )}
@@ -179,16 +207,18 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
                   )}
                 </>
               )}
-            </div>
-          </div>
-          <IconButton
-            className={classes.editButton}
-            size="small"
-            onClick={() => onChangeOpenDrawer(true)}
-            disabled={maintenanceIsActive}
-          >
-            <EditIcon />
-          </IconButton>
+            </Grid>
+          </Grid>
+          <Grid item alignSelf="center">
+            <IconButton
+              className={classes.editButton}
+              size="small"
+              onClick={() => onChangeOpenDrawer(true)}
+              disabled={maintenanceIsActive || disabled}
+            >
+              <EditIcon />
+            </IconButton>
+          </Grid>
         </Grid>
       ) : (
         <div className={classes.centerContainer}>

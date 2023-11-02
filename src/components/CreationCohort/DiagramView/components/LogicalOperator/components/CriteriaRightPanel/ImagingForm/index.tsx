@@ -291,7 +291,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
                     </Grid>
                     <Grid item xs={4}>
                       <TextFieldWrapper
-                        active={!!daysOfDelay}
+                        activated={!!daysOfDelay}
                         value={daysOfDelay}
                         variant="standard"
                         size="small"

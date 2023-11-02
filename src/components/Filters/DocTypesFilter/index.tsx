@@ -8,9 +8,10 @@ type DocTypesFilterProps = {
   allDocTypesList: SimpleCodeType[]
   value: SimpleCodeType[]
   name: string
+  disabled?: boolean
 }
 
-const DocTypesFilter = ({ name, value, allDocTypesList }: DocTypesFilterProps) => {
+const DocTypesFilter = ({ name, value, allDocTypesList, disabled = false }: DocTypesFilterProps) => {
   const context = useContext(FormContext)
   const [selectedDocTypes, setSelectedDocTypes] = useState(value)
 
@@ -57,6 +58,7 @@ const DocTypesFilter = ({ name, value, allDocTypesList }: DocTypesFilterProps) =
     <InputWrapper>
       <Typography variant="h3">Type de documents :</Typography>
       <Autocomplete
+        disabled={disabled}
         multiple
         onChange={(event, value) => {
           setSelectedDocTypes(value)

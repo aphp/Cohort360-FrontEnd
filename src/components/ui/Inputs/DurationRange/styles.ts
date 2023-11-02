@@ -1,7 +1,7 @@
 import { TextField, Typography, styled } from '@mui/material'
 
 type CustomProps = {
-  active?: boolean
+  activated?: boolean
   disabled?: boolean
 }
 export const DurationLabel = styled(Typography)<CustomProps>(({ disabled = false }) => ({
@@ -9,12 +9,12 @@ export const DurationLabel = styled(Typography)<CustomProps>(({ disabled = false
   opacity: disabled ? 0.5 : 1
 }))
 
-export const TextFieldWrapper = styled(TextField)<CustomProps>(({ active = false }) => ({
+export const TextFieldWrapper = styled(TextField)<CustomProps>(({ activated = false }) => ({
   '& input': {
     padding: '2px 4px 3px 0',
     textAlign: 'center',
-    fontWeight: active ? 900 : 400,
-    color: active ? '#153D8A' : '#5B5E63'
+    fontWeight: activated ? 900 : 400,
+    color: activated ? '#153D8A' : '#5B5E63'
   }
 }))
 
@@ -26,9 +26,9 @@ export const DurationLegendWrapper = styled(Typography)(() => ({
   opacity: 0.6
 }))
 
-export const DurationUnitWrapper = styled(Typography)<CustomProps>(({ active = false }) => ({
-  color: active ? '#153D8A' : '#5B5E63',
-  fontWeight: active ? 700 : 400,
+export const DurationUnitWrapper = styled(Typography)<CustomProps>(({ activated = false }) => ({
+  color: activated ? '#153D8A' : '#5B5E63',
+  fontWeight: activated ? 700 : 400,
   fontSize: 11.5,
   textAlign: 'center'
 }))

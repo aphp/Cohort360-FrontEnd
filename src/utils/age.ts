@@ -78,12 +78,12 @@ export const substructAgeString = (range: string): Date => {
 
 export const convertStringToDuration = (age: string | null | undefined): DurationType | null => {
   if (!age) return null
-  const newAge: DurationType = {
-    year: Number(age.split('/')[2]),
-    month: Number(age.split('/')[1]),
-    day: Number(age.split('/')[0])
+  const splitDate = age.split('/')
+  return {
+    year: Number(splitDate?.[2] || 0),
+    month: Number(splitDate?.[1] || 0),
+    day: Number(splitDate?.[0] || 0)
   }
-  return newAge
 }
 
 export const convertDurationToString = (ageDate: DurationType): string | null => {
