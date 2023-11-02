@@ -15,7 +15,7 @@ import {
 } from 'types'
 
 import { FHIR_Bundle_Response } from 'types'
-import { AxiosResponse } from 'axios'
+import { AxiosError, AxiosResponse } from 'axios'
 import apiBackend from '../apiBackend'
 import {
   Binary,
@@ -38,13 +38,19 @@ import { Observation } from 'fhir/r4'
 import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 import { idSort, labelSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
-import { CODE_HIERARCHY_EXTENSION_NAME, PROCEDURE_HIERARCHY } from '../../constants'
-import { Direction, Order, SearchByTypes } from 'types/searchCriterias'
+import {
+  BIOLOGY_HIERARCHY_ITM_ANABIO,
+  BIOLOGY_HIERARCHY_ITM_LOINC,
+  CODE_HIERARCHY_EXTENSION_NAME,
+  PROCEDURE_HIERARCHY
+} from '../../constants'
+import { Direction, Order, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
+import { RessourceType } from 'types/requestCriterias'
 
-const paramValuesReducerWithPrefix =
+export const paramValuesReducerWithPrefix =
   (prefix: string): ((accumulator: string, currentValue: string) => string) =>
   (accumulator: string, currentValue: string) =>
-    accumulator ? `${accumulator},${prefix + currentValue}` : currentValue ? prefix + currentValue : accumulator
+    accumulator ? `${accumulator},${prefix}|${currentValue}` : `${prefix}|${currentValue}`
 const paramValuesReducer = (accumulator: any, currentValue: any): any =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 const paramsReducer = (accumulator: string, currentValue: string): string =>
@@ -335,6 +341,68 @@ export const fetchDocumentReferenceContent = async (docId: string): FHIR_API_Pro
 }
 
 /**
+ * Fhir_Filters
+ */
+
+export const postFilters = async (
+  fhir_resource: RessourceType,
+  name: string,
+  filter: string
+): Promise<AxiosResponse<SavedFilter>> => {
+  const res = await apiBackend.post('/cohort/fhir-filters/', {
+    fhir_resource,
+    fhir_version: '4.0',
+    name,
+    filter
+  })
+  if (res instanceof AxiosError) throw "Le filtre n'a pas pu être sauvegardé."
+  return res
+}
+
+export const getFilters = async (
+  fhir_resource: RessourceType,
+  limit: number,
+  offset: number,
+  next?: string | null
+): Promise<AxiosResponse<SavedFiltersResults>> => {
+  const urlParams = next ? new URLSearchParams(next) : null
+
+  let options: string[] = []
+  options = [...options, `fhir_resource=${urlParams?.get('fhir_resource') || fhir_resource}`]
+  options = [...options, `ordering=${urlParams?.get('ordering') || '-' + Order.CREATED_AT}`]
+  options = [...options, `limit=${urlParams?.get('limit') || limit}`]
+  options = [...options, `offset=${urlParams?.get('offset') || offset}`]
+  const res = await apiBackend.get(`/cohort/fhir-filters/?${options.reduce(paramsReducer)}`)
+  return res
+}
+
+export const deleteFilter = async (fhir_resource_uuid: string): Promise<AxiosResponse<void>> => {
+  const res = await apiBackend.delete(`/cohort/fhir-filters/${fhir_resource_uuid}/`)
+  return res
+}
+
+export const deleteFilters = async (fhir_resource_uuids: string[]): Promise<AxiosResponse<void>> => {
+  const res = await apiBackend.delete(`/cohort/fhir-filters/delete_multiple/`, { data: { uuids: fhir_resource_uuids } })
+  return res
+}
+
+export const patchFilters = async (
+  fhir_resource: RessourceType,
+  uuid: string,
+  name: string,
+  filter: string
+): Promise<AxiosResponse<SavedFilter>> => {
+  const res = await apiBackend.patch(`/cohort/fhir-filters/${uuid}/`, {
+    fhir_resource,
+    fhir_version: '4.0',
+    name,
+    filter
+  })
+  if (res instanceof AxiosError) throw "Le filtre n'a pas pu être modifié."
+  return res
+}
+
+/**
  * Binary Resource
  *
  */
@@ -388,7 +456,7 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (code) options = [...options, `code=${encodeURIComponent(`${PROCEDURE_HIERARCHY}|`) + code}`] // eslint-disable-line
+  if (code) options = [...options, `code=${code}`] // eslint-disable-line
   if (source) options = [...options, `source=${source}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (status)
@@ -453,11 +521,7 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
-  if (diagnosis)
-    options = [
-      ...options,
-      `diagnosis=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-ghm|') + diagnosis}`
-    ] // eslint-disable-line
+  if (diagnosis) options = [...options, `diagnosis=${diagnosis}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (status)
     options = [
@@ -517,8 +581,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   if (offset !== undefined) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (code)
-    options = [...options, `code=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-cim10|') + code}`] // eslint-disable-line
+  if (code) options = [...options, `code=${code}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
   if (minRecordedDate) options = [...options, `recorded-date=ge${minRecordedDate}`] // eslint-disable-line
@@ -527,13 +590,11 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
     options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
-  if (type && type.length > 0)
-    options = [
-      ...options,
-      `orbis-status=${type.reduce(
-        paramValuesReducerWithPrefix(encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-condition-status|'))
-      )}`
-    ] // eslint-disable-line
+  if (type && type.length > 0) {
+    const diagnosticTypesUrl = encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-condition-status|')
+    const urlString = type.map((id) => diagnosticTypesUrl + id).join(',')
+    options = [...options, `orbis-status=${urlString}`]
+  }
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Condition>>(`/Condition?${options.reduce(paramsReducer)}`, {
     signal: args.signal
@@ -592,12 +653,7 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (encounter) options = [...options, `encounter.identifier=${encounter}`] // eslint-disable-line
   if (anabio || loinc)
-    options = [
-      ...options,
-      `code=${anabio ? encodeURIComponent('https://terminology.eds.aphp.fr/aphp-itm-anabio|') + anabio : ''}${
-        anabio && loinc ? ',' : ''
-      }${loinc ? encodeURIComponent('https://terminology.eds.aphp.fr/aphp-itm-loinc|') + loinc : ''}`
-    ] // eslint-disable-line
+    options = [...options, `code=${anabio ? anabio : ''}${anabio && loinc ? ',' : ''}${loinc ? loinc : ''}`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `date=le${maxDate}`] // eslint-disable-line
@@ -740,7 +796,8 @@ export const fetchMedicationAdministration = async (
     ] // eslint-disable-line
   if (minDate) options = [...options, `effective-time=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `effective-time=le${maxDate}`] // eslint-disable-line
-  if (executiveUnits && executiveUnits.length > 0) options = [...options, `context.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `context.encounter-care-site=${executiveUnits}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
 
@@ -843,7 +900,9 @@ const getCodeList = async (
       // if noStar is true then we search for the code, else we search for the display
       searchParam = noStar
         ? `&only-roots=false&code=${search.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
-        : `&only-roots=false&_text=${encodeURIComponent(search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line  
+        : `&only-roots=false&_text=${encodeURIComponent(
+            search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') //eslint-disable-line
+          )}*`
     }
     // TODO test if it returns all the codes without specifying the count
     const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}${searchParam}`, {
@@ -853,7 +912,12 @@ const getCodeList = async (
     return valueSetBundle.length > 0
       ? valueSetBundle
           .map((entry) => {
-            return entry.compose?.include[0].concept?.map((code) => ({ ...code, codeSystem: entry.compose?.include[0].system })) || [] //eslint-disable-line
+            return (
+              entry.compose?.include[0].concept?.map((code) => ({
+                ...code,
+                codeSystem: entry.compose?.include[0].system
+              })) || []
+            ) //eslint-disable-line
           })
           .filter((valueSetPerSystem) => !!valueSetPerSystem)
           .reduce((acc, val) => acc.concat(val), [])
@@ -998,6 +1062,11 @@ export const fetchCohortAccesses = async (cohortIds: string[]) => {
 
 export const fetchPerimeterFromCohortId = async (cohortId: string) => {
   const response = await apiBackend.get(`accesses/perimeters/?cohort_id=${cohortId}`)
+  return response
+}
+
+export const fetchPerimeterFromId = async (perimeterId: string) => {
+  const response = await apiBackend.get(`accesses/perimeters/${perimeterId}/`)
   return response
 }
 

@@ -1,5 +1,5 @@
+import { ValueSetSystem } from 'types/valueSet'
 import { MEDICATION_ATC, MEDICATION_UCD } from '../constants'
-import { ValueSetSystem } from '../types'
 
 export const displaySystem = (system?: ValueSetSystem) => {
   switch (system) {

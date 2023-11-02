@@ -11,9 +11,10 @@ import {
 } from 'types/searchCriterias'
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
-import { ScopeTreeRow, SimpleCodeType, ValueSet } from 'types'
+import { ScopeTreeRow, SimpleCodeType } from 'types'
 import { getDurationRangeLabel } from './age'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
+import { ValueSet } from 'types/valueSet'
 
 export const getCohortsTypeLabel = (type: CohortsType): string => {
   switch (type) {
@@ -57,15 +58,12 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.DOC_TYPES:
       case FilterKeys.STATUS:
       case FilterKeys.MODALITY:
+      case FilterKeys.LOINC:
+      case FilterKeys.ANABIO:
+      case FilterKeys.CODE:
         castedFilters[key] = removeElementInArray(castedFilters[key], value)
         break
-      case FilterKeys.SOURCE:
-        castedFilters[key] = null
-        break
-      case FilterKeys.CODE:
       case FilterKeys.NDA:
-      case FilterKeys.ANABIO:
-      case FilterKeys.LOINC:
       case FilterKeys.IPP:
         castedFilters[key] = removeElementInArray((castedFilters[key] as string).split(','), value as string).join(',')
         break
@@ -76,6 +74,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.END_DATE:
       case FilterKeys.MIN_PATIENTS:
       case FilterKeys.MAX_PATIENTS:
+      case FilterKeys.SOURCE:
         castedFilters[key] = null
         break
       case FilterKeys.FAVORITE:
@@ -112,7 +111,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return `IPP : ${value}`
   }
   if (key === FilterKeys.CODE) {
-    return `Code : ${value}`
+    return `Code : ${(value as LabelObject).id} - ${(value as LabelObject).label}`
   }
   if (key === FilterKeys.SOURCE) {
     return `Source : ${value}`
@@ -133,10 +132,10 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return `Type de prescription : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
   }
   if (key === FilterKeys.ANABIO) {
-    return `Code ANABIO : ${value}`
+    return `Code ANABIO : ${(value as LabelObject).id} - ${(value as LabelObject).label}`
   }
   if (key === FilterKeys.LOINC) {
-    return `Code LOINC : ${value}`
+    return `Code LOINC : ${(value as LabelObject).id} - ${(value as LabelObject).label}`
   }
   if (key === FilterKeys.STATUS) {
     return `Statut : ${(value as ValueSet)?.display}`
@@ -169,6 +168,9 @@ export const selectFiltersAsArray = (filters: Filters) => {
         case FilterKeys.EXECUTIVE_UNITS:
         case FilterKeys.STATUS:
         case FilterKeys.MODALITY:
+        case FilterKeys.LOINC:
+        case FilterKeys.ANABIO:
+        case FilterKeys.CODE:
           ;(value as []).forEach((elem) =>
             result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
           )
@@ -182,6 +184,8 @@ export const selectFiltersAsArray = (filters: Filters) => {
             })
           }
           break
+        case FilterKeys.SOURCE:
+
         case FilterKeys.START_DATE:
         case FilterKeys.END_DATE:
         case FilterKeys.MIN_PATIENTS:
@@ -192,17 +196,7 @@ export const selectFiltersAsArray = (filters: Filters) => {
             value: value as FilterValue
           })
           break
-        case FilterKeys.SOURCE:
-          result.push({
-            category: key,
-            label: getFilterLabel(key, value),
-            value: value as FilterValue
-          })
-          break
         case FilterKeys.NDA:
-        case FilterKeys.CODE:
-        case FilterKeys.ANABIO:
-        case FilterKeys.LOINC:
         case FilterKeys.IPP:
           ;(value as string).split(',').forEach((elem) =>
             result.push({

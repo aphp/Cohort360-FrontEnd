@@ -9,10 +9,16 @@ import { capitalizeFirstLetter } from 'utils/capitalize'
 type PrescriptionTypesFilterProps = {
   value: LabelObject[]
   name: string
-  allAdministrationTypes: HierarchyElement[]
+  allPrescriptionTypes: HierarchyElement[]
+  disabled?: boolean
 }
 
-const PrescriptionTypesFilter = ({ name, value, allAdministrationTypes }: PrescriptionTypesFilterProps) => {
+const PrescriptionTypesFilter = ({
+  name,
+  value,
+  allPrescriptionTypes,
+  disabled = false
+}: PrescriptionTypesFilterProps) => {
   const context = useContext(FormContext)
   const [prescriptionTypes, setPrescriptionTypes] = useState(value)
 
@@ -24,11 +30,12 @@ const PrescriptionTypesFilter = ({ name, value, allAdministrationTypes }: Prescr
     <InputWrapper>
       <Typography variant="h3">Type de prescriptions :</Typography>
       <Autocomplete
+        disabled={disabled}
         multiple
         onChange={(event, value) => {
           setPrescriptionTypes(value)
         }}
-        options={allAdministrationTypes}
+        options={allPrescriptionTypes}
         value={prescriptionTypes}
         disableCloseOnSelect
         getOptionLabel={(prescriptionType: any) => capitalizeFirstLetter(prescriptionType.label)}

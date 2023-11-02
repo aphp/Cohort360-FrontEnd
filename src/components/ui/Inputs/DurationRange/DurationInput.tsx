@@ -22,20 +22,20 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
   }, [duration])
 
   return (
-    <BlockWrapper container justifyContent="space-between" xs={12} alignItems="flex-end">
+    <BlockWrapper container justifyContent="space-between" alignItems="flex-end">
       <Grid item xs={deidentified ? 4 : 3} container alignItems="flex-start">
         <DurationLegendWrapper variant="h5">{label}</DurationLegendWrapper>
       </Grid>
       <Grid item xs={deidentified ? 8 : 9} container justifyContent="space-between">
         <Grid container item xs={deidentified ? 5 : 3} alignItems="center">
-          <Grid item xs={6}>
+          <Grid item xs={7}>
             <TextFieldWrapper
-              active={!!duration.year}
+              active={!disabled && !!duration.year}
               disabled={disabled}
               placeholder={duration.year ? undefined : name === 'max' ? '130' : '0'}
               value={duration.year}
               variant="standard"
-              type="number"
+              type={disabled ? 'text' : 'number'}
               InputProps={{
                 inputProps: {
                   min: 0
@@ -44,24 +44,24 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
               size="small"
               onChange={(e) => {
                 if (!isNaN(+e.target.value) && +e.target.value <= 130) {
-                  setDuration({ ...duration, year: e.target.value !== '' ? +e.target.value : null })
+                  setDuration({ ...duration, year: e.target.value !== '' ? Math.abs(+e.target.value) : null })
                 }
               }}
             />
           </Grid>
-          <Grid item xs={6}>
-            <DurationUnitWrapper active={!!duration.year}>{CalendarRequestLabel.YEAR}</DurationUnitWrapper>
+          <Grid item xs={5}>
+            <DurationUnitWrapper active={!disabled && !!duration.year}>{CalendarRequestLabel.YEAR}</DurationUnitWrapper>
           </Grid>
         </Grid>
         <Grid container item xs={deidentified ? 5 : 3} alignItems="center">
           <Grid item xs={6}>
             <TextFieldWrapper
-              active={!!duration.month}
+              active={!disabled && !!duration.month}
               disabled={disabled}
               value={duration.month ? duration.month : undefined}
               placeholder={duration.month ? undefined : '0'}
               variant="standard"
-              type="number"
+              type={disabled ? 'text' : 'number'}
               InputProps={{
                 inputProps: {
                   min: 0
@@ -70,25 +70,27 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
               size="small"
               onChange={(e) => {
                 if (!isNaN(+e.target.value) && +e.target.value <= 12) {
-                  setDuration({ ...duration, month: e.target.value !== '' ? +e.target.value : null })
+                  setDuration({ ...duration, month: e.target.value !== '' ? Math.abs(+e.target.value) : null })
                 }
               }}
             />
           </Grid>
           <Grid item xs={6}>
-            <DurationUnitWrapper active={!!duration.month}>{CalendarRequestLabel.MONTH}</DurationUnitWrapper>
+            <DurationUnitWrapper active={!disabled && !!duration.month}>
+              {CalendarRequestLabel.MONTH}
+            </DurationUnitWrapper>
           </Grid>
         </Grid>
         {!deidentified && (
           <Grid container item xs={3} alignItems="center">
             <Grid item xs={6}>
               <TextFieldWrapper
-                active={!!duration.day}
+                active={!disabled && !!duration.day}
                 disabled={disabled}
                 value={duration.day ? duration.day : undefined}
                 placeholder={duration.day ? undefined : '0'}
                 variant="standard"
-                type="number"
+                type={disabled ? 'text' : 'number'}
                 InputProps={{
                   inputProps: {
                     min: 0
@@ -97,13 +99,13 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
                 size="small"
                 onChange={(e) => {
                   if (!isNaN(+e.target.value) && +e.target.value <= 31) {
-                    setDuration({ ...duration, day: e.target.value !== '' ? +e.target.value : null })
+                    setDuration({ ...duration, day: e.target.value !== '' ? Math.abs(+e.target.value) : null })
                   }
                 }}
               />
             </Grid>
             <Grid item xs={6}>
-              <DurationUnitWrapper active={!!duration.day}>{CalendarRequestLabel.DAY}</DurationUnitWrapper>
+              <DurationUnitWrapper active={!disabled && !!duration.day}>{CalendarRequestLabel.DAY}</DurationUnitWrapper>
             </Grid>
           </Grid>
         )}

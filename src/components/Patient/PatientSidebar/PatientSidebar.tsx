@@ -144,14 +144,14 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
         </IconButton>
       </div>
       <BlockWrapper item margin={'4px'}>
-        <Searchbar wrap>
+        <Searchbar wrapped>
           <Typography variant="button" style={{ marginBottom: '8px' }}>
             Rechercher par :
           </Typography>
           <Grid container item justifyContent="flex-end">
             {!deidentifiedBoolean && (
               <Select
-                selectedValue={searchBy || SearchByTypes.TEXT}
+                value={searchBy || SearchByTypes.TEXT}
                 label="Rechercher dans :"
                 width={'40%'}
                 items={searchByListPatients}

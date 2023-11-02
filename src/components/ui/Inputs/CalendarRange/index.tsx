@@ -38,9 +38,7 @@ const CalendarRange = ({ value, label, inline = false, onError, disabled = false
     <BlockWrapper>
       {label && (
         <BlockWrapper item xs={12} margin="0px 0px 10px 0px">
-          <CalendarLabel disabled={disabled} variant="h3">
-            {label} :
-          </CalendarLabel>
+          <CalendarLabel variant="h3">{label} :</CalendarLabel>
         </BlockWrapper>
       )}
       <Grid item xs={12} container spacing={2}>

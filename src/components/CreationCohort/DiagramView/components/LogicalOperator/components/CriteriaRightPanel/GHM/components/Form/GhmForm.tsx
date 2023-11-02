@@ -10,7 +10,7 @@ import { fetchClaim } from 'state/pmsi'
 import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
-import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
+import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
 import { GhmDataType } from 'types/requestCriterias'
 
@@ -127,16 +127,14 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             onChangeValue={onChangeValue}
           />
 
-          <InputAutocompleteAsync
-            multiple
+          <AsyncAutocomplete
             label="Codes GHM"
             variant="outlined"
             noOptionsText="Veuillez entrer un code ou un critère GHM"
             className={classes.inputItem}
-            autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteriaData.data.ghmData || []}
-            getAutocompleteOptions={getGhmOptions}
-            onChange={(e, value) => {
+            values={defaultValuesCode}
+            onFetch={getGhmOptions}
+            onChange={(value) => {
               onChangeValue('code', value)
             }}
           />

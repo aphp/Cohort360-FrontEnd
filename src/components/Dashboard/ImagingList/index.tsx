@@ -3,9 +3,8 @@ import useSearchCriterias, { initImagingCriterias } from 'reducers/searchCriteri
 import services from 'services/aphp'
 
 import { CircularProgress, Grid } from '@mui/material'
-import { FilterList } from '@mui/icons-material'
+import { FilterList, Save, SavedSearch } from '@mui/icons-material'
 
-import { BlockWrapper } from 'components/ui/Layout'
 import Button from 'components/ui/Button'
 import Chip from 'components/ui/Chip'
 import DataTableImaging from 'components/DataTable/DataTableImaging'
@@ -16,7 +15,6 @@ import IppFilter from 'components/Filters/IppFilter'
 import Modal from 'components/ui/Modal'
 import ModalityFilter from 'components/Filters/ModalityFilter/ModalityFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
-import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 
 import {
@@ -27,12 +25,17 @@ import {
   LoadingStatus,
   DTTB_ResultsType as ResultsType
 } from 'types'
-import { FilterKeys } from 'types/searchCriterias'
+import { Direction, FilterKeys, ImagingFilters, Order } from 'types/searchCriterias'
 
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 
 import { CanceledError } from 'axios'
+import { RessourceType } from 'types/requestCriterias'
+import { useSavedFilters } from 'hooks/filters/useSavedFilters'
+import { fetchModalities } from 'services/aphp/serviceImaging'
+import TextInput from 'components/Filters/TextInput'
+import List from 'components/ui/List'
 
 type ImagingListProps = {
   groupId?: string
@@ -40,12 +43,16 @@ type ImagingListProps = {
 }
 
 const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
-  const [imagingResults, setImagingResults] = useState<ResultsType>({ nb: 0, total: 0, label: 'résultats' })
+  const [searchResults, setSearchResults] = useState<ResultsType>({ nb: 0, total: 0, label: 'résultats' })
   const [imagingList, setImagingList] = useState<CohortImaging[]>([])
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
-  const [toggleModal, setToggleModal] = useState(false)
-  const [modalitiesList, setModalitiesList] = useState<HierarchyElement[]>([])
+  const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
+  const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
+  const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
+  const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
+  const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
+  const [allModalities, setAllModalities] = useState<HierarchyElement[]>([])
 
   const [page, setPage] = useState(1)
   const [
@@ -55,11 +62,26 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
       filters,
       filters: { ipp, nda, startDate, endDate, executiveUnits, modality }
     },
-    { changeOrderBy, changeSearchInput, addFilters, removeFilter }
+    { changeOrderBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
   ] = useSearchCriterias(initImagingCriterias)
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ ipp, nda, startDate, endDate, executiveUnits, modality })
   }, [ipp, nda, startDate, endDate, executiveUnits, modality])
+  const {
+    allSavedFilters,
+    savedFiltersErrors,
+    selectedSavedFilter,
+    allSavedFiltersAsListItems,
+    methods: {
+      getSavedFilters,
+      postSavedFilter,
+      deleteSavedFilters,
+      patchSavedFilter,
+      selectFilter,
+      resetSavedFilterError
+    }
+  } = useSavedFilters<ImagingFilters>(RessourceType.IMAGING)
+
   const controllerRef = useRef<AbortController | null>(null)
 
   const _fetchImaging = async () => {
@@ -90,7 +112,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
       if (response) {
         const { totalImaging, totalAllImaging, imagingList } = response as ImagingData
         setImagingList(imagingList)
-        setImagingResults((prevState) => ({
+        setSearchResults((prevState) => ({
           ...prevState,
           nb: totalImaging,
           total: totalAllImaging
@@ -109,17 +131,11 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   }
 
   useEffect(() => {
-    const _fetchModalities = async () => {
-      try {
-        const _modalitiesList = await services.cohortCreation.fetchModalities()
-
-        setModalitiesList(_modalitiesList)
-      } catch (e) {
-        console.error(e)
-      }
+    const fetch = async () => {
+      const modalities = await fetchModalities()
+      setAllModalities(modalities)
     }
-
-    _fetchModalities()
+    fetch()
   }, [])
 
   useEffect(() => {
@@ -139,57 +155,64 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   }, [loadingStatus])
 
   return (
-    <Grid container justifyContent="flex-end">
-      <BlockWrapper item xs={12} margin={'20px 0px 10px 0px'}>
-        <Searchbar>
-          <Grid container item xs={12} lg={3}>
-            {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && (
-              <CircularProgress />
-            )}
-            {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
-              <DisplayDigits
-                nb={imagingResults.nb}
-                total={imagingResults.total}
-                label={imagingResults.label as string}
-              />
-            )}
-          </Grid>
-
-          <Grid container item xs={12} lg={4} justifyContent="flex-end">
-            <SearchInput
-              value={searchInput}
-              placeholder={'Rechercher'}
-              width="70%"
-              onchange={(newValue: string) => changeSearchInput(newValue)}
-            />
-            <Button width={'30%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
-              Filtrer
-            </Button>
-            <Modal
-              title="Filtrer par :"
-              open={toggleModal}
-              width={'600px'}
-              onClose={() => setToggleModal(false)}
-              onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
+    <Grid container justifyContent="flex-end" gap="20px">
+      <Grid container justifyContent="flex-end" gap="10px">
+        {(filtersAsArray.length > 0 || searchInput) && (
+          <Grid item>
+            <Button
+              width="250px"
+              icon={<Save height="15px" fill="#FFF" />}
+              onClick={() => {
+                setToggleSaveFiltersModal(true)
+                resetSavedFilterError()
+              }}
+              color="secondary"
             >
-              {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-              {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp ?? ''} />}
-              <ModalityFilter value={modality} name={FilterKeys.MODALITY} modalitiesList={modalitiesList} />
-              <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
-              <ExecutiveUnitsFilter
-                value={executiveUnits}
-                name={FilterKeys.EXECUTIVE_UNITS}
-                criteriaName={CriteriaName.Imaging}
-              />
-            </Modal>
+              Enregistrer filtres
+            </Button>
           </Grid>
-        </Searchbar>
-      </BlockWrapper>
-      <Grid item xs={12} margin="0px 0px 10px">
-        {filtersAsArray.map((filter, index) => (
-          <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
-        ))}
+        )}
+
+        {!!allSavedFilters?.count && (
+          <Grid item>
+            <Button icon={<SavedSearch fill="#FFF" />} width={'170px'} onClick={() => setToggleSavedFiltersModal(true)}>
+              Vos filtres
+            </Button>
+          </Grid>
+        )}
+        <Grid item>
+          <Button
+            width={'170px'}
+            icon={<FilterList height="15px" fill="#FFF" />}
+            onClick={() => setToggleFilterByModal(true)}
+          >
+            Filtrer
+          </Button>
+        </Grid>
       </Grid>
+      <Grid container alignItems="center" item xs={12}>
+        <Grid container item xs={12} lg={5}>
+          {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && <CircularProgress />}
+          {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
+            <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label as string} />
+          )}
+        </Grid>
+
+        <Grid container item xs={12} lg={7} justifyContent="flex-end">
+          <SearchInput
+            value={searchInput}
+            placeholder={'Rechercher'}
+            onchange={(newValue: string) => changeSearchInput(newValue)}
+          />
+        </Grid>
+      </Grid>
+      {filtersAsArray.length > 0 && (
+        <Grid item xs={12} margin="0px 0px 10px">
+          {filtersAsArray.map((filter, index) => (
+            <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
+          ))}
+        </Grid>
+      )}
 
       <Grid item xs={12}>
         <DataTableImaging
@@ -200,10 +223,144 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
           setOrderBy={(orderBy) => changeOrderBy(orderBy)}
           page={page}
           setPage={setPage}
-          total={imagingResults.nb}
+          total={searchResults.nb}
           showIpp
         />
       </Grid>
+      <Modal
+        title="Filtrer par :"
+        open={toggleFilterByModal}
+        width={'600px'}
+        onClose={() => setToggleFilterByModal(false)}
+        onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
+      >
+        {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+        {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp || ''} />}
+        <ModalityFilter value={modality} name={FilterKeys.MODALITY} modalitiesList={allModalities} />
+        <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
+        <ExecutiveUnitsFilter
+          value={executiveUnits}
+          name={FilterKeys.EXECUTIVE_UNITS}
+          criteriaName={CriteriaName.Imaging}
+        />
+      </Modal>
+      <Modal
+        title="Filtres sauvegardés"
+        open={toggleSavedFiltersModal}
+        onClose={() => {
+          setToggleSavedFiltersModal(false)
+          resetSavedFilterError()
+        }}
+        onSubmit={() => {
+          if (selectedSavedFilter) addSearchCriterias(selectedSavedFilter.filterParams)
+        }}
+        validationText="Appliquer le filtre"
+      >
+        <List
+          values={allSavedFiltersAsListItems}
+          count={allSavedFilters?.count || 0}
+          onDelete={deleteSavedFilters}
+          onDisplay={() => {
+            setToggleFilterInfoModal(true)
+            setIsReadonlyFilterInfoModal(true)
+          }}
+          onEdit={() => {
+            setToggleFilterInfoModal(true)
+            setIsReadonlyFilterInfoModal(false)
+          }}
+          onSelect={(filter) => selectFilter(filter)}
+          fetchPaginateData={() => getSavedFilters(allSavedFilters?.next)}
+        >
+          <Modal
+            title={isReadonlyFilterInfoModal ? 'Informations' : 'Modifier le filtre'}
+            open={toggleFilterInfoModal}
+            readonly={isReadonlyFilterInfoModal}
+            onClose={() => setToggleFilterInfoModal(false)}
+            onSubmit={(newFilters) => {
+              const { name, searchInput, modality, nda, startDate, endDate, executiveUnits } = newFilters
+              patchSavedFilter(
+                name,
+                {
+                  searchInput,
+                  orderBy: {
+                    orderBy: Order.STUDY_DATE,
+                    orderDirection: Direction.DESC
+                  },
+                  filters: { modality, nda, startDate, endDate, executiveUnits }
+                },
+                deidentified ?? true
+              )
+            }}
+            validationText={isReadonlyFilterInfoModal ? 'Fermer' : 'Sauvegarder'}
+          >
+            <Grid container direction="column" gap="8px">
+              <Grid item container direction="column">
+                <TextInput
+                  name="filterName"
+                  label="Nom :"
+                  value={selectedSavedFilter?.filterName}
+                  error={savedFiltersErrors}
+                  disabled={isReadonlyFilterInfoModal}
+                  minLimit={2}
+                  maxLimit={50}
+                />
+              </Grid>
+              {!deidentified && (
+                <Grid item container direction="column" paddingBottom="8px">
+                  <TextInput
+                    name="searchInput"
+                    label="Recherche textuelle :"
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.searchInput}
+                  />
+                </Grid>
+              )}
+              <Grid item>
+                {!deidentified && (
+                  <NdaFilter
+                    disabled={isReadonlyFilterInfoModal}
+                    name={FilterKeys.NDA}
+                    value={selectedSavedFilter?.filterParams.filters.nda || ''}
+                  />
+                )}
+                <ModalityFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.filters.modality || []}
+                  name={FilterKeys.MODALITY}
+                  modalitiesList={allModalities}
+                />
+                <DatesRangeFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  values={[
+                    selectedSavedFilter?.filterParams.filters.startDate,
+                    selectedSavedFilter?.filterParams.filters.endDate
+                  ]}
+                  names={[FilterKeys.START_DATE, FilterKeys.END_DATE]}
+                />
+                <ExecutiveUnitsFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
+                  name={FilterKeys.EXECUTIVE_UNITS}
+                  criteriaName={CriteriaName.Imaging}
+                />
+              </Grid>
+            </Grid>
+          </Modal>
+        </List>
+      </Modal>
+      <Modal
+        title="Sauvegarder les filtres"
+        open={toggleSaveFiltersModal}
+        onClose={() => {
+          setToggleSaveFiltersModal(false)
+          resetSavedFilterError()
+        }}
+        onSubmit={({ filtersName }) =>
+          postSavedFilter(filtersName, { searchInput, filters, orderBy }, deidentified ?? true)
+        }
+      >
+        <TextInput name="filtersName" error={savedFiltersErrors} label="Nom" minLimit={2} maxLimit={50} />
+      </Modal>
     </Grid>
   )
 }

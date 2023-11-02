@@ -2,7 +2,7 @@ import { Autocomplete, TextField, Typography } from '@mui/material'
 import { InputWrapper } from 'components/ui/Inputs'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
-import { ValueSet } from 'types'
+import { ValueSet } from 'types/valueSet'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 type CohortStatusFilterProps = {

@@ -10,15 +10,6 @@ export const ButtonWrapper = styled('div')<CustomProps>(({ width }) => ({
   '& button': {
     width: '100%',
     height: 'inherit',
-    backgroundColor: '#5BC5F2',
-    color: 'white',
-    borderRadius: 25,
-    '&:hover': {
-      backgroundColor: 'white',
-      color: '#5BC5F2',
-      '& svg': {
-        fill: '#5BC5F2'
-      }
-    }
+    borderRadius: 25
   }
 }))

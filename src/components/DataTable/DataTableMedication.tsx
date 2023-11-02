@@ -16,11 +16,12 @@ import useStyles from './styles'
 import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
 import { MEDICATION_ATC, MEDICATION_ATC_ORBIS, MEDICATION_UCD } from '../../constants'
 import { OrderBy } from 'types/searchCriterias'
+import { RessourceType } from 'types/requestCriterias'
 
 type DataTableMedicationProps = {
   loading: boolean
   deidentified: boolean
-  selectedTab: 'prescription' | 'administration'
+  selectedTab: RessourceType.MEDICATION_ADMINISTRATION | RessourceType.MEDICATION_REQUEST
   medicationsList: CohortMedication<MedicationRequest | MedicationAdministration>[]
   orderBy?: OrderBy
   setOrderBy?: (order: OrderBy) => void
@@ -44,16 +45,16 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
   const columns = [
     { label: `NDA${deidentified ? ' chiffré' : ''}`, code: 'encounter' },
     {
-      label: selectedTab === 'prescription' ? 'Date de prescription' : "Date d'administration",
+      label: selectedTab === RessourceType.MEDICATION_REQUEST ? 'Date de prescription' : "Date d'administration",
       code: 'Period-start'
     },
     { label: 'Code ATC', code: 'medication-atc' },
     { label: 'Code UCD', code: 'medication-ucd' },
-    selectedTab === 'prescription' ? { label: 'Type de prescription', code: 'category-name' } : null,
+    selectedTab === RessourceType.MEDICATION_REQUEST ? { label: 'Type de prescription', code: 'category-name' } : null,
     { label: "Voie d'administration", code: 'route' },
-    selectedTab === 'administration' ? { label: 'Quantité' } : null,
+    selectedTab === RessourceType.MEDICATION_ADMINISTRATION ? { label: 'Quantité' } : null,
     { label: 'Unité exécutrice' },
-    selectedTab === 'administration' ? { label: 'Commentaire' } : null
+    selectedTab === RessourceType.MEDICATION_ADMINISTRATION ? { label: 'Commentaire' } : null
   ].filter((elem) => elem !== null) as Column[]
 
   return (
@@ -72,7 +73,7 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
                 <CircularProgress />
               ) : (
                 <Typography variant="button">{`Aucune ${
-                  selectedTab === 'prescription' ? 'prescription' : 'administration'
+                  selectedTab === RessourceType.MEDICATION_REQUEST ? 'prescription' : 'administration'
                 } à afficher`}</Typography>
               )}
             </Grid>

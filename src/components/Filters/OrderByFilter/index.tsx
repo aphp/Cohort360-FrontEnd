@@ -23,7 +23,7 @@ const OrderByFilter = ({ orderByValue, name, items }: OrderByFilterProps) => {
 
   return (
     <Select
-      selectedValue={orderBy}
+      value={orderBy}
       width={'200px'}
       label="Trier par :"
       items={items}

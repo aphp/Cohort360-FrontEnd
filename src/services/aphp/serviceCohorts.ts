@@ -38,13 +38,14 @@ import {
   VitalStatus,
   SearchCriterias,
   PatientsFilters,
-  AllDocumentsFilters,
+  DocumentsFilters,
   SearchByTypes,
   ImagingFilters
 } from 'types/searchCriterias'
 import services from '.'
 import { ErrorDetails, SearchInputError } from 'types/error'
 import { getResourceInfos } from 'utils/fillElement'
+import { substructAgeString } from 'utils/age'
 
 export interface IServiceCohorts {
   /**
@@ -134,7 +135,7 @@ export interface IServiceCohorts {
     options: {
       deidentified: boolean
       page: number
-      searchCriterias: SearchCriterias<AllDocumentsFilters>
+      searchCriterias: SearchCriterias<DocumentsFilters>
     },
     groupId?: string,
     signal?: AbortSignal
@@ -339,12 +340,14 @@ const servicesCohorts: IServiceCohorts = {
       }
 
       // convert birthdates into days or months depending of if it's a deidentified perimeter or not
+      const birthdates: [string, string] = [
+        moment(substructAgeString(filters?.birthdatesRanges?.[0] || '')).format('MM/DD/YYYY'),
+        moment(substructAgeString(filters?.birthdatesRanges?.[1] || '')).format('MM/DD/YYYY')
+      ]
       const minBirthdate =
-        filters?.birthdatesRanges &&
-        Math.abs(moment(filters.birthdatesRanges[0]).diff(moment(), deidentified ? 'months' : 'days'))
+        birthdates && Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
       const maxBirthdate =
-        filters?.birthdatesRanges &&
-        Math.abs(moment(filters.birthdatesRanges[1]).diff(moment(), deidentified ? 'months' : 'days'))
+        birthdates && Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
       const patientsResp = await fetchPatient({
         size: 20,
         offset: page ? (page - 1) * 20 : 0,

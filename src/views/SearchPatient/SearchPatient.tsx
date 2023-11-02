@@ -109,7 +109,7 @@ const SearchPatient: React.FC<{}> = () => {
           <Searchbar>
             <Grid container item xs={12} justifyContent="flex-end">
               <Select
-                selectedValue={searchBy || SearchByTypes.TEXT}
+                value={searchBy || SearchByTypes.TEXT}
                 label="Rechercher dans :"
                 width={'20%'}
                 items={searchByListPatients}

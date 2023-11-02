@@ -39,11 +39,20 @@ import {
   MedicationFilters,
   Order,
   PMSIFilters,
-  PatientDocumentsFilters,
+  DocumentsFilters,
   SearchByTypes,
   SearchCriterias
 } from 'types/searchCriterias'
-import { Medication, PMSI } from 'types/patient'
+import { RessourceType } from 'types/requestCriterias'
+import { mapToMedicationObjectAttributeName, mapToPmsiObjectAttributeName } from 'mappers/pmsi'
+import {
+  BIOLOGY_HIERARCHY_ITM_ANABIO,
+  BIOLOGY_HIERARCHY_ITM_LOINC,
+  CLAIM_HIERARCHY,
+  CONDITION_HIERARCHY,
+  PROCEDURE_HIERARCHY
+} from '../constants'
+import ProcedureHierarchy from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CCAM/components/Hierarchy/CCAMHierarchy'
 
 export type PatientState = null | {
   loading: boolean
@@ -55,9 +64,9 @@ export type PatientState = null | {
   }
   documents?: IPatientDocuments
   pmsi?: {
-    diagnostic?: IPatientPmsi<Condition>
-    ghm?: IPatientPmsi<Claim>
-    ccam?: IPatientPmsi<Procedure>
+    condition?: IPatientPmsi<Condition>
+    claim?: IPatientPmsi<Claim>
+    procedure?: IPatientPmsi<Procedure>
   }
   medication?: {
     administration?: IPatientMedication<MedicationAdministration>
@@ -73,7 +82,7 @@ export type PatientState = null | {
  */
 type FetchPmsiParams = {
   options: {
-    selectedTab: PMSI
+    selectedTab: RessourceType.CLAIM | RessourceType.PROCEDURE | RessourceType.CONDITION
     page: number
     searchCriterias: SearchCriterias<PMSIFilters>
   }
@@ -81,18 +90,17 @@ type FetchPmsiParams = {
   signal?: AbortSignal
 }
 type FetchPmsiReturn =
-  | { diagnostic: IPatientPmsi<Condition> }
-  | { ghm: IPatientPmsi<Claim> }
-  | { ccam: IPatientPmsi<Procedure> }
+  | { condition: IPatientPmsi<Condition> }
+  | { claim: IPatientPmsi<Claim> }
+  | { procedure: IPatientPmsi<Procedure> }
   | undefined
 const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: RootState; rejectValue: any }>(
   'patient/fetchPmsi',
   async ({ groupId, options, signal }, thunkApi) => {
     try {
       const patientState = thunkApi.getState().patient
-      const currentPmsiState = patientState?.pmsi
-        ? patientState?.pmsi[options.selectedTab] ?? { total: null }
-        : { total: null }
+      const index = mapToPmsiObjectAttributeName(options.selectedTab)
+      const currentPmsiState = patientState?.pmsi ? patientState?.pmsi[index] ?? { total: null } : { total: null }
       const WILDCARD = '*'
 
       const patientId = patientState?.patientInfo?.id ?? ''
@@ -107,9 +115,15 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const page = options.page ?? 1
       const searchInput =
         options.searchCriterias.searchInput === '' ? '' : options.searchCriterias.searchInput + WILDCARD
-      const code = options.searchCriterias.filters.code ?? ''
-      const source = options.searchCriterias.filters.source
-      const diagnosticTypes = options.searchCriterias.filters.diagnosticTypes.map((type) => type.id)
+      const codeUrl =
+        selectedTab === RessourceType.CLAIM
+          ? CLAIM_HIERARCHY
+          : selectedTab === RessourceType.PROCEDURE
+          ? PROCEDURE_HIERARCHY
+          : CONDITION_HIERARCHY
+      const code = options.searchCriterias.filters.code.map((e) => encodeURIComponent(`${codeUrl}|`) + e.id).join(',')
+      const source = options.searchCriterias.filters.source ?? ''
+      const diagnosticTypes = options.searchCriterias.filters.diagnosticTypes?.map((type) => type.id) ?? []
       const nda = options.searchCriterias.filters.nda
       const startDate = options.searchCriterias.filters.startDate
       const endDate = options.searchCriterias.filters.endDate
@@ -151,12 +165,12 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       }
 
       switch (selectedTab) {
-        case 'diagnostic':
-          return { diagnostic: pmsiReturn as IPatientPmsi<Condition> }
-        case 'ccam':
-          return { ccam: pmsiReturn as IPatientPmsi<Procedure> }
-        case 'ghm':
-          return { ghm: pmsiReturn as IPatientPmsi<Claim> }
+        case RessourceType.CONDITION:
+          return { condition: pmsiReturn as IPatientPmsi<Condition> }
+        case RessourceType.PROCEDURE:
+          return { procedure: pmsiReturn as IPatientPmsi<Procedure> }
+        case RessourceType.CLAIM:
+          return { claim: pmsiReturn as IPatientPmsi<Claim> }
       }
     } catch (error) {
       if (error instanceof CanceledError) {
@@ -200,7 +214,11 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
       const searchInput = searchCriterias.searchInput
       const nda = searchCriterias.filters.nda
       const loinc = searchCriterias.filters.loinc
+        .map((e) => encodeURIComponent(`${BIOLOGY_HIERARCHY_ITM_LOINC}|`) + e.id)
+        .join(',')
       const anabio = searchCriterias.filters.anabio
+        .map((e) => encodeURIComponent(`${BIOLOGY_HIERARCHY_ITM_ANABIO}|`) + e.id)
+        .join(',')
       const startDate = searchCriterias.filters.startDate
       const endDate = searchCriterias.filters.endDate
       const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
@@ -252,7 +270,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
  */
 type FetchMedicationParams = {
   options: {
-    selectedTab: Medication
+    selectedTab: RessourceType.MEDICATION_REQUEST | RessourceType.MEDICATION_ADMINISTRATION
     page: number
     searchCriterias: SearchCriterias<MedicationFilters>
   }
@@ -272,10 +290,11 @@ const fetchMedication = createAsyncThunk<
   async ({ options, options: { selectedTab, page, searchCriterias }, groupId, signal }, thunkApi) => {
     try {
       const patientState = thunkApi.getState().patient
-      const currentMedicationState = patientState?.medication
-        ? patientState?.medication[selectedTab] ?? { total: null }
-        : { total: null }
 
+      const index = mapToMedicationObjectAttributeName(selectedTab)
+      const currentMedicationState = patientState?.medication
+        ? patientState?.medication[index] ?? { total: null }
+        : { total: null }
       const patientId = patientState?.patientInfo?.id ?? ''
       if (!patientId) {
         throw new Error('Patient Error: patient is required')
@@ -286,8 +305,8 @@ const fetchMedication = createAsyncThunk<
       const sortBy = searchCriterias.orderBy.orderBy
       const sortDirection = searchCriterias.orderBy.orderDirection
       const searchInput = searchCriterias.searchInput
-      const prescriptionTypes = searchCriterias.filters.prescriptionTypes.map(({ id }) => id).join(',') ?? ''
-      const administrationRoutes = searchCriterias.filters.administrationRoutes.map(({ id }) => id).join(',') ?? ''
+      const prescriptionTypes = searchCriterias.filters.prescriptionTypes?.map(({ id }) => id).join(',') ?? ''
+      const administrationRoutes = searchCriterias.filters.administrationRoutes?.map(({ id }) => id).join(',') ?? ''
       const nda = searchCriterias.filters.nda
       const startDate = searchCriterias.filters?.startDate
       const endDate = searchCriterias.filters.endDate
@@ -328,9 +347,9 @@ const fetchMedication = createAsyncThunk<
       }
 
       switch (selectedTab) {
-        case Medication.PRESCRIPTION:
+        case RessourceType.MEDICATION_REQUEST:
           return { prescription: medicationReturn as IPatientMedication<MedicationRequest> }
-        case Medication.ADMINISTRATION:
+        case RessourceType.MEDICATION_ADMINISTRATION:
           return { administration: medicationReturn as IPatientMedication<MedicationAdministration> }
       }
     } catch (error) {
@@ -377,7 +396,7 @@ const fetchImaging = createAsyncThunk<FetchImagingReturn, FetchImagingParams, { 
       const startDate = searchCriterias.filters.startDate
       const endDate = searchCriterias.filters.endDate
       const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
-      const modalities = searchCriterias.filters.modality.map(({ id }) => id).join(',') ?? ''
+      const modalities = searchCriterias.filters.modality?.map(({ id }) => id).join(',') ?? ''
 
       const imagingResponse = await services.patients.fetchImaging(
         orderBy,
@@ -421,7 +440,7 @@ const fetchImaging = createAsyncThunk<FetchImagingReturn, FetchImagingParams, { 
 type FetchDocumentsParams = {
   options: {
     page: number
-    searchCriterias: SearchCriterias<PatientDocumentsFilters>
+    searchCriterias: SearchCriterias<DocumentsFilters>
   }
   groupId?: string
   signal?: AbortSignal
@@ -522,8 +541,8 @@ type FetchAllProceduresParams = {
 }
 type FetchAllProceduresReturn =
   | {
-      ccam?: IPatientPmsi<Procedure>
-      diagnostic?: IPatientPmsi<Condition>
+      procedure?: IPatientPmsi<Procedure>
+      condition?: IPatientPmsi<Condition>
     }
   | undefined
 const fetchAllProcedures = createAsyncThunk<FetchAllProceduresReturn, FetchAllProceduresParams, { state: RootState }>(
@@ -534,55 +553,54 @@ const fetchAllProcedures = createAsyncThunk<FetchAllProceduresReturn, FetchAllPr
 
       const deidentified = patientState?.deidentified ?? true
       const hospits = patientState?.hospits?.list ?? []
-      // CCAM Variables:
-      const ccamTotal = patientState?.pmsi?.ccam?.total ?? 0
-      let ccamCount = patientState?.pmsi?.ccam?.list.length ?? 0
 
-      // CIM10 Variables:
-      const diagnosticTotal = patientState?.pmsi?.diagnostic?.total ?? 0
-      let diagnosticCount = patientState?.pmsi?.diagnostic?.list.length ?? 0
+      const procedureTotal = patientState?.pmsi?.procedure?.total ?? 0
+      let procedureCount = patientState?.pmsi?.procedure?.list.length ?? 0
+      const conditionTotal = patientState?.pmsi?.condition?.total ?? 0
+      let conditionCount = patientState?.pmsi?.condition?.list.length ?? 0
 
       // API Calls:
-      const [ccamResponses, diagnosticResponses] = await Promise.all([
-        ccamTotal - ccamCount !== 0
-          ? services.patients.fetchAllProcedures(patientId, groupId ?? '', ccamTotal - ccamCount)
+      const [procedureResponses, conditionResponses] = await Promise.all([
+        procedureTotal - procedureCount !== 0
+          ? services.patients.fetchAllProcedures(patientId, groupId ?? '', procedureTotal - procedureCount)
           : null,
-        diagnosticTotal - diagnosticCount !== 0
-          ? services.patients.fetchAllConditions(patientId, groupId ?? '', diagnosticTotal - diagnosticCount)
+        conditionTotal - conditionCount !== 0
+          ? services.patients.fetchAllConditions(patientId, groupId ?? '', conditionTotal - conditionCount)
           : null
       ])
 
-      // CCAM List:
-      let ccamList: Procedure[] = ccamResponses
-        ? linkElementWithEncounter(ccamResponses as Procedure[], hospits, deidentified)
+      let procedureList: Procedure[] = procedureResponses
+        ? linkElementWithEncounter(procedureResponses as Procedure[], hospits, deidentified)
         : []
-      // eslint-disable-next-line no-unsafe-optional-chaining
-      ccamList = patientState?.pmsi?.ccam?.list ? [...patientState?.pmsi?.ccam?.list, ...ccamList] : ccamList
-      ccamCount = ccamList.length
 
-      // CIM10 List:
-      let diagnosticList: Condition[] = diagnosticResponses
-        ? linkElementWithEncounter(diagnosticResponses as Condition[], hospits, deidentified)
-        : []
-      diagnosticList = patientState?.pmsi?.diagnostic?.list
+      procedureList = patientState?.pmsi?.procedure?.list
         ? // eslint-disable-next-line no-unsafe-optional-chaining
-          [...patientState?.pmsi?.diagnostic?.list, ...diagnosticList]
-        : diagnosticList
-      diagnosticCount = diagnosticList.length
+          [...patientState?.pmsi?.procedure?.list, ...procedureList]
+        : procedureList
+      procedureCount = procedureList.length
+
+      let conditionList: Condition[] = conditionResponses
+        ? linkElementWithEncounter(conditionResponses as Condition[], hospits, deidentified)
+        : []
+      conditionList = patientState?.pmsi?.condition?.list
+        ? // eslint-disable-next-line no-unsafe-optional-chaining
+          [...patientState?.pmsi?.condition?.list, ...conditionList]
+        : conditionList
+      conditionCount = conditionList.length
 
       return {
-        ccam: {
+        procedure: {
           loading: false,
-          count: ccamCount,
-          total: ccamTotal ?? ccamCount,
-          list: ccamList,
+          count: procedureCount,
+          total: procedureTotal ?? procedureCount,
+          list: procedureList,
           page: 1
         },
-        diagnostic: {
+        condition: {
           loading: false,
-          count: diagnosticCount,
-          total: diagnosticTotal ?? diagnosticCount,
-          list: diagnosticList,
+          count: conditionCount,
+          total: conditionTotal ?? conditionCount,
+          list: conditionList,
           page: 1
         }
       }
@@ -608,9 +626,9 @@ type FetchLastPmsiReturn = {
     mainDiagnosis?: Condition[] | 'loading'
   }
   pmsi?: {
-    diagnostic?: IPatientPmsi<Condition>
-    ghm?: IPatientPmsi<Claim>
-    ccam?: IPatientPmsi<Procedure>
+    condition?: IPatientPmsi<Condition>
+    claim?: IPatientPmsi<Claim>
+    procedure?: IPatientPmsi<Procedure>
   }
 } | null
 
@@ -627,7 +645,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
         services.patients.fetchPMSI(
           0,
           patientId,
-          PMSI.DIAGNOSTIC,
+          RessourceType.CONDITION,
           '',
           '',
           '',
@@ -643,7 +661,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
         services.patients.fetchPMSI(
           0,
           patientId,
-          PMSI.CCAM,
+          RessourceType.PROCEDURE,
           '',
           '',
           '',
@@ -659,7 +677,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
         services.patients.fetchPMSI(
           0,
           patientId,
-          PMSI.GHM,
+          RessourceType.CLAIM,
           '',
           '',
           '',
@@ -676,42 +694,46 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
 
       if (fetchPatientResponse === undefined) return null
 
-      const diagnosticList = linkElementWithEncounter(
+      const conditionList = linkElementWithEncounter(
         fetchPatientResponse[0].pmsiData as Condition[],
         hospits,
         deidentified
       )
-      const ccamList = linkElementWithEncounter(fetchPatientResponse[1].pmsiData as Procedure[], hospits, deidentified)
-      const ghmList = linkElementWithEncounter(fetchPatientResponse[2].pmsiData as Claim[], hospits, deidentified)
+      const procedureList = linkElementWithEncounter(
+        fetchPatientResponse[1].pmsiData as Procedure[],
+        hospits,
+        deidentified
+      )
+      const claimList = linkElementWithEncounter(fetchPatientResponse[2].pmsiData as Claim[], hospits, deidentified)
 
       return {
         patientInfo: {
-          lastGhm: ghmList ? (ghmList[0] as Claim) : undefined,
-          lastProcedure: ccamList ? (ccamList[0] as Procedure) : undefined,
-          mainDiagnosis: diagnosticList.filter(
-            (diagnostic: any) => diagnostic.extension?.[0]?.valueCodeableConcept?.coding?.[0]?.code === 'dp'
+          lastGhm: claimList ? (claimList[0] as Claim) : undefined,
+          lastProcedure: procedureList ? (procedureList[0] as Procedure) : undefined,
+          mainDiagnosis: conditionList.filter(
+            (condition: any) => condition.extension?.[0]?.valueCodeableConcept?.coding?.[0]?.code === 'dp'
           ) as Condition[]
         },
         pmsi: {
-          diagnostic: {
+          condition: {
             loading: false,
             count: fetchPatientResponse[0].pmsiTotal ?? 0,
             total: fetchPatientResponse[0].pmsiTotal ?? 0,
-            list: diagnosticList,
+            list: conditionList,
             page: 1
           },
-          ccam: {
+          procedure: {
             loading: false,
             count: fetchPatientResponse[1].pmsiTotal ?? 0,
             total: fetchPatientResponse[1].pmsiTotal ?? 0,
-            list: ccamList,
+            list: procedureList,
             page: 1
           },
-          ghm: {
+          claim: {
             loading: false,
             count: fetchPatientResponse[2].pmsiTotal ?? 0,
             total: fetchPatientResponse[2].pmsiTotal ?? 0,
-            list: ghmList,
+            list: claimList,
             page: 1
           }
         }
@@ -813,7 +835,7 @@ const patientSlice = createSlice({
         ? {
             loading: true,
             patientInfo: {
-              resourceType: 'Patient',
+              resourceType: RessourceType.PATIENT,
               lastGhm: 'loading',
               lastProcedure: 'loading',
               mainDiagnosis: 'loading'
@@ -825,7 +847,7 @@ const patientSlice = createSlice({
             patientInfo: state.patientInfo
               ? state.patientInfo
               : {
-                  resourceType: 'Patient'
+                  resourceType: RessourceType.PATIENT
                 }
           }
     )
@@ -879,7 +901,7 @@ const patientSlice = createSlice({
         ? {
             loading: true,
             patientInfo: {
-              resourceType: 'Patient',
+              resourceType: RessourceType.PATIENT,
               lastGhm: 'loading',
               lastProcedure: 'loading',
               mainDiagnosis: 'loading'
@@ -891,7 +913,7 @@ const patientSlice = createSlice({
             patientInfo: state.patientInfo
               ? { ...state.patientInfo, lastGhm: 'loading', lastProcedure: 'loading', mainDiagnosis: 'loading' }
               : {
-                  resourceType: 'Patient',
+                  resourceType: RessourceType.PATIENT,
                   lastGhm: 'loading',
                   lastProcedure: 'loading',
                   mainDiagnosis: 'loading'
@@ -910,7 +932,7 @@ const patientSlice = createSlice({
                   ...action.payload.patientInfo
                 }
               : {
-                  resourceType: 'Patient',
+                  resourceType: RessourceType.PATIENT,
                   ...action.payload.patientInfo
                 },
             pmsi: action.payload.pmsi
@@ -927,27 +949,27 @@ const patientSlice = createSlice({
             mainDiagnosis: undefined
           }
         : {
-            resourceType: 'Patient',
+            resourceType: RessourceType.PATIENT,
             lastGhm: undefined,
             lastProcedure: undefined,
             mainDiagnosis: undefined
           },
       pmsi: {
-        ccam: {
+        procedure: {
           loading: false,
           count: 0,
           total: 0,
           list: [],
           page: 0
         },
-        diagnostics: {
+        condition: {
           loading: false,
           count: 0,
           total: 0,
           list: [],
           page: 0
         },
-        ghm: {
+        claim: {
           loading: false,
           count: 0,
           total: 0,
@@ -964,15 +986,15 @@ const patientSlice = createSlice({
             pmsi: state.pmsi
               ? {
                   ...state.pmsi,
-                  ccam: state.pmsi.ccam
+                  procedure: state.pmsi.procedure
                     ? {
-                        ...state.pmsi.ccam,
+                        ...state.pmsi.procedure,
                         loading: true
                       }
                     : undefined,
-                  diagnostic: state.pmsi.diagnostic
+                  condition: state.pmsi.condition
                     ? {
-                        ...state.pmsi.diagnostic,
+                        ...state.pmsi.condition,
                         loading: true
                       }
                     : undefined
@@ -989,12 +1011,12 @@ const patientSlice = createSlice({
             pmsi: state?.pmsi
               ? {
                   ...state?.pmsi,
-                  ccam: action.payload.ccam,
-                  diagnostic: action.payload.diagnostic
+                  procedure: action.payload.procedure,
+                  condition: action.payload.condition
                 }
               : {
-                  ccam: action.payload.ccam,
-                  diagnostic: action.payload.diagnostic
+                  procedure: action.payload.procedure,
+                  condition: action.payload.condition
                 }
           }
     )
@@ -1002,14 +1024,14 @@ const patientSlice = createSlice({
       ...state,
       loading: false,
       pmsi: {
-        ccam: {
+        procedure: {
           loading: false,
           count: 0,
           total: 0,
           list: [],
           page: 0
         },
-        diagnostics: {
+        condition: {
           loading: false,
           count: 0,
           total: 0,
@@ -1052,29 +1074,29 @@ const patientSlice = createSlice({
             pmsi: state.pmsi
               ? {
                   ...state.pmsi,
-                  diagnostic: state.pmsi.diagnostic
+                  condition: state.pmsi.condition
                     ? {
-                        ...state.pmsi.diagnostic,
+                        ...state.pmsi.condition,
                         loading: true
                       }
                     : undefined,
-                  ccam: state.pmsi.ccam
+                  procedure: state.pmsi.procedure
                     ? {
-                        ...state.pmsi.ccam,
+                        ...state.pmsi.procedure,
                         loading: true
                       }
                     : undefined,
-                  ghm: state.pmsi.ghm
+                  claim: state.pmsi.claim
                     ? {
-                        ...state.pmsi.ghm,
+                        ...state.pmsi.claim,
                         loading: true
                       }
                     : undefined
                 }
               : {
-                  diagnostic: undefined,
-                  ccam: undefined,
-                  ghm: undefined
+                  condition: undefined,
+                  procedure: undefined,
+                  claim: undefined
                 }
           }
     )
@@ -1096,21 +1118,21 @@ const patientSlice = createSlice({
       ...state,
       loading: false,
       pmsi: {
-        diagnostic: {
+        condition: {
           loading: false,
           count: 0,
           total: 0,
           list: [],
           page: 0
         },
-        ghm: {
+        claim: {
           loading: false,
           count: 0,
           total: 0,
           list: [],
           page: 0
         },
-        ccam: {
+        procedure: {
           loading: false,
           count: 0,
           total: 0,
@@ -1301,26 +1323,26 @@ function linkElementWithEncounter<
     let encounterId = ''
     // @ts-ignore
     switch (entry.resourceType) {
-      case 'Claim':
+      case RessourceType.CLAIM:
         encounterId = (entry as Claim).item?.[0].encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
         break
-      case 'Procedure':
-      case 'Condition':
+      case RessourceType.PROCEDURE:
+      case RessourceType.CONDITION:
         encounterId = (entry as Procedure | Condition).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
-      case 'DocumentReference':
+      case RessourceType.DOCUMENTS:
         encounterId = (entry as DocumentReference).context?.encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
         break
-      case 'MedicationRequest':
+      case RessourceType.MEDICATION_REQUEST:
         encounterId = (entry as MedicationRequest).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
-      case 'MedicationAdministration':
+      case RessourceType.MEDICATION_ADMINISTRATION:
         encounterId = (entry as MedicationAdministration).context?.reference?.replace(/^Encounter\//, '') ?? ''
         break
-      case 'Observation':
+      case RessourceType.OBSERVATION:
         encounterId = (entry as Observation).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
-      case 'ImagingStudy':
+      case RessourceType.IMAGING:
         encounterId = (entry as ImagingStudy).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
     }
@@ -1381,7 +1403,7 @@ function fillElementInformation<
     }
   }
 
-  if (resourceType !== 'DocumentReference' && encounter?.documents && encounter.documents.length > 0) {
+  if (resourceType !== RessourceType.DOCUMENTS && encounter?.documents && encounter.documents.length > 0) {
     newElement.documents = encounter.documents
   }
 

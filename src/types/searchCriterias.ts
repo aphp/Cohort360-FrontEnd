@@ -1,6 +1,8 @@
-import { ScopeTreeRow, SimpleCodeType, ValueSet, ValueSetSystem } from 'types'
+import { ScopeTreeRow, SimpleCodeType } from 'types'
 import { PatientTableLabels } from './patient'
 import { CohortsType } from './cohorts'
+import { RessourceType } from './requestCriterias'
+import { ValueSet, ValueSetSystem } from './valueSet'
 
 export enum GenderStatus {
   MALE = 'MALE',
@@ -8,6 +10,14 @@ export enum GenderStatus {
   OTHER = 'OTHER',
   UNKNOWN = 'UNKNOWN',
   OTHER_UNKNOWN = 'OTHER_UNKNOWN'
+}
+export enum GenderCodes {
+  MALE = 'm',
+  FEMALE = 'f',
+  OTHER = 'a',
+  UNKNOWN = 'INCONNU',
+  UNDETERMINED = 'i',
+  NOT_SPECIFIED = 'NON RENSEIGNE'
 }
 export enum GenderStatusLabel {
   MALE = 'Hommes',
@@ -38,8 +48,7 @@ export enum VitalStatusOptionsLabel {
 
 export enum VitalStatus {
   ALIVE = 'ALIVE',
-  DECEASED = 'DECEASED',
-  ALL = 'ALL'
+  DECEASED = 'DECEASED'
 }
 
 export enum Direction {
@@ -74,7 +83,8 @@ export enum Order {
   MODALITY = 'modality',
   DESCRIPTION = 'description',
   PROCEDURE = 'procedureCode',
-  STUDY_DATE = 'started'
+  STUDY_DATE = 'started',
+  CREATED_AT = 'created_at'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -108,6 +118,7 @@ export enum FilterKeys {
   DIAGNOSTIC_TYPES = 'diagnosticTypes',
   START_DATE = 'startDate',
   END_DATE = 'endDate',
+  ONLY_PDF_AVAILABLE = 'onlyPdfAvailable',
   SOURCE = 'source',
   EXECUTIVE_UNITS = 'executiveUnits',
   DOC_TYPES = 'docTypes',
@@ -142,7 +153,7 @@ export type LabelObject = {
   label: string
   system?: ValueSetSystem
 }
-export type OrderBy = {
+export interface OrderBy {
   orderBy: Order
   orderDirection: Direction
 }
@@ -171,10 +182,16 @@ export type Filters =
   | PMSIFilters
   | MedicationFilters
   | BiologyFilters
-  | PatientDocumentsFilters
-  | AllDocumentsFilters
+  | DocumentsFilters
   | CohortsFilters
   | ImagingFilters
+
+export type GenericFilter = {
+  nda: string
+  startDate: string | null
+  endDate: string | null
+  executiveUnits: ScopeTreeRow[]
+}
 
 export interface PatientsFilters {
   genders: GenderStatus[]
@@ -182,63 +199,34 @@ export interface PatientsFilters {
   vitalStatuses: VitalStatus[]
 }
 
-export type PMSIFilters = {
-  nda: string
-  diagnosticTypes: LabelObject[]
-  code: string
-  startDate: string | null
-  endDate: string | null
-  executiveUnits: ScopeTreeRow[]
-  source: string
+export type PMSIFilters = GenericFilter & {
+  diagnosticTypes?: LabelObject[]
+  code: LabelObject[]
+  source?: string
 }
 
-export type MedicationFilters = {
-  nda: string
-  prescriptionTypes: LabelObject[]
-  administrationRoutes: LabelObject[]
-  startDate: string | null
-  endDate: string | null
-  executiveUnits: ScopeTreeRow[]
+export type MedicationFilters = GenericFilter & {
+  prescriptionTypes?: LabelObject[]
+  administrationRoutes?: LabelObject[]
 }
 
-export type BiologyFilters = {
-  nda: string
-  loinc: string
-  anabio: string
-  startDate: string | null
-  endDate: string | null
-  executiveUnits: ScopeTreeRow[]
+export type BiologyFilters = GenericFilter & {
+  loinc: LabelObject[]
+  anabio: LabelObject[]
   validatedStatus: boolean
 }
 
-export type ImagingFilters = {
+export type ImagingFilters = GenericFilter & {
   ipp?: string
-  nda: string
-  startDate: string | null
-  endDate: string | null
-  executiveUnits: ScopeTreeRow[]
   modality: LabelObject[]
 }
 
-export type PatientDocumentsFilters = {
-  nda: string
+export type DocumentsFilters = GenericFilter & {
+  ipp?: string
   docTypes: SimpleCodeType[]
   onlyPdfAvailable: boolean
-  startDate: string | null
-  endDate: string | null
-  executiveUnits: ScopeTreeRow[]
 }
-
-export type AllDocumentsFilters = {
-  nda: string
-  ipp: string
-  docTypes: SimpleCodeType[]
-  onlyPdfAvailable: boolean
-  startDate: string | null
-  endDate: string | null
-  executiveUnits: ScopeTreeRow[]
-}
-export type CohortsFilters = {
+export interface CohortsFilters {
   status: ValueSet[]
   favorite: CohortsType
   minPatients: null | string
@@ -247,14 +235,14 @@ export type CohortsFilters = {
   endDate: null | string
 }
 
-export type SearchCriterias<F> = {
+export interface SearchCriterias<F> {
   searchBy?: SearchBy
   searchInput: SearchInput
   orderBy: OrderBy
   filters: F
 }
 
-export type Action<T, P> = {
+export interface Action<T, P> {
   type: T
   payload: P
 }
@@ -264,6 +252,7 @@ export enum ActionTypes {
   CHANGE_SEARCH_BY = 'CHANGE_SEARCH_BY',
   ADD_FILTERS = 'ADD_FILTERS',
   REMOVE_FILTER = 'REMOVE_FILTER',
+  ADD_SEARCH_CRITERIAS = 'ADD_SEARCH_CRITERIAS',
   REMOVE_SEARCH_CRITERIAS = 'REMOVE_SEARCH_CRITERIAS'
 }
 
@@ -278,6 +267,7 @@ export type ActionSearchBy = Action<ActionTypes.CHANGE_SEARCH_BY, SearchBy>
 export type ActionFilterBy<F> = Action<ActionTypes.ADD_FILTERS, F>
 export type ActionRemoveFilter = Action<ActionTypes.REMOVE_FILTER, RemoveFilter>
 export type ActionRemoveSearchCriterias = Action<ActionTypes.REMOVE_SEARCH_CRITERIAS, null>
+export type ActionAddSearchCriterias<F> = Action<ActionTypes.ADD_SEARCH_CRITERIAS, SearchCriterias<F>>
 export type ActionFilters<F> =
   | ActionOrderBy
   | ActionSearchInput
@@ -285,6 +275,7 @@ export type ActionFilters<F> =
   | ActionFilterBy<F>
   | ActionRemoveFilter
   | ActionRemoveSearchCriterias
+  | ActionAddSearchCriterias<F>
 
 export const searchByListPatients = [
   {
@@ -355,3 +346,23 @@ export const orderDirection = [
     label: DirectionLabel.DESC
   }
 ]
+
+export type SavedFilter = {
+  created_at: string
+  deleted: string
+  deleted_by_cascade: boolean
+  fhir_resource: RessourceType
+  fhir_version: string
+  filter: string
+  modified_at: string
+  name: string
+  owner: string
+  uuid: string
+}
+
+export type SavedFiltersResults = {
+  count: number
+  next: string | null
+  previous: string | null
+  results: SavedFilter[]
+}
