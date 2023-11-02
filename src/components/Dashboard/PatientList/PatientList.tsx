@@ -18,7 +18,7 @@ import {
 } from 'types'
 
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
-import { Save, SavedSearch } from '@mui/icons-material'
+import { Info, Save, SavedSearch } from '@mui/icons-material'
 import { cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
 import Searchbar from 'components/ui/Searchbar'

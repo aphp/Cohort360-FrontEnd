@@ -6,8 +6,9 @@ import {
 import { displaySort } from 'utils/alphabeticalSort'
 import apiFhir from 'services/apiFhir'
 import { getApiResponseResources } from 'utils/apiHelpers'
-import { FHIR_Bundle_Response, ValueSet } from 'types'
+import { FHIR_Bundle_Response } from 'types'
 import { ConceptMap } from 'fhir/r4'
+import { ValueSet } from 'types/valueSet'
 
 export type ValueSetWithHierarchy = ValueSet & { hierarchyDisplay: string }
 

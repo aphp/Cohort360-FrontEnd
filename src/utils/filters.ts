@@ -11,9 +11,10 @@ import {
 } from 'types/searchCriterias'
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
-import { ScopeTreeRow, SimpleCodeType, ValueSet } from 'types'
+import { ScopeTreeRow, SimpleCodeType } from 'types'
 import { getDurationRangeLabel } from './age'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
+import { ValueSet } from 'types/valueSet'
 
 export const getCohortsTypeLabel = (type: CohortsType): string => {
   switch (type) {
