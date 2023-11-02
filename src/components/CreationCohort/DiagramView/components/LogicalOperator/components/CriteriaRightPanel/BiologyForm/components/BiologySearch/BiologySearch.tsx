@@ -26,10 +26,10 @@ import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
 import useStyles from './styles'
 import { useDebounce } from 'utils/debounce'
-import { ValueSet } from 'types'
 import { ValueSetWithHierarchy } from 'services/aphp/cohortCreation/fetchObservation'
 import services from 'services/aphp'
 import { ObservationDataType } from 'types/requestCriterias'
+import { ValueSet } from 'types'
 
 type BiologySearchListItemProps = {
   label: string

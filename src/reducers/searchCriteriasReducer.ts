@@ -11,8 +11,7 @@ import {
   PMSIFilters,
   MedicationFilters,
   BiologyFilters,
-  PatientDocumentsFilters,
-  AllDocumentsFilters,
+  DocumentsFilters,
   ImagingFilters,
   OrderBy,
   FilterKeys,
@@ -69,7 +68,7 @@ export const initPmsiSearchCriterias: SearchCriterias<PMSIFilters> = {
   searchInput: '',
   searchBy: SearchByTypes.TEXT,
   filters: {
-    code: '',
+    code: [],
     nda: '',
     source: '',
     diagnosticTypes: [],
@@ -106,15 +105,15 @@ export const initBioSearchCriterias: SearchCriterias<BiologyFilters> = {
   filters: {
     validatedStatus: true,
     nda: '',
-    loinc: '',
-    anabio: '',
+    loinc: [],
+    anabio: [],
     startDate: null,
     endDate: null,
     executiveUnits: []
   }
 }
 
-export const initPatientDocsSearchCriterias: SearchCriterias<PatientDocumentsFilters> = {
+export const initPatientDocsSearchCriterias: SearchCriterias<DocumentsFilters> = {
   orderBy: {
     orderBy: Order.DATE,
     orderDirection: Direction.DESC
@@ -131,7 +130,7 @@ export const initPatientDocsSearchCriterias: SearchCriterias<PatientDocumentsFil
   }
 }
 
-export const initAllDocsSearchCriterias: SearchCriterias<AllDocumentsFilters> = {
+export const initAllDocsSearchCriterias: SearchCriterias<DocumentsFilters> = {
   orderBy: {
     orderBy: Order.DATE,
     orderDirection: Direction.DESC
@@ -181,6 +180,8 @@ const searchCriteriasReducer = <F>(
         return { ...state, filters: action.payload }
       case ActionTypes.REMOVE_FILTER:
         return { ...state, filters: removeFilter<F>(action.payload.key, action.payload.value, state.filters) }
+      case ActionTypes.ADD_SEARCH_CRITERIAS:
+        return { ...action.payload }
       case ActionTypes.REMOVE_SEARCH_CRITERIAS:
         return initState()
       default:
@@ -195,6 +196,7 @@ type DispatchActions<F> = {
   changeSearchBy: (searchBy: SearchByTypes) => void
   addFilters: (filters: F) => void
   removeFilter: (key: FilterKeys, value: FilterValue) => void
+  addSearchCriterias: (searchCriterias: SearchCriterias<F>) => void
   removeSearchCriterias: () => void
 }
 
@@ -215,7 +217,9 @@ const useSearchCriterias = <F>(
       addFilters: (filters: F) => dispatch({ type: ActionTypes.ADD_FILTERS, payload: filters }),
       removeFilter: (key: FilterKeys, value: FilterValue) =>
         dispatch({ type: ActionTypes.REMOVE_FILTER, payload: { key, value } }),
-      removeSearchCriterias: () => dispatch({ type: ActionTypes.REMOVE_SEARCH_CRITERIAS, payload: null })
+      removeSearchCriterias: () => dispatch({ type: ActionTypes.REMOVE_SEARCH_CRITERIAS, payload: null }),
+      addSearchCriterias: (searchCriterias: SearchCriterias<F>) =>
+        dispatch({ type: ActionTypes.ADD_SEARCH_CRITERIAS, payload: searchCriterias })
     }
   ]
 }

@@ -10,9 +10,15 @@ type AdministrationTypesFilterProps = {
   value: LabelObject[]
   name: string
   allAdministrationTypes: HierarchyElement[]
+  disabled?: boolean
 }
 
-const AdministrationTypesFilter = ({ name, value, allAdministrationTypes }: AdministrationTypesFilterProps) => {
+const AdministrationTypesFilter = ({
+  name,
+  value,
+  allAdministrationTypes,
+  disabled = false
+}: AdministrationTypesFilterProps) => {
   const context = useContext(FormContext)
   const [administrationTypes, setAdministrationTypes] = useState(value)
 
@@ -24,6 +30,7 @@ const AdministrationTypesFilter = ({ name, value, allAdministrationTypes }: Admi
     <InputWrapper>
       <Typography variant="h3">Voie d'administration :</Typography>
       <Autocomplete
+        disabled={disabled}
         multiple
         onChange={(event, value) => {
           setAdministrationTypes(value)

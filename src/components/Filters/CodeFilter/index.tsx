@@ -1,14 +1,18 @@
-import { TextField, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import { InputWrapper } from 'components/ui/Inputs'
+import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
+import { LabelObject } from 'types/searchCriterias'
 
 type CodeFilterProps = {
-  value: string
+  value: LabelObject[]
   name: string
+  disabled?: boolean
+  onFetch: (text: string, noStar: boolean, signal: AbortSignal) => Promise<any>
 }
 
-const CodeFilter = ({ name, value }: CodeFilterProps) => {
+const CodeFilter = ({ name, value, disabled = false, onFetch }: CodeFilterProps) => {
   const context = useContext(FormContext)
   const [code, setCode] = useState(value)
 
@@ -19,11 +23,16 @@ const CodeFilter = ({ name, value }: CodeFilterProps) => {
   return (
     <InputWrapper>
       <Typography variant="h3">Code :</Typography>
-      <TextField
-        fullWidth
-        placeholder="Exemple: G629,R2630,F310"
-        value={code}
-        onChange={(event) => setCode(event.target.value)}
+      <AsyncAutocomplete
+        disabled={disabled}
+        label="Code(s) sélectionné(s)"
+        variant="outlined"
+        noOptionsText="Veuillez entrer un code"
+        values={value}
+        onFetch={(text, signal) => onFetch(text, false, signal)}
+        onChange={(newValue) => {
+          setCode(newValue)
+        }}
       />
     </InputWrapper>
   )

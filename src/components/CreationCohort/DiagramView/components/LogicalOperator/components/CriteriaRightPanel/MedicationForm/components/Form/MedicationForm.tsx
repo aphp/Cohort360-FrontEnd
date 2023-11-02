@@ -25,9 +25,10 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchMedication } from 'state/medication'
 import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
-import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
+import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
 import { MedicationDataType } from 'types/requestCriterias'
+import { displaySystem } from 'utils/displayValueSetSystem'
 
 type MedicationFormProps = {
   isOpen: boolean
@@ -49,8 +50,12 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
   const currentState = { ...selectedCriteria, ...initialState }
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
-  const getMedicationOptions = async (searchValue: string, signal: AbortSignal) =>
-    await services.cohortCreation.fetchMedicationData(searchValue, false, signal)
+  const getMedicationOptions = async (searchValue: string, signal: AbortSignal) => {
+    const response = await services.cohortCreation.fetchMedicationData(searchValue, false, signal)
+    return response.map((elem) => {
+      return { ...elem, label: displaySystem(elem.system) + elem.label }
+    })
+  }
 
   const _onSubmit = () => {
     onChangeSelectedCriteria(currentState)
@@ -177,16 +182,14 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             </RadioGroup>
           </Grid>
 
-          <InputAutocompleteAsync
-            multiple
+          <AsyncAutocomplete
             label="Code(s) sélectionné(s)"
             variant="outlined"
             noOptionsText="Veuillez entrer un code de médicament"
             className={classes.inputItem}
-            autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteriaData.data.medicationData || []}
-            getAutocompleteOptions={getMedicationOptions}
-            onChange={(e, value) => {
+            values={defaultValuesCode}
+            onFetch={getMedicationOptions}
+            onChange={(value) => {
               onChangeValue('code', value)
             }}
           />

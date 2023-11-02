@@ -23,7 +23,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition } from 'state/pmsi'
 import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
-import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
+import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
 import { Cim10DataType } from 'types/requestCriterias'
 
@@ -148,16 +148,14 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             onChangeValue={onChangeValue}
           />
 
-          <InputAutocompleteAsync
-            multiple
+          <AsyncAutocomplete
             label="Code CIM10"
             variant="outlined"
             noOptionsText="Veuillez entrer un code ou un diagnostic CIM10"
             className={classes.inputItem}
-            autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteriaData.data.cim10Diagnostic || []}
-            getAutocompleteOptions={getDiagOptions}
-            onChange={(e, value) => {
+            values={defaultValuesCode}
+            onFetch={getDiagOptions}
+            onChange={(value) => {
               onChangeValue('code', value)
             }}
           />

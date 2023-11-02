@@ -1,80 +1,155 @@
-import React, { useEffect, useState } from 'react'
-import ListItem, { Item } from './ListItem'
-import { Grid, List as ListMui, Typography } from '@mui/material'
-import InfiniteScroll from 'react-infinite-scroll-component'
+import React, { PropsWithChildren, useContext, useEffect, useState } from 'react'
+import Modal, { FormContext } from 'components/ui/Modal'
+import Button from 'components/ui/Button'
+import { DeleteOutline, Edit, Visibility } from '@mui/icons-material'
+import { Checkbox, FormControlLabel, Grid, Typography } from '@mui/material'
+import { Item } from 'components/ui/List/ListItem'
+import ListItems from 'components/ui/List/ListItems'
+
+type id = string
 
 type ListProps = {
   values: Item[]
-  multiple?: boolean
   count: number
-  onchange: (newValue: Item[]) => void
-  onItemEyeClick?: (item: Item) => void
-  onItemPencilClick?: (item: Item) => void
+  onSelect: (value: id) => void
+  onDisplay?: () => void
+  onEdit?: () => void
+  onDelete?: (value: id[]) => void
   fetchPaginateData: () => void
 }
 
 const List = ({
+  children,
   values,
-  multiple = false,
   count,
-  onchange,
-  onItemEyeClick,
-  onItemPencilClick,
+  onDelete,
+  onSelect,
+  onDisplay,
+  onEdit,
   fetchPaginateData
-}: ListProps) => {
-  const [items, setItems] = useState(values)
-
-  const handleSelectListItem = (selectedItem: Item) => {
-    const newItems = items.map((item) => {
-      return { ...item, checked: item.id === selectedItem.id ? !item.checked : multiple ? item.checked : false }
-    })
-    setItems(newItems)
-    onchange(newItems)
-  }
-
-  const handleEyeClick = (selectedItem: Item) => {
-    if (onItemEyeClick) onItemEyeClick(selectedItem)
-  }
-
-  const handlePencilClick = (selectedItem: Item) => {
-    if (onItemPencilClick) onItemPencilClick(selectedItem)
-  }
+}: PropsWithChildren<ListProps>) => {
+  const context = useContext(FormContext)
+  const [allElements, setAllElements] = useState<Item[]>([])
+  const [selectedElements, setSelectedElements] = useState<string[]>([])
+  const [toggleDeleteModal, setToggleDeleteModal] = useState(false)
+  const [toggleSelectAll, setToggleSelectAll] = useState(false)
 
   useEffect(() => {
-    setItems(values)
+    setAllElements(
+      values.map((e) => {
+        return { ...e, checked: Boolean(selectedElements.find((selected) => selected === e.id)) }
+      })
+    )
   }, [values])
 
+  useEffect(() => {
+    context?.updateError(false)
+    setSelectedElements(allElements.filter((elem) => elem.checked)?.map((e) => e.id))
+  }, [allElements])
+
+  useEffect(() => {
+    context?.updateError(true)
+    if (selectedElements.length === 1) {
+      context?.updateError(false)
+      onSelect(selectedElements[0])
+    }
+  }, [selectedElements])
+
   return (
-    <ListMui
-      id="scrollableDiv"
-      component="nav"
-      aria-labelledby="nested-list-subheader"
-      style={{ maxHeight: '500px', overflow: 'auto' }}
-    >
-      <InfiniteScroll
-        scrollableTarget="scrollableDiv"
-        dataLength={items.length}
-        next={fetchPaginateData}
-        hasMore={items.length < count}
-        scrollThreshold={0.9}
-        loader={
-          <Grid container justifyContent="center">
-            <Typography fontWeight={500}>Loading...</Typography>
+    <Grid container gap={4} marginTop={2}>
+      <Grid container item xs={12} alignItems="center" gap={1}>
+        {onDisplay && (
+          <Grid item xs={3}>
+            <Button color="info" icon={<Visibility />} onClick={onDisplay} disabled={selectedElements.length !== 1}>
+              Voir
+            </Button>
           </Grid>
-        }
-      >
-        {items.map((item, index) => (
-          <ListItem
-            key={index}
-            multiple={multiple}
-            item={item}
-            onclick={handleSelectListItem}
-            onEyeClick={!multiple && item.checked ? handleEyeClick : undefined}
-            onPencilClick={!multiple && item.checked ? handlePencilClick : undefined}
-          />
-        ))}
-      </InfiniteScroll>
-    </ListMui>
+        )}
+        {onEdit && (
+          <Grid item xs={4}>
+            <Button color="info" icon={<Edit />} onClick={onEdit} disabled={selectedElements.length !== 1}>
+              Modifier
+            </Button>
+          </Grid>
+        )}
+        {onDelete && (
+          <Grid item xs={1}>
+            <Button
+              color="warning"
+              onClick={() => {
+                setToggleDeleteModal(true)
+                context?.updateError(true)
+              }}
+              disabled={selectedElements.length < 1}
+            >
+              <DeleteOutline />
+            </Button>
+          </Grid>
+        )}
+      </Grid>
+      <Grid container>
+        {Boolean(allElements.length) ? (
+          <Grid item xs={12}>
+            <FormControlLabel
+              labelPlacement="end"
+              color="warning"
+              style={{ margin: 0 }}
+              control={
+                <Checkbox
+                  color="info"
+                  onChange={() => {
+                    setAllElements(
+                      allElements.map((e) => {
+                        return { ...e, checked: toggleSelectAll ? false : true }
+                      })
+                    )
+                    setToggleSelectAll(!toggleSelectAll)
+                  }}
+                />
+              }
+              label={
+                <Typography variant="h3" textTransform="uppercase" color="#0288d1">
+                  Tout {toggleSelectAll ? 'désélectionner' : 'sélectionner'}
+                </Typography>
+              }
+            />
+            <ListItems
+              values={allElements}
+              multiple
+              count={count}
+              onchange={(newItems) => setAllElements(newItems)}
+              fetchPaginateData={fetchPaginateData}
+            />
+          </Grid>
+        ) : (
+          <Grid item xs={12}>
+            <Typography fontWeight="700" align="center" sx={{ padding: '8px' }}>
+              Aucun élément n'a été enregistré
+            </Typography>
+          </Grid>
+        )}
+      </Grid>
+      {children}
+
+      {onDelete && (
+        <Modal
+          width="250px"
+          open={toggleDeleteModal}
+          onClose={() => {
+            context?.updateError(false)
+            setToggleDeleteModal(false)
+          }}
+          onSubmit={() => {
+            onDelete(selectedElements)
+            context?.updateError(false)
+          }}
+        >
+          <Typography sx={{ color: '#00000099' }} fontWeight={600} fontSize={14}>
+            Êtes-vous sur de vouloir supprimer les éléments sélectionnés ?
+          </Typography>
+        </Modal>
+      )}
+    </Grid>
   )
 }
 

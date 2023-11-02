@@ -8,9 +8,10 @@ type ModalityFilterProps = {
   name: string
   modalitiesList: LabelObject[]
   value: LabelObject[]
+  disabled?: boolean
 }
 
-const ModalityFilter = ({ name, value, modalitiesList }: ModalityFilterProps) => {
+const ModalityFilter = ({ name, value, modalitiesList, disabled = false }: ModalityFilterProps) => {
   const context = useContext(FormContext)
   const [modalities, setModalities] = useState(value)
 
@@ -22,6 +23,7 @@ const ModalityFilter = ({ name, value, modalitiesList }: ModalityFilterProps) =>
     <InputWrapper>
       <Typography variant="h3">Modalités :</Typography>
       <Autocomplete
+        disabled={disabled}
         multiple
         onChange={(event, value) => {
           setModalities(value)
