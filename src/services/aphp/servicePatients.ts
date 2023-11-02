@@ -36,8 +36,9 @@ import {
   Patient,
   Procedure
 } from 'fhir/r4'
-import { Direction, Order, SearchByTypes } from 'types/searchCriterias'
+import { Direction, Order, PatientsFilters, SearchByTypes } from 'types/searchCriterias'
 import { Medication, PMSI } from 'types/patient'
+import { RessourceType } from 'types/requestCriterias'
 
 export interface IServicePatients {
   /*
@@ -827,4 +828,14 @@ export const getEncounterDocuments = async (
   }
 
   return _encounters
+}
+
+export const postFilters = async (
+  //fhir_version: string,
+  fhir_ressource: RessourceType,
+  name: string,
+  filters: PatientsFilters
+) => {
+
+  
 }

@@ -19,6 +19,7 @@ import {
 } from 'types'
 
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
+import SaveIcon from '@mui/icons-material/Save'
 import { substructAgeString } from 'utils/age'
 import { cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
@@ -37,6 +38,7 @@ import Chip from 'components/ui/Chip'
 import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters'
 import GendersFilter from 'components/Filters/GendersFilter'
 import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter'
+import FiltersNameFilter from 'components/Filters/FiltersNameFilter'
 
 type PatientListProps = {
   total: number
@@ -46,11 +48,14 @@ type PatientListProps = {
 }
 
 const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
-  const [toggleModal, setToggleModal] = useState(false)
+  const [toggleFiltersModal, setToggleFiltersModal] = useState(false)
+  const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
+  const [displaySaveFilters, setDisplaySaveFilters] = useState(false)
+  const [filtersName, setFiltersName] = useState('')
   const [page, setPage] = useState(1)
   const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total, label: 'patient(s)' })
   const [patientsList, setPatientsList] = useState<CohortPatient[]>([])
-
+  const [savedFilters, setSavedFilters] = useState<any[]>([])
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [agePyramid, setAgePyramid] = useState<AgeRepartitionType>([])
   const [patientData, setPatientData] = useState<{
@@ -114,6 +119,16 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
     }
   }
 
+  const fetchSavedFilters = async () => {
+
+    
+  }
+
+  useEffect(() => {
+    if (filtersAsArray.length > 0 || searchInput) setDisplaySaveFilters(true)
+    else setDisplaySaveFilters(false)
+  }, [genders, vitalStatuses, birthdatesRanges, searchBy, searchInput])
+
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
@@ -162,7 +177,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
               <Select
                 selectedValue={searchBy || SearchByTypes.TEXT}
                 label="Rechercher dans :"
-                width={'25%'}
+                width={'20%'}
                 items={searchByListPatients}
                 onchange={(newValue: SearchByTypes) => changeSearchBy(newValue)}
               />
@@ -173,18 +188,21 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
               <SearchInput
                 value={searchInput}
                 placeholder="Rechercher"
-                width={'50%'}
+                width={'40%'}
                 onchange={(newValue) => changeSearchInput(newValue)}
               />
             )}
-            <Button width={'25%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
+            <Button
+              width={'15%'}
+              icon={<FilterList height="15px" fill="#FFF" />}
+              onClick={() => setToggleFiltersModal(true)}
+            >
               Filtrer
             </Button>
-
             <Modal
               title="Filtrer les patients"
-              open={toggleModal}
-              onClose={() => setToggleModal(false)}
+              open={toggleFiltersModal}
+              onClose={() => setToggleFiltersModal(false)}
               onSubmit={(newFilters) => addFilters({ genders, birthdatesRanges, vitalStatuses, ...newFilters })}
             >
               <GendersFilter name={FilterKeys.GENDERS} value={genders} />
@@ -194,6 +212,25 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
                 value={birthdatesRanges}
                 deidentified={deidentified || false}
               />
+            </Modal>
+
+            {displaySaveFilters && (
+              <Button
+                width={'25%'}
+                icon={<SaveIcon height="15px" fill="#FFF" />}
+                onClick={() => setToggleSaveFiltersModal(true)}
+                color="#ED6D91"
+              >
+                Enregistrer filtres
+              </Button>
+            )}
+            <Modal
+              title="Sauvegarder les filtres"
+              open={toggleSaveFiltersModal}
+              onClose={() => setToggleSaveFiltersModal(false)}
+              onSubmit={() => console.log('create filters')}
+            >
+              <FiltersNameFilter name="filtersName" value={filtersName} />
             </Modal>
           </Grid>
         </Searchbar>

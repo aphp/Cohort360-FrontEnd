@@ -38,6 +38,7 @@ import { idSort, labelSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { CODE_HIERARCHY_EXTENSION_NAME } from '../../constants'
 import { Direction, Order, SearchByTypes } from 'types/searchCriterias'
+import { RessourceType } from 'types/requestCriterias'
 
 const paramValuesReducerWithPrefix =
   (prefix: string): ((accumulator: string, currentValue: string) => string) =>
@@ -359,13 +360,23 @@ export const fetchDocumentReferenceContent = async (docId: string): FHIR_API_Pro
   return documentResp
 }
 
+export const postFilters = async (
+  fhir_version: string,
+  fhir_ressource: RessourceType,
+  name: string,
+  filters: string
+): FHIR_API_Promise_Response<DocumentReference> => {
+  const documentResp = await apiFhir.get<FHIR_API_Response<DocumentReference>>(`/DocumentReference/${docId}`)
+
+  return documentResp
+}
 /**
  * Binary Resource
  *
  */
 
 type fetchBinaryProps = { _id?: string }
-export const fetchBinary = async (args: fetchBinaryProps): FHIR_Bundle_Promise_Response<Binary> => {
+export const fetchBinary = async (args: fetchBinaryProps): FHIR_Bundle_Promise_Response<Filter> => {
   const { _id } = args
   let options: string[] = []
 
@@ -766,7 +777,8 @@ export const fetchMedicationAdministration = async (
     ] // eslint-disable-line
   if (minDate) options = [...options, `effective-time=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `effective-time=le${maxDate}`] // eslint-disable-line
-  if (executiveUnits && executiveUnits.length > 0) options = [...options, `context.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `context.encounter-care-site=${executiveUnits}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
 
@@ -864,7 +876,9 @@ const getCodeList = async (
       // if noStar is true then we search for the code, else we search for the display
       searchParam = noStar
         ? `&only-roots=false&code=${search.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
-        : `&only-roots=false&_text=${encodeURIComponent(search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line  
+        : `&only-roots=false&_text=${encodeURIComponent(
+            search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')
+          )}*` //eslint-disable-line
     }
     // TODO test if it returns all the codes without specifying the count
     const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(
@@ -874,7 +888,12 @@ const getCodeList = async (
     return valueSetBundle.length > 0
       ? valueSetBundle
           .map((entry) => {
-            return entry.compose?.include[0].concept?.map((code) => ({ ...code, codeSystem: entry.compose?.include[0].system })) || [] //eslint-disable-line
+            return (
+              entry.compose?.include[0].concept?.map((code) => ({
+                ...code,
+                codeSystem: entry.compose?.include[0].system
+              })) || []
+            ) //eslint-disable-line
           })
           .filter((valueSetPerSystem) => !!valueSetPerSystem)
           .reduce((acc, val) => acc.concat(val), [])
