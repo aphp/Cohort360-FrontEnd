@@ -180,7 +180,7 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
           <BlockWrapper margin="1em">
             <DurationRange
               value={age}
-              disabled={birthdates[0] !== null || birthdates[1] !== null}
+              active={birthdates[0] !== null || birthdates[1] !== null}
               label={
                 vitalStatus &&
                 vitalStatus.length === 1 &&

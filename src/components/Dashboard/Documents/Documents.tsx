@@ -39,6 +39,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   const [toggleModal, setToggleModal] = useState(false)
   const [searchInputError, setSearchInputError] = useState<SearchInputError | null>(null)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
+
   const [
     {
       orderBy,
@@ -49,6 +50,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
     },
     { changeOrderBy, changeSearchInput, changeSearchBy, addFilters, removeFilter }
   ] = useSearchCriterias(initAllDocsSearchCriterias)
+
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate, ipp })
   }, [nda, ipp, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate])
@@ -101,11 +103,6 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
-    setPage(1)
-  }, [onlyPdfAvailable, ipp, nda, docTypes, startDate, endDate, executiveUnits, orderBy, searchBy, searchInput])
-
-  useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
   }, [page])
 
   useEffect(() => {
@@ -114,6 +111,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
       fetchDocumentsList()
     }
   }, [loadingStatus])
+
   return (
     <Grid container alignItems="center">
       <BlockWrapper item xs={12}>

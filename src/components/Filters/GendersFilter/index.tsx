@@ -8,9 +8,10 @@ import { isChecked, toggleFilter } from 'utils/filters'
 type GendersFilterProps = {
   value: GenderStatus[]
   name: string
+  disabled?: boolean
 }
 
-const GendersFilter = ({ name, value }: GendersFilterProps) => {
+const GendersFilter = ({ name, value, disabled = false }: GendersFilterProps) => {
   const context = useContext(FormContext)
   const [genders, setGenders] = useState(value)
 
@@ -26,24 +27,28 @@ const GendersFilter = ({ name, value }: GendersFilterProps) => {
         onChange={(e) => setGenders(toggleFilter(genders, (e.target as HTMLInputElement).value) as GenderStatus[])}
       >
         <FormControlLabel
+          disabled={disabled}
           checked={isChecked(GenderStatus.FEMALE, genders)}
           value={GenderStatus.FEMALE}
           control={<Checkbox color="secondary" />}
           label={GenderStatusLabel.FEMALE}
         />
         <FormControlLabel
+          disabled={disabled}
           checked={isChecked(GenderStatus.MALE, genders)}
           value={GenderStatus.MALE}
           control={<Checkbox color="secondary" />}
           label={GenderStatusLabel.MALE}
         />
         <FormControlLabel
+          disabled={disabled}
           checked={isChecked(GenderStatus.OTHER, genders)}
           value={GenderStatus.OTHER}
           control={<Checkbox color="secondary" />}
           label={GenderStatusLabel.OTHER}
         />
         <FormControlLabel
+          disabled={disabled}
           checked={isChecked(GenderStatus.UNKNOWN, genders)}
           value={GenderStatus.UNKNOWN}
           control={<Checkbox color="secondary" />}
