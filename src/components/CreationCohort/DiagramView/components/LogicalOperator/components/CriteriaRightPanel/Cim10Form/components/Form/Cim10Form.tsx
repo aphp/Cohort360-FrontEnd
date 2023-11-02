@@ -123,7 +123,6 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
 
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">Diagnostic</Typography>
-
           <TextField
             required
             className={classes.inputItem}
@@ -133,7 +132,6 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             value={currentState.title}
             onChange={(e) => onChangeValue('title', e.target.value)}
           />
-
           <Grid style={{ display: 'flex' }}>
             <FormLabel
               onClick={() => onChangeValue('isInclusive', !currentState.isInclusive)}
@@ -149,7 +147,6 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               color="secondary"
             />
           </Grid>
-
           <OccurrencesNumberInputs
             form={CriteriaName.Cim10}
             selectedCriteria={selectedCriteria}
@@ -168,7 +165,6 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               onChangeValue('code', value)
             }}
           />
-
           <Autocomplete
             multiple
             id="criteria-cim10-type-autocomplete"
@@ -180,7 +176,6 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             onChange={(e, value) => onChangeValue('diagnosticType', value)}
             renderInput={(params) => <TextField {...params} label="Type de diagnostic" />}
           />
-
           <AdvancedInputs form={CriteriaName.Cim10} selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 

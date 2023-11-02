@@ -2,13 +2,14 @@ import { Autocomplete, TextField, Typography } from '@mui/material'
 import { InputWrapper } from 'components/ui/Inputs'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
+import { HierarchyElement } from 'types'
 import { LabelObject } from 'types/searchCriterias'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 type PrescriptionTypesFilterProps = {
   value: LabelObject[]
   name: string
-  allAdministrationTypes: string[]
+  allAdministrationTypes: HierarchyElement[]
 }
 
 const PrescriptionTypesFilter = ({ name, value, allAdministrationTypes }: PrescriptionTypesFilterProps) => {

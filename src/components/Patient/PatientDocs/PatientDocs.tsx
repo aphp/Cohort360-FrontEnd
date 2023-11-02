@@ -148,14 +148,16 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
             Filtrer
           </Button>
         </Searchbar>
-        <Grid item xs={12}>
+      </BlockWrapper>
+      {filtersAsArray.length > 0 && (
+        <Grid item xs={12} margin="20px 0px 10px 0px">
           {filtersAsArray.map((filter, index) => (
             <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
           ))}
         </Grid>
-      </BlockWrapper>
+      )}
 
-      <BlockWrapper container justifyContent="space-between" alignItems="center" margin={'0px 0px 5px 0px'}>
+      <BlockWrapper container justifyContent="space-between" alignItems="center">
         <Grid item xs={12} md={3}>
           {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && <CircularProgress />}
           {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (

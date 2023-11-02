@@ -6,7 +6,7 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import DataTableMedication from 'components/DataTable/DataTableMedication'
 
-import { CriteriaName, LoadingStatus, TabType } from 'types'
+import { CriteriaName, HierarchyElement, LoadingStatus, TabType } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchMedication } from 'state/patient'
@@ -89,8 +89,8 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
     list: patient?.medication?.[selectedTab.id]?.list ?? [],
     label: 'prescription(s)'
   }
-  const [allAdministrationRoutes, setAdministrationRoutes] = useState<string[]>([])
-  const [allPrescriptionTypes, setPrescriptionTypes] = useState<string[]>([])
+  const [allAdministrationRoutes, setAdministrationRoutes] = useState<HierarchyElement[]>([])
+  const [allPrescriptionTypes, setPrescriptionTypes] = useState<HierarchyElement[]>([])
 
   const controllerRef = useRef<AbortController | null>(null)
 
@@ -172,7 +172,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
-      <BlockWrapper item xs={12} margin={'20px 0px 10px 0px'}>
+      <BlockWrapper item xs={12} margin={'20px 0px'}>
         <Searchbar>
           <Grid container item xs={12} md={12} lg={8} xl={8} style={isSm ? { flexWrap: 'wrap-reverse' } : {}}>
             <Grid item xs={12} md={6} lg={6} xl={6}>
@@ -244,11 +244,13 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
           </Grid>
         </Searchbar>
       </BlockWrapper>
-      <Grid item xs={12} container marginBottom={2}>
-        {filtersAsArray.map((filter, index) => (
-          <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
-        ))}
-      </Grid>
+      {filtersAsArray.length > 0 && (
+        <Grid item xs={12} margin="20px 0px">
+          {filtersAsArray.map((filter, index) => (
+            <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
+          ))}
+        </Grid>
+      )}
       <Grid item xs={12}>
         <DataTableMedication
           loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}

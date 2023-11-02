@@ -9,7 +9,7 @@ import DataTablePmsi from 'components/DataTable/DataTablePmsi'
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPmsi } from 'state/patient'
 
-import { LoadingStatus, TabType } from 'types'
+import { HierarchyElement, LoadingStatus, TabType } from 'types'
 
 import useStyles from './styles'
 import { _cancelPendingRequest } from 'utils/abortController'
@@ -52,7 +52,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const PMSITabs: TabType<PMSI, PMSILabel>[] = [
     { label: PMSILabel.DIAGNOSTIC, id: PMSI.DIAGNOSTIC },
     { label: PMSILabel.CCAM, id: PMSI.CCAM },
-    { label: PMSILabel.GMH, id: PMSI.GMH }
+    { label: PMSILabel.GHM, id: PMSI.GHM }
   ]
   const [page, setPage] = useState(1)
 
@@ -69,7 +69,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
     return selectFiltersAsArray({ code, nda, diagnosticTypes, startDate, endDate, executiveUnits })
   }, [code, nda, diagnosticTypes, startDate, endDate, executiveUnits])
 
-  const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<string[]>([])
+  const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<HierarchyElement[]>([])
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
 
   /* TODO => enlever l'appel de redux */
@@ -81,7 +81,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
     list: patient?.pmsi?.[selectedTab.id]?.list || [],
     nb: patient?.pmsi?.[selectedTab.id]?.count ?? 0,
     total: patient?.pmsi?.[selectedTab.id]?.total ?? 0,
-    label: selectedTab.id === PMSI.DIAGNOSTIC ? 'diagnostic(s)' : selectedTab.id === PMSI.CCAM ? PMSI.CCAM : 'ghm'
+    label: selectedTab.id === PMSI.DIAGNOSTIC ? 'diagnostic(s)' : selectedTab.id === PMSI.CCAM ? PMSI.CCAM : PMSI.GHM
   }
   const controllerRef = useRef<AbortController | null>(null)
 
@@ -151,7 +151,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
-      <BlockWrapper item xs={12} margin={'20px 0px 10px 0px'}>
+      <BlockWrapper item xs={12} margin={'20px 0px'}>
         <Searchbar>
           <Grid container item xs={12} md={12} lg={8} xl={8} style={isSm ? { flexWrap: 'wrap-reverse' } : {}}>
             <Grid item xs={12} md={6} lg={6} xl={6}>
@@ -217,11 +217,13 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
           </Grid>
         </Searchbar>
       </BlockWrapper>
-      <Grid item xs={12} container marginBottom={2}>
-        {filtersAsArray.map((filter, index) => (
-          <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
-        ))}
-      </Grid>
+      {filtersAsArray.length > 0 && (
+        <Grid item xs={12} margin="20px 0px">
+          {filtersAsArray.map((filter, index) => (
+            <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
+          ))}
+        </Grid>
+      )}
       <Grid item xs={12}>
         <DataTablePmsi
           loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}

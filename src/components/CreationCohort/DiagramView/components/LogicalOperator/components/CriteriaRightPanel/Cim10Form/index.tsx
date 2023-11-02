@@ -5,15 +5,15 @@ import Cim10Form from './components/Form/Cim10Form'
 import Cim10Hierarchy from './components/Hierarchy/Cim10Hierarchy'
 
 import useStyles from './styles'
-import { CONDITION, initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
+import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition, PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
 import { CriteriaDrawerComponentProps } from 'types'
-
+import { RessourceType } from 'types/requestCriterias'
 
 export const defaultCondition = {
-  type: CONDITION,
+  type: RessourceType.CONDITION,
   title: 'Critère de diagnostic',
   code: [],
   diagnosticType: [],

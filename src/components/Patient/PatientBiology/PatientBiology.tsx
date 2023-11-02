@@ -131,7 +131,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
           </Typography>
         </Grid>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} margin={'20px 0px 10px 0px'}>
         <Searchbar>
           <Grid item xs={12} lg={3}>
             {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && (
@@ -171,11 +171,13 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
           </Grid>
         </Searchbar>
       </Grid>
-      <Grid item xs={12} container marginBottom={2}>
-        {filtersAsArray.map((filter, index) => (
-          <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
-        ))}
-      </Grid>
+      {filtersAsArray.length > 0 && (
+        <Grid item xs={12} margin="20px 0px">
+          {filtersAsArray.map((filter, index) => (
+            <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
+          ))}
+        </Grid>
+      )}
 
       <Grid item xs={12}>
         <DataTableObservation

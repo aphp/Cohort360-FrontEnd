@@ -15,13 +15,13 @@ export enum PatientTableLabels {
 
 export enum PMSI {
   DIAGNOSTIC = 'diagnostic',
-  GMH = 'ghm',
+  GHM = 'ghm',
   CCAM = 'ccam'
 }
 
 export enum PMSILabel {
   DIAGNOSTIC = 'Diagnostics CIM10',
-  GMH = 'GHM',
+  GHM = 'GHM',
   CCAM = 'Actes CCAM'
 }
 

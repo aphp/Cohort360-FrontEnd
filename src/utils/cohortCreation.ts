@@ -47,15 +47,12 @@ const ENCOUNTER_DESTINATION = 'discharge-disposition'
 const ENCOUNTER_PROVENANCE = 'admit-source'
 const ENCOUNTER_ADMISSION = 'admission-type'
 
-export const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
 const CLAIM_CODE = 'diagnosis'
 const CLAIM_CODE_ALL_HIERARCHY = 'diagnosis'
 
-export const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
 const PROCEDURE_CODE = 'code'
 const PROCEDURE_CODE_ALL_HIERARCHY = 'code'
 
-export const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition'
 const CONDITION_CODE = 'code'
 const CONDITION_CODE_ALL_HIERARCHY = 'code'
 const CONDITION_TYPE = 'orbis-status'
@@ -65,14 +62,11 @@ const COMPOSITION_TITLE = 'description'
 const COMPOSITION_TYPE = 'type'
 const COMPOSITION_STATUS = 'docstatus'
 
-const RESSOURCE_TYPE_MEDICATION_REQUEST: 'MedicationRequest' = 'MedicationRequest' // = Prescription
-const RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: 'MedicationAdministration' = 'MedicationAdministration' // = Administration
 const MEDICATION_CODE = 'medication'
 const MEDICATION_PRESCRIPTION_TYPE = 'category'
 const MEDICATION_ADMINISTRATION_ROUTE = 'dosage-route'
 const MEDICATION_REQUEST_ROUTE = 'dosage-instruction-route'
 
-const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
 const OBSERVATION_CODE = 'code'
 const OBSERVATION_CODE_ALL_HIERARCHY = 'code'
 const OBSERVATION_VALUE = 'value-quantity'
@@ -457,7 +451,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         `${
           criterion.administration && criterion.administration.length > 0
             ? `${
-                criterion.type === RESSOURCE_TYPE_MEDICATION_REQUEST
+                criterion.type === RessourceType.MEDICATION_REQUEST
                   ? MEDICATION_REQUEST_ROUTE
                   : MEDICATION_ADMINISTRATION_ROUTE
               }=${criterion.administration.map((administration: any) => administration.id).reduce(searchReducer)}`
@@ -466,7 +460,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         `${
           criterion.encounterService && criterion.encounterService.length > 0
             ? `${
-                criterion.type === RESSOURCE_TYPE_MEDICATION_REQUEST
+                criterion.type === RessourceType.MEDICATION_REQUEST
                   ? ENCOUNTER_SERVICE_PROVIDER
                   : ENCOUNTER_CONTEXT_SERVICE_PROVIDER
               }=${criterion.encounterService

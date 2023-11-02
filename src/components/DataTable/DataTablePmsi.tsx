@@ -66,7 +66,7 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
           <TableCell colSpan={6} align="left">
             <Grid container justifyContent="center">
               <Typography variant="button">{`Aucun ${
-                selectedTab !== PMSI.DIAGNOSTIC ? (selectedTab !== PMSI.CCAM ? PMSI.GMH : 'acte') : PMSI.DIAGNOSTIC
+                selectedTab !== PMSI.DIAGNOSTIC ? (selectedTab !== PMSI.CCAM ? PMSI.GHM : 'acte') : PMSI.DIAGNOSTIC
               } à afficher`}</Typography>
             </Grid>
           </TableCell>

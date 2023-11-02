@@ -4,13 +4,14 @@ import { Alert, Button, Divider, FormLabel, Grid, IconButton, Switch, Typography
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
-import { CriteriaDrawerComponentProps, IPPListDataType } from 'types'
+import { CriteriaDrawerComponentProps } from 'types'
 
 import useStyles from './styles'
+import { IPPListDataType, RessourceType } from 'types/requestCriterias'
 
 const defaultIPPList: IPPListDataType = {
   title: "Liste d'IPP",
-  type: 'IPPList',
+  type: RessourceType.IPP_LIST,
   search: '',
   isInclusive: true
 }

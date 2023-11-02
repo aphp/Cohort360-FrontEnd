@@ -401,7 +401,7 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case PMSI.GMH:
+      case PMSI.GHM:
         pmsiResp = await fetchClaim({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,

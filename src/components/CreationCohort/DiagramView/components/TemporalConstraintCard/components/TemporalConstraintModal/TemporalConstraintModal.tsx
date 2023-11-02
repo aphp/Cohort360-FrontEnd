@@ -28,7 +28,7 @@ import { buildCohortCreation, updateTemporalConstraints } from 'state/cohortCrea
 
 import EventSequenceTable from '../EventSequenceTable/EventSequenceTable'
 import TemporalConstraintConfig from '../TemporalConstraintConfig/TemporalConstraintConfig'
-import { SelectedCriteriaType, TemporalConstraintsKind, TemporalConstraintsType } from 'types'
+import { TemporalConstraintsKind, TemporalConstraintsType } from 'types'
 import Avatar from 'components/ui/Avatar/Avatar'
 import Card from 'components/ui/Card/Card'
 import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
@@ -36,6 +36,7 @@ import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDia
 import useStyles from './styles'
 import _ from 'lodash'
 import { getSelectableGroups } from 'utils/temporalConstraints'
+import { SelectedCriteriaType } from 'types/requestCriterias'
 
 type EncounterConstraint = {
   selectedGroup: number | null

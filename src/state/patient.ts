@@ -578,7 +578,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
         services.patients.fetchPMSI(
           0,
           patientId,
-          PMSI.GMH,
+          PMSI.GHM,
           '',
           '',
           '',

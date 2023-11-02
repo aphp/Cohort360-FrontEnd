@@ -3,7 +3,6 @@ import apiBack from '../apiBackend'
 
 import {
   DatedMeasure,
-  DocType,
   HierarchyElement,
   HierarchyElementWithSystem,
   QuerySnapshotInfo,
@@ -37,6 +36,7 @@ import {
   SHORT_COHORT_LIMIT
 } from '../../constants'
 import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
+import { DocType } from 'types/requestCriterias'
 
 export interface IServiceCohortCreation {
   /**

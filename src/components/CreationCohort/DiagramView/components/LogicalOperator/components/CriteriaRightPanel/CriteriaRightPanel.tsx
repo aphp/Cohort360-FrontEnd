@@ -157,8 +157,8 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
           if (subItems) searchChild(subItems)
 
           if (id === 'Medication') {
-            if ('MedicationRequest' === selectedCriteria.type) _action = criteriaItem
-            if ('MedicationAdministration' === selectedCriteria.type) _action = criteriaItem
+            if (RessourceType.MEDICATION_REQUEST === selectedCriteria.type) _action = criteriaItem
+            if (RessourceType.MEDICATION_ADMINISTRATION === selectedCriteria.type) _action = criteriaItem
           } else {
             if (id === selectedCriteria.type) _action = criteriaItem
           }
