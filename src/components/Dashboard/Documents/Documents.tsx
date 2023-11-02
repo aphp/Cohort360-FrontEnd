@@ -2,21 +2,13 @@ import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { Checkbox, CircularProgress, Grid, Tooltip, Typography } from '@mui/material'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
-import {
-  CohortComposition,
-  CriteriaName,
-  DocumentsData,
-  LoadingStatus,
-  DTTB_ResultsType as ResultsType,
-  ScopeTreeRow
-} from 'types'
+import { CohortComposition, CriteriaName, DocumentsData, LoadingStatus, DTTB_ResultsType as ResultsType } from 'types'
 import services from 'services/aphp'
 import {
-  AllDocumentsFilters,
+  DocumentsFilters,
   Direction,
   FilterKeys,
   Order,
-  SavedFilter,
   searchByListDocuments,
   SearchByTypes
 } from 'types/searchCriterias'
@@ -42,10 +34,9 @@ import NdaFilter from 'components/Filters/NdaFilter'
 import { RessourceType } from 'types/requestCriterias'
 import { Save, SavedSearch } from '@mui/icons-material'
 import { useAppSelector } from 'state'
-import ListFilter from 'components/Filters/ListFilter'
-import TextInput from 'components/Filters/TextInput'
+import TextInput from 'components/ui/TextInput'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
-import { fetchPerimeterFromPerimeterId } from 'services/aphp/servicePatients'
+import List from 'components/ui/List'
 
 type DocumentsProps = {
   groupId?: string
@@ -53,13 +44,13 @@ type DocumentsProps = {
 }
 
 const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
-  const [toggleModal, setToggleModal] = useState(false)
+  const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
-  const [displaySaveFiltersButton, setDisplaySaveFiltersButton] = useState(false)
 
   const {
     allSavedFilters,
+    allSavedFiltersAsListItems,
     savedFiltersErrors,
     selectedSavedFilter,
     methods: {
@@ -68,10 +59,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
       deleteSavedFilters,
       patchSavedFilter,
       selectFilter,
-      mapToSelectedFilter,
       resetSavedFilterError
     }
-  } = useSavedFilters<AllDocumentsFilters>(RessourceType.DOCUMENTS)
+  } = useSavedFilters<DocumentsFilters>(RessourceType.DOCUMENTS)
 
   const [documentsResult, setDocumentsResult] = useState<ResultsType>({ nb: 0, total: 0, label: 'document(s)' })
   const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total: 0, label: 'patient(s)' })
@@ -95,7 +85,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
       filters,
       filters: { nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate, ipp }
     },
-    { changeOrderBy, changeSearchInput, changeSearchBy, addFilters, removeFilter }
+    { changeOrderBy, changeSearchInput, changeSearchBy, addFilters, removeFilter, addSearchCriterias }
   ] = useSearchCriterias(initAllDocsSearchCriterias)
 
   const filtersAsArray = useMemo(() => {
@@ -148,61 +138,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
     }
   }
 
-  const fetchExecutiveUnits = async (dataToMap: ScopeTreeRow[]) => {
-    const updatedExecutiveUnits = await Promise.all<ScopeTreeRow>(
-      dataToMap.map(async (unit) => {
-        if (!unit.name) {
-          try {
-            const fetchedData = await fetchPerimeterFromPerimeterId(unit.id)
-            return fetchedData
-          } catch (error) {
-            console.error('Erreur lors de la récupération des données', error)
-            return unit
-          }
-        }
-        return unit
-      })
-    )
-    return updatedExecutiveUnits
-  }
-
-  const applySelectedSavedFilter = async () => {
-    if (selectedSavedFilter) {
-      changeSearchBy(selectedSavedFilter.filterParams.searchBy ?? SearchByTypes.TEXT)
-      changeSearchInput(selectedSavedFilter.filterParams.searchInput)
-      addFilters(selectedSavedFilter.filterParams.filters)
-    }
-  }
-
-  const handleSelectFilter = async (savedFilter: SavedFilter) => {
-    const selectedFilter = mapToSelectedFilter(savedFilter)
-    const updatedExecutiveUnits = await fetchExecutiveUnits(selectedFilter.filterParams.filters.executiveUnits)
-    selectedFilter.filterParams.filters.executiveUnits = updatedExecutiveUnits
-    selectFilter(selectedFilter)
-  }
-
-  const SaveFiltersButton = () => (
-    <Button
-      icon={<Save height="15px" fill="#FFF" />}
-      onClick={() => {
-        setToggleSaveFiltersModal(true)
-        resetSavedFilterError()
-      }}
-      color="secondary"
-      disabled={maintenanceIsActive}
-    >
-      Enregistrer filtres
-    </Button>
-  )
-
   useEffect(() => {
     getSavedFilters()
   }, [])
-
-  useEffect(() => {
-    if (filtersAsArray.length > 0 || searchInput) setDisplaySaveFiltersButton(true)
-    else setDisplaySaveFiltersButton(false)
-  }, [nda, ipp, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate, searchBy, searchInput])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -220,8 +158,23 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
     }
   }, [loadingStatus])
 
+  const SaveFiltersButton = () => (
+    <Button
+      width="250px"
+      icon={<Save height="15px" fill="#FFF" />}
+      onClick={() => {
+        setToggleSaveFiltersModal(true)
+        resetSavedFilterError()
+      }}
+      color="secondary"
+      disabled={maintenanceIsActive}
+    >
+      Enregistrer filtres
+    </Button>
+  )
+
   return (
-    <Grid container alignItems="center">
+    <Grid container alignItems="center" gap="25px">
       <BlockWrapper item xs={12}>
         {deidentified ? (
           <AlertWrapper severity="warning">
@@ -237,113 +190,105 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
         )}
       </BlockWrapper>
 
-      <BlockWrapper item xs={12} margin="10px 0px 10px">
-        <Searchbar wrapped>
-          <Grid container direction="column" gap="10px">
-            <Grid container item alignItems="flex-start" justifyContent="flex-end" maxWidth="555px" gap="8px">
-              <Grid item>
-                <Button
-                  width={'150px'}
-                  icon={<FilterList height="15px" fill="#FFF" />}
-                  onClick={() => setToggleModal(true)}
-                >
-                  Filtrer
-                </Button>
-              </Grid>
-              {!!allSavedFilters?.count && (
-                <Grid item>
-                  <Button icon={<SavedSearch fill="#FFF" />} onClick={() => setToggleSavedFiltersModal(true)}>
-                    Filtres sauvegardés
-                  </Button>
+      {!deidentified && (
+        <Grid item xs={12}>
+          <Grid item container justifyContent="flex-end" alignItems="center">
+            <Checkbox
+              checked={onlyPdfAvailable}
+              onChange={() =>
+                addFilters({
+                  ...filters,
+                  onlyPdfAvailable: !onlyPdfAvailable
+                })
+              }
+            />
+            <Typography style={{ color: '#000' }}>
+              N'afficher que les documents dont les PDF sont disponibles
+            </Typography>
+          </Grid>
+        </Grid>
+      )}
+      <Grid container justifyContent="flex-end" gap="10px">
+        {(filtersAsArray.length > 0 || searchInput) && (
+          <Grid item>
+            {maintenanceIsActive ? (
+              <Tooltip
+                title="Ce bouton est désactivé en raison d'une maintenance en cours."
+                arrow
+                placement="bottom-start"
+              >
+                <Grid>
+                  <SaveFiltersButton />
                 </Grid>
-              )}
-              {displaySaveFiltersButton && (
-                <Grid item>
-                  {maintenanceIsActive ? (
-                    <Tooltip
-                      title="Ce bouton est désactivé en raison de maintenance en cours."
-                      arrow
-                      placement="bottom-start"
-                    >
-                      <Grid>
-                        <SaveFiltersButton />
-                      </Grid>
-                    </Tooltip>
-                  ) : (
-                    <SaveFiltersButton />
-                  )}
-                </Grid>
-              )}
-            </Grid>
-            <Grid container item gap="8px">
-              <Select
-                value={searchBy || SearchByTypes.TEXT}
-                label="Rechercher dans :"
-                width={'170px'}
-                items={searchByListDocuments}
-                onchange={(newValue) => changeSearchBy(newValue)}
-              />
-              <SearchInput
-                value={searchInput}
-                placeholder={'Rechercher dans les documents'}
-                displayHelpIcon
-                error={searchInputError}
-                onchange={(newValue) => changeSearchInput(newValue)}
-              />
-            </Grid>
+              </Tooltip>
+            ) : (
+              <SaveFiltersButton />
+            )}
+          </Grid>
+        )}
+        {!!allSavedFilters?.count && (
+          <Grid item>
+            <Button icon={<SavedSearch fill="#FFF" />} width={'170px'} onClick={() => setToggleSavedFiltersModal(true)}>
+              Vos filtres
+            </Button>
+          </Grid>
+        )}
+        <Grid item>
+          <Button
+            width={'170px'}
+            icon={<FilterList height="15px" fill="#FFF" />}
+            onClick={() => setToggleFilterByModal(true)}
+          >
+            Filtrer
+          </Button>
+        </Grid>
+      </Grid>
 
-            <Grid item xs={12}>
-              {filtersAsArray.map((filter, index) => (
-                <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
-              ))}
-            </Grid>
+      <BlockWrapper item xs={12}>
+        <Searchbar>
+          <Grid item xs={12} md={12} lg={5} xl={4} container alignItems="center" gap="inherit">
+            {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && (
+              <CircularProgress />
+            )}
+            {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
+              <Grid item xs={12} container>
+                <DisplayDigits
+                  nb={documentsResult.nb}
+                  total={documentsResult.total}
+                  label={documentsResult.label ?? ''}
+                />
+                <span style={{ width: '25px' }} />
+                <DisplayDigits nb={patientsResult.nb} total={patientsResult.total} label={patientsResult.label ?? ''} />
+              </Grid>
+            )}
+          </Grid>
+          <Grid container item xs={12} md={12} lg={7} xl={8} justifyContent="flex-end">
+            <Select
+              value={searchBy || SearchByTypes.TEXT}
+              label="Rechercher dans :"
+              width={'150px'}
+              items={searchByListDocuments}
+              onchange={(newValue) => changeSearchBy(newValue)}
+            />
+            <SearchInput
+              value={searchInput}
+              width={'70%'}
+              placeholder={'Rechercher dans les documents'}
+              displayHelpIcon
+              error={searchInputError}
+              onchange={(newValue) => changeSearchInput(newValue)}
+            />
           </Grid>
         </Searchbar>
       </BlockWrapper>
 
-      <BlockWrapper container justifyContent="space-between" alignItems="center" margin={'0px 0px 5px 0px'}>
-        <Grid item xs={12} lg={6}>
-          <Grid item xs={12}>
-            {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && (
-              <CircularProgress />
-            )}
-          </Grid>
-          {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
-            <Grid container item xs={12}>
-              <DisplayDigits
-                nb={documentsResult.nb}
-                total={documentsResult.total}
-                label={documentsResult.label ?? ''}
-              />
-              <span style={{ width: 15 }}></span>
-              <DisplayDigits nb={patientsResult.nb} total={patientsResult.total} label={patientsResult.label ?? ''} />
-            </Grid>
-          )}
+      {filtersAsArray.length > 0 && (
+        <Grid item xs={12}>
+          {filtersAsArray.map((filter, index) => (
+            <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
+          ))}
         </Grid>
-        <Grid item xs={12} lg={6}>
-          {!deidentified && (
-            <Grid container alignItems="center" justifyContent="flex-end">
-              <Checkbox
-                checked={onlyPdfAvailable}
-                onChange={() =>
-                  addFilters({
-                    nda,
-                    ipp,
-                    executiveUnits,
-                    docTypes,
-                    startDate,
-                    endDate,
-                    onlyPdfAvailable: !onlyPdfAvailable
-                  })
-                }
-              />
-              <Typography style={{ color: '#000' }}>
-                N'afficher que les documents dont les PDF sont disponibles
-              </Typography>
-            </Grid>
-          )}
-        </Grid>
-      </BlockWrapper>
+      )}
       <DataTableComposition
         showIpp
         loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
@@ -359,13 +304,13 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
       />
       <Modal
         title="Filtrer par :"
-        open={toggleModal}
+        open={toggleFilterByModal}
         width={'600px'}
-        onClose={() => setToggleModal(false)}
+        onClose={() => setToggleFilterByModal(false)}
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
       >
         {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-        {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp} />}
+        {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp || ''} />}
         <DocTypesFilter allDocTypesList={allDocTypesList.docTypes} value={docTypes} name={FilterKeys.DOC_TYPES} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
@@ -378,23 +323,29 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
         title="Filtres sauvegardés"
         open={toggleSavedFiltersModal}
         onClose={() => setToggleSavedFiltersModal(false)}
-        onSubmit={applySelectedSavedFilter}
+        onSubmit={() => {
+          if (selectedSavedFilter) addSearchCriterias(selectedSavedFilter.filterParams)
+        }}
         validationText="Ouvrir"
       >
-        <ListFilter
+        <List
           name="savedFilters"
-          values={allSavedFilters?.results || []}
+          values={allSavedFiltersAsListItems}
           count={allSavedFilters?.count || 0}
           onDelete={deleteSavedFilters}
           onDisplay={() => {
             setToggleFilterInfoModal(true)
             setIsReadonlyFilterInfoModal(true)
           }}
-          onEdit={() => {
-            setToggleFilterInfoModal(true)
-            setIsReadonlyFilterInfoModal(false)
-          }}
-          onSelect={handleSelectFilter}
+          onEdit={
+            maintenanceIsActive
+              ? undefined
+              : () => {
+                  setToggleFilterInfoModal(true)
+                  setIsReadonlyFilterInfoModal(false)
+                }
+          }
+          onSelect={selectFilter}
           fetchPaginateData={() => getSavedFilters(allSavedFilters?.next)}
         >
           <Modal
@@ -404,22 +355,25 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
             width={'560px'}
             onClose={() => setToggleFilterInfoModal(false)}
             onSubmit={(newFilters) => {
-              const name = newFilters.filterName
-              const searchBy = newFilters.searchBy
-              const searchInput = newFilters.searchInput as string
-              const nda = newFilters.nda
-              const ipp = newFilters.ipp
-              const docTypes = newFilters.docTypes
-              const startDate = newFilters.startDate
-              const endDate = newFilters.endDate
-              const executiveUnits = newFilters.executiveUnits
+              const {
+                searchBy,
+                searchInput,
+                nda,
+                executiveUnits,
+                ipp,
+                docTypes,
+                endDate,
+                startDate,
+                onlyPdfAvailable,
+                name
+              } = newFilters
               patchSavedFilter(
                 name,
                 {
                   searchBy,
                   searchInput,
-                  orderBy: { orderBy: Order.FAMILY, orderDirection: Direction.ASC },
-                  filters: { nda, ipp, docTypes, onlyPdfAvailable, startDate, endDate, executiveUnits }
+                  orderBy: { orderBy: Order.DATE, orderDirection: Direction.DESC },
+                  filters: { nda, executiveUnits, ipp, docTypes, endDate, startDate, onlyPdfAvailable }
                 },
                 deidentified ?? true
               )
@@ -429,7 +383,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
             <Grid container direction="column">
               <Grid item>
                 <TextInput
-                  name="filterName"
+                  name="name"
                   label="Nom :"
                   value={selectedSavedFilter?.filterName}
                   error={savedFiltersErrors}
@@ -504,7 +458,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
               </Grid>
             </Grid>
           </Modal>
-        </ListFilter>
+        </List>
       </Modal>
       <Modal
         title="Sauvegarder les filtres"

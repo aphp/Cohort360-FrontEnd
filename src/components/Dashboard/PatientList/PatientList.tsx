@@ -27,14 +27,11 @@ import SearchInput from 'components/ui/Searchbar/SearchInput'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import {
   Direction,
-  DurationRangeType,
   FilterKeys,
-  GenderStatus,
   Order,
   PatientsFilters,
   searchByListPatients,
-  SearchByTypes,
-  VitalStatus
+  SearchByTypes
 } from 'types/searchCriterias'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
@@ -46,11 +43,11 @@ import Chip from 'components/ui/Chip'
 import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters'
 import GendersFilter from 'components/Filters/GendersFilter'
 import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter'
-import TextInput from 'components/Filters/TextInput'
-import { useAppSelector } from 'state'
+import TextInput from 'components/ui/TextInput'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { RessourceType } from 'types/requestCriterias'
-import ListFilter from 'components/Filters/ListFilter'
+import { useAppSelector } from 'state'
+import List from 'components/ui/List'
 
 type PatientListProps = {
   total: number
@@ -60,24 +57,39 @@ type PatientListProps = {
 }
 
 const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
-  const [toggleFiltersModal, setToggleFiltersModal] = useState(false)
+  const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
-  const [displaySaveFiltersButton, setDisplaySaveFiltersButton] = useState(false)
+  const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
+  const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const {
     allSavedFilters,
     savedFiltersErrors,
     selectedSavedFilter,
+    allSavedFiltersAsListItems,
     methods: {
       getSavedFilters,
       postSavedFilter,
       deleteSavedFilters,
       patchSavedFilter,
-      mapToSelectedFilter,
       selectFilter,
       resetSavedFilterError
     }
   } = useSavedFilters<PatientsFilters>(RessourceType.PATIENT)
+  const [
+    {
+      orderBy,
+      searchBy,
+      searchInput,
+      filters,
+      filters: { genders, birthdatesRanges, vitalStatuses }
+    },
+    { changeOrderBy, changeSearchBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
+  ] = useSearchCriterias(initPatientsSearchCriterias)
+
+  const filtersAsArray = useMemo(() => {
+    return selectFiltersAsArray({ genders, vitalStatuses, birthdatesRanges })
+  }, [genders, vitalStatuses, birthdatesRanges])
   const [page, setPage] = useState(1)
   const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total, label: 'patient(s)' })
   const [patientsList, setPatientsList] = useState<CohortPatient[]>([])
@@ -87,26 +99,9 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
     vitalStatusData?: SimpleChartDataType[]
     genderData?: SimpleChartDataType[]
   }>({})
-  const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
-  const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
 
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
-
-  const [
-    {
-      orderBy,
-      searchBy,
-      searchInput,
-      filters,
-      filters: { genders, birthdatesRanges, vitalStatuses }
-    },
-    { changeOrderBy, changeSearchBy, changeSearchInput, addFilters, removeFilter }
-  ] = useSearchCriterias(initPatientsSearchCriterias)
-
-  const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({ genders, vitalStatuses, birthdatesRanges })
-  }, [genders, vitalStatuses, birthdatesRanges])
 
   const controllerRef = useRef<AbortController | null>(null)
 
@@ -147,33 +142,9 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
     }
   }
 
-  const applySelectedSavedFilter = () => {
-    if (selectedSavedFilter) {
-      changeSearchBy(selectedSavedFilter.filterParams.searchBy || SearchByTypes.TEXT)
-      changeSearchInput(selectedSavedFilter.filterParams.searchInput)
-      addFilters(selectedSavedFilter.filterParams.filters)
-    }
-  }
-
-  const SaveFiltersButton = () => (
-    <Button
-      icon={<Save height="15px" fill="#FFF" />}
-      onClick={() => setToggleSaveFiltersModal(true)}
-      color="secondary"
-      disabled={maintenanceIsActive}
-    >
-      Enregistrer filtres
-    </Button>
-  )
-
   useEffect(() => {
     getSavedFilters()
   }, [])
-
-  useEffect(() => {
-    if (filtersAsArray.length > 0 || searchInput) setDisplaySaveFiltersButton(true)
-    else setDisplaySaveFiltersButton(false)
-  }, [genders, vitalStatuses, birthdatesRanges, searchBy, searchInput])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -191,8 +162,23 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
     }
   }, [loadingStatus])
 
+  const SaveFiltersButton = () => (
+    <Button
+      width="250px"
+      icon={<Save height="15px" fill="#FFF" />}
+      onClick={() => {
+        setToggleSaveFiltersModal(true)
+        resetSavedFilterError()
+      }}
+      color="secondary"
+      disabled={maintenanceIsActive}
+    >
+      Enregistrer filtres
+    </Button>
+  )
+
   return (
-    <Grid container>
+    <Grid container gap="25px">
       <Grid item xs={12}>
         <PatientCharts
           agePyramid={
@@ -204,41 +190,44 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
           loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
         />
       </Grid>
-      <Grid container justifyContent="flex-end" margin={'20px 0px 10px 0px'}>
-        <Grid item container justifyContent="flex-end" sx={{ gap: '8px' }}>
+      <Grid container justifyContent="flex-end" gap="10px">
+        {(filtersAsArray.length > 0 || searchInput) && (
           <Grid item>
-            <Button icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleFiltersModal(true)}>
-              Filtrer
+            {maintenanceIsActive ? (
+              <Tooltip
+                title="Ce bouton est désactivé en raison d'une maintenance en cours."
+                arrow
+                placement="bottom-start"
+              >
+                <Grid>
+                  <SaveFiltersButton />
+                </Grid>
+              </Tooltip>
+            ) : (
+              <SaveFiltersButton />
+            )}
+          </Grid>
+        )}
+
+        {!!allSavedFilters?.count && (
+          <Grid item>
+            <Button icon={<SavedSearch fill="#FFF" />} width={'170px'} onClick={() => setToggleSavedFiltersModal(true)}>
+              Vos filtres
             </Button>
           </Grid>
-          {!!allSavedFilters?.count && (
-            <Grid item>
-              <Button icon={<SavedSearch fill="#FFF" />} onClick={() => setToggleSavedFiltersModal(true)}>
-                Filtres sauvegardés
-              </Button>
-            </Grid>
-          )}
-          {displaySaveFiltersButton && (
-            <Grid item>
-              {maintenanceIsActive ? (
-                <Tooltip
-                  title="Ce bouton est désactivé en raison de maintenance en cours."
-                  arrow
-                  placement="bottom-start"
-                >
-                  <Grid>
-                    <SaveFiltersButton />
-                  </Grid>
-                </Tooltip>
-              ) : (
-                <SaveFiltersButton />
-              )}
-            </Grid>
-          )}
+        )}
+        <Grid item>
+          <Button
+            width={'170px'}
+            icon={<FilterList height="15px" fill="#FFF" />}
+            onClick={() => setToggleFilterByModal(true)}
+          >
+            Filtrer
+          </Button>
         </Grid>
       </Grid>
 
-      <BlockWrapper item xs={12} margin={'10px 0px 10px 0px'}>
+      <BlockWrapper item xs={12}>
         <Searchbar>
           <Grid item xs={12} lg={3}>
             {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && (
@@ -252,37 +241,42 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
               />
             )}
           </Grid>
-          <Grid container item xs={12} lg={9} justifyContent="flex-end" style={{ maxWidth: 900 }}>
+          <Grid item xs={12} lg={9} container>
             {!deidentified && (
-              <Select
-                value={searchBy || SearchByTypes.TEXT}
-                label="Rechercher dans :"
-                width={'20%'}
-                items={searchByListPatients}
-                onchange={(newValue: SearchByTypes) => changeSearchBy(newValue)}
-              />
+              <>
+                <Select
+                  value={searchBy || SearchByTypes.TEXT}
+                  label="Rechercher dans :"
+                  width={'150px'}
+                  items={searchByListPatients}
+                  onchange={(newValue: SearchByTypes) => changeSearchBy(newValue)}
+                />
+                <SearchInput
+                  value={searchInput}
+                  placeholder="Rechercher"
+                  width={'70%'}
+                  onchange={(newValue) => changeSearchInput(newValue)}
+                />
+              </>
             )}
-            {deidentified ? (
-              <DisplayLocked />
-            ) : (
-              <SearchInput
-                value={searchInput}
-                placeholder="Rechercher"
-                width={'40%'}
-                onchange={(newValue) => changeSearchInput(newValue)}
-              />
+            {deidentified && (
+              <Grid container justifyContent="flex-end">
+                <DisplayLocked />
+              </Grid>
             )}
           </Grid>
         </Searchbar>
       </BlockWrapper>
 
-      <Grid item xs={12} container marginBottom={1}>
-        {filtersAsArray
-          .filter((filter) => filter.label)
-          .map((filter, index) => (
-            <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
-          ))}
-      </Grid>
+      {filtersAsArray?.length > 0 && (
+        <Grid item xs={12} container>
+          {filtersAsArray
+            .filter((filter) => filter.label)
+            .map((filter, index) => (
+              <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
+            ))}
+        </Grid>
+      )}
       <Grid item xs={12}>
         <DataTablePatient
           loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
@@ -299,8 +293,8 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
 
       <Modal
         title="Filtrer les patients"
-        open={toggleFiltersModal}
-        onClose={() => setToggleFiltersModal(false)}
+        open={toggleFilterByModal}
+        onClose={() => setToggleFilterByModal(false)}
         onSubmit={(newFilters) => addFilters({ genders, birthdatesRanges, vitalStatuses, ...newFilters })}
       >
         <GendersFilter name={FilterKeys.GENDERS} value={genders} />
@@ -318,22 +312,28 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
           setToggleSavedFiltersModal(false)
           resetSavedFilterError()
         }}
-        onSubmit={applySelectedSavedFilter}
+        onSubmit={() => {
+          if (selectedSavedFilter) addSearchCriterias(selectedSavedFilter.filterParams)
+        }}
         validationText="Appliquer le filtre"
       >
-        <ListFilter
-          values={allSavedFilters?.results || []}
+        <List
+          values={allSavedFiltersAsListItems}
           count={allSavedFilters?.count || 0}
           onDelete={deleteSavedFilters}
           onDisplay={() => {
             setToggleFilterInfoModal(true)
             setIsReadonlyFilterInfoModal(true)
           }}
-          onEdit={() => {
-            setToggleFilterInfoModal(true)
-            setIsReadonlyFilterInfoModal(false)
-          }}
-          onSelect={(filter) => selectFilter(mapToSelectedFilter(filter))}
+          onEdit={
+            maintenanceIsActive
+              ? undefined
+              : () => {
+                  setToggleFilterInfoModal(true)
+                  setIsReadonlyFilterInfoModal(false)
+                }
+          }
+          onSelect={(filter) => selectFilter(filter)}
           fetchPaginateData={() => getSavedFilters(allSavedFilters?.next)}
         >
           <Modal
@@ -342,12 +342,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
             readonly={isReadonlyFilterInfoModal}
             onClose={() => setToggleFilterInfoModal(false)}
             onSubmit={(newFilters) => {
-              const name = newFilters.filterName
-              const searchInput = newFilters.searchInput as string
-              const searchBy = newFilters.searchBy as SearchByTypes
-              const genders = newFilters.genders as GenderStatus[]
-              const vitalStatuses = newFilters.vitalStatuses as VitalStatus[]
-              const birthdatesRanges = newFilters.birthdatesRanges as DurationRangeType
+              const { name, searchInput, searchBy, genders, vitalStatuses, birthdatesRanges } = newFilters
               patchSavedFilter(
                 name,
                 {
@@ -364,7 +359,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
             <Grid container direction="column" gap="8px">
               <Grid item container direction="column">
                 <TextInput
-                  name="filterName"
+                  name="name"
                   label="Nom :"
                   value={selectedSavedFilter?.filterName}
                   error={savedFiltersErrors}
@@ -411,7 +406,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
               </Grid>
             </Grid>
           </Modal>
-        </ListFilter>
+        </List>
       </Modal>
       <Modal
         title="Sauvegarder les filtres"

@@ -6,9 +6,10 @@ import React, { useContext, useEffect, useState } from 'react'
 type CodeFilterProps = {
   value: string
   name: string
+  disabled?: boolean
 }
 
-const CodeFilter = ({ name, value }: CodeFilterProps) => {
+const CodeFilter = ({ name, value, disabled = false }: CodeFilterProps) => {
   const context = useContext(FormContext)
   const [code, setCode] = useState(value)
 
@@ -20,6 +21,7 @@ const CodeFilter = ({ name, value }: CodeFilterProps) => {
     <InputWrapper>
       <Typography variant="h3">Code :</Typography>
       <TextField
+        disabled={disabled}
         fullWidth
         placeholder="Exemple: G629,R2630,F310"
         value={code}

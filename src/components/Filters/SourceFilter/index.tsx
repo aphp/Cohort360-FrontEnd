@@ -6,9 +6,10 @@ import { FormContext } from 'components/ui/Modal'
 type SourceFilterProps = {
   value: string
   name: string
+  disabled?: boolean
 }
 
-const SourceFilter = ({ name, value }: SourceFilterProps) => {
+const SourceFilter = ({ name, value, disabled = false }: SourceFilterProps) => {
   const context = useContext(FormContext)
   const [source, setSource] = useState(value)
 
@@ -27,8 +28,8 @@ const SourceFilter = ({ name, value }: SourceFilterProps) => {
         value={source}
         onChange={(e) => setSource((e.target as HTMLInputElement).value)}
       >
-        <FormControlLabel value="AREM" control={<Radio color="secondary" />} label="AREM" />
-        <FormControlLabel value="ORBIS" control={<Radio color="secondary" />} label="ORBIS" />
+        <FormControlLabel disabled={disabled} value="AREM" control={<Radio color="secondary" />} label="AREM" />
+        <FormControlLabel disabled={disabled} value="ORBIS" control={<Radio color="secondary" />} label="ORBIS" />
       </RadioGroup>
     </InputWrapper>
   )

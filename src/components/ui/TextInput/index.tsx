@@ -67,7 +67,7 @@ const TextInput = ({
       </InputWrapper>
       {isError.max && (
         <Grid>
-          <ErrorMessage>Le nom de sauvegarde du filtre ne peut excéder plus de {maxLimit} caractères.</ErrorMessage>
+          <ErrorMessage>Le champ ne peut excéder plus de {maxLimit} caractères.</ErrorMessage>
         </Grid>
       )}
 

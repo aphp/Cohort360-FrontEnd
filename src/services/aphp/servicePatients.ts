@@ -1,4 +1,4 @@
-import { AxiosResponse } from 'axios'
+import { AxiosError, AxiosResponse } from 'axios'
 import { CohortData, FHIR_Bundle_Response, CohortEncounter, CohortComposition, MedicationEntry, ChartCode } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -111,7 +111,7 @@ export interface IServicePatients {
   fetchPMSI: (
     page: number,
     patientId: string,
-    selectedTab: PMSI,
+    selectedTab: RessourceType.CLAIM | RessourceType.CONDITION | RessourceType.PROCEDURE,
     searchInput: string,
     nda: string,
     code: string,
@@ -169,7 +169,7 @@ export interface IServicePatients {
   fetchMedication: (
     page: number,
     patientId: string,
-    selectedTab: Medication,
+    selectedTab: RessourceType.MEDICATION_ADMINISTRATION | RessourceType.MEDICATION_REQUEST,
     sortBy: Order,
     sortDirection: Direction,
     searchInput: string,
@@ -417,7 +417,7 @@ const servicesPatients: IServicePatients = {
     let pmsiResp: AxiosResponse<FHIR_Bundle_Response<Condition | Procedure | Claim>> | null = null
 
     switch (selectedTab) {
-      case PMSI.DIAGNOSTIC:
+      case RessourceType.CONDITION:
         pmsiResp = await fetchCondition({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -435,7 +435,7 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case PMSI.CCAM:
+      case RessourceType.PROCEDURE:
         pmsiResp = await fetchProcedure({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -453,7 +453,7 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case PMSI.GHM:
+      case RessourceType.CLAIM:
         pmsiResp = await fetchClaim({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -533,7 +533,7 @@ const servicesPatients: IServicePatients = {
     let medicationResp: AxiosResponse<FHIR_Bundle_Response<MedicationRequest | MedicationAdministration>> | null = null
 
     switch (selectedTab) {
-      case Medication.PRESCRIPTION:
+      case RessourceType.MEDICATION_REQUEST:
         medicationResp = await fetchMedicationRequest({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -550,7 +550,7 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case Medication.ADMINISTRATION:
+      case RessourceType.MEDICATION_ADMINISTRATION:
         medicationResp = await fetchMedicationAdministration({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -838,39 +838,30 @@ export const postFiltersService = async (
   criterias: SearchCriterias<Filters>,
   deidentified: boolean
 ) => {
-  const criteriasString = mapSearchCriteriasToRequestParams(criterias, deidentified)
+  const criteriasString = mapSearchCriteriasToRequestParams(criterias, fhir_resource, deidentified)
   const response = await postFilters(fhir_resource, name, criteriasString)
-
+  if (response instanceof AxiosError) throw "Le filtre n'a pas pu être ajouté."
   return response.data
 }
 
 export const getFiltersService = async (fhir_resource: RessourceType, next?: string | null) => {
   const LIMIT = 10
   const OFFSET = 0
-  try {
-    const response = await getFilters(fhir_resource, LIMIT, OFFSET, next)
-    return response.data
-  } catch {
-    throw "Les filtres sauvegardés n'ont pas pu être récupérés."
-  }
+  const response = await getFilters(fhir_resource, LIMIT, OFFSET, next)
+  if (response instanceof AxiosError) throw "Les filtres n'ont pas pu être récupérés."
+  return response.data
 }
 
 export const deleteFilterService = async (fhir_resource_uuid: string) => {
-  try {
-    const response = await deleteFilter(fhir_resource_uuid)
-    return response
-  } catch {
-    throw "Le filtre n'a pas pu être supprimé."
-  }
+  const response = await deleteFilter(fhir_resource_uuid)
+  if (response instanceof AxiosError) throw "Le filtre n'a pas pu être supprimé."
+  return response
 }
 
 export const deleteFiltersService = async (fhir_resource_uuids: string[]) => {
-  try {
-    const response = await deleteFilters(fhir_resource_uuids)
-    return response
-  } catch {
-    throw "Les filtres n'ont pas pu être supprimés."
-  }
+  const response = await deleteFilters(fhir_resource_uuids)
+  if (response instanceof AxiosError) throw "Les filtres n'ont pas pu être supprimés."
+  return response
 }
 
 export const patchFiltersService = async (
@@ -880,9 +871,9 @@ export const patchFiltersService = async (
   criterias: SearchCriterias<Filters>,
   deidentified: boolean
 ) => {
-  const criteriasString = mapSearchCriteriasToRequestParams(criterias, deidentified)
+  const criteriasString = mapSearchCriteriasToRequestParams(criterias, fhir_resource, deidentified)
   const response = await patchFilters(fhir_resource, uuid, name, criteriasString)
-
+  if (response instanceof AxiosError) throw "Le filtre n'a pas pu être modifié."
   return response
 }
 

@@ -6,9 +6,10 @@ import React, { useContext, useEffect, useState } from 'react'
 type LoincFilterProps = {
   value: string
   name: string
+  disabled?: boolean
 }
 
-const LoincFilter = ({ name, value }: LoincFilterProps) => {
+const LoincFilter = ({ name, value, disabled = false }: LoincFilterProps) => {
   const context = useContext(FormContext)
   const [loinc, setLoinc] = useState(value)
 
@@ -20,6 +21,7 @@ const LoincFilter = ({ name, value }: LoincFilterProps) => {
     <InputWrapper>
       <Typography variant="h3">Code LOINC :</Typography>
       <TextField
+        disabled={disabled}
         margin="normal"
         fullWidth
         autoFocus

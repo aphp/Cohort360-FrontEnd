@@ -6,9 +6,10 @@ import React, { useContext, useEffect, useState } from 'react'
 type AnabioFilterProps = {
   value: string
   name: string
+  disabled?: boolean
 }
 
-const AnabioFilter = ({ name, value }: AnabioFilterProps) => {
+const AnabioFilter = ({ name, value, disabled = false }: AnabioFilterProps) => {
   const context = useContext(FormContext)
   const [anabio, setAnabio] = useState(value)
 
@@ -21,6 +22,7 @@ const AnabioFilter = ({ name, value }: AnabioFilterProps) => {
       <Typography variant="h3">Code ANABIO :</Typography>
       <TextField
         margin="normal"
+        disabled={disabled}
         fullWidth
         autoFocus
         placeholder="Exemple: A0260,E2068"
