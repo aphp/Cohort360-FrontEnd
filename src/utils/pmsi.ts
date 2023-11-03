@@ -241,6 +241,13 @@ export const checkIfIndeterminated: (_row: any, selectedItems: any) => boolean |
   }
   return checkChild(_row)
 }
+
+/**
+ * @description : find the same {item} in the {rows} list. Because {item} may not have sub items but, its equivalent may have sub items already loaded.
+ * @param item : the item to find (using its id).
+ * @param rows : the list where the search will be performed.
+ * @returns : the item the has the same id field value as the one of {item} param. The difference between the two ones is that the found one could have every field already loaded (like sub items field).
+ */
 export const findEquivalentRowInItemAndSubItems: (
   item: any,
   rows: any[] | undefined
@@ -267,6 +274,7 @@ export const findEquivalentRowInItemAndSubItems: (
   }
   return { equivalentRow: equivalentRow, parentsList: parentsList }
 }
+
 export const flatItems = (items: any[] | undefined): { flattedSelectedItems: any[]; selectedIds: string[] } => {
   const selectedIds: string[] = []
   const flattedSelectedItems: any[] = []

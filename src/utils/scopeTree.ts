@@ -98,10 +98,22 @@ export const expandScopeTree = async (params: ExpandScopeElementParamsType, getS
   }
 }
 
+/**
+ * @description : returns either the executiveUnits field or the perimeters field.
+ * @param scopeList : the object containing the executiveUnits and perimeters.
+ * @param isExecutiveUnit : indicates which field should be returned.
+ * @returns if true then returns executiveUnits else returns perimeters.
+ */
 export const getCurrentScopeList = (scopeList: ScopeListType, isExecutiveUnit?: boolean): ScopeTreeRow[] => {
   return isExecutiveUnit ? scopeList.executiveUnits : scopeList.perimeters
 }
 
+/**
+ * @description : build an object of perimeters and executive units. It converts a ScopeTreeRow[] to ScopeListType.
+ * @param scopes : scope tree list to be used.
+ * @param isExecutiveUnit : if true then the {scopes} param is a list of perimeters else it is a list of executive units.
+ * @returns : an object of ScopeListType (having {perimeters} and {executiveUnits} fields).
+ */
 export const buildScopeListType = (scopes: ScopeTreeRow[], isExecutiveUnit?: boolean): ScopeListType => {
   const newScopeList: ScopeListType = {
     perimeters: !isExecutiveUnit ? scopes : [],
