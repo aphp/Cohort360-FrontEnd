@@ -1,5 +1,4 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
 
 import { Button, Collapse, IconButton, TableCell, TableRow, Typography, Tooltip } from '@mui/material'
 
@@ -15,7 +14,6 @@ import { ProjectType, RequestType, Cohort } from 'types'
 import { useAppDispatch, useAppSelector } from 'state'
 import { setSelectedProject } from 'state/project'
 import { setSelectedRequest } from 'state/request'
-import { resetCohortCreation } from 'state/cohortCreation'
 import { MeState } from 'state/me'
 
 import useStyles from '../styles'
@@ -39,7 +37,6 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
   const [open, setOpen] = React.useState(true)
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
 
   const { meState } = useAppSelector<{
     meState: MeState
@@ -58,9 +55,8 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
   }
 
   const handleAddRequest = () => {
-    dispatch(resetCohortCreation())
+    onSelectedRow([])
     dispatch(setSelectedRequest({ uuid: '', name: '', parent_folder: row.uuid }))
-    navigate('/cohort/new')
   }
 
   // eslint-disable-next-line
