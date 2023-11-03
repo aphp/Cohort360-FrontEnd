@@ -391,7 +391,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
         allowSearchIpp: allowSearchIpp,
         temporalConstraints: _temporalConstraints,
         selectedCriteria: criteria,
-        criteriaGroup: criteriaGroup,
+        criteriaGroup: criteriaGroup.length > 0 ? criteriaGroup : defaultInitialState.criteriaGroup,
         nextCriteriaId: criteria.length + 1,
         nextGroupId: -(criteriaGroup.length + 1)
       }

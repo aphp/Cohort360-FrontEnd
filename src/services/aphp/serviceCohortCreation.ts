@@ -183,9 +183,13 @@ const servicesCohortCreation: IServiceCohortCreation = {
       ({ created_at: a }, { created_at: b }) => new Date(b).valueOf() - new Date(a).valueOf()
     )
 
-    const currentSnapshotResponse: AxiosResponse = await apiBack.get<Snapshot>(
-      `/cohort/request-query-snapshots/${snapshotId ? snapshotId : snapshotsHistoryFromQuery?.[0].uuid}/`
-    )
+    let currentSnapshotResponse: AxiosResponse | null = null
+
+    if (snapshotId || snapshotsHistoryFromQuery?.length > 0) {
+      currentSnapshotResponse = await apiBack.get<Snapshot>(
+        `/cohort/request-query-snapshots/${snapshotId ? snapshotId : snapshotsHistoryFromQuery?.[0].uuid}/`
+      )
+    }
 
     let currentSnapshot: Snapshot | null = currentSnapshotResponse?.data ? currentSnapshotResponse?.data : null
 
