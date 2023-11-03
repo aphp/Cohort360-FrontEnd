@@ -8,7 +8,7 @@ import useSearchCriterias, { initImagingCriterias } from 'reducers/searchCriteri
 import { CircularProgress, Grid } from '@mui/material'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import { BlockWrapper } from 'components/ui/Layout/styles'
+import { BlockWrapper } from 'components/ui/Layout/'
 import Button from 'components/ui/Button'
 import Chip from 'components/ui/Chip/'
 import DataTableImaging from 'components/DataTable/DataTableImaging'

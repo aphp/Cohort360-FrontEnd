@@ -4,7 +4,7 @@ import { checkMinMaxValue, convertDurationToString, convertStringToDuration } fr
 import { DurationRangeType } from 'types/searchCriterias'
 import { DurationType } from 'types/dates'
 import { ErrorType } from 'types/error'
-import { BlockWrapper } from 'components/ui/Layout/styles'
+import { BlockWrapper } from 'components/ui/Layout/'
 import DurationInput from './DurationInput'
 import { ErrorMessage } from '../Errors/styles'
 import { DurationLabel } from './styles'

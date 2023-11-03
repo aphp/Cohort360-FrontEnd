@@ -3,7 +3,7 @@ import { Grid } from '@mui/material'
 
 import moment from 'moment'
 import CalendarInput from './CalendarInput'
-import { BlockWrapper } from 'components/ui/Layout/styles'
+import { BlockWrapper } from 'components/ui/Layout'
 import { ErrorMessage } from '../Errors/styles'
 import { ErrorType } from 'types/error'
 import { DurationRangeType } from 'types/searchCriterias'

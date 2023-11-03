@@ -5,7 +5,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { CriteriaNameType, ScopeTreeRow } from 'types'
 import InfoIcon from '@mui/icons-material/Info'
 import scopeType from 'data/scope_type.json'
-import { InputWrapper } from 'components/ui/Layout/styles'
+import { InputWrapper } from 'components/ui/Layout/'
 
 type ExecutiveUnitsFilterProps = {
   value: ScopeTreeRow[]

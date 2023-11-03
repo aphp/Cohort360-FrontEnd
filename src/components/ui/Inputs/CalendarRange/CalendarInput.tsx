@@ -6,7 +6,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import ClearIcon from '@mui/icons-material/Clear'
 import moment from 'moment'
 import { DatePickerWrapper, DateWrapper } from './styles'
-import { BlockWrapper } from 'components/ui/Layout/styles'
+import { BlockWrapper } from 'components/ui/Layout'
 import { ErrorType } from 'types/error'
 import { ErrorMessage } from '../Errors/styles'
 

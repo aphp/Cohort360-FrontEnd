@@ -112,6 +112,18 @@ export enum OrderByKeys {
   ORDER_DIRECTION = 'orderDirection'
 }
 
+export enum DocumentAttachmentMethod {
+  NONE = 'NONE',
+  ACCESS_NUMBER = 'ACCESS_NUMBER',
+  INFERENCE_TEMPOREL = 'INFERENCE_TEMPOREL'
+}
+
+export enum DocumentAttachmentMethodLabel {
+  NONE = 'Aucune',
+  ACCESS_NUMBER = "Numéro d'accession",
+  INFERENCE_TEMPOREL = 'Inférence temporelle'
+}
+
 export type SearchBy = SearchByTypes
 export type DurationRangeType = [string | null, string | null]
 export type LabelObject = {

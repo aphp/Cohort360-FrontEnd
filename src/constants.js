@@ -113,6 +113,9 @@ export const ODD_IMAGING = import.meta.env.DEV
 export const IMAGING_MODALITIES = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_IMAGING_MODALITIES
   : '{VITE_VALUE_SET_URL_IMAGING_MODALITIES}'
+export const IMAGING_STUDY_UID_URL = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_IMAGING_STUDY_UID
+  : '{VITE_VALUE_SET_URL_IMAGING_STUDY_UID}'
 
 export const ODD_COMPOSITION = import.meta.env.DEV
   ? import.meta.env.VITE_ODD_COMPOSITION == `${BOOLEANTRUE}`
