@@ -13,6 +13,7 @@ import { DurationRangeType, SearchByTypes, VitalStatus } from 'types/searchCrite
 import allDocTypes from 'assets/docTypes.json'
 import { getDurationRangeLabel } from './age'
 import { displaySystem } from './displayValueSetSystem'
+import { useAppSelector } from 'state'
 
 const getVitalStatusLabel = (value: VitalStatus) => {
   switch (value) {
@@ -34,8 +35,35 @@ const getMedicationTypeLabel = (type: MedicationType) => {
   }
 }
 
-const getLabelFromCriteriaObject = (values: LabelCriteriaObject[]) => {
-  const labels = values.map((value) => `${displaySystem(value.system)} ${value.label}`).join(' - ')
+const getLabelFromCriteriaObject = (values: LabelCriteriaObject[], resourceType?: RessourceType) => {
+  const { criteria } = useAppSelector((state) => state.cohortCreation)
+  console.log('test criteria', criteria)
+  console.log('test values', values)
+  const labels = values
+    .map((value) => {
+      console.log('test value', value)
+      console.log('test resourceType', resourceType)
+      criteria.map((criterion) => {
+        console.log('test criterion', criterion)
+        if (
+          resourceType === RessourceType.MEDICATION_REQUEST ||
+          resourceType === RessourceType.MEDICATION_ADMINISTRATION
+        ) {
+          if (criterion.data.id === value.id) {
+            return `${displaySystem(criterion.data.system)} ${criterion.data.label}`
+          }
+        }
+        if (criterion.id === resourceType) {
+          if (resourceType === RessourceType.ENCOUNTER) {
+            console.log('test je suis dans le encounter')
+          }
+          if (criterion.data.id === value.id) {
+            return `${displaySystem(criterion.data.system)} ${criterion.data.label}`
+          }
+        }
+      })
+    })
+    .join(' - ')
   return labels
 }
 
@@ -101,6 +129,7 @@ const getIppListLabel = (values: string) => {
 
 export const criteriasAsArray = (criterias: any, type: RessourceType): string[] => {
   const labels: string[] = []
+  console.log('test criterias', criterias)
   switch (type) {
     case RessourceType.CONDITION:
     case RessourceType.PROCEDURE:
@@ -108,7 +137,7 @@ export const criteriasAsArray = (criterias: any, type: RessourceType): string[] 
     case RessourceType.MEDICATION_REQUEST:
     case RessourceType.MEDICATION_ADMINISTRATION:
     case RessourceType.OBSERVATION:
-      if (criterias.code.length > 0) labels.push(getLabelFromCriteriaObject(criterias.code))
+      if (criterias.code.length > 0) labels.push(getLabelFromCriteriaObject(criterias.code, criterias.type))
       break
   }
   switch (type) {
@@ -128,16 +157,20 @@ export const criteriasAsArray = (criterias: any, type: RessourceType): string[] 
       if (criterias.age[0] || criterias.age[1]) labels.push(getDurationRangeLabel(criterias.age, 'Âge : '))
       if (criterias.duration[0] || criterias.duration[1])
         labels.push(getDurationRangeLabel(criterias.duration, 'Prise en charge : '))
-      if (criterias.priseEnChargeType.length > 0) labels.push(getLabelFromCriteriaObject(criterias.priseEnChargeType))
-      if (criterias.typeDeSejour.length > 0) labels.push(getLabelFromCriteriaObject(criterias.typeDeSejour))
-      if (criterias.fileStatus.length > 0) labels.push(getLabelFromCriteriaObject(criterias.fileStatus))
-      if (criterias.admissionMode.length > 0) labels.push(getLabelFromCriteriaObject(criterias.admissionMode))
-      if (criterias.admission.length > 0) labels.push(getLabelFromCriteriaObject(criterias.admission))
-      if (criterias.entryMode.length > 0) labels.push(getLabelFromCriteriaObject(criterias.entryMode))
-      if (criterias.exitMode.length > 0) labels.push(getLabelFromCriteriaObject(criterias.exitMode))
-      if (criterias.reason.length > 0) labels.push(getLabelFromCriteriaObject(criterias.reason))
-      if (criterias.destination.length > 0) labels.push(getLabelFromCriteriaObject(criterias.destination))
-      if (criterias.provenance.length > 0) labels.push(getLabelFromCriteriaObject(criterias.provenance))
+      if (criterias.priseEnChargeType.length > 0)
+        labels.push(getLabelFromCriteriaObject(criterias.priseEnChargeType, criterias.type))
+      if (criterias.typeDeSejour.length > 0)
+        labels.push(getLabelFromCriteriaObject(criterias.typeDeSejour, criterias.type))
+      if (criterias.fileStatus.length > 0) labels.push(getLabelFromCriteriaObject(criterias.fileStatus, criterias.type))
+      if (criterias.admissionMode.length > 0)
+        labels.push(getLabelFromCriteriaObject(criterias.admissionMode, criterias.type))
+      if (criterias.admission.length > 0) labels.push(getLabelFromCriteriaObject(criterias.admission, criterias.type))
+      if (criterias.entryMode.length > 0) labels.push(getLabelFromCriteriaObject(criterias.entryMode, criterias.type))
+      if (criterias.exitMode.length > 0) labels.push(getLabelFromCriteriaObject(criterias.exitMode, criterias.type))
+      if (criterias.reason.length > 0) labels.push(getLabelFromCriteriaObject(criterias.reason, criterias.type))
+      if (criterias.destination.length > 0)
+        labels.push(getLabelFromCriteriaObject(criterias.destination, criterias.type))
+      if (criterias.provenance.length > 0) labels.push(getLabelFromCriteriaObject(criterias.provenance, criterias.type))
       break
 
     case RessourceType.DOCUMENTS:
