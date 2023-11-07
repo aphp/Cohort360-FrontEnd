@@ -140,14 +140,15 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
       break
 
     case RessourceType.PATIENT:
-      if (criterias.genders?.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.genders, 'gender' as string, type))
+      if (criterias.gender?.length > 0)
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.gender, 'gender', type))
       labels.push(getVitalStatusLabel(criterias.vitalStatus))
       labels.push(getDurationRangeLabel(criterias.age, 'Âge'))
       if (criterias.birthdates[0] || criterias.birthdates[1])
         labels.push(getDatesLabel(criterias.birthdates, 'Naissance'))
       if (criterias.deathDates[0] || criterias.deathDates[1]) labels.push(getDatesLabel(criterias.deathDates, 'Décès'))
       break
+
     case RessourceType.ENCOUNTER:
       if (criterias.age[0] || criterias.age[1]) labels.push(getDurationRangeLabel(criterias.age, 'Âge : '))
       if (criterias.duration[0] || criterias.duration[1])

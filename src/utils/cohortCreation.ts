@@ -20,7 +20,6 @@ import {
   convertTimestampToDuration
 } from './age'
 import { Comparators, DocType, RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
-import { intersectionWith } from 'lodash'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
@@ -784,11 +783,13 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 break
               }
               case PATIENT_GENDER: {
-                const genders = value?.split(',') || []
-                const combinedArray = intersectionWith(allGendersStatuses, genders, (allGender: any, gender: any) => {
-                  return gender === allGender.id
-                })
-                currentCriterion.genders = combinedArray
+                const genderIds = value?.split(',')
+                const newGenderIds = genderIds?.map((genderId: any) => ({ id: genderId }))
+                if (!newGenderIds) continue
+
+                currentCriterion.gender = currentCriterion.gender
+                  ? [...currentCriterion.gender, ...newGenderIds]
+                  : newGenderIds
                 break
               }
               case PATIENT_DECEASED: {
