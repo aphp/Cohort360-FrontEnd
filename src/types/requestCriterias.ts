@@ -1,5 +1,5 @@
 import { ScopeTreeRow, ValueSetSystem } from 'types'
-import { DurationRangeType, GenderStatus, LabelObject, SearchByTypes, VitalStatus } from './searchCriterias'
+import { DurationRangeType, GenderStatus, LabelObject, SearchByTypes } from './searchCriterias'
 
 export enum MedicationType {
   Request = 'MedicationRequest',
@@ -87,7 +87,7 @@ export type DemographicDataType = {
   title: string
   type: RessourceType.PATIENT
   genders: GenderStatus[] | null
-  vitalStatus: VitalStatus | null
+  vitalStatus: LabelObject[] | null
   age: DurationRangeType
   birthdates: DurationRangeType
   deathDates: DurationRangeType

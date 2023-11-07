@@ -10,16 +10,14 @@ import {
   IconButton,
   Typography,
   TextField,
-  Switch,
-  Select,
-  MenuItem
+  Switch
 } from '@mui/material'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
 
-import { DurationRangeType, VitalStatus, VitalStatusLabel } from 'types/searchCriterias'
+import { DurationRangeType, LabelObject, VitalStatus, VitalStatusLabel } from 'types/searchCriterias'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { SelectedCriteriaType, RessourceType } from 'types/requestCriterias'
@@ -37,38 +35,7 @@ type DemographicFormProps = {
   onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
-export const allGendersStatuses = [
-  {
-    id: 'NON RENSEIGNE',
-    label: 'Non renseigné'
-  },
-  {
-    id: 'INCONNU',
-    label: 'Inconnu'
-  },
-  {
-    id: 'a',
-    label: 'Autre'
-  },
-  {
-    id: 'i',
-    label: 'Indeterminé'
-  },
-  {
-    id: 'f',
-    label: 'Féminin'
-  },
-  {
-    id: 'm',
-    label: 'Masculin'
-  }
-]
-
 const allVitalStatuses = [
-  {
-    id: VitalStatus.ALL,
-    label: VitalStatusLabel.ALL
-  },
   {
     id: VitalStatus.ALIVE,
     label: VitalStatusLabel.ALIVE
@@ -80,11 +47,11 @@ const allVitalStatuses = [
 ]
 
 const DemographicForm = (props: DemographicFormProps) => {
-  const { selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [birthdates, setBirthdates] = useState<DurationRangeType>(selectedCriteria?.birthdates || [null, null])
   const [deathDates, setDeathDates] = useState<DurationRangeType>(selectedCriteria?.deathDates || [null, null])
   const [age, setAge] = useState<DurationRangeType>(selectedCriteria?.age || [null, null])
-  const [vitalStatus, setVitalStatus] = useState(selectedCriteria?.vitalStatus || VitalStatus.ALL)
+  const [vitalStatus, setVitalStatus] = useState(selectedCriteria?.vitalStatus) || []
   const [genders, setGenders] = useState(selectedCriteria?.genders) || []
   const [title, setTitle] = useState(selectedCriteria?.title || 'Critère démographique')
   const [isInclusive, setIsInclusive] = useState<boolean>(selectedCriteria?.isInclusive || true)
@@ -98,7 +65,7 @@ const DemographicForm = (props: DemographicFormProps) => {
   useEffect(() => {
     setError(Error.NO_ERROR)
     if (
-      vitalStatus === VitalStatus.ALL &&
+      vitalStatus?.length === 0 &&
       genders?.length === 0 &&
       birthdates[0] === null &&
       birthdates[1] === null &&
@@ -182,26 +149,25 @@ const DemographicForm = (props: DemographicFormProps) => {
             multiple
             id="criteria-gender-autocomplete"
             className={classes.inputItem}
-            options={allGendersStatuses || []}
+            options={criteria.data.gender || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={genders}
             onChange={(e, value) => setGenders(value)}
             renderInput={(params) => <TextField {...params} label="Genre" />}
           />
-          <Select
+
+          <Autocomplete
+            multiple
+            id="criteria-vitalStatus-autocomplete"
             className={classes.inputItem}
-            id="vitalStatus"
+            options={allVitalStatuses}
+            getOptionLabel={(option) => option.label}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={vitalStatus}
-            onChange={(event) => setVitalStatus(event.target.value as VitalStatus)}
-            label="Statut vital"
-          >
-            {allVitalStatuses.map((status) => (
-              <MenuItem key={status.id} value={status.id}>
-                {status.label}
-              </MenuItem>
-            ))}
-          </Select>
+            onChange={(e, value) => setVitalStatus(value)}
+            renderInput={(params) => <TextField {...params} label="Statut vital" />}
+          />
 
           <BlockWrapper margin="1em">
             <CalendarRange
@@ -218,13 +184,18 @@ const DemographicForm = (props: DemographicFormProps) => {
             <DurationRange
               value={age}
               disabled={birthdates[0] !== null || birthdates[1] !== null}
-              label={vitalStatus === VitalStatus.DECEASED ? 'Âge au décès' : 'Âge actuel'}
+              label={
+                vitalStatus.find((status: LabelObject) => status.id === VitalStatus.DECEASED) &&
+                vitalStatus.length === 1
+                  ? 'Âge au décès'
+                  : 'Âge actuel'
+              }
               onChange={(value) => setAge(value)}
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
             />
           </BlockWrapper>
 
-          {(vitalStatus === VitalStatus.DECEASED || vitalStatus === VitalStatus.ALL) && (
+          {vitalStatus.find((status: LabelObject) => status.id === VitalStatus.DECEASED) && (
             <BlockWrapper margin="1em">
               <CalendarRange
                 inline

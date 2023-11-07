@@ -21,7 +21,6 @@ import {
 } from './age'
 import { Comparators, DocType, RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
 import { intersectionWith } from 'lodash'
-import { allGendersStatuses } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicForm'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
@@ -84,7 +83,7 @@ const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   type: RessourceType.PATIENT,
   title: '',
   genders: [],
-  vitalStatus: VitalStatus.ALL,
+  vitalStatus: [],
   birthdates: [null, null],
   deathDates: [null, null],
   age: [null, null]
@@ -195,9 +194,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
             ? `${PATIENT_GENDER}=${criterion.genders.map((gender: any) => gender.id).reduce(searchReducer)}`
             : ''
         }`,
-        criterion.vitalStatus === VitalStatus.ALL
-          ? ''
-          : `${PATIENT_DECEASED}=${criterion.vitalStatus === VitalStatus.DECEASED ? 'true' : 'false'}`,
+        `${
+          criterion.vitalStatus && criterion.vitalStatus.length > 0
+            ? `${PATIENT_DECEASED}=${criterion.vitalStatus
+                .map((vitalStatus: any) => vitalStatus.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
         `${ageMinCriterion}`,
         `${ageMaxCriterion}`,
         criterion.birthdates[0]
