@@ -802,7 +802,10 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   : _vitalStatuses
                 break
               }
+              case 'active':
+                break
               default:
+                console.log('test key', key)
                 currentCriterion.error = true
                 break
             }
