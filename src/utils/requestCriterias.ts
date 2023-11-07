@@ -13,7 +13,7 @@ import { DurationRangeType, SearchByTypes, VitalStatus } from 'types/searchCrite
 import allDocTypes from 'assets/docTypes.json'
 import { getDurationRangeLabel } from './age'
 import { displaySystem } from './displayValueSetSystem'
-import { useAppSelector } from 'state'
+import { CriteriaState } from 'state/criteria'
 
 const getVitalStatusLabel = (value: VitalStatus) => {
   switch (value) {
@@ -35,11 +35,13 @@ const getMedicationTypeLabel = (type: MedicationType) => {
   }
 }
 
-const getLabelFromCriteriaObject = (values: LabelCriteriaObject[], name: string, resourceType?: RessourceType) => {
-  const { criteria } = useAppSelector((state) => state.cohortCreation)
-  //     return `${displaySystem(criterion.data.system)} ${criterion.data.label}`
-
-  const findCriterionById = (criteriaArray, id) => {
+const getLabelFromCriteriaObject = (
+  criteriaState: CriteriaState,
+  values: LabelCriteriaObject[],
+  name: string,
+  resourceType: RessourceType
+) => {
+  const findCriterionById = (criteriaArray: CriteriaState, id: RessourceType): null | CriteriaItemType => {
     for (const criterion of criteriaArray) {
       if (criterion.id === id) {
         return criterion
@@ -53,10 +55,15 @@ const getLabelFromCriteriaObject = (values: LabelCriteriaObject[], name: string,
     }
     return null
   }
-  const criterionData = findCriterionById(criteria, resourceType)?.data ?? []
+
+  const criterionData = findCriterionById(criteriaState, resourceType)?.data
+  if (criterionData === null) return ''
+
   const criterion = criterionData[name]
   if (criterion !== 'loading') {
-    const labels = criterion.filter((obj) => values.map((value) => value.id).includes(obj.id)).map((obj) => obj.label)
+    const labels = criterion
+      .filter((obj: any) => values.map((value) => value.id).includes(obj.id))
+      .map((obj: LabelCriteriaObject) => `${displaySystem(obj.system)} ${obj.label}`)
     return labels.join(' - ')
   }
 }
@@ -121,7 +128,7 @@ const getIppListLabel = (values: string) => {
   return `Contient les patients : ${labels}`
 }
 
-export const criteriasAsArray = (criterias: any, type: RessourceType): string[] => {
+export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaState: CriteriaState): string[] => {
   const labels: string[] = []
   switch (type) {
     case RessourceType.IPP_LIST:
@@ -130,7 +137,7 @@ export const criteriasAsArray = (criterias: any, type: RessourceType): string[] 
 
     case RessourceType.PATIENT:
       if (criterias.genders?.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.genders, 'gender' as string, type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.genders, 'gender' as string, type))
       labels.push(getVitalStatusLabel(criterias.vitalStatus))
       labels.push(getDurationRangeLabel(criterias.age, 'Âge'))
       if (criterias.birthdates[0] || criterias.birthdates[1])
@@ -142,23 +149,25 @@ export const criteriasAsArray = (criterias: any, type: RessourceType): string[] 
       if (criterias.duration[0] || criterias.duration[1])
         labels.push(getDurationRangeLabel(criterias.duration, 'Prise en charge : '))
       if (criterias.priseEnChargeType.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.priseEnChargeType, 'priseEnChargeType', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.priseEnChargeType, 'priseEnChargeType', type))
       if (criterias.typeDeSejour.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.typeDeSejour, 'typeDeSejour', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.typeDeSejour, 'typeDeSejour', type))
       if (criterias.fileStatus.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.fileStatus, 'fileStatus', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.fileStatus, 'fileStatus', type))
       if (criterias.admissionMode.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.admissionMode, 'admissionModes', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.admissionMode, 'admissionModes', type))
       if (criterias.admission.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.admission, 'admission', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.admission, 'admission', type))
       if (criterias.entryMode.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.entryMode, 'entryModes', type))
-      if (criterias.exitMode.length > 0) labels.push(getLabelFromCriteriaObject(criterias.exitMode, 'exitModes', type))
-      if (criterias.reason.length > 0) labels.push(getLabelFromCriteriaObject(criterias.reason, 'reason', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.entryMode, 'entryModes', type))
+      if (criterias.exitMode.length > 0)
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.exitMode, 'exitModes', type))
+      if (criterias.reason.length > 0)
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.reason, 'reason', type))
       if (criterias.destination.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.destination, 'destination', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.destination, 'destination', type))
       if (criterias.provenance.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.provenance, 'provenance', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.provenance, 'provenance', type))
       break
 
     case RessourceType.DOCUMENTS:
@@ -168,36 +177,55 @@ export const criteriasAsArray = (criterias: any, type: RessourceType): string[] 
 
     case RessourceType.CONDITION:
       if (criterias.code.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.code, 'cim10Diagnostic', criterias.type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, 'cim10Diagnostic', criterias.type))
       if (criterias.diagnosticType.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.diagnosticType, 'diagnosticTypes', criterias.type))
+        labels.push(
+          getLabelFromCriteriaObject(criteriaState, criterias.diagnosticType, 'diagnosticTypes', criterias.type)
+        )
       break
 
     case RessourceType.PROCEDURE:
-      if (criterias.code.length > 0) labels.push(getLabelFromCriteriaObject(criterias.code, 'ccamData', criterias.type))
+      if (criterias.code.length > 0)
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, 'ccamData', criterias.type))
       break
 
     case RessourceType.CLAIM:
-      if (criterias.code.length > 0) labels.push(getLabelFromCriteriaObject(criterias.code, 'ghmData', criterias.type))
+      if (criterias.code.length > 0)
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, 'ghmData', criterias.type))
       break
 
     case RessourceType.MEDICATION_REQUEST:
     case RessourceType.MEDICATION_ADMINISTRATION:
       labels.push(getMedicationTypeLabel(criterias.type))
       if (criterias.code.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.code, 'medicationData', RessourceType.MEDICATION))
+        labels.push(
+          getLabelFromCriteriaObject(criteriaState, criterias.code, 'medicationData', RessourceType.MEDICATION)
+        )
       if (criterias.prescriptionType.length > 0)
         labels.push(
-          getLabelFromCriteriaObject(criterias.prescriptionType, 'prescriptionTypes', RessourceType.MEDICATION)
+          getLabelFromCriteriaObject(
+            criteriaState,
+            criterias.prescriptionType,
+            'prescriptionTypes',
+            RessourceType.MEDICATION
+          )
         )
       if (criterias.administration.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.administration, 'administrations', RessourceType.MEDICATION))
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            criterias.administration,
+            'administrations',
+            RessourceType.MEDICATION
+          )
+        )
       break
 
     case RessourceType.OBSERVATION:
       if (criterias.valueComparator && (!isNaN(criterias.valueMin) || !isNaN(criterias.valueMax)))
         getBiologyValuesLabel(criterias.valueComparator, criterias.valueMin, criterias.valueMax)
-      if (criterias.code.length > 0) labels.push(getLabelFromCriteriaObject(criterias.code, 'biologyData', type))
+      if (criterias.code.length > 0)
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, 'biologyData', type))
   }
   switch (type) {
     case RessourceType.DOCUMENTS:

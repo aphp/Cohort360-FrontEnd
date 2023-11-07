@@ -18,6 +18,7 @@ import useStyles from './styles'
 import { criteriasAsArray } from 'utils/requestCriterias'
 import { ChipWrapper } from 'components/ui/Chip/styles'
 import { RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import { CriteriaState } from 'state/criteria'
 
 type CriteriaCardProps = {
   criterion: SelectedCriteriaType
@@ -30,6 +31,8 @@ const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriter
   const { classes } = useStyles()
 
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
+  const { criteria } = useAppSelector<{ criteria: CriteriaState }>((state) => state.cohortCreation)
+
   const maintenanceIsActive = meState?.maintenance?.active
 
   const [needCollapse, setNeedCollapse] = useState(false)
@@ -69,7 +72,7 @@ const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriter
         className={classes.secondItem}
       >
         <Grid item xs={11} container ref={childrenRef} style={{ overflow: 'hidden' }}>
-          {criteriasAsArray(criterion, criterion.type as RessourceType).map((label, index) => (
+          {criteriasAsArray(criterion, criterion.type as RessourceType, criteria).map((label, index) => (
             <Grid key={index} margin={'5px'}>
               <ChipWrapper label={label} />
             </Grid>
