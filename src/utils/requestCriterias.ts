@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { ScopeTreeRow } from 'types'
+import { CriteriaItemType, ScopeTreeRow } from 'types'
 import {
   Comparators,
   DocType,
@@ -35,36 +35,30 @@ const getMedicationTypeLabel = (type: MedicationType) => {
   }
 }
 
-const getLabelFromCriteriaObject = (values: LabelCriteriaObject[], resourceType?: RessourceType) => {
+const getLabelFromCriteriaObject = (values: LabelCriteriaObject[], name: string, resourceType?: RessourceType) => {
   const { criteria } = useAppSelector((state) => state.cohortCreation)
-  console.log('test criteria', criteria)
-  console.log('test values', values)
-  const labels = values
-    .map((value) => {
-      console.log('test value', value)
-      console.log('test resourceType', resourceType)
-      criteria.map((criterion) => {
-        console.log('test criterion', criterion)
-        if (
-          resourceType === RessourceType.MEDICATION_REQUEST ||
-          resourceType === RessourceType.MEDICATION_ADMINISTRATION
-        ) {
-          if (criterion.data.id === value.id) {
-            return `${displaySystem(criterion.data.system)} ${criterion.data.label}`
-          }
+  //     return `${displaySystem(criterion.data.system)} ${criterion.data.label}`
+
+  const findCriterionById = (criteriaArray, id) => {
+    for (const criterion of criteriaArray) {
+      if (criterion.id === id) {
+        return criterion
+      }
+      if (criterion.subItems) {
+        const foundInSubItem = findCriterionById(criterion.subItems, id)
+        if (foundInSubItem) {
+          return foundInSubItem
         }
-        if (criterion.id === resourceType) {
-          if (resourceType === RessourceType.ENCOUNTER) {
-            console.log('test je suis dans le encounter')
-          }
-          if (criterion.data.id === value.id) {
-            return `${displaySystem(criterion.data.system)} ${criterion.data.label}`
-          }
-        }
-      })
-    })
-    .join(' - ')
-  return labels
+      }
+    }
+    return null
+  }
+  const criterionData = findCriterionById(criteria, resourceType)?.data ?? []
+  const criterion = criterionData[name]
+  if (criterion !== 'loading') {
+    const labels = criterion.filter((obj) => values.map((value) => value.id).includes(obj.id)).map((obj) => obj.label)
+    return labels.join(' - ')
+  }
 }
 
 const getLabelFromName = (values: ScopeTreeRow[]) => {
@@ -129,24 +123,14 @@ const getIppListLabel = (values: string) => {
 
 export const criteriasAsArray = (criterias: any, type: RessourceType): string[] => {
   const labels: string[] = []
-  console.log('test criterias', criterias)
-  switch (type) {
-    case RessourceType.CONDITION:
-    case RessourceType.PROCEDURE:
-    case RessourceType.CLAIM:
-    case RessourceType.MEDICATION_REQUEST:
-    case RessourceType.MEDICATION_ADMINISTRATION:
-    case RessourceType.OBSERVATION:
-      if (criterias.code.length > 0) labels.push(getLabelFromCriteriaObject(criterias.code, criterias.type))
-      break
-  }
   switch (type) {
     case RessourceType.IPP_LIST:
       labels.push(getIppListLabel(criterias.search))
       break
 
     case RessourceType.PATIENT:
-      if (criterias.genders?.length > 0) labels.push(getLabelFromCriteriaObject(criterias.genders))
+      if (criterias.genders?.length > 0)
+        labels.push(getLabelFromCriteriaObject(criterias.genders, 'gender' as string, type))
       labels.push(getVitalStatusLabel(criterias.vitalStatus))
       labels.push(getDurationRangeLabel(criterias.age, 'Âge'))
       if (criterias.birthdates[0] || criterias.birthdates[1])
@@ -158,19 +142,23 @@ export const criteriasAsArray = (criterias: any, type: RessourceType): string[] 
       if (criterias.duration[0] || criterias.duration[1])
         labels.push(getDurationRangeLabel(criterias.duration, 'Prise en charge : '))
       if (criterias.priseEnChargeType.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.priseEnChargeType, criterias.type))
+        labels.push(getLabelFromCriteriaObject(criterias.priseEnChargeType, 'priseEnChargeType', type))
       if (criterias.typeDeSejour.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.typeDeSejour, criterias.type))
-      if (criterias.fileStatus.length > 0) labels.push(getLabelFromCriteriaObject(criterias.fileStatus, criterias.type))
+        labels.push(getLabelFromCriteriaObject(criterias.typeDeSejour, 'typeDeSejour', type))
+      if (criterias.fileStatus.length > 0)
+        labels.push(getLabelFromCriteriaObject(criterias.fileStatus, 'fileStatus', type))
       if (criterias.admissionMode.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.admissionMode, criterias.type))
-      if (criterias.admission.length > 0) labels.push(getLabelFromCriteriaObject(criterias.admission, criterias.type))
-      if (criterias.entryMode.length > 0) labels.push(getLabelFromCriteriaObject(criterias.entryMode, criterias.type))
-      if (criterias.exitMode.length > 0) labels.push(getLabelFromCriteriaObject(criterias.exitMode, criterias.type))
-      if (criterias.reason.length > 0) labels.push(getLabelFromCriteriaObject(criterias.reason, criterias.type))
+        labels.push(getLabelFromCriteriaObject(criterias.admissionMode, 'admissionModes', type))
+      if (criterias.admission.length > 0)
+        labels.push(getLabelFromCriteriaObject(criterias.admission, 'admission', type))
+      if (criterias.entryMode.length > 0)
+        labels.push(getLabelFromCriteriaObject(criterias.entryMode, 'entryModes', type))
+      if (criterias.exitMode.length > 0) labels.push(getLabelFromCriteriaObject(criterias.exitMode, 'exitModes', type))
+      if (criterias.reason.length > 0) labels.push(getLabelFromCriteriaObject(criterias.reason, 'reason', type))
       if (criterias.destination.length > 0)
-        labels.push(getLabelFromCriteriaObject(criterias.destination, criterias.type))
-      if (criterias.provenance.length > 0) labels.push(getLabelFromCriteriaObject(criterias.provenance, criterias.type))
+        labels.push(getLabelFromCriteriaObject(criterias.destination, 'destination', type))
+      if (criterias.provenance.length > 0)
+        labels.push(getLabelFromCriteriaObject(criterias.provenance, 'provenance', type))
       break
 
     case RessourceType.DOCUMENTS:
@@ -179,19 +167,37 @@ export const criteriasAsArray = (criterias: any, type: RessourceType): string[] 
       break
 
     case RessourceType.CONDITION:
-      if (criterias.diagnosticType.length > 0) labels.push(getLabelFromCriteriaObject(criterias.diagnosticType))
+      if (criterias.code.length > 0)
+        labels.push(getLabelFromCriteriaObject(criterias.code, 'cim10Diagnostic', criterias.type))
+      if (criterias.diagnosticType.length > 0)
+        labels.push(getLabelFromCriteriaObject(criterias.diagnosticType, 'diagnosticTypes', criterias.type))
+      break
+
+    case RessourceType.PROCEDURE:
+      if (criterias.code.length > 0) labels.push(getLabelFromCriteriaObject(criterias.code, 'ccamData', criterias.type))
+      break
+
+    case RessourceType.CLAIM:
+      if (criterias.code.length > 0) labels.push(getLabelFromCriteriaObject(criterias.code, 'ghmData', criterias.type))
       break
 
     case RessourceType.MEDICATION_REQUEST:
     case RessourceType.MEDICATION_ADMINISTRATION:
       labels.push(getMedicationTypeLabel(criterias.type))
-      if (criterias.prescriptionType.length > 0) labels.push(getLabelFromCriteriaObject(criterias.prescriptionType))
-      if (criterias.administration.length > 0) labels.push(getLabelFromCriteriaObject(criterias.administration))
+      if (criterias.code.length > 0)
+        labels.push(getLabelFromCriteriaObject(criterias.code, 'medicationData', RessourceType.MEDICATION))
+      if (criterias.prescriptionType.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(criterias.prescriptionType, 'prescriptionTypes', RessourceType.MEDICATION)
+        )
+      if (criterias.administration.length > 0)
+        labels.push(getLabelFromCriteriaObject(criterias.administration, 'administrations', RessourceType.MEDICATION))
       break
 
     case RessourceType.OBSERVATION:
       if (criterias.valueComparator && (!isNaN(criterias.valueMin) || !isNaN(criterias.valueMax)))
         getBiologyValuesLabel(criterias.valueComparator, criterias.valueMin, criterias.valueMax)
+      if (criterias.code.length > 0) labels.push(getLabelFromCriteriaObject(criterias.code, 'biologyData', type))
   }
   switch (type) {
     case RessourceType.DOCUMENTS:
