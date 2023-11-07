@@ -793,7 +793,14 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 break
               }
               case PATIENT_DECEASED: {
-                currentCriterion.vitalStatus = value === 'true' ? VitalStatus.DECEASED : VitalStatus.ALIVE
+                console.log('currentCriterion', currentCriterion)
+                const vitalStatuses = value?.split(',') || []
+                const _vitalStatuses = vitalStatuses?.map((vitalStatusId: any) => ({ id: vitalStatusId }))
+                if (!_vitalStatuses) continue
+
+                currentCriterion.vitalStatus = currentCriterion.vitalStatus
+                  ? [...currentCriterion.vitalStatus, ..._vitalStatuses]
+                  : _vitalStatuses
                 break
               }
               default:

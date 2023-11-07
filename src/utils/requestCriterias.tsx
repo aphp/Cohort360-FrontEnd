@@ -7,26 +7,14 @@ import {
   LabelCriteriaObject,
   MedicationType,
   MedicationTypeLabel,
-  RessourceType,
-  VitalStatusLabel
+  RessourceType
 } from 'types/requestCriterias'
-import { DurationRangeType, SearchByTypes, VitalStatus } from 'types/searchCriterias'
+import { DurationRangeType, SearchByTypes } from 'types/searchCriterias'
 import allDocTypes from 'assets/docTypes.json'
 import { getDurationRangeLabel } from './age'
 import { displaySystem } from './displayValueSetSystem'
 import { CriteriaState } from 'state/criteria'
 import { Tooltip } from '@mui/material'
-
-const getVitalStatusLabel = (value: VitalStatus) => {
-  switch (value) {
-    case VitalStatus.ALIVE:
-      return VitalStatusLabel.ALIVE
-    case VitalStatus.DECEASED:
-      return VitalStatusLabel.DECEASED
-    default:
-      return VitalStatusLabel.ALL
-  }
-}
 
 const getMedicationTypeLabel = (type: MedicationType) => {
   switch (type) {
@@ -133,6 +121,7 @@ const getIppListLabel = (values: string) => {
 }
 
 export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaState: CriteriaState): string[] => {
+  console.log('criterias', criterias)
   const labels: (string | any)[] = []
   switch (type) {
     case RessourceType.IPP_LIST:
@@ -142,7 +131,7 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
     case RessourceType.PATIENT:
       if (criterias.gender?.length > 0)
         labels.push(getLabelFromCriteriaObject(criteriaState, criterias.gender, 'gender', type))
-      labels.push(getVitalStatusLabel(criterias.vitalStatus))
+      labels.push(getLabelFromCriteriaObject(criteriaState, criterias.vitalStatus, 'status', type))
       labels.push(getDurationRangeLabel(criterias.age, 'Âge'))
       if (criterias.birthdates[0] || criterias.birthdates[1])
         labels.push(getDatesLabel(criterias.birthdates, 'Naissance'))

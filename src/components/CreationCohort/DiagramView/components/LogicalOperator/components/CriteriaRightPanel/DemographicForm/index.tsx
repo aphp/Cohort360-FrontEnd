@@ -17,7 +17,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
 
-import { DurationRangeType, LabelObject, VitalStatus, VitalStatusLabel } from 'types/searchCriterias'
+import { DurationRangeType, LabelObject, VitalStatus } from 'types/searchCriterias'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { SelectedCriteriaType, RessourceType } from 'types/requestCriterias'
@@ -34,17 +34,6 @@ type DemographicFormProps = {
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
-
-const allVitalStatuses = [
-  {
-    id: VitalStatus.ALIVE,
-    label: VitalStatusLabel.ALIVE
-  },
-  {
-    id: VitalStatus.DECEASED,
-    label: VitalStatusLabel.DECEASED
-  }
-]
 
 const DemographicForm = (props: DemographicFormProps) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
@@ -91,6 +80,8 @@ const DemographicForm = (props: DemographicFormProps) => {
       type: RessourceType.PATIENT
     })
   }
+
+  console.log('vitalStatus', vitalStatus)
 
   return (
     <Grid className={classes.root}>
@@ -161,7 +152,7 @@ const DemographicForm = (props: DemographicFormProps) => {
             multiple
             id="criteria-vitalStatus-autocomplete"
             className={classes.inputItem}
-            options={allVitalStatuses}
+            options={criteria.data.status}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={vitalStatus}
@@ -185,8 +176,9 @@ const DemographicForm = (props: DemographicFormProps) => {
               value={age}
               disabled={birthdates[0] !== null || birthdates[1] !== null}
               label={
-                vitalStatus.find((status: LabelObject) => status.id === VitalStatus.DECEASED) &&
-                vitalStatus.length === 1
+                vitalStatus &&
+                vitalStatus.length === 1 &&
+                vitalStatus.find((status: LabelObject) => status.id === VitalStatus.DECEASED)
                   ? 'Âge au décès'
                   : 'Âge actuel'
               }
@@ -195,17 +187,19 @@ const DemographicForm = (props: DemographicFormProps) => {
             />
           </BlockWrapper>
 
-          {vitalStatus.find((status: LabelObject) => status.id === VitalStatus.DECEASED) && (
-            <BlockWrapper margin="1em">
-              <CalendarRange
-                inline
-                value={deathDates}
-                label={'Date de décès'}
-                onChange={(value) => setDeathDates(value)}
-                onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
-              />
-            </BlockWrapper>
-          )}
+          {vitalStatus &&
+            vitalStatus.length > 0 &&
+            vitalStatus.find((status: LabelObject) => status.id === VitalStatus.DECEASED) && (
+              <BlockWrapper margin="1em">
+                <CalendarRange
+                  inline
+                  value={deathDates}
+                  label={'Date de décès'}
+                  onChange={(value) => setDeathDates(value)}
+                  onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+                />
+              </BlockWrapper>
+            )}
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
