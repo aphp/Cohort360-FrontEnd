@@ -50,6 +50,7 @@
   },
   "scripts": {
     "start": "vite",
+    "type": "tsc --noEmit --watch",
     "build": "vite build",
     "serve": "vite preview",
     "lint": "eslint --ext .jsx,.js,.ts,.tsx src/",
