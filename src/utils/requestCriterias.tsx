@@ -121,7 +121,8 @@ const getIppListLabel = (values: string) => {
 }
 
 export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaState: CriteriaState): string[] => {
-  console.log('criterias', criterias)
+  console.log('test criterias', criterias)
+  console.log('test criteriaState', criteriaState)
   const labels: (string | any)[] = []
   switch (type) {
     case RessourceType.IPP_LIST:
@@ -129,9 +130,10 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
       break
 
     case RessourceType.PATIENT:
-      if (criterias.gender?.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.gender, 'gender', type))
-      labels.push(getLabelFromCriteriaObject(criteriaState, criterias.vitalStatus, 'status', type))
+      if (criterias.genders?.length > 0)
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.genders, 'gender', type))
+      if (criterias.vitalStatus?.length > 0)
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.vitalStatus, 'status', type))
       labels.push(getDurationRangeLabel(criterias.age, 'Âge'))
       if (criterias.birthdates[0] || criterias.birthdates[1])
         labels.push(getDatesLabel(criterias.birthdates, 'Naissance'))

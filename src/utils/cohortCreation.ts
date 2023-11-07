@@ -787,7 +787,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 const newGenderIds = genderIds?.map((genderId: any) => ({ id: genderId }))
                 if (!newGenderIds) continue
 
-                currentCriterion.gender = currentCriterion.gender
+                currentCriterion.genders = currentCriterion.gender
                   ? [...currentCriterion.gender, ...newGenderIds]
                   : newGenderIds
                 break

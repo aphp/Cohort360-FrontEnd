@@ -81,8 +81,6 @@ const DemographicForm = (props: DemographicFormProps) => {
     })
   }
 
-  console.log('vitalStatus', vitalStatus)
-
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
