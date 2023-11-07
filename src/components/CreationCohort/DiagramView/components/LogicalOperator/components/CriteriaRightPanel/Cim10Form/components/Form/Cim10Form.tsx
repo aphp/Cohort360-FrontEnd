@@ -54,7 +54,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     criteria?.data?.statusDiagnostic === 'loading' ||
     criteria?.data?.cim10Diagnostic === 'loading'
   ) {
-    return <> </>
+    return <></>
   }
 
   const defaultValuesCode = currentState.code
@@ -154,6 +154,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
           />
 
           <InputAutocompleteAsync
+            multiple
             label="Code CIM10"
             variant="outlined"
             noOptionsText="Veuillez entrer un code ou un diagnostic CIM10"
