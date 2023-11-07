@@ -42,6 +42,12 @@ export enum VitalStatus {
   ALL = 'all'
 }
 
+export enum VitalStatusFilter {
+  ALIVE = 'ALIVE',
+  DECEASED = 'DECEASED',
+  ALL = 'ALL'
+}
+
 export enum Direction {
   ASC = 'asc',
   DESC = 'desc'
