@@ -1,3 +1,4 @@
+import React from 'react'
 import moment from 'moment'
 import { CriteriaItemType, ScopeTreeRow } from 'types'
 import {
@@ -14,6 +15,7 @@ import allDocTypes from 'assets/docTypes.json'
 import { getDurationRangeLabel } from './age'
 import { displaySystem } from './displayValueSetSystem'
 import { CriteriaState } from 'state/criteria'
+import { Tooltip } from '@mui/material'
 
 const getVitalStatusLabel = (value: VitalStatus) => {
   switch (value) {
@@ -64,7 +66,9 @@ const getLabelFromCriteriaObject = (
     const labels = criterion
       .filter((obj: any) => values.map((value) => value.id).includes(obj.id))
       .map((obj: LabelCriteriaObject) => `${displaySystem(obj.system)} ${obj.label}`)
-    return labels.join(' - ')
+
+    const tooltipTitle = labels.join(' - ')
+    return <Tooltip title={tooltipTitle}>{tooltipTitle}</Tooltip>
   }
 }
 
@@ -129,7 +133,7 @@ const getIppListLabel = (values: string) => {
 }
 
 export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaState: CriteriaState): string[] => {
-  const labels: string[] = []
+  const labels: (string | any)[] = []
   switch (type) {
     case RessourceType.IPP_LIST:
       labels.push(getIppListLabel(criterias.search))
