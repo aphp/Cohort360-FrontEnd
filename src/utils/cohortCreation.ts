@@ -805,7 +805,6 @@ export async function unbuildRequest(_json: string): Promise<any> {
               case 'active':
                 break
               default:
-                console.log('test key', key)
                 currentCriterion.error = true
                 break
             }
