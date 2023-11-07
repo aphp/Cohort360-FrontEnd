@@ -11,7 +11,7 @@ import {
   MEDICATION_ATC,
   PROCEDURE_HIERARCHY
 } from '../constants'
-import { SearchByTypes, VitalStatus } from 'types/searchCriterias'
+import { SearchByTypes } from 'types/searchCriterias'
 import { Calendar } from 'types/dates'
 import {
   convertDurationToString,
@@ -747,7 +747,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
           currentCriterion.title = 'Critère démographique'
           currentCriterion.genders = []
-          currentCriterion.vitalStatus = VitalStatus.ALL
+          currentCriterion.vitalStatus = []
           currentCriterion.age = [null, null]
           currentCriterion.birthdates = [null, null]
           currentCriterion.deathDates = [null, null]
@@ -793,7 +793,6 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 break
               }
               case PATIENT_DECEASED: {
-                console.log('currentCriterion', currentCriterion)
                 const vitalStatuses = value?.split(',') || []
                 const _vitalStatuses = vitalStatuses?.map((vitalStatusId: any) => ({ id: vitalStatusId }))
                 if (!_vitalStatuses) continue

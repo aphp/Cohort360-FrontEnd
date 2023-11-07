@@ -121,8 +121,6 @@ const getIppListLabel = (values: string) => {
 }
 
 export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaState: CriteriaState): string[] => {
-  console.log('test criterias', criterias)
-  console.log('test criteriaState', criteriaState)
   const labels: (string | any)[] = []
   switch (type) {
     case RessourceType.IPP_LIST:
