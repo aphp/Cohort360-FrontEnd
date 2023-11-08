@@ -217,13 +217,14 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
 
     case RessourceType.OBSERVATION:
       if (criterias.valueComparator && (!isNaN(criterias.valueMin) || !isNaN(criterias.valueMax)))
-        getBiologyValuesLabel(criterias.valueComparator, criterias.valueMin, criterias.valueMax)
+        labels.push(getBiologyValuesLabel(criterias.valueComparator, criterias.valueMin, criterias.valueMax))
       if (criterias.code.length > 0)
         labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, 'biologyData', type))
   }
   switch (type) {
     case RessourceType.DOCUMENTS:
     case RessourceType.CONDITION:
+    case RessourceType.CLAIM:
     case RessourceType.PROCEDURE:
     case RessourceType.MEDICATION_REQUEST:
     case RessourceType.MEDICATION_ADMINISTRATION:
