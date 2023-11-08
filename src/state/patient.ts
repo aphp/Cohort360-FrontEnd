@@ -100,7 +100,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const sortBy = options?.sort?.by ?? ''
       const sortDirection = options?.sort?.direction ?? ''
       const page = options?.page ?? 1
-      const searchInput = options?.filters?.searchInput + WILDCARD ?? ''
+      const searchInput = options?.filters?.searchInput === '' ? '' : options?.filters?.searchInput + WILDCARD
       const code = options?.filters?.code ?? ''
       const diagnosticTypes = options?.filters?.diagnosticTypes ?? []
       const nda = options?.filters?.nda ?? ''
