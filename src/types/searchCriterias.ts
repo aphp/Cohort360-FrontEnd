@@ -1,6 +1,7 @@
 import { ScopeTreeRow, SimpleCodeType, ValueSet } from 'types'
 import { PatientTableLabels } from './patient'
 import { CohortsType } from './cohorts'
+import { RessourceType } from './requestCriterias'
 
 export enum GenderStatus {
   MALE = 'MALE',
@@ -73,7 +74,8 @@ export enum Order {
   NAME = 'name',
   MODALITY = 'modality',
   DESCRIPTION = 'description',
-  PROCEDURE = 'procedureCode'
+  PROCEDURE = 'procedureCode',
+  CREATED_AT = 'created_at'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -352,3 +354,23 @@ export const orderDirection = [
     label: DirectionLabel.DESC
   }
 ]
+
+export type SavedFilter = {
+  created_at: string
+  deleted: string
+  deleted_by_cascade: boolean
+  fhir_resource: RessourceType
+  fhir_version: string
+  filter: string
+  modified_at: string
+  name: string
+  owner: string
+  uuid: string
+}
+
+export type SavedFiltersResults = {
+  count: number
+  next: string | null
+  previous: string | null
+  results: SavedFilter[]
+}

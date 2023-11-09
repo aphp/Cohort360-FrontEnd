@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, createContext, useState } from 'react'
 
-import { Button, Dialog, DialogActions, DialogTitle } from '@mui/material'
-import { DialogContentWrapper } from './style'
+import { Button, Dialog, DialogActions, DialogTitle, Typography } from '@mui/material'
+import { DialogContentWrapper } from './styles'
 import { FormContextType } from 'types/form'
 
 export const FormContext = createContext<FormContextType | null>(null)
@@ -11,6 +11,7 @@ type ModalProps = {
   title?: string
   width?: string
   noActions?: boolean
+  validationText?: string
   onSubmit?: (value: any) => void
   onClose?: () => void
 }
@@ -21,6 +22,7 @@ const Modal = ({
   open,
   width = '450px',
   noActions = false,
+  validationText = 'Valider',
   onSubmit,
   onClose
 }: PropsWithChildren<ModalProps>) => {
@@ -41,21 +43,28 @@ const Modal = ({
   return (
     <FormContext.Provider value={{ updateFormData, updateError }}>
       <Dialog open={open} onClose={onClose}>
-        {title && <DialogTitle>{title}</DialogTitle>}
+        {title && (
+          <DialogTitle sx={{ color: '#FC2E8F', textTransform: 'uppercase', fontSize: 20 }}>{title}</DialogTitle>
+        )}
         <DialogContentWrapper width={width}>{children}</DialogContentWrapper>
         {!noActions && (
           <DialogActions>
             <Button color="info" onClick={onClose}>
-              Annuler
+              <Typography fontSize="15px" fontWeight="500">
+                Annuler
+              </Typography>
             </Button>
             <Button
               disabled={isError}
+              color="secondary"
               onClick={() => {
                 handleSubmit()
                 if (onClose) onClose()
               }}
             >
-              Valider
+              <Typography fontSize="15px" fontWeight="900">
+                {validationText}
+              </Typography>
             </Button>
           </DialogActions>
         )}

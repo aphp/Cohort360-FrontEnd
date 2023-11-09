@@ -5,11 +5,11 @@ import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 
 type FiltersNameFilterProps = {
-  value: string
+  value?: string
   name: string
 }
 
-const FiltersNameFilter = ({ name, value }: FiltersNameFilterProps) => {
+const FiltersNameFilter = ({ name, value = '' }: FiltersNameFilterProps) => {
   const context = useContext(FormContext)
   const [filtersName, setFiltersName] = useState(value)
   const [isError, setIsError] = useState({ min: false, max: false })

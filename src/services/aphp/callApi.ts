@@ -37,7 +37,7 @@ import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'u
 import { idSort, labelSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { CODE_HIERARCHY_EXTENSION_NAME } from '../../constants'
-import { Direction, Order, SearchByTypes } from 'types/searchCriterias'
+import { Direction, Order, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
 import { RessourceType } from 'types/requestCriterias'
 
 const paramValuesReducerWithPrefix =
@@ -361,14 +361,31 @@ export const fetchDocumentReferenceContent = async (docId: string): FHIR_API_Pro
 }
 
 export const postFilters = async (
-  fhir_version: string,
-  fhir_ressource: RessourceType,
+  fhir_resource: RessourceType,
   name: string,
-  filters: string
-): FHIR_API_Promise_Response<DocumentReference> => {
-  const documentResp = await apiFhir.get<FHIR_API_Response<DocumentReference>>(`/DocumentReference/${docId}`)
+  filter: string
+): Promise<AxiosResponse<SavedFilter>> => {
+  const res = await apiBackend.post('/cohort/fhir-filters/', {
+    fhir_resource,
+    fhir_version: '4.0',
+    name,
+    filter
+  })
+  return res
+}
 
-  return documentResp
+export const getFilters = async (
+  fhir_resource: RessourceType,
+  limit: number,
+  offset: number
+): Promise<AxiosResponse<SavedFiltersResults>> => {
+  let options: string[] = []
+  options = [...options, `fhir_resource=${fhir_resource}`]
+  options = [...options, `ordering=-${Order.CREATED_AT}`]
+  options = [...options, `limit=${limit}`]
+  options = [...options, `offset=${offset}`]
+  const res = await apiBackend.get(`/cohort/fhir-filters/?${options.reduce(paramsReducer)}`)
+  return res
 }
 /**
  * Binary Resource
@@ -376,7 +393,7 @@ export const postFilters = async (
  */
 
 type fetchBinaryProps = { _id?: string }
-export const fetchBinary = async (args: fetchBinaryProps): FHIR_Bundle_Promise_Response<Filter> => {
+export const fetchBinary = async (args: fetchBinaryProps): FHIR_Bundle_Promise_Response<Binary> => {
   const { _id } = args
   let options: string[] = []
 

@@ -18,7 +18,9 @@ import {
   fetchMedicationRequest,
   fetchMedicationAdministration,
   fetchObservation,
-  fetchImaging
+  fetchImaging,
+  postFilters,
+  getFilters
 } from './callApi'
 
 import servicesPerimeters from './servicePerimeters'
@@ -36,9 +38,10 @@ import {
   Patient,
   Procedure
 } from 'fhir/r4'
-import { Direction, Order, PatientsFilters, SearchByTypes } from 'types/searchCriterias'
+import { Direction, Filters, Order, PatientsFilters, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
 import { Medication, PMSI } from 'types/patient'
 import { RessourceType } from 'types/requestCriterias'
+import { mapObjectToString } from 'mappers/filters'
 
 export interface IServicePatients {
   /*
@@ -830,12 +833,26 @@ export const getEncounterDocuments = async (
   return _encounters
 }
 
-export const postFilters = async (
-  //fhir_version: string,
-  fhir_ressource: RessourceType,
+export const postFiltersService = async (
+  fhir_resource: RessourceType,
   name: string,
-  filters: PatientsFilters
+  criterias: SearchCriterias<Filters>
 ) => {
+  const { searchBy, searchInput, filters } = criterias
+  const criteriasString = `${mapObjectToString({ searchBy, searchInput })}&${mapObjectToString(filters)}`
+  try {
+    const response = await postFilters(fhir_resource, name, criteriasString)
+    return response.data
+  } catch {
+    throw "Le filtre n'a pas pu être sauvegardé."
+  }
+}
 
-  
+export const getFiltersService = async (fhir_resource: RessourceType, limit = 20, offset = 0) => {
+  try {
+    const response = await getFilters(fhir_resource, limit, offset)
+    return response.data
+  } catch {
+    throw "Les filtres sauvegardés n'ont pas pu être récupérés."
+  }
 }
