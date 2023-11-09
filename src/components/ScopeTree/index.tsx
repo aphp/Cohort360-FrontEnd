@@ -3,7 +3,7 @@ import { useAppSelector } from 'state'
 import { ScopeState } from 'state/scope'
 import { ScopeTreeRow, ScopeType } from 'types'
 import { getCurrentScopeList } from 'utils/scopeTree'
-import ScopeSearchBar from '../Inputs/ScopeSearchBar/ScopeSearchBar'
+// import ScopeSearchBar from '../Inputs/ScopeSearchBar/ScopeSearchBar'
 import ScopeTreeChipsets from './ScopeTreeChipsets'
 import ScopeTreeExploration from './ScopeTreeExploration'
 import ScopeTreeSearch from './ScopeTreeSearch'
@@ -78,9 +78,9 @@ const Index = (props: ScopeTreeProps) => {
             onSelect(item, selectedItems, setSelectedItems, scopesList, isSelectionLoading, setIsSelectionLoading)
           }
         />
-        <div className={classes.searchBar}>
+        {/* <div className={classes.searchBar}>
           <ScopeSearchBar searchInput={searchInput} setSearchInput={setSearchInput} />
-        </div>
+        </div> */}
         {searchInput ? (
           <ScopeTreeSearch
             searchInput={searchInput}
