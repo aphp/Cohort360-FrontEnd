@@ -12,6 +12,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material'
+import { AvatarWrapper } from 'components/ui/Avatar/styles'
 import DeleteIcon from '@mui/icons-material/Delete'
 
 import { useAppSelector } from 'state'
@@ -19,7 +20,6 @@ import { useAppSelector } from 'state'
 import { TemporalConstraintsKind, TemporalConstraintsType } from 'types'
 
 import useStyles from './styles'
-import Avatar from 'components/ui/Avatar/Avatar'
 
 const columns = [
   {
@@ -153,12 +153,12 @@ const EventSequenceTable: React.FC<{
                 temporalConstraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING && (
                   <TableRow key={index} className={classes.tableBodyRows} hover>
                     <TableCell align="center" className={classes.flexCenter}>
-                      <Avatar content={temporalConstraint.idList[0]} />
+                      <AvatarWrapper>{temporalConstraint.idList[0]}</AvatarWrapper>
                       <Typography style={{ width: 'fit-content', marginLeft: 4 }}> - {criteriaTitle1}</Typography>
                     </TableCell>
                     <TableCell align="center">s'est produit avant</TableCell>
                     <TableCell align="center" className={classes.flexCenter}>
-                      <Avatar content={temporalConstraint.idList[1]} />
+                      <AvatarWrapper>{temporalConstraint.idList[1]}</AvatarWrapper>
                       <Typography style={{ width: 'fit-content', marginLeft: 4 }}> - {criteriaTitle2}</Typography>
                     </TableCell>
                     <TableCell align="center">{`${minDuration.values ?? '-'} ${minDuration.keys ?? ''}`}</TableCell>

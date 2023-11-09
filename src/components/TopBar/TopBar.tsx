@@ -31,7 +31,7 @@ import { ReactComponent as StarIcon } from 'assets/icones/star.svg'
 import { ReactComponent as StarFullIcon } from 'assets/icones/star full.svg'
 import MoreButton from '@mui/icons-material/MoreVert'
 
-import Avatar from 'components/ui/Avatar/Avatar'
+import { AvatarWrapper } from 'components/ui/Avatar/styles'
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 import ModalEditCohort from 'components/Requests/Modals/ModalEditCohort/ModalEditCohort'
 
@@ -176,7 +176,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
             >
               <Grid item xs={9} direction="row" container style={{ flexWrap: 'nowrap' }}>
                 <Grid container style={{ width: 40 }} alignItems="center">
-                  <Avatar content={cohort.icon} size={40} />
+                  <AvatarWrapper size={40}>{cohort.icon}</AvatarWrapper>
                 </Grid>
 
                 <Grid

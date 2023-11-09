@@ -6,7 +6,7 @@ import AddIcon from '@mui/icons-material/Add'
 
 import LogicalOperatorItem from './components/LogicalOperatorItem/LogicalOperatorItem'
 import CriteriaRightPanel from './components/CriteriaRightPanel/CriteriaRightPanel'
-import Avatar from 'components/ui/Avatar/Avatar'
+import { AvatarWrapper } from 'components/ui/Avatar/styles'
 import CriteriaCardItem from '../CriteriaCard'
 
 import { CriteriaGroupType } from 'types'
@@ -72,7 +72,9 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
         className={classes.operatorChild}
         style={{ height: 30, marginBottom: -12, paddingLeft: 0 }}
       >
-        <Avatar content={Math.abs(itemId) + 1} backgroundColor="#FFE2A9" color="#153D8A" marginLeft={'-14px'} bold />
+        <AvatarWrapper backgroundColor="#FFE2A9" color="#153D8A" marginLeft={'-14px'} bold>
+          {Math.abs(itemId) + 1}
+        </AvatarWrapper>
       </Grid>
       <div className={classes.operatorChild}>
         {displayingItem &&

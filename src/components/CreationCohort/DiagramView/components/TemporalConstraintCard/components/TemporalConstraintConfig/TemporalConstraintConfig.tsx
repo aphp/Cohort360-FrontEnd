@@ -14,12 +14,12 @@ import {
   SelectChangeEvent,
   Typography
 } from '@mui/material'
+import { AvatarWrapper } from 'components/ui/Avatar/styles'
 
 import { useAppSelector } from 'state'
 import { TemporalConstraintsKind, TemporalConstraintsType } from 'types'
 
 import useStyles from './styles'
-import Avatar from 'components/ui/Avatar/Avatar'
 
 const timeMeasurements = [
   {
@@ -180,7 +180,9 @@ const TemporalConstraintConfig: React.FC<{
           >
             {selectableCriteria1.map((selectValue, index) => (
               <MenuItem key={index} value={selectValue.id}>
-                <Avatar content={selectValue.id} size={20} fontSize={12} marginRight={0.5} />
+                <AvatarWrapper size={20} fontSize={12} marginRight={0.5}>
+                  {selectValue.id}
+                </AvatarWrapper>
                 {` - ${selectValue.title}`}
               </MenuItem>
             ))}
@@ -206,7 +208,9 @@ const TemporalConstraintConfig: React.FC<{
           >
             {selectableCriteria2.map((selectValue, index) => (
               <MenuItem key={index} value={selectValue.id}>
-                <Avatar content={selectValue.id} size={20} fontSize={12} marginRight={0.5} />
+                <AvatarWrapper size={20} fontSize={12} marginRight={0.5}>
+                  {selectValue.id}
+                </AvatarWrapper>
                 {` - ${selectValue.title}`}
               </MenuItem>
             ))}
