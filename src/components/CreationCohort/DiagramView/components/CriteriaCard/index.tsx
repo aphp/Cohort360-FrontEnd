@@ -51,13 +51,12 @@ const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriter
   return (
     <Grid
       container
-      justifyContent={'space-between'}
-      alignItems={'flex-start'}
+      alignItems={'center'}
       className={classes.criteriaItem}
       style={{ backgroundColor: criterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
     >
-      <Grid container alignItems="center" item xs={7} xl={4} padding={'5px'}>
-        <Avatar content={criterion.id} />
+      <Grid container alignItems="center" item xs={7} xl={3} padding={'5px'}>
+        <Avatar size={20} content={criterion.id} />
         <Typography className={classes.title} fontWeight={700}>
           {criterion.title} :
         </Typography>
@@ -66,16 +65,14 @@ const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriter
         container
         item
         xs={12}
-        xl={6}
+        xl={7}
         ref={containerRef}
         style={{ height: openCollapse ? '' : 42 }}
         className={classes.secondItem}
       >
         <Grid item xs={11} container ref={childrenRef} style={{ overflow: 'hidden' }}>
           {criteriasAsArray(criterion, criterion.type, criteria).map((label, index) => (
-            <Grid key={index} margin={'5px'}>
-              <ChipWrapper label={label} />
-            </Grid>
+            <ChipWrapper key={index} label={label} style={{ margin: 5, maxWidth: 'calc(100% - 5px)' }} />
           ))}
         </Grid>
         <Grid item xs={1}>
@@ -86,7 +83,7 @@ const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriter
           )}
         </Grid>
       </Grid>
-      <Grid item xs={5} xl={2} container justifyContent="flex-end">
+      <Grid container xs={5} xl={2} justifyContent="flex-end">
         {criterion.error && (
           <IconButton
             size="small"
