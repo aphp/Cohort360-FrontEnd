@@ -7,7 +7,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import WarningIcon from '@mui/icons-material/Warning'
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd'
 
-import Avatar from 'components/ui/Avatar/Avatar'
+import { AvatarWrapper } from 'components/ui/Avatar/styles'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
@@ -56,7 +56,7 @@ const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriter
       style={{ backgroundColor: criterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
     >
       <Grid container alignItems="center" item xs={7} xl={3} padding={'5px'}>
-        <Avatar size={20} content={criterion.id} />
+        <AvatarWrapper size={20}>{criterion.id}</AvatarWrapper>
         <Typography className={classes.title} fontWeight={700}>
           {criterion.title} :
         </Typography>
