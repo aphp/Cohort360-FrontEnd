@@ -16,7 +16,7 @@
     "@types/redux-state-sync": "^3.1.5",
     "ace-builds": "^1.16.0",
     "apollo-boost": "^0.4.9",
-    "axios": "^0.27.2",
+    "axios": "^1.6.0",
     "buffer": "^6.0.3",
     "client-oauth2": "^4.2.4",
     "d3": "^7.8.2",
