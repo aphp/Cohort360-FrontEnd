@@ -18,6 +18,7 @@ import { ScopeTreeRow } from 'types'
 import { ScopeTreeSearchProps } from '../index'
 import ScopeTreeHierarchy from '../ScopeTreeHierarchy'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
+import { getCurrentScopeList } from 'utils/scopeTree'
 
 const Index: React.FC<ScopeTreeSearchProps> = (props) => {
   const {
@@ -39,7 +40,8 @@ const Index: React.FC<ScopeTreeSearchProps> = (props) => {
     scopeState: state.scope || {}
   }))
 
-  const { scopesList = [] } = scopeState
+  const isExecutiveUnit: boolean = !!executiveUnitType ?? false
+  const scopesList: ScopeTreeRow[] = getCurrentScopeList(scopeState.scopesList, isExecutiveUnit) ?? []
   const [openPopulation, setOpenPopulations] = useState<number[]>(scopeState.openPopulation)
   const [rootRows, setRootRows] = useState<ScopeTreeRow[]>([])
   const controllerRef = useRef<AbortController | null>(null)
@@ -144,7 +146,7 @@ const Index: React.FC<ScopeTreeSearchProps> = (props) => {
                           selectedItems,
                           undefined,
                           executiveUnitType,
-                          !!executiveUnitType
+                          isExecutiveUnit
                         )
                       }
                       onSelect={(row: ScopeTreeRow) =>
@@ -152,11 +154,12 @@ const Index: React.FC<ScopeTreeSearchProps> = (props) => {
                           row,
                           selectedItems,
                           searchSavedRootRows,
-                          scopesList as ScopeTreeRow[],
+                          scopesList,
                           isSelectionLoading,
                           setIsSelectionLoading,
                           setSelectedItems,
-                          setSearchSavedRootRows
+                          setSearchSavedRootRows,
+                          isExecutiveUnit
                         )
                       }
                       isIndeterminate={(row: ScopeTreeRow) => isSearchIndeterminate(row, selectedItems)}
