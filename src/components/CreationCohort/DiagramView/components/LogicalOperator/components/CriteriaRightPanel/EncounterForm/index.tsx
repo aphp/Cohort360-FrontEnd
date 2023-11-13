@@ -260,6 +260,7 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
             </FormLabel>
             <DurationRange
               value={duration}
+              unit={'Durée'}
               onChange={(value) => setDuration(value)}
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
             />
