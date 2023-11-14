@@ -558,7 +558,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
     case RessourceType.IMAGING: {
       filterFhir = [
-        'subject.active=true',
+        'patient.active=true',
         `${
           criterion.studyStartDate
             ? `${IMAGING_STUDY_DATE}=ge${moment(criterion.studyStartDate).format('YYYY-MM-DD[T00:00:00Z]')}`
