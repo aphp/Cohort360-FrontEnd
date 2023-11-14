@@ -35,7 +35,7 @@ export enum RessourceType {
   OBSERVATION = 'Observation',
   MICROBIOLOGIE = 'microbiologie',
   PHYSIOLOGIE = 'physiologie',
-  IMAGING = 'Imaging'
+  IMAGING = 'ImagingStudy'
 }
 
 export enum RessourceTypeLabels {

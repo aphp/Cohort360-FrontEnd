@@ -162,10 +162,6 @@ export const criteriasAsArray = (criterias: any, type: RessourceType): string[] 
         labels.push(`Modalités de l'étude : ${getLabelFromObject(criterias.studyModalities)}`)
       if (criterias.studyDescription) labels.push(`Description de l'étude : ${criterias.studyDescription}`)
       if (criterias.studyProcedure) labels.push(`Procédure de l'étude : ${criterias.studyProcedure}`)
-      if (!isNaN(criterias.numberOfSeries) && criterias.seriesComparator)
-        labels.push(getNbOccurencesLabel(criterias.numberOfSeries, criterias.seriesComparator, 'de séries'))
-      if (!isNaN(criterias.numberOfIns) && criterias.instancesComparator)
-        labels.push(getNbOccurencesLabel(criterias.numberOfIns, criterias.instancesComparator, "d'instances"))
       if (criterias.withDocument !== DocumentAttachmentMethod.NONE)
         labels.push(getAttachmentMethod(criterias.withDocument, criterias.daysOfDelay))
       if (criterias.studyUuid) labels.push(getIdsListLabels(criterias.studyUuid, "uuid d'étude"))
@@ -177,6 +173,10 @@ export const criteriasAsArray = (criterias: any, type: RessourceType): string[] 
       if (criterias.seriesProtocol) labels.push(`Protocole de la série : ${criterias.seriesProtocol}`)
       if (criterias.bodySite) labels.push(`Partie du corps : ${criterias.bodySite}`)
       if (criterias.seriesUuid) labels.push(getIdsListLabels(criterias.seriesUuid, 'uuid de série'))
+      if (!isNaN(criterias.numberOfSeries) && criterias.seriesComparator)
+        labels.push(getNbOccurencesLabel(criterias.numberOfSeries, criterias.seriesComparator, 'de séries'))
+      if (!isNaN(criterias.numberOfIns) && criterias.instancesComparator)
+        labels.push(getNbOccurencesLabel(criterias.numberOfIns, criterias.instancesComparator, "d'instances"))
       break
 
     case RessourceType.DOCUMENTS:
