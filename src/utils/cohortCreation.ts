@@ -833,6 +833,13 @@ export async function unbuildRequest(
                 // if (!newGenderIds) continue
 
                 // currentCriterion.genders = currentCriterion.gender ? [...currentCriterion.genders, ...genders] : genders
+                const genderIds = value?.split(',')
+                const newGenderIds = genderIds?.map((genderId: any) => ({ id: genderId }))
+                if (!newGenderIds) continue
+
+                currentCriterion.genders = currentCriterion.gender
+                  ? [...currentCriterion.gender, ...newGenderIds]
+                  : newGenderIds
                 break
               }
               case PATIENT_DECEASED: {
