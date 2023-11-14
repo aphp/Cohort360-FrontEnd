@@ -19,15 +19,7 @@ import {
   convertStringToDuration,
   convertTimestampToDuration
 } from './age'
-import {
-  Comparators,
-  CriteriaDataKey,
-  DocType,
-  // LabelCriteriaObject,
-  RessourceType,
-  SelectedCriteriaType
-} from 'types/requestCriterias'
-// import { CriteriaState } from 'state/criteria'
+import { Comparators, DocType, RessourceType, SelectedCriteriaType, CriteriaDataKey } from 'types/requestCriterias'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
@@ -672,11 +664,7 @@ export function buildRequest(
   return JSON.stringify(json)
 }
 
-export async function unbuildRequest(
-  _json: string
-  // criteria: CriteriaState
-): Promise<any> {
-  // console.log('criteria', criteria)
+export async function unbuildRequest(_json: string): Promise<any> {
   let population: (ScopeTreeRow | undefined)[] | null = null
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
@@ -745,10 +733,7 @@ export async function unbuildRequest(
     return { population, criteria: [], criteriaGroup: [] }
   }
 
-  const _retrieveInformationFromJson = async (
-    element: RequeteurCriteriaType
-    // criteriaState: CriteriaState
-  ): Promise<any> => {
+  const _retrieveInformationFromJson = async (element: RequeteurCriteriaType): Promise<any> => {
     const currentCriterion: any = {
       id: element._id,
       type: element.resourceType,
@@ -798,42 +783,6 @@ export async function unbuildRequest(
                 break
               }
               case PATIENT_GENDER: {
-                // const matchIdWithLabels = (ids: string[], dataName: string, resourceType: RessourceType) => {
-                //   const findCriterionById = (
-                //     criteriaArray: CriteriaState,
-                //     id: RessourceType
-                //   ): null | CriteriaItemType => {
-                //     for (const criterion of criteriaArray) {
-                //       if (criterion.id === id) {
-                //         return criterion
-                //       }
-                //       if (criterion.subItems) {
-                //         const foundInSubItem = findCriterionById(criterion.subItems, id)
-                //         if (foundInSubItem) {
-                //           return foundInSubItem
-                //         }
-                //       }
-                //     }
-                //     return null
-                //   }
-                //   const criterionData = findCriterionById(criteriaState, resourceType)?.data
-                //   console.log('criterionData', criterionData)
-                //   if (criterionData === null) return ''
-
-                //   const criterion = criterionData[dataName]
-                //   console.log('criterion', criterion)
-                //   if (criterion !== 'loading') {
-                //     return criterion.filter((obj: LabelCriteriaObject) => ids.includes(obj.id))
-                //   }
-                // }
-
-                // const genderIds = value?.split(',') ?? []
-                // const genders = matchIdWithLabels(genderIds, 'gender', RessourceType.PATIENT)
-                // console.log('genders', genders)
-                // const newGenderIds = genderIds?.map((genderId: any) => ({ id: genderId }))
-                // if (!newGenderIds) continue
-
-                // currentCriterion.genders = currentCriterion.gender ? [...currentCriterion.genders, ...genders] : genders
                 const genderIds = value?.split(',')
                 const newGenderIds = genderIds?.map((genderId: any) => ({ id: genderId }))
                 if (!newGenderIds) continue
@@ -1585,13 +1534,7 @@ export async function unbuildRequest(
     let newSelectedCriteriaItems: SelectedCriteriaType[] = []
 
     for (const criteriaItem of _criteriaItems) {
-      newSelectedCriteriaItems = [
-        ...newSelectedCriteriaItems,
-        await _retrieveInformationFromJson(
-          criteriaItem
-          // criteria
-        )
-      ]
+      newSelectedCriteriaItems = [...newSelectedCriteriaItems, await _retrieveInformationFromJson(criteriaItem)]
     }
 
     return newSelectedCriteriaItems
@@ -1682,8 +1625,6 @@ export async function unbuildRequest(
     const newIds = oldIds.map((id) => idMap[id] ?? id)
     return { ...constraint, idList: newIds }
   })
-
-  // console.log('criteriaItems', criteriaItems)
 
   // End of unbuild
   return {

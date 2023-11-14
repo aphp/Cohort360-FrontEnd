@@ -343,16 +343,10 @@ type UnbuildParams = { newCurrentSnapshot: CurrentSnapshot }
 
 const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParams, { state: RootState }>(
   'cohortCreation/unbuild',
-  async ({ newCurrentSnapshot }, { getState, dispatch }) => {
+  async ({ newCurrentSnapshot }, { dispatch }) => {
     try {
-      // const state = getState()
-      // console.log('state', state)
       const { serialized_query, dated_measures } = newCurrentSnapshot
-      const { population, criteria, criteriaGroup, temporalConstraints } = await unbuildRequest(
-        serialized_query
-        // state?.cohortCreation?.criteria
-      )
-      // console.log('criteria', criteria)
+      const { population, criteria, criteriaGroup, temporalConstraints } = await unbuildRequest(serialized_query)
 
       let _temporalConstraints
 

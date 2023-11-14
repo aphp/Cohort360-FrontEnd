@@ -22,12 +22,13 @@ import { CriteriaName, ScopeTreeRow } from 'types'
 import PopulationCard from '../../../../PopulationCard/PopulationCard'
 import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE } from 'utils/cohortCreation'
 import { DurationRangeType, LabelObject } from 'types/searchCriterias'
-import { Comparators, RessourceType } from 'types/requestCriterias'
+import { Comparators, CriteriaDataKey, RessourceType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import Collapse from 'components/ui/Collapse'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
+import { mappingCriteria } from '../DemographicForm'
 
 type EncounterFormProps = {
   criteria: any
@@ -52,16 +53,36 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
   const [title, setTitle] = useState(selectedCriteria?.title || 'Critère de prise en charge')
   const [age, setAge] = useState<DurationRangeType>(selectedCriteria?.age || [null, null])
   const [duration, setDuration] = useState<DurationRangeType>(selectedCriteria?.duration || [null, null])
-  const [admissionMode, setAdmissionMode] = useState<LabelObject[]>(selectedCriteria?.admissionMode || [])
-  const [entryMode, setEntryMode] = useState<LabelObject[]>(selectedCriteria?.entryMode || [])
-  const [exitMode, setExitMode] = useState<LabelObject[]>(selectedCriteria?.exitMode || [])
-  const [priseEnChargeType, setPriseEnChargeType] = useState<LabelObject[]>(selectedCriteria?.priseEnChargeType || [])
-  const [typeDeSejour, setTypeDeSejour] = useState<LabelObject[]>(selectedCriteria?.typeDeSejour || [])
-  const [fileStatus, setFileStatus] = useState<LabelObject[]>(selectedCriteria?.fileStatus || [])
-  const [reason, setReason] = useState<LabelObject[]>(selectedCriteria?.reason || [])
-  const [destination, setDestination] = useState<LabelObject[]>(selectedCriteria?.destination || [])
-  const [provenance, setProvenance] = useState<LabelObject[]>(selectedCriteria?.provenance || [])
-  const [admission, setAdmission] = useState<LabelObject[]>(selectedCriteria?.admission || [])
+  const [admissionMode, setAdmissionMode] = useState<LabelObject[]>(
+    mappingCriteria(selectedCriteria?.admissionMode, CriteriaDataKey.ADMISSION_MODE, criteria) || []
+  )
+  const [entryMode, setEntryMode] = useState<LabelObject[]>(
+    mappingCriteria(selectedCriteria?.entryMode, CriteriaDataKey.ENTRY_MODES, criteria) || []
+  )
+  const [exitMode, setExitMode] = useState<LabelObject[]>(
+    mappingCriteria(selectedCriteria?.exitMode, CriteriaDataKey.EXIT_MODES, criteria) || []
+  )
+  const [priseEnChargeType, setPriseEnChargeType] = useState<LabelObject[]>(
+    mappingCriteria(selectedCriteria?.priseEnChargeType, CriteriaDataKey.PRISE_EN_CHARGE_TYPE, criteria) || []
+  )
+  const [typeDeSejour, setTypeDeSejour] = useState<LabelObject[]>(
+    mappingCriteria(selectedCriteria?.typeDeSejour, CriteriaDataKey.TYPE_DE_SEJOUR, criteria) || []
+  )
+  const [fileStatus, setFileStatus] = useState<LabelObject[]>(
+    mappingCriteria(selectedCriteria?.fileStatus, CriteriaDataKey.FILE_STATUS, criteria) || []
+  )
+  const [reason, setReason] = useState<LabelObject[]>(
+    mappingCriteria(selectedCriteria?.reason, CriteriaDataKey.REASON, criteria) || []
+  )
+  const [destination, setDestination] = useState<LabelObject[]>(
+    mappingCriteria(selectedCriteria?.destination, CriteriaDataKey.DESTINATION, criteria) || []
+  )
+  const [provenance, setProvenance] = useState<LabelObject[]>(
+    mappingCriteria(selectedCriteria?.provenance, CriteriaDataKey.PROVENANCE, criteria) || []
+  )
+  const [admission, setAdmission] = useState<LabelObject[]>(
+    mappingCriteria(selectedCriteria?.admission, CriteriaDataKey.ADMISSION, criteria) || []
+  )
   const [encounterService, setEncounterService] = useState<ScopeTreeRow[]>(selectedCriteria?.encounterService || [])
   const [encounterStartDate, setEncounterStartDate] = useState<string | null>(
     selectedCriteria?.encounterStartDate || null

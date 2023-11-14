@@ -20,7 +20,7 @@ import useStyles from './styles'
 import { DurationRangeType, LabelObject, VitalStatus } from 'types/searchCriterias'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
-import { SelectedCriteriaType, RessourceType } from 'types/requestCriterias'
+import { CriteriaDataKey, SelectedCriteriaType, RessourceType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 
 enum Error {
@@ -35,13 +35,24 @@ type DemographicFormProps = {
   onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
+export const mappingCriteria = (criteriaToMap: any, key: string, mapping: any) => {
+  if (criteriaToMap) {
+    return criteriaToMap.map((criteria: any) => {
+      const mappedCriteria = mapping.data[key]?.find((c: any) => c?.id === criteria?.id)
+      return mappedCriteria
+    })
+  }
+}
+
 const DemographicForm = (props: DemographicFormProps) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [birthdates, setBirthdates] = useState<DurationRangeType>(selectedCriteria?.birthdates || [null, null])
   const [deathDates, setDeathDates] = useState<DurationRangeType>(selectedCriteria?.deathDates || [null, null])
   const [age, setAge] = useState<DurationRangeType>(selectedCriteria?.age || [null, null])
-  const [vitalStatus, setVitalStatus] = useState(selectedCriteria?.vitalStatus) || []
-  const [genders, setGenders] = useState(selectedCriteria?.genders) || []
+  const [vitalStatus, setVitalStatus] =
+    useState(mappingCriteria(selectedCriteria?.vitalStatus, CriteriaDataKey.VITALSTATUS, criteria)) || []
+  const [genders, setGenders] =
+    useState(mappingCriteria(selectedCriteria?.genders, CriteriaDataKey.GENDER, criteria)) || []
   const [title, setTitle] = useState(selectedCriteria?.title || 'Critère démographique')
   const [isInclusive, setIsInclusive] = useState<boolean>(selectedCriteria?.isInclusive || true)
 
