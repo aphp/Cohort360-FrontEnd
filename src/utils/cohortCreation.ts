@@ -21,6 +21,7 @@ import {
 } from './age'
 import {
   Comparators,
+  CriteriaDataKey,
   DocType,
   // LabelCriteriaObject,
   RessourceType,
@@ -1713,11 +1714,11 @@ export const getDataFromFetch = async (
       for (const fetchKey of fetchKeys) {
         const dataKey = fetchKey.replace('fetch', '').replace(/(\b[A-Z])(?![A-Z])/g, ($1) => $1.toLowerCase())
         switch (dataKey) {
-          case 'medicationData':
-          case 'biologyData':
-          case 'ghmData':
-          case 'ccamData':
-          case 'cim10Diagnostic': {
+          case CriteriaDataKey.MEDICATION_DATA:
+          case CriteriaDataKey.BIOLOGY_DATA:
+          case CriteriaDataKey.GHM_DATA:
+          case CriteriaDataKey.CCAM_DATA:
+          case CriteriaDataKey.CIM_10_DIAGNOSTIC: {
             if (_criterion.data[dataKey] === 'loading') _criterion.data[dataKey] = []
             const currentSelectedCriteria = selectedCriteria.filter(
               (criterion: SelectedCriteriaType) =>

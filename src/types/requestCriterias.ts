@@ -53,6 +53,29 @@ export type SelectedCriteriaType = {
   | EncounterDataType
 )
 
+export enum CriteriaDataKey {
+  GENDER = 'gender',
+  VITALSTATUS = 'status',
+  PRISE_EN_CHARGE_TYPE = 'priseEnChargeType',
+  TYPE_DE_SEJOUR = 'typeDeSejour',
+  FILE_STATUS = 'fileStatus',
+  ADMISSION_MODE = 'admissionModes',
+  ADMISSION = 'admission',
+  ENTRY_MODES = 'entryModes',
+  EXIT_MODES = 'exitModes',
+  REASON = 'reason',
+  DESTINATION = 'destination',
+  PROVENANCE = 'provenance',
+  CIM_10_DIAGNOSTIC = 'cim10Diagnostic',
+  DIAGNOSTIC_TYPES = 'diagnosticTypes',
+  CCAM_DATA = 'ccamData',
+  GHM_DATA = 'ghmData',
+  MEDICATION_DATA = 'medicationData',
+  PRESCRIPTION_TYPES = 'prescriptionTypes',
+  ADMINISTRATIONS = 'administrations',
+  BIOLOGY_DATA = 'biologyData'
+}
+
 export type CcamDataType = {
   title: string
   type: RessourceType.PROCEDURE

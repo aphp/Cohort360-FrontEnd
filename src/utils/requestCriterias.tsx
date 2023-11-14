@@ -3,6 +3,7 @@ import moment from 'moment'
 import { CriteriaItemType, ScopeTreeRow } from 'types'
 import {
   Comparators,
+  CriteriaDataKey,
   DocType,
   LabelCriteriaObject,
   MedicationType,
@@ -129,9 +130,9 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
 
     case RessourceType.PATIENT:
       if (criterias.genders?.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.genders, 'gender', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.genders, CriteriaDataKey.GENDER, type))
       if (criterias.vitalStatus?.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.vitalStatus, 'status', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.vitalStatus, CriteriaDataKey.VITALSTATUS, type))
       labels.push(getDurationRangeLabel(criterias.age, 'Âge'))
       if (criterias.birthdates[0] || criterias.birthdates[1])
         labels.push(getDatesLabel(criterias.birthdates, 'Naissance'))
@@ -143,25 +144,36 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
       if (criterias.duration[0] || criterias.duration[1])
         labels.push(getDurationRangeLabel(criterias.duration, 'Prise en charge : '))
       if (criterias.priseEnChargeType.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.priseEnChargeType, 'priseEnChargeType', type))
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            criterias.priseEnChargeType,
+            CriteriaDataKey.PRISE_EN_CHARGE_TYPE,
+            type
+          )
+        )
       if (criterias.typeDeSejour.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.typeDeSejour, 'typeDeSejour', type))
+        labels.push(
+          getLabelFromCriteriaObject(criteriaState, criterias.typeDeSejour, CriteriaDataKey.TYPE_DE_SEJOUR, type)
+        )
       if (criterias.fileStatus.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.fileStatus, 'fileStatus', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.fileStatus, CriteriaDataKey.FILE_STATUS, type))
       if (criterias.admissionMode.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.admissionMode, 'admissionModes', type))
+        labels.push(
+          getLabelFromCriteriaObject(criteriaState, criterias.admissionMode, CriteriaDataKey.ADMISSION_MODE, type)
+        )
       if (criterias.admission.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.admission, 'admission', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.admission, CriteriaDataKey.ADMISSION, type))
       if (criterias.entryMode.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.entryMode, 'entryModes', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.entryMode, CriteriaDataKey.ENTRY_MODES, type))
       if (criterias.exitMode.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.exitMode, 'exitModes', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.exitMode, CriteriaDataKey.EXIT_MODES, type))
       if (criterias.reason.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.reason, 'reason', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.reason, CriteriaDataKey.REASON, type))
       if (criterias.destination.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.destination, 'destination', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.destination, CriteriaDataKey.DESTINATION, type))
       if (criterias.provenance.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.provenance, 'provenance', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.provenance, CriteriaDataKey.PROVENANCE, type))
       break
 
     case RessourceType.DOCUMENTS:
@@ -171,21 +183,30 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
 
     case RessourceType.CONDITION:
       if (criterias.code.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, 'cim10Diagnostic', criterias.type))
+        labels.push(
+          getLabelFromCriteriaObject(criteriaState, criterias.code, CriteriaDataKey.CIM_10_DIAGNOSTIC, criterias.type)
+        )
       if (criterias.diagnosticType.length > 0)
         labels.push(
-          getLabelFromCriteriaObject(criteriaState, criterias.diagnosticType, 'diagnosticTypes', criterias.type)
+          getLabelFromCriteriaObject(
+            criteriaState,
+            criterias.diagnosticType,
+            CriteriaDataKey.DIAGNOSTIC_TYPES,
+            criterias.type
+          )
         )
       break
 
     case RessourceType.PROCEDURE:
       if (criterias.code.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, 'ccamData', criterias.type))
+        labels.push(
+          getLabelFromCriteriaObject(criteriaState, criterias.code, CriteriaDataKey.CCAM_DATA, criterias.type)
+        )
       break
 
     case RessourceType.CLAIM:
       if (criterias.code.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, 'ghmData', criterias.type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, CriteriaDataKey.GHM_DATA, criterias.type))
       break
 
     case RessourceType.MEDICATION_REQUEST:
@@ -193,14 +214,19 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
       labels.push(getMedicationTypeLabel(criterias.type))
       if (criterias.code.length > 0)
         labels.push(
-          getLabelFromCriteriaObject(criteriaState, criterias.code, 'medicationData', RessourceType.MEDICATION)
+          getLabelFromCriteriaObject(
+            criteriaState,
+            criterias.code,
+            CriteriaDataKey.MEDICATION_DATA,
+            RessourceType.MEDICATION
+          )
         )
       if (criterias.prescriptionType.length > 0)
         labels.push(
           getLabelFromCriteriaObject(
             criteriaState,
             criterias.prescriptionType,
-            'prescriptionTypes',
+            CriteriaDataKey.PRESCRIPTION_TYPES,
             RessourceType.MEDICATION
           )
         )
@@ -209,7 +235,7 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
           getLabelFromCriteriaObject(
             criteriaState,
             criterias.administration,
-            'administrations',
+            CriteriaDataKey.ADMINISTRATIONS,
             RessourceType.MEDICATION
           )
         )
@@ -219,7 +245,7 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
       if (criterias.valueComparator && (!isNaN(criterias.valueMin) || !isNaN(criterias.valueMax)))
         labels.push(getBiologyValuesLabel(criterias.valueComparator, criterias.valueMin, criterias.valueMax))
       if (criterias.code.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, 'biologyData', type))
+        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, CriteriaDataKey.BIOLOGY_DATA, type))
   }
   switch (type) {
     case RessourceType.DOCUMENTS:
