@@ -23,7 +23,7 @@ const PatientsNbFilter = ({ names, values }: PatientsNbFilterProps) => {
   useEffect(() => {
     setError(false)
     onError(false)
-    if (patientsNb[0] && patientsNb[1] && patientsNb[0] > patientsNb[1]) {
+    if (Number(patientsNb[0]) && Number(patientsNb[1]) && Number(patientsNb[0]) > Number(patientsNb[1])) {
       setError(true)
       onError(true)
     }
