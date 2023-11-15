@@ -1,13 +1,24 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import useStyles from './styles'
 
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 
-import news from './news.json'
+import apiBackend from 'services/apiBackend'
 
 export default function TutorialsCard() {
+  const [_news, setNews] = useState(null)
   const { classes } = useStyles()
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      const response = await apiBackend.get('/release-notes/')
+      setNews(response)
+    }
+    fetchNews()
+  }, [])
+
+  console.log('test _news', _news)
 
   return (
     <>
@@ -18,19 +29,19 @@ export default function TutorialsCard() {
       </div>
 
       <>
-        {news?.entry?.map((entry, index) => (
+        {_news?.data?.results?.map((entry, index) => (
           <div key={index}>
             <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
             <Typography color="textSecondary" style={{ paddingBottom: 14 }}>
-              <b>{entry.news.title}</b>
+              <b>{entry.title}</b>
             </Typography>
-            {entry.news.message.map((item, midx) => (
+            {entry.message.map((item, midx) => (
               <Typography key={midx} color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
                 {item}
               </Typography>
             ))}
             <Typography color="textSecondary" style={{ paddingTop: 6 }}>
-              <b>{entry.news.footer}</b>
+              <b>{entry.author}</b>
             </Typography>
           </div>
         ))}
