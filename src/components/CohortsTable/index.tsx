@@ -275,11 +275,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                 return (
                   <TableRow
                     className={
-                      row.request_job_status === CohortJobStatus._pending ||
-                      row.request_job_status === CohortJobStatus._long_pending ||
-                      row.request_job_status === CohortJobStatus._failed
-                        ? classes.notAllow
-                        : classes.pointerHover
+                      row.request_job_status === CohortJobStatus._finished ? classes.pointerHover : classes.notAllow
                     }
                     hover
                     key={row.uuid}
