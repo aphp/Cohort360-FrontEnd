@@ -236,9 +236,7 @@ const MyRequests = () => {
               selectedProject={selectedProject}
             />
 
-            {selectedRequest !== null && selectedRequest?.uuid !== '' && (
-              <ModalAddOrEditRequest onClose={() => dispatch(setSelectedRequest(null))} />
-            )}
+            {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch(setSelectedRequest(null))} />}
 
             {selectedRequestShare !== null &&
               selectedRequestShare?.shared_query_snapshot !== undefined &&
