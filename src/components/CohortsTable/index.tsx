@@ -153,7 +153,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
         </Grid>
       )}
       {!loading && data.length < 1 && (
-        <Grid container justifyContent="center">
+        <Grid container justifyContent="center" style={{ marginTop: 10 }}>
           <Typography variant="button"> Aucune cohorte à afficher </Typography>
         </Grid>
       )}
