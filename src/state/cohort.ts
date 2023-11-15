@@ -60,7 +60,7 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, FetchCohortsParams,
         startDate: null,
         endDate: null
       }
-      const limit = options?.limit || 0
+      const limit = options?.limit || 20
       const offset = ((options?.page ?? 1) - 1) * limit
       const searchInput = options?.searchCriterias?.searchInput || ''
 
