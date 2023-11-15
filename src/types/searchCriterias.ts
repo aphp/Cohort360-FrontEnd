@@ -37,12 +37,6 @@ export enum VitalStatusOptionsLabel {
 }
 
 export enum VitalStatus {
-  ALIVE = 'alive',
-  DECEASED = 'deceased',
-  ALL = 'all'
-}
-
-export enum VitalStatusFilter {
   ALIVE = 'ALIVE',
   DECEASED = 'DECEASED',
   ALL = 'ALL'

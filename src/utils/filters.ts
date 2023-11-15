@@ -6,8 +6,8 @@ import {
   GenderStatus,
   GenderStatusLabel,
   LabelObject,
-  VitalStatusLabel,
-  VitalStatusFilter
+  VitalStatus,
+  VitalStatusLabel
 } from 'types/searchCriterias'
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
@@ -93,7 +93,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return GenderStatusLabel[value as GenderStatus]
   }
   if (key === FilterKeys.VITAL_STATUSES) {
-    return VitalStatusLabel[value as VitalStatusFilter]
+    return VitalStatusLabel[value as VitalStatus]
   }
   if (key === FilterKeys.START_DATE) {
     return `Après le : ${moment(value as string).format('DD/MM/YYYY')}`

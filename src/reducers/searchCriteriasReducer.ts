@@ -48,7 +48,7 @@ export const initSearchPatientsSearchCriterias: SearchCriterias<null> = {
 
 export const initPatientsSearchCriterias: SearchCriterias<PatientsFilters> = {
   orderBy: {
-    orderBy: Order.BIRTHDATE,
+    orderBy: Order.FAMILY,
     orderDirection: Direction.ASC
   },
   searchInput: '',

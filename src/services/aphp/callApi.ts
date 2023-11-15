@@ -129,7 +129,7 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
   if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`] // eslint-disable-line
   if (gender) options = [...options, `gender=${gender}`] // eslint-disable-line
-  if (_text) {
+  if (_text && _text.length > 0) {
     if (Array.isArray(_text)) {
       const searchInput = _text.map((text) => `${searchBy}=${encodeURIComponent(`"${text}"`)}`).join('&')
       options = [...options, searchInput]
@@ -138,8 +138,8 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
     }
   }
   if (deceased !== undefined) options = [...options, `deceased=${deceased}`] // eslint-disable-line
-  if (minBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=le${minBirthdate}`] // eslint-disable-line
-  if (maxBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=ge${maxBirthdate}`] // eslint-disable-line
+  if (minBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=ge${minBirthdate}`] // eslint-disable-line
+  if (maxBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=le${maxBirthdate}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
   if (pivotFacet && pivotFacet.length > 0)

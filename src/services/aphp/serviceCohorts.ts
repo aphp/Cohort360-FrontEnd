@@ -363,7 +363,8 @@ const servicesCohorts: IServiceCohorts = {
               : false
             : undefined,
         deidentified: deidentified,
-        signal: signal
+        signal: signal,
+        _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
       })
 
       const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
