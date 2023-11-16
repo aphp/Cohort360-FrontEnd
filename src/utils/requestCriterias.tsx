@@ -15,7 +15,7 @@ import allDocTypes from 'assets/docTypes.json'
 import { getDurationRangeLabel } from './age'
 import { displaySystem } from './displayValueSetSystem'
 import { CriteriaState } from 'state/criteria'
-import { Tooltip } from '@mui/material'
+import { Tooltip, Typography } from '@mui/material'
 
 const getMedicationTypeLabel = (type: MedicationType) => {
   switch (type) {
@@ -57,7 +57,11 @@ const getLabelFromCriteriaObject = (
       .map((obj: LabelCriteriaObject) => `${displaySystem(obj.system)} ${obj.label}`)
 
     const tooltipTitle = labels.join(' - ')
-    return <Tooltip title={tooltipTitle}>{tooltipTitle}</Tooltip>
+    return (
+      <Tooltip title={tooltipTitle}>
+        <Typography style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{tooltipTitle}</Typography>
+      </Tooltip>
+    )
   }
 }
 
