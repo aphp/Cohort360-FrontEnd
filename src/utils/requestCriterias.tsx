@@ -52,7 +52,10 @@ const getLabelFromCriteriaObject = (
 
   const criterion = criterionData[name]
   if (criterion !== 'loading') {
-    const labels = criterion
+    const removeDuplicates = (array: any[], key: string) => {
+      return array.filter((obj, index, self) => index === self.findIndex((el) => el[key] === obj[key]))
+    }
+    const labels = removeDuplicates(criterion, 'id')
       .filter((obj: any) => values.map((value) => value.id).includes(obj.id))
       .map((obj: LabelCriteriaObject) => `${displaySystem(obj.system)} ${obj.label}`)
 
