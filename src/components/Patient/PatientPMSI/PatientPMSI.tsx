@@ -151,7 +151,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
-      <BlockWrapper item xs={12} margin={'20px 0px'}>
+      <BlockWrapper item xs={12} margin={'20px 0px 10px'}>
         <Searchbar>
           <Grid container item xs={12} md={12} lg={8} xl={8} style={isSm ? { flexWrap: 'wrap-reverse' } : {}}>
             <Grid item xs={12} md={6} lg={6} xl={6}>
@@ -218,7 +218,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
         </Searchbar>
       </BlockWrapper>
       {filtersAsArray.length > 0 && (
-        <Grid item xs={12} margin="20px 0px">
+        <Grid item xs={12} margin="0px 0px 10px">
           {filtersAsArray.map((filter, index) => (
             <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
           ))}

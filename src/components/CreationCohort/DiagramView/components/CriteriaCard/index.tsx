@@ -72,7 +72,13 @@ const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriter
       >
         <Grid item xs={11} container ref={childrenRef} style={{ overflow: 'hidden' }}>
           {criteriasAsArray(criterion, criterion.type, criteria).map((label, index) => (
-            <ChipWrapper key={index} label={label} style={{ margin: 5, maxWidth: 'calc(100% - 5px)' }} />
+            <ChipWrapper
+              key={index}
+              label={label}
+              colorString="#0063AF"
+              backgroundColor="#FFF"
+              style={{ margin: 5, maxWidth: 'calc(100% - 5px)' }}
+            />
           ))}
         </Grid>
         <Grid item xs={1}>

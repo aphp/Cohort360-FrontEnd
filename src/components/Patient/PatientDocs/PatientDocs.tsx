@@ -128,7 +128,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
         )}
       </BlockWrapper>
 
-      <BlockWrapper item xs={12} margin={'20px 0px'}>
+      <BlockWrapper item xs={12} margin={'20px 0px 10px'}>
         <Searchbar>
           <Select
             selectedValue={searchBy || SearchByTypes.TEXT}
@@ -150,7 +150,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
         </Searchbar>
       </BlockWrapper>
       {filtersAsArray.length > 0 && (
-        <Grid item xs={12} margin="20px 0px 10px 0px">
+        <Grid item xs={12} margin="0px 0px 10px">
           {filtersAsArray.map((filter, index) => (
             <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
           ))}

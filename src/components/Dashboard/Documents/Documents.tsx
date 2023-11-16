@@ -131,7 +131,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
         )}
       </BlockWrapper>
 
-      <BlockWrapper item xs={12} margin="20px 0px">
+      <BlockWrapper item xs={12} margin="20px 0px 10px">
         <Searchbar>
           <Select
             selectedValue={searchBy || SearchByTypes.TEXT}
@@ -151,7 +151,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
             Filtrer
           </Button>
         </Searchbar>
-        <Grid item xs={12}>
+        <Grid item xs={12} style={{ marginTop: 10 }}>
           {filtersAsArray.map((filter, index) => (
             <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
           ))}

@@ -169,7 +169,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
               />
             )}
           </Grid>
-          <Grid container item alignItems="center" justifyContent="space-between">
+          <Grid container item alignItems="center" justifyContent="space-between" style={{ marginTop: 4 }}>
             <Button
               width={'45%'}
               icon={<FilterList height="15px" fill="#FFF" />}
@@ -213,7 +213,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
           </Grid>
         </Searchbar>
       </BlockWrapper>
-      <Grid item style={{ margin: '0 4px' }}>
+      <Grid item style={{ margin: '0 4px 4px' }}>
         {filtersAsArray.map((filter, index) => (
           <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
         ))}
