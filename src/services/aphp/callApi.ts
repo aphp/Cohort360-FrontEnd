@@ -616,9 +616,9 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   if (anabio || loinc)
     options = [
       ...options,
-      `code=${anabio ? encodeURIComponent('https://terminology.eds.aphp.fr/aphp-itm-anabio|') + anabio + ',' : ''}${
-        encodeURIComponent('https://terminology.eds.aphp.fr/aphp-itm-loinc|') + loinc
-      }`
+      `code=${anabio ? encodeURIComponent('https://terminology.eds.aphp.fr/aphp-itm-anabio|') + anabio : ''}${
+        anabio && loinc ? ',' : ''
+      }${loinc ? encodeURIComponent('https://terminology.eds.aphp.fr/aphp-itm-loinc|') + loinc : ''}`
     ] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line

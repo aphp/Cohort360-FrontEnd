@@ -57,7 +57,6 @@ export enum Order {
   RECORDED_DATE = 'recorded-date',
   FAMILY = 'family',
   DATE = 'date',
-  EFFECTIVE_DATETIME = 'effectiveDatetime',
   PERIOD_START = 'Period-start',
   CREATED = 'created',
   DIAGNOSIS = 'diagnosis',

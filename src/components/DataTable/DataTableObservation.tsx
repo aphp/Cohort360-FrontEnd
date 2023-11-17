@@ -104,9 +104,10 @@ const DataTableObservationLine: React.FC<{
   const libelleLOINC = observation.code?.coding?.find(
     (code) => code.id === 'CODE LOINC' || code.system === BIOLOGY_HIERARCHY_ITM_LOINC
   )?.display
-  const result = observation.valueQuantity?.value
-    ? `${observation.valueQuantity.value} ${observation.valueQuantity?.unit || ''}`
-    : '-'
+  const result =
+    observation.valueQuantity?.value !== null
+      ? `${observation.valueQuantity?.value} ${observation.valueQuantity?.unit || ''}`
+      : '-'
   const valueUnit = observation.valueQuantity?.unit ?? ''
   const serviceProvider = observation.serviceProvider
   const referenceRangeArray = observation.referenceRange?.[0]

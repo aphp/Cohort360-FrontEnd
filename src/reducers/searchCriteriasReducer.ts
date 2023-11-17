@@ -96,7 +96,7 @@ export const initMedSearchCriterias: SearchCriterias<MedicationFilters> = {
 
 export const initBioSearchCriterias: SearchCriterias<BiologyFilters> = {
   orderBy: {
-    orderBy: Order.EFFECTIVE_DATETIME,
+    orderBy: Order.DATE,
     orderDirection: Direction.ASC
   },
   searchInput: '',

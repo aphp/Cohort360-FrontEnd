@@ -188,7 +188,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
           setOrderBy={(orderBy) => changeOrderBy(orderBy)}
           page={page}
           setPage={(newPage) => setPage(newPage)}
-          total={searchResults.total}
+          total={searchResults.nb}
         />
       </Grid>
     </Grid>
