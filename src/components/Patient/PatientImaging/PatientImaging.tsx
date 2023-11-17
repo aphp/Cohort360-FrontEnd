@@ -12,16 +12,16 @@ import { BlockWrapper } from 'components/ui/Layout/'
 import Button from 'components/ui/Button'
 import Chip from 'components/ui/Chip/'
 import DataTableImaging from 'components/DataTable/DataTableImaging'
-import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilter'
+import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
-import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/ExecutiveUnitsFilter'
+import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import Modal from 'components/ui/Modal'
 import ModalityFilter from 'components/Filters/ModalityFilter/ModalityFilter'
-import NdaFilter from 'components/Filters/NdaFilter/NdaFilter'
+import NdaFilter from 'components/Filters/NdaFilter'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 
-import { _cancelPendingRequest } from 'utils/abortController'
+import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { CriteriaName, LoadingStatus } from 'types'
 import { PatientTypes } from 'types/patient'
@@ -112,7 +112,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
 
   useEffect(() => {
     if (loadingStatus === LoadingStatus.IDDLE) {
-      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      controllerRef.current = cancelPendingRequest(controllerRef.current)
       _fetchImaging()
     }
   }, [loadingStatus])
