@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import moment from 'moment'
 
-import Chip from '@mui/material/Chip'
+import Chip from 'components/ui/Chip'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Grid from '@mui/material/Grid'
@@ -351,16 +351,13 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
             </Button>
           </Grid>
 
-          <Grid container alignItems="center" justifyContent="flex-end" style={{ margin: 'auto' }}>
+          <Grid container alignItems="center" justifyContent="flex-end" style={{ margin: '10px auto' }}>
             {selectedTypes.length > 0 &&
               selectedTypes.map((diagnosticType) => (
                 <Chip
-                  className={classes.chips}
                   key={diagnosticType.id}
                   label={capitalizeFirstLetter(diagnosticType.label)}
                   onDelete={() => handleDeleteChip(diagnosticType)}
-                  color="primary"
-                  variant="outlined"
                 />
               ))}
           </Grid>
