@@ -522,7 +522,8 @@ export const syncOnChangeFormValue = async (
         selectedCriteria.type !== 'IPPList' &&
         selectedCriteria.type !== 'DocumentReference' &&
         selectedCriteria.type !== 'Encounter' &&
-        selectedCriteria.type !== 'Patient'
+        selectedCriteria.type !== 'Patient' &&
+        selectedCriteria.type !== 'ImagingStudy'
       ) {
         expandHierarchyCodes(
           optimizedHierarchySelection,
