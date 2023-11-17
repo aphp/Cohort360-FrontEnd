@@ -175,7 +175,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
       <BlockWrapper item xs={12} margin={'20px 0px 10px'}>
         <Searchbar>
           <Grid container item xs={12} md={12} lg={8} xl={8} style={isSm ? { flexWrap: 'wrap-reverse' } : {}}>
-            <Grid item xs={12} md={6} lg={6} xl={6}>
+            <Grid item xs={12} md={5} lg={5} xl={5}>
               <Tabs
                 values={medicationTabs}
                 active={selectedTab}
@@ -188,9 +188,9 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
               alignItems="center"
               item
               xs={12}
-              md={6}
-              lg={6}
-              xl={6}
+              md={7}
+              lg={7}
+              xl={7}
               style={isSm ? { marginBottom: 20 } : {}}
             >
               {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && (
