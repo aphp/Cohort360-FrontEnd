@@ -9,19 +9,20 @@ import ModalAdministrationComment from 'components/Patient/PatientMedication/Mod
 
 import displayDigit from 'utils/displayDigit'
 
-import { Column, Order, CohortMedication } from 'types'
+import { Column, CohortMedication } from 'types'
 
 import useStyles from './styles'
 import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
 import { MEDICATION_ATC, MEDICATION_ATC_ORBIS, MEDICATION_UCD } from '../../constants'
+import { OrderBy } from 'types/searchCriterias'
 
 type DataTableMedicationProps = {
   loading: boolean
   deidentified: boolean
   selectedTab: 'prescription' | 'administration'
   medicationsList: CohortMedication<MedicationRequest | MedicationAdministration>[]
-  order?: Order
-  setOrder?: (order: Order) => void
+  orderBy?: OrderBy
+  setOrderBy?: (order: OrderBy) => void
   page?: number
   setPage?: (page: number) => void
   total?: number
@@ -31,8 +32,8 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
   deidentified,
   selectedTab,
   medicationsList,
-  order,
-  setOrder,
+  orderBy,
+  setOrderBy,
   page,
   setPage,
   total
@@ -66,8 +67,8 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
   return (
     <DataTable
       columns={columns}
-      order={order}
-      setOrder={setOrder}
+      order={orderBy}
+      setOrder={setOrderBy}
       rowsPerPage={20}
       page={page}
       setPage={setPage}

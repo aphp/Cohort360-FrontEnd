@@ -4,15 +4,14 @@ import { Alert, Button, Divider, FormLabel, Grid, IconButton, Switch, Typography
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
-import InputSearchDocumentSimple from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentSimple'
-
-import { CriteriaDrawerComponentProps, IPPListDataType } from 'types'
+import { CriteriaDrawerComponentProps } from 'types'
 
 import useStyles from './styles'
+import { IPPListDataType, RessourceType } from 'types/requestCriterias'
 
 const defaultIPPList: IPPListDataType = {
   title: "Liste d'IPP",
-  type: 'IPPList',
+  type: RessourceType.IPP_LIST,
   search: '',
   isInclusive: true
 }
@@ -56,6 +55,8 @@ const IPPForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
 
     if (ippList.length > 0) {
       setError(false)
+    } else {
+      setError(true)
     }
   }, [defaultValues.search])
 
@@ -110,17 +111,16 @@ const IPPForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             {ippList.length} IPP détectés.
           </Typography>
 
-          <Grid className={classes.inputItem}>
-            <InputSearchDocumentSimple
+          <Grid item xs={12} className={classes.inputItem}>
+            <TextField
+              id="outlined-basic"
+              label=""
               placeholder="Ajouter une liste d'IPP"
-              defaultSearchInput={defaultValues.search}
-              setDefaultSearchInput={(newSearchInput: string) => _onChangeValue('search', newSearchInput)}
-              onSearchDocument={() => null}
-              noInfoIcon
-              noClearIcon
-              noSearchIcon
-              squareInput
+              variant="outlined"
+              onChange={(event) => _onChangeValue('search', event.target.value)}
+              multiline
               minRows={5}
+              style={{ width: '100%' }}
             />
           </Grid>
         </Grid>

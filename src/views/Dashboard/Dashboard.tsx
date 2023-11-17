@@ -188,7 +188,7 @@ const Dashboard: React.FC<{
           />
         )}
         {selectedTab === 'documents' && (
-          <Documents groupId={cohortId || perimetreIds} deidentifiedBoolean={dashboard.deidentifiedBoolean ?? false} />
+          <Documents groupId={cohortId || perimetreIds} deidentified={dashboard.deidentifiedBoolean ?? false} />
         )}
       </Grid>
     </Grid>

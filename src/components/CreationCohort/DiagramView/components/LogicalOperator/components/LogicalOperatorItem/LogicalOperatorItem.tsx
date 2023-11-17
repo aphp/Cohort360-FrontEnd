@@ -13,6 +13,7 @@ import {
 
 import useStyles from './styles'
 import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
+import { Comparators } from 'types/requestCriterias'
 
 type LogicalOperatorItemProps = {
   itemId: number
@@ -99,7 +100,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               ..._currentLogicalOperator,
               type: 'NamongM',
               options: {
-                operator: '<',
+                operator: Comparators.LESS,
                 number: 1,
                 timeDelayMin: 0,
                 timeDelayMax: 0
@@ -113,7 +114,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               ..._currentLogicalOperator,
               type: 'NamongM',
               options: {
-                operator: '>',
+                operator: Comparators.GREATER,
                 number: 1,
                 timeDelayMin: 0,
                 timeDelayMax: 0
@@ -127,7 +128,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               ..._currentLogicalOperator,
               type: 'NamongM',
               options: {
-                operator: '=',
+                operator: Comparators.EQUAL,
                 number: 1,
                 timeDelayMin: 0,
                 timeDelayMax: 0
@@ -152,7 +153,8 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
           ..._currentLogicalOperator,
           type: 'NamongM',
           options: {
-            operator: _currentLogicalOperator.type === 'NamongM' ? _currentLogicalOperator.options.operator : '<',
+            operator:
+              _currentLogicalOperator.type === 'NamongM' ? _currentLogicalOperator.options.operator : Comparators.LESS,
             number: value,
             timeDelayMin: _currentLogicalOperator.type === 'NamongM' ? _currentLogicalOperator.options.timeDelayMin : 0,
             timeDelayMax: _currentLogicalOperator.type === 'NamongM' ? _currentLogicalOperator.options.timeDelayMax : 0

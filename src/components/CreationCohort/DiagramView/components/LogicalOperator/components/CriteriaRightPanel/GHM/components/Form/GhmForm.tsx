@@ -4,14 +4,13 @@ import { Alert, Button, Divider, FormLabel, Grid, IconButton, Link, Switch, Text
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
-import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
-
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchClaim } from 'state/pmsi'
 import { CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
+import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
 
 type GHMFormProps = {
   isOpen: boolean
@@ -123,7 +122,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             onChangeValue={onChangeValue}
           />
 
-          <AutocompleteAsync
+          <InputAutocompleteAsync
             multiple
             label="Codes GHM"
             variant="outlined"

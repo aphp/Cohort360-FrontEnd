@@ -28,14 +28,15 @@ import { buildCohortCreation, updateTemporalConstraints } from 'state/cohortCrea
 
 import EventSequenceTable from '../EventSequenceTable/EventSequenceTable'
 import TemporalConstraintConfig from '../TemporalConstraintConfig/TemporalConstraintConfig'
-import { SelectedCriteriaType, TemporalConstraintsKind, TemporalConstraintsType } from 'types'
-import Avatar from 'components/ui/Avatar/Avatar'
+import { TemporalConstraintsKind, TemporalConstraintsType } from 'types'
+import { AvatarWrapper } from 'components/ui/Avatar/styles'
 import Card from 'components/ui/Card/Card'
 import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
 
 import useStyles from './styles'
 import _ from 'lodash'
 import { getSelectableGroups } from 'utils/temporalConstraints'
+import { SelectedCriteriaType } from 'types/requestCriterias'
 
 type EncounterConstraint = {
   selectedGroup: number | null
@@ -253,7 +254,9 @@ const TemporalConstraint: React.FC<{
                           xs={constraint.idList.length > 3 ? 6 : false}
                           sx={{ margin: '4px 0' }}
                         >
-                          <Avatar content={criteriaId} size={20} fontSize={12} marginLeft={0.5} marginRight={0.5} />
+                          <AvatarWrapper size={20} fontSize={12} marginLeft={0.5} marginRight={0.5}>
+                            {criteriaId}
+                          </AvatarWrapper>
                           {` - ${displayCriteria(criteriaId as number)}`}
                         </Grid>
                       ))}
@@ -309,8 +312,7 @@ const TemporalConstraint: React.FC<{
                         {getSelectableGroups(selectedCriteria, criteriaGroup).map((selectValue, index) => (
                           <MenuItem key={index} value={selectValue.id}>
                             {`${selectValue.title}`}
-                            <Avatar
-                              content={Math.abs(selectValue.id) + 1}
+                            <AvatarWrapper
                               backgroundColor="#FFE2A9"
                               color="#153D8A"
                               size={20}
@@ -318,7 +320,9 @@ const TemporalConstraint: React.FC<{
                               marginLeft={0.5}
                               marginRight={0.5}
                               bold
-                            />
+                            >
+                              {Math.abs(selectValue.id) + 1}
+                            </AvatarWrapper>
                           </MenuItem>
                         ))}
                       </Select>
@@ -359,13 +363,10 @@ const TemporalConstraint: React.FC<{
                             }
                             label={
                               <Grid container alignItems="center" wrap="nowrap">
-                                <Avatar
-                                  content={criteria.id}
-                                  size={20}
-                                  fontSize={12}
-                                  marginLeft={0.5}
-                                  marginRight={0.5}
-                                />
+                                <AvatarWrapper size={20} fontSize={12} marginLeft={0.5} marginRight={0.5}>
+                                  {criteria.id}
+                                </AvatarWrapper>
+
                                 {` - ${criteria.title}`}
                               </Grid>
                             }

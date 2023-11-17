@@ -15,12 +15,13 @@ import {
 } from '@mui/material'
 
 import useStyles from './styles'
-import { Column, Order } from 'types'
+import { Column } from 'types'
+import { Direction, OrderBy, Order } from 'types/searchCriterias'
 
 type DataTableProps = {
   columns: Column[]
-  order?: Order
-  setOrder?: (order: Order) => void
+  order?: OrderBy
+  setOrder?: (order: OrderBy) => void
   page?: number
   setPage?: (page: number) => void
   rowsPerPage?: number
@@ -41,18 +42,14 @@ const DataTable: React.FC<DataTableProps> = ({
 }) => {
   const { classes, cx } = useStyles()
 
-  const createSortHandler = (property: string) => () => {
+  const createSortHandler = (property: Order) => () => {
     if (setOrder) {
-      const isAsc: boolean = order?.orderBy === property && order?.orderDirection === 'asc'
-      const _orderDirection = isAsc ? 'desc' : 'asc'
-
       setOrder({
         orderBy: property,
-        orderDirection: _orderDirection
+        orderDirection: order?.orderDirection === Direction.ASC ? Direction.DESC : Direction.ASC
       })
     }
   }
-
   return (
     <Grid container justifyContent="flex-end">
       <TableContainer component={Paper}>
@@ -71,7 +68,7 @@ const DataTable: React.FC<DataTableProps> = ({
                       <TableSortLabel
                         active={order?.orderBy === column.code}
                         direction={order?.orderBy === column.code ? order?.orderDirection : 'asc'}
-                        onClick={createSortHandler(column.code || '')}
+                        onClick={createSortHandler(column.code as Order)}
                       >
                         {column.label}
                       </TableSortLabel>
@@ -90,7 +87,7 @@ const DataTable: React.FC<DataTableProps> = ({
                                 className={classes.multiple}
                                 active={order?.orderBy === subColumn.code}
                                 direction={order?.orderBy === subColumn.code ? order?.orderDirection : 'asc'}
-                                onClick={createSortHandler(subColumn.code || '')}
+                                onClick={createSortHandler(subColumn.code as Order)}
                               >
                                 {subColumn.label}
                               </TableSortLabel>

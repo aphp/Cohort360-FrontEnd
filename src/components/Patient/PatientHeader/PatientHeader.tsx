@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { CohortPatient, IPatientDetails, GenderStatus } from 'types'
+import { CohortPatient, IPatientDetails } from 'types'
 
 import Grid from '@mui/material/Grid'
 
@@ -10,6 +10,7 @@ import PatientInfo from './PatientInfo/PatientInfo'
 import { getAge } from 'utils/age'
 
 import useStyles from './styles'
+import { GenderStatus } from 'types/searchCriterias'
 
 type PatientHeaderProps = {
   patient?: IPatientDetails

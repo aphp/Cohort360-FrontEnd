@@ -6,13 +6,14 @@ import GHMHierarchy from './components/Hierarchy/GhmHierarchy'
 
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
-import { CLAIM, initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
+import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchClaim, PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
 import { CriteriaDrawerComponentProps } from 'types'
+import { RessourceType } from 'types/requestCriterias'
 
-export const defaultDemographic = {
-  type: CLAIM,
+export const defaultClaim = {
+  type: RessourceType.CLAIM,
   title: 'Critères GHM',
   code: [],
   occurrence: 1,
@@ -25,7 +26,7 @@ export const defaultDemographic = {
 const Index = (props: CriteriaDrawerComponentProps) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
-  const [defaultCriteria, setDefaultCriteria] = useState(selectedCriteria || defaultDemographic)
+  const [defaultCriteria, setDefaultCriteria] = useState(selectedCriteria || defaultClaim)
 
   const isEdition = selectedCriteria !== null
   const dispatch = useAppDispatch()
@@ -48,7 +49,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       newHierarchy,
       setDefaultCriteria,
       selectedTab,
-      defaultDemographic.type,
+      defaultClaim.type,
       dispatch
     )
 
@@ -58,7 +59,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       selectedCriteria,
       defaultCriteria && defaultCriteria.code ? defaultCriteria.code : [],
       fetchClaim,
-      defaultDemographic.type,
+      defaultClaim.type,
       dispatch
     )
   }

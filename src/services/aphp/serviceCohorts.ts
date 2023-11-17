@@ -3,16 +3,12 @@ import moment from 'moment'
 import {
   CohortComposition,
   CohortData,
-  SearchByTypes,
-  VitalStatus,
   Back_API_Response,
   Cohort,
   AgeRepartitionType,
   GenderRepartitionType,
-  searchInputError,
-  errorDetails,
-  GenderStatus,
-  ChartCode
+  ChartCode,
+  DocumentsData
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -44,6 +40,15 @@ import {
   Patient
 } from 'fhir/r4'
 import { CanceledError } from 'axios'
+import {
+  VitalStatus,
+  SearchCriterias,
+  PatientsFilters,
+  AllDocumentsFilters,
+  SearchByTypes
+} from 'types/searchCriterias'
+import services from '.'
+import { ErrorDetails, SearchInputError } from 'types/error'
 
 export interface IServiceCohorts {
   /**
@@ -92,14 +97,10 @@ export interface IServiceCohorts {
    *   - genderRepartitionMap: Données liées au graphique de la répartition par genre
    */
   fetchPatientList: (
-    page: number,
-    searchBy: SearchByTypes,
-    searchInput: string,
-    gender: GenderStatus[],
-    birthdates: [string, string],
-    vitalStatus: VitalStatus[],
-    sortBy: string,
-    sortDirection: string,
+    options: {
+      page: number
+      searchCriterias: SearchCriterias<PatientsFilters | null>
+    },
     deidentified: boolean,
     groupId?: string,
     includeFacets?: boolean,
@@ -132,29 +133,16 @@ export interface IServiceCohorts {
    *   - groupId: (optionnel) Périmètre auquel la cohorte est liée
    *   - signal: (optionnel) paramètre permettant d'identifier si une requête est déjà en cours et de l'annuler si besoin
    */
+
   fetchDocuments: (
-    deidentifiedBoolean: boolean,
-    searchBy: SearchByTypes,
-    sortBy: string,
-    sortDirection: string,
-    page: number,
-    searchInput: string,
-    selectedDocTypes: string[],
-    nda: string,
-    ipp: string,
-    onlyPdfAvailable: boolean,
-    signal?: AbortSignal,
-    startDate?: string | null,
-    endDate?: string | null,
+    options: {
+      deidentified: boolean
+      page: number
+      searchCriterias: SearchCriterias<AllDocumentsFilters>
+    },
     groupId?: string,
-    executiveUnits?: string[]
-  ) => Promise<{
-    totalDocs: number
-    totalAllDocs: number
-    totalPatientDocs: number
-    totalAllPatientDocs: number
-    documentsList: DocumentReference[]
-  }>
+    signal?: AbortSignal
+  ) => Promise<DocumentsData> | Promise<SearchInputError> | Promise<CanceledError<any>>
 
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
@@ -165,7 +153,7 @@ export interface IServiceCohorts {
    * Retourne:
    *   - searchInputError: objet décrivant la ou les erreurs du champ de recherche s'il y en a
    */
-  checkDocumentSearchInput: (searchInput: string, signal?: AbortSignal) => Promise<searchInputError>
+  checkDocumentSearchInput: (searchInput: string, signal?: AbortSignal) => Promise<SearchInputError>
 
   /**
    * Permet de récupérer le contenu d'un document
@@ -332,14 +320,7 @@ const servicesCohorts: IServiceCohorts = {
   },
 
   fetchPatientList: async (
-    page,
-    searchBy,
-    searchInput,
-    gender,
-    birthdates,
-    vitalStatus,
-    sortBy,
-    sortDirection,
+    { page, searchCriterias: { orderBy, searchBy, searchInput, filters } },
     deidentified,
     groupId,
     includeFacets,
@@ -352,29 +333,38 @@ const servicesCohorts: IServiceCohorts = {
         .split(' ') // Split by space (= ['mot1', 'mot2' ...])
         .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
 
-      if (searchBy === SearchByTypes.identifier) {
+      if (searchBy === SearchByTypes.IDENTIFIER) {
         _searchInput = _searchInput.join()
       }
 
       // convert birthdates into days or months depending of if it's a deidentified perimeter or not
-      const minBirthdate = Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
-      const maxBirthdate = Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
-
+      const minBirthdate =
+        filters?.birthdatesRanges &&
+        Math.abs(moment(filters.birthdatesRanges[0]).diff(moment(), deidentified ? 'months' : 'days'))
+      const maxBirthdate =
+        filters?.birthdatesRanges &&
+        Math.abs(moment(filters.birthdatesRanges[1]).diff(moment(), deidentified ? 'months' : 'days'))
       const patientsResp = await fetchPatient({
         size: 20,
         offset: page ? (page - 1) * 20 : 0,
-        _sort: sortBy,
-        sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+        _sort: orderBy.orderBy,
+        sortDirection: orderBy.orderDirection,
         pivotFacet: includeFacets ? ['age-month_gender', 'deceased_gender'] : [],
         _list: groupId ? [groupId] : [],
-        gender: gender.join(',') + ``,
+        gender: filters && filters.genders.join(','),
         searchBy,
         _text: _searchInput,
         minBirthdate: minBirthdate,
         maxBirthdate: maxBirthdate,
-        deceased: vitalStatus.length === 1 ? (vitalStatus.includes(VitalStatus.DECEASED) ? true : false) : undefined,
+        deceased:
+          filters && filters.vitalStatuses && filters.vitalStatuses.length === 1
+            ? filters.vitalStatuses.includes(VitalStatus.DECEASED)
+              ? true
+              : false
+            : undefined,
         deidentified: deidentified,
-        signal: signal
+        signal: signal,
+        _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
       })
 
       const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
@@ -410,36 +400,37 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
-  fetchDocuments: async (
-    deidentifiedBoolean,
-    searchBy,
-    sortBy,
-    sortDirection,
-    page,
-    searchInput,
-    selectedDocTypes,
-    nda,
-    ipp,
-    onlyPdfAvailable,
-    signal,
-    startDate,
-    endDate,
-    groupId,
-    executiveUnits
-  ) => {
+  fetchDocuments: async (options, groupId, signal) => {
+    const {
+      deidentified,
+      page,
+      searchCriterias: {
+        orderBy,
+        searchInput,
+        searchBy,
+        filters: { docTypes, endDate, executiveUnits, ipp, nda, onlyPdfAvailable, startDate }
+      }
+    } = options
+    if (searchInput) {
+      const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)
+      if (searchInputError && searchInputError.isError) {
+        throw searchInputError
+      }
+    }
     const [docsList, allDocsList] = await Promise.all([
       fetchDocumentReference({
         size: 20,
         offset: page ? (page - 1) * 20 : 0,
         searchBy: searchBy,
-        _sort: sortBy,
-        sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+        _sort: orderBy.orderBy,
+        sortDirection: orderBy.orderDirection,
         status: 'final',
         _elements: searchInput ? [] : undefined,
         _list: groupId ? [groupId] : [],
         _text: searchInput,
-        highlight_search_results: true,
-        type: selectedDocTypes.length > 0 ? selectedDocTypes.join(',') : '',
+        highlight_search_results: searchBy === SearchByTypes.TEXT ? true : false,
+        type:
+          docTypes.map((docType) => docType.code).length > 0 ? docTypes.map((docType) => docType.code).join(',') : '',
         'encounter-identifier': nda,
         'patient-identifier': ipp,
         onlyPdfAvailable: onlyPdfAvailable,
@@ -447,9 +438,9 @@ const servicesCohorts: IServiceCohorts = {
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
         uniqueFacet: ['subject'],
-        executiveUnits
+        executiveUnits: executiveUnits.map((eu) => eu.id)
       }),
-      !!searchInput || selectedDocTypes.length > 0 || !!nda || !!ipp || !!startDate || !!endDate
+      !!searchInput || docTypes.length > 0 || !!nda || !!ipp || !!startDate || !!endDate
         ? fetchDocumentReference({
             signal: signal,
             status: 'final',
@@ -481,12 +472,7 @@ const servicesCohorts: IServiceCohorts = {
           ).valueDecimal
         : totalPatientDocs
 
-    const documentsList = await getDocumentInfos(
-      deidentifiedBoolean,
-      getApiResponseResources(docsList),
-      groupId,
-      signal
-    )
+    const documentsList = await getDocumentInfos(deidentified, getApiResponseResources(docsList), groupId, signal)
 
     return {
       totalDocs: totalDocs ?? 0,
@@ -509,7 +495,7 @@ const servicesCohorts: IServiceCohorts = {
     if (checkDocumentSearchInput) {
       const errors = checkDocumentSearchInput.find((parameter) => parameter.name === 'WARNING')?.part ?? []
 
-      const parsedErrors: errorDetails[] = []
+      const parsedErrors: ErrorDetails[] = []
 
       errors.forEach((error: ParametersParameter) => {
         try {

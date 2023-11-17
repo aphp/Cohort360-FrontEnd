@@ -31,13 +31,13 @@ import { ReactComponent as StarIcon } from 'assets/icones/star.svg'
 import { ReactComponent as StarFullIcon } from 'assets/icones/star full.svg'
 import MoreButton from '@mui/icons-material/MoreVert'
 
-import Avatar from 'components/ui/Avatar/Avatar'
+import { AvatarWrapper } from 'components/ui/Avatar/styles'
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
-import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
+import ModalEditCohort from 'components/Requests/Modals/ModalEditCohort/ModalEditCohort'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { favoriteExploredCohort } from 'state/exploredCohort'
-import { deleteCohort, fetchCohorts as fetchCohortsList, setSelectedCohort } from 'state/cohort'
+import { deleteCohort, setSelectedCohort } from 'state/cohort'
 import { MeState } from 'state/me'
 
 import services from 'services/aphp'
@@ -63,9 +63,8 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active
 
-  const { dashboard, cohortList } = useAppSelector((state) => ({
-    dashboard: state.exploredCohort,
-    cohortList: state.cohort.cohortsList
+  const { dashboard } = useAppSelector((state) => ({
+    dashboard: state.exploredCohort
   }))
   const [isExtended, onExtend] = useState(false)
   const [openModal, setOpenModal] = useState<'' | 'edit' | 'export' | 'delete'>('')
@@ -177,7 +176,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
             >
               <Grid item xs={9} direction="row" container style={{ flexWrap: 'nowrap' }}>
                 <Grid container style={{ width: 40 }} alignItems="center">
-                  <Avatar content={cohort.icon} size={40} />
+                  <AvatarWrapper size={40}>{cohort.icon}</AvatarWrapper>
                 </Grid>
 
                 <Grid
@@ -304,9 +303,6 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                   <MenuItem
                     onClick={async () => {
                       setAnchorEl(null)
-                      if (!cohortList || (cohortList && cohortList.length === 0)) {
-                        await dispatch(fetchCohortsList({}))
-                      }
                       await dispatch(setSelectedCohort(dashboard ?? null))
                       setOpenModal('edit')
                     }}

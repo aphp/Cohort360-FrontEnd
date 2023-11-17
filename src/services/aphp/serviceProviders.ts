@@ -1,13 +1,12 @@
+import { Direction, OrderBy } from 'types/searchCriterias'
 import apiBack from '../apiBackend'
 
-import { Order } from 'types'
-
-export const getProviders = async (order: Order, page?: number, searchInput?: string) => {
+export const getProviders = async (orderBy: OrderBy, page?: number, searchInput?: string) => {
   const searchFilter = searchInput ? `&search=${searchInput}` : ''
 
   const providersResp = await apiBack.get<any>(
-    `/users/?manual_only=true&page=${page}&ordering=${order.orderDirection === 'desc' ? '-' : ''}${
-      order.orderBy
+    `/users/?manual_only=true&page=${page}&ordering=${orderBy.orderDirection === Direction.DESC ? '-' : ''}${
+      orderBy.orderBy
     }${searchFilter}`
   )
 

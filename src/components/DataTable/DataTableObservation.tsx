@@ -4,17 +4,18 @@ import { CircularProgress, Grid, Typography, TableRow, TableCell } from '@mui/ma
 
 import DataTable from 'components/DataTable/DataTable'
 
-import { Column, Order, CohortObservation } from 'types'
+import { Column, CohortObservation } from 'types'
 
 import useStyles from './styles'
 import { BIOLOGY_HIERARCHY_ITM_LOINC, BIOLOGY_HIERARCHY_ITM_ANABIO } from '../../constants'
+import { Order, OrderBy } from 'types/searchCriterias'
 
 type DataTableObservationProps = {
   loading: boolean
   deidentified: boolean
   observationsList: CohortObservation[]
-  order: Order
-  setOrder?: (order: Order) => void
+  orderBy: OrderBy
+  setOrderBy?: (order: OrderBy) => void
   page?: number
   setPage?: (page: number) => void
   total?: number
@@ -23,8 +24,8 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
   loading,
   deidentified,
   observationsList,
-  order,
-  setOrder,
+  orderBy,
+  setOrderBy,
   page,
   setPage,
   total
@@ -33,9 +34,9 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
 
   const columns: Column[] = [
     { label: `NDA${deidentified ? ' chiffré' : ''}`, code: '', align: 'left', sortableColumn: false },
-    { label: 'Date de prélèvement', code: 'date', align: 'center', sortableColumn: true },
-    { label: 'ANABIO', code: 'code-anabio', align: 'center', sortableColumn: true },
-    { label: 'LOINC', code: 'code-loinc', align: 'center', sortableColumn: true },
+    { label: 'Date de prélèvement', code: Order.DATE, align: 'center', sortableColumn: true },
+    { label: 'ANABIO', code: Order.ANABIO, align: 'center', sortableColumn: true },
+    { label: 'LOINC', code: Order.LOINC, align: 'center', sortableColumn: true },
     { label: 'Résultat', code: '', align: 'center', sortableColumn: false },
     { label: 'Valeurs de référence', code: '', align: 'center', sortableColumn: false },
     { label: 'Unité exécutrice', code: '', align: 'center', sortableColumn: false }
@@ -44,8 +45,8 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
   return (
     <DataTable
       columns={columns}
-      order={order}
-      setOrder={setOrder}
+      order={orderBy}
+      setOrder={setOrderBy}
       rowsPerPage={20}
       page={page}
       setPage={setPage}
@@ -103,9 +104,10 @@ const DataTableObservationLine: React.FC<{
   const libelleLOINC = observation.code?.coding?.find(
     (code) => code.id === 'CODE LOINC' || code.system === BIOLOGY_HIERARCHY_ITM_LOINC
   )?.display
-  const result = observation.valueQuantity?.value
-    ? `${observation.valueQuantity.value} ${observation.valueQuantity?.unit || ''}`
-    : '-'
+  const result =
+    observation.valueQuantity?.value !== null
+      ? `${observation.valueQuantity?.value} ${observation.valueQuantity?.unit || ''}`
+      : '-'
   const valueUnit = observation.valueQuantity?.unit ?? ''
   const serviceProvider = observation.serviceProvider
   const referenceRangeArray = observation.referenceRange?.[0]
