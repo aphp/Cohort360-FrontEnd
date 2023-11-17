@@ -164,7 +164,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
             <Grid
               container
               justifyContent={isSm ? 'flex-start' : isMd ? 'flex-end' : 'center'}
-              alignItems="center"
+              alignItems="end"
               item
               xs={12}
               md={7}

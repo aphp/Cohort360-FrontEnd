@@ -26,5 +26,8 @@ export const TabWrapper = styled(Tab)<CustomProps>(({ width }) => ({
     color: '#FFF',
     fontWeight: 900,
     fontSize: 12
+  },
+  '&.MuiButtonBase-root.MuiTab-root': {
+    minHeight: 40
   }
 }))

@@ -10,7 +10,7 @@ export const SearchbarWrapper = styled('div')<CustomProps>(({ wrap }) => ({
   display: 'flex',
   flexWrap: wrap ? 'wrap' : 'wrap-reverse',
   justifyContent: 'space-between',
-  alignItems: 'center'
+  alignItems: 'end'
 }))
 
 export const SelectWrapper = styled('div')<CustomProps>(({ width }) => ({
