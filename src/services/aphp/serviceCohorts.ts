@@ -428,7 +428,7 @@ const servicesCohorts: IServiceCohorts = {
         _elements: searchInput ? [] : undefined,
         _list: groupId ? [groupId] : [],
         _text: searchInput,
-        highlight_search_results: true,
+        highlight_search_results: searchBy === SearchByTypes.TEXT ? true : false,
         type:
           docTypes.map((docType) => docType.code).length > 0 ? docTypes.map((docType) => docType.code).join(',') : '',
         'encounter-identifier': nda,

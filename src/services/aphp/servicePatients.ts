@@ -599,7 +599,7 @@ const servicesPatients: IServicePatients = {
       offset: page ? (page - 1) * documentLines : 0,
       status: 'final',
       _text: searchInput,
-      highlight_search_results: true,
+      highlight_search_results: searchBy === SearchByTypes.TEXT ? true : false,
       type: selectedDocTypes.join(','),
       'encounter-identifier': nda,
       onlyPdfAvailable: onlyPdfAvailable,

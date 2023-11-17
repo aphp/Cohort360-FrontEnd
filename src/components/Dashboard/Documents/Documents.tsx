@@ -205,7 +205,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
         showIpp
         loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
         deidentified={deidentified}
-        searchMode={searchInput !== ''}
+        searchMode={searchInput !== '' && searchBy === SearchByTypes.TEXT}
         groupId={groupId}
         documentsList={documents ?? []}
         orderBy={orderBy}
