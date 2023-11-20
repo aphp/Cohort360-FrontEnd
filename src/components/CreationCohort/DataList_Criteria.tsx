@@ -205,7 +205,7 @@ const criteriaList: CriteriaItemType[] = [
     ]
   },
   {
-    id: 'Imaging',
+    id: 'ImagingStudy',
     title: 'Imagerie',
     color: ODD_IMAGING ? '#0063AF' : '#808080',
     fontWeight: 'bold',

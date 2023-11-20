@@ -99,7 +99,8 @@ export enum CriteriaDataKey {
   MEDICATION_DATA = 'medicationData',
   PRESCRIPTION_TYPES = 'prescriptionTypes',
   ADMINISTRATIONS = 'administrations',
-  BIOLOGY_DATA = 'biologyData'
+  BIOLOGY_DATA = 'biologyData',
+  MODALITIES = 'modalities'
 }
 
 export type CcamDataType = {
@@ -271,14 +272,14 @@ export type ImagingDataType = {
   instancesComparator: Comparators
   withDocument: DocumentAttachmentMethod
   daysOfDelay: string | null
-  studyUuid: string
+  studyUid: string
   seriesStartDate: string | null
   seriesEndDate: string | null
   seriesDescription: string
   seriesProtocol: string
   seriesModalities: LabelObject[] | null
   bodySite: string
-  seriesUuid: string
+  seriesUid: string
   encounterEndDate: string | null
   encounterStartDate: string | null
   occurrence: number

@@ -84,13 +84,13 @@ const IMAGING_STUDY_PROCEDURE = 'procedureCode'
 const IMAGING_NB_OF_SERIES = 'numberOfSeries'
 const IMAGING_NB_OF_INS = 'numberOfInstances'
 const IMAGING_WITH_DOCUMENT = 'with-document'
-const IMAGING_STUDY_UUID = 'identifier'
+const IMAGING_STUDY_UID = 'identifier'
 const IMAGING_SERIES_DATE = 'series-started'
 const IMAGING_SERIES_DESCRIPTION = 'series-description'
 const IMAGING_SERIES_PROTOCOL = 'series-protocol'
 const IMAGING_SERIES_MODALITIES = 'series-modality'
 const IMAGING_BODYSITE = 'bodysite'
-const IMAGING_SERIES_UUID = 'series'
+const IMAGING_SERIES_UID = 'series'
 
 export const UNITE_EXECUTRICE = 'Unité exécutrice'
 export const STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE = 'Structure hospitalière de prise en charge'
@@ -612,7 +612,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
               }`
             : ''
         }`,
-        `${criterion.studyUuid ? `${IMAGING_STUDY_UUID}=${IMAGING_STUDY_UID_URL}|${criterion.studyUuid}` : ''}`,
+        `${criterion.studyUid ? `${IMAGING_STUDY_UID}=${IMAGING_STUDY_UID_URL}|${criterion.studyUid}` : ''}`,
         `${
           criterion.seriesStartDate
             ? `${IMAGING_SERIES_DATE}=ge${moment(criterion.seriesStartDate).format('YYYY-MM-DD[T00:00:00Z]')}`
@@ -639,7 +639,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
             : ''
         }`,
         `${criterion.bodySite ? `${IMAGING_BODYSITE}=${encodeURIComponent(criterion.bodySite)}` : ''}`,
-        `${criterion.seriesUuid ? `${IMAGING_SERIES_UUID}=${criterion.seriesUuid}` : ''}`
+        `${criterion.seriesUid ? `${IMAGING_SERIES_UID}=${criterion.seriesUid}` : ''}`
       ]
         .filter((elem) => elem)
         .reduce(filterReducer)
@@ -1641,14 +1641,14 @@ export async function unbuildRequest(_json: string): Promise<any> {
           currentCriterion.numberOfIns = 1
           currentCriterion.instancesComparator = Comparators.GREATER_OR_EQUAL
           currentCriterion.withDocument = DocumentAttachmentMethod.NONE
-          currentCriterion.studyUuid = ''
+          currentCriterion.studyUid = ''
           currentCriterion.seriesStartDate = null
           currentCriterion.seriesEndDate = null
           currentCriterion.seriesDescription = ''
           currentCriterion.seriesProtocol = ''
           currentCriterion.seriesModalities = []
           currentCriterion.bodySite = ''
-          currentCriterion.seriesUuid = ''
+          currentCriterion.seriesUid = ''
           currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
@@ -1701,8 +1701,8 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 currentCriterion.daysOfDelay = parsedDocumentAttachment.daysOfDelay
                 break
               }
-              case IMAGING_STUDY_UUID: {
-                currentCriterion.studyUuid = value.replace(`${IMAGING_STUDY_UID_URL}|`, '') ?? ''
+              case IMAGING_STUDY_UID: {
+                currentCriterion.studyUid = value.replace(`${IMAGING_STUDY_UID_URL}|`, '') ?? ''
                 break
               }
               case IMAGING_SERIES_DATE: {
@@ -1735,8 +1735,8 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 currentCriterion.bodySite = value ? decodeURIComponent(value) : ''
                 break
               }
-              case IMAGING_SERIES_UUID: {
-                currentCriterion.seriesUuid = value ?? ''
+              case IMAGING_SERIES_UID: {
+                currentCriterion.seriesUid = value ?? ''
                 break
               }
             }

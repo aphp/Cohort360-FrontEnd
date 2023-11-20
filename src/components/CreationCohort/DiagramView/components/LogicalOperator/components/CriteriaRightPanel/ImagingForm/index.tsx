@@ -3,19 +3,21 @@ import { Autocomplete, FormLabel, Grid, MenuItem, Select, TextField, Tooltip } f
 import InfoIcon from '@mui/icons-material/Info'
 import { BlockWrapper } from 'components/ui/Layout'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
+import Collapse from 'components/ui/Collapse'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import { CriteriaDrawerComponentProps, CriteriaName } from 'types'
-import { Comparators, RessourceType } from 'types/requestCriterias'
-import { DocumentAttachmentMethod, DocumentAttachmentMethodLabel, LabelObject } from 'types/searchCriterias'
-import CriteriaLayout from '../CriteriaLayout'
-import OccurenceInput from 'components/ui/Inputs/Occurences'
-import useStyles from './styles'
-import { TextFieldWrapper } from 'components/ui/Inputs/DurationRange/styles'
 import { DurationUnitWrapper } from 'components/ui/Inputs/DurationRange/styles'
-import { CalendarRequestLabel } from 'types/dates'
+import { TextFieldWrapper } from 'components/ui/Inputs/DurationRange/styles'
+import OccurenceInput from 'components/ui/Inputs/Occurences'
+import CriteriaLayout from '../CriteriaLayout'
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
-import Collapse from 'components/ui/Collapse'
+
+import { CriteriaDrawerComponentProps, CriteriaName } from 'types'
+import { CalendarRequestLabel } from 'types/dates'
+import { Comparators, CriteriaDataKey, RessourceType } from 'types/requestCriterias'
+import { DocumentAttachmentMethod, DocumentAttachmentMethodLabel, LabelObject } from 'types/searchCriterias'
+import useStyles from './styles'
+import { mappingCriteria } from '../DemographicForm'
 
 enum Error {
   EMPTY_FORM,
@@ -50,7 +52,9 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [isInclusive, setIsInclusive] = useState(selectedCriteria?.isInclusive || true)
   const [studyStartDate, setStudyStartDate] = useState<string | null>(selectedCriteria?.studyStartDate || null)
   const [studyEndDate, setStudyEndDate] = useState<string | null>(selectedCriteria?.studyEndDate || null)
-  const [studyModalities, setStudyModalities] = useState<LabelObject[]>(selectedCriteria?.modalities || [])
+  const [studyModalities, setStudyModalities] = useState<LabelObject[]>(
+    mappingCriteria(selectedCriteria?.studyModalities, CriteriaDataKey.MODALITIES, criteria) || []
+  )
   const [studyDescription, setStudyDescription] = useState<string>(selectedCriteria?.studyDescription || '')
   const [studyProcedure, setStudyProcedure] = useState<string>(selectedCriteria?.studyProcedure || '')
   const [numberOfSeries, setNumberOfSeries] = useState<number>(selectedCriteria?.numberOfSeries || 1)
@@ -65,16 +69,18 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
     selectedCriteria?.withDocument || DocumentAttachmentMethod.NONE
   )
   const [daysOfDelay, setDaysOfDelay] = useState<string | null>(selectedCriteria?.daysOfDelay || null)
-  const [studyUuid, setStudyUuid] = useState<string>(selectedCriteria?.studyUuid || '')
+  const [studyUid, setStudyUid] = useState<string>(selectedCriteria?.studyUid || '')
   const isEdition = selectedCriteria !== null ? true : false
 
   const [seriesStartDate, setSeriesStartDate] = useState<string | null>(selectedCriteria?.seriesStartDate || null)
   const [seriesEndDate, setSeriesEndDate] = useState<string | null>(selectedCriteria?.seriesEndDate || null)
   const [seriesDescription, setSeriesDescription] = useState<string>(selectedCriteria?.seriesDescription || '')
   const [seriesProtocol, setSeriesProtocol] = useState<string>(selectedCriteria?.seriesProtocol || '')
-  const [seriesModalities, setSeriesModalities] = useState<LabelObject[]>(selectedCriteria?.seriesModalities || [])
+  const [seriesModalities, setSeriesModalities] = useState<LabelObject[]>(
+    mappingCriteria(selectedCriteria?.seriesModalities, CriteriaDataKey.MODALITIES, criteria) || []
+  )
   const [bodySite, setBodySite] = useState<string>(selectedCriteria?.bodySite || '')
-  const [seriesUuid, setSeriesUuid] = useState(selectedCriteria?.seriesUuid || '')
+  const [seriesUid, setSeriesUid] = useState(selectedCriteria?.seriesUid || '')
   const [encounterService, setEncounterService] = useState(selectedCriteria?.encounterService || [])
   const [encounterStartDate, setEncounterStartDate] = useState(selectedCriteria?.encounterStartDate || null)
   const [encounterEndDate, setEncounterEndDate] = useState(selectedCriteria?.encounterEndDate || null)
@@ -128,14 +134,14 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
       instancesComparator,
       withDocument,
       daysOfDelay,
-      studyUuid,
+      studyUid,
       seriesStartDate,
       seriesEndDate,
       seriesDescription,
       seriesProtocol,
       seriesModalities,
       bodySite,
-      seriesUuid,
+      seriesUid,
       encounterService,
       encounterStartDate,
       encounterEndDate,
@@ -290,13 +296,13 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             </Grid>
           )}
 
-          {/* Recherche par uuid */}
+          {/* Recherche par uid */}
           <TextField
             label=""
-            placeholder="Ajouter une liste d'uuid"
-            value={studyUuid}
+            placeholder="Ajouter une liste d'uid"
+            value={studyUid}
             variant="outlined"
-            onChange={(event) => setStudyUuid(event.target.value)}
+            onChange={(event) => setStudyUid(event.target.value)}
             multiline
             minRows={5}
             style={{ width: '100%' }}
@@ -369,13 +375,13 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             </Grid>
           </Searchbar>
 
-          {/* Recherche par uuid */}
+          {/* Recherche par uid */}
           <TextField
             label=""
-            placeholder="Ajouter une liste d'uuid"
+            placeholder="Ajouter une liste d'uid"
             variant="outlined"
-            value={seriesUuid}
-            onChange={(event) => setSeriesUuid(event.target.value)}
+            value={seriesUid}
+            onChange={(event) => setSeriesUid(event.target.value)}
             multiline
             minRows={5}
             style={{ width: '100%' }}
