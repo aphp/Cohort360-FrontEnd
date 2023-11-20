@@ -90,11 +90,25 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [error, setError] = useState(Error.NO_ERROR)
 
   const _onChangeValue = (key: string, value: any) => {
-    console.log('key', key)
-    console.log('value', value)
-    // const _defaultValues = defaultValues ? { ...defaultValues } : {}
-    // _defaultValues[key] = value
-    // setDefaultValues(_defaultValues)
+    switch (key) {
+      case 'encounterService':
+        setEncounterService(value)
+        break
+      case 'encounterStartDate':
+        setEncounterStartDate(value)
+        break
+      case 'encounterEndDate':
+        setEncounterEndDate(value)
+        break
+      case 'startOccurrence':
+        setStartOccurence(value)
+        break
+      case 'endOccurrence':
+        setEndOccurence(value)
+        break
+      default:
+        break
+    }
   }
 
   useEffect(() => {
