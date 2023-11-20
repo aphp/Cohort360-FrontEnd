@@ -1320,6 +1320,9 @@ function linkElementWithEncounter<
       case 'Observation':
         encounterId = (entry as Observation).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
+      case 'ImagingStudy':
+        encounterId = (entry as ImagingStudy).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
+        break
     }
 
     const foundEncounter = encounterList.find(({ id }) => id === encounterId) || null
