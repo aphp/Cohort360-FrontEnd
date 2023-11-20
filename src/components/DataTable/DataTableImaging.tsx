@@ -40,13 +40,13 @@ const DataTableImaging: React.FC<DataTableImagingProps> = ({
 }) => {
   const columns: Column[] = [
     { label: '', align: 'left' },
-    { label: `NDA${deidentified ? 'chiffré' : ''}`, align: 'left' },
+    { label: `NDA${deidentified ? ' chiffré' : ''}`, align: 'left' },
     { label: 'Date' },
     { label: 'Modalité' },
     { label: 'Description' },
     { label: 'Procédure' },
     { label: 'Nombre de séries' },
-    { label: 'Access number' },
+    ...(!deidentified ? [{ label: 'Access number' }] : []),
     { label: 'Unité exécutrice' },
     { label: 'Comptes rendus' }
   ]
