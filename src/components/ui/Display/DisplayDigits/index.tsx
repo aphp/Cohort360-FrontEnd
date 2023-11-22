@@ -18,10 +18,10 @@ const DisplayDigits = ({ nb, total, label, color = '#153D8A' }: DisplayDigitsPro
         {displayDigit(nb ?? 0)}
         {total !== undefined && (
           <>
-            <span style={{ color: color, fontSize: 12 }}>/</span> {displayDigit(total ?? 0)}{' '}
+            <span style={{ color: color, fontSize: 12 }}> /</span> {displayDigit(total ?? 0)}{' '}
           </>
         )}
-        <span style={{ color: color, fontSize: 12 }}>&nbsp;{label}</span>
+        <span style={{ color: color, fontSize: 14 }}>&nbsp;{label}</span>
       </Typography>
     </DisplayDigitsWrapper>
   )
