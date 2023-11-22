@@ -20,7 +20,8 @@ import {
   fetchObservation,
   fetchImaging,
   postFilters,
-  getFilters
+  getFilters,
+  deleteFilters
 } from './callApi'
 
 import servicesPerimeters from './servicePerimeters'
@@ -854,5 +855,14 @@ export const getFiltersService = async (fhir_resource: RessourceType, limit = 20
     return response.data
   } catch {
     throw "Les filtres sauvegardés n'ont pas pu être récupérés."
+  }
+}
+
+export const deleteFiltersService = async (fhir_resource_uuid: string) => {
+  try {
+    const response = await deleteFilters(fhir_resource_uuid)
+    return response
+  } catch {
+    throw "Le filtre n'a pas pu être supprimé."
   }
 }

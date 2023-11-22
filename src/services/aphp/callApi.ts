@@ -387,6 +387,11 @@ export const getFilters = async (
   const res = await apiBackend.get(`/cohort/fhir-filters/?${options.reduce(paramsReducer)}`)
   return res
 }
+
+export const deleteFilters = async (fhir_resource_uuid: string): Promise<AxiosResponse<void>> => {
+  const res = await apiBackend.delete(`/cohort/fhir-filters/${fhir_resource_uuid}`)
+  return res
+}
 /**
  * Binary Resource
  *

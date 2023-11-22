@@ -6,6 +6,7 @@ import { Item } from 'components/ui/ListItems/ListItem'
 import Button from 'components/ui/Button'
 import { DeleteOutline } from '@mui/icons-material'
 import { Grid, Typography } from '@mui/material'
+import { deleteFiltersService } from 'services/aphp/servicePatients'
 
 enum Mode {
   SINGLE,
@@ -36,6 +37,19 @@ const FiltersList = ({ name, values }: FiltersListProps) => {
     // setSelectedFilter(newFilter)
   }
 
+  const handleDeleteSelectedFilters = async () => {
+    const newFilters = filters.reduce((accumulator, filter) => {
+      if (filter.checked) {
+        deleteFiltersService(filter.id)
+      } else {
+        accumulator.push(filter)
+      }
+      return accumulator
+    }, [] as Item[])
+
+    setFilters(newFilters)
+  }
+
   useEffect(() => {
     if (context?.updateFormData) {
       const matched = values.find((filter) => filter.uuid === (selectedFilter?.id ?? null)) || null
@@ -55,6 +69,7 @@ const FiltersList = ({ name, values }: FiltersListProps) => {
         return { id: value.uuid, name: value.name, checked: false }
       })
     )
+    console.log(filters)
   }, [mode])
 
   return (
@@ -68,7 +83,7 @@ const FiltersList = ({ name, values }: FiltersListProps) => {
       )}
       {mode === Mode.MULTIPLE && (
         <Grid container justifyContent="space-between" item xs={8} margin="0px 0px 20px 0px">
-          <Button width="60%" icon={<DeleteOutline />} color="error" onClick={() => console.log('delete filters')}>
+          <Button width="60%" icon={<DeleteOutline />} color="error" onClick={handleDeleteSelectedFilters}>
             Confirmer
           </Button>
           <Button variant="text" color="error" width="40%" onClick={() => setMode(Mode.SINGLE)}>
