@@ -62,7 +62,7 @@ const getLabelFromCriteriaObject = (
     const tooltipTitle = labels.join(' - ')
     return (
       <Tooltip title={tooltipTitle}>
-        <Typography style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{tooltipTitle}</Typography>
+        <Typography style={{ textOverflow: 'ellipsis', overflow: 'hidden', fontSize: 12 }}>{tooltipTitle}</Typography>
       </Tooltip>
     )
   }
