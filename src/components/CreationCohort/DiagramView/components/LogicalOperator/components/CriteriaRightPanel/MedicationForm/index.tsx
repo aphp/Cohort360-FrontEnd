@@ -77,7 +77,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         value={selectedTab}
         onChange={(e, tab) => setSelectedTab(tab)}
       >
-        <Tab label={EXPLORATION} value="hierarchy" />
+        <Tab label={EXPLORATION} value="exploration" />
         <Tab label="Formulaire" value="form" />
       </Tabs>
 
