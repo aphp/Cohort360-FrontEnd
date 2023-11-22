@@ -22,6 +22,7 @@ import CoronavirusIcon from '@mui/icons-material/Coronavirus'
 import { CriteriaItemType } from 'types'
 import useStyles from './styles'
 import { RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import { PhotoCameraFront } from '@mui/icons-material'
 
 type CriteriaListItemProps = {
   criteriaItem: CriteriaItemType
@@ -66,6 +67,7 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
       case RessourceType.PHYSIOLOGIE:
         return <MonitorHeartIcon />
       case RessourceType.IMAGING:
+        return <PhotoCameraFront />
       default:
         return <></>
     }
