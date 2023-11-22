@@ -87,7 +87,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
     nb: patient?.medication?.[selectedTab.id]?.count ?? 0,
     total: patient?.medication?.[selectedTab.id]?.total ?? 0,
     list: patient?.medication?.[selectedTab.id]?.list ?? [],
-    label: 'prescription(s)'
+    label: selectedTab.id === Medication.PRESCRIPTION ? 'prescription(s)' : 'administration(s)'
   }
   const [allAdministrationRoutes, setAdministrationRoutes] = useState<HierarchyElement[]>([])
   const [allPrescriptionTypes, setPrescriptionTypes] = useState<HierarchyElement[]>([])
