@@ -7,11 +7,6 @@ import {
   SearchByTypes
 } from './searchCriterias'
 
-export enum MedicationType {
-  Request = 'MedicationRequest',
-  Administration = 'MedicationAdministration'
-}
-
 export enum MedicationTypeLabel {
   Request = 'Prescription',
   Administration = 'Administration'
@@ -64,7 +59,10 @@ export enum RessourceTypeLabels {
 export type SelectedCriteriaType = {
   id: number
   error?: boolean
+  type: RessourceType
   encounterService?: ScopeTreeRow[]
+  isInclusive?: boolean
+  title: string
 } & (
   | CcamDataType
   | Cim10DataType
@@ -100,7 +98,9 @@ export enum CriteriaDataKey {
   PRESCRIPTION_TYPES = 'prescriptionTypes',
   ADMINISTRATIONS = 'administrations',
   BIOLOGY_DATA = 'biologyData',
-  MODALITIES = 'modalities'
+  MODALITIES = 'modalities',
+  DOC_TYPES = 'docTypes',
+  STATUS_DIAGNOSTIC = 'statusDiagnostic'
 }
 
 export type CcamDataType = {

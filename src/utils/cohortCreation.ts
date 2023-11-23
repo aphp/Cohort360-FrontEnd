@@ -1,7 +1,13 @@
 import moment from 'moment'
 
 import services from 'services/aphp'
-import { ScopeTreeRow, CriteriaGroupType, TemporalConstraintsType, CriteriaItemType } from 'types'
+import {
+  ScopeTreeRow,
+  CriteriaGroupType,
+  TemporalConstraintsType,
+  CriteriaItemType,
+  CriteriaItemDataCache
+} from 'types'
 
 import docTypes from 'assets/docTypes.json'
 import {
@@ -1882,27 +1888,30 @@ export async function unbuildRequest(_json: string): Promise<any> {
  *
  */
 export const getDataFromFetch = async (
-  _criteria: readonly CriteriaItemType[],
+  criteriaList: readonly CriteriaItemType[],
   selectedCriteria: SelectedCriteriaType[],
-  oldCriteriaList?: any
-): Promise<any> => {
-  for (const _criterion of _criteria) {
-    const oldCriterion = oldCriteriaList
-      ? oldCriteriaList?.find((oldCriterionItem: any) => oldCriterionItem.id === _criterion.id)
-      : []
-    if (_criterion.fetch) {
-      if (!_criterion.data) _criterion.data = {}
-      const fetchKeys = Object.keys(_criterion.fetch)
+  oldCriteriaCache?: CriteriaItemDataCache[]
+): Promise<CriteriaItemDataCache[]> => {
+  const updatedCriteriaData: CriteriaItemDataCache[] = []
+  for (const _criterion of criteriaList) {
+    const criteriaDataCache: CriteriaItemDataCache = {
+      data: {},
+      criteriaType: _criterion.id
+    }
+    // here we do not populate new data with old data because the store froze the data (readonly) so they can't be updated
+    const prevDataCache: CriteriaItemDataCache['data'] =
+      oldCriteriaCache?.find((oldCriterionItem) => oldCriterionItem.criteriaType === _criterion.id)?.data || {}
 
-      for (const fetchKey of fetchKeys) {
-        const dataKey = fetchKey.replace('fetch', '').replace(/(\b[A-Z])(?![A-Z])/g, ($1) => $1.toLowerCase())
+    if (_criterion.fetch) {
+      const dataKeys = Object.keys(_criterion.fetch) as CriteriaDataKey[]
+
+      for (const dataKey of dataKeys) {
         switch (dataKey) {
           case CriteriaDataKey.MEDICATION_DATA:
           case CriteriaDataKey.BIOLOGY_DATA:
           case CriteriaDataKey.GHM_DATA:
           case CriteriaDataKey.CCAM_DATA:
           case CriteriaDataKey.CIM_10_DIAGNOSTIC: {
-            if (_criterion.data[dataKey] === 'loading') _criterion.data[dataKey] = []
             const currentSelectedCriteria = selectedCriteria.filter(
               (criterion: SelectedCriteriaType) =>
                 criterion.type === _criterion.id ||
@@ -1927,18 +1936,10 @@ export const getDataFromFetch = async (
                   currentcriterion.code.length > 0
                 ) {
                   for (const code of currentcriterion.code) {
-                    const allreadyHere = oldCriterion?.data?.[dataKey]
-                      ? oldCriterion?.data?.[dataKey].find((data: any) => data.id === code?.id)
-                      : undefined
-
-                    if (!allreadyHere) {
-                      _criterion.data[dataKey] = [
-                        ..._criterion.data[dataKey],
-                        ...(await _criterion.fetch[fetchKey](code?.id, true))
-                      ]
-                    } else {
-                      _criterion.data[dataKey] = [..._criterion.data[dataKey], allreadyHere]
-                    }
+                    const prevData = prevDataCache[dataKey]?.find((data: any) => data.id === code?.id)
+                    const codeData = prevData ? [prevData] : await _criterion.fetch[dataKey]?.(code?.id, true)
+                    const existingCodes = criteriaDataCache.data[dataKey] || []
+                    criteriaDataCache.data[dataKey] = [...existingCodes, ...(codeData || [])]
                   }
                 }
               }
@@ -1946,32 +1947,21 @@ export const getDataFromFetch = async (
             break
           }
           default:
-            if (
-              oldCriterion &&
-              oldCriterion?.data &&
-              oldCriterion?.data?.[dataKey] &&
-              oldCriterion?.data?.[dataKey] === 'loading'
-            ) {
-              _criterion.data[dataKey] = await _criterion.fetch[fetchKey]()
-            } else if (
-              oldCriterion &&
-              oldCriterion?.data &&
-              oldCriterion?.data?.[dataKey] &&
-              oldCriterion?.data?.[dataKey] !== 'loading'
-            ) {
-              _criterion.data[dataKey] = oldCriterion.data[dataKey]
+            criteriaDataCache.data[dataKey] = prevDataCache[dataKey]
+            if (criteriaDataCache.data[dataKey] === undefined) {
+              criteriaDataCache.data[dataKey] = await _criterion.fetch[dataKey]?.()
             }
             break
         }
       }
     }
+    updatedCriteriaData.push(criteriaDataCache)
 
-    _criterion.subItems =
-      _criterion.subItems && _criterion.subItems.length > 0
-        ? await getDataFromFetch(_criterion.subItems, selectedCriteria, oldCriterion?.subItems ?? [])
-        : []
+    if (_criterion.subItems && _criterion.subItems.length > 0) {
+      updatedCriteriaData.push(...(await getDataFromFetch(_criterion.subItems, selectedCriteria, oldCriteriaCache)))
+    }
   }
-  return _criteria
+  return updatedCriteriaData
 }
 
 export const joinRequest = async (oldJson: string, newJson: string, parentId: number | null): Promise<any> => {

@@ -28,7 +28,7 @@ export const defaultBiology = {
 }
 
 const Index = (props: CriteriaDrawerComponentProps) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy' | 'search'>(
@@ -84,7 +84,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         <BiologyForm
           isOpen={selectedTab === 'form'}
           isEdition={isEdition}
-          criteria={criteria}
+          criteriaData={criteriaData}
           selectedCriteria={defaultCriteria}
           onChangeValue={_onChangeFormValue}
           onChangeSelectedCriteria={onChangeSelectedCriteria}
@@ -95,7 +95,6 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         <BiologySearch
           isEdition={isEdition}
           selectedCriteria={defaultCriteria}
-          criteria={criteria}
           onChangeSelectedCriteria={_onChangeSelectedHierarchy}
           onConfirm={() => setSelectedTab('form')}
           goBack={goBack}

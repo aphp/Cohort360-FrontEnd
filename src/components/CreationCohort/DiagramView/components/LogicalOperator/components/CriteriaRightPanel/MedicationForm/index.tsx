@@ -30,7 +30,7 @@ export const defaultMedication: MedicationDataType = {
 }
 
 const Index = (props: CriteriaDrawerComponentProps) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [selectedTab, setSelectedTab] = useState<'form' | 'exploration'>(selectedCriteria ? 'form' : 'exploration')
   const [defaultCriteria, setDefaultCriteria] = useState(selectedCriteria || defaultMedication)
 
@@ -62,8 +62,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       defaultCriteria && defaultCriteria.code ? defaultCriteria.code : [],
       fetchMedication,
       defaultMedication.type,
-      dispatch,
-      criteria !== null && criteria.data?.atcHierarchy !== 'loading'
+      dispatch
     )
   }
   useEffect(() => {
@@ -86,7 +85,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         <MedicationForm
           isOpen={selectedTab === 'form'}
           isEdition={isEdition}
-          criteria={criteria}
+          criteriaData={criteriaData}
           selectedCriteria={defaultCriteria}
           onChangeValue={_onChangeFormValue}
           onChangeSelectedCriteria={onChangeSelectedCriteria}

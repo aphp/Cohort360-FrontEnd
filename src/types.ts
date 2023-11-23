@@ -19,7 +19,7 @@ import {
 import { AxiosResponse } from 'axios'
 import { SearchByTypes } from 'types/searchCriterias'
 import { SearchInputError } from 'types/error'
-import { Comparators, SelectedCriteriaType } from 'types/requestCriterias'
+import { Comparators, CriteriaDataKey, SelectedCriteriaType } from 'types/requestCriterias'
 
 export enum CohortJobStatus {
   _long_pending = 'long_pending',
@@ -377,10 +377,15 @@ export type TemporalConstraintsType = {
 
 export type CriteriaDrawerComponentProps<T = any> = {
   parentId: number | null
-  criteria: CriteriaItemType | null
+  criteriaData: CriteriaItemDataCache
   selectedCriteria: SelectedCriteriaType & T
   onChangeSelectedCriteria: (newCriteria: SelectedCriteriaType & T) => void
   goBack: () => void
+}
+
+export type CriteriaItemDataCache = {
+  criteriaType: string
+  data: { [key in CriteriaDataKey]?: any }
 }
 
 export type CriteriaItemType = {
@@ -390,9 +395,7 @@ export type CriteriaItemType = {
   fontWeight?: string
   components: React.FC<CriteriaDrawerComponentProps> | null
   disabled?: boolean
-  data?: any
-  fetch?: { [fetchKey: string]: (...args: any[]) => Promise<any> }
-  valueSet?: any
+  fetch?: { [key in CriteriaDataKey]?: (...args: any[]) => Promise<any> }
   subItems?: CriteriaItemType[]
 }
 

@@ -25,7 +25,7 @@ export const defaultCondition = {
 }
 
 const Index = (props: CriteriaDrawerComponentProps) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
   const [defaultCriteria, setDefaultCriteria] = useState(selectedCriteria || defaultCondition)
 
@@ -81,7 +81,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         <Cim10Form
           isOpen={selectedTab === 'form'}
           isEdition={isEdition}
-          criteria={criteria}
+          criteriaData={criteriaData}
           selectedCriteria={defaultCriteria}
           onChangeValue={_onChangeFormValue}
           onChangeSelectedCriteria={onChangeSelectedCriteria}

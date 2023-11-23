@@ -19,10 +19,12 @@ import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import ScienceIcon from '@mui/icons-material/Science'
 import CoronavirusIcon from '@mui/icons-material/Coronavirus'
 
-import { CriteriaItemType } from 'types'
+import { CriteriaItemDataCache, CriteriaItemType } from 'types'
 import useStyles from './styles'
 import { RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
 import { PhotoCameraFront } from '@mui/icons-material'
+import { CriteriaState } from 'state/criteria'
+import criteriaList from 'components/CreationCohort/DataList_Criteria'
 
 type CriteriaListItemProps = {
   criteriaItem: CriteriaItemType
@@ -128,7 +130,7 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
 
 type CriteriaRightPanelProps = {
   parentId: number | null
-  criteria: CriteriaItemType[]
+  criteria: CriteriaState
   selectedCriteria: SelectedCriteriaType | null
   onChangeSelectedCriteria: (item: SelectedCriteriaType) => void
   open: boolean
@@ -137,6 +139,15 @@ type CriteriaRightPanelProps = {
 
 const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
   const { open, onClose, parentId, criteria, selectedCriteria, onChangeSelectedCriteria } = props
+  const criteriaListWithConfig = criteriaList.map((criteriaItem) => {
+    if (criteria.config[criteriaItem.id]) {
+      return {
+        ...criteriaItem,
+        ...criteria.config[criteriaItem.id]
+      }
+    }
+    return criteriaItem
+  })
 
   const { classes } = useStyles()
   const [action, setAction] = useState<CriteriaItemType | null>(null)
@@ -153,37 +164,46 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
   }
 
   useEffect(() => {
-    let _action = null
-
     if (selectedCriteria) {
-      const searchChild: (_criteria: CriteriaItemType[] | null) => void = (_criteria) => {
-        if (!_criteria) return
+      const searchChild = (_criteria: CriteriaItemType[] | null): CriteriaItemType | null => {
+        if (!_criteria) return null
 
         for (const criteriaItem of _criteria) {
           const { id, subItems } = criteriaItem
-          if (subItems) searchChild(subItems)
+          if (subItems) {
+            const found = searchChild(subItems)
+            if (found) {
+              return found
+            }
+          }
 
           if (id === 'Medication') {
-            if (RessourceType.MEDICATION_REQUEST === selectedCriteria.type) _action = criteriaItem
-            if (RessourceType.MEDICATION_ADMINISTRATION === selectedCriteria.type) _action = criteriaItem
+            if (RessourceType.MEDICATION_REQUEST === selectedCriteria.type) return criteriaItem
+            if (RessourceType.MEDICATION_ADMINISTRATION === selectedCriteria.type) return criteriaItem
           } else {
-            if (id === selectedCriteria.type) _action = criteriaItem
+            if (id === selectedCriteria.type) return criteriaItem
           }
         }
+        return null
       }
-      searchChild(criteria)
+      const criteriaItem = searchChild(criteriaListWithConfig)
+      setAction(criteriaItem)
+    } else {
+      setAction(null)
     }
-    setAction(_action)
   }, [open]) // eslint-disable-line
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
       <div className={classes.root}>
         {/* DrawerComponent = action.components */}
-        {DrawerComponent ? (
+        {DrawerComponent && action ? (
           <DrawerComponent
             parentId={parentId}
-            criteria={action}
+            criteriaData={
+              criteria.cache.find((c) => c.criteriaType === action.id) ||
+              ({ criteriaType: action.id, data: {} } as CriteriaItemDataCache)
+            }
             selectedCriteria={selectedCriteria}
             onChangeSelectedCriteria={_onChangeSelectedCriteria}
             goBack={() => setAction(null)}
@@ -203,7 +223,7 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
               }
               className={classes.drawerContentContainer}
             >
-              {criteria.map((criteriaItem, index) => (
+              {criteriaListWithConfig.map((criteriaItem, index) => (
                 <CriteriaListItem key={index} criteriaItem={criteriaItem} handleClick={setAction} />
               ))}
             </List>

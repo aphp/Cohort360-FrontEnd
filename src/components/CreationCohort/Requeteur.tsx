@@ -10,17 +10,17 @@ import ModalCreateNewRequest from './Modals/ModalCreateNewRequest/ModalCreateNew
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchRequestCohortCreation, resetCohortCreation, unbuildCohortCreation } from 'state/cohortCreation'
-import { setCriteriaList } from 'state/criteria'
 import { setSelectedRequest } from 'state/request'
 
 import { CurrentSnapshot } from 'types'
 
-import constructCriteriaList from './DataList_Criteria'
+import criteriaList from './DataList_Criteria'
 
 import { getDataFromFetch } from 'utils/cohortCreation'
 
 import useStyles from './styles'
 import services from 'services/aphp'
+import { setCriteriaData } from 'state/criteria'
 
 const Requeteur = () => {
   const {
@@ -30,16 +30,14 @@ const Requeteur = () => {
       currentSnapshot = {} as CurrentSnapshot,
       navHistory,
       selectedCriteria = [],
-      criteriaGroup = [],
       count = {},
       json = '',
-      allowSearchIpp = false,
-      selectedPopulation = []
+      allowSearchIpp = false
     },
-    criteriaList
+    criteriaData
   } = useAppSelector((state) => ({
     request: state.cohortCreation.request || {},
-    criteriaList: state.cohortCreation.criteria || {}
+    criteriaData: state.cohortCreation.criteria || {}
   }))
 
   const params = useParams<{
@@ -56,7 +54,6 @@ const Requeteur = () => {
 
   const [requestLoading, setRequestLoading] = useState(0)
   const [criteriaLoading, setCriteriaLoading] = useState(0)
-  let _criteria = constructCriteriaList()
   const isRendered = useRef<boolean>(false)
 
   const _fetchRequest = useCallback(async () => {
@@ -85,22 +82,25 @@ const Requeteur = () => {
       setCriteriaLoading((criteriaLoading) => criteriaLoading + 1)
     }
     try {
-      _criteria.forEach((criterion) => {
-        if (criterion.id === 'IPPList') {
-          criterion.color = allowSearchIpp ? '#0063AF' : '#808080'
-          criterion.disabled = !allowSearchIpp
-        }
-      })
-
-      _criteria = await getDataFromFetch(Object.freeze(_criteria), selectedCriteria, criteriaList)
-      dispatch(setCriteriaList(_criteria))
+      const criteriaCache = await getDataFromFetch(criteriaList, selectedCriteria, criteriaData.cache)
+      dispatch(
+        setCriteriaData({
+          config: {
+            IPPList: {
+              color: allowSearchIpp ? '#0063AF' : '#808080',
+              disabled: !allowSearchIpp
+            }
+          },
+          cache: criteriaCache
+        })
+      )
     } catch (error) {
       console.error(error)
     }
     if (isRendered.current) {
       setCriteriaLoading((criteriaLoading) => criteriaLoading - 1)
     }
-  }, [dispatch, criteriaGroup, selectedCriteria, selectedPopulation]) // eslint-disable-line
+  }, [dispatch, selectedCriteria])
 
   const _unbuildRequest = async (newCurrentSnapshot: CurrentSnapshot) => {
     dispatch(unbuildCohortCreation({ newCurrentSnapshot }))

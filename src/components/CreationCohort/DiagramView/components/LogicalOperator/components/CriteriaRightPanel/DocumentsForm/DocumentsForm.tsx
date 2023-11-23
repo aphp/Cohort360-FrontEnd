@@ -53,7 +53,7 @@ const defaultComposition: DocumentDataType = {
 }
 
 const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
@@ -192,7 +192,7 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             multiple
             id="criteria-doc-type-autocomplete"
             className={classes.inputItem}
-            options={criteria?.data?.docTypes || []}
+            options={criteriaData?.data?.docTypes || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => _.isEqual(option, value)}
             value={defaultValues.docType}
@@ -201,8 +201,8 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             groupBy={(doctype) => doctype.type}
             disableCloseOnSelect
             renderGroup={(docType: any) => {
-              const currentDocTypeList = criteria?.data?.docTypes
-                ? criteria?.data?.docTypes.filter((doc: DocType) => doc.type === docType.group)
+              const currentDocTypeList = criteriaData?.data?.docTypes
+                ? criteriaData?.data?.docTypes.filter((doc: DocType) => doc.type === docType.group)
                 : []
 
               const currentSelectedDocTypeList = defaultValues.docType

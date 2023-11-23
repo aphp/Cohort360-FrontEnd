@@ -18,7 +18,7 @@ import InfoIcon from '@mui/icons-material/Info'
 
 import useStyles from './styles'
 
-import { CriteriaName, ScopeTreeRow } from 'types'
+import { CriteriaDrawerComponentProps, CriteriaName, ScopeTreeRow } from 'types'
 import PopulationCard from '../../../../PopulationCard/PopulationCard'
 import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE } from 'utils/cohortCreation'
 import { DurationRangeType, LabelObject } from 'types/searchCriterias'
@@ -29,13 +29,6 @@ import Collapse from 'components/ui/Collapse'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { mappingCriteria } from '../DemographicForm'
-
-type EncounterFormProps = {
-  criteria: any
-  selectedCriteria: any
-  goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
-}
 
 enum Error {
   EMPTY_FORM,
@@ -49,39 +42,44 @@ enum Error {
   NO_ERROR
 }
 
-const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCriteria }: EncounterFormProps) => {
+const EncounterForm = ({
+  criteriaData,
+  selectedCriteria,
+  goBack,
+  onChangeSelectedCriteria
+}: CriteriaDrawerComponentProps) => {
   const [title, setTitle] = useState(selectedCriteria?.title || 'Critère de prise en charge')
   const [age, setAge] = useState<DurationRangeType>(selectedCriteria?.age || [null, null])
   const [duration, setDuration] = useState<DurationRangeType>(selectedCriteria?.duration || [null, null])
   const [admissionMode, setAdmissionMode] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.admissionMode, CriteriaDataKey.ADMISSION_MODE, criteria) || []
+    mappingCriteria(selectedCriteria?.admissionMode, CriteriaDataKey.ADMISSION_MODE, criteriaData) || []
   )
   const [entryMode, setEntryMode] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.entryMode, CriteriaDataKey.ENTRY_MODES, criteria) || []
+    mappingCriteria(selectedCriteria?.entryMode, CriteriaDataKey.ENTRY_MODES, criteriaData) || []
   )
   const [exitMode, setExitMode] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.exitMode, CriteriaDataKey.EXIT_MODES, criteria) || []
+    mappingCriteria(selectedCriteria?.exitMode, CriteriaDataKey.EXIT_MODES, criteriaData) || []
   )
   const [priseEnChargeType, setPriseEnChargeType] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.priseEnChargeType, CriteriaDataKey.PRISE_EN_CHARGE_TYPE, criteria) || []
+    mappingCriteria(selectedCriteria?.priseEnChargeType, CriteriaDataKey.PRISE_EN_CHARGE_TYPE, criteriaData) || []
   )
   const [typeDeSejour, setTypeDeSejour] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.typeDeSejour, CriteriaDataKey.TYPE_DE_SEJOUR, criteria) || []
+    mappingCriteria(selectedCriteria?.typeDeSejour, CriteriaDataKey.TYPE_DE_SEJOUR, criteriaData) || []
   )
   const [fileStatus, setFileStatus] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.fileStatus, CriteriaDataKey.FILE_STATUS, criteria) || []
+    mappingCriteria(selectedCriteria?.fileStatus, CriteriaDataKey.FILE_STATUS, criteriaData) || []
   )
   const [reason, setReason] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.reason, CriteriaDataKey.REASON, criteria) || []
+    mappingCriteria(selectedCriteria?.reason, CriteriaDataKey.REASON, criteriaData) || []
   )
   const [destination, setDestination] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.destination, CriteriaDataKey.DESTINATION, criteria) || []
+    mappingCriteria(selectedCriteria?.destination, CriteriaDataKey.DESTINATION, criteriaData) || []
   )
   const [provenance, setProvenance] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.provenance, CriteriaDataKey.PROVENANCE, criteria) || []
+    mappingCriteria(selectedCriteria?.provenance, CriteriaDataKey.PROVENANCE, criteriaData) || []
   )
   const [admission, setAdmission] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.admission, CriteriaDataKey.ADMISSION, criteria) || []
+    mappingCriteria(selectedCriteria?.admission, CriteriaDataKey.ADMISSION, criteriaData) || []
   )
   const [encounterService, setEncounterService] = useState<ScopeTreeRow[]>(selectedCriteria?.encounterService || [])
   const [encounterStartDate, setEncounterStartDate] = useState<string | null>(
@@ -258,7 +256,7 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
               form={CriteriaName.VisitSupport}
               label={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
               title={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
-              executiveUnits={criteria?.encounterService ?? []}
+              executiveUnits={encounterService || []}
               isAcceptEmptySelection={true}
               isDeleteIcon={true}
               onChangeExecutiveUnits={(newValue) => setEncounterService(newValue)}
@@ -313,7 +311,7 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
               <Autocomplete
                 multiple
                 id="criteria-PriseEnChargeType-autocomplete"
-                options={criteria?.data?.priseEnChargeType || []}
+                options={criteriaData?.data?.priseEnChargeType || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={priseEnChargeType}
@@ -324,7 +322,7 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
               <Autocomplete
                 multiple
                 id="criteria-TypeDeSejour-autocomplete"
-                options={criteria?.data?.typeDeSejour || []}
+                options={criteriaData?.data?.typeDeSejour || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={typeDeSejour}
@@ -335,7 +333,7 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
               <Autocomplete
                 multiple
                 id="criteria-FileStatus-autocomplete"
-                options={criteria?.data?.fileStatus || []}
+                options={criteriaData?.data?.fileStatus || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={fileStatus}
@@ -349,7 +347,7 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
               <Autocomplete
                 multiple
                 id="criteria-admissionMode-autocomplete"
-                options={criteria?.data?.admissionModes || []}
+                options={criteriaData?.data?.admissionModes || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={admissionMode}
@@ -360,7 +358,7 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
               <Autocomplete
                 multiple
                 id="criteria-admission-autocomplete"
-                options={criteria?.data?.admission || []}
+                options={criteriaData?.data?.admission || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={admission}
@@ -374,7 +372,7 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
               <Autocomplete
                 multiple
                 id="criteria-entryMode-autocomplete"
-                options={criteria?.data?.entryModes || []}
+                options={criteriaData?.data?.entryModes || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={entryMode}
@@ -385,7 +383,7 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
               <Autocomplete
                 multiple
                 id="criteria-exitMode-autocomplete"
-                options={criteria?.data?.exitModes || []}
+                options={criteriaData?.data?.exitModes || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={exitMode}
@@ -396,7 +394,7 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
               <Autocomplete
                 multiple
                 id="criteria-reason-autocomplete"
-                options={criteria?.data?.reason || []}
+                options={criteriaData?.data?.reason || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={reason}
@@ -410,7 +408,7 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
               <Autocomplete
                 multiple
                 id="criteria-destination-autocomplete"
-                options={criteria?.data?.destination || []}
+                options={criteriaData?.data?.destination || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={destination}
@@ -421,7 +419,7 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
               <Autocomplete
                 multiple
                 id="criteria-provenance-autocomplete"
-                options={criteria?.data?.provenance || []}
+                options={criteriaData?.data?.provenance || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={provenance}

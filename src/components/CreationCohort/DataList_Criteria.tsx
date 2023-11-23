@@ -56,8 +56,7 @@ const criteriaList: CriteriaItemType[] = [
     color: '#0063AF',
     fontWeight: 'bold',
     components: DemographicForm,
-    data: { gender: 'loading', status: 'loading' },
-    fetch: { fetchGender: services.cohortCreation.fetchGender, fetchStatus: services.cohortCreation.fetchStatus }
+    fetch: { gender: services.cohortCreation.fetchGender, status: services.cohortCreation.fetchStatus }
   },
   {
     id: 'Encounter',
@@ -65,29 +64,17 @@ const criteriaList: CriteriaItemType[] = [
     color: '#0063AF',
     fontWeight: 'bold',
     components: EncounterForm,
-    data: {
-      admissionModes: 'loading',
-      entryModes: 'loading',
-      exitModes: 'loading',
-      priseEnChargeType: 'loading',
-      typeDeSejour: 'loading',
-      fileStatus: 'loading',
-      reason: 'loading',
-      destination: 'loading',
-      provenance: 'loading',
-      admission: 'loading'
-    },
     fetch: {
-      fetchAdmissionModes: services.cohortCreation.fetchAdmissionModes,
-      fetchEntryModes: services.cohortCreation.fetchEntryModes,
-      fetchExitModes: services.cohortCreation.fetchExitModes,
-      fetchPriseEnChargeType: services.cohortCreation.fetchPriseEnChargeType,
-      fetchTypeDeSejour: services.cohortCreation.fetchTypeDeSejour,
-      fetchFileStatus: services.cohortCreation.fetchFileStatus,
-      fetchReason: services.cohortCreation.fetchReason,
-      fetchDestination: services.cohortCreation.fetchDestination,
-      fetchProvenance: services.cohortCreation.fetchProvenance,
-      fetchAdmission: services.cohortCreation.fetchAdmission
+      admissionModes: services.cohortCreation.fetchAdmissionModes,
+      entryModes: services.cohortCreation.fetchEntryModes,
+      exitModes: services.cohortCreation.fetchExitModes,
+      priseEnChargeType: services.cohortCreation.fetchPriseEnChargeType,
+      typeDeSejour: services.cohortCreation.fetchTypeDeSejour,
+      fileStatus: services.cohortCreation.fetchFileStatus,
+      reason: services.cohortCreation.fetchReason,
+      destination: services.cohortCreation.fetchDestination,
+      provenance: services.cohortCreation.fetchProvenance,
+      admission: services.cohortCreation.fetchAdmission
     }
   },
   {
@@ -96,8 +83,7 @@ const criteriaList: CriteriaItemType[] = [
     color: '#0063AF',
     fontWeight: 'bold',
     components: DocumentsForm,
-    data: { docTypes: 'loading' },
-    fetch: { fetchDocTypes: services.cohortCreation.fetchDocTypes }
+    fetch: { docTypes: services.cohortCreation.fetchDocTypes }
   },
   {
     id: 'pmsi',
@@ -112,17 +98,10 @@ const criteriaList: CriteriaItemType[] = [
         color: '#0063AF',
         fontWeight: 'normal',
         components: Cim10Form,
-        data: {
-          statusDiagnostic: 'loading',
-          diagnosticTypes: 'loading',
-          cim10Diagnostic: 'loading',
-          cim10Hierarchy: 'loading'
-        },
         fetch: {
-          fetchStatusDiagnostic: services.cohortCreation.fetchStatusDiagnostic,
-          fetchDiagnosticTypes: services.cohortCreation.fetchDiagnosticTypes,
-          fetchCim10Diagnostic: services.cohortCreation.fetchCim10Diagnostic,
-          fetchCim10Hierarchy: services.cohortCreation.fetchCim10Hierarchy
+          statusDiagnostic: services.cohortCreation.fetchStatusDiagnostic,
+          diagnosticTypes: services.cohortCreation.fetchDiagnosticTypes,
+          cim10Diagnostic: services.cohortCreation.fetchCim10Diagnostic
         }
       },
       {
@@ -131,10 +110,8 @@ const criteriaList: CriteriaItemType[] = [
         color: '#0063AF',
         fontWeight: 'normal',
         components: CCAMForm,
-        data: { ccamData: 'loading', ccamHierarchy: 'loading' },
         fetch: {
-          fetchCcamData: services.cohortCreation.fetchCcamData,
-          fetchCcamHierarchy: services.cohortCreation.fetchCcamHierarchy
+          ccamData: services.cohortCreation.fetchCcamData
         }
       },
       {
@@ -143,10 +120,8 @@ const criteriaList: CriteriaItemType[] = [
         color: '#0063AF',
         fontWeight: 'normal',
         components: GhmForm,
-        data: { ghmData: 'loading', ghmHierarchy: 'loading' },
         fetch: {
-          fetchGhmData: services.cohortCreation.fetchGhmData,
-          fetchGhmHierarchy: services.cohortCreation.fetchGhmHierarchy
+          ghmData: services.cohortCreation.fetchGhmData
         }
       }
     ]
@@ -159,17 +134,10 @@ const criteriaList: CriteriaItemType[] = [
     fontWeight: 'bold',
     components: ODD_MEDICATION ? MedicationForm : null,
     disabled: !ODD_MEDICATION ?? false,
-    data: {
-      medicationData: 'loading',
-      atcHierarchy: 'loading',
-      prescriptionTypes: 'loading',
-      administrations: 'loading'
-    },
     fetch: {
-      fetchMedicationData: services.cohortCreation.fetchMedicationData,
-      fetchAtcHierarchy: services.cohortCreation.fetchAtcHierarchy,
-      fetchPrescriptionTypes: services.cohortCreation.fetchPrescriptionTypes,
-      fetchAdministrations: services.cohortCreation.fetchAdministrations
+      medicationData: services.cohortCreation.fetchMedicationData,
+      prescriptionTypes: services.cohortCreation.fetchPrescriptionTypes,
+      administrations: services.cohortCreation.fetchAdministrations
     }
   },
   {
@@ -186,11 +154,8 @@ const criteriaList: CriteriaItemType[] = [
         fontWeight: 'normal',
         components: !!ODD_BIOLOGY ? BiologyForm : null,
         disabled: !!!ODD_BIOLOGY ?? false,
-        data: { biologyData: 'loading', biologyHierarchy: 'loading' },
         fetch: {
-          fetchBiologyData: services.cohortCreation.fetchBiologyData,
-          fetchBiologyHierarchy: services.cohortCreation.fetchBiologyHierarchy,
-          fetchBiologySearch: services.cohortCreation.fetchBiologySearch
+          biologyData: services.cohortCreation.fetchBiologyData
         }
       },
       {
@@ -199,8 +164,7 @@ const criteriaList: CriteriaItemType[] = [
         components: null,
         color: '#808080',
         fontWeight: 'normal',
-        disabled: true,
-        data: null
+        disabled: true
       }
     ]
   },
@@ -222,11 +186,8 @@ const criteriaList: CriteriaItemType[] = [
     color: '#808080',
     fontWeight: 'bold',
     disabled: true,
-    data: null,
     components: null
   }
 ]
 
-const constructCriteriaList: () => CriteriaItemType[] = () => criteriaList
-
-export default constructCriteriaList
+export default criteriaList
