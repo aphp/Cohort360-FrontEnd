@@ -6,7 +6,6 @@ import { Item } from 'components/ui/ListItems/ListItem'
 import Button from 'components/ui/Button'
 import { DeleteOutline } from '@mui/icons-material'
 import { Grid, Typography } from '@mui/material'
-import { deleteFiltersService } from 'services/aphp/servicePatients'
 
 enum Mode {
   SINGLE,
@@ -19,7 +18,7 @@ type FiltersListProps = {
   onSubmit: (value: any) => void
 }
 
-const FiltersList = ({ name, values, onSubmit }: FiltersListProps) => {
+const FiltersList = ({ values, onSubmit }: FiltersListProps) => {
   const context = useContext(FormContext)
   const [filters, setFilters] = useState<Item[]>(
     values.map((value) => {
