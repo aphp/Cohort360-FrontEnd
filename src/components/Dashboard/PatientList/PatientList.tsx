@@ -40,7 +40,7 @@ import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters'
 import GendersFilter from 'components/Filters/GendersFilter'
 import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter'
 import FiltersNameFilter from 'components/Filters/FiltersNameFilter'
-import { getFiltersService, postFiltersService } from 'services/aphp/servicePatients'
+import { deleteFiltersService, getFiltersService, postFiltersService } from 'services/aphp/servicePatients'
 import { RessourceType } from 'types/requestCriterias'
 import FiltersList from 'components/Filters/FiltersList'
 import { mapStringToSearchCriteria } from 'mappers/filters'
@@ -143,6 +143,11 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
 
   const postSavedFilters = async (name: string) => {
     await postFiltersService(RessourceType.PATIENT, name, { searchBy, searchInput, filters, orderBy })
+    await getSavedFilters()
+  }
+
+  const handleFiltersUpdate = async (filtersUuids: string[]) => {
+    filtersUuids.forEach((uuid) => deleteFiltersService(uuid))
     await getSavedFilters()
   }
 
@@ -283,7 +288,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
           onSubmit={(field) => applySavedFilters(field.savedFilters)}
           validationText="Ouvrir"
         >
-          <FiltersList values={savedFilters?.results || []} name="savedFilters" />
+          <FiltersList values={savedFilters?.results || []} name="savedFilters" onSubmit={handleFiltersUpdate} />
         </Modal>
         <Modal
           title="Filtrer les patients"

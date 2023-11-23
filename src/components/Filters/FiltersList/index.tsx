@@ -16,11 +16,11 @@ enum Mode {
 type FiltersListProps = {
   values: SavedFilter[]
   name: string
+  onSubmit: (value: any) => void
 }
 
-const FiltersList = ({ name, values }: FiltersListProps) => {
+const FiltersList = ({ name, values, onSubmit }: FiltersListProps) => {
   const context = useContext(FormContext)
-  const [selectedFilter, setSelectedFilter] = useState<Item | null>(null)
   const [filters, setFilters] = useState<Item[]>(
     values.map((value) => {
       return { id: value.uuid, name: value.name, checked: false }
@@ -30,46 +30,29 @@ const FiltersList = ({ name, values }: FiltersListProps) => {
   const [mode, setMode] = useState(Mode.SINGLE)
 
   const handleSelectedFilter = (newFilters: Item[]) => {
-    /* const newItems = filters.map((filter) => {
-      return { ...filter, checked: filter.id === newFilter.id }
-    })*/
     setFilters(newFilters)
-    // setSelectedFilter(newFilter)
   }
 
   const handleDeleteSelectedFilters = async () => {
-    const newFilters = filters.reduce((accumulator, filter) => {
-      if (filter.checked) {
-        deleteFiltersService(filter.id)
-      } else {
-        accumulator.push(filter)
-      }
-      return accumulator
-    }, [] as Item[])
+    const checkedFilterIdsToDelete = filters.filter((filter) => filter.checked).map((filter) => filter.id)
+    onSubmit(checkedFilterIdsToDelete)
 
-    setFilters(newFilters)
+    const keptFilters = filters.filter((filter) => !filter.checked)
+    setFilters(keptFilters)
   }
-
-  useEffect(() => {
-    if (context?.updateFormData) {
-      const matched = values.find((filter) => filter.uuid === (selectedFilter?.id ?? null)) || null
-      if (matched) {
-        if (context?.updateFormData) context.updateFormData(name, matched.filter)
-      }
-    }
-  }, [selectedFilter])
 
   useEffect(() => {
     context?.updateError(false)
     if (context?.updateError && mode === Mode.MULTIPLE) {
       context.updateError(true)
     }
-    setFilters(
-      values.map((value) => {
-        return { id: value.uuid, name: value.name, checked: false }
-      })
-    )
-    console.log(filters)
+    if (mode === Mode.SINGLE) {
+      setFilters(
+        filters.map((value) => {
+          return { id: value.id, name: value.name, checked: false }
+        })
+      )
+    }
   }, [mode])
 
   return (
@@ -91,11 +74,23 @@ const FiltersList = ({ name, values }: FiltersListProps) => {
           </Button>
         </Grid>
       )}
-      {mode === Mode.SINGLE && (
-        <ListItems values={filters} onchange={(selectedItem: Item[]) => handleSelectedFilter(selectedItem)} />
-      )}
-      {mode === Mode.MULTIPLE && (
-        <ListItems values={filters} multiple onchange={(selectedItem: Item[]) => handleSelectedFilter(selectedItem)} />
+      {Boolean(filters.length) ? (
+        <>
+          {mode === Mode.SINGLE && (
+            <ListItems values={filters} onchange={(selectedItems: Item[]) => handleSelectedFilter(selectedItems)} />
+          )}
+          {mode === Mode.MULTIPLE && (
+            <ListItems
+              values={filters}
+              multiple
+              onchange={(selectedItems: Item[]) => handleSelectedFilter(selectedItems)}
+            />
+          )}
+        </>
+      ) : (
+        <Typography fontWeight="700" align="center" sx={{ padding: '8px' }}>
+          Aucun filtre n'a été enregistré
+        </Typography>
       )}
     </>
   )

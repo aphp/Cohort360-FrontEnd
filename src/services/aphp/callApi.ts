@@ -389,7 +389,7 @@ export const getFilters = async (
 }
 
 export const deleteFilters = async (fhir_resource_uuid: string): Promise<AxiosResponse<void>> => {
-  const res = await apiBackend.delete(`/cohort/fhir-filters/${fhir_resource_uuid}`)
+  const res = await apiBackend.delete(`/cohort/fhir-filters/${fhir_resource_uuid}/`)
   return res
 }
 /**

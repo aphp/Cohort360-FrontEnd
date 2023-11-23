@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ListItem, { Item } from './ListItem'
 import { List } from '@mui/material'
 
@@ -18,6 +18,10 @@ const ListItems = ({ values, multiple = false, onchange }: ListItemsProps) => {
     setItems(newItems)
     onchange(newItems)
   }
+
+  useEffect(() => {
+    setItems(values)
+  }, [values])
 
   return (
     <List>
