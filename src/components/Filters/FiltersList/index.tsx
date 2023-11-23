@@ -46,13 +46,11 @@ const FiltersList = ({ name, values, onSubmit }: FiltersListProps) => {
     if (context?.updateError && mode === Mode.MULTIPLE) {
       context.updateError(true)
     }
-    if (mode === Mode.SINGLE) {
-      setFilters(
-        filters.map((value) => {
-          return { id: value.id, name: value.name, checked: false }
-        })
-      )
-    }
+    setFilters(
+      filters.map((value) => {
+        return { ...value, checked: false }
+      })
+    )
   }, [mode])
 
   return (
