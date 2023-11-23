@@ -147,7 +147,9 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   }
 
   const handleFiltersUpdate = async (filtersUuids: string[]) => {
-    filtersUuids.forEach((uuid) => deleteFiltersService(uuid))
+    for (const uuid of filtersUuids) {
+      await deleteFiltersService(uuid)
+    }
     await getSavedFilters()
   }
 
@@ -176,6 +178,8 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
     }
   }, [loadingStatus])
 
+  console.log(savedFilters)
+
   return (
     <Grid container>
       <Grid item xs={12}>
@@ -196,11 +200,13 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
               Filtrer
             </Button>
           </Grid>
-          <Grid>
-            <Button icon={<SavedSearch fill="#FFF" />} onClick={() => setToggleSavedFiltersModal(true)}>
-              Filtres sauvegardés
-            </Button>
-          </Grid>
+          {!!savedFilters?.results.length && (
+            <Grid>
+              <Button icon={<SavedSearch fill="#FFF" />} onClick={() => setToggleSavedFiltersModal(true)}>
+                Filtres sauvegardés
+              </Button>
+            </Grid>
+          )}
           {displaySaveFilters && (
             <Grid>
               <Button
