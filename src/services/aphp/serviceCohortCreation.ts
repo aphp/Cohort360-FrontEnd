@@ -322,7 +322,12 @@ const servicesCohortCreation: IServiceCohortCreation = {
     }),
   fetchUCDList: async (ucd?: string) => fetchValueSet(MEDICATION_UCD, { code: ucd }),
   fetchPrescriptionTypes: async () => fetchValueSet(MEDICATION_PRESCRIPTION_TYPES, { joinDisplayWithCode: false }),
-  fetchAdministrations: async () => fetchValueSet(MEDICATION_ADMINISTRATIONS, { joinDisplayWithCode: false }),
+  fetchAdministrations: async () => {
+    const administrations = await fetchValueSet(MEDICATION_ADMINISTRATIONS, { joinDisplayWithCode: false })
+    return administrations.map((administration) =>
+      administration.id === 'GASTROTOMIE.' ? { ...administration, label: 'Gastrotomie.' } : administration
+    )
+  },
   fetchBiologyData: async (searchValue?: string, noStar?: boolean) =>
     fetchValueSet(`${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}`, {
       valueSetTitle: 'Toute la hiérarchie',
