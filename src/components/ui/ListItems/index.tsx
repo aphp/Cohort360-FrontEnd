@@ -6,9 +6,10 @@ type ListItemsProps = {
   values: Item[]
   multiple?: boolean
   onchange: (newValue: Item[]) => void
+  onItemEyeClick?: (item: Item) => void
 }
 
-const ListItems = ({ values, multiple = false, onchange }: ListItemsProps) => {
+const ListItems = ({ values, multiple = false, onchange, onItemEyeClick }: ListItemsProps) => {
   const [items, setItems] = useState(values)
 
   const handleSelectListItem = (selectedItem: Item) => {
@@ -19,6 +20,10 @@ const ListItems = ({ values, multiple = false, onchange }: ListItemsProps) => {
     onchange(newItems)
   }
 
+  const handleEyeClick = (selectedItem: Item) => {
+    if (onItemEyeClick) onItemEyeClick(selectedItem)
+  }
+
   useEffect(() => {
     setItems(values)
   }, [values])
@@ -26,7 +31,13 @@ const ListItems = ({ values, multiple = false, onchange }: ListItemsProps) => {
   return (
     <List>
       {items.map((item, index) => (
-        <ListItem key={index} multiple={multiple} item={item} onclick={(newValue) => handleSelectListItem(newValue)} />
+        <ListItem
+          key={index}
+          multiple={multiple}
+          item={item}
+          onclick={handleSelectListItem}
+          onEyeClick={handleEyeClick}
+        />
       ))}
     </List>
   )

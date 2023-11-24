@@ -14,13 +14,14 @@ type ListItemProps = {
   multiple?: boolean
   disabled?: boolean
   onclick: (item: Item) => void
+  onEyeClick?: (item: Item) => void
 }
 
-const ListItem = ({ item, multiple = false, disabled = false, onclick }: ListItemProps) => {
+const ListItem = ({ item, multiple = false, disabled = false, onclick, onEyeClick }: ListItemProps) => {
   return (
     <ListItemWrapper key={item.id} divider disableGutters ContainerComponent="div">
       <ListItemIcon>
-        <Visibility color="primary" fill="#000" />
+        <Visibility color="primary" fill="#000" onClick={() => onEyeClick && onEyeClick(item)} />
       </ListItemIcon>
       <ListItemText onClick={() => onclick(item)}>
         <Typography fontWeight={700} color="#00000099">

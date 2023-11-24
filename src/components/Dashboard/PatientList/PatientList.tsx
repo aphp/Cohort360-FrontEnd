@@ -194,13 +194,13 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
         />
       </Grid>
       <Grid container justifyContent="flex-end" margin={'20px 0px 10px 0px'}>
-        <Grid item container justifyContent="flex-end">
+        <Grid item container justifyContent="flex-end" sx={{ gap: '8px' }}>
           <Grid>
             <Button icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleFiltersModal(true)}>
               Filtrer
             </Button>
           </Grid>
-          {!!savedFilters?.results.length && (
+          {!!savedFilters?.count && (
             <Grid>
               <Button icon={<SavedSearch fill="#FFF" />} onClick={() => setToggleSavedFiltersModal(true)}>
                 Filtres sauvegardés
@@ -294,7 +294,12 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
           onSubmit={(field) => applySavedFilters(field.savedFilters)}
           validationText="Ouvrir"
         >
-          <FiltersList values={savedFilters?.results || []} name="savedFilters" onSubmit={handleFiltersUpdate} />
+          <FiltersList
+            values={savedFilters?.results || []}
+            name="savedFilters"
+            deidentified={deidentified}
+            onSubmit={handleFiltersUpdate}
+          />
         </Modal>
         <Modal
           title="Filtrer les patients"
