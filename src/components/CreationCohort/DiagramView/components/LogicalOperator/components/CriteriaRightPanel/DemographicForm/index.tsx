@@ -195,17 +195,19 @@ const DemographicForm = (props: DemographicFormProps) => {
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
             />
           </BlockWrapper>
-          {vitalStatus && (vitalStatus.length === 0 || vitalStatus.length === 2) && (
-            <BlockWrapper margin="1em">
-              <CalendarRange
-                inline
-                value={deathDates}
-                label={'Date de décès'}
-                onChange={(value) => setDeathDates(value)}
-                onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
-              />
-            </BlockWrapper>
-          )}
+          {vitalStatus &&
+            (vitalStatus.length === 0 ||
+              vitalStatus.find((status: LabelObject) => status.label === VitalStatusLabel.DECEASED)) && (
+              <BlockWrapper margin="1em">
+                <CalendarRange
+                  inline
+                  value={deathDates}
+                  label={'Date de décès'}
+                  onChange={(value) => setDeathDates(value)}
+                  onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+                />
+              </BlockWrapper>
+            )}
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
