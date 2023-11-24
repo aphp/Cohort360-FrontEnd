@@ -196,7 +196,11 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
               open={toggleModal}
               width={'600px'}
               onClose={() => setToggleModal(false)}
-              onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
+              onSubmit={(newFilters) => {
+                const _newFilters =
+                  selectedTab.id !== PMSI.DIAGNOSTIC ? { ...newFilters, diagnosticTypes: [] } : { ...newFilters }
+                addFilters({ ...filters, ..._newFilters })
+              }}
             >
               {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
               <CodeFilter name={FilterKeys.CODE} value={code} />
