@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import moment from 'moment'
 import { ScopeTreeRow } from 'types'
 import {
@@ -47,7 +47,7 @@ const getLabelFromCriteriaObject = (
       return array.filter((obj, index, self) => index === self.findIndex((el) => el[key] === obj[key]))
     }
     const labels = removeDuplicates(criterion, 'id')
-      .filter((obj: any) => values.map((value) => value.id).includes(obj.id))
+      .filter((obj) => values.map((value) => value.id).includes(obj.id))
       .map((obj: LabelCriteriaObject) => `${displaySystem(obj.system)} ${obj.label}`)
 
     const tooltipTitle = labels.join(' - ')
@@ -133,9 +133,9 @@ export const getAttachmentMethod = (value: DocumentAttachmentMethod, daysOfDelay
   }
 }
 
-export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteriaState: CriteriaState): string[] => {
+export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteriaState: CriteriaState): ReactNode[] => {
   const type = selectedCriteria.type
-  const labels: (string | any)[] = []
+  const labels: ReactNode[] = []
   switch (selectedCriteria.type) {
     case RessourceType.IPP_LIST:
       labels.push(getIdsListLabels(selectedCriteria.search, 'patients'))
