@@ -14,7 +14,7 @@ import { PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
 import { Comparators, MedicationDataType, RessourceType } from 'types/requestCriterias'
 
-export const defaultMedication: MedicationDataType = {
+export const defaultMedication: Omit<MedicationDataType, 'id'> = {
   type: RessourceType.MEDICATION_REQUEST,
   title: 'Critère de médicament',
   code: [],
@@ -32,7 +32,9 @@ export const defaultMedication: MedicationDataType = {
 const Index = (props: CriteriaDrawerComponentProps) => {
   const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [selectedTab, setSelectedTab] = useState<'form' | 'exploration'>(selectedCriteria ? 'form' : 'exploration')
-  const [defaultCriteria, setDefaultCriteria] = useState(selectedCriteria || defaultMedication)
+  const [defaultCriteria, setDefaultCriteria] = useState<MedicationDataType>(
+    (selectedCriteria as MedicationDataType) || defaultMedication
+  )
 
   const isEdition = selectedCriteria !== null
   const dispatch = useAppDispatch()
@@ -49,7 +51,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       value,
       defaultCriteria,
       hierarchy,
-      setDefaultCriteria,
+      (updatedCriteria) => setDefaultCriteria(updatedCriteria as MedicationDataType),
       selectedTab,
       defaultMedication.type,
       dispatch

@@ -27,12 +27,13 @@ import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
 import services from 'services/aphp'
+import { MedicationDataType } from 'types/requestCriterias'
 
 type MedicationFormProps = {
   isOpen: boolean
   isEdition: boolean
   criteriaData: CriteriaItemDataCache
-  selectedCriteria: any
+  selectedCriteria: MedicationDataType
   onChangeValue: (key: string, value: any) => void
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void

@@ -76,7 +76,7 @@ export const substructAgeString = (range: string): Date => {
   return substructDurationType(DurationType)
 }
 
-export const convertStringToDuration = (age: string | null): DurationType | null => {
+export const convertStringToDuration = (age: string | null | undefined): DurationType | null => {
   if (!age) return null
   const newAge: DurationType = {
     year: Number(age.split('/')[2]),

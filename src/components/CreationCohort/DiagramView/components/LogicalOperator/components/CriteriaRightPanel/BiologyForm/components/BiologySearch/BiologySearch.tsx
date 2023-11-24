@@ -29,6 +29,7 @@ import { useDebounce } from 'utils/debounce'
 import { ValueSet } from 'types'
 import { ValueSetWithHierarchy } from 'services/aphp/cohortCreation/fetchObservation'
 import services from 'services/aphp'
+import { ObservationDataType } from 'types/requestCriterias'
 
 type BiologySearchListItemProps = {
   label: string
@@ -87,7 +88,7 @@ type BiologySearchProps = {
   isEdition?: boolean
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
-  selectedCriteria: any
+  selectedCriteria: ObservationDataType
   onConfirm: () => void
 }
 
@@ -119,8 +120,8 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
   const _onNext = () => {
     const formattedSelectedItems =
       selectedItems && selectedItems.length > 0
-        ? [...selectedCriteria.code, selectedItems.map((v) => ({ id: v.code, label: v.display }))].flat()
-        : [...selectedCriteria.code]
+        ? [...(selectedCriteria.code || []), selectedItems.map((v) => ({ id: v.code, label: v.display }))].flat()
+        : [...(selectedCriteria.code || [])]
 
     onChangeSelectedCriteria(formattedSelectedItems)
     onConfirm()

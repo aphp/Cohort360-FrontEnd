@@ -12,12 +12,13 @@ import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/O
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
 import services from 'services/aphp'
+import { GhmDataType } from 'types/requestCriterias'
 
 type GHMFormProps = {
   isOpen: boolean
   isEdition: boolean
   criteriaData: CriteriaItemDataCache
-  selectedCriteria: any
+  selectedCriteria: GhmDataType
   onChangeValue: (key: string, value: any) => void
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void

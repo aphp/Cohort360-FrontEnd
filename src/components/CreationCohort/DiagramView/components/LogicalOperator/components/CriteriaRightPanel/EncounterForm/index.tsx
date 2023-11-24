@@ -22,7 +22,7 @@ import { CriteriaDrawerComponentProps, CriteriaName, ScopeTreeRow } from 'types'
 import PopulationCard from '../../../../PopulationCard/PopulationCard'
 import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE } from 'utils/cohortCreation'
 import { DurationRangeType, LabelObject } from 'types/searchCriterias'
-import { Comparators, CriteriaDataKey, RessourceType } from 'types/requestCriterias'
+import { Comparators, CriteriaDataKey, EncounterDataType, RessourceType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import Collapse from 'components/ui/Collapse'
@@ -48,49 +48,52 @@ const EncounterForm = ({
   goBack,
   onChangeSelectedCriteria
 }: CriteriaDrawerComponentProps) => {
-  const [title, setTitle] = useState(selectedCriteria?.title || 'Critère de prise en charge')
-  const [age, setAge] = useState<DurationRangeType>(selectedCriteria?.age || [null, null])
-  const [duration, setDuration] = useState<DurationRangeType>(selectedCriteria?.duration || [null, null])
+  const criteria = selectedCriteria as EncounterDataType
+  const [title, setTitle] = useState(criteria?.title || 'Critère de prise en charge')
+  const [age, setAge] = useState<DurationRangeType>(criteria?.age || [null, null])
+  const [duration, setDuration] = useState<DurationRangeType>(criteria?.duration || [null, null])
   const [admissionMode, setAdmissionMode] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.admissionMode, CriteriaDataKey.ADMISSION_MODE, criteriaData) || []
+    mappingCriteria(criteria?.admissionMode, CriteriaDataKey.ADMISSION_MODE, criteriaData) || []
   )
   const [entryMode, setEntryMode] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.entryMode, CriteriaDataKey.ENTRY_MODES, criteriaData) || []
+    mappingCriteria(criteria?.entryMode, CriteriaDataKey.ENTRY_MODES, criteriaData) || []
   )
   const [exitMode, setExitMode] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.exitMode, CriteriaDataKey.EXIT_MODES, criteriaData) || []
+    mappingCriteria(criteria?.exitMode, CriteriaDataKey.EXIT_MODES, criteriaData) || []
   )
   const [priseEnChargeType, setPriseEnChargeType] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.priseEnChargeType, CriteriaDataKey.PRISE_EN_CHARGE_TYPE, criteriaData) || []
+    mappingCriteria(criteria?.priseEnChargeType, CriteriaDataKey.PRISE_EN_CHARGE_TYPE, criteriaData) || []
   )
   const [typeDeSejour, setTypeDeSejour] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.typeDeSejour, CriteriaDataKey.TYPE_DE_SEJOUR, criteriaData) || []
+    mappingCriteria(criteria?.typeDeSejour, CriteriaDataKey.TYPE_DE_SEJOUR, criteriaData) || []
   )
   const [fileStatus, setFileStatus] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.fileStatus, CriteriaDataKey.FILE_STATUS, criteriaData) || []
+    mappingCriteria(criteria?.fileStatus, CriteriaDataKey.FILE_STATUS, criteriaData) || []
   )
   const [reason, setReason] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.reason, CriteriaDataKey.REASON, criteriaData) || []
+    mappingCriteria(criteria?.reason, CriteriaDataKey.REASON, criteriaData) || []
   )
   const [destination, setDestination] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.destination, CriteriaDataKey.DESTINATION, criteriaData) || []
+    mappingCriteria(criteria?.destination, CriteriaDataKey.DESTINATION, criteriaData) || []
   )
   const [provenance, setProvenance] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.provenance, CriteriaDataKey.PROVENANCE, criteriaData) || []
+    mappingCriteria(criteria?.provenance, CriteriaDataKey.PROVENANCE, criteriaData) || []
   )
   const [admission, setAdmission] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.admission, CriteriaDataKey.ADMISSION, criteriaData) || []
+    mappingCriteria(criteria?.admission, CriteriaDataKey.ADMISSION, criteriaData) || []
   )
-  const [encounterService, setEncounterService] = useState<ScopeTreeRow[]>(selectedCriteria?.encounterService || [])
-  const [encounterStartDate, setEncounterStartDate] = useState<string | null>(
-    selectedCriteria?.encounterStartDate || null
+  const [encounterService, setEncounterService] = useState<ScopeTreeRow[]>(criteria?.encounterService || [])
+  const [encounterStartDate, setEncounterStartDate] = useState<string | null | undefined>(
+    criteria?.encounterStartDate || null
   )
-  const [encounterEndDate, setEncounterEndDate] = useState<string | null>(selectedCriteria?.encounterEndDate || null)
-  const [occurrence, setOccurrence] = useState<number>(selectedCriteria?.occurrence || 1)
+  const [encounterEndDate, setEncounterEndDate] = useState<string | null | undefined>(
+    criteria?.encounterEndDate || null
+  )
+  const [occurrence, setOccurrence] = useState<number>(criteria?.occurrence || 1)
   const [occurrenceComparator, setOccurrenceComparator] = useState<Comparators>(
-    selectedCriteria?.occurrenceComparator || Comparators.GREATER_OR_EQUAL
+    criteria?.occurrenceComparator || Comparators.GREATER_OR_EQUAL
   )
-  const [isInclusive, setIsInclusive] = useState<boolean>(selectedCriteria?.isInclusive || true)
+  const [isInclusive, setIsInclusive] = useState<boolean>(criteria?.isInclusive || true)
 
   const { classes } = useStyles()
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
@@ -144,7 +147,7 @@ const EncounterForm = ({
 
   const onSubmit = () => {
     onChangeSelectedCriteria({
-      id: selectedCriteria?.id,
+      id: criteria?.id,
       age,
       duration,
       admissionMode,

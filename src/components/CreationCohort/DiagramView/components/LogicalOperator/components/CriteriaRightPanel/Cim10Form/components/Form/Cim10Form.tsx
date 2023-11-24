@@ -25,12 +25,13 @@ import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
 import services from 'services/aphp'
+import { Cim10DataType } from 'types/requestCriterias'
 
 type Cim10FormProps = {
   isOpen: boolean
   isEdition?: boolean
   criteriaData: CriteriaItemDataCache
-  selectedCriteria: any
+  selectedCriteria: Cim10DataType
   onChangeValue: (key: string, value: any) => void
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void

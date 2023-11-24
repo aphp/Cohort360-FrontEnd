@@ -375,11 +375,11 @@ export type TemporalConstraintsType = {
   }
 }
 
-export type CriteriaDrawerComponentProps<T = any> = {
+export type CriteriaDrawerComponentProps = {
   parentId: number | null
   criteriaData: CriteriaItemDataCache
-  selectedCriteria: SelectedCriteriaType & T
-  onChangeSelectedCriteria: (newCriteria: SelectedCriteriaType & T) => void
+  selectedCriteria: SelectedCriteriaType | null
+  onChangeSelectedCriteria: (newCriteria: SelectedCriteriaType) => void
   goBack: () => void
 }
 

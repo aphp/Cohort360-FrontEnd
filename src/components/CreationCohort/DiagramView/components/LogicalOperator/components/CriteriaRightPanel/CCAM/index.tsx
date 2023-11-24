@@ -11,24 +11,30 @@ import { fetchProcedure, PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
 
 import { CriteriaDrawerComponentProps } from 'types'
-import { RessourceType } from 'types/requestCriterias'
+import { CcamDataType, Comparators, RessourceType } from 'types/requestCriterias'
 
-export const defaultProcedure = {
+export const defaultProcedure: Omit<CcamDataType, 'id'> = {
   type: RessourceType.PROCEDURE,
   title: "Critères d'actes CCAM",
+  label: undefined,
   code: [],
   source: 'AREM',
   occurrence: 1,
-  occurrenceComparator: '>=',
+  hierarchy: undefined,
+  occurrenceComparator: Comparators.GREATER_OR_EQUAL,
   startOccurrence: '',
   endOccurrence: '',
-  isInclusive: true
+  isInclusive: true,
+  encounterStartDate: null,
+  encounterEndDate: null
 }
 
 const Index = (props: CriteriaDrawerComponentProps) => {
   const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
-  const [defaultCriteria, setDefaultCriteria] = useState(selectedCriteria || defaultProcedure)
+  const [defaultCriteria, setDefaultCriteria] = useState<CcamDataType>(
+    (selectedCriteria as CcamDataType) || defaultProcedure
+  )
 
   const isEdition = selectedCriteria !== null
   const dispatch = useAppDispatch()
@@ -47,7 +53,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       value,
       defaultCriteria,
       newHierarchy,
-      setDefaultCriteria,
+      (updatedCriteria) => setDefaultCriteria(updatedCriteria as CcamDataType),
       selectedTab,
       defaultProcedure.type,
       dispatch

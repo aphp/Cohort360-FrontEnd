@@ -10,23 +10,26 @@ import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchClaim, PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
 import { CriteriaDrawerComponentProps } from 'types'
-import { RessourceType } from 'types/requestCriterias'
+import { Comparators, GhmDataType, RessourceType } from 'types/requestCriterias'
 
-export const defaultClaim = {
+export const defaultClaim: Omit<GhmDataType, 'id'> = {
   type: RessourceType.CLAIM,
   title: 'Critères GHM',
   code: [],
+  label: undefined,
   occurrence: 1,
-  occurrenceComparator: '>=',
+  occurrenceComparator: Comparators.GREATER_OR_EQUAL,
   startOccurrence: '',
   endOccurrence: '',
-  isInclusive: true
+  isInclusive: true,
+  encounterStartDate: null,
+  encounterEndDate: null
 }
 
 const Index = (props: CriteriaDrawerComponentProps) => {
   const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
-  const [defaultCriteria, setDefaultCriteria] = useState(selectedCriteria || defaultClaim)
+  const [defaultCriteria, setDefaultCriteria] = useState<GhmDataType>((selectedCriteria as GhmDataType) || defaultClaim)
 
   const isEdition = selectedCriteria !== null
   const dispatch = useAppDispatch()
@@ -47,7 +50,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       value,
       defaultCriteria,
       newHierarchy,
-      setDefaultCriteria,
+      (updatedCriteria) => setDefaultCriteria(updatedCriteria as GhmDataType),
       selectedTab,
       defaultClaim.type,
       dispatch

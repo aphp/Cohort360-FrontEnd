@@ -35,6 +35,7 @@ import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
 import { defaultCondition } from '../../index'
 import { HierarchyTree } from 'types'
+import { Cim10DataType } from 'types/requestCriterias'
 
 type CimListItemProps = {
   cim10Item: PmsiListType
@@ -147,7 +148,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
 
 type Cim10HierarchyProps = {
   isOpen: boolean
-  selectedCriteria: any
+  selectedCriteria: Cim10DataType
   goBack: (data: any) => void
   onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
   isEdition?: boolean
@@ -171,7 +172,7 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
     if (!newList.code) {
       newList.code = selectedCriteria.code
     }
-    newList.code.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, cim10Hierarchy).equivalentRow)
+    newList.code?.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, cim10Hierarchy).equivalentRow)
     setCurrentState(newList)
   }, [initialState, cim10Hierarchy])
 

@@ -37,7 +37,7 @@ import { Comparators, DocType, DocumentDataType, RessourceType } from 'types/req
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 
-const defaultComposition: DocumentDataType = {
+const defaultComposition: Omit<DocumentDataType, 'id'> = {
   type: RessourceType.DOCUMENTS,
   title: 'Critère de document',
   search: '',
@@ -56,7 +56,9 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()
-  const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
+  const [defaultValues, setDefaultValues] = useState<DocumentDataType>(
+    (selectedCriteria as DocumentDataType) || defaultComposition
+  )
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const [searchCheckingLoading, setSearchCheckingLoading] = useState(false)
   const [searchInputError, setSearchInputError] = useState<SearchInputError | undefined>(undefined)
@@ -69,7 +71,7 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   }
 
   const _onChangeValue = (key: string, value: any) => {
-    const _defaultValues = defaultValues ? { ...defaultValues } : {}
+    const _defaultValues: any = defaultValues ? { ...defaultValues } : {}
     _defaultValues[key] = value
     setDefaultValues(_defaultValues)
   }
@@ -195,7 +197,7 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             options={criteriaData?.data?.docTypes || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => _.isEqual(option, value)}
-            value={defaultValues.docType}
+            value={defaultValues.docType || undefined}
             onChange={(e, value) => _onChangeValue('docType', value)}
             renderInput={(params) => <TextField {...params} label="Types de documents" />}
             groupBy={(doctype) => doctype.type}
@@ -213,10 +215,13 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
                 if (currentDocTypeList.length === currentSelectedDocTypeList.length) {
                   _onChangeValue(
                     'docType',
-                    defaultValues.docType.filter((doc: DocType) => doc.type !== docType.group)
+                    defaultValues.docType?.filter((doc: DocType) => doc.type !== docType.group)
                   )
                 } else {
-                  _onChangeValue('docType', _.uniqWith([...defaultValues.docType, ...currentDocTypeList], _.isEqual))
+                  _onChangeValue(
+                    'docType',
+                    _.uniqWith([...(defaultValues.docType || []), ...currentDocTypeList], _.isEqual)
+                  )
                 }
               }
 

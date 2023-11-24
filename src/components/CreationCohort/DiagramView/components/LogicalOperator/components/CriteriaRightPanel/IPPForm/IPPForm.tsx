@@ -9,7 +9,7 @@ import { CriteriaDrawerComponentProps } from 'types'
 import useStyles from './styles'
 import { IPPListDataType, RessourceType } from 'types/requestCriterias'
 
-const defaultIPPList: IPPListDataType = {
+const defaultIPPList: Omit<IPPListDataType, 'id'> = {
   title: "Liste d'IPP",
   type: RessourceType.IPP_LIST,
   search: '',
@@ -22,15 +22,17 @@ const IPPForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const { classes } = useStyles()
 
   const [error, setError] = useState(false)
-  const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultIPPList)
+  const [defaultValues, setDefaultValues] = useState<IPPListDataType>(
+    (selectedCriteria as IPPListDataType) || defaultIPPList
+  )
   const [ippList, setIppList] = useState<string[]>([])
 
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onChangeValue = (key: string, value: any) => {
-    const _defaultValues = defaultValues ? { ...defaultValues } : {}
+    const _defaultValues: any = defaultValues ? { ...defaultValues } : {}
     _defaultValues[key] = value
-    setDefaultValues(_defaultValues)
+    setDefaultValues(_defaultValues as IPPListDataType)
   }
 
   const _onSubmit = () => {

@@ -20,7 +20,7 @@ import useStyles from './styles'
 import { DurationRangeType, LabelObject, VitalStatusLabel } from 'types/searchCriterias'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
-import { CriteriaDataKey, RessourceType } from 'types/requestCriterias'
+import { CriteriaDataKey, DemographicDataType, RessourceType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import { convertStringToDuration, checkMinMaxValue } from 'utils/age'
 import { CriteriaDrawerComponentProps, CriteriaItemDataCache } from 'types'
@@ -41,7 +41,8 @@ export const mappingCriteria = (criteriaToMap: any, key: CriteriaDataKey, mappin
 }
 
 const DemographicForm = (props: CriteriaDrawerComponentProps) => {
-  const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { criteriaData, onChangeSelectedCriteria, goBack } = props
+  const selectedCriteria: DemographicDataType | null = props.selectedCriteria as DemographicDataType
   const [birthdates, setBirthdates] = useState<DurationRangeType>(selectedCriteria?.birthdates || [null, null])
   const [deathDates, setDeathDates] = useState<DurationRangeType>(selectedCriteria?.deathDates || [null, null])
   const [age, setAge] = useState<DurationRangeType>(selectedCriteria?.age || [null, null])
