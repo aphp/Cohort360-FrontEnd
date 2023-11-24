@@ -154,7 +154,7 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
             multiple
             id="criteria-gender-autocomplete"
             className={classes.inputItem}
-            options={criteriaData.data?.gender || []}
+            options={criteriaData.data.gender || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={genders}
@@ -166,7 +166,7 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
             multiple
             id="criteria-vitalStatus-autocomplete"
             className={classes.inputItem}
-            options={criteriaData.data?.status}
+            options={criteriaData.data.status}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={vitalStatus}

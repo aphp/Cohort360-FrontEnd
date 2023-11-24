@@ -131,7 +131,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((procedureHierarchySubItem: any, index: number) =>
+            subItems.map((procedureHierarchySubItem, index: number) =>
               procedureHierarchySubItem.id === 'loading' ? (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />

@@ -53,16 +53,16 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     await services.cohortCreation.fetchCim10Diagnostic(searchValue, false)
 
   if (
-    criteriaData?.data?.diagnosticTypes === 'loading' ||
-    criteriaData?.data?.statusDiagnostic === 'loading' ||
-    criteriaData?.data?.cim10Diagnostic === 'loading'
+    !criteriaData?.data?.diagnosticTypes ||
+    !criteriaData?.data?.statusDiagnostic ||
+    !criteriaData?.data?.cim10Diagnostic
   ) {
     return <></>
   }
 
   const defaultValuesCode = currentState.code
-    ? currentState.code.map((code: any) => {
-        const criteriaCode = criteriaData.data?.cim10Diagnostic
+    ? currentState.code.map((code) => {
+        const criteriaCode = criteriaData.data.cim10Diagnostic
           ? criteriaData.data.cim10Diagnostic.find((c: any) => c.id === code.id)
           : null
         return {
@@ -72,8 +72,8 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       })
     : []
   const defaultValuesType = currentState.diagnosticType
-    ? currentState.diagnosticType.map((diagnosticType: any) => {
-        const criteriaType = criteriaData.data?.diagnosticTypes
+    ? currentState.diagnosticType.map((diagnosticType) => {
+        const criteriaType = criteriaData.data.diagnosticTypes
           ? criteriaData.data.diagnosticTypes.find((g: any) => g.id === diagnosticType.id)
           : null
         return {
@@ -163,7 +163,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             noOptionsText="Veuillez entrer un code ou un diagnostic CIM10"
             className={classes.inputItem}
             autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteriaData?.data?.cim10Diagnostic || []}
+            autocompleteOptions={criteriaData.data.cim10Diagnostic || []}
             getAutocompleteOptions={getDiagOptions}
             onChange={(e, value) => {
               onChangeValue('code', value)
@@ -173,9 +173,9 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             multiple
             id="criteria-cim10-type-autocomplete"
             className={classes.inputItem}
-            options={criteriaData?.data?.diagnosticTypes || []}
+            options={criteriaData.data.diagnosticTypes || []}
             getOptionLabel={(option) => option.label}
-            isOptionEqualToValue={(option: any, value: any) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesType}
             onChange={(e, value) => onChangeValue('diagnosticType', value)}
             renderInput={(params) => <TextField {...params} label="Type de diagnostic" />}

@@ -493,7 +493,7 @@ const cohortCreationSlice = createSlice({
               }
             }
           }
-          idMap[selectedCriteria.id as number] = index + 1
+          idMap[selectedCriteria.id] = index + 1
           return { ...selectedCriteria, id: index + 1 }
         })
 

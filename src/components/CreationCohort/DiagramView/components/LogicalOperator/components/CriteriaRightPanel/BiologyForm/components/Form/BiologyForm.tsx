@@ -57,8 +57,8 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   }
 
   const defaultValuesCode = currentState.code
-    ? currentState.code.map((code: any) => {
-        const criteriaCode = criteriaData.data?.biologyData
+    ? currentState.code.map((code) => {
+        const criteriaCode = criteriaData.data.biologyData
           ? criteriaData.data.biologyData.find((g: any) => g.id === code.id)
           : null
         return {
@@ -171,7 +171,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
 
             <Grid container item style={{ margin: '1em 0px', width: 'calc(100%-2em)' }}>
               {defaultValuesCode.length > 0 ? (
-                defaultValuesCode.map((valueCode: any, index: number) => (
+                defaultValuesCode.map((valueCode, index: number) => (
                   <Chip
                     key={index}
                     style={{ margin: 3 }}
@@ -185,7 +185,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                     onDelete={() =>
                       onChangeValue(
                         'code',
-                        defaultValuesCode.filter((code: any) => code !== valueCode)
+                        defaultValuesCode.filter((code) => code !== valueCode)
                       )
                     }
                   />

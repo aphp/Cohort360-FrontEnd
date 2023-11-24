@@ -59,8 +59,8 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
   }
 
   const defaultValuesCode = currentState.code
-    ? currentState.code.map((code: any) => {
-        const criteriaCode = criteriaData.data?.ccamData
+    ? currentState.code.map((code) => {
+        const criteriaCode = criteriaData.data.ccamData
           ? criteriaData.data.ccamData.find((g: any) => g.id === code.id)
           : null
         return {
@@ -163,7 +163,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             noOptionsText="Veuillez entrer un code ou un acte CCAM"
             className={classes.inputItem}
             autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteriaData?.data?.ccamData || []}
+            autocompleteOptions={criteriaData.data.ccamData || []}
             getAutocompleteOptions={getCCAMOptions}
             onChange={(e, value) => onChangeValue('code', value)}
           />

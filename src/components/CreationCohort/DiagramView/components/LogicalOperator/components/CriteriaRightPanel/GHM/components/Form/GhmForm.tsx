@@ -39,8 +39,8 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
     dispatch(fetchClaim())
   }
   const defaultValuesCode = currentState.code
-    ? currentState.code.map((code: any) => {
-        const criteriaCode = criteriaData.data?.ghmData
+    ? currentState.code.map((code) => {
+        const criteriaCode = criteriaData.data.ghmData
           ? criteriaData.data.ghmData.find((g: any) => g.id === code.id)
           : null
         return {
@@ -133,7 +133,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             noOptionsText="Veuillez entrer un code ou un critère GHM"
             className={classes.inputItem}
             autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteriaData?.data?.ghmData || []}
+            autocompleteOptions={criteriaData.data.ghmData || []}
             getAutocompleteOptions={getGhmOptions}
             onChange={(e, value) => {
               onChangeValue('code', value)

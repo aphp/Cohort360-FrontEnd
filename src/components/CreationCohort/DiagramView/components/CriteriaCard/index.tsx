@@ -30,7 +30,7 @@ const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriter
   const { classes } = useStyles()
 
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
-  const { criteria } = useAppSelector((state) => state.cohortCreation || {})
+  const { criteria } = useAppSelector((state) => state.cohortCreation)
 
   const maintenanceIsActive = meState?.maintenance?.active
 

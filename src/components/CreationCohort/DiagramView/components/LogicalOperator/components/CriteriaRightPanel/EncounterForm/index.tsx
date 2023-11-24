@@ -314,7 +314,7 @@ const EncounterForm = ({
               <Autocomplete
                 multiple
                 id="criteria-PriseEnChargeType-autocomplete"
-                options={criteriaData?.data?.priseEnChargeType || []}
+                options={criteriaData.data.priseEnChargeType || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={priseEnChargeType}
@@ -325,7 +325,7 @@ const EncounterForm = ({
               <Autocomplete
                 multiple
                 id="criteria-TypeDeSejour-autocomplete"
-                options={criteriaData?.data?.typeDeSejour || []}
+                options={criteriaData.data.typeDeSejour || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={typeDeSejour}
@@ -336,7 +336,7 @@ const EncounterForm = ({
               <Autocomplete
                 multiple
                 id="criteria-FileStatus-autocomplete"
-                options={criteriaData?.data?.fileStatus || []}
+                options={criteriaData.data.fileStatus || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={fileStatus}
@@ -350,7 +350,7 @@ const EncounterForm = ({
               <Autocomplete
                 multiple
                 id="criteria-admissionMode-autocomplete"
-                options={criteriaData?.data?.admissionModes || []}
+                options={criteriaData.data.admissionModes || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={admissionMode}
@@ -361,7 +361,7 @@ const EncounterForm = ({
               <Autocomplete
                 multiple
                 id="criteria-admission-autocomplete"
-                options={criteriaData?.data?.admission || []}
+                options={criteriaData.data.admission || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={admission}
@@ -375,7 +375,7 @@ const EncounterForm = ({
               <Autocomplete
                 multiple
                 id="criteria-entryMode-autocomplete"
-                options={criteriaData?.data?.entryModes || []}
+                options={criteriaData.data.entryModes || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={entryMode}
@@ -386,7 +386,7 @@ const EncounterForm = ({
               <Autocomplete
                 multiple
                 id="criteria-exitMode-autocomplete"
-                options={criteriaData?.data?.exitModes || []}
+                options={criteriaData.data.exitModes || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={exitMode}
@@ -397,7 +397,7 @@ const EncounterForm = ({
               <Autocomplete
                 multiple
                 id="criteria-reason-autocomplete"
-                options={criteriaData?.data?.reason || []}
+                options={criteriaData.data.reason || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={reason}
@@ -411,7 +411,7 @@ const EncounterForm = ({
               <Autocomplete
                 multiple
                 id="criteria-destination-autocomplete"
-                options={criteriaData?.data?.destination || []}
+                options={criteriaData.data.destination || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={destination}
@@ -422,7 +422,7 @@ const EncounterForm = ({
               <Autocomplete
                 multiple
                 id="criteria-provenance-autocomplete"
-                options={criteriaData?.data?.provenance || []}
+                options={criteriaData.data.provenance || []}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={provenance}

@@ -244,8 +244,7 @@ export type ObservationDataType = CommonCriteriaDataType & {
   encounterEndDate: string | null
 }
 
-export type ImagingDataType = {
-  title: string
+export type ImagingDataType = CommonCriteriaDataType & {
   type: RessourceType.IMAGING
   studyStartDate: string | null
   studyEndDate: string | null
@@ -272,7 +271,6 @@ export type ImagingDataType = {
   occurrenceComparator: Comparators
   startOccurrence: string | null
   endOccurrence: string | null
-  isInclusive?: boolean
 }
 
 export enum VitalStatusLabel {
