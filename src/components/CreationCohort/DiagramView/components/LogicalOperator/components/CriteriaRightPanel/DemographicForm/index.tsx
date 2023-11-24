@@ -17,7 +17,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
 
-import { DurationRangeType, LabelObject, VitalStatus } from 'types/searchCriterias'
+import { DurationRangeType, LabelObject, VitalStatusLabel } from 'types/searchCriterias'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { CriteriaDataKey, SelectedCriteriaType, RessourceType } from 'types/requestCriterias'
@@ -187,7 +187,7 @@ const DemographicForm = (props: DemographicFormProps) => {
               label={
                 vitalStatus &&
                 vitalStatus.length === 1 &&
-                vitalStatus.find((status: LabelObject) => status.id === VitalStatus.DECEASED)
+                vitalStatus.find((status: LabelObject) => status.label === VitalStatusLabel.DECEASED)
                   ? 'Âge au décès'
                   : 'Âge actuel'
               }
@@ -195,20 +195,17 @@ const DemographicForm = (props: DemographicFormProps) => {
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
             />
           </BlockWrapper>
-
-          {vitalStatus &&
-            vitalStatus.length > 0 &&
-            vitalStatus.find((status: LabelObject) => status.id === VitalStatus.DECEASED) && (
-              <BlockWrapper margin="1em">
-                <CalendarRange
-                  inline
-                  value={deathDates}
-                  label={'Date de décès'}
-                  onChange={(value) => setDeathDates(value)}
-                  onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
-                />
-              </BlockWrapper>
-            )}
+          {vitalStatus && (vitalStatus.length === 0 || vitalStatus.length === 2) && (
+            <BlockWrapper margin="1em">
+              <CalendarRange
+                inline
+                value={deathDates}
+                label={'Date de décès'}
+                onChange={(value) => setDeathDates(value)}
+                onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+              />
+            </BlockWrapper>
+          )}
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
