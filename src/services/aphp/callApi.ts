@@ -959,7 +959,7 @@ export const fetchScope: (
   if (cohortIds && cohortIds.length > 0) options = [...options, `cohort_id=${cohortIds.join(',')}`] // eslint-disable-line
   if (type && type.length > 0) options = [...options, `type_source_value=${type.join(',')}`] // eslint-disable-line
 
-  const url: string = isExecutiveUnit ? 'accesses/perimeters/?' : 'accesses/perimeters/read-patient/?'
+  const url: string = isExecutiveUnit ? 'accesses/perimeters/?' : 'accesses/perimeters/patient-data/rights/?'
   const response: AxiosResponse<IScope | unknown> = await apiBackend.get(`${url}${options.reduce(paramsReducer)}`, {
     signal: signal
   })

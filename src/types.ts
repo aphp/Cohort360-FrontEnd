@@ -719,8 +719,8 @@ export type ScopePage = {
   perimeter: ScopeElement
   read_role: string
   right_read_patient_nominative: boolean
-  right_read_patient_pseudo_anonymised: boolean
-  right_search_patient_with_ipp: boolean
+  right_read_patient_pseudonymized: boolean
+  right_search_patients_by_ipp: boolean
   read_access?: string
   read_export?: string
 }
@@ -732,18 +732,6 @@ export type IScope = {
 }
 
 export type GroupRights = {
-  perimeter_id: string
-  care_site_id: number
-  provider_id: string
-  care_site_history_ids: number[]
-  access_ids: number[]
-  right_read_patient_nominative: boolean
-  right_read_patient_pseudo_anonymised: boolean
-  right_search_patient_with_ipp: boolean
-  right_export_csv_nominative: boolean
-  right_export_csv_pseudo_anonymised: boolean
-  right_transfer_jupyter_nominative: boolean
-  right_transfer_jupyter_pseudo_anonymised: boolean
   export_csv_nomi?: boolean
   export_csv_pseudo?: boolean
   export_jupyter_nomi?: boolean

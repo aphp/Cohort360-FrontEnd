@@ -176,18 +176,18 @@ const servicesPerimeters: IServicePerimeters = {
       return false
     }
 
-    const caresiteIds = selectedPopulation
+    const perimetersIds = selectedPopulation
       .map((perimeter) => perimeter?.id)
       .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
       .join(',')
 
-    const rightResponse = await fetchPerimeterAccesses(caresiteIds)
+    const rightResponse = await fetchPerimeterAccesses(perimetersIds)
     const rightsData = (rightResponse.data as any[]) ?? []
 
     let allowSearchIpp = false
 
     rightsData.forEach((right) => {
-      if (right.right_search_patient_with_ipp) {
+      if (right.right_search_patients_by_ipp) {
         allowSearchIpp = true
       }
     })
@@ -287,7 +287,7 @@ const servicesPerimeters: IServicePerimeters = {
       if (!defaultPerimetersIds && !noPerimetersIdsFetch) {
         const url: string = isExecutiveUnit
           ? 'accesses/perimeters/?type_source_value=' + servicesPerimeters.getHigherTypes()[0]
-          : 'accesses/perimeters/read-patient/'
+          : 'accesses/perimeters/patient-data/rights/'
         const rightResponse = await apiBackend.get(url, { signal: signal })
         if (rightResponse.status === 200 && rightResponse.data.message === noRightsMessage) {
           const noRightError: any = {
@@ -407,9 +407,9 @@ const servicesPerimeters: IServicePerimeters = {
   },
 
   fetchPerimetersRights: async (perimeters) => {
-    const caresiteIds = perimeters.map((perimeter) => perimeter.id).join(',')
+    const perimetersIds = perimeters.map((perimeter) => perimeter.id).join(',')
 
-    const rightResponse = await fetchPerimeterAccesses(caresiteIds)
+    const rightResponse = await fetchPerimeterAccesses(perimetersIds)
     const rightsData = (rightResponse.data as any[]) ?? []
 
     return perimeters.map((perimeter) => {
