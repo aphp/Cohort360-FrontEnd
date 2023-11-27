@@ -118,7 +118,7 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
       <Modal
         title="Information sur le filtre"
         open={toggleFilterInfoModal}
-        noActions
+        readonly
         onClose={() => setToggleFilterInfoModal(false)}
         validationText="Fermer"
       >
