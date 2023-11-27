@@ -72,11 +72,15 @@ const FiltersList = ({ values, deidentified, onSubmit }: FiltersListProps) => {
       const [key, value] = pair.split('=')
 
       if (key === 'genders') {
-        params.filters[key] = value.split(',') as GenderStatus[]
+        params.filters[key] = (value ? value.split(',') : []) as GenderStatus[]
       } else if (key === 'birthdatesRanges') {
-        params.filters[key] = value.split(',') as DurationRangeType
+        const dateRange = value ? value.split(',') : ['0/0/0', '0/0/130']
+
+        params.filters[key] = dateRange.map((dateFilter, index) =>
+          dateFilter !== 'null' && dateFilter ? dateFilter : index === 0 ? '0/0/0' : '0/0/130'
+        ) as DurationRangeType
       } else if (key === 'vitalStatuses') {
-        params.filters[key] = value.split(',') as VitalStatus[]
+        params.filters[key] = (value ? value.split(',') : []) as VitalStatus[]
       } else {
         params[key as keyof SearchCriterias<PatientsFilters>] = decodeURIComponent(value) as PatientsFilters &
           SearchByTypes &
