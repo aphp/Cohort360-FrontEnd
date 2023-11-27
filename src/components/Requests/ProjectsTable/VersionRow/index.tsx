@@ -77,50 +77,46 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
         </TableHead>
         <TableBody>
           {cohorts && cohorts.length > 0 ? (
-            cohorts.map((historyRow) => {
-              if (!historyRow) return <></>
+            cohorts.map((cohort) => {
+              if (!cohort) return <></>
 
               const isError =
-                !historyRow.fhir_group_id ||
-                historyRow.request_job_status === JobStatus.pending ||
-                historyRow.request_job_status === JobStatus.new ||
-                !!historyRow.request_job_fail_msg
+                !cohort.fhir_group_id ||
+                cohort.request_job_status === JobStatus.pending ||
+                cohort.request_job_status === JobStatus.new ||
+                !!cohort.request_job_fail_msg
 
-              const canExportThisCohort = !!ODD_EXPORT && !isError ? historyRow.rights?.export_csv_nomi : false
+              const canExportThisCohort = !!ODD_EXPORT && !isError ? cohort.rights?.export_csv_nomi : false
 
               return (
-                <TableRow key={historyRow.uuid}>
+                <TableRow key={cohort.uuid}>
                   <TableCellWrapper align="left" className={classes.tdName}>
-                    {historyRow.fhir_group_id ? (
-                      <Link onClick={() => navigate(`/cohort/${historyRow.fhir_group_id}`)} underline="hover">
-                        {historyRow.name}
+                    {cohort.fhir_group_id ? (
+                      <Link onClick={() => navigate(`/cohort/${cohort.fhir_group_id}`)} underline="hover">
+                        {cohort.name}
                       </Link>
                     ) : (
                       <Typography component="span" className={classes.notAllowed}>
-                        {historyRow.name}
+                        {cohort.name}
                       </Typography>
                     )}
-                    <IconButton
-                      className={classes.editButton}
-                      size="small"
-                      onClick={() => _handleEditCohort(historyRow)}
-                    >
+                    <IconButton className={classes.editButton} size="small" onClick={() => _handleEditCohort(cohort)}>
                       <EditIcon />
                     </IconButton>
                   </TableCellWrapper>
                   <TableCellWrapper>
-                    <IconButton onClick={() => onSetCohortFavorite(historyRow)}>
-                      <FavStar favorite={historyRow.favorite} />
+                    <IconButton onClick={() => onSetCohortFavorite(cohort)}>
+                      <FavStar favorite={cohort.favorite} />
                     </IconButton>
                   </TableCellWrapper>
                   <TableCellWrapper>
-                    {historyRow.fhir_group_id ? (
+                    {cohort.fhir_group_id ? (
                       <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                    ) : historyRow.request_job_status === JobStatus.pending ||
-                      historyRow.request_job_status === JobStatus.new ? (
+                    ) : cohort.request_job_status === JobStatus.pending ||
+                      cohort.request_job_status === JobStatus.new ? (
                       <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
-                    ) : historyRow.request_job_fail_msg ? (
-                      <Tooltip title={historyRow.request_job_fail_msg}>
+                    ) : cohort.request_job_fail_msg ? (
+                      <Tooltip title={cohort.request_job_fail_msg}>
                         <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
                       </Tooltip>
                     ) : (
@@ -130,23 +126,21 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                   <TableCellWrapper>
                     <Link
                       className={classes.versionLabel}
-                      onClick={() => navigate(`/cohort/new/${requestId}/${historyRow.request_query_snapshot}`)}
+                      onClick={() => navigate(`/cohort/new/${requestId}/${cohort.request_query_snapshot}`)}
                     >
-                      {historyRow.request_query_snapshot?.split('-')[0]}
+                      {cohort.request_query_snapshot?.split('-')[0]}
                     </Link>
                   </TableCellWrapper>
-                  <TableCellWrapper>{displayDigit(historyRow.result_size)}</TableCellWrapper>
+                  <TableCellWrapper>{displayDigit(cohort.result_size)}</TableCellWrapper>
                   <Hidden lgDown>
-                    <TableCellWrapper>{moment(historyRow.modified_at).format('DD/MM/YYYY [à] HH:mm')}</TableCellWrapper>
+                    <TableCellWrapper>{moment(cohort.modified_at).format('DD/MM/YYYY [à] HH:mm')}</TableCellWrapper>
                   </Hidden>
 
                   <TableCellWrapper>
                     <IconButton
                       disabled={!canExportThisCohort}
                       onClick={
-                        canExportThisCohort
-                          ? () => setSelectedExportableCohort(historyRow.fhir_group_id ?? '')
-                          : () => null
+                        canExportThisCohort ? () => setSelectedExportableCohort(cohort.fhir_group_id ?? '') : () => null
                       }
                     >
                       <ExportIcon />
