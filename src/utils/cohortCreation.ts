@@ -200,8 +200,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
                 .reduce(searchReducer)}`
             : ''
         }`,
-        `${ageMinCriterion}`,
-        `${ageMaxCriterion}`,
+        criterion.birthdates[0] === null && criterion.birthdates[1] === null ? `${ageMinCriterion}` : '',
+        criterion.birthdates[0] === null && criterion.birthdates[1] === null ? `${ageMaxCriterion}` : '',
         criterion.birthdates[0]
           ? `${PATIENT_BIRTHDATE}=ge${moment(criterion.birthdates[0]).format('YYYY-MM-DD[T00:00:00Z]')}`
           : '',

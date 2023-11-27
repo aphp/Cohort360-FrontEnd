@@ -19,12 +19,12 @@ type DurationRangeProps = {
   onError: (isError: boolean) => void
 }
 const defaultMinDuration: DurationType = {
-  year: 0,
+  year: null,
   month: null,
   day: null
 }
 const defaultMaxDuration: DurationType = {
-  year: 130,
+  year: null,
   month: null,
   day: null
 }
@@ -46,9 +46,6 @@ const DurationRange: React.FC<DurationRangeProps> = ({
     onError(false)
     if (!checkMinMaxValue(minDuration, maxDuration)) {
       setError({ isError: true, errorMessage: 'La date maximale doit être supérieure à la date minimale.' })
-      onError(true)
-    } else if (maxDuration.year === 0 && !maxDuration.month && !maxDuration.day) {
-      setError({ isError: true, errorMessage: 'Au moins une des valeurs maximales ne doit pas être égale à 0' })
       onError(true)
     } else {
       onChange([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
@@ -76,6 +73,7 @@ const DurationRange: React.FC<DurationRangeProps> = ({
       <DurationInput
         disabled={disabled}
         value={maxDuration}
+        name="max"
         deidentified={deidentified}
         label={`${unit} maximum`}
         onChange={(newDuration) => setMaxDuration(newDuration)}
