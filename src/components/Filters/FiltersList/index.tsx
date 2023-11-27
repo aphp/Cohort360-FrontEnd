@@ -1,17 +1,7 @@
 import Modal, { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import ListItems from 'components/ui/ListItems'
-import {
-  DurationRangeType,
-  FilterKeys,
-  GenderStatus,
-  OrderBy,
-  PatientsFilters,
-  SavedFilter,
-  SearchByTypes,
-  SearchCriterias,
-  VitalStatus
-} from 'types/searchCriterias'
+import { FilterKeys, PatientsFilters, SavedFilter, SearchCriterias } from 'types/searchCriterias'
 import { Item } from 'components/ui/ListItems/ListItem'
 import Button from 'components/ui/Button'
 import { DeleteOutline } from '@mui/icons-material'
@@ -19,6 +9,7 @@ import { Grid, TextField, Typography } from '@mui/material'
 import GendersFilter from '../GendersFilter'
 import VitalStatusesFilter from '../VitalStatusesFilter'
 import BirthdatesRangesFilter from '../BirthdatesRangesFilters'
+import { mapStringToSearchCriteria } from 'mappers/filters'
 
 enum Mode {
   SINGLE,
@@ -29,7 +20,8 @@ type FiltersListProps = {
   values: SavedFilter[]
   name: string
   deidentified?: boolean | null
-  onSubmit: (value: any) => void
+  onSubmitDelete: (value: any) => void
+  setSelectedFilter: (value: SearchCriterias<PatientsFilters>) => void
 }
 
 type FilterInfoModal = {
@@ -37,7 +29,7 @@ type FilterInfoModal = {
   filterParams: SearchCriterias<PatientsFilters>
 }
 
-const FiltersList = ({ values, deidentified, onSubmit }: FiltersListProps) => {
+const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }: FiltersListProps) => {
   const context = useContext(FormContext)
   const [filters, setFilters] = useState<Item[]>(
     values.map((value) => {
@@ -55,50 +47,25 @@ const FiltersList = ({ values, deidentified, onSubmit }: FiltersListProps) => {
     if (savedFilterInfo) {
       setSelectedItemInfo({
         filterName: savedFilterInfo.name,
-        filterParams: parseQueryFilterString(savedFilterInfo.filter)
+        filterParams: mapStringToSearchCriteria(savedFilterInfo.filter)
       })
       setToggleFilterInfoModal(true)
     }
   }
 
-  const parseQueryFilterString = (queryString: string): SearchCriterias<PatientsFilters> => {
-    const params: SearchCriterias<PatientsFilters> = {
-      filters: {} as PatientsFilters,
-      searchInput: '',
-      orderBy: {} as OrderBy
-    }
-
-    queryString.split('&').forEach((pair) => {
-      const [key, value] = pair.split('=')
-
-      if (key === 'genders') {
-        params.filters[key] = (value ? value.split(',') : []) as GenderStatus[]
-      } else if (key === 'birthdatesRanges') {
-        const dateRange = value ? value.split(',') : ['0/0/0', '0/0/130']
-
-        params.filters[key] = dateRange.map((dateFilter, index) =>
-          dateFilter !== 'null' && dateFilter ? dateFilter : index === 0 ? '0/0/0' : '0/0/130'
-        ) as DurationRangeType
-      } else if (key === 'vitalStatuses') {
-        params.filters[key] = (value ? value.split(',') : []) as VitalStatus[]
-      } else {
-        params[key as keyof SearchCriterias<PatientsFilters>] = decodeURIComponent(value) as PatientsFilters &
-          SearchByTypes &
-          string &
-          OrderBy
-      }
-    })
-
-    return params
-  }
-
   const handleSelectedFilter = (newFilters: Item[]) => {
+    if (mode === Mode.SINGLE) {
+      const selectedFilter = newFilters.find((newFilter) => newFilter.checked)
+      const savedFilterInfo = values.find((filter) => filter.uuid === selectedFilter?.id)
+
+      setSelectedFilter(mapStringToSearchCriteria(savedFilterInfo?.filter ?? ''))
+    }
     setFilters(newFilters)
   }
 
   const handleDeleteSelectedFilters = async () => {
     const checkedFilterIdsToDelete = filters.filter((filter) => filter.checked).map((filter) => filter.id)
-    onSubmit(checkedFilterIdsToDelete)
+    onSubmitDelete(checkedFilterIdsToDelete)
 
     const keptFilters = filters.filter((filter) => !filter.checked)
     setFilters(keptFilters)

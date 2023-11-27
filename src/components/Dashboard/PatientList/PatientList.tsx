@@ -28,7 +28,16 @@ import Searchbar from 'components/ui/Searchbar'
 import Select from 'components/ui/Searchbar/Select'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
-import { FilterKeys, SavedFiltersResults, searchByListPatients, SearchByTypes } from 'types/searchCriterias'
+import {
+  Direction,
+  FilterKeys,
+  Order,
+  PatientsFilters,
+  SavedFiltersResults,
+  searchByListPatients,
+  SearchByTypes,
+  SearchCriterias
+} from 'types/searchCriterias'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
 import { BlockWrapper } from 'components/ui/Layout'
@@ -43,7 +52,6 @@ import FiltersNameFilter from 'components/Filters/FiltersNameFilter'
 import { deleteFiltersService, getFiltersService, postFiltersService } from 'services/aphp/servicePatients'
 import { RessourceType } from 'types/requestCriterias'
 import FiltersList from 'components/Filters/FiltersList'
-import { mapStringToSearchCriteria } from 'mappers/filters'
 
 type PatientListProps = {
   total: number
@@ -67,6 +75,16 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
     vitalStatusData?: SimpleChartDataType[]
     genderData?: SimpleChartDataType[]
   }>({})
+  const [selectedFilter, setSelectedFilter] = useState<SearchCriterias<PatientsFilters>>({
+    searchBy: SearchByTypes.TEXT,
+    searchInput: '',
+    orderBy: { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
+    filters: {
+      genders: [],
+      birthdatesRanges: ['null', 'null'],
+      vitalStatuses: []
+    }
+  })
 
   const [
     {
@@ -125,11 +143,10 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
     }
   }
 
-  const applySavedFilters = (filtersString: string) => {
-    const mappedFilters = mapStringToSearchCriteria(filtersString)
-    changeSearchBy(mappedFilters.searchBy ?? SearchByTypes.TEXT)
-    changeSearchInput(mappedFilters.searchInput)
-    addFilters({ ...mappedFilters.filters })
+  const applySavedFilters = () => {
+    changeSearchBy(selectedFilter.searchBy ?? SearchByTypes.TEXT)
+    changeSearchInput(selectedFilter.searchInput)
+    addFilters(selectedFilter.filters)
   }
 
   const getSavedFilters = async () => {
@@ -146,7 +163,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
     await getSavedFilters()
   }
 
-  const handleFiltersUpdate = async (filtersUuids: string[]) => {
+  const handleDeleteFilters = async (filtersUuids: string[]) => {
     for (const uuid of filtersUuids) {
       await deleteFiltersService(uuid)
     }
@@ -177,8 +194,6 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
       fetchPatients()
     }
   }, [loadingStatus])
-
-  console.log(savedFilters)
 
   return (
     <Grid container>
@@ -291,14 +306,15 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
           title="Filtres sauvegardés"
           open={toggleSavedFiltersModal}
           onClose={() => setToggleSavedFiltersModal(false)}
-          onSubmit={(field) => applySavedFilters(field.savedFilters)}
+          onSubmit={applySavedFilters}
           validationText="Ouvrir"
         >
           <FiltersList
             values={savedFilters?.results || []}
             name="savedFilters"
             deidentified={deidentified}
-            onSubmit={handleFiltersUpdate}
+            onSubmitDelete={handleDeleteFilters}
+            setSelectedFilter={setSelectedFilter}
           />
         </Modal>
         <Modal

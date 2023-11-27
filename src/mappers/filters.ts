@@ -18,12 +18,12 @@ export function parseFiltersString(filtersString: string): PatientsFilters {
     birthdatesRanges: [null, null],
     vitalStatuses: []
   }
-  const filterPairs = filtersString.split('&')
+  const filterPairs = filtersString.replaceAll('null', '').split('&')
   for (const filterPair of filterPairs) {
     const [filterName, filterValue] = filterPair.split('=')
     switch (filterName) {
       case FilterKeys.GENDERS:
-        filters.genders = filterValue.split(',').map((gender) => gender as GenderStatus)
+        filters.genders = (filterValue?.split(',') ?? []) as GenderStatus[]
         break
       case FilterKeys.BIRTHDATES:
         // eslint-disable-next-line no-case-declarations
@@ -31,7 +31,7 @@ export function parseFiltersString(filtersString: string): PatientsFilters {
         filters.birthdatesRanges = [start, end] as DurationRangeType
         break
       case FilterKeys.VITAL_STATUSES:
-        filters.vitalStatuses = filterValue.split(',').map((vitalStatus) => vitalStatus as VitalStatus)
+        filters.vitalStatuses = (filterValue?.split(',') ?? []) as VitalStatus[]
         break
     }
   }
