@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Autocomplete, FormLabel, Grid, MenuItem, Select, TextField, Tooltip } from '@mui/material'
-import InfoIcon from '@mui/icons-material/Info'
+import { Autocomplete, FormLabel, Grid, MenuItem, Select, TextField } from '@mui/material'
 import { BlockWrapper } from 'components/ui/Layout'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import Collapse from 'components/ui/Collapse'
-import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { DurationUnitWrapper } from 'components/ui/Inputs/DurationRange/styles'
 import { TextFieldWrapper } from 'components/ui/Inputs/DurationRange/styles'
@@ -12,12 +10,14 @@ import OccurenceInput from 'components/ui/Inputs/Occurences'
 import CriteriaLayout from '../CriteriaLayout'
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
-import { CriteriaDrawerComponentProps, CriteriaName } from 'types'
+import { CriteriaDrawerComponentProps, CriteriaName, LoadingStatus } from 'types'
 import { CalendarRequestLabel } from 'types/dates'
 import { Comparators, CriteriaDataKey, RessourceType } from 'types/requestCriterias'
 import { DocumentAttachmentMethod, DocumentAttachmentMethodLabel, LabelObject } from 'types/searchCriterias'
 import useStyles from './styles'
 import { mappingCriteria } from '../DemographicForm'
+import SearchbarWithCheck from 'components/ui/Inputs/SearchbarWithCheck'
+import { SearchInputError } from 'types/error'
 
 enum Error {
   EMPTY_FORM,
@@ -56,7 +56,9 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
     mappingCriteria(selectedCriteria?.studyModalities, CriteriaDataKey.MODALITIES, criteria) || []
   )
   const [studyDescription, setStudyDescription] = useState<string>(selectedCriteria?.studyDescription || '')
+  const [studyDescriptionError, setStudyDescriptionError] = useState<SearchInputError | undefined>(undefined)
   const [studyProcedure, setStudyProcedure] = useState<string>(selectedCriteria?.studyProcedure || '')
+  const [studyProcedureError, setStudyProcedureError] = useState<SearchInputError | undefined>(undefined)
   const [numberOfSeries, setNumberOfSeries] = useState<number>(selectedCriteria?.numberOfSeries || 1)
   const [seriesComparator, setSeriesComparator] = useState<Comparators>(
     selectedCriteria?.seriesComparator || Comparators.GREATER_OR_EQUAL
@@ -75,11 +77,14 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [seriesStartDate, setSeriesStartDate] = useState<string | null>(selectedCriteria?.seriesStartDate || null)
   const [seriesEndDate, setSeriesEndDate] = useState<string | null>(selectedCriteria?.seriesEndDate || null)
   const [seriesDescription, setSeriesDescription] = useState<string>(selectedCriteria?.seriesDescription || '')
+  const [seriesDescriptionError, setSeriesDescriptionError] = useState<SearchInputError | undefined>(undefined)
   const [seriesProtocol, setSeriesProtocol] = useState<string>(selectedCriteria?.seriesProtocol || '')
+  const [seriesProtocolError, setSeriesProtocolError] = useState<SearchInputError | undefined>(undefined)
   const [seriesModalities, setSeriesModalities] = useState<LabelObject[]>(
     mappingCriteria(selectedCriteria?.seriesModalities, CriteriaDataKey.MODALITIES, criteria) || []
   )
   const [bodySite, setBodySite] = useState<string>(selectedCriteria?.bodySite || '')
+  const [bodySiteError, setBodySiteError] = useState<SearchInputError | undefined>(undefined)
   const [seriesUid, setSeriesUid] = useState(selectedCriteria?.seriesUid || '')
   const [encounterService, setEncounterService] = useState(selectedCriteria?.encounterService || [])
   const [encounterStartDate, setEncounterStartDate] = useState(selectedCriteria?.encounterStartDate || null)
@@ -88,8 +93,11 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [endOccurrence, setEndOccurence] = useState(selectedCriteria?.endOccurrence || null)
 
   const [error, setError] = useState(Error.NO_ERROR)
+  const [searchCheckingLoading, setSearchCheckingLoading] = useState(LoadingStatus.SUCCESS)
 
   const _onChangeValue = (key: string, value: any) => {
+    console.log('key', key)
+    console.log('value', value)
     switch (key) {
       case 'encounterService':
         setEncounterService(value)
@@ -180,18 +188,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
         <FormLabel component="legend" className={classes.durationLegend}>
           <BlockWrapper container justifyItems="center">
             Nombre d'occurrences
-            <Tooltip
-              title={
-                <span>
-                  Si vous choisissez un chapitre, le nombre d'occurrences ne s'applique pas sur un unique élément de ce
-                  chapitre, mais sur l'ensemble des éléments de ce chapitre. <br /> Exemple: Nombre d'occurrences &ge; 3
-                  sur un chapitre signifie que l'on inclus les patients qui ont eu au moins 3 éléments de ce chapitre,
-                  distincts ou non`
-                </span>
-              }
-            >
-              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-            </Tooltip>
           </BlockWrapper>
         </FormLabel>
         <OccurenceInput
@@ -231,31 +227,28 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             onChange={(e, value) => setStudyModalities(value)}
             renderInput={(params) => <TextField {...params} label="Modalité" />}
           />
+
           {/* Description (champ text libre) => description */}
-          <Searchbar>
-            <Grid item xs={12}>
-              <SearchInput
-                value={studyDescription}
-                displayHelpIcon
-                placeholder="Rechercher dans les descriptions"
-                //   error={searchInputError?.isError ? searchInputError : undefined}
-                onchange={(newValue) => setStudyDescription(newValue)}
-              />
-            </Grid>
-          </Searchbar>
+          <SearchbarWithCheck
+            searchInput={studyDescription}
+            setSearchInput={setStudyDescription}
+            placeholder="Rechercher dans les descriptions"
+            loading={searchCheckingLoading}
+            setLoading={setSearchCheckingLoading}
+            searchInputError={studyDescriptionError}
+            setSearchInputError={setStudyDescriptionError}
+          />
 
           {/* Procédure (champ text libre) => procedureCode */}
-          <Searchbar>
-            <Grid item xs={12}>
-              <SearchInput
-                value={studyProcedure}
-                displayHelpIcon
-                placeholder="Rechercher dans les procédures"
-                //   error={searchInputError?.isError ? searchInputError : undefined}
-                onchange={(newValue) => setStudyProcedure(newValue)}
-              />
-            </Grid>
-          </Searchbar>
+          <SearchbarWithCheck
+            searchInput={studyProcedure}
+            setSearchInput={setStudyProcedure}
+            placeholder="Rechercher dans les procédures"
+            loading={searchCheckingLoading}
+            setLoading={setSearchCheckingLoading}
+            searchInputError={studyProcedureError}
+            setSearchInputError={setStudyProcedureError}
+          />
 
           {/* Nombre de series (>=0) => numberOfSeries */}
           <FormLabel component="legend" className={classes.durationLegend}>
@@ -340,30 +333,26 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
           />
 
           {/* Description (champ texte libre) => series-descr */}
-          <Searchbar>
-            <Grid item xs={12}>
-              <SearchInput
-                value={seriesDescription}
-                displayHelpIcon
-                placeholder="Rechercher dans les descriptions"
-                //   error={searchInputError?.isError ? searchInputError : undefined}
-                onchange={(newValue) => setSeriesDescription(newValue)}
-              />
-            </Grid>
-          </Searchbar>
+          <SearchbarWithCheck
+            searchInput={seriesDescription}
+            setSearchInput={setSeriesDescription}
+            placeholder="Rechercher dans les descriptions"
+            loading={searchCheckingLoading}
+            setLoading={setSearchCheckingLoading}
+            searchInputError={seriesDescriptionError}
+            setSearchInputError={setSeriesDescriptionError}
+          />
 
           {/* Protocole (champ texte libre) => series-protocol */}
-          <Searchbar>
-            <Grid item xs={12}>
-              <SearchInput
-                value={seriesProtocol}
-                displayHelpIcon
-                placeholder="Rechercher dans les protocoles"
-                //   error={searchInputError?.isError ? searchInputError : undefined}
-                onchange={(newValue) => setSeriesProtocol(newValue)}
-              />
-            </Grid>
-          </Searchbar>
+          <SearchbarWithCheck
+            searchInput={seriesProtocol}
+            setSearchInput={setSeriesProtocol}
+            placeholder="Rechercher dans les protocoles"
+            loading={searchCheckingLoading}
+            setLoading={setSearchCheckingLoading}
+            searchInputError={seriesProtocolError}
+            setSearchInputError={setSeriesProtocolError}
+          />
 
           {/* Modalité (référentiel sous forme de liste ~ 40 items) : afficher "code - nom" => series-modality */}
           <Autocomplete
@@ -377,17 +366,15 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
           />
 
           {/* Partie du corps (champ texte libre) => bodysite */}
-          <Searchbar>
-            <Grid item xs={12}>
-              <SearchInput
-                value={bodySite}
-                displayHelpIcon
-                placeholder="Rechercher dans les parties du corps"
-                //   error={searchInputError?.isError ? searchInputError : undefined}
-                onchange={(newValue) => setBodySite(newValue)}
-              />
-            </Grid>
-          </Searchbar>
+          <SearchbarWithCheck
+            searchInput={bodySite}
+            setSearchInput={setBodySite}
+            placeholder="Rechercher dans les parties du corps"
+            loading={searchCheckingLoading}
+            setLoading={setSearchCheckingLoading}
+            searchInputError={bodySiteError}
+            setSearchInputError={setBodySiteError}
+          />
 
           {/* Recherche par uid */}
           <TextField

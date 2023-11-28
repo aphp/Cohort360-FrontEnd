@@ -1747,9 +1747,9 @@ export async function unbuildRequest(_json: string): Promise<any> {
             currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
           }
 
-          if (element.DurationRangeList) {
-            currentCriterion.startOccurrence = element.DurationRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
-            currentCriterion.endOccurrence = element.DurationRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+          if (element.dateRangeList) {
+            currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+            currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
           }
 
           if (element.encounterDateRange) {

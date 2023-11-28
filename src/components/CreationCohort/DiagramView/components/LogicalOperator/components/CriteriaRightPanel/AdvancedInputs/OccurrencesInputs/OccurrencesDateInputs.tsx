@@ -6,27 +6,13 @@ import ClearIcon from '@mui/icons-material/Clear'
 
 import useStyles from './styles'
 
-const defaultOccurrenceInputs = {
-  code: [],
-  isLeaf: false,
-  valueMin: 0,
-  valueMax: 0,
-  valueComparator: '>=',
-  occurrence: 1,
-  occurrenceComparator: '>=',
-  startOccurrence: '',
-  endOccurrence: '',
-  isInclusive: true
-}
-
 type OccurrenceDateInputsProps = {
   selectedCriteria: any
   onChangeValue: (key: string, value: any) => void
 }
 
 const OccurrenceDateInputs: React.FC<OccurrenceDateInputsProps> = (props) => {
-  const { onChangeValue } = props
-  const selectedCriteria = { ...defaultOccurrenceInputs, ...props.selectedCriteria }
+  const { onChangeValue, selectedCriteria } = props
 
   const { classes } = useStyles()
 
