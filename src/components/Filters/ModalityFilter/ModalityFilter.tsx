@@ -3,7 +3,6 @@ import { Autocomplete, TextField, Typography } from '@mui/material'
 import { FormContext } from 'components/ui/Modal'
 import { LabelObject } from 'types/searchCriterias'
 import { InputWrapper } from 'components/ui/Inputs'
-import { capitalizeFirstLetter } from 'utils/capitalize'
 
 type ModalityFilterProps = {
   name: string
@@ -30,12 +29,8 @@ const ModalityFilter = ({ name, value, modalitiesList }: ModalityFilterProps) =>
         options={modalitiesList}
         value={modalities}
         disableCloseOnSelect
-        getOptionLabel={(modality: LabelObject) => `${modality.id} - ${capitalizeFirstLetter(modality.label)}`}
-        renderOption={(props, modality: LabelObject) => (
-          <li {...props}>
-            {modality.id} - {capitalizeFirstLetter(modality.label)}
-          </li>
-        )}
+        getOptionLabel={(modality: LabelObject) => modality.label}
+        renderOption={(props, modality: LabelObject) => <li {...props}>{modality.label}</li>}
         renderInput={(params) => <TextField {...params} label="Modalité" placeholder="Sélectionner modalité(s)" />}
       />
     </InputWrapper>

@@ -354,7 +354,10 @@ const servicesCohortCreation: IServiceCohortCreation = {
         biologyItem.id !== '527614'
     }),
   fetchBiologySearch: fetchBiologySearch,
-  fetchModalities: async () => fetchValueSet(IMAGING_MODALITIES, { joinDisplayWithCode: false })
+  fetchModalities: async () => {
+    const modalities = await fetchValueSet(IMAGING_MODALITIES, { joinDisplayWithCode: false })
+    return modalities.map((modality) => ({ ...modality, label: `${modality.id} - ${modality.label}` }))
+  }
 }
 
 export default servicesCohortCreation
