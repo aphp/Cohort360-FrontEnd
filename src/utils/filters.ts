@@ -58,6 +58,9 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.STATUS:
         castedFilters[key] = removeElementInArray(castedFilters[key], value)
         break
+      case FilterKeys.SOURCE:
+        castedFilters[key] = null
+        break
       case FilterKeys.CODE:
       case FilterKeys.NDA:
       case FilterKeys.ANABIO:
@@ -109,6 +112,9 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   }
   if (key === FilterKeys.CODE) {
     return `Code : ${value}`
+  }
+  if (key === FilterKeys.SOURCE) {
+    return `Source : ${value}`
   }
   if (key === FilterKeys.EXECUTIVE_UNITS) {
     return `Unité exécutrice : ${(value as ScopeTreeRow).name}`
@@ -181,7 +187,13 @@ export const selectFiltersAsArray = (filters: Filters) => {
             value: value as FilterValue
           })
           break
-
+        case FilterKeys.SOURCE:
+          result.push({
+            category: key,
+            label: getFilterLabel(key, value),
+            value: value as FilterValue
+          })
+          break
         case FilterKeys.NDA:
         case FilterKeys.CODE:
         case FilterKeys.ANABIO:

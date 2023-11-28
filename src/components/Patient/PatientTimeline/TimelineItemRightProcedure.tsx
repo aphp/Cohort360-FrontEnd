@@ -34,6 +34,9 @@ const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
   }
 
   const { classes } = useStyles({ color: color })
+
+  const codeToDisplay = data.code?.coding?.find((code) => code.userSelected === true)
+
   return (
     <li className={classes.timelineItem}>
       <div className={classes.timelineRightContent}>
@@ -50,9 +53,7 @@ const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
               : 'Date inconnue'}
           </span>
           {data.code && (
-            <div className={classes.timelineTextRight}>
-              {`${data.code?.coding?.[0].display} (${data.code?.coding?.[0].code})`}
-            </div>
+            <div className={classes.timelineTextRight}>{`${codeToDisplay?.display} (${codeToDisplay?.code})`}</div>
           )}
         </div>
       </div>

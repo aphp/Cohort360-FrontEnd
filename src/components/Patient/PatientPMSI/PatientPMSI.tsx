@@ -32,6 +32,7 @@ import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import DiagnosticTypesFilter from 'components/Filters/DiagnosticTypesFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
+import SourceFilter from 'components/Filters/SourceFilter'
 
 export type PatientPMSIProps = {
   groupId?: string
@@ -61,13 +62,13 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
       orderBy,
       searchInput,
       filters,
-      filters: { code, nda, diagnosticTypes, startDate, endDate, executiveUnits }
+      filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias }
   ] = useSearchCriterias(initPmsiSearchCriterias)
   const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({ code, nda, diagnosticTypes, startDate, endDate, executiveUnits })
-  }, [code, nda, diagnosticTypes, startDate, endDate, executiveUnits])
+    return selectFiltersAsArray({ code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits })
+  }, [code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits])
 
   const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<HierarchyElement[]>([])
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
@@ -96,7 +97,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
             searchCriterias: {
               orderBy,
               searchInput,
-              filters: { code, nda, diagnosticTypes, startDate, endDate, executiveUnits }
+              filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits }
             }
           },
           groupId,
@@ -130,7 +131,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [searchInput, nda, code, startDate, endDate, diagnosticTypes, orderBy, executiveUnits])
+  }, [searchInput, nda, code, startDate, endDate, diagnosticTypes, source, orderBy, executiveUnits])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -208,6 +209,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                     allDiagnosticTypesList={allDiagnosticTypesList}
                   />
                 )}
+                {selectedTab.id === PMSI.CCAM && <SourceFilter name={FilterKeys.SOURCE} value={source} />}
                 <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
                 <ExecutiveUnitsFilter
                   value={executiveUnits}

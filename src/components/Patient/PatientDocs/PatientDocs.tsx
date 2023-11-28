@@ -199,22 +199,24 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
         setPage={(newPage: number) => setPage(newPage)}
         total={searchResults.totalDocs}
       />
-      <Modal
-        title="Filtrer par :"
-        open={toggleModal}
-        width={'600px'}
-        onClose={() => setToggleModal(false)}
-        onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
-      >
-        {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-        <DocTypesFilter allDocTypesList={allDocTypesList.docTypes} value={docTypes} name={FilterKeys.DOC_TYPES} />
-        <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
-        <ExecutiveUnitsFilter
-          value={executiveUnits}
-          name={FilterKeys.EXECUTIVE_UNITS}
-          criteriaName={CriteriaName.Document}
-        />
-      </Modal>
+      {toggleModal && (
+        <Modal
+          title="Filtrer par :"
+          open={toggleModal}
+          width={'600px'}
+          onClose={() => setToggleModal(false)}
+          onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
+        >
+          {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+          <DocTypesFilter allDocTypesList={allDocTypesList.docTypes} value={docTypes} name={FilterKeys.DOC_TYPES} />
+          <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
+          <ExecutiveUnitsFilter
+            value={executiveUnits}
+            name={FilterKeys.EXECUTIVE_UNITS}
+            criteriaName={CriteriaName.Document}
+          />
+        </Modal>
+      )}
     </Grid>
   )
 }
