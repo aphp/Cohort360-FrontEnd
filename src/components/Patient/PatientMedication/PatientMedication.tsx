@@ -212,41 +212,43 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
             <Button width={'30%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
               Filtrer
             </Button>
-            <Modal
-              title="Filtrer par :"
-              open={toggleModal}
-              width={'600px'}
-              onClose={() => setToggleModal(false)}
-              onSubmit={(newFilters) => {
-                const _newFilters =
-                  selectedTab.id === Medication.ADMINISTRATION
-                    ? { ...newFilters, prescriptionTypes: [] }
-                    : { ...newFilters, administrationRoutes: [] }
-                addFilters({ ...filters, ..._newFilters })
-              }}
-            >
-              {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-              {selectedTab.id === Medication.PRESCRIPTION && (
-                <PrescriptionTypesFilter
-                  value={prescriptionTypes}
-                  name={FilterKeys.PRESCRIPTION_TYPES}
-                  allAdministrationTypes={allPrescriptionTypes}
+            {toggleModal && (
+              <Modal
+                title="Filtrer par :"
+                open={toggleModal}
+                width={'600px'}
+                onClose={() => setToggleModal(false)}
+                onSubmit={(newFilters) => {
+                  const _newFilters =
+                    selectedTab.id === Medication.ADMINISTRATION
+                      ? { ...newFilters, prescriptionTypes: [] }
+                      : { ...newFilters, administrationRoutes: [] }
+                  addFilters({ ...filters, ..._newFilters })
+                }}
+              >
+                {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+                {selectedTab.id === Medication.PRESCRIPTION && (
+                  <PrescriptionTypesFilter
+                    value={prescriptionTypes}
+                    name={FilterKeys.PRESCRIPTION_TYPES}
+                    allAdministrationTypes={allPrescriptionTypes}
+                  />
+                )}
+                {selectedTab.id === Medication.ADMINISTRATION && (
+                  <AdministrationTypesFilter
+                    value={administrationRoutes}
+                    name={FilterKeys.ADMINISTRATION_ROUTES}
+                    allAdministrationTypes={allAdministrationRoutes}
+                  />
+                )}
+                <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
+                <ExecutiveUnitsFilter
+                  value={executiveUnits}
+                  name={FilterKeys.EXECUTIVE_UNITS}
+                  criteriaName={CriteriaName.Medication}
                 />
-              )}
-              {selectedTab.id === Medication.ADMINISTRATION && (
-                <AdministrationTypesFilter
-                  value={administrationRoutes}
-                  name={FilterKeys.ADMINISTRATION_ROUTES}
-                  allAdministrationTypes={allAdministrationRoutes}
-                />
-              )}
-              <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
-              <ExecutiveUnitsFilter
-                value={executiveUnits}
-                name={FilterKeys.EXECUTIVE_UNITS}
-                criteriaName={CriteriaName.Medication}
-              />
-            </Modal>
+              </Modal>
+            )}
           </Grid>
         </Searchbar>
       </BlockWrapper>
