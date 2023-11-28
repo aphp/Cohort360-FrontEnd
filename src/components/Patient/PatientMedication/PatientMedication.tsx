@@ -218,13 +218,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
                 open={toggleModal}
                 width={'600px'}
                 onClose={() => setToggleModal(false)}
-                onSubmit={(newFilters) => {
-                  const _newFilters =
-                    selectedTab.id === Medication.ADMINISTRATION
-                      ? { ...newFilters, prescriptionTypes: [] }
-                      : { ...newFilters, administrationRoutes: [] }
-                  addFilters({ ...filters, ..._newFilters })
-                }}
+                onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
               >
                 {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
                 {selectedTab.id === Medication.PRESCRIPTION && (
