@@ -40,8 +40,9 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
   const [mode, setMode] = useState(Mode.SINGLE)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [selectedItemInfo, setSelectedItemInfo] = useState<FilterInfoModal>()
+  const [isReadonlyModal, setIsReadonlyModal] = useState(true)
 
-  const displaySelectedFilterInfo = (selectedItem: Item) => {
+  const showModalFilterInfo = (selectedItem: Item, isReadonly: boolean) => {
     const savedFilterInfo = values.find((filter) => filter.uuid === selectedItem.id)
 
     if (savedFilterInfo) {
@@ -50,6 +51,7 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
         filterParams: mapStringToSearchCriteria(savedFilterInfo.filter)
       })
       setToggleFilterInfoModal(true)
+      setIsReadonlyModal(isReadonly)
     }
   }
 
@@ -107,7 +109,8 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
           values={filters}
           multiple={mode === Mode.MULTIPLE}
           onchange={handleSelectedFilter}
-          onItemEyeClick={displaySelectedFilterInfo}
+          onItemEyeClick={(item) => showModalFilterInfo(item, true)}
+          onItemPencilClick={(item) => showModalFilterInfo(item, false)}
         />
       ) : (
         <Typography fontWeight="700" align="center" sx={{ padding: '8px' }}>
@@ -118,9 +121,9 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
       <Modal
         title="Information sur le filtre"
         open={toggleFilterInfoModal}
-        readonly
+        readonly={!isReadonlyModal}
         onClose={() => setToggleFilterInfoModal(false)}
-        validationText="Fermer"
+        validationText={isReadonlyModal ? 'Sauvegarder' : 'Fermer'}
       >
         <Grid container direction="column" sx={{ gap: '16px' }}>
           <Grid item container direction="column" sx={{ gap: '8px' }}>

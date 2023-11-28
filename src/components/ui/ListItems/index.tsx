@@ -7,9 +7,10 @@ type ListItemsProps = {
   multiple?: boolean
   onchange: (newValue: Item[]) => void
   onItemEyeClick?: (item: Item) => void
+  onItemPencilClick?: (item: Item) => void
 }
 
-const ListItems = ({ values, multiple = false, onchange, onItemEyeClick }: ListItemsProps) => {
+const ListItems = ({ values, multiple = false, onchange, onItemEyeClick, onItemPencilClick }: ListItemsProps) => {
   const [items, setItems] = useState(values)
 
   const handleSelectListItem = (selectedItem: Item) => {
@@ -22,6 +23,10 @@ const ListItems = ({ values, multiple = false, onchange, onItemEyeClick }: ListI
 
   const handleEyeClick = (selectedItem: Item) => {
     if (onItemEyeClick) onItemEyeClick(selectedItem)
+  }
+
+  const handlePencilClick = (selectedItem: Item) => {
+    if (onItemPencilClick) onItemPencilClick(selectedItem)
   }
 
   useEffect(() => {
@@ -37,6 +42,7 @@ const ListItems = ({ values, multiple = false, onchange, onItemEyeClick }: ListI
           item={item}
           onclick={handleSelectListItem}
           onEyeClick={handleEyeClick}
+          onPencilClick={handlePencilClick}
         />
       ))}
     </List>
