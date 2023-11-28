@@ -3,7 +3,6 @@ import { Autocomplete, FormLabel, Grid, MenuItem, Select, TextField } from '@mui
 import { BlockWrapper } from 'components/ui/Layout'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import Collapse from 'components/ui/Collapse'
-import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { DurationUnitWrapper } from 'components/ui/Inputs/DurationRange/styles'
 import { TextFieldWrapper } from 'components/ui/Inputs/DurationRange/styles'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
