@@ -210,6 +210,7 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
         labels.push(
           getLabelFromCriteriaObject(criteriaState, criterias.code, CriteriaDataKey.CCAM_DATA, criterias.type)
         )
+      if (criterias.source) labels.push(`Source: ${criterias.source}`)
       break
 
     case RessourceType.CLAIM:
