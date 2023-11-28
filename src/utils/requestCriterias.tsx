@@ -199,7 +199,7 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
       break
 
     case RessourceType.DOCUMENTS:
-      labels.push(getSearchDocumentLabel(criterias.search, criterias.searchBy))
+      if (criterias.search) labels.push(getSearchDocumentLabel(criterias.search, criterias.searchBy))
       if (criterias.docType.length > 0) labels.push(getDocumentTypesLabel(criterias.docType))
       break
 
