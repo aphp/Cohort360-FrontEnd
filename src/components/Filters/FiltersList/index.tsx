@@ -121,9 +121,9 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
       <Modal
         title="Information sur le filtre"
         open={toggleFilterInfoModal}
-        readonly={!isReadonlyModal}
+        readonly={isReadonlyModal}
         onClose={() => setToggleFilterInfoModal(false)}
-        validationText={isReadonlyModal ? 'Sauvegarder' : 'Fermer'}
+        validationText={isReadonlyModal ? 'Fermer' : 'Sauvegarder'}
       >
         <Grid container direction="column" sx={{ gap: '16px' }}>
           <Grid item container direction="column" sx={{ gap: '8px' }}>
