@@ -73,6 +73,10 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
     setFilters(keptFilters)
   }
 
+  const saveFilterChanges = (newFilterInfos: Item) => {
+    console.log('saved', newFilterInfos, selectedItemInfo)
+  }
+
   useEffect(() => {
     context?.updateError(false)
     if (context?.updateError && mode === Mode.MULTIPLE) {
@@ -123,6 +127,7 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
         open={toggleFilterInfoModal}
         readonly={isReadonlyModal}
         onClose={() => setToggleFilterInfoModal(false)}
+        onSubmit={saveFilterChanges}
         validationText={isReadonlyModal ? 'Fermer' : 'Sauvegarder'}
       >
         <Grid container direction="column" sx={{ gap: '16px' }}>
@@ -131,7 +136,15 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
               <Typography variant="h3">Nom :</Typography>
             </Grid>
             <Grid item>
-              <TextField size="small" value={selectedItemInfo?.filterName} fullWidth />
+              <TextField
+                size="small"
+                value={selectedItemInfo?.filterName}
+                fullWidth
+                onChange={(e) =>
+                  !isReadonlyModal &&
+                  setSelectedItemInfo({ ...selectedItemInfo, filterName: e.target.value } as FilterInfoModal)
+                }
+              />
             </Grid>
           </Grid>
           <Grid item container direction="column" sx={{ gap: '8px' }}>
@@ -139,7 +152,18 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
               <Typography variant="h3">Recherche textuelle :</Typography>
             </Grid>
             <Grid item>
-              <TextField size="small" value={selectedItemInfo?.filterParams.searchInput} fullWidth />
+              <TextField
+                size="small"
+                value={selectedItemInfo?.filterParams.searchInput}
+                fullWidth
+                onChange={(e) =>
+                  !isReadonlyModal &&
+                  setSelectedItemInfo({
+                    ...selectedItemInfo,
+                    filterParams: { ...selectedItemInfo?.filterParams, searchInput: e.target.value }
+                  } as FilterInfoModal)
+                }
+              />
             </Grid>
           </Grid>
           <Grid item>

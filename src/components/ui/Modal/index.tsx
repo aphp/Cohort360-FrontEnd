@@ -42,6 +42,7 @@ const Modal = ({
   const handleSubmit = () => {
     if (onSubmit) onSubmit(formData)
   }
+
   return (
     <FormContext.Provider value={{ updateFormData, updateError }}>
       <Dialog open={open} onClose={onClose}>
