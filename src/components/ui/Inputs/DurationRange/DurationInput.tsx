@@ -40,7 +40,7 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
               size="small"
               onChange={(e) => {
                 if (!isNaN(+e.target.value) && +e.target.value <= 130) {
-                  setDuration({ ...duration, year: +e.target.value })
+                  setDuration({ ...duration, year: e.target.value !== '' ? +e.target.value : null })
                 }
               }}
             />
@@ -60,7 +60,7 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
               size="small"
               onChange={(e) => {
                 if (!isNaN(+e.target.value) && +e.target.value <= 12) {
-                  setDuration({ ...duration, month: +e.target.value })
+                  setDuration({ ...duration, month: e.target.value !== '' ? +e.target.value : null })
                 }
               }}
             />
@@ -81,7 +81,7 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
                 size="small"
                 onChange={(e) => {
                   if (!isNaN(+e.target.value) && +e.target.value <= 31) {
-                    setDuration({ ...duration, day: +e.target.value })
+                    setDuration({ ...duration, day: e.target.value !== '' ? +e.target.value : null })
                   }
                 }}
               />
