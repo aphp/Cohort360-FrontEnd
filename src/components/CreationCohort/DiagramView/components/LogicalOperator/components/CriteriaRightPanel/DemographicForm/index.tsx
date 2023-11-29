@@ -165,7 +165,10 @@ const DemographicForm = (props: DemographicFormProps) => {
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={vitalStatus}
-            onChange={(e, value) => setVitalStatus(value)}
+            onChange={(e, value) => {
+              setVitalStatus(value)
+              if (value.length === 1 && value[0].label === VitalStatusLabel.ALIVE) setDeathDates([null, null])
+            }}
             renderInput={(params) => <TextField {...params} label="Statut vital" />}
           />
 
@@ -181,6 +184,7 @@ const DemographicForm = (props: DemographicFormProps) => {
           </BlockWrapper>
 
           <BlockWrapper margin="1em">
+            <>{console.log('test age', age)}</>
             <DurationRange
               value={age}
               disabled={birthdates[0] !== null || birthdates[1] !== null}
