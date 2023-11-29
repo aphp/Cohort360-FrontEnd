@@ -21,8 +21,6 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
     onChange(duration)
   }, [duration])
 
-  console.log('test value', value)
-
   return (
     <BlockWrapper container justifyContent="space-between" xs={12} alignItems="flex-end">
       <Grid item xs={deidentified ? 4 : 3} container alignItems="flex-start">

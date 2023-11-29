@@ -184,7 +184,6 @@ const DemographicForm = (props: DemographicFormProps) => {
           </BlockWrapper>
 
           <BlockWrapper margin="1em">
-            <>{console.log('test age', age)}</>
             <DurationRange
               value={age}
               disabled={birthdates[0] !== null || birthdates[1] !== null}
