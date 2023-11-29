@@ -95,8 +95,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [searchCheckingLoading, setSearchCheckingLoading] = useState(LoadingStatus.SUCCESS)
 
   const _onChangeValue = (key: string, value: any) => {
-    console.log('key', key)
-    console.log('value', value)
     switch (key) {
       case 'encounterService':
         setEncounterService(value)
@@ -201,20 +199,22 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
 
       {/* study :         */}
       <BlockWrapper margin="1em">
-        <Collapse title="Critères liés à une étude">
+        <Collapse title="Critères liés à une étude" margin="0">
           {/* Date => started */}
-          <FormLabel component="legend" className={classes.durationLegend}>
-            Date de l'étude
-          </FormLabel>
-          <CalendarRange
-            inline
-            value={[studyStartDate, studyEndDate]}
-            onChange={([start, end]) => {
-              setStudyStartDate(start)
-              setStudyEndDate(end)
-            }}
-            onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
-          />
+          <BlockWrapper style={{ margin: '0 2em 1em 0' }}>
+            <FormLabel component="legend" className={classes.durationLegend} style={{ padding: 0 }}>
+              Date de l'étude
+            </FormLabel>
+            <CalendarRange
+              inline
+              value={[studyStartDate, studyEndDate]}
+              onChange={([start, end]) => {
+                setStudyStartDate(start)
+                setStudyEndDate(end)
+              }}
+              onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+            />
+          </BlockWrapper>
 
           {/* Modalité (des series associées à cette study) (référentiel : afficher "code - nom") (liste multiselect) => modality */}
           <Autocomplete
@@ -225,84 +225,112 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             value={studyModalities}
             onChange={(e, value) => setStudyModalities(value)}
             renderInput={(params) => <TextField {...params} label="Modalité" />}
+            style={{ marginBottom: '1em' }}
           />
 
           {/* Description (champ text libre) => description */}
-          <SearchbarWithCheck
-            searchInput={studyDescription}
-            setSearchInput={setStudyDescription}
-            placeholder="Rechercher dans les descriptions"
-            loading={searchCheckingLoading}
-            setLoading={setSearchCheckingLoading}
-            searchInputError={studyDescriptionError}
-            setSearchInputError={setStudyDescriptionError}
-          />
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <SearchbarWithCheck
+              searchInput={studyDescription}
+              setSearchInput={setStudyDescription}
+              placeholder="Rechercher dans les descriptions"
+              loading={searchCheckingLoading}
+              setLoading={setSearchCheckingLoading}
+              searchInputError={studyDescriptionError}
+              setSearchInputError={setStudyDescriptionError}
+            />
+          </BlockWrapper>
 
           {/* Procédure (champ text libre) => procedureCode */}
-          <SearchbarWithCheck
-            searchInput={studyProcedure}
-            setSearchInput={setStudyProcedure}
-            placeholder="Rechercher dans les procédures"
-            loading={searchCheckingLoading}
-            setLoading={setSearchCheckingLoading}
-            searchInputError={studyProcedureError}
-            setSearchInputError={setStudyProcedureError}
-          />
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <SearchbarWithCheck
+              searchInput={studyProcedure}
+              setSearchInput={setStudyProcedure}
+              placeholder="Rechercher dans les procédures"
+              loading={searchCheckingLoading}
+              setLoading={setSearchCheckingLoading}
+              searchInputError={studyProcedureError}
+              setSearchInputError={setStudyProcedureError}
+            />
+          </BlockWrapper>
 
           {/* Nombre de series (>=0) => numberOfSeries */}
-          <FormLabel component="legend" className={classes.durationLegend}>
-            Nombre de séries
-          </FormLabel>
-          <OccurenceInput
-            value={numberOfSeries}
-            comparator={seriesComparator}
-            onchange={(newOccurence, newComparator) => {
-              setNumberOfSeries(newOccurence)
-              setSeriesComparator(newComparator)
-            }}
-          />
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Nombre de séries
+            </FormLabel>
+            <OccurenceInput
+              value={numberOfSeries}
+              comparator={seriesComparator}
+              onchange={(newOccurence, newComparator) => {
+                setNumberOfSeries(newOccurence)
+                setSeriesComparator(newComparator)
+              }}
+            />
+          </BlockWrapper>
 
           {/* Nombre d'instances (>=0) => numberOfIns */}
-          <FormLabel component="legend" className={classes.durationLegend}>
-            Nombre d'instances
-          </FormLabel>
-          <OccurenceInput
-            value={numberOfIns}
-            comparator={instancesComparator}
-            onchange={(newOccurence, newComparator) => {
-              setNumberOfIns(newOccurence)
-              setInstancesComparator(newComparator)
-            }}
-          />
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Nombre d'instances
+            </FormLabel>
+            <OccurenceInput
+              value={numberOfIns}
+              comparator={instancesComparator}
+              onchange={(newOccurence, newComparator) => {
+                setNumberOfIns(newOccurence)
+                setInstancesComparator(newComparator)
+              }}
+            />
+          </BlockWrapper>
 
           {/* Rattaché à un document (oui/non et méthodologie de rattachement (liste à choix multiples (référentiel) - null=pas de rattachement)) => with-document */}
-          <FormLabel component="legend" className={classes.durationLegend}>
-            Méthode de rattachement à un document
-          </FormLabel>
-          <Select value={withDocument} onChange={(event) => setWithDocument(event.target.value)}>
-            {withDocumentOptions.map((option) => (
-              <MenuItem key={option.id} value={option.id}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </Select>
-          {withDocument === DocumentAttachmentMethod.INFERENCE_TEMPOREL && (
-            <Grid container>
-              <Grid item xs={6}>
-                <TextFieldWrapper
-                  value={daysOfDelay}
-                  variant="standard"
-                  size="small"
-                  onChange={(event) => setDaysOfDelay(event.target.value)}
-                />
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Méthode de rattachement à un document
+            </FormLabel>
+            <Grid container alignItems="center">
+              <Grid item xs={withDocument === DocumentAttachmentMethod.INFERENCE_TEMPOREL ? 6 : 12}>
+                <Select
+                  value={withDocument}
+                  onChange={(event) => setWithDocument(event.target.value)}
+                  style={{ width: '100%' }}
+                >
+                  {withDocumentOptions.map((option) => (
+                    <MenuItem key={option.id} value={option.id}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
               </Grid>
-              <Grid item xs={6}>
-                <DurationUnitWrapper>{CalendarRequestLabel.DAY}</DurationUnitWrapper>
-              </Grid>
+              {withDocument === DocumentAttachmentMethod.INFERENCE_TEMPOREL && (
+                <Grid item xs={6} padding={'0 12px'}>
+                  <Grid container>
+                    <Grid item xs={4}>
+                      <DurationUnitWrapper>Plage de </DurationUnitWrapper>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <TextFieldWrapper
+                        active={!!daysOfDelay}
+                        value={daysOfDelay}
+                        variant="standard"
+                        size="small"
+                        onChange={(event) => setDaysOfDelay(event.target.value)}
+                      />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <DurationUnitWrapper>{CalendarRequestLabel.DAY}</DurationUnitWrapper>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              )}
             </Grid>
-          )}
+          </BlockWrapper>
 
           {/* Recherche par uid */}
+          <FormLabel component="legend" className={classes.durationLegend}>
+            Recherche par uid d'étude
+          </FormLabel>
           <TextField
             label=""
             placeholder="Ajouter une liste d'uid"
@@ -317,76 +345,90 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
 
         {/* série : */}
         {/* Date (si pas cher à faire) => series-started */}
-        <Collapse title="Critères liés à une série" value={false}>
-          <FormLabel component="legend" className={classes.durationLegend}>
-            Date de la série
-          </FormLabel>
-          <CalendarRange
-            inline
-            value={[seriesStartDate, seriesEndDate]}
-            onChange={([start, end]) => {
-              setSeriesStartDate(start)
-              setSeriesEndDate(end)
-            }}
-            onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
-          />
+        <BlockWrapper style={{ marginTop: 26 }}>
+          <Collapse title="Critères liés à une série" value={false} margin="0">
+            <BlockWrapper style={{ margin: '0 2em 1em 0' }}>
+              <FormLabel component="legend" className={classes.durationLegend} style={{ padding: 0 }}>
+                Date de la série
+              </FormLabel>
+              <CalendarRange
+                inline
+                value={[seriesStartDate, seriesEndDate]}
+                onChange={([start, end]) => {
+                  setSeriesStartDate(start)
+                  setSeriesEndDate(end)
+                }}
+                onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+              />
+            </BlockWrapper>
 
-          {/* Description (champ texte libre) => series-descr */}
-          <SearchbarWithCheck
-            searchInput={seriesDescription}
-            setSearchInput={setSeriesDescription}
-            placeholder="Rechercher dans les descriptions"
-            loading={searchCheckingLoading}
-            setLoading={setSearchCheckingLoading}
-            searchInputError={seriesDescriptionError}
-            setSearchInputError={setSeriesDescriptionError}
-          />
+            {/* Description (champ texte libre) => series-descr */}
+            <BlockWrapper style={{ marginBottom: '1em' }}>
+              <SearchbarWithCheck
+                searchInput={seriesDescription}
+                setSearchInput={setSeriesDescription}
+                placeholder="Rechercher dans les descriptions"
+                loading={searchCheckingLoading}
+                setLoading={setSearchCheckingLoading}
+                searchInputError={seriesDescriptionError}
+                setSearchInputError={setSeriesDescriptionError}
+              />
+            </BlockWrapper>
 
-          {/* Protocole (champ texte libre) => series-protocol */}
-          <SearchbarWithCheck
-            searchInput={seriesProtocol}
-            setSearchInput={setSeriesProtocol}
-            placeholder="Rechercher dans les protocoles"
-            loading={searchCheckingLoading}
-            setLoading={setSearchCheckingLoading}
-            searchInputError={seriesProtocolError}
-            setSearchInputError={setSeriesProtocolError}
-          />
+            {/* Protocole (champ texte libre) => series-protocol */}
+            <BlockWrapper style={{ marginBottom: '1em' }}>
+              <SearchbarWithCheck
+                searchInput={seriesProtocol}
+                setSearchInput={setSeriesProtocol}
+                placeholder="Rechercher dans les protocoles"
+                loading={searchCheckingLoading}
+                setLoading={setSearchCheckingLoading}
+                searchInputError={seriesProtocolError}
+                setSearchInputError={setSeriesProtocolError}
+              />
+            </BlockWrapper>
 
-          {/* Modalité (référentiel sous forme de liste ~ 40 items) : afficher "code - nom" => series-modality */}
-          <Autocomplete
-            multiple
-            options={criteria?.data.modalities || []}
-            getOptionLabel={(option) => option.label}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            value={seriesModalities}
-            onChange={(e, value) => setSeriesModalities(value)}
-            renderInput={(params) => <TextField {...params} label="Modalité" />}
-          />
+            {/* Modalité (référentiel sous forme de liste ~ 40 items) : afficher "code - nom" => series-modality */}
+            <Autocomplete
+              multiple
+              options={criteria?.data.modalities || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={seriesModalities}
+              onChange={(e, value) => setSeriesModalities(value)}
+              renderInput={(params) => <TextField {...params} label="Modalité" />}
+              style={{ marginBottom: '1em' }}
+            />
 
-          {/* Partie du corps (champ texte libre) => bodysite */}
-          <SearchbarWithCheck
-            searchInput={bodySite}
-            setSearchInput={setBodySite}
-            placeholder="Rechercher dans les parties du corps"
-            loading={searchCheckingLoading}
-            setLoading={setSearchCheckingLoading}
-            searchInputError={bodySiteError}
-            setSearchInputError={setBodySiteError}
-          />
+            {/* Partie du corps (champ texte libre) => bodysite */}
+            <BlockWrapper style={{ marginBottom: '1em' }}>
+              <SearchbarWithCheck
+                searchInput={bodySite}
+                setSearchInput={setBodySite}
+                placeholder="Rechercher dans les parties du corps"
+                loading={searchCheckingLoading}
+                setLoading={setSearchCheckingLoading}
+                searchInputError={bodySiteError}
+                setSearchInputError={setBodySiteError}
+              />
+            </BlockWrapper>
 
-          {/* Recherche par uid */}
-          <TextField
-            label=""
-            placeholder="Ajouter une liste d'uid"
-            variant="outlined"
-            value={seriesUid}
-            onChange={(event) => setSeriesUid(event.target.value)}
-            multiline
-            minRows={5}
-            style={{ width: '100%' }}
-          />
-        </Collapse>
+            {/* Recherche par uid */}
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Recherche par uid de série
+            </FormLabel>
+            <TextField
+              label=""
+              placeholder="Ajouter une liste d'uid"
+              variant="outlined"
+              value={seriesUid}
+              onChange={(event) => setSeriesUid(event.target.value)}
+              multiline
+              minRows={5}
+              style={{ width: '100%' }}
+            />
+          </Collapse>
+        </BlockWrapper>
       </BlockWrapper>
 
       {/* Recherche avancée */}

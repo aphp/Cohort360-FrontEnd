@@ -1,7 +1,11 @@
 import { Collapse, styled } from '@mui/material'
 
-export const CollapseWrapper = styled(Collapse)(() => ({
+type CustomProps = {
+  margin?: string
+}
+
+export const CollapseWrapper = styled(Collapse)<CustomProps>(({ margin }) => ({
   '& div': {
-    marginBottom: 5
+    margin: margin
   }
 }))
