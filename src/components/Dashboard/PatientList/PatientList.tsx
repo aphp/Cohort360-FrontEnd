@@ -341,6 +341,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
             name="savedFilters"
             deidentified={deidentified}
             onSubmitDelete={handleDeleteFilters}
+            onSubmitPatch={getSavedFilters}
             setSelectedFilter={setSelectedFilter}
           />
         </Modal>

@@ -1,7 +1,7 @@
 import Modal, { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import ListItems from 'components/ui/ListItems'
-import { FilterKeys, PatientsFilters, SavedFilter, SearchCriterias } from 'types/searchCriterias'
+import { FilterKeys, Filters, PatientsFilters, SavedFilter, SearchCriterias } from 'types/searchCriterias'
 import { Item } from 'components/ui/ListItems/ListItem'
 import Button from 'components/ui/Button'
 import { DeleteOutline } from '@mui/icons-material'
@@ -12,6 +12,8 @@ import BirthdatesRangesFilter from '../BirthdatesRangesFilters'
 import { mapStringToSearchCriteria } from 'mappers/filters'
 import { useAppSelector } from 'state'
 import { MeState } from 'state/me'
+import { RessourceType } from 'types/requestCriterias'
+import { patchFiltersService } from 'services/aphp/servicePatients'
 
 enum Mode {
   SINGLE,
@@ -23,15 +25,17 @@ type FiltersListProps = {
   name: string
   deidentified?: boolean | null
   onSubmitDelete: (value: any) => void
+  onSubmitPatch: () => void
   setSelectedFilter: (value: SearchCriterias<PatientsFilters>) => void
 }
 
 type FilterInfoModal = {
+  filterUuid?: string
   filterName: string
   filterParams: SearchCriterias<PatientsFilters>
 }
 
-const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }: FiltersListProps) => {
+const FiltersList = ({ values, deidentified, onSubmitDelete, onSubmitPatch, setSelectedFilter }: FiltersListProps) => {
   const context = useContext(FormContext)
   const [filters, setFilters] = useState<Item[]>(
     values.map((value) => {
@@ -57,6 +61,7 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
 
     if (savedFilterInfo) {
       setSelectedItemInfo({
+        filterUuid: savedFilterInfo.uuid,
         filterName: savedFilterInfo.name,
         filterParams: mapStringToSearchCriteria(savedFilterInfo.filter)
       })
@@ -81,6 +86,27 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
 
     const keptFilters = filters.filter((filter) => !filter.checked)
     setFilters(keptFilters)
+  }
+
+  const submitEditedFilter = async (newFilterInfos: Filters) => {
+    await patchFiltersService(
+      RessourceType.PATIENT,
+      selectedItemInfo?.filterUuid || '',
+      selectedItemInfo?.filterName || '',
+      {
+        ...selectedItemInfo?.filterParams,
+        filters: newFilterInfos
+      } as SearchCriterias<Filters>
+    )
+
+    const updatedFilters = filters.map((filter) => {
+      if (filter.id === selectedItemInfo?.filterUuid) {
+        return { ...filter, name: selectedItemInfo?.filterName || '' }
+      }
+      return filter
+    })
+    setFilters(updatedFilters)
+    onSubmitPatch()
   }
 
   useEffect(() => {
@@ -138,6 +164,7 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
         open={toggleFilterInfoModal}
         readonly={isReadonlyModal}
         onClose={() => setToggleFilterInfoModal(false)}
+        onSubmit={submitEditedFilter}
         validationText={isReadonlyModal ? 'Fermer' : 'Sauvegarder'}
       >
         <Grid container direction="column" sx={{ gap: '16px' }}>

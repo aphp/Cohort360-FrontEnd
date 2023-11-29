@@ -21,7 +21,8 @@ import {
   fetchImaging,
   postFilters,
   getFilters,
-  deleteFilters
+  deleteFilters,
+  patchFilters
 } from './callApi'
 
 import servicesPerimeters from './servicePerimeters'
@@ -864,5 +865,21 @@ export const deleteFiltersService = async (fhir_resource_uuid: string) => {
     return response
   } catch {
     throw "Le filtre n'a pas pu être supprimé."
+  }
+}
+
+export const patchFiltersService = async (
+  fhir_resource: RessourceType,
+  uuid: string,
+  name: string,
+  criterias: SearchCriterias<Filters>
+) => {
+  try {
+    const { searchBy, searchInput, filters } = criterias
+    const criteriasString = `${mapObjectToString({ searchBy, searchInput })}&${mapObjectToString(filters)}`
+    const response = await patchFilters(fhir_resource, uuid, name, criteriasString)
+    return response
+  } catch {
+    throw "Le filtre n'a pas pu être modifié."
   }
 }

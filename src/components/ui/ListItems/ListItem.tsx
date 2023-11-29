@@ -69,9 +69,7 @@ const ListItem = ({ item, multiple = false, disabled = false, onclick, onEyeClic
           <EditPencilIcon />
         </Tooltip>
       ) : (
-        <Tooltip title="Modifier les paramètres du filtre" arrow placement="right">
-          <EditPencilIcon />
-        </Tooltip>
+        <EditPencilIcon />
       )}
     </ListItemWrapper>
   )

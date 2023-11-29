@@ -360,6 +360,10 @@ export const fetchDocumentReferenceContent = async (docId: string): FHIR_API_Pro
   return documentResp
 }
 
+/**
+ * Fhir_Filters
+ */
+
 export const postFilters = async (
   fhir_resource: RessourceType,
   name: string,
@@ -392,6 +396,22 @@ export const deleteFilters = async (fhir_resource_uuid: string): Promise<AxiosRe
   const res = await apiBackend.delete(`/cohort/fhir-filters/${fhir_resource_uuid}/`)
   return res
 }
+
+export const patchFilters = async (
+  fhir_resource: RessourceType,
+  uuid: string,
+  name: string,
+  filter: string
+): Promise<AxiosResponse<SavedFilter>> => {
+  const res = await apiBackend.patch(`/cohort/fhir-filters/${uuid}/`, {
+    fhir_resource,
+    fhir_version: '4.0',
+    name,
+    filter
+  })
+  return res
+}
+
 /**
  * Binary Resource
  *
