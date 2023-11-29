@@ -10,6 +10,8 @@ import GendersFilter from '../GendersFilter'
 import VitalStatusesFilter from '../VitalStatusesFilter'
 import BirthdatesRangesFilter from '../BirthdatesRangesFilters'
 import { mapStringToSearchCriteria } from 'mappers/filters'
+import { useAppSelector } from 'state'
+import { MeState } from 'state/me'
 
 enum Mode {
   SINGLE,
@@ -42,6 +44,14 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
   const [selectedItemInfo, setSelectedItemInfo] = useState<FilterInfoModal>()
   const [isReadonlyModal, setIsReadonlyModal] = useState(true)
 
+  const { meState } = useAppSelector<{
+    meState: MeState
+  }>((state) => ({
+    meState: state.me
+  }))
+
+  const maintenanceIsActive = meState?.maintenance?.active
+
   const showModalFilterInfo = (selectedItem: Item, isReadonly: boolean) => {
     const savedFilterInfo = values.find((filter) => filter.uuid === selectedItem.id)
 
@@ -73,10 +83,6 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
     setFilters(keptFilters)
   }
 
-  const saveFilterChanges = (newFilterInfos: Item) => {
-    console.log('saved', newFilterInfos, selectedItemInfo)
-  }
-
   useEffect(() => {
     context?.updateError(false)
     if (context?.updateError && mode === Mode.MULTIPLE) {
@@ -93,7 +99,12 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
     <>
       {mode === Mode.SINGLE && (
         <Grid container item xs={4} margin="0px 0px 20px 0px">
-          <Button icon={<DeleteOutline />} color="primary" onClick={() => setMode(Mode.MULTIPLE)}>
+          <Button
+            icon={<DeleteOutline />}
+            color="primary"
+            onClick={() => setMode(Mode.MULTIPLE)}
+            disabled={maintenanceIsActive}
+          >
             Supprimer
           </Button>
         </Grid>
@@ -127,7 +138,6 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, setSelectedFilter }
         open={toggleFilterInfoModal}
         readonly={isReadonlyModal}
         onClose={() => setToggleFilterInfoModal(false)}
-        onSubmit={saveFilterChanges}
         validationText={isReadonlyModal ? 'Fermer' : 'Sauvegarder'}
       >
         <Grid container direction="column" sx={{ gap: '16px' }}>

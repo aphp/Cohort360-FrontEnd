@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import moment from 'moment'
 
-import { CircularProgress, Grid } from '@mui/material'
+import { CircularProgress, Grid, Tooltip } from '@mui/material'
 
 import DataTablePatient from 'components/DataTable/DataTablePatient'
 
@@ -52,6 +52,8 @@ import FiltersNameFilter from 'components/Filters/FiltersNameFilter'
 import { deleteFiltersService, getFiltersService, postFiltersService } from 'services/aphp/servicePatients'
 import { RessourceType } from 'types/requestCriterias'
 import FiltersList from 'components/Filters/FiltersList'
+import { useAppSelector } from 'state'
+import { MeState } from 'state/me'
 
 type PatientListProps = {
   total: number
@@ -96,6 +98,14 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
     },
     { changeOrderBy, changeSearchBy, changeSearchInput, addFilters, removeFilter }
   ] = useSearchCriterias(initPatientsSearchCriterias)
+
+  const { meState } = useAppSelector<{
+    meState: MeState
+  }>((state) => ({
+    meState: state.me
+  }))
+
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ genders, vitalStatuses, birthdatesRanges })
@@ -170,6 +180,17 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
     await getSavedFilters()
   }
 
+  const EnregistrerFiltresButton = () => (
+    <Button
+      icon={<SaveIcon height="15px" fill="#FFF" />}
+      onClick={() => setToggleSaveFiltersModal(true)}
+      color="secondary"
+      disabled={maintenanceIsActive}
+    >
+      Enregistrer filtres
+    </Button>
+  )
+
   useEffect(() => {
     getSavedFilters()
   }, [])
@@ -224,13 +245,19 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
           )}
           {displaySaveFilters && (
             <Grid>
-              <Button
-                icon={<SaveIcon height="15px" fill="#FFF" />}
-                onClick={() => setToggleSaveFiltersModal(true)}
-                color="secondary"
-              >
-                Enregistrer filtres
-              </Button>
+              {maintenanceIsActive ? (
+                <Tooltip
+                  title="Ce bouton est désactivé en raison de maintenance en cours."
+                  arrow
+                  placement="bottom-start"
+                >
+                  <Grid>
+                    <EnregistrerFiltresButton />
+                  </Grid>
+                </Tooltip>
+              ) : (
+                <EnregistrerFiltresButton />
+              )}
             </Grid>
           )}
         </Grid>
