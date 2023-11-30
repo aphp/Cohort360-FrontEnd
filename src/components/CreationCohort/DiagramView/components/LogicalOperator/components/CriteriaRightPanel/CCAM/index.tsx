@@ -17,6 +17,7 @@ export const defaultProcedure = {
   type: RessourceType.PROCEDURE,
   title: "Critères d'actes CCAM",
   code: [],
+  source: 'AREM',
   occurrence: 1,
   occurrenceComparator: '>=',
   startOccurrence: '',
