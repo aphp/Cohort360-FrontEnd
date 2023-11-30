@@ -193,6 +193,7 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, onSubmitPatch, setS
                 size="small"
                 value={selectedItemInfo?.filterParams.searchInput}
                 fullWidth
+                placeholder="Votre recherche textuelle"
                 onChange={(e) =>
                   !isReadonlyModal &&
                   setSelectedItemInfo({
