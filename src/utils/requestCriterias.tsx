@@ -135,7 +135,9 @@ const getIdsListLabels = (values: string, name: string) => {
 
 export const getAttachmentMethod = (value: DocumentAttachmentMethod, daysOfDelay: string | null) => {
   if (value === DocumentAttachmentMethod.INFERENCE_TEMPOREL) {
-    return `Rattachement aux documents par ${DocumentAttachmentMethodLabel.INFERENCE_TEMPOREL.toLocaleLowerCase()} de ${daysOfDelay} jours`
+    return `Rattachement aux documents par ${DocumentAttachmentMethodLabel.INFERENCE_TEMPOREL.toLocaleLowerCase()}${
+      daysOfDelay !== '' && daysOfDelay !== null ? ` de ${daysOfDelay} jour(s)` : ''
+    }`
   } else if (value === DocumentAttachmentMethod.ACCESS_NUMBER) {
     return `Rattachement aux documents par ${DocumentAttachmentMethodLabel.ACCESS_NUMBER.toLocaleLowerCase()}`
   } else {

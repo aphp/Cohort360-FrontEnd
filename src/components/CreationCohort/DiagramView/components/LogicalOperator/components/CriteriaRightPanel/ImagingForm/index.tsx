@@ -210,10 +210,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               placeholder="Rechercher dans les descriptions"
               loading={searchCheckingLoading}
               setLoading={setSearchCheckingLoading}
-              onError={(isError) => {
-                console.log('isError', isError)
-                setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)
-              }}
+              onError={(isError) => setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)}
             />
           </BlockWrapper>
 
@@ -287,6 +284,12 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
                         variant="standard"
                         size="small"
                         onChange={(event) => setDaysOfDelay(event.target.value)}
+                        type="number"
+                        InputProps={{
+                          inputProps: {
+                            min: 0
+                          }
+                        }}
                       />
                     </Grid>
                     <Grid item xs={4}>

@@ -608,7 +608,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
             ? `${IMAGING_WITH_DOCUMENT}=${
                 criterion.withDocument === DocumentAttachmentMethod.ACCESS_NUMBER
                   ? DocumentAttachmentMethod.ACCESS_NUMBER
-                  : `INFERENCE_TEMPOREL_${criterion.daysOfDelay !== null ? criterion.daysOfDelay : 'X'}_J`
+                  : `INFERENCE_TEMPOREL${
+                      criterion.daysOfDelay !== null && criterion.daysOfDelay !== ''
+                        ? `_${criterion.daysOfDelay}_J`
+                        : ''
+                    }`
               }`
             : ''
         }`,
