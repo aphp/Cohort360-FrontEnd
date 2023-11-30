@@ -35,7 +35,8 @@ const getLabelFromCriteriaObject = (
   criteriaState: CriteriaState,
   values: LabelCriteriaObject[],
   name: string,
-  resourceType: RessourceType
+  resourceType: RessourceType,
+  label?: string
 ) => {
   const findCriterionById = (criteriaArray: CriteriaState, id: RessourceType): null | CriteriaItemType => {
     for (const criterion of criteriaArray) {
@@ -67,7 +68,9 @@ const getLabelFromCriteriaObject = (
     const tooltipTitle = labels.join(' - ')
     return (
       <Tooltip title={tooltipTitle}>
-        <Typography style={{ textOverflow: 'ellipsis', overflow: 'hidden', fontSize: 12 }}>{tooltipTitle}</Typography>
+        <Typography style={{ textOverflow: 'ellipsis', overflow: 'hidden', fontSize: 12 }}>
+          {label} {tooltipTitle}
+        </Typography>
       </Tooltip>
     )
   }
@@ -278,9 +281,14 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
       if (criterias.studyStartDate || criterias.studyEndDate)
         labels.push(getDatesLabel([criterias.studyStartDate, criterias.studyEndDate], "Date de l'étude : "))
       if (criterias.studyModalities?.length > 0)
-        // TODO: ajouter un label sinon on comprend r
         labels.push(
-          getLabelFromCriteriaObject(criteriaState, criterias.studyModalities, CriteriaDataKey.MODALITIES, type)
+          getLabelFromCriteriaObject(
+            criteriaState,
+            criterias.studyModalities,
+            CriteriaDataKey.MODALITIES,
+            type,
+            "Modalités d'étude :"
+          )
         )
       if (criterias.studyDescription) labels.push(`Description de l'étude : ${criterias.studyDescription}`)
       if (criterias.studyProcedure) labels.push(`Procédure de l'étude : ${criterias.studyProcedure}`)
@@ -290,9 +298,14 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
       if (criterias.seriesStartDate || criterias.seriesEndDate)
         labels.push(getDatesLabel([criterias.seriesStartDate, criterias.seriesEndDate], 'Date de la série : '))
       if (criterias.seriesModalities?.length > 0)
-        // TODO: ajouter un label sinon on comprend r
         labels.push(
-          getLabelFromCriteriaObject(criteriaState, criterias.seriesModalities, CriteriaDataKey.MODALITIES, type)
+          getLabelFromCriteriaObject(
+            criteriaState,
+            criterias.seriesModalities,
+            CriteriaDataKey.MODALITIES,
+            type,
+            'Modalités de séries :'
+          )
         )
       if (criterias.seriesDescription) labels.push(`Description de la série : ${criterias.seriesDescription}`)
       if (criterias.seriesProtocol) labels.push(`Protocole de la série : ${criterias.seriesProtocol}`)
