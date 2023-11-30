@@ -9,6 +9,7 @@ type CriteriaLayoutProps = {
   goBack: () => void
   onSubmit: () => void
   disabled: boolean
+  criteriaLabel: string
   title: string
   onChangeTitle: (title: string) => void
   isInclusive: boolean
@@ -22,6 +23,7 @@ const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
   goBack,
   onSubmit,
   disabled,
+  criteriaLabel,
   children,
   title,
   onChangeTitle,
@@ -41,10 +43,10 @@ const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
               <KeyboardBackspaceIcon />
             </IconButton>
             <Divider className={classes.divider} orientation="vertical" flexItem />
-            <Typography className={classes.titleLabel}>Ajouter un critère {title}</Typography>
+            <Typography className={classes.titleLabel}>Ajouter un critère {criteriaLabel}</Typography>
           </>
         ) : (
-          <Typography className={classes.titleLabel}>Modifier un critère {title}</Typography>
+          <Typography className={classes.titleLabel}>Modifier un critère {criteriaLabel}</Typography>
         )}
       </Grid>
 
@@ -53,7 +55,7 @@ const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
         {warningAlert && <Alert severity="warning">{warningAlert}</Alert>}
 
         <Grid className={classes.inputContainer} container>
-          <Typography variant="h6">{title}</Typography>
+          <Typography variant="h6">Critère {criteriaLabel}</Typography>
 
           <TextField
             required
