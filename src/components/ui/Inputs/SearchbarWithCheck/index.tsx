@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { LoadingStatus } from 'types'
 import { CanceledError } from 'axios'
@@ -12,9 +12,8 @@ type SearchbarWithCheckProps = {
   setSearchInput: (searchInput: string) => void
   loading: LoadingStatus
   setLoading: (loading: LoadingStatus) => void
-  searchInputError: SearchInputError | undefined
-  setSearchInputError: (searchInputError: SearchInputError | undefined) => void
   placeholder: string
+  onError: (isError: boolean) => void
 }
 
 const SearchbarWithCheck = ({
@@ -22,18 +21,23 @@ const SearchbarWithCheck = ({
   setSearchInput,
   loading,
   setLoading,
-  searchInputError,
-  setSearchInputError,
-  placeholder
+  placeholder,
+  onError
 }: SearchbarWithCheckProps) => {
   const controllerRef = useRef<AbortController>(new AbortController())
+  const [error, setError] = useState<SearchInputError>({ isError: false })
 
   const fetchDocumentsList = async () => {
     try {
       setLoading(LoadingStatus.FETCHING)
       const checkResponse = await services.cohorts.checkDocumentSearchInput(searchInput)
 
-      setSearchInputError(checkResponse)
+      setError(checkResponse)
+      if (checkResponse.isError) {
+        onError(true)
+      } else {
+        onError(false)
+      }
       setLoading(LoadingStatus.SUCCESS)
     } catch (error) {
       if (error instanceof CanceledError) {
@@ -59,7 +63,7 @@ const SearchbarWithCheck = ({
         value={searchInput}
         displayHelpIcon
         placeholder={placeholder}
-        error={searchInputError?.isError ? searchInputError : undefined}
+        error={error}
         onchange={(newValue) => setSearchInput(newValue)}
       />
     </SearchbarWithCheckWrapper>
