@@ -63,6 +63,8 @@ const DemographicForm = (props: DemographicFormProps) => {
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const isEdition = selectedCriteria !== null ? true : false
 
+  console.log('test error', error)
+
   useEffect(() => {
     setError(Error.NO_ERROR)
     const _age0 = convertStringToDuration(age[0])
