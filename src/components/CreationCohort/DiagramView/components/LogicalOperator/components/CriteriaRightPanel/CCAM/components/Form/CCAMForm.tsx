@@ -160,7 +160,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
 
           <Grid>
             <Alert severity="info">
-              Les données PMSI d'Obris sont codées au quotidien par les médecins. Les données PMSI AREM sont validées,
+              Les données PMSI d'Orbis sont codées au quotidien par les médecins. Les données PMSI AREM sont validées,
               remontées aux tutelles et disponibles dans le SNDS.
             </Alert>
           </Grid>
