@@ -39,6 +39,7 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
   const columns = [
     { label: `NDA${deidentified ? ' chiffré' : ''}`, align: 'left' },
     { label: 'Codage le', code: Order.DATE },
+    { label: 'source' },
     { label: 'Code', code: Order.CODE },
     { label: 'Libellé' },
     selectedTab === PMSI.DIAGNOSTIC ? { label: 'Type' } : null,
@@ -94,16 +95,12 @@ const DataTablePmsiLine: React.FC<{
       ? new Date(pmsi.performedDateTime).toLocaleDateString('fr-FR') ?? 'Date inconnue'
       : 'Date inconnue'
 
-  const code =
-    pmsi.resourceType === 'Claim'
-      ? pmsi.diagnosis?.[0].packageCode?.coding?.[0].code
-      : // @ts-ignore TODO: There is no class member in Conditon or Procedure FHIR types
-        pmsi.class?.code || pmsi.code?.coding?.[0].code
-  const libelle =
-    pmsi.resourceType === 'Claim'
-      ? pmsi.diagnosis?.[0].packageCode?.coding?.[0].display
-      : // @ts-ignore TODO: There is no class member in Conditon or Procedure FHIR types
-        pmsi.class?.code || pmsi.code?.coding?.[0].display
+  const filterCode = pmsi.resourceType === 'Claim' ? pmsi.diagnosis?.[0]?.packageCode : pmsi.code
+
+  const codeToDisplay = filterCode?.coding?.find((code) => code.userSelected === true)
+
+  const source = pmsi.meta?.source ?? 'Non renseigné'
+
   const type = pmsi.extension ? pmsi.extension[0].valueCodeableConcept?.coding?.[0].code?.toUpperCase() : '-'
   const serviceProvider = pmsi.serviceProvider ?? 'Non renseigné'
 
@@ -112,10 +109,13 @@ const DataTablePmsiLine: React.FC<{
       <TableCellWrapper align="left">{nda ?? 'Inconnu'}</TableCellWrapper>
       <TableCellWrapper>{date}</TableCellWrapper>
       <TableCellWrapper>
-        <Typography className={classes.libelle}>{code}</Typography>
+        <Typography className={classes.libelle}>{source}</Typography>
       </TableCellWrapper>
       <TableCellWrapper>
-        <Typography className={classes.libelle}>{libelle}</Typography>
+        <Typography className={classes.libelle}>{codeToDisplay?.code}</Typography>
+      </TableCellWrapper>
+      <TableCellWrapper>
+        <Typography className={classes.libelle}>{codeToDisplay?.display}</Typography>
       </TableCellWrapper>
       {selectedTab === PMSI.DIAGNOSTIC && <TableCellWrapper>{type}</TableCellWrapper>}
       <TableCellWrapper>{serviceProvider ?? '-'}</TableCellWrapper>

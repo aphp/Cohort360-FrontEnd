@@ -389,6 +389,7 @@ type fetchProcedureProps = {
   sortDirection?: 'asc' | 'desc'
   subject?: string
   code?: string
+  source?: string
   minDate?: string
   maxDate?: string
   _text?: string
@@ -398,7 +399,8 @@ type fetchProcedureProps = {
   executiveUnits?: string[]
 }
 export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Promise_Response<Procedure> => {
-  const { size, offset, _sort, sortDirection, subject, code, _text, status, minDate, maxDate, executiveUnits } = args
+  const { size, offset, _sort, sortDirection, subject, code, source, _text, status, minDate, maxDate, executiveUnits } =
+    args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
   const encounterIdentifier = args['encounter-identifier']
@@ -413,6 +415,7 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code)
     options = [...options, `code=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-ccam|') + code}`] // eslint-disable-line
+  if (source) options = [...options, `source=${source}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (status)
     options = [...options, `status=${encodeURIComponent('http://hl7.org/fhir/CodeSystem/event-status|') + status}`] // eslint-disable-line

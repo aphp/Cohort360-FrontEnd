@@ -67,7 +67,7 @@ const getLabelFromCriteriaObject = (
     const tooltipTitle = labels.join(' - ')
     return (
       <Tooltip title={tooltipTitle}>
-        <Typography style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{tooltipTitle}</Typography>
+        <Typography style={{ textOverflow: 'ellipsis', overflow: 'hidden', fontSize: 12 }}>{tooltipTitle}</Typography>
       </Tooltip>
     )
   }
@@ -155,7 +155,8 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
         labels.push(getLabelFromCriteriaObject(criteriaState, criterias.genders, CriteriaDataKey.GENDER, type))
       if (criterias.vitalStatus?.length > 0)
         labels.push(getLabelFromCriteriaObject(criteriaState, criterias.vitalStatus, CriteriaDataKey.VITALSTATUS, type))
-      labels.push(getDurationRangeLabel(criterias.age, 'Âge'))
+      if (criterias.birthdates[0] === null && criterias.birthdates[1] === null)
+        labels.push(getDurationRangeLabel(criterias.age, 'Âge'))
       if (criterias.birthdates[0] || criterias.birthdates[1])
         labels.push(getDatesLabel(criterias.birthdates, 'Naissance'))
       if (criterias.deathDates[0] || criterias.deathDates[1]) labels.push(getDatesLabel(criterias.deathDates, 'Décès'))
@@ -224,6 +225,7 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
         labels.push(
           getLabelFromCriteriaObject(criteriaState, criterias.code, CriteriaDataKey.CCAM_DATA, criterias.type)
         )
+      if (criterias.source) labels.push(`Source: ${criterias.source}`)
       break
 
     case RessourceType.CLAIM:
@@ -264,10 +266,10 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
       break
 
     case RessourceType.OBSERVATION:
-      if (criterias.valueComparator && (!isNaN(criterias.valueMin) || !isNaN(criterias.valueMax)))
-        labels.push(getBiologyValuesLabel(criterias.valueComparator, criterias.valueMin, criterias.valueMax))
       if (criterias.code.length > 0)
         labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, CriteriaDataKey.BIOLOGY_DATA, type))
+      if (criterias.valueComparator && (!isNaN(criterias.valueMin) || !isNaN(criterias.valueMax)))
+        labels.push(getBiologyValuesLabel(criterias.valueComparator, criterias.valueMin, criterias.valueMax))
       break
 
     case RessourceType.IMAGING:

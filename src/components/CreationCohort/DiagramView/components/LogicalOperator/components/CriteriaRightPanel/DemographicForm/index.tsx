@@ -17,11 +17,12 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
 
-import { DurationRangeType, LabelObject, VitalStatus } from 'types/searchCriterias'
+import { DurationRangeType, LabelObject, VitalStatusLabel } from 'types/searchCriterias'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { CriteriaDataKey, SelectedCriteriaType, RessourceType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
+import { convertStringToDuration, checkMinMaxValue } from 'utils/age'
 
 enum Error {
   EMPTY_FORM,
@@ -64,6 +65,8 @@ const DemographicForm = (props: DemographicFormProps) => {
 
   useEffect(() => {
     setError(Error.NO_ERROR)
+    const _age0 = convertStringToDuration(age[0])
+    const _age1 = convertStringToDuration(age[1])
     if (
       vitalStatus?.length === 0 &&
       genders?.length === 0 &&
@@ -75,6 +78,12 @@ const DemographicForm = (props: DemographicFormProps) => {
       deathDates[1] === null
     ) {
       setError(Error.EMPTY_FORM)
+    }
+    if (_age0 !== null && _age1 === null) {
+      setError(Error.INCOHERENT_AGE_ERROR)
+    }
+    if (_age0 !== null && _age1 !== null && !checkMinMaxValue(_age0, _age1)) {
+      setError(Error.INCOHERENT_AGE_ERROR)
     }
   }, [vitalStatus, genders, birthdates, age, deathDates])
 
@@ -165,7 +174,10 @@ const DemographicForm = (props: DemographicFormProps) => {
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={vitalStatus}
-            onChange={(e, value) => setVitalStatus(value)}
+            onChange={(e, value) => {
+              setVitalStatus(value)
+              if (value.length === 1 && value[0].label === VitalStatusLabel.ALIVE) setDeathDates([null, null])
+            }}
             renderInput={(params) => <TextField {...params} label="Statut vital" />}
           />
 
@@ -187,7 +199,7 @@ const DemographicForm = (props: DemographicFormProps) => {
               label={
                 vitalStatus &&
                 vitalStatus.length === 1 &&
-                vitalStatus.find((status: LabelObject) => status.id === VitalStatus.DECEASED)
+                vitalStatus.find((status: LabelObject) => status.label === VitalStatusLabel.DECEASED)
                   ? 'Âge au décès'
                   : 'Âge actuel'
               }
@@ -195,10 +207,9 @@ const DemographicForm = (props: DemographicFormProps) => {
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
             />
           </BlockWrapper>
-
           {vitalStatus &&
-            vitalStatus.length > 0 &&
-            vitalStatus.find((status: LabelObject) => status.id === VitalStatus.DECEASED) && (
+            (vitalStatus.length === 0 ||
+              vitalStatus.find((status: LabelObject) => status.label === VitalStatusLabel.DECEASED)) && (
               <BlockWrapper margin="1em">
                 <CalendarRange
                   inline

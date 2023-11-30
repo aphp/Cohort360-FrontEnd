@@ -108,6 +108,7 @@ export type CcamDataType = {
   type: RessourceType.PROCEDURE
   hierarchy: undefined
   code: LabelObject[] | null
+  source: string
   encounterEndDate: string | null
   encounterStartDate: string | null
   occurrence: number

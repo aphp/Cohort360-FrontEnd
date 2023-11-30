@@ -151,23 +151,25 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
             <Button width={'25%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
               Filtrer
             </Button>
-            <Modal
-              title="Filtrer par :"
-              open={toggleModal}
-              width={'600px'}
-              onClose={() => setToggleModal(false)}
-              onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
-            >
-              {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-              <AnabioFilter name={FilterKeys.ANABIO} value={anabio} />
-              <LoincFilter name={FilterKeys.LOINC} value={loinc} />
-              <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
-              <ExecutiveUnitsFilter
-                value={executiveUnits}
-                name={FilterKeys.EXECUTIVE_UNITS}
-                criteriaName={CriteriaName.Biology}
-              />
-            </Modal>
+            {toggleModal && (
+              <Modal
+                title="Filtrer par :"
+                open={toggleModal}
+                width={'600px'}
+                onClose={() => setToggleModal(false)}
+                onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
+              >
+                {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+                <AnabioFilter name={FilterKeys.ANABIO} value={anabio} />
+                <LoincFilter name={FilterKeys.LOINC} value={loinc} />
+                <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
+                <ExecutiveUnitsFilter
+                  value={executiveUnits}
+                  name={FilterKeys.EXECUTIVE_UNITS}
+                  criteriaName={CriteriaName.Biology}
+                />
+              </Modal>
+            )}
           </Grid>
         </Searchbar>
       </Grid>

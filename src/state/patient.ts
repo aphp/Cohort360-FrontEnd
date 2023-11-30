@@ -108,6 +108,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const searchInput =
         options.searchCriterias.searchInput === '' ? '' : options.searchCriterias.searchInput + WILDCARD
       const code = options.searchCriterias.filters.code ?? ''
+      const source = options.searchCriterias.filters.source
       const diagnosticTypes = options.searchCriterias.filters.diagnosticTypes.map((type) => type.id)
       const nda = options.searchCriterias.filters.nda
       const startDate = options.searchCriterias.filters.startDate
@@ -121,6 +122,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
         searchInput,
         nda,
         code,
+        source,
         diagnosticTypes,
         sortBy,
         sortDirection,
@@ -629,6 +631,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
           '',
           '',
           '',
+          '',
           [],
           Order.DATE,
           Direction.DESC,
@@ -644,6 +647,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
           '',
           '',
           '',
+          '',
           [],
           Order.DATE,
           Direction.DESC,
@@ -656,6 +660,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
           0,
           patientId,
           PMSI.GHM,
+          '',
           '',
           '',
           '',

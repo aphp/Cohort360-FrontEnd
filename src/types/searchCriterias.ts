@@ -107,6 +107,7 @@ export enum FilterKeys {
   DIAGNOSTIC_TYPES = 'diagnosticTypes',
   START_DATE = 'startDate',
   END_DATE = 'endDate',
+  SOURCE = 'source',
   EXECUTIVE_UNITS = 'executiveUnits',
   DOC_TYPES = 'docTypes',
   FAVORITE = 'favorite',
@@ -186,6 +187,7 @@ export type PMSIFilters = {
   startDate: string | null
   endDate: string | null
   executiveUnits: ScopeTreeRow[]
+  source: string
 }
 
 export type MedicationFilters = {

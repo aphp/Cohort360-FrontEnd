@@ -1,6 +1,20 @@
 import React, { useState } from 'react'
 
-import { Alert, Button, Divider, FormLabel, Grid, IconButton, Link, Switch, TextField, Typography } from '@mui/material'
+import {
+  Alert,
+  Button,
+  Divider,
+  FormLabel,
+  Grid,
+  IconButton,
+  Link,
+  Switch,
+  TextField,
+  Typography,
+  Radio,
+  RadioGroup,
+  FormControlLabel
+} from '@mui/material'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
@@ -128,6 +142,28 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             selectedCriteria={selectedCriteria}
             onChangeValue={onChangeValue}
           />
+
+          <Grid style={{ display: 'flex' }}>
+            <RadioGroup
+              row
+              style={{ justifyContent: 'space-around' }}
+              className={classes.inputItem}
+              aria-label="mode"
+              name="criteria-mode-radio"
+              value={currentState.source}
+              onChange={(e, value) => onChangeValue('source', value)}
+            >
+              <FormControlLabel value="AREM" control={<Radio color="secondary" />} label="AREM" />
+              <FormControlLabel value="ORBIS" control={<Radio color="secondary" />} label="ORBIS" />
+            </RadioGroup>
+          </Grid>
+
+          <Grid>
+            <Alert severity="info">
+              Les données PMSI d'Obris sont codées au quotidien par les médecins. Les données PMSI AREM sont validées,
+              remontées aux tutelles et disponibles dans le SNDS.
+            </Alert>
+          </Grid>
 
           <InputAutocompleteAsync
             multiple

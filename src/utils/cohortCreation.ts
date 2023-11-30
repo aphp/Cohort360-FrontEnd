@@ -53,6 +53,7 @@ const CLAIM_CODE_ALL_HIERARCHY = 'diagnosis'
 
 const PROCEDURE_CODE = 'code'
 const PROCEDURE_CODE_ALL_HIERARCHY = 'code'
+const PROCEDURE_SOURCE = 'source'
 
 const CONDITION_CODE = 'code'
 const CONDITION_CODE_ALL_HIERARCHY = 'code'
@@ -218,8 +219,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
                 .reduce(searchReducer)}`
             : ''
         }`,
-        `${ageMinCriterion}`,
-        `${ageMaxCriterion}`,
+        criterion.birthdates[0] === null && criterion.birthdates[1] === null ? `${ageMinCriterion}` : '',
+        criterion.birthdates[0] === null && criterion.birthdates[1] === null ? `${ageMaxCriterion}` : '',
         criterion.birthdates[0]
           ? `${PATIENT_BIRTHDATE}=ge${moment(criterion.birthdates[0]).format('YYYY-MM-DD[T00:00:00Z]')}`
           : '',
@@ -401,6 +402,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
     case RessourceType.PROCEDURE: {
       const unreducedFilterFhir = [
         'subject.active=true',
+        `${criterion.source ? `${PROCEDURE_SOURCE}=${criterion.source}` : ''}`,
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -1266,6 +1268,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+        currentCriterion.source = currentCriterion.source ? currentCriterion.source : null
 
         if (element.occurrence) {
           currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
@@ -1316,6 +1319,10 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case 'subject.active':
                 break
+              case PROCEDURE_SOURCE: {
+                currentCriterion.source = value
+                break
+              }
               default:
                 currentCriterion.error = true
                 break
