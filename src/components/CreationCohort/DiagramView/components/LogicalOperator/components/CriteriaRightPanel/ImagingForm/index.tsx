@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Autocomplete, FormLabel, Grid, MenuItem, Select, TextField } from '@mui/material'
 import { BlockWrapper } from 'components/ui/Layout'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
@@ -16,11 +16,10 @@ import { DocumentAttachmentMethod, DocumentAttachmentMethodLabel, LabelObject } 
 import useStyles from './styles'
 import { mappingCriteria } from '../DemographicForm'
 import SearchbarWithCheck from 'components/ui/Inputs/SearchbarWithCheck'
-import { SearchInputError } from 'types/error'
 
 enum Error {
-  EMPTY_FORM,
   INCOHERENT_AGE_ERROR,
+  SEARCHINPUT_ERROR,
   NO_ERROR
 }
 
@@ -55,9 +54,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
     mappingCriteria(selectedCriteria?.studyModalities, CriteriaDataKey.MODALITIES, criteria) || []
   )
   const [studyDescription, setStudyDescription] = useState<string>(selectedCriteria?.studyDescription || '')
-  const [studyDescriptionError, setStudyDescriptionError] = useState<SearchInputError | undefined>(undefined)
   const [studyProcedure, setStudyProcedure] = useState<string>(selectedCriteria?.studyProcedure || '')
-  const [studyProcedureError, setStudyProcedureError] = useState<SearchInputError | undefined>(undefined)
   const [numberOfSeries, setNumberOfSeries] = useState<number>(selectedCriteria?.numberOfSeries || 1)
   const [seriesComparator, setSeriesComparator] = useState<Comparators>(
     selectedCriteria?.seriesComparator || Comparators.GREATER_OR_EQUAL
@@ -76,14 +73,11 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [seriesStartDate, setSeriesStartDate] = useState<string | null>(selectedCriteria?.seriesStartDate || null)
   const [seriesEndDate, setSeriesEndDate] = useState<string | null>(selectedCriteria?.seriesEndDate || null)
   const [seriesDescription, setSeriesDescription] = useState<string>(selectedCriteria?.seriesDescription || '')
-  const [seriesDescriptionError, setSeriesDescriptionError] = useState<SearchInputError | undefined>(undefined)
   const [seriesProtocol, setSeriesProtocol] = useState<string>(selectedCriteria?.seriesProtocol || '')
-  const [seriesProtocolError, setSeriesProtocolError] = useState<SearchInputError | undefined>(undefined)
   const [seriesModalities, setSeriesModalities] = useState<LabelObject[]>(
     mappingCriteria(selectedCriteria?.seriesModalities, CriteriaDataKey.MODALITIES, criteria) || []
   )
   const [bodySite, setBodySite] = useState<string>(selectedCriteria?.bodySite || '')
-  const [bodySiteError, setBodySiteError] = useState<SearchInputError | undefined>(undefined)
   const [seriesUid, setSeriesUid] = useState(selectedCriteria?.seriesUid || '')
   const [encounterService, setEncounterService] = useState(selectedCriteria?.encounterService || [])
   const [encounterStartDate, setEncounterStartDate] = useState(selectedCriteria?.encounterStartDate || null)
@@ -115,24 +109,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
         break
     }
   }
-
-  useEffect(() => {
-    setError(Error.NO_ERROR)
-    // if (studyDate[0] === null && studyDate[1] === null && seriesDate[0] === null && seriesDate[1] === null) {
-    //   setError(Error.EMPTY_FORM)
-    // }
-  }, [
-    studyStartDate,
-    studyEndDate,
-    studyModalities,
-    numberOfSeries,
-    numberOfIns,
-    seriesStartDate,
-    seriesEndDate,
-    seriesDescription,
-    seriesProtocol,
-    seriesModalities
-  ])
 
   const onSubmit = () => {
     onChangeSelectedCriteria({
@@ -176,7 +152,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
       isEdition={isEdition}
       goBack={goBack}
       onSubmit={onSubmit}
-      disabled={false}
+      disabled={error === Error.INCOHERENT_AGE_ERROR || error === Error.SEARCHINPUT_ERROR}
       isInclusive={isInclusive}
       onChangeIsInclusive={setIsInclusive}
     >
@@ -236,8 +212,10 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               placeholder="Rechercher dans les descriptions"
               loading={searchCheckingLoading}
               setLoading={setSearchCheckingLoading}
-              searchInputError={studyDescriptionError}
-              setSearchInputError={setStudyDescriptionError}
+              onError={(isError) => {
+                console.log('isError', isError)
+                setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)
+              }}
             />
           </BlockWrapper>
 
@@ -249,8 +227,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               placeholder="Rechercher dans les procédures"
               loading={searchCheckingLoading}
               setLoading={setSearchCheckingLoading}
-              searchInputError={studyProcedureError}
-              setSearchInputError={setStudyProcedureError}
+              onError={(isError) => setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)}
             />
           </BlockWrapper>
 
@@ -370,8 +347,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
                 placeholder="Rechercher dans les descriptions"
                 loading={searchCheckingLoading}
                 setLoading={setSearchCheckingLoading}
-                searchInputError={seriesDescriptionError}
-                setSearchInputError={setSeriesDescriptionError}
+                onError={(isError) => setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)}
               />
             </BlockWrapper>
 
@@ -383,8 +359,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
                 placeholder="Rechercher dans les protocoles"
                 loading={searchCheckingLoading}
                 setLoading={setSearchCheckingLoading}
-                searchInputError={seriesProtocolError}
-                setSearchInputError={setSeriesProtocolError}
+                onError={(isError) => setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)}
               />
             </BlockWrapper>
 
@@ -408,8 +383,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
                 placeholder="Rechercher dans les parties du corps"
                 loading={searchCheckingLoading}
                 setLoading={setSearchCheckingLoading}
-                searchInputError={bodySiteError}
-                setSearchInputError={setBodySiteError}
+                onError={(isError) => setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)}
               />
             </BlockWrapper>
 
