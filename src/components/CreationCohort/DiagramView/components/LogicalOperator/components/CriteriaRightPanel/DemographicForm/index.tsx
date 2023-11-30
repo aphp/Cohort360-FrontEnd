@@ -22,6 +22,7 @@ import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { CriteriaDataKey, SelectedCriteriaType, RessourceType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
+import { convertStringToDuration, checkMinMaxValue } from 'utils/age'
 
 enum Error {
   EMPTY_FORM,
@@ -64,6 +65,8 @@ const DemographicForm = (props: DemographicFormProps) => {
 
   useEffect(() => {
     setError(Error.NO_ERROR)
+    const _age0 = convertStringToDuration(age[0])
+    const _age1 = convertStringToDuration(age[1])
     if (
       vitalStatus?.length === 0 &&
       genders?.length === 0 &&
@@ -75,6 +78,9 @@ const DemographicForm = (props: DemographicFormProps) => {
       deathDates[1] === null
     ) {
       setError(Error.EMPTY_FORM)
+    }
+    if (_age0 !== null && _age1 !== null && !checkMinMaxValue(_age0, _age1)) {
+      setError(Error.INCOHERENT_AGE_ERROR)
     }
   }, [vitalStatus, genders, birthdates, age, deathDates])
 

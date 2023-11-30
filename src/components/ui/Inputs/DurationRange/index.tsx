@@ -47,6 +47,7 @@ const DurationRange: React.FC<DurationRangeProps> = ({
     if (!checkMinMaxValue(minDuration, maxDuration)) {
       setError({ isError: true, errorMessage: 'La date maximale doit être supérieure à la date minimale.' })
       onError(true)
+      onChange([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
     } else {
       onChange([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
     }
