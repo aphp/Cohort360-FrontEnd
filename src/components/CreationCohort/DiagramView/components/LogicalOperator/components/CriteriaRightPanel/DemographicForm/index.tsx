@@ -81,6 +81,9 @@ const DemographicForm = (props: DemographicFormProps) => {
     ) {
       setError(Error.EMPTY_FORM)
     }
+    if (_age0 !== null && _age1 === null) {
+      setError(Error.INCOHERENT_AGE_ERROR)
+    }
     if (_age0 !== null && _age1 !== null && !checkMinMaxValue(_age0, _age1)) {
       setError(Error.INCOHERENT_AGE_ERROR)
     }
