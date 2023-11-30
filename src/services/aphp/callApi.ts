@@ -807,7 +807,9 @@ const getCodeList = async (
         : `&only-roots=false&_text=${encodeURIComponent(search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line  
     }
     // TODO test if it returns all the codes without specifying the count
-    const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}${searchParam}`)
+    const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(
+      `/ValueSet?only-roots=true&reference=${codeSystem}${searchParam}`
+    )
     const valueSetBundle = getApiResponseResourcesOrThrow(res)
     return valueSetBundle.length > 0
       ? valueSetBundle
