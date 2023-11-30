@@ -140,7 +140,8 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
         labels.push(getLabelFromCriteriaObject(criteriaState, criterias.genders, CriteriaDataKey.GENDER, type))
       if (criterias.vitalStatus?.length > 0)
         labels.push(getLabelFromCriteriaObject(criteriaState, criterias.vitalStatus, CriteriaDataKey.VITALSTATUS, type))
-      labels.push(getDurationRangeLabel(criterias.age, 'Âge'))
+      if (criterias.birthdates[0] === null && criterias.birthdates[1] === null)
+        labels.push(getDurationRangeLabel(criterias.age, 'Âge'))
       if (criterias.birthdates[0] || criterias.birthdates[1])
         labels.push(getDatesLabel(criterias.birthdates, 'Naissance'))
       if (criterias.deathDates[0] || criterias.deathDates[1]) labels.push(getDatesLabel(criterias.deathDates, 'Décès'))
@@ -184,7 +185,7 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
       break
 
     case RessourceType.DOCUMENTS:
-      labels.push(getSearchDocumentLabel(criterias.search, criterias.searchBy))
+      if (criterias.search) labels.push(getSearchDocumentLabel(criterias.search, criterias.searchBy))
       if (criterias.docType.length > 0) labels.push(getDocumentTypesLabel(criterias.docType))
       break
 

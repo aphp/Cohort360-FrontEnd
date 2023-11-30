@@ -191,29 +191,31 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
             <Button width={'30%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
               Filtrer
             </Button>
-            <Modal
-              title="Filtrer par :"
-              open={toggleModal}
-              width={'600px'}
-              onClose={() => setToggleModal(false)}
-              onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
-            >
-              {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-              <CodeFilter name={FilterKeys.CODE} value={code} />
-              {selectedTab.id === PMSI.DIAGNOSTIC && (
-                <DiagnosticTypesFilter
-                  name={FilterKeys.DIAGNOSTIC_TYPES}
-                  value={diagnosticTypes}
-                  allDiagnosticTypesList={allDiagnosticTypesList}
+            {toggleModal && (
+              <Modal
+                title="Filtrer par :"
+                open={toggleModal}
+                width={'600px'}
+                onClose={() => setToggleModal(false)}
+                onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
+              >
+                {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+                <CodeFilter name={FilterKeys.CODE} value={code} />
+                {selectedTab.id === PMSI.DIAGNOSTIC && (
+                  <DiagnosticTypesFilter
+                    name={FilterKeys.DIAGNOSTIC_TYPES}
+                    value={diagnosticTypes}
+                    allDiagnosticTypesList={allDiagnosticTypesList}
+                  />
+                )}
+                <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
+                <ExecutiveUnitsFilter
+                  value={executiveUnits}
+                  name={FilterKeys.EXECUTIVE_UNITS}
+                  criteriaName={mapToCriteriaName(selectedTab.id)}
                 />
-              )}
-              <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
-              <ExecutiveUnitsFilter
-                value={executiveUnits}
-                name={FilterKeys.EXECUTIVE_UNITS}
-                criteriaName={mapToCriteriaName(selectedTab.id)}
-              />
-            </Modal>
+              </Modal>
+            )}
           </Grid>
         </Searchbar>
       </BlockWrapper>
