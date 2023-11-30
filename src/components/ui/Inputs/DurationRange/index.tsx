@@ -44,6 +44,20 @@ const DurationRange: React.FC<DurationRangeProps> = ({
   useEffect(() => {
     setError({ isError: false, errorMessage: '' })
     onError(false)
+    if (
+      (minDuration.year === null || minDuration.year === 0) &&
+      (minDuration.month === null || minDuration.month === 0) &&
+      (minDuration.day === null || minDuration.day === 0)
+    ) {
+      setMinDuration(defaultMinDuration)
+    }
+    if (
+      (maxDuration.year === null || maxDuration.year === 0) &&
+      (maxDuration.month === null || maxDuration.month === 0) &&
+      (maxDuration.day === null || maxDuration.day === 0)
+    ) {
+      setMaxDuration(defaultMaxDuration)
+    }
     if (!checkMinMaxValue(minDuration, maxDuration)) {
       setError({ isError: true, errorMessage: 'La date maximale doit être supérieure à la date minimale.' })
       onError(true)
