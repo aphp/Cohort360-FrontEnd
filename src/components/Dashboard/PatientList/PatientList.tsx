@@ -63,6 +63,12 @@ type PatientListProps = {
 }
 
 const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
+  // Par défault, ces filtres se récupèreront par tranche de 8. L'utilisateur n'a pas encore le libre choix de changer cette variable.
+  const PAGE_SIZE = 12
+  // Le FILTERS_STEP n'évolue pas, on récupère toujours les filtres 8 par 8
+  const FILTERS_STEP = 1
+  const [filtersOffset, setFiltersOffset] = useState(0)
+
   const [toggleFiltersModal, setToggleFiltersModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
@@ -99,12 +105,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
     { changeOrderBy, changeSearchBy, changeSearchInput, addFilters, removeFilter }
   ] = useSearchCriterias(initPatientsSearchCriterias)
 
-  const { meState } = useAppSelector<{
-    meState: MeState
-  }>((state) => ({
-    meState: state.me
-  }))
-
+  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active
 
   const filtersAsArray = useMemo(() => {
@@ -159,10 +160,21 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
     addFilters(selectedFilter.filters)
   }
 
-  const getSavedFilters = async () => {
+  const getSavedFilters = async (getMore?: boolean) => {
+    console.log(getMore, savedFilters)
     try {
-      const response = await getFiltersService(RessourceType.PATIENT)
-      setSavedFilters(response)
+      if (getMore) {
+        const increasedOffset = filtersOffset + PAGE_SIZE
+        const response = await getFiltersService(RessourceType.PATIENT, PAGE_SIZE * FILTERS_STEP, increasedOffset)
+        setSavedFilters({
+          ...savedFilters,
+          results: [...(savedFilters?.results || []), ...response.results]
+        } as SavedFiltersResults)
+        setFiltersOffset(increasedOffset)
+      } else {
+        const response = await getFiltersService(RessourceType.PATIENT, PAGE_SIZE * FILTERS_STEP, filtersOffset)
+        setSavedFilters(response)
+      }
     } catch (err) {
       setSavedFilters(null)
     }
@@ -340,9 +352,11 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
             values={savedFilters?.results || []}
             name="savedFilters"
             deidentified={deidentified}
+            savedFiltersCount={savedFilters?.count || 0}
             onSubmitDelete={handleDeleteFilters}
             onSubmitPatch={getSavedFilters}
             setSelectedFilter={setSelectedFilter}
+            fetchPaginateData={() => getSavedFilters(true)}
           />
         </Modal>
         <Modal

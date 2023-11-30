@@ -850,7 +850,7 @@ export const postFiltersService = async (
   }
 }
 
-export const getFiltersService = async (fhir_resource: RessourceType, limit = 20, offset = 0) => {
+export const getFiltersService = async (fhir_resource: RessourceType, limit = 3, offset = 0) => {
   try {
     const response = await getFilters(fhir_resource, limit, offset)
     return response.data

@@ -21,12 +21,7 @@ type ListItemProps = {
 }
 
 const ListItem = ({ item, multiple = false, disabled = false, onclick, onEyeClick, onPencilClick }: ListItemProps) => {
-  const { meState } = useAppSelector<{
-    meState: MeState
-  }>((state) => ({
-    meState: state.me
-  }))
-
+  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active
 
   const EditPencilIcon = React.forwardRef((props, ref) => (

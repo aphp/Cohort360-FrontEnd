@@ -1,8 +1,8 @@
 import Modal, { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
-import ListItems from 'components/ui/ListItems'
+import FilterListItems from 'components/ui/FilterListItems'
 import { FilterKeys, Filters, PatientsFilters, SavedFilter, SearchCriterias } from 'types/searchCriterias'
-import { Item } from 'components/ui/ListItems/ListItem'
+import { Item } from 'components/ui/FilterListItems/ListItem'
 import Button from 'components/ui/Button'
 import { DeleteOutline } from '@mui/icons-material'
 import { Grid, TextField, Typography } from '@mui/material'
@@ -24,9 +24,11 @@ type FiltersListProps = {
   values: SavedFilter[]
   name: string
   deidentified?: boolean | null
+  savedFiltersCount: number
   onSubmitDelete: (value: any) => void
   onSubmitPatch: () => void
   setSelectedFilter: (value: SearchCriterias<PatientsFilters>) => void
+  fetchPaginateData: () => void
 }
 
 type FilterInfoModal = {
@@ -35,7 +37,15 @@ type FilterInfoModal = {
   filterParams: SearchCriterias<PatientsFilters>
 }
 
-const FiltersList = ({ values, deidentified, onSubmitDelete, onSubmitPatch, setSelectedFilter }: FiltersListProps) => {
+const FiltersList = ({
+  values,
+  deidentified,
+  savedFiltersCount,
+  onSubmitDelete,
+  onSubmitPatch,
+  setSelectedFilter,
+  fetchPaginateData
+}: FiltersListProps) => {
   const context = useContext(FormContext)
   const [filters, setFilters] = useState<Item[]>(
     values.map((value) => {
@@ -48,12 +58,7 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, onSubmitPatch, setS
   const [selectedItemInfo, setSelectedItemInfo] = useState<FilterInfoModal>()
   const [isReadonlyModal, setIsReadonlyModal] = useState(true)
 
-  const { meState } = useAppSelector<{
-    meState: MeState
-  }>((state) => ({
-    meState: state.me
-  }))
-
+  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active
 
   const showModalFilterInfo = (selectedItem: Item, isReadonly: boolean) => {
@@ -121,6 +126,20 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, onSubmitPatch, setS
     )
   }, [mode])
 
+  useEffect(
+    () =>
+      setFilters(
+        values.map((value) => {
+          return {
+            id: value.uuid,
+            name: value.name,
+            checked: filters.find((filter) => filter.id === value.uuid)?.checked || false
+          }
+        })
+      ),
+    [values]
+  )
+
   return (
     <>
       {mode === Mode.SINGLE && (
@@ -146,12 +165,14 @@ const FiltersList = ({ values, deidentified, onSubmitDelete, onSubmitPatch, setS
         </Grid>
       )}
       {Boolean(filters.length) ? (
-        <ListItems
+        <FilterListItems
           values={filters}
           multiple={mode === Mode.MULTIPLE}
+          savedFiltersCount={savedFiltersCount}
           onchange={handleSelectedFilter}
           onItemEyeClick={(item) => showModalFilterInfo(item, true)}
           onItemPencilClick={(item) => showModalFilterInfo(item, false)}
+          fetchPaginateData={fetchPaginateData}
         />
       ) : (
         <Typography fontWeight="700" align="center" sx={{ padding: '8px' }}>
