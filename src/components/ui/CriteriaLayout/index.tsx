@@ -1,6 +1,6 @@
 import React from 'react'
 import useStyles from './styles'
-import { Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@mui/material'
+import { Alert, Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@mui/material'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import { PropsWithChildren } from 'react'
 
@@ -13,6 +13,8 @@ type CriteriaLayoutProps = {
   onChangeTitle: (title: string) => void
   isInclusive: boolean
   onChangeIsInclusive: (isInclusive: boolean) => void
+  infoAlert?: string
+  warningAlert?: string
 }
 
 const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
@@ -24,11 +26,12 @@ const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
   title,
   onChangeTitle,
   isInclusive,
-  onChangeIsInclusive
+  onChangeIsInclusive,
+  infoAlert,
+  warningAlert
 }) => {
   const { classes } = useStyles()
 
-  console.log('isInclusive', isInclusive)
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
@@ -46,6 +49,9 @@ const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
       </Grid>
 
       <Grid className={classes.formContainer}>
+        {infoAlert && <Alert severity="info">{infoAlert}</Alert>}
+        {warningAlert && <Alert severity="warning">{warningAlert}</Alert>}
+
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">{title}</Typography>
 

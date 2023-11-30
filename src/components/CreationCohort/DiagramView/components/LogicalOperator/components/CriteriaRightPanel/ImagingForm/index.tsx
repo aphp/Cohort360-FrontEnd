@@ -6,7 +6,7 @@ import Collapse from 'components/ui/Collapse'
 import { DurationUnitWrapper } from 'components/ui/Inputs/DurationRange/styles'
 import { TextFieldWrapper } from 'components/ui/Inputs/DurationRange/styles'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
-import CriteriaLayout from '../CriteriaLayout'
+import CriteriaLayout from 'components/ui/CriteriaLayout'
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
 import { CriteriaDrawerComponentProps, CriteriaName, LoadingStatus } from 'types'
@@ -155,8 +155,9 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
       disabled={error === Error.INCOHERENT_AGE_ERROR || error === Error.SEARCHINPUT_ERROR}
       isInclusive={isInclusive}
       onChangeIsInclusive={setIsInclusive}
+      infoAlert="Tous les éléments des champs multiples sont liés par une contrainte OU"
+      warningAlert="Le flux alimentant les métadonnées associées aux séries et aux examens est suspendu depuis le 01/02/2023 en raison du déploiement du nouveaux PACS. Pendant cette période, il ne sera pas possible d'aligner les patients avec les examens d'imagerie réalisés après cette date. Reprise du flux estimé courant janvier 2024."
     >
-      {/* Nombre d'occurences */}
       <BlockWrapper margin="1em">
         <FormLabel component="legend" className={classes.durationLegend}>
           <BlockWrapper container justifyItems="center">
@@ -173,10 +174,9 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
         />
       </BlockWrapper>
 
-      {/* study :         */}
+      {/* critères de study : */}
       <BlockWrapper margin="1em">
         <Collapse title="Critères liés à une étude" margin="0">
-          {/* Date => started */}
           <BlockWrapper style={{ margin: '0 2em 1em 0' }}>
             <FormLabel component="legend" className={classes.durationLegend} style={{ padding: 0 }}>
               Date de l'étude
@@ -192,7 +192,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             />
           </BlockWrapper>
 
-          {/* Modalité (des series associées à cette study) (référentiel : afficher "code - nom") (liste multiselect) => modality */}
           <Autocomplete
             multiple
             options={criteria?.data.modalities || []}
@@ -204,7 +203,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             style={{ marginBottom: '1em' }}
           />
 
-          {/* Description (champ text libre) => description */}
           <BlockWrapper style={{ marginBottom: '1em' }}>
             <SearchbarWithCheck
               searchInput={studyDescription}
@@ -219,7 +217,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             />
           </BlockWrapper>
 
-          {/* Procédure (champ text libre) => procedureCode */}
           <BlockWrapper style={{ marginBottom: '1em' }}>
             <SearchbarWithCheck
               searchInput={studyProcedure}
@@ -231,7 +228,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             />
           </BlockWrapper>
 
-          {/* Nombre de series (>=0) => numberOfSeries */}
           <BlockWrapper style={{ marginBottom: '1em' }}>
             <FormLabel component="legend" className={classes.durationLegend}>
               Nombre de séries
@@ -246,7 +242,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             />
           </BlockWrapper>
 
-          {/* Nombre d'instances (>=0) => numberOfIns */}
           <BlockWrapper style={{ marginBottom: '1em' }}>
             <FormLabel component="legend" className={classes.durationLegend}>
               Nombre d'instances
@@ -261,7 +256,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             />
           </BlockWrapper>
 
-          {/* Rattaché à un document (oui/non et méthodologie de rattachement (liste à choix multiples (référentiel) - null=pas de rattachement)) => with-document */}
           <BlockWrapper style={{ marginBottom: '1em' }}>
             <FormLabel component="legend" className={classes.durationLegend}>
               Méthode de rattachement à un document
@@ -304,7 +298,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             </Grid>
           </BlockWrapper>
 
-          {/* Recherche par uid */}
           <FormLabel component="legend" className={classes.durationLegend}>
             Recherche par uid d'étude
           </FormLabel>
@@ -320,8 +313,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
           />
         </Collapse>
 
-        {/* série : */}
-        {/* Date (si pas cher à faire) => series-started */}
+        {/*critères de série : */}
         <BlockWrapper style={{ marginTop: 26 }}>
           <Collapse title="Critères liés à une série" value={false} margin="0">
             <BlockWrapper style={{ margin: '0 2em 1em 0' }}>
@@ -339,7 +331,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               />
             </BlockWrapper>
 
-            {/* Description (champ texte libre) => series-descr */}
             <BlockWrapper style={{ marginBottom: '1em' }}>
               <SearchbarWithCheck
                 searchInput={seriesDescription}
@@ -351,7 +342,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               />
             </BlockWrapper>
 
-            {/* Protocole (champ texte libre) => series-protocol */}
             <BlockWrapper style={{ marginBottom: '1em' }}>
               <SearchbarWithCheck
                 searchInput={seriesProtocol}
@@ -363,7 +353,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               />
             </BlockWrapper>
 
-            {/* Modalité (référentiel sous forme de liste ~ 40 items) : afficher "code - nom" => series-modality */}
             <Autocomplete
               multiple
               options={criteria?.data.modalities || []}
@@ -375,7 +364,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               style={{ marginBottom: '1em' }}
             />
 
-            {/* Partie du corps (champ texte libre) => bodysite */}
             <BlockWrapper style={{ marginBottom: '1em' }}>
               <SearchbarWithCheck
                 searchInput={bodySite}
@@ -387,7 +375,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               />
             </BlockWrapper>
 
-            {/* Recherche par uid */}
             <FormLabel component="legend" className={classes.durationLegend}>
               Recherche par uid de série
             </FormLabel>
@@ -405,7 +392,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
         </BlockWrapper>
       </BlockWrapper>
 
-      {/* Recherche avancée */}
       <AdvancedInputs form={CriteriaName.Imaging} selectedCriteria={selectedCriteria} onChangeValue={_onChangeValue} />
     </CriteriaLayout>
   )
