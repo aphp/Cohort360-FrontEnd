@@ -161,18 +161,17 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   }
 
   const getSavedFilters = async (getMore?: boolean) => {
-    console.log(getMore, savedFilters)
     try {
+      const offset = getMore ? filtersOffset + PAGE_SIZE : filtersOffset
+      const response = await getFiltersService(RessourceType.PATIENT, PAGE_SIZE * FILTERS_STEP, offset)
+
       if (getMore) {
-        const increasedOffset = filtersOffset + PAGE_SIZE
-        const response = await getFiltersService(RessourceType.PATIENT, PAGE_SIZE * FILTERS_STEP, increasedOffset)
         setSavedFilters({
           ...savedFilters,
           results: [...(savedFilters?.results || []), ...response.results]
         } as SavedFiltersResults)
-        setFiltersOffset(increasedOffset)
+        setFiltersOffset(offset)
       } else {
-        const response = await getFiltersService(RessourceType.PATIENT, PAGE_SIZE * FILTERS_STEP, filtersOffset)
         setSavedFilters(response)
       }
     } catch (err) {
