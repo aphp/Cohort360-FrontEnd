@@ -145,6 +145,15 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
     })
   }
 
+  const isSeriesUsed =
+    !!seriesStartDate ||
+    !!seriesEndDate ||
+    !!seriesDescription ||
+    !!seriesProtocol ||
+    seriesModalities.length > 0 ||
+    !!bodySite ||
+    !!seriesUid
+
   return (
     <CriteriaLayout
       criteriaLabel={`d'${RessourceTypeLabels.IMAGING}`}
@@ -319,7 +328,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
 
         {/*critères de série : */}
         <BlockWrapper style={{ marginTop: 26 }}>
-          <Collapse title="Critères liés à une série" value={false} margin="0">
+          <Collapse title="Critères liés à une série" value={isSeriesUsed} margin="0">
             <BlockWrapper style={{ margin: '0 2em 1em 0' }}>
               <FormLabel component="legend" className={classes.durationLegend} style={{ padding: 0 }}>
                 Date de la série
