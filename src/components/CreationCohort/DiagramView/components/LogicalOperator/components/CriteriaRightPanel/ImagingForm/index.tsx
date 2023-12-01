@@ -16,10 +16,12 @@ import { DocumentAttachmentMethod, DocumentAttachmentMethodLabel, LabelObject } 
 import useStyles from './styles'
 import { mappingCriteria } from '../DemographicForm'
 import SearchbarWithCheck from 'components/ui/Inputs/SearchbarWithCheck'
+import UidTextfield from 'components/ui/Inputs/UidTextfield'
 
 enum Error {
   INCOHERENT_AGE_ERROR,
   SEARCHINPUT_ERROR,
+  UID_ERROR,
   NO_ERROR
 }
 
@@ -78,7 +80,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
     mappingCriteria(selectedCriteria?.seriesModalities, CriteriaDataKey.MODALITIES, criteria) || []
   )
   const [bodySite, setBodySite] = useState<string>(selectedCriteria?.bodySite || '')
-  const [seriesUid, setSeriesUid] = useState(selectedCriteria?.seriesUid || '')
+  const [seriesUid, setSeriesUid] = useState<string>(selectedCriteria?.seriesUid || '')
   const [encounterService, setEncounterService] = useState(selectedCriteria?.encounterService || [])
   const [encounterStartDate, setEncounterStartDate] = useState(selectedCriteria?.encounterStartDate || null)
   const [encounterEndDate, setEncounterEndDate] = useState(selectedCriteria?.encounterEndDate || null)
@@ -161,7 +163,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
       isEdition={isEdition}
       goBack={goBack}
       onSubmit={onSubmit}
-      disabled={error === Error.INCOHERENT_AGE_ERROR || error === Error.SEARCHINPUT_ERROR}
+      disabled={error === Error.INCOHERENT_AGE_ERROR || error === Error.SEARCHINPUT_ERROR || error === Error.UID_ERROR}
       isInclusive={isInclusive}
       onChangeIsInclusive={setIsInclusive}
       infoAlert="Tous les éléments des champs multiples sont liés par une contrainte OU"
@@ -309,15 +311,10 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
           <FormLabel component="legend" className={classes.durationLegend}>
             Recherche par uid d'étude
           </FormLabel>
-          <TextField
-            label=""
-            placeholder="Ajouter une liste d'uid"
+          <UidTextfield
             value={studyUid}
-            variant="outlined"
-            onChange={(event) => setStudyUid(event.target.value)}
-            multiline
-            minRows={5}
-            style={{ width: '100%' }}
+            onChange={setStudyUid}
+            onError={(isError) => setError(isError ? Error.UID_ERROR : Error.NO_ERROR)}
           />
         </Collapse>
 
@@ -380,15 +377,10 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             <FormLabel component="legend" className={classes.durationLegend}>
               Recherche par uid de série
             </FormLabel>
-            <TextField
-              label=""
-              placeholder="Ajouter une liste d'uid"
-              variant="outlined"
+            <UidTextfield
               value={seriesUid}
-              onChange={(event) => setSeriesUid(event.target.value)}
-              multiline
-              minRows={5}
-              style={{ width: '100%' }}
+              onChange={setSeriesUid}
+              onError={(isError) => setError(isError ? Error.UID_ERROR : Error.NO_ERROR)}
             />
           </Collapse>
         </BlockWrapper>
