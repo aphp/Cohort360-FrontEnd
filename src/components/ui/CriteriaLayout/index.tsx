@@ -87,7 +87,7 @@ const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
       </Grid>
 
       <Grid className={classes.criteriaActionContainer}>
-        {isEdition && (
+        {!isEdition && (
           <Button onClick={goBack} variant="outlined">
             Annuler
           </Button>
