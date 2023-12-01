@@ -159,7 +159,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
           </Grid>
         </Searchbar>
       </BlockWrapper>
-      <Grid item xs={12}>
+      <Grid item xs={12} margin="0px 0px 10px">
         {filtersAsArray.map((filter, index) => (
           <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
         ))}
