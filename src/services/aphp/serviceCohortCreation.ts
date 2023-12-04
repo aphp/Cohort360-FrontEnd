@@ -103,7 +103,7 @@ export interface IServiceCohortCreation {
   fetchBiologySearch: (
     searchInput: string
   ) => Promise<{ anabio: ValueSetWithHierarchy[]; loinc: ValueSetWithHierarchy[] }>
-  fetchModalities: () => Promise<any>
+  fetchModalities: () => Promise<Array<HierarchyElement>>
 }
 
 const servicesCohortCreation: IServiceCohortCreation = {
