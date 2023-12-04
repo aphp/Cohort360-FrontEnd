@@ -23,7 +23,7 @@ import SearchInput from 'components/ui/Searchbar/SearchInput'
 
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
-import { CriteriaName, LoadingStatus } from 'types'
+import { CriteriaName, HierarchyElement, LoadingStatus } from 'types'
 import { PatientTypes } from 'types/patient'
 import { FilterKeys } from 'types/searchCriterias'
 
@@ -33,7 +33,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const { patient } = useAppSelector((state) => ({ patient: state.patient }))
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [toggleModal, setToggleModal] = useState(false)
-  const [modalitiesList, setModalitiesList] = useState([])
+  const [modalitiesList, setModalitiesList] = useState<HierarchyElement[]>([])
 
   const searchResults = {
     deidentified: patient?.deidentified || false,
