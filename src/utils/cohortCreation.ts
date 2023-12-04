@@ -580,7 +580,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         }`,
         `${
           criterion.studyModalities && criterion.studyModalities.length > 0
-            ? `${IMAGING_STUDY_MODALITIES}=${criterion.studyModalities
+            ? `${IMAGING_STUDY_MODALITIES}=*|${criterion.studyModalities
                 .map((modality: any) => modality.id)
                 .reduce(searchReducer)}`
             : ''
@@ -637,7 +637,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         }`,
         `${
           criterion.seriesModalities && criterion.seriesModalities.length > 0
-            ? `${IMAGING_SERIES_MODALITIES}=${criterion.seriesModalities
+            ? `${IMAGING_SERIES_MODALITIES}=*|${criterion.seriesModalities
                 .map((modality: any) => modality.id)
                 .reduce(searchReducer)}`
             : ''
@@ -1670,7 +1670,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 break
               }
               case IMAGING_STUDY_MODALITIES: {
-                const modalitiesIds = value?.split(',')
+                const modalitiesIds = value?.replace(/^[*|]+/, '').split(',')
                 const newModalitiesIds = modalitiesIds?.map((modality) => ({ id: modality }))
                 if (!newModalitiesIds) continue
 
@@ -1726,7 +1726,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 break
               }
               case IMAGING_SERIES_MODALITIES: {
-                const modalitiesIds = value?.split(',')
+                const modalitiesIds = value?.replace(/^[*|]+/, '').split(',')
                 const newModalitiesIds = modalitiesIds?.map((modality) => ({ id: modality }))
                 if (!newModalitiesIds) continue
 

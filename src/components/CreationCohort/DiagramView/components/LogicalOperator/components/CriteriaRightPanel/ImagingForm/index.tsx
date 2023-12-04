@@ -210,7 +210,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={studyModalities}
             onChange={(e, value) => setStudyModalities(value)}
-            renderInput={(params) => <TextField {...params} label="Modalité" />}
+            renderInput={(params) => <TextField {...params} label="Modalités" />}
             style={{ marginBottom: '1em' }}
           />
 
@@ -361,7 +361,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={seriesModalities}
               onChange={(e, value) => setSeriesModalities(value)}
-              renderInput={(params) => <TextField {...params} label="Modalité" />}
+              renderInput={(params) => <TextField {...params} label="Modalités" />}
               style={{ marginBottom: '1em' }}
             />
 
