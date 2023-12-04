@@ -565,7 +565,7 @@ const servicesCohorts: IServiceCohorts = {
       return cohorts.map((cohort) => {
         return {
           ...cohort,
-          rights: rightsResponse.data.find((right: any) => right.cohort_id === cohort.fhir_group_id)?.rights
+          rights: rightsResponse.data.find((right: any) => right.cohort_id == cohort.fhir_group_id)?.rights
         }
       })
     } catch (error) {
