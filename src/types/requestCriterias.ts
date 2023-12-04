@@ -1,5 +1,11 @@
 import { ScopeTreeRow, ValueSetSystem } from 'types'
-import { DurationRangeType, GenderStatus, LabelObject, SearchByTypes } from './searchCriterias'
+import {
+  DocumentAttachmentMethod,
+  DurationRangeType,
+  GenderStatus,
+  LabelObject,
+  SearchByTypes
+} from './searchCriterias'
 
 export enum MedicationType {
   Request = 'MedicationRequest',
@@ -33,7 +39,26 @@ export enum RessourceType {
   BIO_MICRO = 'biologie_microbiologie',
   OBSERVATION = 'Observation',
   MICROBIOLOGIE = 'microbiologie',
-  PHYSIOLOGIE = 'physiologie'
+  PHYSIOLOGIE = 'physiologie',
+  IMAGING = 'ImagingStudy'
+}
+
+export enum RessourceTypeLabels {
+  REQUEST = 'Mes requềtes',
+  IPP_LIST = "Liste d'IPP",
+  PATIENT = 'Démographie',
+  ENCOUNTER = 'Prise en charge',
+  DOCUMENTS = 'Documents cliniques',
+  PMSI = 'PMSI',
+  CONDITION = 'Diagnostics',
+  PROCEDURE = 'Actes',
+  CLAIM = 'GHM',
+  MEDICATION = 'Médicaments',
+  BIO_MICRO = 'Biologie/Microbiologie',
+  OBSERVATION = 'Biologie',
+  MICROBIOLOGIE = 'Microbiologie',
+  PHYSIOLOGIE = 'Physiologie',
+  IMAGING = 'Imagerie'
 }
 
 export type SelectedCriteriaType = {
@@ -51,6 +76,7 @@ export type SelectedCriteriaType = {
   | ObservationDataType
   | IPPListDataType
   | EncounterDataType
+  | ImagingDataType
 )
 
 export enum CriteriaDataKey {
@@ -73,7 +99,8 @@ export enum CriteriaDataKey {
   MEDICATION_DATA = 'medicationData',
   PRESCRIPTION_TYPES = 'prescriptionTypes',
   ADMINISTRATIONS = 'administrations',
-  BIOLOGY_DATA = 'biologyData'
+  BIOLOGY_DATA = 'biologyData',
+  MODALITIES = 'modalities'
 }
 
 export type CcamDataType = {
@@ -229,6 +256,37 @@ export type ObservationDataType = {
   isInclusive?: boolean
   encounterStartDate: string | null
   encounterEndDate: string | null
+}
+
+export type ImagingDataType = {
+  title: string
+  type: RessourceType.IMAGING
+  studyStartDate: string | null
+  studyEndDate: string | null
+  studyModalities: LabelObject[] | null
+  studyDescription: string
+  studyProcedure: string
+  numberOfSeries: number
+  seriesComparator: Comparators
+  numberOfIns: number
+  instancesComparator: Comparators
+  withDocument: DocumentAttachmentMethod
+  daysOfDelay: string | null
+  studyUid: string
+  seriesStartDate: string | null
+  seriesEndDate: string | null
+  seriesDescription: string
+  seriesProtocol: string
+  seriesModalities: LabelObject[] | null
+  bodySite: string
+  seriesUid: string
+  encounterEndDate: string | null
+  encounterStartDate: string | null
+  occurrence: number
+  occurrenceComparator: Comparators
+  startOccurrence: string | null
+  endOccurrence: string | null
+  isInclusive?: boolean
 }
 
 export enum VitalStatusLabel {

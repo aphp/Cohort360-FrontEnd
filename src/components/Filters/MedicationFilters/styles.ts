@@ -4,9 +4,6 @@ const useStyles = makeStyles()(() => ({
   dialog: {
     width: '600px'
   },
-  filter: {
-    marginBottom: '24px'
-  },
   autocomplete: {
     marginTop: '16px'
   },
@@ -25,9 +22,6 @@ const useStyles = makeStyles()(() => ({
     minWidth: 34,
     width: 34,
     maxWidth: 34
-  },
-  buttonLabel: {
-    display: 'inline'
   }
 }))
 

@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import { Buffer } from 'buffer'
 import Parse from 'html-react-parser'
 
-import { CircularProgress, Grid, IconButton, Typography, TableRow, TableCell } from '@mui/material'
+import { CircularProgress, Grid, IconButton, Typography, TableRow } from '@mui/material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import FolderSharedIcon from '@mui/icons-material/FolderShared'
 import DescriptionIcon from '@mui/icons-material/Description'
@@ -56,41 +57,20 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
   const { classes } = useStyles()
 
   const columns = [
-    {
-      multiple: [
-        { label: 'Nom', code: '', align: 'center', sortableColumn: false },
-        { label: 'Date', code: Order.DATE, align: 'center', sortableColumn: true }
-      ]
-    },
+    { multiple: [{ label: 'Nom' }, { label: 'Date', code: Order.DATE }] },
     showIpp
       ? {
-          label: `IPP${deidentified ? ' chiffré' : ''}`,
-          code: '',
-          align: 'center',
-          sortableColumn: false
+          label: `IPP${deidentified ? ' chiffré' : ''}`
         }
       : null,
-    {
-      label: `NDA${deidentified ? ' chiffré' : ''}`,
-      code: '',
-      align: 'center',
-      sortableColumn: false
-    },
-    { label: 'Unité exécutrice', code: '', align: 'center', sortableColumn: false },
-    { label: 'Type de document', code: Order.TYPE, align: 'center', sortableColumn: true },
-    { label: 'Aperçu', code: '', align: 'center', sortableColumn: false }
+    { label: `NDA${deidentified ? ' chiffré' : ''}` },
+    { label: 'Unité exécutrice' },
+    { label: 'Type de document', code: Order.TYPE },
+    { label: 'Aperçu' }
   ].filter((elem) => elem !== null) as Column[]
 
   return (
-    <DataTable
-      columns={columns}
-      order={orderBy}
-      setOrder={setOrderBy}
-      rowsPerPage={20}
-      page={page}
-      setPage={setPage}
-      total={total}
-    >
+    <DataTable columns={columns} order={orderBy} setOrder={setOrderBy} page={page} setPage={setPage} total={total}>
       {!loading && documentsList?.length > 0 && (
         <>
           {documentsList.map((document) => {
@@ -109,20 +89,20 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
       )}
       {!loading && documentsList?.length < 1 && (
         <TableRow className={classes.emptyTableRow}>
-          <TableCell colSpan={6} align="left">
+          <TableCellWrapper colSpan={6} align="left">
             <Grid container justifyContent="center">
               <Typography variant="button">Aucun document à afficher</Typography>
             </Grid>
-          </TableCell>
+          </TableCellWrapper>
         </TableRow>
       )}
       {loading && (
         <TableRow className={classes.emptyTableRow}>
-          <TableCell colSpan={6} align="left">
+          <TableCellWrapper colSpan={6} align="left">
             <Grid container justifyContent="center">
               <CircularProgress />
             </Grid>
-          </TableCell>
+          </TableCellWrapper>
         </TableRow>
       )}
     </DataTable>
@@ -168,16 +148,16 @@ const DataTableCompositionLine: React.FC<{
   return (
     <React.Fragment key={documentId}>
       <TableRow className={classes.tableBodyRows}>
-        <TableCell>
+        <TableCellWrapper align="left">
           <Typography variant="button">{title ?? 'Document sans titre'}</Typography>
           <Typography>
             {date} à {hour}
           </Typography>
-          {getStatusShip(status)}
-        </TableCell>
+          {getStatusChip(status)}
+        </TableCellWrapper>
 
         {showIpp && (
-          <TableCell>
+          <TableCellWrapper>
             <Grid container alignItems="center" wrap="nowrap">
               <UserIcon height="25px" fill="#5BC5F2" className={classes.iconMargin} />
 
@@ -192,31 +172,31 @@ const DataTableCompositionLine: React.FC<{
                 <SearchIcon height="15px" fill="#ED6D91" className={classes.iconMargin} />
               </IconButton>
             </Grid>
-          </TableCell>
+          </TableCellWrapper>
         )}
 
-        <TableCell>
+        <TableCellWrapper>
           <Grid container alignItems="center" wrap="nowrap">
             <FolderSharedIcon htmlColor="#5BC5F2" className={cx(classes.iconSize, classes.iconMargin)} />
             <Typography>{nda}</Typography>
           </Grid>
-        </TableCell>
+        </TableCellWrapper>
 
-        <TableCell>
+        <TableCellWrapper>
           <Grid container alignItems="center" wrap="nowrap">
             <LocalHospitalIcon htmlColor="#5BC5F2" className={cx(classes.iconSize, classes.iconMargin)} />
             <Typography>{serviceProvider}</Typography>
           </Grid>
-        </TableCell>
+        </TableCellWrapper>
 
-        <TableCell>
+        <TableCellWrapper align="left">
           <Grid container alignItems="center" wrap="nowrap">
             <DescriptionIcon htmlColor="#5BC5F2" className={cx(classes.iconSize, classes.iconMargin)} />
             <Typography>{docType?.label ?? '-'}</Typography>
           </Grid>
-        </TableCell>
+        </TableCellWrapper>
 
-        <TableCell>
+        <TableCellWrapper>
           <IconButton onClick={() => setOpen(documentId ?? '')}>
             <Visibility height="30px" />
           </IconButton>
@@ -227,21 +207,25 @@ const DataTableCompositionLine: React.FC<{
             handleClose={() => setOpen(null)}
             documentId={documentId ?? ''}
           />
-        </TableCell>
+        </TableCellWrapper>
       </TableRow>
 
       {documentContent && searchMode && (
         <TableRow className={classes.tableBodyRows}>
-          <TableCell colSpan={6} style={{ backgroundImage: `url(${Watermark})`, backgroundSize: 'contain' }}>
+          <TableCellWrapper
+            align="left"
+            colSpan={6}
+            style={{ backgroundImage: `url(${Watermark})`, backgroundSize: 'contain' }}
+          >
             <Typography>{Parse(documentContent)}</Typography>
-          </TableCell>
+          </TableCellWrapper>
         </TableRow>
       )}
     </React.Fragment>
   )
 }
 
-const getStatusShip = (type?: CompositionStatusKind | DocumentReferenceStatusKind) => {
+const getStatusChip = (type?: CompositionStatusKind | DocumentReferenceStatusKind) => {
   if (type === 'final' || type === 'current') {
     return <StatusChip icon={<CheckIcon height="15px" fill="#FFF" />} label={getDocumentStatus(type)} />
   } else if (type === 'entered-in-error') {

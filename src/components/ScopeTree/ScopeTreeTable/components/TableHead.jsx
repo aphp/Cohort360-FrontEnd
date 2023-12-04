@@ -1,11 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import TableSortLabel from '@mui/material/TableSortLabel'
 import Checkbox from '@mui/material/Checkbox'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 function EnhancedTableHead(props) {
   const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props
@@ -19,7 +19,7 @@ function EnhancedTableHead(props) {
     <TableHead className={classes.head}>
       <TableRow>
         {!props.noCheckbox && (
-          <TableCell align="center" padding="checkbox">
+          <TableCellWrapper padding="checkbox">
             <Checkbox
               indeterminate={numSelected > 0 && numSelected < rowCount}
               indeterminateIcon={<IndeterminateCheckBoxOutlined />}
@@ -27,10 +27,10 @@ function EnhancedTableHead(props) {
               onChange={onSelectAllClick}
               inputProps={{ 'aria-label': 'select all desserts' }}
             />
-          </TableCell>
+          </TableCellWrapper>
         )}
         {headCells.map((headCell) => (
-          <TableCell
+          <TableCellWrapper
             key={headCell.id || Math.random()}
             align={headCell.align}
             padding={headCell.disablePadding ? 'none' : 'normal'}
@@ -50,7 +50,7 @@ function EnhancedTableHead(props) {
                 </span>
               ) : null}
             </TableSortLabel>
-          </TableCell>
+          </TableCellWrapper>
         ))}
       </TableRow>
     </TableHead>

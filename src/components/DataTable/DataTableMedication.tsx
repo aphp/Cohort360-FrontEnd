@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 
-import { CircularProgress, Grid, IconButton, Typography, TableRow, TableCell, Tooltip } from '@mui/material'
+import { CircularProgress, Grid, IconButton, Typography, TableRow, Tooltip } from '@mui/material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import CommentIcon from '@mui/icons-material/Comment'
 
@@ -41,39 +42,22 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
   const { classes } = useStyles()
 
   const columns = [
-    {
-      label: `NDA${deidentified ? ' chiffré' : ''}`,
-      code: 'encounter',
-      align: 'center',
-      sortableColumn: true
-    },
+    { label: `NDA${deidentified ? ' chiffré' : ''}`, code: 'encounter' },
     {
       label: selectedTab === 'prescription' ? 'Date de prescription' : "Date d'administration",
-      code: 'Period-start',
-      align: 'center',
-      sortableColumn: true
+      code: 'Period-start'
     },
-    { label: 'Code ATC', code: 'medication-atc', align: 'center', sortableColumn: true },
-    { label: 'Code UCD', code: 'medication-ucd', align: 'center', sortableColumn: true },
-    selectedTab === 'prescription'
-      ? { label: 'Type de prescription', code: 'type', align: 'center', sortableColumn: true }
-      : null,
-    { label: "Voie d'administration", code: 'route', align: 'center', sortableColumn: true },
-    selectedTab === 'administration' ? { label: 'Quantité', align: 'center', sortableColumn: false } : null,
-    { label: 'Unité exécutrice', align: 'center', sortableColumn: false },
-    selectedTab === 'administration' ? { label: 'Commentaire', align: 'center', sortableColumn: false } : null
+    { label: 'Code ATC', code: 'medication-atc' },
+    { label: 'Code UCD', code: 'medication-ucd' },
+    selectedTab === 'prescription' ? { label: 'Type de prescription', code: 'type' } : null,
+    { label: "Voie d'administration", code: 'route' },
+    selectedTab === 'administration' ? { label: 'Quantité' } : null,
+    { label: 'Unité exécutrice' },
+    selectedTab === 'administration' ? { label: 'Commentaire' } : null
   ].filter((elem) => elem !== null) as Column[]
 
   return (
-    <DataTable
-      columns={columns}
-      order={orderBy}
-      setOrder={setOrderBy}
-      rowsPerPage={20}
-      page={page}
-      setPage={setPage}
-      total={total}
-    >
+    <DataTable columns={columns} order={orderBy} setOrder={setOrderBy} page={page} setPage={setPage} total={total}>
       {!loading && medicationsList && medicationsList.length > 0 ? (
         <>
           {medicationsList.map((medication) => {
@@ -82,7 +66,7 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
         </>
       ) : (
         <TableRow className={classes.emptyTableRow}>
-          <TableCell colSpan={8} align="left">
+          <TableCellWrapper colSpan={8} align="left">
             <Grid container justifyContent="center">
               {loading ? (
                 <CircularProgress />
@@ -92,7 +76,7 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
                 } à afficher`}</Typography>
               )}
             </Grid>
-          </TableCell>
+          </TableCellWrapper>
         </TableRow>
       )}
     </DataTable>
@@ -152,9 +136,9 @@ const DataTableMedicationLine: React.FC<{
 
   return (
     <TableRow className={classes.tableBodyRows} key={medication.id}>
-      <TableCell align="left">{nda ?? 'Inconnu'}</TableCell>
-      <TableCell align="center">{date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}</TableCell>
-      <TableCell align="center">
+      <TableCellWrapper align="left">{nda ?? 'Inconnu'}</TableCellWrapper>
+      <TableCellWrapper>{date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}</TableCellWrapper>
+      <TableCellWrapper>
         <Tooltip title={codeATCSystem}>
           <Typography style={{ fontStyle: isATCStandard ? 'normal' : 'italic' }}>
             {codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : codeATC ?? ''}
@@ -163,8 +147,8 @@ const DataTableMedicationLine: React.FC<{
         <Typography className={classes.libelle}>
           {displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}
         </Typography>
-      </TableCell>
-      <TableCell align="center">
+      </TableCellWrapper>
+      <TableCellWrapper>
         <Tooltip title={codeUCDSystem}>
           <Typography style={{ fontStyle: isUCDStandard ? 'normal' : 'italic' }}>
             {codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : codeUCD ?? ''}
@@ -173,15 +157,15 @@ const DataTableMedicationLine: React.FC<{
         <Typography className={classes.libelle}>
           {displayUCD === 'No matching concept' ? '-' : displayUCD ?? '-'}
         </Typography>
-      </TableCell>
+      </TableCellWrapper>
       {medication.resourceType === 'MedicationRequest' && (
-        <TableCell align="center">{prescriptionType ?? '-'}</TableCell>
+        <TableCellWrapper>{prescriptionType ?? '-'}</TableCellWrapper>
       )}
-      <TableCell align="center">
+      <TableCellWrapper>
         {administrationRoute === 'No matching concept' ? '-' : administrationRoute ?? '-'}
-      </TableCell>
+      </TableCellWrapper>
       {medication.resourceType === 'MedicationAdministration' && (
-        <TableCell align="center">
+        <TableCellWrapper>
           {unit !== 'Non Renseigné' ? (
             <>
               {dose} {unit}
@@ -189,16 +173,16 @@ const DataTableMedicationLine: React.FC<{
           ) : (
             '-'
           )}
-        </TableCell>
+        </TableCellWrapper>
       )}
-      <TableCell align="center">{serviceProvider ?? '-'}</TableCell>
+      <TableCellWrapper>{serviceProvider ?? '-'}</TableCellWrapper>
       {medication.resourceType === 'MedicationAdministration' && deidentified === false && (
         <>
-          <TableCell align="center">
+          <TableCellWrapper>
             <IconButton onClick={() => setOpen(comment ?? '')}>
               <CommentIcon />
             </IconButton>
-          </TableCell>
+          </TableCellWrapper>
           <ModalAdministrationComment open={open !== null} comment={open ?? ''} handleClose={() => setOpen(null)} />
         </>
       )}

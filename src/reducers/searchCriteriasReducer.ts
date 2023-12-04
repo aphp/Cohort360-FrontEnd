@@ -13,6 +13,7 @@ import {
   BiologyFilters,
   PatientDocumentsFilters,
   AllDocumentsFilters,
+  ImagingFilters,
   OrderBy,
   FilterKeys,
   FilterValue,
@@ -145,6 +146,22 @@ export const initAllDocsSearchCriterias: SearchCriterias<AllDocumentsFilters> = 
     startDate: null,
     endDate: null,
     executiveUnits: []
+  }
+}
+
+export const initImagingCriterias: SearchCriterias<ImagingFilters> = {
+  orderBy: {
+    orderBy: Order.IPP,
+    orderDirection: Direction.ASC
+  },
+  searchInput: '',
+  searchBy: SearchByTypes.TEXT,
+  filters: {
+    nda: '',
+    startDate: null,
+    endDate: null,
+    executiveUnits: [],
+    modality: []
   }
 }
 

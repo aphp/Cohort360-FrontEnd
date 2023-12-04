@@ -22,6 +22,7 @@ import CoronavirusIcon from '@mui/icons-material/Coronavirus'
 import { CriteriaItemType } from 'types'
 import useStyles from './styles'
 import { RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import { PhotoCameraFront } from '@mui/icons-material'
 
 type CriteriaListItemProps = {
   criteriaItem: CriteriaItemType
@@ -35,45 +36,51 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
   const { classes } = useStyles()
   const [open, setOpen] = useState(true)
 
-  const svgIcone =
-    id === RessourceType.REQUEST ? (
-      <SavedSearchIcon />
-    ) : id === RessourceType.IPP_LIST ? (
-      <PersonSearchIcon />
-    ) : id === RessourceType.PATIENT ? (
-      <BarChartIcon />
-    ) : id === RessourceType.ENCOUNTER ? (
-      <EventIcon />
-    ) : id === RessourceType.DOCUMENTS ? (
-      <DescriptionIcon />
-    ) : id === RessourceType.PMSI ? (
-      <MedicalInformationIcon />
-    ) : id === RessourceType.CONDITION ? (
-      <ArticleIcon />
-    ) : id === RessourceType.PROCEDURE ? (
-      <ContactPageIcon />
-    ) : id === RessourceType.CLAIM ? (
-      <LocalHospitalIcon />
-    ) : id === RessourceType.MEDICATION ? (
-      <VaccinesIcon />
-    ) : id === RessourceType.BIO_MICRO ? (
-      <BiotechIcon />
-    ) : id === RessourceType.OBSERVATION ? (
-      <CoronavirusIcon />
-    ) : id === RessourceType.MICROBIOLOGIE ? (
-      <ScienceIcon />
-    ) : id === RessourceType.PHYSIOLOGIE ? (
-      <MonitorHeartIcon />
-    ) : (
-      <></>
-    )
+  const getCriteriaIcon = (id: string) => {
+    switch (id) {
+      case RessourceType.REQUEST:
+        return <SavedSearchIcon />
+      case RessourceType.IPP_LIST:
+        return <PersonSearchIcon />
+      case RessourceType.PATIENT:
+        return <BarChartIcon />
+      case RessourceType.ENCOUNTER:
+        return <EventIcon />
+      case RessourceType.DOCUMENTS:
+        return <DescriptionIcon />
+      case RessourceType.PMSI:
+        return <MedicalInformationIcon />
+      case RessourceType.CONDITION:
+        return <ArticleIcon />
+      case RessourceType.PROCEDURE:
+        return <ContactPageIcon />
+      case RessourceType.CLAIM:
+        return <LocalHospitalIcon />
+      case RessourceType.MEDICATION:
+        return <VaccinesIcon />
+      case RessourceType.BIO_MICRO:
+        return <BiotechIcon />
+      case RessourceType.OBSERVATION:
+        return <CoronavirusIcon />
+      case RessourceType.MICROBIOLOGIE:
+        return <ScienceIcon />
+      case RessourceType.PHYSIOLOGIE:
+        return <MonitorHeartIcon />
+      case RessourceType.IMAGING:
+        return <PhotoCameraFront />
+      default:
+        return <></>
+    }
+  }
+
+  const svgIcon = getCriteriaIcon(id)
 
   const cursor = disabled ? 'not-allowed' : components ? 'pointer' : 'default'
 
   if (!subItems || (subItems && subItems.length === 0)) {
     return (
       <ListItem onClick={disabled ? undefined : () => handleClick(criteriaItem)} className={classes.criteriaItem}>
-        <ListItemIcon style={{ minWidth: '2rem', color: 'currentcolor' }}>{svgIcone}</ListItemIcon>
+        <ListItemIcon style={{ minWidth: '2rem', color: 'currentcolor' }}>{svgIcon}</ListItemIcon>
         <ListItemText disableTypography style={{ cursor, color, fontWeight }} primary={title} />
       </ListItem>
     )
@@ -87,7 +94,7 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
       >
         <Grid container flexDirection="column">
           <Grid container flexDirection="row">
-            <ListItemIcon style={{ minWidth: '2rem', color: 'currentcolor' }}>{svgIcone}</ListItemIcon>
+            <ListItemIcon style={{ minWidth: '2rem', color: 'currentcolor' }}>{svgIcon}</ListItemIcon>
             <ListItemText
               disableTypography
               style={{ cursor, color, fontWeight }}

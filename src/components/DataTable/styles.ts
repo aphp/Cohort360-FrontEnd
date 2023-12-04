@@ -73,54 +73,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     padding: 0,
     top: 2,
     position: 'relative'
-  },
-  tabsContainer: {
-    backgroundColor: '#153D8A',
-    borderRadius: 8,
-    color: 'white',
-    minHeight: 41,
-    '& .Mui-selected': { color: 'white' }
-  },
-  indicator: {
-    backgroundColor: '#ED6D91',
-    height: '4px'
-  },
-  selected: {
-    backgroundColor: '#0063AF',
-    color: 'white !important'
-  },
-  tabTitle: {
-    minWidth: 160,
-    color: 'white',
-    fontWeight: 400,
-    borderBottom: '#255CA1 inset 4px',
-    minHeight: 41,
-    padding: '6px 12px'
-  },
-  searchButton: {
-    minWidth: 150,
-    height: 32,
-    backgroundColor: '#5BC5F2',
-    color: 'white',
-    borderRadius: 25,
-    marginInline: 8,
-    '&:hover': {
-      backgroundColor: '#5BC5F2',
-      color: 'white'
-    }
-  },
-  errorContainer: {
-    color: '#f44336',
-    width: '100%',
-    padding: '0 16px'
-  },
-  select: {
-    marginRight: 4,
-    borderRadius: 25,
-    backgroundColor: '#FFF',
-    '& .MuiSelect-select': {
-      borderRadius: 25
-    }
   }
 }))
 

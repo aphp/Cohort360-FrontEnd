@@ -7,6 +7,7 @@ import {
   Encounter,
   FhirResource,
   Group,
+  ImagingStudy,
   MedicationAdministration,
   MedicationRequest,
   Observation,
@@ -221,8 +222,7 @@ export type Column =
   | {
       label: string | ReactNode
       code?: string
-      align: 'inherit' | 'left' | 'center' | 'right' | 'justify'
-      sortableColumn?: boolean
+      align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
       multiple?: undefined
     }
   | {
@@ -642,6 +642,18 @@ export type IPatientObservation<T extends CohortObservation> = {
   }
 }
 
+export type CohortImaging = ImagingStudy & {
+  serviceProvider?: string
+  NDA?: string
+}
+export type IPatientImaging<T extends CohortImaging> = {
+  loading: boolean
+  count: number
+  total: number
+  list: T[]
+  page: number
+}
+
 export type TabType<T, TL> = {
   label: TL
   id: T
@@ -744,7 +756,8 @@ export enum CriteriaName {
   Document = 'document',
   Medication = 'medication',
   Biology = 'biology',
-  VisitSupport = 'supported'
+  VisitSupport = 'supported',
+  Imaging = 'imaging'
 }
 export type CriteriaNameType =
   | CriteriaName.Cim10
@@ -754,6 +767,7 @@ export type CriteriaNameType =
   | CriteriaName.Medication
   | CriteriaName.Biology
   | CriteriaName.VisitSupport
+  | CriteriaName.Imaging
 
 export type AccessExpirationsProps = {
   expiring?: boolean

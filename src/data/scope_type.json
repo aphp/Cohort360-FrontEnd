@@ -6,7 +6,8 @@
     "ghm": "Hôpital",
     "medication": "Hôpital",
     "document": "Hôpital",
-    "supported": "Unité Fonctionnelle (UF)"
+    "supported": "Unité Fonctionnelle (UF)",
+    "imaging": "Hôpital"
   },
   "typeLevel": [["AP-HP"], ["Groupe hospitalier (GH)", "GHU"], ["Hôpital"], ["Pôle/DMU"], ["Unité Fonctionnelle (UF)"]]
 }

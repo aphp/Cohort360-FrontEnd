@@ -23,8 +23,6 @@ import { ProjectState, fetchProjects } from 'state/project'
 import { RequestState, fetchRequests, addRequest, editRequest, deleteRequest } from 'state/request'
 import { fetchRequestCohortCreation } from 'state/cohortCreation'
 
-import useStyles from './styles'
-
 const ERROR_TITLE = 'error_title'
 const ERROR_PROJECT = 'error_project'
 const ERROR_PROJECT_NAME = 'error_project_name'
@@ -37,7 +35,6 @@ const NEW_PROJECT_ID = 'new'
 const ModalCreateNewRequest: React.FC<{
   onClose?: () => void
 }> = ({ onClose }) => {
-  const { classes } = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { projectState, requestState } = useAppSelector<{
@@ -193,13 +190,7 @@ const ModalCreateNewRequest: React.FC<{
         )}
         <DialogContent>
           {loading || currentRequest === null ? (
-            <Grid
-              container
-              direction="column"
-              justifyContent="center"
-              alignItems="center"
-              className={classes.inputContainer}
-            >
+            <Grid container direction="column" justifyContent="center" alignItems="center" marginBottom={3}>
               <CircularProgress />
             </Grid>
           ) : tab === 'form' ? (

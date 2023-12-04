@@ -56,6 +56,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.PRESCRIPTION_TYPES:
       case FilterKeys.DOC_TYPES:
       case FilterKeys.STATUS:
+      case FilterKeys.MODALITY:
         castedFilters[key] = removeElementInArray(castedFilters[key], value)
         break
       case FilterKeys.SOURCE:
@@ -146,6 +147,9 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.MAX_PATIENTS) {
     return `Jusqu'à ${value} patients`
   }
+  if (key === FilterKeys.MODALITY) {
+    return `Modalités : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
+  }
   return ''
 }
 
@@ -164,6 +168,7 @@ export const selectFiltersAsArray = (filters: Filters) => {
         case FilterKeys.DOC_TYPES:
         case FilterKeys.EXECUTIVE_UNITS:
         case FilterKeys.STATUS:
+        case FilterKeys.MODALITY:
           ;(value as []).forEach((elem) =>
             result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
           )

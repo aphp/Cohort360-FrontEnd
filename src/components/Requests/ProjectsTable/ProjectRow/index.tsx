@@ -1,6 +1,7 @@
 import React from 'react'
 
-import { Button, Collapse, IconButton, TableCell, TableRow, Typography, Tooltip } from '@mui/material'
+import { Button, Collapse, IconButton, TableRow, Typography, Tooltip } from '@mui/material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
@@ -65,13 +66,13 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
   return (
     <>
       <TableRow>
-        <TableCell style={{ width: 62 }}>
+        <TableCellWrapper align="left" style={{ width: 62 }}>
           <IconButton style={{ marginLeft: 4 }} aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
-        </TableCell>
-        <TableCell />
-        <TableCell className={classes.tdName}>
+        </TableCellWrapper>
+        <TableCellWrapper />
+        <TableCellWrapper align="left" className={classes.tdName}>
           <Typography style={{ fontWeight: 900, display: 'inline-table' }}>{row.name}</Typography>
           {requestOfProject && requestOfProject.length > 0 && (
             <Tooltip title={'Ajouter une requête'}>
@@ -95,14 +96,12 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
               <EditIcon />
             </IconButton>
           </Tooltip>
-        </TableCell>
-        <TableCell className={classes.dateCell} align="center">
-          {/* {moment(row.modified_at).format('DD/MM/YYYY [à] HH:mm')} */}
-        </TableCell>
+        </TableCellWrapper>
+        <TableCellWrapper className={classes.dateCell} />
       </TableRow>
 
       <TableRow>
-        <TableCell style={{ padding: 0, borderBottomWidth: open ? 1 : 0 }} colSpan={4}>
+        <TableCellWrapper align="left" style={{ padding: 0, borderBottomWidth: open ? 1 : 0 }} colSpan={4}>
           <Collapse in={open} timeout="auto" unmountOnExit style={{ width: '100%', minHeight: 'fit-content' }}>
             {requestOfProject && requestOfProject.length > 0 ? (
               requestOfProject.map((request) => (
@@ -137,7 +136,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
               </Typography>
             )}
           </Collapse>
-        </TableCell>
+        </TableCellWrapper>
       </TableRow>
     </>
   )

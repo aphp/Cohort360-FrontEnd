@@ -3,10 +3,10 @@ import useStyles from 'components/ScopeTree/ScopeTreeTable/styles'
 
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
 import TableRow from '@mui/material/TableRow'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import EnhancedTableHead from 'components/ScopeTree/ScopeTreeTable/components/TableHead'
 import { getComparator, stableSort } from 'utils/alphabeticalSort'
@@ -84,9 +84,9 @@ export default function EnhancedTable(props) {
           <TableBody>
             {emptyRowsMessage ? (
               <TableRow>
-                <TableCell colSpan={headCells.length}>
+                <TableCellWrapper colSpan={headCells.length}>
                   <Typography className={classes.loadingSpinnerContainer}>Aucun résultat à afficher</Typography>
-                </TableCell>
+                </TableCellWrapper>
               </TableRow>
             ) : noPagination !== true ? (
               stableSort(rows, getComparator(order, orderBy))
@@ -106,7 +106,7 @@ export default function EnhancedTable(props) {
 
             {emptyRows > 0 && (
               <TableRow style={{ height: 76 * emptyRows }}>
-                <TableCell colSpan={props.headCells ? props.headCells.length + 1 : 0} />
+                <TableCellWrapper align="left" colSpan={props.headCells ? props.headCells.length + 1 : 0} />
               </TableRow>
             )}
           </TableBody>

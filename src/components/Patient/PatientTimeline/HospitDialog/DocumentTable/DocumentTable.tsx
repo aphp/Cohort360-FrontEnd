@@ -9,12 +9,12 @@ import {
   Paper,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
   TableRow,
   Typography
 } from '@mui/material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import { ReactComponent as CancelIcon } from 'assets/icones/times.svg'
 import { ReactComponent as CheckIcon } from 'assets/icones/check.svg'
@@ -44,7 +44,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
     type: document.type?.coding?.[0].display ?? document.type?.coding?.[0].code ?? '-'
   }
 
-  const getStatusShip = (type?: CompositionStatusKind | DocumentReferenceStatusKind) => {
+  const getStatusChip = (type?: CompositionStatusKind | DocumentReferenceStatusKind) => {
     if (type === 'final' || type === 'current') {
       return (
         <Chip
@@ -67,21 +67,21 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
   return (
     <>
       <TableRow key={row.id} className={classes.tableBodyRows}>
-        <TableCell align="left">{row.NDA}</TableCell>
-        <TableCell align="left">
+        <TableCellWrapper align="left">{row.NDA}</TableCellWrapper>
+        <TableCellWrapper align="left">
           {row.date ? new Date(row.date).toLocaleDateString('fr-FR') : 'Date inconnue'}
-        </TableCell>
-        <TableCell align="left">{row.type}</TableCell>
-        <TableCell align="left" className={classes.description}>
+        </TableCellWrapper>
+        <TableCellWrapper align="left">{row.type}</TableCellWrapper>
+        <TableCellWrapper align="left" className={classes.description}>
           {row.title}
-        </TableCell>
-        <TableCell align="center">{row.serviceProvider}</TableCell>
-        <TableCell align="center">{getStatusShip(row.status as DocumentReferenceStatusKind)}</TableCell>
-        <TableCell align="center">
+        </TableCellWrapper>
+        <TableCellWrapper>{row.serviceProvider}</TableCellWrapper>
+        <TableCellWrapper>{getStatusChip(row.status as DocumentReferenceStatusKind)}</TableCellWrapper>
+        <TableCellWrapper>
           <IconButton onClick={() => setDocumentDialogOpen(true)}>
             <Visibility height="30px" />
           </IconButton>
-        </TableCell>
+        </TableCellWrapper>
       </TableRow>
 
       <DocumentViewer
@@ -114,27 +114,21 @@ const DocumentTable: React.FC<DocumentTableTypes> = ({ deidentified, documents, 
           <Table className={classes.table} aria-label="simple table">
             <TableHead className={classes.tableHead}>
               <TableRow>
-                <TableCell align="left" className={classes.tableHeadCell}>
+                <TableCellWrapper align="left" className={classes.tableHeadCell}>
                   {deidentified ? 'NDA chiffré' : 'NDA'}
-                </TableCell>
-                <TableCell align="left" className={classes.tableHeadCell}>
+                </TableCellWrapper>
+                <TableCellWrapper align="left" className={classes.tableHeadCell}>
                   Date
-                </TableCell>
-                <TableCell align="left" className={classes.tableHeadCell}>
+                </TableCellWrapper>
+                <TableCellWrapper align="left" className={classes.tableHeadCell}>
                   Type
-                </TableCell>
-                <TableCell align="left" className={classes.tableHeadCell}>
+                </TableCellWrapper>
+                <TableCellWrapper align="left" className={classes.tableHeadCell}>
                   Description
-                </TableCell>
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  Unité exécutrice
-                </TableCell>
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  Statut
-                </TableCell>
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  PDF
-                </TableCell>
+                </TableCellWrapper>
+                <TableCellWrapper className={classes.tableHeadCell}>Unité exécutrice</TableCellWrapper>
+                <TableCellWrapper className={classes.tableHeadCell}>Statut</TableCellWrapper>
+                <TableCellWrapper className={classes.tableHeadCell}>PDF</TableCellWrapper>
               </TableRow>
             </TableHead>
             <TableBody>

@@ -10,7 +10,12 @@ import {
   MedicationTypeLabel,
   RessourceType
 } from 'types/requestCriterias'
-import { DurationRangeType, SearchByTypes } from 'types/searchCriterias'
+import {
+  DocumentAttachmentMethod,
+  DocumentAttachmentMethodLabel,
+  DurationRangeType,
+  SearchByTypes
+} from 'types/searchCriterias'
 import allDocTypes from 'assets/docTypes.json'
 import { getDurationRangeLabel } from './age'
 import { displaySystem } from './displayValueSetSystem'
@@ -30,7 +35,8 @@ const getLabelFromCriteriaObject = (
   criteriaState: CriteriaState,
   values: LabelCriteriaObject[],
   name: string,
-  resourceType: RessourceType
+  resourceType: RessourceType,
+  label?: string
 ) => {
   const findCriterionById = (criteriaArray: CriteriaState, id: RessourceType): null | CriteriaItemType => {
     for (const criterion of criteriaArray) {
@@ -62,7 +68,9 @@ const getLabelFromCriteriaObject = (
     const tooltipTitle = labels.join(' - ')
     return (
       <Tooltip title={tooltipTitle}>
-        <Typography style={{ textOverflow: 'ellipsis', overflow: 'hidden', fontSize: 12 }}>{tooltipTitle}</Typography>
+        <Typography style={{ textOverflow: 'ellipsis', overflow: 'hidden', fontSize: 12 }}>
+          {label} {tooltipTitle}
+        </Typography>
       </Tooltip>
     )
   }
@@ -112,8 +120,8 @@ const getDocumentTypesLabel = (values: DocType[]) => {
   return currentDocTypes
 }
 
-const getNbOccurencesLabel = (value: number, comparator: string) => {
-  return `Nombre d'occurrences ${comparator} ${+value}`
+const getNbOccurencesLabel = (value: number, comparator: string, name?: string) => {
+  return `Nombre ${name ? name : "d'occurrences"} ${comparator} ${+value}`
 }
 
 const getBiologyValuesLabel = (comparator: string, valueMin: number, valueMax: number) => {
@@ -123,16 +131,28 @@ const getBiologyValuesLabel = (comparator: string, valueMin: number, valueMax: n
     : `Valeur ${comparator} ${valueMin}`
 }
 
-const getIppListLabel = (values: string) => {
+const getIdsListLabels = (values: string, name: string) => {
   const labels = values.split(',').join(' - ')
-  return `Contient les patients : ${labels}`
+  return `Contient les ${name} : ${labels}`
+}
+
+export const getAttachmentMethod = (value: DocumentAttachmentMethod, daysOfDelay: string | null) => {
+  if (value === DocumentAttachmentMethod.INFERENCE_TEMPOREL) {
+    return `Rattachement aux documents par ${DocumentAttachmentMethodLabel.INFERENCE_TEMPOREL.toLocaleLowerCase()}${
+      daysOfDelay !== '' && daysOfDelay !== null ? ` de ${daysOfDelay} jour(s)` : ''
+    }`
+  } else if (value === DocumentAttachmentMethod.ACCESS_NUMBER) {
+    return `Rattachement aux documents par ${DocumentAttachmentMethodLabel.ACCESS_NUMBER.toLocaleLowerCase()}`
+  } else {
+    return ''
+  }
 }
 
 export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaState: CriteriaState): string[] => {
   const labels: (string | any)[] = []
   switch (type) {
     case RessourceType.IPP_LIST:
-      labels.push(getIppListLabel(criterias.search))
+      labels.push(getIdsListLabels(criterias.search, 'patients'))
       break
 
     case RessourceType.PATIENT:
@@ -255,6 +275,47 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
         labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, CriteriaDataKey.BIOLOGY_DATA, type))
       if (criterias.valueComparator && (!isNaN(criterias.valueMin) || !isNaN(criterias.valueMax)))
         labels.push(getBiologyValuesLabel(criterias.valueComparator, criterias.valueMin, criterias.valueMax))
+      break
+
+    case RessourceType.IMAGING:
+      if (criterias.studyStartDate || criterias.studyEndDate)
+        labels.push(getDatesLabel([criterias.studyStartDate, criterias.studyEndDate], "Date de l'étude : "))
+      if (criterias.studyModalities?.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            criterias.studyModalities,
+            CriteriaDataKey.MODALITIES,
+            type,
+            "Modalités d'étude :"
+          )
+        )
+      if (criterias.studyDescription) labels.push(`Description de l'étude : ${criterias.studyDescription}`)
+      if (criterias.studyProcedure) labels.push(`Procédure de l'étude : ${criterias.studyProcedure}`)
+      if (criterias.withDocument !== DocumentAttachmentMethod.NONE)
+        labels.push(getAttachmentMethod(criterias.withDocument, criterias.daysOfDelay))
+      if (criterias.studyUid) labels.push(getIdsListLabels(criterias.studyUid, "uuid d'étude"))
+      if (criterias.seriesStartDate || criterias.seriesEndDate)
+        labels.push(getDatesLabel([criterias.seriesStartDate, criterias.seriesEndDate], 'Date de la série : '))
+      if (criterias.seriesModalities?.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            criterias.seriesModalities,
+            CriteriaDataKey.MODALITIES,
+            type,
+            'Modalités de séries :'
+          )
+        )
+      if (criterias.seriesDescription) labels.push(`Description de la série : ${criterias.seriesDescription}`)
+      if (criterias.seriesProtocol) labels.push(`Protocole de la série : ${criterias.seriesProtocol}`)
+      if (criterias.bodySite) labels.push(`Partie du corps : ${criterias.bodySite}`)
+      if (criterias.seriesUid) labels.push(getIdsListLabels(criterias.seriesUid, 'uuid de série'))
+      if (!isNaN(criterias.numberOfSeries) && criterias.seriesComparator)
+        labels.push(getNbOccurencesLabel(criterias.numberOfSeries, criterias.seriesComparator, 'de séries'))
+      if (!isNaN(criterias.numberOfIns) && criterias.instancesComparator)
+        labels.push(getNbOccurencesLabel(criterias.numberOfIns, criterias.instancesComparator, "d'instances"))
+      break
   }
   switch (type) {
     case RessourceType.DOCUMENTS:
@@ -265,6 +326,7 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
     case RessourceType.MEDICATION_ADMINISTRATION:
     case RessourceType.OBSERVATION:
     case RessourceType.ENCOUNTER:
+    case RessourceType.IMAGING:
       if (criterias.encounterStartDate || criterias.encounterEndDate)
         labels.push(getDatesLabel([criterias.encounterStartDate, criterias.encounterEndDate], 'Prise en charge'))
       if (!isNaN(criterias.occurrence) && criterias.occurrenceComparator)

@@ -27,9 +27,5 @@ export default makeStyles()((theme) => ({
     color: '#FFF',
     fontStyle: 'italic',
     fontSize: '12px'
-  },
-  populationLabel: {
-    color: '#19235A',
-    textDecoration: 'underline'
   }
 }))

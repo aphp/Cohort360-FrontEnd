@@ -6,27 +6,13 @@ import ClearIcon from '@mui/icons-material/Clear'
 
 import useStyles from './styles'
 
-const defaultOccurrenceInputs = {
-  code: [],
-  isLeaf: false,
-  valueMin: 0,
-  valueMax: 0,
-  valueComparator: '>=',
-  occurrence: 1,
-  occurrenceComparator: '>=',
-  startOccurrence: '',
-  endOccurrence: '',
-  isInclusive: true
-}
-
 type OccurrenceDateInputsProps = {
   selectedCriteria: any
   onChangeValue: (key: string, value: any) => void
 }
 
 const OccurrenceDateInputs: React.FC<OccurrenceDateInputsProps> = (props) => {
-  const { onChangeValue } = props
-  const selectedCriteria = { ...defaultOccurrenceInputs, ...props.selectedCriteria }
+  const { onChangeValue, selectedCriteria } = props
 
   const { classes } = useStyles()
 
@@ -44,7 +30,7 @@ const OccurrenceDateInputs: React.FC<OccurrenceDateInputsProps> = (props) => {
           <Input
             id="date-start-occurrence"
             type="date"
-            value={selectedCriteria.startOccurrence}
+            value={selectedCriteria?.startOccurrence}
             endAdornment={
               <IconButton size="small" onClick={() => onChangeValue('startOccurrence', '')}>
                 <ClearIcon />
@@ -61,7 +47,7 @@ const OccurrenceDateInputs: React.FC<OccurrenceDateInputsProps> = (props) => {
           <Input
             id="date-end-occurrence"
             type="date"
-            value={selectedCriteria.endOccurrence}
+            value={selectedCriteria?.endOccurrence}
             endAdornment={
               <IconButton size="small" onClick={() => onChangeValue('endOccurrence', '')}>
                 <ClearIcon />

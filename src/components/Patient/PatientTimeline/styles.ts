@@ -45,15 +45,12 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
       marginRight: 0
     }
   },
-
   timeline: {
     display: 'flex',
-
     position: 'relative',
     margin: '0 0 0 0',
     padding: 0,
     listStyle: 'none',
-
     '& li': {
       position: 'relative',
       marginRight: 0
@@ -84,7 +81,6 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
     color: 'black',
     zIndex: 5,
     lineHeight: 1
-    // marginTop: 5
   },
   collapsedYear: {
     position: 'relative',
@@ -109,7 +105,6 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
     background: '#43435B',
     zIndex: -2
   },
-
   timelineElementsLeft: {
     position: 'absolute',
     width: `calc(100% + ${marginNextCentralLine}px)`,

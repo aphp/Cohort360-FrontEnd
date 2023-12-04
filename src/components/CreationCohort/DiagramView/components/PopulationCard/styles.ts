@@ -43,10 +43,6 @@ const useStyles = makeStyles<PopulationCardPropsType>()((theme: Theme, params) =
     fontSize: 11,
     fontWeight: 'bold'
   },
-  populationLabel: {
-    color: '#19235A',
-    textDecoration: 'underline'
-  },
   actionButton: {
     backgroundColor: '#19235A',
     color: '#FFFFFF',

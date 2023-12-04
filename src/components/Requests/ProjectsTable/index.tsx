@@ -4,7 +4,6 @@ import {
   Checkbox,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
   TableRow,
@@ -14,6 +13,7 @@ import {
   CircularProgress,
   Grid
 } from '@mui/material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import ProjectRow from './ProjectRow'
 
@@ -169,7 +169,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
           <Table aria-label="projects table" id="projects_table" className={classes.table}>
             <TableHead>
               <TableRow className={classes.tableHead}>
-                <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62, padding: '0 16px' }}>
+                <TableCellWrapper className={classes.tableHeadCell} style={{ width: 62, padding: '0 16px' }}>
                   <Checkbox
                     size="small"
                     checked={allRequestsSelected}
@@ -185,9 +185,9 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
                     }}
                     color="secondary"
                   />
-                </TableCell>
-                <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62 }} />
-                <TableCell className={classes.tableHeadCell} style={{ width: 'calc(100% - 300px' }}>
+                </TableCellWrapper>
+                <TableCellWrapper className={classes.tableHeadCell} style={{ width: 62 }} />
+                <TableCellWrapper className={classes.tableHeadCell} style={{ width: 'calc(100% - 300px' }}>
                   <TableSortLabel
                     active={sortBy === Order.NAME}
                     direction={sortDirection || Direction.ASC}
@@ -195,8 +195,8 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
                   >
                     Titre
                   </TableSortLabel>
-                </TableCell>
-                <TableCell className={classes.tableHeadCell} align="center" style={{ width: 175 }}>
+                </TableCellWrapper>
+                <TableCellWrapper className={classes.tableHeadCell} style={{ width: 175 }}>
                   <TableSortLabel
                     active={sortBy === Order.MODIFIED}
                     direction={sortDirection || Direction.ASC}
@@ -204,16 +204,16 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
                   >
                     Date
                   </TableSortLabel>
-                </TableCell>
+                </TableCellWrapper>
               </TableRow>
             </TableHead>
 
             <TableBody>
               {searchProjectList.length === 0 && (
                 <TableRow>
-                  <TableCell style={{ textAlign: 'center', height: '40vh' }} colSpan={4}>
+                  <TableCellWrapper style={{ textAlign: 'center', height: '40vh' }} colSpan={4}>
                     <Typography>Aucun projet de recherche {!!searchInput && 'trouvé'}</Typography>
-                  </TableCell>
+                  </TableCellWrapper>
                 </TableRow>
               )}
               {searchProjectList.map((project: ProjectType) => (

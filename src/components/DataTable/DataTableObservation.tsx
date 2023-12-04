@@ -1,6 +1,7 @@
 import React from 'react'
 
-import { CircularProgress, Grid, Typography, TableRow, TableCell } from '@mui/material'
+import { CircularProgress, Grid, Typography, TableRow } from '@mui/material'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import DataTable from 'components/DataTable/DataTable'
 
@@ -33,25 +34,17 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
   const { classes } = useStyles()
 
   const columns: Column[] = [
-    { label: `NDA${deidentified ? ' chiffré' : ''}`, code: '', align: 'left', sortableColumn: false },
-    { label: 'Date de prélèvement', code: Order.DATE, align: 'center', sortableColumn: true },
-    { label: 'ANABIO', code: Order.ANABIO, align: 'center', sortableColumn: true },
-    { label: 'LOINC', code: Order.LOINC, align: 'center', sortableColumn: true },
-    { label: 'Résultat', code: '', align: 'center', sortableColumn: false },
-    { label: 'Valeurs de référence', code: '', align: 'center', sortableColumn: false },
-    { label: 'Unité exécutrice', code: '', align: 'center', sortableColumn: false }
+    { label: `NDA${deidentified ? ' chiffré' : ''}`, align: 'left' },
+    { label: 'Date de prélèvement', code: Order.DATE },
+    { label: 'ANABIO', code: Order.ANABIO },
+    { label: 'LOINC', code: Order.LOINC },
+    { label: 'Résultat' },
+    { label: 'Valeurs de référence' },
+    { label: 'Unité exécutrice' }
   ]
 
   return (
-    <DataTable
-      columns={columns}
-      order={orderBy}
-      setOrder={setOrderBy}
-      rowsPerPage={20}
-      page={page}
-      setPage={setPage}
-      total={total}
-    >
+    <DataTable columns={columns} order={orderBy} setOrder={setOrderBy} page={page} setPage={setPage} total={total}>
       {!loading && observationsList?.length > 0 && (
         <>
           {observationsList.map((observation) => (
@@ -61,20 +54,20 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
       )}
       {!loading && observationsList?.length < 1 && (
         <TableRow className={classes.emptyTableRow}>
-          <TableCell colSpan={7} align="left">
+          <TableCellWrapper colSpan={7} align="left">
             <Grid container justifyContent="center">
               <Typography variant="button">Aucun résultat de biologie à afficher</Typography>
             </Grid>
-          </TableCell>
+          </TableCellWrapper>
         </TableRow>
       )}
       {loading && (
         <TableRow className={classes.emptyTableRow}>
-          <TableCell colSpan={7} align="left">
+          <TableCellWrapper colSpan={7} align="left">
             <Grid container justifyContent="center">
               <CircularProgress />
             </Grid>
-          </TableCell>
+          </TableCellWrapper>
         </TableRow>
       )}
     </DataTable>
@@ -120,22 +113,22 @@ const DataTableObservationLine: React.FC<{
 
   return (
     <TableRow className={classes.tableBodyRows} key={observation.id}>
-      <TableCell align="left">{nda ?? 'Inconnu'}</TableCell>
-      <TableCell align="center">{date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}</TableCell>
-      <TableCell align="center">
+      <TableCellWrapper align="left">{nda ?? 'Inconnu'}</TableCellWrapper>
+      <TableCellWrapper>{date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}</TableCellWrapper>
+      <TableCellWrapper>
         <Typography className={classes.libelle}>
           {libelleANABIO === 'No matching concept' ? '-' : libelleANABIO ?? '-'}
         </Typography>
-      </TableCell>
-      <TableCell align="center">
+      </TableCellWrapper>
+      <TableCellWrapper>
         <Typography className={classes.libelle}>
           {codeLOINC === 'No matching concept' || codeLOINC === 'Non Renseigné' ? '' : codeLOINC ?? ''} -{' '}
           {libelleLOINC === 'No matching concept' ? '-' : libelleLOINC ?? '-'}
         </Typography>
-      </TableCell>
-      <TableCell align="center">{result}</TableCell>
-      <TableCell align="center">{referenceRange}</TableCell>
-      <TableCell align="center">{serviceProvider ?? '-'}</TableCell>
+      </TableCellWrapper>
+      <TableCellWrapper>{result}</TableCellWrapper>
+      <TableCellWrapper>{referenceRange}</TableCellWrapper>
+      <TableCellWrapper>{serviceProvider ?? '-'}</TableCellWrapper>
     </TableRow>
   )
 }

@@ -7,7 +7,6 @@ import { RequestType, Provider } from 'types'
 import { getProviders } from 'services/aphp/serviceProviders'
 
 import ProvidersTable from './providersTable'
-import useStyles from '../styles'
 import { useDebounce } from 'utils/debounce'
 import { Direction, Order, OrderBy } from 'types/searchCriterias'
 
@@ -30,7 +29,6 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
   const [loadingOnSearch, setLoadingOnSearch] = useState(false)
   const [usersToShare] = useState<Provider[]>([])
   const [searchInput, setSearchInput] = useState('')
-  const { classes } = useStyles()
 
   const debouncedSearchTerm = useDebounce(700, searchInput)
 
@@ -79,7 +77,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
 
   return (
     <>
-      <Grid container direction="column" className={classes.inputContainer}>
+      <Grid container direction="column" marginBottom={3}>
         <Typography variant="h3">Nom de la requête à partager:</Typography>
         <TextField
           placeholder="Nom de la requête"

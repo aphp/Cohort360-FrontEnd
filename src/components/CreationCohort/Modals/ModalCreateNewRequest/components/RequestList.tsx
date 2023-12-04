@@ -100,7 +100,7 @@ const RequestList: React.FC<RequestListProps> = ({ projectList, requestsList, se
 
   return (
     <>
-      <Grid container direction="column" className={classes.inputContainer}>
+      <Grid container direction="column" marginBottom={3}>
         <List className={classes.requestList}>
           {projectList.length > 0 ? (
             projectList.map((project) => (

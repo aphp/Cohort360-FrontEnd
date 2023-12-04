@@ -9,9 +9,10 @@ import {
   CLAIM_HIERARCHY,
   CONDITION_HIERARCHY,
   MEDICATION_ATC,
+  IMAGING_STUDY_UID_URL,
   PROCEDURE_HIERARCHY
 } from '../constants'
-import { SearchByTypes } from 'types/searchCriterias'
+import { DocumentAttachmentMethod, SearchByTypes } from 'types/searchCriterias'
 import { Calendar } from 'types/dates'
 import {
   convertDurationToString,
@@ -20,6 +21,8 @@ import {
   convertTimestampToDuration
 } from './age'
 import { Comparators, DocType, RessourceType, SelectedCriteriaType, CriteriaDataKey } from 'types/requestCriterias'
+import { comparatorToFilter, parseOccurence } from './valueComparator'
+import { parseDocumentAttachment } from './documentAttachment'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
@@ -73,6 +76,21 @@ const OBSERVATION_STATUS = 'status'
 const ENCOUNTER_SERVICE_PROVIDER = 'encounter.encounter-care-site'
 const ENCOUNTER_CONTEXT_SERVICE_PROVIDER = 'context.encounter-care-site'
 const SERVICE_PROVIDER = 'encounter-care-site'
+
+const IMAGING_STUDY_DATE = 'started'
+const IMAGING_STUDY_MODALITIES = 'modality'
+const IMAGING_STUDY_DESCRIPTION = 'description'
+const IMAGING_STUDY_PROCEDURE = 'procedureCode'
+const IMAGING_NB_OF_SERIES = 'numberOfSeries'
+const IMAGING_NB_OF_INS = 'numberOfInstances'
+const IMAGING_WITH_DOCUMENT = 'with-document'
+const IMAGING_STUDY_UID = 'identifier'
+const IMAGING_SERIES_DATE = 'series-started'
+const IMAGING_SERIES_DESCRIPTION = 'series-description'
+const IMAGING_SERIES_PROTOCOL = 'series-protocol'
+const IMAGING_SERIES_MODALITIES = 'series-modality'
+const IMAGING_BODYSITE = 'bodysite'
+const IMAGING_SERIES_UID = 'series'
 
 export const UNITE_EXECUTRICE = 'Unité exécutrice'
 export const STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE = 'Structure hospitalière de prise en charge'
@@ -544,6 +562,91 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       )
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
+      break
+    }
+
+    case RessourceType.IMAGING: {
+      filterFhir = [
+        'patient.active=true',
+        `${
+          criterion.studyStartDate
+            ? `${IMAGING_STUDY_DATE}=ge${moment(criterion.studyStartDate).format('YYYY-MM-DD[T00:00:00Z]')}`
+            : ''
+        }`,
+        `${
+          criterion.studyEndDate
+            ? `${IMAGING_STUDY_DATE}=le${moment(criterion.studyEndDate).format('YYYY-MM-DD[T00:00:00Z]')}`
+            : ''
+        }`,
+        `${
+          criterion.studyModalities && criterion.studyModalities.length > 0
+            ? `${IMAGING_STUDY_MODALITIES}=*|${criterion.studyModalities
+                .map((modality: any) => modality.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
+          criterion.studyDescription
+            ? `${IMAGING_STUDY_DESCRIPTION}=${encodeURIComponent(criterion.studyDescription)}`
+            : ''
+        }`,
+        `${
+          criterion.studyProcedure ? `${IMAGING_STUDY_PROCEDURE}=${encodeURIComponent(criterion.studyProcedure)}` : ''
+        }`,
+        `${
+          criterion.numberOfSeries
+            ? `${IMAGING_NB_OF_SERIES}=${comparatorToFilter(criterion.seriesComparator)}${criterion.numberOfSeries}`
+            : ''
+        }`,
+        `${
+          criterion.numberOfIns
+            ? `${IMAGING_NB_OF_INS}=${comparatorToFilter(criterion.instancesComparator)}${criterion.numberOfIns}`
+            : ''
+        }`,
+        `${
+          criterion.withDocument !== DocumentAttachmentMethod.NONE
+            ? `${IMAGING_WITH_DOCUMENT}=${
+                criterion.withDocument === DocumentAttachmentMethod.ACCESS_NUMBER
+                  ? DocumentAttachmentMethod.ACCESS_NUMBER
+                  : `INFERENCE_TEMPOREL${
+                      criterion.daysOfDelay !== null && criterion.daysOfDelay !== ''
+                        ? `_${criterion.daysOfDelay}_J`
+                        : ''
+                    }`
+              }`
+            : ''
+        }`,
+        `${criterion.studyUid ? `${IMAGING_STUDY_UID}=${IMAGING_STUDY_UID_URL}|${criterion.studyUid}` : ''}`,
+        `${
+          criterion.seriesStartDate
+            ? `${IMAGING_SERIES_DATE}=ge${moment(criterion.seriesStartDate).format('YYYY-MM-DD[T00:00:00Z]')}`
+            : ''
+        }`,
+        `${
+          criterion.seriesEndDate
+            ? `${IMAGING_SERIES_DATE}=le${moment(criterion.seriesEndDate).format('YYYY-MM-DD[T00:00:00Z]')}`
+            : ''
+        }`,
+        `${
+          criterion.seriesDescription
+            ? `${IMAGING_SERIES_DESCRIPTION}=${encodeURIComponent(criterion.seriesDescription)}`
+            : ''
+        }`,
+        `${
+          criterion.seriesProtocol ? `${IMAGING_SERIES_PROTOCOL}=${encodeURIComponent(criterion.seriesProtocol)}` : ''
+        }`,
+        `${
+          criterion.seriesModalities && criterion.seriesModalities.length > 0
+            ? `${IMAGING_SERIES_MODALITIES}=*|${criterion.seriesModalities
+                .map((modality: any) => modality.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${criterion.bodySite ? `${IMAGING_BODYSITE}=${encodeURIComponent(criterion.bodySite)}` : ''}`,
+        `${criterion.seriesUid ? `${IMAGING_SERIES_UID}=${criterion.seriesUid}` : ''}`
+      ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
       break
     }
 
@@ -1528,6 +1631,138 @@ export async function unbuildRequest(_json: string): Promise<any> {
         }
         break
       }
+      case RessourceType.IMAGING: {
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+          currentCriterion.title = "Critère d'Imagerie"
+          currentCriterion.studyStartDate = null
+          currentCriterion.studyEndDate = null
+          currentCriterion.studyModalities = []
+          currentCriterion.studyDescription = ''
+          currentCriterion.studyProcedure = ''
+          currentCriterion.numberOfSeries = 1
+          currentCriterion.seriesComparator = Comparators.GREATER_OR_EQUAL
+          currentCriterion.numberOfIns = 1
+          currentCriterion.instancesComparator = Comparators.GREATER_OR_EQUAL
+          currentCriterion.withDocument = DocumentAttachmentMethod.NONE
+          currentCriterion.studyUid = ''
+          currentCriterion.seriesStartDate = null
+          currentCriterion.seriesEndDate = null
+          currentCriterion.seriesDescription = ''
+          currentCriterion.seriesProtocol = ''
+          currentCriterion.seriesModalities = []
+          currentCriterion.bodySite = ''
+          currentCriterion.seriesUid = ''
+          currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
+          currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
+          currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+
+          for (const filter of filters) {
+            const key = filter[0]
+            const value = filter[1]
+            switch (key) {
+              case IMAGING_STUDY_DATE: {
+                if (value.includes('ge')) {
+                  currentCriterion.studyStartDate = value?.replace('T00:00:00Z', '').replace('ge', '')
+                } else if (value.includes('le')) {
+                  currentCriterion.studyEndDate = value?.replace('T00:00:00Z', '').replace('le', '')
+                }
+                break
+              }
+              case IMAGING_STUDY_MODALITIES: {
+                const modalitiesIds = value?.replace(/^[*|]+/, '').split(',')
+                const newModalitiesIds = modalitiesIds?.map((modality) => ({ id: modality }))
+                if (!newModalitiesIds) continue
+
+                currentCriterion.studyModalities = currentCriterion.studyModalities
+                  ? [...currentCriterion.studyModalities, ...newModalitiesIds]
+                  : newModalitiesIds
+                break
+              }
+              case IMAGING_STUDY_DESCRIPTION: {
+                currentCriterion.studyDescription = value ? decodeURIComponent(value) : ''
+                break
+              }
+              case IMAGING_STUDY_PROCEDURE: {
+                currentCriterion.studyProcedure = value ? decodeURIComponent(value) : ''
+                break
+              }
+              case IMAGING_NB_OF_SERIES: {
+                const parsedOccurence = parseOccurence(value)
+                currentCriterion.numberOfSeries = parsedOccurence.value
+                currentCriterion.seriesComparator = parsedOccurence.comparator
+                break
+              }
+              case IMAGING_NB_OF_INS: {
+                const parsedOccurence = parseOccurence(value)
+                currentCriterion.numberOfIns = parsedOccurence.value
+                currentCriterion.instancesComparator = parsedOccurence.comparator
+                break
+              }
+              case IMAGING_WITH_DOCUMENT: {
+                const parsedDocumentAttachment = parseDocumentAttachment(value as DocumentAttachmentMethod)
+                currentCriterion.withDocument = parsedDocumentAttachment.documentAttachmentMethod
+                currentCriterion.daysOfDelay = parsedDocumentAttachment.daysOfDelay
+                break
+              }
+              case IMAGING_STUDY_UID: {
+                currentCriterion.studyUid = value.replace(`${IMAGING_STUDY_UID_URL}|`, '') ?? ''
+                break
+              }
+              case IMAGING_SERIES_DATE: {
+                if (value.includes('ge')) {
+                  currentCriterion.seriesStartDate = value?.replace('T00:00:00Z', '').replace('ge', '')
+                } else if (value.includes('le')) {
+                  currentCriterion.seriesEndDate = value?.replace('T00:00:00Z', '').replace('le', '')
+                }
+                break
+              }
+              case IMAGING_SERIES_DESCRIPTION: {
+                currentCriterion.seriesDescription = value ? decodeURIComponent(value) : ''
+                break
+              }
+              case IMAGING_SERIES_PROTOCOL: {
+                currentCriterion.seriesProtocol = value ? decodeURIComponent(value) : ''
+                break
+              }
+              case IMAGING_SERIES_MODALITIES: {
+                const modalitiesIds = value?.replace(/^[*|]+/, '').split(',')
+                const newModalitiesIds = modalitiesIds?.map((modality) => ({ id: modality }))
+                if (!newModalitiesIds) continue
+
+                currentCriterion.seriesModalities = currentCriterion.seriesModalities
+                  ? [...currentCriterion.seriesModalities, ...newModalitiesIds]
+                  : newModalitiesIds
+                break
+              }
+              case IMAGING_BODYSITE: {
+                currentCriterion.bodySite = value ? decodeURIComponent(value) : ''
+                break
+              }
+              case IMAGING_SERIES_UID: {
+                currentCriterion.seriesUid = value ?? ''
+                break
+              }
+            }
+          }
+
+          if (element.occurrence) {
+            currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
+            currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
+          }
+
+          if (element.dateRangeList) {
+            currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+            currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+          }
+
+          if (element.encounterDateRange) {
+            currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
+            currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+          }
+        }
+        break
+      }
 
       default:
         break
@@ -1685,7 +1920,8 @@ export const getDataFromFetch = async (
                     currentcriterion.type === RessourceType.PATIENT ||
                     currentcriterion.type === RessourceType.ENCOUNTER ||
                     currentcriterion.type === RessourceType.IPP_LIST ||
-                    currentcriterion.type === RessourceType.DOCUMENTS
+                    currentcriterion.type === RessourceType.DOCUMENTS ||
+                    currentcriterion.type === RessourceType.IMAGING
                   ) &&
                   currentcriterion.code &&
                   currentcriterion.code.length > 0

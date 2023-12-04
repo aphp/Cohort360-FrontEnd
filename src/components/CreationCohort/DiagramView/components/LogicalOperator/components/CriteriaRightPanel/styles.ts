@@ -23,12 +23,6 @@ const useStyles = makeStyles()(() => ({
   criteriaItem: {
     padding: '2px 16px'
   },
-  indicator: {
-    width: 20,
-    height: 20,
-    border: '2px solid currentColor',
-    borderRadius: 10
-  },
   subItemsContainer: {
     position: 'relative',
     marginLeft: 12
@@ -48,9 +42,6 @@ const useStyles = makeStyles()(() => ({
     height: 2,
     marginTop: 14.5,
     background: '#D0D7D8'
-  },
-  criteriaName: {
-    fontWeight: 'bold'
   }
 }))
 
