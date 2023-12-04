@@ -386,7 +386,17 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
         </BlockWrapper>
       </BlockWrapper>
 
-      <AdvancedInputs form={CriteriaName.Imaging} selectedCriteria={selectedCriteria} onChangeValue={_onChangeValue} />
+      <AdvancedInputs
+        form={CriteriaName.Imaging}
+        selectedCriteria={{
+          encounterService: encounterService,
+          encounterStartDate: encounterStartDate,
+          encounterEndDate: encounterEndDate,
+          startOccurrence: startOccurrence,
+          endOccurrence: endOccurrence
+        }}
+        onChangeValue={_onChangeValue}
+      />
     </CriteriaLayout>
   )
 }

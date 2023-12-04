@@ -24,6 +24,7 @@ type AdvancedInputsProps = {
 const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
   const { form, selectedCriteria = {}, onChangeValue } = props
   const optionsIsUsed =
+    selectedCriteria?.encounterService.length > 0 ||
     !!selectedCriteria?.startOccurrence ||
     !!selectedCriteria?.endOccurrence ||
     !!selectedCriteria?.encounterStartDate ||
