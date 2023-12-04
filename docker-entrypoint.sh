@@ -36,6 +36,8 @@ sed -i "s@{VITE_VALUE_SET_URL_MEDICATION_ATC}@$VITE_VALUE_SET_URL_MEDICATION_ATC
 sed -i "s@{VITE_VALUE_SET_URL_MEDICATION_UCD}@$VITE_VALUE_SET_URL_MEDICATION_UCD@g" /app/build/assets/*.js
 sed -i "s@{VITE_VALUE_SET_URL_MEDICATION_PRESCRIPTION_TYPES}@$VITE_VALUE_SET_URL_MEDICATION_PRESCRIPTION_TYPES@g" /app/build/assets/*.js
 sed -i "s@{VITE_VALUE_SET_URL_MEDICATION_ADMINISTRATIONS}@$VITE_VALUE_SET_URL_MEDICATION_ADMINISTRATIONS@g" /app/build/assets/*.js
+sed -i "s@{VITE_VALUE_SET_URL_IMAGING_MODALITIES}@$VITE_VALUE_SET_URL_IMAGING_MODALITIES@g" /app/build/assets/*.js
+sed -i "s@{VITE_VALUE_SET_URL_IMAGING_STUDY_UID}@$VITE_VALUE_SET_URL_IMAGING_STUDY_UID@g" /app/build/assets/*.js
 sed -i "s@{VITE_VALUE_SET_URL_BIOLOGY_ANABIO}@$VITE_VALUE_SET_URL_BIOLOGY_ANABIO@g" /app/build/assets/*.js
 sed -i "s@{VITE_VALUE_SET_URL_BIOLOGY_LOINC}@$VITE_VALUE_SET_URL_BIOLOGY_LOINC@g" /app/build/assets/*.js
 sed -i "s@{VITE_MEDICATION_ATC_ORBIS}@$VITE_MEDICATION_ATC_ORBIS@g" /app/build/assets/*.js
@@ -49,6 +51,7 @@ sed -i "s@{VITE_ODD_OBSERVATION}@$VITE_ODD_OBSERVATION@g" /app/build/assets/*.js
 sed -i "s@{VITE_ODD_MEDICATION}@$VITE_ODD_MEDICATION@g" /app/build/assets/*.js
 sed -i "s@{VITE_ODD_CONTACT}@$VITE_ODD_CONTACT@g" /app/build/assets/*.js
 sed -i "s@{VITE_ODD_EXPORT}@$VITE_ODD_EXPORT@g" /app/build/assets/*.js
+sed -i "s@{VITE_ODD_EXPORT}@$VITE_ODD_IMAGING@g" /app/build/assets/*.js
 
 # Restart nginx to apply changes
 service nginx restart
