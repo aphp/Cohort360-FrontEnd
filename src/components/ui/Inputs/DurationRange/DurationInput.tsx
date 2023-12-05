@@ -35,6 +35,12 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
               placeholder={duration.year ? undefined : name === 'max' ? '130' : '0'}
               value={duration.year}
               variant="standard"
+              type="number"
+              InputProps={{
+                inputProps: {
+                  min: 0
+                }
+              }}
               size="small"
               onChange={(e) => {
                 if (!isNaN(+e.target.value) && +e.target.value <= 130) {
@@ -55,6 +61,12 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
               value={duration.month ? duration.month : undefined}
               placeholder={duration.month ? undefined : '0'}
               variant="standard"
+              type="number"
+              InputProps={{
+                inputProps: {
+                  min: 0
+                }
+              }}
               size="small"
               onChange={(e) => {
                 if (!isNaN(+e.target.value) && +e.target.value <= 12) {
@@ -76,6 +88,12 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
                 value={duration.day ? duration.day : undefined}
                 placeholder={duration.day ? undefined : '0'}
                 variant="standard"
+                type="number"
+                InputProps={{
+                  inputProps: {
+                    min: 0
+                  }
+                }}
                 size="small"
                 onChange={(e) => {
                   if (!isNaN(+e.target.value) && +e.target.value <= 31) {
