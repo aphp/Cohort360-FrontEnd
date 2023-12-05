@@ -112,10 +112,10 @@ const DataTablePmsiLine: React.FC<{
         <Typography className={classes.libelle}>{source}</Typography>
       </TableCellWrapper>
       <TableCellWrapper>
-        <Typography className={classes.libelle}>{codeToDisplay?.code}</Typography>
+        <Typography className={classes.libelle}>{codeToDisplay?.code ?? 'Non renseigné'}</Typography>
       </TableCellWrapper>
       <TableCellWrapper>
-        <Typography className={classes.libelle}>{codeToDisplay?.display}</Typography>
+        <Typography className={classes.libelle}>{codeToDisplay?.display ?? 'Non renseigné'}</Typography>
       </TableCellWrapper>
       {selectedTab === PMSI.DIAGNOSTIC && <TableCellWrapper>{type}</TableCellWrapper>}
       <TableCellWrapper>{serviceProvider ?? '-'}</TableCellWrapper>
