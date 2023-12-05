@@ -35,7 +35,7 @@ import { Observation } from 'fhir/r4'
 import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 import { idSort, labelSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
-import { CODE_HIERARCHY_EXTENSION_NAME } from '../../constants'
+import { CODE_HIERARCHY_EXTENSION_NAME, PROCEDURE_HIERARCHY } from '../../constants'
 import { Direction, Order, SearchByTypes } from 'types/searchCriterias'
 
 const paramValuesReducerWithPrefix =
@@ -412,8 +412,7 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (code)
-    options = [...options, `code=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-ccam|') + code}`] // eslint-disable-line
+  if (code) options = [...options, `code=${encodeURIComponent(`${PROCEDURE_HIERARCHY}|`) + code}`] // eslint-disable-line
   if (source) options = [...options, `source=${source}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (status)
