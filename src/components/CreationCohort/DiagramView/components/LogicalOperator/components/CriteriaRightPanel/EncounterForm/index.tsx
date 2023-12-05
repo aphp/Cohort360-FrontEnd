@@ -102,6 +102,8 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
   useEffect(() => {
     setError(Error.NO_ERROR)
     if (
+      occurrence === 0 &&
+      occurrenceComparator === Comparators.EQUAL &&
       age[0] === null &&
       age[1] === null &&
       duration[0] === null &&
@@ -117,8 +119,8 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
       provenance?.length === 0 &&
       admission?.length === 0 &&
       encounterService?.length === 0 &&
-      !encounterStartDate &&
-      !encounterEndDate
+      encounterStartDate === null &&
+      encounterEndDate === null
     ) {
       setError(Error.EMPTY_FORM)
     }
@@ -137,7 +139,9 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
     admission,
     encounterService,
     encounterStartDate,
-    encounterEndDate
+    encounterEndDate,
+    occurrence,
+    occurrenceComparator
   ])
 
   const onSubmit = () => {
