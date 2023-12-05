@@ -175,9 +175,8 @@ const criteriaList: CriteriaItemType[] = [
     fontWeight: 'bold',
     components: ODD_IMAGING ? ImagingForm : null,
     disabled: !ODD_IMAGING ?? false,
-    data: { modalities: 'loading' },
     fetch: {
-      fetchModalities: services.cohortCreation.fetchModalities
+      modalities: services.cohortCreation.fetchModalities
     }
   },
   {
