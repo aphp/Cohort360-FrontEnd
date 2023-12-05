@@ -53,17 +53,17 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
       case RessourceType.CONDITION:
         return <ArticleIcon />
       case RessourceType.PROCEDURE:
-        return <ContactPageIcon />
-      case RessourceType.CLAIM:
         return <LocalHospitalIcon />
+      case RessourceType.CLAIM:
+        return <ContactPageIcon />
       case RessourceType.MEDICATION:
         return <VaccinesIcon />
       case RessourceType.BIO_MICRO:
         return <BiotechIcon />
       case RessourceType.OBSERVATION:
-        return <CoronavirusIcon />
-      case RessourceType.MICROBIOLOGIE:
         return <ScienceIcon />
+      case RessourceType.MICROBIOLOGIE:
+        return <CoronavirusIcon />
       case RessourceType.PHYSIOLOGIE:
         return <MonitorHeartIcon />
       case RessourceType.IMAGING:
