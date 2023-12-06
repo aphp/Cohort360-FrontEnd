@@ -16,7 +16,10 @@ const OccurenceInput = ({ value, comparator, onchange }: OccurenceInputProps) =>
 
   useEffect(() => {
     let newValue = occurenceValue
-    if (comparatorValue === Comparators.LESS && occurenceValue === 0) {
+    if (
+      (comparatorValue === Comparators.LESS || comparatorValue === Comparators.LESS_OR_EQUAL) &&
+      occurenceValue === 0
+    ) {
       newValue = 1
       setOccurrenceValue(newValue)
     }

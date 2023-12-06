@@ -36,7 +36,7 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBo
       : patient.mainDiagnosis
           .slice(0, 3)
           .map((diag: any) => diag.code?.coding?.[0].display)
-          .join(', ')
+          .join(' - ')
     : 'Pas de diagnostic principal'
 
   const lastEncounter =
@@ -55,7 +55,7 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBo
   const lastProcedure = patient.lastProcedure
     ? patient.lastProcedure === 'loading'
       ? 'loading'
-      : patient.lastProcedure?.code?.coding?.[0].code && patient.lastProcedure?.code?.coding?.[0].display
+      : patient.lastProcedure?.code?.coding?.find((code) => code.userSelected === true)?.display
     : '-'
   const lastGhm = patient.lastGhm
     ? patient.lastGhm === 'loading'
