@@ -613,7 +613,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
           lastGhm: ghmList ? (ghmList[0] as Claim) : undefined,
           lastProcedure: ccamList ? (ccamList[0] as Procedure) : undefined,
           mainDiagnosis: diagnosticList.filter(
-            (diagnostic: any) => diagnostic.extension?.[0].valueString === 'dp'
+            (diagnostic: any) => diagnostic?.extension?.[0]?.valueCodeableConcept?.coding?.[0]?.code === 'dp'
           ) as Condition[]
         },
         pmsi: {
@@ -671,7 +671,6 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
   async ({ patientId, groupId }, { getState, dispatch }) => {
     try {
       const patientState = getState().patient
-
       if (patientState && patientState.patientInfo && patientState.patientInfo.id === patientId) {
         return {
           patientInfo: patientState.patientInfo,
