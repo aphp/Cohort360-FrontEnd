@@ -102,8 +102,8 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
   useEffect(() => {
     setError(Error.NO_ERROR)
     if (
-      occurrence === 0 &&
-      occurrenceComparator === Comparators.EQUAL &&
+      ((occurrence === 0 && occurrenceComparator === Comparators.EQUAL) ||
+        (occurrence === 1 && occurrenceComparator === Comparators.LESS)) &&
       age[0] === null &&
       age[1] === null &&
       duration[0] === null &&
@@ -196,6 +196,9 @@ const EncounterForm = ({ criteria, selectedCriteria, goBack, onChangeSelectedCri
           >
             Tous les éléments des champs multiples sont liés par une contrainte OU
           </Alert>
+        )}
+        {error === Error.EMPTY_FORM && (
+          <Alert severity="error">Merci de renseigner au moins un nombre d'occurence supérieur ou égal à 1</Alert>
         )}
         <Grid className={classes.inputContainer} container>
           <BlockWrapper>
