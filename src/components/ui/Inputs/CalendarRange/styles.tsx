@@ -1,5 +1,5 @@
 import { Grid, Typography, styled } from '@mui/material'
-import { DatePicker } from '@mui/x-date-pickers'
+import { DesktopDatePicker } from '@mui/x-date-pickers'
 
 type CustomProps = {
   disabled?: boolean
@@ -17,6 +17,6 @@ export const DateWrapper = styled(Grid)(() => ({
   alignItems: 'center'
 }))
 
-export const DatePickerWrapper = styled(DatePicker)(() => ({
+export const DatePickerWrapper = styled(DesktopDatePicker)(() => ({
   width: '100%'
 }))

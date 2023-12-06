@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { DesktopTimePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import 'moment/locale/fr'
 
@@ -204,7 +204,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
               Après le :
             </FormLabel>
             <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
-              <DatePicker
+              <DesktopTimePicker
                 onChange={(date) => setStartDate(date ?? null)}
                 value={_startDate}
                 renderInput={(params: any) => (
@@ -230,7 +230,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
               Avant le :
             </FormLabel>
             <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
-              <DatePicker
+              <DesktopTimePicker
                 onChange={(date) => setEndDate(date ?? null)}
                 value={_endDate}
                 renderInput={(params: any) => (
