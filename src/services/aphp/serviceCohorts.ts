@@ -1,13 +1,15 @@
 import moment from 'moment'
 
 import {
-  CohortComposition,
   CohortData,
   Cohort,
   AgeRepartitionType,
   GenderRepartitionType,
   ChartCode,
-  DocumentsData
+  DocumentsData,
+  ImagingData,
+  CohortImaging,
+  CohortComposition
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -25,30 +27,24 @@ import {
   fetchBinary,
   fetchCheckDocumentSearchInput,
   fetchCohortInfo,
-  fetchCohortAccesses
+  fetchCohortAccesses,
+  fetchImaging
 } from './callApi'
 
 import apiBackend from '../apiBackend'
-import {
-  Binary,
-  BundleEntry,
-  DocumentReference,
-  Encounter,
-  Extension,
-  Identifier,
-  ParametersParameter,
-  Patient
-} from 'fhir/r4'
+import { Binary, DocumentReference, Extension, ParametersParameter, Patient } from 'fhir/r4'
 import { CanceledError } from 'axios'
 import {
   VitalStatus,
   SearchCriterias,
   PatientsFilters,
   AllDocumentsFilters,
-  SearchByTypes
+  SearchByTypes,
+  ImagingFilters
 } from 'types/searchCriterias'
 import services from '.'
 import { ErrorDetails, SearchInputError } from 'types/error'
+import { getResourceInfos } from 'utils/fillElement'
 
 export interface IServiceCohorts {
   /**
@@ -143,6 +139,20 @@ export interface IServiceCohorts {
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<DocumentsData> | Promise<SearchInputError> | Promise<CanceledError<any>>
+
+  /**
+   * Retourne la liste d'objets d'Imagerie liés à une cohorte
+   */
+
+  fetchImagingList: (
+    options: {
+      deidentified: boolean
+      page: number
+      searchCriterias: SearchCriterias<ImagingFilters>
+    },
+    groupId?: string,
+    signal?: AbortSignal
+  ) => Promise<ImagingData> | Promise<CanceledError<any>>
 
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
@@ -391,6 +401,58 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
+  fetchImagingList: async (options, groupId, signal) => {
+    const {
+      deidentified,
+      page,
+      searchCriterias: {
+        orderBy,
+        searchInput,
+        filters: { ipp, nda, startDate, endDate, executiveUnits, modality }
+      }
+    } = options
+    const [imagingResponse, allImagingResponse] = await Promise.all([
+      fetchImaging({
+        size: 20,
+        offset: page ? (page - 1) * 20 : 0,
+        order: orderBy.orderBy,
+        orderDirection: orderBy.orderDirection,
+        _text: searchInput,
+        encounter: nda,
+        ipp,
+        minDate: startDate ?? '',
+        maxDate: endDate ?? '',
+        _list: groupId ? [groupId] : [],
+        signal,
+        modalities: modality.map(({ id }) => id).join() ?? '',
+        executiveUnits: executiveUnits.map((unit) => unit.id)
+      }),
+      !!searchInput || !!ipp || !!nda || !!startDate || !!endDate || executiveUnits.length > 0 || modality.length > 0
+        ? fetchImaging({
+            size: 0,
+            _list: groupId ? [groupId] : [],
+            signal: signal
+          })
+        : null
+    ])
+
+    const imagingList = getApiResponseResources(imagingResponse) ?? []
+    const completeImagingList = (await getResourceInfos(imagingList, deidentified, groupId, signal)) as CohortImaging[]
+
+    const totalImaging = imagingResponse.data?.resourceType === 'Bundle' ? imagingResponse.data?.total : 0
+    const totalAllImaging =
+      allImagingResponse !== null
+        ? allImagingResponse.data?.resourceType === 'Bundle'
+          ? allImagingResponse.data.total
+          : totalImaging
+        : totalImaging
+    return {
+      totalImaging: totalImaging ?? 0,
+      totalAllImaging: totalAllImaging ?? 0,
+      imagingList: completeImagingList ?? []
+    }
+  },
+
   fetchDocuments: async (options, groupId, signal) => {
     const {
       deidentified,
@@ -463,14 +525,20 @@ const servicesCohorts: IServiceCohorts = {
           ).valueDecimal
         : totalPatientDocs
 
-    const documentsList = await getDocumentInfos(deidentified, getApiResponseResources(docsList), groupId, signal)
+    const documentsList = getApiResponseResources(docsList) ?? []
+    const filledDocumentsList = (await getResourceInfos(
+      documentsList,
+      deidentified,
+      groupId,
+      signal
+    )) as CohortComposition[]
 
     return {
       totalDocs: totalDocs ?? 0,
       totalAllDocs: totalAllDocs ?? 0,
       totalPatientDocs: totalPatientDocs ?? 0,
       totalAllPatientDocs: totalAllPatientDocs ?? 0,
-      documentsList
+      documentsList: filledDocumentsList ?? []
     }
   },
 
@@ -606,87 +674,3 @@ const servicesCohorts: IServiceCohorts = {
 }
 
 export default servicesCohorts
-
-const getDocumentInfos: (
-  deidentifiedBoolean: boolean,
-  documents?: DocumentReference[],
-  groupId?: string,
-  signal?: AbortSignal
-) => Promise<CohortComposition[]> = async (deidentifiedBoolean: boolean, documents, groupId, signal) => {
-  const cohortDocuments = (documents as CohortComposition[]) ?? []
-
-  const listePatientsIds = cohortDocuments
-    .map((e) => e.subject?.reference?.substring(8))
-    .filter((item, index, array) => array.indexOf(item) === index)
-    .join()
-  const listeEncounterIds = cohortDocuments
-    .map((e) => e.context?.encounter?.[0]?.reference?.substring(10))
-    .filter((item, index, array) => array.indexOf(item) === index)
-    .join()
-
-  const [patients, encounters] = await Promise.all([
-    fetchPatient({
-      _id: listePatientsIds,
-      _list: groupId ? [groupId] : [],
-      _elements: ['extension', 'id', 'identifier'],
-      signal: signal
-    }),
-    fetchEncounter({
-      _id: listeEncounterIds,
-      _list: groupId ? [groupId] : [],
-      type: 'VISIT',
-      _elements: ['status', 'serviceProvider', 'identifier'],
-      signal: signal
-    }),
-    signal
-  ])
-
-  if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
-    return []
-  }
-
-  const listeEncounters = encounters.data.entry.map((e: BundleEntry<Encounter>) => e.resource) as Encounter[]
-
-  let listePatients: Array<Patient> = []
-  if (patients.data.resourceType === 'Bundle' && patients.data.entry) {
-    listePatients = patients?.data?.entry.map((e: BundleEntry<Patient>) => e.resource).filter((e): e is Patient => !!e)
-  }
-
-  for (const document of cohortDocuments) {
-    for (const patient of listePatients) {
-      if (document.subject?.reference?.substring(8) === patient.id) {
-        document.idPatient = patient.id
-
-        document.IPP = patient.id ?? 'Inconnu'
-        if (patient.identifier) {
-          const ipp = patient.identifier.find((identifier: Identifier) => {
-            return identifier.type?.coding?.[0].code === 'IPP'
-          })
-          document.IPP = ipp?.value ?? 'Inconnu'
-        }
-      }
-    }
-
-    for (const encounter of listeEncounters) {
-      if (document.context?.encounter?.[0].reference?.substring(10) === encounter.id) {
-        document.encounterStatus = encounter.status
-
-        if (encounter.serviceProvider) {
-          document.serviceProvider = encounter?.serviceProvider?.display ?? 'Non renseigné'
-        } else {
-          document.serviceProvider = 'Non renseigné'
-        }
-
-        document.NDA = encounter.id ?? 'Inconnu'
-        if (encounter.identifier) {
-          const nda = encounter.identifier.find((identifier: Identifier) => {
-            return identifier.type?.coding?.[0].code === 'NDA'
-          })
-          document.NDA = nda?.value ?? 'Inconnu'
-        }
-      }
-    }
-  }
-
-  return cohortDocuments
-}

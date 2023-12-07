@@ -123,8 +123,8 @@ const DataTableCompositionLine: React.FC<{
   const documentId = document.id
   const title = document.description
   const status = document.status as DocumentReferenceStatusKind
-  const ipp = deidentified ? document.idPatient : document.IPP
-  const nda = document.NDA ?? '-'
+  const ipp = document.IPP ?? 'Inconnu'
+  const nda = document.NDA ?? 'Inconnu'
   const serviceProvider = document.serviceProvider ?? 'Non renseigné'
   const docType = docTypes.docTypes.find(
     ({ code }) => code === (document?.type?.coding?.[0] ? document.type.coding[0].code : '-')

@@ -761,6 +761,7 @@ type fetchImagingProps = {
   orderDirection?: Direction
   _text?: string
   encounter?: string
+  ipp?: string
   minDate?: string
   maxDate?: string
   _list?: string[]
@@ -777,6 +778,7 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
     orderDirection,
     _text,
     encounter,
+    ipp,
     minDate,
     maxDate,
     signal,
@@ -795,6 +797,7 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   if (order) options = [...options, `_sort=${_orderDirection}${order}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
   if (encounter) options = [...options, `encounter.identifier=${encounter}`]
+  if (ipp) options = [...options, `patient.identifier=${ipp}`]
   if (minDate) options = [...options, `started=ge${minDate}`]
   if (maxDate) options = [...options, `started=le${maxDate}`]
   if (modalities) options = [...options, `modality=*${encodeURIComponent('|')}${modalities}`]

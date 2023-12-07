@@ -1,47 +1,51 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { CanceledError } from 'axios'
-import { useAppDispatch, useAppSelector } from 'state'
-import { fetchImaging } from 'state/patient'
-import services from 'services/aphp'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import useSearchCriterias, { initImagingCriterias } from 'reducers/searchCriteriasReducer'
+import services from 'services/aphp'
 
 import { CircularProgress, Grid } from '@mui/material'
-import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
+import { FilterList } from '@mui/icons-material'
 
-import { BlockWrapper } from 'components/ui/Layout/'
+import { BlockWrapper } from 'components/ui/Layout'
 import Button from 'components/ui/Button'
-import Chip from 'components/ui/Chip/'
+import Chip from 'components/ui/Chip'
 import DataTableImaging from 'components/DataTable/DataTableImaging'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
+import IppFilter from 'components/Filters/IppFilter'
 import Modal from 'components/ui/Modal'
 import ModalityFilter from 'components/Filters/ModalityFilter/ModalityFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 
-import { cancelPendingRequest } from 'utils/abortController'
-import { selectFiltersAsArray } from 'utils/filters'
-import { CriteriaName, HierarchyElement, LoadingStatus } from 'types'
-import { PatientTypes } from 'types/patient'
+import {
+  CohortImaging,
+  CriteriaName,
+  HierarchyElement,
+  ImagingData,
+  LoadingStatus,
+  DTTB_ResultsType as ResultsType
+} from 'types'
 import { FilterKeys } from 'types/searchCriterias'
 
-const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
-  const dispatch = useAppDispatch()
+import { cancelPendingRequest } from 'utils/abortController'
+import { selectFiltersAsArray } from 'utils/filters'
 
-  const patient = useAppSelector((state) => state.patient)
+import { CanceledError } from 'axios'
+
+type ImagingListProps = {
+  groupId?: string
+  deidentified?: boolean
+}
+
+const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
+  const [imagingResults, setImagingResults] = useState<ResultsType>({ nb: 0, total: 0, label: 'résultats' })
+  const [imagingList, setImagingList] = useState<CohortImaging[]>([])
+
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [toggleModal, setToggleModal] = useState(false)
   const [modalitiesList, setModalitiesList] = useState<HierarchyElement[]>([])
-
-  const searchResults = {
-    deidentified: patient?.deidentified || false,
-    list: patient?.imaging?.list,
-    nb: patient?.imaging?.count ?? 0,
-    total: patient?.imaging?.total ?? 0,
-    label: 'résultat(s)'
-  }
 
   const [page, setPage] = useState(1)
   const [
@@ -49,41 +53,56 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
       orderBy,
       searchInput,
       filters,
-      filters: { nda, startDate, endDate, executiveUnits, modality }
+      filters: { ipp, nda, startDate, endDate, executiveUnits, modality }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter }
   ] = useSearchCriterias(initImagingCriterias)
   const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({ nda, startDate, endDate, executiveUnits, modality })
-  }, [nda, startDate, endDate, executiveUnits, modality])
-
+    return selectFiltersAsArray({ ipp, nda, startDate, endDate, executiveUnits, modality })
+  }, [ipp, nda, startDate, endDate, executiveUnits, modality])
   const controllerRef = useRef<AbortController | null>(null)
 
   const _fetchImaging = async () => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
-      const response = await dispatch(
-        fetchImaging({
-          options: {
-            page,
-            searchCriterias: {
-              orderBy,
-              searchInput,
-              filters: { nda, startDate, endDate, executiveUnits, modality }
+
+      const response = await services.cohorts.fetchImagingList(
+        {
+          deidentified: !!deidentified,
+          page,
+          searchCriterias: {
+            searchInput,
+            orderBy,
+            filters: {
+              ipp,
+              nda,
+              startDate,
+              endDate,
+              executiveUnits,
+              modality
             }
-          },
-          groupId,
-          signal: controllerRef.current?.signal
-        })
+          }
+        },
+        groupId,
+        controllerRef.current?.signal
       )
-      if (response.payload.error) {
-        throw response.payload.error
+
+      if (response) {
+        const { totalImaging, totalAllImaging, imagingList } = response as ImagingData
+        setImagingList(imagingList)
+        setImagingResults((prevState) => ({
+          ...prevState,
+          nb: totalImaging,
+          total: totalAllImaging
+        }))
       }
+
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {
       if (error instanceof CanceledError) {
         setLoadingStatus(LoadingStatus.FETCHING)
       } else {
+        setImagingList([])
         setLoadingStatus(LoadingStatus.SUCCESS)
       }
     }
@@ -106,7 +125,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality])
+  }, [ipp, nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -128,7 +147,11 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
               <CircularProgress />
             )}
             {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
-              <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label as string} />
+              <DisplayDigits
+                nb={imagingResults.nb}
+                total={imagingResults.total}
+                label={imagingResults.label as string}
+              />
             )}
           </Grid>
 
@@ -149,7 +172,8 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
               onClose={() => setToggleModal(false)}
               onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
             >
-              {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+              {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+              {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp ?? ''} />}
               <ModalityFilter value={modality} name={FilterKeys.MODALITY} modalitiesList={modalitiesList} />
               <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
               <ExecutiveUnitsFilter
@@ -170,17 +194,18 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
       <Grid item xs={12}>
         <DataTableImaging
           loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
-          deidentified={searchResults.deidentified}
-          imagingList={searchResults.list}
+          deidentified={!!deidentified}
+          imagingList={imagingList}
           orderBy={orderBy}
           setOrderBy={(orderBy) => changeOrderBy(orderBy)}
           page={page}
           setPage={setPage}
-          total={searchResults.total}
+          total={imagingResults.nb}
+          showIpp
         />
       </Grid>
     </Grid>
   )
 }
 
-export default PatientImaging
+export default ImagingList

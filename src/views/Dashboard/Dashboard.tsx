@@ -16,6 +16,7 @@ import { fetchExploredCohort } from 'state/exploredCohort'
 import useStyles from './styles'
 
 import { useAppSelector, useAppDispatch } from 'state'
+import ImagingList from 'components/Dashboard/ImagingList'
 
 type Tabs = { label: string; value: string; to: string; disabled: boolean | undefined } | undefined
 
@@ -46,7 +47,8 @@ const Dashboard: React.FC<{
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu', value: 'preview', to: '/my-patients/preview', disabled: false },
           { label: 'Patients', value: 'patients', to: '/my-patients/patients', disabled: false },
-          { label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false }
+          { label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false },
+          { label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging', disabled: false }
         ])
         break
       case 'cohort':
@@ -59,7 +61,8 @@ const Dashboard: React.FC<{
           },
           { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/${cohortId}/preview`, disabled: false },
           { label: 'Données patient', value: 'patients', to: `/cohort/${cohortId}/patients`, disabled: false },
-          { label: 'Documents cliniques', value: 'documents', to: `/cohort/${cohortId}/documents`, disabled: false }
+          { label: 'Documents cliniques', value: 'documents', to: `/cohort/${cohortId}/documents`, disabled: false },
+          { label: 'Imagerie', value: 'imaging', to: `/cohort/${cohortId}/imaging`, disabled: false }
         ])
         break
       case 'new_cohort':
@@ -67,7 +70,8 @@ const Dashboard: React.FC<{
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/new/preview`, disabled: true },
           { label: 'Données patient', value: 'patients', to: `/cohort/new/patients`, disabled: true },
-          { label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true }
+          { label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true },
+          { label: 'Imagerie', value: 'imaging', to: `/cohort/new/imaging`, disabled: true }
         ])
         break
       case 'perimeters':
@@ -85,7 +89,8 @@ const Dashboard: React.FC<{
             value: 'documents',
             to: `/perimeters/documents${location.search}`,
             disabled: false
-          }
+          },
+          { label: 'Imagerie', value: 'imaging', to: `/perimeters/imaging${location.search}`, disabled: false }
         ])
         break
       default:
@@ -187,6 +192,9 @@ const Dashboard: React.FC<{
         )}
         {selectedTab === 'documents' && (
           <Documents groupId={cohortId || perimetreIds} deidentified={dashboard.deidentifiedBoolean ?? false} />
+        )}
+        {selectedTab === 'imaging' && (
+          <ImagingList groupId={cohortId || perimetreIds} deidentified={dashboard.deidentifiedBoolean ?? false} />
         )}
       </Grid>
     </Grid>

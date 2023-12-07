@@ -319,6 +319,12 @@ export type DocumentsData = {
   documentsList: DocumentReference[]
 }
 
+export type ImagingData = {
+  totalImaging: number
+  totalAllImaging: number
+  imagingList: CohortImaging[]
+}
+
 export type PatientData = {
   patient?: CohortPatient
   hospit?: (CohortEncounter | Encounter)[]
@@ -646,8 +652,10 @@ export type IPatientObservation<T extends CohortObservation> = {
 }
 
 export type CohortImaging = ImagingStudy & {
+  idPatient?: string
   serviceProvider?: string
   NDA?: string
+  IPP?: string
 }
 export type IPatientImaging<T extends CohortImaging> = {
   loading: boolean
