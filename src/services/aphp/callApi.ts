@@ -8,7 +8,9 @@ import {
   FHIR_Bundle_Promise_Response,
   HierarchyElement,
   HierarchyElementWithSystem,
-  IScope
+  IScope,
+  Back_API_Response,
+  Cohort
 } from 'types'
 
 import { FHIR_Bundle_Response } from 'types'
@@ -21,7 +23,6 @@ import {
   DocumentReference,
   Encounter,
   Extension,
-  Group,
   ImagingStudy,
   MedicationAdministration,
   MedicationRequest,
@@ -49,33 +50,6 @@ const paramsReducer = (accumulator: string, currentValue: string): string =>
   accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
 
 const uniq = (item: string, index: number, array: string[]) => array.indexOf(item) === index && item
-
-/**
- * Group Resource
- *
- */
-
-type fetchGroupProps = {
-  _id?: string | (string | undefined)[] // ID of Group
-  managingEntity?: string[] // ID List of organization
-}
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const fetchGroup = async (args: fetchGroupProps): FHIR_Bundle_Promise_Response<Group> => {
-  const { _id, managingEntity } = args
-
-  let options: string[] = []
-  if (_id) options = [...options, `_id=${_id}`] // eslint-disable-line
-  if (managingEntity && managingEntity.length > 0)
-    options = [...options, `managing-entity=${managingEntity.filter(uniq).reduce(paramValuesReducer)}`] // eslint-disable-line
-
-  const response = await apiFhir.get<FHIR_Bundle_Response<Group>>(`/Group?${options.reduce(paramsReducer)}`)
-
-  return response
-}
-
-export const deleteGroup = async (groupID: string) => {
-  return await apiFhir.delete(`/Group/${groupID}`)
-}
 
 /**
  * Patient Resource
@@ -998,5 +972,25 @@ export const fetchAccessExpirations: (
   const response: AxiosResponse<AccessExpiration[]> = await apiBackend.get(
     `accesses/accesses/my-accesses/?${options.reduce(paramsReducer)}`
   )
+  return response
+}
+
+export const fetchPerimeterAccesses = async (perimeter: string) => {
+  const response = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${perimeter}`)
+  return response
+}
+
+export const fetchCohortAccesses = async (cohortIds: string[]) => {
+  const response = await apiBackend.get(`cohort/cohorts/cohort-rights/?fhir_group_id=${cohortIds}`)
+  return response
+}
+
+export const fetchPerimeterFromCohortId = async (cohortId: string) => {
+  const response = await apiBackend.get(`accesses/perimeters/?cohort_id=${cohortId}`)
+  return response
+}
+
+export const fetchCohortInfo = async (cohortId: string) => {
+  const response = await apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?fhir_group_id=${cohortId}`)
   return response
 }
