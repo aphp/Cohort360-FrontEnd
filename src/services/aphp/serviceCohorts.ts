@@ -3,7 +3,6 @@ import moment from 'moment'
 import {
   CohortComposition,
   CohortData,
-  Back_API_Response,
   Cohort,
   AgeRepartitionType,
   GenderRepartitionType,
@@ -24,7 +23,9 @@ import {
   fetchDocumentReference,
   fetchDocumentReferenceContent,
   fetchBinary,
-  fetchCheckDocumentSearchInput
+  fetchCheckDocumentSearchInput,
+  fetchCohortInfo,
+  fetchCohortAccesses
 } from './callApi'
 
 import apiBackend from '../apiBackend'
@@ -202,7 +203,7 @@ const servicesCohorts: IServiceCohorts = {
   fetchCohort: async (cohortId) => {
     try {
       const fetchCohortsResults = await Promise.all([
-        apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?fhir_group_id=${cohortId}`),
+        fetchCohortInfo(cohortId),
         fetchPatient({
           pivotFacet: ['age-month_gender', 'deceased_gender'],
           _list: [cohortId],
@@ -549,9 +550,11 @@ const servicesCohorts: IServiceCohorts = {
 
   fetchCohortsRights: async (cohorts) => {
     try {
-      const ids = cohorts.map((cohort) => cohort.fhir_group_id).filter((id) => id !== '')
+      const ids = cohorts
+        .map((cohort) => cohort.fhir_group_id)
+        .filter((id) => id !== '' || id !== undefined) as string[]
       if (ids.length === 0) return []
-      const rightsResponse = await apiBackend.get(`cohort/cohorts/cohort-rights/?fhir_group_id=${ids}`)
+      const rightsResponse = await fetchCohortAccesses(ids)
       return cohorts.map((cohort) => {
         return {
           ...cohort,

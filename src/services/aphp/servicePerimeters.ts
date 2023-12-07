@@ -16,7 +16,14 @@ import {
   getVisitRepartitionMapAphp
 } from 'utils/graphUtils'
 
-import { fetchAccessExpirations, fetchEncounter, fetchPatient, fetchScope } from './callApi'
+import {
+  fetchAccessExpirations,
+  fetchEncounter,
+  fetchPatient,
+  fetchPerimeterAccesses,
+  fetchPerimeterFromCohortId,
+  fetchScope
+} from './callApi'
 
 import { AxiosResponse } from 'axios'
 import { Group } from 'fhir/r4'
@@ -174,7 +181,7 @@ const servicesPerimeters: IServicePerimeters = {
       .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
       .join(',')
 
-    const rightResponse = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${caresiteIds}`)
+    const rightResponse = await fetchPerimeterAccesses(caresiteIds)
     const rightsData = (rightResponse.data as any[]) ?? []
 
     let allowSearchIpp = false
@@ -190,7 +197,7 @@ const servicesPerimeters: IServicePerimeters = {
 
   fetchPerimetersInfos: async (perimetersId) => {
     const [djangoResponse, patientsResp, encountersResp] = await Promise.all([
-      await apiBackend.get(`/accesses/perimeters/?cohort_id=${perimetersId}`),
+      fetchPerimeterFromCohortId(perimetersId),
       fetchPatient({
         pivotFacet: ['age-month_gender', 'deceased_gender'],
         _list: perimetersId.split(','),
@@ -402,7 +409,7 @@ const servicesPerimeters: IServicePerimeters = {
   fetchPerimetersRights: async (perimeters) => {
     const caresiteIds = perimeters.map((perimeter) => perimeter.id).join(',')
 
-    const rightResponse = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${caresiteIds}`)
+    const rightResponse = await fetchPerimeterAccesses(caresiteIds)
     const rightsData = (rightResponse.data as any[]) ?? []
 
     return perimeters.map((perimeter) => {

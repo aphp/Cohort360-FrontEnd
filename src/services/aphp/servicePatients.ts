@@ -17,7 +17,8 @@ import {
   fetchMedicationRequest,
   fetchMedicationAdministration,
   fetchObservation,
-  fetchImaging
+  fetchImaging,
+  fetchPerimeterFromCohortId
 } from './callApi'
 
 import servicesPerimeters from './servicePerimeters'
@@ -37,7 +38,6 @@ import {
 } from 'fhir/r4'
 import { Direction, Order, SearchByTypes } from 'types/searchCriterias'
 import { Medication, PMSI } from 'types/patient'
-import apiBackend from 'services/apiBackend'
 
 export interface IServicePatients {
   /*
@@ -745,7 +745,7 @@ const servicesPatients: IServicePatients = {
   },
 
   fetchRights: async (groupId) => {
-    const perimeter = await apiBackend.get(`/accesses/perimeters/?cohort_id=${groupId}`)
+    const perimeter = await fetchPerimeterFromCohortId(groupId)
 
     const isPerimeter = perimeter.data.results
 

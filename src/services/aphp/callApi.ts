@@ -8,7 +8,9 @@ import {
   FHIR_Bundle_Promise_Response,
   HierarchyElement,
   HierarchyElementWithSystem,
-  IScope
+  IScope,
+  Back_API_Response,
+  Cohort
 } from 'types'
 
 import { FHIR_Bundle_Response } from 'types'
@@ -972,5 +974,25 @@ export const fetchAccessExpirations: (
   const response: AxiosResponse<AccessExpiration[]> = await apiBackend.get(
     `accesses/accesses/my-accesses/?${options.reduce(paramsReducer)}`
   )
+  return response
+}
+
+export const fetchPerimeterAccesses = async (perimeter: string) => {
+  const response = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${perimeter}`)
+  return response
+}
+
+export const fetchCohortAccesses = async (cohortIds: string[]) => {
+  const response = await apiBackend.get(`cohort/cohorts/cohort-rights/?fhir_group_id=${cohortIds}`)
+  return response
+}
+
+export const fetchPerimeterFromCohortId = async (cohortId: string) => {
+  const response = await apiBackend.get(`accesses/perimeters/?cohort_id=${cohortId}`)
+  return response
+}
+
+export const fetchCohortInfo = async (cohortId: string) => {
+  const response = await apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?fhir_group_id=${cohortId}`)
   return response
 }
