@@ -52,14 +52,6 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const getDiagOptions = async (searchValue: string) =>
     await services.cohortCreation.fetchCim10Diagnostic(searchValue, false)
 
-  if (
-    !criteriaData?.data?.diagnosticTypes ||
-    !criteriaData?.data?.statusDiagnostic ||
-    !criteriaData?.data?.cim10Diagnostic
-  ) {
-    return <></>
-  }
-
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {
         const criteriaCode = criteriaData.data.cim10Diagnostic
