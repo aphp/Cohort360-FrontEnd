@@ -16,7 +16,7 @@ import {
   getVisitRepartitionMapAphp
 } from 'utils/graphUtils'
 
-import { fetchAccessExpirations, fetchEncounter, fetchGroup, fetchPatient, fetchScope } from './callApi'
+import { fetchAccessExpirations, fetchEncounter, fetchPatient, fetchScope } from './callApi'
 
 import { AxiosResponse } from 'axios'
 import { Group } from 'fhir/r4'
@@ -189,10 +189,8 @@ const servicesPerimeters: IServicePerimeters = {
   },
 
   fetchPerimetersInfos: async (perimetersId) => {
-    const [perimetersResp, patientsResp, encountersResp] = await Promise.all([
-      fetchGroup({
-        _id: perimetersId
-      }),
+    const [djangoResponse, patientsResp, encountersResp] = await Promise.all([
+      await apiBackend.get(`/accesses/perimeters/?cohort_id=${perimetersId}`),
       fetchPatient({
         pivotFacet: ['age-month_gender', 'deceased_gender'],
         _list: perimetersId.split(','),
@@ -208,7 +206,9 @@ const servicesPerimeters: IServicePerimeters = {
       })
     ])
 
-    const cohort = await servicesPerimeters.fetchPerimetersRights(getApiResponseResources(perimetersResp) ?? [])
+    const perimeters = djangoResponse.data.results
+
+    const cohort = await servicesPerimeters.fetchPerimetersRights(perimeters)
 
     const totalPatients = patientsResp?.data?.resourceType === 'Bundle' ? patientsResp.data.total : 0
 
@@ -400,24 +400,13 @@ const servicesPerimeters: IServicePerimeters = {
   },
 
   fetchPerimetersRights: async (perimeters) => {
-    const caresiteIds = perimeters
-      .map((perimeter) =>
-        perimeter.managingEntity?.display?.search('Organization/') !== -1
-          ? perimeter.managingEntity?.display?.replace('Organization/', '')
-          : ''
-      )
-      .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
-      .join(',')
+    const caresiteIds = perimeters.map((perimeter) => perimeter.id).join(',')
 
     const rightResponse = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${caresiteIds}`)
     const rightsData = (rightResponse.data as any[]) ?? []
 
     return perimeters.map((perimeter) => {
-      const caresiteId =
-        perimeter.managingEntity?.display?.search('Organization/') !== -1
-          ? perimeter.managingEntity?.display?.replace('Organization/', '')
-          : ''
-      const foundRight = rightsData.find((rightData) => rightData.care_site_id === +(caresiteId ?? '0'))
+      const foundRight = rightsData.find((rightData) => rightData.care_site_id === +(perimeter.id ?? '0'))
 
       return {
         ...perimeter,

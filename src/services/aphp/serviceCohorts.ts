@@ -19,7 +19,6 @@ import {
 import { getApiResponseResource, getApiResponseResources } from 'utils/apiHelpers'
 
 import {
-  fetchGroup,
   fetchPatient,
   fetchEncounter,
   fetchDocumentReference,
@@ -204,7 +203,6 @@ const servicesCohorts: IServiceCohorts = {
     try {
       const fetchCohortsResults = await Promise.all([
         apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?fhir_group_id=${cohortId}`),
-        fetchGroup({ _id: cohortId }),
         fetchPatient({
           pivotFacet: ['age-month_gender', 'deceased_gender'],
           _list: [cohortId],
@@ -221,9 +219,8 @@ const servicesCohorts: IServiceCohorts = {
       ])
 
       const cohortInfo = fetchCohortsResults[0]
-      const cohortResp = fetchCohortsResults[1]
-      const patientsResp = fetchCohortsResults[2]
-      const encountersResp = fetchCohortsResults[3]
+      const patientsResp = fetchCohortsResults[1]
+      const encountersResp = fetchCohortsResults[2]
 
       let name = ''
       let description = ''
@@ -240,14 +237,8 @@ const servicesCohorts: IServiceCohorts = {
         favorite = cohortInfo.data.results[0].favorite ?? false
         uuid = cohortInfo.data.results[0].uuid ?? ''
       } else {
-        throw new Error('This cohort is not your or invalid')
+        throw new Error('This cohort is not yours or invalid')
       }
-
-      if (!name) {
-        name = cohortResp.data.resourceType === 'Bundle' ? cohortResp.data.entry?.[0].resource?.name ?? '-' : '-'
-      }
-
-      const cohort = cohortResp.data.resourceType === 'Bundle' ? cohortResp.data.entry?.[0].resource : undefined
 
       const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
 
@@ -288,7 +279,6 @@ const servicesCohorts: IServiceCohorts = {
       return {
         name,
         description,
-        cohort,
         totalPatients,
         originalPatients,
         genderRepartitionMap,

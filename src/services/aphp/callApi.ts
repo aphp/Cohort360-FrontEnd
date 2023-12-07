@@ -21,7 +21,6 @@ import {
   DocumentReference,
   Encounter,
   Extension,
-  Group,
   ImagingStudy,
   MedicationAdministration,
   MedicationRequest,
@@ -49,33 +48,6 @@ const paramsReducer = (accumulator: string, currentValue: string): string =>
   accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
 
 const uniq = (item: string, index: number, array: string[]) => array.indexOf(item) === index && item
-
-/**
- * Group Resource
- *
- */
-
-type fetchGroupProps = {
-  _id?: string | (string | undefined)[] // ID of Group
-  managingEntity?: string[] // ID List of organization
-}
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const fetchGroup = async (args: fetchGroupProps): FHIR_Bundle_Promise_Response<Group> => {
-  const { _id, managingEntity } = args
-
-  let options: string[] = []
-  if (_id) options = [...options, `_id=${_id}`] // eslint-disable-line
-  if (managingEntity && managingEntity.length > 0)
-    options = [...options, `managing-entity=${managingEntity.filter(uniq).reduce(paramValuesReducer)}`] // eslint-disable-line
-
-  const response = await apiFhir.get<FHIR_Bundle_Response<Group>>(`/Group?${options.reduce(paramsReducer)}`)
-
-  return response
-}
-
-export const deleteGroup = async (groupID: string) => {
-  return await apiFhir.delete(`/Group/${groupID}`)
-}
 
 /**
  * Patient Resource

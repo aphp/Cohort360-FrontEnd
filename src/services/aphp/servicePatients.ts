@@ -8,7 +8,6 @@ import {
 } from 'utils/graphUtils'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import {
-  fetchGroup,
   fetchPatient,
   fetchEncounter,
   fetchClaim,
@@ -38,6 +37,7 @@ import {
 } from 'fhir/r4'
 import { Direction, Order, SearchByTypes } from 'types/searchCriterias'
 import { Medication, PMSI } from 'types/patient'
+import apiBackend from 'services/apiBackend'
 
 export interface IServicePatients {
   /*
@@ -745,24 +745,19 @@ const servicesPatients: IServicePatients = {
   },
 
   fetchRights: async (groupId) => {
-    const groups = await fetchGroup({ _id: groupId })
-    const groupsData = getApiResponseResources(groups)
+    const perimeter = await apiBackend.get(`/accesses/perimeters/?cohort_id=${groupId}`)
 
-    if (!groupsData) return false
+    const isPerimeter = perimeter.data.results
 
-    const isPerimeter = groupsData.some((group) => group.managingEntity?.display?.search('Organization/') !== -1)
-
-    if (isPerimeter) {
-      const perimeterRights = await servicesPerimeters.fetchPerimetersRights(groupsData)
+    if (isPerimeter.length > 0) {
+      const perimeterRights = await servicesPerimeters.fetchPerimetersRights(isPerimeter)
       return perimeterRights.some((perimeterRight) =>
         perimeterRight.extension?.some(
           ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
         )
       )
     } else {
-      const cohortRights = await servicesCohorts.fetchCohortsRights(
-        groupsData.map((groupData) => ({ fhir_group_id: groupData.id ?? '' }))
-      )
+      const cohortRights = await servicesCohorts.fetchCohortsRights([{ fhir_group_id: groupId }])
       return cohortRights?.[0]?.rights?.read_patient_pseudo
         ? cohortRights?.[0]?.rights?.read_patient_nomi
           ? false
