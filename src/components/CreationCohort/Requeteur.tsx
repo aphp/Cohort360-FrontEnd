@@ -100,7 +100,7 @@ const Requeteur = () => {
     if (isRendered.current) {
       setCriteriaLoading((criteriaLoading) => criteriaLoading - 1)
     }
-  }, [dispatch, selectedCriteria])
+  }, [dispatch, selectedCriteria, allowSearchIpp])
 
   const _unbuildRequest = async (newCurrentSnapshot: CurrentSnapshot) => {
     dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
