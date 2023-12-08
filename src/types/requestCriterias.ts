@@ -1,11 +1,5 @@
 import { ScopeTreeRow, ValueSetSystem } from 'types'
-import {
-  DocumentAttachmentMethod,
-  DurationRangeType,
-  GenderStatus,
-  LabelObject,
-  SearchByTypes
-} from './searchCriterias'
+import { DocumentAttachmentMethod, DurationRangeType, LabelObject, SearchByTypes } from './searchCriterias'
 
 export enum MedicationTypeLabel {
   Request = 'Prescription',
@@ -136,7 +130,7 @@ export type Cim10DataType = CommonCriteriaDataType & {
 
 export type DemographicDataType = CommonCriteriaDataType & {
   type: RessourceType.PATIENT
-  genders: GenderStatus[] | null
+  genders: LabelObject[] | null
   vitalStatus: LabelObject[] | null
   age: DurationRangeType
   birthdates: DurationRangeType

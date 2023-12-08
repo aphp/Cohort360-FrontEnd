@@ -142,15 +142,10 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
       break
 
     case RessourceType.PATIENT:
-      if (selectedCriteria.genders && selectedCriteria.genders.length > 0)
-        labels.push(
-          getLabelFromCriteriaObject(
-            criteriaState,
-            selectedCriteria.genders?.map((g) => ({ id: g, label: g })),
-            CriteriaDataKey.GENDER,
-            type
-          )
-        )
+      if (selectedCriteria.genders && selectedCriteria.genders.length > 0) {
+        labels.push(getLabelFromCriteriaObject(criteriaState, selectedCriteria.genders, CriteriaDataKey.GENDER, type))
+      }
+
       if (selectedCriteria.vitalStatus && selectedCriteria.vitalStatus.length > 0)
         labels.push(
           getLabelFromCriteriaObject(criteriaState, selectedCriteria.vitalStatus, CriteriaDataKey.VITALSTATUS, type)
