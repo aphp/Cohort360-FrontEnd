@@ -2,17 +2,25 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 import { login, logout } from 'state/me'
 
-import { CriteriaItemType } from 'types'
+import { CriteriaItemDataCache, CriteriaItemType } from 'types'
 
-export type CriteriaState = CriteriaItemType[]
+export type CriteriaState = {
+  config: {
+    [criteriaKey: string]: Partial<CriteriaItemType>
+  }
+  cache: CriteriaItemDataCache[]
+}
 
-const defaultInitialState = [] as CriteriaState
+const defaultInitialState = {
+  config: {},
+  cache: []
+} as CriteriaState
 
 const criteriaSlice = createSlice({
   name: 'criteria',
   initialState: defaultInitialState,
   reducers: {
-    setCriteriaList: (state: CriteriaState, action: PayloadAction<CriteriaState>) => {
+    setCriteriaData: (state: CriteriaState, action: PayloadAction<CriteriaState>) => {
       return action.payload
     }
   },
@@ -23,4 +31,4 @@ const criteriaSlice = createSlice({
 })
 
 export default criteriaSlice.reducer
-export const { setCriteriaList } = criteriaSlice.actions
+export const { setCriteriaData } = criteriaSlice.actions

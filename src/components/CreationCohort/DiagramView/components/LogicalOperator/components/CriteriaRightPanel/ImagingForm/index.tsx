@@ -11,7 +11,13 @@ import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
 import { CriteriaDrawerComponentProps, CriteriaName } from 'types'
 import { CalendarRequestLabel } from 'types/dates'
-import { Comparators, CriteriaDataKey, RessourceType, RessourceTypeLabels } from 'types/requestCriterias'
+import {
+  Comparators,
+  CriteriaDataKey,
+  ImagingDataType,
+  RessourceType,
+  RessourceTypeLabels
+} from 'types/requestCriterias'
 import { DocumentAttachmentMethod, DocumentAttachmentMethodLabel, LabelObject } from 'types/searchCriterias'
 import useStyles from './styles'
 import { mappingCriteria } from '../DemographicForm'
@@ -42,19 +48,19 @@ export const withDocumentOptions = [
 
 const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const { classes } = useStyles()
-
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { criteriaData, onChangeSelectedCriteria, goBack } = props
+  const selectedCriteria = props.selectedCriteria as ImagingDataType
   const isEdition = selectedCriteria !== null ? true : false
   const [title, setTitle] = useState(selectedCriteria?.title || "Critère d'Imagerie")
   const [occurrence, setOccurrence] = useState<number>(selectedCriteria?.occurrence || 1)
   const [occurrenceComparator, setOccurrenceComparator] = useState<Comparators>(
     selectedCriteria?.occurrenceComparator || Comparators.GREATER_OR_EQUAL
   )
-  const [isInclusive, setIsInclusive] = useState(selectedCriteria?.isInclusive || true)
+  const [isInclusive, setIsInclusive] = useState<boolean>(selectedCriteria?.isInclusive || true)
   const [studyStartDate, setStudyStartDate] = useState<string | null>(selectedCriteria?.studyStartDate || null)
   const [studyEndDate, setStudyEndDate] = useState<string | null>(selectedCriteria?.studyEndDate || null)
   const [studyModalities, setStudyModalities] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.studyModalities, CriteriaDataKey.MODALITIES, criteria) || []
+    mappingCriteria(selectedCriteria?.studyModalities, CriteriaDataKey.MODALITIES, criteriaData) || []
   )
   const [studyDescription, setStudyDescription] = useState<string>(selectedCriteria?.studyDescription || '')
   const [studyProcedure, setStudyProcedure] = useState<string>(selectedCriteria?.studyProcedure || '')
@@ -66,7 +72,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [instancesComparator, setInstancesComparator] = useState<Comparators>(
     selectedCriteria?.instancesComparator || Comparators.GREATER_OR_EQUAL
   )
-  const [withDocument, setWithDocument] = useState<string>(
+  const [withDocument, setWithDocument] = useState<DocumentAttachmentMethod>(
     selectedCriteria?.withDocument || DocumentAttachmentMethod.NONE
   )
   const [daysOfDelay, setDaysOfDelay] = useState<string | null>(selectedCriteria?.daysOfDelay || null)
@@ -77,7 +83,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [seriesDescription, setSeriesDescription] = useState<string>(selectedCriteria?.seriesDescription || '')
   const [seriesProtocol, setSeriesProtocol] = useState<string>(selectedCriteria?.seriesProtocol || '')
   const [seriesModalities, setSeriesModalities] = useState<LabelObject[]>(
-    mappingCriteria(selectedCriteria?.seriesModalities, CriteriaDataKey.MODALITIES, criteria) || []
+    mappingCriteria(selectedCriteria?.seriesModalities, CriteriaDataKey.MODALITIES, criteriaData) || []
   )
   const [bodySite, setBodySite] = useState<string>(selectedCriteria?.bodySite || '')
   const [seriesUid, setSeriesUid] = useState<string>(selectedCriteria?.seriesUid || '')
@@ -196,8 +202,8 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               inline
               value={[studyStartDate, studyEndDate]}
               onChange={([start, end]) => {
-                setStudyStartDate(start)
-                setStudyEndDate(end)
+                setStudyStartDate(start || null)
+                setStudyEndDate(end || null)
               }}
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
             />
@@ -205,7 +211,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
 
           <Autocomplete
             multiple
-            options={criteria?.data.modalities || []}
+            options={criteriaData?.data.modalities || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={studyModalities}
@@ -268,7 +274,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               <Grid item xs={withDocument === DocumentAttachmentMethod.INFERENCE_TEMPOREL ? 6 : 12}>
                 <Select
                   value={withDocument}
-                  onChange={(event) => setWithDocument(event.target.value)}
+                  onChange={(event) => setWithDocument(event.target.value as DocumentAttachmentMethod)}
                   style={{ width: '100%' }}
                 >
                   {withDocumentOptions.map((option) => (
@@ -329,8 +335,8 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
                 inline
                 value={[seriesStartDate, seriesEndDate]}
                 onChange={([start, end]) => {
-                  setSeriesStartDate(start)
-                  setSeriesEndDate(end)
+                  setSeriesStartDate(start || null)
+                  setSeriesEndDate(end || null)
                 }}
                 onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
               />
@@ -356,7 +362,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
 
             <Autocomplete
               multiple
-              options={criteria?.data.modalities || []}
+              options={criteriaData?.data.modalities || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={seriesModalities}

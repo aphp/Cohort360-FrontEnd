@@ -22,22 +22,24 @@ import AdvancedInputs from 'components/CreationCohort/DiagramView/components/Log
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProcedure } from 'state/pmsi'
-import { CriteriaName, HierarchyTree } from 'types'
+import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
+import services from 'services/aphp'
+import { CcamDataType } from 'types/requestCriterias'
 
 type CcamFormProps = {
   isOpen: boolean
   isEdition: boolean
-  criteria: any
-  selectedCriteria: any
+  criteriaData: CriteriaItemDataCache
+  selectedCriteria: CcamDataType
   onChangeValue: (key: string, value: any) => void
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
 }
 
 const CcamForm: React.FC<CcamFormProps> = (props) => {
-  const { isOpen, isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
+  const { isOpen, isEdition, criteriaData, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
@@ -51,14 +53,16 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
   }
 
   const getCCAMOptions = async (searchValue: string) => {
-    const ccamOptions = await criteria.fetch.fetchCcamData(searchValue, false)
+    const ccamOptions = await services.cohortCreation.fetchCcamData(searchValue, false)
 
     return ccamOptions && ccamOptions.length > 0 ? ccamOptions : []
   }
 
   const defaultValuesCode = currentState.code
-    ? currentState.code.map((code: any) => {
-        const criteriaCode = criteria.data.ccamData ? criteria.data.ccamData.find((g: any) => g.id === code.id) : null
+    ? currentState.code.map((code) => {
+        const criteriaCode = criteriaData.data.ccamData
+          ? criteriaData.data.ccamData.find((g: any) => g.id === code.id)
+          : null
         return {
           id: code.id,
           label: code.label ? code.label : criteriaCode?.label ?? '?'
@@ -159,7 +163,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             noOptionsText="Veuillez entrer un code ou un acte CCAM"
             className={classes.inputItem}
             autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteria?.data?.ccamData || []}
+            autocompleteOptions={criteriaData.data.ccamData || []}
             getAutocompleteOptions={getCCAMOptions}
             onChange={(e, value) => onChangeValue('code', value)}
           />

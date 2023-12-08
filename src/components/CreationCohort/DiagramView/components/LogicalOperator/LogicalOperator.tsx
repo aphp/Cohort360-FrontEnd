@@ -194,15 +194,15 @@ const LogicalOperator: React.FC = () => {
     const nextCriteriaId = request.nextCriteriaId
     if (item.id !== undefined) {
       // Edition
-      await dispatch(editSelectedCriteria(item))
+      dispatch(editSelectedCriteria(item))
     } else {
       // Creation
       item.id = nextCriteriaId
-      await dispatch(addNewSelectedCriteria(item))
+      dispatch(addNewSelectedCriteria(item))
       // Link criteria with group operator
       const currentParent = request.criteriaGroup ? request.criteriaGroup.find(({ id }) => id === parentId) : null
       if (!currentParent) return
-      await dispatch(
+      dispatch(
         editCriteriaGroup({
           ...currentParent,
           criteriaIds: [...currentParent.criteriaIds, nextCriteriaId]
@@ -225,9 +225,9 @@ const LogicalOperator: React.FC = () => {
       isSubGroup: parentId === 0 ? false : true,
       isInclusive: true
     }
-    await dispatch(addNewCriteriaGroup(newOperator))
+    dispatch(addNewCriteriaGroup(newOperator))
     // Edit parent and add nextGroupId inside criteriaIds
-    await dispatch(
+    dispatch(
       editCriteriaGroup({
         ...currentParent,
         criteriaIds: [...currentParent.criteriaIds, nextGroupId]
@@ -251,12 +251,12 @@ const LogicalOperator: React.FC = () => {
   }
 
   const _deleteCriteria = async (criteriaId: number) => {
-    await dispatch(deleteSelectedCriteria(criteriaId))
+    dispatch(deleteSelectedCriteria(criteriaId))
     _buildCohortCreation()
   }
 
   const _duplicateCriteria = async (criteriaId: number) => {
-    await dispatch(duplicateSelectedCriteria(criteriaId))
+    dispatch(duplicateSelectedCriteria(criteriaId))
     _buildCohortCreation()
   }
 

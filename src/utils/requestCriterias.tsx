@@ -1,14 +1,14 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import moment from 'moment'
-import { CriteriaItemType, ScopeTreeRow } from 'types'
+import { ScopeTreeRow } from 'types'
 import {
   Comparators,
   CriteriaDataKey,
   DocType,
   LabelCriteriaObject,
-  MedicationType,
   MedicationTypeLabel,
-  RessourceType
+  RessourceType,
+  SelectedCriteriaType
 } from 'types/requestCriterias'
 import {
   DocumentAttachmentMethod,
@@ -22,47 +22,32 @@ import { displaySystem } from './displayValueSetSystem'
 import { CriteriaState } from 'state/criteria'
 import { Tooltip, Typography } from '@mui/material'
 
-const getMedicationTypeLabel = (type: MedicationType) => {
+const getMedicationTypeLabel = (type: RessourceType) => {
   switch (type) {
-    case MedicationType.Request:
+    case RessourceType.MEDICATION_REQUEST:
       return MedicationTypeLabel.Request
-    case MedicationType.Administration:
+    case RessourceType.MEDICATION_ADMINISTRATION:
       return MedicationTypeLabel.Administration
   }
 }
 
 const getLabelFromCriteriaObject = (
   criteriaState: CriteriaState,
-  values: LabelCriteriaObject[],
-  name: string,
+  values: LabelCriteriaObject[] | null,
+  name: CriteriaDataKey,
   resourceType: RessourceType,
   label?: string
 ) => {
-  const findCriterionById = (criteriaArray: CriteriaState, id: RessourceType): null | CriteriaItemType => {
-    for (const criterion of criteriaArray) {
-      if (criterion.id === id) {
-        return criterion
-      }
-      if (criterion.subItems) {
-        const foundInSubItem = findCriterionById(criterion.subItems, id)
-        if (foundInSubItem) {
-          return foundInSubItem
-        }
-      }
-    }
-    return null
-  }
+  const criterionData = criteriaState.cache.find((criteriaCache) => criteriaCache.criteriaType === resourceType)?.data
+  if (criterionData === null || values === null) return ''
 
-  const criterionData = findCriterionById(criteriaState, resourceType)?.data
-  if (criterionData === null) return ''
-
-  const criterion = criterionData[name]
+  const criterion = criterionData?.[name] || []
   if (criterion !== 'loading') {
     const removeDuplicates = (array: any[], key: string) => {
       return array.filter((obj, index, self) => index === self.findIndex((el) => el[key] === obj[key]))
     }
     const labels = removeDuplicates(criterion, 'id')
-      .filter((obj: any) => values.map((value) => value.id).includes(obj.id))
+      .filter((obj) => values.map((value) => value.id).includes(obj.id))
       .map((obj: LabelCriteriaObject) => `${displaySystem(obj.system)} ${obj.label}`)
 
     const tooltipTitle = labels.join(' - ')
@@ -124,10 +109,10 @@ const getNbOccurencesLabel = (value: number, comparator: string, name?: string) 
   return `Nombre ${name ? name : "d'occurrences"} ${comparator} ${+value}`
 }
 
-const getBiologyValuesLabel = (comparator: string, valueMin: number, valueMax: number) => {
-  if (isNaN(valueMin) && isNaN(valueMax)) return null
+const getBiologyValuesLabel = (comparator: string, valueMin: number, valueMax?: number) => {
+  if (isNaN(valueMin) && (valueMax === undefined || isNaN(valueMax))) return null
   return comparator === Comparators.BETWEEN
-    ? `Valeur comprise entre ${valueMin} et ${isNaN(valueMax) ? '?' : valueMax}`
+    ? `Valeur comprise entre ${valueMin} et ${valueMax === undefined || isNaN(valueMax) ? '?' : valueMax}`
     : `Valeur ${comparator} ${valueMin}`
 }
 
@@ -148,122 +133,164 @@ export const getAttachmentMethod = (value: DocumentAttachmentMethod, daysOfDelay
   }
 }
 
-export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaState: CriteriaState): string[] => {
-  const labels: (string | any)[] = []
-  switch (type) {
+export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteriaState: CriteriaState): ReactNode[] => {
+  const type = selectedCriteria.type
+  const labels: ReactNode[] = []
+  switch (selectedCriteria.type) {
     case RessourceType.IPP_LIST:
-      labels.push(getIdsListLabels(criterias.search, 'patients'))
+      labels.push(getIdsListLabels(selectedCriteria.search, 'patients'))
       break
 
     case RessourceType.PATIENT:
-      if (criterias.genders?.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.genders, CriteriaDataKey.GENDER, type))
-      if (criterias.vitalStatus?.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.vitalStatus, CriteriaDataKey.VITALSTATUS, type))
-      if (criterias.birthdates[0] === null && criterias.birthdates[1] === null)
-        labels.push(getDurationRangeLabel(criterias.age, 'Âge'))
-      if (criterias.birthdates[0] || criterias.birthdates[1])
-        labels.push(getDatesLabel(criterias.birthdates, 'Naissance'))
-      if (criterias.deathDates[0] || criterias.deathDates[1]) labels.push(getDatesLabel(criterias.deathDates, 'Décès'))
+      if (selectedCriteria.genders && selectedCriteria.genders.length > 0) {
+        labels.push(getLabelFromCriteriaObject(criteriaState, selectedCriteria.genders, CriteriaDataKey.GENDER, type))
+      }
+
+      if (selectedCriteria.vitalStatus && selectedCriteria.vitalStatus.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(criteriaState, selectedCriteria.vitalStatus, CriteriaDataKey.VITALSTATUS, type)
+        )
+      labels.push(getDurationRangeLabel(selectedCriteria.age, 'Âge'))
+      if (selectedCriteria.birthdates[0] || selectedCriteria.birthdates[1])
+        labels.push(getDatesLabel(selectedCriteria.birthdates, 'Naissance'))
+      if (selectedCriteria.deathDates[0] || selectedCriteria.deathDates[1])
+        labels.push(getDatesLabel(selectedCriteria.deathDates, 'Décès'))
       break
 
     case RessourceType.ENCOUNTER:
-      if (criterias.age[0] || criterias.age[1]) labels.push(getDurationRangeLabel(criterias.age, 'Âge : '))
-      if (criterias.duration[0] || criterias.duration[1])
-        labels.push(getDurationRangeLabel(criterias.duration, 'Prise en charge : '))
-      if (criterias.priseEnChargeType.length > 0)
+      if (selectedCriteria.age[0] || selectedCriteria.age[1])
+        labels.push(getDurationRangeLabel(selectedCriteria.age, 'Âge : '))
+      if (selectedCriteria.duration[0] || selectedCriteria.duration[1])
+        labels.push(getDurationRangeLabel(selectedCriteria.duration, 'Prise en charge : '))
+      if (selectedCriteria.priseEnChargeType?.length || 0 > 0)
         labels.push(
           getLabelFromCriteriaObject(
             criteriaState,
-            criterias.priseEnChargeType,
+            selectedCriteria.priseEnChargeType,
             CriteriaDataKey.PRISE_EN_CHARGE_TYPE,
             type
           )
         )
-      if (criterias.typeDeSejour.length > 0)
+      if (selectedCriteria.typeDeSejour && selectedCriteria.typeDeSejour.length > 0)
         labels.push(
-          getLabelFromCriteriaObject(criteriaState, criterias.typeDeSejour, CriteriaDataKey.TYPE_DE_SEJOUR, type)
+          getLabelFromCriteriaObject(criteriaState, selectedCriteria.typeDeSejour, CriteriaDataKey.TYPE_DE_SEJOUR, type)
         )
-      if (criterias.fileStatus.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.fileStatus, CriteriaDataKey.FILE_STATUS, type))
-      if (criterias.admissionMode.length > 0)
+      if (selectedCriteria.fileStatus && selectedCriteria.fileStatus.length > 0)
         labels.push(
-          getLabelFromCriteriaObject(criteriaState, criterias.admissionMode, CriteriaDataKey.ADMISSION_MODE, type)
+          getLabelFromCriteriaObject(criteriaState, selectedCriteria.fileStatus, CriteriaDataKey.FILE_STATUS, type)
         )
-      if (criterias.admission.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.admission, CriteriaDataKey.ADMISSION, type))
-      if (criterias.entryMode.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.entryMode, CriteriaDataKey.ENTRY_MODES, type))
-      if (criterias.exitMode.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.exitMode, CriteriaDataKey.EXIT_MODES, type))
-      if (criterias.reason.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.reason, CriteriaDataKey.REASON, type))
-      if (criterias.destination.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.destination, CriteriaDataKey.DESTINATION, type))
-      if (criterias.provenance.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.provenance, CriteriaDataKey.PROVENANCE, type))
-      break
-
-    case RessourceType.DOCUMENTS:
-      if (criterias.search) labels.push(getSearchDocumentLabel(criterias.search, criterias.searchBy))
-      if (criterias.docType.length > 0) labels.push(getDocumentTypesLabel(criterias.docType))
-      break
-
-    case RessourceType.CONDITION:
-      if (criterias.code.length > 0)
-        labels.push(
-          getLabelFromCriteriaObject(criteriaState, criterias.code, CriteriaDataKey.CIM_10_DIAGNOSTIC, criterias.type)
-        )
-      if (criterias.diagnosticType.length > 0)
+      if (selectedCriteria.admissionMode && selectedCriteria.admissionMode.length > 0)
         labels.push(
           getLabelFromCriteriaObject(
             criteriaState,
-            criterias.diagnosticType,
+            selectedCriteria.admissionMode,
+            CriteriaDataKey.ADMISSION_MODE,
+            type
+          )
+        )
+      if (selectedCriteria.admission && selectedCriteria.admission.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(criteriaState, selectedCriteria.admission, CriteriaDataKey.ADMISSION, type)
+        )
+      if (selectedCriteria.entryMode && selectedCriteria.entryMode.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(criteriaState, selectedCriteria.entryMode, CriteriaDataKey.ENTRY_MODES, type)
+        )
+      if (selectedCriteria.exitMode && selectedCriteria.exitMode.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(criteriaState, selectedCriteria.exitMode, CriteriaDataKey.EXIT_MODES, type)
+        )
+      if (selectedCriteria.reason && selectedCriteria.reason.length > 0)
+        labels.push(getLabelFromCriteriaObject(criteriaState, selectedCriteria.reason, CriteriaDataKey.REASON, type))
+      if (selectedCriteria.destination && selectedCriteria.destination.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(criteriaState, selectedCriteria.destination, CriteriaDataKey.DESTINATION, type)
+        )
+      if (selectedCriteria.provenance && selectedCriteria.provenance.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(criteriaState, selectedCriteria.provenance, CriteriaDataKey.PROVENANCE, type)
+        )
+      break
+
+    case RessourceType.DOCUMENTS:
+      if (selectedCriteria.search)
+        labels.push(getSearchDocumentLabel(selectedCriteria.search, selectedCriteria.searchBy))
+      if (selectedCriteria.docType && selectedCriteria.docType.length > 0)
+        labels.push(getDocumentTypesLabel(selectedCriteria.docType))
+      break
+
+    case RessourceType.CONDITION:
+      if (selectedCriteria.code && selectedCriteria.code.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.code,
+            CriteriaDataKey.CIM_10_DIAGNOSTIC,
+            selectedCriteria.type
+          )
+        )
+      if (selectedCriteria.diagnosticType && selectedCriteria.diagnosticType.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.diagnosticType,
             CriteriaDataKey.DIAGNOSTIC_TYPES,
-            criterias.type
+            selectedCriteria.type
           )
         )
       break
 
     case RessourceType.PROCEDURE:
-      if (criterias.code.length > 0)
+      if (selectedCriteria.code && selectedCriteria.code.length > 0)
         labels.push(
-          getLabelFromCriteriaObject(criteriaState, criterias.code, CriteriaDataKey.CCAM_DATA, criterias.type)
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.code,
+            CriteriaDataKey.CCAM_DATA,
+            selectedCriteria.type
+          )
         )
-      if (criterias.source) labels.push(`Source: ${criterias.source}`)
+      if (selectedCriteria.source) labels.push(`Source: ${selectedCriteria.source}`)
       break
 
     case RessourceType.CLAIM:
-      if (criterias.code.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, CriteriaDataKey.GHM_DATA, criterias.type))
+      if (selectedCriteria.code && selectedCriteria.code.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.code,
+            CriteriaDataKey.GHM_DATA,
+            selectedCriteria.type
+          )
+        )
       break
 
     case RessourceType.MEDICATION_REQUEST:
     case RessourceType.MEDICATION_ADMINISTRATION:
-      labels.push(getMedicationTypeLabel(criterias.type))
-      if (criterias.code.length > 0)
+      labels.push(getMedicationTypeLabel(selectedCriteria.type))
+      if (selectedCriteria.code && selectedCriteria.code.length > 0)
         labels.push(
           getLabelFromCriteriaObject(
             criteriaState,
-            criterias.code,
+            selectedCriteria.code,
             CriteriaDataKey.MEDICATION_DATA,
             RessourceType.MEDICATION
           )
         )
-      if (criterias.prescriptionType.length > 0)
+      if (selectedCriteria.prescriptionType && selectedCriteria.prescriptionType.length > 0)
         labels.push(
           getLabelFromCriteriaObject(
             criteriaState,
-            criterias.prescriptionType,
+            selectedCriteria.prescriptionType,
             CriteriaDataKey.PRESCRIPTION_TYPES,
             RessourceType.MEDICATION
           )
         )
-      if (criterias.administration.length > 0)
+      if (selectedCriteria.administration && selectedCriteria.administration.length > 0)
         labels.push(
           getLabelFromCriteriaObject(
             criteriaState,
-            criterias.administration,
+            selectedCriteria.administration,
             CriteriaDataKey.ADMINISTRATIONS,
             RessourceType.MEDICATION
           )
@@ -271,50 +298,64 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
       break
 
     case RessourceType.OBSERVATION:
-      if (criterias.code.length > 0)
-        labels.push(getLabelFromCriteriaObject(criteriaState, criterias.code, CriteriaDataKey.BIOLOGY_DATA, type))
-      if (criterias.valueComparator && (!isNaN(criterias.valueMin) || !isNaN(criterias.valueMax)))
-        labels.push(getBiologyValuesLabel(criterias.valueComparator, criterias.valueMin, criterias.valueMax))
+      if (selectedCriteria.code && selectedCriteria.code.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(criteriaState, selectedCriteria.code, CriteriaDataKey.BIOLOGY_DATA, type)
+        )
+      if (selectedCriteria.valueComparator && selectedCriteria.valueMin && !isNaN(selectedCriteria.valueMin))
+        labels.push(
+          getBiologyValuesLabel(selectedCriteria.valueComparator, selectedCriteria.valueMin, selectedCriteria.valueMax)
+        )
       break
 
     case RessourceType.IMAGING:
-      if (criterias.studyStartDate || criterias.studyEndDate)
-        labels.push(getDatesLabel([criterias.studyStartDate, criterias.studyEndDate], "Date de l'étude : "))
-      if (criterias.studyModalities?.length > 0)
+      if (selectedCriteria.studyStartDate || selectedCriteria.studyEndDate)
+        labels.push(
+          getDatesLabel([selectedCriteria.studyStartDate, selectedCriteria.studyEndDate], "Date de l'étude : ")
+        )
+      if (selectedCriteria.studyModalities && selectedCriteria.studyModalities.length > 0)
         labels.push(
           getLabelFromCriteriaObject(
             criteriaState,
-            criterias.studyModalities,
+            selectedCriteria.studyModalities,
             CriteriaDataKey.MODALITIES,
             type,
             "Modalités d'étude :"
           )
         )
-      if (criterias.studyDescription) labels.push(`Description de l'étude : ${criterias.studyDescription}`)
-      if (criterias.studyProcedure) labels.push(`Procédure de l'étude : ${criterias.studyProcedure}`)
-      if (criterias.withDocument !== DocumentAttachmentMethod.NONE)
-        labels.push(getAttachmentMethod(criterias.withDocument, criterias.daysOfDelay))
-      if (criterias.studyUid) labels.push(getIdsListLabels(criterias.studyUid, "uuid d'étude"))
-      if (criterias.seriesStartDate || criterias.seriesEndDate)
-        labels.push(getDatesLabel([criterias.seriesStartDate, criterias.seriesEndDate], 'Date de la série : '))
-      if (criterias.seriesModalities?.length > 0)
+      if (selectedCriteria.studyDescription)
+        labels.push(`Description de l'étude : ${selectedCriteria.studyDescription}`)
+      if (selectedCriteria.studyProcedure) labels.push(`Procédure de l'étude : ${selectedCriteria.studyProcedure}`)
+      if (selectedCriteria.withDocument !== DocumentAttachmentMethod.NONE)
+        labels.push(getAttachmentMethod(selectedCriteria.withDocument, selectedCriteria.daysOfDelay))
+      if (selectedCriteria.studyUid) labels.push(getIdsListLabels(selectedCriteria.studyUid, "uuid d'étude"))
+      if (selectedCriteria.seriesStartDate || selectedCriteria.seriesEndDate)
+        labels.push(
+          getDatesLabel([selectedCriteria.seriesStartDate, selectedCriteria.seriesEndDate], 'Date de la série : ')
+        )
+      if (selectedCriteria.seriesModalities && selectedCriteria.seriesModalities?.length > 0)
         labels.push(
           getLabelFromCriteriaObject(
             criteriaState,
-            criterias.seriesModalities,
+            selectedCriteria.seriesModalities,
             CriteriaDataKey.MODALITIES,
             type,
             'Modalités de séries :'
           )
         )
-      if (criterias.seriesDescription) labels.push(`Description de la série : ${criterias.seriesDescription}`)
-      if (criterias.seriesProtocol) labels.push(`Protocole de la série : ${criterias.seriesProtocol}`)
-      if (criterias.bodySite) labels.push(`Partie du corps : ${criterias.bodySite}`)
-      if (criterias.seriesUid) labels.push(getIdsListLabels(criterias.seriesUid, 'uuid de série'))
-      if (!isNaN(criterias.numberOfSeries) && criterias.seriesComparator)
-        labels.push(getNbOccurencesLabel(criterias.numberOfSeries, criterias.seriesComparator, 'de séries'))
-      if (!isNaN(criterias.numberOfIns) && criterias.instancesComparator)
-        labels.push(getNbOccurencesLabel(criterias.numberOfIns, criterias.instancesComparator, "d'instances"))
+      if (selectedCriteria.seriesDescription)
+        labels.push(`Description de la série : ${selectedCriteria.seriesDescription}`)
+      if (selectedCriteria.seriesProtocol) labels.push(`Protocole de la série : ${selectedCriteria.seriesProtocol}`)
+      if (selectedCriteria.bodySite) labels.push(`Partie du corps : ${selectedCriteria.bodySite}`)
+      if (selectedCriteria.seriesUid) labels.push(getIdsListLabels(selectedCriteria.seriesUid, 'uuid de série'))
+      if (!isNaN(selectedCriteria.numberOfSeries) && selectedCriteria.seriesComparator)
+        labels.push(
+          getNbOccurencesLabel(selectedCriteria.numberOfSeries, selectedCriteria.seriesComparator, 'de séries')
+        )
+      if (!isNaN(selectedCriteria.numberOfIns) && selectedCriteria.instancesComparator)
+        labels.push(
+          getNbOccurencesLabel(selectedCriteria.numberOfIns, selectedCriteria.instancesComparator, "d'instances")
+        )
       break
   }
   switch (type) {
@@ -327,13 +368,16 @@ export const criteriasAsArray = (criterias: any, type: RessourceType, criteriaSt
     case RessourceType.OBSERVATION:
     case RessourceType.ENCOUNTER:
     case RessourceType.IMAGING:
-      if (criterias.encounterStartDate || criterias.encounterEndDate)
-        labels.push(getDatesLabel([criterias.encounterStartDate, criterias.encounterEndDate], 'Prise en charge'))
-      if (!isNaN(criterias.occurrence) && criterias.occurrenceComparator)
-        labels.push(getNbOccurencesLabel(criterias.occurrence, criterias.occurrenceComparator))
-      if (criterias.startOccurrence || criterias.endOccurrence)
-        labels.push(getDatesLabel([criterias.startOccurrence, criterias.endOccurrence], 'Occurence'))
-      if (criterias.encounterService?.length > 0) labels.push(getLabelFromName(criterias.encounterService))
+      if (selectedCriteria.encounterStartDate || selectedCriteria.encounterEndDate)
+        labels.push(
+          getDatesLabel([selectedCriteria.encounterStartDate, selectedCriteria.encounterEndDate], 'Prise en charge')
+        )
+      if (!isNaN(selectedCriteria.occurrence) && selectedCriteria.occurrenceComparator)
+        labels.push(getNbOccurencesLabel(selectedCriteria.occurrence, selectedCriteria.occurrenceComparator))
+      if (selectedCriteria.startOccurrence || selectedCriteria.endOccurrence)
+        labels.push(getDatesLabel([selectedCriteria.startOccurrence, selectedCriteria.endOccurrence], 'Occurence'))
+      if (selectedCriteria.encounterService && selectedCriteria.encounterService.length > 0)
+        labels.push(getLabelFromName(selectedCriteria.encounterService))
   }
 
   return labels

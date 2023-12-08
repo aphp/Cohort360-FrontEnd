@@ -135,7 +135,7 @@ export enum DocumentAttachmentMethodLabel {
 }
 
 export type SearchBy = SearchByTypes
-export type DurationRangeType = [string | null, string | null]
+export type DurationRangeType = [string | null | undefined, string | null | undefined]
 export type LabelObject = {
   id: string
   label: string

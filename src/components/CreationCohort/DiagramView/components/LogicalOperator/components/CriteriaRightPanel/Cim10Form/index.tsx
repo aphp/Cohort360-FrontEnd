@@ -10,24 +10,29 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition, PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
 import { CriteriaDrawerComponentProps } from 'types'
-import { RessourceType } from 'types/requestCriterias'
+import { Cim10DataType, Comparators, RessourceType } from 'types/requestCriterias'
 
-export const defaultCondition = {
+export const defaultCondition: Omit<Cim10DataType, 'id'> = {
   type: RessourceType.CONDITION,
   title: 'Critère de diagnostic',
   code: [],
+  label: undefined,
   diagnosticType: [],
   occurrence: 1,
-  occurrenceComparator: '>=',
+  occurrenceComparator: Comparators.GREATER_OR_EQUAL,
   startOccurrence: '',
   endOccurrence: '',
-  isInclusive: true
+  isInclusive: true,
+  encounterStartDate: null,
+  encounterEndDate: null
 }
 
 const Index = (props: CriteriaDrawerComponentProps) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
-  const [defaultCriteria, setDefaultCriteria] = useState(selectedCriteria || defaultCondition)
+  const [defaultCriteria, setDefaultCriteria] = useState<Cim10DataType>(
+    (selectedCriteria as Cim10DataType) || defaultCondition
+  )
 
   const isEdition = selectedCriteria !== null
   const dispatch = useAppDispatch()
@@ -46,7 +51,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       value,
       defaultCriteria,
       newHierarchy,
-      setDefaultCriteria,
+      (updatedCriteria) => setDefaultCriteria(updatedCriteria as Cim10DataType),
       selectedTab,
       defaultCondition.type,
       dispatch
@@ -81,7 +86,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         <Cim10Form
           isOpen={selectedTab === 'form'}
           isEdition={isEdition}
-          criteria={criteria}
+          criteriaData={criteriaData}
           selectedCriteria={defaultCriteria}
           onChangeValue={_onChangeFormValue}
           onChangeSelectedCriteria={onChangeSelectedCriteria}

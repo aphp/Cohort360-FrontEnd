@@ -7,23 +7,25 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchClaim } from 'state/pmsi'
-import { CriteriaName, HierarchyTree } from 'types'
+import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
+import services from 'services/aphp'
+import { GhmDataType } from 'types/requestCriterias'
 
 type GHMFormProps = {
   isOpen: boolean
   isEdition: boolean
-  criteria: any
-  selectedCriteria: any
+  criteriaData: CriteriaItemDataCache
+  selectedCriteria: GhmDataType
   onChangeValue: (key: string, value: any) => void
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
 }
 
 const GhmForm: React.FC<GHMFormProps> = (props) => {
-  const { isOpen, isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
+  const { isOpen, isEdition, criteriaData, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
@@ -31,14 +33,16 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
   const currentState = { ...selectedCriteria, ...initialState }
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
-  const getGhmOptions = async (searchValue: string) => await criteria.fetch.fetchGhmData(searchValue, false)
+  const getGhmOptions = async (searchValue: string) => await services.cohortCreation.fetchGhmData(searchValue, false)
   const _onSubmit = () => {
     onChangeSelectedCriteria(currentState)
     dispatch(fetchClaim())
   }
   const defaultValuesCode = currentState.code
-    ? currentState.code.map((code: any) => {
-        const criteriaCode = criteria.data.ghmData ? criteria.data.ghmData.find((g: any) => g.id === code.id) : null
+    ? currentState.code.map((code) => {
+        const criteriaCode = criteriaData.data.ghmData
+          ? criteriaData.data.ghmData.find((g: any) => g.id === code.id)
+          : null
         return {
           id: code.id,
           label: code.label ? code.label : criteriaCode?.label ?? '?'
@@ -129,7 +133,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             noOptionsText="Veuillez entrer un code ou un critère GHM"
             className={classes.inputItem}
             autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteria?.data?.ghmData || []}
+            autocompleteOptions={criteriaData.data.ghmData || []}
             getAutocompleteOptions={getGhmOptions}
             onChange={(e, value) => {
               onChangeValue('code', value)

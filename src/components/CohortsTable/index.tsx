@@ -80,7 +80,6 @@ type ResearchTableProps = {
   onUpdate: () => void
 }
 const ResearchTable: React.FC<ResearchTableProps> = ({
-  simplified,
   data,
   orderBy,
   orderDirection,
@@ -521,6 +520,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
           <Button
             onClick={() => {
               handleCloseDialog()
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               onDeleteCohort(selectedCohort!)
             }}
             color="secondary"

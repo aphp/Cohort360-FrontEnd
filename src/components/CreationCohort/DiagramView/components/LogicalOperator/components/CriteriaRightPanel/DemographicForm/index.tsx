@@ -20,40 +20,37 @@ import useStyles from './styles'
 import { DurationRangeType, LabelObject, VitalStatusLabel } from 'types/searchCriterias'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
-import { CriteriaDataKey, SelectedCriteriaType, RessourceType } from 'types/requestCriterias'
+import { CriteriaDataKey, DemographicDataType, RessourceType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import { convertStringToDuration, checkMinMaxValue } from 'utils/age'
+import { CriteriaDrawerComponentProps, CriteriaItemDataCache } from 'types'
 
 enum Error {
-  EMPTY_FORM,
   INCOHERENT_AGE_ERROR,
   NO_ERROR
 }
-type DemographicFormProps = {
-  criteria: any
-  selectedCriteria: any
-  goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
-}
 
-export const mappingCriteria = (criteriaToMap: any, key: string, mapping: any) => {
+export const mappingCriteria = (criteriaToMap: any, key: CriteriaDataKey, mapping: CriteriaItemDataCache) => {
   if (criteriaToMap) {
     return criteriaToMap.map((criteria: any) => {
-      const mappedCriteria = mapping.data[key]?.find((c: any) => c?.id === criteria?.id)
+      const mappedCriteria = mapping.data?.[key]?.find((c: any) => c?.id === criteria?.id)
       return mappedCriteria
     })
+  } else {
+    return []
   }
 }
 
-const DemographicForm = (props: DemographicFormProps) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+const DemographicForm = (props: CriteriaDrawerComponentProps) => {
+  const { criteriaData, onChangeSelectedCriteria, goBack } = props
+  const selectedCriteria: DemographicDataType | null = props.selectedCriteria as DemographicDataType
   const [birthdates, setBirthdates] = useState<DurationRangeType>(selectedCriteria?.birthdates || [null, null])
   const [deathDates, setDeathDates] = useState<DurationRangeType>(selectedCriteria?.deathDates || [null, null])
   const [age, setAge] = useState<DurationRangeType>(selectedCriteria?.age || [null, null])
   const [vitalStatus, setVitalStatus] =
-    useState(mappingCriteria(selectedCriteria?.vitalStatus, CriteriaDataKey.VITALSTATUS, criteria)) || []
+    useState(mappingCriteria(selectedCriteria?.vitalStatus, CriteriaDataKey.VITALSTATUS, criteriaData)) || []
   const [genders, setGenders] =
-    useState(mappingCriteria(selectedCriteria?.genders, CriteriaDataKey.GENDER, criteria)) || []
+    useState(mappingCriteria(selectedCriteria?.genders, CriteriaDataKey.GENDER, criteriaData)) || []
   const [title, setTitle] = useState(selectedCriteria?.title || 'Critère démographique')
   const [isInclusive, setIsInclusive] = useState<boolean>(selectedCriteria?.isInclusive || true)
 
@@ -67,18 +64,6 @@ const DemographicForm = (props: DemographicFormProps) => {
     setError(Error.NO_ERROR)
     const _age0 = convertStringToDuration(age[0])
     const _age1 = convertStringToDuration(age[1])
-    if (
-      vitalStatus?.length === 0 &&
-      genders?.length === 0 &&
-      birthdates[0] === null &&
-      birthdates[1] === null &&
-      age[0] === null &&
-      age[1] === null &&
-      deathDates[0] === null &&
-      deathDates[1] === null
-    ) {
-      setError(Error.EMPTY_FORM)
-    }
     if (_age0 !== null && _age1 === null) {
       setError(Error.INCOHERENT_AGE_ERROR)
     }
@@ -158,7 +143,7 @@ const DemographicForm = (props: DemographicFormProps) => {
             multiple
             id="criteria-gender-autocomplete"
             className={classes.inputItem}
-            options={criteria.data.gender || []}
+            options={criteriaData.data.gender || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={genders}
@@ -170,7 +155,7 @@ const DemographicForm = (props: DemographicFormProps) => {
             multiple
             id="criteria-vitalStatus-autocomplete"
             className={classes.inputItem}
-            options={criteria.data.status}
+            options={criteriaData.data.status}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={vitalStatus}
@@ -233,7 +218,7 @@ const DemographicForm = (props: DemographicFormProps) => {
             type="submit"
             form="demographic-form"
             variant="contained"
-            disabled={error === Error.INCOHERENT_AGE_ERROR || error === Error.EMPTY_FORM}
+            disabled={error === Error.INCOHERENT_AGE_ERROR}
           >
             Confirmer
           </Button>

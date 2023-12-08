@@ -1,7 +1,13 @@
 import moment from 'moment'
 
 import services from 'services/aphp'
-import { ScopeTreeRow, CriteriaGroupType, TemporalConstraintsType, CriteriaItemType } from 'types'
+import {
+  ScopeTreeRow,
+  CriteriaGroupType,
+  TemporalConstraintsType,
+  CriteriaItemType,
+  CriteriaItemDataCache
+} from 'types'
 
 import docTypes from 'assets/docTypes.json'
 import {
@@ -214,9 +220,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         }`,
         `${
           criterion.vitalStatus && criterion.vitalStatus.length > 0
-            ? `${PATIENT_DECEASED}=${criterion.vitalStatus
-                .map((vitalStatus: any) => vitalStatus.id)
-                .reduce(searchReducer)}`
+            ? `${PATIENT_DECEASED}=${criterion.vitalStatus.map((vitalStatus) => vitalStatus.id).reduce(searchReducer)}`
             : ''
         }`,
         criterion.birthdates[0] === null && criterion.birthdates[1] === null ? `${ageMinCriterion}` : '',
@@ -245,73 +249,65 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         `${
           criterion.admissionMode && criterion.admissionMode.length > 0
             ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode
-                .map((admissionMode: any) => admissionMode.id)
+                .map((admissionMode) => admissionMode.id)
                 .reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.entryMode && criterion.entryMode.length > 0
-            ? `${ENCOUNTER_ENTRYMODE}=${criterion.entryMode
-                .map((entryMode: any) => entryMode.id)
-                .reduce(searchReducer)}`
+            ? `${ENCOUNTER_ENTRYMODE}=${criterion.entryMode.map((entryMode) => entryMode.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.exitMode && criterion.exitMode.length > 0
-            ? `${ENCOUNTER_EXITMODE}=${criterion.exitMode.map((exitMode: any) => exitMode.id).reduce(searchReducer)}`
+            ? `${ENCOUNTER_EXITMODE}=${criterion.exitMode.map((exitMode) => exitMode.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.priseEnChargeType && criterion.priseEnChargeType.length > 0
             ? `${ENCOUNTER_PRISENCHARGETYPE}=${criterion.priseEnChargeType
-                .map((priseEnChargeType: any) => priseEnChargeType.id)
+                .map((priseEnChargeType) => priseEnChargeType.id)
                 .reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.typeDeSejour && criterion.typeDeSejour.length > 0
             ? `${ENCOUNTER_TYPEDESEJOUR}=${criterion.typeDeSejour
-                .map((typeDeSejour: any) => typeDeSejour.id)
+                .map((typeDeSejour) => typeDeSejour.id)
                 .reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.fileStatus && criterion.fileStatus.length > 0
-            ? `${ENCOUNTER_FILESTATUS}=${criterion.fileStatus
-                .map((fileStatus: any) => fileStatus.id)
-                .reduce(searchReducer)}`
+            ? `${ENCOUNTER_FILESTATUS}=${criterion.fileStatus.map((fileStatus) => fileStatus.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.reason && criterion.reason.length > 0
-            ? `${ENCOUNTER_REASON}=${criterion.reason.map((reason: any) => reason.id).reduce(searchReducer)}`
+            ? `${ENCOUNTER_REASON}=${criterion.reason.map((reason) => reason.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.destination && criterion.destination.length > 0
             ? `${ENCOUNTER_DESTINATION}=${criterion.destination
-                .map((destination: any) => destination.id)
+                .map((destination) => destination.id)
                 .reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.provenance && criterion.provenance.length > 0
-            ? `${ENCOUNTER_PROVENANCE}=${criterion.provenance
-                .map((provenance: any) => provenance.id)
-                .reduce(searchReducer)}`
+            ? `${ENCOUNTER_PROVENANCE}=${criterion.provenance.map((provenance) => provenance.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.admission && criterion.admission.length > 0
-            ? `${ENCOUNTER_ADMISSION}=${criterion.admission
-                .map((admission: any) => admission.id)
-                .reduce(searchReducer)}`
+            ? `${ENCOUNTER_ADMISSION}=${criterion.admission.map((admission) => admission.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.encounterService && criterion.encounterService.length > 0
             ? `${SERVICE_PROVIDER}=${criterion.encounterService
-                .map((encounterServiceItem: any) => encounterServiceItem.id)
+                .map((encounterServiceItem) => encounterServiceItem.id)
                 .reduce(searchReducer)}`
             : ''
         }`,
@@ -359,7 +355,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         `${
           criterion.encounterService && criterion.encounterService.length > 0
             ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
-                .map((encounterServiceItem: any) => encounterServiceItem.id)
+                .map((encounterServiceItem) => encounterServiceItem.id)
                 .reduce(searchReducer)}`
             : ''
         }`
@@ -376,20 +372,20 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
               ? `${CONDITION_CODE_ALL_HIERARCHY}=${CONDITION_HIERARCHY}|*`
-              : `${CONDITION_CODE}=${criterion.code.map((code: any) => code.id).reduce(searchReducer)}`
+              : `${CONDITION_CODE}=${criterion.code.map((code) => code.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.diagnosticType && criterion.diagnosticType.length > 0
             ? `${CONDITION_TYPE}=${criterion.diagnosticType
-                .map((diagnosticType: any) => diagnosticType.id)
+                .map((diagnosticType) => diagnosticType.id)
                 .reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.encounterService && criterion.encounterService.length > 0
             ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
-                .map((encounterServiceItem: any) => encounterServiceItem.id)
+                .map((encounterServiceItem) => encounterServiceItem.id)
                 .reduce(searchReducer)}`
             : ''
         }`
@@ -407,15 +403,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
               ? `${PROCEDURE_CODE_ALL_HIERARCHY}=${PROCEDURE_HIERARCHY}|*`
-              : `${PROCEDURE_CODE}=${criterion.code
-                  .map((diagnosticType: any) => diagnosticType.id)
-                  .reduce(searchReducer)}`
+              : `${PROCEDURE_CODE}=${criterion.code.map((diagnosticType) => diagnosticType.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.encounterService && criterion.encounterService.length > 0
             ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
-                .map((encounterServiceItem: any) => encounterServiceItem.id)
+                .map((encounterServiceItem) => encounterServiceItem.id)
                 .reduce(searchReducer)}`
             : ''
         }`
@@ -432,13 +426,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
               ? `${CLAIM_CODE_ALL_HIERARCHY}=${CLAIM_HIERARCHY}|*`
-              : `${CLAIM_CODE}=${criterion.code.map((diagnosticType: any) => diagnosticType.id).reduce(searchReducer)}`
+              : `${CLAIM_CODE}=${criterion.code.map((diagnosticType) => diagnosticType.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.encounterService && criterion.encounterService.length > 0
             ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
-                .map((encounterServiceItem: any) => encounterServiceItem.id)
+                .map((encounterServiceItem) => encounterServiceItem.id)
                 .reduce(searchReducer)}`
             : ''
         }`
@@ -466,7 +460,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
           criterion.prescriptionType &&
           criterion.prescriptionType.length > 0
             ? `${MEDICATION_PRESCRIPTION_TYPE}=${criterion.prescriptionType
-                .map((prescriptionType: any) => prescriptionType.id)
+                .map((prescriptionType) => prescriptionType.id)
                 .reduce(searchReducer)}`
             : ''
         }`,
@@ -476,7 +470,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
                 criterion.type === RessourceType.MEDICATION_REQUEST
                   ? MEDICATION_REQUEST_ROUTE
                   : MEDICATION_ADMINISTRATION_ROUTE
-              }=${criterion.administration.map((administration: any) => administration.id).reduce(searchReducer)}`
+              }=${criterion.administration.map((administration) => administration.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
@@ -486,7 +480,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
                   ? ENCOUNTER_SERVICE_PROVIDER
                   : ENCOUNTER_CONTEXT_SERVICE_PROVIDER
               }=${criterion.encounterService
-                .map((encounterServiceItem: any) => encounterServiceItem.id)
+                .map((encounterServiceItem) => encounterServiceItem.id)
                 .reduce(searchReducer)}`
             : ''
         }`
@@ -527,15 +521,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
               ? `${OBSERVATION_CODE_ALL_HIERARCHY}=${BIOLOGY_HIERARCHY_ITM_ANABIO}|*`
-              : `${OBSERVATION_CODE}=${criterion.code
-                  .map((diagnosticType: any) => diagnosticType.id)
-                  .reduce(searchReducer)}`
+              : `${OBSERVATION_CODE}=${criterion.code.map((diagnosticType) => diagnosticType.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
           criterion.encounterService && criterion.encounterService.length > 0
             ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
-                .map((encounterServiceItem: any) => encounterServiceItem.id)
+                .map((encounterServiceItem) => encounterServiceItem.id)
                 .reduce(searchReducer)}`
             : ''
         }`,
@@ -889,7 +881,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case PATIENT_GENDER: {
                 const genderIds = value?.split(',')
-                const newGenderIds = genderIds?.map((genderId: any) => ({ id: genderId }))
+                const newGenderIds = genderIds?.map((genderId) => ({ id: genderId }))
                 if (!newGenderIds) continue
 
                 currentCriterion.genders = currentCriterion.gender
@@ -899,7 +891,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case PATIENT_DECEASED: {
                 const vitalStatuses = value?.split(',') || []
-                const _vitalStatuses = vitalStatuses?.map((vitalStatusId: any) => ({ id: vitalStatusId }))
+                const _vitalStatuses = vitalStatuses?.map((vitalStatusId) => ({ id: vitalStatusId }))
                 if (!_vitalStatuses) continue
 
                 currentCriterion.vitalStatus = currentCriterion.vitalStatus
@@ -974,7 +966,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case ENCOUNTER_ENTRYMODE: {
                 const entryModesIds = value?.split(',')
-                const newEntryModesIds = entryModesIds?.map((entryModeId: any) => ({ id: entryModeId }))
+                const newEntryModesIds = entryModesIds?.map((entryModeId) => ({ id: entryModeId }))
                 if (!newEntryModesIds) continue
 
                 currentCriterion.entryMode = currentCriterion.entryMode
@@ -984,7 +976,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case ENCOUNTER_EXITMODE: {
                 const exitModesIds = value?.split(',')
-                const newExitModesIds = exitModesIds?.map((exitModeId: any) => ({ id: exitModeId }))
+                const newExitModesIds = exitModesIds?.map((exitModeId) => ({ id: exitModeId }))
                 if (!newExitModesIds) continue
 
                 currentCriterion.exitMode = currentCriterion.exitMode
@@ -994,7 +986,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case ENCOUNTER_PRISENCHARGETYPE: {
                 const priseEnChargeTypesIds = value?.split(',')
-                const newPriseEnChargeTypesIds = priseEnChargeTypesIds?.map((priseEnChargeTypeId: any) => ({
+                const newPriseEnChargeTypesIds = priseEnChargeTypesIds?.map((priseEnChargeTypeId) => ({
                   id: priseEnChargeTypeId
                 }))
                 if (!newPriseEnChargeTypesIds) continue
@@ -1006,7 +998,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case ENCOUNTER_TYPEDESEJOUR: {
                 const typeDeSejoursIds = value?.split(',')
-                const newTypeDeSejoursIds = typeDeSejoursIds?.map((typeDeSejourId: any) => ({
+                const newTypeDeSejoursIds = typeDeSejoursIds?.map((typeDeSejourId) => ({
                   id: typeDeSejourId
                 }))
                 if (!newTypeDeSejoursIds) continue
@@ -1018,7 +1010,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case ENCOUNTER_FILESTATUS: {
                 const fileStatusIds = value?.split(',')
-                const newFileStatusIds = fileStatusIds?.map((fileStatusId: any) => ({
+                const newFileStatusIds = fileStatusIds?.map((fileStatusId) => ({
                   id: fileStatusId
                 }))
                 if (!newFileStatusIds) continue
@@ -1030,7 +1022,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case ENCOUNTER_REASON: {
                 const dischargeIds = value?.split(',')
-                const newDischargeIds = dischargeIds?.map((dischargeId: any) => ({
+                const newDischargeIds = dischargeIds?.map((dischargeId) => ({
                   id: dischargeId
                 }))
                 if (!newDischargeIds) continue
@@ -1042,7 +1034,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case ENCOUNTER_ADMISSIONMODE: {
                 const admissionModeIds = value?.split(',')
-                const newAdmissionModeIds = admissionModeIds?.map((admissionModeId: any) => ({
+                const newAdmissionModeIds = admissionModeIds?.map((admissionModeId) => ({
                   id: admissionModeId
                 }))
                 if (!newAdmissionModeIds) continue
@@ -1054,7 +1046,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case ENCOUNTER_DESTINATION: {
                 const destinationIds = value?.split(',')
-                const newDestinationIds = destinationIds?.map((destinationId: any) => ({
+                const newDestinationIds = destinationIds?.map((destinationId) => ({
                   id: destinationId
                 }))
                 if (!newDestinationIds) continue
@@ -1066,7 +1058,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case ENCOUNTER_PROVENANCE: {
                 const provenanceIds = value?.split(',')
-                const newProvenanceIds = provenanceIds?.map((provenanceId: any) => ({
+                const newProvenanceIds = provenanceIds?.map((provenanceId) => ({
                   id: provenanceId
                 }))
                 if (!newProvenanceIds) continue
@@ -1078,7 +1070,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case ENCOUNTER_ADMISSION: {
                 const admissionIds = value?.split(',')
-                const newAdmissionIds = admissionIds?.map((admissionId: any) => ({
+                const newAdmissionIds = admissionIds?.map((admissionId) => ({
                   id: admissionId
                 }))
                 if (!newAdmissionIds) continue
@@ -1221,12 +1213,12 @@ export async function unbuildRequest(_json: string): Promise<any> {
             switch (key) {
               case CONDITION_CODE: {
                 const codeIds = value?.split(',')
-                const newCode = codeIds?.map((codeId: any) => {
-                  codeId = codeId.split('|')
-                  if (codeId.length > 1) {
-                    return { id: codeId[1] }
+                const newCode = codeIds?.map((codeId) => {
+                  const codeIdParts = codeId.split('|')
+                  if (codeIdParts.length > 1) {
+                    return { id: codeIdParts[1] }
                   }
-                  return { id: codeId[0] }
+                  return { id: codeIdParts[0] }
                 })
                 if (!newCode) continue
 
@@ -1235,7 +1227,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case CONDITION_TYPE: {
                 const diagnosticTypeIds = value?.split(',')
-                const newDiagnosticType = diagnosticTypeIds?.map((diagnosticTypeId: any) => ({ id: diagnosticTypeId }))
+                const newDiagnosticType = diagnosticTypeIds?.map((diagnosticTypeId) => ({ id: diagnosticTypeId }))
                 if (!newDiagnosticType) continue
 
                 currentCriterion.diagnosticType = currentCriterion.diagnosticType
@@ -1298,12 +1290,12 @@ export async function unbuildRequest(_json: string): Promise<any> {
             switch (key) {
               case PROCEDURE_CODE: {
                 const codeIds = value?.split(',')
-                const newCode = codeIds?.map((codeId: any) => {
-                  codeId = codeId.split('|')
-                  if (codeId.length > 1) {
-                    return { id: codeId[1] }
+                const newCode = codeIds?.map((codeId) => {
+                  const codeIdParts = codeId.split('|')
+                  if (codeIdParts.length > 1) {
+                    return { id: codeIdParts[1] }
                   }
-                  return { id: codeId[0] }
+                  return { id: codeIdParts[0] }
                 })
                 if (!newCode) continue
 
@@ -1366,12 +1358,12 @@ export async function unbuildRequest(_json: string): Promise<any> {
             switch (key) {
               case CLAIM_CODE: {
                 const codeIds = value?.split(',')
-                const newCode = codeIds?.map((codeId: any) => {
-                  codeId = codeId.split('|')
-                  if (codeId.length > 1) {
-                    return { id: codeId[1] }
+                const newCode = codeIds?.map((codeId) => {
+                  const codeIdParts = codeId.split('|')
+                  if (codeIdParts.length > 1) {
+                    return { id: codeIdParts[1] }
                   }
-                  return { id: codeId[0] }
+                  return { id: codeIdParts[0] }
                 })
                 if (!newCode) continue
 
@@ -1436,7 +1428,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   codeId = codeId.split('|')[1]
                   return codeId
                 })
-                const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
+                const newCode = codeIds?.map((codeId) => ({ id: codeId }))
                 if (!newCode) continue
 
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
@@ -1444,7 +1436,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case MEDICATION_PRESCRIPTION_TYPE: {
                 const prescriptionTypeIds = value?.split(',')
-                const newPrescription = prescriptionTypeIds?.map((prescriptionTypeId: any) => ({
+                const newPrescription = prescriptionTypeIds?.map((prescriptionTypeId) => ({
                   id: prescriptionTypeId
                 }))
                 if (!newPrescription) continue
@@ -1457,7 +1449,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               case MEDICATION_REQUEST_ROUTE:
               case MEDICATION_ADMINISTRATION_ROUTE: {
                 const administrationIds = value?.split(',')
-                const newAdministration = administrationIds?.map((administrationId: any) => ({ id: administrationId }))
+                const newAdministration = administrationIds?.map((administrationId) => ({ id: administrationId }))
                 if (!newAdministration) continue
 
                 currentCriterion.administration = currentCriterion.administration
@@ -1522,12 +1514,12 @@ export async function unbuildRequest(_json: string): Promise<any> {
             switch (key) {
               case OBSERVATION_CODE: {
                 const codeIds = value?.split(',')
-                const newCode = codeIds?.map((codeId: any) => {
-                  codeId = codeId.split('|')
-                  if (codeId.length > 1) {
-                    return { id: codeId[1] }
+                const newCode = codeIds?.map((codeId) => {
+                  const codeIdParts = codeId.split('|')
+                  if (codeIdParts.length > 1) {
+                    return { id: codeIdParts[1] }
                   }
-                  return { id: codeId[0] }
+                  return { id: codeIdParts[0] }
                 })
                 if (!newCode) continue
 
@@ -1882,27 +1874,30 @@ export async function unbuildRequest(_json: string): Promise<any> {
  *
  */
 export const getDataFromFetch = async (
-  _criteria: readonly CriteriaItemType[],
+  criteriaList: readonly CriteriaItemType[],
   selectedCriteria: SelectedCriteriaType[],
-  oldCriteriaList?: any
-): Promise<any> => {
-  for (const _criterion of _criteria) {
-    const oldCriterion = oldCriteriaList
-      ? oldCriteriaList?.find((oldCriterionItem: any) => oldCriterionItem.id === _criterion.id)
-      : []
-    if (_criterion.fetch) {
-      if (!_criterion.data) _criterion.data = {}
-      const fetchKeys = Object.keys(_criterion.fetch)
+  oldCriteriaCache?: CriteriaItemDataCache[]
+): Promise<CriteriaItemDataCache[]> => {
+  const updatedCriteriaData: CriteriaItemDataCache[] = []
+  for (const _criterion of criteriaList) {
+    const criteriaDataCache: CriteriaItemDataCache = {
+      data: {},
+      criteriaType: _criterion.id
+    }
+    // here we do not populate new data with old data because the store froze the data (readonly) so they can't be updated
+    const prevDataCache: CriteriaItemDataCache['data'] =
+      oldCriteriaCache?.find((oldCriterionItem) => oldCriterionItem.criteriaType === _criterion.id)?.data || {}
 
-      for (const fetchKey of fetchKeys) {
-        const dataKey = fetchKey.replace('fetch', '').replace(/(\b[A-Z])(?![A-Z])/g, ($1) => $1.toLowerCase())
+    if (_criterion.fetch) {
+      const dataKeys = Object.keys(_criterion.fetch) as CriteriaDataKey[]
+
+      for (const dataKey of dataKeys) {
         switch (dataKey) {
           case CriteriaDataKey.MEDICATION_DATA:
           case CriteriaDataKey.BIOLOGY_DATA:
           case CriteriaDataKey.GHM_DATA:
           case CriteriaDataKey.CCAM_DATA:
           case CriteriaDataKey.CIM_10_DIAGNOSTIC: {
-            if (_criterion.data[dataKey] === 'loading') _criterion.data[dataKey] = []
             const currentSelectedCriteria = selectedCriteria.filter(
               (criterion: SelectedCriteriaType) =>
                 criterion.type === _criterion.id ||
@@ -1927,18 +1922,10 @@ export const getDataFromFetch = async (
                   currentcriterion.code.length > 0
                 ) {
                   for (const code of currentcriterion.code) {
-                    const allreadyHere = oldCriterion?.data?.[dataKey]
-                      ? oldCriterion?.data?.[dataKey].find((data: any) => data.id === code?.id)
-                      : undefined
-
-                    if (!allreadyHere) {
-                      _criterion.data[dataKey] = [
-                        ..._criterion.data[dataKey],
-                        ...(await _criterion.fetch[fetchKey](code?.id, true))
-                      ]
-                    } else {
-                      _criterion.data[dataKey] = [..._criterion.data[dataKey], allreadyHere]
-                    }
+                    const prevData = prevDataCache[dataKey]?.find((data: any) => data.id === code?.id)
+                    const codeData = prevData ? [prevData] : await _criterion.fetch[dataKey]?.(code?.id, true)
+                    const existingCodes = criteriaDataCache.data[dataKey] || []
+                    criteriaDataCache.data[dataKey] = [...existingCodes, ...(codeData || [])]
                   }
                 }
               }
@@ -1946,32 +1933,21 @@ export const getDataFromFetch = async (
             break
           }
           default:
-            if (
-              oldCriterion &&
-              oldCriterion?.data &&
-              oldCriterion?.data?.[dataKey] &&
-              oldCriterion?.data?.[dataKey] === 'loading'
-            ) {
-              _criterion.data[dataKey] = await _criterion.fetch[fetchKey]()
-            } else if (
-              oldCriterion &&
-              oldCriterion?.data &&
-              oldCriterion?.data?.[dataKey] &&
-              oldCriterion?.data?.[dataKey] !== 'loading'
-            ) {
-              _criterion.data[dataKey] = oldCriterion.data[dataKey]
+            criteriaDataCache.data[dataKey] = prevDataCache[dataKey]
+            if (criteriaDataCache.data[dataKey] === undefined) {
+              criteriaDataCache.data[dataKey] = await _criterion.fetch[dataKey]?.()
             }
             break
         }
       }
     }
+    updatedCriteriaData.push(criteriaDataCache)
 
-    _criterion.subItems =
-      _criterion.subItems && _criterion.subItems.length > 0
-        ? await getDataFromFetch(_criterion.subItems, selectedCriteria, oldCriterion?.subItems ?? [])
-        : []
+    if (_criterion.subItems && _criterion.subItems.length > 0) {
+      updatedCriteriaData.push(...(await getDataFromFetch(_criterion.subItems, selectedCriteria, oldCriteriaCache)))
+    }
   }
-  return _criteria
+  return updatedCriteriaData
 }
 
 export const joinRequest = async (oldJson: string, newJson: string, parentId: number | null): Promise<any> => {

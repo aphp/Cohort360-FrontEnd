@@ -48,12 +48,17 @@ const CalendarRange = ({ value, label, inline = false, onError, disabled = false
           <CalendarInput
             disabled={disabled}
             label="Après le"
-            value={startDate}
+            value={startDate || null}
             onChange={(value) => setStartDate(value)}
           />
         </Grid>
         <Grid item xs={12} md={inline ? 6 : 12}>
-          <CalendarInput disabled={disabled} label="Avant le" value={endDate} onChange={(value) => setEndDate(value)} />
+          <CalendarInput
+            disabled={disabled}
+            label="Avant le"
+            value={endDate || null}
+            onChange={(value) => setEndDate(value)}
+          />
         </Grid>
       </Grid>
       {error.isError && (

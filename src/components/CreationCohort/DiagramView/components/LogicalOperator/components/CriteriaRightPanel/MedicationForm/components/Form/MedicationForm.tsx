@@ -23,22 +23,24 @@ import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchMedication } from 'state/medication'
-import { CriteriaName, HierarchyTree } from 'types'
+import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
+import services from 'services/aphp'
+import { MedicationDataType } from 'types/requestCriterias'
 
 type MedicationFormProps = {
   isOpen: boolean
   isEdition: boolean
-  criteria: any
-  selectedCriteria: any
+  criteriaData: CriteriaItemDataCache
+  selectedCriteria: MedicationDataType
   onChangeValue: (key: string, value: any) => void
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
 }
 
 const MedicationForm: React.FC<MedicationFormProps> = (props) => {
-  const { isOpen, isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
+  const { isOpen, isEdition, criteriaData, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
@@ -48,21 +50,21 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const getMedicationOptions = async (searchValue: string) =>
-    await criteria.fetch.fetchMedicationData(searchValue, false)
+    await services.cohortCreation.fetchMedicationData(searchValue, false)
 
   const _onSubmit = () => {
     onChangeSelectedCriteria(currentState)
     dispatch(fetchMedication())
   }
 
-  if (criteria?.data?.prescriptionTypes === 'loading' || criteria?.data?.administrations === 'loading') {
+  if (criteriaData?.data?.prescriptionTypes === 'loading' || criteriaData?.data?.administrations === 'loading') {
     return <></>
   }
 
   const selectedCriteriaPrescriptionType = currentState.prescriptionType
-    ? currentState.prescriptionType.map((prescriptionType: any) => {
-        const criteriaPrescriptionType = criteria.data.prescriptionTypes
-          ? criteria.data.prescriptionTypes.find((p: any) => p.id === prescriptionType.id)
+    ? currentState.prescriptionType.map((prescriptionType) => {
+        const criteriaPrescriptionType = criteriaData.data.prescriptionTypes
+          ? criteriaData.data.prescriptionTypes.find((p: any) => p.id === prescriptionType.id)
           : null
         return {
           id: prescriptionType.id,
@@ -72,9 +74,9 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
     : []
 
   const selectedCriteriaAdministration = currentState.administration
-    ? currentState.administration.map((administration: any) => {
-        const criteriaAdministration = criteria.data.administrations
-          ? criteria.data.administrations.find((p: any) => p.id === administration.id)
+    ? currentState.administration.map((administration) => {
+        const criteriaAdministration = criteriaData.data.administrations
+          ? criteriaData.data.administrations.find((p: any) => p.id === administration.id)
           : null
         return {
           id: administration.id,
@@ -85,10 +87,9 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
 
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code: any) => {
-        const criteriaCode =
-          criteria.data.medicationData && criteria.medicationData !== 'loading'
-            ? criteria.data.medicationData.find((g: any) => g.id === code.id)
-            : null
+        const criteriaCode = criteriaData.data.medicationData
+          ? criteriaData.data.medicationData.find((g: any) => g.id === code.id)
+          : null
         return {
           id: code.id,
           label: code.label ? code.label : criteriaCode?.label ?? '?',
@@ -183,7 +184,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             noOptionsText="Veuillez entrer un code de médicament"
             className={classes.inputItem}
             autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteria?.data?.medicationData || []}
+            autocompleteOptions={criteriaData.data.medicationData || []}
             getAutocompleteOptions={getMedicationOptions}
             onChange={(e, value) => {
               onChangeValue('code', value)
@@ -194,7 +195,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               multiple
               id="criteria-prescription-type-autocomplete"
               className={classes.inputItem}
-              options={criteria?.data?.prescriptionTypes || []}
+              options={criteriaData?.data?.prescriptionTypes || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={selectedCriteriaPrescriptionType}
@@ -206,7 +207,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             multiple
             id="criteria-prescription-type-autocomplete"
             className={classes.inputItem}
-            options={criteria?.data?.administrations || []}
+            options={criteriaData.data.administrations || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={selectedCriteriaAdministration}

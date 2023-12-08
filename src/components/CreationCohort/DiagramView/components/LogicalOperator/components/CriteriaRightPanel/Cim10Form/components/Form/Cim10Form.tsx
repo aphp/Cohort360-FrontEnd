@@ -21,22 +21,24 @@ import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition } from 'state/pmsi'
-import { CriteriaName, HierarchyTree } from 'types'
+import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
+import services from 'services/aphp'
+import { Cim10DataType } from 'types/requestCriterias'
 
 type Cim10FormProps = {
   isOpen: boolean
   isEdition?: boolean
-  criteria: any
-  selectedCriteria: any
+  criteriaData: CriteriaItemDataCache
+  selectedCriteria: Cim10DataType
   onChangeValue: (key: string, value: any) => void
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
 }
 
 const Cim10Form: React.FC<Cim10FormProps> = (props) => {
-  const { isOpen, isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
+  const { isOpen, isEdition, criteriaData, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
@@ -47,20 +49,13 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     onChangeSelectedCriteria(currentState)
     dispatch(fetchCondition())
   }
-  const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue, false)
-
-  if (
-    criteria?.data?.diagnosticTypes === 'loading' ||
-    criteria?.data?.statusDiagnostic === 'loading' ||
-    criteria?.data?.cim10Diagnostic === 'loading'
-  ) {
-    return <></>
-  }
+  const getDiagOptions = async (searchValue: string) =>
+    await services.cohortCreation.fetchCim10Diagnostic(searchValue, false)
 
   const defaultValuesCode = currentState.code
-    ? currentState.code.map((code: any) => {
-        const criteriaCode = criteria.data.cim10Diagnostic
-          ? criteria.data.cim10Diagnostic.find((c: any) => c.id === code.id)
+    ? currentState.code.map((code) => {
+        const criteriaCode = criteriaData.data.cim10Diagnostic
+          ? criteriaData.data.cim10Diagnostic.find((c: any) => c.id === code.id)
           : null
         return {
           id: code.id,
@@ -69,9 +64,9 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       })
     : []
   const defaultValuesType = currentState.diagnosticType
-    ? currentState.diagnosticType.map((diagnosticType: any) => {
-        const criteriaType = criteria.data.diagnosticTypes
-          ? criteria.data.diagnosticTypes.find((g: any) => g.id === diagnosticType.id)
+    ? currentState.diagnosticType.map((diagnosticType) => {
+        const criteriaType = criteriaData.data.diagnosticTypes
+          ? criteriaData.data.diagnosticTypes.find((g: any) => g.id === diagnosticType.id)
           : null
         return {
           id: diagnosticType.id,
@@ -160,7 +155,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             noOptionsText="Veuillez entrer un code ou un diagnostic CIM10"
             className={classes.inputItem}
             autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteria?.data?.cim10Diagnostic || []}
+            autocompleteOptions={criteriaData.data.cim10Diagnostic || []}
             getAutocompleteOptions={getDiagOptions}
             onChange={(e, value) => {
               onChangeValue('code', value)
@@ -170,9 +165,9 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             multiple
             id="criteria-cim10-type-autocomplete"
             className={classes.inputItem}
-            options={criteria?.data?.diagnosticTypes || []}
+            options={criteriaData.data.diagnosticTypes || []}
             getOptionLabel={(option) => option.label}
-            isOptionEqualToValue={(option: any, value: any) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesType}
             onChange={(e, value) => onChangeValue('diagnosticType', value)}
             renderInput={(params) => <TextField {...params} label="Type de diagnostic" />}

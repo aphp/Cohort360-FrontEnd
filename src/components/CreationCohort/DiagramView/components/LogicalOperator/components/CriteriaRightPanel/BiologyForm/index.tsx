@@ -11,30 +11,34 @@ import { PmsiListType } from 'state/pmsi'
 import { fetchBiology } from 'state/biology'
 import { useAppDispatch, useAppSelector } from 'state'
 import { EXPLORATION } from 'utils/constants'
-import { Comparators, RessourceType } from 'types/requestCriterias'
+import { Comparators, ObservationDataType, RessourceType } from 'types/requestCriterias'
 import { CriteriaDrawerComponentProps } from 'types'
 
-export const defaultBiology = {
+export const defaultBiology: Omit<ObservationDataType, 'id'> = {
   type: RessourceType.OBSERVATION,
   title: 'Critères de biologie',
   code: [],
   isLeaf: false,
   valueComparator: Comparators.GREATER_OR_EQUAL,
   occurrence: 1,
-  occurrenceComparator: '>=',
+  occurrenceComparator: Comparators.GREATER_OR_EQUAL,
   startOccurrence: '',
   endOccurrence: '',
-  isInclusive: true
+  isInclusive: true,
+  encounterStartDate: null,
+  encounterEndDate: null
 }
 
 const Index = (props: CriteriaDrawerComponentProps) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy' | 'search'>(
     selectedCriteria ? 'form' : 'hierarchy'
   )
-  const [defaultCriteria, setDefaultCriteria] = useState(selectedCriteria || defaultBiology)
+  const [defaultCriteria, setDefaultCriteria] = useState<ObservationDataType>(
+    (selectedCriteria as ObservationDataType) || defaultBiology
+  )
 
   const isEdition = selectedCriteria !== null
   const dispatch = useAppDispatch()
@@ -49,7 +53,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       value,
       defaultCriteria,
       newHierarchy,
-      setDefaultCriteria,
+      (updatedCriteria) => setDefaultCriteria(updatedCriteria as ObservationDataType),
       selectedTab,
       defaultBiology.type,
       dispatch
@@ -84,7 +88,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         <BiologyForm
           isOpen={selectedTab === 'form'}
           isEdition={isEdition}
-          criteria={criteria}
+          criteriaData={criteriaData}
           selectedCriteria={defaultCriteria}
           onChangeValue={_onChangeFormValue}
           onChangeSelectedCriteria={onChangeSelectedCriteria}
@@ -95,7 +99,6 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         <BiologySearch
           isEdition={isEdition}
           selectedCriteria={defaultCriteria}
-          criteria={criteria}
           onChangeSelectedCriteria={_onChangeSelectedHierarchy}
           onConfirm={() => setSelectedTab('form')}
           goBack={goBack}

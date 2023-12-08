@@ -28,6 +28,8 @@ import useStyles from './styles'
 import { useDebounce } from 'utils/debounce'
 import { ValueSet } from 'types'
 import { ValueSetWithHierarchy } from 'services/aphp/cohortCreation/fetchObservation'
+import services from 'services/aphp'
+import { ObservationDataType } from 'types/requestCriterias'
 
 type BiologySearchListItemProps = {
   label: string
@@ -84,15 +86,14 @@ const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
 
 type BiologySearchProps = {
   isEdition?: boolean
-  criteria: any
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
-  selectedCriteria: any
+  selectedCriteria: ObservationDataType
   onConfirm: () => void
 }
 
 const BiologySearch: React.FC<BiologySearchProps> = (props) => {
-  const { isEdition, criteria, goBack, onChangeSelectedCriteria, onConfirm, selectedCriteria } = props
+  const { isEdition, goBack, onChangeSelectedCriteria, onConfirm, selectedCriteria } = props
   const { classes } = useStyles()
 
   const [selectedTab, setSelectedTab] = useState<'anabio' | 'loinc'>('anabio')
@@ -119,8 +120,8 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
   const _onNext = () => {
     const formattedSelectedItems =
       selectedItems && selectedItems.length > 0
-        ? [...selectedCriteria.code, selectedItems.map((v) => ({ id: v.code, label: v.display }))].flat()
-        : [...selectedCriteria.code]
+        ? [...(selectedCriteria.code || []), selectedItems.map((v) => ({ id: v.code, label: v.display }))].flat()
+        : [...(selectedCriteria.code || [])]
 
     onChangeSelectedCriteria(formattedSelectedItems)
     onConfirm()
@@ -130,7 +131,7 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
     if (debouncedSearchItem && debouncedSearchItem.length >= 2) {
       try {
         setLoading(true)
-        const biologySearchResults = await criteria.fetch.fetchBiologySearch(debouncedSearchItem)
+        const biologySearchResults = await services.cohortCreation.fetchBiologySearch(debouncedSearchItem)
 
         setBiologySearchResults(
           biologySearchResults ?? {

@@ -35,6 +35,7 @@ import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable 
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import { defaultClaim } from '../../index'
 import { HierarchyTree } from 'types'
+import { GhmDataType } from 'types/requestCriterias'
 
 type GhmListItemProps = {
   ghmItem: PmsiListType
@@ -137,7 +138,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
 
 type GhmHierarchyProps = {
   isOpen: boolean
-  selectedCriteria: any
+  selectedCriteria: GhmDataType
   goBack: (data: any) => void
   onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
   onConfirm: () => void
@@ -165,7 +166,7 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
     if (!newList.code) {
       newList.code = selectedCriteria.code
     }
-    newList.code.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, ghmHierarchy).equivalentRow)
+    newList.code?.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, ghmHierarchy).equivalentRow)
     setCurrentState(newList)
   }, [initialState, ghmHierarchy])
 

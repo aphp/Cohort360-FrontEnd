@@ -23,15 +23,16 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchBiology } from 'state/biology'
-import { CriteriaName, HierarchyTree } from 'types'
+import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 import { ObservationDataType, Comparators } from 'types/requestCriterias'
+import services from 'services/aphp'
 
 type BiologyFormProps = {
   isOpen: boolean
   isEdition: boolean
-  criteria: any
+  criteriaData: CriteriaItemDataCache
   selectedCriteria: ObservationDataType
   onChangeValue: (key: string, value: any) => void
   goBack: (data: any) => void
@@ -39,7 +40,7 @@ type BiologyFormProps = {
 }
 
 const BiologyForm: React.FC<BiologyFormProps> = (props) => {
-  const { isOpen, isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
+  const { isOpen, isEdition, criteriaData, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
@@ -56,9 +57,9 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   }
 
   const defaultValuesCode = currentState.code
-    ? currentState.code.map((code: any) => {
-        const criteriaCode = criteria.data.biologyData
-          ? criteria.data.biologyData.find((g: any) => g.id === code.id)
+    ? currentState.code.map((code) => {
+        const criteriaCode = criteriaData.data.biologyData
+          ? criteriaData.data.biologyData.find((g: any) => g.id === code.id)
           : null
         return {
           id: code.id,
@@ -70,7 +71,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   useEffect(() => {
     const checkChildren = async () => {
       try {
-        const getChildrenResp = await criteria.fetch.fetchBiologyHierarchy(currentState.code?.[0].id)
+        const getChildrenResp = await services.cohortCreation.fetchBiologyHierarchy(currentState.code?.[0].id)
 
         if (getChildrenResp.length > 0) {
           if (currentState.isLeaf !== false) {
@@ -138,7 +139,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            defaultValue="Critères de biologie"
             variant="outlined"
             value={currentState.title}
             onChange={(e) => onChangeValue('title', e.target.value)}
@@ -171,7 +171,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
 
             <Grid container item style={{ margin: '1em 0px', width: 'calc(100%-2em)' }}>
               {defaultValuesCode.length > 0 ? (
-                defaultValuesCode.map((valueCode: any, index: number) => (
+                defaultValuesCode.map((valueCode, index: number) => (
                   <Chip
                     key={index}
                     style={{ margin: 3 }}
@@ -185,7 +185,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                     onDelete={() =>
                       onChangeValue(
                         'code',
-                        defaultValuesCode.filter((code: any) => code !== valueCode)
+                        defaultValuesCode.filter((code) => code !== valueCode)
                       )
                     }
                   />

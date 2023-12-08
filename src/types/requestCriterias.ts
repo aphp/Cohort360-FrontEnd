@@ -1,16 +1,5 @@
 import { ScopeTreeRow, ValueSetSystem } from 'types'
-import {
-  DocumentAttachmentMethod,
-  DurationRangeType,
-  GenderStatus,
-  LabelObject,
-  SearchByTypes
-} from './searchCriterias'
-
-export enum MedicationType {
-  Request = 'MedicationRequest',
-  Administration = 'MedicationAdministration'
-}
+import { DocumentAttachmentMethod, DurationRangeType, LabelObject, SearchByTypes } from './searchCriterias'
 
 export enum MedicationTypeLabel {
   Request = 'Prescription',
@@ -61,11 +50,16 @@ export enum RessourceTypeLabels {
   IMAGING = 'Imagerie'
 }
 
-export type SelectedCriteriaType = {
+export type CommonCriteriaDataType = {
   id: number
   error?: boolean
+  type: RessourceType
   encounterService?: ScopeTreeRow[]
-} & (
+  isInclusive?: boolean
+  title: string
+}
+
+export type SelectedCriteriaType =
   | CcamDataType
   | Cim10DataType
   | DemographicDataType
@@ -75,9 +69,11 @@ export type SelectedCriteriaType = {
   | MedicationDataType
   | ObservationDataType
   | IPPListDataType
-  | EncounterDataType
   | ImagingDataType
-)
+
+export type DraftSelectedCriteriaType = SelectedCriteriaType & {
+  id?: number
+}
 
 export enum CriteriaDataKey {
   GENDER = 'gender',
@@ -100,11 +96,12 @@ export enum CriteriaDataKey {
   PRESCRIPTION_TYPES = 'prescriptionTypes',
   ADMINISTRATIONS = 'administrations',
   BIOLOGY_DATA = 'biologyData',
-  MODALITIES = 'modalities'
+  MODALITIES = 'modalities',
+  DOC_TYPES = 'docTypes',
+  STATUS_DIAGNOSTIC = 'statusDiagnostic'
 }
 
-export type CcamDataType = {
-  title: string
+export type CcamDataType = CommonCriteriaDataType & {
   type: RessourceType.PROCEDURE
   hierarchy: undefined
   code: LabelObject[] | null
@@ -116,11 +113,9 @@ export type CcamDataType = {
   label: undefined
   startOccurrence: string | null
   endOccurrence: string | null
-  isInclusive?: boolean
 }
 
-export type Cim10DataType = {
-  title: string
+export type Cim10DataType = CommonCriteriaDataType & {
   type: RessourceType.CONDITION
   code: LabelObject[] | null
   diagnosticType: LabelObject[] | null
@@ -131,25 +126,20 @@ export type Cim10DataType = {
   label: undefined
   startOccurrence: string | null
   endOccurrence: string | null
-  isInclusive?: boolean
 }
 
-export type DemographicDataType = {
-  title: string
+export type DemographicDataType = CommonCriteriaDataType & {
   type: RessourceType.PATIENT
-  genders: GenderStatus[] | null
+  genders: LabelObject[] | null
   vitalStatus: LabelObject[] | null
   age: DurationRangeType
   birthdates: DurationRangeType
   deathDates: DurationRangeType
-  isInclusive?: boolean
 }
 
-export type IPPListDataType = {
-  title: string
+export type IPPListDataType = CommonCriteriaDataType & {
   type: RessourceType.IPP_LIST
   search: string
-  isInclusive?: boolean
 }
 
 export type DocType = {
@@ -158,8 +148,7 @@ export type DocType = {
   type: string
 }
 
-export type DocumentDataType = {
-  title: string
+export type DocumentDataType = CommonCriteriaDataType & {
   type: RessourceType.DOCUMENTS
   search: string
   searchBy: SearchByTypes.TEXT | SearchByTypes.DESCRIPTION
@@ -170,11 +159,9 @@ export type DocumentDataType = {
   occurrenceComparator: Comparators
   startOccurrence: string | null
   endOccurrence: string | null
-  isInclusive?: boolean
 }
 
-export type GhmDataType = {
-  title: string
+export type GhmDataType = CommonCriteriaDataType & {
   type: RessourceType.CLAIM
   code: LabelObject[] | null
   encounterEndDate: string | null
@@ -184,7 +171,6 @@ export type GhmDataType = {
   label: undefined
   startOccurrence: string | null
   endOccurrence: string | null
-  isInclusive?: boolean
 }
 export enum Comparators {
   LESS_OR_EQUAL = '<=',
@@ -195,9 +181,8 @@ export enum Comparators {
   BETWEEN = '<x>'
 }
 
-export type EncounterDataType = {
+export type EncounterDataType = CommonCriteriaDataType & {
   type: RessourceType.ENCOUNTER
-  title: string
   age: DurationRangeType
   duration: DurationRangeType
   admissionMode: LabelObject[] | null
@@ -206,23 +191,20 @@ export type EncounterDataType = {
   priseEnChargeType: LabelObject[] | null
   typeDeSejour: LabelObject[] | null
   fileStatus: LabelObject[] | null
-  discharge: LabelObject[] | null
   reason: LabelObject[] | null
   destination: LabelObject[] | null
   provenance: LabelObject[] | null
   admission: LabelObject[] | null
   encounterService: ScopeTreeRow[] | null
-  encounterStartDate: string | null
-  encounterEndDate: string | null
+  encounterStartDate?: string | null
+  encounterEndDate?: string | null
   occurrence: number
   occurrenceComparator: Comparators
-  startOccurrence: string | null
-  endOccurrence: string | null
-  isInclusive?: boolean
+  startOccurrence?: string
+  endOccurrence?: string
 }
 
-export type MedicationDataType = {
-  title: string
+export type MedicationDataType = CommonCriteriaDataType & {
   code: LabelObject[] | null
   prescriptionType: LabelObject[] | null
   administration: LabelObject[] | null
@@ -232,17 +214,15 @@ export type MedicationDataType = {
   endOccurrence: string | null
   encounterEndDate: string | null
   encounterStartDate: string | null
-  isInclusive?: boolean
 } & (
-  | {
-      type: RessourceType.MEDICATION_REQUEST
-      prescriptionType: LabelObject[] | null
-    }
-  | { type: RessourceType.MEDICATION_ADMINISTRATION }
-)
+    | {
+        type: RessourceType.MEDICATION_REQUEST
+        prescriptionType: LabelObject[] | null
+      }
+    | { type: RessourceType.MEDICATION_ADMINISTRATION }
+  )
 
-export type ObservationDataType = {
-  title: string
+export type ObservationDataType = CommonCriteriaDataType & {
   type: RessourceType.OBSERVATION
   code: LabelObject[] | null
   isLeaf: boolean
@@ -253,13 +233,11 @@ export type ObservationDataType = {
   occurrenceComparator: Comparators
   startOccurrence: string | null
   endOccurrence: string | null
-  isInclusive?: boolean
   encounterStartDate: string | null
   encounterEndDate: string | null
 }
 
-export type ImagingDataType = {
-  title: string
+export type ImagingDataType = CommonCriteriaDataType & {
   type: RessourceType.IMAGING
   studyStartDate: string | null
   studyEndDate: string | null
@@ -286,7 +264,6 @@ export type ImagingDataType = {
   occurrenceComparator: Comparators
   startOccurrence: string | null
   endOccurrence: string | null
-  isInclusive?: boolean
 }
 
 export enum VitalStatusLabel {

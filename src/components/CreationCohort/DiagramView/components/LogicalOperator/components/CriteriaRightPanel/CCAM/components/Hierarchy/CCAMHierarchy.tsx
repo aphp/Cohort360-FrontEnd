@@ -35,6 +35,7 @@ import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable 
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import { defaultProcedure } from '../../index'
 import { HierarchyTree } from 'types'
+import { CcamDataType } from 'types/requestCriterias'
 
 type ProcedureListItemProps = {
   procedureItem: PmsiListType
@@ -130,7 +131,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((procedureHierarchySubItem: any, index: number) =>
+            subItems.map((procedureHierarchySubItem, index: number) =>
               procedureHierarchySubItem.id === 'loading' ? (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
@@ -155,7 +156,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
 
 type ProcedureHierarchyProps = {
   isOpen: boolean
-  selectedCriteria: any
+  selectedCriteria: CcamDataType
   goBack: (data: any) => void
   onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
   isEdition?: boolean
@@ -179,7 +180,7 @@ const ProcedureHierarchy: React.FC<ProcedureHierarchyProps> = (props) => {
     if (!newList.code) {
       newList.code = selectedCriteria.code
     }
-    newList.code.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, ccamHierarchy).equivalentRow)
+    newList.code?.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, ccamHierarchy).equivalentRow)
     setCurrentState(newList)
   }, [initialState, ccamHierarchy])
 

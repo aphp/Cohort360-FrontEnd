@@ -39,6 +39,7 @@ import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable 
 import { defaultMedication } from '../../index'
 import { PmsiListType } from 'state/pmsi'
 import { HierarchyTree } from 'types'
+import { MedicationDataType } from 'types/requestCriterias'
 
 type MedicationListItemProps = {
   medicationItem: MedicationListType
@@ -169,7 +170,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
 
 type MedicationExplorationProps = {
   isOpen: boolean
-  selectedCriteria: any
+  selectedCriteria: MedicationDataType
   goBack: (data: any) => void
   onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
   onConfirm: () => void
@@ -211,7 +212,7 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
     if (!newList.code) {
       newList.code = selectedCriteria.code
     }
-    newList.code.map(
+    newList.code?.map(
       (item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, medicationHierarchy).equivalentRow
     )
     setCurrentState(newList)

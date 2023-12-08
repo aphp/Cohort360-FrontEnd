@@ -298,7 +298,7 @@ export const flatItems = (items: any[] | undefined): { flattedSelectedItems: any
 
 export const initSyncHierarchyTableEffect = async (
   resourceHierarchy: PmsiListType[],
-  selectedCriteria: SelectedCriteriaType,
+  selectedCriteria: SelectedCriteriaType | null,
   selectedCodes: PmsiListType[],
   fetchResource: AsyncThunk<any, void, { state: RootState }>,
   resourceType: RessourceType,
@@ -511,7 +511,7 @@ export const syncOnChangeFormValue = async (
   value: any,
   selectedCriteria: SelectedCriteriaType,
   resourceHierarchy: PmsiListType[],
-  setDefaultCriteria: (value: PmsiListType[]) => void,
+  setDefaultCriteria: (value: SelectedCriteriaType) => void,
   selectedTab: string,
   resourceType: RessourceType,
   dispatch: AppDispatch
