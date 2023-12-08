@@ -191,7 +191,6 @@ export type EncounterDataType = CommonCriteriaDataType & {
   priseEnChargeType: LabelObject[] | null
   typeDeSejour: LabelObject[] | null
   fileStatus: LabelObject[] | null
-  discharge?: LabelObject[]
   reason: LabelObject[] | null
   destination: LabelObject[] | null
   provenance: LabelObject[] | null
