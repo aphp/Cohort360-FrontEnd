@@ -46,7 +46,8 @@
   },
   "overrides": {
     "nth-check": "2.1.1",
-    "tough-cookie": "4.1.3"
+    "tough-cookie": "4.1.3",
+    "postcss": "8.4.31"
   },
   "scripts": {
     "start": "vite",
