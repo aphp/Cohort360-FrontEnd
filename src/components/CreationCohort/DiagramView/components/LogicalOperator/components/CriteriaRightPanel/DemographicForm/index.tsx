@@ -37,6 +37,8 @@ export const mappingCriteria = (criteriaToMap: any, key: CriteriaDataKey, mappin
       const mappedCriteria = mapping.data?.[key]?.find((c: any) => c?.id === criteria?.id)
       return mappedCriteria
     })
+  } else {
+    return []
   }
 }
 
