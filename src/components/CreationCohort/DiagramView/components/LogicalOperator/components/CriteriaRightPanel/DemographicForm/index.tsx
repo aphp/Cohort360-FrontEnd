@@ -26,7 +26,6 @@ import { convertStringToDuration, checkMinMaxValue } from 'utils/age'
 import { CriteriaDrawerComponentProps, CriteriaItemDataCache } from 'types'
 
 enum Error {
-  EMPTY_FORM,
   INCOHERENT_AGE_ERROR,
   NO_ERROR
 }
@@ -65,18 +64,6 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
     setError(Error.NO_ERROR)
     const _age0 = convertStringToDuration(age[0])
     const _age1 = convertStringToDuration(age[1])
-    if (
-      vitalStatus?.length === 0 &&
-      genders?.length === 0 &&
-      birthdates[0] === null &&
-      birthdates[1] === null &&
-      age[0] === null &&
-      age[1] === null &&
-      deathDates[0] === null &&
-      deathDates[1] === null
-    ) {
-      setError(Error.EMPTY_FORM)
-    }
     if (_age0 !== null && _age1 === null) {
       setError(Error.INCOHERENT_AGE_ERROR)
     }
@@ -231,7 +218,7 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
             type="submit"
             form="demographic-form"
             variant="contained"
-            disabled={error === Error.INCOHERENT_AGE_ERROR || error === Error.EMPTY_FORM}
+            disabled={error === Error.INCOHERENT_AGE_ERROR}
           >
             Confirmer
           </Button>
