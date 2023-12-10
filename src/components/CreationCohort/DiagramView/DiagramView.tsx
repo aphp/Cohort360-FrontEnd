@@ -7,15 +7,12 @@ import TemporalConstraintCard from './components/TemporalConstraintCard/Temporal
 import CohortCreationBreadcrumbs from './components/Breadcrumbs/Breadcrumbs'
 
 import { useAppSelector } from 'state'
-import { MeState } from 'state/me'
 
 import useStyles from './styles'
 
 const DiagramView: React.FC = () => {
   const { selectedPopulation = [] } = useAppSelector((state) => state.cohortCreation.request || {})
-  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
-
-  const maintenanceIsActive = meState?.maintenance?.active
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
   const { classes } = useStyles()
 

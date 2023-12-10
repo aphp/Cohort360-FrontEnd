@@ -15,7 +15,7 @@ const CohortNoPatient = () => {
   const { classes, cx } = useStyles()
   const navigate = useNavigate()
 
-  const { openDrawer } = useAppSelector((state) => ({ openDrawer: state.drawer }))
+  const openDrawer = useAppSelector((state) => state.drawer)
 
   return (
     <Grid

@@ -35,7 +35,6 @@ import {
   unbuildCohortCreation,
   addActionToNavHistory
 } from 'state/cohortCreation'
-import { MeState } from 'state/me'
 
 import { CohortCreationCounterType, CurrentSnapshot, RequestType, SimpleStatus, Snapshot } from 'types'
 
@@ -91,8 +90,7 @@ const ControlPanel: React.FC<{
     uuid: ''
   })
 
-  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
-  const maintenanceIsActive = meState?.maintenance?.active
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
   const cohortLimit = shortCohortLimit ?? SHORT_COHORT_LIMIT
 

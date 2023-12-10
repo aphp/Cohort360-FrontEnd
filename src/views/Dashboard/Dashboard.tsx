@@ -36,10 +36,8 @@ const Dashboard: React.FC<{
   const [selectedTab, selectTab] = useState(tabName || 'preview')
   const [tabs, setTabs] = useState<Tabs[]>([])
 
-  const { open, dashboard } = useAppSelector((state) => ({
-    open: state.drawer,
-    dashboard: state.exploredCohort
-  }))
+  const open = useAppSelector((state) => state.drawer)
+  const dashboard = useAppSelector((state) => state.exploredCohort)
 
   const onChangeTabs = () => {
     switch (context) {

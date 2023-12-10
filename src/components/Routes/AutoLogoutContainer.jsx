@@ -18,10 +18,8 @@ const AutoLogoutContainer = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const { me } = useAppSelector((state) => ({ me: state.me }))
-  const { isOpen } = useAppSelector((state) => ({
-    isOpen: state.autoLogout.isOpen
-  }))
+  const me = useAppSelector((state) => state.me)
+  const isOpen = useAppSelector((state) => state.autoLogout.isOpen)
 
   const handleOnIdle = () => {
     logout()

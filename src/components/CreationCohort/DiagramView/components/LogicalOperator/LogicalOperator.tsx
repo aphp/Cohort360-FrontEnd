@@ -23,7 +23,6 @@ import {
   suspendCount,
   unsuspendCount
 } from 'state/cohortCreation'
-import { MeState } from 'state/me'
 
 import useStyles from './styles'
 import { SelectedCriteriaType } from 'types/requestCriterias'
@@ -50,8 +49,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   const { request } = useAppSelector((state) => state.cohortCreation || {})
   const { loading = false, criteriaGroup = [], selectedCriteria = [] } = request
 
-  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
-  const maintenanceIsActive = meState?.maintenance?.active
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
   const displayingItem = criteriaGroup.filter((_criteriaGroup: CriteriaGroupType) => _criteriaGroup.id === itemId)
 

@@ -36,9 +36,7 @@ import NdaFilter from 'components/Filters/NdaFilter'
 const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
   const [toggleModal, setToggleModal] = useState(false)
-  const { patient } = useAppSelector((state) => ({
-    patient: state.patient
-  }))
+  const patient = useAppSelector((state) => state.patient)
   const searchResults = {
     deidentified: patient?.deidentified || false,
     totalDocs: patient?.documents?.count ?? 0,

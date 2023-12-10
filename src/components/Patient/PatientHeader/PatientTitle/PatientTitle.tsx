@@ -22,9 +22,7 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
   const search = new URLSearchParams(location.search)
   const groupId = search.get('groupId') ?? undefined
 
-  const { cohort } = useAppSelector((state) => ({
-    cohort: state.exploredCohort
-  }))
+  const cohort = useAppSelector((state) => state.exploredCohort)
   const [anchorEl, setAnchorEl] = useState(null)
 
   const handleMenuClose = () => setAnchorEl(null)

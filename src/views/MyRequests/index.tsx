@@ -27,15 +27,9 @@ import ModalDeleteRequests from 'components/Requests/Modals/ModalDeleteRequests/
 import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
 
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import { CohortState, setSelectedCohort, fetchCohorts as fetchCohortsList } from 'state/cohort'
-import { ProjectState, setSelectedProject, fetchProjects as fetchProjectsList } from 'state/project'
-import {
-  fetchRequests as fetchRequestsList,
-  RequestState,
-  setSelectedRequest,
-  setSelectedRequestShare
-} from 'state/request'
-import { MeState } from 'state/me'
+import { setSelectedCohort, fetchCohorts as fetchCohortsList } from 'state/cohort'
+import { setSelectedProject, fetchProjects as fetchProjectsList } from 'state/project'
+import { fetchRequests as fetchRequestsList, setSelectedRequest, setSelectedRequestShare } from 'state/request'
 import { RequestType, SimpleStatus } from 'types'
 import Button from 'components/ui/Button'
 import ProjectTable from 'components/Requests/ProjectsTable'
@@ -56,23 +50,14 @@ const MyRequests = () => {
     [setShareSuccessOrFailMessage]
   )
 
-  const { projectState, requestState, cohortState, meState } = useAppSelector<{
-    open: boolean
-    projectState: ProjectState
-    requestState: RequestState
-    cohortState: CohortState
-    meState: MeState
-  }>((state) => ({
-    open: state.drawer,
-    projectState: state.project,
-    requestState: state.request,
-    cohortState: state.cohort,
-    meState: state.me
-  }))
+  const projectState = useAppSelector((state) => state.project)
+  const requestState = useAppSelector((state) => state.request)
+  const cohortState = useAppSelector((state) => state.cohort)
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
+
   const { selectedProject } = projectState
   const { selectedRequest, selectedRequestShare, requestsList } = requestState
   const { selectedCohort } = cohortState
-  const maintenanceIsActive = meState?.maintenance?.active
 
   const loading = projectState.loading || requestState.loading || cohortState.loading
 

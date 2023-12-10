@@ -20,9 +20,6 @@ import ProjectRow from './ProjectRow'
 import { ProjectType, RequestType } from 'types'
 
 import { useAppSelector } from 'state'
-import { ProjectState } from 'state/project'
-import { RequestState } from 'state/request'
-import { CohortState } from 'state/cohort'
 
 import useStyles from './styles'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
@@ -37,18 +34,10 @@ type ProjectTableProps = {
 
 const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSelectedRequests, selectedRequests }) => {
   const { classes } = useStyles()
-  const { projectState, requestState, cohortState } = useAppSelector<{
-    projectState: ProjectState
-    requestState: RequestState
-    cohortState: CohortState
-  }>((state) => ({
-    projectState: state.project,
-    requestState: state.request,
-    cohortState: state.cohort
-  }))
-  const { projectsList } = projectState
-  const { requestsList } = requestState
-  const { cohortsList } = cohortState
+
+  const projectsList = useAppSelector((state) => state.project.projectsList)
+  const requestsList = useAppSelector((state) => state.request.requestsList)
+  const cohortsList = useAppSelector((state) => state.cohort.cohortsList)
 
   const [sortBy, setSortBy] = useState<'name' | 'modified_at'>('name')
   const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('asc')

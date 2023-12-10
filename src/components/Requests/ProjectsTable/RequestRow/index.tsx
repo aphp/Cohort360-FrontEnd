@@ -16,7 +16,6 @@ import { RequestType, Cohort } from 'types'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { setSelectedRequest, setSelectedRequestShare } from 'state/request'
-import { MeState } from 'state/me'
 import useStyles from '../styles'
 
 type RequestRowProps = {
@@ -32,12 +31,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const { meState } = useAppSelector<{
-    meState: MeState
-  }>((state) => ({
-    meState: state.me
-  }))
-  const maintenanceIsActive = meState?.maintenance?.active
+  const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
 
   const onEditRequest = (requestId: string) => {
     dispatch(setSelectedRequest({ uuid: requestId, name: '' }))

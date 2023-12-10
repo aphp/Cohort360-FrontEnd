@@ -40,10 +40,8 @@ const SearchPatient: React.FC<{}> = () => {
   const nominativeGroupsIds =
     practitioner && practitioner.nominativeGroupsIds ? practitioner.nominativeGroupsIds.join() : ''
 
-  const { deidentified, open } = useAppSelector((state) => ({
-    deidentified: state.me?.deidentified,
-    open: state.drawer
-  }))
+  const deidentified = useAppSelector((state) => state.me?.deidentified)
+  const open = useAppSelector((state) => state.drawer)
 
   const fetchPatients = async () => {
     try {

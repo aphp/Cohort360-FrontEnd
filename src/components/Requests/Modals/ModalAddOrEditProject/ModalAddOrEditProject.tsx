@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from '@mui/material'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { ProjectState, addProject, editProject, deleteProject } from 'state/project'
+import { addProject, editProject, deleteProject } from 'state/project'
 
 import { ProjectType } from 'types'
 
@@ -18,12 +18,7 @@ const ModalAddOrEditProject: React.FC<{
 }> = ({ open, onClose }) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
-  const { projectState } = useAppSelector<{
-    projectState: ProjectState
-  }>((state) => ({
-    projectState: state.project
-  }))
-  const { selectedProject } = projectState
+  const selectedProject = useAppSelector((state) => state.project.selectedProject)
 
   const isEdition = selectedProject !== null && selectedProject.uuid !== ''
 

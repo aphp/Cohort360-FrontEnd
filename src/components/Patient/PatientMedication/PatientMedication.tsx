@@ -55,9 +55,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   const [toggleModal, setToggleModal] = useState(false)
 
   const dispatch = useAppDispatch()
-  const { patient } = useAppSelector((state) => ({
-    patient: state.patient
-  }))
+  const patient = useAppSelector((state) => state.patient)
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [page, setPage] = useState(1)

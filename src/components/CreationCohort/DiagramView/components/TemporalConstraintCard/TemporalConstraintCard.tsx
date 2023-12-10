@@ -3,7 +3,6 @@ import { Button, Badge, Tooltip } from '@mui/material'
 
 import { buildCohortCreation, deleteTemporalConstraint } from 'state/cohortCreation'
 import { useAppSelector, useAppDispatch } from 'state'
-import { MeState } from 'state/me'
 
 import TemporalConstraintModal from './components/TemporalConstraintModal/TemporalConstraintModal'
 
@@ -16,14 +15,12 @@ const TemporalConstraint: React.FC = () => {
   const [temporalConstraintExist, setTemporalConstraintExist] = useState(false)
   const [disableTemporalConstraint, setDisableTemporalConstraint] = useState(false)
 
-  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
   const {
     criteriaGroup = [],
     temporalConstraints,
     selectedCriteria
   } = useAppSelector((state) => state.cohortCreation.request)
-
-  const maintenanceIsActive = meState?.maintenance?.active || false
 
   const findInitialStateRadio = temporalConstraints.find(({ idList }) => idList[0] === 'All')
   const temporalConstraintsNumber =

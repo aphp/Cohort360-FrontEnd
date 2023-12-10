@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useAppSelector } from 'state'
-import { ScopeState } from 'state/scope'
 import { ScopeTreeRow, ScopeType } from 'types'
 import { getCurrentScopeList } from 'utils/scopeTree'
 import ScopeTreeChipsets from './ScopeTreeChipsets'
@@ -55,12 +54,7 @@ type ScopeTreeProps = {
 
 const Index = (props: ScopeTreeProps) => {
   const { selectedItems, setSelectedItems, openPopulation, setOpenPopulations, executiveUnitType } = props
-
-  const { scopeState } = useAppSelector<{
-    scopeState: ScopeState
-  }>((state) => ({
-    scopeState: state.scope || {}
-  }))
+  const scopeState = useAppSelector((state) => state.scope || {})
   const isExecutiveUnit: boolean = !!executiveUnitType ?? false
   const scopesList: ScopeTreeRow[] = getCurrentScopeList(scopeState.scopesList, isExecutiveUnit) ?? []
   const [searchInput, setSearchInput] = useState('')
