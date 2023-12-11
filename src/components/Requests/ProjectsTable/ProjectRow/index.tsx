@@ -15,7 +15,6 @@ import { ProjectType, RequestType, Cohort } from 'types'
 import { useAppDispatch, useAppSelector } from 'state'
 import { setSelectedProject } from 'state/project'
 import { setSelectedRequest } from 'state/request'
-import { MeState } from 'state/me'
 
 import useStyles from '../styles'
 
@@ -39,12 +38,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
-  const { meState } = useAppSelector<{
-    meState: MeState
-  }>((state) => ({
-    meState: state.me
-  }))
-  const maintenanceIsActive = meState?.maintenance?.active
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
   const handleClickAddOrEditProject = (selectedProjectId: string | null) => {
     onSelectedRow([])

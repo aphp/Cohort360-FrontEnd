@@ -38,7 +38,6 @@ import ModalEditCohort from 'components/Requests/Modals/ModalEditCohort/ModalEdi
 import { useAppSelector, useAppDispatch } from 'state'
 import { favoriteExploredCohort } from 'state/exploredCohort'
 import { deleteCohort, setSelectedCohort } from 'state/cohort'
-import { MeState } from 'state/me'
 
 import services from 'services/aphp'
 
@@ -60,12 +59,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
-  const maintenanceIsActive = meState?.maintenance?.active
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
+  const dashboard = useAppSelector((state) => state.exploredCohort)
 
-  const { dashboard } = useAppSelector((state) => ({
-    dashboard: state.exploredCohort
-  }))
   const [isExtended, onExtend] = useState(false)
   const [openModal, setOpenModal] = useState<'' | 'edit' | 'export' | 'delete'>('')
   const [patientsNumber, setPatientsNumber] = useState<number>(patientsNb ?? 0)

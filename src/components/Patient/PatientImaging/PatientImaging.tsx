@@ -30,7 +30,7 @@ import { FilterKeys } from 'types/searchCriterias'
 const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
 
-  const { patient } = useAppSelector((state) => ({ patient: state.patient }))
+  const patient = useAppSelector((state) => state.patient)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [toggleModal, setToggleModal] = useState(false)
   const [modalitiesList, setModalitiesList] = useState<HierarchyElement[]>([])

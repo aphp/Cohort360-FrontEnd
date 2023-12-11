@@ -28,13 +28,9 @@ const Patient = () => {
   const dispatch = useAppDispatch()
   const location = useLocation()
   const { classes, cx } = useStyles()
-
-  const { open, cohort, patient } = useAppSelector((state) => ({
-    open: state.drawer,
-    cohort: state.exploredCohort,
-    patient: state.patient
-  }))
-
+  const open = useAppSelector((state) => state.drawer)
+  const cohort = useAppSelector((state) => state.exploredCohort)
+  const patient = useAppSelector((state) => state.patient)
   const loading = patient !== null ? patient.loading : false
   const deidentified = patient !== null ? patient.deidentified ?? false : false
 

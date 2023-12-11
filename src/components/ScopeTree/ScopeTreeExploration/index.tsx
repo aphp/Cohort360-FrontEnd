@@ -16,7 +16,6 @@ import {
 } from '@mui/material'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { AppDispatch, useAppDispatch, useAppSelector } from 'state'
-import { ScopeState } from 'state/scope'
 import { ScopeTreeRow } from 'types'
 import { getCurrentScopeList } from 'utils/scopeTree'
 import ScopeTreeHierarchy from '../ScopeTreeHierarchy'
@@ -46,11 +45,7 @@ const Index = (props: ScopeTreeExplorationProps) => {
   const { classes } = useStyles()
   const dispatch: AppDispatch = useAppDispatch()
 
-  const { scopeState } = useAppSelector<{
-    scopeState: ScopeState
-  }>((state) => ({
-    scopeState: state.scope || {}
-  }))
+  const scopeState = useAppSelector((state) => state.scope || {})
   const isExecutiveUnit: boolean = !!executiveUnitType ?? false
   const scopesList: ScopeTreeRow[] = getCurrentScopeList(scopeState.scopesList, isExecutiveUnit) ?? []
   const [rootRows, setRootRows] = useState<ScopeTreeRow[]>(scopesList)

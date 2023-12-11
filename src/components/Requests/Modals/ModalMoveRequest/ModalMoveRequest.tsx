@@ -5,7 +5,6 @@ import { Autocomplete, Button, Dialog, DialogActions, DialogContent, DialogTitle
 import { ProjectType, RequestType } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { ProjectState } from 'state/project'
 import { moveRequests } from 'state/request'
 
 interface IModalMoveRequestProps {
@@ -19,12 +18,7 @@ const ModalMoveRequest: React.FunctionComponent<IModalMoveRequestProps> = ({ ope
 
   const [currentFolder, onChangeCurrentFolder] = useState<ProjectType | null>(null)
 
-  const { projectState } = useAppSelector<{
-    projectState: ProjectState
-  }>((state) => ({
-    projectState: state.project
-  }))
-  const { projectsList } = projectState
+  const projectsList = useAppSelector((state) => state.project.projectsList)
 
   useEffect(() => {
     onChangeCurrentFolder(null)

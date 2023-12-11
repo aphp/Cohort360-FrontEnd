@@ -16,13 +16,8 @@ const RequestForm: React.FC<CriteriaDrawerComponentProps> = ({ parentId, goBack 
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
-  const { projectState, requestState } = useAppSelector((state) => ({
-    projectState: state.project,
-    requestState: state.request
-  }))
-
-  const projectsList = projectState.projectsList ?? []
-  const requestsList = requestState.requestsList ?? []
+  const projectsList = useAppSelector((state) => state.project.projectsList || [])
+  const requestsList = useAppSelector((state) => state.request.requestsList || [])
 
   const [selectedRequestId, setSelectedRequest] = useState<string | null>(null)
   const [error, setError] = useState(false)

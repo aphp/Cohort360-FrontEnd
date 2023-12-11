@@ -31,13 +31,11 @@ const Welcome: React.FC = () => {
   const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const { practitioner, open, meState, requestState, cohortState } = useAppSelector((state) => ({
-    practitioner: state.me,
-    open: state.drawer,
-    cohortState: state.cohort,
-    requestState: state.request,
-    meState: state.me
-  }))
+  const practitioner = useAppSelector((state) => state.me)
+  const open = useAppSelector((state) => state.drawer)
+  const cohortState = useAppSelector((state) => state.cohort)
+  const requestState = useAppSelector((state) => state.request)
+  const meState = useAppSelector((state) => state.me)
   const [lastRequest, setLastRequest] = useState<RequestType[]>([])
   const accessExpirations: AccessExpiration[] = meState?.accessExpirations ?? []
   const maintenanceIsActive = meState?.maintenance?.active

@@ -9,15 +9,13 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 
 import { useAppSelector } from 'state'
-import { MeState } from 'state/me'
 
 type ModalRightErrorProps = {
   open: boolean
   handleClose: () => void
 }
 const ModalRightError: React.FC<ModalRightErrorProps> = ({ open, handleClose }) => {
-  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
-  const maintenanceIsActive = meState?.maintenance?.active
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
   const navigate = useNavigate()
 

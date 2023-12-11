@@ -16,7 +16,6 @@ import {
 import { RequestType, Provider, SimpleStatus } from 'types'
 
 import { useAppSelector } from 'state'
-import { RequestState } from 'state/request'
 
 import RequestShareForm from './components/RequestShareForm'
 import services from 'services/aphp'
@@ -30,7 +29,7 @@ const ModalShareRequest: React.FC<{
   parentStateSetter: (val: SimpleStatus) => void
   onClose: () => void
 }> = ({ requestShare, onClose, parentStateSetter }) => {
-  const { requestState } = useAppSelector<{ requestState: RequestState }>((state) => ({ requestState: state.request }))
+  const requestState = useAppSelector((state) => state.request)
   const navigate = useNavigate()
   const { selectedRequestShare } = requestState
 

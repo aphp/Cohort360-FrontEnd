@@ -37,9 +37,7 @@ type PatientBiologyProps = {
 const PatientBiology = ({ groupId }: PatientBiologyProps) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
-  const { patient } = useAppSelector((state) => ({
-    patient: state.patient
-  }))
+  const patient = useAppSelector((state) => state.patient)
   const [toggleModal, setToggleModal] = useState(false)
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)

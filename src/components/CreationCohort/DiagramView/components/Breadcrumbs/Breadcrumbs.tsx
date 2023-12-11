@@ -10,22 +10,10 @@ const CohortCreationBreadcrumbs: React.FC = () => {
   const theme = useTheme()
   const dispatch = useAppDispatch()
 
-  const {
-    request: { requestId, currentSnapshot },
-    projects = [],
-    requests = []
-  } = useAppSelector(
-    (state) =>
-      ({
-        request: state.cohortCreation.request,
-        projects: state.project.projectsList,
-        requests: state.request.requestsList
-      } || {
-        request: { requestId: null, currentSnapshot: [] },
-        projects: [],
-        requests: []
-      })
-  )
+  const { requestId, currentSnapshot } = useAppSelector((state) => state.cohortCreation.request || {})
+  const projects = useAppSelector((state) => state.project.projectsList || [])
+  const requests = useAppSelector((state) => state.request.requestsList || [])
+
   const [projectName, setProjectName] = useState('Projet de recherche')
   const [requestName, setRequestName] = useState('Requête')
 

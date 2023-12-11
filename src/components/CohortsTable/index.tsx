@@ -40,9 +40,7 @@ import ModalEditCohort from 'components/Requests/Modals/ModalEditCohort/ModalEdi
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { CohortState, deleteCohort, editCohort, setSelectedCohort as setSelectedCohortState } from 'state/cohort'
-
-import { MeState } from 'state/me'
+import { deleteCohort, editCohort, setSelectedCohort as setSelectedCohortState } from 'state/cohort'
 
 import { Cohort, CohortJobStatus } from 'types'
 
@@ -97,19 +95,8 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   const [anchorEl, setAnchorEl] = React.useState(null)
   const openMenuItem = Boolean(anchorEl)
 
-  const { cohortState } = useAppSelector<{
-    cohortState: CohortState
-  }>((state) => ({
-    cohortState: state.cohort
-  }))
-  const selectedCohortState = cohortState.selectedCohort
-
-  const { meState } = useAppSelector<{
-    meState: MeState
-  }>((state) => ({
-    meState: state.me
-  }))
-
+  const selectedCohortState = useAppSelector((state) => state.cohort.selectedCohort)
+  const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
 
   const onClickRow = (row: any) => {

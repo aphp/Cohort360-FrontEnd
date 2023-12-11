@@ -19,8 +19,8 @@ import { RequestType } from 'types'
 import services from 'services/aphp'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { ProjectState, fetchProjects } from 'state/project'
-import { RequestState, fetchRequests, addRequest, editRequest, deleteRequest } from 'state/request'
+import { fetchProjects } from 'state/project'
+import { fetchRequests, addRequest, editRequest, deleteRequest } from 'state/request'
 import { fetchRequestCohortCreation } from 'state/cohortCreation'
 
 const ERROR_TITLE = 'error_title'
@@ -37,16 +37,11 @@ const ModalCreateNewRequest: React.FC<{
 }> = ({ onClose }) => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
-  const { projectState, requestState } = useAppSelector<{
-    projectState: ProjectState
-    requestState: RequestState
-  }>((state) => ({
-    projectState: state.project,
-    requestState: state.request
-  }))
+
+  const requestState = useAppSelector((state) => state.request)
+  const _projectsList = useAppSelector((state) => state.project.projectsList)
 
   const { requestsList, selectedRequest } = requestState
-  const { projectsList } = projectState
 
   const isEdition = selectedRequest ? selectedRequest.uuid : false
 
@@ -71,8 +66,8 @@ const ModalCreateNewRequest: React.FC<{
 
   const _fetchProject = async () => {
     let projectsList = []
-    if (projectState && projectState.projectsList && projectState.projectsList.length > 0) {
-      projectsList = projectState.projectsList
+    if (_projectsList && _projectsList.length > 0) {
+      projectsList = _projectsList
     } else {
       const myProjects = (await dispatch(fetchProjects()).unwrap()) || []
       projectsList = myProjects.projectsList
@@ -200,11 +195,11 @@ const ModalCreateNewRequest: React.FC<{
               error={error}
               projectName={projectName}
               onChangeProjectName={onChangeProjectName}
-              projectList={projectsList}
+              projectList={_projectsList}
             />
           ) : (
             <RequestList
-              projectList={projectsList}
+              projectList={_projectsList}
               requestsList={requestsList}
               selectedItem={openRequest}
               onSelectedItem={(newOpenRequest: string) =>

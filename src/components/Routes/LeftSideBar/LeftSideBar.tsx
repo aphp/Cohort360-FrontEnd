@@ -49,11 +49,9 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
-  const { practitioner, open, cohortCreation } = useAppSelector((state) => ({
-    practitioner: state.me,
-    open: state.drawer,
-    cohortCreation: state.cohortCreation
-  }))
+  const practitioner = useAppSelector((state) => state.me)
+  const open = useAppSelector((state) => state.drawer)
+  const cohortCreation = useAppSelector((state) => state.cohortCreation)
   const maintenanceIsActive = practitioner?.maintenance?.active
   // v-- just for zoom transition..
   const [allreadyOpen, setAllreadyOpen] = useState(false)

@@ -24,21 +24,16 @@ import { setCriteriaData } from 'state/criteria'
 
 const Requeteur = () => {
   const {
-    request: {
-      loading = false,
-      requestId = '',
-      currentSnapshot = {} as CurrentSnapshot,
-      navHistory,
-      selectedCriteria = [],
-      count = {},
-      json = '',
-      allowSearchIpp = false
-    },
-    criteriaData
-  } = useAppSelector((state) => ({
-    request: state.cohortCreation.request || {},
-    criteriaData: state.cohortCreation.criteria || {}
-  }))
+    loading = false,
+    requestId = '',
+    currentSnapshot = {} as CurrentSnapshot,
+    navHistory,
+    selectedCriteria = [],
+    count = {},
+    json = '',
+    allowSearchIpp = false
+  } = useAppSelector((state) => state.cohortCreation.request || {})
+  const criteriaData = useAppSelector((state) => state.cohortCreation.criteria || {})
 
   const params = useParams<{
     requestId: string

@@ -10,9 +10,8 @@ import ModalRightError from './components/ModalRightError'
 import PopulationRightPanel from './components/PopulationRightPanel'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { buildCohortCreation, CohortCreationState } from 'state/cohortCreation'
-import { fetchScopesList, ScopeState } from 'state/scope'
-import { MeState } from 'state/me'
+import { buildCohortCreation } from 'state/cohortCreation'
+import { fetchScopesList } from 'state/scope'
 
 import { CriteriaNameType, ScopeType, ScopeTreeRow } from 'types'
 import scopeTypes from 'data/scope_type.json'
@@ -37,21 +36,9 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
   const dispatch = useAppDispatch()
   const isRendered = useRef<boolean>(false)
 
-  const {
-    request: { selectedPopulation = [], ...requestState },
-    scopeState,
-    meState
-  } = useAppSelector<{
-    request: CohortCreationState
-    scopeState: ScopeState
-    meState: MeState
-  }>((state) => ({
-    request: state.cohortCreation.request || {},
-    scopeState: state.scope || {},
-    meState: state.me
-  }))
-
-  const maintenanceIsActive = meState?.maintenance?.active
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
+  const scopeState = useAppSelector((state) => state.scope || {})
+  const { selectedPopulation = [], ...requestState } = useAppSelector((state) => state.cohortCreation.request || {})
 
   const isExecutiveUnit: boolean = !!(form ? (scopeTypes.criteriaType[form] as ScopeType) : undefined) ?? false
   const scopesList = getCurrentScopeList(scopeState.scopesList, isExecutiveUnit) ?? []

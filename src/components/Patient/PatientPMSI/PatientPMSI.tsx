@@ -74,9 +74,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
 
   /* TODO => enlever l'appel de redux */
-  const { patient } = useAppSelector((state) => ({
-    patient: state.patient
-  }))
+  const patient = useAppSelector((state) => state.patient)
   const searchResults = {
     deidentified: patient?.deidentified || false,
     list: patient?.pmsi?.[selectedTab.id]?.list || [],

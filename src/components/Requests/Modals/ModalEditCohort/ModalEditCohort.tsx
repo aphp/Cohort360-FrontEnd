@@ -3,13 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from '@mui/material'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import {
-  CohortState,
-  addCohort,
-  editCohort,
-  deleteCohort,
-  setSelectedCohort as setSelectedCohortState
-} from 'state/cohort'
+import { addCohort, editCohort, deleteCohort, setSelectedCohort as setSelectedCohortState } from 'state/cohort'
 
 import { Cohort } from 'types'
 
@@ -24,12 +18,8 @@ const ModalEditCohort: React.FC<{
 }> = ({ open, onClose }) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
-  const { cohortState } = useAppSelector<{
-    cohortState: CohortState
-  }>((state) => ({
-    cohortState: state.cohort
-  }))
-  const { selectedCohort } = cohortState
+
+  const selectedCohort = useAppSelector((state) => state.cohort.selectedCohort)
 
   const isEdition = selectedCohort !== null && selectedCohort.uuid !== ''
 

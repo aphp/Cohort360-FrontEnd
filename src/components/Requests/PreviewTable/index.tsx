@@ -36,13 +36,10 @@ import ModalAddOrEditRequest from 'components/CreationCohort/Modals/ModalCreateN
 
 import { useAppSelector, useAppDispatch } from 'state'
 import {
-  RequestState,
   setSelectedRequest as setSelectedRequestState,
   setSelectedRequestShare as setSelectedRequestShareState,
   deleteRequest as deleteRequestState
 } from 'state/request'
-
-import { MeState } from 'state/me'
 
 import { RequestType, SimpleStatus } from 'types'
 
@@ -58,20 +55,11 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const { requestState } = useAppSelector<{
-    requestState: RequestState
-  }>((state) => ({
-    requestState: state.request
-  }))
+  const requestState = useAppSelector((state) => state.request)
   const selectedRequestState = requestState.selectedRequest
   const selectedRequestShareState = requestState.selectedRequestShare
 
-  const { meState } = useAppSelector<{
-    meState: MeState
-  }>((state) => ({
-    meState: state.me
-  }))
-  const maintenanceIsActive = meState?.maintenance?.active
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
   const [dialogOpen, setOpenDialog] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<string | undefined>()

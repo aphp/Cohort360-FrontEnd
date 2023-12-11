@@ -12,7 +12,6 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import { useAppSelector } from 'state'
-import { MeState } from 'state/me'
 
 import useStyles from './styles'
 import { criteriasAsArray } from 'utils/requestCriterias'
@@ -29,10 +28,8 @@ type CriteriaCardProps = {
 const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriteria }: CriteriaCardProps) => {
   const { classes } = useStyles()
 
-  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const { criteria } = useAppSelector((state) => state.cohortCreation)
-
-  const maintenanceIsActive = meState?.maintenance?.active
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active || false)
 
   const [needCollapse, setNeedCollapse] = useState(false)
   const [openCollapse, setOpenCollapse] = useState(false)
