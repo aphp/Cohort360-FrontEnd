@@ -17,11 +17,12 @@ import {
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
-import UpdateSharpIcon from '@mui/icons-material/UpdateSharp'
+import DescriptionIcon from '@mui/icons-material/Description'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import InfoIcon from '@mui/icons-material/Info'
 import ShareIcon from '@mui/icons-material/Share'
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
+import UpdateSharpIcon from '@mui/icons-material/UpdateSharp'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
@@ -36,7 +37,7 @@ import {
   addActionToNavHistory
 } from 'state/cohortCreation'
 
-import { CohortCreationCounterType, CurrentSnapshot, RequestType, SimpleStatus, Snapshot } from 'types'
+import { CohortCreationCounterType, CurrentSnapshot, LoadingStatus, RequestType, SimpleStatus, Snapshot } from 'types'
 
 import useStyle from './styles'
 
@@ -44,6 +45,7 @@ import displayDigit from 'utils/displayDigit'
 import { SHORT_COHORT_LIMIT } from '../../../constants'
 import { JobStatus } from '../../../utils/constants'
 import services from 'services/aphp'
+import ValidationDialog from 'components/ui/ValidationDialog'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -62,6 +64,9 @@ const ControlPanel: React.FC<{
     },
     [setShareSuccessOrFailMessage]
   )
+  const [reportLoading, setReportLoading] = useState<LoadingStatus>(LoadingStatus.SUCCESS)
+  const [reportError, setReportError] = useState(false)
+  const [openReportConfirmation, setOpenReportConfirmation] = useState<boolean>(false)
 
   const {
     loading = false,
@@ -170,6 +175,24 @@ const ControlPanel: React.FC<{
     }
   }
 
+  const handleGenerateReport = async () => {
+    try {
+      // TODO: en attente du back vvv
+      setOpenReportConfirmation(true)
+      // setReportLoading(LoadingStatus.FETCHING)
+      // const sendReport = await
+      // if (sendReport.status) {
+      //   setReportError(false)
+      //   setReportLoading(LoadingStatus.SUCCESS)
+      // }
+    } catch (error) {
+      // TODO: erreur à set correctement
+      setReportLoading(LoadingStatus.SUCCESS)
+      setReportError(true)
+      console.log(error)
+    }
+  }
+
   const itLoads = loading || countLoading || saveLoading
   const errorCriteria = selectedCriteria.filter((criteria) => criteria.error)
   const lastUpdated = moment(count.date)
@@ -200,6 +223,7 @@ const ControlPanel: React.FC<{
             }
             onClick={() => onSetOpenModal('executeCohortConfirmation')}
             className={classes.requestExecution}
+            style={{ marginTop: 12, marginBottom: 6 }}
           >
             {itLoads ? (
               <>
@@ -208,6 +232,23 @@ const ControlPanel: React.FC<{
               </>
             ) : (
               <>Créer la cohorte</>
+            )}
+          </Button>
+
+          <Button
+            disabled={itLoads || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated}
+            onClick={handleGenerateReport}
+            className={classes.requestExecution}
+            startIcon={<DescriptionIcon color="action" className={classes.iconBorder} />}
+            style={{ marginBottom: 12 }}
+          >
+            {itLoads ? (
+              <>
+                Veuillez patienter
+                <CircularProgress style={{ marginLeft: '15px' }} size={30} />
+              </>
+            ) : (
+              <>Générer un rapport</>
             )}
           </Button>
 
@@ -428,6 +469,18 @@ const ControlPanel: React.FC<{
           onClose={() => onSetOpenModal(null)}
           longCohort={includePatient ? includePatient > cohortLimit : false}
           cohortLimit={cohortLimit}
+        />
+      )}
+
+      {openReportConfirmation && (
+        <ValidationDialog
+          open
+          loading={reportLoading}
+          onClose={() => setOpenReportConfirmation(false)}
+          error={reportError}
+          message={
+            'Votre demande a bien été prise en compte. Vous recevrez un email de confirmation lorsque le rapport sera prêt.'
+          }
         />
       )}
 

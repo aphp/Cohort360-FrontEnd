@@ -24,8 +24,6 @@ const useStyles = makeStyles()(() => ({
     }
   },
   requestExecution: {
-    marginTop: 12,
-    marginBottom: 12,
     backgroundColor: '#5BC5F2',
     borderRadius: '26px',
     border: 'none',
