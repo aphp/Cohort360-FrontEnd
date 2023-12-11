@@ -93,6 +93,9 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
 
+  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
+  const maintenanceIsActive = meState?.maintenance?.active
+
   const [
     {
       orderBy,
@@ -103,9 +106,6 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
     },
     { changeOrderBy, changeSearchBy, changeSearchInput, addFilters, removeFilter }
   ] = useSearchCriterias(initPatientsSearchCriterias)
-
-  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
-  const maintenanceIsActive = meState?.maintenance?.active
 
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ genders, vitalStatuses, birthdatesRanges })

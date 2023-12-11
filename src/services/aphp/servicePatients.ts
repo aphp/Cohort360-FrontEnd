@@ -23,7 +23,8 @@ import {
   getFilters,
   deleteFilters,
   patchFilters,
-  deleteFilter
+  deleteFilter,
+  fetchPerimeterFromId
 } from './callApi'
 
 import servicesPerimeters from './servicePerimeters'
@@ -837,6 +838,7 @@ export const postFiltersService = async <T>(
   criterias: SearchCriterias<T>
 ) => {
   const { searchBy, searchInput, filters } = criterias
+
   const criteriasString = `${mapObjectToString({ searchBy, searchInput })}&${mapObjectToString(filters)}`
   const response = await postFilters(fhir_resource, name, criteriasString)
 
@@ -887,4 +889,9 @@ export const patchFiltersService = async <T>(
   } catch {
     throw "Le filtre n'a pas pu être modifié."
   }
+}
+
+export const fetchPerimeterFromPerimeterId = async (perimeterId: string) => {
+  const response = await fetchPerimeterFromId(perimeterId)
+  return response.data
 }

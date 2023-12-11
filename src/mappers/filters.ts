@@ -1,4 +1,5 @@
 import { RessourceType } from 'types/requestCriterias'
+import { ScopeTreeRow, SimpleCodeType } from './../types'
 import {
   AllDocumentsFilters,
   Direction,
@@ -13,6 +14,7 @@ import {
   SearchInput,
   VitalStatus
 } from 'types/searchCriterias'
+import allDocTypesList from 'assets/docTypes.json'
 
 export function parsePatientsFiltersString(filterURLParams: URLSearchParams): PatientsFilters {
   const filters: PatientsFilters = {
@@ -28,7 +30,7 @@ export function parsePatientsFiltersString(filterURLParams: URLSearchParams): Pa
         filters.genders = filterValue.split(',') as GenderStatus[]
         break
       case FilterKeys.BIRTHDATES:
-        if (filterValue === ',') continue
+        if (filterValue === ',' || filterValue === 'null,null') continue
         // eslint-disable-next-line no-case-declarations
         const [start, end] = filterValue.split(',')
         filters.birthdatesRanges = [start, end] as DurationRangeType
@@ -54,6 +56,7 @@ export function parseDocumentsFiltersString(filterURLParams: URLSearchParams): A
   }
 
   for (const [filterName, filterValue] of filterURLParams.entries()) {
+    if (filterValue === '') continue
     switch (filterName) {
       case FilterKeys.NDA:
         filters.nda = filterValue
@@ -62,19 +65,27 @@ export function parseDocumentsFiltersString(filterURLParams: URLSearchParams): A
         filters.ipp = filterValue
         break
       case FilterKeys.DOC_TYPES:
-        filters.docTypes = filterValue?.split(',').map((docType) => JSON.parse(docType)) ?? []
+        filters.docTypes = (allDocTypesList.docTypes as SimpleCodeType[]).filter((docType) =>
+          filterValue.split(',').includes(docType.code)
+        )
         break
       case FilterKeys.ONLY_PDF_AVAILABLE:
         filters.onlyPdfAvailable = filterValue === 'true'
         break
       case FilterKeys.START_DATE:
-        filters.startDate = filterValue
+        filters.startDate = filterValue === 'null' ? null : filterValue
         break
       case FilterKeys.END_DATE:
-        filters.endDate = filterValue
+        filters.endDate = filterValue === 'null' ? null : filterValue
         break
       case FilterKeys.EXECUTIVE_UNITS:
-        filters.executiveUnits = filterValue?.split(',').map((executiveUnit) => JSON.parse(executiveUnit)) ?? []
+        filters.executiveUnits =
+          filterValue.split(',').map(
+            (filter) =>
+              ({
+                id: filter
+              } as ScopeTreeRow)
+          ) ?? []
         break
     }
   }
@@ -111,16 +122,30 @@ export const mapStringToSearchCriteria = <T>(filtersString: string, type: Ressou
   }
 }
 
+const isSimpleCodeType = (obj: any): obj is SimpleCodeType => {
+  return 'code' in obj && 'label' in obj && 'type' in obj
+}
+
+const isScopeTreeRow = (obj: any): obj is ScopeTreeRow => {
+  return 'id' in obj && 'name' in obj && 'quantity' in obj
+}
+
 export const mapObjectToString = (obj: any) => {
   let transformedString = ''
   for (const property in obj) {
     const value = obj[property as keyof Filters]
+    if (value === null || value === '' || value.length === 0) continue
     if (Array.isArray(value)) {
+      if (value.every((entry) => entry === null)) continue
       transformedString += `${property}=`
-      for (const entry of value) {
-        transformedString += `${entry},`
-      }
-      transformedString = transformedString.substring(0, transformedString.length - 1)
+      const tempValue = value.map((entry) => {
+        if (typeof entry === 'object') {
+          if (isSimpleCodeType(entry)) return entry.code
+          else if (isScopeTreeRow(entry)) return entry.id
+        }
+        return entry
+      })
+      transformedString += tempValue
     } else {
       transformedString += `${property}=${value}`
     }

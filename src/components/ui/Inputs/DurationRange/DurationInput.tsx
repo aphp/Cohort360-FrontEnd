@@ -28,14 +28,14 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
       </Grid>
       <Grid item xs={deidentified ? 8 : 9} container justifyContent="space-between">
         <Grid container item xs={deidentified ? 5 : 3} alignItems="center">
-          <Grid item xs={6}>
+          <Grid item xs={7}>
             <TextFieldWrapper
               active={!disabled && !!duration.year}
               disabled={disabled}
               placeholder={duration.year ? undefined : name === 'max' ? '130' : '0'}
               value={duration.year}
               variant="standard"
-              type={disabled || !!duration.year ? 'text' : 'number'}
+              type={disabled ? 'text' : 'number'}
               InputProps={{
                 inputProps: {
                   min: 0
@@ -44,12 +44,12 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
               size="small"
               onChange={(e) => {
                 if (!isNaN(+e.target.value) && +e.target.value <= 130) {
-                  setDuration({ ...duration, year: e.target.value !== '' ? +e.target.value : null })
+                  setDuration({ ...duration, year: e.target.value !== '' ? Math.abs(+e.target.value) : null })
                 }
               }}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={5}>
             <DurationUnitWrapper active={!disabled && !!duration.year}>{CalendarRequestLabel.YEAR}</DurationUnitWrapper>
           </Grid>
         </Grid>
@@ -61,7 +61,7 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
               value={duration.month ? duration.month : undefined}
               placeholder={duration.month ? undefined : '0'}
               variant="standard"
-              type={disabled || !!duration.month ? 'text' : 'number'}
+              type={disabled ? 'text' : 'number'}
               InputProps={{
                 inputProps: {
                   min: 0
@@ -70,7 +70,7 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
               size="small"
               onChange={(e) => {
                 if (!isNaN(+e.target.value) && +e.target.value <= 12) {
-                  setDuration({ ...duration, month: e.target.value !== '' ? +e.target.value : null })
+                  setDuration({ ...duration, month: e.target.value !== '' ? Math.abs(+e.target.value) : null })
                 }
               }}
             />
@@ -90,7 +90,7 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
                 value={duration.day ? duration.day : undefined}
                 placeholder={duration.day ? undefined : '0'}
                 variant="standard"
-                type={disabled || !!duration.day ? 'text' : 'number'}
+                type={disabled ? 'text' : 'number'}
                 InputProps={{
                   inputProps: {
                     min: 0
@@ -99,7 +99,7 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
                 size="small"
                 onChange={(e) => {
                   if (!isNaN(+e.target.value) && +e.target.value <= 31) {
-                    setDuration({ ...duration, day: e.target.value !== '' ? +e.target.value : null })
+                    setDuration({ ...duration, day: e.target.value !== '' ? Math.abs(+e.target.value) : null })
                   }
                 }}
               />

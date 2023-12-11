@@ -1070,6 +1070,11 @@ export const fetchPerimeterFromCohortId = async (cohortId: string) => {
   return response
 }
 
+export const fetchPerimeterFromId = async (perimeterId: string) => {
+  const response = await apiBackend.get(`accesses/perimeters/${perimeterId}/`)
+  return response
+}
+
 export const fetchCohortInfo = async (cohortId: string) => {
   const response = await apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?fhir_group_id=${cohortId}`)
   return response

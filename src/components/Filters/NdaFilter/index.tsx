@@ -6,9 +6,10 @@ import React, { useContext, useEffect, useState } from 'react'
 type NdaFilterProps = {
   value: string
   name: string
+  disabled?: boolean
 }
 
-const NdaFilter = ({ name, value }: NdaFilterProps) => {
+const NdaFilter = ({ name, value, disabled = false }: NdaFilterProps) => {
   const context = useContext(FormContext)
   const [nda, setNda] = useState(value)
 
@@ -20,9 +21,10 @@ const NdaFilter = ({ name, value }: NdaFilterProps) => {
     <InputWrapper>
       <Typography variant="h3">NDA :</Typography>
       <TextField
+        disabled={disabled}
         fullWidth
         autoFocus
-        placeholder="Exemple: 6601289264,141740347"
+        placeholder={disabled ? 'Non renseigné' : 'Exemple: 6601289264,141740347'}
         value={nda}
         onChange={(event) => setNda(event.target.value)}
       />

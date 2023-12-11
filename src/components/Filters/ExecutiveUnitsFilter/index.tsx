@@ -11,9 +11,10 @@ type ExecutiveUnitsFilterProps = {
   value: ScopeTreeRow[]
   name: string
   criteriaName: CriteriaNameType
+  disabled?: boolean
 }
 
-const ExecutiveUnitsFilter = ({ name, value, criteriaName }: ExecutiveUnitsFilterProps) => {
+const ExecutiveUnitsFilter = ({ name, value, criteriaName, disabled = false }: ExecutiveUnitsFilterProps) => {
   const context = useContext(FormContext)
   const [executiveUnits, setExecutiveUnits] = useState(value)
 
@@ -45,6 +46,7 @@ const ExecutiveUnitsFilter = ({ name, value, criteriaName }: ExecutiveUnitsFilte
 
       <Grid item container direction="row" alignItems="center">
         <PopulationCard
+          disabled={disabled}
           form={criteriaName}
           label="Sélectionner une unité exécutrice"
           title="Sélectionner une unité exécutrice"

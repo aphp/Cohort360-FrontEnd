@@ -6,9 +6,10 @@ import React, { useContext, useEffect, useState } from 'react'
 type IppFilterProps = {
   value: string
   name: string
+  disabled?: boolean
 }
 
-const IppFilter = ({ name, value }: IppFilterProps) => {
+const IppFilter = ({ name, value, disabled = false }: IppFilterProps) => {
   const context = useContext(FormContext)
   const [ipp, setIpp] = useState(value)
 
@@ -20,10 +21,10 @@ const IppFilter = ({ name, value }: IppFilterProps) => {
     <InputWrapper>
       <Typography variant="h3">IPP :</Typography>
       <TextField
-        margin="normal"
+        disabled={disabled}
         fullWidth
         autoFocus
-        placeholder="Exemple: 8000000000001,8000000000002"
+        placeholder={disabled ? 'Non renseigné ' : 'Exemple: 8000000000001,8000000000002'}
         value={ipp}
         onChange={(event) => setIpp(event.target.value)}
       />
