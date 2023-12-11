@@ -73,7 +73,8 @@ export enum Order {
   NAME = 'name',
   MODALITY = 'modality',
   DESCRIPTION = 'description',
-  PROCEDURE = 'procedureCode'
+  PROCEDURE = 'procedureCode',
+  STUDY_DATE = 'started'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -210,6 +211,7 @@ export type BiologyFilters = {
 }
 
 export type ImagingFilters = {
+  ipp?: string
   nda: string
   startDate: string | null
   endDate: string | null

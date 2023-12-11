@@ -14,10 +14,12 @@ import {
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 import { KeyboardArrowDown, KeyboardArrowUp, Visibility } from '@mui/icons-material'
+import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
 import DataTable from './DataTable'
 
 import { CohortImaging, Column } from 'types'
+import { Order, OrderBy } from 'types/searchCriterias'
 
 import useStyles from './styles'
 
@@ -25,23 +27,32 @@ type DataTableImagingProps = {
   loading: boolean
   deidentified: boolean
   imagingList?: CohortImaging[]
+  orderBy: OrderBy
+  setOrderBy?: (order: OrderBy) => void
   page?: number
   setPage?: (page: number) => void
   total?: number
+  showIpp?: boolean
+  groupId?: string
 }
 
 const DataTableImaging: React.FC<DataTableImagingProps> = ({
   loading,
   deidentified,
   imagingList,
+  orderBy,
+  setOrderBy,
   page,
   setPage,
-  total
+  total,
+  showIpp,
+  groupId
 }) => {
   const columns: Column[] = [
     { label: '', align: 'left' },
+    ...(showIpp ? [{ label: `IPP${deidentified ? ' chiffré' : ''}` }] : []),
     { label: `NDA${deidentified ? ' chiffré' : ''}`, align: 'left' },
-    { label: 'Date' },
+    { label: 'Date', code: Order.STUDY_DATE },
     { label: 'Modalité' },
     { label: 'Description' },
     { label: 'Procédure' },
@@ -52,16 +63,24 @@ const DataTableImaging: React.FC<DataTableImagingProps> = ({
   ]
 
   return (
-    <DataTable columns={columns} page={page} setPage={setPage} total={total}>
+    <DataTable columns={columns} order={orderBy} setOrder={setOrderBy} page={page} setPage={setPage} total={total}>
       {!loading && imagingList && imagingList.length > 0 ? (
         <>
           {imagingList.map((imagingItem) => {
-            return <DataTableImagingLine key={imagingItem.id} imagingItem={imagingItem} deidentified={deidentified} />
+            return (
+              <DataTableImagingLine
+                key={imagingItem.id}
+                imagingItem={imagingItem}
+                deidentified={deidentified}
+                showIpp={showIpp}
+                groupId={groupId}
+              />
+            )
           })}
         </>
       ) : (
         <TableRow>
-          <TableCellWrapper colSpan={10} align="left">
+          <TableCellWrapper colSpan={showIpp ? 11 : 10} align="left">
             <Grid container justifyContent="center">
               {loading ? <CircularProgress /> : <Typography variant="button">Aucun résultat à afficher</Typography>}
             </Grid>
@@ -75,12 +94,15 @@ const DataTableImaging: React.FC<DataTableImagingProps> = ({
 const DataTableImagingLine: React.FC<{
   deidentified: boolean
   imagingItem: CohortImaging
-}> = ({ deidentified, imagingItem }) => {
+  showIpp?: boolean
+  groupId?: string
+}> = ({ deidentified, imagingItem, showIpp, groupId }) => {
   const { classes } = useStyles()
   const [open, setOpen] = useState(false)
   const [openDoc, setOpenDoc] = useState(false)
 
-  const nda = imagingItem.NDA ?? '-'
+  const ipp = imagingItem.IPP ?? 'Inconnu'
+  const nda = imagingItem.NDA ?? 'Inconnu'
   const date = imagingItem.started ? new Date(imagingItem.started).toLocaleDateString('fr-FR') : 'Date inconnue'
   const modality = imagingItem.modality?.map((modality) => modality.code).join(' / ') ?? '-'
   const description = imagingItem.description ?? '-'
@@ -99,7 +121,20 @@ const DataTableImagingLine: React.FC<{
             {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
           </IconButton>
         </TableCellWrapper>
-        <TableCellWrapper align="left">{nda}</TableCellWrapper>
+        {showIpp && (
+          <TableCellWrapper style={{ minWidth: 150 }}>
+            {ipp}
+            <IconButton
+              onClick={() =>
+                window.open(`/patients/${imagingItem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`, '_blank')
+              }
+              className={classes.searchIcon}
+            >
+              <SearchIcon height="15px" fill="#ED6D91" className={classes.iconMargin} />
+            </IconButton>
+          </TableCellWrapper>
+        )}
+        <TableCellWrapper align={showIpp ? 'center' : 'left'}>{nda}</TableCellWrapper>
         <TableCellWrapper>{date}</TableCellWrapper>
         <TableCellWrapper>{modality}</TableCellWrapper>
         <TableCellWrapper className={classes.libelle}>{description}</TableCellWrapper>
@@ -121,7 +156,10 @@ const DataTableImagingLine: React.FC<{
         </TableCellWrapper>
       </TableRow>
       <TableRow>
-        <TableCellWrapper colSpan={10} style={{ padding: 0, borderBottom: 0, backgroundColor: '#e6f1fd66' }}>
+        <TableCellWrapper
+          colSpan={showIpp ? 11 : 10}
+          style={{ padding: 0, borderBottom: 0, backgroundColor: '#e6f1fd66' }}
+        >
           <Collapse in={open} timeout="auto" unmountOnExit>
             <InnerDataTableImaging imagingItem={imagingItem} />
           </Collapse>

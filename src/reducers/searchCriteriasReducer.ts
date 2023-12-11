@@ -151,12 +151,13 @@ export const initAllDocsSearchCriterias: SearchCriterias<AllDocumentsFilters> = 
 
 export const initImagingCriterias: SearchCriterias<ImagingFilters> = {
   orderBy: {
-    orderBy: Order.IPP,
-    orderDirection: Direction.ASC
+    orderBy: Order.STUDY_DATE,
+    orderDirection: Direction.DESC
   },
   searchInput: '',
   searchBy: SearchByTypes.TEXT,
   filters: {
+    ipp: '',
     nda: '',
     startDate: null,
     endDate: null,

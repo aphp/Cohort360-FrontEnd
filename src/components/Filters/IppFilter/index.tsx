@@ -23,7 +23,7 @@ const IppFilter = ({ name, value }: IppFilterProps) => {
         margin="normal"
         fullWidth
         autoFocus
-        placeholder="Exemple: A0260,E2068"
+        placeholder="Exemple: 8000000000001,8000000000002"
         value={ipp}
         onChange={(event) => setIpp(event.target.value)}
       />
