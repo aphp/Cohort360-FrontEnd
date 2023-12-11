@@ -101,8 +101,8 @@ const DataTableImagingLine: React.FC<{
   const [open, setOpen] = useState(false)
   const [openDoc, setOpenDoc] = useState(false)
 
-  const ipp = imagingItem.IPP ?? '-'
-  const nda = imagingItem.NDA ?? '-'
+  const ipp = imagingItem.IPP ?? 'Inconnu'
+  const nda = imagingItem.NDA ?? 'Inconnu'
   const date = imagingItem.started ? new Date(imagingItem.started).toLocaleDateString('fr-FR') : 'Date inconnue'
   const modality = imagingItem.modality?.map((modality) => modality.code).join(' / ') ?? '-'
   const description = imagingItem.description ?? '-'
