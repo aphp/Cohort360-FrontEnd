@@ -635,7 +635,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
             : ''
         }`,
         `${criterion.bodySite ? `${IMAGING_BODYSITE}=${encodeURIComponent(criterion.bodySite)}` : ''}`,
-        `${criterion.seriesUid ? `${IMAGING_SERIES_UID}=${criterion.seriesUid}` : ''}`
+        `${criterion.seriesUid ? `${IMAGING_SERIES_UID}=${criterion.seriesUid}` : ''}`,
+        `${
+          criterion.encounterService && criterion.encounterService.length > 0
+            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
+                .map((encounterServiceItem) => encounterServiceItem.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`
       ]
         .filter((elem) => elem)
         .reduce(filterReducer)
