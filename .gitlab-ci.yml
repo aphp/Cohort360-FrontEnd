@@ -44,6 +44,7 @@ deploy-job:
       artifacts: true
   script:
     - export VERSION=$(cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
+    - if [ "$CI_COMMIT_TAG" != "" ] && [ "$CI_COMMIT_TAG" != "$VERSION" ] && case "$VERSION" in *SNAPSHOT) false;; *) true;; esac; then echo "The version is not the same as the tag name"; exit 1; else echo "Publishing version $VERSION"; fi
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"username\":\"${BOT_NAME}\",\"password\":\"${BOT_TOKEN}\"}}}" > /kaniko/.docker/config.json
     - >-
