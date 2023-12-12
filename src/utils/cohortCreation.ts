@@ -1742,6 +1742,17 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 currentCriterion.seriesUid = value ?? ''
                 break
               }
+              case ENCOUNTER_SERVICE_PROVIDER: {
+                if (!value) continue
+
+                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
+
+                currentCriterion.encounterService = currentCriterion.encounterService
+                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
+                  : updatedEncounterServices
+
+                break
+              }
             }
           }
 
