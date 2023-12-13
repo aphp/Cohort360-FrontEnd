@@ -106,7 +106,12 @@ export const checkRange = (key: string, value: number) => {
 export const checkMinMaxValue = (min: DurationType, max: DurationType) => {
   const maxDate: Date = substructDurationType(min)
   const minDate: Date = substructDurationType(max)
-
+  const error =
+    (min.year === null && min.month === null && min.day === null) ||
+    (max.year === null && max.month === null && max.day === null)
+      ? true
+      : false
+  if (error === true) return true
   if (minDate > maxDate) return false
   return true
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import {
   Alert,
@@ -22,7 +22,6 @@ import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { CriteriaDataKey, SelectedCriteriaType, RessourceType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
-import { convertStringToDuration, checkMinMaxValue } from 'utils/age'
 
 enum Error {
   EMPTY_FORM,
@@ -42,6 +41,8 @@ export const mappingCriteria = (criteriaToMap: any, key: string, mapping: any) =
       const mappedCriteria = mapping.data[key]?.find((c: any) => c?.id === criteria?.id)
       return mappedCriteria
     })
+  } else {
+    return []
   }
 }
 
@@ -62,30 +63,6 @@ const DemographicForm = (props: DemographicFormProps) => {
   const [error, setError] = useState(Error.NO_ERROR)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const isEdition = selectedCriteria !== null ? true : false
-
-  useEffect(() => {
-    setError(Error.NO_ERROR)
-    const _age0 = convertStringToDuration(age[0])
-    const _age1 = convertStringToDuration(age[1])
-    if (
-      vitalStatus?.length === 0 &&
-      genders?.length === 0 &&
-      birthdates[0] === null &&
-      birthdates[1] === null &&
-      age[0] === null &&
-      age[1] === null &&
-      deathDates[0] === null &&
-      deathDates[1] === null
-    ) {
-      setError(Error.EMPTY_FORM)
-    }
-    if (_age0 !== null && _age1 === null) {
-      setError(Error.INCOHERENT_AGE_ERROR)
-    }
-    if (_age0 !== null && _age1 !== null && !checkMinMaxValue(_age0, _age1)) {
-      setError(Error.INCOHERENT_AGE_ERROR)
-    }
-  }, [vitalStatus, genders, birthdates, age, deathDates])
 
   const onSubmit = () => {
     onChangeSelectedCriteria({
@@ -118,7 +95,7 @@ const DemographicForm = (props: DemographicFormProps) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error === Error.NO_ERROR && !multiFields && (
+        {!multiFields && (
           <Alert
             severity="info"
             onClose={() => {
@@ -209,7 +186,8 @@ const DemographicForm = (props: DemographicFormProps) => {
           </BlockWrapper>
           {vitalStatus &&
             (vitalStatus.length === 0 ||
-              vitalStatus.find((status: LabelObject) => status.label === VitalStatusLabel.DECEASED)) && (
+              (vitalStatus.length === 1 &&
+                vitalStatus.find((status: LabelObject) => status.label === VitalStatusLabel.DECEASED))) && (
               <BlockWrapper margin="1em">
                 <CalendarRange
                   inline
@@ -233,7 +211,7 @@ const DemographicForm = (props: DemographicFormProps) => {
             type="submit"
             form="demographic-form"
             variant="contained"
-            disabled={error === Error.INCOHERENT_AGE_ERROR || error === Error.EMPTY_FORM}
+            disabled={error === Error.INCOHERENT_AGE_ERROR}
           >
             Confirmer
           </Button>

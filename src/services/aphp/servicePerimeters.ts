@@ -452,13 +452,16 @@ const servicesPerimeters: IServicePerimeters = {
       return result
     }
     const higherTypes: string[] = servicesPerimeters.getHigherTypes(scopeType)
-    const pageParam = page && page > 1 ? page : undefined
+    const limit = 20
+    const offset = ((page ?? 1) - 1) * limit
     const backCohortResponse: any = await fetchScope(
       {
         search: searchInput,
-        page: pageParam,
+        // page: pageParam,
         type: higherTypes,
-        isExecutiveUnit: isExecutiveUnit
+        isExecutiveUnit: isExecutiveUnit,
+        offset: offset,
+        limit: limit
       },
       signal
     )

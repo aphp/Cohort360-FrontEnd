@@ -47,7 +47,7 @@ const Index: React.FC<ScopeTreeSearchProps> = (props) => {
   const controllerRef = useRef<AbortController | null>(null)
   const [isEmpty, setIsEmpty] = useState<boolean>(true)
   const debouncedSearchTerm = useDebounce(700, searchInput)
-  const [page, setPage] = useState(0)
+  const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false)
 
@@ -173,7 +173,7 @@ const Index: React.FC<ScopeTreeSearchProps> = (props) => {
               {
                 <Pagination
                   className={classes.pagination}
-                  count={Math.ceil((count ?? 0) / 100)}
+                  count={Math.ceil((count ?? 0) / 20)}
                   shape="circular"
                   onChange={(event, page: number) => setPage && setPage(page)}
                   page={page}
