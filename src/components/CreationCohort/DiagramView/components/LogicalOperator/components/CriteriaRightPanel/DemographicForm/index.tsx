@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import {
   Alert,
@@ -22,7 +22,6 @@ import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { CriteriaDataKey, DemographicDataType, RessourceType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
-import { convertStringToDuration, checkMinMaxValue } from 'utils/age'
 import { CriteriaDrawerComponentProps, CriteriaItemDataCache } from 'types'
 
 enum Error {
@@ -60,18 +59,6 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const isEdition = selectedCriteria !== null ? true : false
 
-  useEffect(() => {
-    setError(Error.NO_ERROR)
-    const _age0 = convertStringToDuration(age[0])
-    const _age1 = convertStringToDuration(age[1])
-    if (_age0 !== null && _age1 === null) {
-      setError(Error.INCOHERENT_AGE_ERROR)
-    }
-    if (_age0 !== null && _age1 !== null && !checkMinMaxValue(_age0, _age1)) {
-      setError(Error.INCOHERENT_AGE_ERROR)
-    }
-  }, [vitalStatus, genders, birthdates, age, deathDates])
-
   const onSubmit = () => {
     onChangeSelectedCriteria({
       id: selectedCriteria?.id,
@@ -103,7 +90,7 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error === Error.NO_ERROR && !multiFields && (
+        {!multiFields && (
           <Alert
             severity="info"
             onClose={() => {
@@ -194,7 +181,8 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
           </BlockWrapper>
           {vitalStatus &&
             (vitalStatus.length === 0 ||
-              vitalStatus.find((status: LabelObject) => status.label === VitalStatusLabel.DECEASED)) && (
+              (vitalStatus.length === 1 &&
+                vitalStatus.find((status: LabelObject) => status.label === VitalStatusLabel.DECEASED))) && (
               <BlockWrapper margin="1em">
                 <CalendarRange
                   inline

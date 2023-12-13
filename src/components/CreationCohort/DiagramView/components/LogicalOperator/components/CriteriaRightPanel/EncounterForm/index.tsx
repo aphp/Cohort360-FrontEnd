@@ -103,47 +103,13 @@ const EncounterForm = ({
   useEffect(() => {
     setError(Error.NO_ERROR)
     if (
-      ((occurrence === 0 && occurrenceComparator === Comparators.EQUAL) ||
-        (occurrence === 1 && occurrenceComparator === Comparators.LESS)) &&
-      age[0] === null &&
-      age[1] === null &&
-      duration[0] === null &&
-      duration[1] === null &&
-      admissionMode?.length === 0 &&
-      entryMode?.length === 0 &&
-      exitMode?.length === 0 &&
-      priseEnChargeType?.length === 0 &&
-      typeDeSejour?.length === 0 &&
-      fileStatus?.length === 0 &&
-      reason?.length === 0 &&
-      destination?.length === 0 &&
-      provenance?.length === 0 &&
-      admission?.length === 0 &&
-      encounterService?.length === 0 &&
-      encounterStartDate === null &&
-      encounterEndDate === null
+      (occurrence === 0 && occurrenceComparator === Comparators.EQUAL) ||
+      (occurrence === 1 && occurrenceComparator === Comparators.LESS) ||
+      (occurrence === 0 && occurrenceComparator === Comparators.LESS_OR_EQUAL)
     ) {
       setError(Error.EMPTY_FORM)
     }
-  }, [
-    age,
-    duration,
-    admissionMode,
-    entryMode,
-    exitMode,
-    priseEnChargeType,
-    typeDeSejour,
-    fileStatus,
-    reason,
-    destination,
-    provenance,
-    admission,
-    encounterService,
-    encounterStartDate,
-    encounterEndDate,
-    occurrence,
-    occurrenceComparator
-  ])
+  }, [occurrence, occurrenceComparator])
 
   const onSubmit = () => {
     onChangeSelectedCriteria({
