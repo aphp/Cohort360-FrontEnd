@@ -981,7 +981,7 @@ export const fetchAccessExpirations: (
 }
 
 export const fetchPerimeterAccesses = async (perimeter: string) => {
-  const response = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${perimeter}`)
+  const response = await apiBackend.get(`accesses/accesses/my-data-rights/?perimeters_ids=${perimeter}`)
   return response
 }
 
