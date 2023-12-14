@@ -15,11 +15,13 @@ enum Mode {
 }
 
 type FiltersListProps = {
-  name: string
+  name?: string
   values: SavedFilter[]
   count: number
   onDelete: (value: any) => void
-  onDisplay: (filter: SavedFilter, isReadonlyModal: boolean) => void
+  onSelect: (filter: SavedFilter | null) => void
+  onDisplay: () => void
+  onEdit: () => void
   fetchPaginateData: () => void
 }
 
@@ -29,7 +31,9 @@ const FiltersList = ({
   values,
   count,
   onDelete,
+  onSelect,
   onDisplay,
+  onEdit,
   fetchPaginateData
 }: PropsWithChildren<FiltersListProps>) => {
   const context = useContext(FormContext)
@@ -38,11 +42,6 @@ const FiltersList = ({
 
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active
-
-  const handleDisplaySelectedFilter = (selectedItem: Item, isReadonly: boolean): void => {
-    const savedFilterInfo = values.find((filter) => filter.uuid === selectedItem.id)
-    if (savedFilterInfo) onDisplay(savedFilterInfo, isReadonly)
-  }
 
   const handleDeleteSelectedFilters = async (): Promise<void> => {
     const checkedFilterIdsToDelete = filters.filter((filter) => filter.checked).map((filter) => filter.id)
@@ -68,8 +67,11 @@ const FiltersList = ({
   }, [values])
 
   useEffect(() => {
+    context?.updateError(false)
     const selectedSavedFilter = values.find((filter) => filter.uuid === filters.find((filter) => filter.checked)?.id)
-    context?.updateFormData(name, selectedSavedFilter)
+    if (name && selectedSavedFilter) context?.updateFormData(name, selectedSavedFilter)
+    if (!selectedSavedFilter || mode === Mode.MULTIPLE) context?.updateError(true)
+    onSelect(selectedSavedFilter || null)
   }, [filters])
 
   return (
@@ -88,7 +90,16 @@ const FiltersList = ({
       )}
       {mode === Mode.MULTIPLE && (
         <Grid container justifyContent="space-between" item xs={8} margin="0px 0px 20px 0px">
-          <Button width="60%" icon={<DeleteOutline />} color="error" onClick={handleDeleteSelectedFilters}>
+          <Button
+            width="60%"
+            icon={<DeleteOutline />}
+            color="error"
+            onClick={() => {
+              handleDeleteSelectedFilters()
+              setMode(Mode.SINGLE)
+            }}
+            disabled={!filters.find((item) => item.checked)}
+          >
             Confirmer
           </Button>
           <Button variant="text" color="error" width="40%" onClick={() => setMode(Mode.SINGLE)}>
@@ -102,8 +113,8 @@ const FiltersList = ({
           multiple={mode === Mode.MULTIPLE}
           savedFiltersCount={count}
           onchange={(newFilters) => setFilters(newFilters)}
-          onItemEyeClick={(item) => handleDisplaySelectedFilter(item, true)}
-          onItemPencilClick={(item) => handleDisplaySelectedFilter(item, false)}
+          onItemEyeClick={onDisplay}
+          onItemPencilClick={onEdit}
           fetchPaginateData={fetchPaginateData}
         />
       ) : (

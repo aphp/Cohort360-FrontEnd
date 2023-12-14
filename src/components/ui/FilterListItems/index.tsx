@@ -69,8 +69,8 @@ const FilterListItems = ({
             multiple={multiple}
             item={item}
             onclick={handleSelectListItem}
-            onEyeClick={handleEyeClick}
-            onPencilClick={handlePencilClick}
+            onEyeClick={!multiple && item.checked ? handleEyeClick : undefined}
+            onPencilClick={!multiple && item.checked ? handlePencilClick : undefined}
           />
         ))}
       </InfiniteScroll>

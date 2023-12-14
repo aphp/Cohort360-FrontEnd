@@ -5,55 +5,62 @@ import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import { ErrorType } from 'types/error'
 
-type FiltersNameFilterProps = {
+type TextInputProps = {
   value?: string
+  title?: string
   name: string
-  error: ErrorType
+  error?: ErrorType
+  disabled?: boolean
+  minLimit?: number
+  maxLimit?: number
 }
 
-const FiltersNameFilter = ({ name, value = '', error }: FiltersNameFilterProps) => {
+const TextInput = ({ name, value = '', error, title, disabled, minLimit, maxLimit }: TextInputProps) => {
   const context = useContext(FormContext)
   const [filtersName, setFiltersName] = useState(value)
-  const [isError, setIsError] = useState({ min: false, max: false })
-
-  const onError = (isError: boolean) => {
-    if (context?.updateError) context?.updateError(isError)
-  }
+  const [isError, setIsError] = useState({ min: false, max: false, serverError: false })
 
   useEffect(() => {
-    onError(isError.min || isError.max || error.isError)
-  }, [isError, error])
+    context?.updateError(false)
+    if (isError.min || isError.max || isError.serverError) context?.updateError(true)
+  }, [isError])
 
   useEffect(() => {
     let min = false
     let max = false
-    if (filtersName.length > 50) {
+    const serverError = false
+    if (maxLimit && filtersName.length > maxLimit) {
       max = true
-    } else if (filtersName.length < 2) {
+    } else if (minLimit && filtersName.length < minLimit) {
       min = true
     } else if (context?.updateFormData) context.updateFormData(name, filtersName)
-    setIsError({ min, max })
+    setIsError({ min, max, serverError })
   }, [filtersName])
+
+  useEffect(() => {
+    setIsError({ ...isError, serverError: error ? error.isError : false })
+  }, [error])
 
   return (
     <>
       <InputWrapper>
-        <Typography variant="h3">Nom :</Typography>
+        {title && <Typography variant="h3">{title}</Typography>}
         <TextField
           margin="normal"
           fullWidth
           autoFocus
+          disabled={disabled}
           value={filtersName}
           onChange={(event) => setFiltersName(event.target.value)}
         />
       </InputWrapper>
       {isError.max && (
         <Grid>
-          <ErrorMessage>Le nom de sauvegarde du filtre ne peut excéder plus de 50 caractères.</ErrorMessage>
+          <ErrorMessage>Le nom de sauvegarde du filtre ne peut excéder plus de {maxLimit} caractères.</ErrorMessage>
         </Grid>
       )}
 
-      {error.isError && (
+      {error && isError.serverError && (
         <Grid>
           <ErrorMessage>{error.errorMessage}</ErrorMessage>
         </Grid>
@@ -62,4 +69,4 @@ const FiltersNameFilter = ({ name, value = '', error }: FiltersNameFilterProps) 
   )
 }
 
-export default FiltersNameFilter
+export default TextInput

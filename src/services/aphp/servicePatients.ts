@@ -831,10 +831,10 @@ export const getEncounterDocuments = async (
   return _encounters
 }
 
-export const postFiltersService = async (
+export const postFiltersService = async <T>(
   fhir_resource: RessourceType,
   name: string,
-  criterias: SearchCriterias<Filters>
+  criterias: SearchCriterias<T>
 ) => {
   const { searchBy, searchInput, filters } = criterias
   const criteriasString = `${mapObjectToString({ searchBy, searchInput })}&${mapObjectToString(filters)}`
@@ -873,11 +873,11 @@ export const deleteFiltersService = async (fhir_resource_uuids: string[]) => {
   }
 }
 
-export const patchFiltersService = async (
+export const patchFiltersService = async <T>(
   fhir_resource: RessourceType,
   uuid: string,
   name: string,
-  criterias: SearchCriterias<Filters>
+  criterias: SearchCriterias<T>
 ) => {
   try {
     const { searchBy, searchInput, filters } = criterias

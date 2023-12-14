@@ -52,19 +52,26 @@ const ListItem = ({ item, multiple = false, disabled = false, onclick, onEyeClic
         </Typography>
       </ListItemText>
 
-      <ListItemIcon sx={{ minWidth: '48px' }}>
-        <Tooltip title="Options du filtre" arrow placement="right">
-          <IconButton onClick={() => onEyeClick && onEyeClick(item)}>
-            <Visibility color="primary" fill="#000" />
-          </IconButton>
-        </Tooltip>
-      </ListItemIcon>
-      {maintenanceIsActive ? (
+      {onEyeClick && (
+        <ListItemIcon sx={{ minWidth: '48px' }}>
+          <Tooltip title="Voir les options du filtre" arrow placement="right">
+            <IconButton onClick={() => onEyeClick(item)}>
+              <Visibility color="primary" fill="#000" />
+            </IconButton>
+          </Tooltip>
+        </ListItemIcon>
+      )}
+
+      {maintenanceIsActive && onPencilClick && (
         <Tooltip title="Ce bouton est désactivé en raison d'une maintenance en cours." arrow placement="right">
           <EditPencilIcon />
         </Tooltip>
-      ) : (
-        <EditPencilIcon />
+      )}
+
+      {!maintenanceIsActive && onPencilClick && (
+        <Tooltip title="Modifier les options du filtre" arrow placement="right">
+          <EditPencilIcon />
+        </Tooltip>
       )}
     </ListItemWrapper>
   )

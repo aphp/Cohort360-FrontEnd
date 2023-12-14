@@ -168,17 +168,6 @@ export type FilterValue =
   | SimpleCodeType[]
   | null
 
-export enum FiltersTypes {
-  PATIENTS = 'Patients',
-  PMSI = 'PMSI',
-  MEDICATION = 'Medication',
-  BIOLOGY = 'Biology',
-  PATIENT_DOCUMENTS = 'PatientDocuments',
-  ALL_DOCUMENTS = 'AllDocuments',
-  COHORTS = 'Cohorts',
-  IMAGING = 'Imaging'
-}
-
 export type Filters =
   | PatientsFilters
   | PMSIFilters

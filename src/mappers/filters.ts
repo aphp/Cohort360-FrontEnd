@@ -1,10 +1,10 @@
+import { RessourceType } from 'types/requestCriterias'
 import {
   AllDocumentsFilters,
   Direction,
   DurationRangeType,
   FilterKeys,
   Filters,
-  FiltersTypes,
   GenderStatus,
   Order,
   PatientsFilters,
@@ -82,29 +82,24 @@ export function parseDocumentsFiltersString(filterURLParams: URLSearchParams): A
   return filters
 }
 
-export function mapStringToSearchCriteria(filtersString: string, filterType: FiltersTypes): SearchCriterias<Filters> {
+export const mapStringToSearchCriteria = <T>(filtersString: string, type: RessourceType): SearchCriterias<T> => {
   const parameters = new URLSearchParams(filtersString)
-
   const searchBy = parameters.get('searchBy') as SearchBy
   const searchInput = parameters.get('searchInput') as SearchInput
-  const filters = (function () {
-    switch (filterType) {
-      case FiltersTypes.PATIENTS:
+  const filters = <T>(function () {
+    switch (type) {
+      case RessourceType.PATIENT:
         return parsePatientsFiltersString(parameters)
-      case FiltersTypes.PMSI:
+      case RessourceType.PMSI:
         return {} as Filters
-      case FiltersTypes.MEDICATION:
+      case RessourceType.MEDICATION:
         return {} as Filters
-      case FiltersTypes.BIOLOGY:
+      case RessourceType.BIO_MICRO:
         return {} as Filters
-      case FiltersTypes.PATIENT_DOCUMENTS:
-        return {} as Filters
-      case FiltersTypes.ALL_DOCUMENTS:
+      case RessourceType.DOCUMENTS:
         return parseDocumentsFiltersString(parameters)
-      case FiltersTypes.COHORTS:
-        return {} as Filters
-      case FiltersTypes.IMAGING:
-        return {} as Filters
+      case RessourceType.IMAGING:
+        return {} as T
     }
   })()
 
