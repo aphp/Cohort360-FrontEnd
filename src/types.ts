@@ -740,6 +740,19 @@ export type GroupRights = {
   read_patient_pseudo?: boolean
 }
 
+export type DataRights = {
+  user_id: string
+  perimeter_id: number
+  right_read_patient_nominative: boolean
+  right_read_patient_pseudonymized: boolean
+  right_export_csv_nominative: boolean
+  right_export_csv_pseudonymized: boolean
+  right_export_jupyter_nominative: boolean
+  right_export_jupyter_pseudonymized: boolean
+  right_search_opposed_patients: boolean
+  right_search_patients_by_ipp: boolean
+}
+
 export type ScopeType =
   | 'AP-HP'
   | 'Groupe hospitalier (GH)'

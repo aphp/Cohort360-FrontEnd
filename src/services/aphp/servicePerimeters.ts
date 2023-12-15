@@ -3,6 +3,7 @@ import {
   AccessExpirationsProps,
   ChartCode,
   CohortData,
+  DataRights,
   ScopeElement,
   ScopePage,
   ScopeTreeRow,
@@ -182,7 +183,7 @@ const servicesPerimeters: IServicePerimeters = {
       .join(',')
 
     const rightResponse = await fetchPerimeterAccesses(perimetersIds)
-    const rightsData = (rightResponse.data as any[]) ?? []
+    const rightsData = (rightResponse.data as DataRights[]) ?? []
 
     let allowSearchIpp = false
 
@@ -410,10 +411,10 @@ const servicesPerimeters: IServicePerimeters = {
     const perimetersIds = perimeters.map((perimeter) => perimeter.id).join(',')
 
     const rightResponse = await fetchPerimeterAccesses(perimetersIds)
-    const rightsData = (rightResponse.data as any[]) ?? []
+    const rightsData = (rightResponse.data as DataRights[]) ?? []
 
     return perimeters.map((perimeter) => {
-      const foundRight = rightsData.find((rightData) => rightData.care_site_id === +(perimeter.id ?? '0'))
+      const foundRight = rightsData.find((rightData) => rightData.perimeter_id === +(perimeter.id ?? '0'))
 
       return {
         ...perimeter,
