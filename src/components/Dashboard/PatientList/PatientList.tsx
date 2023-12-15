@@ -49,11 +49,11 @@ import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters'
 import GendersFilter from 'components/Filters/GendersFilter'
 import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter'
 import FiltersNameFilter from 'components/Filters/TextInput'
-import FiltersList from 'components/Filters/FiltersList'
 import { useAppSelector } from 'state'
 import { MeState } from 'state/me'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { RessourceType } from 'types/requestCriterias'
+import ListFilter from 'components/Filters/ListFilter'
 
 type PatientListProps = {
   total: number
@@ -327,7 +327,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
         onSubmit={applySelectedSavedFilter}
         validationText="Appliquer le filtre"
       >
-        <FiltersList
+        <ListFilter
           values={allSavedFilters?.results || []}
           count={allSavedFilters?.count || 0}
           onDelete={deleteSavedFilters}
@@ -405,7 +405,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
               </Grid>
             </Grid>
           </Modal>
-        </FiltersList>
+        </ListFilter>
       </Modal>
       <Modal
         title="Sauvegarder les filtres"

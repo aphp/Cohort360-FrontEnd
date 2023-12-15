@@ -1,20 +1,20 @@
 import React, { PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { FormContext } from 'components/ui/Modal'
-import FilterListItems from 'components/ui/FilterListItems'
 import { SavedFilter } from 'types/searchCriterias'
-import { Item } from 'components/ui/FilterListItems/ListItem'
 import Button from 'components/ui/Button'
 import { DeleteOutline } from '@mui/icons-material'
 import { Grid, Typography } from '@mui/material'
 import { useAppSelector } from 'state'
 import { MeState } from 'state/me'
+import { Item } from 'components/ui/List/ListItem'
+import List from 'components/ui/List'
 
 enum Mode {
   SINGLE,
   MULTIPLE
 }
 
-type FiltersListProps = {
+type ListFilterProps = {
   name?: string
   values: SavedFilter[]
   count: number
@@ -25,7 +25,7 @@ type FiltersListProps = {
   fetchPaginateData: () => void
 }
 
-const FiltersList = ({
+const ListFilter = ({
   children,
   name,
   values,
@@ -35,17 +35,17 @@ const FiltersList = ({
   onDisplay,
   onEdit,
   fetchPaginateData
-}: PropsWithChildren<FiltersListProps>) => {
+}: PropsWithChildren<ListFilterProps>) => {
   const context = useContext(FormContext)
-  const [filters, setFilters] = useState<Item[]>([])
+  const [allElements, setAllElements] = useState<Item[]>([])
   const [mode, setMode] = useState(Mode.SINGLE)
 
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active
 
-  const handleDeleteSelectedFilters = async (): Promise<void> => {
-    const checkedFilterIdsToDelete = filters.filter((filter) => filter.checked).map((filter) => filter.id)
-    onDelete(checkedFilterIdsToDelete)
+  const handleDeleteSelectedElements = async (): Promise<void> => {
+    const elementsIdsToDelete = allElements.filter((elem) => elem.checked).map((elem) => elem.id)
+    onDelete(elementsIdsToDelete)
   }
 
   useEffect(() => {
@@ -53,26 +53,26 @@ const FiltersList = ({
     if (context?.updateError && mode === Mode.MULTIPLE) {
       context.updateError(true)
     }
-    setFilters(filters.map((value) => ({ ...value, checked: false })))
+    setAllElements(allElements.map((value) => ({ ...value, checked: false })))
   }, [mode])
 
   useEffect(() => {
-    setFilters(
+    setAllElements(
       values.map((value) => ({
         id: value.uuid,
         name: value.name,
-        checked: filters.find((filter) => filter.id === value.uuid)?.checked || false
+        checked: allElements.find((elem) => elem.id === value.uuid)?.checked || false
       }))
     )
   }, [values])
 
   useEffect(() => {
     context?.updateError(false)
-    const selectedSavedFilter = values.find((filter) => filter.uuid === filters.find((filter) => filter.checked)?.id)
-    if (name && selectedSavedFilter) context?.updateFormData(name, selectedSavedFilter)
-    if (!selectedSavedFilter || mode === Mode.MULTIPLE) context?.updateError(true)
-    onSelect(selectedSavedFilter || null)
-  }, [filters])
+    const selectedItem = values.find((elem) => elem.uuid === allElements.find((elem) => elem.checked)?.id)
+    if (name && selectedItem) context?.updateFormData(name, selectedItem)
+    if (!selectedItem || mode === Mode.MULTIPLE) context?.updateError(true)
+    onSelect(selectedItem || null)
+  }, [allElements])
 
   return (
     <>
@@ -95,10 +95,10 @@ const FiltersList = ({
             icon={<DeleteOutline />}
             color="error"
             onClick={() => {
-              handleDeleteSelectedFilters()
+              handleDeleteSelectedElements()
               setMode(Mode.SINGLE)
             }}
-            disabled={!filters.find((item) => item.checked)}
+            disabled={!allElements.find((elem) => elem.checked)}
           >
             Confirmer
           </Button>
@@ -107,19 +107,19 @@ const FiltersList = ({
           </Button>
         </Grid>
       )}
-      {Boolean(filters.length) ? (
-        <FilterListItems
-          values={filters}
+      {Boolean(allElements.length) ? (
+        <List
+          values={allElements}
           multiple={mode === Mode.MULTIPLE}
-          savedFiltersCount={count}
-          onchange={(newFilters) => setFilters(newFilters)}
+          count={count}
+          onchange={(newItems) => setAllElements(newItems)}
           onItemEyeClick={onDisplay}
           onItemPencilClick={onEdit}
           fetchPaginateData={fetchPaginateData}
         />
       ) : (
         <Typography fontWeight="700" align="center" sx={{ padding: '8px' }}>
-          Aucun filtre n'a été enregistré
+          Aucun élément n'a été enregistré
         </Typography>
       )}
 
@@ -128,4 +128,4 @@ const FiltersList = ({
   )
 }
 
-export default FiltersList
+export default ListFilter

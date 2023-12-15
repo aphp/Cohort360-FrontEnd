@@ -1,27 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import ListItem, { Item } from './ListItem'
-import { Grid, List, Typography } from '@mui/material'
+import { Grid, List as ListMui, Typography } from '@mui/material'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-type ListItemsProps = {
+type ListProps = {
   values: Item[]
   multiple?: boolean
-  savedFiltersCount: number
+  count: number
   onchange: (newValue: Item[]) => void
   onItemEyeClick?: (item: Item) => void
   onItemPencilClick?: (item: Item) => void
   fetchPaginateData: () => void
 }
 
-const FilterListItems = ({
+const List = ({
   values,
   multiple = false,
-  savedFiltersCount,
+  count,
   onchange,
   onItemEyeClick,
   onItemPencilClick,
   fetchPaginateData
-}: ListItemsProps) => {
+}: ListProps) => {
   const [items, setItems] = useState(values)
 
   const handleSelectListItem = (selectedItem: Item) => {
@@ -45,7 +45,7 @@ const FilterListItems = ({
   }, [values])
 
   return (
-    <List
+    <ListMui
       id="scrollableDiv"
       component="nav"
       aria-labelledby="nested-list-subheader"
@@ -55,7 +55,7 @@ const FilterListItems = ({
         scrollableTarget="scrollableDiv"
         dataLength={items.length}
         next={fetchPaginateData}
-        hasMore={items.length < savedFiltersCount}
+        hasMore={items.length < count}
         scrollThreshold={0.9}
         loader={
           <Grid container justifyContent="center">
@@ -74,8 +74,8 @@ const FilterListItems = ({
           />
         ))}
       </InfiniteScroll>
-    </List>
+    </ListMui>
   )
 }
 
-export default FilterListItems
+export default List
