@@ -127,7 +127,15 @@ const isSimpleCodeType = (obj: any): obj is SimpleCodeType => {
 }
 
 const isScopeTreeRow = (obj: any): obj is ScopeTreeRow => {
-  return 'id' in obj && 'name' in obj && 'quantity' in obj
+  return (
+    'id' in obj &&
+    'name' in obj &&
+    'cohort_id' in obj &&
+    'full_path' in obj &&
+    'above_levels_ids' in obj &&
+    'inferior_levels_ids' in obj &&
+    'type' in obj
+  )
 }
 
 export const mapObjectToString = (obj: any) => {
@@ -139,6 +147,7 @@ export const mapObjectToString = (obj: any) => {
       if (value.every((entry) => entry === null)) continue
       transformedString += `${property}=`
       const tempValue = value.map((entry) => {
+        if (entry === null) return 'null'
         if (typeof entry === 'object') {
           if (isSimpleCodeType(entry)) return entry.code
           else if (isScopeTreeRow(entry)) return entry.id

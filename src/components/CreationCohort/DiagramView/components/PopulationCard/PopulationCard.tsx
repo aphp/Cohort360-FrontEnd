@@ -151,7 +151,7 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
                 </Typography>
               ) : (
                 <Typography className={classes.typography} variant={form ? undefined : 'h6'} align="left">
-                  {'Sélectionné: '}
+                  {selectedItems.length ? 'Sélectionnées: ' : 'Aucune unité exécutrice sélectionnée'}
                 </Typography>
               )}
             </Grid>
@@ -161,10 +161,11 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
                   {selectionAndPopulationWithRightError &&
                     selectionAndPopulationWithRightError.map((pop, index: number) => (
                       <Chip
+                        disabled={disabled}
                         className={classes.populationChip}
                         key={`${index}-${pop?.name}`}
                         label={pop?.name}
-                        onDelete={isDeleteIcon ? () => _onDelete(index) : undefined}
+                        onDelete={isDeleteIcon && !disabled ? () => _onDelete(index) : undefined}
                       />
                     ))}
                   <IconButton size="small" onClick={() => onExtend(false)}>
@@ -183,7 +184,7 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
                             className={classes.populationChip}
                             key={`${index}-${pop.name}`}
                             label={pop.name}
-                            onDelete={isDeleteIcon ? () => _onDelete(index) : undefined}
+                            onDelete={isDeleteIcon && !disabled ? () => _onDelete(index) : undefined}
                           />
                         ) : (
                           <Chip
@@ -191,7 +192,7 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
                             className={classes.populationChip}
                             key={index}
                             label={'?'}
-                            onDelete={isDeleteIcon ? () => _onDelete(index) : undefined}
+                            onDelete={isDeleteIcon && !disabled ? () => _onDelete(index) : undefined}
                           />
                         )
                       )}
