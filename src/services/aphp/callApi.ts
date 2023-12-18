@@ -10,7 +10,8 @@ import {
   HierarchyElementWithSystem,
   IScope,
   Back_API_Response,
-  Cohort
+  Cohort,
+  DataRights
 } from 'types'
 
 import { FHIR_Bundle_Response } from 'types'
@@ -980,8 +981,8 @@ export const fetchAccessExpirations: (
   return response
 }
 
-export const fetchPerimeterAccesses = async (perimeter: string) => {
-  const response = await apiBackend.get(`accesses/accesses/my-data-rights/?perimeters_ids=${perimeter}`)
+export const fetchPerimeterAccesses = async (perimeter: string): Promise<AxiosResponse<DataRights[]>> => {
+  const response = await apiBackend.get<DataRights[]>(`accesses/accesses/my-data-rights/?perimeters_ids=${perimeter}`)
   return response
 }
 
