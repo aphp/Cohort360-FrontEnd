@@ -183,7 +183,7 @@ const servicesPerimeters: IServicePerimeters = {
       .join(',')
 
     const rightResponse = await fetchPerimeterAccesses(perimetersIds)
-    const rightsData = (rightResponse.data as DataRights[]) ?? []
+    const rightsData = rightResponse.data ?? []
 
     let allowSearchIpp = false
 
