@@ -411,7 +411,7 @@ const servicesPerimeters: IServicePerimeters = {
     const perimetersIds = perimeters.map((perimeter) => perimeter.id).join(',')
 
     const rightResponse = await fetchPerimeterAccesses(perimetersIds)
-    const rightsData = (rightResponse.data as DataRights[]) ?? []
+    const rightsData = rightResponse.data ?? []
 
     return perimeters.map((perimeter) => {
       const foundRight = rightsData.find((rightData) => rightData.perimeter_id === +(perimeter.id ?? '0'))
