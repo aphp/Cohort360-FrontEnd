@@ -3,7 +3,6 @@ import {
   AccessExpirationsProps,
   ChartCode,
   CohortData,
-  DataRights,
   ScopeElement,
   ScopePage,
   ScopeTreeRow,
