@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ListItemText, Radio, Typography, ListItemIcon, Checkbox, IconButton, Tooltip } from '@mui/material'
 import { ListItemWrapper } from './styles'
 import { Edit, Visibility } from '@mui/icons-material'
@@ -24,6 +24,8 @@ const ListItem = ({ item, multiple = false, disabled = false, onclick, onEyeClic
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active
 
+  const [editTooltipOpen, setEditTooltipOpen] = useState(false)
+
   const EditPencilIcon = React.forwardRef((props, ref) => (
     <ListItemIcon
       {...props}
@@ -31,7 +33,10 @@ const ListItem = ({ item, multiple = false, disabled = false, onclick, onEyeClic
       sx={{ minWidth: '40px', cursor: maintenanceIsActive ? 'not-allowed' : 'default' }}
     >
       <IconButton
-        onClick={() => onPencilClick && onPencilClick(item)}
+        onClick={() => {
+          onPencilClick && onPencilClick(item)
+          setEditTooltipOpen(false)
+        }}
         disabled={maintenanceIsActive}
         sx={{ '&:disabled': { cursor: 'not-allowed' } }}
       >
@@ -69,7 +74,14 @@ const ListItem = ({ item, multiple = false, disabled = false, onclick, onEyeClic
       )}
 
       {!maintenanceIsActive && onPencilClick && (
-        <Tooltip title="Modifier les options du filtre" arrow placement="right">
+        <Tooltip
+          open={editTooltipOpen}
+          onOpen={() => setEditTooltipOpen(true)}
+          onClose={() => setEditTooltipOpen(false)}
+          title="Modifier les options du filtre"
+          arrow
+          placement="right"
+        >
           <EditPencilIcon />
         </Tooltip>
       )}
