@@ -16,6 +16,7 @@ import {
   Direction,
   FilterKeys,
   Order,
+  SavedFilter,
   searchByListDocuments,
   SearchByTypes
 } from 'types/searchCriterias'
@@ -167,19 +168,18 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   }
 
   const applySelectedSavedFilter = async () => {
-    const updatedExecutiveUnits = await updateExecutiveUnits()
     if (selectedSavedFilter) {
       changeSearchBy(selectedSavedFilter.filterParams.searchBy ?? SearchByTypes.TEXT)
       changeSearchInput(selectedSavedFilter.filterParams.searchInput)
-      addFilters({ ...selectedSavedFilter.filterParams.filters, executiveUnits: updatedExecutiveUnits })
+      addFilters(selectedSavedFilter.filterParams.filters)
     }
   }
 
-  const updateExecutiveUnits = async () => {
-    const updatedExecutiveUnits = await fetchExecutiveUnits(
-      selectedSavedFilter?.filterParams.filters.executiveUnits || []
-    )
-    return updatedExecutiveUnits
+  const handleSelectFilter = async (savedFilter: SavedFilter) => {
+    const selectedFilter = mapToSelectedFilter(savedFilter)
+    const updatedExecutiveUnits = await fetchExecutiveUnits(selectedFilter.filterParams.filters.executiveUnits)
+    selectedFilter.filterParams.filters.executiveUnits = updatedExecutiveUnits
+    selectFilter(selectedFilter)
   }
 
   const SaveFiltersButton = () => (
@@ -395,9 +395,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
             setToggleFilterInfoModal(true)
             setIsReadonlyFilterInfoModal(false)
           }}
-          onSelect={(selectedItem) => {
-            selectFilter(mapToSelectedFilter(selectedItem))
-          }}
+          onSelect={handleSelectFilter}
           fetchPaginateData={() => getSavedFilters(allSavedFilters?.next)}
         >
           <Modal
@@ -484,7 +482,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
               <Grid item>
                 <ExecutiveUnitsFilter
                   disabled={isReadonlyFilterInfoModal}
-                  value={updateExecutiveUnits()}
+                  value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
                   criteriaName={CriteriaName.Document}
                 />

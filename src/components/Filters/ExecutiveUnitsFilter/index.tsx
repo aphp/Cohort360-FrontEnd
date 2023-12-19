@@ -22,8 +22,6 @@ const ExecutiveUnitsFilter = ({ name, value, criteriaName, disabled = false }: E
     if (context?.updateFormData) context.updateFormData(name, executiveUnits)
   }, [executiveUnits])
 
-  console.log(value)
-
   return (
     <InputWrapper>
       <Grid container alignContent="center">
