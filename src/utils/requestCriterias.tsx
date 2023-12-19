@@ -5,7 +5,6 @@ import {
   Comparators,
   CriteriaDataKey,
   DocType,
-  LabelCriteriaObject,
   MedicationTypeLabel,
   RessourceType,
   SelectedCriteriaType
@@ -14,6 +13,7 @@ import {
   DocumentAttachmentMethod,
   DocumentAttachmentMethodLabel,
   DurationRangeType,
+  LabelObject,
   SearchByTypes
 } from 'types/searchCriterias'
 import allDocTypes from 'assets/docTypes.json'
@@ -33,7 +33,7 @@ const getMedicationTypeLabel = (type: RessourceType) => {
 
 const getLabelFromCriteriaObject = (
   criteriaState: CriteriaState,
-  values: LabelCriteriaObject[] | null,
+  values: LabelObject[] | null,
   name: CriteriaDataKey,
   resourceType: RessourceType,
   label?: string
@@ -48,7 +48,7 @@ const getLabelFromCriteriaObject = (
     }
     const labels = removeDuplicates(criterion, 'id')
       .filter((obj) => values.map((value) => value.id).includes(obj.id))
-      .map((obj: LabelCriteriaObject) => `${displaySystem(obj.system)} ${obj.label}`)
+      .map((obj: LabelObject) => `${displaySystem(obj.system)} ${obj.label}`)
 
     const tooltipTitle = labels.join(' - ')
     return (
@@ -150,7 +150,8 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         labels.push(
           getLabelFromCriteriaObject(criteriaState, selectedCriteria.vitalStatus, CriteriaDataKey.VITALSTATUS, type)
         )
-      labels.push(getDurationRangeLabel(selectedCriteria.age, 'Âge'))
+      if (selectedCriteria.birthdates[0] === null && selectedCriteria.birthdates[1] === null)
+        labels.push(getDurationRangeLabel(selectedCriteria.age, 'Âge'))
       if (selectedCriteria.birthdates[0] || selectedCriteria.birthdates[1])
         labels.push(getDatesLabel(selectedCriteria.birthdates, 'Naissance'))
       if (selectedCriteria.deathDates[0] || selectedCriteria.deathDates[1])
