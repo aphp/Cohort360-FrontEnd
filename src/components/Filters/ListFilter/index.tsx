@@ -19,7 +19,7 @@ type ListFilterProps = {
   values: SavedFilter[]
   count: number
   onDelete: (value: any) => void
-  onSelect: (filter: SavedFilter | null) => void
+  onSelect: (filter: SavedFilter) => void
   onDisplay: () => void
   onEdit: () => void
   fetchPaginateData: () => void
@@ -71,7 +71,7 @@ const ListFilter = ({
     const selectedItem = values.find((elem) => elem.uuid === allElements.find((elem) => elem.checked)?.id)
     if (name && selectedItem) context?.updateFormData(name, selectedItem)
     if (!selectedItem || mode === Mode.MULTIPLE) context?.updateError(true)
-    onSelect(selectedItem || null)
+    if (selectedItem) onSelect(selectedItem)
   }, [allElements])
 
   return (

@@ -60,14 +60,16 @@ export const useSavedFilters = <T>(type: RessourceType) => {
     }
   }
 
-  const selectSavedFilter = (selectedItem: SavedFilter | null) => {
-    if (selectedItem) {
-      setSelectedSavedFilter({
-        filterUuid: selectedItem.uuid,
-        filterName: selectedItem.name,
-        filterParams: mapStringToSearchCriteria(selectedItem.filter, type) as SearchCriterias<T>
-      })
-    } else setSelectedSavedFilter(null)
+  const mapToSelectedFilter = (selectedItem: SavedFilter) => {
+    return {
+      filterUuid: selectedItem.uuid,
+      filterName: selectedItem.name,
+      filterParams: mapStringToSearchCriteria(selectedItem.filter, type) as SearchCriterias<T>
+    }
+  }
+
+  const selectFilter = (selectedFilter: SelectedFilter<T>) => {
+    setSelectedSavedFilter(selectedFilter)
   }
 
   const resetSavedFilterError = () => {
@@ -83,7 +85,8 @@ export const useSavedFilters = <T>(type: RessourceType) => {
       postSavedFilter,
       deleteSavedFilters,
       patchSavedFilter,
-      selectSavedFilter,
+      selectFilter,
+      mapToSelectedFilter,
       resetSavedFilterError
     }
   }

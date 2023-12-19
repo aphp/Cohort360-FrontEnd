@@ -48,7 +48,7 @@ import Chip from 'components/ui/Chip'
 import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters'
 import GendersFilter from 'components/Filters/GendersFilter'
 import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter'
-import FiltersNameFilter from 'components/Filters/TextInput'
+import TextInput from 'components/Filters/TextInput'
 import { useAppSelector } from 'state'
 import { MeState } from 'state/me'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
@@ -76,7 +76,8 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
       postSavedFilter,
       deleteSavedFilters,
       patchSavedFilter,
-      selectSavedFilter,
+      mapToSelectedFilter,
+      selectFilter,
       resetSavedFilterError
     }
   } = useSavedFilters<PatientsFilters>(RessourceType.PATIENT)
@@ -155,7 +156,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
 
   const applySelectedSavedFilter = () => {
     if (selectedSavedFilter) {
-      changeSearchBy(selectedSavedFilter.filterParams.searchBy ?? SearchByTypes.TEXT)
+      changeSearchBy(selectedSavedFilter.filterParams.searchBy || SearchByTypes.TEXT)
       changeSearchInput(selectedSavedFilter.filterParams.searchInput)
       addFilters(selectedSavedFilter.filterParams.filters as PatientsFilters)
     }
@@ -164,10 +165,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   const SaveFiltersButton = () => (
     <Button
       icon={<Save height="15px" fill="#FFF" />}
-      onClick={() => {
-        setToggleSaveFiltersModal(true)
-        resetSavedFilterError()
-      }}
+      onClick={() => setToggleSaveFiltersModal(true)}
       color="secondary"
       disabled={maintenanceIsActive}
     >
@@ -264,7 +262,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
           <Grid container item xs={12} lg={9} justifyContent="flex-end" style={{ maxWidth: 900 }}>
             {!deidentified && (
               <Select
-                selectedValue={searchBy || SearchByTypes.TEXT}
+                value={searchBy || SearchByTypes.TEXT}
                 label="Rechercher dans :"
                 width={'20%'}
                 items={searchByListPatients}
@@ -323,7 +321,10 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
       <Modal
         title="Filtres sauvegardés"
         open={toggleSavedFiltersModal}
-        onClose={() => setToggleSavedFiltersModal(false)}
+        onClose={() => {
+          setToggleSavedFiltersModal(false)
+          resetSavedFilterError()
+        }}
         onSubmit={applySelectedSavedFilter}
         validationText="Appliquer le filtre"
       >
@@ -339,7 +340,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
             setToggleFilterInfoModal(true)
             setIsReadonlyFilterInfoModal(false)
           }}
-          onSelect={selectSavedFilter}
+          onSelect={(filter) => selectFilter(mapToSelectedFilter(filter))}
           fetchPaginateData={() => getSavedFilters(allSavedFilters?.next)}
         >
           <Modal
@@ -350,11 +351,13 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
             onSubmit={(newFilters) => {
               const name = newFilters.filterName
               const searchInput = newFilters.searchInput as string
+              const searchBy = newFilters.searchBy as SearchByTypes
               const genders = newFilters.genders as GenderStatus[]
               const vitalStatuses = newFilters.vitalStatuses as VitalStatus[]
               const birthdatesRanges = newFilters.birthdatesRanges as DurationRangeType
               patchSavedFilter(name, {
                 searchInput,
+                searchBy,
                 orderBy: { orderBy: Order.FAMILY, orderDirection: Direction.ASC },
                 filters: {
                   genders,
@@ -366,10 +369,10 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
             validationText={isReadonlyFilterInfoModal ? 'Fermer' : 'Sauvegarder'}
           >
             <Grid container direction="column" sx={{ gap: '16px' }}>
-              <Grid item container direction="column" sx={{ gap: '8px' }}>
-                <FiltersNameFilter
+              <Grid item container direction="column">
+                <TextInput
                   name="filterName"
-                  title="Nom :"
+                  label="Nom :"
                   value={selectedSavedFilter?.filterName}
                   error={savedFiltersErrors}
                   disabled={isReadonlyFilterInfoModal}
@@ -377,14 +380,26 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
                   maxLimit={50}
                 />
               </Grid>
-              <Grid item container direction="column" sx={{ gap: '8px' }}>
-                <FiltersNameFilter
-                  name="searchInput"
-                  title="Recherche textuelle :"
-                  disabled={isReadonlyFilterInfoModal}
-                  value={selectedSavedFilter?.filterParams.searchInput}
-                />
+
+              <Grid item container direction="column" sx={{ gap: '16px' }}>
+                <Grid item container direction="column" sx={{ gap: '8px' }}>
+                  <TextInput
+                    name="searchInput"
+                    label="Recherche textuelle :"
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.searchInput}
+                  />
+                  <Select
+                    label="Rechercher dans"
+                    width="60%"
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.searchBy}
+                    items={searchByListPatients}
+                    name="searchBy"
+                  />
+                </Grid>
               </Grid>
+              <Grid item container direction="column" sx={{ gap: '8px' }}></Grid>
               <Grid item>
                 <GendersFilter
                   disabled={isReadonlyFilterInfoModal}
@@ -410,10 +425,13 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
       <Modal
         title="Sauvegarder les filtres"
         open={toggleSaveFiltersModal}
-        onClose={() => setToggleSaveFiltersModal(false)}
+        onClose={() => {
+          setToggleSaveFiltersModal(false)
+          resetSavedFilterError()
+        }}
         onSubmit={({ filtersName }) => postSavedFilter(filtersName, { searchBy, searchInput, filters, orderBy })}
       >
-        <FiltersNameFilter name="filtersName" error={savedFiltersErrors} title="Nom" minLimit={2} maxLimit={50} />
+        <TextInput name="filtersName" error={savedFiltersErrors} label="Nom" minLimit={2} maxLimit={50} />
       </Modal>
     </Grid>
   )

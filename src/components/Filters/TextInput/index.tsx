@@ -7,7 +7,7 @@ import { ErrorType } from 'types/error'
 
 type TextInputProps = {
   value?: string
-  title?: string
+  label?: string
   name: string
   error?: ErrorType
   disabled?: boolean
@@ -15,7 +15,7 @@ type TextInputProps = {
   maxLimit?: number
 }
 
-const TextInput = ({ name, value = '', error, title, disabled, minLimit, maxLimit }: TextInputProps) => {
+const TextInput = ({ name, value = '', error, label, disabled, minLimit, maxLimit }: TextInputProps) => {
   const context = useContext(FormContext)
   const [filtersName, setFiltersName] = useState(value)
   const [isError, setIsError] = useState({ min: false, max: false, serverError: false })
@@ -44,7 +44,7 @@ const TextInput = ({ name, value = '', error, title, disabled, minLimit, maxLimi
   return (
     <>
       <InputWrapper>
-        {title && <Typography variant="h3">{title}</Typography>}
+        {label && <Typography variant="h3">{label}</Typography>}
         <TextField
           margin="normal"
           fullWidth
