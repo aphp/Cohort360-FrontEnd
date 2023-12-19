@@ -448,6 +448,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
                     value={selectedSavedFilter?.filterParams.filters.nda || ''}
                   />
                 )}
+              </Grid>
+              <Grid item>
                 {!deidentified && (
                   <IppFilter
                     disabled={isReadonlyFilterInfoModal}
@@ -455,12 +457,16 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
                     value={selectedSavedFilter?.filterParams.filters.ipp || ''}
                   />
                 )}
+              </Grid>
+              <Grid item>
                 <DocTypesFilter
                   disabled={isReadonlyFilterInfoModal}
                   allDocTypesList={allDocTypesList.docTypes}
                   value={selectedSavedFilter?.filterParams.filters.docTypes || []}
                   name={FilterKeys.DOC_TYPES}
                 />
+              </Grid>
+              <Grid item>
                 <DatesRangeFilter
                   disabled={isReadonlyFilterInfoModal}
                   values={[
@@ -469,6 +475,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
                   ]}
                   names={[FilterKeys.START_DATE, FilterKeys.END_DATE]}
                 />
+              </Grid>
+              <Grid item>
                 <ExecutiveUnitsFilter
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
