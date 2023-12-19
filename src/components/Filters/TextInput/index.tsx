@@ -51,6 +51,8 @@ const TextInput = ({
     setIsError({ ...isError, serverError: error ? error.isError : false })
   }, [error])
 
+  console.log('TEST', error, isError)
+
   return (
     <>
       <InputWrapper>

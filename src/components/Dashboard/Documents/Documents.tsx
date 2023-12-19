@@ -167,14 +167,19 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   }
 
   const applySelectedSavedFilter = async () => {
-    const updatedExecutiveUnits = await fetchExecutiveUnits(
-      selectedSavedFilter?.filterParams.filters.executiveUnits || []
-    )
+    const updatedExecutiveUnits = await updateExecutiveUnits()
     if (selectedSavedFilter) {
       changeSearchBy(selectedSavedFilter.filterParams.searchBy ?? SearchByTypes.TEXT)
       changeSearchInput(selectedSavedFilter.filterParams.searchInput)
       addFilters({ ...selectedSavedFilter.filterParams.filters, executiveUnits: updatedExecutiveUnits })
     }
+  }
+
+  const updateExecutiveUnits = async () => {
+    const updatedExecutiveUnits = await fetchExecutiveUnits(
+      selectedSavedFilter?.filterParams.filters.executiveUnits || []
+    )
+    return updatedExecutiveUnits
   }
 
   const SaveFiltersButton = () => (
@@ -479,7 +484,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
               <Grid item>
                 <ExecutiveUnitsFilter
                   disabled={isReadonlyFilterInfoModal}
-                  value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
+                  value={updateExecutiveUnits()}
                   name={FilterKeys.EXECUTIVE_UNITS}
                   criteriaName={CriteriaName.Document}
                 />
@@ -491,7 +496,10 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
       <Modal
         title="Sauvegarder les filtres"
         open={toggleSaveFiltersModal}
-        onClose={() => setToggleSaveFiltersModal(false)}
+        onClose={() => {
+          setToggleSaveFiltersModal(false)
+          resetSavedFilterError()
+        }}
         onSubmit={({ filtersName }) => postSavedFilter(filtersName, { searchBy, searchInput, filters, orderBy })}
       >
         <TextInput name="filtersName" error={savedFiltersErrors} />
