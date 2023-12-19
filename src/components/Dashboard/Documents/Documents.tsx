@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
-import { Checkbox, CircularProgress, Grid, TextField, Tooltip, Typography } from '@mui/material'
+import { Checkbox, CircularProgress, Grid, Tooltip, Typography } from '@mui/material'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 import {
@@ -13,17 +13,14 @@ import {
 import services from 'services/aphp'
 import {
   AllDocumentsFilters,
+  Direction,
   FilterKeys,
-  Filters,
-  FiltersTypes,
-  SavedFilter,
-  SavedFiltersResults,
+  Order,
   searchByListDocuments,
-  SearchByTypes,
-  SearchCriterias
+  SearchByTypes
 } from 'types/searchCriterias'
 import allDocTypesList from 'assets/docTypes.json'
-import { ErrorType, SearchInputError } from 'types/error'
+import { SearchInputError } from 'types/error'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Searchbar from 'components/ui/Searchbar'
 import Select from 'components/ui/Searchbar/Select'
@@ -41,37 +38,40 @@ import DocTypesFilter from 'components/Filters/DocTypesFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import IppFilter from 'components/Filters/IppFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
-import {
-  deleteFiltersService,
-  fetchPerimeterFromPerimeterId,
-  getFiltersService,
-  patchFiltersService,
-  postFiltersService
-} from 'services/aphp/servicePatients'
 import { RessourceType } from 'types/requestCriterias'
 import { Save, SavedSearch } from '@mui/icons-material'
-import { mapStringToSearchCriteria } from 'mappers/filters'
 import { useAppSelector } from 'state'
 import { MeState } from 'state/me'
-import FiltersList from 'components/Filters/FiltersList'
-import FiltersNameFilter from 'components/Filters/FiltersNameFilter'
+import ListFilter from 'components/Filters/ListFilter'
+import TextInput from 'components/Filters/TextInput'
+import { useSavedFilters } from 'hooks/filters/useSavedFilters'
+import { fetchPerimeterFromPerimeterId } from 'services/aphp/servicePatients'
 
 type DocumentsProps = {
   groupId?: string
   deidentified: boolean
 }
 
-type SavedFilterInfoModal = {
-  filterUuid?: string
-  filterName: string
-  filterParams: SearchCriterias<AllDocumentsFilters>
-}
-
 const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   const [toggleModal, setToggleModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
-  const [displaySaveFilters, setDisplaySaveFilters] = useState(false)
+  const [displaySaveFiltersButton, setDisplaySaveFiltersButton] = useState(false)
+
+  const {
+    allSavedFilters,
+    savedFiltersErrors,
+    selectedSavedFilter,
+    methods: {
+      getSavedFilters,
+      postSavedFilter,
+      deleteSavedFilters,
+      patchSavedFilter,
+      selectFilter,
+      mapToSelectedFilter,
+      resetSavedFilterError
+    }
+  } = useSavedFilters<AllDocumentsFilters>(RessourceType.DOCUMENTS)
 
   const [documentsResult, setDocumentsResult] = useState<ResultsType>({ nb: 0, total: 0, label: 'document(s)' })
   const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total: 0, label: 'patient(s)' })
@@ -81,10 +81,6 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   const [searchInputError, setSearchInputError] = useState<SearchInputError | null>(null)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
 
-  const [savedFilters, setSavedFilters] = useState<SavedFiltersResults | null>(null)
-  const [savedFiltersErrors, setSavedFiltersErrors] = useState<ErrorType>({ isError: false })
-
-  const [displayedSavedFilter, setDisplayedSavedFilter] = useState<SavedFilterInfoModal>()
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
 
@@ -152,90 +148,33 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
     }
   }
 
-  const applySelectedSavedFilter = async ({ savedFilters }: { savedFilters: SavedFilter }) => {
-    const newFilter = mapStringToSearchCriteria(
-      savedFilters.filter,
-      FiltersTypes.ALL_DOCUMENTS
-    ) as SearchCriterias<AllDocumentsFilters>
-    changeSearchBy(newFilter.searchBy ?? SearchByTypes.TEXT)
-    changeSearchInput(newFilter.searchInput)
-    const mapExecutiveFilters = await Promise.all(
-      newFilter.filters.executiveUnits.map(async (executiveUnit) => {
-        const response = await fetchPerimeterFromPerimeterId(executiveUnit.id)
-        return response
+  const fetchExecutiveUnits = async (dataToMap: ScopeTreeRow[]) => {
+    const updatedExecutiveUnits = await Promise.all<ScopeTreeRow>(
+      dataToMap.map(async (unit) => {
+        if (!unit.name) {
+          try {
+            const fetchedData = await fetchPerimeterFromPerimeterId(unit.id)
+            return fetchedData
+          } catch (error) {
+            console.error('Erreur lors de la récupération des données', error)
+            return unit
+          }
+        }
+        return unit
       })
     )
-    addFilters({ ...newFilter.filters, executiveUnits: mapExecutiveFilters })
+    return updatedExecutiveUnits
   }
 
-  const displaySelectedFilterInfoModal = async (selectedItem: SavedFilter, isReadonly: boolean) => {
-    const filterParamsToDisplay = mapStringToSearchCriteria(
-      selectedItem.filter,
-      FiltersTypes.ALL_DOCUMENTS
-    ) as SearchCriterias<AllDocumentsFilters>
-
-    const fetchedExecutiveUnits = await Promise.all<Promise<ScopeTreeRow>>(
-      filterParamsToDisplay.filters.executiveUnits.map(async (executiveUnit) => {
-        const response = await fetchPerimeterFromPerimeterId(executiveUnit.id)
-        return response
-      })
+  const applySelectedSavedFilter = async () => {
+    const updatedExecutiveUnits = await fetchExecutiveUnits(
+      selectedSavedFilter?.filterParams.filters.executiveUnits || []
     )
-
-    setDisplayedSavedFilter({
-      filterUuid: selectedItem.uuid,
-      filterName: selectedItem.name,
-      filterParams: {
-        ...filterParamsToDisplay,
-        filters: { ...filterParamsToDisplay.filters, executiveUnits: fetchedExecutiveUnits }
-      }
-    })
-    setToggleFilterInfoModal(true)
-    setIsReadonlyFilterInfoModal(isReadonly)
-  }
-
-  const getSavedFilters = async (next?: string | null) => {
-    try {
-      const response = await getFiltersService(RessourceType.DOCUMENTS, next)
-      if (next) {
-        setSavedFilters({
-          ...response,
-          results: [...(savedFilters?.results || []), ...response.results]
-        } as SavedFiltersResults)
-      } else {
-        setSavedFilters(response)
-      }
-    } catch (err) {
-      setSavedFilters(null)
+    if (selectedSavedFilter) {
+      changeSearchBy(selectedSavedFilter.filterParams.searchBy ?? SearchByTypes.TEXT)
+      changeSearchInput(selectedSavedFilter.filterParams.searchInput)
+      addFilters({ ...selectedSavedFilter.filterParams.filters, executiveUnits: updatedExecutiveUnits })
     }
-  }
-
-  const postSavedFilter = async (name: string) => {
-    try {
-      await postFiltersService(RessourceType.DOCUMENTS, name, { searchBy, searchInput, filters, orderBy })
-      setSavedFiltersErrors({ isError: false })
-      await getSavedFilters()
-    } catch {
-      setSavedFiltersErrors({ isError: true, errorMessage: 'Nom déjà existant.' })
-      throw 'Nom déjà existant'
-    }
-  }
-
-  const deleteSavedFilters = async (filtersUuids: string[]) => {
-    await deleteFiltersService(filtersUuids)
-    await getSavedFilters()
-  }
-
-  const patchSavedFilter = async (newFilterInfos: Filters): Promise<void> => {
-    await patchFiltersService(
-      RessourceType.DOCUMENTS,
-      displayedSavedFilter?.filterUuid || '',
-      displayedSavedFilter?.filterName || '',
-      {
-        ...displayedSavedFilter?.filterParams,
-        filters: newFilterInfos
-      } as SearchCriterias<Filters>
-    )
-    await getSavedFilters()
   }
 
   const SaveFiltersButton = () => (
@@ -243,7 +182,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
       icon={<Save height="15px" fill="#FFF" />}
       onClick={() => {
         setToggleSaveFiltersModal(true)
-        setSavedFiltersErrors({ isError: false })
+        resetSavedFilterError()
       }}
       color="secondary"
       disabled={maintenanceIsActive}
@@ -257,8 +196,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   }, [])
 
   useEffect(() => {
-    if (filtersAsArray.length > 0 || searchInput) setDisplaySaveFilters(true)
-    else setDisplaySaveFilters(false)
+    if (filtersAsArray.length > 0 || searchInput) setDisplaySaveFiltersButton(true)
+    else setDisplaySaveFiltersButton(false)
   }, [nda, ipp, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate, searchBy, searchInput])
 
   useEffect(() => {
@@ -295,7 +234,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
       </BlockWrapper>
 
       <BlockWrapper item xs={12} margin="10px 0px 10px">
-        <Searchbar wrap>
+        <Searchbar wrapped>
           <Grid container direction="column" gap="10px">
             <Grid container item alignItems="flex-start" justifyContent="flex-end" maxWidth="555px" gap="8px">
               <Grid item>
@@ -307,14 +246,14 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
                   Filtrer
                 </Button>
               </Grid>
-              {!!savedFilters?.count && (
+              {!!allSavedFilters?.count && (
                 <Grid item>
                   <Button icon={<SavedSearch fill="#FFF" />} onClick={() => setToggleSavedFiltersModal(true)}>
                     Filtres sauvegardés
                   </Button>
                 </Grid>
               )}
-              {displaySaveFilters && (
+              {displaySaveFiltersButton && (
                 <Grid item>
                   {maintenanceIsActive ? (
                     <Tooltip
@@ -334,7 +273,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
             </Grid>
             <Grid container item gap="8px">
               <Select
-                selectedValue={searchBy || SearchByTypes.TEXT}
+                value={searchBy || SearchByTypes.TEXT}
                 label="Rechercher dans :"
                 width={'170px'}
                 items={searchByListDocuments}
@@ -438,13 +377,23 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
         onSubmit={applySelectedSavedFilter}
         validationText="Ouvrir"
       >
-        <FiltersList
+        <ListFilter
           name="savedFilters"
-          values={savedFilters?.results || []}
-          count={savedFilters?.count || 0}
+          values={allSavedFilters?.results || []}
+          count={allSavedFilters?.count || 0}
           onDelete={deleteSavedFilters}
-          onDisplay={displaySelectedFilterInfoModal}
-          fetchPaginateData={() => getSavedFilters(savedFilters?.next)}
+          onDisplay={() => {
+            setToggleFilterInfoModal(true)
+            setIsReadonlyFilterInfoModal(true)
+          }}
+          onEdit={() => {
+            setToggleFilterInfoModal(true)
+            setIsReadonlyFilterInfoModal(false)
+          }}
+          onSelect={(selectedItem) => {
+            selectFilter(mapToSelectedFilter(selectedItem))
+          }}
+          fetchPaginateData={() => getSavedFilters(allSavedFilters?.next)}
         >
           <Modal
             title={isReadonlyFilterInfoModal ? 'Informations sur le filtre' : 'Modifier le filtre'}
@@ -452,98 +401,92 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
             readonly={isReadonlyFilterInfoModal}
             width={'560px'}
             onClose={() => setToggleFilterInfoModal(false)}
-            onSubmit={patchSavedFilter}
+            onSubmit={(newFilters) => {
+              const name = newFilters.filterName
+              const searchBy = newFilters.searchBy
+              const searchInput = newFilters.searchInput as string
+              const nda = newFilters.nda
+              const ipp = newFilters.ipp
+              const docTypes = newFilters.docTypes
+              const startDate = newFilters.startDate
+              const endDate = newFilters.endDate
+              const executiveUnits = newFilters.executiveUnits
+              patchSavedFilter(name, {
+                searchBy,
+                searchInput,
+                orderBy: { orderBy: Order.FAMILY, orderDirection: Direction.ASC },
+                filters: { nda, ipp, docTypes, onlyPdfAvailable, startDate, endDate, executiveUnits }
+              })
+            }}
             validationText={isReadonlyFilterInfoModal ? 'Fermer' : 'Sauvegarder'}
           >
-            <Grid container direction="column" sx={{ gap: '16px' }}>
-              <Grid item container direction="column" sx={{ gap: '8px' }}>
-                <Grid item>
-                  <Typography variant="h3">Nom :</Typography>
-                </Grid>
-                <Grid item>
-                  <TextField
-                    size="small"
-                    disabled={isReadonlyFilterInfoModal}
-                    value={displayedSavedFilter?.filterName}
-                    fullWidth
-                    onChange={(e) =>
-                      !isReadonlyFilterInfoModal &&
-                      setDisplayedSavedFilter({
-                        ...displayedSavedFilter,
-                        filterName: e.target.value
-                      } as SavedFilterInfoModal)
-                    }
-                  />
-                </Grid>
+            <Grid container direction="column">
+              <Grid item>
+                <TextInput
+                  name="filterName"
+                  label="Nom :"
+                  value={selectedSavedFilter?.filterName}
+                  error={savedFiltersErrors}
+                  disabled={isReadonlyFilterInfoModal}
+                  minLimit={2}
+                  maxLimit={50}
+                />
               </Grid>
-              <Grid item container direction="column" sx={{ gap: '8px' }}>
-                <Grid item>
-                  <Typography variant="h3">Recherche textuelle :</Typography>
-                </Grid>
-                <Grid item>
-                  <TextField
-                    size="small"
-                    disabled={isReadonlyFilterInfoModal}
-                    value={displayedSavedFilter?.filterParams.searchInput}
-                    fullWidth
-                    placeholder={isReadonlyFilterInfoModal ? 'Aucune recherche textuelle' : 'Votre recherche textuelle'}
-                    onChange={(e) =>
-                      !isReadonlyFilterInfoModal &&
-                      setDisplayedSavedFilter({
-                        ...displayedSavedFilter,
-                        filterParams: { ...displayedSavedFilter?.filterParams, searchInput: e.target.value }
-                      } as SavedFilterInfoModal)
-                    }
-                  />
-                </Grid>
+              <Grid item>
+                <TextInput
+                  name="searchInput"
+                  label="Recherche textuelle :"
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.searchInput}
+                />
               </Grid>
               <Grid item>
                 {!deidentified && (
                   <NdaFilter
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.NDA}
-                    value={displayedSavedFilter?.filterParams.filters.nda || ''}
+                    value={selectedSavedFilter?.filterParams.filters.nda || ''}
                   />
                 )}
                 {!deidentified && (
                   <IppFilter
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.IPP}
-                    value={displayedSavedFilter?.filterParams.filters.ipp || ''}
+                    value={selectedSavedFilter?.filterParams.filters.ipp || ''}
                   />
                 )}
                 <DocTypesFilter
                   disabled={isReadonlyFilterInfoModal}
                   allDocTypesList={allDocTypesList.docTypes}
-                  value={displayedSavedFilter?.filterParams.filters.docTypes || []}
+                  value={selectedSavedFilter?.filterParams.filters.docTypes || []}
                   name={FilterKeys.DOC_TYPES}
                 />
                 <DatesRangeFilter
                   disabled={isReadonlyFilterInfoModal}
                   values={[
-                    displayedSavedFilter?.filterParams.filters.startDate,
-                    displayedSavedFilter?.filterParams.filters.endDate
+                    selectedSavedFilter?.filterParams.filters.startDate,
+                    selectedSavedFilter?.filterParams.filters.endDate
                   ]}
                   names={[FilterKeys.START_DATE, FilterKeys.END_DATE]}
                 />
                 <ExecutiveUnitsFilter
                   disabled={isReadonlyFilterInfoModal}
-                  value={displayedSavedFilter?.filterParams.filters.executiveUnits || []}
+                  value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
                   criteriaName={CriteriaName.Document}
                 />
               </Grid>
             </Grid>
           </Modal>
-        </FiltersList>
+        </ListFilter>
       </Modal>
       <Modal
         title="Sauvegarder les filtres"
         open={toggleSaveFiltersModal}
         onClose={() => setToggleSaveFiltersModal(false)}
-        onSubmit={({ filtersName }) => postSavedFilter(filtersName)}
+        onSubmit={({ filtersName }) => postSavedFilter(filtersName, { searchBy, searchInput, filters, orderBy })}
       >
-        <FiltersNameFilter name="filtersName" error={savedFiltersErrors} />
+        <TextInput name="filtersName" error={savedFiltersErrors} />
       </Modal>
     </Grid>
   )

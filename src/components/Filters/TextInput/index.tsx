@@ -9,13 +9,23 @@ type TextInputProps = {
   value?: string
   label?: string
   name: string
+  placeholder?: string
   error?: ErrorType
   disabled?: boolean
   minLimit?: number
   maxLimit?: number
 }
 
-const TextInput = ({ name, value = '', error, label, disabled, minLimit, maxLimit }: TextInputProps) => {
+const TextInput = ({
+  name,
+  value = '',
+  placeholder = '',
+  error,
+  label,
+  disabled,
+  minLimit,
+  maxLimit
+}: TextInputProps) => {
   const context = useContext(FormContext)
   const [filtersName, setFiltersName] = useState(value)
   const [isError, setIsError] = useState({ min: false, max: false, serverError: false })
@@ -51,6 +61,7 @@ const TextInput = ({ name, value = '', error, label, disabled, minLimit, maxLimi
           autoFocus
           disabled={disabled}
           value={filtersName}
+          placeholder={(disabled && placeholder) || 'Non renseigné'}
           onChange={(event) => setFiltersName(event.target.value)}
         />
       </InputWrapper>

@@ -111,6 +111,10 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
   }, [selectedItems])
 
   useEffect(() => {
+    setSelectedItems(selection.filter((item): item is ScopeTreeRow => item !== undefined))
+  }, [executiveUnits])
+
+  useEffect(() => {
     if (
       !isRendered.current &&
       !executiveUnits &&

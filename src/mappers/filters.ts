@@ -142,7 +142,7 @@ export const mapObjectToString = (obj: any) => {
   let transformedString = ''
   for (const property in obj) {
     const value = obj[property as keyof Filters]
-    if (value === null || value === '' || value.length === 0) continue
+    if (!value || value.length === 0) continue
     if (Array.isArray(value)) {
       if (value.every((entry) => entry === null)) continue
       transformedString += `${property}=`

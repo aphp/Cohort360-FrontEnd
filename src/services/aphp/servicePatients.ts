@@ -42,7 +42,7 @@ import {
   Patient,
   Procedure
 } from 'fhir/r4'
-import { Direction, Filters, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
+import { Direction, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
 import { Medication, PMSI } from 'types/patient'
 import { RessourceType } from 'types/requestCriterias'
 import { mapObjectToString } from 'mappers/filters'

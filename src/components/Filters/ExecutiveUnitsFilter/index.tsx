@@ -6,6 +6,7 @@ import { CriteriaNameType, ScopeTreeRow } from 'types'
 import InfoIcon from '@mui/icons-material/Info'
 import scopeType from 'data/scope_type.json'
 import { InputWrapper } from 'components/ui/Inputs'
+import { fetchPerimeterFromPerimeterId } from 'services/aphp/servicePatients'
 
 type ExecutiveUnitsFilterProps = {
   value: ScopeTreeRow[]
@@ -18,9 +19,33 @@ const ExecutiveUnitsFilter = ({ name, value, criteriaName, disabled = false }: E
   const context = useContext(FormContext)
   const [executiveUnits, setExecutiveUnits] = useState(value)
 
+  const fetchData = async () => {
+    const updatedExecutiveUnits = await Promise.all(
+      executiveUnits.map(async (unit) => {
+        if (!unit.name) {
+          try {
+            const fetchedData = await fetchPerimeterFromPerimeterId(unit.id)
+            return fetchedData
+          } catch (error) {
+            console.error('Erreur lors de la récupération des données', error)
+            return unit
+          }
+        }
+        return unit
+      })
+    )
+    setExecutiveUnits(updatedExecutiveUnits)
+  }
+
   useEffect(() => {
     if (context?.updateFormData) context.updateFormData(name, executiveUnits)
   }, [executiveUnits])
+
+  useEffect(() => {
+    if (executiveUnits.some((unit) => !unit.name)) {
+      fetchData()
+    }
+  }, [])
 
   return (
     <InputWrapper>

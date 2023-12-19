@@ -24,7 +24,7 @@ const IppFilter = ({ name, value, disabled = false }: IppFilterProps) => {
         disabled={disabled}
         fullWidth
         autoFocus
-        placeholder={disabled ? 'Non renseigné ' : 'Exemple: 8000000000001,8000000000002'}
+        placeholder={disabled ? 'Non renseigné' : 'Exemple: 8000000000001,8000000000002'}
         value={ipp}
         onChange={(event) => setIpp(event.target.value)}
       />

@@ -144,7 +144,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
         </IconButton>
       </div>
       <BlockWrapper item margin={'4px'}>
-        <Searchbar wrap>
+        <Searchbar wrapped>
           <Typography variant="button" style={{ marginBottom: '8px' }}>
             Rechercher par :
           </Typography>

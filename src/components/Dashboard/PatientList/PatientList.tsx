@@ -158,7 +158,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
     if (selectedSavedFilter) {
       changeSearchBy(selectedSavedFilter.filterParams.searchBy || SearchByTypes.TEXT)
       changeSearchInput(selectedSavedFilter.filterParams.searchInput)
-      addFilters(selectedSavedFilter.filterParams.filters as PatientsFilters)
+      addFilters(selectedSavedFilter.filterParams.filters)
     }
   }
 
@@ -359,11 +359,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
                 searchInput,
                 searchBy,
                 orderBy: { orderBy: Order.FAMILY, orderDirection: Direction.ASC },
-                filters: {
-                  genders,
-                  vitalStatuses,
-                  birthdatesRanges
-                }
+                filters: { genders, vitalStatuses, birthdatesRanges }
               })
             }}
             validationText={isReadonlyFilterInfoModal ? 'Fermer' : 'Sauvegarder'}
