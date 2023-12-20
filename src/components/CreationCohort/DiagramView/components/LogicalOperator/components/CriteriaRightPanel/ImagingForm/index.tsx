@@ -85,7 +85,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [seriesModalities, setSeriesModalities] = useState<LabelObject[]>(
     mappingCriteria(selectedCriteria?.seriesModalities, CriteriaDataKey.MODALITIES, criteriaData) || []
   )
-  const [bodySite, setBodySite] = useState<string>(selectedCriteria?.bodySite || '')
   const [seriesUid, setSeriesUid] = useState<string>(selectedCriteria?.seriesUid || '')
   const [encounterService, setEncounterService] = useState(selectedCriteria?.encounterService || [])
   const [encounterStartDate, setEncounterStartDate] = useState(selectedCriteria?.encounterStartDate || null)
@@ -142,7 +141,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
       seriesDescription,
       seriesProtocol,
       seriesModalities,
-      bodySite,
       seriesUid,
       encounterService,
       encounterStartDate,
@@ -158,7 +156,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
     !!seriesDescription ||
     !!seriesProtocol ||
     seriesModalities.length > 0 ||
-    !!bodySite ||
     !!seriesUid
 
   return (
@@ -370,15 +367,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               renderInput={(params) => <TextField {...params} label="Modalités" />}
               style={{ marginBottom: '1em' }}
             />
-
-            <BlockWrapper style={{ marginBottom: '1em' }}>
-              <SearchbarWithCheck
-                searchInput={bodySite}
-                setSearchInput={setBodySite}
-                placeholder="Rechercher dans les parties du corps"
-                onError={(isError) => setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)}
-              />
-            </BlockWrapper>
 
             <FormLabel component="legend" className={classes.durationLegend}>
               Recherche par uid de série

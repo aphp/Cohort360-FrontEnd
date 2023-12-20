@@ -191,7 +191,13 @@ const ControlPanel: React.FC<{
       <Grid className={classes.rightPanelContainerStyle}>
         <Grid className={classes.container}>
           <Button
-            disabled={itLoads || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated}
+            disabled={
+              itLoads ||
+              typeof onExecute !== 'function' ||
+              maintenanceIsActive ||
+              count_outdated ||
+              includePatient === 0
+            }
             onClick={() => onSetOpenModal('executeCohortConfirmation')}
             className={classes.requestExecution}
           >
