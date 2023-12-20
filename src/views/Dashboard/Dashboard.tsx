@@ -63,7 +63,9 @@ const Dashboard: React.FC<{
           { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/${cohortId}/preview`, disabled: false },
           { label: 'Données patient', value: 'patients', to: `/cohort/${cohortId}/patients`, disabled: false },
           { label: 'Documents cliniques', value: 'documents', to: `/cohort/${cohortId}/documents`, disabled: false },
-          { label: 'Imagerie', value: 'imaging', to: `/cohort/${cohortId}/imaging`, disabled: false }
+          ...(ODD_IMAGING
+            ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/${cohortId}/imaging`, disabled: false }]
+            : [])
         ])
         break
       case 'new_cohort':
@@ -72,7 +74,7 @@ const Dashboard: React.FC<{
           { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/new/preview`, disabled: true },
           { label: 'Données patient', value: 'patients', to: `/cohort/new/patients`, disabled: true },
           { label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true },
-          { label: 'Imagerie', value: 'imaging', to: `/cohort/new/imaging`, disabled: true }
+          ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/new/imaging`, disabled: true }] : [])
         ])
         break
       case 'perimeters':
@@ -91,7 +93,9 @@ const Dashboard: React.FC<{
             to: `/perimeters/documents${location.search}`,
             disabled: false
           },
-          { label: 'Imagerie', value: 'imaging', to: `/perimeters/imaging${location.search}`, disabled: false }
+          ...(ODD_IMAGING
+            ? [{ label: 'Imagerie', value: 'imaging', to: `/perimeters/imaging${location.search}`, disabled: false }]
+            : [])
         ])
         break
       default:
