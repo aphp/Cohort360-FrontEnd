@@ -256,7 +256,6 @@ export type ImagingDataType = CommonCriteriaDataType & {
   seriesDescription: string
   seriesProtocol: string
   seriesModalities: LabelObject[] | null
-  bodySite: string
   seriesUid: string
   encounterEndDate: string | null
   encounterStartDate: string | null

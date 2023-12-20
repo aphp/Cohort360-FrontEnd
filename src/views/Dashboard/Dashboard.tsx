@@ -17,6 +17,7 @@ import useStyles from './styles'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import ImagingList from 'components/Dashboard/ImagingList'
+import { ODD_IMAGING } from '../../constants'
 
 type Tabs = { label: string; value: string; to: string; disabled: boolean | undefined } | undefined
 
@@ -48,7 +49,7 @@ const Dashboard: React.FC<{
           { label: 'Aperçu', value: 'preview', to: '/my-patients/preview', disabled: false },
           { label: 'Patients', value: 'patients', to: '/my-patients/patients', disabled: false },
           { label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false },
-          { label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging', disabled: false }
+          ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging', disabled: false }] : [])
         ])
         break
       case 'cohort':

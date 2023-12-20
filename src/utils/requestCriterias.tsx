@@ -346,7 +346,6 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
       if (selectedCriteria.seriesDescription)
         labels.push(`Description de la série : ${selectedCriteria.seriesDescription}`)
       if (selectedCriteria.seriesProtocol) labels.push(`Protocole de la série : ${selectedCriteria.seriesProtocol}`)
-      if (selectedCriteria.bodySite) labels.push(`Partie du corps : ${selectedCriteria.bodySite}`)
       if (selectedCriteria.seriesUid) labels.push(getIdsListLabels(selectedCriteria.seriesUid, 'uuid de série'))
       if (!isNaN(selectedCriteria.numberOfSeries) && selectedCriteria.seriesComparator)
         labels.push(

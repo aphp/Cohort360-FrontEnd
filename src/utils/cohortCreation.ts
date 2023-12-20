@@ -95,7 +95,6 @@ const IMAGING_SERIES_DATE = 'series-started'
 const IMAGING_SERIES_DESCRIPTION = 'series-description'
 const IMAGING_SERIES_PROTOCOL = 'series-protocol'
 const IMAGING_SERIES_MODALITIES = 'series-modality'
-const IMAGING_BODYSITE = 'bodysite'
 const IMAGING_SERIES_UID = 'series'
 
 export const UNITE_EXECUTRICE = 'Unité exécutrice'
@@ -634,7 +633,6 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
                 .reduce(searchReducer)}`
             : ''
         }`,
-        `${criterion.bodySite ? `${IMAGING_BODYSITE}=${encodeURIComponent(criterion.bodySite)}` : ''}`,
         `${criterion.seriesUid ? `${IMAGING_SERIES_UID}=${criterion.seriesUid}` : ''}`,
         `${
           criterion.encounterService && criterion.encounterService.length > 0
@@ -1650,7 +1648,6 @@ export async function unbuildRequest(_json: string): Promise<any> {
           currentCriterion.seriesDescription = ''
           currentCriterion.seriesProtocol = ''
           currentCriterion.seriesModalities = []
-          currentCriterion.bodySite = ''
           currentCriterion.seriesUid = ''
           currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
@@ -1732,10 +1729,6 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 currentCriterion.seriesModalities = currentCriterion.seriesModalities
                   ? [...currentCriterion.seriesModalities, ...newModalitiesIds]
                   : newModalitiesIds
-                break
-              }
-              case IMAGING_BODYSITE: {
-                currentCriterion.bodySite = value ? decodeURIComponent(value) : ''
                 break
               }
               case IMAGING_SERIES_UID: {

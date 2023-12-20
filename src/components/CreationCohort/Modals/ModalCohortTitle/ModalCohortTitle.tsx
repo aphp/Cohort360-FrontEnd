@@ -27,7 +27,7 @@ const ModalCohortTitle: React.FC<{
   const [title, onChangeTitle] = useState('')
   const [description, onChangeDescription] = useState('')
   const [globalCount, onCheckGlobalCount] = useState(false)
-  const [error, setError] = useState<CohortCreationError | null>(null)
+  const [error, setError] = useState<CohortCreationError | null>(CohortCreationError.ERROR_TITLE)
   const [loading, setLoading] = useState(false)
 
   const handleClose = () => onClose()
