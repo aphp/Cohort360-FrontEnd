@@ -22,6 +22,10 @@ const Select = <T,>({ value, label, items, width = '100%', disabled, name, oncha
     if (onchange) onchange(activeValue)
   }, [activeValue])
 
+  useEffect(() => {
+    setActiveValue(value)
+  }, [value])
+
   return (
     <SelectWrapper width={width}>
       <FormControl variant="outlined">

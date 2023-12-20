@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios'
+import { AxiosResponse } from 'axios'
 import { CohortData, FHIR_Bundle_Response, CohortEncounter, CohortComposition, MedicationEntry, ChartCode } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -42,10 +42,10 @@ import {
   Patient,
   Procedure
 } from 'fhir/r4'
-import { Direction, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
+import { Direction, Filters, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
 import { Medication, PMSI } from 'types/patient'
 import { RessourceType } from 'types/requestCriterias'
-import { mapObjectToString } from 'mappers/filters'
+import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
 
 export interface IServicePatients {
   /*
@@ -832,17 +832,15 @@ export const getEncounterDocuments = async (
   return _encounters
 }
 
-export const postFiltersService = async <T>(
+export const postFiltersService = async (
   fhir_resource: RessourceType,
   name: string,
-  criterias: SearchCriterias<T>
+  criterias: SearchCriterias<Filters>,
+  deidentified: boolean
 ) => {
-  const { searchBy, searchInput, filters } = criterias
-
-  const criteriasString = `${mapObjectToString({ searchBy, searchInput })}&${mapObjectToString(filters)}`
+  const criteriasString = mapSearchCriteriasToRequestParams(criterias, deidentified)
   const response = await postFilters(fhir_resource, name, criteriasString)
 
-  if (response instanceof AxiosError) throw "Le filtre n'a pas pu être sauvegardé."
   return response.data
 }
 
@@ -875,20 +873,17 @@ export const deleteFiltersService = async (fhir_resource_uuids: string[]) => {
   }
 }
 
-export const patchFiltersService = async <T>(
+export const patchFiltersService = async (
   fhir_resource: RessourceType,
   uuid: string,
   name: string,
-  criterias: SearchCriterias<T>
+  criterias: SearchCriterias<Filters>,
+  deidentified: boolean
 ) => {
-  try {
-    const { searchBy, searchInput, filters } = criterias
-    const criteriasString = `${mapObjectToString({ searchBy, searchInput })}&${mapObjectToString(filters)}`
-    const response = await patchFilters(fhir_resource, uuid, name, criteriasString)
-    return response
-  } catch {
-    throw "Le filtre n'a pas pu être modifié."
-  }
+  const criteriasString = mapSearchCriteriasToRequestParams(criterias, deidentified)
+  const response = await patchFilters(fhir_resource, uuid, name, criteriasString)
+
+  return response
 }
 
 export const fetchPerimeterFromPerimeterId = async (perimeterId: string) => {

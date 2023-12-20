@@ -15,7 +15,7 @@ import {
 } from 'types'
 
 import { FHIR_Bundle_Response } from 'types'
-import { AxiosResponse } from 'axios'
+import { AxiosError, AxiosResponse } from 'axios'
 import apiBackend from '../apiBackend'
 import {
   Binary,
@@ -350,6 +350,7 @@ export const postFilters = async (
     name,
     filter
   })
+  if (res instanceof AxiosError) throw "Le filtre n'a pas pu être sauvegardé."
   return res
 }
 
@@ -392,6 +393,7 @@ export const patchFilters = async (
     name,
     filter
   })
+  if (res instanceof AxiosError) throw "Le filtre n'a pas pu être modifié."
   return res
 }
 

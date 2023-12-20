@@ -414,12 +414,16 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
               const startDate = newFilters.startDate
               const endDate = newFilters.endDate
               const executiveUnits = newFilters.executiveUnits
-              patchSavedFilter(name, {
-                searchBy,
-                searchInput,
-                orderBy: { orderBy: Order.FAMILY, orderDirection: Direction.ASC },
-                filters: { nda, ipp, docTypes, onlyPdfAvailable, startDate, endDate, executiveUnits }
-              })
+              patchSavedFilter(
+                name,
+                {
+                  searchBy,
+                  searchInput,
+                  orderBy: { orderBy: Order.FAMILY, orderDirection: Direction.ASC },
+                  filters: { nda, ipp, docTypes, onlyPdfAvailable, startDate, endDate, executiveUnits }
+                },
+                deidentified ?? true
+              )
             }}
             validationText={isReadonlyFilterInfoModal ? 'Fermer' : 'Sauvegarder'}
           >
@@ -435,13 +439,25 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
                   maxLimit={50}
                 />
               </Grid>
-              <Grid item>
-                <TextInput
-                  name="searchInput"
-                  label="Recherche textuelle :"
-                  disabled={isReadonlyFilterInfoModal}
-                  value={selectedSavedFilter?.filterParams.searchInput}
-                />
+              <Grid item container direction="column" paddingBottom="16px">
+                <Grid item>
+                  <TextInput
+                    name="searchInput"
+                    label="Recherche textuelle :"
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.searchInput}
+                  />
+                </Grid>
+                <Grid item>
+                  <Select
+                    label="Rechercher dans"
+                    width="60%"
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.searchBy}
+                    items={searchByListDocuments}
+                    name="searchBy"
+                  />
+                </Grid>
               </Grid>
               <Grid item>
                 {!deidentified && (
@@ -498,7 +514,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
           setToggleSaveFiltersModal(false)
           resetSavedFilterError()
         }}
-        onSubmit={({ filtersName }) => postSavedFilter(filtersName, { searchBy, searchInput, filters, orderBy })}
+        onSubmit={({ filtersName }) =>
+          postSavedFilter(filtersName, { searchBy, searchInput, filters, orderBy }, deidentified ?? true)
+        }
       >
         <TextInput name="filtersName" error={savedFiltersErrors} />
       </Modal>

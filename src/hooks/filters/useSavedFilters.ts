@@ -8,7 +8,7 @@ import {
 } from 'services/aphp/servicePatients'
 import { ErrorType } from 'types/error'
 import { RessourceType } from 'types/requestCriterias'
-import { SavedFilter, SavedFiltersResults, SearchCriterias } from 'types/searchCriterias'
+import { Filters, SavedFilter, SavedFiltersResults, SearchCriterias } from 'types/searchCriterias'
 
 export type SelectedFilter<T> = {
   filterUuid: string
@@ -37,9 +37,9 @@ export const useSavedFilters = <T>(type: RessourceType) => {
     }
   }
 
-  const postSavedFilter = async <T>(name: string, searchCriterias: SearchCriterias<T>) => {
+  const postSavedFilter = async (name: string, searchCriterias: SearchCriterias<Filters>, deidentified: boolean) => {
     try {
-      await postFiltersService(type, name, searchCriterias)
+      await postFiltersService(type, name, searchCriterias, deidentified)
       setSavedFiltersErrors({ isError: false })
       await getSavedFilters()
     } catch {
@@ -53,9 +53,13 @@ export const useSavedFilters = <T>(type: RessourceType) => {
     await getSavedFilters()
   }
 
-  const patchSavedFilter = async <T>(name: string, newSearchCriterias: SearchCriterias<T>): Promise<void> => {
+  const patchSavedFilter = async (
+    name: string,
+    newSearchCriterias: SearchCriterias<Filters>,
+    deidentified: boolean
+  ): Promise<void> => {
     if (selectedSavedFilter) {
-      await patchFiltersService(type, selectedSavedFilter?.filterUuid, name, newSearchCriterias)
+      await patchFiltersService(type, selectedSavedFilter?.filterUuid, name, newSearchCriterias, deidentified)
       await getSavedFilters()
     }
   }

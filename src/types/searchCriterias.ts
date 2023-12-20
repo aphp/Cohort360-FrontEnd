@@ -10,6 +10,14 @@ export enum GenderStatus {
   UNKNOWN = 'UNKNOWN',
   OTHER_UNKNOWN = 'OTHER_UNKNOWN'
 }
+export enum GenderCodes {
+  MALE = 'm',
+  FEMALE = 'f',
+  OTHER = 'a',
+  UNKNOWN = 'INCONNU',
+  UNDETERMINED = 'i',
+  NOT_SPECIFIED = 'NON RENSEIGNE'
+}
 export enum GenderStatusLabel {
   MALE = 'Hommes',
   FEMALE = 'Femmes',
@@ -213,7 +221,7 @@ export interface BiologyFilters {
   validatedStatus: boolean
 }
 
-export type ImagingFilters = {
+export interface ImagingFilters {
   ipp?: string
   nda: string
   startDate: string | null
@@ -222,7 +230,7 @@ export type ImagingFilters = {
   modality: LabelObject[]
 }
 
-export type PatientDocumentsFilters = {
+export interface PatientDocumentsFilters {
   nda: string
   docTypes: SimpleCodeType[]
   onlyPdfAvailable: boolean

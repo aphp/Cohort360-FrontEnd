@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
-import moment from 'moment'
 
 import { CircularProgress, Grid, Tooltip } from '@mui/material'
 
@@ -20,7 +19,6 @@ import {
 
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import { Save, SavedSearch } from '@mui/icons-material'
-import { substructAgeString } from 'utils/age'
 import { cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
 import Searchbar from 'components/ui/Searchbar'
@@ -116,10 +114,6 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   const fetchPatients = async () => {
     try {
       const includeFacets = page === 1
-      const birthdates: [string, string] = [
-        moment(substructAgeString(birthdatesRanges?.[0] || '')).format('MM/DD/YYYY'),
-        moment(substructAgeString(birthdatesRanges?.[1] || '')).format('MM/DD/YYYY')
-      ]
       setLoadingStatus(LoadingStatus.FETCHING)
       const result = await services.cohorts.fetchPatientList(
         {
@@ -128,7 +122,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
             orderBy,
             searchInput,
             searchBy,
-            filters: { genders, vitalStatuses, birthdatesRanges: birthdates }
+            filters: { genders, vitalStatuses, birthdatesRanges }
           }
         },
         deidentified ?? true,
@@ -315,7 +309,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
         <BirthdatesRangesFilter
           name={FilterKeys.BIRTHDATES}
           value={birthdatesRanges}
-          deidentified={deidentified || false}
+          deidentified={deidentified ?? false}
         />
       </Modal>
       <Modal
@@ -355,16 +349,20 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
               const genders = newFilters.genders as GenderStatus[]
               const vitalStatuses = newFilters.vitalStatuses as VitalStatus[]
               const birthdatesRanges = newFilters.birthdatesRanges as DurationRangeType
-              patchSavedFilter(name, {
-                searchInput,
-                searchBy,
-                orderBy: { orderBy: Order.FAMILY, orderDirection: Direction.ASC },
-                filters: { genders, vitalStatuses, birthdatesRanges }
-              })
+              patchSavedFilter(
+                name,
+                {
+                  searchInput,
+                  searchBy,
+                  orderBy: { orderBy: Order.FAMILY, orderDirection: Direction.ASC },
+                  filters: { genders, vitalStatuses, birthdatesRanges }
+                },
+                deidentified ?? true
+              )
             }}
             validationText={isReadonlyFilterInfoModal ? 'Fermer' : 'Sauvegarder'}
           >
-            <Grid container direction="column" sx={{ gap: '16px' }}>
+            <Grid container direction="column" gap="8px">
               <Grid item container direction="column">
                 <TextInput
                   name="filterName"
@@ -376,26 +374,22 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
                   maxLimit={50}
                 />
               </Grid>
-
-              <Grid item container direction="column" sx={{ gap: '16px' }}>
-                <Grid item container direction="column" sx={{ gap: '8px' }}>
-                  <TextInput
-                    name="searchInput"
-                    label="Recherche textuelle :"
-                    disabled={isReadonlyFilterInfoModal}
-                    value={selectedSavedFilter?.filterParams.searchInput}
-                  />
-                  <Select
-                    label="Rechercher dans"
-                    width="60%"
-                    disabled={isReadonlyFilterInfoModal}
-                    value={selectedSavedFilter?.filterParams.searchBy}
-                    items={searchByListPatients}
-                    name="searchBy"
-                  />
-                </Grid>
+              <Grid item container direction="column" paddingBottom="8px">
+                <TextInput
+                  name="searchInput"
+                  label="Recherche textuelle :"
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.searchInput}
+                />
+                <Select
+                  label="Rechercher dans"
+                  width="60%"
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.searchBy}
+                  items={searchByListPatients}
+                  name="searchBy"
+                />
               </Grid>
-              <Grid item container direction="column" sx={{ gap: '8px' }}></Grid>
               <Grid item>
                 <GendersFilter
                   disabled={isReadonlyFilterInfoModal}
@@ -411,7 +405,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
                   disabled={isReadonlyFilterInfoModal}
                   name={FilterKeys.BIRTHDATES}
                   value={selectedSavedFilter?.filterParams.filters.birthdatesRanges || [null, null]}
-                  deidentified={deidentified || false}
+                  deidentified={deidentified ?? false}
                 />
               </Grid>
             </Grid>
@@ -425,7 +419,9 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
           setToggleSaveFiltersModal(false)
           resetSavedFilterError()
         }}
-        onSubmit={({ filtersName }) => postSavedFilter(filtersName, { searchBy, searchInput, filters, orderBy })}
+        onSubmit={({ filtersName }) =>
+          postSavedFilter(filtersName, { searchBy, searchInput, filters, orderBy }, deidentified ?? true)
+        }
       >
         <TextInput name="filtersName" error={savedFiltersErrors} label="Nom" minLimit={2} maxLimit={50} />
       </Modal>
