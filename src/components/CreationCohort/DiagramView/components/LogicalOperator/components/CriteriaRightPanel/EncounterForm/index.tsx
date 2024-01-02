@@ -17,6 +17,7 @@ import {
 import InfoIcon from '@mui/icons-material/Info'
 
 import useStyles from './styles'
+import { useAppSelector } from 'state'
 
 import { CriteriaDrawerComponentProps, CriteriaName, ScopeTreeRow } from 'types'
 import PopulationCard from '../../../../PopulationCard/PopulationCard'
@@ -99,6 +100,14 @@ const EncounterForm = ({
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const isEdition = selectedCriteria !== null ? true : false
   const [error, setError] = useState(Error.NO_ERROR)
+  const selectedPopulation = useAppSelector((state) => state.cohortCreation.request.selectedPopulation || [])
+
+  const deidentified: boolean | undefined =
+    selectedPopulation === null
+      ? undefined
+      : selectedPopulation
+          .map((population) => population && population.access)
+          .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
 
   useEffect(() => {
     setError(Error.NO_ERROR)
@@ -246,6 +255,7 @@ const EncounterForm = ({
               value={age}
               onChange={(value) => setAge(value)}
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+              deidentified={deidentified}
             />
           </BlockWrapper>
 

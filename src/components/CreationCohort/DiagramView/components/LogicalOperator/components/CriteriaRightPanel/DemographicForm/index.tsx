@@ -17,6 +17,8 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
 
+import { useAppSelector } from 'state'
+
 import { DurationRangeType, LabelObject, VitalStatusLabel } from 'types/searchCriterias'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
@@ -52,6 +54,15 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
     useState(mappingCriteria(selectedCriteria?.genders, CriteriaDataKey.GENDER, criteriaData)) || []
   const [title, setTitle] = useState(selectedCriteria?.title || 'Critère démographique')
   const [isInclusive, setIsInclusive] = useState<boolean>(selectedCriteria?.isInclusive || true)
+
+  const selectedPopulation = useAppSelector((state) => state.cohortCreation.request.selectedPopulation || [])
+
+  const deidentified: boolean | undefined =
+    selectedPopulation === null
+      ? undefined
+      : selectedPopulation
+          .map((population) => population && population.access)
+          .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
 
   const { classes } = useStyles()
 
@@ -153,16 +164,18 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
             renderInput={(params) => <TextField {...params} label="Statut vital" />}
           />
 
-          <BlockWrapper margin="1em">
-            <CalendarRange
-              inline
-              disabled={age[0] !== null || age[1] !== null}
-              value={birthdates}
-              label={'Date de naissance'}
-              onChange={(value) => setBirthdates(value)}
-              onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
-            />
-          </BlockWrapper>
+          {!deidentified && (
+            <BlockWrapper margin="1em">
+              <CalendarRange
+                inline
+                disabled={age[0] !== null || age[1] !== null}
+                value={birthdates}
+                label={'Date de naissance'}
+                onChange={(value) => setBirthdates(value)}
+                onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+              />
+            </BlockWrapper>
+          )}
 
           <BlockWrapper margin="1em">
             <DurationRange
@@ -177,9 +190,11 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
               }
               onChange={(value) => setAge(value)}
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+              deidentified={deidentified}
             />
           </BlockWrapper>
-          {vitalStatus &&
+          {!deidentified &&
+            vitalStatus &&
             (vitalStatus.length === 0 ||
               (vitalStatus.length === 1 &&
                 vitalStatus.find((status: LabelObject) => status.label === VitalStatusLabel.DECEASED))) && (

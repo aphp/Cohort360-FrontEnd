@@ -125,13 +125,13 @@ export const convertDurationToTimestamp = (duration: DurationType | null): numbe
   return year * 365 + month * 30 + day
 }
 
-export const convertTimestampToDuration = (timestamp: number | null): DurationType => {
+export const convertTimestampToDuration = (timestamp: number | null, type: Calendar): DurationType => {
   const duration: DurationType = { year: 130, month: 0, day: 0 }
   if (!timestamp) return duration
-  duration.year = Math.floor(timestamp / 365)
-  timestamp = timestamp % 365
-  duration.month = Math.floor(timestamp / 30)
-  timestamp = timestamp % 30
+  duration.year = type === Calendar.MONTH ? Math.floor(timestamp / 12) : Math.floor(timestamp / 365)
+  timestamp = type === Calendar.MONTH ? timestamp % 12 : timestamp % 365
+  duration.month = type === Calendar.MONTH ? Math.floor(timestamp / 1) : Math.floor(timestamp / 30)
+  timestamp = type === Calendar.MONTH ? timestamp % 1 : timestamp % 30
   duration.day = timestamp
   return duration
 }
