@@ -24,7 +24,8 @@ import {
   convertDurationToString,
   convertDurationToTimestamp,
   convertStringToDuration,
-  convertTimestampToDuration
+  convertTimestampToDuration,
+  substructAgeString
 } from './age'
 import { Comparators, DocType, RessourceType, SelectedCriteriaType, CriteriaDataKey } from 'types/requestCriterias'
 import { comparatorToFilter, parseOccurence } from './valueComparator'
@@ -36,7 +37,8 @@ const IPP_LIST_FHIR = 'identifier.value'
 
 const PATIENT_GENDER = 'gender'
 const PATIENT_BIRTHDATE = 'birthdate'
-const PATIENT_AGE = 'age-day'
+const PATIENT_AGE_DAY = 'age-day'
+const PATIENT_AGE_MONTH = 'age-month'
 const PATIENT_DEATHDATE = 'death-date'
 const PATIENT_DECEASED = 'deceased'
 
@@ -191,7 +193,7 @@ export const getCalendarMultiplicator = (type: Calendar): number => {
   }
 }
 
-const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
+const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: boolean): string => {
   let filterFhir = ''
   const filterReducer = (accumulator: any, currentValue: any): string =>
     accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
@@ -200,15 +202,16 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
   switch (criterion.type) {
     case RessourceType.PATIENT: {
-      const ageMin = convertDurationToTimestamp(
-        convertStringToDuration(criterion.age?.[0]) || { year: 0, month: 0, day: 0 }
-      )
-      const ageMax = convertDurationToTimestamp(
-        convertStringToDuration(criterion.age?.[1]) || { year: 130, month: 0, day: 0 }
-      )
+      const birthdates: [string, string] = [
+        moment(substructAgeString(criterion?.age?.[0] || '0/0/0')).format('MM/DD/YYYY'),
+        moment(substructAgeString(criterion?.age?.[1] || '0/0/130')).format('MM/DD/YYYY')
+      ]
 
-      const ageMinCriterion = `${PATIENT_AGE}=ge${ageMin}`
-      const ageMaxCriterion = `${PATIENT_AGE}=le${ageMax}`
+      const ageMin = Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
+      const ageMax = Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
+
+      const ageMinCriterion = `${deidentified ? PATIENT_AGE_MONTH : PATIENT_AGE_DAY}=ge${ageMin}`
+      const ageMaxCriterion = `${deidentified ? PATIENT_AGE_MONTH : PATIENT_AGE_DAY}=le${ageMax}`
 
       filterFhir = [
         'active=true',
@@ -243,6 +246,19 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
     }
 
     case RessourceType.ENCOUNTER: {
+      const birthdates: [string, string] = [
+        moment(substructAgeString(criterion?.age?.[0] || '0/0/0')).format('MM/DD/YYYY'),
+        moment(substructAgeString(criterion?.age?.[1] || '0/0/130')).format('MM/DD/YYYY')
+      ]
+
+      deidentified = false //TODO erase this line when deidentified param for encounter is implemented
+
+      const ageMin = Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
+      const ageMax = Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
+
+      const ageMinCriterion = `${deidentified ? ENCOUNTER_MIN_BIRTHDATE : ENCOUNTER_MIN_BIRTHDATE}=ge${ageMin}`
+      const ageMaxCriterion = `${deidentified ? ENCOUNTER_MAX_BIRTHDATE : ENCOUNTER_MAX_BIRTHDATE}=le${ageMax}`
+
       filterFhir = [
         'subject.active=true',
         `${
@@ -320,16 +336,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
             ? `${ENCOUNTER_DURATION}=le${convertDurationToTimestamp(convertStringToDuration(criterion.duration?.[1]))}`
             : ''
         }`,
-        `${
-          criterion.age?.[0]
-            ? `${ENCOUNTER_MIN_BIRTHDATE}=ge${convertDurationToTimestamp(convertStringToDuration(criterion.age?.[0]))}`
-            : ''
-        }`,
-        `${
-          criterion.age?.[1]
-            ? `${ENCOUNTER_MAX_BIRTHDATE}=le${convertDurationToTimestamp(convertStringToDuration(criterion.age?.[1]))}`
-            : ''
-        }`
+        `${criterion.age?.[0] ? ageMinCriterion : ''}`,
+        `${criterion.age?.[1] ? ageMaxCriterion : ''}`
       ]
         .filter((elem) => elem)
         .reduce(filterReducer)
@@ -661,6 +669,12 @@ export function buildRequest(
 ): string {
   if (!selectedPopulation) return ''
   selectedPopulation = selectedPopulation.filter((elem) => elem !== undefined)
+  const deidentified: boolean =
+    selectedPopulation === null
+      ? false
+      : selectedPopulation
+          .map((population) => population && population.access)
+          .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
 
   const exploreCriteriaGroup = (itemIds: number[]): (RequeteurCriteriaType | RequeteurGroupType)[] => {
     let children: (RequeteurCriteriaType | RequeteurGroupType)[] = []
@@ -677,7 +691,7 @@ export function buildRequest(
           _id: item.id ?? 0,
           isInclusive: item.isInclusive ?? true,
           resourceType: item.type ?? RessourceType.PATIENT,
-          filterFhir: constructFilterFhir(item),
+          filterFhir: constructFilterFhir(item, deidentified),
           occurrence:
             !(item.type === RessourceType.PATIENT || item.type === RessourceType.IPP_LIST) && item.occurrence
               ? {
@@ -858,13 +872,23 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const value = filter ? filter[1] : null
 
             switch (key) {
-              case PATIENT_AGE: {
+              case PATIENT_AGE_DAY: {
                 if (value?.includes('ge')) {
                   const ageMin = value?.replace('ge', '')
-                  currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin))
+                  currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin, Calendar.DAY))
                 } else if (value?.includes('le')) {
                   const ageMax = value?.replace('le', '')
-                  currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax))
+                  currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax, Calendar.DAY))
+                }
+                break
+              }
+              case PATIENT_AGE_MONTH: {
+                if (value?.includes('ge')) {
+                  const ageMin = value?.replace('ge', '')
+                  currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin, Calendar.MONTH))
+                } else if (value?.includes('le')) {
+                  const ageMax = value?.replace('le', '')
+                  currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax, Calendar.MONTH))
                 }
                 break
               }
@@ -952,21 +976,25 @@ export async function unbuildRequest(_json: string): Promise<any> {
               case ENCOUNTER_DURATION: {
                 if (value.includes('ge')) {
                   const durationMin = value?.replace('ge', '')
-                  currentCriterion.duration[0] = convertDurationToString(convertTimestampToDuration(+durationMin))
+                  currentCriterion.duration[0] = convertDurationToString(
+                    convertTimestampToDuration(+durationMin, Calendar.DAY)
+                  )
                 } else if (value.includes('le')) {
                   const durationMax = value?.replace('le', '')
-                  currentCriterion.duration[1] = convertDurationToString(convertTimestampToDuration(+durationMax))
+                  currentCriterion.duration[1] = convertDurationToString(
+                    convertTimestampToDuration(+durationMax, Calendar.DAY)
+                  )
                 }
                 break
               }
               case ENCOUNTER_MIN_BIRTHDATE: {
                 const ageMin = value?.replace('ge', '')
-                currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin))
+                currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin, Calendar.DAY))
                 break
               }
               case ENCOUNTER_MAX_BIRTHDATE: {
                 const ageMax = value?.replace('le', '')
-                currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax))
+                currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax, Calendar.DAY))
                 break
               }
               case ENCOUNTER_ENTRYMODE: {
