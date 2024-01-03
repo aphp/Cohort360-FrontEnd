@@ -823,13 +823,15 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
  * @param code
  * @param search
  * @param noStar
+ * @param signal
  * @returns
  */
 const getCodeList = async (
   codeSystem: string,
   expandCode?: string,
   search?: string,
-  noStar = true
+  noStar = true,
+  signal?: AbortSignal
 ): Promise<{ code?: string; display?: string; extension?: Extension[]; codeSystem?: string }[] | undefined> => {
   if (!expandCode) {
     if (search !== undefined && !search.trim()) {
@@ -844,7 +846,9 @@ const getCodeList = async (
         : `&only-roots=false&_text=${encodeURIComponent(search.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line  
     }
     // TODO test if it returns all the codes without specifying the count
-    const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}${searchParam}`)
+    const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}${searchParam}`, {
+      signal: signal
+    })
     const valueSetBundle = getApiResponseResourcesOrThrow(res)
     return valueSetBundle.length > 0
       ? valueSetBundle
@@ -890,7 +894,8 @@ export type FetchValueSetOptions = {
 
 export const fetchValueSet = async (
   codeSystem: string,
-  options?: FetchValueSetOptions
+  options?: FetchValueSetOptions,
+  signal?: AbortSignal
 ): Promise<Array<HierarchyElementWithSystem>> => {
   const {
     code,
@@ -902,7 +907,7 @@ export const fetchValueSet = async (
     filterRoots = () => true,
     filterOut = (value: HierarchyElement) => value.id === 'APHP generated'
   } = options || {}
-  const codeList = await getCodeList(codeSystem, code, search, noStar)
+  const codeList = await getCodeList(codeSystem, code, search, noStar, signal)
   const sortingFunc = sortingKey === 'id' ? idSort : labelSort
   const formattedCodeList =
     codeList

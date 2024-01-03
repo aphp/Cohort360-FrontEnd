@@ -33,7 +33,8 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
   const currentState = { ...selectedCriteria, ...initialState }
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
-  const getGhmOptions = async (searchValue: string) => await services.cohortCreation.fetchGhmData(searchValue, false)
+  const getGhmOptions = async (searchValue: string, signal: AbortSignal) =>
+    await services.cohortCreation.fetchGhmData(searchValue, false, signal)
   const _onSubmit = () => {
     onChangeSelectedCriteria(currentState)
     dispatch(fetchClaim())

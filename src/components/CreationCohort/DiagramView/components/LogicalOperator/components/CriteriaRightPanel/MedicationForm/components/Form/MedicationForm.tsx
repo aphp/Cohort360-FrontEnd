@@ -49,8 +49,8 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
   const currentState = { ...selectedCriteria, ...initialState }
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
-  const getMedicationOptions = async (searchValue: string) =>
-    await services.cohortCreation.fetchMedicationData(searchValue, false)
+  const getMedicationOptions = async (searchValue: string, signal: AbortSignal) =>
+    await services.cohortCreation.fetchMedicationData(searchValue, false, signal)
 
   const _onSubmit = () => {
     onChangeSelectedCriteria(currentState)

@@ -1,10 +1,11 @@
-import React, { FC, useEffect, useState, Fragment } from 'react'
+import React, { FC, useEffect, useState, Fragment, useRef } from 'react'
 
 import { Autocomplete, CircularProgress, TextField } from '@mui/material'
 
 import { displaySystem } from 'utils/displayValueSetSystem'
 
 import { ValueSetSystem } from 'types'
+import { cancelPendingRequest } from 'utils/abortController'
 
 interface ElementType {
   id: string
@@ -22,7 +23,7 @@ type InputAutocompleteAsyncProps = {
   onChange?: (e: any, value: any) => void
   renderInput?: any
   autocompleteOptions?: ElementType[]
-  getAutocompleteOptions?: (searchValue: string) => Promise<any>
+  getAutocompleteOptions?: (searchValue: string, signal: AbortSignal) => Promise<any>
   noOptionsText?: string
   helperText?: string
 }
@@ -46,6 +47,7 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
   const [searchValue, setSearchValue] = useState('')
   const [options, setOptions] = useState<ElementType[]>(autocompleteOptions)
   const [loading, setLoading] = useState(false)
+  const controllerRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
     let active = true
@@ -53,7 +55,8 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
     ;(async () => {
       setLoading(true)
       if (!getAutocompleteOptions) return
-      const response = (await getAutocompleteOptions(searchValue)) || []
+      controllerRef.current = cancelPendingRequest(controllerRef.current)
+      const response = (await getAutocompleteOptions(searchValue, controllerRef.current?.signal)) || []
 
       if (active) {
         setOptions(response)
