@@ -37,7 +37,7 @@ const ModalCreateNewRequest: React.FC<{
 }> = ({ onClose }) => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
-
+  const url = window.location.href && window.location.href.includes('/cohort/new') ? true : false
   const requestState = useAppSelector((state) => state.request)
   const _projectsList = useAppSelector((state) => state.project.projectsList)
 
@@ -214,10 +214,12 @@ const ModalCreateNewRequest: React.FC<{
             <Button disabled={loading} onClick={() => setDeletionConfirmation(true)} style={{ color: '#dc3545' }}>
               Supprimer
             </Button>
-          ) : (
+          ) : url ? (
             <Button variant="contained" disabled={loading} onClick={() => setTab(tab === 'form' ? 'open' : 'form')}>
               {tab === 'form' ? 'Ouvrir' : 'Nouvelle requête'}
             </Button>
+          ) : (
+            <></>
           )}
 
           <Grid style={{ flex: 1 }} />
