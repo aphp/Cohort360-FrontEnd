@@ -248,7 +248,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 id="criteria-value"
                 variant="outlined"
                 value={currentState.valueMin}
-                onChange={(e) => onChangeValue('valueMin', parseInt(e.target.value))}
+                onChange={(e) => onChangeValue('valueMin', parseFloat(e.target.value))}
                 placeholder={currentState.valueComparator === Comparators.BETWEEN ? 'Valeur minimale' : '0'}
                 disabled={!allowSearchByValue}
               />
@@ -262,7 +262,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                   id="criteria-value"
                   variant="outlined"
                   value={currentState.valueMax}
-                  onChange={(e) => onChangeValue('valueMax', parseInt(e.target.value))}
+                  onChange={(e) => onChangeValue('valueMax', parseFloat(e.target.value))}
                   placeholder="Valeur maximale"
                   disabled={!allowSearchByValue}
                 />
