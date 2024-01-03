@@ -24,29 +24,34 @@ import {
 } from 'types/searchCriterias'
 import allDocTypesList from 'assets/docTypes.json'
 import moment from 'moment'
-import { substructAgeString } from 'utils/age'
+import { convertDurationToString, convertTimestampToDuration, substructAgeString } from 'utils/age'
 
-export function parsePatientsFiltersString(filterURLParams: URLSearchParams): PatientsFilters {
+export function parsePatientsFiltersRequestParams(filterURLParams: URLSearchParams): PatientsFilters {
   const filters: PatientsFilters = {
     genders: [],
     birthdatesRanges: [null, null],
-    vitalStatuses: []
+    vitalStatuses: [VitalStatus.ALL]
   }
 
   for (const [filterName, filterValue] of filterURLParams.entries()) {
+    console.log('testParsing', filterName, filterValue)
     if (filterValue === '') continue
     switch (filterName) {
-      case FilterKeys.GENDERS:
-        filters.genders = filterValue.split(',') as GenderStatus[]
+      case 'gender':
+        filters.genders = filterValue.split(',').map((code) => genderCodesToGenderStatus(code as GenderCodes))
         break
-      case FilterKeys.BIRTHDATES:
-        if (filterValue === ',' || filterValue === 'null,null') continue
-        // eslint-disable-next-line no-case-declarations
-        const [start, end] = filterValue.split(',')
-        filters.birthdatesRanges = [start, end] as DurationRangeType
+      case 'age-month':
+      case 'age-day':
+        if (filterValue?.includes('ge')) {
+          const ageMin = filterValue?.replace('ge', '')
+          filters.birthdatesRanges[0] = convertDurationToString(convertTimestampToDuration(+ageMin))
+        } else if (filterValue?.includes('le')) {
+          const ageMax = filterValue?.replace('le', '')
+          filters.birthdatesRanges[1] = convertDurationToString(convertTimestampToDuration(+ageMax))
+        }
         break
-      case FilterKeys.VITAL_STATUSES:
-        filters.vitalStatuses = filterValue.split(',') as VitalStatus[]
+      case 'deceased':
+        filters.vitalStatuses = filterValue === 'true' ? [VitalStatus.DECEASED] : [VitalStatus.ALIVE]
         break
     }
   }
@@ -54,7 +59,7 @@ export function parsePatientsFiltersString(filterURLParams: URLSearchParams): Pa
   return filters
 }
 
-export function parseDocumentsFiltersString(filterURLParams: URLSearchParams): AllDocumentsFilters {
+export function parseDocumentsFiltersRequestParams(filterURLParams: URLSearchParams): AllDocumentsFilters {
   const filters: AllDocumentsFilters = {
     nda: '',
     ipp: '',
@@ -103,14 +108,14 @@ export function parseDocumentsFiltersString(filterURLParams: URLSearchParams): A
   return filters
 }
 
-export const mapStringToSearchCriteria = <T>(filtersString: string, type: RessourceType): SearchCriterias<T> => {
+export const mapRequestParamsToSearchCriteria = <T>(filtersString: string, type: RessourceType): SearchCriterias<T> => {
   const parameters = new URLSearchParams(filtersString)
   const searchBy = parameters.get('searchBy') as SearchBy
   const searchInput = parameters.get('searchInput') as SearchInput
   const filters = <T>(function () {
     switch (type) {
       case RessourceType.PATIENT:
-        return parsePatientsFiltersString(parameters)
+        return parsePatientsFiltersRequestParams(parameters)
       case RessourceType.PMSI:
         return {} as Filters
       case RessourceType.MEDICATION:
@@ -118,7 +123,7 @@ export const mapStringToSearchCriteria = <T>(filtersString: string, type: Ressou
       case RessourceType.BIO_MICRO:
         return {} as Filters
       case RessourceType.DOCUMENTS:
-        return parseDocumentsFiltersString(parameters)
+        return parseDocumentsFiltersRequestParams(parameters)
       case RessourceType.IMAGING:
         return {} as T
     }

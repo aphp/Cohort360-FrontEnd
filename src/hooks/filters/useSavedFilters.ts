@@ -1,4 +1,4 @@
-import { mapStringToSearchCriteria } from 'mappers/filters'
+import { mapRequestParamsToSearchCriteria } from 'mappers/filters'
 import { useState } from 'react'
 import {
   deleteFiltersService,
@@ -68,7 +68,7 @@ export const useSavedFilters = <T>(type: RessourceType) => {
     return {
       filterUuid: selectedItem.uuid,
       filterName: selectedItem.name,
-      filterParams: mapStringToSearchCriteria(selectedItem.filter, type) as SearchCriterias<T>
+      filterParams: mapRequestParamsToSearchCriteria(selectedItem.filter, type) as SearchCriterias<T>
     }
   }
 
