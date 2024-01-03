@@ -49,8 +49,8 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     onChangeSelectedCriteria(currentState)
     dispatch(fetchCondition())
   }
-  const getDiagOptions = async (searchValue: string) =>
-    await services.cohortCreation.fetchCim10Diagnostic(searchValue, false)
+  const getDiagOptions = async (searchValue: string, signal: AbortSignal) =>
+    await services.cohortCreation.fetchCim10Diagnostic(searchValue, false, signal)
 
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {

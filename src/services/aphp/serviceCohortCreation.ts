@@ -85,14 +85,22 @@ export interface IServiceCohortCreation {
   fetchStatus: () => Promise<Array<HierarchyElement>>
   fetchStatusDiagnostic: () => Promise<Array<HierarchyElement>>
   fetchDiagnosticTypes: () => Promise<Array<HierarchyElement>>
-  fetchCim10Diagnostic: (searchValue?: string, noStar?: boolean) => Promise<Array<HierarchyElement>>
+  fetchCim10Diagnostic: (
+    searchValue?: string,
+    noStar?: boolean,
+    signal?: AbortSignal
+  ) => Promise<Array<HierarchyElement>>
   fetchCim10Hierarchy: (cim10Parent?: string) => Promise<Array<HierarchyElement>>
-  fetchCcamData: (searchValue?: string, noStar?: boolean) => Promise<Array<HierarchyElement>>
+  fetchCcamData: (searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<Array<HierarchyElement>>
   fetchCcamHierarchy: (ccamParent: string) => Promise<Array<HierarchyElement>>
-  fetchGhmData: (searchValue?: string, noStar?: boolean) => Promise<Array<HierarchyElement>>
+  fetchGhmData: (searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<Array<HierarchyElement>>
   fetchGhmHierarchy: (ghmParent: string) => Promise<Array<HierarchyElement>>
   fetchDocTypes: () => Promise<DocType[]>
-  fetchMedicationData: (searchValue?: string, noStar?: boolean) => Promise<Array<HierarchyElementWithSystem>>
+  fetchMedicationData: (
+    searchValue?: string,
+    noStar?: boolean,
+    signal?: AbortSignal
+  ) => Promise<Array<HierarchyElementWithSystem>>
   fetchSingleCodeHierarchy: (resourceType: string, code: string) => Promise<string[]>
   fetchAtcHierarchy: (atcParent: string) => Promise<Array<HierarchyElement>>
   fetchUCDList: (ucd?: string) => Promise<Array<HierarchyElement>>
@@ -274,29 +282,41 @@ const servicesCohortCreation: IServiceCohortCreation = {
     ]
   },
   fetchDiagnosticTypes: async () => fetchValueSet(CONDITION_STATUS),
-  fetchCim10Diagnostic: async (searchValue?: string, noStar?: boolean) =>
-    fetchValueSet(CONDITION_HIERARCHY, {
-      valueSetTitle: 'Toute la hiérarchie',
-      search: searchValue || '',
-      noStar
-    }),
+  fetchCim10Diagnostic: async (searchValue?: string, noStar?: boolean, signal?: AbortSignal) =>
+    fetchValueSet(
+      CONDITION_HIERARCHY,
+      {
+        valueSetTitle: 'Toute la hiérarchie',
+        search: searchValue || '',
+        noStar
+      },
+      signal
+    ),
   fetchCim10Hierarchy: async (cim10Parent?: string) =>
     fetchValueSet(CONDITION_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie CIM10', code: cim10Parent }),
-  fetchCcamData: async (searchValue?: string, noStar?: boolean) =>
-    fetchValueSet(PROCEDURE_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', noStar }),
+  fetchCcamData: async (searchValue?: string, noStar?: boolean, signal?: AbortSignal) =>
+    fetchValueSet(
+      PROCEDURE_HIERARCHY,
+      { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', noStar },
+      signal
+    ),
   fetchCcamHierarchy: async (ccamParent?: string) =>
     fetchValueSet(PROCEDURE_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie CCAM', code: ccamParent }),
-  fetchGhmData: async (searchValue?: string, noStar?: boolean) =>
-    fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', noStar }),
+  fetchGhmData: async (searchValue?: string, noStar?: boolean, signal?: AbortSignal) =>
+    fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', noStar }, signal),
   fetchGhmHierarchy: async (ghmParent?: string) =>
     fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie GHM', code: ghmParent }),
   fetchDocTypes: () => Promise.resolve(docTypes && docTypes.docTypes.length > 0 ? docTypes.docTypes : []),
-  fetchMedicationData: async (searchValue?: string, noStar?: boolean) =>
-    fetchValueSet(`${MEDICATION_ATC},${MEDICATION_UCD}`, {
-      valueSetTitle: 'Toute la hiérarchie',
-      search: searchValue || '',
-      noStar
-    }),
+  fetchMedicationData: async (searchValue?: string, noStar?: boolean, signal?: AbortSignal) =>
+    fetchValueSet(
+      `${MEDICATION_ATC},${MEDICATION_UCD}`,
+      {
+        valueSetTitle: 'Toute la hiérarchie',
+        search: searchValue || '',
+        noStar
+      },
+      signal
+    ),
   fetchSingleCodeHierarchy: async (resourceType: string, code: string) => {
     const codeSystemPerResourceType: { [type: string]: string } = {
       Claim: CLAIM_HIERARCHY,

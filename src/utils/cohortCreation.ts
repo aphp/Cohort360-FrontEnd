@@ -1583,24 +1583,24 @@ export async function unbuildRequest(_json: string): Promise<any> {
 
                 if (value?.search('le') === 0) {
                   valueComparator = Comparators.LESS_OR_EQUAL
-                  valueMin = parseInt(value?.replace('le', ''))
+                  valueMin = parseFloat(value?.replace('le', ''))
                 } else if (value?.search('lt') === 0) {
                   valueComparator = Comparators.LESS
-                  valueMin = parseInt(value?.replace('lt', ''))
+                  valueMin = parseFloat(value?.replace('lt', ''))
                 } else if (value?.search('ge') === 0) {
                   if (nbValueComparators === 2) {
                     valueComparator = Comparators.BETWEEN
-                    valueMax = parseInt(value?.replace('ge', ''))
+                    valueMax = parseFloat(value?.replace('ge', ''))
                   } else {
                     valueComparator = Comparators.GREATER_OR_EQUAL
-                    valueMin = parseInt(value?.replace('ge', ''))
+                    valueMin = parseFloat(value?.replace('ge', ''))
                   }
                 } else if (value?.search('gt') === 0) {
                   valueComparator = Comparators.GREATER
-                  valueMin = parseInt(value?.replace('gt', ''))
+                  valueMin = parseFloat(value?.replace('gt', ''))
                 } else {
                   valueComparator = Comparators.EQUAL
-                  valueMin = parseInt(value ?? '0')
+                  valueMin = parseFloat(value ?? '0')
                 }
 
                 currentCriterion.valueComparator = valueComparator

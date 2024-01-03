@@ -244,6 +244,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
 
               <TextField
                 required
+                lang="en-US"
                 type="number"
                 id="criteria-value"
                 variant="outlined"

@@ -52,8 +52,8 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
     dispatch(fetchProcedure())
   }
 
-  const getCCAMOptions = async (searchValue: string) => {
-    const ccamOptions = await services.cohortCreation.fetchCcamData(searchValue, false)
+  const getCCAMOptions = async (searchValue: string, signal: AbortSignal) => {
+    const ccamOptions = await services.cohortCreation.fetchCcamData(searchValue, false, signal)
 
     return ccamOptions && ccamOptions.length > 0 ? ccamOptions : []
   }
