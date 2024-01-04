@@ -1,134 +1,114 @@
 import { RessourceType } from 'types/requestCriterias'
-import { ScopeTreeRow, SimpleCodeType } from 'types'
+import { GenericFilter, PMSIFilters, ScopeTreeRow, SimpleCodeType } from 'types'
 import {
-  AllDocumentsFilters,
-  BiologyFilters,
-  CohortsFilters,
   Direction,
-  DurationRangeType,
-  FilterKeys,
   Filters,
   GenderCodes,
   GenderStatus,
-  ImagingFilters,
-  MedicationFilters,
   Order,
   PatientsFilters,
-  PatientDocumentsFilters,
-  PMSIFilters,
   SearchBy,
   SearchCriterias,
   SearchInput,
   VitalStatus,
-  SearchByTypes
+  SearchByTypes,
+  DurationRangeType,
+  AllDocumentsFilters,
+  CohortsFilters,
+  BiologyFilters,
+  ImagingFilters,
+  MedicationFilters
 } from 'types/searchCriterias'
 import allDocTypesList from 'assets/docTypes.json'
-import moment from 'moment'
-import { convertDurationToString, convertTimestampToDuration, substructAgeString } from 'utils/age'
+import {
+  convertDurationToString,
+  convertDurationToTimestamp,
+  convertStringToDuration,
+  convertTimestampToDuration
+} from 'utils/age'
+import { Calendar } from 'types/dates'
 
-export function parsePatientsFiltersRequestParams(filterURLParams: URLSearchParams): PatientsFilters {
-  const filters: PatientsFilters = {
-    genders: [],
-    birthdatesRanges: [null, null],
-    vitalStatuses: [VitalStatus.ALL]
-  }
-
-  for (const [filterName, filterValue] of filterURLParams.entries()) {
-    console.log('testParsing', filterName, filterValue)
-    if (filterValue === '') continue
-    switch (filterName) {
-      case 'gender':
-        filters.genders = filterValue.split(',').map((code) => genderCodesToGenderStatus(code as GenderCodes))
-        break
-      case 'age-month':
-      case 'age-day':
-        if (filterValue?.includes('ge')) {
-          const ageMin = filterValue?.replace('ge', '')
-          filters.birthdatesRanges[0] = convertDurationToString(convertTimestampToDuration(+ageMin))
-        } else if (filterValue?.includes('le')) {
-          const ageMax = filterValue?.replace('le', '')
-          filters.birthdatesRanges[1] = convertDurationToString(convertTimestampToDuration(+ageMax))
-        }
-        break
-      case 'deceased':
-        filters.vitalStatuses = filterValue === 'true' ? [VitalStatus.DECEASED] : [VitalStatus.ALIVE]
-        break
-    }
-  }
-
-  return filters
+enum RequestParamsKeys {
+  GENDER = 'gender',
+  AGE_MONTH = 'age-month',
+  AGE_DAY = 'age-day',
+  DECEASED = 'deceased',
+  NDA = 'nda',
+  IPP = 'ipp',
+  DOC_TYPES = 'docTypes',
+  EXECUTIVE_UNITS = 'executiveUnits',
+  ONLY_PDF_AVAILABLE = 'onlyPdfAvailable',
+  START_DATE = 'startDate',
+  END_DATE = 'endDate',
+  STATUS = 'status',
+  FAVORITE = 'favorite',
+  MIN_PATIENTS = 'minPatients',
+  MAX_PATIENTS = 'maxPatients',
+  ANABIO = 'anabio',
+  LOINC = 'loinc',
+  VALIDATED_STATUS = 'validatedStatus',
+  MODALITY = 'modality',
+  CODE = 'code',
+  DIAGNOSTIC_TYPES = 'diagnosticTypes',
+  ADMINISTRATION_ROUTES = 'administrationRoutes',
+  PRESCRIPTION_TYPES = 'prescriptionTypes'
 }
 
-export function parseDocumentsFiltersRequestParams(filterURLParams: URLSearchParams): AllDocumentsFilters {
-  const filters: AllDocumentsFilters = {
-    nda: '',
-    ipp: '',
-    docTypes: [],
-    onlyPdfAvailable: false,
-    startDate: '',
-    endDate: '',
-    executiveUnits: []
+const mapFiltersFromRequestParams = (parameters: URLSearchParams, type: RessourceType): Filters => {
+  const genders =
+    parameters
+      .get(RequestParamsKeys.GENDER)
+      ?.split(',')
+      ?.map((code) => mapGenderCodesToGenderStatus(code as GenderCodes)) || []
+  const vitalStatuses =
+    parameters
+      .get(RequestParamsKeys.DECEASED)
+      ?.split(',')
+      ?.map((bool) => (bool === 'true' ? VitalStatus.DECEASED : VitalStatus.ALIVE)) || []
+  const birthdatesRanges =
+    parameters.getAll(RequestParamsKeys.AGE_DAY).length > 0
+      ? mapBirthdatesRangesFromRequestParams(RequestParamsKeys.AGE_DAY, parameters)
+      : mapBirthdatesRangesFromRequestParams(RequestParamsKeys.AGE_MONTH, parameters)
+  const nda = parameters.get(RequestParamsKeys.NDA) || ''
+  const ipp = parameters.get(RequestParamsKeys.IPP) || ''
+  const docTypes =
+    (allDocTypesList.docTypes as SimpleCodeType[]).filter((docType) =>
+      parameters.get(RequestParamsKeys.DOC_TYPES)?.split(',').includes(docType.code)
+    ) || []
+  const onlyPdfAvailable = parameters.get(RequestParamsKeys.ONLY_PDF_AVAILABLE) === 'true'
+  const startDate =
+    parameters.get(RequestParamsKeys.START_DATE) === 'null' ? null : parameters.get(RequestParamsKeys.START_DATE)
+  const endDate =
+    parameters.get(RequestParamsKeys.END_DATE) === 'null' ? null : parameters.get(RequestParamsKeys.END_DATE)
+  const executiveUnits =
+    parameters
+      .get(RequestParamsKeys.EXECUTIVE_UNITS)
+      ?.split(',')
+      .map(
+        (elem) =>
+          ({
+            id: elem
+          } as ScopeTreeRow)
+      ) || []
+  if (type === RessourceType.PATIENT) return { genders, vitalStatuses, birthdatesRanges }
+  return {
+    nda,
+    ipp,
+    docTypes,
+    onlyPdfAvailable,
+    startDate,
+    endDate,
+    executiveUnits
   }
-
-  for (const [filterName, filterValue] of filterURLParams.entries()) {
-    if (filterValue === '') continue
-    switch (filterName) {
-      case FilterKeys.NDA:
-        filters.nda = filterValue
-        break
-      case FilterKeys.IPP:
-        filters.ipp = filterValue
-        break
-      case FilterKeys.DOC_TYPES:
-        filters.docTypes = (allDocTypesList.docTypes as SimpleCodeType[]).filter((docType) =>
-          filterValue.split(',').includes(docType.code)
-        )
-        break
-      case FilterKeys.ONLY_PDF_AVAILABLE:
-        filters.onlyPdfAvailable = filterValue === 'true'
-        break
-      case FilterKeys.START_DATE:
-        filters.startDate = filterValue === 'null' ? null : filterValue
-        break
-      case FilterKeys.END_DATE:
-        filters.endDate = filterValue === 'null' ? null : filterValue
-        break
-      case FilterKeys.EXECUTIVE_UNITS:
-        filters.executiveUnits =
-          filterValue.split(',').map(
-            (filter) =>
-              ({
-                id: filter
-              } as ScopeTreeRow)
-          ) ?? []
-        break
-    }
-  }
-
-  return filters
 }
 
-export const mapRequestParamsToSearchCriteria = <T>(filtersString: string, type: RessourceType): SearchCriterias<T> => {
+export const mapRequestParamsToSearchCriteria = (
+  filtersString: string,
+  type: RessourceType
+): SearchCriterias<Filters> => {
   const parameters = new URLSearchParams(filtersString)
-  const searchBy = parameters.get('searchBy') as SearchBy
-  const searchInput = parameters.get('searchInput') as SearchInput
-  const filters = <T>(function () {
-    switch (type) {
-      case RessourceType.PATIENT:
-        return parsePatientsFiltersRequestParams(parameters)
-      case RessourceType.PMSI:
-        return {} as Filters
-      case RessourceType.MEDICATION:
-        return {} as Filters
-      case RessourceType.BIO_MICRO:
-        return {} as Filters
-      case RessourceType.DOCUMENTS:
-        return parseDocumentsFiltersRequestParams(parameters)
-      case RessourceType.IMAGING:
-        return {} as T
-    }
-  })()
-
+  const [searchBy, searchInput] = mapSearchByAndSearchInputFromRequestParams(parameters)
+  const filters = mapFiltersFromRequestParams(parameters, type)
   return {
     searchBy,
     searchInput,
@@ -137,7 +117,109 @@ export const mapRequestParamsToSearchCriteria = <T>(filtersString: string, type:
   }
 }
 
-function genderStatusToGenderCodes(status: GenderStatus): GenderCodes {
+export const mapSearchCriteriasToRequestParams = (searchCriterias: SearchCriterias<Filters>, deidentified: boolean) => {
+  let requestParams = ''
+  const { searchBy, searchInput, filters } = searchCriterias
+  const searchParams = searchBy ? mapSearchByAndSearchInputToRequestParams(searchBy, searchInput) : ''
+  const { genders, vitalStatuses, birthdatesRanges } = filters as PatientsFilters
+  const { docTypes, onlyPdfAvailable, ipp } = filters as AllDocumentsFilters
+  const { nda, startDate, endDate, executiveUnits } = filters as GenericFilter
+  const { favorite, minPatients, maxPatients, status } = filters as CohortsFilters
+  const { anabio, loinc, validatedStatus } = filters as BiologyFilters
+  const { modality } = filters as ImagingFilters
+  const { code, diagnosticTypes } = filters as PMSIFilters
+  const { administrationRoutes, prescriptionTypes } = filters as MedicationFilters
+  const calendarKey = deidentified ? Calendar.MONTH : Calendar.DAY
+  const minBirthdate = convertDurationToTimestamp(convertStringToDuration(birthdatesRanges?.[0]), calendarKey)
+  const maxBirthdate = convertDurationToTimestamp(convertStringToDuration(birthdatesRanges?.[1]), calendarKey)
+
+  if (searchParams) requestParams += searchParams
+  if (vitalStatuses && vitalStatuses.length > 0)
+    requestParams += `${RequestParamsKeys.DECEASED}=${vitalStatuses.map((status) => status === VitalStatus.DECEASED)}&`
+  if (genders && genders.length > 0)
+    requestParams += `${RequestParamsKeys.GENDER}=${genders.map(mapGenderStatusToGenderCodes)}&`
+  if (minBirthdate && deidentified) requestParams += `${RequestParamsKeys.AGE_MONTH}=ge${minBirthdate}&`
+  if (minBirthdate && !deidentified) requestParams += `${RequestParamsKeys.AGE_DAY}=ge${minBirthdate}&`
+  if (maxBirthdate && deidentified) requestParams += `${RequestParamsKeys.AGE_MONTH}=le${maxBirthdate}&`
+  if (maxBirthdate && !deidentified) requestParams += `${RequestParamsKeys.AGE_DAY}=le${maxBirthdate}&`
+  if (docTypes && docTypes.length > 0)
+    requestParams += `${RequestParamsKeys.DOC_TYPES}=${docTypes.map((codeType) => codeType.code)}&`
+  if (onlyPdfAvailable) requestParams += `${RequestParamsKeys.ONLY_PDF_AVAILABLE}=${onlyPdfAvailable}&`
+  if (nda) requestParams += `${RequestParamsKeys.NDA}=${nda}&`
+  if (ipp) requestParams += `${RequestParamsKeys.IPP}=${ipp}&`
+  if (startDate) requestParams += `${RequestParamsKeys.START_DATE}=${startDate}&`
+  if (endDate) requestParams += `${RequestParamsKeys.END_DATE}=${endDate}&`
+  if (executiveUnits && executiveUnits.length > 0)
+    requestParams += `${RequestParamsKeys.EXECUTIVE_UNITS}=${executiveUnits.map((scopeTreeRow) => scopeTreeRow.id)}&`
+  if (favorite) requestParams += `${RequestParamsKeys.FAVORITE}=${favorite}&`
+  if (minPatients) requestParams += `${RequestParamsKeys.MIN_PATIENTS}=${minPatients}&`
+  if (maxPatients) requestParams += `${RequestParamsKeys.MAX_PATIENTS}=${maxPatients}&`
+  if (status) requestParams += `${RequestParamsKeys.STATUS}=${status.map((valueSet) => valueSet.code)}&`
+  if (anabio) requestParams += `${RequestParamsKeys.ANABIO}=${anabio}&`
+  if (loinc) requestParams += `${RequestParamsKeys.LOINC}=${loinc}&`
+  if (validatedStatus) requestParams += `${RequestParamsKeys.VALIDATED_STATUS}=${validatedStatus}&`
+  if (modality) requestParams += `${RequestParamsKeys.MODALITY}=${modality.map((labelObject) => labelObject.id)}&`
+  if (code) requestParams += `${RequestParamsKeys.CODE}=${code}&`
+  if (diagnosticTypes)
+    requestParams += `${RequestParamsKeys.DIAGNOSTIC_TYPES}=${diagnosticTypes.map((labelObject) => labelObject.id)}&`
+  if (administrationRoutes)
+    requestParams += `${RequestParamsKeys.ADMINISTRATION_ROUTES}=${administrationRoutes.map(
+      (labelObject) => labelObject.id
+    )}&`
+  if (prescriptionTypes)
+    requestParams += `${RequestParamsKeys.PRESCRIPTION_TYPES}=${prescriptionTypes.map(
+      (labelObject) => labelObject.id
+    )}&`
+  return requestParams
+}
+
+const mapSearchByAndSearchInputToRequestParams = (searchBy: SearchByTypes, searchInput: SearchInput) => {
+  const inputs = searchInput.split(' ').filter((elem: string) => elem)
+  let params = ''
+
+  if (searchBy === SearchByTypes.IDENTIFIER) {
+    params = `${searchBy}=${inputs.join()}&`
+  } else {
+    inputs.forEach((input) => (params += `${searchBy}=${input}&`))
+  }
+  return params
+}
+
+const mapSearchByAndSearchInputFromRequestParams = (parameters: URLSearchParams): [SearchBy, SearchInput] => {
+  const keysToCheck = [
+    SearchByTypes.TEXT,
+    SearchByTypes.FAMILY,
+    SearchByTypes.GIVEN,
+    SearchByTypes.IDENTIFIER,
+    SearchByTypes.DESCRIPTION
+  ]
+  const [searchBy, searchInput] = (keysToCheck
+    .map((key) => [key, parameters.getAll(key).join(' ')])
+    .find(([, values]) => values) as [SearchByTypes, string]) ?? [SearchByTypes.TEXT, '']
+  return [searchBy, searchInput]
+}
+
+function mapBirthdatesRangesFromRequestParams(key: RequestParamsKeys, parameters: URLSearchParams): DurationRangeType {
+  const birthdatesRanges: DurationRangeType = [null, null]
+  const dates = parameters.getAll(key)
+  dates.forEach((date) => {
+    if (date?.includes('ge')) {
+      const ageMin = date?.replace('ge', '')
+      birthdatesRanges[0] = convertDurationToString(
+        convertTimestampToDuration(+ageMin, key === RequestParamsKeys.AGE_DAY ? Calendar.DAY : Calendar.MONTH)
+      )
+    }
+    if (date?.includes('le')) {
+      const ageMax = date?.replace('le', '')
+      birthdatesRanges[1] = convertDurationToString(
+        convertTimestampToDuration(+ageMax, key === RequestParamsKeys.AGE_DAY ? Calendar.DAY : Calendar.MONTH)
+      )
+    }
+  })
+  return birthdatesRanges
+}
+
+function mapGenderStatusToGenderCodes(status: GenderStatus): GenderCodes {
   switch (status) {
     case GenderStatus.MALE:
       return GenderCodes.MALE
@@ -153,7 +235,7 @@ function genderStatusToGenderCodes(status: GenderStatus): GenderCodes {
   }
 }
 
-function genderCodesToGenderStatus(code: GenderCodes): GenderStatus {
+function mapGenderCodesToGenderStatus(code: GenderCodes): GenderStatus {
   switch (code) {
     case GenderCodes.MALE:
       return GenderStatus.MALE
@@ -168,111 +250,4 @@ function genderCodesToGenderStatus(code: GenderCodes): GenderStatus {
     default:
       return GenderStatus.OTHER_UNKNOWN
   }
-}
-
-const isPatientsFilter = (filters: Filters): filters is PatientsFilters => {
-  return 'genders' in filters && 'birthdatesRanges' in filters && 'vitalStatuses' in filters
-}
-
-const isPMSIFilters = (filters: Filters): filters is PMSIFilters => {
-  return 'diagnosticTypes' in filters && 'code' in filters && 'source' in filters
-}
-
-const isMedicationFilters = (filters: Filters): filters is MedicationFilters => {
-  return 'prescriptionTypes' in filters && 'administrationRoutes' in filters
-}
-
-const isBiologyFilters = (filters: Filters): filters is BiologyFilters => {
-  return 'loinc' in filters && 'anabio' in filters && 'validatedStatus' in filters
-}
-
-const isImagingFilters = (filters: Filters): filters is ImagingFilters => {
-  return 'modality' in filters
-}
-
-const isPatientDocumentsFilters = (filters: Filters): filters is PatientDocumentsFilters => {
-  return 'docTypes' in filters && 'onlyPdfAvailable' in filters
-}
-
-const isAllDocumentsFilters = (filters: Filters): filters is AllDocumentsFilters => {
-  return isPatientDocumentsFilters(filters) && 'ipp' in filters
-}
-
-const isCohortsFilters = (filters: Filters): filters is CohortsFilters => {
-  return 'status' in filters && 'favorite' in filters && 'minPatients' in filters && 'maxPatients' in filters
-}
-
-export const mapSearchCriteriasToRequestParams = (searchCriterias: SearchCriterias<Filters>, deidentified: boolean) => {
-  let transformedString = ''
-
-  let _searchInput: string | string[] = ''
-  _searchInput = searchCriterias.searchInput
-    .split(' ') // Split by space (= ['mot1', 'mot2' ...])
-    .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
-
-  if (searchCriterias.searchBy === SearchByTypes.IDENTIFIER) {
-    _searchInput = _searchInput.join()
-    transformedString += `${searchCriterias.searchBy}=${_searchInput}&`
-  } else {
-    _searchInput.forEach((input) => (transformedString += `${searchCriterias.searchBy}=${input}&`))
-  }
-
-  const filters = searchCriterias.filters
-
-  if (isPatientsFilter(filters)) {
-    transformedString += filters.genders.length ? `gender=${filters.genders.map(genderStatusToGenderCodes)}&` : ''
-    transformedString +=
-      filters.vitalStatuses.length === 1 ? `deceased=${filters.vitalStatuses[0] === VitalStatus.DECEASED}&` : ''
-
-    const birthdates: [string, string] = [
-      moment(substructAgeString(filters?.birthdatesRanges?.[0] || '')).format('MM/DD/YYYY'),
-      moment(substructAgeString(filters?.birthdatesRanges?.[1] || '')).format('MM/DD/YYYY')
-    ]
-    const minBirthdate = birthdates && Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
-    const maxBirthdate = birthdates && Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
-    if (minBirthdate) transformedString += `${deidentified ? 'age-month' : 'age-day'}=ge${minBirthdate}&`
-    if (maxBirthdate) transformedString += `${deidentified ? 'age-month' : 'age-day'}=le${maxBirthdate}&`
-  } else if (isCohortsFilters(filters)) {
-    transformedString += filters.status ? `status=${filters.status.map((valueSet) => valueSet.code)}&` : ''
-    transformedString += filters.favorite ? `favorite=${filters.favorite}&` : ''
-    transformedString += filters.minPatients ? `minPatients=${filters.minPatients}&` : ''
-    transformedString += filters.maxPatients ? `maxPatients=${filters.maxPatients}&` : ''
-  } else {
-    transformedString += filters.nda ? `nda=${filters.nda}&` : ''
-    transformedString += filters.startDate ? `startDate=${filters.startDate}&` : ''
-    transformedString += filters.endDate ? `endDate=${filters.endDate}&` : ''
-    transformedString += filters.executiveUnits
-      ? `executiveUnits=${filters.executiveUnits.map((scopeTreeRow) => scopeTreeRow.id)}&`
-      : ''
-    if (isImagingFilters(filters) || isAllDocumentsFilters(filters)) {
-      transformedString += filters.ipp ? `ipp=${filters.ipp}&` : ''
-      if (isImagingFilters(filters)) {
-        transformedString += filters.modality
-          ? `modality=${filters.modality.map((labelObject) => labelObject.id)}&`
-          : ''
-      } else {
-        transformedString += filters.docTypes ? `docTypes=${filters.docTypes.map((codeType) => codeType.code)}&` : ''
-        transformedString += filters.onlyPdfAvailable ? `onlyPdfAvailable=${filters.onlyPdfAvailable}&` : ''
-      }
-    } else if (isPMSIFilters(filters)) {
-      transformedString += filters.diagnosticTypes
-        ? `diagnosticTypes=${filters.diagnosticTypes.map((labelObject) => labelObject.id)}&`
-        : ''
-      transformedString += filters.code ? `code=${filters.code}&` : ''
-      transformedString += filters.source ? `source=${filters.source}&` : ''
-    } else if (isMedicationFilters(filters)) {
-      transformedString += filters.prescriptionTypes
-        ? `prescriptionTypes=${filters.prescriptionTypes.map((labelObject) => labelObject.id)}&`
-        : ''
-      transformedString += filters.administrationRoutes
-        ? `administrationRoutes=${filters.administrationRoutes.map((labelObject) => labelObject.id)}&`
-        : ''
-    } else if (isBiologyFilters(filters)) {
-      transformedString += filters.loinc ? `loinc=${filters.loinc}&` : ''
-      transformedString += filters.anabio ? `anabio=${filters.anabio}&` : ''
-      transformedString += filters.validatedStatus ? `validatedStatus=${filters.validatedStatus}&` : ''
-    }
-  }
-  transformedString = transformedString.substring(0, transformedString.length - 1)
-  return transformedString
 }

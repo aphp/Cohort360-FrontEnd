@@ -328,12 +328,18 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         }`,
         `${
           criterion.duration?.[0]
-            ? `${ENCOUNTER_DURATION}=ge${convertDurationToTimestamp(convertStringToDuration(criterion.duration?.[0]))}`
+            ? `${ENCOUNTER_DURATION}=ge${convertDurationToTimestamp(
+                convertStringToDuration(criterion.duration?.[0]),
+                Calendar.DAY
+              )}`
             : ''
         }`,
         `${
           criterion.duration?.[1]
-            ? `${ENCOUNTER_DURATION}=le${convertDurationToTimestamp(convertStringToDuration(criterion.duration?.[1]))}`
+            ? `${ENCOUNTER_DURATION}=le${convertDurationToTimestamp(
+                convertStringToDuration(criterion.duration?.[1]),
+                Calendar.DAY
+              )}`
             : ''
         }`,
         `${criterion.age?.[0] ? ageMinCriterion : ''}`,

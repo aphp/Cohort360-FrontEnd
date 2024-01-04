@@ -78,12 +78,12 @@ export const substructAgeString = (range: string): Date => {
 
 export const convertStringToDuration = (age: string | null | undefined): DurationType | null => {
   if (!age) return null
-  const newAge: DurationType = {
-    year: Number(age.split('/')[2]),
-    month: Number(age.split('/')[1]),
-    day: Number(age.split('/')[0])
+  const splitDate = age.split('/')
+  return {
+    year: Number(splitDate?.[2] || 0),
+    month: Number(splitDate?.[1] || 0),
+    day: Number(splitDate?.[0] || 0)
   }
-  return newAge
 }
 
 export const convertDurationToString = (ageDate: DurationType): string | null => {
@@ -117,12 +117,12 @@ export const checkMinMaxValue = (min: DurationType, max: DurationType) => {
   return true
 }
 
-export const convertDurationToTimestamp = (duration: DurationType | null): number => {
+export const convertDurationToTimestamp = (duration: DurationType | null, type: Calendar): number => {
   if (!duration) return 0
   const year = duration.year ?? 0
   const month = duration.month ?? 0
   const day = duration.day ?? 0
-  return year * 365 + month * 30 + day
+  return type === Calendar.DAY ? year * 365 + month * 30 + day : year * 12 + month
 }
 
 export const convertTimestampToDuration = (timestamp: number | null, type: Calendar): DurationType => {

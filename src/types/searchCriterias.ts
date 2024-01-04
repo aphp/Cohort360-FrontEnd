@@ -47,8 +47,7 @@ export enum VitalStatusOptionsLabel {
 
 export enum VitalStatus {
   ALIVE = 'ALIVE',
-  DECEASED = 'DECEASED',
-  ALL = 'ALL'
+  DECEASED = 'DECEASED'
 }
 
 export enum Direction {

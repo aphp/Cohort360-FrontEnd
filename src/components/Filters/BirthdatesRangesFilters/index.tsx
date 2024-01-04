@@ -18,9 +18,7 @@ const BirthdatesRangesFilter = ({
   disabled = false
 }: BirthdatesRangesFilterProps) => {
   const context = useContext(FormContext)
-  const [birthdatesRanges, setBirthdatesRanges] = useState(
-    value.map((date) => (date === 'null' ? null : date)) as DurationRangeType
-  )
+  const [birthdatesRanges, setBirthdatesRanges] = useState(value.map((date) => date) as DurationRangeType)
 
   const onError = (isError: boolean) => {
     if (context?.updateError) context?.updateError(isError)
