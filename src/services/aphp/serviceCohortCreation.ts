@@ -65,6 +65,11 @@ export interface IServiceCohortCreation {
   createSnapshot: (id: string, json: string, firstTime?: boolean) => Promise<Snapshot | null>
 
   /**
+   * Cette fonction permet de faire une demande de rapport de faisabilité
+   */
+  createReport: (id: string) => Promise<AxiosResponse>
+
+  /**
    * Permet de récupérer toutes les informations utiles pour l'utilisation du requeteur
    */
   fetchRequest: (requestId: string, snapshotId?: string) => Promise<any>
@@ -178,6 +183,13 @@ const servicesCohortCreation: IServiceCohortCreation = {
     }
     const snapshot = (await apiBack.post<Snapshot>('/cohort/request-query-snapshots/', data)) || {}
     return snapshot && snapshot.data ? snapshot.data : null
+  },
+
+  createReport: async (id) => {
+    const data = { request_query_snapshot_id: id }
+
+    const reportResponse = (await apiBack.post('/cohort/feasibility-studies/', data)) || {}
+    return reportResponse
   },
 
   fetchRequest: async (requestId, snapshotId) => {

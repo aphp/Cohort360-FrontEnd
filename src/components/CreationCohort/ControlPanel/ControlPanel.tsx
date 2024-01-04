@@ -177,14 +177,13 @@ const ControlPanel: React.FC<{
 
   const handleGenerateReport = async () => {
     try {
-      // TODO: en attente du back vvv
       setOpenReportConfirmation(true)
-      // setReportLoading(LoadingStatus.FETCHING)
-      // const sendReport = await
-      // if (sendReport.status) {
-      //   setReportError(false)
-      //   setReportLoading(LoadingStatus.SUCCESS)
-      // }
+      setReportLoading(LoadingStatus.FETCHING)
+      const sendReport = await services.cohortCreation.createReport(currentSnapshot.uuid)
+      if (sendReport?.status) {
+        setReportError(false)
+        setReportLoading(LoadingStatus.SUCCESS)
+      }
     } catch (error) {
       // TODO: erreur à set correctement
       setReportLoading(LoadingStatus.SUCCESS)
