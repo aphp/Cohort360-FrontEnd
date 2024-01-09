@@ -182,10 +182,11 @@ const ControlPanel: React.FC<{
       const sendReport = await services.cohortCreation.createReport(currentSnapshot.uuid)
       if (sendReport?.status) {
         setReportError(false)
-        setReportLoading(LoadingStatus.SUCCESS)
+      } else {
+        setReportError(true)
       }
+      setReportLoading(LoadingStatus.SUCCESS)
     } catch (error) {
-      // TODO: erreur à set correctement
       setReportLoading(LoadingStatus.SUCCESS)
       setReportError(true)
       console.log(error)
