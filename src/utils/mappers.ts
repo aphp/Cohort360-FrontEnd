@@ -44,7 +44,7 @@ export const mapToCriteriaName = (criteria: string): CriteriaNameType => {
 }
 
 export const buildLabelObjectFilter = (
-  criterion: LabelObject[] | ScopeTreeRow[] | undefined | null,
+  criterion: LabelObject[] | undefined | null,
   fhirKey: string,
   hierarchyUrl?: string,
   system?: boolean
@@ -54,7 +54,7 @@ export const buildLabelObjectFilter = (
     criterion.find((code) => code.id === '*')
       ? (filter = `${fhirKey}=${hierarchyUrl}|*`)
       : (filter = `${fhirKey}=${criterion
-          .map((item) => (system ? `${(item as LabelObject).system}|${item.id}` : item.id))
+          .map((item) => (system ? `${item.system}|${item.id}` : item.id))
           .reduce(searchReducer)}`)
     return filter
   }
@@ -69,94 +69,11 @@ export const unbuildLabelObjectFilter = (currentCriterion: any, filterName: stri
   }
 }
 
-export const unbuildDocTypesFilter = (currentCriterion: any, filterName: string, values?: string | null) => {
-  const valuesIds = values?.split(',') || []
-  const newArray = docTypes.docTypes.filter((docType: DocType) =>
-    valuesIds?.find((docTypeId) => docTypeId === docType.code)
-  )
-  if (newArray) {
-    currentCriterion[filterName] = currentCriterion ? [...currentCriterion[filterName], ...newArray] : newArray
-  }
-}
-
-export const buildDateFilter = (criterion: string | null | undefined, fhirKey: string, comparator: 'le' | 'ge') => {
-  if (criterion) {
-    return `${fhirKey}=${comparator}${moment(criterion).format('YYYY-MM-DD[T00:00:00Z]')}`
+export const buildEncounterServiceFilter = (criterion: ScopeTreeRow[] | undefined, fhirKey: string) => {
+  if (criterion && criterion.length > 0) {
+    return `${fhirKey}=${criterion.map((item) => item.id).reduce(searchReducer)}`
   }
   return ''
-}
-
-export const unbuildDateFilter = (value: string) => {
-  return replaceTime(value.replace(comparator, ''))
-}
-
-export const buildAgeFilter = (
-  age: DurationRangeType,
-  fhirKey: string,
-  deidentified: boolean,
-  fhirKeyMaxValue?: string
-) => {
-  const ageToBirthdate: [string, string] = [
-    moment(substructAgeString(age?.[0] || '0/0/0')).format('MM/DD/YYYY'),
-    moment(substructAgeString(age?.[1] || '0/0/130')).format('MM/DD/YYYY')
-  ]
-
-  const ageMin = Math.abs(moment(ageToBirthdate[0]).diff(moment(), deidentified ? 'months' : 'days'))
-  const ageMax = Math.abs(moment(ageToBirthdate[1]).diff(moment(), deidentified ? 'months' : 'days'))
-
-  return `${fhirKey}=ge${ageMin}&${fhirKeyMaxValue ? fhirKeyMaxValue : fhirKey}=le${ageMax}`
-}
-
-export const buildDurationFilter = (age: string | null | undefined, fhirKey: string, comparator: 'le' | 'ge') => {
-  const convertedRange = convertDurationToTimestamp(
-    convertStringToDuration(age) || { year: comparator === 'ge' ? 0 : 130, month: 0, day: 0 }
-  )
-  return `${fhirKey}=${comparator}${convertedRange}`
-}
-
-export const buildSearchFilter = (criterion: string, fhirKey: string) => {
-  if (criterion) {
-    return `${fhirKey}=${encodeURIComponent(criterion)}`
-  }
-  return ''
-}
-
-export const unbuildSearchFilter = (value: string | null) => {
-  return value !== null ? decodeURIComponent(value) : ''
-}
-
-export const unbuildDurationFilter = (value: string, type: Calendar) => {
-  const cleanValue = value?.replace(comparator, '')
-  return convertDurationToString(convertTimestampToDuration(+cleanValue, type))
-}
-
-export const unbuildAdvancedCriterias = (
-  element: RequeteurCriteriaType,
-  currentCriterion:
-    | CcamDataType
-    | Cim10DataType
-    | GhmDataType
-    | EncounterDataType
-    | DocumentDataType
-    | MedicationDataType
-    | ObservationDataType
-    | ImagingDataType
-) => {
-  if (element.occurrence) {
-    currentCriterion.occurrence = element.occurrence ? element.occurrence.n : 1
-    currentCriterion.occurrenceComparator = element.occurrence
-      ? element.occurrence.operator ?? Comparators.GREATER_OR_EQUAL
-      : Comparators.GREATER_OR_EQUAL
-  }
-  if (element.dateRangeList) {
-    currentCriterion.startOccurrence = replaceTime(element.dateRangeList[0].minDate)
-    currentCriterion.endOccurrence = replaceTime(element.dateRangeList[0].maxDate)
-  }
-  if (element.encounterDateRange) {
-    currentCriterion.encounterStartDate = replaceTime(element.encounterDateRange.minDate)
-    currentCriterion.encounterEndDate = replaceTime(element.encounterDateRange.maxDate)
-  }
-  return currentCriterion
 }
 
 export const unbuildEncounterServiceCriterias = async (
@@ -172,8 +89,38 @@ export const unbuildEncounterServiceCriterias = async (
   }
 }
 
-export const buildSimpleFilter = (criterion: string, fhirKey: string, url?: string) => {
-  return criterion ? `${fhirKey}=${url ? `${url}|` : ''}${criterion}` : ''
+export const buildDateFilter = (criterion: string | null | undefined, fhirKey: string, comparator: 'le' | 'ge') => {
+  if (criterion) {
+    return `${fhirKey}=${comparator}${moment(criterion).format('YYYY-MM-DD[T00:00:00Z]')}`
+  }
+  return ''
+}
+
+export const unbuildDateFilter = (value: string) => {
+  return replaceTime(value.replace(comparator, ''))
+}
+
+export const buildDurationFilter = (age: string | null | undefined, fhirKey: string, comparator: 'le' | 'ge') => {
+  const convertedRange = convertDurationToTimestamp(
+    convertStringToDuration(age) || { year: comparator === 'ge' ? 0 : 130, month: 0, day: 0 }
+  )
+  return `${fhirKey}=${comparator}${convertedRange}`
+}
+
+export const unbuildDurationFilter = (value: string, type: Calendar) => {
+  const cleanValue = value?.replace(comparator, '')
+  return convertDurationToString(convertTimestampToDuration(+cleanValue, type))
+}
+
+export const buildSearchFilter = (criterion: string, fhirKey: string) => {
+  if (criterion) {
+    return `${fhirKey}=${encodeURIComponent(criterion)}`
+  }
+  return ''
+}
+
+export const unbuildSearchFilter = (value: string | null) => {
+  return value !== null ? decodeURIComponent(value) : ''
 }
 
 export const buildObservationValueFilter = (criterion: ObservationDataType, fhirKey: string) => {
@@ -227,4 +174,64 @@ export const buildWithDocumentFilter = (criterion: ImagingDataType, fhirKey: str
     }`
   }
   return ''
+}
+
+export const unbuildDocTypesFilter = (currentCriterion: any, filterName: string, values?: string | null) => {
+  const valuesIds = values?.split(',') || []
+  const newArray = docTypes.docTypes.filter((docType: DocType) =>
+    valuesIds?.find((docTypeId) => docTypeId === docType.code)
+  )
+  if (newArray) {
+    currentCriterion[filterName] = currentCriterion ? [...currentCriterion[filterName], ...newArray] : newArray
+  }
+}
+
+export const buildAgeFilter = (
+  age: DurationRangeType,
+  fhirKey: string,
+  deidentified: boolean,
+  fhirKeyMaxValue?: string
+) => {
+  const ageToBirthdate: [string, string] = [
+    moment(substructAgeString(age?.[0] || '0/0/0')).format('MM/DD/YYYY'),
+    moment(substructAgeString(age?.[1] || '0/0/130')).format('MM/DD/YYYY')
+  ]
+
+  const ageMin = Math.abs(moment(ageToBirthdate[0]).diff(moment(), deidentified ? 'months' : 'days'))
+  const ageMax = Math.abs(moment(ageToBirthdate[1]).diff(moment(), deidentified ? 'months' : 'days'))
+
+  return `${fhirKey}=ge${ageMin}&${fhirKeyMaxValue ? fhirKeyMaxValue : fhirKey}=le${ageMax}`
+}
+
+export const unbuildAdvancedCriterias = (
+  element: RequeteurCriteriaType,
+  currentCriterion:
+    | CcamDataType
+    | Cim10DataType
+    | GhmDataType
+    | EncounterDataType
+    | DocumentDataType
+    | MedicationDataType
+    | ObservationDataType
+    | ImagingDataType
+) => {
+  if (element.occurrence) {
+    currentCriterion.occurrence = element.occurrence ? element.occurrence.n : 1
+    currentCriterion.occurrenceComparator = element.occurrence
+      ? element.occurrence.operator ?? Comparators.GREATER_OR_EQUAL
+      : Comparators.GREATER_OR_EQUAL
+  }
+  if (element.dateRangeList) {
+    currentCriterion.startOccurrence = replaceTime(element.dateRangeList[0].minDate)
+    currentCriterion.endOccurrence = replaceTime(element.dateRangeList[0].maxDate)
+  }
+  if (element.encounterDateRange) {
+    currentCriterion.encounterStartDate = replaceTime(element.encounterDateRange.minDate)
+    currentCriterion.encounterEndDate = replaceTime(element.encounterDateRange.maxDate)
+  }
+  return currentCriterion
+}
+
+export const buildSimpleFilter = (criterion: string, fhirKey: string, url?: string) => {
+  return criterion ? `${fhirKey}=${url ? `${url}|` : ''}${criterion}` : ''
 }

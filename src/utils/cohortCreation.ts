@@ -40,7 +40,8 @@ import {
   unbuildEncounterServiceCriterias,
   unbuildLabelObjectFilter,
   unbuildObservationValueFilter,
-  unbuildSearchFilter
+  unbuildSearchFilter,
+  buildEncounterServiceFilter
 } from './mappers'
 
 const REQUETEUR_VERSION = 'v1.4.0'
@@ -226,8 +227,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         buildLabelObjectFilter(criterion.destination, ENCOUNTER_DESTINATION),
         buildLabelObjectFilter(criterion.provenance, ENCOUNTER_PROVENANCE),
         buildLabelObjectFilter(criterion.admission, ENCOUNTER_ADMISSION),
-        buildLabelObjectFilter(criterion.encounterService, SERVICE_PROVIDER),
         buildLabelObjectFilter(criterion.reason, ENCOUNTER_REASON),
+        buildEncounterServiceFilter(criterion.encounterService, SERVICE_PROVIDER),
         buildDurationFilter(criterion?.duration?.[0], ENCOUNTER_DURATION, 'ge'),
         buildDurationFilter(criterion?.duration?.[1], ENCOUNTER_DURATION, 'le'),
         buildAgeFilter(criterion.age, ENCOUNTER_MIN_BIRTHDATE, deidentified, ENCOUNTER_MAX_BIRTHDATE)
@@ -240,7 +241,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.DOCUMENTS: {
       const unreducedFilterFhir = [
         `${COMPOSITION_STATUS}=final&type:not=doc-impor&contenttype='http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain'&subject.active=true`,
-        buildLabelObjectFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
+        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
         buildSearchFilter(
           criterion.search,
           criterion.searchBy === SearchByTypes.TEXT ? COMPOSITION_TEXT : COMPOSITION_TITLE
@@ -264,7 +265,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         'subject.active=true',
         buildLabelObjectFilter(criterion.code, CONDITION_CODE, CONDITION_HIERARCHY),
         buildLabelObjectFilter(criterion.diagnosticType, CONDITION_TYPE),
-        buildLabelObjectFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER)
+        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER)
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -275,7 +276,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
       const unreducedFilterFhir = [
         'subject.active=true',
         buildLabelObjectFilter(criterion.code, PROCEDURE_CODE, PROCEDURE_HIERARCHY),
-        buildLabelObjectFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
+        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
         buildSimpleFilter(criterion.source, PROCEDURE_SOURCE)
       ].filter((elem) => elem)
       filterFhir =
@@ -287,7 +288,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
       const unreducedFilterFhir = [
         'patient.active=true',
         buildLabelObjectFilter(criterion.code, CLAIM_CODE, CLAIM_HIERARCHY),
-        buildLabelObjectFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER)
+        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER)
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -304,7 +305,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
             ? MEDICATION_REQUEST_ROUTE
             : MEDICATION_ADMINISTRATION_ROUTE
         ),
-        buildLabelObjectFilter(
+        buildEncounterServiceFilter(
           criterion.encounterService,
           criterion.type === RessourceType.MEDICATION_REQUEST
             ? ENCOUNTER_SERVICE_PROVIDER
@@ -324,7 +325,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
       const unreducedFilterFhir = [
         `subject.active=true&${OBSERVATION_STATUS}=Val`,
         buildLabelObjectFilter(criterion.code, OBSERVATION_CODE, BIOLOGY_HIERARCHY_ITM_ANABIO),
-        buildLabelObjectFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
+        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
         buildObservationValueFilter(criterion, OBSERVATION_VALUE)
       ].filter((elem) => elem)
       filterFhir =
@@ -354,7 +355,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         buildSearchFilter(criterion.seriesProtocol, IMAGING_SERIES_PROTOCOL),
         buildLabelObjectFilter(criterion.studyModalities, IMAGING_STUDY_MODALITIES),
         buildLabelObjectFilter(criterion.seriesModalities, IMAGING_SERIES_MODALITIES),
-        buildLabelObjectFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
+        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
         buildComparatorFilter(criterion.numberOfSeries, criterion.seriesComparator, IMAGING_NB_OF_SERIES),
         buildComparatorFilter(criterion.numberOfIns, criterion.instancesComparator, IMAGING_NB_OF_INS),
         buildWithDocumentFilter(criterion, IMAGING_WITH_DOCUMENT),
