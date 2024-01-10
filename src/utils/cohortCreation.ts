@@ -39,7 +39,11 @@ import {
   unbuildLabelObjectFilter,
   unbuildObservationValueFilter,
   unbuildSearchFilter,
-  buildEncounterServiceFilter
+  buildEncounterServiceFilter,
+  filtersBuilders,
+  questionnaireFiltersBuilders,
+  unbuildQuestionnaireFilters,
+  findQuestionnaireRessource
 } from './mappers'
 
 const REQUETEUR_VERSION = 'v1.4.0'
@@ -107,6 +111,42 @@ const IMAGING_SERIES_DESCRIPTION = 'series-description'
 const IMAGING_SERIES_PROTOCOL = 'series-protocol'
 const IMAGING_SERIES_MODALITIES = 'series-modality'
 const IMAGING_SERIES_UID = 'series'
+
+const PREGNANCY_START_DATE = ['F_MATER_001010', 'valueDate']
+const PREGNANCY_END_DATE = ['F_MATER_001010', 'valueDate']
+const PREGNANCY_MODE = ['F_MATER_001014', 'valueCoding']
+const PREGNANCY_FOETUS = ['F_MATER_001017', 'valueInteger']
+const PREGNANCY_PARITY = ['F_MATER_001192', 'valueInteger']
+const PREGNANCY_MATERNAL_RISKS = ['F_MATER_001361', 'valueCoding']
+const PREGNANCY_MATERNAL_RISKS_PRECISION = ['F_MATER_001362', 'valueString']
+const PREGNANCY_RISKS_OBSTETRIC_HISTORY = ['F_MATER_001363', 'valueCoding']
+const PREGNANCY_RISKS_OBSTETRIC_HISTORY_PRECISION = ['F_MATER_001364', 'valueString']
+const PREGNANCY_RISKS_COMPLICATION_PREGNANCY = ['F_MATER_001631', 'valueCoding']
+const PREGNANCY_RISKS_COMPLICATION_PREGNANCY_PRECISION = ['F_MATER_001632', 'valueString']
+const PREGNANCY_CORTICOTHERAPIE = ['F_MATER_001597', 'valueBoolean']
+const PREGNANCY_PRENATAL_DIAGNOSIS = ['F_MATER_001661', 'valueBoolean']
+const PREGNANCY_ULTRASOUND_MONITORING = ['F_MATER_001552', 'valueBoolean']
+
+// const HOSPIT_HOSPIT_REASON = 'F_MATER_004051'
+// const HOSPIT_IN_UTERO_TRANSFER = 'F_MATER_004056'
+// const HOSPIT_PREGNANCY_MONITORING = 'F_MATER_004062'
+// const HOSPIT_MATURATION_CORTICOTHERAPIE = 'F_MATER_004372'
+// const HOSPIT_CHIRURGICAL_GESTURE = 'F_MATER_004623'
+// const HOSPIT_VME = '?'
+// const HOSPIT_CHILDBIRTH = '?'
+// const HOSPIT_CHILDBIRTH_PLACE = '?'
+// const HOSPIT_CHILDBIRTH_MODE = 'F_MATER_004830'
+// const HOSPIT_MATURATION_REASON = 'F_MATER_004831'
+// const HOSPIT_MATURATION_MODALITY = 'F_MATER_004833'
+// const HOSPIT_IMG_INDICATION = 'F_MATER_004839'
+// const HOSPIT_LABOR_OR_CESAREAN_ENTRY = 'F_MATER_004842'
+// const HOSPIT_PATHOLOGY_DURING_LABOR = 'F_MATER_004859'
+// const HOSPIT_OBSTETRICAL_GESTURE_DURING_LABOR = 'F_MATER_004864'
+// const HOSPIT_ANALGESIE_TYPE = 'F_MATER_004901'
+// const HOSPIT_FEEDING_TYPE = 'F_MATER_005507'
+// const HOSPIT_COMPLICATION = '?'
+// const HOSPIT_EXIT_FEEDING_MODE = 'F_MATER_005834'
+// const HOSPIT_EXIT_DIAGNOSTIC = 'F_MATER_005903'
 
 export const UNITE_EXECUTRICE = 'Unité exécutrice'
 export const STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE = 'Structure hospitalière de prise en charge'
@@ -200,12 +240,12 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.PATIENT: {
       filterFhir = [
         'active=true',
-        buildLabelObjectFilter(criterion.genders, PATIENT_GENDER),
-        buildLabelObjectFilter(criterion.vitalStatus, PATIENT_DECEASED),
-        buildDateFilter(criterion.birthdates[0], PATIENT_BIRTHDATE, 'ge'),
-        buildDateFilter(criterion.birthdates[1], PATIENT_BIRTHDATE, 'le'),
-        buildDateFilter(criterion.deathDates[0], PATIENT_DEATHDATE, 'ge'),
-        buildDateFilter(criterion.deathDates[1], PATIENT_DEATHDATE, 'le'),
+        filtersBuilders(PATIENT_GENDER, buildLabelObjectFilter(criterion.genders)),
+        filtersBuilders(PATIENT_DECEASED, buildLabelObjectFilter(criterion.vitalStatus)),
+        filtersBuilders(PATIENT_BIRTHDATE, buildDateFilter(criterion.birthdates[1], 'le')),
+        filtersBuilders(PATIENT_BIRTHDATE, buildDateFilter(criterion.birthdates[0], 'ge')),
+        filtersBuilders(PATIENT_DEATHDATE, buildDateFilter(criterion.deathDates[0], 'ge')),
+        filtersBuilders(PATIENT_DEATHDATE, buildDateFilter(criterion.deathDates[1], 'le')),
         criterion.birthdates[0] === null && criterion.birthdates[1] === null
           ? buildDurationFilter(
               criterion.age[0],
@@ -232,17 +272,17 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
       deidentified = false //TODO erase this line when deidentified param for encounter is implemented
       filterFhir = [
         'subject.active=true',
-        buildLabelObjectFilter(criterion.admissionMode, ENCOUNTER_ADMISSIONMODE),
-        buildLabelObjectFilter(criterion.entryMode, ENCOUNTER_ENTRYMODE),
-        buildLabelObjectFilter(criterion.exitMode, ENCOUNTER_EXITMODE),
-        buildLabelObjectFilter(criterion.priseEnChargeType, ENCOUNTER_PRISENCHARGETYPE),
-        buildLabelObjectFilter(criterion.typeDeSejour, ENCOUNTER_TYPEDESEJOUR),
-        buildLabelObjectFilter(criterion.fileStatus, ENCOUNTER_FILESTATUS),
-        buildLabelObjectFilter(criterion.destination, ENCOUNTER_DESTINATION),
-        buildLabelObjectFilter(criterion.provenance, ENCOUNTER_PROVENANCE),
-        buildLabelObjectFilter(criterion.admission, ENCOUNTER_ADMISSION),
-        buildLabelObjectFilter(criterion.reason, ENCOUNTER_REASON),
-        buildEncounterServiceFilter(criterion.encounterService, SERVICE_PROVIDER),
+        filtersBuilders(ENCOUNTER_ADMISSIONMODE, buildLabelObjectFilter(criterion.admissionMode)),
+        filtersBuilders(ENCOUNTER_ENTRYMODE, buildLabelObjectFilter(criterion.entryMode)),
+        filtersBuilders(ENCOUNTER_EXITMODE, buildLabelObjectFilter(criterion.exitMode)),
+        filtersBuilders(ENCOUNTER_PRISENCHARGETYPE, buildLabelObjectFilter(criterion.priseEnChargeType)),
+        filtersBuilders(ENCOUNTER_TYPEDESEJOUR, buildLabelObjectFilter(criterion.typeDeSejour)),
+        filtersBuilders(ENCOUNTER_FILESTATUS, buildLabelObjectFilter(criterion.fileStatus)),
+        filtersBuilders(ENCOUNTER_DESTINATION, buildLabelObjectFilter(criterion.destination)),
+        filtersBuilders(ENCOUNTER_PROVENANCE, buildLabelObjectFilter(criterion.provenance)),
+        filtersBuilders(ENCOUNTER_ADMISSION, buildLabelObjectFilter(criterion.admission)),
+        filtersBuilders(ENCOUNTER_REASON, buildLabelObjectFilter(criterion.reason)),
+        filtersBuilders(SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
         buildDurationFilter(criterion?.duration?.[0], ENCOUNTER_DURATION, 'ge'),
         buildDurationFilter(criterion?.duration?.[1], ENCOUNTER_DURATION, 'le'),
         buildDurationFilter(
@@ -266,18 +306,20 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.DOCUMENTS: {
       const unreducedFilterFhir = [
         `${COMPOSITION_STATUS}=final&type:not=doc-impor&contenttype=http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain&subject.active=true`,
-        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
-        buildSearchFilter(
-          criterion.search,
-          criterion.searchBy === SearchByTypes.TEXT ? COMPOSITION_TEXT : COMPOSITION_TITLE
+        filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
+        filtersBuilders(
+          criterion.searchBy === SearchByTypes.TEXT ? COMPOSITION_TEXT : COMPOSITION_TITLE,
+          buildSearchFilter(criterion.search)
         ),
-        buildLabelObjectFilter(
-          criterion.docType?.map((docType) => {
-            return {
-              id: docType.code
-            } as LabelObject
-          }),
-          COMPOSITION_TYPE
+        filtersBuilders(
+          COMPOSITION_TYPE,
+          buildLabelObjectFilter(
+            criterion.docType?.map((docType) => {
+              return {
+                id: docType.code
+              } as LabelObject
+            })
+          )
         )
       ].filter((elem) => elem)
       filterFhir =
@@ -288,9 +330,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.CONDITION: {
       const unreducedFilterFhir = [
         'subject.active=true',
-        buildLabelObjectFilter(criterion.code, CONDITION_CODE, CONDITION_HIERARCHY),
-        buildLabelObjectFilter(criterion.diagnosticType, CONDITION_TYPE),
-        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER)
+        filtersBuilders(CONDITION_CODE, buildLabelObjectFilter(criterion.code, CONDITION_HIERARCHY)),
+        filtersBuilders(CONDITION_TYPE, buildLabelObjectFilter(criterion.diagnosticType)),
+        filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService))
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -300,8 +342,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.PROCEDURE: {
       const unreducedFilterFhir = [
         'subject.active=true',
-        buildLabelObjectFilter(criterion.code, PROCEDURE_CODE, PROCEDURE_HIERARCHY),
-        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
+        filtersBuilders(PROCEDURE_CODE, buildLabelObjectFilter(criterion.code, PROCEDURE_HIERARCHY)),
+        filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
         buildSimpleFilter(criterion.source, PROCEDURE_SOURCE)
       ].filter((elem) => elem)
       filterFhir =
@@ -312,8 +354,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.CLAIM: {
       const unreducedFilterFhir = [
         'patient.active=true',
-        buildLabelObjectFilter(criterion.code, CLAIM_CODE, CLAIM_HIERARCHY),
-        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER)
+        filtersBuilders(CLAIM_CODE, buildLabelObjectFilter(criterion.code, CLAIM_HIERARCHY)),
+        filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService))
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -324,21 +366,21 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.MEDICATION_ADMINISTRATION: {
       const unreducedFilterFhir = [
         'subject.active=true',
-        buildLabelObjectFilter(
-          criterion.administration,
+        filtersBuilders(
           criterion.type === RessourceType.MEDICATION_REQUEST
             ? MEDICATION_REQUEST_ROUTE
-            : MEDICATION_ADMINISTRATION_ROUTE
+            : MEDICATION_ADMINISTRATION_ROUTE,
+          buildLabelObjectFilter(criterion.administration)
         ),
-        buildEncounterServiceFilter(
-          criterion.encounterService,
+        filtersBuilders(
           criterion.type === RessourceType.MEDICATION_REQUEST
             ? ENCOUNTER_SERVICE_PROVIDER
-            : ENCOUNTER_CONTEXT_SERVICE_PROVIDER
+            : ENCOUNTER_CONTEXT_SERVICE_PROVIDER,
+          buildEncounterServiceFilter(criterion.encounterService)
         ),
-        buildLabelObjectFilter(criterion.code, MEDICATION_CODE, MEDICATION_ATC, true),
+        filtersBuilders(MEDICATION_CODE, buildLabelObjectFilter(criterion.code, MEDICATION_ATC, true)),
         criterion.type === RessourceType.MEDICATION_REQUEST
-          ? buildLabelObjectFilter(criterion.prescriptionType, MEDICATION_PRESCRIPTION_TYPE)
+          ? filtersBuilders(MEDICATION_PRESCRIPTION_TYPE, buildLabelObjectFilter(criterion.prescriptionType))
           : ''
       ].filter((elem) => elem)
       filterFhir =
@@ -349,8 +391,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.OBSERVATION: {
       const unreducedFilterFhir = [
         `subject.active=true&${OBSERVATION_STATUS}=Val`,
-        buildLabelObjectFilter(criterion.code, OBSERVATION_CODE, BIOLOGY_HIERARCHY_ITM_ANABIO),
-        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
+        filtersBuilders(OBSERVATION_CODE, buildLabelObjectFilter(criterion.code, BIOLOGY_HIERARCHY_ITM_ANABIO)),
+        filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
         buildObservationValueFilter(criterion, OBSERVATION_VALUE)
       ].filter((elem) => elem)
       filterFhir =
@@ -370,19 +412,22 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.IMAGING: {
       filterFhir = [
         'patient.active=true',
-        buildDateFilter(criterion.studyStartDate, IMAGING_STUDY_DATE, 'ge'),
-        buildDateFilter(criterion.studyEndDate, IMAGING_STUDY_DATE, 'le'),
-        buildDateFilter(criterion.seriesStartDate, IMAGING_SERIES_DATE, 'ge'),
-        buildDateFilter(criterion.seriesEndDate, IMAGING_SERIES_DATE, 'le'),
-        buildSearchFilter(criterion.studyDescription, IMAGING_STUDY_DESCRIPTION),
-        buildSearchFilter(criterion.studyProcedure, IMAGING_STUDY_PROCEDURE),
-        buildSearchFilter(criterion.seriesDescription, IMAGING_SERIES_DESCRIPTION),
-        buildSearchFilter(criterion.seriesProtocol, IMAGING_SERIES_PROTOCOL),
-        buildLabelObjectFilter(criterion.studyModalities, IMAGING_STUDY_MODALITIES),
-        buildLabelObjectFilter(criterion.seriesModalities, IMAGING_SERIES_MODALITIES),
-        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
-        buildComparatorFilter(criterion.numberOfSeries, criterion.seriesComparator, IMAGING_NB_OF_SERIES),
-        buildComparatorFilter(criterion.numberOfIns, criterion.instancesComparator, IMAGING_NB_OF_INS),
+        filtersBuilders(IMAGING_STUDY_DATE, buildDateFilter(criterion.studyStartDate, 'ge')),
+        filtersBuilders(IMAGING_STUDY_DATE, buildDateFilter(criterion.studyEndDate, 'le')),
+        filtersBuilders(IMAGING_SERIES_DATE, buildDateFilter(criterion.seriesStartDate, 'ge')),
+        filtersBuilders(IMAGING_SERIES_DATE, buildDateFilter(criterion.seriesEndDate, 'le')),
+        filtersBuilders(IMAGING_STUDY_DESCRIPTION, buildSearchFilter(criterion.studyDescription)),
+        filtersBuilders(IMAGING_STUDY_PROCEDURE, buildSearchFilter(criterion.studyProcedure)),
+        filtersBuilders(IMAGING_SERIES_DESCRIPTION, buildSearchFilter(criterion.seriesDescription)),
+        filtersBuilders(IMAGING_SERIES_PROTOCOL, buildSearchFilter(criterion.seriesProtocol)),
+        filtersBuilders(IMAGING_STUDY_MODALITIES, buildLabelObjectFilter(criterion.studyModalities)),
+        filtersBuilders(IMAGING_SERIES_MODALITIES, buildLabelObjectFilter(criterion.seriesModalities)),
+        filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
+        filtersBuilders(
+          IMAGING_NB_OF_SERIES,
+          buildComparatorFilter(criterion.numberOfSeries, criterion.seriesComparator)
+        ),
+        filtersBuilders(IMAGING_NB_OF_INS, buildComparatorFilter(criterion.numberOfIns, criterion.instancesComparator)),
         buildWithDocumentFilter(criterion, IMAGING_WITH_DOCUMENT),
         buildSimpleFilter(criterion.studyUid, IMAGING_STUDY_UID, IMAGING_STUDY_UID_URL),
         buildSimpleFilter(criterion.seriesUid, IMAGING_SERIES_UID)
@@ -392,9 +437,128 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
       break
     }
 
+    case RessourceType.PREGNANCY:
+      filterFhir = [
+        'subject.active=true',
+        `questionnaire.name='${RessourceType.PREGNANCY}'`,
+        questionnaireFiltersBuilders(PREGNANCY_START_DATE, buildDateFilter(criterion.pregnancyStartDate, 'ge')),
+        questionnaireFiltersBuilders(PREGNANCY_END_DATE, buildDateFilter(criterion.pregnancyEndDate, 'le')),
+        questionnaireFiltersBuilders(PREGNANCY_MODE, buildLabelObjectFilter(criterion.pregnancyMode)),
+        questionnaireFiltersBuilders(
+          PREGNANCY_FOETUS,
+          buildComparatorFilter(criterion.foetus, criterion.foetusComparator)
+        ),
+        questionnaireFiltersBuilders(
+          PREGNANCY_PARITY,
+          buildComparatorFilter(criterion.parity, criterion.parityComparator)
+        ),
+        questionnaireFiltersBuilders(PREGNANCY_MATERNAL_RISKS, buildLabelObjectFilter(criterion.maternalRisks)),
+        questionnaireFiltersBuilders(
+          PREGNANCY_MATERNAL_RISKS_PRECISION,
+          buildSearchFilter(criterion.maternalRisksPrecision)
+        ),
+        questionnaireFiltersBuilders(
+          PREGNANCY_RISKS_OBSTETRIC_HISTORY,
+          buildLabelObjectFilter(criterion.risksRelatedToObstetricHistory)
+        ),
+        questionnaireFiltersBuilders(
+          PREGNANCY_RISKS_OBSTETRIC_HISTORY_PRECISION,
+          buildSearchFilter(criterion.risksRelatedToObstetricHistoryPrecision)
+        ),
+        questionnaireFiltersBuilders(
+          PREGNANCY_RISKS_COMPLICATION_PREGNANCY,
+          buildLabelObjectFilter(criterion.risksOrComplicationsOfPregnancy)
+        ),
+        questionnaireFiltersBuilders(
+          PREGNANCY_RISKS_COMPLICATION_PREGNANCY_PRECISION,
+          buildSearchFilter(criterion.risksOrComplicationsOfPregnancyPrecision)
+        ),
+        questionnaireFiltersBuilders(PREGNANCY_CORTICOTHERAPIE, buildLabelObjectFilter(criterion.corticotherapie)),
+        questionnaireFiltersBuilders(PREGNANCY_PRENATAL_DIAGNOSIS, buildLabelObjectFilter(criterion.prenatalDiagnosis)),
+        questionnaireFiltersBuilders(
+          PREGNANCY_ULTRASOUND_MONITORING,
+          buildLabelObjectFilter(criterion.ultrasoundMonitoring)
+        ),
+        questionnaireFiltersBuilders(
+          [ENCOUNTER_SERVICE_PROVIDER, 'valueCoding'],
+          buildEncounterServiceFilter(criterion.encounterService)
+        )
+      ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
+      break
+    // case RessourceType.HOSPIT:
+    //   filterFhir = [
+    //     'subject.active=true',
+    //     `_filter=linkId eq ${HOSPIT_HOSPIT_REASON} and value eq ${criterion.hospitReason}`,
+    //     `_filter=linkId eq ${HOSPIT_IN_UTERO_TRANSFER} and value eq ${
+    //       criterion.inUteroTransfer && criterion.inUteroTransfer.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_PREGNANCY_MONITORING} and value eq ${
+    //       criterion.pregnancyMonitoring && criterion.pregnancyMonitoring.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_VME} and value eq ${
+    //       criterion.vme && criterion.vme.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_MATURATION_CORTICOTHERAPIE} and value eq ${
+    //       criterion.maturationCorticotherapie &&
+    //       criterion.maturationCorticotherapie.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_CHIRURGICAL_GESTURE} and value eq ${
+    //       criterion.chirurgicalGesture && criterion.chirurgicalGesture.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_CHILDBIRTH} and value eq ${
+    //       criterion.childbirth && criterion.childbirth.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_CHILDBIRTH_PLACE} and value eq ${
+    //       criterion.childbirthPlace && criterion.childbirthPlace.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_CHILDBIRTH_MODE} and value eq ${
+    //       criterion.childbirthMode && criterion.childbirthMode.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_MATURATION_REASON} and value eq ${
+    //       criterion.maturationReason && criterion.maturationReason.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_MATURATION_MODALITY} and value eq ${
+    //       criterion.maturationModality && criterion.maturationModality.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_IMG_INDICATION} and value eq ${
+    //       criterion.imgIndication && criterion.imgIndication.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_LABOR_OR_CESAREAN_ENTRY} and value eq ${
+    //       criterion.laborOrCesareanEntry && criterion.laborOrCesareanEntry.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_PATHOLOGY_DURING_LABOR} and value eq ${
+    //       criterion.pathologyDuringLabor && criterion.pathologyDuringLabor.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_OBSTETRICAL_GESTURE_DURING_LABOR} and value eq ${
+    //       criterion.obstetricalGestureDuringLabor &&
+    //       criterion.obstetricalGestureDuringLabor.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_ANALGESIE_TYPE} and value eq ${
+    //       criterion.analgesieType && criterion.analgesieType.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_FEEDING_TYPE} and value eq ${
+    //       criterion.feedingType && criterion.feedingType.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_COMPLICATION} and value eq ${
+    //       criterion.complication && criterion.complication.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_EXIT_FEEDING_MODE} and value eq ${
+    //       criterion.exitFeedingMode && criterion.exitFeedingMode.map((item) => item.id).reduce(searchReducer)
+    //     }`,
+    //     `_filter=linkId eq ${HOSPIT_EXIT_DIAGNOSTIC} and value eq ${
+    //       criterion.exitDiagnostic && criterion.exitDiagnostic.map((item) => item.id).reduce(searchReducer)
+    //     }`
+    //   ]
+    //   .filter((elem) => elem)
+    //   .reduce(filterReducer)
+    // break
+
     default:
       break
   }
+
   return filterFhir
 }
 
@@ -427,7 +591,9 @@ export function buildRequest(
           _type: 'basicResource',
           _id: item.id ?? 0,
           isInclusive: item.isInclusive ?? true,
-          resourceType: item.type ?? RessourceType.PATIENT,
+          resourceType:
+            // item.type === RessourceType.MATERNITY ||
+            item.type === RessourceType.PREGNANCY ? RessourceType.QUESTIONNAIRE : item.type,
           filterFhir: constructFilterFhir(item, deidentified),
           occurrence:
             !(item.type === RessourceType.PATIENT || item.type === RessourceType.IPP_LIST) && item.occurrence
@@ -1168,6 +1334,104 @@ export async function unbuildRequest(_json: string): Promise<any> {
         break
       }
 
+      case RessourceType.QUESTIONNAIRE:
+        if (element.filterFhir) {
+          const splittedFilters = element.filterFhir.split('&')
+          const findRessource = findQuestionnaireRessource(splittedFilters)
+          const cleanedFilters = unbuildQuestionnaireFilters(splittedFilters)
+
+          switch (findRessource) {
+            case RessourceType.PREGNANCY:
+              currentCriterion.title = 'Critère de Fiche de grossesse'
+              currentCriterion.type = RessourceType.PREGNANCY
+              currentCriterion.pregnancyStartDate = null
+              currentCriterion.pregnancyEndDate = null
+              currentCriterion.pregnancyMode = []
+              currentCriterion.foetus = 1
+              currentCriterion.foetusComparator = Comparators.GREATER_OR_EQUAL
+              currentCriterion.parity = 1
+              currentCriterion.parityComparator = Comparators.GREATER_OR_EQUAL
+              currentCriterion.maternalRisks = []
+              currentCriterion.maternalRisksPrecision = ''
+              currentCriterion.risksRelatedToObstetricHistory = []
+              currentCriterion.risksRelatedToObstetricHistoryPrecision = ''
+              currentCriterion.risksOrComplicationsOfPregnancy = []
+              currentCriterion.risksOrComplicationsOfPregnancyPrecision = ''
+              currentCriterion.corticotherapie = []
+              currentCriterion.prenatalDiagnosis = []
+              currentCriterion.ultrasoundMonitoring = []
+              currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
+              currentCriterion.encounterService = []
+
+              unbuildAdvancedCriterias(element, currentCriterion)
+
+              for (const filter of cleanedFilters) {
+                const key = filter?.[0]
+                const value = filter?.[1] ?? ''
+
+                switch (key) {
+                  case PREGNANCY_START_DATE[0]:
+                    currentCriterion.pregnancyStartDate = unbuildDateFilter(value)
+                    break
+                  case PREGNANCY_END_DATE[0]:
+                    currentCriterion.pregnancyEndDate = unbuildDateFilter(value)
+                    break
+                  case PREGNANCY_MODE[0]:
+                    unbuildLabelObjectFilter(currentCriterion, 'pregnancyMode', value)
+                    break
+                  case PREGNANCY_FOETUS[0]: {
+                    const parsedOccurence = parseOccurence(value)
+                    currentCriterion.foetus = parsedOccurence.value
+                    currentCriterion.foetusComparator = parsedOccurence.comparator
+                    break
+                  }
+                  case PREGNANCY_PARITY[0]: {
+                    const parsedOccurence = parseOccurence(value)
+                    currentCriterion.parity = parsedOccurence.value
+                    currentCriterion.parityComparator = parsedOccurence.comparator
+                    break
+                  }
+                  case PREGNANCY_MATERNAL_RISKS[0]:
+                    unbuildLabelObjectFilter(currentCriterion, 'maternalRisks', value)
+                    break
+                  case PREGNANCY_MATERNAL_RISKS_PRECISION[0]:
+                    currentCriterion.maternalRisksPrecision = unbuildSearchFilter(value)
+                    break
+                  case PREGNANCY_RISKS_OBSTETRIC_HISTORY[0]:
+                    unbuildLabelObjectFilter(currentCriterion, 'risksRelatedToObstetricHistory', value)
+                    break
+                  case PREGNANCY_RISKS_OBSTETRIC_HISTORY_PRECISION[0]:
+                    currentCriterion.risksRelatedToObstetricHistoryPrecision = unbuildSearchFilter(value)
+                    break
+                  case PREGNANCY_RISKS_COMPLICATION_PREGNANCY[0]:
+                    unbuildLabelObjectFilter(currentCriterion, 'risksOrComplicationsOfPregnancy', value)
+                    break
+                  case PREGNANCY_RISKS_COMPLICATION_PREGNANCY_PRECISION[0]:
+                    currentCriterion.risksOrComplicationsOfPregnancyPrecision = unbuildSearchFilter(value)
+                    break
+                  case PREGNANCY_CORTICOTHERAPIE[0]:
+                    unbuildLabelObjectFilter(currentCriterion, 'corticotherapie', value)
+                    break
+                  case PREGNANCY_PRENATAL_DIAGNOSIS[0]:
+                    unbuildLabelObjectFilter(currentCriterion, 'prenatalDiagnosis', value)
+                    break
+                  case PREGNANCY_ULTRASOUND_MONITORING[0]:
+                    unbuildLabelObjectFilter(currentCriterion, 'ultrasoundMonitoring', value)
+                    break
+                  case ENCOUNTER_SERVICE_PROVIDER:
+                    await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
+                    break
+                }
+              }
+              break
+            case RessourceType.MATERNITY:
+              break
+            default:
+              break
+          }
+        }
+        break
+
       default:
         break
     }
@@ -1331,7 +1595,9 @@ export const getDataFromFetch = async (
                     currentcriterion.type === RessourceType.ENCOUNTER ||
                     currentcriterion.type === RessourceType.IPP_LIST ||
                     currentcriterion.type === RessourceType.DOCUMENTS ||
-                    currentcriterion.type === RessourceType.IMAGING
+                    currentcriterion.type === RessourceType.IMAGING ||
+                    currentcriterion.type === RessourceType.PREGNANCY ||
+                    currentcriterion.type === RessourceType.HOSPIT
                   ) &&
                   currentcriterion.code &&
                   currentcriterion.code.length > 0

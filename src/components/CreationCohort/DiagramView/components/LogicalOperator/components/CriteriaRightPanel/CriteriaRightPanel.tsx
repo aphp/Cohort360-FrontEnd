@@ -18,6 +18,10 @@ import ContactPageIcon from '@mui/icons-material/ContactPage'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import ScienceIcon from '@mui/icons-material/Science'
 import CoronavirusIcon from '@mui/icons-material/Coronavirus'
+import FolderIcon from '@mui/icons-material/Folder'
+import CribIcon from '@mui/icons-material/Crib'
+import PregnantWomanIcon from '@mui/icons-material/PregnantWoman'
+import DomainAddIcon from '@mui/icons-material/DomainAdd'
 
 import { CriteriaItemDataCache, CriteriaItemType } from 'types'
 import useStyles from './styles'
@@ -70,6 +74,14 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
         return <MonitorHeartIcon />
       case RessourceType.IMAGING:
         return <PhotoCameraFront />
+      case RessourceType.SPECIALITY:
+        return <FolderIcon />
+      case RessourceType.MATERNITY:
+        return <CribIcon />
+      case RessourceType.PREGNANCY:
+        return <PregnantWomanIcon />
+      case RessourceType.HOSPIT:
+        return <DomainAddIcon />
       default:
         return <></>
     }

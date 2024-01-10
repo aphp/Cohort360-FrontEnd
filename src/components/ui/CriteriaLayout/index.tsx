@@ -16,6 +16,7 @@ type CriteriaLayoutProps = {
   onChangeIsInclusive: (isInclusive: boolean) => void
   infoAlert?: string
   warningAlert?: string
+  errorAlert?: string
 }
 
 const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
@@ -30,7 +31,8 @@ const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
   isInclusive,
   onChangeIsInclusive,
   infoAlert,
-  warningAlert
+  warningAlert,
+  errorAlert
 }) => {
   const { classes } = useStyles()
 
@@ -53,6 +55,7 @@ const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
       <Grid className={classes.formContainer}>
         {infoAlert && <Alert severity="info">{infoAlert}</Alert>}
         {warningAlert && <Alert severity="warning">{warningAlert}</Alert>}
+        {errorAlert && <Alert severity="error">{errorAlert}</Alert>}
 
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">Critère {criteriaLabel}</Typography>

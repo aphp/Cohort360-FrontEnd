@@ -43,17 +43,14 @@ export const mapToCriteriaName = (criteria: string): CriteriaNameType => {
 
 export const buildLabelObjectFilter = (
   criterion: LabelObject[] | undefined | null,
-  fhirKey: string,
   hierarchyUrl?: string,
   system?: boolean
 ) => {
   if (criterion && criterion.length > 0) {
     let filter = ''
     criterion.find((code) => code.id === '*')
-      ? (filter = `${fhirKey}=${hierarchyUrl}|*`)
-      : (filter = `${fhirKey}=${criterion
-          .map((item) => (system ? `${item.system}|${item.id}` : item.id))
-          .reduce(searchReducer)}`)
+      ? (filter = `${hierarchyUrl}|*`)
+      : (filter = `${criterion.map((item) => (system ? `${item.system}|${item.id}` : item.id)).reduce(searchReducer)}`)
     return filter
   }
   return ''
@@ -67,11 +64,8 @@ export const unbuildLabelObjectFilter = (currentCriterion: any, filterName: stri
   }
 }
 
-export const buildEncounterServiceFilter = (criterion: ScopeTreeRow[] | undefined, fhirKey: string) => {
-  if (criterion && criterion.length > 0) {
-    return `${fhirKey}=${criterion.map((item) => item.id).reduce(searchReducer)}`
-  }
-  return ''
+export const buildEncounterServiceFilter = (criterion: ScopeTreeRow[] | undefined) => {
+  return criterion && criterion.length > 0 ? `${criterion.map((item) => item.id).reduce(searchReducer)}` : ''
 }
 
 export const unbuildEncounterServiceCriterias = async (
@@ -87,11 +81,8 @@ export const unbuildEncounterServiceCriterias = async (
   }
 }
 
-export const buildDateFilter = (criterion: string | null | undefined, fhirKey: string, comparator: 'le' | 'ge') => {
-  if (criterion) {
-    return `${fhirKey}=${comparator}${moment(criterion).format('YYYY-MM-DD[T00:00:00Z]')}`
-  }
-  return ''
+export const buildDateFilter = (criterion: string | null | undefined, comparator: 'le' | 'ge') => {
+  return criterion ? `${comparator}${moment(criterion).format('YYYY-MM-DD[T00:00:00Z]')}` : ''
 }
 
 export const unbuildDateFilter = (value: string) => {
@@ -116,11 +107,8 @@ export const unbuildDurationFilter = (value: string, deidentified?: boolean) => 
   return convertDurationToString(convertTimestampToDuration(+cleanValue, deidentified))
 }
 
-export const buildSearchFilter = (criterion: string, fhirKey: string) => {
-  if (criterion) {
-    return `${fhirKey}=${encodeURIComponent(criterion)}`
-  }
-  return ''
+export const buildSearchFilter = (criterion: string) => {
+  return criterion ? `${encodeURIComponent(criterion)}` : ''
 }
 
 export const unbuildSearchFilter = (value: string | null) => {
@@ -165,8 +153,8 @@ export const unbuildObservationValueFilter = (filters: string[][], currentCriter
   }
 }
 
-export const buildComparatorFilter = (criterion: number, comparator: Comparators, fhirKey: string) => {
-  return criterion ? `${fhirKey}=${comparatorToFilter(comparator)}${criterion}` : ''
+export const buildComparatorFilter = (criterion: number, comparator: Comparators) => {
+  return criterion ? `${comparatorToFilter(comparator)}${criterion}` : ''
 }
 
 export const buildWithDocumentFilter = (criterion: ImagingDataType, fhirKey: string) => {
@@ -223,4 +211,35 @@ export const unbuildAdvancedCriterias = (
 
 export const buildSimpleFilter = (criterion: string, fhirKey: string, url?: string) => {
   return criterion ? `${fhirKey}=${url ? `${url}|` : ''}${criterion}` : ''
+}
+
+export const questionnaireFiltersBuilders = (fhirKey: string[], value?: string) => {
+  return value ? `_filter=linkId eq ${fhirKey[0]} and item.answer.${fhirKey[1]} eq ${value}` : ''
+}
+
+export const findQuestionnaireRessource = (filters: string[]) => {
+  for (const item of filters) {
+    const match = item.match(/questionnaire\.name='([^']*)'/)
+    if (match && match[1]) {
+      return match[1]
+    }
+  }
+}
+
+export const unbuildQuestionnaireFilters = (filters: string[]) => {
+  const regex = /linkId eq (\S+) and item\.answer\.\S+ eq (\S+)/
+
+  return filters
+    .map((str) => {
+      const match = str.match(regex)
+      if (match) {
+        const [, linkId, value] = match
+        return [linkId, value]
+      }
+    })
+    .filter((elem) => elem)
+}
+
+export const filtersBuilders = (fhirKey: string, value?: string) => {
+  return value ? `${fhirKey}=${value}` : ''
 }

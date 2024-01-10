@@ -355,6 +355,287 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
           getNbOccurencesLabel(selectedCriteria.numberOfIns, selectedCriteria.instancesComparator, "d'instances")
         )
       break
+    case RessourceType.PREGNANCY:
+      if (selectedCriteria.pregnancyStartDate || selectedCriteria.pregnancyEndDate)
+        labels.push(
+          getDatesLabel(
+            [selectedCriteria.pregnancyStartDate, selectedCriteria.pregnancyEndDate],
+            'Date de début de grossesse :'
+          )
+        )
+      if (selectedCriteria.pregnancyMode && selectedCriteria.pregnancyMode.length > 0) {
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.pregnancyMode,
+            CriteriaDataKey.PREGNANCY_MODE,
+            type,
+            'Mode de grossesse :'
+          )
+        )
+      }
+      if (!isNaN(selectedCriteria.foetus) && selectedCriteria.foetusComparator)
+        labels.push(getNbOccurencesLabel(selectedCriteria.foetus, selectedCriteria.foetusComparator, 'de foetus'))
+      if (!isNaN(selectedCriteria.parity) && selectedCriteria.parityComparator)
+        labels.push(getNbOccurencesLabel(selectedCriteria.parity, selectedCriteria.parityComparator, 'de parité'))
+      if (selectedCriteria.maternalRisks && selectedCriteria.maternalRisks.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.maternalRisks,
+            CriteriaDataKey.MATERNAL_RISKS,
+            type,
+            'Risques maternels :'
+          )
+        )
+      if (selectedCriteria.maternalRisksPrecision)
+        labels.push(`Précision sur les risques maternels : ${selectedCriteria.maternalRisksPrecision}`)
+      if (selectedCriteria.risksRelatedToObstetricHistory && selectedCriteria.risksRelatedToObstetricHistory.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.risksRelatedToObstetricHistory,
+            CriteriaDataKey.RISKS_RELATED_TO_OBSTETRIC_HISTORY,
+            type,
+            'Risques liés aux antécédents obstétricaux :'
+          )
+        )
+      if (selectedCriteria.risksRelatedToObstetricHistoryPrecision)
+        labels.push(
+          `Précision sur les risques liés aux antécédents obstétricaux : ${selectedCriteria.risksRelatedToObstetricHistoryPrecision}`
+        )
+      if (
+        selectedCriteria.risksOrComplicationsOfPregnancy &&
+        selectedCriteria.risksOrComplicationsOfPregnancy.length > 0
+      )
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.risksOrComplicationsOfPregnancy,
+            CriteriaDataKey.RISKS_OR_COMPLICATIONS_OF_PREGNANCY,
+            type,
+            'Risques ou complications de la grossesse :'
+          )
+        )
+      if (selectedCriteria.risksOrComplicationsOfPregnancyPrecision)
+        labels.push(
+          `Précision sur les risques ou complications de la grossesse : ${selectedCriteria.risksOrComplicationsOfPregnancyPrecision}`
+        )
+      if (selectedCriteria.corticotherapie && selectedCriteria.corticotherapie.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.corticotherapie,
+            CriteriaDataKey.CORTICOTHERAPIE,
+            type,
+            'Corticothérapie :'
+          )
+        )
+      if (selectedCriteria.prenatalDiagnosis && selectedCriteria.prenatalDiagnosis.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.prenatalDiagnosis,
+            CriteriaDataKey.PRENATAL_DIAGNOSIS,
+            type,
+            'Diagnostic prénatal :'
+          )
+        )
+      if (selectedCriteria.ultrasoundMonitoring && selectedCriteria.ultrasoundMonitoring.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.ultrasoundMonitoring,
+            CriteriaDataKey.ULTRASOUND_MONITORING,
+            type,
+            'Suivi échographique :'
+          )
+        )
+      break
+    case RessourceType.HOSPIT:
+      if (selectedCriteria.hospitReason) labels.push(`Motif(s) d'hospitalisation : ${selectedCriteria.hospitReason}`)
+      if (selectedCriteria.inUteroTransfer && selectedCriteria.inUteroTransfer.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.inUteroTransfer,
+            CriteriaDataKey.IN_UTERO_TRANSFER,
+            type,
+            'Transfert in utero :'
+          )
+        )
+      if (selectedCriteria.pregnancyMonitoring && selectedCriteria.pregnancyMonitoring.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.pregnancyMonitoring,
+            CriteriaDataKey.PREGNANCY_MONITORING,
+            type,
+            'Grossesse peu ou pas suivie :'
+          )
+        )
+      if (selectedCriteria.vme && selectedCriteria.vme.length > 0)
+        labels.push(getLabelFromCriteriaObject(criteriaState, selectedCriteria.vme, CriteriaDataKey.VME, type, 'VME :'))
+      if (selectedCriteria.maturationCorticotherapie && selectedCriteria.maturationCorticotherapie.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.maturationCorticotherapie,
+            CriteriaDataKey.MATURATION_CORTICOTHERAPIE,
+            type,
+            'Corticothérapie pour maturation foetal faite :'
+          )
+        )
+      if (selectedCriteria.chirurgicalGesture && selectedCriteria.chirurgicalGesture.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.chirurgicalGesture,
+            CriteriaDataKey.CHIRURGICAL_GESTURE,
+            type,
+            'Type de geste ou de chirurgie :'
+          )
+        )
+      if (selectedCriteria.childbirth && selectedCriteria.childbirth.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.childbirth,
+            CriteriaDataKey.CHILDBIRTH,
+            type,
+            'Accouchement :'
+          )
+        )
+      if (selectedCriteria.childbirthPlace && selectedCriteria.childbirthPlace.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.childbirthPlace,
+            CriteriaDataKey.CHILDBIRTH_PLACE,
+            type,
+            "Lieu d'accouchement :"
+          )
+        )
+      if (selectedCriteria.childbirthMode && selectedCriteria.childbirthMode.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.childbirthMode,
+            CriteriaDataKey.CHILDBIRTH_MODE,
+            type,
+            'Mode de mise en travail :'
+          )
+        )
+      if (selectedCriteria.maturationReason && selectedCriteria.maturationReason.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.maturationReason,
+            CriteriaDataKey.MATURATION_REASON,
+            type,
+            'Motif(s) de maturation / déclenchement :'
+          )
+        )
+      if (selectedCriteria.maturationModality && selectedCriteria.maturationModality.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.maturationModality,
+            CriteriaDataKey.MATURATION_MODALITY,
+            type,
+            'Modalités de maturation cervicale initiale :'
+          )
+        )
+      if (selectedCriteria.imgIndication && selectedCriteria.imgIndication.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.imgIndication,
+            CriteriaDataKey.IMG_INDICATION,
+            type,
+            "Indication de l'IMG :"
+          )
+        )
+      if (selectedCriteria.laborOrCesareanEntry && selectedCriteria.laborOrCesareanEntry.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.laborOrCesareanEntry,
+            CriteriaDataKey.LABOR_OR_CESAREAN_ENTRY,
+            type,
+            "Présentation à l'entrée en travail ou en début de césarienne :"
+          )
+        )
+      if (selectedCriteria.pathologyDuringLabor && selectedCriteria.pathologyDuringLabor.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.pathologyDuringLabor,
+            CriteriaDataKey.PATHOLOGY_DURING_LABOR,
+            type,
+            'Pathologie pendant le travail :'
+          )
+        )
+      if (selectedCriteria.obstetricalGestureDuringLabor && selectedCriteria.obstetricalGestureDuringLabor.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.obstetricalGestureDuringLabor,
+            CriteriaDataKey.OBSTETRICAL_GESTURE_DURING_LABOR,
+            type,
+            'Geste ou manoeuvre obstétricale pendant le travail :'
+          )
+        )
+      if (selectedCriteria.analgesieType && selectedCriteria.analgesieType.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.analgesieType,
+            CriteriaDataKey.ANALGESIE_TYPE,
+            type,
+            'ANALGESIE / ANESTHESIE - type :'
+          )
+        )
+      if (selectedCriteria.feedingType && selectedCriteria.feedingType.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.feedingType,
+            CriteriaDataKey.FEEDING_TYPE,
+            type,
+            "Type d'allaitement :"
+          )
+        )
+      if (selectedCriteria.complication && selectedCriteria.complication.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.complication,
+            CriteriaDataKey.COMPLICATION,
+            type,
+            'Complications :'
+          )
+        )
+      if (selectedCriteria.exitFeedingMode && selectedCriteria.exitFeedingMode.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.exitFeedingMode,
+            CriteriaDataKey.EXIT_FEEDING_MODE,
+            type,
+            "Mode d'allaitement à la sortie :"
+          )
+        )
+      if (selectedCriteria.exitDiagnostic && selectedCriteria.exitDiagnostic.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.exitDiagnostic,
+            CriteriaDataKey.EXIT_DIAGNOSTIC,
+            type,
+            'Diagnostic de sortie :'
+          )
+        )
   }
   switch (type) {
     case RessourceType.DOCUMENTS:
@@ -366,6 +647,8 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
     case RessourceType.OBSERVATION:
     case RessourceType.ENCOUNTER:
     case RessourceType.IMAGING:
+    case RessourceType.PREGNANCY:
+    case RessourceType.HOSPIT:
       if (selectedCriteria.encounterStartDate || selectedCriteria.encounterEndDate)
         labels.push(
           getDatesLabel([selectedCriteria.encounterStartDate, selectedCriteria.encounterEndDate], 'Prise en charge')
