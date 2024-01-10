@@ -190,17 +190,6 @@ type RequeteurSearchType = {
   request: RequeteurGroupType | undefined
 }
 
-export const getCalendarMultiplicator = (type: Calendar): number => {
-  switch (type) {
-    case Calendar.MONTH:
-      return 31
-    case Calendar.YEAR:
-      return 365
-    default:
-      return 1
-  }
-}
-
 const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: boolean): string => {
   let filterFhir = ''
   const filterReducer = (accumulator: any, currentValue: any): string =>
@@ -759,10 +748,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         unbuildAdvancedCriterias(element, currentCriterion)
 
         if (element.filterFhir) {
-          const filters = element.filterFhir
-            // This `replaceAll` is necessary because if a user searches `_text=first && second` we have a bug with filterFhir.split('&')
-            .split('&')
-            .map((elem) => elem.split('='))
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
           for (const filter of filters) {
             const key = filter ? filter[0] : null
@@ -818,7 +804,6 @@ export async function unbuildRequest(_json: string): Promise<any> {
             switch (key) {
               case CONDITION_CODE: {
                 unbuildLabelObjectFilter(currentCriterion, 'code', value)
-
                 break
               }
               case CONDITION_TYPE: {
@@ -829,10 +814,8 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
                 break
               }
-
               case 'subject.active':
                 break
-
               default:
                 currentCriterion.error = true
                 break
@@ -901,7 +884,6 @@ export async function unbuildRequest(_json: string): Promise<any> {
             switch (key) {
               case CLAIM_CODE: {
                 unbuildLabelObjectFilter(currentCriterion, 'code', value)
-
                 break
               }
               case ENCOUNTER_SERVICE_PROVIDER: {
