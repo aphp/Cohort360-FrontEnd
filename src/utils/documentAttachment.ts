@@ -7,7 +7,7 @@ export const parseDocumentAttachment = (value: DocumentAttachmentMethod) => {
   }
   if (value === DocumentAttachmentMethod.ACCESS_NUMBER) {
     documentAttachment.documentAttachmentMethod = value
-  } else if (value === DocumentAttachmentMethod.INFERENCE_TEMPOREL) {
+  } else if (value.startsWith(DocumentAttachmentMethod.INFERENCE_TEMPOREL)) {
     documentAttachment.documentAttachmentMethod = DocumentAttachmentMethod.INFERENCE_TEMPOREL
     const matchNumber = value.match(/\d+/)
     if (matchNumber) {

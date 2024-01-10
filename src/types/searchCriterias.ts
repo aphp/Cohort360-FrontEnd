@@ -1,4 +1,4 @@
-import { ScopeTreeRow, SimpleCodeType, ValueSet } from 'types'
+import { ScopeTreeRow, SimpleCodeType, ValueSet, ValueSetSystem } from 'types'
 import { PatientTableLabels } from './patient'
 import { CohortsType } from './cohorts'
 
@@ -140,6 +140,7 @@ export type DurationRangeType = [string | null | undefined, string | null | unde
 export type LabelObject = {
   id: string
   label: string
+  system?: ValueSetSystem
 }
 export type OrderBy = {
   orderBy: Order

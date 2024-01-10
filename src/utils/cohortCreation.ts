@@ -9,7 +9,6 @@ import {
   CriteriaItemDataCache
 } from 'types'
 
-import docTypes from 'assets/docTypes.json'
 import {
   BIOLOGY_HIERARCHY_ITM_ANABIO,
   CLAIM_HIERARCHY,
@@ -18,18 +17,32 @@ import {
   IMAGING_STUDY_UID_URL,
   PROCEDURE_HIERARCHY
 } from '../constants'
-import { DocumentAttachmentMethod, SearchByTypes } from 'types/searchCriterias'
+import { DocumentAttachmentMethod, LabelObject, SearchByTypes } from 'types/searchCriterias'
 import { Calendar } from 'types/dates'
-import {
-  convertDurationToString,
-  convertDurationToTimestamp,
-  convertStringToDuration,
-  convertTimestampToDuration,
-  substructAgeString
-} from './age'
-import { Comparators, DocType, RessourceType, SelectedCriteriaType, CriteriaDataKey } from 'types/requestCriterias'
-import { comparatorToFilter, parseOccurence } from './valueComparator'
+import { convertDurationToString, convertTimestampToDuration } from './age'
+import { Comparators, RessourceType, SelectedCriteriaType, CriteriaDataKey } from 'types/requestCriterias'
+import { parseOccurence } from './valueComparator'
 import { parseDocumentAttachment } from './documentAttachment'
+import {
+  buildAgeFilter,
+  buildComparatorFilter,
+  buildDateFilter,
+  buildDurationFilter,
+  buildLabelObjectFilter,
+  buildObservationValueFilter,
+  buildSearchFilter,
+  buildSimpleFilter,
+  buildWithDocumentFilter,
+  unbuildAdvancedCriterias,
+  unbuildDateFilter,
+  unbuildDurationFilter,
+  unbuildDocTypesFilter,
+  unbuildEncounterServiceCriterias,
+  unbuildLabelObjectFilter,
+  unbuildObservationValueFilter,
+  unbuildSearchFilter,
+  buildEncounterServiceFilter
+} from './mappers'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
@@ -57,14 +70,11 @@ const ENCOUNTER_PROVENANCE = 'admit-source'
 const ENCOUNTER_ADMISSION = 'admission-type'
 
 const CLAIM_CODE = 'diagnosis'
-const CLAIM_CODE_ALL_HIERARCHY = 'diagnosis'
 
 const PROCEDURE_CODE = 'code'
-const PROCEDURE_CODE_ALL_HIERARCHY = 'code'
 const PROCEDURE_SOURCE = 'source'
 
 const CONDITION_CODE = 'code'
-const CONDITION_CODE_ALL_HIERARCHY = 'code'
 const CONDITION_TYPE = 'orbis-status'
 
 const COMPOSITION_TEXT = '_text'
@@ -78,8 +88,7 @@ const MEDICATION_ADMINISTRATION_ROUTE = 'dosage-route'
 const MEDICATION_REQUEST_ROUTE = 'dosage-instruction-route'
 
 const OBSERVATION_CODE = 'code'
-const OBSERVATION_CODE_ALL_HIERARCHY = 'code'
-const OBSERVATION_VALUE = 'value-quantity'
+export const OBSERVATION_VALUE = 'value-quantity'
 const OBSERVATION_STATUS = 'status'
 const ENCOUNTER_SERVICE_PROVIDER = 'encounter.encounter-care-site'
 const ENCOUNTER_CONTEXT_SERVICE_PROVIDER = 'context.encounter-care-site'
@@ -121,7 +130,7 @@ const DEFAULT_GROUP_ERROR: CriteriaGroupType = {
   criteriaIds: []
 }
 
-type RequeteurCriteriaType = {
+export type RequeteurCriteriaType = {
   // CRITERIA
   _type: string
   _id: number
@@ -182,62 +191,23 @@ type RequeteurSearchType = {
   request: RequeteurGroupType | undefined
 }
 
-export const getCalendarMultiplicator = (type: Calendar): number => {
-  switch (type) {
-    case Calendar.MONTH:
-      return 31
-    case Calendar.YEAR:
-      return 365
-    default:
-      return 1
-  }
-}
-
 const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: boolean): string => {
   let filterFhir = ''
   const filterReducer = (accumulator: any, currentValue: any): string =>
     accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
-  const searchReducer = (accumulator: any, currentValue: any): string =>
-    accumulator || accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 
   switch (criterion.type) {
     case RessourceType.PATIENT: {
-      const birthdates: [string, string] = [
-        moment(substructAgeString(criterion?.age?.[0] || '0/0/0')).format('MM/DD/YYYY'),
-        moment(substructAgeString(criterion?.age?.[1] || '0/0/130')).format('MM/DD/YYYY')
-      ]
-
-      const ageMin = Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
-      const ageMax = Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
-
-      const ageMinCriterion = `${deidentified ? PATIENT_AGE_MONTH : PATIENT_AGE_DAY}=ge${ageMin}`
-      const ageMaxCriterion = `${deidentified ? PATIENT_AGE_MONTH : PATIENT_AGE_DAY}=le${ageMax}`
-
       filterFhir = [
         'active=true',
-        `${
-          criterion.genders && criterion.genders.length > 0
-            ? `${PATIENT_GENDER}=${criterion.genders.map((gender: any) => gender.id).reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.vitalStatus && criterion.vitalStatus.length > 0
-            ? `${PATIENT_DECEASED}=${criterion.vitalStatus.map((vitalStatus) => vitalStatus.id).reduce(searchReducer)}`
-            : ''
-        }`,
-        criterion.birthdates[0] === null && criterion.birthdates[1] === null ? `${ageMinCriterion}` : '',
-        criterion.birthdates[0] === null && criterion.birthdates[1] === null ? `${ageMaxCriterion}` : '',
-        criterion.birthdates[0]
-          ? `${PATIENT_BIRTHDATE}=ge${moment(criterion.birthdates[0]).format('YYYY-MM-DD[T00:00:00Z]')}`
-          : '',
-        criterion.birthdates[1]
-          ? `${PATIENT_BIRTHDATE}=le${moment(criterion.birthdates[1]).format('YYYY-MM-DD[T00:00:00Z]')}`
-          : '',
-        criterion.deathDates[0]
-          ? `${PATIENT_DEATHDATE}=ge${moment(criterion.deathDates[0]).format('YYYY-MM-DD[T00:00:00Z]')}`
-          : '',
-        criterion.deathDates[1]
-          ? `${PATIENT_DEATHDATE}=le${moment(criterion.deathDates[1]).format('YYYY-MM-DD[T00:00:00Z]')}`
+        buildLabelObjectFilter(criterion.genders, PATIENT_GENDER),
+        buildLabelObjectFilter(criterion.vitalStatus, PATIENT_DECEASED),
+        buildDateFilter(criterion.birthdates[0], PATIENT_BIRTHDATE, 'ge'),
+        buildDateFilter(criterion.birthdates[1], PATIENT_BIRTHDATE, 'le'),
+        buildDateFilter(criterion.deathDates[0], PATIENT_DEATHDATE, 'ge'),
+        buildDateFilter(criterion.deathDates[1], PATIENT_DEATHDATE, 'le'),
+        criterion.birthdates[0] === null && criterion.birthdates[1] === null
+          ? buildAgeFilter(criterion.age, deidentified ? PATIENT_AGE_MONTH : PATIENT_AGE_DAY, deidentified)
           : ''
       ]
         .filter((elem) => elem)
@@ -246,98 +216,22 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     }
 
     case RessourceType.ENCOUNTER: {
-      const birthdates: [string, string] = [
-        moment(substructAgeString(criterion?.age?.[0] || '0/0/0')).format('MM/DD/YYYY'),
-        moment(substructAgeString(criterion?.age?.[1] || '0/0/130')).format('MM/DD/YYYY')
-      ]
-
-      deidentified = false //TODO erase this line when deidentified param for encounter is implemented
-
-      const ageMin = Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
-      const ageMax = Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
-
-      const ageMinCriterion = `${deidentified ? ENCOUNTER_MIN_BIRTHDATE : ENCOUNTER_MIN_BIRTHDATE}=ge${ageMin}`
-      const ageMaxCriterion = `${deidentified ? ENCOUNTER_MAX_BIRTHDATE : ENCOUNTER_MAX_BIRTHDATE}=le${ageMax}`
-
       filterFhir = [
         'subject.active=true',
-        `${
-          criterion.admissionMode && criterion.admissionMode.length > 0
-            ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode
-                .map((admissionMode) => admissionMode.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.entryMode && criterion.entryMode.length > 0
-            ? `${ENCOUNTER_ENTRYMODE}=${criterion.entryMode.map((entryMode) => entryMode.id).reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.exitMode && criterion.exitMode.length > 0
-            ? `${ENCOUNTER_EXITMODE}=${criterion.exitMode.map((exitMode) => exitMode.id).reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.priseEnChargeType && criterion.priseEnChargeType.length > 0
-            ? `${ENCOUNTER_PRISENCHARGETYPE}=${criterion.priseEnChargeType
-                .map((priseEnChargeType) => priseEnChargeType.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.typeDeSejour && criterion.typeDeSejour.length > 0
-            ? `${ENCOUNTER_TYPEDESEJOUR}=${criterion.typeDeSejour
-                .map((typeDeSejour) => typeDeSejour.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.fileStatus && criterion.fileStatus.length > 0
-            ? `${ENCOUNTER_FILESTATUS}=${criterion.fileStatus.map((fileStatus) => fileStatus.id).reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.reason && criterion.reason.length > 0
-            ? `${ENCOUNTER_REASON}=${criterion.reason.map((reason) => reason.id).reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.destination && criterion.destination.length > 0
-            ? `${ENCOUNTER_DESTINATION}=${criterion.destination
-                .map((destination) => destination.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.provenance && criterion.provenance.length > 0
-            ? `${ENCOUNTER_PROVENANCE}=${criterion.provenance.map((provenance) => provenance.id).reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.admission && criterion.admission.length > 0
-            ? `${ENCOUNTER_ADMISSION}=${criterion.admission.map((admission) => admission.id).reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.encounterService && criterion.encounterService.length > 0
-            ? `${SERVICE_PROVIDER}=${criterion.encounterService
-                .map((encounterServiceItem) => encounterServiceItem.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.duration?.[0]
-            ? `${ENCOUNTER_DURATION}=ge${convertDurationToTimestamp(convertStringToDuration(criterion.duration?.[0]))}`
-            : ''
-        }`,
-        `${
-          criterion.duration?.[1]
-            ? `${ENCOUNTER_DURATION}=le${convertDurationToTimestamp(convertStringToDuration(criterion.duration?.[1]))}`
-            : ''
-        }`,
-        `${criterion.age?.[0] ? ageMinCriterion : ''}`,
-        `${criterion.age?.[1] ? ageMaxCriterion : ''}`
+        buildLabelObjectFilter(criterion.admissionMode, ENCOUNTER_ADMISSIONMODE),
+        buildLabelObjectFilter(criterion.entryMode, ENCOUNTER_ENTRYMODE),
+        buildLabelObjectFilter(criterion.exitMode, ENCOUNTER_EXITMODE),
+        buildLabelObjectFilter(criterion.priseEnChargeType, ENCOUNTER_PRISENCHARGETYPE),
+        buildLabelObjectFilter(criterion.typeDeSejour, ENCOUNTER_TYPEDESEJOUR),
+        buildLabelObjectFilter(criterion.fileStatus, ENCOUNTER_FILESTATUS),
+        buildLabelObjectFilter(criterion.destination, ENCOUNTER_DESTINATION),
+        buildLabelObjectFilter(criterion.provenance, ENCOUNTER_PROVENANCE),
+        buildLabelObjectFilter(criterion.admission, ENCOUNTER_ADMISSION),
+        buildLabelObjectFilter(criterion.reason, ENCOUNTER_REASON),
+        buildEncounterServiceFilter(criterion.encounterService, SERVICE_PROVIDER),
+        buildDurationFilter(criterion?.duration?.[0], ENCOUNTER_DURATION, 'ge'),
+        buildDurationFilter(criterion?.duration?.[1], ENCOUNTER_DURATION, 'le'),
+        buildAgeFilter(criterion.age, ENCOUNTER_MIN_BIRTHDATE, deidentified, ENCOUNTER_MAX_BIRTHDATE)
       ]
         .filter((elem) => elem)
         .reduce(filterReducer)
@@ -347,25 +241,19 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.DOCUMENTS: {
       const unreducedFilterFhir = [
         `${COMPOSITION_STATUS}=final&type:not=doc-impor&contenttype=http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain&subject.active=true`,
-        `${
-          criterion.search
-            ? `${criterion.searchBy === SearchByTypes.TEXT ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
-                criterion.search
-              )}`
-            : ''
-        }`,
-        `${
-          criterion.docType && criterion.docType.length > 0
-            ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: DocType) => docType.code).reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.encounterService && criterion.encounterService.length > 0
-            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
-                .map((encounterServiceItem) => encounterServiceItem.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`
+        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
+        buildSearchFilter(
+          criterion.search,
+          criterion.searchBy === SearchByTypes.TEXT ? COMPOSITION_TEXT : COMPOSITION_TITLE
+        ),
+        buildLabelObjectFilter(
+          criterion.docType?.map((docType) => {
+            return {
+              id: docType.code
+            } as LabelObject
+          }),
+          COMPOSITION_TYPE
+        )
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -375,27 +263,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.CONDITION: {
       const unreducedFilterFhir = [
         'subject.active=true',
-        `${
-          criterion.code && criterion.code.length > 0
-            ? criterion.code.find((code) => code.id === '*')
-              ? `${CONDITION_CODE_ALL_HIERARCHY}=${CONDITION_HIERARCHY}|*`
-              : `${CONDITION_CODE}=${criterion.code.map((code) => code.id).reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.diagnosticType && criterion.diagnosticType.length > 0
-            ? `${CONDITION_TYPE}=${criterion.diagnosticType
-                .map((diagnosticType) => diagnosticType.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.encounterService && criterion.encounterService.length > 0
-            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
-                .map((encounterServiceItem) => encounterServiceItem.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`
+        buildLabelObjectFilter(criterion.code, CONDITION_CODE, CONDITION_HIERARCHY),
+        buildLabelObjectFilter(criterion.diagnosticType, CONDITION_TYPE),
+        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER)
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -405,21 +275,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.PROCEDURE: {
       const unreducedFilterFhir = [
         'subject.active=true',
-        `${criterion.source ? `${PROCEDURE_SOURCE}=${criterion.source}` : ''}`,
-        `${
-          criterion.code && criterion.code.length > 0
-            ? criterion.code.find((code) => code.id === '*')
-              ? `${PROCEDURE_CODE_ALL_HIERARCHY}=${PROCEDURE_HIERARCHY}|*`
-              : `${PROCEDURE_CODE}=${criterion.code.map((diagnosticType) => diagnosticType.id).reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.encounterService && criterion.encounterService.length > 0
-            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
-                .map((encounterServiceItem) => encounterServiceItem.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`
+        buildLabelObjectFilter(criterion.code, PROCEDURE_CODE, PROCEDURE_HIERARCHY),
+        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
+        buildSimpleFilter(criterion.source, PROCEDURE_SOURCE)
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -429,20 +287,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.CLAIM: {
       const unreducedFilterFhir = [
         'patient.active=true',
-        `${
-          criterion.code && criterion.code.length > 0
-            ? criterion.code.find((code) => code.id === '*')
-              ? `${CLAIM_CODE_ALL_HIERARCHY}=${CLAIM_HIERARCHY}|*`
-              : `${CLAIM_CODE}=${criterion.code.map((diagnosticType) => diagnosticType.id).reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.encounterService && criterion.encounterService.length > 0
-            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
-                .map((encounterServiceItem) => encounterServiceItem.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`
+        buildLabelObjectFilter(criterion.code, CLAIM_CODE, CLAIM_HIERARCHY),
+        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER)
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -453,44 +299,22 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.MEDICATION_ADMINISTRATION: {
       const unreducedFilterFhir = [
         'subject.active=true',
-        `${
-          criterion.code && criterion.code.length > 0
-            ? `${MEDICATION_CODE}=${criterion.code
-                .map((diagnosticType: any) =>
-                  diagnosticType.id === '*' ? `${MEDICATION_ATC}|*` : `${diagnosticType.system}|${diagnosticType.id}`
-                )
-                .reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.type === RessourceType.MEDICATION_REQUEST &&
-          criterion.prescriptionType &&
-          criterion.prescriptionType.length > 0
-            ? `${MEDICATION_PRESCRIPTION_TYPE}=${criterion.prescriptionType
-                .map((prescriptionType) => prescriptionType.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.administration && criterion.administration.length > 0
-            ? `${
-                criterion.type === RessourceType.MEDICATION_REQUEST
-                  ? MEDICATION_REQUEST_ROUTE
-                  : MEDICATION_ADMINISTRATION_ROUTE
-              }=${criterion.administration.map((administration) => administration.id).reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.encounterService && criterion.encounterService.length > 0
-            ? `${
-                criterion.type === RessourceType.MEDICATION_REQUEST
-                  ? ENCOUNTER_SERVICE_PROVIDER
-                  : ENCOUNTER_CONTEXT_SERVICE_PROVIDER
-              }=${criterion.encounterService
-                .map((encounterServiceItem) => encounterServiceItem.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`
+        buildLabelObjectFilter(
+          criterion.administration,
+          criterion.type === RessourceType.MEDICATION_REQUEST
+            ? MEDICATION_REQUEST_ROUTE
+            : MEDICATION_ADMINISTRATION_ROUTE
+        ),
+        buildEncounterServiceFilter(
+          criterion.encounterService,
+          criterion.type === RessourceType.MEDICATION_REQUEST
+            ? ENCOUNTER_SERVICE_PROVIDER
+            : ENCOUNTER_CONTEXT_SERVICE_PROVIDER
+        ),
+        buildLabelObjectFilter(criterion.code, MEDICATION_CODE, MEDICATION_ATC, true),
+        criterion.type === RessourceType.MEDICATION_REQUEST
+          ? buildLabelObjectFilter(criterion.prescriptionType, MEDICATION_PRESCRIPTION_TYPE)
+          : ''
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -498,57 +322,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     }
 
     case RessourceType.OBSERVATION: {
-      let valueComparatorFilter = ''
-      if (criterion.valueComparator) {
-        switch (criterion.valueComparator) {
-          case Comparators.LESS:
-            valueComparatorFilter = 'lt'
-            break
-          case Comparators.LESS_OR_EQUAL:
-            valueComparatorFilter = 'le'
-            break
-          case Comparators.EQUAL:
-            valueComparatorFilter = ''
-            break
-          case Comparators.GREATER:
-            valueComparatorFilter = 'gt'
-            break
-          case Comparators.GREATER_OR_EQUAL:
-            valueComparatorFilter = 'ge'
-            break
-          default:
-            valueComparatorFilter = ''
-            break
-        }
-      }
-
       const unreducedFilterFhir = [
         `subject.active=true&${OBSERVATION_STATUS}=Val`,
-        `${
-          criterion.code && criterion.code.length > 0
-            ? criterion.code.find((code) => code.id === '*')
-              ? `${OBSERVATION_CODE_ALL_HIERARCHY}=${BIOLOGY_HIERARCHY_ITM_ANABIO}|*`
-              : `${OBSERVATION_CODE}=${criterion.code.map((diagnosticType) => diagnosticType.id).reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.encounterService && criterion.encounterService.length > 0
-            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
-                .map((encounterServiceItem) => encounterServiceItem.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.isLeaf &&
-          criterion.code &&
-          criterion.code.length === 1 &&
-          criterion.valueComparator &&
-          (typeof criterion.valueMin === 'number' || typeof criterion.valueMax === 'number')
-            ? criterion.valueComparator === Comparators.BETWEEN && criterion.valueMax
-              ? `${OBSERVATION_VALUE}=le${criterion.valueMax}&${OBSERVATION_VALUE}=ge${criterion.valueMin}`
-              : `${OBSERVATION_VALUE}=${valueComparatorFilter}${criterion.valueMin}`
-            : ''
-        }`
+        buildLabelObjectFilter(criterion.code, OBSERVATION_CODE, BIOLOGY_HIERARCHY_ITM_ANABIO),
+        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
+        buildObservationValueFilter(criterion, OBSERVATION_VALUE)
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -567,88 +345,22 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.IMAGING: {
       filterFhir = [
         'patient.active=true',
-        `${
-          criterion.studyStartDate
-            ? `${IMAGING_STUDY_DATE}=ge${moment(criterion.studyStartDate).format('YYYY-MM-DD[T00:00:00Z]')}`
-            : ''
-        }`,
-        `${
-          criterion.studyEndDate
-            ? `${IMAGING_STUDY_DATE}=le${moment(criterion.studyEndDate).format('YYYY-MM-DD[T00:00:00Z]')}`
-            : ''
-        }`,
-        `${
-          criterion.studyModalities && criterion.studyModalities.length > 0
-            ? `${IMAGING_STUDY_MODALITIES}=*|${criterion.studyModalities
-                .map((modality: any) => modality.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`,
-        `${
-          criterion.studyDescription
-            ? `${IMAGING_STUDY_DESCRIPTION}=${encodeURIComponent(criterion.studyDescription)}`
-            : ''
-        }`,
-        `${
-          criterion.studyProcedure ? `${IMAGING_STUDY_PROCEDURE}=${encodeURIComponent(criterion.studyProcedure)}` : ''
-        }`,
-        `${
-          criterion.numberOfSeries
-            ? `${IMAGING_NB_OF_SERIES}=${comparatorToFilter(criterion.seriesComparator)}${criterion.numberOfSeries}`
-            : ''
-        }`,
-        `${
-          criterion.numberOfIns
-            ? `${IMAGING_NB_OF_INS}=${comparatorToFilter(criterion.instancesComparator)}${criterion.numberOfIns}`
-            : ''
-        }`,
-        `${
-          criterion.withDocument !== DocumentAttachmentMethod.NONE
-            ? `${IMAGING_WITH_DOCUMENT}=${
-                criterion.withDocument === DocumentAttachmentMethod.ACCESS_NUMBER
-                  ? DocumentAttachmentMethod.ACCESS_NUMBER
-                  : `INFERENCE_TEMPOREL${
-                      criterion.daysOfDelay !== null && criterion.daysOfDelay !== ''
-                        ? `_${criterion.daysOfDelay}_J`
-                        : ''
-                    }`
-              }`
-            : ''
-        }`,
-        `${criterion.studyUid ? `${IMAGING_STUDY_UID}=${IMAGING_STUDY_UID_URL}|${criterion.studyUid}` : ''}`,
-        `${
-          criterion.seriesStartDate
-            ? `${IMAGING_SERIES_DATE}=ge${moment(criterion.seriesStartDate).format('YYYY-MM-DD[T00:00:00Z]')}`
-            : ''
-        }`,
-        `${
-          criterion.seriesEndDate
-            ? `${IMAGING_SERIES_DATE}=le${moment(criterion.seriesEndDate).format('YYYY-MM-DD[T00:00:00Z]')}`
-            : ''
-        }`,
-        `${
-          criterion.seriesDescription
-            ? `${IMAGING_SERIES_DESCRIPTION}=${encodeURIComponent(criterion.seriesDescription)}`
-            : ''
-        }`,
-        `${
-          criterion.seriesProtocol ? `${IMAGING_SERIES_PROTOCOL}=${encodeURIComponent(criterion.seriesProtocol)}` : ''
-        }`,
-        `${
-          criterion.seriesModalities && criterion.seriesModalities.length > 0
-            ? `${IMAGING_SERIES_MODALITIES}=*|${criterion.seriesModalities
-                .map((modality: any) => modality.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`,
-        `${criterion.seriesUid ? `${IMAGING_SERIES_UID}=${criterion.seriesUid}` : ''}`,
-        `${
-          criterion.encounterService && criterion.encounterService.length > 0
-            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
-                .map((encounterServiceItem) => encounterServiceItem.id)
-                .reduce(searchReducer)}`
-            : ''
-        }`
+        buildDateFilter(criterion.studyStartDate, IMAGING_STUDY_DATE, 'ge'),
+        buildDateFilter(criterion.studyEndDate, IMAGING_STUDY_DATE, 'le'),
+        buildDateFilter(criterion.seriesStartDate, IMAGING_SERIES_DATE, 'ge'),
+        buildDateFilter(criterion.seriesEndDate, IMAGING_SERIES_DATE, 'le'),
+        buildSearchFilter(criterion.studyDescription, IMAGING_STUDY_DESCRIPTION),
+        buildSearchFilter(criterion.studyProcedure, IMAGING_STUDY_PROCEDURE),
+        buildSearchFilter(criterion.seriesDescription, IMAGING_SERIES_DESCRIPTION),
+        buildSearchFilter(criterion.seriesProtocol, IMAGING_SERIES_PROTOCOL),
+        buildLabelObjectFilter(criterion.studyModalities, IMAGING_STUDY_MODALITIES),
+        buildLabelObjectFilter(criterion.seriesModalities, IMAGING_SERIES_MODALITIES),
+        buildEncounterServiceFilter(criterion.encounterService, ENCOUNTER_SERVICE_PROVIDER),
+        buildComparatorFilter(criterion.numberOfSeries, criterion.seriesComparator, IMAGING_NB_OF_SERIES),
+        buildComparatorFilter(criterion.numberOfIns, criterion.instancesComparator, IMAGING_NB_OF_INS),
+        buildWithDocumentFilter(criterion, IMAGING_WITH_DOCUMENT),
+        buildSimpleFilter(criterion.studyUid, IMAGING_STUDY_UID, IMAGING_STUDY_UID_URL),
+        buildSimpleFilter(criterion.seriesUid, IMAGING_SERIES_UID)
       ]
         .filter((elem) => elem)
         .reduce(filterReducer)
@@ -884,48 +596,34 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case PATIENT_AGE_MONTH: {
                 if (value?.includes('ge')) {
-                  const ageMin = value?.replace('ge', '')
-                  currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin, Calendar.MONTH))
+                  currentCriterion.age[0] = unbuildDurationFilter(value, Calendar.MONTH)
                 } else if (value?.includes('le')) {
-                  const ageMax = value?.replace('le', '')
-                  currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax, Calendar.MONTH))
+                  currentCriterion.age[1] = unbuildDurationFilter(value, Calendar.MONTH)
                 }
                 break
               }
               case PATIENT_BIRTHDATE: {
                 if (value?.includes('ge')) {
-                  currentCriterion.birthdates[0] = value.replace('T00:00:00Z', '').replace('ge', '')
+                  currentCriterion.birthdates[0] = unbuildDateFilter(value)
                 } else if (value?.includes('le')) {
-                  currentCriterion.birthdates[1] = value.replace('T00:00:00Z', '').replace('le', '')
+                  currentCriterion.birthdates[1] = unbuildDateFilter(value)
                 }
                 break
               }
               case PATIENT_DEATHDATE: {
                 if (value?.includes('ge')) {
-                  currentCriterion.deathDates[0] = value.replace('T00:00:00Z', '').replace('ge', '')
+                  currentCriterion.deathDates[0] = unbuildDateFilter(value)
                 } else if (value?.includes('le')) {
-                  currentCriterion.deathDates[1] = value.replace('T00:00:00Z', '').replace('le', '')
+                  currentCriterion.deathDates[1] = unbuildDateFilter(value)
                 }
                 break
               }
               case PATIENT_GENDER: {
-                const genderIds = value?.split(',')
-                const newGenderIds = genderIds?.map((genderId) => ({ id: genderId }))
-                if (!newGenderIds) continue
-
-                currentCriterion.genders = currentCriterion.gender
-                  ? [...currentCriterion.gender, ...newGenderIds]
-                  : newGenderIds
+                unbuildLabelObjectFilter(currentCriterion, 'genders', value)
                 break
               }
               case PATIENT_DECEASED: {
-                const vitalStatuses = value?.split(',') || []
-                const _vitalStatuses = vitalStatuses?.map((vitalStatusId) => ({ id: vitalStatusId }))
-                if (!_vitalStatuses) continue
-
-                currentCriterion.vitalStatus = currentCriterion.vitalStatus
-                  ? [...currentCriterion.vitalStatus, ..._vitalStatuses]
-                  : _vitalStatuses
+                unbuildLabelObjectFilter(currentCriterion, 'vitalStatus', value)
                 break
               }
               case 'active':
@@ -955,19 +653,12 @@ export async function unbuildRequest(_json: string): Promise<any> {
           currentCriterion.provenance = []
           currentCriterion.admission = []
           currentCriterion.discharge = []
+          currentCriterion.encounterService = []
           currentCriterion.occurrence = null
           currentCriterion.startOccurrence = null
           currentCriterion.endOccurrence = null
 
-          if (element.occurrence) {
-            currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
-            currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
-          }
-
-          if (element.encounterDateRange) {
-            currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-            currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
-          }
+          unbuildAdvancedCriterias(element, currentCriterion)
 
           for (const filter of filters) {
             const key = filter[0]
@@ -975,156 +666,66 @@ export async function unbuildRequest(_json: string): Promise<any> {
             switch (key) {
               case ENCOUNTER_DURATION: {
                 if (value.includes('ge')) {
-                  const durationMin = value?.replace('ge', '')
-                  currentCriterion.duration[0] = convertDurationToString(
-                    convertTimestampToDuration(+durationMin, Calendar.DAY)
-                  )
+                  currentCriterion.duration[0] = unbuildDurationFilter(value, Calendar.DAY)
                 } else if (value.includes('le')) {
-                  const durationMax = value?.replace('le', '')
-                  currentCriterion.duration[1] = convertDurationToString(
-                    convertTimestampToDuration(+durationMax, Calendar.DAY)
-                  )
+                  currentCriterion.duration[1] = unbuildDurationFilter(value, Calendar.DAY)
                 }
                 break
               }
               case ENCOUNTER_MIN_BIRTHDATE: {
-                const ageMin = value?.replace('ge', '')
-                currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin, Calendar.DAY))
+                currentCriterion.age[0] = unbuildDurationFilter(value, Calendar.DAY)
                 break
               }
               case ENCOUNTER_MAX_BIRTHDATE: {
-                const ageMax = value?.replace('le', '')
-                currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax, Calendar.DAY))
+                currentCriterion.age[1] = unbuildDurationFilter(value, Calendar.DAY)
                 break
               }
               case ENCOUNTER_ENTRYMODE: {
-                const entryModesIds = value?.split(',')
-                const newEntryModesIds = entryModesIds?.map((entryModeId) => ({ id: entryModeId }))
-                if (!newEntryModesIds) continue
-
-                currentCriterion.entryMode = currentCriterion.entryMode
-                  ? [...currentCriterion.entryMode, ...newEntryModesIds]
-                  : newEntryModesIds
+                unbuildLabelObjectFilter(currentCriterion, 'entryMode', value)
                 break
               }
               case ENCOUNTER_EXITMODE: {
-                const exitModesIds = value?.split(',')
-                const newExitModesIds = exitModesIds?.map((exitModeId) => ({ id: exitModeId }))
-                if (!newExitModesIds) continue
-
-                currentCriterion.exitMode = currentCriterion.exitMode
-                  ? [...currentCriterion.exitMode, ...newExitModesIds]
-                  : newExitModesIds
+                unbuildLabelObjectFilter(currentCriterion, 'exitMode', value)
                 break
               }
               case ENCOUNTER_PRISENCHARGETYPE: {
-                const priseEnChargeTypesIds = value?.split(',')
-                const newPriseEnChargeTypesIds = priseEnChargeTypesIds?.map((priseEnChargeTypeId) => ({
-                  id: priseEnChargeTypeId
-                }))
-                if (!newPriseEnChargeTypesIds) continue
-
-                currentCriterion.priseEnChargeType = currentCriterion.priseEnChargeType
-                  ? [...currentCriterion.priseEnChargeType, ...newPriseEnChargeTypesIds]
-                  : newPriseEnChargeTypesIds
+                unbuildLabelObjectFilter(currentCriterion, 'priseEnChargeType', value)
                 break
               }
               case ENCOUNTER_TYPEDESEJOUR: {
-                const typeDeSejoursIds = value?.split(',')
-                const newTypeDeSejoursIds = typeDeSejoursIds?.map((typeDeSejourId) => ({
-                  id: typeDeSejourId
-                }))
-                if (!newTypeDeSejoursIds) continue
-
-                currentCriterion.typeDeSejour = currentCriterion.typeDeSejour
-                  ? [...currentCriterion.typeDeSejour, ...newTypeDeSejoursIds]
-                  : newTypeDeSejoursIds
+                unbuildLabelObjectFilter(currentCriterion, 'typeDeSejour', value)
                 break
               }
               case ENCOUNTER_FILESTATUS: {
-                const fileStatusIds = value?.split(',')
-                const newFileStatusIds = fileStatusIds?.map((fileStatusId) => ({
-                  id: fileStatusId
-                }))
-                if (!newFileStatusIds) continue
-
-                currentCriterion.fileStatus = currentCriterion.fileStatus
-                  ? [...currentCriterion.fileStatus, ...newFileStatusIds]
-                  : newFileStatusIds
+                unbuildLabelObjectFilter(currentCriterion, 'fileStatus', value)
                 break
               }
               case ENCOUNTER_REASON: {
-                const dischargeIds = value?.split(',')
-                const newDischargeIds = dischargeIds?.map((dischargeId) => ({
-                  id: dischargeId
-                }))
-                if (!newDischargeIds) continue
-
-                currentCriterion.reason = currentCriterion.reason
-                  ? [...currentCriterion.reason, ...newDischargeIds]
-                  : newDischargeIds
+                unbuildLabelObjectFilter(currentCriterion, 'reason', value)
                 break
               }
               case ENCOUNTER_ADMISSIONMODE: {
-                const admissionModeIds = value?.split(',')
-                const newAdmissionModeIds = admissionModeIds?.map((admissionModeId) => ({
-                  id: admissionModeId
-                }))
-                if (!newAdmissionModeIds) continue
-
-                currentCriterion.admissionMode = currentCriterion.admissionMode
-                  ? [...currentCriterion.admissionMode, ...newAdmissionModeIds]
-                  : newAdmissionModeIds
+                unbuildLabelObjectFilter(currentCriterion, 'admissionMode', value)
                 break
               }
               case ENCOUNTER_DESTINATION: {
-                const destinationIds = value?.split(',')
-                const newDestinationIds = destinationIds?.map((destinationId) => ({
-                  id: destinationId
-                }))
-                if (!newDestinationIds) continue
-
-                currentCriterion.destination = currentCriterion.destination
-                  ? [...currentCriterion.destination, ...newDestinationIds]
-                  : newDestinationIds
+                unbuildLabelObjectFilter(currentCriterion, 'destination', value)
                 break
               }
               case ENCOUNTER_PROVENANCE: {
-                const provenanceIds = value?.split(',')
-                const newProvenanceIds = provenanceIds?.map((provenanceId) => ({
-                  id: provenanceId
-                }))
-                if (!newProvenanceIds) continue
-
-                currentCriterion.provenance = currentCriterion.provenance
-                  ? [...currentCriterion.provenance, ...newProvenanceIds]
-                  : newProvenanceIds
+                unbuildLabelObjectFilter(currentCriterion, 'provenance', value)
                 break
               }
               case ENCOUNTER_ADMISSION: {
-                const admissionIds = value?.split(',')
-                const newAdmissionIds = admissionIds?.map((admissionId) => ({
-                  id: admissionId
-                }))
-                if (!newAdmissionIds) continue
-
-                currentCriterion.admission = currentCriterion.admission
-                  ? [...currentCriterion.admission, ...newAdmissionIds]
-                  : newAdmissionIds
+                unbuildLabelObjectFilter(currentCriterion, 'admission', value)
+                break
+              }
+              case SERVICE_PROVIDER: {
+                await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
                 break
               }
               case 'subject.active':
                 break
-              case SERVICE_PROVIDER: {
-                if (!value) continue
-
-                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
-
-                currentCriterion.encounterService = currentCriterion.encounterService
-                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
-                  : updatedEncounterServices
-                break
-              }
               default:
                 currentCriterion.error = true
                 break
@@ -1143,62 +744,32 @@ export async function unbuildRequest(_json: string): Promise<any> {
           : null
         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+        currentCriterion.encounterService = []
 
-        if (element.occurrence) {
-          currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
-          currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
-        }
-
-        if (element.dateRangeList) {
-          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
-        }
-
-        if (element.encounterDateRange) {
-          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
-        }
+        unbuildAdvancedCriterias(element, currentCriterion)
 
         if (element.filterFhir) {
-          const filters = element.filterFhir
-            // This `replaceAll` is necessary because if a user searches `_text=first && second` we have a bug with filterFhir.split('&')
-            .split('&')
-            .map((elem) => elem.split('='))
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
               case COMPOSITION_TITLE:
-                currentCriterion.search = value ? decodeURIComponent(value) : ''
+                currentCriterion.search = unbuildSearchFilter(value)
                 currentCriterion.searchBy = SearchByTypes.DESCRIPTION
                 break
               case COMPOSITION_TEXT: {
-                currentCriterion.search = value ? decodeURIComponent(value) : ''
+                currentCriterion.search = unbuildSearchFilter(value)
                 currentCriterion.searchBy = SearchByTypes.TEXT
                 break
               }
               case COMPOSITION_TYPE: {
-                const docTypeIds = value?.split(',')
-                const newDocTypeIds = docTypes.docTypes.filter((docType: DocType) =>
-                  docTypeIds?.find((docTypeId) => docTypeId === docType.code)
-                )
-
-                if (!newDocTypeIds) continue
-
-                currentCriterion.docType = currentCriterion.docType
-                  ? [...currentCriterion.docType, ...newDocTypeIds]
-                  : newDocTypeIds
+                unbuildDocTypesFilter(currentCriterion, 'docType', value)
                 break
               }
               case ENCOUNTER_SERVICE_PROVIDER: {
-                if (!value) continue
-
-                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
-
-                currentCriterion.encounterService = currentCriterion.encounterService
-                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
-                  : updatedEncounterServices
+                await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
                 break
               }
               case COMPOSITION_STATUS:
@@ -1221,21 +792,9 @@ export async function unbuildRequest(_json: string): Promise<any> {
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+        currentCriterion.encounterService = []
 
-        if (element.occurrence) {
-          currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
-          currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
-        }
-
-        if (element.dateRangeList) {
-          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
-        }
-
-        if (element.encounterDateRange) {
-          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
-        }
+        unbuildAdvancedCriterias(element, currentCriterion)
 
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
@@ -1245,43 +804,19 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const value = filter ? filter[1] : null
             switch (key) {
               case CONDITION_CODE: {
-                const codeIds = value?.split(',')
-                const newCode = codeIds?.map((codeId) => {
-                  const codeIdParts = codeId.split('|')
-                  if (codeIdParts.length > 1) {
-                    return { id: codeIdParts[1] }
-                  }
-                  return { id: codeIdParts[0] }
-                })
-                if (!newCode) continue
-
-                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
+                unbuildLabelObjectFilter(currentCriterion, 'code', value)
                 break
               }
               case CONDITION_TYPE: {
-                const diagnosticTypeIds = value?.split(',')
-                const newDiagnosticType = diagnosticTypeIds?.map((diagnosticTypeId) => ({ id: diagnosticTypeId }))
-                if (!newDiagnosticType) continue
-
-                currentCriterion.diagnosticType = currentCriterion.diagnosticType
-                  ? [...currentCriterion.diagnosticType, ...newDiagnosticType]
-                  : newDiagnosticType
+                unbuildLabelObjectFilter(currentCriterion, 'diagnosticType', value)
                 break
               }
               case ENCOUNTER_SERVICE_PROVIDER: {
-                if (!value) continue
-
-                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
-
-                currentCriterion.encounterService = currentCriterion.encounterService
-                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
-                  : updatedEncounterServices
+                await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
                 break
               }
-
               case 'subject.active':
                 break
-
               default:
                 currentCriterion.error = true
                 break
@@ -1298,21 +833,9 @@ export async function unbuildRequest(_json: string): Promise<any> {
         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
         currentCriterion.source = currentCriterion.source ? currentCriterion.source : null
+        currentCriterion.encounterService = []
 
-        if (element.occurrence) {
-          currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
-          currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
-        }
-
-        if (element.dateRangeList) {
-          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
-        }
-
-        if (element.encounterDateRange) {
-          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
-        }
+        unbuildAdvancedCriterias(element, currentCriterion)
 
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
@@ -1322,28 +845,11 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const value = filter ? filter[1] : null
             switch (key) {
               case PROCEDURE_CODE: {
-                const codeIds = value?.split(',')
-                const newCode = codeIds?.map((codeId) => {
-                  const codeIdParts = codeId.split('|')
-                  if (codeIdParts.length > 1) {
-                    return { id: codeIdParts[1] }
-                  }
-                  return { id: codeIdParts[0] }
-                })
-                if (!newCode) continue
-
-                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
+                unbuildLabelObjectFilter(currentCriterion, 'code', value)
                 break
               }
               case ENCOUNTER_SERVICE_PROVIDER: {
-                if (!value) continue
-
-                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
-
-                currentCriterion.encounterService = currentCriterion.encounterService
-                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
-                  : updatedEncounterServices
-
+                await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
                 break
               }
               case 'subject.active':
@@ -1366,21 +872,9 @@ export async function unbuildRequest(_json: string): Promise<any> {
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+        currentCriterion.encounterService = []
 
-        if (element.occurrence) {
-          currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
-          currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
-        }
-
-        if (element.dateRangeList) {
-          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
-        }
-
-        if (element.encounterDateRange) {
-          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
-        }
+        unbuildAdvancedCriterias(element, currentCriterion)
 
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
@@ -1390,27 +884,11 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const value = filter ? filter[1] : null
             switch (key) {
               case CLAIM_CODE: {
-                const codeIds = value?.split(',')
-                const newCode = codeIds?.map((codeId) => {
-                  const codeIdParts = codeId.split('|')
-                  if (codeIdParts.length > 1) {
-                    return { id: codeIdParts[1] }
-                  }
-                  return { id: codeIdParts[0] }
-                })
-                if (!newCode) continue
-
-                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
+                unbuildLabelObjectFilter(currentCriterion, 'code', value)
                 break
               }
               case ENCOUNTER_SERVICE_PROVIDER: {
-                if (!value) continue
-
-                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
-
-                currentCriterion.encounterService = currentCriterion.encounterService
-                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
-                  : updatedEncounterServices
+                await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
                 break
               }
               case 'patient.active':
@@ -1433,21 +911,9 @@ export async function unbuildRequest(_json: string): Promise<any> {
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+        currentCriterion.encounterService = []
 
-        if (element.occurrence) {
-          currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
-          currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
-        }
-
-        if (element.dateRangeList) {
-          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
-        }
-
-        if (element.encounterDateRange) {
-          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
-        }
+        unbuildAdvancedCriterias(element, currentCriterion)
 
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
@@ -1457,50 +923,24 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const value = filter ? filter[1] : null
             switch (key) {
               case MEDICATION_CODE: {
-                const codeIds = value?.split(',').map((codeId) => {
-                  codeId = codeId.split('|')[1]
-                  return codeId
-                })
-                const newCode = codeIds?.map((codeId) => ({ id: codeId }))
-                if (!newCode) continue
-
-                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
+                const codeIds = value?.replace(/https:\/\/.*?\|/g, '')
+                unbuildLabelObjectFilter(currentCriterion, 'code', codeIds)
                 break
               }
               case MEDICATION_PRESCRIPTION_TYPE: {
-                const prescriptionTypeIds = value?.split(',')
-                const newPrescription = prescriptionTypeIds?.map((prescriptionTypeId) => ({
-                  id: prescriptionTypeId
-                }))
-                if (!newPrescription) continue
-
-                currentCriterion.prescriptionType = currentCriterion.prescriptionType
-                  ? [...currentCriterion.prescriptionType, ...newPrescription]
-                  : newPrescription
+                unbuildLabelObjectFilter(currentCriterion, 'prescriptionType', value)
                 break
               }
               case MEDICATION_REQUEST_ROUTE:
               case MEDICATION_ADMINISTRATION_ROUTE: {
-                const administrationIds = value?.split(',')
-                const newAdministration = administrationIds?.map((administrationId) => ({ id: administrationId }))
-                if (!newAdministration) continue
-
-                currentCriterion.administration = currentCriterion.administration
-                  ? [...currentCriterion.administration, ...newAdministration]
-                  : newAdministration
+                unbuildLabelObjectFilter(currentCriterion, 'administration', value)
                 break
               }
               case 'subject.active':
                 break
               case ENCOUNTER_CONTEXT_SERVICE_PROVIDER:
               case ENCOUNTER_SERVICE_PROVIDER: {
-                if (!value) continue
-
-                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
-
-                currentCriterion.encounterService = currentCriterion.encounterService
-                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
-                  : updatedEncounterServices
+                await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
                 break
               }
               default:
@@ -1518,27 +958,14 @@ export async function unbuildRequest(_json: string): Promise<any> {
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+        currentCriterion.encounterService = []
 
-        if (element.occurrence) {
-          currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
-          currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
-        }
-
-        if (element.dateRangeList) {
-          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
-        }
-
-        if (element.encounterDateRange) {
-          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
-        }
+        unbuildAdvancedCriterias(element, currentCriterion)
 
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
-          const nbValueComparators = element?.filterFhir.match(/value-quantity-value/g)?.length
-          // TODO: remplacer value-quantity-value par vraie regex
+          unbuildObservationValueFilter(filters, currentCriterion)
 
           for (const filter of filters) {
             const key = filter ? filter[0] : null
@@ -1546,17 +973,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
 
             switch (key) {
               case OBSERVATION_CODE: {
-                const codeIds = value?.split(',')
-                const newCode = codeIds?.map((codeId) => {
-                  const codeIdParts = codeId.split('|')
-                  if (codeIdParts.length > 1) {
-                    return { id: codeIdParts[1] }
-                  }
-                  return { id: codeIdParts[0] }
-                })
-                if (!newCode) continue
-
-                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
+                unbuildLabelObjectFilter(currentCriterion, 'code', value)
 
                 // TODO: pas propre vvvv
                 if (currentCriterion.code.length === 1) {
@@ -1575,52 +992,11 @@ export async function unbuildRequest(_json: string): Promise<any> {
 
                 break
               }
-
-              case OBSERVATION_VALUE: {
-                let valueComparator = ''
-                let valueMin
-                let valueMax
-
-                if (value?.search('le') === 0) {
-                  valueComparator = Comparators.LESS_OR_EQUAL
-                  valueMin = parseFloat(value?.replace('le', ''))
-                } else if (value?.search('lt') === 0) {
-                  valueComparator = Comparators.LESS
-                  valueMin = parseFloat(value?.replace('lt', ''))
-                } else if (value?.search('ge') === 0) {
-                  if (nbValueComparators === 2) {
-                    valueComparator = Comparators.BETWEEN
-                    valueMax = parseFloat(value?.replace('ge', ''))
-                  } else {
-                    valueComparator = Comparators.GREATER_OR_EQUAL
-                    valueMin = parseFloat(value?.replace('ge', ''))
-                  }
-                } else if (value?.search('gt') === 0) {
-                  valueComparator = Comparators.GREATER
-                  valueMin = parseFloat(value?.replace('gt', ''))
-                } else {
-                  valueComparator = Comparators.EQUAL
-                  valueMin = parseFloat(value ?? '0')
-                }
-
-                currentCriterion.valueComparator = valueComparator
-                currentCriterion.valueMin = valueMin
-                currentCriterion.valueMax = valueMax
-
-                break
-              }
-
               case ENCOUNTER_SERVICE_PROVIDER: {
-                if (!value) continue
-
-                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
-
-                currentCriterion.encounterService = currentCriterion.encounterService
-                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
-                  : updatedEncounterServices
-
+                await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
                 break
               }
+              case OBSERVATION_VALUE:
               case OBSERVATION_STATUS:
               case 'subject.active':
                 break
@@ -1680,6 +1056,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
           currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+          currentCriterion.encounterService = []
 
           for (const filter of filters) {
             const key = filter[0]
@@ -1687,28 +1064,23 @@ export async function unbuildRequest(_json: string): Promise<any> {
             switch (key) {
               case IMAGING_STUDY_DATE: {
                 if (value.includes('ge')) {
-                  currentCriterion.studyStartDate = value?.replace('T00:00:00Z', '').replace('ge', '')
+                  currentCriterion.studyStartDate = unbuildDateFilter(value)
                 } else if (value.includes('le')) {
-                  currentCriterion.studyEndDate = value?.replace('T00:00:00Z', '').replace('le', '')
+                  currentCriterion.studyEndDate = unbuildDateFilter(value)
                 }
                 break
               }
               case IMAGING_STUDY_MODALITIES: {
-                const modalitiesIds = value?.replace(/^[*|]+/, '').split(',')
-                const newModalitiesIds = modalitiesIds?.map((modality) => ({ id: modality }))
-                if (!newModalitiesIds) continue
-
-                currentCriterion.studyModalities = currentCriterion.studyModalities
-                  ? [...currentCriterion.studyModalities, ...newModalitiesIds]
-                  : newModalitiesIds
+                const modalitiesValues = value?.replace(/^[*|]+/, '')
+                unbuildLabelObjectFilter(currentCriterion, 'studyModalities', modalitiesValues)
                 break
               }
               case IMAGING_STUDY_DESCRIPTION: {
-                currentCriterion.studyDescription = value ? decodeURIComponent(value) : ''
+                currentCriterion.studyDescription = unbuildSearchFilter(value)
                 break
               }
               case IMAGING_STUDY_PROCEDURE: {
-                currentCriterion.studyProcedure = value ? decodeURIComponent(value) : ''
+                currentCriterion.studyProcedure = unbuildSearchFilter(value)
                 break
               }
               case IMAGING_NB_OF_SERIES: {
@@ -1735,28 +1107,23 @@ export async function unbuildRequest(_json: string): Promise<any> {
               }
               case IMAGING_SERIES_DATE: {
                 if (value.includes('ge')) {
-                  currentCriterion.seriesStartDate = value?.replace('T00:00:00Z', '').replace('ge', '')
+                  currentCriterion.seriesStartDate = unbuildDateFilter(value)
                 } else if (value.includes('le')) {
-                  currentCriterion.seriesEndDate = value?.replace('T00:00:00Z', '').replace('le', '')
+                  currentCriterion.seriesEndDate = unbuildDateFilter(value)
                 }
                 break
               }
               case IMAGING_SERIES_DESCRIPTION: {
-                currentCriterion.seriesDescription = value ? decodeURIComponent(value) : ''
+                currentCriterion.seriesDescription = unbuildSearchFilter(value)
                 break
               }
               case IMAGING_SERIES_PROTOCOL: {
-                currentCriterion.seriesProtocol = value ? decodeURIComponent(value) : ''
+                currentCriterion.seriesProtocol = unbuildSearchFilter(value)
                 break
               }
               case IMAGING_SERIES_MODALITIES: {
-                const modalitiesIds = value?.replace(/^[*|]+/, '').split(',')
-                const newModalitiesIds = modalitiesIds?.map((modality) => ({ id: modality }))
-                if (!newModalitiesIds) continue
-
-                currentCriterion.seriesModalities = currentCriterion.seriesModalities
-                  ? [...currentCriterion.seriesModalities, ...newModalitiesIds]
-                  : newModalitiesIds
+                const modalitiesValues = value?.replace(/^[*|]+/, '')
+                unbuildLabelObjectFilter(currentCriterion, 'seriesModalities', modalitiesValues)
                 break
               }
               case IMAGING_SERIES_UID: {
@@ -1764,33 +1131,13 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 break
               }
               case ENCOUNTER_SERVICE_PROVIDER: {
-                if (!value) continue
-
-                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
-
-                currentCriterion.encounterService = currentCriterion.encounterService
-                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
-                  : updatedEncounterServices
-
+                await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
                 break
               }
             }
           }
 
-          if (element.occurrence) {
-            currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
-            currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
-          }
-
-          if (element.dateRangeList) {
-            currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
-            currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
-          }
-
-          if (element.encounterDateRange) {
-            currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
-            currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
-          }
+          unbuildAdvancedCriterias(element, currentCriterion)
         }
         break
       }

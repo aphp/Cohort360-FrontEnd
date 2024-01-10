@@ -1,15 +1,14 @@
-import { ScopeTreeRow, ValueSetSystem } from 'types'
+import { ScopeTreeRow } from 'types'
 import { DocumentAttachmentMethod, DurationRangeType, LabelObject, SearchByTypes } from './searchCriterias'
+
+export enum MedicationType {
+  Request = 'MedicationRequest',
+  Administration = 'MedicationAdministration'
+}
 
 export enum MedicationTypeLabel {
   Request = 'Prescription',
   Administration = 'Administration'
-}
-
-export type LabelCriteriaObject = {
-  id: string
-  label: string
-  system?: ValueSetSystem
 }
 
 export enum RessourceType {
