@@ -346,7 +346,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case RessourceType.DOCUMENTS: {
       const unreducedFilterFhir = [
-        `${COMPOSITION_STATUS}=final&type:not=doc-impor&contenttype='http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain'&subject.active=true`,
+        `${COMPOSITION_STATUS}=final&type:not=doc-impor&contenttype=http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain&subject.active=true`,
         `${
           criterion.search
             ? `${criterion.searchBy === SearchByTypes.TEXT ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
