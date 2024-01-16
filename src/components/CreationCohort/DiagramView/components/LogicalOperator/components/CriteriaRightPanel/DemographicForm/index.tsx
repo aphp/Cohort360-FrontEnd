@@ -53,7 +53,9 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
   const [genders, setGenders] =
     useState(mappingCriteria(selectedCriteria?.genders, CriteriaDataKey.GENDER, criteriaData)) || []
   const [title, setTitle] = useState(selectedCriteria?.title || 'Critère démographique')
-  const [isInclusive, setIsInclusive] = useState<boolean>(selectedCriteria?.isInclusive || true)
+  const [isInclusive, setIsInclusive] = useState<boolean>(
+    selectedCriteria?.isInclusive === undefined ? true : selectedCriteria?.isInclusive
+  )
 
   const selectedPopulation = useAppSelector((state) => state.cohortCreation.request.selectedPopulation || [])
 
@@ -83,7 +85,6 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
       type: RessourceType.PATIENT
     })
   }
-
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
