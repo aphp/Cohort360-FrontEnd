@@ -56,7 +56,9 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [occurrenceComparator, setOccurrenceComparator] = useState<Comparators>(
     selectedCriteria?.occurrenceComparator || Comparators.GREATER_OR_EQUAL
   )
-  const [isInclusive, setIsInclusive] = useState<boolean>(selectedCriteria?.isInclusive || true)
+  const [isInclusive, setIsInclusive] = useState<boolean>(
+    selectedCriteria?.isInclusive === undefined ? true : selectedCriteria?.isInclusive
+  )
   const [studyStartDate, setStudyStartDate] = useState<string | null>(selectedCriteria?.studyStartDate || null)
   const [studyEndDate, setStudyEndDate] = useState<string | null>(selectedCriteria?.studyEndDate || null)
   const [studyModalities, setStudyModalities] = useState<LabelObject[]>(
