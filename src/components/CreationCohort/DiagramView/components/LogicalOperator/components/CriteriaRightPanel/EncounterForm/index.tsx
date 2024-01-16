@@ -94,7 +94,9 @@ const EncounterForm = ({
   const [occurrenceComparator, setOccurrenceComparator] = useState<Comparators>(
     criteria?.occurrenceComparator || Comparators.GREATER_OR_EQUAL
   )
-  const [isInclusive, setIsInclusive] = useState<boolean>(criteria?.isInclusive || true)
+  const [isInclusive, setIsInclusive] = useState<boolean>(
+    selectedCriteria?.isInclusive === undefined ? true : selectedCriteria?.isInclusive
+  )
 
   const { classes } = useStyles()
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
