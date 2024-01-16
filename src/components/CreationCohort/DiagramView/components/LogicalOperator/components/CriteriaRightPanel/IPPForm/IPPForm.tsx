@@ -123,6 +123,7 @@ const IPPForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               multiline
               minRows={5}
               style={{ width: '100%' }}
+              value={defaultValues.search}
             />
           </Grid>
         </Grid>
