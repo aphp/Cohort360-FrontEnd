@@ -18,12 +18,11 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
   TextField,
-  Typography
+  Typography,
+  Autocomplete,
+  RadioGroup,
+  Radio
 } from '@mui/material'
 
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
@@ -36,18 +35,28 @@ import useStyles from './styles'
 
 import export_table from './export_table'
 import services from 'services/aphp'
+import { ExportCSVForm, ExportCSVTable, SavedFilter } from 'types'
+import { useAppSelector } from 'state'
+import { ResourceType } from 'types/requestCriterias'
+import { getProviderFilters } from 'services/aphp/serviceFilters'
+import { ExportTableAccordion, ExportTableAccordionSummary } from './ExportTableAccordion'
 
-const initialState = {
+const initialState: ExportCSVForm = {
   motif: '',
   conditions: false,
-  tables: []
+  tables: export_table.map<ExportCSVTable>((table) => ({
+    ...table,
+    checked: false,
+    fhir_filter: null,
+    respect_table_relationships: true
+  }))
 }
 const ERROR_MOTIF: 'ERROR_MOTIF' = 'ERROR_MOTIF'
 const ERROR_CONDITION: 'ERROR_CONDITION' = 'ERROR_CONDITION'
 const ERROR_TABLE: 'ERROR_TABLE' = 'ERROR_TABLE'
 
 type ExportModalProps = {
-  cohortId: number
+  cohortId: string
   open: boolean
   handleClose: () => void
 }
@@ -56,8 +65,11 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   const { classes } = useStyles()
   const [loading, setLoading] = useState(false)
   const [settings, setSettings] = useState(initialState)
+  const checkedTables = settings.tables.filter((table) => table.checked)
+
   const [exportResponse, setExportResponse] = useState<{ status: 'error' | 'finish'; detail: any } | null>(null)
   const [error, setError] = useState<typeof ERROR_MOTIF | typeof ERROR_CONDITION | typeof ERROR_TABLE | null>(null)
+  const [expandedTableIds, setExpandedTableIds] = useState<string[]>([])
 
   const dialogRef = useRef<HTMLHeadingElement>(null)
 
@@ -68,44 +80,105 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     setError(null)
   }, [open])
 
-  const handleChangeTables = (tableId: string, tableName: string) => {
-    let existingTableIds: string[] = settings.tables
-    const foundItem = existingTableIds.find((existingTableId) => existingTableId === tableId)
-    if (foundItem) {
-      if (tableName === 'Formulaires') {
-        existingTableIds = existingTableIds.filter((elem) => !elem.startsWith('questionnaire'))
-      } else {
-        const index = existingTableIds.indexOf(foundItem)
-        existingTableIds.splice(index, 1)
-      }
-    } else {
-      // Attention règle particulière
-      if (tableId === 'fact_relationship') {
-        const careSiteItem = existingTableIds.find((existingTableId) => existingTableId === 'care_site')
-        if (!careSiteItem) {
-          existingTableIds = [...existingTableIds, 'care_site']
-        }
-      }
-      if (tableId === 'concept_relationship') {
-        const careSiteItem = existingTableIds.find((existingTableId) => existingTableId === 'concept')
-        if (!careSiteItem) {
-          existingTableIds = [...existingTableIds, 'concept']
-        }
-      }
-      if (tableName === 'Formulaires') {
-        existingTableIds = [
-          ...existingTableIds,
-          'questionnaire',
-          'questionnaire__item',
-          'questionnaireresponse',
-          'questionnaireresponse__item',
-          'questionnaireresponse__item__answer'
-        ]
-      }
+  // const handleChangeTables = (tableId: string, tableName: string) => {
+  //   let existingTableIds: string[] = settings.tables
+  //   const foundItem = existingTableIds.find((existingTableId) => existingTableId === tableId)
+  //   if (foundItem) {
+  //     if (tableName === 'Formulaires') {
+  //       existingTableIds = existingTableIds.filter((elem) => !elem.startsWith('questionnaire'))
+  //     } else {
+  //       const index = existingTableIds.indexOf(foundItem)
+  //       existingTableIds.splice(index, 1)
+  //     }
+  //   } else {
+  //     // Attention règle particulière
+  //     if (tableId === 'fact_relationship') {
+  //       const careSiteItem = existingTableIds.find((existingTableId) => existingTableId === 'care_site')
+  //       if (!careSiteItem) {
+  //         existingTableIds = [...existingTableIds, 'care_site']
+  //       }
+  //     }
+  //     if (tableId === 'concept_relationship') {
+  //       const careSiteItem = existingTableIds.find((existingTableId) => existingTableId === 'concept')
+  //       if (!careSiteItem) {
+  //         existingTableIds = [...existingTableIds, 'concept']
+  //       }
+  //     }
+  //     if (tableName === 'Formulaires') {
+  //       existingTableIds = [
+  //         ...existingTableIds,
+  //         'questionnaire',
+  //         'questionnaire__item',
+  //         'questionnaireresponse',
+  //         'questionnaireresponse__item',
+  //         'questionnaireresponse__item__answer'
+  //       ]
+  //     }
+  const handleSelectAllTables = () => {
+    handleChangeSettings(
+      'tables',
+      settings.tables.map<ExportCSVTable>((table) => ({
+        ...table,
+        checked: checkedTables.length !== settings.tables.length
+      }))
+    )
+  }
 
-      existingTableIds = [...existingTableIds, tableId]
+  const handleChangeTables = (tableId: string) => {
+    let existingTables: ExportCSVTable[] = settings.tables
+
+    switch (tableId) {
+      case 'care_site': {
+        const factRelationshipCheckedIndex = existingTables.findIndex(
+          (table) => table.label === 'fact_relationship' && table.checked
+        )
+        if (factRelationshipCheckedIndex > -1) existingTables[factRelationshipCheckedIndex].checked = false
+        break
+      }
+      case 'fact_relationship': {
+        const careSiteTableNotCheckedIndex = existingTables.findIndex(
+          (table) => table.label === 'care_site' && !table.checked
+        )
+        if (careSiteTableNotCheckedIndex > -1) existingTables[careSiteTableNotCheckedIndex].checked = true
+        break
+      }
+      case 'concept': {
+        const conceptRelationshipTableNotCheckedIndex = existingTables.findIndex(
+          (table) => table.label === 'concept_relationship' && table.checked
+        )
+        if (conceptRelationshipTableNotCheckedIndex > -1)
+          existingTables[conceptRelationshipTableNotCheckedIndex].checked = false
+        break
+      }
+      case 'concept_relationship': {
+        const conceptTableNotCheckedIndex = existingTables.findIndex(
+          (table) => table.label === 'concept' && !table.checked
+        )
+        if (conceptTableNotCheckedIndex > -1) existingTables[conceptTableNotCheckedIndex].checked = true
+        break
+      }
+      case 'questionnaire': {
+        const questionnaireResponseIndex = existingTables.findIndex(
+          (table) => table.label === 'questionnaireresponse' && table.checked
+        )
+        if (questionnaireResponseIndex > -1) existingTables[questionnaireResponseIndex].checked = false
+        break
+      }
+      case 'questionnaireresponse': {
+        const questionnaireIndex = existingTables.findIndex(
+          (table) => table.label === 'questionnaire' && !table.checked
+        )
+        if (questionnaireIndex > -1) existingTables[questionnaireIndex].checked = true
+        break
+      }
     }
-    handleChangeSettings('tables', [...new Set(existingTableIds)])
+
+    existingTables = existingTables.map((table) => ({
+      ...table,
+      checked: table.label === tableId ? !table.checked : table.checked
+    }))
+
+    handleChangeSettings('tables', existingTables)
   }
 
   const handleChangeSettings = (key: 'motif' | 'conditions' | 'tables', value: any) => {
@@ -114,6 +187,58 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       ...prevState,
       [key]: value
     }))
+  }
+
+  const handleExpandedTable = (tableId: string) => {
+    setExpandedTableIds((prevExpandedTableIds) => {
+      if (prevExpandedTableIds.includes(tableId)) {
+        return prevExpandedTableIds.filter((id) => id !== tableId)
+      } else {
+        return [...prevExpandedTableIds, tableId]
+      }
+    })
+  }
+
+  const handleMaterForm = (tables: ExportCSVTable[]) => {
+    const tableCopy = [...tables]
+
+    const questionnaireIndex = tables.findIndex(({ label }) => label === 'questionnaire')
+    const questionnaireResponseIndex = tables.findIndex(({ label }) => label === 'questionnaireresponse')
+
+    if (questionnaireIndex > -1) {
+      const questionnaireItem: ExportCSVTable = {
+        id: 'questionnaire__item',
+        label: 'questionnaire__item',
+        name: 'Champs des formulaires',
+        fhir_filter: tables[questionnaireIndex].fhir_filter,
+        respect_table_relationships: tables[questionnaireIndex].respect_table_relationships,
+        checked: true
+      }
+      tableCopy.push(questionnaireItem)
+
+      if (questionnaireResponseIndex > -1) {
+        const questionnaireResponseItems: ExportCSVTable[] = [
+          {
+            id: 'questionnaireresponse__item',
+            label: 'questionnaireresponse__item',
+            name: 'Champs de réponses aux formulaires',
+            fhir_filter: tables[questionnaireResponseIndex].fhir_filter,
+            respect_table_relationships: tables[questionnaireResponseIndex].respect_table_relationships,
+            checked: true
+          },
+          {
+            id: 'questionnaireresponse__item__answer',
+            label: 'questionnaireresponse__item__answer',
+            name: 'Valeurs de réponses aux formulaires',
+            fhir_filter: tables[questionnaireResponseIndex].fhir_filter,
+            respect_table_relationships: tables[questionnaireResponseIndex].respect_table_relationships,
+            checked: true
+          }
+        ]
+        return tableCopy.concat(questionnaireResponseItems)
+      }
+    }
+    return tableCopy
   }
 
   const handleSubmit = async () => {
@@ -151,7 +276,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     const response = await services.cohorts.createExport({
       cohortId,
       motivation: settings?.motif,
-      tables: settings?.tables
+      tables: handleMaterForm(settings?.tables || []).filter((table) => table.checked)
     })
 
     if (isAxiosError(response)) {
@@ -162,9 +287,68 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     setLoading(false)
   }
 
+  function renderExportTable(exportTable: ExportCSVTable) {
+    const { id, name, checked, subtitle, label } = exportTable
+    const isItemExpanded = expandedTableIds.includes(label)
+
+    return (
+      <ExportTableAccordion key={label} expanded={isItemExpanded} onChange={() => handleExpandedTable(label)}>
+        <ExportTableAccordionSummary
+          expandIcon={
+            <Checkbox
+              checked={checked}
+              className={classes.checkbox}
+              onClick={(e) => {
+                e.stopPropagation()
+                handleChangeTables(label)
+              }}
+            />
+          }
+          aria-controls={`panel-${name}-content`}
+          id={`panel-${name}-handler`}
+        >
+          <Grid item container alignItems="center">
+            <Typography
+              variant="subtitle2"
+              className={isItemExpanded ? classes.selectedTable : classes.notSelectedTable}
+            >
+              {name} &nbsp; {'['}
+            </Typography>
+            <Typography variant="h6" className={classes.tableCode}>
+              {label}
+            </Typography>
+            <Typography
+              variant="subtitle2"
+              className={isItemExpanded ? classes.selectedTable : classes.notSelectedTable}
+            >
+              {']'}
+            </Typography>
+            {subtitle && (
+              <Grid container alignItems="center">
+                <Typography className={classes.tableSubtitle} variant="body1">
+                  {subtitle}
+                </Typography>
+              </Grid>
+            )}
+          </Grid>
+        </ExportTableAccordionSummary>
+        <AccordionDetails className={classes.accordionContent}>
+          <ExportTable
+            key={id}
+            exportTable={exportTable}
+            exportRequest={settings}
+            handleTransferRequestChange={setSettings}
+          />
+        </AccordionDetails>
+      </ExportTableAccordion>
+    )
+  }
+
   return (
-    <Dialog open={loading || open} onClose={handleClose} aria-labelledby="form-dialog-title-export">
-      <DialogTitle id="form-dialog-export-title">Demande d'export</DialogTitle>
+    <Dialog open={loading || open} onClose={handleClose} aria-labelledby="form-dialog-title-export" maxWidth="md">
+      <DialogTitle className={classes.dialogTitle} id="form-dialog-export-title">
+        Demande d'export
+      </DialogTitle>
 
       {exportResponse !== null ? (
         <DialogContent ref={dialogRef}>
@@ -201,14 +385,14 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
           )}
         </DialogContent>
       ) : (
-        <DialogContent ref={dialogRef}>
+        <DialogContent ref={dialogRef} className={classes.dialogContent}>
           <DialogContentText>
             Pour effectuer un export de données, veuillez renseigner un motif, selectionner uniquement les tables que
             vous voulez exporter et accepter les conditions de l'entrepôt de données de santé (EDS). <br />
             Tous les champs sont obligatoires
           </DialogContentText>
 
-          <Grid style={{ marginBottom: 12 }}>
+          <Grid mb="12px">
             {error === ERROR_MOTIF && (
               <Alert severity="error">
                 Merci d'indiquer le motif de votre demande d'export, ce motif doit contenir au moins 10 caractères
@@ -233,123 +417,127 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               maxRows={5}
               value={settings.motif}
               helperText="Le motif doit comporter au moins 10 caractères"
+              FormHelperTextProps={{ className: classes.helperText }}
               label="Motif de l'export"
+              variant="filled"
               onChange={(e) => handleChangeSettings('motif', e.target.value)}
             />
 
             <Grid className={classes.warningInfo} container alignItems="center">
-              <WarningIcon className={classes.warningIcon} color="info" />
-              <Grid item xs={11}>
-                <Typography>
-                  <b>Note</b> : la biologie (table <i>measurement</i>) et les comptes-rendus (table <i>note</i>) ne sont
-                  pas disponibles à l’export csv.
-                </Typography>
+              <WarningIcon className={classes.warningIcon} color="warning" fontSize="small" />
+              <Typography className={classes.warningNote}>
+                La biologie (table <i>measurement</i>) et les comptes-rendus (table <i>note</i>) ne sont pas disponibles
+                à l’export csv.
+              </Typography>
+            </Grid>
+
+            <Grid container py="28px" gap="16px">
+              <Grid item container alignItems="center" flexWrap="nowrap" pr="33px">
+                <Grid item container>
+                  <Typography className={classes.dialogHeader} variant="h5">
+                    Tables exportées
+                  </Typography>
+
+                  <IconButton size="small" onClick={() => window.open(`https://doc.eds.aphp.fr/omop/tables`, '_blank')}>
+                    <InfoIcon />
+                  </IconButton>
+                </Grid>
+
+                <Grid item whiteSpace="nowrap">
+                  <FormControlLabel
+                    className={classes.selectAllTables}
+                    control={
+                      <Checkbox
+                        className={classes.checkbox}
+                        indeterminate={
+                          settings.tables.filter((table) => table.checked).length !== settings.tables.length &&
+                          settings.tables.filter((table) => table.checked).length > 0
+                        }
+                        checked={settings.tables.filter((table) => table.checked).length === settings.tables.length}
+                        onChange={handleSelectAllTables}
+                      />
+                    }
+                    label={
+                      settings.tables.filter((table) => table.checked).length === settings.tables.length
+                        ? 'Tout désélectionner'
+                        : 'Tout sélectionner'
+                    }
+                    labelPlacement="start"
+                  />
+                </Grid>
+              </Grid>
+              <Grid item container>
+                {settings.tables.map(renderExportTable)}
               </Grid>
             </Grid>
 
-            <Grid container justifyContent="space-between" alignItems="center">
-              <Typography className={classes.tableTitle} variant="h6">
-                Tables exportées
+            <Grid container gap="12px" pb="10px">
+              <Typography className={classes.dialogHeader} variant="h5">
+                Conditions de l'EDS
               </Typography>
 
-              <IconButton size="small" onClick={() => window.open(`https://doc.eds.aphp.fr/omop/tables`, '_blank')}>
-                <InfoIcon />
-              </IconButton>
-            </Grid>
+              <Grid item container gap="8px">
+                <Typography variant="caption" className={classes.textBody2}>
+                  Le niveau d’habilitation dont vous disposez dans Cohort360 vous autorise à exporter des données à
+                  caractère personnel conformément à la réglementation et aux règles institutionnelles d’utilisation des
+                  données du Système d’Information clinique de l’AP-HP. Vous êtes garant des données exportées et vous
+                  vous engagez à :
+                </Typography>
+                <Grid item container>
+                  <Typography variant="caption" className={classes.conditionItem}>
+                    N’exporter, parmi les catégories de données accessibles, que les données strictement nécessaires et
+                    pertinentes au regard des objectifs de la recherche
+                  </Typography>
 
-            <List className={classes.list}>
-              {export_table.map(({ table_name, table_id, table_subtitle }) => (
-                <ListItem key={table_id}>
-                  <ListItemText
-                    disableTypography
-                    primary={
-                      <Grid container direction="row" alignItems="center">
-                        <Typography variant="body1">{table_name} - </Typography>
-                        <Typography variant="body1" style={{ fontStyle: 'italic', paddingLeft: 4 }}>
-                          {table_id}
-                        </Typography>
-                      </Grid>
-                    }
-                    secondary={
-                      table_subtitle && (
-                        <Grid container direction="row" alignItems="center">
-                          <Typography variant="body2" style={{ color: '#fc1847' }}>
-                            {table_subtitle}
-                          </Typography>
-                        </Grid>
-                      )
-                    }
-                  />
+                  <Typography variant="caption" className={classes.conditionItem}>
+                    A stocker temporairement les données extraites sur un répertoire dont l’accès est techniquement
+                    restreint aux personnes dûment habilitées et authentifiées, présentes dans les locaux du responsable
+                    de la recherche.
+                  </Typography>
 
-                  <ListItemSecondaryAction>
+                  <Typography variant="caption" className={classes.conditionItem}>
+                    A ne pas utiliser du matériel ou des supports de stockage n’appartenant pas à l’AP-HP, à ne pas
+                    sortir les données des locaux de l’AP-HP ou sur un support amovible emporté hors AP-HP.
+                  </Typography>
+                  <Typography variant="caption" className={classes.conditionItem}>
+                    A procéder à la destruction de toutes données exportées, dès qu’il n’y a plus nécessité d’en
+                    disposer dans le cadre de la recherche dans le périmètre concerné.
+                  </Typography>
+
+                  <Typography variant="caption" className={classes.conditionItem}>
+                    A ne pas communiquer les données à des tiers non autorisés
+                  </Typography>
+
+                  <Typography variant="caption" className={classes.conditionItem}>
+                    A informer les chefs de services des UF de Responsabilité où ont été collectées les données
+                    exportées
+                  </Typography>
+
+                  <Typography variant="caption" className={classes.conditionItem}>
+                    A ne pas croiser les données avec tout autre jeu de données, sans autorisation auprès de la CNIL
+                  </Typography>
+                </Grid>
+
+                <FormControlLabel
+                  className={classes.selectAgreeConditions}
+                  control={
                     <Checkbox
-                      checked={!!settings.tables.find((tableId) => tableId === table_id)}
-                      onChange={() => handleChangeTables(table_id, table_name)}
-                      color="secondary"
+                      className={classes.agreeCheckbox}
+                      name="conditions"
+                      checked={settings.conditions}
+                      onChange={() => handleChangeSettings('conditions', !settings.conditions)}
+                      style={{ color: settings.conditions ? '#5A5' : '#E33' }}
                     />
-                  </ListItemSecondaryAction>
-                </ListItem>
-              ))}
-            </List>
-
-            <Typography className={classes.tableTitle} variant="h6">
-              Conditions de l'EDS
-            </Typography>
-
-            <Typography variant="caption">
-              Le niveau d’habilitation dont vous disposez dans Cohort360 vous autorise à exporter des données à
-              caractère personnel conformément à la réglementation et aux règles institutionnelles d’utilisation des
-              données du Système d’Information clinique de l’AP-HP. Vous êtes garant des données exportées et vous vous
-              engagez à :
-            </Typography>
-
-            <Typography variant="caption" className={classes.conditionItem}>
-              N’exporter, parmi les catégories de données accessibles, que les données strictement nécessaires et
-              pertinentes au regard des objectifs de la recherche
-            </Typography>
-
-            <Typography variant="caption" className={classes.conditionItem}>
-              A stocker temporairement les données extraites sur un répertoire dont l’accès est techniquement restreint
-              aux personnes dûment habilitées et authentifiées, présentes dans les locaux du responsable de la
-              recherche.
-            </Typography>
-
-            <Typography variant="caption" className={classes.conditionItem}>
-              A ne pas utiliser du matériel ou des supports de stockage n’appartenant pas à l’AP-HP, à ne pas sortir les
-              données des locaux de l’AP-HP ou sur un support amovible emporté hors AP-HP.
-            </Typography>
-            <Typography variant="caption" className={classes.conditionItem}>
-              A procéder à la destruction de toutes données exportées, dès qu’il n’y a plus nécessité d’en disposer dans
-              le cadre de la recherche dans le périmètre concerné.
-            </Typography>
-
-            <Typography variant="caption" className={classes.conditionItem}>
-              A ne pas communiquer les données à des tiers non autorisés
-            </Typography>
-
-            <Typography variant="caption" className={classes.conditionItem}>
-              A informer les chefs de services des UF de Responsabilité où ont été collectées les données exportées
-            </Typography>
-
-            <Typography variant="caption" className={classes.conditionItem}>
-              A ne pas croiser les données avec tout autre jeu de données, sans autorisation auprès de la CNIL
-            </Typography>
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="conditions"
-                  checked={settings.conditions}
-                  onChange={() => handleChangeSettings('conditions', !settings.conditions)}
-                  color="secondary"
+                  }
+                  labelPlacement="end"
+                  label={
+                    <Typography variant="caption" className={classes.textBody1}>
+                      Je reconnais avoir lu et j'accepte les conditions ci-dessus
+                    </Typography>
+                  }
                 />
-              }
-              labelPlacement="end"
-              style={{ margin: '4px 0' }}
-              label={
-                <Typography variant="caption">Je reconnais avoir lu et j'accepte les conditions ci-dessus</Typography>
-              }
-            />
+              </Grid>
+            </Grid>
           </FormGroup>
         </DialogContent>
       )}
@@ -372,3 +560,103 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
 }
 
 export default ExportModal
+
+type ExportTableProps = {
+  exportTable: ExportCSVTable
+  exportRequest: ExportCSVForm
+  handleTransferRequestChange: (newExportRequest: ExportCSVForm) => void
+}
+
+const ExportTable: React.FC<ExportTableProps> = ({ exportTable, exportRequest, handleTransferRequestChange }) => {
+  const { classes } = useStyles()
+
+  const [filtersOptions, setFiltersOptions] = useState<SavedFilter[]>([])
+
+  const meState = useAppSelector((state) => state.me)
+  const userId = meState?.id
+
+  const _onChangeValue = (
+    key: 'cohort_user' | 'cohort' | 'fhir_filter_user' | 'fhir_filter' | 'tables',
+    value: any
+  ) => {
+    const _transferRequest = { ...exportRequest }
+
+    const exportTableIndex = exportRequest.tables.findIndex((table) => table.id === exportTable.id)
+
+    switch (key) {
+      case 'fhir_filter':
+        _transferRequest.tables[exportTableIndex] = {
+          ...exportRequest.tables[exportTableIndex],
+          [key]: value
+        }
+        break
+      case 'tables':
+        _transferRequest.tables = value
+        break
+    }
+
+    handleTransferRequestChange(_transferRequest)
+  }
+
+  useEffect(() => {
+    const _getProviderFilters = async () => {
+      try {
+        const filtersResp = await getProviderFilters(userId, ResourceType.PATIENT)
+
+        setFiltersOptions(filtersResp)
+      } catch (error) {
+        console.error("Erreur lors de la récupération des filtres de l'utilisateur", error)
+        setFiltersOptions([])
+      }
+    }
+
+    _getProviderFilters()
+  }, [])
+
+  return (
+    <Grid item container padding="0" gap="16px">
+      <Grid item container alignItems="center" justifyContent="space-between">
+        <Grid item xs={5}>
+          <Typography className={classes.textBody2}>Filtrer cette table avec un filtre :</Typography>
+        </Grid>
+        <Grid item xs={6}>
+          <Autocomplete
+            className={classes.autocomplete}
+            size="small"
+            disabled={meState?.maintenance?.active}
+            options={filtersOptions}
+            noOptionsText="Aucun filtre disponible"
+            getOptionLabel={(option) => `Filtre: ${option.name}`}
+            renderOption={(props, option) => <li {...props}>{option.name}</li>}
+            renderInput={(params) => <TextField {...params} label="Sélectionnez un filtre" />}
+            value={exportTable.fhir_filter}
+            onChange={(_, value) => _onChangeValue('fhir_filter', value)}
+          />
+        </Grid>
+      </Grid>
+      <Grid item container alignItems="center" justifyContent="space-between" display="none">
+        <Grid item xs={5}>
+          <Typography className={classes.textBody2}>
+            Filtrer cette table en respectant les contraintes relationnelles avec les autres tables sélectionnées:
+          </Typography>
+        </Grid>
+        <Grid item container xs={6} justifyContent="space-between">
+          <RadioGroup
+            row
+            aria-labelledby="contraintes-relationnelles-label"
+            defaultValue="Oui"
+            name="contraintes-relationnelles"
+            className={classes.radioGroup}
+          >
+            <Grid item xs={6}>
+              <FormControlLabel disabled value="Non" control={<Radio />} label={'Non'} />
+            </Grid>
+            <Grid item xs={6}>
+              <FormControlLabel value="Oui" control={<Radio />} label={'Oui'} />
+            </Grid>
+          </RadioGroup>
+        </Grid>
+      </Grid>
+    </Grid>
+  )
+}

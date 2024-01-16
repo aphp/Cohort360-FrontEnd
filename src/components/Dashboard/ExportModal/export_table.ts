@@ -1,116 +1,151 @@
 export type ExportTableType = {
   id: string
-  table_name: string
-  table_id: string
-  table_subtitle?: string
+  name: string
+  label: string
+  subtitle?: string
+  resourceType: string
 }
 
 const exportTable: ExportTableType[] = [
   {
     id: 'person',
-    table_name: 'Patient',
-    table_id: 'person'
+    name: 'Patient',
+    label: 'person',
+    resourceType: 'Patient'
   },
+  // {
+  //   id: 'observation',
+  //   name: 'Patient - Données démographiques',
+  //   label: 'observation',
+  //   subtitle: '⚠️ Attention cette table comporte des données identifiantes'
+  // },
   {
     id: 'iris',
-    table_name: 'Patient - Données géographiques',
-    table_id: 'iris'
-  },
-  {
-    id: 'drug_exposure_prescription',
-    table_name: 'Fait - Médicaments - Prescription',
-    table_id: 'drug_exposure_prescription'
-  },
-  {
-    id: 'drug_exposure_administration',
-    table_name: 'Fait - Médicaments - Administration',
-    table_id: 'drug_exposure_administration'
+    name: 'Patient - Données géographiques',
+    label: 'iris',
+    resourceType: 'Patient'
   },
   {
     id: 'visit_occurrence',
-    table_name: 'Prise en charge',
-    table_id: 'visit_occurrence'
+    name: 'Prise en charge',
+    label: 'visit_occurrence',
+    resourceType: ''
   },
   {
     id: 'visit_detail',
-    table_name: 'Prise en charge - Passages ',
-    table_id: 'visit_detail'
+    name: 'Prise en charge - Passages ',
+    label: 'visit_detail',
+    resourceType: ''
   },
   {
     id: 'condition_occurrence',
-    table_name: 'Fait - PMSI - Diagnostics',
-    table_id: 'condition_occurrence'
+    name: 'Fait - PMSI - Diagnostics',
+    label: 'condition_occurrence',
+    resourceType: 'Condition'
   },
   {
     id: 'procedure_occurrence',
-    table_name: 'Fait - PMSI - Actes',
-    table_id: 'procedure_occurrence'
+    name: 'Fait - PMSI - Actes',
+    label: 'procedure_occurrence',
+    resourceType: 'Procedure'
   },
   {
     id: 'cost',
-    table_name: 'Fait - PMSI - GHM',
-    table_id: 'cost'
+    name: 'Fait - PMSI - GHM',
+    label: 'cost',
+    resourceType: 'Claim'
+  },
+  // {
+  //   id: 'note',
+  //   table_name: 'Fait - Documents cliniques',
+  //   table_id: 'note',
+  //   resourceType: 'DocumentReference'
+  // },
+  {
+    id: 'drug_exposure_prescription',
+    name: 'Fait - Médicaments - Prescription',
+    label: 'drug_exposure_prescription',
+    resourceType: 'MedicationRequest'
+  },
+  {
+    id: 'drug_exposure_administration',
+    name: 'Fait - Médicaments - Administration',
+    label: 'drug_exposure_administration',
+    resourceType: 'MedicationAdministration'
   },
   {
     id: 'care_site',
-    table_name: 'Référentiel - Structure hospitalière',
-    table_id: 'care_site'
+    name: 'Référentiel - Structure hospitalière',
+    label: 'care_site',
+    resourceType: ''
   },
   {
-    id: 'fact_relationship',
-    table_name: 'Référentiel - Liens entre entités',
-    table_id: 'fact_relationship'
+    id: 'care_site',
+    name: 'Référentiel - Liens entre entités',
+    label: 'fact_relationship',
+    resourceType: ''
   },
   {
     id: 'concept',
-    table_name: 'Référentiel - Terminologie - Concept',
-    table_id: 'concept'
+    name: 'Référentiel - Terminologie - Concept',
+    label: 'concept',
+    resourceType: 'CodableConcept'
   },
   {
-    id: 'concept_relationship',
-    table_name: 'Référentiel - Terminologie - Lien entre concepts',
-    table_id: 'concept_relationship'
+    id: 'concept',
+    name: 'Référentiel - Terminologie - Lien entre concepts',
+    label: 'concept_relationship',
+    resourceType: 'CodableConcept'
   },
   {
     id: 'vocabulary',
-    table_name: 'Référentiel - Terminologie - Vocabulaire et nomenclature',
-    table_id: 'vocabulary'
+    name: 'Référentiel - Terminologie - Vocabulaire et nomenclature',
+    label: 'vocabulary',
+    resourceType: 'ValueSet'
   },
   {
     id: 'imaging_study',
-    table_name: 'Fait - Imagerie - Étude',
-    table_id: 'imaging_study'
+    name: 'Fait - Imagerie - Étude',
+    label: 'imaging_study',
+    resourceType: 'ImagingStudies'
   },
   {
     id: 'imaging_series',
-    table_name: 'Fait - Imagerie - Série',
-    table_id: 'imaging_series'
+    name: 'Fait - Imagerie - Série',
+    label: 'imaging_series',
+    resourceType: 'ImagingSeries'
   },
+  // ---------------------------------
   {
     id: 'questionnaire',
-    table_name: 'Formulaires',
-    table_id: 'questionnaire'
+    name: 'Formulaires',
+    label: 'questionnaire',
+    resourceType: ''
   },
+  // {
+  //   id: 'questionnaire__item',
+  //   name: 'Champs des formulaires',
+  //   label: 'questionnaire__item',
+  //   resourceType: ''
+  // },
   {
-    id: 'questionnaire',
-    table_name: 'Formulaires',
-    table_id: 'questionnaire__item'
-  },
-  {
-    id: 'questionnaire',
-    table_name: 'Formulaires',
-    table_id: 'questionnaireresponse'
-  },
-  {
-    id: 'questionnaire',
-    table_name: 'Formulaires',
-    table_id: 'questionnaireresponse__item'
-  },
-  {
-    id: 'questionnaire',
-    table_name: 'Formulaires',
-    table_id: 'questionnaireresponse__item__answer'
+    id: 'questionnaireresponse',
+    name: 'Réponses aux formulaires',
+    label: 'questionnaireresponse',
+    resourceType: ''
   }
+  // {
+  //   id: 'questionnaireresponse__item',
+  //   name: 'Champs de réponses aux formulaires',
+  //   label: 'questionnaireresponse__item',
+  //   resourceType: ''
+  // },
+  // {
+  //   id: 'questionnaireresponse__item__answer',
+  //   name: 'Valeurs de réponses aux formulaires',
+  //   label: 'questionnaireresponse__item__answer',
+  //   resourceType: ''
+  // }
 ]
 
 export default exportTable
