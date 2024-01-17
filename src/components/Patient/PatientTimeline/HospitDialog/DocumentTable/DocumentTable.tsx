@@ -38,7 +38,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
   const row = {
     ...document,
     NDA: document.NDA,
-    title: document.title ?? '-',
+    title: document.description ?? '-',
     serviceProvider: document.serviceProvider ?? '-',
     event: document.content[0].attachment.url,
     type: document.type?.coding?.[0].display ?? document.type?.coding?.[0].code ?? '-'
@@ -73,7 +73,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
         </TableCellWrapper>
         <TableCellWrapper align="left">{row.type}</TableCellWrapper>
         <TableCellWrapper align="left" className={classes.description}>
-          {row.title}
+          {row.description}
         </TableCellWrapper>
         <TableCellWrapper>{row.serviceProvider}</TableCellWrapper>
         <TableCellWrapper>{getStatusChip(row.status as DocumentReferenceStatusKind)}</TableCellWrapper>
