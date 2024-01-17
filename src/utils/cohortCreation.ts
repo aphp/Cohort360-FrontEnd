@@ -18,13 +18,10 @@ import {
   PROCEDURE_HIERARCHY
 } from '../constants'
 import { DocumentAttachmentMethod, LabelObject, SearchByTypes } from 'types/searchCriterias'
-import { Calendar } from 'types/dates'
-import { convertDurationToString, convertTimestampToDuration } from './age'
 import { Comparators, RessourceType, SelectedCriteriaType, CriteriaDataKey } from 'types/requestCriterias'
 import { parseOccurence } from './valueComparator'
 import { parseDocumentAttachment } from './documentAttachment'
 import {
-  buildAgeFilter,
   buildComparatorFilter,
   buildDateFilter,
   buildDurationFilter,
@@ -207,7 +204,10 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         buildDateFilter(criterion.deathDates[0], PATIENT_DEATHDATE, 'ge'),
         buildDateFilter(criterion.deathDates[1], PATIENT_DEATHDATE, 'le'),
         criterion.birthdates[0] === null && criterion.birthdates[1] === null
-          ? buildAgeFilter(criterion.age, deidentified ? PATIENT_AGE_MONTH : PATIENT_AGE_DAY, deidentified)
+          ? buildDurationFilter(criterion.age[0], deidentified ? PATIENT_AGE_MONTH : PATIENT_AGE_DAY, 'ge')
+          : '',
+        criterion.birthdates[1] === null && criterion.birthdates[1] === null
+          ? buildDurationFilter(criterion.age[1], deidentified ? PATIENT_AGE_MONTH : PATIENT_AGE_DAY, 'le')
           : ''
       ]
         .filter((elem) => elem)
@@ -216,6 +216,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     }
 
     case RessourceType.ENCOUNTER: {
+      deidentified = false //TODO erase this line when deidentified param for encounter is implemented
+
       filterFhir = [
         'subject.active=true',
         buildLabelObjectFilter(criterion.admissionMode, ENCOUNTER_ADMISSIONMODE),
@@ -231,7 +233,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         buildEncounterServiceFilter(criterion.encounterService, SERVICE_PROVIDER),
         buildDurationFilter(criterion?.duration?.[0], ENCOUNTER_DURATION, 'ge'),
         buildDurationFilter(criterion?.duration?.[1], ENCOUNTER_DURATION, 'le'),
-        buildAgeFilter(criterion.age, ENCOUNTER_MIN_BIRTHDATE, deidentified, ENCOUNTER_MAX_BIRTHDATE)
+        buildDurationFilter(criterion?.age[0], deidentified ? ENCOUNTER_MIN_BIRTHDATE : ENCOUNTER_MIN_BIRTHDATE, 'ge'),
+        buildDurationFilter(criterion?.age[1], deidentified ? ENCOUNTER_MAX_BIRTHDATE : ENCOUNTER_MAX_BIRTHDATE, 'le')
       ]
         .filter((elem) => elem)
         .reduce(filterReducer)
@@ -584,21 +587,12 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const value = filter ? filter[1] : null
 
             switch (key) {
-              case PATIENT_AGE_DAY: {
-                if (value?.includes('ge')) {
-                  const ageMin = value?.replace('ge', '')
-                  currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin, Calendar.DAY))
-                } else if (value?.includes('le')) {
-                  const ageMax = value?.replace('le', '')
-                  currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax, Calendar.DAY))
-                }
-                break
-              }
+              case PATIENT_AGE_DAY:
               case PATIENT_AGE_MONTH: {
                 if (value?.includes('ge')) {
-                  currentCriterion.age[0] = unbuildDurationFilter(value, Calendar.MONTH)
+                  currentCriterion.age[0] = unbuildDurationFilter(value)
                 } else if (value?.includes('le')) {
-                  currentCriterion.age[1] = unbuildDurationFilter(value, Calendar.MONTH)
+                  currentCriterion.age[1] = unbuildDurationFilter(value)
                 }
                 break
               }
@@ -666,18 +660,18 @@ export async function unbuildRequest(_json: string): Promise<any> {
             switch (key) {
               case ENCOUNTER_DURATION: {
                 if (value.includes('ge')) {
-                  currentCriterion.duration[0] = unbuildDurationFilter(value, Calendar.DAY)
+                  currentCriterion.duration[0] = unbuildDurationFilter(value)
                 } else if (value.includes('le')) {
-                  currentCriterion.duration[1] = unbuildDurationFilter(value, Calendar.DAY)
+                  currentCriterion.duration[1] = unbuildDurationFilter(value)
                 }
                 break
               }
               case ENCOUNTER_MIN_BIRTHDATE: {
-                currentCriterion.age[0] = unbuildDurationFilter(value, Calendar.DAY)
+                currentCriterion.age[0] = unbuildDurationFilter(value)
                 break
               }
               case ENCOUNTER_MAX_BIRTHDATE: {
-                currentCriterion.age[1] = unbuildDurationFilter(value, Calendar.DAY)
+                currentCriterion.age[1] = unbuildDurationFilter(value)
                 break
               }
               case ENCOUNTER_ENTRYMODE: {

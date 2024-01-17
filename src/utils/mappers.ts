@@ -1,11 +1,10 @@
 import { CriteriaNameType, CriteriaName, ScopeTreeRow } from 'types'
-import { DocumentAttachmentMethod, DurationRangeType, LabelObject } from 'types/searchCriterias'
+import { DocumentAttachmentMethod, LabelObject } from 'types/searchCriterias'
 import {
   convertDurationToString,
   convertDurationToTimestamp,
   convertStringToDuration,
-  convertTimestampToDuration,
-  substructAgeString
+  convertTimestampToDuration
 } from './age'
 import docTypes from 'assets/docTypes.json'
 import { OBSERVATION_VALUE, RequeteurCriteriaType } from './cohortCreation'
@@ -24,7 +23,6 @@ import {
 } from 'types/requestCriterias'
 import { comparatorToFilter, parseOccurence } from './valueComparator'
 import services from 'services/aphp'
-import { Calendar } from 'types/dates'
 
 const searchReducer = (accumulator: any, currentValue: any): string =>
   accumulator || accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -107,9 +105,9 @@ export const buildDurationFilter = (age: string | null | undefined, fhirKey: str
   return `${fhirKey}=${comparator}${convertedRange}`
 }
 
-export const unbuildDurationFilter = (value: string, type: Calendar) => {
+export const unbuildDurationFilter = (value: string) => {
   const cleanValue = value?.replace(comparator, '')
-  return convertDurationToString(convertTimestampToDuration(+cleanValue, type))
+  return convertDurationToString(convertTimestampToDuration(+cleanValue))
 }
 
 export const buildSearchFilter = (criterion: string, fhirKey: string) => {
@@ -184,23 +182,6 @@ export const unbuildDocTypesFilter = (currentCriterion: any, filterName: string,
   if (newArray) {
     currentCriterion[filterName] = currentCriterion ? [...currentCriterion[filterName], ...newArray] : newArray
   }
-}
-
-export const buildAgeFilter = (
-  age: DurationRangeType,
-  fhirKey: string,
-  deidentified: boolean,
-  fhirKeyMaxValue?: string
-) => {
-  const ageToBirthdate: [string, string] = [
-    moment(substructAgeString(age?.[0] || '0/0/0')).format('MM/DD/YYYY'),
-    moment(substructAgeString(age?.[1] || '0/0/130')).format('MM/DD/YYYY')
-  ]
-
-  const ageMin = Math.abs(moment(ageToBirthdate[0]).diff(moment(), deidentified ? 'months' : 'days'))
-  const ageMax = Math.abs(moment(ageToBirthdate[1]).diff(moment(), deidentified ? 'months' : 'days'))
-
-  return `${fhirKey}=ge${ageMin}&${fhirKeyMaxValue ? fhirKeyMaxValue : fhirKey}=le${ageMax}`
 }
 
 export const unbuildAdvancedCriterias = (
