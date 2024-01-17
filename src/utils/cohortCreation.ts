@@ -24,8 +24,7 @@ import {
   convertDurationToString,
   convertDurationToTimestamp,
   convertStringToDuration,
-  convertTimestampToDuration,
-  substructAgeString
+  convertTimestampToDuration
 } from './age'
 import { Comparators, DocType, RessourceType, SelectedCriteriaType, CriteriaDataKey } from 'types/requestCriterias'
 import { comparatorToFilter, parseOccurence } from './valueComparator'
@@ -202,13 +201,12 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
   switch (criterion.type) {
     case RessourceType.PATIENT: {
-      const birthdates: [string, string] = [
-        moment(substructAgeString(criterion?.age?.[0] || '0/0/0')).format('MM/DD/YYYY'),
-        moment(substructAgeString(criterion?.age?.[1] || '0/0/130')).format('MM/DD/YYYY')
-      ]
-
-      const ageMin = Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
-      const ageMax = Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
+      const ageMin = convertDurationToTimestamp(
+        convertStringToDuration(criterion.age?.[0]) || { year: 0, month: 0, day: 0 }
+      )
+      const ageMax = convertDurationToTimestamp(
+        convertStringToDuration(criterion.age?.[1]) || { year: 130, month: 0, day: 0 }
+      )
 
       const ageMinCriterion = `${deidentified ? PATIENT_AGE_MONTH : PATIENT_AGE_DAY}=ge${ageMin}`
       const ageMaxCriterion = `${deidentified ? PATIENT_AGE_MONTH : PATIENT_AGE_DAY}=le${ageMax}`
@@ -246,15 +244,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     }
 
     case RessourceType.ENCOUNTER: {
-      const birthdates: [string, string] = [
-        moment(substructAgeString(criterion?.age?.[0] || '0/0/0')).format('MM/DD/YYYY'),
-        moment(substructAgeString(criterion?.age?.[1] || '0/0/130')).format('MM/DD/YYYY')
-      ]
-
       deidentified = false //TODO erase this line when deidentified param for encounter is implemented
 
-      const ageMin = Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
-      const ageMax = Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
+      const ageMin = convertDurationToTimestamp(
+        convertStringToDuration(criterion.age?.[0]) || { year: 0, month: 0, day: 0 }
+      )
+      const ageMax = convertDurationToTimestamp(
+        convertStringToDuration(criterion.age?.[1]) || { year: 130, month: 0, day: 0 }
+      )
 
       const ageMinCriterion = `${deidentified ? ENCOUNTER_MIN_BIRTHDATE : ENCOUNTER_MIN_BIRTHDATE}=ge${ageMin}`
       const ageMaxCriterion = `${deidentified ? ENCOUNTER_MAX_BIRTHDATE : ENCOUNTER_MAX_BIRTHDATE}=le${ageMax}`
@@ -872,26 +869,16 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const value = filter ? filter[1] : null
 
             switch (key) {
-              case PATIENT_AGE_DAY: {
+              case PATIENT_AGE_DAY:
+              case PATIENT_AGE_MONTH:
                 if (value?.includes('ge')) {
                   const ageMin = value?.replace('ge', '')
-                  currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin, Calendar.DAY))
+                  currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin))
                 } else if (value?.includes('le')) {
                   const ageMax = value?.replace('le', '')
-                  currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax, Calendar.DAY))
+                  currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax))
                 }
                 break
-              }
-              case PATIENT_AGE_MONTH: {
-                if (value?.includes('ge')) {
-                  const ageMin = value?.replace('ge', '')
-                  currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin, Calendar.MONTH))
-                } else if (value?.includes('le')) {
-                  const ageMax = value?.replace('le', '')
-                  currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax, Calendar.MONTH))
-                }
-                break
-              }
               case PATIENT_BIRTHDATE: {
                 if (value?.includes('ge')) {
                   currentCriterion.birthdates[0] = value.replace('T00:00:00Z', '').replace('ge', '')
@@ -976,25 +963,21 @@ export async function unbuildRequest(_json: string): Promise<any> {
               case ENCOUNTER_DURATION: {
                 if (value.includes('ge')) {
                   const durationMin = value?.replace('ge', '')
-                  currentCriterion.duration[0] = convertDurationToString(
-                    convertTimestampToDuration(+durationMin, Calendar.DAY)
-                  )
+                  currentCriterion.duration[0] = convertDurationToString(convertTimestampToDuration(+durationMin))
                 } else if (value.includes('le')) {
                   const durationMax = value?.replace('le', '')
-                  currentCriterion.duration[1] = convertDurationToString(
-                    convertTimestampToDuration(+durationMax, Calendar.DAY)
-                  )
+                  currentCriterion.duration[1] = convertDurationToString(convertTimestampToDuration(+durationMax))
                 }
                 break
               }
               case ENCOUNTER_MIN_BIRTHDATE: {
                 const ageMin = value?.replace('ge', '')
-                currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin, Calendar.DAY))
+                currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin))
                 break
               }
               case ENCOUNTER_MAX_BIRTHDATE: {
                 const ageMax = value?.replace('le', '')
-                currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax, Calendar.DAY))
+                currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax))
                 break
               }
               case ENCOUNTER_ENTRYMODE: {
