@@ -128,12 +128,12 @@ export const buildObservationValueFilter = (criterion: ObservationDataType, fhir
     criterion.code &&
     criterion.code.length === 1 &&
     criterion.valueComparator &&
-    (typeof criterion.valueMin === 'number' || typeof criterion.valueMax === 'number')
+    (typeof criterion.searchByValue[0] === 'number' || typeof criterion.searchByValue[1] === 'number')
   ) {
-    if (criterion.valueComparator === Comparators.BETWEEN && criterion.valueMax) {
-      return `${fhirKey}=le${criterion.valueMax}&${fhirKey}=ge${criterion.valueMin}`
+    if (criterion.valueComparator === Comparators.BETWEEN && criterion.searchByValue[1]) {
+      return `${fhirKey}=le${criterion.searchByValue[1]}&${fhirKey}=ge${criterion.searchByValue[0]}`
     } else {
-      return `${fhirKey}=${valueComparatorFilter}${criterion.valueMin}`
+      return `${fhirKey}=${valueComparatorFilter}${criterion.searchByValue[0]}`
     }
   }
   return ''
@@ -149,11 +149,13 @@ export const unbuildObservationValueFilter = (filters: string[][], currentCriter
   } else if (valueQuantities.length === 1) {
     const parsedOccurence = parseOccurence(valueQuantities[0])
     currentCriterion['valueComparator'] = parsedOccurence.comparator
-    currentCriterion['valueMin'] = parsedOccurence.value
+    currentCriterion['searchByValue'] = [parsedOccurence.value, null]
   } else if (valueQuantities.length === 2) {
     currentCriterion['valueComparator'] = Comparators.BETWEEN
-    currentCriterion['valueMin'] = parseOccurence(valueQuantities.find((value) => value.startsWith('le')) ?? '').value
-    currentCriterion['valueMax'] = parseOccurence(valueQuantities.find((value) => value.startsWith('ge')) ?? '').value
+    currentCriterion['searchByValue'] = [
+      parseOccurence(valueQuantities.find((value) => value.startsWith('ge')) ?? '').value,
+      parseOccurence(valueQuantities.find((value) => value.startsWith('le')) ?? '').value
+    ]
   }
 }
 

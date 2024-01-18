@@ -48,7 +48,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   const currentState = { ...selectedCriteria, ...initialState }
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const [allowSearchByValue, setAllowSearchByValue] = useState(
-    typeof currentState.valueMin === 'number' || typeof currentState.valueMax === 'number'
+    typeof currentState.searchByValue[0] === 'number' || typeof currentState.searchByValue[1] === 'number'
   )
 
   const _onSubmit = () => {
@@ -95,6 +95,12 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       }
     }
   }, [currentState.isLeaf, currentState?.code])
+
+  useEffect(() => {
+    if (!allowSearchByValue) {
+      onChangeValue('searchByValue', [null, null])
+    }
+  }, [allowSearchByValue])
 
   return isOpen ? (
     <Grid className={classes.root}>
@@ -218,13 +224,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             >
               <Checkbox
                 checked={allowSearchByValue}
-                onClick={() => {
-                  if (allowSearchByValue) {
-                    onChangeValue('valueMin', undefined)
-                    onChangeValue('valueMax', undefined)
-                  }
-                  setAllowSearchByValue(!allowSearchByValue)
-                }}
+                onClick={() => setAllowSearchByValue(!allowSearchByValue)}
                 disabled={!currentState.isLeaf}
               />
 
@@ -248,8 +248,10 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 type="number"
                 id="criteria-value"
                 variant="outlined"
-                value={currentState.valueMin}
-                onChange={(e) => onChangeValue('valueMin', parseFloat(e.target.value))}
+                value={currentState.searchByValue[0]}
+                onChange={(e) =>
+                  onChangeValue('searchByValue', [parseFloat(e.target.value), currentState.searchByValue[1]])
+                }
                 placeholder={currentState.valueComparator === Comparators.BETWEEN ? 'Valeur minimale' : '0'}
                 disabled={!allowSearchByValue}
               />
@@ -262,8 +264,10 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                   type="number"
                   id="criteria-value"
                   variant="outlined"
-                  value={currentState.valueMax}
-                  onChange={(e) => onChangeValue('valueMax', parseFloat(e.target.value))}
+                  value={currentState.searchByValue[1]}
+                  onChange={(e) =>
+                    onChangeValue('searchByValue', [currentState.searchByValue[0], parseFloat(e.target.value)])
+                  }
                   placeholder="Valeur maximale"
                   disabled={!allowSearchByValue}
                 />

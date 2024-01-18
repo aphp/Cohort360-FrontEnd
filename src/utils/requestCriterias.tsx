@@ -109,11 +109,11 @@ const getNbOccurencesLabel = (value: number, comparator: string, name?: string) 
   return `Nombre ${name ? name : "d'occurrences"} ${comparator} ${+value}`
 }
 
-const getBiologyValuesLabel = (comparator: string, valueMin: number, valueMax?: number) => {
-  if (isNaN(valueMin) && (valueMax === undefined || isNaN(valueMax))) return null
+const getBiologyValuesLabel = (comparator: string, values: [number | null, number | null]) => {
+  if (values[0] === null && values[1] === null) return null
   return comparator === Comparators.BETWEEN
-    ? `Valeur comprise entre ${valueMin} et ${valueMax === undefined || isNaN(valueMax) ? '?' : valueMax}`
-    : `Valeur ${comparator} ${valueMin}`
+    ? `Valeur comprise entre ${values[0]} et ${values[1] === null ? '?' : values[1]}`
+    : `Valeur ${comparator} ${values[0]}`
 }
 
 const getIdsListLabels = (values: string, name: string) => {
@@ -303,10 +303,8 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         labels.push(
           getLabelFromCriteriaObject(criteriaState, selectedCriteria.code, CriteriaDataKey.BIOLOGY_DATA, type)
         )
-      if (selectedCriteria.valueComparator && selectedCriteria.valueMin && !isNaN(selectedCriteria.valueMin))
-        labels.push(
-          getBiologyValuesLabel(selectedCriteria.valueComparator, selectedCriteria.valueMin, selectedCriteria.valueMax)
-        )
+      if (selectedCriteria.valueComparator && selectedCriteria.searchByValue[0] !== null)
+        labels.push(getBiologyValuesLabel(selectedCriteria.valueComparator, selectedCriteria.searchByValue))
       break
 
     case RessourceType.IMAGING:

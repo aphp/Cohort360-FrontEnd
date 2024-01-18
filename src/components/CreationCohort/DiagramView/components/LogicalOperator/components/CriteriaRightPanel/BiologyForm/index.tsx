@@ -20,6 +20,7 @@ export const defaultBiology: Omit<ObservationDataType, 'id'> = {
   code: [],
   isLeaf: false,
   valueComparator: Comparators.GREATER_OR_EQUAL,
+  searchByValue: [null, null],
   occurrence: 1,
   occurrenceComparator: Comparators.GREATER_OR_EQUAL,
   startOccurrence: '',

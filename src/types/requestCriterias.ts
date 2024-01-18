@@ -225,8 +225,7 @@ export type ObservationDataType = CommonCriteriaDataType & {
   type: RessourceType.OBSERVATION
   code: LabelObject[] | null
   isLeaf: boolean
-  valueMin?: number
-  valueMax?: number
+  searchByValue: [number | null, number | null]
   valueComparator: Comparators
   occurrence: number
   occurrenceComparator: Comparators
