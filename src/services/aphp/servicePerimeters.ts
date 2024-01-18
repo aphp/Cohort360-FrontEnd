@@ -289,7 +289,10 @@ const servicesPerimeters: IServicePerimeters = {
           ? 'accesses/perimeters/?type_source_value=' + servicesPerimeters.getHigherTypes()[0]
           : 'accesses/perimeters/patient-data/rights/'
         const rightResponse = await apiBackend.get(url, { signal: signal })
-        if (rightResponse.status === 200 && rightResponse.data.message === noRightsMessage) {
+        if (
+          rightResponse.status === 200 &&
+          (rightResponse.data.message === noRightsMessage || Object.keys(rightResponse.data).length === 0)
+        ) {
           const noRightError: any = {
             errorType: 'noRight'
           }
