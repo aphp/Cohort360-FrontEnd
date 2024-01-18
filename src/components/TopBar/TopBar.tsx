@@ -77,8 +77,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   }
 
   React.useEffect(() => {
+    const abortController = new AbortController()
     const _fetchPatientNumber = async () => {
-      const _patientNumber = await services.patients.fetchPatientsCount()
+      const _patientNumber = await services.patients.fetchPatientsCount(abortController.signal)
       if (_patientNumber !== null) {
         setPatientsNumber(_patientNumber)
       }
@@ -88,6 +89,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
       _fetchPatientNumber()
     } else {
       setPatientsNumber(dashboard.totalPatients)
+    }
+    return () => {
+      abortController.abort()
     }
   }, [dashboard.totalPatients])
 
