@@ -540,10 +540,10 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
           criterion.code &&
           criterion.code.length === 1 &&
           criterion.valueComparator &&
-          (typeof criterion.valueMin === 'number' || typeof criterion.valueMax === 'number')
-            ? criterion.valueComparator === Comparators.BETWEEN && criterion.valueMax
-              ? `${OBSERVATION_VALUE}=le${criterion.valueMax}&${OBSERVATION_VALUE}=ge${criterion.valueMin}`
-              : `${OBSERVATION_VALUE}=${valueComparatorFilter}${criterion.valueMin}`
+          (typeof criterion.searchByValue[0] === 'number' || typeof criterion.searchByValue[1] === 'number')
+            ? criterion.valueComparator === Comparators.BETWEEN && criterion.searchByValue[1] !== null
+              ? `${OBSERVATION_VALUE}=le${criterion.searchByValue[1]}&${OBSERVATION_VALUE}=ge${criterion.searchByValue[0]}`
+              : `${OBSERVATION_VALUE}=${valueComparatorFilter}${criterion.searchByValue[0]}`
             : ''
         }`
       ].filter((elem) => elem)
@@ -1587,8 +1587,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 }
 
                 currentCriterion.valueComparator = valueComparator
-                currentCriterion.valueMin = valueMin
-                currentCriterion.valueMax = valueMax
+                currentCriterion.searchByValue = [valueMin, valueMax]
 
                 break
               }
