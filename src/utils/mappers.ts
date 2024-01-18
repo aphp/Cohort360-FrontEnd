@@ -98,16 +98,22 @@ export const unbuildDateFilter = (value: string) => {
   return replaceTime(value.replace(comparator, ''))
 }
 
-export const buildDurationFilter = (age: string | null | undefined, fhirKey: string, comparator: 'le' | 'ge') => {
+export const buildDurationFilter = (
+  age: string | null | undefined,
+  fhirKey: string,
+  comparator: 'le' | 'ge',
+  deidentified?: boolean
+) => {
   const convertedRange = convertDurationToTimestamp(
-    convertStringToDuration(age) || { year: comparator === 'ge' ? 0 : 130, month: 0, day: 0 }
+    convertStringToDuration(age) || { year: comparator === 'ge' ? 0 : 130, month: 0, day: 0 },
+    deidentified
   )
   return `${fhirKey}=${comparator}${convertedRange}`
 }
 
-export const unbuildDurationFilter = (value: string) => {
+export const unbuildDurationFilter = (value: string, deidentified?: boolean) => {
   const cleanValue = value?.replace(comparator, '')
-  return convertDurationToString(convertTimestampToDuration(+cleanValue))
+  return convertDurationToString(convertTimestampToDuration(+cleanValue, deidentified))
 }
 
 export const buildSearchFilter = (criterion: string, fhirKey: string) => {
