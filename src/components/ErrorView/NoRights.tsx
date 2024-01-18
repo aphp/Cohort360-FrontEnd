@@ -33,17 +33,19 @@ const NoRights = () => {
               demander la création de votre compte Cohort360 ainsi qu'un créneau de formation obligatoire pour utiliser
               l'application.
             </Typography>
-            <Typography style={{ marginBottom: 16 }} align="center">
+            <Typography align="center">
               S'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante:
-              dsi-id-recherche-support-cohort360@aphp.fr
+              dsi-id-recherche-support-cohort360@aphp.fr.
             </Typography>
-            <Link
-              target="_blank"
-              rel="noopener"
-              href="https://eds.aphp.fr/sites/default/files/2021-09/EDS_AP-HP_ListeCoordGHDS_20210901.pdf"
-            >
-              Liste des coordinateurs
-            </Link>
+            <div style={{ width: '100%', textAlign: 'center' }}>
+              <Link
+                target="_blank"
+                rel="noopener"
+                href="https://eds.aphp.fr/sites/default/files/2021-09/EDS_AP-HP_ListeCoordGHDS_20210901.pdf"
+              >
+                Liste des coordinateurs
+              </Link>
+            </div>
           </Grid>
         </Grid>
       </Grid>
