@@ -117,21 +117,23 @@ export const checkMinMaxValue = (min: DurationType, max: DurationType) => {
   return true
 }
 
-export const convertDurationToTimestamp = (duration: DurationType | null): number => {
+export const convertDurationToTimestamp = (duration: DurationType | null, deidentified?: boolean): number => {
   if (!duration) return 0
   const year = duration.year ?? 0
   const month = duration.month ?? 0
   const day = duration.day ?? 0
-  return year * 365 + month * 30 + day
+  return year * (deidentified ? 30 : 365) + month * (deidentified ? 1 : 30) + day
 }
 
-export const convertTimestampToDuration = (timestamp: number | null): DurationType => {
+export const convertTimestampToDuration = (timestamp: number | null, deidentified?: boolean): DurationType => {
   const duration: DurationType = { year: 130, month: 0, day: 0 }
   if (!timestamp) return duration
-  duration.year = Math.floor(timestamp / 365)
-  timestamp = timestamp % 365
-  duration.month = Math.floor(timestamp / 30)
-  timestamp = timestamp % 30
-  duration.day = timestamp
+  duration.year = Math.floor(timestamp / (deidentified ? 30 : 365))
+  timestamp = timestamp % (deidentified ? 30 : 365)
+  duration.month = Math.floor(timestamp / (deidentified ? 1 : 30))
+  if (!deidentified) {
+    timestamp = timestamp % 30
+    duration.day = timestamp
+  }
   return duration
 }

@@ -42,8 +42,10 @@ const PATIENT_DEATHDATE = 'death-date'
 const PATIENT_DECEASED = 'deceased'
 
 const ENCOUNTER_DURATION = 'length'
-const ENCOUNTER_MIN_BIRTHDATE = 'start-age-visit'
-const ENCOUNTER_MAX_BIRTHDATE = 'end-age-visit'
+const ENCOUNTER_MIN_BIRTHDATE_DAY = 'start-age-visit'
+const ENCOUNTER_MAX_BIRTHDATE_DAY = 'end-age-visit'
+const ENCOUNTER_MIN_BIRTHDATE_MONTH = 'start-age-visit-month'
+const ENCOUNTER_MAX_BIRTHDATE_MONTH = 'end-age-visit-month'
 const ENCOUNTER_ENTRYMODE = 'admission-mode'
 const ENCOUNTER_EXITMODE = 'discharge-disposition-mode'
 const ENCOUNTER_PRISENCHARGETYPE = 'class'
@@ -202,10 +204,12 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
   switch (criterion.type) {
     case RessourceType.PATIENT: {
       const ageMin = convertDurationToTimestamp(
-        convertStringToDuration(criterion.age?.[0]) || { year: 0, month: 0, day: 0 }
+        convertStringToDuration(criterion.age?.[0]) || { year: 0, month: 0, day: 0 },
+        deidentified
       )
       const ageMax = convertDurationToTimestamp(
-        convertStringToDuration(criterion.age?.[1]) || { year: 130, month: 0, day: 0 }
+        convertStringToDuration(criterion.age?.[1]) || { year: 130, month: 0, day: 0 },
+        deidentified
       )
 
       const ageMinCriterion = `${deidentified ? PATIENT_AGE_MONTH : PATIENT_AGE_DAY}=ge${ageMin}`
@@ -247,14 +251,20 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
       deidentified = false //TODO erase this line when deidentified param for encounter is implemented
 
       const ageMin = convertDurationToTimestamp(
-        convertStringToDuration(criterion.age?.[0]) || { year: 0, month: 0, day: 0 }
+        convertStringToDuration(criterion.age?.[0]) || { year: 0, month: 0, day: 0 },
+        deidentified
       )
       const ageMax = convertDurationToTimestamp(
-        convertStringToDuration(criterion.age?.[1]) || { year: 130, month: 0, day: 0 }
+        convertStringToDuration(criterion.age?.[1]) || { year: 130, month: 0, day: 0 },
+        deidentified
       )
 
-      const ageMinCriterion = `${deidentified ? ENCOUNTER_MIN_BIRTHDATE : ENCOUNTER_MIN_BIRTHDATE}=ge${ageMin}`
-      const ageMaxCriterion = `${deidentified ? ENCOUNTER_MAX_BIRTHDATE : ENCOUNTER_MAX_BIRTHDATE}=le${ageMax}`
+      const ageMinCriterion = `${
+        deidentified ? ENCOUNTER_MIN_BIRTHDATE_MONTH : ENCOUNTER_MIN_BIRTHDATE_DAY
+      }=ge${ageMin}`
+      const ageMaxCriterion = `${
+        deidentified ? ENCOUNTER_MAX_BIRTHDATE_MONTH : ENCOUNTER_MAX_BIRTHDATE_DAY
+      }=le${ageMax}`
 
       filterFhir = [
         'subject.active=true',
@@ -873,10 +883,14 @@ export async function unbuildRequest(_json: string): Promise<any> {
               case PATIENT_AGE_MONTH:
                 if (value?.includes('ge')) {
                   const ageMin = value?.replace('ge', '')
-                  currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin))
+                  currentCriterion.age[0] = convertDurationToString(
+                    convertTimestampToDuration(+ageMin, key === PATIENT_AGE_MONTH ? true : false)
+                  )
                 } else if (value?.includes('le')) {
                   const ageMax = value?.replace('le', '')
-                  currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax))
+                  currentCriterion.age[1] = convertDurationToString(
+                    convertTimestampToDuration(+ageMax, key === PATIENT_AGE_MONTH ? true : false)
+                  )
                 }
                 break
               case PATIENT_BIRTHDATE: {
@@ -970,14 +984,20 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 }
                 break
               }
-              case ENCOUNTER_MIN_BIRTHDATE: {
+              case ENCOUNTER_MIN_BIRTHDATE_DAY:
+              case ENCOUNTER_MIN_BIRTHDATE_MONTH: {
                 const ageMin = value?.replace('ge', '')
-                currentCriterion.age[0] = convertDurationToString(convertTimestampToDuration(+ageMin))
+                currentCriterion.age[0] = convertDurationToString(
+                  convertTimestampToDuration(+ageMin, key === ENCOUNTER_MIN_BIRTHDATE_MONTH ? true : false)
+                )
                 break
               }
-              case ENCOUNTER_MAX_BIRTHDATE: {
+              case ENCOUNTER_MAX_BIRTHDATE_DAY:
+              case ENCOUNTER_MAX_BIRTHDATE_MONTH: {
                 const ageMax = value?.replace('le', '')
-                currentCriterion.age[1] = convertDurationToString(convertTimestampToDuration(+ageMax))
+                currentCriterion.age[1] = convertDurationToString(
+                  convertTimestampToDuration(+ageMax, key === ENCOUNTER_MAX_BIRTHDATE_MONTH ? true : false)
+                )
                 break
               }
               case ENCOUNTER_ENTRYMODE: {
