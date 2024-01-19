@@ -302,11 +302,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         labels.push(
           getLabelFromCriteriaObject(criteriaState, selectedCriteria.code, CriteriaDataKey.BIOLOGY_DATA, type)
         )
-      if (
-        selectedCriteria.valueComparator &&
-        selectedCriteria.searchByValue[0] !== null &&
-        selectedCriteria.searchByValue[1] !== null
-      )
+      if (selectedCriteria.valueComparator && selectedCriteria.searchByValue[0] !== null)
         labels.push(getBiologyValuesLabel(selectedCriteria.valueComparator, selectedCriteria.searchByValue))
       break
 
