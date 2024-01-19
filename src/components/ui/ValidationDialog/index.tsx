@@ -26,7 +26,7 @@ const ValidationDialog: React.FC<ValidationDialogProps> = ({ open, onClose, mess
             <Typography style={{ marginTop: 16 }}>Envoi en cours ...</Typography>
           </Grid>
         )}
-        {loading === LoadingStatus.SUCCESS && error && (
+        {loading === LoadingStatus.IDDLE && error && (
           <>
             <WarningIcon htmlColor="#FF9800" style={{ fontSize: 52 }} />
             <Typography className={classes.typographyMargin}>

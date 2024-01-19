@@ -64,7 +64,7 @@ const ControlPanel: React.FC<{
     },
     [setShareSuccessOrFailMessage]
   )
-  const [reportLoading, setReportLoading] = useState<LoadingStatus>(LoadingStatus.SUCCESS)
+  const [reportLoading, setReportLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
   const [reportError, setReportError] = useState(false)
   const [openReportConfirmation, setOpenReportConfirmation] = useState<boolean>(false)
 
@@ -187,7 +187,7 @@ const ControlPanel: React.FC<{
       }
       setReportLoading(LoadingStatus.SUCCESS)
     } catch (error) {
-      setReportLoading(LoadingStatus.SUCCESS)
+      setReportLoading(LoadingStatus.IDDLE)
       setReportError(true)
       console.log(error)
     }
