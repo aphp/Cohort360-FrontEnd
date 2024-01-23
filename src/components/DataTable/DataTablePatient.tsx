@@ -114,17 +114,34 @@ const DataTablePatientLine: React.FC<{
         )}
       </TableCellWrapper>
       <TableCellWrapper align="left">
-        {deidentified ? 'Prénom' : capitalizeFirstLetter(patient.name?.[0].given?.[0])}
+        {deidentified
+          ? 'Prénom'
+          : patient.name?.[0].given?.[0]
+          ? capitalizeFirstLetter(patient.name?.[0].given?.[0])
+          : 'Non renseigné'}
       </TableCellWrapper>
       <TableCellWrapper align="left">
-        {deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ')}
+        {deidentified
+          ? 'Nom'
+          : patient.name
+              ?.map((e) => {
+                if (e.use === 'official') {
+                  return e.family ?? 'Non renseigné'
+                }
+                if (e.use === 'maiden') {
+                  return `(${patient.gender === 'female' ? 'née' : 'né'} : ${e.family})` ?? 'Non renseigné'
+                }
+              })
+              .join(' ') ?? 'Non renseigné'}
       </TableCellWrapper>
       <TableCellWrapper>
         {deidentified ? (
           <Typography>{getAge(patient)}</Typography>
         ) : (
           <>
-            <Typography>{moment(patient.birthDate).format('DD/MM/YYYY')}</Typography>
+            <Typography>
+              {patient.birthDate ? moment(patient.birthDate).format('DD/MM/YYYY') : 'Non renseigné'}
+            </Typography>
             <Typography>{`(${getAge(patient)})`}</Typography>
           </>
         )}
