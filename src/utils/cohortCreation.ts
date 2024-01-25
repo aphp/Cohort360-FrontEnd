@@ -982,6 +982,8 @@ export async function unbuildRequest(_json: string): Promise<any> {
         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
         currentCriterion.encounterService = []
+        currentCriterion.searchByValue = [null, null]
+        currentCriterion.valueComparator = Comparators.GREATER_OR_EQUAL
 
         unbuildAdvancedCriterias(element, currentCriterion)
 
