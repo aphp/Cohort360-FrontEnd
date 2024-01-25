@@ -12,10 +12,13 @@ import MedicationForm from './DiagramView/components/LogicalOperator/components/
 import BiologyForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/BiologyForm'
 import DemographicForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicForm'
 import ImagingForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/ImagingForm'
+import PregnantForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/PregnantForm'
+import HospitForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/HospitForm'
 
 import services from 'services/aphp'
 
 import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION } from '../../constants'
+import { RessourceType } from 'types/requestCriterias'
 
 // ├── Mes requêtes
 // ├── Liste d'IPP
@@ -31,6 +34,10 @@ import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION } from '../../constants'
 // ├── Biologie/Microbiologie
 // │   ├── Biologie
 // │   ├── Microbiologie
+// ├── Dossiers de spécialité
+// |   ├── Maternité
+// |   |   ├── Fiche Grossesse
+// |   |   ├── Hospitalisation
 // ├── Imagerie
 // ├── Physiologie
 
@@ -165,6 +172,80 @@ const criteriaList: CriteriaItemType[] = [
         color: '#808080',
         fontWeight: 'normal',
         disabled: true
+      }
+    ]
+  },
+  {
+    id: 'Speciality',
+    title: 'Dossiers de spécialité',
+    color: '#0063AF',
+    fontWeight: 'bold',
+    components: null,
+    subItems: [
+      {
+        id: 'Maternity',
+        title: 'Maternité',
+        components: null,
+        color: '#0063AF',
+        fontWeight: 'normal',
+        subItems: [
+          {
+            id: RessourceType.PREGNANCY,
+            title: 'Fiche Grossesse',
+            color: '#0063AF',
+            fontWeight: 'normal',
+            disabled: false,
+            components: PregnantForm,
+            fetch: {
+              pregnancyMode: services.cohortCreation.fetchPregnancyMode,
+              maternalRisks: services.cohortCreation.fetchMaternalRisks,
+              risksRelatedToObstetricHistory: services.cohortCreation.fetchRisksRelatedToObstetricHistory,
+              risksOrComplicationsOfPregnancy: services.cohortCreation.fetchRisksOrComplicationsOfPregnancy,
+              corticotherapie: services.cohortCreation.fetchCorticotherapie,
+              prenatalDiagnosis: services.cohortCreation.fetchPrenatalDiagnosis,
+              ultrasoundMonitoring: services.cohortCreation.fetchUltrasoundMonitoring
+            }
+          },
+          {
+            id: 'Hospit',
+            title: 'Hospitalisation',
+            color: '#0063AF',
+            fontWeight: 'normal',
+            disabled: false,
+            components: HospitForm,
+            fetch: {
+              inUteroTransfer: services.cohortCreation.fetchInUteroTransfer,
+              pregnancyMonitoring: services.cohortCreation.fetchPregnancyMonitoring,
+              maturationCorticotherapie: services.cohortCreation.fetchMaturationCorticotherapie,
+              chirurgicalGesture: services.cohortCreation.fetchChirurgicalGesture,
+              vme: services.cohortCreation.fetchVme,
+              childbirth: services.cohortCreation.fetchChildbirth,
+              hospitalChildBirthPlace: services.cohortCreation.fetchHospitalChildBirthPlace,
+              otherHospitalChildBirthPlace: services.cohortCreation.fetchOtherHospitalChildBirthPlace,
+              homeChildBirthPlace: services.cohortCreation.fetchHomeChildBirthPlace,
+              childbirthMode: services.cohortCreation.fetchChildbirthMode,
+              maturationReason: services.cohortCreation.fetchMaturationReason,
+              maturationModality: services.cohortCreation.fetchMaturationModality,
+              imgIndication: services.cohortCreation.fetchImgIndication,
+              laborOrCesareanEntry: services.cohortCreation.fetchLaborOrCesareanEntry,
+              pathologyDuringLabor: services.cohortCreation.fetchPathologyDuringLabor,
+              obstetricalGestureDuringLabor: services.cohortCreation.fetchObstetricalGestureDuringLabor,
+              analgesieType: services.cohortCreation.fetchAnalgesieType,
+              birthDeliveryWay: services.cohortCreation.fetchBirthDeliveryWay,
+              instrumentType: services.cohortCreation.fetchInstrumentType,
+              cSectionModality: services.cohortCreation.fetchCSectionModality,
+              presentationAtDelivery: services.cohortCreation.fetchPresentationAtDelivery,
+              birthStatus: services.cohortCreation.fetchBirthStatus,
+              postpartumHemorrhage: services.cohortCreation.fetchSetPostpartumHemorrhage,
+              conditionPerineum: services.cohortCreation.fetchConditionPerineum,
+              exitPlaceType: services.cohortCreation.fetchExitPlaceType,
+              feedingType: services.cohortCreation.fetchFeedingType,
+              complication: services.cohortCreation.fetchComplication,
+              exitFeedingMode: services.cohortCreation.fetchExitFeedingMode,
+              exitDiagnostic: services.cohortCreation.fetchExitDiagnostic
+            }
+          }
+        ]
       }
     ]
   },

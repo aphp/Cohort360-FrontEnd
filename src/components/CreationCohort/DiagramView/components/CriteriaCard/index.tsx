@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import { IconButton, Typography, Grid } from '@mui/material'
+import { IconButton, Typography, Grid, useMediaQuery } from '@mui/material'
 
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
@@ -17,6 +17,7 @@ import useStyles from './styles'
 import { criteriasAsArray } from 'utils/requestCriterias'
 import { ChipWrapper } from 'components/ui/Chip/styles'
 import { SelectedCriteriaType } from 'types/requestCriterias'
+import theme from 'theme'
 
 type CriteriaCardProps = {
   criterion: SelectedCriteriaType
@@ -36,6 +37,7 @@ const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriter
 
   const containerRef = useRef<HTMLDivElement>(null)
   const childrenRef = useRef<HTMLDivElement>(null)
+  const isXl = useMediaQuery(theme.breakpoints.up('xl'))
 
   useEffect(() => {
     const containerHeight = containerRef.current?.clientHeight || 0
@@ -51,11 +53,23 @@ const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriter
       className={classes.criteriaItem}
       style={{ backgroundColor: criterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
     >
-      <Grid container alignItems="center" item xs={7} xl={3} padding={'5px'}>
-        <AvatarWrapper size={20}>{criterion.id}</AvatarWrapper>
-        <Typography className={classes.title} fontWeight={700}>
-          {criterion.title} :
-        </Typography>
+      <Grid
+        container
+        alignItems="center"
+        item
+        xs={7}
+        xl={3}
+        padding={'5px'}
+        justifyContent={isXl ? 'space-around' : 'flex-start'}
+      >
+        <Grid container item xs={1} justifyContent={'center'}>
+          <AvatarWrapper size={20}>{criterion.id}</AvatarWrapper>
+        </Grid>
+        <Grid container item xs={10}>
+          <Typography className={classes.title} fontWeight={700}>
+            {criterion.title} :
+          </Typography>
+        </Grid>
       </Grid>
       <Grid
         container

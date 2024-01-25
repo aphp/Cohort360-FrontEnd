@@ -22,11 +22,9 @@ const TemporalConstraint: React.FC = () => {
     selectedCriteria
   } = useAppSelector((state) => state.cohortCreation.request)
 
-  const findInitialStateRadio = temporalConstraints.find(({ idList }) => idList[0] === 'All')
-  const temporalConstraintsNumber =
-    findInitialStateRadio?.constraintType === TemporalConstraintsKind.NONE
-      ? temporalConstraints.length - 1
-      : temporalConstraints.length
+  const temporalConstraintsNumber = temporalConstraints.filter(
+    (constraint) => constraint.constraintType !== TemporalConstraintsKind.NONE
+  ).length
 
   const dispatch = useAppDispatch()
   const { classes } = useStyles()

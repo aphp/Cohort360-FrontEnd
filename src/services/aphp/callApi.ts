@@ -34,6 +34,8 @@ import {
   ParametersParameter,
   Patient,
   Procedure,
+  Questionnaire,
+  QuestionnaireResponse,
   ValueSet
 } from 'fhir/r4'
 import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
@@ -876,6 +878,52 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
     {
       signal: signal
     }
+  )
+
+  return response
+}
+
+type fetchFormsProps = {
+  patient?: string
+  formName?: string
+  _list?: string[]
+  startDate?: string | null
+  endDate?: string | null
+  executiveUnits?: string[]
+}
+export const fetchForms = async (args: fetchFormsProps) => {
+  const { patient, formName, _list, startDate, endDate, executiveUnits } = args
+  let options: string[] = []
+  if (patient) options = [...options, `subject=${patient}`]
+  if (formName) options = [...options, `questionnaire.name=${formName}`]
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
+  if (startDate) options = [...options, `authored=ge${startDate}`]
+  if (endDate) options = [...options, `authored=le${endDate}`]
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
+
+  const response = await apiFhir.get<FHIR_Bundle_Response<QuestionnaireResponse>>(
+    `/QuestionnaireResponse?${options.reduce(paramsReducer)}`
+  )
+
+  return response
+}
+
+type fetchQuestionnairesProps = {
+  name?: string
+  _elements?: string[]
+}
+export const fetchQuestionnaires = async (args: fetchQuestionnairesProps) => {
+  const { name } = args
+  let { _elements } = args
+  _elements = _elements ? _elements.filter(uniq) : []
+
+  let options: string[] = []
+  if (name) options = [...options, `name=${name}`]
+  if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer, '')}`]
+
+  const response = await apiFhir.get<FHIR_Bundle_Response<Questionnaire>>(
+    `/Questionnaire?${options.reduce(paramsReducer)}`
   )
 
   return response

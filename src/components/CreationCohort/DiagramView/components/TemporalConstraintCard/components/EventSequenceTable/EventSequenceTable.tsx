@@ -17,7 +17,7 @@ import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import { useAppSelector } from 'state'
 
-import { TemporalConstraintsKind, TemporalConstraintsType } from 'types'
+import { TemporalConstraintsType } from 'types'
 
 import useStyles from './styles'
 
@@ -85,7 +85,7 @@ const EventSequenceTable: React.FC<{
     const minDuration = temporalConstraint.timeRelationMinDuration
     let nonZeroMinDuration: { keys?: string; values?: number } = {}
 
-    if (temporalConstraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING && minDuration) {
+    if (minDuration) {
       for (const [key, value] of Object.entries(minDuration)) {
         if (value !== 0) {
           const keys = durationMeasurementInFrench(key)
@@ -104,7 +104,7 @@ const EventSequenceTable: React.FC<{
     const maxDuration = temporalConstraint.timeRelationMaxDuration
     let nonZeroMaxDuration: { keys?: string; values?: number } = {}
 
-    if (temporalConstraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING && maxDuration) {
+    if (maxDuration) {
       for (const [key, value] of Object.entries(maxDuration)) {
         if (value !== 0) {
           const keys = durationMeasurementInFrench(key)
@@ -120,7 +120,7 @@ const EventSequenceTable: React.FC<{
   }
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} style={{ marginBottom: '1em' }}>
       <Table className={classes.table}>
         <TableHead>
           <TableRow className={classes.tableHead}>
@@ -132,10 +132,7 @@ const EventSequenceTable: React.FC<{
           </TableRow>
         </TableHead>
         <TableBody>
-          {!temporalConstraints ||
-          temporalConstraints.filter(
-            (constraints) => constraints.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING
-          ).length === 0 ? (
+          {!temporalConstraints || temporalConstraints.length === 0 ? (
             <TableRow>
               <TableCellWrapper colSpan={7}>
                 <Typography className={classes.loadingSpinnerContainer}>
@@ -150,33 +147,31 @@ const EventSequenceTable: React.FC<{
               const minDuration = storeNonZeroMinDuration(temporalConstraint)
               const maxDuration = storeNonZeroMaxDuration(temporalConstraint)
               return (
-                temporalConstraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING && (
-                  <TableRow key={index} className={classes.tableBodyRows} hover>
-                    <TableCellWrapper className={classes.flexCenter}>
-                      <AvatarWrapper>{temporalConstraint.idList[0]}</AvatarWrapper>
-                      <Typography style={{ width: 'fit-content', marginLeft: 4 }}> - {criteriaTitle1}</Typography>
-                    </TableCellWrapper>
-                    <TableCellWrapper>s'est produit avant</TableCellWrapper>
-                    <TableCellWrapper className={classes.flexCenter}>
-                      <AvatarWrapper>{temporalConstraint.idList[1]}</AvatarWrapper>
-                      <Typography style={{ width: 'fit-content', marginLeft: 4 }}> - {criteriaTitle2}</Typography>
-                    </TableCellWrapper>
-                    <TableCellWrapper>{`${minDuration.values ?? '-'} ${minDuration.keys ?? ''}`}</TableCellWrapper>
-                    <TableCellWrapper>{`${maxDuration.values ?? '-'} ${maxDuration.keys ?? ''}`}</TableCellWrapper>
-                    <TableCellWrapper>
-                      <Tooltip title="Supprimer la séquence temporelle" style={{ padding: '0 12px' }}>
-                        <IconButton
-                          onClick={(event) => {
-                            event.stopPropagation()
-                            onDeleteTemporalConstraint(temporalConstraint)
-                          }}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCellWrapper>
-                  </TableRow>
-                )
+                <TableRow key={index} className={classes.tableBodyRows} hover>
+                  <TableCellWrapper className={classes.flexCenter}>
+                    <AvatarWrapper>{temporalConstraint.idList[0]}</AvatarWrapper>
+                    <Typography style={{ width: 'fit-content', marginLeft: 4 }}> - {criteriaTitle1}</Typography>
+                  </TableCellWrapper>
+                  <TableCellWrapper>s'est produit avant</TableCellWrapper>
+                  <TableCellWrapper className={classes.flexCenter}>
+                    <AvatarWrapper>{temporalConstraint.idList[1]}</AvatarWrapper>
+                    <Typography style={{ width: 'fit-content', marginLeft: 4 }}> - {criteriaTitle2}</Typography>
+                  </TableCellWrapper>
+                  <TableCellWrapper>{`${minDuration.values ?? '-'} ${minDuration.keys ?? ''}`}</TableCellWrapper>
+                  <TableCellWrapper>{`${maxDuration.values ?? '-'} ${maxDuration.keys ?? ''}`}</TableCellWrapper>
+                  <TableCellWrapper>
+                    <Tooltip title="Supprimer la séquence temporelle" style={{ padding: '0 12px' }}>
+                      <IconButton
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          onDeleteTemporalConstraint(temporalConstraint)
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCellWrapper>
+                </TableRow>
               )
             })
           )}

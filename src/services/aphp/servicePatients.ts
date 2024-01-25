@@ -24,7 +24,9 @@ import {
   deleteFilters,
   patchFilters,
   deleteFilter,
-  fetchPerimeterFromId
+  fetchPerimeterFromId,
+  fetchForms,
+  fetchQuestionnaires
 } from './callApi'
 
 import servicesPerimeters from './servicePerimeters'
@@ -40,9 +42,11 @@ import {
   MedicationRequest,
   Observation,
   Patient,
-  Procedure
+  Procedure,
+  Questionnaire,
+  QuestionnaireResponse
 } from 'fhir/r4'
-import { Direction, Filters, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
+import { Direction, Filters, FormNames, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
 import { RessourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
 
@@ -234,7 +238,6 @@ export interface IServicePatients {
    **   - orderDirection: permet le tri dans l'ordre croissant ou décroissant
    **   - page: permet la pagination des éléments
    **   - patientId: identifiant technique d'un patient
-   **   - deidentified: permet certaines anonymisations de la donnée
    **   - nda: permet de filtrer sur un NDA précis
    **   - searchInput (optionnel): permet la recherche textuelle
    **   - startDate: (optionnel) permet le filtre par date
@@ -264,6 +267,38 @@ export interface IServicePatients {
     imagingList: ImagingStudy[]
     imagingTotal: number
   }>
+
+  /*
+   ** Cette fonction permet de récupérer les formulaires liés à un patient
+   **
+   ** Arguments:
+   **   - patientId: identifiant technique d'un patient
+   **   - formName: permet de requêter le bon type de formulaire
+   **   - groupId: (optionnel) périmètre auquel le patient est lié
+   **   - episodeOfCare: (optionnel) permet de requêter les formulaires liés à un certain épisode de soin
+   **   - startDate: (optionnel) permet le filtre par date
+   **   - endDate: (optionnel) permet le filtre par date
+   **   - executiveUnits: (optionnel) permet de filtrer par unité exécutrice
+   **
+   ** Retour:
+   **   - formsList: liste des formulaires liés à un patient
+   */
+  fetchMaternityForms: (
+    patientId: string,
+    formName: string,
+    groupId?: string,
+    startDate?: string | null,
+    endDate?: string | null,
+    executiveUnits?: string[]
+  ) => Promise<QuestionnaireResponse[]>
+
+  /*
+   ** Cette fonction permet de récupérer les ids des formulaires de maternité
+   **
+   ** Retour:
+   **   - questionnairesList: liste des ids des formulaires de maternité
+   */
+  fetchMaternityFormNamesIds: () => Promise<Questionnaire[]>
 
   /*
    ** Cette fonction permet de récupérer les élèments de Composition lié à un patient
@@ -658,6 +693,33 @@ const servicesPatients: IServicePatients = {
       imagingList: getApiResponseResources(imagingResp) ?? [],
       imagingTotal: imagingTotal ?? 0
     }
+  },
+
+  fetchMaternityForms: async (
+    patientId: string,
+    formName: string,
+    groupId?: string,
+    startDate?: string | null,
+    endDate?: string | null,
+    executiveUnits?: string[]
+  ) => {
+    const formsResp = await fetchForms({
+      patient: patientId,
+      formName,
+      _list: groupId ? [groupId] : [],
+      startDate,
+      endDate,
+      executiveUnits
+    })
+
+    return getApiResponseResources(formsResp) ?? []
+  },
+
+  fetchMaternityFormNamesIds: async () => {
+    const maternityFormNames = `${FormNames.PREGNANCY},${FormNames.HOSPIT}`
+    const questionnaireList = await fetchQuestionnaires({ name: maternityFormNames, _elements: ['id', 'name'] })
+
+    return getApiResponseResources(questionnaireList) ?? []
   },
 
   fetchDocuments: async (
