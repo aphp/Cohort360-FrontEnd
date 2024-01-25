@@ -18,7 +18,13 @@ import {
   fetchMedicationAdministration,
   fetchObservation,
   fetchImaging,
-  fetchPerimeterFromCohortId
+  fetchPerimeterFromCohortId,
+  postFilters,
+  getFilters,
+  deleteFilters,
+  patchFilters,
+  deleteFilter,
+  fetchPerimeterFromId
 } from './callApi'
 
 import servicesPerimeters from './servicePerimeters'
@@ -36,8 +42,10 @@ import {
   Patient,
   Procedure
 } from 'fhir/r4'
-import { Direction, Order, SearchByTypes } from 'types/searchCriterias'
+import { Direction, Filters, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
 import { Medication, PMSI } from 'types/patient'
+import { RessourceType } from 'types/requestCriterias'
+import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
 
 export interface IServicePatients {
   /*
@@ -822,4 +830,63 @@ export const getEncounterDocuments = async (
   }
 
   return _encounters
+}
+
+export const postFiltersService = async (
+  fhir_resource: RessourceType,
+  name: string,
+  criterias: SearchCriterias<Filters>,
+  deidentified: boolean
+) => {
+  const criteriasString = mapSearchCriteriasToRequestParams(criterias, deidentified)
+  const response = await postFilters(fhir_resource, name, criteriasString)
+
+  return response.data
+}
+
+export const getFiltersService = async (fhir_resource: RessourceType, next?: string | null) => {
+  const LIMIT = 10
+  const OFFSET = 0
+  try {
+    const response = await getFilters(fhir_resource, LIMIT, OFFSET, next)
+    return response.data
+  } catch {
+    throw "Les filtres sauvegardés n'ont pas pu être récupérés."
+  }
+}
+
+export const deleteFilterService = async (fhir_resource_uuid: string) => {
+  try {
+    const response = await deleteFilter(fhir_resource_uuid)
+    return response
+  } catch {
+    throw "Le filtre n'a pas pu être supprimé."
+  }
+}
+
+export const deleteFiltersService = async (fhir_resource_uuids: string[]) => {
+  try {
+    const response = await deleteFilters(fhir_resource_uuids)
+    return response
+  } catch {
+    throw "Les filtres n'ont pas pu être supprimés."
+  }
+}
+
+export const patchFiltersService = async (
+  fhir_resource: RessourceType,
+  uuid: string,
+  name: string,
+  criterias: SearchCriterias<Filters>,
+  deidentified: boolean
+) => {
+  const criteriasString = mapSearchCriteriasToRequestParams(criterias, deidentified)
+  const response = await patchFilters(fhir_resource, uuid, name, criteriasString)
+
+  return response
+}
+
+export const fetchPerimeterFromPerimeterId = async (perimeterId: string) => {
+  const response = await fetchPerimeterFromId(perimeterId)
+  return response.data
 }

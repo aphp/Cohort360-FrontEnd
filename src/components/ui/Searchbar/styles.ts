@@ -1,14 +1,14 @@
 import { styled } from '@mui/material/styles'
 
 type CustomProps = {
-  wrap?: boolean
+  wrapped?: boolean
   width?: string
   error?: boolean
 }
 
-export const SearchbarWrapper = styled('div')<CustomProps>(({ wrap }) => ({
+export const SearchbarWrapper = styled('div')<CustomProps>(({ wrapped }) => ({
   display: 'flex',
-  flexWrap: wrap ? 'wrap' : 'wrap-reverse',
+  flexWrap: wrapped ? 'wrap' : 'wrap-reverse',
   justifyContent: 'space-between',
   alignItems: 'end'
 }))

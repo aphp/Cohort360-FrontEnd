@@ -8,11 +8,17 @@ type BirthdatesRangesFilterProps = {
   value: DurationRangeType
   name: string
   deidentified?: boolean
+  disabled?: boolean
 }
 
-const BirthdatesRangesFilter = ({ name, value, deidentified = false }: BirthdatesRangesFilterProps) => {
+const BirthdatesRangesFilter = ({
+  name,
+  value,
+  deidentified = false,
+  disabled = false
+}: BirthdatesRangesFilterProps) => {
   const context = useContext(FormContext)
-  const [birthdatesRanges, setBirthdatesRanges] = useState(value)
+  const [birthdatesRanges, setBirthdatesRanges] = useState(value.map((date) => date) as DurationRangeType)
 
   const onError = (isError: boolean) => {
     if (context?.updateError) context?.updateError(isError)
@@ -25,6 +31,7 @@ const BirthdatesRangesFilter = ({ name, value, deidentified = false }: Birthdate
   return (
     <InputWrapper>
       <DurationRange
+        disabled={disabled}
         deidentified={deidentified}
         label="Âge"
         onError={onError}

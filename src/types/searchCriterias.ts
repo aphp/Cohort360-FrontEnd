@@ -1,6 +1,7 @@
 import { ScopeTreeRow, SimpleCodeType, ValueSet, ValueSetSystem } from 'types'
 import { PatientTableLabels } from './patient'
 import { CohortsType } from './cohorts'
+import { RessourceType } from './requestCriterias'
 
 export enum GenderStatus {
   MALE = 'MALE',
@@ -8,6 +9,14 @@ export enum GenderStatus {
   OTHER = 'OTHER',
   UNKNOWN = 'UNKNOWN',
   OTHER_UNKNOWN = 'OTHER_UNKNOWN'
+}
+export enum GenderCodes {
+  MALE = 'm',
+  FEMALE = 'f',
+  OTHER = 'a',
+  UNKNOWN = 'INCONNU',
+  UNDETERMINED = 'i',
+  NOT_SPECIFIED = 'NON RENSEIGNE'
 }
 export enum GenderStatusLabel {
   MALE = 'Hommes',
@@ -38,8 +47,7 @@ export enum VitalStatusOptionsLabel {
 
 export enum VitalStatus {
   ALIVE = 'ALIVE',
-  DECEASED = 'DECEASED',
-  ALL = 'ALL'
+  DECEASED = 'DECEASED'
 }
 
 export enum Direction {
@@ -74,7 +82,8 @@ export enum Order {
   MODALITY = 'modality',
   DESCRIPTION = 'description',
   PROCEDURE = 'procedureCode',
-  STUDY_DATE = 'started'
+  STUDY_DATE = 'started',
+  CREATED_AT = 'created_at'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -108,6 +117,7 @@ export enum FilterKeys {
   DIAGNOSTIC_TYPES = 'diagnosticTypes',
   START_DATE = 'startDate',
   END_DATE = 'endDate',
+  ONLY_PDF_AVAILABLE = 'onlyPdfAvailable',
   SOURCE = 'source',
   EXECUTIVE_UNITS = 'executiveUnits',
   DOC_TYPES = 'docTypes',
@@ -142,7 +152,7 @@ export type LabelObject = {
   label: string
   system?: ValueSetSystem
 }
-export type OrderBy = {
+export interface OrderBy {
   orderBy: Order
   orderDirection: Direction
 }
@@ -182,7 +192,7 @@ export interface PatientsFilters {
   vitalStatuses: VitalStatus[]
 }
 
-export type PMSIFilters = {
+export interface PMSIFilters {
   nda: string
   diagnosticTypes: LabelObject[]
   code: string
@@ -192,7 +202,7 @@ export type PMSIFilters = {
   source: string
 }
 
-export type MedicationFilters = {
+export interface MedicationFilters {
   nda: string
   prescriptionTypes: LabelObject[]
   administrationRoutes: LabelObject[]
@@ -201,7 +211,7 @@ export type MedicationFilters = {
   executiveUnits: ScopeTreeRow[]
 }
 
-export type BiologyFilters = {
+export interface BiologyFilters {
   nda: string
   loinc: string
   anabio: string
@@ -211,7 +221,7 @@ export type BiologyFilters = {
   validatedStatus: boolean
 }
 
-export type ImagingFilters = {
+export interface ImagingFilters {
   ipp?: string
   nda: string
   startDate: string | null
@@ -220,7 +230,7 @@ export type ImagingFilters = {
   modality: LabelObject[]
 }
 
-export type PatientDocumentsFilters = {
+export interface PatientDocumentsFilters {
   nda: string
   docTypes: SimpleCodeType[]
   onlyPdfAvailable: boolean
@@ -229,7 +239,7 @@ export type PatientDocumentsFilters = {
   executiveUnits: ScopeTreeRow[]
 }
 
-export type AllDocumentsFilters = {
+export interface AllDocumentsFilters {
   nda: string
   ipp: string
   docTypes: SimpleCodeType[]
@@ -238,7 +248,7 @@ export type AllDocumentsFilters = {
   endDate: string | null
   executiveUnits: ScopeTreeRow[]
 }
-export type CohortsFilters = {
+export interface CohortsFilters {
   status: ValueSet[]
   favorite: CohortsType
   minPatients: null | string
@@ -247,14 +257,14 @@ export type CohortsFilters = {
   endDate: null | string
 }
 
-export type SearchCriterias<F> = {
+export interface SearchCriterias<F> {
   searchBy?: SearchBy
   searchInput: SearchInput
   orderBy: OrderBy
   filters: F
 }
 
-export type Action<T, P> = {
+export interface Action<T, P> {
   type: T
   payload: P
 }
@@ -355,3 +365,23 @@ export const orderDirection = [
     label: DirectionLabel.DESC
   }
 ]
+
+export type SavedFilter = {
+  created_at: string
+  deleted: string
+  deleted_by_cascade: boolean
+  fhir_resource: RessourceType
+  fhir_version: string
+  filter: string
+  modified_at: string
+  name: string
+  owner: string
+  uuid: string
+}
+
+export type SavedFiltersResults = {
+  count: number
+  next: string | null
+  previous: string | null
+  results: SavedFilter[]
+}

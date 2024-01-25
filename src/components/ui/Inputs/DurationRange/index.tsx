@@ -57,9 +57,7 @@ const DurationRange: React.FC<DurationRangeProps> = ({
     <BlockWrapper>
       {label && (
         <BlockWrapper margin="0px 0px 10px 0px">
-          <DurationLabel variant="h3" disabled={disabled}>
-            {label} :
-          </DurationLabel>
+          <DurationLabel variant="h3">{label} :</DurationLabel>
         </BlockWrapper>
       )}
       <BlockWrapper margin="0px 0px 10px 0px">

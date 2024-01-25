@@ -8,9 +8,10 @@ import { isChecked, toggleFilter } from 'utils/filters'
 type VitalStatusesFilterProps = {
   value: VitalStatus[]
   name: string
+  disabled?: boolean
 }
 
-const VitalStatusesFilter = ({ name, value }: VitalStatusesFilterProps) => {
+const VitalStatusesFilter = ({ name, value, disabled = false }: VitalStatusesFilterProps) => {
   const context = useContext(FormContext)
   const [vitalStatuses, setVitalStatuses] = useState(value)
 
@@ -28,12 +29,14 @@ const VitalStatusesFilter = ({ name, value }: VitalStatusesFilterProps) => {
         row
       >
         <FormControlLabel
+          disabled={disabled}
           checked={isChecked(VitalStatus.ALIVE, vitalStatuses)}
           value={VitalStatus.ALIVE}
           control={<Checkbox color="secondary" />}
           label="Patients vivants"
         />
         <FormControlLabel
+          disabled={disabled}
           checked={isChecked(VitalStatus.DECEASED, vitalStatuses)}
           value={VitalStatus.DECEASED}
           control={<Checkbox color="secondary" />}

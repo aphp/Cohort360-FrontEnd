@@ -129,7 +129,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
       <BlockWrapper item xs={12} margin={'20px 0px 10px'}>
         <Searchbar>
           <Select
-            selectedValue={searchBy || SearchByTypes.TEXT}
+            value={searchBy || SearchByTypes.TEXT}
             label="Rechercher dans :"
             width={'170px'}
             items={searchByListDocuments}
