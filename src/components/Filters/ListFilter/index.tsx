@@ -5,7 +5,6 @@ import Button from 'components/ui/Button'
 import { DeleteOutline } from '@mui/icons-material'
 import { Grid, Typography } from '@mui/material'
 import { useAppSelector } from 'state'
-import { MeState } from 'state/me'
 import { Item } from 'components/ui/List/ListItem'
 import List from 'components/ui/List'
 
@@ -40,7 +39,7 @@ const ListFilter = ({
   const [allElements, setAllElements] = useState<Item[]>([])
   const [mode, setMode] = useState(Mode.SINGLE)
 
-  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
+  const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
 
   const handleDeleteSelectedElements = async (): Promise<void> => {

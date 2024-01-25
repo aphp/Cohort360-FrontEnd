@@ -3,7 +3,6 @@ import { ListItemText, Radio, Typography, ListItemIcon, Checkbox, IconButton, To
 import { ListItemWrapper } from './styles'
 import { Edit, Visibility } from '@mui/icons-material'
 import { useAppSelector } from 'state'
-import { MeState } from 'state/me'
 
 export type Item = {
   id: string
@@ -21,7 +20,7 @@ type ListItemProps = {
 }
 
 const ListItem = ({ item, multiple = false, disabled = false, onclick, onEyeClick, onPencilClick }: ListItemProps) => {
-  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
+  const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
 
   const [editTooltipOpen, setEditTooltipOpen] = useState(false)

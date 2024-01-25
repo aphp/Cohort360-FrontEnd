@@ -48,7 +48,6 @@ import GendersFilter from 'components/Filters/GendersFilter'
 import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter'
 import TextInput from 'components/Filters/TextInput'
 import { useAppSelector } from 'state'
-import { MeState } from 'state/me'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { RessourceType } from 'types/requestCriterias'
 import ListFilter from 'components/Filters/ListFilter'
@@ -91,7 +90,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
 
-  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
+  const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
 
   const [

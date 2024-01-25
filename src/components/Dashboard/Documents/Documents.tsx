@@ -42,7 +42,6 @@ import NdaFilter from 'components/Filters/NdaFilter'
 import { RessourceType } from 'types/requestCriterias'
 import { Save, SavedSearch } from '@mui/icons-material'
 import { useAppSelector } from 'state'
-import { MeState } from 'state/me'
 import ListFilter from 'components/Filters/ListFilter'
 import TextInput from 'components/Filters/TextInput'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
@@ -85,7 +84,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
 
-  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
+  const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
 
   const [
