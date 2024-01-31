@@ -113,6 +113,8 @@ const IMAGING_SERIES_PROTOCOL = 'series-protocol'
 const IMAGING_SERIES_MODALITIES = 'series-modality'
 const IMAGING_SERIES_UID = 'series'
 
+export const PREGNANCY_FORM_NAME = 'aphp-sdc-fiche-grossesse'
+
 // const HOSPIT_HOSPIT_REASON = 'F_MATER_004051'
 // const HOSPIT_IN_UTERO_TRANSFER = 'F_MATER_004056'
 // const HOSPIT_PREGNANCY_MONITORING = 'F_MATER_004062'
@@ -426,7 +428,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.PREGNANCY:
       filterFhir = [
         'subject.active=true',
-        `questionnaire.name='55542'`,
+        `questionnaire.name=${PREGNANCY_FORM_NAME}`,
         questionnaireFiltersBuilders(
           pregnancyForm.pregnancyStartDate,
           buildDateFilter(criterion.pregnancyStartDate, 'ge')
@@ -1333,7 +1335,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
           const cleanedFilters = unbuildQuestionnaireFilters(splittedFilters)
 
           switch (findRessource) {
-            case '55542':
+            case PREGNANCY_FORM_NAME:
               currentCriterion.title = 'Critère de Fiche de grossesse'
               currentCriterion.type = RessourceType.PREGNANCY
               currentCriterion.pregnancyStartDate = null

@@ -219,7 +219,7 @@ export const questionnaireFiltersBuilders = (fhirKey: { id: string; type: string
 
 export const findQuestionnaireRessource = (filters: string[]) => {
   for (const item of filters) {
-    const match = item.match(/questionnaire\.name='([^']*)'/)
+    const match = item.match(/questionnaire\.name=([^']*)/)
     if (match && match[1]) {
       return match[1]
     }
