@@ -31,8 +31,9 @@ export enum RessourceType {
   IMAGING = 'ImagingStudy',
   SPECIALITY = 'Speciality',
   QUESTIONNAIRE = 'Questionnaire',
+  QUESTIONNAIRE_RESPONSE = 'QuestionnaireResponse',
   MATERNITY = 'Maternity',
-  PREGNANCY = 'aphp-sdc-fiche-grossesse',
+  PREGNANCY = 'Pregnancy',
   HOSPIT = 'Hospit'
 }
 

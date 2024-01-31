@@ -440,7 +440,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.PREGNANCY:
       filterFhir = [
         'subject.active=true',
-        `questionnaire.name='${RessourceType.PREGNANCY}'`,
+        `questionnaire.name='55542'`,
         questionnaireFiltersBuilders(PREGNANCY_START_DATE, buildDateFilter(criterion.pregnancyStartDate, 'ge')),
         questionnaireFiltersBuilders(PREGNANCY_END_DATE, buildDateFilter(criterion.pregnancyEndDate, 'le')),
         questionnaireFiltersBuilders(PREGNANCY_MODE, buildLabelObjectFilter(criterion.pregnancyMode)),
@@ -593,7 +593,7 @@ export function buildRequest(
           isInclusive: item.isInclusive ?? true,
           resourceType:
             // item.type === RessourceType.MATERNITY ||
-            item.type === RessourceType.PREGNANCY ? RessourceType.QUESTIONNAIRE : item.type,
+            item.type === RessourceType.PREGNANCY ? RessourceType.QUESTIONNAIRE_RESPONSE : item.type,
           filterFhir: constructFilterFhir(item, deidentified),
           occurrence:
             !(item.type === RessourceType.PATIENT || item.type === RessourceType.IPP_LIST) && item.occurrence
@@ -1334,14 +1334,14 @@ export async function unbuildRequest(_json: string): Promise<any> {
         break
       }
 
-      case RessourceType.QUESTIONNAIRE:
+      case RessourceType.QUESTIONNAIRE_RESPONSE:
         if (element.filterFhir) {
           const splittedFilters = element.filterFhir.split('&')
           const findRessource = findQuestionnaireRessource(splittedFilters)
           const cleanedFilters = unbuildQuestionnaireFilters(splittedFilters)
 
           switch (findRessource) {
-            case RessourceType.PREGNANCY:
+            case '55542':
               currentCriterion.title = 'Critère de Fiche de grossesse'
               currentCriterion.type = RessourceType.PREGNANCY
               currentCriterion.pregnancyStartDate = null

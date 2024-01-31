@@ -24,7 +24,7 @@ export const maternalRisksData = [
     },
     {
         id: '2',
-        label: 'Conduite adictives'
+        label: 'Conduite addictive'
     },
     {
         id: '3',

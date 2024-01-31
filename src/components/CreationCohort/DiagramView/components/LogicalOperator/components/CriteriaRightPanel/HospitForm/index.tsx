@@ -211,6 +211,7 @@ const HospitForm = ({
               onError={(isError) => setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)}
             />
           </BlockWrapper>
+
           <BlockWrapper className={classes.inputItem}>
             <FormLabel component="legend" className={classes.durationLegend}>
               Transfert in utero
@@ -226,6 +227,7 @@ const HospitForm = ({
               renderInput={(params) => <TextField {...params} label="Transfert in utero" />}
             />
           </BlockWrapper>
+
           <BlockWrapper className={classes.inputItem}>
             <FormLabel component="legend" className={classes.durationLegend}>
               Grossesse peu ou pas suivie
@@ -466,7 +468,232 @@ const HospitForm = ({
 
       <BlockWrapper className={classes.inputItem}>
         <Collapse title="ACCOUCHEMENT ET NAISSANCE" value={false}>
-          <TextField>Salut</TextField>
+          <BlockWrapper style={{ margin: '0 2em 1em 0' }}>
+            <FormLabel component="legend" className={classes.durationLegend} style={{ padding: 0 }}>
+              Date/heure de l'accouchement
+            </FormLabel>
+            <CalendarRange
+              inline
+              value={[pregnancyStartDate, pregnancyEndDate]}
+              onChange={([start, end]) => {
+                setPregnancyStartDate(start)
+                setPregnancyEndDate(end)
+              }}
+              onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Accouchement - Terme - Semaines
+            </FormLabel>
+            <OccurenceInput
+              value={parity}
+              comparator={parityComparator}
+              onchange={(newParity, newComparator) => {
+                setParity(newParity)
+                setParityComparator(newComparator)
+              }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Accouchement - Terme - Jours
+            </FormLabel>
+            <OccurenceInput
+              value={parity}
+              comparator={parityComparator}
+              onchange={(newParity, newComparator) => {
+                setParity(newParity)
+                setParityComparator(newComparator)
+              }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Voie d’accouchement
+            </FormLabel>
+
+            <Autocomplete
+              multiple
+              id="risks-or-complications-of-pregnancy-autocomplete"
+              options={/*criteriaData.data.risksOrComplicationsOfPregnancy*/ risksOrComplicationsOfPregnancyData || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={risksOrComplicationsOfPregnancy}
+              onChange={(e, value) => setRisksOrComplicationsOfPregnancy(value)}
+              renderInput={(params) => <TextField {...params} label="Risques ou complications de la grossesse" />}
+              style={{ marginBottom: '1em' }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Type d'instrument
+            </FormLabel>
+
+            <Autocomplete
+              multiple
+              id="risks-or-complications-of-pregnancy-autocomplete"
+              options={/*criteriaData.data.risksOrComplicationsOfPregnancy*/ risksOrComplicationsOfPregnancyData || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={risksOrComplicationsOfPregnancy}
+              onChange={(e, value) => setRisksOrComplicationsOfPregnancy(value)}
+              renderInput={(params) => <TextField {...params} label="Risques ou complications de la grossesse" />}
+              style={{ marginBottom: '1em' }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Modalités de la césarienne
+            </FormLabel>
+
+            <Autocomplete
+              multiple
+              id="risks-or-complications-of-pregnancy-autocomplete"
+              options={/*criteriaData.data.risksOrComplicationsOfPregnancy*/ risksOrComplicationsOfPregnancyData || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={risksOrComplicationsOfPregnancy}
+              onChange={(e, value) => setRisksOrComplicationsOfPregnancy(value)}
+              renderInput={(params) => <TextField {...params} label="Risques ou complications de la grossesse" />}
+              style={{ marginBottom: '1em' }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Présentation à l'accouchement
+            </FormLabel>
+
+            <Autocomplete
+              multiple
+              id="risks-or-complications-of-pregnancy-autocomplete"
+              options={/*criteriaData.data.risksOrComplicationsOfPregnancy*/ risksOrComplicationsOfPregnancyData || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={risksOrComplicationsOfPregnancy}
+              onChange={(e, value) => setRisksOrComplicationsOfPregnancy(value)}
+              renderInput={(params) => <TextField {...params} label="Risques ou complications de la grossesse" />}
+              style={{ marginBottom: '1em' }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Mensurations naissance - Poids (g)
+            </FormLabel>
+            <OccurenceInput
+              value={parity}
+              comparator={parityComparator}
+              onchange={(newParity, newComparator) => {
+                setParity(newParity)
+                setParityComparator(newComparator)
+              }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Mensurations naissance - Poids (percentile)
+            </FormLabel>
+            <OccurenceInput
+              value={parity}
+              comparator={parityComparator}
+              onchange={(newParity, newComparator) => {
+                setParity(newParity)
+                setParityComparator(newComparator)
+              }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Score Apgar - 1 min
+            </FormLabel>
+            <OccurenceInput
+              value={parity}
+              comparator={parityComparator}
+              onchange={(newParity, newComparator) => {
+                setParity(newParity)
+                setParityComparator(newComparator)
+              }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Score Apgar - 3 min
+            </FormLabel>
+            <OccurenceInput
+              value={parity}
+              comparator={parityComparator}
+              onchange={(newParity, newComparator) => {
+                setParity(newParity)
+                setParityComparator(newComparator)
+              }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Score Apgar - 5 min
+            </FormLabel>
+            <OccurenceInput
+              value={parity}
+              comparator={parityComparator}
+              onchange={(newParity, newComparator) => {
+                setParity(newParity)
+                setParityComparator(newComparator)
+              }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Score Apgar - 10 min
+            </FormLabel>
+            <OccurenceInput
+              value={parity}
+              comparator={parityComparator}
+              onchange={(newParity, newComparator) => {
+                setParity(newParity)
+                setParityComparator(newComparator)
+              }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              pH artériel au cordon
+            </FormLabel>
+            <OccurenceInput
+              value={parity}
+              comparator={parityComparator}
+              onchange={(newParity, newComparator) => {
+                setParity(newParity)
+                setParityComparator(newComparator)
+              }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Lactates artériel au cordon (mmol/L)
+            </FormLabel>
+            <OccurenceInput
+              value={parity}
+              comparator={parityComparator}
+              onchange={(newParity, newComparator) => {
+                setParity(newParity)
+                setParityComparator(newComparator)
+              }}
+            />
+          </BlockWrapper>
         </Collapse>
       </BlockWrapper>
 
