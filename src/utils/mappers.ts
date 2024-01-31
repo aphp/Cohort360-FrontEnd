@@ -213,8 +213,8 @@ export const buildSimpleFilter = (criterion: string, fhirKey: string, url?: stri
   return criterion ? `${fhirKey}=${url ? `${url}|` : ''}${criterion}` : ''
 }
 
-export const questionnaireFiltersBuilders = (fhirKey: string[], value?: string) => {
-  return value ? `_filter=linkId eq ${fhirKey[0]} and item.answer.${fhirKey[1]} eq ${value}` : ''
+export const questionnaireFiltersBuilders = (fhirKey: { id: string; type: string }, value?: string) => {
+  return value ? `_filter=linkId eq ${fhirKey.id} and item.answer.${fhirKey.type} eq ${value}` : ''
 }
 
 export const findQuestionnaireRessource = (filters: string[]) => {

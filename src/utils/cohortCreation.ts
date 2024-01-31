@@ -45,6 +45,7 @@ import {
   unbuildQuestionnaireFilters,
   findQuestionnaireRessource
 } from './mappers'
+import { pregnancyForm } from 'data/pregnancyData'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
@@ -111,21 +112,6 @@ const IMAGING_SERIES_DESCRIPTION = 'series-description'
 const IMAGING_SERIES_PROTOCOL = 'series-protocol'
 const IMAGING_SERIES_MODALITIES = 'series-modality'
 const IMAGING_SERIES_UID = 'series'
-
-const PREGNANCY_START_DATE = ['F_MATER_001010', 'valueDate']
-const PREGNANCY_END_DATE = ['F_MATER_001010', 'valueDate']
-const PREGNANCY_MODE = ['F_MATER_001014', 'valueCoding']
-const PREGNANCY_FOETUS = ['F_MATER_001017', 'valueInteger']
-const PREGNANCY_PARITY = ['F_MATER_001192', 'valueInteger']
-const PREGNANCY_MATERNAL_RISKS = ['F_MATER_001361', 'valueCoding']
-const PREGNANCY_MATERNAL_RISKS_PRECISION = ['F_MATER_001362', 'valueString']
-const PREGNANCY_RISKS_OBSTETRIC_HISTORY = ['F_MATER_001363', 'valueCoding']
-const PREGNANCY_RISKS_OBSTETRIC_HISTORY_PRECISION = ['F_MATER_001364', 'valueString']
-const PREGNANCY_RISKS_COMPLICATION_PREGNANCY = ['F_MATER_001631', 'valueCoding']
-const PREGNANCY_RISKS_COMPLICATION_PREGNANCY_PRECISION = ['F_MATER_001632', 'valueString']
-const PREGNANCY_CORTICOTHERAPIE = ['F_MATER_001597', 'valueBoolean']
-const PREGNANCY_PRENATAL_DIAGNOSIS = ['F_MATER_001661', 'valueBoolean']
-const PREGNANCY_ULTRASOUND_MONITORING = ['F_MATER_001552', 'valueBoolean']
 
 // const HOSPIT_HOSPIT_REASON = 'F_MATER_004051'
 // const HOSPIT_IN_UTERO_TRANSFER = 'F_MATER_004056'
@@ -441,46 +427,52 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
       filterFhir = [
         'subject.active=true',
         `questionnaire.name='55542'`,
-        questionnaireFiltersBuilders(PREGNANCY_START_DATE, buildDateFilter(criterion.pregnancyStartDate, 'ge')),
-        questionnaireFiltersBuilders(PREGNANCY_END_DATE, buildDateFilter(criterion.pregnancyEndDate, 'le')),
-        questionnaireFiltersBuilders(PREGNANCY_MODE, buildLabelObjectFilter(criterion.pregnancyMode)),
         questionnaireFiltersBuilders(
-          PREGNANCY_FOETUS,
+          pregnancyForm.pregnancyStartDate,
+          buildDateFilter(criterion.pregnancyStartDate, 'ge')
+        ),
+        questionnaireFiltersBuilders(pregnancyForm.pregnancyEndDate, buildDateFilter(criterion.pregnancyEndDate, 'le')),
+        questionnaireFiltersBuilders(pregnancyForm.pregnancyMode, buildLabelObjectFilter(criterion.pregnancyMode)),
+        questionnaireFiltersBuilders(
+          pregnancyForm.foetus,
           buildComparatorFilter(criterion.foetus, criterion.foetusComparator)
         ),
         questionnaireFiltersBuilders(
-          PREGNANCY_PARITY,
+          pregnancyForm.parity,
           buildComparatorFilter(criterion.parity, criterion.parityComparator)
         ),
-        questionnaireFiltersBuilders(PREGNANCY_MATERNAL_RISKS, buildLabelObjectFilter(criterion.maternalRisks)),
+        questionnaireFiltersBuilders(pregnancyForm.maternalRisks, buildLabelObjectFilter(criterion.maternalRisks)),
         questionnaireFiltersBuilders(
-          PREGNANCY_MATERNAL_RISKS_PRECISION,
+          pregnancyForm.maternalRisksPrecision,
           buildSearchFilter(criterion.maternalRisksPrecision)
         ),
         questionnaireFiltersBuilders(
-          PREGNANCY_RISKS_OBSTETRIC_HISTORY,
+          pregnancyForm.risksObstetricHistory,
           buildLabelObjectFilter(criterion.risksRelatedToObstetricHistory)
         ),
         questionnaireFiltersBuilders(
-          PREGNANCY_RISKS_OBSTETRIC_HISTORY_PRECISION,
+          pregnancyForm.risksRelatedToObstetricHistoryPrecision,
           buildSearchFilter(criterion.risksRelatedToObstetricHistoryPrecision)
         ),
         questionnaireFiltersBuilders(
-          PREGNANCY_RISKS_COMPLICATION_PREGNANCY,
+          pregnancyForm.risksComplicationPregnancy,
           buildLabelObjectFilter(criterion.risksOrComplicationsOfPregnancy)
         ),
         questionnaireFiltersBuilders(
-          PREGNANCY_RISKS_COMPLICATION_PREGNANCY_PRECISION,
+          pregnancyForm.risksRelatedToObstetricHistoryPrecision,
           buildSearchFilter(criterion.risksOrComplicationsOfPregnancyPrecision)
         ),
-        questionnaireFiltersBuilders(PREGNANCY_CORTICOTHERAPIE, buildLabelObjectFilter(criterion.corticotherapie)),
-        questionnaireFiltersBuilders(PREGNANCY_PRENATAL_DIAGNOSIS, buildLabelObjectFilter(criterion.prenatalDiagnosis)),
+        questionnaireFiltersBuilders(pregnancyForm.corticotherapie, buildLabelObjectFilter(criterion.corticotherapie)),
         questionnaireFiltersBuilders(
-          PREGNANCY_ULTRASOUND_MONITORING,
+          pregnancyForm.prenatalDiagnosis,
+          buildLabelObjectFilter(criterion.prenatalDiagnosis)
+        ),
+        questionnaireFiltersBuilders(
+          pregnancyForm.ultrasoundMonitoring,
           buildLabelObjectFilter(criterion.ultrasoundMonitoring)
         ),
         questionnaireFiltersBuilders(
-          [ENCOUNTER_SERVICE_PROVIDER, 'valueCoding'],
+          { id: ENCOUNTER_SERVICE_PROVIDER, type: 'valueCoding' },
           buildEncounterServiceFilter(criterion.encounterService)
         )
       ]
@@ -1370,52 +1362,52 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 const value = filter?.[1] ?? ''
 
                 switch (key) {
-                  case PREGNANCY_START_DATE[0]:
+                  case pregnancyForm.pregnancyStartDate.id:
                     currentCriterion.pregnancyStartDate = unbuildDateFilter(value)
                     break
-                  case PREGNANCY_END_DATE[0]:
+                  case pregnancyForm.pregnancyEndDate.id:
                     currentCriterion.pregnancyEndDate = unbuildDateFilter(value)
                     break
-                  case PREGNANCY_MODE[0]:
+                  case pregnancyForm.pregnancyMode.id:
                     unbuildLabelObjectFilter(currentCriterion, 'pregnancyMode', value)
                     break
-                  case PREGNANCY_FOETUS[0]: {
+                  case pregnancyForm.foetus.id: {
                     const parsedOccurence = parseOccurence(value)
                     currentCriterion.foetus = parsedOccurence.value
                     currentCriterion.foetusComparator = parsedOccurence.comparator
                     break
                   }
-                  case PREGNANCY_PARITY[0]: {
+                  case pregnancyForm.parity.id: {
                     const parsedOccurence = parseOccurence(value)
                     currentCriterion.parity = parsedOccurence.value
                     currentCriterion.parityComparator = parsedOccurence.comparator
                     break
                   }
-                  case PREGNANCY_MATERNAL_RISKS[0]:
+                  case pregnancyForm.maternalRisks.id:
                     unbuildLabelObjectFilter(currentCriterion, 'maternalRisks', value)
                     break
-                  case PREGNANCY_MATERNAL_RISKS_PRECISION[0]:
+                  case pregnancyForm.maternalRisksPrecision.id:
                     currentCriterion.maternalRisksPrecision = unbuildSearchFilter(value)
                     break
-                  case PREGNANCY_RISKS_OBSTETRIC_HISTORY[0]:
+                  case pregnancyForm.risksObstetricHistory.id:
                     unbuildLabelObjectFilter(currentCriterion, 'risksRelatedToObstetricHistory', value)
                     break
-                  case PREGNANCY_RISKS_OBSTETRIC_HISTORY_PRECISION[0]:
+                  case pregnancyForm.risksObstetricHistoryPrecision.id:
                     currentCriterion.risksRelatedToObstetricHistoryPrecision = unbuildSearchFilter(value)
                     break
-                  case PREGNANCY_RISKS_COMPLICATION_PREGNANCY[0]:
+                  case pregnancyForm.risksOrComplicationsOfPregnancy.id:
                     unbuildLabelObjectFilter(currentCriterion, 'risksOrComplicationsOfPregnancy', value)
                     break
-                  case PREGNANCY_RISKS_COMPLICATION_PREGNANCY_PRECISION[0]:
+                  case pregnancyForm.risksComplicationPregnancyPrecision.id:
                     currentCriterion.risksOrComplicationsOfPregnancyPrecision = unbuildSearchFilter(value)
                     break
-                  case PREGNANCY_CORTICOTHERAPIE[0]:
+                  case pregnancyForm.corticotherapie.id:
                     unbuildLabelObjectFilter(currentCriterion, 'corticotherapie', value)
                     break
-                  case PREGNANCY_PRENATAL_DIAGNOSIS[0]:
+                  case pregnancyForm.prenatalDiagnosis.id:
                     unbuildLabelObjectFilter(currentCriterion, 'prenatalDiagnosis', value)
                     break
-                  case PREGNANCY_ULTRASOUND_MONITORING[0]:
+                  case pregnancyForm.ultrasoundMonitoring.id:
                     unbuildLabelObjectFilter(currentCriterion, 'ultrasoundMonitoring', value)
                     break
                   case ENCOUNTER_SERVICE_PROVIDER:
