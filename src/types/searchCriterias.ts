@@ -220,6 +220,10 @@ export type ImagingFilters = GenericFilter & {
   modality: LabelObject[]
 }
 
+export type FormsFilters = {
+  formName: string
+}
+
 export type DocumentsFilters = GenericFilter & {
   ipp?: string
   docTypes: SimpleCodeType[]

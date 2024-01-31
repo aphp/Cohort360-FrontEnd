@@ -155,6 +155,10 @@ export const ODD_FEASABILITY_REPORT = import.meta.env.DEV
   ? import.meta.env.VITE_ODD_FEASABILITY_REPORT == `${BOOLEANTRUE}`
   : '{VITE_ODD_FEASABILITY_REPORT}' == `${BOOLEANTRUE}`
 
+export const ODD_FORMS = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_FORMS == `${BOOLEANTRUE}`
+  : '{VITE_ODD_FORMS}' == `${BOOLEANTRUE}`
+
 export const SESSION_TIMEOUT = import.meta.env.VITE_SESSION_TIMEOUT
   ? import.meta.env.VITE_SESSION_TIMEOUT
   : 780000 /* 13 * 60 * 1000 ms*/

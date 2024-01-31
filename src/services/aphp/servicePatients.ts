@@ -1,5 +1,13 @@
 import { AxiosResponse } from 'axios'
-import { CohortData, FHIR_Bundle_Response, CohortEncounter, CohortComposition, MedicationEntry, ChartCode } from 'types'
+import {
+  CohortData,
+  FHIR_Bundle_Response,
+  CohortEncounter,
+  CohortComposition,
+  MedicationEntry,
+  ChartCode,
+  CohortQuestionnaireResponse
+} from 'types'
 import {
   getGenderRepartitionMapAphp,
   getEncounterRepartitionMapAphp,
@@ -24,7 +32,8 @@ import {
   deleteFilters,
   patchFilters,
   deleteFilter,
-  fetchPerimeterFromId
+  fetchPerimeterFromId,
+  fetchForms
 } from './callApi'
 
 import servicesPerimeters from './servicePerimeters'
@@ -234,7 +243,6 @@ export interface IServicePatients {
    **   - orderDirection: permet le tri dans l'ordre croissant ou décroissant
    **   - page: permet la pagination des éléments
    **   - patientId: identifiant technique d'un patient
-   **   - deidentified: permet certaines anonymisations de la donnée
    **   - nda: permet de filtrer sur un NDA précis
    **   - searchInput (optionnel): permet la recherche textuelle
    **   - startDate: (optionnel) permet le filtre par date
@@ -264,6 +272,40 @@ export interface IServicePatients {
     imagingList: ImagingStudy[]
     imagingTotal: number
   }>
+
+  /*
+   ** Cette fonction permet de récupérer les formulaires liés à un patient
+   **
+   ** Arguments:
+   **   - patientId: identifiant technique d'un patient
+   **   - formName: permet de requêter le bon type de formulaire
+   **   - groupId: (optionnel) périmètre auquel le patient est lié
+   **   - episodeOfCare: (optionnel) permet de requêter les formulaires liés à un certain épisode de soin
+   **
+   ** Retour:
+   **   - formsList: liste des formulaires liés à un patient
+   */
+  fetchForms: (
+    patientId: string,
+    formName: string,
+    groupId?: string,
+    episodeOfCare?: string
+  ) => Promise<{ formsList: CohortQuestionnaireResponse[] }>
+
+  /*
+   ** Cette fonction permet de lier les formulaires d'hospitalisation à une fiche de grossesse
+   **
+   ** Arguments:
+   **   - patientId: identifiant technique d'un patient
+   **   - formsList: liste de fiches de grossesse liée à un patient
+   **
+   ** Retour:
+   **   - formsList: liste de formulaires grossesse liés à leurs formulaires d'hospitalisation
+   */
+  fetchHospitsLinkedToForm: (
+    patientId: string,
+    formsList: CohortQuestionnaireResponse[]
+  ) => Promise<CohortQuestionnaireResponse[]>
 
   /*
    ** Cette fonction permet de récupérer les élèments de Composition lié à un patient
@@ -658,6 +700,35 @@ const servicesPatients: IServicePatients = {
       imagingList: getApiResponseResources(imagingResp) ?? [],
       imagingTotal: imagingTotal ?? 0
     }
+  },
+
+  fetchForms: async (patientId: string, formName: string, groupId?: string, episodeOfCare?: string) => {
+    const formsResp = await fetchForms({ patient: patientId, formName, episodeOfCare, _list: groupId ? [groupId] : [] })
+    console.log('formsResp', formsResp)
+
+    return {
+      // formsList: getApiResponseResources(formsResp) ?? []
+      formsList: formsResp.entry.map((entry) => entry.resource) ?? []
+    }
+  },
+
+  fetchHospitsLinkedToForm: async (patientId: string, formsList: CohortQuestionnaireResponse[]) => {
+    const _formsList = [...formsList]
+    for (const [index, form] of formsList.entries()) {
+      const episodeOfCareId = form.item
+        ?.find((item) => item.linkId === 'F_MATER_111115')
+        ?.answer?.[0]?.valueString?.replace('../EpisodeOfCare/', '')
+
+      if (episodeOfCareId) {
+        const hospitsForm = await fetchForms({
+          patient: patientId,
+          formName: 'hospits',
+          episodeOfCare: episodeOfCareId
+        })
+        _formsList[index].hospitLinked = getApiResponseResources(hospitsForm)
+      }
+    }
+    return _formsList
   },
 
   fetchDocuments: async (

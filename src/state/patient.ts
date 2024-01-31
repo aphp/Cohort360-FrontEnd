@@ -11,7 +11,8 @@ import {
   IPatientMedication,
   IPatientObservation,
   IPatientImaging,
-  CohortImaging
+  CohortImaging,
+  CohortQuestionnaireResponse
 } from 'types'
 
 import { logout } from './me'
@@ -35,6 +36,7 @@ import { CanceledError } from 'axios'
 import {
   BiologyFilters,
   Direction,
+  FormsFilters,
   ImagingFilters,
   MedicationFilters,
   Order,
@@ -78,6 +80,10 @@ export type PatientState = null | {
   medication?: Medication
   biology?: IPatientObservation<CohortObservation>
   imaging?: IPatientImaging<CohortImaging>
+  forms?: {
+    loading: boolean
+    list: CohortQuestionnaireResponse[]
+  }
 }
 
 /**
@@ -534,6 +540,54 @@ const fetchDocuments = createAsyncThunk<
     }
   }
 })
+
+/** fetchForms */
+type FetchFormsParams = {
+  options: {
+    page: number
+    searchCriterias: SearchCriterias<FormsFilters>
+  }
+  groupId?: string
+}
+type FetchFormsReturn =
+  | {
+      forms: {
+        loading: boolean
+        list: CohortQuestionnaireResponse[]
+      }
+    }
+  | undefined
+const fetchForms = createAsyncThunk<FetchFormsReturn, FetchFormsParams, { state: RootState; rejectValue: any }>(
+  'patient/fetchForms',
+  async ({ groupId, options: { searchCriterias } }, thunkApi) => {
+    try {
+      const patientState = thunkApi.getState().patient
+
+      const patientId = patientState?.patientInfo?.id ?? ''
+      if (!patientId) {
+        throw new Error('Patient Error: patient is required')
+      }
+
+      const formName = searchCriterias.filters.formName
+
+      const formResponse = await services.patients.fetchForms(patientId, formName, groupId)
+      const formsList =
+        searchCriterias.filters.formName === 'pregnancy'
+          ? await services.patients.fetchHospitsLinkedToForm(patientId, formResponse.formsList)
+          : formResponse.formsList
+      console.log('formResponse', formResponse)
+
+      return {
+        forms: {
+          loading: false,
+          list: formsList
+        }
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+)
 
 /**
  * fetchAllProcedure
@@ -1287,6 +1341,40 @@ const patientSlice = createSlice({
             imaging: action.payload?.imaging
           }
     )
+
+    builder.addCase(fetchForms.rejected, (state) => ({
+      ...state,
+      loading: false,
+      forms: {
+        loading: false,
+        list: []
+      }
+    }))
+    builder.addCase(fetchForms.pending, (state) =>
+      state === null
+        ? null
+        : {
+            ...state,
+            forms: state.forms
+              ? {
+                  ...state.forms,
+                  loading: true
+                }
+              : {
+                  loading: true,
+                  list: []
+                }
+          }
+    )
+    builder.addCase(fetchForms.fulfilled, (state, action) =>
+      action.payload === undefined
+        ? null
+        : {
+            ...state,
+            loading: false,
+            forms: action.payload?.forms
+          }
+    )
   }
 })
 
@@ -1299,7 +1387,8 @@ export {
   fetchPmsi,
   fetchMedication,
   fetchBiology,
-  fetchImaging
+  fetchImaging,
+  fetchForms
 }
 export const { clearPatient } = patientSlice.actions
 

@@ -16,6 +16,7 @@ import {
   Parameters,
   Patient,
   Procedure,
+  QuestionnaireResponse,
   Resource
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
@@ -688,6 +689,10 @@ export type IPatientImaging<T extends CohortImaging> = {
   total: number
   list: T[]
   page: number
+}
+
+export type CohortQuestionnaireResponse = QuestionnaireResponse & {
+  hospitLinked?: QuestionnaireResponse[]
 }
 
 export type TabType<T, TL> = {
