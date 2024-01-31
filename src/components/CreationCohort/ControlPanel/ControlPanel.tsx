@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 import moment from 'moment'
 
 import {
@@ -37,15 +37,26 @@ import {
   addActionToNavHistory
 } from 'state/cohortCreation'
 
-import { CohortCreationCounterType, CurrentSnapshot, LoadingStatus, RequestType, SimpleStatus, Snapshot } from 'types'
+import {
+  CohortCreationCounterType,
+  CurrentSnapshot,
+  JobStatus,
+  LoadingStatus,
+  RequestType,
+  SimpleStatus,
+  Snapshot,
+  WebSocketJobName,
+  WebSocketMessage
+} from 'types'
 
 import useStyle from './styles'
 
 import displayDigit from 'utils/displayDigit'
 import { ODD_FEASABILITY_REPORT, SHORT_COHORT_LIMIT } from '../../../constants'
-import { JobStatus } from '../../../utils/constants'
+import { WebSocketJobStatus } from 'types'
 import services from 'services/aphp'
 import ValidationDialog from 'components/ui/ValidationDialog'
+import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -64,6 +75,7 @@ const ControlPanel: React.FC<{
     },
     [setShareSuccessOrFailMessage]
   )
+  const [socketLoading, setSocketLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
   const [reportLoading, setReportLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
   const [reportError, setReportError] = useState(false)
   const [openReportConfirmation, setOpenReportConfirmation] = useState<boolean>(false)
@@ -71,7 +83,6 @@ const ControlPanel: React.FC<{
   const {
     loading = false,
     saveLoading = false,
-    countLoading = false,
     count = {},
     criteriaGroup = [],
     selectedCriteria = [],
@@ -86,6 +97,8 @@ const ControlPanel: React.FC<{
     snapshotsHistory
   } = useAppSelector((state) => state.cohortCreation.request || {})
   const { includePatient, status, jobFailMsg } = count
+
+  const [patientCount, setPatientCount] = useState(includePatient)
 
   const [requestShare, setRequestShare] = useState<RequestType | null>({
     currentSnapshot,
@@ -189,25 +202,42 @@ const ControlPanel: React.FC<{
     } catch (error) {
       setReportLoading(LoadingStatus.IDDLE)
       setReportError(true)
-      console.log(error)
     }
   }
 
-  const itLoads = loading || countLoading || saveLoading
+  const isLoading = loading || socketLoading === LoadingStatus.FETCHING || saveLoading
   const errorCriteria = selectedCriteria.filter((criteria) => criteria.error)
   const lastUpdated = moment(count.date)
   const lastUpdatedOldCount = oldCount ? moment(oldCount.date) : null
 
+  const webSocketContext = useContext(WebSocketContext)
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (count && count.status && (count.status === JobStatus.pending || count.status === JobStatus.new)) {
-        dispatch(countCohortCreation({ uuid: count.uuid }))
-      } else {
-        clearInterval(interval)
+    if (count && count.status && count.status === JobStatus.new) {
+      setSocketLoading(LoadingStatus.FETCHING)
+      dispatch(countCohortCreation({ uuid: count.uuid }))
+    }
+  }, [])
+
+  useEffect(() => {
+    setPatientCount(includePatient)
+  }, [includePatient])
+
+  useEffect(() => {
+    const listener = (message: WebSocketMessage) => {
+      if (
+        message.job_name === WebSocketJobName.COUNT &&
+        message.status === WebSocketJobStatus.finished &&
+        message.extra_info?.measure !== null
+      ) {
+        setPatientCount(message.extra_info.measure)
+        setSocketLoading(LoadingStatus.SUCCESS)
       }
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [count]) //eslint-disable-line
+    }
+
+    webSocketContext?.addListener(listener)
+    return () => webSocketContext?.removeListener(listener)
+  }, [webSocketContext?.websocket.lastMessage])
 
   return (
     <>
@@ -215,17 +245,17 @@ const ControlPanel: React.FC<{
         <Grid className={classes.container}>
           <Button
             disabled={
-              itLoads ||
+              isLoading ||
               typeof onExecute !== 'function' ||
               maintenanceIsActive ||
               count_outdated ||
-              includePatient === 0
+              patientCount === 0
             }
             onClick={() => onSetOpenModal('executeCohortConfirmation')}
             className={classes.requestExecution}
             style={{ marginTop: 12, marginBottom: 6 }}
           >
-            {itLoads ? (
+            {isLoading ? (
               <>
                 Veuillez patienter
                 <CircularProgress style={{ marginLeft: '15px' }} size={30} />
@@ -236,13 +266,13 @@ const ControlPanel: React.FC<{
           </Button>
           {ODD_FEASABILITY_REPORT && (
             <Button
-              disabled={itLoads || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated}
+              disabled={isLoading || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated}
               onClick={handleGenerateReport}
               className={classes.requestExecution}
               startIcon={<DescriptionIcon color="action" className={classes.iconBorder} />}
               style={{ marginBottom: 12 }}
             >
-              {itLoads ? (
+              {isLoading ? (
                 <>
                   Veuillez patienter
                   <CircularProgress style={{ marginLeft: '15px' }} size={30} />
@@ -308,7 +338,6 @@ const ControlPanel: React.FC<{
             </>
           )}
         </Grid>
-
         <Grid className={classes.container}>
           <Grid container justifyContent="space-between">
             <Typography className={cx(classes.boldText, classes.patientTypo)}>ACCÈS :</Typography>
@@ -317,11 +346,10 @@ const ControlPanel: React.FC<{
             </Typography>
           </Grid>
         </Grid>
-
         <Grid className={classes.container}>
           <Grid container justifyContent="space-between">
             <Typography className={cx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS :</Typography>
-            {itLoads ? (
+            {isLoading ? (
               <CircularProgress
                 size={12}
                 style={{ marginTop: 14 }}
@@ -330,19 +358,19 @@ const ControlPanel: React.FC<{
             ) : (
               <Grid container alignItems="center" style={{ width: 'fit-content' }}>
                 <Typography className={cx(classes.boldText, classes.patientTypo, classes.blueText)}>
-                  {displayDigit(includePatient)}
+                  {displayDigit(patientCount)}
                   {oldCount !== null && !!oldCount.includePatient
-                    ? (includePatient ?? 0) - oldCount.includePatient > 0
-                      ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`
-                      : ` (${(includePatient ?? 0) - oldCount.includePatient})`
+                    ? (patientCount ?? 0) - oldCount.includePatient > 0
+                      ? ` (+${(patientCount ?? 0) - oldCount.includePatient})`
+                      : ` (${(patientCount ?? 0) - oldCount.includePatient})`
                     : ''}
                 </Typography>
                 {oldCount !== null && !!oldCount.includePatient && (
                   <Tooltip
                     title={`Le delta ${
-                      (includePatient ?? 0) - oldCount.includePatient > 0
-                        ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`
-                        : ` (${(includePatient ?? 0) - oldCount.includePatient})`
+                      (patientCount ?? 0) - oldCount.includePatient > 0
+                        ? ` (+${(patientCount ?? 0) - oldCount.includePatient})`
+                        : ` (${(patientCount ?? 0) - oldCount.includePatient})`
                     } est la différence de patient entre le ${lastUpdatedOldCount?.format(
                       'DD/MM/YYYY'
                     )} et la date du jour.`}
@@ -354,8 +382,7 @@ const ControlPanel: React.FC<{
             )}
           </Grid>
         </Grid>
-
-        {!status && !includePatient && (
+        {!status && !patientCount && (
           <Alert className={classes.errorAlert} severity="info">
             Votre requête ne contient pas de nombre de patient.
             <br />
@@ -371,7 +398,6 @@ const ControlPanel: React.FC<{
             </Button>
           </Alert>
         )}
-
         {(status === 'failed' || status === 'error') && (
           <Alert className={classes.errorAlert} severity="error">
             Une erreur est survenue lors du calcul du nombre de patients de votre requête.
@@ -390,7 +416,6 @@ const ControlPanel: React.FC<{
             </Button>
           </Alert>
         )}
-
         {errorCriteria && errorCriteria.length > 0 && (
           <Alert className={classes.errorAlert} severity="error">
             Les critères suivants sont obsolètes : <br />
@@ -406,7 +431,6 @@ const ControlPanel: React.FC<{
             <Typography>Ce problème est temporaire. Une solution est en cours de développement.</Typography>
           </Alert>
         )}
-
         {count_outdated && (
           <Alert className={classes.errorAlert} severity="error">
             Attention, l'estimation du nombre de patients correspondant à votre requête effectuée le{' '}
@@ -424,7 +448,6 @@ const ControlPanel: React.FC<{
             </Button>
           </Alert>
         )}
-
         <Grid className={classes.container} style={{ maxHeight: 400, overflow: 'hidden scroll' }}>
           <Grid container justifyContent="space-between" style={{ margin: 10 }}>
             <Typography className={classes.boldText} sx={{ margin: '0px 10px' }}>
@@ -467,7 +490,7 @@ const ControlPanel: React.FC<{
         <ModalCohortTitle
           onExecute={onExecute}
           onClose={() => onSetOpenModal(null)}
-          longCohort={includePatient ? includePatient > cohortLimit : false}
+          longCohort={patientCount ? patientCount > cohortLimit : false}
           cohortLimit={cohortLimit}
         />
       )}

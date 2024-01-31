@@ -10,9 +10,9 @@ import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { PmsiListType } from 'state/pmsi'
 import { fetchBiology } from 'state/biology'
 import { useAppDispatch, useAppSelector } from 'state'
-import { EXPLORATION } from 'utils/constants'
 import { Comparators, ObservationDataType, RessourceType } from 'types/requestCriterias'
 import { CriteriaDrawerComponentProps } from 'types'
+import { EXPLORATION } from '../../../../../../../../constants'
 
 export const defaultBiology: Omit<ObservationDataType, 'id'> = {
   type: RessourceType.OBSERVATION,

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'state'
 
 import { Chip, CircularProgress, CssBaseline, Grid, Pagination, Typography } from '@mui/material'
@@ -13,7 +13,7 @@ import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import { BlockWrapper } from 'components/ui/Layout'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import { LoadingStatus } from 'types'
+import { LoadingStatus, WebSocketJobName, WebSocketJobStatus, WebSocketMessage } from 'types'
 import { CohortsType } from 'types/cohorts'
 import { FilterKeys, OrderBy } from 'types/searchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
@@ -24,6 +24,7 @@ import { cancelPendingRequest } from 'utils/abortController'
 import Modal from 'components/ui/Modal'
 import Button from 'components/ui/Button'
 import ResearchTable from 'components/CohortsTable'
+import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
 
 const statusOptions = [
   {
@@ -47,11 +48,13 @@ type MyCohortsProps = {
 const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
   const { classes, cx } = useStyles()
   const openDrawer = useAppSelector((state) => state.drawer)
+  const cohortState = useAppSelector((state) => state.cohort)
 
   const dispatch = useAppDispatch()
 
-  const cohortState = useAppSelector((state) => state.cohort)
+  const webSocketContext = useContext(WebSocketContext)
 
+  const [cohortList, setCohortList] = useState(cohortState.cohortsList)
   const [toggleModal, setToggleModal] = useState(false)
   const [page, setPage] = useState(1)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
@@ -91,6 +94,37 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
       }
     }
   }
+
+  useEffect(() => {
+    setCohortList(cohortState.cohortsList)
+  }, [cohortState.cohortsList])
+
+  useEffect(() => {
+    const listener = (message: WebSocketMessage) => {
+      if (message.job_name === WebSocketJobName.CREATE && message.status === WebSocketJobStatus.finished) {
+        setCohortList(
+          cohortList.map((cohort) => {
+            const temp = Object.assign({}, cohort)
+            if (temp.uuid === message.uuid) {
+              if (temp.dated_measure_global) {
+                temp.dated_measure_global = {
+                  ...temp.dated_measure_global,
+                  measure_min: message.extra_info?.global.measure_min,
+                  measure_max: message.extra_info?.global.measure_max
+                }
+              }
+              if (temp.request_job_status) {
+                temp.request_job_status = message.status
+              }
+            }
+            return temp
+          })
+        )
+      }
+    }
+    webSocketContext?.addListener(listener)
+    return () => webSocketContext?.removeListener(listener)
+  }, [webSocketContext?.websocket.lastMessage])
 
   useEffect(() => {
     addFilters({ ...filters, favorite: favoriteUrl ? CohortsType.FAVORITE : CohortsType.ALL })
@@ -195,20 +229,20 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
 
           <Grid container justifyContent="flex-end">
             <ResearchTable
-              loading={loadingStatus === LoadingStatus.SUCCESS ? false : true}
-              data={favorite === CohortsType.ALL ? cohortState.cohortsList : cohortState.favoriteCohortsList}
+              loading={loadingStatus !== LoadingStatus.SUCCESS}
+              data={favorite === CohortsType.ALL ? cohortList : cohortState.favoriteCohortsList}
               orderBy={orderBy.orderBy}
               orderDirection={orderBy.orderDirection}
               onChangeOrder={(orderBy: OrderBy) => changeOrderBy(orderBy)}
               onUpdate={() => setLoadingStatus(LoadingStatus.IDDLE)}
             />
 
-            {loadingStatus === LoadingStatus.SUCCESS && cohortState.cohortsList.length > 0 && (
+            {loadingStatus === LoadingStatus.SUCCESS && cohortList.length > 0 && (
               <Pagination
                 className={classes.pagination}
                 count={Math.ceil((cohortState.count ?? 0) / 20)}
                 shape="circular"
-                onChange={(event, page: number) => setPage && setPage(page)}
+                onChange={(_, page: number) => setPage && setPage(page)}
                 page={page}
               />
             )}

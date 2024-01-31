@@ -8,10 +8,10 @@ import CcamHierarchy from './components/Hierarchy/CCAMHierarchy'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProcedure, PmsiListType } from 'state/pmsi'
-import { EXPLORATION } from 'utils/constants'
 
 import { CriteriaDrawerComponentProps } from 'types'
 import { CcamDataType, Comparators, RessourceType } from 'types/requestCriterias'
+import { EXPLORATION } from '../../../../../../../../constants'
 
 export const defaultProcedure: Omit<CcamDataType, 'id'> = {
   type: RessourceType.PROCEDURE,
