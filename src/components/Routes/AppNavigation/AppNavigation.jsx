@@ -7,6 +7,7 @@ import configRoutes from './config'
 import PrivateRoute from '../PrivateRoute'
 import LeftSideBar from '../LeftSideBar/LeftSideBar'
 import AutoLogoutContainer from '../AutoLogoutContainer'
+import { WebSocketProvider } from 'components/WebSocket/WebSocketProvider'
 
 const Layout = (props) => {
   const me = useAppSelector((state) => state.me)
@@ -31,7 +32,11 @@ const AppNavigation = () => (
             <Route
               key={index}
               path={route.path}
-              element={<Layout displaySideBar={route.displaySideBar}>{route.element}</Layout>}
+              element={
+                <WebSocketProvider>
+                  <Layout displaySideBar={route.displaySideBar}>{route.element}</Layout>
+                </WebSocketProvider>
+              }
               param
             />
           </Route>

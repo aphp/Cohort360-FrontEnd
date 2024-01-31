@@ -8,9 +8,9 @@ import CcamHierarchy from './components/Hierarchy/CCAMHierarchy'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProcedure, PmsiListType } from 'state/pmsi'
-import { EXPLORATION } from 'utils/constants'
 
 import { CriteriaDrawerComponentProps } from 'types'
+import { EXPLORATION } from 'constants.js'
 import { CcamDataType, Comparators, CriteriaType } from 'types/requestCriterias'
 
 export const defaultProcedure: Omit<CcamDataType, 'id'> = {

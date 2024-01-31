@@ -18,7 +18,7 @@ import { deleteProject } from './project'
 
 import services from 'services/aphp'
 import { SHORT_COHORT_LIMIT } from '../constants'
-import { JobStatus } from '../utils/constants'
+import { JobStatus } from 'types'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 
 export type CohortCreationState = {
@@ -162,6 +162,7 @@ const countCohortCreation = createAsyncThunk<
     const newSnapshotsHistory = [...snapshotsHistory].map((item) => ({ ...item }))
 
     const countResult = await services.cohortCreation.countCohort(json, snapshotId, requestId, uuid)
+
     if (!countResult) return {}
 
     if (!uuid) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import {
   Checkbox,
@@ -17,13 +17,15 @@ import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import ProjectRow from './ProjectRow'
 
-import { ProjectType, RequestType } from 'types'
+import { ProjectType, RequestType, WebSocketJobName, WebSocketJobStatus, WebSocketMessage } from 'types'
 
 import { useAppSelector } from 'state'
 
 import useStyles from './styles'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 import { Direction, Order } from 'types/searchCriterias'
+import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
+import servicesCohorts from 'services/aphp/serviceCohorts'
 
 type ProjectTableProps = {
   searchInput?: string
@@ -37,22 +39,55 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
 
   const projectsList = useAppSelector((state) => state.project.projectsList)
   const requestsList = useAppSelector((state) => state.request.requestsList)
-  const cohortsList = useAppSelector((state) => state.cohort.cohortsList)
+  const cohortsListState = useAppSelector((state) => state.cohort.cohortsList)
 
   const [sortBy, setSortBy] = useState<'name' | 'modified_at'>('name')
   const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('asc')
 
   const [searchProjectList, setSearchProjectList] = useState(projectsList || [])
   const [currentRequestList, setSearchRequestList] = useState(requestsList || [])
-  const [searchCohortList, setSearchCohortList] = useState(cohortsList || [])
+  const [searchCohortList, setSearchCohortList] = useState(cohortsListState || [])
+
+  const [cohortList, setCohortList] = useState(cohortsListState)
+
+  const webSocketContext = useContext(WebSocketContext)
+
+  useEffect(() => {
+    setCohortList(cohortsListState)
+  }, [cohortsListState])
+
+  useEffect(() => {
+    const listener = async (message: WebSocketMessage) => {
+      if (message.job_name === WebSocketJobName.CREATE && message.status === WebSocketJobStatus.finished) {
+        const websocketUpdatedCohorts = cohortList.map((cohort) => {
+          const temp = Object.assign({}, cohort)
+          if (temp.uuid === message.uuid) {
+            if (temp.dated_measure_global) {
+              temp.dated_measure_global = {
+                ...temp.dated_measure_global,
+                measure_min: message.extra_info?.global.measure_min,
+                measure_max: message.extra_info?.global.measure_max
+              }
+            }
+            temp.request_job_status = message.status
+            temp.fhir_group_id = message.extra_info?.fhir_group_id
+          }
+          return temp
+        })
+        const newCohortList = await servicesCohorts.fetchCohortsRights(websocketUpdatedCohorts)
+        setCohortList(newCohortList)
+      }
+    }
+
+    webSocketContext?.addListener(listener)
+    return () => webSocketContext?.removeListener(listener)
+  }, [cohortList, webSocketContext])
 
   useEffect(() => {
     // eslint-disable-next-line
     const regexp = new RegExp(`${(searchInput || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}`, 'gi')
 
-    const newSearchCohortList = !searchInput
-      ? cohortsList
-      : cohortsList.filter(({ name }) => name?.search(regexp) !== -1)
+    const newSearchCohortList = !searchInput ? cohortList : cohortList.filter(({ name }) => name?.search(regexp) !== -1)
 
     const newSearchRequestList = !searchInput
       ? requestsList
@@ -77,7 +112,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
       setSearchRequestList([])
       setSearchCohortList([])
     }
-  }, [searchInput, projectsList, requestsList, cohortsList])
+  }, [searchInput, projectsList, requestsList, cohortList])
 
   useEffect(() => {
     let newSearchProjectList = projectsList ? [...projectsList] : []
@@ -132,7 +167,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
       setSearchProjectList([])
       setSearchRequestList([])
     }
-  }, [sortBy, sortDirection, projectsList, requestsList, cohortsList])
+  }, [sortBy, sortDirection, projectsList, requestsList, cohortList])
 
   const handleRequestSort = (property: 'name' | 'modified_at') => {
     const isAsc = sortBy === property && sortDirection === 'desc'
@@ -211,7 +246,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
                   row={project}
                   searchInput={searchInput}
                   requestOfProject={currentRequestList.filter(({ parent_folder }) => parent_folder === project.uuid)}
-                  cohortsList={searchCohortList && searchCohortList.length > 0 ? searchCohortList : cohortsList}
+                  cohortsList={searchCohortList && searchCohortList.length > 0 ? searchCohortList : cohortList}
                   selectedRequests={selectedRequests}
                   onSelectedRow={_onSelectedRow}
                 />

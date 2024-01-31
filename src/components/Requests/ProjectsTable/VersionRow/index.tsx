@@ -27,12 +27,11 @@ import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 import { useAppDispatch } from 'state'
 import { editCohort, setSelectedCohort } from 'state/cohort'
 
-import { Cohort } from 'types'
+import { Cohort, CohortJobStatus } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from '../styles'
-import { JobStatus } from 'utils/constants'
 import { ODD_EXPORT } from '../../../../constants'
 
 const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
@@ -82,8 +81,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
 
               const isError =
                 !cohort.fhir_group_id ||
-                cohort.request_job_status === JobStatus.pending ||
-                cohort.request_job_status === JobStatus.new ||
+                cohort.request_job_status === CohortJobStatus._pending ||
+                cohort.request_job_status === CohortJobStatus._new ||
                 !!cohort.request_job_fail_msg
 
               const canExportThisCohort = !!ODD_EXPORT && !isError ? cohort.rights?.export_csv_nomi : false
@@ -112,8 +111,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                   <TableCellWrapper>
                     {cohort.fhir_group_id ? (
                       <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                    ) : cohort.request_job_status === JobStatus.pending ||
-                      cohort.request_job_status === JobStatus.new ? (
+                    ) : cohort.request_job_status === CohortJobStatus._pending ||
+                      cohort.request_job_status === CohortJobStatus._new ? (
                       <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
                     ) : cohort.request_job_fail_msg ? (
                       <Tooltip title={cohort.request_job_fail_msg}>

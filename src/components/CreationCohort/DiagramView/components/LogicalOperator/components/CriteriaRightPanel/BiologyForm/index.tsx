@@ -10,7 +10,7 @@ import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { PmsiListType } from 'state/pmsi'
 import { fetchBiology } from 'state/biology'
 import { useAppDispatch, useAppSelector } from 'state'
-import { EXPLORATION } from 'utils/constants'
+import { EXPLORATION } from 'constants.js'
 import { Comparators, ObservationDataType, CriteriaType } from 'types/requestCriterias'
 import { CriteriaDrawerComponentProps } from 'types'
 

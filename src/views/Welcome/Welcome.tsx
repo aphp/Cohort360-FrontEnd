@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import moment from 'moment'
 
@@ -8,8 +8,12 @@ import NewsCard from 'components/Welcome/NewsCard/NewsCard'
 import PatientsCard from 'components/Welcome/PatientsCard/PatientsCard'
 import SearchPatientCard from 'components/Welcome/SearchPatientCard/SearchPatientCard'
 import TutorialsCard from 'components/Welcome/TutorialsCard/TutorialsCard'
+import CohortsTable from 'components/CohortsTable'
+import RequestsTable from 'components/Requests/PreviewTable'
+import PreviewCard from 'components/ui/Cards/PreviewCard'
 
 import { useAppDispatch, useAppSelector } from 'state'
+import { fetchCohorts } from 'state/cohort'
 import { fetchProjects } from 'state/project'
 import { fetchRequests } from 'state/request'
 import { initPmsiHierarchy } from 'state/pmsi'
@@ -17,15 +21,13 @@ import { initMedicationHierarchy } from 'state/medication'
 import { initBiologyHierarchy } from 'state/biology'
 import { fetchScopesList } from 'state/scope'
 
-import { AccessExpiration, RequestType } from 'types'
+import { AccessExpiration, RequestType, WebSocketJobName, WebSocketJobStatus, WebSocketMessage } from 'types'
 
 import useStyles from './styles'
-import PreviewCard from 'components/ui/Cards/PreviewCard'
-import { fetchCohorts } from 'state/cohort'
 import { CohortsType } from 'types/cohorts'
 import { Direction, Order } from 'types/searchCriterias'
-import CohortsTable from 'components/CohortsTable'
-import RequestsTable from 'components/Requests/PreviewTable'
+import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
+import servicesCohorts from 'services/aphp/serviceCohorts'
 
 const Welcome: React.FC = () => {
   const { classes, cx } = useStyles()
@@ -37,8 +39,11 @@ const Welcome: React.FC = () => {
   const requestState = useAppSelector((state) => state.request)
   const meState = useAppSelector((state) => state.me)
   const [lastRequest, setLastRequest] = useState<RequestType[]>([])
+  const [cohortList, setCohortList] = useState(cohortState.cohortsList)
   const accessExpirations: AccessExpiration[] = meState?.accessExpirations ?? []
   const maintenanceIsActive = meState?.maintenance?.active
+
+  const webSocketContext = useContext(WebSocketContext)
 
   const lastConnection = practitioner?.lastConnection
     ? moment(practitioner.lastConnection).format('[Dernière connexion : ]ddd DD MMMM YYYY[, à ]HH:mm')
@@ -92,6 +97,37 @@ const Welcome: React.FC = () => {
         : []
     setLastRequest(_lastRequest)
   }, [requestState])
+
+  useEffect(() => {
+    setCohortList(cohortState.cohortsList)
+  }, [cohortState.cohortsList])
+
+  useEffect(() => {
+    const listener = async (message: WebSocketMessage) => {
+      if (message.job_name === WebSocketJobName.CREATE && message.status === WebSocketJobStatus.finished) {
+        const websocketUpdatedCohorts = cohortList.map((cohort) => {
+          const temp = Object.assign({}, cohort)
+          if (temp.uuid === message.uuid) {
+            if (temp.dated_measure_global) {
+              temp.dated_measure_global = {
+                ...temp.dated_measure_global,
+                measure_min: message.extra_info?.global.measure_min,
+                measure_max: message.extra_info?.global.measure_max
+              }
+            }
+            temp.request_job_status = message.status
+            temp.fhir_group_id = message.extra_info?.fhir_group_id
+          }
+          return temp
+        })
+        const newCohortList = await servicesCohorts.fetchCohortsRights(websocketUpdatedCohorts)
+        setCohortList(newCohortList)
+      }
+    }
+
+    webSocketContext?.addListener(listener)
+    return () => webSocketContext?.removeListener(listener)
+  }, [cohortList, webSocketContext])
 
   return practitioner ? (
     <Grid
@@ -149,7 +185,7 @@ const Welcome: React.FC = () => {
                   severity="warning"
                   className={classes.alert}
                 >
-                  Attention, votre accès au périmetre suivant: {item.perimeter}, arrivera à expiration dans{' '}
+                  Attention, votre accès au périmètre suivant: {item.perimeter}, arrivera à expiration dans{' '}
                   {item.leftDays} jour{item.leftDays > 1 ? 's' : ''}. Veuillez vous rapprocher de votre référent EDS
                   pour faire renouveler vos accès à l'application.
                 </Alert>
@@ -157,7 +193,7 @@ const Welcome: React.FC = () => {
           </Grid>
         </Grid>
 
-        <Grid container xs={12} spacing={1}>
+        <Grid container spacing={1}>
           <Grid container className={classes.newsGrid} item xs={12} md={6}>
             <Grid item className={classes.pt3}>
               <Paper
@@ -208,8 +244,8 @@ const Welcome: React.FC = () => {
                 onClickLink={() => navigate('/my-cohorts/favorites')}
               >
                 <CohortsTable
-                  loading={cohortState.loading}
                   data={cohortState.favoriteCohortsList}
+                  loading={cohortState.loading}
                   simplified
                   onUpdate={() => fetchCohortsPreview()}
                 />
@@ -226,7 +262,7 @@ const Welcome: React.FC = () => {
                 onClickLink={() => navigate('/my-cohorts')}
               >
                 <CohortsTable
-                  data={cohortState.cohortsList}
+                  data={cohortList}
                   loading={cohortState.loading}
                   simplified
                   onUpdate={() => fetchCohortsPreview()}

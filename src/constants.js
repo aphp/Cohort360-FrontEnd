@@ -241,3 +241,5 @@ export const REFRESH_TOKEN_INTERVAL = import.meta.env.VITE_REFRESH_TOKEN_INTERVA
 export const JTOOL_USERS = import.meta.env.VITE_JTOOL_USERS ? import.meta.env.VITE_JTOOL_USERS : '{VITE_JTOOL_USERS}'
 
 export const VALUE_SET_SIZE = '9999'
+
+export const EXPLORATION = 'Exploration'
