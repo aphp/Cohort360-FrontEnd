@@ -596,6 +596,13 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             'ANALGESIE / ANESTHESIE - type :'
           )
         )
+      if (selectedCriteria.birthDeliveryStartDate || selectedCriteria.birthDeliveryEndDate)
+        labels.push(
+          getDatesLabel(
+            [selectedCriteria.birthDeliveryStartDate, selectedCriteria.birthDeliveryEndDate],
+            'Date de début de grossesse :'
+          )
+        )
       if (selectedCriteria.feedingType && selectedCriteria.feedingType.length > 0)
         labels.push(
           getLabelFromCriteriaObject(

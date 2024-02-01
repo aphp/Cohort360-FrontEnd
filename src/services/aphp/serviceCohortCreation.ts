@@ -158,6 +158,13 @@ export interface IServiceCohortCreation {
   fetchPathologyDuringLabor: () => Promise<Array<HierarchyElement>>
   fetchObstetricalGestureDuringLabor: () => Promise<Array<HierarchyElement>>
   fetchAnalgesieType: () => Promise<Array<HierarchyElement>>
+  fetchBirthDeliveryWay: () => Promise<Array<HierarchyElement>>
+  fetchInstrumentType: () => Promise<Array<HierarchyElement>>
+  fetchCSectionModality: () => Promise<Array<HierarchyElement>>
+  fetchPresentationAtDelivery: () => Promise<Array<HierarchyElement>>
+  fetchSetPostpartumHemorrhage: () => Promise<Array<HierarchyElement>>
+  fetchConditionPerineum: () => Promise<Array<HierarchyElement>>
+  fetchExitPlaceType: () => Promise<Array<HierarchyElement>>
   fetchFeedingType: () => Promise<Array<HierarchyElement>>
   fetchComplication: () => Promise<Array<HierarchyElement>>
   fetchExitFeedingMode: () => Promise<Array<HierarchyElement>>
@@ -508,6 +515,27 @@ const servicesCohortCreation: IServiceCohortCreation = {
   },
   fetchAnalgesieType: async () => {
     return booleanFieldsData
+  },
+  fetchBirthDeliveryWay: async () => {
+    return pregnancyModeData
+  },
+  fetchInstrumentType: async () => {
+    return pregnancyModeData
+  },
+  fetchCSectionModality: async () => {
+    return pregnancyModeData
+  },
+  fetchPresentationAtDelivery: async () => {
+    return pregnancyModeData
+  },
+  fetchSetPostpartumHemorrhage: async () => {
+    return pregnancyModeData
+  },
+  fetchConditionPerineum: async () => {
+    return pregnancyModeData
+  },
+  fetchExitPlaceType: async () => {
+    return pregnancyModeData
   },
   fetchFeedingType: async () => {
     return booleanFieldsData

@@ -21,13 +21,6 @@ import Collapse from 'components/ui/Collapse'
 import SearchbarWithCheck from 'components/ui/Inputs/SearchbarWithCheck'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import { mappingCriteria } from '../DemographicForm'
-import {
-  booleanFieldsData,
-  maternalRisksData,
-  pregnancyModeData,
-  risksOrComplicationsOfPregnancyData,
-  risksRelatedToObstetricHistoryData
-} from 'data/fake_mater_data'
 import CriteriaLayout from 'components/ui/CriteriaLayout'
 
 enum Error {
@@ -213,7 +206,7 @@ const PregnantForm = ({
           <Autocomplete
             multiple
             id="pregnancy-mode-autocomplete"
-            options={/*criteriaData.data.pregnancyMode ||*/ pregnancyModeData || []}
+            options={criteriaData.data.pregnancyMode || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={pregnancyMode}
@@ -258,7 +251,7 @@ const PregnantForm = ({
             <Autocomplete
               multiple
               id="maternal-risks-autocomplete"
-              options={/*criteriaData.data.maternalRisks*/ maternalRisksData || []}
+              options={criteriaData.data.maternalRisks || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={maternalRisks}
@@ -279,7 +272,7 @@ const PregnantForm = ({
             <Autocomplete
               multiple
               id="risks-related-to-obstetric-history-autocomplete"
-              options={/*criteriaData.data.risksRelatedToObstetricHistory*/ risksRelatedToObstetricHistoryData || []}
+              options={criteriaData.data.risksRelatedToObstetricHistory || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={risksRelatedToObstetricHistory}
@@ -306,7 +299,7 @@ const PregnantForm = ({
           <Autocomplete
             multiple
             id="ultrasound-monitoring-autocomplete"
-            options={/*criteriaData.data.prenatalDiagnosis ||*/ booleanFieldsData || []}
+            options={criteriaData.data.prenatalDiagnosis || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={ultrasoundMonitoring}
@@ -321,7 +314,7 @@ const PregnantForm = ({
           <Autocomplete
             multiple
             id="corticotherapie-autocomplete"
-            options={/*criteriaData.data.prenatalDiagnosis ||*/ booleanFieldsData || []}
+            options={criteriaData.data.prenatalDiagnosis || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={corticotherapie}
@@ -341,7 +334,7 @@ const PregnantForm = ({
           <Autocomplete
             multiple
             id="risks-or-complications-of-pregnancy-autocomplete"
-            options={/*criteriaData.data.risksOrComplicationsOfPregnancy*/ risksOrComplicationsOfPregnancyData || []}
+            options={criteriaData.data.risksOrComplicationsOfPregnancy || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={risksOrComplicationsOfPregnancy}
@@ -367,7 +360,7 @@ const PregnantForm = ({
             <Autocomplete
               multiple
               id="prenatal-diagnosis-autocomplete"
-              options={/*criteriaData.data.prenatalDiagnosis ||*/ booleanFieldsData || []}
+              options={criteriaData.data.prenatalDiagnosis || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={prenatalDiagnosis}

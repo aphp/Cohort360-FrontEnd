@@ -130,6 +130,13 @@ export enum CriteriaDataKey {
   PATHOLOGY_DURING_LABOR = 'pathologyDuringLabor',
   OBSTETRICAL_GESTURE_DURING_LABOR = 'obstetricalGestureDuringLabor',
   ANALGESIE_TYPE = 'analgesieType',
+  BIRTH_DELIVERY_WAY = 'birthDeliveryWay',
+  INSTRUMENT_TYPE = 'instrumentType',
+  C_SECTION_MODALITY = 'cSectionModality',
+  PRESENTATION_AT_DELIVERY = 'presentationAtDelivery',
+  POSTPARTUM_HEMORRHAGE = 'postpartumHemorrhage',
+  CONDITION_PERINEUM = 'conditionPerineum',
+  EXIT_PLACE_TYPE = 'exitPlaceType',
   FEEDING_TYPE = 'feedingType',
   COMPLICATION = 'complication',
   EXIT_FEEDING_MODE = 'exitFeedingMode',
@@ -283,6 +290,35 @@ export type HospitDataType = CommonCriteriaDataType & {
   pathologyDuringLabor: LabelObject[] | null
   obstetricalGestureDuringLabor: LabelObject[] | null
   analgesieType: LabelObject[] | null
+  birthDeliveryStartDate: string | null | undefined
+  birthDeliveryEndDate: string | null | undefined
+  birthDeliveryWeeks: number
+  birthDeliveryWeeksComparator: Comparators
+  birthDeliveryDays: number
+  birthDeliveryDaysComparator: Comparators
+  birthDeliveryWay: LabelObject[] | null
+  instrumentType: LabelObject[] | null
+  cSectionModality: LabelObject[] | null
+  presentationAtDelivery: LabelObject[] | null
+  birthMensurationsGrams: number
+  birthMensurationsGramsComparator: Comparators
+  birthMensurationsPercentil: number
+  birthMensurationsPercentilComparator: Comparators
+  apgar1: number
+  apgar1Comparator: Comparators
+  apgar3: number
+  apgar3Comparator: Comparators
+  apgar5: number
+  apgar5Comparator: Comparators
+  apgar10: number
+  apgar10Comparator: Comparators
+  arterialPhCord: number
+  arterialPhCordComparator: Comparators
+  arterialCordLactates: number
+  arterialCordLactatesComparator: Comparators
+  postpartumHemorrhage: LabelObject[] | null
+  conditionPerineum: LabelObject[] | null
+  exitPlaceType: LabelObject[] | null
   feedingType: LabelObject[] | null
   complication: LabelObject[] | null
   exitFeedingMode: LabelObject[] | null

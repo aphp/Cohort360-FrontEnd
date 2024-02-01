@@ -20,8 +20,8 @@ import OccurenceInput from 'components/ui/Inputs/Occurences'
 import Collapse from 'components/ui/Collapse'
 import SearchbarWithCheck from 'components/ui/Inputs/SearchbarWithCheck'
 import { mappingCriteria } from '../DemographicForm'
-import { booleanFieldsData } from 'data/fake_mater_data'
 import CriteriaLayout from 'components/ui/CriteriaLayout'
+import CalendarRange from 'components/ui/Inputs/CalendarRange'
 
 enum Error {
   EMPTY_FORM,
@@ -87,6 +87,75 @@ const HospitForm = ({
   const [analgesieType, setAnalgesieType] = useState<LabelObject[]>(
     mappingCriteria(criteria?.analgesieType, CriteriaDataKey.ANALGESIE_TYPE, criteriaData) || []
   )
+  const [birthDeliveryStartDate, setBirthDeliveryStartDate] = useState<string | null | undefined>(
+    criteria?.birthDeliveryStartDate || null
+  )
+  const [birthDeliveryEndDate, setBirthDeliveryEndDate] = useState<string | null | undefined>(
+    criteria?.birthDeliveryEndDate || null
+  )
+  const [birthDeliveryWeeks, setBirthDeliveryWeeks] = useState<number>(criteria?.birthDeliveryWeeks || 0)
+  const [birthDeliveryWeeksComparator, setBirthDeliveryWeeksComparator] = useState<Comparators>(
+    criteria?.birthDeliveryWeeksComparator || Comparators.GREATER_OR_EQUAL
+  )
+  const [birthDeliveryDays, setBirthDeliveryDays] = useState<number>(criteria?.birthDeliveryDays || 0)
+  const [birthDeliveryDaysComparator, setBirthDeliveryDaysComparator] = useState<Comparators>(
+    criteria?.birthDeliveryDaysComparator || Comparators.GREATER_OR_EQUAL
+  )
+  const [birthDeliveryWay, setBirthDeliveryWay] = useState<LabelObject[]>(
+    mappingCriteria(criteria?.birthDeliveryWay, CriteriaDataKey.BIRTH_DELIVERY_WAY, criteriaData) || []
+  )
+  const [instrumentType, setInstrumentType] = useState<LabelObject[]>(
+    mappingCriteria(criteria?.instrumentType, CriteriaDataKey.INSTRUMENT_TYPE, criteriaData) || []
+  )
+  const [cSectionModality, setCSectionModality] = useState<LabelObject[]>(
+    mappingCriteria(criteria?.cSectionModality, CriteriaDataKey.C_SECTION_MODALITY, criteriaData) || []
+  )
+  const [presentationAtDelivery, setPresentationAtDelivery] = useState<LabelObject[]>(
+    mappingCriteria(criteria?.presentationAtDelivery, CriteriaDataKey.PRESENTATION_AT_DELIVERY, criteriaData) || []
+  )
+  const [birthMensurationsGrams, setBirthMensurationsGrams] = useState<number>(criteria?.birthMensurationsGrams || 0)
+  const [birthMensurationsGramsComparator, setBirthMensurationsGramsComparator] = useState<Comparators>(
+    criteria?.birthMensurationsGramsComparator || Comparators.GREATER_OR_EQUAL
+  )
+  const [birthMensurationsPercentil, setBirthMensurationsPercentil] = useState<number>(
+    criteria?.birthMensurationsPercentil || 0
+  )
+  const [birthMensurationsPercentilComparator, setBirthMensurationsPercentilComparator] = useState<Comparators>(
+    criteria?.birthMensurationsPercentilComparator || Comparators.GREATER_OR_EQUAL
+  )
+  const [apgar1, setApgar1] = useState<number>(criteria?.apgar1 || 0)
+  const [apgar1Comparator, setApgar1Comparator] = useState<Comparators>(
+    criteria?.apgar1Comparator || Comparators.GREATER_OR_EQUAL
+  )
+  const [apgar3, setApgar3] = useState<number>(criteria?.apgar3 || 0)
+  const [apgar3Comparator, setApgar3Comparator] = useState<Comparators>(
+    criteria?.apgar3Comparator || Comparators.GREATER_OR_EQUAL
+  )
+  const [apgar5, setApgar5] = useState<number>(criteria?.apgar5 || 0)
+  const [apgar5Comparator, setApgar5Comparator] = useState<Comparators>(
+    criteria?.apgar5Comparator || Comparators.GREATER_OR_EQUAL
+  )
+  const [apgar10, setApgar10] = useState<number>(criteria?.apgar10 || 0)
+  const [apgar10Comparator, setApgar10Comparator] = useState<Comparators>(
+    criteria?.apgar10Comparator || Comparators.GREATER_OR_EQUAL
+  )
+  const [arterialPhCord, setArterialPhCord] = useState<number>(criteria?.arterialPhCord || 0)
+  const [arterialPhCordComparator, setArterialPhCordComparator] = useState<Comparators>(
+    criteria?.arterialPhCordComparator || Comparators.GREATER_OR_EQUAL
+  )
+  const [arterialCordLactates, setArterialCordLactates] = useState<number>(criteria?.arterialCordLactates || 0)
+  const [arterialCordLactatesComparator, setArterialCordLactatesComparator] = useState<Comparators>(
+    criteria?.arterialCordLactatesComparator || Comparators.GREATER_OR_EQUAL
+  )
+  const [postpartumHemorrhage, setPostpartumHemorrhage] = useState<LabelObject[]>(
+    mappingCriteria(criteria?.postpartumHemorrhage, CriteriaDataKey.POSTPARTUM_HEMORRHAGE, criteriaData) || []
+  )
+  const [conditionPerineum, setConditionPerineum] = useState<LabelObject[]>(
+    mappingCriteria(criteria?.conditionPerineum, CriteriaDataKey.CONDITION_PERINEUM, criteriaData) || []
+  )
+  const [exitPlaceType, setExitPlaceType] = useState<LabelObject[]>(
+    mappingCriteria(criteria?.exitPlaceType, CriteriaDataKey.EXIT_PLACE_TYPE, criteriaData) || []
+  )
   const [feedingType, setFeedingType] = useState<LabelObject[]>(
     mappingCriteria(criteria?.feedingType, CriteriaDataKey.FEEDING_TYPE, criteriaData) || []
   )
@@ -141,6 +210,35 @@ const HospitForm = ({
       pathologyDuringLabor,
       obstetricalGestureDuringLabor,
       analgesieType,
+      birthDeliveryStartDate,
+      birthDeliveryEndDate,
+      birthDeliveryWeeks,
+      birthDeliveryWeeksComparator,
+      birthDeliveryDays,
+      birthDeliveryDaysComparator,
+      birthDeliveryWay,
+      instrumentType,
+      cSectionModality,
+      presentationAtDelivery,
+      birthMensurationsGrams,
+      birthMensurationsGramsComparator,
+      birthMensurationsPercentil,
+      birthMensurationsPercentilComparator,
+      apgar1,
+      apgar1Comparator,
+      apgar3,
+      apgar3Comparator,
+      apgar5,
+      apgar5Comparator,
+      apgar10,
+      apgar10Comparator,
+      arterialPhCord,
+      arterialPhCordComparator,
+      arterialCordLactates,
+      arterialCordLactatesComparator,
+      postpartumHemorrhage,
+      conditionPerineum,
+      exitPlaceType,
       feedingType,
       complication,
       exitFeedingMode,
@@ -219,7 +317,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="in-utero-transfer-autocomplete"
-              options={/*criteriaData.data.inuterotransfert ||*/ booleanFieldsData || []}
+              options={criteriaData.data.inUteroTransfer || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={inUteroTransfer}
@@ -235,7 +333,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="pregnancy-monitoring-autocomplete"
-              options={/*criteriaData.data.pregnancyMonitoring ||*/ booleanFieldsData || []}
+              options={criteriaData.data.pregnancyMonitoring || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={pregnancyMonitoring}
@@ -251,7 +349,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="vme-autocomplete"
-              options={/*criteriaData.data.vme ||*/ booleanFieldsData || []}
+              options={criteriaData.data.vme || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={vme}
@@ -267,7 +365,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="maturation-corticotherapie-autocomplete"
-              options={/*criteriaData.data.maturationCorticotherapie ||*/ booleanFieldsData || []}
+              options={criteriaData.data.maturationCorticotherapie || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={maturationCorticotherapie}
@@ -283,7 +381,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="chirurgical-gesture-autocomplete"
-              options={/*criteriaData.data.chirurgicalGesture ||*/ booleanFieldsData || []}
+              options={criteriaData.data.chirurgicalGesture || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={chirurgicalGesture}
@@ -303,7 +401,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="childbirth-autocomplete"
-              options={/*criteriaData.data.childbirth ||*/ booleanFieldsData || []}
+              options={criteriaData.data.childbirth || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={childbirth}
@@ -319,7 +417,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="childbirth-place-autocomplete"
-              options={/*criteriaData.data.childbirthPlace ||*/ booleanFieldsData || []}
+              options={criteriaData.data.childbirthPlace || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={childbirthPlace}
@@ -335,7 +433,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="childbirth-mode-autocomplete"
-              options={/*criteriaData.data.childbirthMode ||*/ booleanFieldsData || []}
+              options={criteriaData.data.childbirthMode || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={childbirthMode}
@@ -351,7 +449,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="maturation-reason-autocomplete"
-              options={/*criteriaData.data.maturationReason ||*/ booleanFieldsData || []}
+              options={criteriaData.data.maturationReason || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={maturationReason}
@@ -367,7 +465,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="maturation-modality-autocomplete"
-              options={/*criteriaData.data.maturationModality ||*/ booleanFieldsData || []}
+              options={criteriaData.data.maturationModality || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={maturationModality}
@@ -383,7 +481,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="img-indication-autocomplete"
-              options={/*criteriaData.data.imgIndication ||*/ booleanFieldsData || []}
+              options={criteriaData.data.imgIndication || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={imgIndication}
@@ -399,7 +497,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="labor-or-cesarean-entry-autocomplete"
-              options={/*criteriaData.data.laborOrCesareanEntry ||*/ booleanFieldsData || []}
+              options={criteriaData.data.laborOrCesareanEntry || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={laborOrCesareanEntry}
@@ -417,7 +515,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="pathology-during-labor-autocomplete"
-              options={/*criteriaData.data.pathologyDuringLabor ||*/ booleanFieldsData || []}
+              options={criteriaData.data.pathologyDuringLabor || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={pathologyDuringLabor}
@@ -433,7 +531,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="obstetrical-gesture-during-labor-autocomplete"
-              options={/*criteriaData.data.obstetricalGestureDuringLabor ||*/ booleanFieldsData || []}
+              options={criteriaData.data.obstetricalGestureDuringLabor || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={obstetricalGestureDuringLabor}
@@ -455,7 +553,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="analgesie-type-autocomplete"
-              options={/*criteriaData.data.analgesieType ||*/ booleanFieldsData || []}
+              options={criteriaData.data.analgesieType || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={analgesieType}
@@ -474,10 +572,10 @@ const HospitForm = ({
             </FormLabel>
             <CalendarRange
               inline
-              value={[pregnancyStartDate, pregnancyEndDate]}
+              value={[birthDeliveryStartDate, birthDeliveryEndDate]}
               onChange={([start, end]) => {
-                setPregnancyStartDate(start)
-                setPregnancyEndDate(end)
+                setBirthDeliveryStartDate(start)
+                setBirthDeliveryEndDate(end)
               }}
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
             />
@@ -488,11 +586,11 @@ const HospitForm = ({
               Accouchement - Terme - Semaines
             </FormLabel>
             <OccurenceInput
-              value={parity}
-              comparator={parityComparator}
-              onchange={(newParity, newComparator) => {
-                setParity(newParity)
-                setParityComparator(newComparator)
+              value={birthDeliveryWeeks}
+              comparator={birthDeliveryWeeksComparator}
+              onchange={(newBirthdaydeliveryWeeks, newComparator) => {
+                setBirthDeliveryWeeks(newBirthdaydeliveryWeeks)
+                setBirthDeliveryWeeksComparator(newComparator)
               }}
             />
           </BlockWrapper>
@@ -502,11 +600,11 @@ const HospitForm = ({
               Accouchement - Terme - Jours
             </FormLabel>
             <OccurenceInput
-              value={parity}
-              comparator={parityComparator}
-              onchange={(newParity, newComparator) => {
-                setParity(newParity)
-                setParityComparator(newComparator)
+              value={birthDeliveryDays}
+              comparator={birthDeliveryDaysComparator}
+              onchange={(newbirthDeliveryDays, newComparator) => {
+                setBirthDeliveryDays(newbirthDeliveryDays)
+                setBirthDeliveryDaysComparator(newComparator)
               }}
             />
           </BlockWrapper>
@@ -518,13 +616,13 @@ const HospitForm = ({
 
             <Autocomplete
               multiple
-              id="risks-or-complications-of-pregnancy-autocomplete"
-              options={/*criteriaData.data.risksOrComplicationsOfPregnancy*/ risksOrComplicationsOfPregnancyData || []}
+              id="birth-delivery-way-autocomplete"
+              options={criteriaData.data.birthDeliveryWay || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={risksOrComplicationsOfPregnancy}
-              onChange={(e, value) => setRisksOrComplicationsOfPregnancy(value)}
-              renderInput={(params) => <TextField {...params} label="Risques ou complications de la grossesse" />}
+              value={birthDeliveryWay}
+              onChange={(e, value) => setBirthDeliveryWay(value)}
+              renderInput={(params) => <TextField {...params} label="Voie d’accouchement" />}
               style={{ marginBottom: '1em' }}
             />
           </BlockWrapper>
@@ -536,13 +634,13 @@ const HospitForm = ({
 
             <Autocomplete
               multiple
-              id="risks-or-complications-of-pregnancy-autocomplete"
-              options={/*criteriaData.data.risksOrComplicationsOfPregnancy*/ risksOrComplicationsOfPregnancyData || []}
+              id="instrument-type-autocomplete"
+              options={criteriaData.data.instrumentType || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={risksOrComplicationsOfPregnancy}
-              onChange={(e, value) => setRisksOrComplicationsOfPregnancy(value)}
-              renderInput={(params) => <TextField {...params} label="Risques ou complications de la grossesse" />}
+              value={instrumentType}
+              onChange={(e, value) => setInstrumentType(value)}
+              renderInput={(params) => <TextField {...params} label="Type d'instrument" />}
               style={{ marginBottom: '1em' }}
             />
           </BlockWrapper>
@@ -554,13 +652,13 @@ const HospitForm = ({
 
             <Autocomplete
               multiple
-              id="risks-or-complications-of-pregnancy-autocomplete"
-              options={/*criteriaData.data.risksOrComplicationsOfPregnancy*/ risksOrComplicationsOfPregnancyData || []}
+              id="c-section-modality-autocomplete"
+              options={criteriaData.data.cSectionModality || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={risksOrComplicationsOfPregnancy}
-              onChange={(e, value) => setRisksOrComplicationsOfPregnancy(value)}
-              renderInput={(params) => <TextField {...params} label="Risques ou complications de la grossesse" />}
+              value={cSectionModality}
+              onChange={(e, value) => setCSectionModality(value)}
+              renderInput={(params) => <TextField {...params} label="Modalités de la césarienne" />}
               style={{ marginBottom: '1em' }}
             />
           </BlockWrapper>
@@ -572,13 +670,13 @@ const HospitForm = ({
 
             <Autocomplete
               multiple
-              id="risks-or-complications-of-pregnancy-autocomplete"
-              options={/*criteriaData.data.risksOrComplicationsOfPregnancy*/ risksOrComplicationsOfPregnancyData || []}
+              id="presentation-at-delivery-autocomplete"
+              options={criteriaData.data.presentationAtDelivery || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={risksOrComplicationsOfPregnancy}
-              onChange={(e, value) => setRisksOrComplicationsOfPregnancy(value)}
-              renderInput={(params) => <TextField {...params} label="Risques ou complications de la grossesse" />}
+              value={presentationAtDelivery}
+              onChange={(e, value) => setPresentationAtDelivery(value)}
+              renderInput={(params) => <TextField {...params} label="Présentation à l'accouchement" />}
               style={{ marginBottom: '1em' }}
             />
           </BlockWrapper>
@@ -588,11 +686,11 @@ const HospitForm = ({
               Mensurations naissance - Poids (g)
             </FormLabel>
             <OccurenceInput
-              value={parity}
-              comparator={parityComparator}
-              onchange={(newParity, newComparator) => {
-                setParity(newParity)
-                setParityComparator(newComparator)
+              value={birthMensurationsGrams}
+              comparator={birthMensurationsGramsComparator}
+              onchange={(newBirthMensurations, newComparator) => {
+                setBirthMensurationsGrams(newBirthMensurations)
+                setBirthMensurationsGramsComparator(newComparator)
               }}
             />
           </BlockWrapper>
@@ -602,11 +700,11 @@ const HospitForm = ({
               Mensurations naissance - Poids (percentile)
             </FormLabel>
             <OccurenceInput
-              value={parity}
-              comparator={parityComparator}
-              onchange={(newParity, newComparator) => {
-                setParity(newParity)
-                setParityComparator(newComparator)
+              value={birthMensurationsPercentil}
+              comparator={birthMensurationsPercentilComparator}
+              onchange={(newbirthMensurationsPercentil, newComparator) => {
+                setBirthMensurationsPercentil(newbirthMensurationsPercentil)
+                setBirthMensurationsPercentilComparator(newComparator)
               }}
             />
           </BlockWrapper>
@@ -616,11 +714,11 @@ const HospitForm = ({
               Score Apgar - 1 min
             </FormLabel>
             <OccurenceInput
-              value={parity}
-              comparator={parityComparator}
-              onchange={(newParity, newComparator) => {
-                setParity(newParity)
-                setParityComparator(newComparator)
+              value={apgar1}
+              comparator={apgar1Comparator}
+              onchange={(newapgar1, newComparator) => {
+                setApgar1(newapgar1)
+                setApgar1Comparator(newComparator)
               }}
             />
           </BlockWrapper>
@@ -630,11 +728,11 @@ const HospitForm = ({
               Score Apgar - 3 min
             </FormLabel>
             <OccurenceInput
-              value={parity}
-              comparator={parityComparator}
-              onchange={(newParity, newComparator) => {
-                setParity(newParity)
-                setParityComparator(newComparator)
+              value={apgar3}
+              comparator={apgar3Comparator}
+              onchange={(newapgar3, newComparator) => {
+                setApgar3(newapgar3)
+                setApgar3Comparator(newComparator)
               }}
             />
           </BlockWrapper>
@@ -644,11 +742,11 @@ const HospitForm = ({
               Score Apgar - 5 min
             </FormLabel>
             <OccurenceInput
-              value={parity}
-              comparator={parityComparator}
-              onchange={(newParity, newComparator) => {
-                setParity(newParity)
-                setParityComparator(newComparator)
+              value={apgar5}
+              comparator={apgar5Comparator}
+              onchange={(newapgar5, newComparator) => {
+                setApgar5(newapgar5)
+                setApgar5Comparator(newComparator)
               }}
             />
           </BlockWrapper>
@@ -658,11 +756,11 @@ const HospitForm = ({
               Score Apgar - 10 min
             </FormLabel>
             <OccurenceInput
-              value={parity}
-              comparator={parityComparator}
-              onchange={(newParity, newComparator) => {
-                setParity(newParity)
-                setParityComparator(newComparator)
+              value={apgar10}
+              comparator={apgar10Comparator}
+              onchange={(newapgar10, newComparator) => {
+                setApgar10(newapgar10)
+                setApgar10Comparator(newComparator)
               }}
             />
           </BlockWrapper>
@@ -672,11 +770,11 @@ const HospitForm = ({
               pH artériel au cordon
             </FormLabel>
             <OccurenceInput
-              value={parity}
-              comparator={parityComparator}
-              onchange={(newParity, newComparator) => {
-                setParity(newParity)
-                setParityComparator(newComparator)
+              value={arterialPhCord}
+              comparator={arterialPhCordComparator}
+              onchange={(newarterialPhCord, newComparator) => {
+                setArterialPhCord(newarterialPhCord)
+                setArterialPhCordComparator(newComparator)
               }}
             />
           </BlockWrapper>
@@ -686,12 +784,66 @@ const HospitForm = ({
               Lactates artériel au cordon (mmol/L)
             </FormLabel>
             <OccurenceInput
-              value={parity}
-              comparator={parityComparator}
-              onchange={(newParity, newComparator) => {
-                setParity(newParity)
-                setParityComparator(newComparator)
+              value={arterialCordLactates}
+              comparator={arterialCordLactatesComparator}
+              onchange={(newarterialCordLactates, newComparator) => {
+                setArterialCordLactates(newarterialCordLactates)
+                setArterialCordLactatesComparator(newComparator)
               }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Hémorragie du post-partum
+            </FormLabel>
+
+            <Autocomplete
+              multiple
+              id="Postpartum-hemorrhage-autocomplete"
+              options={criteriaData.data.postpartumHemorrhage || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={postpartumHemorrhage}
+              onChange={(e, value) => setPostpartumHemorrhage(value)}
+              renderInput={(params) => <TextField {...params} label="Hémorragie du post-partum" />}
+              style={{ marginBottom: '1em' }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              État du Périnée
+            </FormLabel>
+
+            <Autocomplete
+              multiple
+              id="condition-of-the-perineum-autocomplete"
+              options={criteriaData.data.conditionPerineum || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={conditionPerineum}
+              onChange={(e, value) => setConditionPerineum(value)}
+              renderInput={(params) => <TextField {...params} label="État du Périnée" />}
+              style={{ marginBottom: '1em' }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Type de lieu de sortie
+            </FormLabel>
+
+            <Autocomplete
+              multiple
+              id="exit-place-type-autocomplete"
+              options={criteriaData.data.exitPlaceType || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={exitPlaceType}
+              onChange={(e, value) => setExitPlaceType(value)}
+              renderInput={(params) => <TextField {...params} label="Type de lieu de sortie" />}
+              style={{ marginBottom: '1em' }}
             />
           </BlockWrapper>
         </Collapse>
@@ -706,7 +858,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="feeding-type-autocomplete"
-              options={/*criteriaData.data.feedingType ||*/ booleanFieldsData || []}
+              options={criteriaData.data.feedingType || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={feedingType}
@@ -722,7 +874,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="complication-autocomplete"
-              options={/*criteriaData.data.complication ||*/ booleanFieldsData || []}
+              options={criteriaData.data.complication || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={complication}
@@ -742,7 +894,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="exit-feeding-mode-autocomplete"
-              options={/*criteriaData.data.exitFeedingMode ||*/ booleanFieldsData || []}
+              options={criteriaData.data.exitFeedingMode || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={exitFeedingMode}
@@ -758,7 +910,7 @@ const HospitForm = ({
             <Autocomplete
               multiple
               id="exit-diagnostic-autocomplete"
-              options={/*criteriaData.data.exitDiagnostic ||*/ booleanFieldsData || []}
+              options={criteriaData.data.exitDiagnostic || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={exitDiagnostic}
