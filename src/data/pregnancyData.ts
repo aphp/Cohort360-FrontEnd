@@ -61,5 +61,17 @@ export const pregnancyForm: {
   ultrasoundMonitoring: {
     id: 'F_MATER_001550',
     type: 'valueCoding'
+  },
+  pregnancyType: {
+    id: 'F_MATER_001024',
+    type: 'valueString'
+  },
+  twinPregnancyType: {
+    id: 'F_MATER_001025',
+    type: 'valueCoding'
+  },
+  reasonsOfPrenatalDiagnosticMonitoring: {
+    id: 'F_MATER_001662',
+    type: 'valueString'
   }
 }

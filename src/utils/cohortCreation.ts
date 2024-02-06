@@ -18,7 +18,7 @@ import {
   IMAGING_STUDY_UID_URL,
   PROCEDURE_HIERARCHY
 } from '../constants'
-import { DocumentAttachmentMethod, LabelObject, SearchByTypes } from 'types/searchCriterias'
+import { DocumentAttachmentMethod, FormNames, LabelObject, SearchByTypes } from 'types/searchCriterias'
 import { Comparators, RessourceType, SelectedCriteriaType, CriteriaDataKey } from 'types/requestCriterias'
 import { parseOccurence } from './valueComparator'
 import { parseDocumentAttachment } from './documentAttachment'
@@ -112,8 +112,6 @@ const IMAGING_SERIES_DESCRIPTION = 'series-description'
 const IMAGING_SERIES_PROTOCOL = 'series-protocol'
 const IMAGING_SERIES_MODALITIES = 'series-modality'
 const IMAGING_SERIES_UID = 'series'
-
-export const PREGNANCY_FORM_NAME = 'aphp-sdc-fiche-grossesse'
 
 // const HOSPIT_HOSPIT_REASON = 'F_MATER_004051'
 // const HOSPIT_IN_UTERO_TRANSFER = 'F_MATER_004056'
@@ -428,7 +426,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.PREGNANCY:
       filterFhir = [
         'subject.active=true',
-        `questionnaire.name=${PREGNANCY_FORM_NAME}`,
+        `questionnaire.name=${FormNames.PREGNANCY}`,
         questionnaireFiltersBuilders(
           pregnancyForm.pregnancyStartDate,
           buildDateFilter(criterion.pregnancyStartDate, 'ge')
@@ -1335,7 +1333,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
           const cleanedFilters = unbuildQuestionnaireFilters(splittedFilters)
 
           switch (findRessource) {
-            case PREGNANCY_FORM_NAME:
+            case FormNames.PREGNANCY:
               currentCriterion.title = 'Critère de Fiche de grossesse'
               currentCriterion.type = RessourceType.PREGNANCY
               currentCriterion.pregnancyStartDate = null

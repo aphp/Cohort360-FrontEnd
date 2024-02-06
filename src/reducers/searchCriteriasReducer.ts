@@ -16,7 +16,8 @@ import {
   OrderBy,
   FilterKeys,
   FilterValue,
-  CohortsFilters
+  CohortsFilters,
+  FormsFilters
 } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
 
@@ -162,6 +163,20 @@ export const initImagingCriterias: SearchCriterias<ImagingFilters> = {
     endDate: null,
     executiveUnits: [],
     modality: []
+  }
+}
+
+export const initFormsCriterias: SearchCriterias<FormsFilters> = {
+  orderBy: {
+    orderBy: Order.DATE,
+    orderDirection: Direction.DESC
+  },
+  searchInput: '',
+  filters: {
+    formName: [],
+    startDate: null,
+    endDate: null,
+    executiveUnits: []
   }
 }
 

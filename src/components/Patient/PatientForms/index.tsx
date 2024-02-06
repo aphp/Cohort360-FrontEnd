@@ -1,17 +1,29 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Dialog, DialogContent, Grid } from '@mui/material'
+import moment from 'moment'
 import { useAppDispatch, useAppSelector } from 'state'
-import { CohortQuestionnaireResponse, LoadingStatus } from 'types'
-import useSearchCriterias from 'reducers/searchCriteriasReducer'
-import { selectFiltersAsArray } from 'utils/filters'
-import { CanceledError } from 'axios'
-import Select from 'components/ui/Searchbar/Select'
-import { cancelPendingRequest } from 'utils/abortController'
-import { FormsFilters, OrderByKeys, SearchCriterias } from 'types/searchCriterias'
-import { fetchForms } from 'state/patient'
+import { Grid, useMediaQuery, useTheme } from '@mui/material'
+import { FilterList } from '@mui/icons-material'
+import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
+import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
+import MaternityFormFilter from 'components/Filters/MaternityFormFilter'
 import Button from 'components/ui/Button'
+import Chip from 'components/ui/Chip'
+import { BlockWrapper } from 'components/ui/Layout'
+import Modal from 'components/ui/Modal'
+import Searchbar from 'components/ui/Searchbar'
+import Select from 'components/ui/Searchbar/Select'
+import useSearchCriterias, { initFormsCriterias } from 'reducers/searchCriteriasReducer'
+import { CanceledError } from 'axios'
+import { fetchForms } from 'state/patient'
 import { pregnancyForm } from 'data/pregnancyData'
-import { QuestionnaireResponseItemAnswer } from 'fhir/r4'
+import PregnancyFormDetails from './PregnancyFormDetails'
+import HospitFormDetails from './HospitFormDetails'
+import { cancelPendingRequest } from 'utils/abortController'
+import { selectFiltersAsArray } from 'utils/filters'
+import { getDataFromForm } from 'utils/formUtils'
+import { QuestionnaireResponse } from 'fhir/r4'
+import { CriteriaName, LoadingStatus } from 'types'
+import { FilterKeys } from 'types/searchCriterias'
 
 type PatientFormsProps = {
   groupId?: string
@@ -25,25 +37,33 @@ const forms = [
 ]
 
 const PatientForms = ({ groupId }: PatientFormsProps) => {
+  const theme = useTheme()
+  const isMd = useMediaQuery(theme.breakpoints.between('sm', 'lg'))
+  const isSm = useMediaQuery(theme.breakpoints.down('md'))
+  const [toggleModal, setToggleModal] = useState(false)
+
   const dispatch = useAppDispatch()
   const patient = useAppSelector((state) => state.patient)
   const [form, setForm] = useState('maternity')
+  const [togglePregnancyDetails, setTogglePregnancyDetails] = useState<QuestionnaireResponse | undefined>(undefined)
+  const [toggleHospitDetails, setToggleHospitDetails] = useState<QuestionnaireResponse | undefined>(undefined)
+
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
-  const searchResults = { list: patient?.forms?.list }
-  const [page, setPage] = useState(1)
-  const [togglePregnancyDetails, setTogglePregnancyDetails] = useState<CohortQuestionnaireResponse | undefined>(
-    undefined
-  )
-  //   const [
-  //     {
-  //       filters,
-  //       filters: {}
-  //     },
-  //     { addFilters, removeFilter }
-  //   ] = useSearchCriterias(initFormsSearchCriterias)
-  //   const filtersAsArray = useMemo(() => {
-  //     return selectFiltersAsArray({})
-  //   }, [])
+  const [
+    {
+      filters,
+      filters: { formName, startDate, endDate, executiveUnits }
+    },
+    { addFilters, removeFilter }
+  ] = useSearchCriterias(initFormsCriterias)
+  const filtersAsArray = useMemo(() => {
+    return selectFiltersAsArray({ formName, startDate, endDate, executiveUnits })
+  }, [formName, startDate, endDate, executiveUnits])
+
+  const searchResults = {
+    pregnancyFormList: patient?.forms?.pregnancyFormList,
+    hospitFormList: patient?.forms?.hospitFormList
+  }
 
   const controllerRef = useRef<AbortController | null>(null)
 
@@ -53,11 +73,8 @@ const PatientForms = ({ groupId }: PatientFormsProps) => {
       const response = await dispatch(
         fetchForms({
           options: {
-            page,
             searchCriterias: {
-              orderBy: 'name',
-              searchInput: '',
-              filters: { formName: 'pregnancy' }
+              filters: { formName, startDate, endDate, executiveUnits }
             }
           },
           groupId: groupId
@@ -79,12 +96,11 @@ const PatientForms = ({ groupId }: PatientFormsProps) => {
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
-    setPage(1)
   }, [])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
-  }, [page])
+  }, [formName, startDate, endDate, executiveUnits])
 
   useEffect(() => {
     if (loadingStatus === LoadingStatus.IDDLE) {
@@ -93,63 +109,83 @@ const PatientForms = ({ groupId }: PatientFormsProps) => {
     }
   }, [loadingStatus])
 
-  const getDataFromForm = (
-    form: CohortQuestionnaireResponse,
-    pregnancyDataName: { id: string; type: keyof QuestionnaireResponseItemAnswer }
-  ) => {
-    console.log('pregnancyDataName.type', pregnancyDataName.type)
-    console.log('form', form.item?.find((item) => item.linkId === pregnancyDataName.id)?.answer?.[0]?.valueString)
-    console.log(
-      'form que jai implem',
-      form.item?.find((item) => item.linkId === pregnancyDataName.id)?.answer?.[0]?.[pregnancyDataName.type]
-    )
-
-    switch (pregnancyDataName.type) {
-      case value:
-        break
-
-      default:
-        break
-    }
-
-    return (
-      form.item
-        ?.find((item) => item.linkId === pregnancyDataName.id)
-        ?.answer?.[0]?.[pregnancyDataName.type]?.toString() ?? ''
-    )
-  }
-
   return (
     <Grid container justifyContent="flex-end">
-      <Select selectedValue={form} label="Formulaire" items={forms} onchange={(newValue) => setForm(newValue)} />
-      {searchResults.list?.map((form, index) => (
+      <BlockWrapper item xs={12} margin={'20px 0px 10px'}>
+        <Searchbar>
+          <Grid container item xs={12} md={12} lg={8} xl={8} style={isSm ? { flexWrap: 'wrap-reverse' } : {}}>
+            <Grid
+              container
+              justifyContent={isSm ? 'flex-start' : isMd ? 'flex-end' : 'center'}
+              alignItems="end"
+              item
+              xs={12}
+              md={7}
+              lg={7}
+              xl={7}
+              style={isSm ? { marginBottom: 20 } : {}}
+            >
+              <Select value={form} label="Formulaire" items={forms} onchange={(newValue) => setForm(newValue)} />
+            </Grid>
+          </Grid>
+
+          <Grid container item xs={12} md={12} lg={4} xl={4} justifyContent="flex-end">
+            <Button width={'30%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
+              Filtrer
+            </Button>
+            {toggleModal && (
+              <Modal
+                title="Filtrer par :"
+                open={toggleModal}
+                width={'600px'}
+                onClose={() => setToggleModal(false)}
+                onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
+              >
+                <MaternityFormFilter name={FilterKeys.FORM_NAME} value={formName} />
+                <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
+                <ExecutiveUnitsFilter
+                  value={executiveUnits}
+                  name={FilterKeys.EXECUTIVE_UNITS}
+                  criteriaName={CriteriaName.Form}
+                />
+              </Modal>
+            )}
+          </Grid>
+        </Searchbar>
+      </BlockWrapper>
+      {filtersAsArray.length > 0 && (
+        <Grid item xs={12} margin="0px 0px 10px">
+          {filtersAsArray.map((filter, index) => (
+            <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
+          ))}
+        </Grid>
+      )}
+      {searchResults.pregnancyFormList?.map((form, index) => (
         <Grid container item key={index}>
           <Grid container item xs={4} justifyContent="column">
-            <p> {form.item?.find((item) => item.linkId === 'F_MATER_001024')?.answer?.[0].valueString}</p>
-            <p> {getDataFromForm(form, pregnancyForm.foetus)} </p>
-            <p>Date de début de grossesse : {getDataFromForm(form, pregnancyForm.startDate)}</p>
+            <p> {getDataFromForm(form, pregnancyForm.pregnancyType)} </p>
+            <p>Début de grossesse : {moment(getDataFromForm(form, pregnancyForm.startDate)).format('DD/MM/YYYY')}</p>
             <p>Unité exécutrice à compléter</p>
             <Button onClick={() => setTogglePregnancyDetails(form)}>+ de détails</Button>
           </Grid>
           <Grid container item xs={8}>
-            {form.hospitLinked?.map((hospit, index) => (
+            {/* {form.hospitLinked?.map((hospit, index) => (
               <Grid container item key={index}>
                 <p>Unité exécutrice à compléter</p>
-                {/* Du {getDataFromForm(hospit, pregnancyForm.startDate)} au{' '}
-                {getDataFromForm(hospit, pregnancyForm.endDate)} */}
+                <Button onClick={() => setToggleHospitDetails(hospit)}>+ de détails</Button>
               </Grid>
-            ))}
+            ))} */}
           </Grid>
         </Grid>
       ))}
       {togglePregnancyDetails && (
-        <Dialog open>
-          <DialogContent>
-            Nombre de foetus: Type de grossesse: Type de grossesse gémellaire: Parité: Risques liés aux antécédents
-            maternels: Suivi échographique - Précision : Risques ou complications de la grossesse : Grossesse suivie au
-            diagnostic prénatal :
-          </DialogContent>
-        </Dialog>
+        <PregnancyFormDetails
+          pregnancyFormData={togglePregnancyDetails}
+          onClose={() => setTogglePregnancyDetails(undefined)}
+        />
+      )}
+      {toggleHospitDetails && (
+        <HospitFormDetails hospitFormData={toggleHospitDetails} onClose={() => setToggleHospitDetails(undefined)} />
       )}
     </Grid>
   )

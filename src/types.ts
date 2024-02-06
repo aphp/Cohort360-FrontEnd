@@ -16,7 +16,6 @@ import {
   Parameters,
   Patient,
   Procedure,
-  QuestionnaireResponse,
   Resource
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
@@ -691,10 +690,6 @@ export type IPatientImaging<T extends CohortImaging> = {
   page: number
 }
 
-export type CohortQuestionnaireResponse = QuestionnaireResponse & {
-  hospitLinked?: QuestionnaireResponse[]
-}
-
 export type TabType<T, TL> = {
   label: TL
   id: T
@@ -800,7 +795,8 @@ export enum CriteriaName {
   Medication = 'medication',
   Biology = 'biology',
   VisitSupport = 'supported',
-  Imaging = 'imaging'
+  Imaging = 'imaging',
+  Form = 'questionnaireResponse'
 }
 export type CriteriaNameType =
   | CriteriaName.Cim10
@@ -811,6 +807,7 @@ export type CriteriaNameType =
   | CriteriaName.Biology
   | CriteriaName.VisitSupport
   | CriteriaName.Imaging
+  | CriteriaName.Form
 
 export type AccessExpirationsProps = {
   expiring?: boolean

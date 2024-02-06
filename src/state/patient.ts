@@ -11,8 +11,7 @@ import {
   IPatientMedication,
   IPatientObservation,
   IPatientImaging,
-  CohortImaging,
-  CohortQuestionnaireResponse
+  CohortImaging
 } from 'types'
 
 import { logout } from './me'
@@ -30,12 +29,14 @@ import {
   MedicationRequest,
   Observation,
   Patient,
-  Procedure
+  Procedure,
+  QuestionnaireResponse
 } from 'fhir/r4'
 import { CanceledError } from 'axios'
 import {
   BiologyFilters,
   Direction,
+  FormNames,
   FormsFilters,
   ImagingFilters,
   MedicationFilters,
@@ -82,7 +83,8 @@ export type PatientState = null | {
   imaging?: IPatientImaging<CohortImaging>
   forms?: {
     loading: boolean
-    list: CohortQuestionnaireResponse[]
+    pregnancyFormList: QuestionnaireResponse[]
+    hospitFormList: QuestionnaireResponse[]
   }
 }
 
@@ -544,8 +546,9 @@ const fetchDocuments = createAsyncThunk<
 /** fetchForms */
 type FetchFormsParams = {
   options: {
-    page: number
-    searchCriterias: SearchCriterias<FormsFilters>
+    searchCriterias: {
+      filters: FormsFilters
+    }
   }
   groupId?: string
 }
@@ -553,7 +556,8 @@ type FetchFormsReturn =
   | {
       forms: {
         loading: boolean
-        list: CohortQuestionnaireResponse[]
+        pregnancyFormList: QuestionnaireResponse[]
+        hospitFormList: QuestionnaireResponse[]
       }
     }
   | undefined
@@ -568,19 +572,30 @@ const fetchForms = createAsyncThunk<FetchFormsReturn, FetchFormsParams, { state:
         throw new Error('Patient Error: patient is required')
       }
 
-      const formName = searchCriterias.filters.formName
+      const formName = searchCriterias.filters.formName.join()
+      const startDate = searchCriterias.filters.startDate
+      const endDate = searchCriterias.filters.endDate
+      const executiveUnits = searchCriterias.filters.executiveUnits?.map((unit) => unit.id)
 
-      const formResponse = await services.patients.fetchForms(patientId, formName, groupId)
-      const formsList =
-        searchCriterias.filters.formName === 'pregnancy'
-          ? await services.patients.fetchHospitsLinkedToForm(patientId, formResponse.formsList)
-          : formResponse.formsList
+      const formResponse = await services.patients.fetchForms(
+        patientId,
+        formName,
+        groupId,
+        '',
+        startDate,
+        endDate,
+        executiveUnits
+      )
+      const formsList = searchCriterias.filters.formName.includes(FormNames.PREGNANCY)
+        ? await services.patients.fetchHospitsLinkedToForm(patientId, formResponse.formsList)
+        : formResponse.formsList
       console.log('formResponse', formResponse)
 
       return {
         forms: {
           loading: false,
-          list: formsList
+          pregnancyFormList: formsList,
+          hospitFormList: []
         }
       }
     } catch (error) {
@@ -1347,7 +1362,8 @@ const patientSlice = createSlice({
       loading: false,
       forms: {
         loading: false,
-        list: []
+        pregnancyFormList: [],
+        hospitFormList: []
       }
     }))
     builder.addCase(fetchForms.pending, (state) =>
@@ -1362,7 +1378,8 @@ const patientSlice = createSlice({
                 }
               : {
                   loading: true,
-                  list: []
+                  pregnancyFormList: [],
+                  hospitFormList: []
                 }
           }
     )
