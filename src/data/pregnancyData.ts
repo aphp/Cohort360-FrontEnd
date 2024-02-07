@@ -6,11 +6,11 @@ export const pregnancyForm: {
     type: keyof QuestionnaireResponseItemAnswer
   }
 } = {
-  startDate: {
+  pregnancyStartDate: {
     id: 'F_MATER_001010',
     type: 'valueDate'
   },
-  endDate: {
+  pregnancyEndDate: {
     id: 'F_MATER_001010',
     type: 'valueDate'
   },
@@ -34,19 +34,19 @@ export const pregnancyForm: {
     id: 'F_MATER_001362',
     type: 'valueString'
   },
-  risksObstetricHistory: {
+  risksRelatedToObstetricHistory: {
     id: 'F_MATER_001363',
     type: 'valueCoding'
   },
-  risksObstetricHistoryPrecision: {
+  risksRelatedToObstetricHistoryPrecision: {
     id: 'F_MATER_001364',
     type: 'valueString'
   },
-  risksComplicationPregnancy: {
+  risksOrComplicationsOfPregnancy: {
     id: 'F_MATER_001631',
     type: 'valueCoding'
   },
-  risksComplicationPregnancyPrecision: {
+  risksOrComplicationsOfPregnancyPrecision: {
     id: 'F_MATER_001632',
     type: 'valueString'
   },

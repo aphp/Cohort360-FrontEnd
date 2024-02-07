@@ -426,12 +426,15 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.PREGNANCY:
       filterFhir = [
         'subject.active=true',
-        `questionnaire.name=${FormNames.PREGNANCY}`,
+        `questionnaire=${FormNames.PREGNANCY}`,
         questionnaireFiltersBuilders(
           pregnancyForm.pregnancyStartDate,
-          buildDateFilter(criterion.pregnancyStartDate, 'ge')
+          buildDateFilter(criterion.pregnancyStartDate, 'ge', true)
         ),
-        questionnaireFiltersBuilders(pregnancyForm.pregnancyEndDate, buildDateFilter(criterion.pregnancyEndDate, 'le')),
+        questionnaireFiltersBuilders(
+          pregnancyForm.pregnancyEndDate,
+          buildDateFilter(criterion.pregnancyEndDate, 'le', true)
+        ),
         questionnaireFiltersBuilders(pregnancyForm.pregnancyMode, buildLabelObjectFilter(criterion.pregnancyMode)),
         questionnaireFiltersBuilders(
           pregnancyForm.foetus,
@@ -447,7 +450,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
           buildSearchFilter(criterion.maternalRisksPrecision)
         ),
         questionnaireFiltersBuilders(
-          pregnancyForm.risksObstetricHistory,
+          pregnancyForm.risksRelatedToObstetricHistory,
           buildLabelObjectFilter(criterion.risksRelatedToObstetricHistory)
         ),
         questionnaireFiltersBuilders(
@@ -455,11 +458,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
           buildSearchFilter(criterion.risksRelatedToObstetricHistoryPrecision)
         ),
         questionnaireFiltersBuilders(
-          pregnancyForm.risksComplicationPregnancy,
+          pregnancyForm.risksOrComplicationsOfPregnancy,
           buildLabelObjectFilter(criterion.risksOrComplicationsOfPregnancy)
         ),
         questionnaireFiltersBuilders(
-          pregnancyForm.risksRelatedToObstetricHistoryPrecision,
+          pregnancyForm.risksOrComplicationsOfPregnancyPrecision,
           buildSearchFilter(criterion.risksOrComplicationsOfPregnancyPrecision)
         ),
         questionnaireFiltersBuilders(pregnancyForm.corticotherapie, buildLabelObjectFilter(criterion.corticotherapie)),
@@ -1357,9 +1360,13 @@ export async function unbuildRequest(_json: string): Promise<any> {
 
               unbuildAdvancedCriterias(element, currentCriterion)
 
+              console.log('test cleanedFilters', cleanedFilters)
+
               for (const filter of cleanedFilters) {
+                console.log('test filter', filter)
                 const key = filter?.[0]
-                const value = filter?.[1] ?? ''
+                const comparator = filter?.[1]
+                const value = filter?.[2] ?? ''
 
                 switch (key) {
                   case pregnancyForm.pregnancyStartDate.id:
@@ -1372,13 +1379,15 @@ export async function unbuildRequest(_json: string): Promise<any> {
                     unbuildLabelObjectFilter(currentCriterion, 'pregnancyMode', value)
                     break
                   case pregnancyForm.foetus.id: {
-                    const parsedOccurence = parseOccurence(value)
+                    const _value = `${comparator}${value}`
+                    const parsedOccurence = parseOccurence(_value)
                     currentCriterion.foetus = parsedOccurence.value
                     currentCriterion.foetusComparator = parsedOccurence.comparator
                     break
                   }
                   case pregnancyForm.parity.id: {
-                    const parsedOccurence = parseOccurence(value)
+                    const _value = `${comparator}${value}`
+                    const parsedOccurence = parseOccurence(_value)
                     currentCriterion.parity = parsedOccurence.value
                     currentCriterion.parityComparator = parsedOccurence.comparator
                     break

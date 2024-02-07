@@ -37,21 +37,21 @@ import {
   MEDICATION_UCD,
   MEDICATION_PRESCRIPTION_TYPES,
   PROCEDURE_HIERARCHY,
-  SHORT_COHORT_LIMIT
-  // PREGNANCY_MODE,
-  // MATERNAL_RISKS,
-  // RISKSORCOMPLICATIONSOFPREGNANCY,
-  // RISKSRELATEDTOOBSTETRICHISTORY
+  SHORT_COHORT_LIMIT,
+  PREGNANCY_MODE,
+  MATERNAL_RISKS,
+  RISKSORCOMPLICATIONSOFPREGNANCY,
+  RISKSRELATEDTOOBSTETRICHISTORY
 } from '../../constants'
 import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
 import { DocType } from 'types/requestCriterias'
 import { VitalStatusLabel } from 'types/searchCriterias'
 import {
   booleanFieldsData,
-  pregnancyModeData,
-  maternalRisksData,
-  risksOrComplicationsOfPregnancyData,
-  risksRelatedToObstetricHistoryData
+  pregnancyModeData
+  // maternalRisksData,
+  // risksOrComplicationsOfPregnancyData,
+  // risksRelatedToObstetricHistoryData
 } from 'data/fake_mater_data'
 
 export interface IServiceCohortCreation {
@@ -444,24 +444,12 @@ const servicesCohortCreation: IServiceCohortCreation = {
     const modalities = await fetchValueSet(IMAGING_MODALITIES, { joinDisplayWithCode: false })
     return modalities.map((modality) => ({ ...modality, label: `${modality.id} - ${modality.label}` }))
   },
-  // fetchPregnancyMode: async () => fetchValueSet(PREGANCY_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  // fetchMaternalRisks: async () => fetchValueSet(MATERNAL_RISKS, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  // fetchRisksRelatedToObstetricHistory: async () =>
-  //   fetchValueSet(RISKSRELATEDTOOBSTETRICHISTORY, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  // fetchRisksOrComplicationsOfPregnancy: async () =>
-  //   fetchValueSet(RISKSORCOMPLICATIONSOFPREGNANCY, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchPregnancyMode: async () => {
-    return pregnancyModeData
-  },
-  fetchMaternalRisks: async () => {
-    return maternalRisksData
-  },
-  fetchRisksRelatedToObstetricHistory: async () => {
-    return risksRelatedToObstetricHistoryData
-  },
-  fetchRisksOrComplicationsOfPregnancy: async () => {
-    return risksOrComplicationsOfPregnancyData
-  },
+  fetchPregnancyMode: async () => fetchValueSet(PREGNANCY_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchMaternalRisks: async () => fetchValueSet(MATERNAL_RISKS, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchRisksRelatedToObstetricHistory: async () =>
+    fetchValueSet(RISKSRELATEDTOOBSTETRICHISTORY, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchRisksOrComplicationsOfPregnancy: async () =>
+    fetchValueSet(RISKSORCOMPLICATIONSOFPREGNANCY, { joinDisplayWithCode: false, sortingKey: 'id' }),
   fetchCorticotherapie: async () => {
     return booleanFieldsData
   },

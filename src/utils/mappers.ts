@@ -27,6 +27,7 @@ import services from 'services/aphp'
 const searchReducer = (accumulator: any, currentValue: any): string =>
   accumulator || accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 const comparator = /(le|ge)/gi
+
 const replaceTime = (date?: string) => {
   return date?.replace('T00:00:00Z', '') ?? null
 }
@@ -81,8 +82,14 @@ export const unbuildEncounterServiceCriterias = async (
   }
 }
 
-export const buildDateFilter = (criterion: string | null | undefined, comparator: 'le' | 'ge') => {
-  return criterion ? `${comparator}${moment(criterion).format('YYYY-MM-DD[T00:00:00Z]')}` : ''
+export const buildDateFilter = (
+  criterion: string | null | undefined,
+  comparator: 'le' | 'ge',
+  removeTimeZone = false
+) => {
+  return criterion
+    ? `${comparator}${moment(criterion).format(`YYYY-MM-DD[T00:00:00${removeTimeZone ? '' : 'Z'}]`)}`
+    : ''
 }
 
 export const unbuildDateFilter = (value: string) => {
@@ -214,12 +221,15 @@ export const buildSimpleFilter = (criterion: string, fhirKey: string, url?: stri
 }
 
 export const questionnaireFiltersBuilders = (fhirKey: { id: string; type: string }, value?: string) => {
-  return value ? `_filter=linkId eq ${fhirKey.id} and item.answer.${fhirKey.type} eq ${value}` : ''
+  const slice = value?.slice(0, 2)
+  const operator = slice === 'ge' || slice === 'le' || slice === 'lt' || slice === 'gt' || slice === 'eq' ? slice : 'eq'
+  const _value = slice === 'ge' || slice === 'le' || slice === 'lt' || slice === 'gt' ? value?.slice(2) : value
+  return value ? `_filter=item.linkId eq ${fhirKey.id} and item.answer.${fhirKey.type} ${operator} ${_value}` : ''
 }
 
 export const findQuestionnaireRessource = (filters: string[]) => {
   for (const item of filters) {
-    const match = item.match(/questionnaire\.name=([^']*)/)
+    const match = item.match(/questionnaire=([^']*)/)
     if (match && match[1]) {
       return match[1]
     }
@@ -227,14 +237,14 @@ export const findQuestionnaireRessource = (filters: string[]) => {
 }
 
 export const unbuildQuestionnaireFilters = (filters: string[]) => {
-  const regex = /linkId eq (\S+) and item\.answer\.\S+ eq (\S+)/
+  const regex = /linkId eq (\S+) and item\.answer\.\S+ (\S+) (\S+)/
 
   return filters
     .map((str) => {
       const match = str.match(regex)
       if (match) {
-        const [, linkId, value] = match
-        return [linkId, value]
+        const [, linkId, operator, value] = match
+        return [linkId, operator, value]
       }
     })
     .filter((elem) => elem)
