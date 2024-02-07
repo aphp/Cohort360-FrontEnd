@@ -195,7 +195,7 @@ export type Filters =
   | DocumentsFilters
   | CohortsFilters
   | ImagingFilters
-  | FormsFilters
+  | MaternityFormFilters
 
 export type GenericFilter = {
   nda: string
@@ -232,7 +232,7 @@ export type ImagingFilters = GenericFilter & {
   modality: LabelObject[]
 }
 
-export type FormsFilters = {
+export type MaternityFormFilters = {
   formName: FormNames[]
   startDate: string | null
   endDate: string | null

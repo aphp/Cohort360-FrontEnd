@@ -873,22 +873,21 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
 type fetchFormsProps = {
   patient?: string
   formName?: string
-  episodeOfCare?: string
   _list?: string[]
   startDate?: string | null
   endDate?: string | null
   executiveUnits?: string[]
 }
 export const fetchForms = async (args: fetchFormsProps) => {
-  const { patient, formName, episodeOfCare, _list, startDate, endDate, executiveUnits } = args
+  const { patient, formName, _list, startDate, endDate, executiveUnits } = args
   let options: string[] = []
   if (patient) options = [...options, `subject=${patient}`]
   if (formName) options = [...options, `questionnaire=${formName}`]
-  if (episodeOfCare) options = [...options, `episodeOfCare=${episodeOfCare}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
-  // if (startDate) options = [...options, ``]
-  // if (endDate) options = [...options, ``]
-  // if (executiveUnits && executiveUnits.length > 0) options = [...options, ``]
+  if (startDate) options = [...options, `authored=ge${startDate}`]
+  if (endDate) options = [...options, `authored=le${endDate}`]
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<QuestionnaireResponse>>(
     `/QuestionnaireResponse?${options.reduce(paramsReducer)}`
