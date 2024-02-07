@@ -17,15 +17,15 @@ import { initMedicationHierarchy } from 'state/medication'
 import { initBiologyHierarchy } from 'state/biology'
 import { fetchScopesList } from 'state/scope'
 
-import { AccessExpiration, RequestType } from 'types'
+import { AccessExpiration, Cohort, LoadingStatus, RequestType } from 'types'
 
 import useStyles from './styles'
 import PreviewCard from 'components/ui/Cards/PreviewCard'
-import { fetchCohorts } from 'state/cohort'
 import { CohortsType } from 'types/cohorts'
 import { Direction, Order } from 'types/searchCriterias'
 import CohortsTable from 'components/CohortsTable'
 import RequestsTable from 'components/Requests/PreviewTable'
+import { FetchCohortsResponse, fetchCohorts as fetchCohortsApi } from 'services/cohorts/api'
 
 const Welcome: React.FC = () => {
   const { classes, cx } = useStyles()
@@ -33,7 +33,13 @@ const Welcome: React.FC = () => {
   const navigate = useNavigate()
   const practitioner = useAppSelector((state) => state.me)
   const open = useAppSelector((state) => state.drawer)
-  const cohortState = useAppSelector((state) => state.cohort)
+  const [cohorts, setCohorts] = useState<FetchCohortsResponse>({
+    count: 0,
+    cohortsList: [],
+    favoriteCohortsList: [],
+    lastCohorts: []
+  })
+  const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const requestState = useAppSelector((state) => state.request)
   const meState = useAppSelector((state) => state.me)
   const [lastRequest, setLastRequest] = useState<RequestType[]>([])
@@ -44,11 +50,11 @@ const Welcome: React.FC = () => {
     ? moment(practitioner.lastConnection).format('[Dernière connexion : ]ddd DD MMMM YYYY[, à ]HH:mm')
     : ''
 
-  const fetchCohortsPreview = () => {
-    dispatch(
-      fetchCohorts({
+  const fetchCohorts = async (limit: number, type: CohortsType) => {
+    try {
+      const response = await fetchCohortsApi({
         options: {
-          limit: 5,
+          limit: limit,
           searchCriterias: {
             searchInput: '',
             orderBy: { orderBy: Order.MODIFIED, orderDirection: Direction.DESC },
@@ -58,19 +64,24 @@ const Welcome: React.FC = () => {
               maxPatients: null,
               startDate: null,
               endDate: null,
-              favorite: CohortsType.FAVORITE
+              favorite: type
             }
           }
         }
       })
-    )
-    dispatch(
-      fetchCohorts({
-        options: {
-          limit: 5
-        }
-      })
-    )
+      return response
+    } catch {}
+  }
+
+  const fetchCohortsPreview = async () => {
+    setLoadingStatus(LoadingStatus.FETCHING)
+    const [all, favorite] = await Promise.all([fetchCohorts(5, CohortsType.ALL), fetchCohorts(5, CohortsType.FAVORITE)])
+    setCohorts({
+      ...cohorts,
+      favoriteCohortsList: favorite?.favoriteCohortsList || [],
+      cohortsList: all?.cohortsList || []
+    })
+    setLoadingStatus(LoadingStatus.SUCCESS)
   }
 
   useEffect(() => {
@@ -204,10 +215,10 @@ const Welcome: React.FC = () => {
                 onClickLink={() => navigate('/my-cohorts/favorites')}
               >
                 <CohortsTable
-                  loading={cohortState.loading}
-                  data={cohortState.favoriteCohortsList}
+                  loading={loadingStatus === LoadingStatus.FETCHING}
+                  data={cohorts.favoriteCohortsList}
                   simplified
-                  onUpdate={() => fetchCohortsPreview()}
+                  onUpdate={fetchCohortsPreview}
                 />
               </PreviewCard>
             </Paper>
@@ -222,10 +233,10 @@ const Welcome: React.FC = () => {
                 onClickLink={() => navigate('/my-cohorts')}
               >
                 <CohortsTable
-                  data={cohortState.cohortsList}
-                  loading={cohortState.loading}
+                  data={cohorts.cohortsList}
+                  loading={loadingStatus === LoadingStatus.FETCHING}
                   simplified
-                  onUpdate={() => fetchCohortsPreview()}
+                  onUpdate={fetchCohortsPreview}
                 />
               </PreviewCard>
             </Paper>

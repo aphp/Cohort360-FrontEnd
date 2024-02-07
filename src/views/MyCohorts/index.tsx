@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { useAppDispatch, useAppSelector } from 'state'
+import { useAppSelector } from 'state'
 
 import { Chip, CircularProgress, CssBaseline, Grid, Pagination, Typography } from '@mui/material'
 
@@ -19,11 +19,11 @@ import { FilterKeys, OrderBy } from 'types/searchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
 import { CanceledError } from 'axios'
 import useSearchCriterias, { initCohortsSearchCriterias } from 'reducers/searchCriteriasReducer'
-import { fetchCohorts } from 'state/cohort'
 import { cancelPendingRequest } from 'utils/abortController'
 import Modal from 'components/ui/Modal'
 import Button from 'components/ui/Button'
 import ResearchTable from 'components/CohortsTable'
+import { FetchCohortsResponse, fetchCohorts } from 'services/cohorts/api'
 
 const statusOptions = [
   {
@@ -47,14 +47,15 @@ type MyCohortsProps = {
 const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
   const { classes, cx } = useStyles()
   const openDrawer = useAppSelector((state) => state.drawer)
-
-  const dispatch = useAppDispatch()
-
-  const cohortState = useAppSelector((state) => state.cohort)
-
   const [toggleModal, setToggleModal] = useState(false)
   const [page, setPage] = useState(1)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
+  const [results, setResults] = useState<FetchCohortsResponse>({
+    count: 0,
+    cohortsList: [],
+    favoriteCohortsList: [],
+    lastCohorts: []
+  })
 
   const [
     {
@@ -75,15 +76,14 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
   const onFetchCohorts = async () => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
-      await dispatch(
-        fetchCohorts({
-          options: {
-            page: page,
-            searchCriterias: { filters, orderBy, searchInput }
-          },
-          signal: controllerRef.current?.signal
-        })
-      )
+      const response = await fetchCohorts({
+        options: {
+          page: page,
+          searchCriterias: { filters, orderBy, searchInput }
+        },
+        signal: controllerRef.current?.signal
+      })
+      setResults(response)
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {
       if (error instanceof CanceledError) {
@@ -148,7 +148,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
                 <CircularProgress />
               )}
               {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
-                <DisplayDigits nb={cohortState.count} label={`cohorte${cohortState.count > 1 ? 's' : ''}`} />
+                <DisplayDigits nb={results.count} label={`cohorte${results.count > 1 ? 's' : ''}`} />
               )}
             </Grid>
             <Grid item xs={12} md={7}>
@@ -196,17 +196,17 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
           <Grid container justifyContent="flex-end">
             <ResearchTable
               loading={loadingStatus === LoadingStatus.SUCCESS ? false : true}
-              data={favorite === CohortsType.ALL ? cohortState.cohortsList : cohortState.favoriteCohortsList}
+              data={favorite === CohortsType.ALL ? results.cohortsList : results.favoriteCohortsList}
               orderBy={orderBy.orderBy}
               orderDirection={orderBy.orderDirection}
               onChangeOrder={(orderBy: OrderBy) => changeOrderBy(orderBy)}
               onUpdate={() => setLoadingStatus(LoadingStatus.IDDLE)}
             />
 
-            {loadingStatus === LoadingStatus.SUCCESS && cohortState.cohortsList.length > 0 && (
+            {loadingStatus === LoadingStatus.SUCCESS && results.cohortsList.length > 0 && (
               <Pagination
                 className={classes.pagination}
-                count={Math.ceil((cohortState.count ?? 0) / 20)}
+                count={Math.ceil((results.count ?? 0) / 20)}
                 shape="circular"
                 onChange={(event, page: number) => setPage && setPage(page)}
                 page={page}
