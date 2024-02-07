@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import Grid from '@mui/material/Grid'
 
-import ControlPanel from './ControlPanel/ControlPanel'
+import ControlPanel from './ControlPanel'
 import DiagramView from './DiagramView/DiagramView'
 import ModalCreateNewRequest from './Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 

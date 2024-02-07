@@ -2,12 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  Button,
   Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   Grid,
   Hidden,
   IconButton,
@@ -36,7 +31,6 @@ import ExportIcon from '@mui/icons-material/GetApp'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import UpdateIcon from '@mui/icons-material/Update'
 
-import ModalEditCohort from 'components/Requests/Modals/ModalEditCohort/ModalEditCohort'
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 
 import { useAppSelector, useAppDispatch } from 'state'
@@ -50,6 +44,13 @@ import { ODD_EXPORT } from '../../constants'
 
 import useStyles from './styles'
 import { Direction, Order, OrderBy } from 'types/searchCriterias'
+import Modal from 'components/ui/Modal'
+import TextInput from 'components/Filters/TextInput'
+
+enum Dialog {
+  EDIT,
+  DELETE
+}
 
 type FavStarProps = {
   favorite?: boolean
@@ -89,7 +90,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const [dialogOpen, setOpenDialog] = useState(false)
+  const [dialogOpen, setOpenDialog] = useState<Dialog | null>(null)
   const [selectedCohort, setSelectedCohort] = useState<Cohort | undefined>()
   const [selectedExportableCohort, setSelectedExportableCohort] = useState<number | undefined>()
   const [anchorEl, setAnchorEl] = React.useState(null)
@@ -109,20 +110,13 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
     navigate(`/cohort/${row.fhir_group_id}`)
   }
 
-  const handleClickOpenDialog = () => {
-    setOpenDialog(true)
-  }
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false)
-  }
-
-  const onEditCohort = () => {
+  const onDeleteCohort = async (cohort: Cohort) => {
+    await dispatch(deleteCohort({ deletedCohort: cohort }))
     onUpdate()
   }
 
-  const onDeleteCohort = async (cohort: Cohort) => {
-    await dispatch(deleteCohort({ deletedCohort: cohort }))
+  const onEditCohort = async (cohort: Cohort) => {
+    await dispatch(editCohort({ editedCohort: cohort }))
     onUpdate()
   }
 
@@ -382,6 +376,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                 size="small"
                                 onClick={(event) => {
                                   event.stopPropagation()
+                                  setOpenDialog(Dialog.EDIT)
                                   dispatch(setSelectedCohortState(row ?? null))
                                 }}
                                 disabled={maintenanceIsActive}
@@ -395,7 +390,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                 size="small"
                                 onClick={(event) => {
                                   event.stopPropagation()
-                                  handleClickOpenDialog()
+                                  setOpenDialog(Dialog.DELETE)
                                   setSelectedCohort(row)
                                 }}
                                 disabled={maintenanceIsActive}
@@ -465,6 +460,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                               event.stopPropagation()
                               dispatch(setSelectedCohortState(row ?? null))
                               setAnchorEl(null)
+                              setOpenDialog(Dialog.EDIT)
                             }}
                             disabled={maintenanceIsActive}
                           >
@@ -475,7 +471,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                             onClick={(event) => {
                               event.stopPropagation()
                               setSelectedCohort(row)
-                              handleClickOpenDialog()
+                              setOpenDialog(Dialog.DELETE)
                               setAnchorEl(null)
                             }}
                             disabled={maintenanceIsActive}
@@ -492,32 +488,45 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
           </Table>
         </TableContainer>
       )}
-
-      <Dialog
-        open={dialogOpen}
-        onClose={handleCloseDialog}
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
+      <Modal
+        open={dialogOpen === Dialog.DELETE}
+        title="Supprimer une cohorte"
+        onSubmit={() => {
+          setOpenDialog(null)
+          onDeleteCohort(selectedCohort!)
+        }}
+        onClose={() => setOpenDialog(null)}
+        validationText="Supprimer"
       >
-        <DialogTitle id="alert-dialog-slide-title">Supprimer une cohorte</DialogTitle>
+        <Typography>Êtes-vous sûr(e) de vouloir supprimer la cohorte ?</Typography>
+      </Modal>
 
-        <DialogContent>Êtes-vous sûr(e) de vouloir supprimer la cohorte ?</DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Non</Button>
-          <Button
-            onClick={() => {
-              handleCloseDialog()
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              onDeleteCohort(selectedCohort!)
-            }}
-            color="secondary"
-          >
-            Oui
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <ModalEditCohort open={selectedCohortState !== null} onClose={onEditCohort} />
+      <Modal
+        title="Modifier la cohorte"
+        width="600px"
+        open={dialogOpen === Dialog.EDIT}
+        onClose={() => setOpenDialog(null)}
+        onSubmit={({ name, description }) => {
+          onEditCohort({ uuid: selectedCohortState?.uuid, name, description })
+        }}
+        validationText="Modifier"
+      >
+        <TextInput
+          name="name"
+          label="Nom de la cohorte :"
+          minLimit={2}
+          maxLimit={250}
+          value={selectedCohortState?.name}
+        />
+        <TextInput
+          name="description"
+          value={selectedCohortState?.description}
+          label="Description :"
+          minRows={5}
+          maxRows={8}
+          description
+        />
+      </Modal>
 
       {!!ODD_EXPORT && (
         <ExportModal

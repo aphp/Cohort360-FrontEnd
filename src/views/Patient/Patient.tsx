@@ -15,7 +15,7 @@ import PatientPMSI from 'components/Patient/PatientPMSI/PatientPMSI'
 import PatientMedication from 'components/Patient/PatientMedication/PatientMedication'
 import PatientBiology from 'components/Patient/PatientBiology/PatientBiology'
 import PatientImaging from 'components/Patient/PatientImaging/PatientImaging'
-import TopBar from 'components/TopBar/TopBar'
+import TopBar from 'components/TopBar'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPatientInfo } from 'state/patient'

@@ -2,7 +2,7 @@ import { Grid, TextField, Typography } from '@mui/material'
 import { InputWrapper } from 'components/ui/Inputs'
 import { ErrorMessage } from 'components/ui/Inputs/Errors'
 import { FormContext } from 'components/ui/Modal'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react'
 import { ErrorType } from 'types/error'
 
 type TextInputProps = {
@@ -14,42 +14,49 @@ type TextInputProps = {
   disabled?: boolean
   minLimit?: number
   maxLimit?: number
+  description?: boolean
+  minRows?: number
+  maxRows?: number
+  noSpace?: boolean
 }
 
 const TextInput = ({
   name,
   value = '',
   placeholder = '',
+  description,
   error,
   label,
   disabled,
-  minLimit,
-  maxLimit
+  minLimit = 2,
+  maxLimit = 100,
+  minRows,
+  maxRows,
+  noSpace = true
 }: TextInputProps) => {
   const context = useContext(FormContext)
-  const [filtersName, setFiltersName] = useState(value)
-  const [isError, setIsError] = useState({ min: false, max: false, serverError: false })
+  const [text, setText] = useState(value || '')
+  const [isError, setIsError] = useState({ min: false, max: false, externalError: error?.isError || false })
 
   useEffect(() => {
-    context?.updateError(false)
-    if (isError.min || isError.max || isError.serverError) context?.updateError(true)
-  }, [isError])
+    if (text.length > maxLimit || text.length < minLimit) {
+      setIsError({ ...isError, max: text.length > maxLimit, min: text.length < minLimit })
+      context?.updateError(true)
+    } else {
+      setIsError({ externalError: false, max: false, min: false })
+      context?.updateFormData(name, text)
+      context?.updateError(false)
+    }
+  }, [text])
 
   useEffect(() => {
-    let min = false
-    let max = false
-    const serverError = false
-    if (maxLimit && filtersName.length > maxLimit) {
-      max = true
-    } else if (minLimit && filtersName.length < minLimit) {
-      min = true
-    } else if (context?.updateFormData) context.updateFormData(name, filtersName)
-    setIsError({ min, max, serverError })
-  }, [filtersName])
-
-  useEffect(() => {
-    setIsError({ ...isError, serverError: error ? error.isError : false })
+    setIsError({ ...isError, externalError: error ? error.isError : false })
   }, [error])
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target
+    setText(noSpace ? value.replace(/ +(?= )/g, '') : value)
+  }
 
   return (
     <>
@@ -57,21 +64,24 @@ const TextInput = ({
         {label && <Typography variant="h3">{label}</Typography>}
         <TextField
           margin="normal"
+          multiline={description}
+          minRows={minRows}
+          maxRows={maxRows}
           fullWidth
           autoFocus
           disabled={disabled}
-          value={filtersName}
+          value={text}
           placeholder={(disabled && placeholder) || 'Non renseigné'}
-          onChange={(event) => setFiltersName(event.target.value)}
+          onChange={handleChange}
         />
       </InputWrapper>
       {isError.max && (
         <Grid>
-          <ErrorMessage>Le nom de sauvegarde du filtre ne peut excéder plus de {maxLimit} caractères.</ErrorMessage>
+          <ErrorMessage>Le nom ne peut excéder plus de {maxLimit} caractères.</ErrorMessage>
         </Grid>
       )}
 
-      {error && isError.serverError && (
+      {error && isError.externalError && (
         <Grid>
           <ErrorMessage>{error.errorMessage}</ErrorMessage>
         </Grid>

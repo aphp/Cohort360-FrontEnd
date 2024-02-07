@@ -24,7 +24,6 @@ import ShareIcon from '@mui/icons-material/Share'
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
 import UpdateSharpIcon from '@mui/icons-material/UpdateSharp'
 
-import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
 
 import { useAppSelector, useAppDispatch } from 'state'
@@ -46,6 +45,9 @@ import { ODD_FEASABILITY_REPORT, SHORT_COHORT_LIMIT } from '../../../constants'
 import { JobStatus } from '../../../utils/constants'
 import services from 'services/aphp'
 import ValidationDialog from 'components/ui/ValidationDialog'
+import Modal from 'components/ui/Modal'
+import TextInput from 'components/Filters/TextInput'
+import Checkbox from 'components/Filters/Checkbox'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -54,7 +56,7 @@ const ControlPanel: React.FC<{
 }> = ({ onExecute, onUndo, onRedo }) => {
   const { classes, cx } = useStyle()
   const dispatch = useAppDispatch()
-  const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
+  const [openModal, setOpenModal] = useState(false)
   const [oldCount, setOldCount] = useState<CohortCreationCounterType | null>(null)
   const [openShareRequestModal, setOpenShareRequestModal] = useState<boolean>(false)
   const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
@@ -221,7 +223,7 @@ const ControlPanel: React.FC<{
               count_outdated ||
               includePatient === 0
             }
-            onClick={() => onSetOpenModal('executeCohortConfirmation')}
+            onClick={() => setOpenModal(true)}
             className={classes.requestExecution}
             style={{ marginTop: 12, marginBottom: 6 }}
           >
@@ -463,14 +465,29 @@ const ControlPanel: React.FC<{
         </Grid>
       </Grid>
 
-      {openModal === 'executeCohortConfirmation' && (
-        <ModalCohortTitle
-          onExecute={onExecute}
-          onClose={() => onSetOpenModal(null)}
-          longCohort={includePatient ? includePatient > cohortLimit : false}
-          cohortLimit={cohortLimit}
+      <Modal
+        title="Création de la cohorte"
+        width="600px"
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        onSubmit={({ cohortName, cohortDescription, globalCount }) => {
+          if (onExecute) onExecute(cohortName, cohortDescription, globalCount)
+        }}
+        validationText="Créer"
+      >
+        <TextInput name="cohortName" label="Nom de la cohorte :" minLimit={2} maxLimit={250} />
+        <TextInput name="cohortDescription" label="Description :" minRows={5} maxRows={8} description />
+        <Checkbox
+          name="globalCount"
+          label="Estimer le nombre de patients répondant à vos critères sur le périmètre de l'APHP"
         />
-      )}
+        {includePatient && includePatient > cohortLimit && (
+          <Alert severity="warning" style={{ alignItems: 'center' }}>
+            Cette cohorte contenant plus de {cohortLimit} patients, sa création est plus complexe et nécessite d'être
+            placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.
+          </Alert>
+        )}
+      </Modal>
 
       {openReportConfirmation && (
         <ValidationDialog

@@ -5,7 +5,7 @@ import { Grid, Tabs, Tab } from '@mui/material'
 import CohortPreview from 'components/Dashboard/Preview/Preview'
 import PatientList from 'components/Dashboard/PatientList/PatientList'
 import Documents from 'components/Dashboard/Documents/Documents'
-import TopBar from 'components/TopBar/TopBar'
+import TopBar from 'components/TopBar'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 
 import CohortRightOrNotExist from 'components/ErrorView/CohortRightOrNotExist'
