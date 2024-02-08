@@ -1,14 +1,9 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 
 import {
   Alert,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   Grid,
   IconButton,
   Paper,
@@ -37,32 +32,44 @@ import ModalAddOrEditRequest from 'components/CreationCohort/Modals/ModalCreateN
 import { useAppSelector, useAppDispatch } from 'state'
 import {
   setSelectedRequest as setSelectedRequestState,
-  setSelectedRequestShare as setSelectedRequestShareState,
-  deleteRequest as deleteRequestState
+  setSelectedRequestShare as setSelectedRequestShareState
 } from 'state/request'
 
-import { RequestType, SimpleStatus } from 'types'
+import { ProjectType, RequestType, SimpleStatus } from 'types'
 
 import useStyles from '../../CohortsTable/styles'
 import ModalShareRequest from '../Modals/ModalShareRequest/ModalShareRequest'
+import Modal from 'components/ui/Modal'
+import TextInput from 'components/Filters/TextInput'
+import ProjectsFilter from 'components/Filters/ProjectsFilter'
+import { FetchProjectsResponse, fetchProjects } from 'services/projects/api'
+import { deleteRequest, editRequest, fetchRequests } from 'services/requests/api'
+import services from 'services/aphp'
+
+enum Dialog {
+  EDIT,
+  DELETE
+}
 
 type RequestsTableProps = {
   data: RequestType[]
   loading: boolean
+  onUpdate: () => void
 }
-const RequestsTable = ({ data, loading }: RequestsTableProps) => {
+const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const requestState = useAppSelector((state) => state.request)
-  const selectedRequestState = requestState.selectedRequest
-  const selectedRequestShareState = requestState.selectedRequestShare
+  //const requestState = useAppSelector((state) => state.request)
+  //const selectedRequestState = requestState.selectedRequest
+  //const selectedRequestShareState = requestState.selectedRequestShare
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
-  const [dialogOpen, setOpenDialog] = useState(false)
-  const [selectedRequest, setSelectedRequest] = useState<string | undefined>()
+  const [openModal, setOpenModal] = useState<Dialog | null>(null)
+  const [selectedRequest, setSelectedRequest] = useState<RequestType | null>(null)
+  const [projects, setProjects] = useState<FetchProjectsResponse | null>(null)
   const [anchorEl, setAnchorEl] = React.useState(null)
   const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
   const wrapperSetShareSuccessOrFailMessage = useCallback(
@@ -78,13 +85,38 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
     navigate(`/cohort/new/${row.uuid}`)
   }
 
-  const handleClickOpenDialog = () => {
-    setOpenDialog(true)
+  const handleFetchProjects = async () => {
+    const response = await fetchProjects(100, 0)
+    setProjects(response)
   }
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false)
+  const handleDelete = async () => {
+    setOpenModal(null)
+    await deleteRequest(selectedRequest!)
+    await onUpdate()
   }
+
+  const handleEdit = async ({ name, description, project: { projectName, newProjectName } }: any) => {
+    const copy = { ...selectedRequest }
+    if (newProjectName && newProjectName.length > 2 && newProjectName.length < 55) {
+      const newProject = await services.projects.addProject({ uuid: '', name: newProjectName })
+      if (newProject) {
+        copy.parent_folder = newProject.uuid
+      }
+    } else if (projectName) {
+      copy.parent_folder = projectName
+    }
+    if (name) copy.name = name
+    if (description) copy.description = description
+    await editRequest(copy)
+    await handleFetchProjects()
+    await onUpdate()
+    setOpenModal(null)
+  }
+
+  useEffect(() => {
+    handleFetchProjects()
+  }, [])
 
   return (
     <>
@@ -93,14 +125,11 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
           <CircularProgress />
         </Grid>
       )}
-      {
-        //@ts-ignore
-        !loading && data.length < 1 && (
-          <Grid container justifyContent="center">
-            <Typography variant="button"> Aucune requête à afficher </Typography>
-          </Grid>
-        )
-      }
+      {!loading && data.length < 1 && (
+        <Grid container justifyContent="center">
+          <Typography variant="button"> Aucune requête à afficher </Typography>
+        </Grid>
+      )}
       {!loading && data.length > 0 && (
         <TableContainer component={Paper}>
           <Table className={classes.table} aria-label="simple table">
@@ -144,7 +173,8 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
                             size="small"
                             onClick={(event) => {
                               event.stopPropagation()
-                              dispatch(setSelectedRequestState(row ?? null))
+                              setOpenModal(Dialog.EDIT)
+                              setSelectedRequest(row)
                             }}
                             disabled={maintenanceIsActive}
                           >
@@ -170,8 +200,8 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
                             size="small"
                             onClick={(event) => {
                               event.stopPropagation()
-                              handleClickOpenDialog()
-                              setSelectedRequest(row.uuid)
+                              setOpenModal(Dialog.DELETE)
+                              setSelectedRequest(row)
                             }}
                             disabled={maintenanceIsActive}
                           >
@@ -191,21 +221,22 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
                           event.stopPropagation()
                           // @ts-ignore
                           setAnchorEl(event.currentTarget)
-                          setSelectedRequest(row.uuid)
+                          setSelectedRequest(row)
                         }}
                       >
                         <MoreVertIcon />
                       </IconButton>
                       <Menu
                         anchorEl={anchorEl}
-                        open={openMenuItem && row.uuid === selectedRequest}
+                        open={openMenuItem && row === selectedRequest}
                         onClose={() => setAnchorEl(null)}
                       >
                         <MenuItem
                           className={classes.menuItem}
                           onClick={(event) => {
                             event.stopPropagation()
-                            dispatch(setSelectedRequestState(row ?? null))
+                            setSelectedRequest(row)
+                            setOpenModal(Dialog.EDIT)
                             setAnchorEl(null)
                           }}
                           disabled={maintenanceIsActive}
@@ -216,8 +247,8 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
                           className={classes.menuItem}
                           onClick={(event) => {
                             event.stopPropagation()
-                            setSelectedRequest(row.uuid)
-                            handleClickOpenDialog()
+                            setSelectedRequest(row)
+                            setOpenModal(Dialog.DELETE)
                             setAnchorEl(null)
                           }}
                           disabled={maintenanceIsActive}
@@ -234,35 +265,38 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
         </TableContainer>
       )}
 
-      <Dialog
-        open={dialogOpen}
-        onClose={handleCloseDialog}
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
+      <Modal
+        open={openModal === Dialog.DELETE}
+        title="Supprimer une requête"
+        onSubmit={handleDelete}
+        onClose={() => setOpenModal(null)}
+        validationText="Supprimer"
       >
-        <DialogTitle>Supprimer une requête</DialogTitle>
+        <Typography>Êtes-vous sûr(e) de vouloir supprimer la requête ?</Typography>
+      </Modal>
 
-        <DialogContent>
-          <Typography>Êtes-vous sûr(e) de vouloir supprimer cette requête ?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Non</Button>
-          <Button
-            onClick={() => {
-              handleCloseDialog()
-              const foundItem = data?.find(({ uuid }) => uuid === selectedRequest)
-              if (!foundItem) return
-              dispatch(deleteRequestState({ deletedRequest: foundItem }))
-            }}
-            color="secondary"
-          >
-            Oui
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Modal
+        open={openModal === Dialog.EDIT}
+        title="Modifier la requête"
+        onSubmit={handleEdit}
+        onClose={() => setOpenModal(null)}
+        validationText="Modifier"
+      >
+        <TextInput value={selectedRequest?.name} name="name" label="Nom de la requête :" minLimit={2} maxLimit={255} />
+        <ProjectsFilter name="project" projects={projects?.projectsList || []} value={selectedRequest?.parent_folder} />
+        <TextInput
+          value={selectedRequest?.description}
+          name="description"
+          label="Description :"
+          description
+          noSpace={false}
+          minRows={5}
+          maxRows={8}
+        />
+      </Modal>
 
-      {selectedRequestState && <ModalAddOrEditRequest onClose={() => dispatch(setSelectedRequestState(null))} />}
-      {selectedRequestShareState !== null &&
+      {/*selectedRequestState && <ModalAddOrEditRequest onClose={() => dispatch(setSelectedRequestState(null))} />*/}
+      {/*selectedRequestShareState !== null &&
         selectedRequestShareState?.shared_query_snapshot !== undefined &&
         selectedRequestShareState?.shared_query_snapshot?.length > 0 && (
           <ModalShareRequest
@@ -270,9 +304,9 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
             parentStateSetter={wrapperSetShareSuccessOrFailMessage}
             onClose={() => dispatch(setSelectedRequestShareState(null))}
           />
-        )}
+        )*/}
 
-      {selectedRequestShareState !== null &&
+      {/*selectedRequestShareState !== null &&
         selectedRequestShareState?.shared_query_snapshot !== undefined &&
         selectedRequestShareState?.shared_query_snapshot?.length === 0 && (
           <Snackbar
@@ -285,7 +319,7 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
               Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
             </Alert>
           </Snackbar>
-        )}
+        )*/}
 
       {shareSuccessOrFailMessage === 'success' && (
         <Snackbar

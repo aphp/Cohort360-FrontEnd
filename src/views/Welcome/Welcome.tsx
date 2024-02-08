@@ -10,14 +10,12 @@ import SearchPatientCard from 'components/Welcome/SearchPatientCard/SearchPatien
 import TutorialsCard from 'components/Welcome/TutorialsCard/TutorialsCard'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { fetchProjects } from 'state/project'
-import { fetchRequests } from 'state/request'
 import { initPmsiHierarchy } from 'state/pmsi'
 import { initMedicationHierarchy } from 'state/medication'
 import { initBiologyHierarchy } from 'state/biology'
 import { fetchScopesList } from 'state/scope'
 
-import { AccessExpiration, Cohort, LoadingStatus, RequestType } from 'types'
+import { AccessExpiration, LoadingStatus } from 'types'
 
 import useStyles from './styles'
 import PreviewCard from 'components/ui/Cards/PreviewCard'
@@ -26,6 +24,7 @@ import { Direction, Order } from 'types/searchCriterias'
 import CohortsTable from 'components/CohortsTable'
 import RequestsTable from 'components/Requests/PreviewTable'
 import { FetchCohortsResponse, fetchCohorts as fetchCohortsApi } from 'services/cohorts/api'
+import { FetchRequestsResponse, fetchRequests } from 'services/requests/api'
 
 const Welcome: React.FC = () => {
   const { classes, cx } = useStyles()
@@ -35,10 +34,9 @@ const Welcome: React.FC = () => {
   const open = useAppSelector((state) => state.drawer)
   const [allCohorts, setAllCohorts] = useState<FetchCohortsResponse>({ count: 0, cohortsList: [] })
   const [favoriteCohorts, setFavoriteCohorts] = useState<FetchCohortsResponse>({ count: 0, cohortsList: [] })
+  const [requests, setRequests] = useState<FetchRequestsResponse>({ count: 0, requestsList: [] })
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
-  const requestState = useAppSelector((state) => state.request)
   const meState = useAppSelector((state) => state.me)
-  const [lastRequest, setLastRequest] = useState<RequestType[]>([])
   const accessExpirations: AccessExpiration[] = meState?.accessExpirations ?? []
   const maintenanceIsActive = meState?.maintenance?.active
 
@@ -77,25 +75,21 @@ const Welcome: React.FC = () => {
     setLoadingStatus(LoadingStatus.SUCCESS)
   }
 
+  const fetchRequestPreview = async () => {
+    setLoadingStatus(LoadingStatus.FETCHING)
+    const results = await fetchRequests(5, 0)
+    setRequests(results)
+    setLoadingStatus(LoadingStatus.SUCCESS)
+  }
+
   useEffect(() => {
-    dispatch(fetchProjects())
-    dispatch(fetchRequests())
     dispatch(initPmsiHierarchy())
     dispatch(initMedicationHierarchy())
     dispatch(initBiologyHierarchy())
     dispatch(fetchScopesList({}))
+    fetchRequestPreview()
     fetchCohortsPreview()
   }, [])
-
-  useEffect(() => {
-    const _lastRequest =
-      requestState.requestsList?.length > 0
-        ? [...requestState.requestsList]
-            .sort((a, b) => +moment(b?.modified_at).format('X') - +moment(a.modified_at).format('X'))
-            .splice(0, 5)
-        : []
-    setLastRequest(_lastRequest)
-  }, [requestState])
 
   return practitioner ? (
     <Grid
@@ -243,7 +237,11 @@ const Welcome: React.FC = () => {
                 linkLabel={'Voir toutes mes requêtes'}
                 onClickLink={() => navigate('/my-requests')}
               >
-                <RequestsTable data={lastRequest} loading={requestState.loading} />
+                <RequestsTable
+                  data={requests.requestsList}
+                  loading={loadingStatus === LoadingStatus.FETCHING}
+                  onUpdate={fetchRequestPreview}
+                />
               </PreviewCard>
             </Paper>
           </Grid>

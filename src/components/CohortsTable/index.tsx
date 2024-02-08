@@ -524,6 +524,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
           label="Description :"
           minRows={5}
           maxRows={8}
+          noSpace={false}
           description
         />
       </Modal>

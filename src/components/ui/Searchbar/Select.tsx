@@ -6,7 +6,7 @@ import { FormContext } from '../Modal'
 type SelectProps<T> = {
   value: T
   label: string
-  items: { id: T; label: string }[]
+  items: { id: string; label: string }[]
   width?: string
   disabled?: boolean
   name?: string
@@ -39,7 +39,7 @@ const Select = <T,>({ value, label, items, width = '100%', disabled, name, oncha
             label={label}
           >
             {items.map((item) => (
-              <MenuItem key={item.id as string} value={item.id as string}>
+              <MenuItem key={item.id} value={item.id}>
                 {item.label}
               </MenuItem>
             ))}

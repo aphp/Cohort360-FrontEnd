@@ -28,8 +28,8 @@ const TextInput = ({
   error,
   label,
   disabled,
-  minLimit = 2,
-  maxLimit = 100,
+  minLimit = 0,
+  maxLimit = 1000,
   minRows,
   maxRows,
   noSpace = true

@@ -283,12 +283,12 @@ const servicesProjects: IServiceProjects = {
   },
 
   fetchRequestsList: async (limit, offset) => {
-    let search = `?`
+    let search = `?ordering=-modified_at`
     if (limit) {
-      search += `limit=${limit}`
+      search += `&limit=${limit}`
     }
     if (offset) {
-      search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
+      search += `&offset=${offset}`
     }
 
     const fetchRequestsListResponse = (await apiBack.get<{
