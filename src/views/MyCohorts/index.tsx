@@ -50,12 +50,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
   const [toggleModal, setToggleModal] = useState(false)
   const [page, setPage] = useState(1)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
-  const [results, setResults] = useState<FetchCohortsResponse>({
-    count: 0,
-    cohortsList: [],
-    favoriteCohortsList: [],
-    lastCohorts: []
-  })
+  const [results, setResults] = useState<FetchCohortsResponse>({count: 0, cohortsList: []})
 
   const [
     {
@@ -196,7 +191,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
           <Grid container justifyContent="flex-end">
             <ResearchTable
               loading={loadingStatus === LoadingStatus.SUCCESS ? false : true}
-              data={favorite === CohortsType.ALL ? results.cohortsList : results.favoriteCohortsList}
+              data={favorite === CohortsType.ALL ? results.cohortsList : results.cohortsList}
               orderBy={orderBy.orderBy}
               orderDirection={orderBy.orderDirection}
               onChangeOrder={(orderBy: OrderBy) => changeOrderBy(orderBy)}

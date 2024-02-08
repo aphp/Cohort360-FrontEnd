@@ -8,8 +8,6 @@ export type FetchCohortsResponse = {
   count: number
   selectedCohort?: null
   cohortsList: Cohort[]
-  favoriteCohortsList: Cohort[]
-  lastCohorts: Cohort[]
 }
 
 type FetchCohortsParams = {
@@ -65,16 +63,15 @@ export const fetchCohorts = async ({ options, signal }: FetchCohortsParams): Pro
     return {
       count: cohorts.count,
       selectedCohort: null,
-      ...{ cohortsList: cohortsType === CohortsType.ALL ? cohortsList : [] },
-      ...{
-        favoriteCohortsList:
-          cohortsType === CohortsType.FAVORITE || cohortsType === CohortsType.NOT_FAVORITE ? cohortsList : []
-      },
-      ...{ lastCohorts: cohortsType === CohortsType.LAST ? cohortsList : [] }
+      cohortsList: cohortsList
     }
   } catch (error) {
     console.error(error)
-    throw error
+    return {
+      count: 0,
+      selectedCohort: null,
+      cohortsList: []
+    }
   }
 }
 

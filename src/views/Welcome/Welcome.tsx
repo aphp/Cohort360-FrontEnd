@@ -33,12 +33,8 @@ const Welcome: React.FC = () => {
   const navigate = useNavigate()
   const practitioner = useAppSelector((state) => state.me)
   const open = useAppSelector((state) => state.drawer)
-  const [cohorts, setCohorts] = useState<FetchCohortsResponse>({
-    count: 0,
-    cohortsList: [],
-    favoriteCohortsList: [],
-    lastCohorts: []
-  })
+  const [allCohorts, setAllCohorts] = useState<FetchCohortsResponse>({ count: 0, cohortsList: [] })
+  const [favoriteCohorts, setFavoriteCohorts] = useState<FetchCohortsResponse>({ count: 0, cohortsList: [] })
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const requestState = useAppSelector((state) => state.request)
   const meState = useAppSelector((state) => state.me)
@@ -76,11 +72,8 @@ const Welcome: React.FC = () => {
   const fetchCohortsPreview = async () => {
     setLoadingStatus(LoadingStatus.FETCHING)
     const [all, favorite] = await Promise.all([fetchCohorts(5, CohortsType.ALL), fetchCohorts(5, CohortsType.FAVORITE)])
-    setCohorts({
-      ...cohorts,
-      favoriteCohortsList: favorite?.favoriteCohortsList || [],
-      cohortsList: all?.cohortsList || []
-    })
+    setAllCohorts(all!)
+    setFavoriteCohorts(favorite!)
     setLoadingStatus(LoadingStatus.SUCCESS)
   }
 
@@ -216,7 +209,7 @@ const Welcome: React.FC = () => {
               >
                 <CohortsTable
                   loading={loadingStatus === LoadingStatus.FETCHING}
-                  data={cohorts.favoriteCohortsList}
+                  data={favoriteCohorts.cohortsList}
                   simplified
                   onUpdate={fetchCohortsPreview}
                 />
@@ -233,7 +226,7 @@ const Welcome: React.FC = () => {
                 onClickLink={() => navigate('/my-cohorts')}
               >
                 <CohortsTable
-                  data={cohorts.cohortsList}
+                  data={allCohorts.cohortsList}
                   loading={loadingStatus === LoadingStatus.FETCHING}
                   simplified
                   onUpdate={fetchCohortsPreview}
