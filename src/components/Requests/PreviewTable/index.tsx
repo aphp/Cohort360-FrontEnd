@@ -119,7 +119,7 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
               {data?.map((row: RequestType) => (
                 <TableRow className={classes.pointerHover} hover key={row.uuid}>
                   <TableCell onClick={() => _onClickRow(row)}>
-                    {row.shared_by?.displayed_name ? (
+                    {row.shared_by?.display_name ? (
                       <>
                         {row.name} - Envoyée par : {row.shared_by.firstname} {row.shared_by.lastname?.toUpperCase()}
                       </>

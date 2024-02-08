@@ -37,7 +37,7 @@ const ProvidersTable: React.FC<ProvidersTableProps> = ({
   const columns = [
     {
       label: 'Identifiant APH',
-      code: 'provider_source_value'
+      code: 'username'
     },
     {
       label: 'Nom',
@@ -98,8 +98,8 @@ const ProvidersTable: React.FC<ProvidersTableProps> = ({
             providersList.map((provider: Provider) => {
               return (
                 provider && (
-                  <TableRow key={provider.provider_id} className={classes.tableBodyRows} hover>
-                    <TableCellWrapper>{provider.provider_source_value}</TableCellWrapper>
+                  <TableRow key={provider.username} className={classes.tableBodyRows} hover>
+                    <TableCellWrapper>{provider.username}</TableCellWrapper>
                     <TableCellWrapper>{provider.lastname?.toLocaleUpperCase()}</TableCellWrapper>
                     <TableCellWrapper>{provider.firstname}</TableCellWrapper>
                     <TableCellWrapper>{provider.email ?? '-'}</TableCellWrapper>

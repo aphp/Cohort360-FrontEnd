@@ -84,26 +84,11 @@ export type Back_API_Response<T> = {
 }
 
 export type Provider = {
-  birth_date?: string
-  cdm_source?: string
-  delete_datetime?: string
-  displayed_name?: string
+  username?: string
   email?: string
   firstname?: string
-  gender_concept_id?: number
-  gender_source_concept_id?: number
-  gender_source_value?: string
-  insert_datetime?: string
   lastname?: string
-  provider_username?: string
-  provider_id?: number
-  provider_name?: string
-  provider_source_value?: string
-  specialty_concept_id?: number
-  specialty_source_concept_id?: number
-  specialty_source_value?: string
-  update_datetime?: string
-  year_of_birth?: number
+  display_name?: string
 }
 
 export type CohortComposition = DocumentReference & {
