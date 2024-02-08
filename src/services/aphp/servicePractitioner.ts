@@ -76,7 +76,7 @@ const servicePractitioner: IServicePractitioner = {
   },
 
   logout: async () => {
-    await apiBackend.post(`/accounts/logout/`)
+    await apiBackend.post(`/accounts/logout/`, { refresh_token: localStorage.getItem(REFRESH_TOKEN) })
     localStorage.clear()
   },
 
