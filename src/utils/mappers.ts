@@ -224,7 +224,18 @@ export const questionnaireFiltersBuilders = (fhirKey: { id: string; type: string
   const slice = value?.slice(0, 2)
   const operator = slice === 'ge' || slice === 'le' || slice === 'lt' || slice === 'gt' || slice === 'eq' ? slice : 'eq'
   const _value = slice === 'ge' || slice === 'le' || slice === 'lt' || slice === 'gt' ? value?.slice(2) : value
-  return value ? `_filter=item.linkId eq ${fhirKey.id} and item.answer.${fhirKey.type} ${operator} ${_value}` : ''
+
+  if (fhirKey.type === 'valueBoolean' || fhirKey.type === 'valueCoding') {
+    const _code = value?.split(',')
+    console.log('test _code', _code)
+    return value && _code && _code?.length > 0
+      ? `_filter=item.linkId eq ${fhirKey.id} and (${_code
+          .map((code) => `item.answer.${fhirKey.type} eq ${code}`)
+          .join(' or ')})`
+      : ''
+  } else {
+    return value ? `_filter=item.linkId eq ${fhirKey.id} and item.answer.${fhirKey.type} ${operator} ${_value}` : ''
+  }
 }
 
 export const findQuestionnaireRessource = (filters: string[]) => {
@@ -237,17 +248,24 @@ export const findQuestionnaireRessource = (filters: string[]) => {
 }
 
 export const unbuildQuestionnaireFilters = (filters: string[]) => {
-  const regex = /linkId eq (\S+) and item\.answer\.\S+ (\S+) (\S+)/
+  console.log('test filters', filters)
+  const regex = /linkId eq (\S+) item\.answer\.\S+ (\S+) (\S+)/
+  // const regex = /(?:ge|le|gt|lt|eq)\s+(\w+)/g
 
   return filters
     .map((str) => {
+      console.log('test str', str)
       const match = str.match(regex)
+      console.log('test match', match)
       if (match) {
         const [, linkId, operator, value] = match
         return [linkId, operator, value]
       }
     })
-    .filter((elem) => elem)
+    .filter((elem) => {
+      console.log('test elem', elem)
+      return elem
+    })
 }
 
 export const filtersBuilders = (fhirKey: string, value?: string) => {
