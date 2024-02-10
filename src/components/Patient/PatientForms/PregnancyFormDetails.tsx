@@ -31,7 +31,7 @@ const PregnancyFormDetails = ({ pregnancyFormData, onClose }: PregnancyFormDetai
     },
     {
       name: 'Risques ou complications de la grossesse',
-      value: getDataFromForm(pregnancyFormData, pregnancyForm.risksComplicationPregnancy)
+      value: getDataFromForm(pregnancyFormData, pregnancyForm.risksOrComplicationsOfPregnancy)
     },
     {
       name: 'Grossesse suivie au diagnostic prénatal',

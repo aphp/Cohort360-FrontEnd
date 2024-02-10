@@ -10,9 +10,9 @@ export const getDataFromForm = (
     case 'valueString':
       return itemValue?.[0]?.valueString ?? 'N/A'
     case 'valueDate':
-      return itemValue?.[0]?.valueString ?? 'N/A'
+      return itemValue?.[0]?.valueDate ?? 'N/A'
     case 'valueCoding':
-      return itemValue?.map((answer) => answer.valueString).join(' - ') ?? 'N/A'
+      return itemValue?.map((answer) => answer.valueCoding?.display).join(' - ') ?? 'N/A'
     case 'valueInteger':
       return itemValue?.[0]?.valueInteger ?? 'N/A'
     default:

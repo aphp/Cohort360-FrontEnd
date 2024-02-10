@@ -592,7 +592,11 @@ const fetchMaternityForms = createAsyncThunk<
       _executiveUnits
     )
 
-    const maternityFormsList = linkElementWithEncounter(formResponse, hospits, deidentified)
+    const maternityFormsList = linkElementWithEncounter(formResponse, hospits, deidentified).sort((form1, form2) => {
+      const dateForm1 = new Date(form1.authored ?? '').getTime()
+      const dateForm2 = new Date(form2.authored ?? '').getTime()
+      return dateForm2 - dateForm1
+    })
 
     return {
       forms: {

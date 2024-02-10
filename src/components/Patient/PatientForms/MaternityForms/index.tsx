@@ -20,9 +20,10 @@ import { selectFiltersAsArray } from 'utils/filters'
 import { getDataFromForm } from 'utils/formUtils'
 import { QuestionnaireResponse } from 'fhir/r4'
 import { CriteriaName, LoadingStatus } from 'types'
-import { FilterKeys } from 'types/searchCriterias'
+import { FilterKeys, FormNames } from 'types/searchCriterias'
 import PregnancyFormDetails from '../PregnancyFormDetails'
 import HospitFormDetails from '../HospitFormDetails'
+import Timeline from './Timeline'
 
 type PatientFormsProps = {
   groupId?: string
@@ -54,8 +55,6 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
 
   const controllerRef = useRef<AbortController | null>(null)
 
-  console.log('filters', filters)
-
   const _fetchForms = async () => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
@@ -83,6 +82,18 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
     }
   }
 
+  const prepareTimelineData = () => {
+    if (formName.length === 1 && formName.includes(FormNames.HOSPIT)) {
+      return formName.includes(FormNames.PREGNANCY)
+        ? searchResults.maternityFormList?.filter((form) => form.questionnaire === FormNames.HOSPIT) ?? []
+        : searchResults.maternityFormList?.filter((form) => form.questionnaire === FormNames.PREGNANCY) ?? []
+    } else {
+      return searchResults.maternityFormList ?? []
+    }
+  }
+
+  const timelineData = prepareTimelineData()
+
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
   }, [])
@@ -102,8 +113,8 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
     <Grid container justifyContent="flex-end">
       <BlockWrapper item xs={12} margin={'20px 0px 10px'}>
         <Searchbar>
-          <Grid container item xs={12} md={12} lg={4} xl={4} justifyContent="flex-end">
-            <Button width={'30%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
+          <Grid container item xs={12} justifyContent="flex-end">
+            <Button width={'10%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
               Filtrer
             </Button>
             {toggleModal && (
@@ -133,24 +144,11 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
           ))}
         </Grid>
       )}
-      {searchResults.maternityFormList?.map((form, index) => (
-        <Grid container item key={index}>
-          <Grid container item xs={4} justifyContent="column">
-            <p> {getDataFromForm(form, pregnancyForm.pregnancyType)} </p>
-            <p>Début de grossesse : {moment(getDataFromForm(form, pregnancyForm.startDate)).format('DD/MM/YYYY')}</p>
-            <p>Unité exécutrice à compléter</p>
-            <Button onClick={() => setTogglePregnancyDetails(form)}>+ de détails</Button>
-          </Grid>
-          <Grid container item xs={8}>
-            {/* {form.hospitLinked?.map((hospit, index) => (
-              <Grid container item key={index}>
-                <p>Unité exécutrice à compléter</p>
-                <Button onClick={() => setToggleHospitDetails(hospit)}>+ de détails</Button>
-              </Grid>
-            ))} */}
-          </Grid>
-        </Grid>
-      ))}
+
+      <Grid item xs={12}>
+        <Timeline questionnaireResponses={timelineData} />
+      </Grid>
+
       {togglePregnancyDetails && (
         <PregnancyFormDetails
           pregnancyFormData={togglePregnancyDetails}

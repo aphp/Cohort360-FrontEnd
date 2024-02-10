@@ -20,7 +20,7 @@ const PatientForms = ({ groupId }: PatientFormsProps) => {
 
   return (
     <Grid container justifyContent="flex-end">
-      <BlockWrapper item xs={12} margin={'20px 0px 10px'}>
+      <BlockWrapper item xs={12} margin={'20px 0px 0px'}>
         <Select value={formType} label="Formulaire" items={formTypes} onchange={(newValue) => setFormType(newValue)} />
       </BlockWrapper>
       {formType === 'maternity' && <MaternityForm groupId={groupId} />}
