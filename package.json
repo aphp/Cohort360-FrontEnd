@@ -15,6 +15,7 @@
     "@reduxjs/toolkit": "^1.9.3",
     "@types/redux-state-sync": "^3.1.5",
     "ace-builds": "^1.16.0",
+    "antlr4": "^4.13.1-patch-1",
     "apollo-boost": "^0.4.9",
     "axios": "^1.6.0",
     "buffer": "^6.0.3",

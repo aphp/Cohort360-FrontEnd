@@ -23,6 +23,7 @@ import {
 } from 'types/requestCriterias'
 import { comparatorToFilter, parseOccurence } from './valueComparator'
 import services from 'services/aphp'
+import extractFilterParams, { FhirFilterValue } from './fhirFilterParser'
 
 const searchReducer = (accumulator: any, currentValue: any): string =>
   accumulator || accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -220,6 +221,10 @@ export const buildSimpleFilter = (criterion: string, fhirKey: string, url?: stri
   return criterion ? `${fhirKey}=${url ? `${url}|` : ''}${criterion}` : ''
 }
 
+const LINK_ID_PARAM_NAME = 'item.linkId'
+const VALUE_PARAM_NAME_PREFIX = 'item.answer.'
+const FILTER_PARAM_NAME = '_filter'
+
 export const questionnaireFiltersBuilders = (fhirKey: { id: string; type: string }, value?: string) => {
   const slice = value?.slice(0, 2)
   const operator = slice === 'ge' || slice === 'le' || slice === 'lt' || slice === 'gt' || slice === 'eq' ? slice : 'eq'
@@ -227,45 +232,58 @@ export const questionnaireFiltersBuilders = (fhirKey: { id: string; type: string
 
   if (fhirKey.type === 'valueBoolean' || fhirKey.type === 'valueCoding') {
     const _code = value?.split(',')
-    console.log('test _code', _code)
     return value && _code && _code?.length > 0
-      ? `_filter=item.linkId eq ${fhirKey.id} and (${_code
-          .map((code) => `item.answer.${fhirKey.type} eq ${code}`)
+      ? `${FILTER_PARAM_NAME}=${LINK_ID_PARAM_NAME} eq ${fhirKey.id} and (${_code
+          .map((code) => `${VALUE_PARAM_NAME_PREFIX}${fhirKey.type} eq "${code}"`)
           .join(' or ')})`
       : ''
   } else {
-    return value ? `_filter=item.linkId eq ${fhirKey.id} and item.answer.${fhirKey.type} ${operator} ${_value}` : ''
+    return value
+      ? `${FILTER_PARAM_NAME}=${LINK_ID_PARAM_NAME} eq ${fhirKey.id} and ${VALUE_PARAM_NAME_PREFIX}${fhirKey.type} ${operator} ${_value}`
+      : ''
   }
 }
 
-export const findQuestionnaireRessource = (filters: string[]) => {
+export const findQuestionnaireName = (filters: string[]) => {
   for (const item of filters) {
-    const match = item.match(/questionnaire=([^']*)/)
+    const match = item.match(/questionnaire=(.*)/)
     if (match && match[1]) {
       return match[1]
     }
   }
 }
 
-export const unbuildQuestionnaireFilters = (filters: string[]) => {
-  console.log('test filters', filters)
-  const regex = /linkId eq (\S+) item\.answer\.\S+ (\S+) (\S+)/
-  // const regex = /(?:ge|le|gt|lt|eq)\s+(\w+)/g
-
-  return filters
-    .map((str) => {
-      console.log('test str', str)
-      const match = str.match(regex)
-      console.log('test match', match)
-      if (match) {
-        const [, linkId, operator, value] = match
-        return [linkId, operator, value]
+export const unbuildQuestionnaireFilters = (
+  filters: string[]
+): Array<{ key: string; values: Array<FhirFilterValue> }> => {
+  const specialFilters = filters
+    .filter((filter) => filter.startsWith(`${FILTER_PARAM_NAME}=`))
+    .map((filter) => {
+      const filterContent = filter.split(`${FILTER_PARAM_NAME}=`)[1]
+      const filterElements = extractFilterParams(filterContent, { omitOperatorEq: true })
+      if (filterElements) {
+        // should check that this param exist and does not have multiple values
+        // and raise an error (but errors should be properly handled in the unbuildRequest function)
+        const paramKey = filterElements.find((element) => element.param === LINK_ID_PARAM_NAME)
+        const paramValues = filterElements.filter((element) => element.param.startsWith(VALUE_PARAM_NAME_PREFIX))
+        const key = paramKey?.values[0].value
+        return {
+          key: key,
+          values: paramValues.flatMap((element) => element.values)
+        }
       }
     })
-    .filter((elem) => {
-      console.log('test elem', elem)
-      return elem
+    .filter((filter) => filter !== undefined) as Array<{ key: string; values: Array<FhirFilterValue> }>
+  const standardFilters = filters
+    .filter((filter) => !filter.startsWith(`${FILTER_PARAM_NAME}=`))
+    .map((filter) => {
+      const [key, value] = filter.split('=')
+      return {
+        key: key,
+        values: [{ value: value, operator: 'undefined' }]
+      }
     })
+  return specialFilters.concat(standardFilters)
 }
 
 export const filtersBuilders = (fhirKey: string, value?: string) => {

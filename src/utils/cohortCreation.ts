@@ -43,7 +43,7 @@ import {
   filtersBuilders,
   questionnaireFiltersBuilders,
   unbuildQuestionnaireFilters,
-  findQuestionnaireRessource
+  findQuestionnaireName
 } from './mappers'
 import { pregnancyForm } from 'data/pregnancyData'
 
@@ -679,6 +679,8 @@ export function buildRequest(
 }
 
 export async function unbuildRequest(_json: string): Promise<any> {
+  // TODO: handle potential errors (here or in the caller)
+  // so if a single criteria fails, the whole request is not lost
   let population: (ScopeTreeRow | undefined)[] | null = null
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
@@ -1332,7 +1334,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
       case RessourceType.QUESTIONNAIRE_RESPONSE:
         if (element.filterFhir) {
           const splittedFilters = element.filterFhir.split('&')
-          const findRessource = findQuestionnaireRessource(splittedFilters)
+          const findRessource = findQuestionnaireName(splittedFilters)
           const cleanedFilters = unbuildQuestionnaireFilters(splittedFilters)
 
           switch (findRessource) {
@@ -1360,67 +1362,64 @@ export async function unbuildRequest(_json: string): Promise<any> {
 
               unbuildAdvancedCriterias(element, currentCriterion)
 
-              console.log('test cleanedFilters', cleanedFilters)
-
-              for (const filter of cleanedFilters) {
-                console.log('test filter', filter)
-                const key = filter?.[0]
-                const comparator = filter?.[1]
-                const value = filter?.[2] ?? ''
+              for (const { key, values } of cleanedFilters) {
+                // this is bad design, we should properly handle multiple values and operators
+                const { value: singleValue, operator } = values.length > 0 ? values[0] : { value: '', operator: 'eq' }
+                const joinedValues = values.map((val) => val.value).join(',')
 
                 switch (key) {
                   case pregnancyForm.pregnancyStartDate.id:
-                    currentCriterion.pregnancyStartDate = unbuildDateFilter(value)
+                    currentCriterion.pregnancyStartDate = unbuildDateFilter(singleValue)
                     break
                   case pregnancyForm.pregnancyEndDate.id:
-                    currentCriterion.pregnancyEndDate = unbuildDateFilter(value)
+                    currentCriterion.pregnancyEndDate = unbuildDateFilter(singleValue)
                     break
                   case pregnancyForm.pregnancyMode.id:
-                    unbuildLabelObjectFilter(currentCriterion, 'pregnancyMode', value)
+                    unbuildLabelObjectFilter(currentCriterion, 'pregnancyMode', joinedValues)
                     break
                   case pregnancyForm.foetus.id: {
-                    const _value = `${comparator}${value}`
+                    const _value = `${operator}${singleValue}`
                     const parsedOccurence = parseOccurence(_value)
                     currentCriterion.foetus = parsedOccurence.value
                     currentCriterion.foetusComparator = parsedOccurence.comparator
                     break
                   }
                   case pregnancyForm.parity.id: {
-                    const _value = `${comparator}${value}`
+                    const _value = `${operator}${singleValue}`
                     const parsedOccurence = parseOccurence(_value)
                     currentCriterion.parity = parsedOccurence.value
                     currentCriterion.parityComparator = parsedOccurence.comparator
                     break
                   }
                   case pregnancyForm.maternalRisks.id:
-                    unbuildLabelObjectFilter(currentCriterion, 'maternalRisks', value)
+                    unbuildLabelObjectFilter(currentCriterion, 'maternalRisks', joinedValues)
                     break
                   case pregnancyForm.maternalRisksPrecision.id:
-                    currentCriterion.maternalRisksPrecision = unbuildSearchFilter(value)
+                    currentCriterion.maternalRisksPrecision = unbuildSearchFilter(singleValue)
                     break
                   case pregnancyForm.risksObstetricHistory.id:
-                    unbuildLabelObjectFilter(currentCriterion, 'risksRelatedToObstetricHistory', value)
+                    unbuildLabelObjectFilter(currentCriterion, 'risksRelatedToObstetricHistory', joinedValues)
                     break
                   case pregnancyForm.risksObstetricHistoryPrecision.id:
-                    currentCriterion.risksRelatedToObstetricHistoryPrecision = unbuildSearchFilter(value)
+                    currentCriterion.risksRelatedToObstetricHistoryPrecision = unbuildSearchFilter(singleValue)
                     break
                   case pregnancyForm.risksOrComplicationsOfPregnancy.id:
-                    unbuildLabelObjectFilter(currentCriterion, 'risksOrComplicationsOfPregnancy', value)
+                    unbuildLabelObjectFilter(currentCriterion, 'risksOrComplicationsOfPregnancy', joinedValues)
                     break
                   case pregnancyForm.risksComplicationPregnancyPrecision.id:
-                    currentCriterion.risksOrComplicationsOfPregnancyPrecision = unbuildSearchFilter(value)
+                    currentCriterion.risksOrComplicationsOfPregnancyPrecision = unbuildSearchFilter(singleValue)
                     break
                   case pregnancyForm.corticotherapie.id:
-                    unbuildLabelObjectFilter(currentCriterion, 'corticotherapie', value)
+                    unbuildLabelObjectFilter(currentCriterion, 'corticotherapie', joinedValues)
                     break
                   case pregnancyForm.prenatalDiagnosis.id:
-                    unbuildLabelObjectFilter(currentCriterion, 'prenatalDiagnosis', value)
+                    unbuildLabelObjectFilter(currentCriterion, 'prenatalDiagnosis', joinedValues)
                     break
                   case pregnancyForm.ultrasoundMonitoring.id:
-                    unbuildLabelObjectFilter(currentCriterion, 'ultrasoundMonitoring', value)
+                    unbuildLabelObjectFilter(currentCriterion, 'ultrasoundMonitoring', joinedValues)
                     break
                   case ENCOUNTER_SERVICE_PROVIDER:
-                    await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
+                    await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', joinedValues)
                     break
                 }
               }
