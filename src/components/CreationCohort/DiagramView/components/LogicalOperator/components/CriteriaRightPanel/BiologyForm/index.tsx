@@ -11,11 +11,11 @@ import { PmsiListType } from 'state/pmsi'
 import { fetchBiology } from 'state/biology'
 import { useAppDispatch, useAppSelector } from 'state'
 import { EXPLORATION } from 'utils/constants'
-import { Comparators, ObservationDataType, RessourceType } from 'types/requestCriterias'
+import { Comparators, ObservationDataType, CriteriaType } from 'types/requestCriterias'
 import { CriteriaDrawerComponentProps } from 'types'
 
 export const defaultBiology: Omit<ObservationDataType, 'id'> = {
-  type: RessourceType.OBSERVATION,
+  type: CriteriaType.OBSERVATION,
   title: 'Critères de biologie',
   code: [],
   isLeaf: false,

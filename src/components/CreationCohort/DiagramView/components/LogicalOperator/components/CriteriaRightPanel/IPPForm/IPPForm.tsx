@@ -7,11 +7,11 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import { CriteriaDrawerComponentProps } from 'types'
 
 import useStyles from './styles'
-import { IPPListDataType, RessourceType } from 'types/requestCriterias'
+import { IPPListDataType, CriteriaType } from 'types/requestCriterias'
 
 const defaultIPPList: Omit<IPPListDataType, 'id'> = {
   title: "Liste d'IPP",
-  type: RessourceType.IPP_LIST,
+  type: CriteriaType.IPP_LIST,
   search: '',
   isInclusive: true
 }

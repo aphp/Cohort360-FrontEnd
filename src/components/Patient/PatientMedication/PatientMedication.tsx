@@ -30,7 +30,7 @@ import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
 import PrescriptionTypesFilter from 'components/Filters/PrescriptionTypesFilter'
 import { Save, SavedSearch } from '@mui/icons-material'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
 import { MedicationLabel } from 'types/patient'
@@ -68,17 +68,17 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [page, setPage] = useState(1)
   const [selectedTab, setSelectedTab] = useState<
-    TabType<RessourceType.MEDICATION_ADMINISTRATION | RessourceType.MEDICATION_REQUEST, MedicationLabel>
+    TabType<ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST, MedicationLabel>
   >({
-    id: RessourceType.MEDICATION_REQUEST,
+    id: ResourceType.MEDICATION_REQUEST,
     label: MedicationLabel.PRESCRIPTION
   })
   const medicationTabs: TabType<
-    RessourceType.MEDICATION_ADMINISTRATION | RessourceType.MEDICATION_REQUEST,
+    ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST,
     MedicationLabel
   >[] = [
-    { id: RessourceType.MEDICATION_REQUEST, label: MedicationLabel.PRESCRIPTION },
-    { id: RessourceType.MEDICATION_ADMINISTRATION, label: MedicationLabel.ADMINISTRATION }
+    { id: ResourceType.MEDICATION_REQUEST, label: MedicationLabel.PRESCRIPTION },
+    { id: ResourceType.MEDICATION_ADMINISTRATION, label: MedicationLabel.ADMINISTRATION }
   ]
   const {
     allSavedFilters,
@@ -114,7 +114,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
     list: [],
     nb: 0,
     total: 0,
-    label: mapToLabel(RessourceType.MEDICATION_REQUEST)
+    label: mapToLabel(ResourceType.MEDICATION_REQUEST)
   })
 
   const controllerRef = useRef<AbortController | null>(null)
@@ -249,10 +249,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
             values={medicationTabs}
             active={selectedTab}
             onchange={(
-              value: TabType<
-                RessourceType.MEDICATION_ADMINISTRATION | RessourceType.MEDICATION_REQUEST,
-                MedicationLabel
-              >
+              value: TabType<ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST, MedicationLabel>
             ) => setSelectedTab(value)}
           />
         </Grid>
@@ -301,14 +298,14 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
         onClean={triggerClean}
       >
         {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-        {selectedTab.id === RessourceType.MEDICATION_REQUEST && prescriptionTypes && (
+        {selectedTab.id === ResourceType.MEDICATION_REQUEST && prescriptionTypes && (
           <PrescriptionTypesFilter
             value={prescriptionTypes}
             name={FilterKeys.PRESCRIPTION_TYPES}
             allPrescriptionTypes={allPrescriptionTypes}
           />
         )}
-        {selectedTab.id === RessourceType.MEDICATION_ADMINISTRATION && administrationRoutes && (
+        {selectedTab.id === ResourceType.MEDICATION_ADMINISTRATION && administrationRoutes && (
           <AdministrationTypesFilter
             value={administrationRoutes}
             name={FilterKeys.ADMINISTRATION_ROUTES}
@@ -411,7 +408,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
                     value={selectedSavedFilter?.filterParams.filters.nda || ''}
                   />
                 )}
-                {selectedTab.id === RessourceType.MEDICATION_REQUEST && (
+                {selectedTab.id === ResourceType.MEDICATION_REQUEST && (
                   <PrescriptionTypesFilter
                     value={selectedSavedFilter?.filterParams.filters.prescriptionTypes || []}
                     name={FilterKeys.PRESCRIPTION_TYPES}
@@ -419,7 +416,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
                     disabled={isReadonlyFilterInfoModal}
                   />
                 )}
-                {selectedTab.id === RessourceType.MEDICATION_ADMINISTRATION && (
+                {selectedTab.id === ResourceType.MEDICATION_ADMINISTRATION && (
                   <AdministrationTypesFilter
                     disabled={isReadonlyFilterInfoModal}
                     value={selectedSavedFilter?.filterParams.filters.administrationRoutes || []}

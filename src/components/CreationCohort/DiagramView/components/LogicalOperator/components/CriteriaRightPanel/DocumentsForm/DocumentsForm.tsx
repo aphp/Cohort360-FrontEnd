@@ -32,14 +32,14 @@ import { useDebounce } from 'utils/debounce'
 import { SearchByTypes, FilterByDocumentStatus } from 'types/searchCriterias'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 import { SearchInputError } from 'types/error'
-import { Comparators, DocType, DocumentDataType, RessourceType } from 'types/requestCriterias'
+import { Comparators, DocType, DocumentDataType, CriteriaType } from 'types/requestCriterias'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 
 const defaultComposition: Omit<DocumentDataType, 'id'> = {
-  type: RessourceType.DOCUMENTS,
+  type: CriteriaType.DOCUMENTS,
   title: 'Critère de document',
   search: '',
   searchBy: SearchByTypes.TEXT,

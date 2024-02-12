@@ -16,12 +16,12 @@ import useStyles from './styles'
 import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
 import { MEDICATION_ATC, MEDICATION_ATC_ORBIS, MEDICATION_UCD } from '../../constants'
 import { OrderBy } from 'types/searchCriterias'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 
 type DataTableMedicationProps = {
   loading: boolean
   deidentified: boolean
-  selectedTab: RessourceType.MEDICATION_ADMINISTRATION | RessourceType.MEDICATION_REQUEST
+  selectedTab: ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST
   medicationsList: CohortMedication<MedicationRequest | MedicationAdministration>[]
   orderBy?: OrderBy
   setOrderBy?: (order: OrderBy) => void
@@ -45,16 +45,16 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
   const columns = [
     { label: `NDA${deidentified ? ' chiffré' : ''}`, code: 'encounter' },
     {
-      label: selectedTab === RessourceType.MEDICATION_REQUEST ? 'Date de prescription' : "Date d'administration",
+      label: selectedTab === ResourceType.MEDICATION_REQUEST ? 'Date de prescription' : "Date d'administration",
       code: 'Period-start'
     },
     { label: 'Code ATC', code: 'medication-atc' },
     { label: 'Code UCD', code: 'medication-ucd' },
-    selectedTab === RessourceType.MEDICATION_REQUEST ? { label: 'Type de prescription', code: 'category-name' } : null,
+    selectedTab === ResourceType.MEDICATION_REQUEST ? { label: 'Type de prescription', code: 'category-name' } : null,
     { label: "Voie d'administration", code: 'route' },
-    selectedTab === RessourceType.MEDICATION_ADMINISTRATION ? { label: 'Quantité' } : null,
+    selectedTab === ResourceType.MEDICATION_ADMINISTRATION ? { label: 'Quantité' } : null,
     { label: 'Unité exécutrice' },
-    selectedTab === RessourceType.MEDICATION_ADMINISTRATION ? { label: 'Commentaire' } : null
+    selectedTab === ResourceType.MEDICATION_ADMINISTRATION ? { label: 'Commentaire' } : null
   ].filter((elem) => elem !== null) as Column[]
 
   return (
@@ -73,7 +73,7 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
                 <CircularProgress />
               ) : (
                 <Typography variant="button">{`Aucune ${
-                  selectedTab === RessourceType.MEDICATION_REQUEST ? 'prescription' : 'administration'
+                  selectedTab === ResourceType.MEDICATION_REQUEST ? 'prescription' : 'administration'
                 } à afficher`}</Typography>
               )}
             </Grid>

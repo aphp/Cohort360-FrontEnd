@@ -32,7 +32,7 @@ import DiagnosticTypesFilter from 'components/Filters/DiagnosticTypesFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
 import SourceFilter from 'components/Filters/SourceFilter'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
@@ -45,7 +45,7 @@ export type PatientPMSIProps = {
   groupId?: string
 }
 
-type PmsiTab = TabType<RessourceType.CLAIM | RessourceType.CONDITION | RessourceType.PROCEDURE, PMSILabel>
+type PmsiTab = TabType<ResourceType.CLAIM | ResourceType.CONDITION | ResourceType.PROCEDURE, PMSILabel>
 
 type PmsiTabs = PmsiTab[]
 
@@ -68,13 +68,13 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const dispatch = useAppDispatch()
 
   const [selectedTab, setSelectedTab] = useState<PmsiTab>({
-    id: RessourceType.CONDITION,
+    id: ResourceType.CONDITION,
     label: PMSILabel.DIAGNOSTIC
   })
   const PMSITabs: PmsiTabs = [
-    { label: PMSILabel.DIAGNOSTIC, id: RessourceType.CONDITION },
-    { label: PMSILabel.CCAM, id: RessourceType.PROCEDURE },
-    { label: PMSILabel.GHM, id: RessourceType.CLAIM }
+    { label: PMSILabel.DIAGNOSTIC, id: ResourceType.CONDITION },
+    { label: PMSILabel.CCAM, id: ResourceType.PROCEDURE },
+    { label: PMSILabel.GHM, id: ResourceType.CLAIM }
   ]
   const [page, setPage] = useState(1)
   const {
@@ -200,9 +200,9 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
 
   const fetchCodes = useCallback(() => {
     switch (selectedTab.id) {
-      case RessourceType.CONDITION:
+      case ResourceType.CONDITION:
         return fetchConditionCodes
-      case RessourceType.PROCEDURE:
+      case ResourceType.PROCEDURE:
         return fetchProcedureCodes
       default:
         return fetchClaimCodes
@@ -254,7 +254,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                 values={PMSITabs}
                 active={selectedTab}
                 onchange={(
-                  value: TabType<RessourceType.CONDITION | RessourceType.PROCEDURE | RessourceType.CLAIM, PMSILabel>
+                  value: TabType<ResourceType.CONDITION | ResourceType.PROCEDURE | ResourceType.CLAIM, PMSILabel>
                 ) => setSelectedTab(value)}
               />
             </Grid>
@@ -310,14 +310,14 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
       >
         {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
         <CodeFilter name={FilterKeys.CODE} value={code} onFetch={fetchCodes()} />
-        {selectedTab.id === RessourceType.CONDITION && (
+        {selectedTab.id === ResourceType.CONDITION && (
           <DiagnosticTypesFilter
             name={FilterKeys.DIAGNOSTIC_TYPES}
             value={diagnosticTypes || []}
             allDiagnosticTypesList={allDiagnosticTypesList}
           />
         )}
-        {selectedTab.id === RessourceType.PROCEDURE && <SourceFilter name={FilterKeys.SOURCE} value={source || ''} />}
+        {selectedTab.id === ResourceType.PROCEDURE && <SourceFilter name={FilterKeys.SOURCE} value={source || ''} />}
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
           value={executiveUnits}
@@ -424,7 +424,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                   onFetch={fetchCodes()}
                 />
               </Grid>
-              {selectedTab.id === RessourceType.CONDITION && (
+              {selectedTab.id === ResourceType.CONDITION && (
                 <Grid item xs={12}>
                   <DiagnosticTypesFilter
                     disabled={isReadonlyFilterInfoModal}
@@ -434,7 +434,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                   />
                 </Grid>
               )}
-              {selectedTab.id === RessourceType.PROCEDURE && (
+              {selectedTab.id === ResourceType.PROCEDURE && (
                 <Grid item xs={12}>
                   <SourceFilter
                     disabled={isReadonlyFilterInfoModal}

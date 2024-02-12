@@ -1,4 +1,4 @@
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { ScopeTreeRow, SimpleCodeType } from 'types'
 import {
   Direction,
@@ -117,34 +117,34 @@ enum ImagingParamsKeys {
   EXECUTIVE_UNITS = 'encounter.encounter-care-site'
 }
 
-const getGenericKeyFromRessourceType = (type: RessourceType, key: 'NDA' | 'DATE' | 'EXECUTIVE_UNITS') => {
+const getGenericKeyFromResourceType = (type: ResourceType, key: 'NDA' | 'DATE' | 'EXECUTIVE_UNITS') => {
   switch (type) {
-    case RessourceType.DOCUMENTS:
+    case ResourceType.DOCUMENTS:
       return DocumentsParamsKeys[key]
-    case RessourceType.CONDITION:
+    case ResourceType.CONDITION:
       return ConditionParamsKeys[key]
-    case RessourceType.PROCEDURE:
+    case ResourceType.PROCEDURE:
       return ProcedureParamsKeys[key]
-    case RessourceType.CLAIM:
+    case ResourceType.CLAIM:
       return ClaimParamsKeys[key]
-    case RessourceType.MEDICATION_REQUEST:
+    case ResourceType.MEDICATION_REQUEST:
       return PrescriptionParamsKeys[key]
-    case RessourceType.MEDICATION_ADMINISTRATION:
+    case ResourceType.MEDICATION_ADMINISTRATION:
       return AdministrationParamsKeys[key]
-    case RessourceType.OBSERVATION:
+    case ResourceType.OBSERVATION:
       return ObservationParamsKeys[key]
-    case RessourceType.IMAGING:
+    case ResourceType.IMAGING:
       return ImagingParamsKeys[key]
   }
   return ''
 }
 
-const mapGenericFromRequestParams = async (parameters: URLSearchParams, type: RessourceType) => {
-  const nda = decodeURIComponent(parameters.get(getGenericKeyFromRessourceType(type, 'NDA')) || '')
-  const dates = parameters.getAll(getGenericKeyFromRessourceType(type, 'DATE'))
+const mapGenericFromRequestParams = async (parameters: URLSearchParams, type: ResourceType) => {
+  const nda = decodeURIComponent(parameters.get(getGenericKeyFromResourceType(type, 'NDA')) || '')
+  const dates = parameters.getAll(getGenericKeyFromResourceType(type, 'DATE'))
   const startDate = dates.find((e) => e.includes('ge'))?.split('ge')?.[1] || null
   const endDate = dates.find((e) => e.includes('le'))?.split('le')?.[1] || null
-  const executiveUnitsParams = parameters.get(getGenericKeyFromRessourceType(type, 'EXECUTIVE_UNITS'))
+  const executiveUnitsParams = parameters.get(getGenericKeyFromResourceType(type, 'EXECUTIVE_UNITS'))
   let executiveUnits: ScopeTreeRow[] = []
   if (executiveUnitsParams) {
     executiveUnits = await Promise.all<ScopeTreeRow>(
@@ -203,7 +203,7 @@ const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
   const onlyPdfAvailable = true
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
     parameters,
-    RessourceType.DOCUMENTS
+    ResourceType.DOCUMENTS
   )
   return { docStatuses, docTypes, ipp, onlyPdfAvailable, nda, startDate, endDate, executiveUnits }
 }
@@ -229,7 +229,7 @@ const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
   }
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
     parameters,
-    RessourceType.CONDITION
+    ResourceType.CONDITION
   )
   return { code, diagnosticTypes, nda, startDate, endDate, executiveUnits }
 }
@@ -247,7 +247,7 @@ const mapProcedureFromRequestParams = async (parameters: URLSearchParams) => {
   const source = parameters.get(ProcedureParamsKeys.SOURCE) || ''
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
     parameters,
-    RessourceType.PROCEDURE
+    ResourceType.PROCEDURE
   )
   return { code, source, nda, startDate, endDate, executiveUnits }
 }
@@ -262,7 +262,7 @@ const mapClaimFromRequestParams = async (parameters: URLSearchParams) => {
   const code = fetchCodesResults.map((e) => {
     return { id: e.id, label: e.label }
   })
-  const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(parameters, RessourceType.CLAIM)
+  const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(parameters, ResourceType.CLAIM)
   return { code, nda, startDate, endDate, executiveUnits }
 }
 
@@ -277,7 +277,7 @@ const mapPrescriptionFromRequestParams = async (parameters: URLSearchParams) => 
   }
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
     parameters,
-    RessourceType.MEDICATION_REQUEST
+    ResourceType.MEDICATION_REQUEST
   )
   return { prescriptionTypes, nda, startDate, endDate, executiveUnits }
 }
@@ -295,7 +295,7 @@ const mapAdministrationFromRequestParams = async (parameters: URLSearchParams) =
   }
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
     parameters,
-    RessourceType.MEDICATION_ADMINISTRATION
+    ResourceType.MEDICATION_ADMINISTRATION
   )
   return { administrationRoutes, nda, startDate, endDate, executiveUnits }
 }
@@ -323,7 +323,7 @@ const mapBiologyFromRequestParams = async (parameters: URLSearchParams) => {
   const validatedStatus = true
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
     parameters,
-    RessourceType.OBSERVATION
+    ResourceType.OBSERVATION
   )
   return { loinc, anabio, validatedStatus, nda, startDate, endDate, executiveUnits }
 }
@@ -343,28 +343,28 @@ const mapImagingFromRequestParams = async (parameters: URLSearchParams) => {
   }
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
     parameters,
-    RessourceType.IMAGING
+    ResourceType.IMAGING
   )
   return { modality, nda, startDate, endDate, executiveUnits, ipp }
 }
 
-const mapFiltersFromRequestParams = async (parameters: URLSearchParams, type: RessourceType): Promise<Filters> => {
+const mapFiltersFromRequestParams = async (parameters: URLSearchParams, type: ResourceType): Promise<Filters> => {
   switch (type) {
-    case RessourceType.PATIENT:
+    case ResourceType.PATIENT:
       return mapPatientFromRequestParams(parameters)
-    case RessourceType.DOCUMENTS:
+    case ResourceType.DOCUMENTS:
       return await mapDocumentsFromRequestParams(parameters)
-    case RessourceType.CONDITION:
+    case ResourceType.CONDITION:
       return await mapConditionFromRequestParams(parameters)
-    case RessourceType.PROCEDURE:
+    case ResourceType.PROCEDURE:
       return await mapProcedureFromRequestParams(parameters)
-    case RessourceType.CLAIM:
+    case ResourceType.CLAIM:
       return await mapClaimFromRequestParams(parameters)
-    case RessourceType.MEDICATION_REQUEST:
+    case ResourceType.MEDICATION_REQUEST:
       return await mapPrescriptionFromRequestParams(parameters)
-    case RessourceType.MEDICATION_ADMINISTRATION:
+    case ResourceType.MEDICATION_ADMINISTRATION:
       return await mapAdministrationFromRequestParams(parameters)
-    case RessourceType.IMAGING:
+    case ResourceType.IMAGING:
       return await mapImagingFromRequestParams(parameters)
     default:
       return await mapBiologyFromRequestParams(parameters)
@@ -373,7 +373,7 @@ const mapFiltersFromRequestParams = async (parameters: URLSearchParams, type: Re
 
 export const mapRequestParamsToSearchCriteria = async (
   filtersString: string,
-  type: RessourceType
+  type: ResourceType
 ): Promise<SearchCriterias<Filters>> => {
   const parameters = new URLSearchParams(filtersString)
   const [searchBy, searchInput] = mapSearchByAndSearchInputFromRequestParams(parameters)
@@ -387,15 +387,15 @@ export const mapRequestParamsToSearchCriteria = async (
   }
 }
 
-const mapGenericToRequestParams = (filters: GenericFilter, type: RessourceType) => {
+const mapGenericToRequestParams = (filters: GenericFilter, type: ResourceType) => {
   const { nda, startDate, endDate, executiveUnits } = filters
   const requestParams: string[] = []
-  if (nda) requestParams.push(`${getGenericKeyFromRessourceType(type, 'NDA')}=${encodeURIComponent(nda)}`)
-  if (startDate) requestParams.push(`${getGenericKeyFromRessourceType(type, 'DATE')}=ge${startDate}`)
-  if (endDate) requestParams.push(`${getGenericKeyFromRessourceType(type, 'DATE')}=le${endDate}`)
+  if (nda) requestParams.push(`${getGenericKeyFromResourceType(type, 'NDA')}=${encodeURIComponent(nda)}`)
+  if (startDate) requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=ge${startDate}`)
+  if (endDate) requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=le${endDate}`)
   if (executiveUnits && executiveUnits.length > 0)
     requestParams.push(
-      `${getGenericKeyFromRessourceType(type, 'EXECUTIVE_UNITS')}=${executiveUnits.map(
+      `${getGenericKeyFromResourceType(type, 'EXECUTIVE_UNITS')}=${executiveUnits.map(
         (scopeTreeRow: ScopeTreeRow) => scopeTreeRow.id
       )}`
     )
@@ -435,7 +435,7 @@ const mapDocumentsToRequestParams = (filters: DocumentsFilters) => {
     requestParams.push(
       `${DocumentsParamsKeys.DOC_TYPES}=${encodeURIComponent(docTypes.map((codeType) => codeType.code).toString())}`
     )
-  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.DOCUMENTS))
+  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, ResourceType.DOCUMENTS))
   return requestParams
 }
 
@@ -451,7 +451,7 @@ const mapConditionToRequestParams = (filters: PMSIFilters) => {
     requestParams.push(
       `${ConditionParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${CONDITION_HIERARCHY}|${e.id}`).join(','))}`
     )
-  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.CONDITION))
+  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, ResourceType.CONDITION))
   return requestParams
 }
 
@@ -462,7 +462,7 @@ const mapClaimToRequestParams = (filters: PMSIFilters) => {
     requestParams.push(
       `${ClaimParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${CLAIM_HIERARCHY}|${e.id}`).join(','))}`
     )
-  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.CLAIM))
+  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, ResourceType.CLAIM))
   return requestParams
 }
 
@@ -474,7 +474,7 @@ const mapProcedureToRequestParams = (filters: PMSIFilters) => {
       `${ProcedureParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${PROCEDURE_HIERARCHY}|${e.id}`).join(','))}`
     )
   if (source) requestParams.push(`${ProcedureParamsKeys.SOURCE}=${source}`)
-  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.PROCEDURE))
+  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, ResourceType.PROCEDURE))
   return requestParams
 }
 
@@ -487,7 +487,7 @@ const mapPrescriptionToRequestParams = (filters: MedicationFilters) => {
     requestParams.push(`${PrescriptionParamsKeys.PRESCRIPTION_TYPES}=${encodeURIComponent(urlString)}`)
   }
   requestParams.push(
-    ...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.MEDICATION_REQUEST)
+    ...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, ResourceType.MEDICATION_REQUEST)
   )
   return requestParams
 }
@@ -501,7 +501,7 @@ const mapAdministrationToRequestParams = (filters: MedicationFilters) => {
     requestParams.push(`${AdministrationParamsKeys.ADMINISTRATION_ROUTES}=${encodeURIComponent(urlString)}`)
   }
   requestParams.push(
-    ...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.MEDICATION_ADMINISTRATION)
+    ...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, ResourceType.MEDICATION_ADMINISTRATION)
   )
   return requestParams
 }
@@ -533,7 +533,7 @@ const mapBiologyToRequestParams = (filters: BiologyFilters) => {
   }
   if (validatedStatus) requestParams.push(`${ObservationParamsKeys.VALIDATED_STATUS}=VAL`)
   requestParams.push(
-    ...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.OBSERVATION)
+    ...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, ResourceType.OBSERVATION)
   )
   return requestParams
 }
@@ -548,13 +548,13 @@ const mapImagingToRequestParams = (filters: ImagingFilters) => {
         modality.map((labelObject) => `${IMAGING_MODALITIES}|${labelObject.id}`).join(',')
       )}`
     )
-  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.IMAGING))
+  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, ResourceType.IMAGING))
   return requestParams
 }
 
 export const mapSearchCriteriasToRequestParams = (
   searchCriterias: SearchCriterias<Filters>,
-  type: RessourceType,
+  type: ResourceType,
   deidentified: boolean
 ) => {
   const { searchBy, searchInput, filters } = searchCriterias
@@ -564,33 +564,33 @@ export const mapSearchCriteriasToRequestParams = (
     : []
 
   switch (type) {
-    case RessourceType.PATIENT:
+    case ResourceType.PATIENT:
       filtersParam.push(...mapPatientToRequestParams(filters as PatientsFilters, deidentified))
       break
-    case RessourceType.DOCUMENTS:
+    case ResourceType.DOCUMENTS:
       filtersParam.push(...mapDocumentsToRequestParams(filters as DocumentsFilters))
       break
-    case RessourceType.CONDITION:
+    case ResourceType.CONDITION:
       filtersParam.push(...mapConditionToRequestParams(filters as PMSIFilters))
       break
 
-    case RessourceType.PROCEDURE:
+    case ResourceType.PROCEDURE:
       filtersParam.push(...mapProcedureToRequestParams(filters as PMSIFilters))
       break
-    case RessourceType.CLAIM:
+    case ResourceType.CLAIM:
       filtersParam.push(...mapClaimToRequestParams(filters as PMSIFilters))
       break
-    case RessourceType.MEDICATION_REQUEST:
+    case ResourceType.MEDICATION_REQUEST:
       filtersParam.push(...mapPrescriptionToRequestParams(filters as MedicationFilters))
       break
-    case RessourceType.MEDICATION_ADMINISTRATION:
+    case ResourceType.MEDICATION_ADMINISTRATION:
       filtersParam.push(...mapAdministrationToRequestParams(filters as MedicationFilters))
       break
-    case RessourceType.OBSERVATION:
+    case ResourceType.OBSERVATION:
       filtersParam.push(...mapBiologyToRequestParams(filters as BiologyFilters))
       break
 
-    case RessourceType.IMAGING:
+    case ResourceType.IMAGING:
       filtersParam.push(...mapImagingToRequestParams(filters as ImagingFilters))
       break
   }
@@ -598,32 +598,32 @@ export const mapSearchCriteriasToRequestParams = (
   return _filtersParam
 }
 
-const getDefaultOrderBy = (type: RessourceType) => {
+const getDefaultOrderBy = (type: ResourceType) => {
   switch (type) {
-    case RessourceType.PATIENT:
+    case ResourceType.PATIENT:
       return {
         orderBy: Order.FAMILY,
         orderDirection: Direction.ASC
       }
-    case RessourceType.CLAIM:
-    case RessourceType.PROCEDURE:
-    case RessourceType.CONDITION:
+    case ResourceType.CLAIM:
+    case ResourceType.PROCEDURE:
+    case ResourceType.CONDITION:
       return {
         orderBy: Order.DATE,
         orderDirection: Direction.DESC
       }
-    case RessourceType.MEDICATION_REQUEST:
-    case RessourceType.MEDICATION_ADMINISTRATION:
+    case ResourceType.MEDICATION_REQUEST:
+    case ResourceType.MEDICATION_ADMINISTRATION:
       return {
         orderBy: Order.PERIOD_START,
         orderDirection: Direction.DESC
       }
-    case RessourceType.OBSERVATION:
+    case ResourceType.OBSERVATION:
       return {
         orderBy: Order.DATE,
         orderDirection: Direction.ASC
       }
-    case RessourceType.IMAGING:
+    case ResourceType.IMAGING:
       return {
         orderBy: Order.STUDY_DATE,
         orderDirection: Direction.DESC
@@ -639,12 +639,12 @@ const getDefaultOrderBy = (type: RessourceType) => {
 const mapSearchByAndSearchInputToRequestParams = (
   searchBy: SearchByTypes,
   searchInput: SearchInput,
-  type: RessourceType
+  type: ResourceType
 ) => {
   const inputs = searchInput.split(' ').filter((elem: string) => elem)
   const params: string[] = []
 
-  if (type === RessourceType.PATIENT) {
+  if (type === ResourceType.PATIENT) {
     switch (searchBy) {
       case SearchByTypes.TEXT:
       case SearchByTypes.FAMILY:

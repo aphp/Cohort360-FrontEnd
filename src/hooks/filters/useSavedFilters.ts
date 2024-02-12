@@ -8,7 +8,7 @@ import {
   postFiltersService
 } from 'services/aphp/servicePatients'
 import { ErrorType } from 'types/error'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { Filters, SavedFilter, SavedFiltersResults, SearchCriterias } from 'types/searchCriterias'
 
 export type SelectedFilter<T> = {
@@ -17,7 +17,7 @@ export type SelectedFilter<T> = {
   filterParams: SearchCriterias<T>
 }
 
-export const useSavedFilters = <T>(type: RessourceType) => {
+export const useSavedFilters = <T>(type: ResourceType) => {
   const [allSavedFilters, setAllSavedFilters] = useState<SavedFiltersResults | null>(null)
   const [allSavedFiltersAsListItems, setAllSavedFiltersAsListItems] = useState<Item[]>([])
   const [savedFiltersErrors, setSavedFiltersErrors] = useState<ErrorType>({ isError: false })

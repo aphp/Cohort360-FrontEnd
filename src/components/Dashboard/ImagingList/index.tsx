@@ -32,7 +32,7 @@ import { selectFiltersAsArray } from 'utils/filters'
 
 import { CanceledError } from 'axios'
 import { AlertWrapper } from 'components/ui/Alert'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
@@ -82,7 +82,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
       selectFilter,
       resetSavedFilterError
     }
-  } = useSavedFilters<ImagingFilters>(RessourceType.IMAGING)
+  } = useSavedFilters<ImagingFilters>(ResourceType.IMAGING)
 
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)

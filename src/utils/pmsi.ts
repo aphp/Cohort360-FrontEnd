@@ -11,7 +11,7 @@ import { AbstractTree } from '../types'
 import { expandMedicationElement } from '../state/medication'
 import { expandBiologyElement } from '../state/biology'
 import services from 'services/aphp'
-import { RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 
 /**
  * This function is called when a user select an element of pmsi hierarchy
@@ -301,7 +301,7 @@ export const initSyncHierarchyTableEffect = async (
   selectedCriteria: SelectedCriteriaType | null,
   selectedCodes: PmsiListType[],
   fetchResource: AsyncThunk<any, void, { state: RootState }>,
-  resourceType: RessourceType,
+  resourceType: CriteriaType,
   dispatch: AppDispatch,
   isFetchedResource?: boolean
 ): Promise<void> => {
@@ -328,7 +328,7 @@ export const onChangeSelectedCriteriaEffect = async (
   codesToExpand: PmsiListType[],
   selectedCodes: PmsiListType[],
   resourceHierarchy: PmsiListType[],
-  resourceType: RessourceType,
+  resourceType: CriteriaType,
   dispatch: AppDispatch
 ): Promise<void> => {
   await expandHierarchyCodes(codesToExpand, selectedCodes, resourceHierarchy, resourceType, dispatch)
@@ -351,11 +351,11 @@ const isExpanded = (itemToExpand: PmsiListType | undefined): boolean => {
 const expandRequest = async (
   codeToExpand: string,
   selectedCodes: PmsiListType[],
-  resourceType: RessourceType,
+  resourceType: CriteriaType,
   dispatch: AppDispatch
 ): Promise<PmsiListType[] | undefined> => {
   let type: 'claim' | 'condition' | 'procedure'
-  if (resourceType.toLowerCase() === RessourceType.MEDICATION_REQUEST.toLowerCase()) {
+  if (resourceType.toLowerCase() === CriteriaType.MEDICATION_REQUEST.toLowerCase()) {
     const expandedMedication = await dispatch(
       expandMedicationElement({
         rowId: codeToExpand,
@@ -363,7 +363,7 @@ const expandRequest = async (
       })
     ).unwrap()
     return expandedMedication.list
-  } else if (resourceType.toLowerCase() === RessourceType.OBSERVATION.toLowerCase()) {
+  } else if (resourceType.toLowerCase() === CriteriaType.OBSERVATION.toLowerCase()) {
     const expandedBiology = await dispatch(
       expandBiologyElement({
         rowId: codeToExpand,
@@ -371,11 +371,11 @@ const expandRequest = async (
       })
     ).unwrap()
     return expandedBiology.list
-  } else if (resourceType.toLowerCase() === RessourceType.CLAIM.toLowerCase()) {
+  } else if (resourceType.toLowerCase() === CriteriaType.CLAIM.toLowerCase()) {
     type = 'claim'
-  } else if (resourceType.toLowerCase() === RessourceType.PROCEDURE.toLowerCase()) {
+  } else if (resourceType.toLowerCase() === CriteriaType.PROCEDURE.toLowerCase()) {
     type = 'procedure'
-  } else if (resourceType.toLowerCase() === RessourceType.CONDITION.toLowerCase()) {
+  } else if (resourceType.toLowerCase() === CriteriaType.CONDITION.toLowerCase()) {
     type = 'condition'
   } else {
     return undefined
@@ -394,7 +394,7 @@ export const expandItem = async (
   codeToExpand: string,
   selectedCodes: PmsiListType[],
   resourceHierarchy: PmsiListType[],
-  resourceType: RessourceType,
+  resourceType: CriteriaType,
   dispatch: AppDispatch
 ): Promise<PmsiListType[]> => {
   const equivalentRow = findEquivalentRowInItemAndSubItems(
@@ -414,7 +414,7 @@ const expandSingleResourceItem = async (
   codeToExpand: PmsiListType,
   selectedCodes: PmsiListType[],
   resourceHierarchy: PmsiListType[],
-  resourceType: RessourceType,
+  resourceType: CriteriaType,
   dispatch: AppDispatch
 ): Promise<PmsiListType[]> => {
   if (
@@ -426,7 +426,7 @@ const expandSingleResourceItem = async (
   let newResourceHierarchy: PmsiListType[] = resourceHierarchy
   const expandItemAndSubItems = async (
     itemToExpand: PmsiListType,
-    resourceType: RessourceType
+    resourceType: CriteriaType
   ): Promise<PmsiListType[]> => {
     newResourceHierarchy = await expandItem(
       itemToExpand?.id,
@@ -490,7 +490,7 @@ const expandHierarchyCodes = async (
   codesToExpand: PmsiListType[],
   selectedCodes: PmsiListType[],
   resourceHierarchy: PmsiListType[],
-  resourceType: RessourceType,
+  resourceType: CriteriaType,
   dispatch: AppDispatch
 ): Promise<PmsiListType[]> => {
   let newResourceHierarchy: PmsiListType[] = resourceHierarchy
@@ -513,7 +513,7 @@ export const syncOnChangeFormValue = async (
   resourceHierarchy: PmsiListType[],
   setDefaultCriteria: (value: SelectedCriteriaType) => void,
   selectedTab: string,
-  resourceType: RessourceType,
+  resourceType: CriteriaType,
   dispatch: AppDispatch
 ): Promise<void> => {
   const newSelectedCriteria: any = selectedCriteria ? { ...selectedCriteria } : {}

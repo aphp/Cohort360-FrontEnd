@@ -40,7 +40,7 @@ import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import DocTypesFilter from 'components/Filters/DocTypesFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
@@ -77,7 +77,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
       selectFilter,
       resetSavedFilterError
     }
-  } = useSavedFilters<DocumentsFilters>(RessourceType.DOCUMENTS)
+  } = useSavedFilters<DocumentsFilters>(ResourceType.DOCUMENTS)
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [page, setPage] = useState(1)

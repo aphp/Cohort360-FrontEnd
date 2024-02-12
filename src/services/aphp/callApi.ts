@@ -50,8 +50,8 @@ import {
   DOC_STATUS_CODE_SYSTEM
 } from '../../constants'
 import { Direction, Order, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
-import { RessourceType } from 'types/requestCriterias'
 import { mapDocumentStatusesToRequestParam } from '../../mappers/filters'
+import { ResourceType } from 'types/requestCriterias'
 
 export const paramValuesReducerWithPrefix =
   (prefix: string): ((accumulator: string, currentValue: string) => string) =>
@@ -349,7 +349,7 @@ export const fetchDocumentReferenceContent = async (docId: string): FHIR_API_Pro
  */
 
 export const postFilters = async (
-  fhir_resource: RessourceType,
+  fhir_resource: ResourceType,
   name: string,
   filter: string
 ): Promise<AxiosResponse<SavedFilter>> => {
@@ -364,7 +364,7 @@ export const postFilters = async (
 }
 
 export const getFilters = async (
-  fhir_resource: RessourceType,
+  fhir_resource: ResourceType,
   limit: number,
   offset: number,
   next?: string | null
@@ -391,7 +391,7 @@ export const deleteFilters = async (fhir_resource_uuids: string[]): Promise<Axio
 }
 
 export const patchFilters = async (
-  fhir_resource: RessourceType,
+  fhir_resource: ResourceType,
   uuid: string,
   name: string,
   filter: string

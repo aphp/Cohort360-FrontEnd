@@ -55,7 +55,7 @@ import {
   SearchByTypes,
   SearchCriterias
 } from 'types/searchCriterias'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
 
 export interface IServicePatients {
@@ -122,7 +122,7 @@ export interface IServicePatients {
   fetchPMSI: (
     page: number,
     patientId: string,
-    selectedTab: RessourceType.CLAIM | RessourceType.CONDITION | RessourceType.PROCEDURE,
+    selectedTab: ResourceType.CLAIM | ResourceType.CONDITION | ResourceType.PROCEDURE,
     searchInput: string,
     nda: string,
     code: string,
@@ -180,7 +180,7 @@ export interface IServicePatients {
   fetchMedication: (
     page: number,
     patientId: string,
-    selectedTab: RessourceType.MEDICATION_ADMINISTRATION | RessourceType.MEDICATION_REQUEST,
+    selectedTab: ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST,
     sortBy: Order,
     sortDirection: Direction,
     searchInput: string,
@@ -460,7 +460,7 @@ const servicesPatients: IServicePatients = {
     let pmsiResp: AxiosResponse<FHIR_Bundle_Response<Condition | Procedure | Claim>> | null = null
 
     switch (selectedTab) {
-      case RessourceType.CONDITION:
+      case ResourceType.CONDITION:
         pmsiResp = await fetchCondition({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -478,7 +478,7 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case RessourceType.PROCEDURE:
+      case ResourceType.PROCEDURE:
         pmsiResp = await fetchProcedure({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -496,7 +496,7 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case RessourceType.CLAIM:
+      case ResourceType.CLAIM:
         pmsiResp = await fetchClaim({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -576,7 +576,7 @@ const servicesPatients: IServicePatients = {
     let medicationResp: AxiosResponse<FHIR_Bundle_Response<MedicationRequest | MedicationAdministration>> | null = null
 
     switch (selectedTab) {
-      case RessourceType.MEDICATION_REQUEST:
+      case ResourceType.MEDICATION_REQUEST:
         medicationResp = await fetchMedicationRequest({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -593,7 +593,7 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case RessourceType.MEDICATION_ADMINISTRATION:
+      case ResourceType.MEDICATION_ADMINISTRATION:
         medicationResp = await fetchMedicationAdministration({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -904,7 +904,7 @@ export const getEncounterDocuments = async (
 }
 
 export const postFiltersService = async (
-  fhir_resource: RessourceType,
+  fhir_resource: ResourceType,
   name: string,
   criterias: SearchCriterias<Filters>,
   deidentified: boolean
@@ -915,7 +915,7 @@ export const postFiltersService = async (
   return response.data
 }
 
-export const getFiltersService = async (fhir_resource: RessourceType, next?: string | null) => {
+export const getFiltersService = async (fhir_resource: ResourceType, next?: string | null) => {
   const LIMIT = 10
   const OFFSET = 0
   try {
@@ -945,7 +945,7 @@ export const deleteFiltersService = async (fhir_resource_uuids: string[]) => {
 }
 
 export const patchFiltersService = async (
-  fhir_resource: RessourceType,
+  fhir_resource: ResourceType,
   uuid: string,
   name: string,
   criterias: SearchCriterias<Filters>,
