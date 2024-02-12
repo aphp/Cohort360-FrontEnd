@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Card, CardContent, Typography } from '@mui/material'
+import { Card, CardContent, Typography } from '@mui/material'
 import { QuestionnaireResponse } from 'fhir/r4'
 import ArrowWithYears from './ArrowWithYears'
 import { getDataFromForm } from 'utils/formUtils'

@@ -1,13 +1,13 @@
 import React from 'react'
 import FormDetailsDialog from 'components/ui/FormDetailsDialog'
 import { QuestionnaireResponse } from 'fhir/r4'
-import { getDataFromForm } from 'utils/formUtils'
 
 type HospitFormDetailsProps = {
   hospitFormData: QuestionnaireResponse
   onClose: () => void
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const HospitFormDetails = ({ hospitFormData, onClose }: HospitFormDetailsProps) => {
   const hospitDetails = [
     {

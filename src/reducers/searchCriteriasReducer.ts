@@ -17,7 +17,7 @@ import {
   FilterKeys,
   FilterValue,
   CohortsFilters,
-  FormsFilters
+  MaternityFormFilters
 } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
 
@@ -166,7 +166,7 @@ export const initImagingCriterias: SearchCriterias<ImagingFilters> = {
   }
 }
 
-export const initFormsCriterias: SearchCriterias<FormsFilters> = {
+export const initFormsCriterias: SearchCriterias<MaternityFormFilters> = {
   orderBy: {
     orderBy: Order.DATE,
     orderDirection: Direction.DESC
