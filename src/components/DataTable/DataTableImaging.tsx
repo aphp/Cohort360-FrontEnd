@@ -55,7 +55,7 @@ const DataTableImaging: React.FC<DataTableImagingProps> = ({
     { label: 'Date', code: Order.STUDY_DATE },
     { label: 'Modalité' },
     { label: 'Description' },
-    { label: 'Procédure' },
+    { label: 'Code Procédure' },
     { label: 'Nombre de séries' },
     ...(!deidentified ? [{ label: 'Access number' }] : []),
     { label: 'Unité exécutrice' },
