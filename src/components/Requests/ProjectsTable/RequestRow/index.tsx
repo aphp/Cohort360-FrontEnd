@@ -76,7 +76,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
             </IconButton>
           </TableCellWrapper>
           <TableCellWrapper align="left" className={classes.tdName}>
-            {row?.shared_by?.displayed_name ? (
+            {row?.shared_by?.display_name ? (
               <Link onClick={() => navigate(`/cohort/new/${row.uuid}`)} underline="hover" style={{ cursor: 'pointer' }}>
                 {`${row.name} - Envoyée par : ${row?.shared_by?.firstname} ${row?.shared_by?.lastname?.toUpperCase()}`}
               </Link>
