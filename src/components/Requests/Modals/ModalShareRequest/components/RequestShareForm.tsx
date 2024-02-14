@@ -140,11 +140,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
             )}
           />
 
-          <UsersTable
-            usersList={usersToShare}
-            onChangeUsersAssociated={onChangeValue}
-            usersAssociated={usersToShare}
-          />
+          <UsersTable usersList={usersToShare} onChangeUsersAssociated={onChangeValue} usersAssociated={usersToShare} />
         </div>
       </Grid>
       <Grid container direction="column">

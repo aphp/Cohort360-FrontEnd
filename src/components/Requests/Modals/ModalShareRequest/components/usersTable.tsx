@@ -26,12 +26,7 @@ type UsersTableProps = {
   onChangeUsersAssociated: (key: any, value: any) => void
 }
 
-const UsersTable: React.FC<UsersTableProps> = ({
-  usersList,
-  loading,
-  usersAssociated,
-  onChangeUsersAssociated
-}) => {
+const UsersTable: React.FC<UsersTableProps> = ({ usersList, loading, usersAssociated, onChangeUsersAssociated }) => {
   const { classes } = useStyles()
 
   const columns = [
