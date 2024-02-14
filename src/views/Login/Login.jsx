@@ -125,8 +125,32 @@ const Login = () => {
     }
   }, [authCode])
 
-  const getPractitionerData = async (practitioner, lastConnection, maintenance, accessExpirations = []) => {
+  const loadBootstrapData = async (practitionerData, lastConnection) => {
+    const practitioner = {
+      id: practitionerData.username,
+      displayName: `${practitionerData.firstname} ${practitionerData.lastname}`,
+      firstName: practitionerData.firstname,
+      lastName: practitionerData.lastname
+    }
     if (practitioner) {
+      const maintenanceResponse = await services.practitioner.maintenance()
+
+      if (maintenanceResponse.error || maintenanceResponse.status !== 200) {
+        setLoading(false)
+        return (
+          setError(true),
+          setErrorMessage(
+            'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+          )
+        )
+      }
+
+      const maintenance = maintenanceResponse.data
+
+      const accessExpirations = await services.perimeters
+        .getAccessExpirations({ expiring: true })
+        .then((values) => setLeftDays(values))
+
       const practitionerPerimeters = await services.perimeters.getPerimeters()
 
       if (practitionerPerimeters && practitionerPerimeters.errorType) {
@@ -213,7 +237,7 @@ const Login = () => {
       return (
         setError(true),
         setErrorMessage(
-          'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+          "Erreur d'authentification. Si elle persiste, veuillez contacter le support au: dsi-id-recherche-support-cohort360@aphp.fr."
         )
       )
     }
@@ -221,66 +245,15 @@ const Login = () => {
     const { status, data = {} } = response
 
     if (status === 200) {
-      localStorage.setItem(ACCESS_TOKEN, data.jwt.access)
-      localStorage.setItem(REFRESH_TOKEN, data.jwt.refresh)
+      localStorage.setItem(ACCESS_TOKEN, data.access_token)
+      localStorage.setItem(REFRESH_TOKEN, data.refresh_token)
 
-      const practitioner = await services.practitioner.fetchPractitioner(data.user.provider_username)
-
-      if (!practitioner || practitioner.error || !practitioner.response || practitioner.response.status !== 200) {
-        setLoading(false)
-        return (
-          setError(true),
-          setErrorMessage(
-            'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
-          )
-        )
-      }
-
-      const lastConnection = data.jwt.last_connection ? data.jwt.last_connection.modified_at : undefined
-
-      const maintenanceResponse = await services.practitioner.maintenance()
-
-      if (maintenanceResponse.error || maintenanceResponse.status !== 200) {
-        setLoading(false)
-        return (
-          setError(true),
-          setErrorMessage(
-            'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
-          )
-        )
-      }
-
-      const maintenance = maintenanceResponse.data
-
-      const accessExpirations = await services.perimeters
-        .getAccessExpirations({ expiring: true })
-        .then((values) => setLeftDays(values))
-
-      // because it also contains the response object that is not serializable and causes an error when stored in localstorage
-      const cleanedUpPractitionerData = {
-        id: practitioner.id,
-        displayName: practitioner.displayName,
-        firstName: practitioner.firstName,
-        lastName: practitioner.lastName
-      }
-      getPractitionerData(cleanedUpPractitionerData, lastConnection, maintenance, accessExpirations)
+      const practitioner = data.user
+      const lastConnection = data.last_login
+      loadBootstrapData(practitioner, lastConnection)
     } else {
-      const invalidCredential = 'Invalid Credentials - Invalid username or password'
-
-      if (response.response.status === 401 && response.response.data.errors[0] === invalidCredential) {
-        setLoading(false)
-        return setError(true), setErrorMessage("Votre nom d'utilisateur ou votre mot de passe est incorrect.")
-      }
-
-      if (response.status !== 200) {
-        setLoading(false)
-        return (
-          setError(true),
-          setErrorMessage(
-            'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
-          )
-        )
-      }
+      setLoading(false)
+      return setError(true), setErrorMessage("Votre nom d'utilisateur ou mot de passe est incorrect.")
     }
   }
 

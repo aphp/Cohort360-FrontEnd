@@ -1,6 +1,6 @@
 import apiBack from '../apiBackend'
 
-import { ProjectType, RequestType, Cohort } from 'types'
+import { ProjectType, RequestType, Cohort, User } from 'types'
 
 import servicesCohorts from './serviceCohorts'
 import { CohortsFilters, Direction, OrderBy } from 'types/searchCriterias'
@@ -332,7 +332,7 @@ const servicesProjects: IServiceProjects = {
     }
   },
   shareRequest: async (sharedRequest, notify_by_email) => {
-    const usersToShareId = sharedRequest.usersToShare?.map((userToshareId: any) => userToshareId.provider_username)
+    const usersToShareId = sharedRequest.usersToShare?.map((userToshareId: User) => userToshareId.username)
     const shared_query_snapshot_id = sharedRequest.shared_query_snapshot
       ? sharedRequest.shared_query_snapshot
       : sharedRequest.currentSnapshot?.uuid

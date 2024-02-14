@@ -2,11 +2,11 @@ import React, { useState, useEffect, Fragment, PropsWithChildren } from 'react'
 
 import { Autocomplete, CircularProgress, Grid, TextField, Typography } from '@mui/material'
 
-import { RequestType, Provider } from 'types'
+import { RequestType, User } from 'types'
 
-import { getProviders } from 'services/aphp/serviceProviders'
+import { getUsers } from 'services/aphp/serviceUsers'
 
-import ProvidersTable from './providersTable'
+import UsersTable from './usersTable'
 import { useDebounce } from 'utils/debounce'
 import { Direction, Order, OrderBy } from 'types/searchCriterias'
 
@@ -17,7 +17,7 @@ const orderDefault: OrderBy = { orderBy: Order.LASTNAME, orderDirection: Directi
 
 type RequestShareFormProps = {
   currentRequest: RequestType | undefined
-  onChangeValue: (key: 'name' | 'requestName' | 'usersToShare', value: string | string | Provider[]) => void
+  onChangeValue: (key: 'name' | 'requestName' | 'usersToShare', value: string | string | User[]) => void
   error: 'error_title' | 'error_user_share_list' | null
 }
 
@@ -25,53 +25,53 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
   props: PropsWithChildren<RequestShareFormProps>
 ) => {
   const { currentRequest, onChangeValue, error, children } = props
-  const [providersSearchResults, setProvidersSearchResults] = useState<Provider[]>([])
+  const [usersSearchResults, setUsersSearchResults] = useState<User[]>([])
   const [loadingOnSearch, setLoadingOnSearch] = useState(false)
-  const [usersToShare] = useState<Provider[]>([])
+  const [usersToShare] = useState<User[]>([])
   const [searchInput, setSearchInput] = useState('')
 
   const debouncedSearchTerm = useDebounce(700, searchInput)
 
-  const addProvider = (provider?: Provider | null) => {
-    if (!provider) return
+  const addUser = (user?: User | null) => {
+    if (!user) return
 
     const _usersToShare = usersToShare ?? []
     let alreadyExists = false
 
-    for (const user of _usersToShare) {
-      if (user.displayed_name === provider.displayed_name) {
+    for (const _user of _usersToShare) {
+      if (_user.display_name === user.display_name) {
         alreadyExists = true
       }
     }
 
     if (!alreadyExists) {
-      _usersToShare.push(provider)
+      _usersToShare.push(user)
     }
 
     onChangeValue('usersToShare', _usersToShare)
   }
 
   useEffect(() => {
-    const _searchProviders = async () => {
+    const _searchUsers = async () => {
       try {
         setLoadingOnSearch(true)
 
-        const providersResp = await getProviders(orderDefault, 1, debouncedSearchTerm)
+        const usersResp = await getUsers(orderDefault, 1, debouncedSearchTerm)
 
-        setProvidersSearchResults(providersResp.providers)
+        setUsersSearchResults(usersResp.users)
 
         setLoadingOnSearch(false)
       } catch (error) {
         console.error('Erreur lors de la recherche des utilisateurs')
-        setProvidersSearchResults([])
+        setUsersSearchResults([])
         setLoadingOnSearch(false)
       }
     }
 
     if (debouncedSearchTerm && debouncedSearchTerm?.length > 0) {
-      _searchProviders()
+      _searchUsers()
     } else {
-      setProvidersSearchResults([])
+      setUsersSearchResults([])
     }
   }, [debouncedSearchTerm])
 
@@ -105,16 +105,16 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
           <Autocomplete
             noOptionsText="Rechercher un utilisateur"
             clearOnEscape
-            options={providersSearchResults ?? []}
+            options={usersSearchResults ?? []}
             loading={loadingOnSearch}
             onChange={(e, value) => {
-              addProvider(value)
+              addUser(value)
               setSearchInput('')
             }}
             inputValue={searchInput}
             onInputChange={() => setSearchInput('')}
             getOptionLabel={(option) =>
-              `${option.provider_source_value} - ${option.lastname?.toLocaleUpperCase()} ${option.firstname} ${
+              `${option.username} - ${option.lastname?.toLocaleUpperCase()} ${option.firstname} ${
                 option.email ? `- ${option.email}` : ''
               }` ?? ''
             }
@@ -140,11 +140,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
             )}
           />
 
-          <ProvidersTable
-            providersList={usersToShare}
-            onChangeUsersAssociated={onChangeValue}
-            usersAssociated={usersToShare}
-          />
+          <UsersTable usersList={usersToShare} onChangeUsersAssociated={onChangeValue} usersAssociated={usersToShare} />
         </div>
       </Grid>
       <Grid container direction="column">
