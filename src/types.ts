@@ -83,7 +83,7 @@ export type Back_API_Response<T> = {
   count?: number
 }
 
-export type Provider = {
+export type User = {
   username?: string
   email?: string
   firstname?: string
@@ -414,7 +414,7 @@ export type RequestType = {
   uuid: string
   owner?: string
   query_snapshots?: QuerySnapshotInfo[]
-  shared_by?: Provider
+  shared_by?: User
   parent_folder?: string
   deleted?: string
   deleted_by_cascade?: boolean
@@ -428,7 +428,7 @@ export type RequestType = {
   requestId?: string
   requestName?: string
   shared_query_snapshot?: string[]
-  usersToShare?: Provider[]
+  usersToShare?: User[]
 }
 
 export type QuerySnapshotInfo = {
@@ -445,7 +445,7 @@ export type Snapshot = QuerySnapshotInfo & {
   previous_snapshot: string | null
   dated_measures: DatedMeasure[]
   cohort_results: Cohort[]
-  shared_by?: Provider
+  shared_by?: User
   deleted?: boolean
   deleted_by_cascade?: boolean
   modified_at?: string

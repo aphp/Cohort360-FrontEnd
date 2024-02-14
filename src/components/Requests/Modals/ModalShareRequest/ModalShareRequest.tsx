@@ -13,7 +13,7 @@ import {
   FormControlLabel
 } from '@mui/material'
 
-import { RequestType, Provider, SimpleStatus } from 'types'
+import { RequestType, User, SimpleStatus } from 'types'
 
 import { useAppSelector } from 'state'
 
@@ -36,7 +36,7 @@ const ModalShareRequest: React.FC<{
   const selectedCurrentRequest = selectedRequestShare || requestShare
   const [loading, setLoading] = useState(false)
   const [currentRequest, setCurrentRequest] = useState<RequestType | null | undefined>(selectedCurrentRequest)
-  const [currentUserToShare, setCurrentUserToShare] = useState<Provider[] | null>(null)
+  const [currentUserToShare, setCurrentUserToShare] = useState<User[] | null>(null)
   const [error, setError] = useState<'error_title' | 'error_user_share_list' | null>(null)
   const [notifyByEmail, setNotifyByEmail] = useState(false)
 
@@ -44,7 +44,7 @@ const ModalShareRequest: React.FC<{
     setNotifyByEmail(event.target.checked)
   }
 
-  const _onChangeValue = (key: 'name' | 'requestName' | 'usersToShare', value: string | string | Provider[]) => {
+  const _onChangeValue = (key: 'name' | 'requestName' | 'usersToShare', value: string | string | User[]) => {
     if (value && typeof value !== 'string') {
       setCurrentUserToShare(value)
     }
