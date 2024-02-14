@@ -9,7 +9,8 @@ import {
   DocumentsData,
   ImagingData,
   CohortImaging,
-  CohortComposition
+  CohortComposition,
+  Export
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -139,7 +140,7 @@ export interface IServiceCohorts {
     },
     groupId?: string,
     signal?: AbortSignal
-  ) => Promise<DocumentsData> | Promise<SearchInputError> | Promise<CanceledError<any>>
+  ) => Promise<DocumentsData> | Promise<SearchInputError>
 
   /**
    * Retourne la liste d'objets d'Imagerie liés à une cohorte
@@ -153,7 +154,7 @@ export interface IServiceCohorts {
     },
     groupId?: string,
     signal?: AbortSignal
-  ) => Promise<ImagingData> | Promise<CanceledError<any>>
+  ) => Promise<ImagingData>
 
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
@@ -207,7 +208,7 @@ export interface IServiceCohorts {
    *   - motivation: Raison de l'export
    *   - tables: Liste de tables demandées dans l'export
    */
-  createExport: (args: { cohortId: number; motivation: string; tables: string[] }) => Promise<any>
+  createExport: (args: { cohortId: number; motivation: string; tables: string[] }) => Promise<Export>
 }
 
 const servicesCohorts: IServiceCohorts = {
@@ -643,9 +644,9 @@ const servicesCohorts: IServiceCohorts = {
     try {
       const { cohortId, motivation, tables } = args
 
-      const exportResponse = await new Promise((resolve) => {
+      const exportResponse = await new Promise<Export>((resolve) => {
         resolve(
-          apiBackend.post('/exports/', {
+          apiBackend.post<Export, Export>('/exports/', {
             cohort_id: cohortId,
             motivation,
             tables: tables.map((table: string) => ({
@@ -663,12 +664,9 @@ const servicesCohorts: IServiceCohorts = {
           return error
         })
 
-      // @ts-ignore
-      if (exportResponse && exportResponse && exportResponse.status !== 201) {
-        // @ts-ignore
+      if (exportResponse && exportResponse.status !== 201) {
         return { error: exportResponse && exportResponse.response.data }
       } else {
-        // @ts-ignore
         return exportResponse && exportResponse.data
       }
     } catch (error) {

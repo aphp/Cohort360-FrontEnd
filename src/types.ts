@@ -386,7 +386,7 @@ export type CriteriaItemType = {
   fontWeight?: string
   components: React.FC<CriteriaDrawerComponentProps> | null
   disabled?: boolean
-  fetch?: { [key in CriteriaDataKey]?: (...args: any[]) => Promise<any> }
+  fetch?: { [key in CriteriaDataKey]?: (...args: any[]) => Promise<string> }
   subItems?: CriteriaItemType[]
 }
 
@@ -480,6 +480,17 @@ export type DatedMeasure = {
   mode: 'Snapshot' | 'Global'
 }
 
+export type CountCohort = {
+  date: string
+  status?: string
+  uuid: string
+  shortCohortLimit: number
+  count_outdated: boolean
+  jobFailMsg?: string
+  includePatient?: number
+  byrequest?: number
+}
+
 export type Cohort = {
   uuid?: string
   owner?: string
@@ -518,6 +529,30 @@ export type CohortCreationCounterType = {
   date?: string
   cohort_limit?: number
   count_outdated?: boolean
+}
+
+export type FetchRequest = {
+  requestName: string
+  snapshotsHistory: QuerySnapshotInfo[]
+  json: string
+  currentSnapshot: Snapshot
+  count: DatedMeasure
+  shortCohortLimit: number
+  count_outdated: boolean
+}
+
+export type Export = {
+  motivation: string
+  output_format: string
+  cohort_id: string
+  provider_source_value: string
+  target_unix_account: number
+  tables: { omop_table_name: string }
+  nominative: boolean
+  shift_dates: boolean
+  cohort_fk: string
+  provider_id: string
+  owner: string
 }
 
 export type ContactSubmitForm = FormData

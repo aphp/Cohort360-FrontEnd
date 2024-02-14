@@ -4,7 +4,7 @@ import { Autocomplete, CircularProgress, TextField } from '@mui/material'
 
 import { displaySystem } from 'utils/displayValueSetSystem'
 
-import { ValueSetSystem } from 'types'
+import { HierarchyElement, ValueSetSystem } from 'types'
 import { cancelPendingRequest } from 'utils/abortController'
 
 interface ElementType {
@@ -22,8 +22,8 @@ type InputAutocompleteAsyncProps = {
   autocompleteValue?: any
   onChange?: (e: any, value: any) => void
   renderInput?: any
-  autocompleteOptions?: ElementType[]
-  getAutocompleteOptions?: (searchValue: string, signal: AbortSignal) => Promise<any>
+  autocompleteOptions?: HierarchyElement[] | ElementType[]
+  getAutocompleteOptions?: (searchValue: string, signal: AbortSignal) => Promise<HierarchyElement[] | ElementType[]>
   noOptionsText?: string
   helperText?: string
 }
@@ -45,7 +45,7 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
 
   const [open, setOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
-  const [options, setOptions] = useState<ElementType[]>(autocompleteOptions)
+  const [options, setOptions] = useState<HierarchyElement[] | ElementType[]>(autocompleteOptions)
   const [loading, setLoading] = useState(false)
   const controllerRef = useRef<AbortController | null>(null)
 
@@ -93,7 +93,7 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
       onChange={onChange}
       options={options ?? []}
       isOptionEqualToValue={(option, value) => option.id === value.id}
-      getOptionLabel={(option) => `${displaySystem(option.system)}${option.label} `}
+      getOptionLabel={(option) => `${displaySystem(option?.system)}${option.label} `}
       renderInput={(params) => (
         <TextField
           {...params}
