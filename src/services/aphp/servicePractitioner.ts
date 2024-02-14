@@ -1,5 +1,5 @@
 import apiBackend from 'services/apiBackend'
-import {REFRESH_TOKEN} from "../../constants";
+import { REFRESH_TOKEN } from '../../constants'
 
 export interface IServicePractitioner {
   /**
