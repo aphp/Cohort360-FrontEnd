@@ -33,7 +33,7 @@ const servicePractitioner: IServicePractitioner = {
       formData.append('username', username.toString())
       formData.append('password', password)
 
-      return await apiBackend.post(`/accounts/login/`, formData)
+      return await apiBackend.post(`/auth/login/`, formData)
     } catch (error) {
       console.error('Error authenticating with credentials', error)
       return error
@@ -50,7 +50,7 @@ const servicePractitioner: IServicePractitioner = {
   },
 
   logout: async () => {
-    await apiBackend.post(`/accounts/logout/`, { refresh_token: localStorage.getItem(REFRESH_TOKEN) })
+    await apiBackend.post(`/auth/logout/`, { refresh_token: localStorage.getItem(REFRESH_TOKEN) })
     localStorage.clear()
   },
 
