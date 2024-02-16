@@ -36,6 +36,7 @@ import useStyles from './styles'
 
 import export_table from './export_table'
 import services from 'services/aphp'
+import { isAxiosError } from 'utils/apiHelpers'
 
 const initialState = {
   motif: '',
