@@ -2,7 +2,10 @@ import { AxiosResponse } from 'axios'
 import apiBack from '../apiBackend'
 
 import {
+  Cohort,
+  CountCohort,
   DatedMeasure,
+  FetchRequest,
   HierarchyElement,
   HierarchyElementWithSystem,
   QuerySnapshotInfo,
@@ -52,12 +55,17 @@ export interface IServiceCohortCreation {
     cohortName?: string,
     cohortDescription?: string,
     globalCount?: boolean
-  ) => Promise<any>
+  ) => Promise<AxiosResponse<Cohort> | null>
 
   /**
    * Cette fonction permet de récupérer le count d'une requête
    */
-  countCohort: (requeteurJson?: string, snapshotId?: string, requestId?: string, uuid?: string) => Promise<any>
+  countCohort: (
+    requeteurJson?: string,
+    snapshotId?: string,
+    requestId?: string,
+    uuid?: string
+  ) => Promise<CountCohort | null>
 
   /**
    * Cette fonction permet de créer un état de `snapshot` pour l'historique d'une requête
@@ -72,7 +80,7 @@ export interface IServiceCohortCreation {
   /**
    * Permet de récupérer toutes les informations utiles pour l'utilisation du requeteur
    */
-  fetchRequest: (requestId: string, snapshotId?: string) => Promise<any>
+  fetchRequest: (requestId: string, snapshotId?: string) => Promise<FetchRequest>
 
   fetchSnapshot: (snapshotId: string) => Promise<Snapshot>
 
@@ -132,7 +140,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
     if (!requeteurJson || !datedMeasureId || !snapshotId || !requestId) return null
     if (globalCount === undefined) globalCount = false
 
-    const cohortResult = await apiBack.post('/cohort/cohorts/', {
+    const cohortResult = await apiBack.post<Cohort>('/cohort/cohorts/', {
       dated_measure_id: datedMeasureId,
       request_query_snapshot_id: snapshotId,
       request_id: requestId,
@@ -157,7 +165,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
         byrequest: 0,
         count_outdated: measureResult?.data?.count_outdated,
         shortCohortLimit: measureResult?.data?.cohort_limit
-      }
+      } as CountCohort
     } else {
       if (!requeteurJson || !snapshotId || !requestId) return null
 
@@ -172,7 +180,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
         uuid: measureResult?.data?.uuid,
         count_outdated: measureResult?.data?.count_outdated,
         shortCohortLimit: measureResult?.data?.cohort_limit
-      }
+      } as CountCohort
     }
   },
 
@@ -224,7 +232,9 @@ const servicesCohortCreation: IServiceCohortCreation = {
       // clean Global count
       currentSnapshot = {
         ...currentSnapshot,
-        dated_measures: currentSnapshot.dated_measures.filter((dated_measure: any) => dated_measure.mode !== 'Global')
+        dated_measures: currentSnapshot.dated_measures.filter(
+          (dated_measure: DatedMeasure) => dated_measure.mode !== 'Global'
+        )
       }
 
       shortCohortLimit =
@@ -242,7 +252,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
       count: currentSnapshot ? currentSnapshot.dated_measures[0] : {},
       shortCohortLimit,
       count_outdated
-    }
+    } as FetchRequest
     return result
   },
 

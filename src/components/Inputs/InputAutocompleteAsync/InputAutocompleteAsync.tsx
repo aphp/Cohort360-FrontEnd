@@ -4,13 +4,12 @@ import { Autocomplete, CircularProgress, TextField } from '@mui/material'
 
 import { displaySystem } from 'utils/displayValueSetSystem'
 
-import { ValueSetSystem } from 'types'
 import { cancelPendingRequest } from 'utils/abortController'
 
 interface ElementType {
   id: string
   label: string
-  system: ValueSetSystem
+  system?: string
 }
 
 type InputAutocompleteAsyncProps = {
@@ -23,7 +22,7 @@ type InputAutocompleteAsyncProps = {
   onChange?: (e: any, value: any) => void
   renderInput?: any
   autocompleteOptions?: ElementType[]
-  getAutocompleteOptions?: (searchValue: string, signal: AbortSignal) => Promise<any>
+  getAutocompleteOptions?: (searchValue: string, signal: AbortSignal) => Promise<ElementType[]>
   noOptionsText?: string
   helperText?: string
 }
@@ -93,7 +92,7 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
       onChange={onChange}
       options={options ?? []}
       isOptionEqualToValue={(option, value) => option.id === value.id}
-      getOptionLabel={(option) => `${displaySystem(option.system)}${option.label} `}
+      getOptionLabel={(option) => `${displaySystem(option?.system)}${option.label} `}
       renderInput={(params) => (
         <TextField
           {...params}

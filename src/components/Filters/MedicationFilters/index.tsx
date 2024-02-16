@@ -55,8 +55,8 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
   const { classes } = useStyles()
 
   const [_nda, setNda] = useState<string>(filters.nda)
-  const [_startDate, setStartDate] = useState<any>(filters.startDate)
-  const [_endDate, setEndDate] = useState<any>(filters.endDate)
+  const [_startDate, setStartDate] = useState<string | null>(filters.startDate)
+  const [_endDate, setEndDate] = useState<string | null>(filters.endDate)
   const [_selectedPrescriptionTypes, setSelectedPrescriptionTypes] = useState<any[]>(filters.selectedPrescriptionTypes)
   const [_selectedAdministrationRoutes, setSelectedAdministrationRoutes] = useState<any[]>(
     filters.selectedAdministrationRoutes

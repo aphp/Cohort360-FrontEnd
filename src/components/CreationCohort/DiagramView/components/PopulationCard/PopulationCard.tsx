@@ -66,7 +66,7 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
   const selectionAndPopulationWithRightError = [...selectedItems, ...populationWithRightError]
 
   const _onChangePopulation = async (selectedPopulations: ScopeTreeRow[]) => {
-    dispatch<any>(buildCohortCreation({ selectedPopulation: selectedPopulations }))
+    dispatch(buildCohortCreation({ selectedPopulation: selectedPopulations }))
   }
 
   const setUpdatedItems = (updatedSelection: ScopeTreeRow[]) => {

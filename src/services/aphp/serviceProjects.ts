@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios'
 import apiBack from '../apiBackend'
 
 import { ProjectType, RequestType, Cohort, User } from 'types'
@@ -117,7 +118,7 @@ export interface IServiceProjects {
    * Retourne:
    *  - Requete partagée
    */
-  shareRequest: (sharedRequest: RequestType, notify_by_email: boolean) => Promise<any>
+  shareRequest: (sharedRequest: RequestType, notify_by_email: boolean) => Promise<AxiosResponse<ProjectType>>
 
   /**
    * Cette fonction supprime un requete existant
@@ -331,13 +332,13 @@ const servicesProjects: IServiceProjects = {
       throw new Error('Impossible de modifier la requête')
     }
   },
-  shareRequest: async (sharedRequest, notify_by_email) => {
+  shareRequest: async (sharedRequest, notify_by_email): Promise<AxiosResponse<ProjectType>> => {
     const usersToShareId = sharedRequest.usersToShare?.map((userToshareId: User) => userToshareId.username)
     const shared_query_snapshot_id = sharedRequest.shared_query_snapshot
       ? sharedRequest.shared_query_snapshot
       : sharedRequest.currentSnapshot?.uuid
     const shared_query_snapshot_name = sharedRequest.name ? sharedRequest.name : sharedRequest.requestName
-    const shareRequestResponse = (await apiBack.post(
+    const shareRequestResponse = (await apiBack.post<ProjectType>(
       `/cohort/request-query-snapshots/${shared_query_snapshot_id}/share/`,
       {
         name: shared_query_snapshot_name,
@@ -346,7 +347,7 @@ const servicesProjects: IServiceProjects = {
       }
     )) ?? { status: 400 }
     if (shareRequestResponse.status === 201) {
-      return shareRequestResponse.data as ProjectType, shareRequestResponse
+      return shareRequestResponse.data, shareRequestResponse
     } else {
       console.error('Impossible de partager la requête')
       return shareRequestResponse
@@ -357,7 +358,7 @@ const servicesProjects: IServiceProjects = {
       status: 400
     }
     if (deleteProjectResponse.status === 204) {
-      return deleteProjectResponse.data as ProjectType
+      return deleteProjectResponse.data
     } else {
       throw new Error('Impossible de supprimer la requête')
     }
@@ -406,7 +407,7 @@ const servicesProjects: IServiceProjects = {
 
   fetchCohortsList: async (filters, searchInput, orderBy, limit, offset, signal) => {
     const _sortDirection = orderBy.orderDirection === Direction.DESC ? '-' : ''
-    const optionsReducer = (accumulator: any, currentValue: any) =>
+    const optionsReducer = (accumulator: string, currentValue: string) =>
       accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
 
     let options: string[] = []

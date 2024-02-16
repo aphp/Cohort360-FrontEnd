@@ -11,7 +11,8 @@ import {
   IScope,
   Back_API_Response,
   Cohort,
-  DataRights
+  DataRights,
+  CohortRights
 } from 'types'
 
 import { FHIR_Bundle_Response } from 'types'
@@ -27,6 +28,7 @@ import {
   ImagingStudy,
   MedicationAdministration,
   MedicationRequest,
+  Observation,
   OperationOutcome,
   Parameters,
   ParametersParameter,
@@ -34,7 +36,6 @@ import {
   Procedure,
   ValueSet
 } from 'fhir/r4'
-import { Observation } from 'fhir/r4'
 import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 import { idSort, labelSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
@@ -46,7 +47,7 @@ const paramValuesReducerWithPrefix =
   (prefix: string): ((accumulator: string, currentValue: string) => string) =>
   (accumulator: string, currentValue: string) =>
     accumulator ? `${accumulator},${prefix + currentValue}` : currentValue ? prefix + currentValue : accumulator
-const paramValuesReducer = (accumulator: any, currentValue: any): any =>
+const paramValuesReducer = (accumulator: string, currentValue: string): string =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 const paramsReducer = (accumulator: string, currentValue: string): string =>
   accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
@@ -101,27 +102,27 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
 
   // By default, all the calls to `/Patient` will have 'active=true' in parameter
   let options: string[] = ['active=true']
-  if (_id) options = [...options, `_id=${_id}`] // eslint-disable-line
-  if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`] // eslint-disable-line
-  if (gender) options = [...options, `gender=${gender}`] // eslint-disable-line
+  if (_id) options = [...options, `_id=${_id}`]
+  if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset) options = [...options, `_offset=${offset}`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
+  if (gender) options = [...options, `gender=${gender}`]
   if (_text && _text.length > 0) {
     if (Array.isArray(_text)) {
       const searchInput = _text.map((text) => `${searchBy}=${encodeURIComponent(`"${text}"`)}`).join('&')
       options = [...options, searchInput]
     } else {
-      options = [...options, `${searchBy}=${_text}`] // eslint-disable-line
+      options = [...options, `${searchBy}=${_text}`]
     }
   }
-  if (deceased !== undefined) options = [...options, `deceased=${deceased}`] // eslint-disable-line
-  if (minBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=ge${minBirthdate}`] // eslint-disable-line
-  if (maxBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=le${maxBirthdate}`] // eslint-disable-line
+  if (deceased !== undefined) options = [...options, `deceased=${deceased}`]
+  if (minBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=ge${minBirthdate}`]
+  if (maxBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=le${maxBirthdate}`]
 
-  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
   if (pivotFacet && pivotFacet.length > 0)
-    options = [...options, `pivot-facet=${pivotFacet.reduce(paramValuesReducer)}`] // eslint-disable-line
-  if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer)}`] // eslint-disable-line
+    options = [...options, `pivot-facet=${pivotFacet.reduce(paramValuesReducer, '')}`]
+  if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer, '')}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Patient>>(`/Patient?${options.reduce(paramsReducer)}`, {
     signal: signal
@@ -163,18 +164,18 @@ export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Pro
 
   // By default, all the calls to `/Encounter` will have 'subject.active=true' in parameter
   let options: string[] = ['subject.active=true']
-  if (_id) options = [...options, `_id=${_id}`] // eslint-disable-line
-  if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
-  if (patient) options = [...options, `subject=${patient}`] // eslint-disable-line
-  if (type) options = [...options, `type=${type}`] // eslint-disable-line
-  if (typeNot) options = [...options, `type:not=${typeNot}`] // eslint-disable-line
+  if (_id) options = [...options, `_id=${_id}`]
+  if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset) options = [...options, `offset=${offset}`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
+  if (patient) options = [...options, `subject=${patient}`]
+  if (type) options = [...options, `type=${type}`]
+  if (typeNot) options = [...options, `type:not=${typeNot}`]
 
-  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
-  if (status && status.length > 0) options = [...options, `status=${status.reduce(paramValuesReducer)}`] // eslint-disable-line
-  if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer)}`] // eslint-disable-line
-  if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(paramValuesReducer)}`] // eslint-disable-line
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
+  if (status && status.length > 0) options = [...options, `status=${status.reduce(paramValuesReducer)}`]
+  if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer, '')}`]
+  if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(paramValuesReducer, '')}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Encounter>>(`/Encounter?${options.reduce(paramsReducer)}`, {
     signal: signal
@@ -267,13 +268,13 @@ export const fetchDocumentReference = async (
     `contenttype=${encodeURIComponent('http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain')}`,
     'subject.active=true'
   ]
-  if (_id) options = [...options, `_id=${_id}`] // eslint-disable-line
-  if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
+  if (_id) options = [...options, `_id=${_id}`]
+  if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `offset=${offset}`]
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
-  if (type) options = [...options, `type=${type}`] // eslint-disable-line
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
+  if (type) options = [...options, `type=${type}`]
   if (_text)
-    options = [...options, `${searchBy === SearchByTypes.TEXT ? `_text` : 'description'}=${encodeURIComponent(_text)}`] // eslint-disable-line
+    options = [...options, `${searchBy === SearchByTypes.TEXT ? `_text` : 'description'}=${encodeURIComponent(_text)}`]
   if (highlight_search_results)
     options = [
       ...options,
@@ -282,31 +283,31 @@ export const fetchDocumentReference = async (
           ? `_tag=${encodeURIComponent('https://terminology.eds.aphp.fr/misc|HIGHLIGHT_RESULTS')}`
           : ''
       }`
-    ] // eslint-disable-line
+    ]
   if (status)
     options = [
       ...options,
       `docstatus=${encodeURIComponent('http://hl7.org/fhir/CodeSystem/composition-status|') + status}`
-    ] // eslint-disable-line
-  if (patient) options = [...options, `subject=${patient}`] // eslint-disable-line
-  if (patientIdentifier) options = [...options, `subject.identifier=${patientIdentifier}`] // eslint-disable-line
-  if (encounter) options = [...options, `encounter=${encounter}`] // eslint-disable-line
-  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
+    ]
+  if (patient) options = [...options, `subject=${patient}`]
+  if (patientIdentifier) options = [...options, `subject.identifier=${patientIdentifier}`]
+  if (encounter) options = [...options, `encounter=${encounter}`]
+  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`]
   if (onlyPdfAvailable)
     options = [
       ...options,
       `contenttype=${encodeURIComponent('http://terminology.hl7.org/CodeSystem/v3-mediatypes|application/pdf')}`
-    ] // eslint-disable-line
-  if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line
-  if (maxDate) options = [...options, `date=le${maxDate}`] // eslint-disable-line
+    ]
+  if (minDate) options = [...options, `date=ge${minDate}`]
+  if (maxDate) options = [...options, `date=le${maxDate}`]
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
 
-  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
-  if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(paramValuesReducer)}`] // eslint-disable-line
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
+  if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(paramValuesReducer, '')}`]
   if (uniqueFacet && uniqueFacet.length > 0)
-    options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer)}`] // eslint-disable-line
-  if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer)}`] // eslint-disable-line
+    options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer, '')}`]
+  if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer, '')}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<DocumentReference>>(
     `/DocumentReference?${options.reduce(paramsReducer)}`,
@@ -407,7 +408,7 @@ export const fetchBinary = async (args: fetchBinaryProps): FHIR_Bundle_Promise_R
   const { _id } = args
   let options: string[] = []
 
-  if (_id) options = [...options, `_id=${_id}`] // eslint-disable-line
+  if (_id) options = [...options, `_id=${_id}`]
 
   const documentResp = await apiFhir.get<FHIR_Bundle_Response<Binary>>(`/Binary?${options.reduce(paramsReducer)}`)
 
@@ -447,21 +448,21 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
 
   // By default, all the calls to `/Procedure` will have 'patient.active=true' in parameter
   let options: string[] = ['subject.active=true']
-  if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
-  if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (code) options = [...options, `code=${encodeURIComponent(`${PROCEDURE_HIERARCHY}|`) + code}`] // eslint-disable-line
+  if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset) options = [...options, `offset=${offset}`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
+  if (subject) options = [...options, `subject=${subject}`]
+  if (code) options = [...options, `code=${encodeURIComponent(`${PROCEDURE_HIERARCHY}|`) + code}`]
   if (source) options = [...options, `source=${source}`]
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
   if (status)
-    options = [...options, `status=${encodeURIComponent('http://hl7.org/fhir/CodeSystem/event-status|') + status}`] // eslint-disable-line
-  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
-  if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line
-  if (maxDate) options = [...options, `date=le${maxDate}`] // eslint-disable-line
-  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
+    options = [...options, `status=${encodeURIComponent('http://hl7.org/fhir/CodeSystem/event-status|') + status}`]
+  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`]
+  if (minDate) options = [...options, `date=ge${minDate}`]
+  if (maxDate) options = [...options, `date=le${maxDate}`]
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Procedure>>(`/Procedure?${options.reduce(paramsReducer)}`, {
     signal: args.signal
@@ -512,28 +513,28 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
 
   // By default, all the calls to `/Claim` will have 'patient.active=true' in parameter
   let options: string[] = ['patient.active=true']
-  if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
-  if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
+  if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset) options = [...options, `offset=${offset}`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
+  if (patient) options = [...options, `patient=${patient}`]
   if (diagnosis)
     options = [
       ...options,
       `diagnosis=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-ghm|') + diagnosis}`
-    ] // eslint-disable-line
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
+    ]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
   if (status)
     options = [
       ...options,
       `status=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-ghm-cost-status|') + status}`
-    ] // eslint-disable-line
-  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
-  if (minCreated) options = [...options, `created=ge${minCreated}`] // eslint-disable-line
-  if (maxCreated) options = [...options, `created=le${maxCreated}`] // eslint-disable-line
+    ]
+  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`]
+  if (minCreated) options = [...options, `created=ge${minCreated}`]
+  if (maxCreated) options = [...options, `created=le${maxCreated}`]
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
 
-  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Claim>>(`/Claim?${options.reduce(paramsReducer)}`, {
     signal: args.signal
@@ -576,20 +577,20 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
 
   // By default, all the calls to `/Condition` will have 'patient.active=true' in parameter
   let options: string[] = ['subject.active=true']
-  if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset !== undefined) options = [...options, `offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
-  if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
+  if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset !== undefined) options = [...options, `offset=${offset}`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
+  if (subject) options = [...options, `subject=${subject}`]
   if (code)
-    options = [...options, `code=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-cim10|') + code}`] // eslint-disable-line
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
-  if (minRecordedDate) options = [...options, `recorded-date=ge${minRecordedDate}`] // eslint-disable-line
-  if (maxRecordedDate) options = [...options, `recorded-date=le${maxRecordedDate}`] // eslint-disable-line
+    options = [...options, `code=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-cim10|') + code}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
+  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`]
+  if (minRecordedDate) options = [...options, `recorded-date=ge${minRecordedDate}`]
+  if (maxRecordedDate) options = [...options, `recorded-date=le${maxRecordedDate}`]
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
 
-  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
   if (type && type.length > 0)
     options = [
       ...options,
@@ -648,27 +649,27 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
 
   // By default, all the calls to `/Observation` will have 'value-quantity-value=ge0,le0' and 'patient.active=true' in the parameters
   let options: string[] = ['value-quantity=ge0,le0', 'subject.active=true']
-  if (id) options = [...options, `_id=${id}`] // eslint-disable-line
-  if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort},id`}`] // eslint-disable-line
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (encounter) options = [...options, `encounter.identifier=${encounter}`] // eslint-disable-line
+  if (id) options = [...options, `_id=${id}`]
+  if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset) options = [...options, `offset=${offset}`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort},id`}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
+  if (encounter) options = [...options, `encounter.identifier=${encounter}`]
   if (anabio || loinc)
     options = [
       ...options,
       `code=${anabio ? encodeURIComponent('https://terminology.eds.aphp.fr/aphp-itm-anabio|') + anabio : ''}${
         anabio && loinc ? ',' : ''
       }${loinc ? encodeURIComponent('https://terminology.eds.aphp.fr/aphp-itm-loinc|') + loinc : ''}`
-    ] // eslint-disable-line
-  if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line
-  if (maxDate) options = [...options, `date=le${maxDate}`] // eslint-disable-line
-  if (rowStatus) options = [...options, `status=${BiologyStatus.VALIDATED}`] // eslint-disable-line
+    ]
+  if (subject) options = [...options, `subject=${subject}`]
+  if (minDate) options = [...options, `date=ge${minDate}`]
+  if (maxDate) options = [...options, `date=le${maxDate}`]
+  if (rowStatus) options = [...options, `status=${BiologyStatus.VALIDATED}`]
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
 
-  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Observation>>(
     `/Observation?${options.reduce(paramsReducer)}`,
@@ -721,20 +722,20 @@ export const fetchMedicationRequest = async (
 
   // By default, all the calls to `/MedicationRequest` will have 'patient.active=true' in parameter
   let options: string[] = ['subject.active=true']
-  if (id) options = [...options, `_id=${id}`] // eslint-disable-line
-  if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset !== undefined) options = [...options, `offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
-  if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (encounter) options = [...options, `encounter.identifier=${encounter}`] // eslint-disable-line
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (type) options = [...options, `category=*${encodeURIComponent('|')}${type}`] // eslint-disable-line
-  if (minDate) options = [...options, `validity-period-start=ge${minDate}`] // eslint-disable-line
-  if (maxDate) options = [...options, `validity-period-start=le${maxDate}`] // eslint-disable-line
+  if (id) options = [...options, `_id=${id}`]
+  if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset !== undefined) options = [...options, `offset=${offset}`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
+  if (subject) options = [...options, `subject=${subject}`]
+  if (encounter) options = [...options, `encounter.identifier=${encounter}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
+  if (type) options = [...options, `category=*${encodeURIComponent('|')}${type}`]
+  if (minDate) options = [...options, `validity-period-start=ge${minDate}`]
+  if (maxDate) options = [...options, `validity-period-start=le${maxDate}`]
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
 
-  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<MedicationRequest>>(
     `/MedicationRequest?${options.reduce(paramsReducer)}`,
@@ -787,25 +788,25 @@ export const fetchMedicationAdministration = async (
 
   // By default, all the calls to `/MedicationAdministration` will have 'patient.active=true' in parameter
   let options: string[] = ['subject.active=true']
-  if (id) options = [...options, `_id=${id}`] // eslint-disable-line
-  if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
-  if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (encounter) options = [...options, `context.identifier=${encounter}`] // eslint-disable-line
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
+  if (id) options = [...options, `_id=${id}`]
+  if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset) options = [...options, `offset=${offset}`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
+  if (subject) options = [...options, `subject=${subject}`]
+  if (encounter) options = [...options, `context.identifier=${encounter}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
   if (route)
     options = [
       ...options,
       `dosage-route=${
         encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-medicament-voie-administration|') + route
       }`
-    ] // eslint-disable-line
-  if (minDate) options = [...options, `effective-time=ge${minDate}`] // eslint-disable-line
-  if (maxDate) options = [...options, `effective-time=le${maxDate}`] // eslint-disable-line
+    ]
+  if (minDate) options = [...options, `effective-time=ge${minDate}`]
+  if (maxDate) options = [...options, `effective-time=le${maxDate}`]
   if (executiveUnits && executiveUnits.length > 0) options = [...options, `context.encounter-care-site=${executiveUnits}`] // eslint-disable-line
 
-  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<MedicationAdministration>>(
     `/MedicationAdministration?${options.reduce(paramsReducer)}`,
@@ -867,7 +868,7 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   if (modalities) options = [...options, `modality=*${encodeURIComponent('|')}${modalities}`]
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
-  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<ImagingStudy>>(
     `/ImagingStudy?${options.reduce(paramsReducer)}`,
@@ -1018,13 +1019,13 @@ export const fetchScope: (
   const { perimetersIds, cohortIds, search, type, isExecutiveUnit, offset, limit } = args
 
   let options: string[] = []
-  if (search) options = [...options, `search=${search}`] // eslint-disable-line
-  if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
-  if (limit) options = [...options, `limit=${limit}`] // eslint-disable-line
-  if (!search) options = [...options, `limit=-1`] // eslint-disable-line
-  if (perimetersIds && perimetersIds.length > 0) options = [...options, `local_id=${perimetersIds.join(',')}`] // eslint-disable-line
-  if (cohortIds && cohortIds.length > 0) options = [...options, `cohort_id=${cohortIds.join(',')}`] // eslint-disable-line
-  if (type && type.length > 0) options = [...options, `type_source_value=${type.join(',')}`] // eslint-disable-line
+  if (search) options = [...options, `search=${search}`]
+  if (offset) options = [...options, `offset=${offset}`]
+  if (limit) options = [...options, `limit=${limit}`]
+  if (!search) options = [...options, `limit=-1`]
+  if (perimetersIds && perimetersIds.length > 0) options = [...options, `local_id=${perimetersIds.join(',')}`]
+  if (cohortIds && cohortIds.length > 0) options = [...options, `cohort_id=${cohortIds.join(',')}`]
+  if (type && type.length > 0) options = [...options, `type_source_value=${type.join(',')}`]
 
   const url: string = isExecutiveUnit ? 'accesses/perimeters/?' : 'accesses/perimeters/patient-data/rights/?'
   const response: AxiosResponse<IScope | unknown> = await apiBackend.get(`${url}${options.reduce(paramsReducer)}`, {
@@ -1039,7 +1040,7 @@ export const fetchAccessExpirations: (
   const { expiring } = args
 
   let options: string[] = []
-  if (expiring === true || expiring === false) options = [...options, `expiring=${expiring}`] // eslint-disable-line
+  if (expiring === true || expiring === false) options = [...options, `expiring=${expiring}`]
 
   const response: AxiosResponse<AccessExpiration[]> = await apiBackend.get(
     `accesses/accesses/my-accesses/?${options.reduce(paramsReducer)}`
@@ -1053,7 +1054,7 @@ export const fetchPerimeterAccesses = async (perimeter: string): Promise<AxiosRe
 }
 
 export const fetchCohortAccesses = async (cohortIds: string[]) => {
-  const response = await apiBackend.get(`cohort/cohorts/cohort-rights/?fhir_group_id=${cohortIds}`)
+  const response = await apiBackend.get<CohortRights[]>(`cohort/cohorts/cohort-rights/?fhir_group_id=${cohortIds}`)
   return response
 }
 

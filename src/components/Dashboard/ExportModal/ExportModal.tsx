@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { isAxiosError } from 'axios'
 
 import {
   Accordion,
@@ -139,8 +140,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       tables: settings?.tables
     })
 
-    if (response && response.error) {
-      setExportResponse({ status: 'error', detail: response.error.detail })
+    if (isAxiosError(response)) {
+      setExportResponse({ status: 'error', detail: response.message })
     } else {
       setExportResponse({ status: 'finish', detail: '' })
     }
