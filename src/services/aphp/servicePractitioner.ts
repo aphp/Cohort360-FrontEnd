@@ -1,5 +1,7 @@
 import apiBackend from 'services/apiBackend'
 import { REFRESH_TOKEN } from '../../constants'
+import { Authentication, MaintenanceInfo } from 'types'
+import { AxiosError, AxiosResponse } from 'axios'
 
 export interface IServicePractitioner {
   /**
@@ -11,8 +13,11 @@ export interface IServicePractitioner {
    *
    * Retourne la reponse de Axios
    */
-  authenticateWithCredentials: (username: string, password: string) => Promise<any>
-  authenticateWithCode: (code: string) => Promise<any>
+  authenticateWithCredentials: (
+    username: string,
+    password: string
+  ) => Promise<AxiosResponse<Authentication> | AxiosError>
+  authenticateWithCode: (code: string) => Promise<AxiosResponse<Authentication> | AxiosError>
 
   /**
    * Cette fonction permet d'appeler la route de logout
@@ -23,43 +28,43 @@ export interface IServicePractitioner {
   /**
    * Maintenance
    */
-  maintenance: () => Promise<any>
+  maintenance: () => Promise<AxiosResponse<MaintenanceInfo> | AxiosError>
 }
 
 const servicePractitioner: IServicePractitioner = {
-  authenticateWithCredentials: async (username, password) => {
+  authenticateWithCredentials: async (username, password): Promise<AxiosResponse<Authentication> | AxiosError> => {
     try {
       const formData = new FormData()
       formData.append('username', username.toString())
       formData.append('password', password)
 
-      return await apiBackend.post(`/auth/login/`, formData)
+      return await apiBackend.post<Authentication>(`/auth/login/`, formData)
     } catch (error) {
       console.error('Error authenticating with credentials', error)
-      return error
+      return error as AxiosError
     }
   },
 
-  authenticateWithCode: async (authCode: string) => {
+  authenticateWithCode: async (authCode: string): Promise<AxiosResponse<Authentication> | AxiosError> => {
     try {
-      return await apiBackend.post(`/auth/oidc/login`, { auth_code: authCode })
+      return await apiBackend.post<Authentication>(`/auth/oidc/login`, { auth_code: authCode })
     } catch (error) {
       console.error('Error authenticating with an authorization code', error)
-      return error
+      return error as AxiosError
     }
   },
 
-  logout: async () => {
+  logout: async (): Promise<void> => {
     await apiBackend.post(`/auth/logout/`, { refresh_token: localStorage.getItem(REFRESH_TOKEN) })
     localStorage.clear()
   },
 
-  maintenance: async () => {
+  maintenance: async (): Promise<AxiosResponse<MaintenanceInfo> | AxiosError> => {
     try {
-      return await apiBackend.get(`/maintenances/next/`)
+      return await apiBackend.get<MaintenanceInfo>(`/maintenances/next/`)
     } catch (error) {
-      console.error("erreur lors de l'éxécution de la fonction maintenance", error)
-      return error
+      console.error("Erreur lors de l'exécution de la fonction maintenance", error)
+      return error as AxiosError
     }
   }
 }

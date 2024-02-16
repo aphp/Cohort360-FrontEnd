@@ -7,12 +7,12 @@ import { ODD_EXPORT } from '../constants'
 
 import services from 'services/aphp'
 import servicesPerimeters from '../services/aphp/servicePerimeters'
-import { GroupMember } from 'fhir/r4'
+import { GroupMember, Patient } from 'fhir/r4'
 
 export type ExploredCohortState = {
-  importedPatients: any[]
-  includedPatients: any[]
-  excludedPatients: any[]
+  importedPatients: Patient[]
+  includedPatients: Patient[]
+  excludedPatients: Patient[]
   loading: boolean
   rightToExplore: boolean | undefined
   requestId?: string
@@ -94,7 +94,7 @@ const fetchExploredCohort = createAsyncThunk<
       shouldRefreshData =
         !statePerimeterIds ||
         statePerimeterIds.length !== perimeterIds.length ||
-        statePerimeterIds.some((id) => !perimeterIds.includes(id))
+        statePerimeterIds.some((id: string) => !perimeterIds.includes(id))
       break
     }
     case 'patients': {
@@ -198,7 +198,7 @@ const exploredCohortSlice = createSlice({
   name: 'exploredCohort',
   initialState: defaultInitialState as ExploredCohortState,
   reducers: {
-    addImportedPatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
+    addImportedPatients: (state: ExploredCohortState, action: PayloadAction<Patient[]>) => {
       const importedPatients = [...state.importedPatients, ...action.payload]
       state.importedPatients = importedPatients.filter(
         (patient, index, self) =>
@@ -207,18 +207,18 @@ const exploredCohortSlice = createSlice({
           !state.excludedPatients.map((p) => p.id).includes(patient.id)
       )
     },
-    removeImportedPatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
+    removeImportedPatients: (state: ExploredCohortState, action: PayloadAction<Patient[]>) => {
       const listId = action.payload.map((patient) => patient.id)
       state.importedPatients = state.importedPatients.filter((patient) => !listId.includes(patient.id))
     },
-    includePatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
+    includePatients: (state: ExploredCohortState, action: PayloadAction<Patient[]>) => {
       const includedPatients = [...state.includedPatients, ...action.payload]
       state.importedPatients = state.importedPatients.filter(
         (patient) => !action.payload.map((p) => p.id).includes(patient.id)
       )
       state.includedPatients = includedPatients
     },
-    excludePatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
+    excludePatients: (state: ExploredCohortState, action: PayloadAction<Patient[]>) => {
       const toExcluded = state.originalPatients?.filter((patient) =>
         action.payload.map((p) => p.id).includes(patient.id)
       )
@@ -241,7 +241,7 @@ const exploredCohortSlice = createSlice({
         importedPatients: allImportedPatients
       }
     },
-    removeExcludedPatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
+    removeExcludedPatients: (state: ExploredCohortState, action: PayloadAction<Patient[]>) => {
       if (!action || !action.payload) return
       const statePatient = state.originalPatients || []
       const originalPatients = [...statePatient, ...action.payload]
