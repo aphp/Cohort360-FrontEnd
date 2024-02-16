@@ -10,8 +10,7 @@ import {
   ImagingData,
   CohortImaging,
   CohortComposition,
-  Export,
-  CohortRights
+  Export
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -34,8 +33,8 @@ import {
 } from './callApi'
 
 import apiBackend from '../apiBackend'
-import { Binary, DocumentReference, Extension, ParametersParameter, Patient } from 'fhir/r4'
-import { AxiosError, AxiosResponse, CanceledError } from 'axios'
+import { Binary, DocumentReference, Extension, ImagingStudy, ParametersParameter, Patient } from 'fhir/r4'
+import { AxiosError, AxiosResponse, CanceledError, isAxiosError } from 'axios'
 import {
   VitalStatus,
   SearchCriterias,
@@ -265,33 +264,29 @@ const servicesCohorts: IServiceCohorts = {
       const agePyramidData =
         patientsResp.data.resourceType === 'Bundle'
           ? getAgeRepartitionMapAphp(
-              patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === ChartCode.agePyramid)
-                ?.extension
+              patientsResp.data.meta?.extension?.find((facet) => facet.url === ChartCode.agePyramid)?.extension
             )
           : undefined
 
       const genderRepartitionMap =
         patientsResp.data.resourceType === 'Bundle'
           ? getGenderRepartitionMapAphp(
-              patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === ChartCode.genderRepartition)
-                ?.extension
+              patientsResp.data.meta?.extension?.find((facet) => facet.url === ChartCode.genderRepartition)?.extension
             )
           : undefined
 
       const monthlyVisitData =
         encountersResp.data.resourceType === 'Bundle'
           ? getVisitRepartitionMapAphp(
-              encountersResp.data.meta?.extension?.find((facet: Extension) => facet.url === ChartCode.monthlyVisits)
-                ?.extension
+              encountersResp.data.meta?.extension?.find((facet) => facet.url === ChartCode.monthlyVisits)?.extension
             )
           : undefined
 
       const visitTypeRepartitionData =
         encountersResp.data.resourceType === 'Bundle'
           ? getEncounterRepartitionMapAphp(
-              encountersResp.data.meta?.extension?.find(
-                (facet: Extension) => facet.url === ChartCode.visitTypeRepartition
-              )?.extension
+              encountersResp.data.meta?.extension?.find((facet) => facet.url === ChartCode.visitTypeRepartition)
+                ?.extension
             )
           : undefined
 
@@ -447,7 +442,12 @@ const servicesCohorts: IServiceCohorts = {
     ])
 
     const imagingList = getApiResponseResources(imagingResponse) ?? []
-    const completeImagingList = (await getResourceInfos(imagingList, deidentified, groupId, signal)) as CohortImaging[]
+    const completeImagingList = await getResourceInfos<ImagingStudy, CohortImaging>(
+      imagingList,
+      deidentified,
+      groupId,
+      signal
+    )
 
     const totalImaging = imagingResponse.data?.resourceType === 'Bundle' ? imagingResponse.data?.total : 0
     const totalAllImaging =
@@ -536,12 +536,12 @@ const servicesCohorts: IServiceCohorts = {
         : totalPatientDocs
 
     const documentsList = getApiResponseResources(docsList) ?? []
-    const filledDocumentsList = (await getResourceInfos(
+    const filledDocumentsList = await getResourceInfos<DocumentReference, CohortComposition>(
       documentsList,
       deidentified,
       groupId,
       signal
-    )) as CohortComposition[]
+    )
 
     return {
       totalDocs: totalDocs ?? 0,
@@ -631,13 +631,13 @@ const servicesCohorts: IServiceCohorts = {
       const ids = cohorts
         .map((cohort) => cohort.fhir_group_id)
         .filter((id) => id !== undefined || id !== '')
-        .filter((i) => i !== '') as string[]
+        .filter((i): i is string => i !== '')
       if (ids.length === 0) return []
       const rightsResponse = await fetchCohortAccesses(ids)
       return cohorts.map((cohort) => {
         return {
           ...cohort,
-          rights: rightsResponse.data.find((right: CohortRights) => right.cohort_id == cohort.fhir_group_id)?.rights
+          rights: rightsResponse.data.find((right) => right.cohort_id == cohort.fhir_group_id)?.rights
         }
       })
     } catch (error) {
@@ -653,14 +653,15 @@ const servicesCohorts: IServiceCohorts = {
       return await apiBackend.post<Export>('/exports/', {
         cohort_id: cohortId,
         motivation,
-        tables: tables.map((table: string) => ({
+        tables: tables.map((table) => ({
           omop_table_name: table
         })),
         nominative: true, // Nominative should always be true when exporting a CSV (see issue #1113)
         output_format: 'csv'
       })
     } catch (error) {
-      return error as AxiosError
+      if (isAxiosError(error)) return error
+      else throw error
     }
   }
 }

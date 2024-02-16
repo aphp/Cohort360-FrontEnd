@@ -184,8 +184,8 @@ type RequeteurSearchType = {
   version: string
   _type: string
   sourcePopulation: {
-    caresiteCohortList?: number[]
-    providerCohorttList?: number[]
+    caresiteCohortList?: string[]
+    providerCohortList?: string[]
   }
   request: RequeteurGroupType | undefined
 }
@@ -499,8 +499,8 @@ export function buildRequest(
     _type: 'request',
     sourcePopulation: {
       caresiteCohortList: selectedPopulation
-        ?.map((_selectedPopulation: any) => _selectedPopulation.cohort_id)
-        .filter((item) => !!item && item !== 'loading')
+        ?.map((_selectedPopulation) => _selectedPopulation?.cohort_id)
+        .filter((item): item is string => !!item && item !== 'loading')
     },
     request: !mainCriteriaGroups
       ? undefined

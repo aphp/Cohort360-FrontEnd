@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios'
+import { AxiosResponse } from 'axios'
 import { FhirResource, OperationOutcome, Resource } from 'fhir/r4'
 import { FHIR_API_Response, FHIR_Bundle_Response } from 'types'
 
@@ -49,8 +49,4 @@ export function getResponseDataOrThrow<T extends Resource, R>(
   }
 
   return responseMapper(response.data as T)
-}
-
-export function isAxiosError(response: AxiosResponse | AxiosError): response is AxiosError {
-  return response && (response as AxiosError).isAxiosError
 }
