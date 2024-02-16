@@ -5,6 +5,7 @@ import {
   Condition,
   DocumentReference,
   Encounter,
+  Extension,
   FhirResource,
   Group,
   ImagingStudy,
@@ -12,6 +13,7 @@ import {
   MedicationRequest,
   Observation,
   OperationOutcome,
+  Parameters,
   Patient,
   Procedure,
   Resource
@@ -19,7 +21,7 @@ import {
 import { AxiosResponse } from 'axios'
 import { SearchByTypes } from 'types/searchCriterias'
 import { SearchInputError } from 'types/error'
-import { Comparators, CriteriaDataKey, SelectedCriteriaType } from 'types/requestCriterias'
+import { Comparators, CriteriaDataKey, DocType, SelectedCriteriaType } from 'types/requestCriterias'
 
 export enum CohortJobStatus {
   _long_pending = 'long_pending',
@@ -73,6 +75,29 @@ export enum CohortCreationError {
   ERROR_REGEX = 'error_regex'
 }
 
+export type Authentication = Token & {
+  user: User
+  last_login: string
+}
+
+export type Token = {
+  access_token: string
+  refresh_token: string
+}
+
+export type MaintenanceInfo = {
+  id: string
+  insert_datetime: string
+  update_datetime: string
+  delete_datetime: string
+  start_datetime: string
+  end_datetime: string
+  maintenance_start: string
+  maintenance_end: string
+  active: boolean
+  subject: string
+}
+
 export type FHIR_API_Response<T extends Resource> = T | OperationOutcome
 export type FHIR_Bundle_Response<T extends FhirResource> = FHIR_API_Response<Bundle<T>>
 export type FHIR_API_Promise_Response<T extends Resource> = Promise<AxiosResponse<FHIR_API_Response<T>>>
@@ -99,7 +124,7 @@ export type CohortComposition = DocumentReference & {
   serviceProvider?: string
   NDA?: string
   event?: {}
-  parameter?: any[]
+  parameter?: Parameters[]
   title?: string
   encounter?: {
     id?: string
@@ -107,7 +132,7 @@ export type CohortComposition = DocumentReference & {
     serviceProvider?: string
     NDA?: string
     event?: {}
-    parameter?: any[]
+    parameter?: Parameters[]
     title?: string
   }[]
 }
@@ -221,7 +246,7 @@ export type ScopeTreeRow = AbstractTree<{
   full_path?: string
   quantity: number
   parentId?: string | null
-  managingEntity?: any | undefined
+  managingEntity?: never
   above_levels_ids?: string
   inferior_levels_ids?: string
   cohort_id?: string
@@ -285,7 +310,7 @@ export type CohortData = {
   originalPatients?: CohortPatient[]
   totalDocs?: number
   documentsList?: CohortComposition[]
-  wordcloudData?: any
+  wordcloudData?: never[]
   encounters?: Encounter[]
   genderRepartitionMap?: GenderRepartitionType
   visitTypeRepartitionData?: SimpleChartDataType[]
@@ -386,9 +411,15 @@ export type CriteriaItemType = {
   fontWeight?: string
   components: React.FC<CriteriaDrawerComponentProps> | null
   disabled?: boolean
-  fetch?: { [key in CriteriaDataKey]?: (...args: any[]) => Promise<string> }
+  fetch?: { [key in CriteriaDataKey]?: FetchFunctionVariant }
   subItems?: CriteriaItemType[]
 }
+
+type FetchFunctionVariant =
+  | (() => Promise<DocType[]>)
+  | ((searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<HierarchyElement[]>)
+
+export type ResearchType = string | boolean | AbortSignal | undefined
 
 export type ValueSet = {
   code: string
@@ -454,6 +485,13 @@ export type Snapshot = QuerySnapshotInfo & {
   perimeters_ids?: string[]
 }
 
+export type RequestQuerySnapshot = Snapshot & {
+  name: string
+  insert_datetime: string
+  update_datetime: string
+  delete_datetime: string
+}
+
 export type CurrentSnapshot = Snapshot & {
   navHistoryIndex: number
 }
@@ -515,7 +553,12 @@ export type Cohort = {
   favorite?: boolean
   create_task_id?: string
   type?: 'IMPORT_I2B2' | 'MY_ORGANIZATIONS' | 'MY_PATIENTS' | 'MY_COHORTS'
-  extension?: any[]
+  extension?: Extension[]
+  rights?: GroupRights
+}
+
+export type CohortRights = {
+  cohort_id: string
   rights?: GroupRights
 }
 

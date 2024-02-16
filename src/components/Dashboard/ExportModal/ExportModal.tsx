@@ -35,6 +35,7 @@ import useStyles from './styles'
 
 import export_table from './export_table'
 import services from 'services/aphp'
+import { isAxiosError } from 'utils/apiHelpers'
 
 const initialState = {
   motif: '',
@@ -139,8 +140,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       tables: settings?.tables
     })
 
-    if (response && response.error) {
-      setExportResponse({ status: 'error', detail: response.error.detail })
+    if (isAxiosError(response)) {
+      setExportResponse({ status: 'error', detail: response.message })
     } else {
       setExportResponse({ status: 'finish', detail: '' })
     }

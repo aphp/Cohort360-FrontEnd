@@ -192,7 +192,7 @@ type RequeteurSearchType = {
 
 const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: boolean): string => {
   let filterFhir = ''
-  const filterReducer = (accumulator: any, currentValue: any): string =>
+  const filterReducer = (accumulator: string, currentValue: string): string =>
     accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
 
   switch (criterion.type) {
@@ -1190,17 +1190,20 @@ export async function unbuildRequest(_json: string): Promise<any> {
   ) =>
     _criteriaGroup && _criteriaGroup.length > 0
       ? _criteriaGroup
-          .map((groupItem: any) => ({
-            id: groupItem._id,
-            title: 'Groupe de critères',
-            criteriaIds:
-              groupItem.criteria && groupItem.criteria.length > 0
-                ? groupItem.criteria.map((criteria: RequeteurCriteriaType | RequeteurGroupType) => criteria._id)
-                : [],
-            isSubGroup: groupItem.isSubItem,
-            isInclusive: groupItem.isInclusive,
-            type: groupItem._type
-          }))
+          .map(
+            (groupItem: RequeteurGroupType) =>
+              ({
+                id: groupItem._id,
+                title: 'Groupe de critères',
+                criteriaIds:
+                  groupItem.criteria && groupItem.criteria.length > 0
+                    ? groupItem.criteria.map((criteria) => criteria._id)
+                    : [],
+                isSubGroup: !!groupItem.criteria.length,
+                isInclusive: groupItem.isInclusive,
+                type: groupItem._type
+              } as CriteriaGroupType)
+          )
           .sort((prev, next) => next.id - prev.id)
       : []
 
@@ -1365,16 +1368,22 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
   const oldRequest = JSON.parse(oldJson) as RequeteurSearchType
   const newRequest = JSON.parse(newJson) as RequeteurSearchType
 
-  const changeIdOfRequest = (request: any): any => {
-    const { criteria } = request
+  const isRequeteurGroupType = (
+    criterion: RequeteurGroupType | RequeteurCriteriaType
+  ): criterion is RequeteurGroupType => {
+    return criterion && !!(criterion as RequeteurGroupType).criteria.length
+  }
 
+  const changeIdOfRequest = (
+    criteria: (RequeteurGroupType | RequeteurCriteriaType)[]
+  ): (RequeteurGroupType | RequeteurCriteriaType)[] => {
     for (const criterion of criteria) {
       if (criterion._type === 'basicResource') {
         criterion._id += 128
       } else {
         criterion._id -= 128
-        if (criterion && criterion.criteria && criterion.criteria.length > 0) {
-          criterion.criteria = changeIdOfRequest(criterion)
+        if (isRequeteurGroupType(criterion) && criterion.criteria && criterion.criteria.length > 0) {
+          criterion.criteria = changeIdOfRequest(criterion.criteria)
         }
       }
     }
@@ -1385,7 +1394,7 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
     _id: (newRequest?.request?._id ?? 0) - 128,
     _type: newRequest.request?._type === 'andGroup' ? 'andGroup' : 'orGroup',
     isInclusive: true,
-    criteria: changeIdOfRequest(newRequest.request)
+    criteria: changeIdOfRequest(newRequest.request?.criteria || [])
   }
 
   const fillRequestWithNewRequest = (criterionGroup?: RequeteurGroupType): RequeteurGroupType | undefined => {

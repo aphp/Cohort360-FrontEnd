@@ -10,7 +10,8 @@ import {
   ImagingData,
   CohortImaging,
   CohortComposition,
-  Export
+  Export,
+  CohortRights
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -34,7 +35,7 @@ import {
 
 import apiBackend from '../apiBackend'
 import { Binary, DocumentReference, Extension, ParametersParameter, Patient } from 'fhir/r4'
-import { CanceledError } from 'axios'
+import { AxiosError, AxiosResponse, CanceledError } from 'axios'
 import {
   VitalStatus,
   SearchCriterias,
@@ -208,7 +209,11 @@ export interface IServiceCohorts {
    *   - motivation: Raison de l'export
    *   - tables: Liste de tables demandées dans l'export
    */
-  createExport: (args: { cohortId: number; motivation: string; tables: string[] }) => Promise<Export>
+  createExport: (args: {
+    cohortId: number
+    motivation: string
+    tables: string[]
+  }) => Promise<AxiosResponse<Export> | AxiosError>
 }
 
 const servicesCohorts: IServiceCohorts = {
@@ -260,14 +265,15 @@ const servicesCohorts: IServiceCohorts = {
       const agePyramidData =
         patientsResp.data.resourceType === 'Bundle'
           ? getAgeRepartitionMapAphp(
-              patientsResp.data.meta?.extension?.find((facet: any) => facet.url === ChartCode.agePyramid)?.extension
+              patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === ChartCode.agePyramid)
+                ?.extension
             )
           : undefined
 
       const genderRepartitionMap =
         patientsResp.data.resourceType === 'Bundle'
           ? getGenderRepartitionMapAphp(
-              patientsResp.data.meta?.extension?.find((facet: any) => facet.url === ChartCode.genderRepartition)
+              patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === ChartCode.genderRepartition)
                 ?.extension
             )
           : undefined
@@ -275,7 +281,7 @@ const servicesCohorts: IServiceCohorts = {
       const monthlyVisitData =
         encountersResp.data.resourceType === 'Bundle'
           ? getVisitRepartitionMapAphp(
-              encountersResp.data.meta?.extension?.find((facet: any) => facet.url === ChartCode.monthlyVisits)
+              encountersResp.data.meta?.extension?.find((facet: Extension) => facet.url === ChartCode.monthlyVisits)
                 ?.extension
             )
           : undefined
@@ -620,7 +626,7 @@ const servicesCohorts: IServiceCohorts = {
     return documentBinaries && documentBinaries.length > 0 ? documentBinaries[0] : undefined
   },
 
-  fetchCohortsRights: async (cohorts) => {
+  fetchCohortsRights: async (cohorts): Promise<Cohort[]> => {
     try {
       const ids = cohorts
         .map((cohort) => cohort.fhir_group_id)
@@ -631,7 +637,7 @@ const servicesCohorts: IServiceCohorts = {
       return cohorts.map((cohort) => {
         return {
           ...cohort,
-          rights: rightsResponse.data.find((right: any) => right.cohort_id == cohort.fhir_group_id)?.rights
+          rights: rightsResponse.data.find((right: CohortRights) => right.cohort_id == cohort.fhir_group_id)?.rights
         }
       })
     } catch (error) {
@@ -640,37 +646,21 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
-  createExport: async (args) => {
+  createExport: async (args): Promise<AxiosResponse<Export> | AxiosError> => {
     try {
       const { cohortId, motivation, tables } = args
 
-      const exportResponse = await new Promise<Export>((resolve) => {
-        resolve(
-          apiBackend.post<Export, Export>('/exports/', {
-            cohort_id: cohortId,
-            motivation,
-            tables: tables.map((table: string) => ({
-              omop_table_name: table
-            })),
-            nominative: true, // Nominative should always be true when exporting a CSV (see issue #1113)
-            output_format: 'csv'
-          })
-        )
+      return await apiBackend.post<Export>('/exports/', {
+        cohort_id: cohortId,
+        motivation,
+        tables: tables.map((table: string) => ({
+          omop_table_name: table
+        })),
+        nominative: true, // Nominative should always be true when exporting a CSV (see issue #1113)
+        output_format: 'csv'
       })
-        .then((values) => {
-          return values
-        })
-        .catch((error) => {
-          return error
-        })
-
-      if (exportResponse && exportResponse.status !== 201) {
-        return { error: exportResponse && exportResponse.response.data }
-      } else {
-        return exportResponse && exportResponse.data
-      }
     } catch (error) {
-      return { error }
+      return error as AxiosError
     }
   }
 }

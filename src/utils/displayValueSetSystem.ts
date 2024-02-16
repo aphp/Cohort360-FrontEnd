@@ -1,7 +1,6 @@
 import { MEDICATION_ATC, MEDICATION_UCD } from '../constants'
-import { ValueSetSystem } from '../types'
 
-export const displaySystem = (system?: ValueSetSystem) => {
+export const displaySystem = (system?: string) => {
   switch (system) {
     case MEDICATION_ATC:
       return 'ATC: '

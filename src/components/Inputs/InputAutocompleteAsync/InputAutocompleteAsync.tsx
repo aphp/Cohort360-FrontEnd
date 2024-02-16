@@ -4,13 +4,12 @@ import { Autocomplete, CircularProgress, TextField } from '@mui/material'
 
 import { displaySystem } from 'utils/displayValueSetSystem'
 
-import { HierarchyElement, ValueSetSystem } from 'types'
 import { cancelPendingRequest } from 'utils/abortController'
 
 interface ElementType {
   id: string
   label: string
-  system: ValueSetSystem
+  system?: string
 }
 
 type InputAutocompleteAsyncProps = {
@@ -22,8 +21,8 @@ type InputAutocompleteAsyncProps = {
   autocompleteValue?: any
   onChange?: (e: any, value: any) => void
   renderInput?: any
-  autocompleteOptions?: HierarchyElement[] | ElementType[]
-  getAutocompleteOptions?: (searchValue: string, signal: AbortSignal) => Promise<HierarchyElement[] | ElementType[]>
+  autocompleteOptions?: ElementType[]
+  getAutocompleteOptions?: (searchValue: string, signal: AbortSignal) => Promise<ElementType[]>
   noOptionsText?: string
   helperText?: string
 }
@@ -45,7 +44,7 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
 
   const [open, setOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
-  const [options, setOptions] = useState<HierarchyElement[] | ElementType[]>(autocompleteOptions)
+  const [options, setOptions] = useState<ElementType[]>(autocompleteOptions)
   const [loading, setLoading] = useState(false)
   const controllerRef = useRef<AbortController | null>(null)
 
