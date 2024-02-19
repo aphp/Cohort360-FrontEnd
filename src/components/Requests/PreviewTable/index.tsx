@@ -27,15 +27,10 @@ import EditIcon from '@mui/icons-material/Edit'
 import ShareIcon from '@mui/icons-material/Share'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 
-import ModalAddOrEditRequest from 'components/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
-
 import { useAppSelector, useAppDispatch } from 'state'
-import {
-  setSelectedRequest as setSelectedRequestState,
-  setSelectedRequestShare as setSelectedRequestShareState
-} from 'state/request'
+import { setSelectedRequestShare as setSelectedRequestShareState } from 'state/request'
 
-import { ProjectType, RequestType, SimpleStatus } from 'types'
+import { RequestType, SimpleStatus } from 'types'
 
 import useStyles from '../../CohortsTable/styles'
 import ModalShareRequest from '../Modals/ModalShareRequest/ModalShareRequest'
@@ -48,7 +43,8 @@ import services from 'services/aphp'
 
 enum Dialog {
   EDIT,
-  DELETE
+  DELETE,
+  SHARE
 }
 
 type RequestsTableProps = {
@@ -60,10 +56,6 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-
-  //const requestState = useAppSelector((state) => state.request)
-  //const selectedRequestState = requestState.selectedRequest
-  //const selectedRequestShareState = requestState.selectedRequestShare
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
@@ -96,6 +88,8 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
     await onUpdate()
   }
 
+  const handleShare = async () => {}
+
   const handleEdit = async ({ name, description, project: { projectName, newProjectName } }: any) => {
     const copy = { ...selectedRequest }
     if (newProjectName && newProjectName.length > 2 && newProjectName.length < 55) {
@@ -117,6 +111,7 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
   useEffect(() => {
     handleFetchProjects()
   }, [])
+  console.log('test selected', selectedRequest)
 
   return (
     <>
@@ -187,7 +182,8 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
                             size="small"
                             onClick={(event) => {
                               event.stopPropagation()
-                              dispatch(setSelectedRequestShareState(row ?? null))
+                              setOpenModal(Dialog.SHARE)
+                              setSelectedRequest(row)
                             }}
                             disabled={maintenanceIsActive}
                           >
@@ -295,31 +291,40 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
         />
       </Modal>
 
-      {/*selectedRequestState && <ModalAddOrEditRequest onClose={() => dispatch(setSelectedRequestState(null))} />*/}
-      {/*selectedRequestShareState !== null &&
-        selectedRequestShareState?.shared_query_snapshot !== undefined &&
-        selectedRequestShareState?.shared_query_snapshot?.length > 0 && (
-          <ModalShareRequest
-            shareSuccessOrFailMessage={shareSuccessOrFailMessage}
-            parentStateSetter={wrapperSetShareSuccessOrFailMessage}
-            onClose={() => dispatch(setSelectedRequestShareState(null))}
+      <Modal
+        open={openModal === Dialog.SHARE}
+        title="Partager la requête"
+        onSubmit={handleShare}
+        width={'600px'}
+        onClose={() => setOpenModal(null)}
+        validationText="Envoyer"
+      >
+        <Grid item xs={12}>
+          <TextInput
+            value={selectedRequest?.name}
+            name="name"
+            label="Nom de la requête à partager:"
+            minLimit={2}
+            maxLimit={255}
           />
-        )*/}
+        </Grid>
+      </Modal>
 
-      {/*selectedRequestShareState !== null &&
-        selectedRequestShareState?.shared_query_snapshot !== undefined &&
-        selectedRequestShareState?.shared_query_snapshot?.length === 0 && (
-          <Snackbar
-            open
-            onClose={() => dispatch(setSelectedRequestShareState(null))}
-            autoHideDuration={5000}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          >
-            <Alert severity="error" onClose={() => dispatch(setSelectedRequestShareState(null))}>
-              Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
-            </Alert>
-          </Snackbar>
-        )*/}
+      {selectedRequest?.shared_query_snapshot !== undefined && selectedRequest?.shared_query_snapshot?.length > 0 && (
+        <ModalShareRequest
+          shareSuccessOrFailMessage={shareSuccessOrFailMessage}
+          parentStateSetter={wrapperSetShareSuccessOrFailMessage}
+          onClose={() => dispatch(setSelectedRequestShareState(null))}
+        />
+      )}
+
+      {selectedRequest?.query_snapshots?.length === 0 && (
+        <Snackbar open autoHideDuration={5000} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+          <Alert severity="error" onClose={() => setSelectedRequest(null)}>
+            Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
+          </Alert>
+        </Snackbar>
+      )}
 
       {shareSuccessOrFailMessage === 'success' && (
         <Snackbar
