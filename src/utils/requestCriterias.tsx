@@ -324,7 +324,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         )
       if (selectedCriteria.studyDescription)
         labels.push(`Description de l'étude : ${selectedCriteria.studyDescription}`)
-      if (selectedCriteria.studyProcedure) labels.push(`Procédure de l'étude : ${selectedCriteria.studyProcedure}`)
+      if (selectedCriteria.studyProcedure) labels.push(`Code procédure de l'étude : ${selectedCriteria.studyProcedure}`)
       if (selectedCriteria.withDocument !== DocumentAttachmentMethod.NONE)
         labels.push(getAttachmentMethod(selectedCriteria.withDocument, selectedCriteria.daysOfDelay))
       if (selectedCriteria.studyUid) labels.push(getIdsListLabels(selectedCriteria.studyUid, "uuid d'étude"))
