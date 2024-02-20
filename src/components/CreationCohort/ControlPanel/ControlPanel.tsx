@@ -42,7 +42,7 @@ import { CohortCreationCounterType, CurrentSnapshot, LoadingStatus, RequestType,
 import useStyle from './styles'
 
 import displayDigit from 'utils/displayDigit'
-import { SHORT_COHORT_LIMIT } from '../../../constants'
+import { ODD_FEASABILITY_REPORT, SHORT_COHORT_LIMIT } from '../../../constants'
 import { JobStatus } from '../../../utils/constants'
 import services from 'services/aphp'
 import ValidationDialog from 'components/ui/ValidationDialog'
@@ -234,24 +234,24 @@ const ControlPanel: React.FC<{
               <>Créer la cohorte</>
             )}
           </Button>
-
-          <Button
-            disabled={itLoads || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated}
-            onClick={handleGenerateReport}
-            className={classes.requestExecution}
-            startIcon={<DescriptionIcon color="action" className={classes.iconBorder} />}
-            style={{ marginBottom: 12 }}
-          >
-            {itLoads ? (
-              <>
-                Veuillez patienter
-                <CircularProgress style={{ marginLeft: '15px' }} size={30} />
-              </>
-            ) : (
-              <>Générer un rapport</>
-            )}
-          </Button>
-
+          {ODD_FEASABILITY_REPORT && (
+            <Button
+              disabled={itLoads || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated}
+              onClick={handleGenerateReport}
+              className={classes.requestExecution}
+              startIcon={<DescriptionIcon color="action" className={classes.iconBorder} />}
+              style={{ marginBottom: 12 }}
+            >
+              {itLoads ? (
+                <>
+                  Veuillez patienter
+                  <CircularProgress style={{ marginLeft: '15px' }} size={30} />
+                </>
+              ) : (
+                <>Générer un rapport</>
+              )}
+            </Button>
+          )}
           <Button
             className={classes.actionButton}
             onClick={onUndo}
