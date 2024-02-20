@@ -2,13 +2,13 @@ import { Direction, OrderBy } from 'types/searchCriterias'
 import apiBack from '../apiBackend'
 import { Back_API_Response, User } from 'types'
 
-export const getUsers = async (orderBy: OrderBy, page?: number, searchInput?: string) => {
+export const getUsers = async (orderBy: OrderBy, page?: number, searchInput?: string, signal?: AbortSignal) => {
   const searchFilter = searchInput ? `&search=${searchInput}` : ''
 
   const usersResp = await apiBack.get<Back_API_Response<User>>(
     `/users/?manual_only=true&page=${page}&ordering=${orderBy.orderDirection === Direction.DESC ? '-' : ''}${
       orderBy.orderBy
-    }${searchFilter}`
+    }${searchFilter}`, {signal: signal}
   )
 
   if (usersResp.status === 200) {

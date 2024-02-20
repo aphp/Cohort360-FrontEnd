@@ -40,6 +40,10 @@ import ProjectsFilter from 'components/Filters/ProjectsFilter'
 import { FetchProjectsResponse, fetchProjects } from 'services/projects/api'
 import { deleteRequest, editRequest, fetchRequests } from 'services/requests/api'
 import services from 'services/aphp'
+import UsersFilter from 'components/Filters/UsersFilters'
+import { getProviders } from 'services/aphp/serviceProviders'
+import { Direction, Order } from 'types/searchCriterias'
+import { fetchUsers } from 'services/users/api'
 
 enum Dialog {
   EDIT,
@@ -111,7 +115,6 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
   useEffect(() => {
     handleFetchProjects()
   }, [])
-  console.log('test selected', selectedRequest)
 
   return (
     <>
@@ -303,20 +306,26 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
           <TextInput
             value={selectedRequest?.name}
             name="name"
-            label="Nom de la requête à partager:"
+            label="Nom de la requête à partager :"
             minLimit={2}
             maxLimit={255}
           />
         </Grid>
+        <Grid item xs={12}>
+          <UsersFilter
+            onFetch={fetchUsers}
+            name="users"
+          />
+        </Grid>
       </Modal>
 
-      {selectedRequest?.shared_query_snapshot !== undefined && selectedRequest?.shared_query_snapshot?.length > 0 && (
+      {/*selectedRequest?.shared_query_snapshot !== undefined && selectedRequest?.shared_query_snapshot?.length > 0 && (
         <ModalShareRequest
           shareSuccessOrFailMessage={shareSuccessOrFailMessage}
           parentStateSetter={wrapperSetShareSuccessOrFailMessage}
           onClose={() => dispatch(setSelectedRequestShareState(null))}
         />
-      )}
+      )*/}
 
       {selectedRequest?.query_snapshots?.length === 0 && (
         <Snackbar open autoHideDuration={5000} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
