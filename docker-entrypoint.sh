@@ -52,6 +52,7 @@ sed -i "s@{VITE_ODD_MEDICATION}@$VITE_ODD_MEDICATION@g" /app/build/assets/*.js
 sed -i "s@{VITE_ODD_CONTACT}@$VITE_ODD_CONTACT@g" /app/build/assets/*.js
 sed -i "s@{VITE_ODD_EXPORT}@$VITE_ODD_EXPORT@g" /app/build/assets/*.js
 sed -i "s@{VITE_ODD_IMAGING}@$VITE_ODD_IMAGING@g" /app/build/assets/*.js
+sed -i "s@{VITE_ODD_FEASABILITY_REPORT}@$VITE_ODD_FEASABILITY_REPORT@g" /app/build/assets/*.js
 
 # Restart nginx to apply changes
 service nginx restart
