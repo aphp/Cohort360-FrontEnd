@@ -58,10 +58,10 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
             return (
               <ListItem key={request.uuid} className={classes.requestItem}>
                 <ListItemText onClick={() => onSelectedItem(request.uuid as string)}>
-                  {request.shared_by?.display_name ? (
+                  {request.shared_by?.displayName ? (
                     <Typography noWrap style={{ marginLeft: 8 }}>
-                      {request.name} - Envoyée par : {request.shared_by.firstname}{' '}
-                      {request.shared_by.lastname?.toUpperCase()}
+                      {request.name} - Envoyée par : {request.shared_by.firstName}{' '}
+                      {request.shared_by.lastName?.toUpperCase()}
                     </Typography>
                   ) : (
                     <Typography noWrap style={{ marginLeft: 8 }}>

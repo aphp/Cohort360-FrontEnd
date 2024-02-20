@@ -6,7 +6,8 @@ import {
   CriteriaGroupType,
   TemporalConstraintsType,
   CriteriaItemType,
-  CriteriaItemDataCache
+  CriteriaItemDataCache,
+  AbstractTree
 } from 'types'
 
 import {
@@ -1429,14 +1430,15 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
     criteriaGroup
   }
 }
+
 export const findSelectedInListAndSubItems = (
-  selectedItems: any[],
-  searchedItem: any,
-  pmsiHierarchy: any[],
+  selectedItems: AbstractTree<any>[],
+  searchedItem: AbstractTree<any> | undefined,
+  pmsiHierarchy: AbstractTree<any>[],
   valueSetSystem?: string
 ): boolean => {
   if (!searchedItem || !selectedItems || selectedItems.length === 0) return false
-  selectedItems = selectedItems?.filter(({ id }) => id !== 'loading')
+  selectedItems = selectedItems.filter(({ id }) => id !== 'loading')
   const foundItem = selectedItems.find((selectedItem) => {
     if (selectedItem.id === searchedItem.id || (selectedItem.id == '*' && valueSetSystem !== 'UCD')) {
       return true

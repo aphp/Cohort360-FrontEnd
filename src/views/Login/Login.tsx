@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { KeyboardEvent as ReactKeyboardEvent, SyntheticEvent, UIEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import localforage from 'localforage'
 import {
@@ -24,7 +24,7 @@ import logoAPHP from 'assets/images/logo-aphp.png'
 import { ReactComponent as Keycloak } from 'assets/icones/keycloak.svg'
 
 import { useAppDispatch } from 'state'
-import { login as loginAction } from 'state/me'
+import { MeState, login as loginAction } from 'state/me'
 import {
   ACCESS_TOKEN,
   REFRESH_TOKEN,
@@ -35,17 +35,26 @@ import {
   OIDC_SCOPE,
   OIDC_STATE,
   CODE_DISPLAY_JWT
-} from '../../constants'
+} from 'constants.js'
 
 import services from 'services/aphp'
 
 import useStyles from './styles'
-import { getDaysLeft } from '../../utils/formatDate'
+import { getDaysLeft } from 'utils/formatDate'
+import { isCustomError } from 'utils/perimeters'
 import Welcome from '../Welcome/Welcome'
+import { AccessExpiration, User } from 'types'
+import { isAxiosError } from 'axios'
 
-const ErrorSnackBarAlert = ({ open, setError, errorMessage }) => {
+type ErrorSnackBarAlertProps = {
+  open?: boolean
+  setError?: (error: boolean) => void
+  errorMessage?: string
+}
+
+const ErrorSnackBarAlert = ({ open, setError, errorMessage }: ErrorSnackBarAlertProps) => {
   const _setError = () => {
-    if (setError && typeof setError === 'function') {
+    if (setError) {
       setError(false)
     }
   }
@@ -64,7 +73,12 @@ const ErrorSnackBarAlert = ({ open, setError, errorMessage }) => {
   )
 }
 
-const LegalMentionDialog = ({ open, setOpen }) => {
+type LegalMentionDialogProps = {
+  open: boolean
+  setOpen: (open: boolean) => void
+}
+
+const LegalMentionDialog = ({ open, setOpen }: LegalMentionDialogProps) => {
   const _setOpen = () => {
     if (setOpen && typeof setOpen === 'function') {
       setOpen(false)
@@ -103,13 +117,13 @@ const Login = () => {
   const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
-  const [username, setUsername] = useState(undefined)
-  const [password, setPassword] = useState(undefined)
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [noRights, setNoRights] = useState(false)
   const [error, setError] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [open, setOpen] = useState(false)
-  const [authCode, setAuthCode] = useState(undefined)
+  const [authCode, setAuthCode] = useState<string>('')
   const urlParams = new URLSearchParams(window.location.search)
   const [display_jwt_form, setDisplay_jwt_form] = useState(false)
   const code = urlParams.get('code')
@@ -125,17 +139,37 @@ const Login = () => {
     }
   }, [authCode])
 
-  const loadBootstrapData = async (practitionerData, lastConnection) => {
-    const practitioner = {
-      id: practitionerData.username,
-      displayName: `${practitionerData.firstname} ${practitionerData.lastname}`,
-      firstName: practitionerData.firstname,
-      lastName: practitionerData.lastname
-    }
-    if (practitioner) {
-      const maintenanceResponse = await services.practitioner.maintenance()
+  const loadBootstrapData = async (practitionerData: User, lastConnection: string) => {
+    const maintenanceResponse = await services.practitioner.maintenance()
 
-      if (maintenanceResponse.error || maintenanceResponse.status !== 200) {
+    if (maintenanceResponse.status !== 200 || isAxiosError(maintenanceResponse)) {
+      setLoading(false)
+      return (
+        setError(true),
+        setErrorMessage(
+          'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+        )
+      )
+    }
+
+    const maintenance = maintenanceResponse.data
+
+    const accessExpirations = await services.perimeters
+      .getAccessExpirations({ expiring: true })
+      .then((values) => setLeftDays(values))
+
+    const practitionerPerimeters = await services.perimeters.getPerimeters()
+
+    if (isCustomError(practitionerPerimeters)) {
+      if (practitionerPerimeters.errorType === 'fhir') {
+        setLoading(false)
+        return (
+          setError(true),
+          setErrorMessage(
+            'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+          )
+        )
+      } else if (practitionerPerimeters.errorType === 'back') {
         setLoading(false)
         return (
           setError(true),
@@ -143,68 +177,41 @@ const Login = () => {
             'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
           )
         )
+      } else if (practitionerPerimeters.errorType === 'noRight') {
+        localStorage.clear()
+        setLoading(false)
+        return setNoRights(true)
       }
-
-      const maintenance = maintenanceResponse.data
-
-      const accessExpirations = await services.perimeters
-        .getAccessExpirations({ expiring: true })
-        .then((values) => setLeftDays(values))
-
-      const practitionerPerimeters = await services.perimeters.getPerimeters()
-
-      if (practitionerPerimeters && practitionerPerimeters.errorType) {
-        if (practitionerPerimeters.errorType === 'fhir') {
-          setLoading(false)
-          return (
-            setError(true),
-            setErrorMessage(
-              'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
-            )
-          )
-        } else if (practitionerPerimeters.errorType === 'back') {
-          setLoading(false)
-          return (
-            setError(true),
-            setErrorMessage(
-              'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
-            )
-          )
-        } else if (practitionerPerimeters.errorType === 'noRight') {
-          localStorage.clear()
-          setLoading(false)
-          return setNoRights(true)
-        }
-      }
-
+    } else {
       const nominativeGroupsIds = practitionerPerimeters
         .filter((perimeterItem) => perimeterItem.read_access === 'DATA_NOMINATIVE')
         .map((practitionerPerimeter) => practitionerPerimeter.perimeter.cohort_id)
         .filter((item) => item)
 
-      dispatch(
-        loginAction({
-          ...practitioner,
-          nominativeGroupsIds,
-          deidentified: nominativeGroupsIds.length === 0,
-          lastConnection,
-          maintenance,
-          accessExpirations
-        })
-      )
+      const loginState: MeState = {
+        id: practitionerData.userName || '',
+        userName: practitionerData.userName || '',
+        displayName: `${practitionerData.firstName} ${practitionerData.lastName}`,
+        firstName: practitionerData.firstName || '',
+        lastName: practitionerData.lastName || '',
+        nominativeGroupsIds,
+        deidentified: nominativeGroupsIds.length === 0,
+        lastConnection,
+        maintenance,
+        accessExpirations
+      }
+
+      dispatch(loginAction(loginState))
 
       const oldPath = localStorage.getItem('old-path')
       localStorage.removeItem('old-path')
       navigate(oldPath ?? '/home')
-    } else {
-      setLoading(false)
-      setError(true)
     }
   }
 
-  const setLeftDays = (accessExpirations) => {
+  const setLeftDays = (accessExpirations: AccessExpiration[]) => {
     return accessExpirations
-      ?.map((item) => {
+      .map((item) => {
         item.leftDays = getDaysLeft(item.end_datetime)
         return item
       })
@@ -232,7 +239,7 @@ const Login = () => {
       }
     }
 
-    if (!response) {
+    if (!response || isAxiosError(response)) {
       setLoading(false)
       return (
         setError(true),
@@ -242,7 +249,7 @@ const Login = () => {
       )
     }
 
-    const { status, data = {} } = response
+    const { status, data } = response
 
     if (status === 200) {
       localStorage.setItem(ACCESS_TOKEN, data.access_token)
@@ -257,22 +264,22 @@ const Login = () => {
     }
   }
 
-  const _onSubmit = (e) => {
-    e.preventDefault()
+  const _onSubmit = (event: UIEvent<HTMLElement>) => {
+    event.preventDefault()
     login()
   }
 
-  const oidcLogin = (e) => {
-    e.preventDefault()
-    window.location =
-      `${OIDC_PROVIDER_URL}?state=${OIDC_STATE}&` + // eslint-disable-line
-      `client_id=${OIDC_CLIENT_ID}&` + // eslint-disable-line
-      `redirect_uri=${OIDC_REDIRECT_URI}&` + // eslint-disable-line
-      `response_type=${OIDC_RESPONSE_TYPE}&` + // eslint-disable-line
-      `scope=${OIDC_SCOPE}` // eslint-disable-line
+  const oidcLogin = (event: SyntheticEvent) => {
+    event.preventDefault()
+    window.location.href =
+      `${OIDC_PROVIDER_URL}?state=${OIDC_STATE}&` +
+      `client_id=${OIDC_CLIENT_ID}&` +
+      `redirect_uri=${OIDC_REDIRECT_URI}&` +
+      `response_type=${OIDC_RESPONSE_TYPE}&` +
+      `scope=${OIDC_SCOPE}`
   }
 
-  const onKeyDown = (event) => {
+  const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     event.key === 'Enter' ? _onSubmit(event) : null
   }
 
@@ -280,8 +287,8 @@ const Login = () => {
     const code_display_jwt = CODE_DISPLAY_JWT.split(',')
     let code_display_jwtPosition = 0
 
-    const keyHandler = (e) => {
-      if (e.key === code_display_jwt[code_display_jwtPosition]) {
+    const keyHandler = (event: KeyboardEvent) => {
+      if (event.key === code_display_jwt[code_display_jwtPosition]) {
         code_display_jwtPosition++
       } else {
         code_display_jwtPosition = 0
@@ -291,8 +298,8 @@ const Login = () => {
         code_display_jwtPosition = 0
       }
     }
-    document.addEventListener('keydown', keyHandler)
-    return () => document.removeEventListener('keydown', keyHandler)
+    document.addEventListener('keydown', (e) => keyHandler(e))
+    return () => document.removeEventListener('keydown', (e) => keyHandler(e))
   }, [display_jwt_form])
 
   if (noRights === true) return <NoRights />
@@ -318,7 +325,6 @@ const Login = () => {
           xs={12}
           sm={6}
           md={6}
-          elevation={6}
           direction="column"
           justifyContent="center"
           alignItems="center"
@@ -331,7 +337,7 @@ const Login = () => {
               Bienvenue ! Connectez-vous.
             </Typography>
             {display_jwt_form && (
-              <Grid container direction="column" alignItems="center" justifyContent="center" className={classes.form}>
+              <Grid container direction="column" alignItems="center" justifyContent="center">
                 <TextField
                   margin="normal"
                   required
@@ -389,7 +395,7 @@ const Login = () => {
             </Button>
           </Grid>
           <Link href="https://eds.aphp.fr">
-            <img className={classes.logoAPHP} src={logoAPHP} alt="Footer" />
+            <img src={logoAPHP} alt="Footer" />
           </Link>
           {/* </Grid> */}
         </Grid>

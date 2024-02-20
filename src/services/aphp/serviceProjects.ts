@@ -333,7 +333,7 @@ const servicesProjects: IServiceProjects = {
     }
   },
   shareRequest: async (sharedRequest, notify_by_email): Promise<AxiosResponse<ProjectType>> => {
-    const usersToShareId = sharedRequest.usersToShare?.map((userToshareId: User) => userToshareId.username)
+    const usersToShareId = sharedRequest.usersToShare?.map((userToshareId: User) => userToshareId.userName)
     const shared_query_snapshot_id = sharedRequest.shared_query_snapshot
       ? sharedRequest.shared_query_snapshot
       : sharedRequest.currentSnapshot?.uuid
