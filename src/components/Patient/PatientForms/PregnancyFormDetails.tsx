@@ -12,6 +12,10 @@ type PregnancyFormDetailsProps = {
 const PregnancyFormDetails = ({ pregnancyFormData, onClose }: PregnancyFormDetailsProps) => {
   const pregnancyDetails = [
     {
+      name: 'Date de début de grossesse',
+      value: getDataFromForm(pregnancyFormData, pregnancyForm.pregnancyStartDate)
+    },
+    {
       name: 'Nombre de foetus',
       value: getDataFromForm(pregnancyFormData, pregnancyForm.foetus)
     },
@@ -22,19 +26,15 @@ const PregnancyFormDetails = ({ pregnancyFormData, onClose }: PregnancyFormDetai
     },
     { name: 'Parité', value: getDataFromForm(pregnancyFormData, pregnancyForm.parity) },
     {
-      name: 'Risques liés aux antécédents maternels',
-      value: getDataFromForm(pregnancyFormData, pregnancyForm.maternalRisks)
-    },
-    {
       name: 'Suivi échographique - Précision',
       value: getDataFromForm(pregnancyFormData, pregnancyForm.ultrasoundMonitoring)
     },
     {
-      name: 'Risques ou complications de la grossesse',
-      value: getDataFromForm(pregnancyFormData, pregnancyForm.risksOrComplicationsOfPregnancy)
+      name: 'Corticothérapie pour maturation pulmonaire foetale',
+      value: getDataFromForm(pregnancyFormData, pregnancyForm.corticotherapie)
     },
     {
-      name: 'Grossesse suivie au diagnostic prénatal',
+      name: 'Raisons du suivi au diagnostic prénatal',
       value: getDataFromForm(pregnancyFormData, pregnancyForm.reasonsOfPrenatalDiagnosticMonitoring)
     }
   ]

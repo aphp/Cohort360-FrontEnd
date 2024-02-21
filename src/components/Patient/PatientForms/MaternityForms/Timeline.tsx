@@ -1,20 +1,21 @@
 import React from 'react'
-import { Card, CardContent, Typography } from '@mui/material'
-import { QuestionnaireResponse } from 'fhir/r4'
+import { CircularProgress, Typography } from '@mui/material'
 import ArrowWithYears from './ArrowWithYears'
-import { getDataFromForm } from 'utils/formUtils'
-import { pregnancyForm } from 'data/pregnancyData'
-import moment from 'moment'
+import { FormNames } from 'types/searchCriterias'
+import HospitCard from './HospitCard'
+import { CohortQuestionnaireResponse } from 'types'
+import PregnancyCard from './PregnancyCard'
 
 interface TimelineProps {
-  questionnaireResponses: QuestionnaireResponse[]
+  loading: boolean
+  questionnaireResponses: CohortQuestionnaireResponse[]
 }
 
 interface YearGroup {
-  [year: string]: QuestionnaireResponse[]
+  [year: string]: CohortQuestionnaireResponse[]
 }
 
-const groupEventsByYear = (data: QuestionnaireResponse[]): YearGroup => {
+const groupEventsByYear = (data: CohortQuestionnaireResponse[]): YearGroup => {
   return data.reduce((acc, curr) => {
     const year = new Date(curr.authored ?? '').getFullYear().toString()
     if (!acc[year]) {
@@ -25,7 +26,7 @@ const groupEventsByYear = (data: QuestionnaireResponse[]): YearGroup => {
   }, {} as YearGroup)
 }
 
-const Timeline: React.FC<TimelineProps> = ({ questionnaireResponses }) => {
+const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses }) => {
   const yearGroups = groupEventsByYear(questionnaireResponses)
 
   console.log('yearGroups', yearGroups)
@@ -33,34 +34,29 @@ const Timeline: React.FC<TimelineProps> = ({ questionnaireResponses }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <ArrowWithYears years={years} />
-      <div style={{ flexGrow: 1 }}>
-        {years.reverse().map((year) => (
-          <div key={year}>
-            <Typography variant="h6" style={{ margin: '10px 0' }}>
-              {year}
-            </Typography>
-            {yearGroups[year].map((form) => (
-              <Card key={form.id} style={{ margin: '10px 0' }}>
-                <CardContent>
-                  <Typography color="textSecondary" gutterBottom></Typography>
-                  <Typography variant="body2" component="p">
-                    {getDataFromForm(form, pregnancyForm.pregnancyType)}
-                  </Typography>
-                  <Typography variant="body2" component="p">
-                    Début de grossesse :{' '}
-                    {moment(getDataFromForm(form, pregnancyForm.pregnancyStartDate)).format('DD/MM/YYYY')}
-                  </Typography>
-                  <Typography variant="body2" component="p">
-                    Unité exécutrice : todo
-                  </Typography>
-                  {/* <Button onClick={() => setTogglePregnancyDetails(form)}>+ de détails</Button> */}
-                </CardContent>
-              </Card>
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <>
+          <ArrowWithYears years={years} />
+          <div style={{ flexGrow: 1 }}>
+            {years.reverse().map((year) => (
+              <div key={year}>
+                <Typography variant="h6" style={{ margin: '10px 0' }}>
+                  {year}
+                </Typography>
+                {yearGroups[year].map((form) =>
+                  form.questionnaire?.includes(FormNames.PREGNANCY) ? (
+                    <PregnancyCard key={form.id} form={form} />
+                  ) : (
+                    <HospitCard key={form.id} form={form} />
+                  )
+                )}
+              </div>
             ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </div>
   )
 }

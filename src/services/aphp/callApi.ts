@@ -882,7 +882,7 @@ export const fetchForms = async (args: fetchFormsProps) => {
   const { patient, formName, _list, startDate, endDate, executiveUnits } = args
   let options: string[] = []
   if (patient) options = [...options, `subject=${patient}`]
-  if (formName) options = [...options, `questionnaire=${formName}`]
+  if (formName) options = [...options, `questionnaire.name=${formName}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
   if (startDate) options = [...options, `authored=ge${startDate}`]
   if (endDate) options = [...options, `authored=le${endDate}`]

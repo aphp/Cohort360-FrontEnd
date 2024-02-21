@@ -18,23 +18,23 @@ const ArrowWithYears: React.FC<ArrowWithYearsProps> = ({ years }) => {
     >
       <Box
         sx={{
+          width: 0,
+          height: 0,
+          borderLeft: '10px solid transparent',
+          borderRight: '10px solid transparent',
+          borderBottom: '10px solid #000'
+        }}
+      />
+
+      <Box
+        sx={{
           width: '2px',
           backgroundColor: '#000',
           flexGrow: 1
         }}
       />
 
-      <Box
-        sx={{
-          width: 0,
-          height: 0,
-          borderLeft: '10px solid transparent',
-          borderRight: '10px solid transparent',
-          borderTop: '10px solid #000'
-        }}
-      />
-
-      {years.map((year, index) => (
+      {/* {years.map((year, index) => (
         <Typography
           key={year}
           sx={{
@@ -47,7 +47,7 @@ const ArrowWithYears: React.FC<ArrowWithYearsProps> = ({ years }) => {
         >
           {year}
         </Typography>
-      ))}
+      ))} */}
     </Box>
   )
 }

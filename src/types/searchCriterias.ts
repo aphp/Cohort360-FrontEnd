@@ -4,8 +4,8 @@ import { CohortsType } from './cohorts'
 import { RessourceType } from './requestCriterias'
 
 export enum FormNames {
-  PREGNANCY = 'aphp-sdc-fiche-grossesse',
-  HOSPIT = ''
+  PREGNANCY = 'APHPEDSQuestionnaireFicheGrossesse',
+  HOSPIT = 'APHPEDSQuestionnaireFicheHospitalisation'
 }
 
 export enum FormNamesLabel {

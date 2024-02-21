@@ -16,6 +16,7 @@ import {
   Parameters,
   Patient,
   Procedure,
+  QuestionnaireResponse,
   Resource
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
@@ -647,6 +648,11 @@ export type IPatientMedication<T extends MedicationRequest | MedicationAdministr
 
 export enum BiologyStatus {
   VALIDATED = 'Val'
+}
+
+export type CohortQuestionnaireResponse = QuestionnaireResponse & {
+  serviceProvider?: string
+  NDA?: string
 }
 
 export type CohortObservation = Observation & {

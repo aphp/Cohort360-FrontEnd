@@ -11,7 +11,8 @@ import {
   IPatientMedication,
   IPatientObservation,
   IPatientImaging,
-  CohortImaging
+  CohortImaging,
+  CohortQuestionnaireResponse
 } from 'types'
 
 import { logout } from './me'
@@ -84,7 +85,7 @@ export type PatientState = null | {
   forms?: {
     maternityForms: {
       loading: boolean
-      maternityFormsList: QuestionnaireResponse[]
+      maternityFormsList: CohortQuestionnaireResponse[]
     }
   }
 }

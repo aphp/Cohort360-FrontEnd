@@ -17,7 +17,7 @@ import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { QuestionnaireResponse } from 'fhir/r4'
 import { CriteriaName, LoadingStatus } from 'types'
-import { FilterKeys, FormNames } from 'types/searchCriterias'
+import { FilterKeys } from 'types/searchCriterias'
 import PregnancyFormDetails from '../PregnancyFormDetails'
 import HospitFormDetails from '../HospitFormDetails'
 import Timeline from './Timeline'
@@ -79,18 +79,6 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
     }
   }
 
-  const prepareTimelineData = () => {
-    if (formName.length === 1 && formName.includes(FormNames.HOSPIT)) {
-      return formName.includes(FormNames.PREGNANCY)
-        ? searchResults.maternityFormList?.filter((form) => form.questionnaire === FormNames.HOSPIT) ?? []
-        : searchResults.maternityFormList?.filter((form) => form.questionnaire === FormNames.PREGNANCY) ?? []
-    } else {
-      return searchResults.maternityFormList ?? []
-    }
-  }
-
-  const timelineData = prepareTimelineData()
-
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
   }, [])
@@ -108,7 +96,7 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
 
   return (
     <Grid container justifyContent="flex-end">
-      <BlockWrapper item xs={12} margin={'20px 0px 10px'}>
+      <BlockWrapper item xs={12} margin={'20px 0px 0px'}>
         <Searchbar>
           <Grid container item xs={12} justifyContent="flex-end">
             <Button width={'10%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
@@ -143,7 +131,10 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
       )}
 
       <Grid item xs={12}>
-        <Timeline questionnaireResponses={timelineData} />
+        <Timeline
+          loading={loadingStatus === LoadingStatus.FETCHING}
+          questionnaireResponses={searchResults.maternityFormList ?? []}
+        />
       </Grid>
 
       {togglePregnancyDetails && (
