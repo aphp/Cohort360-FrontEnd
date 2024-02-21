@@ -364,8 +364,6 @@ const servicesPerimeters: IServicePerimeters = {
     }
   },
 
-  //export type ScopePage = { perimeter: ScopeElement }
-
   getAccessExpirations: async (accessExpirationsProps: AccessExpirationsProps) => {
     let response: AxiosResponse<AccessExpiration[]> | undefined = undefined
     try {
