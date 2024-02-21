@@ -125,10 +125,7 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
                   subItems.map((criteriaSubItem, index) => (
                     <Fragment key={index}>
                       <div className={classes.subItemsIndicator} />
-                      <CriteriaListItem
-                        criteriaItem={criteriaSubItem}
-                        handleClick={() => handleClick(criteriaSubItem)}
-                      />
+                      <CriteriaListItem criteriaItem={criteriaSubItem} handleClick={handleClick} />
                     </Fragment>
                   ))}
               </List>
