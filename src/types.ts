@@ -786,6 +786,7 @@ export type ScopePage = {
   right_search_patients_by_ipp: boolean
   read_access?: string
   read_export?: string
+  export_access?: string
 }
 export type IScope = {
   count: number
@@ -851,7 +852,7 @@ export type AccessExpirationsProps = {
 export type SimpleStatus = 'success' | 'error' | null
 
 export type AccessExpiration = {
-  leftDays?: number
+  leftDays: number
   start_datetime: Date
   end_datetime: Date
   profile: string
@@ -885,4 +886,14 @@ export type ScopeTreeTableHeadCellsType = {
 export type ScopeListType = {
   perimeters: ScopeTreeRow[]
   executiveUnits: ScopeTreeRow[]
+}
+
+export type FindScope = {
+  scopeTreeRows: ScopeTreeRow[]
+  count: number
+  aborted?: boolean
+}
+
+export type CustomError = {
+  errorType: string
 }

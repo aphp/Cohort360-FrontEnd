@@ -137,8 +137,9 @@ const Welcome: React.FC = () => {
                 activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
               </Alert>
             )}
-            {accessExpirations?.map((item: AccessExpiration) =>
-              item.leftDays && !Number.isNaN(item.leftDays) && item.leftDays <= 30 ? (
+            {accessExpirations
+              .filter((item) => item.leftDays && !Number.isNaN(item.leftDays) && item.leftDays <= 30)
+              .map((item: AccessExpiration) => (
                 <Alert
                   key={item.perimeter + '-' + item.leftDays && item.leftDays}
                   severity="warning"
@@ -148,10 +149,7 @@ const Welcome: React.FC = () => {
                   {item.leftDays} jour{item.leftDays > 1 ? 's' : ''}. Veuillez vous rapprocher de votre référent EDS
                   pour faire renouveler vos accès à l'application.
                 </Alert>
-              ) : (
-                <></>
-              )
-            )}
+              ))}
           </Grid>
         </Grid>
 

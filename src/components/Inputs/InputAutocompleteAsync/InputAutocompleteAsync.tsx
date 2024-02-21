@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState, Fragment, useRef } from 'react'
+import React, { useEffect, useState, Fragment, useRef, SyntheticEvent } from 'react'
 
 import { Autocomplete, CircularProgress, TextField } from '@mui/material'
 
@@ -18,16 +18,16 @@ type InputAutocompleteAsyncProps = {
   label?: string
   className?: string
   multiple?: boolean
-  autocompleteValue?: any
-  onChange?: (e: any, value: any) => void
-  renderInput?: any
+  autocompleteValue?: ElementType | ElementType[] | null
+  onChange?: (e: SyntheticEvent, value: ElementType | ElementType[] | null) => void
+  renderInput?: ElementType
   autocompleteOptions?: ElementType[]
   getAutocompleteOptions?: (searchValue: string, signal: AbortSignal) => Promise<ElementType[]>
   noOptionsText?: string
   helperText?: string
 }
 
-const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
+const InputAutocompleteAsync = (props: InputAutocompleteAsyncProps) => {
   const {
     id,
     variant,
