@@ -266,14 +266,12 @@ const servicesPerimeters: IServicePerimeters = {
       if (!cohortId) return undefined
       const scopeItemList = await servicesPerimeters.getPerimeters(undefined, [cohortId], true)
 
-      const isCustomError = (response: ScopePage[] | CustomError): response is CustomError => {
-        return response && !!(response as CustomError).errorType
-      }
-
-      if (scopeItemList && !isCustomError(scopeItemList)) {
+      if (!isCustomError(scopeItemList)) {
         const scopeTreeRowList = await servicesPerimeters.buildScopeTreeRowList(scopeItemList)
         return scopeTreeRowList && scopeTreeRowList.length > 0 ? scopeTreeRowList[0] : undefined
-      } else return undefined
+      } else {
+        return undefined
+      }
     } catch (error) {
       return undefined
     }
