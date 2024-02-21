@@ -86,6 +86,16 @@ const exportTable: ExportTableType[] = [
     id: 'vocabulary',
     table_name: 'Référentiel - Terminologie - Vocabulaire et nomenclature',
     table_id: 'vocabulary'
+  },
+  {
+    id: 'imaging_study',
+    table_name: 'Fait - Imagerie - Étude',
+    table_id: 'imaging_study'
+  },
+  {
+    id: 'imaging_serie',
+    table_name: 'Fait - Imagerie - Série',
+    table_id: 'imaging_serie'
   }
 ]
 
