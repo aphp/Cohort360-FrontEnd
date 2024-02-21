@@ -39,7 +39,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
     let alreadyExists = false
 
     for (const _user of _usersToShare) {
-      if (_user.displayName === user.displayName) {
+      if (_user.display_name === user.display_name) {
         alreadyExists = true
       }
     }
@@ -114,7 +114,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
             inputValue={searchInput}
             onInputChange={() => setSearchInput('')}
             getOptionLabel={(option) =>
-              `${option.userName} - ${option.lastName?.toLocaleUpperCase()} ${option.firstName} ${
+              `${option.username} - ${option.lastname?.toLocaleUpperCase()} ${option.firstname} ${
                 option.email ? `- ${option.email}` : ''
               }` ?? ''
             }

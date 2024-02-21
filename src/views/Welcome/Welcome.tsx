@@ -93,6 +93,8 @@ const Welcome: React.FC = () => {
     setLastRequest(_lastRequest)
   }, [requestState])
 
+  console.log('AYAYA', practitioner)
+
   return practitioner ? (
     <Grid
       container

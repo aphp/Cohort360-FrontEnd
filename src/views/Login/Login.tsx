@@ -189,11 +189,11 @@ const Login = () => {
         .filter((item) => item)
 
       const loginState: MeState = {
-        id: practitionerData.userName || '',
-        userName: practitionerData.userName || '',
-        displayName: `${practitionerData.firstName} ${practitionerData.lastName}`,
-        firstName: practitionerData.firstName || '',
-        lastName: practitionerData.lastName || '',
+        id: practitionerData.username || '',
+        userName: practitionerData.username || '',
+        displayName: `${practitionerData.firstname} ${practitionerData.lastname}`,
+        firstName: practitionerData.firstname || '',
+        lastName: practitionerData.lastname || '',
         nominativeGroupsIds,
         deidentified: nominativeGroupsIds.length === 0,
         lastConnection,
@@ -298,8 +298,8 @@ const Login = () => {
         code_display_jwtPosition = 0
       }
     }
-    document.addEventListener('keydown', (e) => keyHandler(e))
-    return () => document.removeEventListener('keydown', (e) => keyHandler(e))
+    document.addEventListener('keydown', keyHandler)
+    return () => document.removeEventListener('keydown', keyHandler)
   }, [display_jwt_form])
 
   if (noRights === true) return <NoRights />

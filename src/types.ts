@@ -109,12 +109,11 @@ export type Back_API_Response<T> = {
 }
 
 export type User = {
-  id?: string
-  userName?: string
+  username?: string
   email?: string
-  firstName?: string
-  lastName?: string
-  displayName?: string
+  firstname?: string
+  lastname?: string
+  display_name?: string
 }
 
 export type CohortComposition = DocumentReference & {

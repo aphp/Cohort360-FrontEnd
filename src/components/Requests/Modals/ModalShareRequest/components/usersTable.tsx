@@ -93,10 +93,10 @@ const UsersTable: React.FC<UsersTableProps> = ({ usersList, loading, usersAssoci
             usersList.map((user: User) => {
               return (
                 user && (
-                  <TableRow key={user.userName} className={classes.tableBodyRows} hover>
-                    <TableCellWrapper>{user.userName}</TableCellWrapper>
-                    <TableCellWrapper>{user.lastName?.toLocaleUpperCase()}</TableCellWrapper>
-                    <TableCellWrapper>{user.firstName}</TableCellWrapper>
+                  <TableRow key={user.username} className={classes.tableBodyRows} hover>
+                    <TableCellWrapper>{user.username}</TableCellWrapper>
+                    <TableCellWrapper>{user.lastname?.toLocaleUpperCase()}</TableCellWrapper>
+                    <TableCellWrapper>{user.firstname}</TableCellWrapper>
                     <TableCellWrapper>{user.email ?? '-'}</TableCellWrapper>
                     <TableCellWrapper>
                       <Tooltip title="Supprimer l'utilisateur" style={{ padding: '0 12px' }}>
