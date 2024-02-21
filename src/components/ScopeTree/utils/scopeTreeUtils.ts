@@ -7,6 +7,7 @@ import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import { cancelPendingRequest } from 'utils/abortController'
 import { buildScopeListType, expandScopeTree, getCurrentScopeList, LOADING } from 'utils/scopeTree'
+import { isCustomError } from 'utils/perimeters'
 
 export const getAllParentsIds = async (selectedItems: ScopeTreeRow[]) => {
   const allParentsIds: string[] = selectedItems
@@ -35,19 +36,23 @@ export const getParents = async (allParentsIds: string[], rootRows: ScopeTreeRow
       return idValue && array.indexOf(idValue) === index
     }
   )
-  const notFetchedParents: ScopeTreeRow[] =
-    notFetchedItems?.length > 0
-      ? await servicesPerimeters.buildScopeTreeRowList(
-          await servicesPerimeters.getPerimeters(
-            notFetchedItems,
-            undefined,
-            undefined,
-            undefined,
-            isExecutiveUnit,
-            undefined
-          )
-        )
-      : []
+
+  let notFetchedParents: ScopeTreeRow[] = []
+
+  if (notFetchedItems?.length > 0) {
+    const perimeters = await servicesPerimeters.getPerimeters(
+      notFetchedItems,
+      undefined,
+      undefined,
+      undefined,
+      isExecutiveUnit,
+      undefined
+    )
+
+    if (!isCustomError(perimeters)) {
+      notFetchedParents = await servicesPerimeters.buildScopeTreeRowList(perimeters)
+    }
+  }
   return [...fetchedParents, ...notFetchedParents]
 }
 
@@ -300,13 +305,16 @@ const getScopeTree = async (
   if (!equivalentRow) {
     equivalentRow = findEquivalentRowInItemAndSubItems({ id: id }, explorationRootRows).equivalentRow
     if (!equivalentRow && !isNoLoading) {
-      equivalentRow = await servicesPerimeters.buildScopeTreeRowList(
-        await servicesPerimeters.getPerimeters([id], undefined, undefined, undefined, isExecutiveUnit),
-        undefined,
-        undefined,
-        isExecutiveUnit
-      )
-      await updateRootRows(searchRootRows, [equivalentRow], [])
+      const perimeters = await servicesPerimeters.getPerimeters([id], undefined, undefined, undefined, isExecutiveUnit)
+      if (!isCustomError(perimeters)) {
+        equivalentRow = await servicesPerimeters.buildScopeTreeRowList(
+          perimeters,
+          undefined,
+          undefined,
+          isExecutiveUnit
+        )
+        await updateRootRows(searchRootRows, [equivalentRow], [])
+      }
     }
   }
   return equivalentRow
@@ -336,14 +344,24 @@ const getScopeTreeList = async (
     }
   }
   if (postLoadedIds?.length > 0) {
-    const postLoadedRows: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
-      await servicesPerimeters.getPerimeters(postLoadedIds, undefined, undefined, undefined, isExecutiveUnit),
+    const perimeters = await servicesPerimeters.getPerimeters(
+      postLoadedIds,
+      undefined,
       undefined,
       undefined,
       isExecutiveUnit
     )
-    await updateRootRows(searchRootRows, postLoadedRows, [])
-    scopeTreeList.push(...postLoadedRows)
+
+    if (!isCustomError(perimeters)) {
+      const postLoadedRows: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
+        perimeters,
+        undefined,
+        undefined,
+        isExecutiveUnit
+      )
+      await updateRootRows(searchRootRows, postLoadedRows, [])
+      scopeTreeList.push(...postLoadedRows)
+    }
   }
   return scopeTreeList
 }
@@ -743,10 +761,11 @@ export const searchInPerimeters = async (
   let newRootRows: ScopeTreeRow[] = []
   try {
     cancelPendingRequest(controllerRef.current)
+
     const {
       scopeTreeRows: newPerimetersList,
       count: newCount,
-      aborted: aborted
+      aborted
     } = await servicesPerimeters.findScope(
       searchInput,
       page,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { KeyboardEvent, UIEvent, useEffect, useState } from 'react'
 
 import {
   Breadcrumbs,
@@ -110,11 +110,13 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
 
   const debouncedSearchItem = useDebounce(500, searchInput)
 
-  const onKeyDown = async (e: any) => {
-    if (e.keyCode === 13 && !e.shiftKey) {
-      e.preventDefault()
-      getBiologySearchResults()
-    }
+  const _onSubmit = (event: UIEvent) => {
+    event.preventDefault()
+    getBiologySearchResults()
+  }
+
+  const onKeyDown = (event: KeyboardEvent) => {
+    event.key === 'Enter' && !event.shiftKey ? _onSubmit(event) : null
   }
 
   const _onNext = () => {
@@ -191,7 +193,7 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
             }
           />
 
-          <IconButton type="submit" aria-label="search" onClick={onKeyDown}>
+          <IconButton type="submit" aria-label="search" onClick={_onSubmit}>
             <SearchIcon fill="#ED6D91" height="15px" />
           </IconButton>
         </Grid>

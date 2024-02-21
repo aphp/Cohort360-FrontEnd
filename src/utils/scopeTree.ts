@@ -122,12 +122,12 @@ export const buildScopeListType = (scopes: ScopeTreeRow[], isExecutiveUnit?: boo
   return newScopeList
 }
 
-export const removeSpace = (scopes: ScopeElement[]) => {
-  return scopes.map((scope) => {
-    scope.cohort_id = scope.cohort_id?.replace(/\s/g, '')
-    scope.above_levels_ids = scope.above_levels_ids?.replace(/\s/g, '')
-    scope.inferior_levels_ids = scope.inferior_levels_ids?.replace(/\s/g, '')
-    scope.parent_id = scope.parent_id?.replace(/\s/g, '') ?? null
-    return scope
-  })
+export const removeSpace = (scope: ScopeElement) => {
+  return {
+    ...scope,
+    cohort_id: scope.cohort_id?.replace(/\s/g, ''),
+    above_levels_ids: scope.above_levels_ids?.replace(/\s/g, ''),
+    inferior_levels_ids: scope.inferior_levels_ids?.replace(/\s/g, ''),
+    parent_id: scope.parent_id?.replace(/\s/g, '') ?? null
+  }
 }

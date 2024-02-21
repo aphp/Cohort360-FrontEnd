@@ -44,6 +44,7 @@ import {
   SearchCriterias
 } from 'types/searchCriterias'
 import { Medication, PMSI } from 'types/patient'
+import { isCustomError } from 'utils/perimeters'
 
 export type PatientState = null | {
   loading: boolean
@@ -135,7 +136,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
 
       if (pmsiResponse.pmsiData === undefined) return undefined
 
-      const pmsiList: any[] = linkElementWithEncounter(
+      const pmsiList = linkElementWithEncounter(
         pmsiResponse.pmsiData as (Procedure | Condition | Claim)[],
         hospits,
         deidentified
@@ -223,7 +224,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
         executiveUnits
       )
 
-      const biologyList: any[] = linkElementWithEncounter(biologyResponse.biologyList, hospits, deidentified)
+      const biologyList = linkElementWithEncounter(biologyResponse.biologyList, hospits, deidentified)
 
       return {
         biology: {
@@ -312,7 +313,7 @@ const fetchMedication = createAsyncThunk<
 
       if (medicationResponse.medicationData === undefined) return undefined
 
-      const medicationList: any[] = linkElementWithEncounter(
+      const medicationList = linkElementWithEncounter(
         medicationResponse.medicationData as (MedicationRequest | MedicationAdministration)[],
         hospits,
         deidentified
@@ -394,7 +395,7 @@ const fetchImaging = createAsyncThunk<FetchImagingReturn, FetchImagingParams, { 
         executiveUnits
       )
 
-      const imagingList: any[] = linkElementWithEncounter(imagingResponse.imagingList, hospits, deidentified)
+      const imagingList = linkElementWithEncounter(imagingResponse.imagingList, hospits, deidentified)
 
       return {
         imaging: {
@@ -488,7 +489,7 @@ const fetchDocuments = createAsyncThunk<
       executiveUnits
     )
 
-    const documentsList: any[] = linkElementWithEncounter(
+    const documentsList = linkElementWithEncounter(
       documentsResponse.docsList as DocumentReference[],
       hospits,
       deidentified
@@ -689,7 +690,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
           lastGhm: ghmList ? (ghmList[0] as Claim) : undefined,
           lastProcedure: ccamList ? (ccamList[0] as Procedure) : undefined,
           mainDiagnosis: diagnosticList.filter(
-            (diagnostic: any) => diagnostic.extension?.[0]?.valueCodeableConcept?.coding?.[0]?.code === 'dp'
+            (diagnostic) => diagnostic.extension?.[0]?.valueCodeableConcept?.coding?.[0]?.code === 'dp'
           ) as Condition[]
         },
         pmsi: {
@@ -766,9 +767,12 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
         deidentifiedBoolean = (await services.patients.fetchRights(groupId)) ?? {}
       } else {
         const perimeters = await services.perimeters.getPerimeters()
-        deidentifiedBoolean = perimeters.some(
-          (perimeter) => servicesPerimeters.getAccessFromScope(perimeter) === 'Pseudonymisé'
-        )
+
+        if (!isCustomError(perimeters)) {
+          deidentifiedBoolean = perimeters.some(
+            (perimeter) => servicesPerimeters.getAccessFromScope(perimeter) === 'Pseudonymisé'
+          )
+        }
       }
       if (
         patientState?.patientInfo?.id !== patientId ||

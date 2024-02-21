@@ -8,6 +8,7 @@ import { ODD_EXPORT } from '../constants'
 import services from 'services/aphp'
 import servicesPerimeters from '../services/aphp/servicePerimeters'
 import { GroupMember, Patient } from 'fhir/r4'
+import { isCustomError } from 'utils/perimeters'
 
 export type ExploredCohortState = {
   importedPatients: Patient[]
@@ -152,7 +153,8 @@ const fetchExploredCohortInBackground = createAsyncThunk<
     case 'patients': {
       cohort = (await services.patients.fetchMyPatients()) as ExploredCohortState
       const perimeters = await services.perimeters.getPerimeters()
-      if (cohort) {
+
+      if (cohort && !isCustomError(perimeters)) {
         cohort.name = '-'
         cohort.description = ''
         cohort.requestId = ''

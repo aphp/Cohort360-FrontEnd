@@ -1012,10 +1012,10 @@ type fetchScopeProps = {
   offset?: number
   limit?: number
 }
-export const fetchScope: (
+export const fetchScope: (args: fetchScopeProps, signal?: AbortSignal) => Promise<AxiosResponse<IScope>> = async (
   args: fetchScopeProps,
   signal?: AbortSignal
-) => Promise<AxiosResponse<IScope | unknown>> = async (args: fetchScopeProps, signal?: AbortSignal) => {
+) => {
   const { perimetersIds, cohortIds, search, type, isExecutiveUnit, offset, limit } = args
 
   let options: string[] = []
@@ -1028,7 +1028,7 @@ export const fetchScope: (
   if (type && type.length > 0) options = [...options, `type_source_value=${type.join(',')}`]
 
   const url: string = isExecutiveUnit ? 'accesses/perimeters/?' : 'accesses/perimeters/patient-data/rights/?'
-  const response: AxiosResponse<IScope | unknown> = await apiBackend.get(`${url}${options.reduce(paramsReducer)}`, {
+  const response: AxiosResponse<IScope> = await apiBackend.get(`${url}${options.reduce(paramsReducer)}`, {
     signal: signal
   })
   return response
