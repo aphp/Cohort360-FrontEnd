@@ -426,7 +426,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case RessourceType.PREGNANCY:
       filterFhir = [
         'subject.active=true',
-        `questionnaire=${FormNames.PREGNANCY}`,
+        `questionnaire.name=${FormNames.PREGNANCY}`,
         questionnaireFiltersBuilders(
           pregnancyForm.pregnancyStartDate,
           buildDateFilter(criterion.pregnancyStartDate, 'ge', true)
