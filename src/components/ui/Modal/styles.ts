@@ -1,9 +1,9 @@
-import { DialogContent, styled } from '@mui/material'
+import { styled } from '@mui/material'
 
 type CustomProps = {
   width: string
 }
 
-export const DialogContentWrapper = styled(DialogContent)<CustomProps>(({ width }) => ({
-  width: width
+export const DialogWrapper = styled('div')<CustomProps>(({ width }) => ({
+  width: `${width} !important`
 }))

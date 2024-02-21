@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 
@@ -27,23 +27,20 @@ import EditIcon from '@mui/icons-material/Edit'
 import ShareIcon from '@mui/icons-material/Share'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 
-import { useAppSelector, useAppDispatch } from 'state'
-import { setSelectedRequestShare as setSelectedRequestShareState } from 'state/request'
-
-import { RequestType, SimpleStatus } from 'types'
+import { useAppSelector } from 'state'
+import { RequestType, ResponseStatus } from 'types'
 
 import useStyles from '../../CohortsTable/styles'
-import ModalShareRequest from '../Modals/ModalShareRequest/ModalShareRequest'
 import Modal from 'components/ui/Modal'
 import TextInput from 'components/Filters/TextInput'
 import ProjectsFilter from 'components/Filters/ProjectsFilter'
 import { FetchProjectsResponse, fetchProjects } from 'services/projects/api'
-import { deleteRequest, editRequest, fetchRequests } from 'services/requests/api'
+import { deleteRequest, editRequest } from 'services/requests/api'
 import services from 'services/aphp'
 import UsersFilter from 'components/Filters/UsersFilters'
-import { getProviders } from 'services/aphp/serviceProviders'
-import { Direction, Order } from 'types/searchCriterias'
+import { LabelObject } from 'types/searchCriterias'
 import { fetchUsers } from 'services/users/api'
+import CheckboxFilter from 'components/Filters/CheckboxFilter'
 
 enum Dialog {
   EDIT,
@@ -58,7 +55,6 @@ type RequestsTableProps = {
 }
 const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
   const { classes } = useStyles()
-  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
@@ -67,13 +63,7 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
   const [selectedRequest, setSelectedRequest] = useState<RequestType | null>(null)
   const [projects, setProjects] = useState<FetchProjectsResponse | null>(null)
   const [anchorEl, setAnchorEl] = React.useState(null)
-  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
-  const wrapperSetShareSuccessOrFailMessage = useCallback(
-    (val: SimpleStatus) => {
-      setShareSuccessOrFailMessage(val)
-    },
-    [setShareSuccessOrFailMessage]
-  )
+  const [shareStatus, setShareStatus] = useState<ResponseStatus>(ResponseStatus.IDDLE)
   const openMenuItem = Boolean(anchorEl)
 
   const _onClickRow = (row: any) => {
@@ -92,10 +82,22 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
     await onUpdate()
   }
 
-  const handleShare = async () => {}
+  const handleShare = async (name: string, users: LabelObject[], notifyByEmail: boolean) => {
+    const usersIds = users.map((user) => user.id)
+    const requestId = selectedRequest?.query_snapshots?.[0].uuid
+    if (requestId) {
+      const shareRequestResponse = await services.projects.shareRequest(requestId, name, usersIds, notifyByEmail)
+      if (shareRequestResponse?.status === 201) {
+        setShareStatus(ResponseStatus.SUCCESS)
+        await onUpdate()
+      } else {
+        setShareStatus(ResponseStatus.ERROR)
+      }
+    }
+  }
 
   const handleEdit = async ({ name, description, project: { projectName, newProjectName } }: any) => {
-    const copy = { ...selectedRequest }
+    const copy = { ...selectedRequest } as RequestType
     if (newProjectName && newProjectName.length > 2 && newProjectName.length < 55) {
       const newProject = await services.projects.addProject({ uuid: '', name: newProjectName })
       if (newProject) {
@@ -235,6 +237,18 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
                           onClick={(event) => {
                             event.stopPropagation()
                             setSelectedRequest(row)
+                            setOpenModal(Dialog.SHARE)
+                            setAnchorEl(null)
+                          }}
+                          disabled={maintenanceIsActive}
+                        >
+                          <ShareIcon /> Partager
+                        </MenuItem>
+                        <MenuItem
+                          className={classes.menuItem}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            setSelectedRequest(row)
                             setOpenModal(Dialog.EDIT)
                             setAnchorEl(null)
                           }}
@@ -297,35 +311,23 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
       <Modal
         open={openModal === Dialog.SHARE}
         title="Partager la requête"
-        onSubmit={handleShare}
-        width={'600px'}
+        onSubmit={({ name, users, sendMail }) => {
+          handleShare(name, users, sendMail)
+        }}
+        width={'700px'}
         onClose={() => setOpenModal(null)}
         validationText="Envoyer"
       >
-        <Grid item xs={12}>
-          <TextInput
-            value={selectedRequest?.name}
-            name="name"
-            label="Nom de la requête à partager :"
-            minLimit={2}
-            maxLimit={255}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <UsersFilter
-            onFetch={fetchUsers}
-            name="users"
-          />
-        </Grid>
-      </Modal>
-
-      {/*selectedRequest?.shared_query_snapshot !== undefined && selectedRequest?.shared_query_snapshot?.length > 0 && (
-        <ModalShareRequest
-          shareSuccessOrFailMessage={shareSuccessOrFailMessage}
-          parentStateSetter={wrapperSetShareSuccessOrFailMessage}
-          onClose={() => dispatch(setSelectedRequestShareState(null))}
+        <TextInput
+          value={selectedRequest?.name}
+          name="name"
+          label="Nom de la requête à partager :"
+          minLimit={2}
+          maxLimit={255}
         />
-      )*/}
+        <UsersFilter onFetch={fetchUsers} name="users" />
+        <CheckboxFilter name="sendMail" label="Envoyer un email au destinataire de la requête" />
+      </Modal>
 
       {selectedRequest?.query_snapshots?.length === 0 && (
         <Snackbar open autoHideDuration={5000} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
@@ -335,27 +337,17 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
         </Snackbar>
       )}
 
-      {shareSuccessOrFailMessage === 'success' && (
-        <Snackbar
-          open
-          onClose={() => setShareSuccessOrFailMessage(null)}
-          autoHideDuration={5000}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert severity="success" onClose={() => setShareSuccessOrFailMessage(null)}>
+      {shareStatus === ResponseStatus.SUCCESS && (
+        <Snackbar open autoHideDuration={5000} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+          <Alert severity="success" onClose={() => setShareStatus(ResponseStatus.IDDLE)}>
             Votre requête a été partagée.
           </Alert>
         </Snackbar>
       )}
 
-      {shareSuccessOrFailMessage === 'error' && (
-        <Snackbar
-          open
-          onClose={() => setShareSuccessOrFailMessage(null)}
-          autoHideDuration={5000}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert severity="error" onClose={() => setShareSuccessOrFailMessage(null)}>
+      {shareStatus === ResponseStatus.ERROR && (
+        <Snackbar open autoHideDuration={5000} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+          <Alert severity="error" onClose={() => setShareStatus(ResponseStatus.IDDLE)}>
             Une erreur est survenue, votre requête n'a pas pu être partagée.
           </Alert>
         </Snackbar>

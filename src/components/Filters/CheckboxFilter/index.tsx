@@ -3,13 +3,13 @@ import { InputWrapper } from 'components/ui/Inputs'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 
-type CheckboxProps = {
+type CheckboxFilterProps = {
   value?: boolean
   name: string
   label: string
 }
 
-const Checkbox = ({ name, value = false, label }: CheckboxProps) => {
+const CheckboxFilter = ({ name, value = false, label }: CheckboxFilterProps) => {
   const context = useContext(FormContext)
   const [isChecked, setIsChecked] = useState(value)
 
@@ -19,16 +19,16 @@ const Checkbox = ({ name, value = false, label }: CheckboxProps) => {
 
   return (
     <InputWrapper>
-      <Grid container alignItems="center">
-        <Grid item xs={11}>
-          <Typography variant="h3">{label}</Typography>
-        </Grid>
-        <Grid item xs={1} container justifyContent="flex-end">
-          <CheckboxMui checked={isChecked} onChange={() => setIsChecked(!isChecked)} />
-        </Grid>
+      <Grid container alignItems="center" sx={{ display: 'flex', flexWrap: 'nowrap' }}>
+        <CheckboxMui
+          checked={isChecked}
+          onChange={() => setIsChecked(!isChecked)}
+          sx={{ padding: '0px 10px 0px 0px' }}
+        />
+        <Typography variant="h3">{label}</Typography>
       </Grid>
     </InputWrapper>
   )
 }
 
-export default Checkbox
+export default CheckboxFilter

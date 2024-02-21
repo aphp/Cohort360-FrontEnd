@@ -37,14 +37,17 @@ const AsyncAutocomplete = ({
     let active = true
 
     ;(async () => {
-      setLoading(true)
-      if (!onFetch) return
-      controllerRef.current = cancelPendingRequest(controllerRef.current)
-      const response = (await onFetch(searchValue, controllerRef.current?.signal)) || []
-      if (active) {
-        setOptions(response)
-        setLoading(false)
+      if (searchValue) {
+        setLoading(true)
+        controllerRef.current = cancelPendingRequest(controllerRef.current)
+        const response = (await onFetch(searchValue, controllerRef.current?.signal)) || []
+        if (active) {
+          setOptions(response)
+        }
+      } else {
+        setOptions([])
       }
+      setLoading(false)
     })()
 
     return () => {

@@ -1,8 +1,8 @@
 import React, { PropsWithChildren, createContext, useState } from 'react'
 
-import { Button, Dialog, DialogActions, DialogTitle, Divider, Grid, Typography } from '@mui/material'
-import { DialogContentWrapper } from './styles'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, Typography } from '@mui/material'
 import { FormContextType } from 'types/form'
+import { DialogWrapper } from './styles'
 
 export const FormContext = createContext<FormContextType | null>(null)
 
@@ -49,10 +49,18 @@ const Modal = ({
       // Nothing to do if reaching here
     }
   }
+  console.log('width', width, title)
 
   return (
     <FormContext.Provider value={{ updateFormData, updateError }}>
-      <Dialog open={open} onClose={onClose}>
+      <Dialog
+        open={open}
+        onClose={onClose}
+        fullWidth
+        maxWidth={false}
+        transitionDuration={350}
+        PaperProps={{ sx: { width: width } }}
+      >
         {title && (
           <>
             <DialogTitle sx={{ padding: '25px 30px' }}>
@@ -67,9 +75,7 @@ const Modal = ({
             </Grid>
           </>
         )}
-        <DialogContentWrapper width={width} style={{ padding: '25px 30px' }}>
-          {children}
-        </DialogContentWrapper>
+        <DialogContent style={{ padding: '25px 30px' }}>{children}</DialogContent>
         {!noActions &&
           (!readonly ? (
             <DialogActions style={{ backgroundColor: '#00000011', padding: '10px 30px' }}>

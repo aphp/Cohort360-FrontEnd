@@ -118,7 +118,12 @@ export interface IServiceProjects {
    * Retourne:
    *  - Requete partagée
    */
-  shareRequest: (sharedRequest: RequestType, notify_by_email: boolean) => Promise<AxiosResponse<ProjectType>>
+  shareRequest: (
+    sharedRequest: string,
+    name: string,
+    usersIds: string[],
+    notify_by_email: boolean
+  ) => Promise<AxiosResponse<ProjectType>>
 
   /**
    * Cette fonction supprime un requete existant
@@ -332,20 +337,12 @@ const servicesProjects: IServiceProjects = {
       throw new Error('Impossible de modifier la requête')
     }
   },
-  shareRequest: async (sharedRequest, notify_by_email): Promise<AxiosResponse<ProjectType>> => {
-    const usersToShareId = sharedRequest.usersToShare?.map((userToshareId: User) => userToshareId.username)
-    const shared_query_snapshot_id = sharedRequest.shared_query_snapshot
-      ? sharedRequest.shared_query_snapshot
-      : sharedRequest.currentSnapshot?.uuid
-    const shared_query_snapshot_name = sharedRequest.name ? sharedRequest.name : sharedRequest.requestName
-    const shareRequestResponse = (await apiBack.post<ProjectType>(
-      `/cohort/request-query-snapshots/${shared_query_snapshot_id}/share/`,
-      {
-        name: shared_query_snapshot_name,
-        recipients: usersToShareId?.join(),
-        notify_by_email: notify_by_email
-      }
-    )) ?? { status: 400 }
+  shareRequest: async (requestId, name, usersIds, notify_by_email) => {
+    const shareRequestResponse = (await apiBack.post(`/cohort/request-query-snapshots/${requestId}/share/`, {
+      name: name,
+      recipients: usersIds.join(','),
+      notify_by_email: notify_by_email
+    })) ?? { status: 400 }
     if (shareRequestResponse.status === 201) {
       return shareRequestResponse.data, shareRequestResponse
     } else {

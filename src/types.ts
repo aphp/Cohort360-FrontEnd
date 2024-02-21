@@ -55,6 +55,12 @@ export enum LoadingStatus {
   SUCCESS = 'SUCCESS'
 }
 
+export enum ResponseStatus {
+  ERROR = 'ERROR',
+  IDDLE = 'IDLE',
+  SUCCESS = 'SUCCESS'
+}
+
 export enum CompositionStatusKind {
   _preliminary = 'preliminary',
   _final = 'final',

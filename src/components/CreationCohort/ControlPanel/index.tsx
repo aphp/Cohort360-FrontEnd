@@ -47,7 +47,7 @@ import services from 'services/aphp'
 import ValidationDialog from 'components/ui/ValidationDialog'
 import Modal from 'components/ui/Modal'
 import TextInput from 'components/Filters/TextInput'
-import Checkbox from 'components/Filters/Checkbox'
+import CheckboxFilter from 'components/Filters/CheckboxFilter'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -477,7 +477,7 @@ const ControlPanel: React.FC<{
       >
         <TextInput name="cohortName" label="Nom de la cohorte :" minLimit={2} maxLimit={250} />
         <TextInput name="cohortDescription" label="Description :" minRows={5} maxRows={8} description />
-        <Checkbox
+        <CheckboxFilter
           name="globalCount"
           label="Estimer le nombre de patients répondant à vos critères sur le périmètre de l'APHP"
         />

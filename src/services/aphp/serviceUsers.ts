@@ -2,7 +2,12 @@ import { Direction, OrderBy } from 'types/searchCriterias'
 import apiBack from '../apiBackend'
 import { Back_API_Response, User } from 'types'
 
-export const getUsers = async (orderBy: OrderBy, page?: number, searchInput?: string, signal?: AbortSignal) => {
+type UsersRequest = {
+  users: User[],
+  total: number
+}
+
+export const getUsers = async (orderBy: OrderBy, page?: number, searchInput?: string, signal?: AbortSignal): Promise<UsersRequest> => {
   const searchFilter = searchInput ? `&search=${searchInput}` : ''
 
   const usersResp = await apiBack.get<Back_API_Response<User>>(
