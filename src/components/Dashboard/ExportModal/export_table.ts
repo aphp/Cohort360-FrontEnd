@@ -79,18 +79,6 @@ const exportTable: ExportTableType[] = [
     label: 'drug_exposure_administration',
     resourceType: 'MedicationAdministration'
   },
-  // {
-  //   id: 'imaging_study',
-  //   table_name: 'Fait - Imagerie - Étude',
-  //   label: 'imaging_study',
-  //   resourceType: 'ImagingStudies'
-  // },
-  // {
-  //   id: 'imaging_series',
-  //   table_name: 'Fait - Imagerie - Série',
-  //   label: 'imaging_series',
-  //   resourceType: 'ImagingStudies'
-  // },
   {
     id: 'care_site',
     name: 'Référentiel - Structure hospitalière',
@@ -125,13 +113,13 @@ const exportTable: ExportTableType[] = [
     id: 'imaging_study',
     name: 'Fait - Imagerie - Étude',
     label: 'imaging_study',
-    resourceType: ''
+    resourceType: 'ImagingStudies'
   },
   {
     id: 'imaging_serie',
     name: 'Fait - Imagerie - Série',
     label: 'imaging_serie',
-    resourceType: ''
+    resourceType: 'ImagingStudies'
   }
 ]
 
