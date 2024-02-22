@@ -236,7 +236,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             <SearchbarWithCheck
               searchInput={studyProcedure}
               setSearchInput={setStudyProcedure}
-              placeholder="Rechercher dans les procédures"
+              placeholder="Rechercher dans les codes procédures"
               onError={(isError) => setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)}
             />
           </BlockWrapper>
