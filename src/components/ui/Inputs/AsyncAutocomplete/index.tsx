@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment, useRef, SyntheticEvent } from 'react'
+import React, { useEffect, useState, Fragment, useRef } from 'react'
 
 import { Autocomplete, CircularProgress, TextField } from '@mui/material'
 import { cancelPendingRequest } from 'utils/abortController'
