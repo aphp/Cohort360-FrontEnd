@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
-import { Button, Collapse, IconButton, TableRow, Typography, Tooltip } from '@mui/material'
+import { Button, Collapse, IconButton, TableRow, Typography, Tooltip, Grid } from '@mui/material'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
@@ -20,28 +20,27 @@ import useStyles from '../styles'
 
 type ProjectRowProps = {
   row: ProjectType
-  requestOfProject: RequestType[]
-  cohortsList: Cohort[]
+  //requestOfProject: RequestType[]
+  //cohortsList: Cohort[]
   searchInput?: string
-  selectedRequests: RequestType[]
-  onSelectedRow: (selectedRequests: RequestType[]) => void
+  //selectedRequests: RequestType[]
+  //onSelectedRow: (selectedRequests: RequestType[]) => void
 }
 const ProjectRow: React.FC<ProjectRowProps> = ({
   row,
-  requestOfProject,
-  cohortsList,
-  searchInput,
-  selectedRequests,
-  onSelectedRow
+  //requestOfProject,
+  //cohortsList,
+  searchInput
+  //selectedRequests,
+  //onSelectedRow
 }) => {
   const [open, setOpen] = React.useState(true)
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
-
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
   const handleClickAddOrEditProject = (selectedProjectId: string | null) => {
-    onSelectedRow([])
+    //onSelectedRow([])
     if (selectedProjectId) {
       dispatch(setSelectedProject(selectedProjectId))
     } else {
@@ -50,36 +49,44 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
   }
 
   const handleAddRequest = () => {
-    onSelectedRow([])
-    dispatch(setSelectedRequest({ uuid: '', name: '', parent_folder: row.uuid }))
+    /*onSelectedRow([])
+    dispatch(setSelectedRequest({ uuid: '', name: '', parent_folder: row.uuid }))*/
   }
 
   // eslint-disable-next-line
-  const regexp = new RegExp(`${(searchInput || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}`, 'gi')
+  /* const regexp = new RegExp(`${(searchInput || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}`, 'gi')*/
+
+  const date = new Date(row.modified_at || '').toLocaleString('fr-FR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  })
 
   return (
     <>
-      <TableRow>
-        <TableCellWrapper align="left" style={{ width: 62 }}>
+      <Grid container>
+        <TableCellWrapper style={{ width: '70px', textAlign: 'left' }}>
           <IconButton style={{ marginLeft: 4 }} aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCellWrapper>
-        <TableCellWrapper />
-        <TableCellWrapper align="left" className={classes.tdName}>
+        <TableCellWrapper style={{ width: '120px', textAlign: 'left' }}>
+          <Typography>{date}</Typography>
+        </TableCellWrapper>
+        <TableCellWrapper align="left">
           <Typography style={{ fontWeight: 900, display: 'inline-table' }}>{row.name}</Typography>
-          {requestOfProject && requestOfProject.length > 0 && (
-            <Tooltip title={'Ajouter une requête'}>
-              <IconButton
-                onClick={handleAddRequest}
-                className={classes.smallAddButton}
-                size="small"
-                disabled={maintenanceIsActive}
-              >
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          )}
+
+          <Tooltip title={'Ajouter une requête'}>
+            <IconButton
+              onClick={handleAddRequest}
+              className={classes.smallAddButton}
+              size="small"
+              disabled={maintenanceIsActive}
+            >
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
+
           <Tooltip title={'Modifier le projet'}>
             <IconButton
               onClick={() => handleClickAddOrEditProject(row.uuid)}
@@ -91,10 +98,9 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
             </IconButton>
           </Tooltip>
         </TableCellWrapper>
-        <TableCellWrapper className={classes.dateCell} />
-      </TableRow>
+      </Grid>
 
-      <TableRow>
+      {/*<TableRow>
         <TableCellWrapper align="left" style={{ padding: 0, borderBottomWidth: open ? 1 : 0 }} colSpan={4}>
           <Collapse in={open} timeout="auto" unmountOnExit style={{ width: '100%', minHeight: 'fit-content' }}>
             {requestOfProject && requestOfProject.length > 0 ? (
@@ -116,22 +122,11 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
             ) : (
               <Typography className={classes.emptyRequestRow}>
                 Aucune requête n'est associée à ce projet de recherche
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  size="small"
-                  onClick={handleAddRequest}
-                  className={classes.addButton}
-                  style={{ margin: 4 }}
-                  disabled={maintenanceIsActive}
-                >
-                  Ajouter une requête
-                </Button>
               </Typography>
             )}
           </Collapse>
         </TableCellWrapper>
-      </TableRow>
+            </TableRow>*/}
     </>
   )
 }

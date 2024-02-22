@@ -30,9 +30,14 @@ import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { setSelectedCohort, fetchCohorts as fetchCohortsList } from 'state/cohort'
 import { setSelectedProject, fetchProjects as fetchProjectsList } from 'state/project'
 import { fetchRequests as fetchRequestsList, setSelectedRequest, setSelectedRequestShare } from 'state/request'
-import { RequestType, SimpleStatus } from 'types'
+import { ProjectType, RequestType, SimpleStatus } from 'types'
 import Button from 'components/ui/Button'
 import ProjectTable from 'components/Requests/ProjectsTable'
+import { fetchProjects } from 'services/projects/api'
+import Modal from 'components/ui/Modal'
+import TextInput from 'components/Filters/TextInput'
+import servicesProjects from 'services/aphp/serviceProjects'
+import services from 'services/aphp'
 
 const MyRequests = () => {
   const { classes, cx } = useStyles()
@@ -40,6 +45,7 @@ const MyRequests = () => {
   const dispatch = useAppDispatch()
 
   const [searchInput, setSearchInput] = useState('')
+ 
   const [selectedRequests, setSelectedRequests] = useState<RequestType[]>([])
   const [openModal, setOpenModal] = useState<'move_to_folder' | 'delete_items' | null>(null)
   const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
@@ -59,19 +65,19 @@ const MyRequests = () => {
   const { selectedRequest, selectedRequestShare, requestsList } = requestState
   const { selectedCohort } = cohortState
 
-  const loading = projectState.loading || requestState.loading || cohortState.loading
+  //const loading = projectState.loading || requestState.loading || cohortState.loading
 
-  const _fetchProjectsList = async () => {
+  /*const _fetchProjectsList = async () => {
     dispatch(setSelectedProject(null))
     dispatch(fetchProjectsList())
-  }
+  }*/
 
-  const _fetchRequestsList = async () => {
+  /*const _fetchRequestsList = async () => {
     dispatch(setSelectedRequest(null))
     dispatch(fetchRequestsList())
-  }
+  }*/
 
-  const _fetchCohortsList = async () => {
+  /*const _fetchCohortsList = async () => {
     dispatch(
       fetchCohortsList({
         options: {
@@ -79,21 +85,21 @@ const MyRequests = () => {
         }
       })
     )
-  }
+  }*/
 
-  const _fetch = async () => {
+  /*const _fetch = async () => {
     await _fetchProjectsList()
     await _fetchRequestsList()
     await _fetchCohortsList()
-  }
+  }*/
 
-  useEffect(() => {
-    _fetch()
-  }, [])
-
-  const handleClickAddProject = () => {
-    dispatch(setSelectedProject(''))
-  }
+  /*useEffect(() => {
+    const fetch = async () => {
+      const { projectsList } = await fetchProjects()
+      setProjects(projectsList)
+    }
+    fetch()
+  }, [])*/
 
   return (
     <Grid
@@ -168,32 +174,12 @@ const MyRequests = () => {
                   </Grid>
                 )}
               </Grid>
-              <Grid item xs={6} container justifyContent="flex-end" alignItems="center">
+              <Grid item xs={5} container justifyContent="flex-end" alignItems="center">
                 <SearchInput
                   value={searchInput}
                   placeholder="Rechercher"
-                  width={'75%'}
                   onchange={(newValue) => setSearchInput(newValue)}
                 />
-
-                <Hidden only={['xs', 'sm', 'md']}>
-                  <Button
-                    icon={<AddIcon />}
-                    width="200px"
-                    onClick={() => handleClickAddProject()}
-                    disabled={maintenanceIsActive}
-                  >
-                    Ajouter un projet
-                  </Button>
-                </Hidden>
-
-                <Hidden only={['lg', 'xl']}>
-                  <Tooltip title={'Ajouter un projet'}>
-                    <IconButton onClick={() => handleClickAddProject()} disabled={maintenanceIsActive}>
-                      <AddIcon />
-                    </IconButton>
-                  </Tooltip>
-                </Hidden>
               </Grid>
             </Grid>
 
@@ -208,18 +194,19 @@ const MyRequests = () => {
 
             <Grid container>
               <ProjectTable
-                loading={loading}
+                //  projects={projects}
+                // loading={loading}
                 searchInput={searchInput}
-                selectedRequests={selectedRequests}
-                setSelectedRequests={setSelectedRequests}
+                // selectedRequests={selectedRequests}
+                // setSelectedRequests={setSelectedRequests}
               />
             </Grid>
 
-            <ModalAddOrEditProject
+            {/*} <ModalAddOrEditProject
               open={selectedProject !== null}
               onClose={() => dispatch(setSelectedProject(null))}
               selectedProject={selectedProject}
-            />
+                />*/}
 
             {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch(setSelectedRequest(null))} />}
 
@@ -297,6 +284,7 @@ const MyRequests = () => {
               }}
               selectedRequests={selectedRequests}
             />
+       
           </Grid>
         </Grid>
       </Grid>

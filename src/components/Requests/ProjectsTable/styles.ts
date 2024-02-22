@@ -10,16 +10,12 @@ const useStyles = makeStyles()((theme: Theme) => ({
       borderBottom: 'unset'
     }
   },
-  tableHead: {
-    height: '42px',
-    backgroundColor: '#D1E2F4',
-    textTransform: 'uppercase'
-  },
   tableHeadCell: {
     fontSize: '11px',
     fontWeight: 'bold',
     color: '#0063AF',
-    padding: '0 20px'
+    padding: '8px 20px',
+    backgroundColor: '#D1E2F4'
   },
   tdName: {
     '&:hover > button': {
@@ -27,7 +23,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   editButton: {
-    display: 'none',
+    //display: 'none',
     color: '#5BC5F2',
     marginLeft: theme.spacing(1),
     '& svg': {

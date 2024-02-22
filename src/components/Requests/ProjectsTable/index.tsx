@@ -11,215 +11,195 @@ import {
   Paper,
   Typography,
   CircularProgress,
-  Grid
+  Grid,
+  Hidden,
+  Tooltip,
+  IconButton
 } from '@mui/material'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import ProjectRow from './ProjectRow'
 
-import { ProjectType, RequestType } from 'types'
+import { LoadingStatus, ProjectType, RequestType } from 'types'
 
 import { useAppSelector } from 'state'
 
 import useStyles from './styles'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
-import { Direction, Order } from 'types/searchCriterias'
+import { Direction, Order, OrderBy } from 'types/searchCriterias'
+import { FetchProjectsResponse, fetchProjects as fetchProjectsApi } from 'services/projects/api'
+import Modal from 'components/ui/Modal'
+import TextInput from 'components/Filters/TextInput'
+import services from 'services/aphp'
+import Button from 'components/ui/Button'
+import AddIcon from '@mui/icons-material/Add'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 type ProjectTableProps = {
   searchInput?: string
-  selectedRequests: RequestType[]
-  loading: boolean
-  setSelectedRequests: (selectedRequests: RequestType[]) => void
+  // projects: ProjectType[]
+  //selectedRequests: RequestType[]
+  //loading: boolean
+  //setSelectedRequests: (selectedRequests: RequestType[]) => void
 }
 
-const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSelectedRequests, selectedRequests }) => {
+const ProjectTable = ({
+  searchInput /*, loading, projects, setSelectedRequests, selectedRequests*/
+}: ProjectTableProps) => {
   const { classes } = useStyles()
 
-  const projectsList = useAppSelector((state) => state.project.projectsList)
+  const [results, setResults] = useState<FetchProjectsResponse | null>(null)
+
+  /*const projectsList = useAppSelector((state) => state.project.projectsList)
   const requestsList = useAppSelector((state) => state.request.requestsList)
-  const cohortsList = useAppSelector((state) => state.cohort.cohortsList)
+  const cohortsList = useAppSelector((state) => state.cohort.cohortsList)*/
 
-  const [sortBy, setSortBy] = useState<'name' | 'modified_at'>('name')
-  const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('asc')
+  const [orderBy, setOrderBy] = useState<OrderBy>({ orderBy: Order.NAME, orderDirection: Direction.ASC })
 
-  const [searchProjectList, setSearchProjectList] = useState(projectsList || [])
+  /*const [searchProjectList, setSearchProjectList] = useState(projectsList || [])
   const [currentRequestList, setSearchRequestList] = useState(requestsList || [])
-  const [searchCohortList, setSearchCohortList] = useState(cohortsList || [])
+  const [searchCohortList, setSearchCohortList] = useState(cohortsList || [])*/
+  const [toggleAddProjectModal, setToggleAddProjectModal] = useState(false)
+  const [loadingStatus, setLoadingStatus] = useState<LoadingStatus>(LoadingStatus.IDDLE)
 
-  useEffect(() => {
-    // eslint-disable-next-line
-    const regexp = new RegExp(`${(searchInput || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}`, 'gi')
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
-    const newSearchCohortList = !searchInput
-      ? cohortsList
-      : cohortsList.filter(({ name }) => name?.search(regexp) !== -1)
-
-    const newSearchRequestList = !searchInput
-      ? requestsList
-      : requestsList.filter(
-          ({ name, uuid }) =>
-            name.search(regexp) !== -1 || !!newSearchCohortList.find(({ request }) => request === uuid)
-        )
-
-    const newSearchProjectList = !searchInput
-      ? projectsList
-      : projectsList.filter(
-          ({ name, uuid }) =>
-            name.search(regexp) !== -1 || !!newSearchRequestList.find(({ parent_folder }) => parent_folder === uuid)
-        )
-
-    setSearchCohortList(newSearchCohortList && newSearchCohortList.length > 0 ? newSearchCohortList : [])
-    setSearchRequestList(newSearchRequestList && newSearchRequestList.length > 0 ? newSearchRequestList : [])
-    setSearchProjectList(newSearchProjectList && newSearchProjectList.length > 0 ? newSearchProjectList : [])
-
-    return () => {
-      setSearchProjectList([])
-      setSearchRequestList([])
-      setSearchCohortList([])
-    }
-  }, [searchInput, projectsList, requestsList, cohortsList])
-
-  useEffect(() => {
-    let newSearchProjectList = projectsList ? [...projectsList] : []
-    let newSearchRequestList = requestsList ? [...requestsList] : []
-
-    switch (sortBy) {
-      case 'name': {
-        newSearchRequestList = newSearchRequestList.sort((a: RequestType, b: RequestType) => {
-          if (a.name > b.name) {
-            return sortDirection === 'asc' ? 1 : -1
-          } else {
-            return sortDirection === 'asc' ? -1 : 1
-          }
-        })
-
-        newSearchProjectList = newSearchProjectList.sort((a: ProjectType, b: ProjectType) => {
-          if (a.name > b.name) {
-            return sortDirection === 'asc' ? 1 : -1
-          } else {
-            return sortDirection === 'asc' ? -1 : 1
-          }
-        })
-        break
-      }
-
-      case 'modified_at': {
-        newSearchRequestList = newSearchRequestList.sort((a: RequestType, b: RequestType) => {
-          if (a.modified_at && b.modified_at && a.modified_at > b.modified_at) {
-            return sortDirection === 'asc' ? 1 : -1
-          } else {
-            return sortDirection === 'asc' ? -1 : 1
-          }
-        })
-
-        newSearchProjectList = newSearchProjectList.sort((a: ProjectType, b: ProjectType) => {
-          if (a.modified_at && b.modified_at && a.modified_at > b.modified_at) {
-            return sortDirection === 'asc' ? 1 : -1
-          } else {
-            return sortDirection === 'asc' ? -1 : 1
-          }
-        })
-        break
-      }
-      default:
-        break
-    }
-
-    setSearchProjectList(newSearchProjectList)
-    setSearchRequestList(newSearchRequestList)
-
-    return () => {
-      setSearchProjectList([])
-      setSearchRequestList([])
-    }
-  }, [sortBy, sortDirection, projectsList, requestsList, cohortsList])
-
-  const handleRequestSort = (property: 'name' | 'modified_at') => {
-    const isAsc = sortBy === property && sortDirection === 'desc'
-    setSortDirection(isAsc ? 'asc' : 'desc')
-    setSortBy(property)
+  const handleClickAddProject = async (name: string) => {
+    await services.projects.addProject({ uuid: '', name })
   }
 
-  const _onSelectedRow = (_selectedRequests: RequestType[]) => {
-    setSelectedRequests(_selectedRequests)
+  const fetchProjects = async (next?: string) => {
+    setLoadingStatus(LoadingStatus.FETCHING)
+    const results = await fetchProjectsApi(orderBy, 5, 0, searchInput, next)
+    setResults(results)
+    setLoadingStatus(LoadingStatus.SUCCESS)
   }
 
-  const allRequestsSelected = selectedRequests.length === currentRequestList.length
+  useEffect(() => {
+    if (loadingStatus === LoadingStatus.IDDLE) fetchProjects()
+  }, [loadingStatus])
+
+  useEffect(() => {
+    setLoadingStatus(LoadingStatus.IDDLE)
+  }, [searchInput, orderBy])
+
+  console.log('info scroll', results)
 
   return (
     <>
-      {loading && (
+      {loadingStatus === LoadingStatus.FETCHING && (
         <Grid container justifyContent="center">
           <CircularProgress />
         </Grid>
       )}
-      {!loading && (
+      {loadingStatus === LoadingStatus.SUCCESS && (
         <TableContainer component={Paper} className={classes.grid}>
           <Table aria-label="projects table" id="projects_table" className={classes.table}>
             <TableHead>
-              <TableRow className={classes.tableHead}>
-                <TableCellWrapper className={classes.tableHeadCell} style={{ width: 62, padding: '0 16px' }}>
-                  <Checkbox
-                    size="small"
-                    checked={allRequestsSelected}
-                    indeterminate={allRequestsSelected ? false : selectedRequests.length !== 0}
-                    indeterminateIcon={<IndeterminateCheckBoxOutlined />}
-                    onChange={() => {
-                      const _selectedRequests = currentRequestList
-                      if (selectedRequests.length === 0) {
-                        setSelectedRequests(_selectedRequests)
-                      } else {
-                        setSelectedRequests([])
-                      }
-                    }}
-                    color="secondary"
-                  />
-                </TableCellWrapper>
-                <TableCellWrapper className={classes.tableHeadCell} style={{ width: 62 }} />
-                <TableCellWrapper className={classes.tableHeadCell} style={{ width: 'calc(100% - 300px' }}>
+              <TableRow>
+                <TableCellWrapper className={classes.tableHeadCell} style={{ width: '70px', textAlign: 'left' }} />
+                <TableCellWrapper className={classes.tableHeadCell} style={{ width: '120px', textAlign: 'left' }}>
                   <TableSortLabel
-                    active={sortBy === Order.NAME}
-                    direction={sortDirection || Direction.ASC}
-                    onClick={() => handleRequestSort(Order.NAME)}
-                  >
-                    Titre
-                  </TableSortLabel>
-                </TableCellWrapper>
-                <TableCellWrapper className={classes.tableHeadCell} style={{ width: 175 }}>
-                  <TableSortLabel
-                    active={sortBy === Order.MODIFIED}
-                    direction={sortDirection || Direction.ASC}
-                    onClick={() => handleRequestSort(Order.MODIFIED)}
+                    active={orderBy.orderBy === Order.MODIFIED}
+                    direction={orderBy.orderDirection}
+                    onClick={() =>
+                      setOrderBy({
+                        orderBy: Order.MODIFIED,
+                        orderDirection: orderBy.orderDirection === Direction.ASC ? Direction.DESC : Direction.ASC
+                      })
+                    }
                   >
                     Date
                   </TableSortLabel>
                 </TableCellWrapper>
+                <TableCellWrapper className={classes.tableHeadCell} style={{ width: '50%', textAlign: 'left' }}>
+                  <TableSortLabel
+                    active={orderBy.orderBy === Order.NAME}
+                    direction={orderBy.orderDirection}
+                    onClick={() =>
+                      setOrderBy({
+                        orderBy: Order.NAME,
+                        orderDirection: orderBy.orderDirection === Direction.ASC ? Direction.DESC : Direction.ASC
+                      })
+                    }
+                  >
+                    Titre
+                  </TableSortLabel>
+                </TableCellWrapper>
+
+                <TableCellWrapper className={classes.tableHeadCell} style={{ textAlign: 'right' }}>
+                  <Hidden only={['xs', 'sm', 'md']}>
+                    <Button
+                      icon={<AddIcon />}
+                      width="200px"
+                      onClick={() => setToggleAddProjectModal(true)}
+                      disabled={maintenanceIsActive}
+                    >
+                      Ajouter un projet
+                    </Button>
+                  </Hidden>
+                  <Hidden only={['lg', 'xl']}>
+                    <Tooltip title={'Ajouter un projet'}>
+                      <IconButton onClick={() => setToggleAddProjectModal(true)} disabled={maintenanceIsActive}>
+                        <AddIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Hidden>
+                </TableCellWrapper>
               </TableRow>
             </TableHead>
-
-            <TableBody>
-              {searchProjectList.length === 0 && (
-                <TableRow>
-                  <TableCellWrapper style={{ textAlign: 'center', height: '40vh' }} colSpan={4}>
-                    <Typography>Aucun projet de recherche {!!searchInput && 'trouvé'}</Typography>
-                  </TableCellWrapper>
-                </TableRow>
-              )}
-              {searchProjectList.map((project: ProjectType) => (
-                <ProjectRow
-                  key={project.uuid}
-                  row={project}
-                  searchInput={searchInput}
-                  requestOfProject={currentRequestList.filter(({ parent_folder }) => parent_folder === project.uuid)}
-                  cohortsList={searchCohortList && searchCohortList.length > 0 ? searchCohortList : cohortsList}
-                  selectedRequests={selectedRequests}
-                  onSelectedRow={_onSelectedRow}
-                />
-              ))}
-            </TableBody>
           </Table>
+          {loadingStatus === LoadingStatus.SUCCESS && results?.results.length === 0 && (
+            <TableRow>
+              <TableCellWrapper style={{ textAlign: 'center', height: '40vh' }} colSpan={4}>
+                <Typography>Aucun projet de recherche {!!searchInput && 'trouvé'}</Typography>
+              </TableCellWrapper>
+            </TableRow>
+          )}
+          {loadingStatus === LoadingStatus.SUCCESS && (
+            <Grid container id="scrollableDiv" style={{ overflow: 'auto', height: '200px', width: '100%' }}>
+              <InfiniteScroll
+                scrollableTarget="scrollableDiv"
+                dataLength={results?.results?.length || 0}
+                next={() => setLoadingStatus(LoadingStatus.IDDLE)}
+                hasMore={/*(results?.results?.length || 0) < (results?.count || 0)*/ true}
+                scrollThreshold={0.9}
+                loader={
+                  <Grid container justifyContent="center">
+                    <Typography fontWeight={500}>Loading...</Typography>
+                  </Grid>
+                }
+              >
+                {results?.results.map((project: ProjectType) => (
+                  <Grid container>
+                    <ProjectRow
+                      key={project.uuid}
+                      row={project}
+                      searchInput={searchInput}
+                      //requestOfProject={currentRequestList.filter(({ parent_folder }) => parent_folder === project.uuid)}
+                      //cohortsList={searchCohortList && searchCohortList.length > 0 ? searchCohortList : cohortsList}
+                      // selectedRequests={selectedRequests}
+                      // onSelectedRow={_onSelectedRow}
+                    />
+                  </Grid>
+                ))}
+              </InfiniteScroll>
+            </Grid>
+          )}
         </TableContainer>
       )}
+
+      <Modal
+        title="Créer un projet de recherche"
+        color="secondary"
+        open={toggleAddProjectModal}
+        onClose={() => {
+          setToggleAddProjectModal(false)
+        }}
+        onSubmit={({ projectName }) => handleClickAddProject(projectName)}
+      >
+        <TextInput name="projectName" label="Nom du projet" minLimit={2} maxLimit={255} />
+      </Modal>
     </>
   )
 }

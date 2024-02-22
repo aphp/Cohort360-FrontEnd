@@ -38,7 +38,7 @@ import { FetchProjectsResponse, fetchProjects } from 'services/projects/api'
 import { deleteRequest, editRequest } from 'services/requests/api'
 import services from 'services/aphp'
 import UsersFilter from 'components/Filters/UsersFilters'
-import { LabelObject } from 'types/searchCriterias'
+import { Direction, LabelObject, Order } from 'types/searchCriterias'
 import { fetchUsers } from 'services/users/api'
 import CheckboxFilter from 'components/Filters/CheckboxFilter'
 
@@ -72,7 +72,7 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
   }
 
   const handleFetchProjects = async () => {
-    const response = await fetchProjects(100, 0)
+    const response = await fetchProjects({ orderBy: Order.NAME, orderDirection: Direction.ASC }, 100)
     setProjects(response)
   }
 
@@ -296,7 +296,7 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
         validationText="Modifier"
       >
         <TextInput value={selectedRequest?.name} name="name" label="Nom de la requête :" minLimit={2} maxLimit={255} />
-        <ProjectsFilter name="project" projects={projects?.projectsList || []} value={selectedRequest?.parent_folder} />
+        <ProjectsFilter name="project" projects={projects?.results || []} value={selectedRequest?.parent_folder} />
         <TextInput
           value={selectedRequest?.description}
           name="description"

@@ -7,6 +7,8 @@ import servicesCohorts from './serviceCohorts'
 import { CohortsFilters, Direction, OrderBy } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
 
+const paramsReducer = (accumulator: string, currentValue: string): string =>
+  accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
 export interface IServiceProjects {
   /**
    * Retourne la liste de projet de recherche d'un practitioner
@@ -22,8 +24,11 @@ export interface IServiceProjects {
    *   - results: Liste de projet de recherche récupéré
    */
   fetchProjectsList: (
+    orderBy: OrderBy,
     limit?: number,
-    offset?: number
+    offset?: number,
+    text?: string,
+    next?: string
   ) => Promise<{
     count: number
     next: string | null
@@ -224,21 +229,25 @@ export interface IServiceProjects {
 }
 
 const servicesProjects: IServiceProjects = {
-  fetchProjectsList: async (limit, offset) => {
-    let search = `?ordering=created_at`
-    if (limit) {
-      search += `&limit=${limit}`
-    }
-    if (offset) {
-      search += `&offset=${offset}`
-    }
+  fetchProjectsList: async (orderBy, limit, offset, text, next) => {
+    const urlParams = next ? new URLSearchParams(next) : null
+    let options: string[] = []
+    options = [
+      ...options,
+      `ordering=${
+        urlParams?.get('ordering') || `${orderBy.orderDirection === Direction.DESC ? '-' : ''}${orderBy.orderBy}`
+      }`
+    ]
+    options = [...options, `limit=${urlParams?.get('limit') || limit}`]
+    options = [...options, `offset=${urlParams?.get('offset') || offset}`]
+    options = [...options, text || next ? `search=${urlParams?.get('search') || text}` : '']
 
     const fetchProjectsResponse = (await apiBack.get<{
       count: number
       next: string | null
       previous: string | null
       results: ProjectType[]
-    }>(`/cohort/folders/${search}`)) ?? { status: 400 }
+    }>(`/cohort/folders/?${options.reduce(paramsReducer)}`)) ?? { status: 400 }
 
     if (fetchProjectsResponse.status === 200) {
       const { data } = fetchProjectsResponse
@@ -254,7 +263,6 @@ const servicesProjects: IServiceProjects = {
   },
   addProject: async (newProject) => {
     const addProjectResponse = (await apiBack.post(`/cohort/folders/`, newProject)) ?? { status: 400 }
-
     if (addProjectResponse.status === 201) {
       return addProjectResponse.data as ProjectType
     } else {
