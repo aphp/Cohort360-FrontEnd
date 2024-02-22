@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 
 import {
-  Checkbox,
   Table,
-  TableBody,
   TableContainer,
   TableHead,
   TableRow,
@@ -17,15 +15,15 @@ import {
   IconButton
 } from '@mui/material'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
+import { v4 as uuidv4 } from 'uuid'
 
 import ProjectRow from './ProjectRow'
 
-import { LoadingStatus, ProjectType, RequestType } from 'types'
+import { LoadingStatus, ProjectType } from 'types'
 
 import { useAppSelector } from 'state'
 
 import useStyles from './styles'
-import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 import { Direction, Order, OrderBy } from 'types/searchCriterias'
 import { FetchProjectsResponse, fetchProjects as fetchProjectsApi } from 'services/projects/api'
 import Modal from 'components/ui/Modal'
@@ -37,41 +35,34 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 
 type ProjectTableProps = {
   searchInput?: string
-  // projects: ProjectType[]
-  //selectedRequests: RequestType[]
-  //loading: boolean
-  //setSelectedRequests: (selectedRequests: RequestType[]) => void
 }
 
-const ProjectTable = ({
-  searchInput /*, loading, projects, setSelectedRequests, selectedRequests*/
-}: ProjectTableProps) => {
+const ProjectTable = ({ searchInput }: ProjectTableProps) => {
   const { classes } = useStyles()
 
   const [results, setResults] = useState<FetchProjectsResponse | null>(null)
-
-  /*const projectsList = useAppSelector((state) => state.project.projectsList)
-  const requestsList = useAppSelector((state) => state.request.requestsList)
-  const cohortsList = useAppSelector((state) => state.cohort.cohortsList)*/
-
   const [orderBy, setOrderBy] = useState<OrderBy>({ orderBy: Order.NAME, orderDirection: Direction.ASC })
-
-  /*const [searchProjectList, setSearchProjectList] = useState(projectsList || [])
-  const [currentRequestList, setSearchRequestList] = useState(requestsList || [])
-  const [searchCohortList, setSearchCohortList] = useState(cohortsList || [])*/
   const [toggleAddProjectModal, setToggleAddProjectModal] = useState(false)
   const [loadingStatus, setLoadingStatus] = useState<LoadingStatus>(LoadingStatus.IDDLE)
-
+  const scrollUuid = useRef(uuidv4())
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
   const handleClickAddProject = async (name: string) => {
     await services.projects.addProject({ uuid: '', name })
+    setLoadingStatus(LoadingStatus.IDDLE)
   }
 
   const fetchProjects = async (next?: string) => {
     setLoadingStatus(LoadingStatus.FETCHING)
-    const results = await fetchProjectsApi(orderBy, 5, 0, searchInput, next)
-    setResults(results)
+    const response = await fetchProjectsApi({ orderBy, limit: 7, text: searchInput, next })
+    if (next) {
+      setResults({
+        ...response,
+        results: [...(results?.results || []), ...response.results]
+      })
+    } else {
+      setResults(response)
+    }
     setLoadingStatus(LoadingStatus.SUCCESS)
   }
 
@@ -83,119 +74,119 @@ const ProjectTable = ({
     setLoadingStatus(LoadingStatus.IDDLE)
   }, [searchInput, orderBy])
 
-  console.log('info scroll', results)
-
   return (
     <>
-      {loadingStatus === LoadingStatus.FETCHING && (
-        <Grid container justifyContent="center">
-          <CircularProgress />
-        </Grid>
-      )}
-      {loadingStatus === LoadingStatus.SUCCESS && (
-        <TableContainer component={Paper} className={classes.grid}>
-          <Table aria-label="projects table" id="projects_table" className={classes.table}>
-            <TableHead>
-              <TableRow>
-                <TableCellWrapper className={classes.tableHeadCell} style={{ width: '70px', textAlign: 'left' }} />
-                <TableCellWrapper className={classes.tableHeadCell} style={{ width: '120px', textAlign: 'left' }}>
-                  <TableSortLabel
-                    active={orderBy.orderBy === Order.MODIFIED}
-                    direction={orderBy.orderDirection}
-                    onClick={() =>
-                      setOrderBy({
-                        orderBy: Order.MODIFIED,
-                        orderDirection: orderBy.orderDirection === Direction.ASC ? Direction.DESC : Direction.ASC
-                      })
-                    }
-                  >
-                    Date
-                  </TableSortLabel>
-                </TableCellWrapper>
-                <TableCellWrapper className={classes.tableHeadCell} style={{ width: '50%', textAlign: 'left' }}>
-                  <TableSortLabel
-                    active={orderBy.orderBy === Order.NAME}
-                    direction={orderBy.orderDirection}
-                    onClick={() =>
-                      setOrderBy({
-                        orderBy: Order.NAME,
-                        orderDirection: orderBy.orderDirection === Direction.ASC ? Direction.DESC : Direction.ASC
-                      })
-                    }
-                  >
-                    Titre
-                  </TableSortLabel>
-                </TableCellWrapper>
-
-                <TableCellWrapper className={classes.tableHeadCell} style={{ textAlign: 'right' }}>
-                  <Hidden only={['xs', 'sm', 'md']}>
-                    <Button
-                      icon={<AddIcon />}
-                      width="200px"
-                      onClick={() => setToggleAddProjectModal(true)}
-                      disabled={maintenanceIsActive}
-                    >
-                      Ajouter un projet
-                    </Button>
-                  </Hidden>
-                  <Hidden only={['lg', 'xl']}>
-                    <Tooltip title={'Ajouter un projet'}>
-                      <IconButton onClick={() => setToggleAddProjectModal(true)} disabled={maintenanceIsActive}>
-                        <AddIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Hidden>
-                </TableCellWrapper>
-              </TableRow>
-            </TableHead>
-          </Table>
-          {loadingStatus === LoadingStatus.SUCCESS && results?.results.length === 0 && (
+      <TableContainer component={Paper} className={classes.grid}>
+        <Table aria-label="projects table" id="projects_table" className={classes.table}>
+          <TableHead>
             <TableRow>
-              <TableCellWrapper style={{ textAlign: 'center', height: '40vh' }} colSpan={4}>
-                <Typography>Aucun projet de recherche {!!searchInput && 'trouvé'}</Typography>
+              <TableCellWrapper className={classes.tableHeadCell} style={{ width: '70px', textAlign: 'left' }} />
+              <TableCellWrapper className={classes.tableHeadCell} style={{ width: '70px', textAlign: 'left' }} />
+              <TableCellWrapper className={classes.tableHeadCell} style={{ width: '120px', textAlign: 'left' }}>
+                <TableSortLabel
+                  active={orderBy.orderBy === Order.MODIFIED}
+                  direction={orderBy.orderDirection}
+                  onClick={() =>
+                    setOrderBy({
+                      orderBy: Order.MODIFIED,
+                      orderDirection: orderBy.orderDirection === Direction.ASC ? Direction.DESC : Direction.ASC
+                    })
+                  }
+                >
+                  Date
+                </TableSortLabel>
+              </TableCellWrapper>
+              <TableCellWrapper className={classes.tableHeadCell} style={{ width: '50%', textAlign: 'left' }}>
+                <TableSortLabel
+                  active={orderBy.orderBy === Order.NAME}
+                  direction={orderBy.orderDirection}
+                  onClick={() =>
+                    setOrderBy({
+                      orderBy: Order.NAME,
+                      orderDirection: orderBy.orderDirection === Direction.ASC ? Direction.DESC : Direction.ASC
+                    })
+                  }
+                >
+                  Titre
+                </TableSortLabel>
+              </TableCellWrapper>
+
+              <TableCellWrapper className={classes.tableHeadCell} style={{ textAlign: 'right' }}>
+                <Hidden only={['xs', 'sm', 'md']}>
+                  <Button
+                    icon={<AddIcon />}
+                    color="info"
+                    width="200px"
+                    onClick={() => setToggleAddProjectModal(true)}
+                    disabled={maintenanceIsActive}
+                  >
+                    Ajouter un projet
+                  </Button>
+                </Hidden>
+                <Hidden only={['lg', 'xl']}>
+                  <Tooltip title={'Ajouter un projet'}>
+                    <IconButton onClick={() => setToggleAddProjectModal(true)} disabled={maintenanceIsActive}>
+                      <AddIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Hidden>
               </TableCellWrapper>
             </TableRow>
-          )}
-          {loadingStatus === LoadingStatus.SUCCESS && (
-            <Grid
-              container
-              id="scrollableDiv"
-              className={classes.scrollableDiv}
-              item
-              xs={12}
-              style={{ overflow: 'auto', height: '200px', width: '100% !important' }}
-            >
-              <InfiniteScroll
-                scrollableTarget="scrollableDiv"
-                style={{ width: '100% !important' }}
-                dataLength={results?.results?.length || 0}
-                next={() => setLoadingStatus(LoadingStatus.IDDLE)}
-                hasMore={/*(results?.results?.length || 0) < (results?.count || 0)*/ true}
-                scrollThreshold={0.9}
-                loader={
-                  <Grid container justifyContent="center">
-                    <Typography fontWeight={500}>Loading...</Typography>
-                  </Grid>
-                }
-              >
-                {results?.results.map((project: ProjectType) => (
-                  <Grid item xs={12}>
-                    <ProjectRow
-                      key={project.uuid}
-                      row={project}
-                      searchInput={searchInput}
-                      //requestOfProject={currentRequestList.filter(({ parent_folder }) => parent_folder === project.uuid)}
-                      //cohortsList={searchCohortList && searchCohortList.length > 0 ? searchCohortList : cohortsList}
-                      // selectedRequests={selectedRequests}
-                      // onSelectedRow={_onSelectedRow}
-                    />
-                  </Grid>
-                ))}
-              </InfiniteScroll>
+          </TableHead>
+        </Table>
+
+        {loadingStatus === LoadingStatus.SUCCESS && results?.count === 0 && (
+          <Grid container justifyContent="center" alignItems="center" height={300}>
+            <Grid item xs={3}>
+              <Typography>Aucun projet de recherche trouvé</Typography>
+            </Grid>
+          </Grid>
+        )}
+
+        <Grid
+          container
+          id={scrollUuid.current}
+          className={classes.scrollableDiv}
+          item
+          xs={12}
+          style={{
+            overflow: 'auto',
+            minHeight: results?.results?.length! * 60,
+            maxHeight: 700,
+            height:
+              (results?.results?.length || 0) < (results?.count || 0)
+                ? (results?.results.length || 0) * 60 - 1
+                : (results?.results.length || 0) * 60
+          }}
+        >
+          {loadingStatus === LoadingStatus.FETCHING && (
+            <Grid container justifyContent="center">
+              <CircularProgress />
             </Grid>
           )}
-        </TableContainer>
-      )}
+          {loadingStatus === LoadingStatus.SUCCESS && results?.count! > 0 && (
+            <InfiniteScroll
+              scrollableTarget={scrollUuid.current}
+              dataLength={results?.results?.length || 0}
+              next={() => fetchProjects(results?.next!)}
+              hasMore={(results?.results?.length || 0) < (results?.count || 0)}
+              scrollThreshold={0.9}
+              loader={<Fragment />}
+            >
+              {results?.results.map((project: ProjectType, index) => (
+                <Grid container item xs={12} alignItems="center" key={project.uuid}>
+                  <ProjectRow
+                    row={project}
+                    fetchRequests={index > 0}
+                    searchInput={searchInput}
+                    onUpdate={() => setLoadingStatus(LoadingStatus.IDDLE)}
+                  />
+                </Grid>
+              ))}
+            </InfiniteScroll>
+          )}
+        </Grid>
+      </TableContainer>
 
       <Modal
         title="Créer un projet de recherche"

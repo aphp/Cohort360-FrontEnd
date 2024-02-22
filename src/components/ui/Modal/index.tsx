@@ -49,8 +49,6 @@ const Modal = ({
       // Nothing to do if reaching here
     }
   }
-  console.log('width', width, title)
-
   return (
     <FormContext.Provider value={{ updateFormData, updateError }}>
       <Dialog

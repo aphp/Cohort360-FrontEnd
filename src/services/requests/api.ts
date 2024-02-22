@@ -1,26 +1,50 @@
 import { RequestType } from 'types'
 import services from '../aphp'
+import { OrderBy } from 'types/searchCriterias'
 
 export type FetchRequestsResponse = {
   count: number
-  selectedRequest?: null
-  requestsList: RequestType[]
+  results: RequestType[]
 }
 
-export const fetchRequests = async (limit: number = 5, offset: number = 0): Promise<FetchRequestsResponse> => {
+export type FetchRequestsOptions = {
+  orderBy?: OrderBy
+  limit: number
+  text?: string
+  next?: string
+}
+
+export const fetchRequests = async (options: FetchRequestsOptions): Promise<FetchRequestsResponse> => {
   try {
-    const requests = (await services.projects.fetchRequestsList(limit, offset)) || []
+    const requests = (await services.projects.fetchRequestsList(options)) || []
     return {
       count: requests.count,
-      selectedRequest: null,
-      requestsList: requests.results
+      results: requests.results
     }
   } catch (error) {
     console.error(error)
     return {
       count: 0,
-      selectedRequest: null,
-      requestsList: []
+      results: []
+    }
+  }
+}
+
+export const fetchRequestsFromProject = async (
+  projectId: string,
+  options: FetchRequestsOptions
+): Promise<FetchRequestsResponse> => {
+  try {
+    const requests = (await services.projects.fetchRequestsFromProject(projectId, options)) || []
+    return {
+      count: requests.count,
+      results: requests.results
+    }
+  } catch (error) {
+    console.error(error)
+    return {
+      count: 0,
+      results: []
     }
   }
 }

@@ -6,6 +6,8 @@ import { ProjectType, RequestType, Cohort, User } from 'types'
 import servicesCohorts from './serviceCohorts'
 import { CohortsFilters, Direction, OrderBy } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
+import { FetchRequestsOptions } from 'services/requests/api'
+import { FetchProjectsOptions } from 'services/projects/api'
 
 const paramsReducer = (accumulator: string, currentValue: string): string =>
   accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
@@ -23,13 +25,7 @@ export interface IServiceProjects {
    *   - previous: URL d'appel pour récupérer les projet de recherche précédent
    *   - results: Liste de projet de recherche récupéré
    */
-  fetchProjectsList: (
-    orderBy: OrderBy,
-    limit?: number,
-    offset?: number,
-    text?: string,
-    next?: string
-  ) => Promise<{
+  fetchProjectsList: (options: FetchProjectsOptions) => Promise<{
     count: number
     next: string | null
     previous: string | null
@@ -82,9 +78,28 @@ export interface IServiceProjects {
    *   - previous: URL d'appel pour récupérer les requete précédent
    *   - results: Liste de requete récupéré
    */
-  fetchRequestsList: (
-    limit?: number,
-    offset?: number
+  fetchRequestsList: (options: FetchRequestsOptions) => Promise<{
+    count: number
+    next: string | null
+    previous: string | null
+    results: RequestType[]
+  }>
+  /**
+   * Retourne la liste de requete d'un projet spécifique d'un practitioner
+   *
+   * Argument:
+   *   - limit: Determine une limite de requete demandé
+   *   - offset: Determine un index de départ
+   *
+   * Retourne:
+   *   - count: Nombre total de requete
+   *   - next: URL d'appel pour récupérer les requete suivant
+   *   - previous: URL d'appel pour récupérer les requete précédent
+   *   - results: Liste de requete récupéré
+   */
+  fetchRequestsFromProject: (
+    projectId: string,
+    options: FetchRequestsOptions
   ) => Promise<{
     count: number
     next: string | null
@@ -229,25 +244,28 @@ export interface IServiceProjects {
 }
 
 const servicesProjects: IServiceProjects = {
-  fetchProjectsList: async (orderBy, limit, offset, text, next) => {
-    const urlParams = next ? new URLSearchParams(next) : null
-    let options: string[] = []
-    options = [
-      ...options,
+  fetchProjectsList: async (options) => {
+    const urlParams = options.next ? new URLSearchParams(options.next) : null
+    let paramOptions: string[] = []
+    paramOptions = [
+      ...paramOptions,
       `ordering=${
-        urlParams?.get('ordering') || `${orderBy.orderDirection === Direction.DESC ? '-' : ''}${orderBy.orderBy}`
+        urlParams?.get('ordering') ||
+        `${options.orderBy.orderDirection === Direction.DESC ? '-' : ''}${options.orderBy.orderBy}`
       }`
     ]
-    options = [...options, `limit=${urlParams?.get('limit') || limit}`]
-    options = [...options, `offset=${urlParams?.get('offset') || offset}`]
-    options = [...options, text || next ? `search=${urlParams?.get('search') || text}` : '']
+    paramOptions = [...paramOptions, `limit=${urlParams?.get('limit') || options.limit}`]
+    paramOptions = [
+      ...paramOptions,
+      options.text || options.next ? `search=${urlParams?.get('search') || options.text}` : ''
+    ]
 
     const fetchProjectsResponse = (await apiBack.get<{
       count: number
       next: string | null
       previous: string | null
       results: ProjectType[]
-    }>(`/cohort/folders/?${options.reduce(paramsReducer)}`)) ?? { status: 400 }
+    }>(`/cohort/folders/?${paramOptions.reduce(paramsReducer)}`)) ?? { status: 400 }
 
     if (fetchProjectsResponse.status === 200) {
       const { data } = fetchProjectsResponse
@@ -295,21 +313,66 @@ const servicesProjects: IServiceProjects = {
     }
   },
 
-  fetchRequestsList: async (limit, offset) => {
-    let search = `?ordering=-modified_at`
-    if (limit) {
-      search += `&limit=${limit}`
-    }
-    if (offset) {
-      search += `&offset=${offset}`
-    }
+  fetchRequestsList: async (options: FetchRequestsOptions) => {
+    const urlParams = options.next ? new URLSearchParams(options.next) : null
+    let paramOptions: string[] = []
+    paramOptions = [
+      ...paramOptions,
+      options.orderBy || options.next
+        ? `ordering=${
+            urlParams?.get('ordering') ||
+            `${options.orderBy!.orderDirection === Direction.DESC ? '-' : ''}${options.orderBy!.orderBy}`
+          }`
+        : ''
+    ]
+    paramOptions = [...paramOptions, `limit=${urlParams?.get('limit') || options.limit}`]
+    paramOptions = [
+      ...paramOptions,
+      options.text || options.next ? `search=${urlParams?.get('search') || options.text}` : ''
+    ]
 
     const fetchRequestsListResponse = (await apiBack.get<{
       count: number
       next: string | null
       previous: string | null
       results: RequestType[]
-    }>(`/cohort/requests/${search}`)) ?? { status: 400 }
+    }>(`/cohort/requests/?${paramOptions.reduce(paramsReducer)}`)) ?? { status: 400 }
+
+    if (fetchRequestsListResponse.status === 200) {
+      return fetchRequestsListResponse.data
+    } else {
+      return {
+        count: 0,
+        next: null,
+        previous: null,
+        results: []
+      }
+    }
+  },
+  fetchRequestsFromProject: async (projectId: string, options: FetchRequestsOptions) => {
+    const urlParams = options.next ? new URLSearchParams(options.next) : null
+    let paramOptions: string[] = []
+    paramOptions = [
+      ...paramOptions,
+      options.orderBy || options.next
+        ? `ordering=${
+            urlParams?.get('ordering') ||
+            `${options.orderBy!.orderDirection === Direction.DESC ? '-' : ''}${options.orderBy!.orderBy}`
+          }`
+        : ''
+    ]
+    paramOptions = [...paramOptions, `limit=${urlParams?.get('limit') || options.limit}`]
+    paramOptions = [
+      ...paramOptions,
+      options.text || options.next ? `search=${urlParams?.get('search') || options.text}` : ''
+    ]
+
+    const fetchRequestsListResponse = (await apiBack.get<{
+      count: number
+      next: string | null
+      previous: string | null
+      results: RequestType[]
+    }>(`/cohort/folders/${projectId}/requests/?${paramOptions.reduce(paramsReducer)}`)) ?? { status: 400 }
 
     if (fetchRequestsListResponse.status === 200) {
       return fetchRequestsListResponse.data

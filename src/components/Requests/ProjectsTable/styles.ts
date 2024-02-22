@@ -33,8 +33,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   smallAddButton: {
     color: '#fff',
+    padding: 8,
     backgroundColor: '#5BC5F2 !important',
-    marginLeft: theme.spacing(1),
     '& svg': {
       color: '#fff',
       fontSize: 16

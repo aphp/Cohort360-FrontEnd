@@ -72,7 +72,10 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
   }
 
   const handleFetchProjects = async () => {
-    const response = await fetchProjects({ orderBy: Order.NAME, orderDirection: Direction.ASC }, 100)
+    const response = await fetchProjects({
+      orderBy: { orderBy: Order.NAME, orderDirection: Direction.ASC },
+      limit: 100
+    })
     setProjects(response)
   }
 
@@ -308,28 +311,30 @@ const RequestsTable = ({ data, loading, onUpdate }: RequestsTableProps) => {
         />
       </Modal>
 
-      <Modal
-        open={openModal === Dialog.SHARE}
-        title="Partager la requête"
-        onSubmit={({ name, users, sendMail }) => {
-          handleShare(name, users, sendMail)
-        }}
-        width={'700px'}
-        onClose={() => setOpenModal(null)}
-        validationText="Envoyer"
-      >
-        <TextInput
-          value={selectedRequest?.name}
-          name="name"
-          label="Nom de la requête à partager :"
-          minLimit={2}
-          maxLimit={255}
-        />
-        <UsersFilter onFetch={fetchUsers} name="users" />
-        <CheckboxFilter name="sendMail" label="Envoyer un email au destinataire de la requête" />
-      </Modal>
+      {selectedRequest?.query_snapshots?.length! > 0 && (
+        <Modal
+          open={openModal === Dialog.SHARE}
+          title="Partager la requête"
+          onSubmit={({ name, users, sendMail }) => {
+            handleShare(name, users, sendMail)
+          }}
+          width={'700px'}
+          onClose={() => setOpenModal(null)}
+          validationText="Envoyer"
+        >
+          <TextInput
+            value={selectedRequest?.name}
+            name="name"
+            label="Nom de la requête à partager :"
+            minLimit={2}
+            maxLimit={255}
+          />
+          <UsersFilter onFetch={fetchUsers} name="users" />
+          <CheckboxFilter name="sendMail" label="Envoyer un email au destinataire de la requête" />
+        </Modal>
+      )}
 
-      {selectedRequest?.query_snapshots?.length === 0 && (
+      {selectedRequest?.query_snapshots?.length === 0 && openModal === Dialog.SHARE && (
         <Snackbar open autoHideDuration={5000} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
           <Alert severity="error" onClose={() => setSelectedRequest(null)}>
             Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
