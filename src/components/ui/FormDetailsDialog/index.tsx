@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material'
+import { Grid } from '@mui/material'
 
 type FormDetailsDialogProps = {
   title: string
@@ -7,21 +7,23 @@ type FormDetailsDialogProps = {
   onClose: () => void
 }
 
-const FormDetailsDialog = ({ title, content, onClose }: FormDetailsDialogProps) => {
+const FormDetailsDialog = ({ content }: FormDetailsDialogProps) => {
   return (
     // <Dialog open onClose={onClose}>
     //   <DialogTitle>{title}</DialogTitle>
     //   <DialogContent>
-    content.map((row, index) => (
-      <Grid container key={index}>
-        <Grid container item xs={6}>
-          {row.name}
+    <div>
+      {content.map((row, index) => (
+        <Grid container key={index}>
+          <Grid container item xs={6}>
+            {row.name}
+          </Grid>
+          <Grid container item xs={6}>
+            {row.value}
+          </Grid>
         </Grid>
-        <Grid container item xs={6}>
-          {row.value}
-        </Grid>
-      </Grid>
-    ))
+      ))}
+    </div>
     //   </DialogContent>
     //   <DialogActions>
     //     <Button onClick={onClose}>Fermer</Button>

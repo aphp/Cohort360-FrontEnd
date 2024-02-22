@@ -6,12 +6,12 @@ export const hospitForm: { [key: string]: { id: string; type: keyof Questionnair
     type: 'valueString'
   },
   hospitInUteroTransfer: {
-    id: 'F_MATER_007001'
-    // type: 'value'
+    id: 'F_MATER_007001',
+    type: 'valueCoding'
   },
   hospitMaturationCorticotherapie: {
-    id: 'F_MATER_007006'
-    // type: ''
+    id: 'F_MATER_007006',
+    type: 'valueCoding'
   },
   hospitChirurgicalGestureDate: {
     id: 'F_MATER_004621',

@@ -1,11 +1,11 @@
 import React from 'react'
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 
 interface ArrowWithYearsProps {
   years: string[]
 }
 
-const ArrowWithYears: React.FC<ArrowWithYearsProps> = ({ years }) => {
+const ArrowWithYears: React.FC<ArrowWithYearsProps> = () => {
   return (
     <Box
       sx={{
