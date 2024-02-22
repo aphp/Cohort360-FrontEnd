@@ -1,14 +1,18 @@
-import { TextField, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
+import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import { InputWrapper } from 'components/ui/Inputs'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
+import { LabelObject } from 'types/searchCriterias'
 
 type LoincFilterProps = {
-  value: string
+  value: LabelObject[]
   name: string
+  disabled?: boolean
+  onFetch: (text: string, noStar: boolean, signal: AbortSignal) => Promise<any>
 }
 
-const LoincFilter = ({ name, value }: LoincFilterProps) => {
+const LoincFilter = ({ name, value, disabled = false, onFetch }: LoincFilterProps) => {
   const context = useContext(FormContext)
   const [loinc, setLoinc] = useState(value)
 
@@ -19,13 +23,16 @@ const LoincFilter = ({ name, value }: LoincFilterProps) => {
   return (
     <InputWrapper>
       <Typography variant="h3">Code LOINC :</Typography>
-      <TextField
-        margin="normal"
-        fullWidth
-        autoFocus
-        placeholder="Exemple: A0260,E2068"
-        value={loinc}
-        onChange={(event) => setLoinc(event.target.value)}
+      <AsyncAutocomplete
+        disabled={disabled}
+        label="Code(s) sélectionné(s)"
+        variant="outlined"
+        noOptionsText="Veuillez entrer un code Loinc"
+        values={value}
+        onFetch={(text, signal) => onFetch(text, false, signal)}
+        onChange={(newValue) => {
+          setLoinc(newValue)
+        }}
       />
     </InputWrapper>
   )

@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react'
 
-import { Button as ButtonMui } from '@mui/material'
 import { ButtonWrapper } from './style'
 
 type ButtonProps = {
@@ -23,17 +22,17 @@ const Button = ({
   onClick
 }: ButtonProps) => {
   return (
-    <ButtonWrapper id="DTTB_btn" width={width}>
-      <ButtonMui
-        variant={variant}
-        color={color}
-        disableElevation
-        onClick={onClick}
-        startIcon={icon}
-        disabled={disabled}
-      >
-        {children}
-      </ButtonMui>
+    <ButtonWrapper
+      id="DTTB_btn"
+      width={width}
+      variant={variant}
+      color={color}
+      disableElevation
+      onClick={onClick}
+      startIcon={icon}
+      disabled={disabled}
+    >
+      {children}
     </ButtonWrapper>
   )
 }

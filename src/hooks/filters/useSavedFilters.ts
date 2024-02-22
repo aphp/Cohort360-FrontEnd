@@ -1,5 +1,6 @@
+import { Item } from 'components/ui/List/ListItem'
 import { mapRequestParamsToSearchCriteria } from 'mappers/filters'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   deleteFiltersService,
   getFiltersService,
@@ -18,8 +19,23 @@ export type SelectedFilter<T> = {
 
 export const useSavedFilters = <T>(type: RessourceType) => {
   const [allSavedFilters, setAllSavedFilters] = useState<SavedFiltersResults | null>(null)
+  const [allSavedFiltersAsListItems, setAllSavedFiltersAsListItems] = useState<Item[]>([])
   const [savedFiltersErrors, setSavedFiltersErrors] = useState<ErrorType>({ isError: false })
   const [selectedSavedFilter, setSelectedSavedFilter] = useState<SelectedFilter<T> | null>(null)
+
+  useEffect(() => {
+    getSavedFilters()
+  }, [type])
+
+  useEffect(
+    () =>
+      setAllSavedFiltersAsListItems(
+        allSavedFilters?.results.map((elem) => {
+          return { id: elem.uuid, name: elem.name, checked: false }
+        }) || []
+      ),
+    [allSavedFilters]
+  )
 
   const getSavedFilters = async (next?: string | null) => {
     try {
@@ -64,16 +80,18 @@ export const useSavedFilters = <T>(type: RessourceType) => {
     }
   }
 
-  const mapToSelectedFilter = (selectedItem: SavedFilter) => {
+  const mapToSelectedFilter = async (selectedItem: SavedFilter) => {
     return {
       filterUuid: selectedItem.uuid,
       filterName: selectedItem.name,
-      filterParams: mapRequestParamsToSearchCriteria(selectedItem.filter, type) as SearchCriterias<T>
+      filterParams: (await mapRequestParamsToSearchCriteria(selectedItem.filter, type)) as SearchCriterias<T>
     }
   }
 
-  const selectFilter = (selectedFilter: SelectedFilter<T>) => {
-    setSelectedSavedFilter(selectedFilter)
+  const selectFilter = (selectedFilterId: string) => {
+    const selectedFilter = allSavedFilters?.results.find((elem) => elem.uuid === selectedFilterId)
+    if (selectedFilter) mapToSelectedFilter(selectedFilter).then((result) => setSelectedSavedFilter(result))
+    else setSelectedSavedFilter(null)
   }
 
   const resetSavedFilterError = () => {
@@ -82,6 +100,7 @@ export const useSavedFilters = <T>(type: RessourceType) => {
 
   return {
     allSavedFilters,
+    allSavedFiltersAsListItems,
     selectedSavedFilter,
     savedFiltersErrors,
     methods: {
@@ -90,7 +109,6 @@ export const useSavedFilters = <T>(type: RessourceType) => {
       deleteSavedFilters,
       patchSavedFilter,
       selectFilter,
-      mapToSelectedFilter,
       resetSavedFilterError
     }
   }

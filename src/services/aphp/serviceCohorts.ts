@@ -39,7 +39,7 @@ import {
   VitalStatus,
   SearchCriterias,
   PatientsFilters,
-  AllDocumentsFilters,
+  DocumentsFilters,
   SearchByTypes,
   ImagingFilters
 } from 'types/searchCriterias'
@@ -136,7 +136,7 @@ export interface IServiceCohorts {
     options: {
       deidentified: boolean
       page: number
-      searchCriterias: SearchCriterias<AllDocumentsFilters>
+      searchCriterias: SearchCriterias<DocumentsFilters>
     },
     groupId?: string,
     signal?: AbortSignal

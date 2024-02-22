@@ -14,17 +14,14 @@ import { fetchMedication } from 'state/patient'
 import useStyles from './styles'
 import { cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
-import Searchbar from 'components/ui/Searchbar'
-import { CircularProgress, useMediaQuery, useTheme } from '@mui/material'
+import { CircularProgress, Tooltip, useMediaQuery, useTheme } from '@mui/material'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Tabs from 'components/ui/Tabs'
-import { FilterKeys } from 'types/searchCriterias'
+import { Direction, FilterKeys, MedicationFilters, Order } from 'types/searchCriterias'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
-import services from 'services/aphp'
 import { selectFiltersAsArray } from 'utils/filters'
-import { BlockWrapper } from 'components/ui/Layout'
 import useSearchCriterias, { initMedSearchCriterias } from 'reducers/searchCriteriasReducer'
 import Chip from 'components/ui/Chip'
 import AdministrationTypesFilter from 'components/Filters/AdministrationTypesFilter'
@@ -32,33 +29,70 @@ import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
 import PrescriptionTypesFilter from 'components/Filters/PrescriptionTypesFilter'
+import { Save, SavedSearch } from '@mui/icons-material'
+import { RessourceType } from 'types/requestCriterias'
+import { useSavedFilters } from 'hooks/filters/useSavedFilters'
+import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
+import { MedicationLabel } from 'types/patient'
+import TextInput from 'components/Filters/TextInput'
+import List from 'components/ui/List'
+import { mapToAttribute, mapToLabel } from 'mappers/pmsi'
+import services from 'services/aphp'
 
 type PatientMedicationProps = {
   groupId?: string
 }
 
-enum Medication {
-  PRESCRIPTION = 'prescription',
-  ADMINISTRATION = 'administration'
-}
-
-enum MedicationLabel {
-  PRESCRIPTION = 'Prescription',
-  ADMINISTRATION = 'Administration'
+type MedicationSearchResults = {
+  deidentified: boolean
+  list: MedicationRequest[] | MedicationAdministration[]
+  nb: number
+  total: number
+  label: string
 }
 
 const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   const { classes } = useStyles()
   const theme = useTheme()
-  const isMd = useMediaQuery(theme.breakpoints.between('sm', 'lg'))
   const isSm = useMediaQuery(theme.breakpoints.down('md'))
-  const [toggleModal, setToggleModal] = useState(false)
+  const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
+  const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
+  const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
+  const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
+  const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
 
   const dispatch = useAppDispatch()
   const patient = useAppSelector((state) => state.patient)
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [page, setPage] = useState(1)
+  const [selectedTab, setSelectedTab] = useState<
+    TabType<RessourceType.MEDICATION_ADMINISTRATION | RessourceType.MEDICATION_REQUEST, MedicationLabel>
+  >({
+    id: RessourceType.MEDICATION_REQUEST,
+    label: MedicationLabel.PRESCRIPTION
+  })
+  const medicationTabs: TabType<
+    RessourceType.MEDICATION_ADMINISTRATION | RessourceType.MEDICATION_REQUEST,
+    MedicationLabel
+  >[] = [
+    { id: RessourceType.MEDICATION_REQUEST, label: MedicationLabel.PRESCRIPTION },
+    { id: RessourceType.MEDICATION_ADMINISTRATION, label: MedicationLabel.ADMINISTRATION }
+  ]
+  const {
+    allSavedFilters,
+    savedFiltersErrors,
+    selectedSavedFilter,
+    allSavedFiltersAsListItems,
+    methods: {
+      getSavedFilters,
+      postSavedFilter,
+      deleteSavedFilters,
+      patchSavedFilter,
+      selectFilter,
+      resetSavedFilterError
+    }
+  } = useSavedFilters<MedicationFilters>(selectedTab.id)
   const [
     {
       orderBy,
@@ -66,31 +100,25 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
       filters,
       filters: { nda, prescriptionTypes, startDate, endDate, administrationRoutes, executiveUnits }
     },
-    { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias }
+    { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias, addSearchCriterias }
   ] = useSearchCriterias(initMedSearchCriterias)
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ nda, prescriptionTypes, administrationRoutes, startDate, endDate, executiveUnits })
   }, [nda, prescriptionTypes, administrationRoutes, startDate, endDate, executiveUnits])
 
-  const [selectedTab, setSelectedTab] = useState<TabType<Medication, MedicationLabel>>({
-    id: Medication.PRESCRIPTION,
-    label: MedicationLabel.PRESCRIPTION
+  const [allAdministrationRoutes, setAllAdministrationRoutes] = useState<HierarchyElement[]>([])
+  const [allPrescriptionTypes, setAllPrescriptionTypes] = useState<HierarchyElement[]>([])
+  const [searchResults, setSearchResults] = useState<MedicationSearchResults>({
+    deidentified: false,
+    list: [],
+    nb: 0,
+    total: 0,
+    label: mapToLabel(RessourceType.MEDICATION_REQUEST)
   })
-  const medicationTabs: TabType<Medication, MedicationLabel>[] = [
-    { id: Medication.PRESCRIPTION, label: MedicationLabel.PRESCRIPTION },
-    { id: Medication.ADMINISTRATION, label: MedicationLabel.ADMINISTRATION }
-  ]
-  const searchResults = {
-    deidentified: patient?.deidentified || false,
-    nb: patient?.medication?.[selectedTab.id]?.count ?? 0,
-    total: patient?.medication?.[selectedTab.id]?.total ?? 0,
-    list: patient?.medication?.[selectedTab.id]?.list ?? [],
-    label: selectedTab.id === Medication.PRESCRIPTION ? 'prescription(s)' : 'administration(s)'
-  }
-  const [allAdministrationRoutes, setAdministrationRoutes] = useState<HierarchyElement[]>([])
-  const [allPrescriptionTypes, setPrescriptionTypes] = useState<HierarchyElement[]>([])
 
   const controllerRef = useRef<AbortController | null>(null)
+  const meState = useAppSelector((state) => state.me)
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const _fetchMedication = async () => {
     try {
@@ -131,19 +159,15 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   }
 
   useEffect(() => {
-    const _fetchPrescriptionsAdministrations = async () => {
-      try {
-        const [prescriptions, administrations] = await Promise.all([
-          services.cohortCreation.fetchPrescriptionTypes(),
-          services.cohortCreation.fetchAdministrations()
-        ])
-        setAdministrationRoutes(administrations)
-        setPrescriptionTypes(prescriptions)
-      } catch (e) {
-        /* empty */
-      }
+    const fetch = async () => {
+      const [administrations, prescriptions] = await Promise.all([
+        services.cohortCreation.fetchAdministrations(),
+        services.cohortCreation.fetchPrescriptionTypes()
+      ])
+      setAllAdministrationRoutes(administrations)
+      setAllPrescriptionTypes(prescriptions)
     }
-    _fetchPrescriptionsAdministrations()
+    fetch()
   }, [])
 
   useEffect(() => {
@@ -168,84 +192,85 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
     setLoadingStatus(LoadingStatus.IDDLE)
   }, [selectedTab])
 
-  return (
-    <Grid container justifyContent="flex-end" className={classes.documentTable}>
-      <BlockWrapper item xs={12} margin={'20px 0px 10px'}>
-        <Searchbar>
-          <Grid container item xs={12} md={12} lg={8} xl={8} style={isSm ? { flexWrap: 'wrap-reverse' } : {}}>
-            <Grid item xs={12} md={5} lg={5} xl={5}>
-              <Tabs
-                values={medicationTabs}
-                active={selectedTab}
-                onchange={(value: TabType<Medication, MedicationLabel>) => setSelectedTab(value)}
-              />
-            </Grid>
-            <Grid
-              container
-              justifyContent={isSm ? 'flex-start' : isMd ? 'flex-end' : 'center'}
-              alignItems="end"
-              item
-              xs={12}
-              md={7}
-              lg={7}
-              xl={7}
-              style={isSm ? { marginBottom: 20 } : {}}
-            >
-              {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && (
-                <CircularProgress />
-              )}
-              {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
-                <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label} />
-              )}
-            </Grid>
-          </Grid>
+  useEffect(() => {
+    const medicationIndex = mapToAttribute(selectedTab.id)
+    setSearchResults({
+      deidentified: patient?.deidentified || false,
+      list: patient?.medication?.[medicationIndex]?.list || [],
+      nb: patient?.medication?.[medicationIndex]?.count ?? 0,
+      total: patient?.medication?.[medicationIndex]?.total ?? 0,
+      label: mapToLabel(selectedTab.id)
+    })
+  }, [patient, selectedTab.id])
 
-          <Grid container item xs={12} md={12} lg={4} xl={4} justifyContent="flex-end">
-            <SearchInput
-              value={searchInput}
-              placeholder={'Rechercher'}
-              width="70%"
-              onchange={(newValue: string) => changeSearchInput(newValue)}
-            />
-            <Button width={'30%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
+  return (
+    <Grid container className={classes.documentTable} gap="20px">
+      <Grid container justifyContent="flex-end">
+        <Grid container item xs={12} md={10} lg={7} xl={5} justifyContent="flex-end" spacing={1}>
+          {(filtersAsArray.length > 0 || searchInput) && (
+            <Grid container item xs={12} md={5}>
+              <Tooltip title={maintenanceIsActive ? "Ce bouton est desactivé en fonction d'une maintenance." : ''}>
+                <Grid container>
+                  <Button
+                    width="100%"
+                    icon={<Save height="15px" fill="#FFF" />}
+                    onClick={() => setToggleSaveFiltersModal(true)}
+                    color="secondary"
+                    disabled={maintenanceIsActive}
+                  >
+                    Enregistrer filtres
+                  </Button>
+                </Grid>
+              </Tooltip>
+            </Grid>
+          )}
+          <Grid container item xs={12} md={!!allSavedFilters?.count ? 7 : 3} justifyContent="space-between">
+            {!!allSavedFilters?.count && (
+              <Button icon={<SavedSearch fill="#FFF" />} width="49%" onClick={() => setToggleSavedFiltersModal(true)}>
+                Vos filtres
+              </Button>
+            )}
+            <Button
+              icon={<FilterList height="15px" fill="#FFF" />}
+              width={!!allSavedFilters?.count ? '49%' : '100%'}
+              onClick={() => setToggleFilterByModal(true)}
+            >
               Filtrer
             </Button>
-            {toggleModal && (
-              <Modal
-                title="Filtrer par :"
-                open={toggleModal}
-                width={'600px'}
-                onClose={() => setToggleModal(false)}
-                onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
-              >
-                {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-                {selectedTab.id === Medication.PRESCRIPTION && (
-                  <PrescriptionTypesFilter
-                    value={prescriptionTypes}
-                    name={FilterKeys.PRESCRIPTION_TYPES}
-                    allAdministrationTypes={allPrescriptionTypes}
-                  />
-                )}
-                {selectedTab.id === Medication.ADMINISTRATION && (
-                  <AdministrationTypesFilter
-                    value={administrationRoutes}
-                    name={FilterKeys.ADMINISTRATION_ROUTES}
-                    allAdministrationTypes={allAdministrationRoutes}
-                  />
-                )}
-                <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
-                <ExecutiveUnitsFilter
-                  value={executiveUnits}
-                  name={FilterKeys.EXECUTIVE_UNITS}
-                  criteriaName={CriteriaName.Medication}
-                />
-              </Modal>
-            )}
           </Grid>
-        </Searchbar>
-      </BlockWrapper>
+        </Grid>
+      </Grid>
+
+      <Grid container item xs={12} style={isSm ? { flexWrap: 'wrap-reverse' } : {}}>
+        <Grid item xs={12} md={4}>
+          <Tabs
+            values={medicationTabs}
+            active={selectedTab}
+            onchange={(
+              value: TabType<
+                RessourceType.MEDICATION_ADMINISTRATION | RessourceType.MEDICATION_REQUEST,
+                MedicationLabel
+              >
+            ) => setSelectedTab(value)}
+          />
+        </Grid>
+        <Grid container justifyContent="center" item xs={12} md={4}>
+          {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && <CircularProgress />}
+          {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
+            <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label} />
+          )}
+        </Grid>
+        <Grid container item xs={12} md={4} justifyContent="flex-end">
+          <SearchInput
+            value={searchInput}
+            placeholder={'Rechercher'}
+            onchange={(newValue: string) => changeSearchInput(newValue)}
+          />
+        </Grid>
+      </Grid>
+
       {filtersAsArray.length > 0 && (
-        <Grid item xs={12} margin="0px 0px 10px">
+        <Grid item xs={12}>
           {filtersAsArray.map((filter, index) => (
             <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
           ))}
@@ -264,6 +289,174 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
           total={searchResults.nb}
         />
       </Grid>
+
+      <Modal
+        title="Filtrer par :"
+        open={toggleFilterByModal}
+        color="secondary"
+        onClose={() => setToggleFilterByModal(false)}
+        onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
+      >
+        {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+        {selectedTab.id === RessourceType.MEDICATION_REQUEST && prescriptionTypes && (
+          <PrescriptionTypesFilter
+            value={prescriptionTypes}
+            name={FilterKeys.PRESCRIPTION_TYPES}
+            allPrescriptionTypes={allPrescriptionTypes}
+          />
+        )}
+        {selectedTab.id === RessourceType.MEDICATION_ADMINISTRATION && administrationRoutes && (
+          <AdministrationTypesFilter
+            value={administrationRoutes}
+            name={FilterKeys.ADMINISTRATION_ROUTES}
+            allAdministrationTypes={allAdministrationRoutes}
+          />
+        )}
+        <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
+        <ExecutiveUnitsFilter
+          value={executiveUnits}
+          name={FilterKeys.EXECUTIVE_UNITS}
+          criteriaName={CriteriaName.Medication}
+        />
+      </Modal>
+      <Modal
+        title="Filtres sauvegardés"
+        open={toggleSavedFiltersModal}
+        onClose={() => {
+          setToggleSavedFiltersModal(false)
+          resetSavedFilterError()
+        }}
+        onSubmit={() => {
+          if (selectedSavedFilter) addSearchCriterias(selectedSavedFilter.filterParams)
+        }}
+        validationText="Appliquer le filtre"
+      >
+        <List
+          values={allSavedFiltersAsListItems}
+          count={allSavedFilters?.count || 0}
+          onDisplay={() => {
+            setToggleFilterInfoModal(true)
+            setIsReadonlyFilterInfoModal(true)
+          }}
+          onEdit={
+            maintenanceIsActive
+              ? undefined
+              : () => {
+                  setToggleFilterInfoModal(true)
+                  setIsReadonlyFilterInfoModal(false)
+                }
+          }
+          onDelete={maintenanceIsActive ? undefined : deleteSavedFilters}
+          onSelect={(filter) => selectFilter(filter)}
+          fetchPaginateData={() => getSavedFilters(allSavedFilters?.next)}
+        >
+          <Modal
+            title={isReadonlyFilterInfoModal ? 'Informations' : 'Modifier le filtre'}
+            open={toggleFilterInfoModal}
+            color="secondary"
+            readonly={isReadonlyFilterInfoModal}
+            onClose={() => setToggleFilterInfoModal(false)}
+            onSubmit={({
+              filterName,
+              searchInput,
+              nda,
+              prescriptionTypes,
+              startDate,
+              endDate,
+              administrationRoutes,
+              executiveUnits
+            }) => {
+              patchSavedFilter(
+                filterName,
+                {
+                  searchInput,
+                  orderBy: { orderBy: Order.PERIOD_START, orderDirection: Direction.DESC },
+                  filters: { nda, prescriptionTypes, startDate, endDate, administrationRoutes, executiveUnits }
+                },
+                searchResults.deidentified ?? true
+              )
+            }}
+            validationText="Sauvegarder"
+          >
+            <Grid container direction="column" gap="8px">
+              <Grid item container direction="column">
+                <TextInput
+                  name="filterName"
+                  label="Nom :"
+                  value={selectedSavedFilter?.filterName}
+                  error={savedFiltersErrors}
+                  disabled={isReadonlyFilterInfoModal}
+                  minLimit={2}
+                  maxLimit={50}
+                />
+              </Grid>
+              {!searchResults.deidentified && (
+                <Grid item container direction="column" paddingBottom="8px">
+                  <TextInput
+                    name="searchInput"
+                    label="Recherche textuelle :"
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.searchInput}
+                  />
+                </Grid>
+              )}
+              <Grid item>
+                {!searchResults.deidentified && (
+                  <NdaFilter
+                    disabled={isReadonlyFilterInfoModal}
+                    name={FilterKeys.NDA}
+                    value={selectedSavedFilter?.filterParams.filters.nda || ''}
+                  />
+                )}
+                {selectedTab.id === RessourceType.MEDICATION_REQUEST && (
+                  <PrescriptionTypesFilter
+                    value={selectedSavedFilter?.filterParams.filters.prescriptionTypes || []}
+                    name={FilterKeys.PRESCRIPTION_TYPES}
+                    allPrescriptionTypes={allPrescriptionTypes}
+                    disabled={isReadonlyFilterInfoModal}
+                  />
+                )}
+                {selectedTab.id === RessourceType.MEDICATION_ADMINISTRATION && (
+                  <AdministrationTypesFilter
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.filters.administrationRoutes || []}
+                    name={FilterKeys.ADMINISTRATION_ROUTES}
+                    allAdministrationTypes={allAdministrationRoutes}
+                  />
+                )}
+                <DatesRangeFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  values={[
+                    selectedSavedFilter?.filterParams.filters.startDate,
+                    selectedSavedFilter?.filterParams.filters.endDate
+                  ]}
+                  names={[FilterKeys.START_DATE, FilterKeys.END_DATE]}
+                />
+                <ExecutiveUnitsFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
+                  name={FilterKeys.EXECUTIVE_UNITS}
+                  criteriaName={CriteriaName.Medication}
+                />
+              </Grid>
+            </Grid>
+          </Modal>
+        </List>
+      </Modal>
+      <Modal
+        title="Sauvegarder le filtre"
+        color="secondary"
+        open={toggleSaveFiltersModal}
+        onClose={() => {
+          setToggleSaveFiltersModal(false)
+          resetSavedFilterError()
+        }}
+        onSubmit={({ filtersName }) =>
+          postSavedFilter(filtersName, { searchInput, filters, orderBy }, searchResults.deidentified ?? true)
+        }
+      >
+        <TextInput name="filtersName" error={savedFiltersErrors} label="Nom" minLimit={2} maxLimit={50} />
+      </Modal>
     </Grid>
   )
 }

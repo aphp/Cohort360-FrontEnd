@@ -24,7 +24,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProcedure } from 'state/pmsi'
 import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
-import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
+import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
 import { CcamDataType } from 'types/requestCriterias'
 
@@ -156,16 +156,14 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             </Alert>
           </Grid>
 
-          <InputAutocompleteAsync
-            multiple
+          <AsyncAutocomplete
             label="Codes d'actes CCAM"
             variant="outlined"
             noOptionsText="Veuillez entrer un code ou un acte CCAM"
             className={classes.inputItem}
-            autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteriaData.data.ccamData || []}
-            getAutocompleteOptions={getCCAMOptions}
-            onChange={(e, value) => onChangeValue('code', value)}
+            values={defaultValuesCode}
+            onFetch={getCCAMOptions}
+            onChange={(value) => onChangeValue('code', value)}
           />
 
           <AdvancedInputs form={CriteriaName.Ccam} selectedCriteria={currentState} onChangeValue={onChangeValue} />
