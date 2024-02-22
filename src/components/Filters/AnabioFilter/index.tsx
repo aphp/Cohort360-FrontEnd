@@ -1,14 +1,18 @@
-import { TextField, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import { InputWrapper } from 'components/ui/Inputs'
+import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
+import { LabelObject } from 'types/searchCriterias'
 
 type AnabioFilterProps = {
-  value: string
+  value: LabelObject[]
   name: string
+  disabled?: boolean
+  onFetch: (text: string, noStar: boolean, signal: AbortSignal) => Promise<any>
 }
 
-const AnabioFilter = ({ name, value }: AnabioFilterProps) => {
+const AnabioFilter = ({ name, value, disabled = false, onFetch }: AnabioFilterProps) => {
   const context = useContext(FormContext)
   const [anabio, setAnabio] = useState(value)
 
@@ -19,13 +23,16 @@ const AnabioFilter = ({ name, value }: AnabioFilterProps) => {
   return (
     <InputWrapper>
       <Typography variant="h3">Code ANABIO :</Typography>
-      <TextField
-        margin="normal"
-        fullWidth
-        autoFocus
-        placeholder="Exemple: A0260,E2068"
-        value={anabio}
-        onChange={(event) => setAnabio(event.target.value)}
+      <AsyncAutocomplete
+        disabled={disabled}
+        label="Code(s) sélectionné(s)"
+        variant="outlined"
+        noOptionsText="Veuillez entrer un code Anabio"
+        values={value}
+        onFetch={(text, signal) => onFetch(text, false, signal)}
+        onChange={(newValue) => {
+          setAnabio(newValue)
+        }}
       />
     </InputWrapper>
   )

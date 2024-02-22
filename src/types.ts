@@ -167,39 +167,6 @@ export type MedicationEntry<T extends MedicationRequest | MedicationAdministrati
 
 export type SimpleCodeType = { code: string; label: string; type: string }
 
-export type GenericFilter = {
-  nda: string
-  startDate: string | null
-  endDate: string | null
-  executiveUnits: ScopeTreeRow[]
-}
-
-export type DocumentFilters = GenericFilter & {
-  ipp?: string
-  selectedDocTypes: SimpleCodeType[]
-  onlyPdfAvailable: boolean
-}
-
-export type MedicationsFilters = GenericFilter & {
-  selectedPrescriptionTypes: { id: string; label: string }[]
-  selectedAdministrationRoutes: { id: string; label: string }[]
-}
-
-export type PMSIFilters = GenericFilter & {
-  code: string
-  diagnosticTypes: { id: string; label: string }[]
-}
-
-export type ObservationFilters = GenericFilter & {
-  loinc: string
-  anabio: string
-}
-
-export type Sort = {
-  sortBy: string
-  sortDirection: 'asc' | 'desc'
-}
-
 export type CohortGroup = Group & {
   id: string
   name: string
@@ -424,11 +391,6 @@ export type ResearchType = string | boolean | AbortSignal | undefined
 export type ValueSet = {
   code: string
   display: string
-}
-
-export enum ValueSetSystem {
-  ATC = 'ATC',
-  UCD = 'UCD'
 }
 
 export type ProjectType = {

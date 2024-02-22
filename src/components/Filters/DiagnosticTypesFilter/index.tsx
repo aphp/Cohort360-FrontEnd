@@ -10,9 +10,15 @@ type DiagnosticTypesFilterProps = {
   value: LabelObject[]
   name: string
   allDiagnosticTypesList: HierarchyElement[]
+  disabled?: boolean
 }
 
-const DiagnosticTypesFilter = ({ name, value, allDiagnosticTypesList }: DiagnosticTypesFilterProps) => {
+const DiagnosticTypesFilter = ({
+  name,
+  value,
+  allDiagnosticTypesList,
+  disabled = false
+}: DiagnosticTypesFilterProps) => {
   const context = useContext(FormContext)
   const [diagnosticTypes, setDiagnosticTypes] = useState(value)
 
@@ -24,6 +30,7 @@ const DiagnosticTypesFilter = ({ name, value, allDiagnosticTypesList }: Diagnost
     <InputWrapper>
       <Typography variant="h3">Type de diagnostics :</Typography>
       <Autocomplete
+        disabled={disabled}
         multiple
         onChange={(event, value) => {
           setDiagnosticTypes(value)

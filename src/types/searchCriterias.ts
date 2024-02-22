@@ -1,4 +1,4 @@
-import { ScopeTreeRow, SimpleCodeType, ValueSet, ValueSetSystem } from 'types'
+import { ScopeTreeRow, SimpleCodeType, ValueSet } from 'types'
 import { PatientTableLabels } from './patient'
 import { CohortsType } from './cohorts'
 import { RessourceType } from './requestCriterias'
@@ -150,7 +150,7 @@ export type DurationRangeType = [string | null | undefined, string | null | unde
 export type LabelObject = {
   id: string
   label: string
-  system?: ValueSetSystem
+  system?: string
 }
 export interface OrderBy {
   orderBy: Order
@@ -181,10 +181,16 @@ export type Filters =
   | PMSIFilters
   | MedicationFilters
   | BiologyFilters
-  | PatientDocumentsFilters
-  | AllDocumentsFilters
+  | DocumentsFilters
   | CohortsFilters
   | ImagingFilters
+
+export type GenericFilter = {
+  nda: string
+  startDate: string | null
+  endDate: string | null
+  executiveUnits: ScopeTreeRow[]
+}
 
 export interface PatientsFilters {
   genders: GenderStatus[]
@@ -192,61 +198,32 @@ export interface PatientsFilters {
   vitalStatuses: VitalStatus[]
 }
 
-export interface PMSIFilters {
-  nda: string
-  diagnosticTypes: LabelObject[]
-  code: string
-  startDate: string | null
-  endDate: string | null
-  executiveUnits: ScopeTreeRow[]
-  source: string
+export type PMSIFilters = GenericFilter & {
+  diagnosticTypes?: LabelObject[]
+  code: LabelObject[]
+  source?: string
 }
 
-export interface MedicationFilters {
-  nda: string
-  prescriptionTypes: LabelObject[]
-  administrationRoutes: LabelObject[]
-  startDate: string | null
-  endDate: string | null
-  executiveUnits: ScopeTreeRow[]
+export type MedicationFilters = GenericFilter & {
+  prescriptionTypes?: LabelObject[]
+  administrationRoutes?: LabelObject[]
 }
 
-export interface BiologyFilters {
-  nda: string
-  loinc: string
-  anabio: string
-  startDate: string | null
-  endDate: string | null
-  executiveUnits: ScopeTreeRow[]
+export type BiologyFilters = GenericFilter & {
+  loinc: LabelObject[]
+  anabio: LabelObject[]
   validatedStatus: boolean
 }
 
-export interface ImagingFilters {
+export type ImagingFilters = GenericFilter & {
   ipp?: string
-  nda: string
-  startDate: string | null
-  endDate: string | null
-  executiveUnits: ScopeTreeRow[]
   modality: LabelObject[]
 }
 
-export interface PatientDocumentsFilters {
-  nda: string
+export type DocumentsFilters = GenericFilter & {
+  ipp?: string
   docTypes: SimpleCodeType[]
   onlyPdfAvailable: boolean
-  startDate: string | null
-  endDate: string | null
-  executiveUnits: ScopeTreeRow[]
-}
-
-export interface AllDocumentsFilters {
-  nda: string
-  ipp: string
-  docTypes: SimpleCodeType[]
-  onlyPdfAvailable: boolean
-  startDate: string | null
-  endDate: string | null
-  executiveUnits: ScopeTreeRow[]
 }
 export interface CohortsFilters {
   status: ValueSet[]
@@ -274,6 +251,7 @@ export enum ActionTypes {
   CHANGE_SEARCH_BY = 'CHANGE_SEARCH_BY',
   ADD_FILTERS = 'ADD_FILTERS',
   REMOVE_FILTER = 'REMOVE_FILTER',
+  ADD_SEARCH_CRITERIAS = 'ADD_SEARCH_CRITERIAS',
   REMOVE_SEARCH_CRITERIAS = 'REMOVE_SEARCH_CRITERIAS'
 }
 
@@ -288,6 +266,7 @@ export type ActionSearchBy = Action<ActionTypes.CHANGE_SEARCH_BY, SearchBy>
 export type ActionFilterBy<F> = Action<ActionTypes.ADD_FILTERS, F>
 export type ActionRemoveFilter = Action<ActionTypes.REMOVE_FILTER, RemoveFilter>
 export type ActionRemoveSearchCriterias = Action<ActionTypes.REMOVE_SEARCH_CRITERIAS, null>
+export type ActionAddSearchCriterias<F> = Action<ActionTypes.ADD_SEARCH_CRITERIAS, SearchCriterias<F>>
 export type ActionFilters<F> =
   | ActionOrderBy
   | ActionSearchInput
@@ -295,6 +274,7 @@ export type ActionFilters<F> =
   | ActionFilterBy<F>
   | ActionRemoveFilter
   | ActionRemoveSearchCriterias
+  | ActionAddSearchCriterias<F>
 
 export const searchByListPatients = [
   {

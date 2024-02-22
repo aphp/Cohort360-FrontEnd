@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, createContext, useState } from 'react'
 
-import { Button, Dialog, DialogActions, DialogTitle, Typography } from '@mui/material'
+import { Button, Dialog, DialogActions, DialogTitle, Divider, Grid, Typography } from '@mui/material'
 import { DialogContentWrapper } from './styles'
 import { FormContextType } from 'types/form'
 
@@ -10,6 +10,7 @@ type ModalProps = {
   open: boolean
   title?: string
   width?: string
+  color?: 'success' | 'secondary' | 'primary' | 'error' | 'warning' | 'info'
   noActions?: boolean
   readonly?: boolean
   validationText?: string
@@ -21,7 +22,8 @@ const Modal = ({
   children,
   title,
   open,
-  width = '450px',
+  width = '550px',
+  color = 'primary',
   noActions = false,
   readonly = false,
   validationText = 'Valider',
@@ -52,27 +54,40 @@ const Modal = ({
     <FormContext.Provider value={{ updateFormData, updateError }}>
       <Dialog open={open} onClose={onClose}>
         {title && (
-          <DialogTitle sx={{ color: '#FC2E8F', textTransform: 'uppercase', fontSize: 20 }}>{title}</DialogTitle>
+          <>
+            <DialogTitle sx={{ padding: '25px 30px' }}>
+              <Typography textTransform="uppercase" fontSize={20} fontWeight={700} textAlign="center" color={color}>
+                {title}
+              </Typography>
+            </DialogTitle>
+            <Grid container justifyContent="center">
+              <Grid item xs={6}>
+                <Divider />
+              </Grid>
+            </Grid>
+          </>
         )}
-        <DialogContentWrapper width={width}>{children}</DialogContentWrapper>
+        <DialogContentWrapper width={width} style={{ padding: '25px 30px' }}>
+          {children}
+        </DialogContentWrapper>
         {!noActions &&
           (!readonly ? (
-            <DialogActions>
+            <DialogActions style={{ backgroundColor: '#00000011', padding: '10px 30px' }}>
               <Button color="info" onClick={onClose}>
-                <Typography fontSize="15px" fontWeight="500">
+                <Typography fontSize="15px" fontWeight="600" color="#5B5E63">
                   Annuler
                 </Typography>
               </Button>
-              <Button disabled={isError} color="secondary" onClick={submit}>
+              <Button disabled={isError} color={color} onClick={submit}>
                 <Typography fontSize="15px" fontWeight="900">
                   {validationText}
                 </Typography>
               </Button>
             </DialogActions>
           ) : (
-            <DialogActions>
-              <Button color="primary" onClick={onClose}>
-                <Typography fontSize="15px" fontWeight="900">
+            <DialogActions style={{ backgroundColor: '#00000011', padding: '10px 30px' }}>
+              <Button color={color} onClick={onClose}>
+                <Typography fontSize="15px" fontWeight="600" color="#5B5E63">
                   Retour
                 </Typography>
               </Button>

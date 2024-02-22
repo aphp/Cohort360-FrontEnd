@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { CircularProgress, Grid, useMediaQuery, useTheme } from '@mui/material'
+import { CircularProgress, Grid, Tooltip } from '@mui/material'
 import Chip from 'components/ui/Chip'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
@@ -18,11 +18,10 @@ import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import Tabs from 'components/ui/Tabs'
-import { FilterKeys } from 'types/searchCriterias'
+import { Direction, FilterKeys, Order, PMSIFilters } from 'types/searchCriterias'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
-import { mapToCriteriaName } from 'utils/mappers'
-import { PMSI, PMSILabel } from 'types/patient'
+import { PMSILabel } from 'types/patient'
 import { selectFiltersAsArray } from 'utils/filters'
 import { BlockWrapper } from 'components/ui/Layout'
 import useSearchCriterias, { initPmsiSearchCriterias } from 'reducers/searchCriteriasReducer'
@@ -33,29 +32,64 @@ import DiagnosticTypesFilter from 'components/Filters/DiagnosticTypesFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
 import SourceFilter from 'components/Filters/SourceFilter'
+import { RessourceType } from 'types/requestCriterias'
+import { useSavedFilters } from 'hooks/filters/useSavedFilters'
+import { Save, SavedSearch } from '@mui/icons-material'
+import TextInput from 'components/Filters/TextInput'
+import { Claim, Condition, Procedure } from 'fhir/r4'
+import { mapToAttribute, mapToCriteriaName, mapToLabel } from 'mappers/pmsi'
+import List from 'components/ui/List'
+import { fetchClaimCodes, fetchConditionCodes, fetchProcedureCodes } from 'services/aphp/servicePmsi'
 
 export type PatientPMSIProps = {
   groupId?: string
 }
 
+type PmsiTab = TabType<RessourceType.CLAIM | RessourceType.CONDITION | RessourceType.PROCEDURE, PMSILabel>
+
+type PmsiTabs = PmsiTab[]
+
+type PmsiSearchResults = {
+  deidentified: boolean
+  list: Condition[] | Procedure[] | Claim[]
+  nb: number
+  total: number
+  label: PMSILabel
+}
+
 const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const { classes } = useStyles()
-  const theme = useTheme()
-  const isMd = useMediaQuery(theme.breakpoints.between('sm', 'lg'))
-  const isSm = useMediaQuery(theme.breakpoints.down('md'))
-  const [toggleModal, setToggleModal] = useState(false)
+  const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
+  const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
+  const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
+  const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
+  const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const dispatch = useAppDispatch()
 
-  const [selectedTab, setSelectedTab] = useState<TabType<PMSI, PMSILabel>>({
-    id: PMSI.DIAGNOSTIC,
+  const [selectedTab, setSelectedTab] = useState<PmsiTab>({
+    id: RessourceType.CONDITION,
     label: PMSILabel.DIAGNOSTIC
   })
-  const PMSITabs: TabType<PMSI, PMSILabel>[] = [
-    { label: PMSILabel.DIAGNOSTIC, id: PMSI.DIAGNOSTIC },
-    { label: PMSILabel.CCAM, id: PMSI.CCAM },
-    { label: PMSILabel.GHM, id: PMSI.GHM }
+  const PMSITabs: PmsiTabs = [
+    { label: PMSILabel.DIAGNOSTIC, id: RessourceType.CONDITION },
+    { label: PMSILabel.CCAM, id: RessourceType.PROCEDURE },
+    { label: PMSILabel.GHM, id: RessourceType.CLAIM }
   ]
   const [page, setPage] = useState(1)
+  const {
+    allSavedFilters,
+    savedFiltersErrors,
+    selectedSavedFilter,
+    allSavedFiltersAsListItems,
+    methods: {
+      getSavedFilters,
+      postSavedFilter,
+      deleteSavedFilters,
+      patchSavedFilter,
+      selectFilter,
+      resetSavedFilterError
+    }
+  } = useSavedFilters<PMSIFilters>(selectedTab.id)
 
   const [
     {
@@ -64,25 +98,27 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
       filters,
       filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits }
     },
-    { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias }
+    { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias, addSearchCriterias }
   ] = useSearchCriterias(initPmsiSearchCriterias)
-  const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({ code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits })
-  }, [code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits])
+  const filtersAsArray = useMemo(
+    () => selectFiltersAsArray({ code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits }),
+    [code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits]
+  )
 
   const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<HierarchyElement[]>([])
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
-
-  /* TODO => enlever l'appel de redux */
   const patient = useAppSelector((state) => state.patient)
-  const searchResults = {
-    deidentified: patient?.deidentified || false,
-    list: patient?.pmsi?.[selectedTab.id]?.list || [],
-    nb: patient?.pmsi?.[selectedTab.id]?.count ?? 0,
-    total: patient?.pmsi?.[selectedTab.id]?.total ?? 0,
-    label: selectedTab.id === PMSI.DIAGNOSTIC ? 'diagnostic(s)' : selectedTab.id === PMSI.CCAM ? PMSI.CCAM : PMSI.GHM
-  }
+  const [searchResults, setSearchResults] = useState<PmsiSearchResults>({
+    deidentified: false,
+    list: [],
+    nb: 0,
+    total: 0,
+    label: PMSILabel.DIAGNOSTIC
+  })
+
   const controllerRef = useRef<AbortController | null>(null)
+  const meState = useAppSelector((state) => state.me)
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const _fetchPMSI = async () => {
     try {
@@ -123,6 +159,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
         /* empty */
       }
     }
+    getSavedFilters()
     _fetchDiagnosticTypes()
   }, [])
 
@@ -148,29 +185,78 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
     setLoadingStatus(LoadingStatus.IDDLE)
   }, [selectedTab])
 
+  useEffect(() => {
+    const pmsiIndex = mapToAttribute(selectedTab.id)
+    setSearchResults({
+      deidentified: patient?.deidentified || false,
+      list: patient?.pmsi?.[pmsiIndex]?.list || [],
+      nb: patient?.pmsi?.[pmsiIndex]?.count ?? 0,
+      total: patient?.pmsi?.[pmsiIndex]?.total ?? 0,
+      label: mapToLabel(selectedTab.id)
+    })
+  }, [patient, selectedTab.id])
+
+  const fetchCodes = useCallback(() => {
+    switch (selectedTab.id) {
+      case RessourceType.CONDITION:
+        return fetchConditionCodes
+      case RessourceType.PROCEDURE:
+        return fetchProcedureCodes
+      default:
+        return fetchClaimCodes
+    }
+  }, [selectedTab.id])
+
   return (
-    <Grid container justifyContent="flex-end" className={classes.documentTable}>
-      <BlockWrapper item xs={12} margin={'20px 0px 10px'}>
+    <Grid container className={classes.documentTable} gap="20px">
+      <Grid container justifyContent="flex-end">
+        <Grid container item xs={12} md={10} lg={7} xl={5} justifyContent="flex-end" spacing={1}>
+          {(filtersAsArray.length > 0 || searchInput) && (
+            <Grid container item xs={12} md={5}>
+              <Tooltip title={maintenanceIsActive ? "Ce bouton est desactivé en fonction d'une maintenance." : ''}>
+                <Grid container>
+                  <Button
+                    width="100%"
+                    icon={<Save height="15px" fill="#FFF" />}
+                    onClick={() => setToggleSaveFiltersModal(true)}
+                    color="secondary"
+                    disabled={maintenanceIsActive}
+                  >
+                    Enregistrer filtres
+                  </Button>
+                </Grid>
+              </Tooltip>
+            </Grid>
+          )}
+          <Grid container item xs={12} md={!!allSavedFilters?.count ? 7 : 4} justifyContent="space-between">
+            {!!allSavedFilters?.count && (
+              <Button icon={<SavedSearch fill="#FFF" />} width="49%" onClick={() => setToggleSavedFiltersModal(true)}>
+                Vos filtres
+              </Button>
+            )}
+            <Button
+              icon={<FilterList height="15px" fill="#FFF" />}
+              width={!!allSavedFilters?.count ? '49%' : '100%'}
+              onClick={() => setToggleFilterByModal(true)}
+            >
+              Filtrer
+            </Button>
+          </Grid>
+        </Grid>
+      </Grid>
+      <BlockWrapper item xs={12}>
         <Searchbar>
-          <Grid container item xs={12} md={12} lg={8} xl={8} style={isSm ? { flexWrap: 'wrap-reverse' } : {}}>
-            <Grid item xs={12} md={5} lg={5} xl={5}>
+          <Grid container alignItems="center">
+            <Grid item xs={12} md={12} lg={4} xl={4}>
               <Tabs
                 values={PMSITabs}
                 active={selectedTab}
-                onchange={(value: TabType<PMSI, PMSILabel>) => setSelectedTab(value)}
+                onchange={(
+                  value: TabType<RessourceType.CONDITION | RessourceType.PROCEDURE | RessourceType.CLAIM, PMSILabel>
+                ) => setSelectedTab(value)}
               />
             </Grid>
-            <Grid
-              container
-              justifyContent={isSm ? 'flex-start' : isMd ? 'flex-end' : 'center'}
-              alignItems="end"
-              item
-              xs={12}
-              md={7}
-              lg={7}
-              xl={7}
-              style={isSm ? { marginBottom: 20 } : {}}
-            >
+            <Grid item xs={12} md={12} lg={4} xl={4} container justifyContent="center">
               {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && (
                 <CircularProgress />
               )}
@@ -178,47 +264,19 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                 <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label} />
               )}
             </Grid>
-          </Grid>
 
-          <Grid container item xs={12} md={12} lg={4} xl={4} justifyContent="flex-end">
-            <SearchInput
-              value={searchInput}
-              placeholder={'Rechercher'}
-              width="70%"
-              onchange={(newValue) => changeSearchInput(newValue)}
-            />
-            <Button width={'30%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
-              Filtrer
-            </Button>
-            {toggleModal && (
-              <Modal
-                title="Filtrer par :"
-                open={toggleModal}
-                width={'600px'}
-                onClose={() => setToggleModal(false)}
-                onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
-              >
-                {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-                <CodeFilter name={FilterKeys.CODE} value={code} />
-                {selectedTab.id === PMSI.DIAGNOSTIC && (
-                  <DiagnosticTypesFilter
-                    name={FilterKeys.DIAGNOSTIC_TYPES}
-                    value={diagnosticTypes}
-                    allDiagnosticTypesList={allDiagnosticTypesList}
-                  />
-                )}
-                {selectedTab.id === PMSI.CCAM && <SourceFilter name={FilterKeys.SOURCE} value={source} />}
-                <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
-                <ExecutiveUnitsFilter
-                  value={executiveUnits}
-                  name={FilterKeys.EXECUTIVE_UNITS}
-                  criteriaName={mapToCriteriaName(selectedTab.id)}
-                />
-              </Modal>
-            )}
+            <Grid item xs={12} md={12} lg={4} xl={4}>
+              <SearchInput
+                value={searchInput}
+                placeholder={'Rechercher'}
+                width="100%"
+                onchange={(newValue) => changeSearchInput(newValue)}
+              />
+            </Grid>
           </Grid>
         </Searchbar>
       </BlockWrapper>
+
       {filtersAsArray.length > 0 && (
         <Grid item xs={12} margin="0px 0px 10px">
           {filtersAsArray.map((filter, index) => (
@@ -239,6 +297,185 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
           total={searchResults.nb}
         />
       </Grid>
+
+      <Modal
+        title="Filtrer par :"
+        open={toggleFilterByModal}
+        color="secondary"
+        onClose={() => setToggleFilterByModal(false)}
+        onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
+      >
+        {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+        <CodeFilter name={FilterKeys.CODE} value={code} onFetch={fetchCodes()} />
+        {selectedTab.id === RessourceType.CONDITION && (
+          <DiagnosticTypesFilter
+            name={FilterKeys.DIAGNOSTIC_TYPES}
+            value={diagnosticTypes || []}
+            allDiagnosticTypesList={allDiagnosticTypesList}
+          />
+        )}
+        {selectedTab.id === RessourceType.PROCEDURE && <SourceFilter name={FilterKeys.SOURCE} value={source || ''} />}
+        <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
+        <ExecutiveUnitsFilter
+          value={executiveUnits}
+          name={FilterKeys.EXECUTIVE_UNITS}
+          criteriaName={mapToCriteriaName(selectedTab.id)}
+        />
+      </Modal>
+
+      <Modal
+        title="Filtres sauvegardés"
+        open={toggleSavedFiltersModal}
+        onClose={() => {
+          setToggleSavedFiltersModal(false)
+          resetSavedFilterError()
+        }}
+        onSubmit={() => {
+          if (selectedSavedFilter) addSearchCriterias(selectedSavedFilter.filterParams)
+        }}
+        validationText="Appliquer le filtre"
+      >
+        <List
+          values={allSavedFiltersAsListItems}
+          count={allSavedFilters?.count || 0}
+          onDisplay={() => {
+            setToggleFilterInfoModal(true)
+            setIsReadonlyFilterInfoModal(true)
+          }}
+          onEdit={
+            maintenanceIsActive
+              ? undefined
+              : () => {
+                  setToggleFilterInfoModal(true)
+                  setIsReadonlyFilterInfoModal(false)
+                }
+          }
+          onDelete={maintenanceIsActive ? undefined : deleteSavedFilters}
+          onSelect={(filter) => selectFilter(filter)}
+          fetchPaginateData={() => getSavedFilters(allSavedFilters?.next)}
+        >
+          <Modal
+            title={isReadonlyFilterInfoModal ? 'Informations' : 'Modifier le filtre'}
+            color="secondary"
+            open={toggleFilterInfoModal}
+            readonly={isReadonlyFilterInfoModal}
+            onClose={() => setToggleFilterInfoModal(false)}
+            onSubmit={({
+              filterName,
+              searchInput,
+              code,
+              nda,
+              diagnosticTypes,
+              source,
+              startDate,
+              endDate,
+              executiveUnits
+            }) => {
+              patchSavedFilter(
+                filterName,
+                {
+                  searchInput,
+                  orderBy: { orderBy: Order.DATE, orderDirection: Direction.DESC },
+                  filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits }
+                },
+                searchResults.deidentified ?? true
+              )
+            }}
+            validationText="Sauvegarder"
+          >
+            <Grid container gap="8px">
+              <Grid item xs={12}>
+                <TextInput
+                  name="filterName"
+                  label="Nom :"
+                  value={selectedSavedFilter?.filterName}
+                  error={savedFiltersErrors}
+                  disabled={isReadonlyFilterInfoModal}
+                  minLimit={2}
+                  maxLimit={50}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextInput
+                  name="searchInput"
+                  label="Recherche textuelle :"
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.searchInput}
+                />
+              </Grid>
+              {!searchResults.deidentified && (
+                <Grid item xs={12}>
+                  <NdaFilter
+                    disabled={isReadonlyFilterInfoModal}
+                    name={FilterKeys.NDA}
+                    value={selectedSavedFilter?.filterParams.filters.nda || ''}
+                  />
+                </Grid>
+              )}
+              <Grid item xs={12}>
+                <CodeFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  name={FilterKeys.CODE}
+                  value={selectedSavedFilter?.filterParams.filters.code || []}
+                  onFetch={fetchCodes()}
+                />
+              </Grid>
+              {selectedTab.id === RessourceType.CONDITION && (
+                <Grid item xs={12}>
+                  <DiagnosticTypesFilter
+                    disabled={isReadonlyFilterInfoModal}
+                    name={FilterKeys.DIAGNOSTIC_TYPES}
+                    value={selectedSavedFilter?.filterParams.filters.diagnosticTypes || []}
+                    allDiagnosticTypesList={allDiagnosticTypesList}
+                  />
+                </Grid>
+              )}
+              {selectedTab.id === RessourceType.PROCEDURE && (
+                <Grid item xs={12}>
+                  <SourceFilter
+                    disabled={isReadonlyFilterInfoModal}
+                    name={FilterKeys.SOURCE}
+                    value={selectedSavedFilter?.filterParams.filters.source || ''}
+                  />
+                </Grid>
+              )}
+              <Grid item xs={12}>
+                <DatesRangeFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  values={[
+                    selectedSavedFilter?.filterParams.filters.startDate,
+                    selectedSavedFilter?.filterParams.filters.endDate
+                  ]}
+                  names={[FilterKeys.START_DATE, FilterKeys.END_DATE]}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <ExecutiveUnitsFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
+                  name={FilterKeys.EXECUTIVE_UNITS}
+                  criteriaName={mapToCriteriaName(selectedTab.id)}
+                />
+              </Grid>
+            </Grid>
+          </Modal>
+        </List>
+      </Modal>
+      <Modal
+        title="Sauvegarder le filtre"
+        color="secondary"
+        open={toggleSaveFiltersModal}
+        onClose={() => {
+          setToggleSaveFiltersModal(false)
+          resetSavedFilterError()
+        }}
+        onSubmit={({ filtersName }) =>
+          postSavedFilter(filtersName, { searchInput, filters, orderBy }, searchResults.deidentified ?? true)
+        }
+      >
+        <TextInput name="filtersName" error={savedFiltersErrors} label="Nom" minLimit={2} maxLimit={50} />
+      </Modal>
     </Grid>
   )
 }
