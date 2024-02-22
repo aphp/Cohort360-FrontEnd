@@ -157,9 +157,17 @@ const ProjectTable = ({
             </TableRow>
           )}
           {loadingStatus === LoadingStatus.SUCCESS && (
-            <Grid container id="scrollableDiv" style={{ overflow: 'auto', height: '200px', width: '100%' }}>
+            <Grid
+              container
+              id="scrollableDiv"
+              className={classes.scrollableDiv}
+              item
+              xs={12}
+              style={{ overflow: 'auto', height: '200px', width: '100% !important' }}
+            >
               <InfiniteScroll
                 scrollableTarget="scrollableDiv"
+                style={{ width: '100% !important' }}
                 dataLength={results?.results?.length || 0}
                 next={() => setLoadingStatus(LoadingStatus.IDDLE)}
                 hasMore={/*(results?.results?.length || 0) < (results?.count || 0)*/ true}
@@ -171,7 +179,7 @@ const ProjectTable = ({
                 }
               >
                 {results?.results.map((project: ProjectType) => (
-                  <Grid container>
+                  <Grid item xs={12}>
                     <ProjectRow
                       key={project.uuid}
                       row={project}

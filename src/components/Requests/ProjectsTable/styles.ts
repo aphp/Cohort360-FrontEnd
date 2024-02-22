@@ -71,7 +71,12 @@ const useStyles = makeStyles()((theme: Theme) => ({
     flexDirection: 'column',
     textAlign: 'center'
   },
-  notAllowed: { cursor: 'not-allowed' }
+  notAllowed: { cursor: 'not-allowed' },
+  scrollableDiv: {
+    '& .infinite-scroll-component__outerdiv': {
+      width: '100% !important'
+    }
+  }
 }))
 
 export default useStyles

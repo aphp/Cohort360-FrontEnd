@@ -64,41 +64,38 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
 
   return (
     <>
-      <Grid container>
-        <TableCellWrapper style={{ width: '70px', textAlign: 'left' }}>
-          <IconButton style={{ marginLeft: 4 }} aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+      <TableCellWrapper style={{ width: '70px', textAlign: 'left' }}>
+        <IconButton style={{ marginLeft: 4 }} aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+          {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+        </IconButton>
+      </TableCellWrapper>
+      <TableCellWrapper style={{ width: '120px', textAlign: 'left' }}>
+        <Typography>{date}</Typography>
+      </TableCellWrapper>
+      <TableCellWrapper align="left" style={{ width: 'calc(100% - 70px - 120px)' }}>
+        <Typography style={{ fontWeight: 900, display: 'inline-table' }}>{row.name}</Typography>
+        <Tooltip title={'Ajouter une requête'}>
+          <IconButton
+            onClick={handleAddRequest}
+            className={classes.smallAddButton}
+            size="small"
+            disabled={maintenanceIsActive}
+          >
+            <AddIcon />
           </IconButton>
-        </TableCellWrapper>
-        <TableCellWrapper style={{ width: '120px', textAlign: 'left' }}>
-          <Typography>{date}</Typography>
-        </TableCellWrapper>
-        <TableCellWrapper align="left">
-          <Typography style={{ fontWeight: 900, display: 'inline-table' }}>{row.name}</Typography>
+        </Tooltip>
 
-          <Tooltip title={'Ajouter une requête'}>
-            <IconButton
-              onClick={handleAddRequest}
-              className={classes.smallAddButton}
-              size="small"
-              disabled={maintenanceIsActive}
-            >
-              <AddIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title={'Modifier le projet'}>
-            <IconButton
-              onClick={() => handleClickAddOrEditProject(row.uuid)}
-              className={classes.editButton}
-              size="small"
-              disabled={maintenanceIsActive}
-            >
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-        </TableCellWrapper>
-      </Grid>
+        <Tooltip title={'Modifier le projet'}>
+          <IconButton
+            onClick={() => handleClickAddOrEditProject(row.uuid)}
+            className={classes.editButton}
+            size="small"
+            disabled={maintenanceIsActive}
+          >
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+      </TableCellWrapper>
 
       {/*<TableRow>
         <TableCellWrapper align="left" style={{ padding: 0, borderBottomWidth: open ? 1 : 0 }} colSpan={4}>
