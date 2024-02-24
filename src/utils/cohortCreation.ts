@@ -46,6 +46,7 @@ import {
   findQuestionnaireName
 } from './mappers'
 import { pregnancyForm } from 'data/pregnancyData'
+import { hospitForm } from 'data/hospitData'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
@@ -112,27 +113,6 @@ const IMAGING_SERIES_DESCRIPTION = 'series-description'
 const IMAGING_SERIES_PROTOCOL = 'series-protocol'
 const IMAGING_SERIES_MODALITIES = 'series-modality'
 const IMAGING_SERIES_UID = 'series'
-
-// const HOSPIT_HOSPIT_REASON = 'F_MATER_004051'
-// const HOSPIT_IN_UTERO_TRANSFER = 'F_MATER_004056'
-// const HOSPIT_PREGNANCY_MONITORING = 'F_MATER_004062'
-// const HOSPIT_MATURATION_CORTICOTHERAPIE = 'F_MATER_004372'
-// const HOSPIT_CHIRURGICAL_GESTURE = 'F_MATER_004623'
-// const HOSPIT_VME = '?'
-// const HOSPIT_CHILDBIRTH = '?'
-// const HOSPIT_CHILDBIRTH_PLACE = '?'
-// const HOSPIT_CHILDBIRTH_MODE = 'F_MATER_004830'
-// const HOSPIT_MATURATION_REASON = 'F_MATER_004831'
-// const HOSPIT_MATURATION_MODALITY = 'F_MATER_004833'
-// const HOSPIT_IMG_INDICATION = 'F_MATER_004839'
-// const HOSPIT_LABOR_OR_CESAREAN_ENTRY = 'F_MATER_004842'
-// const HOSPIT_PATHOLOGY_DURING_LABOR = 'F_MATER_004859'
-// const HOSPIT_OBSTETRICAL_GESTURE_DURING_LABOR = 'F_MATER_004864'
-// const HOSPIT_ANALGESIE_TYPE = 'F_MATER_004901'
-// const HOSPIT_FEEDING_TYPE = 'F_MATER_005507'
-// const HOSPIT_COMPLICATION = '?'
-// const HOSPIT_EXIT_FEEDING_MODE = 'F_MATER_005834'
-// const HOSPIT_EXIT_DIAGNOSTIC = 'F_MATER_005903'
 
 export const UNITE_EXECUTRICE = 'Unité exécutrice'
 export const STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE = 'Structure hospitalière de prise en charge'
@@ -482,73 +462,119 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         .filter((elem) => elem)
         .reduce(filterReducer)
       break
-    // case RessourceType.HOSPIT:
-    //   filterFhir = [
-    //     'subject.active=true',
-    //     `_filter=linkId eq ${HOSPIT_HOSPIT_REASON} and value eq ${criterion.hospitReason}`,
-    //     `_filter=linkId eq ${HOSPIT_IN_UTERO_TRANSFER} and value eq ${
-    //       criterion.inUteroTransfer && criterion.inUteroTransfer.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_PREGNANCY_MONITORING} and value eq ${
-    //       criterion.pregnancyMonitoring && criterion.pregnancyMonitoring.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_VME} and value eq ${
-    //       criterion.vme && criterion.vme.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_MATURATION_CORTICOTHERAPIE} and value eq ${
-    //       criterion.maturationCorticotherapie &&
-    //       criterion.maturationCorticotherapie.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_CHIRURGICAL_GESTURE} and value eq ${
-    //       criterion.chirurgicalGesture && criterion.chirurgicalGesture.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_CHILDBIRTH} and value eq ${
-    //       criterion.childbirth && criterion.childbirth.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_CHILDBIRTH_PLACE} and value eq ${
-    //       criterion.childbirthPlace && criterion.childbirthPlace.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_CHILDBIRTH_MODE} and value eq ${
-    //       criterion.childbirthMode && criterion.childbirthMode.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_MATURATION_REASON} and value eq ${
-    //       criterion.maturationReason && criterion.maturationReason.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_MATURATION_MODALITY} and value eq ${
-    //       criterion.maturationModality && criterion.maturationModality.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_IMG_INDICATION} and value eq ${
-    //       criterion.imgIndication && criterion.imgIndication.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_LABOR_OR_CESAREAN_ENTRY} and value eq ${
-    //       criterion.laborOrCesareanEntry && criterion.laborOrCesareanEntry.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_PATHOLOGY_DURING_LABOR} and value eq ${
-    //       criterion.pathologyDuringLabor && criterion.pathologyDuringLabor.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_OBSTETRICAL_GESTURE_DURING_LABOR} and value eq ${
-    //       criterion.obstetricalGestureDuringLabor &&
-    //       criterion.obstetricalGestureDuringLabor.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_ANALGESIE_TYPE} and value eq ${
-    //       criterion.analgesieType && criterion.analgesieType.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_FEEDING_TYPE} and value eq ${
-    //       criterion.feedingType && criterion.feedingType.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_COMPLICATION} and value eq ${
-    //       criterion.complication && criterion.complication.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_EXIT_FEEDING_MODE} and value eq ${
-    //       criterion.exitFeedingMode && criterion.exitFeedingMode.map((item) => item.id).reduce(searchReducer)
-    //     }`,
-    //     `_filter=linkId eq ${HOSPIT_EXIT_DIAGNOSTIC} and value eq ${
-    //       criterion.exitDiagnostic && criterion.exitDiagnostic.map((item) => item.id).reduce(searchReducer)
-    //     }`
-    //   ]
-    //   .filter((elem) => elem)
-    //   .reduce(filterReducer)
-    // break
+    case RessourceType.HOSPIT:
+      filterFhir = [
+        'subject.active=true',
+        `questionnaire.name=${FormNames.HOSPIT}`,
+        questionnaireFiltersBuilders(hospitForm.hospitReason, buildSearchFilter(criterion.hospitReason)),
+        questionnaireFiltersBuilders(
+          hospitForm.hospitInUteroTransfer,
+          buildLabelObjectFilter(criterion.inUteroTransfer)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.pregnancyMonitoring,
+          buildLabelObjectFilter(criterion.pregnancyMonitoring)
+        ),
+        questionnaireFiltersBuilders(hospitForm.vme, buildLabelObjectFilter(criterion.vme)),
+        questionnaireFiltersBuilders(
+          hospitForm.maturationCorticotherapie,
+          buildLabelObjectFilter(criterion.maturationCorticotherapie)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.chirurgicalGesture,
+          buildLabelObjectFilter(criterion.chirurgicalGesture)
+        ),
+        questionnaireFiltersBuilders(hospitForm.childbirth, buildLabelObjectFilter(criterion.childbirth)),
+        questionnaireFiltersBuilders(hospitForm.childbirthPlace, buildLabelObjectFilter(criterion.childbirthPlace)),
+        questionnaireFiltersBuilders(hospitForm.childbirthMode, buildLabelObjectFilter(criterion.childbirthMode)),
+        questionnaireFiltersBuilders(hospitForm.maturationReason, buildLabelObjectFilter(criterion.maturationReason)),
+        questionnaireFiltersBuilders(
+          hospitForm.maturationModality,
+          buildLabelObjectFilter(criterion.maturationModality)
+        ),
+        questionnaireFiltersBuilders(hospitForm.imgIndication, buildLabelObjectFilter(criterion.imgIndication)),
+        questionnaireFiltersBuilders(
+          hospitForm.laborOrCesareanEntry,
+          buildLabelObjectFilter(criterion.laborOrCesareanEntry)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.pathologyDuringLabor,
+          buildLabelObjectFilter(criterion.pathologyDuringLabor)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.obstetricalGestureDuringLabor,
+          buildLabelObjectFilter(criterion.obstetricalGestureDuringLabor)
+        ),
+        questionnaireFiltersBuilders(hospitForm.analgesieType, buildLabelObjectFilter(criterion.analgesieType)),
+        questionnaireFiltersBuilders(
+          hospitForm.birthDeliveryStartDate,
+          buildDateFilter(criterion.birthDeliveryStartDate, 'ge', true)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.birthDeliveryEndDate,
+          buildDateFilter(criterion.birthDeliveryEndDate, 'le', true)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.birthDeliveryWeeks,
+          buildComparatorFilter(criterion.birthDeliveryWeeks, criterion.birthDeliveryWeeksComparator)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.birthDeliveryDays,
+          buildComparatorFilter(criterion.birthDeliveryDays, criterion.birthDeliveryDaysComparator)
+        ),
+        questionnaireFiltersBuilders(hospitForm.birthDeliveryWay, buildLabelObjectFilter(criterion.birthDeliveryWay)),
+        questionnaireFiltersBuilders(hospitForm.instrumentType, buildLabelObjectFilter(criterion.instrumentType)),
+        questionnaireFiltersBuilders(hospitForm.cSectionModality, buildLabelObjectFilter(criterion.cSectionModality)),
+        questionnaireFiltersBuilders(
+          hospitForm.presentationAtDelivery,
+          buildLabelObjectFilter(criterion.presentationAtDelivery)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.birthMensurationsGrams,
+          buildComparatorFilter(criterion.birthMensurationsGrams, criterion.birthMensurationsGramsComparator)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.birthMensurationsPercentil,
+          buildComparatorFilter(criterion.birthMensurationsPercentil, criterion.birthMensurationsPercentilComparator)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.apgar1,
+          buildComparatorFilter(criterion.apgar1, criterion.apgar1Comparator)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.apgar3,
+          buildComparatorFilter(criterion.apgar3, criterion.apgar3Comparator)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.apgar5,
+          buildComparatorFilter(criterion.apgar5, criterion.apgar5Comparator)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.apgar10,
+          buildComparatorFilter(criterion.apgar10, criterion.apgar10Comparator)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.arterialPhCord,
+          buildComparatorFilter(criterion.arterialPhCord, criterion.arterialPhCordComparator)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.arterialCordLactates,
+          buildComparatorFilter(criterion.arterialCordLactates, criterion.arterialCordLactatesComparator)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.postpartumHemorrhage,
+          buildLabelObjectFilter(criterion.postpartumHemorrhage)
+        ),
+        questionnaireFiltersBuilders(hospitForm.conditionPerineum, buildLabelObjectFilter(criterion.conditionPerineum)),
+        questionnaireFiltersBuilders(hospitForm.exitPlaceType, buildLabelObjectFilter(criterion.exitPlaceType)),
+        questionnaireFiltersBuilders(hospitForm.feedingType, buildLabelObjectFilter(criterion.feedingType)),
+        questionnaireFiltersBuilders(hospitForm.complication, buildLabelObjectFilter(criterion.complication)),
+        questionnaireFiltersBuilders(hospitForm.exitFeedingMode, buildLabelObjectFilter(criterion.exitFeedingMode)),
+        questionnaireFiltersBuilders(hospitForm.exitDiagnostic, buildLabelObjectFilter(criterion.exitDiagnostic))
+      ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
+      break
 
     default:
       break
@@ -1424,7 +1450,231 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 }
               }
               break
-            case RessourceType.MATERNITY:
+            case FormNames.HOSPIT:
+              currentCriterion.title = "Critère de Fiche d'hospitalisation"
+              currentCriterion.type = RessourceType.HOSPIT
+              currentCriterion.hospitReason = ''
+              currentCriterion.inUteroTransfer = []
+              currentCriterion.pregnancyMonitoring = []
+              currentCriterion.vme = []
+              currentCriterion.maturationCorticotherapie = []
+              currentCriterion.chirurgicalGesture = []
+              currentCriterion.childbirth = []
+              currentCriterion.childbirthPlace = []
+              currentCriterion.childbirthMode = []
+              currentCriterion.maturationReason = []
+              currentCriterion.maturationModality = []
+              currentCriterion.imgIndication = []
+              currentCriterion.laborOrCesareanEntry = []
+              currentCriterion.pathologyDuringLabor = []
+              currentCriterion.obstetricalGestureDuringLabor = []
+              currentCriterion.analgesieType = []
+              currentCriterion.birthDeliveryStartDate = '' // TODO : check type
+              currentCriterion.birthDeliveryEndDate = '' // TODO : check type
+              currentCriterion.birthDeliveryWeeks = 1
+              currentCriterion.birthDeliveryWeeksComparator = Comparators.GREATER_OR_EQUAL
+              currentCriterion.birthDeliveryDays = 1
+              currentCriterion.birthDeliveryDaysComparator = Comparators.GREATER_OR_EQUAL
+              currentCriterion.birthDeliveryWay = []
+              currentCriterion.instrumentType = []
+              currentCriterion.cSectionModality = []
+              currentCriterion.presentationAtDelivery = []
+              currentCriterion.birthMensurationsGrams = 1
+              currentCriterion.birthMensurationsGramsComparator = Comparators.GREATER_OR_EQUAL
+              currentCriterion.birthMensurationsPercentil = 1
+              currentCriterion.birthMensurationsPercentilComparator = Comparators.GREATER_OR_EQUAL
+              currentCriterion.apgar1 = 1
+              currentCriterion.apgar1Comparator = Comparators.GREATER_OR_EQUAL
+              currentCriterion.apgar3 = 1
+              currentCriterion.apgar3Comparator = Comparators.GREATER_OR_EQUAL
+              currentCriterion.apgar5 = 1
+              currentCriterion.apgar5Comparator = Comparators.GREATER_OR_EQUAL
+              currentCriterion.apgar10 = 1
+              currentCriterion.apgar10Comparator = Comparators.GREATER_OR_EQUAL
+              currentCriterion.arterialPhCord = 1
+              currentCriterion.arterialPhCordComparator = Comparators.GREATER_OR_EQUAL
+              currentCriterion.arterialCordLactates = 1
+              currentCriterion.arterialCordLactatesComparator = Comparators.GREATER_OR_EQUAL
+              currentCriterion.postpartumHemorrhage = []
+              currentCriterion.conditionPerineum = []
+              currentCriterion.exitPlaceType = []
+              currentCriterion.feedingType = []
+              currentCriterion.complication = []
+              currentCriterion.exitFeedingMode = []
+              currentCriterion.exitDiagnostic = []
+              currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
+              currentCriterion.encounterService = []
+
+              unbuildAdvancedCriterias(element, currentCriterion)
+
+              for (const { key, values } of cleanedFilters) {
+                // this is bad design, we should properly handle multiple values and operators
+                const { value: singleValue, operator } = values.length > 0 ? values[0] : { value: '', operator: 'eq' }
+                const joinedValues = values.map((val) => val.value).join(',')
+
+                switch (key) {
+                  case hospitForm.hospitReason.id:
+                    currentCriterion.hospitReason = unbuildSearchFilter(singleValue)
+                    break
+                  case hospitForm.inUteroTransfer.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'inUteroTransfer', joinedValues)
+                    break
+                  case hospitForm.pregnancyMonitoring.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'pregnancyMonitoring', joinedValues)
+                    break
+                  case hospitForm.vme.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'vme', joinedValues)
+                    break
+                  case hospitForm.maturationCorticotherapie.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'maturationCorticotherapie', joinedValues)
+                    break
+                  case hospitForm.chirurgicalGesture.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'chirurgicalGesture', joinedValues)
+                    break
+                  case hospitForm.childbirth.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'childbirth', joinedValues)
+                    break
+                  case hospitForm.childbirthPlace.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'childbirthPlace', joinedValues)
+                    break
+                  case hospitForm.childbirthMode.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'childbirthMode', joinedValues)
+                    break
+                  case hospitForm.maturationReason.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'maturationReason', joinedValues)
+                    break
+                  case hospitForm.maturationModality.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'maturationModality', joinedValues)
+                    break
+                  case hospitForm.imgIndication.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'imgIndication', joinedValues)
+                    break
+                  case hospitForm.laborOrCesareanEntry.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'laborOrCesareanEntry', joinedValues)
+                    break
+                  case hospitForm.pathologyDuringLabor.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'pathologyDuringLabor', joinedValues)
+                    break
+                  case hospitForm.obstetricalGestureDuringLabor.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'obstetricalGestureDuringLabor', joinedValues)
+                    break
+                  case hospitForm.analgesieType.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'analgesieType', joinedValues)
+                    break
+                  case hospitForm.birthDeliveryStartDate.id:
+                    currentCriterion.birthDeliveryStartDate = unbuildDateFilter(singleValue)
+                    break
+                  case hospitForm.birthDeliveryEndDate.id:
+                    currentCriterion.birthDeliveryEndDate = unbuildDateFilter(singleValue)
+                    break
+                  case hospitForm.birthDeliveryWeeks.id: {
+                    const _value = `${operator}${singleValue}`
+                    const parsedOccurence = parseOccurence(_value)
+                    currentCriterion.birthDeliveryWeeks = parsedOccurence.value
+                    currentCriterion.birthDeliveryWeeksComparator = parsedOccurence.comparator
+                    break
+                  }
+                  case hospitForm.birthDeliveryDays.id: {
+                    const _value = `${operator}${singleValue}`
+                    const parsedOccurence = parseOccurence(_value)
+                    currentCriterion.birthDeliveryDays = parsedOccurence.value
+                    currentCriterion.birthDeliveryDaysComparator = parsedOccurence.comparator
+                    break
+                  }
+                  case hospitForm.birthDeliveryWay.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'birthDeliveryWay', joinedValues)
+                    break
+                  case hospitForm.instrumentType.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'instrumentType', joinedValues)
+                    break
+                  case hospitForm.cSectionModality.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'cSectionModality', joinedValues)
+                    break
+                  case hospitForm.presentationAtDelivery.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'presentationAtDelivery', joinedValues)
+                    break
+                  case hospitForm.birthMensurationsGrams.id: {
+                    const _value = `${operator}${singleValue}`
+                    const parsedOccurence = parseOccurence(_value)
+                    currentCriterion.birthMensurationsGrams = parsedOccurence.value
+                    currentCriterion.birthMensurationsGramsComparator = parsedOccurence.comparator
+                    break
+                  }
+                  case hospitForm.birthMensurationsPercentil.id: {
+                    const _value = `${operator}${singleValue}`
+                    const parsedOccurence = parseOccurence(_value)
+                    currentCriterion.birthMensurationsPercentil = parsedOccurence.value
+                    currentCriterion.birthMensurationsPercentilComparator = parsedOccurence.comparator
+                    break
+                  }
+                  case hospitForm.apgar1.id: {
+                    const _value = `${operator}${singleValue}`
+                    const parsedOccurence = parseOccurence(_value)
+                    currentCriterion.apgar1 = parsedOccurence.value
+                    currentCriterion.apgar1Comparator = parsedOccurence.comparator
+                    break
+                  }
+                  case hospitForm.apgar3.id: {
+                    const _value = `${operator}${singleValue}`
+                    const parsedOccurence = parseOccurence(_value)
+                    currentCriterion.apgar3 = parsedOccurence.value
+                    currentCriterion.apgar3Comparator = parsedOccurence.comparator
+                    break
+                  }
+                  case hospitForm.apgar5.id: {
+                    const _value = `${operator}${singleValue}`
+                    const parsedOccurence = parseOccurence(_value)
+                    currentCriterion.apgar5 = parsedOccurence.value
+                    currentCriterion.apgar5Comparator = parsedOccurence.comparator
+                    break
+                  }
+                  case hospitForm.apgar10.id: {
+                    const _value = `${operator}${singleValue}`
+                    const parsedOccurence = parseOccurence(_value)
+                    currentCriterion.apgar10 = parsedOccurence.value
+                    currentCriterion.apgar10Comparator = parsedOccurence.comparator
+                    break
+                  }
+                  case hospitForm.arterialPhCord.id: {
+                    const _value = `${operator}${singleValue}`
+                    const parsedOccurence = parseOccurence(_value)
+                    currentCriterion.arterialPhCord = parsedOccurence.value
+                    currentCriterion.arterialPhCordComparator = parsedOccurence.comparator
+                    break
+                  }
+                  case hospitForm.arterialCordLactates.id: {
+                    const _value = `${operator}${singleValue}`
+                    const parsedOccurence = parseOccurence(_value)
+                    currentCriterion.arterialCordLactates = parsedOccurence.value
+                    currentCriterion.arterialCordLactatesComparator = parsedOccurence.comparator
+                    break
+                  }
+                  case hospitForm.postpartumHemorrhage.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'postpartumHemorrhage', joinedValues)
+                    break
+                  case hospitForm.conditionPerineum.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'conditionPerineum', joinedValues)
+                    break
+                  case hospitForm.exitPlaceType.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'exitPlaceType', joinedValues)
+                    break
+                  case hospitForm.feedingType.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'feedingType', joinedValues)
+                    break
+                  case hospitForm.complication.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'complication', joinedValues)
+                    break
+                  case hospitForm.exitFeedingMode.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'exitFeedingMode', joinedValues)
+                    break
+                  case hospitForm.exitDiagnostic.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'exitDiagnostic', joinedValues)
+                    break
+                  case ENCOUNTER_SERVICE_PROVIDER:
+                    await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', joinedValues)
+                    break
+                }
+              }
               break
             default:
               break

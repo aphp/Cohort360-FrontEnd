@@ -41,7 +41,25 @@ import {
   PREGNANCY_MODE,
   MATERNAL_RISKS,
   RISKSORCOMPLICATIONSOFPREGNANCY,
-  RISKSRELATEDTOOBSTETRICHISTORY
+  RISKSRELATEDTOOBSTETRICHISTORY,
+  CHIRURGICAL_GESTURE,
+  CHILD_BIRTH_MODE,
+  MATURATION_REASON,
+  MATURATION_MODALITY,
+  IMG_INDICATION,
+  LABOR_OR_CESAREAN_ENTRY,
+  PATHOLOGY_DURING_LABOR,
+  OBSTETRICAL_GESTURE_DURING_LABOR,
+  ANALGESIE_TYPE,
+  BIRTH_DELIVERY_WAY,
+  INSTRUMENT_TYPE,
+  C_SECTION_MODALITY,
+  PRESENTATION_AT_DELIVERY,
+  CONDITION_PERINEUM,
+  EXIT_PLACE_TYPE,
+  FEEDING_TYPE,
+  EXIT_FEEDING_MODE,
+  EXIT_DIAGNOSTIC
 } from '../../constants'
 import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
 import { DocType } from 'types/requestCriterias'
@@ -468,9 +486,8 @@ const servicesCohortCreation: IServiceCohortCreation = {
   fetchMaturationCorticotherapie: async () => {
     return booleanFieldsData
   },
-  fetchChirurgicalGesture: async () => {
-    return booleanFieldsData
-  },
+  fetchChirurgicalGesture: async () =>
+    fetchValueSet(CHIRURGICAL_GESTURE, { joinDisplayWithCode: false, sortingKey: 'id' }),
   fetchVme: async () => {
     return booleanFieldsData
   },
@@ -480,63 +497,37 @@ const servicesCohortCreation: IServiceCohortCreation = {
   fetchChildbirthPlace: async () => {
     return booleanFieldsData
   },
-  fetchChildbirthMode: async () => {
-    return booleanFieldsData
-  },
-  fetchMaturationReason: async () => {
-    return booleanFieldsData
-  },
-  fetchMaturationModality: async () => {
-    return booleanFieldsData
-  },
-  fetchImgIndication: async () => {
-    return booleanFieldsData
-  },
-  fetchLaborOrCesareanEntry: async () => {
-    return booleanFieldsData
-  },
-  fetchPathologyDuringLabor: async () => {
-    return booleanFieldsData
-  },
-  fetchObstetricalGestureDuringLabor: async () => {
-    return booleanFieldsData
-  },
-  fetchAnalgesieType: async () => {
-    return booleanFieldsData
-  },
-  fetchBirthDeliveryWay: async () => {
-    return pregnancyModeData
-  },
-  fetchInstrumentType: async () => {
-    return pregnancyModeData
-  },
-  fetchCSectionModality: async () => {
-    return pregnancyModeData
-  },
-  fetchPresentationAtDelivery: async () => {
-    return pregnancyModeData
-  },
+  fetchChildbirthMode: async () => fetchValueSet(CHILD_BIRTH_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchMaturationReason: async () => fetchValueSet(MATURATION_REASON, { joinDisplayWithCode: false, sortingKey: 'id' }),
+
+  fetchMaturationModality: async () =>
+    fetchValueSet(MATURATION_MODALITY, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchImgIndication: async () => fetchValueSet(IMG_INDICATION, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchLaborOrCesareanEntry: async () =>
+    fetchValueSet(LABOR_OR_CESAREAN_ENTRY, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchPathologyDuringLabor: async () =>
+    fetchValueSet(PATHOLOGY_DURING_LABOR, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchObstetricalGestureDuringLabor: async () =>
+    fetchValueSet(OBSTETRICAL_GESTURE_DURING_LABOR, { joinDisplayWithCode: false }),
+  fetchAnalgesieType: async () => fetchValueSet(ANALGESIE_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchBirthDeliveryWay: async () =>
+    fetchValueSet(BIRTH_DELIVERY_WAY, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchInstrumentType: async () => fetchValueSet(INSTRUMENT_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchCSectionModality: async () =>
+    fetchValueSet(C_SECTION_MODALITY, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchPresentationAtDelivery: async () => fetchValueSet(PRESENTATION_AT_DELIVERY, { joinDisplayWithCode: false }),
   fetchSetPostpartumHemorrhage: async () => {
     return pregnancyModeData
   },
-  fetchConditionPerineum: async () => {
-    return pregnancyModeData
-  },
-  fetchExitPlaceType: async () => {
-    return pregnancyModeData
-  },
-  fetchFeedingType: async () => {
-    return booleanFieldsData
-  },
+  fetchConditionPerineum: async () =>
+    fetchValueSet(CONDITION_PERINEUM, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchExitPlaceType: async () => fetchValueSet(EXIT_PLACE_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchFeedingType: async () => fetchValueSet(FEEDING_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
   fetchComplication: async () => {
     return booleanFieldsData
   },
-  fetchExitFeedingMode: async () => {
-    return booleanFieldsData
-  },
-  fetchExitDiagnostic: async () => {
-    return booleanFieldsData
-  }
+  fetchExitFeedingMode: async () => fetchValueSet(EXIT_FEEDING_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchExitDiagnostic: async () => fetchValueSet(EXIT_DIAGNOSTIC, { joinDisplayWithCode: false, sortingKey: 'id' })
 }
 
 export default servicesCohortCreation
