@@ -20,6 +20,7 @@ import TextInput from 'components/Filters/TextInput'
 import servicesProjects from 'services/aphp/serviceProjects'
 import { FetchRequestsResponse, fetchRequestsFromProject } from 'services/requests/api'
 import moment from 'moment'
+import { Direction, Order } from 'types/searchCriterias'
 
 enum Dialog {
   EDIT,
@@ -56,7 +57,9 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, fetchRequests, searchInput
   }
 
   const handleFetchRequests = async () => {
-    const response = await fetchRequestsFromProject(row.uuid, { limit: 10 })
+    const response = await fetchRequestsFromProject(row.uuid, { limit: 10, orderBy: {
+      orderBy: Order.MODIFIED, orderDirection: Direction.DESC
+    } })
     setRequests(response)
   }
 

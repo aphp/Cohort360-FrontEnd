@@ -1,23 +1,27 @@
-import React, { useEffect } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 
-import { Checkbox, Collapse, IconButton, Link, Table, TableBody, TableRow, Tooltip, Typography } from '@mui/material'
+import { Checkbox, Collapse, IconButton, Link, Table, TableBody, TableRow, Typography } from '@mui/material'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
-import EditIcon from '@mui/icons-material/Edit'
-import ShareIcon from '@mui/icons-material/Share'
 
 import VersionRow from '../VersionRow'
 
-import { RequestType, Cohort } from 'types'
+import { RequestType, Cohort, ResponseStatus } from 'types'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { setSelectedRequest, setSelectedRequestShare } from 'state/request'
 import useStyles from '../styles'
-import { Delete } from '@mui/icons-material'
+import RequestActions from 'components/Requests/RequestActions'
+
+enum Dialog {
+  EDIT,
+  DELETE,
+  SHARE
+}
 
 type RequestRowProps = {
   row: RequestType
@@ -26,21 +30,15 @@ type RequestRowProps = {
   /*onSelectedRow: (selectedRequests: RequestType[]) => void*/
   isSearch?: boolean
 }
-const RequestRow: React.FC<RequestRowProps> = ({ row, /*cohortsList, selectedRequests, onSelectedRow,*/ isSearch }) => {
+const RequestRow = ({ row, /*cohortsList, selectedRequests, onSelectedRow,*/ isSearch }: RequestRowProps) => {
   const [open, setOpen] = React.useState(false)
+  const [openModal, setOpenModal] = useState<Dialog | null>(null)
+  const [shareStatus, setShareStatus] = useState<ResponseStatus>(ResponseStatus.IDDLE)
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
-
-  const onEditRequest = (requestId: string) => {
-    dispatch(setSelectedRequest({ uuid: requestId, name: '' }))
-  }
-
-  const onShareRequest = (requestId: string) => {
-    dispatch(setSelectedRequestShare({ uuid: requestId, name: '' }))
-  }
 
   /*useEffect(() => {
     if (isSearch) {
@@ -102,21 +100,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, /*cohortsList, selectedReq
           align="left"
           style={{ height: '70px', textAlign: 'left', display: 'flex', alignItems: 'center' }}
         >
-          <Tooltip title={'Partager la requête'}>
-            <IconButton /*onClick={() => setOpenModal(Dialog.ADD_REQUEST)}*/ disabled={maintenanceIsActive}>
-              <ShareIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={'Modifier la requête'}>
-            <IconButton /*onClick={() => setOpenModal(Dialog.EDIT)}*/ disabled={maintenanceIsActive}>
-              <EditIcon color="action" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={'Supprimer la requête'}>
-            <IconButton /*onClick={() => setOpenModal(Dialog.DELETE)}*/ disabled={maintenanceIsActive} color="warning">
-              <Delete color="warning" />
-            </IconButton>
-          </Tooltip>
+          <RequestActions request={row} disabled={maintenanceIsActive} onUpdate={() => {}} />
         </TableCellWrapper>
       </TableRow>
 

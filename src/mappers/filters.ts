@@ -411,7 +411,7 @@ const mapConditionToRequestParams = (filters: PMSIFilters) => {
     requestParams += `${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${urlString}&`
   }
   if (code)
-    requestParams += `${ConditionParamsKeys.CODE}=${code.map((e) => `${CONDITION_HIERARCHY}|${e.id}`).join(',')}`
+    requestParams += `${ConditionParamsKeys.CODE}=${code.map((e) => `${CONDITION_HIERARCHY}|${e.id}`).join(',')}&`
   requestParams += mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.CONDITION)
   return requestParams
 }
@@ -419,7 +419,7 @@ const mapConditionToRequestParams = (filters: PMSIFilters) => {
 const mapClaimToRequestParams = (filters: PMSIFilters) => {
   const { code, nda, endDate, startDate, executiveUnits } = filters
   let requestParams = ''
-  if (code) requestParams += `${ClaimParamsKeys.CODE}=${code.map((e) => `${CLAIM_HIERARCHY}|${e.id}`).join(',')}`
+  if (code) requestParams += `${ClaimParamsKeys.CODE}=${code.map((e) => `${CLAIM_HIERARCHY}|${e.id}`).join(',')}&`
   requestParams += mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.CLAIM)
   return requestParams
 }
@@ -428,7 +428,7 @@ const mapProcedureToRequestParams = (filters: PMSIFilters) => {
   const { source, code, nda, endDate, startDate, executiveUnits } = filters
   let requestParams = ''
   if (code)
-    requestParams += `${ProcedureParamsKeys.CODE}=${code.map((e) => `${PROCEDURE_HIERARCHY}|${e.id}`).join(',')}`
+    requestParams += `${ProcedureParamsKeys.CODE}=${code.map((e) => `${PROCEDURE_HIERARCHY}|${e.id}`).join(',')}&`
   if (source) requestParams += `${ProcedureParamsKeys.SOURCE}=${source}&`
   requestParams += mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.PROCEDURE)
   return requestParams

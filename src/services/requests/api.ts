@@ -8,7 +8,7 @@ export type FetchRequestsResponse = {
 }
 
 export type FetchRequestsOptions = {
-  orderBy?: OrderBy
+  orderBy: OrderBy
   limit: number
   text?: string
   next?: string

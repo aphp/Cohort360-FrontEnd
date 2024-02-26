@@ -78,7 +78,11 @@ const Welcome: React.FC = () => {
   const fetchRequestPreview = async () => {
     setLoadingStatus(LoadingStatus.FETCHING)
     const results = await fetchRequests({
-      limit: 5
+      limit: 5,
+      orderBy: {
+        orderBy: Order.MODIFIED,
+        orderDirection: Direction.DESC
+      }
     })
     setRequests(results)
     setLoadingStatus(LoadingStatus.SUCCESS)
