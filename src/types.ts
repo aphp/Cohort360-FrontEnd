@@ -68,8 +68,41 @@ export enum TemporalConstraintsKind {
   SAME_ENCOUNTER = 'sameEncounter',
   DIFFERENT_ENCOUNTER = 'differentEncounter',
   PARTIAL_CONSTRAINT = 'partialConstraint',
-  DIRECT_CHRONOLOGICAL_ORDERING = 'directChronologicalOrdering'
+  DIRECT_CHRONOLOGICAL_ORDERING = 'directChronologicalOrdering',
+  SAME_EPISODE_OF_CARE = 'sameEpisodeOfCare',
+  DIFFERENT_EPISODE_OF_CARE = 'differentEpisodeOfCare',
+  PARTIAL_EPISODE_CONSTRAINT = 'partialEpisodeConstraint'
 }
+
+export const TemporalConstraintsTypes = [
+  {
+    id: TemporalConstraintsKind.NONE,
+    label: 'Aucune contrainte sur les épisodes'
+  },
+  {
+    id: TemporalConstraintsKind.SAME_ENCOUNTER,
+    label: 'Tous les critères ont lieu au cours du même séjour'
+  },
+  {
+    id: TemporalConstraintsKind.PARTIAL_CONSTRAINT,
+    label: 'Certains critères ont lieu au cours du même séjour'
+  }
+]
+
+export const EpisodesTemporalConstraintsTypes = [
+  {
+    id: TemporalConstraintsKind.NONE,
+    label: 'Aucune contrainte sur les épisodes'
+  },
+  {
+    id: TemporalConstraintsKind.SAME_EPISODE_OF_CARE,
+    label: 'Tous les critères ont lieu au cours du même épisode'
+  },
+  {
+    id: TemporalConstraintsKind.PARTIAL_EPISODE_CONSTRAINT,
+    label: 'Certains critères ont lieu au cours du même épisode'
+  }
+]
 
 export enum CohortCreationError {
   ERROR_TITLE = 'error_title',

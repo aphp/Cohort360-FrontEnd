@@ -1422,16 +1422,16 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   case pregnancyForm.maternalRisksPrecision.id:
                     currentCriterion.maternalRisksPrecision = unbuildSearchFilter(singleValue)
                     break
-                  case pregnancyForm.risksObstetricHistory.id:
+                  case pregnancyForm.risksRelatedToObstetricHistory.id:
                     unbuildLabelObjectFilter(currentCriterion, 'risksRelatedToObstetricHistory', joinedValues)
                     break
-                  case pregnancyForm.risksObstetricHistoryPrecision.id:
+                  case pregnancyForm.risksRelatedToObstetricHistoryPrecision.id:
                     currentCriterion.risksRelatedToObstetricHistoryPrecision = unbuildSearchFilter(singleValue)
                     break
                   case pregnancyForm.risksOrComplicationsOfPregnancy.id:
                     unbuildLabelObjectFilter(currentCriterion, 'risksOrComplicationsOfPregnancy', joinedValues)
                     break
-                  case pregnancyForm.risksComplicationPregnancyPrecision.id:
+                  case pregnancyForm.risksOrComplicationsOfPregnancyPrecision.id:
                     currentCriterion.risksOrComplicationsOfPregnancyPrecision = unbuildSearchFilter(singleValue)
                     break
                   case pregnancyForm.corticotherapie.id:
