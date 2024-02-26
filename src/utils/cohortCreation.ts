@@ -462,15 +462,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         .filter((elem) => elem)
         .reduce(filterReducer)
       break
+
     case RessourceType.HOSPIT:
       filterFhir = [
         'subject.active=true',
         `questionnaire.name=${FormNames.HOSPIT}`,
         questionnaireFiltersBuilders(hospitForm.hospitReason, buildSearchFilter(criterion.hospitReason)),
-        questionnaireFiltersBuilders(
-          hospitForm.hospitInUteroTransfer,
-          buildLabelObjectFilter(criterion.inUteroTransfer)
-        ),
+        questionnaireFiltersBuilders(hospitForm.inUteroTransfer, buildLabelObjectFilter(criterion.inUteroTransfer)),
         questionnaireFiltersBuilders(
           hospitForm.pregnancyMonitoring,
           buildLabelObjectFilter(criterion.pregnancyMonitoring)
@@ -613,8 +611,9 @@ export function buildRequest(
           _id: item.id ?? 0,
           isInclusive: item.isInclusive ?? true,
           resourceType:
-            // item.type === RessourceType.MATERNITY ||
-            item.type === RessourceType.PREGNANCY ? RessourceType.QUESTIONNAIRE_RESPONSE : item.type,
+            item.type === RessourceType.HOSPIT || item.type === RessourceType.PREGNANCY
+              ? RessourceType.QUESTIONNAIRE_RESPONSE
+              : item.type,
           filterFhir: constructFilterFhir(item, deidentified),
           occurrence:
             !(item.type === RessourceType.PATIENT || item.type === RessourceType.IPP_LIST) && item.occurrence
