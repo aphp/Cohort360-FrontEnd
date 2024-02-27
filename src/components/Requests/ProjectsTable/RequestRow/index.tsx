@@ -14,28 +14,19 @@ import { RequestType, Cohort, ResponseStatus } from 'types'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { setSelectedRequest, setSelectedRequestShare } from 'state/request'
-import useStyles from '../styles'
+import useStyles from '../../styles'
 import RequestActions from 'components/Requests/RequestActions'
 
-enum Dialog {
-  EDIT,
-  DELETE,
-  SHARE
-}
 
 type RequestRowProps = {
-  row: RequestType
+  request: RequestType
   /*cohortsList: Cohort[]*/
   /*selectedRequests: RequestType[]*/
   /*onSelectedRow: (selectedRequests: RequestType[]) => void*/
   isSearch?: boolean
 }
-const RequestRow = ({ row, /*cohortsList, selectedRequests, onSelectedRow,*/ isSearch }: RequestRowProps) => {
+const RequestRow = ({ request, /*cohortsList, selectedRequests, onSelectedRow,*/ isSearch }: RequestRowProps) => {
   const [open, setOpen] = React.useState(false)
-  const [openModal, setOpenModal] = useState<Dialog | null>(null)
-  const [shareStatus, setShareStatus] = useState<ResponseStatus>(ResponseStatus.IDDLE)
-  const { classes } = useStyles()
-  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
@@ -78,18 +69,21 @@ const RequestRow = ({ row, /*cohortsList, selectedRequests, onSelectedRow,*/ isS
           </IconButton>
         </TableCellWrapper>
         <TableCellWrapper align="left" style={{ width: 120, height: '70px' }}>
-          <Typography>{moment(row.modified_at).format('DD/MM/YYYY HH:mm')}</Typography>
+          <Typography>{moment(request.modified_at).format('DD/MM/YYYY HH:mm')}</Typography>
         </TableCellWrapper>
         <TableCellWrapper align="left" style={{ width: 'calc(100% - 70px - 70px - 120px - 160px)', height: '70px' }}>
           <Link
-            onClick={() => navigate(`/cohort/new/${row.uuid}`)}
+            onClick={() => navigate(`/cohort/new/${request.uuid}`)}
             underline="hover"
             style={{ cursor: 'pointer', color: '#153D8A' }}
           >
             <Typography fontWeight={700}>
-              {`${row.name} ${
-                row?.shared_by?.display_name
-                  ? '- Envoyée par : ' + row?.shared_by?.firstname + ' ' + row?.shared_by?.lastname?.toUpperCase()
+              {`${request.name} ${
+                request?.shared_by?.display_name
+                  ? '- Envoyée par : ' +
+                    request?.shared_by?.firstname +
+                    ' ' +
+                    request?.shared_by?.lastname?.toUpperCase()
                   : ''
               } `}
             </Typography>
@@ -100,7 +94,7 @@ const RequestRow = ({ row, /*cohortsList, selectedRequests, onSelectedRow,*/ isS
           align="left"
           style={{ height: '70px', textAlign: 'left', display: 'flex', alignItems: 'center' }}
         >
-          <RequestActions request={row} disabled={maintenanceIsActive} onUpdate={() => {}} />
+          <RequestActions request={request} disabled={maintenanceIsActive} onUpdate={() => {}} />
         </TableCellWrapper>
       </TableRow>
 

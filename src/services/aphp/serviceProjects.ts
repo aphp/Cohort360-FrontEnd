@@ -255,9 +255,10 @@ const servicesProjects: IServiceProjects = {
       }`
     ]
     paramOptions = [...paramOptions, `limit=${urlParams?.get('limit') || options.limit}`]
+    paramOptions = [...paramOptions, urlParams?.get('offset') ? `offset=${urlParams?.get('offset')}` : '']
     paramOptions = [
       ...paramOptions,
-      options.text || options.next ? `search=${urlParams?.get('search') || options.text}` : ''
+      options.text || urlParams?.get('search') ? `search=${urlParams?.get('search') || options.text}` : ''
     ]
 
     const fetchProjectsResponse = (await apiBack.get<{
@@ -326,11 +327,11 @@ const servicesProjects: IServiceProjects = {
         : ''
     ]
     paramOptions = [...paramOptions, `limit=${urlParams?.get('limit') || options.limit}`]
+    paramOptions = [...paramOptions, urlParams?.get('offset') ? `offset=${urlParams?.get('offset')}` : '']
     paramOptions = [
       ...paramOptions,
-      options.text || options.next ? `search=${urlParams?.get('search') || options.text}` : ''
+      options.text || urlParams?.get('search') ? `search=${urlParams?.get('search') || options.text}` : ''
     ]
-
     const fetchRequestsListResponse = (await apiBack.get<{
       count: number
       next: string | null
@@ -362,9 +363,10 @@ const servicesProjects: IServiceProjects = {
         : ''
     ]
     paramOptions = [...paramOptions, `limit=${urlParams?.get('limit') || options.limit}`]
+    paramOptions = [...paramOptions, urlParams?.get('offset') ? `offset=${urlParams?.get('offset')}` : '']
     paramOptions = [
       ...paramOptions,
-      options.text || options.next ? `search=${urlParams?.get('search') || options.text}` : ''
+      options.text || urlParams?.get('search') ? `search=${urlParams?.get('search') || options.text}` : ''
     ]
 
     const fetchRequestsListResponse = (await apiBack.get<{

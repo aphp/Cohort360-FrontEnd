@@ -31,21 +31,26 @@ import { Cohort } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
-import useStyles from '../styles'
+import useStyles from '../../styles'
 import { JobStatus } from 'utils/constants'
 import { ODD_EXPORT } from '../../../../constants'
 
-const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
+type CohortRowProps = {
+  requestId: string
+  cohort: Cohort[]
+}
+
+const CohortRow = ({ requestId, cohort }: CohortRowProps) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<null | string>(null)
 
-  const cohorts: Cohort[] =
+  /*const cohorts: Cohort[] =
     cohortsList
       .filter(({ request }) => request === requestId)
-      .sort((a, b) => +moment(a.created_at).format('x') - +moment(b.created_at).format('x')) || []
+      .sort((a, b) => +moment(a.created_at).format('x') - +moment(b.created_at).format('x')) || []*/
 
   const _handleEditCohort = (cohort: Cohort) => {
     dispatch(setSelectedCohort(cohort ?? null))
@@ -191,4 +196,4 @@ const FavStar: React.FC<FavStarProps> = ({ favorite }) => {
   return <Star height="15px" fill="#ED6D91" />
 }
 
-export default VersionRow
+export default CohortRow

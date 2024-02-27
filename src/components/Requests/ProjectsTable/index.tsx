@@ -23,7 +23,7 @@ import { LoadingStatus, ProjectType } from 'types'
 
 import { useAppSelector } from 'state'
 
-import useStyles from './styles'
+import useStyles from '../styles'
 import { Direction, Order, OrderBy } from 'types/searchCriterias'
 import { FetchProjectsResponse, fetchProjects as fetchProjectsApi } from 'services/projects/api'
 import Modal from 'components/ui/Modal'
@@ -40,7 +40,7 @@ type ProjectTableProps = {
 const ProjectTable = ({ searchInput }: ProjectTableProps) => {
   const { classes } = useStyles()
 
-  const [results, setResults] = useState<FetchProjectsResponse | null>(null)
+  const [projects, setProjects] = useState<FetchProjectsResponse | null>(null)
   const [orderBy, setOrderBy] = useState<OrderBy>({ orderBy: Order.NAME, orderDirection: Direction.ASC })
   const [toggleAddProjectModal, setToggleAddProjectModal] = useState(false)
   const [loadingStatus, setLoadingStatus] = useState<LoadingStatus>(LoadingStatus.IDDLE)
@@ -56,12 +56,12 @@ const ProjectTable = ({ searchInput }: ProjectTableProps) => {
     setLoadingStatus(LoadingStatus.FETCHING)
     const response = await fetchProjectsApi({ orderBy, limit: 7, text: searchInput, next })
     if (next) {
-      setResults({
+      setProjects({
         ...response,
-        results: [...(results?.results || []), ...response.results]
+        results: [...(projects?.results || []), ...response.results]
       })
     } else {
-      setResults(response)
+      setProjects(response)
     }
     setLoadingStatus(LoadingStatus.SUCCESS)
   }
@@ -135,14 +135,6 @@ const ProjectTable = ({ searchInput }: ProjectTableProps) => {
           </TableHead>
         </Table>
 
-        {loadingStatus === LoadingStatus.SUCCESS && results?.count === 0 && (
-          <Grid container justifyContent="center" alignItems="center" height={300}>
-            <Grid item xs={3}>
-              <Typography>Aucun projet de recherche trouvé</Typography>
-            </Grid>
-          </Grid>
-        )}
-
         <Grid
           container
           id={scrollUuid.current}
@@ -151,35 +143,53 @@ const ProjectTable = ({ searchInput }: ProjectTableProps) => {
           xs={12}
           style={{
             overflow: 'auto',
-            minHeight: results?.results?.length! * 60,
+            // minHeight: results?.results?.length! * 60,
             maxHeight: 700,
-            height:
-              (results?.results?.length || 0) < (results?.count || 0)
-                ? (results?.results.length || 0) * 60 - 1
-                : (results?.results.length || 0) * 60
+            minHeight:
+              (projects?.results?.length || 0) < (projects?.count || 0)
+                ? (projects?.results.length || 0) * 60 - 1
+                : (projects?.results.length || 0) * 60
           }}
         >
-          {loadingStatus === LoadingStatus.FETCHING && (
-            <Grid container justifyContent="center">
-              <CircularProgress />
+          {loadingStatus === LoadingStatus.SUCCESS && projects?.count === 0 && (
+            <Grid container justifyContent="center" alignItems="center" height={300}>
+              <Grid item xs={3}>
+                <Typography>Aucun projet de recherche trouvé</Typography>
+              </Grid>
             </Grid>
           )}
-          {loadingStatus === LoadingStatus.SUCCESS && results?.count! > 0 && (
+          {loadingStatus === LoadingStatus.FETCHING && (
+            <Grid container justifyContent="center" alignItems="center" height={300}>
+              <Grid item xs={3} container justifyContent="center">
+                <CircularProgress />
+              </Grid>
+            </Grid>
+          )}
+          {loadingStatus === LoadingStatus.SUCCESS && projects?.count! > 0 && (
             <InfiniteScroll
               scrollableTarget={scrollUuid.current}
-              dataLength={results?.results?.length || 0}
-              next={() => fetchProjects(results?.next!)}
-              hasMore={(results?.results?.length || 0) < (results?.count || 0)}
+              dataLength={projects?.results?.length || 0}
+              next={() => fetchProjects(projects?.next!)}
+              hasMore={(projects?.results?.length || 0) < (projects?.count || 0)}
               scrollThreshold={0.9}
               loader={<Fragment />}
             >
-              {results?.results.map((project: ProjectType, index) => (
+              {projects?.results.map((project: ProjectType, index) => (
                 <Grid container item xs={12} alignItems="center" key={project.uuid}>
                   <ProjectRow
                     row={project}
                     fetchRequests={index > 0}
                     searchInput={searchInput}
                     onUpdate={() => setLoadingStatus(LoadingStatus.IDDLE)}
+                  />
+                  <TableRow
+                    style={{
+                      display: 'flex',
+                      width: '100%',
+                      backgroundColor: '#E6F1FD',
+                      height: 20,
+                      borderWidth: 0
+                    }}
                   />
                 </Grid>
               ))}

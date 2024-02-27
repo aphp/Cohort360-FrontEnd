@@ -5,6 +5,8 @@ import { OrderBy } from 'types/searchCriterias'
 export type FetchRequestsResponse = {
   count: number
   results: RequestType[]
+  next: string | null
+  previous: string | null
 }
 
 export type FetchRequestsOptions = {
@@ -17,15 +19,14 @@ export type FetchRequestsOptions = {
 export const fetchRequests = async (options: FetchRequestsOptions): Promise<FetchRequestsResponse> => {
   try {
     const requests = (await services.projects.fetchRequestsList(options)) || []
-    return {
-      count: requests.count,
-      results: requests.results
-    }
+    return requests
   } catch (error) {
     console.error(error)
     return {
       count: 0,
-      results: []
+      results: [],
+      next: null,
+      previous: null
     }
   }
 }
@@ -36,15 +37,14 @@ export const fetchRequestsFromProject = async (
 ): Promise<FetchRequestsResponse> => {
   try {
     const requests = (await services.projects.fetchRequestsFromProject(projectId, options)) || []
-    return {
-      count: requests.count,
-      results: requests.results
-    }
+    return requests
   } catch (error) {
     console.error(error)
     return {
       count: 0,
-      results: []
+      results: [],
+      next: null,
+      previous: null
     }
   }
 }

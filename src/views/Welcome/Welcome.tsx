@@ -34,7 +34,7 @@ const Welcome: React.FC = () => {
   const open = useAppSelector((state) => state.drawer)
   const [allCohorts, setAllCohorts] = useState<FetchCohortsResponse>({ count: 0, cohortsList: [] })
   const [favoriteCohorts, setFavoriteCohorts] = useState<FetchCohortsResponse>({ count: 0, cohortsList: [] })
-  const [requests, setRequests] = useState<FetchRequestsResponse>({ count: 0, results: [] })
+  const [requests, setRequests] = useState<FetchRequestsResponse>({ count: 0, results: [], next: null, previous: null })
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const meState = useAppSelector((state) => state.me)
   const accessExpirations: AccessExpiration[] = meState?.accessExpirations ?? []
