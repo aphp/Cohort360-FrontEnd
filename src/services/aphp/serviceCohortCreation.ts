@@ -64,13 +64,7 @@ import {
 import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
 import { DocType } from 'types/requestCriterias'
 import { VitalStatusLabel } from 'types/searchCriterias'
-import {
-  booleanFieldsData,
-  pregnancyModeData
-  // maternalRisksData,
-  // risksOrComplicationsOfPregnancyData,
-  // risksRelatedToObstetricHistoryData
-} from 'data/fake_mater_data'
+import { booleanFieldsData } from 'data/questionnaire_data'
 
 export interface IServiceCohortCreation {
   /**
@@ -517,7 +511,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
     fetchValueSet(C_SECTION_MODALITY, { joinDisplayWithCode: false, sortingKey: 'id' }),
   fetchPresentationAtDelivery: async () => fetchValueSet(PRESENTATION_AT_DELIVERY, { joinDisplayWithCode: false }),
   fetchSetPostpartumHemorrhage: async () => {
-    return pregnancyModeData
+    return booleanFieldsData
   },
   fetchConditionPerineum: async () =>
     fetchValueSet(CONDITION_PERINEUM, { joinDisplayWithCode: false, sortingKey: 'id' }),
