@@ -1,5 +1,16 @@
 import React, { useState } from 'react'
-import { Card, CardContent, CardHeader, Collapse, IconButton, IconButtonProps, Typography, styled } from '@mui/material'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Chip,
+  Collapse,
+  Grid,
+  IconButton,
+  IconButtonProps,
+  Typography,
+  styled
+} from '@mui/material'
 import { getDataFromForm } from 'utils/formUtils'
 import { ExpandMore as ExpandMoreIcon, DomainAdd } from '@mui/icons-material'
 import { CohortQuestionnaireResponse } from 'types'
@@ -28,30 +39,38 @@ interface HospitCardProps {
 
 const HospitCard: React.FC<HospitCardProps> = ({ form }) => {
   const [expanded, setExpanded] = useState(false)
+  const hospitChipData = [
+    form.item?.find((item) => item.linkId === hospitForm.birthDeliveryStartDate.id)
+      ? `Accouchement le ${getDataFromForm(form, hospitForm.birthDeliveryStartDate)}`
+      : `Date d'écriture : ${moment(form.authored).format('DD/MM/YYYY')}`,
+    `Unité exécutrice : ${form.serviceProvider}`
+  ]
 
   return (
-    <Card style={{ margin: '10px 0', border: '1px solid limegreen' }}>
+    <Card
+      style={{
+        margin: '10px 0',
+        border: '1px solid #A8D178'
+      }}
+    >
       <CardHeader
         action={
           <ExpandMore expand={expanded} onClick={() => setExpanded(!expanded)}>
             <ExpandMoreIcon />
           </ExpandMore>
         }
-        avatar={<DomainAdd />}
-        title={<Typography variant="h6">Hospitalisation</Typography>}
+        avatar={<DomainAdd htmlColor="#A8D178" />}
+        title={<Typography variant="h6">Fiche d'hospitalisation</Typography>}
         subheader={
-          form.item?.find((item) => item.linkId === hospitForm.birthDeliveryStartDate.id)
-            ? `Accouchement le ${getDataFromForm(form, hospitForm.birthDeliveryStartDate)}`
-            : `Date d'écriture : ${moment(form.authored).format('DD/MM/YYYY')}`
+          <Grid container style={{ marginBottom: 4 }}>
+            {hospitChipData.map((chip, index) => (
+              <Chip key={index} variant="outlined" size="small" label={chip} style={{ marginRight: 4 }} />
+            ))}
+          </Grid>
         }
       />
-      <CardContent>
-        <Typography variant="body2" component="p">
-          Unité exécutrice : {form.serviceProvider}
-        </Typography>
-      </CardContent>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <CardContent>
+        <CardContent style={{ paddingTop: 8 }}>
           <HospitFormDetails hospitFormData={form} onClose={() => console.log('coucou')} />
         </CardContent>
       </Collapse>

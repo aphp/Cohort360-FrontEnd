@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid } from '@mui/material'
+import { Grid, Typography } from '@mui/material'
 
 type FormDetailsDialogProps = {
   title: string
@@ -16,10 +16,10 @@ const FormDetailsDialog = ({ content }: FormDetailsDialogProps) => {
       {content.map((row, index) => (
         <Grid container key={index} style={{ padding: '4px 0' }}>
           <Grid container item xs={6}>
-            {row.name}
+            <Typography>{row.name}</Typography>
           </Grid>
           <Grid container item xs={6}>
-            {row.value}
+            <Typography>{row.value}</Typography>
           </Grid>
         </Grid>
       ))}

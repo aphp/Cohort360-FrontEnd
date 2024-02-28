@@ -1,5 +1,5 @@
 import React from 'react'
-import { CircularProgress, Typography } from '@mui/material'
+import { CircularProgress, Grid, Typography } from '@mui/material'
 import ArrowWithYears from './ArrowWithYears'
 import { FormNames } from 'types/searchCriterias'
 import HospitCard from './HospitCard'
@@ -38,11 +38,13 @@ const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses, ma
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
       {loading ? (
-        <CircularProgress />
+        <Grid container justifyContent="center">
+          <CircularProgress />
+        </Grid>
       ) : (
         <>
           <ArrowWithYears years={years} />
-          <div style={{ flexGrow: 1 }}>
+          <div style={{ flexGrow: 1, marginLeft: '1em' }}>
             {years.reverse().map((year) => (
               <div key={year}>
                 <Typography variant="h6" style={{ margin: '10px 0' }}>

@@ -1,5 +1,16 @@
 import React, { useState } from 'react'
-import { Card, CardContent, CardHeader, Collapse, IconButton, IconButtonProps, Typography, styled } from '@mui/material'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Chip,
+  Collapse,
+  Grid,
+  IconButton,
+  IconButtonProps,
+  Typography,
+  styled
+} from '@mui/material'
 import { getDataFromForm } from 'utils/formUtils'
 import { pregnancyForm } from 'data/pregnancyData'
 import { ExpandMore as ExpandMoreIcon, PregnantWoman } from '@mui/icons-material'
@@ -27,31 +38,37 @@ interface PregnancyCardProps {
 
 const PregnancyCard: React.FC<PregnancyCardProps> = ({ form }) => {
   const [expanded, setExpanded] = useState(false)
+  const pregnancyChipData = [
+    getDataFromForm(form, pregnancyForm.pregnancyType) ?? getDataFromForm(form, pregnancyForm.twinPregnancyType),
+    `Début de grossesse : ${getDataFromForm(form, pregnancyForm.pregnancyStartDate)}`,
+    `Unité exécutrice : ${form.serviceProvider}`
+  ]
 
   return (
-    <Card style={{ margin: '10px 0', border: '1px solid #ED6D91' }}>
+    <Card
+      style={{
+        margin: '10px 0',
+        border: '1px solid #ED6D91'
+      }}
+    >
       <CardHeader
         action={
           <ExpandMore expand={expanded} onClick={() => setExpanded(!expanded)}>
             <ExpandMoreIcon />
           </ExpandMore>
         }
-        avatar={<PregnantWoman />}
-        title={
-          <Typography variant="h6">
-            {getDataFromForm(form, pregnancyForm.pregnancyType) ??
-              getDataFromForm(form, pregnancyForm.twinPregnancyType)}
-          </Typography>
+        avatar={<PregnantWoman htmlColor="#ED6D91" />}
+        title={<Typography variant="h6">Fiche de grossesse</Typography>}
+        subheader={
+          <Grid container style={{ marginBottom: 4 }}>
+            {pregnancyChipData.map((chip, index) => (
+              <Chip key={index} variant="outlined" size="small" label={chip} style={{ marginRight: 4 }} />
+            ))}
+          </Grid>
         }
-        subheader={`Début de grossesse : ${getDataFromForm(form, pregnancyForm.pregnancyStartDate)}`}
       />
-      <CardContent>
-        <Typography variant="body2" component="p">
-          Unité exécutrice : {form.serviceProvider}
-        </Typography>
-      </CardContent>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <CardContent>
+        <CardContent style={{ paddingTop: 8 }}>
           <PregnancyFormDetails pregnancyFormData={form} onClose={() => console.log('first')} />
         </CardContent>
       </Collapse>
