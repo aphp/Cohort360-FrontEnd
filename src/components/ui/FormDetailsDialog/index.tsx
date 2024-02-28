@@ -14,7 +14,7 @@ const FormDetailsDialog = ({ content }: FormDetailsDialogProps) => {
     //   <DialogContent>
     <div>
       {content.map((row, index) => (
-        <Grid container key={index}>
+        <Grid container key={index} style={{ padding: '4px 0' }}>
           <Grid container item xs={6}>
             {row.name}
           </Grid>
