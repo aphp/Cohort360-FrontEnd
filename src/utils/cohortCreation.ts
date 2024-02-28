@@ -580,7 +580,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         questionnaireFiltersBuilders(hospitForm.feedingType, buildLabelObjectFilter(criterion.feedingType)),
         questionnaireFiltersBuilders(hospitForm.complication, buildLabelObjectFilter(criterion.complication)),
         questionnaireFiltersBuilders(hospitForm.exitFeedingMode, buildLabelObjectFilter(criterion.exitFeedingMode)),
-        questionnaireFiltersBuilders(hospitForm.exitDiagnostic, buildLabelObjectFilter(criterion.exitDiagnostic))
+        questionnaireFiltersBuilders(hospitForm.exitDiagnostic, buildLabelObjectFilter(criterion.exitDiagnostic)),
+        questionnaireFiltersBuilders(
+          { id: ENCOUNTER_SERVICE_PROVIDER, type: 'valueCoding' },
+          buildEncounterServiceFilter(criterion.encounterService)
+        )
       ]
         .filter((elem) => elem)
         .reduce(filterReducer)
