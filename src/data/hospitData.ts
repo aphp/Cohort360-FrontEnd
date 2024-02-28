@@ -25,6 +25,14 @@ export const hospitForm: { [key: string]: { id: string; type: keyof Questionnair
     id: 'F_MATER_004623',
     type: 'valueCoding'
   },
+  chirurgicalGestureDate: {
+    id: 'F_MATER_004621',
+    type: 'valueDate'
+  },
+  ageDuringChirurgicalGesture: {
+    id: 'F_MATER_004622',
+    type: 'valueString'
+  },
   childbirth: {
     id: 'F_MATER_007025',
     type: 'valueCoding'
@@ -103,7 +111,7 @@ export const hospitForm: { [key: string]: { id: string; type: keyof Questionnair
   },
   birthMensurationsPercentil: {
     id: 'F_MATER_005034',
-    type: 'valueInteger'
+    type: 'valueDecimal'
   },
   apgar1: {
     id: 'F_MATER_005051',
@@ -156,5 +164,21 @@ export const hospitForm: { [key: string]: { id: string; type: keyof Questionnair
   exitDiagnostic: {
     id: 'F_MATER_005903',
     type: 'valueCoding'
+  },
+  foetusPresentation: {
+    id: 'F_MATER_004212',
+    type: 'valueString'
+  },
+  gender: {
+    id: 'F_MATER_005032',
+    type: 'valueCoding'
+  },
+  birthVitalStatus: {
+    id: 'F_MATER_7030',
+    type: 'valueCoding'
+  },
+  bloodLossEstimation: {
+    id: 'F_MATER_005249',
+    type: 'valueInteger'
   }
 }

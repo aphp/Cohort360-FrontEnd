@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { Card, CardContent, CardHeader, Collapse, IconButton, IconButtonProps, Typography, styled } from '@mui/material'
 import { getDataFromForm } from 'utils/formUtils'
-import moment from 'moment'
 import { ExpandMore as ExpandMoreIcon, DomainAdd } from '@mui/icons-material'
 import { CohortQuestionnaireResponse } from 'types'
 import HospitFormDetails from '../HospitFormDetails'
 import { hospitForm } from 'data/hospitData'
+import moment from 'moment'
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean
@@ -30,7 +30,7 @@ const HospitCard: React.FC<HospitCardProps> = ({ form }) => {
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <Card style={{ margin: '10px 0' }}>
+    <Card style={{ margin: '10px 0', border: '1px solid limegreen' }}>
       <CardHeader
         action={
           <ExpandMore expand={expanded} onClick={() => setExpanded(!expanded)}>
@@ -40,11 +40,9 @@ const HospitCard: React.FC<HospitCardProps> = ({ form }) => {
         avatar={<DomainAdd />}
         title={'Hospitalisation'}
         subheader={
-          moment(getDataFromForm(form, hospitForm.hospitChildbirthDate))
-            ? `Accouchement le ${moment(getDataFromForm(form, hospitForm.hospitChildbirthDate)).format(
-                'DD/MM/YYYY à hh:mm'
-              )}`
-            : ''
+          form.item?.find((item) => item.linkId === hospitForm.birthDeliveryStartDate.id)
+            ? `Accouchement le ${getDataFromForm(form, hospitForm.birthDeliveryStartDate)}`
+            : `Date d'écriture : ${moment(form.authored).format('DD/MM/YYYY')}`
         }
       />
       <CardContent>

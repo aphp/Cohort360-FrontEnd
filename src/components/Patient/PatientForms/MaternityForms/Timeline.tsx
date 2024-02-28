@@ -5,10 +5,12 @@ import { FormNames } from 'types/searchCriterias'
 import HospitCard from './HospitCard'
 import { CohortQuestionnaireResponse } from 'types'
 import PregnancyCard from './PregnancyCard'
+import { Questionnaire } from 'fhir/r4'
 
 interface TimelineProps {
   loading: boolean
   questionnaireResponses: CohortQuestionnaireResponse[]
+  maternityFormNamesIds: Questionnaire[]
 }
 
 interface YearGroup {
@@ -26,8 +28,9 @@ const groupEventsByYear = (data: CohortQuestionnaireResponse[]): YearGroup => {
   }, {} as YearGroup)
 }
 
-const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses }) => {
+const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses, maternityFormNamesIds }) => {
   const yearGroups = groupEventsByYear(questionnaireResponses)
+  const pregnancyFormId = maternityFormNamesIds.find((form) => form.name === FormNames.PREGNANCY)?.id ?? ''
 
   console.log('yearGroups', yearGroups)
   const years = Object.keys(yearGroups).sort()
@@ -46,7 +49,7 @@ const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses }) 
                   {year}
                 </Typography>
                 {yearGroups[year].map((form) =>
-                  form.questionnaire?.includes(FormNames.PREGNANCY) ? (
+                  form.questionnaire?.includes(pregnancyFormId) ? (
                     <PregnancyCard key={form.id} form={form} />
                   ) : (
                     <HospitCard key={form.id} form={form} />

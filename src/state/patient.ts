@@ -1451,6 +1451,7 @@ function linkElementWithEncounter<
       case RessourceType.MEDICATION_REQUEST:
       case RessourceType.OBSERVATION:
       case RessourceType.IMAGING:
+      case RessourceType.QUESTIONNAIRE_RESPONSE:
         encounterId = entry.encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
       case RessourceType.DOCUMENTS:

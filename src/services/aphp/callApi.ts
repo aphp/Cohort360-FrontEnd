@@ -34,6 +34,7 @@ import {
   ParametersParameter,
   Patient,
   Procedure,
+  Questionnaire,
   QuestionnaireResponse,
   ValueSet
 } from 'fhir/r4'
@@ -891,6 +892,26 @@ export const fetchForms = async (args: fetchFormsProps) => {
 
   const response = await apiFhir.get<FHIR_Bundle_Response<QuestionnaireResponse>>(
     `/QuestionnaireResponse?${options.reduce(paramsReducer)}`
+  )
+
+  return response
+}
+
+type fetchQuestionnairesProps = {
+  name?: string
+  _elements?: string[]
+}
+export const fetchQuestionnaires = async (args: fetchQuestionnairesProps) => {
+  const { name } = args
+  let { _elements } = args
+  _elements = _elements ? _elements.filter(uniq) : []
+
+  let options: string[] = []
+  if (name) options = [...options, `name=${name}`]
+  if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer, '')}`]
+
+  const response = await apiFhir.get<FHIR_Bundle_Response<Questionnaire>>(
+    `/Questionnaire?${options.reduce(paramsReducer)}`
   )
 
   return response

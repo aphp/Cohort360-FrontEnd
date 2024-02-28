@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Card, CardContent, CardHeader, Collapse, IconButton, IconButtonProps, Typography, styled } from '@mui/material'
 import { getDataFromForm } from 'utils/formUtils'
 import { pregnancyForm } from 'data/pregnancyData'
-import moment from 'moment'
 import { ExpandMore as ExpandMoreIcon, PregnantWoman } from '@mui/icons-material'
 import PregnancyFormDetails from '../PregnancyFormDetails'
 import { CohortQuestionnaireResponse } from 'types'
@@ -30,7 +29,7 @@ const PregnancyCard: React.FC<PregnancyCardProps> = ({ form }) => {
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <Card style={{ margin: '10px 0' }}>
+    <Card style={{ margin: '10px 0', border: '1px solid #ED6D91' }}>
       <CardHeader
         action={
           <ExpandMore expand={expanded} onClick={() => setExpanded(!expanded)}>
@@ -38,10 +37,10 @@ const PregnancyCard: React.FC<PregnancyCardProps> = ({ form }) => {
           </ExpandMore>
         }
         avatar={<PregnantWoman />}
-        title={getDataFromForm(form, pregnancyForm.pregnancyType)}
-        subheader={`Début de grossesse : ${moment(getDataFromForm(form, pregnancyForm.pregnancyStartDate)).format(
-          'DD/MM/YYYY'
-        )}`}
+        title={
+          getDataFromForm(form, pregnancyForm.pregnancyType) ?? getDataFromForm(form, pregnancyForm.twinPregnancyType)
+        }
+        subheader={`Début de grossesse : ${getDataFromForm(form, pregnancyForm.pregnancyStartDate)}`}
       />
       <CardContent>
         <Typography variant="body2" component="p">

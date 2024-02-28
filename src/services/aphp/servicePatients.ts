@@ -25,7 +25,8 @@ import {
   patchFilters,
   deleteFilter,
   fetchPerimeterFromId,
-  fetchForms
+  fetchForms,
+  fetchQuestionnaires
 } from './callApi'
 
 import servicesPerimeters from './servicePerimeters'
@@ -42,9 +43,10 @@ import {
   Observation,
   Patient,
   Procedure,
+  Questionnaire,
   QuestionnaireResponse
 } from 'fhir/r4'
-import { Direction, Filters, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
+import { Direction, Filters, FormNames, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
 import { RessourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
 
@@ -289,6 +291,14 @@ export interface IServicePatients {
     endDate?: string | null,
     executiveUnits?: string[]
   ) => Promise<QuestionnaireResponse[]>
+
+  /*
+   ** Cette fonction permet de récupérer les ids des formulaires de maternité
+   **
+   ** Retour:
+   **   - questionnairesList: liste des ids des formulaires de maternité
+   */
+  fetchMaternityFormNamesIds: () => Promise<Questionnaire[]>
 
   /*
    ** Cette fonction permet de récupérer les élèments de Composition lié à un patient
@@ -703,6 +713,13 @@ const servicesPatients: IServicePatients = {
     })
 
     return getApiResponseResources(formsResp) ?? []
+  },
+
+  fetchMaternityFormNamesIds: async () => {
+    const maternityFormNames = `${FormNames.PREGNANCY},${FormNames.HOSPIT}`
+    const questionnaireList = await fetchQuestionnaires({ name: maternityFormNames, _elements: ['id', 'name'] })
+
+    return getApiResponseResources(questionnaireList) ?? []
   },
 
   fetchDocuments: async (

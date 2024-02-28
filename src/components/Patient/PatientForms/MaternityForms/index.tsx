@@ -15,12 +15,13 @@ import { CanceledError } from 'axios'
 import { fetchMaternityForms } from 'state/patient'
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
-import { QuestionnaireResponse } from 'fhir/r4'
+import { Questionnaire, QuestionnaireResponse } from 'fhir/r4'
 import { CriteriaName, LoadingStatus } from 'types'
 import { FilterKeys } from 'types/searchCriterias'
 import PregnancyFormDetails from '../PregnancyFormDetails'
 import HospitFormDetails from '../HospitFormDetails'
 import Timeline from './Timeline'
+import services from 'services/aphp'
 
 type PatientFormsProps = {
   groupId?: string
@@ -35,6 +36,7 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
   const [toggleHospitDetails, setToggleHospitDetails] = useState<QuestionnaireResponse | undefined>(undefined)
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
+  const [maternityFormNamesIds, setMaternityFormNamesIds] = useState<Questionnaire[]>([])
   const [
     {
       filters,
@@ -79,8 +81,14 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
     }
   }
 
+  const _fetchMaternityFormNamesIds = async () => {
+    const maternityFormNamesIds = await services.patients.fetchMaternityFormNamesIds()
+    setMaternityFormNamesIds(maternityFormNamesIds)
+  }
+
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
+    _fetchMaternityFormNamesIds()
   }, [])
 
   useEffect(() => {
@@ -134,6 +142,7 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
         <Timeline
           loading={loadingStatus === LoadingStatus.FETCHING}
           questionnaireResponses={searchResults.maternityFormList ?? []}
+          maternityFormNamesIds={maternityFormNamesIds}
         />
       </Grid>
 
