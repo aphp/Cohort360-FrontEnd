@@ -218,13 +218,12 @@ export const ODD_CONTACT = import.meta.env.DEV
 export const ODD_EXPORT = import.meta.env.DEV
   ? import.meta.env.VITE_ODD_EXPORT == `${BOOLEANTRUE}`
   : '{VITE_ODD_EXPORT}' == `${BOOLEANTRUE}`
-export const ODD_FEASABILITY_REPORT = import.meta.env.DEV
-  ? import.meta.env.VITE_ODD_FEASABILITY_REPORT == `${BOOLEANTRUE}`
-  : '{VITE_ODD_FEASABILITY_REPORT}' == `${BOOLEANTRUE}`
-
-export const ODD_FORMS = import.meta.env.DEV
-  ? import.meta.env.VITE_ODD_FORMS == `${BOOLEANTRUE}`
-  : '{VITE_ODD_FORMS}' == `${BOOLEANTRUE}`
+export const ODD_FEASIBILITY_REPORT = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_FEASIBILITY_REPORT == `${BOOLEANTRUE}`
+  : '{VITE_ODD_FEASIBILITY_REPORT}' == `${BOOLEANTRUE}`
+export const ODD_QUESTIONNAIRE = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_QUESTIONNAIRE == `${BOOLEANTRUE}`
+  : '{VITE_ODD_QUESTIONNAIRE}' == `${BOOLEANTRUE}`
 
 export const SESSION_TIMEOUT = import.meta.env.VITE_SESSION_TIMEOUT
   ? import.meta.env.VITE_SESSION_TIMEOUT

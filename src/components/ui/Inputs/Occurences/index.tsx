@@ -51,7 +51,7 @@ const OccurenceInput = ({ value, comparator, onchange }: OccurenceInputProps) =>
         type="number"
         id="criteria-occurrence-required"
         value={value}
-        onChange={(e) => setOccurrenceValue(+e.target.value as number)}
+        onChange={(e) => setOccurrenceValue(parseInt(e.target.value))}
       />
     </OccurenceInputWrapper>
   )

@@ -42,7 +42,7 @@ import { CohortCreationCounterType, CurrentSnapshot, LoadingStatus, RequestType,
 import useStyle from './styles'
 
 import displayDigit from 'utils/displayDigit'
-import { ODD_FEASABILITY_REPORT, SHORT_COHORT_LIMIT } from '../../../constants'
+import { ODD_FEASIBILITY_REPORT, SHORT_COHORT_LIMIT } from '../../../constants'
 import { JobStatus } from '../../../utils/constants'
 import services from 'services/aphp'
 import ValidationDialog from 'components/ui/ValidationDialog'
@@ -234,7 +234,7 @@ const ControlPanel: React.FC<{
               <>Créer la cohorte</>
             )}
           </Button>
-          {ODD_FEASABILITY_REPORT && (
+          {ODD_FEASIBILITY_REPORT && (
             <Button
               disabled={itLoads || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated}
               onClick={handleGenerateReport}

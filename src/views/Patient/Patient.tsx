@@ -21,7 +21,7 @@ import TopBar from 'components/TopBar/TopBar'
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPatientInfo } from 'state/patient'
 
-import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION, ODD_FORMS } from '../../constants'
+import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION, ODD_QUESTIONNAIRE } from '../../constants'
 
 import useStyles from './styles'
 
@@ -157,7 +157,7 @@ const Patient = () => {
                 to={`/patients/${patientId}/imaging${groupId ? `?groupId=${groupId}` : ''}`}
               />
             )}
-            {ODD_FORMS && (
+            {ODD_QUESTIONNAIRE && (
               <Tab
                 className={classes.tabTitle}
                 label="Formulaires"
@@ -187,7 +187,7 @@ const Patient = () => {
           {ODD_MEDICATION && selectedTab === 'medication' && <PatientMedication groupId={groupId} />}
           {ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology groupId={groupId} />}
           {ODD_IMAGING && selectedTab === 'imaging' && <PatientImaging groupId={groupId} />}
-          {ODD_FORMS && selectedTab === 'forms' && <PatientForms groupId={groupId} />}
+          {ODD_QUESTIONNAIRE && selectedTab === 'forms' && <PatientForms groupId={groupId} />}
         </Grid>
 
         <PatientSidebar

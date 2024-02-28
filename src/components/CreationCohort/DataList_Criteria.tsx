@@ -209,7 +209,7 @@ const criteriaList: CriteriaItemType[] = [
           {
             id: 'Hospit',
             title: 'Hospitalisation',
-            color: '#808080',
+            color: '#0063AF',
             fontWeight: 'normal',
             disabled: false,
             components: HospitForm,
