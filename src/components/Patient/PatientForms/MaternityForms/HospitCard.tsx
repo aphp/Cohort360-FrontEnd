@@ -38,7 +38,7 @@ const HospitCard: React.FC<HospitCardProps> = ({ form }) => {
           </ExpandMore>
         }
         avatar={<DomainAdd />}
-        title={'Hospitalisation'}
+        title={<Typography variant="h6">Hospitalisation</Typography>}
         subheader={
           form.item?.find((item) => item.linkId === hospitForm.birthDeliveryStartDate.id)
             ? `Accouchement le ${getDataFromForm(form, hospitForm.birthDeliveryStartDate)}`

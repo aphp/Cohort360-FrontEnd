@@ -38,7 +38,10 @@ const PregnancyCard: React.FC<PregnancyCardProps> = ({ form }) => {
         }
         avatar={<PregnantWoman />}
         title={
-          getDataFromForm(form, pregnancyForm.pregnancyType) ?? getDataFromForm(form, pregnancyForm.twinPregnancyType)
+          <Typography variant="h6">
+            {getDataFromForm(form, pregnancyForm.pregnancyType) ??
+              getDataFromForm(form, pregnancyForm.twinPregnancyType)}
+          </Typography>
         }
         subheader={`Début de grossesse : ${getDataFromForm(form, pregnancyForm.pregnancyStartDate)}`}
       />

@@ -37,10 +37,10 @@ const HospitFormDetails = ({ hospitFormData, onClose }: HospitFormDetailsProps) 
       name: 'Accouchement',
       value: getDataFromForm(hospitFormData, hospitForm.childbirth)
     },
-    {
-      name: "Lieu d'accouchement - domicile",
-      value: getDataFromForm(hospitFormData, hospitForm.childbirthPlace)
-    },
+    // {
+    //   name: "Lieu d'accouchement - domicile",
+    //   value: getDataFromForm(hospitFormData, hospitForm.childbirthPlace)
+    // },
     {
       name: 'Mode de mise en travail',
       value: getDataFromForm(hospitFormData, hospitForm.childbirthMode)
