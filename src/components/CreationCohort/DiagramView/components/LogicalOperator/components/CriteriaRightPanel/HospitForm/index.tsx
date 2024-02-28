@@ -56,8 +56,14 @@ const HospitForm = ({
   const [childbirth, setChildbirth] = useState<LabelObject[]>(
     mappingCriteria(criteria?.childbirth, CriteriaDataKey.CHILDBIRTH, criteriaData) || []
   )
-  const [childbirthPlace, setChildbirthPlace] = useState<LabelObject[]>(
-    mappingCriteria(criteria?.childbirthPlace, CriteriaDataKey.CHILDBIRTH_PLACE, criteriaData) || []
+  const [hospitalChildBirthPlace, setHospitalChildBirthPlace] = useState<LabelObject[]>(
+    mappingCriteria(criteria?.hospitalChildBirthPlace, CriteriaDataKey.HOSPITALCHILDBIRTHPLACE, criteriaData)
+  )
+  const [otherHospitalChildBirthPlace, setOtherHospitalChildBirthPlace] = useState<LabelObject[]>(
+    mappingCriteria(criteria?.otherHospitalChildBirthPlace, CriteriaDataKey.OTHERHOSPITALCHILDBIRTHPLACE, criteriaData)
+  )
+  const [homeChildBirthPlace, setHomeChildBirthPlace] = useState<LabelObject[]>(
+    mappingCriteria(criteria?.homeChildBirthPlace, CriteriaDataKey.HOMECHILDBIRTHPLACE, criteriaData)
   )
   const [childbirthMode, setChildbirthMode] = useState<LabelObject[]>(
     mappingCriteria(criteria?.childbirthMode, CriteriaDataKey.CHILDBIRTH_MODE, criteriaData) || []
@@ -147,6 +153,9 @@ const HospitForm = ({
   const [arterialCordLactatesComparator, setArterialCordLactatesComparator] = useState<Comparators>(
     criteria?.arterialCordLactatesComparator || Comparators.GREATER_OR_EQUAL
   )
+  const [birthStatus, setBirthStatus] = useState<LabelObject[]>(
+    mappingCriteria(criteria?.birthStatus, CriteriaDataKey.BIRTHSTATUS, criteriaData) || []
+  )
   const [postpartumHemorrhage, setPostpartumHemorrhage] = useState<LabelObject[]>(
     mappingCriteria(criteria?.postpartumHemorrhage, CriteriaDataKey.POSTPARTUM_HEMORRHAGE, criteriaData) || []
   )
@@ -201,7 +210,9 @@ const HospitForm = ({
       maturationCorticotherapie,
       chirurgicalGesture,
       childbirth,
-      childbirthPlace,
+      hospitalChildBirthPlace,
+      otherHospitalChildBirthPlace,
+      homeChildBirthPlace,
       childbirthMode,
       maturationReason,
       maturationModality,
@@ -236,6 +247,7 @@ const HospitForm = ({
       arterialPhCordComparator,
       arterialCordLactates,
       arterialCordLactatesComparator,
+      birthStatus,
       postpartumHemorrhage,
       conditionPerineum,
       exitPlaceType,
@@ -412,17 +424,51 @@ const HospitForm = ({
 
           <BlockWrapper className={classes.inputItem}>
             <FormLabel component="legend" className={classes.durationLegend}>
-              Lieu d'accouchement
+              Accouchement à la maternité de l'hospitalisation
             </FormLabel>
             <Autocomplete
               multiple
-              id="childbirth-place-autocomplete"
-              options={criteriaData.data.childbirthPlace || []}
+              id="hospital-childbirth-place-autocomplete"
+              options={criteriaData.data.hospitalChildBirthPlace || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={childbirthPlace}
-              onChange={(e, value) => setChildbirthPlace(value)}
-              renderInput={(params) => <TextField {...params} label="Lieu d'accouchement" />}
+              value={hospitalChildBirthPlace}
+              onChange={(e, value) => setHospitalChildBirthPlace(value)}
+              renderInput={(params) => (
+                <TextField {...params} label="Accouchement à la maternité de l'hospitalisation" />
+              )}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper className={classes.inputItem}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Accouchement dans un autre hôpital
+            </FormLabel>
+            <Autocomplete
+              multiple
+              id="other-hospital-childbirth-place-autocomplete"
+              options={criteriaData.data.otherHospitalChildBirthPlace || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={otherHospitalChildBirthPlace}
+              onChange={(e, value) => setOtherHospitalChildBirthPlace(value)}
+              renderInput={(params) => <TextField {...params} label="Accouchement dans un autre hôpital" />}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper className={classes.inputItem}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Accouchement à domicile
+            </FormLabel>
+            <Autocomplete
+              multiple
+              id="home-childbirth-place-autocomplete"
+              options={criteriaData.data.homeChildBirthPlace || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={homeChildBirthPlace}
+              onChange={(e, value) => setHomeChildBirthPlace(value)}
+              renderInput={(params) => <TextField {...params} label="Accouchement à domicile" />}
             />
           </BlockWrapper>
 
@@ -795,6 +841,24 @@ const HospitForm = ({
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
             <FormLabel component="legend" className={classes.durationLegend}>
+              Statut vital à la naissance
+            </FormLabel>
+
+            <Autocomplete
+              multiple
+              id="birth-status-autocomplete"
+              options={criteriaData.data.birthStatus || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={birthStatus}
+              onChange={(e, value) => setBirthStatus(value)}
+              renderInput={(params) => <TextField {...params} label="Statut vital à la naissance" />}
+              style={{ marginBottom: '1em' }}
+            />
+          </BlockWrapper>
+
+          <BlockWrapper style={{ marginBottom: '1em' }}>
+            <FormLabel component="legend" className={classes.durationLegend}>
               Hémorragie du post-partum
             </FormLabel>
 
@@ -869,7 +933,7 @@ const HospitForm = ({
 
           <BlockWrapper className={classes.inputItem}>
             <FormLabel component="legend" className={classes.durationLegend}>
-              Complications
+              Aucune complication
             </FormLabel>
             <Autocomplete
               multiple
@@ -879,7 +943,7 @@ const HospitForm = ({
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={complication}
               onChange={(e, value) => setComplication(value)}
-              renderInput={(params) => <TextField {...params} label="Complications" />}
+              renderInput={(params) => <TextField {...params} label="Aucune complication" />}
             />
           </BlockWrapper>
         </Collapse>

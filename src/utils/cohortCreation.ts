@@ -483,7 +483,18 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
           buildLabelObjectFilter(criterion.chirurgicalGesture)
         ),
         questionnaireFiltersBuilders(hospitForm.childbirth, buildLabelObjectFilter(criterion.childbirth)),
-        questionnaireFiltersBuilders(hospitForm.childbirthPlace, buildLabelObjectFilter(criterion.childbirthPlace)),
+        questionnaireFiltersBuilders(
+          hospitForm.hospitalChildBirthPlace,
+          buildLabelObjectFilter(criterion.hospitalChildBirthPlace)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.otherHospitalChildBirthPlace,
+          buildLabelObjectFilter(criterion.otherHospitalChildBirthPlace)
+        ),
+        questionnaireFiltersBuilders(
+          hospitForm.homeChildBirthPlace,
+          buildLabelObjectFilter(criterion.homeChildBirthPlace)
+        ),
         questionnaireFiltersBuilders(hospitForm.childbirthMode, buildLabelObjectFilter(criterion.childbirthMode)),
         questionnaireFiltersBuilders(hospitForm.maturationReason, buildLabelObjectFilter(criterion.maturationReason)),
         questionnaireFiltersBuilders(
@@ -559,6 +570,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
           hospitForm.arterialCordLactates,
           buildComparatorFilter(criterion.arterialCordLactates, criterion.arterialCordLactatesComparator)
         ),
+        questionnaireFiltersBuilders(hospitForm.birthStatus, buildLabelObjectFilter(criterion.birthStatus)),
         questionnaireFiltersBuilders(
           hospitForm.postpartumHemorrhage,
           buildLabelObjectFilter(criterion.postpartumHemorrhage)
@@ -1459,7 +1471,9 @@ export async function unbuildRequest(_json: string): Promise<any> {
               currentCriterion.maturationCorticotherapie = []
               currentCriterion.chirurgicalGesture = []
               currentCriterion.childbirth = []
-              currentCriterion.childbirthPlace = []
+              currentCriterion.hospitalChildBirthPlace = []
+              currentCriterion.otherHospitalChildBirthPlace = []
+              currentCriterion.homeChildBirthPlace = []
               currentCriterion.childbirthMode = []
               currentCriterion.maturationReason = []
               currentCriterion.maturationModality = []
@@ -1494,6 +1508,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
               currentCriterion.arterialPhCordComparator = Comparators.GREATER_OR_EQUAL
               currentCriterion.arterialCordLactates = 1
               currentCriterion.arterialCordLactatesComparator = Comparators.GREATER_OR_EQUAL
+              currentCriterion.birthStatus = []
               currentCriterion.postpartumHemorrhage = []
               currentCriterion.conditionPerineum = []
               currentCriterion.exitPlaceType = []
@@ -1533,8 +1548,14 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   case hospitForm.childbirth.id:
                     unbuildLabelObjectFilter(currentCriterion, 'childbirth', joinedValues)
                     break
-                  case hospitForm.childbirthPlace.id:
-                    unbuildLabelObjectFilter(currentCriterion, 'childbirthPlace', joinedValues)
+                  case hospitForm.hospitalChildBirthPlace.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'hospitalChildBirthPlace', joinedValues)
+                    break
+                  case hospitForm.otherHospitalChildBirthPlace.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'otherHospitalChildBirthPlace', joinedValues)
+                    break
+                  case hospitForm.homeChildBirthPlace.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'homeChildBirthPlace', joinedValues)
                     break
                   case hospitForm.childbirthMode.id:
                     unbuildLabelObjectFilter(currentCriterion, 'childbirthMode', joinedValues)
@@ -1648,6 +1669,9 @@ export async function unbuildRequest(_json: string): Promise<any> {
                     currentCriterion.arterialCordLactatesComparator = parsedOccurence.comparator
                     break
                   }
+                  case hospitForm.birthStatus.id:
+                    unbuildLabelObjectFilter(currentCriterion, 'birthStatus', joinedValues)
+                    break
                   case hospitForm.postpartumHemorrhage.id:
                     unbuildLabelObjectFilter(currentCriterion, 'postpartumHemorrhage', joinedValues)
                     break

@@ -506,14 +506,34 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             'Accouchement :'
           )
         )
-      if (selectedCriteria.childbirthPlace && selectedCriteria.childbirthPlace.length > 0)
+      if (selectedCriteria.hospitalChildBirthPlace && selectedCriteria.hospitalChildBirthPlace.length > 0)
         labels.push(
           getLabelFromCriteriaObject(
             criteriaState,
-            selectedCriteria.childbirthPlace,
-            CriteriaDataKey.CHILDBIRTH_PLACE,
+            selectedCriteria.hospitalChildBirthPlace,
+            CriteriaDataKey.HOSPITALCHILDBIRTHPLACE,
             type,
-            "Lieu d'accouchement :"
+            "Accouchement à la maternité de l'hospitalisation :"
+          )
+        )
+      if (selectedCriteria.otherHospitalChildBirthPlace && selectedCriteria.otherHospitalChildBirthPlace.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.otherHospitalChildBirthPlace,
+            CriteriaDataKey.OTHERHOSPITALCHILDBIRTHPLACE,
+            type,
+            'Accouchement dans un autre hôpital :'
+          )
+        )
+      if (selectedCriteria.homeChildBirthPlace && selectedCriteria.homeChildBirthPlace.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.homeChildBirthPlace,
+            CriteriaDataKey.HOMECHILDBIRTHPLACE,
+            type,
+            'Accouchement à domicile :'
           )
         )
       if (selectedCriteria.childbirthMode && selectedCriteria.childbirthMode.length > 0)
@@ -600,7 +620,151 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         labels.push(
           getDatesLabel(
             [selectedCriteria.birthDeliveryStartDate, selectedCriteria.birthDeliveryEndDate],
-            'Date de début de grossesse :'
+            "Date/heure de l'accouchement :"
+          )
+        )
+      if (!isNaN(selectedCriteria.birthDeliveryWeeks) && selectedCriteria.birthDeliveryWeeksComparator)
+        labels.push(
+          getNbOccurencesLabel(
+            selectedCriteria.birthDeliveryWeeks,
+            selectedCriteria.birthDeliveryWeeksComparator,
+            'de semaines (Accouchement - Terme)'
+          )
+        )
+      if (!isNaN(selectedCriteria.birthDeliveryDays) && selectedCriteria.birthDeliveryDaysComparator)
+        labels.push(
+          getNbOccurencesLabel(
+            selectedCriteria.birthDeliveryDays,
+            selectedCriteria.birthDeliveryDaysComparator,
+            'de jours (Accouchement - Terme)'
+          )
+        )
+      if (selectedCriteria.birthDeliveryWay && selectedCriteria.birthDeliveryWay.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.birthDeliveryWay,
+            CriteriaDataKey.BIRTH_DELIVERY_WAY,
+            type,
+            "Voie d'accouchement :"
+          )
+        )
+      if (selectedCriteria.instrumentType && selectedCriteria.instrumentType.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.instrumentType,
+            CriteriaDataKey.INSTRUMENT_TYPE,
+            type,
+            "Type d'instrument :"
+          )
+        )
+      if (selectedCriteria.cSectionModality && selectedCriteria.cSectionModality.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.cSectionModality,
+            CriteriaDataKey.C_SECTION_MODALITY,
+            type,
+            'Modalités de la céarienne :'
+          )
+        )
+      if (selectedCriteria.presentationAtDelivery && selectedCriteria.presentationAtDelivery.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.presentationAtDelivery,
+            CriteriaDataKey.PRESENTATION_AT_DELIVERY,
+            type,
+            "Présentation à l'accouchement :"
+          )
+        )
+      if (!isNaN(selectedCriteria.birthMensurationsGrams) && selectedCriteria.birthMensurationsGramsComparator)
+        labels.push(
+          getNbOccurencesLabel(
+            selectedCriteria.birthMensurationsGrams,
+            selectedCriteria.birthMensurationsGramsComparator,
+            'Mensurations naissance - Poids (g) :'
+          )
+        )
+      if (!isNaN(selectedCriteria.birthMensurationsPercentil) && selectedCriteria.birthMensurationsPercentilComparator)
+        labels.push(
+          getNbOccurencesLabel(
+            selectedCriteria.birthMensurationsPercentil,
+            selectedCriteria.birthMensurationsPercentilComparator,
+            'Mensurations naissance - Poids (percentile) :'
+          )
+        )
+      if (!isNaN(selectedCriteria.apgar1) && selectedCriteria.apgar1Comparator)
+        labels.push(
+          getNbOccurencesLabel(selectedCriteria.apgar1, selectedCriteria.apgar1Comparator, 'Score Apgar - 1 min :')
+        )
+      if (!isNaN(selectedCriteria.apgar3) && selectedCriteria.apgar3Comparator)
+        labels.push(
+          getNbOccurencesLabel(selectedCriteria.apgar3, selectedCriteria.apgar3Comparator, 'Score Apgar - 3 min :')
+        )
+      if (!isNaN(selectedCriteria.apgar5) && selectedCriteria.apgar5Comparator)
+        labels.push(
+          getNbOccurencesLabel(selectedCriteria.apgar5, selectedCriteria.apgar5Comparator, 'Score Apgar - 5 min :')
+        )
+      if (!isNaN(selectedCriteria.apgar10) && selectedCriteria.apgar10Comparator)
+        labels.push(
+          getNbOccurencesLabel(selectedCriteria.apgar10, selectedCriteria.apgar10Comparator, 'Score Apgar - 10 min :')
+        )
+      if (!isNaN(selectedCriteria.arterialPhCord) && selectedCriteria.arterialPhCordComparator)
+        labels.push(
+          getNbOccurencesLabel(
+            selectedCriteria.arterialPhCord,
+            selectedCriteria.arterialPhCordComparator,
+            'pH artériel au cordon :'
+          )
+        )
+      if (!isNaN(selectedCriteria.arterialCordLactates) && selectedCriteria.arterialCordLactatesComparator)
+        labels.push(
+          getNbOccurencesLabel(
+            selectedCriteria.arterialCordLactates,
+            selectedCriteria.arterialCordLactatesComparator,
+            'Lactates artériel au cordon (mmol/L) :'
+          )
+        )
+      if (selectedCriteria.birthStatus && selectedCriteria.birthStatus.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.birthStatus,
+            CriteriaDataKey.BIRTHSTATUS,
+            type,
+            'Statut vital à la naissance :'
+          )
+        )
+      if (selectedCriteria.postpartumHemorrhage && selectedCriteria.postpartumHemorrhage.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.postpartumHemorrhage,
+            CriteriaDataKey.POSTPARTUM_HEMORRHAGE,
+            type,
+            'Hémorragie du post-partum :'
+          )
+        )
+      if (selectedCriteria.conditionPerineum && selectedCriteria.conditionPerineum.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.conditionPerineum,
+            CriteriaDataKey.CONDITION_PERINEUM,
+            type,
+            'État du Périnée :'
+          )
+        )
+      if (selectedCriteria.exitPlaceType && selectedCriteria.exitPlaceType.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.exitPlaceType,
+            CriteriaDataKey.EXIT_PLACE_TYPE,
+            type,
+            'Type de lieu de sortie :'
           )
         )
       if (selectedCriteria.feedingType && selectedCriteria.feedingType.length > 0)
@@ -620,7 +784,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             selectedCriteria.complication,
             CriteriaDataKey.COMPLICATION,
             type,
-            'Complications :'
+            'Aucune complication :'
           )
         )
       if (selectedCriteria.exitFeedingMode && selectedCriteria.exitFeedingMode.length > 0)

@@ -121,7 +121,9 @@ export enum CriteriaDataKey {
   CHIRURGICAL_GESTURE = 'chirurgicalGesture',
   VME = 'vme',
   CHILDBIRTH = 'childbirth',
-  CHILDBIRTH_PLACE = 'childbirthPlace',
+  HOSPITALCHILDBIRTHPLACE = 'hospitalChildBirthPlace',
+  OTHERHOSPITALCHILDBIRTHPLACE = 'otherHospitalChildBirthPlace',
+  HOMECHILDBIRTHPLACE = 'homeChildBirthPlace',
   CHILDBIRTH_MODE = 'childbirthMode',
   MATURATION_REASON = 'maturationReason',
   MATURATION_MODALITY = 'maturationModality',
@@ -134,6 +136,7 @@ export enum CriteriaDataKey {
   INSTRUMENT_TYPE = 'instrumentType',
   C_SECTION_MODALITY = 'cSectionModality',
   PRESENTATION_AT_DELIVERY = 'presentationAtDelivery',
+  BIRTHSTATUS = 'birthStatus',
   POSTPARTUM_HEMORRHAGE = 'postpartumHemorrhage',
   CONDITION_PERINEUM = 'conditionPerineum',
   EXIT_PLACE_TYPE = 'exitPlaceType',
@@ -281,7 +284,9 @@ export type HospitDataType = CommonCriteriaDataType & {
   maturationCorticotherapie: LabelObject[] | null
   chirurgicalGesture: LabelObject[] | null
   childbirth: LabelObject[] | null
-  childbirthPlace: LabelObject[] | null
+  hospitalChildBirthPlace: LabelObject[] | null
+  otherHospitalChildBirthPlace: LabelObject[] | null
+  homeChildBirthPlace: LabelObject[] | null
   childbirthMode: LabelObject[] | null
   maturationReason: LabelObject[] | null
   maturationModality: LabelObject[] | null
@@ -316,6 +321,7 @@ export type HospitDataType = CommonCriteriaDataType & {
   arterialPhCordComparator: Comparators
   arterialCordLactates: number
   arterialCordLactatesComparator: Comparators
+  birthStatus: LabelObject[] | null
   postpartumHemorrhage: LabelObject[] | null
   conditionPerineum: LabelObject[] | null
   exitPlaceType: LabelObject[] | null

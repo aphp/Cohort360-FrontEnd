@@ -37,8 +37,16 @@ export const hospitForm: { [key: string]: { id: string; type: keyof Questionnair
     id: 'F_MATER_007025',
     type: 'valueCoding'
   },
-  childbirthPlace: {
+  hospitalChildBirthPlace: {
     id: 'F_MATER_004801',
+    type: 'valueBoolean'
+  },
+  otherHospitalChildBirthPlace: {
+    id: 'F_MATER_004803',
+    type: 'valueBoolean'
+  },
+  homeChildBirthPlace: {
+    id: 'F_MATER_004805',
     type: 'valueBoolean'
   },
   childbirthMode: {
@@ -137,6 +145,10 @@ export const hospitForm: { [key: string]: { id: string; type: keyof Questionnair
     id: 'F_MATER_005061',
     type: 'valueDecimal'
   },
+  birthStatus: {
+    id: 'F_MATER_007030',
+    type: 'valueCoding'
+  },
   postpartumHemorrhage: {
     id: 'F_MATER_007031',
     type: 'valueCoding'
@@ -154,7 +166,7 @@ export const hospitForm: { [key: string]: { id: string; type: keyof Questionnair
     type: 'valueCoding'
   },
   complication: {
-    id: 'F_MATER_007022',
+    id: 'F_MATER_005556',
     type: 'valueCoding'
   },
   exitFeedingMode: {

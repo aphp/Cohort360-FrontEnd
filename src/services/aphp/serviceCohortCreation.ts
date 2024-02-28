@@ -64,7 +64,7 @@ import {
 import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
 import { DocType } from 'types/requestCriterias'
 import { VitalStatusLabel } from 'types/searchCriterias'
-import { booleanFieldsData } from 'data/questionnaire_data'
+import { birthStatusData, booleanFieldsData, vmeData } from 'data/questionnaire_data'
 
 export interface IServiceCohortCreation {
   /**
@@ -161,7 +161,9 @@ export interface IServiceCohortCreation {
   fetchChirurgicalGesture: () => Promise<Array<HierarchyElement>>
   fetchVme: () => Promise<Array<HierarchyElement>>
   fetchChildbirth: () => Promise<Array<HierarchyElement>>
-  fetchChildbirthPlace: () => Promise<Array<HierarchyElement>>
+  fetchHospitalChildBirthPlace: () => Promise<Array<HierarchyElement>>
+  fetchOtherHospitalChildBirthPlace: () => Promise<Array<HierarchyElement>>
+  fetchHomeChildBirthPlace: () => Promise<Array<HierarchyElement>>
   fetchChildbirthMode: () => Promise<Array<HierarchyElement>>
   fetchMaturationReason: () => Promise<Array<HierarchyElement>>
   fetchMaturationModality: () => Promise<Array<HierarchyElement>>
@@ -174,6 +176,7 @@ export interface IServiceCohortCreation {
   fetchInstrumentType: () => Promise<Array<HierarchyElement>>
   fetchCSectionModality: () => Promise<Array<HierarchyElement>>
   fetchPresentationAtDelivery: () => Promise<Array<HierarchyElement>>
+  fetchBirthStatus: () => Promise<Array<HierarchyElement>>
   fetchSetPostpartumHemorrhage: () => Promise<Array<HierarchyElement>>
   fetchConditionPerineum: () => Promise<Array<HierarchyElement>>
   fetchExitPlaceType: () => Promise<Array<HierarchyElement>>
@@ -483,12 +486,18 @@ const servicesCohortCreation: IServiceCohortCreation = {
   fetchChirurgicalGesture: async () =>
     fetchValueSet(CHIRURGICAL_GESTURE, { joinDisplayWithCode: false, sortingKey: 'id' }),
   fetchVme: async () => {
-    return booleanFieldsData
+    return vmeData
   },
   fetchChildbirth: async () => {
     return booleanFieldsData
   },
-  fetchChildbirthPlace: async () => {
+  fetchHospitalChildBirthPlace: async () => {
+    return booleanFieldsData
+  },
+  fetchOtherHospitalChildBirthPlace: async () => {
+    return booleanFieldsData
+  },
+  fetchHomeChildBirthPlace: async () => {
     return booleanFieldsData
   },
   fetchChildbirthMode: async () => fetchValueSet(CHILD_BIRTH_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
@@ -510,6 +519,9 @@ const servicesCohortCreation: IServiceCohortCreation = {
   fetchCSectionModality: async () =>
     fetchValueSet(C_SECTION_MODALITY, { joinDisplayWithCode: false, sortingKey: 'id' }),
   fetchPresentationAtDelivery: async () => fetchValueSet(PRESENTATION_AT_DELIVERY, { joinDisplayWithCode: false }),
+  fetchBirthStatus: async () => {
+    return birthStatusData
+  },
   fetchSetPostpartumHemorrhage: async () => {
     return booleanFieldsData
   },
