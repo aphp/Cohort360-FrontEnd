@@ -225,6 +225,10 @@ const LINK_ID_PARAM_NAME = 'item.linkId'
 const VALUE_PARAM_NAME_PREFIX = 'item.answer.'
 const FILTER_PARAM_NAME = '_filter'
 
+const quoteValue = (value: string, type: string) => {
+  return type in ['valueString', 'valueCoding'] ? `"${value}"` : value
+}
+
 export const questionnaireFiltersBuilders = (fhirKey: { id: string; type: string }, value?: string) => {
   const slice = value?.slice(0, 2)
   const operator = slice === 'ge' || slice === 'le' || slice === 'lt' || slice === 'gt' || slice === 'eq' ? slice : 'eq'
@@ -234,12 +238,14 @@ export const questionnaireFiltersBuilders = (fhirKey: { id: string; type: string
     const _code = value?.split(',')
     return value && _code && _code?.length > 0
       ? `${FILTER_PARAM_NAME}=${LINK_ID_PARAM_NAME} eq ${fhirKey.id} and (${_code
-          .map((code) => `${VALUE_PARAM_NAME_PREFIX}${fhirKey.type} eq "${code}"`)
+          .map((code) => `${VALUE_PARAM_NAME_PREFIX}${fhirKey.type} eq ${quoteValue(code, fhirKey.type)}`)
           .join(' or ')})`
       : ''
   } else {
-    return value
-      ? `${FILTER_PARAM_NAME}=${LINK_ID_PARAM_NAME} eq ${fhirKey.id} and ${VALUE_PARAM_NAME_PREFIX}${fhirKey.type} ${operator} ${_value}`
+    return _value
+      ? `${FILTER_PARAM_NAME}=${LINK_ID_PARAM_NAME} eq ${fhirKey.id} and ${VALUE_PARAM_NAME_PREFIX}${
+          fhirKey.type
+        } ${operator} ${quoteValue(_value, fhirKey.type)}`
       : ''
   }
 }
