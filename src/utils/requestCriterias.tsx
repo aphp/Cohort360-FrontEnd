@@ -623,7 +623,11 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             "Date/heure de l'accouchement :"
           )
         )
-      if (!isNaN(selectedCriteria.birthDeliveryWeeks) && selectedCriteria.birthDeliveryWeeksComparator)
+      if (
+        !isNaN(selectedCriteria.birthDeliveryWeeks) &&
+        selectedCriteria.birthDeliveryWeeksComparator &&
+        selectedCriteria.birthDeliveryWeeks !== 0
+      )
         labels.push(
           getNbOccurencesLabel(
             selectedCriteria.birthDeliveryWeeks,
@@ -631,7 +635,11 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             'de semaines (Accouchement - Terme)'
           )
         )
-      if (!isNaN(selectedCriteria.birthDeliveryDays) && selectedCriteria.birthDeliveryDaysComparator)
+      if (
+        !isNaN(selectedCriteria.birthDeliveryDays) &&
+        selectedCriteria.birthDeliveryDaysComparator &&
+        selectedCriteria.birthDeliveryDays !== 0
+      )
         labels.push(
           getNbOccurencesLabel(
             selectedCriteria.birthDeliveryDays,
@@ -679,7 +687,11 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             "Présentation à l'accouchement :"
           )
         )
-      if (!isNaN(selectedCriteria.birthMensurationsGrams) && selectedCriteria.birthMensurationsGramsComparator)
+      if (
+        !isNaN(selectedCriteria.birthMensurationsGrams) &&
+        selectedCriteria.birthMensurationsGramsComparator &&
+        selectedCriteria.birthMensurationsGrams !== 0
+      )
         labels.push(
           getNbOccurencesLabel(
             selectedCriteria.birthMensurationsGrams,
@@ -687,7 +699,11 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             'Mensurations naissance - Poids (g) :'
           )
         )
-      if (!isNaN(selectedCriteria.birthMensurationsPercentil) && selectedCriteria.birthMensurationsPercentilComparator)
+      if (
+        !isNaN(selectedCriteria.birthMensurationsPercentil) &&
+        selectedCriteria.birthMensurationsPercentilComparator &&
+        selectedCriteria.birthMensurationsPercentil !== 0
+      )
         labels.push(
           getNbOccurencesLabel(
             selectedCriteria.birthMensurationsPercentil,
@@ -695,23 +711,27 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             'Mensurations naissance - Poids (percentile) :'
           )
         )
-      if (!isNaN(selectedCriteria.apgar1) && selectedCriteria.apgar1Comparator)
+      if (!isNaN(selectedCriteria.apgar1) && selectedCriteria.apgar1Comparator && selectedCriteria.apgar1 !== 0)
         labels.push(
           getNbOccurencesLabel(selectedCriteria.apgar1, selectedCriteria.apgar1Comparator, 'Score Apgar - 1 min :')
         )
-      if (!isNaN(selectedCriteria.apgar3) && selectedCriteria.apgar3Comparator)
+      if (!isNaN(selectedCriteria.apgar3) && selectedCriteria.apgar3Comparator && selectedCriteria.apgar3 !== 0)
         labels.push(
           getNbOccurencesLabel(selectedCriteria.apgar3, selectedCriteria.apgar3Comparator, 'Score Apgar - 3 min :')
         )
-      if (!isNaN(selectedCriteria.apgar5) && selectedCriteria.apgar5Comparator)
+      if (!isNaN(selectedCriteria.apgar5) && selectedCriteria.apgar5Comparator && selectedCriteria.apgar5 !== 0)
         labels.push(
           getNbOccurencesLabel(selectedCriteria.apgar5, selectedCriteria.apgar5Comparator, 'Score Apgar - 5 min :')
         )
-      if (!isNaN(selectedCriteria.apgar10) && selectedCriteria.apgar10Comparator)
+      if (!isNaN(selectedCriteria.apgar10) && selectedCriteria.apgar10Comparator && selectedCriteria.apgar10 !== 0)
         labels.push(
           getNbOccurencesLabel(selectedCriteria.apgar10, selectedCriteria.apgar10Comparator, 'Score Apgar - 10 min :')
         )
-      if (!isNaN(selectedCriteria.arterialPhCord) && selectedCriteria.arterialPhCordComparator)
+      if (
+        !isNaN(selectedCriteria.arterialPhCord) &&
+        selectedCriteria.arterialPhCordComparator &&
+        selectedCriteria.arterialPhCord !== 0
+      )
         labels.push(
           getNbOccurencesLabel(
             selectedCriteria.arterialPhCord,
@@ -719,7 +739,11 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             'pH artériel au cordon :'
           )
         )
-      if (!isNaN(selectedCriteria.arterialCordLactates) && selectedCriteria.arterialCordLactatesComparator)
+      if (
+        !isNaN(selectedCriteria.arterialCordLactates) &&
+        selectedCriteria.arterialCordLactatesComparator &&
+        selectedCriteria.arterialCordLactates !== 0
+      )
         labels.push(
           getNbOccurencesLabel(
             selectedCriteria.arterialCordLactates,
