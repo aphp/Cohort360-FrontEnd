@@ -113,6 +113,16 @@ export enum SearchByTypesLabelDocuments {
   TEXT = 'Corps du document',
   DESCRIPTION = 'Titre du document'
 }
+export enum FilterByDocumentStatus {
+  VALIDATED = 'Validé',
+  NOT_VALIDATED = 'Non validé',
+  CANCELED = 'Annulé'
+}
+export enum DocumentStatuses {
+  FINAL = 'final',
+  PRELIMINARY = 'preliminary',
+  CANCELED = 'canceled' // todo: get FHIR mapped value
+}
 export enum FilterKeys {
   IPP = 'ipp',
   GENDERS = 'genders',
@@ -131,6 +141,7 @@ export enum FilterKeys {
   SOURCE = 'source',
   EXECUTIVE_UNITS = 'executiveUnits',
   DOC_TYPES = 'docTypes',
+  DOC_STATUSES = 'docStatuses',
   FAVORITE = 'favorite',
   STATUS = 'status',
   MIN_PATIENTS = 'minPatients',
@@ -242,6 +253,7 @@ export type MaternityFormFilters = {
 export type DocumentsFilters = GenericFilter & {
   ipp?: string
   docTypes: SimpleCodeType[]
+  docStatuses: string[]
   onlyPdfAvailable: boolean
 }
 export interface CohortsFilters {

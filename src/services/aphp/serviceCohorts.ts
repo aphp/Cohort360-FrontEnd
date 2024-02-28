@@ -480,7 +480,7 @@ const servicesCohorts: IServiceCohorts = {
         orderBy,
         searchInput,
         searchBy,
-        filters: { docTypes, endDate, executiveUnits, ipp, nda, onlyPdfAvailable, startDate }
+        filters: { docStatuses, docTypes, endDate, executiveUnits, ipp, nda, onlyPdfAvailable, startDate }
       }
     } = options
     if (searchInput) {
@@ -496,7 +496,7 @@ const servicesCohorts: IServiceCohorts = {
         searchBy: searchBy,
         _sort: orderBy.orderBy,
         sortDirection: orderBy.orderDirection,
-        status: 'final',
+        docStatuses: docStatuses,
         _elements: searchInput ? [] : undefined,
         _list: groupId ? [groupId] : [],
         _text: searchInput,
@@ -515,7 +515,7 @@ const servicesCohorts: IServiceCohorts = {
       !!searchInput || docTypes.length > 0 || !!nda || !!ipp || !!startDate || !!endDate
         ? fetchDocumentReference({
             signal: signal,
-            status: 'final',
+            docStatuses: docStatuses,
             _list: groupId ? [groupId] : [],
             size: 0,
             uniqueFacet: ['subject']

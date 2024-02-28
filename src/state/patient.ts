@@ -483,6 +483,7 @@ const fetchDocuments = createAsyncThunk<
     const nda = searchCriterias.filters.nda
     const searchBy = searchCriterias.searchBy || SearchByTypes.TEXT
     const selectedDocTypes = searchCriterias.filters.docTypes.map((docType) => docType.code)
+    const docStatuses = searchCriterias.filters.docStatuses
     const startDate = searchCriterias.filters.startDate
     const endDate = searchCriterias.filters.endDate
     const onlyPdfAvailable = searchCriterias.filters.onlyPdfAvailable
@@ -514,6 +515,7 @@ const fetchDocuments = createAsyncThunk<
       patientId,
       searchInput,
       selectedDocTypes,
+      docStatuses,
       nda,
       onlyPdfAvailable,
       startDate,

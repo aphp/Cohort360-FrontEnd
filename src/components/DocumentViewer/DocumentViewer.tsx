@@ -86,9 +86,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
     margin: 'auto'
   }
 
-  const findContent = documentContent?.content?.find(
-    (content) => content.attachment?.contentType === 'http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain'
-  )
+  const findContent = documentContent?.content?.find((content) => content.attachment?.contentType === 'text/plain')
 
   const documentContentDecode =
     findContent?.attachment.data != undefined

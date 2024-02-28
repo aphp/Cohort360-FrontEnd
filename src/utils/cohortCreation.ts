@@ -16,9 +16,17 @@ import {
   CONDITION_HIERARCHY,
   MEDICATION_ATC,
   IMAGING_STUDY_UID_URL,
-  PROCEDURE_HIERARCHY
+  PROCEDURE_HIERARCHY,
+  DOC_STATUS_CODE_SYSTEM
 } from '../constants'
-import { DocumentAttachmentMethod, FormNames, LabelObject, SearchByTypes } from 'types/searchCriterias'
+import {
+  DocumentAttachmentMethod,
+  DocumentStatuses,
+  FormNames,
+  FilterByDocumentStatus,
+  LabelObject,
+  SearchByTypes
+} from 'types/searchCriterias'
 import { Comparators, RessourceType, SelectedCriteriaType, CriteriaDataKey } from 'types/requestCriterias'
 import { parseOccurence } from './valueComparator'
 import { parseDocumentAttachment } from './documentAttachment'
@@ -41,6 +49,7 @@ import {
   unbuildSearchFilter,
   buildEncounterServiceFilter,
   filtersBuilders,
+  unbuildDocStatusesFilter,
   questionnaireFiltersBuilders,
   unbuildQuestionnaireFilters,
   findQuestionnaireName
@@ -203,6 +212,20 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
   const filterReducer = (accumulator: string, currentValue: string): string =>
     accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
 
+  const joinDocStatuses = (docStatuses: string[]): string => {
+    const filterDocStatuses: string[] = []
+    for (const _status of docStatuses) {
+      const status =
+        _status === FilterByDocumentStatus.VALIDATED
+          ? DocumentStatuses.FINAL
+          : _status === FilterByDocumentStatus.NOT_VALIDATED
+          ? DocumentStatuses.PRELIMINARY
+          : DocumentStatuses.CANCELED
+      filterDocStatuses.push(`${DOC_STATUS_CODE_SYSTEM}|${status}`)
+    }
+    return filterDocStatuses.join(',')
+  }
+
   switch (criterion.type) {
     case RessourceType.PATIENT: {
       filterFhir = [
@@ -272,12 +295,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case RessourceType.DOCUMENTS: {
       const unreducedFilterFhir = [
-        `${COMPOSITION_STATUS}=final&type:not=doc-impor&contenttype=http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain&subject.active=true`,
+        `type:not=doc-impor&contenttype=text/plain&subject.active=true`,
         filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(
           criterion.searchBy === SearchByTypes.TEXT ? COMPOSITION_TEXT : COMPOSITION_TITLE,
           buildSearchFilter(criterion.search)
         ),
+        filtersBuilders(COMPOSITION_STATUS, joinDocStatuses(criterion.docStatuses)),
         filtersBuilders(
           COMPOSITION_TYPE,
           buildLabelObjectFilter(
@@ -969,6 +993,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         currentCriterion.title = element.name ?? 'Critère de document'
         currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
         currentCriterion.docType = currentCriterion.docType ? currentCriterion.docType : []
+        currentCriterion.docStatuses = currentCriterion.docStatuses ? currentCriterion.docStatuses : []
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
         currentCriterion.occurrenceComparator = currentCriterion.occurrenceComparator
           ? currentCriterion.occurrenceComparator
@@ -1004,6 +1029,8 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 break
               }
               case COMPOSITION_STATUS:
+                unbuildDocStatusesFilter(currentCriterion, 'docStatuses', value)
+                break
               case 'subject.active':
               case 'type:not':
               case 'contenttype':

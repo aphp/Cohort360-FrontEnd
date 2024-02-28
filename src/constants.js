@@ -28,6 +28,8 @@ export const CODE_HIERARCHY_EXTENSION_NAME =
 export const CONCEPT_MAP_HIERARCHY_EXTENSION_NAME =
   'https://terminology.eds.aphp.fr/fhir/profile/conceptMap/extension/group-source-hierarchy-path'
 
+export const DOC_STATUS_CODE_SYSTEM = 'http://hl7.org/fhir/CodeSystem/composition-status'
+
 export const CLAIM_HIERARCHY = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_CLAIM_HIERARCHY
   : '{VITE_VALUE_SET_URL_CLAIM_HIERARCHY}'

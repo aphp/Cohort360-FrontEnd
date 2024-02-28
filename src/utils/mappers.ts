@@ -24,6 +24,7 @@ import {
 import { comparatorToFilter, parseOccurence } from './valueComparator'
 import services from 'services/aphp'
 import extractFilterParams, { FhirFilterValue } from './fhirFilterParser'
+import { mapDocumentStatusesFromRequestParam } from 'mappers/filters'
 
 const searchReducer = (accumulator: any, currentValue: any): string =>
   accumulator || accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -185,6 +186,14 @@ export const unbuildDocTypesFilter = (currentCriterion: any, filterName: string,
   const newArray = docTypes.docTypes.filter((docType: DocType) =>
     valuesIds?.find((docTypeId) => docTypeId === docType.code)
   )
+  if (newArray) {
+    currentCriterion[filterName] = currentCriterion ? [...currentCriterion[filterName], ...newArray] : newArray
+  }
+}
+
+export const unbuildDocStatusesFilter = (currentCriterion: any, filterName: string, values?: string | null) => {
+  const newArray = values?.split(',').map((value) => mapDocumentStatusesFromRequestParam(value.split('|')[1]))
+
   if (newArray) {
     currentCriterion[filterName] = currentCriterion ? [...currentCriterion[filterName], ...newArray] : newArray
   }

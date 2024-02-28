@@ -56,6 +56,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.EXECUTIVE_UNITS:
       case FilterKeys.ADMINISTRATION_ROUTES:
       case FilterKeys.PRESCRIPTION_TYPES:
+      case FilterKeys.DOC_STATUSES:
       case FilterKeys.DOC_TYPES:
       case FilterKeys.STATUS:
       case FilterKeys.MODALITY:
@@ -128,6 +129,9 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.EXECUTIVE_UNITS) {
     return `Unité exécutrice : ${(value as ScopeTreeRow).name}`
   }
+  if (key === FilterKeys.DOC_STATUSES) {
+    return `Documents : ${value}`
+  }
   if (key === FilterKeys.DOC_TYPES) {
     return (value as SimpleCodeType).label
   }
@@ -173,6 +177,11 @@ export const selectFiltersAsArray = (filters: Filters) => {
         case FilterKeys.DIAGNOSTIC_TYPES:
         case FilterKeys.ADMINISTRATION_ROUTES:
         case FilterKeys.PRESCRIPTION_TYPES:
+        case FilterKeys.DOC_STATUSES:
+          ;(value as []).forEach((elem) => {
+            result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
+          })
+          break
         case FilterKeys.DOC_TYPES:
         case FilterKeys.EXECUTIVE_UNITS:
         case FilterKeys.STATUS:

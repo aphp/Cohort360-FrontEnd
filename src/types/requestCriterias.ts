@@ -143,7 +143,8 @@ export enum CriteriaDataKey {
   FEEDING_TYPE = 'feedingType',
   COMPLICATION = 'complication',
   EXIT_FEEDING_MODE = 'exitFeedingMode',
-  EXIT_DIAGNOSTIC = 'exitDiagnostic'
+  EXIT_DIAGNOSTIC = 'exitDiagnostic',
+  DOC_STATUSES = 'docStatuses'
 }
 
 export type CcamDataType = CommonCriteriaDataType & {
@@ -204,6 +205,7 @@ export type DocumentDataType = CommonCriteriaDataType & {
   occurrenceComparator: Comparators
   startOccurrence: string | null
   endOccurrence: string | null
+  docStatuses: string[]
 }
 
 export type GhmDataType = CommonCriteriaDataType & {

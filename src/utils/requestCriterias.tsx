@@ -108,6 +108,9 @@ const getDocumentTypesLabel = (values: DocType[]) => {
 const getNbOccurencesLabel = (value: number, comparator: string, name: string) => {
   return `${name} ${comparator} ${+value}`
 }
+const getDocumentStatusLabel = (value: string[]) => {
+  return `Statut de documents : ${value.join(', ')}`
+}
 
 const getBiologyValuesLabel = (comparator: string, values: [number | null, number | null]) => {
   if (values[0] === null && values[1] === null) return null
@@ -218,6 +221,9 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         labels.push(getSearchDocumentLabel(selectedCriteria.search, selectedCriteria.searchBy))
       if (selectedCriteria.docType && selectedCriteria.docType.length > 0)
         labels.push(getDocumentTypesLabel(selectedCriteria.docType))
+      if (selectedCriteria.docStatuses) {
+        labels.push(getDocumentStatusLabel(selectedCriteria.docStatuses))
+      }
       break
 
     case RessourceType.CONDITION:
