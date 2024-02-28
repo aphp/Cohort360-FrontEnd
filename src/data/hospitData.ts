@@ -54,7 +54,7 @@ export const hospitForm: { [key: string]: { id: string; type: keyof Questionnair
     type: 'valueCoding'
   },
   maturationReason: {
-    id: 'F_MATER_004351',
+    id: 'F_MATER_004831',
     type: 'valueCoding'
   },
   maturationModality: {
@@ -167,7 +167,7 @@ export const hospitForm: { [key: string]: { id: string; type: keyof Questionnair
   },
   complication: {
     id: 'F_MATER_005556',
-    type: 'valueCoding'
+    type: 'valueBoolean'
   },
   exitFeedingMode: {
     id: 'F_MATER_005834',
