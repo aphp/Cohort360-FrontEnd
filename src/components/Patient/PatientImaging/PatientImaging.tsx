@@ -26,6 +26,7 @@ import { selectFiltersAsArray } from 'utils/filters'
 import { CriteriaName, HierarchyElement, LoadingStatus } from 'types'
 import { PatientTypes } from 'types/patient'
 import { FilterKeys } from 'types/searchCriterias'
+import { AlertWrapper } from 'components/ui/Alert'
 
 const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
@@ -121,6 +122,15 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
 
   return (
     <Grid container justifyContent="flex-end">
+      <BlockWrapper item xs={12}>
+        <AlertWrapper severity="warning">
+          Seuls les examens présents dans le PACS Philips et rattachés à un Dossier Administratif (NDA) sont
+          actuellement disponibles. Le flux alimentant les métadonnées associées aux séries et aux examens est suspendu
+          depuis le 01/02/2023 suite à la migration du PACS AP-HP. Aucun examen produit après cette date n'est
+          disponible via cohort360. Pour tout besoin d'examen post 01/02/2023, merci de contacter le support Cohort360 :
+          dsn-id-recherche-support-cohort360@aphp.fr.
+        </AlertWrapper>
+      </BlockWrapper>
       <BlockWrapper item xs={12} margin={'20px 0px 10px 0px'}>
         <Searchbar>
           <Grid container item xs={12} lg={3}>
