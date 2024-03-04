@@ -45,8 +45,7 @@ const IPPForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   }
 
   useEffect(() => {
-    const ippMatches = (defaultValues.search || '').matchAll(/(?:^|\D+)*(8\d{9})(?:\D+|$)/gm) || []
-
+    const ippMatches = (defaultValues.search || '').matchAll(/(?:^|\D+){0,1}(8\d{9})(?:$|\D+)/gm) || []
     const ippList = []
 
     for (const match of ippMatches) {
