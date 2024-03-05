@@ -4,6 +4,7 @@ import Parse from 'html-react-parser'
 
 import { CircularProgress, Grid, IconButton, Typography, TableRow } from '@mui/material'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
+import DOMPurify from 'dompurify'
 
 import FolderSharedIcon from '@mui/icons-material/FolderShared'
 import DescriptionIcon from '@mui/icons-material/Description'
@@ -217,7 +218,7 @@ const DataTableCompositionLine: React.FC<{
             colSpan={6}
             style={{ backgroundImage: `url(${Watermark})`, backgroundSize: 'contain' }}
           >
-            <Typography>{Parse(documentContent)}</Typography>
+            <Typography>{Parse(DOMPurify.sanitize(documentContent))}</Typography>
           </TableCellWrapper>
         </TableRow>
       )}
