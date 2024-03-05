@@ -352,24 +352,24 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
                   maxLimit={50}
                 />
               </Grid>
-              {!searchResults.deidentified && (
-                <Grid item container direction="column" paddingBottom="8px">
-                  <TextInput
-                    name="searchInput"
-                    label="Recherche textuelle :"
-                    disabled={isReadonlyFilterInfoModal}
-                    value={selectedSavedFilter?.filterParams.searchInput}
-                  />
-                  <Select
-                    label="Rechercher dans"
-                    width="60%"
-                    disabled={isReadonlyFilterInfoModal}
-                    value={selectedSavedFilter?.filterParams.searchBy}
-                    items={searchByListDocuments}
-                    name="searchBy"
-                  />
-                </Grid>
-              )}
+
+              <Grid item container direction="column" paddingBottom="8px">
+                <TextInput
+                  name="searchInput"
+                  label="Recherche textuelle :"
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.searchInput}
+                />
+                <Select
+                  label="Rechercher dans"
+                  width="60%"
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.searchBy}
+                  items={searchByListDocuments}
+                  name="searchBy"
+                />
+              </Grid>
+
               <Grid item>
                 {!searchResults.deidentified && (
                   <NdaFilter

@@ -126,11 +126,11 @@ const Login = () => {
   const [authCode, setAuthCode] = useState<string>('')
   const urlParams = new URLSearchParams(window.location.search)
   const [display_jwt_form, setDisplay_jwt_form] = useState(false)
-  const code = urlParams.get('code')
+  const oidcCode = urlParams.get('code')
 
   useEffect(() => {
     localforage.setItem('persist:root', '')
-    if (code) setAuthCode(code)
+    if (oidcCode) setAuthCode(oidcCode)
   }, [])
 
   useEffect(() => {
@@ -302,9 +302,9 @@ const Login = () => {
     return () => document.removeEventListener('keydown', keyHandler)
   }, [display_jwt_form])
 
-  if (noRights === true) return <NoRights />
+  if (noRights === true) return <NoRights oidcCode={oidcCode} />
 
-  return code ? (
+  return oidcCode ? (
     <Grid className={classes.oidcConnexionProgress}>
       <Typography variant="h2" color="primary">
         Connexion...

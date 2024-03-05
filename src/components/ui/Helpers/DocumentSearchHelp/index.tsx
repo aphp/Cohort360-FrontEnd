@@ -441,7 +441,7 @@ const DocumentSearchHelp: React.FC<DocumentSearchHelpProps> = ({ open, onClose }
                   </TableCellWrapper>
                   <TableCellWrapper>
                     <Typography>
-                      Mot1 <span className={classes.bold}>+</span> Mot2
+                      Mot1 <span className={classes.bold}>+</span>Mot2
                     </Typography>
                   </TableCellWrapper>
                   <TableCellWrapper align="left">

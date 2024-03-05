@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, createContext, useState } from 'react'
+import React, { PropsWithChildren, createContext, useEffect, useState } from 'react'
 
 import { Button, Dialog, DialogActions, DialogTitle, Divider, Grid, Typography } from '@mui/material'
 import { DialogContentWrapper } from './styles'
@@ -15,6 +15,7 @@ type ModalProps = {
   readonly?: boolean
   validationText?: string
   onSubmit?: (value: any) => void
+  onClean?: boolean
   onClose?: () => void
 }
 
@@ -28,6 +29,7 @@ const Modal = ({
   readonly = false,
   validationText = 'Valider',
   onSubmit,
+  onClean,
   onClose
 }: PropsWithChildren<ModalProps>) => {
   const [formData, setFormData] = useState<Record<string, any>>({})
@@ -40,6 +42,14 @@ const Modal = ({
   const updateError = (isError: boolean) => {
     setIsError(isError)
   }
+
+  const deleteFormData = () => {
+    setFormData({})
+  }
+
+  useEffect(() => {
+    deleteFormData()
+  }, [onClean])
 
   const submit = async () => {
     try {

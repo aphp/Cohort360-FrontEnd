@@ -220,6 +220,7 @@ export type ScopeTreeRow = AbstractTree<{
   cohort_size?: string
   cohort_tag?: string
   type?: string
+  source_value?: string
 }>
 
 export enum ChartCode {

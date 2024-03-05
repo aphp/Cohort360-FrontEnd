@@ -110,7 +110,7 @@ const IPPForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
           </Grid>
 
           <Typography className={classes.inputItem} style={{ fontWeight: 'bold' }}>
-            {ippList.length} IPP détectés.
+            {ippList.length} IPP détecté{ippList.length > 1 ? 's' : ''}.
           </Typography>
 
           <Grid item xs={12} className={classes.inputItem}>

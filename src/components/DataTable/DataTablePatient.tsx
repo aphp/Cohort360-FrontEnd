@@ -50,7 +50,7 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
     { label: PatientTableLabels.LASTNAME, code: !deidentified ? Order.FAMILY : undefined, align: 'left' },
     {
       label: !deidentified ? PatientTableLabels.BIRTHDATE : PatientTableLabels.AGE,
-      code: !deidentified ? `${Order.BIRTHDATE},${Order.ID}` : undefined
+      code: `${Order.BIRTHDATE},${Order.ID}`
     },
     { label: PatientTableLabels.LAST_ENCOUNTER, align: 'left' },
     { label: PatientTableLabels.VITAL_STATUS },

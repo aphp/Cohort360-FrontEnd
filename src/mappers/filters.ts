@@ -1,5 +1,5 @@
 import { RessourceType } from 'types/requestCriterias'
-import { ScopeTreeRow, SimpleCodeType } from 'types'
+import { ScopeTreeRow } from 'types'
 import {
   Direction,
   Filters,
@@ -37,7 +37,10 @@ import {
   PROCEDURE_HIERARCHY,
   CONDITION_STATUS,
   BIOLOGY_HIERARCHY_ITM_ANABIO,
-  BIOLOGY_HIERARCHY_ITM_LOINC
+  BIOLOGY_HIERARCHY_ITM_LOINC,
+  IMAGING_MODALITIES,
+  MEDICATION_ADMINISTRATIONS,
+  MEDICATION_PRESCRIPTION_TYPES
 } from '../constants'
 import services from 'services/aphp'
 
@@ -103,10 +106,11 @@ enum ObservationParamsKeys {
 }
 
 enum ImagingParamsKeys {
+  IPP = 'subject.identifier',
   MODALITY = 'modality',
   NDA = 'encounter.identifier',
-  DATE = 'date',
-  EXECUTIVE_UNITS = 'context.encounter-care-site'
+  DATE = 'started',
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site'
 }
 
 const getGenericKeyFromRessourceType = (type: RessourceType, key: 'NDA' | 'DATE' | 'EXECUTIVE_UNITS') => {
@@ -132,7 +136,7 @@ const getGenericKeyFromRessourceType = (type: RessourceType, key: 'NDA' | 'DATE'
 }
 
 const mapGenericFromRequestParams = async (parameters: URLSearchParams, type: RessourceType) => {
-  const nda = parameters.get(getGenericKeyFromRessourceType(type, 'NDA')) || ''
+  const nda = decodeURIComponent(parameters.get(getGenericKeyFromRessourceType(type, 'NDA')) || '')
   const dates = parameters.getAll(getGenericKeyFromRessourceType(type, 'DATE'))
   const startDate = dates.find((e) => e.includes('ge'))?.split('ge')?.[1] || null
   const endDate = dates.find((e) => e.includes('le'))?.split('le')?.[1] || null
@@ -150,6 +154,10 @@ const mapGenericFromRequestParams = async (parameters: URLSearchParams, type: Re
         }
       })
     )
+    executiveUnits = executiveUnits.map((executiveUnit) => ({
+      ...executiveUnit,
+      name: `${executiveUnit.source_value} - ${executiveUnit.name}`
+    }))
   }
   return { nda, startDate, endDate, executiveUnits }
 }
@@ -174,10 +182,13 @@ const mapPatientFromRequestParams = (parameters: URLSearchParams) => {
 
 const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
   const docTypes =
-    (allDocTypesList.docTypes as SimpleCodeType[]).filter((docType) =>
-      parameters.get(DocumentsParamsKeys.DOC_TYPES)?.split(',').includes(docType.code)
-    ) || []
-  const ipp = parameters.get(DocumentsParamsKeys.IPP) || ''
+    decodeURIComponent(parameters.get(DocumentsParamsKeys.DOC_TYPES) || '')
+      ?.split(',')
+      ?.map((code) => {
+        const elem = allDocTypesList.docTypes.find((docType) => docType.code === code)
+        return { label: elem?.label, code: elem?.code, type: elem?.type }
+      }) || []
+  const ipp = decodeURIComponent(parameters.get(DocumentsParamsKeys.IPP) || '')
   const onlyPdfAvailable = true
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
     parameters,
@@ -196,7 +207,7 @@ const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
   const code = fetchCodesResults.map((e) => {
     return { id: e.id, label: e.label }
   })
-  const diagnosticTypesParams = parameters.get(ConditionParamsKeys.DIAGNOSTIC_TYPES)
+  const diagnosticTypesParams = decodeURIComponent(parameters.get(ConditionParamsKeys.DIAGNOSTIC_TYPES) || '')
   let diagnosticTypes: LabelObject[] = []
   if (diagnosticTypesParams) {
     const allDiagnosticTypes = await services.cohortCreation.fetchDiagnosticTypes()
@@ -245,12 +256,12 @@ const mapClaimFromRequestParams = async (parameters: URLSearchParams) => {
 }
 
 const mapPrescriptionFromRequestParams = async (parameters: URLSearchParams) => {
-  const prescriptionTypesParam = parameters.get(PrescriptionParamsKeys.PRESCRIPTION_TYPES)
+  const prescriptionTypesParam = decodeURIComponent(parameters.get(PrescriptionParamsKeys.PRESCRIPTION_TYPES) || '')
   let prescriptionTypes: LabelObject[] = []
   if (prescriptionTypesParam) {
     const types = await services.cohortCreation.fetchPrescriptionTypes()
     prescriptionTypes = prescriptionTypesParam?.split(',')?.map((elem) => {
-      return { id: elem, label: types.find((type) => type.id === elem)?.label || '' }
+      return { id: elem.split('|')?.[1], label: types.find((type) => type.id === elem.split('|')?.[1])?.label || '' }
     })
   }
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
@@ -261,12 +272,14 @@ const mapPrescriptionFromRequestParams = async (parameters: URLSearchParams) => 
 }
 
 const mapAdministrationFromRequestParams = async (parameters: URLSearchParams) => {
-  const administrationRoutesParam = parameters.get(AdministrationParamsKeys.ADMINISTRATION_ROUTES)
+  const administrationRoutesParam = decodeURIComponent(
+    parameters.get(AdministrationParamsKeys.ADMINISTRATION_ROUTES) || ''
+  )
   let administrationRoutes: LabelObject[] = []
   if (administrationRoutesParam) {
     const routes = await services.cohortCreation.fetchAdministrations()
     administrationRoutes = administrationRoutesParam?.split(',')?.map((elem) => {
-      return { id: elem, label: routes.find((route) => route.id === elem)?.label || '' }
+      return { id: elem.split('|')?.[1], label: routes.find((route) => route.id === elem.split('|')?.[1])?.label || '' }
     })
   }
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
@@ -305,22 +318,23 @@ const mapBiologyFromRequestParams = async (parameters: URLSearchParams) => {
 }
 
 const mapImagingFromRequestParams = async (parameters: URLSearchParams) => {
-  const modalityParams = parameters.get(ImagingParamsKeys.MODALITY)
+  const modalityParams = decodeURIComponent(parameters.get(ImagingParamsKeys.MODALITY) || '')
+  const ipp = decodeURIComponent(parameters.get(ImagingParamsKeys.IPP) || '')
   let modality: LabelObject[] = []
   if (modalityParams) {
     const allModalities = await services.cohortCreation.fetchModalities()
-    modality = modalityParams
-      ?.split('*|')?.[1]
-      .split(',')
-      ?.map((elem) => {
-        return { id: elem, label: allModalities.find((diag) => diag.id === elem)?.label || '' }
-      })
+    modality = modalityParams?.split(',')?.map((elem) => {
+      return {
+        id: elem.split('|')?.[1],
+        label: allModalities.find((allModality) => allModality.id === elem.split('|')?.[1])?.label || ''
+      }
+    })
   }
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
     parameters,
     RessourceType.IMAGING
   )
-  return { modality, nda, startDate, endDate, executiveUnits }
+  return { modality, nda, startDate, endDate, executiveUnits, ipp }
 }
 
 const mapFiltersFromRequestParams = async (parameters: URLSearchParams, type: RessourceType): Promise<Filters> => {
@@ -341,8 +355,9 @@ const mapFiltersFromRequestParams = async (parameters: URLSearchParams, type: Re
       return await mapAdministrationFromRequestParams(parameters)
     case RessourceType.IMAGING:
       return await mapImagingFromRequestParams(parameters)
+    default:
+      return await mapBiologyFromRequestParams(parameters)
   }
-  return await mapBiologyFromRequestParams(parameters)
 }
 
 export const mapRequestParamsToSearchCriteria = async (
@@ -363,125 +378,159 @@ export const mapRequestParamsToSearchCriteria = async (
 
 const mapGenericToRequestParams = (filters: GenericFilter, type: RessourceType) => {
   const { nda, startDate, endDate, executiveUnits } = filters
-  let requestParams = ''
-  if (nda) requestParams += `${getGenericKeyFromRessourceType(type, 'NDA')}=${nda}&`
-  if (startDate) requestParams += `${getGenericKeyFromRessourceType(type, 'DATE')}=ge${startDate}&`
-  if (endDate) requestParams += `${getGenericKeyFromRessourceType(type, 'DATE')}=le${endDate}&`
+  const requestParams: string[] = []
+  if (nda) requestParams.push(`${getGenericKeyFromRessourceType(type, 'NDA')}=${encodeURIComponent(nda)}`)
+  if (startDate) requestParams.push(`${getGenericKeyFromRessourceType(type, 'DATE')}=ge${startDate}`)
+  if (endDate) requestParams.push(`${getGenericKeyFromRessourceType(type, 'DATE')}=le${endDate}`)
   if (executiveUnits && executiveUnits.length > 0)
-    requestParams += `${getGenericKeyFromRessourceType(type, 'EXECUTIVE_UNITS')}=${executiveUnits.map(
-      (scopeTreeRow: ScopeTreeRow) => scopeTreeRow.id
-    )}`
+    requestParams.push(
+      `${getGenericKeyFromRessourceType(type, 'EXECUTIVE_UNITS')}=${executiveUnits.map(
+        (scopeTreeRow: ScopeTreeRow) => scopeTreeRow.id
+      )}`
+    )
   return requestParams
 }
 
 const mapPatientToRequestParams = (filters: PatientsFilters, deidentified: boolean) => {
   const { genders, vitalStatuses, birthdatesRanges } = filters
-  let requestParams = ''
+  const requestParams: string[] = []
   if (vitalStatuses && vitalStatuses.length > 0)
-    requestParams += `${PatientsParamsKeys.VITAL_STATUS}=${vitalStatuses.map(
-      (status) => status === VitalStatus.DECEASED
-    )}&`
+    requestParams.push(
+      `${PatientsParamsKeys.VITAL_STATUS}=${vitalStatuses.map((status) => status === VitalStatus.DECEASED)}`
+    )
   if (genders && genders.length > 0)
-    requestParams += `${PatientsParamsKeys.GENDERS}=${genders.map(mapGenderStatusToGenderCodes)}&`
+    requestParams.push(`${PatientsParamsKeys.GENDERS}=${genders.map(mapGenderStatusToGenderCodes)}`)
   const minBirthdate = convertDurationToTimestamp(convertStringToDuration(birthdatesRanges?.[0]), deidentified)
   const maxBirthdate = convertDurationToTimestamp(convertStringToDuration(birthdatesRanges?.[1]), deidentified)
-  if (minBirthdate && deidentified) requestParams += `${PatientsParamsKeys.DATE_DEINDENTIFIED}=ge${minBirthdate}&`
-  if (minBirthdate && !deidentified) requestParams += `${PatientsParamsKeys.DATE_IDENTIFIED}=ge${minBirthdate}&`
-  if (maxBirthdate && deidentified) requestParams += `${PatientsParamsKeys.DATE_DEINDENTIFIED}=le${maxBirthdate}&`
-  if (maxBirthdate && !deidentified) requestParams += `${PatientsParamsKeys.DATE_IDENTIFIED}=le${maxBirthdate}&`
+  if (minBirthdate && deidentified) requestParams.push(`${PatientsParamsKeys.DATE_DEINDENTIFIED}=ge${minBirthdate}`)
+  if (minBirthdate && !deidentified) requestParams.push(`${PatientsParamsKeys.DATE_IDENTIFIED}=ge${minBirthdate}`)
+  if (maxBirthdate && deidentified) requestParams.push(`${PatientsParamsKeys.DATE_DEINDENTIFIED}=le${maxBirthdate}`)
+  if (maxBirthdate && !deidentified) requestParams.push(`${PatientsParamsKeys.DATE_IDENTIFIED}=le${maxBirthdate}`)
   return requestParams
 }
 
 const mapDocumentsToRequestParams = (filters: DocumentsFilters) => {
   const { ipp, docTypes, nda, endDate, startDate, executiveUnits } = filters
-  let requestParams = ''
-  if (ipp) requestParams += `${DocumentsParamsKeys.IPP}=${ipp}&`
+  const requestParams: string[] = []
+  if (ipp) requestParams.push(`${DocumentsParamsKeys.IPP}=${encodeURIComponent(ipp)}`)
   if (docTypes && docTypes.length > 0)
-    requestParams += `${DocumentsParamsKeys.DOC_TYPES}=${docTypes.map((codeType) => codeType.code)}&`
-  requestParams += mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.DOCUMENTS)
+    requestParams.push(
+      `${DocumentsParamsKeys.DOC_TYPES}=${encodeURIComponent(docTypes.map((codeType) => codeType.code).toString())}`
+    )
+  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.DOCUMENTS))
   return requestParams
 }
 
 const mapConditionToRequestParams = (filters: PMSIFilters) => {
   const { diagnosticTypes, code, nda, endDate, startDate, executiveUnits } = filters
-  let requestParams = ''
+  const requestParams: string[] = []
   if (diagnosticTypes && diagnosticTypes.length > 0) {
     const diagnosticTypesUrl = encodeURIComponent(`${CONDITION_STATUS}|`)
     const urlString = diagnosticTypes.map((elem) => diagnosticTypesUrl + elem.id).join(',')
-    requestParams += `${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${urlString}&`
+    requestParams.push(`${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${encodeURIComponent(urlString)}`)
   }
-  if (code)
-    requestParams += `${ConditionParamsKeys.CODE}=${code.map((e) => `${CONDITION_HIERARCHY}|${e.id}`).join(',')}`
-  requestParams += mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.CONDITION)
+  if (code && code.length > 0)
+    requestParams.push(
+      `${ConditionParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${CONDITION_HIERARCHY}|${e.id}`).join(','))}`
+    )
+  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.CONDITION))
   return requestParams
 }
 
 const mapClaimToRequestParams = (filters: PMSIFilters) => {
   const { code, nda, endDate, startDate, executiveUnits } = filters
-  let requestParams = ''
-  if (code) requestParams += `${ClaimParamsKeys.CODE}=${code.map((e) => `${CLAIM_HIERARCHY}|${e.id}`).join(',')}`
-  requestParams += mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.CLAIM)
+  const requestParams: string[] = []
+  if (code && code.length > 0)
+    requestParams.push(
+      `${ClaimParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${CLAIM_HIERARCHY}|${e.id}`).join(','))}`
+    )
+  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.CLAIM))
   return requestParams
 }
 
 const mapProcedureToRequestParams = (filters: PMSIFilters) => {
   const { source, code, nda, endDate, startDate, executiveUnits } = filters
-  let requestParams = ''
-  if (code)
-    requestParams += `${ProcedureParamsKeys.CODE}=${code.map((e) => `${PROCEDURE_HIERARCHY}|${e.id}`).join(',')}`
-  if (source) requestParams += `${ProcedureParamsKeys.SOURCE}=${source}&`
-  requestParams += mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.PROCEDURE)
+  const requestParams: string[] = []
+  if (code && code.length > 0)
+    requestParams.push(
+      `${ProcedureParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${PROCEDURE_HIERARCHY}|${e.id}`).join(','))}`
+    )
+  if (source) requestParams.push(`${ProcedureParamsKeys.SOURCE}=${source}`)
+  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.PROCEDURE))
   return requestParams
 }
 
 const mapPrescriptionToRequestParams = (filters: MedicationFilters) => {
   const { prescriptionTypes, nda, endDate, startDate, executiveUnits } = filters
-  let requestParams = ''
-  if (prescriptionTypes)
-    requestParams += `${PrescriptionParamsKeys.PRESCRIPTION_TYPES}=${prescriptionTypes.map(
-      (labelObject) => labelObject.id
-    )}&`
-  requestParams += mapGenericToRequestParams(
-    { nda, startDate, endDate, executiveUnits },
-    RessourceType.MEDICATION_REQUEST
+  const requestParams: string[] = []
+  if (prescriptionTypes && prescriptionTypes.length > 0) {
+    const prescriptionTypesUrl = encodeURIComponent(`${MEDICATION_PRESCRIPTION_TYPES}|`)
+    const urlString = prescriptionTypes.map((elem) => prescriptionTypesUrl + elem.id).join(',')
+    requestParams.push(`${PrescriptionParamsKeys.PRESCRIPTION_TYPES}=${encodeURIComponent(urlString)}`)
+  }
+  requestParams.push(
+    ...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.MEDICATION_REQUEST)
   )
   return requestParams
 }
 
 const mapAdministrationToRequestParams = (filters: MedicationFilters) => {
   const { administrationRoutes, nda, endDate, startDate, executiveUnits } = filters
-  let requestParams = ''
-  if (administrationRoutes)
-    requestParams += `${AdministrationParamsKeys.ADMINISTRATION_ROUTES}=${administrationRoutes.map(
-      (labelObject) => labelObject.id
-    )}&`
-  requestParams += mapGenericToRequestParams(
-    { nda, startDate, endDate, executiveUnits },
-    RessourceType.MEDICATION_ADMINISTRATION
+  const requestParams: string[] = []
+  if (administrationRoutes && administrationRoutes.length > 0) {
+    const administrationRoutesUrl = encodeURIComponent(`${MEDICATION_ADMINISTRATIONS}|`)
+    const urlString = administrationRoutes.map((elem) => administrationRoutesUrl + elem.id).join(',')
+    requestParams.push(`${AdministrationParamsKeys.ADMINISTRATION_ROUTES}=${encodeURIComponent(urlString)}`)
+  }
+  requestParams.push(
+    ...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.MEDICATION_ADMINISTRATION)
   )
   return requestParams
 }
 
 const mapBiologyToRequestParams = (filters: BiologyFilters) => {
   const { anabio, loinc, validatedStatus, nda, endDate, startDate, executiveUnits } = filters
-  let requestParams = ''
-  if (anabio || loinc) {
-    requestParams += `${ObservationParamsKeys.ANABIO_LOINC}=`
-    if (anabio) requestParams += anabio.map((e) => `${BIOLOGY_HIERARCHY_ITM_ANABIO}|` + e.id)
-    if (anabio && loinc) requestParams += ','
-    if (loinc) requestParams += loinc.map((e) => `${BIOLOGY_HIERARCHY_ITM_LOINC}|` + e.id)
-    requestParams += '&'
+  const requestParams: string[] = []
+  if ((anabio && anabio.length > 0) || (loinc && loinc.length > 0)) {
+    const key = `${ObservationParamsKeys.ANABIO_LOINC}=`
+    let _anabio = ''
+    let _loinc = ''
+
+    if (anabio && anabio.length > 0) {
+      _anabio = anabio.map((e) => `${BIOLOGY_HIERARCHY_ITM_ANABIO}|` + e.id).join(',')
+    }
+    if (loinc && loinc.length > 0) {
+      _loinc = loinc.map((e) => `${BIOLOGY_HIERARCHY_ITM_LOINC}|` + e.id).join(',')
+    }
+
+    _anabio && _loinc
+      ? requestParams.push(
+          `${key}${encodeURIComponent(_anabio)}${encodeURIComponent(',')}${encodeURIComponent(_loinc)}`
+        )
+      : _anabio && !_loinc
+      ? requestParams.push(`${key}${encodeURIComponent(_anabio)}`)
+      : _loinc && !_anabio
+      ? requestParams.push(`${key}${encodeURIComponent(_loinc)}`)
+      : ''
   }
-  if (validatedStatus) requestParams += `${ObservationParamsKeys.VALIDATED_STATUS}=VAL&`
-  requestParams += mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.OBSERVATION)
+  if (validatedStatus) requestParams.push(`${ObservationParamsKeys.VALIDATED_STATUS}=VAL`)
+  requestParams.push(
+    ...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.OBSERVATION)
+  )
   return requestParams
 }
 
 const mapImagingToRequestParams = (filters: ImagingFilters) => {
-  const { modality, nda, endDate, startDate, executiveUnits } = filters
-  let requestParams = ''
-  if (modality) requestParams += `${ImagingParamsKeys.MODALITY}=*|${modality.map((labelObject) => labelObject.id)}&`
-  requestParams += mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.IMAGING)
+  const { modality, nda, endDate, startDate, executiveUnits, ipp } = filters
+  const requestParams: string[] = []
+  if (ipp) requestParams.push(`${ImagingParamsKeys.IPP}=${encodeURIComponent(ipp)}`)
+  if (modality && modality.length > 0)
+    requestParams.push(
+      `${ImagingParamsKeys.MODALITY}=${encodeURIComponent(
+        modality.map((labelObject) => `${IMAGING_MODALITIES}|${labelObject.id}`).join(',')
+      )}`
+    )
+  requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, RessourceType.IMAGING))
   return requestParams
 }
 
@@ -492,42 +541,43 @@ export const mapSearchCriteriasToRequestParams = (
 ) => {
   const { searchBy, searchInput, filters } = searchCriterias
   const searchByParam = searchBy || SearchByTypes.TEXT
-  const searchParam = searchInput ? mapSearchByAndSearchInputToRequestParams(searchByParam, searchInput) : null
-  let filtersParam = searchParam ? `${searchParam}&` : ''
+  const filtersParam: string[] = searchInput
+    ? mapSearchByAndSearchInputToRequestParams(searchByParam, searchInput, type)
+    : []
 
   switch (type) {
     case RessourceType.PATIENT:
-      filtersParam += mapPatientToRequestParams(filters as PatientsFilters, deidentified)
+      filtersParam.push(...mapPatientToRequestParams(filters as PatientsFilters, deidentified))
       break
     case RessourceType.DOCUMENTS:
-      filtersParam += mapDocumentsToRequestParams(filters as DocumentsFilters)
+      filtersParam.push(...mapDocumentsToRequestParams(filters as DocumentsFilters))
       break
     case RessourceType.CONDITION:
-      filtersParam += mapConditionToRequestParams(filters as PMSIFilters)
+      filtersParam.push(...mapConditionToRequestParams(filters as PMSIFilters))
       break
 
     case RessourceType.PROCEDURE:
-      filtersParam += mapProcedureToRequestParams(filters as PMSIFilters)
+      filtersParam.push(...mapProcedureToRequestParams(filters as PMSIFilters))
       break
     case RessourceType.CLAIM:
-      filtersParam += mapClaimToRequestParams(filters as PMSIFilters)
+      filtersParam.push(...mapClaimToRequestParams(filters as PMSIFilters))
       break
     case RessourceType.MEDICATION_REQUEST:
-      filtersParam += mapPrescriptionToRequestParams(filters as MedicationFilters)
+      filtersParam.push(...mapPrescriptionToRequestParams(filters as MedicationFilters))
       break
     case RessourceType.MEDICATION_ADMINISTRATION:
-      filtersParam += mapAdministrationToRequestParams(filters as MedicationFilters)
+      filtersParam.push(...mapAdministrationToRequestParams(filters as MedicationFilters))
       break
     case RessourceType.OBSERVATION:
-      filtersParam += mapBiologyToRequestParams(filters as BiologyFilters)
+      filtersParam.push(...mapBiologyToRequestParams(filters as BiologyFilters))
       break
 
     case RessourceType.IMAGING:
-      filtersParam += mapImagingToRequestParams(filters as ImagingFilters)
+      filtersParam.push(...mapImagingToRequestParams(filters as ImagingFilters))
       break
   }
-
-  return filtersParam
+  const _filtersParam = filtersParam.join('&')
+  return _filtersParam
 }
 
 const getDefaultOrderBy = (type: RessourceType) => {
@@ -555,21 +605,40 @@ const getDefaultOrderBy = (type: RessourceType) => {
         orderBy: Order.DATE,
         orderDirection: Direction.ASC
       }
-  }
-  return {
-    orderBy: Order.STUDY_DATE,
-    orderDirection: Direction.DESC
+    case RessourceType.IMAGING:
+      return {
+        orderBy: Order.STUDY_DATE,
+        orderDirection: Direction.DESC
+      }
+    default:
+      return {
+        orderBy: Order.DATE,
+        orderDirection: Direction.DESC
+      }
   }
 }
 
-const mapSearchByAndSearchInputToRequestParams = (searchBy: SearchByTypes, searchInput: SearchInput) => {
+const mapSearchByAndSearchInputToRequestParams = (
+  searchBy: SearchByTypes,
+  searchInput: SearchInput,
+  type: RessourceType
+) => {
   const inputs = searchInput.split(' ').filter((elem: string) => elem)
-  let params = ''
+  const params: string[] = []
 
-  if (searchBy === SearchByTypes.IDENTIFIER) {
-    params = `${searchBy}=${inputs.join()}&`
+  if (type === RessourceType.PATIENT) {
+    switch (searchBy) {
+      case SearchByTypes.TEXT:
+      case SearchByTypes.FAMILY:
+      case SearchByTypes.GIVEN:
+        inputs.forEach((input) => params.push(`${searchBy}=${encodeURIComponent(input)}`))
+        break
+      case SearchByTypes.IDENTIFIER:
+        params.push(`${searchBy}=${encodeURIComponent(inputs.join())}`)
+        break
+    }
   } else {
-    inputs.forEach((input) => (params += `${searchBy}=${input}&`))
+    params.push(`${searchBy}=${encodeURIComponent(searchInput)}`)
   }
   return params
 }

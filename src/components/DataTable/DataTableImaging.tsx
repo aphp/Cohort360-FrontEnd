@@ -52,7 +52,7 @@ const DataTableImaging: React.FC<DataTableImagingProps> = ({
     { label: '', align: 'left' },
     ...(showIpp ? [{ label: `IPP${deidentified ? ' chiffré' : ''}` }] : []),
     { label: `NDA${deidentified ? ' chiffré' : ''}`, align: 'left' },
-    { label: 'Date', code: Order.STUDY_DATE },
+    { label: 'Date', code: `${Order.STUDY_DATE},id` },
     { label: 'Modalité' },
     { label: 'Description' },
     { label: 'Code Procédure' },

@@ -282,7 +282,7 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           >
             <Alert severity="error" onClose={() => dispatch(setSelectedRequestShareState(null))}>
-              Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
+              Votre requête ne possède aucun critère. Elle ne peut donc pas être partagée.
             </Alert>
           </Snackbar>
         )}

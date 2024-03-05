@@ -29,13 +29,14 @@ import useStyles from './styles'
 import { CriteriaDrawerComponentProps, CriteriaName } from 'types'
 import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
-import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import { SearchByTypes } from 'types/searchCriterias'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 import { SearchInputError } from 'types/error'
 import { Comparators, DocType, DocumentDataType, RessourceType } from 'types/requestCriterias'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
+import { BlockWrapper } from 'components/ui/Layout'
+import OccurenceInput from 'components/ui/Inputs/Occurences'
 
 const defaultComposition: Omit<DocumentDataType, 'id'> = {
   type: RessourceType.DOCUMENTS,
@@ -62,12 +63,16 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const [searchCheckingLoading, setSearchCheckingLoading] = useState(false)
   const [searchInputError, setSearchInputError] = useState<SearchInputError | undefined>(undefined)
+  const [occurrence, setOccurrence] = useState(defaultValues.occurrence || 1)
+  const [occurrenceComparator, setOccurrenceComparator] = useState(
+    defaultValues.occurrenceComparator || Comparators.GREATER_OR_EQUAL
+  )
   const debouncedSearchItem = useDebounce(500, defaultValues.search)
 
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = () => {
-    onChangeSelectedCriteria(defaultValues)
+    onChangeSelectedCriteria({ ...defaultValues, occurrence: occurrence, occurrenceComparator: occurrenceComparator })
   }
 
   const _onChangeValue = (key: string, value: any) => {
@@ -151,11 +156,19 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             />
           </Grid>
 
-          <OccurrencesNumberInputs
-            form={CriteriaName.Document}
-            selectedCriteria={defaultValues}
-            onChangeValue={_onChangeValue}
-          />
+          <BlockWrapper className={classes.inputItem}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              Nombre d'occurrences
+            </FormLabel>
+            <OccurenceInput
+              value={occurrence}
+              comparator={occurrenceComparator}
+              onchange={(newOccurence, newComparator) => {
+                setOccurrence(newOccurence)
+                setOccurrenceComparator(newComparator)
+              }}
+            />
+          </BlockWrapper>
 
           <FormControl variant="outlined" className={classes.inputItem}>
             <InputLabel>Rechercher dans :</InputLabel>

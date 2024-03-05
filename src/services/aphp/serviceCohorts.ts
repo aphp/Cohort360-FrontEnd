@@ -429,7 +429,7 @@ const servicesCohorts: IServiceCohorts = {
         maxDate: endDate ?? '',
         _list: groupId ? [groupId] : [],
         signal,
-        modalities: modality.map(({ id }) => id).join() ?? '',
+        modalities: modality.map(({ id }) => id),
         executiveUnits: executiveUnits.map((unit) => unit.id)
       }),
       !!searchInput || !!ipp || !!nda || !!startDate || !!endDate || executiveUnits.length > 0 || modality.length > 0

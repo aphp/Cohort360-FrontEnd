@@ -207,6 +207,7 @@ const useSearchCriterias = <F>(
     searchCriteriasReducer<F>(() => initState),
     initState
   )
+
   return [
     state,
     {

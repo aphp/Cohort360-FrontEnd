@@ -25,7 +25,18 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
 
   const age = getAge(patient as CohortPatient)
   const firstName = deidentifiedBoolean ? 'Prénom' : patient.name?.[0].given?.[0]
-  const lastName = deidentifiedBoolean ? 'Nom' : patient.name?.map((e) => e.family).join(' ')
+  const lastName = deidentifiedBoolean
+    ? 'Nom'
+    : patient.name
+        ?.map((e) => {
+          if (e.use === 'official') {
+            return e.family ?? 'Non renseigné'
+          }
+          if (e.use === 'maiden') {
+            return `(${patient.gender === 'female' ? 'née' : 'né'} : ${e.family})` ?? 'Non renseigné'
+          }
+        })
+        .join(' ') ?? 'Non renseigné'
 
   const ipp = deidentifiedBoolean
     ? `IPP chiffré: ${patient.id ?? '-'}`

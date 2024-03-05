@@ -173,8 +173,8 @@ export interface IServicePatients {
     sortDirection: Direction,
     searchInput: string,
     nda: string,
-    selectedPrescriptionTypeIds: string,
-    selectedAdministrationRouteIds: string,
+    selectedPrescriptionTypeIds: string[],
+    selectedAdministrationRouteIds: string[],
     startDate: string | null,
     endDate: string | null,
     executiveUnits?: string[],
@@ -258,7 +258,7 @@ export interface IServicePatients {
     endDate?: string | null,
     groupId?: string,
     signal?: AbortSignal,
-    modalities?: string,
+    modalities?: string[],
     executiveUnits?: string[]
   ) => Promise<{
     imagingList: ImagingStudy[]
@@ -633,7 +633,7 @@ const servicesPatients: IServicePatients = {
     endDate?: string | null,
     groupId?: string,
     signal?: AbortSignal,
-    modalities?: string,
+    modalities?: string[],
     executiveUnits?: string[]
   ) => {
     const imagingResp = await fetchImaging({
