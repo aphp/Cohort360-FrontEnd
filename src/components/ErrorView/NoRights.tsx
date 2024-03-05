@@ -51,7 +51,7 @@ const NoRights = () => {
       </Grid>
 
       <Grid item>
-        <Button variant="outlined" style={{ borderColor: 'currentColor' }} onClick={() => navigate(0)}>
+        <Button variant="outlined" style={{ borderColor: 'currentColor' }} onClick={() => navigate(`/`)}>
           Retour à la connexion
         </Button>
       </Grid>
