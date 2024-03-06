@@ -12,7 +12,7 @@ import useStyles from './styles'
 
 type PatientTitleProps = {
   firstName: string | undefined
-  lastName: string | undefined
+  lastName: string | (string | undefined)[] | undefined
 }
 const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
   const { classes } = useStyles()
