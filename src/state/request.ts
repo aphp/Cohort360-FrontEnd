@@ -30,20 +30,9 @@ type FetchRequestListReturn = {
 
 const fetchRequests = createAsyncThunk<FetchRequestListReturn, void, { state: RootState }>(
   'request/fetchRequests',
-  async (DO_NOT_USE, { getState }) => {
+  async () => {
     try {
-      const state = getState().request
-
-      const oldRequestList = state.requestsList || []
       const requests = (await services.projects.fetchRequestsList(100, 0)) || []
-
-      if (state.count === requests.count) {
-        return {
-          count: state.count,
-          selectedRequest: null,
-          requestsList: oldRequestList
-        }
-      }
 
       let requestList = requests.results || []
       // requestList.length <= 100, check fetchRequestsList() for more information
