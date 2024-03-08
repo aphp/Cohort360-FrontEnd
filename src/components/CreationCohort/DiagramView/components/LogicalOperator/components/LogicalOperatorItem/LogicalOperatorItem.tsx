@@ -175,16 +175,16 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
   const deleteInvalidConstraints = () => {
     const currentLogicalOperatorCriteriaIds: number[] = criteriaGroup.find(({ id }) => id === itemId)?.criteriaIds ?? []
 
-    let correctConstraints = temporalConstraints.filter(
-      (constraint) =>
-        !(constraint.idList as number[]).some((criteriaId: number) =>
-          currentLogicalOperatorCriteriaIds.includes(criteriaId)
-        )
-    )
+    const correctConstraints = temporalConstraints.filter((constraint) => {
+      const constraintsInAndGroup = !(constraint.idList as number[]).some((criteriaId: number) =>
+        currentLogicalOperatorCriteriaIds.includes(criteriaId)
+      )
 
-    if (itemId === 0) {
-      correctConstraints = correctConstraints.filter((constraint) => !constraint.idList.includes('All' as never))
-    }
+      const noGlobalConstraints = itemId !== 0 || !constraint.idList.includes('All' as never)
+
+      return constraintsInAndGroup && noGlobalConstraints
+    })
+
     dispatch(updateTemporalConstraints(correctConstraints))
   }
 
