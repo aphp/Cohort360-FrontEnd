@@ -190,6 +190,7 @@ const TemporalConstraint: React.FC<{
                 value={TemporalConstraintsKind.SAME_ENCOUNTER}
                 control={<Radio />}
                 label="Tous les critères ont lieu au cours du même séjour"
+                disabled={criteriaGroup[0].type === 'orGroup'}
               />
               <FormControlLabel
                 value={TemporalConstraintsKind.PARTIAL_CONSTRAINT}
@@ -380,19 +381,24 @@ const TemporalConstraint: React.FC<{
               </Grid>
             </div>
           )}
-          <Grid>
-            <Grid item container direction="row" alignItems="center">
-              <Typography variant="h3">Séquence d'évènements entre deux critères</Typography>
-              <Tooltip title="Les contraintes temporelles ne peuvent être ajoutées que sur le groupe ET principal.">
-                <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-              </Tooltip>
+          {criteriaGroup[0].type !== 'orGroup' && (
+            <Grid>
+              <Grid item container direction="row" alignItems="center">
+                <Typography variant="h3">Séquence d'évènements entre deux critères</Typography>
+                <Tooltip title="Les contraintes temporelles ne peuvent être ajoutées que sur le groupe ET principal.">
+                  <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+                </Tooltip>
+              </Grid>
+              <TemporalConstraintConfig
+                newConstraintsList={newConstraintsList}
+                onChangeNewConstraintsList={setNewConstraintsList}
+              />
+              <EventSequenceTable
+                temporalConstraints={newConstraintsList}
+                onChangeConstraints={setNewConstraintsList}
+              />
             </Grid>
-            <TemporalConstraintConfig
-              newConstraintsList={newConstraintsList}
-              onChangeNewConstraintsList={setNewConstraintsList}
-            />
-            <EventSequenceTable temporalConstraints={newConstraintsList} onChangeConstraints={setNewConstraintsList} />
-          </Grid>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary">

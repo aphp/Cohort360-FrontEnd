@@ -175,13 +175,15 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
   const deleteInvalidConstraints = () => {
     const currentLogicalOperatorCriteriaIds: number[] = criteriaGroup.find(({ id }) => id === itemId)?.criteriaIds ?? []
 
-    const correctConstraints = temporalConstraints.filter(
-      (constraint) =>
-        !(constraint.idList as number[]).every((criteriaId: number) =>
-          currentLogicalOperatorCriteriaIds.includes(criteriaId)
-        )
+    let correctConstraints = temporalConstraints.filter((constraint) =>
+      (constraint.idList as number[]).some((criteriaId: number) =>
+        currentLogicalOperatorCriteriaIds.includes(criteriaId)
+      )
     )
 
+    if (itemId === 0) {
+      correctConstraints = correctConstraints.filter((constraint) => !constraint.idList.includes('All' as never))
+    }
     dispatch(updateTemporalConstraints(correctConstraints))
   }
 
@@ -230,13 +232,10 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               className={classes.inputSelect}
               onChange={(event) => {
                 if (event.target.value !== 'andGroup') {
-                  if (isMainOperator) {
-                    setOpenConfirmationDialog(true)
-                  } else {
-                    deleteInvalidConstraints()
-                  }
+                  setOpenConfirmationDialog(true)
+                } else {
+                  _handleChangeLogicalOperatorProps('groupType', event.target.value)
                 }
-                _handleChangeLogicalOperatorProps('groupType', event.target.value)
               }}
               style={{ color: 'currentColor' }}
               variant="standard"
@@ -289,11 +288,11 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         onCancel={() => setOpenConfirmationDialog(false)}
         onClose={() => setOpenConfirmationDialog(false)}
         onConfirm={() => {
-          dispatch(updateTemporalConstraints([]))
+          deleteInvalidConstraints()
           _handleChangeLogicalOperatorProps('groupType', 'orGroup')
         }}
         message={
-          "L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères ET, passer sur un groupe de critères OU vous fera perdre toutes vos précédentes contraintes temporelles."
+          "L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères ET, passer sur un groupe de critères OU vous fera perdre toutes les contraintes temporelles de ce groupe."
         }
       />
     </>
