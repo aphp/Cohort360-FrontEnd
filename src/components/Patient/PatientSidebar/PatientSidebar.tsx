@@ -1,12 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import moment from 'moment/moment'
 
 import { Divider, Drawer, Grid, IconButton, Typography } from '@mui/material'
 import { ChevronRight, Sort } from '@mui/icons-material'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import { substructAgeString } from 'utils/age'
 import { selectFiltersAsArray } from 'utils/filters'
 import { cancelPendingRequest } from 'utils/abortController'
 import services from 'services/aphp'
@@ -85,10 +83,6 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
   const fetchPatients = async () => {
     try {
       const includeFacets = false
-      const birthdates: [string, string] = [
-        moment(substructAgeString(filters.birthdatesRanges[0] || '')).format('MM/DD/YYYY'),
-        moment(substructAgeString(filters.birthdatesRanges[1] || '')).format('MM/DD/YYYY')
-      ]
 
       setLoadingStatus(LoadingStatus.FETCHING)
       const result = await services.cohorts.fetchPatientList(
@@ -98,7 +92,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
             orderBy,
             searchInput,
             searchBy,
-            filters: { genders, vitalStatuses, birthdatesRanges: birthdates }
+            filters: { genders, vitalStatuses, birthdatesRanges }
           }
         },
         deidentifiedBoolean ?? true,
@@ -185,7 +179,11 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
             >
               <GendersFilter name={FilterKeys.GENDERS} value={genders} />
               <VitalStatusesFilter name={FilterKeys.VITAL_STATUSES} value={vitalStatuses} />
-              <BirthdatesRangesFilter name={FilterKeys.BIRTHDATES} value={birthdatesRanges} />
+              <BirthdatesRangesFilter
+                name={FilterKeys.BIRTHDATES}
+                value={birthdatesRanges}
+                deidentified={deidentifiedBoolean}
+              />
             </Modal>
 
             <Button width={'45%'} icon={<Sort height="15px" fill="#FFF" />} onClick={() => setToggleSortModal(true)}>
