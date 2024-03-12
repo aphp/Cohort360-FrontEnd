@@ -29,7 +29,7 @@ import {
 
 import { AxiosResponse } from 'axios'
 import { Group } from 'fhir/r4'
-import { LOADING, removeSpace, sortByQuantityAndName } from 'utils/scopeTree'
+import { LOADING, sortByQuantityAndName } from 'utils/scopeTree'
 import scopeTypes from '../../data/scope_type.json'
 import apiBackend from '../apiBackend'
 import { isCustomError } from 'utils/perimeters'
@@ -323,13 +323,14 @@ const servicesPerimeters: IServicePerimeters = {
 
       const higherTypes: string[] = servicesPerimeters.getHigherTypes(type)
 
-      const perimetersListReponse = await fetchScope({
+      const perimetersListResponse = await fetchScope({
         perimetersIds: perimetersIds,
         cohortIds: cohortIds,
         isExecutiveUnit,
         type: higherTypes
       })
-      if (!perimetersListReponse || !perimetersListReponse.data || !perimetersListReponse.data.results) {
+
+      if (!perimetersListResponse || !perimetersListResponse.data || !perimetersListResponse.data.results) {
         console.error(
           'Error (getPerimeters) while fetching perimeter (from back) ! perimeters = {}, cohortIds = {}',
           perimetersIds ?? '',
@@ -337,7 +338,7 @@ const servicesPerimeters: IServicePerimeters = {
         )
         return []
       }
-      const perimetersList = perimetersListReponse.data.results.map((perimeterItem) => {
+      const perimetersList = perimetersListResponse.data.results.map((perimeterItem) => {
         let read_access = undefined
         if (!defaultPerimetersIds && !isExecutiveUnit) {
           const foundRight = rightsData?.results?.find(
@@ -347,7 +348,7 @@ const servicesPerimeters: IServicePerimeters = {
         }
         const export_access = 'DATA_PSEUDOANONYMISED' // Impossible de faire un export de donnée sur un périmètre
 
-        perimeterItem.perimeter = removeSpace(perimeterItem.perimeter)
+        // perimeterItem.perimeter = removeSpace(perimeterItem.perimeter)
 
         return {
           ...perimeterItem,
