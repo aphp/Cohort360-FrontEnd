@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography'
 
 import { Document, Page, pdfjs } from 'react-pdf'
 import services from 'services/aphp'
-import { FHIR_API_URL } from '../../constants'
+import { FHIR_API_URL, ACCESS_TOKEN } from '../../constants'
 
 import { Tab, Tabs } from '@mui/material'
 import Watermark from 'assets/images/watermark_pseudo.svg'
@@ -129,7 +129,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
                       url: `${FHIR_API_URL}/Binary/${documentId}`,
                       httpHeaders: {
                         Accept: 'application/pdf',
-                        Authorization: `Bearer ${localStorage.getItem('access')}`,
+                        Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`,
                         authorizationMethod: getAuthorizationMethod()
                       }
                     }}
