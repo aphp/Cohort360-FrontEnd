@@ -1,18 +1,32 @@
 import React, { useState } from 'react'
 
-import { Alert, Button, Divider, FormLabel, Grid, IconButton, Link, Switch, TextField, Typography } from '@mui/material'
+import {
+  Alert,
+  Button,
+  Divider,
+  FormLabel,
+  Grid,
+  IconButton,
+  Link,
+  Switch,
+  TextField,
+  Tooltip,
+  Typography
+} from '@mui/material'
 
+import InfoIcon from '@mui/icons-material/Info'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchClaim } from 'state/pmsi'
 import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
-import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
-import { GhmDataType } from 'types/requestCriterias'
+import { Comparators, GhmDataType } from 'types/requestCriterias'
+import { BlockWrapper } from 'components/ui/Layout'
+import OccurenceInput from 'components/ui/Inputs/Occurences'
 
 type GHMFormProps = {
   isOpen: boolean
@@ -32,11 +46,15 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const currentState = { ...selectedCriteria, ...initialState }
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
+  const [occurrence, setOccurrence] = useState(currentState.occurrence || 1)
+  const [occurrenceComparator, setOccurrenceComparator] = useState(
+    currentState.occurrenceComparator || Comparators.GREATER_OR_EQUAL
+  )
 
   const getGhmOptions = async (searchValue: string, signal: AbortSignal) =>
     await services.cohortCreation.fetchGhmData(searchValue, false, signal)
   const _onSubmit = () => {
-    onChangeSelectedCriteria(currentState)
+    onChangeSelectedCriteria({ ...currentState, occurrence: occurrence, occurrenceComparator: occurrenceComparator })
     dispatch(fetchClaim())
   }
   const defaultValuesCode = currentState.code
@@ -121,11 +139,33 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             />
           </Grid>
 
-          <OccurrencesNumberInputs
-            form={CriteriaName.Ghm}
-            selectedCriteria={selectedCriteria}
-            onChangeValue={onChangeValue}
-          />
+          <BlockWrapper className={classes.inputItem}>
+            <FormLabel component="legend" className={classes.durationLegend}>
+              <BlockWrapper container justifyItems="center">
+                Nombre d'occurrences
+                <Tooltip
+                  title={
+                    <span>
+                      Si vous choisissez un chapitre, le nombre d'occurrences ne s'applique pas sur un unique élément de
+                      ce chapitre, mais sur l'ensemble des éléments de ce chapitre. <br /> Exemple: Nombre d'occurrences
+                      &ge; 3 sur un chapitre signifie que l'on inclus les patients qui ont eu au moins 3 éléments de ce
+                      chapitre, distincts ou non`
+                    </span>
+                  }
+                >
+                  <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+                </Tooltip>
+              </BlockWrapper>
+            </FormLabel>
+            <OccurenceInput
+              value={occurrence}
+              comparator={occurrenceComparator}
+              onchange={(newOccurence, newComparator) => {
+                setOccurrence(newOccurence)
+                setOccurrenceComparator(newComparator)
+              }}
+            />
+          </BlockWrapper>
 
           <AsyncAutocomplete
             label="Codes GHM"

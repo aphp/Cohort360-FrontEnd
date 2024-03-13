@@ -47,6 +47,12 @@ const useStyles = makeStyles()(() => ({
     '& > button': {
       margin: '12px 8px'
     }
+  },
+  durationLegend: {
+    color: '#153D8A',
+    fontWeight: 600,
+    fontSize: 12,
+    paddingBottom: 10
   }
 }))
 

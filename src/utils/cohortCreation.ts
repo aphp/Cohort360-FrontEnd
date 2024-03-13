@@ -429,13 +429,12 @@ export function buildRequest(
           isInclusive: item.isInclusive ?? true,
           resourceType: item.type ?? RessourceType.PATIENT,
           filterFhir: constructFilterFhir(item, deidentified),
-          occurrence:
-            !(item.type === RessourceType.PATIENT || item.type === RessourceType.IPP_LIST) && item.occurrence
-              ? {
-                  n: item.occurrence,
-                  operator: item?.occurrenceComparator || undefined
-                }
-              : undefined,
+          occurrence: !(item.type === RessourceType.PATIENT || item.type === RessourceType.IPP_LIST)
+            ? {
+                n: item.occurrence,
+                operator: item?.occurrenceComparator || undefined
+              }
+            : undefined,
           dateRangeList:
             !(item.type === RessourceType.PATIENT || item.type === RessourceType.IPP_LIST) &&
             (item.startOccurrence || item.endOccurrence)
