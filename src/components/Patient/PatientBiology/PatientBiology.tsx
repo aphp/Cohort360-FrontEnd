@@ -325,6 +325,13 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
                   />
                 </Grid>
                 <Grid item xs={12}>
+                  <NdaFilter
+                    name="nda"
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.filters.nda || ''}
+                  />
+                </Grid>
+                <Grid item xs={12}>
                   <AnabioFilter
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.ANABIO}

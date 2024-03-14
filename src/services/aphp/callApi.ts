@@ -39,7 +39,13 @@ import {
 import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 import { idSort, labelSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
-import { CODE_HIERARCHY_EXTENSION_NAME } from '../../constants'
+import {
+  CODE_HIERARCHY_EXTENSION_NAME,
+  CONDITION_STATUS,
+  IMAGING_MODALITIES,
+  MEDICATION_ADMINISTRATIONS,
+  MEDICATION_PRESCRIPTION_TYPES
+} from '../../constants'
 import { Direction, Order, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
 import { RessourceType } from 'types/requestCriterias'
 
@@ -587,9 +593,9 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
   if (type && type.length > 0) {
-    const diagnosticTypesUrl = encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-condition-status|')
+    const diagnosticTypesUrl = `${CONDITION_STATUS}|`
     const urlString = type.map((id) => diagnosticTypesUrl + id).join(',')
-    options = [...options, `orbis-status=${urlString}`]
+    options = [...options, `orbis-status=${encodeURIComponent(urlString)}`]
   }
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Condition>>(`/Condition?${options.reduce(paramsReducer)}`, {
@@ -678,7 +684,7 @@ type fetchMedicationRequestProps = {
   _text?: string
   encounter?: string
   subject?: string
-  type?: string
+  type?: string[]
   minDate: string | null
   maxDate: string | null
   _list?: string[]
@@ -717,7 +723,11 @@ export const fetchMedicationRequest = async (
   if (subject) options = [...options, `subject=${subject}`]
   if (encounter) options = [...options, `encounter.identifier=${encounter}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
-  if (type) options = [...options, `category=*${encodeURIComponent('|')}${type}`]
+  if (type && type.length > 0) {
+    const routeUrl = `${MEDICATION_PRESCRIPTION_TYPES}|`
+    const urlString = type.map((id) => routeUrl + id).join(',')
+    options = [...options, `category=${encodeURIComponent(urlString)}`]
+  }
   if (minDate) options = [...options, `validity-period-start=ge${minDate}`]
   if (maxDate) options = [...options, `validity-period-start=le${maxDate}`]
   if (executiveUnits && executiveUnits.length > 0)
@@ -744,7 +754,7 @@ type fetchMedicationAdministrationProps = {
   _text?: string
   encounter?: string
   subject?: string
-  route?: string
+  route?: string[]
   minDate: string | null
   maxDate: string | null
   _list?: string[]
@@ -783,13 +793,11 @@ export const fetchMedicationAdministration = async (
   if (subject) options = [...options, `subject=${subject}`]
   if (encounter) options = [...options, `context.identifier=${encounter}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
-  if (route)
-    options = [
-      ...options,
-      `dosage-route=${
-        encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-medicament-voie-administration|') + route
-      }`
-    ] // eslint-disable-line
+  if (route && route.length > 0) {
+    const routeUrl = `${MEDICATION_ADMINISTRATIONS}|`
+    const urlString = route.map((id) => routeUrl + id).join(',')
+    options = [...options, `dosage-route=${encodeURIComponent(urlString)}`]
+  }
   if (minDate) options = [...options, `effective-time=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `effective-time=le${maxDate}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0)
@@ -820,7 +828,7 @@ type fetchImagingProps = {
   maxDate?: string
   _list?: string[]
   signal?: AbortSignal
-  modalities?: string
+  modalities?: string[]
   executiveUnits?: string[]
 }
 export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise_Response<ImagingStudy> => {
@@ -854,7 +862,11 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   if (ipp) options = [...options, `patient.identifier=${ipp}`]
   if (minDate) options = [...options, `started=ge${minDate}`]
   if (maxDate) options = [...options, `started=le${maxDate}`]
-  if (modalities) options = [...options, `modality=*${encodeURIComponent('|')}${modalities}`]
+  if (modalities && modalities.length > 0) {
+    const modalitiesUrl = `${IMAGING_MODALITIES}|`
+    const urlString = modalities.map((id) => modalitiesUrl + id).join(',')
+    options = [...options, `modality=${encodeURIComponent(urlString)}`]
+  }
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
@@ -895,9 +907,11 @@ const getCodeList = async (
     if (search !== '*' && search !== undefined) {
       // if noStar is true then we search for the code, else we search for the display
       searchParam = noStar
-        ? `&only-roots=false&code=${search.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
+        ? `&only-roots=false&code=${encodeURIComponent(
+            search.trim().replace(/[\[\]\/\{\}\(\)\*\?\.\\\^\$\|]/g, '\\$&') //eslint-disable-line
+          )}`
         : `&only-roots=false&_text=${encodeURIComponent(
-            search.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') //eslint-disable-line
+            search.trim().replace(/[\[\]\/\{\}\(\)\*\?\.\\\^\$\|]/g, '\\$&') //eslint-disable-line
           )}*`
     }
     // TODO test if it returns all the codes without specifying the count

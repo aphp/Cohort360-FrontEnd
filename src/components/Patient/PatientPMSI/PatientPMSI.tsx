@@ -64,6 +64,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
+  const [triggerClean, setTriggerClean] = useState<boolean>(false)
   const dispatch = useAppDispatch()
 
   const [selectedTab, setSelectedTab] = useState<PmsiTab>({
@@ -100,6 +101,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias, addSearchCriterias }
   ] = useSearchCriterias(initPmsiSearchCriterias)
+
   const filtersAsArray = useMemo(
     () => selectFiltersAsArray({ code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits }),
     [code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits]
@@ -182,6 +184,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   useEffect(() => {
     setPage(1)
     removeSearchCriterias()
+    setTriggerClean(!triggerClean)
     setLoadingStatus(LoadingStatus.IDDLE)
   }, [selectedTab])
 
@@ -304,6 +307,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
         color="secondary"
         onClose={() => setToggleFilterByModal(false)}
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
+        onClean={triggerClean}
       >
         {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
         <CodeFilter name={FilterKeys.CODE} value={code} onFetch={fetchCodes()} />

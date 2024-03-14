@@ -60,6 +60,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
+  const [triggerClean, setTriggerClean] = useState<boolean>(false)
 
   const dispatch = useAppDispatch()
   const patient = useAppSelector((state) => state.patient)
@@ -189,6 +190,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   useEffect(() => {
     setPage(1)
     removeSearchCriterias()
+    setTriggerClean(!triggerClean)
     setLoadingStatus(LoadingStatus.IDDLE)
   }, [selectedTab])
 
@@ -296,6 +298,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
         color="secondary"
         onClose={() => setToggleFilterByModal(false)}
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
+        onClean={triggerClean}
       >
         {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
         {selectedTab.id === RessourceType.MEDICATION_REQUEST && prescriptionTypes && (

@@ -375,28 +375,28 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
                   maxLimit={50}
                 />
               </Grid>
-              {!deidentified && (
-                <Grid item container direction="column" paddingBottom="16px">
-                  <Grid item>
-                    <TextInput
-                      name="searchInput"
-                      label="Recherche textuelle :"
-                      disabled={isReadonlyFilterInfoModal}
-                      value={selectedSavedFilter?.filterParams.searchInput}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <Select
-                      label="Rechercher dans"
-                      width="60%"
-                      disabled={isReadonlyFilterInfoModal}
-                      value={selectedSavedFilter?.filterParams.searchBy}
-                      items={searchByListDocuments}
-                      name="searchBy"
-                    />
-                  </Grid>
+
+              <Grid item container direction="column" paddingBottom="16px">
+                <Grid item>
+                  <TextInput
+                    name="searchInput"
+                    label="Recherche textuelle :"
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.searchInput}
+                  />
                 </Grid>
-              )}
+                <Grid item>
+                  <Select
+                    label="Rechercher dans"
+                    width="60%"
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.searchBy}
+                    items={searchByListDocuments}
+                    name="searchBy"
+                  />
+                </Grid>
+              </Grid>
+
               <Grid item>
                 {!deidentified && (
                   <NdaFilter

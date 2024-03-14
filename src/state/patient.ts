@@ -309,8 +309,8 @@ const fetchMedication = createAsyncThunk<
       const sortBy = searchCriterias.orderBy.orderBy
       const sortDirection = searchCriterias.orderBy.orderDirection
       const searchInput = searchCriterias.searchInput
-      const prescriptionTypes = searchCriterias.filters.prescriptionTypes?.map(({ id }) => id).join(',') ?? ''
-      const administrationRoutes = searchCriterias.filters.administrationRoutes?.map(({ id }) => id).join(',') ?? ''
+      const prescriptionTypes = searchCriterias.filters.prescriptionTypes?.map(({ id }) => id) ?? []
+      const administrationRoutes = searchCriterias.filters.administrationRoutes?.map(({ id }) => id) ?? []
       const nda = searchCriterias.filters.nda
       const startDate = searchCriterias.filters?.startDate
       const endDate = searchCriterias.filters.endDate
@@ -400,7 +400,7 @@ const fetchImaging = createAsyncThunk<FetchImagingReturn, FetchImagingParams, { 
       const startDate = searchCriterias.filters.startDate
       const endDate = searchCriterias.filters.endDate
       const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
-      const modalities = searchCriterias.filters.modality?.map(({ id }) => id).join(',') ?? ''
+      const modalities = searchCriterias.filters.modality?.map(({ id }) => id)
 
       const imagingResponse = await services.patients.fetchImaging(
         orderBy,
