@@ -78,28 +78,22 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       try {
         const getChildrenResp = await services.cohortCreation.fetchBiologyHierarchy(currentState.code?.[0].id)
 
-        if (getChildrenResp.length > 0) {
-          if (currentState.isLeaf !== false) {
-            onChangeValue('isLeaf', false)
-          }
-        } else {
-          if (currentState.isLeaf !== true) {
-            onChangeValue('isLeaf', true)
-          }
-        }
+        getChildrenResp?.length > 0 ? onChangeValue('isLeaf', false) : onChangeValue('isLeaf', true)
       } catch (error) {
         console.error('Erreur lors du check des enfants du code de biologie sélectionné', error)
       }
     }
 
-    if (currentState?.code?.length === 1 && currentState?.code[0].id !== '*') {
-      checkChildren()
-    } else {
-      if (currentState.isLeaf !== false) {
-        onChangeValue('isLeaf', false)
-      }
+    currentState?.code?.length === 1 && currentState?.code[0].id !== '*'
+      ? checkChildren()
+      : onChangeValue('isLeaf', false)
+  }, [currentState?.code])
+
+  useEffect(() => {
+    if (!currentState.isLeaf) {
+      setAllowSearchByValue(false)
     }
-  }, [currentState.isLeaf, currentState?.code])
+  }, [currentState.isLeaf])
 
   useEffect(() => {
     if (!allowSearchByValue) {
