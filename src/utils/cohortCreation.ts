@@ -134,6 +134,7 @@ export type RequeteurCriteriaType = {
   // CRITERIA
   _type: string
   _id: number
+  name: string
   isInclusive: boolean
   resourceType: RessourceType
   filterFhir: string
@@ -426,6 +427,7 @@ export function buildRequest(
         child = {
           _type: 'basicResource',
           _id: item.id ?? 0,
+          name: item.title,
           isInclusive: item.isInclusive ?? true,
           resourceType: item.type ?? RessourceType.PATIENT,
           filterFhir: constructFilterFhir(item, deidentified),
@@ -597,7 +599,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
       case RessourceType.PATIENT: {
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-          currentCriterion.title = 'Critère démographique'
+          currentCriterion.title = element.name ?? 'Critère démographique'
           currentCriterion.genders = []
           currentCriterion.vitalStatus = []
           currentCriterion.age = [null, null]
@@ -654,7 +656,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
       case RessourceType.ENCOUNTER: {
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-          currentCriterion.title = 'Critère de prise en charge'
+          currentCriterion.title = element.name ?? 'Critère de prise en charge'
           currentCriterion.duration = [null, null]
           currentCriterion.age = [null, null]
           currentCriterion.admissionMode = []
@@ -758,7 +760,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         break
       }
       case RessourceType.DOCUMENTS: {
-        currentCriterion.title = 'Critère de document'
+        currentCriterion.title = element.name ?? 'Critère de document'
         currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
         currentCriterion.docType = currentCriterion.docType ? currentCriterion.docType : []
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
@@ -809,7 +811,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         break
       }
       case RessourceType.CONDITION: {
-        currentCriterion.title = 'Critère de diagnostic'
+        currentCriterion.title = element.name ?? 'Critère de diagnostic'
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
         currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : []
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
@@ -849,7 +851,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         break
       }
       case RessourceType.PROCEDURE: {
-        currentCriterion.title = "Critères d'actes CCAM"
+        currentCriterion.title = element.name ?? "Critères d'actes CCAM"
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
         currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : []
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
@@ -890,7 +892,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         break
       }
       case RessourceType.CLAIM: {
-        currentCriterion.title = 'Critère de GHM'
+        currentCriterion.title = element.name ?? 'Critère de GHM'
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
@@ -926,7 +928,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
       }
       case RessourceType.MEDICATION_REQUEST:
       case RessourceType.MEDICATION_ADMINISTRATION: {
-        currentCriterion.title = 'Critère de médicament'
+        currentCriterion.title = element.name ?? 'Critère de médicament'
         currentCriterion.mode = currentCriterion.mode ? currentCriterion.mode : []
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
         currentCriterion.prescriptionType = currentCriterion.prescriptionType ? currentCriterion.prescriptionType : []
@@ -975,7 +977,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         break
       }
       case RessourceType.OBSERVATION: {
-        currentCriterion.title = 'Critère de biologie'
+        currentCriterion.title = element.name ?? 'Critère de biologie'
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
         currentCriterion.isLeaf = currentCriterion.isLeaf ? currentCriterion.isLeaf : false
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
@@ -1034,7 +1036,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
         break
       }
       case RessourceType.IPP_LIST: {
-        currentCriterion.title = 'Critère de liste IPP'
+        currentCriterion.title = element.name ?? 'Critère de liste IPP'
         currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
 
         if (element.filterFhir) {
@@ -1060,7 +1062,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
       case RessourceType.IMAGING: {
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-          currentCriterion.title = "Critère d'Imagerie"
+          currentCriterion.title = element.name ?? "Critère d'Imagerie"
           currentCriterion.studyStartDate = null
           currentCriterion.studyEndDate = null
           currentCriterion.studyModalities = []

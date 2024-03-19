@@ -19,7 +19,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   title: {
-    whiteSpace: 'nowrap',
     marginLeft: 4
   },
   secondItem: {
