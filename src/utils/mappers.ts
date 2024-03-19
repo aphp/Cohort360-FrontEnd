@@ -52,7 +52,8 @@ export const buildLabelObjectFilter = (
     criterion.find((code) => code.id === '*')
       ? (filter = `${fhirKey}=${hierarchyUrl}|*`)
       : (filter = `${fhirKey}=${criterion
-          .map((item) => (system ? `${item.system}|${item.id}` : item.id))
+
+          .map((item) => (system && item.system ? `${item.system}|${item.id}` : item.id))
           .reduce(searchReducer)}`)
     return filter
   }
