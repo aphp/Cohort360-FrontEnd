@@ -177,7 +177,7 @@ export enum Comparators {
   EQUAL = '=',
   GREATER = '>',
   GREATER_OR_EQUAL = '>=',
-  BETWEEN = '<x>'
+  BETWEEN = '≤x≥'
 }
 
 export type EncounterDataType = CommonCriteriaDataType & {
