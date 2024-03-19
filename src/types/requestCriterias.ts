@@ -205,7 +205,6 @@ export type EncounterDataType = CommonCriteriaDataType & {
 
 export type MedicationDataType = CommonCriteriaDataType & {
   code: LabelObject[] | null
-  prescriptionType: LabelObject[] | null
   administration: LabelObject[] | null
   occurrence: number
   occurrenceComparator: Comparators

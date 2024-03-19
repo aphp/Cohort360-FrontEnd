@@ -28,7 +28,7 @@ import { fetchMedication } from 'state/medication'
 import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
-import { Comparators, MedicationDataType } from 'types/requestCriterias'
+import { Comparators, MedicationDataType, RessourceType } from 'types/requestCriterias'
 import { displaySystem } from 'utils/displayValueSetSystem'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
@@ -73,17 +73,18 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
     return <></>
   }
 
-  const selectedCriteriaPrescriptionType = currentState.prescriptionType
-    ? currentState.prescriptionType.map((prescriptionType) => {
-        const criteriaPrescriptionType = criteriaData.data.prescriptionTypes
-          ? criteriaData.data.prescriptionTypes.find((p: any) => p.id === prescriptionType.id)
-          : null
-        return {
-          id: prescriptionType.id,
-          label: prescriptionType.label ? prescriptionType.label : criteriaPrescriptionType?.label ?? '?'
-        }
-      })
-    : []
+  const selectedCriteriaPrescriptionType =
+    currentState.type === RessourceType.MEDICATION_REQUEST && currentState.prescriptionType
+      ? currentState.prescriptionType.map((prescriptionType) => {
+          const criteriaPrescriptionType = criteriaData.data.prescriptionTypes
+            ? criteriaData.data.prescriptionTypes.find((p: any) => p.id === prescriptionType.id)
+            : null
+          return {
+            id: prescriptionType.id,
+            label: prescriptionType.label ? prescriptionType.label : criteriaPrescriptionType?.label ?? '?'
+          }
+        })
+      : []
 
   const selectedCriteriaAdministration = currentState.administration
     ? currentState.administration.map((administration) => {
@@ -222,7 +223,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               onChangeValue('code', value)
             }}
           />
-          {currentState.type === 'MedicationRequest' && (
+          {currentState.type === RessourceType.MEDICATION_REQUEST && (
             <Autocomplete
               multiple
               id="criteria-prescription-type-autocomplete"

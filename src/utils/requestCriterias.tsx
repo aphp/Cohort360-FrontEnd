@@ -278,7 +278,11 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             RessourceType.MEDICATION
           )
         )
-      if (selectedCriteria.prescriptionType && selectedCriteria.prescriptionType.length > 0)
+      if (
+        selectedCriteria.type === RessourceType.MEDICATION_REQUEST &&
+        selectedCriteria.prescriptionType &&
+        selectedCriteria.prescriptionType.length > 0
+      )
         labels.push(
           getLabelFromCriteriaObject(
             criteriaState,
