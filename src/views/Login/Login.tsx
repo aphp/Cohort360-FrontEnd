@@ -42,7 +42,6 @@ import services from 'services/aphp'
 import useStyles from './styles'
 import { getDaysLeft } from 'utils/formatDate'
 import { isCustomError } from 'utils/perimeters'
-import Welcome from '../Welcome/Welcome'
 import { AccessExpiration, User } from 'types'
 import { isAxiosError } from 'axios'
 
@@ -123,21 +122,16 @@ const Login = () => {
   const [error, setError] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [open, setOpen] = useState(false)
-  const [authCode, setAuthCode] = useState<string>('')
   const urlParams = new URLSearchParams(window.location.search)
   const [display_jwt_form, setDisplay_jwt_form] = useState(false)
-  const code = urlParams.get('code')
+  const nextPage = urlParams.get('next')
+  const oidcCode = urlParams.get('code')
 
   useEffect(() => {
     localforage.setItem('persist:root', '')
-    if (code) setAuthCode(code)
+    if (nextPage) localStorage.setItem('next', nextPage)
+    if (oidcCode) login()
   }, [])
-
-  useEffect(() => {
-    if (authCode) {
-      login()
-    }
-  }, [authCode])
 
   const loadBootstrapData = async (practitionerData: User, lastConnection: string) => {
     const maintenanceResponse = await services.practitioner.maintenance()
@@ -203,9 +197,15 @@ const Login = () => {
 
       dispatch(loginAction(loginState))
 
-      const oldPath = localStorage.getItem('old-path')
-      localStorage.removeItem('old-path')
-      navigate(oldPath ?? '/home')
+      const next = localStorage.getItem('next')
+      localStorage.removeItem('next')
+      if (next) {
+        navigate(next, { replace: true })
+      } else {
+        const oldPath = localStorage.getItem('old-path')
+        localStorage.removeItem('old-path')
+        navigate(oldPath ?? '/home')
+      }
     }
   }
 
@@ -225,8 +225,8 @@ const Login = () => {
 
     let response = null
 
-    if (authCode) {
-      response = await services.practitioner.authenticateWithCode(authCode)
+    if (oidcCode) {
+      response = await services.practitioner.authenticateWithCode(oidcCode)
       localStorage.setItem('oidcAuth', 'true')
     } else {
       if (!username || !password) {
@@ -302,18 +302,16 @@ const Login = () => {
     return () => document.removeEventListener('keydown', keyHandler)
   }, [display_jwt_form])
 
-  if (noRights === true) return <NoRights />
+  if (noRights) return <NoRights oidcCode={oidcCode} />
 
-  return code ? (
+  return oidcCode ? (
     <Grid className={classes.oidcConnexionProgress}>
       <Typography variant="h2" color="primary">
         Connexion...
       </Typography>
       <CircularProgress />
-      <ErrorSnackBarAlert open={error !== false} setError={setError} errorMessage={errorMessage} />
+      <ErrorSnackBarAlert open={error} setError={setError} errorMessage={errorMessage} />
     </Grid>
-  ) : authCode ? (
-    <Welcome />
   ) : (
     <>
       <Grid container component="main" className={classes.root}>

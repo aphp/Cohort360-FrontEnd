@@ -9,7 +9,11 @@ import WarningIcon from '@mui/icons-material/Report'
 
 import useStyles from './styles'
 
-const NoRights = () => {
+type NoRightsProps = {
+  oidcCode: string | null
+}
+
+const NoRights: React.FC<NoRightsProps> = ({ oidcCode }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
 
@@ -51,7 +55,11 @@ const NoRights = () => {
       </Grid>
 
       <Grid item>
-        <Button variant="outlined" style={{ borderColor: 'currentColor' }} onClick={() => navigate(`/`)}>
+        <Button
+          variant="outlined"
+          style={{ borderColor: 'currentColor' }}
+          onClick={() => (oidcCode ? navigate(-1) : navigate(0))}
+        >
           Retour à la connexion
         </Button>
       </Grid>
