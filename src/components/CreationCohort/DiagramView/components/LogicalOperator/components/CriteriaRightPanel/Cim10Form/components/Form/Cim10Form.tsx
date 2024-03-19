@@ -49,7 +49,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const currentState = { ...selectedCriteria, ...initialState }
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const _onSubmit = () => {
-    onChangeSelectedCriteria(currentState)
+    onChangeSelectedCriteria({ ...currentState, occurrence: occurrence, occurrenceComparator: occurrenceComparator })
     dispatch(fetchCondition())
   }
   const [occurrence, setOccurrence] = useState(currentState.occurrence || 1)
