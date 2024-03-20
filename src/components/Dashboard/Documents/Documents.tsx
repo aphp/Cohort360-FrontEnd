@@ -457,7 +457,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
           postSavedFilter(filtersName, { searchBy, searchInput, filters, orderBy }, deidentified ?? true)
         }
       >
-        <TextInput name="filtersName" error={savedFiltersErrors} />
+        <TextInput name="filtersName" error={savedFiltersErrors} label="Nom" minLimit={2} maxLimit={50} />
       </Modal>
     </Grid>
   )

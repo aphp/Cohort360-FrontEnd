@@ -1,5 +1,5 @@
 import { RessourceType } from 'types/requestCriterias'
-import { ScopeTreeRow, SimpleCodeType } from 'types'
+import { ScopeTreeRow } from 'types'
 import {
   Direction,
   Filters,
@@ -154,6 +154,25 @@ const mapGenericFromRequestParams = async (parameters: URLSearchParams, type: Re
         }
       })
     )
+    executiveUnits = executiveUnits.map((executiveUnit) => {
+      return {
+        id: executiveUnit.id,
+        access: executiveUnit.access,
+        resourceType: executiveUnit.resourceType,
+        name: `${executiveUnit.source_value} - ${executiveUnit.name}`,
+        full_path: executiveUnit.full_path,
+        quantity: executiveUnit.quantity,
+        parentId: executiveUnit.parentId,
+        managingEntity: executiveUnit.managingEntity,
+        above_levels_ids: executiveUnit.above_levels_ids,
+        inferior_levels_ids: executiveUnit.inferior_levels_ids,
+        cohort_id: executiveUnit.cohort_id,
+        cohort_size: executiveUnit.cohort_size,
+        cohort_tag: executiveUnit.cohort_tag,
+        type: executiveUnit.type,
+        source_value: executiveUnit.source_value
+      }
+    })
   }
   return { nda, startDate, endDate, executiveUnits }
 }
@@ -178,11 +197,12 @@ const mapPatientFromRequestParams = (parameters: URLSearchParams) => {
 
 const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
   const docTypes =
-    (allDocTypesList.docTypes as SimpleCodeType[]).filter((docType) =>
-      decodeURIComponent(parameters.get(DocumentsParamsKeys.DOC_TYPES) || '')
-        ?.split(',')
-        .includes(docType.code)
-    ) || []
+    decodeURIComponent(parameters.get(DocumentsParamsKeys.DOC_TYPES) || '')
+      ?.split(',')
+      ?.map((code) => {
+        const elem = allDocTypesList.docTypes.find((docType) => docType.code === code)
+        return { label: elem?.label, code: elem?.code, type: elem?.type }
+      }) || []
   const ipp = decodeURIComponent(parameters.get(DocumentsParamsKeys.IPP) || '')
   const onlyPdfAvailable = true
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
