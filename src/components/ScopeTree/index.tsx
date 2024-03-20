@@ -66,7 +66,7 @@ const Index = (props: ScopeTreeProps) => {
    */
   const fixSelectedItems = selectedItems.map((item) => ({
     ...item,
-    id: item.id.toString()
+    id: item.id?.toString()
   }))
 
   return (

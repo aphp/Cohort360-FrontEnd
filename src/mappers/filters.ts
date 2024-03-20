@@ -154,25 +154,10 @@ const mapGenericFromRequestParams = async (parameters: URLSearchParams, type: Re
         }
       })
     )
-    executiveUnits = executiveUnits.map((executiveUnit) => {
-      return {
-        id: executiveUnit.id,
-        access: executiveUnit.access,
-        resourceType: executiveUnit.resourceType,
-        name: `${executiveUnit.source_value} - ${executiveUnit.name}`,
-        full_path: executiveUnit.full_path,
-        quantity: executiveUnit.quantity,
-        parentId: executiveUnit.parentId,
-        managingEntity: executiveUnit.managingEntity,
-        above_levels_ids: executiveUnit.above_levels_ids,
-        inferior_levels_ids: executiveUnit.inferior_levels_ids,
-        cohort_id: executiveUnit.cohort_id,
-        cohort_size: executiveUnit.cohort_size,
-        cohort_tag: executiveUnit.cohort_tag,
-        type: executiveUnit.type,
-        source_value: executiveUnit.source_value
-      }
-    })
+    executiveUnits = executiveUnits.map((executiveUnit) => ({
+      ...executiveUnit,
+      name: `${executiveUnit.source_value} - ${executiveUnit.name}`
+    }))
   }
   return { nda, startDate, endDate, executiveUnits }
 }
