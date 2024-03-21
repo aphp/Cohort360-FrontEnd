@@ -416,50 +416,59 @@ const servicesCohorts: IServiceCohorts = {
         filters: { ipp, nda, startDate, endDate, executiveUnits, modality }
       }
     } = options
-    const [imagingResponse, allImagingResponse] = await Promise.all([
-      fetchImaging({
-        size: 20,
-        offset: page ? (page - 1) * 20 : 0,
-        order: orderBy.orderBy,
-        orderDirection: orderBy.orderDirection,
-        _text: searchInput,
-        encounter: nda,
-        ipp,
-        minDate: startDate ?? '',
-        maxDate: endDate ?? '',
-        _list: groupId ? [groupId] : [],
-        signal,
-        modalities: modality.map(({ id }) => id),
-        executiveUnits: executiveUnits.map((unit) => unit.id)
-      }),
-      !!searchInput || !!ipp || !!nda || !!startDate || !!endDate || executiveUnits.length > 0 || modality.length > 0
-        ? fetchImaging({
-            size: 0,
-            _list: groupId ? [groupId] : [],
-            signal: signal
-          })
-        : null
-    ])
+    try {
+      const [imagingResponse, allImagingResponse] = await Promise.all([
+        fetchImaging({
+          size: 20,
+          offset: page ? (page - 1) * 20 : 0,
+          order: orderBy.orderBy,
+          orderDirection: orderBy.orderDirection,
+          _text: searchInput,
+          encounter: nda,
+          ipp,
+          minDate: startDate ?? '',
+          maxDate: endDate ?? '',
+          _list: groupId ? [groupId] : [],
+          signal,
+          modalities: modality.map(({ id }) => id),
+          executiveUnits: executiveUnits.map((unit) => unit.id)
+        }),
+        !!searchInput || !!ipp || !!nda || !!startDate || !!endDate || executiveUnits.length > 0 || modality.length > 0
+          ? fetchImaging({
+              size: 0,
+              _list: groupId ? [groupId] : [],
+              signal: signal
+            })
+          : null
+      ])
 
-    const imagingList = getApiResponseResources(imagingResponse) ?? []
-    const completeImagingList = await getResourceInfos<ImagingStudy, CohortImaging>(
-      imagingList,
-      deidentified,
-      groupId,
-      signal
-    )
+      const imagingList = getApiResponseResources(imagingResponse) ?? []
+      const completeImagingList = await getResourceInfos<ImagingStudy, CohortImaging>(
+        imagingList,
+        deidentified,
+        groupId,
+        signal
+      )
 
-    const totalImaging = imagingResponse.data?.resourceType === 'Bundle' ? imagingResponse.data?.total : 0
-    const totalAllImaging =
-      allImagingResponse !== null
-        ? allImagingResponse.data?.resourceType === 'Bundle'
-          ? allImagingResponse.data.total
+      const totalImaging = imagingResponse.data?.resourceType === 'Bundle' ? imagingResponse.data?.total : 0
+      const totalAllImaging =
+        allImagingResponse !== null
+          ? allImagingResponse.data?.resourceType === 'Bundle'
+            ? allImagingResponse.data.total
+            : totalImaging
           : totalImaging
-        : totalImaging
-    return {
-      totalImaging: totalImaging ?? 0,
-      totalAllImaging: totalAllImaging ?? 0,
-      imagingList: completeImagingList ?? []
+      return {
+        totalImaging: totalImaging ?? 0,
+        totalAllImaging: totalAllImaging ?? 0,
+        imagingList: completeImagingList ?? []
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération de la liste d'imagerie :", error)
+      return {
+        totalImaging: 0,
+        totalAllImaging: 0,
+        imagingList: []
+      }
     }
   },
 

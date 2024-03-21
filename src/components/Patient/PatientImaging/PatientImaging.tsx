@@ -46,7 +46,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
 
   const searchResults = {
     deidentified: patient?.deidentified || false,
-    list: patient?.imaging?.list,
+    list: patient?.imaging?.list ?? [],
     nb: patient?.imaging?.count ?? 0,
     total: patient?.imaging?.total ?? 0,
     label: 'résultat(s)'
