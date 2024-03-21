@@ -433,6 +433,8 @@ const fetchImaging = createAsyncThunk<FetchImagingReturn, FetchImagingParams, { 
       console.error(error)
       if (error instanceof CanceledError) {
         return thunkApi.rejectWithValue({ error })
+      } else {
+        throw error
       }
     }
   }

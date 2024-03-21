@@ -129,8 +129,8 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
         setLoadingStatus(LoadingStatus.FETCHING)
       } else {
         setImagingList([])
-        setLoadingStatus(LoadingStatus.SUCCESS)
       }
+      setLoadingStatus(LoadingStatus.SUCCESS)
     }
   }
 

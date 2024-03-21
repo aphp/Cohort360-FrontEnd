@@ -135,6 +135,16 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
       setDocuments([])
       setSearchInputError(error as SearchInputError)
       setLoadingStatus(LoadingStatus.SUCCESS)
+      setDocumentsResult((prevState) => ({
+        ...prevState,
+        nb: 0,
+        total: 0
+      }))
+      setPatientsResult((prevState) => ({
+        ...prevState,
+        nb: 0,
+        total: 0
+      }))
     }
   }
 
