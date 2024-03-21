@@ -28,7 +28,13 @@ export enum RessourceType {
   OBSERVATION = 'Observation',
   MICROBIOLOGIE = 'microbiologie',
   PHYSIOLOGIE = 'physiologie',
-  IMAGING = 'ImagingStudy'
+  IMAGING = 'ImagingStudy',
+  SPECIALITY = 'Speciality',
+  QUESTIONNAIRE = 'Questionnaire',
+  QUESTIONNAIRE_RESPONSE = 'QuestionnaireResponse',
+  MATERNITY = 'Maternity',
+  PREGNANCY = 'Pregnancy',
+  HOSPIT = 'Hospit'
 }
 
 export enum RessourceTypeLabels {
@@ -46,7 +52,9 @@ export enum RessourceTypeLabels {
   OBSERVATION = 'Biologie',
   MICROBIOLOGIE = 'Microbiologie',
   PHYSIOLOGIE = 'Physiologie',
-  IMAGING = 'Imagerie'
+  IMAGING = 'Imagerie',
+  PREGNANCY = 'Fiche grossesse',
+  HOSPIT = "Fiche d'hospitalisation"
 }
 
 export type CommonCriteriaDataType = {
@@ -69,6 +77,8 @@ export type SelectedCriteriaType =
   | ObservationDataType
   | IPPListDataType
   | ImagingDataType
+  | PregnancyDataType
+  | HospitDataType
 
 export type DraftSelectedCriteriaType = SelectedCriteriaType & {
   id?: number
@@ -97,7 +107,43 @@ export enum CriteriaDataKey {
   BIOLOGY_DATA = 'biologyData',
   MODALITIES = 'modalities',
   DOC_TYPES = 'docTypes',
-  STATUS_DIAGNOSTIC = 'statusDiagnostic'
+  STATUS_DIAGNOSTIC = 'statusDiagnostic',
+  PREGNANCY_MODE = 'pregnancyMode',
+  MATERNAL_RISKS = 'maternalRisks',
+  RISKS_RELATED_TO_OBSTETRIC_HISTORY = 'risksRelatedToObstetricHistory',
+  RISKS_OR_COMPLICATIONS_OF_PREGNANCY = 'risksOrComplicationsOfPregnancy',
+  CORTICOTHERAPIE = 'corticotherapie',
+  PRENATAL_DIAGNOSIS = 'prenatalDiagnosis',
+  ULTRASOUND_MONITORING = 'ultrasoundMonitoring',
+  IN_UTERO_TRANSFER = 'inUteroTransfer',
+  PREGNANCY_MONITORING = 'pregnancyMonitoring',
+  MATURATION_CORTICOTHERAPIE = 'maturationCorticotherapie',
+  CHIRURGICAL_GESTURE = 'chirurgicalGesture',
+  VME = 'vme',
+  CHILDBIRTH = 'childbirth',
+  HOSPITALCHILDBIRTHPLACE = 'hospitalChildBirthPlace',
+  OTHERHOSPITALCHILDBIRTHPLACE = 'otherHospitalChildBirthPlace',
+  HOMECHILDBIRTHPLACE = 'homeChildBirthPlace',
+  CHILDBIRTH_MODE = 'childbirthMode',
+  MATURATION_REASON = 'maturationReason',
+  MATURATION_MODALITY = 'maturationModality',
+  IMG_INDICATION = 'imgIndication',
+  LABOR_OR_CESAREAN_ENTRY = 'laborOrCesareanEntry',
+  PATHOLOGY_DURING_LABOR = 'pathologyDuringLabor',
+  OBSTETRICAL_GESTURE_DURING_LABOR = 'obstetricalGestureDuringLabor',
+  ANALGESIE_TYPE = 'analgesieType',
+  BIRTH_DELIVERY_WAY = 'birthDeliveryWay',
+  INSTRUMENT_TYPE = 'instrumentType',
+  C_SECTION_MODALITY = 'cSectionModality',
+  PRESENTATION_AT_DELIVERY = 'presentationAtDelivery',
+  BIRTHSTATUS = 'birthStatus',
+  POSTPARTUM_HEMORRHAGE = 'postpartumHemorrhage',
+  CONDITION_PERINEUM = 'conditionPerineum',
+  EXIT_PLACE_TYPE = 'exitPlaceType',
+  FEEDING_TYPE = 'feedingType',
+  COMPLICATION = 'complication',
+  EXIT_FEEDING_MODE = 'exitFeedingMode',
+  EXIT_DIAGNOSTIC = 'exitDiagnostic'
 }
 
 export type CcamDataType = CommonCriteriaDataType & {
@@ -201,6 +247,94 @@ export type EncounterDataType = CommonCriteriaDataType & {
   occurrenceComparator: Comparators
   startOccurrence?: string
   endOccurrence?: string
+}
+
+export type PregnancyDataType = CommonCriteriaDataType & {
+  type: RessourceType.PREGNANCY
+  pregnancyStartDate: string | null | undefined
+  pregnancyEndDate: string | null | undefined
+  pregnancyMode: LabelObject[] | null
+  foetus: number
+  foetusComparator: Comparators
+  parity: number
+  parityComparator: Comparators
+  maternalRisks: LabelObject[] | null
+  maternalRisksPrecision: string
+  risksRelatedToObstetricHistory: LabelObject[] | null
+  risksRelatedToObstetricHistoryPrecision: string
+  risksOrComplicationsOfPregnancy: LabelObject[] | null
+  risksOrComplicationsOfPregnancyPrecision: string
+  corticotherapie: LabelObject[] | null
+  prenatalDiagnosis: LabelObject[] | null
+  ultrasoundMonitoring: LabelObject[] | null
+  occurrence: number
+  occurrenceComparator: Comparators
+  startOccurrence: string | null
+  endOccurrence: string | null
+  encounterStartDate: string | null
+  encounterEndDate: string | null
+}
+
+export type HospitDataType = CommonCriteriaDataType & {
+  type: RessourceType.HOSPIT
+  hospitReason: string
+  inUteroTransfer: LabelObject[] | null
+  pregnancyMonitoring: LabelObject[] | null
+  vme: LabelObject[] | null
+  maturationCorticotherapie: LabelObject[] | null
+  chirurgicalGesture: LabelObject[] | null
+  childbirth: LabelObject[] | null
+  hospitalChildBirthPlace: LabelObject[] | null
+  otherHospitalChildBirthPlace: LabelObject[] | null
+  homeChildBirthPlace: LabelObject[] | null
+  childbirthMode: LabelObject[] | null
+  maturationReason: LabelObject[] | null
+  maturationModality: LabelObject[] | null
+  imgIndication: LabelObject[] | null
+  laborOrCesareanEntry: LabelObject[] | null
+  pathologyDuringLabor: LabelObject[] | null
+  obstetricalGestureDuringLabor: LabelObject[] | null
+  analgesieType: LabelObject[] | null
+  birthDeliveryStartDate: string | null | undefined
+  birthDeliveryEndDate: string | null | undefined
+  birthDeliveryWeeks: number
+  birthDeliveryWeeksComparator: Comparators
+  birthDeliveryDays: number
+  birthDeliveryDaysComparator: Comparators
+  birthDeliveryWay: LabelObject[] | null
+  instrumentType: LabelObject[] | null
+  cSectionModality: LabelObject[] | null
+  presentationAtDelivery: LabelObject[] | null
+  birthMensurationsGrams: number
+  birthMensurationsGramsComparator: Comparators
+  birthMensurationsPercentil: number
+  birthMensurationsPercentilComparator: Comparators
+  apgar1: number
+  apgar1Comparator: Comparators
+  apgar3: number
+  apgar3Comparator: Comparators
+  apgar5: number
+  apgar5Comparator: Comparators
+  apgar10: number
+  apgar10Comparator: Comparators
+  arterialPhCord: number
+  arterialPhCordComparator: Comparators
+  arterialCordLactates: number
+  arterialCordLactatesComparator: Comparators
+  birthStatus: LabelObject[] | null
+  postpartumHemorrhage: LabelObject[] | null
+  conditionPerineum: LabelObject[] | null
+  exitPlaceType: LabelObject[] | null
+  feedingType: LabelObject[] | null
+  complication: LabelObject[] | null
+  exitFeedingMode: LabelObject[] | null
+  exitDiagnostic: LabelObject[] | null
+  occurrence: number
+  occurrenceComparator: Comparators
+  startOccurrence?: string
+  endOccurrence?: string
+  encounterStartDate: string | null
+  encounterEndDate: string | null
 }
 
 export type MedicationDataType = CommonCriteriaDataType & {

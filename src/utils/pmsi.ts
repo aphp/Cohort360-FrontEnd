@@ -531,7 +531,9 @@ export const syncOnChangeFormValue = async (
         selectedCriteria.type !== 'DocumentReference' &&
         selectedCriteria.type !== 'Encounter' &&
         selectedCriteria.type !== 'Patient' &&
-        selectedCriteria.type !== 'ImagingStudy'
+        selectedCriteria.type !== 'ImagingStudy' &&
+        selectedCriteria.type !== 'Pregnancy' &&
+        selectedCriteria.type !== 'Hospit'
       ) {
         expandHierarchyCodes(
           optimizedHierarchySelection,

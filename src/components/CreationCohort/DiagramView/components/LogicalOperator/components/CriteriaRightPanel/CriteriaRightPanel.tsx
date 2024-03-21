@@ -18,6 +18,10 @@ import ContactPageIcon from '@mui/icons-material/ContactPage'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import ScienceIcon from '@mui/icons-material/Science'
 import CoronavirusIcon from '@mui/icons-material/Coronavirus'
+import FolderIcon from '@mui/icons-material/Folder'
+import CribIcon from '@mui/icons-material/Crib'
+import PregnantWomanIcon from '@mui/icons-material/PregnantWoman'
+import DomainAddIcon from '@mui/icons-material/DomainAdd'
 
 import { CriteriaItemDataCache, CriteriaItemType } from 'types'
 import useStyles from './styles'
@@ -70,6 +74,14 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
         return <MonitorHeartIcon />
       case RessourceType.IMAGING:
         return <PhotoCameraFront />
+      case RessourceType.SPECIALITY:
+        return <FolderIcon />
+      case RessourceType.MATERNITY:
+        return <CribIcon />
+      case RessourceType.PREGNANCY:
+        return <PregnantWomanIcon />
+      case RessourceType.HOSPIT:
+        return <DomainAddIcon />
       default:
         return <></>
     }
@@ -113,10 +125,7 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
                   subItems.map((criteriaSubItem, index) => (
                     <Fragment key={index}>
                       <div className={classes.subItemsIndicator} />
-                      <CriteriaListItem
-                        criteriaItem={criteriaSubItem}
-                        handleClick={() => handleClick(criteriaSubItem)}
-                      />
+                      <CriteriaListItem criteriaItem={criteriaSubItem} handleClick={handleClick} />
                     </Fragment>
                   ))}
               </List>
@@ -139,15 +148,34 @@ type CriteriaRightPanelProps = {
 
 const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
   const { open, onClose, parentId, criteria, selectedCriteria, onChangeSelectedCriteria } = props
-  const criteriaListWithConfig = criteriaList.map((criteriaItem) => {
-    if (criteria.config[criteriaItem.id]) {
-      return {
+
+  const applyConfigToCriteriaItem = (
+    criteriaItem: CriteriaItemType,
+    config: {
+      [criteriaKey: string]: Partial<CriteriaItemType>
+    }
+  ) => {
+    let updatedCriteriaItem = criteriaItem
+    if (config[criteriaItem.id]) {
+      updatedCriteriaItem = {
         ...criteriaItem,
-        ...criteria.config[criteriaItem.id]
+        ...config[criteriaItem.id]
       }
     }
-    return criteriaItem
-  })
+
+    if (criteriaItem.subItems && criteriaItem.subItems.length > 0) {
+      updatedCriteriaItem = {
+        ...updatedCriteriaItem,
+        subItems: criteriaItem.subItems.map((subItem) => applyConfigToCriteriaItem(subItem, config))
+      }
+    }
+
+    return updatedCriteriaItem
+  }
+
+  const criteriaListWithConfig = criteriaList.map((criteriaItem) =>
+    applyConfigToCriteriaItem(criteriaItem, criteria.config)
+  )
 
   const { classes } = useStyles()
   const [action, setAction] = useState<CriteriaItemType | null>(null)

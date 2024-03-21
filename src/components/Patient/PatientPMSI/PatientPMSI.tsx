@@ -101,7 +101,6 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias, addSearchCriterias }
   ] = useSearchCriterias(initPmsiSearchCriterias)
-
   const filtersAsArray = useMemo(
     () => selectFiltersAsArray({ code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits }),
     [code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits]

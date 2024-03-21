@@ -37,11 +37,34 @@ import {
   MEDICATION_UCD,
   MEDICATION_PRESCRIPTION_TYPES,
   PROCEDURE_HIERARCHY,
-  SHORT_COHORT_LIMIT
+  SHORT_COHORT_LIMIT,
+  PREGNANCY_MODE,
+  MATERNAL_RISKS,
+  RISKSORCOMPLICATIONSOFPREGNANCY,
+  RISKSRELATEDTOOBSTETRICHISTORY,
+  CHIRURGICAL_GESTURE,
+  CHILD_BIRTH_MODE,
+  MATURATION_REASON,
+  MATURATION_MODALITY,
+  IMG_INDICATION,
+  LABOR_OR_CESAREAN_ENTRY,
+  PATHOLOGY_DURING_LABOR,
+  OBSTETRICAL_GESTURE_DURING_LABOR,
+  ANALGESIE_TYPE,
+  BIRTH_DELIVERY_WAY,
+  INSTRUMENT_TYPE,
+  C_SECTION_MODALITY,
+  PRESENTATION_AT_DELIVERY,
+  CONDITION_PERINEUM,
+  EXIT_PLACE_TYPE,
+  FEEDING_TYPE,
+  EXIT_FEEDING_MODE,
+  EXIT_DIAGNOSTIC
 } from '../../constants'
 import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
 import { DocType } from 'types/requestCriterias'
 import { VitalStatusLabel } from 'types/searchCriterias'
+import { birthStatusData, booleanFieldsData, vmeData } from 'data/questionnaire_data'
 
 export interface IServiceCohortCreation {
   /**
@@ -125,6 +148,42 @@ export interface IServiceCohortCreation {
     searchInput: string
   ) => Promise<{ anabio: ValueSetWithHierarchy[]; loinc: ValueSetWithHierarchy[] }>
   fetchModalities: () => Promise<Array<HierarchyElement>>
+  fetchPregnancyMode: () => Promise<Array<HierarchyElement>>
+  fetchMaternalRisks: () => Promise<Array<HierarchyElement>>
+  fetchRisksRelatedToObstetricHistory: () => Promise<Array<HierarchyElement>>
+  fetchRisksOrComplicationsOfPregnancy: () => Promise<Array<HierarchyElement>>
+  fetchCorticotherapie: () => Promise<Array<HierarchyElement>>
+  fetchPrenatalDiagnosis: () => Promise<Array<HierarchyElement>>
+  fetchUltrasoundMonitoring: () => Promise<Array<HierarchyElement>>
+  fetchInUteroTransfer: () => Promise<Array<HierarchyElement>>
+  fetchPregnancyMonitoring: () => Promise<Array<HierarchyElement>>
+  fetchMaturationCorticotherapie: () => Promise<Array<HierarchyElement>>
+  fetchChirurgicalGesture: () => Promise<Array<HierarchyElement>>
+  fetchVme: () => Promise<Array<HierarchyElement>>
+  fetchChildbirth: () => Promise<Array<HierarchyElement>>
+  fetchHospitalChildBirthPlace: () => Promise<Array<HierarchyElement>>
+  fetchOtherHospitalChildBirthPlace: () => Promise<Array<HierarchyElement>>
+  fetchHomeChildBirthPlace: () => Promise<Array<HierarchyElement>>
+  fetchChildbirthMode: () => Promise<Array<HierarchyElement>>
+  fetchMaturationReason: () => Promise<Array<HierarchyElement>>
+  fetchMaturationModality: () => Promise<Array<HierarchyElement>>
+  fetchImgIndication: () => Promise<Array<HierarchyElement>>
+  fetchLaborOrCesareanEntry: () => Promise<Array<HierarchyElement>>
+  fetchPathologyDuringLabor: () => Promise<Array<HierarchyElement>>
+  fetchObstetricalGestureDuringLabor: () => Promise<Array<HierarchyElement>>
+  fetchAnalgesieType: () => Promise<Array<HierarchyElement>>
+  fetchBirthDeliveryWay: () => Promise<Array<HierarchyElement>>
+  fetchInstrumentType: () => Promise<Array<HierarchyElement>>
+  fetchCSectionModality: () => Promise<Array<HierarchyElement>>
+  fetchPresentationAtDelivery: () => Promise<Array<HierarchyElement>>
+  fetchBirthStatus: () => Promise<Array<HierarchyElement>>
+  fetchSetPostpartumHemorrhage: () => Promise<Array<HierarchyElement>>
+  fetchConditionPerineum: () => Promise<Array<HierarchyElement>>
+  fetchExitPlaceType: () => Promise<Array<HierarchyElement>>
+  fetchFeedingType: () => Promise<Array<HierarchyElement>>
+  fetchComplication: () => Promise<Array<HierarchyElement>>
+  fetchExitFeedingMode: () => Promise<Array<HierarchyElement>>
+  fetchExitDiagnostic: () => Promise<Array<HierarchyElement>>
 }
 
 const servicesCohortCreation: IServiceCohortCreation = {
@@ -399,7 +458,82 @@ const servicesCohortCreation: IServiceCohortCreation = {
   fetchModalities: async () => {
     const modalities = await fetchValueSet(IMAGING_MODALITIES, { joinDisplayWithCode: false })
     return modalities.map((modality) => ({ ...modality, label: `${modality.id} - ${modality.label}` }))
-  }
+  },
+  fetchPregnancyMode: async () => fetchValueSet(PREGNANCY_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchMaternalRisks: async () => fetchValueSet(MATERNAL_RISKS, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchRisksRelatedToObstetricHistory: async () =>
+    fetchValueSet(RISKSRELATEDTOOBSTETRICHISTORY, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchRisksOrComplicationsOfPregnancy: async () =>
+    fetchValueSet(RISKSORCOMPLICATIONSOFPREGNANCY, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchCorticotherapie: async () => {
+    return booleanFieldsData
+  },
+  fetchPrenatalDiagnosis: async () => {
+    return booleanFieldsData
+  },
+  fetchUltrasoundMonitoring: async () => {
+    return booleanFieldsData
+  },
+  fetchInUteroTransfer: async () => {
+    return booleanFieldsData
+  },
+  fetchPregnancyMonitoring: async () => {
+    return booleanFieldsData
+  },
+  fetchMaturationCorticotherapie: async () => {
+    return booleanFieldsData
+  },
+  fetchChirurgicalGesture: async () =>
+    fetchValueSet(CHIRURGICAL_GESTURE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchVme: async () => {
+    return vmeData
+  },
+  fetchChildbirth: async () => {
+    return booleanFieldsData
+  },
+  fetchHospitalChildBirthPlace: async () => {
+    return booleanFieldsData
+  },
+  fetchOtherHospitalChildBirthPlace: async () => {
+    return booleanFieldsData
+  },
+  fetchHomeChildBirthPlace: async () => {
+    return booleanFieldsData
+  },
+  fetchChildbirthMode: async () => fetchValueSet(CHILD_BIRTH_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchMaturationReason: async () => fetchValueSet(MATURATION_REASON, { joinDisplayWithCode: false, sortingKey: 'id' }),
+
+  fetchMaturationModality: async () =>
+    fetchValueSet(MATURATION_MODALITY, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchImgIndication: async () => fetchValueSet(IMG_INDICATION, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchLaborOrCesareanEntry: async () =>
+    fetchValueSet(LABOR_OR_CESAREAN_ENTRY, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchPathologyDuringLabor: async () =>
+    fetchValueSet(PATHOLOGY_DURING_LABOR, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchObstetricalGestureDuringLabor: async () =>
+    fetchValueSet(OBSTETRICAL_GESTURE_DURING_LABOR, { joinDisplayWithCode: false }),
+  fetchAnalgesieType: async () => fetchValueSet(ANALGESIE_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchBirthDeliveryWay: async () =>
+    fetchValueSet(BIRTH_DELIVERY_WAY, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchInstrumentType: async () => fetchValueSet(INSTRUMENT_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchCSectionModality: async () =>
+    fetchValueSet(C_SECTION_MODALITY, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchPresentationAtDelivery: async () => fetchValueSet(PRESENTATION_AT_DELIVERY, { joinDisplayWithCode: false }),
+  fetchBirthStatus: async () => {
+    return birthStatusData
+  },
+  fetchSetPostpartumHemorrhage: async () => {
+    return booleanFieldsData
+  },
+  fetchConditionPerineum: async () =>
+    fetchValueSet(CONDITION_PERINEUM, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchExitPlaceType: async () => fetchValueSet(EXIT_PLACE_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchFeedingType: async () => fetchValueSet(FEEDING_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchComplication: async () => {
+    return booleanFieldsData
+  },
+  fetchExitFeedingMode: async () => fetchValueSet(EXIT_FEEDING_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchExitDiagnostic: async () => fetchValueSet(EXIT_DIAGNOSTIC, { joinDisplayWithCode: false, sortingKey: 'id' })
 }
 
 export default servicesCohortCreation

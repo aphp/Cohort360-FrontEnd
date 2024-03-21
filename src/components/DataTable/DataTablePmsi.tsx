@@ -63,7 +63,7 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
               <Typography variant="button">{`Aucun ${
                 selectedTab !== RessourceType.CONDITION
                   ? selectedTab !== RessourceType.PROCEDURE
-                    ? RessourceType.CLAIM
+                    ? 'GHM'
                     : 'acte'
                   : PMSI.DIAGNOSTIC
               } à afficher`}</Typography>

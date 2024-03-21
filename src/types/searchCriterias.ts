@@ -3,6 +3,16 @@ import { PatientTableLabels } from './patient'
 import { CohortsType } from './cohorts'
 import { RessourceType } from './requestCriterias'
 
+export enum FormNames {
+  PREGNANCY = 'APHPEDSQuestionnaireFicheGrossesse',
+  HOSPIT = 'APHPEDSQuestionnaireFicheHospitalisation'
+}
+
+export enum FormNamesLabel {
+  PREGNANCY = 'Fiches de grossesse',
+  HOSPIT = "Formulaires d'hospitalisation"
+}
+
 export enum GenderStatus {
   MALE = 'MALE',
   FEMALE = 'FEMALE',
@@ -125,7 +135,8 @@ export enum FilterKeys {
   STATUS = 'status',
   MIN_PATIENTS = 'minPatients',
   MAX_PATIENTS = 'maxPatients',
-  MODALITY = 'modality'
+  MODALITY = 'modality',
+  FORM_NAME = 'formName'
 }
 
 export enum OrderByKeys {
@@ -184,6 +195,7 @@ export type Filters =
   | DocumentsFilters
   | CohortsFilters
   | ImagingFilters
+  | MaternityFormFilters
 
 export type GenericFilter = {
   nda: string
@@ -218,6 +230,13 @@ export type BiologyFilters = GenericFilter & {
 export type ImagingFilters = GenericFilter & {
   ipp?: string
   modality: LabelObject[]
+}
+
+export type MaternityFormFilters = {
+  formName: FormNames[]
+  startDate: string | null
+  endDate: string | null
+  executiveUnits: ScopeTreeRow[]
 }
 
 export type DocumentsFilters = GenericFilter & {

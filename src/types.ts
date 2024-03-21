@@ -16,6 +16,7 @@ import {
   Parameters,
   Patient,
   Procedure,
+  QuestionnaireResponse,
   Resource
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
@@ -67,7 +68,10 @@ export enum TemporalConstraintsKind {
   SAME_ENCOUNTER = 'sameEncounter',
   DIFFERENT_ENCOUNTER = 'differentEncounter',
   PARTIAL_CONSTRAINT = 'partialConstraint',
-  DIRECT_CHRONOLOGICAL_ORDERING = 'directChronologicalOrdering'
+  DIRECT_CHRONOLOGICAL_ORDERING = 'directChronologicalOrdering',
+  SAME_EPISODE_OF_CARE = 'sameEpisodeOfCare',
+  DIFFERENT_EPISODE_OF_CARE = 'differentEpisodeOfCare',
+  PARTIAL_EPISODE_CONSTRAINT = 'partialEpisodeConstraint'
 }
 
 export enum CohortCreationError {
@@ -650,6 +654,11 @@ export enum BiologyStatus {
   VALIDATED = 'Val'
 }
 
+export type CohortQuestionnaireResponse = QuestionnaireResponse & {
+  serviceProvider?: string
+  NDA?: string
+}
+
 export type CohortObservation = Observation & {
   serviceProvider?: string
   NDA?: string
@@ -796,7 +805,8 @@ export enum CriteriaName {
   Medication = 'medication',
   Biology = 'biology',
   VisitSupport = 'supported',
-  Imaging = 'imaging'
+  Imaging = 'imaging',
+  Form = 'questionnaireResponse'
 }
 export type CriteriaNameType =
   | CriteriaName.Cim10
@@ -807,6 +817,7 @@ export type CriteriaNameType =
   | CriteriaName.Biology
   | CriteriaName.VisitSupport
   | CriteriaName.Imaging
+  | CriteriaName.Form
 
 export type AccessExpirationsProps = {
   expiring?: boolean

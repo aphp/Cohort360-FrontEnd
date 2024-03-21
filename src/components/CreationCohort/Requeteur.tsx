@@ -29,11 +29,13 @@ const Requeteur = () => {
     currentSnapshot = {} as CurrentSnapshot,
     navHistory,
     selectedCriteria = [],
+    selectedPopulation,
     count = {},
     json = '',
     allowSearchIpp = false
   } = useAppSelector((state) => state.cohortCreation.request || {})
   const criteriaData = useAppSelector((state) => state.cohortCreation.criteria || {})
+  const user = useAppSelector((state) => state.me)
 
   const params = useParams<{
     requestId: string
@@ -78,12 +80,24 @@ const Requeteur = () => {
     }
     try {
       const criteriaCache = await getDataFromFetch(criteriaList, selectedCriteria, criteriaData.cache)
+
+      const selectedPopulationIds = selectedPopulation?.map((perimeter) => perimeter?.cohort_id)
+      const allowMaternityForms = selectedPopulationIds?.every((id) => user?.nominativeGroupsIds?.includes(id))
+
       dispatch(
         setCriteriaData({
           config: {
             IPPList: {
               color: allowSearchIpp ? '#0063AF' : '#808080',
               disabled: !allowSearchIpp
+            },
+            Pregnancy: {
+              color: allowMaternityForms ? '#0063AF' : '#808080',
+              disabled: !allowMaternityForms
+            },
+            Hospit: {
+              color: allowMaternityForms ? '#0063AF' : '#808080',
+              disabled: !allowMaternityForms
             }
           },
           cache: criteriaCache
@@ -95,7 +109,7 @@ const Requeteur = () => {
     if (isRendered.current) {
       setCriteriaLoading((criteriaLoading) => criteriaLoading - 1)
     }
-  }, [dispatch, selectedCriteria, allowSearchIpp])
+  }, [dispatch, selectedCriteria, allowSearchIpp, selectedPopulation])
 
   const _unbuildRequest = async (newCurrentSnapshot: CurrentSnapshot) => {
     dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
