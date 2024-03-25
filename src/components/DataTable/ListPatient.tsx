@@ -88,7 +88,18 @@ const ListPatientLine: React.FC<{
   const { search } = location
 
   const firstName = deidentified ? 'Prénom' : patient.name?.[0].given?.[0] ?? ''
-  const lastName = deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ') ?? ''
+  const lastName = deidentified
+    ? 'Nom'
+    : patient.name
+        ?.map((e) => {
+          if (e.use === 'official') {
+            return e.family ?? 'Non renseigné'
+          }
+          if (e.use === 'maiden') {
+            return `(${patient.gender === 'female' ? 'née' : 'né'} : ${e.family})` ?? 'Non renseigné'
+          }
+        })
+        .join(' ') ?? ''
   const age = getAge(patient)
   const ipp = deidentified
     ? `IPP chiffré: ${patient.id}`
