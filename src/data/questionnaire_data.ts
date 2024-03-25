@@ -1,10 +1,10 @@
 export const booleanFieldsData = [
   {
-    id: 'true',
+    id: 'Oui',
     label: 'Oui'
   },
   {
-    id: 'false',
+    id: 'Non',
     label: 'Non'
   }
 ]
