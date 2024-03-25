@@ -28,7 +28,7 @@ const LoincFilter = ({ name, value, disabled = false, onFetch }: LoincFilterProp
         label="Code(s) sélectionné(s)"
         variant="outlined"
         noOptionsText="Veuillez entrer un code Loinc"
-        values={value}
+        values={loinc}
         onFetch={(text, signal) => onFetch(text, false, signal)}
         onChange={(newValue) => {
           setLoinc(newValue)
