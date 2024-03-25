@@ -1386,9 +1386,9 @@ export async function unbuildRequest(_json: string): Promise<any> {
               currentCriterion.pregnancyStartDate = null
               currentCriterion.pregnancyEndDate = null
               currentCriterion.pregnancyMode = []
-              currentCriterion.foetus = 1
+              currentCriterion.foetus = 0
               currentCriterion.foetusComparator = Comparators.GREATER_OR_EQUAL
-              currentCriterion.parity = 1
+              currentCriterion.parity = 0
               currentCriterion.parityComparator = Comparators.GREATER_OR_EQUAL
               currentCriterion.maternalRisks = []
               currentCriterion.maternalRisksPrecision = ''
@@ -1411,10 +1411,11 @@ export async function unbuildRequest(_json: string): Promise<any> {
 
                 switch (key) {
                   case pregnancyForm.pregnancyStartDate.id:
-                    currentCriterion.pregnancyStartDate = unbuildDateFilter(singleValue)
-                    break
-                  case pregnancyForm.pregnancyEndDate.id:
-                    currentCriterion.pregnancyEndDate = unbuildDateFilter(singleValue)
+                    if (operator?.includes('ge')) {
+                      currentCriterion.pregnancyStartDate = unbuildDateFilter(singleValue)
+                    } else if (operator === 'le') {
+                      currentCriterion.pregnancyEndDate = unbuildDateFilter(singleValue)
+                    }
                     break
                   case pregnancyForm.pregnancyMode.id:
                     unbuildLabelObjectFilter(currentCriterion, 'pregnancyMode', joinedValues)
@@ -1587,10 +1588,11 @@ export async function unbuildRequest(_json: string): Promise<any> {
                     unbuildLabelObjectFilter(currentCriterion, 'analgesieType', joinedValues)
                     break
                   case hospitForm.birthDeliveryStartDate.id:
-                    currentCriterion.birthDeliveryStartDate = unbuildDateFilter(singleValue)
-                    break
-                  case hospitForm.birthDeliveryEndDate.id:
-                    currentCriterion.birthDeliveryEndDate = unbuildDateFilter(singleValue)
+                    if (operator?.includes('ge')) {
+                      currentCriterion.birthDeliveryStartDate = unbuildDateFilter(singleValue)
+                    } else if (operator === 'le') {
+                      currentCriterion.birthDeliveryEndDate = unbuildDateFilter(singleValue)
+                    }
                     break
                   case hospitForm.birthDeliveryWeeks.id: {
                     const _value = `${operator}${singleValue}`

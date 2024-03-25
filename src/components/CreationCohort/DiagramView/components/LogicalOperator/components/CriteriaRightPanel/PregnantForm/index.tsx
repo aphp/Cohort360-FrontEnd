@@ -43,16 +43,16 @@ const PregnantForm = ({
     criteria?.pregnancyStartDate || null
   )
   const [pregnancyEndDate, setPregnancyEndDate] = useState<string | null | undefined>(
-    criteria?.pregnancyStartDate || null
+    criteria?.pregnancyEndDate || null
   )
   const [pregnancyMode, setPregnancyMode] = useState<LabelObject[]>(
     mappingCriteria(criteria?.pregnancyMode, CriteriaDataKey.PREGNANCY_MODE, criteriaData) || []
   )
-  const [foetus, setFoetus] = useState<number>(criteria?.foetus || 1)
+  const [foetus, setFoetus] = useState<number>(criteria?.foetus || 0)
   const [foetusComparator, setFoetusComparator] = useState<Comparators>(
     criteria?.foetusComparator || Comparators.GREATER_OR_EQUAL
   )
-  const [parity, setParity] = useState<number>(criteria?.parity || 1)
+  const [parity, setParity] = useState<number>(criteria?.parity || 0)
   const [parityComparator, setParityComparator] = useState<Comparators>(
     criteria?.parityComparator || Comparators.GREATER_OR_EQUAL
   )

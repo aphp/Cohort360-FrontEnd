@@ -378,11 +378,11 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
           )
         )
       }
-      if (!isNaN(selectedCriteria.foetus) && selectedCriteria.foetusComparator)
+      if (!isNaN(selectedCriteria.foetus) && selectedCriteria.foetusComparator && selectedCriteria.foetus !== 0)
         labels.push(
           getNbOccurencesLabel(selectedCriteria.foetus, selectedCriteria.foetusComparator, 'Nombre de foetus')
         )
-      if (!isNaN(selectedCriteria.parity) && selectedCriteria.parityComparator)
+      if (!isNaN(selectedCriteria.parity) && selectedCriteria.parityComparator && selectedCriteria.parity !== 0)
         labels.push(getNbOccurencesLabel(selectedCriteria.parity, selectedCriteria.parityComparator, 'Parité'))
       if (selectedCriteria.maternalRisks && selectedCriteria.maternalRisks.length > 0)
         labels.push(
