@@ -228,7 +228,7 @@ const VALUE_PARAM_NAME_PREFIX = 'item.answer.'
 const FILTER_PARAM_NAME = '_filter'
 
 const quoteValue = (value: string, type: string) => {
-  return type in ['valueString', 'valueCoding'] ? `"${value}"` : value
+  return ['valueString', 'valueCoding'].includes(type) ? `"${value}"` : value
 }
 
 export const questionnaireFiltersBuilders = (fhirKey: { id: string; type: string }, value?: string) => {
