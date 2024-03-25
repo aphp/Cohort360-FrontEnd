@@ -28,7 +28,7 @@ const CodeFilter = ({ name, value, disabled = false, onFetch }: CodeFilterProps)
         label="Code(s) sélectionné(s)"
         variant="outlined"
         noOptionsText="Veuillez entrer un code"
-        values={value}
+        values={code}
         onFetch={(text, signal) => onFetch(text, false, signal)}
         onChange={(newValue) => {
           setCode(newValue)

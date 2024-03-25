@@ -28,7 +28,7 @@ const AnabioFilter = ({ name, value, disabled = false, onFetch }: AnabioFilterPr
         label="Code(s) sélectionné(s)"
         variant="outlined"
         noOptionsText="Veuillez entrer un code Anabio"
-        values={value}
+        values={anabio}
         onFetch={(text, signal) => onFetch(text, false, signal)}
         onChange={(newValue) => {
           setAnabio(newValue)
