@@ -1,5 +1,5 @@
 import { RessourceType } from 'types/requestCriterias'
-import { ScopeTreeRow } from 'types'
+import { ScopeTreeRow, SimpleCodeType } from 'types'
 import {
   Direction,
   Filters,
@@ -181,13 +181,17 @@ const mapPatientFromRequestParams = (parameters: URLSearchParams) => {
 }
 
 const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
-  const docTypes =
-    decodeURIComponent(parameters.get(DocumentsParamsKeys.DOC_TYPES) || '')
+  const docTypesParams = parameters.get(DocumentsParamsKeys.DOC_TYPES)
+  let docTypes: SimpleCodeType[] = []
+  if (docTypesParams) {
+    docTypes = decodeURIComponent(docTypesParams)
       ?.split(',')
       ?.map((code) => {
         const elem = allDocTypesList.docTypes.find((docType) => docType.code === code)
-        return { label: elem?.label, code: elem?.code, type: elem?.type }
-      }) || []
+        return elem ? { label: elem.label, code: elem.code, type: elem.type } : null
+      })
+      .filter((elem) => elem !== null) as SimpleCodeType[]
+  }
   const ipp = decodeURIComponent(parameters.get(DocumentsParamsKeys.IPP) || '')
   const onlyPdfAvailable = true
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(

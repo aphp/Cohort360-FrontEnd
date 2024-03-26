@@ -43,11 +43,6 @@ const exportTable: ExportTableType[] = [
     table_id: 'visit_detail'
   },
   {
-    id: 'cohort_definition',
-    table_name: 'Cohorte - Information (requête)',
-    table_id: 'cohort_definition'
-  },
-  {
     id: 'condition_occurrence',
     table_name: 'Fait - PMSI - Diagnostics',
     table_id: 'condition_occurrence'
@@ -93,9 +88,9 @@ const exportTable: ExportTableType[] = [
     table_id: 'imaging_study'
   },
   {
-    id: 'imaging_serie',
+    id: 'imaging_series',
     table_name: 'Fait - Imagerie - Série',
-    table_id: 'imaging_serie'
+    table_id: 'imaging_series'
   }
 ]
 
