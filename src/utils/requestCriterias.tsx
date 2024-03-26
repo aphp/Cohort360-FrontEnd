@@ -859,7 +859,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
           getNbOccurencesLabel(
             selectedCriteria.occurrence,
             selectedCriteria.occurrenceComparator,
-            "Nombre d'occurences"
+            "Nombre d'occurrences"
           )
         )
       if (selectedCriteria.startOccurrence || selectedCriteria.endOccurrence)

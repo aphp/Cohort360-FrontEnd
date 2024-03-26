@@ -155,7 +155,7 @@ const PregnantForm = ({
       onChangeIsInclusive={setIsInclusive}
       infoAlert={['Tous les éléments des champs multiples sont liés par une contrainte OU']}
       errorAlert={[
-        error === Error.EMPTY_FORM ? "Merci de renseigner au moins un nombre d'occurence supérieur ou égal à 1" : ''
+        error === Error.EMPTY_FORM ? "Merci de renseigner au moins un nombre d'occurrence supérieur ou égal à 1" : ''
       ]}
     >
       <BlockWrapper className={classes.inputItem}>
