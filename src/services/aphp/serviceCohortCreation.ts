@@ -64,7 +64,7 @@ import {
 import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
 import { DocType } from 'types/requestCriterias'
 import { VitalStatusLabel } from 'types/searchCriterias'
-import { birthStatusData, booleanFieldsData, vmeData } from 'data/questionnaire_data'
+import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
 
 export interface IServiceCohortCreation {
   /**
@@ -475,13 +475,13 @@ const servicesCohortCreation: IServiceCohortCreation = {
     return booleanFieldsData
   },
   fetchInUteroTransfer: async () => {
-    return booleanFieldsData
+    return booleanOpenChoiceFieldsData
   },
   fetchPregnancyMonitoring: async () => {
     return booleanFieldsData
   },
   fetchMaturationCorticotherapie: async () => {
-    return booleanFieldsData
+    return booleanOpenChoiceFieldsData
   },
   fetchChirurgicalGesture: async () =>
     fetchValueSet(CHIRURGICAL_GESTURE, { joinDisplayWithCode: false, sortingKey: 'id' }),
@@ -489,7 +489,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
     return vmeData
   },
   fetchChildbirth: async () => {
-    return booleanFieldsData
+    return booleanOpenChoiceFieldsData
   },
   fetchHospitalChildBirthPlace: async () => {
     return booleanFieldsData
@@ -523,7 +523,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
     return birthStatusData
   },
   fetchSetPostpartumHemorrhage: async () => {
-    return booleanFieldsData
+    return booleanOpenChoiceFieldsData
   },
   fetchConditionPerineum: async () =>
     fetchValueSet(CONDITION_PERINEUM, { joinDisplayWithCode: false, sortingKey: 'id' }),

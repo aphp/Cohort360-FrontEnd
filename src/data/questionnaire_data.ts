@@ -1,10 +1,21 @@
-export const booleanFieldsData = [
+export const booleanOpenChoiceFieldsData = [
   {
     id: 'Oui',
     label: 'Oui'
   },
   {
     id: 'Non',
+    label: 'Non'
+  }
+]
+
+export const booleanFieldsData = [
+  {
+    id: 'true',
+    label: 'Oui'
+  },
+  {
+    id: 'false',
     label: 'Non'
   }
 ]
