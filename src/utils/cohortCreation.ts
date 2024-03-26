@@ -408,6 +408,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
       filterFhir = [
         'subject.active=true',
         `questionnaire.name=${FormNames.PREGNANCY}`,
+        'status=in-progress,completed',
         questionnaireFiltersBuilders(
           pregnancyForm.pregnancyStartDate,
           buildDateFilter(criterion.pregnancyStartDate, 'ge', true)
@@ -468,6 +469,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
       filterFhir = [
         'subject.active=true',
         `questionnaire.name=${FormNames.HOSPIT}`,
+        'status=in-progress,completed',
         questionnaireFiltersBuilders(hospitForm.hospitReason, buildSearchFilter(criterion.hospitReason)),
         questionnaireFiltersBuilders(hospitForm.inUteroTransfer, buildLabelObjectFilter(criterion.inUteroTransfer)),
         questionnaireFiltersBuilders(
