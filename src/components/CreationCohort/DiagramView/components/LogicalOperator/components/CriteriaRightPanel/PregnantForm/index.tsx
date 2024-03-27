@@ -43,16 +43,16 @@ const PregnantForm = ({
     criteria?.pregnancyStartDate || null
   )
   const [pregnancyEndDate, setPregnancyEndDate] = useState<string | null | undefined>(
-    criteria?.pregnancyStartDate || null
+    criteria?.pregnancyEndDate || null
   )
   const [pregnancyMode, setPregnancyMode] = useState<LabelObject[]>(
     mappingCriteria(criteria?.pregnancyMode, CriteriaDataKey.PREGNANCY_MODE, criteriaData) || []
   )
-  const [foetus, setFoetus] = useState<number>(criteria?.foetus || 1)
+  const [foetus, setFoetus] = useState<number>(criteria?.foetus || 0)
   const [foetusComparator, setFoetusComparator] = useState<Comparators>(
     criteria?.foetusComparator || Comparators.GREATER_OR_EQUAL
   )
-  const [parity, setParity] = useState<number>(criteria?.parity || 1)
+  const [parity, setParity] = useState<number>(criteria?.parity || 0)
   const [parityComparator, setParityComparator] = useState<Comparators>(
     criteria?.parityComparator || Comparators.GREATER_OR_EQUAL
   )
@@ -155,7 +155,7 @@ const PregnantForm = ({
       onChangeIsInclusive={setIsInclusive}
       infoAlert={['Tous les éléments des champs multiples sont liés par une contrainte OU']}
       errorAlert={[
-        error === Error.EMPTY_FORM ? "Merci de renseigner au moins un nombre d'occurence supérieur ou égal à 1" : ''
+        error === Error.EMPTY_FORM ? "Merci de renseigner au moins un nombre d'occurrence supérieur ou égal à 1" : ''
       ]}
     >
       <BlockWrapper className={classes.inputItem}>

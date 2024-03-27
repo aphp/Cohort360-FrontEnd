@@ -893,7 +893,7 @@ type fetchFormsProps = {
 }
 export const fetchForms = async (args: fetchFormsProps) => {
   const { patient, formName, _list, startDate, endDate, executiveUnits } = args
-  let options: string[] = []
+  let options: string[] = ['status=in-progress,completed']
   if (patient) options = [...options, `subject=${patient}`]
   if (formName) options = [...options, `questionnaire.name=${formName}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]

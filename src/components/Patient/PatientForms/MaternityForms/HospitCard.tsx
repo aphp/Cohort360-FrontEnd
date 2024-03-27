@@ -5,17 +5,39 @@ import { hospitForm } from 'data/hospitData'
 import moment from 'moment'
 import FormCards from 'components/ui/FormCard'
 import DomainAdd from '@mui/icons-material/DomainAdd'
+import { QuestionnaireResponse, QuestionnaireResponseItemAnswer } from 'fhir/r4'
 interface HospitCardProps {
   form: CohortQuestionnaireResponse
 }
 
 const HospitCard: React.FC<HospitCardProps> = ({ form }) => {
+  const getBirthDeliveryDate = (
+    form: QuestionnaireResponse,
+    hospitForm: {
+      [key: string]: {
+        id: string
+        type: keyof QuestionnaireResponseItemAnswer
+      }
+    }
+  ) => {
+    const item = form.item?.find((item) => item.linkId === hospitForm.birthDeliveryStartDate.id)
+    return item ? `Accouchement le ${getDataFromForm(form, hospitForm.birthDeliveryStartDate)}` : undefined
+  }
+
+  const formatHospitalisationDates = (start?: string, end?: string) => {
+    if (start && end) {
+      return `Hospitalisation du ${moment(start).format('DD/MM/YYYY')} au ${moment(end).format('DD/MM/YYYY')}`
+    } else if (start && !end) {
+      return `Début d'hospitalisation le ${moment(start).format('DD/MM/YYYY')}`
+    }
+  }
+
   const hospitChipData = [
-    form.item?.find((item) => item.linkId === hospitForm.birthDeliveryStartDate.id)
-      ? `Accouchement le ${getDataFromForm(form, hospitForm.birthDeliveryStartDate)}`
-      : `Date d'écriture : ${moment(form.authored).format('DD/MM/YYYY')}`,
+    getBirthDeliveryDate(form, hospitForm),
+    formatHospitalisationDates(form.hospitDates?.start, form.hospitDates?.end),
     `Unité exécutrice : ${form.serviceProvider}`
-  ]
+  ].filter((item): item is string => item !== undefined)
+
   const hospitDetails = [
     {
       name: "Motif d'hospitalisation",

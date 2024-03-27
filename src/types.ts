@@ -15,6 +15,7 @@ import {
   OperationOutcome,
   Parameters,
   Patient,
+  Period,
   Procedure,
   QuestionnaireResponse,
   Resource
@@ -657,6 +658,7 @@ export enum BiologyStatus {
 export type CohortQuestionnaireResponse = QuestionnaireResponse & {
   serviceProvider?: string
   NDA?: string
+  hospitDates?: Period
 }
 
 export type CohortObservation = Observation & {

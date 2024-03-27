@@ -1435,6 +1435,7 @@ function linkElementWithEncounter<
     serviceProvider?: string
     NDA?: string
     documents?: any[]
+    hospitDates?: string[]
   })[] = []
 
   for (const entry of elementEntries) {
@@ -1442,6 +1443,7 @@ function linkElementWithEncounter<
       serviceProvider?: string
       NDA?: string
       documents?: any[]
+      hospitDates?: string[]
     }
 
     let encounterId = ''
@@ -1468,6 +1470,9 @@ function linkElementWithEncounter<
         break
       case RessourceType.IMAGING:
         encounterId = (entry as ImagingStudy).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
+        break
+      case RessourceType.QUESTIONNAIRE_RESPONSE:
+        encounterId = entry.encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
     }
 
@@ -1506,6 +1511,7 @@ function fillElementInformation<
     serviceProvider?: string
     NDA?: string
     documents?: any[]
+    hospitDates?: string[]
   }
 
   const encounterIsDetailed = encounter?.id !== encounterId
@@ -1530,6 +1536,10 @@ function fillElementInformation<
 
   if (resourceType !== RessourceType.DOCUMENTS && encounter?.documents && encounter.documents.length > 0) {
     newElement.documents = encounter.documents
+  }
+
+  if (resourceType === RessourceType.QUESTIONNAIRE_RESPONSE) {
+    newElement.hospitDates = encounter.period
   }
 
   return newElement

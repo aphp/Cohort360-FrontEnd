@@ -42,7 +42,7 @@ const StayConstraints: React.FC<StayConstraintsProps> = ({ constraints, onChange
   const temporalConstraintsTypes = [
     {
       id: TemporalConstraintsKind.NONE,
-      label: 'Aucune contrainte sur les épisodes'
+      label: 'Aucune contrainte sur les séjours'
     },
     {
       id: TemporalConstraintsKind.SAME_ENCOUNTER,
