@@ -29,7 +29,7 @@ import useStyles from './styles'
 import { CriteriaDrawerComponentProps, CriteriaName } from 'types'
 import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
-import { SearchByTypes } from 'types/searchCriterias'
+import { SearchByTypes, FilterByDocumentStatus } from 'types/searchCriterias'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 import { SearchInputError } from 'types/error'
 import { Comparators, DocType, DocumentDataType, RessourceType } from 'types/requestCriterias'
@@ -50,10 +50,11 @@ const defaultComposition: Omit<DocumentDataType, 'id'> = {
   encounterStartDate: '',
   startOccurrence: '',
   endOccurrence: '',
-  isInclusive: true
+  isInclusive: true,
+  docStatuses: [FilterByDocumentStatus.VALIDATED]
 }
 
-const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
+const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()
@@ -70,6 +71,12 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const debouncedSearchItem = useDebounce(500, defaultValues.search)
 
   const isEdition = selectedCriteria !== null ? true : false
+
+  const docStatuses: string[] = [
+    FilterByDocumentStatus.VALIDATED,
+    FilterByDocumentStatus.NOT_VALIDATED,
+    FilterByDocumentStatus.CANCELED
+  ]
 
   const _onSubmit = () => {
     onChangeSelectedCriteria({ ...defaultValues, occurrence: occurrence, occurrenceComparator: occurrenceComparator })
@@ -260,6 +267,17 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             }}
           />
 
+          <FormControl variant="outlined" className={classes.inputItem}>
+            <Autocomplete
+              disableCloseOnSelect
+              multiple
+              onChange={(e, value) => _onChangeValue('docStatuses', value)}
+              options={docStatuses}
+              value={defaultValues.docStatuses || undefined}
+              renderInput={(params) => <TextField {...params} placeholder="Statut de documents" />}
+            />
+          </FormControl>
+
           <AdvancedInputs
             form={CriteriaName.Document}
             selectedCriteria={defaultValues}
@@ -288,4 +306,4 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   )
 }
 
-export default CompositionForm
+export default DocumentsForm

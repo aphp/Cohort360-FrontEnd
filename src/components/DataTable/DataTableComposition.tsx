@@ -131,9 +131,7 @@ const DataTableCompositionLine: React.FC<{
     ({ code }) => code === (document?.type?.coding?.[0] ? document.type.coding[0].code : '-')
   )
 
-  const findContent = document?.content?.find(
-    (content) => content.attachment?.contentType === 'http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain'
-  )
+  const findContent = document?.content?.find((content) => content.attachment?.contentType === 'text/plain')
 
   const documentContent = findContent?.attachment?.data
     ? Buffer.from(findContent?.attachment.data, 'base64').toString('utf-8')

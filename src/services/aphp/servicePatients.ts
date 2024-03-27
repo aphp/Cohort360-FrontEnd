@@ -46,7 +46,15 @@ import {
   Questionnaire,
   QuestionnaireResponse
 } from 'fhir/r4'
-import { Direction, Filters, FormNames, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
+import {
+  Direction,
+  DocumentStatuses,
+  FormNames,
+  Filters,
+  Order,
+  SearchByTypes,
+  SearchCriterias
+} from 'types/searchCriterias'
 import { RessourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
 
@@ -331,6 +339,7 @@ export interface IServicePatients {
     patientId: string,
     searchInput: string,
     selectedDocTypes: string[],
+    docStatuses: string[],
     nda: string,
     onlyPdfAvailable: boolean,
     startDate?: string | null,
@@ -730,6 +739,7 @@ const servicesPatients: IServicePatients = {
     patientId: string,
     searchInput: string,
     selectedDocTypes: string[],
+    docStatuses: string[],
     nda: string,
     onlyPdfAvailable?: boolean,
     startDate?: string | null,
@@ -748,7 +758,7 @@ const servicesPatients: IServicePatients = {
       sortDirection,
       size: documentLines,
       offset: page ? (page - 1) * documentLines : 0,
-      status: 'final',
+      docStatuses: docStatuses,
       _text: searchInput,
       highlight_search_results: searchBy === SearchByTypes.TEXT ? true : false,
       type: selectedDocTypes.join(','),
@@ -856,7 +866,7 @@ export const getEncounterDocuments = async (
 
   const documentsResp = await fetchDocumentReference({
     encounter: encountersIdList.join(','),
-    status: 'final',
+    docStatuses: [DocumentStatuses.FINAL],
     _list: groupId ? groupId.split(',') : []
   })
 

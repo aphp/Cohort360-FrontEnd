@@ -19,7 +19,9 @@ import {
   MedicationFilters,
   PMSIFilters,
   LabelObject,
-  GenericFilter
+  GenericFilter,
+  FilterByDocumentStatus,
+  DocumentStatuses
 } from 'types/searchCriterias'
 import allDocTypesList from 'assets/docTypes.json'
 import {
@@ -40,7 +42,8 @@ import {
   BIOLOGY_HIERARCHY_ITM_LOINC,
   IMAGING_MODALITIES,
   MEDICATION_ADMINISTRATIONS,
-  MEDICATION_PRESCRIPTION_TYPES
+  MEDICATION_PRESCRIPTION_TYPES,
+  DOC_STATUS_CODE_SYSTEM
 } from '../constants'
 import services from 'services/aphp'
 
@@ -53,6 +56,7 @@ enum PatientsParamsKeys {
 
 enum DocumentsParamsKeys {
   IPP = 'subject.identifier',
+  DOC_STATUSES = 'docstatus',
   DOC_TYPES = 'type',
   ONLY_PDF_AVAILABLE = 'onlyPdfAvailable',
   NDA = 'encounter.identifier',
@@ -193,12 +197,15 @@ const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
       .filter((elem) => elem !== null) as SimpleCodeType[]
   }
   const ipp = decodeURIComponent(parameters.get(DocumentsParamsKeys.IPP) || '')
+  const docStatuses = decodeURIComponent(parameters.get(DocumentsParamsKeys.DOC_STATUSES) || '')
+    ?.split(',')
+    ?.map((e) => mapDocumentStatusesFromRequestParam(e.split('|')?.[1]))
   const onlyPdfAvailable = true
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
     parameters,
     RessourceType.DOCUMENTS
   )
-  return { docTypes, ipp, onlyPdfAvailable, nda, startDate, endDate, executiveUnits }
+  return { docStatuses, docTypes, ipp, onlyPdfAvailable, nda, startDate, endDate, executiveUnits }
 }
 
 const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
@@ -414,9 +421,16 @@ const mapPatientToRequestParams = (filters: PatientsFilters, deidentified: boole
 }
 
 const mapDocumentsToRequestParams = (filters: DocumentsFilters) => {
-  const { ipp, docTypes, nda, endDate, startDate, executiveUnits } = filters
+  const { ipp, docStatuses, docTypes, nda, endDate, startDate, executiveUnits } = filters
   const requestParams: string[] = []
   if (ipp) requestParams.push(`${DocumentsParamsKeys.IPP}=${encodeURIComponent(ipp)}`)
+  if (docStatuses && docStatuses.length > 0) {
+    requestParams.push(
+      `${DocumentsParamsKeys.DOC_STATUSES}=${encodeURIComponent(
+        docStatuses.map((status) => `${DOC_STATUS_CODE_SYSTEM}|${mapDocumentStatusesToRequestParam(status)}`).toString()
+      )}`
+    )
+  }
   if (docTypes && docTypes.length > 0)
     requestParams.push(
       `${DocumentsParamsKeys.DOC_TYPES}=${encodeURIComponent(docTypes.map((codeType) => codeType.code).toString())}`
@@ -712,4 +726,20 @@ function mapGenderCodesToGenderStatus(code: GenderCodes): GenderStatus {
     default:
       return GenderStatus.OTHER_UNKNOWN
   }
+}
+
+export function mapDocumentStatusesToRequestParam(docStatus: string): string {
+  return docStatus === FilterByDocumentStatus.VALIDATED
+    ? DocumentStatuses.FINAL
+    : docStatus === FilterByDocumentStatus.NOT_VALIDATED
+    ? DocumentStatuses.PRELIMINARY
+    : DocumentStatuses.CANCELED
+}
+
+export function mapDocumentStatusesFromRequestParam(docStatus: string): string {
+  return docStatus === DocumentStatuses.FINAL
+    ? FilterByDocumentStatus.VALIDATED
+    : docStatus === DocumentStatuses.PRELIMINARY
+    ? FilterByDocumentStatus.NOT_VALIDATED
+    : FilterByDocumentStatus.CANCELED
 }

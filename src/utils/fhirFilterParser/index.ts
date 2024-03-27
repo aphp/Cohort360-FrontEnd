@@ -28,7 +28,6 @@ class ParamExtractionVisitor extends FilterLanguageVisitor<void> {
   }
 
   visitParamExp: (ctx: ParamExpContext) => void = (ctx: ParamExpContext) => {
-    console.log()
     const paramKey = ctx.paramValue().getText()
     const compareOp = ctx.CompareOp().getText()
     // remove double quotes when it matches the String rule

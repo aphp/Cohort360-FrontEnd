@@ -46,10 +46,12 @@ import {
   CONDITION_STATUS,
   IMAGING_MODALITIES,
   MEDICATION_ADMINISTRATIONS,
-  MEDICATION_PRESCRIPTION_TYPES
+  MEDICATION_PRESCRIPTION_TYPES,
+  DOC_STATUS_CODE_SYSTEM
 } from '../../constants'
 import { Direction, Order, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
 import { RessourceType } from 'types/requestCriterias'
+import { mapDocumentStatusesToRequestParam } from '../../mappers/filters'
 
 export const paramValuesReducerWithPrefix =
   (prefix: string): ((accumulator: string, currentValue: string) => string) =>
@@ -211,7 +213,7 @@ type fetchDocumentReferenceProps = {
   maxDate?: string
   _text?: string
   highlight_search_results?: boolean
-  status?: string
+  docStatuses?: string[]
   patient?: string
   encounter?: string
   'encounter-identifier'?: string
@@ -250,7 +252,7 @@ export const fetchDocumentReference = async (
     type,
     _text,
     highlight_search_results,
-    status,
+    docStatuses,
     patient,
     encounter,
     onlyPdfAvailable,
@@ -268,12 +270,12 @@ export const fetchDocumentReference = async (
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
 
-  // By default, all the calls to `/DocumentReference` will have `type:not=https://terminology.eds.aphp.fr/aphp-orbis-document-textuel-hospitalier|doc-impor`, contenttype=http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain, and patient.active=true in parameter
+  // By default, all the calls to `/DocumentReference` will have `type:not=https://terminology.eds.aphp.fr/aphp-orbis-document-textuel-hospitalier|doc-impor`, contenttype=text/plain, and patient.active=true in parameter
   let options: string[] = [
     `type:not=${encodeURIComponent(
       'https://terminology.eds.aphp.fr/aphp-orbis-document-textuel-hospitalier|doc-impor'
     )}`,
-    `contenttype=${encodeURIComponent('http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain')}`,
+    `contenttype=${encodeURIComponent('text/plain')}`,
     'subject.active=true'
   ]
   if (_id) options = [...options, `_id=${_id}`]
@@ -292,20 +294,18 @@ export const fetchDocumentReference = async (
           : ''
       }`
     ]
-  if (status)
-    options = [
-      ...options,
-      `docstatus=${encodeURIComponent('http://hl7.org/fhir/CodeSystem/composition-status|') + status}`
-    ]
+  if (docStatuses && docStatuses.length > 0) {
+    const docStatusesUrl = DOC_STATUS_CODE_SYSTEM
+    const urlString = docStatuses
+      .map((status) => `${docStatusesUrl}|${mapDocumentStatusesToRequestParam(status)}`)
+      .join(',')
+    options = [...options, `docstatus=${encodeURIComponent(urlString)}`]
+  }
   if (patient) options = [...options, `subject=${patient}`]
   if (patientIdentifier) options = [...options, `subject.identifier=${patientIdentifier}`]
   if (encounter) options = [...options, `encounter=${encounter}`]
   if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`]
-  if (onlyPdfAvailable)
-    options = [
-      ...options,
-      `contenttype=${encodeURIComponent('http://terminology.hl7.org/CodeSystem/v3-mediatypes|application/pdf')}`
-    ]
+  if (onlyPdfAvailable) options = [...options, `contenttype=${encodeURIComponent('application/pdf')}`]
   if (minDate) options = [...options, `date=ge${minDate}`]
   if (maxDate) options = [...options, `date=le${maxDate}`]
   if (executiveUnits && executiveUnits.length > 0)
@@ -463,8 +463,7 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (code) options = [...options, `code=${code}`] // eslint-disable-line
   if (source) options = [...options, `source=${source}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
-  if (status)
-    options = [...options, `status=${encodeURIComponent('http://hl7.org/fhir/CodeSystem/event-status|') + status}`]
+  if (status) options = [...options, `status=${encodeURIComponent(`${DOC_STATUS_CODE_SYSTEM}|${status}`)}`]
   if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`]
   if (minDate) options = [...options, `date=ge${minDate}`]
   if (maxDate) options = [...options, `date=le${maxDate}`]
