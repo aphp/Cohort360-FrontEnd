@@ -176,7 +176,7 @@ export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Pro
   let options: string[] = ['subject.active=true']
   if (_id) options = [...options, `_id=${_id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
-  if (offset) options = [...options, `offset=${offset}`]
+  if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (patient) options = [...options, `subject=${patient}`]
   if (type) options = [...options, `type=${type}`]
@@ -280,7 +280,7 @@ export const fetchDocumentReference = async (
   ]
   if (_id) options = [...options, `_id=${_id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
-  if (offset) options = [...options, `offset=${offset}`]
+  if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (type) options = [...options, `type=${type}`]
   if (_text)
@@ -457,7 +457,7 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   // By default, all the calls to `/Procedure` will have 'patient.active=true' in parameter
   let options: string[] = ['subject.active=true']
   if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
+  if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `code=${code}`] // eslint-disable-line
@@ -521,7 +521,7 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
   // By default, all the calls to `/Claim` will have 'patient.active=true' in parameter
   let options: string[] = ['patient.active=true']
   if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
+  if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
   if (diagnosis) options = [...options, `diagnosis=${diagnosis}`] // eslint-disable-line
@@ -581,7 +581,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   // By default, all the calls to `/Condition` will have 'patient.active=true' in parameter
   let options: string[] = ['subject.active=true']
   if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset !== undefined) options = [...options, `offset=${offset}`] // eslint-disable-line
+  if (offset !== undefined) options = [...options, `_offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `code=${code}`] // eslint-disable-line
@@ -651,7 +651,7 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   let options: string[] = ['value-quantity=ge0,le0', 'subject.active=true']
   if (id) options = [...options, `_id=${id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
-  if (offset) options = [...options, `offset=${offset}`]
+  if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort},id`}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
   if (encounter) options = [...options, `encounter.identifier=${encounter}`]
@@ -719,7 +719,7 @@ export const fetchMedicationRequest = async (
   let options: string[] = ['subject.active=true']
   if (id) options = [...options, `_id=${id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
-  if (offset !== undefined) options = [...options, `offset=${offset}`]
+  if (offset !== undefined) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (subject) options = [...options, `subject=${subject}`]
   if (encounter) options = [...options, `encounter.identifier=${encounter}`]
@@ -789,7 +789,7 @@ export const fetchMedicationAdministration = async (
   let options: string[] = ['subject.active=true']
   if (id) options = [...options, `_id=${id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
-  if (offset) options = [...options, `offset=${offset}`]
+  if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (subject) options = [...options, `subject=${subject}`]
   if (encounter) options = [...options, `context.identifier=${encounter}`]
@@ -856,7 +856,7 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   let options: string[] = ['patient.active=true']
   if (patient) options = [...options, `patient=${patient}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
-  if (offset) options = [...options, `offset=${offset}`]
+  if (offset) options = [...options, `_offset=${offset}`]
   if (order) options = [...options, `_sort=${_orderDirection}${order}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
   if (encounter) options = [...options, `encounter.identifier=${encounter}`]
