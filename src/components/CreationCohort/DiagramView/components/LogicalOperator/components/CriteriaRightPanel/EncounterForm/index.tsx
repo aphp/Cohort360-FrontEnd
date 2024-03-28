@@ -23,7 +23,7 @@ import { CriteriaDrawerComponentProps, CriteriaName, ScopeTreeRow } from 'types'
 import PopulationCard from '../../../../PopulationCard/PopulationCard'
 import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE } from 'utils/cohortCreation'
 import { DurationRangeType, LabelObject } from 'types/searchCriterias'
-import { Comparators, CriteriaDataKey, EncounterDataType, RessourceType } from 'types/requestCriterias'
+import { Comparators, CriteriaDataKey, EncounterDataType, CriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import Collapse from 'components/ui/Collapse'
@@ -144,7 +144,7 @@ const EncounterForm = ({
       occurrenceComparator,
       isInclusive,
       title,
-      type: RessourceType.ENCOUNTER
+      type: CriteriaType.ENCOUNTER
     })
   }
   return (

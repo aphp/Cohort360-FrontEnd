@@ -8,13 +8,7 @@ import { CriteriaDrawerComponentProps, CriteriaName, ScopeTreeRow } from 'types'
 import PopulationCard from '../../../../PopulationCard/PopulationCard'
 import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE } from 'utils/cohortCreation'
 import { LabelObject } from 'types/searchCriterias'
-import {
-  Comparators,
-  CriteriaDataKey,
-  HospitDataType,
-  RessourceType,
-  RessourceTypeLabels
-} from 'types/requestCriterias'
+import { Comparators, CriteriaDataKey, HospitDataType, CriteriaType, CriteriaTypeLabels } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import Collapse from 'components/ui/Collapse'
@@ -201,7 +195,7 @@ const HospitForm = ({
 
   const onSubmit = () => {
     onChangeSelectedCriteria({
-      type: RessourceType.HOSPIT,
+      type: CriteriaType.HOSPIT,
       id: criteria?.id,
       hospitReason,
       inUteroTransfer,
@@ -266,7 +260,7 @@ const HospitForm = ({
   }
   return (
     <CriteriaLayout
-      criteriaLabel={`de ${RessourceTypeLabels.HOSPIT}`}
+      criteriaLabel={`de ${CriteriaTypeLabels.HOSPIT}`}
       title={title}
       onChangeTitle={setTitle}
       isEdition={isEdition}

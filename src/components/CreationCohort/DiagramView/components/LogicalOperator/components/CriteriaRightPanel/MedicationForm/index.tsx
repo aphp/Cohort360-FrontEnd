@@ -12,10 +12,10 @@ import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchMedication } from 'state/medication'
 import { PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
-import { Comparators, MedicationDataType, RessourceType } from 'types/requestCriterias'
+import { Comparators, MedicationDataType, CriteriaType } from 'types/requestCriterias'
 
 export const defaultMedication: Omit<MedicationDataType, 'id'> = {
-  type: RessourceType.MEDICATION_REQUEST,
+  type: CriteriaType.MEDICATION_REQUEST,
   title: 'Critère de médicament',
   code: [],
   administration: [],
@@ -29,7 +29,7 @@ export const defaultMedication: Omit<MedicationDataType, 'id'> = {
 }
 
 const removeNonCommonFields = (medication: MedicationDataType) => {
-  if (medication.type === RessourceType.MEDICATION_ADMINISTRATION) {
+  if (medication.type === CriteriaType.MEDICATION_ADMINISTRATION) {
     return { ...medication, prescriptionType: null }
   }
   return medication

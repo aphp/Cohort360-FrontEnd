@@ -25,7 +25,7 @@ import DomainAddIcon from '@mui/icons-material/DomainAdd'
 
 import { CriteriaItemDataCache, CriteriaItemType } from 'types'
 import useStyles from './styles'
-import { RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 import { PhotoCameraFront } from '@mui/icons-material'
 import { CriteriaState } from 'state/criteria'
 import criteriaList from 'components/CreationCohort/DataList_Criteria'
@@ -44,43 +44,43 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
 
   const getCriteriaIcon = (id: string) => {
     switch (id) {
-      case RessourceType.REQUEST:
+      case CriteriaType.REQUEST:
         return <SavedSearchIcon />
-      case RessourceType.IPP_LIST:
+      case CriteriaType.IPP_LIST:
         return <PersonSearchIcon />
-      case RessourceType.PATIENT:
+      case CriteriaType.PATIENT:
         return <BarChartIcon />
-      case RessourceType.ENCOUNTER:
+      case CriteriaType.ENCOUNTER:
         return <EventIcon />
-      case RessourceType.DOCUMENTS:
+      case CriteriaType.DOCUMENTS:
         return <DescriptionIcon />
-      case RessourceType.PMSI:
+      case CriteriaType.PMSI:
         return <MedicalInformationIcon />
-      case RessourceType.CONDITION:
+      case CriteriaType.CONDITION:
         return <ArticleIcon />
-      case RessourceType.PROCEDURE:
+      case CriteriaType.PROCEDURE:
         return <LocalHospitalIcon />
-      case RessourceType.CLAIM:
+      case CriteriaType.CLAIM:
         return <ContactPageIcon />
-      case RessourceType.MEDICATION:
+      case CriteriaType.MEDICATION:
         return <VaccinesIcon />
-      case RessourceType.BIO_MICRO:
+      case CriteriaType.BIO_MICRO:
         return <BiotechIcon />
-      case RessourceType.OBSERVATION:
+      case CriteriaType.OBSERVATION:
         return <ScienceIcon />
-      case RessourceType.MICROBIOLOGIE:
+      case CriteriaType.MICROBIOLOGIE:
         return <CoronavirusIcon />
-      case RessourceType.PHYSIOLOGIE:
+      case CriteriaType.PHYSIOLOGIE:
         return <MonitorHeartIcon />
-      case RessourceType.IMAGING:
+      case CriteriaType.IMAGING:
         return <PhotoCameraFront />
-      case RessourceType.SPECIALITY:
+      case CriteriaType.SPECIALITY:
         return <FolderIcon />
-      case RessourceType.MATERNITY:
+      case CriteriaType.MATERNITY:
         return <CribIcon />
-      case RessourceType.PREGNANCY:
+      case CriteriaType.PREGNANCY:
         return <PregnantWomanIcon />
-      case RessourceType.HOSPIT:
+      case CriteriaType.HOSPIT:
         return <DomainAddIcon />
       default:
         return <></>
@@ -206,8 +206,8 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
           }
 
           if (id === 'Medication') {
-            if (RessourceType.MEDICATION_REQUEST === selectedCriteria.type) return criteriaItem
-            if (RessourceType.MEDICATION_ADMINISTRATION === selectedCriteria.type) return criteriaItem
+            if (CriteriaType.MEDICATION_REQUEST === selectedCriteria.type) return criteriaItem
+            if (CriteriaType.MEDICATION_ADMINISTRATION === selectedCriteria.type) return criteriaItem
           } else {
             if (id === selectedCriteria.type) return criteriaItem
           }

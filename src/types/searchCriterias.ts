@@ -1,7 +1,7 @@
 import { ScopeTreeRow, SimpleCodeType, ValueSet } from 'types'
 import { PatientTableLabels } from './patient'
 import { CohortsType } from './cohorts'
-import { RessourceType } from './requestCriterias'
+import { ResourceType } from './requestCriterias'
 
 export enum FormNames {
   PREGNANCY = 'APHPEDSQuestionnaireFicheGrossesse',
@@ -381,7 +381,7 @@ export type SavedFilter = {
   created_at: string
   deleted: string
   deleted_by_cascade: boolean
-  fhir_resource: RessourceType
+  fhir_resource: ResourceType
   fhir_version: string
   filter: string
   modified_at: string

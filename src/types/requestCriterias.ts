@@ -1,17 +1,29 @@
 import { ScopeTreeRow } from 'types'
 import { DocumentAttachmentMethod, DurationRangeType, LabelObject, SearchByTypes } from './searchCriterias'
 
-export enum MedicationType {
-  Request = 'MedicationRequest',
-  Administration = 'MedicationAdministration'
-}
-
 export enum MedicationTypeLabel {
   Request = 'Prescription',
   Administration = 'Administration'
 }
 
-export enum RessourceType {
+export enum ResourceType {
+  UNKNOWN = 'Unknown',
+  IPP_LIST = 'IPPList',
+  PATIENT = 'Patient',
+  ENCOUNTER = 'Encounter',
+  DOCUMENTS = 'DocumentReference',
+  CONDITION = 'Condition',
+  PROCEDURE = 'Procedure',
+  CLAIM = 'Claim',
+  MEDICATION_REQUEST = 'MedicationRequest',
+  MEDICATION_ADMINISTRATION = 'MedicationAdministration',
+  OBSERVATION = 'Observation',
+  IMAGING = 'ImagingStudy',
+  QUESTIONNAIRE = 'Questionnaire',
+  QUESTIONNAIRE_RESPONSE = 'QuestionnaireResponse'
+}
+
+export enum CriteriaType {
   REQUEST = 'Request',
   IPP_LIST = 'IPPList',
   PATIENT = 'Patient',
@@ -37,7 +49,7 @@ export enum RessourceType {
   HOSPIT = 'Hospit'
 }
 
-export enum RessourceTypeLabels {
+export enum CriteriaTypeLabels {
   REQUEST = 'Mes requềtes',
   IPP_LIST = "Liste d'IPP",
   PATIENT = 'Démographie',
@@ -60,10 +72,22 @@ export enum RessourceTypeLabels {
 export type CommonCriteriaDataType = {
   id: number
   error?: boolean
-  type: RessourceType
+  type: CriteriaType
   encounterService?: ScopeTreeRow[]
   isInclusive?: boolean
   title: string
+}
+
+export type WithOccurenceCriteriaDataType = {
+  occurrence?: number | null
+  occurrenceComparator?: Comparators | null
+  startOccurrence?: string | null
+  endOccurrence?: string | null
+}
+
+export type WithEncounterDateDataType = {
+  encounterEndDate?: string | null
+  encounterStartDate?: string | null
 }
 
 export type SelectedCriteriaType =
@@ -147,35 +171,27 @@ export enum CriteriaDataKey {
   DOC_STATUSES = 'docStatuses'
 }
 
-export type CcamDataType = CommonCriteriaDataType & {
-  type: RessourceType.PROCEDURE
-  hierarchy: undefined
-  code: LabelObject[] | null
-  source: string
-  encounterEndDate: string | null
-  encounterStartDate: string | null
-  occurrence: number
-  occurrenceComparator: Comparators
-  label: undefined
-  startOccurrence: string | null
-  endOccurrence: string | null
-}
+export type CcamDataType = CommonCriteriaDataType &
+  WithOccurenceCriteriaDataType &
+  WithEncounterDateDataType & {
+    type: CriteriaType.PROCEDURE
+    hierarchy: undefined
+    code: LabelObject[] | null
+    source: string | null
+    label: undefined
+  }
 
-export type Cim10DataType = CommonCriteriaDataType & {
-  type: RessourceType.CONDITION
-  code: LabelObject[] | null
-  diagnosticType: LabelObject[] | null
-  encounterEndDate: string | null
-  encounterStartDate: string | null
-  occurrence: number
-  occurrenceComparator: Comparators
-  label: undefined
-  startOccurrence: string | null
-  endOccurrence: string | null
-}
+export type Cim10DataType = CommonCriteriaDataType &
+  WithOccurenceCriteriaDataType &
+  WithEncounterDateDataType & {
+    type: CriteriaType.CONDITION
+    code: LabelObject[] | null
+    diagnosticType: LabelObject[] | null
+    label: undefined
+  }
 
 export type DemographicDataType = CommonCriteriaDataType & {
-  type: RessourceType.PATIENT
+  type: CriteriaType.PATIENT
   genders: LabelObject[] | null
   vitalStatus: LabelObject[] | null
   age: DurationRangeType
@@ -184,7 +200,7 @@ export type DemographicDataType = CommonCriteriaDataType & {
 }
 
 export type IPPListDataType = CommonCriteriaDataType & {
-  type: RessourceType.IPP_LIST
+  type: CriteriaType.IPP_LIST
   search: string
 }
 
@@ -194,31 +210,24 @@ export type DocType = {
   type: string
 }
 
-export type DocumentDataType = CommonCriteriaDataType & {
-  type: RessourceType.DOCUMENTS
-  search: string
-  searchBy: SearchByTypes.TEXT | SearchByTypes.DESCRIPTION
-  docType: DocType[] | null
-  encounterEndDate: string | null
-  encounterStartDate: string | null
-  occurrence: number
-  occurrenceComparator: Comparators
-  startOccurrence: string | null
-  endOccurrence: string | null
-  docStatuses: string[]
-}
+export type DocumentDataType = CommonCriteriaDataType &
+  WithOccurenceCriteriaDataType &
+  WithEncounterDateDataType & {
+    type: CriteriaType.DOCUMENTS
+    search: string
+    searchBy: SearchByTypes.TEXT | SearchByTypes.DESCRIPTION
+    docType: DocType[] | null
+    docStatuses: string[]
+  }
 
-export type GhmDataType = CommonCriteriaDataType & {
-  type: RessourceType.CLAIM
-  code: LabelObject[] | null
-  encounterEndDate: string | null
-  encounterStartDate: string | null
-  occurrence: number
-  occurrenceComparator: Comparators
-  label: undefined
-  startOccurrence: string | null
-  endOccurrence: string | null
-}
+export type GhmDataType = CommonCriteriaDataType &
+  WithOccurenceCriteriaDataType &
+  WithEncounterDateDataType & {
+    type: CriteriaType.CLAIM
+    code: LabelObject[] | null
+    label: undefined
+  }
+
 export enum Comparators {
   LESS_OR_EQUAL = '<=',
   LESS = '<',
@@ -228,175 +237,151 @@ export enum Comparators {
   BETWEEN = '≤x≥'
 }
 
-export type EncounterDataType = CommonCriteriaDataType & {
-  type: RessourceType.ENCOUNTER
-  age: DurationRangeType
-  duration: DurationRangeType
-  admissionMode: LabelObject[] | null
-  entryMode: LabelObject[] | null
-  exitMode: LabelObject[] | null
-  priseEnChargeType: LabelObject[] | null
-  typeDeSejour: LabelObject[] | null
-  fileStatus: LabelObject[] | null
-  reason: LabelObject[] | null
-  destination: LabelObject[] | null
-  provenance: LabelObject[] | null
-  admission: LabelObject[] | null
-  encounterService: ScopeTreeRow[] | null
-  encounterStartDate?: string | null
-  encounterEndDate?: string | null
-  occurrence: number
-  occurrenceComparator: Comparators
-  startOccurrence?: string
-  endOccurrence?: string
-}
+export type EncounterDataType = CommonCriteriaDataType &
+  WithOccurenceCriteriaDataType &
+  WithEncounterDateDataType & {
+    type: CriteriaType.ENCOUNTER
+    age: DurationRangeType
+    duration: DurationRangeType
+    admissionMode: LabelObject[] | null
+    entryMode: LabelObject[] | null
+    exitMode: LabelObject[] | null
+    priseEnChargeType: LabelObject[] | null
+    typeDeSejour: LabelObject[] | null
+    fileStatus: LabelObject[] | null
+    reason: LabelObject[] | null
+    destination: LabelObject[] | null
+    provenance: LabelObject[] | null
+    admission: LabelObject[] | null
+    encounterService: ScopeTreeRow[] | null
+  }
 
-export type PregnancyDataType = CommonCriteriaDataType & {
-  type: RessourceType.PREGNANCY
-  pregnancyStartDate: string | null | undefined
-  pregnancyEndDate: string | null | undefined
-  pregnancyMode: LabelObject[] | null
-  foetus: number
-  foetusComparator: Comparators
-  parity: number
-  parityComparator: Comparators
-  maternalRisks: LabelObject[] | null
-  maternalRisksPrecision: string
-  risksRelatedToObstetricHistory: LabelObject[] | null
-  risksRelatedToObstetricHistoryPrecision: string
-  risksOrComplicationsOfPregnancy: LabelObject[] | null
-  risksOrComplicationsOfPregnancyPrecision: string
-  corticotherapie: LabelObject[] | null
-  prenatalDiagnosis: LabelObject[] | null
-  ultrasoundMonitoring: LabelObject[] | null
-  occurrence: number
-  occurrenceComparator: Comparators
-  startOccurrence: string | null
-  endOccurrence: string | null
-  encounterStartDate: string | null
-  encounterEndDate: string | null
-}
+export type PregnancyDataType = CommonCriteriaDataType &
+  WithOccurenceCriteriaDataType &
+  WithEncounterDateDataType & {
+    type: CriteriaType.PREGNANCY
+    pregnancyStartDate: string | null | undefined
+    pregnancyEndDate: string | null | undefined
+    pregnancyMode: LabelObject[] | null
+    foetus: number
+    foetusComparator: Comparators
+    parity: number
+    parityComparator: Comparators
+    maternalRisks: LabelObject[] | null
+    maternalRisksPrecision: string
+    risksRelatedToObstetricHistory: LabelObject[] | null
+    risksRelatedToObstetricHistoryPrecision: string
+    risksOrComplicationsOfPregnancy: LabelObject[] | null
+    risksOrComplicationsOfPregnancyPrecision: string
+    corticotherapie: LabelObject[] | null
+    prenatalDiagnosis: LabelObject[] | null
+    ultrasoundMonitoring: LabelObject[] | null
+  }
 
-export type HospitDataType = CommonCriteriaDataType & {
-  type: RessourceType.HOSPIT
-  hospitReason: string
-  inUteroTransfer: LabelObject[] | null
-  pregnancyMonitoring: LabelObject[] | null
-  vme: LabelObject[] | null
-  maturationCorticotherapie: LabelObject[] | null
-  chirurgicalGesture: LabelObject[] | null
-  childbirth: LabelObject[] | null
-  hospitalChildBirthPlace: LabelObject[] | null
-  otherHospitalChildBirthPlace: LabelObject[] | null
-  homeChildBirthPlace: LabelObject[] | null
-  childbirthMode: LabelObject[] | null
-  maturationReason: LabelObject[] | null
-  maturationModality: LabelObject[] | null
-  imgIndication: LabelObject[] | null
-  laborOrCesareanEntry: LabelObject[] | null
-  pathologyDuringLabor: LabelObject[] | null
-  obstetricalGestureDuringLabor: LabelObject[] | null
-  analgesieType: LabelObject[] | null
-  birthDeliveryStartDate: string | null | undefined
-  birthDeliveryEndDate: string | null | undefined
-  birthDeliveryWeeks: number
-  birthDeliveryWeeksComparator: Comparators
-  birthDeliveryDays: number
-  birthDeliveryDaysComparator: Comparators
-  birthDeliveryWay: LabelObject[] | null
-  instrumentType: LabelObject[] | null
-  cSectionModality: LabelObject[] | null
-  presentationAtDelivery: LabelObject[] | null
-  birthMensurationsGrams: number
-  birthMensurationsGramsComparator: Comparators
-  birthMensurationsPercentil: number
-  birthMensurationsPercentilComparator: Comparators
-  apgar1: number
-  apgar1Comparator: Comparators
-  apgar3: number
-  apgar3Comparator: Comparators
-  apgar5: number
-  apgar5Comparator: Comparators
-  apgar10: number
-  apgar10Comparator: Comparators
-  arterialPhCord: number
-  arterialPhCordComparator: Comparators
-  arterialCordLactates: number
-  arterialCordLactatesComparator: Comparators
-  birthStatus: LabelObject[] | null
-  postpartumHemorrhage: LabelObject[] | null
-  conditionPerineum: LabelObject[] | null
-  exitPlaceType: LabelObject[] | null
-  feedingType: LabelObject[] | null
-  complication: LabelObject[] | null
-  exitFeedingMode: LabelObject[] | null
-  exitDiagnostic: LabelObject[] | null
-  occurrence: number
-  occurrenceComparator: Comparators
-  startOccurrence?: string
-  endOccurrence?: string
-  encounterStartDate: string | null
-  encounterEndDate: string | null
-}
+export type HospitDataType = CommonCriteriaDataType &
+  WithOccurenceCriteriaDataType &
+  WithEncounterDateDataType & {
+    type: CriteriaType.HOSPIT
+    hospitReason: string
+    inUteroTransfer: LabelObject[] | null
+    pregnancyMonitoring: LabelObject[] | null
+    vme: LabelObject[] | null
+    maturationCorticotherapie: LabelObject[] | null
+    chirurgicalGesture: LabelObject[] | null
+    childbirth: LabelObject[] | null
+    hospitalChildBirthPlace: LabelObject[] | null
+    otherHospitalChildBirthPlace: LabelObject[] | null
+    homeChildBirthPlace: LabelObject[] | null
+    childbirthMode: LabelObject[] | null
+    maturationReason: LabelObject[] | null
+    maturationModality: LabelObject[] | null
+    imgIndication: LabelObject[] | null
+    laborOrCesareanEntry: LabelObject[] | null
+    pathologyDuringLabor: LabelObject[] | null
+    obstetricalGestureDuringLabor: LabelObject[] | null
+    analgesieType: LabelObject[] | null
+    birthDeliveryStartDate: string | null | undefined
+    birthDeliveryEndDate: string | null | undefined
+    birthDeliveryWeeks: number
+    birthDeliveryWeeksComparator: Comparators
+    birthDeliveryDays: number
+    birthDeliveryDaysComparator: Comparators
+    birthDeliveryWay: LabelObject[] | null
+    instrumentType: LabelObject[] | null
+    cSectionModality: LabelObject[] | null
+    presentationAtDelivery: LabelObject[] | null
+    birthMensurationsGrams: number
+    birthMensurationsGramsComparator: Comparators
+    birthMensurationsPercentil: number
+    birthMensurationsPercentilComparator: Comparators
+    apgar1: number
+    apgar1Comparator: Comparators
+    apgar3: number
+    apgar3Comparator: Comparators
+    apgar5: number
+    apgar5Comparator: Comparators
+    apgar10: number
+    apgar10Comparator: Comparators
+    arterialPhCord: number
+    arterialPhCordComparator: Comparators
+    arterialCordLactates: number
+    arterialCordLactatesComparator: Comparators
+    birthStatus: LabelObject[] | null
+    postpartumHemorrhage: LabelObject[] | null
+    conditionPerineum: LabelObject[] | null
+    exitPlaceType: LabelObject[] | null
+    feedingType: LabelObject[] | null
+    complication: LabelObject[] | null
+    exitFeedingMode: LabelObject[] | null
+    exitDiagnostic: LabelObject[] | null
+  }
 
-export type MedicationDataType = CommonCriteriaDataType & {
-  code: LabelObject[] | null
-  administration: LabelObject[] | null
-  occurrence: number
-  occurrenceComparator: Comparators
-  startOccurrence: string | null
-  endOccurrence: string | null
-  encounterEndDate: string | null
-  encounterStartDate: string | null
-} & (
+export type MedicationDataType = CommonCriteriaDataType &
+  WithOccurenceCriteriaDataType &
+  WithEncounterDateDataType & {
+    code: LabelObject[] | null
+    administration: LabelObject[] | null
+  } & (
     | {
-        type: RessourceType.MEDICATION_REQUEST
+        type: CriteriaType.MEDICATION_REQUEST
         prescriptionType: LabelObject[] | null
       }
-    | { type: RessourceType.MEDICATION_ADMINISTRATION }
+    | { type: CriteriaType.MEDICATION_ADMINISTRATION }
   )
 
-export type ObservationDataType = CommonCriteriaDataType & {
-  type: RessourceType.OBSERVATION
-  code: LabelObject[] | null
-  isLeaf: boolean
-  searchByValue: [number | null, number | null]
-  valueComparator: Comparators
-  occurrence: number
-  occurrenceComparator: Comparators
-  startOccurrence: string | null
-  endOccurrence: string | null
-  encounterStartDate: string | null
-  encounterEndDate: string | null
-}
+export type ObservationDataType = CommonCriteriaDataType &
+  WithOccurenceCriteriaDataType &
+  WithEncounterDateDataType & {
+    type: CriteriaType.OBSERVATION
+    code: LabelObject[] | null
+    isLeaf: boolean
+    searchByValue: [number | null, number | null]
+    valueComparator: Comparators
+  }
 
-export type ImagingDataType = CommonCriteriaDataType & {
-  type: RessourceType.IMAGING
-  studyStartDate: string | null
-  studyEndDate: string | null
-  studyModalities: LabelObject[] | null
-  studyDescription: string
-  studyProcedure: string
-  numberOfSeries: number
-  seriesComparator: Comparators
-  numberOfIns: number
-  instancesComparator: Comparators
-  withDocument: DocumentAttachmentMethod
-  daysOfDelay: string | null
-  studyUid: string
-  seriesStartDate: string | null
-  seriesEndDate: string | null
-  seriesDescription: string
-  seriesProtocol: string
-  seriesModalities: LabelObject[] | null
-  seriesUid: string
-  encounterEndDate: string | null
-  encounterStartDate: string | null
-  occurrence: number
-  occurrenceComparator: Comparators
-  startOccurrence: string | null
-  endOccurrence: string | null
-}
+export type ImagingDataType = CommonCriteriaDataType &
+  WithOccurenceCriteriaDataType &
+  WithEncounterDateDataType & {
+    type: CriteriaType.IMAGING
+    studyStartDate: string | null
+    studyEndDate: string | null
+    studyModalities: LabelObject[] | null
+    studyDescription: string
+    studyProcedure: string
+    numberOfSeries: number
+    seriesComparator: Comparators
+    numberOfIns: number
+    instancesComparator: Comparators
+    withDocument: DocumentAttachmentMethod
+    daysOfDelay: string | null
+    studyUid: string
+    seriesStartDate: string | null
+    seriesEndDate: string | null
+    seriesDescription: string
+    seriesProtocol: string
+    seriesModalities: LabelObject[] | null
+    seriesUid: string
+  }
 
 export enum VitalStatusLabel {
   ALIVE = 'Vivant(e)',

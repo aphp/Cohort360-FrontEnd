@@ -12,8 +12,8 @@ import {
   Comparators,
   CriteriaDataKey,
   PregnancyDataType,
-  RessourceType,
-  RessourceTypeLabels
+  CriteriaType,
+  CriteriaTypeLabels
 } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
@@ -113,7 +113,7 @@ const PregnantForm = ({
 
   const onSubmit = () => {
     onChangeSelectedCriteria({
-      type: RessourceType.PREGNANCY,
+      type: CriteriaType.PREGNANCY,
       id: criteria?.id,
       pregnancyStartDate,
       pregnancyEndDate,
@@ -144,7 +144,7 @@ const PregnantForm = ({
   }
   return (
     <CriteriaLayout
-      criteriaLabel={`de ${RessourceTypeLabels.PREGNANCY}`}
+      criteriaLabel={`de ${CriteriaTypeLabels.PREGNANCY}`}
       title={title}
       onChangeTitle={setTitle}
       isEdition={isEdition}

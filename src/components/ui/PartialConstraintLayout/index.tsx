@@ -16,7 +16,7 @@ import { AvatarWrapper } from '../Avatar/styles'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import DeleteIcon from '@mui/icons-material/Delete'
 import useStyles from './styles'
-import { RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 import { useAppSelector } from 'state'
 
 type EncounterConstraint = {
@@ -81,10 +81,10 @@ const PartialConstraintLayout: React.FC<PartialConstraintLayoutProps> = ({ isEpi
 
     return isEpisode
       ? groupCriteria.filter(
-          (criteria) => criteria.type === RessourceType.PREGNANCY || criteria.type === RessourceType.HOSPIT
+          (criteria) => criteria.type === CriteriaType.PREGNANCY || criteria.type === CriteriaType.HOSPIT
         )
       : groupCriteria.filter(
-          (criteria) => criteria.type !== RessourceType.IPP_LIST && criteria.type !== RessourceType.PATIENT
+          (criteria) => criteria.type !== CriteriaType.IPP_LIST && criteria.type !== CriteriaType.PATIENT
         )
   }
 

@@ -24,7 +24,7 @@ import { CriteriaName, HierarchyElement, LoadingStatus } from 'types'
 import { PatientTypes } from 'types/patient'
 import { AlertWrapper } from 'components/ui/Alert'
 import { Direction, FilterKeys, ImagingFilters, Order } from 'types/searchCriterias'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
@@ -78,7 +78,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
       selectFilter,
       resetSavedFilterError
     }
-  } = useSavedFilters<ImagingFilters>(RessourceType.IMAGING)
+  } = useSavedFilters<ImagingFilters>(ResourceType.IMAGING)
 
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)

@@ -6,7 +6,7 @@ import {
   CriteriaDataKey,
   DocType,
   MedicationTypeLabel,
-  RessourceType,
+  CriteriaType,
   SelectedCriteriaType
 } from 'types/requestCriterias'
 import {
@@ -22,11 +22,11 @@ import { displaySystem } from './displayValueSetSystem'
 import { CriteriaState } from 'state/criteria'
 import { Tooltip, Typography } from '@mui/material'
 
-const getMedicationTypeLabel = (type: RessourceType) => {
+const getMedicationTypeLabel = (type: CriteriaType) => {
   switch (type) {
-    case RessourceType.MEDICATION_REQUEST:
+    case CriteriaType.MEDICATION_REQUEST:
       return MedicationTypeLabel.Request
-    case RessourceType.MEDICATION_ADMINISTRATION:
+    case CriteriaType.MEDICATION_ADMINISTRATION:
       return MedicationTypeLabel.Administration
   }
 }
@@ -35,7 +35,7 @@ const getLabelFromCriteriaObject = (
   criteriaState: CriteriaState,
   values: LabelObject[] | null,
   name: CriteriaDataKey,
-  resourceType: RessourceType,
+  resourceType: CriteriaType,
   label?: string
 ) => {
   const criterionData = criteriaState.cache.find((criteriaCache) => criteriaCache.criteriaType === resourceType)?.data
@@ -140,11 +140,11 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
   const type = selectedCriteria.type
   const labels: ReactNode[] = []
   switch (selectedCriteria.type) {
-    case RessourceType.IPP_LIST:
+    case CriteriaType.IPP_LIST:
       labels.push(getIdsListLabels(selectedCriteria.search, 'patients'))
       break
 
-    case RessourceType.PATIENT:
+    case CriteriaType.PATIENT:
       if (selectedCriteria.genders && selectedCriteria.genders.length > 0) {
         labels.push(getLabelFromCriteriaObject(criteriaState, selectedCriteria.genders, CriteriaDataKey.GENDER, type))
       }
@@ -161,7 +161,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         labels.push(getDatesLabel(selectedCriteria.deathDates, 'Décès'))
       break
 
-    case RessourceType.ENCOUNTER:
+    case CriteriaType.ENCOUNTER:
       if (selectedCriteria.age[0] || selectedCriteria.age[1])
         labels.push(getDurationRangeLabel(selectedCriteria.age, 'Âge : '))
       if (selectedCriteria.duration[0] || selectedCriteria.duration[1])
@@ -216,7 +216,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         )
       break
 
-    case RessourceType.DOCUMENTS:
+    case CriteriaType.DOCUMENTS:
       if (selectedCriteria.search)
         labels.push(getSearchDocumentLabel(selectedCriteria.search, selectedCriteria.searchBy))
       if (selectedCriteria.docType && selectedCriteria.docType.length > 0)
@@ -226,7 +226,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
       }
       break
 
-    case RessourceType.CONDITION:
+    case CriteriaType.CONDITION:
       if (selectedCriteria.code && selectedCriteria.code.length > 0)
         labels.push(
           getLabelFromCriteriaObject(
@@ -247,7 +247,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         )
       break
 
-    case RessourceType.PROCEDURE:
+    case CriteriaType.PROCEDURE:
       if (selectedCriteria.code && selectedCriteria.code.length > 0)
         labels.push(
           getLabelFromCriteriaObject(
@@ -260,7 +260,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
       if (selectedCriteria.source) labels.push(`Source: ${selectedCriteria.source}`)
       break
 
-    case RessourceType.CLAIM:
+    case CriteriaType.CLAIM:
       if (selectedCriteria.code && selectedCriteria.code.length > 0)
         labels.push(
           getLabelFromCriteriaObject(
@@ -272,8 +272,8 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         )
       break
 
-    case RessourceType.MEDICATION_REQUEST:
-    case RessourceType.MEDICATION_ADMINISTRATION:
+    case CriteriaType.MEDICATION_REQUEST:
+    case CriteriaType.MEDICATION_ADMINISTRATION:
       labels.push(getMedicationTypeLabel(selectedCriteria.type))
       if (selectedCriteria.code && selectedCriteria.code.length > 0)
         labels.push(
@@ -281,11 +281,11 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             criteriaState,
             selectedCriteria.code,
             CriteriaDataKey.MEDICATION_DATA,
-            RessourceType.MEDICATION
+            CriteriaType.MEDICATION
           )
         )
       if (
-        selectedCriteria.type === RessourceType.MEDICATION_REQUEST &&
+        selectedCriteria.type === CriteriaType.MEDICATION_REQUEST &&
         selectedCriteria.prescriptionType &&
         selectedCriteria.prescriptionType.length > 0
       )
@@ -294,7 +294,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             criteriaState,
             selectedCriteria.prescriptionType,
             CriteriaDataKey.PRESCRIPTION_TYPES,
-            RessourceType.MEDICATION
+            CriteriaType.MEDICATION
           )
         )
       if (selectedCriteria.administration && selectedCriteria.administration.length > 0)
@@ -303,12 +303,12 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             criteriaState,
             selectedCriteria.administration,
             CriteriaDataKey.ADMINISTRATIONS,
-            RessourceType.MEDICATION
+            CriteriaType.MEDICATION
           )
         )
       break
 
-    case RessourceType.OBSERVATION:
+    case CriteriaType.OBSERVATION:
       if (selectedCriteria.code && selectedCriteria.code.length > 0)
         labels.push(
           getLabelFromCriteriaObject(criteriaState, selectedCriteria.code, CriteriaDataKey.BIOLOGY_DATA, type)
@@ -317,7 +317,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         labels.push(getBiologyValuesLabel(selectedCriteria.valueComparator, selectedCriteria.searchByValue))
       break
 
-    case RessourceType.IMAGING:
+    case CriteriaType.IMAGING:
       if (selectedCriteria.studyStartDate || selectedCriteria.studyEndDate)
         labels.push(
           getDatesLabel([selectedCriteria.studyStartDate, selectedCriteria.studyEndDate], "Date de l'étude : ")
@@ -365,7 +365,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
           getNbOccurencesLabel(selectedCriteria.numberOfIns, selectedCriteria.instancesComparator, "Nombre d'instances")
         )
       break
-    case RessourceType.PREGNANCY:
+    case CriteriaType.PREGNANCY:
       if (selectedCriteria.pregnancyStartDate || selectedCriteria.pregnancyEndDate)
         labels.push(
           getDatesLabel(
@@ -464,7 +464,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
           )
         )
       break
-    case RessourceType.HOSPIT:
+    case CriteriaType.HOSPIT:
       if (selectedCriteria.hospitReason) labels.push(`Motif(s) d'hospitalisation : ${selectedCriteria.hospitReason}`)
       if (selectedCriteria.inUteroTransfer && selectedCriteria.inUteroTransfer.length > 0)
         labels.push(
@@ -845,22 +845,22 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         )
   }
   switch (type) {
-    case RessourceType.DOCUMENTS:
-    case RessourceType.CONDITION:
-    case RessourceType.CLAIM:
-    case RessourceType.PROCEDURE:
-    case RessourceType.MEDICATION_REQUEST:
-    case RessourceType.MEDICATION_ADMINISTRATION:
-    case RessourceType.OBSERVATION:
-    case RessourceType.ENCOUNTER:
-    case RessourceType.IMAGING:
-    case RessourceType.PREGNANCY:
-    case RessourceType.HOSPIT:
+    case CriteriaType.DOCUMENTS:
+    case CriteriaType.CONDITION:
+    case CriteriaType.CLAIM:
+    case CriteriaType.PROCEDURE:
+    case CriteriaType.MEDICATION_REQUEST:
+    case CriteriaType.MEDICATION_ADMINISTRATION:
+    case CriteriaType.OBSERVATION:
+    case CriteriaType.ENCOUNTER:
+    case CriteriaType.IMAGING:
+    case CriteriaType.PREGNANCY:
+    case CriteriaType.HOSPIT:
       if (selectedCriteria.encounterStartDate || selectedCriteria.encounterEndDate)
         labels.push(
           getDatesLabel([selectedCriteria.encounterStartDate, selectedCriteria.encounterEndDate], 'Prise en charge')
         )
-      if (!isNaN(selectedCriteria.occurrence) && selectedCriteria.occurrenceComparator)
+      if (selectedCriteria.occurrence && !isNaN(selectedCriteria.occurrence) && selectedCriteria.occurrenceComparator)
         labels.push(
           getNbOccurencesLabel(
             selectedCriteria.occurrence,

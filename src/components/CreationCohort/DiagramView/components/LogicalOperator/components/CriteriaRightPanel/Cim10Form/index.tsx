@@ -10,10 +10,10 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition, PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
 import { CriteriaDrawerComponentProps } from 'types'
-import { Cim10DataType, Comparators, RessourceType } from 'types/requestCriterias'
+import { Cim10DataType, Comparators, CriteriaType } from 'types/requestCriterias'
 
 export const defaultCondition: Omit<Cim10DataType, 'id'> = {
-  type: RessourceType.CONDITION,
+  type: CriteriaType.CONDITION,
   title: 'Critère de diagnostic',
   code: [],
   label: undefined,

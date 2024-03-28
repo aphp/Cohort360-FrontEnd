@@ -32,7 +32,7 @@ import DocStatusFilter from 'components/Filters/DocStatusFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import IppFilter from 'components/Filters/IppFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
@@ -63,7 +63,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
       selectFilter,
       resetSavedFilterError
     }
-  } = useSavedFilters<DocumentsFilters>(RessourceType.DOCUMENTS)
+  } = useSavedFilters<DocumentsFilters>(ResourceType.DOCUMENTS)
 
   const [documentsResult, setDocumentsResult] = useState<ResultsType>({ nb: 0, total: 0, label: 'document(s)' })
   const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total: 0, label: 'patient(s)' })

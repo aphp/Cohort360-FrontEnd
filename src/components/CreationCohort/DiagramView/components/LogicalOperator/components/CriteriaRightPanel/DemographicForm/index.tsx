@@ -22,7 +22,7 @@ import { useAppSelector } from 'state'
 import { DurationRangeType, LabelObject, VitalStatusLabel } from 'types/searchCriterias'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
-import { CriteriaDataKey, DemographicDataType, RessourceType } from 'types/requestCriterias'
+import { CriteriaDataKey, DemographicDataType, CriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import { CriteriaDrawerComponentProps, CriteriaItemDataCache } from 'types'
 
@@ -82,7 +82,7 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
       isInclusive,
       vitalStatus,
       title,
-      type: RessourceType.PATIENT
+      type: CriteriaType.PATIENT
     })
   }
   return (

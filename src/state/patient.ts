@@ -48,7 +48,7 @@ import {
   SearchCriterias
 } from 'types/searchCriterias'
 import { isCustomError } from 'utils/perimeters'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { mapToAttribute } from 'mappers/pmsi'
 import {
   BIOLOGY_HIERARCHY_ITM_ANABIO,
@@ -96,7 +96,7 @@ export type PatientState = null | {
  */
 type FetchPmsiParams = {
   options: {
-    selectedTab: RessourceType.CLAIM | RessourceType.PROCEDURE | RessourceType.CONDITION
+    selectedTab: ResourceType.CLAIM | ResourceType.PROCEDURE | ResourceType.CONDITION
     page: number
     searchCriterias: SearchCriterias<PMSIFilters>
   }
@@ -130,9 +130,9 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const searchInput =
         options.searchCriterias.searchInput === '' ? '' : options.searchCriterias.searchInput + WILDCARD
       const codeUrl =
-        selectedTab === RessourceType.CLAIM
+        selectedTab === ResourceType.CLAIM
           ? CLAIM_HIERARCHY
-          : selectedTab === RessourceType.PROCEDURE
+          : selectedTab === ResourceType.PROCEDURE
           ? PROCEDURE_HIERARCHY
           : CONDITION_HIERARCHY
       const code = options.searchCriterias.filters.code.map((e) => encodeURIComponent(`${codeUrl}|`) + e.id).join(',')
@@ -179,11 +179,11 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       }
 
       switch (selectedTab) {
-        case RessourceType.CONDITION:
+        case ResourceType.CONDITION:
           return { condition: pmsiReturn as IPatientPmsi<Condition> }
-        case RessourceType.PROCEDURE:
+        case ResourceType.PROCEDURE:
           return { procedure: pmsiReturn as IPatientPmsi<Procedure> }
-        case RessourceType.CLAIM:
+        case ResourceType.CLAIM:
           return { claim: pmsiReturn as IPatientPmsi<Claim> }
       }
     } catch (error) {
@@ -284,7 +284,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
  */
 type FetchMedicationParams = {
   options: {
-    selectedTab: RessourceType.MEDICATION_REQUEST | RessourceType.MEDICATION_ADMINISTRATION
+    selectedTab: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION
     page: number
     searchCriterias: SearchCriterias<MedicationFilters>
   }
@@ -361,9 +361,9 @@ const fetchMedication = createAsyncThunk<
       }
 
       switch (selectedTab) {
-        case RessourceType.MEDICATION_REQUEST:
+        case ResourceType.MEDICATION_REQUEST:
           return { prescription: medicationReturn as IPatientMedication<MedicationRequest> }
-        case RessourceType.MEDICATION_ADMINISTRATION:
+        case ResourceType.MEDICATION_ADMINISTRATION:
           return { administration: medicationReturn as IPatientMedication<MedicationAdministration> }
       }
     } catch (error) {
@@ -730,7 +730,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
         services.patients.fetchPMSI(
           0,
           patientId,
-          RessourceType.CONDITION,
+          ResourceType.CONDITION,
           '',
           '',
           '',
@@ -746,7 +746,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
         services.patients.fetchPMSI(
           0,
           patientId,
-          RessourceType.PROCEDURE,
+          ResourceType.PROCEDURE,
           '',
           '',
           '',
@@ -762,7 +762,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
         services.patients.fetchPMSI(
           0,
           patientId,
-          RessourceType.CLAIM,
+          ResourceType.CLAIM,
           '',
           '',
           '',
@@ -923,7 +923,7 @@ const patientSlice = createSlice({
         ? {
             loading: true,
             patientInfo: {
-              resourceType: RessourceType.PATIENT,
+              resourceType: ResourceType.PATIENT,
               lastGhm: 'loading',
               lastProcedure: 'loading',
               mainDiagnosis: 'loading'
@@ -935,7 +935,7 @@ const patientSlice = createSlice({
             patientInfo: state.patientInfo
               ? state.patientInfo
               : {
-                  resourceType: RessourceType.PATIENT
+                  resourceType: ResourceType.PATIENT
                 }
           }
     )
@@ -991,7 +991,7 @@ const patientSlice = createSlice({
         ? {
             loading: true,
             patientInfo: {
-              resourceType: RessourceType.PATIENT,
+              resourceType: ResourceType.PATIENT,
               lastGhm: 'loading',
               lastProcedure: 'loading',
               mainDiagnosis: 'loading'
@@ -1003,7 +1003,7 @@ const patientSlice = createSlice({
             patientInfo: state.patientInfo
               ? { ...state.patientInfo, lastGhm: 'loading', lastProcedure: 'loading', mainDiagnosis: 'loading' }
               : {
-                  resourceType: RessourceType.PATIENT,
+                  resourceType: ResourceType.PATIENT,
                   lastGhm: 'loading',
                   lastProcedure: 'loading',
                   mainDiagnosis: 'loading'
@@ -1022,7 +1022,7 @@ const patientSlice = createSlice({
                   ...action.payload.patientInfo
                 }
               : {
-                  resourceType: RessourceType.PATIENT,
+                  resourceType: ResourceType.PATIENT,
                   ...action.payload.patientInfo
                 },
             pmsi: action.payload.pmsi
@@ -1039,7 +1039,7 @@ const patientSlice = createSlice({
             mainDiagnosis: undefined
           }
         : {
-            resourceType: RessourceType.PATIENT,
+            resourceType: ResourceType.PATIENT,
             lastGhm: undefined,
             lastProcedure: undefined,
             mainDiagnosis: undefined
@@ -1451,30 +1451,21 @@ function linkElementWithEncounter<
     let encounterId = ''
     // @ts-ignore
     switch (entry.resourceType) {
-      case RessourceType.CLAIM:
+      case ResourceType.CLAIM:
         encounterId = (entry as Claim).item?.[0].encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
         break
-      case RessourceType.PROCEDURE:
-      case RessourceType.CONDITION:
-        encounterId = (entry as Procedure | Condition).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
+      case ResourceType.PROCEDURE:
+      case ResourceType.CONDITION:
+      case ResourceType.MEDICATION_REQUEST:
+      case ResourceType.OBSERVATION:
+      case ResourceType.IMAGING:
+        encounterId = entry.encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
-      case RessourceType.DOCUMENTS:
+      case ResourceType.DOCUMENTS:
         encounterId = (entry as DocumentReference).context?.encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
         break
-      case RessourceType.MEDICATION_REQUEST:
-        encounterId = (entry as MedicationRequest).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
-        break
-      case RessourceType.MEDICATION_ADMINISTRATION:
+      case ResourceType.MEDICATION_ADMINISTRATION:
         encounterId = (entry as MedicationAdministration).context?.reference?.replace(/^Encounter\//, '') ?? ''
-        break
-      case RessourceType.OBSERVATION:
-        encounterId = (entry as Observation).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
-        break
-      case RessourceType.IMAGING:
-        encounterId = (entry as ImagingStudy).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
-        break
-      case RessourceType.QUESTIONNAIRE_RESPONSE:
-        encounterId = entry.encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
     }
 
@@ -1536,11 +1527,11 @@ function fillElementInformation<
     }
   }
 
-  if (resourceType !== RessourceType.DOCUMENTS && encounter?.documents && encounter.documents.length > 0) {
+  if (resourceType !== ResourceType.DOCUMENTS && encounter?.documents && encounter.documents.length > 0) {
     newElement.documents = encounter.documents
   }
 
-  if (resourceType === RessourceType.QUESTIONNAIRE_RESPONSE) {
+  if (resourceType === ResourceType.QUESTIONNAIRE_RESPONSE) {
     newElement.hospitDates = encounter.period
   }
 

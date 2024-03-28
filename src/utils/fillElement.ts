@@ -2,13 +2,13 @@ import { AxiosResponse } from 'axios'
 import { Bundle, DocumentReference, Encounter, Identifier, ImagingStudy, Patient } from 'fhir/r4'
 import { fetchPatient, fetchEncounter } from 'services/aphp/callApi'
 import { CohortComposition, CohortImaging, FHIR_API_Response } from 'types'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { getApiResponseResources } from './apiHelpers'
 
 const retrieveEncounterIds = (elementEntries: (DocumentReference | ImagingStudy)[]) => {
   return elementEntries
     .map((e) =>
-      e.resourceType === RessourceType.DOCUMENTS
+      e.resourceType === ResourceType.DOCUMENTS
         ? e.context?.encounter?.[0]?.reference?.replace(/^Encounter\//, '')
         : e.encounter?.reference?.replace(/^Encounter\//, '')
     )
@@ -30,7 +30,7 @@ const getLinkedPatient = (patients: Patient[], entry: DocumentReference | Imagin
 
 const getLinkedEncounter = (encounters: Encounter[], entry: DocumentReference | ImagingStudy) => {
   const encounterLocation =
-    entry.resourceType === RessourceType.DOCUMENTS ? entry.context?.encounter?.[0] : entry.encounter
+    entry.resourceType === ResourceType.DOCUMENTS ? entry.context?.encounter?.[0] : entry.encounter
   const encounterId = encounterLocation?.reference?.replace(/^Encounter\//, '')
   return encounters.find((encounter) => encounter.id === encounterId)
 }

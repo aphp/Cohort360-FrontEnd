@@ -11,13 +11,7 @@ import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
 import { CriteriaDrawerComponentProps, CriteriaName } from 'types'
 import { CalendarRequestLabel } from 'types/dates'
-import {
-  Comparators,
-  CriteriaDataKey,
-  ImagingDataType,
-  RessourceType,
-  RessourceTypeLabels
-} from 'types/requestCriterias'
+import { Comparators, CriteriaDataKey, ImagingDataType, CriteriaType, CriteriaTypeLabels } from 'types/requestCriterias'
 import { DocumentAttachmentMethod, DocumentAttachmentMethodLabel, LabelObject } from 'types/searchCriterias'
 import useStyles from './styles'
 import { mappingCriteria } from '../DemographicForm'
@@ -121,7 +115,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const onSubmit = () => {
     onChangeSelectedCriteria({
       id: selectedCriteria?.id,
-      type: RessourceType.IMAGING,
+      type: CriteriaType.IMAGING,
       title,
       isInclusive,
       occurrence,
@@ -162,7 +156,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
 
   return (
     <CriteriaLayout
-      criteriaLabel={`d'${RessourceTypeLabels.IMAGING}`}
+      criteriaLabel={`d'${CriteriaTypeLabels.IMAGING}`}
       title={title}
       onChangeTitle={setTitle}
       isEdition={isEdition}

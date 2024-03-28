@@ -11,10 +11,10 @@ import { fetchProcedure, PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
 
 import { CriteriaDrawerComponentProps } from 'types'
-import { CcamDataType, Comparators, RessourceType } from 'types/requestCriterias'
+import { CcamDataType, Comparators, CriteriaType } from 'types/requestCriterias'
 
 export const defaultProcedure: Omit<CcamDataType, 'id'> = {
-  type: RessourceType.PROCEDURE,
+  type: CriteriaType.PROCEDURE,
   title: "Critères d'actes CCAM",
   label: undefined,
   code: [],

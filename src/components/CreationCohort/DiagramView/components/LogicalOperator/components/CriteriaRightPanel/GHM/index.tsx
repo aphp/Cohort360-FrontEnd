@@ -10,10 +10,10 @@ import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchClaim, PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
 import { CriteriaDrawerComponentProps } from 'types'
-import { Comparators, GhmDataType, RessourceType } from 'types/requestCriterias'
+import { Comparators, GhmDataType, CriteriaType } from 'types/requestCriterias'
 
 export const defaultClaim: Omit<GhmDataType, 'id'> = {
-  type: RessourceType.CLAIM,
+  type: CriteriaType.CLAIM,
   title: 'Critères GHM',
   code: [],
   label: undefined,

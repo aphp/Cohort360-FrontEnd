@@ -17,9 +17,11 @@ import {
   DocumentDataType,
   EncounterDataType,
   GhmDataType,
+  HospitDataType,
   ImagingDataType,
   MedicationDataType,
-  ObservationDataType
+  ObservationDataType,
+  PregnancyDataType
 } from 'types/requestCriterias'
 import { comparatorToFilter, parseOccurence } from './valueComparator'
 import services from 'services/aphp'
@@ -210,6 +212,8 @@ export const unbuildAdvancedCriterias = (
     | MedicationDataType
     | ObservationDataType
     | ImagingDataType
+    | PregnancyDataType
+    | HospitDataType
 ) => {
   if (element.occurrence) {
     currentCriterion.occurrence = element.occurrence ? element.occurrence.n : 1

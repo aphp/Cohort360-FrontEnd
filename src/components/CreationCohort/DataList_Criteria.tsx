@@ -18,7 +18,7 @@ import HospitForm from './DiagramView/components/LogicalOperator/components/Crit
 import services from 'services/aphp'
 
 import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION } from '../../constants'
-import { RessourceType } from 'types/requestCriterias'
+import { CriteriaType } from 'types/requestCriterias'
 
 // ├── Mes requêtes
 // ├── Liste d'IPP
@@ -188,9 +188,10 @@ const criteriaList: CriteriaItemType[] = [
         components: null,
         color: '#0063AF',
         fontWeight: 'normal',
+        disabled: false,
         subItems: [
           {
-            id: RessourceType.PREGNANCY,
+            id: CriteriaType.PREGNANCY,
             title: 'Fiche Grossesse',
             color: '#0063AF',
             fontWeight: 'normal',
