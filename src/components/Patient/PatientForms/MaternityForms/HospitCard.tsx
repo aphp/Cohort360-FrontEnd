@@ -55,10 +55,6 @@ const HospitCard: React.FC<HospitCardProps> = ({ form }) => {
       name: 'Date geste ou chirurgie',
       value: getDataFromForm(form, hospitForm.chirurgicalGestureDate)
     },
-    {
-      name: 'Âge gestationnel lors de la chirurgie ou du geste',
-      value: getDataFromForm(form, hospitForm.ageDuringChirurgicalGesture)
-    },
     { name: 'Type de geste ou chirurgie', value: getDataFromForm(form, hospitForm.chirurgicalGesture) },
     {
       name: 'Accouchement',
