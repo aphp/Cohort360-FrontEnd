@@ -1459,6 +1459,7 @@ function linkElementWithEncounter<
       case ResourceType.MEDICATION_REQUEST:
       case ResourceType.OBSERVATION:
       case ResourceType.IMAGING:
+      case ResourceType.QUESTIONNAIRE_RESPONSE:
         encounterId = entry.encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
       case ResourceType.DOCUMENTS:
@@ -1532,7 +1533,7 @@ function fillElementInformation<
   }
 
   if (resourceType === ResourceType.QUESTIONNAIRE_RESPONSE) {
-    newElement.hospitDates = encounter.period
+    newElement.hospitDates = encounter?.period
   }
 
   return newElement
