@@ -48,12 +48,12 @@ import {
 } from 'fhir/r4'
 import {
   Direction,
-  DocumentStatuses,
   FormNames,
   Filters,
   Order,
   SearchByTypes,
-  SearchCriterias
+  SearchCriterias,
+  FilterByDocumentStatus
 } from 'types/searchCriterias'
 import { ResourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
@@ -866,7 +866,7 @@ export const getEncounterDocuments = async (
 
   const documentsResp = await fetchDocumentReference({
     encounter: encountersIdList.join(','),
-    docStatuses: [DocumentStatuses.FINAL],
+    docStatuses: [FilterByDocumentStatus.VALIDATED],
     _list: groupId ? groupId.split(',') : []
   })
 
