@@ -15,7 +15,8 @@ import {
   ListItemIcon,
   Typography,
   Tooltip,
-  Zoom
+  Zoom,
+  Box
 } from '@mui/material'
 
 import AddIcon from '@mui/icons-material/Add'
@@ -39,6 +40,7 @@ import { resetCohortCreation } from 'state/cohortCreation'
 
 import { ODD_CONTACT } from '../../../constants'
 import useStyles from './styles'
+import versionInfo from 'data/version.json'
 
 const smallDrawerWidth = 52
 const largeDrawerWidth = 260
@@ -414,6 +416,13 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               </List>
             </Collapse>
           </List>
+
+          {open && versionInfo.version && (
+            <Box className={classes.footer}>
+              <Divider />
+              <Typography variant="caption">{`${versionInfo.version} (${versionInfo.commit})`}</Typography>
+            </Box>
+          )}
 
           {ODD_CONTACT &&
             (open ? (

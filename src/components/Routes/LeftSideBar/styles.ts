@@ -142,6 +142,17 @@ const useStyles = makeStyles()((theme: Theme) => ({
     '&:hover': {
       color: '#499cbf'
     }
+  },
+  footer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'fixed',
+    bottom: 0,
+    width: 'inherit',
+    height: 50,
+    backgroundColor: '#232E6A',
+    color: '#FFF'
   }
 }))
 
