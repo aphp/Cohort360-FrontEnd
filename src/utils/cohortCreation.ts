@@ -239,7 +239,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
           ? DocumentStatuses.FINAL
           : _status === FilterByDocumentStatus.NOT_VALIDATED
           ? DocumentStatuses.PRELIMINARY
-          : DocumentStatuses.CANCELED
+          : ''
       filterDocStatuses.push(`${DOC_STATUS_CODE_SYSTEM}|${status}`)
     }
     return filterDocStatuses.join(',')

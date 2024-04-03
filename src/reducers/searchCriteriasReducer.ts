@@ -17,8 +17,7 @@ import {
   FilterKeys,
   FilterValue,
   CohortsFilters,
-  MaternityFormFilters,
-  FilterByDocumentStatus
+  MaternityFormFilters
 } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
 
@@ -124,7 +123,7 @@ export const initPatientDocsSearchCriterias: SearchCriterias<DocumentsFilters> =
   searchBy: SearchByTypes.TEXT,
   filters: {
     nda: '',
-    docStatuses: [FilterByDocumentStatus.VALIDATED],
+    docStatuses: [],
     docTypes: [],
     onlyPdfAvailable: true,
     startDate: null,
@@ -143,7 +142,7 @@ export const initAllDocsSearchCriterias: SearchCriterias<DocumentsFilters> = {
   filters: {
     ipp: '',
     nda: '',
-    docStatuses: [FilterByDocumentStatus.VALIDATED],
+    docStatuses: [],
     docTypes: [],
     onlyPdfAvailable: true,
     startDate: null,

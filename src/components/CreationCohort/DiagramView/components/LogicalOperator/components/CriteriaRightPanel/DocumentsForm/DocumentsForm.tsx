@@ -51,7 +51,7 @@ const defaultComposition: Omit<DocumentDataType, 'id'> = {
   startOccurrence: '',
   endOccurrence: '',
   isInclusive: true,
-  docStatuses: [FilterByDocumentStatus.VALIDATED]
+  docStatuses: []
 }
 
 const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
@@ -72,11 +72,7 @@ const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
 
   const isEdition = selectedCriteria !== null ? true : false
 
-  const docStatuses: string[] = [
-    FilterByDocumentStatus.VALIDATED,
-    FilterByDocumentStatus.NOT_VALIDATED,
-    FilterByDocumentStatus.CANCELED
-  ]
+  const docStatuses: string[] = [FilterByDocumentStatus.VALIDATED, FilterByDocumentStatus.NOT_VALIDATED]
 
   const _onSubmit = () => {
     onChangeSelectedCriteria({ ...defaultValues, occurrence: occurrence, occurrenceComparator: occurrenceComparator })

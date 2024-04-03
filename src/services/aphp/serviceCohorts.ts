@@ -512,10 +512,17 @@ const servicesCohorts: IServiceCohorts = {
         uniqueFacet: ['subject'],
         executiveUnits: executiveUnits.map((eu) => eu.id)
       }),
-      !!searchInput || docTypes.length > 0 || !!nda || !!ipp || !!startDate || !!endDate
+      !!searchInput ||
+      docTypes.length > 0 ||
+      !!nda ||
+      !!ipp ||
+      !!startDate ||
+      !!endDate ||
+      executiveUnits.length > 0 ||
+      docStatuses.length > 0 ||
+      !!onlyPdfAvailable
         ? fetchDocumentReference({
             signal: signal,
-            docStatuses: docStatuses,
             _list: groupId ? [groupId] : [],
             size: 0,
             uniqueFacet: ['subject']

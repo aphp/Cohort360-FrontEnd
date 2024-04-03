@@ -733,7 +733,7 @@ export function mapDocumentStatusesToRequestParam(docStatus: string): string {
     ? DocumentStatuses.FINAL
     : docStatus === FilterByDocumentStatus.NOT_VALIDATED
     ? DocumentStatuses.PRELIMINARY
-    : DocumentStatuses.CANCELED
+    : ''
 }
 
 export function mapDocumentStatusesFromRequestParam(docStatus: string): string {
@@ -741,5 +741,5 @@ export function mapDocumentStatusesFromRequestParam(docStatus: string): string {
     ? FilterByDocumentStatus.VALIDATED
     : docStatus === DocumentStatuses.PRELIMINARY
     ? FilterByDocumentStatus.NOT_VALIDATED
-    : FilterByDocumentStatus.CANCELED
+    : ''
 }

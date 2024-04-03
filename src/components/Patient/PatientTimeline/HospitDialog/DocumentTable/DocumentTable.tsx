@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 
-import { CohortComposition, CompositionStatusKind, DocumentReferenceStatusKind } from 'types'
+import { CohortComposition } from 'types'
+import { DocumentReference } from 'fhir/r4'
+
+import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
 
 import {
-  Chip,
   Grid,
   IconButton,
   Paper,
@@ -44,23 +46,21 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
     type: document.type?.coding?.[0].display ?? document.type?.coding?.[0].code ?? '-'
   }
 
-  const getStatusChip = (type?: CompositionStatusKind | DocumentReferenceStatusKind) => {
-    if (type === 'final' || type === 'current') {
-      return (
-        <Chip
-          className={classes.validChip}
-          icon={<CheckIcon height="15px" fill="#FFF" />}
-          label={getDocumentStatus(type)}
-        />
-      )
-    } else {
-      return (
-        <Chip
-          className={classes.cancelledChip}
-          icon={<CancelIcon height="15px" fill="#FFF" />}
-          label={getDocumentStatus(type)}
-        />
-      )
+  const getStatusChip = (type?: DocumentReference['docStatus']) => {
+    switch (type) {
+      case 'preliminary':
+        return (
+          <StatusChip
+            icon={<CancelIcon height="15px" fill="#FFF" />}
+            status={ChipStyles.CANCELLED}
+            label={getDocumentStatus(type)}
+          />
+        )
+      case 'final':
+        return <StatusChip icon={<CheckIcon height="15px" fill="#FFF" />} label={getDocumentStatus(type)} />
+
+      default:
+        return ''
     }
   }
 
@@ -76,7 +76,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
           {row.description}
         </TableCellWrapper>
         <TableCellWrapper>{row.serviceProvider}</TableCellWrapper>
-        <TableCellWrapper>{getStatusChip(row.status as DocumentReferenceStatusKind)}</TableCellWrapper>
+        <TableCellWrapper>{getStatusChip(row.docStatus)}</TableCellWrapper>
         <TableCellWrapper>
           <IconButton onClick={() => setDocumentDialogOpen(true)}>
             <Visibility height="30px" />

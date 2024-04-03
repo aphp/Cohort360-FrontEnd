@@ -115,13 +115,11 @@ export enum SearchByTypesLabelDocuments {
 }
 export enum FilterByDocumentStatus {
   VALIDATED = 'Validé',
-  NOT_VALIDATED = 'Non validé',
-  CANCELED = 'Annulé'
+  NOT_VALIDATED = 'Non validé'
 }
 export enum DocumentStatuses {
   FINAL = 'final',
-  PRELIMINARY = 'preliminary',
-  CANCELED = 'canceled' // todo: get FHIR mapped value
+  PRELIMINARY = 'preliminary'
 }
 export enum FilterKeys {
   IPP = 'ipp',

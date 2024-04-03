@@ -105,11 +105,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
 
   const controllerRef = useRef<AbortController>(new AbortController())
 
-  const docStatusesList = [
-    FilterByDocumentStatus.VALIDATED,
-    FilterByDocumentStatus.NOT_VALIDATED,
-    FilterByDocumentStatus.CANCELED
-  ]
+  const docStatusesList = [FilterByDocumentStatus.VALIDATED, FilterByDocumentStatus.NOT_VALIDATED]
 
   const fetchDocumentsList = async () => {
     try {

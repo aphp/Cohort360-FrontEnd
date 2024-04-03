@@ -33,12 +33,6 @@ export enum CohortJobStatus {
   _new = 'new'
 }
 
-export enum DocumentReferenceStatusKind {
-  _current = 'current',
-  _superseded = 'superseded',
-  _enteredInError = 'entered-in-error'
-}
-
 export enum EncounterStatusKind {
   _planned = 'planned',
   _arrived = 'arrived',
@@ -55,13 +49,6 @@ export enum LoadingStatus {
   FETCHING = 'FETCHING',
   IDDLE = 'IDLE',
   SUCCESS = 'SUCCESS'
-}
-
-export enum CompositionStatusKind {
-  _preliminary = 'preliminary',
-  _final = 'final',
-  _amended = 'amended',
-  _enteredInError = 'entered-in-error'
 }
 
 export enum TemporalConstraintsKind {

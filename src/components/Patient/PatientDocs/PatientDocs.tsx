@@ -99,11 +99,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
 
-  const docStatusesList = [
-    FilterByDocumentStatus.VALIDATED,
-    FilterByDocumentStatus.NOT_VALIDATED,
-    FilterByDocumentStatus.CANCELED
-  ]
+  const docStatusesList = [FilterByDocumentStatus.VALIDATED, FilterByDocumentStatus.NOT_VALIDATED]
   const fetchDocumentsList = async () => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)

@@ -157,7 +157,7 @@ const Patient = () => {
                 to={`/patients/${patientId}/imaging${groupId ? `?groupId=${groupId}` : ''}`}
               />
             )}
-            {ODD_QUESTIONNAIRE && (
+            {ODD_QUESTIONNAIRE && !deidentified && (
               <Tab
                 className={classes.tabTitle}
                 label="Formulaires"
