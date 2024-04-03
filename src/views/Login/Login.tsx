@@ -124,12 +124,10 @@ const Login = () => {
   const [open, setOpen] = useState(false)
   const urlParams = new URLSearchParams(window.location.search)
   const [display_jwt_form, setDisplay_jwt_form] = useState(false)
-  const nextPage = urlParams.get('next')
   const oidcCode = urlParams.get('code')
 
   useEffect(() => {
     localforage.setItem('persist:root', '')
-    if (nextPage) localStorage.setItem('next', nextPage)
     if (oidcCode) login()
   }, [])
 
@@ -197,15 +195,9 @@ const Login = () => {
 
       dispatch(loginAction(loginState))
 
-      const next = localStorage.getItem('next')
-      localStorage.removeItem('next')
-      if (next) {
-        navigate(next, { replace: true })
-      } else {
-        const oldPath = localStorage.getItem('old-path')
-        localStorage.removeItem('old-path')
-        navigate(oldPath ?? '/home')
-      }
+      const oldPath = localStorage.getItem('old-path')
+      localStorage.removeItem('old-path')
+      navigate(oldPath ?? '/home')
     }
   }
 
