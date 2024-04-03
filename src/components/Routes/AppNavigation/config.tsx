@@ -12,7 +12,7 @@ import PageNotFound from 'views/PageNotFound/PageNotFound'
 import CareSiteView from 'views/Scope/CareSiteView'
 import MyCohorts from 'views/MyCohorts'
 import MyRequests from 'views/MyRequests'
-import ExportDownload from '../../../views/ExportDownload/ExportDownload'
+import ExportDownload from 'views/ExportDownload/ExportDownload'
 
 // import { ODD_CONTACT } from '../../../constants'
 
