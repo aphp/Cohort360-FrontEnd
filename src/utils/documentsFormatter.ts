@@ -1,18 +1,13 @@
 import docTypes from 'assets/docTypes.json'
-import { CompositionStatusKind, DocumentReferenceStatusKind, EncounterStatusKind, SimpleCodeType } from 'types'
+import { EncounterStatusKind, SimpleCodeType } from 'types'
+import { DocumentReference } from 'fhir/r4'
 
-export const getDocumentStatus = (status?: CompositionStatusKind | DocumentReferenceStatusKind): string => {
+export const getDocumentStatus = (status?: DocumentReference['docStatus']): string => {
   switch (status) {
-    case CompositionStatusKind._amended:
-      return 'Corrigé'
-    case CompositionStatusKind._enteredInError:
-    case DocumentReferenceStatusKind._enteredInError:
-      return 'Annulé'
-    case CompositionStatusKind._final:
-    case DocumentReferenceStatusKind._current:
+    case 'final':
       return 'Validé'
-    case CompositionStatusKind._preliminary:
-      return 'Préliminaire'
+    case 'preliminary':
+      return 'Non Validé'
     default:
       return 'Statut inconnu'
   }
