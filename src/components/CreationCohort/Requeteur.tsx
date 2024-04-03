@@ -35,7 +35,6 @@ const Requeteur = () => {
     allowSearchIpp = false
   } = useAppSelector((state) => state.cohortCreation.request || {})
   const criteriaData = useAppSelector((state) => state.cohortCreation.criteria || {})
-  const user = useAppSelector((state) => state.me)
 
   const params = useParams<{
     requestId: string
@@ -81,8 +80,7 @@ const Requeteur = () => {
     try {
       const criteriaCache = await getDataFromFetch(criteriaList, selectedCriteria, criteriaData.cache)
 
-      const selectedPopulationIds = selectedPopulation?.map((perimeter) => perimeter?.cohort_id)
-      const allowMaternityForms = selectedPopulationIds?.every((id) => user?.nominativeGroupsIds?.includes(id))
+      const allowMaternityForms = selectedPopulation?.every((population) => population?.access === 'Nominatif')
 
       dispatch(
         setCriteriaData({
