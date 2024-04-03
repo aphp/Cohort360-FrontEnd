@@ -34,14 +34,24 @@ import {
   ParametersParameter,
   Patient,
   Procedure,
+  Questionnaire,
+  QuestionnaireResponse,
   ValueSet
 } from 'fhir/r4'
 import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 import { idSort, labelSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
-import { CODE_HIERARCHY_EXTENSION_NAME } from '../../constants'
+import {
+  CODE_HIERARCHY_EXTENSION_NAME,
+  CONDITION_STATUS,
+  IMAGING_MODALITIES,
+  MEDICATION_ADMINISTRATIONS,
+  MEDICATION_PRESCRIPTION_TYPES,
+  DOC_STATUS_CODE_SYSTEM
+} from '../../constants'
 import { Direction, Order, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
-import { RessourceType } from 'types/requestCriterias'
+import { mapDocumentStatusesToRequestParam } from '../../mappers/filters'
+import { ResourceType } from 'types/requestCriterias'
 
 export const paramValuesReducerWithPrefix =
   (prefix: string): ((accumulator: string, currentValue: string) => string) =>
@@ -166,7 +176,7 @@ export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Pro
   let options: string[] = ['subject.active=true']
   if (_id) options = [...options, `_id=${_id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
-  if (offset) options = [...options, `offset=${offset}`]
+  if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (patient) options = [...options, `subject=${patient}`]
   if (type) options = [...options, `type=${type}`]
@@ -203,7 +213,7 @@ type fetchDocumentReferenceProps = {
   maxDate?: string
   _text?: string
   highlight_search_results?: boolean
-  status?: string
+  docStatuses?: string[]
   patient?: string
   encounter?: string
   'encounter-identifier'?: string
@@ -242,7 +252,7 @@ export const fetchDocumentReference = async (
     type,
     _text,
     highlight_search_results,
-    status,
+    docStatuses,
     patient,
     encounter,
     onlyPdfAvailable,
@@ -260,17 +270,17 @@ export const fetchDocumentReference = async (
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
 
-  // By default, all the calls to `/DocumentReference` will have `type:not=https://terminology.eds.aphp.fr/aphp-orbis-document-textuel-hospitalier|doc-impor`, contenttype=http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain, and patient.active=true in parameter
+  // By default, all the calls to `/DocumentReference` will have `type:not=https://terminology.eds.aphp.fr/aphp-orbis-document-textuel-hospitalier|doc-impor`, contenttype=text/plain, and patient.active=true in parameter
   let options: string[] = [
     `type:not=${encodeURIComponent(
       'https://terminology.eds.aphp.fr/aphp-orbis-document-textuel-hospitalier|doc-impor'
     )}`,
-    `contenttype=${encodeURIComponent('http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain')}`,
+    `contenttype=${encodeURIComponent('text/plain')}`,
     'subject.active=true'
   ]
   if (_id) options = [...options, `_id=${_id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
-  if (offset) options = [...options, `offset=${offset}`]
+  if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (type) options = [...options, `type=${type}`]
   if (_text)
@@ -284,20 +294,18 @@ export const fetchDocumentReference = async (
           : ''
       }`
     ]
-  if (status)
-    options = [
-      ...options,
-      `docstatus=${encodeURIComponent('http://hl7.org/fhir/CodeSystem/composition-status|') + status}`
-    ]
+  if (docStatuses && docStatuses.length > 0) {
+    const docStatusesUrl = DOC_STATUS_CODE_SYSTEM
+    const urlString = docStatuses
+      .map((status) => `${docStatusesUrl}|${mapDocumentStatusesToRequestParam(status)}`)
+      .join(',')
+    options = [...options, `docstatus=${encodeURIComponent(urlString)}`]
+  }
   if (patient) options = [...options, `subject=${patient}`]
   if (patientIdentifier) options = [...options, `subject.identifier=${patientIdentifier}`]
   if (encounter) options = [...options, `encounter=${encounter}`]
   if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`]
-  if (onlyPdfAvailable)
-    options = [
-      ...options,
-      `contenttype=${encodeURIComponent('http://terminology.hl7.org/CodeSystem/v3-mediatypes|application/pdf')}`
-    ]
+  if (onlyPdfAvailable) options = [...options, `contenttype=${encodeURIComponent('application/pdf')}`]
   if (minDate) options = [...options, `date=ge${minDate}`]
   if (maxDate) options = [...options, `date=le${maxDate}`]
   if (executiveUnits && executiveUnits.length > 0)
@@ -341,7 +349,7 @@ export const fetchDocumentReferenceContent = async (docId: string): FHIR_API_Pro
  */
 
 export const postFilters = async (
-  fhir_resource: RessourceType,
+  fhir_resource: ResourceType,
   name: string,
   filter: string
 ): Promise<AxiosResponse<SavedFilter>> => {
@@ -356,7 +364,7 @@ export const postFilters = async (
 }
 
 export const getFilters = async (
-  fhir_resource: RessourceType,
+  fhir_resource: ResourceType,
   limit: number,
   offset: number,
   next?: string | null
@@ -383,7 +391,7 @@ export const deleteFilters = async (fhir_resource_uuids: string[]): Promise<Axio
 }
 
 export const patchFilters = async (
-  fhir_resource: RessourceType,
+  fhir_resource: ResourceType,
   uuid: string,
   name: string,
   filter: string
@@ -449,14 +457,13 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   // By default, all the calls to `/Procedure` will have 'patient.active=true' in parameter
   let options: string[] = ['subject.active=true']
   if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
+  if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `code=${code}`] // eslint-disable-line
   if (source) options = [...options, `source=${source}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
-  if (status)
-    options = [...options, `status=${encodeURIComponent('http://hl7.org/fhir/CodeSystem/event-status|') + status}`]
+  if (status) options = [...options, `status=${encodeURIComponent(`${DOC_STATUS_CODE_SYSTEM}|${status}`)}`]
   if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`]
   if (minDate) options = [...options, `date=ge${minDate}`]
   if (maxDate) options = [...options, `date=le${maxDate}`]
@@ -514,7 +521,7 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
   // By default, all the calls to `/Claim` will have 'patient.active=true' in parameter
   let options: string[] = ['patient.active=true']
   if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
+  if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
   if (diagnosis) options = [...options, `diagnosis=${diagnosis}`] // eslint-disable-line
@@ -574,7 +581,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   // By default, all the calls to `/Condition` will have 'patient.active=true' in parameter
   let options: string[] = ['subject.active=true']
   if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset !== undefined) options = [...options, `offset=${offset}`] // eslint-disable-line
+  if (offset !== undefined) options = [...options, `_offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `code=${code}`] // eslint-disable-line
@@ -587,9 +594,9 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
   if (type && type.length > 0) {
-    const diagnosticTypesUrl = encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-condition-status|')
+    const diagnosticTypesUrl = `${CONDITION_STATUS}|`
     const urlString = type.map((id) => diagnosticTypesUrl + id).join(',')
-    options = [...options, `orbis-status=${urlString}`]
+    options = [...options, `orbis-status=${encodeURIComponent(urlString)}`]
   }
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Condition>>(`/Condition?${options.reduce(paramsReducer)}`, {
@@ -644,7 +651,7 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   let options: string[] = ['value-quantity=ge0,le0', 'subject.active=true']
   if (id) options = [...options, `_id=${id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
-  if (offset) options = [...options, `offset=${offset}`]
+  if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort},id`}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
   if (encounter) options = [...options, `encounter.identifier=${encounter}`]
@@ -678,7 +685,7 @@ type fetchMedicationRequestProps = {
   _text?: string
   encounter?: string
   subject?: string
-  type?: string
+  type?: string[]
   minDate: string | null
   maxDate: string | null
   _list?: string[]
@@ -712,12 +719,16 @@ export const fetchMedicationRequest = async (
   let options: string[] = ['subject.active=true']
   if (id) options = [...options, `_id=${id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
-  if (offset !== undefined) options = [...options, `offset=${offset}`]
+  if (offset !== undefined) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (subject) options = [...options, `subject=${subject}`]
   if (encounter) options = [...options, `encounter.identifier=${encounter}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
-  if (type) options = [...options, `category=*${encodeURIComponent('|')}${type}`]
+  if (type && type.length > 0) {
+    const routeUrl = `${MEDICATION_PRESCRIPTION_TYPES}|`
+    const urlString = type.map((id) => routeUrl + id).join(',')
+    options = [...options, `category=${encodeURIComponent(urlString)}`]
+  }
   if (minDate) options = [...options, `validity-period-start=ge${minDate}`]
   if (maxDate) options = [...options, `validity-period-start=le${maxDate}`]
   if (executiveUnits && executiveUnits.length > 0)
@@ -744,7 +755,7 @@ type fetchMedicationAdministrationProps = {
   _text?: string
   encounter?: string
   subject?: string
-  route?: string
+  route?: string[]
   minDate: string | null
   maxDate: string | null
   _list?: string[]
@@ -778,18 +789,16 @@ export const fetchMedicationAdministration = async (
   let options: string[] = ['subject.active=true']
   if (id) options = [...options, `_id=${id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
-  if (offset) options = [...options, `offset=${offset}`]
+  if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (subject) options = [...options, `subject=${subject}`]
   if (encounter) options = [...options, `context.identifier=${encounter}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
-  if (route)
-    options = [
-      ...options,
-      `dosage-route=${
-        encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-medicament-voie-administration|') + route
-      }`
-    ] // eslint-disable-line
+  if (route && route.length > 0) {
+    const routeUrl = `${MEDICATION_ADMINISTRATIONS}|`
+    const urlString = route.map((id) => routeUrl + id).join(',')
+    options = [...options, `dosage-route=${encodeURIComponent(urlString)}`]
+  }
   if (minDate) options = [...options, `effective-time=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `effective-time=le${maxDate}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0)
@@ -820,7 +829,7 @@ type fetchImagingProps = {
   maxDate?: string
   _list?: string[]
   signal?: AbortSignal
-  modalities?: string
+  modalities?: string[]
   executiveUnits?: string[]
 }
 export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise_Response<ImagingStudy> => {
@@ -847,14 +856,18 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   let options: string[] = ['patient.active=true']
   if (patient) options = [...options, `patient=${patient}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
-  if (offset) options = [...options, `offset=${offset}`]
+  if (offset) options = [...options, `_offset=${offset}`]
   if (order) options = [...options, `_sort=${_orderDirection}${order}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
   if (encounter) options = [...options, `encounter.identifier=${encounter}`]
   if (ipp) options = [...options, `patient.identifier=${ipp}`]
   if (minDate) options = [...options, `started=ge${minDate}`]
   if (maxDate) options = [...options, `started=le${maxDate}`]
-  if (modalities) options = [...options, `modality=*${encodeURIComponent('|')}${modalities}`]
+  if (modalities && modalities.length > 0) {
+    const modalitiesUrl = `${IMAGING_MODALITIES}|`
+    const urlString = modalities.map((id) => modalitiesUrl + id).join(',')
+    options = [...options, `modality=${encodeURIComponent(urlString)}`]
+  }
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
@@ -864,6 +877,52 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
     {
       signal: signal
     }
+  )
+
+  return response
+}
+
+type fetchFormsProps = {
+  patient?: string
+  formName?: string
+  _list?: string[]
+  startDate?: string | null
+  endDate?: string | null
+  executiveUnits?: string[]
+}
+export const fetchForms = async (args: fetchFormsProps) => {
+  const { patient, formName, _list, startDate, endDate, executiveUnits } = args
+  let options: string[] = ['status=in-progress,completed']
+  if (patient) options = [...options, `subject=${patient}`]
+  if (formName) options = [...options, `questionnaire.name=${formName}`]
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
+  if (startDate) options = [...options, `authored=ge${startDate}`]
+  if (endDate) options = [...options, `authored=le${endDate}`]
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
+
+  const response = await apiFhir.get<FHIR_Bundle_Response<QuestionnaireResponse>>(
+    `/QuestionnaireResponse?${options.reduce(paramsReducer)}`
+  )
+
+  return response
+}
+
+type fetchQuestionnairesProps = {
+  name?: string
+  _elements?: string[]
+}
+export const fetchQuestionnaires = async (args: fetchQuestionnairesProps) => {
+  const { name } = args
+  let { _elements } = args
+  _elements = _elements ? _elements.filter(uniq) : []
+
+  let options: string[] = []
+  if (name) options = [...options, `name=${name}`]
+  if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer, '')}`]
+
+  const response = await apiFhir.get<FHIR_Bundle_Response<Questionnaire>>(
+    `/Questionnaire?${options.reduce(paramsReducer)}`
   )
 
   return response
@@ -895,9 +954,11 @@ const getCodeList = async (
     if (search !== '*' && search !== undefined) {
       // if noStar is true then we search for the code, else we search for the display
       searchParam = noStar
-        ? `&only-roots=false&code=${search.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
+        ? `&only-roots=false&code=${encodeURIComponent(
+            search.trim().replace(/[\[\]\/\{\}\(\)\*\?\.\\\^\$\|]/g, '\\$&') //eslint-disable-line
+          )}`
         : `&only-roots=false&_text=${encodeURIComponent(
-            search.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') //eslint-disable-line
+            search.trim().replace(/[\[\]\/\{\}\(\)\*\?\.\\\^\$\|]/g, '\\$&') //eslint-disable-line
           )}*`
     }
     // TODO test if it returns all the codes without specifying the count

@@ -11,7 +11,8 @@ import {
   IPatientMedication,
   IPatientObservation,
   IPatientImaging,
-  CohortImaging
+  CohortImaging,
+  CohortQuestionnaireResponse
 } from 'types'
 
 import { logout } from './me'
@@ -29,13 +30,16 @@ import {
   MedicationRequest,
   Observation,
   Patient,
-  Procedure
+  Procedure,
+  QuestionnaireResponse
 } from 'fhir/r4'
 import { CanceledError } from 'axios'
 import {
   BiologyFilters,
   Direction,
+  FormNames,
   ImagingFilters,
+  MaternityFormFilters,
   MedicationFilters,
   Order,
   PMSIFilters,
@@ -44,7 +48,7 @@ import {
   SearchCriterias
 } from 'types/searchCriterias'
 import { isCustomError } from 'utils/perimeters'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { mapToAttribute } from 'mappers/pmsi'
 import {
   BIOLOGY_HIERARCHY_ITM_ANABIO,
@@ -78,6 +82,12 @@ export type PatientState = null | {
   medication?: Medication
   biology?: IPatientObservation<CohortObservation>
   imaging?: IPatientImaging<CohortImaging>
+  forms?: {
+    maternityForms: {
+      loading: boolean
+      maternityFormsList: CohortQuestionnaireResponse[]
+    }
+  }
 }
 
 /**
@@ -86,7 +96,7 @@ export type PatientState = null | {
  */
 type FetchPmsiParams = {
   options: {
-    selectedTab: RessourceType.CLAIM | RessourceType.PROCEDURE | RessourceType.CONDITION
+    selectedTab: ResourceType.CLAIM | ResourceType.PROCEDURE | ResourceType.CONDITION
     page: number
     searchCriterias: SearchCriterias<PMSIFilters>
   }
@@ -120,9 +130,9 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const searchInput =
         options.searchCriterias.searchInput === '' ? '' : options.searchCriterias.searchInput + WILDCARD
       const codeUrl =
-        selectedTab === RessourceType.CLAIM
+        selectedTab === ResourceType.CLAIM
           ? CLAIM_HIERARCHY
-          : selectedTab === RessourceType.PROCEDURE
+          : selectedTab === ResourceType.PROCEDURE
           ? PROCEDURE_HIERARCHY
           : CONDITION_HIERARCHY
       const code = options.searchCriterias.filters.code.map((e) => encodeURIComponent(`${codeUrl}|`) + e.id).join(',')
@@ -169,11 +179,11 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       }
 
       switch (selectedTab) {
-        case RessourceType.CONDITION:
+        case ResourceType.CONDITION:
           return { condition: pmsiReturn as IPatientPmsi<Condition> }
-        case RessourceType.PROCEDURE:
+        case ResourceType.PROCEDURE:
           return { procedure: pmsiReturn as IPatientPmsi<Procedure> }
-        case RessourceType.CLAIM:
+        case ResourceType.CLAIM:
           return { claim: pmsiReturn as IPatientPmsi<Claim> }
       }
     } catch (error) {
@@ -274,7 +284,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
  */
 type FetchMedicationParams = {
   options: {
-    selectedTab: RessourceType.MEDICATION_REQUEST | RessourceType.MEDICATION_ADMINISTRATION
+    selectedTab: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION
     page: number
     searchCriterias: SearchCriterias<MedicationFilters>
   }
@@ -309,8 +319,8 @@ const fetchMedication = createAsyncThunk<
       const sortBy = searchCriterias.orderBy.orderBy
       const sortDirection = searchCriterias.orderBy.orderDirection
       const searchInput = searchCriterias.searchInput
-      const prescriptionTypes = searchCriterias.filters.prescriptionTypes?.map(({ id }) => id).join(',') ?? ''
-      const administrationRoutes = searchCriterias.filters.administrationRoutes?.map(({ id }) => id).join(',') ?? ''
+      const prescriptionTypes = searchCriterias.filters.prescriptionTypes?.map(({ id }) => id) ?? []
+      const administrationRoutes = searchCriterias.filters.administrationRoutes?.map(({ id }) => id) ?? []
       const nda = searchCriterias.filters.nda
       const startDate = searchCriterias.filters?.startDate
       const endDate = searchCriterias.filters.endDate
@@ -351,9 +361,9 @@ const fetchMedication = createAsyncThunk<
       }
 
       switch (selectedTab) {
-        case RessourceType.MEDICATION_REQUEST:
+        case ResourceType.MEDICATION_REQUEST:
           return { prescription: medicationReturn as IPatientMedication<MedicationRequest> }
-        case RessourceType.MEDICATION_ADMINISTRATION:
+        case ResourceType.MEDICATION_ADMINISTRATION:
           return { administration: medicationReturn as IPatientMedication<MedicationAdministration> }
       }
     } catch (error) {
@@ -400,7 +410,7 @@ const fetchImaging = createAsyncThunk<FetchImagingReturn, FetchImagingParams, { 
       const startDate = searchCriterias.filters.startDate
       const endDate = searchCriterias.filters.endDate
       const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
-      const modalities = searchCriterias.filters.modality?.map(({ id }) => id).join(',') ?? ''
+      const modalities = searchCriterias.filters.modality?.map(({ id }) => id)
 
       const imagingResponse = await services.patients.fetchImaging(
         orderBy,
@@ -433,6 +443,8 @@ const fetchImaging = createAsyncThunk<FetchImagingReturn, FetchImagingParams, { 
       console.error(error)
       if (error instanceof CanceledError) {
         return thunkApi.rejectWithValue({ error })
+      } else {
+        throw error
       }
     }
   }
@@ -471,6 +483,7 @@ const fetchDocuments = createAsyncThunk<
     const nda = searchCriterias.filters.nda
     const searchBy = searchCriterias.searchBy || SearchByTypes.TEXT
     const selectedDocTypes = searchCriterias.filters.docTypes.map((docType) => docType.code)
+    const docStatuses = searchCriterias.filters.docStatuses
     const startDate = searchCriterias.filters.startDate
     const endDate = searchCriterias.filters.endDate
     const onlyPdfAvailable = searchCriterias.filters.onlyPdfAvailable
@@ -502,6 +515,7 @@ const fetchDocuments = createAsyncThunk<
       patientId,
       searchInput,
       selectedDocTypes,
+      docStatuses,
       nda,
       onlyPdfAvailable,
       startDate,
@@ -532,6 +546,73 @@ const fetchDocuments = createAsyncThunk<
     if (error instanceof CanceledError) {
       return thunkApi.rejectWithValue({ error })
     }
+  }
+})
+
+/** fetchMaternityForms */
+type FetchMaternityFormsParams = {
+  options: {
+    searchCriterias: {
+      filters: MaternityFormFilters
+    }
+  }
+  groupId?: string
+}
+type FetchMaternityFormsReturn =
+  | {
+      forms: {
+        maternityForms: {
+          loading: boolean
+          maternityFormsList: QuestionnaireResponse[]
+        }
+      }
+    }
+  | undefined
+const fetchMaternityForms = createAsyncThunk<
+  FetchMaternityFormsReturn,
+  FetchMaternityFormsParams,
+  { state: RootState; rejectValue: any }
+>('patient/fetchMaternityForms', async ({ groupId, options: { searchCriterias } }, thunkApi) => {
+  try {
+    const patientState = thunkApi.getState().patient
+
+    const patientId = patientState?.patientInfo?.id ?? ''
+    if (!patientId) {
+      throw new Error('Patient Error: patient is required')
+    }
+    const deidentified = patientState?.deidentified ?? true
+    const hospits = patientState?.hospits?.list ?? []
+
+    const { formName, startDate, endDate, executiveUnits } = searchCriterias.filters
+    const _formName = formName.length === 0 ? [FormNames.PREGNANCY, FormNames.HOSPIT] : [...formName]
+
+    const _executiveUnits = executiveUnits?.map((unit) => unit.id)
+
+    const formResponse = await services.patients.fetchMaternityForms(
+      patientId,
+      _formName.join(),
+      groupId,
+      startDate,
+      endDate,
+      _executiveUnits
+    )
+
+    const maternityFormsList = linkElementWithEncounter(formResponse, hospits, deidentified).sort((form1, form2) => {
+      const dateForm1 = new Date(form1.authored ?? '').getTime()
+      const dateForm2 = new Date(form2.authored ?? '').getTime()
+      return dateForm2 - dateForm1
+    })
+
+    return {
+      forms: {
+        maternityForms: {
+          loading: false,
+          maternityFormsList: maternityFormsList
+        }
+      }
+    }
+  } catch (error) {
+    console.error(error)
   }
 })
 
@@ -649,7 +730,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
         services.patients.fetchPMSI(
           0,
           patientId,
-          RessourceType.CONDITION,
+          ResourceType.CONDITION,
           '',
           '',
           '',
@@ -665,7 +746,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
         services.patients.fetchPMSI(
           0,
           patientId,
-          RessourceType.PROCEDURE,
+          ResourceType.PROCEDURE,
           '',
           '',
           '',
@@ -681,7 +762,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
         services.patients.fetchPMSI(
           0,
           patientId,
-          RessourceType.CLAIM,
+          ResourceType.CLAIM,
           '',
           '',
           '',
@@ -842,7 +923,7 @@ const patientSlice = createSlice({
         ? {
             loading: true,
             patientInfo: {
-              resourceType: RessourceType.PATIENT,
+              resourceType: ResourceType.PATIENT,
               lastGhm: 'loading',
               lastProcedure: 'loading',
               mainDiagnosis: 'loading'
@@ -854,7 +935,7 @@ const patientSlice = createSlice({
             patientInfo: state.patientInfo
               ? state.patientInfo
               : {
-                  resourceType: RessourceType.PATIENT
+                  resourceType: ResourceType.PATIENT
                 }
           }
     )
@@ -899,7 +980,9 @@ const patientSlice = createSlice({
                 page: 0
               }
             },
-            biology: undefined
+            biology: undefined,
+            imaging: undefined,
+            forms: undefined
           }
     )
     builder.addCase(fetchPatientInfo.rejected, () => null)
@@ -908,7 +991,7 @@ const patientSlice = createSlice({
         ? {
             loading: true,
             patientInfo: {
-              resourceType: RessourceType.PATIENT,
+              resourceType: ResourceType.PATIENT,
               lastGhm: 'loading',
               lastProcedure: 'loading',
               mainDiagnosis: 'loading'
@@ -920,7 +1003,7 @@ const patientSlice = createSlice({
             patientInfo: state.patientInfo
               ? { ...state.patientInfo, lastGhm: 'loading', lastProcedure: 'loading', mainDiagnosis: 'loading' }
               : {
-                  resourceType: RessourceType.PATIENT,
+                  resourceType: ResourceType.PATIENT,
                   lastGhm: 'loading',
                   lastProcedure: 'loading',
                   mainDiagnosis: 'loading'
@@ -939,7 +1022,7 @@ const patientSlice = createSlice({
                   ...action.payload.patientInfo
                 }
               : {
-                  resourceType: RessourceType.PATIENT,
+                  resourceType: ResourceType.PATIENT,
                   ...action.payload.patientInfo
                 },
             pmsi: action.payload.pmsi
@@ -956,7 +1039,7 @@ const patientSlice = createSlice({
             mainDiagnosis: undefined
           }
         : {
-            resourceType: RessourceType.PATIENT,
+            resourceType: ResourceType.PATIENT,
             lastGhm: undefined,
             lastProcedure: undefined,
             mainDiagnosis: undefined
@@ -1287,6 +1370,40 @@ const patientSlice = createSlice({
             imaging: action.payload?.imaging
           }
     )
+
+    builder.addCase(fetchMaternityForms.rejected, (state) => ({
+      ...state,
+      loading: false,
+      forms: {
+        maternityForms: {
+          loading: false,
+          maternityFormsList: []
+        }
+      }
+    }))
+    builder.addCase(fetchMaternityForms.pending, (state) =>
+      state === null
+        ? null
+        : {
+            ...state,
+            forms: {
+              ...state.forms,
+              maternityForms: {
+                loading: true,
+                maternityFormsList: state.forms?.maternityForms.maternityFormsList ?? []
+              }
+            }
+          }
+    )
+    builder.addCase(fetchMaternityForms.fulfilled, (state, action) =>
+      action.payload === undefined
+        ? null
+        : {
+            ...state,
+            loading: false,
+            forms: action.payload?.forms
+          }
+    )
   }
 })
 
@@ -1299,7 +1416,8 @@ export {
   fetchPmsi,
   fetchMedication,
   fetchBiology,
-  fetchImaging
+  fetchImaging,
+  fetchMaternityForms
 }
 export const { clearPatient } = patientSlice.actions
 
@@ -1313,11 +1431,13 @@ function linkElementWithEncounter<
     | MedicationAdministration
     | Observation
     | ImagingStudy
+    | QuestionnaireResponse
 >(elementEntries: T[], encounterList: any[], deidentifiedBoolean: any) {
   let elementList: (T & {
     serviceProvider?: string
     NDA?: string
     documents?: any[]
+    hospitDates?: string[]
   })[] = []
 
   for (const entry of elementEntries) {
@@ -1325,32 +1445,28 @@ function linkElementWithEncounter<
       serviceProvider?: string
       NDA?: string
       documents?: any[]
+      hospitDates?: string[]
     }
 
     let encounterId = ''
     // @ts-ignore
     switch (entry.resourceType) {
-      case RessourceType.CLAIM:
+      case ResourceType.CLAIM:
         encounterId = (entry as Claim).item?.[0].encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
         break
-      case RessourceType.PROCEDURE:
-      case RessourceType.CONDITION:
-        encounterId = (entry as Procedure | Condition).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
+      case ResourceType.PROCEDURE:
+      case ResourceType.CONDITION:
+      case ResourceType.MEDICATION_REQUEST:
+      case ResourceType.OBSERVATION:
+      case ResourceType.IMAGING:
+      case ResourceType.QUESTIONNAIRE_RESPONSE:
+        encounterId = entry.encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
-      case RessourceType.DOCUMENTS:
+      case ResourceType.DOCUMENTS:
         encounterId = (entry as DocumentReference).context?.encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
         break
-      case RessourceType.MEDICATION_REQUEST:
-        encounterId = (entry as MedicationRequest).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
-        break
-      case RessourceType.MEDICATION_ADMINISTRATION:
+      case ResourceType.MEDICATION_ADMINISTRATION:
         encounterId = (entry as MedicationAdministration).context?.reference?.replace(/^Encounter\//, '') ?? ''
-        break
-      case RessourceType.OBSERVATION:
-        encounterId = (entry as Observation).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
-        break
-      case RessourceType.IMAGING:
-        encounterId = (entry as ImagingStudy).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
     }
 
@@ -1383,11 +1499,13 @@ function fillElementInformation<
     | MedicationAdministration
     | Observation
     | ImagingStudy
+    | QuestionnaireResponse
 >(deidentifiedBoolean: boolean, element: T, encounter: any, encounterId: string, resourceType: string) {
   const newElement = element as T & {
     serviceProvider?: string
     NDA?: string
     documents?: any[]
+    hospitDates?: string[]
   }
 
   const encounterIsDetailed = encounter?.id !== encounterId
@@ -1410,8 +1528,12 @@ function fillElementInformation<
     }
   }
 
-  if (resourceType !== RessourceType.DOCUMENTS && encounter?.documents && encounter.documents.length > 0) {
+  if (resourceType !== ResourceType.DOCUMENTS && encounter?.documents && encounter.documents.length > 0) {
     newElement.documents = encounter.documents
+  }
+
+  if (resourceType === ResourceType.QUESTIONNAIRE_RESPONSE) {
+    newElement.hospitDates = encounter?.period
   }
 
   return newElement

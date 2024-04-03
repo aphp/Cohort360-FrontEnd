@@ -12,13 +12,12 @@ import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchMedication } from 'state/medication'
 import { PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
-import { Comparators, MedicationDataType, RessourceType } from 'types/requestCriterias'
+import { Comparators, MedicationDataType, CriteriaType } from 'types/requestCriterias'
 
 export const defaultMedication: Omit<MedicationDataType, 'id'> = {
-  type: RessourceType.MEDICATION_REQUEST,
+  type: CriteriaType.MEDICATION_REQUEST,
   title: 'Critère de médicament',
   code: [],
-  prescriptionType: [],
   administration: [],
   occurrence: 1,
   occurrenceComparator: Comparators.GREATER_OR_EQUAL,
@@ -27,6 +26,13 @@ export const defaultMedication: Omit<MedicationDataType, 'id'> = {
   encounterEndDate: null,
   encounterStartDate: null,
   isInclusive: true
+}
+
+const removeNonCommonFields = (medication: MedicationDataType) => {
+  if (medication.type === CriteriaType.MEDICATION_ADMINISTRATION) {
+    return { ...medication, prescriptionType: null }
+  }
+  return medication
 }
 
 const Index = (props: CriteriaDrawerComponentProps) => {
@@ -51,7 +57,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       value,
       defaultCriteria,
       hierarchy,
-      (updatedCriteria) => setDefaultCriteria(updatedCriteria as MedicationDataType),
+      (updatedCriteria) => setDefaultCriteria(removeNonCommonFields(updatedCriteria as MedicationDataType)),
       selectedTab,
       defaultMedication.type,
       dispatch

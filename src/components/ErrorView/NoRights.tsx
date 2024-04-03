@@ -16,7 +16,6 @@ type NoRightsProps = {
 const NoRights: React.FC<NoRightsProps> = ({ oidcCode }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
-
   return (
     <Grid
       container

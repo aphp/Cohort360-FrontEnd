@@ -3,10 +3,14 @@ stages: # List of stages for jobs in their order of execution
   - dependency-check
   - deploy
 
+
 build-job:
   image: harbor.eds.aphp.fr/cohort360/node:16.13.2
   stage: build
   script:
+    - export VERSION=$(cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/"version"://g' | sed 's/[",]//g' | tr -d '[[:space:]]')
+    - |
+      echo "{\"commit\": \"$CI_COMMIT_SHORT_SHA\", \"version\": \"$VERSION\"}" > src/data/version.json
     - npm install
     - npm run build
   artifacts:

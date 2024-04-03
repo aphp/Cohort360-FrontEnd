@@ -13,7 +13,7 @@ type DocTypesFilterProps = {
 
 const DocTypesFilter = ({ name, value, allDocTypesList, disabled = false }: DocTypesFilterProps) => {
   const context = useContext(FormContext)
-  const [selectedDocTypes, setSelectedDocTypes] = useState(value)
+  const [selectedDocTypes, setSelectedDocTypes] = useState<SimpleCodeType[]>(value)
 
   const renderDocTypes = (docType: AutocompleteRenderGroupParams) => {
     const currentDocTypeList = allDocTypesList ? allDocTypesList.filter((doc: any) => doc.type === docType.group) : []

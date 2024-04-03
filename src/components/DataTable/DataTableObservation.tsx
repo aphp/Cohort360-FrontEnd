@@ -89,13 +89,13 @@ const DataTableObservationLine: React.FC<{
   const nda = observation.NDA
   const date = observation.effectiveDateTime
   const libelleANABIO = observation.code?.coding?.find(
-    (code) => code.id === 'CODE ANABIO' || code.system === BIOLOGY_HIERARCHY_ITM_ANABIO
+    (code) => code.system === BIOLOGY_HIERARCHY_ITM_ANABIO && code.userSelected
   )?.display
   const codeLOINC = observation.code?.coding?.find(
-    (code) => code.id === 'CODE LOINC' || code.system === BIOLOGY_HIERARCHY_ITM_LOINC
+    (code) => code.system === BIOLOGY_HIERARCHY_ITM_LOINC && code.userSelected
   )?.code
   const libelleLOINC = observation.code?.coding?.find(
-    (code) => code.id === 'CODE LOINC' || code.system === BIOLOGY_HIERARCHY_ITM_LOINC
+    (code) => code.system === BIOLOGY_HIERARCHY_ITM_LOINC && code.userSelected
   )?.display
   const result =
     observation.valueQuantity?.value !== null

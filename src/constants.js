@@ -28,6 +28,8 @@ export const CODE_HIERARCHY_EXTENSION_NAME =
 export const CONCEPT_MAP_HIERARCHY_EXTENSION_NAME =
   'https://terminology.eds.aphp.fr/fhir/profile/conceptMap/extension/group-source-hierarchy-path'
 
+export const DOC_STATUS_CODE_SYSTEM = 'http://hl7.org/fhir/CodeSystem/composition-status'
+
 export const CLAIM_HIERARCHY = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_CLAIM_HIERARCHY
   : '{VITE_VALUE_SET_URL_CLAIM_HIERARCHY}'
@@ -110,6 +112,79 @@ export const BIOLOGY_HIERARCHY_ITM_ANABIO = import.meta.env.DEV
 export const BIOLOGY_HIERARCHY_ITM_LOINC = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_BIOLOGY_LOINC
   : '{VITE_VALUE_SET_URL_BIOLOGY_LOINC}'
+export const IMAGING_MODALITIES = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_IMAGING_MODALITIES
+  : '{VITE_VALUE_SET_URL_IMAGING_MODALITIES}'
+export const IMAGING_STUDY_UID_URL = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_IMAGING_STUDY_UID
+  : '{VITE_VALUE_SET_URL_IMAGING_STUDY_UID}'
+export const PREGNANCY_MODE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_PREGNANCY_MODE
+  : '{VITE_VALUE_SET_URL_PREGNANCY_MODE}'
+export const MATERNAL_RISKS = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_MATERNAL_RISKS
+  : '{VITE_VALUE_SET_URL_MATERNAL_RISKS}'
+export const RISKSRELATEDTOOBSTETRICHISTORY = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_RISKSRELATEDTOOBSTETRICHISTORY
+  : '{VITE_VALUE_SET_URL_RISKSRELATEDTOOBSTETRICHISTORY}'
+export const RISKSORCOMPLICATIONSOFPREGNANCY = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_RISKSORCOMPLICATIONSOFPREGNANCY
+  : '{VITE_VALUE_SET_URL_RISKSORCOMPLICATIONSOFPREGNANCY}'
+
+export const CHIRURGICAL_GESTURE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_CHIRURGICAL_GESTURE
+  : '{VITE_VALUE_SET_URL_CHIRURGICAL_GESTURE}'
+export const CHILD_BIRTH_MODE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_CHILD_BIRTH_MODE
+  : '{VITE_VALUE_SET_URL_CHILD_BIRTH_MODE}'
+export const MATURATION_REASON = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_MATURATION_REASON
+  : '{VITE_VALUE_SET_URL_MATURATION_REASON}'
+export const MATURATION_MODALITY = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_MATURATION_MODALITY
+  : '{VITE_VALUE_SET_URL_MATURATION_MODALITY}'
+export const IMG_INDICATION = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_IMG_INDICATION
+  : '{VITE_VALUE_SET_URL_IMG_INDICATION}'
+export const LABOR_OR_CESAREAN_ENTRY = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_LABOR_OR_CESAREAN_ENTRY
+  : '{VITE_VALUE_SET_URL_LABOR_OR_CESAREAN_ENTRY}'
+export const PATHOLOGY_DURING_LABOR = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_PATHOLOGY_DURING_LABOR
+  : '{VITE_VALUE_SET_URL_PATHOLOGY_DURING_LABOR}'
+export const OBSTETRICAL_GESTURE_DURING_LABOR = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_OBSTETRICAL_GESTURE_DURING_LABOR
+  : '{VITE_VALUE_SET_URL_OBSTETRICAL_GESTURE_DURING_LABOR}'
+export const ANALGESIE_TYPE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_ANALGESIE_TYPE
+  : '{VITE_VALUE_SET_URL_ANALGESIE_TYPE}'
+export const BIRTH_DELIVERY_WAY = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_BIRTH_DELIVERY_WAY
+  : '{VITE_VALUE_SET_URL_BIRTH_DELIVERY_WAY}'
+export const INSTRUMENT_TYPE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_INSTRUMENT_TYPE
+  : '{VITE_VALUE_SET_URL_INSTRUMENT_TYPE}'
+export const C_SECTION_MODALITY = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_C_SECTION_MODALITY
+  : '{VITE_VALUE_SET_URL_C_SECTION_MODALITY}'
+export const PRESENTATION_AT_DELIVERY = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_PRESENTATION_AT_DELIVERY
+  : '{VITE_VALUE_SET_URL_PRESENTATION_AT_DELIVERY}'
+export const CONDITION_PERINEUM = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_CONDITION_PERINEUM
+  : '{VITE_VALUE_SET_URL_CONDITION_PERINEUM}'
+export const EXIT_PLACE_TYPE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_EXIT_PLACE_TYPE
+  : '{VITE_VALUE_SET_URL_EXIT_PLACE_TYPE}'
+export const FEEDING_TYPE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_FEEDING_TYPE
+  : '{VITE_VALUE_SET_URL_FEEDING_TYPE}'
+export const EXIT_FEEDING_MODE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_EXIT_FEEDING_MODE
+  : '{VITE_VALUE_SET_URL_EXIT_FEEDING_MODE}'
+export const EXIT_DIAGNOSTIC = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_EXIT_DIAGNOSTIC
+  : '{VITE_VALUE_SET_URL_EXIT_DIAGNOSTIC}'
 
 export const CODE_DISPLAY_JWT = import.meta.env.DEV ? import.meta.env.VITE_CODE_DISPLAY_JWT : '{VITE_CODE_DISPLAY_JWT}'
 
@@ -120,12 +195,6 @@ export const ODD_BIOLOGY = import.meta.env.DEV
 export const ODD_IMAGING = import.meta.env.DEV
   ? import.meta.env.VITE_ODD_IMAGING == `${BOOLEANTRUE}`
   : '{VITE_ODD_IMAGING}' == `${BOOLEANTRUE}`
-export const IMAGING_MODALITIES = import.meta.env.DEV
-  ? import.meta.env.VITE_VALUE_SET_URL_IMAGING_MODALITIES
-  : '{VITE_VALUE_SET_URL_IMAGING_MODALITIES}'
-export const IMAGING_STUDY_UID_URL = import.meta.env.DEV
-  ? import.meta.env.VITE_VALUE_SET_URL_IMAGING_STUDY_UID
-  : '{VITE_VALUE_SET_URL_IMAGING_STUDY_UID}'
 
 export const ODD_COMPOSITION = import.meta.env.DEV
   ? import.meta.env.VITE_ODD_COMPOSITION == `${BOOLEANTRUE}`
@@ -154,6 +223,9 @@ export const ODD_EXPORT = import.meta.env.DEV
 export const ODD_FEASABILITY_REPORT = import.meta.env.DEV
   ? import.meta.env.VITE_ODD_FEASABILITY_REPORT == `${BOOLEANTRUE}`
   : '{VITE_ODD_FEASABILITY_REPORT}' == `${BOOLEANTRUE}`
+export const ODD_QUESTIONNAIRE = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_QUESTIONNAIRE == `${BOOLEANTRUE}`
+  : '{VITE_ODD_QUESTIONNAIRE}' == `${BOOLEANTRUE}`
 
 export const SESSION_TIMEOUT = import.meta.env.VITE_SESSION_TIMEOUT
   ? import.meta.env.VITE_SESSION_TIMEOUT

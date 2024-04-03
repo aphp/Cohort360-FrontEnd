@@ -45,7 +45,7 @@ import GendersFilter from 'components/Filters/GendersFilter'
 import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter'
 import TextInput from 'components/Filters/TextInput'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import List from 'components/ui/List'
 import { useAppSelector } from 'state'
 
@@ -75,7 +75,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
       selectFilter,
       resetSavedFilterError
     }
-  } = useSavedFilters<PatientsFilters>(RessourceType.PATIENT)
+  } = useSavedFilters<PatientsFilters>(ResourceType.PATIENT)
   const [page, setPage] = useState(1)
   const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total, label: 'patient(s)' })
   const [patientsList, setPatientsList] = useState<CohortPatient[]>([])

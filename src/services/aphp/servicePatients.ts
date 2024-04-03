@@ -24,7 +24,9 @@ import {
   deleteFilters,
   patchFilters,
   deleteFilter,
-  fetchPerimeterFromId
+  fetchPerimeterFromId,
+  fetchForms,
+  fetchQuestionnaires
 } from './callApi'
 
 import servicesPerimeters from './servicePerimeters'
@@ -40,10 +42,20 @@ import {
   MedicationRequest,
   Observation,
   Patient,
-  Procedure
+  Procedure,
+  Questionnaire,
+  QuestionnaireResponse
 } from 'fhir/r4'
-import { Direction, Filters, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
-import { RessourceType } from 'types/requestCriterias'
+import {
+  Direction,
+  FormNames,
+  Filters,
+  Order,
+  SearchByTypes,
+  SearchCriterias,
+  FilterByDocumentStatus
+} from 'types/searchCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
 
 export interface IServicePatients {
@@ -110,7 +122,7 @@ export interface IServicePatients {
   fetchPMSI: (
     page: number,
     patientId: string,
-    selectedTab: RessourceType.CLAIM | RessourceType.CONDITION | RessourceType.PROCEDURE,
+    selectedTab: ResourceType.CLAIM | ResourceType.CONDITION | ResourceType.PROCEDURE,
     searchInput: string,
     nda: string,
     code: string,
@@ -168,13 +180,13 @@ export interface IServicePatients {
   fetchMedication: (
     page: number,
     patientId: string,
-    selectedTab: RessourceType.MEDICATION_ADMINISTRATION | RessourceType.MEDICATION_REQUEST,
+    selectedTab: ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST,
     sortBy: Order,
     sortDirection: Direction,
     searchInput: string,
     nda: string,
-    selectedPrescriptionTypeIds: string,
-    selectedAdministrationRouteIds: string,
+    selectedPrescriptionTypeIds: string[],
+    selectedAdministrationRouteIds: string[],
     startDate: string | null,
     endDate: string | null,
     executiveUnits?: string[],
@@ -234,7 +246,6 @@ export interface IServicePatients {
    **   - orderDirection: permet le tri dans l'ordre croissant ou décroissant
    **   - page: permet la pagination des éléments
    **   - patientId: identifiant technique d'un patient
-   **   - deidentified: permet certaines anonymisations de la donnée
    **   - nda: permet de filtrer sur un NDA précis
    **   - searchInput (optionnel): permet la recherche textuelle
    **   - startDate: (optionnel) permet le filtre par date
@@ -258,12 +269,44 @@ export interface IServicePatients {
     endDate?: string | null,
     groupId?: string,
     signal?: AbortSignal,
-    modalities?: string,
+    modalities?: string[],
     executiveUnits?: string[]
   ) => Promise<{
     imagingList: ImagingStudy[]
     imagingTotal: number
   }>
+
+  /*
+   ** Cette fonction permet de récupérer les formulaires liés à un patient
+   **
+   ** Arguments:
+   **   - patientId: identifiant technique d'un patient
+   **   - formName: permet de requêter le bon type de formulaire
+   **   - groupId: (optionnel) périmètre auquel le patient est lié
+   **   - episodeOfCare: (optionnel) permet de requêter les formulaires liés à un certain épisode de soin
+   **   - startDate: (optionnel) permet le filtre par date
+   **   - endDate: (optionnel) permet le filtre par date
+   **   - executiveUnits: (optionnel) permet de filtrer par unité exécutrice
+   **
+   ** Retour:
+   **   - formsList: liste des formulaires liés à un patient
+   */
+  fetchMaternityForms: (
+    patientId: string,
+    formName: string,
+    groupId?: string,
+    startDate?: string | null,
+    endDate?: string | null,
+    executiveUnits?: string[]
+  ) => Promise<QuestionnaireResponse[]>
+
+  /*
+   ** Cette fonction permet de récupérer les ids des formulaires de maternité
+   **
+   ** Retour:
+   **   - questionnairesList: liste des ids des formulaires de maternité
+   */
+  fetchMaternityFormNamesIds: () => Promise<Questionnaire[]>
 
   /*
    ** Cette fonction permet de récupérer les élèments de Composition lié à un patient
@@ -296,6 +339,7 @@ export interface IServicePatients {
     patientId: string,
     searchInput: string,
     selectedDocTypes: string[],
+    docStatuses: string[],
     nda: string,
     onlyPdfAvailable: boolean,
     startDate?: string | null,
@@ -416,7 +460,7 @@ const servicesPatients: IServicePatients = {
     let pmsiResp: AxiosResponse<FHIR_Bundle_Response<Condition | Procedure | Claim>> | null = null
 
     switch (selectedTab) {
-      case RessourceType.CONDITION:
+      case ResourceType.CONDITION:
         pmsiResp = await fetchCondition({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -434,7 +478,7 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case RessourceType.PROCEDURE:
+      case ResourceType.PROCEDURE:
         pmsiResp = await fetchProcedure({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -452,7 +496,7 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case RessourceType.CLAIM:
+      case ResourceType.CLAIM:
         pmsiResp = await fetchClaim({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -532,7 +576,7 @@ const servicesPatients: IServicePatients = {
     let medicationResp: AxiosResponse<FHIR_Bundle_Response<MedicationRequest | MedicationAdministration>> | null = null
 
     switch (selectedTab) {
-      case RessourceType.MEDICATION_REQUEST:
+      case ResourceType.MEDICATION_REQUEST:
         medicationResp = await fetchMedicationRequest({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -549,7 +593,7 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case RessourceType.MEDICATION_ADMINISTRATION:
+      case ResourceType.MEDICATION_ADMINISTRATION:
         medicationResp = await fetchMedicationAdministration({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -633,7 +677,7 @@ const servicesPatients: IServicePatients = {
     endDate?: string | null,
     groupId?: string,
     signal?: AbortSignal,
-    modalities?: string,
+    modalities?: string[],
     executiveUnits?: string[]
   ) => {
     const imagingResp = await fetchImaging({
@@ -660,6 +704,33 @@ const servicesPatients: IServicePatients = {
     }
   },
 
+  fetchMaternityForms: async (
+    patientId: string,
+    formName: string,
+    groupId?: string,
+    startDate?: string | null,
+    endDate?: string | null,
+    executiveUnits?: string[]
+  ) => {
+    const formsResp = await fetchForms({
+      patient: patientId,
+      formName,
+      _list: groupId ? [groupId] : [],
+      startDate,
+      endDate,
+      executiveUnits
+    })
+
+    return getApiResponseResources(formsResp) ?? []
+  },
+
+  fetchMaternityFormNamesIds: async () => {
+    const maternityFormNames = `${FormNames.PREGNANCY},${FormNames.HOSPIT}`
+    const questionnaireList = await fetchQuestionnaires({ name: maternityFormNames, _elements: ['id', 'name'] })
+
+    return getApiResponseResources(questionnaireList) ?? []
+  },
+
   fetchDocuments: async (
     sortBy: Order,
     sortDirection: Direction,
@@ -668,6 +739,7 @@ const servicesPatients: IServicePatients = {
     patientId: string,
     searchInput: string,
     selectedDocTypes: string[],
+    docStatuses: string[],
     nda: string,
     onlyPdfAvailable?: boolean,
     startDate?: string | null,
@@ -686,7 +758,7 @@ const servicesPatients: IServicePatients = {
       sortDirection,
       size: documentLines,
       offset: page ? (page - 1) * documentLines : 0,
-      status: 'final',
+      docStatuses: docStatuses,
       _text: searchInput,
       highlight_search_results: searchBy === SearchByTypes.TEXT ? true : false,
       type: selectedDocTypes.join(','),
@@ -794,7 +866,7 @@ export const getEncounterDocuments = async (
 
   const documentsResp = await fetchDocumentReference({
     encounter: encountersIdList.join(','),
-    status: 'final',
+    docStatuses: [FilterByDocumentStatus.VALIDATED],
     _list: groupId ? groupId.split(',') : []
   })
 
@@ -832,7 +904,7 @@ export const getEncounterDocuments = async (
 }
 
 export const postFiltersService = async (
-  fhir_resource: RessourceType,
+  fhir_resource: ResourceType,
   name: string,
   criterias: SearchCriterias<Filters>,
   deidentified: boolean
@@ -843,7 +915,7 @@ export const postFiltersService = async (
   return response.data
 }
 
-export const getFiltersService = async (fhir_resource: RessourceType, next?: string | null) => {
+export const getFiltersService = async (fhir_resource: ResourceType, next?: string | null) => {
   const LIMIT = 10
   const OFFSET = 0
   try {
@@ -873,7 +945,7 @@ export const deleteFiltersService = async (fhir_resource_uuids: string[]) => {
 }
 
 export const patchFiltersService = async (
-  fhir_resource: RessourceType,
+  fhir_resource: ResourceType,
   uuid: string,
   name: string,
   criterias: SearchCriterias<Filters>,

@@ -18,10 +18,14 @@ import ContactPageIcon from '@mui/icons-material/ContactPage'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import ScienceIcon from '@mui/icons-material/Science'
 import CoronavirusIcon from '@mui/icons-material/Coronavirus'
+import FolderIcon from '@mui/icons-material/Folder'
+import CribIcon from '@mui/icons-material/Crib'
+import PregnantWomanIcon from '@mui/icons-material/PregnantWoman'
+import DomainAddIcon from '@mui/icons-material/DomainAdd'
 
 import { CriteriaItemDataCache, CriteriaItemType } from 'types'
 import useStyles from './styles'
-import { RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 import { PhotoCameraFront } from '@mui/icons-material'
 import { CriteriaState } from 'state/criteria'
 import criteriaList from 'components/CreationCohort/DataList_Criteria'
@@ -40,36 +44,44 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
 
   const getCriteriaIcon = (id: string) => {
     switch (id) {
-      case RessourceType.REQUEST:
+      case CriteriaType.REQUEST:
         return <SavedSearchIcon />
-      case RessourceType.IPP_LIST:
+      case CriteriaType.IPP_LIST:
         return <PersonSearchIcon />
-      case RessourceType.PATIENT:
+      case CriteriaType.PATIENT:
         return <BarChartIcon />
-      case RessourceType.ENCOUNTER:
+      case CriteriaType.ENCOUNTER:
         return <EventIcon />
-      case RessourceType.DOCUMENTS:
+      case CriteriaType.DOCUMENTS:
         return <DescriptionIcon />
-      case RessourceType.PMSI:
+      case CriteriaType.PMSI:
         return <MedicalInformationIcon />
-      case RessourceType.CONDITION:
+      case CriteriaType.CONDITION:
         return <ArticleIcon />
-      case RessourceType.PROCEDURE:
+      case CriteriaType.PROCEDURE:
         return <LocalHospitalIcon />
-      case RessourceType.CLAIM:
+      case CriteriaType.CLAIM:
         return <ContactPageIcon />
-      case RessourceType.MEDICATION:
+      case CriteriaType.MEDICATION:
         return <VaccinesIcon />
-      case RessourceType.BIO_MICRO:
+      case CriteriaType.BIO_MICRO:
         return <BiotechIcon />
-      case RessourceType.OBSERVATION:
+      case CriteriaType.OBSERVATION:
         return <ScienceIcon />
-      case RessourceType.MICROBIOLOGIE:
+      case CriteriaType.MICROBIOLOGIE:
         return <CoronavirusIcon />
-      case RessourceType.PHYSIOLOGIE:
+      case CriteriaType.PHYSIOLOGIE:
         return <MonitorHeartIcon />
-      case RessourceType.IMAGING:
+      case CriteriaType.IMAGING:
         return <PhotoCameraFront />
+      case CriteriaType.SPECIALITY:
+        return <FolderIcon />
+      case CriteriaType.MATERNITY:
+        return <CribIcon />
+      case CriteriaType.PREGNANCY:
+        return <PregnantWomanIcon />
+      case CriteriaType.HOSPIT:
+        return <DomainAddIcon />
       default:
         return <></>
     }
@@ -113,10 +125,7 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
                   subItems.map((criteriaSubItem, index) => (
                     <Fragment key={index}>
                       <div className={classes.subItemsIndicator} />
-                      <CriteriaListItem
-                        criteriaItem={criteriaSubItem}
-                        handleClick={() => handleClick(criteriaSubItem)}
-                      />
+                      <CriteriaListItem criteriaItem={criteriaSubItem} handleClick={handleClick} />
                     </Fragment>
                   ))}
               </List>
@@ -139,15 +148,34 @@ type CriteriaRightPanelProps = {
 
 const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
   const { open, onClose, parentId, criteria, selectedCriteria, onChangeSelectedCriteria } = props
-  const criteriaListWithConfig = criteriaList.map((criteriaItem) => {
-    if (criteria.config[criteriaItem.id]) {
-      return {
+
+  const applyConfigToCriteriaItem = (
+    criteriaItem: CriteriaItemType,
+    config: {
+      [criteriaKey: string]: Partial<CriteriaItemType>
+    }
+  ) => {
+    let updatedCriteriaItem = criteriaItem
+    if (config[criteriaItem.id]) {
+      updatedCriteriaItem = {
         ...criteriaItem,
-        ...criteria.config[criteriaItem.id]
+        ...config[criteriaItem.id]
       }
     }
-    return criteriaItem
-  })
+
+    if (criteriaItem.subItems && criteriaItem.subItems.length > 0) {
+      updatedCriteriaItem = {
+        ...updatedCriteriaItem,
+        subItems: criteriaItem.subItems.map((subItem) => applyConfigToCriteriaItem(subItem, config))
+      }
+    }
+
+    return updatedCriteriaItem
+  }
+
+  const criteriaListWithConfig = criteriaList.map((criteriaItem) =>
+    applyConfigToCriteriaItem(criteriaItem, criteria.config)
+  )
 
   const { classes } = useStyles()
   const [action, setAction] = useState<CriteriaItemType | null>(null)
@@ -178,8 +206,8 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
           }
 
           if (id === 'Medication') {
-            if (RessourceType.MEDICATION_REQUEST === selectedCriteria.type) return criteriaItem
-            if (RessourceType.MEDICATION_ADMINISTRATION === selectedCriteria.type) return criteriaItem
+            if (CriteriaType.MEDICATION_REQUEST === selectedCriteria.type) return criteriaItem
+            if (CriteriaType.MEDICATION_ADMINISTRATION === selectedCriteria.type) return criteriaItem
           } else {
             if (id === selectedCriteria.type) return criteriaItem
           }

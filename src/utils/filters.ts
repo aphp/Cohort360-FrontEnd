@@ -3,6 +3,8 @@ import {
   FilterKeys,
   FilterValue,
   Filters,
+  FormNames,
+  FormNamesLabel,
   GenderStatus,
   GenderStatusLabel,
   LabelObject,
@@ -54,12 +56,14 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.EXECUTIVE_UNITS:
       case FilterKeys.ADMINISTRATION_ROUTES:
       case FilterKeys.PRESCRIPTION_TYPES:
+      case FilterKeys.DOC_STATUSES:
       case FilterKeys.DOC_TYPES:
       case FilterKeys.STATUS:
       case FilterKeys.MODALITY:
       case FilterKeys.LOINC:
       case FilterKeys.ANABIO:
       case FilterKeys.CODE:
+      case FilterKeys.FORM_NAME:
         castedFilters[key] = removeElementInArray(castedFilters[key], value)
         break
       case FilterKeys.NDA:
@@ -94,6 +98,13 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.GENDERS) {
     return GenderStatusLabel[value as GenderStatus]
   }
+  if (key === FilterKeys.FORM_NAME) {
+    if (value === FormNames.HOSPIT) {
+      return FormNamesLabel.HOSPIT
+    } else if (value === FormNames.PREGNANCY) {
+      return FormNamesLabel.PREGNANCY
+    }
+  }
   if (key === FilterKeys.VITAL_STATUSES) {
     return VitalStatusLabel[value as VitalStatus]
   }
@@ -117,6 +128,9 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   }
   if (key === FilterKeys.EXECUTIVE_UNITS) {
     return `Unité exécutrice : ${(value as ScopeTreeRow).name}`
+  }
+  if (key === FilterKeys.DOC_STATUSES) {
+    return `Documents : ${value}`
   }
   if (key === FilterKeys.DOC_TYPES) {
     return (value as SimpleCodeType).label
@@ -163,6 +177,11 @@ export const selectFiltersAsArray = (filters: Filters) => {
         case FilterKeys.DIAGNOSTIC_TYPES:
         case FilterKeys.ADMINISTRATION_ROUTES:
         case FilterKeys.PRESCRIPTION_TYPES:
+        case FilterKeys.DOC_STATUSES:
+          ;(value as []).forEach((elem) => {
+            result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
+          })
+          break
         case FilterKeys.DOC_TYPES:
         case FilterKeys.EXECUTIVE_UNITS:
         case FilterKeys.STATUS:
@@ -170,6 +189,7 @@ export const selectFiltersAsArray = (filters: Filters) => {
         case FilterKeys.LOINC:
         case FilterKeys.ANABIO:
         case FilterKeys.CODE:
+        case FilterKeys.FORM_NAME:
           ;(value as []).forEach((elem) =>
             result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
           )

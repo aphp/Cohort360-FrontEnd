@@ -61,12 +61,20 @@ const Index = (props: ScopeTreeProps) => {
   const [searchSavedRootRows, setSearchSavedRootRows] = useState<ScopeTreeRow[]>([...scopesList])
   const [isSelectionLoading, setIsSelectionLoading] = useState<boolean>(false)
 
+  /** cast selectedItems.id into string for comparaison
+   * TODO : Change call made by alizé to retrive caresite into filters.ts to avoid the cast
+   */
+  const fixSelectedItems = selectedItems.map((item) => ({
+    ...item,
+    id: item.id?.toString()
+  }))
+
   return (
     <div>
       <ScopeTreeChipsets
-        selectedItems={selectedItems}
+        selectedItems={fixSelectedItems}
         onDelete={(item) =>
-          onSelect(item, selectedItems, setSelectedItems, scopesList, isSelectionLoading, setIsSelectionLoading)
+          onSelect(item, fixSelectedItems, setSelectedItems, scopesList, isSelectionLoading, setIsSelectionLoading)
         }
       />
 
@@ -77,7 +85,7 @@ const Index = (props: ScopeTreeProps) => {
       {searchInput ? (
         <ScopeTreeSearch
           searchInput={searchInput}
-          selectedItems={selectedItems}
+          selectedItems={fixSelectedItems}
           setSelectedItems={setSelectedItems}
           searchSavedRootRows={searchSavedRootRows}
           setSearchSavedRootRows={setSearchSavedRootRows}
@@ -87,7 +95,7 @@ const Index = (props: ScopeTreeProps) => {
         />
       ) : (
         <ScopeTreeExploration
-          selectedItems={selectedItems}
+          selectedItems={fixSelectedItems}
           setSelectedItems={setSelectedItems}
           searchSavedRootRows={searchSavedRootRows}
           setSearchSavedRootRows={setSearchSavedRootRows}

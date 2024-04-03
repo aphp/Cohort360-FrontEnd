@@ -15,7 +15,9 @@ import {
   OperationOutcome,
   Parameters,
   Patient,
+  Period,
   Procedure,
+  QuestionnaireResponse,
   Resource
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
@@ -29,12 +31,6 @@ export enum CohortJobStatus {
   _finished = 'finished',
   _pending = 'pending',
   _new = 'new'
-}
-
-export enum DocumentReferenceStatusKind {
-  _current = 'current',
-  _superseded = 'superseded',
-  _enteredInError = 'entered-in-error'
 }
 
 export enum EncounterStatusKind {
@@ -55,19 +51,15 @@ export enum LoadingStatus {
   SUCCESS = 'SUCCESS'
 }
 
-export enum CompositionStatusKind {
-  _preliminary = 'preliminary',
-  _final = 'final',
-  _amended = 'amended',
-  _enteredInError = 'entered-in-error'
-}
-
 export enum TemporalConstraintsKind {
   NONE = 'none',
   SAME_ENCOUNTER = 'sameEncounter',
   DIFFERENT_ENCOUNTER = 'differentEncounter',
   PARTIAL_CONSTRAINT = 'partialConstraint',
-  DIRECT_CHRONOLOGICAL_ORDERING = 'directChronologicalOrdering'
+  DIRECT_CHRONOLOGICAL_ORDERING = 'directChronologicalOrdering',
+  SAME_EPISODE_OF_CARE = 'sameEpisodeOfCare',
+  DIFFERENT_EPISODE_OF_CARE = 'differentEpisodeOfCare',
+  PARTIAL_EPISODE_CONSTRAINT = 'partialEpisodeConstraint'
 }
 
 export enum CohortCreationError {
@@ -220,6 +212,7 @@ export type ScopeTreeRow = AbstractTree<{
   cohort_size?: string
   cohort_tag?: string
   type?: string
+  source_value?: string
 }>
 
 export enum ChartCode {
@@ -649,6 +642,12 @@ export enum BiologyStatus {
   VALIDATED = 'Val'
 }
 
+export type CohortQuestionnaireResponse = QuestionnaireResponse & {
+  serviceProvider?: string
+  NDA?: string
+  hospitDates?: Period
+}
+
 export type CohortObservation = Observation & {
   serviceProvider?: string
   NDA?: string
@@ -795,7 +794,8 @@ export enum CriteriaName {
   Medication = 'medication',
   Biology = 'biology',
   VisitSupport = 'supported',
-  Imaging = 'imaging'
+  Imaging = 'imaging',
+  Form = 'questionnaireResponse'
 }
 export type CriteriaNameType =
   | CriteriaName.Cim10
@@ -806,6 +806,7 @@ export type CriteriaNameType =
   | CriteriaName.Biology
   | CriteriaName.VisitSupport
   | CriteriaName.Imaging
+  | CriteriaName.Form
 
 export type AccessExpirationsProps = {
   expiring?: boolean

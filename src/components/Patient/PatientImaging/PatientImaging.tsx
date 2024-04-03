@@ -24,7 +24,7 @@ import { CriteriaName, HierarchyElement, LoadingStatus } from 'types'
 import { PatientTypes } from 'types/patient'
 import { AlertWrapper } from 'components/ui/Alert'
 import { Direction, FilterKeys, ImagingFilters, Order } from 'types/searchCriterias'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
@@ -46,7 +46,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
 
   const searchResults = {
     deidentified: patient?.deidentified || false,
-    list: patient?.imaging?.list,
+    list: patient?.imaging?.list ?? [],
     nb: patient?.imaging?.count ?? 0,
     total: patient?.imaging?.total ?? 0,
     label: 'résultat(s)'
@@ -78,7 +78,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
       selectFilter,
       resetSavedFilterError
     }
-  } = useSavedFilters<ImagingFilters>(RessourceType.IMAGING)
+  } = useSavedFilters<ImagingFilters>(ResourceType.IMAGING)
 
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)
@@ -145,7 +145,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
           Seuls les examens présents dans le PACS Philips et rattachés à un Dossier Administratif (NDA) sont
           actuellement disponibles. Le flux alimentant les métadonnées associées aux séries et aux examens est suspendu
           depuis le 01/02/2023 suite à la migration du PACS AP-HP. Aucun examen produit après cette date n'est
-          disponible via cohort360. Pour tout besoin d'examen post 01/02/2023, merci de contacter le support Cohort360 :
+          disponible via Cohort360. Pour tout besoin d'examen post 01/02/2023, merci de contacter le support Cohort360 :
           dsn-id-recherche-support-cohort360@aphp.fr.
         </AlertWrapper>
       </BlockWrapper>

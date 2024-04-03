@@ -1,7 +1,17 @@
 import { ScopeTreeRow, SimpleCodeType, ValueSet } from 'types'
 import { PatientTableLabels } from './patient'
 import { CohortsType } from './cohorts'
-import { RessourceType } from './requestCriterias'
+import { ResourceType } from './requestCriterias'
+
+export enum FormNames {
+  PREGNANCY = 'APHPEDSQuestionnaireFicheGrossesse',
+  HOSPIT = 'APHPEDSQuestionnaireFicheHospitalisation'
+}
+
+export enum FormNamesLabel {
+  PREGNANCY = 'Fiches de grossesse',
+  HOSPIT = "Formulaires d'hospitalisation"
+}
 
 export enum GenderStatus {
   MALE = 'MALE',
@@ -103,6 +113,14 @@ export enum SearchByTypesLabelDocuments {
   TEXT = 'Corps du document',
   DESCRIPTION = 'Titre du document'
 }
+export enum FilterByDocumentStatus {
+  VALIDATED = 'Validé',
+  NOT_VALIDATED = 'Non validé'
+}
+export enum DocumentStatuses {
+  FINAL = 'final',
+  PRELIMINARY = 'preliminary'
+}
 export enum FilterKeys {
   IPP = 'ipp',
   GENDERS = 'genders',
@@ -121,11 +139,13 @@ export enum FilterKeys {
   SOURCE = 'source',
   EXECUTIVE_UNITS = 'executiveUnits',
   DOC_TYPES = 'docTypes',
+  DOC_STATUSES = 'docStatuses',
   FAVORITE = 'favorite',
   STATUS = 'status',
   MIN_PATIENTS = 'minPatients',
   MAX_PATIENTS = 'maxPatients',
-  MODALITY = 'modality'
+  MODALITY = 'modality',
+  FORM_NAME = 'formName'
 }
 
 export enum OrderByKeys {
@@ -184,6 +204,7 @@ export type Filters =
   | DocumentsFilters
   | CohortsFilters
   | ImagingFilters
+  | MaternityFormFilters
 
 export type GenericFilter = {
   nda: string
@@ -220,9 +241,17 @@ export type ImagingFilters = GenericFilter & {
   modality: LabelObject[]
 }
 
+export type MaternityFormFilters = {
+  formName: FormNames[]
+  startDate: string | null
+  endDate: string | null
+  executiveUnits: ScopeTreeRow[]
+}
+
 export type DocumentsFilters = GenericFilter & {
   ipp?: string
   docTypes: SimpleCodeType[]
+  docStatuses: string[]
   onlyPdfAvailable: boolean
 }
 export interface CohortsFilters {
@@ -350,7 +379,7 @@ export type SavedFilter = {
   created_at: string
   deleted: string
   deleted_by_cascade: boolean
-  fhir_resource: RessourceType
+  fhir_resource: ResourceType
   fhir_version: string
   filter: string
   modified_at: string

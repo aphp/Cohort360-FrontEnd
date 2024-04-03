@@ -11,12 +11,12 @@ import useStyles from './styles'
 import { Claim, Condition, Procedure } from 'fhir/r4'
 import { Order, OrderBy } from 'types/searchCriterias'
 import { PMSI } from 'types/patient'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 
 type DataTablePmsiProps = {
   loading: boolean
   deidentified: boolean
-  selectedTab: RessourceType.CONDITION | RessourceType.PROCEDURE | RessourceType.CLAIM
+  selectedTab: ResourceType.CONDITION | ResourceType.PROCEDURE | ResourceType.CLAIM
   pmsiList: PMSIEntry<Procedure | Condition | Claim>[]
   orderBy: OrderBy
   setOrderBy?: (order: OrderBy) => void
@@ -43,7 +43,7 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
     { label: 'source' },
     { label: 'Code', code: Order.CODE },
     { label: 'Libellé' },
-    selectedTab === RessourceType.CONDITION ? { label: 'Type' } : null,
+    selectedTab === ResourceType.CONDITION ? { label: 'Type' } : null,
     { label: 'Unité exécutrice' }
   ].filter((elem) => elem !== null) as Column[]
 
@@ -58,12 +58,12 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
       )}
       {!loading && pmsiList?.length < 1 && (
         <TableRow className={classes.emptyTableRow}>
-          <TableCellWrapper colSpan={selectedTab === RessourceType.CONDITION ? 7 : 6} align="left">
+          <TableCellWrapper colSpan={selectedTab === ResourceType.CONDITION ? 7 : 6} align="left">
             <Grid container justifyContent="center">
               <Typography variant="button">{`Aucun ${
-                selectedTab !== RessourceType.CONDITION
-                  ? selectedTab !== RessourceType.PROCEDURE
-                    ? RessourceType.CLAIM
+                selectedTab !== ResourceType.CONDITION
+                  ? selectedTab !== ResourceType.PROCEDURE
+                    ? 'GHM'
                     : 'acte'
                   : PMSI.DIAGNOSTIC
               } à afficher`}</Typography>
@@ -73,7 +73,7 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
       )}
       {loading && (
         <TableRow className={classes.emptyTableRow}>
-          <TableCellWrapper colSpan={selectedTab === RessourceType.CONDITION ? 7 : 6} align="left">
+          <TableCellWrapper colSpan={selectedTab === ResourceType.CONDITION ? 7 : 6} align="left">
             <Grid container justifyContent="center">
               <CircularProgress />
             </Grid>
@@ -86,21 +86,21 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
 
 const DataTablePmsiLine: React.FC<{
   pmsi: PMSIEntry<Procedure | Condition | Claim>
-  selectedTab: RessourceType.CONDITION | RessourceType.PROCEDURE | RessourceType.CLAIM
+  selectedTab: ResourceType.CONDITION | ResourceType.PROCEDURE | ResourceType.CLAIM
 }> = ({ pmsi, selectedTab }) => {
   const { classes } = useStyles()
 
   const nda = pmsi.NDA
   const date =
-    pmsi.resourceType === RessourceType.CONDITION && pmsi.recordedDate
+    pmsi.resourceType === ResourceType.CONDITION && pmsi.recordedDate
       ? new Date(pmsi.recordedDate).toLocaleDateString('fr-FR') ?? 'Date inconnue'
-      : pmsi.resourceType === RessourceType.CLAIM && pmsi.created
+      : pmsi.resourceType === ResourceType.CLAIM && pmsi.created
       ? new Date(pmsi.created).toLocaleDateString('fr-FR') ?? 'Date inconnue'
-      : pmsi.resourceType === RessourceType.PROCEDURE && pmsi.performedDateTime
+      : pmsi.resourceType === ResourceType.PROCEDURE && pmsi.performedDateTime
       ? new Date(pmsi.performedDateTime).toLocaleDateString('fr-FR') ?? 'Date inconnue'
       : 'Date inconnue'
 
-  const filterCode = pmsi.resourceType === RessourceType.CLAIM ? pmsi.diagnosis?.[0]?.packageCode : pmsi.code
+  const filterCode = pmsi.resourceType === ResourceType.CLAIM ? pmsi.diagnosis?.[0]?.packageCode : pmsi.code
 
   const codeToDisplay = filterCode?.coding?.find((code) => code.userSelected === true)
 
@@ -122,7 +122,7 @@ const DataTablePmsiLine: React.FC<{
       <TableCellWrapper>
         <Typography className={classes.libelle}>{codeToDisplay?.display ?? 'Non renseigné'}</Typography>
       </TableCellWrapper>
-      {selectedTab === RessourceType.CONDITION && <TableCellWrapper>{type}</TableCellWrapper>}
+      {selectedTab === ResourceType.CONDITION && <TableCellWrapper>{type}</TableCellWrapper>}
       <TableCellWrapper>{serviceProvider ?? '-'}</TableCellWrapper>
     </TableRow>
   )

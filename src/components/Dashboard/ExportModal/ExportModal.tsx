@@ -68,12 +68,16 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     setError(null)
   }, [open])
 
-  const handleChangeTables = (tableId: string) => {
+  const handleChangeTables = (tableId: string, tableName: string) => {
     let existingTableIds: string[] = settings.tables
     const foundItem = existingTableIds.find((existingTableId) => existingTableId === tableId)
     if (foundItem) {
-      const index = existingTableIds.indexOf(foundItem)
-      existingTableIds.splice(index, 1)
+      if (tableName === 'Formulaires') {
+        existingTableIds = existingTableIds.filter((elem) => !elem.startsWith('questionnaire'))
+      } else {
+        const index = existingTableIds.indexOf(foundItem)
+        existingTableIds.splice(index, 1)
+      }
     } else {
       // Attention règle particulière
       if (tableId === 'fact_relationship') {
@@ -84,14 +88,25 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       }
       if (tableId === 'concept_relationship') {
         const careSiteItem = existingTableIds.find((existingTableId) => existingTableId === 'concept')
+        console.log('!careSiteItem', !careSiteItem)
         if (!careSiteItem) {
           existingTableIds = [...existingTableIds, 'concept']
         }
       }
+      if (tableName === 'Formulaires') {
+        existingTableIds = [
+          ...existingTableIds,
+          'questionnaire',
+          'questionnaire__item',
+          'questionnaireresponse',
+          'questionnaireresponse__item',
+          'questionnaireresponse__item__answer'
+        ]
+      }
 
       existingTableIds = [...existingTableIds, tableId]
     }
-    handleChangeSettings('tables', existingTableIds)
+    handleChangeSettings('tables', [...new Set(existingTableIds)])
   }
 
   const handleChangeSettings = (key: 'motif' | 'conditions' | 'tables', value: any) => {
@@ -270,7 +285,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
                   <ListItemSecondaryAction>
                     <Checkbox
                       checked={!!settings.tables.find((tableId) => tableId === table_id)}
-                      onChange={() => handleChangeTables(table_id)}
+                      onChange={() => handleChangeTables(table_id, table_name)}
                       color="secondary"
                     />
                   </ListItemSecondaryAction>

@@ -29,7 +29,6 @@ const AsyncAutocomplete = ({
 }: AsyncAutocompleteProps) => {
   const [open, setOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
-  const [autocompleteValues, setAutocompleteValues] = React.useState<LabelObject[]>(values)
   const [options, setOptions] = useState<LabelObject[]>([])
   const [loading, setLoading] = useState(false)
   const controllerRef = useRef<AbortController | null>(null)
@@ -59,10 +58,6 @@ const AsyncAutocomplete = ({
     }
   }, [open])
 
-  useEffect(() => {
-    onChange(autocompleteValues)
-  }, [autocompleteValues])
-
   return (
     <Autocomplete
       disabled={disabled}
@@ -77,11 +72,11 @@ const AsyncAutocomplete = ({
       multiple
       noOptionsText={noOptionsText}
       loading={loading}
-      value={autocompleteValues}
+      value={values}
       autoComplete
       filterSelectedOptions
       onChange={(event: any, newValue: any) => {
-        setAutocompleteValues(newValue)
+        onChange(newValue)
       }}
       options={options}
       isOptionEqualToValue={(option, value) => option.id === value.id}

@@ -22,12 +22,13 @@ import Watermark from 'assets/images/watermark_pseudo.svg'
 
 import { getDocumentStatus } from 'utils/documentsFormatter'
 
-import { Column, CohortComposition, CompositionStatusKind, DocumentReferenceStatusKind } from 'types'
+import { Column, CohortComposition } from 'types'
 
 import useStyles from './styles'
 import { Visibility } from '@mui/icons-material'
 import { Order, OrderBy } from 'types/searchCriterias'
 import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
+import { DocumentReference } from 'fhir/r4'
 
 type DataTableCompositionProps = {
   loading: boolean
@@ -123,7 +124,7 @@ const DataTableCompositionLine: React.FC<{
 
   const documentId = document.id
   const title = document.description
-  const status = document.status as DocumentReferenceStatusKind
+  const status = document.docStatus
   const ipp = document.IPP ?? 'Inconnu'
   const nda = document.NDA ?? 'Inconnu'
   const serviceProvider = document.serviceProvider ?? 'Non renseigné'
@@ -131,9 +132,7 @@ const DataTableCompositionLine: React.FC<{
     ({ code }) => code === (document?.type?.coding?.[0] ? document.type.coding[0].code : '-')
   )
 
-  const findContent = document?.content?.find(
-    (content) => content.attachment?.contentType === 'http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain'
-  )
+  const findContent = document?.content?.find((content) => content.attachment?.contentType === 'text/plain')
 
   const documentContent = findContent?.attachment?.data
     ? Buffer.from(findContent?.attachment.data, 'base64').toString('utf-8')
@@ -226,19 +225,20 @@ const DataTableCompositionLine: React.FC<{
   )
 }
 
-const getStatusChip = (type?: CompositionStatusKind | DocumentReferenceStatusKind) => {
-  if (type === 'final' || type === 'current') {
-    return <StatusChip icon={<CheckIcon height="15px" fill="#FFF" />} label={getDocumentStatus(type)} />
-  } else if (type === 'entered-in-error') {
-    return (
-      <StatusChip
-        status={ChipStyles.CANCELLED}
-        icon={<CancelIcon height="15px" fill="#FFF" />}
-        label={getDocumentStatus(type)}
-      />
-    )
-  } else {
-    return ''
+const getStatusChip = (type?: DocumentReference['docStatus']) => {
+  switch (type) {
+    case 'preliminary':
+      return (
+        <StatusChip
+          status={ChipStyles.CANCELLED}
+          icon={<CancelIcon height="15px" fill="#FFF" />}
+          label={getDocumentStatus(type)}
+        />
+      )
+    case 'final':
+      return <StatusChip icon={<CheckIcon height="15px" fill="#FFF" />} label={getDocumentStatus(type)} />
+    default:
+      return ''
   }
 }
 

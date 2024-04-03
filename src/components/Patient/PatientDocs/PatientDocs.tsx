@@ -21,7 +21,8 @@ import {
   Order,
   DocumentsFilters,
   searchByListDocuments,
-  SearchByTypes
+  SearchByTypes,
+  FilterByDocumentStatus
 } from 'types/searchCriterias'
 import { PatientTypes } from 'types/patient'
 import Modal from 'components/ui/Modal'
@@ -39,11 +40,12 @@ import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import DocTypesFilter from 'components/Filters/DocTypesFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
+import DocStatusFilter from '../../Filters/DocStatusFilter'
 
 const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
@@ -75,7 +77,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
       selectFilter,
       resetSavedFilterError
     }
-  } = useSavedFilters<DocumentsFilters>(RessourceType.DOCUMENTS)
+  } = useSavedFilters<DocumentsFilters>(ResourceType.DOCUMENTS)
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [page, setPage] = useState(1)
@@ -85,18 +87,19 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
       searchInput,
       searchBy,
       filters,
-      filters: { nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate }
+      filters: { nda, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, startDate, endDate }
     },
     { changeOrderBy, changeSearchInput, changeSearchBy, addFilters, removeFilter, addSearchCriterias }
   ] = useSearchCriterias(initPatientDocsSearchCriterias)
   const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({ nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate })
-  }, [nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate])
+    return selectFiltersAsArray({ nda, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, startDate, endDate })
+  }, [nda, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, startDate, endDate])
 
   const controllerRef = useRef<AbortController>(new AbortController())
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
 
+  const docStatusesList = [FilterByDocumentStatus.VALIDATED, FilterByDocumentStatus.NOT_VALIDATED]
   const fetchDocumentsList = async () => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
@@ -108,7 +111,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
               orderBy,
               searchBy,
               searchInput,
-              filters: { nda, executiveUnits, onlyPdfAvailable, docTypes, startDate, endDate }
+              filters: { nda, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, startDate, endDate }
             }
           },
           groupId,
@@ -129,7 +132,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [onlyPdfAvailable, nda, docTypes, startDate, endDate, executiveUnits, orderBy, searchBy, searchInput])
+  }, [onlyPdfAvailable, nda, docStatuses, docTypes, startDate, endDate, executiveUnits, orderBy, searchBy, searchInput])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -236,6 +239,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
                   addFilters({
                     nda,
                     executiveUnits,
+                    docStatuses,
                     docTypes,
                     startDate,
                     endDate,
@@ -268,9 +272,12 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
         open={toggleFilterByModal}
         color="secondary"
         onClose={() => setToggleFilterByModal(false)}
-        onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
+        onSubmit={(newFilters) => {
+          addFilters({ ...filters, ...newFilters })
+        }}
       >
         {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+        <DocStatusFilter docStatusesList={docStatusesList} name={FilterKeys.DOC_STATUSES} value={docStatuses} />
         <DocTypesFilter allDocTypesList={allDocTypesList.docTypes} value={docTypes} name={FilterKeys.DOC_TYPES} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
@@ -352,24 +359,24 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
                   maxLimit={50}
                 />
               </Grid>
-              {!searchResults.deidentified && (
-                <Grid item container direction="column" paddingBottom="8px">
-                  <TextInput
-                    name="searchInput"
-                    label="Recherche textuelle :"
-                    disabled={isReadonlyFilterInfoModal}
-                    value={selectedSavedFilter?.filterParams.searchInput}
-                  />
-                  <Select
-                    label="Rechercher dans"
-                    width="60%"
-                    disabled={isReadonlyFilterInfoModal}
-                    value={selectedSavedFilter?.filterParams.searchBy}
-                    items={searchByListDocuments}
-                    name="searchBy"
-                  />
-                </Grid>
-              )}
+
+              <Grid item container direction="column" paddingBottom="8px">
+                <TextInput
+                  name="searchInput"
+                  label="Recherche textuelle :"
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.searchInput}
+                />
+                <Select
+                  label="Rechercher dans"
+                  width="60%"
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.searchBy}
+                  items={searchByListDocuments}
+                  name="searchBy"
+                />
+              </Grid>
+
               <Grid item>
                 {!searchResults.deidentified && (
                   <NdaFilter
@@ -378,6 +385,14 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
                     value={selectedSavedFilter?.filterParams.filters.nda || ''}
                   />
                 )}
+                <Grid item>
+                  <DocStatusFilter
+                    disabled={isReadonlyFilterInfoModal}
+                    docStatusesList={docStatusesList}
+                    value={selectedSavedFilter?.filterParams.filters.docStatuses || []}
+                    name={FilterKeys.DOC_STATUSES}
+                  />
+                </Grid>
                 <DocTypesFilter
                   disabled={isReadonlyFilterInfoModal}
                   allDocTypesList={allDocTypesList.docTypes}

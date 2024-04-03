@@ -7,11 +7,11 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import { CriteriaDrawerComponentProps } from 'types'
 
 import useStyles from './styles'
-import { IPPListDataType, RessourceType } from 'types/requestCriterias'
+import { IPPListDataType, CriteriaType } from 'types/requestCriterias'
 
 const defaultIPPList: Omit<IPPListDataType, 'id'> = {
   title: "Liste d'IPP",
-  type: RessourceType.IPP_LIST,
+  type: CriteriaType.IPP_LIST,
   search: '',
   isInclusive: true
 }
@@ -45,8 +45,7 @@ const IPPForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   }
 
   useEffect(() => {
-    const ippMatches = (defaultValues.search || '').matchAll(/(?:^|\D+)*(8\d{9})(?:\D+|$)/gm) || []
-
+    const ippMatches = (defaultValues.search || '').matchAll(/(?:^|\D+)?(8\d{9})(?:$|\D+)/gm) || []
     const ippList = []
 
     for (const match of ippMatches) {
@@ -110,7 +109,7 @@ const IPPForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
           </Grid>
 
           <Typography className={classes.inputItem} style={{ fontWeight: 'bold' }}>
-            {ippList.length} IPP détectés.
+            {ippList.length} IPP détecté{ippList.length > 1 ? 's' : ''}.
           </Typography>
 
           <Grid item xs={12} className={classes.inputItem}>

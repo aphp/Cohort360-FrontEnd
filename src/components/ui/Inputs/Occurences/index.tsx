@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-
-import { MenuItem, Select, TextField } from '@mui/material'
+import { MenuItem, Select, SelectChangeEvent, TextField } from '@mui/material'
 import { Comparators } from 'types/requestCriterias'
 import { OccurenceInputWrapper } from './styles'
 
@@ -8,31 +7,47 @@ type OccurenceInputProps = {
   value: number
   comparator: Comparators
   onchange: (value: number, comparator: Comparators) => void
+  enableNegativeValues?: boolean
 }
 
-const OccurenceInput = ({ value, comparator, onchange }: OccurenceInputProps) => {
-  const [occurenceValue, setOccurrenceValue] = useState(value)
+const OccurenceInput = ({ value, comparator, onchange, enableNegativeValues = false }: OccurenceInputProps) => {
+  const [occurrenceValue, setOccurrenceValue] = useState(value)
   const [comparatorValue, setComparatorValue] = useState(comparator)
 
   useEffect(() => {
-    let newValue = occurenceValue
-    if (
-      (comparatorValue === Comparators.LESS || comparatorValue === Comparators.LESS_OR_EQUAL) &&
-      occurenceValue === 0
-    ) {
-      newValue = 1
-      setOccurrenceValue(newValue)
+    if (!enableNegativeValues && comparatorValue === Comparators.LESS && occurrenceValue === 0) {
+      setOccurrenceValue(1)
+      onchange(1, comparatorValue)
     }
-    onchange(newValue, comparatorValue)
-  }, [occurenceValue, comparatorValue])
+  }, [comparatorValue, occurrenceValue, enableNegativeValues, onchange])
+
+  const handleOccurrenceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value === '' ? '0' : e.target.value
+    if (newValue.match(/^\d+$/) || (enableNegativeValues && newValue === '0' && comparatorValue === Comparators.LESS)) {
+      const numericValue = parseInt(newValue, 10)
+      setOccurrenceValue(numericValue)
+      onchange(numericValue, comparatorValue)
+    }
+  }
+
+  const handleComparatorChange = (event: SelectChangeEvent<Comparators>) => {
+    const newComparator = event.target.value as Comparators
+    setComparatorValue(newComparator)
+    if (!enableNegativeValues && newComparator === Comparators.LESS && occurrenceValue === 0) {
+      setOccurrenceValue(1)
+      onchange(1, newComparator)
+    } else {
+      onchange(occurrenceValue, newComparator)
+    }
+  }
 
   return (
     <OccurenceInputWrapper>
       <Select
         style={{ marginRight: '1em' }}
         id="criteria-occurrenceComparator-select"
-        value={comparator}
-        onChange={(event) => setComparatorValue(event.target.value as Comparators)}
+        value={comparatorValue}
+        onChange={handleComparatorChange}
       >
         <MenuItem value={Comparators.LESS_OR_EQUAL}>{Comparators.LESS_OR_EQUAL}</MenuItem>
         <MenuItem value={Comparators.LESS}>{Comparators.LESS}</MenuItem>
@@ -43,15 +58,10 @@ const OccurenceInput = ({ value, comparator, onchange }: OccurenceInputProps) =>
 
       <TextField
         required
-        InputProps={{
-          inputProps: {
-            min: 0
-          }
-        }}
-        type="number"
+        type="text"
         id="criteria-occurrence-required"
-        value={value}
-        onChange={(e) => setOccurrenceValue(+e.target.value as number)}
+        value={occurrenceValue}
+        onChange={handleOccurrenceChange}
       />
     </OccurenceInputWrapper>
   )

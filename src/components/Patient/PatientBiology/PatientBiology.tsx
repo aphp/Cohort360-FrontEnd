@@ -29,7 +29,7 @@ import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import LoincFilter from 'components/Filters/LoincFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
 import { Save, SavedSearch } from '@mui/icons-material'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import List from 'components/ui/List'
 import TextInput from 'components/Filters/TextInput'
@@ -66,7 +66,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
       selectFilter,
       resetSavedFilterError
     }
-  } = useSavedFilters<BiologyFilters>(RessourceType.OBSERVATION)
+  } = useSavedFilters<BiologyFilters>(ResourceType.OBSERVATION)
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const searchResults = {
@@ -322,6 +322,13 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
                     label="Recherche textuelle :"
                     disabled={isReadonlyFilterInfoModal}
                     value={selectedSavedFilter?.filterParams.searchInput}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <NdaFilter
+                    name="nda"
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.filters.nda || ''}
                   />
                 </Grid>
                 <Grid item xs={12}>

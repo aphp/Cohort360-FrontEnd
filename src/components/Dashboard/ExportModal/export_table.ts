@@ -11,12 +11,6 @@ const exportTable: ExportTableType[] = [
     table_name: 'Patient',
     table_id: 'person'
   },
-  // {
-  //   id: 'observation',
-  //   table_name: 'Patient - Données démographiques',
-  //   table_id: 'observation',
-  //   table_subtitle: '⚠️ Attention cette table comporte des données identifiantes'
-  // },
   {
     id: 'iris',
     table_name: 'Patient - Données géographiques',
@@ -41,11 +35,6 @@ const exportTable: ExportTableType[] = [
     id: 'visit_detail',
     table_name: 'Prise en charge - Passages ',
     table_id: 'visit_detail'
-  },
-  {
-    id: 'cohort_definition',
-    table_name: 'Cohorte - Information (requête)',
-    table_id: 'cohort_definition'
   },
   {
     id: 'condition_occurrence',
@@ -93,9 +82,34 @@ const exportTable: ExportTableType[] = [
     table_id: 'imaging_study'
   },
   {
-    id: 'imaging_serie',
+    id: 'imaging_series',
     table_name: 'Fait - Imagerie - Série',
-    table_id: 'imaging_serie'
+    table_id: 'imaging_series'
+  },
+  {
+    id: 'questionnaire',
+    table_name: 'Formulaires',
+    table_id: 'questionnaire'
+  },
+  {
+    id: 'questionnaire',
+    table_name: 'Formulaires',
+    table_id: 'questionnaire__item'
+  },
+  {
+    id: 'questionnaire',
+    table_name: 'Formulaires',
+    table_id: 'questionnaireresponse'
+  },
+  {
+    id: 'questionnaire',
+    table_name: 'Formulaires',
+    table_id: 'questionnaireresponse__item'
+  },
+  {
+    id: 'questionnaire',
+    table_name: 'Formulaires',
+    table_id: 'questionnaireresponse__item__answer'
   }
 ]
 

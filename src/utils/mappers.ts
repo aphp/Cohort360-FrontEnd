@@ -17,16 +17,21 @@ import {
   DocumentDataType,
   EncounterDataType,
   GhmDataType,
+  HospitDataType,
   ImagingDataType,
   MedicationDataType,
-  ObservationDataType
+  ObservationDataType,
+  PregnancyDataType
 } from 'types/requestCriterias'
 import { comparatorToFilter, parseOccurence } from './valueComparator'
 import services from 'services/aphp'
+import extractFilterParams, { FhirFilterValue } from './fhirFilterParser'
+import { mapDocumentStatusesFromRequestParam } from 'mappers/filters'
 
 const searchReducer = (accumulator: any, currentValue: any): string =>
   accumulator || accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 const comparator = /(le|ge)/gi
+
 const replaceTime = (date?: string) => {
   return date?.replace('T00:00:00Z', '') ?? null
 }
@@ -43,16 +48,15 @@ export const mapToCriteriaName = (criteria: string): CriteriaNameType => {
 
 export const buildLabelObjectFilter = (
   criterion: LabelObject[] | undefined | null,
-  fhirKey: string,
   hierarchyUrl?: string,
   system?: boolean
 ) => {
   if (criterion && criterion.length > 0) {
     let filter = ''
     criterion.find((code) => code.id === '*')
-      ? (filter = `${fhirKey}=${hierarchyUrl}|*`)
-      : (filter = `${fhirKey}=${criterion
-          .map((item) => (system ? `${item.system}|${item.id}` : item.id))
+      ? (filter = `${hierarchyUrl}|*`)
+      : (filter = `${criterion
+          .map((item) => (system && item.system ? `${item.system}|${item.id}` : item.id))
           .reduce(searchReducer)}`)
     return filter
   }
@@ -67,11 +71,8 @@ export const unbuildLabelObjectFilter = (currentCriterion: any, filterName: stri
   }
 }
 
-export const buildEncounterServiceFilter = (criterion: ScopeTreeRow[] | undefined, fhirKey: string) => {
-  if (criterion && criterion.length > 0) {
-    return `${fhirKey}=${criterion.map((item) => item.id).reduce(searchReducer)}`
-  }
-  return ''
+export const buildEncounterServiceFilter = (criterion: ScopeTreeRow[] | undefined) => {
+  return criterion && criterion.length > 0 ? `${criterion.map((item) => item.id).reduce(searchReducer)}` : ''
 }
 
 export const unbuildEncounterServiceCriterias = async (
@@ -87,11 +88,14 @@ export const unbuildEncounterServiceCriterias = async (
   }
 }
 
-export const buildDateFilter = (criterion: string | null | undefined, fhirKey: string, comparator: 'le' | 'ge') => {
-  if (criterion) {
-    return `${fhirKey}=${comparator}${moment(criterion).format('YYYY-MM-DD[T00:00:00Z]')}`
-  }
-  return ''
+export const buildDateFilter = (
+  criterion: string | null | undefined,
+  comparator: 'le' | 'ge',
+  removeTimeZone = false
+) => {
+  return criterion
+    ? `${comparator}${moment(criterion).format(`YYYY-MM-DD[T00:00:00${removeTimeZone ? '' : 'Z'}]`)}`
+    : ''
 }
 
 export const unbuildDateFilter = (value: string) => {
@@ -116,11 +120,8 @@ export const unbuildDurationFilter = (value: string, deidentified?: boolean) => 
   return convertDurationToString(convertTimestampToDuration(+cleanValue, deidentified))
 }
 
-export const buildSearchFilter = (criterion: string, fhirKey: string) => {
-  if (criterion) {
-    return `${fhirKey}=${encodeURIComponent(criterion)}`
-  }
-  return ''
+export const buildSearchFilter = (criterion: string) => {
+  return criterion ? `${encodeURIComponent(criterion)}` : ''
 }
 
 export const unbuildSearchFilter = (value: string | null) => {
@@ -165,8 +166,8 @@ export const unbuildObservationValueFilter = (filters: string[][], currentCriter
   }
 }
 
-export const buildComparatorFilter = (criterion: number, comparator: Comparators, fhirKey: string) => {
-  return criterion ? `${fhirKey}=${comparatorToFilter(comparator)}${criterion}` : ''
+export const buildComparatorFilter = (criterion: number, comparator: Comparators) => {
+  return criterion ? `${comparatorToFilter(comparator)}${criterion}` : ''
 }
 
 export const buildWithDocumentFilter = (criterion: ImagingDataType, fhirKey: string) => {
@@ -192,6 +193,14 @@ export const unbuildDocTypesFilter = (currentCriterion: any, filterName: string,
   }
 }
 
+export const unbuildDocStatusesFilter = (currentCriterion: any, filterName: string, values?: string | null) => {
+  const newArray = values?.split(',').map((value) => mapDocumentStatusesFromRequestParam(value.split('|')[1]))
+
+  if (newArray) {
+    currentCriterion[filterName] = currentCriterion ? [...currentCriterion[filterName], ...newArray] : newArray
+  }
+}
+
 export const unbuildAdvancedCriterias = (
   element: RequeteurCriteriaType,
   currentCriterion:
@@ -203,6 +212,8 @@ export const unbuildAdvancedCriterias = (
     | MedicationDataType
     | ObservationDataType
     | ImagingDataType
+    | PregnancyDataType
+    | HospitDataType
 ) => {
   if (element.occurrence) {
     currentCriterion.occurrence = element.occurrence ? element.occurrence.n : 1
@@ -223,4 +234,79 @@ export const unbuildAdvancedCriterias = (
 
 export const buildSimpleFilter = (criterion: string, fhirKey: string, url?: string) => {
   return criterion ? `${fhirKey}=${url ? `${url}|` : ''}${criterion}` : ''
+}
+
+const LINK_ID_PARAM_NAME = 'item.linkId'
+const VALUE_PARAM_NAME_PREFIX = 'item.answer.'
+const FILTER_PARAM_NAME = '_filter'
+
+const quoteValue = (value: string, type: string) => {
+  return ['valueString', 'valueCoding'].includes(type) ? `"${value}"` : value
+}
+
+export const questionnaireFiltersBuilders = (fhirKey: { id: string; type: string }, value?: string) => {
+  const slice = value?.slice(0, 2)
+  const operator = slice === 'ge' || slice === 'le' || slice === 'lt' || slice === 'gt' || slice === 'eq' ? slice : 'eq'
+  const _value = slice === 'ge' || slice === 'le' || slice === 'lt' || slice === 'gt' ? value?.slice(2) : value
+
+  if (fhirKey.type === 'valueBoolean' || fhirKey.type === 'valueCoding') {
+    const _code = value?.split(',')
+    return value && _code && _code?.length > 0
+      ? `${FILTER_PARAM_NAME}=${LINK_ID_PARAM_NAME} eq ${fhirKey.id} and (${_code
+          .map((code) => `${VALUE_PARAM_NAME_PREFIX}${fhirKey.type} eq ${quoteValue(code, fhirKey.type)}`)
+          .join(' or ')})`
+      : ''
+  } else {
+    return _value
+      ? `${FILTER_PARAM_NAME}=${LINK_ID_PARAM_NAME} eq ${fhirKey.id} and ${VALUE_PARAM_NAME_PREFIX}${
+          fhirKey.type
+        } ${operator} ${quoteValue(_value, fhirKey.type)}`
+      : ''
+  }
+}
+
+export const findQuestionnaireName = (filters: string[]) => {
+  for (const item of filters) {
+    const match = item.match(/questionnaire.name=(.*)/)
+    if (match && match[1]) {
+      return match[1]
+    }
+  }
+}
+
+export const unbuildQuestionnaireFilters = (
+  filters: string[]
+): Array<{ key: string; values: Array<FhirFilterValue> }> => {
+  const specialFilters = filters
+    .filter((filter) => filter.startsWith(`${FILTER_PARAM_NAME}=`))
+    .map((filter) => {
+      const filterContent = filter.split(`${FILTER_PARAM_NAME}=`)[1]
+      const filterElements = extractFilterParams(filterContent, { omitOperatorEq: true })
+      if (filterElements) {
+        // should check that this param exist and does not have multiple values
+        // and raise an error (but errors should be properly handled in the unbuildRequest function)
+        const paramKey = filterElements.find((element) => element.param === LINK_ID_PARAM_NAME)
+        const paramValues = filterElements.filter((element) => element.param.startsWith(VALUE_PARAM_NAME_PREFIX))
+        const key = paramKey?.values[0].value
+        return {
+          key: key,
+          values: paramValues.flatMap((element) => element.values)
+        }
+      }
+    })
+    .filter((filter) => filter !== undefined) as Array<{ key: string; values: Array<FhirFilterValue> }>
+  const standardFilters = filters
+    .filter((filter) => !filter.startsWith(`${FILTER_PARAM_NAME}=`))
+    .map((filter) => {
+      const [key, value] = filter.split('=')
+      return {
+        key: key,
+        values: [{ value: value, operator: 'undefined' }]
+      }
+    })
+  return specialFilters.concat(standardFilters)
+}
+
+export const filtersBuilders = (fhirKey: string, value?: string) => {
+  return value ? `${fhirKey}=${value}` : ''
 }
