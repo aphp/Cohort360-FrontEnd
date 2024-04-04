@@ -1,6 +1,6 @@
 {
   "name": "cohort360_react",
-  "version": "2.33.3",
+  "version": "2.33.4",
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.7.10",
