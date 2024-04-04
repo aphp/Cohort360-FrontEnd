@@ -42,7 +42,6 @@ import services from 'services/aphp'
 import useStyles from './styles'
 import { getDaysLeft } from 'utils/formatDate'
 import { isCustomError } from 'utils/perimeters'
-import Welcome from '../Welcome/Welcome'
 import { AccessExpiration, User } from 'types'
 import { isAxiosError } from 'axios'
 
@@ -123,21 +122,14 @@ const Login = () => {
   const [error, setError] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [open, setOpen] = useState(false)
-  const [authCode, setAuthCode] = useState<string>('')
   const urlParams = new URLSearchParams(window.location.search)
   const [display_jwt_form, setDisplay_jwt_form] = useState(false)
   const oidcCode = urlParams.get('code')
 
   useEffect(() => {
     localforage.setItem('persist:root', '')
-    if (oidcCode) setAuthCode(oidcCode)
+    if (oidcCode) login()
   }, [])
-
-  useEffect(() => {
-    if (authCode) {
-      login()
-    }
-  }, [authCode])
 
   const loadBootstrapData = async (practitionerData: User, lastConnection: string) => {
     const maintenanceResponse = await services.practitioner.maintenance()
@@ -225,8 +217,8 @@ const Login = () => {
 
     let response = null
 
-    if (authCode) {
-      response = await services.practitioner.authenticateWithCode(authCode)
+    if (oidcCode) {
+      response = await services.practitioner.authenticateWithCode(oidcCode)
       localStorage.setItem('oidcAuth', 'true')
     } else {
       if (!username || !password) {
@@ -302,7 +294,7 @@ const Login = () => {
     return () => document.removeEventListener('keydown', keyHandler)
   }, [display_jwt_form])
 
-  if (noRights === true) return <NoRights oidcCode={oidcCode} />
+  if (noRights) return <NoRights oidcCode={oidcCode} />
 
   return oidcCode ? (
     <Grid className={classes.oidcConnexionProgress}>
@@ -310,10 +302,8 @@ const Login = () => {
         Connexion...
       </Typography>
       <CircularProgress />
-      <ErrorSnackBarAlert open={error !== false} setError={setError} errorMessage={errorMessage} />
+      <ErrorSnackBarAlert open={error} setError={setError} errorMessage={errorMessage} />
     </Grid>
-  ) : authCode ? (
-    <Welcome />
   ) : (
     <>
       <Grid container component="main" className={classes.root}>

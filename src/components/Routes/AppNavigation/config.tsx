@@ -12,6 +12,7 @@ import PageNotFound from 'views/PageNotFound/PageNotFound'
 import CareSiteView from 'views/Scope/CareSiteView'
 import MyCohorts from 'views/MyCohorts'
 import MyRequests from 'views/MyRequests'
+import ExportDownload from 'views/ExportDownload/ExportDownload'
 
 // import { ODD_CONTACT } from '../../../constants'
 
@@ -207,6 +208,12 @@ const configRoutes: configRoute[] = [
     name: 'patients/:patientId/:tabName',
     isPrivate: true,
     element: <Patient />
+  },
+  {
+    path: '/exports/:exportId/download',
+    name: '/exports/:exportId/download',
+    isPrivate: true,
+    element: <ExportDownload />
   },
   /**
    * Cohort360: 404 - Page Not Found
