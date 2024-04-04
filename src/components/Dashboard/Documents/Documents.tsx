@@ -2,7 +2,14 @@ import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { Checkbox, CircularProgress, Grid, Tooltip, Typography } from '@mui/material'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
-import { CohortComposition, CriteriaName, DocumentsData, LoadingStatus, DTTB_ResultsType as ResultsType } from 'types'
+import {
+  CohortComposition,
+  CriteriaName,
+  DocumentsData,
+  HierarchyElement,
+  LoadingStatus,
+  DTTB_ResultsType as ResultsType
+} from 'types'
 import services from 'services/aphp'
 import {
   DocumentsFilters,
@@ -39,6 +46,7 @@ import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import List from 'components/ui/List'
 import { useAppSelector } from 'state'
 import Modal from 'components/ui/Modal'
+import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 
 type DocumentsProps = {
   groupId?: string
@@ -72,6 +80,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   const [page, setPage] = useState(1)
   const [searchInputError, setSearchInputError] = useState<SearchInputError | null>(null)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
 
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
@@ -85,7 +94,17 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
       searchInput,
       searchBy,
       filters,
-      filters: { nda, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, startDate, endDate, ipp }
+      filters: {
+        nda,
+        executiveUnits,
+        onlyPdfAvailable,
+        docStatuses,
+        docTypes,
+        startDate,
+        endDate,
+        ipp,
+        encounterStatus
+      }
     },
     { changeOrderBy, changeSearchInput, changeSearchBy, addFilters, removeFilter, addSearchCriterias }
   ] = useSearchCriterias(initAllDocsSearchCriterias)
@@ -99,9 +118,10 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
       docTypes,
       startDate,
       endDate,
-      ipp
+      ipp,
+      encounterStatus
     })
-  }, [nda, ipp, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, startDate, endDate])
+  }, [nda, ipp, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, startDate, endDate, encounterStatus])
 
   const controllerRef = useRef<AbortController>(new AbortController())
 
@@ -119,7 +139,17 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
             orderBy,
             searchBy,
             searchInput,
-            filters: { nda, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, ipp, startDate, endDate }
+            filters: {
+              nda,
+              executiveUnits,
+              onlyPdfAvailable,
+              docStatuses,
+              docTypes,
+              ipp,
+              startDate,
+              endDate,
+              encounterStatus
+            }
           }
         },
         groupId,
@@ -162,6 +192,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   }
 
   useEffect(() => {
+    const fetch = async () => {
+      const encounterStatus = await services.cohortCreation.fetchEncounterStatus()
+      setEncounterStatusList(encounterStatus)
+    }
+    fetch()
     getSavedFilters()
   }, [])
 
@@ -180,7 +215,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
     orderBy,
     searchBy,
     searchInput,
-    groupId
+    groupId,
+    encounterStatus
   ])
 
   useEffect(() => {
@@ -340,6 +376,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
           name={FilterKeys.EXECUTIVE_UNITS}
           criteriaName={CriteriaName.Document}
         />
+        <EncounterStatusFilter
+          value={encounterStatus}
+          name={FilterKeys.ENCOUNTER_STATUS}
+          encounterStatusList={encounterStatusList}
+        />
       </Modal>
       <Modal
         title="Filtres sauvegardés"
@@ -386,7 +427,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
               endDate,
               startDate,
               onlyPdfAvailable,
-              filterName
+              filterName,
+              encounterStatus
             }) => {
               patchSavedFilter(
                 filterName,
@@ -394,7 +436,17 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
                   searchBy,
                   searchInput,
                   orderBy: { orderBy: Order.DATE, orderDirection: Direction.DESC },
-                  filters: { nda, executiveUnits, ipp, docStatuses, docTypes, endDate, startDate, onlyPdfAvailable }
+                  filters: {
+                    nda,
+                    executiveUnits,
+                    ipp,
+                    docStatuses,
+                    docTypes,
+                    endDate,
+                    startDate,
+                    onlyPdfAvailable,
+                    encounterStatus
+                  }
                 },
                 deidentified ?? true
               )
@@ -485,6 +537,14 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
                   criteriaName={CriteriaName.Document}
+                />
+              </Grid>
+              <Grid item>
+                <EncounterStatusFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
+                  name={FilterKeys.ENCOUNTER_STATUS}
+                  encounterStatusList={encounterStatusList}
                 />
               </Grid>
             </Grid>

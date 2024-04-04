@@ -16,14 +16,14 @@ const DocTypesFilter = ({ name, value, allDocTypesList, disabled = false }: DocT
   const [selectedDocTypes, setSelectedDocTypes] = useState<SimpleCodeType[]>(value)
 
   const renderDocTypes = (docType: AutocompleteRenderGroupParams) => {
-    const currentDocTypeList = allDocTypesList ? allDocTypesList.filter((doc: any) => doc.type === docType.group) : []
+    const currentDocTypeList = allDocTypesList ? allDocTypesList.filter((doc) => doc.type === docType.group) : []
     const currentSelectedDocTypeList = selectedDocTypes
-      ? selectedDocTypes.filter((doc: any) => doc.type === docType.group)
+      ? selectedDocTypes.filter((doc) => doc.type === docType.group)
       : []
 
     const onClick = () => {
       if (currentDocTypeList.length === currentSelectedDocTypeList.length) {
-        setSelectedDocTypes(selectedDocTypes.filter((doc: any) => doc.type !== docType.group))
+        setSelectedDocTypes(selectedDocTypes.filter((doc) => doc.type !== docType.group))
       } else {
         setSelectedDocTypes(
           [...selectedDocTypes, ...currentDocTypeList].filter((item, index, array) => array.indexOf(item) === index)
@@ -67,7 +67,7 @@ const DocTypesFilter = ({ name, value, allDocTypesList, disabled = false }: DocT
         options={allDocTypesList}
         value={selectedDocTypes}
         disableCloseOnSelect
-        getOptionLabel={(docType: any) => docType.label}
+        getOptionLabel={(docType) => docType.label}
         renderGroup={(docType: AutocompleteRenderGroupParams) => {
           return renderDocTypes(docType)
         }}

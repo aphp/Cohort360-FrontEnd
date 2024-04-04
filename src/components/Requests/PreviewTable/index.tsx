@@ -73,7 +73,7 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
   )
   const openMenuItem = Boolean(anchorEl)
 
-  const _onClickRow = (row: any) => {
+  const _onClickRow = (row: RequestType) => {
     if (!row.uuid) return
     navigate(`/cohort/new/${row.uuid}`)
   }

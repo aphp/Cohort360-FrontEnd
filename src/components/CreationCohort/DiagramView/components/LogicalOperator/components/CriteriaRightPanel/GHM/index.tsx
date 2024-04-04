@@ -23,7 +23,8 @@ export const defaultClaim: Omit<GhmDataType, 'id'> = {
   endOccurrence: '',
   isInclusive: true,
   encounterStartDate: null,
-  encounterEndDate: null
+  encounterEndDate: null,
+  encounterStatus: []
 }
 
 const Index = (props: CriteriaDrawerComponentProps) => {

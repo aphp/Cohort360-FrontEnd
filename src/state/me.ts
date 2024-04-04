@@ -12,7 +12,7 @@ export type MeState = null | {
   lastName: string
   deidentified: boolean
   accessExpirations: AccessExpiration[]
-  nominativeGroupsIds?: any[]
+  nominativeGroupsIds?: string[]
   lastConnection?: string
   maintenance?: { active: boolean; maintenance_end: string; maintenance_start: string }
 }

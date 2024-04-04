@@ -140,6 +140,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const startDate = options.searchCriterias.filters.startDate
       const endDate = options.searchCriterias.filters.endDate
       const executiveUnits = options.searchCriterias.filters.executiveUnits.map((unit) => unit.id)
+      const encounterStatus = options.searchCriterias.filters.encounterStatus?.map(({ id }) => id)
 
       const pmsiResponse = await services.patients.fetchPMSI(
         page,
@@ -156,7 +157,8 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
         endDate,
         executiveUnits,
         groupId,
-        signal
+        signal,
+        encounterStatus
       )
 
       if (pmsiResponse.pmsiData === undefined) return undefined
@@ -235,6 +237,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
       const endDate = searchCriterias.filters.endDate
       const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
       const rowStatus = searchCriterias.filters.validatedStatus
+      const encounterStatus = searchCriterias.filters.encounterStatus?.map(({ id }) => id)
 
       const biologyResponse = await services.patients.fetchObservation(
         sortBy,
@@ -250,7 +253,8 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
         endDate,
         groupId,
         signal,
-        executiveUnits
+        executiveUnits,
+        encounterStatus
       )
 
       const biologyList = linkElementWithEncounter(biologyResponse.biologyList, hospits, deidentified)
@@ -323,6 +327,7 @@ const fetchMedication = createAsyncThunk<
       const startDate = searchCriterias.filters?.startDate
       const endDate = searchCriterias.filters.endDate
       const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
+      const encounterStatus = searchCriterias.filters.encounterStatus?.map(({ id }) => id)
 
       const medicationResponse = await services.patients.fetchMedication(
         page,
@@ -338,7 +343,8 @@ const fetchMedication = createAsyncThunk<
         endDate,
         executiveUnits,
         groupId,
-        signal
+        signal,
+        encounterStatus
       )
 
       if (medicationResponse.medicationData === undefined) return undefined
@@ -409,6 +415,7 @@ const fetchImaging = createAsyncThunk<FetchImagingReturn, FetchImagingParams, { 
       const endDate = searchCriterias.filters.endDate
       const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
       const modalities = searchCriterias.filters.modality?.map(({ id }) => id)
+      const encounterStatus = searchCriterias.filters.encounterStatus?.map(({ id }) => id)
 
       const imagingResponse = await services.patients.fetchImaging(
         orderBy,
@@ -422,7 +429,8 @@ const fetchImaging = createAsyncThunk<FetchImagingReturn, FetchImagingParams, { 
         groupId,
         signal,
         modalities,
-        executiveUnits
+        executiveUnits,
+        encounterStatus
       )
 
       const imagingList = linkElementWithEncounter(imagingResponse.imagingList, hospits, deidentified)
@@ -486,6 +494,7 @@ const fetchDocuments = createAsyncThunk<
     const endDate = searchCriterias.filters.endDate
     const onlyPdfAvailable = searchCriterias.filters.onlyPdfAvailable
     const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
+    const encounterStatus = searchCriterias.filters.encounterStatus?.map(({ id }) => id)
 
     if (searchInput) {
       const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)
@@ -520,7 +529,8 @@ const fetchDocuments = createAsyncThunk<
       endDate,
       groupId,
       signal,
-      executiveUnits
+      executiveUnits,
+      encounterStatus
     )
 
     const documentsList = linkElementWithEncounter(
@@ -581,10 +591,11 @@ const fetchMaternityForms = createAsyncThunk<
     const deidentified = patientState?.deidentified ?? true
     const hospits = patientState?.hospits?.list ?? []
 
-    const { formName, startDate, endDate, executiveUnits } = searchCriterias.filters
+    const { formName, startDate, endDate, executiveUnits, encounterStatus } = searchCriterias.filters
     const _formName = formName.length === 0 ? [FormNames.PREGNANCY, FormNames.HOSPIT] : [...formName]
 
     const _executiveUnits = executiveUnits?.map((unit) => unit.id)
+    const _encounterStatus = encounterStatus?.map(({ id }) => id)
 
     const formResponse = await services.patients.fetchMaternityForms(
       patientId,
@@ -592,7 +603,8 @@ const fetchMaternityForms = createAsyncThunk<
       groupId,
       startDate,
       endDate,
-      _executiveUnits
+      _executiveUnits,
+      _encounterStatus
     )
 
     const maternityFormsList = linkElementWithEncounter(formResponse, hospits, deidentified).sort((form1, form2) => {
@@ -722,7 +734,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
       const patientState = getState().patient
 
       const hospits = patientState?.hospits?.list ?? []
-      const deidentified = patientState?.deidentified ?? []
+      const deidentified = !!patientState?.deidentified
 
       const fetchPatientResponse = await Promise.all([
         services.patients.fetchPMSI(
@@ -794,7 +806,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
           lastGhm: claimList ? (claimList[0] as Claim) : undefined,
           lastProcedure: procedureList ? (procedureList[0] as Procedure) : undefined,
           mainDiagnosis: conditionList.filter(
-            (condition: any) => condition.extension?.[0]?.valueCodeableConcept?.coding?.[0]?.code === 'dp'
+            (condition) => condition.extension?.[0]?.valueCodeableConcept?.coding?.[0]?.code === 'dp'
           ) as Condition[]
         },
         pmsi: {
@@ -1430,7 +1442,7 @@ function linkElementWithEncounter<
     | Observation
     | ImagingStudy
     | QuestionnaireResponse
->(elementEntries: T[], encounterList: any[], deidentifiedBoolean: any) {
+>(elementEntries: T[], encounterList: any[], deidentifiedBoolean: boolean) {
   let elementList: (T & {
     serviceProvider?: string
     NDA?: string

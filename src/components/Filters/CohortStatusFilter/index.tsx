@@ -30,8 +30,8 @@ const CohortStatusFilter = ({ name, value, allStatus }: CohortStatusFilterProps)
         options={allStatus}
         value={status}
         disableCloseOnSelect
-        getOptionLabel={(status: any) => capitalizeFirstLetter(status.display)}
-        renderOption={(props, status: any) => <li {...props}>{capitalizeFirstLetter(status.display)}</li>}
+        getOptionLabel={(status) => capitalizeFirstLetter(status.display)}
+        renderOption={(props, status) => <li {...props}>{capitalizeFirstLetter(status.display)}</li>}
         renderInput={(params) => <TextField {...params} label="Statut" placeholder="Statut de la cohorte" />}
       />
     </InputWrapper>

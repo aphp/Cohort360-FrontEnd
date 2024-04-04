@@ -31,6 +31,7 @@ import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
 import services from 'services/aphp'
 import { BlockWrapper } from 'components/ui/Layout'
+import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 
 const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
@@ -43,6 +44,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [allModalities, setAllModalities] = useState<HierarchyElement[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
 
   const searchResults = {
     deidentified: patient?.deidentified || false,
@@ -58,13 +60,13 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
       orderBy,
       searchInput,
       filters,
-      filters: { nda, startDate, endDate, executiveUnits, modality }
+      filters: { nda, startDate, endDate, executiveUnits, modality, encounterStatus }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
   ] = useSearchCriterias(initImagingCriterias)
   const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({ nda, startDate, endDate, executiveUnits, modality })
-  }, [nda, startDate, endDate, executiveUnits, modality])
+    return selectFiltersAsArray({ nda, startDate, endDate, executiveUnits, modality, encounterStatus })
+  }, [nda, startDate, endDate, executiveUnits, modality, encounterStatus])
   const {
     allSavedFilters,
     savedFiltersErrors,
@@ -94,7 +96,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
             searchCriterias: {
               orderBy,
               searchInput,
-              filters: { nda, startDate, endDate, executiveUnits, modality }
+              filters: { nda, startDate, endDate, executiveUnits, modality, encounterStatus }
             }
           },
           groupId,
@@ -116,8 +118,13 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
 
   useEffect(() => {
     const fetch = async () => {
-      const modalities = await services.cohortCreation.fetchModalities()
+      const [modalities, encounterStatus] = await Promise.all([
+        services.cohortCreation.fetchModalities(),
+        services.cohortCreation.fetchEncounterStatus()
+      ])
+
       setAllModalities(modalities)
+      setEncounterStatusList(encounterStatus)
     }
     fetch()
   }, [])
@@ -125,7 +132,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality])
+  }, [nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality, encounterStatus])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -237,6 +244,11 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
           name={FilterKeys.EXECUTIVE_UNITS}
           criteriaName={CriteriaName.Imaging}
         />
+        <EncounterStatusFilter
+          value={encounterStatus}
+          name={FilterKeys.ENCOUNTER_STATUS}
+          encounterStatusList={encounterStatusList}
+        />
       </Modal>
       <Modal
         title="Filtres sauvegardés"
@@ -275,7 +287,16 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
             open={toggleFilterInfoModal}
             readonly={isReadonlyFilterInfoModal}
             onClose={() => setToggleFilterInfoModal(false)}
-            onSubmit={({ filterName, searchInput, modality, nda, startDate, endDate, executiveUnits }) => {
+            onSubmit={({
+              filterName,
+              searchInput,
+              modality,
+              nda,
+              startDate,
+              endDate,
+              executiveUnits,
+              encounterStatus
+            }) => {
               patchSavedFilter(
                 filterName,
                 {
@@ -284,7 +305,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
                     orderBy: Order.STUDY_DATE,
                     orderDirection: Direction.DESC
                   },
-                  filters: { modality, nda, startDate, endDate, executiveUnits }
+                  filters: { modality, nda, startDate, endDate, executiveUnits, encounterStatus }
                 },
                 searchResults.deidentified ?? true
               )
@@ -340,6 +361,12 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
                   criteriaName={CriteriaName.Imaging}
+                />
+                <EncounterStatusFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
+                  name={FilterKeys.ENCOUNTER_STATUS}
+                  encounterStatusList={encounterStatusList}
                 />
               </Grid>
             </Grid>

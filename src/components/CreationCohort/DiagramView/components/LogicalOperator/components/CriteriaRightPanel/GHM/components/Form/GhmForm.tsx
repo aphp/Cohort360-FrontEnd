@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 
 import {
   Alert,
+  Autocomplete,
   Button,
   Divider,
   FormLabel,
@@ -177,6 +178,17 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             onChange={(value) => {
               onChangeValue('code', value)
             }}
+          />
+
+          <Autocomplete
+            multiple
+            className={classes.inputItem}
+            options={criteriaData.data.encounterStatus || []}
+            getOptionLabel={(option) => option.label}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            value={currentState.encounterStatus}
+            onChange={(e, value) => onChangeValue('encounterStatus', value)}
+            renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
           />
 
           <AdvancedInputs form={CriteriaName.Ghm} selectedCriteria={currentState} onChangeValue={onChangeValue} />

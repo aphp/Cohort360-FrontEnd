@@ -873,6 +873,18 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         labels.push(getDatesLabel([selectedCriteria.startOccurrence, selectedCriteria.endOccurrence], 'Occurence'))
       if (selectedCriteria.encounterService && selectedCriteria.encounterService.length > 0)
         labels.push(getLabelFromName(selectedCriteria.encounterService))
+      if (selectedCriteria.encounterStatus && selectedCriteria.encounterStatus.length > 0)
+        labels.push(
+          getLabelFromCriteriaObject(
+            criteriaState,
+            selectedCriteria.encounterStatus,
+            CriteriaDataKey.ENCOUNTER_STATUS,
+            type === CriteriaType.MEDICATION_ADMINISTRATION || type === CriteriaType.MEDICATION_REQUEST
+              ? CriteriaType.MEDICATION
+              : type,
+            `Statut de la visite ${!(type === CriteriaType.ENCOUNTER) ? 'associée ' : ''}:`
+          )
+        )
   }
 
   return labels

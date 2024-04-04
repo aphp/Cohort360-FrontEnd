@@ -38,6 +38,7 @@ import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
 import { mapToAttribute, mapToLabel } from 'mappers/pmsi'
 import services from 'services/aphp'
+import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 
 type PatientMedicationProps = {
   groupId?: string
@@ -61,6 +62,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [triggerClean, setTriggerClean] = useState<boolean>(false)
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
 
   const dispatch = useAppDispatch()
   const patient = useAppSelector((state) => state.patient)
@@ -99,13 +101,21 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
       orderBy,
       searchInput,
       filters,
-      filters: { nda, prescriptionTypes, startDate, endDate, administrationRoutes, executiveUnits }
+      filters: { nda, prescriptionTypes, startDate, endDate, administrationRoutes, executiveUnits, encounterStatus }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias, addSearchCriterias }
   ] = useSearchCriterias(initMedSearchCriterias)
   const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({ nda, prescriptionTypes, administrationRoutes, startDate, endDate, executiveUnits })
-  }, [nda, prescriptionTypes, administrationRoutes, startDate, endDate, executiveUnits])
+    return selectFiltersAsArray({
+      nda,
+      prescriptionTypes,
+      administrationRoutes,
+      startDate,
+      endDate,
+      executiveUnits,
+      encounterStatus
+    })
+  }, [nda, prescriptionTypes, administrationRoutes, startDate, endDate, executiveUnits, encounterStatus])
 
   const [allAdministrationRoutes, setAllAdministrationRoutes] = useState<HierarchyElement[]>([])
   const [allPrescriptionTypes, setAllPrescriptionTypes] = useState<HierarchyElement[]>([])
@@ -138,7 +148,8 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
                 prescriptionTypes,
                 startDate,
                 endDate,
-                executiveUnits
+                executiveUnits,
+                encounterStatus
               }
             }
           },
@@ -161,12 +172,14 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
 
   useEffect(() => {
     const fetch = async () => {
-      const [administrations, prescriptions] = await Promise.all([
+      const [administrations, prescriptions, encounterStatus] = await Promise.all([
         services.cohortCreation.fetchAdministrations(),
-        services.cohortCreation.fetchPrescriptionTypes()
+        services.cohortCreation.fetchPrescriptionTypes(),
+        services.cohortCreation.fetchEncounterStatus()
       ])
       setAllAdministrationRoutes(administrations)
       setAllPrescriptionTypes(prescriptions)
+      setEncounterStatusList(encounterStatus)
     }
     fetch()
   }, [])
@@ -174,7 +187,17 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [searchInput, nda, startDate, endDate, prescriptionTypes, administrationRoutes, orderBy, executiveUnits])
+  }, [
+    searchInput,
+    nda,
+    startDate,
+    endDate,
+    prescriptionTypes,
+    administrationRoutes,
+    orderBy,
+    executiveUnits,
+    encounterStatus
+  ])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -318,6 +341,11 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
           name={FilterKeys.EXECUTIVE_UNITS}
           criteriaName={CriteriaName.Medication}
         />
+        <EncounterStatusFilter
+          value={encounterStatus}
+          name={FilterKeys.ENCOUNTER_STATUS}
+          encounterStatusList={encounterStatusList}
+        />
       </Modal>
       <Modal
         title="Filtres sauvegardés"
@@ -364,14 +392,23 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
               startDate,
               endDate,
               administrationRoutes,
-              executiveUnits
+              executiveUnits,
+              encounterStatus
             }) => {
               patchSavedFilter(
                 filterName,
                 {
                   searchInput,
                   orderBy: { orderBy: Order.PERIOD_START, orderDirection: Direction.DESC },
-                  filters: { nda, prescriptionTypes, startDate, endDate, administrationRoutes, executiveUnits }
+                  filters: {
+                    nda,
+                    prescriptionTypes,
+                    startDate,
+                    endDate,
+                    administrationRoutes,
+                    executiveUnits,
+                    encounterStatus
+                  }
                 },
                 searchResults.deidentified ?? true
               )
@@ -437,6 +474,12 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
                   criteriaName={CriteriaName.Medication}
+                />
+                <EncounterStatusFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
+                  name={FilterKeys.ENCOUNTER_STATUS}
+                  encounterStatusList={encounterStatusList}
                 />
               </Grid>
             </Grid>

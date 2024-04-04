@@ -212,7 +212,7 @@ const servicesPerimeters: IServicePerimeters = {
         facet: ['class', 'visit-year-month-gender-facet'],
         _list: perimetersId.split(','),
         size: 0,
-        type: 'VISIT'
+        visit: true
       })
     ])
 

@@ -97,6 +97,9 @@ const EncounterForm = ({
   const [isInclusive, setIsInclusive] = useState<boolean>(
     selectedCriteria?.isInclusive === undefined ? true : selectedCriteria?.isInclusive
   )
+  const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>(
+    mappingCriteria(criteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
+  )
 
   const { classes } = useStyles()
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
@@ -142,6 +145,7 @@ const EncounterForm = ({
       encounterEndDate,
       occurrence,
       occurrenceComparator,
+      encounterStatus,
       isInclusive,
       title,
       type: CriteriaType.ENCOUNTER
@@ -320,6 +324,16 @@ const EncounterForm = ({
                 value={fileStatus}
                 onChange={(e, value) => setFileStatus(value)}
                 renderInput={(params) => <TextField {...params} label="Statut dossier" />}
+              />
+
+              <Autocomplete
+                multiple
+                options={criteriaData.data.encounterStatus || []}
+                getOptionLabel={(option) => option.label}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                value={encounterStatus}
+                onChange={(e, value) => setEncounterStatus(value)}
+                renderInput={(params) => <TextField {...params} label="Statut de la visite" />} // TODO Mehdi
               />
             </Collapse>
           </BlockWrapper>

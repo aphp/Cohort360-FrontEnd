@@ -35,7 +35,7 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBo
       ? 'loading'
       : patient.mainDiagnosis
           .slice(0, 3)
-          .map((diag: any) => diag.code?.coding?.[0].display)
+          .map((diag) => diag.code?.coding?.[0].display)
           .join(' - ')
     : 'Pas de diagnostic principal'
 

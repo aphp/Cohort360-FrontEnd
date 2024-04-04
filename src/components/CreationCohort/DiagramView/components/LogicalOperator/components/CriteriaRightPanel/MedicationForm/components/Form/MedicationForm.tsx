@@ -193,24 +193,22 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               }}
             />
           </BlockWrapper>
-          <Grid style={{ display: 'flex' }}>
-            <RadioGroup
-              row
-              style={{ justifyContent: 'space-around' }}
-              className={classes.inputItem}
-              aria-label="mode"
-              name="criteria-mode-radio"
-              value={currentState.type}
-              onChange={(e, value) => onChangeValue('type', value)}
-            >
-              <FormControlLabel value="MedicationRequest" control={<Radio color="secondary" />} label="Prescription" />
-              <FormControlLabel
-                value="MedicationAdministration"
-                control={<Radio color="secondary" />}
-                label="Administration"
-              />
-            </RadioGroup>
-          </Grid>
+          <RadioGroup
+            row
+            style={{ justifyContent: 'space-around' }}
+            className={classes.inputItem}
+            aria-label="mode"
+            name="criteria-mode-radio"
+            value={currentState.type}
+            onChange={(e, value) => onChangeValue('type', value)}
+          >
+            <FormControlLabel value="MedicationRequest" control={<Radio color="secondary" />} label="Prescription" />
+            <FormControlLabel
+              value="MedicationAdministration"
+              control={<Radio color="secondary" />}
+              label="Administration"
+            />
+          </RadioGroup>
 
           <AsyncAutocomplete
             label="Code(s) sélectionné(s)"
@@ -246,6 +244,16 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             value={selectedCriteriaAdministration}
             onChange={(e, value) => onChangeValue('administration', value)}
             renderInput={(params) => <TextField {...params} label="Voie d'administration" />}
+          />
+          <Autocomplete
+            multiple
+            options={criteriaData.data.encounterStatus || []}
+            className={classes.inputItem}
+            getOptionLabel={(option) => option.label}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            value={currentState.encounterStatus}
+            onChange={(e, value) => onChangeValue('encounterStatus', value)}
+            renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
           />
           <AdvancedInputs
             form={CriteriaName.Medication}

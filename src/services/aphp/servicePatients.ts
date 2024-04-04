@@ -46,15 +46,7 @@ import {
   Questionnaire,
   QuestionnaireResponse
 } from 'fhir/r4'
-import {
-  Direction,
-  FormNames,
-  Filters,
-  Order,
-  SearchByTypes,
-  SearchCriterias,
-  FilterByDocumentStatus
-} from 'types/searchCriterias'
+import { Direction, FormNames, Filters, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
 import { ResourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
 
@@ -134,7 +126,8 @@ export interface IServicePatients {
     endDate: string | null,
     executiveUnits?: string[],
     groupId?: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    encounterStatus?: string[]
   ) => Promise<{
     pmsiData?: (Claim | Condition | Procedure)[]
     pmsiTotal?: number
@@ -191,7 +184,8 @@ export interface IServicePatients {
     endDate: string | null,
     executiveUnits?: string[],
     groupId?: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    encounterStatus?: string[]
   ) => Promise<{
     medicationData?: MedicationEntry<MedicationAdministration | MedicationRequest>[]
     medicationTotal?: number
@@ -232,7 +226,8 @@ export interface IServicePatients {
     endDate?: string | null,
     groupId?: string,
     signal?: AbortSignal,
-    executiveUnits?: string[]
+    executiveUnits?: string[],
+    encounterStatus?: string[]
   ) => Promise<{
     biologyList: Observation[]
     biologyTotal: number
@@ -270,7 +265,8 @@ export interface IServicePatients {
     groupId?: string,
     signal?: AbortSignal,
     modalities?: string[],
-    executiveUnits?: string[]
+    executiveUnits?: string[],
+    encounterStatus?: string[]
   ) => Promise<{
     imagingList: ImagingStudy[]
     imagingTotal: number
@@ -297,7 +293,8 @@ export interface IServicePatients {
     groupId?: string,
     startDate?: string | null,
     endDate?: string | null,
-    executiveUnits?: string[]
+    executiveUnits?: string[],
+    encounterStatus?: string[]
   ) => Promise<QuestionnaireResponse[]>
 
   /*
@@ -346,7 +343,8 @@ export interface IServicePatients {
     endDate?: string | null,
     groupId?: string,
     signal?: AbortSignal,
-    executiveUnits?: string[]
+    executiveUnits?: string[],
+    encounterStatus?: string[]
   ) => Promise<{
     docsList: DocumentReference[]
     docsTotal: number
@@ -387,7 +385,7 @@ const servicesPatients: IServicePatients = {
       fetchEncounter({
         facet: ['class', 'visit-year-month-gender-facet'],
         size: 0,
-        type: 'VISIT'
+        visit: true
       })
     ])
 
@@ -398,15 +396,14 @@ const servicesPatients: IServicePatients = {
     const agePyramidData =
       myPatientsResp.data.resourceType === 'Bundle'
         ? getAgeRepartitionMapAphp(
-            myPatientsResp.data.meta?.extension?.filter((facet: any) => facet.url === ChartCode.agePyramid)?.[0]
-              .extension
+            myPatientsResp.data.meta?.extension?.filter((facet) => facet.url === ChartCode.agePyramid)?.[0].extension
           )
         : undefined
 
     const genderRepartitionMap =
       myPatientsResp.data.resourceType === 'Bundle'
         ? getGenderRepartitionMapAphp(
-            myPatientsResp.data.meta?.extension?.filter((facet: any) => facet.url === ChartCode.genderRepartition)?.[0]
+            myPatientsResp.data.meta?.extension?.filter((facet) => facet.url === ChartCode.genderRepartition)?.[0]
               .extension
           )
         : undefined
@@ -414,9 +411,8 @@ const servicesPatients: IServicePatients = {
     const monthlyVisitData =
       myPatientsEncounters.data.resourceType === 'Bundle'
         ? getVisitRepartitionMapAphp(
-            myPatientsEncounters.data.meta?.extension?.filter(
-              (facet: any) => facet.url === ChartCode.monthlyVisits
-            )?.[0].extension
+            myPatientsEncounters.data.meta?.extension?.filter((facet) => facet.url === ChartCode.monthlyVisits)?.[0]
+              .extension
           )
         : undefined
 
@@ -424,7 +420,7 @@ const servicesPatients: IServicePatients = {
       myPatientsEncounters.data.resourceType === 'Bundle'
         ? getEncounterRepartitionMapAphp(
             myPatientsEncounters.data.meta?.extension?.filter(
-              (facet: any) => facet.url === ChartCode.visitTypeRepartition
+              (facet) => facet.url === ChartCode.visitTypeRepartition
             )?.[0].extension
           )
         : undefined
@@ -455,7 +451,8 @@ const servicesPatients: IServicePatients = {
     endDate,
     executiveUnits,
     groupId,
-    signal
+    signal,
+    encounterStatus
   ) => {
     let pmsiResp: AxiosResponse<FHIR_Bundle_Response<Condition | Procedure | Claim>> | null = null
 
@@ -476,7 +473,8 @@ const servicesPatients: IServicePatients = {
           'min-recorded-date': startDate ?? '',
           'max-recorded-date': endDate ?? '',
           signal,
-          executiveUnits
+          executiveUnits,
+          encounterStatus
         })
         break
       case ResourceType.PROCEDURE:
@@ -494,7 +492,8 @@ const servicesPatients: IServicePatients = {
           minDate: startDate ?? '',
           maxDate: endDate ?? '',
           signal,
-          executiveUnits
+          executiveUnits,
+          encounterStatus
         })
         break
       case ResourceType.CLAIM:
@@ -511,7 +510,8 @@ const servicesPatients: IServicePatients = {
           minCreated: startDate ?? '',
           maxCreated: endDate ?? '',
           signal,
-          executiveUnits
+          executiveUnits,
+          encounterStatus
         })
         break
       default:
@@ -572,7 +572,8 @@ const servicesPatients: IServicePatients = {
     endDate,
     executiveUnits,
     groupId,
-    signal
+    signal,
+    encounterStatus
   ) => {
     let medicationResp: AxiosResponse<FHIR_Bundle_Response<MedicationRequest | MedicationAdministration>> | null = null
 
@@ -591,7 +592,8 @@ const servicesPatients: IServicePatients = {
           minDate: startDate,
           maxDate: endDate,
           signal,
-          executiveUnits
+          executiveUnits,
+          encounterStatus
         })
         break
       case ResourceType.MEDICATION_ADMINISTRATION:
@@ -608,7 +610,8 @@ const servicesPatients: IServicePatients = {
           minDate: startDate,
           maxDate: endDate,
           signal,
-          executiveUnits
+          executiveUnits,
+          encounterStatus
         })
         break
       default:
@@ -639,7 +642,8 @@ const servicesPatients: IServicePatients = {
     endDate?: string | null,
     groupId?: string,
     signal?: AbortSignal,
-    executiveUnits?: string[]
+    executiveUnits?: string[],
+    encounterStatus?: string[]
   ) => {
     const observationResp = await fetchObservation({
       subject: patientId,
@@ -656,7 +660,8 @@ const servicesPatients: IServicePatients = {
       maxDate: endDate ?? '',
       rowStatus,
       signal,
-      executiveUnits
+      executiveUnits,
+      encounterStatus
     })
 
     const biologyTotal = observationResp.data.resourceType === 'Bundle' ? observationResp.data.total : 0
@@ -679,7 +684,8 @@ const servicesPatients: IServicePatients = {
     groupId?: string,
     signal?: AbortSignal,
     modalities?: string[],
-    executiveUnits?: string[]
+    executiveUnits?: string[],
+    encounterStatus?: string[]
   ) => {
     const imagingResp = await fetchImaging({
       patient: patientId,
@@ -694,7 +700,8 @@ const servicesPatients: IServicePatients = {
       _list: groupId ? [groupId] : [],
       signal,
       modalities,
-      executiveUnits
+      executiveUnits,
+      encounterStatus
     })
 
     const imagingTotal = imagingResp.data.resourceType === 'Bundle' ? imagingResp.data.total : 0
@@ -711,7 +718,8 @@ const servicesPatients: IServicePatients = {
     groupId?: string,
     startDate?: string | null,
     endDate?: string | null,
-    executiveUnits?: string[]
+    executiveUnits?: string[],
+    encounterStatus?: string[]
   ) => {
     const formsResp = await fetchForms({
       patient: patientId,
@@ -719,7 +727,8 @@ const servicesPatients: IServicePatients = {
       _list: groupId ? [groupId] : [],
       startDate,
       endDate,
-      executiveUnits
+      executiveUnits,
+      encounterStatus
     })
 
     return getApiResponseResources(formsResp) ?? []
@@ -747,7 +756,8 @@ const servicesPatients: IServicePatients = {
     endDate?: string | null,
     groupId?: string,
     signal?: AbortSignal,
-    executiveUnits?: string[]
+    executiveUnits?: string[],
+    encounterStatus?: string[]
   ) => {
     const documentLines = 20 // Number of desired lines in the document array
 
@@ -768,7 +778,8 @@ const servicesPatients: IServicePatients = {
       minDate: startDate ?? '',
       maxDate: endDate ?? '',
       signal: signal,
-      executiveUnits
+      executiveUnits,
+      encounterStatus
     })
 
     if (docsList.data.resourceType !== 'Bundle' || !docsList.data.total) {
@@ -785,22 +796,14 @@ const servicesPatients: IServicePatients = {
   },
 
   fetchPatientInfo: async (patientId, groupId) => {
-    const [patientResponse, encounterResponse, encounterDetailResponse] = await Promise.all([
+    const [patientResponse, encounterResponse] = await Promise.all([
       fetchPatient({ _id: patientId, _list: groupId ? [groupId] : [] }),
       fetchEncounter({
         patient: patientId,
-        type: 'VISIT',
-        status: ['arrived', 'triaged', 'in-progress', 'onleave', 'finished', 'unknown'],
         _sort: 'period-start',
         sortDirection: 'desc',
-        _list: groupId ? [groupId] : []
-      }),
-      fetchEncounter({
-        patient: patientId,
-        'type:not': 'VISIT',
-        _sort: 'period-start',
-        sortDirection: 'desc',
-        _list: groupId ? [groupId] : []
+        _list: groupId ? [groupId] : [],
+        size: 1000
       })
     ])
 
@@ -808,10 +811,11 @@ const servicesPatients: IServicePatients = {
     if (patientDataList === undefined || (patientDataList && patientDataList.length === 0)) return undefined
     const patientData = patientDataList[0]
 
-    const encounters: Encounter[] = getApiResponseResources(encounterResponse) || []
-    const encountersDetail: Encounter[] = getApiResponseResources(encounterDetailResponse) || []
+    const cleanedEncounters: Encounter[] = getApiResponseResources(encounterResponse) || []
+    const encounters = cleanedEncounters.filter((encounter) => !encounter.partOf)
+    const encountersDetails = cleanedEncounters.filter((encounter) => encounter.partOf)
 
-    const hospits = await getEncounterDocuments(encounters, encountersDetail, groupId)
+    const hospits = await getEncounterDocuments(encounters, encountersDetails, groupId)
 
     const patientInfo = {
       ...patientData,
@@ -867,7 +871,6 @@ export const getEncounterDocuments = async (
 
   const documentsResp = await fetchDocumentReference({
     encounter: encountersIdList.join(','),
-    docStatuses: [FilterByDocumentStatus.VALIDATED],
     _list: groupId ? groupId.split(',') : []
   })
 

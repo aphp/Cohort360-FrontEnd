@@ -83,7 +83,7 @@ const expandBiologyElement = createAsyncThunk<BiologyState, ExpandBiologyElement
         for (let item of items) {
           // Replace sub items element by response of back-end
           if (item.id === rowId) {
-            const foundItem = item.subItems ? item.subItems.find((i: any) => i.id === 'loading') : true
+            const foundItem = item.subItems ? item.subItems.find((i) => i.id === 'loading') : true
             if (foundItem) {
               let subItems: BiologyListType[] = []
               subItems = await services.cohortCreation.fetchBiologyHierarchy(item.id)
@@ -114,7 +114,7 @@ const expandBiologyElement = createAsyncThunk<BiologyState, ExpandBiologyElement
       loading: false,
       list: _rootRows,
       openedElement: _openedElement,
-      savedSelectedItems: savedSelectedItems.filter((savedSelectedItem: any) => savedSelectedItem.id !== 'loading')
+      savedSelectedItems: savedSelectedItems.filter((savedSelectedItem) => savedSelectedItem.id !== 'loading')
     }
   }
 )

@@ -38,8 +38,8 @@ const AdministrationTypesFilter = ({
         options={allAdministrationTypes}
         value={administrationTypes}
         disableCloseOnSelect
-        getOptionLabel={(administrationRoute: any) => capitalizeFirstLetter(administrationRoute.label)}
-        renderOption={(props, administrationRoute: any) => (
+        getOptionLabel={(administrationRoute) => capitalizeFirstLetter(administrationRoute.label)}
+        renderOption={(props, administrationRoute) => (
           <li {...props}>{capitalizeFirstLetter(administrationRoute.label)}</li>
         )}
         renderInput={(params) => (

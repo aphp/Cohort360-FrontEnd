@@ -38,10 +38,8 @@ const PrescriptionTypesFilter = ({
         options={allPrescriptionTypes}
         value={prescriptionTypes}
         disableCloseOnSelect
-        getOptionLabel={(prescriptionType: any) => capitalizeFirstLetter(prescriptionType.label)}
-        renderOption={(props, prescriptionType: any) => (
-          <li {...props}>{capitalizeFirstLetter(prescriptionType.label)}</li>
-        )}
+        getOptionLabel={(prescriptionType) => capitalizeFirstLetter(prescriptionType.label)}
+        renderOption={(props, prescriptionType) => <li {...props}>{capitalizeFirstLetter(prescriptionType.label)}</li>}
         renderInput={(params) => (
           <TextField {...params} label="Types de prescriptions" placeholder="Sélectionner type(s) de prescriptions" />
         )}

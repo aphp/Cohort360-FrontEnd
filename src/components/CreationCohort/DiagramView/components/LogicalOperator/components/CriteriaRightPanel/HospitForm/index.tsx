@@ -171,6 +171,9 @@ const HospitForm = ({
   const [exitDiagnostic, setExitDiagnostic] = useState<LabelObject[]>(
     mappingCriteria(criteria?.exitDiagnostic, CriteriaDataKey.EXIT_DIAGNOSTIC, criteriaData) || []
   )
+  const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>(
+    mappingCriteria(criteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
+  )
   const [encounterService, setEncounterService] = useState<ScopeTreeRow[]>(criteria?.encounterService || [])
   const [occurrence, setOccurrence] = useState<number>(criteria?.occurrence || 1)
   const [occurrenceComparator, setOccurrenceComparator] = useState<Comparators>(
@@ -254,6 +257,7 @@ const HospitForm = ({
       occurrenceComparator,
       encounterStartDate: null,
       encounterEndDate: null,
+      encounterStatus,
       isInclusive,
       title
     })
@@ -298,6 +302,18 @@ const HospitForm = ({
           isAcceptEmptySelection={true}
           isDeleteIcon={true}
           onChangeExecutiveUnits={(newValue) => setEncounterService(newValue)}
+        />
+      </BlockWrapper>
+
+      <BlockWrapper style={{ margin: '0 1em 1em' }}>
+        <Autocomplete
+          multiple
+          options={criteriaData.data.encounterStatus || []}
+          getOptionLabel={(option) => option.label}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          value={encounterStatus}
+          onChange={(e, value) => setEncounterStatus(value)}
+          renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
         />
       </BlockWrapper>
 

@@ -87,7 +87,7 @@ const ModalAddOrEditProject: React.FC<{
             <TextField
               placeholder="Nom du projet"
               value={modalProjectState.name}
-              onChange={(e: any) => onChangeValue('name', e.target.value)}
+              onChange={(e) => onChangeValue('name', e.target.value)}
               autoFocus
               id="title"
               margin="normal"

@@ -8,7 +8,7 @@ import DataTableObservation from 'components/DataTable/DataTableObservation'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchBiology } from 'state/patient'
-import { CriteriaName, LoadingStatus } from 'types'
+import { CriteriaName, HierarchyElement, LoadingStatus } from 'types'
 
 import useStyles from './styles'
 import { cancelPendingRequest } from 'utils/abortController'
@@ -37,6 +37,8 @@ import {
   fetchLoincCodes as fetchLoincCodesApi,
   fetchAnabioCodes as fetchAnabioCodesApi
 } from 'services/aphp/serviceBiology'
+import services from 'services/aphp'
+import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 
 type PatientBiologyProps = {
   groupId?: string
@@ -53,6 +55,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
   const {
     allSavedFilters,
     savedFiltersErrors,
@@ -83,13 +86,22 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
       orderBy,
       searchInput,
       filters,
-      filters: { nda, loinc, anabio, startDate, endDate, executiveUnits, validatedStatus }
+      filters: { nda, loinc, anabio, startDate, endDate, executiveUnits, validatedStatus, encounterStatus }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
   ] = useSearchCriterias(initBioSearchCriterias)
   const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({ nda, validatedStatus, loinc, anabio, startDate, endDate, executiveUnits })
-  }, [nda, loinc, anabio, startDate, endDate, executiveUnits])
+    return selectFiltersAsArray({
+      nda,
+      validatedStatus,
+      loinc,
+      anabio,
+      startDate,
+      endDate,
+      executiveUnits,
+      encounterStatus
+    })
+  }, [nda, loinc, anabio, startDate, endDate, executiveUnits, encounterStatus])
 
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)
@@ -105,7 +117,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
             searchCriterias: {
               orderBy,
               searchInput,
-              filters: { validatedStatus, nda, loinc, anabio, startDate, endDate, executiveUnits }
+              filters: { validatedStatus, nda, loinc, anabio, startDate, endDate, executiveUnits, encounterStatus }
             }
           },
           groupId,
@@ -126,9 +138,17 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
   }
 
   useEffect(() => {
+    const fetchEncounterStatusList = async () => {
+      const encounterStatus = await services.cohortCreation.fetchEncounterStatus()
+      setEncounterStatusList(encounterStatus)
+    }
+    fetchEncounterStatusList()
+  }, [])
+
+  useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [nda, loinc, anabio, startDate, endDate, executiveUnits, validatedStatus, orderBy, searchInput])
+  }, [nda, loinc, anabio, startDate, endDate, executiveUnits, validatedStatus, orderBy, searchInput, encounterStatus])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -242,6 +262,11 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
           name={FilterKeys.EXECUTIVE_UNITS}
           criteriaName={CriteriaName.Biology}
         />
+        <EncounterStatusFilter
+          value={encounterStatus}
+          name={FilterKeys.ENCOUNTER_STATUS}
+          encounterStatusList={encounterStatusList}
+        />
       </Modal>
       <Modal
         title="Filtres sauvegardés"
@@ -289,14 +314,15 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
               startDate,
               endDate,
               validatedStatus,
-              executiveUnits
+              executiveUnits,
+              encounterStatus
             }) => {
               patchSavedFilter(
                 filterName,
                 {
                   searchInput,
                   orderBy: { orderBy: Order.FAMILY, orderDirection: Direction.ASC },
-                  filters: { nda, anabio, loinc, startDate, endDate, validatedStatus, executiveUnits }
+                  filters: { nda, anabio, loinc, startDate, endDate, validatedStatus, executiveUnits, encounterStatus }
                 },
                 searchResults.deidentified ?? true
               )
@@ -363,6 +389,14 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
                     value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                     name={FilterKeys.EXECUTIVE_UNITS}
                     criteriaName={CriteriaName.Biology}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <EncounterStatusFilter
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
+                    name={FilterKeys.ENCOUNTER_STATUS}
+                    encounterStatusList={encounterStatusList}
                   />
                 </Grid>
               </Grid>

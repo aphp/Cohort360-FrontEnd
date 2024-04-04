@@ -40,6 +40,7 @@ import { Claim, Condition, Procedure } from 'fhir/r4'
 import { mapToAttribute, mapToCriteriaName, mapToLabel } from 'mappers/pmsi'
 import List from 'components/ui/List'
 import { fetchClaimCodes, fetchConditionCodes, fetchProcedureCodes } from 'services/aphp/servicePmsi'
+import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 
 export type PatientPMSIProps = {
   groupId?: string
@@ -65,6 +66,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [triggerClean, setTriggerClean] = useState<boolean>(false)
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
   const dispatch = useAppDispatch()
 
   const [selectedTab, setSelectedTab] = useState<PmsiTab>({
@@ -97,13 +99,14 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
       orderBy,
       searchInput,
       filters,
-      filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits }
+      filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias, addSearchCriterias }
   ] = useSearchCriterias(initPmsiSearchCriterias)
   const filtersAsArray = useMemo(
-    () => selectFiltersAsArray({ code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits }),
-    [code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits]
+    () =>
+      selectFiltersAsArray({ code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus }),
+    [code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus]
   )
 
   const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<HierarchyElement[]>([])
@@ -132,7 +135,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
             searchCriterias: {
               orderBy,
               searchInput,
-              filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits }
+              filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus }
             }
           },
           groupId,
@@ -152,22 +155,26 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
     }
   }
   useEffect(() => {
-    const _fetchDiagnosticTypes = async () => {
+    const fetch = async () => {
       try {
-        const diagnosticTypes = await services.cohortCreation.fetchDiagnosticTypes()
+        const [diagnosticTypes, encounterStatus] = await Promise.all([
+          services.cohortCreation.fetchDiagnosticTypes(),
+          services.cohortCreation.fetchEncounterStatus()
+        ])
         setAllDiagnosticTypesList(diagnosticTypes)
+        setEncounterStatusList(encounterStatus)
       } catch (e) {
         /* empty */
       }
     }
     getSavedFilters()
-    _fetchDiagnosticTypes()
+    fetch()
   }, [])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [searchInput, nda, code, startDate, endDate, diagnosticTypes, source, orderBy, executiveUnits])
+  }, [searchInput, nda, code, startDate, endDate, diagnosticTypes, source, orderBy, executiveUnits, encounterStatus])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -324,6 +331,11 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
           name={FilterKeys.EXECUTIVE_UNITS}
           criteriaName={mapToCriteriaName(selectedTab.id)}
         />
+        <EncounterStatusFilter
+          value={encounterStatus}
+          name={FilterKeys.ENCOUNTER_STATUS}
+          encounterStatusList={encounterStatusList}
+        />
       </Modal>
 
       <Modal
@@ -372,14 +384,15 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
               source,
               startDate,
               endDate,
-              executiveUnits
+              executiveUnits,
+              encounterStatus
             }) => {
               patchSavedFilter(
                 filterName,
                 {
                   searchInput,
                   orderBy: { orderBy: Order.DATE, orderDirection: Direction.DESC },
-                  filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits }
+                  filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus }
                 },
                 searchResults.deidentified ?? true
               )
@@ -459,6 +472,14 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
                   criteriaName={mapToCriteriaName(selectedTab.id)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <EncounterStatusFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
+                  name={FilterKeys.ENCOUNTER_STATUS}
+                  encounterStatusList={encounterStatusList}
                 />
               </Grid>
             </Grid>

@@ -81,7 +81,8 @@ const criteriaList: CriteriaItemType[] = [
       reason: services.cohortCreation.fetchReason,
       destination: services.cohortCreation.fetchDestination,
       provenance: services.cohortCreation.fetchProvenance,
-      admission: services.cohortCreation.fetchAdmission
+      admission: services.cohortCreation.fetchAdmission,
+      encounterStatus: services.cohortCreation.fetchEncounterStatus
     }
   },
   {
@@ -90,7 +91,10 @@ const criteriaList: CriteriaItemType[] = [
     color: '#0063AF',
     fontWeight: 'bold',
     components: DocumentsForm,
-    fetch: { docTypes: services.cohortCreation.fetchDocTypes }
+    fetch: {
+      docTypes: services.cohortCreation.fetchDocTypes,
+      encounterStatus: services.cohortCreation.fetchEncounterStatus
+    }
   },
   {
     id: 'pmsi',
@@ -108,7 +112,8 @@ const criteriaList: CriteriaItemType[] = [
         fetch: {
           statusDiagnostic: services.cohortCreation.fetchStatusDiagnostic,
           diagnosticTypes: services.cohortCreation.fetchDiagnosticTypes,
-          cim10Diagnostic: services.cohortCreation.fetchCim10Diagnostic
+          cim10Diagnostic: services.cohortCreation.fetchCim10Diagnostic,
+          encounterStatus: services.cohortCreation.fetchEncounterStatus
         }
       },
       {
@@ -118,7 +123,8 @@ const criteriaList: CriteriaItemType[] = [
         fontWeight: 'normal',
         components: CCAMForm,
         fetch: {
-          ccamData: services.cohortCreation.fetchCcamData
+          ccamData: services.cohortCreation.fetchCcamData,
+          encounterStatus: services.cohortCreation.fetchEncounterStatus
         }
       },
       {
@@ -128,7 +134,8 @@ const criteriaList: CriteriaItemType[] = [
         fontWeight: 'normal',
         components: GhmForm,
         fetch: {
-          ghmData: services.cohortCreation.fetchGhmData
+          ghmData: services.cohortCreation.fetchGhmData,
+          encounterStatus: services.cohortCreation.fetchEncounterStatus
         }
       }
     ]
@@ -144,7 +151,8 @@ const criteriaList: CriteriaItemType[] = [
     fetch: {
       medicationData: services.cohortCreation.fetchMedicationData,
       prescriptionTypes: services.cohortCreation.fetchPrescriptionTypes,
-      administrations: services.cohortCreation.fetchAdministrations
+      administrations: services.cohortCreation.fetchAdministrations,
+      encounterStatus: services.cohortCreation.fetchEncounterStatus
     }
   },
   {
@@ -162,7 +170,8 @@ const criteriaList: CriteriaItemType[] = [
         components: !!ODD_BIOLOGY ? BiologyForm : null,
         disabled: !!!ODD_BIOLOGY ?? false,
         fetch: {
-          biologyData: services.cohortCreation.fetchBiologyData
+          biologyData: services.cohortCreation.fetchBiologyData,
+          encounterStatus: services.cohortCreation.fetchEncounterStatus
         }
       },
       {
@@ -204,7 +213,8 @@ const criteriaList: CriteriaItemType[] = [
               risksOrComplicationsOfPregnancy: services.cohortCreation.fetchRisksOrComplicationsOfPregnancy,
               corticotherapie: services.cohortCreation.fetchCorticotherapie,
               prenatalDiagnosis: services.cohortCreation.fetchPrenatalDiagnosis,
-              ultrasoundMonitoring: services.cohortCreation.fetchUltrasoundMonitoring
+              ultrasoundMonitoring: services.cohortCreation.fetchUltrasoundMonitoring,
+              encounterStatus: services.cohortCreation.fetchEncounterStatus
             }
           },
           {
@@ -243,7 +253,8 @@ const criteriaList: CriteriaItemType[] = [
               feedingType: services.cohortCreation.fetchFeedingType,
               complication: services.cohortCreation.fetchComplication,
               exitFeedingMode: services.cohortCreation.fetchExitFeedingMode,
-              exitDiagnostic: services.cohortCreation.fetchExitDiagnostic
+              exitDiagnostic: services.cohortCreation.fetchExitDiagnostic,
+              encounterStatus: services.cohortCreation.fetchEncounterStatus
             }
           }
         ]
@@ -258,7 +269,8 @@ const criteriaList: CriteriaItemType[] = [
     components: ODD_IMAGING ? ImagingForm : null,
     disabled: !ODD_IMAGING ?? false,
     fetch: {
-      modalities: services.cohortCreation.fetchModalities
+      modalities: services.cohortCreation.fetchModalities,
+      encounterStatus: services.cohortCreation.fetchEncounterStatus
     }
   },
   {

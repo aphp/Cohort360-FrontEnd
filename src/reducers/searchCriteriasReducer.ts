@@ -75,7 +75,8 @@ export const initPmsiSearchCriterias: SearchCriterias<PMSIFilters> = {
     diagnosticTypes: [],
     startDate: null,
     endDate: null,
-    executiveUnits: []
+    executiveUnits: [],
+    encounterStatus: []
   }
 }
 
@@ -92,7 +93,8 @@ export const initMedSearchCriterias: SearchCriterias<MedicationFilters> = {
     endDate: null,
     executiveUnits: [],
     administrationRoutes: [],
-    prescriptionTypes: []
+    prescriptionTypes: [],
+    encounterStatus: []
   }
 }
 
@@ -110,7 +112,8 @@ export const initBioSearchCriterias: SearchCriterias<BiologyFilters> = {
     anabio: [],
     startDate: null,
     endDate: null,
-    executiveUnits: []
+    executiveUnits: [],
+    encounterStatus: []
   }
 }
 
@@ -128,7 +131,8 @@ export const initPatientDocsSearchCriterias: SearchCriterias<DocumentsFilters> =
     onlyPdfAvailable: true,
     startDate: null,
     endDate: null,
-    executiveUnits: []
+    executiveUnits: [],
+    encounterStatus: []
   }
 }
 
@@ -147,7 +151,8 @@ export const initAllDocsSearchCriterias: SearchCriterias<DocumentsFilters> = {
     onlyPdfAvailable: true,
     startDate: null,
     endDate: null,
-    executiveUnits: []
+    executiveUnits: [],
+    encounterStatus: []
   }
 }
 
@@ -164,7 +169,8 @@ export const initImagingCriterias: SearchCriterias<ImagingFilters> = {
     startDate: null,
     endDate: null,
     executiveUnits: [],
-    modality: []
+    modality: [],
+    encounterStatus: []
   }
 }
 
@@ -178,6 +184,7 @@ export const initFormsCriterias: SearchCriterias<MaternityFormFilters> = {
     formName: [],
     startDate: null,
     endDate: null,
+    encounterStatus: [],
     executiveUnits: []
   }
 }
