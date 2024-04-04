@@ -186,7 +186,9 @@ const mapPatientFromRequestParams = (parameters: URLSearchParams) => {
 
 const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
   const docTypesParams = parameters.get(DocumentsParamsKeys.DOC_TYPES)
+  const docStatusesParams = parameters.get(DocumentsParamsKeys.DOC_STATUSES)
   let docTypes: SimpleCodeType[] = []
+  let docStatuses: string[] = []
   if (docTypesParams) {
     docTypes = decodeURIComponent(docTypesParams)
       ?.split(',')
@@ -197,9 +199,11 @@ const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
       .filter((elem) => elem !== null) as SimpleCodeType[]
   }
   const ipp = decodeURIComponent(parameters.get(DocumentsParamsKeys.IPP) || '')
-  const docStatuses = decodeURIComponent(parameters.get(DocumentsParamsKeys.DOC_STATUSES) || '')
-    ?.split(',')
-    ?.map((e) => mapDocumentStatusesFromRequestParam(e.split('|')?.[1]))
+  if (docStatusesParams) {
+    docStatuses = decodeURIComponent(docStatusesParams)
+      ?.split(',')
+      ?.map((e) => mapDocumentStatusesFromRequestParam(e.split('|')?.[1]))
+  }
   const onlyPdfAvailable = true
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
     parameters,
