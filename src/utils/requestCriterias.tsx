@@ -221,7 +221,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         labels.push(getSearchDocumentLabel(selectedCriteria.search, selectedCriteria.searchBy))
       if (selectedCriteria.docType && selectedCriteria.docType.length > 0)
         labels.push(getDocumentTypesLabel(selectedCriteria.docType))
-      if (selectedCriteria.docStatuses) {
+      if (selectedCriteria.docStatuses && selectedCriteria.docStatuses.length > 0) {
         labels.push(getDocumentStatusLabel(selectedCriteria.docStatuses))
       }
       break
