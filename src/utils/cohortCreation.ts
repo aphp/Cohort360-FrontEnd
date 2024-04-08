@@ -25,7 +25,8 @@ import {
   FormNames,
   FilterByDocumentStatus,
   LabelObject,
-  SearchByTypes
+  SearchByTypes,
+  DurationRangeType
 } from 'types/searchCriterias'
 import {
   Comparators,
@@ -75,6 +76,8 @@ import {
 } from './mappers'
 import { pregnancyForm } from 'data/pregnancyData'
 import { hospitForm } from 'data/hospitData'
+import { editAllCriteria } from 'state/cohortCreation'
+import { AppDispatch } from 'state'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
@@ -224,6 +227,45 @@ type RequeteurSearchType = {
     providerCohortList?: string[]
   }
   request: RequeteurGroupType | undefined
+}
+
+export const cleanCriterias = (selectedCriteria: SelectedCriteriaType[], dispatch: AppDispatch) => {
+  const cleanDurationRange = (value: DurationRangeType) => {
+    const regex = /\/[^/]*$/
+    return [
+      value[0] ? value[0].replace(regex, '/0') : null,
+      value[1] ? value[1].replace(regex, '/0') : null
+    ] as DurationRangeType
+  }
+  const cleanedSelectedCriteria = selectedCriteria
+    .filter(
+      (criteria) =>
+        criteria.type !== CriteriaType.IPP_LIST &&
+        criteria.type !== CriteriaType.PREGNANCY &&
+        criteria.type !== CriteriaType.HOSPIT
+    )
+    .map((criterion) => {
+      switch (criterion.type) {
+        case CriteriaType.PATIENT: {
+          return {
+            ...criterion,
+            birthdates: [null, null] as DurationRangeType,
+            deathDates: [null, null] as DurationRangeType,
+            age: cleanDurationRange(criterion.age)
+          }
+        }
+        case CriteriaType.ENCOUNTER: {
+          return {
+            ...criterion,
+            age: cleanDurationRange(criterion.age)
+          }
+        }
+        default:
+          return criterion
+      }
+    })
+
+  dispatch(editAllCriteria(cleanedSelectedCriteria))
 }
 
 const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: boolean): string => {

@@ -19,6 +19,7 @@ import scopeTypes from 'data/scope_type.json'
 import useStyles from './styles'
 import { findEquivalentRowInItemAndSubItems } from 'utils/pmsi'
 import { getCurrentScopeList } from 'utils/scopeTree'
+import { cleanCriterias } from 'utils/cohortCreation'
 
 export type PopulationCardPropsType = {
   label?: string
@@ -66,6 +67,9 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
   const selectionAndPopulationWithRightError = [...selectedItems, ...populationWithRightError]
 
   const _onChangePopulation = async (selectedPopulations: ScopeTreeRow[]) => {
+    if (selectedPopulations?.some((perimeter) => perimeter?.access === 'Pseudonymisé')) {
+      cleanCriterias(requestState.selectedCriteria, dispatch)
+    }
     dispatch(buildCohortCreation({ selectedPopulation: selectedPopulations }))
   }
 
