@@ -85,32 +85,32 @@ const exportTable: ExportTableType[] = [
     id: 'imaging_series',
     table_name: 'Fait - Imagerie - Série',
     table_id: 'imaging_series'
+  },
+  {
+    id: 'questionnaire',
+    table_name: 'Formulaires',
+    table_id: 'questionnaire'
+  },
+  {
+    id: 'questionnaire',
+    table_name: 'Formulaires',
+    table_id: 'questionnaire__item'
+  },
+  {
+    id: 'questionnaire',
+    table_name: 'Formulaires',
+    table_id: 'questionnaireresponse'
+  },
+  {
+    id: 'questionnaire',
+    table_name: 'Formulaires',
+    table_id: 'questionnaireresponse__item'
+  },
+  {
+    id: 'questionnaire',
+    table_name: 'Formulaires',
+    table_id: 'questionnaireresponse__item__answer'
   }
-  // {
-  //   id: 'questionnaire',
-  //   table_name: 'Formulaires',
-  //   table_id: 'questionnaire'
-  // },
-  // {
-  //   id: 'questionnaire',
-  //   table_name: 'Formulaires',
-  //   table_id: 'questionnaire__item'
-  // },
-  // {
-  //   id: 'questionnaire',
-  //   table_name: 'Formulaires',
-  //   table_id: 'questionnaireresponse'
-  // },
-  // {
-  //   id: 'questionnaire',
-  //   table_name: 'Formulaires',
-  //   table_id: 'questionnaireresponse__item'
-  // },
-  // {
-  //   id: 'questionnaire',
-  //   table_name: 'Formulaires',
-  //   table_id: 'questionnaireresponse__item__answer'
-  // }
 ]
 
 export default exportTable
