@@ -1,8 +1,9 @@
-import React, { useEffect, useState, Fragment, useRef } from 'react'
+import React, { useEffect, useState, Fragment, useRef, SyntheticEvent } from 'react'
 
 import { Autocomplete, CircularProgress, TextField } from '@mui/material'
 import { cancelPendingRequest } from 'utils/abortController'
 import { LabelObject } from 'types/searchCriterias'
+import { useDebounce } from 'utils/debounce'
 
 type AsyncAutocompleteProps = {
   variant?: 'standard' | 'filled' | 'outlined'
@@ -29,28 +30,22 @@ const AsyncAutocomplete = ({
 }: AsyncAutocompleteProps) => {
   const [open, setOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
+  const debouncedSearchValue = useDebounce(500, searchValue)
   const [options, setOptions] = useState<LabelObject[]>([])
   const [loading, setLoading] = useState(false)
   const controllerRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
-    let active = true
-
-    ;(async () => {
-      setLoading(true)
+    const handleRequest = async () => {
       if (!onFetch) return
+      setLoading(true)
       controllerRef.current = cancelPendingRequest(controllerRef.current)
-      const response = (await onFetch(searchValue, controllerRef.current?.signal)) || []
-      if (active) {
-        setOptions(response)
-        setLoading(false)
-      }
-    })()
-
-    return () => {
-      active = false
+      const response = (await onFetch(debouncedSearchValue, controllerRef.current?.signal)) || []
+      setOptions(response)
+      setLoading(false)
     }
-  }, [searchValue])
+    handleRequest()
+  }, [debouncedSearchValue])
 
   useEffect(() => {
     if (!open) {
@@ -71,14 +66,16 @@ const AsyncAutocomplete = ({
       className={className}
       multiple
       noOptionsText={noOptionsText}
+      loadingText={'Chargement en cours...'}
       loading={loading}
       value={values}
       autoComplete
       filterSelectedOptions
-      onChange={(event: any, newValue: any) => {
+      onChange={(event: SyntheticEvent, newValue: LabelObject[]) => {
         onChange(newValue)
       }}
       options={options}
+      filterOptions={(x) => x}
       isOptionEqualToValue={(option, value) => option.id === value.id}
       getOptionLabel={(option) => option.label}
       renderInput={(params) => (
