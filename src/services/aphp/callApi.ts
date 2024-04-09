@@ -119,7 +119,7 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
   if (gender) options = [...options, `gender=${gender}`]
   if (_text && _text.length > 0) {
     if (Array.isArray(_text)) {
-      const searchInput = _text.map((text) => `${searchBy}=${encodeURIComponent(text)}`).join('&')
+      const searchInput = _text.map((text) => `${searchBy}=${encodeURIComponent(`"${text}"`)}`).join('&')
       options = [...options, searchInput]
     } else {
       options = [...options, `${searchBy}=${_text}`]
@@ -959,7 +959,7 @@ const getCodeList = async (
           )}`
         : `&only-roots=false&_text=${encodeURIComponent(
             search.trim().replace(/[\[\]\/\{\}\(\)\*\?\.\\\^\$\|]/g, '\\$&') //eslint-disable-line
-          )}`
+          )}*`
     }
     // TODO test if it returns all the codes without specifying the count
     const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}${searchParam}`, {

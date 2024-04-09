@@ -115,6 +115,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const patientState = thunkApi.getState().patient
       const index = mapToAttribute(options.selectedTab)
       const currentPmsiState = patientState?.pmsi ? patientState?.pmsi[index] ?? { total: null } : { total: null }
+      const WILDCARD = '*'
 
       const patientId = patientState?.patientInfo?.id ?? ''
       if (!patientId) {
@@ -126,7 +127,8 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const sortBy = options.searchCriterias.orderBy.orderBy
       const sortDirection = options.searchCriterias.orderBy.orderDirection
       const page = options.page ?? 1
-      const searchInput = options.searchCriterias.searchInput === '' ? '' : options.searchCriterias.searchInput
+      const searchInput =
+        options.searchCriterias.searchInput === '' ? '' : options.searchCriterias.searchInput + WILDCARD
       const codeUrl =
         selectedTab === ResourceType.CLAIM
           ? CLAIM_HIERARCHY
