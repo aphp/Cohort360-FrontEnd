@@ -559,6 +559,7 @@ type fetchConditionProps = {
   sortDirection?: Direction
   subject?: string
   code?: string
+  source?: string
   type?: string[]
   _text?: string
   'min-recorded-date'?: string
@@ -568,7 +569,7 @@ type fetchConditionProps = {
   executiveUnits?: string[]
 }
 export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Promise_Response<Condition> => {
-  const { size, offset, _sort, sortDirection, subject, code, _text, executiveUnits } = args
+  const { size, offset, _sort, sortDirection, subject, code, source, _text, executiveUnits } = args
   const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list, type } = args
   const encounterIdentifier = args['encounter-identifier']
@@ -585,6 +586,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `code=${code}`] // eslint-disable-line
+  if (source) options = [...options, `source=${source}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
   if (minRecordedDate) options = [...options, `recorded-date=ge${minRecordedDate}`] // eslint-disable-line

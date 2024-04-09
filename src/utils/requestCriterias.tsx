@@ -245,6 +245,7 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             selectedCriteria.type
           )
         )
+      if (selectedCriteria.source) labels.push(`Source: ${selectedCriteria.source}`)
       break
 
     case CriteriaType.PROCEDURE:

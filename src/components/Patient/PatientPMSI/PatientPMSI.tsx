@@ -317,7 +317,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
             allDiagnosticTypesList={allDiagnosticTypesList}
           />
         )}
-        {selectedTab.id === ResourceType.PROCEDURE && <SourceFilter name={FilterKeys.SOURCE} value={source || ''} />}
+        {selectedTab.id !== ResourceType.CLAIM && <SourceFilter name={FilterKeys.SOURCE} value={source || ''} />}
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
           value={executiveUnits}
@@ -434,7 +434,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                   />
                 </Grid>
               )}
-              {selectedTab.id === ResourceType.PROCEDURE && (
+              {selectedTab.id !== ResourceType.CLAIM && (
                 <Grid item xs={12}>
                   <SourceFilter
                     disabled={isReadonlyFilterInfoModal}

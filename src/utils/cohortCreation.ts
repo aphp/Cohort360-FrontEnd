@@ -109,6 +109,7 @@ const PROCEDURE_CODE = 'code'
 const PROCEDURE_SOURCE = 'source'
 
 const CONDITION_CODE = 'code'
+const CONDITION_SOURCE = 'source'
 const CONDITION_TYPE = 'orbis-status'
 
 const COMPOSITION_TEXT = '_text'
@@ -342,6 +343,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         'subject.active=true',
         filtersBuilders(CONDITION_CODE, buildLabelObjectFilter(criterion.code, CONDITION_HIERARCHY)),
         filtersBuilders(CONDITION_TYPE, buildLabelObjectFilter(criterion.diagnosticType)),
+        criterion.source ? buildSimpleFilter(criterion.source, PROCEDURE_SOURCE) : '',
         filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService))
       ].filter((elem) => elem)
       filterFhir =
@@ -1024,6 +1026,7 @@ const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise
     type: CriteriaType.CONDITION,
     title: element.name ?? 'Critère de diagnostic',
     code: [],
+    source: null,
     diagnosticType: [],
     occurrence: null,
     startOccurrence: null,
@@ -1046,6 +1049,10 @@ const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise
       switch (key) {
         case CONDITION_CODE: {
           unbuildLabelObjectFilter(currentCriterion, 'code', value)
+          break
+        }
+        case CONDITION_SOURCE: {
+          currentCriterion.source = value
           break
         }
         case CONDITION_TYPE: {

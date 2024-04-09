@@ -471,6 +471,7 @@ const servicesPatients: IServicePatients = {
           sortDirection: sortDirection,
           'encounter-identifier': nda,
           code: code,
+          source: source,
           type: diagnosticTypes,
           'min-recorded-date': startDate ?? '',
           'max-recorded-date': endDate ?? '',

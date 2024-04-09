@@ -186,6 +186,7 @@ export type Cim10DataType = CommonCriteriaDataType &
   WithEncounterDateDataType & {
     type: CriteriaType.CONDITION
     code: LabelObject[] | null
+    source: string | null
     diagnosticType: LabelObject[] | null
     label: undefined
   }

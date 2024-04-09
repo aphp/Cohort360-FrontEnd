@@ -5,10 +5,13 @@ import {
   Autocomplete,
   Button,
   Divider,
+  FormControlLabel,
   FormLabel,
   Grid,
   IconButton,
   Link,
+  Radio,
+  RadioGroup,
   Switch,
   TextField,
   Tooltip,
@@ -178,6 +181,28 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               }}
             />
           </BlockWrapper>
+
+          <Grid style={{ display: 'flex' }}>
+            <RadioGroup
+              row
+              style={{ justifyContent: 'space-around' }}
+              className={classes.inputItem}
+              aria-label="mode"
+              name="criteria-mode-radio"
+              value={currentState.source}
+              onChange={(e, value) => onChangeValue('source', value)}
+            >
+              <FormControlLabel value="AREM" control={<Radio color="secondary" />} label="AREM" />
+              <FormControlLabel value="ORBIS" control={<Radio color="secondary" />} label="ORBIS" />
+            </RadioGroup>
+          </Grid>
+
+          <Grid>
+            <Alert severity="info">
+              Les données PMSI d'ORBIS sont codées au quotidien par les médecins. Les données PMSI AREM sont validées,
+              remontées aux tutelles et disponibles dans le SNDS.
+            </Alert>
+          </Grid>
 
           <AsyncAutocomplete
             label="Code CIM10"

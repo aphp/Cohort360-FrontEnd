@@ -16,6 +16,7 @@ export const defaultCondition: Omit<Cim10DataType, 'id'> = {
   type: CriteriaType.CONDITION,
   title: 'Critère de diagnostic',
   code: [],
+  source: 'AREM',
   label: undefined,
   diagnosticType: [],
   occurrence: 1,

@@ -69,7 +69,8 @@ enum ConditionParamsKeys {
   CODE = 'code',
   DIAGNOSTIC_TYPES = 'orbis-status',
   DATE = 'recorded-date',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site'
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
+  SOURCE = 'source'
 }
 
 enum ProcedureParamsKeys {
@@ -231,11 +232,12 @@ const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
       return { id: toParse, label: allDiagnosticTypes.find((diag) => diag.id === toParse)?.label || '' }
     })
   }
+  const source = parameters.get(ConditionParamsKeys.SOURCE) || ''
   const { nda, startDate, endDate, executiveUnits } = await mapGenericFromRequestParams(
     parameters,
     ResourceType.CONDITION
   )
-  return { code, diagnosticTypes, nda, startDate, endDate, executiveUnits }
+  return { code, source, diagnosticTypes, nda, startDate, endDate, executiveUnits }
 }
 
 const mapProcedureFromRequestParams = async (parameters: URLSearchParams) => {
@@ -444,7 +446,7 @@ const mapDocumentsToRequestParams = (filters: DocumentsFilters) => {
 }
 
 const mapConditionToRequestParams = (filters: PMSIFilters) => {
-  const { diagnosticTypes, code, nda, endDate, startDate, executiveUnits } = filters
+  const { diagnosticTypes, code, source, nda, endDate, startDate, executiveUnits } = filters
   const requestParams: string[] = []
   if (diagnosticTypes && diagnosticTypes.length > 0) {
     const diagnosticTypesUrl = encodeURIComponent(`${CONDITION_STATUS}|`)
@@ -455,6 +457,7 @@ const mapConditionToRequestParams = (filters: PMSIFilters) => {
     requestParams.push(
       `${ConditionParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${CONDITION_HIERARCHY}|${e.id}`).join(','))}`
     )
+  if (source) requestParams.push(`${ProcedureParamsKeys.SOURCE}=${source}`)
   requestParams.push(...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits }, ResourceType.CONDITION))
   return requestParams
 }
