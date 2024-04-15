@@ -76,7 +76,7 @@ type fetchPatientProps = {
   minBirthdate?: number
   maxBirthdate?: number
   searchBy?: string
-  _text?: string | string[]
+  _text?: string
   deceased?: boolean
   pivotFacet?: ('age-month_gender' | 'deceased_gender')[]
   _elements?: ('id' | 'gender' | 'name' | 'birthDate' | 'deceased' | 'identifier' | 'extension')[]
@@ -113,14 +113,7 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
   if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
   if (gender) options = [...options, `gender=${gender}`]
-  if (_text && _text.length > 0) {
-    if (Array.isArray(_text)) {
-      const searchInput = _text.map((text) => `${searchBy}=${encodeURIComponent(text)}`).join('&')
-      options = [...options, searchInput]
-    } else {
-      options = [...options, `${searchBy}=${_text}`]
-    }
-  }
+  if (_text) options = [...options, `${searchBy}=${_text}`]
   if (deceased !== undefined) options = [...options, `deceased=${deceased}`]
   if (minBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=ge${minBirthdate}`]
   if (maxBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=le${maxBirthdate}`]
@@ -906,13 +899,9 @@ const getCodeList = async (
     // if search is * then we fetch the roots of the valueSet
     if (search !== '*' && search !== undefined) {
       // if noStar is true then we search for the code, else we search for the display
-      searchParam = noStar
-        ? `&only-roots=false&code=${encodeURIComponent(
-            search.trim().replace(/[\[\]\/\{\}\(\)\*\?\.\\\^\$\|]/g, '\\$&') //eslint-disable-line
-          )}`
-        : `&only-roots=false&_text=${encodeURIComponent(
-            search.trim().replace(/[\[\]\/\{\}\(\)\*\?\.\\\^\$\|]/g, '\\$&') //eslint-disable-line
-          )}`
+      searchParam = `&only-roots=false&_tag=text-search-rank&${noStar ? 'code' : '_text'}=${encodeURIComponent(
+        search.trim().replace(/[\[\]\/\{\}\(\)\*\?\.\\\^\$\|]/g, '\\$&') //eslint-disable-line
+      )}`
     }
     // TODO test if it returns all the codes without specifying the count
     const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}${searchParam}`, {
