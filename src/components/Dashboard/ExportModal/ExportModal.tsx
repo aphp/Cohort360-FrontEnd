@@ -88,7 +88,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       }
       if (tableId === 'concept_relationship') {
         const careSiteItem = existingTableIds.find((existingTableId) => existingTableId === 'concept')
-        console.log('!careSiteItem', !careSiteItem)
         if (!careSiteItem) {
           existingTableIds = [...existingTableIds, 'concept']
         }
