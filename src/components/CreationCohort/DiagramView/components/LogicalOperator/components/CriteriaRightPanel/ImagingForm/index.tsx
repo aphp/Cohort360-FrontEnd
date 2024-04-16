@@ -87,6 +87,9 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [encounterEndDate, setEncounterEndDate] = useState(selectedCriteria?.encounterEndDate || null)
   const [startOccurrence, setStartOccurence] = useState(selectedCriteria?.startOccurrence || null)
   const [endOccurrence, setEndOccurence] = useState(selectedCriteria?.endOccurrence || null)
+  const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>(
+    mappingCriteria(selectedCriteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
+  )
 
   const [error, setError] = useState(Error.NO_ERROR)
 
@@ -142,7 +145,8 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
       encounterStartDate,
       encounterEndDate,
       startOccurrence,
-      endOccurrence
+      endOccurrence,
+      encounterStatus
     })
   }
 
@@ -184,6 +188,17 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             setOccurrence(newOccurence)
             setOccurrenceComparator(newComparator)
           }}
+        />
+      </BlockWrapper>
+      <BlockWrapper margin="1em">
+        <Autocomplete
+          multiple
+          options={criteriaData.data.encounterStatus || []}
+          getOptionLabel={(option) => option.label}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          value={encounterStatus}
+          onChange={(e, value) => setEncounterStatus(value)}
+          renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
         />
       </BlockWrapper>
 

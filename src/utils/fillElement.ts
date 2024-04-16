@@ -62,15 +62,14 @@ export const getResourceInfos = async <
   encounters = await fetchEncounter({
     _id: listeEncounterIds,
     _list: groupId ? [groupId] : [],
-    type: 'VISIT',
-    _elements: ['status', 'serviceProvider', 'identifier'],
+    _elements: ['status', 'serviceProvider', 'identifier', 'partOf'],
     signal: signal
   })
   if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
     return []
   }
   const _patients = getApiResponseResources(patients) ?? []
-  const _encounters = getApiResponseResources(encounters) ?? []
+  const _encounters = getApiResponseResources(encounters)?.filter((encounter) => !encounter.partOf) ?? []
 
   const filledEntries: U[] = elementEntries.map((entry) => {
     const linkedPatient = !deidentifiedBoolean ? getLinkedPatient(_patients, entry) : undefined

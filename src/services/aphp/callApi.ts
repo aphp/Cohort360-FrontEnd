@@ -142,8 +142,7 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
 type fetchEncounterProps = {
   _id?: string
   _list?: string[]
-  type?: string
-  'type:not'?: string
+  visit?: boolean
   size?: number
   offset?: number
   _sort?: string
@@ -151,14 +150,13 @@ type fetchEncounterProps = {
   patient?: string
   status?: string[]
   facet?: ('class' | 'visit-year-month-gender-facet')[]
-  _elements?: ('status' | 'serviceProvider' | 'identifier')[]
+  _elements?: Array<keyof Encounter>
   signal?: AbortSignal
 }
 export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Promise_Response<Encounter> => {
-  const { _id, size, offset, _sort, sortDirection, patient, type, signal } = args
+  const { _id, size, offset, _sort, sortDirection, patient, visit, signal } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list, _elements, status, facet } = args
-  const typeNot = args['type:not']
 
   _list = _list ? _list.filter(uniq) : []
   status = status ? status.filter(uniq) : []
@@ -172,8 +170,7 @@ export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Pro
   if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (patient) options = [...options, `subject=${patient}`]
-  if (type) options = [...options, `type=${type}`]
-  if (typeNot) options = [...options, `type:not=${typeNot}`]
+  if (visit) options = [...options, `part-of:missing=false`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
   if (status && status.length > 0) options = [...options, `status=${status.reduce(paramValuesReducer)}`]
@@ -230,6 +227,7 @@ type fetchDocumentReferenceProps = {
     | 'description'
   )[]
   executiveUnits?: string[]
+  encounterStatus?: string[]
 }
 export const fetchDocumentReference = async (
   args: fetchDocumentReferenceProps
@@ -251,7 +249,8 @@ export const fetchDocumentReference = async (
     onlyPdfAvailable,
     minDate,
     maxDate,
-    executiveUnits
+    executiveUnits,
+    encounterStatus
   } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list, facet, uniqueFacet, _elements } = args
@@ -303,6 +302,7 @@ export const fetchDocumentReference = async (
   if (maxDate) options = [...options, `date=le${maxDate}`]
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
+  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
   if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(paramValuesReducer, '')}`]
@@ -437,10 +437,24 @@ type fetchProcedureProps = {
   signal?: AbortSignal
   'encounter-identifier'?: string
   executiveUnits?: string[]
+  encounterStatus?: string[]
 }
 export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Promise_Response<Procedure> => {
-  const { size, offset, _sort, sortDirection, subject, code, source, _text, status, minDate, maxDate, executiveUnits } =
-    args
+  const {
+    size,
+    offset,
+    _sort,
+    sortDirection,
+    subject,
+    code,
+    source,
+    _text,
+    status,
+    minDate,
+    maxDate,
+    executiveUnits,
+    encounterStatus
+  } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
   const encounterIdentifier = args['encounter-identifier']
@@ -463,6 +477,7 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
+  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Procedure>>(`/Procedure?${options.reduce(paramsReducer)}`, {
     signal: args.signal
@@ -490,6 +505,7 @@ type fetchClaimProps = {
   'encounter-identifier'?: string
   signal?: AbortSignal
   executiveUnits?: string[]
+  encounterStatus?: string[]
 }
 export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Response<Claim> => {
   const {
@@ -503,7 +519,8 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
     status,
     minCreated,
     maxCreated,
-    executiveUnits
+    executiveUnits,
+    encounterStatus
   } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
@@ -529,6 +546,7 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
   if (maxCreated) options = [...options, `created=le${maxCreated}`]
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
+  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
@@ -560,9 +578,10 @@ type fetchConditionProps = {
   'encounter-identifier'?: string
   signal?: AbortSignal
   executiveUnits?: string[]
+  encounterStatus?: string[]
 }
 export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Promise_Response<Condition> => {
-  const { size, offset, _sort, sortDirection, subject, code, source, _text, executiveUnits } = args
+  const { size, offset, _sort, sortDirection, subject, code, source, _text, executiveUnits, encounterStatus } = args
   const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list, type } = args
   const encounterIdentifier = args['encounter-identifier']
@@ -586,6 +605,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   if (maxRecordedDate) options = [...options, `recorded-date=le${maxRecordedDate}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
+  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
   if (type && type.length > 0) {
@@ -618,6 +638,7 @@ type fetchObservationProps = {
   rowStatus: boolean
   signal?: AbortSignal
   executiveUnits?: string[]
+  encounterStatus?: string[]
 }
 export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle_Promise_Response<Observation> => {
   const {
@@ -635,7 +656,8 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
     maxDate,
     rowStatus,
     signal,
-    executiveUnits
+    executiveUnits,
+    encounterStatus
   } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
@@ -658,6 +680,7 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   if (rowStatus) options = [...options, `status=${BiologyStatus.VALIDATED}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
+  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
@@ -686,6 +709,7 @@ type fetchMedicationRequestProps = {
   _list?: string[]
   signal?: AbortSignal
   executiveUnits?: string[]
+  encounterStatus?: string[]
 }
 export const fetchMedicationRequest = async (
   args: fetchMedicationRequestProps
@@ -703,7 +727,8 @@ export const fetchMedicationRequest = async (
     minDate,
     maxDate,
     signal,
-    executiveUnits
+    executiveUnits,
+    encounterStatus
   } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
@@ -728,6 +753,7 @@ export const fetchMedicationRequest = async (
   if (maxDate) options = [...options, `validity-period-start=le${maxDate}`]
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
+  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
@@ -756,6 +782,7 @@ type fetchMedicationAdministrationProps = {
   _list?: string[]
   signal?: AbortSignal
   executiveUnits?: string[]
+  encounterStatus?: string[]
 }
 export const fetchMedicationAdministration = async (
   args: fetchMedicationAdministrationProps
@@ -773,7 +800,8 @@ export const fetchMedicationAdministration = async (
     minDate,
     maxDate,
     signal,
-    executiveUnits
+    executiveUnits,
+    encounterStatus
   } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
@@ -798,6 +826,7 @@ export const fetchMedicationAdministration = async (
   if (maxDate) options = [...options, `effective-time=le${maxDate}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `context.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+  if (encounterStatus && encounterStatus.length > 0) options = [...options, `context.status=${encounterStatus}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
@@ -826,6 +855,7 @@ type fetchImagingProps = {
   signal?: AbortSignal
   modalities?: string[]
   executiveUnits?: string[]
+  encounterStatus?: string[]
 }
 export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise_Response<ImagingStudy> => {
   const {
@@ -841,7 +871,8 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
     maxDate,
     signal,
     modalities,
-    executiveUnits
+    executiveUnits,
+    encounterStatus
   } = args
   const _orderDirection = orderDirection === Direction.DESC ? '-' : ''
   let { _list } = args
@@ -865,6 +896,7 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   }
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
+  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<ImagingStudy>>(
@@ -884,9 +916,10 @@ type fetchFormsProps = {
   startDate?: string | null
   endDate?: string | null
   executiveUnits?: string[]
+  encounterStatus?: string[]
 }
 export const fetchForms = async (args: fetchFormsProps) => {
-  const { patient, formName, _list, startDate, endDate, executiveUnits } = args
+  const { patient, formName, _list, startDate, endDate, executiveUnits, encounterStatus } = args
   let options: string[] = ['status=in-progress,completed']
   if (patient) options = [...options, `subject=${patient}`]
   if (formName) options = [...options, `questionnaire.name=${formName}`]
@@ -895,6 +928,7 @@ export const fetchForms = async (args: fetchFormsProps) => {
   if (endDate) options = [...options, `authored=le${endDate}`]
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
+  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<QuestionnaireResponse>>(
     `/QuestionnaireResponse?${options.reduce(paramsReducer)}`

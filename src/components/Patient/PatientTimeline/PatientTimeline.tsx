@@ -17,7 +17,7 @@ import FilterTimelineDialog from './FilterTimelineDialog/FilterTimelineDialog'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import { CohortComposition, CohortEncounter, PMSIEntry } from 'types'
+import { CohortComposition, CohortEncounter, HierarchyElement, PMSIEntry } from 'types'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
@@ -28,6 +28,7 @@ import services from 'services/aphp'
 
 import useStyles from './styles'
 import { Condition, DocumentReference, Encounter, Period, Procedure } from 'fhir/r4'
+import { FilterKeys, LabelObject } from 'types/searchCriterias'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -73,12 +74,15 @@ const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<Procedur
 }
 
 const generateTimelineFormattedData = (
+  encounterStatusIds: string[],
   hospits?: CohortEncounter[],
   consults?: PMSIEntry<Procedure>[],
   diagnostics?: PMSIEntry<Condition>[],
   selectedTypes?: { id: string; label: string }[]
 ): TimelineData => {
   const data: TimelineData = {}
+
+  hospits = hospits?.filter((item) => (encounterStatusIds.length > 0 ? encounterStatusIds.includes(item.status) : item))
 
   hospits?.forEach((item) => {
     const { dataItem, monthStr, yearStr } = getTimelineFormattedDataItem(item)
@@ -152,7 +156,9 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   const [openFilter, setOpenFilter] = useState(false)
 
   const [selectedTypes, setSelectedTypes] = useState<any[]>([])
+  const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>([])
   const [diagnosticTypesList, setDiagnosticTypesList] = useState<any[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
 
   const [loading, setLoading] = useState(false)
   const yearComponentSize: { [year: number]: number } = {}
@@ -173,23 +179,34 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   }, [])
 
   useEffect(() => {
-    const _fetchDiagnosticTypes = async () => {
-      const diagnosticTypes = await services.cohortCreation.fetchDiagnosticTypes()
+    const _fetch = async () => {
+      const [diagnosticTypes, encounterStatus] = await Promise.all([
+        services.cohortCreation.fetchDiagnosticTypes(),
+        services.cohortCreation.fetchEncounterStatus()
+      ])
       if (!diagnosticTypes) return
 
-      // Find main dianosys
-      const foundItem = diagnosticTypes.find((diagnosticTypes: any) => diagnosticTypes.id === 'dp')
+      setEncounterStatusList(encounterStatus)
+      // Find main diagnosis
+      const foundItem = diagnosticTypes.find((diagnosticTypes) => diagnosticTypes.id === 'dp')
       foundItem && setSelectedTypes([foundItem])
       setDiagnosticTypesList(diagnosticTypes)
     }
 
-    _fetchDiagnosticTypes()
+    _fetch()
   }, [])
 
   useEffect(() => {
-    const _timelineData = generateTimelineFormattedData(hospits, consults, diagnostics, selectedTypes)
+    const encounterStatusIds = encounterStatus.map(({ id }) => id)
+    const _timelineData = generateTimelineFormattedData(
+      encounterStatusIds,
+      hospits,
+      consults,
+      diagnostics,
+      selectedTypes
+    )
     setTimelineData(_timelineData)
-  }, [hospits, consults, diagnostics, selectedTypes])
+  }, [hospits, consults, diagnostics, selectedTypes, encounterStatus])
 
   let yearList: number[] = timelineData
     ? Object.keys(timelineData)
@@ -275,7 +292,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
           <div className={classes.leftElements}>
             {monthVisits.hospit.map((hospit, index) => (
               <TimelineItemLeft
-                key={`ecounter ${hospit.data.id ?? index}`}
+                key={`encounter ${hospit.data.id ?? index}`}
                 data={hospit.data}
                 open={handleClickOpenHospitDialog}
                 dotHeight={getComponentSize(hospit.data.period)}
@@ -311,8 +328,17 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
     </React.Fragment>
   )
 
-  const handleDeleteChip = (value: any) => {
-    value && setSelectedTypes(selectedTypes.filter((item: any) => item.id !== value.id))
+  const handleDeleteChip = (key: FilterKeys, value: any) => {
+    switch (key) {
+      case FilterKeys.DIAGNOSTIC_TYPES:
+        value && setSelectedTypes(selectedTypes.filter((item: any) => item.id !== value.id))
+        break
+      case FilterKeys.ENCOUNTER_STATUS:
+        value && setEncounterStatus(encounterStatus.filter((item: any) => item.id !== value.id))
+        break
+      default:
+        break
+    }
   }
 
   return (
@@ -337,6 +363,9 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
             onChangeSelectedDiagnosticTypes={(newSelectedTypes: string[]) => setSelectedTypes(newSelectedTypes)}
             open={openFilter}
             onClose={() => setOpenFilter(false)}
+            encounterStatusList={encounterStatusList}
+            encounterStatus={encounterStatus}
+            onChangeEncounterStatus={setEncounterStatus}
           />
 
           <Grid container alignItems="center" justifyContent="flex-end" style={{ margin: 'auto' }}>
@@ -357,7 +386,15 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
                 <Chip
                   key={diagnosticType.id}
                   label={capitalizeFirstLetter(diagnosticType.label)}
-                  onDelete={() => handleDeleteChip(diagnosticType)}
+                  onDelete={() => handleDeleteChip(FilterKeys.DIAGNOSTIC_TYPES, diagnosticType)}
+                />
+              ))}
+            {encounterStatus.length > 0 &&
+              encounterStatus.map((status) => (
+                <Chip
+                  key={status.id}
+                  label={capitalizeFirstLetter(status.label)}
+                  onDelete={() => handleDeleteChip(FilterKeys.ENCOUNTER_STATUS, status)}
                 />
               ))}
           </Grid>

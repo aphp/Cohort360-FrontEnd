@@ -25,7 +25,8 @@ export const defaultMedication: Omit<MedicationDataType, 'id'> = {
   endOccurrence: '',
   encounterEndDate: null,
   encounterStartDate: null,
-  isInclusive: true
+  isInclusive: true,
+  encounterStatus: []
 }
 
 const removeNonCommonFields = (medication: MedicationDataType) => {

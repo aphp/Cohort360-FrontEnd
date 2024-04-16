@@ -94,6 +94,9 @@ const PregnantForm = ({
   const [occurrenceComparator, setOccurrenceComparator] = useState<Comparators>(
     criteria?.occurrenceComparator || Comparators.GREATER_OR_EQUAL
   )
+  const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>(
+    mappingCriteria(criteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
+  )
   const [isInclusive, setIsInclusive] = useState<boolean>(criteria?.isInclusive || true)
 
   const { classes } = useStyles()
@@ -138,6 +141,7 @@ const PregnantForm = ({
       endOccurrence: null,
       encounterStartDate: null,
       encounterEndDate: null,
+      encounterStatus,
       isInclusive,
       title
     })
@@ -182,6 +186,17 @@ const PregnantForm = ({
           isAcceptEmptySelection={true}
           isDeleteIcon={true}
           onChangeExecutiveUnits={(newValue) => setEncounterService(newValue)}
+        />
+      </BlockWrapper>
+      <BlockWrapper style={{ margin: '0 1em 1em' }}>
+        <Autocomplete
+          multiple
+          options={criteriaData.data.encounterStatus || []}
+          getOptionLabel={(option) => option.label}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          value={encounterStatus}
+          onChange={(e, value) => setEncounterStatus(value)}
+          renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
         />
       </BlockWrapper>
 

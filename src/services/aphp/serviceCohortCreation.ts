@@ -65,6 +65,7 @@ import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
 import { DocType } from 'types/requestCriterias'
 import { VitalStatusLabel } from 'types/searchCriterias'
 import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
+import { encounterStatusList } from 'data/encounterStatus'
 
 export interface IServiceCohortCreation {
   /**
@@ -184,6 +185,7 @@ export interface IServiceCohortCreation {
   fetchComplication: () => Promise<Array<HierarchyElement>>
   fetchExitFeedingMode: () => Promise<Array<HierarchyElement>>
   fetchExitDiagnostic: () => Promise<Array<HierarchyElement>>
+  fetchEncounterStatus: () => Promise<Array<HierarchyElement>>
 }
 
 const servicesCohortCreation: IServiceCohortCreation = {
@@ -533,7 +535,8 @@ const servicesCohortCreation: IServiceCohortCreation = {
     return booleanFieldsData
   },
   fetchExitFeedingMode: async () => fetchValueSet(EXIT_FEEDING_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchExitDiagnostic: async () => fetchValueSet(EXIT_DIAGNOSTIC, { joinDisplayWithCode: false, sortingKey: 'id' })
+  fetchExitDiagnostic: async () => fetchValueSet(EXIT_DIAGNOSTIC, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchEncounterStatus: async () => encounterStatusList
 }
 
 export default servicesCohortCreation

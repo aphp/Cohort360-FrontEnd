@@ -51,7 +51,8 @@ const defaultComposition: Omit<DocumentDataType, 'id'> = {
   startOccurrence: '',
   endOccurrence: '',
   isInclusive: true,
-  docStatuses: []
+  docStatuses: [],
+  encounterStatus: []
 }
 
 const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
@@ -271,6 +272,18 @@ const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               options={docStatuses}
               value={defaultValues.docStatuses || undefined}
               renderInput={(params) => <TextField {...params} placeholder="Statut de documents" />}
+            />
+          </FormControl>
+
+          <FormControl variant="outlined" className={classes.inputItem}>
+            <Autocomplete
+              multiple
+              options={criteriaData.data.encounterStatus || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={defaultValues.encounterStatus}
+              onChange={(e, value) => _onChangeValue('encounterStatus', value)}
+              renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
             />
           </FormControl>
 

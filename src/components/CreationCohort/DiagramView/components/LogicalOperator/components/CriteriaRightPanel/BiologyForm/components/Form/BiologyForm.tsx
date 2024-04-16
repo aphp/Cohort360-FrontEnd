@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import {
   Alert,
+  Autocomplete,
   Button,
   Checkbox,
   Chip,
@@ -240,7 +241,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 gridTemplateColumns:
                   currentState.valueComparator === Comparators.BETWEEN ? '50px 1fr 1fr 1fr' : '50px 1fr 1fr',
                 alignItems: 'center',
-                marginTop: '1em'
+                margin: '1em 0'
               }}
             >
               <Checkbox
@@ -293,9 +294,18 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                   disabled={!allowSearchByValue}
                 />
               )}
-
               {/* TODO: gérer l'erreur si valumin > valuemax */}
             </Grid>
+
+            <Autocomplete
+              multiple
+              options={criteriaData.data.encounterStatus || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={currentState.encounterStatus}
+              onChange={(e, value) => onChangeValue('encounterStatus', value)}
+              renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
+            />
           </Grid>
 
           <AdvancedInputs form={CriteriaName.Biology} selectedCriteria={currentState} onChangeValue={onChangeValue} />

@@ -6,7 +6,7 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import DataTableComposition from 'components/DataTable/DataTableComposition'
 
-import { CriteriaName, LoadingStatus } from 'types'
+import { CriteriaName, HierarchyElement, LoadingStatus } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'
@@ -46,6 +46,8 @@ import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
 import DocStatusFilter from '../../Filters/DocStatusFilter'
+import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
+import services from 'services/aphp'
 
 const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
@@ -54,6 +56,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
   const patient = useAppSelector((state) => state.patient)
   const searchResults = {
     deidentified: patient?.deidentified || false,
@@ -87,13 +90,22 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
       searchInput,
       searchBy,
       filters,
-      filters: { nda, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, startDate, endDate }
+      filters: { nda, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, startDate, endDate, encounterStatus }
     },
     { changeOrderBy, changeSearchInput, changeSearchBy, addFilters, removeFilter, addSearchCriterias }
   ] = useSearchCriterias(initPatientDocsSearchCriterias)
   const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({ nda, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, startDate, endDate })
-  }, [nda, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, startDate, endDate])
+    return selectFiltersAsArray({
+      nda,
+      executiveUnits,
+      onlyPdfAvailable,
+      docStatuses,
+      docTypes,
+      startDate,
+      endDate,
+      encounterStatus
+    })
+  }, [nda, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, startDate, endDate, encounterStatus])
 
   const controllerRef = useRef<AbortController>(new AbortController())
   const meState = useAppSelector((state) => state.me)
@@ -111,7 +123,16 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
               orderBy,
               searchBy,
               searchInput,
-              filters: { nda, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, startDate, endDate }
+              filters: {
+                nda,
+                executiveUnits,
+                onlyPdfAvailable,
+                docStatuses,
+                docTypes,
+                startDate,
+                endDate,
+                encounterStatus
+              }
             }
           },
           groupId,
@@ -130,9 +151,29 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   }
 
   useEffect(() => {
+    const fetch = async () => {
+      const encounterStatus = await services.cohortCreation.fetchEncounterStatus()
+      setEncounterStatusList(encounterStatus)
+    }
+    fetch()
+  }, [])
+
+  useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [onlyPdfAvailable, nda, docStatuses, docTypes, startDate, endDate, executiveUnits, orderBy, searchBy, searchInput])
+  }, [
+    onlyPdfAvailable,
+    nda,
+    docStatuses,
+    docTypes,
+    startDate,
+    endDate,
+    executiveUnits,
+    orderBy,
+    searchBy,
+    searchInput,
+    encounterStatus
+  ])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -243,7 +284,8 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
                     docTypes,
                     startDate,
                     endDate,
-                    onlyPdfAvailable: !onlyPdfAvailable
+                    onlyPdfAvailable: !onlyPdfAvailable,
+                    encounterStatus
                   })
                 }
               />
@@ -284,6 +326,11 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
           criteriaName={CriteriaName.Document}
+        />
+        <EncounterStatusFilter
+          value={encounterStatus}
+          name={FilterKeys.ENCOUNTER_STATUS}
+          encounterStatusList={encounterStatusList}
         />
       </Modal>
       <Modal
@@ -332,7 +379,8 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
               startDate,
               endDate,
               docTypes,
-              onlyPdfAvailable
+              onlyPdfAvailable,
+              encounterStatus
             }) => {
               patchSavedFilter(
                 filterName,
@@ -340,7 +388,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
                   searchInput,
                   searchBy,
                   orderBy: { orderBy: Order.DATE, orderDirection: Direction.ASC },
-                  filters: { nda, executiveUnits, startDate, endDate, docTypes, onlyPdfAvailable }
+                  filters: { nda, executiveUnits, startDate, endDate, docTypes, onlyPdfAvailable, encounterStatus }
                 },
                 searchResults.deidentified ?? true
               )
@@ -412,6 +460,12 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
                   criteriaName={CriteriaName.Document}
+                />
+                <EncounterStatusFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
+                  name={FilterKeys.ENCOUNTER_STATUS}
+                  encounterStatusList={encounterStatusList}
                 />
               </Grid>
             </Grid>

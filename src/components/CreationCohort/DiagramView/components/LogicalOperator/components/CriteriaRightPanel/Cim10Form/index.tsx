@@ -25,7 +25,8 @@ export const defaultCondition: Omit<Cim10DataType, 'id'> = {
   endOccurrence: '',
   isInclusive: true,
   encounterStartDate: null,
-  encounterEndDate: null
+  encounterEndDate: null,
+  encounterStatus: []
 }
 
 const Index = (props: CriteriaDrawerComponentProps) => {

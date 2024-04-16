@@ -54,7 +54,7 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
     { label: "Voie d'administration", code: 'route' },
     selectedTab === ResourceType.MEDICATION_ADMINISTRATION ? { label: 'Quantité' } : null,
     { label: 'Unité exécutrice' },
-    selectedTab === ResourceType.MEDICATION_ADMINISTRATION ? { label: 'Commentaire' } : null
+    selectedTab === ResourceType.MEDICATION_ADMINISTRATION && !deidentified ? { label: 'Commentaire' } : null
   ].filter((elem) => elem !== null) as Column[]
 
   return (

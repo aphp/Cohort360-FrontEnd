@@ -38,6 +38,7 @@ import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
 import { useAppSelector } from 'state'
 import { BlockWrapper } from 'components/ui/Layout'
+import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 
 type ImagingListProps = {
   groupId?: string
@@ -55,6 +56,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [allModalities, setAllModalities] = useState<HierarchyElement[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
 
   const [page, setPage] = useState(1)
   const [
@@ -62,13 +64,13 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
       orderBy,
       searchInput,
       filters,
-      filters: { ipp, nda, startDate, endDate, executiveUnits, modality }
+      filters: { ipp, nda, startDate, endDate, executiveUnits, modality, encounterStatus }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
   ] = useSearchCriterias(initImagingCriterias)
   const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({ ipp, nda, startDate, endDate, executiveUnits, modality })
-  }, [ipp, nda, startDate, endDate, executiveUnits, modality])
+    return selectFiltersAsArray({ ipp, nda, startDate, endDate, executiveUnits, modality, encounterStatus })
+  }, [ipp, nda, startDate, endDate, executiveUnits, modality, encounterStatus])
   const {
     allSavedFilters,
     savedFiltersErrors,
@@ -105,7 +107,8 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
               startDate,
               endDate,
               executiveUnits,
-              modality
+              modality,
+              encounterStatus
             }
           }
         },
@@ -136,8 +139,13 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
 
   useEffect(() => {
     const fetch = async () => {
-      const modalities = await services.cohortCreation.fetchModalities()
+      const [modalities, encounterStatus] = await Promise.all([
+        services.cohortCreation.fetchModalities(),
+        services.cohortCreation.fetchEncounterStatus()
+      ])
+
       setAllModalities(modalities)
+      setEncounterStatusList(encounterStatus)
     }
     fetch()
   }, [])
@@ -145,7 +153,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [ipp, nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality, groupId])
+  }, [ipp, nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality, groupId, encounterStatus])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -257,6 +265,11 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
           name={FilterKeys.EXECUTIVE_UNITS}
           criteriaName={CriteriaName.Imaging}
         />
+        <EncounterStatusFilter
+          value={encounterStatus}
+          name={FilterKeys.ENCOUNTER_STATUS}
+          encounterStatusList={encounterStatusList}
+        />
       </Modal>
       <Modal
         title="Filtres sauvegardés"
@@ -295,7 +308,16 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
             readonly={isReadonlyFilterInfoModal}
             color="secondary"
             onClose={() => setToggleFilterInfoModal(false)}
-            onSubmit={({ filterName, searchInput, modality, nda, startDate, endDate, executiveUnits }) => {
+            onSubmit={({
+              filterName,
+              searchInput,
+              modality,
+              nda,
+              startDate,
+              endDate,
+              executiveUnits,
+              encounterStatus
+            }) => {
               patchSavedFilter(
                 filterName,
                 {
@@ -304,7 +326,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
                     orderBy: Order.STUDY_DATE,
                     orderDirection: Direction.DESC
                   },
-                  filters: { modality, nda, startDate, endDate, executiveUnits }
+                  filters: { modality, nda, startDate, endDate, executiveUnits, encounterStatus }
                 },
                 deidentified ?? true
               )

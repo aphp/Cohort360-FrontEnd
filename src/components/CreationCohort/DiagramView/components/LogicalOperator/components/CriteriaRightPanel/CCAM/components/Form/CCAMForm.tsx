@@ -13,7 +13,8 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
-  Tooltip
+  Tooltip,
+  Autocomplete
 } from '@mui/material'
 
 import InfoIcon from '@mui/icons-material/Info'
@@ -179,7 +180,13 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
           </Grid>
 
           <Grid>
-            <Alert severity="info">
+            <Alert
+              severity="info"
+              style={{
+                margin: '0 1em',
+                width: 'calc(100% - 2em)'
+              }}
+            >
               Les données PMSI d'ORBIS sont codées au quotidien par les médecins. Les données PMSI AREM sont validées,
               remontées aux tutelles et disponibles dans le SNDS.
             </Alert>
@@ -193,6 +200,17 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             values={defaultValuesCode}
             onFetch={getCCAMOptions}
             onChange={(value) => onChangeValue('code', value)}
+          />
+
+          <Autocomplete
+            multiple
+            className={classes.inputItem}
+            options={criteriaData.data.encounterStatus || []}
+            getOptionLabel={(option) => option.label}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            value={currentState.encounterStatus}
+            onChange={(e, value) => onChangeValue('encounterStatus', value)}
+            renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
           />
 
           <AdvancedInputs form={CriteriaName.Ccam} selectedCriteria={currentState} onChangeValue={onChangeValue} />

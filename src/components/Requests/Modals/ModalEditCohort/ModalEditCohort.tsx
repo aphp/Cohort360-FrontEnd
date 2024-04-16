@@ -92,7 +92,7 @@ const ModalEditCohort: React.FC<{
             <TextField
               placeholder="Nom de la cohorte"
               value={modalCohortState.name}
-              onChange={(e: any) => onChangeValue('name', e.target.value)}
+              onChange={(e) => onChangeValue('name', e.target.value)}
               autoFocus
               id="title"
               margin="normal"
@@ -113,7 +113,7 @@ const ModalEditCohort: React.FC<{
             <TextField
               placeholder="Description"
               value={modalCohortState.description}
-              onChange={(e: any) => onChangeValue('description', e.target.value)}
+              onChange={(e) => onChangeValue('description', e.target.value)}
               id="description"
               margin="normal"
               fullWidth

@@ -38,8 +38,8 @@ const DiagnosticTypesFilter = ({
         options={allDiagnosticTypesList}
         value={diagnosticTypes}
         disableCloseOnSelect
-        getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.label)}
-        renderOption={(props, diagnosticType: any) => <li {...props}>{capitalizeFirstLetter(diagnosticType.label)}</li>}
+        getOptionLabel={(diagnosticType) => capitalizeFirstLetter(diagnosticType.label)}
+        renderOption={(props, diagnosticType) => <li {...props}>{capitalizeFirstLetter(diagnosticType.label)}</li>}
         renderInput={(params) => (
           <TextField {...params} label="Types de diagnostics" placeholder="Sélectionner type(s) de diagnostics" />
         )}

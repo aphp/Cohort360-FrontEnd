@@ -83,7 +83,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
           placeholder="Nom de la requête"
           // value={currentRequest?.name}
           value={currentRequest?.name ? currentRequest?.name : currentRequest?.requestName}
-          onChange={(e: any) => onChangeValue(currentRequest?.name ? 'name' : 'requestName', e.target.value)}
+          onChange={(e) => onChangeValue(currentRequest?.name ? 'name' : 'requestName', e.target.value)}
           autoFocus
           id="title"
           margin="normal"

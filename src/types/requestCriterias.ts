@@ -90,6 +90,10 @@ export type WithEncounterDateDataType = {
   encounterStartDate?: string | null
 }
 
+export type WithEncounterStatusDataType = {
+  encounterStatus: LabelObject[]
+}
+
 export type SelectedCriteriaType =
   | CcamDataType
   | Cim10DataType
@@ -168,12 +172,14 @@ export enum CriteriaDataKey {
   COMPLICATION = 'complication',
   EXIT_FEEDING_MODE = 'exitFeedingMode',
   EXIT_DIAGNOSTIC = 'exitDiagnostic',
-  DOC_STATUSES = 'docStatuses'
+  DOC_STATUSES = 'docStatuses',
+  ENCOUNTER_STATUS = 'encounterStatus'
 }
 
 export type CcamDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
-  WithEncounterDateDataType & {
+  WithEncounterDateDataType &
+  WithEncounterStatusDataType & {
     type: CriteriaType.PROCEDURE
     hierarchy: undefined
     code: LabelObject[] | null
@@ -183,7 +189,8 @@ export type CcamDataType = CommonCriteriaDataType &
 
 export type Cim10DataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
-  WithEncounterDateDataType & {
+  WithEncounterDateDataType &
+  WithEncounterStatusDataType & {
     type: CriteriaType.CONDITION
     code: LabelObject[] | null
     source: string | null
@@ -213,7 +220,8 @@ export type DocType = {
 
 export type DocumentDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
-  WithEncounterDateDataType & {
+  WithEncounterDateDataType &
+  WithEncounterStatusDataType & {
     type: CriteriaType.DOCUMENTS
     search: string
     searchBy: SearchByTypes.TEXT | SearchByTypes.DESCRIPTION
@@ -223,7 +231,8 @@ export type DocumentDataType = CommonCriteriaDataType &
 
 export type GhmDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
-  WithEncounterDateDataType & {
+  WithEncounterDateDataType &
+  WithEncounterStatusDataType & {
     type: CriteriaType.CLAIM
     code: LabelObject[] | null
     label: undefined
@@ -240,7 +249,8 @@ export enum Comparators {
 
 export type EncounterDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
-  WithEncounterDateDataType & {
+  WithEncounterDateDataType &
+  WithEncounterStatusDataType & {
     type: CriteriaType.ENCOUNTER
     age: DurationRangeType
     duration: DurationRangeType
@@ -249,7 +259,6 @@ export type EncounterDataType = CommonCriteriaDataType &
     exitMode: LabelObject[] | null
     priseEnChargeType: LabelObject[] | null
     typeDeSejour: LabelObject[] | null
-    fileStatus: LabelObject[] | null
     reason: LabelObject[] | null
     destination: LabelObject[] | null
     provenance: LabelObject[] | null
@@ -259,7 +268,8 @@ export type EncounterDataType = CommonCriteriaDataType &
 
 export type PregnancyDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
-  WithEncounterDateDataType & {
+  WithEncounterDateDataType &
+  WithEncounterStatusDataType & {
     type: CriteriaType.PREGNANCY
     pregnancyStartDate: string | null | undefined
     pregnancyEndDate: string | null | undefined
@@ -281,7 +291,8 @@ export type PregnancyDataType = CommonCriteriaDataType &
 
 export type HospitDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
-  WithEncounterDateDataType & {
+  WithEncounterDateDataType &
+  WithEncounterStatusDataType & {
     type: CriteriaType.HOSPIT
     hospitReason: string
     inUteroTransfer: LabelObject[] | null
@@ -339,7 +350,8 @@ export type HospitDataType = CommonCriteriaDataType &
 
 export type MedicationDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
-  WithEncounterDateDataType & {
+  WithEncounterDateDataType &
+  WithEncounterStatusDataType & {
     code: LabelObject[] | null
     administration: LabelObject[] | null
   } & (
@@ -352,7 +364,8 @@ export type MedicationDataType = CommonCriteriaDataType &
 
 export type ObservationDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
-  WithEncounterDateDataType & {
+  WithEncounterDateDataType &
+  WithEncounterStatusDataType & {
     type: CriteriaType.OBSERVATION
     code: LabelObject[] | null
     isLeaf: boolean
@@ -362,7 +375,8 @@ export type ObservationDataType = CommonCriteriaDataType &
 
 export type ImagingDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
-  WithEncounterDateDataType & {
+  WithEncounterDateDataType &
+  WithEncounterStatusDataType & {
     type: CriteriaType.IMAGING
     studyStartDate: string | null
     studyEndDate: string | null

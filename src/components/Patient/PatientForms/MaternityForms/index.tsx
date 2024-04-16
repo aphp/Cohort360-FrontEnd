@@ -16,10 +16,11 @@ import { fetchMaternityForms } from 'state/patient'
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { Questionnaire } from 'fhir/r4'
-import { CriteriaName, LoadingStatus } from 'types'
+import { CriteriaName, HierarchyElement, LoadingStatus } from 'types'
 import { FilterKeys } from 'types/searchCriterias'
 import Timeline from './Timeline'
 import services from 'services/aphp'
+import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 
 type PatientFormsProps = {
   groupId?: string
@@ -33,16 +34,18 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [maternityFormNamesIds, setMaternityFormNamesIds] = useState<Questionnaire[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
+
   const [
     {
       filters,
-      filters: { formName, startDate, endDate, executiveUnits }
+      filters: { formName, startDate, endDate, executiveUnits, encounterStatus }
     },
     { addFilters, removeFilter }
   ] = useSearchCriterias(initFormsCriterias)
   const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({ formName, startDate, endDate, executiveUnits })
-  }, [formName, startDate, endDate, executiveUnits])
+    return selectFiltersAsArray({ formName, startDate, endDate, executiveUnits, encounterStatus })
+  }, [formName, startDate, endDate, executiveUnits, encounterStatus])
 
   const searchResults = {
     maternityFormList: patient?.forms?.maternityForms?.maternityFormsList
@@ -57,7 +60,7 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
         fetchMaternityForms({
           options: {
             searchCriterias: {
-              filters: { formName, startDate, endDate, executiveUnits }
+              filters: { formName, startDate, endDate, executiveUnits, encounterStatus }
             }
           },
           groupId: groupId
@@ -77,19 +80,23 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
     }
   }
 
-  const _fetchMaternityFormNamesIds = async () => {
-    const maternityFormNamesIds = await services.patients.fetchMaternityFormNamesIds()
+  const fetch = async () => {
+    const [maternityFormNamesIds, encounterStatus] = await Promise.all([
+      services.patients.fetchMaternityFormNamesIds(),
+      services.cohortCreation.fetchEncounterStatus()
+    ])
     setMaternityFormNamesIds(maternityFormNamesIds)
+    setEncounterStatusList(encounterStatus)
   }
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
-    _fetchMaternityFormNamesIds()
+    fetch()
   }, [])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
-  }, [formName, startDate, endDate, executiveUnits])
+  }, [formName, startDate, endDate, executiveUnits, encounterStatus])
 
   useEffect(() => {
     if (loadingStatus === LoadingStatus.IDDLE) {
@@ -120,6 +127,11 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
                   value={executiveUnits}
                   name={FilterKeys.EXECUTIVE_UNITS}
                   criteriaName={CriteriaName.Form}
+                />
+                <EncounterStatusFilter
+                  value={encounterStatus}
+                  name={FilterKeys.ENCOUNTER_STATUS}
+                  encounterStatusList={encounterStatusList}
                 />
               </Modal>
             )}

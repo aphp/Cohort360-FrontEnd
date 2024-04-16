@@ -231,7 +231,7 @@ const servicesCohorts: IServiceCohorts = {
           facet: ['class', 'visit-year-month-gender-facet'],
           _list: [cohortId],
           size: 0,
-          type: 'VISIT'
+          visit: true
         })
       ])
 
@@ -403,7 +403,7 @@ const servicesCohorts: IServiceCohorts = {
       searchCriterias: {
         orderBy,
         searchInput,
-        filters: { ipp, nda, startDate, endDate, executiveUnits, modality }
+        filters: { ipp, nda, startDate, endDate, executiveUnits, modality, encounterStatus }
       }
     } = options
     try {
@@ -421,7 +421,8 @@ const servicesCohorts: IServiceCohorts = {
           _list: groupId ? [groupId] : [],
           signal,
           modalities: modality.map(({ id }) => id),
-          executiveUnits: executiveUnits.map((unit) => unit.id)
+          executiveUnits: executiveUnits.map((unit) => unit.id),
+          encounterStatus: encounterStatus.map(({ id }) => id)
         }),
         !!searchInput || !!ipp || !!nda || !!startDate || !!endDate || executiveUnits.length > 0 || modality.length > 0
           ? fetchImaging({
@@ -470,7 +471,17 @@ const servicesCohorts: IServiceCohorts = {
         orderBy,
         searchInput,
         searchBy,
-        filters: { docStatuses, docTypes, endDate, executiveUnits, ipp, nda, onlyPdfAvailable, startDate }
+        filters: {
+          docStatuses,
+          docTypes,
+          endDate,
+          executiveUnits,
+          ipp,
+          nda,
+          onlyPdfAvailable,
+          startDate,
+          encounterStatus
+        }
       }
     } = options
     if (searchInput) {
@@ -500,7 +511,8 @@ const servicesCohorts: IServiceCohorts = {
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
         uniqueFacet: ['subject'],
-        executiveUnits: executiveUnits.map((eu) => eu.id)
+        executiveUnits: executiveUnits.map((eu) => eu.id),
+        encounterStatus: encounterStatus.map(({ id }) => id)
       }),
       !!searchInput ||
       docTypes.length > 0 ||
@@ -510,7 +522,8 @@ const servicesCohorts: IServiceCohorts = {
       !!endDate ||
       executiveUnits.length > 0 ||
       docStatuses.length > 0 ||
-      !!onlyPdfAvailable
+      !!onlyPdfAvailable ||
+      encounterStatus.length > 0
         ? fetchDocumentReference({
             signal: signal,
             _list: groupId ? [groupId] : [],

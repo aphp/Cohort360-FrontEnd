@@ -226,6 +226,16 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             onChange={(e, value) => onChangeValue('diagnosticType', value)}
             renderInput={(params) => <TextField {...params} label="Type de diagnostic" />}
           />
+          <Autocomplete
+            multiple
+            options={criteriaData.data.encounterStatus || []}
+            className={classes.inputItem}
+            getOptionLabel={(option) => option.label}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            value={currentState.encounterStatus}
+            onChange={(e, value) => onChangeValue('encounterStatus', value)}
+            renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
+          />
           <AdvancedInputs form={CriteriaName.Cim10} selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 

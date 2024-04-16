@@ -145,7 +145,8 @@ export enum FilterKeys {
   MIN_PATIENTS = 'minPatients',
   MAX_PATIENTS = 'maxPatients',
   MODALITY = 'modality',
-  FORM_NAME = 'formName'
+  FORM_NAME = 'formName',
+  ENCOUNTER_STATUS = 'encounterStatus'
 }
 
 export enum OrderByKeys {
@@ -211,6 +212,7 @@ export type GenericFilter = {
   startDate: string | null
   endDate: string | null
   executiveUnits: ScopeTreeRow[]
+  encounterStatus: LabelObject[]
 }
 
 export interface PatientsFilters {
@@ -245,6 +247,7 @@ export type MaternityFormFilters = {
   formName: FormNames[]
   startDate: string | null
   endDate: string | null
+  encounterStatus: LabelObject[]
   executiveUnits: ScopeTreeRow[]
 }
 

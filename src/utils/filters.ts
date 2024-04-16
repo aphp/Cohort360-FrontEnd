@@ -64,6 +64,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.ANABIO:
       case FilterKeys.CODE:
       case FilterKeys.FORM_NAME:
+      case FilterKeys.ENCOUNTER_STATUS:
         castedFilters[key] = removeElementInArray(castedFilters[key], value)
         break
       case FilterKeys.NDA:
@@ -162,6 +163,9 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.MODALITY) {
     return `Modalités : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
   }
+  if (key === FilterKeys.ENCOUNTER_STATUS) {
+    return `Statut de la visite associée : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
+  }
   return ''
 }
 
@@ -190,6 +194,7 @@ export const selectFiltersAsArray = (filters: Filters) => {
         case FilterKeys.ANABIO:
         case FilterKeys.CODE:
         case FilterKeys.FORM_NAME:
+        case FilterKeys.ENCOUNTER_STATUS:
           ;(value as []).forEach((elem) =>
             result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
           )

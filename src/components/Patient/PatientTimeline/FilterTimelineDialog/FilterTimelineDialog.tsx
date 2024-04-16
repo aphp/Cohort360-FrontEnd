@@ -15,6 +15,8 @@ import {
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
+import { HierarchyElement } from 'types'
+import { LabelObject } from 'types/searchCriterias'
 
 type FilterTimelineDialogProps = {
   open: boolean
@@ -22,17 +24,24 @@ type FilterTimelineDialogProps = {
   diagnosticTypesList: any[]
   selectedDiagnosticTypes: string[]
   onChangeSelectedDiagnosticTypes: (selectedDiagnosticTypes: string[]) => void
+  encounterStatusList: HierarchyElement[]
+  encounterStatus: LabelObject[]
+  onChangeEncounterStatus: (encounterStatus: LabelObject[]) => void
 }
 const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
   open,
   onClose,
   diagnosticTypesList,
   selectedDiagnosticTypes,
-  onChangeSelectedDiagnosticTypes
+  onChangeSelectedDiagnosticTypes,
+  encounterStatusList,
+  encounterStatus,
+  onChangeEncounterStatus
 }) => {
   const { classes } = useStyles()
 
   const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>(selectedDiagnosticTypes)
+  const [_encounterStatus, setEncounterStatus] = useState<LabelObject[]>(encounterStatus)
 
   const _onChangeSelectedDiagnosticTypes = (event: React.ChangeEvent<{}>, value: any[]) => {
     setSelectedDiagnosticTypes(value)
@@ -40,11 +49,13 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
 
   const _onSubmit = () => {
     onChangeSelectedDiagnosticTypes(_selectedDiagnosticTypes)
+    onChangeEncounterStatus(_encounterStatus)
     onClose()
   }
 
   useEffect(() => {
     setSelectedDiagnosticTypes(selectedDiagnosticTypes)
+    setEncounterStatus(encounterStatus)
   }, [open]) // eslint-disable-line
 
   const currentSelectedTypes = diagnosticTypesList.filter((item) =>
@@ -70,6 +81,24 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
             )}
             renderInput={(params) => (
               <TextField {...params} label="Types de diagnostics" placeholder="Sélectionner type(s) de diagnostics" />
+            )}
+            className={classes.autocomplete}
+          />
+          <Typography variant="h3" className={classes.autocomplete}>
+            Statut de la visite associée :
+          </Typography>
+          <Autocomplete
+            multiple
+            onChange={(event, value) => {
+              setEncounterStatus(value)
+            }}
+            options={encounterStatusList}
+            value={_encounterStatus}
+            disableCloseOnSelect
+            getOptionLabel={(encounterStatus: LabelObject) => encounterStatus.label}
+            renderOption={(props, encounterStatus: LabelObject) => <li {...props}>{encounterStatus.label}</li>}
+            renderInput={(params) => (
+              <TextField {...params} placeholder="Sélectionner le statut de la visite associée" />
             )}
             className={classes.autocomplete}
           />

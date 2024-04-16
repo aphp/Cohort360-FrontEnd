@@ -185,6 +185,9 @@ export const EXIT_FEEDING_MODE = import.meta.env.DEV
 export const EXIT_DIAGNOSTIC = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_EXIT_DIAGNOSTIC
   : '{VITE_VALUE_SET_URL_EXIT_DIAGNOSTIC}'
+export const ENCOUNTER_STATUS = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_STATUS
+  : '{VITE_VALUE_SET_URL_ENCOUNTER_STATUS}'
 
 export const CODE_DISPLAY_JWT = import.meta.env.DEV ? import.meta.env.VITE_CODE_DISPLAY_JWT : '{VITE_CODE_DISPLAY_JWT}'
 
