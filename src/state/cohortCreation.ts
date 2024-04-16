@@ -607,6 +607,9 @@ const cohortCreationSlice = createSlice({
       state.criteriaGroup = [...state.criteriaGroup, action.payload]
       state.nextGroupId--
     },
+    editAllCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType[]>) => {
+      state.selectedCriteria = action.payload
+    },
     editSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
       const foundItem = state.selectedCriteria.find(({ id }) => id === action.payload.id)
       const index = foundItem ? state.selectedCriteria.indexOf(foundItem) : -1
@@ -771,6 +774,7 @@ export const {
   deleteCriteriaGroup,
   addNewSelectedCriteria,
   addNewCriteriaGroup,
+  editAllCriteria,
   editSelectedCriteria,
   editCriteriaGroup,
   duplicateSelectedCriteria,
