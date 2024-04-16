@@ -331,16 +331,6 @@ const servicesCohorts: IServiceCohorts = {
     signal
   ) => {
     try {
-      let _searchInput: string | string[] = ''
-      _searchInput = searchInput
-        .trim() // Remove space before/after search
-        .split(' ') // Split by space (= ['mot1', 'mot2' ...])
-        .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
-
-      if (searchBy === SearchByTypes.IDENTIFIER) {
-        _searchInput = _searchInput.join()
-      }
-
       // convert birthdates into days or months depending of if it's a deidentified perimeter or not
       const birthdates: [string, string] = [
         moment(substructAgeString(filters?.birthdatesRanges?.[0] || '')).format('MM/DD/YYYY'),
@@ -359,7 +349,7 @@ const servicesCohorts: IServiceCohorts = {
         _list: groupId ? [groupId] : [],
         gender: filters && filters.genders.join(','),
         searchBy,
-        _text: _searchInput,
+        _text: searchInput.trim(),
         minBirthdate: minBirthdate,
         maxBirthdate: maxBirthdate,
         deceased:

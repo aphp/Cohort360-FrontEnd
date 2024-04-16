@@ -26,16 +26,6 @@ export const fetchBiologySearch = async (
   const res = await apiFhir.get<FHIR_Bundle_Response<ConceptMap>>(
     `/ConceptMap?_count=2000&name=Maps%20to,Concept%20Fhir%20Maps%20To&source-system=${BIOLOGY_HIERARCHY_ITM_ANABIO}&target-system=${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}&_text=${encodeURIComponent(
       lowerCaseTrimmedSearchInput.replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') // eslint-disable-line
-    )},${encodeURIComponent(
-      `/(.)*${lowerCaseTrimmedSearchInput.replace(/[/"]/g, function (m) {
-        switch (m) {
-          case '/':
-            return '\\/'
-          case '"':
-            return '\\"'
-        }
-        return m
-      })}(.)*/`
     )}`
   )
 
