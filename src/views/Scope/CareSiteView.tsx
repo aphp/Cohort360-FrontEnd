@@ -4,22 +4,22 @@ import useStyles from './styles'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from 'state'
 import { closeAllOpenedPopulation } from 'state/scope'
-import { ScopeTreeRow } from 'types'
+import { ScopeElement } from 'types'
 import Typography from '@mui/material/Typography'
 import ScopeTree from 'components/ScopeTree'
+import { Hierarchy } from 'types/hierarchy'
+import { SourceType } from 'types/scope'
 
 const CareSiteView = () => {
   const { classes, cx } = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
-
-  const [selectedItems, setSelectedItems] = useState<ScopeTreeRow[]>([])
-  const [openPopulation, setOpenPopulations] = useState<number[]>([])
+  const population = useAppSelector((state) => state.scope.rights)
+  const [selectedCodes, setSelectedCodes] = useState<Hierarchy<ScopeElement, string>[]>([])
   const open = useAppSelector((state) => state.drawer)
-  const trimItems = () => {
-    const _selectedItems = selectedItems ? selectedItems : []
 
-    const perimetresIds = _selectedItems.map((_selected) => _selected.cohort_id ?? null)
+  const handleNavigation = () => {
+    const perimetresIds = selectedCodes.map((code) => code.cohort_id ?? null)
     navigate(`/perimeters?${perimetresIds}`)
   }
 
@@ -34,7 +34,7 @@ const CareSiteView = () => {
       className={cx(classes.appBar, {
         [classes.appBarShift]: open
       })}
-      style={{ height: '100%', overflow: 'auto' }}
+      style={{ height: '100%' }}
     >
       <Grid container justifyContent="center" alignItems="center">
         <Grid container item xs={11} direction="column">
@@ -42,11 +42,10 @@ const CareSiteView = () => {
             Explorer un périmètre
           </Typography>
           <ScopeTree
-            selectedItems={selectedItems}
-            setSelectedItems={setSelectedItems}
-            openPopulation={openPopulation}
-            setOpenPopulations={setOpenPopulations}
-            executiveUnitType={undefined}
+            selectedNodes={[]}
+            baseTree={population}
+            onSelect={(items) => setSelectedCodes(items)}
+            sourceType={SourceType.ALL}
           />
         </Grid>
         <Grid
@@ -62,17 +61,8 @@ const CareSiteView = () => {
             <Button
               variant="contained"
               disableElevation
-              onClick={() => setSelectedItems([])}
-              disabled={!selectedItems.length}
-              className={classes.cancelButton}
-            >
-              Annuler
-            </Button>
-            <Button
-              variant="contained"
-              disableElevation
-              disabled={!selectedItems.length}
-              onClick={trimItems}
+              disabled={!selectedCodes.length}
+              onClick={handleNavigation}
               className={classes.validateButton}
             >
               Valider

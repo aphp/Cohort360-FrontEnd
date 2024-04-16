@@ -33,13 +33,14 @@ import useStyles from './styles'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import { defaultProcedure } from '../../index'
-import { HierarchyElement, HierarchyTree } from 'types'
+import { HierarchyTree } from 'types'
 import { CcamDataType } from 'types/requestCriterias'
+import { Hierarchy } from 'types/hierarchy'
 
 type ProcedureListItemProps = {
-  procedureItem: HierarchyElement
-  selectedItems?: HierarchyElement[] | null
-  handleClick: (procedureItem: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => void
+  procedureItem: Hierarchy<any, any>
+  selectedItems?: Hierarchy<any, any>[] | null
+  handleClick: (procedureItem: Hierarchy<any, any>[] | null | undefined, newHierarchy?: Hierarchy<any, any>[]) => void
 }
 
 const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
@@ -75,7 +76,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = async (procedureItem: HierarchyElement) => {
+  const handleClickOnHierarchy = async (procedureItem: Hierarchy<any, any>) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getHierarchySelection(procedureItem, selectedItems || [], procedureHierarchy)
@@ -130,8 +131,8 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((procedureHierarchySubItem, index: number) =>
-              procedureHierarchySubItem.id === 'loading' ? (
+            subItems.map((subItem: Hierarchy<any, any>, index: number) =>
+              subItem.id === 'loading' ? (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
                   <Skeleton style={{ flex: 1, margin: '2px 32px' }} height={32} />
@@ -139,11 +140,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
-                  <ProcedureListItem
-                    procedureItem={procedureHierarchySubItem}
-                    selectedItems={selectedItems}
-                    handleClick={handleClick}
-                  />
+                  <ProcedureListItem procedureItem={subItem} selectedItems={selectedItems} handleClick={handleClick} />
                 </Fragment>
               )
             )}
@@ -157,7 +154,10 @@ type ProcedureHierarchyProps = {
   isOpen: boolean
   selectedCriteria: CcamDataType
   goBack: () => void
-  onChangeSelectedHierarchy: (data: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => void
+  onChangeSelectedHierarchy: (
+    data: Hierarchy<any, any>[] | null | undefined,
+    newHierarchy?: Hierarchy<any, any>[]
+  ) => void
   isEdition?: boolean
   onConfirm: () => void
 }
@@ -179,11 +179,16 @@ const ProcedureHierarchy: React.FC<ProcedureHierarchyProps> = (props) => {
     if (!newList.code) {
       newList.code = selectedCriteria.code
     }
-    newList.code?.map((item: HierarchyElement) => findEquivalentRowInItemAndSubItems(item, ccamHierarchy).equivalentRow)
+    newList.code?.map(
+      (item: Hierarchy<any, any>) => findEquivalentRowInItemAndSubItems(item, ccamHierarchy).equivalentRow
+    )
     setCurrentState(newList)
   }, [initialState, ccamHierarchy])
 
-  const _handleClick = (newSelectedItems: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => {
+  const _handleClick = (
+    newSelectedItems: Hierarchy<any, any>[] | null | undefined,
+    newHierarchy?: Hierarchy<any, any>[]
+  ) => {
     onChangeSelectedHierarchy(newSelectedItems, newHierarchy)
   }
   useEffect(() => {

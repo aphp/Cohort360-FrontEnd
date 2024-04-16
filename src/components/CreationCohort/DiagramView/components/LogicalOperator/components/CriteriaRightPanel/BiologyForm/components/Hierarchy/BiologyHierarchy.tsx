@@ -33,12 +33,13 @@ import useStyles from './styles'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import { defaultBiology } from '../../index'
-import { HierarchyElement, HierarchyTree } from 'types'
+import { HierarchyTree } from 'types'
+import { Hierarchy } from 'types/hierarchy'
 
 type BiologyListItemProps = {
-  biologyItem: HierarchyElement
-  selectedItems?: HierarchyElement[] | null
-  handleClick: (biologyItem: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => void
+  biologyItem: Hierarchy<any, any>
+  selectedItems?: Hierarchy<any, any>[] | null
+  handleClick: (biologyItem: Hierarchy<any, any>[] | null | undefined, newHierarchy?: Hierarchy<any, any>[]) => void
 }
 
 const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
@@ -70,7 +71,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = async (biologyItem: HierarchyElement) => {
+  const handleClickOnHierarchy = async (biologyItem: Hierarchy<any, any>) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getHierarchySelection(biologyItem, selectedItems || [], biologyHierarchy)
@@ -121,7 +122,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((biologyHierarchySubItem, index: number) =>
+            subItems.map((biologyHierarchySubItem: Hierarchy<any, any>, index: number) =>
               biologyHierarchySubItem.id === 'loading' ? (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
@@ -149,7 +150,10 @@ type BiologyHierarchyProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   selectedCriteria: any
   goBack: () => void
-  onChangeSelectedHierarchy: (data: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => void
+  onChangeSelectedHierarchy: (
+    data: Hierarchy<any, any>[] | null | undefined,
+    newHierarchy?: Hierarchy<any, any>[]
+  ) => void
   isEdition?: boolean
   onConfirm: () => void
 }
@@ -172,12 +176,15 @@ const BiologyHierarchy: React.FC<BiologyHierarchyProps> = (props) => {
       newList.code = selectedCriteria.code
     }
     newList.code.map(
-      (item: HierarchyElement) => findEquivalentRowInItemAndSubItems(item, biologyHierarchy).equivalentRow
+      (item: Hierarchy<any, any>) => findEquivalentRowInItemAndSubItems(item, biologyHierarchy).equivalentRow
     )
     setCurrentState(newList)
   }, [initialState, biologyHierarchy])
 
-  const _handleClick = (newSelectedItems: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => {
+  const _handleClick = (
+    newSelectedItems: Hierarchy<any, any>[] | null | undefined,
+    newHierarchy?: Hierarchy<any, any>[]
+  ) => {
     onChangeSelectedHierarchy(newSelectedItems, newHierarchy)
   }
   useEffect(() => {

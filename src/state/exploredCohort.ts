@@ -152,17 +152,17 @@ const fetchExploredCohortInBackground = createAsyncThunk<
     }
     case 'patients': {
       cohort = (await services.patients.fetchMyPatients()) as ExploredCohortState
-      const perimeters = await services.perimeters.getPerimeters()
+      const rights = await services.perimeters.getRights({})
 
-      if (cohort && !isCustomError(perimeters)) {
+      if (cohort && !isCustomError(rights)) {
         cohort.name = '-'
         cohort.description = ''
         cohort.requestId = ''
         cohort.favorite = false
         cohort.uuid = ''
         cohort.canMakeExport = false
-        cohort.deidentifiedBoolean = perimeters.some(
-          (perimeter) => servicesPerimeters.getAccessFromScope(perimeter) === 'Pseudonymisé'
+        cohort.deidentifiedBoolean = rights.results.some((right) =>
+          right.rights ? servicesPerimeters.getAccessFromRights(right.rights) === 'Pseudonymisé' : true
         )
       }
       break

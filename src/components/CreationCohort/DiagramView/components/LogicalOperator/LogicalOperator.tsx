@@ -184,7 +184,7 @@ const LogicalOperator: React.FC = () => {
   const [selectedCriteria, setSelectedCriteria] = useState<SelectedCriteriaType | null>(null)
 
   const _buildCohortCreation = () => {
-    dispatch(buildCohortCreation({}))
+    dispatch(buildCohortCreation({ selectedPopulation: null }))
   }
 
   const _onConfirmAddOrEditCriteria = async (item: SelectedCriteriaType) => {

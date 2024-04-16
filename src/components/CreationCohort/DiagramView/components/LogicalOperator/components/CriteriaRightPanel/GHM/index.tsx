@@ -9,8 +9,9 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchClaim } from 'state/pmsi'
 import { EXPLORATION } from '../../../../../../../../constants'
-import { CriteriaDrawerComponentProps, HierarchyElement } from 'types'
+import { CriteriaDrawerComponentProps } from 'types'
 import { Comparators, GhmDataType, CriteriaType } from 'types/requestCriterias'
+import { Hierarchy } from 'types/hierarchy'
 
 export const defaultClaim: Omit<GhmDataType, 'id'> = {
   type: CriteriaType.CLAIM,
@@ -40,13 +41,13 @@ const Index = (props: CriteriaDrawerComponentProps) => {
   const { classes } = useStyles()
 
   const _onChangeSelectedHierarchy = (
-    newSelectedItems: HierarchyElement[] | null | undefined,
-    newHierarchy?: HierarchyElement[]
+    newSelectedItems: Hierarchy<any, any>[] | null | undefined,
+    newHierarchy?: Hierarchy<any, any>[]
   ) => {
     _onChangeFormValue('code', newSelectedItems, newHierarchy)
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const _onChangeFormValue = async (key: string, value: any, newHierarchy: HierarchyElement[] = ghmHierarchy) =>
+  const _onChangeFormValue = async (key: string, value: any, newHierarchy: Hierarchy<any, any>[] = ghmHierarchy) =>
     await syncOnChangeFormValue(
       key,
       value,

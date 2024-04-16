@@ -8,12 +8,12 @@ import {
   initSyncHierarchyTable,
   pushSyncHierarchyTable
 } from '../state/syncHierarchyTable'
-import { AbstractTree, HierarchyElement } from '../types'
 import { expandMedicationElement } from '../state/medication'
 import { expandBiologyElement } from '../state/biology'
 import services from 'services/aphp'
 import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 import { Condition } from 'fhir/r4'
+import { Hierarchy } from 'types/hierarchy'
 
 /**
  * @description : get the last diagnosis labels
@@ -132,7 +132,7 @@ export const getHierarchySelection = (row: any, selectedItems: any[] | undefined
 export const optimizeHierarchySelection = <
   T extends {
     id: string
-    subItems?: AbstractTree<T>[]
+    subItems?: Hierarchy<T, string>[]
   }
 >(
   selectedItems: T[],
@@ -314,9 +314,9 @@ export const flatItems = (items: any[] | undefined): { flattedSelectedItems: any
 }
 
 export const initSyncHierarchyTableEffect = async (
-  resourceHierarchy: HierarchyElement[],
+  resourceHierarchy: Hierarchy<any, any>[],
   selectedCriteria: SelectedCriteriaType | null,
-  selectedCodes: HierarchyElement[],
+  selectedCodes: Hierarchy<any, any>[],
   fetchResource: AsyncThunk<any, void, { state: RootState }>,
   resourceType: CriteriaType,
   dispatch: AppDispatch,
@@ -342,9 +342,9 @@ export const initSyncHierarchyTableEffect = async (
 }
 
 export const onChangeSelectedCriteriaEffect = async (
-  codesToExpand: HierarchyElement[],
-  selectedCodes: HierarchyElement[],
-  resourceHierarchy: HierarchyElement[],
+  codesToExpand: Hierarchy<any, any>[],
+  selectedCodes: Hierarchy<any, any>[],
+  resourceHierarchy: Hierarchy<any, any>[],
   resourceType: CriteriaType,
   dispatch: AppDispatch
 ): Promise<void> => {
@@ -352,13 +352,8 @@ export const onChangeSelectedCriteriaEffect = async (
   dispatch(pushSyncHierarchyTable({ code: selectedCodes }))
 }
 
-const isExpanded = (itemToExpand: HierarchyElement | undefined): boolean => {
-  if (
-    itemToExpand &&
-    itemToExpand.subItems &&
-    itemToExpand.subItems?.length > 0 &&
-    itemToExpand.subItems[0].id !== 'loading'
-  ) {
+const isExpanded = (itemToExpand: Hierarchy<any, any> | undefined): boolean => {
+  if (itemToExpand?.subItems?.length > 0 && itemToExpand?.subItems[0].id !== 'loading') {
     return true
   } else {
     return false
@@ -367,10 +362,10 @@ const isExpanded = (itemToExpand: HierarchyElement | undefined): boolean => {
 
 const expandRequest = async (
   codeToExpand: string,
-  selectedCodes: HierarchyElement[],
+  selectedCodes: Hierarchy<any, any>[],
   resourceType: CriteriaType,
   dispatch: AppDispatch
-): Promise<HierarchyElement[] | undefined> => {
+): Promise<Hierarchy<any, any>[] | undefined> => {
   let type: 'claim' | 'condition' | 'procedure'
   if (resourceType.toLowerCase() === CriteriaType.MEDICATION_REQUEST.toLowerCase()) {
     const expandedMedication = await dispatch(
@@ -409,11 +404,11 @@ const expandRequest = async (
 
 export const expandItem = async (
   codeToExpand: string,
-  selectedCodes: HierarchyElement[],
-  resourceHierarchy: HierarchyElement[],
+  selectedCodes: Hierarchy<any, any>[],
+  resourceHierarchy: Hierarchy<any, any>[],
   resourceType: CriteriaType,
   dispatch: AppDispatch
-): Promise<HierarchyElement[]> => {
+): Promise<Hierarchy<any, any>[]> => {
   const equivalentRow = findEquivalentRowInItemAndSubItems(
     { id: codeToExpand, label: 'loading' },
     resourceHierarchy
@@ -428,23 +423,23 @@ export const expandItem = async (
 }
 
 const expandSingleResourceItem = async (
-  codeToExpand: HierarchyElement,
-  selectedCodes: HierarchyElement[],
-  resourceHierarchy: HierarchyElement[],
+  codeToExpand: Hierarchy<any, any>,
+  selectedCodes: Hierarchy<any, any>[],
+  resourceHierarchy: Hierarchy<any, any>[],
   resourceType: CriteriaType,
   dispatch: AppDispatch
-): Promise<HierarchyElement[]> => {
+): Promise<Hierarchy<any, any>[]> => {
   if (
     !codeToExpand ||
     (selectedCodes.find((item) => item.id === codeToExpand.id) &&
       findEquivalentRowInItemAndSubItems(codeToExpand, resourceHierarchy).equivalentRow)
   )
     return resourceHierarchy
-  let newResourceHierarchy: HierarchyElement[] = resourceHierarchy
+  let newResourceHierarchy: Hierarchy<any, any>[] = resourceHierarchy
   const expandItemAndSubItems = async (
-    itemToExpand: HierarchyElement,
+    itemToExpand: Hierarchy<any, any>,
     resourceType: CriteriaType
-  ): Promise<HierarchyElement[]> => {
+  ): Promise<Hierarchy<any, any>[]> => {
     newResourceHierarchy = await expandItem(
       itemToExpand?.id,
       selectedCodes,
@@ -459,29 +454,32 @@ const expandSingleResourceItem = async (
           findEquivalentRowInItemAndSubItems(itemToExpand, newResourceHierarchy).equivalentRow ?? itemToExpand
         itemToExpand = updatedItem ?? itemToExpand
       }
-      const subItems = itemToExpand.subItems?.filter((item) => parentsList.find((code) => code.id === item.id)) ?? []
+      const subItems =
+        itemToExpand.subItems?.filter((item: Hierarchy<any, any>) => parentsList.find((code) => code.id === item.id)) ??
+        []
       for await (const item of subItems) {
         newResourceHierarchy = await expandItemAndSubItems(item, resourceType)
       }
     }
     return newResourceHierarchy
   }
-  const getHigherParentFromList = (parentsList: HierarchyElement[]): HierarchyElement | undefined => {
-    const higherParentCode: HierarchyElement | undefined =
-      newResourceHierarchy && newResourceHierarchy[0] && newResourceHierarchy[0].subItems
-        ? newResourceHierarchy[0].subItems.find(({ id }) => parentsList.find((code) => code.id === id))
-        : undefined
+  const getHigherParentFromList = (parentsList: Hierarchy<any, any>[]): Hierarchy<any, any> | undefined => {
+    const higherParentCode: Hierarchy<any, any> | undefined = newResourceHierarchy?.[0].subItems
+      ? newResourceHierarchy[0].subItems.find(({ id }: Hierarchy<any, any>) =>
+          parentsList.find((code) => code.id === id)
+        )
+      : undefined
     return higherParentCode
   }
 
   const getHigherParent = async (
-    code: HierarchyElement
-  ): Promise<{ higherParentCode: HierarchyElement | undefined; parentsList: any[] }> => {
+    code: Hierarchy<any, any>
+  ): Promise<{ higherParentCode: Hierarchy<any, any> | undefined; parentsList: any[] }> => {
     const { parentsList: parentsListByAlreadyFetched } = findEquivalentRowInItemAndSubItems(
       codeToExpand,
       newResourceHierarchy
     )
-    let higherParentCode: HierarchyElement | undefined = getHigherParentFromList(parentsListByAlreadyFetched)
+    let higherParentCode: Hierarchy<any, any> | undefined = getHigherParentFromList(parentsListByAlreadyFetched)
     if (higherParentCode) {
       return { higherParentCode: higherParentCode, parentsList: parentsListByAlreadyFetched }
     } else if (!higherParentCode) {
@@ -504,12 +502,12 @@ const expandSingleResourceItem = async (
   return newResourceHierarchy
 }
 const expandHierarchyCodes = async (
-  codesToExpand: HierarchyElement[],
-  selectedCodes: HierarchyElement[],
-  resourceHierarchy: HierarchyElement[],
+  codesToExpand: Hierarchy<any, any>[],
+  selectedCodes: Hierarchy<any, any>[],
+  resourceHierarchy: Hierarchy<any, any>[],
   resourceType: CriteriaType,
   dispatch: AppDispatch
-): Promise<HierarchyElement[]> => {
+): Promise<Hierarchy<any, any>[]> => {
   let newResourceHierarchy = resourceHierarchy
   for await (const itemToExpand of codesToExpand) {
     newResourceHierarchy = await expandSingleResourceItem(
@@ -527,7 +525,7 @@ export const syncOnChangeFormValue = async (
   key: string,
   value: any,
   selectedCriteria: SelectedCriteriaType,
-  resourceHierarchy: HierarchyElement[],
+  resourceHierarchy: Hierarchy<any, any>[],
   setDefaultCriteria: (value: SelectedCriteriaType) => void,
   selectedTab: string,
   resourceType: CriteriaType,

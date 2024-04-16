@@ -1,7 +1,8 @@
-import { ScopeTreeRow, SimpleCodeType, ValueSet } from 'types'
+import { ScopeElement, SimpleCodeType, ValueSet } from 'types'
 import { PatientTableLabels } from './patient'
 import { CohortsType } from './cohorts'
 import { ResourceType } from './requestCriterias'
+import { Hierarchy } from './hierarchy'
 
 export enum FormNames {
   PREGNANCY = 'APHPEDSQuestionnaireFicheGrossesse',
@@ -191,8 +192,8 @@ export type FilterValue =
   | GenderStatus[]
   | VitalStatus
   | VitalStatus[]
-  | ScopeTreeRow
-  | ScopeTreeRow[]
+  | Hierarchy<ScopeElement, string>
+  | Hierarchy<ScopeElement, string>[]
   | SimpleCodeType
   | SimpleCodeType[]
   | null
@@ -211,7 +212,7 @@ export type GenericFilter = {
   nda: string
   startDate: string | null
   endDate: string | null
-  executiveUnits: ScopeTreeRow[]
+  executiveUnits: Hierarchy<ScopeElement, string>[]
   encounterStatus: LabelObject[]
 }
 
@@ -248,7 +249,7 @@ export type MaternityFormFilters = {
   startDate: string | null
   endDate: string | null
   encounterStatus: LabelObject[]
-  executiveUnits: ScopeTreeRow[]
+  executiveUnits: Hierarchy<ScopeElement, string>[]
 }
 
 export type DocumentsFilters = GenericFilter & {

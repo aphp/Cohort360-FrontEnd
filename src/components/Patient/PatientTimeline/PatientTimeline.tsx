@@ -17,7 +17,7 @@ import FilterTimelineDialog from './FilterTimelineDialog/FilterTimelineDialog'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import FilterList from 'assets/icones/filter.svg?react'
 
-import { CohortComposition, CohortEncounter, HierarchyElement, PMSIEntry } from 'types'
+import { CohortComposition, CohortEncounter, PMSIEntry } from 'types'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
@@ -29,6 +29,7 @@ import services from 'services/aphp'
 import useStyles from './styles'
 import { Condition, DocumentReference, Encounter, Period, Procedure } from 'fhir/r4'
 import { FilterKeys, LabelObject } from 'types/searchCriterias'
+import { Hierarchy } from 'types/hierarchy'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -155,10 +156,10 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   const [dialogDocuments, setDialogDocuments] = useState<CohortComposition[] | undefined>([])
   const [openFilter, setOpenFilter] = useState(false)
 
-  const [selectedTypes, setSelectedTypes] = useState<HierarchyElement[]>([])
+  const [selectedTypes, setSelectedTypes] = useState<Hierarchy<any, any>[]>([])
   const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>([])
-  const [diagnosticTypesList, setDiagnosticTypesList] = useState<HierarchyElement[]>([])
-  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
+  const [diagnosticTypesList, setDiagnosticTypesList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
 
   const [loading, setLoading] = useState(false)
   const yearComponentSize: { [year: number]: number } = {}

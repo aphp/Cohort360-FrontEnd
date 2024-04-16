@@ -29,7 +29,8 @@ import { useDebounce } from 'utils/debounce'
 import { ValueSetWithHierarchy } from 'services/aphp/cohortCreation/fetchObservation'
 import services from 'services/aphp'
 import { ObservationDataType } from 'types/requestCriterias'
-import { HierarchyElement, ValueSet } from 'types'
+import { ValueSet } from 'types'
+import { Hierarchy } from 'types/hierarchy'
 
 type BiologySearchListItemProps = {
   label: string
@@ -87,7 +88,7 @@ const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
 type BiologySearchProps = {
   isEdition?: boolean
   goBack: () => void
-  onChangeSelectedCriteria: (data: HierarchyElement[] | undefined | null) => void
+  onChangeSelectedCriteria: (data: Hierarchy<any, any>[] | undefined | null) => void
   selectedCriteria: ObservationDataType
   onConfirm: () => void
 }

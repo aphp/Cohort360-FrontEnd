@@ -20,7 +20,7 @@ import SearchInput from 'components/ui/Searchbar/SearchInput'
 
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
-import { CriteriaName, HierarchyElement, LoadingStatus } from 'types'
+import { LoadingStatus } from 'types'
 import { PatientTypes } from 'types/patient'
 import { AlertWrapper } from 'components/ui/Alert'
 import { Direction, FilterKeys, ImagingFilters, Order } from 'types/searchCriterias'
@@ -33,6 +33,8 @@ import services from 'services/aphp'
 import { BlockWrapper } from 'components/ui/Layout'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { MAIL_SUPPORT } from '../../../constants'
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
 
 const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
@@ -44,8 +46,8 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
-  const [allModalities, setAllModalities] = useState<HierarchyElement[]>([])
-  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
+  const [allModalities, setAllModalities] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
 
   const searchResults = {
     deidentified: patient?.deidentified || false,
@@ -241,9 +243,9 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
         <ModalityFilter value={modality} name={FilterKeys.MODALITY} modalitiesList={allModalities} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
+          sourceType={SourceType.IMAGING}
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
-          criteriaName={CriteriaName.Imaging}
         />
         <EncounterStatusFilter
           value={encounterStatus}
@@ -358,10 +360,10 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
                   names={[FilterKeys.START_DATE, FilterKeys.END_DATE]}
                 />
                 <ExecutiveUnitsFilter
+                  sourceType={SourceType.IMAGING}
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
-                  criteriaName={CriteriaName.Imaging}
                 />
                 <EncounterStatusFilter
                   disabled={isReadonlyFilterInfoModal}

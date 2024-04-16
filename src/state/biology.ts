@@ -4,11 +4,11 @@ import { RootState } from 'state'
 import { impersonate, login, logout } from 'state/me'
 
 import services from 'services/aphp'
-import { HierarchyElement } from 'types'
+import { Hierarchy } from 'types/hierarchy'
 
 export type BiologyState = {
   loading: boolean
-  list: HierarchyElement[]
+  list: Hierarchy<any, any>[]
   openedElement: string[]
 }
 
@@ -56,7 +56,7 @@ const fetchBiology = createAsyncThunk<BiologyState, void, { state: RootState }>(
 
 type ExpandBiologyElementsParams = {
   rowId: string
-  selectedItems?: HierarchyElement[]
+  selectedItems?: Hierarchy<any, any>[]
 }
 const expandBiologyElement = createAsyncThunk<BiologyState, ExpandBiologyElementsParams, { state: RootState }>(
   'scope/expandBiologyElement',
@@ -75,14 +75,14 @@ const expandBiologyElement = createAsyncThunk<BiologyState, ExpandBiologyElement
     } else {
       _openedElement = [..._openedElement, rowId]
 
-      const replaceSubItems = async (items: HierarchyElement[]) => {
-        let _items: HierarchyElement[] = []
+      const replaceSubItems = async (items: Hierarchy<any, any>[]) => {
+        let _items: Hierarchy<any, any>[] = []
         for (let item of items) {
           // Replace sub items element by response of back-end
           if (item.id === rowId) {
-            const foundItem = item.subItems ? item.subItems.find((i) => i.id === 'loading') : true
+            const foundItem = item.subItems ? item.subItems.find((i: Hierarchy<any, any>) => i.id === 'loading') : true
             if (foundItem) {
-              let subItems: HierarchyElement[] = []
+              let subItems: Hierarchy<any, any>[] = []
               subItems = await services.cohortCreation.fetchBiologyHierarchy(item.id)
 
               item = { ...item, subItems: subItems }

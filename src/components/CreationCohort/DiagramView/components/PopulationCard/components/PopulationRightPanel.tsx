@@ -1,67 +1,79 @@
 import React, { useState } from 'react'
-
-import Button from '@mui/material/Button'
-import Drawer from '@mui/material/Drawer'
-import Typography from '@mui/material/Typography'
-
-import { ScopeTreeRow, ScopeType } from 'types'
-
-import useStyles from './styles'
+import { ScopeElement } from 'types'
 import ScopeTree from 'components/ScopeTree'
+import { Grid, Button, Drawer, Typography } from '@mui/material'
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
 
 type PopulationRightPanelProps = {
   open: boolean
   title?: string
-  executiveUnitType?: ScopeType
-  selectedPopulation: ScopeTreeRow[]
-  isAcceptEmptySelection?: boolean
-  onConfirm: (selectedPopulation: ScopeTreeRow[]) => void
+  mandatory?: boolean
+  population: Hierarchy<ScopeElement, string>[]
+  selectedPopulation: Hierarchy<ScopeElement, string>[]
+  sourceType: SourceType
+  onConfirm: (selectedPopulation: Hierarchy<ScopeElement, string>[]) => void
   onClose: () => void
 }
 
-const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
-  const { open, title, executiveUnitType, selectedPopulation, isAcceptEmptySelection, onConfirm, onClose } = props
+const PopulationRightPanel = ({
+  open,
+  title,
+  population,
+  selectedPopulation,
+  sourceType,
+  mandatory = false,
+  onConfirm,
+  onClose
+}: PopulationRightPanelProps) => {
+  const [selectedCodes, setSelectedCodes] = useState<Hierarchy<ScopeElement, string>[]>([])
 
-  const { classes } = useStyles()
-
-  const [_selectedPopulation, _setSelectedPopulation] = useState<ScopeTreeRow[]>(selectedPopulation)
-  const [openPopulation, setOpenPopulations] = useState<number[]>([])
-
-  /**
-   * Render
-   */
   return (
-    <Drawer anchor="right" open={open} onClose={onClose} className={classes.drawer}>
-      <div className={classes.root}>
-        <div className={classes.drawerTitleContainer}>
-          <Typography className={classes.title}>{title ?? 'Structure hospitalière'}</Typography>
-        </div>
-        <div className={classes.drawerContentContainer}>
+    <Drawer
+      anchor="right"
+      open={open}
+      PaperProps={{ style: { width: '650px' } }}
+      onClose={onClose}
+      sx={{ zIndex: 1300, overflowY: 'unset' }}
+    >
+      <Grid container direction="column" maxWidth="650px" height="100%" flexWrap="nowrap">
+        <Grid item container flexDirection="column" height="100%" flexWrap="nowrap" overflow="auto">
+          <Grid container justifyContent="center" borderBottom="1px solid grey" width="100%">
+            <Typography fontSize="22px" margin="12px 0px">
+              {title ?? 'Structure hospitalière'}
+            </Typography>
+          </Grid>
           <ScopeTree
-            selectedItems={_selectedPopulation}
-            setSelectedItems={_setSelectedPopulation}
-            openPopulation={openPopulation}
-            setOpenPopulations={setOpenPopulations}
-            executiveUnitType={executiveUnitType}
+            baseTree={population}
+            selectedNodes={selectedPopulation}
+            onSelect={setSelectedCodes}
+            sourceType={sourceType}
           />
-        </div>
-
-        <div className={classes.drawerActionContainer}>
-          <Button onClick={onClose} variant="outlined">
-            Annuler
-          </Button>
-          <Button
-            disabled={
-              !isAcceptEmptySelection &&
-              (!_selectedPopulation || (_selectedPopulation && _selectedPopulation.length === 0))
-            }
-            onClick={() => onConfirm(_selectedPopulation)}
-            variant="contained"
-          >
-            Confirmer
-          </Button>
-        </div>
-      </div>
+        </Grid>
+        <Grid
+          container
+          item
+          alignItems="center"
+          justifyContent="center"
+          flexWrap="wrap"
+          width="100%"
+          padding="12px"
+          borderTop="1px solid grey"
+        >
+          <Grid item xs={4} container justifyContent="space-between">
+            <Button onClick={onClose} variant="outlined">
+              Annuler
+            </Button>
+            <Button
+              disabled={mandatory ? selectedCodes.length === 0 : false}
+              onClick={() => onConfirm(selectedCodes)}
+              variant="contained"
+            >
+              Confirmer
+            </Button>
+          </Grid>
+        </Grid>
+      </Grid>
     </Drawer>
   )
 }

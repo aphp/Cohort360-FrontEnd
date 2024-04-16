@@ -13,9 +13,10 @@ import {
 } from 'types/searchCriterias'
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
-import { ScopeTreeRow, SimpleCodeType, ValueSet } from 'types'
+import { ScopeElement, SimpleCodeType, ValueSet } from 'types'
 import { getDurationRangeLabel } from './age'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
+import { Hierarchy } from 'types/hierarchy'
 
 export const getCohortsTypeLabel = (type: CohortsType): string => {
   switch (type) {
@@ -129,7 +130,9 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return `Source : ${value}`
   }
   if (key === FilterKeys.EXECUTIVE_UNITS) {
-    return `Unité exécutrice : ${(value as ScopeTreeRow).name}`
+    return `Unité exécutrice :  ${(value as Hierarchy<ScopeElement, string>).source_value} - ${
+      (value as Hierarchy<ScopeElement, string>).name
+    }`
   }
   if (key === FilterKeys.DOC_STATUSES) {
     return `Documents : ${value}`

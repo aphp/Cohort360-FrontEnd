@@ -6,7 +6,6 @@ import {
   CountCohort,
   DatedMeasure,
   FetchRequest,
-  HierarchyElement,
   HierarchyElementWithSystem,
   QuerySnapshotInfo,
   RequestType,
@@ -66,6 +65,7 @@ import {
 import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
 import { VitalStatusLabel } from 'types/searchCriterias'
 import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
+import { Hierarchy } from 'types/hierarchy'
 
 export interface IServiceCohortCreation {
   /**
@@ -108,84 +108,80 @@ export interface IServiceCohortCreation {
 
   fetchSnapshot: (snapshotId: string) => Promise<Snapshot>
 
-  fetchAdmissionModes: () => Promise<Array<HierarchyElement>>
-  fetchEntryModes: () => Promise<Array<HierarchyElement>>
-  fetchExitModes: () => Promise<Array<HierarchyElement>>
-  fetchPriseEnChargeType: () => Promise<Array<HierarchyElement>>
-  fetchTypeDeSejour: () => Promise<Array<HierarchyElement>>
-  fetchFileStatus: () => Promise<Array<HierarchyElement>>
-  fetchReason: () => Promise<Array<HierarchyElement>>
-  fetchDestination: () => Promise<Array<HierarchyElement>>
-  fetchProvenance: () => Promise<Array<HierarchyElement>>
-  fetchAdmission: () => Promise<Array<HierarchyElement>>
-  fetchGender: () => Promise<Array<HierarchyElement>>
-  fetchStatus: () => Promise<Array<HierarchyElement>>
-  fetchStatusDiagnostic: () => Promise<Array<HierarchyElement>>
-  fetchDiagnosticTypes: () => Promise<Array<HierarchyElement>>
-  fetchCim10Diagnostic: (
-    searchValue?: string,
-    noStar?: boolean,
-    signal?: AbortSignal
-  ) => Promise<Array<HierarchyElement>>
-  fetchCim10Hierarchy: (cim10Parent?: string) => Promise<Array<HierarchyElement>>
-  fetchCcamData: (searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<Array<HierarchyElement>>
-  fetchCcamHierarchy: (ccamParent: string) => Promise<Array<HierarchyElement>>
-  fetchGhmData: (searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<Array<HierarchyElement>>
-  fetchGhmHierarchy: (ghmParent: string) => Promise<Array<HierarchyElement>>
+  fetchAdmissionModes: () => Promise<Hierarchy<any, any>[]>
+  fetchEntryModes: () => Promise<Hierarchy<any, any>[]>
+  fetchExitModes: () => Promise<Hierarchy<any, any>[]>
+  fetchPriseEnChargeType: () => Promise<Hierarchy<any, any>[]>
+  fetchTypeDeSejour: () => Promise<Hierarchy<any, any>[]>
+  fetchFileStatus: () => Promise<Hierarchy<any, any>[]>
+  fetchReason: () => Promise<Hierarchy<any, any>[]>
+  fetchDestination: () => Promise<Hierarchy<any, any>[]>
+  fetchProvenance: () => Promise<Hierarchy<any, any>[]>
+  fetchAdmission: () => Promise<Hierarchy<any, any>[]>
+  fetchGender: () => Promise<Hierarchy<any, any>[]>
+  fetchStatus: () => Promise<Hierarchy<any, any>[]>
+  fetchStatusDiagnostic: () => Promise<Hierarchy<any, any>[]>
+  fetchDiagnosticTypes: () => Promise<Hierarchy<any, any>[]>
+  fetchCim10Diagnostic: (searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<Hierarchy<any, any>[]>
+  fetchCim10Hierarchy: (cim10Parent?: string) => Promise<Hierarchy<any, any>[]>
+  fetchCcamData: (searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<Hierarchy<any, any>[]>
+  fetchCcamHierarchy: (ccamParent: string) => Promise<Hierarchy<any, any>[]>
+  fetchGhmData: (searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<Hierarchy<any, any>[]>
+  fetchGhmHierarchy: (ghmParent: string) => Promise<Hierarchy<any, any>[]>
   fetchDocTypes: () => Promise<SimpleCodeType[]>
   fetchMedicationData: (
     searchValue?: string,
     noStar?: boolean,
     signal?: AbortSignal
-  ) => Promise<Array<HierarchyElementWithSystem>>
+  ) => Promise<HierarchyElementWithSystem[]>
   fetchSingleCodeHierarchy: (resourceType: string, code: string) => Promise<string[]>
-  fetchAtcHierarchy: (atcParent: string) => Promise<Array<HierarchyElement>>
-  fetchUCDList: (ucd?: string) => Promise<Array<HierarchyElement>>
-  fetchPrescriptionTypes: () => Promise<Array<HierarchyElement>>
-  fetchAdministrations: () => Promise<Array<HierarchyElement>>
-  fetchBiologyData: () => Promise<Array<HierarchyElement>>
-  fetchBiologyHierarchy: (biologyParent?: string) => Promise<Array<HierarchyElement>>
+  fetchAtcHierarchy: (atcParent: string) => Promise<Hierarchy<any, any>[]>
+  fetchUCDList: (ucd?: string) => Promise<Hierarchy<any, any>[]>
+  fetchPrescriptionTypes: () => Promise<Hierarchy<any, any>[]>
+  fetchAdministrations: () => Promise<Hierarchy<any, any>[]>
+  fetchBiologyData: () => Promise<Hierarchy<any, any>[]>
+  fetchBiologyHierarchy: (biologyParent?: string) => Promise<Hierarchy<any, any>[]>
   fetchBiologySearch: (
     searchInput: string
   ) => Promise<{ anabio: ValueSetWithHierarchy[]; loinc: ValueSetWithHierarchy[] }>
-  fetchModalities: () => Promise<Array<HierarchyElement>>
-  fetchPregnancyMode: () => Promise<Array<HierarchyElement>>
-  fetchMaternalRisks: () => Promise<Array<HierarchyElement>>
-  fetchRisksRelatedToObstetricHistory: () => Promise<Array<HierarchyElement>>
-  fetchRisksOrComplicationsOfPregnancy: () => Promise<Array<HierarchyElement>>
-  fetchCorticotherapie: () => Promise<Array<HierarchyElement>>
-  fetchPrenatalDiagnosis: () => Promise<Array<HierarchyElement>>
-  fetchUltrasoundMonitoring: () => Promise<Array<HierarchyElement>>
-  fetchInUteroTransfer: () => Promise<Array<HierarchyElement>>
-  fetchPregnancyMonitoring: () => Promise<Array<HierarchyElement>>
-  fetchMaturationCorticotherapie: () => Promise<Array<HierarchyElement>>
-  fetchChirurgicalGesture: () => Promise<Array<HierarchyElement>>
-  fetchVme: () => Promise<Array<HierarchyElement>>
-  fetchChildbirth: () => Promise<Array<HierarchyElement>>
-  fetchHospitalChildBirthPlace: () => Promise<Array<HierarchyElement>>
-  fetchOtherHospitalChildBirthPlace: () => Promise<Array<HierarchyElement>>
-  fetchHomeChildBirthPlace: () => Promise<Array<HierarchyElement>>
-  fetchChildbirthMode: () => Promise<Array<HierarchyElement>>
-  fetchMaturationReason: () => Promise<Array<HierarchyElement>>
-  fetchMaturationModality: () => Promise<Array<HierarchyElement>>
-  fetchImgIndication: () => Promise<Array<HierarchyElement>>
-  fetchLaborOrCesareanEntry: () => Promise<Array<HierarchyElement>>
-  fetchPathologyDuringLabor: () => Promise<Array<HierarchyElement>>
-  fetchObstetricalGestureDuringLabor: () => Promise<Array<HierarchyElement>>
-  fetchAnalgesieType: () => Promise<Array<HierarchyElement>>
-  fetchBirthDeliveryWay: () => Promise<Array<HierarchyElement>>
-  fetchInstrumentType: () => Promise<Array<HierarchyElement>>
-  fetchCSectionModality: () => Promise<Array<HierarchyElement>>
-  fetchPresentationAtDelivery: () => Promise<Array<HierarchyElement>>
-  fetchBirthStatus: () => Promise<Array<HierarchyElement>>
-  fetchSetPostpartumHemorrhage: () => Promise<Array<HierarchyElement>>
-  fetchConditionPerineum: () => Promise<Array<HierarchyElement>>
-  fetchExitPlaceType: () => Promise<Array<HierarchyElement>>
-  fetchFeedingType: () => Promise<Array<HierarchyElement>>
-  fetchComplication: () => Promise<Array<HierarchyElement>>
-  fetchExitFeedingMode: () => Promise<Array<HierarchyElement>>
-  fetchExitDiagnostic: () => Promise<Array<HierarchyElement>>
-  fetchEncounterStatus: () => Promise<Array<HierarchyElement>>
+  fetchModalities: () => Promise<Hierarchy<any, any>[]>
+  fetchPregnancyMode: () => Promise<Hierarchy<any, any>[]>
+  fetchMaternalRisks: () => Promise<Hierarchy<any, any>[]>
+  fetchRisksRelatedToObstetricHistory: () => Promise<Hierarchy<any, any>[]>
+  fetchRisksOrComplicationsOfPregnancy: () => Promise<Hierarchy<any, any>[]>
+  fetchCorticotherapie: () => Promise<Hierarchy<any, any>[]>
+  fetchPrenatalDiagnosis: () => Promise<Hierarchy<any, any>[]>
+  fetchUltrasoundMonitoring: () => Promise<Hierarchy<any, any>[]>
+  fetchInUteroTransfer: () => Promise<Hierarchy<any, any>[]>
+  fetchPregnancyMonitoring: () => Promise<Hierarchy<any, any>[]>
+  fetchMaturationCorticotherapie: () => Promise<Hierarchy<any, any>[]>
+  fetchChirurgicalGesture: () => Promise<Hierarchy<any, any>[]>
+  fetchVme: () => Promise<Hierarchy<any, any>[]>
+  fetchChildbirth: () => Promise<Hierarchy<any, any>[]>
+  fetchHospitalChildBirthPlace: () => Promise<Hierarchy<any, any>[]>
+  fetchOtherHospitalChildBirthPlace: () => Promise<Hierarchy<any, any>[]>
+  fetchHomeChildBirthPlace: () => Promise<Hierarchy<any, any>[]>
+  fetchChildbirthMode: () => Promise<Hierarchy<any, any>[]>
+  fetchMaturationReason: () => Promise<Hierarchy<any, any>[]>
+  fetchMaturationModality: () => Promise<Hierarchy<any, any>[]>
+  fetchImgIndication: () => Promise<Hierarchy<any, any>[]>
+  fetchLaborOrCesareanEntry: () => Promise<Hierarchy<any, any>[]>
+  fetchPathologyDuringLabor: () => Promise<Hierarchy<any, any>[]>
+  fetchObstetricalGestureDuringLabor: () => Promise<Hierarchy<any, any>[]>
+  fetchAnalgesieType: () => Promise<Hierarchy<any, any>[]>
+  fetchBirthDeliveryWay: () => Promise<Hierarchy<any, any>[]>
+  fetchInstrumentType: () => Promise<Hierarchy<any, any>[]>
+  fetchCSectionModality: () => Promise<Hierarchy<any, any>[]>
+  fetchPresentationAtDelivery: () => Promise<Hierarchy<any, any>[]>
+  fetchBirthStatus: () => Promise<Hierarchy<any, any>[]>
+  fetchSetPostpartumHemorrhage: () => Promise<Hierarchy<any, any>[]>
+  fetchConditionPerineum: () => Promise<Hierarchy<any, any>[]>
+  fetchExitPlaceType: () => Promise<Hierarchy<any, any>[]>
+  fetchFeedingType: () => Promise<Hierarchy<any, any>[]>
+  fetchComplication: () => Promise<Hierarchy<any, any>[]>
+  fetchExitFeedingMode: () => Promise<Hierarchy<any, any>[]>
+  fetchExitDiagnostic: () => Promise<Hierarchy<any, any>[]>
+  fetchEncounterStatus: () => Promise<Hierarchy<any, any>[]>
 }
 
 const servicesCohortCreation: IServiceCohortCreation = {

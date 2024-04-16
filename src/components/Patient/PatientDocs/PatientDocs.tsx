@@ -6,7 +6,7 @@ import FilterList from 'assets/icones/filter.svg?react'
 
 import DataTableComposition from 'components/DataTable/DataTableComposition'
 
-import { CriteriaName, HierarchyElement, LoadingStatus } from 'types'
+import { LoadingStatus } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'
@@ -48,6 +48,8 @@ import List from 'components/ui/List'
 import DocStatusFilter from '../../Filters/DocStatusFilter'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import services from 'services/aphp'
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
 
 const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
@@ -56,7 +58,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
-  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
   const patient = useAppSelector((state) => state.patient)
   const searchResults = {
     deidentified: patient?.deidentified || false,
@@ -323,9 +325,9 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
         <DocTypesFilter allDocTypesList={allDocTypesList.docTypes} value={docTypes} name={FilterKeys.DOC_TYPES} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
+          sourceType={SourceType.DOCUMENT}
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
-          criteriaName={CriteriaName.Document}
         />
         <EncounterStatusFilter
           value={encounterStatus}
@@ -457,9 +459,9 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
                 />
                 <ExecutiveUnitsFilter
                   disabled={isReadonlyFilterInfoModal}
+                  sourceType={SourceType.DOCUMENT}
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
-                  criteriaName={CriteriaName.Document}
                 />
                 <EncounterStatusFilter
                   disabled={isReadonlyFilterInfoModal}

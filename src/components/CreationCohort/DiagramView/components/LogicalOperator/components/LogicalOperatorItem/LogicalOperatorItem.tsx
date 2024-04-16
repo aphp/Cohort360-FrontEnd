@@ -80,7 +80,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
   }
 
   const _buildCohortCreation = () => {
-    dispatch(buildCohortCreation({}))
+    dispatch(buildCohortCreation({ selectedPopulation: null }))
   }
 
   const _deleteLogicalOperator = async () => {

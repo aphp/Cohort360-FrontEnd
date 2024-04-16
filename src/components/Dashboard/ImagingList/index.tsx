@@ -17,14 +17,7 @@ import ModalityFilter from 'components/Filters/ModalityFilter/ModalityFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 
-import {
-  CohortImaging,
-  CriteriaName,
-  HierarchyElement,
-  ImagingData,
-  LoadingStatus,
-  DTTB_ResultsType as ResultsType
-} from 'types'
+import { CohortImaging, ImagingData, LoadingStatus, DTTB_ResultsType as ResultsType } from 'types'
 import { Direction, FilterKeys, ImagingFilters, Order } from 'types/searchCriterias'
 
 import { cancelPendingRequest } from 'utils/abortController'
@@ -40,6 +33,8 @@ import { useAppSelector } from 'state'
 import { BlockWrapper } from 'components/ui/Layout'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { MAIL_SUPPORT } from '../../../constants'
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
 
 type ImagingListProps = {
   groupId?: string
@@ -56,8 +51,8 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
-  const [allModalities, setAllModalities] = useState<HierarchyElement[]>([])
-  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
+  const [allModalities, setAllModalities] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
 
   const [page, setPage] = useState(1)
   const [
@@ -262,9 +257,9 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
         <ModalityFilter value={modality} name={FilterKeys.MODALITY} modalitiesList={allModalities} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
+          sourceType={SourceType.IMAGING}
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
-          criteriaName={CriteriaName.Imaging}
         />
         <EncounterStatusFilter
           value={encounterStatus}
@@ -379,10 +374,10 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
                   names={[FilterKeys.START_DATE, FilterKeys.END_DATE]}
                 />
                 <ExecutiveUnitsFilter
+                  sourceType={SourceType.IMAGING}
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
-                  criteriaName={CriteriaName.Imaging}
                 />
               </Grid>
             </Grid>

@@ -19,17 +19,14 @@ import { fetchRequests } from 'state/request'
 import { initPmsiHierarchy } from 'state/pmsi'
 import { initMedicationHierarchy } from 'state/medication'
 import { initBiologyHierarchy } from 'state/biology'
-import { fetchScopesList } from 'state/scope'
-
 import { AccessExpiration, RequestType, WebSocketJobName, WebSocketJobStatus, WebSocketMessage } from 'types'
-
 import useStyles from './styles'
 import { CohortsType } from 'types/cohorts'
 import { Direction, Order } from 'types/searchCriterias'
 import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
 import servicesCohorts from 'services/aphp/serviceCohorts'
 
-const Welcome: React.FC = () => {
+const Welcome = () => {
   const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
@@ -84,7 +81,6 @@ const Welcome: React.FC = () => {
     dispatch(initPmsiHierarchy())
     dispatch(initMedicationHierarchy())
     dispatch(initBiologyHierarchy())
-    dispatch(fetchScopesList({}))
     fetchCohortsPreview()
   }, [])
 

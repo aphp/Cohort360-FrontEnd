@@ -4,7 +4,7 @@ import { Tabs, Tab } from '@mui/material'
 import MedicationForm from './components/Form/MedicationForm'
 import MedicationExploration from './components/Hierarchy/MedicationHierarchy'
 
-import { CriteriaDrawerComponentProps, HierarchyElement } from 'types'
+import { CriteriaDrawerComponentProps } from 'types'
 
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
@@ -12,6 +12,7 @@ import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchMedication } from 'state/medication'
 import { EXPLORATION } from '../../../../../../../../constants'
 import { Comparators, MedicationDataType, CriteriaType } from 'types/requestCriterias'
+import { Hierarchy } from 'types/hierarchy'
 
 export const defaultMedication: Omit<MedicationDataType, 'id'> = {
   type: CriteriaType.MEDICATION_REQUEST,
@@ -49,13 +50,13 @@ const Index = (props: CriteriaDrawerComponentProps) => {
   const { classes } = useStyles()
 
   const _onChangeSelectedHierarchy = (
-    newSelectedItems: HierarchyElement[] | null | undefined,
-    newHierarchy?: HierarchyElement[]
+    newSelectedItems: Hierarchy<any, any>[] | null | undefined,
+    newHierarchy?: Hierarchy<any, any>[]
   ) => {
     _onChangeFormValue('code', newSelectedItems, newHierarchy)
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const _onChangeFormValue = (key: string, value: any, hierarchy: HierarchyElement[] = medicationHierarchy) =>
+  const _onChangeFormValue = (key: string, value: any, hierarchy: Hierarchy<any, any>[] = medicationHierarchy) =>
     syncOnChangeFormValue(
       key,
       value,

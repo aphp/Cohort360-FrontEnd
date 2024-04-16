@@ -25,12 +25,14 @@ import AdvancedInputs from 'components/CreationCohort/DiagramView/components/Log
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProcedure } from 'state/pmsi'
-import { CriteriaItemDataCache, CriteriaName, HierarchyElement, HierarchyTree } from 'types'
+import { CriteriaItemDataCache, HierarchyTree } from 'types'
 import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
 import { CcamDataType, Comparators, SelectedCriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
 
 type CcamFormProps = {
   isOpen: boolean
@@ -70,7 +72,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {
         const criteriaCode = criteriaData.data.ccamData
-          ? criteriaData.data.ccamData.find((g: HierarchyElement) => g.id === code.id)
+          ? criteriaData.data.ccamData.find((g: Hierarchy<any, any>) => g.id === code.id)
           : null
         return {
           id: code.id,
@@ -221,7 +223,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
           />
 
-          <AdvancedInputs form={CriteriaName.Ccam} selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs sourceType={SourceType.CCAM} selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

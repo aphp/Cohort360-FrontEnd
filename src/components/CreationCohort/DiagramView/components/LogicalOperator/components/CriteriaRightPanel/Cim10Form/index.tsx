@@ -9,8 +9,9 @@ import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition } from 'state/pmsi'
 import { EXPLORATION } from '../../../../../../../../constants'
-import { CriteriaDrawerComponentProps, HierarchyElement } from 'types'
+import { CriteriaDrawerComponentProps } from 'types'
 import { Cim10DataType, Comparators, CriteriaType } from 'types/requestCriterias'
+import { Hierarchy } from 'types/hierarchy'
 
 export const defaultCondition: Omit<Cim10DataType, 'id'> = {
   type: CriteriaType.CONDITION,
@@ -42,13 +43,13 @@ const Index = (props: CriteriaDrawerComponentProps) => {
 
   const { classes } = useStyles()
   const _onChangeSelectedHierarchy = (
-    newSelectedItems: HierarchyElement[] | null | undefined,
-    newHierarchy?: HierarchyElement[]
+    newSelectedItems: Hierarchy<any, any>[] | null | undefined,
+    newHierarchy?: Hierarchy<any, any>[]
   ) => {
     _onChangeFormValue('code', newSelectedItems, newHierarchy)
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const _onChangeFormValue = async (key: string, value: any, newHierarchy: HierarchyElement[] = cim10Hierarchy) =>
+  const _onChangeFormValue = async (key: string, value: any, newHierarchy: Hierarchy<any, any>[] = cim10Hierarchy) =>
     await syncOnChangeFormValue(
       key,
       value,

@@ -8,6 +8,7 @@ export const FormWrapper = styled('div')(() => ({
 }))
 
 export const InputWrapper = styled('div')(() => ({
+  width: '100%',
   padding: 0,
   '& > div': {
     margin: '15px 0px'
