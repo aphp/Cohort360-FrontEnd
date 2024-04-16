@@ -179,10 +179,6 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         labels.push(
           getLabelFromCriteriaObject(criteriaState, selectedCriteria.typeDeSejour, CriteriaDataKey.TYPE_DE_SEJOUR, type)
         )
-      if (selectedCriteria.fileStatus && selectedCriteria.fileStatus.length > 0)
-        labels.push(
-          getLabelFromCriteriaObject(criteriaState, selectedCriteria.fileStatus, CriteriaDataKey.FILE_STATUS, type)
-        )
       if (selectedCriteria.admissionMode && selectedCriteria.admissionMode.length > 0)
         labels.push(
           getLabelFromCriteriaObject(

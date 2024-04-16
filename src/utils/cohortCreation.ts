@@ -96,7 +96,6 @@ const ENCOUNTER_ENTRYMODE = 'admission-mode'
 const ENCOUNTER_EXITMODE = 'discharge-disposition-mode'
 const ENCOUNTER_PRISENCHARGETYPE = 'class'
 const ENCOUNTER_TYPEDESEJOUR = 'stay'
-const ENCOUNTER_FILESTATUS = 'status' // TODO Mehdi
 const ENCOUNTER_ADMISSIONMODE = 'reason-code'
 const ENCOUNTER_REASON = 'admission-destination-type'
 const ENCOUNTER_DESTINATION = 'discharge-disposition'
@@ -289,7 +288,6 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         filtersBuilders(ENCOUNTER_EXITMODE, buildLabelObjectFilter(criterion.exitMode)),
         filtersBuilders(ENCOUNTER_PRISENCHARGETYPE, buildLabelObjectFilter(criterion.priseEnChargeType)),
         filtersBuilders(ENCOUNTER_TYPEDESEJOUR, buildLabelObjectFilter(criterion.typeDeSejour)),
-        filtersBuilders(ENCOUNTER_FILESTATUS, buildLabelObjectFilter(criterion.fileStatus)),
         filtersBuilders(ENCOUNTER_DESTINATION, buildLabelObjectFilter(criterion.destination)),
         filtersBuilders(ENCOUNTER_PROVENANCE, buildLabelObjectFilter(criterion.provenance)),
         filtersBuilders(ENCOUNTER_ADMISSION, buildLabelObjectFilter(criterion.admission)),
@@ -880,7 +878,6 @@ const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise
     exitMode: [],
     priseEnChargeType: [],
     typeDeSejour: [],
-    fileStatus: [],
     reason: [],
     destination: [],
     provenance: [],
@@ -932,10 +929,6 @@ const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise
         }
         case ENCOUNTER_TYPEDESEJOUR: {
           unbuildLabelObjectFilter(currentCriterion, 'typeDeSejour', value)
-          break
-        }
-        case ENCOUNTER_FILESTATUS: {
-          unbuildLabelObjectFilter(currentCriterion, 'fileStatus', value)
           break
         }
         case ENCOUNTER_REASON: {
