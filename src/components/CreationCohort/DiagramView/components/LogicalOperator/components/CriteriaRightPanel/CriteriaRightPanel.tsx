@@ -192,7 +192,7 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
   }
 
   useEffect(() => {
-    if (selectedCriteria) {
+    if (selectedCriteria && open) {
       const searchChild = (_criteria: CriteriaItemType[] | null): CriteriaItemType | null => {
         if (!_criteria) return null
 

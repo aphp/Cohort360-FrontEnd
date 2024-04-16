@@ -76,7 +76,7 @@ import {
 import { pregnancyForm } from 'data/pregnancyData'
 import { hospitForm } from 'data/hospitData'
 
-const REQUETEUR_VERSION = 'v1.4.0'
+const REQUETEUR_VERSION = 'v1.4.4'
 
 const IPP_LIST_FHIR = 'identifier.value'
 
