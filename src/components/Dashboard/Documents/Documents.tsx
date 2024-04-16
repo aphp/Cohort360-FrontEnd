@@ -179,7 +179,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
     endDate,
     orderBy,
     searchBy,
-    searchInput
+    searchInput,
+    groupId
   ])
 
   useEffect(() => {
