@@ -41,7 +41,7 @@ import { fetchClaimCodes, fetchConditionCodes, fetchProcedureCodes } from 'servi
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { AlertWrapper } from 'components/ui/Alert'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 
 export type PatientPMSIProps = {
   groupId?: string
@@ -67,7 +67,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [triggerClean, setTriggerClean] = useState<boolean>(false)
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElementWithSystem[]>([])
   const dispatch = useAppDispatch()
 
   const [selectedTab, setSelectedTab] = useState<PmsiTab>({
@@ -117,7 +117,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
     [code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus]
   )
 
-  const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<Hierarchy<any, any>[]>([])
+  const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<HierarchyElementWithSystem[]>([])
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const patient = useAppSelector((state) => state.patient)
   const [searchResults, setSearchResults] = useState<PmsiSearchResults>({

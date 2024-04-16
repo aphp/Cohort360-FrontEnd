@@ -11,8 +11,7 @@ import {
   Cohort,
   DataRights,
   CohortRights,
-  UserAccesses,
-  HierarchyElementWithSystem
+  UserAccesses
 } from 'types'
 
 import { AxiosError, AxiosResponse } from 'axios'
@@ -23,7 +22,6 @@ import {
   Condition,
   DocumentReference,
   Encounter,
-  Extension,
   ImagingStudy,
   Location,
   MedicationAdministration,
@@ -35,21 +33,16 @@ import {
   Patient,
   Procedure,
   Questionnaire,
-  QuestionnaireResponse,
-  ValueSet
+  QuestionnaireResponse
 } from 'fhir/r4'
-import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
-import { idSort, labelSort } from 'utils/alphabeticalSort'
-import { capitalizeFirstLetter } from 'utils/capitalize'
 import {
-  CODE_HIERARCHY_EXTENSION_NAME,
   CONDITION_STATUS,
   IMAGING_MODALITIES,
   MEDICATION_ADMINISTRATIONS,
   MEDICATION_PRESCRIPTION_TYPES,
   DOC_STATUS_CODE_SYSTEM
 } from '../../constants'
-import { Direction, Order, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
+import { Direction, Order, OrderBy, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
 import {
   AdministrationParamsKeys,
   ClaimParamsKeys,
@@ -64,7 +57,13 @@ import {
   QuestionnaireResponseParamsKeys
 } from '../../mappers/filters'
 import { ResourceType } from 'types/requestCriterias'
-import { Hierarchy } from 'types/hierarchy'
+import { FhirHierarchy, HierarchyElementWithSystem, HierarchyWithLabel } from 'types/hierarchy'
+import {
+  getFhirCodes,
+  getHierarchyRoots,
+  mapFhirHierarchyToHierarchyWithLabelAndSystem,
+  searchCodes
+} from './serviceValueSets'
 
 const paramValuesReducer = (accumulator: string, currentValue: string): string =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -1017,134 +1016,73 @@ export const fetchLocation = async (args: fetchLocationProps) => {
   return response
 }
 
-/**
- *
- * Retrieve the codeList from FHIR api either from expanding a code or fetching the roots of the valueSet
- * @param codeSystem
- * @param code
- * @param search
- * @param noStar
- * @param signal
- * @returns
- */
-const getCodeList = async (
-  codeSystem: string,
-  expandCode?: string,
-  search?: string,
-  noStar = true,
-  signal?: AbortSignal
-): Promise<{ code?: string; display?: string; extension?: Extension[]; codeSystem?: string }[] | undefined> => {
-  if (!expandCode) {
-    if (search !== undefined && !search.trim()) {
-      return []
-    }
-    let searchParam = '&only-roots=true'
-    // if search is * then we fetch the roots of the valueSet
-    if (search !== '*' && search !== undefined) {
-      // if noStar is true then we search for the code, else we search for the display
-      searchParam = `&only-roots=false&${
-        noStar ? 'code' : `_tag=text-search-rank&_tag=${lowToleranceTag}&_text`
-      }=${encodeURIComponent(search.trim())}`
-    }
-    // TODO test if it returns all the codes without specifying the count
-    const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}${searchParam}`, {
-      signal: signal
-    })
-    const valueSetBundle = getApiResponseResourcesOrThrow(res)
-    return valueSetBundle.length > 0
-      ? valueSetBundle
-          .map((entry) => {
-            return (
-              entry.compose?.include[0].concept?.map((code) => ({
-                ...code,
-                codeSystem: entry.compose?.include[0].system
-              })) || []
-            ) //eslint-disable-line
-          })
-          .filter((valueSetPerSystem) => !!valueSetPerSystem)
-          .reduce((acc, val) => acc.concat(val), [])
-      : []
-  } else {
-    const json = {
-      resourceType: 'ValueSet',
-      url: codeSystem,
-      compose: {
-        include: [
-          {
-            filter: [
-              {
-                op: 'is-a',
-                value: expandCode
-              }
-            ]
-          }
-        ]
-      }
-    }
-    const res = await apiFhir.post<FHIR_API_Response<ValueSet>>(`/ValueSet/$expand`, JSON.stringify(json))
-    const valueSetExpansion = getApiResponseResourceOrThrow(res).expansion
-    return valueSetExpansion?.contains?.map((code) => ({ ...code, codeSystem: codeSystem }))
-  }
-}
-
 export type FetchValueSetOptions = {
-  valueSetTitle?: string
-  code?: string
-  sortingKey?: 'id' | 'label'
-  search?: string
-  noStar?: boolean
-  joinDisplayWithCode?: boolean
-  filterRoots?: (code: Hierarchy<any, any>) => boolean
-  filterOut?: (code: Hierarchy<any, any>) => boolean
+  // the first 3 param are mutually exclusive
+  valueSetTitle?: string // an optional valueset node title for fetching valueset roots
+  codes?: string[] // an optional list of codes to fetch
+  search?: string // an optional search query
+  // other optional params
+  exactSearch?: boolean // legacy param, if set to true, the search param will be considered to be a single code
+  joinDisplayWithCode?: boolean // join the code and display for the label of nodes
+  offset?: number // offset for pagination (only used for searching codes or query search), default = 0
+  count?: number // count for pagination (only used for searching codes or query search), default = 100
+  orderBy?: OrderBy // legacy param, unused for now with the new search endpoint TODO: should be passed someway if needed
+  filterRoots?: (code: HierarchyWithLabel) => boolean // legacy param used to filter in only some roots results (for some broken valuesets)
+  filterOut?: (code: HierarchyWithLabel) => boolean // same usage as filterRoots but to filter out some results (should be merged with prev param ...)
 }
 
+/**
+ * Fetch partial hierarchy nodes from different query types :
+ * - Fetch by codesystem and codes
+ * - Fetch by codesystem and provided valueSetTitle for valueset roots
+ * - Fetch by codesystem and search query
+ * @param codeSystem code system to fetch (can be a comma separated list)
+ * @param options fetching options (see FetchValueSetOptions documentation)
+ * @param signal cancellation signal
+ * @returns a partial hierarchy element with system
+ */
 export const fetchValueSet = async (
   codeSystem: string,
   options?: FetchValueSetOptions,
   signal?: AbortSignal
-): Promise<HierarchyElementWithSystem[]> => {
+): Promise<Back_API_Response<HierarchyElementWithSystem>> => {
   const {
-    code,
+    codes = [],
     valueSetTitle,
-    sortingKey = 'label',
+    orderBy = { orderBy: Order.DISPLAY, orderDirection: Direction.ASC },
     search,
-    noStar,
+    exactSearch,
+    offset,
+    count,
     joinDisplayWithCode = true,
     filterRoots = () => true,
-    filterOut = (value: Hierarchy<any, any>) => value.id === 'APHP generated'
+    filterOut = (value: HierarchyWithLabel) => value.id === 'APHP generated'
   } = options || {}
-  const codeList = await getCodeList(codeSystem, code, search, noStar, signal)
-  const sortingFunc = sortingKey === 'id' ? idSort : labelSort
-  const formattedCodeList =
-    codeList
-      ?.map((code) => ({
-        id: code.code || '',
-        label: joinDisplayWithCode
-          ? `${code.code} - ${capitalizeFirstLetter(code.display)}`
-          : capitalizeFirstLetter(code.display),
-        system: code.codeSystem,
-        subItems: [{ id: 'loading', label: 'loading', subItems: [] as Hierarchy<any, any>[] }]
-      }))
-      .filter((code) => !filterOut(code))
-      .sort(sortingFunc) || []
-  if (!code && (search === undefined || search === '*') && valueSetTitle) {
-    return [{ id: '*', label: valueSetTitle, subItems: formattedCodeList.filter((code) => filterRoots(code)) }]
-  } else {
-    return formattedCodeList
+  const methodRouting: Array<{ condition: () => boolean; fetcher: () => Promise<Back_API_Response<FhirHierarchy>> }> = [
+    {
+      condition: () => !!(codes.length > 0 || (search && exactSearch === true)),
+      fetcher: () => getFhirCodes(codeSystem, codes.length > 0 ? codes : [search as string], signal)
+    },
+    {
+      condition: () => (search === '*' || search === undefined) && valueSetTitle !== undefined,
+      fetcher: () =>
+        getHierarchyRoots(codeSystem, valueSetTitle as string, joinDisplayWithCode, filterRoots, filterOut, signal)
+    },
+    {
+      condition: () => true,
+      fetcher: () => searchCodes(codeSystem.split(','), search || '', offset || 0, count || 100, signal)
+    }
+  ]
+  for (const { condition, fetcher } of methodRouting) {
+    if (condition()) {
+      const hierarchy = await fetcher()
+      return {
+        results: hierarchy.results.map((item) => mapFhirHierarchyToHierarchyWithLabelAndSystem(item)),
+        count: hierarchy.count
+      }
+    }
   }
-}
-
-export const fetchSingleCodeHierarchy = async (codeSystem: string, code: string): Promise<string[]> => {
-  const codeList = await getCodeList(codeSystem, undefined, code)
-  if (!codeList || codeList.length === 0) {
-    return []
-  }
-  return (
-    codeList[0].extension
-      ?.find((e) => e.url === CODE_HIERARCHY_EXTENSION_NAME)
-      ?.valueCodeableConcept?.coding?.map((c) => c.code || '')
-      .filter((c) => !!c) || []
-  )
+  throw new Error(`Cannot handle valueset params ${options}`)
 }
 
 export const fetchAccessExpirations: (

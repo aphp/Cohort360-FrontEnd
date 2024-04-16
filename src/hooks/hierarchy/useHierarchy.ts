@@ -8,16 +8,17 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { LoadingStatus, SelectedStatus } from 'types'
 import { getSelectedCodes } from 'utils/hierarchy'
-import { Hierarchy, Mode } from '../../types/hierarchy'
+import { Hierarchy, HierarchyLoadingStatus, HierarchyRoots, Mode, UseHierarchy } from '../../types/hierarchy'
 import { removeElement } from 'utils/arrays'
 
 export const useHierarchy = <T>(
-  baseTree: Hierarchy<T, string>[],
+  roots: HierarchyRoots<T, string>[],
   selectedNodes: Hierarchy<T, string>[],
   _codes: Hierarchy<T, string>[],
   onCache: (codes: Hierarchy<T, string>[]) => void,
   fetchHandler: (ids: string) => Promise<Hierarchy<T, string>[]>
 ) => {
+  const [hierarchies, setHierarchies] = useState<UseHierarchy<T>[]>([])
   const [hierarchyRepresentation, setHierarchyRepresentation] = useState<Hierarchy<T, string>[]>([])
   const [hierarchyDisplay, setHierarchyDisplay] = useState<Hierarchy<T, string>[]>([])
   const [selectedCodes, setSelectedCodes] = useState<Hierarchy<T, string>[]>(selectedNodes)
@@ -25,7 +26,7 @@ export const useHierarchy = <T>(
     mapHierarchyToMap(_codes.map((code) => ({ ...code, subItems: undefined })))
   )
   const latestCodes = useRef(codes)
-  const [loadingStatus, setLoadingStatus] = useState({
+  const [loadingStatus, setLoadingStatus] = useState<HierarchyLoadingStatus>({
     search: LoadingStatus.FETCHING,
     expand: LoadingStatus.SUCCESS
   })
@@ -47,18 +48,28 @@ export const useHierarchy = <T>(
   }, [hierarchyDisplay])
 
   useEffect(() => {
-    const init = async () => {
-      const fetchedCodes = [...baseTree, ...selectedCodes]
-      const newCodes = await getMissingCodes(baseTree, codes, fetchedCodes, Mode.INIT, fetchHandler)
-      const newTree = buildHierarchy(baseTree, fetchedCodes, newCodes, selectedCodes, Mode.INIT)
-      const newDisplay = getHierarchyDisplay(baseTree, newTree)
-      setCodes(newCodes)
-      setHierarchyRepresentation(newTree)
-      setHierarchyDisplay(newDisplay)
-      setLoadingStatus({ ...loadingStatus, search: LoadingStatus.SUCCESS })
+    const init = async (roots: HierarchyRoots<T, string>[]) => {
+      const hierarchies: UseHierarchy<T>[] = []
+            const codes: UseHierarchy<T>[] = []
+      roots.forEach(async (root) => {
+        const fetchedCodes = [...root.baseTree, ...selectedCodes]
+        const newCodes = await getMissingCodes(root.baseTree, codes, fetchedCodes, Mode.INIT, fetchHandler)
+        const newTree = buildHierarchy(root.baseTree, fetchedCodes, newCodes, selectedCodes, Mode.INIT)
+        const newDisplay = getHierarchyDisplay(root.baseTree, newTree)
+        hierarchies.push({
+          hierarchyRepresentation: newTree,
+          hierarchyDisplay: newDisplay,
+          loadingStatus: { ...loadingStatus, search: LoadingStatus.SUCCESS },
+        })
+        setHierarchies(hierarchies)
+        setCodes(newCodes)
+        //setHierarchyRepresentation(newTree)
+        //setHierarchyDisplay(newDisplay)
+        //setLoadingStatus({ ...loadingStatus, search: LoadingStatus.SUCCESS })
+      })
     }
-    init()
-  }, [])
+    init(roots)
+  }, [roots])
 
   const search = async (
     searchValue: string,

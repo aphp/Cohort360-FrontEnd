@@ -16,15 +16,15 @@ import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
 import { LabelObject } from 'types/searchCriterias'
-import { Hierarchy } from 'types/hierarchy'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 
 type FilterTimelineDialogProps = {
   open: boolean
   onClose: () => void
-  diagnosticTypesList: Hierarchy<any, any>[]
+  diagnosticTypesList: HierarchyElementWithSystem[]
   selectedDiagnosticTypes: LabelObject[]
   onChangeSelectedDiagnosticTypes: (selectedDiagnosticTypes: LabelObject[]) => void
-  encounterStatusList: Hierarchy<any, any>[]
+  encounterStatusList: HierarchyElementWithSystem[]
   encounterStatus: LabelObject[]
   onChangeEncounterStatus: (encounterStatus: LabelObject[]) => void
 }

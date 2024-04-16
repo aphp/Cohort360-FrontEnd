@@ -22,7 +22,7 @@ import Timeline from './Timeline'
 import services from 'services/aphp'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 
 type PatientFormsProps = {
   groupId?: string
@@ -36,7 +36,7 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [maternityFormNamesIds, setMaternityFormNamesIds] = useState<Questionnaire[]>([])
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElementWithSystem[]>([])
 
   const [
     {

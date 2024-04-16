@@ -72,13 +72,19 @@ export interface IServicePerimeters {
    *   - IOrganization[]
    */
 
-  mapRightsToScopeElement: (item: ReadRightPerimeter) => ScopeElement
+  mapRightsToScopeElement: (item: ReadRightPerimeter) => Hierarchy<ScopeElement, string>
 
-  mapPerimeterToScopeElement: (item: ScopeElement) => ScopeElement
+  mapPerimeterToScopeElement: (item: ScopeElement) => Hierarchy<ScopeElement, string>
 
-  getRights: (options: FetchScopeOptions, signal?: AbortSignal) => Promise<Back_API_Response<ScopeElement>>
+  getRights: (
+    options: FetchScopeOptions,
+    signal?: AbortSignal
+  ) => Promise<Back_API_Response<Hierarchy<ScopeElement, string>>>
 
-  getPerimeters: (options?: FetchScopeOptions, signal?: AbortSignal) => Promise<Back_API_Response<ScopeElement>>
+  getPerimeters: (
+    options?: FetchScopeOptions,
+    signal?: AbortSignal
+  ) => Promise<Back_API_Response<Hierarchy<ScopeElement, string>>>
 
   getAccessExpirations: (accessExpirationsProps: AccessExpirationsProps) => Promise<AccessExpiration[]>
 
@@ -198,6 +204,7 @@ const servicesPerimeters: IServicePerimeters = {
           {
             id: Rights.EXPIRED,
             name: '',
+            label: '',
             source_value: '',
             above_levels_ids: '',
             inferior_levels_ids: '',
@@ -213,7 +220,7 @@ const servicesPerimeters: IServicePerimeters = {
     return population
   },
 
-  mapRightsToScopeElement: (item: ReadRightPerimeter): ScopeElement => {
+  mapRightsToScopeElement: (item: ReadRightPerimeter): Hierarchy<ScopeElement, string> => {
     const {
       perimeter,
       read_role,
@@ -233,12 +240,13 @@ const servicesPerimeters: IServicePerimeters = {
     return {
       ...perimeter,
       id: perimeter.id.toString(),
+      label: `${perimeter.source_value} - ${perimeter.name}`,
       access: servicesPerimeters.getAccessFromRights(rights),
       rights
     }
   },
 
-  mapPerimeterToScopeElement: (item: ScopeElement): ScopeElement => {
+  mapPerimeterToScopeElement: (item: ScopeElement): Hierarchy<ScopeElement, string> => {
     const {
       id,
       name,
@@ -255,6 +263,7 @@ const servicesPerimeters: IServicePerimeters = {
     return {
       id: id.toString(),
       name,
+      label: `${source_value} - ${name}`,
       source_value,
       type,
       parent_id,
@@ -266,8 +275,11 @@ const servicesPerimeters: IServicePerimeters = {
     }
   },
 
-  getRights: async (options?: FetchScopeOptions, signal?: AbortSignal): Promise<Back_API_Response<ScopeElement>> => {
-    const response: Back_API_Response<ScopeElement> = { results: [], count: 0 }
+  getRights: async (
+    options?: FetchScopeOptions,
+    signal?: AbortSignal
+  ): Promise<Back_API_Response<Hierarchy<ScopeElement, string>>> => {
+    const response: Back_API_Response<Hierarchy<ScopeElement, string>> = { results: [], count: 0 }
     try {
       let baseUrl = 'accesses/perimeters/patient-data/rights/'
       const params = []
@@ -296,8 +308,8 @@ const servicesPerimeters: IServicePerimeters = {
   getPerimeters: async (
     options?: FetchScopeOptions,
     signal?: AbortSignal
-  ): Promise<Back_API_Response<ScopeElement>> => {
-    const response: Back_API_Response<ScopeElement> = { results: [], count: 0 }
+  ): Promise<Back_API_Response<Hierarchy<ScopeElement, string>>> => {
+    const response: Back_API_Response<Hierarchy<ScopeElement, string>> = { results: [], count: 0 }
     try {
       let baseUrl = 'accesses/perimeters/'
       const params = []

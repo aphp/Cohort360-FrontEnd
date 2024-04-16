@@ -9,10 +9,11 @@ import { Rights, SourceType } from 'types/scope'
 import { buildCohortCreation } from 'state/cohortCreation'
 import { ScopeElement } from 'types'
 import { Hierarchy } from 'types/hierarchy'
-import PopulationRightPanel from './components/PopulationCard/components/PopulationRightPanel'
+import Panel from '../../ui/Panel'
 import PopulationCard from './components/PopulationCard/PopulationCard'
 import ModalRightError from './components/PopulationCard/components/ModalRightError'
 import { checkNominativeCriteria, cleanNominativeCriterias } from 'utils/cohortCreation'
+import ScopeTree from 'components/ScopeTree'
 
 const DiagramView = () => {
   const dispatch = useAppDispatch()
@@ -45,9 +46,8 @@ const DiagramView = () => {
   }, [selectedPopulation])
 
   useEffect(() => {
-    if (!selectedPopulation?.length && rights.length === 1) {
+    if (!selectedPopulation?.length && rights.length === 1)
       dispatch(buildCohortCreation({ selectedPopulation: rights }))
-    }
   }, [selectedPopulation, rights])
 
   return (
@@ -92,15 +92,20 @@ const DiagramView = () => {
         </Grid>
         {selectedPopulation && selectedPopulation.length > 0 ? <LogicalOperator /> : <></>}
       </div>
-      <PopulationRightPanel
+      <Panel
+        title="Structure hospitalière"
         open={openDrawer}
-        population={rights}
-        selectedPopulation={selectedCodes}
-        sourceType={SourceType.ALL}
-        onConfirm={handleChangePopulation}
-        mandatory
+        mandatory={!selectedCodes.length}
+        onConfirm={() => handleChangePopulation(selectedCodes)}
         onClose={() => setOpenDrawer(false)}
-      />
+      >
+        <ScopeTree
+          baseTree={rights}
+          selectedNodes={selectedCodes}
+          onSelect={setSelectedCodes}
+          sourceType={SourceType.ALL}
+        />
+      </Panel>
       <ModalRightError open={rightsError} handleClose={() => setOpenDrawer(true)} />
     </Grid>
   )

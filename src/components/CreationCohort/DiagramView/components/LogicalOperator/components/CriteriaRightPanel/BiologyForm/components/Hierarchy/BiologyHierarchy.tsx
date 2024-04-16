@@ -22,29 +22,31 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { useAppDispatch, useAppSelector } from 'state'
 
-import {
-  checkIfIndeterminated,
-  expandItem,
-  findEquivalentRowInItemAndSubItems,
-  getHierarchySelection
-} from 'utils/pmsi'
+import { expandItem, findEquivalentRowInItemAndSubItems, getHierarchySelection } from 'utils/pmsi'
 
 import useStyles from './styles'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import { defaultBiology } from '../../index'
 import { HierarchyTree } from 'types'
-import { Hierarchy } from 'types/hierarchy'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 
 type BiologyListItemProps = {
-  biologyItem: Hierarchy<any, any>
-  selectedItems?: Hierarchy<any, any>[] | null
-  handleClick: (biologyItem: Hierarchy<any, any>[] | null | undefined, newHierarchy?: Hierarchy<any, any>[]) => void
+  biologyItem: HierarchyElementWithSystem
+  selectedItems?: HierarchyElementWithSystem[] | null
+  handleClick: (
+    biologyItem: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
+  ) => void
 }
 
 const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
   const { biologyItem, selectedItems, handleClick } = props
-  const { id, label, subItems } = biologyItem
+  const {
+    id,
+    id: { label },
+    subItems
+  } = biologyItem
 
   const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
@@ -55,7 +57,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
 
   const [open, setOpen] = useState(false)
   const isSelected = findSelectedInListAndSubItems(selectedItems ? selectedItems : [], biologyItem, biologyHierarchy)
-  const isIndeterminated = checkIfIndeterminated(biologyItem, selectedItems)
+  //const isIndeterminated = checkIcheckIfInfIndeterminated(biologyItem, selectedItems)
   const _onExpand = async (biologyCode: string) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
@@ -71,7 +73,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = async (biologyItem: Hierarchy<any, any>) => {
+  const handleClickOnHierarchy = async (biologyItem: HierarchyElementWithSystem) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getHierarchySelection(biologyItem, selectedItems || [], biologyHierarchy)
@@ -87,7 +89,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
             onClick={() => handleClickOnHierarchy(biologyItem)}
             className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
-              [classes.indeterminateIndicator]: isIndeterminated
+              [classes.indeterminateIndicator]: /*isIndeterminated*/ false
             })}
             style={{ color: '#0063af', cursor: 'pointer' }}
           />
@@ -107,23 +109,23 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
             onClick={() => handleClickOnHierarchy(biologyItem)}
             className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
-              [classes.indeterminateIndicator]: isIndeterminated
+              [classes.indeterminateIndicator]: /*isIndeterminated*/ false
             })}
             style={{ color: '#0063af', cursor: 'pointer' }}
           />
         </ListItemIcon>
         <Tooltip title={label} enterDelay={2500}>
-          <ListItemText onClick={() => _onExpand(id)} className={classes.label} primary={label} />
+          <ListItemText onClick={() => _onExpand(label)} className={classes.label} primary={label} />
         </Tooltip>
-        {id !== '*' &&
-          (open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => _onExpand(id)} />)}
+        {label !== '*' &&
+          (open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => _onExpand(label)} />)}
       </ListItem>
-      <Collapse in={id === '*' ? true : open} timeout="auto" unmountOnExit>
+      <Collapse in={label === '*' ? true : open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((biologyHierarchySubItem: Hierarchy<any, any>, index: number) =>
-              biologyHierarchySubItem.id === 'loading' ? (
+            subItems.map((biologyHierarchySubItem: HierarchyElementWithSystem, index: number) =>
+              biologyHierarchySubItem.id.label === 'loading' ? (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
                   <Skeleton style={{ flex: 1, margin: '2px 32px' }} height={32} />
@@ -151,8 +153,8 @@ type BiologyHierarchyProps = {
   selectedCriteria: any
   goBack: () => void
   onChangeSelectedHierarchy: (
-    data: Hierarchy<any, any>[] | null | undefined,
-    newHierarchy?: Hierarchy<any, any>[]
+    data: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
   ) => void
   isEdition?: boolean
   onConfirm: () => void
@@ -176,14 +178,14 @@ const BiologyHierarchy: React.FC<BiologyHierarchyProps> = (props) => {
       newList.code = selectedCriteria.code
     }
     newList.code.map(
-      (item: Hierarchy<any, any>) => findEquivalentRowInItemAndSubItems(item, biologyHierarchy).equivalentRow
+      (item: HierarchyElementWithSystem) => findEquivalentRowInItemAndSubItems(item, biologyHierarchy).equivalentRow
     )
     setCurrentState(newList)
   }, [initialState, biologyHierarchy])
 
   const _handleClick = (
-    newSelectedItems: Hierarchy<any, any>[] | null | undefined,
-    newHierarchy?: Hierarchy<any, any>[]
+    newSelectedItems: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
   ) => {
     onChangeSelectedHierarchy(newSelectedItems, newHierarchy)
   }

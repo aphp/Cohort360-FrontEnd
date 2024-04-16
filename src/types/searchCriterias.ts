@@ -95,7 +95,8 @@ export enum Order {
   DESCRIPTION = 'description',
   PROCEDURE = 'procedureCode',
   STUDY_DATE = 'started',
-  CREATED_AT = 'created_at'
+  CREATED_AT = 'created_at',
+  DISPLAY = 'display'
 }
 export enum SearchByTypes {
   TEXT = '_text',

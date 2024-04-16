@@ -81,7 +81,6 @@ import { pregnancyForm } from 'data/pregnancyData'
 import { hospitForm } from 'data/hospitData'
 import { editAllCriteria, editAllCriteriaGroup, pseudonimizeCriteria, buildCohortCreation } from 'state/cohortCreation'
 import { AppDispatch } from 'state'
-import { Hierarchy } from 'types/hierarchy'
 import {
   AdministrationParamsKeys,
   ClaimParamsKeys,
@@ -96,6 +95,7 @@ import {
   ProcedureParamsKeys,
   QuestionnaireResponseParamsKeys
 } from 'mappers/filters'
+import { Hierarchy, HierarchyElementWithSystem } from 'types/hierarchy'
 
 const REQUETEUR_VERSION = 'v1.4.5'
 
@@ -2381,7 +2381,6 @@ export const getDataFromFetch = async (
                   (criterion.type === CriteriaType.MEDICATION_REQUEST ||
                     criterion.type === CriteriaType.MEDICATION_ADMINISTRATION))
             )
-
             if (currentSelectedCriteria) {
               for (const currentcriterion of currentSelectedCriteria) {
                 if (
@@ -2402,7 +2401,10 @@ export const getDataFromFetch = async (
                     const prevData = prevDataCache[dataKey]?.find((data: any) => data.id === code?.id)
                     const codeData = prevData ? [prevData] : await _criterion.fetch[dataKey]?.(code?.id, true)
                     const existingCodes = criteriaDataCache.data[dataKey] || []
-                    criteriaDataCache.data[dataKey] = [...existingCodes, ...(codeData || [])]
+                    criteriaDataCache.data[dataKey] = [
+                      ...existingCodes,
+                      ...((codeData as HierarchyElementWithSystem[]) || [])
+                    ]
                   }
                 }
               }
@@ -2496,9 +2498,9 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
 }
 
 export const findSelectedInListAndSubItems = (
-  selectedItems: Hierarchy<any, any>[],
-  searchedItem: Hierarchy<any, any> | undefined,
-  pmsiHierarchy: Hierarchy<any, any>[],
+  selectedItems: HierarchyElementWithSystem[],
+  searchedItem: HierarchyElementWithSystem | undefined,
+  pmsiHierarchy: HierarchyElementWithSystem[],
   valueSetSystem?: string
 ): boolean => {
   if (!searchedItem || !selectedItems || selectedItems.length === 0) return false
