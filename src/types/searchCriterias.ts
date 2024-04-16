@@ -70,6 +70,7 @@ export enum DirectionLabel {
   DESC = 'Décroissant'
 }
 export enum Order {
+  LABEL = 'label',
   CODE = 'code',
   RESULT_SIZE = 'result_size',
   FAVORITE = 'favorite',
@@ -101,7 +102,8 @@ export enum Order {
   MEDICATION_ATC = 'medication-atc',
   MEDICATION_UCD = 'medication-ucd',
   PRESCRIPTION_TYPES = 'category-name',
-  ADMINISTRATION_MODE = 'route'
+  ADMINISTRATION_MODE = 'route',
+  DISPLAY = 'display'
 }
 export enum SearchByTypes {
   TEXT = '_text',

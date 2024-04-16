@@ -1,4 +1,3 @@
-import { Item } from 'components/ui/List/ListItem'
 import { mapRequestParamsToSearchCriteria } from 'mappers/filters'
 import { useEffect, useState } from 'react'
 import {
@@ -11,6 +10,11 @@ import { ErrorType } from 'types/error'
 import { ResourceType } from 'types/requestCriterias'
 import { Filters, SavedFilter, SavedFiltersResults, SearchCriterias } from 'types/searchCriterias'
 
+type RequestOptions = {
+  next?: string | null
+  limit?: number
+}
+
 export type SelectedFilter<T> = {
   filterUuid: string
   filterName: string
@@ -19,7 +23,6 @@ export type SelectedFilter<T> = {
 
 export const useSavedFilters = <T>(type: ResourceType) => {
   const [allSavedFilters, setAllSavedFilters] = useState<SavedFiltersResults | null>(null)
-  const [allSavedFiltersAsListItems, setAllSavedFiltersAsListItems] = useState<Item[]>([])
   const [savedFiltersErrors, setSavedFiltersErrors] = useState<ErrorType>({ isError: false })
   const [selectedSavedFilter, setSelectedSavedFilter] = useState<SelectedFilter<T> | null>(null)
 
@@ -27,20 +30,10 @@ export const useSavedFilters = <T>(type: ResourceType) => {
     getSavedFilters()
   }, [type])
 
-  useEffect(
-    () =>
-      setAllSavedFiltersAsListItems(
-        allSavedFilters?.results.map((elem) => {
-          return { id: elem.uuid, name: elem.name, checked: false }
-        }) || []
-      ),
-    [allSavedFilters]
-  )
-
-  const getSavedFilters = async (next?: string | null) => {
+  const getSavedFilters = async (options?: RequestOptions) => {
     try {
-      const response = await getFiltersService(type, next)
-      if (next) {
+      const response = await getFiltersService(type, options?.next, options?.limit)
+      if (options?.next) {
         setAllSavedFilters({
           ...response,
           results: [...(allSavedFilters?.results || []), ...response.results]
@@ -100,7 +93,6 @@ export const useSavedFilters = <T>(type: ResourceType) => {
 
   return {
     allSavedFilters,
-    allSavedFiltersAsListItems,
     selectedSavedFilter,
     savedFiltersErrors,
     methods: {

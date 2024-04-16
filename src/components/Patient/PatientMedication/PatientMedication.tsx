@@ -39,9 +39,9 @@ import { mapToAttribute, mapToLabel } from 'mappers/pmsi'
 import services from 'services/aphp'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 
 type PatientMedicationProps = {
   groupId?: string
@@ -72,7 +72,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [triggerClean, setTriggerClean] = useState<boolean>(false)
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElementWithSystem[]>([])
 
   const dispatch = useAppDispatch()
   const patient = useAppSelector((state) => state.patient)
@@ -122,8 +122,8 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
     })
   }, [nda, prescriptionTypes, administrationRoutes, startDate, endDate, executiveUnits, encounterStatus])
 
-  const [allAdministrationRoutes, setAllAdministrationRoutes] = useState<Hierarchy<any, any>[]>([])
-  const [allPrescriptionTypes, setAllPrescriptionTypes] = useState<Hierarchy<any, any>[]>([])
+  const [allAdministrationRoutes, setAllAdministrationRoutes] = useState<HierarchyElementWithSystem[]>([])
+  const [allPrescriptionTypes, setAllPrescriptionTypes] = useState<HierarchyElementWithSystem[]>([])
   const [searchResults, setSearchResults] = useState<MedicationSearchResults>({
     deidentified: false,
     list: [],

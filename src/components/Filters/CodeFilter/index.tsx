@@ -9,7 +9,7 @@ type CodeFilterProps = {
   value: LabelObject[]
   name: string
   disabled?: boolean
-  onFetch: (text: string, noStar: boolean, signal: AbortSignal) => Promise<LabelObject[]>
+  onFetch: (text: string, exactSearch: boolean, signal: AbortSignal) => Promise<any>
 }
 
 const CodeFilter = ({ name, value, disabled = false, onFetch }: CodeFilterProps) => {

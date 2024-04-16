@@ -1,34 +1,47 @@
-import { Chip, CircularProgress, Grid, IconButton, Tooltip } from '@mui/material'
-import React, { ReactNode, useEffect, useState } from 'react'
+import { Chip, CircularProgress, Grid, IconButton, Tooltip, Typography } from '@mui/material'
+import { FormContext } from 'components/ui/Modal'
+import React, { useContext, useEffect, useState } from 'react'
 import { LoadingStatus, ScopeElement } from 'types'
 import InfoIcon from '@mui/icons-material/Info'
 import { InputWrapper } from 'components/ui/Inputs'
 import EditIcon from '@mui/icons-material/Edit'
 import { ExecutiveUnitsWrapper } from './styles'
 import { SourceType } from 'types/scope'
-import PopulationRightPanel from 'components/CreationCohort/DiagramView/components/PopulationCard/components/PopulationRightPanel'
 import { Hierarchy } from 'types/hierarchy'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import { getScopeLevelBySourceType } from 'utils/perimeters'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
+import ScopeTree from 'components/ScopeTree'
+import Panel from 'components/ui/Panel'
 
 type ExecutiveUnitsFilterProps = {
   value: Hierarchy<ScopeElement, string>[]
   sourceType: SourceType
+  name: string
   disabled?: boolean
   onChange?: (value: Hierarchy<ScopeElement, string>[]) => void
-  label?: ReactNode
+  isCriterion?: boolean
 }
 
-const ExecutiveUnitsInput = ({ value, sourceType, disabled = false, onChange, label }: ExecutiveUnitsFilterProps) => {
+const ExecutiveUnitsFilter = ({
+  name,
+  value,
+  sourceType,
+  disabled = false,
+  onChange,
+  isCriterion = false
+}: ExecutiveUnitsFilterProps) => {
+  const context = useContext(FormContext)
   const [population, setPopulation] = useState<Hierarchy<ScopeElement, string>[]>([])
-  const [selectedPopulation, setSelectedPopulation] = useState<Hierarchy<ScopeElement, string>[]>(value)
+  const [selectedPopulation, setSelectedPopulation] = useState<Hierarchy<ScopeElement, string>[]>([])
+  const [confirmedPopulation, setConfirmedPopulation] = useState<Hierarchy<ScopeElement, string>[]>(value)
   const [loading, setLoading] = useState(disabled ? LoadingStatus.SUCCESS : LoadingStatus.FETCHING)
   const [open, setOpen] = useState(false)
 
   const handleDelete = (id: string) => {
     const newSelectedPopulation = selectedPopulation.filter((item) => item.id !== id)
     setSelectedPopulation(newSelectedPopulation)
+    setConfirmedPopulation(newSelectedPopulation)
   }
 
   useEffect(() => {
@@ -41,12 +54,20 @@ const ExecutiveUnitsInput = ({ value, sourceType, disabled = false, onChange, la
   }, [])
 
   useEffect(() => {
-    if (onChange) onChange(selectedPopulation)
-  }, [selectedPopulation])
+    if (context?.updateFormData) context.updateFormData(name, confirmedPopulation)
+    if (onChange) onChange(confirmedPopulation)
+  }, [confirmedPopulation])
+
   return (
     <InputWrapper>
       <Grid item container alignContent="center" alignItems={'center'}>
-        {label || <CriteriaLabel style={{ padding: 0 }} label="Unité exécutrice" />}
+        {isCriterion ? (
+          <CriteriaLabel style={{ padding: 0 }} label="Unité exécutrice" />
+        ) : (
+          <Typography variant="h3" alignSelf="center">
+            Unité exécutrice :
+          </Typography>
+        )}
         <Tooltip
           title={
             <>
@@ -64,8 +85,8 @@ const ExecutiveUnitsInput = ({ value, sourceType, disabled = false, onChange, la
       <Grid item container direction="row" alignItems="center">
         <ExecutiveUnitsWrapper>
           <Grid container>
-            {!selectedPopulation.length && 'Sélectionner une unité exécutrice'}
-            {selectedPopulation.map((unit) => (
+            {!confirmedPopulation.length && 'Sélectionner une unité exécutrice'}
+            {confirmedPopulation.map((unit) => (
               <Chip
                 disabled={disabled}
                 sx={{
@@ -89,21 +110,25 @@ const ExecutiveUnitsInput = ({ value, sourceType, disabled = false, onChange, la
             {loading === LoadingStatus.FETCHING && <CircularProgress size={24} />}
           </IconButton>
         </ExecutiveUnitsWrapper>
-        <PopulationRightPanel
+        <Panel
           title="Sélectionner une unité exécutrice"
           open={open}
-          population={population}
-          selectedPopulation={selectedPopulation}
-          sourceType={sourceType}
-          onConfirm={(value) => {
-            setSelectedPopulation(value)
+          onConfirm={() => {
+            setConfirmedPopulation(selectedPopulation)
             setOpen(false)
           }}
           onClose={() => setOpen(false)}
-        />
+        >
+          <ScopeTree
+            baseTree={population}
+            selectedNodes={confirmedPopulation}
+            onSelect={setSelectedPopulation}
+            sourceType={sourceType}
+          />
+        </Panel>
       </Grid>
     </InputWrapper>
   )
 }
 
-export default ExecutiveUnitsInput
+export default ExecutiveUnitsFilter

@@ -23,7 +23,6 @@ import { PMSILabel } from 'types/patient'
 import { selectFiltersAsArray } from 'utils/filters'
 import { BlockWrapper } from 'components/ui/Layout'
 import useSearchCriterias, { initPmsiSearchCriterias } from 'reducers/searchCriteriasReducer'
-import services from 'services/aphp'
 import CodeFilter from 'components/Filters/CodeFilter'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import DiagnosticTypesFilter from 'components/Filters/DiagnosticTypesFilter'
@@ -36,12 +35,13 @@ import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
 import { mapToAttribute, mapToLabel, mapToSourceType } from 'mappers/pmsi'
 import List from 'components/ui/List'
-import { fetchClaimCodes, fetchConditionCodes, fetchProcedureCodes } from 'services/aphp/servicePmsi'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { AlertWrapper } from 'components/ui/Alert'
-import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { FhirItem } from 'types/hierarchy'
+import { getConfig } from 'config'
+import { getCodeList } from 'services/aphp/serviceValueSets'
 
 type PatientPMSIProps = {
   groupId?: string
@@ -72,7 +72,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [triggerClean, setTriggerClean] = useState<boolean>(false)
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<FhirItem[]>([])
   const dispatch = useAppDispatch()
 
   const [selectedTab, setSelectedTab] = useState<PmsiTab>({
@@ -114,7 +114,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
     [code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus]
   )
 
-  const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<Hierarchy<any, any>[]>([])
+  const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<FhirItem[]>([])
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const patient = useAppSelector((state) => state.patient)
   const [searchResults, setSearchResults] = useState<PmsiSearchResults>({
@@ -168,11 +168,11 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
     const fetch = async () => {
       try {
         const [diagnosticTypes, encounterStatus] = await Promise.all([
-          services.cohortCreation.fetchDiagnosticTypes(),
-          services.cohortCreation.fetchEncounterStatus()
+          getCodeList(getConfig().features.condition.valueSets.conditionStatus.url),
+          getCodeList(getConfig().core.valueSets.encounterStatus.url)
         ])
-        setAllDiagnosticTypesList(diagnosticTypes)
-        setEncounterStatusList(encounterStatus)
+        setAllDiagnosticTypesList(diagnosticTypes.results)
+        setEncounterStatusList(encounterStatus.results)
       } catch (e) {
         /* empty */
       }
@@ -234,11 +234,11 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const fetchCodes = useCallback(() => {
     switch (selectedTab.id) {
       case ResourceType.CONDITION:
-        return fetchConditionCodes
+        return () => Promise.resolve()
       case ResourceType.PROCEDURE:
-        return fetchProcedureCodes
+        return Promise.resolve()
       default:
-        return fetchClaimCodes
+        return Promise.resolve()
     }
   }, [selectedTab.id])
 

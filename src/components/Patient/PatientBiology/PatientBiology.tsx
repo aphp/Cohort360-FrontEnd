@@ -33,16 +33,13 @@ import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import List from 'components/ui/List'
 import TextInput from 'components/Filters/TextInput'
-import {
-  fetchLoincCodes as fetchLoincCodesApi,
-  fetchAnabioCodes as fetchAnabioCodesApi
-} from 'services/aphp/serviceBiology'
-import services from 'services/aphp'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { FhirItem } from 'types/hierarchy'
+import { getConfig } from 'config'
+import { getCodeList } from 'services/aphp/serviceValueSets'
 
 type PatientBiologyProps = {
   groupId?: string
@@ -62,7 +59,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<FhirItem[]>([])
   const {
     allSavedFilters,
     savedFiltersErrors,
@@ -150,7 +147,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
 
   useEffect(() => {
     const fetchEncounterStatusList = async () => {
-      const encounterStatus = await services.cohortCreation.fetchEncounterStatus()
+      const encounterStatus = await (await getCodeList(getConfig().core.valueSets.encounterStatus.url)).results
       setEncounterStatusList(encounterStatus)
     }
     fetchEncounterStatusList()
@@ -274,8 +271,8 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
       >
         {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-        <AnabioFilter name={FilterKeys.ANABIO} value={anabio} onFetch={fetchAnabioCodesApi} />
-        <LoincFilter name={FilterKeys.LOINC} value={loinc} onFetch={fetchLoincCodesApi} />
+        <AnabioFilter name={FilterKeys.ANABIO} value={anabio} onFetch={() => Promise.resolve()} />
+        <LoincFilter name={FilterKeys.LOINC} value={loinc} onFetch={() => Promise.resolve()} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
           sourceType={SourceType.BIOLOGY}
@@ -382,7 +379,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.ANABIO}
                     value={selectedSavedFilter?.filterParams.filters.anabio || []}
-                    onFetch={fetchAnabioCodesApi}
+                    onFetch={() => Promise.resolve()}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -390,7 +387,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.LOINC}
                     value={selectedSavedFilter?.filterParams.filters.loinc || []}
-                    onFetch={fetchLoincCodesApi}
+                    onFetch={() => Promise.resolve()}
                   />
                 </Grid>
                 <Grid item xs={12}>

@@ -30,7 +30,7 @@ import { CcamDataType, Comparators, SelectedCriteriaType } from 'types/requestCr
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
+import { Hierarchy, HierarchyElementWithSystem } from 'types/hierarchy'
 
 type CcamFormProps = {
   isOpen: boolean
@@ -70,13 +70,13 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
   const getCCAMOptions = async (searchValue: string, signal: AbortSignal) => {
     const ccamOptions = await services.cohortCreation.fetchCcamData(searchValue, false, signal)
 
-    return ccamOptions && ccamOptions.length > 0 ? ccamOptions : []
+    return ccamOptions && (ccamOptions.results || []).length > 0 ? ccamOptions : []
   }
 
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {
         const criteriaCode = criteriaData.data.ccamData
-          ? criteriaData.data.ccamData.find((g: Hierarchy<any, any>) => g.id === code.id)
+          ? criteriaData.data.ccamData.find((g: HierarchyElementWithSystem) => g.id === code.id)
           : null
         return {
           id: code.id,

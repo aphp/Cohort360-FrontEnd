@@ -30,7 +30,7 @@ import { Cim10DataType, Comparators, SelectedCriteriaType } from 'types/requestC
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
+import { Hierarchy, HierarchyElementWithSystem } from 'types/hierarchy'
 
 type Cim10FormProps = {
   isOpen: boolean
@@ -67,12 +67,12 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const [error, setError] = useState(Error.NO_ERROR)
 
   const getDiagOptions = async (searchValue: string, signal: AbortSignal) =>
-    await services.cohortCreation.fetchCim10Diagnostic(searchValue, false, signal)
+    await services.cohortCreation.fetchCim10Diagnostic(searchValue, signal)
 
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {
         const criteriaCode = criteriaData.data.cim10Diagnostic
-          ? criteriaData.data.cim10Diagnostic.find((c: Hierarchy<any, any>) => c.id === code.id)
+          ? criteriaData.data.cim10Diagnostic.find((c: HierarchyElementWithSystem) => c.id === code.id)
           : null
         return {
           id: code.id,
@@ -83,7 +83,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const defaultValuesType = currentState.diagnosticType
     ? currentState.diagnosticType.map((diagnosticType) => {
         const criteriaType = criteriaData.data.diagnosticTypes
-          ? criteriaData.data.diagnosticTypes.find((g: Hierarchy<any, any>) => g.id === diagnosticType.id)
+          ? criteriaData.data.diagnosticTypes.find((g: HierarchyElementWithSystem) => g.id === diagnosticType.id)
           : null
         return {
           id: diagnosticType.id,

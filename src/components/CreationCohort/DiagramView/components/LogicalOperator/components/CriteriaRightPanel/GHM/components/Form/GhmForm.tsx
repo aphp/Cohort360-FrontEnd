@@ -27,7 +27,7 @@ import { Comparators, GhmDataType, SelectedCriteriaType } from 'types/requestCri
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
+import { Hierarchy, HierarchyElementWithSystem } from 'types/hierarchy'
 
 type GHMFormProps = {
   isOpen: boolean
@@ -68,7 +68,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {
         const criteriaCode = criteriaData.data.ghmData
-          ? criteriaData.data.ghmData.find((g: Hierarchy<any, any>) => g.id === code.id)
+          ? criteriaData.data.ghmData.find((g: HierarchyElementWithSystem) => g.id === code.id)
           : null
         return {
           id: code.id,

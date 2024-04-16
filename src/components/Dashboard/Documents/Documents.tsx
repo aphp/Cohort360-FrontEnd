@@ -41,9 +41,9 @@ import { useAppDispatch, useAppSelector } from 'state'
 import Modal from 'components/ui/Modal'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { HierarchyWithLabelAndSystem } from 'types/hierarchy'
 
 type DocumentsProps = {
   groupId?: string
@@ -81,7 +81,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const [searchInputError, setSearchInputError] = useState<SearchInputError | null>(null)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyWithLabelAndSystem[]>([])
 
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)

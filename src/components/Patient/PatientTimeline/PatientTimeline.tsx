@@ -29,9 +29,9 @@ import services from 'services/aphp'
 import useStyles from './styles'
 import { Condition, DocumentReference, Encounter, Period, Procedure } from 'fhir/r4'
 import { FilterKeys, LabelObject } from 'types/searchCriterias'
-import { Hierarchy } from 'types/hierarchy'
 import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -166,10 +166,10 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   const [dialogDocuments, setDialogDocuments] = useState<CohortComposition[] | undefined>([])
   const [openFilter, setOpenFilter] = useState(false)
 
-  const [selectedTypes, setSelectedTypes] = useState<Hierarchy<any, any>[]>([])
+  const [selectedTypes, setSelectedTypes] = useState<HierarchyElementWithSystem[]>([])
   const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>([])
-  const [diagnosticTypesList, setDiagnosticTypesList] = useState<Hierarchy<any, any>[]>([])
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [diagnosticTypesList, setDiagnosticTypesList] = useState<HierarchyElementWithSystem[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElementWithSystem[]>([])
 
   const [loading, setLoading] = useState(false)
   const yearComponentSize: { [year: number]: number } = {}

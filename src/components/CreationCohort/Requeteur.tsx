@@ -82,7 +82,6 @@ const Requeteur = () => {
     }
     try {
       const criteriaCache = await getDataFromFetch(criteriaList(), selectedCriteria, criteriaData.cache)
-
       const allowMaternityForms = selectedPopulation?.every((population) => population?.access === 'Nominatif')
       const questionnairesEnabled = config.features.questionnaires.enabled
       dispatch(

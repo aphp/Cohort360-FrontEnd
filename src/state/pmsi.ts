@@ -4,11 +4,11 @@ import { RootState } from 'state'
 import { impersonate, login, logout } from 'state/me'
 
 import services from 'services/aphp'
-import { Hierarchy } from 'types/hierarchy'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 
 export type PmsiElementType = {
   loading: boolean
-  list: Hierarchy<any, any>[]
+  list: HierarchyElementWithSystem[]
   openedElement: string[]
 }
 
@@ -45,11 +45,16 @@ const initPmsiHierarchy = createAsyncThunk<PmsiState, void, { state: RootState }
       const state = getState().pmsi
       const { claim, condition, procedure } = state
 
-      const claimList = claim.list.length === 0 ? await services.cohortCreation.fetchGhmHierarchy('') : claim.list
+      const claimList =
+        claim.list.length === 0 ? (await services.cohortCreation.fetchGhmHierarchy('')).results || [] : claim.list
       const conditionList =
-        condition.list.length === 0 ? await services.cohortCreation.fetchCim10Hierarchy('') : condition.list
+        condition.list.length === 0
+          ? (await services.cohortCreation.fetchCim10Hierarchy('')).results || []
+          : condition.list
       const procedureList =
-        procedure.list.length === 0 ? await services.cohortCreation.fetchCcamHierarchy('') : procedure.list
+        procedure.list.length === 0
+          ? (await services.cohortCreation.fetchCcamHierarchy('')).results || []
+          : procedure.list
 
       return {
         ...state,
@@ -80,7 +85,7 @@ const fetchCondition = createAsyncThunk<PmsiElementType, void, { state: RootStat
   'pmsi/fetchCondition',
   async (DO_NOT_USE, { getState }) => {
     const state = getState().pmsi
-    const conditionList = await services.cohortCreation.fetchCim10Hierarchy('')
+    const conditionList: PmsiListType[] = (await services.cohortCreation.fetchCim10Hierarchy('')).results || []
 
     return {
       ...state.condition,
@@ -95,7 +100,7 @@ const fetchClaim = createAsyncThunk<PmsiElementType, void, { state: RootState }>
   'pmsi/fetchClaim',
   async (DO_NOT_USE, { getState }) => {
     const state = getState().pmsi
-    const claimList = await services.cohortCreation.fetchGhmHierarchy('')
+    const claimList: PmsiListType[] = (await services.cohortCreation.fetchGhmHierarchy('')).results || []
 
     return {
       ...state.claim,
@@ -110,7 +115,7 @@ const fetchProcedure = createAsyncThunk<PmsiElementType, void, { state: RootStat
   'pmsi/fetchProcedure',
   async (DO_NOT_USE, { getState }) => {
     const state = getState().pmsi
-    const procedureList = await services.cohortCreation.fetchCcamHierarchy('')
+    const procedureList: PmsiListType[] = (await services.cohortCreation.fetchCcamHierarchy('')).results || []
 
     return {
       ...state.procedure,
@@ -124,7 +129,7 @@ const fetchProcedure = createAsyncThunk<PmsiElementType, void, { state: RootStat
 type ExpandPmsiElementParams = {
   rowId: string
   keyElement: 'claim' | 'condition' | 'procedure'
-  selectedItems?: Hierarchy<any, any>[]
+  selectedItems?: HierarchyElementWithSystem[]
 }
 
 const expandPmsiElement = createAsyncThunk<PmsiState, ExpandPmsiElementParams, { state: RootState }>(
@@ -144,22 +149,24 @@ const expandPmsiElement = createAsyncThunk<PmsiState, ExpandPmsiElementParams, {
     } else {
       _openedElement = [..._openedElement, rowId]
 
-      const replaceSubItems = async (items: Hierarchy<any, any>[]) => {
-        let _items: Hierarchy<any, any>[] = []
+      const replaceSubItems = async (items: HierarchyElementWithSystem[]) => {
+        let _items: HierarchyElementWithSystem[] = []
         for (let item of items) {
           // Replace sub items element by response of back-end
           if (item.id === rowId) {
-            const foundItem = item.subItems ? item.subItems.find((i: Hierarchy<any, any>) => i.id === 'loading') : true
+            const foundItem = item.subItems
+              ? item.subItems.find((i: HierarchyElementWithSystem) => i.id === 'loading')
+              : true
             if (foundItem) {
-              let subItems: Hierarchy<any, any>[] = []
+              let subItems: HierarchyElementWithSystem[] = []
               if (keyElement === 'claim') {
-                subItems = await services.cohortCreation.fetchGhmHierarchy(item.id)
+                subItems = (await services.cohortCreation.fetchGhmHierarchy(item.id)).results || []
               }
               if (keyElement === 'condition') {
-                subItems = await services.cohortCreation.fetchCim10Hierarchy(item.id)
+                subItems = (await services.cohortCreation.fetchCim10Hierarchy(item.id)).results || []
               }
               if (keyElement === 'procedure') {
-                subItems = await services.cohortCreation.fetchCcamHierarchy(item.id)
+                subItems = (await services.cohortCreation.fetchCcamHierarchy(item.id)).results || []
               }
 
               item = { ...item, subItems: subItems }
