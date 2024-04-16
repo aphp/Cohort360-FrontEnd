@@ -1,14 +1,16 @@
 import {
   AccessExpiration,
   AccessExpirationsProps,
+  Back_API_Response,
   ChartCode,
   CohortData,
   CustomError,
   FindScope,
   ScopeElement,
-  ScopePage,
+  ReadRightPerimeter,
   ScopeTreeRow,
-  ScopeType
+  ScopeType,
+  PerimeterRights
 } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import {
@@ -29,10 +31,10 @@ import {
 
 import { AxiosResponse } from 'axios'
 import { Group } from 'fhir/r4'
-import { LOADING, sortByQuantityAndName } from 'utils/scopeTree'
 import scopeTypes from '../../data/scope_type.json'
 import apiBackend from '../apiBackend'
 import { isCustomError } from 'utils/perimeters'
+import { Hierarchy } from '../../types/hierarchy'
 
 export interface IServicePerimeters {
   /**
@@ -78,14 +80,22 @@ export interface IServicePerimeters {
    * Retour:
    *   - IOrganization[]
    */
-  getPerimeters: (
-    defaultPerimetersIds?: string[],
-    cohortIds?: string[],
-    noPerimetersIdsFetch?: boolean,
-    type?: ScopeType,
-    isExecutiveUnit?: boolean,
+
+  mapRightsToScopeElement: (item: ReadRightPerimeter) => ScopeElement
+
+  mapPerimeterToScopeElement: (item: ScopeElement) => ScopeElement
+
+  getRights: (
+    practitionerId: string,
+    childrenIds?: string,
     signal?: AbortSignal
-  ) => Promise<ScopePage[] | CustomError>
+  ) => Promise<Back_API_Response<ScopeElement>>
+
+  getPerimeters: (
+    practitionerId: string,
+    childrenIds?: string,
+    signal?: AbortSignal
+  ) => Promise<Back_API_Response<ScopeElement>>
 
   getAccessExpirations: (accessExpirationsProps: AccessExpirationsProps) => Promise<AccessExpiration[]>
 
@@ -103,7 +113,7 @@ export interface IServicePerimeters {
     type?: ScopeType,
     isExecutiveUnit?: boolean,
     signal?: AbortSignal
-  ) => Promise<ScopeTreeRow[]>
+  ) => Promise<Back_API_Response<ReadRightPerimeter>>
 
   /**
    * Cette fonction retoune l'ensemble des périmètres enfant d'un périmètre passé en argument
@@ -145,20 +155,20 @@ export interface IServicePerimeters {
    * construire une liste de ScopeTreeTableRow à travers une liste de ScopePage
    */
   buildScopeTreeRowList: (
-    subScopes: ScopePage[],
+    subScopes: ReadRightPerimeter[],
     getSubItem?: boolean | undefined,
     type?: ScopeType,
     isExecutiveUnit?: boolean,
     signal?: AbortSignal
-  ) => Promise<ScopeTreeRow[]>
+  ) => Promise<Hierarchy<ReadRightPerimeter, string>[]>
 
-  buildScopeTreeRowItem: (scopeElement: ScopeElement, type?: string) => ScopeTreeRow
+  buildPerimeter: (scopeElement: ScopeElement) => ScopeElement
 
   /**
    * à travers un ScopePage on retourne 'Nominatif' ou 'Pseudonymisé' selon les droits d'accès
    * @param perimeterItem
    */
-  getAccessFromScope: (perimeterItem: ScopePage) => string
+  getAccessFromScope: (perimeterItem: ScopeElement) => string
 
   /**
    * constuire le nom du périmètre à travers l'id, le nom et la source_value
@@ -267,7 +277,7 @@ const servicesPerimeters: IServicePerimeters = {
       const scopeItemList = await servicesPerimeters.getPerimeters(undefined, [cohortId], true)
 
       if (!isCustomError(scopeItemList)) {
-        const scopeTreeRowList = await servicesPerimeters.buildScopeTreeRowList(scopeItemList)
+        const scopeTreeRowList = await servicesPerimeters.buildScopeTreeRowList(scopeItemList.results)
         return scopeTreeRowList && scopeTreeRowList.length > 0 ? scopeTreeRowList[0] : undefined
       } else {
         return undefined
@@ -277,92 +287,107 @@ const servicesPerimeters: IServicePerimeters = {
     }
   },
 
-  getPerimeters: async (
-    defaultPerimetersIds?: string[],
-    cohortIds?: string[],
-    noPerimetersIdsFetch?: boolean,
-    type?: ScopeType,
-    isExecutiveUnit?: boolean,
-    signal?: AbortSignal
-  ): Promise<ScopePage[] | CustomError> => {
-    try {
-      const noRightsMessage = 'No accesses with read patient right found'
-      let perimetersIds: string[] | undefined = []
-      let rightsData: any
-      if (!defaultPerimetersIds && !noPerimetersIdsFetch) {
-        const url: string = isExecutiveUnit
-          ? 'accesses/perimeters/?type_source_value=' + servicesPerimeters.getHigherTypes()[0]
-          : 'accesses/perimeters/patient-data/rights/'
-        const rightResponse = await apiBackend.get(url, { signal: signal })
-        if (
-          rightResponse.status === 200 &&
-          (rightResponse.data.message === noRightsMessage || Object.keys(rightResponse.data).length === 0)
-        ) {
-          const noRightError: CustomError = {
-            errorType: 'noRight'
-          }
-          return noRightError
-        }
-        rightsData = rightResponse.status === 200 ? rightResponse?.data : ''
+  mapRightsToScopeElement: (item: ReadRightPerimeter): ScopeElement => {
+    const {
+      perimeter,
+      read_role,
+      right_read_patient_nominative,
+      right_read_patient_pseudonymized,
+      right_search_patients_by_ipp
+    } = item
 
-        if (rightResponse.status !== 200) {
-          const backError: CustomError = {
-            errorType: 'back'
-          }
-          return backError
-        } else if (rightsData && rightsData.length === 0) {
-          return []
-        }
-
-        perimetersIds = rightsData.results.map((rightData: any) =>
-          isExecutiveUnit ? rightData.id : rightData.perimeter.id
-        )
-      } else {
-        perimetersIds = defaultPerimetersIds
+    return {
+      ...perimeter,
+      id: perimeter.id.toString(),
+      rights: {
+        read_role,
+        right_read_patient_nominative,
+        right_read_patient_pseudonymized,
+        right_search_patients_by_ipp,
+        read_access: right_read_patient_nominative ? 'DATA_NOMINATIVE' : 'DATA_PSEUDOANONYMISED',
+        export_access: 'DATA_PSEUDOANONYMISED'
       }
-
-      const higherTypes: string[] = servicesPerimeters.getHigherTypes(type)
-
-      const perimetersListResponse = await fetchScope({
-        perimetersIds: perimetersIds,
-        cohortIds: cohortIds,
-        isExecutiveUnit,
-        type: higherTypes
-      })
-
-      if (!perimetersListResponse || !perimetersListResponse.data || !perimetersListResponse.data.results) {
-        console.error(
-          'Error (getPerimeters) while fetching perimeter (from back) ! perimeters = {}, cohortIds = {}',
-          perimetersIds ?? '',
-          cohortIds ?? ''
-        )
-        return []
-      }
-      const perimetersList = perimetersListResponse.data.results.map((perimeterItem) => {
-        let read_access = undefined
-        if (!defaultPerimetersIds && !isExecutiveUnit) {
-          const foundRight = rightsData?.results?.find(
-            (rightData: any) => rightData.perimeter.id === +(perimeterItem.perimeter.id ?? '0')
-          )
-          read_access = foundRight?.right_read_patient_nominative ? 'DATA_NOMINATIVE' : 'DATA_PSEUDOANONYMISED'
-        }
-        const export_access = 'DATA_PSEUDOANONYMISED' // Impossible de faire un export de donnée sur un périmètre
-
-        // perimeterItem.perimeter = removeSpace(perimeterItem.perimeter)
-
-        return {
-          ...perimeterItem,
-          ...{ read_access: read_access, export_access: export_access }
-        }
-      })
-
-      return perimetersList
-    } catch (error) {
-      const fhirError: CustomError = {
-        errorType: 'fhir'
-      }
-      return fhirError
     }
+  },
+
+  mapPerimeterToScopeElement: (item: ScopeElement): ScopeElement => {
+    const {
+      id,
+      name,
+      source_value,
+      parent_id,
+      type,
+      above_levels_ids,
+      inferior_levels_ids,
+      cohort_id,
+      cohort_size,
+      full_path
+    } = item
+
+    return {
+      id: id.toString(),
+      name,
+      source_value,
+      parent_id,
+      type,
+      above_levels_ids,
+      inferior_levels_ids,
+      cohort_id,
+      cohort_size,
+      full_path
+    }
+  },
+
+  getRights: async (
+    practitionerId: string,
+    childrenIds?: string,
+    signal?: AbortSignal
+  ): Promise<Back_API_Response<ScopeElement>> => {
+    const response: Back_API_Response<ScopeElement> = { results: [], count: 0 }
+    if (practitionerId) {
+      try {
+        let url = 'accesses/perimeters/patient-data/rights/'
+        if (childrenIds) url += `?local_id=${childrenIds}`
+        const backendResponse = await apiBackend.get<Back_API_Response<ReadRightPerimeter>>(url, { signal: signal })
+        if (backendResponse.status !== 200 || Object.keys(backendResponse.data).length === 0) return response
+        const mappedElement = backendResponse.data.results.map((item) =>
+          servicesPerimeters.mapRightsToScopeElement(item)
+        )
+        return {
+          ...backendResponse.data,
+          results: mappedElement
+        }
+      } catch (error) {
+        return response
+      }
+    }
+    return response
+  },
+
+  getPerimeters: async (
+    practitionerId: string,
+    childrenIds?: string,
+    signal?: AbortSignal
+  ): Promise<Back_API_Response<ScopeElement>> => {
+    const response: Back_API_Response<ScopeElement> = { results: [], count: 0 }
+    if (practitionerId) {
+      try {
+        let url: string = 'accesses/perimeters/?type_source_value=' + servicesPerimeters.getHigherTypes()[0]
+        if (childrenIds) url += `local_id=${childrenIds}`
+        const backendResponse = await apiBackend.get<Back_API_Response<ScopeElement>>(url, { signal: signal })
+        if (backendResponse.status !== 200 || Object.keys(backendResponse.data).length === 0) return response
+        const mappedElement = backendResponse.data.results.map((item) =>
+          servicesPerimeters.mapPerimeterToScopeElement(item)
+        )
+        return {
+          ...backendResponse.data,
+          results: mappedElement
+        }
+      } catch (error) {
+        return response
+      }
+    }
+    return response
   },
 
   getAccessExpirations: async (accessExpirationsProps: AccessExpirationsProps) => {
@@ -380,31 +405,20 @@ const servicesPerimeters: IServicePerimeters = {
     }
   },
 
-  getScopePerimeters: async (practitionerId, type?: ScopeType, isExecutiveUnit?: boolean, signal?: AbortSignal) => {
-    if (!practitionerId) return []
-
-    const scopeItemList = await servicesPerimeters.getPerimeters(
-      undefined,
-      undefined,
-      undefined,
-      type,
-      isExecutiveUnit,
-      signal
-    )
-
-    if (!isCustomError(scopeItemList)) {
-      const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
-        scopeItemList,
-        undefined,
-        type,
-        isExecutiveUnit,
-        signal
-      )
-      return scopeTreeRowList
+  /*getScopePerimeters: async (practitionerId, type?: ScopeType, isExecutiveUnit?: boolean, signal?: AbortSignal) => {
+    if (practitionerId && !isExecutiveUnit) {
+      const response = await servicesPerimeters.getPerimeters(signal)
+      if (!isCustomError(response)) {
+        response.results = response.results.map((item) => ({
+          ...item,
+          id: item.id,
+          perimeter: servicesPerimeters.buildPerimeter(item)
+        }))
+        return response
+      }
     }
-
-    return []
-  },
+    return { results: [], count: 0 }
+  },*/
 
   getScopesWithSubItems: async (
     subScopesIds: string | null | undefined,
@@ -425,7 +439,7 @@ const servicesPerimeters: IServicePerimeters = {
 
     if (!isCustomError(subScopes)) {
       const scopeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
-        subScopes,
+        subScopes.results,
         getSubItem,
         type,
         isExecutiveUnit,
@@ -501,26 +515,26 @@ const servicesPerimeters: IServicePerimeters = {
       )
       result = {
         scopeTreeRows: newPerimetersList,
-        count: backCohortResponse.data.count
+        count: backCohortResponse.data.count ?? 0
       }
     }
     result.aborted = signal?.aborted
     return result
   },
 
-  buildScopeTreeRowList: async (
+  /*buildScopeTreeRowList: async (
     subScopes: (ScopePage | ScopeElement)[],
     getSubItem?: boolean | undefined,
     type?: ScopeType,
     isExecutiveUnit?: boolean,
     signal?: AbortSignal
   ) => {
-    let scopeRowList: ScopeTreeRow[] = []
+    let scopeRowList: Hierarchy<ScopePage, string>[] = []
     for (const scopeItem of subScopes) {
       const itemScopeElement: ScopeElement = isExecutiveUnit
         ? (scopeItem as ScopeElement)
         : (scopeItem as ScopePage).perimeter
-      const scopeRowItem = servicesPerimeters.buildScopeTreeRowItem(itemScopeElement)
+      const scopeRowItem = servicesPerimeters.buildPerimeter(itemScopeElement)
       scopeRowItem.access = isExecutiveUnit ? undefined : servicesPerimeters.getAccessFromScope(scopeItem as ScopePage)
       scopeRowItem.subItems =
         getSubItem === true
@@ -536,24 +550,21 @@ const servicesPerimeters: IServicePerimeters = {
     }
     scopeRowList = sortByQuantityAndName(scopeRowList)
     return scopeRowList
+  },*/
+
+  buildPerimeter: (scopeElement: ScopeElement) => {
+    return {
+      ...scopeElement,
+      name: servicesPerimeters.getScopeName(scopeElement),
+      above_levels_ids: scopeElement.above_levels_ids?.replace(/\s/g, ''),
+      inferior_levels_ids: scopeElement.inferior_levels_ids?.replace(/\s/g, ''),
+      parent_id: scopeElement.parent_id?.replace(/\s/g, '')
+    }
   },
 
-  buildScopeTreeRowItem: (scopeElement: ScopeElement) => {
-    const scopeRowItem: ScopeTreeRow = { id: '', name: '', quantity: 0, subItems: [LOADING] }
-    scopeRowItem.id = scopeElement.id?.toString().replace(/\s/g, '')
-    scopeRowItem.cohort_id = scopeElement.cohort_id?.replace(/\s/g, '')
-    scopeRowItem.name = servicesPerimeters.getScopeName(scopeElement)
-    scopeRowItem.full_path = scopeElement.full_path
-    scopeRowItem.quantity = +scopeElement.cohort_size
-    scopeRowItem.above_levels_ids = scopeElement.above_levels_ids?.replace(/\s/g, '')
-    scopeRowItem.inferior_levels_ids = scopeElement.inferior_levels_ids?.replace(/\s/g, '')
-    scopeRowItem.type = scopeElement.type
-    scopeRowItem.parentId = scopeElement.parent_id?.replace(/\s/g, '')
-    return scopeRowItem
-  },
-
-  getAccessFromScope: (perimeterItem: ScopePage) => {
-    return perimeterItem.read_access === 'DATA_NOMINATIVE' || perimeterItem.right_read_patient_nominative === true
+  getAccessFromScope: (perimeterItem: ScopeElement) => {
+    return perimeterItem.rights?.read_access === 'DATA_NOMINATIVE' ||
+      perimeterItem.rights?.right_read_patient_nominative === true
       ? 'Nominatif'
       : 'Pseudonymisé'
   },

@@ -51,13 +51,7 @@ const ScopeTreeTableRow: React.FC<ScopeTreeTableRowProps> = (props: ScopeTreeTab
           </TableCell>
         </TableRow>
       ) : (
-        <TableRow
-          hover
-          key={row.id}
-          classes={{
-            root: level % 2 === 0 ? classes.mainRow : classes.secondRow
-          }}
-        >
+        <TableRow hover key={row.id}>
           <TableCell>
             {(row.subItems?.length ?? 0) > 0 && (!isSearchMode || row.type !== executiveUnitType) && (
               <IconButton

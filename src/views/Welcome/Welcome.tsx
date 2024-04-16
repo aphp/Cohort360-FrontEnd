@@ -17,7 +17,7 @@ import { initMedicationHierarchy } from 'state/medication'
 import { initBiologyHierarchy } from 'state/biology'
 import { fetchScopesList } from 'state/scope'
 
-import { AccessExpiration, RequestType } from 'types'
+import { AccessExpiration, Back_API_Response, RequestType, ReadRightPerimeter } from 'types'
 
 import useStyles from './styles'
 import PreviewCard from 'components/ui/Cards/PreviewCard'
@@ -26,6 +26,7 @@ import { CohortsType } from 'types/cohorts'
 import { Direction, Order } from 'types/searchCriterias'
 import CohortsTable from 'components/CohortsTable'
 import RequestsTable from 'components/Requests/PreviewTable'
+import apiBackend from 'services/apiBackend'
 
 const Welcome: React.FC = () => {
   const { classes, cx } = useStyles()
@@ -81,7 +82,18 @@ const Welcome: React.FC = () => {
     dispatch(initBiologyHierarchy())
     dispatch(fetchScopesList({}))
     fetchCohortsPreview()
+    fetchScopeList()
   }, [])
+
+  const scopeState = useAppSelector((state) => state.scope)
+
+  const fetchScopeList = async () => {
+    const rightResponse = await apiBackend.get<Back_API_Response<ReadRightPerimeter>>(
+      'accesses/perimeters/patient-data/rights/?limit=-1'
+    )
+    const rightResponse2 = await apiBackend.get<Back_API_Response<ReadRightPerimeter>>('accesses/perimeters/?limit=-1')
+    // dispatch(fetchScopesList({}))
+  }
 
   useEffect(() => {
     const _lastRequest =

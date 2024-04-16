@@ -96,8 +96,10 @@ export type FHIR_API_Promise_Response<T extends Resource> = Promise<AxiosRespons
 export type FHIR_Bundle_Promise_Response<T extends FhirResource> = FHIR_API_Promise_Response<Bundle<T>>
 
 export type Back_API_Response<T> = {
-  results?: T[]
-  count?: number
+  results: T[]
+  next?: string
+  previous?: string
+  count: number
 }
 
 export type User = {
@@ -184,6 +186,7 @@ export enum Month {
 
 export type AbstractTree<T> = T & {
   id: string
+  status?: SelectedStatus
   subItems?: AbstractTree<T>[]
 }
 
@@ -722,25 +725,26 @@ export type HierarchyElement<E = {}> = E & {
   id: string
   label: string
   subItems?: HierarchyElement[]
+  status?: SelectedStatus
 }
 
 export type HierarchyElementWithSystem = HierarchyElement<{ system?: string }>
 
 export type TreeElement = { id: string; subItems: TreeElement[] }
 export type ScopeElement = {
-  id: number
+  id: string
   name: string
   source_value: string
-  parent_id: string | null
+  parent_id: string
   type: string
   above_levels_ids: string
   inferior_levels_ids: string
   cohort_id: string
   cohort_size: string
   full_path: string
+  rights?: PerimeterRights
 }
-export type ScopePage = {
-  perimeter: ScopeElement
+export type PerimeterRights = {
   read_role: string
   right_read_patient_nominative: boolean
   right_read_patient_pseudonymized: boolean
@@ -749,11 +753,23 @@ export type ScopePage = {
   read_export?: string
   export_access?: string
 }
+
+export type ReadRightPerimeter = {
+  id: number
+  perimeter: ScopeElement
+  read_role: string
+  right_read_patient_nominative: boolean
+  right_read_patient_pseudonymized: boolean
+  right_search_patients_by_ipp: boolean
+  read_access?: string
+  export_access?: string
+}
+
 export type IScope = {
   count: number
   next: string | null
   previous: string | null
-  results: ScopePage[]
+  results: ReadRightPerimeter[]
 }
 
 export type GroupRights = {
@@ -889,4 +905,10 @@ export type SavedFilter = {
   name: string
   owner: string
   uuid: string
+}
+
+export enum SelectedStatus {
+  SELECTED,
+  NOT_SELECTED,
+  INDETERMINATE
 }

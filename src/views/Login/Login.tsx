@@ -175,7 +175,7 @@ const Login = () => {
         return setNoRights(true)
       }
     } else {
-      const nominativeGroupsIds = practitionerPerimeters
+      const nominativeGroupsIds = practitionerPerimeters.results
         .filter((perimeterItem) => perimeterItem.read_access === 'DATA_NOMINATIVE')
         .map((practitionerPerimeter) => practitionerPerimeter.perimeter.cohort_id)
         .filter((item) => item)

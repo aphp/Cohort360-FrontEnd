@@ -4,9 +4,8 @@ export default makeStyles()(() => ({
   container: {
     background: 'white'
   },
-  mainRow: {},
-  secondRow: {
-    background: '#f3f5f9'
+  expandIcon: {
+    padding: '0 0 0 8px'
   },
   loadingSpinnerContainer: {
     display: 'flex',
@@ -24,8 +23,14 @@ export default makeStyles()(() => ({
   tableHeadCell: {
     fontSize: 11,
     fontWeight: 'bold',
+    color: '#0063AF'
+  },
+  emptyTableHeadCell: {
+    width: '42px',
+    fontSize: 11,
+    fontWeight: 'bold',
     color: '#0063AF',
-    padding: '0 20px'
+    padding: 0
   },
   pagination: {
     float: 'right',

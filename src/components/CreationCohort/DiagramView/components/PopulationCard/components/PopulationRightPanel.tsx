@@ -25,7 +25,6 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
   const { classes } = useStyles()
 
   const [_selectedPopulation, _setSelectedPopulation] = useState<ScopeTreeRow[]>(selectedPopulation)
-  const [openPopulation, setOpenPopulations] = useState<number[]>([])
 
   /**
    * Render
@@ -38,11 +37,11 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
         </div>
         <div className={classes.drawerContentContainer}>
           <ScopeTree
-            selectedItems={_selectedPopulation}
+            //selectedIds=""
+            selectedIds={'8312016825,8312077037,8312085055,8312016350,8312076084,16180131083'}
             setSelectedItems={_setSelectedPopulation}
-            openPopulation={openPopulation}
-            setOpenPopulations={setOpenPopulations}
             executiveUnitType={executiveUnitType}
+            isExecutiveUnit={!!executiveUnitType}
           />
         </div>
 

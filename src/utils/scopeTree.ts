@@ -1,8 +1,13 @@
 import services from 'services/aphp'
 import { RootState } from 'state'
-import { ExpandScopeElementParamsType, ScopeElement, ScopeListType, ScopeTreeRow, ScopeType } from 'types'
-
-export const LOADING: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
+import {
+  ExpandScopeElementParamsType,
+  ScopeElement,
+  ScopeListType,
+  ReadRightPerimeter,
+  ScopeTreeRow,
+  ScopeType
+} from 'types'
 
 export const buildScopeList = (
   oldScopeList: ScopeListType,

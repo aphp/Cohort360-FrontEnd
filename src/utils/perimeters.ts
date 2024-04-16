@@ -1,5 +1,5 @@
-import { CustomError, ScopePage } from 'types'
+import { Back_API_Response, CustomError } from 'types'
 
-export const isCustomError = (response: ScopePage[] | CustomError): response is CustomError => {
+export const isCustomError = <T>(response: Back_API_Response<T> | CustomError): response is CustomError => {
   return response && !!(response as CustomError).errorType
 }

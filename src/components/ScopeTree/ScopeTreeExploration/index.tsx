@@ -50,10 +50,10 @@ const Index = (props: ScopeTreeExplorationProps) => {
   const scopesList: ScopeTreeRow[] = getCurrentScopeList(scopeState.scopesList, isExecutiveUnit) ?? []
   const [rootRows, setRootRows] = useState<ScopeTreeRow[]>(scopesList)
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false)
-  const [page, setPage] = useState(1)
-  const [count, setCount] = useState(0)
+  //const [page, setPage] = useState(1)
+  //const [count, setCount] = useState(0)
   const [isEmpty, setIsEmpty] = useState<boolean>(!rootRows || rootRows.length === 0)
-  const [openPopulation, setOpenPopulations] = useState<number[]>([])
+  const [open, setOpen] = useState<number[]>([])
 
   const isHeadChecked: boolean = rootRows.length > 0 && rootRows.every((item) => isSearchSelected(item, selectedItems))
   const isHeadIndeterminate: boolean =
@@ -76,20 +76,20 @@ const Index = (props: ScopeTreeExplorationProps) => {
   )
   const headCells = getHeadCells(headCheckbox, executiveUnitType)
 
-  useEffect(() => {
+  /*useEffect(() => {
     init(
       setIsSearchLoading,
       controllerRef,
       rootRows,
       setRootRows,
-      setOpenPopulations,
+      setOpen,
       setCount,
       setIsEmpty,
       dispatch,
       executiveUnitType,
       !!executiveUnitType
     )
-  }, [])
+  }, [])*/
 
   return (
     <div className={classes.container}>
@@ -127,14 +127,14 @@ const Index = (props: ScopeTreeExplorationProps) => {
                       row={row}
                       level={0}
                       parentAccess={row.access ?? '-'}
-                      openPopulation={openPopulation}
+                      openPopulation={open}
                       labelId={`enhanced-table-checkbox-${index}`}
                       onExpand={(rowId: number) =>
                         onExpand(
                           rowId,
                           controllerRef,
-                          openPopulation,
-                          setOpenPopulations,
+                          open,
+                          setOpen,
                           rootRows,
                           setRootRows,
                           selectedItems,
@@ -163,15 +163,7 @@ const Index = (props: ScopeTreeExplorationProps) => {
                   )
                 }}
               </EnhancedTable>
-              {
-                <Pagination
-                  className={classes.pagination}
-                  count={Math.ceil((count ?? 0) / 100)}
-                  shape="circular"
-                  onChange={(event, page: number) => setPage && setPage(page)}
-                  page={page}
-                />
-              }
+              {}
             </>
           )}
         </>

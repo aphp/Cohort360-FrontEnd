@@ -5,17 +5,17 @@ import {
   BiologyStatus,
   FHIR_API_Promise_Response,
   FHIR_API_Response,
+  FHIR_Bundle_Response,
   FHIR_Bundle_Promise_Response,
   HierarchyElement,
   HierarchyElementWithSystem,
-  IScope,
   Back_API_Response,
   Cohort,
   DataRights,
-  CohortRights
+  CohortRights,
+  ReadRightPerimeter
 } from 'types'
 
-import { FHIR_Bundle_Response } from 'types'
 import { AxiosError, AxiosResponse } from 'axios'
 import apiBackend from '../apiBackend'
 import {
@@ -1098,7 +1098,10 @@ type fetchScopeProps = {
   offset?: number
   limit?: number
 }
-export const fetchScope: (args: fetchScopeProps, signal?: AbortSignal) => Promise<AxiosResponse<IScope>> = async (
+export const fetchScope: (
+  args: fetchScopeProps,
+  signal?: AbortSignal
+) => Promise<AxiosResponse<Back_API_Response<ReadRightPerimeter>>> = async (
   args: fetchScopeProps,
   signal?: AbortSignal
 ) => {
@@ -1114,9 +1117,12 @@ export const fetchScope: (args: fetchScopeProps, signal?: AbortSignal) => Promis
   if (type && type.length > 0) options = [...options, `type_source_value=${type.join(',')}`]
 
   const url: string = isExecutiveUnit ? 'accesses/perimeters/?' : 'accesses/perimeters/patient-data/rights/?'
-  const response: AxiosResponse<IScope> = await apiBackend.get(`${url}${options.reduce(paramsReducer)}`, {
-    signal: signal
-  })
+  const response: AxiosResponse<Back_API_Response<ReadRightPerimeter>> = await apiBackend.get(
+    `${url}${options.reduce(paramsReducer)}`,
+    {
+      signal: signal
+    }
+  )
   return response
 }
 
