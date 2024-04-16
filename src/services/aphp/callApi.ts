@@ -899,8 +899,8 @@ const getCodeList = async (
     // if search is * then we fetch the roots of the valueSet
     if (search !== '*' && search !== undefined) {
       // if noStar is true then we search for the code, else we search for the display
-      searchParam = `&only-roots=false&_tag=text-search-rank&${noStar ? 'code' : '_text'}=${encodeURIComponent(
-        search.trim().replace(/[\[\]\/\{\}\(\)\*\?\.\\\^\$\|]/g, '\\$&') //eslint-disable-line
+      searchParam = `&only-roots=false&${noStar ? 'code' : '_tag=text-search-rank&_text'}=${encodeURIComponent(
+        search.trim()
       )}`
     }
     // TODO test if it returns all the codes without specifying the count
