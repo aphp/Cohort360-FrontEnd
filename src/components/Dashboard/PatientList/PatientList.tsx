@@ -149,7 +149,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [genders, vitalStatuses, birthdatesRanges, orderBy, searchBy, searchInput])
+  }, [genders, vitalStatuses, birthdatesRanges, orderBy, searchBy, searchInput, groupId])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)

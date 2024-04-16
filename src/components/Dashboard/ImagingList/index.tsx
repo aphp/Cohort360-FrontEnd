@@ -145,7 +145,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [ipp, nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality])
+  }, [ipp, nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality, groupId])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
