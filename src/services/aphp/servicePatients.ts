@@ -396,23 +396,23 @@ const servicesPatients: IServicePatients = {
     const agePyramidData =
       myPatientsResp.data.resourceType === 'Bundle'
         ? getAgeRepartitionMapAphp(
-            myPatientsResp.data.meta?.extension?.filter((facet) => facet.url === ChartCode.agePyramid)?.[0].extension
+            myPatientsResp.data.meta?.extension?.filter((facet) => facet?.url === ChartCode?.agePyramid)?.[0]?.extension
           )
         : undefined
 
     const genderRepartitionMap =
       myPatientsResp.data.resourceType === 'Bundle'
         ? getGenderRepartitionMapAphp(
-            myPatientsResp.data.meta?.extension?.filter((facet) => facet.url === ChartCode.genderRepartition)?.[0]
-              .extension
+            myPatientsResp.data.meta?.extension?.filter((facet) => facet?.url === ChartCode?.genderRepartition)?.[0]
+              ?.extension
           )
         : undefined
 
     const monthlyVisitData =
       myPatientsEncounters.data.resourceType === 'Bundle'
         ? getVisitRepartitionMapAphp(
-            myPatientsEncounters.data.meta?.extension?.filter((facet) => facet.url === ChartCode.monthlyVisits)?.[0]
-              .extension
+            myPatientsEncounters.data.meta?.extension?.filter((facet) => facet?.url === ChartCode?.monthlyVisits)?.[0]
+              ?.extension
           )
         : undefined
 
@@ -420,8 +420,8 @@ const servicesPatients: IServicePatients = {
       myPatientsEncounters.data.resourceType === 'Bundle'
         ? getEncounterRepartitionMapAphp(
             myPatientsEncounters.data.meta?.extension?.filter(
-              (facet) => facet.url === ChartCode.visitTypeRepartition
-            )?.[0].extension
+              (facet) => facet?.url === ChartCode?.visitTypeRepartition
+            )?.[0]?.extension
           )
         : undefined
 
