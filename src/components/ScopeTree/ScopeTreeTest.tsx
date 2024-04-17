@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react'
 
-import { Breadcrumbs, Checkbox, ListItem, TableCell, TableRow, Typography } from '@mui/material'
+import { Checkbox, ListItem, TableCell, TableRow, Typography } from '@mui/material'
 import useStyles from './styles'
 import { ScopeElement, SelectedStatus } from 'types'
 import { Hierarchy } from 'types/hierarchy'
@@ -12,7 +12,7 @@ type HierarchyItemProps = {
   item: Hierarchy<ScopeElement, string>
   path: number[]
   onSelect: (path: number[], toAdd: boolean) => void
-  onExpand: (path: number[], id: string) => void
+  onExpand: (id: string, path: number[]) => void
 }
 
 const ScopeTreeItem = ({ item, path, onSelect, onExpand }: HierarchyItemProps) => {
@@ -23,7 +23,7 @@ const ScopeTreeItem = ({ item, path, onSelect, onExpand }: HierarchyItemProps) =
   const isSearchMode = false
 
   useEffect(() => {
-    if (open === true && !subItems) onExpand(path, inferior_levels_ids)
+    if (open === true && !subItems) onExpand(inferior_levels_ids, path)
   }, [open])
 
   return (
@@ -121,20 +121,20 @@ const ScopeTreeItem = ({ item, path, onSelect, onExpand }: HierarchyItemProps) =
 
 type HierarchyProps = {
   hierarchy: Hierarchy<ScopeElement, string>[]
-  onExpand: (index: number[], parentCode: string) => void
+  onExpand: (parentCode: string, index: number[]) => void
   onSelect: (path: number[], toAdd: boolean) => void
 }
 
 const ScopeTree = ({ hierarchy, onSelect, onExpand }: HierarchyProps) => {
   return (
     // <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-    <>
+    <Fragment>
       {hierarchy
         /*.sort((a, b) => a.source_value.localeCompare(b.source_value))*/
         .map((item, index) => {
           return <ScopeTreeItem path={[index]} key={item.id} item={item} onExpand={onExpand} onSelect={onSelect} />
         })}
-    </>
+    </Fragment>
     // </List>
   )
 }

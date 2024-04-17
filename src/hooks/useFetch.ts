@@ -18,20 +18,20 @@ export const useFetch = <T>(options: FetchOptions, fetchCall: () => Promise<Back
   const [error, setError] = useState('')
   const [fetchStatus, setLoadingStatus] = useState(LoadingStatus.IDDLE)
 
-  const handleFetchCall = async () => {
-    const response = await fetchCall()
-    if (isAxiosError(response)) {
-      setError(response.message)
-    }
-    setLoadingStatus(LoadingStatus.SUCCESS)
-    setResponse(response)
-  }
-
   useEffect(() => {
     setLoadingStatus(LoadingStatus.FETCHING)
   }, [options])
 
   useEffect(() => {
+    const handleFetchCall = async () => {
+      setLoadingStatus(LoadingStatus.FETCHING)
+      const response = await fetchCall()
+      if (isAxiosError(response)) {
+        setError(response.message)
+      }
+      setLoadingStatus(LoadingStatus.SUCCESS)
+      setResponse(response)
+    }
     if (fetchStatus === LoadingStatus.FETCHING) {
       handleFetchCall()
     }

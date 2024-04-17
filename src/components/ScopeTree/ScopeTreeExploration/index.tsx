@@ -14,16 +14,14 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
-import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import React, { ReactElement, useRef, useState } from 'react'
 import { AppDispatch, useAppDispatch, useAppSelector } from 'state'
 import { ScopeTreeRow } from 'types'
 import { getCurrentScopeList } from 'utils/scopeTree'
 import ScopeTreeHierarchy from '../ScopeTreeHierarchy'
 import EnhancedTable from '../ScopeTreeTable'
-import { ScopeTreeExplorationProps } from '../index'
 import {
   getHeadCells,
-  init,
   isSearchIndeterminate,
   isSearchSelected,
   onExpand,
