@@ -170,7 +170,7 @@ export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Pro
   if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (patient) options = [...options, `subject=${patient}`]
-  if (visit) options = [...options, `part-of:missing=false`]
+  if (visit) options = [...options, visit === true ? `part-of:missing=true` : `part-of:missing=false`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
   if (status && status.length > 0) options = [...options, `status=${status.reduce(paramValuesReducer)}`]
