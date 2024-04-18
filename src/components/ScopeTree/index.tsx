@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useAppSelector } from 'state'
 import { LoadingStatus, ScopeTreeRow, ScopeType } from 'types'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
@@ -16,7 +16,7 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
-import { useHierarchy } from '../../hooks/hierarchy/useHierarchy'
+import { DisplayMode, useHierarchy } from '../../hooks/hierarchy/useHierarchy'
 import { useSearchParameters } from '../../hooks/useSearchParameters'
 import servicesPerimeters from '../../services/aphp/servicePerimeters'
 import useStyles from './utils/styles'
@@ -81,11 +81,13 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
   const { classes } = useStyles()
   const practitionerId = useAppSelector((state) => state.me)?.id || ''
 
+  const { options, totalPageNumber, onChangeSearchInput, onChangePage } = useSearchParameters(20, 0)
+
   const handleFetch = useCallback(() => {
     return isExecutiveUnit
-      ? servicesPerimeters.getPerimeters({ practitionerId })
-      : servicesPerimeters.getRights({ practitionerId })
-  }, [isExecutiveUnit, practitionerId])
+      ? servicesPerimeters.getPerimeters({ practitionerId, search: options.searchInput })
+      : servicesPerimeters.getRights({ practitionerId, search: options.searchInput })
+  }, [isExecutiveUnit, practitionerId, options.searchInput])
 
   const handleFetchChildren = useCallback(
     async (ids: string) => {
@@ -96,14 +98,24 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
     },
     [isExecutiveUnit, practitionerId]
   )
-  const { options, totalPageNumber, onChangeSearchInput, onChangePage } = useSearchParameters(20, 0)
+
+  const hierarchyDisplayMode = useMemo(() => {
+    return options.searchInput ? DisplayMode.SEARCH : DisplayMode.TREE
+  }, [options.searchInput])
+
   const {
     fetchStatus,
     response: { count, results }
   } = useFetch(options, handleFetch)
 
-  const { hierarchy, selectedCodes, isChildrenLoading, expandHierarchy, selectHierarchyCodes, deleteHierarchyCode } =
-    useHierarchy(results, handleFetchChildren, selectedIds)
+  const {
+    hierarchyDisplay,
+    selectedCodes,
+    isChildrenLoading,
+    expandHierarchy,
+    selectHierarchyCodes,
+    deleteHierarchyCode
+  } = useHierarchy(results, handleFetchChildren, hierarchyDisplayMode, selectedIds)
 
   return (
     <Grid container alignContent="flex-start" height="100%">
@@ -139,7 +151,11 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
             </TableHead>
             <TableBody>
               {fetchStatus === LoadingStatus.SUCCESS && count && (
-                <ScopeTreeTest hierarchy={hierarchy} onExpand={expandHierarchy} onSelect={selectHierarchyCodes} />
+                <ScopeTreeTest
+                  hierarchy={hierarchyDisplay}
+                  onExpand={expandHierarchy}
+                  onSelect={selectHierarchyCodes}
+                />
               )}
               {fetchStatus === LoadingStatus.SUCCESS && !count && (
                 <TableRow>

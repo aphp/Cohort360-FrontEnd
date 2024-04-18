@@ -1,19 +1,28 @@
 import { SelectedStatus } from 'types'
 import { Hierarchy, InfiniteMap } from 'types/hierarchy'
 
-export const getBranch = <T, S>(code: Hierarchy<T, S>, hierarchy: Hierarchy<T, S>[]) => {
-  const goThroughBranch = (idsPath: string[], hierarchy: Hierarchy<T, S>[], branch: number[]) => {
+export const getBranch = async <T, S>(
+  code: Hierarchy<T, S>,
+  hierarchy: Hierarchy<T, S>[],
+  childrenHandler: (ids: string) => Promise<Hierarchy<T, S>[]>
+) => {
+  const goThroughBranch = async (idsPath: string[], hierarchy: Hierarchy<T, S>[], branch: number[]) => {
     if (!idsPath.length) return
     const currentPathId = idsPath[0]
     const index = hierarchy.findIndex((item) => item.id === currentPathId)
     branch.push(index)
-    const subItems = hierarchy[index].subItems
-    if (subItems) goThroughBranch(idsPath.slice(1), subItems, branch)
+    if (idsPath.length === 1) return
+    const childrenIds = hierarchy[index].inferior_levels_ids
+    if (!hierarchy[index].subItems && childrenIds) {
+      const children = await childrenHandler(childrenIds)
+      hierarchy[index].subItems = children
+    }
+    goThroughBranch(idsPath.slice(1), hierarchy[index].subItems || [], branch)
   }
-  const branch: number[] = []
+  const path: number[] = []
   const idsPath = [...(code.above_levels_ids || '').split(',').slice(1), ...[code.id + '']]
-  if (idsPath.length && hierarchy.length) goThroughBranch(idsPath, hierarchy, branch)
-  return branch
+  if (idsPath.length && hierarchy.length) await goThroughBranch(idsPath, hierarchy, path)
+  return { path, branch: hierarchy }
 }
 
 export const buildHierarchyFromSelectedIds = async <T, S>(
@@ -30,12 +39,12 @@ export const buildHierarchyFromSelectedIds = async <T, S>(
 const buildTree = async <T, S>(
   uniquePaths: InfiniteMap,
   baseLevels: Hierarchy<T, S>[],
-  fetchChildren: (ids: string) => Promise<Hierarchy<T, S>[]>
+  childrenHandler: (ids: string) => Promise<Hierarchy<T, S>[]>
 ) => {
   const buildBranch = async <T, S>(
     path: [string, InfiniteMap],
     node: Hierarchy<T, S>[],
-    fetchChildren: (ids: string) => Promise<Hierarchy<T, S>[]>
+    childrenHandler: (ids: string) => Promise<Hierarchy<T, S>[]>
   ) => {
     const [key, nextPath] = path
     const currentIndex = node.findIndex((elem) => elem.id === key)
@@ -43,14 +52,14 @@ const buildTree = async <T, S>(
     if (!nextPath.size) return
     const childrenIds = node[currentIndex].inferior_levels_ids
     if (childrenIds) {
-      const children = await fetchChildren(childrenIds)
+      const children = await childrenHandler(childrenIds)
       node[currentIndex].subItems = children
-      nextPath.forEach((value, key) => buildBranch([key, value], node[currentIndex].subItems || [], fetchChildren))
+      nextPath.forEach((value, key) => buildBranch([key, value], node[currentIndex].subItems || [], childrenHandler))
     }
   }
   const newTree = [...baseLevels]
   for (const path of uniquePaths) {
-    await buildBranch(path, newTree, fetchChildren)
+    await buildBranch(path, newTree, childrenHandler)
   }
   return newTree
 }

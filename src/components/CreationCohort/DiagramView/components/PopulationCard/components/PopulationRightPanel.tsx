@@ -37,7 +37,7 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
         </div>
         <div className={classes.drawerContentContainer}>
           <ScopeTree
-            //selectedIds=""
+           // selectedIds=""
             selectedIds={'8312016825,8312077037,8312085055,8312016350,8312076084,16180131083'}
             setSelectedItems={_setSelectedPopulation}
             executiveUnitType={executiveUnitType}
