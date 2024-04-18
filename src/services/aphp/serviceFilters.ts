@@ -1,7 +1,7 @@
 import apiBackend from 'services/apiBackend'
-import { RessourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 
-export const getProviderFilters = async (provider_source_value?: string, fhir_resource?: RessourceType) => {
+export const getProviderFilters = async (provider_source_value?: string, fhir_resource?: ResourceType) => {
   if (!provider_source_value || !fhir_resource) {
     return []
   }

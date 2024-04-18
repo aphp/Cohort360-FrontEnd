@@ -23,7 +23,7 @@ import {
 import { AxiosResponse } from 'axios'
 import { SearchByTypes } from 'types/searchCriterias'
 import { SearchInputError } from 'types/error'
-import { Comparators, CriteriaDataKey, DocType, RessourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import { Comparators, CriteriaDataKey, DocType, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
 
 export enum CohortJobStatus {
   _long_pending = 'long_pending',
@@ -875,13 +875,14 @@ export type ExportCSVTable = {
   subtitle?: string
   fhir_filter: SavedFilter | null
   respect_table_relationships: boolean
+  resourceType: ResourceType
 }
 
 export type SavedFilter = {
   created_at: string
   deleted: string
   deleted_by_cascade: boolean
-  fhir_resource: RessourceType
+  fhir_resource: ResourceType
   fhir_version: string
   filter: string
   modified_at: string

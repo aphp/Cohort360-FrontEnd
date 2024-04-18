@@ -40,6 +40,7 @@ import { useAppSelector } from 'state'
 import { ResourceType } from 'types/requestCriterias'
 import { getProviderFilters } from 'services/aphp/serviceFilters'
 import { ExportTableAccordion, ExportTableAccordionSummary } from './ExportTableAccordion'
+import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 const initialState: ExportCSVForm = {
   motif: '',
@@ -80,40 +81,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     setError(null)
   }, [open])
 
-  // const handleChangeTables = (tableId: string, tableName: string) => {
-  //   let existingTableIds: string[] = settings.tables
-  //   const foundItem = existingTableIds.find((existingTableId) => existingTableId === tableId)
-  //   if (foundItem) {
-  //     if (tableName === 'Formulaires') {
-  //       existingTableIds = existingTableIds.filter((elem) => !elem.startsWith('questionnaire'))
-  //     } else {
-  //       const index = existingTableIds.indexOf(foundItem)
-  //       existingTableIds.splice(index, 1)
-  //     }
-  //   } else {
-  //     // Attention règle particulière
-  //     if (tableId === 'fact_relationship') {
-  //       const careSiteItem = existingTableIds.find((existingTableId) => existingTableId === 'care_site')
-  //       if (!careSiteItem) {
-  //         existingTableIds = [...existingTableIds, 'care_site']
-  //       }
-  //     }
-  //     if (tableId === 'concept_relationship') {
-  //       const careSiteItem = existingTableIds.find((existingTableId) => existingTableId === 'concept')
-  //       if (!careSiteItem) {
-  //         existingTableIds = [...existingTableIds, 'concept']
-  //       }
-  //     }
-  //     if (tableName === 'Formulaires') {
-  //       existingTableIds = [
-  //         ...existingTableIds,
-  //         'questionnaire',
-  //         'questionnaire__item',
-  //         'questionnaireresponse',
-  //         'questionnaireresponse__item',
-  //         'questionnaireresponse__item__answer'
-  //       ]
-  //     }
   const handleSelectAllTables = () => {
     handleChangeSettings(
       'tables',
@@ -157,26 +124,28 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
         if (conceptTableNotCheckedIndex > -1) existingTables[conceptTableNotCheckedIndex].checked = true
         break
       }
-      case 'questionnaire': {
-        const questionnaireResponseIndex = existingTables.findIndex(
-          (table) => table.label === 'questionnaireresponse' && table.checked
-        )
-        if (questionnaireResponseIndex > -1) existingTables[questionnaireResponseIndex].checked = false
-        break
-      }
-      case 'questionnaireresponse': {
-        const questionnaireIndex = existingTables.findIndex(
-          (table) => table.label === 'questionnaire' && !table.checked
-        )
-        if (questionnaireIndex > -1) existingTables[questionnaireIndex].checked = true
-        break
-      }
     }
 
-    existingTables = existingTables.map((table) => ({
-      ...table,
-      checked: table.label === tableId ? !table.checked : table.checked
-    }))
+    const isFormulaire = (tableId: string) =>
+      [
+        'questionnaire',
+        'questionnaire__item',
+        'questionnaireresponse',
+        'questionnaireresponse__item',
+        'questionnaireresponse__item__answer'
+      ].includes(tableId)
+
+    if (isFormulaire(tableId)) {
+      existingTables = existingTables.map((table) => ({
+        ...table,
+        checked: isFormulaire(table.label) ? !table.checked : table.checked
+      }))
+    } else {
+      existingTables = existingTables.map((table) => ({
+        ...table,
+        checked: table.label === tableId ? !table.checked : table.checked
+      }))
+    }
 
     handleChangeSettings('tables', existingTables)
   }
@@ -189,56 +158,16 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     }))
   }
 
-  const handleExpandedTable = (tableId: string) => {
-    setExpandedTableIds((prevExpandedTableIds) => {
-      if (prevExpandedTableIds.includes(tableId)) {
-        return prevExpandedTableIds.filter((id) => id !== tableId)
-      } else {
-        return [...prevExpandedTableIds, tableId]
-      }
-    })
-  }
-
-  const handleMaterForm = (tables: ExportCSVTable[]) => {
-    const tableCopy = [...tables]
-
-    const questionnaireIndex = tables.findIndex(({ label }) => label === 'questionnaire')
-    const questionnaireResponseIndex = tables.findIndex(({ label }) => label === 'questionnaireresponse')
-
-    if (questionnaireIndex > -1) {
-      const questionnaireItem: ExportCSVTable = {
-        id: 'questionnaire__item',
-        label: 'questionnaire__item',
-        name: 'Champs des formulaires',
-        fhir_filter: tables[questionnaireIndex].fhir_filter,
-        respect_table_relationships: tables[questionnaireIndex].respect_table_relationships,
-        checked: true
-      }
-      tableCopy.push(questionnaireItem)
-
-      if (questionnaireResponseIndex > -1) {
-        const questionnaireResponseItems: ExportCSVTable[] = [
-          {
-            id: 'questionnaireresponse__item',
-            label: 'questionnaireresponse__item',
-            name: 'Champs de réponses aux formulaires',
-            fhir_filter: tables[questionnaireResponseIndex].fhir_filter,
-            respect_table_relationships: tables[questionnaireResponseIndex].respect_table_relationships,
-            checked: true
-          },
-          {
-            id: 'questionnaireresponse__item__answer',
-            label: 'questionnaireresponse__item__answer',
-            name: 'Valeurs de réponses aux formulaires',
-            fhir_filter: tables[questionnaireResponseIndex].fhir_filter,
-            respect_table_relationships: tables[questionnaireResponseIndex].respect_table_relationships,
-            checked: true
-          }
-        ]
-        return tableCopy.concat(questionnaireResponseItems)
-      }
+  const handleExpandedTable = (tableId: string, resourceType: ResourceType) => {
+    if (resourceType !== ResourceType.UNKNOWN) {
+      setExpandedTableIds((prevExpandedTableIds) => {
+        if (prevExpandedTableIds.includes(tableId)) {
+          return prevExpandedTableIds.filter((id) => id !== tableId)
+        } else {
+          return [...prevExpandedTableIds, tableId]
+        }
+      })
     }
-    return tableCopy
   }
 
   const handleSubmit = async () => {
@@ -276,7 +205,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     const response = await services.cohorts.createExport({
       cohortId,
       motivation: settings?.motif,
-      tables: handleMaterForm(settings?.tables || []).filter((table) => table.checked)
+      tables: (settings?.tables || []).filter((table) => table.checked)
     })
 
     if (isAxiosError(response)) {
@@ -288,14 +217,20 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   }
 
   function renderExportTable(exportTable: ExportCSVTable) {
-    const { id, name, checked, subtitle, label } = exportTable
+    const { id, name, checked, subtitle, label, resourceType } = exportTable
     const isItemExpanded = expandedTableIds.includes(label)
 
     return (
-      <ExportTableAccordion key={label} expanded={isItemExpanded} onChange={() => handleExpandedTable(label)}>
+      <ExportTableAccordion
+        key={label}
+        expanded={isItemExpanded}
+        onChange={() => handleExpandedTable(label, resourceType)}
+      >
         <ExportTableAccordionSummary
+          style={resourceType === ResourceType.UNKNOWN ? { cursor: 'default' } : {}}
           expandIcon={
             <Checkbox
+              color="secondary"
               checked={checked}
               className={classes.checkbox}
               onClick={(e) => {
@@ -332,14 +267,16 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
             )}
           </Grid>
         </ExportTableAccordionSummary>
-        <AccordionDetails className={classes.accordionContent}>
-          <ExportTable
-            key={id}
-            exportTable={exportTable}
-            exportRequest={settings}
-            handleTransferRequestChange={setSettings}
-          />
-        </AccordionDetails>
+        {resourceType !== ResourceType.UNKNOWN && (
+          <AccordionDetails className={classes.accordionContent}>
+            <ExportTable
+              key={id}
+              exportTable={exportTable}
+              exportRequest={settings}
+              handleTransferRequestChange={setSettings}
+            />
+          </AccordionDetails>
+        )}
       </ExportTableAccordion>
     )
   }
@@ -448,11 +385,13 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
                     className={classes.selectAllTables}
                     control={
                       <Checkbox
+                        color="secondary"
                         className={classes.checkbox}
                         indeterminate={
                           settings.tables.filter((table) => table.checked).length !== settings.tables.length &&
                           settings.tables.filter((table) => table.checked).length > 0
                         }
+                        indeterminateIcon={<IndeterminateCheckBoxOutlined style={{ color: 'rgba(0,0,0,0.6)' }} />}
                         checked={settings.tables.filter((table) => table.checked).length === settings.tables.length}
                         onChange={handleSelectAllTables}
                       />
@@ -522,11 +461,11 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
                   className={classes.selectAgreeConditions}
                   control={
                     <Checkbox
+                      color="secondary"
                       className={classes.agreeCheckbox}
                       name="conditions"
                       checked={settings.conditions}
                       onChange={() => handleChangeSettings('conditions', !settings.conditions)}
-                      style={{ color: settings.conditions ? '#5A5' : '#E33' }}
                     />
                   }
                   labelPlacement="end"
@@ -601,7 +540,7 @@ const ExportTable: React.FC<ExportTableProps> = ({ exportTable, exportRequest, h
   useEffect(() => {
     const _getProviderFilters = async () => {
       try {
-        const filtersResp = await getProviderFilters(userId, ResourceType.PATIENT)
+        const filtersResp = await getProviderFilters(userId, exportTable.resourceType)
 
         setFiltersOptions(filtersResp)
       } catch (error) {

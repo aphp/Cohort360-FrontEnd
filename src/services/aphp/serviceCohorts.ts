@@ -673,7 +673,7 @@ const servicesCohorts: IServiceCohorts = {
       return await apiBackend.post<Export>('/exports/v1/exports/', {
         motivation,
         export_tables: tables.map((table: ExportCSVTable) => ({
-          name: table.name,
+          name: table.id,
           cohort_result_source: cohortId,
           respect_table_relationships: table.respect_table_relationships,
           ...(table.fhir_filter && { fhir_filter: table.fhir_filter?.uuid })
