@@ -354,12 +354,6 @@ const Login = () => {
                   onKeyDown={onKeyDown}
                 />
 
-                <Typography align="center" className={classes.mention}>
-                  <Link href="#" onClick={() => setOpen(true)} underline="hover">
-                    En cliquant sur &quot;connexion&quot;, vous acceptez la mention légale.
-                  </Link>
-                </Typography>
-
                 <Button
                   type="submit"
                   onClick={_onSubmit}
@@ -383,6 +377,12 @@ const Login = () => {
             >
               Connexion via Keycloak
             </Button>
+
+            <Typography align="center">
+              <Link href="#" onClick={() => setOpen(true)} underline="hover">
+                En cliquant sur &quot;connexion&quot;, vous acceptez la mention légale.
+              </Link>
+            </Typography>
           </Grid>
           <Link href="https://eds.aphp.fr">
             <img src={logoAPHP} alt="Footer" />

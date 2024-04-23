@@ -115,7 +115,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
           </Alert>
         )}
 
-        <Alert severity="warning">
+        {/* <Alert severity="warning">
           Données actuellement disponibles : PMSI ORBIS. Pour plus d'informations sur les prochaines intégrations de
           données, veuillez vous référer au tableau trimestriel de disponibilité des données disponible{' '}
           <Link
@@ -125,7 +125,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
           >
             ici
           </Link>
-        </Alert>
+        </Alert> */}
 
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">Diagnostic</Typography>
