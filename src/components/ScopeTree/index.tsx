@@ -67,8 +67,8 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
     useHierarchy(results, handleFetchChildren, hierarchyDisplayMode, selectedIds)
 
   return (
-    <Grid container alignContent="flex-start" height="100%">
-      <Grid style={{ width: '25%', marginLeft: '75%', marginBottom: '10px' }}>
+    <Grid container direction="column" wrap="nowrap" height="100%" overflow="hidden">
+      <Grid style={{ width: '30%', margin: '8px 8px 8px 70%' }}>
         <SearchInput
           value={options.searchInput}
           placeholder={'Rechercher'}
@@ -76,22 +76,26 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
         />
       </Grid>
 
-      <Grid container height="90%" justifyContent="space-between">
-        <TableContainer component={Paper}>
-          <Table className={classes.table}>
-            <TableHead>
-              <TableRow className={classes.tableHead}>
-                <TableCell className={classes.emptyTableHeadCell}></TableCell>
-                <TableCell align="center" className={classes.emptyTableHeadCell}>
-                  <Checkbox color="secondary" indeterminateIcon={<IndeterminateCheckBoxOutlined />} />
-                </TableCell>
-                <TableCell align="left" className={classes.tableHeadCell}>
-                  Nom
-                </TableCell>
+      <Grid container direction="column" wrap="nowrap" height="100%" overflow="auto">
+        <Grid item height="100%" style={{ overflowX: 'auto' }}>
+          <TableContainer component={Paper} style={{ overflowX: 'unset', flexWrap: 'nowrap' }}>
+            <Table className={classes.table}>
+              <TableHead>
+                <TableRow className={classes.tableHead}>
+                  <TableCell className={classes.emptyTableHeadCell}></TableCell>
+                  <TableCell align="center" className={classes.emptyTableHeadCell}>
+                    <Checkbox
+                      color="secondary"
+                      indeterminateIcon={<IndeterminateCheckBoxOutlined style={{ color: 'rgba(0,0,0,0.6)' }} />}
+                    />
+                  </TableCell>
+                  <TableCell align="left" className={classes.tableHeadCell}>
+                    Nom
+                  </TableCell>
 
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  Nombre de patients
-                </TableCell>
+                  <TableCell align="center" className={classes.tableHeadCell}>
+                    Nombre de patients
+                  </TableCell>
 
                 <TableCell align="center" className={classes.tableHeadCell}>
                   {!!executiveUnitType ? 'Type' : 'Accès'}
@@ -137,12 +141,12 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
           isSelectionLoading={isSelectionLoading}
           setIsSelectionLoading={setIsSelectionLoading}
         />
-      ) : (
+        ) : (
 
-      )}
-      */}
+        )}
+        */}
 
-        <Grid item xs={12} style={{ backgroundColor: '#E6F1FD', height: '12vh' }} padding="20px 40px 0px 40px">
+        <Grid item style={{ backgroundColor: '#E6F1FD' }} padding="20px 40px">
           <SelectedCodes values={selectedCodes} onDelete={deleteHierarchyCode} />
         </Grid>
       </Grid>

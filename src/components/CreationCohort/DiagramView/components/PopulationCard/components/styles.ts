@@ -2,19 +2,16 @@ import { makeStyles } from 'tss-react/mui'
 
 const useStyles = makeStyles()(() => ({
   drawer: {
-    zIndex: 1300
+    zIndex: 1300,
+    overflowY: 'unset'
   },
   root: {
     display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    width: '95vw',
     maxWidth: 650,
     height: '100%'
   },
   drawerTitleContainer: {
     display: 'flex',
-    alignItems: 'center',
     justifyContent: 'center',
     borderBottom: '1px solid grey'
   },
@@ -22,10 +19,7 @@ const useStyles = makeStyles()(() => ({
     fontSize: 22,
     margin: '12px 0'
   },
-  drawerContentContainer: {
-    flex: '1 1 auto',
-    overflow: 'auto'
-  },
+  drawerContentContainer: {},
   drawerActionContainer: {
     display: 'flex',
     alignItems: 'center',

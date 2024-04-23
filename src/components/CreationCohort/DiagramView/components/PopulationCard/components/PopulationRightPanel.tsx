@@ -8,6 +8,7 @@ import { ScopeTreeRow, ScopeType } from 'types'
 
 import useStyles from './styles'
 import ScopeTree from 'components/ScopeTree'
+import { Grid } from '@mui/material'
 
 type PopulationRightPanelProps = {
   open: boolean
@@ -30,12 +31,18 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
    * Render
    */
   return (
-    <Drawer anchor="right" open={open} onClose={onClose} className={classes.drawer}>
-      <div className={classes.root}>
-        <div className={classes.drawerTitleContainer}>
-          <Typography className={classes.title}>{title ?? 'Structure hospitalière'}</Typography>
-        </div>
-        <div className={classes.drawerContentContainer}>
+    <Drawer
+      anchor="right"
+      open={open}
+      PaperProps={{ style: { overflowY: 'unset' } }}
+      onClose={onClose}
+      className={classes.drawer}
+    >
+      <Grid container direction="column" flexWrap="nowrap" className={classes.root}>
+        <Grid item container flexDirection="column" height="100%" flexWrap="nowrap" overflow="auto">
+          <Grid item className={classes.drawerTitleContainer} width="100%">
+            <Typography className={classes.title}>{title ?? 'Structure hospitalière'}</Typography>
+          </Grid>
           <ScopeTree
             //selectedIds=""
             selectedIds={'8312016825,8312077037,8312085055,8312016350,8312076084,16180131083,18042109754'}
@@ -45,9 +52,8 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
             executiveUnitType={executiveUnitType}
             isExecutiveUnit={!!executiveUnitType}
           />
-        </div>
-
-        <div className={classes.drawerActionContainer}>
+        </Grid>
+        <Grid item className={classes.drawerActionContainer} width="100%">
           <Button onClick={onClose} variant="outlined">
             Annuler
           </Button>
@@ -61,8 +67,8 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
           >
             Confirmer
           </Button>
-        </div>
-      </div>
+        </Grid>
+      </Grid>
     </Drawer>
   )
 }

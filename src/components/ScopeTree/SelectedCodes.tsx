@@ -22,7 +22,6 @@ const SelectedCodes = <T,>({ values, onDelete }: SelectedCodesProps<T>) => {
           container
           xs={12}
           justifyContent="space-between"
-          marginBottom={2}
           style={{ maxHeight: 200, overflowX: 'hidden', overflowY: 'auto' }}
         >
           {values?.length > 0 && (
@@ -36,9 +35,9 @@ const SelectedCodes = <T,>({ values, onDelete }: SelectedCodesProps<T>) => {
           )}
         </Grid>
       )}
-      <Grid item container xs={12} justifyContent="space-between" marginBottom={2}>
+      <Grid item container xs={12} justifyContent="space-between">
         <Grid item xs={4} container>
-          <Typography textAlign="center" fontWeight={900}>
+          <Typography textAlign="center" padding="10px" fontWeight={900}>
             {values?.length} sélectionné(s)
           </Typography>
         </Grid>

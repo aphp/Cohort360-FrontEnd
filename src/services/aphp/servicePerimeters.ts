@@ -420,25 +420,25 @@ const servicesPerimeters: IServicePerimeters = {
     signal?: AbortSignal
   ): Promise<ScopeTreeRow[]> => {
     if (!subScopesIds) return []
-    const subScopes = await servicesPerimeters.getPerimeters(
-      subScopesIds.trim().split(','),
-      undefined,
-      undefined,
-      type,
-      isExecutiveUnit,
-      signal
-    )
+    // const subScopes = await servicesPerimeters.getPerimeters(
+    //   subScopesIds.trim().split(','),
+    //   undefined,
+    //   undefined,
+    //   type,
+    //   isExecutiveUnit,
+    //   signal
+    // )
 
-    if (!isCustomError(subScopes)) {
-      const scopeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
-        subScopes.results,
-        getSubItem,
-        type,
-        isExecutiveUnit,
-        signal
-      )
-      return scopeRowList
-    }
+    // if (!isCustomError(subScopes)) {
+    //   const scopeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
+    //     subScopes.results,
+    //     getSubItem,
+    //     type,
+    //     isExecutiveUnit,
+    //     signal
+    //   )
+    //   return scopeRowList
+    // }
 
     return []
   },
