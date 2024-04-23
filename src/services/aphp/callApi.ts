@@ -64,6 +64,9 @@ const paramsReducer = (accumulator: string, currentValue: string): string =>
 
 const uniq = (item: string, index: number, array: string[]) => array.indexOf(item) === index && item
 
+const lowToleranceTag = encodeURIComponent('https://terminology.eds.aphp.fr/text-fault-tolerant|LOW')
+const highToleranceTag = encodeURIComponent('https://terminology.eds.aphp.fr/text-fault-tolerant|HIGH')
+
 /**
  * Patient Resource
  *
@@ -455,7 +458,7 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `code=${code}`] // eslint-disable-line
   if (source) options = [...options, `source=${source}`]
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)},_tag=${lowToleranceTag}`]
   if (status) options = [...options, `status=${encodeURIComponent(`${DOC_STATUS_CODE_SYSTEM}|${status}`)}`]
   if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`]
   if (minDate) options = [...options, `date=ge${minDate}`]
@@ -518,7 +521,7 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
   if (diagnosis) options = [...options, `diagnosis=${diagnosis}`] // eslint-disable-line
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)},_tag=${lowToleranceTag}`] // eslint-disable-line
   if (status)
     options = [
       ...options,
@@ -580,7 +583,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `code=${code}`] // eslint-disable-line
   if (source) options = [...options, `source=${source}`]
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)},_tag=${lowToleranceTag}`] // eslint-disable-line
   if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
   if (minRecordedDate) options = [...options, `recorded-date=ge${minRecordedDate}`] // eslint-disable-line
   if (maxRecordedDate) options = [...options, `recorded-date=le${maxRecordedDate}`] // eslint-disable-line
@@ -648,7 +651,7 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort},id`}`]
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)},_tag=${lowToleranceTag}`]
   if (encounter) options = [...options, `encounter.identifier=${encounter}`]
   if (anabio || loinc)
     options = [...options, `code=${anabio ? anabio : ''}${anabio && loinc ? ',' : ''}${loinc ? loinc : ''}`] // eslint-disable-line
@@ -718,7 +721,7 @@ export const fetchMedicationRequest = async (
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (subject) options = [...options, `subject=${subject}`]
   if (encounter) options = [...options, `encounter.identifier=${encounter}`]
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)},_tag=${lowToleranceTag}`]
   if (type && type.length > 0) {
     const routeUrl = `${MEDICATION_PRESCRIPTION_TYPES}|`
     const urlString = type.map((id) => routeUrl + id).join(',')
@@ -788,7 +791,7 @@ export const fetchMedicationAdministration = async (
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (subject) options = [...options, `subject=${subject}`]
   if (encounter) options = [...options, `context.identifier=${encounter}`]
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)},_tag=${lowToleranceTag}`]
   if (route && route.length > 0) {
     const routeUrl = `${MEDICATION_ADMINISTRATIONS}|`
     const urlString = route.map((id) => routeUrl + id).join(',')
@@ -853,7 +856,7 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
   if (order) options = [...options, `_sort=${_orderDirection}${order}`]
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)},_tag=${lowToleranceTag}`]
   if (encounter) options = [...options, `encounter.identifier=${encounter}`]
   if (ipp) options = [...options, `patient.identifier=${ipp}`]
   if (minDate) options = [...options, `started=ge${minDate}`]
@@ -948,9 +951,9 @@ const getCodeList = async (
     // if search is * then we fetch the roots of the valueSet
     if (search !== '*' && search !== undefined) {
       // if noStar is true then we search for the code, else we search for the display
-      searchParam = `&only-roots=false&${noStar ? 'code' : '_tag=text-search-rank&_text'}=${encodeURIComponent(
-        search.trim()
-      )}`
+      searchParam = `&only-roots=false&${
+        noStar ? 'code' : `_tag=text-search-rank&_tag=${highToleranceTag}&_text`
+      }=${encodeURIComponent(search.trim())}`
     }
     // TODO test if it returns all the codes without specifying the count
     const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}${searchParam}`, {
