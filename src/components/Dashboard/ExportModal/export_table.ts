@@ -1,7 +1,7 @@
 import { ResourceType } from 'types/requestCriterias'
 
 export type ExportTableType = {
-  id: string
+  id: string[]
   name: string
   label: string
   subtitle?: string
@@ -10,151 +10,76 @@ export type ExportTableType = {
 
 const exportTable: ExportTableType[] = [
   {
-    id: 'person',
+    id: ['person', 'iris'],
     name: 'Patient',
-    label: 'person',
+    label: 'person - iris',
     resourceType: ResourceType.PATIENT
   },
-  // {
-  //   id: 'observation',
-  //   name: 'Patient - Données démographiques',
-  //   label: 'observation',
-  //   subtitle: '⚠️ Attention cette table comporte des données identifiantes'
-  // },
   {
-    id: 'iris',
-    name: 'Patient - Données géographiques',
-    label: 'iris',
-    resourceType: ResourceType.UNKNOWN
-  },
-  {
-    id: 'visit_occurrence',
+    id: ['visit_occurrence', 'visit_detail'],
     name: 'Prise en charge',
-    label: 'visit_occurrence',
+    label: 'visit_occurrence - visit_detail',
     resourceType: ResourceType.UNKNOWN
   },
   {
-    id: 'visit_detail',
-    name: 'Prise en charge - Passages ',
-    label: 'visit_detail',
-    resourceType: ResourceType.UNKNOWN
-  },
-  {
-    id: 'condition_occurrence',
+    id: ['condition_occurrence'],
     name: 'Fait - PMSI - Diagnostics',
     label: 'condition_occurrence',
     resourceType: ResourceType.CONDITION
   },
   {
-    id: 'procedure_occurrence',
+    id: ['procedure_occurrence'],
     name: 'Fait - PMSI - Actes',
     label: 'procedure_occurrence',
     resourceType: ResourceType.PROCEDURE
   },
   {
-    id: 'cost',
+    id: ['cost'],
     name: 'Fait - PMSI - GHM',
     label: 'cost',
     resourceType: ResourceType.CLAIM
   },
-  // {
-  //   id: 'note',
-  //   table_name: 'Fait - Documents cliniques',
-  //   table_id: 'note',
-  //   resourceType: 'DocumentReference'
-  // },
   {
-    id: 'drug_exposure_prescription',
+    id: ['note'],
+    name: 'Fait - Documents cliniques',
+    label: 'note',
+    resourceType: ResourceType.DOCUMENTS
+  },
+  {
+    id: ['drug_exposure_prescription'],
     name: 'Fait - Médicaments - Prescription',
     label: 'drug_exposure_prescription',
     resourceType: ResourceType.MEDICATION_REQUEST
   },
   {
-    id: 'drug_exposure_administration',
+    id: ['drug_exposure_administration'],
     name: 'Fait - Médicaments - Administration',
     label: 'drug_exposure_administration',
     resourceType: ResourceType.MEDICATION_ADMINISTRATION
   },
   {
-    id: 'care_site',
+    id: ['care_site', 'fact_relationship'],
     name: 'Référentiel - Structure hospitalière',
-    label: 'care_site',
+    label: 'care_site - fact_relationship',
     resourceType: ResourceType.UNKNOWN
   },
   {
-    id: 'care_site',
-    name: 'Référentiel - Liens entre entités',
-    label: 'fact_relationship',
-    resourceType: ResourceType.UNKNOWN
+    id: ['imaging_study', 'imaging_series'],
+    name: 'Fait - Imagerie - Étude & Séries',
+    label: 'imaging_study - imaging_series',
+    resourceType: ResourceType.IMAGING
   },
   {
-    id: 'concept',
-    name: 'Référentiel - Terminologie - Concept',
-    label: 'concept',
-    // resourceType: 'CodableConcept'
-    resourceType: ResourceType.UNKNOWN
-  },
-  {
-    id: 'concept',
-    name: 'Référentiel - Terminologie - Lien entre concepts',
-    label: 'concept_relationship',
-    // resourceType: 'CodableConcept'
-    resourceType: ResourceType.UNKNOWN
-  },
-  {
-    id: 'vocabulary',
-    name: 'Référentiel - Terminologie - Vocabulaire et nomenclature',
-    label: 'vocabulary',
-    // resourceType: 'ValueSet'
-    resourceType: ResourceType.UNKNOWN
-  },
-  {
-    id: 'imaging_study',
-    name: 'Fait - Imagerie - Étude',
-    label: 'imaging_study',
-    // resourceType: 'ImagingStudies'
-    resourceType: ResourceType.UNKNOWN
-  },
-  {
-    id: 'imaging_series',
-    name: 'Fait - Imagerie - Série',
-    label: 'imaging_series',
-    // resourceType: 'ImagingSeries'
-    resourceType: ResourceType.UNKNOWN
-  },
-  // ---------------------------------
-  {
-    id: 'questionnaire',
+    id: [
+      'questionnaire',
+      'questionnaire__item',
+      'questionnaireresponse',
+      'questionnaireresponse__item',
+      'questionnaireresponse__item__answer'
+    ],
     name: 'Formulaires',
-    label: 'questionnaire',
-    resourceType: ResourceType.UNKNOWN
-  },
-  {
-    id: 'questionnaire__item',
-    // name: 'Champs des formulaires',
-    name: 'Formulaires',
-    label: 'questionnaire__item',
-    resourceType: ResourceType.UNKNOWN
-  },
-  {
-    id: 'questionnaireresponse',
-    // name: 'Réponses aux formulaires',
-    name: 'Formulaires',
-    label: 'questionnaireresponse',
-    resourceType: ResourceType.UNKNOWN
-  },
-  {
-    id: 'questionnaireresponse__item',
-    // name: 'Champs de réponses aux formulaires',
-    name: 'Formulaires',
-    label: 'questionnaireresponse__item',
-    resourceType: ResourceType.UNKNOWN
-  },
-  {
-    id: 'questionnaireresponse__item__answer',
-    // name: 'Valeurs de réponses aux formulaires',
-    name: 'Formulaires',
-    label: 'questionnaireresponse__item__answer',
+    label:
+      'questionnaire - questionnaire__item - questionnaireresponse - questionnaireresponse__item - questionnaireresponse__item__answer',
     resourceType: ResourceType.UNKNOWN
   }
 ]

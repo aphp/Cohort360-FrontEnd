@@ -868,7 +868,7 @@ export type ExportCSVForm = {
 }
 
 export type ExportCSVTable = {
-  id: string
+  id: string[]
   label: string
   checked: boolean
   name: string

@@ -94,58 +94,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   const handleChangeTables = (tableId: string) => {
     let existingTables: ExportCSVTable[] = settings.tables
 
-    switch (tableId) {
-      case 'care_site': {
-        const factRelationshipCheckedIndex = existingTables.findIndex(
-          (table) => table.label === 'fact_relationship' && table.checked
-        )
-        if (factRelationshipCheckedIndex > -1) existingTables[factRelationshipCheckedIndex].checked = false
-        break
-      }
-      case 'fact_relationship': {
-        const careSiteTableNotCheckedIndex = existingTables.findIndex(
-          (table) => table.label === 'care_site' && !table.checked
-        )
-        if (careSiteTableNotCheckedIndex > -1) existingTables[careSiteTableNotCheckedIndex].checked = true
-        break
-      }
-      case 'concept': {
-        const conceptRelationshipTableNotCheckedIndex = existingTables.findIndex(
-          (table) => table.label === 'concept_relationship' && table.checked
-        )
-        if (conceptRelationshipTableNotCheckedIndex > -1)
-          existingTables[conceptRelationshipTableNotCheckedIndex].checked = false
-        break
-      }
-      case 'concept_relationship': {
-        const conceptTableNotCheckedIndex = existingTables.findIndex(
-          (table) => table.label === 'concept' && !table.checked
-        )
-        if (conceptTableNotCheckedIndex > -1) existingTables[conceptTableNotCheckedIndex].checked = true
-        break
-      }
-    }
-
-    const isFormulaire = (tableId: string) =>
-      [
-        'questionnaire',
-        'questionnaire__item',
-        'questionnaireresponse',
-        'questionnaireresponse__item',
-        'questionnaireresponse__item__answer'
-      ].includes(tableId)
-
-    if (isFormulaire(tableId)) {
-      existingTables = existingTables.map((table) => ({
-        ...table,
-        checked: isFormulaire(table.label) ? !table.checked : table.checked
-      }))
-    } else {
-      existingTables = existingTables.map((table) => ({
-        ...table,
-        checked: table.label === tableId ? !table.checked : table.checked
-      }))
-    }
+    existingTables = existingTables.map((table) => ({
+      ...table,
+      checked: table.label === tableId ? !table.checked : table.checked
+    }))
 
     handleChangeSettings('tables', existingTables)
   }
@@ -270,7 +222,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
         {resourceType !== ResourceType.UNKNOWN && (
           <AccordionDetails className={classes.accordionContent}>
             <ExportTable
-              key={id}
+              key={name}
               exportTable={exportTable}
               exportRequest={settings}
               handleTransferRequestChange={setSettings}
