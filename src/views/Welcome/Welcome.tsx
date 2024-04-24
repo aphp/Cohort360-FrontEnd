@@ -115,7 +115,11 @@ const Welcome: React.FC = () => {
               noWrap
               className={classes.title}
             >
-              Bienvenue {practitioner.displayName}
+              {`Bienvenue ${
+                practitioner.impersonation
+                  ? practitioner.impersonation.firstname + ' ' + practitioner.impersonation.lastname
+                  : practitioner.displayName
+              }`}
             </Typography>
           </Grid>
           <Grid item>

@@ -12,7 +12,8 @@ import {
   Back_API_Response,
   Cohort,
   DataRights,
-  CohortRights
+  CohortRights,
+  UserAccesses
 } from 'types'
 
 import { FHIR_Bundle_Response } from 'types'
@@ -1122,14 +1123,19 @@ export const fetchScope: (args: fetchScopeProps, signal?: AbortSignal) => Promis
 
 export const fetchAccessExpirations: (
   args: AccessExpirationsProps
-) => Promise<AxiosResponse<AccessExpiration[]>> = async (args: AccessExpirationsProps) => {
+) => Promise<AxiosResponse<Array<AccessExpiration | UserAccesses>>> = async (args: AccessExpirationsProps) => {
   const { expiring } = args
 
   let options: string[] = []
   if (expiring === true || expiring === false) options = [...options, `expiring=${expiring}`]
 
-  const response: AxiosResponse<AccessExpiration[]> = await apiBackend.get(
-    `accesses/accesses/my-accesses/?${options.reduce(paramsReducer)}`
+  let queryParams = ''
+  if (options.length != 0) {
+    queryParams = `?${options.reduce(paramsReducer)}`
+  }
+
+  const response: AxiosResponse<Array<AccessExpiration | UserAccesses>> = await apiBackend.get(
+    `accesses/accesses/my-accesses/${queryParams}`
   )
   return response
 }

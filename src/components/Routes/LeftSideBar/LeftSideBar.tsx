@@ -41,6 +41,7 @@ import { resetCohortCreation } from 'state/cohortCreation'
 import { ODD_CONTACT } from '../../../constants'
 import useStyles from './styles'
 import versionInfo from 'data/version.json'
+import Impersonation from 'components/Impersonation'
 
 const smallDrawerWidth = 52
 const largeDrawerWidth = 260
@@ -134,14 +135,20 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             <ListItem>
               <Grid container justifyContent="space-between" alignItems="center" wrap="nowrap">
                 <Grid container wrap="nowrap" xs={10} alignItems="center" item>
-                  <ListItemIcon className={classes.listIcon}>
-                    <div className={classes.avatar}>
-                      {practitioner && `${practitioner.firstName[0]}${practitioner.lastName[0]}`}
-                    </div>
-                  </ListItemIcon>
-                  <Typography variant="h3" noWrap className={classes.userName}>
-                    {practitioner && `${practitioner.displayName}`}
-                  </Typography>
+                  <Impersonation
+                    UserInfo={({ practitioner }) => (
+                      <>
+                        <ListItemIcon className={classes.listIcon}>
+                          <div className={classes.avatar}>
+                            {practitioner && `${practitioner.firstname?.[0]}${practitioner.lastname?.[0]}`}
+                          </div>
+                        </ListItemIcon>
+                        <Typography variant="h3" noWrap className={classes.userName}>
+                          {practitioner && `${practitioner.display_name}`}
+                        </Typography>
+                      </>
+                    )}
+                  />
                 </Grid>
                 <Grid container xs={2} item>
                   <ListItemIcon

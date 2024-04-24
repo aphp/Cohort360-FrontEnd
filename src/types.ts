@@ -822,6 +822,13 @@ export type AccessExpiration = {
   perimeter: string
 }
 
+// this is an incomplete type, it should be completed with the other fields
+export type UserAccesses = {
+  role: {
+    right_full_admin: boolean
+  }
+}
+
 export type ExpandScopeElementParamsType = {
   rowId: number
   scopesList?: ScopeListType
