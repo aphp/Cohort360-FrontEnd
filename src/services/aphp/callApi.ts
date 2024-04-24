@@ -65,7 +65,6 @@ const paramsReducer = (accumulator: string, currentValue: string): string =>
 const uniq = (item: string, index: number, array: string[]) => array.indexOf(item) === index && item
 
 const lowToleranceTag = encodeURIComponent('https://terminology.eds.aphp.fr/text-fault-tolerant|LOW')
-const highToleranceTag = encodeURIComponent('https://terminology.eds.aphp.fr/text-fault-tolerant|HIGH')
 
 /**
  * Patient Resource
@@ -986,7 +985,7 @@ const getCodeList = async (
     if (search !== '*' && search !== undefined) {
       // if noStar is true then we search for the code, else we search for the display
       searchParam = `&only-roots=false&${
-        noStar ? 'code' : `_tag=text-search-rank&_tag=${highToleranceTag}&_text`
+        noStar ? 'code' : `_tag=text-search-rank&_tag=${lowToleranceTag}&_text`
       }=${encodeURIComponent(search.trim())}`
     }
     // TODO test if it returns all the codes without specifying the count
