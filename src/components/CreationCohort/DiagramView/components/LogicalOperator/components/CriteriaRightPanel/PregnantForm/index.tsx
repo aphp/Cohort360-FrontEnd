@@ -206,6 +206,7 @@ const PregnantForm = ({
             multiple
             id="pregnancy-mode-autocomplete"
             options={criteriaData.data.pregnancyMode || []}
+            noOptionsText="Veuillez entrer un mode d'obtention de la grossesse"
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={pregnancyMode}
@@ -251,6 +252,7 @@ const PregnantForm = ({
               multiple
               id="maternal-risks-autocomplete"
               options={criteriaData.data.maternalRisks || []}
+              noOptionsText="Veuillez entrer un risques liés aux antécédents maternels"
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={maternalRisks}
@@ -272,6 +274,7 @@ const PregnantForm = ({
               multiple
               id="risks-related-to-obstetric-history-autocomplete"
               options={criteriaData.data.risksRelatedToObstetricHistory || []}
+              noOptionsText="Veuillez entrer un risques liés aux antécédents obstétricaux"
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={risksRelatedToObstetricHistory}
@@ -299,6 +302,7 @@ const PregnantForm = ({
             multiple
             id="ultrasound-monitoring-autocomplete"
             options={criteriaData.data.prenatalDiagnosis || []}
+            noOptionsText="Veuillez entrer 'oui' ou 'non'"
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={ultrasoundMonitoring}
@@ -314,6 +318,7 @@ const PregnantForm = ({
             multiple
             id="corticotherapie-autocomplete"
             options={criteriaData.data.prenatalDiagnosis || []}
+            noOptionsText="Veuillez entrer 'oui' ou 'non'"
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={corticotherapie}
@@ -334,6 +339,7 @@ const PregnantForm = ({
             multiple
             id="risks-or-complications-of-pregnancy-autocomplete"
             options={criteriaData.data.risksOrComplicationsOfPregnancy || []}
+            noOptionsText="Veuillez entrer un risques ou complications de la grossesse"
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={risksOrComplicationsOfPregnancy}
@@ -360,6 +366,7 @@ const PregnantForm = ({
               multiple
               id="prenatal-diagnosis-autocomplete"
               options={criteriaData.data.prenatalDiagnosis || []}
+              noOptionsText="Veuillez entrer 'oui' ou 'non'"
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={prenatalDiagnosis}

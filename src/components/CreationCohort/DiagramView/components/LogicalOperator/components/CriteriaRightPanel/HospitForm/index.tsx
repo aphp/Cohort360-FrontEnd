@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import React, { useEffect, useState } from 'react'
 
 import { Autocomplete, FormLabel, TextField } from '@mui/material'
@@ -318,6 +319,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer 'oui' ou 'non'"
               id="in-utero-transfer-autocomplete"
               options={criteriaData.data.inUteroTransfer || []}
               getOptionLabel={(option) => option.label}
@@ -334,6 +336,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer 'oui' ou 'non'"
               id="pregnancy-monitoring-autocomplete"
               options={criteriaData.data.pregnancyMonitoring || []}
               getOptionLabel={(option) => option.label}
@@ -350,6 +353,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer des valeurs de VME"
               id="vme-autocomplete"
               options={criteriaData.data.vme || []}
               getOptionLabel={(option) => option.label}
@@ -366,6 +370,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer 'oui' ou 'non'"
               id="maturation-corticotherapie-autocomplete"
               options={criteriaData.data.maturationCorticotherapie || []}
               getOptionLabel={(option) => option.label}
@@ -381,6 +386,7 @@ const HospitForm = ({
           </FormLabel>
           <Autocomplete
             multiple
+            noOptionsText="Veuillez entrer un type de geste ou de chirurgie"
             id="chirurgical-gesture-autocomplete"
             options={criteriaData.data.chirurgicalGesture || []}
             getOptionLabel={(option) => option.label}
@@ -400,6 +406,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer 'oui' ou 'non'"
               id="childbirth-autocomplete"
               options={criteriaData.data.childbirth || []}
               getOptionLabel={(option) => option.label}
@@ -416,6 +423,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer 'oui' ou 'non'"
               id="hospital-childbirth-place-autocomplete"
               options={criteriaData.data.hospitalChildBirthPlace || []}
               getOptionLabel={(option) => option.label}
@@ -434,6 +442,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer 'oui' ou 'non'"
               id="other-hospital-childbirth-place-autocomplete"
               options={criteriaData.data.otherHospitalChildBirthPlace || []}
               getOptionLabel={(option) => option.label}
@@ -450,6 +459,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer 'oui' ou 'non'"
               id="home-childbirth-place-autocomplete"
               options={criteriaData.data.homeChildBirthPlace || []}
               getOptionLabel={(option) => option.label}
@@ -466,6 +476,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer un mode de mise en travail"
               id="childbirth-mode-autocomplete"
               options={criteriaData.data.childbirthMode || []}
               getOptionLabel={(option) => option.label}
@@ -482,6 +493,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer un motif(s) de maturation / déclenchement"
               id="maturation-reason-autocomplete"
               options={criteriaData.data.maturationReason || []}
               getOptionLabel={(option) => option.label}
@@ -498,6 +510,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer une modalités de maturation cervicale initiale"
               id="maturation-modality-autocomplete"
               options={criteriaData.data.maturationModality || []}
               getOptionLabel={(option) => option.label}
@@ -514,6 +527,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer une indication de l'IMG"
               id="img-indication-autocomplete"
               options={criteriaData.data.imgIndication || []}
               getOptionLabel={(option) => option.label}
@@ -530,6 +544,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer une présentation à l'entrée en travail ou en début de césarienne"
               id="labor-or-cesarean-entry-autocomplete"
               options={criteriaData.data.laborOrCesareanEntry || []}
               getOptionLabel={(option) => option.label}
@@ -548,6 +563,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer une pathologie pendant le travail"
               id="pathology-during-labor-autocomplete"
               options={criteriaData.data.pathologyDuringLabor || []}
               getOptionLabel={(option) => option.label}
@@ -564,6 +580,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer un geste ou manoeuvre obstétricale pendant le travail"
               id="obstetrical-gesture-during-labor-autocomplete"
               options={criteriaData.data.obstetricalGestureDuringLabor || []}
               getOptionLabel={(option) => option.label}
@@ -585,6 +602,7 @@ const HospitForm = ({
           </FormLabel>
           <Autocomplete
             multiple
+            noOptionsText="Veuillez entrer un type d'Analgésie / Anesthésie - Type"
             id="analgesie-type-autocomplete"
             options={criteriaData.data.analgesieType || []}
             getOptionLabel={(option) => option.label}
@@ -647,6 +665,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer une voie d’accouchement"
               id="birth-delivery-way-autocomplete"
               options={criteriaData.data.birthDeliveryWay || []}
               getOptionLabel={(option) => option.label}
@@ -664,6 +683,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer un type d'instrument"
               id="instrument-type-autocomplete"
               options={criteriaData.data.instrumentType || []}
               getOptionLabel={(option) => option.label}
@@ -681,6 +701,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer une modalités de la césarienne"
               id="c-section-modality-autocomplete"
               options={criteriaData.data.cSectionModality || []}
               getOptionLabel={(option) => option.label}
@@ -699,6 +720,7 @@ const HospitForm = ({
 
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer une présentation à l'accouchement"
               id="presentation-at-delivery-autocomplete"
               options={criteriaData.data.presentationAtDelivery || []}
               getOptionLabel={(option) => option.label}
@@ -828,6 +850,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer un statut vital à la naissance"
               id="birth-status-autocomplete"
               options={criteriaData.data.birthStatus || []}
               getOptionLabel={(option) => option.label}
@@ -845,6 +868,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer 'oui' ou 'non'"
               id="Postpartum-hemorrhage-autocomplete"
               options={criteriaData.data.postpartumHemorrhage || []}
               getOptionLabel={(option) => option.label}
@@ -862,6 +886,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer un état du Périnée"
               id="condition-of-the-perineum-autocomplete"
               options={criteriaData.data.conditionPerineum || []}
               getOptionLabel={(option) => option.label}
@@ -878,6 +903,7 @@ const HospitForm = ({
           </FormLabel>
           <Autocomplete
             multiple
+            noOptionsText="Veuillez entrer un type de lieu de sortie"
             id="exit-place-type-autocomplete"
             options={criteriaData.data.exitPlaceType || []}
             getOptionLabel={(option) => option.label}
@@ -898,6 +924,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer un type d'allaitement"
               id="feeding-type-autocomplete"
               options={criteriaData.data.feedingType || []}
               getOptionLabel={(option) => option.label}
@@ -913,6 +940,7 @@ const HospitForm = ({
           </FormLabel>
           <Autocomplete
             multiple
+            noOptionsText="Veuillez entrer 'oui' ou 'non'"
             id="complication-autocomplete"
             options={criteriaData.data.complication || []}
             getOptionLabel={(option) => option.label}
@@ -932,6 +960,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
+              noOptionsText="Veuillez entrer un mode d'allaitement à la sortie"
               id="exit-feeding-mode-autocomplete"
               options={criteriaData.data.exitFeedingMode || []}
               getOptionLabel={(option) => option.label}
@@ -947,6 +976,7 @@ const HospitForm = ({
           </FormLabel>
           <Autocomplete
             multiple
+            noOptionsText="Veuillez entrer un diagnostic de sortie"
             id="exit-diagnostic-autocomplete"
             options={criteriaData.data.exitDiagnostic || []}
             getOptionLabel={(option) => option.label}
