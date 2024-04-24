@@ -1,115 +1,86 @@
+import { ResourceType } from 'types/requestCriterias'
+
 export type ExportTableType = {
-  id: string
-  table_name: string
-  table_id: string
-  table_subtitle?: string
+  id: string[]
+  name: string
+  label: string
+  subtitle?: string
+  resourceType: ResourceType
 }
 
 const exportTable: ExportTableType[] = [
   {
-    id: 'person',
-    table_name: 'Patient',
-    table_id: 'person'
+    id: ['person', 'iris'],
+    name: 'Patient',
+    label: 'person - iris',
+    resourceType: ResourceType.PATIENT
   },
   {
-    id: 'iris',
-    table_name: 'Patient - Données géographiques',
-    table_id: 'iris'
+    id: ['visit_occurrence', 'visit_detail'],
+    name: 'Prise en charge',
+    label: 'visit_occurrence - visit_detail',
+    resourceType: ResourceType.UNKNOWN
   },
   {
-    id: 'drug_exposure_prescription',
-    table_name: 'Fait - Médicaments - Prescription',
-    table_id: 'drug_exposure_prescription'
+    id: ['condition_occurrence'],
+    name: 'Fait - PMSI - Diagnostics',
+    label: 'condition_occurrence',
+    resourceType: ResourceType.CONDITION
   },
   {
-    id: 'drug_exposure_administration',
-    table_name: 'Fait - Médicaments - Administration',
-    table_id: 'drug_exposure_administration'
+    id: ['procedure_occurrence'],
+    name: 'Fait - PMSI - Actes',
+    label: 'procedure_occurrence',
+    resourceType: ResourceType.PROCEDURE
   },
   {
-    id: 'visit_occurrence',
-    table_name: 'Prise en charge',
-    table_id: 'visit_occurrence'
+    id: ['cost'],
+    name: 'Fait - PMSI - GHM',
+    label: 'cost',
+    resourceType: ResourceType.CLAIM
   },
   {
-    id: 'visit_detail',
-    table_name: 'Prise en charge - Passages ',
-    table_id: 'visit_detail'
+    id: ['note'],
+    name: 'Fait - Documents cliniques',
+    label: 'note',
+    resourceType: ResourceType.DOCUMENTS
   },
   {
-    id: 'condition_occurrence',
-    table_name: 'Fait - PMSI - Diagnostics',
-    table_id: 'condition_occurrence'
+    id: ['drug_exposure_prescription'],
+    name: 'Fait - Médicaments - Prescription',
+    label: 'drug_exposure_prescription',
+    resourceType: ResourceType.MEDICATION_REQUEST
   },
   {
-    id: 'procedure_occurrence',
-    table_name: 'Fait - PMSI - Actes',
-    table_id: 'procedure_occurrence'
+    id: ['drug_exposure_administration'],
+    name: 'Fait - Médicaments - Administration',
+    label: 'drug_exposure_administration',
+    resourceType: ResourceType.MEDICATION_ADMINISTRATION
   },
   {
-    id: 'cost',
-    table_name: 'Fait - PMSI - GHM',
-    table_id: 'cost'
+    id: ['care_site', 'fact_relationship'],
+    name: 'Référentiel - Structure hospitalière',
+    label: 'care_site - fact_relationship',
+    resourceType: ResourceType.UNKNOWN
   },
   {
-    id: 'care_site',
-    table_name: 'Référentiel - Structure hospitalière',
-    table_id: 'care_site'
+    id: ['imaging_study', 'imaging_series'],
+    name: 'Fait - Imagerie - Étude & Séries',
+    label: 'imaging_study - imaging_series',
+    resourceType: ResourceType.IMAGING
   },
   {
-    id: 'fact_relationship',
-    table_name: 'Référentiel - Liens entre entités',
-    table_id: 'fact_relationship'
-  },
-  {
-    id: 'concept',
-    table_name: 'Référentiel - Terminologie - Concept',
-    table_id: 'concept'
-  },
-  {
-    id: 'concept_relationship',
-    table_name: 'Référentiel - Terminologie - Lien entre concepts',
-    table_id: 'concept_relationship'
-  },
-  {
-    id: 'vocabulary',
-    table_name: 'Référentiel - Terminologie - Vocabulaire et nomenclature',
-    table_id: 'vocabulary'
-  },
-  {
-    id: 'imaging_study',
-    table_name: 'Fait - Imagerie - Étude',
-    table_id: 'imaging_study'
-  },
-  {
-    id: 'imaging_series',
-    table_name: 'Fait - Imagerie - Série',
-    table_id: 'imaging_series'
-  },
-  {
-    id: 'questionnaire',
-    table_name: 'Formulaires',
-    table_id: 'questionnaire'
-  },
-  {
-    id: 'questionnaire',
-    table_name: 'Formulaires',
-    table_id: 'questionnaire__item'
-  },
-  {
-    id: 'questionnaire',
-    table_name: 'Formulaires',
-    table_id: 'questionnaireresponse'
-  },
-  {
-    id: 'questionnaire',
-    table_name: 'Formulaires',
-    table_id: 'questionnaireresponse__item'
-  },
-  {
-    id: 'questionnaire',
-    table_name: 'Formulaires',
-    table_id: 'questionnaireresponse__item__answer'
+    id: [
+      'questionnaire',
+      'questionnaire__item',
+      'questionnaireresponse',
+      'questionnaireresponse__item',
+      'questionnaireresponse__item__answer'
+    ],
+    name: 'Formulaires',
+    label:
+      'questionnaire - questionnaire__item - questionnaireresponse - questionnaireresponse__item - questionnaireresponse__item__answer',
+    resourceType: ResourceType.UNKNOWN
   }
 ]
 

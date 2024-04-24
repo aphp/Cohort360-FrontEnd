@@ -10,7 +10,8 @@ import {
   ImagingData,
   CohortImaging,
   CohortComposition,
-  Export
+  Export,
+  ExportCSVTable
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -209,9 +210,9 @@ export interface IServiceCohorts {
    *   - tables: Liste de tables demandées dans l'export
    */
   createExport: (args: {
-    cohortId: number
+    cohortId: string
     motivation: string
-    tables: string[]
+    tables: ExportCSVTable[]
   }) => Promise<AxiosResponse<Export> | AxiosError>
 }
 
@@ -669,11 +670,13 @@ const servicesCohorts: IServiceCohorts = {
     try {
       const { cohortId, motivation, tables } = args
 
-      return await apiBackend.post<Export>('/exports/', {
-        cohort_id: cohortId,
+      return await apiBackend.post<Export>('/exports/v1/exports/', {
         motivation,
-        tables: tables.map((table) => ({
-          omop_table_name: table
+        export_tables: tables.map((table: ExportCSVTable) => ({
+          table_ids: table.id,
+          cohort_result_source: cohortId,
+          respect_table_relationships: table.respect_table_relationships,
+          ...(table.fhir_filter && { fhir_filter: table.fhir_filter?.uuid })
         })),
         nominative: true, // Nominative should always be true when exporting a CSV (see issue #1113)
         output_format: 'csv'
