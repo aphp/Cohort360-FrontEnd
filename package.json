@@ -13,6 +13,7 @@
     "@mui/material": "^5.11.14",
     "@mui/x-date-pickers": "^5.0.20",
     "@reduxjs/toolkit": "^1.9.3",
+    "@storybook/addon-mdx-gfm": "^8.0.9",
     "@types/redux-state-sync": "^3.1.5",
     "ace-builds": "^1.16.0",
     "antlr4": "^4.13.1-patch-1",
@@ -44,6 +45,7 @@
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
     "redux-state-sync": "^3.1.4",
+    "remark-gfm": "^4.0.0",
     "tss-react": "^4.8.4",
     "uuid": "^9.0.1"
   },
@@ -58,7 +60,9 @@
     "build": "vite build",
     "serve": "vite preview",
     "lint": "eslint --ext .jsx,.js,.ts,.tsx src/",
-    "test": "vitest"
+    "test": "vitest",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "browserslist": {
     "production": [
@@ -73,6 +77,14 @@
     ]
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^1.3.3",
+    "@storybook/addon-essentials": "^8.0.9",
+    "@storybook/addon-interactions": "^8.0.9",
+    "@storybook/addon-links": "^8.0.9",
+    "@storybook/blocks": "^8.0.9",
+    "@storybook/react": "^8.0.9",
+    "@storybook/react-vite": "^8.0.9",
+    "@storybook/test": "^8.0.9",
     "@testing-library/dom": "^8.20.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -107,6 +119,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "normalize-url": "^7.0.3",
     "prettier": "^2.8.7",
+    "storybook": "^8.0.9",
     "typescript": "^4.9.5",
     "vite": "^4.5.3",
     "vite-plugin-svgr": "^3.2.0",
@@ -115,5 +128,8 @@
   },
   "jest": {
     "clearMocks": true
+  },
+  "resolutions": {
+    "jackspeak": "2.1.1"
   }
 }
