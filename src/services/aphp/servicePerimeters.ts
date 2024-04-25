@@ -35,7 +35,7 @@ import scopeTypes from '../../data/scope_type.json'
 import apiBackend from '../apiBackend'
 import { isCustomError } from 'utils/perimeters'
 import { Hierarchy } from '../../types/hierarchy'
-import { FetchScopeOptions } from 'types/perimeters'
+import { FetchScopeOptions } from 'types/scope'
 
 export interface IServicePerimeters {
   /**
@@ -88,7 +88,7 @@ export interface IServicePerimeters {
 
   getRights: (options: FetchScopeOptions, signal?: AbortSignal) => Promise<Back_API_Response<ScopeElement>>
 
-  getPerimeters: (options: FetchScopeOptions, signal?: AbortSignal) => Promise<Back_API_Response<ScopeElement>>
+  getPerimeters: (options?: FetchScopeOptions, signal?: AbortSignal) => Promise<Back_API_Response<ScopeElement>>
 
   getAccessExpirations: (accessExpirationsProps: AccessExpirationsProps) => Promise<AccessExpiration[]>
 
@@ -331,16 +331,14 @@ const servicesPerimeters: IServicePerimeters = {
     }
   },
 
-  getRights: async (
-    { ids, practitionerId, search }: FetchScopeOptions,
-    signal?: AbortSignal
-  ): Promise<Back_API_Response<ScopeElement>> => {
+  getRights: async (options?: FetchScopeOptions, signal?: AbortSignal): Promise<Back_API_Response<ScopeElement>> => {
     const response: Back_API_Response<ScopeElement> = { results: [], count: 0 }
-    if (practitionerId) {
+    if (options && options.practitionerId) {
       try {
         let url = 'accesses/perimeters/patient-data/rights/'
-        if (ids) url += `?local_id=${ids}`
-        if (search) url += `?search=${search}`
+        if (options.ids) url += `?local_id=${options.ids}`
+        if (options.limit) url += `&limit=${options.limit}`
+        if (options.search) url += `?search=${options.search}`
         const backendResponse = await apiBackend.get<Back_API_Response<ReadRightPerimeter>>(url, { signal: signal })
         if (backendResponse.status !== 200 || Object.keys(backendResponse.data).length === 0) return response
         const mappedElement = backendResponse.data.results.map((item) =>
@@ -358,15 +356,16 @@ const servicesPerimeters: IServicePerimeters = {
   },
 
   getPerimeters: async (
-    { ids, practitionerId, search }: FetchScopeOptions,
+    options?: FetchScopeOptions,
     signal?: AbortSignal
   ): Promise<Back_API_Response<ScopeElement>> => {
     const response: Back_API_Response<ScopeElement> = { results: [], count: 0 }
-    if (practitionerId) {
+    if (options && options.practitionerId) {
       try {
         let url: string = 'accesses/perimeters/?type_source_value=' + servicesPerimeters.getHigherTypes()[0]
-        if (ids) url += `local_id=${ids}`
-        if (search) url += `?search=${search}`
+        if (options.ids) url += `local_id=${options.ids}`
+        if (options.limit) url += `&limit=${options.limit}`
+        if (options.search) url += `?search=${options.search}`
         const backendResponse = await apiBackend.get<Back_API_Response<ScopeElement>>(url, { signal: signal })
         if (backendResponse.status !== 200 || Object.keys(backendResponse.data).length === 0) return response
         const mappedElement = backendResponse.data.results.map((item) =>

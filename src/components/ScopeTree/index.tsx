@@ -25,51 +25,6 @@ import ScopeTreeTest from './ScopeTreeTest'
 import SelectedCodes from './SelectedCodes'
 import { useFetch } from 'hooks/useFetch'
 
-/*
-export type ScopeTreeSearchProps = {
-  searchInput: string
-  selectedItems: ScopeTreeRow[]
-  setSelectedItems: (selectedItems: ScopeTreeRow[]) => void
-  searchSavedRootRows: ScopeTreeRow[]
-  setSearchSavedRootRows: (selectedItems: ScopeTreeRow[]) => void
-  isSelectionLoading: boolean
-  setIsSelectionLoading: (isSelectionLoading: boolean) => void
-  executiveUnitType?: ScopeType
-}
-
-export type ScopeTreeExplorationProps = {
-  selectedItems: ScopeTreeRow[]
-  setSelectedItems: (selectedItems: ScopeTreeRow[]) => void
-  searchSavedRootRows: ScopeTreeRow[]
-  setSearchSavedRootRows: (selectedItems: ScopeTreeRow[]) => void
-  openPopulation: number[]
-  setOpenPopulations: (openPopulation: number[]) => void
-  isSelectionLoading: boolean
-  setIsSelectionLoading: (isSelectionLoading: boolean) => void
-  executiveUnitType?: ScopeType
-}
-
-type ScopeTreeExcludedProps = {
-  searchInput: string
-  searchRootRows: ScopeTreeRow[]
-  setSearchRootRows: (selectedItems: ScopeTreeRow[]) => void
-  isSelectionLoading: boolean
-  setIsSelectionLoading: (isSelectionLoading: boolean) => void
-  searchSavedRootRows: ScopeTreeRow[]
-  setSearchSavedRootRows: (selectedItems: ScopeTreeRow[]) => void
-}
-type ScopeTreeProps = {
-  [K in Exclude<
-    keyof ScopeTreeExplorationProps | keyof ScopeTreeSearchProps,
-    keyof ScopeTreeExcludedProps
-  >]: K extends keyof ScopeTreeExplorationProps
-    ? ScopeTreeExplorationProps[K]
-    : K extends keyof ScopeTreeSearchProps
-    ? ScopeTreeSearchProps[K]
-    : never
-}
-*/
-
 type ScopeTreeProps = {
   selectedIds: string
   setSelectedItems: (selectedItems: ScopeTreeRow[]) => void
@@ -92,8 +47,8 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
   const handleFetchChildren = useCallback(
     async (ids: string) => {
       const { results } = isExecutiveUnit
-        ? await servicesPerimeters.getPerimeters({ practitionerId, ids })
-        : await servicesPerimeters.getRights({ practitionerId, ids })
+        ? await servicesPerimeters.getPerimeters({ practitionerId, ids, limit: -1 })
+        : await servicesPerimeters.getRights({ practitionerId, ids, limit: -1 })
       return results
     },
     [isExecutiveUnit, practitionerId]
@@ -108,14 +63,8 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
     response: { count, results }
   } = useFetch(options, handleFetch)
 
-  const {
-    hierarchyDisplay,
-    selectedCodes,
-    isChildrenLoading,
-    expandHierarchy,
-    selectHierarchyCodes,
-    deleteHierarchyCode
-  } = useHierarchy(results, handleFetchChildren, hierarchyDisplayMode, selectedIds)
+  const { hierarchy, selectedCodes, loadingStatus, expandHierarchy, selectHierarchyCodes, deleteHierarchyCode } =
+    useHierarchy(results, handleFetchChildren, hierarchyDisplayMode, selectedIds)
 
   return (
     <Grid container alignContent="flex-start" height="100%">
@@ -150,12 +99,8 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
               </TableRow>
             </TableHead>
             <TableBody>
-              {fetchStatus === LoadingStatus.SUCCESS && count && (
-                <ScopeTreeTest
-                  hierarchy={hierarchyDisplay}
-                  onExpand={expandHierarchy}
-                  onSelect={selectHierarchyCodes}
-                />
+              {fetchStatus === LoadingStatus.SUCCESS && loadingStatus === LoadingStatus.SUCCESS && count && (
+                <ScopeTreeTest hierarchy={hierarchy} onExpand={expandHierarchy} onSelect={selectHierarchyCodes} />
               )}
               {fetchStatus === LoadingStatus.SUCCESS && !count && (
                 <TableRow>
@@ -167,7 +112,7 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
             </TableBody>
           </Table>
         </TableContainer>
-        {(fetchStatus === LoadingStatus.FETCHING || isChildrenLoading === LoadingStatus.FETCHING) && (
+        {(fetchStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.FETCHING) && (
           <Grid container justifyContent="center" alignContent="center" height={500}>
             <CircularProgress />
           </Grid>

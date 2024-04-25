@@ -1,67 +1,129 @@
 import { SelectedStatus } from 'types'
 import { Hierarchy, InfiniteMap } from 'types/hierarchy'
 
-export const getBranch = async <T, S>(
-  code: Hierarchy<T, S>,
-  hierarchy: Hierarchy<T, S>[],
-  childrenHandler: (ids: string) => Promise<Hierarchy<T, S>[]>
-) => {
-  const goThroughBranch = async (idsPath: string[], hierarchy: Hierarchy<T, S>[], branch: number[]) => {
-    if (!idsPath.length) return
-    const currentPathId = idsPath[0]
-    const index = hierarchy.findIndex((item) => item.id === currentPathId)
-    branch.push(index)
-    if (idsPath.length === 1) return
-    const childrenIds = hierarchy[index].inferior_levels_ids
-    if (!hierarchy[index].subItems && childrenIds) {
-      const children = await childrenHandler(childrenIds)
-      hierarchy[index].subItems = children
+
+const mapInfiniteMapToList = (map: InfiniteMap): string[] => {
+  let allValues: string[] = []
+  map.forEach((value, key) => {
+    allValues.push(key)
+    if (value instanceof Map) {
+      allValues = allValues.concat(mapInfiniteMapToList(value))
     }
-    goThroughBranch(idsPath.slice(1), hierarchy[index].subItems || [], branch)
-  }
-  const path: number[] = []
-  const idsPath = [...(code.above_levels_ids || '').split(',').slice(1), ...[code.id + '']]
-  if (idsPath.length && hierarchy.length) await goThroughBranch(idsPath, hierarchy, path)
-  return { path, branch: hierarchy }
+  })
+  return allValues
 }
 
-export const buildHierarchyFromSelectedIds = async <T, S>(
-  selectedCodes: Hierarchy<T, S>[],
-  defaultLevels: Hierarchy<T, S>[],
-  childrenHandler: (ids: string) => Promise<Hierarchy<T, S>[]>
+const createBranchFromInfo = <T>(
+  path: [string, InfiniteMap],
+  results: Map<string, Hierarchy<T, string>>,
+  node: Hierarchy<T, string> | null
 ) => {
-  const paths = selectedCodes.map((item) => [...(item.above_levels_ids || '').split(',').slice(1), ...[item.id + '']])
+  const [key, nextPath] = path
+  node = results.get(key) || null
+  if (node) {
+    if (nextPath.size) {
+      const inferiorLevels = node.inferior_levels_ids?.split(',')
+      const childrenToAdd =
+        inferiorLevels?.map((id) => results.get(id) || ({ id: 'last: ' + id } as Hierarchy<T, string>)) || []
+      node.subItems = []
+      node.subItems.push(...childrenToAdd)
+      for (const [nextKey, next] of nextPath) {
+        const index = node.subItems.findIndex((elem) => elem.id === nextKey)
+        createBranchFromInfo([nextKey, next], results, node.subItems[index])
+      }
+      node.status = getItemSelectedStatus(node)
+    } else {
+      node.status = SelectedStatus.SELECTED
+    }
+  }
+  return node
+}
+
+const getBranchMissingInfo = async <T>(
+  path: [string, InfiniteMap],
+  codes: Map<string, Hierarchy<T, string>>,
+  fetchHandler: (ids: string) => Promise<Hierarchy<T, string>[]>
+) => {
+  const [key, nextPath] = path
+  const parentsKeysList = mapInfiniteMapToList(nextPath)
+  const parentsUniqueKeysList = [key, ...parentsKeysList.filter((elem) => !codes.has(elem))].join(',')
+  const parents = await fetchHandler(parentsUniqueKeysList)
+  const childrenUniqueKeysList = parents
+    .map((elem) => elem.inferior_levels_ids || '')
+    .filter((elem) => !codes.has(elem) && !parentsUniqueKeysList.includes(elem))
+    .join(',')
+  const children = await fetchHandler(childrenUniqueKeysList)
+  const results = [...parents, ...children, ...codes.values()].reduce(
+    (resultMap: Map<string, Hierarchy<T, string>>, item) => {
+      resultMap.set(item.id, item)
+      return resultMap
+    },
+    new Map()
+  )
+  const branch = createBranchFromInfo(path, results, null)
+  return branch
+}
+
+export const buildBranch = async <T>(
+  node: Hierarchy<T, string>,
+  path: [string, InfiniteMap],
+  fetchHandler: (ids: string) => Promise<Hierarchy<T, string>[]>,
+  codes: Map<string, Hierarchy<T, string>>
+) => {
+  const [key, nextPath] = path
+  if (nextPath.size) {
+    if (!node.subItems) {
+      const branch = await getBranchMissingInfo(path, codes, fetchHandler)
+      if (branch) node = branch
+    } else {
+      for (const [nextKey, next] of nextPath) {
+        const index = node.subItems.findIndex((elem) => elem.id === key)
+        await buildBranch(node.subItems[index], [nextKey, next], fetchHandler, codes)
+      }
+    }
+  }
+  return node
+  //node[currentIndex].status = getItemSelectedStatus(node[currentIndex])
+}
+
+export const buildHierarchyFromSelectedIds = async <T>(
+  selectedCodes: Hierarchy<T, string>[],
+  defaultLevels: Hierarchy<T, string>[],
+  fetchHandler: (ids: string) => Promise<Hierarchy<T, string>[]>
+) => {
+  const paths = selectedCodes.map((item) => [...(item.above_levels_ids || '').split(','), ...[item.id + '']])
   const uniquePaths = getTreeFromPath(paths)
-  const newTree = await buildTree(uniquePaths, defaultLevels, childrenHandler)
-  return newTree
+  const selectedCodesMap = selectedCodes.reduce((resultMap, item) => {
+    resultMap.set(item.id, item)
+    return resultMap
+  }, new Map())
+  for (const [key, value] of uniquePaths) {
+    const index = defaultLevels.findIndex((elem) => elem.id === key)
+    const branch = await buildBranch(defaultLevels[index], [key, value], fetchHandler, selectedCodesMap)
+    defaultLevels[index] = branch
+  }
+  return [...defaultLevels]
 }
 
-const buildTree = async <T, S>(
-  uniquePaths: InfiniteMap,
-  baseLevels: Hierarchy<T, S>[],
-  childrenHandler: (ids: string) => Promise<Hierarchy<T, S>[]>
-) => {
-  const buildBranch = async <T, S>(
-    path: [string, InfiniteMap],
-    node: Hierarchy<T, S>[],
-    childrenHandler: (ids: string) => Promise<Hierarchy<T, S>[]>
-  ) => {
-    const [key, nextPath] = path
-    const currentIndex = node.findIndex((elem) => elem.id === key)
-    node[currentIndex].status = nextPath.size ? SelectedStatus.INDETERMINATE : SelectedStatus.SELECTED
-    if (!nextPath.size) return
-    const childrenIds = node[currentIndex].inferior_levels_ids
-    if (childrenIds) {
-      const children = await childrenHandler(childrenIds)
-      node[currentIndex].subItems = children
-      nextPath.forEach((value, key) => buildBranch([key, value], node[currentIndex].subItems || [], childrenHandler))
-    }
+export const getHierarchyDisplay = <T>(defaultLevels: Hierarchy<T, string>[], tree: Hierarchy<T, string>[]) => {
+  const branches = defaultLevels.map((item) => {
+    const path = [...(item.above_levels_ids || '').split(',').filter((elem) => elem !== ''), ...[item.id + '']]
+    return findBranch(path, tree)
+  })
+  return branches
+}
+
+const findBranch = <T>(path: string[], tree: Hierarchy<T, string>[]): Hierarchy<T, string> => {
+  let branch: Hierarchy<T, string> = { id: 'empty' } as Hierarchy<T, string>
+  const key = path[0]
+  const index = tree.findIndex((item) => item.id === key)
+  const next = tree[index]
+  if (path.length === 1) {
+    branch = next
+  } else {
+    if (next.subItems) branch = findBranch(path.slice(1), next.subItems)
   }
-  const newTree = [...baseLevels]
-  for (const path of uniquePaths) {
-    await buildBranch(path, newTree, childrenHandler)
-  }
-  return newTree
+  return branch
 }
 
 export const getTreeFromPath = (paths: string[][]): InfiniteMap => {
@@ -100,17 +162,14 @@ export const getSelectedCodes = <T, S>(list: Hierarchy<T, S>, selectedCodes: Hie
   return selectedCodes
 }
 
-export const addSubItems = <T, S>(
-  tree: Hierarchy<T, S>[],
-  depth: number,
-  indices: number[],
-  toAdd: Hierarchy<T, S>[]
-) => {
-  const index = indices[depth]
-  if (depth < indices.length - 1) {
-    addSubItems(tree[index].subItems || [], depth + 1, indices, toAdd)
-  } else {
+export const addSubItems = <T, S>(path: string[], tree: Hierarchy<T, S>[], toAdd: Hierarchy<T, S>[]) => {
+  const key = path[0]
+  const index = tree.findIndex((item) => item.id === key)
+  if (path.length === 1) {
     tree[index].subItems = toAdd
+  } else {
+    const next = tree[index].subItems
+    if (next) addSubItems(path.slice(1), next, toAdd)
   }
   return tree
 }

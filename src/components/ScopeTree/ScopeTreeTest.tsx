@@ -12,18 +12,18 @@ type HierarchyItemProps = {
   item: Hierarchy<ScopeElement, string>
   path: number[]
   onSelect: (path: number[], toAdd: boolean, code: Hierarchy<ScopeElement, string>) => void
-  onExpand: (id: string, path: number[]) => void
+  onExpand: (children: string, path: string[], displayIndex: number) => void
 }
 
 const ScopeTreeItem = ({ item, path, onSelect, onExpand }: HierarchyItemProps) => {
   const { classes } = useStyles()
   const [open, setOpen] = useState(false)
-  const { id, name, subItems, status, inferior_levels_ids, source_value, cohort_size } = item
-
-  const isSearchMode = false
+  const { id, name, subItems, status, inferior_levels_ids, above_levels_ids, source_value, cohort_size } = item
 
   useEffect(() => {
-    if (open === true && !subItems) onExpand(inferior_levels_ids, path)
+    if (open === true && !subItems) {
+      onExpand(inferior_levels_ids, [...above_levels_ids.split(','), id], path[0])
+    }
   }, [open])
 
   return (
@@ -121,7 +121,7 @@ const ScopeTreeItem = ({ item, path, onSelect, onExpand }: HierarchyItemProps) =
 
 type HierarchyProps = {
   hierarchy: Hierarchy<ScopeElement, string>[]
-  onExpand: (parentCode: string, index: number[]) => void
+  onExpand: (children: string, path: string[], displayIndex: number) => void
   onSelect: (path: number[], toAdd: boolean, code: Hierarchy<ScopeElement, string>) => void
 }
 
