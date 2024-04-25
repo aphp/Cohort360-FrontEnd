@@ -17,6 +17,8 @@ import {
 } from '@mui/material'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
+import UpdateIcon from '@mui/icons-material/Update'
+
 import EditIcon from '@mui/icons-material/Edit'
 import ExportIcon from '@mui/icons-material/GetApp'
 import Star from 'assets/icones/star.svg?react'
@@ -109,11 +111,20 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                     </IconButton>
                   </TableCellWrapper>
                   <TableCellWrapper>
-                    {cohort.fhir_group_id ? (
+                    {cohort.request_job_status === CohortJobStatus._finished ? (
                       <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
                     ) : cohort.request_job_status === CohortJobStatus._pending ||
                       cohort.request_job_status === CohortJobStatus._new ? (
                       <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
+                    ) : cohort.request_job_status === CohortJobStatus._long_pending ? (
+                      <Tooltip title="Cohorte volumineuse: sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.">
+                        <Chip
+                          label="En cours"
+                          size="small"
+                          style={{ backgroundColor: '#ffc107', color: 'black' }}
+                          icon={<UpdateIcon />}
+                        />
+                      </Tooltip>
                     ) : cohort.request_job_fail_msg ? (
                       <Tooltip title={cohort.request_job_fail_msg}>
                         <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />

@@ -78,7 +78,7 @@ const ControlPanel: React.FC<{
     },
     [setShareSuccessOrFailMessage]
   )
-  const [socketLoading, setSocketLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
+  const [countLoading, setCountLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
   const [reportLoading, setReportLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
   const [reportError, setReportError] = useState(false)
   const [openReportConfirmation, setOpenReportConfirmation] = useState<boolean>(false)
@@ -208,7 +208,7 @@ const ControlPanel: React.FC<{
     }
   }
 
-  const isLoading = loading || socketLoading === LoadingStatus.FETCHING || saveLoading
+  const isLoading = loading || countLoading === LoadingStatus.FETCHING || saveLoading
   const errorCriteria = selectedCriteria.filter((criteria) => criteria.error)
   const lastUpdated = moment(count.date)
   const lastUpdatedOldCount = oldCount ? moment(oldCount.date) : null
@@ -217,7 +217,7 @@ const ControlPanel: React.FC<{
 
   useEffect(() => {
     if (status && status === CohortJobStatus._new) {
-      setSocketLoading(LoadingStatus.FETCHING)
+      setCountLoading(LoadingStatus.FETCHING)
       dispatch(countCohortCreation({ uuid: uuid }))
     }
   }, [dispatch, status, uuid])
@@ -234,7 +234,7 @@ const ControlPanel: React.FC<{
         message.extra_info?.measure !== null
       ) {
         setPatientCount(message.extra_info.measure)
-        setSocketLoading(LoadingStatus.SUCCESS)
+        setCountLoading(LoadingStatus.SUCCESS)
       }
     }
 
