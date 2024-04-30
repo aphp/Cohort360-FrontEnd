@@ -35,7 +35,7 @@ const SelectedCodes = <T,>({ values, onDelete }: SelectedCodesProps<T>) => {
           )}
         </Grid>
       )}
-      <Grid item container xs={12} justifyContent="space-between">
+      <Grid item xs={12} container justifyContent="space-between">
         <Grid item xs={4} container>
           <Typography textAlign="center" padding="10px" fontWeight={900}>
             {values?.length} sélectionné(s)

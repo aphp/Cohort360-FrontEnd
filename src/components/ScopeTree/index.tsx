@@ -97,32 +97,32 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
                     Nombre de patients
                   </TableCell>
 
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  {!!executiveUnitType ? 'Type' : 'Accès'}
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {fetchStatus === LoadingStatus.SUCCESS && loadingStatus === LoadingStatus.SUCCESS && count && (
-                <ScopeTreeTest hierarchy={hierarchy} onExpand={expandHierarchy} onSelect={selectHierarchyCodes} />
-              )}
-              {fetchStatus === LoadingStatus.SUCCESS && !count && (
-                <TableRow>
-                  <TableCell colSpan={7}>
-                    <Typography className={classes.loadingSpinnerContainer}>Aucun résultat à afficher</Typography>
+                  <TableCell align="center" className={classes.tableHeadCell}>
+                    {!!executiveUnitType ? 'Type' : 'Accès'}
                   </TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        {(fetchStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.FETCHING) && (
-          <Grid container justifyContent="center" alignContent="center" height={500}>
-            <CircularProgress />
-          </Grid>
-        )}
+              </TableHead>
+              <TableBody>
+                {fetchStatus === LoadingStatus.SUCCESS && loadingStatus === LoadingStatus.SUCCESS && count && (
+                  <ScopeTreeTest hierarchy={hierarchy} onExpand={expandHierarchy} onSelect={selectHierarchyCodes} />
+                )}
+                {fetchStatus === LoadingStatus.SUCCESS && !count && (
+                  <TableRow>
+                    <TableCell colSpan={7}>
+                      <Typography className={classes.loadingSpinnerContainer}>Aucun résultat à afficher</Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          {(fetchStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.FETCHING) && (
+            <Grid container justifyContent="center" alignContent="center" height={500}>
+              <CircularProgress />
+            </Grid>
+          )}
 
-        {/*<Pagination
+          {/*<Pagination
           // className={classes.pagination}
           count={Math.ceil((count ?? 0) / 100)}
           shape="circular"
@@ -130,7 +130,7 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
           page={options.page}
         />*/}
 
-        {/*searchInput ? (
+          {/*searchInput ? (
         <ScopeTreeSearch
           searchInput={searchInput}
           selectedItems={fixSelectedItems}
@@ -146,8 +146,9 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
         )}
         */}
 
-        <Grid item style={{ backgroundColor: '#E6F1FD' }} padding="20px 40px">
-          <SelectedCodes values={selectedCodes} onDelete={deleteHierarchyCode} />
+          <Grid item style={{ backgroundColor: '#E6F1FD' }} padding="20px 40px">
+            <SelectedCodes values={selectedCodes} onDelete={deleteHierarchyCode} />
+          </Grid>
         </Grid>
       </Grid>
     </Grid>

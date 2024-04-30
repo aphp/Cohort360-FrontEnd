@@ -1,7 +1,6 @@
 import { SelectedStatus } from 'types'
 import { Hierarchy, InfiniteMap } from 'types/hierarchy'
 
-
 const mapInfiniteMapToList = (map: InfiniteMap): string[] => {
   let allValues: string[] = []
   map.forEach((value, key) => {
@@ -16,7 +15,8 @@ const mapInfiniteMapToList = (map: InfiniteMap): string[] => {
 const createBranchFromInfo = <T>(
   path: [string, InfiniteMap],
   results: Map<string, Hierarchy<T, string>>,
-  node: Hierarchy<T, string> | null
+  node: Hierarchy<T, string> | null,
+  status: SelectedStatus
 ) => {
   const [key, nextPath] = path
   node = results.get(key) || null
@@ -29,11 +29,11 @@ const createBranchFromInfo = <T>(
       node.subItems.push(...childrenToAdd)
       for (const [nextKey, next] of nextPath) {
         const index = node.subItems.findIndex((elem) => elem.id === nextKey)
-        createBranchFromInfo([nextKey, next], results, node.subItems[index])
+        createBranchFromInfo([nextKey, next], results, node.subItems[index], status)
       }
       node.status = getItemSelectedStatus(node)
     } else {
-      node.status = SelectedStatus.SELECTED
+      node.status = status
     }
   }
   return node
@@ -42,6 +42,7 @@ const createBranchFromInfo = <T>(
 const getBranchMissingInfo = async <T>(
   path: [string, InfiniteMap],
   codes: Map<string, Hierarchy<T, string>>,
+  status: SelectedStatus,
   fetchHandler: (ids: string) => Promise<Hierarchy<T, string>[]>
 ) => {
   const [key, nextPath] = path
@@ -60,35 +61,39 @@ const getBranchMissingInfo = async <T>(
     },
     new Map()
   )
-  const branch = createBranchFromInfo(path, results, null)
+  const branch = createBranchFromInfo(path, results, null, status)
   return branch
 }
 
 export const buildBranch = async <T>(
   node: Hierarchy<T, string>,
   path: [string, InfiniteMap],
-  fetchHandler: (ids: string) => Promise<Hierarchy<T, string>[]>,
-  codes: Map<string, Hierarchy<T, string>>
+  codes: Map<string, Hierarchy<T, string>>,
+  status: SelectedStatus,
+  fetchHandler: (ids: string) => Promise<Hierarchy<T, string>[]>
 ) => {
   const [key, nextPath] = path
   if (nextPath.size) {
     if (!node.subItems) {
-      const branch = await getBranchMissingInfo(path, codes, fetchHandler)
+      const branch = await getBranchMissingInfo(path, codes, status, fetchHandler)
       if (branch) node = branch
     } else {
       for (const [nextKey, next] of nextPath) {
-        const index = node.subItems.findIndex((elem) => elem.id === key)
-        await buildBranch(node.subItems[index], [nextKey, next], fetchHandler, codes)
+        const index = node.subItems.findIndex((elem) => elem.id === nextKey)
+        await buildBranch(node.subItems[index], [nextKey, next], codes, status, fetchHandler)
       }
     }
+    node.status = getItemSelectedStatus(node)
+  } else {
+    node.status = status
   }
   return node
-  //node[currentIndex].status = getItemSelectedStatus(node[currentIndex])
 }
 
 export const buildHierarchyFromSelectedIds = async <T>(
   selectedCodes: Hierarchy<T, string>[],
   defaultLevels: Hierarchy<T, string>[],
+  status: SelectedStatus,
   fetchHandler: (ids: string) => Promise<Hierarchy<T, string>[]>
 ) => {
   const paths = selectedCodes.map((item) => [...(item.above_levels_ids || '').split(','), ...[item.id + '']])
@@ -99,7 +104,7 @@ export const buildHierarchyFromSelectedIds = async <T>(
   }, new Map())
   for (const [key, value] of uniquePaths) {
     const index = defaultLevels.findIndex((elem) => elem.id === key)
-    const branch = await buildBranch(defaultLevels[index], [key, value], fetchHandler, selectedCodesMap)
+    const branch = await buildBranch(defaultLevels[index], [key, value], selectedCodesMap, status, fetchHandler)
     defaultLevels[index] = branch
   }
   return [...defaultLevels]
@@ -154,11 +159,14 @@ export const updateSelectedStatus = <T, S>(path: number[], list: Hierarchy<T, S>
   else list[currentIndex].status = getItemSelectedStatus(list[currentIndex])
   return list
 }
-
-export const getSelectedCodes = <T, S>(list: Hierarchy<T, S>, selectedCodes: Hierarchy<T, S>[]) => {
-  if (list.status === SelectedStatus.INDETERMINATE)
-    list.subItems?.forEach((subItem) => getSelectedCodes(subItem, selectedCodes))
-  if (list.status === SelectedStatus.SELECTED) selectedCodes.push(list)
+export const getSelectedCodes = <T>(list: Hierarchy<T, string>[]) => {
+  const get = <T>(hierarchy: Hierarchy<T, string>, selectedCodes: Hierarchy<T, string>[]) => {
+    if (hierarchy.status === SelectedStatus.INDETERMINATE)
+      hierarchy.subItems?.forEach((subItem) => get(subItem, selectedCodes))
+    if (hierarchy.status === SelectedStatus.SELECTED) selectedCodes.push(hierarchy)
+    return selectedCodes
+  }
+  const selectedCodes = list.flatMap((hierarchy) => get(hierarchy, []))
   return selectedCodes
 }
 
