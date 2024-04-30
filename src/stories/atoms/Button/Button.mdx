@@ -1,0 +1,80 @@
+import { Canvas, Meta } from '@storybook/blocks'
+import { Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import { Button } from './Button'
+
+<Meta title="Stories/Atoms/Button" />
+
+# Button
+
+<Typography>Primary UI component for user interaction</Typography>
+<br />
+
+export const sizes = ['small', 'medium', 'large']
+
+export const rows = [
+  {
+    title: 'Text'
+  },
+  {
+    title: 'Contained',
+    variant: 'contained'
+  },
+  {
+    title: 'Outlined',
+    variant: 'outlined'
+  }
+]
+
+export const displayRows = () =>
+  rows.map((row) => (
+    <TableRow>
+      <TableCell align="center">{row.title}</TableCell>
+      <TableCell align="center">
+        <Button variant={row.variant}>My Button</Button>
+      </TableCell>
+      <TableCell align="center">
+        <Button variant={row.variant} disabled>
+          Disabled
+        </Button>
+      </TableCell>
+      <TableCell align="center">
+        <Button variant={row.variant} href="#">
+          Link
+        </Button>
+      </TableCell>
+      <TableCell align="center">
+        <Grid container alignItems="center" justifyContent="center" gap="16px">
+          {sizes.map((size) => (
+            <Button variant={row.variant} size={size}>
+              <span>{size}</span>
+            </Button>
+          ))}
+        </Grid>
+      </TableCell>
+    </TableRow>
+  ))
+
+<TableContainer>
+  <Table className="table">
+    <TableHead className="tableHead">
+      <TableRow className="tableRow">
+        <TableCell></TableCell>
+        <TableCell align="center">Default</TableCell>
+        <TableCell align="center">Disabled</TableCell>
+        <TableCell align="center">Link</TableCell>
+        <TableCell align="center">Size</TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {displayRows()}
+    </TableBody>
+
+  </Table>
+</TableContainer>
+
+```tsx
+// Extended from MUI Button
+<Button disabled={disabled} href={link} size={size} variant={variant}>
+  Text or JSX element
+</Button>
+```
