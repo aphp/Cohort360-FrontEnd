@@ -55,14 +55,12 @@ export const useHierarchy = <T, S>(
   const selectHierarchyCodes = async (path: string[], toAdd: boolean, displayIndex: number) => {
     const status = toAdd ? SelectedStatus.NOT_SELECTED : SelectedStatus.SELECTED
     const paths = getTreeFromPath([path])
-    for (const [key, value] of paths) {
-      const index = hierarchyRepresentation.findIndex((elem) => elem.id === key)
-      const branch = await buildBranch(hierarchyRepresentation[index], [key, value], new Map(), status, fetchHandler)
-      hierarchyRepresentation[index] = branch
-    }
+    const [key, value] = paths.entries().next().value
+    const index = hierarchyRepresentation.findIndex((elem) => elem.id === key)
+    const branch = await buildBranch(hierarchyRepresentation[index], [key, value], new Map(), status, fetchHandler)
+    hierarchyRepresentation[index] = branch
     const updatedHierarchyDisplay = getHierarchyDisplay(hierarchyDisplay, hierarchyRepresentation)
     const selectedCodes = getSelectedCodes(hierarchyRepresentation)
-    console.log('test algo', selectedCodes)
     setSelectedCodes(selectedCodes)
     setHierarchyRepresentation([...hierarchyRepresentation])
     setHierarchyDisplay(updatedHierarchyDisplay)

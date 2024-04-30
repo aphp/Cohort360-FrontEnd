@@ -65,6 +65,16 @@ const getBranchMissingInfo = async <T>(
   return branch
 }
 
+const updateBranchStatus = <T>(node: Hierarchy<T, string>, status: SelectedStatus) => {
+  if (node.subItems) {
+    node.subItems.forEach((subItem) => {
+      subItem.status = status
+      updateBranchStatus(subItem, status)
+    })
+  }
+  return node
+}
+
 export const buildBranch = async <T>(
   node: Hierarchy<T, string>,
   path: [string, InfiniteMap],
@@ -86,6 +96,7 @@ export const buildBranch = async <T>(
     node.status = getItemSelectedStatus(node)
   } else {
     node.status = status
+    updateBranchStatus(node, status)
   }
   return node
 }
@@ -124,6 +135,7 @@ const findBranch = <T>(path: string[], tree: Hierarchy<T, string>[]): Hierarchy<
   const index = tree.findIndex((item) => item.id === key)
   const next = tree[index]
   if (path.length === 1) {
+    console.log('test algo branch', next)
     branch = next
   } else {
     if (next.subItems) branch = findBranch(path.slice(1), next.subItems)
