@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { RefObject, useEffect, useRef, useState } from 'react'
 
-import { Grid, IconButton, Typography } from '@mui/material'
+import { Collapse, Grid, IconButton, Typography } from '@mui/material'
 import Chip from 'components/ui/Chip'
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
 import { ScopeElement } from 'types'
@@ -14,9 +14,16 @@ type SelectedCodesProps<T> = {
 const SelectedCodes = <T,>({ values, onDelete }: SelectedCodesProps<T>) => {
   const [openSelectedCodesDrawer, setOpenSelectedCodesDrawer] = useState(false)
 
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
+  useOutsideAlerter(wrapperRef, (event: any) => {
+    if (openSelectedCodesDrawer && wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+      setOpenSelectedCodesDrawer(false)
+    }
+  })
+
   return (
-    <>
-      {openSelectedCodesDrawer && (
+    <Grid container ref={wrapperRef}>
+      <Collapse in={openSelectedCodesDrawer}>
         <Grid
           item
           container
@@ -34,7 +41,7 @@ const SelectedCodes = <T,>({ values, onDelete }: SelectedCodesProps<T>) => {
             </Grid>
           )}
         </Grid>
-      )}
+      </Collapse>
       <Grid item xs={12} container justifyContent="space-between">
         <Grid item xs={4} container>
           <Typography textAlign="center" padding="10px" fontWeight={900}>
@@ -43,14 +50,25 @@ const SelectedCodes = <T,>({ values, onDelete }: SelectedCodesProps<T>) => {
         </Grid>
         <Grid item xs={1} container justifyContent="flex-end">
           {values.length > 0 && (
-            <IconButton onClick={() => setOpenSelectedCodesDrawer(!openSelectedCodesDrawer)}>
+            <IconButton onClick={() => setOpenSelectedCodesDrawer((prev) => !prev)}>
               {openSelectedCodesDrawer ? <KeyboardArrowDown /> : <KeyboardArrowUp />}
             </IconButton>
           )}
         </Grid>
       </Grid>
-    </>
+    </Grid>
   )
 }
 
 export default SelectedCodes
+
+function useOutsideAlerter(ref: RefObject<HTMLElement | null>, action: (event: Event) => void) {
+  useEffect(() => {
+    // Bind the event listener
+    document.addEventListener('mousedown', action)
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener('mousedown', action)
+    }
+  }, [ref, action])
+}
