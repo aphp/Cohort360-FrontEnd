@@ -1,3 +1,4 @@
+import React from 'react'
 import { Button } from './Button'
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -32,8 +33,15 @@ const meta: Meta<typeof Button> = {
     },
     ref: { if: { arg: 'parent', exists: true } },
     component: { if: { arg: 'parent', exists: true } }
-  }
+  },
   // For argTypes doc, see https://storybook.js.org/docs/api/arg-types
+  decorators: [
+    (Story) => (
+      <div style={{ margin: '40px' }}>
+        <Story />
+      </div>
+    )
+  ]
 }
 
 export default meta
