@@ -12,9 +12,6 @@ export default makeStyles()(() => ({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  table: {
-    minWidth: 650
-  },
   tableHead: {
     height: 42,
     backgroundColor: '#D1E2F4',

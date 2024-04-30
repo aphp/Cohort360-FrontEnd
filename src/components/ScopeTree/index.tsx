@@ -76,10 +76,18 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
         />
       </Grid>
 
-      <Grid container direction="column" wrap="nowrap" height="100%" overflow="auto">
-        <Grid item height="100%" style={{ overflowX: 'auto' }}>
-          <TableContainer component={Paper} style={{ overflowX: 'unset', flexWrap: 'nowrap' }}>
-            <Table className={classes.table}>
+      <Grid container direction="column" wrap="wrap" height="100%" overflow="auto">
+        <Grid
+          item
+          container
+          direction="column"
+          justifyContent="space-between"
+          wrap="nowrap"
+          height="100%"
+          style={{ overflowX: 'auto' }}
+        >
+          <TableContainer component={Paper} style={{ overflowX: 'hidden' }}>
+            <Table>
               <TableHead>
                 <TableRow className={classes.tableHead}>
                   <TableCell className={classes.emptyTableHeadCell}></TableCell>
@@ -146,7 +154,7 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
         )}
         */}
 
-          <Grid item style={{ backgroundColor: '#E6F1FD' }} padding="20px 40px">
+          <Grid item style={{ backgroundColor: '#E6F1FD' }} padding="20px 40px" alignSelf="bottom">
             <SelectedCodes values={selectedCodes} onDelete={deleteHierarchyCode} />
           </Grid>
         </Grid>

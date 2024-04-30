@@ -34,7 +34,7 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
     <Drawer
       anchor="right"
       open={open}
-      PaperProps={{ style: { overflowY: 'unset' } }}
+      PaperProps={{ style: { overflowY: 'unset', width: '650px' } }}
       onClose={onClose}
       className={classes.drawer}
     >
