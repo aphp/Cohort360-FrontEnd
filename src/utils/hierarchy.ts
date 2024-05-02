@@ -65,16 +65,6 @@ const getBranchMissingInfo = async <T>(
   return branch
 }
 
-const updateBranchStatus = <T>(node: Hierarchy<T, string>, status?: SelectedStatus) => {
-  if (node.subItems) {
-    node.subItems.forEach((subItem) => {
-      subItem.status = status === SelectedStatus.SELECTED ? SelectedStatus.SELECTED : SelectedStatus.NOT_SELECTED
-      updateBranchStatus(subItem, status)
-    })
-  }
-  return node
-}
-
 export const buildBranch = async <T>(
   node: Hierarchy<T, string>,
   path: [string, InfiniteMap],
