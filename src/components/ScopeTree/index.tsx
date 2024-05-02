@@ -16,7 +16,7 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
-import { DisplayMode, useHierarchy } from '../../hooks/hierarchy/useHierarchy'
+import { useHierarchy } from '../../hooks/hierarchy/useHierarchy'
 import { useSearchParameters } from '../../hooks/useSearchParameters'
 import servicesPerimeters from '../../services/aphp/servicePerimeters'
 import useStyles from './utils/styles'
@@ -35,16 +35,15 @@ type ScopeTreeProps = {
 const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitType }: ScopeTreeProps) => {
   const { classes } = useStyles()
   const practitionerId = useAppSelector((state) => state.me)?.id || ''
+  const { options, totalPageNumber } = useSearchParameters(20, 0)
 
-  const { options, totalPageNumber, onChangeSearchInput, onChangePage } = useSearchParameters(20, 0)
-
-  const handleFetch = useCallback(() => {
+  const fetchBaseTree = useCallback(() => {
     return isExecutiveUnit
       ? servicesPerimeters.getPerimeters({ practitionerId, search: options.searchInput })
       : servicesPerimeters.getRights({ practitionerId, search: options.searchInput })
   }, [isExecutiveUnit, practitionerId, options.searchInput])
 
-  const handleFetchChildren = useCallback(
+  const fetchChildren = useCallback(
     async (ids: string) => {
       const { results } = isExecutiveUnit
         ? await servicesPerimeters.getPerimeters({ practitionerId, ids, limit: -1 })
@@ -54,17 +53,27 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
     [isExecutiveUnit, practitionerId]
   )
 
-  const hierarchyDisplayMode = useMemo(() => {
-    return options.searchInput ? DisplayMode.SEARCH : DisplayMode.TREE
-  }, [options.searchInput])
+  const fetchSearch = useCallback(
+    async (searchInput: string) => {
+      const { results } = isExecutiveUnit
+        ? await servicesPerimeters.getPerimeters({ practitionerId, search: searchInput })
+        : await servicesPerimeters.getRights({ practitionerId, search: searchInput })
+      return results
+    },
+    [isExecutiveUnit, practitionerId]
+  )
+
+  const { fetchStatus: baseLevelsFetchStatus, response: baseLevelsResponse } = useFetch(fetchBaseTree)
 
   const {
-    fetchStatus,
-    response: { count, results }
-  } = useFetch(options, handleFetch)
-
-  const { hierarchy, selectedCodes, loadingStatus, expandHierarchy, selectHierarchyCodes, deleteHierarchyCode } =
-    useHierarchy(results, handleFetchChildren, hierarchyDisplayMode, selectedIds)
+    hierarchy,
+    selectedCodes,
+    loadingStatus,
+    search,
+    expandHierarchy,
+    selectHierarchyCodes,
+    deleteHierarchyCode
+  } = useHierarchy(baseLevelsResponse.results, fetchChildren, selectedIds)
 
   return (
     <Grid container direction="column" wrap="nowrap" height="100%" overflow="hidden">
@@ -72,7 +81,7 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
         <SearchInput
           value={options.searchInput}
           placeholder={'Rechercher'}
-          onchange={(newValue) => onChangeSearchInput(newValue)}
+          onchange={(newValue) => search(newValue, () => fetchSearch(newValue))}
         />
       </Grid>
 
@@ -111,10 +120,12 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
                 </TableRow>
               </TableHead>
               <TableBody>
-                {fetchStatus === LoadingStatus.SUCCESS && loadingStatus === LoadingStatus.SUCCESS && count && (
-                  <ScopeTreeTest hierarchy={hierarchy} onExpand={expandHierarchy} onSelect={selectHierarchyCodes} />
-                )}
-                {fetchStatus === LoadingStatus.SUCCESS && !count && (
+                {baseLevelsFetchStatus === LoadingStatus.SUCCESS &&
+                  loadingStatus === LoadingStatus.SUCCESS &&
+                  baseLevelsResponse.count && (
+                    <ScopeTreeTest hierarchy={hierarchy} onExpand={expandHierarchy} onSelect={selectHierarchyCodes} />
+                  )}
+                {baseLevelsFetchStatus === LoadingStatus.SUCCESS && !baseLevelsResponse.count && (
                   <TableRow>
                     <TableCell colSpan={7}>
                       <Typography className={classes.loadingSpinnerContainer}>Aucun résultat à afficher</Typography>
@@ -124,11 +135,12 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
               </TableBody>
             </Table>
           </TableContainer>
-          {(fetchStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.FETCHING) && (
-            <Grid container justifyContent="center" alignContent="center" height={500}>
-              <CircularProgress />
-            </Grid>
-          )}
+          {baseLevelsFetchStatus === LoadingStatus.FETCHING ||
+            (loadingStatus === LoadingStatus.FETCHING && (
+              <Grid container justifyContent="center" alignContent="center" height={500}>
+                <CircularProgress />
+              </Grid>
+            ))}
 
           {/*<Pagination
           // className={classes.pagination}

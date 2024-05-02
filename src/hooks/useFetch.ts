@@ -8,7 +8,7 @@ type FetchOptions = {
   page?: number
 }
 
-export const useFetch = <T>(options: FetchOptions, fetchCall: () => Promise<Back_API_Response<T>>) => {
+export const useFetch = <T>(fetchCall: () => Promise<Back_API_Response<T>>, options?: FetchOptions) => {
   const [response, setResponse] = useState<Back_API_Response<T>>({
     count: 0,
     next: '',

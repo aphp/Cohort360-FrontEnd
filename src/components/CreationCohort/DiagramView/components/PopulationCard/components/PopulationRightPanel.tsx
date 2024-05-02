@@ -44,8 +44,8 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
             <Typography className={classes.title}>{title ?? 'Structure hospitalière'}</Typography>
           </Grid>
           <ScopeTree
-            //selectedIds=""
-            selectedIds={'8312016825,8312077037,8312085055,8312016350,8312076084,16180131083,18042109754'}
+            selectedIds=""
+            //selectedIds={'8312016825,8312077037,8312085055,8312016350,8312076084,16180131083,18042109754'}
             //selectedIds={'8312016825,8312077037,8312085055,8312016350,8312076084,16180131083'}
             //selectedIds={'16180131083'}
             setSelectedItems={_setSelectedPopulation}

@@ -11,7 +11,7 @@ import displayDigit from 'utils/displayDigit'
 type HierarchyItemProps = {
   item: Hierarchy<ScopeElement, string>
   path: number[]
-  onSelect: (path: string[], toAdd: boolean, displayIndex: number) => void
+  onSelect: (path: string[], toAdd: boolean) => void
   onExpand: (children: string, path: string[], displayIndex: number) => void
 }
 
@@ -58,7 +58,7 @@ const ScopeTreeItem = ({ item, path, onSelect, onExpand }: HierarchyItemProps) =
             indeterminateIcon={<IndeterminateCheckBoxOutlined />}
             onClick={() => {
               const ids = above_levels_ids ? [...above_levels_ids.split(','), id] : [id]
-              onSelect(ids, status === SelectedStatus.SELECTED || status === SelectedStatus.INDETERMINATE, path[0])
+              onSelect(ids, status === SelectedStatus.SELECTED || status === SelectedStatus.INDETERMINATE)
             }}
             inputProps={{ 'aria-labelledby': name }}
           />
@@ -123,7 +123,7 @@ const ScopeTreeItem = ({ item, path, onSelect, onExpand }: HierarchyItemProps) =
 type HierarchyProps = {
   hierarchy: Hierarchy<ScopeElement, string>[]
   onExpand: (children: string, path: string[], displayIndex: number) => void
-  onSelect: (path: string[], toAdd: boolean, displayIndex: number) => void
+  onSelect: (path: string[], toAdd: boolean) => void
 }
 
 const ScopeTree = ({ hierarchy, onSelect, onExpand }: HierarchyProps) => {

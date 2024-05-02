@@ -1,63 +1,66 @@
-import {
-  buildBranch,
-  buildHierarchyFromSelectedIds,
-  getHierarchyDisplay,
-  getTreeFromPath
-} from './../../utils/hierarchy'
+import { buildBranch, buildHierarchy, getHierarchyDisplay, getUniquePath } from './../../utils/hierarchy'
 import { useEffect, useState } from 'react'
 import { LoadingStatus, SelectedStatus } from 'types'
-import { addSubItems, getSelectedCodes, updateSelectedStatus, getItemSelectedStatus } from 'utils/hierarchy'
+import { addSubItems, getSelectedCodes } from 'utils/hierarchy'
 import { Hierarchy } from '../../types/hierarchy'
 import { removeElement } from 'utils/arrays'
 
-export enum DisplayMode {
-  TREE,
-  SEARCH
-}
-
 export const useHierarchy = <T, S>(
-  tree: Hierarchy<T, string>[],
+  baseTree: Hierarchy<T, string>[],
   fetchHandler: (ids: string) => Promise<Hierarchy<T, string>[]>,
-  displayMode: DisplayMode,
   selectedIds?: string
 ) => {
   const [hierarchyRepresentation, setHierarchyRepresentation] = useState<Hierarchy<T, string>[]>([])
   const [hierarchyDisplay, setHierarchyDisplay] = useState<Hierarchy<T, string>[]>([])
+  const [baseLevels, setBaseLevels] = useState<Hierarchy<T, string>[]>([])
   const [selectedCodes, setSelectedCodes] = useState<Hierarchy<T, string>[]>([])
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.SUCCESS)
 
   useEffect(() => {
-    const handleInit = async (tree: Hierarchy<T, string>[]) => {
+    setBaseLevels(baseTree)
+  }, [baseTree])
+
+  useEffect(() => {
+    const handleInit = async () => {
       setLoadingStatus(LoadingStatus.FETCHING)
-      if (selectedIds && tree.length) {
+      let newTree: Hierarchy<T, string>[] = []
+      if (selectedIds && baseLevels.length) {
         const selectedCodes = await fetchHandler(selectedIds)
-        const newTree = await buildHierarchyFromSelectedIds(selectedCodes, tree, SelectedStatus.SELECTED, fetchHandler)
-        const display = getHierarchyDisplay(tree, newTree)
-        setHierarchyRepresentation(newTree)
-        setHierarchyDisplay(display)
+        newTree = await buildHierarchy(selectedCodes, hierarchyRepresentation, fetchHandler, SelectedStatus.SELECTED)
         setSelectedCodes(selectedCodes)
       } else {
-        setHierarchyRepresentation(tree)
-        setHierarchyDisplay(tree)
+        newTree = await buildHierarchy(baseLevels, [], fetchHandler, SelectedStatus.NOT_SELECTED)
       }
+      const display = getHierarchyDisplay(baseLevels, newTree)
+      setHierarchyRepresentation(newTree)
+      setHierarchyDisplay(display)
       setLoadingStatus(LoadingStatus.SUCCESS)
     }
-    handleInit(tree)
-  }, [tree, selectedIds, fetchHandler /*, displayMode*/])
+    handleInit()
+  }, [baseLevels, selectedIds, fetchHandler])
 
-  /*const mapToUniqueParent = (children: Hierarchy<T, S>[]) => {
-    const firstParent: Hierarchy<T, S> = { id: 'firstParent' } as Hierarchy<T, S>
-    firstParent.subItems = children
-    firstParent.status = getItemSelectedStatus(firstParent)
-    return firstParent
-  }*/
+  const search = async (search: string, fetchSearch: (ids: string) => Promise<Hierarchy<T, string>[]>) => {
+    setLoadingStatus(LoadingStatus.FETCHING)
 
-  const selectHierarchyCodes = async (path: string[], toAdd: boolean, displayIndex: number) => {
+    if (search) {
+      const searchResults = await fetchSearch(search)
+      const newTree = await buildHierarchy(searchResults, hierarchyRepresentation, fetchHandler)
+      setHierarchyRepresentation(newTree)
+      const display = getHierarchyDisplay(searchResults, hierarchyRepresentation)
+      setHierarchyDisplay(display)
+    } else {
+      const display = getHierarchyDisplay(baseLevels, hierarchyRepresentation)
+      setHierarchyDisplay(display)
+    }
+    setLoadingStatus(LoadingStatus.SUCCESS)
+  }
+
+  const selectHierarchyCodes = async (path: string[], toAdd: boolean) => {
     const status = toAdd ? SelectedStatus.NOT_SELECTED : SelectedStatus.SELECTED
-    const paths = getTreeFromPath([path])
+    const paths = getUniquePath([path])
     const [key, value] = paths.entries().next().value
     const index = hierarchyRepresentation.findIndex((elem) => elem.id === key)
-    const branch = await buildBranch(hierarchyRepresentation[index], [key, value], new Map(), status, fetchHandler)
+    const branch = await buildBranch(hierarchyRepresentation[index], [key, value], new Map(), fetchHandler, status)
     hierarchyRepresentation[index] = branch
     const updatedHierarchyDisplay = getHierarchyDisplay(hierarchyDisplay, hierarchyRepresentation)
     const selectedCodes = getSelectedCodes(hierarchyRepresentation)
@@ -66,11 +69,26 @@ export const useHierarchy = <T, S>(
     setHierarchyDisplay(updatedHierarchyDisplay)
   }
 
-  const deleteHierarchyCode = async (hierarchyItem: Hierarchy<T, S>) => {
-    const newSelectedCodes = removeElement(hierarchyItem, selectedCodes)
-    const updatedHierarchy = updateSelectedStatus(path, hierarchyRepresentation, SelectedStatus.NOT_SELECTED)
-    setSelectedCodes(newSelectedCodes)
-    setHierarchyRepresentation(updatedHierarchy)
+  const deleteHierarchyCode = async (hierarchyItem: Hierarchy<T, string>) => {
+    const path = hierarchyItem.above_levels_ids
+      ? [...hierarchyItem.above_levels_ids.split(','), hierarchyItem.id]
+      : [hierarchyItem.id]
+    const paths = getUniquePath([path])
+    const [key, value] = paths.entries().next().value
+    const index = hierarchyRepresentation.findIndex((elem) => elem.id === key)
+    const branch = await buildBranch(
+      hierarchyRepresentation[index],
+      [key, value],
+      new Map(),
+      fetchHandler,
+      SelectedStatus.NOT_SELECTED
+    )
+    hierarchyRepresentation[index] = branch
+    const updatedHierarchyDisplay = getHierarchyDisplay(hierarchyDisplay, hierarchyRepresentation)
+    const updatedSelectedCodes = removeElement(hierarchyItem, selectedCodes)
+    setSelectedCodes(updatedSelectedCodes)
+    setHierarchyRepresentation([...hierarchyRepresentation])
+    setHierarchyDisplay(updatedHierarchyDisplay)
   }
 
   const expandHierarchy = async (childrenIds: string, path: string[], displayIndex: number) => {
@@ -86,6 +104,7 @@ export const useHierarchy = <T, S>(
     hierarchy: hierarchyDisplay,
     selectedCodes,
     loadingStatus,
+    search,
     selectHierarchyCodes,
     expandHierarchy,
     deleteHierarchyCode
