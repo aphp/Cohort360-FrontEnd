@@ -32,11 +32,14 @@ const SelectedCodes = <T,>({ values, onDelete }: SelectedCodesProps<T>) => {
           style={{ maxHeight: 200, overflowX: 'hidden', overflowY: 'auto' }}
         >
           {values?.length > 0 && (
-            <Grid item xs={12} container marginBottom={3} spacing={1}>
+            <Grid item xs={12} container marginBottom={3}>
               {values.map((code) => (
-                <Grid item xs={4} container key={code.id}>
-                  <Chip label={`${code.source_value} - ${code.name}`} onDelete={() => onDelete(code)} />
-                </Grid>
+                <Chip
+                  key={code.id}
+                  style={{ backgroundColor: '#D1E2F4', color: '153D8A important!' }}
+                  label={`${code.source_value} - ${code.name}`}
+                  onDelete={() => onDelete(code)}
+                />
               ))}
             </Grid>
           )}
@@ -44,13 +47,13 @@ const SelectedCodes = <T,>({ values, onDelete }: SelectedCodesProps<T>) => {
       </Collapse>
       <Grid item xs={12} container justifyContent="space-between">
         <Grid item xs={4} container>
-          <Typography textAlign="center" padding="10px" fontWeight={900}>
+          <Typography textAlign="center" padding="10px" fontWeight={900} color="#0063AF">
             {values?.length} sélectionné(s)
           </Typography>
         </Grid>
         <Grid item xs={1} container justifyContent="flex-end">
           {values.length > 0 && (
-            <IconButton onClick={() => setOpenSelectedCodesDrawer((prev) => !prev)}>
+            <IconButton style={{ color: '#153D8A' }} onClick={() => setOpenSelectedCodesDrawer((prev) => !prev)}>
               {openSelectedCodesDrawer ? <KeyboardArrowDown /> : <KeyboardArrowUp />}
             </IconButton>
           )}

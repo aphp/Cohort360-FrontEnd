@@ -1,34 +1,55 @@
 import { useEffect, useMemo, useState } from 'react'
 
-export const useSearchParameters = (limit: number, count: number) => {
-  const [searchInput, setSearchInput] = useState('')
+export const useSearchParameters = () => {
+  const [search, setSearch] = useState('')
+  const [searchMode, setSearchMode] = useState(false)
   const [page, setPage] = useState(0)
-  const [totalPageNumber, setTotalPageNumber] = useState(0)
+  const [limit, setLimit] = useState(20)
+  const [count, setCount] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
 
   const options = useMemo(
     () => ({
       page,
-      searchInput
+      search,
+      searchMode,
+      limit,
+      count,
+      totalPages
     }),
-    [searchInput, page]
+    [search, page, limit, count, totalPages, searchMode]
   )
 
+  useEffect(() => {
+    setTotalPages(Math.ceil(count / limit))
+  }, [count, limit])
+
+  const onChangeLimit = (newValue: number) => {
+    setLimit(newValue)
+  }
+
   const onChangeSearchInput = (newValue: string) => {
-    setSearchInput(newValue)
+    setSearch(newValue)
   }
 
   const onChangePage = (newValue: number) => {
     setPage(newValue)
   }
 
-  useEffect(() => {
-    setTotalPageNumber(Math.floor(count / limit))
-  }, [limit, count])
+  const onChangeCount = (newValue: number) => {
+    setCount(newValue)
+  }
+
+  const onChangeSearchMode = (newValue: boolean) => {
+    setSearchMode(newValue)
+  }
 
   return {
     options,
-    totalPageNumber,
     onChangeSearchInput,
-    onChangePage
+    onChangeSearchMode,
+    onChangePage,
+    onChangeLimit,
+    onChangeCount
   }
 }

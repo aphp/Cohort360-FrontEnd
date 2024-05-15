@@ -1,11 +1,17 @@
-import { buildBranch, buildHierarchy, getHierarchyDisplay, getUniquePath } from './../../utils/hierarchy'
+import {
+  buildBranch,
+  buildHierarchy,
+  getHierarchyDisplay,
+  getItemSelectedStatus,
+  getUniquePath
+} from './../../utils/hierarchy'
 import { useEffect, useState } from 'react'
 import { LoadingStatus, SelectedStatus } from 'types'
-import { addSubItems, getSelectedCodes } from 'utils/hierarchy'
+import { getSelectedCodes } from 'utils/hierarchy'
 import { Hierarchy } from '../../types/hierarchy'
 import { removeElement } from 'utils/arrays'
 
-export const useHierarchy = <T, S>(
+export const useHierarchy = <T>(
   baseTree: Hierarchy<T, string>[],
   fetchHandler: (ids: string) => Promise<Hierarchy<T, string>[]>,
   selectedIds?: string
@@ -15,10 +21,45 @@ export const useHierarchy = <T, S>(
   const [baseLevels, setBaseLevels] = useState<Hierarchy<T, string>[]>([])
   const [selectedCodes, setSelectedCodes] = useState<Hierarchy<T, string>[]>([])
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.SUCCESS)
+  const [selectAllStatus, setSelectAllStatus] = useState(SelectedStatus.NOT_SELECTED)
 
   useEffect(() => {
     setBaseLevels(baseTree)
+    //setHierarchyRepresentation(baseTree)
+    //setHierarchyDisplay(baseLevels)
   }, [baseTree])
+
+  /*
+  useEffect(() => {
+    const handle = async () => {
+      if (selectedIds && baseLevels.length) {
+        const selectedCodes = await fetchHandler(selectedIds)
+        const newTree = await buildHierarchy(
+          selectedCodes,
+          hierarchyRepresentation,
+          fetchHandler,
+          SelectedStatus.SELECTED
+        )
+        setSelectedCodes(selectedCodes)
+        setHierarchyRepresentation(newTree)
+      }
+    }
+    handle()
+  }, [selectedIds, baseLevels])
+
+  useEffect(() => {
+    setBaseLevels(baseTree)
+    setHierarchyRepresentation(baseTree)
+  }, [hierarchyRepresentation])*/
+
+  useEffect(() => {
+    const node = { id: 'parent', subItems: hierarchyDisplay } as Hierarchy<T, string>
+    const status = getItemSelectedStatus(node)
+    setSelectAllStatus(status)
+ /*   if (status === SelectedStatus.SELECTED) console.log('test status CHECKED')
+    if (status === SelectedStatus.NOT_SELECTED) console.log('test status NOT CHECKED')
+    if (status === SelectedStatus.INDETERMINATE) console.log('test status INDETERMINATE')*/
+  }, [hierarchyDisplay])
 
   useEffect(() => {
     const handleInit = async () => {
@@ -39,14 +80,17 @@ export const useHierarchy = <T, S>(
     handleInit()
   }, [baseLevels, selectedIds, fetchHandler])
 
-  const search = async (search: string, fetchSearch: (ids: string) => Promise<Hierarchy<T, string>[]>) => {
+  const search = async (
+    search: string,
+    page: number,
+    fetchSearch: (sarch: string, page: number) => Promise<Hierarchy<T, string>[]>
+  ) => {
     setLoadingStatus(LoadingStatus.FETCHING)
-
     if (search) {
-      const searchResults = await fetchSearch(search)
-      const newTree = await buildHierarchy(searchResults, hierarchyRepresentation, fetchHandler)
+      const searchResults = await fetchSearch(search, page)
+      const newTree = await buildHierarchy(searchResults, hierarchyRepresentation, fetchHandler, null)
+      const display = getHierarchyDisplay(searchResults, newTree)
       setHierarchyRepresentation(newTree)
-      const display = getHierarchyDisplay(searchResults, hierarchyRepresentation)
       setHierarchyDisplay(display)
     } else {
       const display = getHierarchyDisplay(baseLevels, hierarchyRepresentation)
@@ -55,8 +99,8 @@ export const useHierarchy = <T, S>(
     setLoadingStatus(LoadingStatus.SUCCESS)
   }
 
-  const selectHierarchyCodes = async (path: string[], toAdd: boolean) => {
-    const status = toAdd ? SelectedStatus.NOT_SELECTED : SelectedStatus.SELECTED
+  const selectHierarchyCode = async (path: string[], toAdd: boolean) => {
+    const status = toAdd ? SelectedStatus.SELECTED : SelectedStatus.NOT_SELECTED
     const paths = getUniquePath([path])
     const [key, value] = paths.entries().next().value
     const index = hierarchyRepresentation.findIndex((elem) => elem.id === key)
@@ -67,6 +111,16 @@ export const useHierarchy = <T, S>(
     setSelectedCodes(selectedCodes)
     setHierarchyRepresentation([...hierarchyRepresentation])
     setHierarchyDisplay(updatedHierarchyDisplay)
+  }
+
+  const selectAllHierarchyCodes = async (toAdd: boolean) => {
+    const status = toAdd ? SelectedStatus.SELECTED : SelectedStatus.NOT_SELECTED
+    const newTree = await buildHierarchy(hierarchyDisplay, hierarchyRepresentation, fetchHandler, status)
+    const updatedHierarchyDisplay = getHierarchyDisplay(hierarchyDisplay, newTree)
+    const selectedCodes = getSelectedCodes(hierarchyRepresentation)
+    setHierarchyRepresentation(newTree)
+    setHierarchyDisplay(updatedHierarchyDisplay)
+    setSelectedCodes(selectedCodes)
   }
 
   const deleteHierarchyCode = async (hierarchyItem: Hierarchy<T, string>) => {
@@ -91,21 +145,25 @@ export const useHierarchy = <T, S>(
     setHierarchyDisplay(updatedHierarchyDisplay)
   }
 
-  const expandHierarchy = async (childrenIds: string, path: string[], displayIndex: number) => {
-    const children = await fetchHandler(childrenIds)
-    const newTree = addSubItems(path, hierarchyRepresentation, children)
-    hierarchyDisplay[displayIndex] = getHierarchyDisplay([hierarchyDisplay[displayIndex]], newTree)[0]
-    setHierarchyRepresentation(newTree)
+  const expandHierarchy = async (path: string[], displayIndex: number) => {
+    const paths = getUniquePath([path])
+    const [key, value] = paths.entries().next().value
+    const index = hierarchyRepresentation.findIndex((elem) => elem.id === key)
+    const branch = await buildBranch(hierarchyRepresentation[index], [key, value], new Map(), fetchHandler, null, true)
+    hierarchyRepresentation[index] = branch
+    hierarchyDisplay[displayIndex] = getHierarchyDisplay([hierarchyDisplay[displayIndex]], hierarchyRepresentation)[0]
+    setHierarchyRepresentation([...hierarchyRepresentation])
     setHierarchyDisplay([...hierarchyDisplay])
-    // const sortedChild = children.sort((a: any, b: any) => a.name.localeCompare(b.label))
   }
 
   return {
     hierarchy: hierarchyDisplay,
     selectedCodes,
     loadingStatus,
+    selectAllStatus,
     search,
-    selectHierarchyCodes,
+    selectHierarchyCode,
+    selectAllHierarchyCodes,
     expandHierarchy,
     deleteHierarchyCode
   }

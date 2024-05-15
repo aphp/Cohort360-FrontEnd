@@ -1,28 +1,39 @@
 import React, { Fragment, useEffect, useState } from 'react'
 
-import { Checkbox, ListItem, TableCell, TableRow, Typography } from '@mui/material'
-import useStyles from './styles'
-import { ScopeElement, SelectedStatus } from 'types'
+import {
+  Breadcrumbs,
+  Checkbox,
+  ListItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography
+} from '@mui/material'
+import { ScopeElement, ScopeType, SelectedStatus } from 'types'
 import { Hierarchy } from 'types/hierarchy'
 import { IndeterminateCheckBoxOutlined, KeyboardArrowDown, KeyboardArrowRight } from '@mui/icons-material'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import displayDigit from 'utils/displayDigit'
+import useStyles from './styles'
 
 type HierarchyItemProps = {
   item: Hierarchy<ScopeElement, string>
+  searchMode: boolean
   path: number[]
   onSelect: (path: string[], toAdd: boolean) => void
-  onExpand: (children: string, path: string[], displayIndex: number) => void
+  onExpand: (path: string[], displayIndex: number) => void
 }
 
-const ScopeTreeItem = ({ item, path, onSelect, onExpand }: HierarchyItemProps) => {
+const ScopeTreeItem = ({ item, searchMode, path, onSelect, onExpand }: HierarchyItemProps) => {
   const { classes } = useStyles()
   const [open, setOpen] = useState(false)
-  const { id, name, subItems, status, inferior_levels_ids, above_levels_ids, source_value, cohort_size } = item
+  const { id, name, subItems, status, above_levels_ids, source_value, cohort_size, full_path } = item
 
   useEffect(() => {
     if (open === true && !subItems) {
-      onExpand(inferior_levels_ids, [...above_levels_ids.split(','), id], path[0])
+      onExpand([...above_levels_ids.split(','), id], path[0])
     }
   }, [open])
 
@@ -38,15 +49,11 @@ const ScopeTreeItem = ({ item, path, onSelect, onExpand }: HierarchyItemProps) =
             className={classes.expandIcon}
             style={path.length > 1 ? { marginLeft: path.length * 24 - 24 + 'px' } : { margin: '0' }}
           >
-            {path.length && item.inferior_levels_ids && open ? (
-              <KeyboardArrowDown onClick={() => setOpen(false)} />
-            ) : (
-              <Fragment />
-            )}
-            {path.length && item.inferior_levels_ids && !open ? (
-              <KeyboardArrowRight onClick={() => setOpen(true)} />
-            ) : (
-              <Fragment />
+            {path.length && item.inferior_levels_ids && (
+              <>
+                {open && <KeyboardArrowDown onClick={() => setOpen(false)} />}
+                {!open && <KeyboardArrowRight onClick={() => setOpen(true)} />}
+              </>
             )}
           </ListItem>
         </TableCell>
@@ -56,41 +63,32 @@ const ScopeTreeItem = ({ item, path, onSelect, onExpand }: HierarchyItemProps) =
             indeterminate={status === SelectedStatus.INDETERMINATE}
             color="secondary"
             indeterminateIcon={<IndeterminateCheckBoxOutlined />}
-            onClick={() => {
+            onChange={(event, checked) => {
               const ids = above_levels_ids ? [...above_levels_ids.split(','), id] : [id]
-              onSelect(ids, status === SelectedStatus.SELECTED || status === SelectedStatus.INDETERMINATE)
+              onSelect(ids, checked)
             }}
             inputProps={{ 'aria-labelledby': name }}
           />
         </TableCell>
-        {/* <TableCell>
-          {!isSearchMode ? (
-            <>
-              <Typography onClick={() => setOpen(!open)}>{`${source_value} - ${name}`}</Typography>
-              <Typography onClick={() => setOpen(!open)}>{id}</Typography>
-            </>
-          ) : row.full_path ? (
+        {searchMode && full_path && (
+          <TableCell>
             <Breadcrumbs maxItems={2}>
-              {(row.full_path.split('/').length > 1
-                ? row.full_path.split('/').slice(1)
-                : row.full_path.split('/').slice(0)
+              {(item.full_path.split('/').length > 1
+                ? item.full_path.split('/').slice(1)
+                : item.full_path.split('/').slice(0)
               ).map((full_path: string, index: number) => (
                 <Typography key={index} style={{ color: '#153D8A' }}>
                   {full_path}
                 </Typography>
               ))}
             </Breadcrumbs>
-          ) : (
-            <>
-              <Typography onClick={() => setOpen(!open)}>{`${source_value} - ${name}`}</Typography>
-              <Typography onClick={() => setOpen(!open)}>{id}</Typography>
-            </>
-          )}
-        </TableCell> */}
-        <TableCell style={{ cursor: 'pointer' }}>
-          <Typography onClick={() => setOpen(!open)}>{`${source_value} - ${name}`}</Typography>
-          <Typography onClick={() => setOpen(!open)}>{id}</Typography>
-        </TableCell>
+          </TableCell>
+        )}
+        {!searchMode && (
+          <TableCell style={{ cursor: 'pointer' }}>
+            <Typography onClick={() => setOpen(!open)}>{`${source_value} - ${name}`}</Typography>
+          </TableCell>
+        )}
         <TableCell align="center">
           <Typography onClick={() => setOpen(!open)}>{displayDigit(+cohort_size)}</Typography>
         </TableCell>
@@ -100,43 +98,83 @@ const ScopeTreeItem = ({ item, path, onSelect, onExpand }: HierarchyItemProps) =
       </TableRow>
       {open &&
         subItems &&
-        subItems.map((subItem: Hierarchy<ScopeElement, string>, currentIndex: number) => {
-          if (subItem.id === 'loading') {
-            return <Fragment key={currentIndex}></Fragment>
-          } else {
-            subItem.status = status !== SelectedStatus.INDETERMINATE ? status : subItem.status
-            return (
-              <ScopeTreeItem
-                path={[...path, currentIndex]}
-                key={currentIndex}
-                item={subItem}
-                onSelect={onSelect}
-                onExpand={onExpand}
-              />
-            )
-          }
-        })}
+        subItems.map((subItem: Hierarchy<ScopeElement, string>, currentIndex: number) => (
+          <ScopeTreeItem
+            path={[...path, currentIndex]}
+            searchMode={searchMode}
+            key={currentIndex}
+            item={subItem}
+            onSelect={onSelect}
+            onExpand={onExpand}
+          />
+        ))}
     </Fragment>
   )
 }
 
 type HierarchyProps = {
+  executiveUnitType?: ScopeType
   hierarchy: Hierarchy<ScopeElement, string>[]
-  onExpand: (children: string, path: string[], displayIndex: number) => void
+  searchMode: boolean
+  selectAllStatus: SelectedStatus
+  onExpand: (path: string[], displayIndex: number) => void
   onSelect: (path: string[], toAdd: boolean) => void
+  onSelectAll: (toAdd: boolean) => void
 }
 
-const ScopeTree = ({ hierarchy, onSelect, onExpand }: HierarchyProps) => {
+const ScopeTree = ({
+  executiveUnitType,
+  hierarchy,
+  searchMode,
+  selectAllStatus,
+  onSelect,
+  onSelectAll,
+  onExpand
+}: HierarchyProps) => {
+  const { classes } = useStyles()
+
   return (
-    // <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-    <Fragment>
-      {hierarchy
-        /*.sort((a, b) => a.source_value.localeCompare(b.source_value))*/
-        .map((item, index) => {
-          return <ScopeTreeItem path={[index]} key={item.id} item={item} onExpand={onExpand} onSelect={onSelect} />
+    <Table>
+      <TableHead>
+        <TableRow className={classes.tableHead}>
+          <TableCell className={classes.emptyTableHeadCell}></TableCell>
+          <TableCell align="center" className={classes.emptyTableHeadCell}>
+            <Checkbox
+              color="secondary"
+              checked={selectAllStatus === SelectedStatus.SELECTED}
+              indeterminate={selectAllStatus === SelectedStatus.INDETERMINATE}
+              indeterminateIcon={<IndeterminateCheckBoxOutlined style={{ color: 'rgba(0,0,0,0.6)' }} />}
+              onChange={(event, checked) => onSelectAll(checked)}
+            />
+          </TableCell>
+          <TableCell align="left" className={classes.tableHeadCell}>
+            Nom
+          </TableCell>
+
+          <TableCell align="center" className={classes.tableHeadCell}>
+            Nombre de patients
+          </TableCell>
+
+          <TableCell align="center" className={classes.tableHeadCell}>
+            {!!executiveUnitType ? 'Type' : 'Accès'}
+          </TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody style={{ height: '100%' }}>
+        {hierarchy.map((item, index) => {
+          return (
+            <ScopeTreeItem
+              searchMode={searchMode}
+              path={[index]}
+              key={item.id}
+              item={item}
+              onExpand={onExpand}
+              onSelect={onSelect}
+            />
+          )
         })}
-    </Fragment>
-    // </List>
+      </TableBody>
+    </Table>
   )
 }
 

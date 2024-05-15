@@ -2,6 +2,6 @@ export type FetchScopeOptions = {
   ids?: string
   practitionerId?: string
   search?: string
-  offset?: number
+  page?: number
   limit?: number
 }

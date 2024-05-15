@@ -337,8 +337,9 @@ const servicesPerimeters: IServicePerimeters = {
       try {
         let url = 'accesses/perimeters/patient-data/rights/'
         if (options.ids) url += `?local_id=${options.ids}`
-        if (options.limit) url += `&limit=${options.limit}`
         if (options.search) url += `?search=${options.search}`
+        if (options.limit) url += `&limit=${options.limit}`
+        if (options.page !== undefined && options.limit) url += `&offset=${options.page * options.limit}`
         const backendResponse = await apiBackend.get<Back_API_Response<ReadRightPerimeter>>(url, { signal: signal })
         if (backendResponse.status !== 200 || Object.keys(backendResponse.data).length === 0) return response
         const mappedElement = backendResponse.data.results.map((item) =>
@@ -364,8 +365,9 @@ const servicesPerimeters: IServicePerimeters = {
       try {
         let url: string = 'accesses/perimeters/?type_source_value=' + servicesPerimeters.getHigherTypes()[0]
         if (options.ids) url += `local_id=${options.ids}`
-        if (options.limit) url += `&limit=${options.limit}`
         if (options.search) url += `?search=${options.search}`
+        if (options.limit) url += `&limit=${options.limit}`
+        if (options.page !== undefined && options.limit) url += `&offset=${options.page * options.limit}`
         const backendResponse = await apiBackend.get<Back_API_Response<ScopeElement>>(url, { signal: signal })
         if (backendResponse.status !== 200 || Object.keys(backendResponse.data).length === 0) return response
         const mappedElement = backendResponse.data.results.map((item) =>
