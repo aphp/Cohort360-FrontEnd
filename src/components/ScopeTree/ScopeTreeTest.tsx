@@ -22,8 +22,8 @@ type HierarchyItemProps = {
   item: Hierarchy<ScopeElement, string>
   searchMode: boolean
   path: number[]
-  onSelect: (path: string[], toAdd: boolean) => void
-  onExpand: (path: string[], displayIndex: number) => void
+  onSelect: (node: Hierarchy<ScopeElement, string>, toAdd: boolean) => void
+  onExpand: (node: Hierarchy<ScopeElement, string>) => void
 }
 
 const ScopeTreeItem = ({ item, searchMode, path, onSelect, onExpand }: HierarchyItemProps) => {
@@ -32,9 +32,7 @@ const ScopeTreeItem = ({ item, searchMode, path, onSelect, onExpand }: Hierarchy
   const { id, name, subItems, status, above_levels_ids, source_value, cohort_size, full_path } = item
 
   useEffect(() => {
-    if (open === true && !subItems) {
-      onExpand([...above_levels_ids.split(','), id], path[0])
-    }
+    if (open === true && !subItems) onExpand(item)
   }, [open])
 
   return (
@@ -63,10 +61,7 @@ const ScopeTreeItem = ({ item, searchMode, path, onSelect, onExpand }: Hierarchy
             indeterminate={status === SelectedStatus.INDETERMINATE}
             color="secondary"
             indeterminateIcon={<IndeterminateCheckBoxOutlined />}
-            onChange={(event, checked) => {
-              const ids = above_levels_ids ? [...above_levels_ids.split(','), id] : [id]
-              onSelect(ids, checked)
-            }}
+            onChange={(event, checked) => onSelect(item, checked)}
             inputProps={{ 'aria-labelledby': name }}
           />
         </TableCell>
@@ -117,8 +112,8 @@ type HierarchyProps = {
   hierarchy: Hierarchy<ScopeElement, string>[]
   searchMode: boolean
   selectAllStatus: SelectedStatus
-  onExpand: (path: string[], displayIndex: number) => void
-  onSelect: (path: string[], toAdd: boolean) => void
+  onExpand: (node: Hierarchy<ScopeElement, string>) => void
+  onSelect: (node: Hierarchy<ScopeElement, string>, toAdd: boolean) => void
   onSelectAll: (toAdd: boolean) => void
 }
 

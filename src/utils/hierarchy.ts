@@ -76,7 +76,8 @@ export const buildBranch = async <T>(
   status: SelectedStatus | null,
   toAdd = false
 ) => {
-  const [, nextPath] = path
+  const [key, nextPath] = path
+  const code = codes.get(key)
   if (nextPath.size && (!node || !codes.get(node.id))) {
     if (!node || !node.subItems) {
       const branch = await getBranchMissingInfo(path, codes, fetchHandler, status)
@@ -90,6 +91,7 @@ export const buildBranch = async <T>(
     }
     if (status !== null) node.status = getItemSelectedStatus(node)
   } else {
+    if (!node && code) node = code
     if (toAdd && node.inferior_levels_ids) {
       const children = await fetchHandler(node.inferior_levels_ids)
       status = node.status === SelectedStatus.SELECTED ? SelectedStatus.SELECTED : SelectedStatus.NOT_SELECTED
@@ -104,32 +106,32 @@ export const buildBranch = async <T>(
 }
 
 export const buildHierarchy = async <T>(
-  selectedCodes: Hierarchy<T, string>[],
+  codes: Hierarchy<T, string>[],
   defaultLevels: Hierarchy<T, string>[],
   fetchHandler: (ids: string) => Promise<Hierarchy<T, string>[]>,
-  status: SelectedStatus | null
+  status: SelectedStatus | null,
+  toAdd: boolean
 ) => {
-  const paths = selectedCodes.map((item) =>
+  const paths = codes.map((item) =>
     item.above_levels_ids ? [...(item.above_levels_ids || '').split(','), ...[item.id]] : [item.id]
   )
   const uniquePaths = getUniquePath(paths)
-  const selectedCodesMap = selectedCodes.reduce((resultMap, item) => {
-    resultMap.set(item.id, item)
-    return resultMap
-  }, new Map())
+  const codesMap = mapHierarchyToMap(codes)
   for (const [key, value] of uniquePaths) {
     const index = defaultLevels.findIndex((elem) => elem.id === key)
-    const branch = await buildBranch(defaultLevels[index], [key, value], selectedCodesMap, fetchHandler, status)
-    index > -1 ? (defaultLevels[index] = branch) : defaultLevels.push(branch)
+    const branch = await buildBranch(defaultLevels[index] || null, [key, value], codesMap, fetchHandler, status, toAdd)
+    if (branch) index > -1 ? (defaultLevels[index] = branch) : defaultLevels.push(branch)
   }
   return [...defaultLevels]
 }
 
 export const getHierarchyDisplay = <T>(defaultLevels: Hierarchy<T, string>[], tree: Hierarchy<T, string>[]) => {
-  const branches = defaultLevels.map((item) => {
-    const path = [...(item.above_levels_ids || '').split(',').filter((elem) => elem !== ''), ...[item.id + '']]
-    return findBranch(path, tree)
-  })
+  let branches: Hierarchy<T, string>[] = []
+  if (defaultLevels.length && tree.length)
+    branches = defaultLevels.map((item) => {
+      const path = [...(item.above_levels_ids || '').split(',').filter((elem) => elem !== ''), ...[item.id + '']]
+      return findBranch(path, tree)
+    })
   return branches
 }
 
@@ -148,7 +150,7 @@ const findBranch = <T>(path: string[], tree: Hierarchy<T, string>[]): Hierarchy<
   return branch
 }
 
-export const getUniquePath = (paths: string[][]): InfiniteMap => {
+const getUniquePath = (paths: string[][]): InfiniteMap => {
   const tree = new Map()
   for (const path of paths) {
     let currentNode = tree

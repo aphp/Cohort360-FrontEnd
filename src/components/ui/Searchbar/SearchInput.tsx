@@ -75,7 +75,6 @@ const SearchInput = ({
                 <IconButton
                   onClick={() => {
                     setSearchInput('')
-                    onchange('')
                   }}
                   style={{ padding: 2 }}
                 >

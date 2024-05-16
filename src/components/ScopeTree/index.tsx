@@ -60,17 +60,8 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
 
   const { fetchStatus: baseLevelsFetchStatus, response: baseLevelsResponse } = useFetch(fetchBaseTree)
 
-  const {
-    hierarchy,
-    selectedCodes,
-    loadingStatus,
-    selectAllStatus,
-    search,
-    expandHierarchy,
-    selectHierarchyCode,
-    selectAllHierarchyCodes,
-    deleteHierarchyCode
-  } = useHierarchy(baseLevelsResponse.results, fetchChildren, selectedIds)
+  const { hierarchy, selectedCodes, loadingStatus, selectAllStatus, search, expand, select, selectAll, deleteCode } =
+    useHierarchy(baseLevelsResponse.results, fetchChildren, selectedIds)
 
   const handleSearch = (searchValue: string, page: number) => {
     if (searchValue === '') onChangeCount(baseLevelsResponse.count)
@@ -86,7 +77,10 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
         <SearchInput
           value={options.search}
           placeholder={'Rechercher'}
-          onchange={(newValue) => handleSearch(newValue, 0)}
+          onchange={(newValue) => {
+            console.log('test handleSearch')
+            handleSearch(newValue, 0)
+          }}
         />
       </Grid>
 
@@ -109,9 +103,9 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
                   executiveUnitType={executiveUnitType}
                   searchMode={options.searchMode}
                   hierarchy={hierarchy}
-                  onExpand={expandHierarchy}
-                  onSelect={selectHierarchyCode}
-                  onSelectAll={selectAllHierarchyCodes}
+                  onExpand={expand}
+                  onSelect={select}
+                  onSelectAll={selectAll}
                 />
 
                 <>
@@ -129,7 +123,7 @@ const Index = ({ selectedIds, setSelectedItems, isExecutiveUnit, executiveUnitTy
               <Grid item alignSelf="bottom">
                 <Paper elevation={5}>
                   <Grid item style={{ padding: '10px 40px', borderBottom: '2px solid #0063AF' }}>
-                    <SelectedCodes values={selectedCodes} onDelete={deleteHierarchyCode} />
+                    <SelectedCodes values={selectedCodes} onDelete={deleteCode} />
                   </Grid>
 
                   <Grid item container justifyContent="center" style={{ padding: '10px 40px' }}>
