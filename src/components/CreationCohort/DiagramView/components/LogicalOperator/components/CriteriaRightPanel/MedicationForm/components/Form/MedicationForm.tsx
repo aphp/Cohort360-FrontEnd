@@ -248,6 +248,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
           <Autocomplete
             multiple
             options={criteriaData.data.encounterStatus || []}
+            noOptionsText="Veuillez entrer un statut de visite associée"
             className={classes.inputItem}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}

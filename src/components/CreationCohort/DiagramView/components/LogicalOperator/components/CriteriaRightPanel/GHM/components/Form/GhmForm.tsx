@@ -184,6 +184,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             multiple
             className={classes.inputItem}
             options={criteriaData.data.encounterStatus || []}
+            noOptionsText="Veuillez entrer un statut de visite associée"
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={currentState.encounterStatus}

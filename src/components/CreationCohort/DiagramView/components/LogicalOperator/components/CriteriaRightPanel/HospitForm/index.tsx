@@ -310,6 +310,7 @@ const HospitForm = ({
         <Autocomplete
           multiple
           options={criteriaData.data.encounterStatus || []}
+          noOptionsText="Veuillez entrer un statut de visite associée"
           getOptionLabel={(option) => option.label}
           isOptionEqualToValue={(option, value) => option.id === value.id}
           value={encounterStatus}
@@ -335,7 +336,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
-              noOptionsText="Veuillez entrer 'oui' ou 'non'"
+              noOptionsText='Veuillez entrer "oui" ou "non"'
               id="in-utero-transfer-autocomplete"
               options={criteriaData.data.inUteroTransfer || []}
               getOptionLabel={(option) => option.label}
@@ -352,7 +353,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
-              noOptionsText="Veuillez entrer 'oui' ou 'non'"
+              noOptionsText='Veuillez entrer "oui" ou "non"'
               id="pregnancy-monitoring-autocomplete"
               options={criteriaData.data.pregnancyMonitoring || []}
               getOptionLabel={(option) => option.label}
@@ -386,7 +387,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
-              noOptionsText="Veuillez entrer 'oui' ou 'non'"
+              noOptionsText='Veuillez entrer "oui" ou "non"'
               id="maturation-corticotherapie-autocomplete"
               options={criteriaData.data.maturationCorticotherapie || []}
               getOptionLabel={(option) => option.label}
@@ -422,7 +423,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
-              noOptionsText="Veuillez entrer 'oui' ou 'non'"
+              noOptionsText='Veuillez entrer "oui" ou "non"'
               id="childbirth-autocomplete"
               options={criteriaData.data.childbirth || []}
               getOptionLabel={(option) => option.label}
@@ -439,7 +440,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
-              noOptionsText="Veuillez entrer 'oui' ou 'non'"
+              noOptionsText='Veuillez entrer "oui" ou "non"'
               id="hospital-childbirth-place-autocomplete"
               options={criteriaData.data.hospitalChildBirthPlace || []}
               getOptionLabel={(option) => option.label}
@@ -458,7 +459,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
-              noOptionsText="Veuillez entrer 'oui' ou 'non'"
+              noOptionsText='Veuillez entrer "oui" ou "non"'
               id="other-hospital-childbirth-place-autocomplete"
               options={criteriaData.data.otherHospitalChildBirthPlace || []}
               getOptionLabel={(option) => option.label}
@@ -475,7 +476,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
-              noOptionsText="Veuillez entrer 'oui' ou 'non'"
+              noOptionsText='Veuillez entrer "oui" ou "non"'
               id="home-childbirth-place-autocomplete"
               options={criteriaData.data.homeChildBirthPlace || []}
               getOptionLabel={(option) => option.label}
@@ -509,7 +510,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
-              noOptionsText="Veuillez entrer un motif(s) de maturation / déclenchement"
+              noOptionsText="Veuillez entrer un motif de maturation / déclenchement"
               id="maturation-reason-autocomplete"
               options={criteriaData.data.maturationReason || []}
               getOptionLabel={(option) => option.label}
@@ -526,7 +527,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
-              noOptionsText="Veuillez entrer une modalités de maturation cervicale initiale"
+              noOptionsText="Veuillez entrer une modalité de maturation cervicale initiale"
               id="maturation-modality-autocomplete"
               options={criteriaData.data.maturationModality || []}
               getOptionLabel={(option) => option.label}
@@ -717,7 +718,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
-              noOptionsText="Veuillez entrer une modalités de la césarienne"
+              noOptionsText="Veuillez entrer une modalité de la césarienne"
               id="c-section-modality-autocomplete"
               options={criteriaData.data.cSectionModality || []}
               getOptionLabel={(option) => option.label}
@@ -884,7 +885,7 @@ const HospitForm = ({
             </FormLabel>
             <Autocomplete
               multiple
-              noOptionsText="Veuillez entrer 'oui' ou 'non'"
+              noOptionsText='Veuillez entrer "oui" ou "non"'
               id="Postpartum-hemorrhage-autocomplete"
               options={criteriaData.data.postpartumHemorrhage || []}
               getOptionLabel={(option) => option.label}
@@ -956,7 +957,7 @@ const HospitForm = ({
           </FormLabel>
           <Autocomplete
             multiple
-            noOptionsText="Veuillez entrer 'oui' ou 'non'"
+            noOptionsText='Veuillez entrer "oui" ou "non"'
             id="complication-autocomplete"
             options={criteriaData.data.complication || []}
             getOptionLabel={(option) => option.label}

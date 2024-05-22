@@ -300,6 +300,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             <Autocomplete
               multiple
               options={criteriaData.data.encounterStatus || []}
+              noOptionsText="Veuillez entrer un statut de visite associée"
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={currentState.encounterStatus}
