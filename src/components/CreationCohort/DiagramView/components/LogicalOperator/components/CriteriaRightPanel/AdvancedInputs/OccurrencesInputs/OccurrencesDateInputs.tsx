@@ -5,10 +5,32 @@ import { FormControl, FormLabel, Grid, IconButton, Input, InputLabel } from '@mu
 import ClearIcon from '@mui/icons-material/Clear'
 
 import useStyles from './styles'
+import {
+  CcamDataType,
+  Cim10DataType,
+  DocumentDataType,
+  EncounterDataType,
+  GhmDataType,
+  HospitDataType,
+  ImagingDataType,
+  MedicationDataType,
+  ObservationDataType,
+  PregnancyDataType
+} from 'types/requestCriterias'
 
 type OccurrenceDateInputsProps = {
-  selectedCriteria: any
-  onChangeValue: (key: string, value: any) => void
+  selectedCriteria:
+    | CcamDataType
+    | Cim10DataType
+    | DocumentDataType
+    | GhmDataType
+    | EncounterDataType
+    | PregnancyDataType
+    | HospitDataType
+    | MedicationDataType
+    | ObservationDataType
+    | ImagingDataType
+  onChangeValue: (key: string, value: string) => void
 }
 
 const OccurrenceDateInputs: React.FC<OccurrenceDateInputsProps> = (props) => {

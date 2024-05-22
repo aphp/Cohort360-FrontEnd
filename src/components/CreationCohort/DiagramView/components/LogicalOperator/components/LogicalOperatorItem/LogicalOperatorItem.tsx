@@ -14,6 +14,7 @@ import {
 import useStyles from './styles'
 import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
 import { Comparators } from 'types/requestCriterias'
+import { CriteriaGroupType } from 'types'
 
 type LogicalOperatorItemProps = {
   itemId: number
@@ -28,7 +29,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
   const isMainOperator = itemId === 0
 
   const [isOpen, setOpen] = useState<boolean>(false)
-  const [groupType, setGroupType] = useState('andGroup')
+  const [groupType, setGroupType] = useState<CriteriaGroupType>(CriteriaGroupType.AND_GROUP)
   const [openConfirmationDialog, setOpenConfirmationDialog] = useState<boolean>(false)
 
   const { request } = useAppSelector((state) => state.cohortCreation || {})
@@ -37,18 +38,18 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
   useEffect(() => {
     const currentLogicalOperator = criteriaGroup.find(({ id }) => id === itemId)
     if (currentLogicalOperator) {
-      if (currentLogicalOperator.type !== 'NamongM') {
+      if (currentLogicalOperator.type !== CriteriaGroupType.N_AMONG_M) {
         setGroupType(currentLogicalOperator.type)
       } else {
         switch (currentLogicalOperator.options.operator) {
-          case '=':
-            setGroupType('exactly')
+          case Comparators.EQUAL:
+            setGroupType(CriteriaGroupType.EXACTLY)
             break
-          case '<':
-            setGroupType('atLeast')
+          case Comparators.LESS:
+            setGroupType(CriteriaGroupType.AT_LEAST)
             break
-          case '>':
-            setGroupType('atMost')
+          case Comparators.GREATER:
+            setGroupType(CriteriaGroupType.AT_MOST)
             break
           default:
             break
@@ -63,13 +64,13 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
   const logicalOperatorDic = {
     andGroup: 'ET',
     orGroup: 'OU',
-    NamongM: `${currentLogicalOperator.type === 'NamongM' ? currentLogicalOperator.options.number : 'X'} parmi ${
-      currentLogicalOperator?.criteriaIds.length
-    }`
+    nAmongM: `${
+      currentLogicalOperator.type === CriteriaGroupType.N_AMONG_M ? currentLogicalOperator.options.number : 'X'
+    } parmi ${currentLogicalOperator?.criteriaIds.length}`
   }
 
   let boxWidth = 50
-  if (currentLogicalOperator.type === 'NamongM') {
+  if (currentLogicalOperator.type === CriteriaGroupType.N_AMONG_M) {
     boxWidth = isOpen ? 500 : 75
   } else {
     boxWidth = isOpen ? 400 : 50
@@ -87,18 +88,21 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
     _buildCohortCreation()
   }
 
-  const _handleChangeLogicalOperatorProps = (key: string, value: any) => {
+  const _handleChangeLogicalOperatorProps = (
+    key: 'isInclusive' | 'groupType' | 'options.number',
+    value: CriteriaGroupType | number | boolean | string
+  ) => {
     const _currentLogicalOperator = criteriaGroup.find(({ id }) => id === itemId)
     if (!_currentLogicalOperator) return
     if (key === 'groupType') {
-      setGroupType(value)
+      setGroupType(value as CriteriaGroupType)
 
       switch (value) {
-        case 'atLeast':
+        case CriteriaGroupType.AT_LEAST:
           dispatch(
             editCriteriaGroup({
               ..._currentLogicalOperator,
-              type: 'NamongM',
+              type: CriteriaGroupType.N_AMONG_M,
               options: {
                 operator: Comparators.LESS,
                 number: 1,
@@ -108,11 +112,11 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
             })
           )
           break
-        case 'atMost':
+        case CriteriaGroupType.AT_MOST:
           dispatch(
             editCriteriaGroup({
               ..._currentLogicalOperator,
-              type: 'NamongM',
+              type: CriteriaGroupType.N_AMONG_M,
               options: {
                 operator: Comparators.GREATER,
                 number: 1,
@@ -122,11 +126,11 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
             })
           )
           break
-        case 'exactly':
+        case CriteriaGroupType.EXACTLY:
           dispatch(
             editCriteriaGroup({
               ..._currentLogicalOperator,
-              type: 'NamongM',
+              type: CriteriaGroupType.N_AMONG_M,
               options: {
                 operator: Comparators.EQUAL,
                 number: 1,
@@ -136,13 +140,13 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
             })
           )
           break
-        case 'andGroup':
-        case 'orGroup':
+        case CriteriaGroupType.AND_GROUP:
+        case CriteriaGroupType.OR_GROUP:
         default:
           dispatch(
             editCriteriaGroup({
               ..._currentLogicalOperator,
-              type: value
+              type: value as CriteriaGroupType.AND_GROUP | CriteriaGroupType.OR_GROUP
             })
           )
           break
@@ -151,13 +155,21 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
       dispatch(
         editCriteriaGroup({
           ..._currentLogicalOperator,
-          type: 'NamongM',
+          type: CriteriaGroupType.N_AMONG_M,
           options: {
             operator:
-              _currentLogicalOperator.type === 'NamongM' ? _currentLogicalOperator.options.operator : Comparators.LESS,
-            number: value,
-            timeDelayMin: _currentLogicalOperator.type === 'NamongM' ? _currentLogicalOperator.options.timeDelayMin : 0,
-            timeDelayMax: _currentLogicalOperator.type === 'NamongM' ? _currentLogicalOperator.options.timeDelayMax : 0
+              _currentLogicalOperator.type === CriteriaGroupType.N_AMONG_M
+                ? _currentLogicalOperator.options.operator
+                : Comparators.LESS,
+            number: value as number,
+            timeDelayMin:
+              _currentLogicalOperator.type === CriteriaGroupType.N_AMONG_M
+                ? _currentLogicalOperator.options.timeDelayMin
+                : 0,
+            timeDelayMax:
+              _currentLogicalOperator.type === CriteriaGroupType.N_AMONG_M
+                ? _currentLogicalOperator.options.timeDelayMax
+                : 0
           }
         })
       )
@@ -165,7 +177,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
       dispatch(
         editCriteriaGroup({
           ..._currentLogicalOperator,
-          [key]: value
+          [key]: value as boolean
         })
       )
     }
@@ -232,7 +244,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               classes={{ icon: classes.selectIcon }}
               className={classes.inputSelect}
               onChange={(event) => {
-                if (event.target.value !== 'andGroup') {
+                if (event.target.value !== CriteriaGroupType.AND_GROUP) {
                   setOpenConfirmationDialog(true)
                 } else {
                   _handleChangeLogicalOperatorProps('groupType', event.target.value)
@@ -241,14 +253,14 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               style={{ color: 'currentColor' }}
               variant="standard"
             >
-              <MenuItem value={'andGroup'}>tous les</MenuItem>
-              <MenuItem value={'orGroup'}>un des</MenuItem>
-              {/* <MenuItem value={'exactly'}>exactement</MenuItem>
-                <MenuItem value={'atLeast'}>au moins</MenuItem>
-                <MenuItem value={'atMost'}>au plus</MenuItem> */}
+              <MenuItem value={CriteriaGroupType.AND_GROUP}>tous les</MenuItem>
+              <MenuItem value={CriteriaGroupType.OR_GROUP}>un des</MenuItem>
+              {/* <MenuItem value={CriteriaGroupType.EXACTLY}>exactement</MenuItem>
+              <MenuItem value={CriteriaGroupType.AT_LEAST}>au moins</MenuItem>
+              <MenuItem value={CriteriaGroupType.AT_MOST}>au plus</MenuItem> */}
             </Select>
 
-            {currentLogicalOperator.type === 'NamongM' && (
+            {currentLogicalOperator.type === CriteriaGroupType.N_AMONG_M && (
               <TextField
                 classes={{ root: classes.input }}
                 value={currentLogicalOperator?.options?.number}
@@ -277,9 +289,9 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         ) : (
           <Typography variant="h5" className={classes.textOperator}>
             {!currentLogicalOperator.isInclusive && 'NON '}
-            {groupType === 'andGroup' || groupType === 'orGroup'
+            {groupType === CriteriaGroupType.AND_GROUP || groupType === CriteriaGroupType.OR_GROUP
               ? logicalOperatorDic[groupType]
-              : logicalOperatorDic['NamongM']}
+              : logicalOperatorDic[CriteriaGroupType.N_AMONG_M]}
           </Typography>
         )}
       </Box>
@@ -290,7 +302,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         onClose={() => setOpenConfirmationDialog(false)}
         onConfirm={() => {
           deleteInvalidConstraints()
-          _handleChangeLogicalOperatorProps('groupType', 'orGroup')
+          _handleChangeLogicalOperatorProps('groupType', CriteriaGroupType.OR_GROUP)
         }}
         message={
           "L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères ET, passer sur un groupe de critères OU vous fera perdre toutes les contraintes temporelles de ce groupe."

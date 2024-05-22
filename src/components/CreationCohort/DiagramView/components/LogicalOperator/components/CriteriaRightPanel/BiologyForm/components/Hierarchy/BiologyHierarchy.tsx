@@ -21,7 +21,6 @@ import ExpandMore from '@mui/icons-material/ExpandMore'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { BiologyListType } from 'state/biology'
 
 import {
   checkIfIndeterminated,
@@ -31,16 +30,15 @@ import {
 } from 'utils/pmsi'
 
 import useStyles from './styles'
-import { PmsiListType } from 'state/pmsi'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import { defaultBiology } from '../../index'
-import { HierarchyTree } from 'types'
+import { HierarchyElement, HierarchyTree } from 'types'
 
 type BiologyListItemProps = {
-  biologyItem: BiologyListType
-  selectedItems?: PmsiListType[] | null
-  handleClick: (biologyItem: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
+  biologyItem: HierarchyElement
+  selectedItems?: HierarchyElement[] | null
+  handleClick: (biologyItem: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => void
 }
 
 const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
@@ -72,7 +70,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = async (biologyItem: PmsiListType) => {
+  const handleClickOnHierarchy = async (biologyItem: HierarchyElement) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getHierarchySelection(biologyItem, selectedItems || [], biologyHierarchy)
@@ -123,7 +121,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((biologyHierarchySubItem: any, index: number) =>
+            subItems.map((biologyHierarchySubItem, index: number) =>
               biologyHierarchySubItem.id === 'loading' ? (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
@@ -148,9 +146,10 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
 
 type BiologyHierarchyProps = {
   isOpen: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   selectedCriteria: any
-  goBack: (data: any) => void
-  onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
+  goBack: () => void
+  onChangeSelectedHierarchy: (data: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => void
   isEdition?: boolean
   onConfirm: () => void
 }
@@ -172,11 +171,13 @@ const BiologyHierarchy: React.FC<BiologyHierarchyProps> = (props) => {
     if (!newList.code) {
       newList.code = selectedCriteria.code
     }
-    newList.code.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, biologyHierarchy).equivalentRow)
+    newList.code.map(
+      (item: HierarchyElement) => findEquivalentRowInItemAndSubItems(item, biologyHierarchy).equivalentRow
+    )
     setCurrentState(newList)
   }, [initialState, biologyHierarchy])
 
-  const _handleClick = (newSelectedItems: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => {
+  const _handleClick = (newSelectedItems: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => {
     onChangeSelectedHierarchy(newSelectedItems, newHierarchy)
   }
   useEffect(() => {

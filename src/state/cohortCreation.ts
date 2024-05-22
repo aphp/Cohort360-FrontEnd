@@ -3,11 +3,13 @@ import { RootState } from 'state'
 import {
   CohortCreationCounterType,
   ScopeTreeRow,
-  CriteriaGroupType,
+  CriteriaGroup,
   TemporalConstraintsType,
   TemporalConstraintsKind,
   QuerySnapshotInfo,
-  CurrentSnapshot
+  CurrentSnapshot,
+  CohortJobStatus,
+  CriteriaGroupType
 } from 'types'
 
 import { buildRequest, unbuildRequest, joinRequest, checkNominativeCriteria } from 'utils/cohortCreation'
@@ -18,7 +20,6 @@ import { deleteProject } from './project'
 
 import services from 'services/aphp'
 import { SHORT_COHORT_LIMIT } from '../constants'
-import { JobStatus } from 'types'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 
 export type CohortCreationState = {
@@ -39,7 +40,7 @@ export type CohortCreationState = {
   allowSearchIpp: boolean
   selectedCriteria: SelectedCriteriaType[]
   isCriteriaNominative: boolean
-  criteriaGroup: CriteriaGroupType[]
+  criteriaGroup: CriteriaGroup[]
   temporalConstraints: TemporalConstraintsType[]
   nextCriteriaId: number
   nextGroupId: number
@@ -69,7 +70,7 @@ const defaultInitialState: CohortCreationState = {
     {
       id: 0,
       title: `Opérateur logique principal`,
-      type: 'andGroup',
+      type: CriteriaGroupType.AND_GROUP,
       criteriaIds: [],
       isSubGroup: false,
       isInclusive: true
@@ -272,7 +273,7 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
         ? selectedPopulation
         : state.cohortCreation.request.selectedPopulation
       const _selectedCriteria = state.cohortCreation.request.selectedCriteria
-      const _criteriaGroup: CriteriaGroupType[] =
+      const _criteriaGroup: CriteriaGroup[] =
         state.cohortCreation.request.criteriaGroup && state.cohortCreation.request.criteriaGroup.length > 0
           ? state.cohortCreation.request.criteriaGroup
           : defaultInitialState.criteriaGroup
@@ -338,7 +339,7 @@ type UnbuildCohortReturn = {
   currentSnapshot: CurrentSnapshot
   selectedPopulation: (ScopeTreeRow | undefined)[] | null
   selectedCriteria: SelectedCriteriaType[]
-  criteriaGroup: CriteriaGroupType[]
+  criteriaGroup: CriteriaGroup[]
   nextCriteriaId: number
   nextGroupId: number
 }
@@ -418,7 +419,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
 type AddRequestToCohortReturn = {
   json: string
   selectedCriteria: SelectedCriteriaType[]
-  criteriaGroup: CriteriaGroupType[]
+  criteriaGroup: CriteriaGroup[]
   nextCriteriaId: number
   nextGroupId: number
 }
@@ -612,14 +613,14 @@ const cohortCreationSlice = createSlice({
       state.selectedCriteria = [...state.selectedCriteria, action.payload]
       state.nextCriteriaId++
     },
-    addNewCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroupType>) => {
+    addNewCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroup>) => {
       state.criteriaGroup = [...state.criteriaGroup, action.payload]
       state.nextGroupId--
     },
     editAllCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType[]>) => {
       state.selectedCriteria = action.payload
     },
-    editAllCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroupType[]>) => {
+    editAllCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroup[]>) => {
       state.criteriaGroup = action.payload
     },
     pseudonimizeCriteria: (state: CohortCreationState) => {
@@ -630,7 +631,7 @@ const cohortCreationSlice = createSlice({
       const index = foundItem ? state.selectedCriteria.indexOf(foundItem) : -1
       if (index !== -1) state.selectedCriteria[index] = action.payload
     },
-    editCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroupType>) => {
+    editCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroup>) => {
       const foundItem = state.criteriaGroup.find(({ id }) => id === action.payload.id)
       const index = foundItem ? state.criteriaGroup.indexOf(foundItem) : -1
       if (index !== -1) state.criteriaGroup[index] = action.payload
@@ -690,17 +691,17 @@ const cohortCreationSlice = createSlice({
       state.count = {
         ...(state.count || {}),
         status:
-          (state.count || {}).status === JobStatus.pending ||
-          (state.count || {}).status === JobStatus.new ||
-          (state.count || {}).status === 'suspended'
-            ? 'suspended'
+          (state.count || {}).status === CohortJobStatus.PENDING ||
+          (state.count || {}).status === CohortJobStatus.NEW ||
+          (state.count || {}).status === CohortJobStatus.SUSPENDED
+            ? CohortJobStatus.SUSPENDED
             : (state.count || {}).status
       }
     },
     unsuspendCount: (state: CohortCreationState) => {
       state.count = {
         ...state.count,
-        status: JobStatus.pending
+        status: CohortJobStatus.PENDING
       }
     },
     addActionToNavHistory: (state: CohortCreationState, action: PayloadAction<CurrentSnapshot>) => {
@@ -732,13 +733,13 @@ const cohortCreationSlice = createSlice({
     // countCohortCreation
     builder.addCase(countCohortCreation.pending, (state) => ({
       ...state,
-      status: JobStatus.pending,
+      status: CohortJobStatus.PENDING,
       countLoading: true
     }))
     builder.addCase(countCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
-      countLoading: payload?.count?.status === JobStatus.pending || payload?.count?.status === JobStatus.new
+      countLoading: payload?.count?.status === CohortJobStatus.PENDING || payload?.count?.status === CohortJobStatus.NEW
     }))
     builder.addCase(countCohortCreation.rejected, (state) => ({
       ...state,

@@ -25,10 +25,10 @@ import AdvancedInputs from 'components/CreationCohort/DiagramView/components/Log
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProcedure } from 'state/pmsi'
-import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
+import { CriteriaItemDataCache, CriteriaName, HierarchyElement, HierarchyTree } from 'types'
 import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
-import { CcamDataType, Comparators } from 'types/requestCriterias'
+import { CcamDataType, Comparators, SelectedCriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 
@@ -37,9 +37,10 @@ type CcamFormProps = {
   isEdition: boolean
   criteriaData: CriteriaItemDataCache
   selectedCriteria: CcamDataType
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChangeValue: (key: string, value: any) => void
-  goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
+  goBack: () => void
+  onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
 const CcamForm: React.FC<CcamFormProps> = (props) => {
@@ -69,7 +70,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {
         const criteriaCode = criteriaData.data.ccamData
-          ? criteriaData.data.ccamData.find((g: any) => g.id === code.id)
+          ? criteriaData.data.ccamData.find((g: HierarchyElement) => g.id === code.id)
           : null
         return {
           id: code.id,

@@ -10,7 +10,7 @@ import {
   Select,
   Typography
 } from '@mui/material'
-import { CriteriaGroupType, TemporalConstraintsKind, TemporalConstraintsType } from 'types'
+import { CriteriaGroup, TemporalConstraintsKind, TemporalConstraintsType } from 'types'
 import Card from '../Card/Card'
 import { AvatarWrapper } from '../Avatar/styles'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
@@ -29,7 +29,7 @@ interface PartialConstraintLayoutProps {
   data: {
     title: string
     constraints: TemporalConstraintsType[]
-    selectableGroups: CriteriaGroupType[]
+    selectableGroups: CriteriaGroup[]
   }
   actions: {
     onConfirm: (constraint: TemporalConstraintsType) => void

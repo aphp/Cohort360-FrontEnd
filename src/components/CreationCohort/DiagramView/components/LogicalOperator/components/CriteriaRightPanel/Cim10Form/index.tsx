@@ -7,9 +7,9 @@ import Cim10Hierarchy from './components/Hierarchy/Cim10Hierarchy'
 import useStyles from './styles'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { useAppDispatch, useAppSelector } from 'state'
-import { fetchCondition, PmsiListType } from 'state/pmsi'
-import { EXPLORATION } from 'constants.js'
-import { CriteriaDrawerComponentProps } from 'types'
+import { fetchCondition } from 'state/pmsi'
+import { EXPLORATION } from 'utils/constants'
+import { CriteriaDrawerComponentProps, HierarchyElement } from 'types'
 import { Cim10DataType, Comparators, CriteriaType } from 'types/requestCriterias'
 
 export const defaultCondition: Omit<Cim10DataType, 'id'> = {
@@ -42,12 +42,13 @@ const Index = (props: CriteriaDrawerComponentProps) => {
 
   const { classes } = useStyles()
   const _onChangeSelectedHierarchy = (
-    newSelectedItems: PmsiListType[] | null | undefined,
-    newHierarchy?: PmsiListType[]
+    newSelectedItems: HierarchyElement[] | null | undefined,
+    newHierarchy?: HierarchyElement[]
   ) => {
     _onChangeFormValue('code', newSelectedItems, newHierarchy)
   }
-  const _onChangeFormValue = async (key: string, value: any, newHierarchy: PmsiListType[] = cim10Hierarchy) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const _onChangeFormValue = async (key: string, value: any, newHierarchy: HierarchyElement[] = cim10Hierarchy) =>
     await syncOnChangeFormValue(
       key,
       value,

@@ -7,12 +7,11 @@ import BiologyForm from './components/Form/BiologyForm'
 import BiologyHierarchy from './components/Hierarchy/BiologyHierarchy'
 import BiologySearch from './components/BiologySearch/BiologySearch'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
-import { PmsiListType } from 'state/pmsi'
 import { fetchBiology } from 'state/biology'
 import { useAppDispatch, useAppSelector } from 'state'
 import { EXPLORATION } from 'constants.js'
 import { Comparators, ObservationDataType, CriteriaType } from 'types/requestCriterias'
-import { CriteriaDrawerComponentProps } from 'types'
+import { CriteriaDrawerComponentProps, HierarchyElement } from 'types'
 
 export const defaultBiology: Omit<ObservationDataType, 'id'> = {
   type: CriteriaType.OBSERVATION,
@@ -46,10 +45,14 @@ const Index = (props: CriteriaDrawerComponentProps) => {
   const dispatch = useAppDispatch()
   const biologyHierarchy = useAppSelector((state) => state.biology.list || {})
 
-  const _onChangeSelectedHierarchy = (newSelectedItems: any, newHierarchy?: PmsiListType[]) => {
+  const _onChangeSelectedHierarchy = (
+    newSelectedItems: HierarchyElement[] | null | undefined,
+    newHierarchy?: HierarchyElement[]
+  ) => {
     _onChangeFormValue('code', newSelectedItems, newHierarchy)
   }
-  const _onChangeFormValue = async (key: string, value: any, newHierarchy: PmsiListType[] = biologyHierarchy) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const _onChangeFormValue = async (key: string, value: any, newHierarchy: HierarchyElement[] = biologyHierarchy) =>
     await syncOnChangeFormValue(
       key,
       value,

@@ -29,7 +29,9 @@ const IPPForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
 
   const isEdition = selectedCriteria !== null ? true : false
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const _onChangeValue = (key: string, value: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const _defaultValues: any = defaultValues ? { ...defaultValues } : {}
     _defaultValues[key] = value
     setDefaultValues(_defaultValues as IPPListDataType)

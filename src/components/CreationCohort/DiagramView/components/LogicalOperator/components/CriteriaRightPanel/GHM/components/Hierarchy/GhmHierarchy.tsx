@@ -21,7 +21,6 @@ import ExpandMore from '@mui/icons-material/ExpandMore'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { PmsiListType } from 'state/pmsi'
 
 import {
   checkIfIndeterminated,
@@ -34,13 +33,13 @@ import useStyles from './styles'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import { defaultClaim } from '../../index'
-import { HierarchyTree } from 'types'
+import { HierarchyElement, HierarchyTree } from 'types'
 import { GhmDataType } from 'types/requestCriterias'
 
 type GhmListItemProps = {
-  ghmItem: PmsiListType
-  selectedItems?: PmsiListType[] | null
-  handleClick: (ghmItem: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
+  ghmItem: HierarchyElement
+  selectedItems?: HierarchyElement[] | null
+  handleClick: (ghmItem: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => void
 }
 
 const GhmListItem: React.FC<GhmListItemProps> = (props) => {
@@ -66,7 +65,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = async (ghmItem: PmsiListType) => {
+  const handleClickOnHierarchy = async (ghmItem: HierarchyElement) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getHierarchySelection(ghmItem, selectedItems || [], ghmHierarchy)
@@ -117,7 +116,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((ghmHierarchySubItem: any, index: number) =>
+            subItems.map((ghmHierarchySubItem, index: number) =>
               ghmHierarchySubItem.id === 'loading' ? (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
@@ -139,8 +138,8 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
 type GhmHierarchyProps = {
   isOpen: boolean
   selectedCriteria: GhmDataType
-  goBack: (data: any) => void
-  onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
+  goBack: () => void
+  onChangeSelectedHierarchy: (data: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => void
   onConfirm: () => void
   isEdition?: boolean
 }
@@ -157,7 +156,7 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
 
   const ghmHierarchy = useAppSelector((state) => state.pmsi.claim.list || {})
 
-  const _handleClick = (newSelectedItems: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => {
+  const _handleClick = (newSelectedItems: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => {
     onChangeSelectedHierarchy(newSelectedItems, newHierarchy)
   }
 
@@ -166,7 +165,7 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
     if (!newList.code) {
       newList.code = selectedCriteria.code
     }
-    newList.code?.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, ghmHierarchy).equivalentRow)
+    newList.code?.map((item: HierarchyElement) => findEquivalentRowInItemAndSubItems(item, ghmHierarchy).equivalentRow)
     setCurrentState(newList)
   }, [initialState, ghmHierarchy])
 

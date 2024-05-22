@@ -22,6 +22,7 @@ const defaultContactRequest = {
   requestType: '',
   object: '',
   url: '',
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   files: FileList as any,
   message: ''
 }

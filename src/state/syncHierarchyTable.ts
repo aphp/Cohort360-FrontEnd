@@ -35,6 +35,7 @@ const initSyncHierarchyTable: AsyncThunk<HierarchyTree, SelectedCriteriaType, { 
   SelectedCriteriaType,
   { state: RootState }
 >('syncHierarchyTable/initSyncHierarchyTable', (selectedCriteria: SelectedCriteriaType, { getState }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const selectedResource: any = (getState().cohortCreation.request ?? {}).selectedCriteria?.find(
     (item) => item.id === selectedCriteria.id
   )

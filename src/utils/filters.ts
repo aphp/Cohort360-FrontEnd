@@ -47,6 +47,7 @@ export const toggleFilter = <T>(arr: Array<T>, value: T): Array<T> => {
 }
 
 export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const castedFilters = filters as any
   if (filters[key as keyof F] !== undefined) {
     switch (key) {

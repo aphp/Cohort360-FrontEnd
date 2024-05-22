@@ -25,10 +25,10 @@ import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchMedication } from 'state/medication'
-import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
+import { CriteriaItemDataCache, CriteriaName, HierarchyElement, HierarchyElementWithSystem, HierarchyTree } from 'types'
 import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
-import { Comparators, CriteriaType, MedicationDataType } from 'types/requestCriterias'
+import { Comparators, CriteriaType, MedicationDataType, SelectedCriteriaType } from 'types/requestCriterias'
 import { displaySystem } from 'utils/displayValueSetSystem'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
@@ -38,9 +38,10 @@ type MedicationFormProps = {
   isEdition: boolean
   criteriaData: CriteriaItemDataCache
   selectedCriteria: MedicationDataType
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChangeValue: (key: string, value: any) => void
-  goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
+  goBack: () => void
+  onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
 const MedicationForm: React.FC<MedicationFormProps> = (props) => {
@@ -77,7 +78,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
     currentState.type === CriteriaType.MEDICATION_REQUEST && currentState.prescriptionType
       ? currentState.prescriptionType.map((prescriptionType) => {
           const criteriaPrescriptionType = criteriaData.data.prescriptionTypes
-            ? criteriaData.data.prescriptionTypes.find((p: any) => p.id === prescriptionType.id)
+            ? criteriaData.data.prescriptionTypes.find((p: HierarchyElement) => p.id === prescriptionType.id)
             : null
           return {
             id: prescriptionType.id,
@@ -89,7 +90,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
   const selectedCriteriaAdministration = currentState.administration
     ? currentState.administration.map((administration) => {
         const criteriaAdministration = criteriaData.data.administrations
-          ? criteriaData.data.administrations.find((p: any) => p.id === administration.id)
+          ? criteriaData.data.administrations.find((p: HierarchyElement) => p.id === administration.id)
           : null
         return {
           id: administration.id,
@@ -99,9 +100,9 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
     : []
 
   const defaultValuesCode = currentState.code
-    ? currentState.code.map((code: any) => {
+    ? currentState.code.map((code: HierarchyElementWithSystem) => {
         const criteriaCode = criteriaData.data.medicationData
-          ? criteriaData.data.medicationData.find((g: any) => g.id === code.id)
+          ? criteriaData.data.medicationData.find((g: HierarchyElementWithSystem) => g.id === code.id)
           : null
         return {
           id: code.id,

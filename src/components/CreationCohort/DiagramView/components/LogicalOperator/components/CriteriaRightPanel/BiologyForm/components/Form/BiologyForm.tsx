@@ -24,9 +24,9 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchBiology } from 'state/biology'
-import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
+import { CriteriaItemDataCache, CriteriaName, HierarchyElement, HierarchyTree } from 'types'
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
-import { ObservationDataType, Comparators } from 'types/requestCriterias'
+import { ObservationDataType, Comparators, SelectedCriteriaType } from 'types/requestCriterias'
 import services from 'services/aphp'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
@@ -44,9 +44,10 @@ type BiologyFormProps = {
   isEdition: boolean
   criteriaData: CriteriaItemDataCache
   selectedCriteria: ObservationDataType
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChangeValue: (key: string, value: any) => void
-  goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
+  goBack: () => void
+  onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
 const BiologyForm: React.FC<BiologyFormProps> = (props) => {
@@ -71,7 +72,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   ])
 
   const _onSubmit = () => {
-    const parseSearchByValue = (value: [string, string]) => {
+    const parseSearchByValue = (value: [string, string]): [number | null, number | null] => {
       return [value[0] ? parseFloat(value[0]) : null, value[1] ? parseFloat(value[1]) : null]
     }
     onChangeSelectedCriteria({
@@ -86,7 +87,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {
         const criteriaCode = criteriaData.data.biologyData
-          ? criteriaData.data.biologyData.find((g: any) => g.id === code.id)
+          ? criteriaData.data.biologyData.find((g: HierarchyElement) => g.id === code.id)
           : null
         return {
           id: code.id,

@@ -8,23 +8,39 @@ import InfoIcon from '@mui/icons-material/Info'
 
 import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
 import VisitInputs from './VisitInputs/VisitInputs'
-import { CriteriaNameType } from 'types'
+import { CriteriaName } from 'types'
 import OccurrencesDateInputs from './OccurrencesInputs/OccurrencesDateInputs'
 
 import scopeType from 'data/scope_type.json'
 
 import { ScopeTreeRow } from 'types'
+import {
+  CcamDataType,
+  Cim10DataType,
+  DocumentDataType,
+  GhmDataType,
+  ImagingDataType,
+  MedicationDataType,
+  ObservationDataType
+} from 'types/requestCriterias'
 
 type AdvancedInputsProps = {
-  form: CriteriaNameType
-  selectedCriteria: any
-  onChangeValue: (key: string, value: any) => void
+  form: CriteriaName
+  selectedCriteria:
+    | CcamDataType
+    | Cim10DataType
+    | DocumentDataType
+    | GhmDataType
+    | MedicationDataType
+    | ImagingDataType
+    | ObservationDataType
+  onChangeValue: (key: string, value: ScopeTreeRow[] | string | undefined) => void
 }
 
 const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
-  const { form, selectedCriteria = {}, onChangeValue } = props
+  const { form, selectedCriteria, onChangeValue } = props
   const optionsIsUsed =
-    selectedCriteria?.encounterService?.length > 0 ||
+    (selectedCriteria.encounterService && selectedCriteria?.encounterService.length > 0) ||
     !!selectedCriteria?.startOccurrence ||
     !!selectedCriteria?.endOccurrence ||
     !!selectedCriteria?.encounterStartDate ||

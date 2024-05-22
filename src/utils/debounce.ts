@@ -15,15 +15,3 @@ export const useDebounce = (delay: number, value: string): string => {
 
   return debouncedValue
 }
-
-export const debounce = (fn: any, delay: any): ((...args: any) => void) => {
-  let timeout: any = -1
-
-  return (...args: any) => {
-    if (timeout !== -1) {
-      clearTimeout(timeout)
-    }
-
-    timeout = setTimeout(fn, delay, ...args)
-  }
-}

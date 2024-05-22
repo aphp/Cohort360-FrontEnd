@@ -7,10 +7,10 @@ import CcamForm from './components/Form/CCAMForm'
 import CcamHierarchy from './components/Hierarchy/CCAMHierarchy'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { useAppDispatch, useAppSelector } from 'state'
-import { fetchProcedure, PmsiListType } from 'state/pmsi'
+import { fetchProcedure } from 'state/pmsi'
+import { EXPLORATION } from 'utils/constants'
 
-import { CriteriaDrawerComponentProps } from 'types'
-import { EXPLORATION } from 'constants.js'
+import { CriteriaDrawerComponentProps, HierarchyElement } from 'types'
 import { CcamDataType, Comparators, CriteriaType } from 'types/requestCriterias'
 
 export const defaultProcedure: Omit<CcamDataType, 'id'> = {
@@ -43,12 +43,13 @@ const Index = (props: CriteriaDrawerComponentProps) => {
   const { classes } = useStyles()
 
   const _onChangeSelectedHierarchy = (
-    newSelectedItems: PmsiListType[] | null | undefined,
-    newHierarchy?: PmsiListType[]
+    newSelectedItems: HierarchyElement[] | null | undefined,
+    newHierarchy?: HierarchyElement[]
   ) => {
     _onChangeFormValue('code', newSelectedItems, newHierarchy)
   }
-  const _onChangeFormValue = async (key: string, value: any, newHierarchy: PmsiListType[] = ccamHierarchy) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const _onChangeFormValue = async (key: string, value: any, newHierarchy: HierarchyElement[] = ccamHierarchy) =>
     await syncOnChangeFormValue(
       key,
       value,

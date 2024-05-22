@@ -1,4 +1,5 @@
-import { expandPmsiElement, PmsiListType } from 'state/pmsi'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { expandPmsiElement } from 'state/pmsi'
 import { AsyncThunk } from '@reduxjs/toolkit'
 import { AppDispatch, RootState } from '../state'
 import {
@@ -7,11 +8,27 @@ import {
   initSyncHierarchyTable,
   pushSyncHierarchyTable
 } from '../state/syncHierarchyTable'
-import { AbstractTree } from '../types'
+import { AbstractTree, HierarchyElement } from '../types'
 import { expandMedicationElement } from '../state/medication'
 import { expandBiologyElement } from '../state/biology'
 import services from 'services/aphp'
 import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
+import { Condition } from 'fhir/r4'
+
+/**
+ * @description : get the last diagnosis labels
+ * @param mainDiagnosisList : the main diagnosis list
+ * @returns : the last three diagnosis labels
+ */
+export const getLastDiagnosisLabels = (mainDiagnosisList: Condition[]) => {
+  const mainDiagnosisLabels = mainDiagnosisList.map((diagnosis) => diagnosis.code?.coding?.[0].display)
+  const lastThreeDiagnosisLabels = mainDiagnosisLabels
+    .filter((diagnosis, index) => mainDiagnosisLabels.indexOf(diagnosis) === index)
+    .slice(0, 3)
+    .join(' - ')
+
+  return lastThreeDiagnosisLabels
+}
 
 /**
  * This function is called when a user select an element of pmsi hierarchy
@@ -163,12 +180,12 @@ export const optimizeHierarchySelection = <
       return parentElement
     }
 
-    const parentItem: any | undefined = returnParentElement(rootRows, undefined)
+    const parentItem: any = returnParentElement(rootRows, undefined)
 
     if (parentItem !== undefined) {
       const selectedChildren =
         parentItem.subItems && parentItem.subItems.length > 0
-          ? parentItem.subItems.filter((subItem: { id: any }) => !!array.find(({ id }) => id === subItem.id))
+          ? parentItem.subItems.filter((subItem: { id: string }) => !!array.find(({ id }) => id === subItem.id))
           : []
 
       if (
@@ -297,9 +314,9 @@ export const flatItems = (items: any[] | undefined): { flattedSelectedItems: any
 }
 
 export const initSyncHierarchyTableEffect = async (
-  resourceHierarchy: PmsiListType[],
+  resourceHierarchy: HierarchyElement[],
   selectedCriteria: SelectedCriteriaType | null,
-  selectedCodes: PmsiListType[],
+  selectedCodes: HierarchyElement[],
   fetchResource: AsyncThunk<any, void, { state: RootState }>,
   resourceType: CriteriaType,
   dispatch: AppDispatch,
@@ -325,9 +342,9 @@ export const initSyncHierarchyTableEffect = async (
 }
 
 export const onChangeSelectedCriteriaEffect = async (
-  codesToExpand: PmsiListType[],
-  selectedCodes: PmsiListType[],
-  resourceHierarchy: PmsiListType[],
+  codesToExpand: HierarchyElement[],
+  selectedCodes: HierarchyElement[],
+  resourceHierarchy: HierarchyElement[],
   resourceType: CriteriaType,
   dispatch: AppDispatch
 ): Promise<void> => {
@@ -335,7 +352,7 @@ export const onChangeSelectedCriteriaEffect = async (
   dispatch(pushSyncHierarchyTable({ code: selectedCodes }))
 }
 
-const isExpanded = (itemToExpand: PmsiListType | undefined): boolean => {
+const isExpanded = (itemToExpand: HierarchyElement | undefined): boolean => {
   if (
     itemToExpand &&
     itemToExpand.subItems &&
@@ -350,10 +367,10 @@ const isExpanded = (itemToExpand: PmsiListType | undefined): boolean => {
 
 const expandRequest = async (
   codeToExpand: string,
-  selectedCodes: PmsiListType[],
+  selectedCodes: HierarchyElement[],
   resourceType: CriteriaType,
   dispatch: AppDispatch
-): Promise<PmsiListType[] | undefined> => {
+): Promise<HierarchyElement[] | undefined> => {
   let type: 'claim' | 'condition' | 'procedure'
   if (resourceType.toLowerCase() === CriteriaType.MEDICATION_REQUEST.toLowerCase()) {
     const expandedMedication = await dispatch(
@@ -392,11 +409,11 @@ const expandRequest = async (
 
 export const expandItem = async (
   codeToExpand: string,
-  selectedCodes: PmsiListType[],
-  resourceHierarchy: PmsiListType[],
+  selectedCodes: HierarchyElement[],
+  resourceHierarchy: HierarchyElement[],
   resourceType: CriteriaType,
   dispatch: AppDispatch
-): Promise<PmsiListType[]> => {
+): Promise<HierarchyElement[]> => {
   const equivalentRow = findEquivalentRowInItemAndSubItems(
     { id: codeToExpand, label: 'loading' },
     resourceHierarchy
@@ -411,23 +428,23 @@ export const expandItem = async (
 }
 
 const expandSingleResourceItem = async (
-  codeToExpand: PmsiListType,
-  selectedCodes: PmsiListType[],
-  resourceHierarchy: PmsiListType[],
+  codeToExpand: HierarchyElement,
+  selectedCodes: HierarchyElement[],
+  resourceHierarchy: HierarchyElement[],
   resourceType: CriteriaType,
   dispatch: AppDispatch
-): Promise<PmsiListType[]> => {
+): Promise<HierarchyElement[]> => {
   if (
     !codeToExpand ||
     (selectedCodes.find((item) => item.id === codeToExpand.id) &&
       findEquivalentRowInItemAndSubItems(codeToExpand, resourceHierarchy).equivalentRow)
   )
     return resourceHierarchy
-  let newResourceHierarchy: PmsiListType[] = resourceHierarchy
+  let newResourceHierarchy: HierarchyElement[] = resourceHierarchy
   const expandItemAndSubItems = async (
-    itemToExpand: PmsiListType,
+    itemToExpand: HierarchyElement,
     resourceType: CriteriaType
-  ): Promise<PmsiListType[]> => {
+  ): Promise<HierarchyElement[]> => {
     newResourceHierarchy = await expandItem(
       itemToExpand?.id,
       selectedCodes,
@@ -449,8 +466,8 @@ const expandSingleResourceItem = async (
     }
     return newResourceHierarchy
   }
-  const getHigherParentFromList = (parentsList: PmsiListType[]): PmsiListType | undefined => {
-    const higherParentCode: PmsiListType | undefined =
+  const getHigherParentFromList = (parentsList: HierarchyElement[]): HierarchyElement | undefined => {
+    const higherParentCode: HierarchyElement | undefined =
       newResourceHierarchy && newResourceHierarchy[0] && newResourceHierarchy[0].subItems
         ? newResourceHierarchy[0].subItems.find(({ id }) => parentsList.find((code) => code.id === id))
         : undefined
@@ -458,13 +475,13 @@ const expandSingleResourceItem = async (
   }
 
   const getHigherParent = async (
-    code: PmsiListType
-  ): Promise<{ higherParentCode: PmsiListType | undefined; parentsList: any[] }> => {
+    code: HierarchyElement
+  ): Promise<{ higherParentCode: HierarchyElement | undefined; parentsList: any[] }> => {
     const { parentsList: parentsListByAlreadyFetched } = findEquivalentRowInItemAndSubItems(
       codeToExpand,
       newResourceHierarchy
     )
-    let higherParentCode: PmsiListType | undefined = getHigherParentFromList(parentsListByAlreadyFetched)
+    let higherParentCode: HierarchyElement | undefined = getHigherParentFromList(parentsListByAlreadyFetched)
     if (higherParentCode) {
       return { higherParentCode: higherParentCode, parentsList: parentsListByAlreadyFetched }
     } else if (!higherParentCode) {
@@ -487,13 +504,13 @@ const expandSingleResourceItem = async (
   return newResourceHierarchy
 }
 const expandHierarchyCodes = async (
-  codesToExpand: PmsiListType[],
-  selectedCodes: PmsiListType[],
-  resourceHierarchy: PmsiListType[],
+  codesToExpand: HierarchyElement[],
+  selectedCodes: HierarchyElement[],
+  resourceHierarchy: HierarchyElement[],
   resourceType: CriteriaType,
   dispatch: AppDispatch
-): Promise<PmsiListType[]> => {
-  let newResourceHierarchy: PmsiListType[] = resourceHierarchy
+): Promise<HierarchyElement[]> => {
+  let newResourceHierarchy = resourceHierarchy
   for await (const itemToExpand of codesToExpand) {
     newResourceHierarchy = await expandSingleResourceItem(
       itemToExpand,
@@ -510,7 +527,7 @@ export const syncOnChangeFormValue = async (
   key: string,
   value: any,
   selectedCriteria: SelectedCriteriaType,
-  resourceHierarchy: PmsiListType[],
+  resourceHierarchy: HierarchyElement[],
   setDefaultCriteria: (value: SelectedCriteriaType) => void,
   selectedTab: string,
   resourceType: CriteriaType,
@@ -519,10 +536,7 @@ export const syncOnChangeFormValue = async (
   const newSelectedCriteria: any = selectedCriteria ? { ...selectedCriteria } : {}
   newSelectedCriteria[key] = value
   if (key === 'code') {
-    const optimizedHierarchySelection: PmsiListType[] = optimizeHierarchySelection(
-      newSelectedCriteria.code,
-      resourceHierarchy
-    )
+    const optimizedHierarchySelection = optimizeHierarchySelection(newSelectedCriteria.code, resourceHierarchy)
     newSelectedCriteria[key] = optimizedHierarchySelection
     dispatch(pushSyncHierarchyTable({ code: optimizedHierarchySelection }))
     if (selectedTab === 'form') {

@@ -4,7 +4,7 @@ import { Grid, Typography } from '@mui/material'
 
 import { useAppSelector } from 'state'
 
-import { TemporalConstraintsKind, TemporalConstraintsType } from 'types'
+import { CriteriaGroupType, TemporalConstraintsKind, TemporalConstraintsType } from 'types'
 import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
 
 import _ from 'lodash'
@@ -47,7 +47,7 @@ const StayConstraints: React.FC<StayConstraintsProps> = ({ constraints, onChange
     {
       id: TemporalConstraintsKind.SAME_ENCOUNTER,
       label: 'Tous les critères ont lieu au cours du même séjour',
-      disabled: criteriaGroup[0].type === 'orGroup'
+      disabled: criteriaGroup[0].type === CriteriaGroupType.OR_GROUP
     },
     {
       id: TemporalConstraintsKind.PARTIAL_CONSTRAINT,

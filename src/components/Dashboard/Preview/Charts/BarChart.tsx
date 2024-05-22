@@ -3,6 +3,7 @@ import React, { useRef, useEffect, memo } from 'react'
 import * as d3 from 'd3'
 
 import { SimpleChartDataType } from 'types'
+import { GenderStatusLabel } from 'types/searchCriterias'
 
 type BarChartProps = {
   data?: SimpleChartDataType[]
@@ -18,9 +19,9 @@ const BarChart: React.FC<BarChartProps> = memo(({ data, height = 250, width = 30
       return
     }
 
-    const woman_value = data.find(({ label }) => label === 'Femmes')
-    const men_value = data.find(({ label }) => label === 'Hommes')
-    const other_value = data.find(({ label }) => label !== 'Hommes' && label !== 'Femmes')
+    const woman_value = data.find(({ label }) => label === GenderStatusLabel.FEMALE)
+    const men_value = data.find(({ label }) => label === GenderStatusLabel.MALE)
+    const other_value = data.find(({ label }) => label !== GenderStatusLabel.MALE && label !== GenderStatusLabel.FEMALE)
     const total_value = (woman_value?.value || 0) + (men_value?.value || 0) + (other_value?.value || 0)
 
     const svg = d3.select(node.current)

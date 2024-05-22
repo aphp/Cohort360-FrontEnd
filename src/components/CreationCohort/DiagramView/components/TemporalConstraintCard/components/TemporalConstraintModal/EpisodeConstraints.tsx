@@ -5,7 +5,7 @@ import InfoIcon from '@mui/icons-material/Info'
 
 import { useAppSelector } from 'state'
 
-import { TemporalConstraintsKind, TemporalConstraintsType } from 'types'
+import { CriteriaGroupType, TemporalConstraintsKind, TemporalConstraintsType } from 'types'
 import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
 
 import _ from 'lodash'
@@ -50,7 +50,7 @@ const EpisodeConstraints: React.FC<EpisodeConstraintsProps> = ({ constraints, on
     {
       id: TemporalConstraintsKind.SAME_EPISODE_OF_CARE,
       label: 'Tous les critères ont lieu au cours du même épisode',
-      disabled: criteriaGroup[0].type === 'orGroup'
+      disabled: criteriaGroup[0].type === CriteriaGroupType.OR_GROUP
     },
     {
       id: TemporalConstraintsKind.PARTIAL_EPISODE_CONSTRAINT,

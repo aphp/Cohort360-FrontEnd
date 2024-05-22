@@ -1,11 +1,10 @@
 import React, { ReactNode } from 'react'
 import moment from 'moment'
-import { ScopeTreeRow } from 'types'
+import { ScopeTreeRow, SimpleCodeType } from 'types'
 import {
   Comparators,
   CriteriaDataKey,
-  DocType,
-  MedicationTypeLabel,
+  MedicationLabel,
   CriteriaType,
   SelectedCriteriaType
 } from 'types/requestCriterias'
@@ -25,9 +24,9 @@ import { Tooltip, Typography } from '@mui/material'
 const getMedicationTypeLabel = (type: CriteriaType) => {
   switch (type) {
     case CriteriaType.MEDICATION_REQUEST:
-      return MedicationTypeLabel.Request
+      return MedicationLabel.PRESCRIPTION
     case CriteriaType.MEDICATION_ADMINISTRATION:
-      return MedicationTypeLabel.Administration
+      return MedicationLabel.ADMINISTRATION
   }
 }
 
@@ -43,6 +42,7 @@ const getLabelFromCriteriaObject = (
 
   const criterion = criterionData?.[name] || []
   if (criterion !== 'loading') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const removeDuplicates = (array: any[], key: string) => {
       return array.filter((obj, index, self) => index === self.findIndex((el) => el[key] === obj[key]))
     }
@@ -86,8 +86,8 @@ const getSearchDocumentLabel = (value: string, searchBy: SearchByTypes) => {
   return `Contient "${value}" dans le ${loc}`
 }
 
-const getDocumentTypesLabel = (values: DocType[]) => {
-  const allTypes = new Set(allDocTypes.docTypes.map((docType: DocType) => docType.type))
+const getDocumentTypesLabel = (values: SimpleCodeType[]) => {
+  const allTypes = new Set(allDocTypes.docTypes.map((docType: SimpleCodeType) => docType.type))
 
   const displayingSelectedDocTypes = values.reduce((acc, selectedDocType) => {
     const numberOfElementFromGroup = allTypes.has(selectedDocType.type) ? allTypes.size : 0
@@ -98,7 +98,7 @@ const getDocumentTypesLabel = (values: DocType[]) => {
     } else {
       return [...acc, selectedDocType]
     }
-  }, [] as DocType[])
+  }, [] as SimpleCodeType[])
 
   const currentDocTypes = displayingSelectedDocTypes.map(({ label }) => label).join(' - ')
 

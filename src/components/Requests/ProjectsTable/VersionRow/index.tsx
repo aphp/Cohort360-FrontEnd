@@ -83,8 +83,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
 
               const isError =
                 !cohort.fhir_group_id ||
-                cohort.request_job_status === CohortJobStatus._pending ||
-                cohort.request_job_status === CohortJobStatus._new ||
+                cohort.request_job_status === CohortJobStatus.PENDING ||
+                cohort.request_job_status === CohortJobStatus.NEW ||
                 !!cohort.request_job_fail_msg
 
               const canExportThisCohort = !!ODD_EXPORT && !isError ? cohort.rights?.export_csv_nomi : false
@@ -111,12 +111,12 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                     </IconButton>
                   </TableCellWrapper>
                   <TableCellWrapper>
-                    {cohort.request_job_status === CohortJobStatus._finished ? (
+                    {cohort.request_job_status === CohortJobStatus.FINISHED ? (
                       <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                    ) : cohort.request_job_status === CohortJobStatus._pending ||
-                      cohort.request_job_status === CohortJobStatus._new ? (
+                    ) : cohort.request_job_status === CohortJobStatus.PENDING ||
+                      cohort.request_job_status === CohortJobStatus.NEW ? (
                       <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
-                    ) : cohort.request_job_status === CohortJobStatus._long_pending ? (
+                    ) : cohort.request_job_status === CohortJobStatus.LONG_PENDING ? (
                       <Tooltip title="Cohorte volumineuse: sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.">
                         <Chip
                           label="En cours"

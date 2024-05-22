@@ -13,7 +13,7 @@ type AsyncAutocompleteProps = {
   noOptionsText?: string
   helperText?: string
   disabled?: boolean
-  onFetch: (options: any, signal: AbortSignal) => Promise<any>
+  onFetch: (options: string, signal: AbortSignal) => Promise<LabelObject[]>
   onChange: (elem: LabelObject[]) => void
 }
 

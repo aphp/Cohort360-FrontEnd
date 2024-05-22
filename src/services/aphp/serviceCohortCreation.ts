@@ -10,6 +10,7 @@ import {
   HierarchyElementWithSystem,
   QuerySnapshotInfo,
   RequestType,
+  SimpleCodeType,
   Snapshot
 } from 'types'
 import docTypes from 'assets/docTypes.json'
@@ -63,7 +64,6 @@ import {
   ENCOUNTER_STATUS
 } from '../../constants'
 import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
-import { DocType } from 'types/requestCriterias'
 import { VitalStatusLabel } from 'types/searchCriterias'
 import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
 
@@ -132,7 +132,7 @@ export interface IServiceCohortCreation {
   fetchCcamHierarchy: (ccamParent: string) => Promise<Array<HierarchyElement>>
   fetchGhmData: (searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<Array<HierarchyElement>>
   fetchGhmHierarchy: (ghmParent: string) => Promise<Array<HierarchyElement>>
-  fetchDocTypes: () => Promise<DocType[]>
+  fetchDocTypes: () => Promise<SimpleCodeType[]>
   fetchMedicationData: (
     searchValue?: string,
     noStar?: boolean,

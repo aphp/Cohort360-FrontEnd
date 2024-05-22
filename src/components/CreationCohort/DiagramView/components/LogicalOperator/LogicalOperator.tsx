@@ -9,7 +9,7 @@ import CriteriaRightPanel from './components/CriteriaRightPanel/CriteriaRightPan
 import { AvatarWrapper } from 'components/ui/Avatar/styles'
 import CriteriaCardItem from '../CriteriaCard'
 
-import { CriteriaGroupType } from 'types'
+import { CriteriaGroup, CriteriaGroupType } from 'types'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import {
@@ -51,7 +51,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
-  const displayingItem = criteriaGroup.filter((_criteriaGroup: CriteriaGroupType) => _criteriaGroup.id === itemId)
+  const displayingItem = criteriaGroup.filter((_criteriaGroup: CriteriaGroup) => _criteriaGroup.id === itemId)
 
   let timeout: NodeJS.Timeout | null = null
 
@@ -77,9 +77,9 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
       <div className={classes.operatorChild}>
         {displayingItem &&
           displayingItem.map(({ criteriaIds }) => {
-            const children: (CriteriaGroupType | SelectedCriteriaType | undefined)[] = criteriaIds
+            const children: (CriteriaGroup | SelectedCriteriaType | undefined)[] = criteriaIds
               .map((criteriaId: number) => {
-                let foundItem: CriteriaGroupType | SelectedCriteriaType | undefined = criteriaGroup.find(
+                let foundItem: CriteriaGroup | SelectedCriteriaType | undefined = criteriaGroup.find(
                   ({ id }) => id === criteriaId
                 )
                 if (!foundItem) {
@@ -215,10 +215,11 @@ const LogicalOperator: React.FC = () => {
     const currentParent = request.criteriaGroup ? request.criteriaGroup.find(({ id }) => id === parentId) : null
     if (!currentParent) return
     const nextGroupId = request.nextGroupId
-    const newOperator: CriteriaGroupType = {
+    const newOperator: CriteriaGroup = {
       id: nextGroupId,
       title: 'Groupe de critères',
-      type: currentParent.type === 'orGroup' ? 'andGroup' : 'orGroup',
+      type:
+        currentParent.type === CriteriaGroupType.OR_GROUP ? CriteriaGroupType.AND_GROUP : CriteriaGroupType.OR_GROUP,
       criteriaIds: [],
       isSubGroup: parentId === 0 ? false : true,
       isInclusive: true

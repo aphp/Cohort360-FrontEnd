@@ -4,13 +4,11 @@ import { RootState } from 'state'
 import { impersonate, login, logout } from 'state/me'
 
 import services from 'services/aphp'
-import { AbstractTree } from 'types'
-
-export type BiologyListType = AbstractTree<{ label: string }>
+import { HierarchyElement } from 'types'
 
 export type BiologyState = {
   loading: boolean
-  list: BiologyListType[]
+  list: HierarchyElement[]
   openedElement: string[]
 }
 
@@ -27,8 +25,7 @@ const initBiologyHierarchy = createAsyncThunk<BiologyState, void, { state: RootS
       const state = getState().biology
       const { list } = state
 
-      const biologyList: BiologyListType[] =
-        list.length === 0 ? await services.cohortCreation.fetchBiologyHierarchy() : list
+      const biologyList = list.length === 0 ? await services.cohortCreation.fetchBiologyHierarchy() : list
 
       return {
         ...state,
@@ -46,7 +43,7 @@ const fetchBiology = createAsyncThunk<BiologyState, void, { state: RootState }>(
   'biology/fetchBiology',
   async (DO_NOT_USE, { getState }) => {
     const state = getState().biology
-    const biologyList: BiologyListType[] = await services.cohortCreation.fetchBiologyHierarchy()
+    const biologyList = await services.cohortCreation.fetchBiologyHierarchy()
 
     return {
       ...state,
@@ -59,7 +56,7 @@ const fetchBiology = createAsyncThunk<BiologyState, void, { state: RootState }>(
 
 type ExpandBiologyElementsParams = {
   rowId: string
-  selectedItems?: BiologyListType[]
+  selectedItems?: HierarchyElement[]
 }
 const expandBiologyElement = createAsyncThunk<BiologyState, ExpandBiologyElementsParams, { state: RootState }>(
   'scope/expandBiologyElement',
@@ -78,14 +75,14 @@ const expandBiologyElement = createAsyncThunk<BiologyState, ExpandBiologyElement
     } else {
       _openedElement = [..._openedElement, rowId]
 
-      const replaceSubItems = async (items: BiologyListType[]) => {
-        let _items: BiologyListType[] = []
+      const replaceSubItems = async (items: HierarchyElement[]) => {
+        let _items: HierarchyElement[] = []
         for (let item of items) {
           // Replace sub items element by response of back-end
           if (item.id === rowId) {
             const foundItem = item.subItems ? item.subItems.find((i) => i.id === 'loading') : true
             if (foundItem) {
-              let subItems: BiologyListType[] = []
+              let subItems: HierarchyElement[] = []
               subItems = await services.cohortCreation.fetchBiologyHierarchy(item.id)
 
               item = { ...item, subItems: subItems }
@@ -96,9 +93,7 @@ const expandBiologyElement = createAsyncThunk<BiologyState, ExpandBiologyElement
           _items = [..._items, item]
 
           // Check if element is selected, if true => add sub items to savedSelectedItems
-          const isSelected = savedSelectedItems.find(
-            (savedSelectedItem: BiologyListType) => savedSelectedItem.id === item.id
-          )
+          const isSelected = savedSelectedItems.find((savedSelectedItem) => savedSelectedItem.id === item.id)
           if (isSelected !== undefined && item.subItems && item.subItems.length > 0) {
             savedSelectedItems = [...savedSelectedItems, ...item.subItems]
           }

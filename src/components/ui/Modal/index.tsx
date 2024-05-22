@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { PropsWithChildren, createContext, useEffect, useState } from 'react'
 
 import { Button, Dialog, DialogActions, DialogTitle, Divider, Grid, Typography } from '@mui/material'

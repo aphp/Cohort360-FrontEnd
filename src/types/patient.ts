@@ -13,24 +13,8 @@ export enum PatientTableLabels {
   IPP = 'IPP'
 }
 
-export enum PMSI {
-  DIAGNOSTIC = 'diagnostic',
-  GHM = 'ghm',
-  CCAM = 'ccam'
-}
-
 export enum PMSILabel {
   DIAGNOSTIC = 'Diagnostics CIM10',
   GHM = 'GHM',
   CCAM = 'Actes CCAM'
-}
-
-export enum Medication {
-  PRESCRIPTION = 'prescription',
-  ADMINISTRATION = 'administration'
-}
-
-export enum MedicationLabel {
-  PRESCRIPTION = 'Prescription',
-  ADMINISTRATION = 'Administration'
 }

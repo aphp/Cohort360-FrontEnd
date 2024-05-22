@@ -9,7 +9,6 @@ import {
   FormLabel,
   Grid,
   IconButton,
-  Link,
   Radio,
   RadioGroup,
   Switch,
@@ -26,10 +25,10 @@ import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition } from 'state/pmsi'
-import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
+import { CriteriaItemDataCache, CriteriaName, HierarchyElement, HierarchyTree } from 'types'
 import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
-import { Cim10DataType, Comparators } from 'types/requestCriterias'
+import { Cim10DataType, Comparators, SelectedCriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 
@@ -38,9 +37,10 @@ type Cim10FormProps = {
   isEdition?: boolean
   criteriaData: CriteriaItemDataCache
   selectedCriteria: Cim10DataType
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChangeValue: (key: string, value: any) => void
-  goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
+  goBack: () => void
+  onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
 const Cim10Form: React.FC<Cim10FormProps> = (props) => {
@@ -66,7 +66,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {
         const criteriaCode = criteriaData.data.cim10Diagnostic
-          ? criteriaData.data.cim10Diagnostic.find((c: any) => c.id === code.id)
+          ? criteriaData.data.cim10Diagnostic.find((c: HierarchyElement) => c.id === code.id)
           : null
         return {
           id: code.id,
@@ -77,7 +77,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const defaultValuesType = currentState.diagnosticType
     ? currentState.diagnosticType.map((diagnosticType) => {
         const criteriaType = criteriaData.data.diagnosticTypes
-          ? criteriaData.data.diagnosticTypes.find((g: any) => g.id === diagnosticType.id)
+          ? criteriaData.data.diagnosticTypes.find((g: HierarchyElement) => g.id === diagnosticType.id)
           : null
         return {
           id: diagnosticType.id,

@@ -21,7 +21,6 @@ import ExpandMore from '@mui/icons-material/ExpandMore'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { PmsiListType } from 'state/pmsi'
 
 import {
   checkIfIndeterminated,
@@ -34,13 +33,13 @@ import useStyles from './styles'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import { defaultProcedure } from '../../index'
-import { HierarchyTree } from 'types'
+import { HierarchyElement, HierarchyTree } from 'types'
 import { CcamDataType } from 'types/requestCriterias'
 
 type ProcedureListItemProps = {
-  procedureItem: PmsiListType
-  selectedItems?: PmsiListType[] | null
-  handleClick: (procedureItem: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
+  procedureItem: HierarchyElement
+  selectedItems?: HierarchyElement[] | null
+  handleClick: (procedureItem: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => void
 }
 
 const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
@@ -76,7 +75,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = async (procedureItem: PmsiListType) => {
+  const handleClickOnHierarchy = async (procedureItem: HierarchyElement) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getHierarchySelection(procedureItem, selectedItems || [], procedureHierarchy)
@@ -157,8 +156,8 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
 type ProcedureHierarchyProps = {
   isOpen: boolean
   selectedCriteria: CcamDataType
-  goBack: (data: any) => void
-  onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
+  goBack: () => void
+  onChangeSelectedHierarchy: (data: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => void
   isEdition?: boolean
   onConfirm: () => void
 }
@@ -180,11 +179,11 @@ const ProcedureHierarchy: React.FC<ProcedureHierarchyProps> = (props) => {
     if (!newList.code) {
       newList.code = selectedCriteria.code
     }
-    newList.code?.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, ccamHierarchy).equivalentRow)
+    newList.code?.map((item: HierarchyElement) => findEquivalentRowInItemAndSubItems(item, ccamHierarchy).equivalentRow)
     setCurrentState(newList)
   }, [initialState, ccamHierarchy])
 
-  const _handleClick = (newSelectedItems: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => {
+  const _handleClick = (newSelectedItems: HierarchyElement[] | null | undefined, newHierarchy?: HierarchyElement[]) => {
     onChangeSelectedHierarchy(newSelectedItems, newHierarchy)
   }
   useEffect(() => {
