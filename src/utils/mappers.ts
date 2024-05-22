@@ -1,4 +1,4 @@
-import { CriteriaNameType, CriteriaName, ScopeTreeRow } from 'types'
+import { CriteriaNameType, CriteriaName, ScopeTreeRow, SimpleCodeType } from 'types'
 import { DocumentAttachmentMethod, LabelObject } from 'types/searchCriterias'
 import {
   convertDurationToString,
@@ -13,7 +13,6 @@ import {
   CcamDataType,
   Cim10DataType,
   Comparators,
-  DocType,
   DocumentDataType,
   EncounterDataType,
   GhmDataType,
@@ -21,8 +20,7 @@ import {
   ImagingDataType,
   MedicationDataType,
   ObservationDataType,
-  PregnancyDataType,
-  SelectedCriteriaType
+  PregnancyDataType
 } from 'types/requestCriterias'
 import { comparatorToFilter, parseOccurence } from './valueComparator'
 import services from 'services/aphp'
@@ -64,11 +62,7 @@ export const buildLabelObjectFilter = (
   return ''
 }
 
-export const unbuildLabelObjectFilter = (
-  currentCriterion: SelectedCriteriaType,
-  filterName: string,
-  values?: string | null
-) => {
+export const unbuildLabelObjectFilter = (currentCriterion: any, filterName: string, values?: string | null) => {
   const valuesIds = values?.split(',') || []
   const newArray = valuesIds?.map((value) => (value.includes('|*') ? { id: '*' } : { id: value }))
   if (newArray) {
@@ -188,13 +182,9 @@ export const buildWithDocumentFilter = (criterion: ImagingDataType, fhirKey: str
   return ''
 }
 
-export const unbuildDocTypesFilter = (
-  currentCriterion: DocumentDataType,
-  filterName: keyof DocumentDataType,
-  values?: string | null
-) => {
+export const unbuildDocTypesFilter = (currentCriterion: any, filterName: string, values?: string | null) => {
   const valuesIds = values?.split(',') || []
-  const newArray = docTypes.docTypes.filter((docType: DocType) =>
+  const newArray = docTypes.docTypes.filter((docType: SimpleCodeType) =>
     valuesIds?.find((docTypeId) => docTypeId === docType.code)
   )
   if (newArray) {
@@ -202,31 +192,7 @@ export const unbuildDocTypesFilter = (
   }
 }
 
-export const unbuildDocTypesFilter2 = (
-  currentCriterion: DocumentDataType,
-  filterName: keyof DocumentDataType,
-  values?: string | null
-) => {
-  if (!(filterName in currentCriterion)) {
-    throw new Error(`Filter name ${filterName} is not valid for DocumentDataType`)
-  }
-
-  const valuesIds = values?.split(',') || []
-  const newArray = docTypes.docTypes.filter((docType: DocType) =>
-    valuesIds?.find((docTypeId) => docTypeId === docType.code)
-  )
-  if (newArray) {
-    // Assurez-vous que filterName est une propriété qui peut être un tableau
-    const existingArray = currentCriterion[filterName] as DocType[] | undefined
-    currentCriterion[filterName] = existingArray ? [...existingArray, ...newArray] : newArray
-  }
-}
-
-export const unbuildDocStatusesFilter = (
-  currentCriterion: DocumentDataType,
-  filterName: string,
-  values?: string | null
-) => {
+export const unbuildDocStatusesFilter = (currentCriterion: any, filterName: string, values?: string | null) => {
   const newArray = values?.split(',').map((value) => mapDocumentStatusesFromRequestParam(value.split('|')[1]))
 
   if (newArray) {

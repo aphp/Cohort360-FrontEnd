@@ -22,7 +22,7 @@ import {
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
 import { SearchInputError } from 'types/error'
-import { Comparators, CriteriaDataKey, DocType, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import { Comparators, CriteriaDataKey, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
 
 export enum CohortJobStatus {
   _long_pending = 'long_pending',
@@ -375,7 +375,7 @@ export type CriteriaItemType = {
 }
 
 type FetchFunctionVariant =
-  | (() => Promise<DocType[]>)
+  | (() => Promise<SimpleCodeType[]>)
   | ((searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<HierarchyElement[]>)
 
 export type ResearchType = string | boolean | AbortSignal | undefined

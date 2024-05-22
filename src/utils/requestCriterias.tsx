@@ -1,10 +1,9 @@
 import React, { ReactNode } from 'react'
 import moment from 'moment'
-import { ScopeTreeRow } from 'types'
+import { ScopeTreeRow, SimpleCodeType } from 'types'
 import {
   Comparators,
   CriteriaDataKey,
-  DocType,
   MedicationTypeLabel,
   CriteriaType,
   SelectedCriteriaType
@@ -86,8 +85,8 @@ const getSearchDocumentLabel = (value: string, searchBy: SearchByTypes) => {
   return `Contient "${value}" dans le ${loc}`
 }
 
-const getDocumentTypesLabel = (values: DocType[]) => {
-  const allTypes = new Set(allDocTypes.docTypes.map((docType: DocType) => docType.type))
+const getDocumentTypesLabel = (values: SimpleCodeType[]) => {
+  const allTypes = new Set(allDocTypes.docTypes.map((docType: SimpleCodeType) => docType.type))
 
   const displayingSelectedDocTypes = values.reduce((acc, selectedDocType) => {
     const numberOfElementFromGroup = allTypes.has(selectedDocType.type) ? allTypes.size : 0
@@ -98,7 +97,7 @@ const getDocumentTypesLabel = (values: DocType[]) => {
     } else {
       return [...acc, selectedDocType]
     }
-  }, [] as DocType[])
+  }, [] as SimpleCodeType[])
 
   const currentDocTypes = displayingSelectedDocTypes.map(({ label }) => label).join(' - ')
 
