@@ -157,7 +157,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
 type ProcedureHierarchyProps = {
   isOpen: boolean
   selectedCriteria: CcamDataType
-  goBack: (data: any) => void
+  goBack: () => void
   onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
   isEdition?: boolean
   onConfirm: () => void

@@ -23,7 +23,10 @@ type UsersTableProps = {
   usersList: User[]
   loading?: boolean
   usersAssociated?: User[]
-  onChangeUsersAssociated: (key: any, value: any) => void
+  onChangeUsersAssociated: (
+    key: 'name' | 'requestName' | 'usersToShare' | 'usersAssociated',
+    value: User[] | string
+  ) => void
 }
 
 const UsersTable: React.FC<UsersTableProps> = ({ usersList, loading, usersAssociated, onChangeUsersAssociated }) => {

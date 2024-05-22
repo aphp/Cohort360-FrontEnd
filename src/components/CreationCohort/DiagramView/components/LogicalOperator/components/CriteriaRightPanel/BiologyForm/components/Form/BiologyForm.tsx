@@ -26,7 +26,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchBiology } from 'state/biology'
 import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
-import { ObservationDataType, Comparators } from 'types/requestCriterias'
+import { ObservationDataType, Comparators, SelectedCriteriaType } from 'types/requestCriterias'
 import services from 'services/aphp'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
@@ -37,8 +37,8 @@ type BiologyFormProps = {
   criteriaData: CriteriaItemDataCache
   selectedCriteria: ObservationDataType
   onChangeValue: (key: string, value: any) => void
-  goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
+  goBack: () => void
+  onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
 const BiologyForm: React.FC<BiologyFormProps> = (props) => {

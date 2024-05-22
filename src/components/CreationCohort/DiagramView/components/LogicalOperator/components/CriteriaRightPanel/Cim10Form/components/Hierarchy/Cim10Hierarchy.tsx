@@ -149,7 +149,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
 type Cim10HierarchyProps = {
   isOpen: boolean
   selectedCriteria: Cim10DataType
-  goBack: (data: any) => void
+  goBack: () => void
   onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
   isEdition?: boolean
   onConfirm: () => void

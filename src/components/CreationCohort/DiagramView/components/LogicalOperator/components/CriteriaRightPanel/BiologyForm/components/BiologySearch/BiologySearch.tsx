@@ -86,7 +86,7 @@ const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
 
 type BiologySearchProps = {
   isEdition?: boolean
-  goBack: (data: any) => void
+  goBack: () => void
   onChangeSelectedCriteria: (data: any) => void
   selectedCriteria: ObservationDataType
   onConfirm: () => void

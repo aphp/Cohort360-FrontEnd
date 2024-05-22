@@ -67,7 +67,7 @@ const DataTable: React.FC<DataTableProps> = ({
                     {column.code ? (
                       <TableSortLabel
                         active={order?.orderBy === column.code}
-                        direction={order?.orderBy === column.code ? order?.orderDirection : 'asc'}
+                        direction={order?.orderBy === column.code ? order?.orderDirection : Direction.ASC}
                         onClick={createSortHandler(column.code as Order)}
                       >
                         {column.label}
@@ -86,7 +86,7 @@ const DataTable: React.FC<DataTableProps> = ({
                               <TableSortLabel
                                 className={classes.multiple}
                                 active={order?.orderBy === subColumn.code}
-                                direction={order?.orderBy === subColumn.code ? order?.orderDirection : 'asc'}
+                                direction={order?.orderBy === subColumn.code ? order?.orderDirection : Direction.ASC}
                                 onClick={createSortHandler(subColumn.code as Order)}
                               >
                                 {subColumn.label}

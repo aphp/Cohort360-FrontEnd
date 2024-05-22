@@ -29,7 +29,7 @@ import { fetchCondition } from 'state/pmsi'
 import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
-import { Cim10DataType, Comparators } from 'types/requestCriterias'
+import { Cim10DataType, Comparators, SelectedCriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 
@@ -39,8 +39,8 @@ type Cim10FormProps = {
   criteriaData: CriteriaItemDataCache
   selectedCriteria: Cim10DataType
   onChangeValue: (key: string, value: any) => void
-  goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
+  goBack: () => void
+  onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
 const Cim10Form: React.FC<Cim10FormProps> = (props) => {

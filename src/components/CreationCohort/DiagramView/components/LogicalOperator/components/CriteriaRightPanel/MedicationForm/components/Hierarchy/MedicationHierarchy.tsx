@@ -171,7 +171,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
 type MedicationExplorationProps = {
   isOpen: boolean
   selectedCriteria: MedicationDataType
-  goBack: (data: any) => void
+  goBack: () => void
   onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
   onConfirm: () => void
   isEdition?: boolean

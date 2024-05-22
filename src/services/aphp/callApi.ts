@@ -57,7 +57,7 @@ export const paramValuesReducerWithPrefix =
   (prefix: string): ((accumulator: string, currentValue: string) => string) =>
   (accumulator: string, currentValue: string) =>
     accumulator ? `${accumulator},${prefix}|${currentValue}` : `${prefix}|${currentValue}`
-const paramValuesReducer = (accumulator: any, currentValue: any): any =>
+const paramValuesReducer = (accumulator: string, currentValue: string): string =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 const paramsReducer = (accumulator: string, currentValue: string): string =>
   accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
@@ -77,7 +77,7 @@ type fetchPatientProps = {
   size?: number
   offset?: number
   _sort?: string
-  sortDirection?: 'asc' | 'desc'
+  sortDirection?: Direction.ASC | Direction.DESC
   gender?: string | null
   minBirthdate?: number
   maxBirthdate?: number
@@ -105,7 +105,7 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
     deidentified,
     signal
   } = args
-  const _sortDirection = sortDirection === 'desc' ? '-' : ''
+  const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list, pivotFacet, _elements } = args
 
   _list = _list ? _list.filter(uniq) : []
@@ -148,7 +148,7 @@ type fetchEncounterProps = {
   size?: number
   offset?: number
   _sort?: string
-  sortDirection?: 'asc' | 'desc'
+  sortDirection?: Direction
   patient?: string
   status?: string[]
   facet?: ('class' | 'visit-year-month-gender-facet')[]
@@ -157,7 +157,7 @@ type fetchEncounterProps = {
 }
 export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Promise_Response<Encounter> => {
   const { _id, size, offset, _sort, sortDirection, patient, visit, signal } = args
-  const _sortDirection = sortDirection === 'desc' ? '-' : ''
+  const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list, _elements, status, facet } = args
 
   _list = _list ? _list.filter(uniq) : []
@@ -199,7 +199,7 @@ type fetchDocumentReferenceProps = {
   offset?: number
   searchBy?: SearchByTypes
   _sort?: string
-  sortDirection?: 'asc' | 'desc'
+  sortDirection?: Direction
   type?: string
   minDate?: string
   maxDate?: string
@@ -254,7 +254,7 @@ export const fetchDocumentReference = async (
     executiveUnits,
     encounterStatus
   } = args
-  const _sortDirection = sortDirection === 'desc' ? '-' : ''
+  const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list, facet, uniqueFacet, _elements } = args
   const encounterIdentifier = args['encounter-identifier']
   const patientIdentifier = args['patient-identifier']
@@ -428,7 +428,7 @@ type fetchProcedureProps = {
   size?: number
   offset?: number
   _sort?: string
-  sortDirection?: 'asc' | 'desc'
+  sortDirection?: Direction
   subject?: string
   code?: string
   source?: string
@@ -457,7 +457,7 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
     executiveUnits,
     encounterStatus
   } = args
-  const _sortDirection = sortDirection === 'desc' ? '-' : ''
+  const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list } = args
   const encounterIdentifier = args['encounter-identifier']
 
@@ -497,7 +497,7 @@ type fetchClaimProps = {
   size?: number
   offset?: number
   _sort?: string
-  sortDirection?: 'asc' | 'desc'
+  sortDirection?: Direction
   patient?: string
   diagnosis?: string
   minCreated?: string
@@ -524,7 +524,7 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
     executiveUnits,
     encounterStatus
   } = args
-  const _sortDirection = sortDirection === 'desc' ? '-' : ''
+  const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list } = args
   const encounterIdentifier = args['encounter-identifier']
 
@@ -628,7 +628,7 @@ type fetchObservationProps = {
   size?: number
   offset?: number
   _sort?: string
-  sortDirection?: 'asc' | 'desc'
+  sortDirection?: Direction
   _text?: string
   encounter?: string
   loinc?: string
@@ -661,7 +661,7 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
     executiveUnits,
     encounterStatus
   } = args
-  const _sortDirection = sortDirection === 'desc' ? '-' : ''
+  const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list } = args
 
   _list = _list ? _list.filter(uniq) : []
@@ -732,7 +732,7 @@ export const fetchMedicationRequest = async (
     executiveUnits,
     encounterStatus
   } = args
-  const _sortDirection = sortDirection === 'desc' ? '-' : ''
+  const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list } = args
 
   _list = _list ? _list.filter(uniq) : []
@@ -774,7 +774,7 @@ type fetchMedicationAdministrationProps = {
   size?: number
   offset?: number
   _sort?: string
-  sortDirection?: 'asc' | 'desc'
+  sortDirection?: Direction
   _text?: string
   encounter?: string
   subject?: string
@@ -805,7 +805,7 @@ export const fetchMedicationAdministration = async (
     executiveUnits,
     encounterStatus
   } = args
-  const _sortDirection = sortDirection === 'desc' ? '-' : ''
+  const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list } = args
 
   _list = _list ? _list.filter(uniq) : []

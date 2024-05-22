@@ -44,7 +44,7 @@ const ModalShareRequest: React.FC<{
     setNotifyByEmail(event.target.checked)
   }
 
-  const _onChangeValue = (key: 'name' | 'requestName' | 'usersToShare', value: string | string | User[]) => {
+  const _onChangeValue = (key: 'name' | 'requestName' | 'usersToShare' | 'usersAssociated', value: string | User[]) => {
     if (value && typeof value !== 'string') {
       setCurrentUserToShare(value)
     }
