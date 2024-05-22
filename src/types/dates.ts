@@ -1,9 +1,3 @@
-export enum Calendar {
-  YEAR = 'year',
-  MONTH = 'month',
-  DAY = 'day'
-}
-
 export enum CalendarLabel {
   YEAR = 'années',
   MONTH = 'mois',
