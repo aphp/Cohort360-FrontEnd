@@ -670,7 +670,7 @@ const servicesCohorts: IServiceCohorts = {
     try {
       const { cohortId, motivation, tables } = args
 
-      return await apiBackend.post<Export>('/exports/v1/exports/', {
+      return await apiBackend.post<Export>('/exports/', {
         motivation,
         export_tables: tables.map((table: ExportCSVTable) => ({
           table_ids: table.id,
