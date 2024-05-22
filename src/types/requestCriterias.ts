@@ -1,4 +1,4 @@
-import { ScopeTreeRow } from 'types'
+import { ScopeTreeRow, SimpleCodeType } from 'types'
 import { DocumentAttachmentMethod, DurationRangeType, LabelObject, SearchByTypes } from './searchCriterias'
 
 export enum MedicationTypeLabel {
@@ -212,12 +212,6 @@ export type IPPListDataType = CommonCriteriaDataType & {
   search: string
 }
 
-export type DocType = {
-  code: string
-  label: string
-  type: string
-}
-
 export type DocumentDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
   WithEncounterDateDataType &
@@ -225,7 +219,7 @@ export type DocumentDataType = CommonCriteriaDataType &
     type: CriteriaType.DOCUMENTS
     search: string
     searchBy: SearchByTypes.TEXT | SearchByTypes.DESCRIPTION
-    docType: DocType[] | null
+    docType: SimpleCodeType[] | null
     docStatuses: string[]
   }
 
