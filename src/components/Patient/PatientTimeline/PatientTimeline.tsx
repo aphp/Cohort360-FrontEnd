@@ -155,9 +155,9 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   const [dialogDocuments, setDialogDocuments] = useState<CohortComposition[] | undefined>([])
   const [openFilter, setOpenFilter] = useState(false)
 
-  const [selectedTypes, setSelectedTypes] = useState<any[]>([])
+  const [selectedTypes, setSelectedTypes] = useState<HierarchyElement[]>([])
   const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>([])
-  const [diagnosticTypesList, setDiagnosticTypesList] = useState<any[]>([])
+  const [diagnosticTypesList, setDiagnosticTypesList] = useState<HierarchyElement[]>([])
   const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
 
   const [loading, setLoading] = useState(false)
@@ -328,13 +328,13 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
     </React.Fragment>
   )
 
-  const handleDeleteChip = (key: FilterKeys, value: any) => {
+  const handleDeleteChip = (key: FilterKeys, value: LabelObject) => {
     switch (key) {
       case FilterKeys.DIAGNOSTIC_TYPES:
-        value && setSelectedTypes(selectedTypes.filter((item: any) => item.id !== value.id))
+        value && setSelectedTypes(selectedTypes.filter((item) => item.id !== value.id))
         break
       case FilterKeys.ENCOUNTER_STATUS:
-        value && setEncounterStatus(encounterStatus.filter((item: any) => item.id !== value.id))
+        value && setEncounterStatus(encounterStatus.filter((item) => item.id !== value.id))
         break
       default:
         break
@@ -360,7 +360,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
           <FilterTimelineDialog
             diagnosticTypesList={diagnosticTypesList}
             selectedDiagnosticTypes={selectedTypes}
-            onChangeSelectedDiagnosticTypes={(newSelectedTypes: string[]) => setSelectedTypes(newSelectedTypes)}
+            onChangeSelectedDiagnosticTypes={(newSelectedTypes) => setSelectedTypes(newSelectedTypes)}
             open={openFilter}
             onClose={() => setOpenFilter(false)}
             encounterStatusList={encounterStatusList}
