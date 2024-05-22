@@ -28,7 +28,7 @@ import { fetchMedication } from 'state/medication'
 import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
 import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
-import { Comparators, CriteriaType, MedicationDataType } from 'types/requestCriterias'
+import { Comparators, CriteriaType, MedicationDataType, SelectedCriteriaType } from 'types/requestCriterias'
 import { displaySystem } from 'utils/displayValueSetSystem'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
@@ -39,8 +39,8 @@ type MedicationFormProps = {
   criteriaData: CriteriaItemDataCache
   selectedCriteria: MedicationDataType
   onChangeValue: (key: string, value: any) => void
-  goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
+  goBack: () => void
+  onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
 const MedicationForm: React.FC<MedicationFormProps> = (props) => {

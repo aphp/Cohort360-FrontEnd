@@ -149,7 +149,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
 type BiologyHierarchyProps = {
   isOpen: boolean
   selectedCriteria: any
-  goBack: (data: any) => void
+  goBack: () => void
   onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
   isEdition?: boolean
   onConfirm: () => void

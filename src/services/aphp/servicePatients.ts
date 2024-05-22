@@ -537,7 +537,7 @@ const servicesPatients: IServicePatients = {
       _list: groupId ? [groupId] : [],
       subject: patientId,
       _sort: 'date',
-      sortDirection: 'desc'
+      sortDirection: Direction.DESC
     })
 
     const proceduresData: Procedure[] = getApiResponseResources(proceduresResp) ?? []
@@ -801,7 +801,7 @@ const servicesPatients: IServicePatients = {
       fetchEncounter({
         patient: patientId,
         _sort: 'period-start',
-        sortDirection: 'desc',
+        sortDirection: Direction.DESC,
         _list: groupId ? [groupId] : [],
         size: 1000
       })
@@ -862,11 +862,11 @@ export const getEncounterDocuments = async (
   if (encounters.length === 0) return encounters
 
   const _encounters = encounters
-  const encountersIdList: any[] = []
+  const encountersIdList: string[] = []
 
   _encounters.forEach((encounter) => {
     encounter.documents = []
-    encountersIdList.push(encounter.id)
+    encountersIdList.push(encounter.id ?? '')
   })
 
   const documentsResp = await fetchDocumentReference({

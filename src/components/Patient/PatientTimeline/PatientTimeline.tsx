@@ -78,7 +78,7 @@ const generateTimelineFormattedData = (
   hospits?: CohortEncounter[],
   consults?: PMSIEntry<Procedure>[],
   diagnostics?: PMSIEntry<Condition>[],
-  selectedTypes?: { id: string; label: string }[]
+  selectedTypes?: LabelObject[]
 ): TimelineData => {
   const data: TimelineData = {}
 

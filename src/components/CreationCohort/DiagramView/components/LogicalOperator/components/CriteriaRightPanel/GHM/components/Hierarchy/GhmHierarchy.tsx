@@ -139,7 +139,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
 type GhmHierarchyProps = {
   isOpen: boolean
   selectedCriteria: GhmDataType
-  goBack: (data: any) => void
+  goBack: () => void
   onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
   onConfirm: () => void
   isEdition?: boolean
