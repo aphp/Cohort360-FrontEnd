@@ -1,6 +1,6 @@
 import { CohortPatient } from 'types'
 import moment from 'moment'
-import { DurationType, Calendar } from 'types/dates'
+import { DurationType } from 'types/dates'
 import { DurationRangeType } from 'types/searchCriterias'
 
 export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'months'): string => {
@@ -90,17 +90,6 @@ export const convertDurationToString = (ageDate: DurationType): string | null =>
   if (ageDate.year === null && ageDate.month === null && ageDate.day === null) return null
   if ((ageDate.year === 130 || ageDate.year === 0) && !ageDate.month && !ageDate.day) return null
   return `${ageDate.day || 0}/${ageDate.month || 0}/${ageDate.year || 0}`
-}
-
-export const checkRange = (key: string, value: number) => {
-  if (key === Calendar.DAY && value <= 31 && value >= 0) {
-    return true
-  } else if (key === Calendar.MONTH && value <= 12 && value >= 0) {
-    return true
-  } else if (key === Calendar.YEAR && value >= 0) {
-    return true
-  }
-  return false
 }
 
 export const checkMinMaxValue = (min: DurationType, max: DurationType) => {

@@ -32,18 +32,6 @@ export enum CohortJobStatus {
   _new = 'new'
 }
 
-export enum EncounterStatusKind {
-  _planned = 'planned',
-  _arrived = 'arrived',
-  _triaged = 'triaged',
-  _inProgress = 'in-progress',
-  _onleave = 'onleave',
-  _finished = 'finished',
-  _cancelled = 'cancelled',
-  _enteredInError = 'entered-in-error',
-  _unknown = 'unknown'
-}
-
 export enum LoadingStatus {
   FETCHING = 'FETCHING',
   IDDLE = 'IDLE',
