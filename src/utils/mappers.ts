@@ -21,15 +21,16 @@ import {
   ImagingDataType,
   MedicationDataType,
   ObservationDataType,
-  PregnancyDataType
+  PregnancyDataType,
+  SelectedCriteriaType
 } from 'types/requestCriterias'
 import { comparatorToFilter, parseOccurence } from './valueComparator'
 import services from 'services/aphp'
 import extractFilterParams, { FhirFilterValue } from './fhirFilterParser'
 import { mapDocumentStatusesFromRequestParam } from 'mappers/filters'
 
-const searchReducer = (accumulator: any, currentValue: any): string =>
-  accumulator || accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
+const searchReducer = (accumulator: string, currentValue: string): string =>
+  accumulator || !!accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 const comparator = /(le|ge)/gi
 
 const replaceTime = (date?: string) => {
@@ -63,7 +64,11 @@ export const buildLabelObjectFilter = (
   return ''
 }
 
-export const unbuildLabelObjectFilter = (currentCriterion: any, filterName: string, values?: string | null) => {
+export const unbuildLabelObjectFilter = (
+  currentCriterion: SelectedCriteriaType,
+  filterName: string,
+  values?: string | null
+) => {
   const valuesIds = values?.split(',') || []
   const newArray = valuesIds?.map((value) => (value.includes('|*') ? { id: '*' } : { id: value }))
   if (newArray) {
@@ -146,7 +151,7 @@ export const buildObservationValueFilter = (criterion: ObservationDataType, fhir
   return ''
 }
 
-export const unbuildObservationValueFilter = (filters: string[][], currentCriterion: any) => {
+export const unbuildObservationValueFilter = (filters: string[][], currentCriterion: ObservationDataType) => {
   const valueQuantities = filters
     .filter((keyValue) => keyValue[0].includes(OBSERVATION_VALUE))
     ?.map((value) => value[1])
@@ -183,7 +188,11 @@ export const buildWithDocumentFilter = (criterion: ImagingDataType, fhirKey: str
   return ''
 }
 
-export const unbuildDocTypesFilter = (currentCriterion: any, filterName: string, values?: string | null) => {
+export const unbuildDocTypesFilter = (
+  currentCriterion: DocumentDataType,
+  filterName: keyof DocumentDataType,
+  values?: string | null
+) => {
   const valuesIds = values?.split(',') || []
   const newArray = docTypes.docTypes.filter((docType: DocType) =>
     valuesIds?.find((docTypeId) => docTypeId === docType.code)
@@ -193,7 +202,31 @@ export const unbuildDocTypesFilter = (currentCriterion: any, filterName: string,
   }
 }
 
-export const unbuildDocStatusesFilter = (currentCriterion: any, filterName: string, values?: string | null) => {
+export const unbuildDocTypesFilter2 = (
+  currentCriterion: DocumentDataType,
+  filterName: keyof DocumentDataType,
+  values?: string | null
+) => {
+  if (!(filterName in currentCriterion)) {
+    throw new Error(`Filter name ${filterName} is not valid for DocumentDataType`)
+  }
+
+  const valuesIds = values?.split(',') || []
+  const newArray = docTypes.docTypes.filter((docType: DocType) =>
+    valuesIds?.find((docTypeId) => docTypeId === docType.code)
+  )
+  if (newArray) {
+    // Assurez-vous que filterName est une propriété qui peut être un tableau
+    const existingArray = currentCriterion[filterName] as DocType[] | undefined
+    currentCriterion[filterName] = existingArray ? [...existingArray, ...newArray] : newArray
+  }
+}
+
+export const unbuildDocStatusesFilter = (
+  currentCriterion: DocumentDataType,
+  filterName: string,
+  values?: string | null
+) => {
   const newArray = values?.split(',').map((value) => mapDocumentStatusesFromRequestParam(value.split('|')[1]))
 
   if (newArray) {

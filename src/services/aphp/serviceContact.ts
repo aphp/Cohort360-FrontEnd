@@ -1,15 +1,14 @@
-import { ContactSubmitForm } from 'types'
 import apiBackend from '../apiBackend'
 
 export interface IServiceContact {
   /**
    * Cette fonction permet d'appeler le back-end pour créer un ticket lors d'une prise de contact
    */
-  postIssue: (contactSubmitForm: ContactSubmitForm) => Promise<boolean>
+  postIssue: (contactSubmitForm: FormData) => Promise<boolean>
 }
 
 const serviceContact: IServiceContact = {
-  postIssue: async (contactSubmitForm: ContactSubmitForm) => {
+  postIssue: async (contactSubmitForm: FormData) => {
     try {
       const requestHeader = {
         headers: {

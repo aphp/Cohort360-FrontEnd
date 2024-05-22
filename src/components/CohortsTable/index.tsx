@@ -99,7 +99,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
 
-  const onClickRow = (row: any) => {
+  const onClickRow = (row: Cohort) => {
     if (
       row.request_job_status === CohortJobStatus._pending ||
       row.request_job_status === CohortJobStatus._long_pending ||

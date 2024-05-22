@@ -21,7 +21,6 @@ import {
   Resource
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
-import { SearchByTypes } from 'types/searchCriterias'
 import { SearchInputError } from 'types/error'
 import { Comparators, CriteriaDataKey, DocType, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
 
@@ -553,8 +552,6 @@ export type Export = {
   owner: string
 }
 
-export type ContactSubmitForm = FormData
-
 /**
  * Patient State Types
  */
@@ -700,19 +697,6 @@ export type DTTB_ResultsType = {
   nb: number
   total: number
   label?: string
-}
-export type DTTB_SearchBarType = {
-  type: 'simple' | 'patient' | 'document'
-  value: string | undefined
-  onSearch: (newSearch: string, newSearchBy: SearchByTypes) => void
-  searchBy?: any
-  error?: SearchInputError
-  fullWidth?: boolean
-}
-export type DTTB_ButtonType = {
-  label: string
-  icon?: ReactElement
-  onClick: (args?: any) => void
 }
 export type HierarchyTree = null | {
   code?: HierarchyElement[]

@@ -21,9 +21,9 @@ import { LabelObject } from 'types/searchCriterias'
 type FilterTimelineDialogProps = {
   open: boolean
   onClose: () => void
-  diagnosticTypesList: any[]
-  selectedDiagnosticTypes: string[]
-  onChangeSelectedDiagnosticTypes: (selectedDiagnosticTypes: string[]) => void
+  diagnosticTypesList: HierarchyElement[]
+  selectedDiagnosticTypes: LabelObject[]
+  onChangeSelectedDiagnosticTypes: (selectedDiagnosticTypes: LabelObject[]) => void
   encounterStatusList: HierarchyElement[]
   encounterStatus: LabelObject[]
   onChangeEncounterStatus: (encounterStatus: LabelObject[]) => void
@@ -40,10 +40,10 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
 }) => {
   const { classes } = useStyles()
 
-  const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>(selectedDiagnosticTypes)
+  const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<LabelObject[]>(selectedDiagnosticTypes)
   const [_encounterStatus, setEncounterStatus] = useState<LabelObject[]>(encounterStatus)
 
-  const _onChangeSelectedDiagnosticTypes = (event: React.ChangeEvent<{}>, value: any[]) => {
+  const _onChangeSelectedDiagnosticTypes = (event: React.ChangeEvent<{}>, value: LabelObject[]) => {
     setSelectedDiagnosticTypes(value)
   }
 
@@ -75,10 +75,8 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
             value={currentSelectedTypes}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             disableCloseOnSelect
-            getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.label)}
-            renderOption={(props, diagnosticType: any) => (
-              <li {...props}>{capitalizeFirstLetter(diagnosticType.label)}</li>
-            )}
+            getOptionLabel={(diagnosticType) => capitalizeFirstLetter(diagnosticType.label)}
+            renderOption={(props, diagnosticType) => <li {...props}>{capitalizeFirstLetter(diagnosticType.label)}</li>}
             renderInput={(params) => (
               <TextField {...params} label="Types de diagnostics" placeholder="Sélectionner type(s) de diagnostics" />
             )}
