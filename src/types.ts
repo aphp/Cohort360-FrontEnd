@@ -29,7 +29,8 @@ export enum CohortJobStatus {
   _failed = 'failed',
   _finished = 'finished',
   _pending = 'pending',
-  _new = 'new'
+  _new = 'new',
+  _suspended = 'suspended'
 }
 
 export enum LoadingStatus {

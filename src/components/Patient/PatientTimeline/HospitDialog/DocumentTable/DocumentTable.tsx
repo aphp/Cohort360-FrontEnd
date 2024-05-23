@@ -27,6 +27,7 @@ import { getDocumentStatus } from 'utils/documentsFormatter'
 
 import useStyles from './styles'
 import { Visibility } from '@mui/icons-material'
+import { DocumentStatuses } from 'types/searchCriterias'
 
 type DocumentRowTypes = {
   deidentified: boolean
@@ -48,7 +49,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
 
   const getStatusChip = (type?: DocumentReference['docStatus']) => {
     switch (type) {
-      case 'preliminary':
+      case DocumentStatuses.PRELIMINARY:
         return (
           <StatusChip
             icon={<CancelIcon height="15px" fill="#FFF" />}
@@ -56,9 +57,8 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
             label={getDocumentStatus(type)}
           />
         )
-      case 'final':
+      case DocumentStatuses.FINAL:
         return <StatusChip icon={<CheckIcon height="15px" fill="#FFF" />} label={getDocumentStatus(type)} />
-
       default:
         return ''
     }

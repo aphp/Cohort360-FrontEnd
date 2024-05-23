@@ -37,13 +37,20 @@ import {
   addActionToNavHistory
 } from 'state/cohortCreation'
 
-import { CohortCreationCounterType, CurrentSnapshot, LoadingStatus, RequestType, SimpleStatus, Snapshot } from 'types'
+import {
+  CohortCreationCounterType,
+  CohortJobStatus,
+  CurrentSnapshot,
+  LoadingStatus,
+  RequestType,
+  SimpleStatus,
+  Snapshot
+} from 'types'
 
 import useStyle from './styles'
 
 import displayDigit from 'utils/displayDigit'
 import { ODD_FEASABILITY_REPORT, SHORT_COHORT_LIMIT } from '../../../constants'
-import { JobStatus } from '../../../utils/constants'
 import services from 'services/aphp'
 import ValidationDialog from 'components/ui/ValidationDialog'
 
@@ -200,7 +207,11 @@ const ControlPanel: React.FC<{
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (count && count.status && (count.status === JobStatus.pending || count.status === JobStatus.new)) {
+      if (
+        count &&
+        count.status &&
+        (count.status === CohortJobStatus._pending || count.status === CohortJobStatus._new)
+      ) {
         dispatch(countCohortCreation({ uuid: count.uuid }))
       } else {
         clearInterval(interval)

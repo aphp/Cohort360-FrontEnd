@@ -1,10 +1,9 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
-import { Cohort } from 'types'
+import { Cohort, CohortJobStatus } from 'types'
 
 import { logout, login, impersonate } from './me'
 import services from 'services/aphp'
-import { JobStatus } from '../utils/constants'
 import { CohortsFilters, Direction, Order, OrderBy, SearchCriterias } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
 
@@ -72,7 +71,8 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, FetchCohortsParams,
       const forceRefresh = cohorts?.results?.some(
         (cohortList) =>
           !cohortList.fhir_group_id &&
-          (cohortList.request_job_status === JobStatus.pending || cohortList.request_job_status === JobStatus.new)
+          (cohortList.request_job_status === CohortJobStatus._pending ||
+            cohortList.request_job_status === CohortJobStatus._new)
       )
 
       if (forceRefresh) {
@@ -129,7 +129,8 @@ const fetchCohortInBackGround = createAsyncThunk<
         cohortsList?.some(
           (cohort) =>
             !cohort.fhir_group_id &&
-            (cohort.request_job_status === JobStatus.pending || cohort.request_job_status === JobStatus.new)
+            (cohort.request_job_status === CohortJobStatus._pending ||
+              cohort.request_job_status === CohortJobStatus._new)
         )
       ) {
         const newResult = await services.projects.fetchCohortsList(filters, searchInput, sort, limit, offset)
