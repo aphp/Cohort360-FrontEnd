@@ -7,7 +7,8 @@ import {
   TemporalConstraintsType,
   TemporalConstraintsKind,
   QuerySnapshotInfo,
-  CurrentSnapshot
+  CurrentSnapshot,
+  CohortJobStatus
 } from 'types'
 
 import { buildRequest, unbuildRequest, joinRequest } from 'utils/cohortCreation'
@@ -18,7 +19,6 @@ import { deleteProject } from './project'
 
 import services from 'services/aphp'
 import { SHORT_COHORT_LIMIT } from '../constants'
-import { JobStatus } from '../utils/constants'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 
 export type CohortCreationState = {
@@ -675,8 +675,8 @@ const cohortCreationSlice = createSlice({
       state.count = {
         ...(state.count || {}),
         status:
-          (state.count || {}).status === JobStatus.pending ||
-          (state.count || {}).status === JobStatus.new ||
+          (state.count || {}).status === CohortJobStatus._pending ||
+          (state.count || {}).status === CohortJobStatus._new ||
           (state.count || {}).status === 'suspended'
             ? 'suspended'
             : (state.count || {}).status
@@ -685,7 +685,7 @@ const cohortCreationSlice = createSlice({
     unsuspendCount: (state: CohortCreationState) => {
       state.count = {
         ...state.count,
-        status: JobStatus.pending
+        status: CohortJobStatus._pending
       }
     },
     addActionToNavHistory: (state: CohortCreationState, action: PayloadAction<CurrentSnapshot>) => {
@@ -716,13 +716,14 @@ const cohortCreationSlice = createSlice({
     // countCohortCreation
     builder.addCase(countCohortCreation.pending, (state) => ({
       ...state,
-      status: JobStatus.pending,
+      status: CohortJobStatus._pending,
       countLoading: true
     }))
     builder.addCase(countCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
-      countLoading: payload?.count?.status === JobStatus.pending || payload?.count?.status === JobStatus.new
+      countLoading:
+        payload?.count?.status === CohortJobStatus._pending || payload?.count?.status === CohortJobStatus._new
     }))
     builder.addCase(countCohortCreation.rejected, (state) => ({
       ...state,

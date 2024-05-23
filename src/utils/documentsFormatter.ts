@@ -1,10 +1,11 @@
 import { DocumentReference } from 'fhir/r4'
+import { DocumentStatuses } from 'types/searchCriterias'
 
 export const getDocumentStatus = (status?: DocumentReference['docStatus']): string => {
   switch (status) {
-    case 'final':
+    case DocumentStatuses.FINAL:
       return 'Validé'
-    case 'preliminary':
+    case DocumentStatuses.PRELIMINARY:
       return 'Non Validé'
     default:
       return 'Statut inconnu'

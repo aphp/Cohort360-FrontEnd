@@ -4,7 +4,7 @@ import { ScopeTreeRow, SimpleCodeType } from 'types'
 import {
   Comparators,
   CriteriaDataKey,
-  MedicationTypeLabel,
+  MedicationLabel,
   CriteriaType,
   SelectedCriteriaType
 } from 'types/requestCriterias'
@@ -24,9 +24,9 @@ import { Tooltip, Typography } from '@mui/material'
 const getMedicationTypeLabel = (type: CriteriaType) => {
   switch (type) {
     case CriteriaType.MEDICATION_REQUEST:
-      return MedicationTypeLabel.Request
+      return MedicationLabel.PRESCRIPTION
     case CriteriaType.MEDICATION_ADMINISTRATION:
-      return MedicationTypeLabel.Administration
+      return MedicationLabel.ADMINISTRATION
   }
 }
 

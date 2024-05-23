@@ -10,7 +10,3 @@ export type ErrorDetails = {
 }
 
 export type ErrorType = { isError: boolean; errorMessage?: string }
-
-export enum SavedFiltersError {
-  NAME_DUPPLICATION
-}

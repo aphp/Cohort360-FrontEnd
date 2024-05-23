@@ -1,9 +1,9 @@
 import { ScopeTreeRow, SimpleCodeType } from 'types'
 import { DocumentAttachmentMethod, DurationRangeType, LabelObject, SearchByTypes } from './searchCriterias'
 
-export enum MedicationTypeLabel {
-  Request = 'Prescription',
-  Administration = 'Administration'
+export enum MedicationLabel {
+  PRESCRIPTION = 'Prescription',
+  ADMINISTRATION = 'Administration'
 }
 
 export enum ResourceType {

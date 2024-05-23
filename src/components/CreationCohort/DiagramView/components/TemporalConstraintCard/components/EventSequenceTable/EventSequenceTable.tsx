@@ -17,6 +17,7 @@ import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import { useAppSelector } from 'state'
 
+import { CalendarRequestLabel } from 'types/dates'
 import { TemporalConstraintsType } from 'types'
 
 import useStyles from './styles'
@@ -68,15 +69,15 @@ const EventSequenceTable: React.FC<{
   const durationMeasurementInFrench = (key: string) => {
     let keyInFrench
     if (key === 'days') {
-      keyInFrench = 'jour(s)'
+      keyInFrench = CalendarRequestLabel.DAY
     } else if (key === 'weeks') {
-      keyInFrench = 'semaine(s)'
+      keyInFrench = CalendarRequestLabel.WEEK
     } else if (key === 'months') {
-      keyInFrench = 'mois'
+      keyInFrench = CalendarRequestLabel.MONTH
     } else if (key === 'years') {
-      keyInFrench = 'an(s)'
+      keyInFrench = CalendarRequestLabel.YEAR
     } else if (key === 'hours') {
-      keyInFrench = 'heure(s)'
+      keyInFrench = CalendarRequestLabel.HOUR
     }
     return keyInFrench
   }

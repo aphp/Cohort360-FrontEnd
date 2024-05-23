@@ -26,7 +26,7 @@ import { Column, CohortComposition } from 'types'
 
 import useStyles from './styles'
 import { Visibility } from '@mui/icons-material'
-import { Order, OrderBy } from 'types/searchCriterias'
+import { DocumentStatuses, Order, OrderBy } from 'types/searchCriterias'
 import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
 import { DocumentReference } from 'fhir/r4'
 
@@ -227,7 +227,7 @@ const DataTableCompositionLine: React.FC<{
 
 const getStatusChip = (type?: DocumentReference['docStatus']) => {
   switch (type) {
-    case 'preliminary':
+    case DocumentStatuses.PRELIMINARY:
       return (
         <StatusChip
           status={ChipStyles.CANCELLED}
@@ -235,7 +235,7 @@ const getStatusChip = (type?: DocumentReference['docStatus']) => {
           label={getDocumentStatus(type)}
         />
       )
-    case 'final':
+    case DocumentStatuses.FINAL:
       return <StatusChip icon={<CheckIcon height="15px" fill="#FFF" />} label={getDocumentStatus(type)} />
     default:
       return ''
