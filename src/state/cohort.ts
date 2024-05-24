@@ -2,7 +2,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 import { Cohort } from 'types'
 
-import { logout, login } from './me'
+import { logout, login, impersonate } from './me'
 import services from 'services/aphp'
 import { JobStatus } from '../utils/constants'
 import { CohortsFilters, Direction, Order, OrderBy, SearchCriterias } from 'types/searchCriterias'
@@ -251,6 +251,7 @@ const setCohortSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout.fulfilled, () => defaultInitialState)
+    builder.addCase(impersonate, () => defaultInitialState)
     // fetchCohorts
     builder.addCase(fetchCohorts.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(fetchCohorts.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))

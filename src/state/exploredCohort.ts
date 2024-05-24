@@ -1,6 +1,6 @@
 import { Cohort, CohortData } from 'types'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { login, logout } from './me'
+import { impersonate, login, logout } from './me'
 import { RootState } from 'state'
 
 import { ODD_EXPORT } from '../constants'
@@ -272,6 +272,7 @@ const exploredCohortSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout.fulfilled, () => defaultInitialState)
+    builder.addCase(impersonate, () => defaultInitialState)
     builder.addCase(fetchExploredCohort.pending, (state) => ({ ...state, loading: true, rightToExplore: undefined }))
     builder.addCase(fetchExploredCohort.fulfilled, (state, { payload }) => ({
       ...state,

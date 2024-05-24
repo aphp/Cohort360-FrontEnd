@@ -2,7 +2,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 import { ProjectType } from 'types'
 
-import { logout, login } from './me'
+import { logout, login, impersonate } from './me'
 
 import services from 'services/aphp'
 
@@ -219,6 +219,7 @@ const setProjectSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout.fulfilled, () => defaultInitialState)
+    builder.addCase(impersonate, () => defaultInitialState)
     // fetchProjects
     builder.addCase(fetchProjects.pending, (state) => ({ ...state, loading: !state.count }))
     builder.addCase(fetchProjects.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))

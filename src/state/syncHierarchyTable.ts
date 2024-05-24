@@ -2,6 +2,7 @@ import { AsyncThunk, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { RootState } from './index'
 import { HierarchyTree } from '../types'
 import { SelectedCriteriaType } from 'types/requestCriterias'
+import { impersonate, login, logout } from './me'
 
 const initialState: HierarchyTree = {
   code: undefined,
@@ -51,6 +52,9 @@ const synchroSlice = createSlice({
   initialState: initialState,
   reducers: {},
   extraReducers: (builder) => {
+    builder.addCase(login, () => initialState)
+    builder.addCase(logout.fulfilled, () => initialState)
+    builder.addCase(impersonate, () => initialState)
     builder.addCase(pushSyncHierarchyTable.fulfilled, (state, action) => ({
       ...action.payload,
       ...{ loading: state.loading ?? 0 }

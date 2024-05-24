@@ -15,7 +15,7 @@ import {
   CohortQuestionnaireResponse
 } from 'types'
 
-import { logout } from './me'
+import { impersonate, logout } from './me'
 
 import services from 'services/aphp'
 import servicesPerimeters from '../services/aphp/servicePerimeters'
@@ -927,6 +927,7 @@ const patientSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(logout.fulfilled, () => null)
+    builder.addCase(impersonate, () => null)
     // fetchPatientInfo
     builder.addCase(fetchPatientInfo.pending, (state) =>
       state === null

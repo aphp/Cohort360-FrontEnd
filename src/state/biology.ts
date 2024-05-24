@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import { RootState } from 'state'
-import { login, logout } from 'state/me'
+import { impersonate, login, logout } from 'state/me'
 
 import services from 'services/aphp'
 import { AbstractTree } from 'types'
@@ -134,6 +134,7 @@ const biologySlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout.fulfilled, () => defaultInitialState)
+    builder.addCase(impersonate, () => defaultInitialState)
     // initBiologyHierarchy
     builder.addCase(initBiologyHierarchy.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(initBiologyHierarchy.fulfilled, (state, action) => ({ ...state, ...action.payload }))

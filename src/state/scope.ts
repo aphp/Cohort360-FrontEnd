@@ -1,7 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 
-import { login, logout } from './me'
+import { impersonate, login, logout } from './me'
 
 import services from 'services/aphp'
 
@@ -155,6 +155,7 @@ const scopeSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout.fulfilled, () => defaultInitialState)
+    builder.addCase(impersonate, () => defaultInitialState)
     // fetchScopesList
     builder.addCase(fetchScopesList.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(fetchScopesList.fulfilled, (state, action) => ({

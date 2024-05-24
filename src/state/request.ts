@@ -2,7 +2,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 import { RequestType } from 'types'
 
-import { logout, login } from './me'
+import { logout, login, impersonate } from './me'
 
 import services from 'services/aphp'
 
@@ -330,6 +330,7 @@ const setRequestSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout.fulfilled, () => defaultInitialState)
+    builder.addCase(impersonate, () => defaultInitialState)
     // fetchRequests
     builder.addCase(fetchRequests.pending, (state) => ({ ...state, loading: !state.count }))
     builder.addCase(fetchRequests.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))

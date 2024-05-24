@@ -34,7 +34,7 @@ export const impersonate = createAction('me/impersonate', (user?: User) => {
   // this is bad but i don't know how to refresh the page after impersonation (which is sometimes needed to refresh the current page content/store)
   setTimeout(() => {
     window.location.reload()
-  }, 2000)
+  }, 1000)
   return {
     payload: { user }
   }
