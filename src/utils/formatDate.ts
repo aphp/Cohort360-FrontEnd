@@ -4,29 +4,29 @@ import moment from 'moment/moment'
 const getStringMonth = (monthNumber: number): Month | undefined => {
   switch (monthNumber) {
     case 0:
-      return Month.january
+      return Month.JANUARY
     case 1:
-      return Month.february
+      return Month.FEBRUARY
     case 2:
-      return Month.march
+      return Month.MARCH
     case 3:
-      return Month.april
+      return Month.APRIL
     case 4:
-      return Month.may
+      return Month.MAY
     case 5:
-      return Month.june
+      return Month.JUNE
     case 6:
-      return Month.july
+      return Month.JULY
     case 7:
-      return Month.august
+      return Month.AUGUST
     case 8:
-      return Month.september
+      return Month.SEPTEMBER
     case 9:
-      return Month.october
+      return Month.OCTOBER
     case 10:
-      return Month.november
+      return Month.NOVEMBER
     case 11:
-      return Month.december
+      return Month.DECEMBER
 
     default:
       return
@@ -36,29 +36,29 @@ const getStringMonth = (monthNumber: number): Month | undefined => {
 const getStringMonthAphp = (monthNumber: number): Month | undefined => {
   switch (monthNumber) {
     case 1:
-      return Month.january
+      return Month.JANUARY
     case 2:
-      return Month.february
+      return Month.FEBRUARY
     case 3:
-      return Month.march
+      return Month.MARCH
     case 4:
-      return Month.april
+      return Month.APRIL
     case 5:
-      return Month.may
+      return Month.MAY
     case 6:
-      return Month.june
+      return Month.JUNE
     case 7:
-      return Month.july
+      return Month.JULY
     case 8:
-      return Month.august
+      return Month.AUGUST
     case 9:
-      return Month.september
+      return Month.SEPTEMBER
     case 10:
-      return Month.october
+      return Month.OCTOBER
     case 11:
-      return Month.november
+      return Month.NOVEMBER
     case 12:
-      return Month.december
+      return Month.DECEMBER
 
     default:
       return

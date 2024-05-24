@@ -675,8 +675,8 @@ const cohortCreationSlice = createSlice({
       state.count = {
         ...(state.count || {}),
         status:
-          (state.count || {}).status === CohortJobStatus._pending ||
-          (state.count || {}).status === CohortJobStatus._new ||
+          (state.count || {}).status === CohortJobStatus.PENDING ||
+          (state.count || {}).status === CohortJobStatus.NEW ||
           (state.count || {}).status === 'suspended'
             ? 'suspended'
             : (state.count || {}).status
@@ -685,7 +685,7 @@ const cohortCreationSlice = createSlice({
     unsuspendCount: (state: CohortCreationState) => {
       state.count = {
         ...state.count,
-        status: CohortJobStatus._pending
+        status: CohortJobStatus.PENDING
       }
     },
     addActionToNavHistory: (state: CohortCreationState, action: PayloadAction<CurrentSnapshot>) => {
@@ -716,14 +716,13 @@ const cohortCreationSlice = createSlice({
     // countCohortCreation
     builder.addCase(countCohortCreation.pending, (state) => ({
       ...state,
-      status: CohortJobStatus._pending,
+      status: CohortJobStatus.PENDING,
       countLoading: true
     }))
     builder.addCase(countCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
-      countLoading:
-        payload?.count?.status === CohortJobStatus._pending || payload?.count?.status === CohortJobStatus._new
+      countLoading: payload?.count?.status === CohortJobStatus.PENDING || payload?.count?.status === CohortJobStatus.NEW
     }))
     builder.addCase(countCohortCreation.rejected, (state) => ({
       ...state,

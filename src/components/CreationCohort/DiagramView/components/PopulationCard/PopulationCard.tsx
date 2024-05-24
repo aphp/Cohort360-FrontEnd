@@ -13,7 +13,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { buildCohortCreation } from 'state/cohortCreation'
 import { fetchScopesList } from 'state/scope'
 
-import { CriteriaNameType, ScopeType, ScopeTreeRow } from 'types'
+import { CriteriaName, ScopeType, ScopeTreeRow } from 'types'
 import scopeTypes from 'data/scope_type.json'
 
 import useStyles from './styles'
@@ -24,7 +24,7 @@ import { cleanCriterias } from 'utils/cohortCreation'
 export type PopulationCardPropsType = {
   label?: string
   title?: string
-  form?: CriteriaNameType
+  form?: CriteriaName
   executiveUnits?: ScopeTreeRow[]
   disabled?: boolean
   isAcceptEmptySelection?: boolean

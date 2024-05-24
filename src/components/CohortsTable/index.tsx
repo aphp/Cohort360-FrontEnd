@@ -101,9 +101,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
 
   const onClickRow = (row: Cohort) => {
     if (
-      row.request_job_status === CohortJobStatus._pending ||
-      row.request_job_status === CohortJobStatus._long_pending ||
-      row.request_job_status === CohortJobStatus._failed
+      row.request_job_status === CohortJobStatus.PENDING ||
+      row.request_job_status === CohortJobStatus.LONG_PENDING ||
+      row.request_job_status === CohortJobStatus.FAILED
     )
       return
     navigate(`/cohort/${row.fhir_group_id}`)
@@ -262,7 +262,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                 return (
                   <TableRow
                     className={
-                      row.request_job_status === CohortJobStatus._finished ? classes.pointerHover : classes.notAllow
+                      row.request_job_status === CohortJobStatus.FINISHED ? classes.pointerHover : classes.notAllow
                     }
                     hover
                     key={row.uuid}
@@ -284,12 +284,12 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       </IconButton>
                     </TableCell>
                     <TableCell onClick={() => onClickRow(row)} align="center">
-                      {row.request_job_status === CohortJobStatus._finished ? (
+                      {row.request_job_status === CohortJobStatus.FINISHED ? (
                         <Chip label="Terminé" size="small" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                      ) : row.request_job_status === CohortJobStatus._pending ||
-                        row.request_job_status === CohortJobStatus._new ? (
+                      ) : row.request_job_status === CohortJobStatus.PENDING ||
+                        row.request_job_status === CohortJobStatus.NEW ? (
                         <Chip label="En cours" size="small" style={{ backgroundColor: '#ffc107', color: 'black' }} />
-                      ) : row.request_job_status === CohortJobStatus._long_pending ? (
+                      ) : row.request_job_status === CohortJobStatus.LONG_PENDING ? (
                         <Tooltip title="Cohorte volumineuse: sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.">
                           <Chip
                             label="En cours"
@@ -346,11 +346,11 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                               title={
                                 !row.exportable
                                   ? 'Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé.'
-                                  : !canExportThisCohort && row.request_job_status === CohortJobStatus._finished
+                                  : !canExportThisCohort && row.request_job_status === CohortJobStatus.FINISHED
                                   ? "Vous n'avez pas les droits suffisants pour exporter cette cohorte."
-                                  : row.request_job_status === CohortJobStatus._failed
+                                  : row.request_job_status === CohortJobStatus.FAILED
                                   ? 'Cette cohorte ne peut pas être exportée car elle a échoué lors de sa création'
-                                  : row.request_job_status === CohortJobStatus._pending
+                                  : row.request_job_status === CohortJobStatus.PENDING
                                   ? 'Cette cohorte ne peut pas être exportée car elle est en cours de création'
                                   : ''
                               }
@@ -366,9 +366,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                     !canExportThisCohort ||
                                     !row.exportable ||
                                     maintenanceIsActive ||
-                                    row.request_job_status === CohortJobStatus._long_pending ||
-                                    row.request_job_status === CohortJobStatus._failed ||
-                                    row.request_job_status === CohortJobStatus._pending
+                                    row.request_job_status === CohortJobStatus.LONG_PENDING ||
+                                    row.request_job_status === CohortJobStatus.FAILED ||
+                                    row.request_job_status === CohortJobStatus.PENDING
                                   }
                                 >
                                   <ExportIcon />

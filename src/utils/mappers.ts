@@ -1,4 +1,4 @@
-import { CriteriaNameType, CriteriaName, ScopeTreeRow, SimpleCodeType } from 'types'
+import { CriteriaName, ScopeTreeRow, SimpleCodeType } from 'types'
 import { DocumentAttachmentMethod, LabelObject } from 'types/searchCriterias'
 import {
   convertDurationToString,
@@ -35,8 +35,8 @@ const replaceTime = (date?: string) => {
   return date?.replace('T00:00:00Z', '') ?? null
 }
 
-export const mapToCriteriaName = (criteria: string): CriteriaNameType => {
-  const mapping: { [key: string]: CriteriaNameType } = {
+export const mapToCriteriaName = (criteria: string): CriteriaName => {
+  const mapping: { [key: string]: CriteriaName } = {
     diagnostic: CriteriaName.Cim10,
     ghm: CriteriaName.Ghm,
     ccam: CriteriaName.Ccam

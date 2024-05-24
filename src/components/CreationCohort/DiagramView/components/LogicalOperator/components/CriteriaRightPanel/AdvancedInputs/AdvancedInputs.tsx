@@ -8,7 +8,7 @@ import InfoIcon from '@mui/icons-material/Info'
 
 import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
 import VisitInputs from './VisitInputs/VisitInputs'
-import { CriteriaNameType } from 'types'
+import { CriteriaName } from 'types'
 import OccurrencesDateInputs from './OccurrencesInputs/OccurrencesDateInputs'
 
 import scopeType from 'data/scope_type.json'
@@ -16,7 +16,7 @@ import scopeType from 'data/scope_type.json'
 import { ScopeTreeRow } from 'types'
 
 type AdvancedInputsProps = {
-  form: CriteriaNameType
+  form: CriteriaName
   selectedCriteria: any
   onChangeValue: (key: string, value: any) => void
 }

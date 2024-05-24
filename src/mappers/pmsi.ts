@@ -1,12 +1,12 @@
 import { Medication, Pmsi } from 'state/patient'
-import { CriteriaNameType, CriteriaName } from 'types'
+import { CriteriaName } from 'types'
 import { PMSILabel } from 'types/patient'
 import { ResourceType } from 'types/requestCriterias'
 
 export const mapToCriteriaName = (
   criteria: ResourceType.CLAIM | ResourceType.CONDITION | ResourceType.PROCEDURE
-): CriteriaNameType => {
-  const mapping: { [key: string]: CriteriaNameType } = {
+): CriteriaName => {
+  const mapping: { [key: string]: CriteriaName } = {
     diagnostic: CriteriaName.Cim10,
     ghm: CriteriaName.Ghm,
     ccam: CriteriaName.Ccam
