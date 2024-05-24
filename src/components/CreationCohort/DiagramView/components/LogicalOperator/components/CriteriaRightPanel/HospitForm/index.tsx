@@ -17,6 +17,7 @@ import SearchbarWithCheck from 'components/ui/Inputs/SearchbarWithCheck'
 import { mappingCriteria } from '../DemographicForm'
 import CriteriaLayout from 'components/ui/CriteriaLayout'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
+import NumericConditionInput from 'components/ui/Inputs/OccurencesWithFloats'
 
 enum Error {
   EMPTY_FORM,
@@ -767,7 +768,7 @@ const HospitForm = ({
             <FormLabel component="legend" className={classes.durationLegend}>
               Mensurations naissance - Poids (percentile)
             </FormLabel>
-            <OccurenceInput
+            <NumericConditionInput
               value={birthMensurationsPercentil}
               comparator={birthMensurationsPercentilComparator}
               onchange={(newbirthMensurationsPercentil, newComparator) => {
@@ -837,7 +838,7 @@ const HospitForm = ({
             <FormLabel component="legend" className={classes.durationLegend}>
               pH artériel au cordon
             </FormLabel>
-            <OccurenceInput
+            <NumericConditionInput
               value={arterialPhCord}
               comparator={arterialPhCordComparator}
               onchange={(newarterialPhCord, newComparator) => {
@@ -851,7 +852,7 @@ const HospitForm = ({
             <FormLabel component="legend" className={classes.durationLegend}>
               Lactate artériel au cordon (mmol/L)
             </FormLabel>
-            <OccurenceInput
+            <NumericConditionInput
               value={arterialCordLactates}
               comparator={arterialCordLactatesComparator}
               onchange={(newarterialCordLactates, newComparator) => {

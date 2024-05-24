@@ -42,12 +42,12 @@ export const filterToComparator = (filter: string) => {
 }
 
 export const parseOccurence = (value: string) => {
-  const match = value.match(/^(lt|le|gt|ge)?(-?\d+)$/)
+  const match = value.match(/^(lt|le|gt|ge)?(-?\d*\.?\d*)$/)
   if (match) {
     const [, comparator, number] = match
     const criterion = {
       comparator: comparator ? filterToComparator(comparator) : Comparators.GREATER_OR_EQUAL,
-      value: parseInt(number, 10)
+      value: parseFloat(number)
     }
     return criterion
   } else {
