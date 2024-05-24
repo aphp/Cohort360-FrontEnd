@@ -8,7 +8,8 @@ import {
   ScopeElement,
   ScopePage,
   ScopeTreeRow,
-  ScopeType
+  ScopeType,
+  UserAccesses
 } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import {
@@ -88,6 +89,8 @@ export interface IServicePerimeters {
   ) => Promise<ScopePage[] | CustomError>
 
   getAccessExpirations: (accessExpirationsProps: AccessExpirationsProps) => Promise<AccessExpiration[]>
+
+  getAccesses: () => Promise<UserAccesses[]>
 
   /**
    * Cette fonction se base sur la fonction `getPerimeters` du service, et ré-organise la donnée sous forme d'un ScopeTreeTableRow[]
@@ -368,7 +371,22 @@ const servicesPerimeters: IServicePerimeters = {
   getAccessExpirations: async (accessExpirationsProps: AccessExpirationsProps) => {
     let response: AxiosResponse<AccessExpiration[]> | undefined = undefined
     try {
-      response = await fetchAccessExpirations(accessExpirationsProps)
+      response = (await fetchAccessExpirations(accessExpirationsProps)) as AxiosResponse<AccessExpiration[]>
+    } catch (error) {
+      console.error(error)
+    }
+    if (response?.data && response.data.length > 0) {
+      return response?.data
+    } else {
+      console.error('Error while fetching access expirations (from Back)')
+      return []
+    }
+  },
+
+  getAccesses: async () => {
+    let response: AxiosResponse<UserAccesses[]> | undefined = undefined
+    try {
+      response = (await fetchAccessExpirations({ expiring: undefined })) as AxiosResponse<UserAccesses[]>
     } catch (error) {
       console.error(error)
     }

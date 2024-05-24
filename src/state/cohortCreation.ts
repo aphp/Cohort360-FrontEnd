@@ -12,7 +12,7 @@ import {
 
 import { buildRequest, unbuildRequest, joinRequest } from 'utils/cohortCreation'
 
-import { logout, login } from './me'
+import { logout, login, impersonate } from './me'
 import { addRequest, deleteRequest } from './request'
 import { deleteProject } from './project'
 
@@ -701,6 +701,7 @@ const cohortCreationSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout.fulfilled, () => defaultInitialState)
+    builder.addCase(impersonate, () => defaultInitialState)
     // buildCohortCreation
     builder.addCase(buildCohortCreation.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(buildCohortCreation.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
