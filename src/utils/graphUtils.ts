@@ -1,4 +1,4 @@
-import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
+import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType, Month } from 'types'
 import { getStringMonth, getStringMonthAphp } from './formatDate'
 import { Encounter, Extension, Patient } from 'fhir/r4'
 import { GenderStatus } from 'types/searchCriterias'
@@ -229,7 +229,7 @@ export const getVisitRepartitionMapAphp = (facet?: Extension[]): VisiteRepartiti
     Septembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
     Octobre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
     Novembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
-    Decembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 }
+    Décembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 }
   }
 
   facet?.forEach((object) => {
@@ -261,32 +261,19 @@ export const getVisitRepartitionMapAphp = (facet?: Extension[]): VisiteRepartiti
   })
 
   // Idiot de TS...... Don't forget the type !
-  const months: [
-    'Janvier',
-    'Février',
-    'Mars',
-    'Avril',
-    'Mai',
-    'Juin',
-    'Juillet',
-    'Août',
-    'Septembre',
-    'Octobre',
-    'Novembre',
-    'Decembre'
-  ] = [
-    'Janvier',
-    'Février',
-    'Mars',
-    'Avril',
-    'Mai',
-    'Juin',
-    'Juillet',
-    'Août',
-    'Septembre',
-    'Octobre',
-    'Novembre',
-    'Decembre'
+  const months: Month[] = [
+    Month.JANUARY,
+    Month.FEBRUARY,
+    Month.MARCH,
+    Month.APRIL,
+    Month.MAY,
+    Month.JUNE,
+    Month.JULY,
+    Month.AUGUST,
+    Month.SEPTEMBER,
+    Month.OCTOBER,
+    Month.NOVEMBER,
+    Month.DECEMBER
   ]
   for (const month of months) {
     if (!repartitionMap[month]) continue
@@ -311,7 +298,7 @@ export const getVisitRepartitionMap = (patients: Patient[], encounters: Encounte
     Septembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
     Octobre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
     Novembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
-    Decembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 }
+    Décembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 }
   }
 
   encounters.forEach((encounter) => {

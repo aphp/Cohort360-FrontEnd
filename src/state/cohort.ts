@@ -71,8 +71,8 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, FetchCohortsParams,
       const forceRefresh = cohorts?.results?.some(
         (cohortList) =>
           !cohortList.fhir_group_id &&
-          (cohortList.request_job_status === CohortJobStatus._pending ||
-            cohortList.request_job_status === CohortJobStatus._new)
+          (cohortList.request_job_status === CohortJobStatus.PENDING ||
+            cohortList.request_job_status === CohortJobStatus.NEW)
       )
 
       if (forceRefresh) {
@@ -129,8 +129,7 @@ const fetchCohortInBackGround = createAsyncThunk<
         cohortsList?.some(
           (cohort) =>
             !cohort.fhir_group_id &&
-            (cohort.request_job_status === CohortJobStatus._pending ||
-              cohort.request_job_status === CohortJobStatus._new)
+            (cohort.request_job_status === CohortJobStatus.PENDING || cohort.request_job_status === CohortJobStatus.NEW)
         )
       ) {
         const newResult = await services.projects.fetchCohortsList(filters, searchInput, sort, limit, offset)

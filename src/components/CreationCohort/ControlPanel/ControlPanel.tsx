@@ -207,11 +207,7 @@ const ControlPanel: React.FC<{
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (
-        count &&
-        count.status &&
-        (count.status === CohortJobStatus._pending || count.status === CohortJobStatus._new)
-      ) {
+      if (count && count.status && (count.status === CohortJobStatus.PENDING || count.status === CohortJobStatus.NEW)) {
         dispatch(countCohortCreation({ uuid: count.uuid }))
       } else {
         clearInterval(interval)

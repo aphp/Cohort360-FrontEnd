@@ -81,8 +81,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
 
               const isError =
                 !cohort.fhir_group_id ||
-                cohort.request_job_status === CohortJobStatus._pending ||
-                cohort.request_job_status === CohortJobStatus._new ||
+                cohort.request_job_status === CohortJobStatus.PENDING ||
+                cohort.request_job_status === CohortJobStatus.NEW ||
                 !!cohort.request_job_fail_msg
 
               const canExportThisCohort = !!ODD_EXPORT && !isError ? cohort.rights?.export_csv_nomi : false
@@ -111,8 +111,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                   <TableCellWrapper>
                     {cohort.fhir_group_id ? (
                       <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                    ) : cohort.request_job_status === CohortJobStatus._pending ||
-                      cohort.request_job_status === CohortJobStatus._new ? (
+                    ) : cohort.request_job_status === CohortJobStatus.PENDING ||
+                      cohort.request_job_status === CohortJobStatus.NEW ? (
                       <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
                     ) : cohort.request_job_fail_msg ? (
                       <Tooltip title={cohort.request_job_fail_msg}>

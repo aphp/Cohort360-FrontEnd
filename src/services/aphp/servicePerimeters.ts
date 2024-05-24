@@ -227,13 +227,13 @@ const servicesPerimeters: IServicePerimeters = {
 
     const originalPatients = getApiResponseResources(patientsResp)
 
-    const ageFacet = patientsResp.data.meta?.extension?.filter((facet) => facet.url === ChartCode.agePyramid)
+    const ageFacet = patientsResp.data.meta?.extension?.filter((facet) => facet.url === ChartCode.AGE_PYRAMID)
     const deceasedFacet = patientsResp.data.meta?.extension?.filter(
-      (facet) => facet.url === ChartCode.genderRepartition
+      (facet) => facet.url === ChartCode.GENDER_REPARTITION
     )
-    const visitFacet = encountersResp.data.meta?.extension?.filter((facet) => facet.url === ChartCode.monthlyVisits)
+    const visitFacet = encountersResp.data.meta?.extension?.filter((facet) => facet.url === ChartCode.MONTHLY_VISITS)
     const classFacet = encountersResp.data.meta?.extension?.filter(
-      (facet) => facet.url === ChartCode.visitTypeRepartition
+      (facet) => facet.url === ChartCode.VISIT_TYPE_REPARTITION
     )
 
     const agePyramidData =

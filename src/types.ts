@@ -25,12 +25,12 @@ import { SearchInputError } from 'types/error'
 import { Comparators, CriteriaDataKey, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
 
 export enum CohortJobStatus {
-  _long_pending = 'long_pending',
-  _failed = 'failed',
-  _finished = 'finished',
-  _pending = 'pending',
-  _new = 'new',
-  _suspended = 'suspended'
+  LONG_PENDING = 'long_pending',
+  FAILED = 'failed',
+  FINISHED = 'finished',
+  PENDING = 'pending',
+  NEW = 'new',
+  SUSPENDED = 'suspended'
 }
 
 export enum LoadingStatus {
@@ -156,18 +156,18 @@ export type CohortGroup = Group & {
 }
 
 export enum Month {
-  january = 'Janvier',
-  february = 'Février',
-  march = 'Mars',
-  april = 'Avril',
-  may = 'Mai',
-  june = 'Juin',
-  july = 'Juillet',
-  august = 'Août',
-  september = 'Septembre',
-  october = 'Octobre',
-  november = 'Novembre',
-  december = 'Decembre'
+  JANUARY = 'Janvier',
+  FEBRUARY = 'Février',
+  MARCH = 'Mars',
+  APRIL = 'Avril',
+  MAY = 'Mai',
+  JUNE = 'Juin',
+  JULY = 'Juillet',
+  AUGUST = 'Août',
+  SEPTEMBER = 'Septembre',
+  OCTOBER = 'Octobre',
+  NOVEMBER = 'Novembre',
+  DECEMBER = 'Décembre'
 }
 
 export type AbstractTree<T> = T & {
@@ -204,10 +204,10 @@ export type ScopeTreeRow = AbstractTree<{
 }>
 
 export enum ChartCode {
-  agePyramid = 'facet-extension.ageMonth',
-  genderRepartition = 'facet-deceased',
-  monthlyVisits = 'facet-_facet.period.startGender',
-  visitTypeRepartition = 'facet-class.coding.display'
+  AGE_PYRAMID = 'facet-extension.ageMonth',
+  GENDER_REPARTITION = 'facet-deceased',
+  MONTHLY_VISITS = 'facet-_facet.period.startGender',
+  VISIT_TYPE_REPARTITION = 'facet-class.coding.display'
 }
 
 export type SimpleChartDataType = {
@@ -247,7 +247,7 @@ export type VisiteRepartitionType = {
   Septembre: MonthVisiteRepartitionType
   Octobre: MonthVisiteRepartitionType
   Novembre: MonthVisiteRepartitionType
-  Decembre: MonthVisiteRepartitionType
+  Décembre: MonthVisiteRepartitionType
 }
 
 export type CohortData = {
@@ -366,8 +366,6 @@ export type CriteriaItemType = {
 type FetchFunctionVariant =
   | (() => Promise<SimpleCodeType[]>)
   | ((searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<HierarchyElement[]>)
-
-export type ResearchType = string | boolean | AbortSignal | undefined
 
 export type ValueSet = {
   code: string
@@ -770,16 +768,6 @@ export enum CriteriaName {
   Imaging = 'imaging',
   Form = 'questionnaireResponse'
 }
-export type CriteriaNameType =
-  | CriteriaName.Cim10
-  | CriteriaName.Ccam
-  | CriteriaName.Ghm
-  | CriteriaName.Document
-  | CriteriaName.Medication
-  | CriteriaName.Biology
-  | CriteriaName.VisitSupport
-  | CriteriaName.Imaging
-  | CriteriaName.Form
 
 export type AccessExpirationsProps = {
   expiring?: boolean
