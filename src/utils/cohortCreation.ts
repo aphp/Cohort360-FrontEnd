@@ -7,7 +7,8 @@ import {
   TemporalConstraintsType,
   CriteriaItemType,
   CriteriaItemDataCache,
-  AbstractTree
+  AbstractTree,
+  BiologyStatus
 } from 'types'
 
 import {
@@ -450,7 +451,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case CriteriaType.OBSERVATION: {
       const unreducedFilterFhir = [
-        `subject.active=true&${OBSERVATION_STATUS}=Val`,
+        `subject.active=true&${OBSERVATION_STATUS}=${BiologyStatus.VALIDATED}`,
         filtersBuilders(OBSERVATION_CODE, buildLabelObjectFilter(criterion.code, BIOLOGY_HIERARCHY_ITM_ANABIO)),
         filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(ENCOUNTER_STATUS_REFERENCE, buildLabelObjectFilter(criterion.encounterStatus)),

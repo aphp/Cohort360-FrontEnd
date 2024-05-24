@@ -103,7 +103,7 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, FetchCohortsParams,
   }
 )
 
-const sleep = (m: any) => new Promise((r: any) => setTimeout(r, m))
+const sleep = (m: number) => new Promise((r) => setTimeout(r, m))
 
 type FetchCohortInBackGroundParams = {
   cohortsType?: CohortsType

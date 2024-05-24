@@ -4,6 +4,7 @@ import * as d3 from 'd3'
 import legend from './Legend'
 
 import { VisiteRepartitionType, Month } from 'types'
+import { GenderStatusLabel } from 'types/searchCriterias'
 
 type GroupedBarChartProps = {
   data?: VisiteRepartitionType
@@ -56,7 +57,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
 
     const groupKey = 'Mois'
 
-    const keys = ['Hommes', 'Femmes']
+    const keys = [GenderStatusLabel.MALE, GenderStatusLabel.FEMALE]
     const color = d3.scaleOrdinal().domain(keys).range(['#78D4FA', '#FC568F', '#8446E4'])
 
     const div = d3.select('#tooltip').style('opacity', 0)

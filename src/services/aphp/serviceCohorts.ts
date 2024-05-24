@@ -371,15 +371,14 @@ const servicesCohorts: IServiceCohorts = {
       const agePyramidData =
         patientsResp.data.resourceType === 'Bundle'
           ? getAgeRepartitionMapAphp(
-              patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === 'facet-extension.ageMonth')
-                ?.extension
+              patientsResp.data.meta?.extension?.find((facet) => facet.url === ChartCode.AGE_PYRAMID)?.extension
             )
           : undefined
 
       const genderRepartitionMap =
         patientsResp.data.resourceType === 'Bundle'
           ? getGenderRepartitionMapAphp(
-              patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === 'facet-deceased')?.extension
+              patientsResp.data.meta?.extension?.find((facet) => facet.url === ChartCode.GENDER_REPARTITION)?.extension
             )
           : undefined
 

@@ -108,10 +108,6 @@ export type SelectedCriteriaType =
   | PregnancyDataType
   | HospitDataType
 
-export type DraftSelectedCriteriaType = SelectedCriteriaType & {
-  id?: number
-}
-
 export enum CriteriaDataKey {
   GENDER = 'gender',
   VITALSTATUS = 'status',

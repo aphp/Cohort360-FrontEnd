@@ -4,6 +4,7 @@ import { Autocomplete, CircularProgress, TextField } from '@mui/material'
 import { cancelPendingRequest } from 'utils/abortController'
 import { LabelObject } from 'types/searchCriterias'
 import { useDebounce } from 'utils/debounce'
+import { HierarchyElementWithSystem } from 'types'
 
 type AsyncAutocompleteProps = {
   variant?: 'standard' | 'filled' | 'outlined'
@@ -13,7 +14,7 @@ type AsyncAutocompleteProps = {
   noOptionsText?: string
   helperText?: string
   disabled?: boolean
-  onFetch: (options: any, signal: AbortSignal) => Promise<any>
+  onFetch: (options: string, signal: AbortSignal) => Promise<HierarchyElementWithSystem[]>
   onChange: (elem: LabelObject[]) => void
 }
 

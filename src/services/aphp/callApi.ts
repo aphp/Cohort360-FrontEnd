@@ -51,7 +51,19 @@ import {
   DOC_STATUS_CODE_SYSTEM
 } from '../../constants'
 import { Direction, Order, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
-import { mapDocumentStatusesToRequestParam } from '../../mappers/filters'
+import {
+  AdministrationParamsKeys,
+  ClaimParamsKeys,
+  ConditionParamsKeys,
+  DocumentsParamsKeys,
+  ImagingParamsKeys,
+  mapDocumentStatusesToRequestParam,
+  ObservationParamsKeys,
+  PatientsParamsKeys,
+  PrescriptionParamsKeys,
+  ProcedureParamsKeys,
+  QuestionnaireResponseParamsKeys
+} from '../../mappers/filters'
 import { ResourceType } from 'types/requestCriterias'
 
 export const paramValuesReducerWithPrefix =
@@ -119,11 +131,19 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
-  if (gender) options = [...options, `gender=${gender}`]
+  if (gender) options = [...options, `${PatientsParamsKeys.GENDERS}=${gender}`]
   if (_text) options = [...options, `${searchBy}=${_text}`]
-  if (deceased !== undefined) options = [...options, `deceased=${deceased}`]
-  if (minBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=ge${minBirthdate}`]
-  if (maxBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=le${maxBirthdate}`]
+  if (deceased !== undefined) options = [...options, `${PatientsParamsKeys.VITAL_STATUS}=${deceased}`]
+  if (minBirthdate)
+    options = [
+      ...options,
+      `${deidentified ? PatientsParamsKeys.DATE_DEIDENTIFIED : PatientsParamsKeys.DATE_IDENTIFIED}=ge${minBirthdate}`
+    ]
+  if (maxBirthdate)
+    options = [
+      ...options,
+      `${deidentified ? PatientsParamsKeys.DATE_DEIDENTIFIED : PatientsParamsKeys.DATE_IDENTIFIED}=le${maxBirthdate}`
+    ]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
   if (pivotFacet && pivotFacet.length > 0)
@@ -277,7 +297,7 @@ export const fetchDocumentReference = async (
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
-  if (type) options = [...options, `type=${type}`]
+  if (type) options = [...options, `${DocumentsParamsKeys.DOC_TYPES}=${type}`]
   if (_text)
     options = [...options, `${searchBy === SearchByTypes.TEXT ? `_text` : 'description'}=${encodeURIComponent(_text)}`]
   if (highlight_search_results)
@@ -294,18 +314,19 @@ export const fetchDocumentReference = async (
     const urlString = docStatuses
       .map((status) => `${docStatusesUrl}|${mapDocumentStatusesToRequestParam(status)}`)
       .join(',')
-    options = [...options, `docstatus=${encodeURIComponent(urlString)}`]
+    options = [...options, `${DocumentsParamsKeys.DOC_STATUSES}=${encodeURIComponent(urlString)}`]
   }
   if (patient) options = [...options, `subject=${patient}`]
-  if (patientIdentifier) options = [...options, `subject.identifier=${patientIdentifier}`]
+  if (patientIdentifier) options = [...options, `${DocumentsParamsKeys.IPP}=${patientIdentifier}`]
   if (encounter) options = [...options, `encounter=${encounter}`]
-  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`]
+  if (encounterIdentifier) options = [...options, `${DocumentsParamsKeys.NDA}=${encounterIdentifier}`]
   if (onlyPdfAvailable) options = [...options, `contenttype=${encodeURIComponent('application/pdf')}`]
-  if (minDate) options = [...options, `date=ge${minDate}`]
-  if (maxDate) options = [...options, `date=le${maxDate}`]
+  if (minDate) options = [...options, `${DocumentsParamsKeys.DATE}=ge${minDate}`]
+  if (maxDate) options = [...options, `${DocumentsParamsKeys.DATE}=le${maxDate}`]
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
-  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
+    options = [...options, `${DocumentsParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
+  if (encounterStatus && encounterStatus.length > 0)
+    options = [...options, `${DocumentsParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
   if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(paramValuesReducer, '')}`]
@@ -470,17 +491,18 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (code) options = [...options, `code=${code}`] // eslint-disable-line
-  if (source) options = [...options, `source=${source}`]
+  if (code) options = [...options, `${ProcedureParamsKeys.CODE}=${code}`] // eslint-disable-line
+  if (source) options = [...options, `${ProcedureParamsKeys.SOURCE}=${source}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
   if (status) options = [...options, `status=${encodeURIComponent(`${DOC_STATUS_CODE_SYSTEM}|${status}`)}`]
-  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`]
+  if (encounterIdentifier) options = [...options, `${ProcedureParamsKeys.NDA}=${encounterIdentifier}`]
   if (minDate) options = [...options, `date=ge${minDate}`]
   if (maxDate) options = [...options, `date=le${maxDate}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
-  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
+    options = [...options, `${ProcedureParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
+  if (encounterStatus && encounterStatus.length > 0)
+    options = [...options, `${ProcedureParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Procedure>>(`/Procedure?${options.reduce(paramsReducer)}`, {
     signal: args.signal
@@ -537,18 +559,18 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
   if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
-  if (diagnosis) options = [...options, `diagnosis=${diagnosis}`] // eslint-disable-line
+  if (diagnosis) options = [...options, `${ClaimParamsKeys.CODE}=${diagnosis}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`] // eslint-disable-line
   if (status)
     options = [
       ...options,
       `status=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-ghm-cost-status|') + status}`
     ]
-  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`]
-  if (minCreated) options = [...options, `created=ge${minCreated}`]
-  if (maxCreated) options = [...options, `created=le${maxCreated}`]
+  if (encounterIdentifier) options = [...options, `${ClaimParamsKeys.NDA}=${encounterIdentifier}`]
+  if (minCreated) options = [...options, `${ClaimParamsKeys.DATE}=ge${minCreated}`]
+  if (maxCreated) options = [...options, `${ClaimParamsKeys.DATE}=le${maxCreated}`]
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
+    options = [...options, `${ClaimParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
   if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
@@ -600,15 +622,16 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   if (offset !== undefined) options = [...options, `_offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (code) options = [...options, `code=${code}`] // eslint-disable-line
-  if (source) options = [...options, `source=${source}`]
+  if (code) options = [...options, `${ConditionParamsKeys.CODE}=${code}`] // eslint-disable-line
+  if (source) options = [...options, `${ConditionParamsKeys.SOURCE}=${source}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`] // eslint-disable-line
-  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
-  if (minRecordedDate) options = [...options, `recorded-date=ge${minRecordedDate}`] // eslint-disable-line
-  if (maxRecordedDate) options = [...options, `recorded-date=le${maxRecordedDate}`] // eslint-disable-line
+  if (encounterIdentifier) options = [...options, `${ConditionParamsKeys.NDA}=${encounterIdentifier}`] // eslint-disable-line
+  if (minRecordedDate) options = [...options, `${ConditionParamsKeys.DATE}=ge${minRecordedDate}`] // eslint-disable-line
+  if (maxRecordedDate) options = [...options, `${ConditionParamsKeys.DATE}=le${maxRecordedDate}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
-  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
+    options = [...options, `${ConditionParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
+  if (encounterStatus && encounterStatus.length > 0)
+    options = [...options, `${ConditionParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
   if (type && type.length > 0) {
@@ -674,16 +697,20 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort},id`}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
-  if (encounter) options = [...options, `encounter.identifier=${encounter}`]
+  if (encounter) options = [...options, `${ObservationParamsKeys.NDA}=${encounter}`]
   if (anabio || loinc)
-    options = [...options, `code=${anabio ? anabio : ''}${anabio && loinc ? ',' : ''}${loinc ? loinc : ''}`] // eslint-disable-line
+    options = [
+      ...options,
+      `${ObservationParamsKeys.ANABIO_LOINC}=${anabio ? anabio : ''}${anabio && loinc ? ',' : ''}${loinc ? loinc : ''}`
+    ] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line
-  if (maxDate) options = [...options, `date=le${maxDate}`] // eslint-disable-line
-  if (rowStatus) options = [...options, `status=${BiologyStatus.VALIDATED}`] // eslint-disable-line
+  if (minDate) options = [...options, `${ObservationParamsKeys.DATE}=ge${minDate}`] // eslint-disable-line
+  if (maxDate) options = [...options, `${ObservationParamsKeys.DATE}=le${maxDate}`] // eslint-disable-line
+  if (rowStatus) options = [...options, `${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
-  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
+  if (encounterStatus && encounterStatus.length > 0)
+    options = [...options, `${ObservationParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
@@ -745,18 +772,19 @@ export const fetchMedicationRequest = async (
   if (offset !== undefined) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (subject) options = [...options, `subject=${subject}`]
-  if (encounter) options = [...options, `encounter.identifier=${encounter}`]
+  if (encounter) options = [...options, `${PrescriptionParamsKeys.NDA}=${encounter}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
   if (type && type.length > 0) {
     const routeUrl = `${MEDICATION_PRESCRIPTION_TYPES}|`
     const urlString = type.map((id) => routeUrl + id).join(',')
-    options = [...options, `category=${encodeURIComponent(urlString)}`]
+    options = [...options, `${PrescriptionParamsKeys.PRESCRIPTION_TYPES}=${encodeURIComponent(urlString)}`]
   }
-  if (minDate) options = [...options, `validity-period-start=ge${minDate}`]
-  if (maxDate) options = [...options, `validity-period-start=le${maxDate}`]
+  if (minDate) options = [...options, `${PrescriptionParamsKeys.DATE}=ge${minDate}`]
+  if (maxDate) options = [...options, `${PrescriptionParamsKeys.DATE}=le${maxDate}`]
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
-  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
+    options = [...options, `${PrescriptionParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
+  if (encounterStatus && encounterStatus.length > 0)
+    options = [...options, `${PrescriptionParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
@@ -818,18 +846,19 @@ export const fetchMedicationAdministration = async (
   if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (subject) options = [...options, `subject=${subject}`]
-  if (encounter) options = [...options, `context.identifier=${encounter}`]
+  if (encounter) options = [...options, `${AdministrationParamsKeys.NDA}=${encounter}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
   if (route && route.length > 0) {
     const routeUrl = `${MEDICATION_ADMINISTRATIONS}|`
     const urlString = route.map((id) => routeUrl + id).join(',')
-    options = [...options, `dosage-route=${encodeURIComponent(urlString)}`]
+    options = [...options, `${AdministrationParamsKeys.ADMINISTRATION_ROUTES}=${encodeURIComponent(urlString)}`]
   }
-  if (minDate) options = [...options, `effective-time=ge${minDate}`] // eslint-disable-line
-  if (maxDate) options = [...options, `effective-time=le${maxDate}`] // eslint-disable-line
+  if (minDate) options = [...options, `${AdministrationParamsKeys.DATE}=ge${minDate}`] // eslint-disable-line
+  if (maxDate) options = [...options, `${AdministrationParamsKeys.DATE}=le${maxDate}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `context.encounter-care-site=${executiveUnits}`] // eslint-disable-line
-  if (encounterStatus && encounterStatus.length > 0) options = [...options, `context.status=${encounterStatus}`]
+    options = [...options, `${AdministrationParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`] // eslint-disable-line
+  if (encounterStatus && encounterStatus.length > 0)
+    options = [...options, `${AdministrationParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
@@ -888,18 +917,19 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   if (offset) options = [...options, `_offset=${offset}`]
   if (order) options = [...options, `_sort=${_orderDirection}${order}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
-  if (encounter) options = [...options, `encounter.identifier=${encounter}`]
+  if (encounter) options = [...options, `${ImagingParamsKeys.NDA}=${encounter}`]
   if (ipp) options = [...options, `patient.identifier=${ipp}`]
-  if (minDate) options = [...options, `started=ge${minDate}`]
-  if (maxDate) options = [...options, `started=le${maxDate}`]
+  if (minDate) options = [...options, `${ImagingParamsKeys.DATE}=ge${minDate}`]
+  if (maxDate) options = [...options, `${ImagingParamsKeys.DATE}=le${maxDate}`]
   if (modalities && modalities.length > 0) {
     const modalitiesUrl = `${IMAGING_MODALITIES}|`
     const urlString = modalities.map((id) => modalitiesUrl + id).join(',')
-    options = [...options, `modality=${encodeURIComponent(urlString)}`]
+    options = [...options, `${ImagingParamsKeys.MODALITY}=${encodeURIComponent(urlString)}`]
   }
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
-  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
+    options = [...options, `${ImagingParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
+  if (encounterStatus && encounterStatus.length > 0)
+    options = [...options, `${ImagingParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<ImagingStudy>>(
@@ -925,13 +955,14 @@ export const fetchForms = async (args: fetchFormsProps) => {
   const { patient, formName, _list, startDate, endDate, executiveUnits, encounterStatus } = args
   let options: string[] = ['status=in-progress,completed']
   if (patient) options = [...options, `subject=${patient}`]
-  if (formName) options = [...options, `questionnaire.name=${formName}`]
+  if (formName) options = [...options, `${QuestionnaireResponseParamsKeys.NAME}=${formName}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
-  if (startDate) options = [...options, `authored=ge${startDate}`]
-  if (endDate) options = [...options, `authored=le${endDate}`]
+  if (startDate) options = [...options, `${QuestionnaireResponseParamsKeys.DATE}=ge${startDate}`]
+  if (endDate) options = [...options, `${QuestionnaireResponseParamsKeys.DATE}=le${endDate}`]
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
-  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
+    options = [...options, `${QuestionnaireResponseParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
+  if (encounterStatus && encounterStatus.length > 0)
+    options = [...options, `${QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<QuestionnaireResponse>>(
     `/QuestionnaireResponse?${options.reduce(paramsReducer)}`

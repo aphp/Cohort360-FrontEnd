@@ -1,7 +1,7 @@
 import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType, Month } from 'types'
 import { getStringMonth, getStringMonthAphp } from './formatDate'
 import { Encounter, Extension, Patient } from 'fhir/r4'
-import { GenderStatus } from 'types/searchCriterias'
+import { GenderStatus, VitalStatusLabel } from 'types/searchCriterias'
 
 function getRandomColor(): string {
   const letters = '0123456789ABCDEF'
@@ -371,12 +371,12 @@ export const getGenderRepartitionSimpleData = (
     }
 
     vitalStatusData.push({
-      label: 'Patients vivants',
+      label: VitalStatusLabel.ALIVE,
       value: aliveCount,
       color: '#6DF2E3'
     })
     vitalStatusData.push({
-      label: 'Patients décédés',
+      label: VitalStatusLabel.DECEASED,
       value: deceasedCount,
       color: '#D0D7D8'
     })
