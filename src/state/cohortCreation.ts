@@ -3,12 +3,13 @@ import { RootState } from 'state'
 import {
   CohortCreationCounterType,
   ScopeTreeRow,
-  CriteriaGroupType,
+  CriteriaGroup,
   TemporalConstraintsType,
   TemporalConstraintsKind,
   QuerySnapshotInfo,
   CurrentSnapshot,
-  CohortJobStatus
+  CohortJobStatus,
+  CriteriaGroupType
 } from 'types'
 
 import { buildRequest, unbuildRequest, joinRequest } from 'utils/cohortCreation'
@@ -38,7 +39,7 @@ export type CohortCreationState = {
   executiveUnits: (ScopeTreeRow | undefined)[] | null
   allowSearchIpp: boolean
   selectedCriteria: SelectedCriteriaType[]
-  criteriaGroup: CriteriaGroupType[]
+  criteriaGroup: CriteriaGroup[]
   temporalConstraints: TemporalConstraintsType[]
   nextCriteriaId: number
   nextGroupId: number
@@ -67,7 +68,7 @@ const defaultInitialState: CohortCreationState = {
     {
       id: 0,
       title: `Opérateur logique principal`,
-      type: 'andGroup',
+      type: CriteriaGroupType.AND_GROUP,
       criteriaIds: [],
       isSubGroup: false,
       isInclusive: true
@@ -269,7 +270,7 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
         ? selectedPopulation
         : state.cohortCreation.request.selectedPopulation
       const _selectedCriteria = state.cohortCreation.request.selectedCriteria
-      const _criteriaGroup: CriteriaGroupType[] =
+      const _criteriaGroup: CriteriaGroup[] =
         state.cohortCreation.request.criteriaGroup && state.cohortCreation.request.criteriaGroup.length > 0
           ? state.cohortCreation.request.criteriaGroup
           : defaultInitialState.criteriaGroup
@@ -335,7 +336,7 @@ type UnbuildCohortReturn = {
   currentSnapshot: CurrentSnapshot
   selectedPopulation: (ScopeTreeRow | undefined)[] | null
   selectedCriteria: SelectedCriteriaType[]
-  criteriaGroup: CriteriaGroupType[]
+  criteriaGroup: CriteriaGroup[]
   nextCriteriaId: number
   nextGroupId: number
 }
@@ -409,7 +410,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
 type AddRequestToCohortReturn = {
   json: string
   selectedCriteria: SelectedCriteriaType[]
-  criteriaGroup: CriteriaGroupType[]
+  criteriaGroup: CriteriaGroup[]
   nextCriteriaId: number
   nextGroupId: number
 }
@@ -603,7 +604,7 @@ const cohortCreationSlice = createSlice({
       state.selectedCriteria = [...state.selectedCriteria, action.payload]
       state.nextCriteriaId++
     },
-    addNewCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroupType>) => {
+    addNewCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroup>) => {
       state.criteriaGroup = [...state.criteriaGroup, action.payload]
       state.nextGroupId--
     },
@@ -615,7 +616,7 @@ const cohortCreationSlice = createSlice({
       const index = foundItem ? state.selectedCriteria.indexOf(foundItem) : -1
       if (index !== -1) state.selectedCriteria[index] = action.payload
     },
-    editCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroupType>) => {
+    editCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroup>) => {
       const foundItem = state.criteriaGroup.find(({ id }) => id === action.payload.id)
       const index = foundItem ? state.criteriaGroup.indexOf(foundItem) : -1
       if (index !== -1) state.criteriaGroup[index] = action.payload

@@ -1,10 +1,10 @@
-import { CriteriaGroupType } from 'types'
+import { CriteriaGroup, CriteriaGroupType } from 'types'
 import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 
 // function used to get AND groups that contain AT LEAST 2 criteria that are not of type IPP or Patient
 export const getSelectableGroups = (
   selectedCriteria: SelectedCriteriaType[],
-  criteriaGroups: CriteriaGroupType[],
+  criteriaGroups: CriteriaGroup[],
   isEpisode?: boolean
 ) => {
   const selectableCriteria = selectedCriteria
@@ -15,7 +15,7 @@ export const getSelectableGroups = (
     )
     .map((criteria) => criteria.id)
   const andGroupsWithSelectableCriteria = criteriaGroups
-    .filter(({ type }) => type === 'andGroup')
+    .filter(({ type }) => type === CriteriaGroupType.AND_GROUP)
     .map((group) => {
       return { ...group, criteriaIds: group.criteriaIds.filter((id) => selectableCriteria.includes(id)) }
     })

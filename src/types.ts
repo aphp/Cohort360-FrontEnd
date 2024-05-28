@@ -300,7 +300,16 @@ export type PatientData = {
   medicationAdministrationTotal?: number
 }
 
-export type CriteriaGroupType = {
+export enum CriteriaGroupType {
+  AND_GROUP = 'andGroup',
+  AT_LEAST = 'atLeast',
+  AT_MOST = 'atMost',
+  EXACTLY = 'exactly',
+  N_AMONG_M = 'nAmongM',
+  OR_GROUP = 'orGroup'
+}
+
+export type CriteriaGroup = {
   id: number
   title: string
   criteriaIds: number[]
@@ -308,10 +317,10 @@ export type CriteriaGroupType = {
   isInclusive?: boolean
 } & (
   | {
-      type: 'andGroup' | 'orGroup'
+      type: CriteriaGroupType.AND_GROUP | CriteriaGroupType.OR_GROUP
     }
   | {
-      type: 'NamongM'
+      type: CriteriaGroupType.N_AMONG_M
       options: {
         operator: Comparators
         number: number

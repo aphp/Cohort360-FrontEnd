@@ -9,7 +9,7 @@ import { buildCohortCreation, updateTemporalConstraints } from 'state/cohortCrea
 
 import EventSequenceTable from '../EventSequenceTable/EventSequenceTable'
 import TemporalConstraintConfig from '../TemporalConstraintConfig/TemporalConstraintConfig'
-import { TemporalConstraintsKind, TemporalConstraintsType } from 'types'
+import { CriteriaGroupType, TemporalConstraintsKind, TemporalConstraintsType } from 'types'
 import StayConstraints from './StayConstraints'
 import EpisodeConstraints from './EpisodeConstraints'
 
@@ -60,7 +60,7 @@ const TemporalConstraint: React.FC<{
         <DialogTitle>Contraintes temporelles</DialogTitle>
         <DialogContent>
           <StayConstraints constraints={stayConstraints} onChangeConstraints={setStayConstraints} />
-          {criteriaGroup[0].type !== 'orGroup' && (
+          {criteriaGroup[0].type !== CriteriaGroupType.OR_GROUP && (
             <Grid>
               <Grid item container direction="row" alignItems="center">
                 <Typography variant="h3">Séquence d'évènements entre deux critères</Typography>

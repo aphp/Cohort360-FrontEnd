@@ -123,7 +123,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((cimHierarchySubItem: any, index: number) =>
+            subItems.map((cimHierarchySubItem, index: number) =>
               cimHierarchySubItem.id === 'loading' ? (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />

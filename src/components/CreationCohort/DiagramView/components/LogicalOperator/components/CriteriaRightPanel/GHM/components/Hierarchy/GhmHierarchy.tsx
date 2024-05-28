@@ -117,7 +117,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((ghmHierarchySubItem: any, index: number) =>
+            subItems.map((ghmHierarchySubItem, index: number) =>
               ghmHierarchySubItem.id === 'loading' ? (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />

@@ -144,7 +144,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((medicationHierarchySubItem: any, index: number) =>
+            subItems.map((medicationHierarchySubItem, index: number) =>
               medicationHierarchySubItem.id === 'loading' ? (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />

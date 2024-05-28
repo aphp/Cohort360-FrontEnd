@@ -68,7 +68,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   const [settings, setSettings] = useState(initialState)
   const checkedTables = settings.tables.filter((table) => table.checked)
 
-  const [exportResponse, setExportResponse] = useState<{ status: 'error' | 'finish'; detail: any } | null>(null)
+  const [exportResponse, setExportResponse] = useState<{ status: 'error' | 'finish'; detail: string } | null>(null)
   const [error, setError] = useState<typeof ERROR_MOTIF | typeof ERROR_CONDITION | typeof ERROR_TABLE | null>(null)
   const [expandedTableIds, setExpandedTableIds] = useState<string[]>([])
 
@@ -102,7 +102,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     handleChangeSettings('tables', existingTables)
   }
 
-  const handleChangeSettings = (key: 'motif' | 'conditions' | 'tables', value: any) => {
+  const handleChangeSettings = (key: 'motif' | 'conditions' | 'tables', value: ExportCSVTable[] | string | boolean) => {
     setError(null)
     setSettings((prevState) => ({
       ...prevState,
@@ -466,26 +466,15 @@ const ExportTable: React.FC<ExportTableProps> = ({ exportTable, exportRequest, h
   const meState = useAppSelector((state) => state.me)
   const userId = meState?.id
 
-  const _onChangeValue = (
-    key: 'cohort_user' | 'cohort' | 'fhir_filter_user' | 'fhir_filter' | 'tables',
-    value: any
-  ) => {
+  const _onChangeValue = (value: SavedFilter | null) => {
     const _transferRequest = { ...exportRequest }
 
     const exportTableIndex = exportRequest.tables.findIndex((table) => table.id === exportTable.id)
 
-    switch (key) {
-      case 'fhir_filter':
-        _transferRequest.tables[exportTableIndex] = {
-          ...exportRequest.tables[exportTableIndex],
-          [key]: value
-        }
-        break
-      case 'tables':
-        _transferRequest.tables = value
-        break
+    _transferRequest.tables[exportTableIndex] = {
+      ...exportRequest.tables[exportTableIndex],
+      fhir_filter: value
     }
-
     handleTransferRequestChange(_transferRequest)
   }
 
@@ -521,7 +510,7 @@ const ExportTable: React.FC<ExportTableProps> = ({ exportTable, exportRequest, h
             renderOption={(props, option) => <li {...props}>{option.name}</li>}
             renderInput={(params) => <TextField {...params} label="Sélectionnez un filtre" />}
             value={exportTable.fhir_filter}
-            onChange={(_, value) => _onChangeValue('fhir_filter', value)}
+            onChange={(_, value) => _onChangeValue(value)}
           />
         </Grid>
       </Grid>
