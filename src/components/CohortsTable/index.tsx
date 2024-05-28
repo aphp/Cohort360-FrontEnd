@@ -29,8 +29,8 @@ import {
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import InfoIcon from '@mui/icons-material/Info'
 
-import { ReactComponent as Star } from 'assets/icones/star.svg'
-import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
+import Star from 'assets/icones/star.svg?react'
+import StarFull from 'assets/icones/star full.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
 import ExportIcon from '@mui/icons-material/GetApp'
 import MoreVertIcon from '@mui/icons-material/MoreVert'

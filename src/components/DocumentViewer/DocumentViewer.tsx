@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer'
 import Parse from 'html-react-parser'
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState, useMemo } from 'react'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -15,7 +15,7 @@ import services from 'services/aphp'
 import { FHIR_API_URL, ACCESS_TOKEN } from '../../constants'
 
 import { Tab, Tabs } from '@mui/material'
-import Watermark from 'assets/images/watermark_pseudo.svg'
+import Watermark from 'assets/images/watermark_pseudo.svg?react'
 import { DocumentReference } from 'fhir/r4'
 import { getAuthorizationMethod } from 'services/apiFhir'
 
@@ -86,6 +86,22 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
     margin: 'auto'
   }
 
+  const url = useMemo(() => {
+    return { url: `${FHIR_API_URL}/Binary/${documentId}` }
+  }, [documentId])
+
+  const options = useMemo(() => {
+    return {
+      cMapUrl: '/cmaps/',
+      standardFontDataUrl: '/standard_fonts/',
+      httpHeaders: {
+        Accept: 'application/pdf',
+        Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`,
+        authorizationMethod: getAuthorizationMethod()
+      }
+    }
+  }, [])
+
   const findContent = documentContent?.content?.find((content) => content.attachment?.contentType === 'text/plain')
 
   const documentContentDecode =
@@ -123,14 +139,8 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
                   <Document
                     error={'Le document est introuvable.'}
                     loading={'PDF en cours de chargement...'}
-                    file={{
-                      url: `${FHIR_API_URL}/Binary/${documentId}`,
-                      httpHeaders: {
-                        Accept: 'application/pdf',
-                        Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`,
-                        authorizationMethod: getAuthorizationMethod()
-                      }
-                    }}
+                    file={url}
+                    options={options}
                     onLoadSuccess={({ numPages }) => setNumPages(numPages)}
                   >
                     {Array.from(new Array(numPages), (el, index) => (

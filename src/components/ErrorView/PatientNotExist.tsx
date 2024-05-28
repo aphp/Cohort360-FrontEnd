@@ -5,7 +5,7 @@ import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
-import { ReactComponent as PersonOffIcon } from 'assets/icones/person-off.svg'
+import PersonOffIcon from 'assets/icones/person-off.svg?react'
 
 import { useAppSelector } from 'state'
 

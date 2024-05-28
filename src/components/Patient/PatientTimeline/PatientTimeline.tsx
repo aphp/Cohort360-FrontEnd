@@ -15,7 +15,7 @@ import HospitDialog from './HospitDialog/HospitDialog'
 import FilterTimelineDialog from './FilterTimelineDialog/FilterTimelineDialog'
 
 import MoreVertIcon from '@mui/icons-material/MoreVert'
-import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
+import FilterList from 'assets/icones/filter.svg?react'
 
 import { CohortComposition, CohortEncounter, HierarchyElement, PMSIEntry } from 'types'
 

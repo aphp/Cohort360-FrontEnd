@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { ReactComponent as FemaleIcon } from 'assets/icones/venus.svg'
-import { ReactComponent as MaleIcon } from 'assets/icones/mars.svg'
-import { ReactComponent as UnknownIcon } from 'assets/icones/autre-inconnu.svg'
+import FemaleIcon from 'assets/icones/venus.svg?react'
+import MaleIcon from 'assets/icones/mars.svg?react'
+import UnknownIcon from 'assets/icones/autre-inconnu.svg?react'
 
 import { GenderStatus } from 'types/searchCriterias'
 

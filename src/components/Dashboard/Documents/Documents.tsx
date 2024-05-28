@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { Checkbox, CircularProgress, Grid, Tooltip, Typography } from '@mui/material'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
-import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
+import FilterList from 'assets/icones/filter.svg?react'
 import {
   CohortComposition,
   CriteriaName,

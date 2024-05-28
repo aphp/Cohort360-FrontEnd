@@ -21,7 +21,7 @@ import NoRights from 'components/ErrorView/NoRights'
 
 import logo from 'assets/images/logo-login.png'
 import logoAPHP from 'assets/images/logo-aphp.png'
-import { ReactComponent as Keycloak } from 'assets/icones/keycloak.svg'
+import Keycloak from 'assets/icones/keycloak.svg?react'
 
 import { useAppDispatch } from 'state'
 import { MeState, login as loginAction } from 'state/me'

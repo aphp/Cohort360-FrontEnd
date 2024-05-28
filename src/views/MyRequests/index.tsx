@@ -15,7 +15,7 @@ import {
 
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { ReactComponent as DriveFileMoveIcon } from 'assets/icones/drive-file-move.svg'
+import DriveFileMoveIcon from 'assets/icones/drive-file-move.svg?react'
 
 import useStyles from '../MyCohorts/styles'
 

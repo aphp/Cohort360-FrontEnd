@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { CircularProgress, Grid, Tooltip } from '@mui/material'
 import Chip from 'components/ui/Chip'
-import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
+import FilterList from 'assets/icones/filter.svg?react'
 
 import DataTablePmsi from 'components/DataTable/DataTablePmsi'
 

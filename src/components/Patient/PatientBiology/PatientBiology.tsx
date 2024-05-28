@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 import { Checkbox, CircularProgress, Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
 
-import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
+import FilterList from 'assets/icones/filter.svg?react'
 
 import DataTableObservation from 'components/DataTable/DataTableObservation'
 

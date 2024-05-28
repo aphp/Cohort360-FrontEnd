@@ -22,7 +22,7 @@ import {
 
 import ClearIcon from '@mui/icons-material/Clear'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
-import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
+import SearchIcon from 'assets/icones/search.svg?react'
 
 import useStyles from './styles'
 import { useDebounce } from 'utils/debounce'

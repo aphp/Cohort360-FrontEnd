@@ -4,7 +4,7 @@ import { CircularProgress, Grid, Tooltip } from '@mui/material'
 
 import DataTablePatient from 'components/DataTable/DataTablePatient'
 
-import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
+import FilterList from 'assets/icones/filter.svg?react'
 
 import PatientCharts from './components/PatientCharts'
 

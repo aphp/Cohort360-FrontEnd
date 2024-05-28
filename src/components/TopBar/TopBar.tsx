@@ -27,8 +27,8 @@ import FaceIcon from '@mui/icons-material/Face'
 import CloseIcon from '@mui/icons-material/Close'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
-import { ReactComponent as StarIcon } from 'assets/icones/star.svg'
-import { ReactComponent as StarFullIcon } from 'assets/icones/star full.svg'
+import StarIcon from 'assets/icones/star.svg?react'
+import StarFullIcon from 'assets/icones/star full.svg?react'
 import MoreButton from '@mui/icons-material/MoreVert'
 
 import { AvatarWrapper } from 'components/ui/Avatar/styles'

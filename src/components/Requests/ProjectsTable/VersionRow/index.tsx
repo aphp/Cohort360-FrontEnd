@@ -19,8 +19,8 @@ import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import EditIcon from '@mui/icons-material/Edit'
 import ExportIcon from '@mui/icons-material/GetApp'
-import { ReactComponent as Star } from 'assets/icones/star.svg'
-import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
+import Star from 'assets/icones/star.svg?react'
+import StarFull from 'assets/icones/star full.svg?react'
 
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 

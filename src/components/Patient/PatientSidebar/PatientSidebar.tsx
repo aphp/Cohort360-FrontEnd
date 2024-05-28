@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom'
 
 import { Divider, Drawer, Grid, IconButton, Typography } from '@mui/material'
 import { ChevronRight, Sort } from '@mui/icons-material'
-import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
+import FilterList from 'assets/icones/filter.svg?react'
 
 import { selectFiltersAsArray } from 'utils/filters'
 import { cancelPendingRequest } from 'utils/abortController'

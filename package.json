@@ -2,6 +2,7 @@
   "name": "cohort360_react",
   "version": "2.36.0-SNAPSHOT",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@apollo/client": "^3.7.10",
     "@apollo/react-hooks": "^4.0.0",
@@ -50,8 +51,7 @@
   "overrides": {
     "nth-check": "2.1.1",
     "tough-cookie": "4.1.3",
-    "postcss": "8.4.31",
-    "pdfjs-dist": "4.2.67"
+    "postcss": "8.4.31"
   },
   "scripts": {
     "start": "vite",
@@ -109,11 +109,12 @@
     "normalize-url": "^7.0.3",
     "prettier": "^2.8.7",
     "typescript": "^4.9.5",
-    "vite": "^4.5.3",
-    "vite-plugin-svgr": "^3.2.0",
+    "vite": "^5.0.0",
+    "vite-plugin-svgr": "^4.2.0",
     "vite-tsconfig-paths": "^4.2.0",
     "vitest": "^0.34.4",
-    "vite-plugin-top-level-await": "^1.4.1"
+    "vite-plugin-top-level-await": "^1.4.1",
+    "vite-plugin-static-copy": "1.0.0"
   },
   "jest": {
     "clearMocks": true

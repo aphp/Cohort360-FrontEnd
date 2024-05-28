@@ -1,8 +1,18 @@
-import { defineConfig } from 'vite'
+import { defineConfig, normalizePath } from 'vite'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import svgr from 'vite-plugin-svgr'
 import topLevelAwait from 'vite-plugin-top-level-await'
+
+import path from 'node:path'
+import { createRequire } from 'node:module'
+import { viteStaticCopy } from 'vite-plugin-static-copy'
+
+const require = createRequire(import.meta.url)
+const cMapsDir = normalizePath(path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'cmaps'))
+const standardFontsDir = normalizePath(
+  path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'standard_fonts')
+)
 
 export default defineConfig(() => {
   return {
@@ -12,7 +22,18 @@ export default defineConfig(() => {
     server: {
       port: 3000
     },
-    plugins: [react(), tsconfigPaths(), svgr(), topLevelAwait()],
+    plugins: [
+      react(),
+      tsconfigPaths(),
+      svgr(),
+      topLevelAwait(),
+      viteStaticCopy({
+        targets: [
+          { src: cMapsDir, dest: '' },
+          { src: standardFontsDir, dest: '' }
+        ]
+      })
+    ],
     test: {
       globals: true,
       environment: 'jsdom', // tells Vitest to run our tests in a mock browser environment rather than the default Node environment

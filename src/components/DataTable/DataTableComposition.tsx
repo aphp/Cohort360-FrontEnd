@@ -9,16 +9,16 @@ import DOMPurify from 'dompurify'
 import FolderSharedIcon from '@mui/icons-material/FolderShared'
 import DescriptionIcon from '@mui/icons-material/Description'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
-import { ReactComponent as CheckIcon } from 'assets/icones/check.svg'
-import { ReactComponent as CancelIcon } from 'assets/icones/times.svg'
-import { ReactComponent as UserIcon } from 'assets/icones/user.svg'
-import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
+import CheckIcon from 'assets/icones/check.svg?react'
+import CancelIcon from 'assets/icones/times.svg?react'
+import UserIcon from 'assets/icones/user.svg?react'
+import SearchIcon from 'assets/icones/search.svg?react'
 
 import DataTable from 'components/DataTable/DataTable'
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 
 import docTypes from 'assets/docTypes.json'
-import Watermark from 'assets/images/watermark_pseudo.svg'
+import Watermark from 'assets/images/watermark_pseudo.svg?react'
 
 import { getDocumentStatus } from 'utils/documentsFormatter'
 

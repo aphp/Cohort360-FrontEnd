@@ -5,7 +5,7 @@ import { fetchImaging } from 'state/patient'
 import useSearchCriterias, { initImagingCriterias } from 'reducers/searchCriteriasReducer'
 
 import { CircularProgress, Grid, Tooltip } from '@mui/material'
-import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
+import FilterList from 'assets/icones/filter.svg?react'
 
 import Button from 'components/ui/Button'
 import Chip from 'components/ui/Chip/'

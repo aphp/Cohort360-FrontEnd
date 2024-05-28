@@ -14,7 +14,7 @@ import {
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 import { KeyboardArrowDown, KeyboardArrowUp, Visibility } from '@mui/icons-material'
-import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
+import SearchIcon from 'assets/icones/search.svg?react'
 
 import DataTable from './DataTable'
 

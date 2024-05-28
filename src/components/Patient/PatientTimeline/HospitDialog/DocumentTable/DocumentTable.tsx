@@ -18,8 +18,8 @@ import {
 } from '@mui/material'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
-import { ReactComponent as CancelIcon } from 'assets/icones/times.svg'
-import { ReactComponent as CheckIcon } from 'assets/icones/check.svg'
+import CancelIcon from 'assets/icones/times.svg?react'
+import CheckIcon from 'assets/icones/check.svg?react'
 
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 
