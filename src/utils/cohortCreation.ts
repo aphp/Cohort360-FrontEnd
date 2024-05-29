@@ -233,10 +233,10 @@ type RequeteurSearchType = {
 
 export const cleanCriterias = (selectedCriteria: SelectedCriteriaType[], dispatch: AppDispatch) => {
   const cleanDurationRange = (value: DurationRangeType) => {
-    const regex = /\/[^/]*$/
+    const regex = /^[^/]+/
     return [
-      value[0] ? value[0].replace(regex, '/0') : null,
-      value[1] ? value[1].replace(regex, '/0') : null
+      value[0] ? value[0].replace(regex, '0') : null,
+      value[1] ? value[1].replace(regex, '0') : null
     ] as DurationRangeType
   }
   const cleanedSelectedCriteria = selectedCriteria
