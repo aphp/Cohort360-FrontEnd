@@ -59,13 +59,13 @@ import {
   EXIT_PLACE_TYPE,
   FEEDING_TYPE,
   EXIT_FEEDING_MODE,
-  EXIT_DIAGNOSTIC
+  EXIT_DIAGNOSTIC,
+  ENCOUNTER_STATUS
 } from '../../constants'
 import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
 import { DocType } from 'types/requestCriterias'
 import { VitalStatusLabel } from 'types/searchCriterias'
 import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
-import { encounterStatusList } from 'data/encounterStatus'
 
 export interface IServiceCohortCreation {
   /**
@@ -536,7 +536,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
   },
   fetchExitFeedingMode: async () => fetchValueSet(EXIT_FEEDING_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
   fetchExitDiagnostic: async () => fetchValueSet(EXIT_DIAGNOSTIC, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchEncounterStatus: async () => encounterStatusList
+  fetchEncounterStatus: async () => fetchValueSet(ENCOUNTER_STATUS, { joinDisplayWithCode: false, sortingKey: 'id' })
 }
 
 export default servicesCohortCreation
