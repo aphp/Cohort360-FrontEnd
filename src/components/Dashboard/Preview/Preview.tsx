@@ -19,11 +19,14 @@ import DonutChart from './Charts/DonutChart'
 import PyramidChart from './Charts/PyramidChart'
 
 import useStyles from './styles'
+import clsx from 'clsx'
 
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import displayDigit from 'utils/displayDigit'
 
 import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
+import LocationMap from 'components/Dashboard/Preview/LocationMap'
+import { ODD_MAP } from 'constants.js'
 
 type RepartitionTableProps = {
   genderRepartitionMap?: GenderRepartitionType
@@ -85,6 +88,7 @@ const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMa
 }
 
 type PreviewProps = {
+  cohortId?: string
   total?: number
   loading?: boolean
   genderRepartitionMap?: GenderRepartitionType
@@ -93,6 +97,7 @@ type PreviewProps = {
   agePyramidData?: AgeRepartitionType
 }
 const Preview: React.FC<PreviewProps> = ({
+  cohortId,
   total,
   genderRepartitionMap,
   visitTypeRepartitionData,
@@ -133,7 +138,7 @@ const Preview: React.FC<PreviewProps> = ({
 
       <Grid container>
         <Grid container item xs={12} sm={6} lg={4} justifyContent="center">
-          <Paper id="vital-repartition-card" className={classes.chartOverlay}>
+          <Paper id="vital-repartition-card" className={clsx(classes.chartOverlay, classes.fixedChartOverlay)}>
             <Grid container item className={classes.chartTitle}>
               <Typography id="vital-repartition-card-title" variant="h3" color="primary">
                 Répartition par statut vital
@@ -151,7 +156,7 @@ const Preview: React.FC<PreviewProps> = ({
         </Grid>
 
         <Grid container item xs={12} sm={6} lg={4} justifyContent="center">
-          <Paper id="visit-type-repartition-card" className={classes.chartOverlay}>
+          <Paper id="visit-type-repartition-card" className={clsx(classes.chartOverlay, classes.fixedChartOverlay)}>
             <Grid container item className={classes.chartTitle}>
               <Typography id="visit-type-repartition-card-title" variant="h3" color="primary">
                 Répartition par type de visite
@@ -169,7 +174,7 @@ const Preview: React.FC<PreviewProps> = ({
         </Grid>
 
         <Grid container item xs={12} sm={12} lg={4} justifyContent="center">
-          <Paper id="gender-repartition-card" className={classes.chartOverlay}>
+          <Paper id="gender-repartition-card" className={clsx(classes.chartOverlay, classes.fixedChartOverlay)}>
             <Grid container item className={classes.chartTitle}>
               <Typography id="gender-repartition-card-title" variant="h3" color="primary">
                 Répartition par genre
@@ -188,7 +193,7 @@ const Preview: React.FC<PreviewProps> = ({
 
         <Grid container item md={12} lg={6} justifyContent="center">
           <Grid container item justifyContent="center">
-            <Paper id="age-structure-card" className={classes.chartOverlay}>
+            <Paper id="age-structure-card" className={clsx(classes.chartOverlay, classes.fixedChartOverlay)}>
               <Grid container item className={classes.chartTitle}>
                 <Typography id="age-structure-card-title" variant="h3" color="primary">
                   Pyramide des âges
@@ -208,7 +213,7 @@ const Preview: React.FC<PreviewProps> = ({
 
         <Grid container item md={12} lg={6} justifyContent="center">
           <Grid container item justifyContent="center">
-            <Paper id="month-repartition-visit-card" className={classes.chartOverlay}>
+            <Paper id="month-repartition-visit-card" className={clsx(classes.chartOverlay, classes.fixedChartOverlay)}>
               <Grid container item className={classes.chartTitle}>
                 <Typography id="month-repartition-visit-card-title" variant="h3" color="primary">
                   Répartition des visites par mois
@@ -226,6 +231,22 @@ const Preview: React.FC<PreviewProps> = ({
           </Grid>
         </Grid>
       </Grid>
+
+      {ODD_MAP && cohortId && (
+        <Grid container item justifyContent="space-between" alignItems="center">
+          <Grid item xs={12} sm={12} md={12} justifyContent="center">
+            <Paper id="location-map" className={classes.chartOverlay}>
+              <Grid container item className={classes.chartTitle}>
+                <Typography id="location-map-card-title" variant="h3" color="primary">
+                  Répartition spatiale par zone IRIS
+                </Typography>
+              </Grid>
+
+              <LocationMap cohortId={cohortId} />
+            </Paper>
+          </Grid>
+        </Grid>
+      )}
     </Grid>
   )
 }
