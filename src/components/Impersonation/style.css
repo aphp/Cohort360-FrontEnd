@@ -1,0 +1,13 @@
+.bounce-in-right {
+  animation: bounce-in-right 6s ease infinite;
+}
+@keyframes bounce-in-right {
+  0% {
+    transform: translateX(2000px);
+  }
+  40% {
+    transform: translateX(100px);
+  }
+  80% { transform: translateX(100px); }
+  100% { transform: translateX(2000px); }
+}

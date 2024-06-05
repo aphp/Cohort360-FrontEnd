@@ -11,6 +11,8 @@ import CircularProgress from '@mui/material/CircularProgress'
 import services from 'services/aphp'
 
 import displayDigit from 'utils/displayDigit'
+import JToolEggWrapper from 'components/Impersonation/JTool'
+import { JEgg1 } from 'components/Impersonation/Eggs'
 
 const PatientSearchCard = () => {
   const [patientNb, setPatientNb] = useState(0)
@@ -42,16 +44,18 @@ const PatientSearchCard = () => {
       </div>
       <Divider />
       <Grid container direction="column" justifyContent="space-evenly" style={{ height: '100%', marginTop: 8 }}>
-        <Button
-          id="patients-research-button"
-          onClick={() => navigate('/my-patients')}
-          size="small"
-          variant="contained"
-          disableElevation
-          className={classes.button}
-        >
-          Explorer tous les patients
-        </Button>
+        <JToolEggWrapper Egg={JEgg1}>
+          <Button
+            id="patients-research-button"
+            onClick={() => navigate('/my-patients')}
+            size="small"
+            variant="contained"
+            disableElevation
+            className={classes.button}
+          >
+            Explorer tous les patients
+          </Button>
+        </JToolEggWrapper>
         <Button
           id="scope-research-button"
           onClick={() => navigate('/perimeter')}
