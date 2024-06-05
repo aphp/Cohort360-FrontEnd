@@ -46,6 +46,8 @@ import { ODD_FEASABILITY_REPORT, SHORT_COHORT_LIMIT } from '../../../constants'
 import { JobStatus } from '../../../utils/constants'
 import services from 'services/aphp'
 import ValidationDialog from 'components/ui/ValidationDialog'
+import { JToolComponentEggWrapper } from 'components/Impersonation/JTool'
+import { Egg3 } from 'components/Impersonation/Eggs'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -317,6 +319,12 @@ const ControlPanel: React.FC<{
             </Typography>
           </Grid>
         </Grid>
+
+        <JToolComponentEggWrapper>
+          {!itLoads && (count.date ? moment(count.date).diff(moment.now()) > -100000 : false) && (
+            <Egg3 count={includePatient} />
+          )}
+        </JToolComponentEggWrapper>
 
         <Grid className={classes.container}>
           <Grid container justifyContent="space-between">
