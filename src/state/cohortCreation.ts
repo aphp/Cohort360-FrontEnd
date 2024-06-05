@@ -10,7 +10,7 @@ import {
   CurrentSnapshot
 } from 'types'
 
-import { buildRequest, unbuildRequest, joinRequest } from 'utils/cohortCreation'
+import { buildRequest, unbuildRequest, joinRequest, checkNominativeCriteria } from 'utils/cohortCreation'
 
 import { logout, login, impersonate } from './me'
 import { addRequest, deleteRequest } from './request'
@@ -38,6 +38,7 @@ export type CohortCreationState = {
   executiveUnits: (ScopeTreeRow | undefined)[] | null
   allowSearchIpp: boolean
   selectedCriteria: SelectedCriteriaType[]
+  isCriteriaNominative: boolean
   criteriaGroup: CriteriaGroupType[]
   temporalConstraints: TemporalConstraintsType[]
   nextCriteriaId: number
@@ -63,6 +64,7 @@ const defaultInitialState: CohortCreationState = {
   executiveUnits: null,
   allowSearchIpp: false,
   selectedCriteria: [],
+  isCriteriaNominative: false,
   criteriaGroup: [
     {
       id: 0,
@@ -276,7 +278,7 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
       const _temporalConstraints =
         state.cohortCreation.request.temporalConstraints ?? defaultInitialState.temporalConstraints
 
-      const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
+      const json = buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
 
       if (json !== state?.cohortCreation?.request?.json) {
         const saveJsonResponse = await dispatch(saveJson({ newJson: json })).unwrap()
@@ -349,6 +351,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
       const { population, criteria, criteriaGroup, temporalConstraints } = await unbuildRequest(serialized_query)
 
       let _temporalConstraints
+      let isCriteriaNominative = false
 
       if (temporalConstraints && temporalConstraints?.length > 0) {
         _temporalConstraints = temporalConstraints.map((temporalConstraint: TemporalConstraintsType, index: number) => {
@@ -364,6 +367,10 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
       let allowSearchIpp = false
       if (population) {
         allowSearchIpp = await services.perimeters.allowSearchIpp(population as ScopeTreeRow[])
+      }
+
+      if (checkNominativeCriteria(criteria)) {
+        isCriteriaNominative = true
       }
 
       const countId = dated_measures && dated_measures[0] ? dated_measures[0].uuid : null
@@ -391,6 +398,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
         allowSearchIpp: allowSearchIpp,
         temporalConstraints: _temporalConstraints,
         selectedCriteria: criteria,
+        isCriteriaNominative: isCriteriaNominative,
         criteriaGroup: criteriaGroup.length > 0 ? criteriaGroup : defaultInitialState.criteriaGroup,
         nextCriteriaId: criteria.length + 1,
         nextGroupId: -(criteriaGroup.length + 1)
@@ -610,6 +618,12 @@ const cohortCreationSlice = createSlice({
     editAllCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType[]>) => {
       state.selectedCriteria = action.payload
     },
+    editAllCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroupType[]>) => {
+      state.criteriaGroup = action.payload
+    },
+    pseudonimizeCriteria: (state: CohortCreationState) => {
+      state.isCriteriaNominative = false
+    },
     editSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
       const foundItem = state.selectedCriteria.find(({ id }) => id === action.payload.id)
       const index = foundItem ? state.selectedCriteria.indexOf(foundItem) : -1
@@ -775,7 +789,9 @@ export const {
   deleteCriteriaGroup,
   addNewSelectedCriteria,
   addNewCriteriaGroup,
+  editAllCriteriaGroup,
   editAllCriteria,
+  pseudonimizeCriteria,
   editSelectedCriteria,
   editCriteriaGroup,
   duplicateSelectedCriteria,

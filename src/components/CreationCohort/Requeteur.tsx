@@ -16,7 +16,7 @@ import { CurrentSnapshot } from 'types'
 
 import criteriaList from './DataList_Criteria'
 
-import { getDataFromFetch } from 'utils/cohortCreation'
+import { getDataFromFetch, cleanNominativeCriterias } from 'utils/cohortCreation'
 
 import useStyles from './styles'
 import services from 'services/aphp'
@@ -29,6 +29,8 @@ const Requeteur = () => {
     currentSnapshot = {} as CurrentSnapshot,
     navHistory,
     selectedCriteria = [],
+    isCriteriaNominative = false,
+    criteriaGroup = [],
     selectedPopulation,
     count = {},
     json = '',
@@ -112,6 +114,12 @@ const Requeteur = () => {
   const _unbuildRequest = async (newCurrentSnapshot: CurrentSnapshot) => {
     dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
   }
+
+  useEffect(() => {
+    if (selectedPopulation?.some((perimeter) => perimeter?.access === 'Pseudonymisé') && isCriteriaNominative) {
+      cleanNominativeCriterias(selectedCriteria, criteriaGroup, dispatch)
+    }
+  }, [selectedPopulation, isCriteriaNominative])
 
   /**
    * Execute query:
