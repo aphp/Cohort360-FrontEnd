@@ -68,6 +68,7 @@ export const store = configureStore({
           predicate: (action) => action.type == 'autoLogout/open' || action.type == 'autoLogout/close'
         })
       )
+      // @ts-ignore
       .concat(logger)
 })
 
