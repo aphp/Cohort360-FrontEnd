@@ -76,7 +76,7 @@ import {
 } from './mappers'
 import { pregnancyForm } from 'data/pregnancyData'
 import { hospitForm } from 'data/hospitData'
-import { editAllCriteria } from 'state/cohortCreation'
+import { editAllCriteria, editAllCriteriaGroup, pseudonimizeCriteria, buildCohortCreation } from 'state/cohortCreation'
 import { AppDispatch } from 'state'
 
 const REQUETEUR_VERSION = 'v1.4.4'
@@ -231,14 +231,50 @@ type RequeteurSearchType = {
   request: RequeteurGroupType | undefined
 }
 
-export const cleanCriterias = (selectedCriteria: SelectedCriteriaType[], dispatch: AppDispatch) => {
+export const checkNominativeCriteria = (selectedCriteria: SelectedCriteriaType[]) => {
+  const regex = /^[^0/][^/]*\/.*/
+  // matches if the value before the first / isn't 0
+
+  const isPatientWithDates = selectedCriteria.some(
+    (criterion) =>
+      criterion.type === CriteriaType.PATIENT &&
+      (criterion.birthdates[0] !== null ||
+        criterion.birthdates[1] !== null ||
+        criterion.deathDates[0] !== null ||
+        criterion.deathDates[1] !== null)
+  )
+
+  const isEncounterWithAgesInDays = selectedCriteria.some(
+    (criterion) =>
+      (criterion.type === CriteriaType.ENCOUNTER || criterion.type === CriteriaType.PATIENT) &&
+      (criterion.age?.[0]?.match(regex) || criterion.age?.[1]?.match(regex))
+  )
+
+  const isSensitiveCriteria = selectedCriteria.some(
+    (criterion) =>
+      criterion.type === CriteriaType.IPP_LIST ||
+      criterion.type === CriteriaType.PREGNANCY ||
+      criterion.type === CriteriaType.HOSPIT
+  )
+
+  return isPatientWithDates || isEncounterWithAgesInDays || isSensitiveCriteria
+}
+
+export const cleanNominativeCriterias = (
+  selectedCriteria: SelectedCriteriaType[],
+  criteriaGroups: CriteriaGroupType[],
+  dispatch: AppDispatch,
+  selectedPopulation?: ScopeTreeRow[]
+) => {
   const cleanDurationRange = (value: DurationRangeType) => {
-    const regex = /^[^/]+/
-    return [
-      value[0] ? value[0].replace(regex, '0') : null,
-      value[1] ? value[1].replace(regex, '0') : null
-    ] as DurationRangeType
+    const regex = /^[^/]*\// // matches everything before the first '/'
+
+    const cleanValue = (value: string | null | undefined) =>
+      value ? (value.replace(regex, '0/') === '0/0/0' ? null : value.replace(regex, '0/')) : null
+
+    return [cleanValue(value[0]), cleanValue(value[1])] as DurationRangeType
   }
+
   const cleanedSelectedCriteria = selectedCriteria
     .filter(
       (criteria) =>
@@ -267,7 +303,21 @@ export const cleanCriterias = (selectedCriteria: SelectedCriteriaType[], dispatc
       }
     })
 
+  const cleanedCriteriasIds = cleanedSelectedCriteria.map((criterion) => criterion.id)
+  const cleanedGroups = criteriaGroups.map((group) => {
+    return {
+      ...group,
+      criteriaIds: group.criteriaIds.filter((id) => cleanedCriteriasIds.includes(id))
+    }
+  })
+  dispatch(editAllCriteriaGroup(cleanedGroups))
   dispatch(editAllCriteria(cleanedSelectedCriteria))
+  dispatch(pseudonimizeCriteria())
+  if (selectedPopulation != undefined && selectedPopulation.length > 0) {
+    dispatch(buildCohortCreation({ selectedPopulation: selectedPopulation }))
+  } else {
+    dispatch(buildCohortCreation({}))
+  }
 }
 
 const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: boolean): string => {
@@ -322,7 +372,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     }
 
     case CriteriaType.ENCOUNTER: {
-      deidentified = false //TODO erase this line when deidentified param for encounter is implemented
+      // deidentified = false //TODO erase this line when deidentified param for encounter is implemented
       filterFhir = [
         'subject.active=true',
         filtersBuilders(ENCOUNTER_ADMISSIONMODE, buildLabelObjectFilter(criterion.admissionMode)),
