@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, ReactElement } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -99,6 +99,17 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
     navigate('/cohort/new')
   }
 
+  const zoomed = (component: ReactElement) => {
+    if (allreadyOpen) {
+      return (
+        <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
+          {component}
+        </Zoom>
+      )
+    }
+    return component
+  }
+
   return (
     <>
       <div className={classes.root}>
@@ -190,132 +201,60 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
 
             <Divider />
 
-            {!cohortCreation?.request?.requestId ? (
-              <ListItem>
+            <ListItem>
+              {!open && (
+                <Tooltip title="Nouvelle requête">
+                  <IconButton
+                    onClick={handleNewRequest}
+                    className={cx(classes.button, classes.miniButton)}
+                    disabled={maintenanceIsActive}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {zoomed(
+                <Button
+                  onClick={handleNewRequest}
+                  className={cx(classes.newCohortButton, classes.linkHover, {
+                    [classes.hide]: !open
+                  })}
+                  disabled={maintenanceIsActive}
+                >
+                  <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
+                    {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
+                  </Typography>
+                </Button>
+              )}
+            </ListItem>
+            {!!cohortCreation?.request?.requestId && (
+              <ListItem style={{ padding: !open ? '0 16px' : undefined }}>
                 {!open && (
-                  <Tooltip title="Nouvelle requête">
+                  <Tooltip title="Modifier la requête en cours">
                     <IconButton
-                      onClick={handleNewRequest}
+                      onClick={() => navigate('/cohort/new')}
                       className={cx(classes.button, classes.miniButton)}
                       disabled={maintenanceIsActive}
                     >
-                      <AddIcon />
+                      <EditIcon />
                     </IconButton>
                   </Tooltip>
                 )}
-                {allreadyOpen ? (
-                  <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
-                    <Button
-                      onClick={handleNewRequest}
-                      className={cx(classes.newCohortButton, classes.linkHover, {
-                        [classes.hide]: !open
-                      })}
-                      disabled={maintenanceIsActive}
-                    >
-                      <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
-                        {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
-                      </Typography>
-                    </Button>
-                  </Zoom>
-                ) : (
+                {zoomed(
                   <Button
-                    onClick={handleNewRequest}
-                    className={cx(classes.newCohortButton, classes.linkHover, {
-                      [classes.hide]: !open
-                    })}
+                    onClick={() => navigate('/cohort/new')}
+                    className={cx(classes.searchButton, classes.editCohortButton, classes.linkHover)}
                     disabled={maintenanceIsActive}
                   >
-                    <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
-                      {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
-                    </Typography>
+                    <>
+                      <Typography variant="h5">Requête en cours</Typography>
+                      <Typography noWrap style={{ width: 200 }}>
+                        {cohortCreation.request.requestName}
+                      </Typography>
+                    </>
                   </Button>
                 )}
               </ListItem>
-            ) : (
-              <>
-                <ListItem>
-                  {!open && (
-                    <Tooltip title="Nouvelle requête">
-                      <IconButton
-                        onClick={handleNewRequest}
-                        className={cx(classes.button, classes.miniButton)}
-                        disabled={maintenanceIsActive}
-                      >
-                        <AddIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                  {allreadyOpen ? (
-                    <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
-                      <Button
-                        onClick={handleNewRequest}
-                        className={cx(classes.newCohortButton, classes.linkHover, {
-                          [classes.hide]: !open
-                        })}
-                        disabled={maintenanceIsActive}
-                      >
-                        <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
-                          {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
-                        </Typography>
-                      </Button>
-                    </Zoom>
-                  ) : (
-                    <Button
-                      onClick={handleNewRequest}
-                      className={cx(classes.newCohortButton, classes.linkHover, {
-                        [classes.hide]: !open
-                      })}
-                      disabled={maintenanceIsActive}
-                    >
-                      <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
-                        {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
-                      </Typography>
-                    </Button>
-                  )}
-                </ListItem>
-                <ListItem style={{ padding: !open ? '0 16px' : undefined }}>
-                  {!open && (
-                    <Tooltip title="Modifier la requête en cours">
-                      <IconButton
-                        onClick={() => navigate('/cohort/new')}
-                        className={cx(classes.button, classes.miniButton)}
-                        disabled={maintenanceIsActive}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                  {allreadyOpen ? (
-                    <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
-                      <Button
-                        onClick={() => navigate('/cohort/new')}
-                        className={cx(classes.searchButton, classes.editCohortButton, classes.linkHover)}
-                        disabled={maintenanceIsActive}
-                      >
-                        <>
-                          <Typography variant="h5">Requête en cours</Typography>
-                          <Typography noWrap style={{ width: 200 }}>
-                            {cohortCreation.request.requestName}
-                          </Typography>
-                        </>
-                      </Button>
-                    </Zoom>
-                  ) : (
-                    <Button
-                      onClick={() => navigate('/cohort/new')}
-                      className={cx(classes.searchButton, classes.editCohortButton, classes.linkHover)}
-                      disabled={maintenanceIsActive}
-                    >
-                      <>
-                        <Typography variant="h5">Requête en cours</Typography>
-                        <Typography noWrap style={{ width: 200 }}>
-                          {cohortCreation.request.requestName}
-                        </Typography>
-                      </>
-                    </Button>
-                  )}
-                </ListItem>
-              </>
             )}
 
             <ListItem id="accueil" className={classes.listItem} button onClick={() => navigate('/home')}>
