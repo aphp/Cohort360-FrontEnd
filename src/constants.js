@@ -238,3 +238,5 @@ export const REFRESH_TOKEN_INTERVAL = import.meta.env.VITE_REFRESH_TOKEN_INTERVA
   : 180000 /* 3 * 60 * 1000 ms*/
 
 export const VALUE_SET_SIZE = '9999'
+
+export const MAIL_SUPPORT = 'id.recherche.support.dsn@aphp.fr'

@@ -5,6 +5,7 @@ import WarningIcon from '@mui/icons-material/Warning'
 
 import { LoadingStatus } from 'types'
 import useStyles from './styles'
+import { MAIL_SUPPORT } from '../../../constants'
 
 type ValidationDialogProps = {
   open: boolean
@@ -31,8 +32,7 @@ const ValidationDialog: React.FC<ValidationDialogProps> = ({ open, onClose, mess
             <WarningIcon htmlColor="#FF9800" style={{ fontSize: 52 }} />
             <Typography className={classes.typographyMargin}>
               Erreur lors de votre demande. Veuillez réessayer ultérieurement ou{' '}
-              <a href="mailto:dsi-id-recherche-support-cohort360@aphp.fr">contacter le support</a> pour plus
-              d'informations.
+              <a href={`mailto:${MAIL_SUPPORT}`}>contacter le support</a> pour plus d'informations.
             </Typography>
           </>
         )}

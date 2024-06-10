@@ -10,6 +10,7 @@ import WarningIcon from '@mui/icons-material/Report'
 import { useAppSelector } from 'state'
 
 import useStyles from './styles'
+import { MAIL_SUPPORT } from '../../constants'
 
 const CohortRightOrNotExist = () => {
   const { classes, cx } = useStyles()
@@ -36,8 +37,8 @@ const CohortRightOrNotExist = () => {
               Vous tentez d'accéder à des données qui n'existent pas, ou vous ne disposez pas de droits suffisants
             </Typography>
             <Typography style={{ marginBottom: 16 }} align="center">
-              S'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante :
-              dsi-id-recherche-support-cohort360@aphp.fr.
+              S'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante : {MAIL_SUPPORT}
+              .
             </Typography>
           </Grid>
         </Grid>

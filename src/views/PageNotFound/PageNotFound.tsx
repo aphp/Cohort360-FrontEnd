@@ -7,6 +7,7 @@ import JohnTravolta from 'assets/images/johntravolta.gif'
 import cohortLogo from 'assets/images/logo-login.png'
 
 import useStyles from './styles'
+import { MAIL_SUPPORT } from '../../constants'
 
 const PageNotFound: React.FC = () => {
   const { classes, cx } = useStyles()
@@ -26,8 +27,8 @@ const PageNotFound: React.FC = () => {
             La page que vous avez sélectionné n'existe pas ou plus.
           </Typography>
           <Typography color="primary" variant="h2" style={{ margin: '12px 0' }}>
-            Si vous pensez qu'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante :
-            dsi-id-recherche-support-cohort360@aphp.fr.
+            Si vous pensez qu'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante :{' '}
+            {MAIL_SUPPORT}.
           </Typography>
           <Button onClick={() => navigate('/home')} variant="contained" className={classes.button}>
             Accueil
