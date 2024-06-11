@@ -197,7 +197,19 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             </RadioGroup>
           </Grid>
 
-          <Grid>
+          <Grid
+            style={{
+              margin: '0 1em',
+              width: 'calc(100% - 2em)'
+            }}
+          >
+            <Alert severity="warning">
+              Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/12/2022.
+            </Alert>
+            <Alert severity="warning">
+              Seuls les diagnostics rattachés à une visite Orbis (avec un Dossier Administratif - NDA) sont actuellement
+              disponibles.
+            </Alert>
             <Alert severity="info">
               Les données PMSI d'ORBIS sont codées au quotidien par les médecins. Les données PMSI AREM sont validées,
               remontées aux tutelles et disponibles dans le SNDS.
