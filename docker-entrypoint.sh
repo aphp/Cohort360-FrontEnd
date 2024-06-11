@@ -66,6 +66,7 @@ sed -i "s@{VITE_VALUE_SET_URL_FEEDING_TYPE}@$VITE_VALUE_SET_URL_FEEDING_TYPE@g" 
 sed -i "s@{VITE_VALUE_SET_URL_EXIT_FEEDING_MODE}@$VITE_VALUE_SET_URL_EXIT_FEEDING_MODE@g" /app/build/assets/*.js
 sed -i "s@{VITE_VALUE_SET_URL_EXIT_DIAGNOSTIC}@$VITE_VALUE_SET_URL_EXIT_DIAGNOSTIC@g" /app/build/assets/*.js
 
+sed -i "s@{VITE_MAIL_SUPPORT}@$VITE_MAIL_SUPPORT@g" /app/build/assets/*.js
 sed -i "s@{VITE_CODE_DISPLAY_JWT}@$VITE_CODE_DISPLAY_JWT@g" /app/build/assets/*.js
 sed -i "s@{VITE_ODD_BIOLOGY}@$VITE_ODD_BIOLOGY@g" /app/build/assets/*.js
 sed -i "s@{VITE_ODD_COMPOSITION}@$VITE_ODD_COMPOSITION@g" /app/build/assets/*.js

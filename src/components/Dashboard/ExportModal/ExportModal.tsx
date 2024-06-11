@@ -41,6 +41,7 @@ import { ResourceType } from 'types/requestCriterias'
 import { getProviderFilters } from 'services/aphp/serviceFilters'
 import { ExportTableAccordion, ExportTableAccordionSummary } from './ExportTableAccordion'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
+import { MAIL_SUPPORT } from '../../../constants'
 
 const initialState: ExportCSVForm = {
   motif: '',
@@ -253,8 +254,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               <CancelIcon style={{ fontSize: 52 }} htmlColor="#FC5656" />
               <DialogContentText style={{ marginBottom: 0, width: 'calc(100% - 62px)' }}>
                 Une erreur est survenue lors de votre demande d'export. Veuillez{' '}
-                <a href="mailto:dsi-id-recherche-support-cohort360@aphp.fr">contacter le support</a> pour plus
-                d'informations
+                <a href={`mailto:${MAIL_SUPPORT}`}>contacter le support</a> pour plus d'informations
                 {exportResponse.detail && (
                   <Accordion id="reason-accordion" square className={classes.accordion}>
                     <AccordionSummary
