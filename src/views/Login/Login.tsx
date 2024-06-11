@@ -34,7 +34,8 @@ import {
   OIDC_RESPONSE_TYPE,
   OIDC_SCOPE,
   OIDC_STATE,
-  CODE_DISPLAY_JWT
+  CODE_DISPLAY_JWT,
+  MAIL_SUPPORT
 } from 'constants.js'
 
 import services from 'services/aphp'
@@ -139,7 +140,7 @@ const Login = () => {
       return (
         setError(true),
         setErrorMessage(
-          'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+          `Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : ${MAIL_SUPPORT}.`
         )
       )
     }
@@ -158,7 +159,7 @@ const Login = () => {
         return (
           setError(true),
           setErrorMessage(
-            'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+            `Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : ${MAIL_SUPPORT}.`
           )
         )
       } else if (practitionerPerimeters.errorType === 'back') {
@@ -166,7 +167,7 @@ const Login = () => {
         return (
           setError(true),
           setErrorMessage(
-            'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+            `Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : ${MAIL_SUPPORT}.`
           )
         )
       } else if (practitionerPerimeters.errorType === 'noRight') {
@@ -236,7 +237,7 @@ const Login = () => {
       return (
         setError(true),
         setErrorMessage(
-          "Erreur d'authentification. Si elle persiste, veuillez contacter le support au: dsi-id-recherche-support-cohort360@aphp.fr."
+          `Erreur d'authentification. Si elle persiste, veuillez contacter le support au: ${MAIL_SUPPORT}.`
         )
       )
     }

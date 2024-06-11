@@ -189,6 +189,8 @@ export const ENCOUNTER_STATUS = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_STATUS
   : '{VITE_VALUE_SET_URL_ENCOUNTER_STATUS}'
 
+export const MAIL_SUPPORT = import.meta.env.DEV ? import.meta.env.VITE_MAIL_SUPPORT : '{VITE_MAIL_SUPPORT}'
+
 export const CODE_DISPLAY_JWT = import.meta.env.DEV ? import.meta.env.VITE_CODE_DISPLAY_JWT : '{VITE_CODE_DISPLAY_JWT}'
 
 export const ODD_BIOLOGY = import.meta.env.DEV
