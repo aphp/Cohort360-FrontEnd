@@ -81,7 +81,13 @@ export const unbuildEncounterServiceCriterias = async (
   values?: string | null
 ) => {
   if (values && values !== null) {
-    const encounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(values)
+    const isExecutiveUnits = true
+    const encounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(
+      values,
+      undefined,
+      undefined,
+      isExecutiveUnits
+    )
     currentCriterion[filterName] = currentCriterion
       ? [...currentCriterion[filterName], ...encounterServices]
       : encounterServices
