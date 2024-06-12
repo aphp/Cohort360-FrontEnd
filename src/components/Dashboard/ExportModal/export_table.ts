@@ -10,15 +10,27 @@ export type ExportTableType = {
 
 const exportTable: ExportTableType[] = [
   {
-    id: ['person', 'iris'],
+    id: ['person'],
     name: 'Patient',
-    label: 'person - iris',
+    label: 'person',
     resourceType: ResourceType.PATIENT
   },
   {
-    id: ['visit_occurrence', 'visit_detail'],
+    id: ['iris'],
+    name: 'Zone géographique',
+    label: 'iris',
+    resourceType: ResourceType.UNKNOWN
+  },
+  {
+    id: ['visit_occurrence'],
     name: 'Prise en charge',
-    label: 'visit_occurrence - visit_detail',
+    label: 'visit_occurrence',
+    resourceType: ResourceType.UNKNOWN
+  },
+  {
+    id: ['visit_detail'],
+    name: 'Détail de prise en charge',
+    label: 'visit_detail',
     resourceType: ResourceType.UNKNOWN
   },
   {
