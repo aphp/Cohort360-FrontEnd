@@ -37,7 +37,6 @@ const ModalCohortTitle: React.FC<{
       return
     }
     setLoading(true)
-
     if (onExecute) {
       onExecute(title, description, globalCount)
     }

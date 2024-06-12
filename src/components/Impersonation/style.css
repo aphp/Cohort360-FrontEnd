@@ -1,0 +1,29 @@
+.bounce-in-right {
+  animation: bounce-in-right 6s ease infinite;
+}
+@keyframes bounce-in-right {
+  0% {
+    transform: translateX(2000px);
+  }
+  40% {
+    transform: translateX(100px);
+  }
+  80% { transform: translateX(100px); }
+  100% { transform: translateX(2000px); }
+}
+
+.fade-in-and-out {
+  animation: fadeInAndOut 10s ease infinite;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  70% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeInAndOut {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
