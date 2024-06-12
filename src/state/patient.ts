@@ -902,8 +902,21 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
         dispatch(fetchLastPmsiInfo({ patientId, groupId }))
       }
 
+      const _patientInfo = {
+        ...patientInfo,
+        active: patientInfo.active,
+        birthDate: patientInfo.birthDate,
+        deceasedBoolean: patientInfo.deceasedBoolean ?? false,
+        extension: patientInfo.extension,
+        gender: patientInfo.gender,
+        identifier: patientInfo.identifier,
+        lastEncounter: patientInfo.lastEncounter,
+        mainDiagnosis: patientInfo.mainDiagnosis ?? null,
+        name: patientInfo.name
+      }
+
       return {
-        patientInfo,
+        patientInfo: _patientInfo,
         deidentified: deidentifiedBoolean,
         hospits: {
           loading: false,
