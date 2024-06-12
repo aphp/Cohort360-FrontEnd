@@ -30,6 +30,13 @@ import { ObservationDataType, Comparators } from 'types/requestCriterias'
 import services from 'services/aphp'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
+import { ErrorWrapper } from 'components/ui/Searchbar/styles'
+
+enum Error {
+  NO_ERROR,
+  INCOHERENT_VALUE_ERROR,
+  INVALID_VALUE_ERROR
+}
 
 type BiologyFormProps = {
   isOpen: boolean
@@ -56,6 +63,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   const [occurrenceComparator, setOccurrenceComparator] = useState(
     currentState.occurrenceComparator || Comparators.GREATER_OR_EQUAL
   )
+  const [error, setError] = useState(Error.NO_ERROR)
 
   const _onSubmit = () => {
     onChangeSelectedCriteria({ ...currentState, occurrence: occurrence, occurrenceComparator: occurrenceComparator })
@@ -101,6 +109,35 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       onChangeValue('searchByValue', [null, null])
     }
   }, [allowSearchByValue])
+
+  useEffect(() => {
+    const floatRegex = /^-?\d*\.?\d*$/ // matches numbers, with decimals or not, negative or not
+
+    if (
+      (currentState.searchByValue[0] && !currentState.searchByValue[0].toString().match(floatRegex)) ||
+      (currentState.searchByValue[1] && !currentState.searchByValue[1].toString().match(floatRegex))
+    ) {
+      setError(Error.INVALID_VALUE_ERROR)
+    } else if (
+      currentState.searchByValue[0] &&
+      currentState.searchByValue[1] &&
+      currentState.searchByValue[0] > currentState.searchByValue[1]
+    ) {
+      setError(Error.INCOHERENT_VALUE_ERROR)
+    } else {
+      setError(Error.NO_ERROR)
+    }
+  }, [currentState.searchByValue])
+
+  const handleValueChange = (newValue: string, index: number) => {
+    const invalidCharRegex = /[^0-9.-]/ // matches everything that is not a number, a "," or a "."
+    if (!newValue.match(invalidCharRegex)) {
+      onChangeValue(
+        'searchByValue',
+        index === 0 ? [newValue, currentState.searchByValue[1]] : [currentState.searchByValue[0], newValue]
+      )
+    }
+  }
 
   return isOpen ? (
     <Grid className={classes.root}>
@@ -266,35 +303,40 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
 
               <TextField
                 required
-                lang="en-US"
-                type="number"
+                type="text"
                 id="criteria-value"
                 variant="outlined"
                 value={currentState.searchByValue[0]}
-                onChange={(e) =>
-                  onChangeValue('searchByValue', [parseFloat(e.target.value), currentState.searchByValue[1]])
-                }
+                onChange={(e) => handleValueChange(e.target.value, 0)}
                 placeholder={currentState.valueComparator === Comparators.BETWEEN ? 'Valeur minimale' : '0'}
                 disabled={!allowSearchByValue}
+                error={error === Error.INCOHERENT_VALUE_ERROR || error === Error.INVALID_VALUE_ERROR}
               />
               {currentState.valueComparator === Comparators.BETWEEN && (
                 <TextField
                   required
-                  inputProps={{
-                    min: 1
-                  }}
-                  type="number"
+                  type="text"
                   id="criteria-value"
                   variant="outlined"
                   value={currentState.searchByValue[1]}
-                  onChange={(e) =>
-                    onChangeValue('searchByValue', [currentState.searchByValue[0], parseFloat(e.target.value)])
-                  }
+                  onChange={(e) => handleValueChange(e.target.value, 1)}
                   placeholder="Valeur maximale"
                   disabled={!allowSearchByValue}
+                  error={error === Error.INCOHERENT_VALUE_ERROR || error === Error.INVALID_VALUE_ERROR}
                 />
               )}
-              {/* TODO: gérer l'erreur si valumin > valuemax */}
+            </Grid>
+            <Grid container style={{ margin: '0 0 1em', textAlign: 'end' }}>
+              <ErrorWrapper>
+                {error === Error.INCOHERENT_VALUE_ERROR && (
+                  <Typography style={{ fontWeight: 'bold' }}>
+                    La valeur minimale ne peut pas être supérieure à la valeur maximale.
+                  </Typography>
+                )}
+                {error === Error.INVALID_VALUE_ERROR && (
+                  <Typography style={{ fontWeight: 'bold' }}>Veuillez entrer un nombre valide.</Typography>
+                )}
+              </ErrorWrapper>
             </Grid>
 
             <Autocomplete
@@ -318,7 +360,13 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="biology-form" variant="contained">
+          <Button
+            onClick={_onSubmit}
+            type="submit"
+            form="biology-form"
+            variant="contained"
+            disabled={error === Error.INCOHERENT_VALUE_ERROR || error === Error.INVALID_VALUE_ERROR}
+          >
             Confirmer
           </Button>
         </Grid>
