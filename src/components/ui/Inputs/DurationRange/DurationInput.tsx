@@ -10,11 +10,20 @@ type DurationProps = {
   label: string
   disabled?: boolean
   deidentified?: boolean
+  placeholderType?: string
   onChange: (newDuration: DurationType) => void
   name?: string
 }
 
-const DurationInput = ({ value, label, deidentified = false, disabled = false, onChange, name }: DurationProps) => {
+const DurationInput = ({
+  value,
+  label,
+  deidentified = false,
+  disabled = false,
+  placeholderType,
+  onChange,
+  name
+}: DurationProps) => {
   const [duration, setDuration] = useState(value)
 
   useEffect(() => {
@@ -32,7 +41,15 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
             <TextFieldWrapper
               activated={!disabled && !!duration.year}
               disabled={disabled}
-              placeholder={duration.year ? undefined : name === 'max' ? '130' : '0'}
+              placeholder={
+                placeholderType === 'encounter' && name === 'max'
+                  ? '0'
+                  : duration.year
+                  ? undefined
+                  : name === 'max'
+                  ? '130'
+                  : '0'
+              }
               value={duration.year}
               variant="standard"
               type={disabled ? 'text' : 'number'}
