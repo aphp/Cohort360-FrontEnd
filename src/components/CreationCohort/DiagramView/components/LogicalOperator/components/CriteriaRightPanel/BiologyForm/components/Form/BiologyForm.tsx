@@ -35,7 +35,8 @@ import { ErrorWrapper } from 'components/ui/Searchbar/styles'
 enum Error {
   NO_ERROR,
   INCOHERENT_VALUE_ERROR,
-  INVALID_VALUE_ERROR
+  INVALID_VALUE_ERROR,
+  MISSING_VALUE_ERROR
 }
 
 type BiologyFormProps = {
@@ -64,9 +65,21 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
     currentState.occurrenceComparator || Comparators.GREATER_OR_EQUAL
   )
   const [error, setError] = useState(Error.NO_ERROR)
+  const [_searchByValues, setSearchByValues] = useState<[string, string]>([
+    currentState.searchByValue[0] ? currentState.searchByValue[0].toString() : '',
+    currentState.searchByValue[1] ? currentState.searchByValue[1].toString() : ''
+  ])
 
   const _onSubmit = () => {
-    onChangeSelectedCriteria({ ...currentState, occurrence: occurrence, occurrenceComparator: occurrenceComparator })
+    const parseSearchByValue = (value: [string, string]) => {
+      return [value[0] ? parseFloat(value[0]) : null, value[1] ? parseFloat(value[1]) : null]
+    }
+    onChangeSelectedCriteria({
+      ...currentState,
+      occurrence: occurrence,
+      occurrenceComparator: occurrenceComparator,
+      searchByValue: parseSearchByValue(_searchByValues)
+    })
     dispatch(fetchBiology())
   }
 
@@ -106,6 +119,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
 
   useEffect(() => {
     if (!allowSearchByValue) {
+      setSearchByValues(['', ''])
       onChangeValue('searchByValue', [null, null])
     }
   }, [allowSearchByValue])
@@ -114,28 +128,29 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
     const floatRegex = /^-?\d*\.?\d*$/ // matches numbers, with decimals or not, negative or not
 
     if (
-      (currentState.searchByValue[0] && !currentState.searchByValue[0].toString().match(floatRegex)) ||
-      (currentState.searchByValue[1] && !currentState.searchByValue[1].toString().match(floatRegex))
+      (_searchByValues[0] && !_searchByValues[0].match(floatRegex)) ||
+      (_searchByValues[1] && !_searchByValues[1].match(floatRegex))
     ) {
       setError(Error.INVALID_VALUE_ERROR)
     } else if (
-      currentState.searchByValue[0] &&
-      currentState.searchByValue[1] &&
-      currentState.searchByValue[0] > currentState.searchByValue[1]
+      _searchByValues[0] &&
+      _searchByValues[1] &&
+      parseFloat(_searchByValues[0]) > parseFloat(_searchByValues[1])
     ) {
       setError(Error.INCOHERENT_VALUE_ERROR)
+    } else if (currentState.valueComparator === Comparators.BETWEEN && (!_searchByValues[0] || !_searchByValues[1])) {
+      setError(Error.MISSING_VALUE_ERROR)
     } else {
       setError(Error.NO_ERROR)
     }
-  }, [currentState.searchByValue])
+  }, [_searchByValues, currentState.valueComparator])
 
   const handleValueChange = (newValue: string, index: number) => {
     const invalidCharRegex = /[^0-9.-]/ // matches everything that is not a number, a "," or a "."
+
     if (!newValue.match(invalidCharRegex)) {
-      onChangeValue(
-        'searchByValue',
-        index === 0 ? [newValue, currentState.searchByValue[1]] : [currentState.searchByValue[0], newValue]
-      )
+      const parsedNewValue = newValue !== '' ? newValue : ''
+      setSearchByValues(index === 0 ? [parsedNewValue, _searchByValues[1]] : [_searchByValues[0], parsedNewValue])
     }
   }
 
@@ -306,11 +321,15 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 type="text"
                 id="criteria-value"
                 variant="outlined"
-                value={currentState.searchByValue[0]}
+                value={_searchByValues[0]}
                 onChange={(e) => handleValueChange(e.target.value, 0)}
                 placeholder={currentState.valueComparator === Comparators.BETWEEN ? 'Valeur minimale' : '0'}
                 disabled={!allowSearchByValue}
-                error={error === Error.INCOHERENT_VALUE_ERROR || error === Error.INVALID_VALUE_ERROR}
+                error={
+                  error === Error.INCOHERENT_VALUE_ERROR ||
+                  error === Error.INVALID_VALUE_ERROR ||
+                  error === Error.MISSING_VALUE_ERROR
+                }
               />
               {currentState.valueComparator === Comparators.BETWEEN && (
                 <TextField
@@ -318,11 +337,15 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                   type="text"
                   id="criteria-value"
                   variant="outlined"
-                  value={currentState.searchByValue[1]}
+                  value={_searchByValues[1]}
                   onChange={(e) => handleValueChange(e.target.value, 1)}
                   placeholder="Valeur maximale"
                   disabled={!allowSearchByValue}
-                  error={error === Error.INCOHERENT_VALUE_ERROR || error === Error.INVALID_VALUE_ERROR}
+                  error={
+                    error === Error.INCOHERENT_VALUE_ERROR ||
+                    error === Error.INVALID_VALUE_ERROR ||
+                    error === Error.MISSING_VALUE_ERROR
+                  }
                 />
               )}
             </Grid>
@@ -335,6 +358,9 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 )}
                 {error === Error.INVALID_VALUE_ERROR && (
                   <Typography style={{ fontWeight: 'bold' }}>Veuillez entrer un nombre valide.</Typography>
+                )}
+                {error === Error.MISSING_VALUE_ERROR && (
+                  <Typography style={{ fontWeight: 'bold' }}>Veuillez entrer 2 valeurs avec ce comparateur.</Typography>
                 )}
               </ErrorWrapper>
             </Grid>
@@ -365,7 +391,11 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             type="submit"
             form="biology-form"
             variant="contained"
-            disabled={error === Error.INCOHERENT_VALUE_ERROR || error === Error.INVALID_VALUE_ERROR}
+            disabled={
+              error === Error.INCOHERENT_VALUE_ERROR ||
+              error === Error.INVALID_VALUE_ERROR ||
+              error === Error.MISSING_VALUE_ERROR
+            }
           >
             Confirmer
           </Button>
