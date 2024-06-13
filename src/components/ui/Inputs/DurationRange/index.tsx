@@ -15,6 +15,7 @@ type DurationRangeProps = {
   deidentified?: boolean
   active?: boolean
   unit?: string
+  placeholderType?: string
   onChange: (newDuration: DurationRangeType) => void
   onError: (isError: boolean) => void
 }
@@ -34,6 +35,7 @@ const DurationRange: React.FC<DurationRangeProps> = ({
   deidentified = false,
   active = true,
   unit = 'Âge',
+  placeholderType = undefined,
   onChange,
   onError
 }) => {
@@ -76,6 +78,7 @@ const DurationRange: React.FC<DurationRangeProps> = ({
         deidentified={deidentified}
         label={`${unit} maximum`}
         onChange={(newDuration) => setMaxDuration(newDuration)}
+        placeholderType={placeholderType}
       />
       {error.isError && (
         <BlockWrapper margin="15px 0px">

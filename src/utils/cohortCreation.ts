@@ -386,20 +386,24 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         filtersBuilders(ENCOUNTER_REASON, buildLabelObjectFilter(criterion.reason)),
         filtersBuilders(SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
-        buildDurationFilter(criterion?.duration?.[0], ENCOUNTER_DURATION, 'ge'),
-        buildDurationFilter(criterion?.duration?.[1], ENCOUNTER_DURATION, 'le'),
-        buildDurationFilter(
-          criterion?.age[0],
-          deidentified ? ENCOUNTER_MIN_BIRTHDATE_MONTH : ENCOUNTER_MIN_BIRTHDATE_DAY,
-          'ge',
-          deidentified
-        ),
-        buildDurationFilter(
-          criterion?.age[1],
-          deidentified ? ENCOUNTER_MAX_BIRTHDATE_MONTH : ENCOUNTER_MAX_BIRTHDATE_DAY,
-          'le',
-          deidentified
-        )
+        criterion.duration[0] !== null ? buildDurationFilter(criterion?.duration?.[0], ENCOUNTER_DURATION, 'ge') : '',
+        criterion.duration[1] !== null ? buildDurationFilter(criterion?.duration?.[1], ENCOUNTER_DURATION, 'le') : '',
+        criterion.age[0] !== null
+          ? buildDurationFilter(
+              criterion?.age[0],
+              deidentified ? ENCOUNTER_MIN_BIRTHDATE_MONTH : ENCOUNTER_MIN_BIRTHDATE_DAY,
+              'ge',
+              deidentified
+            )
+          : '',
+        criterion.age[1] !== null
+          ? buildDurationFilter(
+              criterion?.age[1],
+              deidentified ? ENCOUNTER_MAX_BIRTHDATE_MONTH : ENCOUNTER_MAX_BIRTHDATE_DAY,
+              'le',
+              deidentified
+            )
+          : ''
       ]
         .filter((elem) => elem)
         .reduce(filterReducer)
