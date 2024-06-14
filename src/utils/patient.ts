@@ -1,3 +1,4 @@
+import { Condition } from 'fhir/r4'
 import { GenderStatus, VitalStatus } from 'types/searchCriterias'
 
 export const genderName = (gender: GenderStatus | null): string | null => {
@@ -26,4 +27,14 @@ export const vitalStatusName = (vitalStatus: VitalStatus | null): string | null 
     default:
       return null
   }
+}
+
+export const getLastDiagnosisLabels = (mainDiagnosisList: Condition[]) => {
+  const mainDiagnosisLabels = mainDiagnosisList.map((diagnosis) => diagnosis.code?.coding?.[0].display)
+  const lastThreeDiagnosisLabels = mainDiagnosisLabels
+    .filter((diagnosis, index) => mainDiagnosisLabels.indexOf(diagnosis) === index)
+    .slice(0, 3)
+    .join(' - ')
+
+  return lastThreeDiagnosisLabels
 }

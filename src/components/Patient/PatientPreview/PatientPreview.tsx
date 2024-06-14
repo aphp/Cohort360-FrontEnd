@@ -5,6 +5,7 @@ import { Grid, Paper } from '@mui/material'
 import PatientField from './PatientField/PatientField'
 
 import { getAge } from 'utils/age'
+import { getLastDiagnosisLabels } from 'utils/patient'
 import { CohortPatient, IPatientDetails } from 'types'
 
 import useStyles from './styles'
@@ -33,10 +34,7 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBo
   const mainDiagnosis = patient.mainDiagnosis
     ? patient.mainDiagnosis === 'loading'
       ? 'loading'
-      : patient.mainDiagnosis
-          .slice(0, 3)
-          .map((diag) => diag.code?.coding?.[0].display)
-          .join(' - ')
+      : getLastDiagnosisLabels(patient.mainDiagnosis)
     : 'Pas de diagnostic principal'
 
   const lastEncounter =
