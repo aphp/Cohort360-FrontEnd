@@ -31,7 +31,6 @@ const CareSiteView = () => {
     <Grid
       container
       direction="column"
-      position="fixed"
       className={cx(classes.appBar, {
         [classes.appBarShift]: open
       })}
