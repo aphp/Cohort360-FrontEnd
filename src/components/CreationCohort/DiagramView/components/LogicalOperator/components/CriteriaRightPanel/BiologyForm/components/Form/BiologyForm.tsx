@@ -66,8 +66,8 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   )
   const [error, setError] = useState(Error.NO_ERROR)
   const [_searchByValues, setSearchByValues] = useState<[string, string]>([
-    currentState.searchByValue[0] ? currentState.searchByValue[0].toString() : '',
-    currentState.searchByValue[1] ? currentState.searchByValue[1].toString() : ''
+    currentState.searchByValue[0] !== null ? currentState.searchByValue[0].toString() : '',
+    currentState.searchByValue[1] !== null ? currentState.searchByValue[1].toString() : ''
   ])
 
   const _onSubmit = () => {
