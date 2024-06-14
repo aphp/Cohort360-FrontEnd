@@ -41,6 +41,7 @@ import { mapToAttribute, mapToCriteriaName, mapToLabel } from 'mappers/pmsi'
 import List from 'components/ui/List'
 import { fetchClaimCodes, fetchConditionCodes, fetchProcedureCodes } from 'services/aphp/servicePmsi'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
+import { AlertWrapper } from 'components/ui/Alert'
 
 export type PatientPMSIProps = {
   groupId?: string
@@ -218,6 +219,15 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
 
   return (
     <Grid container className={classes.documentTable} gap="20px">
+      {(selectedTab.id === ResourceType.PROCEDURE || selectedTab.id === ResourceType.CONDITION) && (
+        <BlockWrapper item xs={12}>
+          <AlertWrapper severity="warning">
+            Attention : Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/12/2022. Seuls
+            les diagnostics rattachés à une visite Orbis (avec un Dossier Administratif - NDA) sont actuellement
+            disponibles.
+          </AlertWrapper>
+        </BlockWrapper>
+      )}
       <Grid container justifyContent="flex-end">
         <Grid container item xs={12} md={10} lg={7} xl={5} justifyContent="flex-end" spacing={1}>
           {(filtersAsArray.length > 0 || searchInput) && (
