@@ -290,39 +290,43 @@ const EncounterForm = ({
             />
           </BlockWrapper>
           <BlockWrapper className={classes.inputItem}>
-            <Autocomplete
-              multiple
-              id="criteria-PriseEnChargeType-autocomplete"
-              options={criteriaData.data.priseEnChargeType || []}
-              getOptionLabel={(option) => option.label}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={priseEnChargeType}
-              onChange={(e, value) => setPriseEnChargeType(value)}
-              renderInput={(params) => <TextField {...params} label="Type de prise en charge" />}
-            />
-          </BlockWrapper>
-          <BlockWrapper className={classes.inputItem}>
-            <Autocomplete
-              multiple
-              id="criteria-TypeDeSejour-autocomplete"
-              options={criteriaData.data.typeDeSejour || []}
-              getOptionLabel={(option) => option.label}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={typeDeSejour}
-              onChange={(e, value) => setTypeDeSejour(value)}
-              renderInput={(params) => <TextField {...params} label="Type séjour" />}
-            />
-          </BlockWrapper>
-          <BlockWrapper className={classes.inputItem}>
-            <Autocomplete
-              multiple
-              options={criteriaData.data.encounterStatus || []}
-              getOptionLabel={(option) => option.label}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={encounterStatus}
-              onChange={(e, value) => setEncounterStatus(value)}
-              renderInput={(params) => <TextField {...params} label="Statut de la visite" />} // TODO Mehdi
-            />
+            <Collapse title="Général" value={false}>
+              <BlockWrapper className={classes.inputItem}>
+                <Autocomplete
+                  multiple
+                  id="criteria-PriseEnChargeType-autocomplete"
+                  options={criteriaData.data.priseEnChargeType || []}
+                  getOptionLabel={(option) => option.label}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={priseEnChargeType}
+                  onChange={(e, value) => setPriseEnChargeType(value)}
+                  renderInput={(params) => <TextField {...params} label="Type de prise en charge" />}
+                />
+              </BlockWrapper>
+              <BlockWrapper className={classes.inputItem}>
+                <Autocomplete
+                  multiple
+                  id="criteria-TypeDeSejour-autocomplete"
+                  options={criteriaData.data.typeDeSejour || []}
+                  getOptionLabel={(option) => option.label}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={typeDeSejour}
+                  onChange={(e, value) => setTypeDeSejour(value)}
+                  renderInput={(params) => <TextField {...params} label="Type séjour" />}
+                />
+              </BlockWrapper>
+              <BlockWrapper className={classes.inputItem}>
+                <Autocomplete
+                  multiple
+                  options={criteriaData.data.encounterStatus || []}
+                  getOptionLabel={(option) => option.label}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={encounterStatus}
+                  onChange={(e, value) => setEncounterStatus(value)}
+                  renderInput={(params) => <TextField {...params} label="Statut de la visite" />} // TODO Mehdi
+                />
+              </BlockWrapper>
+            </Collapse>
           </BlockWrapper>
           <BlockWrapper className={classes.inputItem}>
             <Collapse title="Admission" value={false}>
