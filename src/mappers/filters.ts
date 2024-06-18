@@ -80,7 +80,7 @@ enum ProcedureParamsKeys {
   NDA = 'encounter.identifier',
   CODE = 'code',
   SOURCE = 'source',
-  DATE = 'recorded-date',
+  DATE = 'date',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
   ENCOUNTER_STATUS = 'encounter.status'
 }
