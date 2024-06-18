@@ -19,7 +19,7 @@ export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'm
     ageUnitDisplay = 'mois'
   } else if (today.diff(momentAge, 'day') >= 0) {
     ageUnit = 'day'
-    ageUnitDisplay = 'jours'
+    ageUnitDisplay = today.diff(momentAge, 'day') <= 1 ? 'jour' : 'jours'
   } else {
     return 'Âge inconnu'
   }
