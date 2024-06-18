@@ -39,8 +39,7 @@ const NoRights: React.FC<NoRightsProps> = ({ oidcCode }) => {
               l'application.
             </Typography>
             <Typography align="center">
-              S'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante: ${MAIL_SUPPORT}
-              .
+              S'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante: {MAIL_SUPPORT}.
             </Typography>
             <div style={{ width: '100%', textAlign: 'center' }}>
               <Link
