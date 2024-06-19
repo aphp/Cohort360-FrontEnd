@@ -90,7 +90,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
 
   const _handleChangeLogicalOperatorProps = (
     key: 'isInclusive' | 'groupType' | 'options.number',
-    value: CriteriaGroupType | number | boolean | string
+    value: boolean | CriteriaGroupType | number | string
   ) => {
     const _currentLogicalOperator = criteriaGroup.find(({ id }) => id === itemId)
     if (!_currentLogicalOperator) return
@@ -264,8 +264,8 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               <TextField
                 classes={{ root: classes.input }}
                 value={currentLogicalOperator?.options?.number}
-                onChange={(event) => _handleChangeLogicalOperatorProps('options.number', event.target.value)}
                 type="number"
+                onChange={(event) => _handleChangeLogicalOperatorProps('options.number', event.target.value)}
                 inputProps={{
                   max: currentLogicalOperator.criteriaIds.length,
                   min: 1

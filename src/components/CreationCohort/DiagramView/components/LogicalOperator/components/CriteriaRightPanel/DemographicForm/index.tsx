@@ -175,7 +175,7 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
                 inline
                 disabled={age[0] !== null || age[1] !== null}
                 value={birthdates}
-                label={'Date de naissance'}
+                label={VitalStatusOptionsLabel.birth}
                 onChange={(value) => setBirthdates(value)}
                 onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
               />

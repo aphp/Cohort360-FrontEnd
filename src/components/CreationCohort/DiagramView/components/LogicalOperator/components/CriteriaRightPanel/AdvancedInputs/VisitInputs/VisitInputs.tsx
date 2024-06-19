@@ -25,8 +25,6 @@ type VisitInputsProps = {
     | DocumentDataType
     | GhmDataType
     | EncounterDataType
-    | PregnancyDataType
-    | HospitDataType
     | MedicationDataType
     | ObservationDataType
     | ImagingDataType

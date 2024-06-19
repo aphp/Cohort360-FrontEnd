@@ -1,6 +1,5 @@
 import { CriteriaItemType } from 'types'
 
-// Components
 import RequestForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/RequestForm/RequestForm'
 import IPPForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/IPPForm/IPPForm'
 import DocumentsForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DocumentsForm/DocumentsForm'
@@ -19,27 +18,6 @@ import services from 'services/aphp'
 
 import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION } from '../../constants'
 import { CriteriaType, CriteriaTypeLabels } from 'types/requestCriterias'
-
-// ├── Mes requêtes
-// ├── Liste d'IPP
-// ├── Patients
-// ├── Visites
-// ├── Documents cliniques
-// ├── PMSI
-// │   ├── Diagnostics
-// │   ├── Actes
-// │   ├── GHM
-// ├── Médicaments
-// │   ├── Prescription - Dispension - Administration
-// ├── Biologie/Microbiologie
-// │   ├── Biologie
-// │   ├── Microbiologie
-// ├── Dossiers de spécialité
-// |   ├── Maternité
-// |   |   ├── Fiche Grossesse
-// |   |   ├── Hospitalisation
-// ├── Imagerie
-// ├── Physiologie
 
 const criteriaList: CriteriaItemType[] = [
   {

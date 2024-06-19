@@ -40,11 +40,11 @@ type AdvancedInputsProps = {
 const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
   const { form, selectedCriteria, onChangeValue } = props
   const optionsIsUsed =
-    (selectedCriteria.encounterService && selectedCriteria?.encounterService.length > 0) ||
-    !!selectedCriteria?.startOccurrence ||
-    !!selectedCriteria?.endOccurrence ||
-    !!selectedCriteria?.encounterStartDate ||
-    !!selectedCriteria?.encounterEndDate
+    (selectedCriteria.encounterService && selectedCriteria.encounterService.length > 0) ||
+    !!selectedCriteria.startOccurrence ||
+    !!selectedCriteria.endOccurrence ||
+    !!selectedCriteria.encounterStartDate ||
+    !!selectedCriteria.encounterEndDate
 
   const [checked, setCheck] = useState(optionsIsUsed)
   const label = 'Sélectionnez une unité exécutrice'
@@ -93,7 +93,7 @@ const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
             form={form}
             label={label}
             title={label}
-            executiveUnits={selectedCriteria?.encounterService ?? []}
+            executiveUnits={selectedCriteria.encounterService ?? []}
             isAcceptEmptySelection={true}
             isDeleteIcon={true}
             onChangeExecutiveUnits={_onSubmitExecutiveUnits}
