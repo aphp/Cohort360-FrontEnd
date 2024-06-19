@@ -86,11 +86,11 @@ const AutoLogoutContainer = () => {
 
   useEffect(() => {
     start()
-    const intervall = setInterval(() => {
+    const interval = setInterval(() => {
       refreshToken()
     }, REFRESH_TOKEN_INTERVAL)
     return () => {
-      clearInterval(intervall)
+      clearInterval(interval)
       pause()
     }
   }, [me])
@@ -98,21 +98,19 @@ const AutoLogoutContainer = () => {
   if (!me) return <></>
 
   return (
-    <div>
-      <Dialog open={isOpen}>
-        <DialogContent>
-          <DialogContentText variant="button" className={classes.title}>
-            Vous allez être déconnecté car vous avez été inactif pendant 14 minutes.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={stayActive} className={classes.validateButton}>
-            Restez connecté
-          </Button>
-          <Button onClick={logout}>Déconnexion</Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+    <Dialog open={isOpen}>
+      <DialogContent>
+        <DialogContentText variant="button" className={classes.title}>
+          Vous allez être déconnecté car vous avez été inactif pendant 14 minutes.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={stayActive} className={classes.validateButton}>
+          Restez connecté
+        </Button>
+        <Button onClick={logout}>Déconnexion</Button>
+      </DialogActions>
+    </Dialog>
   )
 }
 export default AutoLogoutContainer

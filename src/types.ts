@@ -25,6 +25,20 @@ import { SearchByTypes } from 'types/searchCriterias'
 import { SearchInputError } from 'types/error'
 import { Comparators, CriteriaDataKey, DocType, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
 
+export enum JobStatus {
+  new = 'new',
+  pending = 'pending',
+  suspended = 'suspended'
+}
+
+export enum WebSocketJobStatus {
+  new = 'new',
+  pending = 'pending',
+  suspended = 'suspended',
+  accepted = 'accepted',
+  finished = 'finished'
+}
+
 export enum CohortJobStatus {
   _long_pending = 'long_pending',
   _failed = 'failed',
@@ -896,4 +910,23 @@ export type SavedFilter = {
   name: string
   owner: string
   uuid: string
+}
+
+export enum WebSocketMessageType {
+  STATUS = 'status'
+}
+
+export enum WebSocketJobName {
+  COUNT = 'count',
+  CREATE = 'create'
+}
+
+export type WebSocketMessage = {
+  status: WebSocketJobStatus
+  type: WebSocketMessageType
+  client_id?: string
+  uuid?: string
+  details?: string
+  job_name?: WebSocketJobName
+  extra_info?: any
 }

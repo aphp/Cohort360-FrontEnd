@@ -17,6 +17,8 @@ import {
 } from '@mui/material'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
+import UpdateIcon from '@mui/icons-material/Update'
+
 import EditIcon from '@mui/icons-material/Edit'
 import ExportIcon from '@mui/icons-material/GetApp'
 import Star from 'assets/icones/star.svg?react'
@@ -27,12 +29,11 @@ import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 import { useAppDispatch } from 'state'
 import { editCohort, setSelectedCohort } from 'state/cohort'
 
-import { Cohort } from 'types'
+import { Cohort, CohortJobStatus } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from '../styles'
-import { JobStatus } from 'utils/constants'
 import { ODD_EXPORT } from '../../../../constants'
 
 const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
@@ -82,8 +83,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
 
               const isError =
                 !cohort.fhir_group_id ||
-                cohort.request_job_status === JobStatus.pending ||
-                cohort.request_job_status === JobStatus.new ||
+                cohort.request_job_status === CohortJobStatus._pending ||
+                cohort.request_job_status === CohortJobStatus._new ||
                 !!cohort.request_job_fail_msg
 
               const canExportThisCohort = !!ODD_EXPORT && !isError ? cohort.rights?.export_csv_nomi : false
@@ -110,11 +111,20 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                     </IconButton>
                   </TableCellWrapper>
                   <TableCellWrapper>
-                    {cohort.fhir_group_id ? (
+                    {cohort.request_job_status === CohortJobStatus._finished ? (
                       <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                    ) : cohort.request_job_status === JobStatus.pending ||
-                      cohort.request_job_status === JobStatus.new ? (
+                    ) : cohort.request_job_status === CohortJobStatus._pending ||
+                      cohort.request_job_status === CohortJobStatus._new ? (
                       <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
+                    ) : cohort.request_job_status === CohortJobStatus._long_pending ? (
+                      <Tooltip title="Cohorte volumineuse: sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.">
+                        <Chip
+                          label="En cours"
+                          size="small"
+                          style={{ backgroundColor: '#ffc107', color: 'black' }}
+                          icon={<UpdateIcon />}
+                        />
+                      </Tooltip>
                     ) : cohort.request_job_fail_msg ? (
                       <Tooltip title={cohort.request_job_fail_msg}>
                         <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
