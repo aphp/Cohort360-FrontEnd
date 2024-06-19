@@ -48,7 +48,7 @@ const initialState: ExportCSVForm = {
   conditions: false,
   tables: export_table.map<ExportCSVTable>((table) => ({
     ...table,
-    checked: false,
+    checked: table.label === 'person' ? true : false,
     fhir_filter: null,
     respect_table_relationships: true
   }))
@@ -87,7 +87,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       'tables',
       settings.tables.map<ExportCSVTable>((table) => ({
         ...table,
-        checked: checkedTables.length !== settings.tables.length
+        checked: table.label !== 'person' ? settings.tables.length !== checkedTables.length : true
       }))
     )
   }
@@ -183,6 +183,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
           style={resourceType === ResourceType.UNKNOWN ? { cursor: 'default' } : {}}
           expandIcon={
             <Checkbox
+              disabled={label === 'person'}
               color="secondary"
               checked={checked}
               className={classes.checkbox}
@@ -439,7 +440,13 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
         </Button>
         {exportResponse === null && (
           <Button
-            disabled={loading || !cohortId || !settings.motif || !settings.conditions || !settings.tables.length}
+            disabled={
+              loading ||
+              !cohortId ||
+              !settings.motif ||
+              !settings.conditions ||
+              !settings.tables.filter((table) => table.checked).length
+            }
             onClick={handleSubmit}
           >
             {loading ? <CircularProgress size={20} /> : 'Exporter les données'}
