@@ -191,7 +191,6 @@ const ControlPanel: React.FC<{
     } catch (error) {
       setReportLoading(LoadingStatus.IDDLE)
       setReportError(true)
-      console.log(error)
     }
   }
 
