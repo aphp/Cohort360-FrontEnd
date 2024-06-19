@@ -8,7 +8,7 @@ import CcamHierarchy from './components/Hierarchy/CCAMHierarchy'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProcedure } from 'state/pmsi'
-import { EXPLORATION } from 'utils/constants'
+import { EXPLORATION } from '../../../../../../../..//constants'
 
 import { CriteriaDrawerComponentProps, HierarchyElement } from 'types'
 import { CcamDataType, Comparators, CriteriaType } from 'types/requestCriterias'

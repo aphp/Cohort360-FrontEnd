@@ -5,7 +5,7 @@ import { Grid, Paper } from '@mui/material'
 import PatientField from './PatientField/PatientField'
 
 import { getAge } from 'utils/age'
-import { getLastDiagnosisLabels } from 'utils/patient'
+import { getLastDiagnosisLabels } from 'utils/pmsi'
 import { CohortPatient, IPatientDetails } from 'types'
 
 import useStyles from './styles'

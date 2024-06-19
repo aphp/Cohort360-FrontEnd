@@ -8,7 +8,7 @@ import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchClaim } from 'state/pmsi'
-import { EXPLORATION } from 'utils/constants'
+import { EXPLORATION } from '../../../../../../../../constants'
 import { CriteriaDrawerComponentProps, HierarchyElement } from 'types'
 import { Comparators, GhmDataType, CriteriaType } from 'types/requestCriterias'
 

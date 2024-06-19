@@ -10,7 +10,7 @@ import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchMedication } from 'state/medication'
-import { EXPLORATION } from 'utils/constants'
+import { EXPLORATION } from '../../../../../../../../constants'
 import { Comparators, MedicationDataType, CriteriaType } from 'types/requestCriterias'
 
 export const defaultMedication: Omit<MedicationDataType, 'id'> = {
