@@ -434,7 +434,7 @@ const mapGenericToRequestParams = (filters: GenericFilter, type: ResourceType) =
       )}`
     )
   if (encounterStatus && encounterStatus.length > 0) {
-    const encounterStatusUrl = encodeURIComponent(`${ENCOUNTER_STATUS}|`)
+    const encounterStatusUrl = `${ENCOUNTER_STATUS}|`
     const urlString = encounterStatus.map((elem) => encounterStatusUrl + elem.id).join(',')
     requestParams.push(`${getGenericKeyFromResourceType(type, 'ENCOUNTER_STATUS')}=${encodeURIComponent(urlString)}`)
   }
@@ -484,7 +484,7 @@ const mapConditionToRequestParams = (filters: PMSIFilters) => {
   const { diagnosticTypes, code, source, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (diagnosticTypes && diagnosticTypes.length > 0) {
-    const diagnosticTypesUrl = encodeURIComponent(`${CONDITION_STATUS}|`)
+    const diagnosticTypesUrl = `${CONDITION_STATUS}|`
     const urlString = diagnosticTypes.map((elem) => diagnosticTypesUrl + elem.id).join(',')
     requestParams.push(`${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${encodeURIComponent(urlString)}`)
   }
@@ -530,7 +530,7 @@ const mapPrescriptionToRequestParams = (filters: MedicationFilters) => {
   const { prescriptionTypes, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (prescriptionTypes && prescriptionTypes.length > 0) {
-    const prescriptionTypesUrl = encodeURIComponent(`${MEDICATION_PRESCRIPTION_TYPES}|`)
+    const prescriptionTypesUrl = `${MEDICATION_PRESCRIPTION_TYPES}|`
     const urlString = prescriptionTypes.map((elem) => prescriptionTypesUrl + elem.id).join(',')
     requestParams.push(`${PrescriptionParamsKeys.PRESCRIPTION_TYPES}=${encodeURIComponent(urlString)}`)
   }
@@ -547,7 +547,7 @@ const mapAdministrationToRequestParams = (filters: MedicationFilters) => {
   const { administrationRoutes, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (administrationRoutes && administrationRoutes.length > 0) {
-    const administrationRoutesUrl = encodeURIComponent(`${MEDICATION_ADMINISTRATIONS}|`)
+    const administrationRoutesUrl = `${MEDICATION_ADMINISTRATIONS}|`
     const urlString = administrationRoutes.map((elem) => administrationRoutesUrl + elem.id).join(',')
     requestParams.push(`${AdministrationParamsKeys.ADMINISTRATION_ROUTES}=${encodeURIComponent(urlString)}`)
   }
