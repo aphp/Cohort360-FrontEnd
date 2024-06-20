@@ -42,15 +42,17 @@ const useStyles = makeStyles()((theme: Theme) => ({
     padding: '0 20px',
     textTransform: 'uppercase'
   },
-  chartOverlay: {
+  fixedChartOverlay: {
     display: 'flex',
     flexDirection: 'column',
+    height: '300px',
+    alignItems: 'center'
+  },
+  chartOverlay: {
     backgroundColor: '#FFF',
     padding: theme.spacing(2),
     margin: theme.spacing(1),
-    height: '300px',
     borderRadius: '8px',
-    alignItems: 'center',
     fontSize: '16px',
     width: 'calc(100% - 16px)'
   },

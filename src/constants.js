@@ -231,6 +231,9 @@ export const ODD_FEASABILITY_REPORT = import.meta.env.DEV
 export const ODD_QUESTIONNAIRE = import.meta.env.DEV
   ? import.meta.env.VITE_ODD_QUESTIONNAIRE == `${BOOLEANTRUE}`
   : '{VITE_ODD_QUESTIONNAIRE}' == `${BOOLEANTRUE}`
+export const ODD_MAP = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_MAP == `${BOOLEANTRUE}`
+  : '{VITE_ODD_MAP}' == `${BOOLEANTRUE}`
 
 export const SESSION_TIMEOUT = import.meta.env.VITE_SESSION_TIMEOUT
   ? import.meta.env.VITE_SESSION_TIMEOUT

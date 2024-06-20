@@ -27,6 +27,7 @@ import {
   Encounter,
   Extension,
   ImagingStudy,
+  Location,
   MedicationAdministration,
   MedicationRequest,
   Observation,
@@ -983,6 +984,34 @@ export const fetchQuestionnaires = async (args: fetchQuestionnairesProps) => {
   const response = await apiFhir.get<FHIR_Bundle_Response<Questionnaire>>(
     `/Questionnaire?${options.reduce(paramsReducer)}`
   )
+
+  return response
+}
+
+type fetchLocationProps = {
+  _elements?: string[]
+  size?: number
+  offset?: number
+  near?: string
+  _list?: string[]
+  signal?: AbortSignal
+}
+export const fetchLocation = async (args: fetchLocationProps) => {
+  const { _list, _elements, near, size, offset, signal } = args
+
+  let options: string[] = []
+  if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset) options = [...options, `_offset=${offset}`]
+  if (near) options = [...options, `near=${near}`]
+  if (_elements && _elements.length > 0)
+    options = [...options, `_elements=${_elements.filter(uniq).reduce(paramValuesReducer, '')}`]
+
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.filter(uniq).reduce(paramValuesReducer)}`]
+
+  const queryString = options.length > 0 ? `?${options.reduce(paramsReducer)}` : ''
+  const response = await apiFhir.get<FHIR_Bundle_Response<Location>>(`/Location${queryString}`, {
+    signal
+  })
 
   return response
 }

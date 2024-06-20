@@ -18,6 +18,7 @@ import useStyles from './styles'
 import { useAppSelector, useAppDispatch } from 'state'
 import ImagingList from 'components/Dashboard/ImagingList'
 import { ODD_IMAGING } from '../../constants'
+import { MeState } from 'state/me'
 
 type Tabs = { label: string; value: string; to: string; disabled: boolean | undefined } | undefined
 
@@ -40,6 +41,7 @@ const Dashboard: React.FC<{
 
   const open = useAppSelector((state) => state.drawer)
   const dashboard = useAppSelector((state) => state.exploredCohort)
+  const me = useAppSelector((state) => state.me)
 
   const onChangeTabs = () => {
     switch (context) {
@@ -180,6 +182,15 @@ const Dashboard: React.FC<{
       <Grid container xs={11} alignItems="center" direction="column">
         {selectedTab === 'preview' && (
           <CohortPreview
+            cohortId={
+              context === 'cohort'
+                ? cohortId
+                : context === 'perimeters'
+                ? perimetreIds
+                : context === 'patients'
+                ? me?.topLevelCareSites?.join(',')
+                : undefined
+            }
             total={dashboard.totalPatients}
             agePyramidData={dashboard.agePyramidData}
             genderRepartitionMap={dashboard.genderRepartitionMap}
