@@ -14,7 +14,7 @@ export type MeState = null | {
   deidentified: boolean
   accessExpirations: AccessExpiration[]
   nominativeGroupsIds?: string[]
-  highCareSite?: string[]
+  topLevelCareSites?: string[]
   lastConnection?: string
   maintenance?: { active: boolean; maintenance_end: string; maintenance_start: string }
   impersonation?: User

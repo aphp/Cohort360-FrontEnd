@@ -188,7 +188,7 @@ const Dashboard: React.FC<{
                 : context === 'perimeters'
                 ? perimetreIds
                 : context === 'patients'
-                ? me?.highCareSite?.join(',')
+                ? me?.topLevelCareSites?.join(',')
                 : undefined
             }
             total={dashboard.totalPatients}

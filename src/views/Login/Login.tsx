@@ -181,7 +181,7 @@ const Login = () => {
         .map((practitionerPerimeter) => practitionerPerimeter.perimeter.cohort_id)
         .filter((item) => item)
 
-      const highCareSite = practitionerPerimeters.map((perimeterItem) => perimeterItem.perimeter.cohort_id)
+      const topLevelCareSites = practitionerPerimeters.map((perimeterItem) => perimeterItem.perimeter.cohort_id)
 
       const loginState: MeState = {
         id: practitionerData.username || '',
@@ -190,7 +190,7 @@ const Login = () => {
         firstName: practitionerData.firstname || '',
         lastName: practitionerData.lastname || '',
         nominativeGroupsIds,
-        highCareSite,
+        topLevelCareSites,
         deidentified: nominativeGroupsIds.length === 0,
         lastConnection,
         maintenance,
