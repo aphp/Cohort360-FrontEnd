@@ -21,11 +21,11 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchClaim } from 'state/pmsi'
-import { CriteriaItemDataCache, CriteriaName, HierarchyTree } from 'types'
+import { CriteriaItemDataCache, CriteriaName, HierarchyElement, HierarchyTree } from 'types'
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
-import { Comparators, GhmDataType } from 'types/requestCriterias'
+import { Comparators, GhmDataType, SelectedCriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 
@@ -34,9 +34,10 @@ type GHMFormProps = {
   isEdition: boolean
   criteriaData: CriteriaItemDataCache
   selectedCriteria: GhmDataType
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChangeValue: (key: string, value: any) => void
-  goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
+  goBack: () => void
+  onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
 const GhmForm: React.FC<GHMFormProps> = (props) => {
@@ -61,7 +62,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {
         const criteriaCode = criteriaData.data.ghmData
-          ? criteriaData.data.ghmData.find((g: any) => g.id === code.id)
+          ? criteriaData.data.ghmData.find((g: HierarchyElement) => g.id === code.id)
           : null
         return {
           id: code.id,

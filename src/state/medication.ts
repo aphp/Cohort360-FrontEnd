@@ -4,16 +4,14 @@ import { RootState } from 'state'
 import { impersonate, login, logout } from 'state/me'
 
 import services from 'services/aphp'
-import { AbstractTree } from 'types'
-
-export type MedicationListType = AbstractTree<{ label: string }>
+import { HierarchyElement } from 'types'
 
 export type MedicationState = {
   syncLoading?: number
   loading: boolean
-  list: MedicationListType[]
+  list: HierarchyElement[]
   openedElement: string[]
-  ucdList: MedicationListType[]
+  ucdList: HierarchyElement[]
 }
 
 const defaultInitialState: MedicationState = {
@@ -30,10 +28,9 @@ const initMedicationHierarchy = createAsyncThunk<MedicationState, void, { state:
       const state = getState().medication
       const { list } = state
 
-      const medicationList: MedicationListType[] =
-        list.length === 0 ? await services.cohortCreation.fetchAtcHierarchy('') : list
+      const medicationList = list.length === 0 ? await services.cohortCreation.fetchAtcHierarchy('') : list
 
-      const medicationUCDList: MedicationListType[] = await services.cohortCreation.fetchUCDList('')
+      const medicationUCDList = await services.cohortCreation.fetchUCDList('')
 
       return {
         ...state,
@@ -52,8 +49,8 @@ const fetchMedication = createAsyncThunk<MedicationState, void, { state: RootSta
   'medication/fetchMedication',
   async (DO_NOT_USE, { getState }) => {
     const state = getState().medication
-    const medicationList: MedicationListType[] = await services.cohortCreation.fetchAtcHierarchy('')
-    const medicationUCDList: MedicationListType[] = await services.cohortCreation.fetchUCDList('')
+    const medicationList = await services.cohortCreation.fetchAtcHierarchy('')
+    const medicationUCDList = await services.cohortCreation.fetchUCDList('')
 
     return {
       ...state,
@@ -67,7 +64,7 @@ const fetchMedication = createAsyncThunk<MedicationState, void, { state: RootSta
 
 type ExpandMedicationElementParams = {
   rowId: string
-  selectedItems?: MedicationListType[]
+  selectedItems?: HierarchyElement[]
 }
 
 const expandMedicationElement = createAsyncThunk<MedicationState, ExpandMedicationElementParams, { state: RootState }>(
@@ -87,14 +84,14 @@ const expandMedicationElement = createAsyncThunk<MedicationState, ExpandMedicati
     } else {
       _openedElement = [..._openedElement, rowId]
 
-      const replaceSubItems = async (items: MedicationListType[]) => {
-        let _items: MedicationListType[] = []
+      const replaceSubItems = async (items: HierarchyElement[]) => {
+        let _items: HierarchyElement[] = []
         for (let item of items) {
           // Replace sub items element by response of back-end
           if (item.id === rowId) {
             const foundItem = item.subItems ? item.subItems.find((i) => i.id === 'loading') : true
             if (foundItem) {
-              let subItems: MedicationListType[] = []
+              let subItems: HierarchyElement[] = []
               subItems = await services.cohortCreation.fetchAtcHierarchy(item.id)
 
               item = { ...item, subItems: subItems }
@@ -105,9 +102,7 @@ const expandMedicationElement = createAsyncThunk<MedicationState, ExpandMedicati
           _items = [..._items, item]
 
           // Check if element is selected, if true => add sub items to savedSelectedItems
-          const isSelected = savedSelectedItems.find(
-            (savedSelectedItem: MedicationListType) => savedSelectedItem.id === item.id
-          )
+          const isSelected = savedSelectedItems.find((savedSelectedItem) => savedSelectedItem.id === item.id)
           if (isSelected !== undefined && item.subItems && item.subItems.length > 0) {
             savedSelectedItems = [...savedSelectedItems, ...item.subItems]
           }

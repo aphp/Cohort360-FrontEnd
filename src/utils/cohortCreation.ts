@@ -1,13 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import moment from 'moment'
 
 import services from 'services/aphp'
 import {
   ScopeTreeRow,
-  CriteriaGroupType,
+  CriteriaGroup,
   TemporalConstraintsType,
   CriteriaItemType,
   CriteriaItemDataCache,
-  AbstractTree
+  AbstractTree,
+  BiologyStatus,
+  CriteriaGroupType
 } from 'types'
 
 import {
@@ -162,10 +165,10 @@ const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   age: [null, null]
 }
 
-const DEFAULT_GROUP_ERROR: CriteriaGroupType = {
+const DEFAULT_GROUP_ERROR: CriteriaGroup = {
   id: 0,
   title: '',
-  type: 'andGroup',
+  type: CriteriaGroupType.AND_GROUP,
   criteriaIds: []
 }
 
@@ -199,7 +202,7 @@ export type RequeteurCriteriaType = {
 type RequeteurGroupType =
   | {
       // GROUP (andGroup | orGroup)
-      _type: 'andGroup' | 'orGroup'
+      _type: CriteriaGroupType.AND_GROUP | CriteriaGroupType.OR_GROUP
       _id: number
       isInclusive: boolean
       criteria: (RequeteurCriteriaType | RequeteurGroupType)[]
@@ -208,7 +211,7 @@ type RequeteurGroupType =
   // NOT IMPLEMENTED
   | {
       // GROUP (nAmongM)
-      _type: 'nAmongM'
+      _type: CriteriaGroupType.N_AMONG_M
       _id: number
       isInclusive: boolean
       criteria: (RequeteurCriteriaType | RequeteurGroupType)[]
@@ -262,7 +265,7 @@ export const checkNominativeCriteria = (selectedCriteria: SelectedCriteriaType[]
 
 export const cleanNominativeCriterias = (
   selectedCriteria: SelectedCriteriaType[],
-  criteriaGroups: CriteriaGroupType[],
+  criteriaGroups: CriteriaGroup[],
   dispatch: AppDispatch,
   selectedPopulation?: ScopeTreeRow[]
 ) => {
@@ -504,7 +507,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case CriteriaType.OBSERVATION: {
       const unreducedFilterFhir = [
-        `subject.active=true&${OBSERVATION_STATUS}=Val`,
+        `subject.active=true&${OBSERVATION_STATUS}=${BiologyStatus.VALIDATED}`,
         filtersBuilders(OBSERVATION_CODE, buildLabelObjectFilter(criterion.code, BIOLOGY_HIERARCHY_ITM_ANABIO)),
         filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(ENCOUNTER_STATUS_REFERENCE, buildLabelObjectFilter(criterion.encounterStatus)),
@@ -776,7 +779,7 @@ const mapCriteriaToResource = (criteriaType: CriteriaType): ResourceType => {
 export function buildRequest(
   selectedPopulation: (ScopeTreeRow | undefined)[] | null,
   selectedCriteria: SelectedCriteriaType[],
-  criteriaGroup: CriteriaGroupType[],
+  criteriaGroup: CriteriaGroup[],
   temporalConstraints: TemporalConstraintsType[]
 ): string {
   if (!selectedPopulation) return ''
@@ -840,12 +843,12 @@ export function buildRequest(
         }
       } else {
         // return RequeteurGroupType
-        const group: CriteriaGroupType = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
+        const group: CriteriaGroup = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
 
         // DO SPECIAL THING FOR `NamongM`
-        if (group.type === 'NamongM') {
+        if (group.type === CriteriaGroupType.N_AMONG_M) {
           child = {
-            _type: 'nAmongM',
+            _type: CriteriaGroupType.N_AMONG_M,
             _id: group.id,
             isInclusive: group.isInclusive ?? true,
             criteria: exploreCriteriaGroup(group.criteriaIds),
@@ -882,7 +885,10 @@ export function buildRequest(
       ? undefined
       : {
           _id: 0,
-          _type: mainCriteriaGroups.type === 'orGroup' ? 'orGroup' : 'andGroup',
+          _type:
+            mainCriteriaGroups.type === CriteriaGroupType.OR_GROUP
+              ? CriteriaGroupType.OR_GROUP
+              : CriteriaGroupType.AND_GROUP,
           isInclusive: !!mainCriteriaGroups.isInclusive,
           criteria: exploreCriteriaGroup(mainCriteriaGroups.criteriaIds),
           temporalConstraints: temporalConstraints.filter(({ constraintType }) => constraintType !== 'none')
@@ -2043,7 +2049,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
     return newSelectedCriteriaItems
   }
 
-  const convertJsonObjectsToCriteriaGroup: (_criteriaGroup: RequeteurGroupType[]) => CriteriaGroupType[] = (
+  const convertJsonObjectsToCriteriaGroup: (_criteriaGroup: RequeteurGroupType[]) => CriteriaGroup[] = (
     _criteriaGroup
   ) =>
     _criteriaGroup && _criteriaGroup.length > 0
@@ -2060,7 +2066,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 isSubGroup: !!groupItem.criteria.length,
                 isInclusive: groupItem.isInclusive,
                 type: groupItem._type
-              } as CriteriaGroupType)
+              } as CriteriaGroup)
           )
           .sort((prev, next) => next.id - prev.id)
       : []
@@ -2252,7 +2258,10 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
 
   const criteriaGroupFromNewRequest: RequeteurGroupType = {
     _id: (newRequest?.request?._id ?? 0) - 128,
-    _type: newRequest.request?._type === 'andGroup' ? 'andGroup' : 'orGroup',
+    _type:
+      newRequest.request?._type === CriteriaGroupType.AND_GROUP
+        ? CriteriaGroupType.AND_GROUP
+        : CriteriaGroupType.OR_GROUP,
     isInclusive: true,
     criteria: changeIdOfRequest(newRequest.request?.criteria || [])
   }
@@ -2267,8 +2276,7 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
     if (!criterionGroup.criteria) return criterionGroup
     const { criteria = [] } = criterionGroup
     for (let criterion of criteria) {
-      // @ts-ignore
-      if (criterion?._type === 'orGroup' || criterion?._type === 'andGroup') {
+      if (criterion?._type === CriteriaGroupType.OR_GROUP || criterion?._type === CriteriaGroupType.AND_GROUP) {
         // @ts-ignore
         criterion = fillRequestWithNewRequest(criterion)
       }

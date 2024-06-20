@@ -9,7 +9,7 @@ type LoincFilterProps = {
   value: LabelObject[]
   name: string
   disabled?: boolean
-  onFetch: (text: string, noStar: boolean, signal: AbortSignal) => Promise<any>
+  onFetch: (text: string, noStar: boolean, signal: AbortSignal) => Promise<LabelObject[]>
 }
 
 const LoincFilter = ({ name, value, disabled = false, onFetch }: LoincFilterProps) => {

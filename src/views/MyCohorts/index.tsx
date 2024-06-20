@@ -109,8 +109,8 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
             if (temp.dated_measure_global) {
               temp.dated_measure_global = {
                 ...temp.dated_measure_global,
-                measure_min: message.extra_info?.global.measure_min,
-                measure_max: message.extra_info?.global.measure_max
+                measure_min: message.extra_info?.global ? message.extra_info.global.measure_min : null,
+                measure_max: message.extra_info?.global ? message.extra_info.global.measure_max : null
               }
             }
             temp.request_job_status = message.status

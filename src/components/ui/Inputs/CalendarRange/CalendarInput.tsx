@@ -42,7 +42,7 @@ const CalendarInput = ({ value, label, disabled = false, onChange }: CalendarInp
                 disabled={disabled}
                 onChange={(newValue: unknown) => setDate(newValue as string)}
                 value={date}
-                renderInput={(params: any) => <TextField {...params} variant="standard" />}
+                renderInput={(params) => <TextField {...params} variant="standard" />}
               >
                 <InputAdornment position="start">
                   <ClearIcon color="primary" onClick={() => setDate(null)} />{' '}

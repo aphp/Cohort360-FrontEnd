@@ -4,13 +4,11 @@ import { RootState } from 'state'
 import { impersonate, login, logout } from 'state/me'
 
 import services from 'services/aphp'
-import { AbstractTree } from 'types'
-
-export type PmsiListType = AbstractTree<{ label: string }>
+import { HierarchyElement } from 'types'
 
 export type PmsiElementType = {
   loading: boolean
-  list: PmsiListType[]
+  list: HierarchyElement[]
   openedElement: string[]
 }
 
@@ -82,7 +80,7 @@ const fetchCondition = createAsyncThunk<PmsiElementType, void, { state: RootStat
   'pmsi/fetchCondition',
   async (DO_NOT_USE, { getState }) => {
     const state = getState().pmsi
-    const conditionList: PmsiListType[] = await services.cohortCreation.fetchCim10Hierarchy('')
+    const conditionList = await services.cohortCreation.fetchCim10Hierarchy('')
 
     return {
       ...state.condition,
@@ -97,7 +95,7 @@ const fetchClaim = createAsyncThunk<PmsiElementType, void, { state: RootState }>
   'pmsi/fetchClaim',
   async (DO_NOT_USE, { getState }) => {
     const state = getState().pmsi
-    const claimList: PmsiListType[] = await services.cohortCreation.fetchGhmHierarchy('')
+    const claimList = await services.cohortCreation.fetchGhmHierarchy('')
 
     return {
       ...state.claim,
@@ -112,7 +110,7 @@ const fetchProcedure = createAsyncThunk<PmsiElementType, void, { state: RootStat
   'pmsi/fetchProcedure',
   async (DO_NOT_USE, { getState }) => {
     const state = getState().pmsi
-    const procedureList: PmsiListType[] = await services.cohortCreation.fetchCcamHierarchy('')
+    const procedureList = await services.cohortCreation.fetchCcamHierarchy('')
 
     return {
       ...state.procedure,
@@ -126,7 +124,7 @@ const fetchProcedure = createAsyncThunk<PmsiElementType, void, { state: RootStat
 type ExpandPmsiElementParams = {
   rowId: string
   keyElement: 'claim' | 'condition' | 'procedure'
-  selectedItems?: PmsiListType[]
+  selectedItems?: HierarchyElement[]
 }
 
 const expandPmsiElement = createAsyncThunk<PmsiState, ExpandPmsiElementParams, { state: RootState }>(
@@ -146,14 +144,14 @@ const expandPmsiElement = createAsyncThunk<PmsiState, ExpandPmsiElementParams, {
     } else {
       _openedElement = [..._openedElement, rowId]
 
-      const replaceSubItems = async (items: PmsiListType[]) => {
-        let _items: PmsiListType[] = []
+      const replaceSubItems = async (items: HierarchyElement[]) => {
+        let _items: HierarchyElement[] = []
         for (let item of items) {
           // Replace sub items element by response of back-end
           if (item.id === rowId) {
             const foundItem = item.subItems ? item.subItems.find((i) => i.id === 'loading') : true
             if (foundItem) {
-              let subItems: PmsiListType[] = []
+              let subItems: HierarchyElement[] = []
               if (keyElement === 'claim') {
                 subItems = await services.cohortCreation.fetchGhmHierarchy(item.id)
               }
@@ -172,9 +170,7 @@ const expandPmsiElement = createAsyncThunk<PmsiState, ExpandPmsiElementParams, {
           _items = [..._items, item]
 
           // Check if element is selected, if true => add sub items to savedSelectedItems
-          const isSelected = savedSelectedItems.find(
-            (savedSelectedItem: PmsiListType) => savedSelectedItem.id === item.id
-          )
+          const isSelected = savedSelectedItems.find((savedSelectedItem) => savedSelectedItem.id === item.id)
           if (isSelected !== undefined && item.subItems && item.subItems.length > 0) {
             savedSelectedItems = [...savedSelectedItems, ...item.subItems]
           }

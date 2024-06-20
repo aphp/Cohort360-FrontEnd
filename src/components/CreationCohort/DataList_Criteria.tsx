@@ -1,6 +1,5 @@
 import { CriteriaItemType } from 'types'
 
-// Components
 import RequestForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/RequestForm/RequestForm'
 import IPPForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/IPPForm/IPPForm'
 import DocumentsForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DocumentsForm/DocumentsForm'
@@ -18,40 +17,19 @@ import HospitForm from './DiagramView/components/LogicalOperator/components/Crit
 import services from 'services/aphp'
 
 import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION } from '../../constants'
-import { CriteriaType } from 'types/requestCriterias'
-
-// ├── Mes requêtes
-// ├── Liste d'IPP
-// ├── Patients
-// ├── Visites
-// ├── Documents cliniques
-// ├── PMSI
-// │   ├── Diagnostics
-// │   ├── Actes
-// │   ├── GHM
-// ├── Médicaments
-// │   ├── Prescription - Dispension - Administration
-// ├── Biologie/Microbiologie
-// │   ├── Biologie
-// │   ├── Microbiologie
-// ├── Dossiers de spécialité
-// |   ├── Maternité
-// |   |   ├── Fiche Grossesse
-// |   |   ├── Hospitalisation
-// ├── Imagerie
-// ├── Physiologie
+import { CriteriaType, CriteriaTypeLabels } from 'types/requestCriterias'
 
 const criteriaList: CriteriaItemType[] = [
   {
     id: 'Request',
-    title: 'Mes requêtes',
+    title: CriteriaTypeLabels.REQUEST,
     color: '#0063AF',
     fontWeight: 'bold',
     components: RequestForm
   },
   {
     id: 'IPPList',
-    title: "Liste d'IPP",
+    title: CriteriaTypeLabels.IPP_LIST,
     color: '#0063AF',
     fontWeight: 'bold',
     components: IPPForm,
@@ -59,7 +37,7 @@ const criteriaList: CriteriaItemType[] = [
   },
   {
     id: 'Patient',
-    title: 'Démographie',
+    title: CriteriaTypeLabels.PATIENT,
     color: '#0063AF',
     fontWeight: 'bold',
     components: DemographicForm,
@@ -67,7 +45,7 @@ const criteriaList: CriteriaItemType[] = [
   },
   {
     id: 'Encounter',
-    title: 'Prise en charge',
+    title: CriteriaTypeLabels.ENCOUNTER,
     color: '#0063AF',
     fontWeight: 'bold',
     components: EncounterForm,
@@ -87,7 +65,7 @@ const criteriaList: CriteriaItemType[] = [
   },
   {
     id: 'DocumentReference',
-    title: 'Documents cliniques',
+    title: CriteriaTypeLabels.DOCUMENTS,
     color: '#0063AF',
     fontWeight: 'bold',
     components: DocumentsForm,
@@ -98,14 +76,14 @@ const criteriaList: CriteriaItemType[] = [
   },
   {
     id: 'pmsi',
-    title: 'PMSI',
+    title: CriteriaTypeLabels.PMSI,
     color: '#0063AF',
     fontWeight: 'bold',
     components: null,
     subItems: [
       {
         id: 'Condition',
-        title: 'Diagnostics',
+        title: CriteriaTypeLabels.CONDITION,
         color: '#0063AF',
         fontWeight: 'normal',
         components: Cim10Form,
@@ -118,7 +96,7 @@ const criteriaList: CriteriaItemType[] = [
       },
       {
         id: 'Procedure',
-        title: 'Actes',
+        title: CriteriaTypeLabels.PROCEDURE,
         color: '#0063AF',
         fontWeight: 'normal',
         components: CCAMForm,
@@ -129,7 +107,7 @@ const criteriaList: CriteriaItemType[] = [
       },
       {
         id: 'Claim',
-        title: 'GHM',
+        title: CriteriaTypeLabels.CLAIM,
         color: '#0063AF',
         fontWeight: 'normal',
         components: GhmForm,
@@ -157,14 +135,14 @@ const criteriaList: CriteriaItemType[] = [
   },
   {
     id: 'biologie_microbiologie',
-    title: 'Biologie/Microbiologie',
+    title: CriteriaTypeLabels.BIO_MICRO,
     color: !!ODD_BIOLOGY ? '#0063AF' : '#808080',
     fontWeight: 'bold',
     components: null,
     subItems: [
       {
         id: 'Observation',
-        title: 'Biologie',
+        title: CriteriaTypeLabels.OBSERVATION,
         color: !!ODD_BIOLOGY ? '#0063AF' : '#808080',
         fontWeight: 'normal',
         components: !!ODD_BIOLOGY ? BiologyForm : null,
@@ -176,7 +154,7 @@ const criteriaList: CriteriaItemType[] = [
       },
       {
         id: 'microbiologie',
-        title: 'Microbiologie',
+        title: CriteriaTypeLabels.MICROBIOLOGIE,
         components: null,
         color: '#808080',
         fontWeight: 'normal',
@@ -263,7 +241,7 @@ const criteriaList: CriteriaItemType[] = [
   },
   {
     id: 'ImagingStudy',
-    title: 'Imagerie',
+    title: CriteriaTypeLabels.IMAGING,
     color: ODD_IMAGING ? '#0063AF' : '#808080',
     fontWeight: 'bold',
     components: ODD_IMAGING ? ImagingForm : null,
@@ -275,7 +253,7 @@ const criteriaList: CriteriaItemType[] = [
   },
   {
     id: 'physiologie',
-    title: 'Physiologie',
+    title: CriteriaTypeLabels.PHYSIOLOGIE,
     color: '#808080',
     fontWeight: 'bold',
     disabled: true,

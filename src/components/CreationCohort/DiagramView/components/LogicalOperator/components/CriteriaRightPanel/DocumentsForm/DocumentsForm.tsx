@@ -26,13 +26,13 @@ import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
 
-import { CriteriaDrawerComponentProps, CriteriaName } from 'types'
+import { CriteriaDrawerComponentProps, CriteriaName, SimpleCodeType } from 'types'
 import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
 import { SearchByTypes, FilterByDocumentStatus } from 'types/searchCriterias'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 import { SearchInputError } from 'types/error'
-import { Comparators, DocType, DocumentDataType, CriteriaType } from 'types/requestCriterias'
+import { Comparators, DocumentDataType, CriteriaType } from 'types/requestCriterias'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { BlockWrapper } from 'components/ui/Layout'
@@ -79,7 +79,9 @@ const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
     onChangeSelectedCriteria({ ...defaultValues, occurrence: occurrence, occurrenceComparator: occurrenceComparator })
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const _onChangeValue = (key: string, value: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const _defaultValues: any = defaultValues ? { ...defaultValues } : {}
     _defaultValues[key] = value
     setDefaultValues(_defaultValues)
@@ -219,20 +221,20 @@ const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             renderInput={(params) => <TextField {...params} label="Types de documents" />}
             groupBy={(doctype) => doctype.type}
             disableCloseOnSelect
-            renderGroup={(docType: any) => {
+            renderGroup={(docType) => {
               const currentDocTypeList = criteriaData.data.docTypes
-                ? criteriaData.data.docTypes.filter((doc: DocType) => doc.type === docType.group)
+                ? criteriaData.data.docTypes.filter((doc: SimpleCodeType) => doc.type === docType.group)
                 : []
 
               const currentSelectedDocTypeList = defaultValues.docType
-                ? defaultValues.docType.filter((doc: DocType) => doc.type === docType.group)
+                ? defaultValues.docType.filter((doc) => doc.type === docType.group)
                 : []
 
               const onClick = () => {
                 if (currentDocTypeList.length === currentSelectedDocTypeList.length) {
                   _onChangeValue(
                     'docType',
-                    defaultValues.docType?.filter((doc: DocType) => doc.type !== docType.group)
+                    defaultValues.docType?.filter((doc) => doc.type !== docType.group)
                   )
                 } else {
                   _onChangeValue(

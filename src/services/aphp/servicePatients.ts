@@ -396,14 +396,15 @@ const servicesPatients: IServicePatients = {
     const agePyramidData =
       myPatientsResp.data.resourceType === 'Bundle'
         ? getAgeRepartitionMapAphp(
-            myPatientsResp.data.meta?.extension?.filter((facet) => facet?.url === ChartCode?.agePyramid)?.[0]?.extension
+            myPatientsResp.data.meta?.extension?.filter((facet) => facet?.url === ChartCode?.AGE_PYRAMID)?.[0]
+              ?.extension
           )
         : undefined
 
     const genderRepartitionMap =
       myPatientsResp.data.resourceType === 'Bundle'
         ? getGenderRepartitionMapAphp(
-            myPatientsResp.data.meta?.extension?.filter((facet) => facet?.url === ChartCode?.genderRepartition)?.[0]
+            myPatientsResp.data.meta?.extension?.filter((facet) => facet?.url === ChartCode?.GENDER_REPARTITION)?.[0]
               ?.extension
           )
         : undefined
@@ -411,7 +412,7 @@ const servicesPatients: IServicePatients = {
     const monthlyVisitData =
       myPatientsEncounters.data.resourceType === 'Bundle'
         ? getVisitRepartitionMapAphp(
-            myPatientsEncounters.data.meta?.extension?.filter((facet) => facet?.url === ChartCode?.monthlyVisits)?.[0]
+            myPatientsEncounters.data.meta?.extension?.filter((facet) => facet?.url === ChartCode?.MONTHLY_VISITS)?.[0]
               ?.extension
           )
         : undefined
@@ -420,7 +421,7 @@ const servicesPatients: IServicePatients = {
       myPatientsEncounters.data.resourceType === 'Bundle'
         ? getEncounterRepartitionMapAphp(
             myPatientsEncounters.data.meta?.extension?.filter(
-              (facet) => facet?.url === ChartCode?.visitTypeRepartition
+              (facet) => facet?.url === ChartCode?.VISIT_TYPE_REPARTITION
             )?.[0]?.extension
           )
         : undefined
@@ -537,7 +538,7 @@ const servicesPatients: IServicePatients = {
       _list: groupId ? [groupId] : [],
       subject: patientId,
       _sort: 'date',
-      sortDirection: 'desc'
+      sortDirection: Direction.DESC
     })
 
     const proceduresData: Procedure[] = getApiResponseResources(proceduresResp) ?? []
@@ -801,7 +802,7 @@ const servicesPatients: IServicePatients = {
       fetchEncounter({
         patient: patientId,
         _sort: 'period-start',
-        sortDirection: 'desc',
+        sortDirection: Direction.DESC,
         _list: groupId ? [groupId] : [],
         size: 1000
       })
@@ -862,11 +863,11 @@ export const getEncounterDocuments = async (
   if (encounters.length === 0) return encounters
 
   const _encounters = encounters
-  const encountersIdList: any[] = []
+  const encountersIdList: string[] = []
 
   _encounters.forEach((encounter) => {
     encounter.documents = []
-    encountersIdList.push(encounter.id)
+    encountersIdList.push(encounter.id ?? '')
   })
 
   const documentsResp = await fetchDocumentReference({

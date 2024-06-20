@@ -42,7 +42,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
   const cohortsListState = useAppSelector((state) => state.cohort.cohortsList)
 
   const [sortBy, setSortBy] = useState<'name' | 'modified_at'>('name')
-  const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('asc')
+  const [sortDirection, setSortDirection] = useState<Direction>(Direction.ASC)
 
   const [searchProjectList, setSearchProjectList] = useState(projectsList || [])
   const [currentRequestList, setSearchRequestList] = useState(requestsList || [])
@@ -65,8 +65,8 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
             if (temp.dated_measure_global) {
               temp.dated_measure_global = {
                 ...temp.dated_measure_global,
-                measure_min: message.extra_info?.global.measure_min,
-                measure_max: message.extra_info?.global.measure_max
+                measure_min: message.extra_info?.global ? message.extra_info.global.measure_min : null,
+                measure_max: message.extra_info?.global ? message.extra_info.global.measure_max : null
               }
             }
             temp.request_job_status = message.status
@@ -122,17 +122,17 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
       case 'name': {
         newSearchRequestList = newSearchRequestList.sort((a: RequestType, b: RequestType) => {
           if (a.name > b.name) {
-            return sortDirection === 'asc' ? 1 : -1
+            return sortDirection === Direction.ASC ? 1 : -1
           } else {
-            return sortDirection === 'asc' ? -1 : 1
+            return sortDirection === Direction.ASC ? -1 : 1
           }
         })
 
         newSearchProjectList = newSearchProjectList.sort((a: ProjectType, b: ProjectType) => {
           if (a.name > b.name) {
-            return sortDirection === 'asc' ? 1 : -1
+            return sortDirection === Direction.ASC ? 1 : -1
           } else {
-            return sortDirection === 'asc' ? -1 : 1
+            return sortDirection === Direction.ASC ? -1 : 1
           }
         })
         break
@@ -141,17 +141,17 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
       case 'modified_at': {
         newSearchRequestList = newSearchRequestList.sort((a: RequestType, b: RequestType) => {
           if (a.modified_at && b.modified_at && a.modified_at > b.modified_at) {
-            return sortDirection === 'asc' ? 1 : -1
+            return sortDirection === Direction.ASC ? 1 : -1
           } else {
-            return sortDirection === 'asc' ? -1 : 1
+            return sortDirection === Direction.ASC ? -1 : 1
           }
         })
 
         newSearchProjectList = newSearchProjectList.sort((a: ProjectType, b: ProjectType) => {
           if (a.modified_at && b.modified_at && a.modified_at > b.modified_at) {
-            return sortDirection === 'asc' ? 1 : -1
+            return sortDirection === Direction.ASC ? 1 : -1
           } else {
-            return sortDirection === 'asc' ? -1 : 1
+            return sortDirection === Direction.ASC ? -1 : 1
           }
         })
         break
@@ -170,8 +170,8 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
   }, [sortBy, sortDirection, projectsList, requestsList, cohortList])
 
   const handleRequestSort = (property: 'name' | 'modified_at') => {
-    const isAsc = sortBy === property && sortDirection === 'desc'
-    setSortDirection(isAsc ? 'asc' : 'desc')
+    const isAsc = sortBy === property && sortDirection === Direction.DESC
+    setSortDirection(isAsc ? Direction.ASC : Direction.DESC)
     setSortBy(property)
   }
 

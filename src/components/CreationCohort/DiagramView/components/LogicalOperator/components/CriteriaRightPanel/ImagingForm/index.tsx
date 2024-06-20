@@ -94,6 +94,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
 
   const [error, setError] = useState(Error.NO_ERROR)
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const _onChangeValue = (key: string, value: any) => {
     switch (key) {
       case 'encounterService':
@@ -399,6 +400,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
       <AdvancedInputs
         form={CriteriaName.Imaging}
         selectedCriteria={{
+          ...selectedCriteria,
           encounterService: encounterService,
           encounterStartDate: encounterStartDate,
           encounterEndDate: encounterEndDate,

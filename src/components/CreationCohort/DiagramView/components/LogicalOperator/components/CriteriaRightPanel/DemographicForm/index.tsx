@@ -19,7 +19,7 @@ import useStyles from './styles'
 
 import { useAppSelector } from 'state'
 
-import { DurationRangeType, LabelObject, VitalStatusLabel } from 'types/searchCriterias'
+import { DurationRangeType, LabelObject, VitalStatusLabel, VitalStatusOptionsLabel } from 'types/searchCriterias'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { CriteriaDataKey, DemographicDataType, CriteriaType } from 'types/requestCriterias'
@@ -31,10 +31,14 @@ enum Error {
   NO_ERROR
 }
 
-export const mappingCriteria = (criteriaToMap: any, key: CriteriaDataKey, mapping: CriteriaItemDataCache) => {
+export const mappingCriteria = (
+  criteriaToMap: LabelObject[] | null,
+  key: CriteriaDataKey,
+  mapping: CriteriaItemDataCache
+) => {
   if (criteriaToMap) {
-    return criteriaToMap.map((criteria: any) => {
-      const mappedCriteria = mapping.data?.[key]?.find((c: any) => c?.id === criteria?.id)
+    return criteriaToMap.map((criteria) => {
+      const mappedCriteria = mapping.data?.[key]?.find((c: LabelObject) => c?.id === criteria?.id)
       return mappedCriteria
     })
   } else {
@@ -171,7 +175,7 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
                 inline
                 disabled={age[0] !== null || age[1] !== null}
                 value={birthdates}
-                label={'Date de naissance'}
+                label={VitalStatusOptionsLabel.birth}
                 onChange={(value) => setBirthdates(value)}
                 onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
               />
@@ -186,8 +190,8 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
                 vitalStatus &&
                 vitalStatus.length === 1 &&
                 vitalStatus.find((status: LabelObject) => status.label === VitalStatusLabel.DECEASED)
-                  ? 'Âge au décès'
-                  : 'Âge actuel'
+                  ? VitalStatusOptionsLabel.deceasedAge
+                  : VitalStatusOptionsLabel.age
               }
               onChange={(value) => setAge(value)}
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
@@ -203,7 +207,7 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
                 <CalendarRange
                   inline
                   value={deathDates}
-                  label={'Date de décès'}
+                  label={VitalStatusOptionsLabel.deceasedDate}
                   onChange={(value) => setDeathDates(value)}
                   onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
                 />

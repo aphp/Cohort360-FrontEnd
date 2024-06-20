@@ -48,14 +48,14 @@ import {
 } from '../constants'
 import services from 'services/aphp'
 
-enum PatientsParamsKeys {
+export enum PatientsParamsKeys {
   GENDERS = 'gender',
-  DATE_DEINDENTIFIED = 'age-month',
+  DATE_DEIDENTIFIED = 'age-month',
   DATE_IDENTIFIED = 'age-day',
   VITAL_STATUS = 'deceased'
 }
 
-enum DocumentsParamsKeys {
+export enum DocumentsParamsKeys {
   IPP = 'subject.identifier',
   DOC_STATUSES = 'docstatus',
   DOC_TYPES = 'type',
@@ -66,7 +66,7 @@ enum DocumentsParamsKeys {
   ENCOUNTER_STATUS = 'encounter.status'
 }
 
-enum ConditionParamsKeys {
+export enum ConditionParamsKeys {
   NDA = 'encounter.identifier',
   CODE = 'code',
   DIAGNOSTIC_TYPES = 'orbis-status',
@@ -76,7 +76,7 @@ enum ConditionParamsKeys {
   ENCOUNTER_STATUS = 'encounter.status'
 }
 
-enum ProcedureParamsKeys {
+export enum ProcedureParamsKeys {
   NDA = 'encounter.identifier',
   CODE = 'code',
   SOURCE = 'source',
@@ -85,7 +85,7 @@ enum ProcedureParamsKeys {
   ENCOUNTER_STATUS = 'encounter.status'
 }
 
-enum ClaimParamsKeys {
+export enum ClaimParamsKeys {
   NDA = 'encounter.identifier',
   CODE = 'diagnosis',
   DATE = 'created',
@@ -93,7 +93,7 @@ enum ClaimParamsKeys {
   ENCOUNTER_STATUS = 'encounter.status'
 }
 
-enum PrescriptionParamsKeys {
+export enum PrescriptionParamsKeys {
   NDA = 'encounter.identifier',
   PRESCRIPTION_TYPES = 'category',
   DATE = 'validity-period-start',
@@ -101,7 +101,7 @@ enum PrescriptionParamsKeys {
   ENCOUNTER_STATUS = 'encounter.status'
 }
 
-enum AdministrationParamsKeys {
+export enum AdministrationParamsKeys {
   NDA = 'context.identifier',
   ADMINISTRATION_ROUTES = 'dosage-route',
   DATE = 'effective-time',
@@ -109,20 +109,27 @@ enum AdministrationParamsKeys {
   ENCOUNTER_STATUS = 'context.status'
 }
 
-enum ObservationParamsKeys {
+export enum ObservationParamsKeys {
   NDA = 'encounter.identifier',
   ANABIO_LOINC = 'code',
   VALIDATED_STATUS = 'status',
   DATE = 'date',
-  EXECUTIVE_UNITS = 'context.encounter-care-site',
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
   ENCOUNTER_STATUS = 'encounter.status'
 }
 
-enum ImagingParamsKeys {
-  IPP = 'subject.identifier',
+export enum ImagingParamsKeys {
+  IPP = 'patient.identifier',
   MODALITY = 'modality',
   NDA = 'encounter.identifier',
   DATE = 'started',
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
+  ENCOUNTER_STATUS = 'encounter.status'
+}
+
+export enum QuestionnaireResponseParamsKeys {
+  NAME = 'questionnaire.name',
+  DATE = 'authored',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
   ENCOUNTER_STATUS = 'encounter.status'
 }
@@ -206,7 +213,7 @@ const mapPatientFromRequestParams = (parameters: URLSearchParams) => {
   const birthdatesRanges =
     parameters.getAll(PatientsParamsKeys.DATE_IDENTIFIED).length > 0
       ? mapBirthdatesRangesFromRequestParams(PatientsParamsKeys.DATE_IDENTIFIED, parameters)
-      : mapBirthdatesRangesFromRequestParams(PatientsParamsKeys.DATE_DEINDENTIFIED, parameters)
+      : mapBirthdatesRangesFromRequestParams(PatientsParamsKeys.DATE_DEIDENTIFIED, parameters)
   return { genders, vitalStatuses, birthdatesRanges }
 }
 
@@ -452,9 +459,9 @@ const mapPatientToRequestParams = (filters: PatientsFilters, deidentified: boole
     requestParams.push(`${PatientsParamsKeys.GENDERS}=${genders.map(mapGenderStatusToGenderCodes)}`)
   const minBirthdate = convertDurationToTimestamp(convertStringToDuration(birthdatesRanges?.[0]), deidentified)
   const maxBirthdate = convertDurationToTimestamp(convertStringToDuration(birthdatesRanges?.[1]), deidentified)
-  if (minBirthdate && deidentified) requestParams.push(`${PatientsParamsKeys.DATE_DEINDENTIFIED}=ge${minBirthdate}`)
+  if (minBirthdate && deidentified) requestParams.push(`${PatientsParamsKeys.DATE_DEIDENTIFIED}=ge${minBirthdate}`)
   if (minBirthdate && !deidentified) requestParams.push(`${PatientsParamsKeys.DATE_IDENTIFIED}=ge${minBirthdate}`)
-  if (maxBirthdate && deidentified) requestParams.push(`${PatientsParamsKeys.DATE_DEINDENTIFIED}=le${maxBirthdate}`)
+  if (maxBirthdate && deidentified) requestParams.push(`${PatientsParamsKeys.DATE_DEIDENTIFIED}=le${maxBirthdate}`)
   if (maxBirthdate && !deidentified) requestParams.push(`${PatientsParamsKeys.DATE_IDENTIFIED}=le${maxBirthdate}`)
   return requestParams
 }

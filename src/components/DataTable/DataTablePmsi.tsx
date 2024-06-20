@@ -10,7 +10,6 @@ import { Column, PMSIEntry } from 'types'
 import useStyles from './styles'
 import { Claim, Condition, Procedure } from 'fhir/r4'
 import { Order, OrderBy } from 'types/searchCriterias'
-import { PMSI } from 'types/patient'
 import { ResourceType } from 'types/requestCriterias'
 
 type DataTablePmsiProps = {
@@ -65,7 +64,7 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
                   ? selectedTab !== ResourceType.PROCEDURE
                     ? 'GHM'
                     : 'acte'
-                  : PMSI.DIAGNOSTIC
+                  : 'diagnostic'
               } à afficher`}</Typography>
             </Grid>
           </TableCellWrapper>

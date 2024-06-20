@@ -1,9 +1,9 @@
-import { ScopeTreeRow } from 'types'
+import { ScopeTreeRow, SimpleCodeType } from 'types'
 import { DocumentAttachmentMethod, DurationRangeType, LabelObject, SearchByTypes } from './searchCriterias'
 
-export enum MedicationTypeLabel {
-  Request = 'Prescription',
-  Administration = 'Administration'
+export enum MedicationLabel {
+  PRESCRIPTION = 'Prescription',
+  ADMINISTRATION = 'Administration'
 }
 
 export enum ResourceType {
@@ -108,10 +108,6 @@ export type SelectedCriteriaType =
   | PregnancyDataType
   | HospitDataType
 
-export type DraftSelectedCriteriaType = SelectedCriteriaType & {
-  id?: number
-}
-
 export enum CriteriaDataKey {
   GENDER = 'gender',
   VITALSTATUS = 'status',
@@ -212,12 +208,6 @@ export type IPPListDataType = CommonCriteriaDataType & {
   search: string
 }
 
-export type DocType = {
-  code: string
-  label: string
-  type: string
-}
-
 export type DocumentDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
   WithEncounterDateDataType &
@@ -225,7 +215,7 @@ export type DocumentDataType = CommonCriteriaDataType &
     type: CriteriaType.DOCUMENTS
     search: string
     searchBy: SearchByTypes.TEXT | SearchByTypes.DESCRIPTION
-    docType: DocType[] | null
+    docType: SimpleCodeType[] | null
     docStatuses: string[]
   }
 

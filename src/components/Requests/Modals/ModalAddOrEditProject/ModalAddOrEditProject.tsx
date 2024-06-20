@@ -13,7 +13,7 @@ const ERROR_TITLE = 'error_title'
 
 const ModalAddOrEditProject: React.FC<{
   open: boolean
-  selectedProject: any
+  selectedProject: ProjectType | null
   onClose: () => void
 }> = ({ open, onClose }) => {
   const { classes } = useStyles()

@@ -17,7 +17,7 @@ const orderDefault: OrderBy = { orderBy: Order.LASTNAME, orderDirection: Directi
 
 type RequestShareFormProps = {
   currentRequest: RequestType | undefined
-  onChangeValue: (key: 'name' | 'requestName' | 'usersToShare', value: string | string | User[]) => void
+  onChangeValue: (key: 'name' | 'requestName' | 'usersToShare' | 'usersAssociated', value: User[] | string) => void
   error: 'error_title' | 'error_user_share_list' | null
 }
 

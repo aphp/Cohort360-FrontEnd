@@ -2,7 +2,7 @@ import { Grid, Tooltip, Typography } from '@mui/material'
 import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
-import { CriteriaNameType, ScopeTreeRow } from 'types'
+import { CriteriaName, ScopeTreeRow } from 'types'
 import InfoIcon from '@mui/icons-material/Info'
 import scopeType from 'data/scope_type.json'
 import { InputWrapper } from 'components/ui/Inputs'
@@ -10,7 +10,7 @@ import { InputWrapper } from 'components/ui/Inputs'
 type ExecutiveUnitsFilterProps = {
   value: ScopeTreeRow[]
   name: string
-  criteriaName: CriteriaNameType
+  criteriaName: CriteriaName
   disabled?: boolean
 }
 

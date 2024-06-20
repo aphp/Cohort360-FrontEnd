@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import moment from 'moment'
+import { Direction } from 'types/searchCriterias'
 
 export const descendingComparator = (a: any, b: any, orderBy: string | ((obj: any) => any)): number => {
   const fieldExtractor =
@@ -19,19 +21,19 @@ export const descendingComparator = (a: any, b: any, orderBy: string | ((obj: an
 }
 
 export const getComparator = (
-  order: 'desc' | 'asc',
+  order: Direction,
   orderBy: string | ((obj: any) => any)
 ): ((a: any, b: any) => number) => {
-  return order === 'desc'
+  return order === Direction.DESC
     ? (a: any, b: any): number => descendingComparator(a, b, orderBy)
     : (a: any, b: any): number => -descendingComparator(a, b, orderBy)
 }
 
-export const displaySort = getComparator('desc', (obj: any) => obj.display)
+export const displaySort = getComparator(Direction.DESC, (obj: any) => obj.display)
 
-export const idSort = getComparator('asc', (obj: any) => obj.id)
+export const idSort = getComparator(Direction.ASC, (obj: any) => obj.id)
 
-export const labelSort = getComparator('asc', (obj: any) => obj.label)
+export const labelSort = getComparator(Direction.ASC, (obj: any) => obj.label)
 
 export const stableSort = (array: any[], comparator: any): any[] => {
   const stabilizedThis = array.map((el, index) => [el, index])

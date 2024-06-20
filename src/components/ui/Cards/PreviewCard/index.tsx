@@ -6,7 +6,7 @@ type PreviewCardProps = {
   children: ReactNode
   title: string
   linkLabel: string
-  onClickLink: (props: any) => void
+  onClickLink: () => void
 }
 
 const PreviewCard = ({ children, title, linkLabel, onClickLink }: PropsWithChildren<PreviewCardProps>) => {

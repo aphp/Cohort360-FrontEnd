@@ -21,9 +21,8 @@ import {
   Resource
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
-import { SearchByTypes } from 'types/searchCriterias'
 import { SearchInputError } from 'types/error'
-import { Comparators, CriteriaDataKey, DocType, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import { Comparators, CriteriaDataKey, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
 
 export enum JobStatus {
   new = 'new',
@@ -40,23 +39,12 @@ export enum WebSocketJobStatus {
 }
 
 export enum CohortJobStatus {
-  _long_pending = 'long_pending',
-  _failed = 'failed',
-  _finished = 'finished',
-  _pending = 'pending',
-  _new = 'new'
-}
-
-export enum EncounterStatusKind {
-  _planned = 'planned',
-  _arrived = 'arrived',
-  _triaged = 'triaged',
-  _inProgress = 'in-progress',
-  _onleave = 'onleave',
-  _finished = 'finished',
-  _cancelled = 'cancelled',
-  _enteredInError = 'entered-in-error',
-  _unknown = 'unknown'
+  LONG_PENDING = 'long_pending',
+  FAILED = 'failed',
+  FINISHED = 'finished',
+  PENDING = 'pending',
+  NEW = 'new',
+  SUSPENDED = 'suspended'
 }
 
 export enum LoadingStatus {
@@ -182,23 +170,18 @@ export type CohortGroup = Group & {
 }
 
 export enum Month {
-  january = 'Janvier',
-  february = 'Février',
-  march = 'Mars',
-  april = 'Avril',
-  may = 'Mai',
-  june = 'Juin',
-  july = 'Juillet',
-  august = 'Août',
-  september = 'Septembre',
-  october = 'Octobre',
-  november = 'Novembre',
-  december = 'Decembre'
-}
-
-export type AbstractTree<T> = T & {
-  id: string
-  subItems?: AbstractTree<T>[]
+  JANUARY = 'Janvier',
+  FEBRUARY = 'Février',
+  MARCH = 'Mars',
+  APRIL = 'Avril',
+  MAY = 'Mai',
+  JUNE = 'Juin',
+  JULY = 'Juillet',
+  AUGUST = 'Août',
+  SEPTEMBER = 'Septembre',
+  OCTOBER = 'Octobre',
+  NOVEMBER = 'Novembre',
+  DECEMBER = 'Décembre'
 }
 
 export type Column =
@@ -230,10 +213,10 @@ export type ScopeTreeRow = AbstractTree<{
 }>
 
 export enum ChartCode {
-  agePyramid = 'facet-extension.ageMonth',
-  genderRepartition = 'facet-deceased',
-  monthlyVisits = 'facet-_facet.period.startGender',
-  visitTypeRepartition = 'facet-class.coding.display'
+  AGE_PYRAMID = 'facet-extension.ageMonth',
+  GENDER_REPARTITION = 'facet-deceased',
+  MONTHLY_VISITS = 'facet-_facet.period.startGender',
+  VISIT_TYPE_REPARTITION = 'facet-class.coding.display'
 }
 
 export type SimpleChartDataType = {
@@ -273,7 +256,7 @@ export type VisiteRepartitionType = {
   Septembre: MonthVisiteRepartitionType
   Octobre: MonthVisiteRepartitionType
   Novembre: MonthVisiteRepartitionType
-  Decembre: MonthVisiteRepartitionType
+  Décembre: MonthVisiteRepartitionType
 }
 
 export type CohortData = {
@@ -326,7 +309,16 @@ export type PatientData = {
   medicationAdministrationTotal?: number
 }
 
-export type CriteriaGroupType = {
+export enum CriteriaGroupType {
+  AND_GROUP = 'andGroup',
+  AT_LEAST = 'atLeast',
+  AT_MOST = 'atMost',
+  EXACTLY = 'exactly',
+  N_AMONG_M = 'nAmongM',
+  OR_GROUP = 'orGroup'
+}
+
+export type CriteriaGroup = {
   id: number
   title: string
   criteriaIds: number[]
@@ -334,10 +326,10 @@ export type CriteriaGroupType = {
   isInclusive?: boolean
 } & (
   | {
-      type: 'andGroup' | 'orGroup'
+      type: CriteriaGroupType.AND_GROUP | CriteriaGroupType.OR_GROUP
     }
   | {
-      type: 'NamongM'
+      type: CriteriaGroupType.N_AMONG_M
       options: {
         operator: Comparators
         number: number
@@ -375,6 +367,7 @@ export type CriteriaDrawerComponentProps = {
 
 export type CriteriaItemDataCache = {
   criteriaType: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: { [key in CriteriaDataKey]?: any }
 }
 
@@ -390,10 +383,8 @@ export type CriteriaItemType = {
 }
 
 type FetchFunctionVariant =
-  | (() => Promise<DocType[]>)
+  | (() => Promise<SimpleCodeType[]>)
   | ((searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<HierarchyElement[]>)
-
-export type ResearchType = string | boolean | AbortSignal | undefined
 
 export type ValueSet = {
   code: string
@@ -567,8 +558,6 @@ export type Export = {
   owner: string
 }
 
-export type ContactSubmitForm = FormData
-
 /**
  * Patient State Types
  */
@@ -715,32 +704,27 @@ export type DTTB_ResultsType = {
   total: number
   label?: string
 }
-export type DTTB_SearchBarType = {
-  type: 'simple' | 'patient' | 'document'
-  value: string | undefined
-  onSearch: (newSearch: string, newSearchBy: SearchByTypes) => void
-  searchBy?: any
-  error?: SearchInputError
-  fullWidth?: boolean
-}
-export type DTTB_ButtonType = {
-  label: string
-  icon?: ReactElement
-  onClick: (args?: any) => void
-}
-export type HierarchyTree = null | {
-  code?: HierarchyElement[]
-  loading?: number
-}
-export type HierarchyElement<E = {}> = E & {
+
+export type AbstractTree<T> = T & {
   id: string
-  label: string
-  subItems?: HierarchyElement[]
+  subItems?: AbstractTree<T>[]
 }
+
+export type HierarchyElement<E = {}> = AbstractTree<
+  E & {
+    label: string
+  }
+>
+
+export type TreeElement = { id: string; subItems: TreeElement[] }
 
 export type HierarchyElementWithSystem = HierarchyElement<{ system?: string }>
 
-export type TreeElement = { id: string; subItems: TreeElement[] }
+export type HierarchyTree = {
+  code?: HierarchyElement[]
+  loading?: number
+}
+
 export type ScopeElement = {
   id: number
   name: string
@@ -811,16 +795,6 @@ export enum CriteriaName {
   Imaging = 'imaging',
   Form = 'questionnaireResponse'
 }
-export type CriteriaNameType =
-  | CriteriaName.Cim10
-  | CriteriaName.Ccam
-  | CriteriaName.Ghm
-  | CriteriaName.Document
-  | CriteriaName.Medication
-  | CriteriaName.Biology
-  | CriteriaName.VisitSupport
-  | CriteriaName.Imaging
-  | CriteriaName.Form
 
 export type AccessExpirationsProps = {
   expiring?: boolean
@@ -928,5 +902,10 @@ export type WebSocketMessage = {
   uuid?: string
   details?: string
   job_name?: WebSocketJobName
-  extra_info?: any
+  extra_info?: {
+    fhir_group_id?: string
+    request_job_status: JobStatus
+    measure?: number
+    global?: { measure_min: number; measure_max: number }
+  }
 }

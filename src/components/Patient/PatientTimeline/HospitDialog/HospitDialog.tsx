@@ -19,7 +19,7 @@ const HospitDialog: React.FC<HospitDialogTypes> = ({ deidentified, open, onClose
   const documentLines = 4 // Number of desired lines in the document array
   const [page, setPage] = useState(1)
 
-  const handleChange = (_event: any, value: React.SetStateAction<number>) => {
+  const handleChange = (_event: React.ChangeEvent<unknown>, value: React.SetStateAction<number>) => {
     setPage(value)
   }
 

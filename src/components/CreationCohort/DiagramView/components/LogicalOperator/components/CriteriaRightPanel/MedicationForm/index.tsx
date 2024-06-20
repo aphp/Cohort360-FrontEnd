@@ -4,14 +4,13 @@ import { Tabs, Tab } from '@mui/material'
 import MedicationForm from './components/Form/MedicationForm'
 import MedicationExploration from './components/Hierarchy/MedicationHierarchy'
 
-import { CriteriaDrawerComponentProps } from 'types'
+import { CriteriaDrawerComponentProps, HierarchyElement } from 'types'
 
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchMedication } from 'state/medication'
-import { PmsiListType } from 'state/pmsi'
-import { EXPLORATION } from 'constants.js'
+import { EXPLORATION } from '../../../../../../../../constants'
 import { Comparators, MedicationDataType, CriteriaType } from 'types/requestCriterias'
 
 export const defaultMedication: Omit<MedicationDataType, 'id'> = {
@@ -49,10 +48,14 @@ const Index = (props: CriteriaDrawerComponentProps) => {
 
   const { classes } = useStyles()
 
-  const _onChangeSelectedHierarchy = (newSelectedItems: any, newHierarchy?: PmsiListType[]) => {
+  const _onChangeSelectedHierarchy = (
+    newSelectedItems: HierarchyElement[] | null | undefined,
+    newHierarchy?: HierarchyElement[]
+  ) => {
     _onChangeFormValue('code', newSelectedItems, newHierarchy)
   }
-  const _onChangeFormValue = (key: string, value: any, hierarchy: PmsiListType[] = medicationHierarchy) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const _onChangeFormValue = (key: string, value: any, hierarchy: HierarchyElement[] = medicationHierarchy) =>
     syncOnChangeFormValue(
       key,
       value,

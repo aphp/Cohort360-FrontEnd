@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import { RootState } from 'state'
@@ -12,7 +13,8 @@ import {
   IPatientObservation,
   IPatientImaging,
   CohortImaging,
-  CohortQuestionnaireResponse
+  CohortQuestionnaireResponse,
+  CohortComposition
 } from 'types'
 
 import { impersonate, logout } from './me'
@@ -30,6 +32,7 @@ import {
   MedicationRequest,
   Observation,
   Patient,
+  Period,
   Procedure,
   QuestionnaireResponse
 } from 'fhir/r4'
@@ -1456,11 +1459,11 @@ function linkElementWithEncounter<
     | Observation
     | ImagingStudy
     | QuestionnaireResponse
->(elementEntries: T[], encounterList: any[], deidentifiedBoolean: boolean) {
+>(elementEntries: T[], encounterList: CohortEncounter[], deidentifiedBoolean: boolean) {
   let elementList: (T & {
     serviceProvider?: string
     NDA?: string
-    documents?: any[]
+    documents?: CohortComposition[]
     hospitDates?: string[]
   })[] = []
 
@@ -1468,12 +1471,11 @@ function linkElementWithEncounter<
     let newElement = entry as T & {
       serviceProvider?: string
       NDA?: string
-      documents?: any[]
+      documents?: CohortComposition[]
       hospitDates?: string[]
     }
 
     let encounterId = ''
-    // @ts-ignore
     switch (entry.resourceType) {
       case ResourceType.CLAIM:
         encounterId = (entry as Claim).item?.[0].encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
@@ -1496,7 +1498,6 @@ function linkElementWithEncounter<
 
     const foundEncounter = encounterList.find(({ id }) => id === encounterId) || null
     const foundEncounterWithDetails =
-      // @ts-ignore
       encounterList.find(({ details }) => details?.find(({ id }) => id === encounterId)) || null
 
     newElement = fillElementInformation(
@@ -1524,12 +1525,18 @@ function fillElementInformation<
     | Observation
     | ImagingStudy
     | QuestionnaireResponse
->(deidentifiedBoolean: boolean, element: T, encounter: any, encounterId: string, resourceType: string) {
+>(
+  deidentifiedBoolean: boolean,
+  element: T,
+  encounter: CohortEncounter | null,
+  encounterId: string,
+  resourceType: string
+) {
   const newElement = element as T & {
     serviceProvider?: string
     NDA?: string
-    documents?: any[]
-    hospitDates?: string[]
+    documents?: CohortComposition[]
+    hospitDates?: Period
   }
 
   const encounterIsDetailed = encounter?.id !== encounterId
