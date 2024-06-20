@@ -114,12 +114,12 @@ enum ObservationParamsKeys {
   ANABIO_LOINC = 'code',
   VALIDATED_STATUS = 'status',
   DATE = 'date',
-  EXECUTIVE_UNITS = 'context.encounter-care-site',
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
   ENCOUNTER_STATUS = 'encounter.status'
 }
 
 enum ImagingParamsKeys {
-  IPP = 'subject.identifier',
+  IPP = 'patient.identifier',
   MODALITY = 'modality',
   NDA = 'encounter.identifier',
   DATE = 'started',
