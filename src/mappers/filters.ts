@@ -114,12 +114,12 @@ export enum ObservationParamsKeys {
   ANABIO_LOINC = 'code',
   VALIDATED_STATUS = 'status',
   DATE = 'date',
-  EXECUTIVE_UNITS = 'context.encounter-care-site', // hmmmmm ???? encounter ou context?????????????
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
   ENCOUNTER_STATUS = 'encounter.status'
 }
 
 export enum ImagingParamsKeys {
-  IPP = 'subject.identifier', // pareil, subject ou patient?
+  IPP = 'patient.identifier',
   MODALITY = 'modality',
   NDA = 'encounter.identifier',
   DATE = 'started',
