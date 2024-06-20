@@ -233,7 +233,7 @@ const ControlPanel: React.FC<{
         message.status === WebSocketJobStatus.finished &&
         message.extra_info?.measure !== null
       ) {
-        setPatientCount(message.extra_info.measure)
+        setPatientCount(message.extra_info?.measure)
         setCountLoading(LoadingStatus.SUCCESS)
       }
     }

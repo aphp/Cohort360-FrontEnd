@@ -902,5 +902,10 @@ export type WebSocketMessage = {
   uuid?: string
   details?: string
   job_name?: WebSocketJobName
-  extra_info?: any
+  extra_info?: {
+    fhir_group_id?: string
+    request_job_status: JobStatus
+    measure?: number
+    global?: { measure_min: number; measure_max: number }
+  }
 }

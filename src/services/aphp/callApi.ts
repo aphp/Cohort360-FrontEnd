@@ -66,10 +66,6 @@ import {
 } from '../../mappers/filters'
 import { ResourceType } from 'types/requestCriterias'
 
-export const paramValuesReducerWithPrefix =
-  (prefix: string): ((accumulator: string, currentValue: string) => string) =>
-  (accumulator: string, currentValue: string) =>
-    accumulator ? `${accumulator},${prefix}|${currentValue}` : `${prefix}|${currentValue}`
 const paramValuesReducer = (accumulator: string, currentValue: string): string =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 const paramsReducer = (accumulator: string, currentValue: string): string =>
