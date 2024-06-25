@@ -1002,7 +1002,7 @@ export const fetchLocation = async (args: fetchLocationProps) => {
   let options: string[] = []
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
-  if (near) options = [...options, `near=${near}`]
+  if (near) options = [...options, `near=${encodeURIComponent(near)}`]
   if (_elements && _elements.length > 0)
     options = [...options, `_elements=${_elements.filter(uniq).reduce(paramValuesReducer, '')}`]
 

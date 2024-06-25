@@ -54,7 +54,11 @@ export function getResponseDataOrThrow<T extends Resource, R>(
 export function getAllResults<
   T extends FhirResource,
   U extends { offset?: number; size?: number; signal?: AbortSignal }
->(fetcher: (params: U) => Promise<AxiosResponse<FHIR_Bundle_Response<T>>>, fetcherParams: U): Promise<T[]> {
+>(
+  fetcher: (params: U) => Promise<AxiosResponse<FHIR_Bundle_Response<T>>>,
+  fetcherParams: U,
+  updateCompletion?: (stage: number, total: number) => void
+): Promise<T[]> {
   const size = fetcherParams.size || 100
   const fetch = async (offset: number): Promise<T[]> => {
     const response = await fetcher({
@@ -66,6 +70,9 @@ export function getAllResults<
     const data = getApiResponseResourceOrThrow(response)
     const results = data.entry ? data.entry.map((r) => r.resource).filter((r): r is T => undefined !== r) : []
     const total = data.total || results.length
+    if (updateCompletion) {
+      updateCompletion((offset + size) / size, Math.ceil(total / size))
+    }
     if (total > offset + size) {
       return results.concat(await fetch(offset + size))
     }
