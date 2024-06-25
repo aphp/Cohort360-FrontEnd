@@ -10,6 +10,7 @@ sed -i "s@{DISPOSE_URL}@$DISPOSE_URL@g" /etc/nginx/conf.d/nginx.conf
 sed -i "s@{VITE_BACK_API_URL}@$VITE_BACK_API_URL@g" /app/build/assets/*.js
 sed -i "s@{VITE_REQUEST_API_URL}@$VITE_REQUEST_API_URL@g" /app/build/assets/*.js
 sed -i "s@{VITE_FHIR_API_URL}@$VITE_FHIR_API_URL@g" /app/build/assets/*.js
+sed -i "s@{VITE_SOCKET_API_URL}@$VITE_SOCKET_API_URL@g" /app/build/assets/*.js
 sed -i "s@{VITE_OIDC_PROVIDER_URL}@$VITE_OIDC_PROVIDER_URL@g" /app/build/assets/*.js
 sed -i "s@{VITE_OIDC_REDIRECT_URI}@$VITE_OIDC_REDIRECT_URI@g" /app/build/assets/*.js
 sed -i "s@{VITE_OIDC_RESPONSE_TYPE}@$VITE_OIDC_RESPONSE_TYPE@g" /app/build/assets/*.js

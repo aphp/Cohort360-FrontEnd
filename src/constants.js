@@ -3,6 +3,8 @@ export let BOOLEANTRUE = 'true'
 export const ACCESS_TOKEN = 'access_token'
 export const REFRESH_TOKEN = 'refresh_token'
 
+export const SOCKET_API_URL = import.meta.env.DEV ? import.meta.env.VITE_SOCKET_API_URL : '{VITE_SOCKET_API_URL}'
+
 export const OIDC_PROVIDER_URL = import.meta.env.DEV
   ? import.meta.env.VITE_OIDC_PROVIDER_URL
   : '{VITE_OIDC_PROVIDER_URL}'

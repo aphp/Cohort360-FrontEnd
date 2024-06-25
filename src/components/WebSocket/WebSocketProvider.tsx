@@ -1,4 +1,4 @@
-import { ACCESS_TOKEN, BACK_API_URL } from '../../constants'
+import { ACCESS_TOKEN, BACK_API_URL, SOCKET_API_URL } from '../../constants'
 import React, { PropsWithChildren, createContext, useEffect, useRef } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { WebSocketHook } from 'react-use-websocket/dist/lib/types'
@@ -13,7 +13,7 @@ type WebSocketContentType = {
 export const WebSocketContext = createContext<WebSocketContentType | null>(null)
 
 export const WebSocketProvider = ({ children }: PropsWithChildren) => {
-  const websocket = useWebSocket<string>(`ws://${window.location.host}${BACK_API_URL}/ws/`, {
+  const websocket = useWebSocket<string>(`${SOCKET_API_URL}${window.location.host}${BACK_API_URL}/ws/`, {
     share: true,
     onError: () => console.error('An error occured.'),
     onClose: () => console.info('Disconnected from WebSocket.'),
