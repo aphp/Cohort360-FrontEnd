@@ -1,0 +1,29 @@
+//WIP : work in progress
+    {
+        "criteriaType": "Hospit",
+        "title": "Critère de Fiche d'hospitalisation",
+        "name": "Fiche d'hospitalisation",
+        "inputs": [
+            {
+                "field": "CriteriaLayout",
+                "infoAlert": ["Tous les éléments des champs multiples sont liés par une contrainte OU"],
+                "props": {}
+            },
+            {
+                "field": "OccurenceInput",
+                "props": {
+                    "label": "Nombre d'occurence",
+                    "value": "occurence",
+                    "comparator": "comparator"
+                }
+            },
+            {
+                "field": "ExecutiveUnits",
+                "props": {}
+            },
+            {
+                "field": "autocomplete",
+                "props": {}
+            }
+        ]
+    }

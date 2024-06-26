@@ -50,6 +50,8 @@ export enum CriteriaType {
 }
 
 export enum CriteriaTypeLabels {
+  AUTOFORMULAHOSPIT = 'Formulaire auto généré hospit', //WIP : work in progress
+  AUTOFORMULAPREGNANCY = 'Formulaire auto généré pregnancy', //WIP : work in progress
   REQUEST = 'Mes requềtes',
   IPP_LIST = "Liste d'IPP",
   PATIENT = 'Démographie',

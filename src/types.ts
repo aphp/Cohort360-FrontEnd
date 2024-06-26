@@ -22,7 +22,7 @@ import {
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
 import { SearchInputError } from 'types/error'
-import { Comparators, CriteriaDataKey, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import { Comparators, CriteriaDataKey, CriteriaType, ResourceType, SelectedCriteriaType } from 'types/requestCriterias' //WIP : work in progress
 
 export enum JobStatus {
   new = 'new',
@@ -363,6 +363,20 @@ export type CriteriaDrawerComponentProps = {
   selectedCriteria: SelectedCriteriaType | null
   onChangeSelectedCriteria: (newCriteria: SelectedCriteriaType) => void
   goBack: () => void
+  json?: DataJson //WIP : work in progress
+}
+
+export type DataJson = { //WIP : work in progress
+  criteriaType: string //WIP : work in progress
+  title: string //WIP : work in progress
+  name: string  //WIP : work in progress
+  inputs: CriteriaDataInput[] //WIP : work in progress 
+}
+
+export type CriteriaDataInput = { //WIP : work in progress
+  field: string //WIP : work in progress
+  infoAlert?: string[] //WIP : work in progress
+  props: any  //WIP : work in progress
 }
 
 export type CriteriaItemDataCache = {

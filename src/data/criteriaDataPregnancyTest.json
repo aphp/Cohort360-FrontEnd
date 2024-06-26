@@ -1,0 +1,30 @@
+//WIP : work in progress
+{
+    "criteriaType": "Pregnancy",
+    "title": "Critère de Fiche de grossesse",
+    "name": "Fiche de grossesse",
+    "inputs": [
+        {
+            "field": "CriteriaLayout",
+            "infoAlert": ["Tous les éléments des champs multiples sont liés par une contrainte OU"],
+            "props": {}
+        },
+        {
+            "field": "OccurenceInput",
+            "props": {
+                "label": "Nombre d'occurence",
+                "value": "occurence",
+                "comparator": "comparator"
+            }
+        },
+        {
+            "field": "ExecutiveUnits",
+            "props": {}
+        },
+        {
+            "field": "autocomplete",
+            "props": {}
+        }
+    ]
+}
+

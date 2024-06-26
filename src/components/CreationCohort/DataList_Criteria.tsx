@@ -1,4 +1,5 @@
-import { CriteriaItemType } from 'types'
+import React from 'react'
+import { CriteriaDrawerComponentProps, CriteriaItemType } from 'types'
 
 import RequestForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/RequestForm/RequestForm'
 import IPPForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/IPPForm/IPPForm'
@@ -13,6 +14,9 @@ import DemographicForm from './DiagramView/components/LogicalOperator/components
 import ImagingForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/ImagingForm'
 import PregnantForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/PregnantForm'
 import HospitForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/HospitForm'
+import AutoFormulaGeneration from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AutoFormulaGeneration/AutoFormulaGeneration' //WIP : work in progress
+import hospitJson from 'data/criteriaDataHospitTest.json' //WIP : work in progress
+import pregnancyJson from 'data/criteriaDataPregnancyTest.json' //WIP : work in progress
 
 import services from 'services/aphp'
 
@@ -20,6 +24,24 @@ import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION } from '../../constants'
 import { CriteriaType, CriteriaTypeLabels } from 'types/requestCriterias'
 
 const criteriaList: CriteriaItemType[] = [
+  { //WIP : work in progress
+    id: 'AutoFormulaTest', //WIP : work in progress
+    title: CriteriaTypeLabels.AUTOFORMULAHOSPIT, //WIP : work in progres
+    color: '#0063AF', //WIP : work in progres
+    fontWeight: 'bold', //WIP : work in progres
+    components: (props: CriteriaDrawerComponentProps) => { //WIP : work in progres
+      return <AutoFormulaGeneration {...props} json={hospitJson} /> //WIP : work in progres
+    } //WIP : work in progres
+  }, //WIP : work in progres
+  { //WIP : work in progress
+    id: 'AutoFormulaTest',  //WIP : work in progress
+    title: CriteriaTypeLabels.AUTOFORMULAPREGNANCY, //WIP : work in progress
+    color: '#0063AF', //WIP : work in progress
+    fontWeight: 'bold',   //WIP : work in progress
+    components: (props: CriteriaDrawerComponentProps) => { //WIP : work in progress
+      return <AutoFormulaGeneration {...props} json={pregnancyJson} /> //WIP : work in progress
+    } //WIP : work in progress
+  }, //WIP : work in progress
   {
     id: 'Request',
     title: CriteriaTypeLabels.REQUEST,
