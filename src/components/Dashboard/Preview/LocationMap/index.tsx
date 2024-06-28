@@ -9,7 +9,15 @@ import { MapContainer } from 'react-leaflet/MapContainer'
 import { TileLayer } from 'react-leaflet/TileLayer'
 import { fetchLocation } from 'services/aphp/callApi'
 import { getAllResults } from 'utils/apiHelpers'
-import { colorize, computeNearFilter, explodeBoundsIntoMesh, isBoundCovered, parseShape } from './utils'
+import {
+  _explodeBoundsIntoMesh,
+  colorize,
+  computeNearFilter,
+  explodeBoundsIntoMesh,
+  isBoundCovered,
+  parseShape,
+  uncoveredBoundMeshUnits
+} from './utils'
 import { cancelPendingRequest } from 'utils/abortController'
 import * as d3 from 'd3'
 import { CircularProgress, Slider, Typography } from '@mui/material'
@@ -112,17 +120,24 @@ const IrisZones = (props: IrisZonesProps) => {
           setDataLoading(true)
           setDataLoadingProgress(0)
           // Fetch fhir locations for the current viewbox using the near filter
-          const nearFilter = computeNearFilter(map, bounds)
-          const locations = await getAllResults(
-            fetchLocation,
-            {
-              _list: [cohortId],
-              size: LOCATION_FETCH_BATCH_SIZE,
-              near: nearFilter,
-              signal: abortController.signal
-            },
-            loadingProgress
+          const smallBounds = uncoveredBoundMeshUnits(map, bounds, loadedBounds)
+          const locationParts = await Promise.all(
+            smallBounds.map(async (boundPart) => {
+              const nearFilter = computeNearFilter(map, boundPart)
+              return await getAllResults(
+                fetchLocation,
+                {
+                  _list: [cohortId],
+                  size: LOCATION_FETCH_BATCH_SIZE,
+                  near: nearFilter,
+                  signal: abortController.signal
+                },
+                // don't want to show loading progress when fetching multiple parts
+                smallBounds.length === 1 ? loadingProgress : undefined
+              )
+            })
           )
+          const locations = locationParts.flat()
 
           if (locations) {
             // updates loaded zones
@@ -252,7 +267,7 @@ const IrisZones = (props: IrisZonesProps) => {
               />
             ))}
           {bounds &&
-            explodeBoundsIntoMesh(map, bounds, 1000).map((b, i) => (
+            _explodeBoundsIntoMesh(map, bounds, 10, 10).map((b, i) => (
               <Rectangle
                 key={`mesh_${i}`}
                 pathOptions={{

@@ -1,4 +1,5 @@
 import L, { LatLngBounds, LatLngTuple } from 'leaflet'
+import { map } from 'lodash'
 
 /**
  * Transform the string polygon description retrieved by FHIR (POLYGON((lat lng, lat lng, ...))) into an array of LatLngTuple
@@ -39,6 +40,32 @@ export const computeNearFilter = (map: L.Map, bounds: LatLngBounds): string => {
 /**
  * Explode the map viewbox bounds into a mesh of smaller bounds
  */
+export const _explodeBoundsIntoMesh = (
+  map: L.Map,
+  bounds: LatLngBounds,
+  xSteps: number,
+  ySteps: number
+): LatLngBounds[] => {
+  const ne = map.project(bounds.getNorthEast())
+  const sw = map.project(bounds.getSouthWest())
+  const width = ne.x - sw.x
+  const height = sw.y - ne.y
+  const xStepSize = width / xSteps
+  const yStepSize = height / ySteps
+  const mesh: LatLngBounds[] = []
+  for (let i = 0; i < xSteps; i++) {
+    for (let j = 0; j < ySteps; j++) {
+      const bsw = map.unproject([sw.x + i * xStepSize, sw.y - j * yStepSize])
+      const bne = map.unproject([sw.x + (i + 1) * xStepSize, sw.y - (j + 1) * yStepSize])
+      mesh.push(new LatLngBounds(bsw, bne))
+    }
+  }
+  return mesh
+}
+
+/**
+ * Explode the map viewbox bounds into a mesh of smaller bounds with a given mesh unit size (in meters)
+ */
 export const explodeBoundsIntoMesh = (map: L.Map, bounds: LatLngBounds, meshUnitSize: number): LatLngBounds[] => {
   const ne = map.project(bounds.getNorthEast())
   const sw = map.project(bounds.getSouthWest())
@@ -49,30 +76,21 @@ export const explodeBoundsIntoMesh = (map: L.Map, bounds: LatLngBounds, meshUnit
   const heightDistance = height * pixelToDistanceRatio
   const xSteps = Math.min(Math.floor(widthDistance / meshUnitSize), 100)
   const ySteps = Math.min(Math.floor(heightDistance / meshUnitSize), 100)
-  const xStepSize = width / xSteps
-  const yStepSize = height / ySteps
-  const mesh: LatLngBounds[] = []
-  for (let i = 1; i < xSteps - 1; i++) {
-    for (let j = 1; j < ySteps - 1; j++) {
-      const bsw = map.unproject([sw.x + i * xStepSize, sw.y - j * yStepSize])
-      const bne = map.unproject([sw.x + (i + 1) * xStepSize, sw.y - (j + 1) * yStepSize])
-      mesh.push(new LatLngBounds(bsw, bne))
-    }
-  }
-  return mesh
+  return _explodeBoundsIntoMesh(map, bounds, xSteps, ySteps)
 }
 
 export const isBoundCovered = (map: L.Map, bounds: LatLngBounds, loadedBounds: LatLngBounds[]): boolean => {
   // Explode the current viewbox bounds into a mesh of smaller bounds
   const boundMesh = explodeBoundsIntoMesh(map, bounds, 1000)
   // Search for a mesh unit that is not covered by the already loaded bounds
-  const meshUnitNotCovered = boundMesh.find((b) => {
-    if (loadedBounds.some((lb) => lb.contains(b))) {
-      return false
-    }
-    return true
-  })
-  return !meshUnitNotCovered
+  return !boundMesh.some((b) => !loadedBounds.some((lb) => lb.contains(b)))
+}
+
+export const uncoveredBoundMeshUnits = (map: L.Map, bounds: LatLngBounds, loadedBounds: LatLngBounds[]) => {
+  // Explode the current viewbox bounds into a mesh of smaller bounds
+  const boundMesh = _explodeBoundsIntoMesh(map, bounds, 10, 10)
+  // Search for a mesh unit that is not covered by the already loaded bounds
+  return boundMesh.filter((b) => !loadedBounds.some((lb) => lb.contains(b)))
 }
 
 /**
