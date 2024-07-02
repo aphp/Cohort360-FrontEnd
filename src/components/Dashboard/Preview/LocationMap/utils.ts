@@ -1,5 +1,4 @@
 import L, { LatLngBounds, LatLngTuple } from 'leaflet'
-import { map } from 'lodash'
 
 /**
  * Transform the string polygon description retrieved by FHIR (POLYGON((lat lng, lat lng, ...))) into an array of LatLngTuple
@@ -99,7 +98,7 @@ export const uncoveredBoundMeshUnits = (map: L.Map, bounds: LatLngBounds, loaded
 export const colorize = (colorPalette: string[], count: number, maxCount: number): string => {
   const step = maxCount / colorPalette.length
   const colorIndex = Math.floor(count / step)
-  if (colorIndex > colorPalette.length) {
+  if (colorIndex >= colorPalette.length) {
     return colorPalette[colorPalette.length - 1]
   }
   return colorPalette[colorIndex]
