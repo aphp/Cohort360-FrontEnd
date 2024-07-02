@@ -37,7 +37,7 @@ export function mapToAttribute(type: ResourceType) {
 
 export function mapToLabel(
   type: ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST
-): 'administration(s)' | 'prescriptions'
+): 'administration(s)' | 'prescription(s)'
 export function mapToLabel(type: ResourceType.CONDITION | ResourceType.CLAIM | ResourceType.PROCEDURE): PMSILabel
 export function mapToLabel(type: ResourceType) {
   switch (type) {
@@ -50,6 +50,6 @@ export function mapToLabel(type: ResourceType) {
     case ResourceType.MEDICATION_ADMINISTRATION:
       return 'administration(s)'
     case ResourceType.MEDICATION_REQUEST:
-      return 'prescriptions'
+      return 'prescription(s)'
   }
 }

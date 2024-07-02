@@ -100,6 +100,7 @@ export type PatientState = null | {
 type FetchPmsiParams = {
   options: {
     selectedTab: ResourceType.CLAIM | ResourceType.PROCEDURE | ResourceType.CONDITION
+    oldTab: ResourceType.CLAIM | ResourceType.PROCEDURE | ResourceType.CONDITION | null
     page: number
     searchCriterias: SearchCriterias<PMSIFilters>
   }
@@ -126,6 +127,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const deidentified = patientState?.deidentified ?? true
       const hospits = patientState?.hospits?.list ?? []
       const selectedTab = options.selectedTab
+      const oldTab = options.oldTab
       const sortBy = options.searchCriterias.orderBy.orderBy
       const sortDirection = options.searchCriterias.orderBy.orderDirection
       const page = options.page ?? 1
@@ -175,7 +177,12 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const pmsiReturn = {
         loading: false,
         count: pmsiResponse.pmsiTotal ?? 0,
-        total: currentPmsiState?.total ?? pmsiResponse.pmsiTotal ?? 0,
+        total:
+          selectedTab === oldTab && currentPmsiState?.total !== null
+            ? currentPmsiState?.total !== 0
+              ? currentPmsiState?.total
+              : pmsiResponse.pmsiTotal
+            : pmsiResponse.pmsiTotal,
         list: pmsiList,
         page,
         options
@@ -290,6 +297,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
 type FetchMedicationParams = {
   options: {
     selectedTab: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION
+    oldTab: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION | null
     page: number
     searchCriterias: SearchCriterias<MedicationFilters>
   }
@@ -306,7 +314,7 @@ const fetchMedication = createAsyncThunk<
   { state: RootState; rejectValue: any }
 >(
   'patient/fetchMedication',
-  async ({ options, options: { selectedTab, page, searchCriterias }, groupId, signal }, thunkApi) => {
+  async ({ options, options: { selectedTab, oldTab, page, searchCriterias }, groupId, signal }, thunkApi) => {
     try {
       const patientState = thunkApi.getState().patient
 
@@ -361,7 +369,12 @@ const fetchMedication = createAsyncThunk<
       const medicationReturn = {
         loading: false,
         count: medicationResponse.medicationTotal ?? 0,
-        total: currentMedicationState?.total ?? medicationResponse.medicationTotal ?? 0,
+        total:
+          selectedTab === oldTab && currentMedicationState?.total !== null
+            ? currentMedicationState?.total !== 0
+              ? currentMedicationState?.total
+              : medicationResponse.medicationTotal
+            : medicationResponse.medicationTotal,
         list: medicationList,
         page,
         options
