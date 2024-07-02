@@ -13,7 +13,6 @@ import {
   _explodeBoundsIntoMesh,
   colorize,
   computeNearFilter,
-  explodeBoundsIntoMesh,
   isBoundCovered,
   parseShape,
   uncoveredBoundMeshUnits
@@ -162,6 +161,9 @@ const IrisZones = (props: IrisZonesProps) => {
               )
               // update the loaded bounds
               setLoadedBounds((prevLoadedBounds) => {
+                if (prevLoadedBounds.some((b) => b.equals(bounds))) {
+                  return prevLoadedBounds
+                }
                 return prevLoadedBounds.concat(bounds)
               })
 
