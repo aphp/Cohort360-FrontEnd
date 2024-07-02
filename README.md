@@ -1,11 +1,15 @@
-![cohort360-front](https://github.com/aphp/Cohort360/actions/workflows/app.yml/badge.svg)
-
 <div align="center" style="display:flex;flex-direction:column;">
   <img src="./public/logo_c360.png" alt="Cohort360 logo" />
   <h3>A web application to find patients, build cohorts and visualize data.</h3>
 </div>
 
 # Cohort360
+
+[![Actions Status](https://github.com/aphp/Cohort360/workflows/cohort360-main-pipeline/badge.svg)](https://github.com/aphp/Cohort360/actions)
+[![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=aphp_Cohort360&metric=coverage)](https://sonarcloud.io/component_measures?id=aphp_Cohort360&metric=coverage)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=aphp_Cohort360&metric=alert_status)](https://sonarcloud.io/dashboard?id=aphp_Cohort360)
+
+
 
 ## Architecture
 
