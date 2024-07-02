@@ -334,7 +334,12 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
       )}
 
       {openModal === 'export' && (
-        <ExportModal cohortId={dashboard?.uuid ? dashboard?.uuid : '0'} open handleClose={() => handleClose()} />
+        <ExportModal
+          cohortId={dashboard?.uuid ? dashboard?.uuid : '0'}
+          open
+          handleClose={() => handleClose()}
+          fhirGroupId={cohort.cohortId ?? ''}
+        />
       )}
 
       {openModal === 'delete' && (

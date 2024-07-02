@@ -24,6 +24,9 @@ export const FHIR_API_URL = import.meta.env.DEV ? import.meta.env.VITE_FHIR_API_
 export const AUTH_API_URL = import.meta.env.DEV ? import.meta.env.VITE_AUTH_API_URL : '{VITE_AUTH_API_URL}'
 
 export const SHORT_COHORT_LIMIT = 20000
+export const EXPORT_LINES_LIMIT = import.meta.env.DEV
+  ? import.meta.env.VITE_EXPORT_TABLE_LIMIT
+  : '{VITE_EXPORT_TABLE_LIMIT}'
 
 export const CODE_HIERARCHY_EXTENSION_NAME =
   'https://terminology.eds.aphp.fr/fhir/profile/valueSet/extension/hierarchy-path-id'

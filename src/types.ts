@@ -867,10 +867,10 @@ export type ExportCSVTable = {
   label: string
   checked: boolean
   name: string
-  subtitle?: string
   fhir_filter: SavedFilter | null
   respect_table_relationships: boolean
   resourceType: ResourceType
+  count: number
 }
 
 export type SavedFilter = {

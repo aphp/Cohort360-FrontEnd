@@ -4,7 +4,6 @@ export type ExportTableType = {
   id: string[]
   name: string
   label: string
-  subtitle?: string
   resourceType: ResourceType
 }
 
@@ -25,13 +24,13 @@ const exportTable: ExportTableType[] = [
     id: ['visit_occurrence'],
     name: 'Prise en charge',
     label: 'visit_occurrence',
-    resourceType: ResourceType.UNKNOWN
+    resourceType: ResourceType.ENCOUNTER
   },
   {
     id: ['visit_detail'],
     name: 'Détail de prise en charge',
     label: 'visit_detail',
-    resourceType: ResourceType.UNKNOWN
+    resourceType: ResourceType.ENCOUNTER
   },
   {
     id: ['condition_occurrence'],
@@ -92,7 +91,7 @@ const exportTable: ExportTableType[] = [
     name: 'Formulaires',
     label:
       'questionnaire - questionnaire__item - questionnaireresponse - questionnaireresponse__item - questionnaireresponse__item__answer',
-    resourceType: ResourceType.UNKNOWN
+    resourceType: ResourceType.QUESTIONNAIRE_RESPONSE
   }
 ]
 

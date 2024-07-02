@@ -91,7 +91,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
 
   const [dialogOpen, setOpenDialog] = useState(false)
   const [selectedCohort, setSelectedCohort] = useState<Cohort | undefined>()
-  const [selectedExportableCohort, setSelectedExportableCohort] = useState<string | undefined>()
+  const [selectedExportableCohort, setSelectedExportableCohort] = useState<Cohort | undefined>()
   const [anchorEl, setAnchorEl] = React.useState(null)
   const openMenuItem = Boolean(anchorEl)
 
@@ -360,7 +360,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                   size="small"
                                   onClick={(event) => {
                                     event.stopPropagation()
-                                    setSelectedExportableCohort(row.uuid ?? undefined)
+                                    setSelectedExportableCohort(row ?? undefined)
                                   }}
                                   disabled={
                                     !canExportThisCohort ||
@@ -433,7 +433,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                               className={classes.menuItem}
                               onClick={(event) => {
                                 event.stopPropagation()
-                                setSelectedExportableCohort(row.uuid ?? undefined)
+                                setSelectedExportableCohort(row ?? undefined)
                                 setAnchorEl(null)
                               }}
                               disabled={maintenanceIsActive}
@@ -448,7 +448,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                   className={classes.menuItem}
                                   onClick={(event) => {
                                     event.stopPropagation()
-                                    setSelectedExportableCohort(row.uuid ?? undefined)
+                                    setSelectedExportableCohort(row ?? undefined)
                                     setAnchorEl(null)
                                   }}
                                   disabled={maintenanceIsActive || !row.exportable}
@@ -522,9 +522,10 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
 
       {!!ODD_EXPORT && (
         <ExportModal
-          cohortId={selectedExportableCohort ?? ''}
+          cohortId={selectedExportableCohort?.uuid ?? ''}
           open={!!selectedExportableCohort}
           handleClose={() => setSelectedExportableCohort(undefined)}
+          fhirGroupId={selectedExportableCohort?.fhir_group_id ?? ''}
         />
       )}
     </>

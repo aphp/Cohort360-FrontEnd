@@ -109,7 +109,8 @@ export const useSavedFilters = <T>(type: ResourceType) => {
       deleteSavedFilters,
       patchSavedFilter,
       selectFilter,
-      resetSavedFilterError
+      resetSavedFilterError,
+      mapToSelectedFilter
     }
   }
 }

@@ -93,9 +93,6 @@ const useStyles = makeStyles()(() => ({
     fontWeight: '600',
     padding: '0 5px 0 4px'
   },
-  tableSubtitle: {
-    color: '#fc1847'
-  },
   textBody1: {
     color: 'rgba(0, 0, 0, 0.6)',
     fontWeight: '700'
