@@ -74,6 +74,10 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
     id: ResourceType.MEDICATION_REQUEST,
     label: MedicationLabel.PRESCRIPTION
   })
+  const [oldTabs, setOldTabs] = useState<TabType<
+    ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST,
+    MedicationLabel
+  > | null>(null)
   const medicationTabs: TabType<
     ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST,
     MedicationLabel
@@ -137,6 +141,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
         fetchMedication({
           options: {
             selectedTab: selectedTab.id,
+            oldTab: oldTabs ? oldTabs.id : null,
             page,
             searchCriterias: {
               orderBy,
@@ -181,11 +186,13 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
       setEncounterStatusList(encounterStatus)
     }
     fetch()
+    setOldTabs(selectedTab)
   }, [])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
+    setOldTabs(selectedTab)
   }, [
     searchInput,
     nda,
@@ -200,6 +207,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
+    setOldTabs(selectedTab)
   }, [page])
 
   useEffect(() => {
@@ -207,6 +215,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
       controllerRef.current = cancelPendingRequest(controllerRef.current)
       _fetchMedication()
     }
+    setOldTabs(selectedTab)
   }, [loadingStatus])
 
   useEffect(() => {
@@ -272,7 +281,10 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
             active={selectedTab}
             onchange={(
               value: TabType<ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST, MedicationLabel>
-            ) => setSelectedTab(value)}
+            ) => {
+              setOldTabs(selectedTab)
+              setSelectedTab(value)
+            }}
           />
         </Grid>
         <Grid container justifyContent="center" item xs={12} md={4}>

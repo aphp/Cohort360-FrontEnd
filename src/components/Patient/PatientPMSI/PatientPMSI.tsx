@@ -74,6 +74,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
     id: ResourceType.CONDITION,
     label: PMSILabel.DIAGNOSTIC
   })
+  const [oldTabs, setOldTabs] = useState<PmsiTab | null>(null)
   const PMSITabs: PmsiTabs = [
     { label: PMSILabel.DIAGNOSTIC, id: ResourceType.CONDITION },
     { label: PMSILabel.CCAM, id: ResourceType.PROCEDURE },
@@ -132,6 +133,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
         fetchPmsi({
           options: {
             selectedTab: selectedTab.id,
+            oldTab: oldTabs ? oldTabs.id : null,
             page,
             searchCriterias: {
               orderBy,
@@ -168,6 +170,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
         /* empty */
       }
     }
+    setOldTabs(selectedTab)
     getSavedFilters()
     fetch()
   }, [])
@@ -175,13 +178,16 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
+    setOldTabs(selectedTab)
   }, [searchInput, nda, code, startDate, endDate, diagnosticTypes, source, orderBy, executiveUnits, encounterStatus])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
+    setOldTabs(selectedTab)
   }, [page])
 
   useEffect(() => {
+    setOldTabs(selectedTab)
     if (loadingStatus === LoadingStatus.IDDLE) {
       controllerRef.current = cancelPendingRequest(controllerRef.current)
       _fetchPMSI()
@@ -273,7 +279,9 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                 active={selectedTab}
                 onchange={(
                   value: TabType<ResourceType.CONDITION | ResourceType.PROCEDURE | ResourceType.CLAIM, PMSILabel>
-                ) => setSelectedTab(value)}
+                ) => {
+                  setOldTabs(selectedTab), setSelectedTab(value)
+                }}
               />
             </Grid>
             <Grid item xs={12} md={12} lg={4} xl={4} container justifyContent="center">
