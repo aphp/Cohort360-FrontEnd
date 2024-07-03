@@ -1,20 +1,30 @@
-import { CLAIM_HIERARCHY, CONDITION_HIERARCHY, PROCEDURE_HIERARCHY } from '../../../constants'
+import {
+  BIOLOGY_HIERARCHY_ITM_ANABIO,
+  BIOLOGY_HIERARCHY_ITM_LOINC,
+  CLAIM_HIERARCHY,
+  CONDITION_HIERARCHY,
+  PROCEDURE_HIERARCHY
+} from '../../../constants'
 import { mapRequestParamsToSearchCriteria } from 'mappers/filters'
 import moment from 'moment'
 import {
   fetchClaim,
   fetchCondition,
+  fetchDocumentReference,
   fetchEncounter,
   fetchForms,
   fetchImaging,
   fetchMedicationAdministration,
   fetchMedicationRequest,
+  fetchObservation,
   fetchPatient,
   fetchProcedure
 } from 'services/aphp/callApi'
 import { ExportCSVTable } from 'types'
 import { ResourceType } from 'types/requestCriterias'
 import {
+  BiologyFilters,
+  DocumentsFilters,
   ImagingFilters,
   MedicationFilters,
   PMSIFilters,
@@ -31,8 +41,10 @@ export type Counts = {
   conditionCount?: number
   procedureCount?: number
   claimCount?: number
+  documentsCount?: number
   medicationRequestCount?: number
   medicationAdministrationCount?: number
+  observationCount?: number
   imagingCount?: number
   questionnaireResponseCount?: number
 }
@@ -47,6 +59,8 @@ export type ResourcesWithExportTables =
   | ResourceType.MEDICATION_ADMINISTRATION
   | ResourceType.IMAGING
   | ResourceType.QUESTIONNAIRE_RESPONSE
+  | ResourceType.DOCUMENTS
+  | ResourceType.OBSERVATION
 
 const fetchPatientCount = async (cohortId: string, patientsFilters?: SearchCriterias<PatientsFilters>) => {
   try {
@@ -282,6 +296,71 @@ const fetchQuestionnaireCount = async (cohortId: string) => {
   }
 }
 
+const fetchDocumentsCount = async (cohortId: string, documentsFilters?: SearchCriterias<DocumentsFilters>) => {
+  try {
+    let docResp
+    if (documentsFilters && documentsFilters !== null) {
+      const { nda, startDate, endDate, executiveUnits, encounterStatus, ipp, docTypes, docStatuses } =
+        documentsFilters.filters
+
+      docResp = await fetchDocumentReference({
+        size: 0,
+        _list: [cohortId],
+        searchBy: documentsFilters.searchBy,
+        docStatuses: docStatuses,
+        _text: documentsFilters.searchInput,
+        type: docTypes.map((docType) => docType.code).join(),
+        'encounter-identifier': nda,
+        'patient-identifier': ipp,
+        minDate: startDate ?? '',
+        maxDate: endDate ?? '',
+        executiveUnits: executiveUnits.map((unit) => unit.id),
+        encounterStatus: encounterStatus.map((status) => status.id)
+      })
+    } else {
+      docResp = await fetchDocumentReference({ size: 0, _list: [cohortId] })
+    }
+    const count = docResp.data.resourceType === 'Bundle' ? docResp.data.total : 0
+
+    return count
+  } catch (error) {
+    console.error('Erreur lors de fetchDocumentsCount', error)
+    throw error
+  }
+}
+
+const fetchObservationCount = async (cohortId: string, observationFilters?: SearchCriterias<BiologyFilters>) => {
+  try {
+    let observationResp
+    if (observationFilters && observationFilters !== null) {
+      const { nda, startDate, endDate, executiveUnits, encounterStatus, loinc, anabio, validatedStatus } =
+        observationFilters.filters
+
+      observationResp = await fetchObservation({
+        size: 0,
+        _list: [cohortId],
+        _text: observationFilters.searchInput,
+        encounter: nda,
+        loinc: loinc.map((e) => encodeURIComponent(`${BIOLOGY_HIERARCHY_ITM_LOINC}|`) + e.id).join(','),
+        anabio: anabio.map((e) => encodeURIComponent(`${BIOLOGY_HIERARCHY_ITM_ANABIO}|`) + e.id).join(','),
+        minDate: startDate ?? '',
+        maxDate: endDate ?? '',
+        rowStatus: validatedStatus,
+        executiveUnits: executiveUnits.map((unit) => unit.id),
+        encounterStatus: encounterStatus.map((status) => status.id)
+      })
+    } else {
+      observationResp = await fetchObservation({ size: 0, _list: [cohortId], rowStatus: false })
+    }
+    const count = observationResp.data.resourceType === 'Bundle' ? observationResp.data.total : 0
+
+    return count
+  } catch (error) {
+    console.error('Erreur lors de fetchObservationCount', error)
+    throw error
+  }
+}
+
 export const fetchAllResourcesCount = async (cohortId: string) => {
   try {
     const [
@@ -289,8 +368,10 @@ export const fetchAllResourcesCount = async (cohortId: string) => {
       conditionCount,
       procedureCount,
       claimCount,
+      documentsCount,
       medicationRequestCount,
       medicationAdministrationCount,
+      observationCount,
       imagingCount,
       encounterVisitCount,
       encounterDetailsCounts,
@@ -300,8 +381,10 @@ export const fetchAllResourcesCount = async (cohortId: string) => {
       fetchConditionCount(cohortId),
       fetchProcedureCount(cohortId),
       fetchClaimCount(cohortId),
+      fetchDocumentsCount(cohortId),
       fetchMedicationCount(cohortId, ResourceType.MEDICATION_REQUEST),
       fetchMedicationCount(cohortId, ResourceType.MEDICATION_ADMINISTRATION),
+      fetchObservationCount(cohortId),
       fetchImagingCount(cohortId),
       fetchEncounterCount(cohortId, true),
       fetchEncounterCount(cohortId),
@@ -313,8 +396,10 @@ export const fetchAllResourcesCount = async (cohortId: string) => {
       conditionCount,
       procedureCount,
       claimCount,
+      documentsCount,
       medicationRequestCount,
       medicationAdministrationCount,
+      observationCount,
       imagingCount,
       encounterVisitCount,
       encounterDetailsCounts,
@@ -335,12 +420,14 @@ export const fetchResourceCount = async (cohortId: string, table: ExportCSVTable
       [ResourceType.CONDITION]: fetchConditionCount,
       [ResourceType.PROCEDURE]: fetchProcedureCount,
       [ResourceType.CLAIM]: fetchClaimCount,
+      [ResourceType.DOCUMENTS]: fetchDocumentsCount,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       [ResourceType.MEDICATION_REQUEST]: (cohortId: string, filters: any) =>
         fetchMedicationCount(cohortId, ResourceType.MEDICATION_REQUEST, filters),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       [ResourceType.MEDICATION_ADMINISTRATION]: (cohortId: string, filters: any) =>
         fetchMedicationCount(cohortId, ResourceType.MEDICATION_ADMINISTRATION, filters),
+      [ResourceType.OBSERVATION]: fetchObservationCount,
       [ResourceType.IMAGING]: fetchImagingCount
     }
 
@@ -351,8 +438,10 @@ export const fetchResourceCount = async (cohortId: string, table: ExportCSVTable
           | ResourceType.CONDITION
           | ResourceType.PROCEDURE
           | ResourceType.CLAIM
+          | ResourceType.DOCUMENTS
           | ResourceType.MEDICATION_REQUEST
           | ResourceType.MEDICATION_ADMINISTRATION
+          | ResourceType.OBSERVATION
           | ResourceType.IMAGING
       ]
 
@@ -371,8 +460,10 @@ export const getRightCount = (counts: Counts, tableResourceType: ResourcesWithEx
     [ResourceType.CONDITION]: counts?.conditionCount,
     [ResourceType.PROCEDURE]: counts?.procedureCount,
     [ResourceType.CLAIM]: counts?.claimCount,
+    [ResourceType.DOCUMENTS]: counts?.documentsCount,
     [ResourceType.MEDICATION_REQUEST]: counts?.medicationRequestCount,
     [ResourceType.MEDICATION_ADMINISTRATION]: counts?.medicationAdministrationCount,
+    [ResourceType.OBSERVATION]: counts?.observationCount,
     [ResourceType.IMAGING]: counts?.imagingCount,
     [ResourceType.QUESTIONNAIRE_RESPONSE]: counts?.questionnaireResponseCount
   }

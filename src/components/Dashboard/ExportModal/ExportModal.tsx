@@ -567,10 +567,11 @@ const ExportTable: React.FC<ExportTableProps> = ({
       }
 
       handleTransferRequestChange(_transferRequest)
-      setCountLoading(false)
     } catch (error) {
       console.error('Erreur lors du fetch du count de la ressource', error)
       setError(Error.ERROR_FETCH)
+    } finally {
+      setCountLoading(false)
     }
   }
 

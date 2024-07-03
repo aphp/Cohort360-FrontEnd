@@ -50,12 +50,12 @@ const exportTable: ExportTableType[] = [
     label: 'cost',
     resourceType: ResourceType.CLAIM
   },
-  // {
-  //   id: ['note'],
-  //   name: 'Fait - Documents cliniques',
-  //   label: 'note',
-  //   resourceType: ResourceType.DOCUMENTS
-  // },
+  {
+    id: ['note'],
+    name: 'Fait - Documents cliniques',
+    label: 'note',
+    resourceType: ResourceType.DOCUMENTS
+  },
   {
     id: ['drug_exposure_prescription'],
     name: 'Fait - Médicaments - Prescription',
@@ -67,6 +67,12 @@ const exportTable: ExportTableType[] = [
     name: 'Fait - Médicaments - Administration',
     label: 'drug_exposure_administration',
     resourceType: ResourceType.MEDICATION_ADMINISTRATION
+  },
+  {
+    id: ['measurement'],
+    name: 'Fait - Biologie',
+    label: 'measurement',
+    resourceType: ResourceType.OBSERVATION
   },
   {
     id: ['care_site', 'fact_relationship'],
