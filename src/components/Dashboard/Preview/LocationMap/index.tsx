@@ -13,6 +13,7 @@ import {
   _explodeBoundsIntoMesh,
   colorize,
   computeNearFilter,
+  getColorPalette,
   isBoundCovered,
   parseShape,
   uncoveredBoundMeshUnits
@@ -68,6 +69,7 @@ const IrisZones = (props: IrisZonesProps) => {
   const [loadedBounds, setLoadedBounds] = useState<LatLngBounds[]>([])
   const [maxCount, setMaxCount] = useState(MAX_COUNT_DEFAULT)
   const [zoneOpacity, setZoneOpacity] = useState(ZONE_COLOR_OPACITY * 100)
+  const colorPalette = getColorPalette(COLOR_PALETTE, maxCount)
 
   const updateBounds = useCallback((newBounds: LatLngBounds) => {
     setBounds((prevBounds) => {
@@ -188,11 +190,13 @@ const IrisZones = (props: IrisZonesProps) => {
     const newVisibleZones = zones.filter((zone) => zone.shape.find((shape) => bounds?.contains(shape)))
     setVisibleZones(newVisibleZones)
     const maxCount =
-      d3.quantile(
-        newVisibleZones.map((zone) => zone.meta.count),
-        MAX_COUNT_QUANTILE
-      ) || Math.max(...newVisibleZones.map((zone) => zone.meta.count))
-    setMaxCount(maxCount)
+      newVisibleZones.length === 0
+        ? MAX_COUNT_DEFAULT
+        : d3.quantile(
+            newVisibleZones.map((zone) => zone.meta.count),
+            MAX_COUNT_QUANTILE
+          ) || Math.max(...newVisibleZones.map((zone) => zone.meta.count))
+    setMaxCount(Math.floor(maxCount))
   }, [zones, bounds])
 
   /***************************************************** */
@@ -286,7 +290,7 @@ const IrisZones = (props: IrisZonesProps) => {
         <Polygon
           key={i}
           pathOptions={{
-            color: colorize(COLOR_PALETTE, zone.meta.count, maxCount),
+            color: colorize(colorPalette, zone.meta.count, maxCount),
             opacity: (BORDER_RELATIVE_OPACITY * zoneOpacity) / 100,
             fillOpacity: zoneOpacity / 100
           }}
@@ -300,13 +304,13 @@ const IrisZones = (props: IrisZonesProps) => {
           </Tooltip>
         </Polygon>
       ))}
-      <MapLegend maxCount={maxCount} />
+      <MapLegend maxCount={maxCount} colorPalette={colorPalette} />
     </div>
   )
 }
 
-const MapLegend = (props: { maxCount: number }) => {
-  const { maxCount } = props
+const MapLegend = (props: { maxCount: number; colorPalette: string[] }) => {
+  const { maxCount, colorPalette } = props
   return (
     <div
       className="leaflet-control leaflet-bar"
@@ -326,7 +330,7 @@ const MapLegend = (props: { maxCount: number }) => {
       <div>
         <div>Densité</div>
         <div style={{ display: 'flex', justifyContent: 'center', width: '100%', height: '10px' }}>
-          {COLOR_PALETTE.map((color, i) => (
+          {colorPalette.map((color, i) => (
             <div key={i} style={{ flexGrow: 1, backgroundColor: color }} />
           ))}
         </div>
@@ -337,7 +341,7 @@ const MapLegend = (props: { maxCount: number }) => {
           }}
         >
           <div>1</div>
-          <div>{Math.max(Math.round(maxCount / 10), 1) * 10}+</div>
+          <div>{maxCount}+</div>
         </div>
       </div>
     </div>

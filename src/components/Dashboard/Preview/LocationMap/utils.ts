@@ -92,6 +92,17 @@ export const uncoveredBoundMeshUnits = (map: L.Map, bounds: LatLngBounds, loaded
   return boundMesh.filter((b) => !loadedBounds.some((lb) => lb.contains(b)))
 }
 
+export const getColorPalette = (colors: string[], maxCount: number): string[] => {
+  if (maxCount >= colors.length) {
+    return colors
+  }
+  const colorPalette: string[] = [colors[0]]
+  for (let i = 1; i < maxCount; i++) {
+    colorPalette.push(colors[i])
+  }
+  return colorPalette
+}
+
 /**
  * Colorize a count based on a color palette
  */
