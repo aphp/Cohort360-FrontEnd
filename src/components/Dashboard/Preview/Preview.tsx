@@ -8,7 +8,9 @@ import {
   Table,
   TableBody,
   TableContainer,
-  Typography
+  Typography,
+  IconButton,
+  Tooltip
 } from '@mui/material'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
@@ -17,6 +19,7 @@ import BarChart from './Charts/BarChart'
 import GroupedBarChart from './Charts/GroupedBarChart'
 import DonutChart from './Charts/DonutChart'
 import PyramidChart from './Charts/PyramidChart'
+import InfoIcon from '@mui/icons-material/Info'
 
 import useStyles from './styles'
 import clsx from 'clsx'
@@ -239,6 +242,11 @@ const Preview: React.FC<PreviewProps> = ({
               <Grid container item className={classes.chartTitle}>
                 <Typography id="location-map-card-title" variant="h3" color="primary">
                   Répartition spatiale par zone IRIS
+                  <Tooltip title="Les localisations des patients sont affichées uniquement si leur adresse est disponible (certains patients n'ayant pas d'adresse associée).">
+                    <IconButton style={{ padding: '0 0 0 4px', marginTop: '-2.5px', position: 'absolute' }}>
+                      <InfoIcon style={{ height: 22 }} />
+                    </IconButton>
+                  </Tooltip>
                 </Typography>
               </Grid>
 
