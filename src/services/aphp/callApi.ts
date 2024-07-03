@@ -184,7 +184,7 @@ export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Pro
   facet = facet ? facet.filter(uniq) : []
 
   // By default, all the calls to `/Encounter` will have 'subject.active=true' in parameter
-  let options: string[] = ['subject.active=true', visit ? `part-of:missing=true` : `part-of:missing=false`]
+  let options: string[] = ['subject.active=true']
   if (_id) options = [...options, `_id=${_id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
@@ -195,6 +195,7 @@ export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Pro
   if (status && status.length > 0) options = [...options, `status=${status.reduce(paramValuesReducer)}`]
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer, '')}`]
   if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(paramValuesReducer, '')}`]
+  visit ? (options = [...options, `part-of:missing=true`]) : (options = [...options, `part-of:missing=false`])
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Encounter>>(`/Encounter?${options.reduce(paramsReducer)}`, {
     signal: signal
