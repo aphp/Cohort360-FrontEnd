@@ -1,6 +1,6 @@
 {
   "name": "cohort360_react",
-  "version": "2.37.2",
+  "version": "2.37.3",
   "private": true,
   "type": "module",
   "dependencies": {
