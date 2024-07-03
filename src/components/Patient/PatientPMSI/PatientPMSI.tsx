@@ -280,7 +280,8 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                 onchange={(
                   value: TabType<ResourceType.CONDITION | ResourceType.PROCEDURE | ResourceType.CLAIM, PMSILabel>
                 ) => {
-                  setOldTabs(selectedTab), setSelectedTab(value)
+                  setOldTabs(selectedTab)
+                  setSelectedTab(value)
                 }}
               />
             </Grid>
