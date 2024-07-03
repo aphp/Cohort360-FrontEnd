@@ -56,7 +56,7 @@ const initialState: ExportCSVForm = {
   }))
 }
 
-const resourcesWithNoFilters = [ResourceType.ENCOUNTER, ResourceType.QUESTIONNAIRE_RESPONSE]
+const resourcesWithNoFilters = [ResourceType.ENCOUNTER, ResourceType.QUESTIONNAIRE_RESPONSE, ResourceType.UNKNOWN]
 
 enum Error {
   ERROR_MOTIF,
@@ -116,7 +116,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
         ...initialState,
         tables: initialState.tables.map((table) => ({
           ...table,
-          count: getRightCount(counts, table.resourceType as ResourcesWithExportTables, table.label)
+          count: getRightCount(counts, table.resourceType as ResourcesWithExportTables)
         }))
       }
 
@@ -140,10 +140,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
       newSelectedTables
         .filter(
           (table) =>
-            table.checked &&
-            table.resourceType !== ResourceType.UNKNOWN &&
-            ((table.count > EXPORT_LINES_LIMIT && resourcesWithNoFilters.includes(table.resourceType)) ||
-              !resourcesWithNoFilters.includes(table.resourceType))
+            table.checked && (table.count > EXPORT_LINES_LIMIT || !resourcesWithNoFilters.includes(table.resourceType))
         )
         .map((table) => table.label)
     )
@@ -157,10 +154,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
       checked: table.label === selectedTable.label ? !table.checked : table.checked
     }))
 
-    const expandableTables =
-      selectedTable.resourceType !== ResourceType.UNKNOWN &&
-      ((selectedTable.count > EXPORT_LINES_LIMIT && resourcesWithNoFilters.includes(selectedTable.resourceType)) ||
-        !resourcesWithNoFilters.includes(selectedTable.resourceType))
+    const expandableTables = !resourcesWithNoFilters.includes(selectedTable.resourceType)
     const isSelectedTableChecked = existingTables.find((table) => table.label === selectedTable.label)?.checked
 
     if (expandableTables) {
@@ -212,7 +206,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
     return (
       <ExportTableAccordion key={label} expanded={isItemExpanded} error={checked && count > EXPORT_LINES_LIMIT}>
         <ExportTableAccordionSummary
-          style={resourceType === ResourceType.UNKNOWN ? { cursor: 'default' } : {}}
+          style={resourcesWithNoFilters.includes(resourceType) ? { cursor: 'default' } : {}}
           expandIcon={
             <Checkbox
               disabled={label === 'person'}
@@ -260,12 +254,12 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
               textAlign={'center'}
               color={checked ? '#153D8A' : '#888'}
             >
-              {resourceType !== ResourceType.UNKNOWN &&
+              {!resourcesWithNoFilters.includes(resourceType) &&
                 (_countLoading ? <CircularProgress size={15} /> : `${count} lignes`)}
             </Typography>
           </Grid>
         </ExportTableAccordionSummary>
-        {resourceType !== ResourceType.UNKNOWN && (
+        {!resourcesWithNoFilters.includes(resourceType) && (
           <AccordionDetails className={classes.accordionContent}>
             <ExportTable
               key={name}
@@ -638,10 +632,8 @@ const ExportTable: React.FC<ExportTableProps> = ({
       </Grid>
       {exportTable.checked && exportTable.count > EXPORT_LINES_LIMIT && (
         <Typography color={'red'} fontWeight={'bold'} fontSize={12}>
-          La table sélectionnée dépasse la limite de {EXPORT_LINES_LIMIT} tables autorisées.
-          {resourcesWithNoFilters.includes(exportTable.resourceType)
-            ? " Veuillez décocher cette table pour pouvoir procéder à l'export."
-            : " Veuillez affiner votre sélection à l'aide de filtres ou déselectionner la table."}
+          La table sélectionnée dépasse la limite de {EXPORT_LINES_LIMIT} lignes autorisées. Veuillez affiner votre
+          sélection à l'aide de filtres ou désélectionner la table.
         </Typography>
       )}
     </Grid>

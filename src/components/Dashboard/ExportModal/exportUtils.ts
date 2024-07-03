@@ -36,8 +36,6 @@ import { substructAgeString } from 'utils/age'
 
 export type Counts = {
   patientCount?: number
-  encounterVisitCount?: number
-  encounterDetailsCounts?: number
   conditionCount?: number
   procedureCount?: number
   claimCount?: number
@@ -46,19 +44,16 @@ export type Counts = {
   medicationAdministrationCount?: number
   observationCount?: number
   imagingCount?: number
-  questionnaireResponseCount?: number
 }
 
 export type ResourcesWithExportTables =
   | ResourceType.PATIENT
-  | ResourceType.ENCOUNTER
   | ResourceType.CONDITION
   | ResourceType.PROCEDURE
   | ResourceType.CLAIM
   | ResourceType.MEDICATION_REQUEST
   | ResourceType.MEDICATION_ADMINISTRATION
   | ResourceType.IMAGING
-  | ResourceType.QUESTIONNAIRE_RESPONSE
   | ResourceType.DOCUMENTS
   | ResourceType.OBSERVATION
 
@@ -452,11 +447,9 @@ export const fetchResourceCount = async (cohortId: string, table: ExportCSVTable
   }
 }
 
-export const getRightCount = (counts: Counts, tableResourceType: ResourcesWithExportTables, tableLabel: string) => {
+export const getRightCount = (counts: Counts, tableResourceType: ResourcesWithExportTables) => {
   const countMapping = {
     [ResourceType.PATIENT]: counts?.patientCount,
-    [ResourceType.ENCOUNTER]:
-      tableLabel === 'visit_occurrence' ? counts?.encounterVisitCount : counts?.encounterDetailsCounts,
     [ResourceType.CONDITION]: counts?.conditionCount,
     [ResourceType.PROCEDURE]: counts?.procedureCount,
     [ResourceType.CLAIM]: counts?.claimCount,
@@ -464,8 +457,7 @@ export const getRightCount = (counts: Counts, tableResourceType: ResourcesWithEx
     [ResourceType.MEDICATION_REQUEST]: counts?.medicationRequestCount,
     [ResourceType.MEDICATION_ADMINISTRATION]: counts?.medicationAdministrationCount,
     [ResourceType.OBSERVATION]: counts?.observationCount,
-    [ResourceType.IMAGING]: counts?.imagingCount,
-    [ResourceType.QUESTIONNAIRE_RESPONSE]: counts?.questionnaireResponseCount
+    [ResourceType.IMAGING]: counts?.imagingCount
   }
 
   return countMapping[tableResourceType] ?? 0
