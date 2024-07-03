@@ -190,12 +190,12 @@ export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Pro
   if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (patient) options = [...options, `subject=${patient}`]
-  if (visit) options = [...options, visit === true ? `part-of:missing=true` : `part-of:missing=false`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
   if (status && status.length > 0) options = [...options, `status=${status.reduce(paramValuesReducer)}`]
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer, '')}`]
   if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(paramValuesReducer, '')}`]
+  visit ? (options = [...options, `part-of:missing=true`]) : (options = [...options, `part-of:missing=false`])
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Encounter>>(`/Encounter?${options.reduce(paramsReducer)}`, {
     signal: signal
@@ -947,9 +947,10 @@ type fetchFormsProps = {
   endDate?: string | null
   executiveUnits?: string[]
   encounterStatus?: string[]
+  size?: number
 }
 export const fetchForms = async (args: fetchFormsProps) => {
-  const { patient, formName, _list, startDate, endDate, executiveUnits, encounterStatus } = args
+  const { patient, formName, _list, startDate, endDate, executiveUnits, encounterStatus, size } = args
   let options: string[] = ['status=in-progress,completed']
   if (patient) options = [...options, `subject=${patient}`]
   if (formName) options = [...options, `${QuestionnaireResponseParamsKeys.NAME}=${formName}`]
@@ -960,6 +961,7 @@ export const fetchForms = async (args: fetchFormsProps) => {
     options = [...options, `${QuestionnaireResponseParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
+  if (size !== undefined) options = [...options, `_count=${size}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<QuestionnaireResponse>>(
     `/QuestionnaireResponse?${options.reduce(paramsReducer)}`

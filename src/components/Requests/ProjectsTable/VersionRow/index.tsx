@@ -41,7 +41,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<string | null>(null)
+  const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<Cohort | null>(null)
 
   const cohorts: Cohort[] =
     cohortsList
@@ -149,7 +149,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                   <TableCellWrapper>
                     <IconButton
                       disabled={!canExportThisCohort}
-                      onClick={canExportThisCohort ? () => setSelectedExportableCohort(cohort.uuid ?? '') : () => null}
+                      onClick={canExportThisCohort ? () => setSelectedExportableCohort(cohort ?? '') : () => null}
                     >
                       <ExportIcon />
                     </IconButton>
@@ -180,7 +180,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
 
       {!!ODD_EXPORT && (
         <ExportModal
-          cohortId={selectedExportableCohort ?? ''}
+          cohortId={selectedExportableCohort?.uuid ?? ''}
+          fhirGroupId={selectedExportableCohort?.fhir_group_id ?? ''}
           open={!!selectedExportableCohort}
           handleClose={() => setSelectedExportableCohort(null)}
         />

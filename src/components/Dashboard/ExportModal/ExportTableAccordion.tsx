@@ -1,10 +1,14 @@
 import { Accordion, AccordionSummary, styled } from '@mui/material'
 
-export const ExportTableAccordion = styled(Accordion)(({ theme }) => ({
-  border: `1px solid ${theme.palette.divider}`,
+type CustomProps = {
+  error: boolean
+}
+
+export const ExportTableAccordion = styled(Accordion)<CustomProps>(({ theme, error }) => ({
+  border: `${error ? 2 : 1}px solid ${error ? 'red' : theme.palette.divider}`,
   width: '100%',
   '&:not(:last-child)': {
-    borderBottom: 0
+    borderBottom: `${error ? '2px solid red' : 0}`
   },
   '&::before': {
     display: 'none'
