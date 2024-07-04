@@ -25,6 +25,8 @@ import ShareIcon from '@mui/icons-material/Share'
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
 import UpdateSharpIcon from '@mui/icons-material/UpdateSharp'
 
+import { WebSocketJobStatus } from 'types'
+
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
 
@@ -35,7 +37,8 @@ import {
   deleteCriteriaGroup,
   buildCohortCreation,
   unbuildCohortCreation,
-  addActionToNavHistory
+  addActionToNavHistory,
+  updateCount
 } from 'state/cohortCreation'
 
 import {
@@ -46,7 +49,6 @@ import {
   RequestType,
   SimpleStatus,
   Snapshot,
-  WebSocketJobName,
   WebSocketMessage
 } from 'types'
 
@@ -54,7 +56,6 @@ import useStyle from './styles'
 
 import displayDigit from 'utils/displayDigit'
 import { ODD_FEASABILITY_REPORT, SHORT_COHORT_LIMIT } from '../../../constants'
-import { WebSocketJobStatus } from 'types'
 import services from 'services/aphp'
 import ValidationDialog from 'components/ui/ValidationDialog'
 import { JToolComponentEggWrapper } from 'components/Impersonation/JTool'
@@ -100,10 +101,6 @@ const ControlPanel: React.FC<{
     snapshotsHistory
   } = useAppSelector((state) => state.cohortCreation.request || {})
   const { uuid, includePatient, status, jobFailMsg } = count
-
-  const [patientCount, setPatientCount] = useState(includePatient)
-  const [countError, setCountError] = useState<string | undefined>(jobFailMsg)
-  const [countStatus, setCountStatus] = useState<string | undefined>(status)
 
   const [requestShare, setRequestShare] = useState<RequestType | null>({
     currentSnapshot,
@@ -222,30 +219,20 @@ const ControlPanel: React.FC<{
       setCountLoading(LoadingStatus.FETCHING)
       dispatch(countCohortCreation({ uuid: uuid }))
     }
-    setCountStatus(status)
-    setCountError(jobFailMsg)
-  }, [dispatch, status, uuid, jobFailMsg])
-
-  useEffect(() => {
-    setPatientCount(includePatient)
-  }, [includePatient])
+  }, [dispatch, status, uuid, jobFailMsg, includePatient])
 
   useEffect(() => {
     const listener = (message: WebSocketMessage) => {
-      if (
-        message.job_name === WebSocketJobName.COUNT &&
-        message.status === WebSocketJobStatus.finished &&
-        message.extra_info?.measure !== null
-      ) {
-        setPatientCount(message.extra_info?.measure)
+      let response = {}
+      if (message.status !== WebSocketJobStatus.pending) {
         setCountLoading(LoadingStatus.SUCCESS)
+        response = {
+          includePatient: message.extra_info?.measure,
+          status: message.status,
+          jobFailMsg: message.extra_info?.request_job_fail_msg
+        }
       }
-      if (message.job_name === WebSocketJobName.COUNT && message.status === WebSocketJobStatus.failed) {
-        setCountStatus('failed')
-        setPatientCount(message.extra_info?.measure)
-        setCountError(message.extra_info?.request_job_fail_msg)
-        setCountLoading(LoadingStatus.SUCCESS)
-      }
+      dispatch(updateCount(response))
     }
 
     webSocketContext?.addListener(listener)
@@ -262,7 +249,7 @@ const ControlPanel: React.FC<{
               typeof onExecute !== 'function' ||
               maintenanceIsActive ||
               count_outdated ||
-              patientCount === 0
+              includePatient === 0
             }
             onClick={() => onSetOpenModal('executeCohortConfirmation')}
             className={classes.requestExecution}
@@ -378,19 +365,19 @@ const ControlPanel: React.FC<{
             ) : (
               <Grid container alignItems="center" style={{ width: 'fit-content' }}>
                 <Typography className={cx(classes.boldText, classes.patientTypo, classes.blueText)}>
-                  {displayDigit(patientCount)}
+                  {displayDigit(includePatient)}
                   {oldCount !== null && !!oldCount.includePatient
-                    ? (patientCount ?? 0) - oldCount.includePatient > 0
-                      ? ` (+${(patientCount ?? 0) - oldCount.includePatient})`
-                      : ` (${(patientCount ?? 0) - oldCount.includePatient})`
+                    ? (includePatient ?? 0) - oldCount.includePatient > 0
+                      ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`
+                      : ` (${(includePatient ?? 0) - oldCount.includePatient})`
                     : ''}
                 </Typography>
                 {oldCount !== null && !!oldCount.includePatient && (
                   <Tooltip
                     title={`Le delta ${
-                      (patientCount ?? 0) - oldCount.includePatient > 0
-                        ? ` (+${(patientCount ?? 0) - oldCount.includePatient})`
-                        : ` (${(patientCount ?? 0) - oldCount.includePatient})`
+                      (includePatient ?? 0) - oldCount.includePatient > 0
+                        ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`
+                        : ` (${(includePatient ?? 0) - oldCount.includePatient})`
                     } est la différence de patient entre le ${lastUpdatedOldCount?.format(
                       'DD/MM/YYYY'
                     )} et la date du jour.`}
@@ -402,7 +389,7 @@ const ControlPanel: React.FC<{
             )}
           </Grid>
         </Grid>
-        {!status && !patientCount && (
+        {!status && !includePatient && (
           <Alert className={classes.errorAlert} severity="info">
             Votre requête ne contient pas de nombre de patient.
             <br />
@@ -418,11 +405,11 @@ const ControlPanel: React.FC<{
             </Button>
           </Alert>
         )}
-        {(countStatus === 'failed' || countStatus === 'error') && (
+        {(status === 'failed' || status === 'error') && (
           <Alert className={classes.errorAlert} severity="error">
             Une erreur est survenue lors du calcul du nombre de patients de votre requête.
             <br />
-            <Typography style={{ wordBreak: 'break-all' }}>{countError}</Typography>
+            <Typography style={{ wordBreak: 'break-all' }}>{jobFailMsg}</Typography>
             <br />
             <Button
               onClick={() => _relaunchCount(false)}
@@ -510,7 +497,7 @@ const ControlPanel: React.FC<{
         <ModalCohortTitle
           onExecute={onExecute}
           onClose={() => onSetOpenModal(null)}
-          longCohort={patientCount ? patientCount > cohortLimit : false}
+          longCohort={includePatient ? includePatient > cohortLimit : false}
           cohortLimit={cohortLimit}
         />
       )}
