@@ -96,8 +96,12 @@ export const getColorPalette = (colors: string[], maxCount: number): string[] =>
   if (maxCount >= colors.length) {
     return colors
   }
+  if (maxCount === 2) {
+    return [colors[0], colors[colors.length - 1]]
+  }
   const colorPalette: string[] = [colors[0]]
-  for (let i = 1; i < maxCount; i++) {
+  const inc = Math.floor(colors.length / maxCount)
+  for (let i = inc; i < colors.length; i += inc) {
     colorPalette.push(colors[i])
   }
   return colorPalette
@@ -108,7 +112,7 @@ export const getColorPalette = (colors: string[], maxCount: number): string[] =>
  */
 export const colorize = (colorPalette: string[], count: number, maxCount: number): string => {
   const step = maxCount / colorPalette.length
-  const colorIndex = Math.floor(count / step)
+  const colorIndex = Math.floor((count - 0.1) / step)
   if (colorIndex >= colorPalette.length) {
     return colorPalette[colorPalette.length - 1]
   }
