@@ -63,7 +63,7 @@ const IrisZones = (props: IrisZonesProps) => {
   const [dataLoadingProgress, setDataLoadingProgress] = useState(0)
   const [zones, setZones] = useState<Array<{ shape: LatLngTuple[]; meta: { count: number; name: string } }>>([])
   const [visibleZones, setVisibleZones] = useState<
-    Array<{ shape: LatLngTuple[]; meta: { count: number; name: string } }>
+    Array<{ shape: LatLngTuple[]; meta: { count: number; name: string; id?: string } }>
   >([])
   const [bounds, setBounds] = useState<LatLngBounds | null>(null)
   const [loadedBounds, setLoadedBounds] = useState<LatLngBounds[]>([])
@@ -147,6 +147,7 @@ const IrisZones = (props: IrisZonesProps) => {
               const existingNames = existingZones.map((zone) => zone.meta.name)
               const newZones = existingZones.concat(
                 locations
+                  .filter((ft, i) => locations.findIndex((f) => ft.id === f.id) === i) // to filter out duplicates
                   .filter((ft) => ft.name && existingNames.indexOf(ft.name) === -1)
                   .map((ft) => {
                     return {
@@ -156,7 +157,8 @@ const IrisZones = (props: IrisZonesProps) => {
                         ) || [],
                       meta: {
                         count: ft.extension?.find((ext) => ext.url === LOCATION_COUNT_EXTENSION_URL)?.valueInteger || 0,
-                        name: ft.name || ''
+                        name: ft.name || '',
+                        id: ft.id
                       }
                     }
                   })
@@ -286,24 +288,26 @@ const IrisZones = (props: IrisZonesProps) => {
             ))}
         </div>
       )}
-      {visibleZones.map((zone, i) => (
-        <Polygon
-          key={i}
-          pathOptions={{
-            color: colorize(colorPalette, zone.meta.count, maxCount),
-            opacity: (BORDER_RELATIVE_OPACITY * zoneOpacity) / 100,
-            fillOpacity: zoneOpacity / 100
-          }}
-          positions={zone.shape}
-        >
-          <Tooltip sticky>
-            <div>
-              <b>{zone.meta.name}</b>
-            </div>
-            <div>Total: {zone.meta.count}</div>
-          </Tooltip>
-        </Polygon>
-      ))}
+      {visibleZones.map((zone, i) => {
+        return (
+          <Polygon
+            key={i}
+            pathOptions={{
+              color: colorize(colorPalette, zone.meta.count, maxCount),
+              opacity: (BORDER_RELATIVE_OPACITY * zoneOpacity) / 100,
+              fillOpacity: zoneOpacity / 100
+            }}
+            positions={zone.shape}
+          >
+            <Tooltip sticky>
+              <div>
+                <b>{zone.meta.name}</b>
+              </div>
+              <div>Total: {zone.meta.count}</div>
+            </Tooltip>
+          </Polygon>
+        )
+      })}
       <MapLegend maxCount={maxCount} colorPalette={colorPalette} />
     </div>
   )
