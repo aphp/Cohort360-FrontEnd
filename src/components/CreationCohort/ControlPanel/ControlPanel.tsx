@@ -102,6 +102,8 @@ const ControlPanel: React.FC<{
   const { uuid, includePatient, status, jobFailMsg } = count
 
   const [patientCount, setPatientCount] = useState(includePatient)
+  const [countError, setCountError] = useState<string | undefined>(jobFailMsg)
+  const [countStatus, setCountStatus] = useState<string | undefined>(status)
 
   const [requestShare, setRequestShare] = useState<RequestType | null>({
     currentSnapshot,
@@ -220,7 +222,9 @@ const ControlPanel: React.FC<{
       setCountLoading(LoadingStatus.FETCHING)
       dispatch(countCohortCreation({ uuid: uuid }))
     }
-  }, [dispatch, status, uuid])
+    setCountStatus(status)
+    setCountError(jobFailMsg)
+  }, [dispatch, status, uuid, jobFailMsg])
 
   useEffect(() => {
     setPatientCount(includePatient)
@@ -234,6 +238,12 @@ const ControlPanel: React.FC<{
         message.extra_info?.measure !== null
       ) {
         setPatientCount(message.extra_info?.measure)
+        setCountLoading(LoadingStatus.SUCCESS)
+      }
+      if (message.job_name === WebSocketJobName.COUNT && message.status === WebSocketJobStatus.failed) {
+        setCountStatus('failed')
+        setPatientCount(message.extra_info?.measure)
+        setCountError(message.extra_info?.request_job_fail_msg)
         setCountLoading(LoadingStatus.SUCCESS)
       }
     }
@@ -408,11 +418,11 @@ const ControlPanel: React.FC<{
             </Button>
           </Alert>
         )}
-        {(status === 'failed' || status === 'error') && (
+        {(countStatus === 'failed' || countStatus === 'error') && (
           <Alert className={classes.errorAlert} severity="error">
             Une erreur est survenue lors du calcul du nombre de patients de votre requête.
             <br />
-            <Typography style={{ wordBreak: 'break-all' }}>{jobFailMsg}</Typography>
+            <Typography style={{ wordBreak: 'break-all' }}>{countError}</Typography>
             <br />
             <Button
               onClick={() => _relaunchCount(false)}
