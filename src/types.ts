@@ -35,7 +35,8 @@ export enum WebSocketJobStatus {
   pending = 'pending',
   suspended = 'suspended',
   accepted = 'accepted',
-  finished = 'finished'
+  finished = 'finished',
+  failed = 'failed'
 }
 
 export enum CohortJobStatus {
@@ -904,6 +905,7 @@ export type WebSocketMessage = {
   job_name?: WebSocketJobName
   extra_info?: {
     fhir_group_id?: string
+    request_job_fail_msg?: string
     request_job_status: JobStatus
     measure?: number
     global?: { measure_min: number; measure_max: number }
