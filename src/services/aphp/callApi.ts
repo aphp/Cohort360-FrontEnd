@@ -1204,7 +1204,7 @@ export const fetchPerimeterAccesses = async (perimeter: string): Promise<AxiosRe
 }
 
 export const fetchCohortAccesses = async (cohortIds: string[]) => {
-  const response = await apiBackend.get<CohortRights[]>(`cohort/cohorts/cohort-rights/?fhir_group_id=${cohortIds}`)
+  const response = await apiBackend.get<CohortRights[]>(`cohort/cohorts/cohort-rights/?group_id=${cohortIds}`)
   return response
 }
 
@@ -1219,6 +1219,6 @@ export const fetchPerimeterFromId = async (perimeterId: string) => {
 }
 
 export const fetchCohortInfo = async (cohortId: string) => {
-  const response = await apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?fhir_group_id=${cohortId}`)
+  const response = await apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?group_id=${cohortId}`)
   return response
 }

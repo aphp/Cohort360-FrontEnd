@@ -648,7 +648,7 @@ const servicesCohorts: IServiceCohorts = {
   fetchCohortsRights: async (cohorts): Promise<Cohort[]> => {
     try {
       const ids = cohorts
-        .map((cohort) => cohort.fhir_group_id)
+        .map((cohort) => cohort.group_id)
         .filter((id) => id !== undefined || id !== '')
         .filter((i): i is string => i !== '')
       if (ids.length === 0) return []
@@ -656,7 +656,7 @@ const servicesCohorts: IServiceCohorts = {
       return cohorts.map((cohort) => {
         return {
           ...cohort,
-          rights: rightsResponse.data.find((right) => right.cohort_id == cohort.fhir_group_id)?.rights
+          rights: rightsResponse.data.find((right) => right.cohort_id == cohort.group_id)?.rights
         }
       })
     } catch (error) {

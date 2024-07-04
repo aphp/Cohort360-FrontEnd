@@ -70,7 +70,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
               }
             }
             temp.request_job_status = message.status
-            temp.fhir_group_id = message.extra_info?.fhir_group_id
+            temp.group_id = message.extra_info?.group_id
           }
           return temp
         })

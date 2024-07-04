@@ -499,7 +499,7 @@ export type Cohort = {
   dated_measure?: DatedMeasure
   dated_measure_global?: DatedMeasure
   global_estimate?: boolean
-  fhir_group_id?: string
+  group_id?: string
   exportable?: boolean
   deleted?: string
   deleted_by_cascade?: boolean
@@ -904,7 +904,7 @@ export type WebSocketMessage = {
   details?: string
   job_name?: WebSocketJobName
   extra_info?: {
-    fhir_group_id?: string
+    group_id?: string
     request_job_fail_msg?: string
     request_job_status: JobStatus
     measure?: number
