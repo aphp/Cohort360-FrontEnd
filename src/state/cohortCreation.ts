@@ -9,7 +9,8 @@ import {
   QuerySnapshotInfo,
   CurrentSnapshot,
   CohortJobStatus,
-  CriteriaGroupType
+  CriteriaGroupType,
+  WebSocketMessage
 } from 'types'
 
 import { buildRequest, unbuildRequest, joinRequest, checkNominativeCriteria } from 'utils/cohortCreation'
@@ -704,6 +705,14 @@ const cohortCreationSlice = createSlice({
         status: CohortJobStatus.PENDING
       }
     },
+    updateCount: (state: CohortCreationState, action: PayloadAction<CohortCreationCounterType>) => {
+      state.count = {
+        ...state.count,
+        status: action.payload.status,
+        includePatient: action.payload.includePatient,
+        jobFailMsg: action.payload.jobFailMsg
+      }
+    },
     addActionToNavHistory: (state: CohortCreationState, action: PayloadAction<CurrentSnapshot>) => {
       let navHistory = state.navHistory
       const newSnapshot = action.payload
@@ -801,5 +810,6 @@ export const {
   deleteTemporalConstraint,
   suspendCount,
   unsuspendCount,
+  updateCount,
   addActionToNavHistory
 } = cohortCreationSlice.actions
