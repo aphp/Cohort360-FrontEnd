@@ -56,6 +56,11 @@ const defaultComposition: Omit<DocumentDataType, 'id'> = {
   encounterStatus: []
 }
 
+enum Error {
+  ADVANCED_INPUTS_ERROR,
+  NO_ERROR
+}
+
 const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
@@ -76,16 +81,18 @@ const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
 
   const docStatuses: string[] = [FilterByDocumentStatus.VALIDATED, FilterByDocumentStatus.NOT_VALIDATED]
 
+  const [error, setError] = useState(Error.NO_ERROR)
+
   const _onSubmit = () => {
     onChangeSelectedCriteria({ ...defaultValues, occurrence: occurrence, occurrenceComparator: occurrenceComparator })
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const _onChangeValue = (key: string, value: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const _defaultValues: any = defaultValues ? { ...defaultValues } : {}
-    _defaultValues[key] = value
-    setDefaultValues(_defaultValues)
+    setDefaultValues((prevValues) => {
+      const _defaultValues = { ...prevValues, [key]: value }
+      return _defaultValues
+    })
   }
 
   useEffect(() => {
@@ -295,6 +302,7 @@ const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             sourceType={SourceType.DOCUMENT}
             selectedCriteria={defaultValues}
             onChangeValue={_onChangeValue}
+            onError={(isError) => setError(isError ? Error.ADVANCED_INPUTS_ERROR : Error.NO_ERROR)}
           />
         </Grid>
 
@@ -306,7 +314,7 @@ const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
           )}
           <Button
             onClick={_onSubmit}
-            disabled={searchInputError?.isError || searchCheckingLoading}
+            disabled={searchInputError?.isError || searchCheckingLoading || error === Error.ADVANCED_INPUTS_ERROR}
             type="submit"
             form="documents-form"
             variant="contained"

@@ -208,7 +208,7 @@ const EncounterForm = ({
           </BlockWrapper>
           <BlockWrapper className={classes.inputItem}>
             <FormLabel component="legend" className={classes.durationLegend}>
-              <BlockWrapper container justifyItems="center">
+              <BlockWrapper container justifyItems="center" alignItems={'center'}>
                 Nombre d'occurrences
                 <Tooltip
                   title={
@@ -245,7 +245,7 @@ const EncounterForm = ({
 
           <BlockWrapper className={classes.inputItem}>
             <FormLabel component="legend" className={classes.durationLegend}>
-              <BlockWrapper container justifyItems="center">
+              <BlockWrapper container justifyItems="center" alignItems={'center'}>
                 Âge au moment de la prise en charge
                 <Tooltip title="La valeur par défaut sera prise en compte si le sélecteur d'âge n'a pas été modifié.">
                   <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />

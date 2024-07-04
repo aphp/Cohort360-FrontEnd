@@ -7,7 +7,7 @@ import {
   convertTimestampToDuration
 } from './age'
 import docTypes from 'assets/docTypes.json'
-import { OBSERVATION_VALUE, RequeteurCriteriaType } from './cohortCreation'
+import { RequeteurCriteriaType } from './cohortCreation'
 import moment from 'moment'
 import {
   CcamDataType,
@@ -25,8 +25,8 @@ import {
 import { comparatorToFilter, parseOccurence } from './valueComparator'
 import services from 'services/aphp'
 import extractFilterParams, { FhirFilterValue } from './fhirFilterParser'
-import { mapDocumentStatusesFromRequestParam } from 'mappers/filters'
 import { Hierarchy } from 'types/hierarchy'
+import { ObservationParamsKeys, mapDocumentStatusesFromRequestParam } from 'mappers/filters'
 
 const searchReducer = (accumulator: string, currentValue: string): string =>
   accumulator || !!accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -148,7 +148,7 @@ export const buildObservationValueFilter = (criterion: ObservationDataType, fhir
 
 export const unbuildObservationValueFilter = (filters: string[][], currentCriterion: ObservationDataType) => {
   const valueQuantities = filters
-    .filter((keyValue) => keyValue[0].includes(OBSERVATION_VALUE))
+    .filter((keyValue) => keyValue[0].includes(ObservationParamsKeys.VALUE))
     ?.map((value) => value[1])
   if (valueQuantities[0] === 'le0,ge0') return null
   if (valueQuantities.length === 0) {
@@ -220,10 +220,6 @@ export const unbuildAdvancedCriterias = (
     currentCriterion.occurrenceComparator = element.occurrence
       ? element.occurrence.operator ?? Comparators.GREATER_OR_EQUAL
       : Comparators.GREATER_OR_EQUAL
-  }
-  if (element.dateRangeList) {
-    currentCriterion.startOccurrence = replaceTime(element.dateRangeList[0].minDate)
-    currentCriterion.endOccurrence = replaceTime(element.dateRangeList[0].maxDate)
   }
   if (element.encounterDateRange) {
     currentCriterion.encounterStartDate = replaceTime(element.encounterDateRange.minDate)

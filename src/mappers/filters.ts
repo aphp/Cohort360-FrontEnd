@@ -53,7 +53,28 @@ export enum PatientsParamsKeys {
   GENDERS = 'gender',
   DATE_DEIDENTIFIED = 'age-month',
   DATE_IDENTIFIED = 'age-day',
-  VITAL_STATUS = 'deceased'
+  VITAL_STATUS = 'deceased',
+  BIRTHDATE = 'birthdate',
+  DEATHDATE = 'death-date'
+}
+
+export enum EncounterParamsKeys {
+  DURATION = 'length',
+  MIN_BIRTHDATE_DAY = 'start-age-visit',
+  MAX_BIRTHDATE_DAY = 'end-age-visit',
+  MIN_BIRTHDATE_MONTH = 'start-age-visit-month',
+  MAX_BIRTHDATE_MONTH = 'end-age-visit-month',
+  ENTRYMODE = 'admission-mode',
+  EXITMODE = 'discharge-disposition-mode',
+  PRISENCHARGETYPE = 'class',
+  TYPEDESEJOUR = 'stay',
+  ADMISSIONMODE = 'reason-code',
+  REASON = 'admission-destination-type',
+  DESTINATION = 'discharge-disposition',
+  PROVENANCE = 'admit-source',
+  ADMISSION = 'admission-type',
+  SERVICE_PROVIDER = 'encounter-care-site',
+  STATUS = 'status'
 }
 
 export enum DocumentsParamsKeys {
@@ -98,8 +119,10 @@ export enum PrescriptionParamsKeys {
   NDA = 'encounter.identifier',
   PRESCRIPTION_TYPES = 'category',
   DATE = 'validity-period-start',
+  CODE = 'code',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status'
+  ENCOUNTER_STATUS = 'encounter.status',
+  PRESCRIPTION_ROUTES = 'dosage-instruction-route'
 }
 
 export enum AdministrationParamsKeys {
@@ -115,6 +138,7 @@ export enum ObservationParamsKeys {
   ANABIO_LOINC = 'code',
   VALIDATED_STATUS = 'status',
   DATE = 'date',
+  VALUE = 'value-quantity',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
   ENCOUNTER_STATUS = 'encounter.status'
 }
@@ -124,6 +148,17 @@ export enum ImagingParamsKeys {
   MODALITY = 'modality',
   NDA = 'encounter.identifier',
   DATE = 'started',
+  STUDY_DESCRIPTION = 'description',
+  STUDY_PROCEDURE = 'procedureCode',
+  NB_OF_SERIES = 'numberOfSeries',
+  NB_OF_INS = 'numberOfInstances',
+  WITH_DOCUMENT = 'with-document',
+  STUDY_UID = 'identifier',
+  SERIES_DATE = 'series-started',
+  SERIES_DESCRIPTION = 'series-description',
+  SERIES_PROTOCOL = 'series-protocol',
+  SERIES_MODALITIES = 'series-modality',
+  SERIES_UID = 'series',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
   ENCOUNTER_STATUS = 'encounter.status'
 }
@@ -133,6 +168,10 @@ export enum QuestionnaireResponseParamsKeys {
   DATE = 'authored',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
   ENCOUNTER_STATUS = 'encounter.status'
+}
+
+export enum IppParamsKeys {
+  IPP_LIST_FHIR = 'identifier.value'
 }
 
 const getGenericKeyFromResourceType = (

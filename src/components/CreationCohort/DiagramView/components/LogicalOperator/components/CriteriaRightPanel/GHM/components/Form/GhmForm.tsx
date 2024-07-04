@@ -42,6 +42,11 @@ type GHMFormProps = {
   onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
+enum Error {
+  ADVANCED_INPUTS_ERROR,
+  NO_ERROR
+}
+
 const GhmForm: React.FC<GHMFormProps> = (props) => {
   const { isOpen, isEdition, criteriaData, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
@@ -54,6 +59,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
   const [occurrenceComparator, setOccurrenceComparator] = useState(
     currentState.occurrenceComparator || Comparators.GREATER_OR_EQUAL
   )
+  const [error, setError] = useState(Error.NO_ERROR)
 
   const getGhmOptions = async (searchValue: string, signal: AbortSignal) =>
     await services.cohortCreation.fetchGhmData(searchValue, false, signal)
@@ -195,7 +201,12 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
           />
 
-          <AdvancedInputs sourceType={SourceType.GHM} selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs
+            sourceType={SourceType.GHM}
+            selectedCriteria={currentState}
+            onChangeValue={onChangeValue}
+            onError={(isError) => setError(isError ? Error.ADVANCED_INPUTS_ERROR : Error.NO_ERROR)}
+          />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
@@ -204,7 +215,13 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="ghm-form" variant="contained">
+          <Button
+            onClick={_onSubmit}
+            type="submit"
+            form="ghm-form"
+            variant="contained"
+            disabled={error === Error.ADVANCED_INPUTS_ERROR}
+          >
             Confirmer
           </Button>
         </Grid>

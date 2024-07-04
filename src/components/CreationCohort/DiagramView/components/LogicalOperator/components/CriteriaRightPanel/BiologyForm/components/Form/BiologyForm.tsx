@@ -36,7 +36,8 @@ enum Error {
   NO_ERROR,
   INCOHERENT_VALUE_ERROR,
   INVALID_VALUE_ERROR,
-  MISSING_VALUE_ERROR
+  MISSING_VALUE_ERROR,
+  ADVANCED_INPUTS_ERROR
 }
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
@@ -388,6 +389,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             sourceType={SourceType.BIOLOGY}
             selectedCriteria={currentState}
             onChangeValue={onChangeValue}
+            onError={(isError) => setError(isError ? Error.ADVANCED_INPUTS_ERROR : Error.NO_ERROR)}
           />
         </Grid>
 
@@ -405,7 +407,8 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             disabled={
               error === Error.INCOHERENT_VALUE_ERROR ||
               error === Error.INVALID_VALUE_ERROR ||
-              error === Error.MISSING_VALUE_ERROR
+              error === Error.MISSING_VALUE_ERROR ||
+              error === Error.ADVANCED_INPUTS_ERROR
             }
           >
             Confirmer

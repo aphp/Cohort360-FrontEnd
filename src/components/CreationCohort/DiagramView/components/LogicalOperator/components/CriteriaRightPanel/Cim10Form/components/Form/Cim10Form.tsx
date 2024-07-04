@@ -45,6 +45,11 @@ type Cim10FormProps = {
   onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
+enum Error {
+  ADVANCED_INPUTS_ERROR,
+  NO_ERROR
+}
+
 const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const { isOpen, isEdition, criteriaData, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
@@ -61,6 +66,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const [occurrenceComparator, setOccurrenceComparator] = useState(
     currentState.occurrenceComparator || Comparators.GREATER_OR_EQUAL
   )
+  const [error, setError] = useState(Error.NO_ERROR)
 
   const getDiagOptions = async (searchValue: string, signal: AbortSignal) =>
     await services.cohortCreation.fetchCim10Diagnostic(searchValue, false, signal)
@@ -239,7 +245,12 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             onChange={(e, value) => onChangeValue('encounterStatus', value)}
             renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
           />
-          <AdvancedInputs sourceType={SourceType.CIM10} selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs
+            sourceType={SourceType.CIM10}
+            selectedCriteria={currentState}
+            onChangeValue={onChangeValue}
+            onError={(isError) => setError(isError ? Error.ADVANCED_INPUTS_ERROR : Error.NO_ERROR)}
+          />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
@@ -248,7 +259,13 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="cim10-form" variant="contained">
+          <Button
+            onClick={_onSubmit}
+            type="submit"
+            form="cim10-form"
+            variant="contained"
+            disabled={error === Error.ADVANCED_INPUTS_ERROR}
+          >
             Confirmer
           </Button>
         </Grid>

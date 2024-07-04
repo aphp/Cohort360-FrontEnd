@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { expandPmsiElement } from 'state/pmsi'
 import { AsyncThunk } from '@reduxjs/toolkit'
 import { AppDispatch, RootState } from '../state'
@@ -11,9 +10,10 @@ import {
 import { expandMedicationElement } from '../state/medication'
 import { expandBiologyElement } from '../state/biology'
 import services from 'services/aphp'
-import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
+import { CommonCriteriaDataType, CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 import { Condition } from 'fhir/r4'
 import { Hierarchy } from 'types/hierarchy'
+import { LabelObject } from 'types/searchCriterias'
 
 /**
  * @description : get the last diagnosis labels
@@ -521,41 +521,44 @@ const expandHierarchyCodes = async (
   resourceHierarchy = newResourceHierarchy
   return resourceHierarchy
 }
-export const syncOnChangeFormValue = async (
+export const syncOnChangeFormValue = async <T extends CommonCriteriaDataType>(
   key: string,
   value: any,
-  selectedCriteria: SelectedCriteriaType,
   resourceHierarchy: Hierarchy<any, any>[],
-  setDefaultCriteria: (value: SelectedCriteriaType) => void,
+  setDefaultCriteria: (value: React.SetStateAction<T>) => void,
   selectedTab: string,
   resourceType: CriteriaType,
   dispatch: AppDispatch
 ): Promise<void> => {
-  const newSelectedCriteria: any = selectedCriteria ? { ...selectedCriteria } : {}
-  newSelectedCriteria[key] = value
-  if (key === 'code') {
-    const optimizedHierarchySelection = optimizeHierarchySelection(newSelectedCriteria.code, resourceHierarchy)
-    newSelectedCriteria[key] = optimizedHierarchySelection
-    dispatch(pushSyncHierarchyTable({ code: optimizedHierarchySelection }))
-    if (selectedTab === 'form') {
-      if (
-        selectedCriteria.type !== 'IPPList' &&
-        selectedCriteria.type !== 'DocumentReference' &&
-        selectedCriteria.type !== 'Encounter' &&
-        selectedCriteria.type !== 'Patient' &&
-        selectedCriteria.type !== 'ImagingStudy' &&
-        selectedCriteria.type !== 'Pregnancy' &&
-        selectedCriteria.type !== 'Hospit'
-      ) {
-        expandHierarchyCodes(
-          optimizedHierarchySelection,
-          selectedCriteria.code?.map((code) => ({ ...code, subItems: [] })) ?? [],
-          resourceHierarchy,
-          resourceType,
-          dispatch
-        )
+  setDefaultCriteria((selectedCriteria) => {
+    const newSelectedCriteria: any = selectedCriteria ? { ...selectedCriteria } : {}
+    newSelectedCriteria[key] = value
+    if (key === 'code') {
+      const optimizedHierarchySelection = optimizeHierarchySelection(newSelectedCriteria.code, resourceHierarchy)
+      newSelectedCriteria[key] = optimizedHierarchySelection
+      dispatch(pushSyncHierarchyTable({ code: optimizedHierarchySelection }))
+      if (selectedTab === 'form') {
+        if (
+          selectedCriteria.type !== 'IPPList' &&
+          selectedCriteria.type !== 'DocumentReference' &&
+          selectedCriteria.type !== 'Encounter' &&
+          selectedCriteria.type !== 'Patient' &&
+          selectedCriteria.type !== 'ImagingStudy' &&
+          selectedCriteria.type !== 'Pregnancy' &&
+          selectedCriteria.type !== 'Hospit'
+        ) {
+          expandHierarchyCodes(
+            optimizedHierarchySelection,
+            // because the function is caca anyways
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (selectedCriteria as any).code?.map((code: LabelObject) => ({ ...code, subItems: [] })) ?? [],
+            resourceHierarchy,
+            resourceType,
+            dispatch
+          )
+        }
       }
     }
-  }
-  setDefaultCriteria(newSelectedCriteria)
+    return newSelectedCriteria
+  })
 }

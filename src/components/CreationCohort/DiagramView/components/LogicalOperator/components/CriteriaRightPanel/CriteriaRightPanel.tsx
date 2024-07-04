@@ -30,6 +30,14 @@ import { PhotoCameraFront } from '@mui/icons-material'
 import { CriteriaState } from 'state/criteria'
 import criteriaList from 'components/CreationCohort/DataList_Criteria'
 
+type CriteriaTypesWithIcons = Exclude<
+  CriteriaType,
+  | CriteriaType.MEDICATION_REQUEST
+  | CriteriaType.MEDICATION_ADMINISTRATION
+  | CriteriaType.QUESTIONNAIRE
+  | CriteriaType.QUESTIONNAIRE_RESPONSE
+>
+
 type CriteriaListItemProps = {
   criteriaItem: CriteriaItemType
   handleClick: (criteriaItem: CriteriaItemType) => void
@@ -42,52 +50,33 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
   const { classes } = useStyles()
   const [open, setOpen] = useState(true)
 
-  const getCriteriaIcon = (id: string) => {
-    switch (id) {
-      case CriteriaType.REQUEST:
-        return <SavedSearchIcon />
-      case CriteriaType.IPP_LIST:
-        return <PersonSearchIcon />
-      case CriteriaType.PATIENT:
-        return <BarChartIcon />
-      case CriteriaType.ENCOUNTER:
-        return <EventIcon />
-      case CriteriaType.DOCUMENTS:
-        return <DescriptionIcon />
-      case CriteriaType.PMSI:
-        return <MedicalInformationIcon />
-      case CriteriaType.CONDITION:
-        return <ArticleIcon />
-      case CriteriaType.PROCEDURE:
-        return <LocalHospitalIcon />
-      case CriteriaType.CLAIM:
-        return <ContactPageIcon />
-      case CriteriaType.MEDICATION:
-        return <VaccinesIcon />
-      case CriteriaType.BIO_MICRO:
-        return <BiotechIcon />
-      case CriteriaType.OBSERVATION:
-        return <ScienceIcon />
-      case CriteriaType.MICROBIOLOGIE:
-        return <CoronavirusIcon />
-      case CriteriaType.PHYSIOLOGIE:
-        return <MonitorHeartIcon />
-      case CriteriaType.IMAGING:
-        return <PhotoCameraFront />
-      case CriteriaType.SPECIALITY:
-        return <FolderIcon />
-      case CriteriaType.MATERNITY:
-        return <CribIcon />
-      case CriteriaType.PREGNANCY:
-        return <PregnantWomanIcon />
-      case CriteriaType.HOSPIT:
-        return <DomainAddIcon />
-      default:
-        return <></>
+  const getCriteriaIcon = (id: CriteriaTypesWithIcons) => {
+    const mapper = {
+      [CriteriaType.REQUEST]: <SavedSearchIcon />,
+      [CriteriaType.IPP_LIST]: <PersonSearchIcon />,
+      [CriteriaType.PATIENT]: <BarChartIcon />,
+      [CriteriaType.ENCOUNTER]: <EventIcon />,
+      [CriteriaType.DOCUMENTS]: <DescriptionIcon />,
+      [CriteriaType.PMSI]: <MedicalInformationIcon />,
+      [CriteriaType.CONDITION]: <ArticleIcon />,
+      [CriteriaType.PROCEDURE]: <LocalHospitalIcon />,
+      [CriteriaType.CLAIM]: <ContactPageIcon />,
+      [CriteriaType.MEDICATION]: <VaccinesIcon />,
+      [CriteriaType.BIO_MICRO]: <BiotechIcon />,
+      [CriteriaType.OBSERVATION]: <ScienceIcon />,
+      [CriteriaType.MICROBIOLOGIE]: <CoronavirusIcon />,
+      [CriteriaType.PHYSIOLOGIE]: <MonitorHeartIcon />,
+      [CriteriaType.IMAGING]: <PhotoCameraFront />,
+      [CriteriaType.SPECIALITY]: <FolderIcon />,
+      [CriteriaType.MATERNITY]: <CribIcon />,
+      [CriteriaType.PREGNANCY]: <PregnantWomanIcon />,
+      [CriteriaType.HOSPIT]: <DomainAddIcon />
     }
+
+    return mapper[id]
   }
 
-  const svgIcon = getCriteriaIcon(id)
+  const svgIcon = getCriteriaIcon(id as CriteriaTypesWithIcons)
 
   const cursor = disabled ? 'not-allowed' : components ? 'pointer' : 'default'
 

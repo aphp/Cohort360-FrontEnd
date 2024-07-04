@@ -13,6 +13,7 @@ import { fetchMedication } from 'state/medication'
 import { EXPLORATION } from '../../../../../../../../constants'
 import { Comparators, MedicationDataType, CriteriaType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
+import { any } from 'prop-types'
 
 export const defaultMedication: Omit<MedicationDataType, 'id'> = {
   type: CriteriaType.MEDICATION_REQUEST,
@@ -27,13 +28,6 @@ export const defaultMedication: Omit<MedicationDataType, 'id'> = {
   encounterStartDate: null,
   isInclusive: true,
   encounterStatus: []
-}
-
-const removeNonCommonFields = (medication: MedicationDataType) => {
-  if (medication.type === CriteriaType.MEDICATION_ADMINISTRATION) {
-    return { ...medication, prescriptionType: null }
-  }
-  return medication
 }
 
 const Index = (props: CriteriaDrawerComponentProps) => {
@@ -57,16 +51,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const _onChangeFormValue = (key: string, value: any, hierarchy: Hierarchy<any, any>[] = medicationHierarchy) =>
-    syncOnChangeFormValue(
-      key,
-      value,
-      defaultCriteria,
-      hierarchy,
-      (updatedCriteria) => setDefaultCriteria(removeNonCommonFields(updatedCriteria as MedicationDataType)),
-      selectedTab,
-      defaultMedication.type,
-      dispatch
-    )
+    syncOnChangeFormValue(key, value, hierarchy, setDefaultCriteria, selectedTab, defaultMedication.type, dispatch)
 
   const _initSyncHierarchyTableEffect = async () => {
     await initSyncHierarchyTableEffect(

@@ -21,14 +21,14 @@ import { CriteriaType, CriteriaTypeLabels } from 'types/requestCriterias'
 
 const criteriaList: CriteriaItemType[] = [
   {
-    id: 'Request',
+    id: CriteriaType.REQUEST,
     title: CriteriaTypeLabels.REQUEST,
     color: '#0063AF',
     fontWeight: 'bold',
     components: RequestForm
   },
   {
-    id: 'IPPList',
+    id: CriteriaType.IPP_LIST,
     title: CriteriaTypeLabels.IPP_LIST,
     color: '#0063AF',
     fontWeight: 'bold',
@@ -36,7 +36,7 @@ const criteriaList: CriteriaItemType[] = [
     disabled: true
   },
   {
-    id: 'Patient',
+    id: CriteriaType.PATIENT,
     title: CriteriaTypeLabels.PATIENT,
     color: '#0063AF',
     fontWeight: 'bold',
@@ -44,7 +44,7 @@ const criteriaList: CriteriaItemType[] = [
     fetch: { gender: services.cohortCreation.fetchGender, status: services.cohortCreation.fetchStatus }
   },
   {
-    id: 'Encounter',
+    id: CriteriaType.ENCOUNTER,
     title: CriteriaTypeLabels.ENCOUNTER,
     color: '#0063AF',
     fontWeight: 'bold',
@@ -64,7 +64,7 @@ const criteriaList: CriteriaItemType[] = [
     }
   },
   {
-    id: 'DocumentReference',
+    id: CriteriaType.DOCUMENTS,
     title: CriteriaTypeLabels.DOCUMENTS,
     color: '#0063AF',
     fontWeight: 'bold',
@@ -75,14 +75,14 @@ const criteriaList: CriteriaItemType[] = [
     }
   },
   {
-    id: 'pmsi',
+    id: CriteriaType.PMSI,
     title: CriteriaTypeLabels.PMSI,
     color: '#0063AF',
     fontWeight: 'bold',
     components: null,
     subItems: [
       {
-        id: 'Condition',
+        id: CriteriaType.CONDITION,
         title: CriteriaTypeLabels.CONDITION,
         color: '#0063AF',
         fontWeight: 'normal',
@@ -95,7 +95,7 @@ const criteriaList: CriteriaItemType[] = [
         }
       },
       {
-        id: 'Procedure',
+        id: CriteriaType.PROCEDURE,
         title: CriteriaTypeLabels.PROCEDURE,
         color: '#0063AF',
         fontWeight: 'normal',
@@ -106,7 +106,7 @@ const criteriaList: CriteriaItemType[] = [
         }
       },
       {
-        id: 'Claim',
+        id: CriteriaType.CLAIM,
         title: CriteriaTypeLabels.CLAIM,
         color: '#0063AF',
         fontWeight: 'normal',
@@ -119,8 +119,7 @@ const criteriaList: CriteriaItemType[] = [
     ]
   },
   {
-    id: 'Medication',
-    // title: 'Médicaments (Prescription - Dispension - Administration)',
+    id: CriteriaType.MEDICATION,
     title: 'Médicaments (Prescription - Administration)',
     color: ODD_MEDICATION ? '#0063AF' : '#808080',
     fontWeight: 'bold',
@@ -134,14 +133,14 @@ const criteriaList: CriteriaItemType[] = [
     }
   },
   {
-    id: 'biologie_microbiologie',
+    id: CriteriaType.BIO_MICRO,
     title: CriteriaTypeLabels.BIO_MICRO,
     color: !!ODD_BIOLOGY ? '#0063AF' : '#808080',
     fontWeight: 'bold',
     components: null,
     subItems: [
       {
-        id: 'Observation',
+        id: CriteriaType.OBSERVATION,
         title: CriteriaTypeLabels.OBSERVATION,
         color: !!ODD_BIOLOGY ? '#0063AF' : '#808080',
         fontWeight: 'normal',
@@ -153,7 +152,7 @@ const criteriaList: CriteriaItemType[] = [
         }
       },
       {
-        id: 'microbiologie',
+        id: CriteriaType.MICROBIOLOGIE,
         title: CriteriaTypeLabels.MICROBIOLOGIE,
         components: null,
         color: '#808080',
@@ -163,14 +162,14 @@ const criteriaList: CriteriaItemType[] = [
     ]
   },
   {
-    id: 'Speciality',
+    id: CriteriaType.SPECIALITY,
     title: 'Dossiers de spécialité',
     color: '#0063AF',
     fontWeight: 'bold',
     components: null,
     subItems: [
       {
-        id: 'Maternity',
+        id: CriteriaType.MATERNITY,
         title: 'Maternité',
         components: null,
         color: '#0063AF',
@@ -196,7 +195,7 @@ const criteriaList: CriteriaItemType[] = [
             }
           },
           {
-            id: 'Hospit',
+            id: CriteriaType.HOSPIT,
             title: 'Hospitalisation',
             color: '#0063AF',
             fontWeight: 'normal',
@@ -240,7 +239,7 @@ const criteriaList: CriteriaItemType[] = [
     ]
   },
   {
-    id: 'ImagingStudy',
+    id: CriteriaType.IMAGING,
     title: CriteriaTypeLabels.IMAGING,
     color: ODD_IMAGING ? '#0063AF' : '#808080',
     fontWeight: 'bold',
@@ -252,7 +251,7 @@ const criteriaList: CriteriaItemType[] = [
     }
   },
   {
-    id: 'physiologie',
+    id: CriteriaType.PHYSIOLOGIE,
     title: CriteriaTypeLabels.PHYSIOLOGIE,
     color: '#808080',
     fontWeight: 'bold',
