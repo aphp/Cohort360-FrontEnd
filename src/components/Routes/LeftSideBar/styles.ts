@@ -122,13 +122,16 @@ const useStyles = makeStyles()((theme: Theme) => ({
   linkHover: {
     '&:hover': { cursor: 'pointer', textDecoration: 'None' }
   },
+  divNewRequest: {
+    width: '100%'
+  },
   newCohortButton: {
     backgroundColor: '#5BC5F2',
     borderRadius: 25,
     border: 'none',
     height: 45,
     color: '#FFF',
-    width: '100%',
+    // width: '100%',
     '&:hover': {
       backgroundColor: '#499cbf'
     }

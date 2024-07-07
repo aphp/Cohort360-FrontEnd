@@ -218,19 +218,21 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 </Tooltip>
               )}
               {zoomed(
-                <JToolEggWrapper Egg={Egg2}>
-                  <Button
-                    onClick={handleNewRequest}
-                    className={cx(classes.newCohortButton, classes.linkHover, {
-                      [classes.hide]: !open
-                    })}
-                    disabled={maintenanceIsActive}
-                  >
-                    <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
-                      {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
-                    </Typography>
-                  </Button>
-                </JToolEggWrapper>
+                <div className={classes.divNewRequest}>
+                  <JToolEggWrapper Egg={Egg2}>
+                    <Button
+                      onClick={handleNewRequest}
+                      className={cx(classes.newCohortButton, classes.linkHover, {
+                        [classes.hide]: !open
+                      })}
+                      disabled={maintenanceIsActive}
+                    >
+                      <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
+                        {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
+                      </Typography>
+                    </Button>
+                  </JToolEggWrapper>
+                </div>
               )}
             </ListItem>
             {!!cohortCreation?.request?.requestId && (
