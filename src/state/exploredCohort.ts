@@ -127,7 +127,7 @@ const fetchExploredCohortInBackground = createAsyncThunk<
         cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
         if (cohort) {
           cohort.cohortId = id
-          const cohortRights = await services.cohorts.fetchCohortsRights([{ fhir_group_id: id }])
+          const cohortRights = await services.cohorts.fetchCohortsRights([{ group_id: id }])
           if (cohortRights?.[0].rights) {
             if (
               cohortRights?.[0]?.rights?.read_patient_pseudo === false &&

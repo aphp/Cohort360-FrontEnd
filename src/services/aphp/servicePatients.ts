@@ -842,7 +842,7 @@ const servicesPatients: IServicePatients = {
         )
       )
     } else {
-      const cohortRights = await servicesCohorts.fetchCohortsRights([{ fhir_group_id: groupId }])
+      const cohortRights = await servicesCohorts.fetchCohortsRights([{ group_id: groupId }])
       return cohortRights?.[0]?.rights?.read_patient_pseudo
         ? cohortRights?.[0]?.rights?.read_patient_nomi
           ? false

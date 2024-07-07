@@ -106,7 +106,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
       row.request_job_status === CohortJobStatus.FAILED
     )
       return
-    navigate(`/cohort/${row.fhir_group_id}`)
+    navigate(`/cohort/${row.group_id}`)
   }
 
   const handleClickOpenDialog = () => {
@@ -525,7 +525,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
           cohortId={selectedExportableCohort?.uuid ?? ''}
           open={!!selectedExportableCohort}
           handleClose={() => setSelectedExportableCohort(undefined)}
-          fhirGroupId={selectedExportableCohort?.fhir_group_id ?? ''}
+          fhirGroupId={selectedExportableCohort?.group_id ?? ''}
         />
       )}
     </>

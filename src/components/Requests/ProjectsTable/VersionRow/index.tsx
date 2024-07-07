@@ -82,7 +82,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
               if (!cohort) return <></>
 
               const isError =
-                !cohort.fhir_group_id ||
+                !cohort.group_id ||
                 cohort.request_job_status === CohortJobStatus.PENDING ||
                 cohort.request_job_status === CohortJobStatus.NEW ||
                 !!cohort.request_job_fail_msg
@@ -92,8 +92,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
               return (
                 <TableRow key={cohort.uuid}>
                   <TableCellWrapper align="left" className={classes.tdName}>
-                    {cohort.fhir_group_id ? (
-                      <Link onClick={() => navigate(`/cohort/${cohort.fhir_group_id}`)} underline="hover">
+                    {cohort.group_id ? (
+                      <Link onClick={() => navigate(`/cohort/${cohort.group_id}`)} underline="hover">
                         {cohort.name}
                       </Link>
                     ) : (
@@ -181,7 +181,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
       {!!ODD_EXPORT && (
         <ExportModal
           cohortId={selectedExportableCohort?.uuid ?? ''}
-          fhirGroupId={selectedExportableCohort?.fhir_group_id ?? ''}
+          fhirGroupId={selectedExportableCohort?.group_id ?? ''}
           open={!!selectedExportableCohort}
           handleClose={() => setSelectedExportableCohort(null)}
         />
