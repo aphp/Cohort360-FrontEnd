@@ -131,7 +131,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     border: 'none',
     height: 45,
     color: '#FFF',
-    // width: '100%',
+    width: '100%',
     '&:hover': {
       backgroundColor: '#499cbf'
     }
