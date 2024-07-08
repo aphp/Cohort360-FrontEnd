@@ -10,6 +10,9 @@ import { ACCESS_TOKEN } from '../../constants'
 import { useAppSelector, useAppDispatch } from '../../state'
 import { login } from '../../state/me'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const window: any
+
 const ME = gql`
   query me {
     me {
@@ -42,6 +45,12 @@ const PrivateRoute: React.FC = () => {
       dispatch(login(me))
     }
   }, [me, data, dispatch])
+
+  useEffect(() => {
+    if (window.clarity && me?.id) {
+      window.clarity('identify', me?.id)
+    }
+  }, [me?.id])
 
   if (!me || (!me && !authToken) || error || (authToken && !loading && data && !data.me)) {
     if (allowRedirect === true) return <Navigate to="/" replace />
