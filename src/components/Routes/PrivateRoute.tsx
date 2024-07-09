@@ -5,13 +5,15 @@ import { gql } from 'apollo-boost'
 
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material'
 
-import { ACCESS_TOKEN } from '../../constants'
+import { ACCESS_TOKEN, USER_TRACKING_BLACKLIST } from '../../constants'
 
 import { useAppSelector, useAppDispatch } from '../../state'
 import { login } from '../../state/me'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const window: any
+
+const USER_TRACKING_BLACKLIST_LIST: string[] = (USER_TRACKING_BLACKLIST || '').split(',')
 
 const ME = gql`
   query me {
@@ -41,16 +43,16 @@ const PrivateRoute: React.FC = () => {
   })
 
   useEffect(() => {
+    if (window.clarity && me?.id) {
+      window.clarity('identify', me?.id)
+      if (USER_TRACKING_BLACKLIST_LIST.includes(me?.id)) {
+        window.clarity('set', 'exclude', 'true')
+      }
+    }
     if (!me && data && data.me) {
       dispatch(login(me))
     }
   }, [me, data, dispatch])
-
-  useEffect(() => {
-    if (window.clarity && me?.id) {
-      window.clarity('identify', me?.id)
-    }
-  }, [me?.id])
 
   if (!me || (!me && !authToken) || error || (authToken && !loading && data && !data.me)) {
     if (allowRedirect === true) return <Navigate to="/" replace />
