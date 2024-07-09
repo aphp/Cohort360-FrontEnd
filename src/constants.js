@@ -247,6 +247,9 @@ export const REFRESH_TOKEN_INTERVAL = import.meta.env.VITE_REFRESH_TOKEN_INTERVA
   ? import.meta.env.VITE_REFRESH_TOKEN_INTERVAL
   : 180000 /* 3 * 60 * 1000 ms*/
 export const JTOOL_USERS = import.meta.env.VITE_JTOOL_USERS ? import.meta.env.VITE_JTOOL_USERS : '{VITE_JTOOL_USERS}'
+export const USER_TRACKING_BLACKLIST = import.meta.env.DEV
+  ? import.meta.env.VITE_USER_TRACKING_BLACKLIST
+  : '{VITE_USER_TRACKING_BLACKLIST}'
 
 export const VALUE_SET_SIZE = '9999'
 
