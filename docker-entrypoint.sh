@@ -85,6 +85,8 @@ sed -i "s@{VITE_ODD_QUESTIONNAIRE}@$VITE_ODD_QUESTIONNAIRE@g" /app/build/assets/
 sed -i "s@{VITE_JTOOL_USERS}@$VITE_JTOOL_USERS@g" /app/build/assets/*.js
 sed -i "s@{VITE_ODD_MAP}@$VITE_ODD_MAP@g" /app/build/assets/*.js
 
+sed -i "s@{VITE_CLARITY_APP_ID}@$VITE_CLARITY_APP_ID@g" /app/build/index.html
+
 # Restart nginx to apply changes
 service nginx restart
 
