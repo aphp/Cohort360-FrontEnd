@@ -50,7 +50,7 @@ export enum CriteriaType {
 }
 
 export enum CriteriaTypeLabels {
-  REQUEST = 'Mes requềtes',
+  REQUEST = 'Mes requêtes',
   IPP_LIST = "Liste d'IPP",
   PATIENT = 'Démographie',
   ENCOUNTER = 'Prise en charge',
