@@ -100,7 +100,9 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
   useEffect(() => {
     setError(
       settings.tables.some((table) => {
-        return table.checked && table.count > EXPORT_LINES_LIMIT
+        return (
+          table.checked && table.count > (table.resourceType === ResourceType.DOCUMENTS ? 5000 : EXPORT_LINES_LIMIT)
+        )
       })
         ? Error.ERROR_TABLE_LIMIT
         : null
@@ -140,7 +142,9 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
       newSelectedTables
         .filter(
           (table) =>
-            table.checked && (table.count > EXPORT_LINES_LIMIT || !resourcesWithNoFilters.includes(table.resourceType))
+            table.checked &&
+            (table.count > (table.resourceType === ResourceType.DOCUMENTS ? 5000 : EXPORT_LINES_LIMIT) ||
+              !resourcesWithNoFilters.includes(table.resourceType))
         )
         .map((table) => table.label)
     )
@@ -202,9 +206,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
     const { name, checked, label, resourceType, count } = exportTable
     const isItemExpanded = expandedTableIds.includes(label)
     const _countLoading = (countLoading && typeof countLoading === 'boolean') || countLoading === label ? true : false
+    const setLimitError = resourceType === ResourceType.DOCUMENTS ? 5000 : EXPORT_LINES_LIMIT
 
     return (
-      <ExportTableAccordion key={label} expanded={isItemExpanded} error={checked && count > EXPORT_LINES_LIMIT}>
+      <ExportTableAccordion key={label} expanded={isItemExpanded} error={checked && count > setLimitError}>
         <ExportTableAccordionSummary
           style={resourcesWithNoFilters.includes(resourceType) ? { cursor: 'default' } : {}}
           expandIcon={
@@ -359,14 +364,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
           variant="filled"
           onChange={(e) => handleChangeSettings('motif', e.target.value)}
         />
-
-        <Grid className={classes.warningInfo} container alignItems="center">
-          <WarningIcon className={classes.warningIcon} color="warning" fontSize="small" />
-          <Typography className={classes.warningNote}>
-            La biologie (table <i>measurement</i>) et les comptes-rendus (table <i>note</i>) ne sont pas disponibles à
-            l’export csv.
-          </Typography>
-        </Grid>
 
         <Grid container py="28px" gap="16px">
           <Grid item container alignItems="center" flexWrap="nowrap" pr="33px">
@@ -630,12 +627,14 @@ const ExportTable: React.FC<ExportTableProps> = ({
           </RadioGroup>
         </Grid>
       </Grid>
-      {exportTable.checked && exportTable.count > EXPORT_LINES_LIMIT && (
-        <Typography color={'red'} fontWeight={'bold'} fontSize={12}>
-          La table sélectionnée dépasse la limite de {EXPORT_LINES_LIMIT} lignes autorisées. Veuillez affiner votre
-          sélection à l'aide de filtres ou désélectionner la table.
-        </Typography>
-      )}
+      {exportTable.checked &&
+        exportTable.count > (exportTable.resourceType === ResourceType.DOCUMENTS ? 5000 : EXPORT_LINES_LIMIT) && (
+          <Typography color={'red'} fontWeight={'bold'} fontSize={12}>
+            La table sélectionnée dépasse la limite de{' '}
+            {exportTable.resourceType === ResourceType.DOCUMENTS ? 5000 : EXPORT_LINES_LIMIT} lignes autorisées.
+            Veuillez affiner votre sélection à l'aide de filtres ou désélectionner la table.
+          </Typography>
+        )}
     </Grid>
   )
 }
