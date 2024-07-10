@@ -21,18 +21,18 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
       return
     }
     const customData = [
-      { Mois: Month.january, Hommes: 0, Femmes: 0 },
-      { Mois: Month.february, Hommes: 0, Femmes: 0 },
-      { Mois: Month.march, Hommes: 0, Femmes: 0 },
-      { Mois: Month.april, Hommes: 0, Femmes: 0 },
-      { Mois: Month.may, Hommes: 0, Femmes: 0 },
-      { Mois: Month.june, Hommes: 0, Femmes: 0 },
-      { Mois: Month.july, Hommes: 0, Femmes: 0 },
-      { Mois: Month.august, Hommes: 0, Femmes: 0 },
-      { Mois: Month.september, Hommes: 0, Femmes: 0 },
-      { Mois: Month.october, Hommes: 0, Femmes: 0 },
-      { Mois: Month.november, Hommes: 0, Femmes: 0 },
-      { Mois: Month.december, Hommes: 0, Femmes: 0 }
+      { Mois: Month.JANUARY, Hommes: 0, Femmes: 0 },
+      { Mois: Month.FEBRUARY, Hommes: 0, Femmes: 0 },
+      { Mois: Month.MARCH, Hommes: 0, Femmes: 0 },
+      { Mois: Month.APRIL, Hommes: 0, Femmes: 0 },
+      { Mois: Month.MAY, Hommes: 0, Femmes: 0 },
+      { Mois: Month.JUNE, Hommes: 0, Femmes: 0 },
+      { Mois: Month.JULY, Hommes: 0, Femmes: 0 },
+      { Mois: Month.AUGUST, Hommes: 0, Femmes: 0 },
+      { Mois: Month.SEPTEMBER, Hommes: 0, Femmes: 0 },
+      { Mois: Month.OCTOBER, Hommes: 0, Femmes: 0 },
+      { Mois: Month.NOVEMBER, Hommes: 0, Femmes: 0 },
+      { Mois: Month.DECEMBER, Hommes: 0, Femmes: 0 }
     ]
     const months = Object.keys(data)
     for (const month of months) {
