@@ -174,7 +174,7 @@ type fetchEncounterProps = {
   signal?: AbortSignal
 }
 export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Promise_Response<Encounter> => {
-  const { _id, size, offset, _sort, sortDirection, patient, visit, signal } = args
+  const { _id, size, offset, _sort, sortDirection, patient, visit = false, signal } = args
   const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list, _elements, status, facet } = args
 
@@ -195,7 +195,11 @@ export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Pro
   if (status && status.length > 0) options = [...options, `status=${status.reduce(paramValuesReducer)}`]
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer, '')}`]
   if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(paramValuesReducer, '')}`]
-  visit ? (options = [...options, `part-of:missing=true`]) : (options = [...options, `part-of:missing=false`])
+  if (visit) {
+    options = [...options, `part-of:missing=true`]
+  } else {
+    options = [...options, `part-of:missing=false`]
+  }
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Encounter>>(`/Encounter?${options.reduce(paramsReducer)}`, {
     signal: signal
