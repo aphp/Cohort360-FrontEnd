@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import L, { LatLngBounds, LatLngTuple } from 'leaflet'
 // https://github.com/PaulLeCam/react-leaflet/issues/1077
 //@ts-ignore
@@ -10,7 +10,6 @@ import { TileLayer } from 'react-leaflet/TileLayer'
 import { fetchLocation } from 'services/aphp/callApi'
 import { getAllResults } from 'utils/apiHelpers'
 import {
-  _explodeBoundsIntoMesh,
   colorize,
   computeNearFilter,
   getColorPalette,
@@ -22,6 +21,7 @@ import { cancelPendingRequest } from 'utils/abortController'
 import * as d3 from 'd3'
 import { CircularProgress, Slider, Typography } from '@mui/material'
 import CircularProgressWithLabel from 'components/ui/CircularProgressWithLabel'
+import useMultipartDataLoading from './useMultipartDataLoading'
 
 const DEBUG_SHOW_LOADED_BOUNDS = false
 const SHOW_OPACITY_CONTROL = false
@@ -30,6 +30,7 @@ const LOCATION_FETCH_BATCH_SIZE = 2000
 const MAX_COUNT_QUANTILE = 0.96
 const ZONE_COLOR_OPACITY = 0.37
 const BORDER_RELATIVE_OPACITY = 1.33
+const MIN_ZOOM = 7
 const DEFAULT_MAP_CENTER: LatLngTuple = [48.8575, 2.3514]
 const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 const MAP_COPYRIGHTS = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -53,20 +54,20 @@ type LocationMapProps = {
   center?: LatLngTuple
 }
 
+type ZoneInfo = { shape: LatLngTuple[]; meta: { count: number; name: string; id: string } }
+
 type IrisZonesProps = {
   cohortId: string
 }
 
 const IrisZones = (props: IrisZonesProps) => {
   const { cohortId } = props
-  const [dataLoading, setDataLoading] = useState(true)
-  const [dataLoadingProgress, setDataLoadingProgress] = useState(0)
-  const [zones, setZones] = useState<Array<{ shape: LatLngTuple[]; meta: { count: number; name: string } }>>([])
-  const [visibleZones, setVisibleZones] = useState<
-    Array<{ shape: LatLngTuple[]; meta: { count: number; name: string; id?: string } }>
-  >([])
+  const { dataLoading, dataLoadingProgress, updateLoadingProgress, setDataLoading } = useMultipartDataLoading()
+  const [zones, setZones] = useState<{ [id: string]: ZoneInfo }>({})
+  const [visibleZones, setVisibleZones] = useState<Array<ZoneInfo>>([])
   const [bounds, setBounds] = useState<LatLngBounds | null>(null)
   const [loadedBounds, setLoadedBounds] = useState<LatLngBounds[]>([])
+  const [loadingBounds, setLoadingBounds] = useState<LatLngBounds[]>([])
   const [maxCount, setMaxCount] = useState(MAX_COUNT_DEFAULT)
   const [zoneOpacity, setZoneOpacity] = useState(ZONE_COLOR_OPACITY * 100)
   const colorPalette = getColorPalette(COLOR_PALETTE, maxCount)
@@ -79,10 +80,6 @@ const IrisZones = (props: IrisZonesProps) => {
       return newBounds
     })
   }, [])
-
-  const loadingProgress = (stage: number, total: number) => {
-    setDataLoadingProgress((stage / total) * 100)
-  }
 
   // Update bounds on map move
   const map = useMapEvents({
@@ -101,7 +98,7 @@ const IrisZones = (props: IrisZonesProps) => {
   // Reset zones when cohortId changes
   useEffect(() => {
     setVisibleZones([])
-    setZones([])
+    setZones({})
     setLoadedBounds([])
     setMaxCount(MAX_COUNT_DEFAULT)
   }, [cohortId])
@@ -119,11 +116,16 @@ const IrisZones = (props: IrisZonesProps) => {
       ;(async () => {
         try {
           setDataLoading(true)
-          setDataLoadingProgress(0)
           // Fetch fhir locations for the current viewbox using the near filter
           const smallBounds = uncoveredBoundMeshUnits(map, bounds, loadedBounds)
+          if (DEBUG_SHOW_LOADED_BOUNDS) {
+            setLoadingBounds(smallBounds)
+          }
           const locationParts = await Promise.all(
-            smallBounds.map(async (boundPart) => {
+            smallBounds.map(async (boundPart, i) => {
+              const loadingPartProgress = (stage: number, total: number) => {
+                updateLoadingProgress(i, stage, total, smallBounds.length)
+              }
               const nearFilter = computeNearFilter(map, boundPart)
               return await getAllResults(
                 fetchLocation,
@@ -133,8 +135,7 @@ const IrisZones = (props: IrisZonesProps) => {
                   near: nearFilter,
                   signal: abortController.signal
                 },
-                // don't want to show loading progress when fetching multiple parts
-                smallBounds.length === 1 ? loadingProgress : undefined
+                loadingPartProgress
               )
             })
           )
@@ -143,14 +144,10 @@ const IrisZones = (props: IrisZonesProps) => {
           if (locations) {
             // updates loaded zones
             setZones((existingZones) => {
-              // get existing zone names (to avoid duplicates and prevent parsing the shape again)
-              const existingNames = existingZones.map((zone) => zone.meta.name)
-              const newZones = existingZones.concat(
-                locations
-                  .filter((ft, i) => locations.findIndex((f) => ft.id === f.id) === i) // to filter out duplicates
-                  .filter((ft) => ft.name && existingNames.indexOf(ft.name) === -1)
-                  .map((ft) => {
-                    return {
+              const newZones = locations.reduce(
+                (acc, ft) => {
+                  if (ft.id && !Object.prototype.hasOwnProperty.call(acc, ft.id)) {
+                    acc[ft.id] = {
                       shape:
                         parseShape(
                           ft.extension?.find((ext) => ext.url === LOCATION_SHAPE_EXTENSION_URL)?.valueString
@@ -158,10 +155,13 @@ const IrisZones = (props: IrisZonesProps) => {
                       meta: {
                         count: ft.extension?.find((ext) => ext.url === LOCATION_COUNT_EXTENSION_URL)?.valueInteger || 0,
                         name: ft.name || '',
-                        id: ft.id
+                        id: ft.id || ''
                       }
                     }
-                  })
+                  }
+                  return acc
+                },
+                { ...existingZones }
               )
               // update the loaded bounds
               setLoadedBounds((prevLoadedBounds) => {
@@ -185,11 +185,13 @@ const IrisZones = (props: IrisZonesProps) => {
     return () => {
       cancelPendingRequest(abortController)
     }
-  }, [cohortId, bounds, setDataLoading, map, loadedBounds])
+  }, [cohortId, bounds, updateLoadingProgress, setDataLoading, map, loadedBounds])
 
   // Update visible zones (and max visible count) when zones or bounds change
   useEffect(() => {
-    const newVisibleZones = zones.filter((zone) => zone.shape.find((shape) => bounds?.contains(shape)))
+    const newVisibleZones = Object.values(zones).filter((zone: ZoneInfo) =>
+      zone.shape.some((shape) => bounds?.contains(shape))
+    )
     setVisibleZones(newVisibleZones)
     const maxCount =
       newVisibleZones.length === 0
@@ -205,7 +207,7 @@ const IrisZones = (props: IrisZonesProps) => {
   /*                    RENDERING                        */
   /***************************************************** */
 
-  const renderLoader = () => {
+  const renderLoader = useMemo(() => {
     return (
       dataLoading && (
         <div
@@ -224,7 +226,7 @@ const IrisZones = (props: IrisZonesProps) => {
         </div>
       )
     )
-  }
+  }, [dataLoading, dataLoadingProgress])
 
   const renderControls = () => {
     return (
@@ -258,7 +260,7 @@ const IrisZones = (props: IrisZonesProps) => {
 
   return (
     <div>
-      {renderLoader()}
+      {renderLoader}
       {SHOW_OPACITY_CONTROL && renderControls()}
       {DEBUG_SHOW_LOADED_BOUNDS && (
         <div>
@@ -274,8 +276,8 @@ const IrisZones = (props: IrisZonesProps) => {
                 bounds={b}
               />
             ))}
-          {bounds &&
-            _explodeBoundsIntoMesh(map, bounds, 10, 10).map((b, i) => (
+          {loadingBounds &&
+            loadingBounds.map((b, i) => (
               <Rectangle
                 key={`mesh_${i}`}
                 pathOptions={{
@@ -288,10 +290,10 @@ const IrisZones = (props: IrisZonesProps) => {
             ))}
         </div>
       )}
-      {visibleZones.map((zone, i) => {
+      {visibleZones.map((zone) => {
         return (
           <Polygon
-            key={i}
+            key={zone.meta.id}
             pathOptions={{
               color: colorize(colorPalette, zone.meta.count, maxCount),
               opacity: (BORDER_RELATIVE_OPACITY * zoneOpacity) / 100,
@@ -362,6 +364,7 @@ const LocationMap = (props: LocationMapProps) => {
         renderer={L.canvas()}
         center={center}
         zoom={10}
+        minZoom={MIN_ZOOM}
         scrollWheelZoom={true}
         style={{ height: '500px', width: '100%' }}
       >

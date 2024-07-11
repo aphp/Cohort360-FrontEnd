@@ -20,6 +20,7 @@ import GroupedBarChart from './Charts/GroupedBarChart'
 import DonutChart from './Charts/DonutChart'
 import PyramidChart from './Charts/PyramidChart'
 import InfoIcon from '@mui/icons-material/Info'
+import WarningIcon from '@mui/icons-material/Warning'
 
 import useStyles from './styles'
 import clsx from 'clsx'
@@ -30,6 +31,8 @@ import displayDigit from 'utils/displayDigit'
 import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
 import LocationMap from 'components/Dashboard/Preview/LocationMap'
 import { ODD_MAP } from 'constants.js'
+
+const MAP_WARNING_PERSON_COUNT_THRESHOLD = 1000000
 
 type RepartitionTableProps = {
   genderRepartitionMap?: GenderRepartitionType
@@ -247,6 +250,15 @@ const Preview: React.FC<PreviewProps> = ({
                       <InfoIcon style={{ height: 22 }} />
                     </IconButton>
                   </Tooltip>
+                  {total && total > MAP_WARNING_PERSON_COUNT_THRESHOLD && (
+                    <Tooltip title="Le nombre de patients de ce périmètre est très large, la carte peut être lente à charger.">
+                      <IconButton
+                        style={{ padding: '0 0 0 4px', marginTop: '-2.5px', marginLeft: '25px', position: 'absolute' }}
+                      >
+                        <WarningIcon color="warning" style={{ height: 22 }} />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </Typography>
               </Grid>
 
