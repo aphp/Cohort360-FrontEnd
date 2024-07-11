@@ -63,8 +63,7 @@ export const getResourceInfos = async <
     _id: listeEncounterIds,
     _list: groupId ? [groupId] : [],
     _elements: ['status', 'serviceProvider', 'identifier', 'partOf'],
-    signal: signal,
-    visit: true
+    signal: signal
   })
   if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
     return []
