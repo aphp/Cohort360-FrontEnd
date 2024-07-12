@@ -82,7 +82,7 @@ import { hospitForm } from 'data/hospitData'
 import { editAllCriteria, editAllCriteriaGroup, pseudonimizeCriteria, buildCohortCreation } from 'state/cohortCreation'
 import { AppDispatch } from 'state'
 
-const REQUETEUR_VERSION = 'v1.4.4'
+const REQUETEUR_VERSION = 'v1.4.5'
 
 const IPP_LIST_FHIR = 'identifier.value'
 
@@ -507,7 +507,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case CriteriaType.OBSERVATION: {
       const unreducedFilterFhir = [
-        `subject.active=true&${OBSERVATION_STATUS}=${BiologyStatus.VALIDATED}`,
+        `subject.active=true&${OBSERVATION_STATUS}=${BiologyStatus.VALIDATED}&value-quantity=ge0,le0`,
         filtersBuilders(OBSERVATION_CODE, buildLabelObjectFilter(criterion.code, BIOLOGY_HIERARCHY_ITM_ANABIO)),
         filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(ENCOUNTER_STATUS_REFERENCE, buildLabelObjectFilter(criterion.encounterStatus)),
@@ -1411,6 +1411,7 @@ const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promi
         case OBSERVATION_VALUE:
         case OBSERVATION_STATUS:
         case 'subject.active':
+        case 'value-quantity':
           break
         default:
           currentCriterion.error = true
