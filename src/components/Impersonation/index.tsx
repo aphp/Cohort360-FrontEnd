@@ -5,11 +5,12 @@ import Overlay from './Overlay'
 import { addRequestConfigHook as addRequestConfigHookForFhir } from 'services/apiFhir'
 import { addRequestConfigHook as addRequestConfigHookForBackend } from 'services/apiBackend'
 import services from 'services/aphp'
-import { useAppSelector } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import { IconButton } from '@mui/material'
 import { User } from 'types'
 import { CODE_DISPLAY_JWT } from 'constants.js'
+import { impersonate } from 'state/me'
 
 export const IMPERSONATED_USER = 'impersonated_user'
 
@@ -30,6 +31,7 @@ type ImpersonationProps = {
 
 const Impersonation = (props: ImpersonationProps) => {
   const { UserInfo } = props
+  const dispatch = useAppDispatch()
   const me = useAppSelector((state) => state.me)
   const [modalOpen, setModalOpen] = useState(false)
   const [haveRightFullAdmin, setHaveRightFullAdmin] = useState(false)
@@ -39,6 +41,17 @@ const Impersonation = (props: ImpersonationProps) => {
     lastname: me?.lastName,
     display_name: me?.displayName
   })
+
+  // this effect is used to impersonate the user if the impersonated user is stored in the local storage after the window was closed
+  useEffect(() => {
+    const impersonatedUser = localStorage.getItem(IMPERSONATED_USER)
+    if (impersonatedUser) {
+      const user: User = JSON.parse(impersonatedUser)
+      if (me?.impersonation?.username !== user.username) {
+        dispatch(impersonate(user))
+      }
+    }
+  }, [dispatch, me?.impersonation?.username])
 
   useEffect(() => {
     const fetchAccesses = async () => {
