@@ -87,7 +87,7 @@ export const isBoundCovered = (map: L.Map, bounds: LatLngBounds, loadedBounds: L
 
 export const uncoveredBoundMeshUnits = (map: L.Map, bounds: LatLngBounds, loadedBounds: LatLngBounds[]) => {
   // Explode the current viewbox bounds into a mesh of smaller bounds
-  const boundMesh = _explodeBoundsIntoMesh(map, bounds, 10, 10)
+  const boundMesh = _explodeBoundsIntoMesh(map, bounds, 6, 4)
   // Search for a mesh unit that is not covered by the already loaded bounds
   return boundMesh.filter((b) => !loadedBounds.some((lb) => lb.contains(b)))
 }
