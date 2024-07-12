@@ -569,7 +569,7 @@ const mapAdministrationToRequestParams = (filters: MedicationFilters) => {
 
 const mapBiologyToRequestParams = (filters: BiologyFilters) => {
   const { anabio, loinc, validatedStatus, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
-  const requestParams: string[] = []
+  const requestParams: string[] = ['value-quantity=ge0,le0', 'subject.active=true']
   if ((anabio && anabio.length > 0) || (loinc && loinc.length > 0)) {
     const key = `${ObservationParamsKeys.ANABIO_LOINC}=`
     let _anabio = ''
