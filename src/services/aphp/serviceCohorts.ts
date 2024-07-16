@@ -34,7 +34,7 @@ import {
 } from './callApi'
 
 import apiBackend from '../apiBackend'
-import { Binary, DocumentReference, Extension, ImagingStudy, ParametersParameter, Patient } from 'fhir/r4'
+import { Binary, DocumentReference, ImagingStudy, ParametersParameter, Patient } from 'fhir/r4'
 import { AxiosError, AxiosResponse, CanceledError, isAxiosError } from 'axios'
 import {
   VitalStatus,
