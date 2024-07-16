@@ -23,6 +23,7 @@ import {
 import { AxiosResponse } from 'axios'
 import { SearchInputError } from 'types/error'
 import { Comparators, CriteriaDataKey, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import { ExportTableType } from 'components/Dashboard/ExportModal/export_table'
 
 export enum JobStatus {
   new = 'new',
@@ -863,14 +864,10 @@ export type ExportCSVForm = {
   tables: ExportCSVTable[]
 }
 
-export type ExportCSVTable = {
-  id: string[]
-  label: string
+export type ExportCSVTable = ExportTableType & {
   checked: boolean
-  name: string
   fhir_filter: SavedFilter | null
   respect_table_relationships: boolean
-  resourceType: ResourceType
   count: number
 }
 

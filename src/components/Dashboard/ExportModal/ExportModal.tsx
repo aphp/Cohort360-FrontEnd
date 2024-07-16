@@ -22,18 +22,20 @@ import {
   Typography,
   Autocomplete,
   RadioGroup,
-  Radio
+  Radio,
+  Select,
+  MenuItem,
+  Tooltip
 } from '@mui/material'
 
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import CancelIcon from '@mui/icons-material/Cancel'
-import WarningIcon from '@mui/icons-material/Warning'
 import InfoIcon from '@mui/icons-material/Info'
 
 import useStyles from './styles'
 
-import export_table from './export_table'
+import export_table, { label } from './export_table'
 import services from 'services/aphp'
 import { ExportCSVForm, ExportCSVTable, SavedFilter } from 'types'
 import { useAppSelector } from 'state'
@@ -131,6 +133,37 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
     }
   }
 
+  const [isChecked, setIsChecked] = useState(false)
+  const [selectState, setSelectState] = useState<'csv' | 'xlsx'>('csv')
+
+  const compatibilities = (exportTable: ExportCSVTable) => {
+    const checkedResources = checkedTables.map((table) => {
+      const com = table.compatibleResourceTypes
+      return com
+    })
+    const findCompatibilities = (checkedResourcesCompatibilities: label[][]) => {
+      let smallestArray = checkedResourcesCompatibilities[0]
+      for (let i = 1; i < checkedResourcesCompatibilities.length; i++) {
+        if (checkedResourcesCompatibilities[i].length < smallestArray.length) {
+          smallestArray = checkedResourcesCompatibilities[i]
+        }
+      }
+      return smallestArray
+    }
+    const resourceCompatibilities = findCompatibilities(checkedResources)
+
+    return !resourceCompatibilities.includes(exportTable.label)
+  }
+
+  const resetSelectedTables = () => {
+    const newSelectedTables = settings.tables.map<ExportCSVTable>((table) => ({
+      ...table,
+      checked: table.label !== 'person' ? false : true
+    }))
+    handleChangeSettings('tables', newSelectedTables)
+    setExpandedTableIds([])
+  }
+
   const handleSelectAllTables = () => {
     const newSelectedTables = settings.tables.map<ExportCSVTable>((table) => ({
       ...table,
@@ -191,7 +224,9 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
     const response = await services.cohorts.createExport({
       cohortId,
       motivation: settings?.motif,
-      tables: (settings?.tables || []).filter((table) => table.checked)
+      tables: (settings?.tables || []).filter((table) => table.checked),
+      outputFormat: selectState,
+      group_tables: isChecked
     })
 
     if (isAxiosError(response)) {
@@ -214,7 +249,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
           style={resourcesWithNoFilters.includes(resourceType) ? { cursor: 'default' } : {}}
           expandIcon={
             <Checkbox
-              disabled={label === 'person'}
+              disabled={isChecked ? compatibilities(exportTable) || label === 'person' : label === 'person'}
               color="secondary"
               checked={checked}
               className={classes.checkbox}
@@ -365,6 +400,31 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
           onChange={(e) => handleChangeSettings('motif', e.target.value)}
         />
 
+        <Grid>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isChecked}
+                onClick={() => {
+                  setIsChecked(!isChecked), resetSelectedTables()
+                }}
+              />
+            }
+            label={'Regrouper plusieurs tables en un seul fichier'}
+          />
+          <Tooltip
+            title={
+              <span>
+                Par exemple, il coche prescription, alors seules les tables person et visit_occurrence restent cochables
+                Par exemple, il coche person, alors tout est cochable, mais si ensuite il coche prescription, alors
+                seule visit_occurrence reste cochable, le reste se grise
+              </span>
+            }
+          >
+            <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+          </Tooltip>
+        </Grid>
+
         <Grid container py="28px" gap="16px">
           <Grid item container alignItems="center" flexWrap="nowrap" pr="33px">
             <Grid item container>
@@ -405,6 +465,20 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
           <Grid item container>
             {settings.tables.map(renderExportTable)}
           </Grid>
+        </Grid>
+
+        <Grid container className={classes.referentielContainer}>
+          <Typography variant="h3">Type de fichier : </Typography>
+          <Select
+            className={classes.select}
+            style={{ height: 32 }}
+            id="file-type-selector"
+            value={selectState}
+            onChange={(event) => setSelectState(event.target.value as 'csv' | 'xlsx')}
+          >
+            <MenuItem value={'csv'}>{'Fichier csv'}</MenuItem>
+            <MenuItem value={'xlsx'}>{'Fichier xlsx'}</MenuItem>
+          </Select>
         </Grid>
 
         <Grid container gap="12px" pb="10px">
