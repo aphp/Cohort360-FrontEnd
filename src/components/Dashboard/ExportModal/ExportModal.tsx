@@ -51,7 +51,7 @@ const initialState: ExportCSVForm = {
   conditions: false,
   tables: export_table.map<ExportCSVTable>((table) => ({
     ...table,
-    checked: table.label === 'person' ? true : false,
+    checked: table.label === 'person',
     fhir_filter: null,
     respect_table_relationships: true,
     count: 0
@@ -158,7 +158,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
   const resetSelectedTables = () => {
     const newSelectedTables = settings.tables.map<ExportCSVTable>((table) => ({
       ...table,
-      checked: table.label !== 'person' ? false : true
+      checked: table.label === 'person'
     }))
     handleChangeSettings('tables', newSelectedTables)
     setExpandedTableIds([])
@@ -240,7 +240,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
   function renderExportTable(exportTable: ExportCSVTable) {
     const { name, checked, label, resourceType, count } = exportTable
     const isItemExpanded = expandedTableIds.includes(label)
-    const _countLoading = (countLoading && typeof countLoading === 'boolean') || countLoading === label ? true : false
+    const _countLoading = !!((countLoading && typeof countLoading === 'boolean') || countLoading === label)
     const setLimitError = resourceType === ResourceType.DOCUMENTS ? 5000 : EXPORT_LINES_LIMIT
 
     return (
@@ -406,7 +406,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
               <Checkbox
                 checked={isChecked}
                 onClick={() => {
-                  setIsChecked(!isChecked), resetSelectedTables()
+                  setIsChecked(!isChecked)
+                  resetSelectedTables()
                 }}
               />
             }
