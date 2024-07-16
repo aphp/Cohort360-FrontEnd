@@ -34,7 +34,7 @@ import {
 } from './callApi'
 
 import apiBackend from '../apiBackend'
-import { Binary, DocumentReference, Extension, ImagingStudy, ParametersParameter, Patient } from 'fhir/r4'
+import { Binary, DocumentReference, ImagingStudy, ParametersParameter, Patient } from 'fhir/r4'
 import { AxiosError, AxiosResponse, CanceledError, isAxiosError } from 'axios'
 import {
   VitalStatus,
@@ -213,6 +213,8 @@ export interface IServiceCohorts {
     cohortId: string
     motivation: string
     tables: ExportCSVTable[]
+    outputFormat: 'csv' | 'xlsx'
+    group_tables: boolean
   }) => Promise<AxiosResponse<Export> | AxiosError>
 }
 
@@ -667,7 +669,7 @@ const servicesCohorts: IServiceCohorts = {
 
   createExport: async (args): Promise<AxiosResponse<Export> | AxiosError> => {
     try {
-      const { cohortId, motivation, tables } = args
+      const { cohortId, motivation, tables, outputFormat, group_tables } = args
 
       return await apiBackend.post<Export>('/exports/', {
         motivation,
@@ -678,7 +680,8 @@ const servicesCohorts: IServiceCohorts = {
           ...(table.fhir_filter && { fhir_filter: table.fhir_filter?.uuid })
         })),
         nominative: true, // Nominative should always be true when exporting a CSV (see issue #1113)
-        output_format: 'csv'
+        output_format: outputFormat,
+        group_tables: group_tables
       })
     } catch (error) {
       if (isAxiosError(error)) return error

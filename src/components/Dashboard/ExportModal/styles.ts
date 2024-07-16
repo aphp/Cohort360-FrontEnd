@@ -111,6 +111,19 @@ const useStyles = makeStyles()(() => ({
     color: '#ed6c02',
     fontSize: '12px',
     fontWeight: '600'
+  },
+  referentielContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  select: {
+    marginLeft: 8,
+    borderRadius: 25,
+    backgroundColor: '#FFF',
+    '& .MuiSelect-select': {
+      borderRadius: 25
+    }
   }
 }))
 
