@@ -50,16 +50,12 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
   const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
 
-  const procedureHierarchy = useAppSelector((state) => state.pmsi.procedure.list || {})
-  const isLoadingsyncHierarchyTable = useAppSelector((state) => state.syncHierarchyTable.loading || 0)
-  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)
+  const procedureHierarchy = useAppSelector((state) => state.pmsi.procedure.list)
+  const isLoadingsyncHierarchyTable = useAppSelector((state) => state.syncHierarchyTable.loading ?? 0)
+  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading ?? 0)
 
   const [open, setOpen] = useState(false)
-  const isSelected = findSelectedInListAndSubItems(
-    selectedItems ? selectedItems : [],
-    procedureItem,
-    procedureHierarchy
-  )
+  const isSelected = findSelectedInListAndSubItems(selectedItems ?? [], procedureItem, procedureHierarchy)
   const isIndeterminated = checkIfIndeterminated(procedureItem, selectedItems)
   const _onExpand = async (procedureCode: string) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
@@ -72,15 +68,15 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
       defaultProcedure.type,
       dispatch
     )
-    await handleClick(selectedItems, newHierarchy)
+    handleClick(selectedItems, newHierarchy)
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = async (procedureItem: Hierarchy<any, any>) => {
+  const handleClickOnHierarchy = (procedureItem: Hierarchy<any, any>) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getHierarchySelection(procedureItem, selectedItems || [], procedureHierarchy)
-    await handleClick(newSelectedItems)
+    handleClick(newSelectedItems)
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
@@ -88,7 +84,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
     return (
       <ListItem className={classes.procedureItem}>
         <ListItemIcon>
-          <div
+          <button
             onClick={() => handleClickOnHierarchy(procedureItem)}
             className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,

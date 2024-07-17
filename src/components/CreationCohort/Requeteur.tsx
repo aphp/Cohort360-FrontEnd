@@ -21,6 +21,7 @@ import { getDataFromFetch, cleanNominativeCriterias } from 'utils/cohortCreation
 import useStyles from './styles'
 import services from 'services/aphp'
 import { setCriteriaData } from 'state/criteria'
+import { ODD_QUESTIONNAIRE } from '../../constants'
 
 const Requeteur = () => {
   const {
@@ -92,12 +93,12 @@ const Requeteur = () => {
               disabled: !allowSearchIpp
             },
             Pregnancy: {
-              color: allowMaternityForms ? '#0063AF' : '#808080',
-              disabled: !allowMaternityForms
+              color: allowMaternityForms && ODD_QUESTIONNAIRE ? '#0063AF' : '#808080',
+              disabled: !allowMaternityForms || !ODD_QUESTIONNAIRE
             },
             Hospit: {
-              color: allowMaternityForms ? '#0063AF' : '#808080',
-              disabled: !allowMaternityForms
+              color: allowMaternityForms && ODD_QUESTIONNAIRE ? '#0063AF' : '#808080',
+              disabled: !allowMaternityForms || !ODD_QUESTIONNAIRE
             }
           },
           cache: criteriaCache

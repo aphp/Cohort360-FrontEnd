@@ -15,7 +15,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     padding: 20,
     backgroundColor: '#317EAA',
     color: 'white',
-    // Not default
     marginBottom: 46
   },
   backButton: { color: 'white' },
@@ -25,7 +24,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
     width: 20,
     height: 20,
     border: '2px solid currentColor',
-    borderRadius: 10
+    borderRadius: 10,
+    backgroundColor: '#fff'
   },
   selectedIndicator: {
     width: 20,
