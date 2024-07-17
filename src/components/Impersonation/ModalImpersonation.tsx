@@ -34,6 +34,8 @@ const ModalImpersonation: React.FC<{
   const [searchInput, setSearchInput] = useState('')
   const debouncedSearchTerm = useDebounce(700, searchInput)
 
+  const impersonateUserEmail = impersonatedUser?.email ? `- ${impersonatedUser.email}` : ''
+
   const handleConfirm = () => {
     dispatch(impersonate(impersonatedUser))
     handleClose()
@@ -91,13 +93,13 @@ const ModalImpersonation: React.FC<{
               getOptionLabel={(option) =>
                 `${option.username} - ${option.lastname?.toLocaleUpperCase()} ${option.firstname} ${
                   option.email ? `- ${option.email}` : ''
-                }` ?? ''
+                }`
               }
               renderInput={(params) => {
                 const value = impersonatedUser
                   ? `${impersonatedUser.username} - ${impersonatedUser.lastname?.toLocaleUpperCase()} ${
                       impersonatedUser.firstname
-                    } ${impersonatedUser.email ? `- ${impersonatedUser.email}` : ''}`
+                    } ${impersonateUserEmail}`
                   : searchInput
                 delete params.inputProps.value
                 return (

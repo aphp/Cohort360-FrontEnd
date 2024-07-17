@@ -16,14 +16,12 @@ import ExportDownload from 'views/ExportDownload/ExportDownload'
 
 // import { ODD_CONTACT } from '../../../constants'
 
-type configRoute =
-  | (RouteObject & {
-      exact?: boolean
-      displaySideBar?: boolean
-      isPrivate?: boolean
-      name?: string
-    })
-  | boolean
+type configRoute = RouteObject & {
+  exact: boolean
+  displaySideBar: boolean
+  isPrivate: boolean
+  name: string
+}
 
 const configRoutes: configRoute[] = [
   /**
@@ -33,7 +31,9 @@ const configRoutes: configRoute[] = [
     exact: true,
     path: '/',
     name: 'main',
-    element: <Login />
+    element: <Login />,
+    isPrivate: false,
+    displaySideBar: false
   },
   /**
    * Cohort360: Main Page
@@ -50,7 +50,9 @@ const configRoutes: configRoute[] = [
     exact: true,
     path: '/health-check',
     name: 'health-check',
-    element: <HealthCheck />
+    element: <HealthCheck />,
+    isPrivate: false,
+    displaySideBar: false
   },
   /**
    * Cohort360: Research Patient Page
@@ -166,14 +168,16 @@ const configRoutes: configRoute[] = [
     path: '/perimeters',
     name: 'perimeters',
     isPrivate: true,
-    element: <Dashboard context={'perimeters'} />
+    element: <Dashboard context={'perimeters'} />,
+    exact: false
   },
   {
     displaySideBar: true,
     path: '/perimeters/:tabName',
     name: 'perimeters/:tabName',
     isPrivate: true,
-    element: <Dashboard context={'perimeters'} />
+    element: <Dashboard context={'perimeters'} />,
+    exact: false
   },
   // /**
   //  * Cohort360: All Patients Page
@@ -183,14 +187,16 @@ const configRoutes: configRoute[] = [
     path: '/my-patients',
     name: 'my-patients',
     isPrivate: true,
-    element: <Dashboard context={'patients'} />
+    element: <Dashboard context={'patients'} />,
+    exact: false
   },
   {
     displaySideBar: true,
     path: '/my-patients/:tabName',
     name: 'my-patients/:tabName',
     isPrivate: true,
-    element: <Dashboard context={'patients'} />
+    element: <Dashboard context={'patients'} />,
+    exact: false
   },
   // /**
   //  * Cohort360: Patient Page
@@ -200,20 +206,24 @@ const configRoutes: configRoute[] = [
     path: '/patients/:patientId',
     name: 'patients/:patientId',
     isPrivate: true,
-    element: <Patient />
+    element: <Patient />,
+    exact: false
   },
   {
     displaySideBar: true,
     path: '/patients/:patientId/:tabName',
     name: 'patients/:patientId/:tabName',
     isPrivate: true,
-    element: <Patient />
+    element: <Patient />,
+    exact: false
   },
   {
     path: '/exports/:exportId/download',
     name: '/exports/:exportId/download',
     isPrivate: true,
-    element: <ExportDownload />
+    element: <ExportDownload />,
+    exact: false,
+    displaySideBar: false
   },
   /**
    * Cohort360: 404 - Page Not Found
@@ -222,7 +232,9 @@ const configRoutes: configRoute[] = [
     path: '*',
     name: 'page-not-found',
     isPrivate: false,
-    element: <PageNotFound />
+    element: <PageNotFound />,
+    displaySideBar: false,
+    exact: false
   }
   /**
    * Cohort360: Contact Page

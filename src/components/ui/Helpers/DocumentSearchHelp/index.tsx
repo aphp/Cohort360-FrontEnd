@@ -307,8 +307,8 @@ const DocumentSearchHelp: React.FC<DocumentSearchHelpProps> = ({ open, onClose }
                   </TableCellWrapper>
                   <TableCellWrapper align="left">
                     <Typography>
-                      <span className={classes.bold}>(</span>embolie AND pulmonaire
-                      <span className={classes.bold}>)</span> NOT <span className={classes.bold}>(</span>infarctus AND
+                      <span className={classes.bold}>(</span>embolie AND pulmonaire{' '}
+                      <span className={classes.bold}>)</span> NOT <span className={classes.bold}>(</span>infarctus AND{' '}
                       myocarde
                       <span className={classes.bold}>)</span>
                     </Typography>

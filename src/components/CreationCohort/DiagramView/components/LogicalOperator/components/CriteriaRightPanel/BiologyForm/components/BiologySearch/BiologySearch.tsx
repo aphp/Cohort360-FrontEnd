@@ -61,7 +61,7 @@ const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
   return (
     <ListItem className={classes.biologyItem}>
       <ListItemIcon>
-        <div
+        <button
           onClick={() => handleClickOnList(biologyItem)}
           className={cx(classes.indicator, {
             [classes.selectedIndicator]: isSelected
@@ -73,7 +73,7 @@ const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
         <Breadcrumbs maxItems={2}>
           {label.split('|').map((_label: string, index: number) => (
             <ListItemText
-              key={index}
+              key={index + _label}
               onClick={() => handleClickOnList(biologyItem)}
               className={classes.label}
               primary={_label}
@@ -111,13 +111,14 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
 
   const debouncedSearchItem = useDebounce(500, searchInput)
 
-  const _onSubmit = (event: UIEvent) => {
+  const _onSubmit = (event: UIEvent | null) => {
+    if (event === null) return
     event.preventDefault()
     getBiologySearchResults()
   }
 
   const onKeyDown = (event: KeyboardEvent) => {
-    event.key === 'Enter' && !event.shiftKey ? _onSubmit(event) : null
+    event.key === 'Enter' && !event.shiftKey ? _onSubmit(event) : _onSubmit(null)
   }
 
   const _onNext = () => {
@@ -224,11 +225,11 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
           <List className={classes.drawerContentContainer}>
             {selectedTab === 'anabio' &&
               biologySearchResults.anabio.length > 0 &&
-              biologySearchResults.anabio.map((anabioItem, index) => {
+              biologySearchResults.anabio.map((anabioItem) => {
                 const label = anabioItem.hierarchyDisplay
                 return (
                   <BiologySearchListItem
-                    key={index}
+                    key={anabioItem.code}
                     label={label}
                     selectedItems={selectedItems}
                     handleClick={setSelectedItems}
@@ -239,12 +240,12 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
 
             {selectedTab === 'loinc' &&
               biologySearchResults.loinc.length > 0 &&
-              biologySearchResults.loinc.map((loincItem, index) => {
+              biologySearchResults.loinc.map((loincItem) => {
                 const label = `${loincItem.code} - ${loincItem.display}`
 
                 return (
                   <BiologySearchListItem
-                    key={index}
+                    key={loincItem.code}
                     label={label}
                     selectedItems={selectedItems}
                     handleClick={setSelectedItems}

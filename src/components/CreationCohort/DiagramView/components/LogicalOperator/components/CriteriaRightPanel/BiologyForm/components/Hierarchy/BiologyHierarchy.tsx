@@ -49,12 +49,12 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
   const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
 
-  const biologyHierarchy = useAppSelector((state) => state.biology.list || {})
-  const isLoadingsyncHierarchyTable = useAppSelector((state) => state.syncHierarchyTable.loading || 0)
-  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)
+  const biologyHierarchy = useAppSelector((state) => state.biology.list)
+  const isLoadingsyncHierarchyTable = useAppSelector((state) => state.syncHierarchyTable.loading ?? 0)
+  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading ?? 0)
 
   const [open, setOpen] = useState(false)
-  const isSelected = findSelectedInListAndSubItems(selectedItems ? selectedItems : [], biologyItem, biologyHierarchy)
+  const isSelected = findSelectedInListAndSubItems(selectedItems ?? [], biologyItem, biologyHierarchy)
   const isIndeterminated = checkIfIndeterminated(biologyItem, selectedItems)
   const _onExpand = async (biologyCode: string) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
@@ -67,7 +67,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
       defaultBiology.type,
       dispatch
     )
-    await handleClick(selectedItems, newHierarchy)
+    handleClick(selectedItems, newHierarchy)
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
@@ -75,7 +75,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getHierarchySelection(biologyItem, selectedItems || [], biologyHierarchy)
-    await handleClick(newSelectedItems)
+    handleClick(newSelectedItems)
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
@@ -83,7 +83,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
     return (
       <ListItem className={classes.biologyItem}>
         <ListItemIcon>
-          <div
+          <button
             onClick={() => handleClickOnHierarchy(biologyItem)}
             className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
@@ -103,7 +103,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
     <>
       <ListItem className={classes.biologyItem}>
         <ListItemIcon>
-          <div
+          <button
             onClick={() => handleClickOnHierarchy(biologyItem)}
             className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
@@ -121,24 +121,23 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
       <Collapse in={id === '*' ? true : open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
-          {subItems &&
-            subItems.map((biologyHierarchySubItem: Hierarchy<any, any>, index: number) =>
-              biologyHierarchySubItem.id === 'loading' ? (
-                <Fragment key={index}>
-                  <div className={classes.subItemsIndicator} />
-                  <Skeleton style={{ flex: 1, margin: '2px 32px' }} height={32} />
-                </Fragment>
-              ) : (
-                <Fragment key={index}>
-                  <div className={classes.subItemsIndicator} />
-                  <BiologyListItem
-                    biologyItem={biologyHierarchySubItem}
-                    selectedItems={selectedItems}
-                    handleClick={handleClick}
-                  />
-                </Fragment>
-              )
-            )}
+          {subItems?.map((biologyHierarchySubItem: Hierarchy<any, any>, index: number) =>
+            biologyHierarchySubItem.id === 'loading' ? (
+              <Fragment key={index + biologyHierarchySubItem.id}>
+                <div className={classes.subItemsIndicator} />
+                <Skeleton style={{ flex: 1, margin: '2px 32px' }} height={32} />
+              </Fragment>
+            ) : (
+              <Fragment key={index + biologyHierarchySubItem.id}>
+                <div className={classes.subItemsIndicator} />
+                <BiologyListItem
+                  biologyItem={biologyHierarchySubItem}
+                  selectedItems={selectedItems}
+                  handleClick={handleClick}
+                />
+              </Fragment>
+            )
+          )}
         </List>
       </Collapse>
     </>
@@ -164,14 +163,14 @@ const BiologyHierarchy: React.FC<BiologyHierarchyProps> = (props) => {
 
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const isLoadingSyncHierarchyTable = initialState?.loading ?? 0
-  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)
+  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading ?? 0)
   const [currentState, setCurrentState] = useState({ ...selectedCriteria, ...initialState })
   const [loading, setLoading] = useState(isLoadingSyncHierarchyTable > 0 || isLoadingPmsi > 0)
 
-  const biologyHierarchy = useAppSelector((state) => state.biology.list || {})
+  const biologyHierarchy = useAppSelector((state) => state.biology.list)
 
   useEffect(() => {
-    const newList = { ...selectedCriteria, ...initialState } ?? {}
+    const newList = { ...selectedCriteria, ...initialState }
     if (!newList.code) {
       newList.code = selectedCriteria.code
     }
@@ -179,7 +178,7 @@ const BiologyHierarchy: React.FC<BiologyHierarchyProps> = (props) => {
       (item: Hierarchy<any, any>) => findEquivalentRowInItemAndSubItems(item, biologyHierarchy).equivalentRow
     )
     setCurrentState(newList)
-  }, [initialState, biologyHierarchy])
+  }, [initialState, biologyHierarchy, selectedCriteria])
 
   const _handleClick = (
     newSelectedItems: Hierarchy<any, any>[] | null | undefined,
@@ -196,47 +195,44 @@ const BiologyHierarchy: React.FC<BiologyHierarchyProps> = (props) => {
   }, [isLoadingSyncHierarchyTable, isLoadingPmsi])
 
   return isOpen ? (
-    <>
-      <Grid className={classes.root}>
-        <Grid className={classes.actionContainer}>
-          {!isEdition ? (
-            <>
-              <IconButton className={classes.backButton} onClick={goBack}>
-                <KeyboardBackspaceIcon />
-              </IconButton>
-              <Divider className={classes.divider} orientation="vertical" flexItem />
-              <Typography className={classes.titleLabel}>Ajouter un critère de biologie</Typography>
-            </>
-          ) : (
-            <Typography className={classes.titleLabel}>Modifier un critère de biologie</Typography>
-          )}
-        </Grid>
-
-        <div className={classes.loader}>{loading && <LinearProgress />}</div>
-        <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-          {biologyHierarchy &&
-            biologyHierarchy.map((biologyItem, index) => (
-              <BiologyListItem
-                key={index}
-                biologyItem={biologyItem}
-                selectedItems={currentState.code}
-                handleClick={_handleClick}
-              />
-            ))}
-        </List>
-
-        <Grid className={classes.biologyHierarchyActionContainer}>
-          {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
-              Annuler
-            </Button>
-          )}
-          <Button onClick={() => onConfirm()} type="submit" form="biology-form" color="primary" variant="contained">
-            Suivant
-          </Button>
-        </Grid>
+    <Grid className={classes.root}>
+      <Grid className={classes.actionContainer}>
+        {!isEdition ? (
+          <>
+            <IconButton className={classes.backButton} onClick={goBack}>
+              <KeyboardBackspaceIcon />
+            </IconButton>
+            <Divider className={classes.divider} orientation="vertical" flexItem />
+            <Typography className={classes.titleLabel}>Ajouter un critère de biologie</Typography>
+          </>
+        ) : (
+          <Typography className={classes.titleLabel}>Modifier un critère de biologie</Typography>
+        )}
       </Grid>
-    </>
+
+      <div className={classes.loader}>{loading && <LinearProgress />}</div>
+      <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
+        {biologyHierarchy?.map((biologyItem, index) => (
+          <BiologyListItem
+            key={index + biologyItem.id}
+            biologyItem={biologyItem}
+            selectedItems={currentState.code}
+            handleClick={_handleClick}
+          />
+        ))}
+      </List>
+
+      <Grid className={classes.biologyHierarchyActionContainer}>
+        {!isEdition && (
+          <Button onClick={goBack} color="primary" variant="outlined">
+            Annuler
+          </Button>
+        )}
+        <Button onClick={() => onConfirm()} type="submit" form="biology-form" color="primary" variant="contained">
+          Suivant
+        </Button>
+      </Grid>
+    </Grid>
   ) : (
     <></>
   )

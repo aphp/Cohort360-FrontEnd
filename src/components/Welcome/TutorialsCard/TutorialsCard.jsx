@@ -53,7 +53,7 @@ const TutorialsCard = () => {
         {youtubeIds.map(
           (m, i) =>
             currentIndex === i && (
-              <Paper key={i} className={classes.carouselPaper}>
+              <Paper key={i + m} className={classes.carouselPaper}>
                 <Grid className={classes.videoResponsive}>
                   <YoutubeEmbed embedId={m} />
                 </Grid>
@@ -80,9 +80,9 @@ const TutorialsCard = () => {
         <Grid className={classes.dotIndicatorContainer}>
           {youtubeIds.map((DO_NOT_USE, i) =>
             currentIndex === i ? (
-              <RadioButtonCheckedIcon key={i} onClick={() => setCurrentIndex(i)} />
+              <RadioButtonCheckedIcon key={i + 'a'} onClick={() => setCurrentIndex(i)} />
             ) : (
-              <RadioButtonUncheckedIcon key={i} onClick={() => setCurrentIndex(i)} />
+              <RadioButtonUncheckedIcon key={i + 'a'} onClick={() => setCurrentIndex(i)} />
             )
           )}
         </Grid>
