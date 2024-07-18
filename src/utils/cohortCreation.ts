@@ -507,7 +507,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case CriteriaType.OBSERVATION: {
       const unreducedFilterFhir = [
-        `subject.active=true&${OBSERVATION_STATUS}=${BiologyStatus.VALIDATED}&value-quantity=ge0,le0`,
+        `subject.active=true&${OBSERVATION_STATUS}=${BiologyStatus.VALIDATED}`,
         filtersBuilders(OBSERVATION_CODE, buildLabelObjectFilter(criterion.code, BIOLOGY_HIERARCHY_ITM_ANABIO)),
         filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(ENCOUNTER_STATUS_REFERENCE, buildLabelObjectFilter(criterion.encounterStatus)),

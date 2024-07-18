@@ -149,7 +149,7 @@ export const buildObservationValueFilter = (criterion: ObservationDataType, fhir
       return `${fhirKey}=${valueComparatorFilter}${criterion.searchByValue[0]}`
     }
   }
-  return ''
+  return `${fhirKey}=le0,ge0`
 }
 
 export const unbuildObservationValueFilter = (filters: string[][], currentCriterion: ObservationDataType) => {
