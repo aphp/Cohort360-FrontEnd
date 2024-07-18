@@ -1,4 +1,3 @@
-/* eslint-disable max-statements */
 import React, { useState } from 'react'
 import { Autocomplete, FormLabel, Grid, MenuItem, Select, TextField } from '@mui/material'
 import { BlockWrapper } from 'components/ui/Layout'
@@ -13,7 +12,12 @@ import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 import { CriteriaDrawerComponentProps } from 'types'
 import { CalendarRequestLabel } from 'types/dates'
 import { Comparators, CriteriaDataKey, ImagingDataType, CriteriaType, CriteriaTypeLabels } from 'types/requestCriterias'
-import { DocumentAttachmentMethod, DocumentAttachmentMethodLabel, LabelObject } from 'types/searchCriterias'
+import {
+  DocumentAttachmentMethod,
+  DocumentAttachmentMethodLabel,
+  DurationRangeType,
+  LabelObject
+} from 'types/searchCriterias'
 import useStyles from './styles'
 import { mappingCriteria } from '../DemographicForm'
 import SearchbarWithCheck from 'components/ui/Inputs/SearchbarWithCheck'
@@ -87,8 +91,18 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   )
   const [seriesUid, setSeriesUid] = useState<string>(selectedCriteria?.seriesUid || '')
   const [encounterService, setEncounterService] = useState(selectedCriteria?.encounterService || [])
-  const [encounterStartDate, setEncounterStartDate] = useState(selectedCriteria?.encounterStartDate || null)
-  const [encounterEndDate, setEncounterEndDate] = useState(selectedCriteria?.encounterEndDate || null)
+  const [encounterStartDate, setEncounterStartDate] = useState<DurationRangeType>(
+    selectedCriteria?.encounterStartDate || [null, null]
+  )
+  const [includeEncounterStartDateNull, setIncludeEncounterStartDateNull] = useState(
+    selectedCriteria?.includeEncounterStartDateNull
+  )
+  const [encounterEndDate, setEncounterEndDate] = useState<DurationRangeType>(
+    selectedCriteria?.encounterEndDate || [null, null]
+  )
+  const [includeEncounterEndDateNull, setIncludeEncounterEndDateNull] = useState(
+    selectedCriteria?.includeEncounterEndDateNull
+  )
   const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>(
     mappingCriteria(selectedCriteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
   )
@@ -106,6 +120,12 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
         break
       case 'encounterEndDate':
         setEncounterEndDate(value)
+        break
+      case 'includeEncounterStartDateNull':
+        setIncludeEncounterStartDateNull(value)
+        break
+      case 'includeEncounterEndDateNull':
+        setIncludeEncounterEndDateNull(value)
         break
       default:
         break
@@ -140,7 +160,9 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
       seriesUid,
       encounterService,
       encounterStartDate,
+      includeEncounterStartDateNull,
       encounterEndDate,
+      includeEncounterEndDateNull,
       encounterStatus
     })
   }
@@ -402,7 +424,9 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
           type: CriteriaType.IMAGING,
           encounterService: encounterService,
           encounterStartDate: encounterStartDate,
-          encounterEndDate: encounterEndDate
+          encounterEndDate: encounterEndDate,
+          includeEncounterStartDateNull,
+          includeEncounterEndDateNull
         }}
         onError={(isError) => setError(isError ? Error.ADVANCED_INPUTS_ERROR : Error.NO_ERROR)}
         onChangeValue={_onChangeValue}

@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import moment from 'moment'
-
 import services from 'services/aphp'
 import {
   CriteriaGroup,
@@ -61,7 +59,7 @@ import {
   buildSearchFilter,
   buildSimpleFilter,
   buildWithDocumentFilter,
-  unbuildAdvancedCriterias,
+  unbuildOccurrence,
   unbuildDateFilter,
   unbuildDurationFilter,
   unbuildDocTypesFilter,
@@ -74,7 +72,10 @@ import {
   unbuildDocStatusesFilter,
   questionnaireFiltersBuilders,
   unbuildQuestionnaireFilters,
-  findQuestionnaireName
+  findQuestionnaireName,
+  buildEncounterDateFilter,
+  getCriterionDateFilterName,
+  unbuildEncounterDatesFilters
 } from './mappers'
 import { pregnancyForm } from 'data/pregnancyData'
 import { hospitForm } from 'data/hospitData'
@@ -132,17 +133,6 @@ export type RequeteurCriteriaType = {
     operator?: Comparators
     timeDelayMin?: number
     timeDelayMax?: number
-  }
-  dateRangeList?: {
-    minDate?: string // YYYY-MM-DD
-    maxDate?: string // YYYY-MM-DD
-    datePreference?: 'event_date' | 'encounter_end_date' | 'encounter_start_date'
-    dateIsNotNull?: boolean
-  }[]
-  encounterDateRange?: {
-    minDate?: string // YYYY-MM-DD
-    maxDate?: string // YYYY-MM-DD
-    dateIsNotNull?: boolean
   }
 }
 
@@ -356,7 +346,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
               'le',
               deidentified
             )
-          : ''
+          : '',
+        buildEncounterDateFilter(
+          criterion.type,
+          criterion.includeEncounterStartDateNull,
+          criterion.encounterStartDate,
+          true
+        ),
+        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
       ]
         .filter((elem) => elem)
         .reduce(filterReducer)
@@ -384,7 +381,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         ),
         filtersBuilders(DocumentsParamsKeys.DOC_STATUSES, buildLabelObjectFilter(criterion.encounterStatus)),
         filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
-        filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le'))
+        filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le')),
+        buildEncounterDateFilter(
+          criterion.type,
+          criterion.includeEncounterStartDateNull,
+          criterion.encounterStartDate,
+          true
+        ),
+        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -400,7 +404,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         filtersBuilders(ConditionParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(ConditionParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
         filtersBuilders(ConditionParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
-        filtersBuilders(ConditionParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le'))
+        filtersBuilders(ConditionParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le')),
+        buildEncounterDateFilter(
+          criterion.type,
+          criterion.includeEncounterStartDateNull,
+          criterion.encounterStartDate,
+          true
+        ),
+        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -415,7 +426,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         filtersBuilders(ProcedureParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
         filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
         filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le')),
-        criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : ''
+        criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : '',
+        buildEncounterDateFilter(
+          criterion.type,
+          criterion.includeEncounterStartDateNull,
+          criterion.encounterStartDate,
+          true
+        ),
+        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -429,7 +447,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         filtersBuilders(ClaimParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(ClaimParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
         filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
-        filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le'))
+        filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le')),
+        buildEncounterDateFilter(
+          criterion.type,
+          criterion.includeEncounterStartDateNull,
+          criterion.encounterStartDate,
+          true
+        ),
+        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -476,7 +501,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
               PrescriptionParamsKeys.PRESCRIPTION_TYPES,
               buildLabelObjectFilter(criterion.prescriptionType)
             )
-          : ''
+          : '',
+        buildEncounterDateFilter(
+          criterion.type,
+          criterion.includeEncounterStartDateNull,
+          criterion.encounterStartDate,
+          true
+        ),
+        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -494,7 +526,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         filtersBuilders(ObservationParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
         filtersBuilders(ObservationParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
         filtersBuilders(ObservationParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le')),
-        buildObservationValueFilter(criterion, ObservationParamsKeys.VALUE)
+        buildObservationValueFilter(criterion, ObservationParamsKeys.VALUE),
+        buildEncounterDateFilter(
+          criterion.type,
+          criterion.includeEncounterStartDateNull,
+          criterion.encounterStartDate,
+          true
+        ),
+        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -535,7 +574,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         filtersBuilders(ImagingParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
         buildWithDocumentFilter(criterion, ImagingParamsKeys.WITH_DOCUMENT),
         buildSimpleFilter(criterion.studyUid, ImagingParamsKeys.STUDY_UID, IMAGING_STUDY_UID_URL),
-        buildSimpleFilter(criterion.seriesUid, ImagingParamsKeys.SERIES_UID)
+        buildSimpleFilter(criterion.seriesUid, ImagingParamsKeys.SERIES_UID),
+        buildEncounterDateFilter(
+          criterion.type,
+          criterion.includeEncounterStartDateNull,
+          criterion.encounterStartDate,
+          true
+        ),
+        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
       ]
         .filter((elem) => elem)
         .reduce(filterReducer)
@@ -805,19 +851,7 @@ export function buildRequest(
                 n: item.occurrence,
                 operator: item?.occurrenceComparator || undefined
               }
-            : undefined,
-          encounterDateRange:
-            !(item.type === CriteriaType.PATIENT || item.type === CriteriaType.IPP_LIST) &&
-            (item.encounterStartDate || item.encounterEndDate)
-              ? {
-                  minDate: item.encounterStartDate
-                    ? moment(item.encounterStartDate).format('YYYY-MM-DD[T00:00:00Z]')
-                    : undefined,
-                  maxDate: item.encounterEndDate
-                    ? moment(item.encounterEndDate).format('YYYY-MM-DD[T00:00:00Z]')
-                    : undefined
-                }
-              : undefined
+            : undefined
         }
       } else {
         // return RequeteurGroupType
@@ -972,12 +1006,14 @@ const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise
     occurrence: null,
     startOccurrence: null,
     endOccurrence: null,
+    encounterStartDate: [null, null],
+    encounterEndDate: [null, null],
     encounterStatus: []
   }
   if (element.filterFhir) {
     const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
-    unbuildAdvancedCriterias(element, currentCriterion)
+    unbuildOccurrence(element, currentCriterion)
 
     for (const filter of filters) {
       const key = filter[0]
@@ -1051,6 +1087,25 @@ const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise
           unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
           break
         }
+        case EncounterParamsKeys.START_DATE: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case EncounterParamsKeys.END_DATE: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case '_filter':
+          unbuildEncounterDatesFilters(currentCriterion, value)
+          break
         case 'subject.active':
           break
         default:
@@ -1076,12 +1131,12 @@ const unbuildDocumentReferenceCriteria = async (element: RequeteurCriteriaType):
     startOccurrence: null,
     endOccurrence: null,
     encounterService: [],
-    encounterEndDate: null,
-    encounterStartDate: null,
+    encounterEndDate: [null, null],
+    encounterStartDate: [null, null],
     encounterStatus: []
   }
 
-  unbuildAdvancedCriterias(element, currentCriterion)
+  unbuildOccurrence(element, currentCriterion)
 
   if (element.filterFhir) {
     const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
@@ -1122,6 +1177,25 @@ const unbuildDocumentReferenceCriteria = async (element: RequeteurCriteriaType):
           }
           break
         }
+        case `${getCriterionDateFilterName(CriteriaType.DOCUMENTS)}.${EncounterParamsKeys.START_DATE}`: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case `${getCriterionDateFilterName(CriteriaType.DOCUMENTS)}.${EncounterParamsKeys.END_DATE}`: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case '_filter':
+          unbuildEncounterDatesFilters(currentCriterion, value)
+          break
         case 'subject.active':
         case 'type:not':
         case 'contenttype':
@@ -1147,14 +1221,14 @@ const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise
     startOccurrence: null,
     endOccurrence: null,
     encounterService: [],
-    encounterEndDate: null,
-    encounterStartDate: null,
+    encounterEndDate: [null, null],
+    encounterStartDate: [null, null],
     occurrenceComparator: null,
     label: undefined,
     encounterStatus: []
   }
 
-  unbuildAdvancedCriterias(element, currentCriterion)
+  unbuildOccurrence(element, currentCriterion)
 
   if (element.filterFhir) {
     const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
@@ -1191,6 +1265,26 @@ const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise
           }
           break
         }
+        case `${getCriterionDateFilterName(CriteriaType.CONDITION)}.${EncounterParamsKeys.START_DATE}`: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case `${getCriterionDateFilterName(CriteriaType.CONDITION)}.${EncounterParamsKeys.END_DATE}`: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case '_filter': {
+          unbuildEncounterDatesFilters(currentCriterion, value)
+          break
+        }
         case 'subject.active':
           break
         default:
@@ -1215,10 +1309,12 @@ const unbuildProcedureCriteria = async (element: RequeteurCriteriaType): Promise
     hierarchy: undefined,
     encounterService: [],
     occurrenceComparator: null,
-    encounterStatus: []
+    encounterStatus: [],
+    encounterStartDate: [null, null],
+    encounterEndDate: [null, null]
   }
 
-  unbuildAdvancedCriterias(element, currentCriterion)
+  unbuildOccurrence(element, currentCriterion)
 
   if (element.filterFhir) {
     const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
@@ -1253,6 +1349,25 @@ const unbuildProcedureCriteria = async (element: RequeteurCriteriaType): Promise
           }
           break
         }
+        case `${getCriterionDateFilterName(CriteriaType.PROCEDURE)}.${EncounterParamsKeys.START_DATE}`: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case `${getCriterionDateFilterName(CriteriaType.PROCEDURE)}.${EncounterParamsKeys.END_DATE}`: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case '_filter':
+          unbuildEncounterDatesFilters(currentCriterion, value)
+          break
         default:
           currentCriterion.error = true
           break
@@ -1273,10 +1388,12 @@ const unbuildClaimCriteria = async (element: RequeteurCriteriaType): Promise<Ghm
     endOccurrence: null,
     encounterService: [],
     label: undefined,
-    encounterStatus: []
+    encounterStatus: [],
+    encounterStartDate: [null, null],
+    encounterEndDate: [null, null]
   }
 
-  unbuildAdvancedCriterias(element, currentCriterion)
+  unbuildOccurrence(element, currentCriterion)
 
   if (element.filterFhir) {
     const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
@@ -1305,6 +1422,25 @@ const unbuildClaimCriteria = async (element: RequeteurCriteriaType): Promise<Ghm
           }
           break
         }
+        case `${getCriterionDateFilterName(CriteriaType.CLAIM)}.${EncounterParamsKeys.START_DATE}`: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case `${getCriterionDateFilterName(CriteriaType.CLAIM)}.${EncounterParamsKeys.END_DATE}`: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case '_filter':
+          unbuildEncounterDatesFilters(currentCriterion, value)
+          break
         case 'patient.active':
           break
         default:
@@ -1330,10 +1466,12 @@ const unbuildMedicationCriteria = async (element: RequeteurCriteriaType): Promis
     startOccurrence: null,
     endOccurrence: null,
     encounterService: [],
-    encounterStatus: []
+    encounterStatus: [],
+    encounterStartDate: [null, null],
+    encounterEndDate: [null, null]
   }
 
-  unbuildAdvancedCriterias(element, currentCriterion)
+  unbuildOccurrence(element, currentCriterion)
   if (element.filterFhir) {
     const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
@@ -1376,6 +1514,29 @@ const unbuildMedicationCriteria = async (element: RequeteurCriteriaType): Promis
           }
           break
         }
+        case `${getCriterionDateFilterName(CriteriaType.MEDICATION_REQUEST)}.${EncounterParamsKeys.START_DATE}`:
+        case `${getCriterionDateFilterName(CriteriaType.MEDICATION_ADMINISTRATION)}.${
+          EncounterParamsKeys.START_DATE
+        }`: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case `${getCriterionDateFilterName(CriteriaType.MEDICATION_REQUEST)}.${EncounterParamsKeys.END_DATE}`:
+        case `${getCriterionDateFilterName(CriteriaType.MEDICATION_ADMINISTRATION)}.${EncounterParamsKeys.END_DATE}`: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case '_filter':
+          unbuildEncounterDatesFilters(currentCriterion, value)
+          break
         default:
           currentCriterion.error = true
           break
@@ -1397,10 +1558,12 @@ const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promi
     encounterService: [],
     searchByValue: [null, null],
     valueComparator: Comparators.GREATER_OR_EQUAL,
-    encounterStatus: []
+    encounterStatus: [],
+    encounterStartDate: [null, null],
+    encounterEndDate: [null, null]
   }
 
-  unbuildAdvancedCriterias(element, currentCriterion)
+  unbuildOccurrence(element, currentCriterion)
 
   if (element.filterFhir) {
     const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
@@ -1448,6 +1611,25 @@ const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promi
           }
           break
         }
+        case `${getCriterionDateFilterName(CriteriaType.OBSERVATION)}.${EncounterParamsKeys.START_DATE}`: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case `${getCriterionDateFilterName(CriteriaType.OBSERVATION)}.${EncounterParamsKeys.END_DATE}`: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case '_filter':
+          unbuildEncounterDatesFilters(currentCriterion, value)
+          break
         case ObservationParamsKeys.VALUE:
         case ObservationParamsKeys.VALIDATED_STATUS:
         case 'subject.active':
@@ -1515,6 +1697,8 @@ const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<I
     occurrence: null,
     startOccurrence: null,
     endOccurrence: null,
+    encounterStartDate: [null, null],
+    encounterEndDate: [null, null],
     encounterService: [],
     encounterStatus: []
   }
@@ -1601,10 +1785,29 @@ const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<I
           unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
           break
         }
+        case `${getCriterionDateFilterName(CriteriaType.IMAGING)}.${EncounterParamsKeys.START_DATE}`: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case `${getCriterionDateFilterName(CriteriaType.IMAGING)}.${EncounterParamsKeys.END_DATE}`: {
+          if (value?.includes('ge')) {
+            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case '_filter':
+          unbuildEncounterDatesFilters(currentCriterion, value)
+          break
       }
     }
 
-    unbuildAdvancedCriterias(element, currentCriterion)
+    unbuildOccurrence(element, currentCriterion)
   }
   return currentCriterion
 }
@@ -1642,7 +1845,7 @@ const unbuildPregnancyQuestionnaireResponseCriteria = async (
     const splittedFilters = element.filterFhir.split('&')
     const cleanedFilters = unbuildQuestionnaireFilters(splittedFilters)
 
-    unbuildAdvancedCriterias(element, currentCriterion)
+    unbuildOccurrence(element, currentCriterion)
 
     for (const { key, values } of cleanedFilters) {
       // this is bad design, we should properly handle multiple values and operators
@@ -1780,7 +1983,7 @@ const unbuildHospitQuestionnaireResponseCriteria = async (element: RequeteurCrit
     const splittedFilters = element.filterFhir.split('&')
     const cleanedFilters = unbuildQuestionnaireFilters(splittedFilters)
 
-    unbuildAdvancedCriterias(element, currentCriterion)
+    unbuildOccurrence(element, currentCriterion)
 
     for (const { key, values } of cleanedFilters) {
       // this is bad design, we should properly handle multiple values and operators

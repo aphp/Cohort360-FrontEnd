@@ -23,8 +23,8 @@ export const defaultMedication: Omit<MedicationDataType, 'id'> = {
   occurrenceComparator: Comparators.GREATER_OR_EQUAL,
   startOccurrence: '',
   endOccurrence: '',
-  encounterEndDate: null,
-  encounterStartDate: null,
+  encounterEndDate: [null, null],
+  encounterStartDate: [null, null],
   isInclusive: true,
   encounterStatus: []
 }

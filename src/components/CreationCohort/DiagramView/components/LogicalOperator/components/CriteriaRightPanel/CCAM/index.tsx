@@ -26,8 +26,8 @@ export const defaultProcedure: Omit<CcamDataType, 'id'> = {
   startOccurrence: '',
   endOccurrence: '',
   isInclusive: true,
-  encounterStartDate: null,
-  encounterEndDate: null,
+  encounterStartDate: [null, null],
+  encounterEndDate: [null, null],
   encounterStatus: []
 }
 

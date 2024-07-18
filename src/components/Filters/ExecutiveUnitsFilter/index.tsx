@@ -11,6 +11,7 @@ import PopulationRightPanel from 'components/CreationCohort/DiagramView/componen
 import { Hierarchy } from 'types/hierarchy'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import { getScopeLevelBySourceType } from 'utils/perimeters'
+import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 
 type ExecutiveUnitsFilterProps = {
   value: Hierarchy<ScopeElement, string>[]
@@ -18,9 +19,17 @@ type ExecutiveUnitsFilterProps = {
   name: string
   disabled?: boolean
   onChange?: (value: Hierarchy<ScopeElement, string>[]) => void
+  isCriterion?: boolean
 }
 
-const ExecutiveUnitsFilter = ({ name, value, sourceType, disabled = false, onChange }: ExecutiveUnitsFilterProps) => {
+const ExecutiveUnitsFilter = ({
+  name,
+  value,
+  sourceType,
+  disabled = false,
+  onChange,
+  isCriterion = false
+}: ExecutiveUnitsFilterProps) => {
   const context = useContext(FormContext)
   const [population, setPopulation] = useState<Hierarchy<ScopeElement, string>[]>([])
   const [selectedPopulation, setSelectedPopulation] = useState<Hierarchy<ScopeElement, string>[]>(value)
@@ -47,10 +56,14 @@ const ExecutiveUnitsFilter = ({ name, value, sourceType, disabled = false, onCha
   }, [selectedPopulation])
   return (
     <InputWrapper>
-      <Grid item container alignContent="center">
-        <Typography variant="h3" alignSelf="center">
-          Unité exécutrice :
-        </Typography>
+      <Grid item container alignContent="center" alignItems={'center'}>
+        {isCriterion ? (
+          <CriteriaLabel style={{ padding: 0 }}>Unité exécutrice</CriteriaLabel>
+        ) : (
+          <Typography variant="h3" alignSelf="center">
+            Unité exécutrice :
+          </Typography>
+        )}
         <Tooltip
           title={
             <>

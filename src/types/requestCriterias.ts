@@ -50,6 +50,18 @@ export enum CriteriaType {
   HOSPIT = 'Hospit'
 }
 
+export type CriteriaTypesWithAdvancedInputs = Extract<
+  CriteriaType,
+  | CriteriaType.DOCUMENTS
+  | CriteriaType.CONDITION
+  | CriteriaType.PROCEDURE
+  | CriteriaType.CLAIM
+  | CriteriaType.MEDICATION_REQUEST
+  | CriteriaType.MEDICATION_ADMINISTRATION
+  | CriteriaType.OBSERVATION
+  | CriteriaType.IMAGING
+>
+
 export enum CriteriaTypeLabels {
   REQUEST = 'Mes requêtes',
   IPP_LIST = "Liste d'IPP",
@@ -87,8 +99,10 @@ export type WithOccurenceCriteriaDataType = {
 }
 
 export type WithEncounterDateDataType = {
-  encounterEndDate?: string | null
-  encounterStartDate?: string | null
+  encounterStartDate: DurationRangeType
+  includeEncounterStartDateNull?: boolean
+  encounterEndDate: DurationRangeType
+  includeEncounterEndDateNull?: boolean
 }
 
 export type WithEncounterStatusDataType = {
@@ -108,6 +122,13 @@ export type SelectedCriteriaType =
   | ImagingDataType
   | PregnancyDataType
   | HospitDataType
+
+export type SelectedCriteriaTypesWithAdvancedInputs = Exclude<
+  SelectedCriteriaType,
+  DemographicDataType | IPPListDataType | PregnancyDataType | HospitDataType | EncounterDataType
+>
+
+export type SelectedCriteriaTypesWithOccurrences = Exclude<SelectedCriteriaType, DemographicDataType | IPPListDataType>
 
 export enum CriteriaDataKey {
   GENDER = 'gender',
@@ -259,7 +280,6 @@ export type EncounterDataType = CommonCriteriaDataType &
 
 export type PregnancyDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
-  WithEncounterDateDataType &
   WithEncounterStatusDataType & {
     type: CriteriaType.PREGNANCY
     pregnancyStartDate: string | null | undefined
@@ -282,7 +302,6 @@ export type PregnancyDataType = CommonCriteriaDataType &
 
 export type HospitDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
-  WithEncounterDateDataType &
   WithEncounterStatusDataType & {
     type: CriteriaType.HOSPIT
     hospitReason: string

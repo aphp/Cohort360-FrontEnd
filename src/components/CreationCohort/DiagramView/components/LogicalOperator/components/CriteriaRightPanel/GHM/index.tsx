@@ -23,8 +23,8 @@ export const defaultClaim: Omit<GhmDataType, 'id'> = {
   startOccurrence: '',
   endOccurrence: '',
   isInclusive: true,
-  encounterStartDate: null,
-  encounterEndDate: null,
+  encounterStartDate: [null, null],
+  encounterEndDate: [null, null],
   encounterStatus: []
 }
 

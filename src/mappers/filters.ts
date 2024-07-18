@@ -74,7 +74,9 @@ export enum EncounterParamsKeys {
   PROVENANCE = 'admit-source',
   ADMISSION = 'admission-type',
   SERVICE_PROVIDER = 'encounter-care-site',
-  STATUS = 'status'
+  STATUS = 'status',
+  START_DATE = 'period-start',
+  END_DATE = 'period-end'
 }
 
 export enum DocumentsParamsKeys {

@@ -31,6 +31,7 @@ import { mappingCriteria } from '../DemographicForm'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
+import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 
 enum Error {
   EMPTY_FORM,
@@ -84,12 +85,16 @@ const EncounterForm = ({
   const [encounterService, setEncounterService] = useState<Hierarchy<ScopeElement, string>[]>(
     criteria?.encounterService || []
   )
-  const [encounterStartDate, setEncounterStartDate] = useState<string | null | undefined>(
-    criteria?.encounterStartDate || null
+  const [encounterStartDate, setEncounterStartDate] = useState<DurationRangeType>(
+    criteria?.encounterStartDate || [null, null]
   )
-  const [encounterEndDate, setEncounterEndDate] = useState<string | null | undefined>(
-    criteria?.encounterEndDate || null
+  const [includeEncounterStartDateNull, setIncludeEncounterStartDateNull] = useState(
+    criteria?.includeEncounterStartDateNull
   )
+  const [encounterEndDate, setEncounterEndDate] = useState<DurationRangeType>(
+    criteria?.encounterEndDate || [null, null]
+  )
+  const [includeEncounterEndDateNull, setIncludeEncounterEndDateNull] = useState(criteria?.includeEncounterEndDateNull)
   const [occurrence, setOccurrence] = useState<number>(criteria?.occurrence || 1)
   const [occurrenceComparator, setOccurrenceComparator] = useState<Comparators>(
     criteria?.occurrenceComparator || Comparators.GREATER_OR_EQUAL
@@ -141,7 +146,9 @@ const EncounterForm = ({
       admission,
       encounterService,
       encounterStartDate,
+      includeEncounterStartDateNull,
       encounterEndDate,
+      includeEncounterEndDateNull,
       occurrence,
       occurrenceComparator,
       encounterStatus,
@@ -240,6 +247,7 @@ const EncounterForm = ({
               value={encounterService}
               name="DocumentForm"
               onChange={setEncounterService}
+              isCriterion
             />
           </BlockWrapper>
 
@@ -276,19 +284,37 @@ const EncounterForm = ({
           </BlockWrapper>
 
           <BlockWrapper className={classes.inputItem}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Date de prise en charge
+            <CriteriaLabel>Date de prise en charge</CriteriaLabel>
+            <FormLabel style={{ padding: '0 0 0.5em', fontWeight: 600, fontSize: 12 }} component="legend">
+              Début de prise en charge
             </FormLabel>
             <CalendarRange
               inline
-              value={[encounterStartDate, encounterEndDate]}
-              onChange={([start, end]) => {
-                setEncounterStartDate(start)
-                setEncounterEndDate(end)
-              }}
+              value={encounterStartDate}
+              onChange={(newStartDate) => setEncounterStartDate(newStartDate)}
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+              includeNullValues={includeEncounterStartDateNull}
+              onChangeIncludeNullValues={(includeNullValues) => setIncludeEncounterStartDateNull(includeNullValues)}
+            />
+            <FormLabel
+              style={{ padding: '1em 0 0.5em', fontWeight: 600, fontSize: 12, display: 'flex', alignItems: 'center' }}
+              component="legend"
+            >
+              Fin de prise en charge
+              <Tooltip title={'Ne concerne pas les consultations'}>
+                <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+              </Tooltip>
+            </FormLabel>
+            <CalendarRange
+              inline
+              value={encounterEndDate}
+              onChange={(newEndDate) => setEncounterEndDate(newEndDate)}
+              onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+              includeNullValues={includeEncounterEndDateNull}
+              onChangeIncludeNullValues={(includeNullValues) => setIncludeEncounterEndDateNull(includeNullValues)}
             />
           </BlockWrapper>
+
           <BlockWrapper className={classes.inputItem}>
             <Collapse title="Général" value={false}>
               <BlockWrapper className={classes.inputItem}>

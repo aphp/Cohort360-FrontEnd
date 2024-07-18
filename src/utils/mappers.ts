@@ -1,5 +1,5 @@
 import { CriteriaName, ScopeElement, SimpleCodeType } from 'types'
-import { DocumentAttachmentMethod, LabelObject } from 'types/searchCriterias'
+import { DocumentAttachmentMethod, DurationRangeType, LabelObject } from 'types/searchCriterias'
 import {
   convertDurationToString,
   convertDurationToTimestamp,
@@ -10,23 +10,20 @@ import docTypes from 'assets/docTypes.json'
 import { RequeteurCriteriaType } from './cohortCreation'
 import moment from 'moment'
 import {
-  CcamDataType,
-  Cim10DataType,
   Comparators,
-  DocumentDataType,
-  EncounterDataType,
-  GhmDataType,
-  HospitDataType,
+  CriteriaType,
+  CriteriaTypesWithAdvancedInputs,
   ImagingDataType,
-  MedicationDataType,
   ObservationDataType,
-  PregnancyDataType
+  SelectedCriteriaTypesWithOccurrences,
+  SelectedCriteriaTypesWithAdvancedInputs,
+  EncounterDataType
 } from 'types/requestCriterias'
 import { comparatorToFilter, parseOccurence } from './valueComparator'
 import services from 'services/aphp'
 import extractFilterParams, { FhirFilterValue } from './fhirFilterParser'
 import { Hierarchy } from 'types/hierarchy'
-import { ObservationParamsKeys, mapDocumentStatusesFromRequestParam } from 'mappers/filters'
+import { EncounterParamsKeys, ObservationParamsKeys, mapDocumentStatusesFromRequestParam } from 'mappers/filters'
 
 const searchReducer = (accumulator: string, currentValue: string): string =>
   accumulator || !!accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -91,11 +88,13 @@ export const unbuildEncounterServiceCriterias = async (
 export const buildDateFilter = (
   criterion: string | null | undefined,
   comparator: 'le' | 'ge',
-  removeTimeZone = false
+  removeTimeZone = false,
+  withSpace = false
 ) => {
-  return criterion
-    ? `${comparator}${moment(criterion).format(`YYYY-MM-DD[T00:00:00${removeTimeZone ? '' : 'Z'}]`)}`
-    : ''
+  const _withSpace = withSpace ? ' ' : ''
+  const dateFormat = `YYYY-MM-DD[T00:00:00${removeTimeZone ? '' : 'Z'}]`
+
+  return criterion ? `${comparator}${_withSpace}${moment(criterion).format(dateFormat)}` : ''
 }
 
 export const unbuildDateFilter = (value: string) => {
@@ -201,29 +200,15 @@ export const unbuildDocStatusesFilter = (currentCriterion: any, filterName: stri
   }
 }
 
-export const unbuildAdvancedCriterias = (
+export const unbuildOccurrence = (
   element: RequeteurCriteriaType,
-  currentCriterion:
-    | CcamDataType
-    | Cim10DataType
-    | GhmDataType
-    | EncounterDataType
-    | DocumentDataType
-    | MedicationDataType
-    | ObservationDataType
-    | ImagingDataType
-    | PregnancyDataType
-    | HospitDataType
+  currentCriterion: SelectedCriteriaTypesWithOccurrences
 ) => {
   if (element.occurrence) {
     currentCriterion.occurrence = element.occurrence ? element.occurrence.n : 1
     currentCriterion.occurrenceComparator = element.occurrence
       ? element.occurrence.operator ?? Comparators.GREATER_OR_EQUAL
       : Comparators.GREATER_OR_EQUAL
-  }
-  if (element.encounterDateRange) {
-    currentCriterion.encounterStartDate = replaceTime(element.encounterDateRange.minDate)
-    currentCriterion.encounterEndDate = replaceTime(element.encounterDateRange.maxDate)
   }
   return currentCriterion
 }
@@ -259,6 +244,103 @@ export const questionnaireFiltersBuilders = (fhirKey: { id: string; type: string
         } ${operator} ${quoteValue(_value, fhirKey.type)}`
       : ''
   }
+}
+
+export const buildEncounterDateFilter = (
+  criterionType: CriteriaTypesWithAdvancedInputs | CriteriaType.ENCOUNTER,
+  includeNullDates?: boolean,
+  encounterDate?: DurationRangeType,
+  startDate?: boolean
+) => {
+  const encounterDateExists = !!encounterDate && (!!encounterDate[0] || !!encounterDate[1])
+  const criteriaFilterPrefix =
+    criterionType === CriteriaType.ENCOUNTER ? '' : `${getCriterionDateFilterName(criterionType)}.`
+  const criterionDateFilterName = `${criteriaFilterPrefix}${
+    startDate ? EncounterParamsKeys.START_DATE : EncounterParamsKeys.END_DATE
+  }`
+
+  if (includeNullDates && encounterDateExists) {
+    const dateFilter = `(${getDateFilters(
+      encounterDate,
+      criterionDateFilterName.replace('-', '.')
+    )}) or not (${criterionDateFilterName.replace('-', '.')} eq "*")`
+
+    return filtersBuilders(FILTER_PARAM_NAME, dateFilter)
+  } else if (encounterDateExists) {
+    if (encounterDate[0] && encounterDate[1]) {
+      const startDateFilter = filtersBuilders(criterionDateFilterName, buildDateFilter(encounterDate[0], 'ge'))
+      const endDateFilter = filtersBuilders(criterionDateFilterName, buildDateFilter(encounterDate[1], 'le'))
+
+      return `${startDateFilter}&${endDateFilter}`
+    } else {
+      const dateFilter = encounterDate[0]
+        ? buildDateFilter(encounterDate[0], 'ge')
+        : buildDateFilter(encounterDate[1], 'le')
+
+      return filtersBuilders(criterionDateFilterName, dateFilter)
+    }
+  } else return ''
+}
+
+export const getDateFilters = (dates: DurationRangeType, criterionDateFilterName: string) => {
+  if (dates[0] && dates[1]) {
+    return `${criterionDateFilterName} ${buildDateFilter(
+      dates[0],
+      'ge',
+      false,
+      true
+    )} and ${criterionDateFilterName} ${buildDateFilter(dates[1], 'le', false, true)}`
+  } else {
+    return `${criterionDateFilterName} ${
+      dates[0] ? buildDateFilter(dates[0], 'ge', false, true) : buildDateFilter(dates[1], 'le', false, true)
+    }`
+  }
+}
+
+export const getCriterionDateFilterName = (criterion: CriteriaTypesWithAdvancedInputs) => {
+  const mapping = {
+    [CriteriaType.DOCUMENTS]: 'encounter',
+    [CriteriaType.CONDITION]: 'encounter',
+    [CriteriaType.PROCEDURE]: 'encounter',
+    [CriteriaType.CLAIM]: 'encounter',
+    [CriteriaType.MEDICATION_REQUEST]: 'encounter',
+    [CriteriaType.MEDICATION_ADMINISTRATION]: 'context',
+    [CriteriaType.OBSERVATION]: 'encounter',
+    [CriteriaType.IMAGING]: 'encounter'
+  }
+  return mapping[criterion]
+}
+
+export const unbuildEncounterDatesFilters = (
+  criterion: SelectedCriteriaTypesWithAdvancedInputs | EncounterDataType,
+  value: string | null
+) => {
+  if (value?.includes(EncounterParamsKeys.START_DATE.replace('-', '.'))) {
+    criterion.encounterStartDate = unbuildEncounterDateFilters(value)
+    criterion.includeEncounterStartDateNull = true
+  } else if (value?.includes(EncounterParamsKeys.END_DATE.replace('-', '.'))) {
+    criterion.encounterEndDate = unbuildEncounterDateFilters(value)
+    criterion.includeEncounterEndDateNull = true
+  }
+
+  return criterion
+}
+
+export const unbuildEncounterDateFilters = (filter: string) => {
+  const datesRegex = /(le|ge)\s(\d{4})-(\d{2})-(\d{2})/g // matches dates
+  const dates = filter.match(datesRegex)
+  let formattedDates: DurationRangeType
+
+  if (dates && dates.length > 1) {
+    formattedDates = [unbuildDateFilter(dates[0].split(' ').join('')), unbuildDateFilter(dates[1].split(' ').join(''))]
+  } else if (dates && dates.length === 1) {
+    const formattedDate = unbuildDateFilter(dates[0].split(' ').join(''))
+    formattedDates = dates[0].includes('ge') ? [formattedDate, null] : [null, formattedDate]
+  } else {
+    formattedDates = [null, null]
+  }
+
+  return formattedDates
 }
 
 export const findQuestionnaireName = (filters: string[]) => {

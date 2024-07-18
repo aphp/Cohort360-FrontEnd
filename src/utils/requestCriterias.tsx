@@ -67,19 +67,30 @@ const getLabelFromName = (values: Hierarchy<ScopeElement, string>[]) => {
   return labels
 }
 
-const getDatesLabel = (values: DurationRangeType, word?: string) => {
+const getDatesLabel = (values: DurationRangeType, word?: string, excludeNullDates?: boolean) => {
+  const excludeNullDatesWording = excludeNullDates ? ', valeurs nulles incluses' : ''
+  let datesLabel = ''
   if (values[0] && values[1]) {
-    return `${word ? word + ' entre' : 'Entre'} le ${moment(values[0]).format('DD/MM/YYYY')} et le ${moment(
+    datesLabel = `${word ? word + ' entre' : 'Entre'} le ${moment(values[0]).format('DD/MM/YYYY')} et le ${moment(
       values[1]
-    ).format('DD/MM/YYYY')}`
+    ).format('DD/MM/YYYY')}${excludeNullDatesWording}`
   }
   if (values[0] && !values[1]) {
-    return `${word ? word + ' à' : 'À'} partir du ${moment(values[0]).format('DD/MM/YYYY')}`
+    datesLabel = `${word ? word + ' à' : 'À'} partir du ${moment(values[0]).format(
+      'DD/MM/YYYY'
+    )}${excludeNullDatesWording}`
   }
   if (!values[0] && values[1]) {
-    return `${word ? word + " jusqu'au" : "jusqu'au"}  ${moment(values[1]).format('DD/MM/YYYY')}`
+    datesLabel = `${word ? word + " jusqu'au" : "jusqu'au"}  ${moment(values[1]).format(
+      'DD/MM/YYYY'
+    )}${excludeNullDatesWording}`
   }
-  return ''
+
+  return (
+    <Tooltip title={datesLabel}>
+      <Typography style={{ textOverflow: 'ellipsis', overflow: 'hidden', fontSize: 12 }}>{datesLabel}</Typography>
+    </Tooltip>
+  )
 }
 
 const getSearchDocumentLabel = (value: string, searchBy: SearchByTypes) => {
@@ -854,10 +865,24 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
     case CriteriaType.IMAGING:
     case CriteriaType.PREGNANCY:
     case CriteriaType.HOSPIT:
-      if (selectedCriteria.encounterStartDate || selectedCriteria.encounterEndDate)
-        labels.push(
-          getDatesLabel([selectedCriteria.encounterStartDate, selectedCriteria.encounterEndDate], 'Prise en charge')
-        )
+      if (type !== CriteriaType.PREGNANCY && type !== CriteriaType.HOSPIT) {
+        if (selectedCriteria.encounterStartDate[0] !== null || selectedCriteria.encounterStartDate[1] !== null)
+          labels.push(
+            getDatesLabel(
+              selectedCriteria.encounterStartDate,
+              'Date de début de prise en charge',
+              selectedCriteria.includeEncounterStartDateNull
+            )
+          )
+        if (selectedCriteria.encounterEndDate[0] !== null || selectedCriteria.encounterEndDate[1] !== null)
+          labels.push(
+            getDatesLabel(
+              selectedCriteria.encounterEndDate,
+              'Date de fin de prise en charge',
+              selectedCriteria.includeEncounterEndDateNull
+            )
+          )
+      }
       if (selectedCriteria.occurrence && !isNaN(selectedCriteria.occurrence) && selectedCriteria.occurrenceComparator)
         labels.push(
           getNbOccurencesLabel(
