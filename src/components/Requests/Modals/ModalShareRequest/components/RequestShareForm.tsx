@@ -75,6 +75,11 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
     }
   }, [debouncedSearchTerm])
 
+  const currentRequestLengthError =
+    currentRequest?.name.length === 0
+      ? 'Le nom de la requête doit comporter au moins un caractère.'
+      : 'Le nom est trop long (255 caractères max.)'
+
   return (
     <>
       <Grid container direction="column" marginBottom={3}>
@@ -89,13 +94,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
           margin="normal"
           fullWidth
           error={error === ERROR_TITLE}
-          helperText={
-            error === ERROR_TITLE
-              ? currentRequest?.name.length === 0
-                ? 'Le nom de la requête doit comporter au moins un caractère.'
-                : 'Le nom est trop long (255 caractères max.)'
-              : ''
-          }
+          helperText={error === ERROR_TITLE ? currentRequestLengthError : ''}
         />
       </Grid>
 
@@ -116,7 +115,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
             getOptionLabel={(option) =>
               `${option.username} - ${option.lastname?.toLocaleUpperCase()} ${option.firstname} ${
                 option.email ? `- ${option.email}` : ''
-              }` ?? ''
+              }`
             }
             renderInput={(params) => (
               <TextField

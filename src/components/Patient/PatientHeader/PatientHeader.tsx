@@ -33,7 +33,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
             return e.family ?? 'Non renseigné'
           }
           if (e.use === 'maiden') {
-            return `(${patient.gender === 'female' ? 'née' : 'né'} : ${e.family})` ?? 'Non renseigné'
+            return `(${patient.gender === 'female' ? 'née' : 'né'} : ${e.family})`
           }
         })
         .join(' ') ?? 'Non renseigné'

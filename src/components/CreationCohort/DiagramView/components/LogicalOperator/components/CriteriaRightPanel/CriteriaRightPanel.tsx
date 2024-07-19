@@ -78,7 +78,9 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
 
   const svgIcon = getCriteriaIcon(id as CriteriaTypesWithIcons)
 
-  const cursor = disabled ? 'not-allowed' : components ? 'pointer' : 'default'
+  const pointer = components ? 'pointer' : 'default'
+
+  const cursor = disabled ? 'not-allowed' : pointer
 
   if (!subItems || (subItems && subItems.length === 0)) {
     return (
@@ -90,39 +92,36 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
   }
 
   return (
-    <>
-      <ListItem
-        onClick={disabled ? undefined : () => !subItems ?? handleClick(criteriaItem)}
-        className={classes.criteriaItem}
-      >
-        <Grid container flexDirection="column">
-          <Grid container flexDirection="row">
-            <ListItemIcon style={{ minWidth: '2rem', color: 'currentcolor' }}>{svgIcon}</ListItemIcon>
-            <ListItemText
-              disableTypography
-              style={{ cursor, color, fontWeight }}
-              primary={title}
-              onClick={() => setOpen(!open)}
-            />
-            {open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => setOpen(!open)} />}
-          </Grid>
-          <Grid>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-              <List disablePadding className={classes.subItemsContainer}>
-                <div className={classes.subItemsContainerIndicator} />
-                {subItems &&
-                  subItems.map((criteriaSubItem, index) => (
-                    <Fragment key={index}>
-                      <div className={classes.subItemsIndicator} />
-                      <CriteriaListItem criteriaItem={criteriaSubItem} handleClick={handleClick} />
-                    </Fragment>
-                  ))}
-              </List>
-            </Collapse>
-          </Grid>
+    <ListItem
+      onClick={disabled ? undefined : () => subItems || handleClick(criteriaItem)}
+      className={classes.criteriaItem}
+    >
+      <Grid container flexDirection="column">
+        <Grid container flexDirection="row">
+          <ListItemIcon style={{ minWidth: '2rem', color: 'currentcolor' }}>{svgIcon}</ListItemIcon>
+          <ListItemText
+            disableTypography
+            style={{ cursor, color, fontWeight }}
+            primary={title}
+            onClick={() => setOpen(!open)}
+          />
+          {open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => setOpen(!open)} />}
         </Grid>
-      </ListItem>
-    </>
+        <Grid>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <List disablePadding className={classes.subItemsContainer}>
+              <div className={classes.subItemsContainerIndicator} />
+              {subItems?.map((criteriaSubItem, index) => (
+                <Fragment key={index + criteriaSubItem.id}>
+                  <div className={classes.subItemsIndicator} />
+                  <CriteriaListItem criteriaItem={criteriaSubItem} handleClick={handleClick} />
+                </Fragment>
+              ))}
+            </List>
+          </Collapse>
+        </Grid>
+      </Grid>
+    </ListItem>
   )
 }
 
@@ -187,18 +186,22 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
 
         for (const criteriaItem of _criteria) {
           const { id, subItems } = criteriaItem
+          // For medication, we match request and medication administration
+          if (
+            id === 'Medication' &&
+            [CriteriaType.MEDICATION_REQUEST, CriteriaType.MEDICATION_ADMINISTRATION].includes(selectedCriteria.type)
+          ) {
+            return criteriaItem
+          }
+          // For others the id should match the selected criteria type
+          if (id === selectedCriteria.type) return criteriaItem
+
+          // Search subcriterias
           if (subItems) {
             const found = searchChild(subItems)
             if (found) {
               return found
             }
-          }
-
-          if (id === 'Medication') {
-            if (CriteriaType.MEDICATION_REQUEST === selectedCriteria.type) return criteriaItem
-            if (CriteriaType.MEDICATION_ADMINISTRATION === selectedCriteria.type) return criteriaItem
-          } else {
-            if (id === selectedCriteria.type) return criteriaItem
           }
         }
         return null
@@ -241,7 +244,7 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
               className={classes.drawerContentContainer}
             >
               {criteriaListWithConfig.map((criteriaItem, index) => (
-                <CriteriaListItem key={index} criteriaItem={criteriaItem} handleClick={setAction} />
+                <CriteriaListItem key={index + criteriaItem.id} criteriaItem={criteriaItem} handleClick={setAction} />
               ))}
             </List>
           </>

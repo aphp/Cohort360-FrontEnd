@@ -48,7 +48,8 @@ const useStyles = makeStyles()(() => ({
     width: 20,
     height: 20,
     border: '2px solid currentColor',
-    borderRadius: 10
+    borderRadius: 10,
+    backgroundColor: '#fff'
   },
   loader: {
     height: '4px',
