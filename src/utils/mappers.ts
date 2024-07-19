@@ -156,7 +156,7 @@ export const unbuildObservationValueFilter = (filters: string[][], currentCriter
   const valueQuantities = filters
     .filter((keyValue) => keyValue[0].includes(OBSERVATION_VALUE))
     ?.map((value) => value[1])
-
+  if (valueQuantities[0] === 'le0,ge0') return null
   if (valueQuantities.length === 0) {
     currentCriterion['valueComparator'] = Comparators.GREATER_OR_EQUAL
   } else if (valueQuantities.length === 1) {
