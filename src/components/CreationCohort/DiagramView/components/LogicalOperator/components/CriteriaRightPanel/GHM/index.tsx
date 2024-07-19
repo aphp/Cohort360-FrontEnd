@@ -48,16 +48,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const _onChangeFormValue = async (key: string, value: any, newHierarchy: Hierarchy<any, any>[] = ghmHierarchy) =>
-    await syncOnChangeFormValue(
-      key,
-      value,
-      defaultCriteria,
-      newHierarchy,
-      (updatedCriteria) => setDefaultCriteria(updatedCriteria as GhmDataType),
-      selectedTab,
-      defaultClaim.type,
-      dispatch
-    )
+    await syncOnChangeFormValue(key, value, newHierarchy, setDefaultCriteria, selectedTab, defaultClaim.type, dispatch)
 
   const _initSyncHierarchyTableEffect = async () => {
     await initSyncHierarchyTableEffect(

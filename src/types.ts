@@ -22,7 +22,7 @@ import {
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
 import { SearchInputError } from 'types/error'
-import { Comparators, CriteriaDataKey, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import { Comparators, CriteriaDataKey, CriteriaType, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
 import { ExportTableType } from 'components/Dashboard/ExportModal/export_table'
 import { Hierarchy } from 'types/hierarchy'
 import { SearchByTypes } from 'types/searchCriterias'
@@ -361,7 +361,7 @@ export type CriteriaItemDataCache = {
 }
 
 export type CriteriaItemType = {
-  id: string
+  id: CriteriaType
   title: string
   color: string
   fontWeight?: string

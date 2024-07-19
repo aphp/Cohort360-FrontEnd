@@ -81,76 +81,23 @@ import { hospitForm } from 'data/hospitData'
 import { editAllCriteria, editAllCriteriaGroup, pseudonimizeCriteria, buildCohortCreation } from 'state/cohortCreation'
 import { AppDispatch } from 'state'
 import { Hierarchy } from 'types/hierarchy'
+import {
+  AdministrationParamsKeys,
+  ClaimParamsKeys,
+  ConditionParamsKeys,
+  DocumentsParamsKeys,
+  EncounterParamsKeys,
+  ImagingParamsKeys,
+  IppParamsKeys,
+  ObservationParamsKeys,
+  PatientsParamsKeys,
+  PrescriptionParamsKeys,
+  ProcedureParamsKeys,
+  QuestionnaireResponseParamsKeys
+} from 'mappers/filters'
 
 const REQUETEUR_VERSION = 'v1.4.5'
 
-const IPP_LIST_FHIR = 'identifier.value'
-
-const PATIENT_GENDER = 'gender'
-const PATIENT_BIRTHDATE = 'birthdate'
-const PATIENT_AGE_DAY = 'age-day'
-const PATIENT_AGE_MONTH = 'age-month'
-const PATIENT_DEATHDATE = 'death-date'
-const PATIENT_DECEASED = 'deceased'
-
-const ENCOUNTER_DURATION = 'length'
-const ENCOUNTER_MIN_BIRTHDATE_DAY = 'start-age-visit'
-const ENCOUNTER_MAX_BIRTHDATE_DAY = 'end-age-visit'
-const ENCOUNTER_MIN_BIRTHDATE_MONTH = 'start-age-visit-month'
-const ENCOUNTER_MAX_BIRTHDATE_MONTH = 'end-age-visit-month'
-const ENCOUNTER_ENTRYMODE = 'admission-mode'
-const ENCOUNTER_EXITMODE = 'discharge-disposition-mode'
-const ENCOUNTER_PRISENCHARGETYPE = 'class'
-const ENCOUNTER_TYPEDESEJOUR = 'stay'
-const ENCOUNTER_ADMISSIONMODE = 'reason-code'
-const ENCOUNTER_REASON = 'admission-destination-type'
-const ENCOUNTER_DESTINATION = 'discharge-disposition'
-const ENCOUNTER_PROVENANCE = 'admit-source'
-const ENCOUNTER_ADMISSION = 'admission-type'
-
-const CLAIM_CODE = 'diagnosis'
-
-const PROCEDURE_CODE = 'code'
-const PROCEDURE_SOURCE = 'source'
-
-const CONDITION_CODE = 'code'
-const CONDITION_SOURCE = 'source'
-const CONDITION_TYPE = 'orbis-status'
-
-const COMPOSITION_TEXT = '_text'
-const COMPOSITION_TITLE = 'description'
-const COMPOSITION_TYPE = 'type'
-const COMPOSITION_STATUS = 'docstatus'
-
-const MEDICATION_CODE = 'medication'
-const MEDICATION_PRESCRIPTION_TYPE = 'category'
-const MEDICATION_ADMINISTRATION_ROUTE = 'dosage-route'
-const MEDICATION_REQUEST_ROUTE = 'dosage-instruction-route'
-
-const OBSERVATION_CODE = 'code'
-export const OBSERVATION_VALUE = 'value-quantity'
-const OBSERVATION_STATUS = 'status'
-const ENCOUNTER_SERVICE_PROVIDER = 'encounter.encounter-care-site'
-const ENCOUNTER_CONTEXT_SERVICE_PROVIDER = 'context.encounter-care-site'
-const SERVICE_PROVIDER = 'encounter-care-site'
-const ENCOUNTER_STATUS_REFERENCE = 'encounter.status'
-const ENCOUNTER_STATUS = 'status'
-
-const IMAGING_STUDY_DATE = 'started'
-const IMAGING_STUDY_MODALITIES = 'modality'
-const IMAGING_STUDY_DESCRIPTION = 'description'
-const IMAGING_STUDY_PROCEDURE = 'procedureCode'
-const IMAGING_NB_OF_SERIES = 'numberOfSeries'
-const IMAGING_NB_OF_INS = 'numberOfInstances'
-const IMAGING_WITH_DOCUMENT = 'with-document'
-const IMAGING_STUDY_UID = 'identifier'
-const IMAGING_SERIES_DATE = 'series-started'
-const IMAGING_SERIES_DESCRIPTION = 'series-description'
-const IMAGING_SERIES_PROTOCOL = 'series-protocol'
-const IMAGING_SERIES_MODALITIES = 'series-modality'
-const IMAGING_SERIES_UID = 'series'
-
-export const UNITE_EXECUTRICE = 'Unité exécutrice'
 export const STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE = 'Structure hospitalière de prise en charge'
 
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
@@ -346,16 +293,16 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case CriteriaType.PATIENT: {
       filterFhir = [
         'active=true',
-        filtersBuilders(PATIENT_GENDER, buildLabelObjectFilter(criterion.genders)),
-        filtersBuilders(PATIENT_DECEASED, buildLabelObjectFilter(criterion.vitalStatus)),
-        filtersBuilders(PATIENT_BIRTHDATE, buildDateFilter(criterion.birthdates[1], 'le')),
-        filtersBuilders(PATIENT_BIRTHDATE, buildDateFilter(criterion.birthdates[0], 'ge')),
-        filtersBuilders(PATIENT_DEATHDATE, buildDateFilter(criterion.deathDates[0], 'ge')),
-        filtersBuilders(PATIENT_DEATHDATE, buildDateFilter(criterion.deathDates[1], 'le')),
+        filtersBuilders(PatientsParamsKeys.GENDERS, buildLabelObjectFilter(criterion.genders)),
+        filtersBuilders(PatientsParamsKeys.VITAL_STATUS, buildLabelObjectFilter(criterion.vitalStatus)),
+        filtersBuilders(PatientsParamsKeys.BIRTHDATE, buildDateFilter(criterion.birthdates[1], 'le')),
+        filtersBuilders(PatientsParamsKeys.BIRTHDATE, buildDateFilter(criterion.birthdates[0], 'ge')),
+        filtersBuilders(PatientsParamsKeys.DEATHDATE, buildDateFilter(criterion.deathDates[0], 'ge')),
+        filtersBuilders(PatientsParamsKeys.DEATHDATE, buildDateFilter(criterion.deathDates[1], 'le')),
         criterion.birthdates[0] === null && criterion.birthdates[1] === null
           ? buildDurationFilter(
               criterion.age[0],
-              deidentified ? PATIENT_AGE_MONTH : PATIENT_AGE_DAY,
+              deidentified ? PatientsParamsKeys.DATE_DEIDENTIFIED : PatientsParamsKeys.DATE_IDENTIFIED,
               'ge',
               deidentified
             )
@@ -363,7 +310,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         criterion.birthdates[1] === null && criterion.birthdates[1] === null
           ? buildDurationFilter(
               criterion.age[1],
-              deidentified ? PATIENT_AGE_MONTH : PATIENT_AGE_DAY,
+              deidentified ? PatientsParamsKeys.DATE_DEIDENTIFIED : PatientsParamsKeys.DATE_IDENTIFIED,
               'le',
               deidentified
             )
@@ -375,26 +322,29 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     }
 
     case CriteriaType.ENCOUNTER: {
-      // deidentified = false //TODO erase this line when deidentified param for encounter is implemented
       filterFhir = [
         'subject.active=true',
-        filtersBuilders(ENCOUNTER_ADMISSIONMODE, buildLabelObjectFilter(criterion.admissionMode)),
-        filtersBuilders(ENCOUNTER_ENTRYMODE, buildLabelObjectFilter(criterion.entryMode)),
-        filtersBuilders(ENCOUNTER_EXITMODE, buildLabelObjectFilter(criterion.exitMode)),
-        filtersBuilders(ENCOUNTER_PRISENCHARGETYPE, buildLabelObjectFilter(criterion.priseEnChargeType)),
-        filtersBuilders(ENCOUNTER_TYPEDESEJOUR, buildLabelObjectFilter(criterion.typeDeSejour)),
-        filtersBuilders(ENCOUNTER_DESTINATION, buildLabelObjectFilter(criterion.destination)),
-        filtersBuilders(ENCOUNTER_PROVENANCE, buildLabelObjectFilter(criterion.provenance)),
-        filtersBuilders(ENCOUNTER_ADMISSION, buildLabelObjectFilter(criterion.admission)),
-        filtersBuilders(ENCOUNTER_REASON, buildLabelObjectFilter(criterion.reason)),
-        filtersBuilders(SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
-        filtersBuilders(ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
-        criterion.duration[0] !== null ? buildDurationFilter(criterion?.duration?.[0], ENCOUNTER_DURATION, 'ge') : '',
-        criterion.duration[1] !== null ? buildDurationFilter(criterion?.duration?.[1], ENCOUNTER_DURATION, 'le') : '',
+        filtersBuilders(EncounterParamsKeys.ADMISSIONMODE, buildLabelObjectFilter(criterion.admissionMode)),
+        filtersBuilders(EncounterParamsKeys.ENTRYMODE, buildLabelObjectFilter(criterion.entryMode)),
+        filtersBuilders(EncounterParamsKeys.EXITMODE, buildLabelObjectFilter(criterion.exitMode)),
+        filtersBuilders(EncounterParamsKeys.PRISENCHARGETYPE, buildLabelObjectFilter(criterion.priseEnChargeType)),
+        filtersBuilders(EncounterParamsKeys.TYPEDESEJOUR, buildLabelObjectFilter(criterion.typeDeSejour)),
+        filtersBuilders(EncounterParamsKeys.DESTINATION, buildLabelObjectFilter(criterion.destination)),
+        filtersBuilders(EncounterParamsKeys.PROVENANCE, buildLabelObjectFilter(criterion.provenance)),
+        filtersBuilders(EncounterParamsKeys.ADMISSION, buildLabelObjectFilter(criterion.admission)),
+        filtersBuilders(EncounterParamsKeys.REASON, buildLabelObjectFilter(criterion.reason)),
+        filtersBuilders(EncounterParamsKeys.SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
+        filtersBuilders(EncounterParamsKeys.STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
+        criterion.duration[0] !== null
+          ? buildDurationFilter(criterion?.duration?.[0], EncounterParamsKeys.DURATION, 'ge')
+          : '',
+        criterion.duration[1] !== null
+          ? buildDurationFilter(criterion?.duration?.[1], EncounterParamsKeys.DURATION, 'le')
+          : '',
         criterion.age[0] !== null
           ? buildDurationFilter(
               criterion?.age[0],
-              deidentified ? ENCOUNTER_MIN_BIRTHDATE_MONTH : ENCOUNTER_MIN_BIRTHDATE_DAY,
+              deidentified ? EncounterParamsKeys.MIN_BIRTHDATE_MONTH : EncounterParamsKeys.MIN_BIRTHDATE_DAY,
               'ge',
               deidentified
             )
@@ -402,7 +352,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         criterion.age[1] !== null
           ? buildDurationFilter(
               criterion?.age[1],
-              deidentified ? ENCOUNTER_MAX_BIRTHDATE_MONTH : ENCOUNTER_MAX_BIRTHDATE_DAY,
+              deidentified ? EncounterParamsKeys.MAX_BIRTHDATE_MONTH : EncounterParamsKeys.MAX_BIRTHDATE_DAY,
               'le',
               deidentified
             )
@@ -416,14 +366,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case CriteriaType.DOCUMENTS: {
       const unreducedFilterFhir = [
         `type:not=doc-impor&contenttype=text/plain&subject.active=true`,
-        filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
+        filtersBuilders(DocumentsParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(
-          criterion.searchBy === SearchByTypes.TEXT ? COMPOSITION_TEXT : COMPOSITION_TITLE,
+          criterion.searchBy === SearchByTypes.TEXT ? SearchByTypes.TEXT : SearchByTypes.DESCRIPTION,
           buildSearchFilter(criterion.search)
         ),
-        filtersBuilders(COMPOSITION_STATUS, joinDocStatuses(criterion.docStatuses)),
+        filtersBuilders(DocumentsParamsKeys.DOC_STATUSES, joinDocStatuses(criterion.docStatuses)),
         filtersBuilders(
-          COMPOSITION_TYPE,
+          DocumentsParamsKeys.DOC_TYPES,
           buildLabelObjectFilter(
             criterion.docType?.map((docType) => {
               return {
@@ -432,7 +382,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
             })
           )
         ),
-        filtersBuilders(ENCOUNTER_STATUS_REFERENCE, buildLabelObjectFilter(criterion.encounterStatus))
+        filtersBuilders(DocumentsParamsKeys.DOC_STATUSES, buildLabelObjectFilter(criterion.encounterStatus)),
+        filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
+        filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le'))
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -442,11 +394,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case CriteriaType.CONDITION: {
       const unreducedFilterFhir = [
         'subject.active=true',
-        filtersBuilders(CONDITION_CODE, buildLabelObjectFilter(criterion.code, CONDITION_HIERARCHY)),
-        filtersBuilders(CONDITION_TYPE, buildLabelObjectFilter(criterion.diagnosticType)),
-        criterion.source ? buildSimpleFilter(criterion.source, PROCEDURE_SOURCE) : '',
-        filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
-        filtersBuilders(ENCOUNTER_STATUS_REFERENCE, buildLabelObjectFilter(criterion.encounterStatus))
+        filtersBuilders(ConditionParamsKeys.CODE, buildLabelObjectFilter(criterion.code, CONDITION_HIERARCHY)),
+        filtersBuilders(ConditionParamsKeys.DIAGNOSTIC_TYPES, buildLabelObjectFilter(criterion.diagnosticType)),
+        criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : '',
+        filtersBuilders(ConditionParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
+        filtersBuilders(ConditionParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
+        filtersBuilders(ConditionParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
+        filtersBuilders(ConditionParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le'))
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -456,10 +410,12 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case CriteriaType.PROCEDURE: {
       const unreducedFilterFhir = [
         'subject.active=true',
-        filtersBuilders(PROCEDURE_CODE, buildLabelObjectFilter(criterion.code, PROCEDURE_HIERARCHY)),
-        filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
-        filtersBuilders(ENCOUNTER_STATUS_REFERENCE, buildLabelObjectFilter(criterion.encounterStatus)),
-        criterion.source ? buildSimpleFilter(criterion.source, PROCEDURE_SOURCE) : ''
+        filtersBuilders(ProcedureParamsKeys.CODE, buildLabelObjectFilter(criterion.code, PROCEDURE_HIERARCHY)),
+        filtersBuilders(ProcedureParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
+        filtersBuilders(ProcedureParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
+        filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
+        filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le')),
+        criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : ''
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -469,9 +425,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case CriteriaType.CLAIM: {
       const unreducedFilterFhir = [
         'patient.active=true',
-        filtersBuilders(CLAIM_CODE, buildLabelObjectFilter(criterion.code, CLAIM_HIERARCHY)),
-        filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
-        filtersBuilders(ENCOUNTER_STATUS_REFERENCE, buildLabelObjectFilter(criterion.encounterStatus))
+        filtersBuilders(ClaimParamsKeys.CODE, buildLabelObjectFilter(criterion.code, CLAIM_HIERARCHY)),
+        filtersBuilders(ClaimParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
+        filtersBuilders(ClaimParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
+        filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
+        filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le'))
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -484,20 +442,40 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         'subject.active=true',
         filtersBuilders(
           criterion.type === CriteriaType.MEDICATION_REQUEST
-            ? MEDICATION_REQUEST_ROUTE
-            : MEDICATION_ADMINISTRATION_ROUTE,
+            ? PrescriptionParamsKeys.PRESCRIPTION_ROUTES
+            : AdministrationParamsKeys.ADMINISTRATION_ROUTES,
           buildLabelObjectFilter(criterion.administration)
         ),
         filtersBuilders(
           criterion.type === CriteriaType.MEDICATION_REQUEST
-            ? ENCOUNTER_SERVICE_PROVIDER
-            : ENCOUNTER_CONTEXT_SERVICE_PROVIDER,
+            ? PrescriptionParamsKeys.EXECUTIVE_UNITS
+            : AdministrationParamsKeys.EXECUTIVE_UNITS,
           buildEncounterServiceFilter(criterion.encounterService)
         ),
-        filtersBuilders(MEDICATION_CODE, buildLabelObjectFilter(criterion.code, MEDICATION_ATC, true)),
-        filtersBuilders(ENCOUNTER_STATUS_REFERENCE, buildLabelObjectFilter(criterion.encounterStatus)),
+        filtersBuilders(PrescriptionParamsKeys.CODE, buildLabelObjectFilter(criterion.code, MEDICATION_ATC, true)),
+        filtersBuilders(
+          criterion.type === CriteriaType.MEDICATION_REQUEST
+            ? PrescriptionParamsKeys.ENCOUNTER_STATUS
+            : AdministrationParamsKeys.ENCOUNTER_STATUS,
+          buildLabelObjectFilter(criterion.encounterStatus)
+        ),
+        filtersBuilders(
+          criterion.type === CriteriaType.MEDICATION_REQUEST
+            ? PrescriptionParamsKeys.DATE
+            : AdministrationParamsKeys.DATE,
+          buildDateFilter(criterion.startOccurrence, 'ge')
+        ),
+        filtersBuilders(
+          criterion.type === CriteriaType.MEDICATION_REQUEST
+            ? PrescriptionParamsKeys.DATE
+            : AdministrationParamsKeys.DATE,
+          buildDateFilter(criterion.endOccurrence, 'le')
+        ),
         criterion.type === CriteriaType.MEDICATION_REQUEST
-          ? filtersBuilders(MEDICATION_PRESCRIPTION_TYPE, buildLabelObjectFilter(criterion.prescriptionType))
+          ? filtersBuilders(
+              PrescriptionParamsKeys.PRESCRIPTION_TYPES,
+              buildLabelObjectFilter(criterion.prescriptionType)
+            )
           : ''
       ].filter((elem) => elem)
       filterFhir =
@@ -507,11 +485,16 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case CriteriaType.OBSERVATION: {
       const unreducedFilterFhir = [
-        `subject.active=true&${OBSERVATION_STATUS}=${BiologyStatus.VALIDATED}`,
-        filtersBuilders(OBSERVATION_CODE, buildLabelObjectFilter(criterion.code, BIOLOGY_HIERARCHY_ITM_ANABIO)),
-        filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
-        filtersBuilders(ENCOUNTER_STATUS_REFERENCE, buildLabelObjectFilter(criterion.encounterStatus)),
-        buildObservationValueFilter(criterion, OBSERVATION_VALUE)
+        `subject.active=true&${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`,
+        filtersBuilders(
+          ObservationParamsKeys.ANABIO_LOINC,
+          buildLabelObjectFilter(criterion.code, BIOLOGY_HIERARCHY_ITM_ANABIO)
+        ),
+        filtersBuilders(ObservationParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
+        filtersBuilders(ObservationParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
+        filtersBuilders(ObservationParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
+        filtersBuilders(ObservationParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le')),
+        buildObservationValueFilter(criterion, ObservationParamsKeys.VALUE)
       ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
@@ -519,9 +502,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     }
 
     case CriteriaType.IPP_LIST: {
-      const unreducedFilterFhir = [`${criterion.search ? `${IPP_LIST_FHIR}=${criterion.search}` : ''}`].filter(
-        (elem) => elem
-      )
+      const unreducedFilterFhir = [
+        `${criterion.search ? `${IppParamsKeys.IPP_LIST_FHIR}=${criterion.search}` : ''}`
+      ].filter((elem) => elem)
       filterFhir =
         unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
       break
@@ -530,26 +513,29 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case CriteriaType.IMAGING: {
       filterFhir = [
         'patient.active=true',
-        filtersBuilders(IMAGING_STUDY_DATE, buildDateFilter(criterion.studyStartDate, 'ge')),
-        filtersBuilders(IMAGING_STUDY_DATE, buildDateFilter(criterion.studyEndDate, 'le')),
-        filtersBuilders(IMAGING_SERIES_DATE, buildDateFilter(criterion.seriesStartDate, 'ge')),
-        filtersBuilders(IMAGING_SERIES_DATE, buildDateFilter(criterion.seriesEndDate, 'le')),
-        filtersBuilders(IMAGING_STUDY_DESCRIPTION, buildSearchFilter(criterion.studyDescription)),
-        filtersBuilders(IMAGING_STUDY_PROCEDURE, buildSearchFilter(criterion.studyProcedure)),
-        filtersBuilders(IMAGING_SERIES_DESCRIPTION, buildSearchFilter(criterion.seriesDescription)),
-        filtersBuilders(IMAGING_SERIES_PROTOCOL, buildSearchFilter(criterion.seriesProtocol)),
-        filtersBuilders(IMAGING_STUDY_MODALITIES, buildLabelObjectFilter(criterion.studyModalities)),
-        filtersBuilders(IMAGING_SERIES_MODALITIES, buildLabelObjectFilter(criterion.seriesModalities)),
-        filtersBuilders(ENCOUNTER_SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
+        filtersBuilders(ImagingParamsKeys.DATE, buildDateFilter(criterion.studyStartDate, 'ge')),
+        filtersBuilders(ImagingParamsKeys.DATE, buildDateFilter(criterion.studyEndDate, 'le')),
+        filtersBuilders(ImagingParamsKeys.SERIES_DATE, buildDateFilter(criterion.seriesStartDate, 'ge')),
+        filtersBuilders(ImagingParamsKeys.SERIES_DATE, buildDateFilter(criterion.seriesEndDate, 'le')),
+        filtersBuilders(ImagingParamsKeys.STUDY_DESCRIPTION, buildSearchFilter(criterion.studyDescription)),
+        filtersBuilders(ImagingParamsKeys.STUDY_PROCEDURE, buildSearchFilter(criterion.studyProcedure)),
+        filtersBuilders(ImagingParamsKeys.SERIES_DESCRIPTION, buildSearchFilter(criterion.seriesDescription)),
+        filtersBuilders(ImagingParamsKeys.SERIES_PROTOCOL, buildSearchFilter(criterion.seriesProtocol)),
+        filtersBuilders(ImagingParamsKeys.MODALITY, buildLabelObjectFilter(criterion.studyModalities)),
+        filtersBuilders(ImagingParamsKeys.SERIES_MODALITIES, buildLabelObjectFilter(criterion.seriesModalities)),
+        filtersBuilders(ImagingParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(
-          IMAGING_NB_OF_SERIES,
+          ImagingParamsKeys.NB_OF_SERIES,
           buildComparatorFilter(criterion.numberOfSeries, criterion.seriesComparator)
         ),
-        filtersBuilders(IMAGING_NB_OF_INS, buildComparatorFilter(criterion.numberOfIns, criterion.instancesComparator)),
-        filtersBuilders(ENCOUNTER_STATUS_REFERENCE, buildLabelObjectFilter(criterion.encounterStatus)),
-        buildWithDocumentFilter(criterion, IMAGING_WITH_DOCUMENT),
-        buildSimpleFilter(criterion.studyUid, IMAGING_STUDY_UID, IMAGING_STUDY_UID_URL),
-        buildSimpleFilter(criterion.seriesUid, IMAGING_SERIES_UID)
+        filtersBuilders(
+          ImagingParamsKeys.NB_OF_INS,
+          buildComparatorFilter(criterion.numberOfIns, criterion.instancesComparator)
+        ),
+        filtersBuilders(ImagingParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
+        buildWithDocumentFilter(criterion, ImagingParamsKeys.WITH_DOCUMENT),
+        buildSimpleFilter(criterion.studyUid, ImagingParamsKeys.STUDY_UID, IMAGING_STUDY_UID_URL),
+        buildSimpleFilter(criterion.seriesUid, ImagingParamsKeys.SERIES_UID)
       ]
         .filter((elem) => elem)
         .reduce(filterReducer)
@@ -561,7 +547,10 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         'subject.active=true',
         `questionnaire.name=${FormNames.PREGNANCY}`,
         'status=in-progress,completed',
-        filtersBuilders(ENCOUNTER_STATUS_REFERENCE, buildLabelObjectFilter(criterion.encounterStatus)),
+        filtersBuilders(
+          QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS,
+          buildLabelObjectFilter(criterion.encounterStatus)
+        ),
         questionnaireFiltersBuilders(
           pregnancyForm.pregnancyStartDate,
           buildDateFilter(criterion.pregnancyStartDate, 'ge', true)
@@ -610,7 +599,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
           buildLabelObjectFilter(criterion.ultrasoundMonitoring)
         ),
         questionnaireFiltersBuilders(
-          { id: ENCOUNTER_SERVICE_PROVIDER, type: 'valueCoding' },
+          { id: QuestionnaireResponseParamsKeys.EXECUTIVE_UNITS, type: 'valueCoding' },
           buildEncounterServiceFilter(criterion.encounterService)
         )
       ]
@@ -622,7 +611,10 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         'subject.active=true',
         `questionnaire.name=${FormNames.HOSPIT}`,
         'status=in-progress,completed',
-        filtersBuilders(ENCOUNTER_STATUS_REFERENCE, buildLabelObjectFilter(criterion.encounterStatus)),
+        filtersBuilders(
+          QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS,
+          buildLabelObjectFilter(criterion.encounterStatus)
+        ),
         questionnaireFiltersBuilders(hospitForm.hospitReason, buildSearchFilter(criterion.hospitReason)),
         questionnaireFiltersBuilders(hospitForm.inUteroTransfer, buildLabelObjectFilter(criterion.inUteroTransfer)),
         questionnaireFiltersBuilders(
@@ -738,7 +730,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         questionnaireFiltersBuilders(hospitForm.exitFeedingMode, buildLabelObjectFilter(criterion.exitFeedingMode)),
         questionnaireFiltersBuilders(hospitForm.exitDiagnostic, buildLabelObjectFilter(criterion.exitDiagnostic)),
         questionnaireFiltersBuilders(
-          { id: ENCOUNTER_SERVICE_PROVIDER, type: 'valueCoding' },
+          { id: QuestionnaireResponseParamsKeys.EXECUTIVE_UNITS, type: 'valueCoding' },
           buildEncounterServiceFilter(criterion.encounterService)
         )
       ]
@@ -814,20 +806,6 @@ export function buildRequest(
                 operator: item?.occurrenceComparator || undefined
               }
             : undefined,
-          dateRangeList:
-            !(item.type === CriteriaType.PATIENT || item.type === CriteriaType.IPP_LIST) &&
-            (item.startOccurrence || item.endOccurrence)
-              ? [
-                  {
-                    minDate: item.startOccurrence
-                      ? moment(item.startOccurrence).format('YYYY-MM-DD[T00:00:00Z]')
-                      : undefined,
-                    maxDate: item.endOccurrence
-                      ? moment(item.endOccurrence).format('YYYY-MM-DD[T00:00:00Z]')
-                      : undefined
-                  }
-                ]
-              : undefined,
           encounterDateRange:
             !(item.type === CriteriaType.PATIENT || item.type === CriteriaType.IPP_LIST) &&
             (item.encounterStartDate || item.encounterEndDate)
@@ -924,16 +902,22 @@ const unbuildPatientCriteria = (element: RequeteurCriteriaType): DemographicData
       const value = filter ? filter[1] : null
 
       switch (key) {
-        case PATIENT_AGE_DAY:
-        case PATIENT_AGE_MONTH: {
+        case PatientsParamsKeys.DATE_IDENTIFIED:
+        case PatientsParamsKeys.DATE_DEIDENTIFIED: {
           if (value?.includes('ge')) {
-            currentCriterion.age[0] = unbuildDurationFilter(value, key === PATIENT_AGE_MONTH ? true : false)
+            currentCriterion.age[0] = unbuildDurationFilter(
+              value,
+              key === PatientsParamsKeys.DATE_DEIDENTIFIED ? true : false
+            )
           } else if (value?.includes('le')) {
-            currentCriterion.age[1] = unbuildDurationFilter(value, key === PATIENT_AGE_MONTH ? true : false)
+            currentCriterion.age[1] = unbuildDurationFilter(
+              value,
+              key === PatientsParamsKeys.DATE_DEIDENTIFIED ? true : false
+            )
           }
           break
         }
-        case PATIENT_BIRTHDATE: {
+        case PatientsParamsKeys.BIRTHDATE: {
           if (value?.includes('ge')) {
             currentCriterion.birthdates[0] = unbuildDateFilter(value)
           } else if (value?.includes('le')) {
@@ -941,7 +925,7 @@ const unbuildPatientCriteria = (element: RequeteurCriteriaType): DemographicData
           }
           break
         }
-        case PATIENT_DEATHDATE: {
+        case PatientsParamsKeys.DEATHDATE: {
           if (value?.includes('ge')) {
             currentCriterion.deathDates[0] = unbuildDateFilter(value)
           } else if (value?.includes('le')) {
@@ -949,11 +933,11 @@ const unbuildPatientCriteria = (element: RequeteurCriteriaType): DemographicData
           }
           break
         }
-        case PATIENT_GENDER: {
+        case PatientsParamsKeys.GENDERS: {
           unbuildLabelObjectFilter(currentCriterion, 'genders', value)
           break
         }
-        case PATIENT_DECEASED: {
+        case PatientsParamsKeys.VITAL_STATUS: {
           unbuildLabelObjectFilter(currentCriterion, 'vitalStatus', value)
           break
         }
@@ -999,7 +983,7 @@ const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise
       const key = filter[0]
       const value = filter[1]
       switch (key) {
-        case ENCOUNTER_DURATION: {
+        case EncounterParamsKeys.DURATION: {
           if (value.includes('ge')) {
             currentCriterion.duration[0] = unbuildDurationFilter(value)
           } else if (value.includes('le')) {
@@ -1007,57 +991,63 @@ const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise
           }
           break
         }
-        case ENCOUNTER_MIN_BIRTHDATE_DAY:
-        case ENCOUNTER_MIN_BIRTHDATE_MONTH: {
-          currentCriterion.age[0] = unbuildDurationFilter(value, key === ENCOUNTER_MIN_BIRTHDATE_MONTH ? true : false)
+        case EncounterParamsKeys.MIN_BIRTHDATE_DAY:
+        case EncounterParamsKeys.MIN_BIRTHDATE_MONTH: {
+          currentCriterion.age[0] = unbuildDurationFilter(
+            value,
+            key === EncounterParamsKeys.MIN_BIRTHDATE_MONTH ? true : false
+          )
           break
         }
-        case ENCOUNTER_MAX_BIRTHDATE_DAY:
-        case ENCOUNTER_MAX_BIRTHDATE_MONTH: {
-          currentCriterion.age[1] = unbuildDurationFilter(value, key === ENCOUNTER_MAX_BIRTHDATE_MONTH ? true : false)
+        case EncounterParamsKeys.MAX_BIRTHDATE_DAY:
+        case EncounterParamsKeys.MAX_BIRTHDATE_MONTH: {
+          currentCriterion.age[1] = unbuildDurationFilter(
+            value,
+            key === EncounterParamsKeys.MAX_BIRTHDATE_MONTH ? true : false
+          )
           break
         }
-        case ENCOUNTER_ENTRYMODE: {
+        case EncounterParamsKeys.ENTRYMODE: {
           unbuildLabelObjectFilter(currentCriterion, 'entryMode', value)
           break
         }
-        case ENCOUNTER_EXITMODE: {
+        case EncounterParamsKeys.EXITMODE: {
           unbuildLabelObjectFilter(currentCriterion, 'exitMode', value)
           break
         }
-        case ENCOUNTER_PRISENCHARGETYPE: {
+        case EncounterParamsKeys.PRISENCHARGETYPE: {
           unbuildLabelObjectFilter(currentCriterion, 'priseEnChargeType', value)
           break
         }
-        case ENCOUNTER_TYPEDESEJOUR: {
+        case EncounterParamsKeys.TYPEDESEJOUR: {
           unbuildLabelObjectFilter(currentCriterion, 'typeDeSejour', value)
           break
         }
-        case ENCOUNTER_REASON: {
+        case EncounterParamsKeys.REASON: {
           unbuildLabelObjectFilter(currentCriterion, 'reason', value)
           break
         }
-        case ENCOUNTER_ADMISSIONMODE: {
+        case EncounterParamsKeys.ADMISSIONMODE: {
           unbuildLabelObjectFilter(currentCriterion, 'admissionMode', value)
           break
         }
-        case ENCOUNTER_DESTINATION: {
+        case EncounterParamsKeys.DESTINATION: {
           unbuildLabelObjectFilter(currentCriterion, 'destination', value)
           break
         }
-        case ENCOUNTER_PROVENANCE: {
+        case EncounterParamsKeys.PROVENANCE: {
           unbuildLabelObjectFilter(currentCriterion, 'provenance', value)
           break
         }
-        case ENCOUNTER_ADMISSION: {
+        case EncounterParamsKeys.ADMISSION: {
           unbuildLabelObjectFilter(currentCriterion, 'admission', value)
           break
         }
-        case SERVICE_PROVIDER: {
+        case EncounterParamsKeys.SERVICE_PROVIDER: {
           await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
           break
         }
-        case ENCOUNTER_STATUS: {
+        case EncounterParamsKeys.STATUS: {
           unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
           break
         }
@@ -1100,28 +1090,36 @@ const unbuildDocumentReferenceCriteria = async (element: RequeteurCriteriaType):
       const key = filter ? filter[0] : null
       const value = filter ? filter[1] : null
       switch (key) {
-        case COMPOSITION_TITLE:
+        case SearchByTypes.DESCRIPTION:
           currentCriterion.search = unbuildSearchFilter(value)
           currentCriterion.searchBy = SearchByTypes.DESCRIPTION
           break
-        case COMPOSITION_TEXT: {
+        case SearchByTypes.TEXT: {
           currentCriterion.search = unbuildSearchFilter(value)
           currentCriterion.searchBy = SearchByTypes.TEXT
           break
         }
-        case COMPOSITION_TYPE: {
+        case DocumentsParamsKeys.DOC_TYPES: {
           unbuildDocTypesFilter(currentCriterion, 'docType', value)
           break
         }
-        case ENCOUNTER_SERVICE_PROVIDER: {
+        case DocumentsParamsKeys.EXECUTIVE_UNITS: {
           await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
           break
         }
-        case COMPOSITION_STATUS:
+        case DocumentsParamsKeys.DOC_STATUSES:
           unbuildDocStatusesFilter(currentCriterion, 'docStatuses', value)
           break
-        case ENCOUNTER_STATUS_REFERENCE: {
+        case DocumentsParamsKeys.ENCOUNTER_STATUS: {
           unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
+          break
+        }
+        case DocumentsParamsKeys.DATE: {
+          if (value?.includes('ge')) {
+            currentCriterion.startOccurrence = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.endOccurrence = unbuildDateFilter(value)
+          }
           break
         }
         case 'subject.active':
@@ -1165,24 +1163,32 @@ const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise
       const key = filter ? filter[0] : null
       const value = filter ? filter[1] : null
       switch (key) {
-        case CONDITION_CODE: {
+        case ConditionParamsKeys.CODE: {
           unbuildLabelObjectFilter(currentCriterion, 'code', value)
           break
         }
-        case CONDITION_SOURCE: {
+        case ConditionParamsKeys.SOURCE: {
           currentCriterion.source = value
           break
         }
-        case CONDITION_TYPE: {
+        case ConditionParamsKeys.DIAGNOSTIC_TYPES: {
           unbuildLabelObjectFilter(currentCriterion, 'diagnosticType', value)
           break
         }
-        case ENCOUNTER_SERVICE_PROVIDER: {
+        case ConditionParamsKeys.EXECUTIVE_UNITS: {
           await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
           break
         }
-        case ENCOUNTER_STATUS_REFERENCE: {
+        case ConditionParamsKeys.ENCOUNTER_STATUS: {
           unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
+          break
+        }
+        case ConditionParamsKeys.DATE: {
+          if (value?.includes('ge')) {
+            currentCriterion.startOccurrence = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.endOccurrence = unbuildDateFilter(value)
+          }
           break
         }
         case 'subject.active':
@@ -1221,22 +1227,30 @@ const unbuildProcedureCriteria = async (element: RequeteurCriteriaType): Promise
       const key = filter ? filter[0] : null
       const value = filter ? filter[1] : null
       switch (key) {
-        case PROCEDURE_CODE: {
+        case ProcedureParamsKeys.CODE: {
           unbuildLabelObjectFilter(currentCriterion, 'code', value)
           break
         }
-        case ENCOUNTER_SERVICE_PROVIDER: {
+        case ProcedureParamsKeys.EXECUTIVE_UNITS: {
           await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
           break
         }
         case 'subject.active':
           break
-        case PROCEDURE_SOURCE: {
+        case ProcedureParamsKeys.SOURCE: {
           currentCriterion.source = value
           break
         }
-        case ENCOUNTER_STATUS_REFERENCE: {
+        case ProcedureParamsKeys.ENCOUNTER_STATUS: {
           unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
+          break
+        }
+        case ProcedureParamsKeys.DATE: {
+          if (value?.includes('ge')) {
+            currentCriterion.startOccurrence = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.endOccurrence = unbuildDateFilter(value)
+          }
           break
         }
         default:
@@ -1271,16 +1285,24 @@ const unbuildClaimCriteria = async (element: RequeteurCriteriaType): Promise<Ghm
       const key = filter ? filter[0] : null
       const value = filter ? filter[1] : null
       switch (key) {
-        case CLAIM_CODE: {
+        case ClaimParamsKeys.CODE: {
           unbuildLabelObjectFilter(currentCriterion, 'code', value)
           break
         }
-        case ENCOUNTER_SERVICE_PROVIDER: {
+        case ClaimParamsKeys.EXECUTIVE_UNITS: {
           await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
           break
         }
-        case ENCOUNTER_STATUS_REFERENCE: {
+        case ClaimParamsKeys.ENCOUNTER_STATUS: {
           unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
+          break
+        }
+        case ClaimParamsKeys.DATE: {
+          if (value?.includes('ge')) {
+            currentCriterion.startOccurrence = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.endOccurrence = unbuildDateFilter(value)
+          }
           break
         }
         case 'patient.active':
@@ -1319,29 +1341,39 @@ const unbuildMedicationCriteria = async (element: RequeteurCriteriaType): Promis
       const key = filter ? filter[0] : null
       const value = filter ? filter[1] : null
       switch (key) {
-        case MEDICATION_CODE: {
+        case PrescriptionParamsKeys.CODE: {
           const codeIds = value?.replace(/https:\/\/.*?\|/g, '')
           unbuildLabelObjectFilter(currentCriterion, 'code', codeIds)
           break
         }
-        case MEDICATION_PRESCRIPTION_TYPE: {
+        case PrescriptionParamsKeys.PRESCRIPTION_TYPES: {
           unbuildLabelObjectFilter(currentCriterion, 'prescriptionType', value)
           break
         }
-        case MEDICATION_REQUEST_ROUTE:
-        case MEDICATION_ADMINISTRATION_ROUTE: {
+        case PrescriptionParamsKeys.PRESCRIPTION_ROUTES:
+        case AdministrationParamsKeys.ADMINISTRATION_ROUTES: {
           unbuildLabelObjectFilter(currentCriterion, 'administration', value)
           break
         }
         case 'subject.active':
           break
-        case ENCOUNTER_CONTEXT_SERVICE_PROVIDER:
-        case ENCOUNTER_SERVICE_PROVIDER: {
+        case PrescriptionParamsKeys.EXECUTIVE_UNITS:
+        case AdministrationParamsKeys.EXECUTIVE_UNITS: {
           await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
           break
         }
-        case ENCOUNTER_STATUS_REFERENCE: {
+        case PrescriptionParamsKeys.ENCOUNTER_STATUS:
+        case AdministrationParamsKeys.ENCOUNTER_STATUS: {
           unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
+          break
+        }
+        case PrescriptionParamsKeys.DATE:
+        case AdministrationParamsKeys.DATE: {
+          if (value?.includes('ge')) {
+            currentCriterion.startOccurrence = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.endOccurrence = unbuildDateFilter(value)
+          }
           break
         }
         default:
@@ -1380,7 +1412,7 @@ const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promi
       const value = filter ? filter[1] : null
 
       switch (key) {
-        case OBSERVATION_CODE: {
+        case ObservationParamsKeys.ANABIO_LOINC: {
           unbuildLabelObjectFilter(currentCriterion, 'code', value)
 
           // TODO: pas propre vvvv
@@ -1400,16 +1432,24 @@ const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promi
 
           break
         }
-        case ENCOUNTER_SERVICE_PROVIDER: {
+        case ObservationParamsKeys.EXECUTIVE_UNITS: {
           await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
           break
         }
-        case ENCOUNTER_STATUS_REFERENCE: {
+        case ObservationParamsKeys.ENCOUNTER_STATUS: {
           unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
           break
         }
-        case OBSERVATION_VALUE:
-        case OBSERVATION_STATUS:
+        case ObservationParamsKeys.DATE: {
+          if (value?.includes('ge')) {
+            currentCriterion.startOccurrence = unbuildDateFilter(value)
+          } else if (value?.includes('le')) {
+            currentCriterion.endOccurrence = unbuildDateFilter(value)
+          }
+          break
+        }
+        case ObservationParamsKeys.VALUE:
+        case ObservationParamsKeys.VALIDATED_STATUS:
         case 'subject.active':
         case 'value-quantity':
           break
@@ -1437,7 +1477,7 @@ const unbuildIPPListCriteria = (element: RequeteurCriteriaType): IPPListDataType
       const value = filter ? filter[1] : null
 
       switch (key) {
-        case IPP_LIST_FHIR: {
+        case IppParamsKeys.IPP_LIST_FHIR: {
           currentCriterion.search = value ?? ''
           break
         }
@@ -1485,7 +1525,7 @@ const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<I
       const key = filter[0]
       const value = filter[1]
       switch (key) {
-        case IMAGING_STUDY_DATE: {
+        case ImagingParamsKeys.DATE: {
           if (value.includes('ge')) {
             currentCriterion.studyStartDate = unbuildDateFilter(value)
           } else if (value.includes('le')) {
@@ -1493,42 +1533,42 @@ const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<I
           }
           break
         }
-        case IMAGING_STUDY_MODALITIES: {
+        case ImagingParamsKeys.MODALITY: {
           const modalitiesValues = value?.replace(/^[*|]+/, '')
           unbuildLabelObjectFilter(currentCriterion, 'studyModalities', modalitiesValues)
           break
         }
-        case IMAGING_STUDY_DESCRIPTION: {
+        case ImagingParamsKeys.STUDY_DESCRIPTION: {
           currentCriterion.studyDescription = unbuildSearchFilter(value)
           break
         }
-        case IMAGING_STUDY_PROCEDURE: {
+        case ImagingParamsKeys.STUDY_PROCEDURE: {
           currentCriterion.studyProcedure = unbuildSearchFilter(value)
           break
         }
-        case IMAGING_NB_OF_SERIES: {
+        case ImagingParamsKeys.NB_OF_SERIES: {
           const parsedOccurence = parseOccurence(value)
           currentCriterion.numberOfSeries = parsedOccurence.value
           currentCriterion.seriesComparator = parsedOccurence.comparator
           break
         }
-        case IMAGING_NB_OF_INS: {
+        case ImagingParamsKeys.NB_OF_INS: {
           const parsedOccurence = parseOccurence(value)
           currentCriterion.numberOfIns = parsedOccurence.value
           currentCriterion.instancesComparator = parsedOccurence.comparator
           break
         }
-        case IMAGING_WITH_DOCUMENT: {
+        case ImagingParamsKeys.WITH_DOCUMENT: {
           const parsedDocumentAttachment = parseDocumentAttachment(value as DocumentAttachmentMethod)
           currentCriterion.withDocument = parsedDocumentAttachment.documentAttachmentMethod
           currentCriterion.daysOfDelay = parsedDocumentAttachment.daysOfDelay
           break
         }
-        case IMAGING_STUDY_UID: {
+        case ImagingParamsKeys.STUDY_UID: {
           currentCriterion.studyUid = value.replace(`${IMAGING_STUDY_UID_URL}|`, '') ?? ''
           break
         }
-        case IMAGING_SERIES_DATE: {
+        case ImagingParamsKeys.SERIES_DATE: {
           if (value.includes('ge')) {
             currentCriterion.seriesStartDate = unbuildDateFilter(value)
           } else if (value.includes('le')) {
@@ -1536,28 +1576,28 @@ const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<I
           }
           break
         }
-        case IMAGING_SERIES_DESCRIPTION: {
+        case ImagingParamsKeys.SERIES_DESCRIPTION: {
           currentCriterion.seriesDescription = unbuildSearchFilter(value)
           break
         }
-        case IMAGING_SERIES_PROTOCOL: {
+        case ImagingParamsKeys.SERIES_PROTOCOL: {
           currentCriterion.seriesProtocol = unbuildSearchFilter(value)
           break
         }
-        case IMAGING_SERIES_MODALITIES: {
+        case ImagingParamsKeys.SERIES_MODALITIES: {
           const modalitiesValues = value?.replace(/^[*|]+/, '')
           unbuildLabelObjectFilter(currentCriterion, 'seriesModalities', modalitiesValues)
           break
         }
-        case IMAGING_SERIES_UID: {
+        case ImagingParamsKeys.SERIES_UID: {
           currentCriterion.seriesUid = value ?? ''
           break
         }
-        case ENCOUNTER_SERVICE_PROVIDER: {
+        case ImagingParamsKeys.EXECUTIVE_UNITS: {
           await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
           break
         }
-        case ENCOUNTER_STATUS_REFERENCE: {
+        case ImagingParamsKeys.ENCOUNTER_STATUS: {
           unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
           break
         }
@@ -1661,10 +1701,10 @@ const unbuildPregnancyQuestionnaireResponseCriteria = async (
         case pregnancyForm.ultrasoundMonitoring.id:
           unbuildLabelObjectFilter(currentCriterion, 'ultrasoundMonitoring', joinedValues)
           break
-        case ENCOUNTER_SERVICE_PROVIDER:
+        case QuestionnaireResponseParamsKeys.EXECUTIVE_UNITS:
           await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', joinedValues)
           break
-        case ENCOUNTER_STATUS_REFERENCE: {
+        case QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS: {
           unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', joinedValues)
           break
         }
@@ -1915,10 +1955,10 @@ const unbuildHospitQuestionnaireResponseCriteria = async (element: RequeteurCrit
         case hospitForm.exitDiagnostic.id:
           unbuildLabelObjectFilter(currentCriterion, 'exitDiagnostic', joinedValues)
           break
-        case ENCOUNTER_SERVICE_PROVIDER:
+        case QuestionnaireResponseParamsKeys.EXECUTIVE_UNITS:
           await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', joinedValues)
           break
-        case ENCOUNTER_STATUS_REFERENCE: {
+        case QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS: {
           unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', joinedValues)
           break
         }

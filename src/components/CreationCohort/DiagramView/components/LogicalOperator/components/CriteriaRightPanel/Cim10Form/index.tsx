@@ -53,9 +53,8 @@ const Index = (props: CriteriaDrawerComponentProps) => {
     await syncOnChangeFormValue(
       key,
       value,
-      defaultCriteria,
       newHierarchy,
-      (updatedCriteria) => setDefaultCriteria(updatedCriteria as Cim10DataType),
+      setDefaultCriteria,
       selectedTab,
       defaultCondition.type,
       dispatch

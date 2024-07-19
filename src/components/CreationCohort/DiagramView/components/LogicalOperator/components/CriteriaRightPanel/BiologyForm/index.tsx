@@ -57,9 +57,8 @@ const Index = (props: CriteriaDrawerComponentProps) => {
     await syncOnChangeFormValue(
       key,
       value,
-      defaultCriteria,
       newHierarchy,
-      (updatedCriteria) => setDefaultCriteria(updatedCriteria as ObservationDataType),
+      setDefaultCriteria,
       selectedTab,
       defaultBiology.type,
       dispatch

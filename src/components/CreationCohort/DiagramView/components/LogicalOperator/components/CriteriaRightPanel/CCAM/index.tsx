@@ -54,9 +54,8 @@ const Index = (props: CriteriaDrawerComponentProps) => {
     await syncOnChangeFormValue(
       key,
       value,
-      defaultCriteria,
       newHierarchy,
-      (updatedCriteria) => setDefaultCriteria(updatedCriteria as CcamDataType),
+      setDefaultCriteria,
       selectedTab,
       defaultProcedure.type,
       dispatch

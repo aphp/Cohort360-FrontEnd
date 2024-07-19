@@ -46,6 +46,11 @@ type MedicationFormProps = {
   onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
+enum Error {
+  ADVANCED_INPUTS_ERROR,
+  NO_ERROR
+}
+
 const MedicationForm: React.FC<MedicationFormProps> = (props) => {
   const { isOpen, isEdition, criteriaData, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
@@ -59,6 +64,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
   const [occurrenceComparator, setOccurrenceComparator] = useState(
     currentState.occurrenceComparator || Comparators.GREATER_OR_EQUAL
   )
+  const [error, setError] = useState(Error.NO_ERROR)
 
   const getMedicationOptions = async (searchValue: string, signal: AbortSignal) => {
     const response = await services.cohortCreation.fetchMedicationData(searchValue, false, signal)
@@ -263,6 +269,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             sourceType={SourceType.MEDICATION}
             selectedCriteria={currentState}
             onChangeValue={onChangeValue}
+            onError={(isError) => setError(isError ? Error.ADVANCED_INPUTS_ERROR : Error.NO_ERROR)}
           />
         </Grid>
 
@@ -272,7 +279,13 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="medication-form" variant="contained">
+          <Button
+            onClick={_onSubmit}
+            type="submit"
+            form="medication-form"
+            variant="contained"
+            disabled={error === Error.ADVANCED_INPUTS_ERROR}
+          >
             Confirmer
           </Button>
         </Grid>

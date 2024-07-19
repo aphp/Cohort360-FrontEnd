@@ -45,6 +45,11 @@ type CcamFormProps = {
   onChangeSelectedCriteria: (data: SelectedCriteriaType) => void
 }
 
+enum Error {
+  ADVANCED_INPUTS_ERROR,
+  NO_ERROR
+}
+
 const CcamForm: React.FC<CcamFormProps> = (props) => {
   const { isOpen, isEdition, criteriaData, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
@@ -57,6 +62,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
   const [occurrenceComparator, setOccurrenceComparator] = useState(
     currentState.occurrenceComparator || Comparators.GREATER_OR_EQUAL
   )
+  const [error, setError] = useState(Error.NO_ERROR)
 
   const _onSubmit = () => {
     onChangeSelectedCriteria({ ...currentState, occurrence: occurrence, occurrenceComparator: occurrenceComparator })
@@ -223,7 +229,12 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
           />
 
-          <AdvancedInputs sourceType={SourceType.CCAM} selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs
+            sourceType={SourceType.CCAM}
+            selectedCriteria={currentState}
+            onChangeValue={onChangeValue}
+            onError={(isError) => setError(isError ? Error.ADVANCED_INPUTS_ERROR : Error.NO_ERROR)}
+          />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
@@ -232,7 +243,14 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="ccam-form" color="primary" variant="contained">
+          <Button
+            onClick={_onSubmit}
+            type="submit"
+            form="ccam-form"
+            color="primary"
+            variant="contained"
+            disabled={error === Error.ADVANCED_INPUTS_ERROR}
+          >
             Confirmer
           </Button>
         </Grid>

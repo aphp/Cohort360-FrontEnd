@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import React, { useState } from 'react'
 import { Autocomplete, FormLabel, Grid, MenuItem, Select, TextField } from '@mui/material'
 import { BlockWrapper } from 'components/ui/Layout'
@@ -24,7 +25,8 @@ enum Error {
   INCOHERENT_AGE_ERROR,
   SEARCHINPUT_ERROR,
   UID_ERROR,
-  NO_ERROR
+  NO_ERROR,
+  ADVANCED_INPUTS_ERROR
 }
 
 export const withDocumentOptions = [
@@ -87,8 +89,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [encounterService, setEncounterService] = useState(selectedCriteria?.encounterService || [])
   const [encounterStartDate, setEncounterStartDate] = useState(selectedCriteria?.encounterStartDate || null)
   const [encounterEndDate, setEncounterEndDate] = useState(selectedCriteria?.encounterEndDate || null)
-  const [startOccurrence, setStartOccurence] = useState(selectedCriteria?.startOccurrence || null)
-  const [endOccurrence, setEndOccurence] = useState(selectedCriteria?.endOccurrence || null)
   const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>(
     mappingCriteria(selectedCriteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
   )
@@ -106,12 +106,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
         break
       case 'encounterEndDate':
         setEncounterEndDate(value)
-        break
-      case 'startOccurrence':
-        setStartOccurence(value)
-        break
-      case 'endOccurrence':
-        setEndOccurence(value)
         break
       default:
         break
@@ -147,8 +141,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
       encounterService,
       encounterStartDate,
       encounterEndDate,
-      startOccurrence,
-      endOccurrence,
       encounterStatus
     })
   }
@@ -169,7 +161,12 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
       isEdition={isEdition}
       goBack={goBack}
       onSubmit={onSubmit}
-      disabled={error === Error.INCOHERENT_AGE_ERROR || error === Error.SEARCHINPUT_ERROR || error === Error.UID_ERROR}
+      disabled={
+        error === Error.INCOHERENT_AGE_ERROR ||
+        error === Error.SEARCHINPUT_ERROR ||
+        error === Error.UID_ERROR ||
+        error === Error.ADVANCED_INPUTS_ERROR
+      }
       isInclusive={isInclusive}
       onChangeIsInclusive={setIsInclusive}
       infoAlert={['Tous les éléments des champs multiples sont liés par une contrainte OU']}
@@ -402,12 +399,12 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
         sourceType={SourceType.IMAGING}
         selectedCriteria={{
           ...selectedCriteria,
+          type: CriteriaType.IMAGING,
           encounterService: encounterService,
           encounterStartDate: encounterStartDate,
-          encounterEndDate: encounterEndDate,
-          startOccurrence: startOccurrence,
-          endOccurrence: endOccurrence
+          encounterEndDate: encounterEndDate
         }}
+        onError={(isError) => setError(isError ? Error.ADVANCED_INPUTS_ERROR : Error.NO_ERROR)}
         onChangeValue={_onChangeValue}
       />
     </CriteriaLayout>
