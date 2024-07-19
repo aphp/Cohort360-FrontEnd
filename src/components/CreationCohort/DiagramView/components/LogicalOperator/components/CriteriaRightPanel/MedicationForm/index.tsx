@@ -13,7 +13,6 @@ import { fetchMedication } from 'state/medication'
 import { EXPLORATION } from '../../../../../../../../constants'
 import { Comparators, MedicationDataType, CriteriaType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
-import { any } from 'prop-types'
 
 export const defaultMedication: Omit<MedicationDataType, 'id'> = {
   type: CriteriaType.MEDICATION_REQUEST,
