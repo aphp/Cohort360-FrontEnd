@@ -99,7 +99,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   useEffect(() => {
     const checkChildren = async () => {
       try {
-        const getChildrenResp = await services.cohortCreation.fetchBiologyHierarchy(currentState.code?.[0].id)
+        const getChildrenResp = await services.cohortCreation.fetchBiologyHierarchy(selectedCriteria.code?.[0].id)
 
         getChildrenResp?.length > 0 ? onChangeValue('isLeaf', false) : onChangeValue('isLeaf', true)
       } catch (error) {
@@ -107,7 +107,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       }
     }
 
-    currentState?.code?.length === 1 && currentState?.code[0].id !== '*'
+    selectedCriteria?.code?.length === 1 && selectedCriteria?.code[0].id !== '*'
       ? checkChildren()
       : onChangeValue('isLeaf', false)
   }, [currentState?.code])
@@ -139,12 +139,16 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       parseFloat(_searchByValues[0]) > parseFloat(_searchByValues[1])
     ) {
       setError(Error.INCOHERENT_VALUE_ERROR)
-    } else if (currentState.valueComparator === Comparators.BETWEEN && (!_searchByValues[0] || !_searchByValues[1])) {
+    } else if (
+      allowSearchByValue &&
+      currentState.valueComparator === Comparators.BETWEEN &&
+      (!_searchByValues[0] || !_searchByValues[1])
+    ) {
       setError(Error.MISSING_VALUE_ERROR)
     } else {
       setError(Error.NO_ERROR)
     }
-  }, [_searchByValues, currentState.valueComparator])
+  }, [_searchByValues, currentState.valueComparator, allowSearchByValue])
 
   const handleValueChange = (newValue: string, index: number) => {
     const invalidCharRegex = /[^0-9.-]/ // matches everything that is not a number, a "," or a "."
