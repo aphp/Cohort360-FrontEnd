@@ -18,13 +18,11 @@ import {
   fetchMedicationAdministration,
   fetchObservation,
   fetchImaging,
-  fetchPerimeterFromCohortId,
   postFilters,
   getFilters,
   deleteFilters,
   patchFilters,
   deleteFilter,
-  fetchPerimeterFromId,
   fetchForms,
   fetchQuestionnaires
 } from './callApi'
@@ -36,6 +34,7 @@ import {
   Condition,
   DocumentReference,
   Encounter,
+  Group,
   Identifier,
   ImagingStudy,
   MedicationAdministration,
@@ -830,14 +829,14 @@ const servicesPatients: IServicePatients = {
   },
 
   fetchRights: async (groupId) => {
-    const perimeter = await fetchPerimeterFromCohortId(groupId)
+    const perimetersResponse = await servicesPerimeters.getPerimeters({ cohortIds: groupId })
 
-    const isPerimeter = perimeter.data.results
-
-    if (isPerimeter.length > 0) {
-      const perimeterRights = await servicesPerimeters.fetchPerimetersRights(isPerimeter)
-      return perimeterRights.some((perimeterRight) =>
-        perimeterRight.extension?.some(
+    if (perimetersResponse.results.length > 0) {
+      const perimeterRights = await servicesPerimeters.fetchPerimetersRights(
+        perimetersResponse.results as unknown as Group[]
+      )
+      return perimeterRights.some((right) =>
+        (right.extension || []).some(
           ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
         )
       )
@@ -960,9 +959,4 @@ export const patchFiltersService = async (
   const response = await patchFilters(fhir_resource, uuid, name, criteriasString)
 
   return response
-}
-
-export const fetchPerimeterFromPerimeterId = async (perimeterId: string) => {
-  const response = await fetchPerimeterFromId(perimeterId)
-  return response.data
 }

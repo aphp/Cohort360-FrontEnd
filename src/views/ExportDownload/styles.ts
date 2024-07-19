@@ -1,7 +1,6 @@
 import { makeStyles } from 'tss-react/mui'
-import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles()((theme: Theme) => ({
+const useStyles = makeStyles()(() => ({
   exportDownloadDialog: {
     position: 'absolute',
     top: 50

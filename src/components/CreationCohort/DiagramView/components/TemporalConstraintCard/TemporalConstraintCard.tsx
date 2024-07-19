@@ -44,7 +44,7 @@ const TemporalConstraint: React.FC = () => {
       if (temporalConstraints && temporalConstraints.length > 1) {
         temporalConstraints?.map((temporalConstraint) => {
           dispatch(deleteTemporalConstraint(temporalConstraint))
-          dispatch(buildCohortCreation({}))
+          dispatch(buildCohortCreation({ selectedPopulation: null }))
         })
       }
       setDisableTemporalConstraint(true)

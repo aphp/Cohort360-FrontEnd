@@ -1,29 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
-
 import { IconButton, Grid, Tabs, Tab, CircularProgress } from '@mui/material'
-
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
-
 import PatientNotExist from 'components/ErrorView/PatientNotExist'
 import PatientDocs from 'components/Patient/PatientDocs/PatientDocs'
 import PatientHeader from 'components/Patient/PatientHeader/PatientHeader'
 import PatientPreview from 'components/Patient/PatientPreview/PatientPreview'
 import PatientSidebar from 'components/Patient/PatientSidebar/PatientSidebar'
 import PatientTimeline from 'components/Patient/PatientTimeline/PatientTimeline'
-import PatientPMSI from 'components/Patient/PatientPMSI/PatientPMSI'
 import PatientMedication from 'components/Patient/PatientMedication/PatientMedication'
 import PatientBiology from 'components/Patient/PatientBiology/PatientBiology'
 import PatientImaging from 'components/Patient/PatientImaging/PatientImaging'
+import PatientPMSI from 'components/Patient/PatientPMSI/PatientPMSI'
 import PatientForms from 'components/Patient/PatientForms'
 import TopBar from 'components/TopBar/TopBar'
-
+import useStyles from './styles'
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPatientInfo } from 'state/patient'
-
 import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION, ODD_QUESTIONNAIRE } from '../../constants'
-
-import useStyles from './styles'
 
 const Patient = () => {
   const dispatch = useAppDispatch()

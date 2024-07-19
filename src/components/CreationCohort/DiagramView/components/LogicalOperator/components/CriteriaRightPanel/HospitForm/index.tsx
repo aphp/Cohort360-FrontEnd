@@ -5,9 +5,7 @@ import { Autocomplete, FormLabel, TextField } from '@mui/material'
 
 import useStyles from './styles'
 
-import { CriteriaDrawerComponentProps, CriteriaName, ScopeTreeRow } from 'types'
-import PopulationCard from '../../../../PopulationCard/PopulationCard'
-import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE } from 'utils/cohortCreation'
+import { CriteriaDrawerComponentProps, ScopeElement } from 'types'
 import { LabelObject } from 'types/searchCriterias'
 import { Comparators, CriteriaDataKey, HospitDataType, CriteriaType, CriteriaTypeLabels } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
@@ -18,6 +16,9 @@ import { mappingCriteria } from '../DemographicForm'
 import CriteriaLayout from 'components/ui/CriteriaLayout'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import NumericConditionInput from 'components/ui/Inputs/OccurencesWithFloats'
+import { SourceType } from 'types/scope'
+import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
+import { Hierarchy } from 'types/hierarchy'
 
 enum Error {
   EMPTY_FORM,
@@ -176,7 +177,9 @@ const HospitForm = ({
   const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>(
     mappingCriteria(criteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
   )
-  const [encounterService, setEncounterService] = useState<ScopeTreeRow[]>(criteria?.encounterService || [])
+  const [encounterService, setEncounterService] = useState<Hierarchy<ScopeElement, string>[]>(
+    criteria?.encounterService || []
+  )
   const [occurrence, setOccurrence] = useState<number>(criteria?.occurrence || 1)
   const [occurrenceComparator, setOccurrenceComparator] = useState<Comparators>(
     criteria?.occurrenceComparator || Comparators.GREATER_OR_EQUAL
@@ -296,14 +299,11 @@ const HospitForm = ({
         />
       </BlockWrapper>
       <BlockWrapper style={{ margin: '0 1em 1em' }}>
-        <PopulationCard
-          form={CriteriaName.VisitSupport}
-          label={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
-          title={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
-          executiveUnits={encounterService || []}
-          isAcceptEmptySelection={true}
-          isDeleteIcon={true}
-          onChangeExecutiveUnits={(newValue) => setEncounterService(newValue)}
+        <ExecutiveUnitsFilter
+          sourceType={SourceType.MATERNITY}
+          value={encounterService}
+          name="PregancyForm"
+          onChange={setEncounterService}
         />
       </BlockWrapper>
 

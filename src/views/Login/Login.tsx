@@ -45,6 +45,7 @@ import { getDaysLeft } from 'utils/formatDate'
 import { isCustomError } from 'utils/perimeters'
 import { AccessExpiration, User } from 'types'
 import { isAxiosError } from 'axios'
+import { saveRights } from 'state/scope'
 
 type ErrorSnackBarAlertProps = {
   open?: boolean
@@ -151,7 +152,7 @@ const Login = () => {
       .getAccessExpirations({ expiring: true })
       .then((values) => setLeftDays(values))
 
-    const practitionerPerimeters = await services.perimeters.getPerimeters()
+    const practitionerPerimeters = await services.perimeters.getRights({})
 
     if (isCustomError(practitionerPerimeters)) {
       if (practitionerPerimeters.errorType === 'fhir') {
@@ -176,12 +177,12 @@ const Login = () => {
         return setNoRights(true)
       }
     } else {
-      const nominativeGroupsIds = practitionerPerimeters
-        .filter((perimeterItem) => perimeterItem.read_access === 'DATA_NOMINATIVE')
-        .map((practitionerPerimeter) => practitionerPerimeter.perimeter.cohort_id)
+      const nominativeGroupsIds = practitionerPerimeters.results
+        .filter((perimeterItem) => perimeterItem.rights?.read_access === 'DATA_NOMINATIVE')
+        .map((practitionerPerimeter) => practitionerPerimeter.cohort_id)
         .filter((item) => item)
 
-      const topLevelCareSites = practitionerPerimeters.map((perimeterItem) => perimeterItem.perimeter.cohort_id)
+      const topLevelCareSites = practitionerPerimeters.results.map((perimeterItem) => perimeterItem.cohort_id)
 
       const loginState: MeState = {
         id: practitionerData.username || '',
@@ -198,7 +199,7 @@ const Login = () => {
       }
 
       dispatch(loginAction(loginState))
-
+      dispatch(saveRights({ rights: practitionerPerimeters.results }))
       const oldPath = localStorage.getItem('old-path')
       localStorage.removeItem('old-path')
       navigate(oldPath ?? '/home')

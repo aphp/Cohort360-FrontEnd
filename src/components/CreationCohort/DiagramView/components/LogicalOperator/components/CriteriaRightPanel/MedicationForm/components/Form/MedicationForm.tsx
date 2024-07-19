@@ -25,13 +25,15 @@ import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchMedication } from 'state/medication'
-import { CriteriaItemDataCache, CriteriaName, HierarchyElement, HierarchyElementWithSystem, HierarchyTree } from 'types'
+import { CriteriaItemDataCache, HierarchyElementWithSystem, HierarchyTree } from 'types'
 import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
 import { Comparators, CriteriaType, MedicationDataType, SelectedCriteriaType } from 'types/requestCriterias'
 import { displaySystem } from 'utils/displayValueSetSystem'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
 
 type MedicationFormProps = {
   isOpen: boolean
@@ -78,7 +80,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
     currentState.type === CriteriaType.MEDICATION_REQUEST && currentState.prescriptionType
       ? currentState.prescriptionType.map((prescriptionType) => {
           const criteriaPrescriptionType = criteriaData.data.prescriptionTypes
-            ? criteriaData.data.prescriptionTypes.find((p: HierarchyElement) => p.id === prescriptionType.id)
+            ? criteriaData.data.prescriptionTypes.find((p: Hierarchy<any, any>) => p.id === prescriptionType.id)
             : null
           return {
             id: prescriptionType.id,
@@ -90,7 +92,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
   const selectedCriteriaAdministration = currentState.administration
     ? currentState.administration.map((administration) => {
         const criteriaAdministration = criteriaData.data.administrations
-          ? criteriaData.data.administrations.find((p: HierarchyElement) => p.id === administration.id)
+          ? criteriaData.data.administrations.find((p: Hierarchy<any, any>) => p.id === administration.id)
           : null
         return {
           id: administration.id,
@@ -258,7 +260,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
           />
           <AdvancedInputs
-            form={CriteriaName.Medication}
+            sourceType={SourceType.MEDICATION}
             selectedCriteria={currentState}
             onChangeValue={onChangeValue}
           />

@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { CriteriaName, ScopeTreeRow, SimpleCodeType } from 'types'
+import { CriteriaName, ScopeElement, SimpleCodeType } from 'types'
 import { DocumentAttachmentMethod, LabelObject } from 'types/searchCriterias'
 import {
   convertDurationToString,
@@ -27,6 +26,7 @@ import { comparatorToFilter, parseOccurence } from './valueComparator'
 import services from 'services/aphp'
 import extractFilterParams, { FhirFilterValue } from './fhirFilterParser'
 import { mapDocumentStatusesFromRequestParam } from 'mappers/filters'
+import { Hierarchy } from 'types/hierarchy'
 
 const searchReducer = (accumulator: string, currentValue: string): string =>
   accumulator || !!accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -71,7 +71,7 @@ export const unbuildLabelObjectFilter = (currentCriterion: any, filterName: stri
   }
 }
 
-export const buildEncounterServiceFilter = (criterion: ScopeTreeRow[] | undefined) => {
+export const buildEncounterServiceFilter = (criterion: Hierarchy<ScopeElement, string>[] | undefined) => {
   return criterion && criterion.length > 0 ? `${criterion.map((item) => item.id).reduce(searchReducer)}` : ''
 }
 
@@ -81,13 +81,7 @@ export const unbuildEncounterServiceCriterias = async (
   values?: string | null
 ) => {
   if (values && values !== null) {
-    const isExecutiveUnits = true
-    const encounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(
-      values,
-      undefined,
-      undefined,
-      isExecutiveUnits
-    )
+    const encounterServices: ScopeElement[] = (await services.perimeters.getPerimeters({ ids: values })).results
     currentCriterion[filterName] = currentCriterion
       ? [...currentCriterion[filterName], ...encounterServices]
       : encounterServices

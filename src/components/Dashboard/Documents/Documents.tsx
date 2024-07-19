@@ -2,14 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { Checkbox, CircularProgress, Grid, Tooltip, Typography } from '@mui/material'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
 import FilterList from 'assets/icones/filter.svg?react'
-import {
-  CohortComposition,
-  CriteriaName,
-  DocumentsData,
-  HierarchyElement,
-  LoadingStatus,
-  DTTB_ResultsType as ResultsType
-} from 'types'
+import { CohortComposition, DocumentsData, LoadingStatus, DTTB_ResultsType as ResultsType } from 'types'
 import services from 'services/aphp'
 import {
   DocumentsFilters,
@@ -47,6 +40,8 @@ import List from 'components/ui/List'
 import { useAppSelector } from 'state'
 import Modal from 'components/ui/Modal'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
 
 type DocumentsProps = {
   groupId?: string
@@ -80,7 +75,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   const [page, setPage] = useState(1)
   const [searchInputError, setSearchInputError] = useState<SearchInputError | null>(null)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
-  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
 
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
@@ -372,9 +367,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
         <DocTypesFilter allDocTypesList={allDocTypesList.docTypes} value={docTypes} name={FilterKeys.DOC_TYPES} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
+          sourceType={SourceType.DOCUMENT}
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
-          criteriaName={CriteriaName.Document}
         />
         <EncounterStatusFilter
           value={encounterStatus}
@@ -533,10 +528,10 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
               </Grid>
               <Grid item>
                 <ExecutiveUnitsFilter
+                  sourceType={SourceType.DOCUMENT}
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
-                  criteriaName={CriteriaName.Document}
                 />
               </Grid>
               <Grid item>

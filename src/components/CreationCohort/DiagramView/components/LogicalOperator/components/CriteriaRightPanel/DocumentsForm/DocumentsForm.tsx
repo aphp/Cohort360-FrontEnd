@@ -26,7 +26,7 @@ import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
 
-import { CriteriaDrawerComponentProps, CriteriaName, SimpleCodeType } from 'types'
+import { CriteriaDrawerComponentProps, SimpleCodeType } from 'types'
 import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
 import { SearchByTypes, FilterByDocumentStatus } from 'types/searchCriterias'
@@ -37,6 +37,7 @@ import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
+import { SourceType } from 'types/scope'
 
 const defaultComposition: Omit<DocumentDataType, 'id'> = {
   type: CriteriaType.DOCUMENTS,
@@ -291,7 +292,7 @@ const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
           </FormControl>
 
           <AdvancedInputs
-            form={CriteriaName.Document}
+            sourceType={SourceType.DOCUMENT}
             selectedCriteria={defaultValues}
             onChangeValue={_onChangeValue}
           />

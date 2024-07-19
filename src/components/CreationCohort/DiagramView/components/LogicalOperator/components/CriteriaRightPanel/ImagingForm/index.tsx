@@ -9,7 +9,7 @@ import OccurenceInput from 'components/ui/Inputs/Occurences'
 import CriteriaLayout from 'components/ui/CriteriaLayout'
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
-import { CriteriaDrawerComponentProps, CriteriaName } from 'types'
+import { CriteriaDrawerComponentProps } from 'types'
 import { CalendarRequestLabel } from 'types/dates'
 import { Comparators, CriteriaDataKey, ImagingDataType, CriteriaType, CriteriaTypeLabels } from 'types/requestCriterias'
 import { DocumentAttachmentMethod, DocumentAttachmentMethodLabel, LabelObject } from 'types/searchCriterias'
@@ -18,6 +18,7 @@ import { mappingCriteria } from '../DemographicForm'
 import SearchbarWithCheck from 'components/ui/Inputs/SearchbarWithCheck'
 import UidTextfield from 'components/ui/Inputs/UidTextfield'
 import { MAIL_SUPPORT } from '../../../../../../../../constants'
+import { SourceType } from 'types/scope'
 
 enum Error {
   INCOHERENT_AGE_ERROR,
@@ -398,7 +399,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
       </BlockWrapper>
 
       <AdvancedInputs
-        form={CriteriaName.Imaging}
+        sourceType={SourceType.IMAGING}
         selectedCriteria={{
           ...selectedCriteria,
           encounterService: encounterService,

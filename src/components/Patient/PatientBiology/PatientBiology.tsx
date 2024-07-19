@@ -8,7 +8,7 @@ import DataTableObservation from 'components/DataTable/DataTableObservation'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchBiology } from 'state/patient'
-import { CriteriaName, HierarchyElement, LoadingStatus } from 'types'
+import { LoadingStatus } from 'types'
 
 import useStyles from './styles'
 import { cancelPendingRequest } from 'utils/abortController'
@@ -39,6 +39,8 @@ import {
 } from 'services/aphp/serviceBiology'
 import services from 'services/aphp'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
 
 type PatientBiologyProps = {
   groupId?: string
@@ -55,7 +57,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
-  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
   const {
     allSavedFilters,
     savedFiltersErrors,
@@ -258,9 +260,9 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
         <LoincFilter name={FilterKeys.LOINC} value={loinc} onFetch={fetchLoincCodesApi} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
+          sourceType={SourceType.BIOLOGY}
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
-          criteriaName={CriteriaName.Biology}
         />
         <EncounterStatusFilter
           value={encounterStatus}
@@ -385,10 +387,10 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
                 </Grid>
                 <Grid item xs={12}>
                   <ExecutiveUnitsFilter
+                    sourceType={SourceType.BIOLOGY}
                     disabled={isReadonlyFilterInfoModal}
                     value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                     name={FilterKeys.EXECUTIVE_UNITS}
-                    criteriaName={CriteriaName.Biology}
                   />
                 </Grid>
                 <Grid item xs={12}>

@@ -145,7 +145,7 @@ const ControlPanel: React.FC<{
         dispatch(deleteCriteriaGroup(id))
       }
     }
-    dispatch(buildCohortCreation({}))
+    dispatch(buildCohortCreation({ selectedPopulation: null }))
   }
 
   const _relaunchCount = (keepCount: boolean) => {

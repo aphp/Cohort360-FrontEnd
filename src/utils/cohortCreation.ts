@@ -3,14 +3,13 @@ import moment from 'moment'
 
 import services from 'services/aphp'
 import {
-  ScopeTreeRow,
   CriteriaGroup,
   TemporalConstraintsType,
   CriteriaItemType,
   CriteriaItemDataCache,
-  AbstractTree,
   BiologyStatus,
-  CriteriaGroupType
+  CriteriaGroupType,
+  ScopeElement
 } from 'types'
 
 import {
@@ -81,6 +80,7 @@ import { pregnancyForm } from 'data/pregnancyData'
 import { hospitForm } from 'data/hospitData'
 import { editAllCriteria, editAllCriteriaGroup, pseudonimizeCriteria, buildCohortCreation } from 'state/cohortCreation'
 import { AppDispatch } from 'state'
+import { Hierarchy } from 'types/hierarchy'
 
 const REQUETEUR_VERSION = 'v1.4.5'
 
@@ -267,7 +267,7 @@ export const cleanNominativeCriterias = (
   selectedCriteria: SelectedCriteriaType[],
   criteriaGroups: CriteriaGroup[],
   dispatch: AppDispatch,
-  selectedPopulation?: ScopeTreeRow[]
+  selectedPopulation?: ScopeElement[]
 ) => {
   const cleanDurationRange = (value: DurationRangeType) => {
     const regex = /^[^/]*\// // matches everything before the first '/'
@@ -319,7 +319,7 @@ export const cleanNominativeCriterias = (
   if (selectedPopulation != undefined && selectedPopulation.length > 0) {
     dispatch(buildCohortCreation({ selectedPopulation: selectedPopulation }))
   } else {
-    dispatch(buildCohortCreation({}))
+    dispatch(buildCohortCreation({ selectedPopulation: null }))
   }
 }
 
@@ -777,7 +777,7 @@ const mapCriteriaToResource = (criteriaType: CriteriaType): ResourceType => {
 }
 
 export function buildRequest(
-  selectedPopulation: (ScopeTreeRow | undefined)[] | null,
+  selectedPopulation: (Hierarchy<ScopeElement, string> | undefined)[] | null,
   selectedCriteria: SelectedCriteriaType[],
   criteriaGroup: CriteriaGroup[],
   temporalConstraints: TemporalConstraintsType[]
@@ -1948,7 +1948,7 @@ const unbuildQuestionnaireResponseCriteria = async (element: RequeteurCriteriaTy
 export async function unbuildRequest(_json: string): Promise<any> {
   // TODO: handle potential errors (here or in the caller)
   // so if a single criteria fails, the whole request is not lost
-  let population: (ScopeTreeRow | undefined)[] | null = null
+  //  let population: (ScopeTreeRow | undefined)[] | null = null
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
   let temporalConstraints: TemporalConstraintsType[] = []
@@ -1966,30 +1966,12 @@ export async function unbuildRequest(_json: string): Promise<any> {
     request
   } = json
 
-  /**
-   * Retrieve population
-   */
-  if (typeof services.perimeters.fetchPerimeterInfoForRequeteur !== 'function') {
-    return {
-      population: null,
-      criteria: [],
-      criteriaGroup: []
-    }
-  }
-
-  for (const caresiteCohortItem of caresiteCohortList) {
-    const newPopulation = await services.perimeters.fetchPerimeterInfoForRequeteur(caresiteCohortItem ?? '')
-    // Don't do that, do not filter population, if you have a pop. with an undefined,
-    // you got a modal with the posibility to change your current source pop.
-    // if (!newPopulation) continue
-    population = population ? [...population, newPopulation] : [newPopulation]
-  }
+  const population = await services.perimeters.fetchPopulationForRequeteur(caresiteCohortList)
 
   // retrieve temporal constraints
   if (request && request.temporalConstraints) {
     temporalConstraints = request.temporalConstraints
   }
-
   /**
    * Retrieve criteria + groups
    *
@@ -2300,9 +2282,9 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
 }
 
 export const findSelectedInListAndSubItems = (
-  selectedItems: AbstractTree<any>[],
-  searchedItem: AbstractTree<any> | undefined,
-  pmsiHierarchy: AbstractTree<any>[],
+  selectedItems: Hierarchy<any, any>[],
+  searchedItem: Hierarchy<any, any> | undefined,
+  pmsiHierarchy: Hierarchy<any, any>[],
   valueSetSystem?: string
 ): boolean => {
   if (!searchedItem || !selectedItems || selectedItems.length === 0) return false

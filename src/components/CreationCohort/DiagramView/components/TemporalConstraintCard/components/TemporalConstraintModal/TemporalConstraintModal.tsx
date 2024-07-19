@@ -43,7 +43,7 @@ const TemporalConstraint: React.FC<{
 
   const handleConfirm = () => {
     dispatch(updateTemporalConstraints([...stayConstraints, ...chronologicalConstraints, ...episodeConstraints]))
-    dispatch(buildCohortCreation({}))
+    dispatch(buildCohortCreation({ selectedPopulation: null }))
   }
 
   const handleClose = () => {

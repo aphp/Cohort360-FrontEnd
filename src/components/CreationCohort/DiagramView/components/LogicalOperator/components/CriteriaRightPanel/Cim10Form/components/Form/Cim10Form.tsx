@@ -25,12 +25,14 @@ import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition } from 'state/pmsi'
-import { CriteriaItemDataCache, CriteriaName, HierarchyElement, HierarchyTree } from 'types'
+import { CriteriaItemDataCache, HierarchyTree } from 'types'
 import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
 import { Cim10DataType, Comparators, SelectedCriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
 
 type Cim10FormProps = {
   isOpen: boolean
@@ -66,7 +68,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {
         const criteriaCode = criteriaData.data.cim10Diagnostic
-          ? criteriaData.data.cim10Diagnostic.find((c: HierarchyElement) => c.id === code.id)
+          ? criteriaData.data.cim10Diagnostic.find((c: Hierarchy<any, any>) => c.id === code.id)
           : null
         return {
           id: code.id,
@@ -77,7 +79,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const defaultValuesType = currentState.diagnosticType
     ? currentState.diagnosticType.map((diagnosticType) => {
         const criteriaType = criteriaData.data.diagnosticTypes
-          ? criteriaData.data.diagnosticTypes.find((g: HierarchyElement) => g.id === diagnosticType.id)
+          ? criteriaData.data.diagnosticTypes.find((g: Hierarchy<any, any>) => g.id === diagnosticType.id)
           : null
         return {
           id: diagnosticType.id,
@@ -237,7 +239,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             onChange={(e, value) => onChangeValue('encounterStatus', value)}
             renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
           />
-          <AdvancedInputs form={CriteriaName.Cim10} selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs sourceType={SourceType.CIM10} selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

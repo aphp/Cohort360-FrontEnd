@@ -1,4 +1,5 @@
-import { ScopeTreeRow, SimpleCodeType } from 'types'
+import { ScopeElement, SimpleCodeType } from 'types'
+import { Hierarchy } from './hierarchy'
 import { DocumentAttachmentMethod, DurationRangeType, LabelObject, SearchByTypes } from './searchCriterias'
 
 export enum MedicationLabel {
@@ -73,7 +74,7 @@ export type CommonCriteriaDataType = {
   id: number
   error?: boolean
   type: CriteriaType
-  encounterService?: ScopeTreeRow[]
+  encounterService?: Hierarchy<ScopeElement, string>[]
   isInclusive?: boolean
   title: string
 }
@@ -253,7 +254,7 @@ export type EncounterDataType = CommonCriteriaDataType &
     destination: LabelObject[] | null
     provenance: LabelObject[] | null
     admission: LabelObject[] | null
-    encounterService: ScopeTreeRow[] | null
+    encounterService: Hierarchy<ScopeElement, string>[] | null
   }
 
 export type PregnancyDataType = CommonCriteriaDataType &

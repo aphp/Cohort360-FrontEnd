@@ -4,14 +4,14 @@ import { RootState } from 'state'
 import { impersonate, login, logout } from 'state/me'
 
 import services from 'services/aphp'
-import { HierarchyElement } from 'types'
+import { Hierarchy } from 'types/hierarchy'
 
 export type MedicationState = {
   syncLoading?: number
   loading: boolean
-  list: HierarchyElement[]
+  list: Hierarchy<any, any>[]
   openedElement: string[]
-  ucdList: HierarchyElement[]
+  ucdList: Hierarchy<any, any>[]
 }
 
 const defaultInitialState: MedicationState = {
@@ -64,7 +64,7 @@ const fetchMedication = createAsyncThunk<MedicationState, void, { state: RootSta
 
 type ExpandMedicationElementParams = {
   rowId: string
-  selectedItems?: HierarchyElement[]
+  selectedItems?: Hierarchy<any, any>[]
 }
 
 const expandMedicationElement = createAsyncThunk<MedicationState, ExpandMedicationElementParams, { state: RootState }>(
@@ -84,14 +84,14 @@ const expandMedicationElement = createAsyncThunk<MedicationState, ExpandMedicati
     } else {
       _openedElement = [..._openedElement, rowId]
 
-      const replaceSubItems = async (items: HierarchyElement[]) => {
-        let _items: HierarchyElement[] = []
+      const replaceSubItems = async (items: Hierarchy<any, any>[]) => {
+        let _items: Hierarchy<any, any>[] = []
         for (let item of items) {
           // Replace sub items element by response of back-end
           if (item.id === rowId) {
-            const foundItem = item.subItems ? item.subItems.find((i) => i.id === 'loading') : true
+            const foundItem = item.subItems ? item.subItems.find((i: Hierarchy<any, any>) => i.id === 'loading') : true
             if (foundItem) {
-              let subItems: HierarchyElement[] = []
+              let subItems: Hierarchy<any, any>[] = []
               subItems = await services.cohortCreation.fetchAtcHierarchy(item.id)
 
               item = { ...item, subItems: subItems }

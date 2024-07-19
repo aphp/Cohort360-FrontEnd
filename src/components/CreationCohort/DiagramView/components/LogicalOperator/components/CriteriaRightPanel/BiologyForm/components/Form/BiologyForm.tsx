@@ -24,7 +24,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchBiology } from 'state/biology'
-import { CriteriaItemDataCache, CriteriaName, HierarchyElement, HierarchyTree } from 'types'
+import { CriteriaItemDataCache, HierarchyTree } from 'types'
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 import { ObservationDataType, Comparators, SelectedCriteriaType } from 'types/requestCriterias'
 import services from 'services/aphp'
@@ -38,6 +38,8 @@ enum Error {
   INVALID_VALUE_ERROR,
   MISSING_VALUE_ERROR
 }
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
 
 type BiologyFormProps = {
   isOpen: boolean
@@ -87,7 +89,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {
         const criteriaCode = criteriaData.data.biologyData
-          ? criteriaData.data.biologyData.find((g: HierarchyElement) => g.id === code.id)
+          ? criteriaData.data.biologyData.find((g: Hierarchy<any, any>) => g.id === code.id)
           : null
         return {
           id: code.id,
@@ -382,7 +384,11 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             />
           </Grid>
 
-          <AdvancedInputs form={CriteriaName.Biology} selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs
+            sourceType={SourceType.BIOLOGY}
+            selectedCriteria={currentState}
+            onChangeValue={onChangeValue}
+          />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

@@ -898,11 +898,10 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
       if (groupId) {
         deidentifiedBoolean = (await services.patients.fetchRights(groupId)) ?? {}
       } else {
-        const perimeters = await services.perimeters.getPerimeters()
-
-        if (!isCustomError(perimeters)) {
-          deidentifiedBoolean = perimeters.some(
-            (perimeter) => servicesPerimeters.getAccessFromScope(perimeter) === 'Pseudonymisé'
+        const rights = await services.perimeters.getRights({})
+        if (!isCustomError(rights)) {
+          deidentifiedBoolean = rights.results.some((right) =>
+            right.rights ? servicesPerimeters.getAccessFromRights(right.rights) === 'Pseudonymisé' : false
           )
         }
       }

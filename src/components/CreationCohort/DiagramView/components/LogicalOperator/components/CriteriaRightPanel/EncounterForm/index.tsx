@@ -19,9 +19,7 @@ import InfoIcon from '@mui/icons-material/Info'
 import useStyles from './styles'
 import { useAppSelector } from 'state'
 
-import { CriteriaDrawerComponentProps, CriteriaName, ScopeTreeRow } from 'types'
-import PopulationCard from '../../../../PopulationCard/PopulationCard'
-import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE } from 'utils/cohortCreation'
+import { CriteriaDrawerComponentProps, ScopeElement } from 'types'
 import { DurationRangeType, LabelObject } from 'types/searchCriterias'
 import { Comparators, CriteriaDataKey, EncounterDataType, CriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
@@ -30,6 +28,9 @@ import Collapse from 'components/ui/Collapse'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { mappingCriteria } from '../DemographicForm'
+import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
 
 enum Error {
   EMPTY_FORM,
@@ -80,7 +81,9 @@ const EncounterForm = ({
   const [admission, setAdmission] = useState<LabelObject[]>(
     mappingCriteria(criteria?.admission, CriteriaDataKey.ADMISSION, criteriaData) || []
   )
-  const [encounterService, setEncounterService] = useState<ScopeTreeRow[]>(criteria?.encounterService || [])
+  const [encounterService, setEncounterService] = useState<Hierarchy<ScopeElement, string>[]>(
+    criteria?.encounterService || []
+  )
   const [encounterStartDate, setEncounterStartDate] = useState<string | null | undefined>(
     criteria?.encounterStartDate || null
   )
@@ -232,14 +235,11 @@ const EncounterForm = ({
           </BlockWrapper>
 
           <BlockWrapper className={classes.inputItem}>
-            <PopulationCard
-              form={CriteriaName.VisitSupport}
-              label={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
-              title={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
-              executiveUnits={encounterService || []}
-              isAcceptEmptySelection={true}
-              isDeleteIcon={true}
-              onChangeExecutiveUnits={(newValue) => setEncounterService(newValue)}
+            <ExecutiveUnitsFilter
+              sourceType={SourceType.DOCUMENT}
+              value={encounterService}
+              name="DocumentForm"
+              onChange={setEncounterService}
             />
           </BlockWrapper>
 

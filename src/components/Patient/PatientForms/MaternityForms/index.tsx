@@ -16,11 +16,13 @@ import { fetchMaternityForms } from 'state/patient'
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { Questionnaire } from 'fhir/r4'
-import { CriteriaName, HierarchyElement, LoadingStatus } from 'types'
+import { LoadingStatus } from 'types'
 import { FilterKeys } from 'types/searchCriterias'
 import Timeline from './Timeline'
 import services from 'services/aphp'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
 
 type PatientFormsProps = {
   groupId?: string
@@ -34,7 +36,7 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [maternityFormNamesIds, setMaternityFormNamesIds] = useState<Questionnaire[]>([])
-  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
 
   const [
     {
@@ -124,9 +126,9 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
                 <MaternityFormFilter name={FilterKeys.FORM_NAME} value={formName} />
                 <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
                 <ExecutiveUnitsFilter
+                  sourceType={SourceType.FORM_RESPONSE}
                   value={executiveUnits}
                   name={FilterKeys.EXECUTIVE_UNITS}
-                  criteriaName={CriteriaName.Form}
                 />
                 <EncounterStatusFilter
                   value={encounterStatus}

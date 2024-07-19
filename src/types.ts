@@ -24,6 +24,8 @@ import { AxiosResponse } from 'axios'
 import { SearchInputError } from 'types/error'
 import { Comparators, CriteriaDataKey, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
 import { ExportTableType } from 'components/Dashboard/ExportModal/export_table'
+import { Hierarchy } from 'types/hierarchy'
+import { SearchByTypes } from 'types/searchCriterias'
 
 export enum JobStatus {
   new = 'new',
@@ -100,8 +102,10 @@ export type FHIR_API_Promise_Response<T extends Resource> = Promise<AxiosRespons
 export type FHIR_Bundle_Promise_Response<T extends FhirResource> = FHIR_API_Promise_Response<Bundle<T>>
 
 export type Back_API_Response<T> = {
-  results?: T[]
-  count?: number
+  results: T[]
+  next?: string
+  previous?: string
+  count: number
 }
 
 export type User = {
@@ -196,23 +200,6 @@ export type Column =
   | {
       multiple: Column[]
     }
-
-export type ScopeTreeRow = AbstractTree<{
-  access?: string
-  resourceType?: string
-  name: string
-  full_path?: string
-  quantity: number
-  parentId?: string | null
-  managingEntity?: never
-  above_levels_ids?: string
-  inferior_levels_ids?: string
-  cohort_id?: string
-  cohort_size?: string
-  cohort_tag?: string
-  type?: string
-  source_value?: string
-}>
 
 export enum ChartCode {
   AGE_PYRAMID = 'facet-extension.ageMonth',
@@ -386,7 +373,7 @@ export type CriteriaItemType = {
 
 type FetchFunctionVariant =
   | (() => Promise<SimpleCodeType[]>)
-  | ((searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<HierarchyElement[]>)
+  | ((searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<Hierarchy<any, any>[]>)
 
 export type ValueSet = {
   code: string
@@ -706,40 +693,41 @@ export type DTTB_ResultsType = {
   total: number
   label?: string
 }
-
-export type AbstractTree<T> = T & {
-  id: string
-  subItems?: AbstractTree<T>[]
+export type DTTB_SearchBarType = {
+  type: 'simple' | 'patient' | 'document'
+  value: string | undefined
+  onSearch: (newSearch: string, newSearchBy: SearchByTypes) => void
+  searchBy?: any
+  error?: SearchInputError
+  fullWidth?: boolean
 }
-
-export type HierarchyElement<E = {}> = AbstractTree<
-  E & {
-    label: string
-  }
->
-
-export type TreeElement = { id: string; subItems: TreeElement[] }
-
-export type HierarchyElementWithSystem = HierarchyElement<{ system?: string }>
-
-export type HierarchyTree = {
-  code?: HierarchyElement[]
+export type DTTB_ButtonType = {
+  label: string
+  icon?: ReactElement
+  onClick: (args?: any) => void
+}
+export type HierarchyTree = null | {
+  code?: Hierarchy<any, any>[]
   loading?: number
 }
 
+export type HierarchyElementWithSystem = Hierarchy<any, any> & { system?: string }
+
 export type ScopeElement = {
-  id: number
+  id: string
   name: string
   source_value: string
-  parent_id: string | null
   type: string
+  parent_id: string
   above_levels_ids: string
   inferior_levels_ids: string
   cohort_id: string
   cohort_size: string
   full_path: string
+  rights?: ReadRightPerimeter
+  access?: 'Nominatif' | 'Pseudonymisé'
 }
-export type ScopePage = {
+export type ReadRightPerimeter = {
   perimeter: ScopeElement
   read_role: string
   right_read_patient_nominative: boolean
@@ -748,12 +736,6 @@ export type ScopePage = {
   read_access?: string
   read_export?: string
   export_access?: string
-}
-export type IScope = {
-  count: number
-  next: string | null
-  previous: string | null
-  results: ScopePage[]
 }
 
 export type GroupRights = {
@@ -777,14 +759,6 @@ export type DataRights = {
   right_search_opposed_patients: boolean
   right_search_patients_by_ipp: boolean
 }
-
-export type ScopeType =
-  | 'AP-HP'
-  | 'Groupe hospitalier (GH)'
-  | 'GHU'
-  | 'Hôpital'
-  | 'Pôle/DMU'
-  | 'Unité Fonctionnelle (UF)'
 
 export enum CriteriaName {
   Cim10 = 'cim10',
@@ -817,41 +791,6 @@ export type UserAccesses = {
   role: {
     right_full_admin: boolean
   }
-}
-
-export type ExpandScopeElementParamsType = {
-  rowId: number
-  scopesList?: ScopeListType
-  selectedItems?: ScopeTreeRow[]
-  openPopulation?: number[]
-  executiveUnitType?: ScopeType
-  isExecutiveUnit?: boolean
-  signal?: AbortSignal
-}
-export type ExpandScopeElementReturnType = {
-  scopesList: ScopeListType
-  selectedItems: ScopeTreeRow[]
-  openPopulation: number[]
-  aborted?: boolean
-}
-
-export type ScopeTreeTableHeadCellsType = {
-  id: string
-  align: string
-  disablePadding: boolean
-  disableOrderBy: boolean
-  label: string | ReactElement
-}
-
-export type ScopeListType = {
-  perimeters: ScopeTreeRow[]
-  executiveUnits: ScopeTreeRow[]
-}
-
-export type FindScope = {
-  scopeTreeRows: ScopeTreeRow[]
-  count: number
-  aborted?: boolean
 }
 
 export type CustomError = {
@@ -907,4 +846,10 @@ export type WebSocketMessage = {
     measure?: number
     global?: { measure_min: number; measure_max: number }
   }
+}
+
+export enum SelectedStatus {
+  NOT_SELECTED,
+  SELECTED,
+  INDETERMINATE
 }

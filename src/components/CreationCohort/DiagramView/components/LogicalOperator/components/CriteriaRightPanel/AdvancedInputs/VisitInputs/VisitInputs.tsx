@@ -11,8 +11,6 @@ import {
   DocumentDataType,
   GhmDataType,
   EncounterDataType,
-  PregnancyDataType,
-  HospitDataType,
   MedicationDataType,
   ObservationDataType,
   ImagingDataType

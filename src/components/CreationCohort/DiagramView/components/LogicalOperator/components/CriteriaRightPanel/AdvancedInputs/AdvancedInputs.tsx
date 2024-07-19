@@ -1,44 +1,25 @@
 import React, { useState } from 'react'
 
-import { Collapse, FormLabel, Grid, IconButton, Tooltip, Typography } from '@mui/material'
+import { Collapse, Grid, IconButton, Typography } from '@mui/material'
 
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import InfoIcon from '@mui/icons-material/Info'
 
-import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
 import VisitInputs from './VisitInputs/VisitInputs'
-import { CriteriaName } from 'types'
 import OccurrencesDateInputs from './OccurrencesInputs/OccurrencesDateInputs'
 
-import scopeType from 'data/scope_type.json'
-
-import { ScopeTreeRow } from 'types'
-import {
-  CcamDataType,
-  Cim10DataType,
-  DocumentDataType,
-  GhmDataType,
-  ImagingDataType,
-  MedicationDataType,
-  ObservationDataType
-} from 'types/requestCriterias'
+import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
+import { ScopeElement } from 'types'
 
 type AdvancedInputsProps = {
-  form: CriteriaName
-  selectedCriteria:
-    | CcamDataType
-    | Cim10DataType
-    | DocumentDataType
-    | GhmDataType
-    | MedicationDataType
-    | ImagingDataType
-    | ObservationDataType
-  onChangeValue: (key: string, value: ScopeTreeRow[] | string | undefined) => void
+  sourceType: SourceType
+  selectedCriteria: any
+  onChangeValue: (key: string, value: any) => void
 }
 
-const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
-  const { form, selectedCriteria, onChangeValue } = props
+const AdvancedInputs = ({ sourceType, selectedCriteria = {}, onChangeValue }: AdvancedInputsProps) => {
   const optionsIsUsed =
     (selectedCriteria.encounterService && selectedCriteria.encounterService.length > 0) ||
     !!selectedCriteria.startOccurrence ||
@@ -47,9 +28,8 @@ const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
     !!selectedCriteria.encounterEndDate
 
   const [checked, setCheck] = useState(optionsIsUsed)
-  const label = 'Sélectionnez une unité exécutrice'
 
-  const _onSubmitExecutiveUnits = (_selectedExecutiveUnits: ScopeTreeRow[] | undefined) => {
+  const _onSubmitExecutiveUnits = (_selectedExecutiveUnits: Hierarchy<ScopeElement, string>[]) => {
     onChangeValue('encounterService', _selectedExecutiveUnits)
   }
 
@@ -73,30 +53,12 @@ const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
       </Grid>
 
       <Collapse in={checked} unmountOnExit>
-        <FormLabel style={{ padding: '1em 1em 0 1em', display: 'flex', alignItems: 'center' }} component="legend">
-          Unité exécutrice
-          <Tooltip
-            title={
-              <>
-                {'- Le niveau hiérarchique de rattachement est : ' + scopeType?.criteriaType[form] + '.'}
-                <br />
-                {"- L'unité exécutrice" +
-                  ' est la structure élémentaire de prise en charge des malades par une équipe soignante ou médico-technique identifiées par leurs fonctions et leur organisation.'}
-              </>
-            }
-          >
-            <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-          </Tooltip>
-        </FormLabel>
-        <Grid item container direction="row" alignItems="center" margin="1em">
-          <PopulationCard
-            form={form}
-            label={label}
-            title={label}
-            executiveUnits={selectedCriteria.encounterService ?? []}
-            isAcceptEmptySelection={true}
-            isDeleteIcon={true}
-            onChangeExecutiveUnits={_onSubmitExecutiveUnits}
+        <Grid container direction="row" alignItems="center" padding="0em 1em" color="rgba(0, 0, 0, 0.6)">
+          <ExecutiveUnitsFilter
+            sourceType={sourceType}
+            value={selectedCriteria?.encounterService || []}
+            name="AdvancedInputs"
+            onChange={_onSubmitExecutiveUnits}
           />
         </Grid>
 

@@ -10,8 +10,9 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProcedure } from 'state/pmsi'
 import { EXPLORATION } from '../../../../../../../..//constants'
 
-import { CriteriaDrawerComponentProps, HierarchyElement } from 'types'
+import { CriteriaDrawerComponentProps } from 'types'
 import { CcamDataType, Comparators, CriteriaType } from 'types/requestCriterias'
+import { Hierarchy } from 'types/hierarchy'
 
 export const defaultProcedure: Omit<CcamDataType, 'id'> = {
   type: CriteriaType.PROCEDURE,
@@ -43,13 +44,13 @@ const Index = (props: CriteriaDrawerComponentProps) => {
   const { classes } = useStyles()
 
   const _onChangeSelectedHierarchy = (
-    newSelectedItems: HierarchyElement[] | null | undefined,
-    newHierarchy?: HierarchyElement[]
+    newSelectedItems: Hierarchy<any, any>[] | null | undefined,
+    newHierarchy?: Hierarchy<any, any>[]
   ) => {
     _onChangeFormValue('code', newSelectedItems, newHierarchy)
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const _onChangeFormValue = async (key: string, value: any, newHierarchy: HierarchyElement[] = ccamHierarchy) =>
+  const _onChangeFormValue = async (key: string, value: any, newHierarchy: Hierarchy<any, any>[] = ccamHierarchy) =>
     await syncOnChangeFormValue(
       key,
       value,

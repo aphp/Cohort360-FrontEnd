@@ -210,7 +210,7 @@ const Requeteur = () => {
 
   return (
     <>
-      <DiagramView />
+      {(requestId || requestIdFromUrl) && <DiagramView />}
 
       <ControlPanel
         onExecute={_canExecute() ? _onExecute : undefined}

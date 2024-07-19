@@ -6,7 +6,7 @@ import FilterList from 'assets/icones/filter.svg?react'
 
 import DataTableMedication from 'components/DataTable/DataTableMedication'
 
-import { CriteriaName, HierarchyElement, LoadingStatus, TabType } from 'types'
+import { LoadingStatus, TabType } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchMedication } from 'state/patient'
@@ -38,6 +38,8 @@ import List from 'components/ui/List'
 import { mapToAttribute, mapToLabel } from 'mappers/pmsi'
 import services from 'services/aphp'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
 
 type PatientMedicationProps = {
   groupId?: string
@@ -61,7 +63,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [triggerClean, setTriggerClean] = useState<boolean>(false)
-  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
 
   const dispatch = useAppDispatch()
   const patient = useAppSelector((state) => state.patient)
@@ -120,8 +122,8 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
     })
   }, [nda, prescriptionTypes, administrationRoutes, startDate, endDate, executiveUnits, encounterStatus])
 
-  const [allAdministrationRoutes, setAllAdministrationRoutes] = useState<HierarchyElement[]>([])
-  const [allPrescriptionTypes, setAllPrescriptionTypes] = useState<HierarchyElement[]>([])
+  const [allAdministrationRoutes, setAllAdministrationRoutes] = useState<Hierarchy<any, any>[]>([])
+  const [allPrescriptionTypes, setAllPrescriptionTypes] = useState<Hierarchy<any, any>[]>([])
   const [searchResults, setSearchResults] = useState<MedicationSearchResults>({
     deidentified: false,
     list: [],
@@ -348,9 +350,9 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
         )}
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
+          sourceType={SourceType.MEDICATION}
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
-          criteriaName={CriteriaName.Medication}
         />
         <EncounterStatusFilter
           value={encounterStatus}
@@ -481,10 +483,10 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
                   names={[FilterKeys.START_DATE, FilterKeys.END_DATE]}
                 />
                 <ExecutiveUnitsFilter
+                  sourceType={SourceType.MEDICATION}
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
-                  criteriaName={CriteriaName.Medication}
                 />
                 <EncounterStatusFilter
                   disabled={isReadonlyFilterInfoModal}

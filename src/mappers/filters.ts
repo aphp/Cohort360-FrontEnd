@@ -1,5 +1,5 @@
 import { ResourceType } from 'types/requestCriterias'
-import { ScopeTreeRow, SimpleCodeType } from 'types'
+import { ScopeElement, SimpleCodeType } from 'types'
 import {
   Direction,
   Filters,
@@ -30,7 +30,6 @@ import {
   convertStringToDuration,
   convertTimestampToDuration
 } from 'utils/age'
-import { fetchPerimeterFromPerimeterId } from 'services/aphp/servicePatients'
 import { fetchClaimCodes, fetchConditionCodes, fetchProcedureCodes } from 'services/aphp/servicePmsi'
 import { fetchAnabioCodes, fetchLoincCodes } from 'services/aphp/serviceBiology'
 import {
@@ -47,6 +46,8 @@ import {
   ENCOUNTER_STATUS
 } from '../constants'
 import services from 'services/aphp'
+import servicesPerimeters from 'services/aphp/servicePerimeters'
+import { Hierarchy } from 'types/hierarchy'
 
 export enum PatientsParamsKeys {
   GENDERS = 'gender',
@@ -165,23 +166,10 @@ const mapGenericFromRequestParams = async (parameters: URLSearchParams, type: Re
   const startDate = dates.find((e) => e.includes('ge'))?.split('ge')?.[1] || null
   const endDate = dates.find((e) => e.includes('le'))?.split('le')?.[1] || null
   const executiveUnitsParams = parameters.get(getGenericKeyFromResourceType(type, 'EXECUTIVE_UNITS'))
-  let executiveUnits: ScopeTreeRow[] = []
+  let executiveUnits: Hierarchy<ScopeElement, string>[] = []
   if (executiveUnitsParams) {
-    executiveUnits = await Promise.all<ScopeTreeRow>(
-      executiveUnitsParams.split(',').map(async (unit) => {
-        try {
-          const fetchedData = await fetchPerimeterFromPerimeterId(unit)
-          return fetchedData
-        } catch (error) {
-          console.error('Erreur lors de la récupération des données', error)
-          return unit
-        }
-      })
-    )
-    executiveUnits = executiveUnits.map((executiveUnit) => ({
-      ...executiveUnit,
-      name: `${executiveUnit.source_value} - ${executiveUnit.name}`
-    }))
+    const fetchedData = await servicesPerimeters.getPerimeters({ ids: executiveUnitsParams })
+    executiveUnits = fetchedData.results
   }
   const encounterStatusParams = decodeURIComponent(
     parameters.get(getGenericKeyFromResourceType(type, 'ENCOUNTER_STATUS')) || ''
@@ -436,9 +424,7 @@ const mapGenericToRequestParams = (filters: GenericFilter, type: ResourceType) =
   if (endDate) requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=le${endDate}`)
   if (executiveUnits && executiveUnits.length > 0)
     requestParams.push(
-      `${getGenericKeyFromResourceType(type, 'EXECUTIVE_UNITS')}=${executiveUnits.map(
-        (scopeTreeRow: ScopeTreeRow) => scopeTreeRow.id
-      )}`
+      `${getGenericKeyFromResourceType(type, 'EXECUTIVE_UNITS')}=${executiveUnits.map((unit) => unit.id)}`
     )
   if (encounterStatus && encounterStatus.length > 0) {
     const encounterStatusUrl = `${ENCOUNTER_STATUS}|`

@@ -8,9 +8,7 @@ import DataTablePmsi from 'components/DataTable/DataTablePmsi'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPmsi } from 'state/patient'
-
-import { HierarchyElement, LoadingStatus, TabType } from 'types'
-
+import { LoadingStatus, TabType } from 'types'
 import useStyles from './styles'
 import { cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
@@ -37,11 +35,13 @@ import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
 import { Claim, Condition, Procedure } from 'fhir/r4'
-import { mapToAttribute, mapToCriteriaName, mapToLabel } from 'mappers/pmsi'
+import { mapToAttribute, mapToLabel } from 'mappers/pmsi'
 import List from 'components/ui/List'
 import { fetchClaimCodes, fetchConditionCodes, fetchProcedureCodes } from 'services/aphp/servicePmsi'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { AlertWrapper } from 'components/ui/Alert'
+import { SourceType } from 'types/scope'
+import { Hierarchy } from 'types/hierarchy'
 
 export type PatientPMSIProps = {
   groupId?: string
@@ -67,7 +67,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [triggerClean, setTriggerClean] = useState<boolean>(false)
-  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElement[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
   const dispatch = useAppDispatch()
 
   const [selectedTab, setSelectedTab] = useState<PmsiTab>({
@@ -80,6 +80,12 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
     { label: PMSILabel.CCAM, id: ResourceType.PROCEDURE },
     { label: PMSILabel.GHM, id: ResourceType.CLAIM }
   ]
+  const sourceType =
+    selectedTab.id === ResourceType.CONDITION
+      ? SourceType.CIM10
+      : selectedTab.id === ResourceType.PROCEDURE
+      ? SourceType.CCAM
+      : SourceType.GHM
   const [page, setPage] = useState(1)
   const {
     allSavedFilters,
@@ -111,7 +117,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
     [code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus]
   )
 
-  const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<HierarchyElement[]>([])
+  const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<Hierarchy<any, any>[]>([])
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const patient = useAppSelector((state) => state.patient)
   const [searchResults, setSearchResults] = useState<PmsiSearchResults>({
@@ -346,11 +352,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
         )}
         {selectedTab.id !== ResourceType.CLAIM && <SourceFilter name={FilterKeys.SOURCE} value={source || ''} />}
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
-        <ExecutiveUnitsFilter
-          value={executiveUnits}
-          name={FilterKeys.EXECUTIVE_UNITS}
-          criteriaName={mapToCriteriaName(selectedTab.id)}
-        />
+        <ExecutiveUnitsFilter sourceType={sourceType} value={executiveUnits} name={FilterKeys.EXECUTIVE_UNITS} />
         <EncounterStatusFilter
           value={encounterStatus}
           name={FilterKeys.ENCOUNTER_STATUS}
@@ -488,10 +490,10 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
               </Grid>
               <Grid item xs={12}>
                 <ExecutiveUnitsFilter
+                  sourceType={sourceType}
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
-                  criteriaName={mapToCriteriaName(selectedTab.id)}
                 />
               </Grid>
               <Grid item xs={12}>
