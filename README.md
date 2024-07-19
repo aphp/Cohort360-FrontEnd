@@ -5,7 +5,7 @@
 
 # Cohort360
 
-[![Actions Status](https://github.com/aphp/Cohort360/workflows/cohort360-main-pipeline/badge.svg)](https://github.com/aphp/Cohort360/actions)
+[![Actions Status](https://github.com/aphp/Cohort360-FrontEnd/workflows/cohort360-main-pipeline/badge.svg)](https://github.com/aphp/Cohort360-FrontEnd/actions)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=aphp_Cohort360&metric=alert_status)](https://sonarcloud.io/dashboard?id=aphp_Cohort360)
 
 
