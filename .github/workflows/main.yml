@@ -82,4 +82,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: "aphpid/cohort360-frontend:${{ env.VERSION }}"
+          tags: ${{ github.ref == 'refs/heads/main' && format('aphpid/cohort360-frontend:{0},aphpid/cohort360-frontend:latest',env.VERSION) || format('aphpid/cohort360-frontend:{0}',env.VERSION) }}
