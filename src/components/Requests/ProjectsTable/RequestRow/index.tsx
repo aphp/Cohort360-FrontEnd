@@ -109,7 +109,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
           </TableCellWrapper>
 
           <TableCellWrapper className={classes.dateCell}>
-            {moment(row.modified_at).format('DD/MM/YYYY [à] HH:mm')}
+            {moment(row.updated_at).format('DD/MM/YYYY [à] HH:mm')}
           </TableCellWrapper>
         </TableRow>
 

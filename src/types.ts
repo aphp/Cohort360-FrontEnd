@@ -400,6 +400,7 @@ export type RequestType = {
   deleted_by_cascade?: boolean
   created_at?: string
   modified_at?: string
+  updated_at?: string
   name: string
   description?: string
   favorite?: boolean
