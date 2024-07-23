@@ -41,7 +41,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
   const requestsList = useAppSelector((state) => state.request.requestsList)
   const cohortsListState = useAppSelector((state) => state.cohort.cohortsList)
 
-  const [sortBy, setSortBy] = useState<'name' | 'modified_at'>('name')
+  const [sortBy, setSortBy] = useState<'name' | 'updated_at'>('name')
   const [sortDirection, setSortDirection] = useState<Direction>(Direction.ASC)
 
   const [searchProjectList, setSearchProjectList] = useState(projectsList || [])
@@ -138,9 +138,9 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
         break
       }
 
-      case 'modified_at': {
+      case 'updated_at': {
         newSearchRequestList = newSearchRequestList.sort((a: RequestType, b: RequestType) => {
-          if (a.modified_at && b.modified_at && a.modified_at > b.modified_at) {
+          if (a.updated_at && b.updated_at && a.updated_at > b.updated_at) {
             return sortDirection === Direction.ASC ? 1 : -1
           } else {
             return sortDirection === Direction.ASC ? -1 : 1
@@ -169,7 +169,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
     }
   }, [sortBy, sortDirection, projectsList, requestsList, cohortList])
 
-  const handleRequestSort = (property: 'name' | 'modified_at') => {
+  const handleRequestSort = (property: 'name' | 'updated_at') => {
     const isAsc = sortBy === property && sortDirection === Direction.DESC
     setSortDirection(isAsc ? Direction.ASC : Direction.DESC)
     setSortBy(property)
@@ -222,9 +222,9 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
                 </TableCellWrapper>
                 <TableCellWrapper className={classes.tableHeadCell} style={{ width: 175 }}>
                   <TableSortLabel
-                    active={sortBy === Order.MODIFIED}
+                    active={sortBy === Order.UPDATED}
                     direction={sortDirection || Direction.ASC}
-                    onClick={() => handleRequestSort(Order.MODIFIED)}
+                    onClick={() => handleRequestSort(Order.UPDATED)}
                   >
                     Date
                   </TableSortLabel>

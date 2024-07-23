@@ -128,7 +128,7 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
                     )}
                   </TableCell>
                   <TableCell onClick={() => _onClickRow(row)} align="center">
-                    {moment(row.modified_at).format('DD/MM/YYYY [à] HH:mm')}
+                    {moment(row.updated_at).format('DD/MM/YYYY [à] HH:mm')}
                   </TableCell>
                   <TableCell align="center">
                     <Hidden lgDown>

@@ -89,6 +89,7 @@ export enum Order {
   IPP = 'identifier',
   ID = 'id',
   MODIFIED = 'modified_at',
+  UPDATED = 'updated_at',
   NAME = 'name',
   MODALITY = 'modality',
   DESCRIPTION = 'description',

@@ -88,7 +88,7 @@ const Welcome = () => {
     const _lastRequest =
       requestState.requestsList?.length > 0
         ? [...requestState.requestsList]
-            .sort((a, b) => +moment(b?.modified_at).format('X') - +moment(a.modified_at).format('X'))
+            .sort((a, b) => +moment(b?.updated_at).format('X') - +moment(a.updated_at).format('X'))
             .splice(0, 5)
         : []
     setLastRequest(_lastRequest)
