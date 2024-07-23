@@ -262,6 +262,7 @@ const HospitForm = ({
       occurrenceComparator,
       encounterStatus,
       isInclusive,
+      startOccurrence: [null, null],
       title
     })
   }

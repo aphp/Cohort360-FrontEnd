@@ -380,8 +380,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
           )
         ),
         filtersBuilders(DocumentsParamsKeys.DOC_STATUSES, buildLabelObjectFilter(criterion.encounterStatus)),
-        filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
-        filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le')),
+        filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
+        filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
         buildEncounterDateFilter(
           criterion.type,
           criterion.includeEncounterStartDateNull,
@@ -403,8 +403,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : '',
         filtersBuilders(ConditionParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(ConditionParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
-        filtersBuilders(ConditionParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
-        filtersBuilders(ConditionParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le')),
+        filtersBuilders(ConditionParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
+        filtersBuilders(ConditionParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
         buildEncounterDateFilter(
           criterion.type,
           criterion.includeEncounterStartDateNull,
@@ -424,8 +424,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         filtersBuilders(ProcedureParamsKeys.CODE, buildLabelObjectFilter(criterion.code, PROCEDURE_HIERARCHY)),
         filtersBuilders(ProcedureParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(ProcedureParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
-        filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
-        filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le')),
+        filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
+        filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
         criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : '',
         buildEncounterDateFilter(
           criterion.type,
@@ -446,8 +446,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         filtersBuilders(ClaimParamsKeys.CODE, buildLabelObjectFilter(criterion.code, CLAIM_HIERARCHY)),
         filtersBuilders(ClaimParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(ClaimParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
-        filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
-        filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le')),
+        filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
+        filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
         buildEncounterDateFilter(
           criterion.type,
           criterion.includeEncounterStartDateNull,
@@ -488,14 +488,16 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
           criterion.type === CriteriaType.MEDICATION_REQUEST
             ? PrescriptionParamsKeys.DATE
             : AdministrationParamsKeys.DATE,
-          buildDateFilter(criterion.startOccurrence, 'ge')
+          buildDateFilter(criterion.startOccurrence[0], 'ge')
         ),
         filtersBuilders(
           criterion.type === CriteriaType.MEDICATION_REQUEST
             ? PrescriptionParamsKeys.DATE
             : AdministrationParamsKeys.DATE,
-          buildDateFilter(criterion.endOccurrence, 'le')
+          buildDateFilter(criterion.startOccurrence[1], 'le')
         ),
+        filtersBuilders(PrescriptionParamsKeys.END_DATE, buildDateFilter(criterion.endOccurrence?.[0], 'ge')),
+        filtersBuilders(PrescriptionParamsKeys.END_DATE, buildDateFilter(criterion.endOccurrence?.[1], 'le')),
         criterion.type === CriteriaType.MEDICATION_REQUEST
           ? filtersBuilders(
               PrescriptionParamsKeys.PRESCRIPTION_TYPES,
@@ -524,8 +526,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         ),
         filtersBuilders(ObservationParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(ObservationParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
-        filtersBuilders(ObservationParamsKeys.DATE, buildDateFilter(criterion.startOccurrence, 'ge')),
-        filtersBuilders(ObservationParamsKeys.DATE, buildDateFilter(criterion.endOccurrence, 'le')),
+        filtersBuilders(ObservationParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
+        filtersBuilders(ObservationParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
         buildObservationValueFilter(criterion, ObservationParamsKeys.VALUE),
         buildEncounterDateFilter(
           criterion.type,
@@ -1004,8 +1006,7 @@ const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise
     admission: [],
     encounterService: [],
     occurrence: null,
-    startOccurrence: null,
-    endOccurrence: null,
+    startOccurrence: [null, null],
     encounterStartDate: [null, null],
     encounterEndDate: [null, null],
     encounterStatus: []
@@ -1128,8 +1129,7 @@ const unbuildDocumentReferenceCriteria = async (element: RequeteurCriteriaType):
     docStatuses: [],
     occurrence: null,
     occurrenceComparator: null,
-    startOccurrence: null,
-    endOccurrence: null,
+    startOccurrence: [null, null],
     encounterService: [],
     encounterEndDate: [null, null],
     encounterStartDate: [null, null],
@@ -1171,9 +1171,9 @@ const unbuildDocumentReferenceCriteria = async (element: RequeteurCriteriaType):
         }
         case DocumentsParamsKeys.DATE: {
           if (value?.includes('ge')) {
-            currentCriterion.startOccurrence = unbuildDateFilter(value)
+            currentCriterion.startOccurrence[0] = unbuildDateFilter(value)
           } else if (value?.includes('le')) {
-            currentCriterion.endOccurrence = unbuildDateFilter(value)
+            currentCriterion.startOccurrence[1] = unbuildDateFilter(value)
           }
           break
         }
@@ -1218,8 +1218,7 @@ const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise
     source: null,
     diagnosticType: [],
     occurrence: null,
-    startOccurrence: null,
-    endOccurrence: null,
+    startOccurrence: [null, null],
     encounterService: [],
     encounterEndDate: [null, null],
     encounterStartDate: [null, null],
@@ -1259,9 +1258,9 @@ const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise
         }
         case ConditionParamsKeys.DATE: {
           if (value?.includes('ge')) {
-            currentCriterion.startOccurrence = unbuildDateFilter(value)
+            currentCriterion.startOccurrence[0] = unbuildDateFilter(value)
           } else if (value?.includes('le')) {
-            currentCriterion.endOccurrence = unbuildDateFilter(value)
+            currentCriterion.startOccurrence[1] = unbuildDateFilter(value)
           }
           break
         }
@@ -1302,8 +1301,7 @@ const unbuildProcedureCriteria = async (element: RequeteurCriteriaType): Promise
     title: element.name ?? "Critères d'actes CCAM",
     code: [],
     occurrence: null,
-    startOccurrence: null,
-    endOccurrence: null,
+    startOccurrence: [null, null],
     source: null,
     label: undefined,
     hierarchy: undefined,
@@ -1343,9 +1341,9 @@ const unbuildProcedureCriteria = async (element: RequeteurCriteriaType): Promise
         }
         case ProcedureParamsKeys.DATE: {
           if (value?.includes('ge')) {
-            currentCriterion.startOccurrence = unbuildDateFilter(value)
+            currentCriterion.startOccurrence[0] = unbuildDateFilter(value)
           } else if (value?.includes('le')) {
-            currentCriterion.endOccurrence = unbuildDateFilter(value)
+            currentCriterion.startOccurrence[1] = unbuildDateFilter(value)
           }
           break
         }
@@ -1384,8 +1382,7 @@ const unbuildClaimCriteria = async (element: RequeteurCriteriaType): Promise<Ghm
     title: element.name ?? 'Critère de GHM',
     code: [],
     occurrence: null,
-    startOccurrence: null,
-    endOccurrence: null,
+    startOccurrence: [null, null],
     encounterService: [],
     label: undefined,
     encounterStatus: [],
@@ -1416,9 +1413,9 @@ const unbuildClaimCriteria = async (element: RequeteurCriteriaType): Promise<Ghm
         }
         case ClaimParamsKeys.DATE: {
           if (value?.includes('ge')) {
-            currentCriterion.startOccurrence = unbuildDateFilter(value)
+            currentCriterion.startOccurrence[0] = unbuildDateFilter(value)
           } else if (value?.includes('le')) {
-            currentCriterion.endOccurrence = unbuildDateFilter(value)
+            currentCriterion.startOccurrence[1] = unbuildDateFilter(value)
           }
           break
         }
@@ -1463,8 +1460,8 @@ const unbuildMedicationCriteria = async (element: RequeteurCriteriaType): Promis
     prescriptionType: [],
     administration: [],
     occurrence: null,
-    startOccurrence: null,
-    endOccurrence: null,
+    startOccurrence: [null, null],
+    endOccurrence: [null, null],
     encounterService: [],
     encounterStatus: [],
     encounterStartDate: [null, null],
@@ -1508,9 +1505,17 @@ const unbuildMedicationCriteria = async (element: RequeteurCriteriaType): Promis
         case PrescriptionParamsKeys.DATE:
         case AdministrationParamsKeys.DATE: {
           if (value?.includes('ge')) {
-            currentCriterion.startOccurrence = unbuildDateFilter(value)
+            currentCriterion.startOccurrence[0] = unbuildDateFilter(value)
           } else if (value?.includes('le')) {
-            currentCriterion.endOccurrence = unbuildDateFilter(value)
+            currentCriterion.startOccurrence[1] = unbuildDateFilter(value)
+          }
+          break
+        }
+        case PrescriptionParamsKeys.END_DATE: {
+          if (value?.includes('ge')) {
+            currentCriterion.endOccurrence = [unbuildDateFilter(value), currentCriterion.endOccurrence?.[1] ?? null]
+          } else if (value?.includes('le')) {
+            currentCriterion.endOccurrence = [currentCriterion.endOccurrence?.[0] ?? null, unbuildDateFilter(value)]
           }
           break
         }
@@ -1553,8 +1558,7 @@ const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promi
     code: [],
     isLeaf: false,
     occurrence: null,
-    startOccurrence: null,
-    endOccurrence: null,
+    startOccurrence: [null, null],
     encounterService: [],
     searchByValue: [null, null],
     valueComparator: Comparators.GREATER_OR_EQUAL,
@@ -1605,9 +1609,9 @@ const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promi
         }
         case ObservationParamsKeys.DATE: {
           if (value?.includes('ge')) {
-            currentCriterion.startOccurrence = unbuildDateFilter(value)
+            currentCriterion.startOccurrence[0] = unbuildDateFilter(value)
           } else if (value?.includes('le')) {
-            currentCriterion.endOccurrence = unbuildDateFilter(value)
+            currentCriterion.startOccurrence[1] = unbuildDateFilter(value)
           }
           break
         }
@@ -1695,8 +1699,7 @@ const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<I
     seriesModalities: [],
     seriesUid: '',
     occurrence: null,
-    startOccurrence: null,
-    endOccurrence: null,
+    startOccurrence: [null, null],
     encounterStartDate: [null, null],
     encounterEndDate: [null, null],
     encounterService: [],
@@ -1837,8 +1840,7 @@ const unbuildPregnancyQuestionnaireResponseCriteria = async (
     ultrasoundMonitoring: [],
     occurrence: null,
     encounterService: [],
-    startOccurrence: null,
-    endOccurrence: null,
+    startOccurrence: [null, null],
     encounterStatus: []
   }
   if (element.filterFhir) {
@@ -1975,6 +1977,7 @@ const unbuildHospitQuestionnaireResponseCriteria = async (element: RequeteurCrit
     exitFeedingMode: [],
     exitDiagnostic: [],
     occurrence: null,
+    startOccurrence: [null, null],
     encounterService: [],
     encounterStatus: []
   }

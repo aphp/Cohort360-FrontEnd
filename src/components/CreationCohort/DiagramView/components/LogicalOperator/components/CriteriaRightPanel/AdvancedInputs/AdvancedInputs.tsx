@@ -12,14 +12,11 @@ import { Hierarchy } from 'types/hierarchy'
 import { ScopeElement } from 'types'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 
-import {
-  CriteriaType,
-  CriteriaTypesWithAdvancedInputs,
-  SelectedCriteriaTypesWithAdvancedInputs
-} from 'types/requestCriterias'
+import { CriteriaType, SelectedCriteriaTypesWithAdvancedInputs } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import { DurationRangeType } from 'types/searchCriterias'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
+import { getOccurenceDateLabel } from 'utils/requestCriterias'
 
 type AdvancedInputsProps = {
   sourceType: SourceType
@@ -31,8 +28,10 @@ type AdvancedInputsProps = {
 const AdvancedInputs = ({ sourceType, selectedCriteria, onChangeValue, onError }: AdvancedInputsProps) => {
   const optionsIsUsed =
     (selectedCriteria.encounterService && selectedCriteria.encounterService.length > 0) ||
-    !!selectedCriteria.startOccurrence ||
-    !!selectedCriteria.endOccurrence ||
+    selectedCriteria.startOccurrence?.[0] !== null ||
+    selectedCriteria.startOccurrence?.[1] !== null ||
+    selectedCriteria.endOccurrence?.[0] !== null ||
+    selectedCriteria.endOccurrence?.[1] !== null ||
     selectedCriteria.encounterStartDate[0] !== null ||
     selectedCriteria.encounterStartDate[1] !== null ||
     selectedCriteria.encounterEndDate[0] !== null ||
@@ -42,22 +41,6 @@ const AdvancedInputs = ({ sourceType, selectedCriteria, onChangeValue, onError }
 
   const _onSubmitExecutiveUnits = (_selectedExecutiveUnits: Hierarchy<ScopeElement, string>[]) => {
     onChangeValue('encounterService', _selectedExecutiveUnits)
-  }
-
-  const getOccurenceDateLabel = (
-    selectedCriteriaType: Exclude<CriteriaTypesWithAdvancedInputs, CriteriaType.IMAGING>
-  ) => {
-    const mapping = {
-      [CriteriaType.DOCUMENTS]: 'Date de création du document',
-      [CriteriaType.CONDITION]: 'Date du diagnostic CIM10',
-      [CriteriaType.PROCEDURE]: "Date de l'acte CCAM",
-      [CriteriaType.CLAIM]: 'Date du classement en GHM',
-      [CriteriaType.MEDICATION_REQUEST]: 'Date de prescription',
-      [CriteriaType.MEDICATION_ADMINISTRATION]: "Date de début d'administration",
-      [CriteriaType.OBSERVATION]: "Date de l'examen"
-    }
-
-    return mapping[selectedCriteriaType]
   }
 
   return (
@@ -132,18 +115,32 @@ const AdvancedInputs = ({ sourceType, selectedCriteria, onChangeValue, onError }
         </BlockWrapper>
 
         {selectedCriteria.type !== CriteriaType.IMAGING && (
-          <BlockWrapper style={{ margin: '1em 1em 2em', width: 'calc(100% - 2em)' }}>
-            <CriteriaLabel>{getOccurenceDateLabel(selectedCriteria.type)}</CriteriaLabel>
-            <CalendarRange
-              inline
-              value={[selectedCriteria?.startOccurrence, selectedCriteria?.endOccurrence]}
-              onChange={([start, end]) => {
-                onChangeValue('startOccurrence', start)
-                onChangeValue('endOccurrence', end)
-              }}
-              onError={(isError) => onError(isError)}
-            />
-          </BlockWrapper>
+          <>
+            <BlockWrapper style={{ margin: '1em 1em 2em', width: 'calc(100% - 2em)' }}>
+              <CriteriaLabel>{getOccurenceDateLabel(selectedCriteria.type)}</CriteriaLabel>
+              <CalendarRange
+                inline
+                value={selectedCriteria?.startOccurrence}
+                onChange={(newDate) => {
+                  onChangeValue('startOccurrence', newDate)
+                }}
+                onError={(isError) => onError(isError)}
+              />
+            </BlockWrapper>
+            {selectedCriteria.type === CriteriaType.MEDICATION_REQUEST && (
+              <BlockWrapper style={{ margin: '1em 1em 2em', width: 'calc(100% - 2em)' }}>
+                <CriteriaLabel>{getOccurenceDateLabel(selectedCriteria.type, true)}</CriteriaLabel>
+                <CalendarRange
+                  inline
+                  value={selectedCriteria?.endOccurrence ?? [null, null]}
+                  onChange={(newDate) => {
+                    onChangeValue('endOccurrence', newDate)
+                  }}
+                  onError={(isError) => onError(isError)}
+                />
+              </BlockWrapper>
+            )}
+          </>
         )}
       </Collapse>
     </Grid>

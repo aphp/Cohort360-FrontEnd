@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import {
   Alert,
@@ -65,6 +65,12 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
     currentState.occurrenceComparator || Comparators.GREATER_OR_EQUAL
   )
   const [error, setError] = useState(Error.NO_ERROR)
+
+  useEffect(() => {
+    if (currentState.type === CriteriaType.MEDICATION_ADMINISTRATION) {
+      onChangeValue('endOccurrence', [null, null])
+    }
+  }, [currentState.type])
 
   const getMedicationOptions = async (searchValue: string, signal: AbortSignal) => {
     const response = await services.cohortCreation.fetchMedicationData(searchValue, false, signal)

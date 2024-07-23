@@ -140,8 +140,7 @@ const PregnantForm = ({
       encounterService,
       occurrence,
       occurrenceComparator,
-      startOccurrence: null,
-      endOccurrence: null,
+      startOccurrence: [null, null],
       encounterStatus,
       isInclusive,
       title

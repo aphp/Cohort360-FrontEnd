@@ -152,6 +152,7 @@ const EncounterForm = ({
       occurrence,
       occurrenceComparator,
       encounterStatus,
+      startOccurrence: [null, null],
       isInclusive,
       title,
       type: CriteriaType.ENCOUNTER

@@ -94,8 +94,8 @@ export type CommonCriteriaDataType = {
 export type WithOccurenceCriteriaDataType = {
   occurrence?: number | null
   occurrenceComparator?: Comparators | null
-  startOccurrence?: string | null
-  endOccurrence?: string | null
+  startOccurrence: DurationRangeType
+  endOccurrence?: DurationRangeType
 }
 
 export type WithEncounterDateDataType = {
