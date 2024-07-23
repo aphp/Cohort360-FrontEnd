@@ -11,11 +11,9 @@ import {
   Link,
   Switch,
   TextField,
-  Tooltip,
   Typography
 } from '@mui/material'
 
-import InfoIcon from '@mui/icons-material/Info'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
@@ -150,23 +148,6 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
           </Grid>
 
           <BlockWrapper className={classes.inputItem}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              <BlockWrapper container justifyItems="center">
-                Nombre d'occurrences
-                <Tooltip
-                  title={
-                    <span>
-                      Si vous choisissez un chapitre, le nombre d'occurrences ne s'applique pas sur un unique élément de
-                      ce chapitre, mais sur l'ensemble des éléments de ce chapitre. <br /> Exemple: Nombre d'occurrences
-                      &ge; 3 sur un chapitre signifie que l'on inclus les patients qui ont eu au moins 3 éléments de ce
-                      chapitre, distincts ou non`
-                    </span>
-                  }
-                >
-                  <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-                </Tooltip>
-              </BlockWrapper>
-            </FormLabel>
             <OccurenceInput
               value={occurrence}
               comparator={occurrenceComparator}
@@ -174,6 +155,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
                 setOccurrence(newOccurence)
                 setOccurrenceComparator(newComparator)
               }}
+              withHierarchyInfo
             />
           </BlockWrapper>
 

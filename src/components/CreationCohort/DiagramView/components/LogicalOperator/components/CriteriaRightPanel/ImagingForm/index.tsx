@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Autocomplete, FormLabel, Grid, MenuItem, Select, TextField } from '@mui/material'
+import { Autocomplete, Grid, MenuItem, Select, TextField } from '@mui/material'
 import { BlockWrapper } from 'components/ui/Layout'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import Collapse from 'components/ui/Collapse'
@@ -24,6 +24,7 @@ import SearchbarWithCheck from 'components/ui/Inputs/SearchbarWithCheck'
 import UidTextfield from 'components/ui/Inputs/UidTextfield'
 import { MAIL_SUPPORT } from '../../../../../../../../constants'
 import { SourceType } from 'types/scope'
+import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 
 enum Error {
   INCOHERENT_AGE_ERROR,
@@ -199,11 +200,6 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
       ]}
     >
       <BlockWrapper margin="1em">
-        <FormLabel component="legend" className={classes.durationLegend}>
-          <BlockWrapper container justifyItems="center">
-            Nombre d'occurrences
-          </BlockWrapper>
-        </FormLabel>
         <OccurenceInput
           value={occurrence}
           comparator={occurrenceComparator}
@@ -230,9 +226,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
       <BlockWrapper margin="1em">
         <Collapse title="Critères liés à une étude" margin="0">
           <BlockWrapper style={{ margin: '0 2em 1em 0' }}>
-            <FormLabel component="legend" className={classes.durationLegend} style={{ padding: 0 }}>
-              Date de l'étude
-            </FormLabel>
+            <CriteriaLabel label="Date de l'étude" style={{ padding: 0 }} />
             <CalendarRange
               inline
               value={[studyStartDate, studyEndDate]}
@@ -274,10 +268,8 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Nombre de séries
-            </FormLabel>
             <OccurenceInput
+              label="Nombre de séries"
               value={numberOfSeries}
               comparator={seriesComparator}
               onchange={(newOccurence, newComparator) => {
@@ -288,10 +280,8 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Nombre d'instances
-            </FormLabel>
             <OccurenceInput
+              label="Nombre d'instances"
               value={numberOfIns}
               comparator={instancesComparator}
               onchange={(newOccurence, newComparator) => {
@@ -302,9 +292,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Méthode de rattachement à un document
-            </FormLabel>
+            <CriteriaLabel label="Méthode de rattachement à un document" />
             <Grid container alignItems="center">
               <Grid item xs={withDocument === DocumentAttachmentMethod.INFERENCE_TEMPOREL ? 6 : 12}>
                 <Select
@@ -349,9 +337,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             </Grid>
           </BlockWrapper>
 
-          <FormLabel component="legend" className={classes.durationLegend}>
-            Recherche par uid d'étude
-          </FormLabel>
+          <CriteriaLabel label="Recherche par uid d'étude" />
           <UidTextfield
             value={studyUid}
             onChange={setStudyUid}
@@ -363,9 +349,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
         <BlockWrapper style={{ marginTop: 26 }}>
           <Collapse title="Critères liés à une série" value={isSeriesUsed} margin="0">
             <BlockWrapper style={{ margin: '0 2em 1em 0' }}>
-              <FormLabel component="legend" className={classes.durationLegend} style={{ padding: 0 }}>
-                Date de la série
-              </FormLabel>
+              <CriteriaLabel label="Date de la série" style={{ padding: 0 }} />
               <CalendarRange
                 inline
                 value={[seriesStartDate, seriesEndDate]}
@@ -406,9 +390,7 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               style={{ marginBottom: '1em' }}
             />
 
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Recherche par uid de série
-            </FormLabel>
+            <CriteriaLabel label="Recherche par uid de série" />
             <UidTextfield
               value={seriesUid}
               onChange={setSeriesUid}

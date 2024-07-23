@@ -25,6 +25,7 @@ import DurationRange from 'components/ui/Inputs/DurationRange'
 import { CriteriaDataKey, DemographicDataType, CriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import { CriteriaDrawerComponentProps, CriteriaItemDataCache } from 'types'
+import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 
 enum Error {
   INCOHERENT_AGE_ERROR,
@@ -171,11 +172,11 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
 
           {!deidentified && (
             <BlockWrapper margin="1em">
+              <CriteriaLabel label={VitalStatusOptionsLabel.birth} />
               <CalendarRange
                 inline
                 disabled={age[0] !== null || age[1] !== null}
                 value={birthdates}
-                label={VitalStatusOptionsLabel.birth}
                 onChange={(value) => setBirthdates(value)}
                 onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
               />
@@ -183,9 +184,7 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
           )}
 
           <BlockWrapper margin="1em">
-            <DurationRange
-              value={age}
-              active={!birthdates[0] || !birthdates[1]}
+            <CriteriaLabel
               label={
                 vitalStatus &&
                 vitalStatus.length === 1 &&
@@ -193,6 +192,10 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
                   ? VitalStatusOptionsLabel.deceasedAge
                   : VitalStatusOptionsLabel.age
               }
+            />
+            <DurationRange
+              value={age}
+              active={!birthdates[0] || !birthdates[1]}
               onChange={(value) => setAge(value)}
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
               deidentified={deidentified}
@@ -204,10 +207,10 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
               (vitalStatus.length === 1 &&
                 vitalStatus.find((status: LabelObject) => status.label === VitalStatusLabel.DECEASED))) && (
               <BlockWrapper margin="1em">
+                <CriteriaLabel label={VitalStatusOptionsLabel.deceasedDate} />
                 <CalendarRange
                   inline
                   value={deathDates}
-                  label={VitalStatusOptionsLabel.deceasedDate}
                   onChange={(value) => setDeathDates(value)}
                   onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
                 />

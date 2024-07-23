@@ -74,7 +74,7 @@ const AdvancedInputs = ({ sourceType, selectedCriteria, onChangeValue, onError }
         </BlockWrapper>
 
         <BlockWrapper style={{ margin: '1em 1em 2em', width: 'calc(100% - 2em)' }}>
-          <CriteriaLabel>Prise en charge</CriteriaLabel>
+          <CriteriaLabel label="Prise en charge" />
           <FormLabel style={{ padding: '0 0 1em', fontWeight: 600, fontSize: 12 }} component="legend">
             Début de prise en charge
           </FormLabel>
@@ -90,7 +90,6 @@ const AdvancedInputs = ({ sourceType, selectedCriteria, onChangeValue, onError }
               onChangeValue('includeEncounterStartDateNull', includeNullValues)
             }
           />
-
           <FormLabel
             style={{ padding: '1em 0', fontWeight: 600, fontSize: 12, display: 'flex', alignItems: 'center' }}
             component="legend"
@@ -117,7 +116,7 @@ const AdvancedInputs = ({ sourceType, selectedCriteria, onChangeValue, onError }
         {selectedCriteria.type !== CriteriaType.IMAGING && (
           <>
             <BlockWrapper style={{ margin: '1em 1em 2em', width: 'calc(100% - 2em)' }}>
-              <CriteriaLabel>{getOccurenceDateLabel(selectedCriteria.type)}</CriteriaLabel>
+              <CriteriaLabel label={getOccurenceDateLabel(selectedCriteria.type)} />
               <CalendarRange
                 inline
                 value={selectedCriteria?.startOccurrence}
@@ -129,7 +128,7 @@ const AdvancedInputs = ({ sourceType, selectedCriteria, onChangeValue, onError }
             </BlockWrapper>
             {selectedCriteria.type === CriteriaType.MEDICATION_REQUEST && (
               <BlockWrapper style={{ margin: '1em 1em 2em', width: 'calc(100% - 2em)' }}>
-                <CriteriaLabel>{getOccurenceDateLabel(selectedCriteria.type, true)}</CriteriaLabel>
+                <CriteriaLabel label={getOccurenceDateLabel(selectedCriteria.type, true)} />
                 <CalendarRange
                   inline
                   value={selectedCriteria?.endOccurrence ?? [null, null]}

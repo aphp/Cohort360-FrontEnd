@@ -58,7 +58,7 @@ const ExecutiveUnitsFilter = ({
     <InputWrapper>
       <Grid item container alignContent="center" alignItems={'center'}>
         {isCriterion ? (
-          <CriteriaLabel style={{ padding: 0 }}>Unité exécutrice</CriteriaLabel>
+          <CriteriaLabel style={{ padding: 0 }} label="Unité exécutrice" />
         ) : (
           <Typography variant="h3" alignSelf="center">
             Unité exécutrice :

@@ -172,9 +172,6 @@ const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
           </Grid>
 
           <BlockWrapper className={classes.inputItem}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Nombre d'occurrences
-            </FormLabel>
             <OccurenceInput
               value={occurrence}
               comparator={occurrenceComparator}

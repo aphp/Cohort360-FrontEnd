@@ -18,7 +18,6 @@ import {
   Typography
 } from '@mui/material'
 
-import InfoIcon from '@mui/icons-material/Info'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
@@ -41,6 +40,7 @@ enum Error {
 }
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
+import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 
 type BiologyFormProps = {
   isOpen: boolean
@@ -227,23 +227,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
           </Grid>
 
           <BlockWrapper className={classes.inputItem}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              <BlockWrapper container justifyItems="center">
-                Nombre d'occurrences
-                <Tooltip
-                  title={
-                    <span>
-                      Si vous choisissez un chapitre, le nombre d'occurrences ne s'applique pas sur un unique élément de
-                      ce chapitre, mais sur l'ensemble des éléments de ce chapitre. <br /> Exemple: Nombre d'occurrences
-                      &ge; 3 sur un chapitre signifie que l'on inclus les patients qui ont eu au moins 3 éléments de ce
-                      chapitre, distincts ou non`
-                    </span>
-                  }
-                >
-                  <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-                </Tooltip>
-              </BlockWrapper>
-            </FormLabel>
             <OccurenceInput
               value={occurrence}
               comparator={occurrenceComparator}
@@ -251,13 +234,14 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 setOccurrence(newOccurence)
                 setOccurrenceComparator(newComparator)
               }}
+              withHierarchyInfo
             />
           </BlockWrapper>
 
           <Grid className={classes.inputContainer}>
-            <Typography variant="h6">Codes de biologie</Typography>
+            <CriteriaLabel label="Codes de biologie" />
 
-            <Grid container item style={{ margin: '1em 0px', width: 'calc(100%-2em)' }}>
+            <Grid container item style={{ marginBottom: '1em', width: 'calc(100%-2em)' }}>
               {defaultValuesCode.length > 0 ? (
                 defaultValuesCode.map((valueCode, index: number) => (
                   <Chip
@@ -285,16 +269,11 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
               )}
             </Grid>
 
-            <Grid item container direction="row" alignItems="center">
-              <Typography variant="h6">Recherche par valeur</Typography>
-              <Tooltip
-                title="Pour pouvoir rechercher par valeur, vous devez sélectionner un seul et unique analyte (élement le plus
+            <CriteriaLabel
+              label="Recherche par valeur"
+              infoIcon="Pour pouvoir rechercher par valeur, vous devez sélectionner un seul et unique analyte (élement le plus
                 fin de la hiérarchie)."
-              >
-                <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-              </Tooltip>
-            </Grid>
-
+            />
             <Grid
               style={{
                 display: 'grid',
