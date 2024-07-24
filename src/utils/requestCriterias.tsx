@@ -5,7 +5,8 @@ import {
   CriteriaDataKey,
   MedicationLabel,
   CriteriaType,
-  SelectedCriteriaType
+  SelectedCriteriaType,
+  CriteriaTypesWithAdvancedInputs
 } from 'types/requestCriterias'
 import {
   DocumentAttachmentMethod,
@@ -21,6 +22,23 @@ import { CriteriaState } from 'state/criteria'
 import { Tooltip, Typography } from '@mui/material'
 import { Hierarchy } from 'types/hierarchy'
 import { ScopeElement, SimpleCodeType } from 'types'
+
+export const getOccurenceDateLabel = (
+  selectedCriteriaType: Exclude<CriteriaTypesWithAdvancedInputs, CriteriaType.IMAGING>,
+  endOccurrence?: boolean
+) => {
+  const mapping = {
+    [CriteriaType.DOCUMENTS]: 'Date de création du document',
+    [CriteriaType.CONDITION]: 'Date du diagnostic CIM10',
+    [CriteriaType.PROCEDURE]: "Date de l'acte CCAM",
+    [CriteriaType.CLAIM]: 'Date du classement en GHM',
+    [CriteriaType.MEDICATION_REQUEST]: endOccurrence ? 'Date de fin de prescription' : 'Date de début de prescription',
+    [CriteriaType.MEDICATION_ADMINISTRATION]: "Date de début d'administration",
+    [CriteriaType.OBSERVATION]: "Date de l'examen"
+  }
+
+  return mapping[selectedCriteriaType]
+}
 
 const getMedicationTypeLabel = (type: CriteriaType) => {
   switch (type) {
@@ -891,8 +909,28 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
             "Nombre d'occurrences"
           )
         )
-      if (selectedCriteria.startOccurrence || selectedCriteria.endOccurrence)
-        labels.push(getDatesLabel([selectedCriteria.startOccurrence, selectedCriteria.endOccurrence], 'Occurence'))
+      if (selectedCriteria.startOccurrence?.[0] !== null || selectedCriteria.startOccurrence?.[1] !== null)
+        labels.push(
+          getDatesLabel(
+            selectedCriteria.startOccurrence,
+            getOccurenceDateLabel(
+              selectedCriteria.type as Exclude<CriteriaTypesWithAdvancedInputs, CriteriaType.IMAGING>
+            )
+          )
+        )
+      if (
+        selectedCriteria.endOccurrence &&
+        (selectedCriteria.endOccurrence?.[0] !== null || selectedCriteria.endOccurrence?.[1] !== null)
+      )
+        labels.push(
+          getDatesLabel(
+            selectedCriteria.endOccurrence ?? [null, null],
+            getOccurenceDateLabel(
+              selectedCriteria.type as Exclude<CriteriaTypesWithAdvancedInputs, CriteriaType.IMAGING>
+            ),
+            true
+          )
+        )
       if (selectedCriteria.encounterService && selectedCriteria.encounterService.length > 0)
         labels.push(getLabelFromName(selectedCriteria.encounterService))
       if (selectedCriteria.encounterStatus && selectedCriteria.encounterStatus.length > 0)

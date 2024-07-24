@@ -121,6 +121,7 @@ export enum PrescriptionParamsKeys {
   NDA = 'encounter.identifier',
   PRESCRIPTION_TYPES = 'category',
   DATE = 'validity-period-start',
+  END_DATE = 'validity-period-end',
   CODE = 'code',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
   ENCOUNTER_STATUS = 'encounter.status',

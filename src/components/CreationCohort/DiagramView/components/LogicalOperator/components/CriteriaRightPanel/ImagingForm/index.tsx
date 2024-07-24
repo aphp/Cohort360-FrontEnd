@@ -163,7 +163,8 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
       includeEncounterStartDateNull,
       encounterEndDate,
       includeEncounterEndDateNull,
-      encounterStatus
+      encounterStatus,
+      startOccurrence: [null, null]
     })
   }
 

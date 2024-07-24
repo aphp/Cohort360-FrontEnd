@@ -51,8 +51,7 @@ const defaultComposition: Omit<DocumentDataType, 'id'> = {
   encounterEndDate: [null, null],
   includeEncounterStartDateNull: false,
   includeEncounterEndDateNull: false,
-  startOccurrence: '',
-  endOccurrence: '',
+  startOccurrence: [null, null],
   isInclusive: true,
   docStatuses: [],
   encounterStatus: []
