@@ -10,7 +10,9 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import { IconButton } from '@mui/material'
 import { User } from 'types'
 import { CODE_DISPLAY_JWT } from 'constants.js'
-import { impersonate } from 'state/me'
+import { impersonate, updatePerimeters as updatePerimetersAction } from 'state/me'
+import { updatePerimeters } from 'views/Login/utils'
+import { saveRights } from 'state/scope'
 
 export const IMPERSONATED_USER = 'impersonated_user'
 
@@ -86,6 +88,13 @@ const Impersonation = (props: ImpersonationProps) => {
   }, [])
 
   useEffect(() => {
+    ;(async () => {
+      await updatePerimeters((nominativeGroupsIds, topLevelCareSites, practitionerPerimeters) => {
+        dispatch(updatePerimetersAction({ nominativeGroupsIds, topLevelCareSites }))
+        dispatch(saveRights({ rights: practitionerPerimeters }))
+      })
+    })()
+
     if (me?.impersonation) {
       setPractitioner(me.impersonation)
     } else {

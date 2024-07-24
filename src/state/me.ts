@@ -47,6 +47,20 @@ const meSlice = createSlice({
   reducers: {
     login: (state: MeState, action: PayloadAction<MeState>) => {
       return action.payload
+    },
+    updatePerimeters: (
+      state,
+      action: PayloadAction<{ nominativeGroupsIds: string[]; topLevelCareSites: string[] }>
+    ) => {
+      if (state) {
+        return {
+          ...state,
+          nominativeGroupsIds: action.payload.nominativeGroupsIds,
+          topLevelCareSites: action.payload.topLevelCareSites,
+          deidentified: action.payload.nominativeGroupsIds.length === 0
+        }
+      }
+      return state
     }
   },
   extraReducers: (builder) => {
@@ -63,4 +77,4 @@ const meSlice = createSlice({
 
 export default meSlice.reducer
 export { logout }
-export const { login } = meSlice.actions
+export const { login, updatePerimeters } = meSlice.actions
