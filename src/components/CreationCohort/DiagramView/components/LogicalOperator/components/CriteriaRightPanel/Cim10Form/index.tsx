@@ -25,8 +25,8 @@ export const defaultCondition: Omit<Cim10DataType, 'id'> = {
   startOccurrence: '',
   endOccurrence: '',
   isInclusive: true,
-  encounterStartDate: null,
-  encounterEndDate: null,
+  encounterStartDate: [null, null],
+  encounterEndDate: [null, null],
   encounterStatus: []
 }
 

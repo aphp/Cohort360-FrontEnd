@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Grid } from '@mui/material'
+import { Checkbox, FormControlLabel, Grid } from '@mui/material'
 
 import moment from 'moment'
 import CalendarInput from './CalendarInput'
@@ -16,11 +16,24 @@ interface CalendarRangeProps {
   disabled?: boolean
   onChange: (newDuration: DurationRangeType) => void
   onError: (isError: boolean) => void
+  includeNullValues?: boolean
+  onChangeIncludeNullValues?: (includeNullValues: boolean) => void
 }
 
-const CalendarRange = ({ value, label, inline = false, onError, disabled = false, onChange }: CalendarRangeProps) => {
+const CalendarRange = ({
+  value,
+  label,
+  inline = false,
+  onError,
+  disabled = false,
+  onChange,
+  includeNullValues = false,
+  onChangeIncludeNullValues
+}: CalendarRangeProps) => {
   const [startDate, setStartDate] = useState(value[0])
   const [endDate, setEndDate] = useState(value[1])
+  const [isNullValuesChecked, setIsNullValuesChecked] = useState(includeNullValues)
+
   const [error, setError] = useState<ErrorType>({ isError: false, errorMessage: '' })
 
   useEffect(() => {
@@ -31,8 +44,11 @@ const CalendarRange = ({ value, label, inline = false, onError, disabled = false
       onError(true)
     } else {
       onChange([startDate, endDate])
+      if (onChangeIncludeNullValues) {
+        onChangeIncludeNullValues(isNullValuesChecked)
+      }
     }
-  }, [startDate, endDate])
+  }, [startDate, endDate, isNullValuesChecked])
 
   return (
     <BlockWrapper>
@@ -59,6 +75,20 @@ const CalendarRange = ({ value, label, inline = false, onError, disabled = false
           />
         </Grid>
       </Grid>
+      {onChangeIncludeNullValues &&
+        ((startDate !== '' && startDate !== null) || (endDate !== '' && endDate !== null)) && (
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="small"
+                checked={isNullValuesChecked}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsNullValuesChecked(event.target.checked)}
+                style={{ padding: '4px 9px' }}
+              />
+            }
+            label="Inclure les valeurs non renseignées"
+          />
+        )}
       {error.isError && (
         <BlockWrapper margin="10px 0px">
           <ErrorMessage>{error.errorMessage}</ErrorMessage>

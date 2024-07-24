@@ -260,8 +260,6 @@ const HospitForm = ({
       encounterService,
       occurrence,
       occurrenceComparator,
-      encounterStartDate: null,
-      encounterEndDate: null,
       encounterStatus,
       isInclusive,
       title
@@ -304,6 +302,7 @@ const HospitForm = ({
           value={encounterService}
           name="PregancyForm"
           onChange={setEncounterService}
+          isCriterion
         />
       </BlockWrapper>
 

@@ -142,8 +142,6 @@ const PregnantForm = ({
       occurrenceComparator,
       startOccurrence: null,
       endOccurrence: null,
-      encounterStartDate: null,
-      encounterEndDate: null,
       encounterStatus,
       isInclusive,
       title
@@ -186,6 +184,7 @@ const PregnantForm = ({
           value={encounterService}
           name="PregancyForm"
           onChange={setEncounterService}
+          isCriterion
         />
       </BlockWrapper>
       <BlockWrapper style={{ margin: '0 1em 1em' }}>
