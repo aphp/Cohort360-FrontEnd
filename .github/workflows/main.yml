@@ -46,20 +46,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 20.x
-          cache: 'npm'
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Build
-        run: |
-          VERSION=$(cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/"version"://g' | sed 's/[",]//g' | tr -d '[[:space:]]')
-          CI_COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)
-          echo "{\"commit\": \"$CI_COMMIT_SHORT_SHA\", \"version\": \"$VERSION\"}" > src/data/version.json
-          npm run build
-
       - name: Check correct tag and version
         run: |
           VERSION=$(cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/"version"://g' | sed 's/[",]//g' | tr -d '[[:space:]]')
