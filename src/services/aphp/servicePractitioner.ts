@@ -1,5 +1,5 @@
 import apiBackend from 'services/apiBackend'
-import { REFRESH_TOKEN } from '../../constants'
+import { OIDC_REDIRECT_URI, REFRESH_TOKEN } from '../../constants'
 import { Authentication, MaintenanceInfo } from 'types'
 import { AxiosError, AxiosResponse } from 'axios'
 
@@ -47,7 +47,10 @@ const servicePractitioner: IServicePractitioner = {
 
   authenticateWithCode: async (authCode: string): Promise<AxiosResponse<Authentication> | AxiosError> => {
     try {
-      return await apiBackend.post<Authentication>(`/auth/oidc/login`, { auth_code: authCode })
+      return await apiBackend.post<Authentication>(`/auth/oidc/login`, {
+        auth_code: authCode,
+        redirect_uri: OIDC_REDIRECT_URI
+      })
     } catch (error) {
       console.error('Error authenticating with an authorization code', error)
       return error as AxiosError
