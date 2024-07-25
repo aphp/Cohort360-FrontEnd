@@ -47,10 +47,16 @@ const servicePractitioner: IServicePractitioner = {
 
   authenticateWithCode: async (authCode: string): Promise<AxiosResponse<Authentication> | AxiosError> => {
     try {
-      return await apiBackend.post<Authentication>(`/auth/oidc/login`, {
-        auth_code: authCode,
-        redirect_uri: OIDC_REDIRECT_URI
-      })
+      return await apiBackend.post<Authentication>(
+        `/auth/oidc/login`,
+        {
+          auth_code: authCode,
+          redirect_uri: OIDC_REDIRECT_URI
+        },
+        {
+          headers: { authorizationMethod: 'OIDC' }
+        }
+      )
     } catch (error) {
       console.error('Error authenticating with an authorization code', error)
       return error as AxiosError

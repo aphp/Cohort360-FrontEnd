@@ -217,16 +217,16 @@ const Login = () => {
     let response = null
 
     if (oidcCode) {
-      response = await services.practitioner.authenticateWithCode(oidcCode)
       localStorage.setItem('oidcAuth', 'true')
+      response = await services.practitioner.authenticateWithCode(oidcCode)
     } else {
       if (!username || !password) {
         setLoading(false)
         return setError(true), setErrorMessage("L'un des champs nom d'utilisateur ou mot de passe est vide.")
       }
       if (username && password) {
-        response = await services.practitioner.authenticateWithCredentials(username, password)
         localStorage.setItem('oidcAuth', 'false')
+        response = await services.practitioner.authenticateWithCredentials(username, password)
       }
     }
 
