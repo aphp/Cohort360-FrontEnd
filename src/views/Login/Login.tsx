@@ -46,6 +46,7 @@ import { isCustomError } from 'utils/perimeters'
 import { AccessExpiration, User } from 'types'
 import { isAxiosError } from 'axios'
 import { saveRights } from 'state/scope'
+import { updatePerimeters } from './utils'
 
 type ErrorSnackBarAlertProps = {
   open?: boolean
@@ -152,58 +153,51 @@ const Login = () => {
       .getAccessExpirations({ expiring: true })
       .then((values) => setLeftDays(values))
 
-    const practitionerPerimeters = await services.perimeters.getRights({})
-
-    if (isCustomError(practitionerPerimeters)) {
-      if (practitionerPerimeters.errorType === 'fhir') {
-        setLoading(false)
-        return (
-          setError(true),
-          setErrorMessage(
-            `Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : ${MAIL_SUPPORT}.`
+    await updatePerimeters(
+      (nominativeGroupsIds, topLevelCareSites, practitionerPerimeters) => {
+        const loginState: MeState = {
+          id: practitionerData.username || '',
+          userName: practitionerData.username || '',
+          displayName: `${practitionerData.firstname} ${practitionerData.lastname}`,
+          firstName: practitionerData.firstname || '',
+          lastName: practitionerData.lastname || '',
+          nominativeGroupsIds,
+          topLevelCareSites,
+          deidentified: nominativeGroupsIds.length === 0,
+          lastConnection,
+          maintenance,
+          accessExpirations
+        }
+        dispatch(loginAction(loginState))
+        dispatch(saveRights({ rights: practitionerPerimeters }))
+        const oldPath = localStorage.getItem('old-path')
+        localStorage.removeItem('old-path')
+        navigate(oldPath ?? '/home')
+      },
+      (error) => {
+        if (error.errorType === 'fhir') {
+          setLoading(false)
+          return (
+            setError(true),
+            setErrorMessage(
+              `Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : ${MAIL_SUPPORT}.`
+            )
           )
-        )
-      } else if (practitionerPerimeters.errorType === 'back') {
-        setLoading(false)
-        return (
-          setError(true),
-          setErrorMessage(
-            `Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : ${MAIL_SUPPORT}.`
+        } else if (error.errorType === 'back') {
+          setLoading(false)
+          return (
+            setError(true),
+            setErrorMessage(
+              `Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : ${MAIL_SUPPORT}.`
+            )
           )
-        )
-      } else if (practitionerPerimeters.errorType === 'noRight') {
-        localStorage.clear()
-        setLoading(false)
-        return setNoRights(true)
+        } else if (error.errorType === 'noRight') {
+          localStorage.clear()
+          setLoading(false)
+          return setNoRights(true)
+        }
       }
-    } else {
-      const nominativeGroupsIds = practitionerPerimeters.results
-        .filter((perimeterItem) => perimeterItem.rights?.read_access === 'DATA_NOMINATIVE')
-        .map((practitionerPerimeter) => practitionerPerimeter.cohort_id)
-        .filter((item) => item)
-
-      const topLevelCareSites = practitionerPerimeters.results.map((perimeterItem) => perimeterItem.cohort_id)
-
-      const loginState: MeState = {
-        id: practitionerData.username || '',
-        userName: practitionerData.username || '',
-        displayName: `${practitionerData.firstname} ${practitionerData.lastname}`,
-        firstName: practitionerData.firstname || '',
-        lastName: practitionerData.lastname || '',
-        nominativeGroupsIds,
-        topLevelCareSites,
-        deidentified: nominativeGroupsIds.length === 0,
-        lastConnection,
-        maintenance,
-        accessExpirations
-      }
-
-      dispatch(loginAction(loginState))
-      dispatch(saveRights({ rights: practitionerPerimeters.results }))
-      const oldPath = localStorage.getItem('old-path')
-      localStorage.removeItem('old-path')
-      navigate(oldPath ?? '/home')
-    }
+    )
   }
 
   const setLeftDays = (accessExpirations: AccessExpiration[]) => {
