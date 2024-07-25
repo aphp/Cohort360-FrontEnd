@@ -1,12 +1,6 @@
 import { makeStyles } from 'tss-react/mui'
 
 const useStyles = makeStyles()(() => ({
-  durationLegend: {
-    color: '#153D8A',
-    fontWeight: 600,
-    fontSize: 12,
-    paddingBottom: 10
-  },
   inputContainer: {
     padding: '1em',
     display: 'flex',

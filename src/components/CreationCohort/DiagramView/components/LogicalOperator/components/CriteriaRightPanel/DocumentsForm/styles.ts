@@ -53,12 +53,6 @@ const useStyles = makeStyles()(() => ({
       height: 50,
       padding: '10px 0px'
     }
-  },
-  durationLegend: {
-    color: '#153D8A',
-    fontWeight: 600,
-    fontSize: 12,
-    paddingBottom: 10
   }
 }))
 

@@ -1,7 +1,7 @@
 /* eslint-disable max-statements */
 import React, { useEffect, useState } from 'react'
 
-import { Autocomplete, FormLabel, TextField } from '@mui/material'
+import { Autocomplete, TextField } from '@mui/material'
 
 import useStyles from './styles'
 
@@ -19,6 +19,7 @@ import NumericConditionInput from 'components/ui/Inputs/OccurencesWithFloats'
 import { SourceType } from 'types/scope'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import { Hierarchy } from 'types/hierarchy'
+import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 
 enum Error {
   EMPTY_FORM,
@@ -283,11 +284,6 @@ const HospitForm = ({
       ]}
     >
       <BlockWrapper className={classes.inputItem}>
-        <FormLabel component="legend" className={classes.durationLegend}>
-          <BlockWrapper container justifyItems="center">
-            Nombre d'occurrences
-          </BlockWrapper>
-        </FormLabel>
         <OccurenceInput
           value={occurrence}
           comparator={occurrenceComparator}
@@ -332,9 +328,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Transfert in utero
-            </FormLabel>
+            <CriteriaLabel label="Transfert in utero" />
             <Autocomplete
               multiple
               noOptionsText='Veuillez entrer "oui" ou "non"'
@@ -349,9 +343,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Grossesse peu ou pas suivie
-            </FormLabel>
+            <CriteriaLabel label="Grossesse peu ou pas suivie" />
             <Autocomplete
               multiple
               noOptionsText='Veuillez entrer "oui" ou "non"'
@@ -366,9 +358,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              VME
-            </FormLabel>
+            <CriteriaLabel label="VME" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer des valeurs de VME"
@@ -383,9 +373,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Corticothérapie pour maturation foetale faite
-            </FormLabel>
+            <CriteriaLabel label="Corticothérapie pour maturation fœtale faite" />
             <Autocomplete
               multiple
               noOptionsText='Veuillez entrer "oui" ou "non"'
@@ -399,9 +387,7 @@ const HospitForm = ({
             />
           </BlockWrapper>
 
-          <FormLabel component="legend" className={classes.durationLegend}>
-            Type de geste ou de chirurgie
-          </FormLabel>
+          <CriteriaLabel label="Type de geste ou de chirurgie" />
           <Autocomplete
             multiple
             noOptionsText="Veuillez entrer un type de geste ou de chirurgie"
@@ -419,9 +405,7 @@ const HospitForm = ({
       <BlockWrapper className={classes.inputItem}>
         <Collapse title="SYNTHESE" value={false} margin="0">
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Accouchement
-            </FormLabel>
+            <CriteriaLabel label="Accouchement" />
             <Autocomplete
               multiple
               noOptionsText='Veuillez entrer "oui" ou "non"'
@@ -436,9 +420,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Accouchement à la maternité de l'hospitalisation
-            </FormLabel>
+            <CriteriaLabel label="Accouchement à la maternité de l'hospitalisation" />
             <Autocomplete
               multiple
               noOptionsText='Veuillez entrer "oui" ou "non"'
@@ -455,9 +437,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Accouchement dans un autre hôpital
-            </FormLabel>
+            <CriteriaLabel label="Accouchement dans un autre hôpital" />
             <Autocomplete
               multiple
               noOptionsText='Veuillez entrer "oui" ou "non"'
@@ -472,9 +452,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Accouchement à domicile
-            </FormLabel>
+            <CriteriaLabel label="Accouchement à domicile" />
             <Autocomplete
               multiple
               noOptionsText='Veuillez entrer "oui" ou "non"'
@@ -489,9 +467,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Mode de mise en travail
-            </FormLabel>
+            <CriteriaLabel label="Mode de mise en travail" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer un mode de mise en travail"
@@ -506,9 +482,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Motif(s) de maturation / déclenchement
-            </FormLabel>
+            <CriteriaLabel label="Motif(s) de maturation / déclenchement" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer un motif de maturation / déclenchement"
@@ -523,9 +497,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Modalités de maturation cervicale initiale
-            </FormLabel>
+            <CriteriaLabel label="Modalités de maturation cervicale initiale" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer une modalité de maturation cervicale initiale"
@@ -540,9 +512,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Indication de l'IMG
-            </FormLabel>
+            <CriteriaLabel label="Indication de l'IMG" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer une indication de l'IMG"
@@ -557,9 +527,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Présentation à l'entrée en travail ou en début de césarienne
-            </FormLabel>
+            <CriteriaLabel label="Présentation à l'entrée en travail ou en début de césarienne" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer une présentation à l'entrée en travail ou en début de césarienne"
@@ -576,9 +544,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Pathologie pendant le travail
-            </FormLabel>
+            <CriteriaLabel label="Pathologie pendant le travail" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer une pathologie pendant le travail"
@@ -593,9 +559,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Geste ou manoeuvre obstétricale pendant le travail
-            </FormLabel>
+            <CriteriaLabel label="Geste ou manoeuvre obstétricale pendant le travail" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer un geste ou manoeuvre obstétricale pendant le travail"
@@ -615,9 +579,7 @@ const HospitForm = ({
 
       <BlockWrapper className={classes.inputItem}>
         <Collapse title="ANALGESIE / ANESTHESIE" value={false} margin="0">
-          <FormLabel component="legend" className={classes.durationLegend}>
-            Analgésie / Anesthésie - Type
-          </FormLabel>
+          <CriteriaLabel label="Analgésie / Anesthésie - Type" />
           <Autocomplete
             multiple
             noOptionsText="Veuillez entrer un type d'Analgésie / Anesthésie - Type"
@@ -635,9 +597,7 @@ const HospitForm = ({
       <BlockWrapper className={classes.inputItem}>
         <Collapse title="ACCOUCHEMENT ET NAISSANCE" value={false} margin="0">
           <BlockWrapper style={{ margin: '0 2em 1em 0' }}>
-            <FormLabel component="legend" className={classes.durationLegend} style={{ padding: 0 }}>
-              Date/heure de l'accouchement
-            </FormLabel>
+            <CriteriaLabel label="Date/heure de l'accouchement" style={{ padding: 0 }} />
             <CalendarRange
               inline
               value={[birthDeliveryStartDate, birthDeliveryEndDate]}
@@ -650,10 +610,8 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Accouchement - Terme - Semaines
-            </FormLabel>
             <OccurenceInput
+              label="Accouchement - Terme - Semaines"
               value={birthDeliveryWeeks}
               comparator={birthDeliveryWeeksComparator}
               onchange={(newBirthdaydeliveryWeeks, newComparator) => {
@@ -664,10 +622,8 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Accouchement - Terme - Jours
-            </FormLabel>
             <OccurenceInput
+              label="Accouchement - Terme - Jours"
               value={birthDeliveryDays}
               comparator={birthDeliveryDaysComparator}
               onchange={(newbirthDeliveryDays, newComparator) => {
@@ -678,9 +634,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Voie d’accouchement
-            </FormLabel>
+            <CriteriaLabel label="Voie d’accouchement" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer une voie d’accouchement"
@@ -696,9 +650,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Type d'instrument
-            </FormLabel>
+            <CriteriaLabel label="Type d'instrument" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer un type d'instrument"
@@ -714,9 +666,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Modalités de la césarienne
-            </FormLabel>
+            <CriteriaLabel label="Modalités de la césarienne" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer une modalité de la césarienne"
@@ -732,10 +682,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Présentation à l'accouchement
-            </FormLabel>
-
+            <CriteriaLabel label="Présentation à l'accouchement" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer une présentation à l'accouchement"
@@ -751,10 +698,8 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Mensurations naissance - Poids (g)
-            </FormLabel>
             <OccurenceInput
+              label="Mensurations naissance - Poids (g)"
               value={birthMensurationsGrams}
               comparator={birthMensurationsGramsComparator}
               onchange={(newBirthMensurations, newComparator) => {
@@ -765,9 +710,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Mensurations naissance - Poids (percentile)
-            </FormLabel>
+            <CriteriaLabel label="Mensurations naissance - Poids (percentile)" />
             <NumericConditionInput
               value={birthMensurationsPercentil}
               comparator={birthMensurationsPercentilComparator}
@@ -779,10 +722,8 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Score Apgar - 1 min
-            </FormLabel>
             <OccurenceInput
+              label="Score Apgar - 1 min"
               value={apgar1}
               comparator={apgar1Comparator}
               onchange={(newapgar1, newComparator) => {
@@ -793,10 +734,8 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Score Apgar - 3 min
-            </FormLabel>
             <OccurenceInput
+              label="Score Apgar - 3 min"
               value={apgar3}
               comparator={apgar3Comparator}
               onchange={(newapgar3, newComparator) => {
@@ -807,10 +746,8 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Score Apgar - 5 min
-            </FormLabel>
             <OccurenceInput
+              label="Score Apgar - 5 min"
               value={apgar5}
               comparator={apgar5Comparator}
               onchange={(newapgar5, newComparator) => {
@@ -821,10 +758,8 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Score Apgar - 10 min
-            </FormLabel>
             <OccurenceInput
+              label="Score Apgar - 10 min"
               value={apgar10}
               comparator={apgar10Comparator}
               onchange={(newapgar10, newComparator) => {
@@ -835,9 +770,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              pH artériel au cordon
-            </FormLabel>
+            <CriteriaLabel label="pH artériel au cordon" />
             <NumericConditionInput
               value={arterialPhCord}
               comparator={arterialPhCordComparator}
@@ -849,9 +782,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Lactate artériel au cordon (mmol/L)
-            </FormLabel>
+            <CriteriaLabel label="Lactate artériel au cordon (mmol/L)" />
             <NumericConditionInput
               value={arterialCordLactates}
               comparator={arterialCordLactatesComparator}
@@ -863,9 +794,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Statut vital à la naissance
-            </FormLabel>
+            <CriteriaLabel label="Statut vital à la naissance" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer un statut vital à la naissance"
@@ -881,9 +810,7 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Hémorragie du post-partum
-            </FormLabel>
+            <CriteriaLabel label="Hémorragie du post-partum" />
             <Autocomplete
               multiple
               noOptionsText='Veuillez entrer "oui" ou "non"'
@@ -899,26 +826,22 @@ const HospitForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              État du Périnée
-            </FormLabel>
+            <CriteriaLabel label="État du périnée" />
             <Autocomplete
               multiple
-              noOptionsText="Veuillez entrer un état du Périnée"
+              noOptionsText="Veuillez entrer un état du périnée"
               id="condition-of-the-perineum-autocomplete"
               options={criteriaData.data.conditionPerineum || []}
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={conditionPerineum}
               onChange={(e, value) => setConditionPerineum(value)}
-              renderInput={(params) => <TextField {...params} label="État du Périnée" />}
+              renderInput={(params) => <TextField {...params} label="État du périnée" />}
               style={{ marginBottom: '1em' }}
             />
           </BlockWrapper>
 
-          <FormLabel component="legend" className={classes.durationLegend}>
-            Type de lieu de sortie
-          </FormLabel>
+          <CriteriaLabel label="Type de lieu de sortie" />
           <Autocomplete
             multiple
             noOptionsText="Veuillez entrer un type de lieu de sortie"
@@ -937,9 +860,7 @@ const HospitForm = ({
       <BlockWrapper className={classes.inputItem}>
         <Collapse title="SUITES DE COUCHES" value={false} margin="0">
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Type d'allaitement
-            </FormLabel>
+            <CriteriaLabel label="Type d'allaitement" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer un type d'allaitement"
@@ -953,9 +874,7 @@ const HospitForm = ({
             />
           </BlockWrapper>
 
-          <FormLabel component="legend" className={classes.durationLegend}>
-            Aucune complication
-          </FormLabel>
+          <CriteriaLabel label="Aucune complication" />
           <Autocomplete
             multiple
             noOptionsText='Veuillez entrer "oui" ou "non"'
@@ -973,9 +892,7 @@ const HospitForm = ({
       <BlockWrapper className={classes.inputItem}>
         <Collapse title="SORTIE" value={false} margin="0">
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Mode d'allaitement à la sortie
-            </FormLabel>
+            <CriteriaLabel label="Mode d'allaitement à la sortie" />
             <Autocomplete
               multiple
               noOptionsText="Veuillez entrer un mode d'allaitement à la sortie"
@@ -989,9 +906,7 @@ const HospitForm = ({
             />
           </BlockWrapper>
 
-          <FormLabel component="legend" className={classes.durationLegend}>
-            Diagnostic de sortie
-          </FormLabel>
+          <CriteriaLabel label="Diagnostic de sortie" />
           <Autocomplete
             multiple
             noOptionsText="Veuillez entrer un diagnostic de sortie"

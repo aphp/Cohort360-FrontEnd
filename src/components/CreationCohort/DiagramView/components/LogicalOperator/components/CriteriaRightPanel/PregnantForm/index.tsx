@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { Autocomplete, FormLabel, TextField } from '@mui/material'
+import { Autocomplete, TextField } from '@mui/material'
 
 import useStyles from './styles'
 
@@ -23,6 +23,7 @@ import CriteriaLayout from 'components/ui/CriteriaLayout'
 import { SourceType } from 'types/scope'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import { Hierarchy } from 'types/hierarchy'
+import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 
 enum Error {
   EMPTY_FORM,
@@ -163,11 +164,6 @@ const PregnantForm = ({
       ]}
     >
       <BlockWrapper className={classes.inputItem}>
-        <FormLabel component="legend" className={classes.durationLegend}>
-          <BlockWrapper container justifyItems="center">
-            Nombre d'occurrences
-          </BlockWrapper>
-        </FormLabel>
         <OccurenceInput
           value={occurrence}
           comparator={occurrenceComparator}
@@ -202,9 +198,7 @@ const PregnantForm = ({
       <BlockWrapper className={classes.inputItem}>
         <Collapse title="Renseignement de grossesse" margin="0">
           <BlockWrapper style={{ margin: '0 2em 1em 0' }}>
-            <FormLabel component="legend" className={classes.durationLegend} style={{ padding: 0 }}>
-              Date de début de grossesse
-            </FormLabel>
+            <CriteriaLabel label="Date de début de grossesse" style={{ paddingBottom: 0 }} />
             <CalendarRange
               inline
               value={[pregnancyStartDate, pregnancyEndDate]}
@@ -230,10 +224,8 @@ const PregnantForm = ({
           />
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Nombre de fœtus
-            </FormLabel>
             <OccurenceInput
+              label="Nombre de fœtus"
               value={foetus}
               comparator={foetusComparator}
               onchange={(newFoetus, newComparator) => {
@@ -244,10 +236,8 @@ const PregnantForm = ({
           </BlockWrapper>
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Parité
-            </FormLabel>
             <OccurenceInput
+              label="Parité"
               value={parity}
               comparator={parityComparator}
               onchange={(newParity, newComparator) => {
@@ -258,9 +248,7 @@ const PregnantForm = ({
           </BlockWrapper>
 
           <BlockWrapper>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Risques
-            </FormLabel>
+            <CriteriaLabel label="Risques" />
 
             <Autocomplete
               multiple
@@ -309,9 +297,7 @@ const PregnantForm = ({
 
       <BlockWrapper className={classes.inputItem}>
         <Collapse title="Suivi de grossesse" margin="0">
-          <FormLabel component="legend" className={classes.durationLegend}>
-            Suivi échographique
-          </FormLabel>
+          <CriteriaLabel label="Suivi échographique" />
           <Autocomplete
             multiple
             id="ultrasound-monitoring-autocomplete"
@@ -325,9 +311,7 @@ const PregnantForm = ({
             style={{ marginBottom: '1em' }}
           />
 
-          <FormLabel component="legend" className={classes.durationLegend}>
-            Corticothérapie pour maturation pulmonaire fœtale
-          </FormLabel>
+          <CriteriaLabel label="Corticothérapie pour maturation pulmonaire fœtale" />
           <Autocomplete
             multiple
             id="corticotherapie-autocomplete"
@@ -343,12 +327,7 @@ const PregnantForm = ({
             style={{ marginBottom: '1em' }}
           />
 
-          <FormLabel component="legend" className={classes.durationLegend}>
-            <BlockWrapper container justifyItems="center">
-              Risques
-            </BlockWrapper>
-          </FormLabel>
-
+          <CriteriaLabel label="Risques" />
           <Autocomplete
             multiple
             id="risks-or-complications-of-pregnancy-autocomplete"
@@ -372,9 +351,7 @@ const PregnantForm = ({
           </BlockWrapper>
 
           <BlockWrapper className={classes.inputItem}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Grossesse suivie au diagnostic prénatal
-            </FormLabel>
+            <CriteriaLabel label="Grossesse suivie au diagnostic prénatal" />
 
             <Autocomplete
               multiple

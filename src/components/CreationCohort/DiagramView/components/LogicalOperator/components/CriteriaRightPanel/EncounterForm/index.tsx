@@ -215,23 +215,6 @@ const EncounterForm = ({
             />
           </BlockWrapper>
           <BlockWrapper className={classes.inputItem}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              <BlockWrapper container justifyItems="center" alignItems={'center'}>
-                Nombre d'occurrences
-                <Tooltip
-                  title={
-                    <span>
-                      Si vous choisissez un chapitre, le nombre d'occurrences ne s'applique pas sur un unique élément de
-                      ce chapitre, mais sur l'ensemble des éléments de ce chapitre. <br /> Exemple: Nombre d'occurrences
-                      &ge; 3 sur un chapitre signifie que l'on inclus les patients qui ont eu au moins 3 éléments de ce
-                      chapitre, distincts ou non`
-                    </span>
-                  }
-                >
-                  <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-                </Tooltip>
-              </BlockWrapper>
-            </FormLabel>
             <OccurenceInput
               value={occurrence}
               comparator={occurrenceComparator}
@@ -253,14 +236,10 @@ const EncounterForm = ({
           </BlockWrapper>
 
           <BlockWrapper className={classes.inputItem}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              <BlockWrapper container justifyItems="center" alignItems={'center'}>
-                Âge au moment de la prise en charge
-                <Tooltip title="La valeur par défaut sera prise en compte si le sélecteur d'âge n'a pas été modifié.">
-                  <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-                </Tooltip>
-              </BlockWrapper>
-            </FormLabel>
+            <CriteriaLabel
+              label="Âge au moment de la prise en charge"
+              infoIcon="La valeur par défaut sera prise en compte si le sélecteur d'âge n'a pas été modifié."
+            />
 
             <DurationRange
               value={age}
@@ -272,9 +251,7 @@ const EncounterForm = ({
           </BlockWrapper>
 
           <BlockWrapper container className={classes.inputItem}>
-            <FormLabel component="legend" className={classes.durationLegend}>
-              Durée de la prise en charge
-            </FormLabel>
+            <CriteriaLabel label="Durée de la prise en charge" />
             <DurationRange
               value={duration}
               unit={'Durée'}
@@ -285,7 +262,7 @@ const EncounterForm = ({
           </BlockWrapper>
 
           <BlockWrapper className={classes.inputItem}>
-            <CriteriaLabel>Date de prise en charge</CriteriaLabel>
+            <CriteriaLabel label="Date de prise en charge" />
             <FormLabel style={{ padding: '0 0 0.5em', fontWeight: 600, fontSize: 12 }} component="legend">
               Début de prise en charge
             </FormLabel>
