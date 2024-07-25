@@ -244,12 +244,27 @@ export const cleanNominativeCriterias = (
     })
 
   const cleanedCriteriasIds = cleanedSelectedCriteria.map((criterion) => criterion.id)
-  const cleanedGroups = criteriaGroups.map((group) => {
-    return {
-      ...group,
-      criteriaIds: group.criteriaIds.filter((id) => cleanedCriteriasIds.includes(id))
-    }
-  })
+  const groupsIdsToDelete = criteriaGroups
+    .filter((group) => !group.criteriaIds.filter((id) => id > 0).some((id) => cleanedCriteriasIds.includes(id)))
+    .map((group) => group.id)
+  const cleanedGroups = criteriaGroups
+    .map((group) => {
+      const cleanIds = group.criteriaIds.filter((id) => {
+        // id < 0 would be a group, and id > 0 a criteria
+        if (id > 0) {
+          return cleanedCriteriasIds.includes(id)
+        } else {
+          const nestedGroup = criteriaGroups.find((nestedGroup) => nestedGroup.id === id)
+          return nestedGroup?.criteriaIds.some((id) => cleanedCriteriasIds.includes(id))
+        }
+      })
+
+      return {
+        ...group,
+        criteriaIds: cleanIds
+      }
+    })
+    .filter((group) => !groupsIdsToDelete.includes(group.id))
   dispatch(editAllCriteriaGroup(cleanedGroups))
   dispatch(editAllCriteria(cleanedSelectedCriteria))
   dispatch(pseudonimizeCriteria())
