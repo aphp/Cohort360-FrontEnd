@@ -1,8 +1,6 @@
 FROM node:20 AS build
 
-COPY package.json package-lock.json ./
-COPY src src
-COPY public public
+COPY . .
 RUN npm install
 RUN VERSION=$(cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/"version"://g' | sed 's/[",]//g' | tr -d '[[:space:]]') CI_COMMIT_SHORT_SHA=$(git rev-parse --short HEAD) echo "{\"commit\": \"$CI_COMMIT_SHORT_SHA\", \"version\": \"$VERSION\"}" > src/data/version.json
 RUN npm run build
