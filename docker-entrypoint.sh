@@ -17,6 +17,7 @@ sed -i "s@{VITE_OIDC_CLIENT_ID}@$VITE_OIDC_CLIENT_ID@g" /app/build/assets/*.js
 sed -i "s@{VITE_OIDC_SCOPE}@$VITE_OIDC_SCOPE@g" /app/build/assets/*.js
 sed -i "s@{VITE_OIDC_STATE}@$VITE_OIDC_STATE@g" /app/build/assets/*.js
 sed -i "s@{VITE_AUTH_API_URL}@$VITE_AUTH_API_URL@g" /app/build/assets/*.js
+sed -i "s@{VITE_PERIMETER_SOURCE_TYPE_HIERARCHY}@$VITE_PERIMETER_SOURCE_TYPE_HIERARCHY@g" /app/build/assets/*.js
 sed -i "s@{VITE_VALUE_SET_URL_CLAIM_HIERARCHY}@$VITE_VALUE_SET_URL_CLAIM_HIERARCHY@g" /app/build/assets/*.js
 sed -i "s@{VITE_VALUE_SET_URL_CONDITION_HIERARCHY}@$VITE_VALUE_SET_URL_CONDITION_HIERARCHY@g" /app/build/assets/*.js
 sed -i "s@{VITE_VALUE_SET_URL_CONDITION_STATUS}@$VITE_VALUE_SET_URL_CONDITION_STATUS@g" /app/build/assets/*.js

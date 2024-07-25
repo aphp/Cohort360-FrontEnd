@@ -35,6 +35,10 @@ export const CONCEPT_MAP_HIERARCHY_EXTENSION_NAME =
 
 export const DOC_STATUS_CODE_SYSTEM = 'http://hl7.org/fhir/CodeSystem/composition-status'
 
+export const PERIMETER_SOURCE_TYPE_HIERARCHY = import.meta.env.DEV
+  ? import.meta.env.VITE_PERIMETER_SOURCE_TYPE_HIERARCHY
+  : '{VITE_PERIMETER_SOURCE_TYPE_HIERARCHY}'
+
 export const CLAIM_HIERARCHY = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_CLAIM_HIERARCHY
   : '{VITE_VALUE_SET_URL_CLAIM_HIERARCHY}'

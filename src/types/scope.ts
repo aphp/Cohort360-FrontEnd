@@ -8,15 +8,6 @@ export type FetchScopeOptions = {
   sourceType?: SourceType
 }
 
-export enum SourceValue {
-  APHP = 'AP-HP',
-  GH = 'Groupe hospitalier (GH)',
-  GHU = 'GHU',
-  HOPITAL = 'Hôpital',
-  POLE = 'Pôle/DMU',
-  UF = 'Unité Fonctionnelle (UF)'
-}
-
 export enum SourceType {
   BIOLOGY,
   CCAM,
