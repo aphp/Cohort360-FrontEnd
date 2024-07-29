@@ -37,7 +37,7 @@ const Dashboard: React.FC<{
 
   const perimetreIds = location.search.substr(1)
 
-  const [selectedTab, selectTab] = useState(tabName || 'preview')
+  const [selectedTab, selectTab] = useState(tabName || (appConfig.core.fhir.facetsExtensions ? 'preview' : 'patients'))
   const [tabs, setTabs] = useState<Tabs[]>([])
 
   const open = useAppSelector((state) => state.drawer)
@@ -49,10 +49,29 @@ const Dashboard: React.FC<{
       case 'patients':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'preview', to: '/my-patients/preview', disabled: false },
+          {
+            label: 'Aperçu',
+            value: 'preview',
+            to: '/my-patients/preview',
+            disabled: !appConfig.core.fhir.facetsExtensions
+          },
           { label: 'Patients', value: 'patients', to: '/my-patients/patients', disabled: false },
-          { label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false },
-          ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging', disabled: false }] : [])
+          {
+            label: 'Documents',
+            value: 'documents',
+            to: '/my-patients/documents',
+            disabled: !appConfig.core.fhir.resourceLists
+          },
+          ...(ODD_IMAGING
+            ? [
+                {
+                  label: 'Imagerie',
+                  value: 'imaging',
+                  to: '/my-patients/imaging',
+                  disabled: !appConfig.core.fhir.resourceLists
+                }
+              ]
+            : [])
         ])
         break
       case 'cohort':
@@ -63,18 +82,40 @@ const Dashboard: React.FC<{
             to: `/cohort/new/${dashboard.requestId}/${dashboard.snapshotId}`,
             disabled: false
           },
-          { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/${cohortId}/preview`, disabled: false },
+          {
+            label: 'Aperçu cohorte',
+            value: 'preview',
+            to: `/cohort/${cohortId}/preview`,
+            disabled: !appConfig.core.fhir.facetsExtensions
+          },
           { label: 'Données patient', value: 'patients', to: `/cohort/${cohortId}/patients`, disabled: false },
-          { label: 'Documents cliniques', value: 'documents', to: `/cohort/${cohortId}/documents`, disabled: false },
+          {
+            label: 'Documents cliniques',
+            value: 'documents',
+            to: `/cohort/${cohortId}/documents`,
+            disabled: !appConfig.core.fhir.resourceLists
+          },
           ...(ODD_IMAGING
-            ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/${cohortId}/imaging`, disabled: false }]
+            ? [
+                {
+                  label: 'Imagerie',
+                  value: 'imaging',
+                  to: `/cohort/${cohortId}/imaging`,
+                  disabled: !appConfig.core.fhir.resourceLists
+                }
+              ]
             : [])
         ])
         break
       case 'new_cohort':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/new/preview`, disabled: true },
+          {
+            label: 'Aperçu cohorte',
+            value: 'preview',
+            to: `/cohort/new/preview`,
+            disabled: !appConfig.core.fhir.facetsExtensions
+          },
           { label: 'Données patient', value: 'patients', to: `/cohort/new/patients`, disabled: true },
           { label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true },
           ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/new/imaging`, disabled: true }] : [])
@@ -83,7 +124,12 @@ const Dashboard: React.FC<{
       case 'perimeters':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'preview', to: `/perimeters/preview${location.search}`, disabled: false },
+          {
+            label: 'Aperçu',
+            value: 'preview',
+            to: `/perimeters/preview${location.search}`,
+            disabled: !appConfig.core.fhir.facetsExtensions
+          },
           {
             label: 'Données patient',
             value: 'patients',
@@ -94,10 +140,17 @@ const Dashboard: React.FC<{
             label: 'Documents cliniques',
             value: 'documents',
             to: `/perimeters/documents${location.search}`,
-            disabled: false
+            disabled: !appConfig.core.fhir.resourceLists
           },
           ...(ODD_IMAGING
-            ? [{ label: 'Imagerie', value: 'imaging', to: `/perimeters/imaging${location.search}`, disabled: false }]
+            ? [
+                {
+                  label: 'Imagerie',
+                  value: 'imaging',
+                  to: `/perimeters/imaging${location.search}`,
+                  disabled: !appConfig.core.fhir.resourceLists
+                }
+              ]
             : [])
         ])
         break

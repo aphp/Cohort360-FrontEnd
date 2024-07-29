@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import { Grid, Paper } from '@mui/material'
 
@@ -9,6 +9,8 @@ import { getLastDiagnosisLabels } from 'utils/pmsi'
 import { CohortPatient, IPatientDetails } from 'types'
 
 import useStyles from './styles'
+import { getPreferedCode } from 'utils/mappers'
+import { AppConfig } from 'config'
 
 type PatientPreviewProps = {
   patient?: IPatientDetails
@@ -16,6 +18,7 @@ type PatientPreviewProps = {
 }
 const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBoolean }) => {
   const { classes } = useStyles()
+  const appConfig = useContext(AppConfig)
 
   if (!patient) return <></>
 
@@ -53,7 +56,7 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBo
   const lastProcedure = patient.lastProcedure
     ? patient.lastProcedure === 'loading'
       ? 'loading'
-      : patient.lastProcedure?.code?.coding?.find((code) => code.userSelected === true)?.display
+      : getPreferedCode(patient.lastProcedure?.code)?.display
     : '-'
   const lastGhm = patient.lastGhm
     ? patient.lastGhm === 'loading'
@@ -73,7 +76,7 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBo
           <PatientField fieldName="Dernière prise en charge" fieldValue={lastEncounter} />
           <PatientField fieldName="Durée de prise en charge" fieldValue={lastEncounterDuration} />
           <PatientField fieldName="Dernier acte" fieldValue={lastProcedure} />
-          <PatientField fieldName="Dernier GHM" fieldValue={lastGhm} />
+          {appConfig.features.claim.enabled && <PatientField fieldName="Dernier GHM" fieldValue={lastGhm} />}
         </Grid>
       </Grid>
     </Grid>

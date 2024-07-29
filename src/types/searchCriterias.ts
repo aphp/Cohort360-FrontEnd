@@ -3,6 +3,7 @@ import { PatientTableLabels } from './patient'
 import { CohortsType } from './cohorts'
 import { ResourceType } from './requestCriterias'
 import { Hierarchy } from './hierarchy'
+import { getConfig } from 'config'
 
 export enum FormNames {
   PREGNANCY = 'APHPEDSQuestionnaireFicheGrossesse',
@@ -76,7 +77,7 @@ export enum Order {
   RECORDED_DATE = 'recorded-date',
   FAMILY = 'family',
   DATE = 'date',
-  PERIOD_START = 'Period-start',
+  EFFECTIVE_TIME = 'effective-time',
   CREATED = 'created',
   DIAGNOSIS = 'diagnosis',
   ANABIO = 'code-anabio',
@@ -310,11 +311,15 @@ export type ActionFilters<F> =
   | ActionRemoveSearchCriterias
   | ActionAddSearchCriterias<F>
 
-export const searchByListPatients = [
-  {
-    id: SearchByTypes.TEXT,
-    label: SearchByTypesLabelPatients.TEXT
-  },
+export const searchByListPatients = () => [
+  ...(getConfig().core.fhir.textSearch
+    ? [
+        {
+          id: SearchByTypes.TEXT,
+          label: SearchByTypesLabelPatients.TEXT
+        }
+      ]
+    : []),
   {
     id: SearchByTypes.FAMILY,
     label: SearchByTypesLabelPatients.FAMILY

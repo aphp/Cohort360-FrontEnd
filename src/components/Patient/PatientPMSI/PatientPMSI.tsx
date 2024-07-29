@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
 import { CircularProgress, Grid, Tooltip } from '@mui/material'
 import Chip from 'components/ui/Chip'
@@ -42,6 +42,7 @@ import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { AlertWrapper } from 'components/ui/Alert'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
+import { AppConfig } from 'config'
 
 export type PatientPMSIProps = {
   groupId?: string
@@ -69,6 +70,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const [triggerClean, setTriggerClean] = useState<boolean>(false)
   const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
   const dispatch = useAppDispatch()
+  const appConfig = useContext(AppConfig)
 
   const [selectedTab, setSelectedTab] = useState<PmsiTab>({
     id: ResourceType.CONDITION,
@@ -78,14 +80,18 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const PMSITabs: PmsiTabs = [
     { label: PMSILabel.DIAGNOSTIC, id: ResourceType.CONDITION },
     { label: PMSILabel.CCAM, id: ResourceType.PROCEDURE },
-    { label: PMSILabel.GHM, id: ResourceType.CLAIM }
+    ...(appConfig.features.claim.enabled
+      ? ([{ label: PMSILabel.GHM, id: ResourceType.CLAIM }] as PmsiTab[])
+      : ([] as PmsiTab[]))
   ]
   const sourceType =
     selectedTab.id === ResourceType.CONDITION
       ? SourceType.CIM10
       : selectedTab.id === ResourceType.PROCEDURE
       ? SourceType.CCAM
-      : SourceType.GHM
+      : appConfig.features.claim.enabled
+      ? SourceType.GHM
+      : SourceType.CIM10
   const [page, setPage] = useState(1)
   const {
     allSavedFilters,

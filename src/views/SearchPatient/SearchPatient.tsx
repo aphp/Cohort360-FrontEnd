@@ -33,7 +33,7 @@ const SearchPatient: React.FC<{}> = () => {
   const [page, setPage] = useState(1)
 
   const [{ orderBy, searchBy, searchInput }, { changeOrderBy, changeSearchBy, changeSearchInput }] =
-    useSearchCriterias(initPatientsSearchCriterias)
+    useSearchCriterias(initPatientsSearchCriterias())
 
   const controllerRef = useRef<AbortController | null>(null)
 
@@ -112,7 +112,7 @@ const SearchPatient: React.FC<{}> = () => {
                 value={searchBy || SearchByTypes.TEXT}
                 label="Rechercher dans :"
                 width={'20%'}
-                items={searchByListPatients}
+                items={searchByListPatients()}
                 onchange={(newValue) => changeSearchBy(newValue)}
               />
               <SearchInput
