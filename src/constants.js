@@ -258,3 +258,7 @@ export const USER_TRACKING_BLACKLIST = import.meta.env.DEV
 export const VALUE_SET_SIZE = '9999'
 
 export const EXPLORATION = 'Exploration'
+
+export const USE_FACETS_EXTENSION = false
+export const USE_FILTER_ACTIVE = false
+export const USE_TOTAL_COUNT = true

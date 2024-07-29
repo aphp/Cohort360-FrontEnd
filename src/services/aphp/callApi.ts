@@ -47,7 +47,10 @@ import {
   IMAGING_MODALITIES,
   MEDICATION_ADMINISTRATIONS,
   MEDICATION_PRESCRIPTION_TYPES,
-  DOC_STATUS_CODE_SYSTEM
+  DOC_STATUS_CODE_SYSTEM,
+  USE_FILTER_ACTIVE,
+  USE_FACETS_EXTENSION,
+  USE_TOTAL_COUNT
 } from '../../constants'
 import { Direction, Order, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
 import {
@@ -122,7 +125,8 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
   _elements = _elements ? _elements.filter(uniq) : []
 
   // By default, all the calls to `/Patient` will have 'active=true' in parameter
-  let options: string[] = ['active=true']
+  let options: string[] = USE_FILTER_ACTIVE ? ['active=true'] : []
+  if (USE_TOTAL_COUNT) options = [...options, '_total=accurate']
   if (_id) options = [...options, `_id=${_id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
@@ -142,7 +146,7 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
     ]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
-  if (pivotFacet && pivotFacet.length > 0)
+  if (USE_FACETS_EXTENSION && pivotFacet && pivotFacet.length > 0)
     options = [...options, `pivot-facet=${pivotFacet.reduce(paramValuesReducer, '')}`]
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer, '')}`]
 
@@ -183,17 +187,19 @@ export const fetchEncounter = async (args: fetchEncounterProps): FHIR_Bundle_Pro
   facet = facet ? facet.filter(uniq) : []
 
   // By default, all the calls to `/Encounter` will have 'subject.active=true' in parameter
-  let options: string[] = ['subject.active=true']
+  let options: string[] = USE_FILTER_ACTIVE ? ['subject.active=true'] : []
+  if (USE_TOTAL_COUNT) options = [...options, '_total=accurate']
   if (_id) options = [...options, `_id=${_id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
   if (patient) options = [...options, `subject=${patient}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
   if (status && status.length > 0) options = [...options, `status=${status.reduce(paramValuesReducer)}`]
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer, '')}`]
-  if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(paramValuesReducer, '')}`]
+  if (USE_FACETS_EXTENSION && facet && facet.length > 0)
+    options = [...options, `facet=${facet.reduce(paramValuesReducer, '')}`]
   if (visit !== undefined) options = [...options, `part-of:missing=${visit}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Encounter>>(`/Encounter?${options.reduce(paramsReducer)}`, {
@@ -286,13 +292,14 @@ export const fetchDocumentReference = async (
     `type:not=${encodeURIComponent(
       'https://terminology.eds.aphp.fr/aphp-orbis-document-textuel-hospitalier|doc-impor'
     )}`,
-    `contenttype=${encodeURIComponent('text/plain')}`,
-    'subject.active=true'
+    `contenttype=${encodeURIComponent('text/plain')}`
   ]
+  if (USE_TOTAL_COUNT) options = [...options, '_total=accurate']
+  if (USE_FILTER_ACTIVE) options = [...options, 'patient.active=true']
   if (_id) options = [...options, `_id=${_id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
   if (type) options = [...options, `${DocumentsParamsKeys.DOC_TYPES}=${type}`]
   if (_text)
     options = [...options, `${searchBy === SearchByTypes.TEXT ? `_text` : 'description'}=${encodeURIComponent(_text)}`]
@@ -325,8 +332,9 @@ export const fetchDocumentReference = async (
     options = [...options, `${DocumentsParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
-  if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(paramValuesReducer, '')}`]
-  if (uniqueFacet && uniqueFacet.length > 0)
+  if (USE_FACETS_EXTENSION && facet && facet.length > 0)
+    options = [...options, `facet=${facet.reduce(paramValuesReducer, '')}`]
+  if (USE_FACETS_EXTENSION && uniqueFacet && uniqueFacet.length > 0)
     options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer, '')}`]
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer, '')}`]
 
@@ -482,10 +490,11 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   _list = _list ? _list.filter(uniq) : []
 
   // By default, all the calls to `/Procedure` will have 'patient.active=true' in parameter
-  let options: string[] = ['subject.active=true']
+  let options: string[] = USE_FILTER_ACTIVE ? ['subject.active=true'] : []
+  if (USE_TOTAL_COUNT) options = [...options, '_total=accurate']
   if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
   if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `${ProcedureParamsKeys.CODE}=${code}`] // eslint-disable-line
   if (source) options = [...options, `${ProcedureParamsKeys.SOURCE}=${source}`]
@@ -550,10 +559,11 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
   _list = _list ? _list.filter(uniq) : []
 
   // By default, all the calls to `/Claim` will have 'patient.active=true' in parameter
-  let options: string[] = ['patient.active=true']
+  let options: string[] = USE_FILTER_ACTIVE ? ['patient.active=true'] : []
+  if (USE_TOTAL_COUNT) options = [...options, '_total=accurate']
   if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
   if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
   if (diagnosis) options = [...options, `${ClaimParamsKeys.CODE}=${diagnosis}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`] // eslint-disable-line
@@ -613,10 +623,11 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   type = type ? type.filter(uniq) : []
 
   // By default, all the calls to `/Condition` will have 'patient.active=true' in parameter
-  let options: string[] = ['subject.active=true']
+  let options: string[] = USE_FILTER_ACTIVE ? ['subject.active=true'] : []
+  if (USE_TOTAL_COUNT) options = [...options, '_total=accurate']
   if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
   if (offset !== undefined) options = [...options, `_offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `${ConditionParamsKeys.CODE}=${code}`] // eslint-disable-line
   if (source) options = [...options, `${ConditionParamsKeys.SOURCE}=${source}`]
@@ -687,11 +698,13 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   _list = _list ? _list.filter(uniq) : []
 
   // By default, all the calls to `/Observation` will have 'value-quantity-value=ge0,le0' and 'patient.active=true' in the parameters
-  let options: string[] = ['value-quantity=ge0,le0', 'subject.active=true']
+  let options: string[] = ['value-quantity=ge0,le0']
+  if (USE_FILTER_ACTIVE) options = [...options, 'subject.active=true']
+  if (USE_TOTAL_COUNT) options = [...options, '_total=accurate']
   if (id) options = [...options, `_id=${id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort},id`}`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort}`}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
   if (encounter) options = [...options, `${ObservationParamsKeys.NDA}=${encounter}`]
   if (anabio || loinc)
@@ -762,11 +775,12 @@ export const fetchMedicationRequest = async (
   _list = _list ? _list.filter(uniq) : []
 
   // By default, all the calls to `/MedicationRequest` will have 'patient.active=true' in parameter
-  let options: string[] = ['subject.active=true']
+  let options: string[] = USE_FILTER_ACTIVE ? ['subject.active=true'] : []
+  if (USE_TOTAL_COUNT) options = [...options, '_total=accurate']
   if (id) options = [...options, `_id=${id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset !== undefined) options = [...options, `_offset=${offset}`]
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
   if (subject) options = [...options, `subject=${subject}`]
   if (encounter) options = [...options, `${PrescriptionParamsKeys.NDA}=${encounter}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
@@ -836,11 +850,12 @@ export const fetchMedicationAdministration = async (
   _list = _list ? _list.filter(uniq) : []
 
   // By default, all the calls to `/MedicationAdministration` will have 'patient.active=true' in parameter
-  let options: string[] = ['subject.active=true']
+  let options: string[] = USE_FILTER_ACTIVE ? ['subject.active=true'] : []
+  if (USE_TOTAL_COUNT) options = [...options, '_total=accurate']
   if (id) options = [...options, `_id=${id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
   if (subject) options = [...options, `subject=${subject}`]
   if (encounter) options = [...options, `${AdministrationParamsKeys.NDA}=${encounter}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
@@ -907,7 +922,8 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   _list = _list ? _list.filter(uniq) : []
 
   // By default, all the calls to `/ImagingStudy` will have 'patient.active=true' in parameter
-  let options: string[] = ['patient.active=true']
+  let options: string[] = USE_FILTER_ACTIVE ? ['patient.active=true'] : []
+  if (USE_TOTAL_COUNT) options = [...options, '_total=accurate']
   if (patient) options = [...options, `patient=${patient}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
@@ -951,6 +967,7 @@ type fetchFormsProps = {
 export const fetchForms = async (args: fetchFormsProps) => {
   const { patient, formName, _list, startDate, endDate, executiveUnits, encounterStatus, size } = args
   let options: string[] = ['status=in-progress,completed']
+  if (USE_TOTAL_COUNT) options = [...options, '_total=accurate']
   if (patient) options = [...options, `subject=${patient}`]
   if (formName) options = [...options, `${QuestionnaireResponseParamsKeys.NAME}=${formName}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
@@ -1001,6 +1018,7 @@ export const fetchLocation = async (args: fetchLocationProps) => {
   const { _list, _elements, near, size, offset, signal } = args
 
   let options: string[] = []
+  if (USE_TOTAL_COUNT) options = [...options, '_total=accurate']
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
   if (near) options = [...options, `near=${encodeURIComponent(near)}`]

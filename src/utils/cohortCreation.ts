@@ -17,7 +17,8 @@ import {
   MEDICATION_ATC,
   IMAGING_STUDY_UID_URL,
   PROCEDURE_HIERARCHY,
-  DOC_STATUS_CODE_SYSTEM
+  DOC_STATUS_CODE_SYSTEM,
+  USE_FILTER_ACTIVE
 } from '../constants'
 import {
   DocumentAttachmentMethod,
@@ -98,6 +99,7 @@ import {
 } from 'mappers/filters'
 
 const REQUETEUR_VERSION = 'v1.4.5'
+const USE_SEARCH_PARAMS_EXTENSIONS = false
 
 export const STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE = 'Structure hospitalière de prise en charge'
 
@@ -297,7 +299,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
   switch (criterion.type) {
     case CriteriaType.PATIENT: {
       filterFhir = [
-        'active=true',
+        ...(USE_FILTER_ACTIVE ? ['active=true'] : []),
         filtersBuilders(PatientsParamsKeys.GENDERS, buildLabelObjectFilter(criterion.genders)),
         filtersBuilders(PatientsParamsKeys.VITAL_STATUS, buildLabelObjectFilter(criterion.vitalStatus)),
         filtersBuilders(PatientsParamsKeys.BIRTHDATE, buildDateFilter(criterion.birthdates[1], 'le')),
@@ -328,7 +330,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case CriteriaType.ENCOUNTER: {
       filterFhir = [
-        'subject.active=true',
+        ...(USE_FILTER_ACTIVE ? ['subject.active=true'] : []),
         filtersBuilders(EncounterParamsKeys.ADMISSIONMODE, buildLabelObjectFilter(criterion.admissionMode)),
         filtersBuilders(EncounterParamsKeys.ENTRYMODE, buildLabelObjectFilter(criterion.entryMode)),
         filtersBuilders(EncounterParamsKeys.EXITMODE, buildLabelObjectFilter(criterion.exitMode)),
@@ -377,7 +379,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case CriteriaType.DOCUMENTS: {
       const unreducedFilterFhir = [
-        `type:not=doc-impor&contenttype=text/plain&subject.active=true`,
+        ...(USE_FILTER_ACTIVE ? ['subject.active=true'] : []),
+        `type:not=doc-impor&contenttype=text/plain`,
         filtersBuilders(DocumentsParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(
           criterion.searchBy === SearchByTypes.TEXT ? SearchByTypes.TEXT : SearchByTypes.DESCRIPTION,
@@ -412,7 +415,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case CriteriaType.CONDITION: {
       const unreducedFilterFhir = [
-        'subject.active=true',
+        ...(USE_FILTER_ACTIVE ? ['subject.active=true'] : []),
         filtersBuilders(ConditionParamsKeys.CODE, buildLabelObjectFilter(criterion.code, CONDITION_HIERARCHY)),
         filtersBuilders(ConditionParamsKeys.DIAGNOSTIC_TYPES, buildLabelObjectFilter(criterion.diagnosticType)),
         criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : '',
@@ -435,7 +438,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case CriteriaType.PROCEDURE: {
       const unreducedFilterFhir = [
-        'subject.active=true',
+        ...(USE_FILTER_ACTIVE ? ['subject.active=true'] : []),
         filtersBuilders(ProcedureParamsKeys.CODE, buildLabelObjectFilter(criterion.code, PROCEDURE_HIERARCHY)),
         filtersBuilders(ProcedureParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(ProcedureParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
@@ -457,7 +460,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case CriteriaType.CLAIM: {
       const unreducedFilterFhir = [
-        'patient.active=true',
+        ...(USE_FILTER_ACTIVE ? ['patient.active=true'] : []),
         filtersBuilders(ClaimParamsKeys.CODE, buildLabelObjectFilter(criterion.code, CLAIM_HIERARCHY)),
         filtersBuilders(ClaimParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
         filtersBuilders(ClaimParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
@@ -479,7 +482,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     case CriteriaType.MEDICATION_REQUEST:
     case CriteriaType.MEDICATION_ADMINISTRATION: {
       const unreducedFilterFhir = [
-        'subject.active=true',
+        ...(USE_FILTER_ACTIVE ? ['subject.active=true'] : []),
         filtersBuilders(
           criterion.type === CriteriaType.MEDICATION_REQUEST
             ? PrescriptionParamsKeys.PRESCRIPTION_ROUTES
@@ -534,7 +537,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case CriteriaType.OBSERVATION: {
       const unreducedFilterFhir = [
-        `subject.active=true&${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`,
+        ...(USE_FILTER_ACTIVE ? ['subject.active=true'] : []),
+        `${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`,
         filtersBuilders(
           ObservationParamsKeys.ANABIO_LOINC,
           buildLabelObjectFilter(criterion.code, BIOLOGY_HIERARCHY_ITM_ANABIO)
@@ -568,7 +572,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case CriteriaType.IMAGING: {
       filterFhir = [
-        'patient.active=true',
+        ...(USE_FILTER_ACTIVE ? ['patient.active=true'] : []),
         filtersBuilders(ImagingParamsKeys.DATE, buildDateFilter(criterion.studyStartDate, 'ge')),
         filtersBuilders(ImagingParamsKeys.DATE, buildDateFilter(criterion.studyEndDate, 'le')),
         filtersBuilders(ImagingParamsKeys.SERIES_DATE, buildDateFilter(criterion.seriesStartDate, 'ge')),
@@ -580,14 +584,22 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
         filtersBuilders(ImagingParamsKeys.MODALITY, buildLabelObjectFilter(criterion.studyModalities)),
         filtersBuilders(ImagingParamsKeys.SERIES_MODALITIES, buildLabelObjectFilter(criterion.seriesModalities)),
         filtersBuilders(ImagingParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
-        filtersBuilders(
-          ImagingParamsKeys.NB_OF_SERIES,
-          buildComparatorFilter(criterion.numberOfSeries, criterion.seriesComparator)
-        ),
-        filtersBuilders(
-          ImagingParamsKeys.NB_OF_INS,
-          buildComparatorFilter(criterion.numberOfIns, criterion.instancesComparator)
-        ),
+        ...(USE_SEARCH_PARAMS_EXTENSIONS
+          ? [
+              filtersBuilders(
+                ImagingParamsKeys.NB_OF_SERIES,
+                buildComparatorFilter(criterion.numberOfSeries, criterion.seriesComparator)
+              )
+            ]
+          : []),
+        ...(USE_SEARCH_PARAMS_EXTENSIONS
+          ? [
+              filtersBuilders(
+                ImagingParamsKeys.NB_OF_INS,
+                buildComparatorFilter(criterion.numberOfIns, criterion.instancesComparator)
+              )
+            ]
+          : []),
         filtersBuilders(ImagingParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
         buildWithDocumentFilter(criterion, ImagingParamsKeys.WITH_DOCUMENT),
         buildSimpleFilter(criterion.studyUid, ImagingParamsKeys.STUDY_UID, IMAGING_STUDY_UID_URL),
@@ -607,7 +619,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
 
     case CriteriaType.PREGNANCY:
       filterFhir = [
-        'subject.active=true',
+        ...(USE_FILTER_ACTIVE ? ['subject.active=true'] : []),
         `questionnaire.name=${FormNames.PREGNANCY}`,
         'status=in-progress,completed',
         filtersBuilders(
@@ -671,7 +683,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
       break
     case CriteriaType.HOSPIT:
       filterFhir = [
-        'subject.active=true',
+        ...(USE_FILTER_ACTIVE ? ['subject.active=true'] : []),
         `questionnaire.name=${FormNames.HOSPIT}`,
         'status=in-progress,completed',
         filtersBuilders(
