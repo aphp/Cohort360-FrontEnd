@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Tab, Tabs } from '@mui/material'
 
 import useStyles from './styles'
@@ -13,6 +13,7 @@ import { EXPLORATION } from '../../../../../../../..//constants'
 import { CriteriaDrawerComponentProps } from 'types'
 import { CcamDataType, Comparators, CriteriaType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
+import { AppConfig } from 'config'
 
 export const defaultProcedure: Omit<CcamDataType, 'id'> = {
   type: CriteriaType.PROCEDURE,
@@ -32,7 +33,10 @@ export const defaultProcedure: Omit<CcamDataType, 'id'> = {
 
 const Index = (props: CriteriaDrawerComponentProps) => {
   const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
+  const appConfig = useContext(AppConfig)
+  const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(
+    selectedCriteria || !appConfig.core.fhir.valueSetExploration ? 'form' : 'hierarchy'
+  )
   const [defaultCriteria, setDefaultCriteria] = useState<CcamDataType>(
     (selectedCriteria as CcamDataType) || defaultProcedure
   )
@@ -81,7 +85,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         value={selectedTab}
         onChange={(e, tab) => setSelectedTab(tab)}
       >
-        <Tab label={EXPLORATION} value="hierarchy" />
+        {appConfig.core.fhir.valueSetExploration && <Tab label={EXPLORATION} value="hierarchy" />}
         <Tab label="Formulaire" value="form" />
       </Tabs>
 

@@ -44,7 +44,9 @@ const Dashboard: React.FC<{
   const [searchParams] = useSearchParams()
   const groupIds = getCleanGroupId(searchParams.get('groupId'))
 
-  const [selectedTab, setSelectedTab] = useState(tabName ?? 'preview')
+  const [selectedTab, setSelectedTab] = useState(
+    tabName || (appConfig.core.fhir.facetsExtensions ? 'preview' : 'patients')
+  )
   const [tabs, setTabs] = useState<Tabs[]>([])
 
   const open = useAppSelector((state) => state.drawer)
@@ -56,19 +58,55 @@ const Dashboard: React.FC<{
       case 'patients':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'preview', to: '/my-patients/preview', disabled: false },
+          {
+            label: 'Aperçu',
+            value: 'preview',
+            to: '/my-patients/preview',
+            disabled: !appConfig.core.fhir.facetsExtensions
+          },
           { label: 'Patients', value: 'patients', to: '/my-patients/patients', disabled: false },
           ...(ODD_DOCUMENT_REFERENCE
-            ? [{ label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false }]
+            ? [
+                {
+                  label: 'Documents',
+                  value: 'documents',
+                  to: '/my-patients/documents',
+                  disabled: !appConfig.core.fhir.resourceLists
+                }
+              ]
             : []),
-          { label: 'PMSI', value: 'pmsi', to: '/my-patients/pmsi', disabled: false },
-          { label: 'Médicaments', value: 'medication', to: '/my-patients/medication', disabled: false },
-          { label: 'Biologie', value: 'biology', to: '/my-patients/biology', disabled: false },
+          { label: 'PMSI', value: 'pmsi', to: '/my-patients/pmsi', disabled: !appConfig.core.fhir.resourceLists },
+          {
+            label: 'Médicaments',
+            value: 'medication',
+            to: '/my-patients/medication',
+            disabled: !appConfig.core.fhir.resourceLists
+          },
+          {
+            label: 'Biologie',
+            value: 'biology',
+            to: '/my-patients/biology',
+            disabled: !appConfig.core.fhir.resourceLists
+          },
           ...(ODD_IMAGING
-            ? [{ label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging', disabled: false }]
+            ? [
+                {
+                  label: 'Imagerie',
+                  value: 'imaging',
+                  to: '/my-patients/imaging',
+                  disabled: !appConfig.core.fhir.resourceLists
+                }
+              ]
             : []),
           ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/my-patients/forms`, disabled: false }]
+            ? [
+                {
+                  label: 'Formulaires',
+                  value: 'forms',
+                  to: `/my-patients/forms`,
+                  disabled: !appConfig.core.fhir.resourceLists
+                }
+              ]
             : [])
         ])
         break
@@ -79,31 +117,72 @@ const Dashboard: React.FC<{
             value: 'creation',
             to: `/cohort/new/${dashboard.requestId}/${dashboard.snapshotId}`
           },
-          { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/preview?groupId=${groupIds}` },
-          { label: 'Données patient', value: 'patients', to: `/cohort/patients${location.search}` },
+          {
+            label: 'Aperçu cohorte',
+            value: 'preview',
+            to: `/cohort/preview?groupId=${groupIds}`,
+            disabled: !appConfig.core.fhir.facetsExtensions
+          },
+          { label: 'Données patient', value: 'patients', to: `/cohort/patients${location.search}`, disabled: false },
           ...(ODD_DOCUMENT_REFERENCE
             ? [
                 {
                   label: 'Documents cliniques',
                   value: 'documents',
                   to: `/cohort/documents${location.search}`,
-                  disabled: false
+                  disabled: !appConfig.core.fhir.resourceLists
                 }
               ]
             : []),
-          { label: 'PMSI', value: 'pmsi', to: `/cohort/pmsi${location.search}` },
-          { label: 'Médicaments', value: 'medication', to: `/cohort/medication${location.search}` },
-          { label: 'Biologie', value: 'biology', to: `/cohort/biology${location.search}` },
-          ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/imaging${location.search}` }] : []),
+          {
+            label: 'PMSI',
+            value: 'pmsi',
+            to: `/cohort/pmsi${location.search}`,
+            disabled: !appConfig.core.fhir.resourceLists
+          },
+          {
+            label: 'Médicaments',
+            value: 'medication',
+            to: `/cohort/medication${location.search}`,
+            disabled: !appConfig.core.fhir.resourceLists
+          },
+          {
+            label: 'Biologie',
+            value: 'biology',
+            to: `/cohort/biology${location.search}`,
+            disabled: !appConfig.core.fhir.resourceLists
+          },
+          ...(ODD_IMAGING
+            ? [
+                {
+                  label: 'Imagerie',
+                  value: 'imaging',
+                  to: `/cohort/imaging${location.search}`,
+                  disabled: !appConfig.core.fhir.resourceLists
+                }
+              ]
+            : []),
           ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/cohort/forms${location.search}` }]
+            ? [
+                {
+                  label: 'Formulaires',
+                  value: 'forms',
+                  to: `/cohort/forms${location.search}`,
+                  disabled: !appConfig.core.fhir.resourceLists
+                }
+              ]
             : [])
         ])
         break
       case 'new_cohort':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/new/preview`, disabled: true },
+          {
+            label: 'Aperçu cohorte',
+            value: 'preview',
+            to: `/cohort/new/preview`,
+            disabled: !appConfig.core.fhir.facetsExtensions
+          },
           { label: 'Données patient', value: 'patients', to: `/cohort/new/patients`, disabled: true },
           ...(ODD_DOCUMENT_REFERENCE
             ? [{ label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true }]
@@ -120,7 +199,12 @@ const Dashboard: React.FC<{
       case 'perimeters': {
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'preview', to: `/perimeters/preview?groupId=${groupIds}` },
+          {
+            label: 'Aperçu',
+            value: 'preview',
+            to: `/perimeters/preview?groupId=${groupIds}`,
+            disabled: !appConfig.core.fhir.facetsExtensions
+          },
           {
             label: 'Données patient',
             value: 'patients',
@@ -132,7 +216,7 @@ const Dashboard: React.FC<{
                   label: 'Documents cliniques',
                   value: 'documents',
                   to: `/perimeters/documents${location.search}`,
-                  disabled: false
+                  disabled: !appConfig.core.fhir.resourceLists
                 }
               ]
             : []),
@@ -144,10 +228,24 @@ const Dashboard: React.FC<{
           },
           { label: 'Biologie', value: 'biology', to: `/perimeters/biology${location.search}` },
           ...(ODD_IMAGING
-            ? [{ label: 'Imagerie', value: 'imaging', to: `/perimeters/imaging${location.search}` }]
+            ? [
+                {
+                  label: 'Imagerie',
+                  value: 'imaging',
+                  to: `/perimeters/imaging${location.search}`,
+                  disabled: !appConfig.core.fhir.facetsExtensions
+                }
+              ]
             : []),
           ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/perimeters/forms${location.search}` }]
+            ? [
+                {
+                  label: 'Formulaires',
+                  value: 'forms',
+                  to: `/perimeters/forms${location.search}`,
+                  disabled: !appConfig.core.fhir.facetsExtensions
+                }
+              ]
             : [])
         ])
         break

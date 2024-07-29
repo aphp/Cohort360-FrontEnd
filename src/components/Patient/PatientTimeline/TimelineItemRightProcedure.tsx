@@ -3,6 +3,7 @@ import React from 'react'
 import useStyles from './styles'
 import { PMSIEntry } from 'types'
 import { Procedure } from 'fhir/r4'
+import { getPreferedCode } from 'utils/mappers'
 
 /**
  * @usage
@@ -35,7 +36,7 @@ const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
 
   const { classes } = useStyles({ color: color })
 
-  const codeToDisplay = data.code?.coding?.find((code) => code.userSelected === true)
+  const codeToDisplay = getPreferedCode(data.code)
 
   return (
     <li className={classes.timelineItem}>

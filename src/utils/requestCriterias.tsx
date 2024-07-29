@@ -22,6 +22,7 @@ import { CriteriaState } from 'state/criteria'
 import { Tooltip, Typography } from '@mui/material'
 import { Hierarchy } from 'types/hierarchy'
 import { ScopeElement, SimpleCodeType } from 'types'
+import { perimeterDisplay } from './perimeters'
 
 export const getOccurenceDateLabel = (
   selectedCriteriaType: Exclude<CriteriaTypesWithAdvancedInputs, CriteriaType.IMAGING>,
@@ -81,7 +82,7 @@ const getLabelFromCriteriaObject = (
 }
 
 const getLabelFromName = (values: Hierarchy<ScopeElement, string>[]) => {
-  const labels = values.map((value) => `${value.source_value} - ${value.name}`).join(' - ')
+  const labels = values.map((value) => perimeterDisplay(value.source_value, value.name)).join(' - ')
   return labels
 }
 

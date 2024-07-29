@@ -81,7 +81,7 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
       filters: { validatedStatus, nda, ipp, loinc, anabio, startDate, endDate, executiveUnits, encounterStatus }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
-  ] = useSearchCriterias(initBioSearchCriterias)
+  ] = useSearchCriterias(initBioSearchCriterias())
   const filtersAsArray = useMemo(
     () =>
       selectFiltersAsArray({

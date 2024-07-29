@@ -302,7 +302,7 @@ const PMSIList = ({ deidentified }: PMSIListProps) => {
           <Grid container alignItems="center">
             <Grid item xs={12} md={12} lg={4} xl={4}>
               <Tabs
-                values={PMSITabs}
+                values={PMSITabs()}
                 active={selectedTab}
                 onchange={(value: PmsiTab) => {
                   setSelectedTab(value)

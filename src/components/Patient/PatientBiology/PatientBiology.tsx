@@ -93,7 +93,7 @@ const PatientBiology = () => {
       filters: { nda, loinc, anabio, startDate, endDate, executiveUnits, validatedStatus, encounterStatus }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
-  ] = useSearchCriterias(initBioSearchCriterias)
+  ] = useSearchCriterias(initBioSearchCriterias())
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({
       nda,

@@ -25,6 +25,7 @@ const criteriaList: () => CriteriaItemType[] = () => {
   const ODD_IMAGING = getConfig().features.imaging.enabled
   const ODD_MEDICATION = getConfig().features.medication.enabled
   const ODD_DOCUMENT_REFERENCE = getConfig().features.documentReference.enabled
+  const ODD_CLAIM = getConfig().features.claim.enabled
   return [
     {
       id: CriteriaType.REQUEST,
@@ -112,17 +113,22 @@ const criteriaList: () => CriteriaItemType[] = () => {
             encounterStatus: services.cohortCreation.fetchEncounterStatus
           }
         },
-        {
-          id: CriteriaType.CLAIM,
-          title: CriteriaTypeLabels.CLAIM,
-          color: '#0063AF',
-          fontWeight: 'normal',
-          components: GhmForm,
-          fetch: {
-            ghmData: services.cohortCreation.fetchGhmData,
-            encounterStatus: services.cohortCreation.fetchEncounterStatus
-          }
-        }
+        ...(ODD_CLAIM
+          ? [
+              {
+                id: CriteriaType.CLAIM,
+                title: CriteriaTypeLabels.CLAIM,
+                color: '#0063AF',
+                fontWeight: 'normal',
+                components: GhmForm,
+                fetch: {
+                  ghmData: services.cohortCreation.fetchGhmData,
+                  encounterStatus: services.cohortCreation.fetchEncounterStatus
+                },
+                disabled: !ODD_CLAIM
+              }
+            ]
+          : [])
       ]
     },
     {

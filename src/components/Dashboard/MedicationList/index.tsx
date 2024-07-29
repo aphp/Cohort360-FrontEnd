@@ -94,7 +94,7 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
       }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias, addSearchCriterias }
-  ] = useSearchCriterias(initMedSearchCriterias)
+  ] = useSearchCriterias(initMedSearchCriterias(selectedTab.id))
   const filtersAsArray = useMemo(
     () =>
       selectFiltersAsArray({

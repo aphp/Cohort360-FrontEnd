@@ -5,7 +5,7 @@ import { MedicationLabel, ResourceType } from 'types/requestCriterias'
 
 export const getPMSITab = (tabId?: string) => {
   return (
-    PMSITabs.find((tab) => tab.id.toLocaleLowerCase() === tabId?.toLocaleLowerCase()) ?? {
+    PMSITabs().find((tab) => tab.id.toLocaleLowerCase() === tabId?.toLocaleLowerCase()) ?? {
       id: ResourceType.CONDITION,
       label: PMSILabel.DIAGNOSTIC
     }

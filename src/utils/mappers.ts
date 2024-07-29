@@ -30,6 +30,9 @@ import { comparatorToFilter, parseOccurence } from './valueComparator'
 import services from 'services/aphp'
 import extractFilterParams, { FhirFilterValue } from './fhirFilterParser'
 import { Hierarchy } from 'types/hierarchy'
+import { CodeableConcept, Coding, Condition } from 'fhir/r4'
+import { getConfig } from 'config'
+import { getExtension } from './fhir'
 
 const searchReducer = (accumulator: string, currentValue: string): string =>
   accumulator || !!accumulator === false ? `${accumulator},${currentValue}` : currentValue || accumulator
@@ -136,7 +139,10 @@ export const buildObservationValueFilter = (criterion: ObservationDataType, fhir
       return `${fhirKey}=${valueComparatorFilter}${criterion.searchByValue[0]}`
     }
   }
-  return `${fhirKey}=le0,ge0`
+  if (getConfig().features.observation.useObservationValueRestriction) {
+    return `${fhirKey}=le0,ge0`
+  }
+  return ''
 }
 
 export const unbuildObservationValueFilter = (filters: string[][], currentCriterion: ObservationDataType) => {
@@ -381,4 +387,23 @@ export const unbuildQuestionnaireFilters = (
 
 export const filtersBuilders = (fhirKey: string, value?: string) => {
   return value ? `${fhirKey}=${value}` : ''
+}
+
+export const getPreferedCode = (code?: CodeableConcept): Coding | undefined => {
+  return (
+    code?.coding?.find((c) => c.userSelected === true) ||
+    (!getConfig().core.fhir.selectedCodeOnly ? code?.coding?.[0] : undefined)
+  )
+}
+
+export const getMainDiagnosis = (conditionList: Condition[]): Condition[] => {
+  const appConfig = getConfig()
+  if (appConfig.features.condition.extensions.orbisStatus) {
+    return conditionList.filter(
+      (condition) =>
+        getExtension(condition, appConfig.features.condition.extensions.orbisStatus)?.valueCodeableConcept?.coding?.[0]
+          ?.code === 'dp'
+    )
+  }
+  return conditionList
 }

@@ -89,6 +89,7 @@ import { Hierarchy } from 'types/hierarchy'
 import { getConfig } from 'config'
 
 const REQUETEUR_VERSION = 'v1.6.0'
+const USE_SEARCH_PARAMS_EXTENSIONS = false
 
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   id: 0,
@@ -269,50 +270,66 @@ export const cleanNominativeCriterias = (
 
 export const buildPatientFilter = (criterion: DemographicDataType, deidentified: boolean): string[] => {
   const isDeidentified = deidentified ? PatientsParamsKeys.DATE_DEIDENTIFIED : PatientsParamsKeys.DATE_IDENTIFIED
+  const appConfig = getConfig()
   return [
-    'active=true',
+    ...(appConfig.core.fhir.filterActive ? ['active=true'] : []),
     filtersBuilders(PatientsParamsKeys.GENDERS, buildLabelObjectFilter(criterion.genders)),
     filtersBuilders(PatientsParamsKeys.VITAL_STATUS, buildLabelObjectFilter(criterion.vitalStatus)),
     filtersBuilders(PatientsParamsKeys.BIRTHDATE, buildDateFilter(criterion.birthdates[1], 'le')),
     filtersBuilders(PatientsParamsKeys.BIRTHDATE, buildDateFilter(criterion.birthdates[0], 'ge')),
     filtersBuilders(PatientsParamsKeys.DEATHDATE, buildDateFilter(criterion.deathDates[0], 'ge')),
     filtersBuilders(PatientsParamsKeys.DEATHDATE, buildDateFilter(criterion.deathDates[1], 'le')),
-    criterion.birthdates[0] === null && criterion.birthdates[1] === null
+    appConfig.core.fhir.extraSearchParams && criterion.birthdates[0] === null && criterion.birthdates[1] === null
       ? buildDurationFilter(criterion.age[0], isDeidentified, 'ge', deidentified)
       : '',
-    criterion.birthdates[0] === null && criterion.birthdates[1] === null
+    appConfig.core.fhir.extraSearchParams && criterion.birthdates[0] === null && criterion.birthdates[1] === null
       ? buildDurationFilter(criterion.age[1], isDeidentified, 'le', deidentified)
       : ''
   ]
 }
 
 export const buildEncounterFilter = (criterion: EncounterDataType, deidentified: boolean): string[] => {
+  const appConfig = getConfig()
   const isMinBirthdateDeidentified = deidentified
     ? EncounterParamsKeys.MIN_BIRTHDATE_MONTH
     : EncounterParamsKeys.MIN_BIRTHDATE_DAY
   return [
-    'subject.active=true',
+    ...(appConfig.core.fhir.filterActive ? ['subject.active=true'] : []),
     filtersBuilders(EncounterParamsKeys.ADMISSIONMODE, buildLabelObjectFilter(criterion.admissionMode)),
-    filtersBuilders(EncounterParamsKeys.ENTRYMODE, buildLabelObjectFilter(criterion.entryMode)),
-    filtersBuilders(EncounterParamsKeys.EXITMODE, buildLabelObjectFilter(criterion.exitMode)),
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(EncounterParamsKeys.ENTRYMODE, buildLabelObjectFilter(criterion.entryMode))
+      : '',
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(EncounterParamsKeys.EXITMODE, buildLabelObjectFilter(criterion.exitMode))
+      : '',
     filtersBuilders(EncounterParamsKeys.PRISENCHARGETYPE, buildLabelObjectFilter(criterion.priseEnChargeType)),
-    filtersBuilders(EncounterParamsKeys.TYPEDESEJOUR, buildLabelObjectFilter(criterion.typeDeSejour)),
-    filtersBuilders(EncounterParamsKeys.DESTINATION, buildLabelObjectFilter(criterion.destination)),
-    filtersBuilders(EncounterParamsKeys.PROVENANCE, buildLabelObjectFilter(criterion.provenance)),
-    filtersBuilders(EncounterParamsKeys.ADMISSION, buildLabelObjectFilter(criterion.admission)),
-    filtersBuilders(EncounterParamsKeys.REASON, buildLabelObjectFilter(criterion.reason)),
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(EncounterParamsKeys.TYPEDESEJOUR, buildLabelObjectFilter(criterion.typeDeSejour))
+      : '',
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(EncounterParamsKeys.DESTINATION, buildLabelObjectFilter(criterion.destination))
+      : '',
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(EncounterParamsKeys.PROVENANCE, buildLabelObjectFilter(criterion.provenance))
+      : '',
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(EncounterParamsKeys.ADMISSION, buildLabelObjectFilter(criterion.admission))
+      : '',
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(EncounterParamsKeys.REASON, buildLabelObjectFilter(criterion.reason))
+      : '',
     filtersBuilders(EncounterParamsKeys.SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
     filtersBuilders(EncounterParamsKeys.STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
-    criterion.duration[0] !== null
+    appConfig.core.fhir.extraSearchParams && criterion.duration[0] !== null
       ? buildDurationFilter(criterion?.duration?.[0], EncounterParamsKeys.DURATION, 'ge')
       : '',
-    criterion.duration[1] !== null
+    appConfig.core.fhir.extraSearchParams && criterion.duration[1] !== null
       ? buildDurationFilter(criterion?.duration?.[1], EncounterParamsKeys.DURATION, 'le')
       : '',
-    criterion.age[0] !== null
+    appConfig.core.fhir.extraSearchParams && criterion.age[0] !== null
       ? buildDurationFilter(criterion?.age[0], isMinBirthdateDeidentified, 'ge', deidentified)
       : '',
-    criterion.age[1] !== null
+    appConfig.core.fhir.extraSearchParams && criterion.age[1] !== null
       ? buildDurationFilter(criterion?.age[1], isMinBirthdateDeidentified, 'le', deidentified)
       : '',
     buildEncounterDateFilter(
@@ -326,6 +343,7 @@ export const buildEncounterFilter = (criterion: EncounterDataType, deidentified:
 }
 
 export const buildDocumentFilter = (criterion: DocumentDataType): string[] => {
+  const appConfig = getConfig()
   const docStatusCodeSystem = getConfig().core.codeSystems.docStatus
   const joinDocStatuses = (docStatuses: string[]): string => {
     const filterDocStatuses: string[] = []
@@ -338,13 +356,16 @@ export const buildDocumentFilter = (criterion: DocumentDataType): string[] => {
   }
 
   return [
-    `type:not=doc-impor&contenttype=text/plain&subject.active=true`,
+    ...(appConfig.core.fhir.filterActive ? ['subject.active=true'] : []),
+    'type:not=doc-impor&contenttype=text/plain',
     filtersBuilders(DocumentsParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
     filtersBuilders(
       criterion.searchBy === SearchByTypes.TEXT ? SearchByTypes.TEXT : SearchByTypes.DESCRIPTION,
       buildSearchFilter(criterion.search)
     ),
-    filtersBuilders(DocumentsParamsKeys.DOC_STATUSES, joinDocStatuses(criterion.docStatuses)),
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(DocumentsParamsKeys.DOC_STATUSES, joinDocStatuses(criterion.docStatuses))
+      : '',
     filtersBuilders(
       DocumentsParamsKeys.DOC_TYPES,
       buildLabelObjectFilter(
@@ -369,14 +390,19 @@ export const buildDocumentFilter = (criterion: DocumentDataType): string[] => {
 }
 
 export const buildConditionFilter = (criterion: Cim10DataType): string[] => {
+  const appConfig = getConfig()
   return [
-    'subject.active=true',
+    ...(appConfig.core.fhir.filterActive ? ['subject.active=true'] : []),
     filtersBuilders(
       ConditionParamsKeys.CODE,
       buildLabelObjectFilter(criterion.code, getConfig().features.condition.valueSets.conditionHierarchy.url)
     ),
-    filtersBuilders(ConditionParamsKeys.DIAGNOSTIC_TYPES, buildLabelObjectFilter(criterion.diagnosticType)),
-    criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : '',
+    ...(appConfig.core.fhir.extraSearchParams
+      ? [filtersBuilders(ConditionParamsKeys.DIAGNOSTIC_TYPES, buildLabelObjectFilter(criterion.diagnosticType))]
+      : []),
+    appConfig.core.fhir.extraSearchParams && criterion.source
+      ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE)
+      : '',
     filtersBuilders(ConditionParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
     filtersBuilders(ConditionParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
     filtersBuilders(ConditionParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
@@ -392,8 +418,9 @@ export const buildConditionFilter = (criterion: Cim10DataType): string[] => {
 }
 
 export const buildProcedureFilter = (criterion: CcamDataType): string[] => {
+  const appConfig = getConfig()
   return [
-    'subject.active=true',
+    ...(appConfig.core.fhir.filterActive ? ['subject.active=true'] : []),
     filtersBuilders(
       ProcedureParamsKeys.CODE,
       buildLabelObjectFilter(criterion.code, getConfig().features.procedure.valueSets.procedureHierarchy.url)
@@ -402,7 +429,9 @@ export const buildProcedureFilter = (criterion: CcamDataType): string[] => {
     filtersBuilders(ProcedureParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
     filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
     filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
-    criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : '',
+    appConfig.core.fhir.extraSearchParams && criterion.source
+      ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE)
+      : '',
     buildEncounterDateFilter(
       criterion.type,
       criterion.includeEncounterStartDateNull,
@@ -414,8 +443,9 @@ export const buildProcedureFilter = (criterion: CcamDataType): string[] => {
 }
 
 export const buildClaimFilter = (criterion: GhmDataType): string[] => {
+  const appConfig = getConfig()
   return [
-    'patient.active=true',
+    ...(appConfig.core.fhir.filterActive ? ['patient.active=true'] : []),
     filtersBuilders(
       ClaimParamsKeys.CODE,
       buildLabelObjectFilter(criterion.code, getConfig().features.claim.valueSets.claimHierarchy.url)
@@ -435,14 +465,17 @@ export const buildClaimFilter = (criterion: GhmDataType): string[] => {
 }
 
 export const buildMedicationFilter = (criterion: MedicationDataType): string[] => {
+  const appConfig = getConfig()
   return [
-    'subject.active=true',
-    filtersBuilders(
-      criterion.type === CriteriaType.MEDICATION_REQUEST
-        ? PrescriptionParamsKeys.PRESCRIPTION_ROUTES
-        : AdministrationParamsKeys.ADMINISTRATION_ROUTES,
-      buildLabelObjectFilter(criterion.administration)
-    ),
+    ...(appConfig.core.fhir.filterActive ? ['subject.active=true'] : []),
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(
+          criterion.type === CriteriaType.MEDICATION_REQUEST
+            ? PrescriptionParamsKeys.PRESCRIPTION_ROUTES
+            : AdministrationParamsKeys.ADMINISTRATION_ROUTES,
+          buildLabelObjectFilter(criterion.administration)
+        )
+      : '',
     filtersBuilders(
       criterion.type === CriteriaType.MEDICATION_REQUEST
         ? PrescriptionParamsKeys.EXECUTIVE_UNITS
@@ -467,8 +500,12 @@ export const buildMedicationFilter = (criterion: MedicationDataType): string[] =
       criterion.type === CriteriaType.MEDICATION_REQUEST ? PrescriptionParamsKeys.DATE : AdministrationParamsKeys.DATE,
       buildDateFilter(criterion.startOccurrence[1], 'le')
     ),
-    filtersBuilders(PrescriptionParamsKeys.END_DATE, buildDateFilter(criterion.endOccurrence?.[0], 'ge')),
-    filtersBuilders(PrescriptionParamsKeys.END_DATE, buildDateFilter(criterion.endOccurrence?.[1], 'le')),
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(PrescriptionParamsKeys.END_DATE, buildDateFilter(criterion.endOccurrence?.[0], 'ge'))
+      : '',
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(PrescriptionParamsKeys.END_DATE, buildDateFilter(criterion.endOccurrence?.[1], 'le'))
+      : '',
     criterion.type === CriteriaType.MEDICATION_REQUEST
       ? filtersBuilders(PrescriptionParamsKeys.PRESCRIPTION_TYPES, buildLabelObjectFilter(criterion.prescriptionType))
       : '',
@@ -483,8 +520,12 @@ export const buildMedicationFilter = (criterion: MedicationDataType): string[] =
 }
 
 export const buildObservationFilter = (criterion: ObservationDataType): string[] => {
+  const appConfig = getConfig()
   return [
-    `subject.active=true&${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`,
+    ...(appConfig.core.fhir.filterActive ? ['subject.active=true'] : []),
+    ...(appConfig.features.observation.useObservationDefaultValidated
+      ? [`${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`]
+      : []),
     filtersBuilders(
       ObservationParamsKeys.ANABIO_LOINC,
       buildLabelObjectFilter(criterion.code, getConfig().features.observation.valueSets.biologyHierarchyAnabio.url)
@@ -505,29 +546,50 @@ export const buildObservationFilter = (criterion: ObservationDataType): string[]
 }
 
 export const buildImagingFilter = (criterion: ImagingDataType): string[] => {
+  const appConfig = getConfig()
   return [
-    'patient.active=true',
+    ...(appConfig.core.fhir.filterActive ? ['patient.active=true'] : []),
     filtersBuilders(ImagingParamsKeys.DATE, buildDateFilter(criterion.studyStartDate, 'ge')),
     filtersBuilders(ImagingParamsKeys.DATE, buildDateFilter(criterion.studyEndDate, 'le')),
-    filtersBuilders(ImagingParamsKeys.SERIES_DATE, buildDateFilter(criterion.seriesStartDate, 'ge')),
-    filtersBuilders(ImagingParamsKeys.SERIES_DATE, buildDateFilter(criterion.seriesEndDate, 'le')),
-    filtersBuilders(ImagingParamsKeys.STUDY_DESCRIPTION, buildSearchFilter(criterion.studyDescription)),
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(ImagingParamsKeys.SERIES_DATE, buildDateFilter(criterion.seriesStartDate, 'ge'))
+      : '',
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(ImagingParamsKeys.SERIES_DATE, buildDateFilter(criterion.seriesEndDate, 'le'))
+      : '',
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(ImagingParamsKeys.STUDY_DESCRIPTION, buildSearchFilter(criterion.studyDescription))
+      : '',
     filtersBuilders(ImagingParamsKeys.STUDY_PROCEDURE, buildSearchFilter(criterion.studyProcedure)),
-    filtersBuilders(ImagingParamsKeys.SERIES_DESCRIPTION, buildSearchFilter(criterion.seriesDescription)),
-    filtersBuilders(ImagingParamsKeys.SERIES_PROTOCOL, buildSearchFilter(criterion.seriesProtocol)),
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(ImagingParamsKeys.SERIES_DESCRIPTION, buildSearchFilter(criterion.seriesDescription))
+      : '',
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(ImagingParamsKeys.SERIES_PROTOCOL, buildSearchFilter(criterion.seriesProtocol))
+      : '',
     filtersBuilders(ImagingParamsKeys.MODALITY, buildLabelObjectFilter(criterion.studyModalities)),
-    filtersBuilders(ImagingParamsKeys.SERIES_MODALITIES, buildLabelObjectFilter(criterion.seriesModalities)),
+    appConfig.core.fhir.extraSearchParams
+      ? filtersBuilders(ImagingParamsKeys.SERIES_MODALITIES, buildLabelObjectFilter(criterion.seriesModalities))
+      : '',
     filtersBuilders(ImagingParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
-    filtersBuilders(
-      ImagingParamsKeys.NB_OF_SERIES,
-      buildComparatorFilter(criterion.numberOfSeries, criterion.seriesComparator)
-    ),
-    filtersBuilders(
-      ImagingParamsKeys.NB_OF_INS,
-      buildComparatorFilter(criterion.numberOfIns, criterion.instancesComparator)
-    ),
+    ...(USE_SEARCH_PARAMS_EXTENSIONS
+      ? [
+          filtersBuilders(
+            ImagingParamsKeys.NB_OF_SERIES,
+            buildComparatorFilter(criterion.numberOfSeries, criterion.seriesComparator)
+          )
+        ]
+      : []),
+    ...(USE_SEARCH_PARAMS_EXTENSIONS
+      ? [
+          filtersBuilders(
+            ImagingParamsKeys.NB_OF_INS,
+            buildComparatorFilter(criterion.numberOfIns, criterion.instancesComparator)
+          )
+        ]
+      : []),
     filtersBuilders(ImagingParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
-    buildWithDocumentFilter(criterion, ImagingParamsKeys.WITH_DOCUMENT),
+    appConfig.core.fhir.extraSearchParams ? buildWithDocumentFilter(criterion, ImagingParamsKeys.WITH_DOCUMENT) : '',
     buildSimpleFilter(
       criterion.studyUid,
       ImagingParamsKeys.STUDY_UID,
@@ -545,8 +607,9 @@ export const buildImagingFilter = (criterion: ImagingDataType): string[] => {
 }
 
 export const buildPregnancyFilter = (criterion: PregnancyDataType): string[] => {
+  const appConfig = getConfig()
   return [
-    'subject.active=true',
+    ...(appConfig.core.fhir.filterActive ? ['subject.active=true'] : []),
     `questionnaire.name=${FormNames.PREGNANCY}`,
     'status=in-progress,completed',
     filtersBuilders(
@@ -605,8 +668,9 @@ export const buildPregnancyFilter = (criterion: PregnancyDataType): string[] => 
 }
 
 export const buildHospitFilter = (criterion: HospitDataType): string[] => {
+  const appConfig = getConfig()
   return [
-    'subject.active=true',
+    ...(appConfig.core.fhir.filterActive ? ['subject.active=true'] : []),
     `questionnaire.name=${FormNames.HOSPIT}`,
     'status=in-progress,completed',
     filtersBuilders(

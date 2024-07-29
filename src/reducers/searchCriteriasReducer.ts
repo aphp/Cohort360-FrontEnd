@@ -20,6 +20,8 @@ import {
   MaternityFormFilters
 } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
+import { ResourceType } from 'types/requestCriterias'
+import { getConfig } from 'config'
 
 export const initCohortsSearchCriterias: SearchCriterias<CohortsFilters> = {
   orderBy: {
@@ -47,19 +49,19 @@ export const initSearchPatientsSearchCriterias: SearchCriterias<null> = {
   filters: null
 }
 
-export const initPatientsSearchCriterias: SearchCriterias<PatientsFilters> = {
+export const initPatientsSearchCriterias: () => SearchCriterias<PatientsFilters> = () => ({
   orderBy: {
     orderBy: Order.FAMILY,
     orderDirection: Direction.ASC
   },
   searchInput: '',
-  searchBy: SearchByTypes.TEXT,
+  searchBy: getConfig().core.fhir.textSearch ? SearchByTypes.TEXT : SearchByTypes.FAMILY,
   filters: {
     genders: [],
     birthdatesRanges: [null, null],
     vitalStatuses: []
   }
-}
+})
 
 export const initPmsiSearchCriterias: SearchCriterias<PMSIFilters> = {
   orderBy: {
@@ -81,9 +83,11 @@ export const initPmsiSearchCriterias: SearchCriterias<PMSIFilters> = {
   }
 }
 
-export const initMedSearchCriterias: SearchCriterias<MedicationFilters> = {
+export const initMedSearchCriterias: (
+  medType: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION
+) => SearchCriterias<MedicationFilters> = (medType) => ({
   orderBy: {
-    orderBy: Order.PERIOD_START,
+    orderBy: medType === ResourceType.MEDICATION_REQUEST ? Order.DATE : Order.EFFECTIVE_TIME,
     orderDirection: Direction.DESC
   },
   searchInput: '',
@@ -98,9 +102,9 @@ export const initMedSearchCriterias: SearchCriterias<MedicationFilters> = {
     prescriptionTypes: [],
     encounterStatus: []
   }
-}
+})
 
-export const initBioSearchCriterias: SearchCriterias<BiologyFilters> = {
+export const initBioSearchCriterias: () => SearchCriterias<BiologyFilters> = () => ({
   orderBy: {
     orderBy: Order.DATE,
     orderDirection: Direction.ASC
@@ -108,7 +112,7 @@ export const initBioSearchCriterias: SearchCriterias<BiologyFilters> = {
   searchInput: '',
   searchBy: SearchByTypes.TEXT,
   filters: {
-    validatedStatus: true,
+    validatedStatus: getConfig().features.observation.useObservationDefaultValidated,
     nda: '',
     loinc: [],
     anabio: [],
@@ -117,7 +121,7 @@ export const initBioSearchCriterias: SearchCriterias<BiologyFilters> = {
     executiveUnits: [],
     encounterStatus: []
   }
-}
+})
 
 export const initPatientDocsSearchCriterias: SearchCriterias<DocumentsFilters> = {
   orderBy: {

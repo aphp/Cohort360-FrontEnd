@@ -8,3 +8,5 @@ export const REFRESH_TOKEN = 'refresh_token'
 export const IMPERSONATED_USER = 'impersonated_user'
 
 export const EXPLORATION = 'Exploration'
+
+export const USE_FHIR_ENCOUNTER_CARE_SITE = false

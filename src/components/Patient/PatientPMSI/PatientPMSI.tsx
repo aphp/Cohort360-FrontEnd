@@ -43,6 +43,7 @@ import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
 import { getPMSITab } from 'utils/tabsUtils'
+import { getConfig } from 'config'
 
 type PmsiSearchResults = {
   deidentified: boolean
@@ -52,10 +53,12 @@ type PmsiSearchResults = {
   label: PMSILabel
 }
 
-export const PMSITabs: PmsiTab[] = [
+export const PMSITabs: () => PmsiTab[] = () => [
   { label: PMSILabel.DIAGNOSTIC, id: ResourceType.CONDITION },
   { label: PMSILabel.CCAM, id: ResourceType.PROCEDURE },
-  { label: PMSILabel.GHM, id: ResourceType.CLAIM }
+  ...(getConfig().features.claim.enabled
+    ? ([{ label: PMSILabel.GHM, id: ResourceType.CLAIM }] as PmsiTab[])
+    : ([] as PmsiTab[]))
 ]
 
 const PatientPMSI = () => {
@@ -288,7 +291,7 @@ const PatientPMSI = () => {
           <Grid container alignItems="center">
             <Grid item xs={12} md={12} lg={4} xl={4}>
               <Tabs
-                values={PMSITabs}
+                values={PMSITabs()}
                 active={selectedTab}
                 onchange={(value: PmsiTab) => {
                   setOldTabs(selectedTab)

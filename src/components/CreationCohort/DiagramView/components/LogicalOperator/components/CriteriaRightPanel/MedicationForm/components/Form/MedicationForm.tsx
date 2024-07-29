@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import {
   Alert,
@@ -32,6 +32,7 @@ import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
+import { AppConfig } from 'config'
 
 type MedicationFormProps = {
   isOpen: boolean
@@ -54,7 +55,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
 
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
-
+  const appConfig = useContext(AppConfig)
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const currentState = { ...selectedCriteria, ...initialState }
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
@@ -231,17 +232,19 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               renderInput={(params) => <TextField {...params} label="Type de prescription" />}
             />
           )}
-          <Autocomplete
-            multiple
-            id="criteria-prescription-type-autocomplete"
-            className={classes.inputItem}
-            options={criteriaData.data.administrations || []}
-            getOptionLabel={(option) => option.label}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            value={selectedCriteriaAdministration}
-            onChange={(e, value) => onChangeValue('administration', value)}
-            renderInput={(params) => <TextField {...params} label="Voie d'administration" />}
-          />
+          {appConfig.core.fhir.extraSearchParams && (
+            <Autocomplete
+              multiple
+              id="criteria-prescription-type-autocomplete"
+              className={classes.inputItem}
+              options={criteriaData.data.administrations || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={selectedCriteriaAdministration}
+              onChange={(e, value) => onChangeValue('administration', value)}
+              renderInput={(params) => <TextField {...params} label="Voie d'administration" />}
+            />
+          )}
           <Autocomplete
             multiple
             options={criteriaData.data.encounterStatus || []}

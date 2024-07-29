@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 import {
   Alert,
@@ -26,6 +26,7 @@ import { CriteriaDataKey, DemographicDataType, CriteriaType } from 'types/reques
 import { BlockWrapper } from 'components/ui/Layout'
 import { CriteriaDrawerComponentProps, CriteriaItemDataCache } from 'types'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
+import { AppConfig } from 'config'
 
 enum Error {
   INCOHERENT_AGE_ERROR,
@@ -61,6 +62,7 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
   const [isInclusive, setIsInclusive] = useState<boolean>(
     selectedCriteria?.isInclusive === undefined ? true : selectedCriteria?.isInclusive
   )
+  const appConfig = useContext(AppConfig)
 
   const selectedPopulation = useAppSelector((state) => state.cohortCreation.request.selectedPopulation || [])
 
@@ -183,24 +185,26 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
             </BlockWrapper>
           )}
 
-          <BlockWrapper margin="1em">
-            <CriteriaLabel
-              label={
-                vitalStatus &&
-                vitalStatus.length === 1 &&
-                vitalStatus.find((status: LabelObject) => status.label === VitalStatusLabel.DECEASED)
-                  ? VitalStatusOptionsLabel.deceasedAge
-                  : VitalStatusOptionsLabel.age
-              }
-            />
-            <DurationRange
-              value={age}
-              active={!birthdates[0] || !birthdates[1]}
-              onChange={(value) => setAge(value)}
-              onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
-              deidentified={deidentified}
-            />
-          </BlockWrapper>
+          {appConfig.core.fhir.extraSearchParams && (
+            <BlockWrapper margin="1em">
+              <CriteriaLabel
+                label={
+                  vitalStatus &&
+                  vitalStatus.length === 1 &&
+                  vitalStatus.find((status: LabelObject) => status.label === VitalStatusLabel.DECEASED)
+                    ? VitalStatusOptionsLabel.deceasedAge
+                    : VitalStatusOptionsLabel.age
+                }
+              />
+              <DurationRange
+                value={age}
+                active={!birthdates[0] || !birthdates[1]}
+                onChange={(value) => setAge(value)}
+                onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+                deidentified={deidentified}
+              />
+            </BlockWrapper>
+          )}
           {!deidentified &&
             vitalStatus &&
             (vitalStatus.length === 0 ||

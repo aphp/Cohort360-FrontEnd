@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+/* eslint-disable max-statements */
+import React, { useContext, useEffect, useState } from 'react'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import {
@@ -32,6 +33,7 @@ import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnit'
+import { AppConfig } from 'config'
 
 enum Error {
   EMPTY_FORM,
@@ -51,6 +53,7 @@ const EncounterForm = ({
   goBack,
   onChangeSelectedCriteria
 }: CriteriaDrawerComponentProps) => {
+  const appConfig = useContext(AppConfig)
   const criteria = selectedCriteria as EncounterDataType
   const [title, setTitle] = useState(criteria?.title || 'Critère de prise en charge')
   const [age, setAge] = useState<DurationRangeType>(criteria?.age || [null, null])
@@ -247,42 +250,46 @@ const EncounterForm = ({
             />
           </BlockWrapper>
 
-          <BlockWrapper container className={classes.inputItem}>
-            <CriteriaLabel label="Durée de la prise en charge" infoIcon="Ne concerne pas les consultations" />
-            <DurationRange
-              value={duration}
-              unit={'Durée'}
-              onChange={(value) => setDuration(value)}
-              onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
-            />
-          </BlockWrapper>
+          {appConfig.core.fhir.extraSearchParams && (
+            <>
+              <BlockWrapper container className={classes.inputItem}>
+                <CriteriaLabel label="Durée de la prise en charge" infoIcon="Ne concerne pas les consultations" />
+                <DurationRange
+                  value={duration}
+                  unit={'Durée'}
+                  onChange={(value) => setDuration(value)}
+                  onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+                />
+              </BlockWrapper>
 
-          <BlockWrapper className={classes.inputItem}>
-            <CriteriaLabel label="Date de prise en charge" infoIcon="Ne concerne pas les consultations" />
+              <BlockWrapper className={classes.inputItem}>
+                <CriteriaLabel label="Date de prise en charge" infoIcon="Ne concerne pas les consultations" />
 
-            <FormLabel style={{ padding: '0 0 0.5em', fontWeight: 600, fontSize: 12 }} component="legend">
-              Début de prise en charge
-            </FormLabel>
-            <CalendarRange
-              inline
-              value={encounterStartDate}
-              onChange={(newStartDate) => setEncounterStartDate(newStartDate)}
-              onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
-              includeNullValues={includeEncounterStartDateNull}
-              onChangeIncludeNullValues={(includeNullValues) => setIncludeEncounterStartDateNull(includeNullValues)}
-            />
-            <FormLabel style={{ padding: '1em 0 0.5em', fontWeight: 600, fontSize: 12 }} component="legend">
-              Fin de prise en charge
-            </FormLabel>
-            <CalendarRange
-              inline
-              value={encounterEndDate}
-              onChange={(newEndDate) => setEncounterEndDate(newEndDate)}
-              onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
-              includeNullValues={includeEncounterEndDateNull}
-              onChangeIncludeNullValues={(includeNullValues) => setIncludeEncounterEndDateNull(includeNullValues)}
-            />
-          </BlockWrapper>
+                <FormLabel style={{ padding: '0 0 0.5em', fontWeight: 600, fontSize: 12 }} component="legend">
+                  Début de prise en charge
+                </FormLabel>
+                <CalendarRange
+                  inline
+                  value={encounterStartDate}
+                  onChange={(newStartDate) => setEncounterStartDate(newStartDate)}
+                  onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+                  includeNullValues={includeEncounterStartDateNull}
+                  onChangeIncludeNullValues={(includeNullValues) => setIncludeEncounterStartDateNull(includeNullValues)}
+                />
+                <FormLabel style={{ padding: '1em 0 0.5em', fontWeight: 600, fontSize: 12 }} component="legend">
+                  Fin de prise en charge
+                </FormLabel>
+                <CalendarRange
+                  inline
+                  value={encounterEndDate}
+                  onChange={(newEndDate) => setEncounterEndDate(newEndDate)}
+                  onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+                  includeNullValues={includeEncounterEndDateNull}
+                  onChangeIncludeNullValues={(includeNullValues) => setIncludeEncounterEndDateNull(includeNullValues)}
+                />
+              </BlockWrapper>
+            </>
+          )}
 
           <BlockWrapper className={classes.inputItem}>
             <Collapse title="Général" value={false}>
@@ -298,18 +305,20 @@ const EncounterForm = ({
                   renderInput={(params) => <TextField {...params} label="Type de prise en charge" />}
                 />
               </BlockWrapper>
-              <BlockWrapper className={classes.inputItem}>
-                <Autocomplete
-                  multiple
-                  id="criteria-TypeDeSejour-autocomplete"
-                  options={criteriaData.data.typeDeSejour || []}
-                  getOptionLabel={(option) => option.label}
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
-                  value={typeDeSejour}
-                  onChange={(e, value) => setTypeDeSejour(value)}
-                  renderInput={(params) => <TextField {...params} label="Type séjour" />}
-                />
-              </BlockWrapper>
+              {appConfig.core.fhir.extraSearchParams && (
+                <BlockWrapper className={classes.inputItem}>
+                  <Autocomplete
+                    multiple
+                    id="criteria-TypeDeSejour-autocomplete"
+                    options={criteriaData.data.typeDeSejour || []}
+                    getOptionLabel={(option) => option.label}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    value={typeDeSejour}
+                    onChange={(e, value) => setTypeDeSejour(value)}
+                    renderInput={(params) => <TextField {...params} label="Type séjour" />}
+                  />
+                </BlockWrapper>
+              )}
               <BlockWrapper className={classes.inputItem}>
                 <Autocomplete
                   multiple
@@ -335,80 +344,85 @@ const EncounterForm = ({
                 onChange={(e, value) => setAdmissionMode(value)}
                 renderInput={(params) => <TextField {...params} label="Motif Admission" />}
               />
-
-              <Autocomplete
-                multiple
-                id="criteria-admission-autocomplete"
-                options={criteriaData.data.admission || []}
-                getOptionLabel={(option) => option.label}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={admission}
-                onChange={(e, value) => setAdmission(value)}
-                renderInput={(params) => <TextField {...params} label="Type Admission" />}
-              />
+              {appConfig.core.fhir.extraSearchParams && (
+                <Autocomplete
+                  multiple
+                  id="criteria-admission-autocomplete"
+                  options={criteriaData.data.admission || []}
+                  getOptionLabel={(option) => option.label}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={admission}
+                  onChange={(e, value) => setAdmission(value)}
+                  renderInput={(params) => <TextField {...params} label="Type Admission" />}
+                />
+              )}
             </Collapse>
           </BlockWrapper>
-          <BlockWrapper className={classes.inputItem}>
-            <Collapse title="Entrée / Sortie" value={false}>
-              <Autocomplete
-                multiple
-                id="criteria-entryMode-autocomplete"
-                options={criteriaData.data.entryModes || []}
-                getOptionLabel={(option) => option.label}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={entryMode}
-                onChange={(e, value) => setEntryMode(value)}
-                renderInput={(params) => <TextField {...params} label="Mode entrée" />}
-              />
+          {appConfig.core.fhir.extraSearchParams && (
+            <BlockWrapper className={classes.inputItem}>
+              <Collapse title="Entrée / Sortie" value={false}>
+                <Autocomplete
+                  multiple
+                  id="criteria-entryMode-autocomplete"
+                  options={criteriaData.data.entryModes || []}
+                  getOptionLabel={(option) => option.label}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={entryMode}
+                  onChange={(e, value) => setEntryMode(value)}
+                  renderInput={(params) => <TextField {...params} label="Mode entrée" />}
+                />
 
-              <Autocomplete
-                multiple
-                id="criteria-exitMode-autocomplete"
-                options={criteriaData.data.exitModes || []}
-                getOptionLabel={(option) => option.label}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={exitMode}
-                onChange={(e, value) => setExitMode(value)}
-                renderInput={(params) => <TextField {...params} label="Mode sortie" />}
-              />
+                <Autocomplete
+                  multiple
+                  id="criteria-exitMode-autocomplete"
+                  options={criteriaData.data.exitModes || []}
+                  getOptionLabel={(option) => option.label}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={exitMode}
+                  onChange={(e, value) => setExitMode(value)}
+                  renderInput={(params) => <TextField {...params} label="Mode sortie" />}
+                />
 
-              <Autocomplete
-                multiple
-                id="criteria-reason-autocomplete"
-                options={criteriaData.data.reason || []}
-                getOptionLabel={(option) => option.label}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={reason}
-                onChange={(e, value) => setReason(value)}
-                renderInput={(params) => <TextField {...params} label="Type sortie" />}
-              />
-            </Collapse>
-          </BlockWrapper>
-          <BlockWrapper className={classes.inputItem}>
-            <Collapse title="Destination / Provenance" value={false}>
-              <Autocomplete
-                multiple
-                id="criteria-destination-autocomplete"
-                options={criteriaData.data.destination || []}
-                getOptionLabel={(option) => option.label}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={destination}
-                onChange={(e, value) => setDestination(value)}
-                renderInput={(params) => <TextField {...params} label="Destination" />}
-              />
+                <Autocomplete
+                  multiple
+                  id="criteria-reason-autocomplete"
+                  options={criteriaData.data.reason || []}
+                  getOptionLabel={(option) => option.label}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={reason}
+                  onChange={(e, value) => setReason(value)}
+                  renderInput={(params) => <TextField {...params} label="Type sortie" />}
+                />
+              </Collapse>
+            </BlockWrapper>
+          )}
+          {appConfig.core.fhir.extraSearchParams && (
+            <BlockWrapper className={classes.inputItem}>
+              <Collapse title="Destination / Provenance" value={false}>
+                <Autocomplete
+                  multiple
+                  id="criteria-destination-autocomplete"
+                  options={criteriaData.data.destination || []}
+                  getOptionLabel={(option) => option.label}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={destination}
+                  onChange={(e, value) => setDestination(value)}
+                  renderInput={(params) => <TextField {...params} label="Destination" />}
+                />
 
-              <Autocomplete
-                multiple
-                id="criteria-provenance-autocomplete"
-                options={criteriaData.data.provenance || []}
-                getOptionLabel={(option) => option.label}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={provenance}
-                onChange={(e, value) => setProvenance(value)}
-                renderInput={(params) => <TextField {...params} label="Provenance" />}
-              />
-            </Collapse>
-          </BlockWrapper>
+                <Autocomplete
+                  multiple
+                  id="criteria-provenance-autocomplete"
+                  options={criteriaData.data.provenance || []}
+                  getOptionLabel={(option) => option.label}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={provenance}
+                  onChange={(e, value) => setProvenance(value)}
+                  renderInput={(params) => <TextField {...params} label="Provenance" />}
+                />
+              </Collapse>
+            </BlockWrapper>
+          )}
           <Grid className={classes.criteriaActionContainer}>
             {!isEdition && (
               <Button onClick={goBack} variant="outlined">

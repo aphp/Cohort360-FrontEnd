@@ -5,6 +5,7 @@ import Chip from 'components/ui/Chip'
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
 import { ScopeElement } from 'types'
 import { Hierarchy } from 'types/hierarchy'
+import { perimeterDisplay } from 'utils/perimeters'
 
 type SelectedCodesProps<T> = {
   values: Hierarchy<ScopeElement, T>[]
@@ -44,7 +45,7 @@ const SelectedCodes = <T,>({ values, onDelete }: SelectedCodesProps<T>) => {
                 <Chip
                   key={code.id}
                   style={{ backgroundColor: '#D1E2F4', color: '153D8A important!' }}
-                  label={`${code.source_value} - ${code.name}`}
+                  label={perimeterDisplay(code.source_value, code.name)}
                   onDelete={() => onDelete(code)}
                 />
               ))}
