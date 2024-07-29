@@ -42,6 +42,8 @@ import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { AlertWrapper } from 'components/ui/Alert'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
+import { useSearchParams } from 'react-router-dom'
+import { checkIfPageAvailable } from 'utils/paginationUtils'
 
 export type PatientPMSIProps = {
   groupId?: string
@@ -61,6 +63,9 @@ type PmsiSearchResults = {
 
 const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const { classes } = useStyles()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const getPageParam = searchParams.get('page')
+
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
@@ -86,7 +91,8 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
       : selectedTab.id === ResourceType.PROCEDURE
       ? SourceType.CCAM
       : SourceType.GHM
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
+
   const {
     allSavedFilters,
     savedFiltersErrors,
@@ -131,6 +137,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
+  const isFirstRender = useRef(true)
 
   const _fetchPMSI = async () => {
     try {
@@ -151,6 +158,9 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
           signal: controllerRef.current?.signal
         })
       )
+      if (response) {
+        checkIfPageAvailable(searchResults.total, page, setPage)
+      }
       if (response.payload.error) {
         throw response.payload.error
       }
@@ -182,14 +192,20 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   }, [])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
-    setPage(1)
-    setOldTabs(selectedTab)
+    if (!isFirstRender.current) {
+      setLoadingStatus(LoadingStatus.IDDLE)
+      setPage(1)
+      setOldTabs(selectedTab)
+    }
   }, [searchInput, nda, code, startDate, endDate, diagnosticTypes, source, orderBy, executiveUnits, encounterStatus])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setOldTabs(selectedTab)
+
+    const updatedSearchParams = new URLSearchParams(searchParams)
+    updatedSearchParams.set('page', page.toString())
+    setSearchParams(updatedSearchParams)
   }, [page])
 
   useEffect(() => {
@@ -201,7 +217,11 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   }, [loadingStatus])
 
   useEffect(() => {
-    setPage(1)
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+    } else {
+      setPage(1)
+    }
     removeSearchCriterias()
     setTriggerClean(!triggerClean)
     setLoadingStatus(LoadingStatus.IDDLE)

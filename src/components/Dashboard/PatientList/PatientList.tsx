@@ -48,15 +48,19 @@ import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { ResourceType } from 'types/requestCriterias'
 import List from 'components/ui/List'
 import { useAppSelector } from 'state'
+import { useSearchParams } from 'react-router-dom'
+import { checkIfPageAvailable } from 'utils/paginationUtils'
 
 type PatientListProps = {
   total: number
   groupId?: string
   deidentified?: boolean | null
-  loading?: boolean
 }
 
 const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const getPageParam = searchParams.get('page')
+
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
@@ -76,7 +80,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
       resetSavedFilterError
     }
   } = useSavedFilters<PatientsFilters>(ResourceType.PATIENT)
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total, label: 'patient(s)' })
   const [patientsList, setPatientsList] = useState<CohortPatient[]>([])
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
@@ -104,10 +108,14 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
+  const isFirstRender = useRef(true)
 
   const fetchPatients = async () => {
     try {
-      const includeFacets = page === 1
+      const includeFacets = isFirstRender.current || page === 1
+      if (isFirstRender.current) {
+        isFirstRender.current = false
+      }
       setLoadingStatus(LoadingStatus.FETCHING)
       const result = await services.cohorts.fetchPatientList(
         {
@@ -132,6 +140,8 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
           if (agePyramidData) setAgePyramid(agePyramidData)
         }
         setPatientsResult((ps) => ({ ...ps, nb: totalPatients, label: 'patient(s)' }))
+
+        checkIfPageAvailable(totalPatients, page, setPage)
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {
@@ -147,12 +157,15 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   }, [])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
-    setPage(1)
+    if (!isFirstRender.current) {
+      setLoadingStatus(LoadingStatus.IDDLE)
+      setPage(1)
+    }
   }, [genders, vitalStatuses, birthdatesRanges, orderBy, searchBy, searchInput, groupId])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
+    setSearchParams({ page: page.toString() })
   }, [page])
 
   useEffect(() => {

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 
-import { CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Pagination } from '@mui/material'
+import { CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
 import DocumentTable from 'components/Patient/PatientTimeline/HospitDialog/DocumentTable/DocumentTable'
+import { Pagination } from 'components/ui/Pagination'
 
 import { CohortComposition } from 'types'
 
@@ -19,7 +20,7 @@ const HospitDialog: React.FC<HospitDialogTypes> = ({ deidentified, open, onClose
   const documentLines = 4 // Number of desired lines in the document array
   const [page, setPage] = useState(1)
 
-  const handleChange = (_event: React.ChangeEvent<unknown>, value: React.SetStateAction<number>) => {
+  const handleChange = (value: React.SetStateAction<number>) => {
     setPage(value)
   }
 
@@ -54,11 +55,9 @@ const HospitDialog: React.FC<HospitDialogTypes> = ({ deidentified, open, onClose
       </DialogContent>
       <DialogActions>
         <Pagination
-          className={classes.pagination}
           count={Math.ceil((documents?.length ?? 0) / documentLines)}
-          variant="outlined"
-          shape="circular"
-          onChange={handleChange}
+          currentPage={page}
+          onPageChange={handleChange}
         />
       </DialogActions>
     </Dialog>
