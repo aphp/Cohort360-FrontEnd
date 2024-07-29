@@ -50,9 +50,13 @@ import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import services from 'services/aphp'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
+import { useSearchParams } from 'react-router-dom'
+import { checkIfPageAvailable } from 'utils/paginationUtils'
 
 const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const getPageParam = searchParams.get('page')
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
@@ -85,7 +89,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   } = useSavedFilters<DocumentsFilters>(ResourceType.DOCUMENTS)
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const [
     {
       orderBy,
@@ -112,6 +116,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   const controllerRef = useRef<AbortController>(new AbortController())
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
+  const isFirstRender = useRef(true)
 
   const docStatusesList = [FilterByDocumentStatus.VALIDATED, FilterByDocumentStatus.NOT_VALIDATED]
   const fetchDocumentsList = async () => {
@@ -141,6 +146,9 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
           signal: controllerRef.current?.signal
         })
       )
+      if (response) {
+        checkIfPageAvailable(searchResults.totalDocs, page, setPage)
+      }
       if (response.payload.error) {
         throw response.payload.error
       }
@@ -161,8 +169,12 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   }, [])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
-    setPage(1)
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+    } else {
+      setLoadingStatus(LoadingStatus.IDDLE)
+      setPage(1)
+    }
   }, [
     onlyPdfAvailable,
     nda,
@@ -179,6 +191,9 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
+    const updatedSearchParams = new URLSearchParams(searchParams)
+    updatedSearchParams.set('page', page.toString())
+    setSearchParams(updatedSearchParams)
   }, [page])
 
   useEffect(() => {
