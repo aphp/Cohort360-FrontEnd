@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'state'
 
-import { Chip, CircularProgress, CssBaseline, Grid, Pagination, Typography } from '@mui/material'
+import { Chip, CircularProgress, CssBaseline, Grid, Typography } from '@mui/material'
 
 import useStyles from './styles'
 import { FilterList } from '@mui/icons-material'
@@ -26,6 +26,9 @@ import Button from 'components/ui/Button'
 import ResearchTable from 'components/CohortsTable'
 import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
 import servicesCohorts from 'services/aphp/serviceCohorts'
+import { Pagination } from 'components/ui/Pagination'
+import { useSearchParams } from 'react-router-dom'
+import { checkIfPageAvailable } from 'utils/paginationUtils'
 
 const statusOptions = [
   {
@@ -47,6 +50,9 @@ type MyCohortsProps = {
 }
 
 const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const getPageParam = searchParams.get('page')
+
   const { classes, cx } = useStyles()
   const openDrawer = useAppSelector((state) => state.drawer)
   const cohortState = useAppSelector((state) => state.cohort)
@@ -57,7 +63,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
 
   const [cohortList, setCohortList] = useState(cohortState.cohortsList)
   const [toggleModal, setToggleModal] = useState(false)
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
 
   const [
@@ -75,11 +81,12 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
   }, [status, startDate, endDate, minPatients, maxPatients, favorite])
 
   const controllerRef = useRef<AbortController>(new AbortController())
+  const isFirstRender = useRef(true)
 
   const onFetchCohorts = async () => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
-      await dispatch(
+      const response = await dispatch(
         fetchCohorts({
           options: {
             page: page,
@@ -88,6 +95,9 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
           signal: controllerRef.current?.signal
         })
       )
+      if (response) {
+        checkIfPageAvailable(cohortState.count, page, setPage)
+      }
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {
       if (error instanceof CanceledError) {
@@ -131,12 +141,17 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
   }, [favoriteUrl])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
-    setPage(1)
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+    } else {
+      setLoadingStatus(LoadingStatus.IDDLE)
+      setPage(1)
+    }
   }, [status, startDate, endDate, minPatients, maxPatients, searchInput, orderBy, favorite])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
+    setSearchParams({ page: page.toString() })
   }, [page])
 
   useEffect(() => {
@@ -239,11 +254,9 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
 
             {loadingStatus === LoadingStatus.SUCCESS && cohortList.length > 0 && (
               <Pagination
-                className={classes.pagination}
+                currentPage={page}
                 count={Math.ceil((cohortState.count ?? 0) / 20)}
-                shape="circular"
-                onChange={(_, page: number) => setPage && setPage(page)}
-                page={page}
+                onPageChange={(newPage) => setPage && setPage(newPage)}
               />
             )}
           </Grid>

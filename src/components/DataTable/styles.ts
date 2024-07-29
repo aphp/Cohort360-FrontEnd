@@ -45,18 +45,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     height: 25,
     fill: '#0063AF'
   },
-  pagination: {
-    margin: '10px 0',
-    float: 'right',
-    '& button': {
-      backgroundColor: '#fff',
-      color: '#5BC5F2'
-    },
-    '& .MuiPaginationItem-page.Mui-selected': {
-      color: '#0063AF',
-      backgroundColor: '#FFF'
-    }
-  },
   emptyTableRow: {
     minHeight: `calc(100vh - 500px)`,
     height: `calc(100vh - 500px)`,
