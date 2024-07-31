@@ -16,7 +16,7 @@ import HospitForm from './DiagramView/components/LogicalOperator/components/Crit
 
 import services from 'services/aphp'
 
-import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION } from '../../constants'
+import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION, ODD_QUESTIONNAIRE } from '../../constants'
 import { CriteriaType, CriteriaTypeLabels } from 'types/requestCriterias'
 
 const criteriaList: CriteriaItemType[] = [
@@ -123,8 +123,8 @@ const criteriaList: CriteriaItemType[] = [
     title: 'Médicaments (Prescription - Administration)',
     color: ODD_MEDICATION ? '#0063AF' : '#808080',
     fontWeight: 'bold',
-    components: ODD_MEDICATION ? MedicationForm : null,
-    disabled: !ODD_MEDICATION ?? false,
+    components: MedicationForm,
+    disabled: !ODD_MEDICATION,
     fetch: {
       medicationData: services.cohortCreation.fetchMedicationData,
       prescriptionTypes: services.cohortCreation.fetchPrescriptionTypes,
@@ -135,17 +135,17 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: CriteriaType.BIO_MICRO,
     title: CriteriaTypeLabels.BIO_MICRO,
-    color: !!ODD_BIOLOGY ? '#0063AF' : '#808080',
+    color: ODD_BIOLOGY ? '#0063AF' : '#808080',
     fontWeight: 'bold',
     components: null,
     subItems: [
       {
         id: CriteriaType.OBSERVATION,
         title: CriteriaTypeLabels.OBSERVATION,
-        color: !!ODD_BIOLOGY ? '#0063AF' : '#808080',
+        color: ODD_BIOLOGY ? '#0063AF' : '#808080',
         fontWeight: 'normal',
-        components: !!ODD_BIOLOGY ? BiologyForm : null,
-        disabled: !!!ODD_BIOLOGY ?? false,
+        components: BiologyForm,
+        disabled: !ODD_BIOLOGY,
         fetch: {
           biologyData: services.cohortCreation.fetchBiologyData,
           encounterStatus: services.cohortCreation.fetchEncounterStatus
@@ -174,14 +174,13 @@ const criteriaList: CriteriaItemType[] = [
         components: null,
         color: '#0063AF',
         fontWeight: 'normal',
-        disabled: false,
         subItems: [
           {
             id: CriteriaType.PREGNANCY,
             title: 'Fiche Grossesse',
-            color: '#0063AF',
+            color: ODD_QUESTIONNAIRE ? '#0063AF' : '#808080',
             fontWeight: 'normal',
-            disabled: false,
+            disabled: !ODD_QUESTIONNAIRE,
             components: PregnantForm,
             fetch: {
               pregnancyMode: services.cohortCreation.fetchPregnancyMode,
@@ -197,9 +196,9 @@ const criteriaList: CriteriaItemType[] = [
           {
             id: CriteriaType.HOSPIT,
             title: 'Hospitalisation',
-            color: '#0063AF',
+            color: ODD_QUESTIONNAIRE ? '#0063AF' : '#808080',
             fontWeight: 'normal',
-            disabled: false,
+            disabled: !ODD_QUESTIONNAIRE,
             components: HospitForm,
             fetch: {
               inUteroTransfer: services.cohortCreation.fetchInUteroTransfer,
@@ -243,8 +242,8 @@ const criteriaList: CriteriaItemType[] = [
     title: CriteriaTypeLabels.IMAGING,
     color: ODD_IMAGING ? '#0063AF' : '#808080',
     fontWeight: 'bold',
-    components: ODD_IMAGING ? ImagingForm : null,
-    disabled: !ODD_IMAGING ?? false,
+    components: ImagingForm,
+    disabled: !ODD_IMAGING,
     fetch: {
       modalities: services.cohortCreation.fetchModalities,
       encounterStatus: services.cohortCreation.fetchEncounterStatus

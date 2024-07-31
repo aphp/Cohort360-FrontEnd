@@ -36,6 +36,8 @@ const TimelineItemLeft: React.FC<TimelineItemLeftTypes> = ({ data, open, dotHeig
   }
 
   const { classes } = useStyles({ dotHeight: dotHeight, color: color })
+  const periodStart = data.period?.start ? new Date(data.period.start).toLocaleDateString('fr-FR') : '-'
+  const periodEnd = data.period?.end ? new Date(data.period.end).toLocaleDateString('fr-FR') : '-'
   return (
     <>
       <div className={classes.timelineElementsLeft}>
@@ -46,34 +48,21 @@ const TimelineItemLeft: React.FC<TimelineItemLeftTypes> = ({ data, open, dotHeig
         <Card className={classes.leftHospitCard} variant="outlined">
           <div>
             {data.documents && data.documents.length > 0 && (
-              <span className={classes.detailsButton} onClick={() => open(data)}>
+              <button className={classes.detailsButton} onClick={() => open(data)}>
                 + de détails
-              </span>
+              </button>
             )}
             {data.serviceProvider?.display && (
               <Chip label={data.serviceProvider.display} size="small" className={classes.chip} />
             )}
             <div className={classes.hospitText}>
-              <div className={classes.hospitTitle}>
-                {data.class ? data.class.display : 'classe inconnue'}
-                {/* {` ${
-                  data.diagnosis
-                    ? data.diagnosis[0].condition.display
-                    : ''
-                }`} */}
-              </div>
+              <div className={classes.hospitTitle}>{data.class ? data.class.display : 'classe inconnue'}</div>
               {data?.class?.code === 'ext' ? (
                 <div className={classes.hospitDates}>
                   {data.period?.start ? `Le ${new Date(data.period.start).toLocaleDateString('fr-FR')}` : 'Pas de date'}
                 </div>
               ) : (
-                <div className={classes.hospitDates}>
-                  {data.period?.start
-                    ? `Du ${new Date(data.period.start).toLocaleDateString('fr-FR')} au ${
-                        data.period.end ? new Date(data.period.end).toLocaleDateString('fr-FR') : '-'
-                      }`
-                    : 'Pas de date'}
-                </div>
+                <div className={classes.hospitDates}>{`Du ${periodStart} au ${periodEnd}`}</div>
               )}
             </div>
           </div>

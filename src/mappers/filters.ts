@@ -203,10 +203,10 @@ const getGenericKeyFromResourceType = (
 }
 
 const mapGenericFromRequestParams = async (parameters: URLSearchParams, type: ResourceType) => {
-  const nda = decodeURIComponent(parameters.get(getGenericKeyFromResourceType(type, 'NDA')) || '')
+  const nda = decodeURIComponent(parameters.get(getGenericKeyFromResourceType(type, 'NDA')) ?? '')
   const dates = parameters.getAll(getGenericKeyFromResourceType(type, 'DATE'))
-  const startDate = dates.find((e) => e.includes('ge'))?.split('ge')?.[1] || null
-  const endDate = dates.find((e) => e.includes('le'))?.split('le')?.[1] || null
+  const startDate = dates.find((e) => e.includes('ge'))?.split('ge')?.[1] ?? null
+  const endDate = dates.find((e) => e.includes('le'))?.split('le')?.[1] ?? null
   const executiveUnitsParams = parameters.get(getGenericKeyFromResourceType(type, 'EXECUTIVE_UNITS'))
   let executiveUnits: Hierarchy<ScopeElement, string>[] = []
   if (executiveUnitsParams) {
@@ -214,7 +214,7 @@ const mapGenericFromRequestParams = async (parameters: URLSearchParams, type: Re
     executiveUnits = fetchedData.results
   }
   const encounterStatusParams = decodeURIComponent(
-    parameters.get(getGenericKeyFromResourceType(type, 'ENCOUNTER_STATUS')) || ''
+    parameters.get(getGenericKeyFromResourceType(type, 'ENCOUNTER_STATUS')) ?? ''
   )
   let encounterStatus: LabelObject[] = []
   if (encounterStatusParams) {
@@ -261,7 +261,7 @@ const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
       })
       .filter((elem) => elem !== null) as SimpleCodeType[]
   }
-  const ipp = decodeURIComponent(parameters.get(DocumentsParamsKeys.IPP) || '')
+  const ipp = decodeURIComponent(parameters.get(DocumentsParamsKeys.IPP) ?? '')
   if (docStatusesParams) {
     docStatuses = decodeURIComponent(docStatusesParams)
       ?.split(',')
@@ -277,7 +277,7 @@ const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
 
 const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
   const codeIds =
-    decodeURIComponent(parameters.get(ConditionParamsKeys.CODE) || '')
+    decodeURIComponent(parameters.get(ConditionParamsKeys.CODE) ?? '')
       ?.split(',')
       ?.map((e) => e.split('|')?.[1])
       ?.join(',') || ''
@@ -285,7 +285,7 @@ const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
   const code = fetchCodesResults.map((e) => {
     return { id: e.id, label: e.label }
   })
-  const diagnosticTypesParams = decodeURIComponent(parameters.get(ConditionParamsKeys.DIAGNOSTIC_TYPES) || '')
+  const diagnosticTypesParams = decodeURIComponent(parameters.get(ConditionParamsKeys.DIAGNOSTIC_TYPES) ?? '')
   let diagnosticTypes: LabelObject[] = []
   if (diagnosticTypesParams) {
     const allDiagnosticTypes = await services.cohortCreation.fetchDiagnosticTypes()
@@ -294,7 +294,7 @@ const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
       return { id: toParse, label: allDiagnosticTypes.find((diag) => diag.id === toParse)?.label || '' }
     })
   }
-  const source = parameters.get(ConditionParamsKeys.SOURCE) || ''
+  const source = parameters.get(ConditionParamsKeys.SOURCE) ?? ''
   const { nda, startDate, endDate, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
     parameters,
     ResourceType.CONDITION
@@ -304,7 +304,7 @@ const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
 
 const mapProcedureFromRequestParams = async (parameters: URLSearchParams) => {
   const codeIds =
-    decodeURIComponent(parameters.get(ProcedureParamsKeys.CODE) || '')
+    decodeURIComponent(parameters.get(ProcedureParamsKeys.CODE) ?? '')
       ?.split(',')
       ?.map((e) => e.split('|')?.[1])
       ?.join(',') || ''
@@ -312,7 +312,7 @@ const mapProcedureFromRequestParams = async (parameters: URLSearchParams) => {
   const code = fetchCodesResults.map((e) => {
     return { id: e.id, label: e.label }
   })
-  const source = parameters.get(ProcedureParamsKeys.SOURCE) || ''
+  const source = parameters.get(ProcedureParamsKeys.SOURCE) ?? ''
   const { nda, startDate, endDate, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
     parameters,
     ResourceType.PROCEDURE
@@ -322,7 +322,7 @@ const mapProcedureFromRequestParams = async (parameters: URLSearchParams) => {
 
 const mapClaimFromRequestParams = async (parameters: URLSearchParams) => {
   const codeIds =
-    decodeURIComponent(parameters.get(ClaimParamsKeys.CODE) || '')
+    decodeURIComponent(parameters.get(ClaimParamsKeys.CODE) ?? '')
       ?.split(',')
       ?.map((e) => e.split('|')?.[1])
       ?.join(',') || ''
@@ -338,7 +338,7 @@ const mapClaimFromRequestParams = async (parameters: URLSearchParams) => {
 }
 
 const mapPrescriptionFromRequestParams = async (parameters: URLSearchParams) => {
-  const prescriptionTypesParam = decodeURIComponent(parameters.get(PrescriptionParamsKeys.PRESCRIPTION_TYPES) || '')
+  const prescriptionTypesParam = decodeURIComponent(parameters.get(PrescriptionParamsKeys.PRESCRIPTION_TYPES) ?? '')
   let prescriptionTypes: LabelObject[] = []
   if (prescriptionTypesParam) {
     const types = await services.cohortCreation.fetchPrescriptionTypes()
@@ -355,7 +355,7 @@ const mapPrescriptionFromRequestParams = async (parameters: URLSearchParams) => 
 
 const mapAdministrationFromRequestParams = async (parameters: URLSearchParams) => {
   const administrationRoutesParam = decodeURIComponent(
-    parameters.get(AdministrationParamsKeys.ADMINISTRATION_ROUTES) || ''
+    parameters.get(AdministrationParamsKeys.ADMINISTRATION_ROUTES) ?? ''
   )
   let administrationRoutes: LabelObject[] = []
   if (administrationRoutesParam) {
@@ -400,8 +400,8 @@ const mapBiologyFromRequestParams = async (parameters: URLSearchParams) => {
 }
 
 const mapImagingFromRequestParams = async (parameters: URLSearchParams) => {
-  const modalityParams = decodeURIComponent(parameters.get(ImagingParamsKeys.MODALITY) || '')
-  const ipp = decodeURIComponent(parameters.get(ImagingParamsKeys.IPP) || '')
+  const modalityParams = decodeURIComponent(parameters.get(ImagingParamsKeys.MODALITY) ?? '')
+  const ipp = decodeURIComponent(parameters.get(ImagingParamsKeys.IPP) ?? '')
   let modality: LabelObject[] = []
   if (modalityParams) {
     const allModalities = await services.cohortCreation.fetchModalities()
