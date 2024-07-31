@@ -46,7 +46,8 @@ import {
   MedicationDataType,
   GhmDataType,
   CcamDataType,
-  HospitDataType
+  HospitDataType,
+  SelectedCriteriaTypesWithOccurrences
 } from 'types/requestCriterias'
 import { parseOccurence } from './valueComparator'
 import { parseDocumentAttachment } from './documentAttachment'
@@ -209,8 +210,11 @@ export const cleanNominativeCriterias = (
   const cleanDurationRange = (value: DurationRangeType) => {
     const regex = /^[^/]*\// // matches everything before the first '/'
 
-    const cleanValue = (value: string | null | undefined) =>
-      value ? (value.replace(regex, '0/') === '0/0/0' ? null : value.replace(regex, '0/')) : null
+    const cleanValue = (value: string | null | undefined) => {
+      if (value !== null && value !== undefined) {
+        return value.replace(regex, '0/') === '0/0/0' ? null : value.replace(regex, '0/')
+      } else return null
+    }
 
     return [cleanValue(value[0]), cleanValue(value[1])] as DurationRangeType
   }
@@ -276,6 +280,7 @@ export const cleanNominativeCriterias = (
 }
 
 const buildPatientFilter = (criterion: DemographicDataType, deidentified: boolean): string[] => {
+  const isDeidentified = deidentified ? PatientsParamsKeys.DATE_DEIDENTIFIED : PatientsParamsKeys.DATE_IDENTIFIED
   return [
     'active=true',
     filtersBuilders(PatientsParamsKeys.GENDERS, buildLabelObjectFilter(criterion.genders)),
@@ -285,25 +290,21 @@ const buildPatientFilter = (criterion: DemographicDataType, deidentified: boolea
     filtersBuilders(PatientsParamsKeys.DEATHDATE, buildDateFilter(criterion.deathDates[0], 'ge')),
     filtersBuilders(PatientsParamsKeys.DEATHDATE, buildDateFilter(criterion.deathDates[1], 'le')),
     criterion.birthdates[0] === null && criterion.birthdates[1] === null
-      ? buildDurationFilter(
-          criterion.age[0],
-          deidentified ? PatientsParamsKeys.DATE_DEIDENTIFIED : PatientsParamsKeys.DATE_IDENTIFIED,
-          'ge',
-          deidentified
-        )
+      ? buildDurationFilter(criterion.age[0], isDeidentified, 'ge', deidentified)
       : '',
-    criterion.birthdates[1] === null && criterion.birthdates[1] === null
-      ? buildDurationFilter(
-          criterion.age[1],
-          deidentified ? PatientsParamsKeys.DATE_DEIDENTIFIED : PatientsParamsKeys.DATE_IDENTIFIED,
-          'le',
-          deidentified
-        )
+    criterion.birthdates[0] === null && criterion.birthdates[1] === null
+      ? buildDurationFilter(criterion.age[1], isDeidentified, 'le', deidentified)
       : ''
   ]
 }
 
 const buildEncounterFilter = (criterion: EncounterDataType, deidentified: boolean): string[] => {
+  const isMinBirthdateDeidentified = deidentified
+    ? EncounterParamsKeys.MIN_BIRTHDATE_MONTH
+    : EncounterParamsKeys.MIN_BIRTHDATE_DAY
+  const isMaxBirthdateDeidentified = deidentified
+    ? EncounterParamsKeys.MAX_BIRTHDATE_MONTH
+    : EncounterParamsKeys.MAX_BIRTHDATE_DAY
   return [
     'subject.active=true',
     filtersBuilders(EncounterParamsKeys.ADMISSIONMODE, buildLabelObjectFilter(criterion.admissionMode)),
@@ -324,20 +325,10 @@ const buildEncounterFilter = (criterion: EncounterDataType, deidentified: boolea
       ? buildDurationFilter(criterion?.duration?.[1], EncounterParamsKeys.DURATION, 'le')
       : '',
     criterion.age[0] !== null
-      ? buildDurationFilter(
-          criterion?.age[0],
-          deidentified ? EncounterParamsKeys.MIN_BIRTHDATE_MONTH : EncounterParamsKeys.MIN_BIRTHDATE_DAY,
-          'ge',
-          deidentified
-        )
+      ? buildDurationFilter(criterion?.age[0], isMinBirthdateDeidentified, 'ge', deidentified)
       : '',
     criterion.age[1] !== null
-      ? buildDurationFilter(
-          criterion?.age[1],
-          deidentified ? EncounterParamsKeys.MAX_BIRTHDATE_MONTH : EncounterParamsKeys.MAX_BIRTHDATE_DAY,
-          'le',
-          deidentified
-        )
+      ? buildDurationFilter(criterion?.age[1], isMaxBirthdateDeidentified, 'le', deidentified)
       : '',
     buildEncounterDateFilter(
       criterion.type,
@@ -354,11 +345,7 @@ const buildDocumentFilter = (criterion: DocumentDataType): string[] => {
     const filterDocStatuses: string[] = []
     for (const _status of docStatuses) {
       const status =
-        _status === FilterByDocumentStatus.VALIDATED
-          ? DocumentStatuses.FINAL
-          : _status === FilterByDocumentStatus.NOT_VALIDATED
-          ? DocumentStatuses.PRELIMINARY
-          : ''
+        _status === FilterByDocumentStatus.VALIDATED ? DocumentStatuses.FINAL : DocumentStatuses.PRELIMINARY
       filterDocStatuses.push(`${DOC_STATUS_CODE_SYSTEM}|${status}`)
     }
     return filterDocStatuses.join(',')
@@ -497,7 +484,7 @@ const buildMedicationFilter = (criterion: MedicationDataType): string[] => {
   ]
 }
 
-const buildObvserationFilter = (criterion: ObservationDataType): string[] => {
+const buildObservationFilter = (criterion: ObservationDataType): string[] => {
   return [
     `subject.active=true&${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`,
     filtersBuilders(
@@ -746,11 +733,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     [CriteriaType.CLAIM]: (c) => buildClaimFilter(c as GhmDataType),
     [CriteriaType.MEDICATION_REQUEST]: (c) => buildMedicationFilter(c as MedicationDataType),
     [CriteriaType.MEDICATION_ADMINISTRATION]: (c) => buildMedicationFilter(c as MedicationDataType),
-    [CriteriaType.OBSERVATION]: (c) => buildObvserationFilter(c as ObservationDataType),
+    [CriteriaType.OBSERVATION]: (c) => buildObservationFilter(c as ObservationDataType),
     [CriteriaType.IPP_LIST]: (c) =>
-      ((criterion: IPPListDataType) => [
-        `${criterion.search ? `${IppParamsKeys.IPP_LIST_FHIR}=${criterion.search}` : ''}`
-      ])(c as IPPListDataType),
+      ((criterion: IPPListDataType) => [filtersBuilders(IppParamsKeys.IPP_LIST_FHIR, criterion.search)])(
+        c as IPPListDataType
+      ),
     [CriteriaType.IMAGING]: (c) => buildImagingFilter(c as ImagingDataType),
     [CriteriaType.PREGNANCY]: (c) => buildPregnancyFilter(c as PregnancyDataType),
     [CriteriaType.HOSPIT]: (c) => buildHospitFilter(c as HospitDataType)
@@ -819,7 +806,7 @@ export function buildRequest(
           occurrence: !(item.type === CriteriaType.PATIENT || item.type === CriteriaType.IPP_LIST)
             ? {
                 n: item.occurrence,
-                operator: item?.occurrenceComparator || undefined
+                operator: item?.occurrenceComparator ?? undefined
               }
             : undefined
         }
@@ -888,7 +875,28 @@ const unbuildCommonCriteria = (element: RequeteurCriteriaType): Omit<CommonCrite
   }
 }
 
-const unbuildPatientCriteria = (element: RequeteurCriteriaType): DemographicDataType => {
+const unbuildCriteria = async <T extends SelectedCriteriaTypesWithOccurrences | SelectedCriteriaType>(
+  element: RequeteurCriteriaType,
+  emptyCriterion: T,
+  filterUnbuilders: Partial<{ [key: string]: (c: T, v: string | null) => Promise<void> | void }>
+): Promise<T> => {
+  if (emptyCriterion.type !== CriteriaType.PATIENT && emptyCriterion.type !== CriteriaType.IPP_LIST)
+    unbuildOccurrence(element, emptyCriterion as SelectedCriteriaTypesWithOccurrences)
+
+  if (element.filterFhir) {
+    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+
+    for (const filter of filters) {
+      const key = filter[0] ?? null
+      const value = filter[1] ?? null
+      if (key !== null) await filterUnbuilders[key]?.(emptyCriterion, value)
+      else emptyCriterion.error = true
+    }
+  }
+  return emptyCriterion
+}
+
+const unbuildPatientCriteria = async (element: RequeteurCriteriaType): Promise<DemographicDataType> => {
   const currentCriterion: DemographicDataType = {
     ...unbuildCommonCriteria(element),
     type: CriteriaType.PATIENT,
@@ -899,61 +907,43 @@ const unbuildPatientCriteria = (element: RequeteurCriteriaType): DemographicData
     birthdates: [null, null],
     deathDates: [null, null]
   }
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-    for (const filter of filters) {
-      const key = filter ? filter[0] : null
-      const value = filter ? filter[1] : null
 
-      switch (key) {
-        case PatientsParamsKeys.DATE_IDENTIFIED:
-        case PatientsParamsKeys.DATE_DEIDENTIFIED: {
-          if (value?.includes('ge')) {
-            currentCriterion.age[0] = unbuildDurationFilter(
-              value,
-              key === PatientsParamsKeys.DATE_DEIDENTIFIED ? true : false
-            )
-          } else if (value?.includes('le')) {
-            currentCriterion.age[1] = unbuildDurationFilter(
-              value,
-              key === PatientsParamsKeys.DATE_DEIDENTIFIED ? true : false
-            )
-          }
-          break
-        }
-        case PatientsParamsKeys.BIRTHDATE: {
-          if (value?.includes('ge')) {
-            currentCriterion.birthdates[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.birthdates[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case PatientsParamsKeys.DEATHDATE: {
-          if (value?.includes('ge')) {
-            currentCriterion.deathDates[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.deathDates[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case PatientsParamsKeys.GENDERS: {
-          unbuildLabelObjectFilter(currentCriterion, 'genders', value)
-          break
-        }
-        case PatientsParamsKeys.VITAL_STATUS: {
-          unbuildLabelObjectFilter(currentCriterion, 'vitalStatus', value)
-          break
-        }
-        case 'active':
-          break
-        default:
-          currentCriterion.error = true
-          break
+  return await unbuildCriteria(element, currentCriterion, {
+    [PatientsParamsKeys.DATE_IDENTIFIED]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.age[0] = unbuildDurationFilter(v, false)
+      } else if (v?.includes('le')) {
+        c.age[1] = unbuildDurationFilter(v, false)
       }
+    },
+    [PatientsParamsKeys.DATE_DEIDENTIFIED]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.age[0] = unbuildDurationFilter(v, true)
+      } else if (v?.includes('le')) {
+        c.age[1] = unbuildDurationFilter(v, true)
+      }
+    },
+    [PatientsParamsKeys.BIRTHDATE]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.birthdates[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.birthdates[1] = unbuildDateFilter(v)
+      }
+    },
+    [PatientsParamsKeys.DEATHDATE]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.deathDates[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.deathDates[1] = unbuildDateFilter(v)
+      }
+    },
+    [PatientsParamsKeys.GENDERS]: (c, v) => {
+      unbuildLabelObjectFilter(c, 'genders', v)
+    },
+    [PatientsParamsKeys.VITAL_STATUS]: (c, v) => {
+      unbuildLabelObjectFilter(c, 'vitalStatus', v)
     }
-  }
-  return currentCriterion
+  })
 }
 
 const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise<EncounterDataType> => {
@@ -979,111 +969,78 @@ const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise
     encounterEndDate: [null, null],
     encounterStatus: []
   }
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
-    unbuildOccurrence(element, currentCriterion)
-
-    for (const filter of filters) {
-      const key = filter[0]
-      const value = filter[1]
-      switch (key) {
-        case EncounterParamsKeys.DURATION: {
-          if (value.includes('ge')) {
-            currentCriterion.duration[0] = unbuildDurationFilter(value)
-          } else if (value.includes('le')) {
-            currentCriterion.duration[1] = unbuildDurationFilter(value)
-          }
-          break
-        }
-        case EncounterParamsKeys.MIN_BIRTHDATE_DAY:
-        case EncounterParamsKeys.MIN_BIRTHDATE_MONTH: {
-          currentCriterion.age[0] = unbuildDurationFilter(
-            value,
-            key === EncounterParamsKeys.MIN_BIRTHDATE_MONTH ? true : false
-          )
-          break
-        }
-        case EncounterParamsKeys.MAX_BIRTHDATE_DAY:
-        case EncounterParamsKeys.MAX_BIRTHDATE_MONTH: {
-          currentCriterion.age[1] = unbuildDurationFilter(
-            value,
-            key === EncounterParamsKeys.MAX_BIRTHDATE_MONTH ? true : false
-          )
-          break
-        }
-        case EncounterParamsKeys.ENTRYMODE: {
-          unbuildLabelObjectFilter(currentCriterion, 'entryMode', value)
-          break
-        }
-        case EncounterParamsKeys.EXITMODE: {
-          unbuildLabelObjectFilter(currentCriterion, 'exitMode', value)
-          break
-        }
-        case EncounterParamsKeys.PRISENCHARGETYPE: {
-          unbuildLabelObjectFilter(currentCriterion, 'priseEnChargeType', value)
-          break
-        }
-        case EncounterParamsKeys.TYPEDESEJOUR: {
-          unbuildLabelObjectFilter(currentCriterion, 'typeDeSejour', value)
-          break
-        }
-        case EncounterParamsKeys.REASON: {
-          unbuildLabelObjectFilter(currentCriterion, 'reason', value)
-          break
-        }
-        case EncounterParamsKeys.ADMISSIONMODE: {
-          unbuildLabelObjectFilter(currentCriterion, 'admissionMode', value)
-          break
-        }
-        case EncounterParamsKeys.DESTINATION: {
-          unbuildLabelObjectFilter(currentCriterion, 'destination', value)
-          break
-        }
-        case EncounterParamsKeys.PROVENANCE: {
-          unbuildLabelObjectFilter(currentCriterion, 'provenance', value)
-          break
-        }
-        case EncounterParamsKeys.ADMISSION: {
-          unbuildLabelObjectFilter(currentCriterion, 'admission', value)
-          break
-        }
-        case EncounterParamsKeys.SERVICE_PROVIDER: {
-          await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
-          break
-        }
-        case EncounterParamsKeys.STATUS: {
-          unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
-          break
-        }
-        case EncounterParamsKeys.START_DATE: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case EncounterParamsKeys.END_DATE: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case '_filter':
-          unbuildEncounterDatesFilters(currentCriterion, value)
-          break
-        case 'subject.active':
-          break
-        default:
-          currentCriterion.error = true
-          break
+  return await unbuildCriteria(element, currentCriterion, {
+    [EncounterParamsKeys.DURATION]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.duration[0] = unbuildDurationFilter(v)
+      } else if (v?.includes('le')) {
+        c.duration[1] = unbuildDurationFilter(v)
       }
+    },
+    [EncounterParamsKeys.MIN_BIRTHDATE_DAY]: (c, v) => {
+      c.age[0] = v ? unbuildDurationFilter(v, false) : null
+    },
+    [EncounterParamsKeys.MIN_BIRTHDATE_MONTH]: (c, v) => {
+      c.age[0] = v ? unbuildDurationFilter(v, true) : null
+    },
+    [EncounterParamsKeys.MAX_BIRTHDATE_DAY]: (c, v) => {
+      c.age[1] = v ? unbuildDurationFilter(v, false) : null
+    },
+    [EncounterParamsKeys.MAX_BIRTHDATE_MONTH]: (c, v) => {
+      c.age[1] = v ? unbuildDurationFilter(v, true) : null
+    },
+    [EncounterParamsKeys.ENTRYMODE]: (c, v) => {
+      unbuildLabelObjectFilter(c, 'entryMode', v)
+    },
+    [EncounterParamsKeys.EXITMODE]: (c, v) => {
+      unbuildLabelObjectFilter(c, 'exitMode', v)
+    },
+    [EncounterParamsKeys.PRISENCHARGETYPE]: (c, v) => {
+      unbuildLabelObjectFilter(c, 'priseEnChargeType', v)
+    },
+    [EncounterParamsKeys.TYPEDESEJOUR]: (c, v) => {
+      unbuildLabelObjectFilter(c, 'typeDeSejour', v)
+    },
+    [EncounterParamsKeys.REASON]: (c, v) => {
+      unbuildLabelObjectFilter(c, 'reason', v)
+    },
+    [EncounterParamsKeys.ADMISSIONMODE]: (c, v) => {
+      unbuildLabelObjectFilter(c, 'admissionMode', v)
+    },
+    [EncounterParamsKeys.DESTINATION]: (c, v) => {
+      unbuildLabelObjectFilter(c, 'destination', v)
+    },
+    [EncounterParamsKeys.PROVENANCE]: (c, v) => {
+      unbuildLabelObjectFilter(c, 'provenance', v)
+    },
+    [EncounterParamsKeys.ADMISSION]: (c, v) => {
+      unbuildLabelObjectFilter(c, 'admission', v)
+    },
+    [EncounterParamsKeys.SERVICE_PROVIDER]: async (c, v) => {
+      await unbuildEncounterServiceCriterias(c, 'encounterService', v)
+    },
+    [EncounterParamsKeys.STATUS]: (c, v) => {
+      unbuildLabelObjectFilter(c, 'encounterStatus', v)
+    },
+    [EncounterParamsKeys.START_DATE]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterStartDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterStartDate[1] = unbuildDateFilter(v)
+      }
+    },
+    [EncounterParamsKeys.END_DATE]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterEndDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterEndDate[1] = unbuildDateFilter(v)
+      }
+    },
+    ['_filter']: (c, v) => {
+      unbuildEncounterDatesFilters(c, v)
     }
-  }
-  return currentCriterion
+  })
 }
 
 const unbuildDocumentReferenceCriteria = async (element: RequeteurCriteriaType): Promise<DocumentDataType> => {
@@ -1103,78 +1060,52 @@ const unbuildDocumentReferenceCriteria = async (element: RequeteurCriteriaType):
     encounterStartDate: [null, null],
     encounterStatus: []
   }
-
-  unbuildOccurrence(element, currentCriterion)
-
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    for (const filter of filters) {
-      const key = filter ? filter[0] : null
-      const value = filter ? filter[1] : null
-      switch (key) {
-        case SearchByTypes.DESCRIPTION:
-          currentCriterion.search = unbuildSearchFilter(value)
-          currentCriterion.searchBy = SearchByTypes.DESCRIPTION
-          break
-        case SearchByTypes.TEXT: {
-          currentCriterion.search = unbuildSearchFilter(value)
-          currentCriterion.searchBy = SearchByTypes.TEXT
-          break
-        }
-        case DocumentsParamsKeys.DOC_TYPES: {
-          unbuildDocTypesFilter(currentCriterion, 'docType', value)
-          break
-        }
-        case DocumentsParamsKeys.EXECUTIVE_UNITS: {
-          await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
-          break
-        }
-        case DocumentsParamsKeys.DOC_STATUSES:
-          unbuildDocStatusesFilter(currentCriterion, 'docStatuses', value)
-          break
-        case DocumentsParamsKeys.ENCOUNTER_STATUS: {
-          unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
-          break
-        }
-        case DocumentsParamsKeys.DATE: {
-          if (value?.includes('ge')) {
-            currentCriterion.startOccurrence[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.startOccurrence[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case `${getCriterionDateFilterName(CriteriaType.DOCUMENTS)}.${EncounterParamsKeys.START_DATE}`: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case `${getCriterionDateFilterName(CriteriaType.DOCUMENTS)}.${EncounterParamsKeys.END_DATE}`: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case '_filter':
-          unbuildEncounterDatesFilters(currentCriterion, value)
-          break
-        case 'subject.active':
-        case 'type:not':
-        case 'contenttype':
-          break
-        default:
-          currentCriterion.error = true
-          break
+  return await unbuildCriteria(element, currentCriterion, {
+    [SearchByTypes.DESCRIPTION]: (c, v) => {
+      c.search = unbuildSearchFilter(v)
+      c.searchBy = SearchByTypes.DESCRIPTION
+    },
+    [SearchByTypes.TEXT]: (c, v) => {
+      c.search = unbuildSearchFilter(v)
+      c.searchBy = SearchByTypes.TEXT
+    },
+    [DocumentsParamsKeys.DOC_TYPES]: (c, v) => {
+      unbuildDocTypesFilter(c, 'docType', v)
+    },
+    [DocumentsParamsKeys.EXECUTIVE_UNITS]: async (c, v) => {
+      await unbuildEncounterServiceCriterias(c, 'encounterService', v)
+    },
+    [DocumentsParamsKeys.DOC_STATUSES]: (c, v) => {
+      unbuildDocStatusesFilter(c, 'docStatuses', v)
+    },
+    [DocumentsParamsKeys.ENCOUNTER_STATUS]: (c, v) => {
+      unbuildLabelObjectFilter(c, 'encounterStatus', v)
+    },
+    [DocumentsParamsKeys.DATE]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.startOccurrence[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.startOccurrence[1] = unbuildDateFilter(v)
       }
+    },
+    [`${getCriterionDateFilterName(CriteriaType.DOCUMENTS)}.${EncounterParamsKeys.START_DATE}`]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterStartDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterStartDate[1] = unbuildDateFilter(v)
+      }
+    },
+    [`${getCriterionDateFilterName(CriteriaType.DOCUMENTS)}.${EncounterParamsKeys.END_DATE}`]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterEndDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterEndDate[1] = unbuildDateFilter(v)
+      }
+    },
+    ['_filter']: (c, v) => {
+      unbuildEncounterDatesFilters(c, v)
     }
-  }
-  return currentCriterion
+  })
 }
 
 const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise<Cim10DataType> => {
@@ -1195,73 +1126,38 @@ const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise
     encounterStatus: []
   }
 
-  unbuildOccurrence(element, currentCriterion)
-
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    for (const filter of filters) {
-      const key = filter ? filter[0] : null
-      const value = filter ? filter[1] : null
-      switch (key) {
-        case ConditionParamsKeys.CODE: {
-          unbuildLabelObjectFilter(currentCriterion, 'code', value)
-          break
-        }
-        case ConditionParamsKeys.SOURCE: {
-          currentCriterion.source = value
-          break
-        }
-        case ConditionParamsKeys.DIAGNOSTIC_TYPES: {
-          unbuildLabelObjectFilter(currentCriterion, 'diagnosticType', value)
-          break
-        }
-        case ConditionParamsKeys.EXECUTIVE_UNITS: {
-          await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
-          break
-        }
-        case ConditionParamsKeys.ENCOUNTER_STATUS: {
-          unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
-          break
-        }
-        case ConditionParamsKeys.DATE: {
-          if (value?.includes('ge')) {
-            currentCriterion.startOccurrence[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.startOccurrence[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case `${getCriterionDateFilterName(CriteriaType.CONDITION)}.${EncounterParamsKeys.START_DATE}`: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case `${getCriterionDateFilterName(CriteriaType.CONDITION)}.${EncounterParamsKeys.END_DATE}`: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case '_filter': {
-          unbuildEncounterDatesFilters(currentCriterion, value)
-          break
-        }
-        case 'subject.active':
-          break
-        default:
-          currentCriterion.error = true
-          break
+  return await unbuildCriteria(element, currentCriterion, {
+    [ConditionParamsKeys.CODE]: (c, v) => unbuildLabelObjectFilter(c, 'code', v),
+    [ConditionParamsKeys.SOURCE]: (c, v) => (c.source = v),
+    [ConditionParamsKeys.DIAGNOSTIC_TYPES]: (c, v) => unbuildLabelObjectFilter(c, 'diagnosticType', v),
+    [ConditionParamsKeys.EXECUTIVE_UNITS]: async (c, v) =>
+      await unbuildEncounterServiceCriterias(c, 'encounterService', v),
+    [ConditionParamsKeys.ENCOUNTER_STATUS]: (c, v) => unbuildLabelObjectFilter(c, 'encounterStatus', v),
+    [ConditionParamsKeys.DATE]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.startOccurrence[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.startOccurrence[1] = unbuildDateFilter(v)
       }
-    }
-  }
-  return currentCriterion
+    },
+    [`${getCriterionDateFilterName(CriteriaType.CONDITION)}.${EncounterParamsKeys.START_DATE}`]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterStartDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterStartDate[1] = unbuildDateFilter(v)
+      }
+    },
+    [`${getCriterionDateFilterName(CriteriaType.CONDITION)}.${EncounterParamsKeys.END_DATE}`]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterEndDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterEndDate[1] = unbuildDateFilter(v)
+      }
+    },
+    ['_filter']: (c, v) => unbuildEncounterDatesFilters(c, v)
+  })
 }
+
 const unbuildProcedureCriteria = async (element: RequeteurCriteriaType): Promise<CcamDataType> => {
   const currentCriterion: CcamDataType = {
     ...unbuildCommonCriteria(element),
@@ -1280,67 +1176,35 @@ const unbuildProcedureCriteria = async (element: RequeteurCriteriaType): Promise
     encounterEndDate: [null, null]
   }
 
-  unbuildOccurrence(element, currentCriterion)
-
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    for (const filter of filters) {
-      const key = filter ? filter[0] : null
-      const value = filter ? filter[1] : null
-      switch (key) {
-        case ProcedureParamsKeys.CODE: {
-          unbuildLabelObjectFilter(currentCriterion, 'code', value)
-          break
-        }
-        case ProcedureParamsKeys.EXECUTIVE_UNITS: {
-          await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
-          break
-        }
-        case 'subject.active':
-          break
-        case ProcedureParamsKeys.SOURCE: {
-          currentCriterion.source = value
-          break
-        }
-        case ProcedureParamsKeys.ENCOUNTER_STATUS: {
-          unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
-          break
-        }
-        case ProcedureParamsKeys.DATE: {
-          if (value?.includes('ge')) {
-            currentCriterion.startOccurrence[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.startOccurrence[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case `${getCriterionDateFilterName(CriteriaType.PROCEDURE)}.${EncounterParamsKeys.START_DATE}`: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case `${getCriterionDateFilterName(CriteriaType.PROCEDURE)}.${EncounterParamsKeys.END_DATE}`: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case '_filter':
-          unbuildEncounterDatesFilters(currentCriterion, value)
-          break
-        default:
-          currentCriterion.error = true
-          break
+  return await unbuildCriteria(element, currentCriterion, {
+    [ProcedureParamsKeys.CODE]: (c, v) => unbuildLabelObjectFilter(c, 'code', v),
+    [ProcedureParamsKeys.EXECUTIVE_UNITS]: async (c, v) =>
+      await unbuildEncounterServiceCriterias(c, 'encounterService', v),
+    [ProcedureParamsKeys.SOURCE]: (c, v) => (c.source = v),
+    [ProcedureParamsKeys.ENCOUNTER_STATUS]: (c, v) => unbuildLabelObjectFilter(c, 'encounterStatus', v),
+    [ProcedureParamsKeys.DATE]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.startOccurrence[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.startOccurrence[1] = unbuildDateFilter(v)
       }
-    }
-  }
-  return currentCriterion
+    },
+    [`${getCriterionDateFilterName(CriteriaType.PROCEDURE)}.${EncounterParamsKeys.START_DATE}`]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterStartDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterStartDate[1] = unbuildDateFilter(v)
+      }
+    },
+    [`${getCriterionDateFilterName(CriteriaType.PROCEDURE)}.${EncounterParamsKeys.END_DATE}`]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterEndDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterEndDate[1] = unbuildDateFilter(v)
+      }
+    },
+    ['_filter']: (c, v) => unbuildEncounterDatesFilters(c, v)
+  })
 }
 
 const unbuildClaimCriteria = async (element: RequeteurCriteriaType): Promise<GhmDataType> => {
@@ -1358,63 +1222,33 @@ const unbuildClaimCriteria = async (element: RequeteurCriteriaType): Promise<Ghm
     encounterEndDate: [null, null]
   }
 
-  unbuildOccurrence(element, currentCriterion)
-
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    for (const filter of filters) {
-      const key = filter ? filter[0] : null
-      const value = filter ? filter[1] : null
-      switch (key) {
-        case ClaimParamsKeys.CODE: {
-          unbuildLabelObjectFilter(currentCriterion, 'code', value)
-          break
-        }
-        case ClaimParamsKeys.EXECUTIVE_UNITS: {
-          await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
-          break
-        }
-        case ClaimParamsKeys.ENCOUNTER_STATUS: {
-          unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
-          break
-        }
-        case ClaimParamsKeys.DATE: {
-          if (value?.includes('ge')) {
-            currentCriterion.startOccurrence[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.startOccurrence[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case `${getCriterionDateFilterName(CriteriaType.CLAIM)}.${EncounterParamsKeys.START_DATE}`: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case `${getCriterionDateFilterName(CriteriaType.CLAIM)}.${EncounterParamsKeys.END_DATE}`: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case '_filter':
-          unbuildEncounterDatesFilters(currentCriterion, value)
-          break
-        case 'patient.active':
-          break
-        default:
-          currentCriterion.error = true
-          break
+  return await unbuildCriteria(element, currentCriterion, {
+    [ClaimParamsKeys.CODE]: (c, v) => unbuildLabelObjectFilter(c, 'code', v),
+    [ClaimParamsKeys.EXECUTIVE_UNITS]: async (c, v) => await unbuildEncounterServiceCriterias(c, 'encounterService', v),
+    [ClaimParamsKeys.ENCOUNTER_STATUS]: (c, v) => unbuildLabelObjectFilter(c, 'encounterStatus', v),
+    [ClaimParamsKeys.DATE]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.startOccurrence[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.startOccurrence[1] = unbuildDateFilter(v)
       }
-    }
-  }
-  return currentCriterion
+    },
+    [`${getCriterionDateFilterName(CriteriaType.CLAIM)}.${EncounterParamsKeys.START_DATE}`]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterStartDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterStartDate[1] = unbuildDateFilter(v)
+      }
+    },
+    [`${getCriterionDateFilterName(CriteriaType.CLAIM)}.${EncounterParamsKeys.END_DATE}`]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterEndDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterEndDate[1] = unbuildDateFilter(v)
+      }
+    },
+    ['_filter']: (c, v) => unbuildEncounterDatesFilters(c, v)
+  })
 }
 const unbuildMedicationCriteria = async (element: RequeteurCriteriaType): Promise<MedicationDataType> => {
   const currentCriterion: MedicationDataType = {
@@ -1436,87 +1270,52 @@ const unbuildMedicationCriteria = async (element: RequeteurCriteriaType): Promis
     encounterEndDate: [null, null]
   }
 
-  unbuildOccurrence(element, currentCriterion)
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    for (const filter of filters) {
-      const key = filter ? filter[0] : null
-      const value = filter ? filter[1] : null
-      switch (key) {
-        case PrescriptionParamsKeys.CODE: {
-          const codeIds = value?.replace(/https:\/\/.*?\|/g, '')
-          unbuildLabelObjectFilter(currentCriterion, 'code', codeIds)
-          break
-        }
-        case PrescriptionParamsKeys.PRESCRIPTION_TYPES: {
-          unbuildLabelObjectFilter(currentCriterion, 'prescriptionType', value)
-          break
-        }
-        case PrescriptionParamsKeys.PRESCRIPTION_ROUTES:
-        case AdministrationParamsKeys.ADMINISTRATION_ROUTES: {
-          unbuildLabelObjectFilter(currentCriterion, 'administration', value)
-          break
-        }
-        case 'subject.active':
-          break
-        case PrescriptionParamsKeys.EXECUTIVE_UNITS:
-        case AdministrationParamsKeys.EXECUTIVE_UNITS: {
-          await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
-          break
-        }
-        case PrescriptionParamsKeys.ENCOUNTER_STATUS:
-        case AdministrationParamsKeys.ENCOUNTER_STATUS: {
-          unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
-          break
-        }
-        case PrescriptionParamsKeys.DATE:
-        case AdministrationParamsKeys.DATE: {
-          if (value?.includes('ge')) {
-            currentCriterion.startOccurrence[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.startOccurrence[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case PrescriptionParamsKeys.END_DATE: {
-          if (value?.includes('ge')) {
-            currentCriterion.endOccurrence = [unbuildDateFilter(value), currentCriterion.endOccurrence?.[1] ?? null]
-          } else if (value?.includes('le')) {
-            currentCriterion.endOccurrence = [currentCriterion.endOccurrence?.[0] ?? null, unbuildDateFilter(value)]
-          }
-          break
-        }
-        case `${getCriterionDateFilterName(CriteriaType.MEDICATION_REQUEST)}.${EncounterParamsKeys.START_DATE}`:
-        case `${getCriterionDateFilterName(CriteriaType.MEDICATION_ADMINISTRATION)}.${
-          EncounterParamsKeys.START_DATE
-        }`: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case `${getCriterionDateFilterName(CriteriaType.MEDICATION_REQUEST)}.${EncounterParamsKeys.END_DATE}`:
-        case `${getCriterionDateFilterName(CriteriaType.MEDICATION_ADMINISTRATION)}.${EncounterParamsKeys.END_DATE}`: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case '_filter':
-          unbuildEncounterDatesFilters(currentCriterion, value)
-          break
-        default:
-          currentCriterion.error = true
-          break
+  return await unbuildCriteria(element, currentCriterion, {
+    [PrescriptionParamsKeys.CODE]: (c, v) => {
+      const codeIds = v?.replace(/https:\/\/.*?\|/g, '')
+      unbuildLabelObjectFilter(c, 'code', codeIds)
+    },
+    [PrescriptionParamsKeys.PRESCRIPTION_TYPES]: (c, v) => unbuildLabelObjectFilter(c, 'prescriptionType', v),
+    [PrescriptionParamsKeys.PRESCRIPTION_ROUTES || AdministrationParamsKeys.ADMINISTRATION_ROUTES]: (c, v) =>
+      unbuildLabelObjectFilter(c, 'administration', v),
+    [PrescriptionParamsKeys.EXECUTIVE_UNITS || AdministrationParamsKeys.EXECUTIVE_UNITS]: async (c, v) =>
+      await unbuildEncounterServiceCriterias(c, 'encounterService', v),
+    [PrescriptionParamsKeys.ENCOUNTER_STATUS || AdministrationParamsKeys.ENCOUNTER_STATUS]: (c, v) =>
+      unbuildLabelObjectFilter(c, 'encounterStatus', v),
+    [PrescriptionParamsKeys.DATE || AdministrationParamsKeys.DATE]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.startOccurrence[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.startOccurrence[1] = unbuildDateFilter(v)
       }
-    }
-  }
-  return currentCriterion
+    },
+    [PrescriptionParamsKeys.END_DATE]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.endOccurrence = [unbuildDateFilter(v), c.endOccurrence?.[1] ?? null]
+      } else if (v?.includes('le')) {
+        c.endOccurrence = [c.endOccurrence?.[0] ?? null, unbuildDateFilter(v)]
+      }
+    },
+    [`${getCriterionDateFilterName(CriteriaType.MEDICATION_REQUEST || CriteriaType.MEDICATION_ADMINISTRATION)}.${
+      EncounterParamsKeys.START_DATE
+    }`]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterStartDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterStartDate[1] = unbuildDateFilter(v)
+      }
+    },
+    [`${getCriterionDateFilterName(CriteriaType.MEDICATION_REQUEST || CriteriaType.MEDICATION_ADMINISTRATION)}.${
+      EncounterParamsKeys.END_DATE
+    }`]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterEndDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterEndDate[1] = unbuildDateFilter(v)
+      }
+    },
+    ['_filter']: (c, v) => unbuildEncounterDatesFilters(c, v)
+  })
 }
 const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promise<ObservationDataType> => {
   const currentCriterion: ObservationDataType = {
@@ -1535,87 +1334,51 @@ const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promi
     encounterEndDate: [null, null]
   }
 
-  unbuildOccurrence(element, currentCriterion)
+  return await unbuildCriteria(element, currentCriterion, {
+    [ObservationParamsKeys.ANABIO_LOINC]: async (c, v) => {
+      unbuildLabelObjectFilter(c, 'code', v)
 
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+      // TODO: pas propre vvvv
+      if (currentCriterion.code && currentCriterion.code.length === 1) {
+        try {
+          const checkChildrenResp = await services.cohortCreation.fetchBiologyHierarchy(currentCriterion.code?.[0].id)
 
-    unbuildObservationValueFilter(filters, currentCriterion)
-
-    for (const filter of filters) {
-      const key = filter ? filter[0] : null
-      const value = filter ? filter[1] : null
-
-      switch (key) {
-        case ObservationParamsKeys.ANABIO_LOINC: {
-          unbuildLabelObjectFilter(currentCriterion, 'code', value)
-
-          // TODO: pas propre vvvv
-          if (currentCriterion.code && currentCriterion.code.length === 1) {
-            try {
-              const checkChildrenResp = await services.cohortCreation.fetchBiologyHierarchy(
-                currentCriterion.code?.[0].id
-              )
-
-              if (checkChildrenResp.length === 0) {
-                currentCriterion.isLeaf = true
-              }
-            } catch (error) {
-              console.error('Erreur lors du check des enfants du code de biologie sélectionné', error)
-            }
+          if (checkChildrenResp.length === 0) {
+            currentCriterion.isLeaf = true
           }
-
-          break
+        } catch (error) {
+          console.error('Erreur lors du check des enfants du code de biologie sélectionné', error)
         }
-        case ObservationParamsKeys.EXECUTIVE_UNITS: {
-          await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
-          break
-        }
-        case ObservationParamsKeys.ENCOUNTER_STATUS: {
-          unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
-          break
-        }
-        case ObservationParamsKeys.DATE: {
-          if (value?.includes('ge')) {
-            currentCriterion.startOccurrence[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.startOccurrence[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case `${getCriterionDateFilterName(CriteriaType.OBSERVATION)}.${EncounterParamsKeys.START_DATE}`: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case `${getCriterionDateFilterName(CriteriaType.OBSERVATION)}.${EncounterParamsKeys.END_DATE}`: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case '_filter':
-          unbuildEncounterDatesFilters(currentCriterion, value)
-          break
-        case ObservationParamsKeys.VALUE:
-        case ObservationParamsKeys.VALIDATED_STATUS:
-        case 'subject.active':
-        case 'value-quantity':
-          break
-        default:
-          currentCriterion.error = true
-          break
       }
-    }
-  }
-  return currentCriterion
+    },
+    [ObservationParamsKeys.EXECUTIVE_UNITS]: async (c, v) =>
+      await unbuildEncounterServiceCriterias(c, 'encounterService', v),
+    [ObservationParamsKeys.ENCOUNTER_STATUS]: (c, v) => unbuildLabelObjectFilter(c, 'encounterStatus', v),
+    [ObservationParamsKeys.DATE]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.startOccurrence[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.startOccurrence[1] = unbuildDateFilter(v)
+      }
+    },
+    [`${getCriterionDateFilterName(CriteriaType.OBSERVATION)}.${EncounterParamsKeys.START_DATE}`]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterStartDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterStartDate[1] = unbuildDateFilter(v)
+      }
+    },
+    [`${getCriterionDateFilterName(CriteriaType.OBSERVATION)}.${EncounterParamsKeys.END_DATE}`]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterEndDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterEndDate[1] = unbuildDateFilter(v)
+      }
+    },
+    ['_filter']: (c, v) => unbuildEncounterDatesFilters(c, v)
+  })
 }
-const unbuildIPPListCriteria = (element: RequeteurCriteriaType): IPPListDataType => {
+const unbuildIPPListCriteria = async (element: RequeteurCriteriaType): Promise<IPPListDataType> => {
   const currentCriterion: IPPListDataType = {
     ...unbuildCommonCriteria(element),
     type: CriteriaType.IPP_LIST,
@@ -1623,26 +1386,13 @@ const unbuildIPPListCriteria = (element: RequeteurCriteriaType): IPPListDataType
     search: ''
   }
 
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    for (const filter of filters) {
-      const key = filter ? filter[0] : null
-      const value = filter ? filter[1] : null
-
-      switch (key) {
-        case IppParamsKeys.IPP_LIST_FHIR: {
-          currentCriterion.search = value ?? ''
-          break
-        }
-        default:
-          currentCriterion.error = true
-          break
-      }
+  return await unbuildCriteria(element, currentCriterion, {
+    [IppParamsKeys.IPP_LIST_FHIR]: (c, v) => {
+      c.search = v ?? ''
     }
-  }
-  return currentCriterion
+  })
 }
+
 const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<ImagingDataType> => {
   const currentCriterion: ImagingDataType = {
     ...unbuildCommonCriteria(element),
@@ -1673,114 +1423,87 @@ const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<I
     encounterService: [],
     encounterStatus: []
   }
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
-    for (const filter of filters) {
-      const key = filter[0]
-      const value = filter[1]
-      switch (key) {
-        case ImagingParamsKeys.DATE: {
-          if (value.includes('ge')) {
-            currentCriterion.studyStartDate = unbuildDateFilter(value)
-          } else if (value.includes('le')) {
-            currentCriterion.studyEndDate = unbuildDateFilter(value)
-          }
-          break
-        }
-        case ImagingParamsKeys.MODALITY: {
-          const modalitiesValues = value?.replace(/^[*|]+/, '')
-          unbuildLabelObjectFilter(currentCriterion, 'studyModalities', modalitiesValues)
-          break
-        }
-        case ImagingParamsKeys.STUDY_DESCRIPTION: {
-          currentCriterion.studyDescription = unbuildSearchFilter(value)
-          break
-        }
-        case ImagingParamsKeys.STUDY_PROCEDURE: {
-          currentCriterion.studyProcedure = unbuildSearchFilter(value)
-          break
-        }
-        case ImagingParamsKeys.NB_OF_SERIES: {
-          const parsedOccurence = parseOccurence(value)
-          currentCriterion.numberOfSeries = parsedOccurence.value
-          currentCriterion.seriesComparator = parsedOccurence.comparator
-          break
-        }
-        case ImagingParamsKeys.NB_OF_INS: {
-          const parsedOccurence = parseOccurence(value)
-          currentCriterion.numberOfIns = parsedOccurence.value
-          currentCriterion.instancesComparator = parsedOccurence.comparator
-          break
-        }
-        case ImagingParamsKeys.WITH_DOCUMENT: {
-          const parsedDocumentAttachment = parseDocumentAttachment(value as DocumentAttachmentMethod)
-          currentCriterion.withDocument = parsedDocumentAttachment.documentAttachmentMethod
-          currentCriterion.daysOfDelay = parsedDocumentAttachment.daysOfDelay
-          break
-        }
-        case ImagingParamsKeys.STUDY_UID: {
-          currentCriterion.studyUid = value.replace(`${IMAGING_STUDY_UID_URL}|`, '') ?? ''
-          break
-        }
-        case ImagingParamsKeys.SERIES_DATE: {
-          if (value.includes('ge')) {
-            currentCriterion.seriesStartDate = unbuildDateFilter(value)
-          } else if (value.includes('le')) {
-            currentCriterion.seriesEndDate = unbuildDateFilter(value)
-          }
-          break
-        }
-        case ImagingParamsKeys.SERIES_DESCRIPTION: {
-          currentCriterion.seriesDescription = unbuildSearchFilter(value)
-          break
-        }
-        case ImagingParamsKeys.SERIES_PROTOCOL: {
-          currentCriterion.seriesProtocol = unbuildSearchFilter(value)
-          break
-        }
-        case ImagingParamsKeys.SERIES_MODALITIES: {
-          const modalitiesValues = value?.replace(/^[*|]+/, '')
-          unbuildLabelObjectFilter(currentCriterion, 'seriesModalities', modalitiesValues)
-          break
-        }
-        case ImagingParamsKeys.SERIES_UID: {
-          currentCriterion.seriesUid = value ?? ''
-          break
-        }
-        case ImagingParamsKeys.EXECUTIVE_UNITS: {
-          await unbuildEncounterServiceCriterias(currentCriterion, 'encounterService', value)
-          break
-        }
-        case ImagingParamsKeys.ENCOUNTER_STATUS: {
-          unbuildLabelObjectFilter(currentCriterion, 'encounterStatus', value)
-          break
-        }
-        case `${getCriterionDateFilterName(CriteriaType.IMAGING)}.${EncounterParamsKeys.START_DATE}`: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterStartDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterStartDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case `${getCriterionDateFilterName(CriteriaType.IMAGING)}.${EncounterParamsKeys.END_DATE}`: {
-          if (value?.includes('ge')) {
-            currentCriterion.encounterEndDate[0] = unbuildDateFilter(value)
-          } else if (value?.includes('le')) {
-            currentCriterion.encounterEndDate[1] = unbuildDateFilter(value)
-          }
-          break
-        }
-        case '_filter':
-          unbuildEncounterDatesFilters(currentCriterion, value)
-          break
+  return await unbuildCriteria(element, currentCriterion, {
+    [ImagingParamsKeys.DATE]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.studyStartDate = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.studyEndDate = unbuildDateFilter(v)
       }
+    },
+    [ImagingParamsKeys.MODALITY]: (c, v) => {
+      const modalitiesValues = v?.replace(/^[*|]+/, '')
+      unbuildLabelObjectFilter(c, 'studyModalities', modalitiesValues)
+    },
+    [ImagingParamsKeys.STUDY_DESCRIPTION]: (c, v) => {
+      c.studyDescription = unbuildSearchFilter(v)
+    },
+    [ImagingParamsKeys.STUDY_PROCEDURE]: (c, v) => {
+      c.studyProcedure = unbuildSearchFilter(v)
+    },
+    [ImagingParamsKeys.NB_OF_SERIES]: (c, v) => {
+      const parsedOccurence = v ? parseOccurence(v) : null
+      c.numberOfSeries = parsedOccurence !== null ? parsedOccurence.value : 1
+      c.seriesComparator = parsedOccurence !== null ? parsedOccurence.comparator : Comparators.GREATER_OR_EQUAL
+    },
+    [ImagingParamsKeys.NB_OF_INS]: (c, v) => {
+      const parsedOccurence = v ? parseOccurence(v) : null
+      c.numberOfIns = parsedOccurence !== null ? parsedOccurence.value : 1
+      c.instancesComparator = parsedOccurence !== null ? parsedOccurence.comparator : Comparators.GREATER_OR_EQUAL
+    },
+    [ImagingParamsKeys.WITH_DOCUMENT]: (c, v) => {
+      const parsedDocumentAttachment = parseDocumentAttachment(v as DocumentAttachmentMethod)
+      c.withDocument = parsedDocumentAttachment.documentAttachmentMethod
+      c.daysOfDelay = parsedDocumentAttachment.daysOfDelay
+    },
+    [ImagingParamsKeys.STUDY_UID]: (c, v) => {
+      c.studyUid = v?.replace(`${IMAGING_STUDY_UID_URL}|`, '') ?? ''
+    },
+    [ImagingParamsKeys.SERIES_DATE]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.seriesStartDate = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.seriesEndDate = unbuildDateFilter(v)
+      }
+    },
+    [ImagingParamsKeys.SERIES_DESCRIPTION]: (c, v) => {
+      c.seriesDescription = unbuildSearchFilter(v)
+    },
+    [ImagingParamsKeys.SERIES_PROTOCOL]: (c, v) => {
+      c.seriesProtocol = unbuildSearchFilter(v)
+    },
+    [ImagingParamsKeys.SERIES_MODALITIES]: (c, v) => {
+      const modalitiesValues = v?.replace(/^[*|]+/, '')
+      unbuildLabelObjectFilter(c, 'seriesModalities', modalitiesValues)
+    },
+    [ImagingParamsKeys.SERIES_UID]: (c, v) => {
+      c.seriesUid = v ?? ''
+    },
+    [ImagingParamsKeys.EXECUTIVE_UNITS]: async (c, v) => {
+      await unbuildEncounterServiceCriterias(c, 'encounterService', v)
+    },
+    [ImagingParamsKeys.ENCOUNTER_STATUS]: (c, v) => {
+      unbuildLabelObjectFilter(c, 'encounterStatus', v)
+    },
+    [`${getCriterionDateFilterName(CriteriaType.IMAGING)}.${EncounterParamsKeys.START_DATE}`]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterStartDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterStartDate[1] = unbuildDateFilter(v)
+      }
+    },
+    [`${getCriterionDateFilterName(CriteriaType.IMAGING)}.${EncounterParamsKeys.END_DATE}`]: (c, v) => {
+      if (v?.includes('ge')) {
+        c.encounterEndDate[0] = unbuildDateFilter(v)
+      } else if (v?.includes('le')) {
+        c.encounterEndDate[1] = unbuildDateFilter(v)
+      }
+    },
+    ['_filter']: (c, v) => {
+      unbuildEncounterDatesFilters(c, v)
     }
-
-    unbuildOccurrence(element, currentCriterion)
-  }
-  return currentCriterion
+  })
 }
 
 const unbuildPregnancyQuestionnaireResponseCriteria = async (
@@ -1811,11 +1534,12 @@ const unbuildPregnancyQuestionnaireResponseCriteria = async (
     startOccurrence: [null, null],
     encounterStatus: []
   }
+
+  unbuildOccurrence(element, currentCriterion)
+
   if (element.filterFhir) {
     const splittedFilters = element.filterFhir.split('&')
     const cleanedFilters = unbuildQuestionnaireFilters(splittedFilters)
-
-    unbuildOccurrence(element, currentCriterion)
 
     for (const { key, values } of cleanedFilters) {
       // this is bad design, we should properly handle multiple values and operators

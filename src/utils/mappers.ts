@@ -346,7 +346,7 @@ export const unbuildEncounterDateFilters = (filter: string) => {
 export const findQuestionnaireName = (filters: string[]) => {
   for (const item of filters) {
     const match = item.match(/questionnaire.name=(.*)/)
-    if (match && match[1]) {
+    if (match?.[1]) {
       return match[1]
     }
   }
