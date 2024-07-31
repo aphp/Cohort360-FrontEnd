@@ -275,11 +275,81 @@ export const cleanNominativeCriterias = (
   }
 }
 
-const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: boolean): string => {
-  let filterFhir = ''
-  const filterReducer = (accumulator: string, currentValue: string): string =>
-    accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
+const buildPatientFilter = (criterion: DemographicDataType, deidentified: boolean): string[] => {
+  return [
+    'active=true',
+    filtersBuilders(PatientsParamsKeys.GENDERS, buildLabelObjectFilter(criterion.genders)),
+    filtersBuilders(PatientsParamsKeys.VITAL_STATUS, buildLabelObjectFilter(criterion.vitalStatus)),
+    filtersBuilders(PatientsParamsKeys.BIRTHDATE, buildDateFilter(criterion.birthdates[1], 'le')),
+    filtersBuilders(PatientsParamsKeys.BIRTHDATE, buildDateFilter(criterion.birthdates[0], 'ge')),
+    filtersBuilders(PatientsParamsKeys.DEATHDATE, buildDateFilter(criterion.deathDates[0], 'ge')),
+    filtersBuilders(PatientsParamsKeys.DEATHDATE, buildDateFilter(criterion.deathDates[1], 'le')),
+    criterion.birthdates[0] === null && criterion.birthdates[1] === null
+      ? buildDurationFilter(
+          criterion.age[0],
+          deidentified ? PatientsParamsKeys.DATE_DEIDENTIFIED : PatientsParamsKeys.DATE_IDENTIFIED,
+          'ge',
+          deidentified
+        )
+      : '',
+    criterion.birthdates[1] === null && criterion.birthdates[1] === null
+      ? buildDurationFilter(
+          criterion.age[1],
+          deidentified ? PatientsParamsKeys.DATE_DEIDENTIFIED : PatientsParamsKeys.DATE_IDENTIFIED,
+          'le',
+          deidentified
+        )
+      : ''
+  ]
+}
 
+const buildEncounterFilter = (criterion: EncounterDataType, deidentified: boolean): string[] => {
+  return [
+    'subject.active=true',
+    filtersBuilders(EncounterParamsKeys.ADMISSIONMODE, buildLabelObjectFilter(criterion.admissionMode)),
+    filtersBuilders(EncounterParamsKeys.ENTRYMODE, buildLabelObjectFilter(criterion.entryMode)),
+    filtersBuilders(EncounterParamsKeys.EXITMODE, buildLabelObjectFilter(criterion.exitMode)),
+    filtersBuilders(EncounterParamsKeys.PRISENCHARGETYPE, buildLabelObjectFilter(criterion.priseEnChargeType)),
+    filtersBuilders(EncounterParamsKeys.TYPEDESEJOUR, buildLabelObjectFilter(criterion.typeDeSejour)),
+    filtersBuilders(EncounterParamsKeys.DESTINATION, buildLabelObjectFilter(criterion.destination)),
+    filtersBuilders(EncounterParamsKeys.PROVENANCE, buildLabelObjectFilter(criterion.provenance)),
+    filtersBuilders(EncounterParamsKeys.ADMISSION, buildLabelObjectFilter(criterion.admission)),
+    filtersBuilders(EncounterParamsKeys.REASON, buildLabelObjectFilter(criterion.reason)),
+    filtersBuilders(EncounterParamsKeys.SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
+    filtersBuilders(EncounterParamsKeys.STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
+    criterion.duration[0] !== null
+      ? buildDurationFilter(criterion?.duration?.[0], EncounterParamsKeys.DURATION, 'ge')
+      : '',
+    criterion.duration[1] !== null
+      ? buildDurationFilter(criterion?.duration?.[1], EncounterParamsKeys.DURATION, 'le')
+      : '',
+    criterion.age[0] !== null
+      ? buildDurationFilter(
+          criterion?.age[0],
+          deidentified ? EncounterParamsKeys.MIN_BIRTHDATE_MONTH : EncounterParamsKeys.MIN_BIRTHDATE_DAY,
+          'ge',
+          deidentified
+        )
+      : '',
+    criterion.age[1] !== null
+      ? buildDurationFilter(
+          criterion?.age[1],
+          deidentified ? EncounterParamsKeys.MAX_BIRTHDATE_MONTH : EncounterParamsKeys.MAX_BIRTHDATE_DAY,
+          'le',
+          deidentified
+        )
+      : '',
+    buildEncounterDateFilter(
+      criterion.type,
+      criterion.includeEncounterStartDateNull,
+      criterion.encounterStartDate,
+      true
+    ),
+    buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
+  ]
+}
+
+const buildDocumentFilter = (criterion: DocumentDataType): string[] => {
   const joinDocStatuses = (docStatuses: string[]): string => {
     const filterDocStatuses: string[] = []
     for (const _status of docStatuses) {
@@ -294,518 +364,401 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
     return filterDocStatuses.join(',')
   }
 
-  switch (criterion.type) {
-    case CriteriaType.PATIENT: {
-      filterFhir = [
-        'active=true',
-        filtersBuilders(PatientsParamsKeys.GENDERS, buildLabelObjectFilter(criterion.genders)),
-        filtersBuilders(PatientsParamsKeys.VITAL_STATUS, buildLabelObjectFilter(criterion.vitalStatus)),
-        filtersBuilders(PatientsParamsKeys.BIRTHDATE, buildDateFilter(criterion.birthdates[1], 'le')),
-        filtersBuilders(PatientsParamsKeys.BIRTHDATE, buildDateFilter(criterion.birthdates[0], 'ge')),
-        filtersBuilders(PatientsParamsKeys.DEATHDATE, buildDateFilter(criterion.deathDates[0], 'ge')),
-        filtersBuilders(PatientsParamsKeys.DEATHDATE, buildDateFilter(criterion.deathDates[1], 'le')),
-        criterion.birthdates[0] === null && criterion.birthdates[1] === null
-          ? buildDurationFilter(
-              criterion.age[0],
-              deidentified ? PatientsParamsKeys.DATE_DEIDENTIFIED : PatientsParamsKeys.DATE_IDENTIFIED,
-              'ge',
-              deidentified
-            )
-          : '',
-        criterion.birthdates[1] === null && criterion.birthdates[1] === null
-          ? buildDurationFilter(
-              criterion.age[1],
-              deidentified ? PatientsParamsKeys.DATE_DEIDENTIFIED : PatientsParamsKeys.DATE_IDENTIFIED,
-              'le',
-              deidentified
-            )
-          : ''
-      ]
-        .filter((elem) => elem)
-        .reduce(filterReducer)
-      break
-    }
+  return [
+    `type:not=doc-impor&contenttype=text/plain&subject.active=true`,
+    filtersBuilders(DocumentsParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
+    filtersBuilders(
+      criterion.searchBy === SearchByTypes.TEXT ? SearchByTypes.TEXT : SearchByTypes.DESCRIPTION,
+      buildSearchFilter(criterion.search)
+    ),
+    filtersBuilders(DocumentsParamsKeys.DOC_STATUSES, joinDocStatuses(criterion.docStatuses)),
+    filtersBuilders(
+      DocumentsParamsKeys.DOC_TYPES,
+      buildLabelObjectFilter(
+        criterion.docType?.map((docType) => {
+          return {
+            id: docType.code
+          } as LabelObject
+        })
+      )
+    ),
+    filtersBuilders(DocumentsParamsKeys.DOC_STATUSES, buildLabelObjectFilter(criterion.encounterStatus)),
+    filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
+    filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
+    buildEncounterDateFilter(
+      criterion.type,
+      criterion.includeEncounterStartDateNull,
+      criterion.encounterStartDate,
+      true
+    ),
+    buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
+  ]
+}
 
-    case CriteriaType.ENCOUNTER: {
-      filterFhir = [
-        'subject.active=true',
-        filtersBuilders(EncounterParamsKeys.ADMISSIONMODE, buildLabelObjectFilter(criterion.admissionMode)),
-        filtersBuilders(EncounterParamsKeys.ENTRYMODE, buildLabelObjectFilter(criterion.entryMode)),
-        filtersBuilders(EncounterParamsKeys.EXITMODE, buildLabelObjectFilter(criterion.exitMode)),
-        filtersBuilders(EncounterParamsKeys.PRISENCHARGETYPE, buildLabelObjectFilter(criterion.priseEnChargeType)),
-        filtersBuilders(EncounterParamsKeys.TYPEDESEJOUR, buildLabelObjectFilter(criterion.typeDeSejour)),
-        filtersBuilders(EncounterParamsKeys.DESTINATION, buildLabelObjectFilter(criterion.destination)),
-        filtersBuilders(EncounterParamsKeys.PROVENANCE, buildLabelObjectFilter(criterion.provenance)),
-        filtersBuilders(EncounterParamsKeys.ADMISSION, buildLabelObjectFilter(criterion.admission)),
-        filtersBuilders(EncounterParamsKeys.REASON, buildLabelObjectFilter(criterion.reason)),
-        filtersBuilders(EncounterParamsKeys.SERVICE_PROVIDER, buildEncounterServiceFilter(criterion.encounterService)),
-        filtersBuilders(EncounterParamsKeys.STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
-        criterion.duration[0] !== null
-          ? buildDurationFilter(criterion?.duration?.[0], EncounterParamsKeys.DURATION, 'ge')
-          : '',
-        criterion.duration[1] !== null
-          ? buildDurationFilter(criterion?.duration?.[1], EncounterParamsKeys.DURATION, 'le')
-          : '',
-        criterion.age[0] !== null
-          ? buildDurationFilter(
-              criterion?.age[0],
-              deidentified ? EncounterParamsKeys.MIN_BIRTHDATE_MONTH : EncounterParamsKeys.MIN_BIRTHDATE_DAY,
-              'ge',
-              deidentified
-            )
-          : '',
-        criterion.age[1] !== null
-          ? buildDurationFilter(
-              criterion?.age[1],
-              deidentified ? EncounterParamsKeys.MAX_BIRTHDATE_MONTH : EncounterParamsKeys.MAX_BIRTHDATE_DAY,
-              'le',
-              deidentified
-            )
-          : '',
-        buildEncounterDateFilter(
-          criterion.type,
-          criterion.includeEncounterStartDateNull,
-          criterion.encounterStartDate,
-          true
-        ),
-        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
-      ]
-        .filter((elem) => elem)
-        .reduce(filterReducer)
-      break
-    }
+const buildConditionFilter = (criterion: Cim10DataType): string[] => {
+  return [
+    'subject.active=true',
+    filtersBuilders(ConditionParamsKeys.CODE, buildLabelObjectFilter(criterion.code, CONDITION_HIERARCHY)),
+    filtersBuilders(ConditionParamsKeys.DIAGNOSTIC_TYPES, buildLabelObjectFilter(criterion.diagnosticType)),
+    criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : '',
+    filtersBuilders(ConditionParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
+    filtersBuilders(ConditionParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
+    filtersBuilders(ConditionParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
+    filtersBuilders(ConditionParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
+    buildEncounterDateFilter(
+      criterion.type,
+      criterion.includeEncounterStartDateNull,
+      criterion.encounterStartDate,
+      true
+    ),
+    buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
+  ]
+}
 
-    case CriteriaType.DOCUMENTS: {
-      const unreducedFilterFhir = [
-        `type:not=doc-impor&contenttype=text/plain&subject.active=true`,
-        filtersBuilders(DocumentsParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
-        filtersBuilders(
-          criterion.searchBy === SearchByTypes.TEXT ? SearchByTypes.TEXT : SearchByTypes.DESCRIPTION,
-          buildSearchFilter(criterion.search)
-        ),
-        filtersBuilders(DocumentsParamsKeys.DOC_STATUSES, joinDocStatuses(criterion.docStatuses)),
-        filtersBuilders(
-          DocumentsParamsKeys.DOC_TYPES,
-          buildLabelObjectFilter(
-            criterion.docType?.map((docType) => {
-              return {
-                id: docType.code
-              } as LabelObject
-            })
-          )
-        ),
-        filtersBuilders(DocumentsParamsKeys.DOC_STATUSES, buildLabelObjectFilter(criterion.encounterStatus)),
-        filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
-        filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
-        buildEncounterDateFilter(
-          criterion.type,
-          criterion.includeEncounterStartDateNull,
-          criterion.encounterStartDate,
-          true
-        ),
-        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
-      ].filter((elem) => elem)
-      filterFhir =
-        unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
-      break
-    }
+const buildProcedureFilter = (criterion: CcamDataType): string[] => {
+  return [
+    'subject.active=true',
+    filtersBuilders(ProcedureParamsKeys.CODE, buildLabelObjectFilter(criterion.code, PROCEDURE_HIERARCHY)),
+    filtersBuilders(ProcedureParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
+    filtersBuilders(ProcedureParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
+    filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
+    filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
+    criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : '',
+    buildEncounterDateFilter(
+      criterion.type,
+      criterion.includeEncounterStartDateNull,
+      criterion.encounterStartDate,
+      true
+    ),
+    buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
+  ]
+}
 
-    case CriteriaType.CONDITION: {
-      const unreducedFilterFhir = [
-        'subject.active=true',
-        filtersBuilders(ConditionParamsKeys.CODE, buildLabelObjectFilter(criterion.code, CONDITION_HIERARCHY)),
-        filtersBuilders(ConditionParamsKeys.DIAGNOSTIC_TYPES, buildLabelObjectFilter(criterion.diagnosticType)),
-        criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : '',
-        filtersBuilders(ConditionParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
-        filtersBuilders(ConditionParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
-        filtersBuilders(ConditionParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
-        filtersBuilders(ConditionParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
-        buildEncounterDateFilter(
-          criterion.type,
-          criterion.includeEncounterStartDateNull,
-          criterion.encounterStartDate,
-          true
-        ),
-        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
-      ].filter((elem) => elem)
-      filterFhir =
-        unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
-      break
-    }
+const buildClaimFilter = (criterion: GhmDataType): string[] => {
+  return [
+    'patient.active=true',
+    filtersBuilders(ClaimParamsKeys.CODE, buildLabelObjectFilter(criterion.code, CLAIM_HIERARCHY)),
+    filtersBuilders(ClaimParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
+    filtersBuilders(ClaimParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
+    filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
+    filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
+    buildEncounterDateFilter(
+      criterion.type,
+      criterion.includeEncounterStartDateNull,
+      criterion.encounterStartDate,
+      true
+    ),
+    buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
+  ]
+}
 
-    case CriteriaType.PROCEDURE: {
-      const unreducedFilterFhir = [
-        'subject.active=true',
-        filtersBuilders(ProcedureParamsKeys.CODE, buildLabelObjectFilter(criterion.code, PROCEDURE_HIERARCHY)),
-        filtersBuilders(ProcedureParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
-        filtersBuilders(ProcedureParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
-        filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
-        filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
-        criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : '',
-        buildEncounterDateFilter(
-          criterion.type,
-          criterion.includeEncounterStartDateNull,
-          criterion.encounterStartDate,
-          true
-        ),
-        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
-      ].filter((elem) => elem)
-      filterFhir =
-        unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
-      break
-    }
+const buildMedicationFilter = (criterion: MedicationDataType): string[] => {
+  return [
+    'subject.active=true',
+    filtersBuilders(
+      criterion.type === CriteriaType.MEDICATION_REQUEST
+        ? PrescriptionParamsKeys.PRESCRIPTION_ROUTES
+        : AdministrationParamsKeys.ADMINISTRATION_ROUTES,
+      buildLabelObjectFilter(criterion.administration)
+    ),
+    filtersBuilders(
+      criterion.type === CriteriaType.MEDICATION_REQUEST
+        ? PrescriptionParamsKeys.EXECUTIVE_UNITS
+        : AdministrationParamsKeys.EXECUTIVE_UNITS,
+      buildEncounterServiceFilter(criterion.encounterService)
+    ),
+    filtersBuilders(PrescriptionParamsKeys.CODE, buildLabelObjectFilter(criterion.code, MEDICATION_ATC, true)),
+    filtersBuilders(
+      criterion.type === CriteriaType.MEDICATION_REQUEST
+        ? PrescriptionParamsKeys.ENCOUNTER_STATUS
+        : AdministrationParamsKeys.ENCOUNTER_STATUS,
+      buildLabelObjectFilter(criterion.encounterStatus)
+    ),
+    filtersBuilders(
+      criterion.type === CriteriaType.MEDICATION_REQUEST ? PrescriptionParamsKeys.DATE : AdministrationParamsKeys.DATE,
+      buildDateFilter(criterion.startOccurrence[0], 'ge')
+    ),
+    filtersBuilders(
+      criterion.type === CriteriaType.MEDICATION_REQUEST ? PrescriptionParamsKeys.DATE : AdministrationParamsKeys.DATE,
+      buildDateFilter(criterion.startOccurrence[1], 'le')
+    ),
+    filtersBuilders(PrescriptionParamsKeys.END_DATE, buildDateFilter(criterion.endOccurrence?.[0], 'ge')),
+    filtersBuilders(PrescriptionParamsKeys.END_DATE, buildDateFilter(criterion.endOccurrence?.[1], 'le')),
+    criterion.type === CriteriaType.MEDICATION_REQUEST
+      ? filtersBuilders(PrescriptionParamsKeys.PRESCRIPTION_TYPES, buildLabelObjectFilter(criterion.prescriptionType))
+      : '',
+    buildEncounterDateFilter(
+      criterion.type,
+      criterion.includeEncounterStartDateNull,
+      criterion.encounterStartDate,
+      true
+    ),
+    buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
+  ]
+}
 
-    case CriteriaType.CLAIM: {
-      const unreducedFilterFhir = [
-        'patient.active=true',
-        filtersBuilders(ClaimParamsKeys.CODE, buildLabelObjectFilter(criterion.code, CLAIM_HIERARCHY)),
-        filtersBuilders(ClaimParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
-        filtersBuilders(ClaimParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
-        filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
-        filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
-        buildEncounterDateFilter(
-          criterion.type,
-          criterion.includeEncounterStartDateNull,
-          criterion.encounterStartDate,
-          true
-        ),
-        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
-      ].filter((elem) => elem)
-      filterFhir =
-        unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
-      break
-    }
+const buildObvserationFilter = (criterion: ObservationDataType): string[] => {
+  return [
+    `subject.active=true&${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`,
+    filtersBuilders(
+      ObservationParamsKeys.ANABIO_LOINC,
+      buildLabelObjectFilter(criterion.code, BIOLOGY_HIERARCHY_ITM_ANABIO)
+    ),
+    filtersBuilders(ObservationParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
+    filtersBuilders(ObservationParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
+    filtersBuilders(ObservationParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
+    filtersBuilders(ObservationParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
+    buildObservationValueFilter(criterion, ObservationParamsKeys.VALUE),
+    buildEncounterDateFilter(
+      criterion.type,
+      criterion.includeEncounterStartDateNull,
+      criterion.encounterStartDate,
+      true
+    ),
+    buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
+  ]
+}
 
-    case CriteriaType.MEDICATION_REQUEST:
-    case CriteriaType.MEDICATION_ADMINISTRATION: {
-      const unreducedFilterFhir = [
-        'subject.active=true',
-        filtersBuilders(
-          criterion.type === CriteriaType.MEDICATION_REQUEST
-            ? PrescriptionParamsKeys.PRESCRIPTION_ROUTES
-            : AdministrationParamsKeys.ADMINISTRATION_ROUTES,
-          buildLabelObjectFilter(criterion.administration)
-        ),
-        filtersBuilders(
-          criterion.type === CriteriaType.MEDICATION_REQUEST
-            ? PrescriptionParamsKeys.EXECUTIVE_UNITS
-            : AdministrationParamsKeys.EXECUTIVE_UNITS,
-          buildEncounterServiceFilter(criterion.encounterService)
-        ),
-        filtersBuilders(PrescriptionParamsKeys.CODE, buildLabelObjectFilter(criterion.code, MEDICATION_ATC, true)),
-        filtersBuilders(
-          criterion.type === CriteriaType.MEDICATION_REQUEST
-            ? PrescriptionParamsKeys.ENCOUNTER_STATUS
-            : AdministrationParamsKeys.ENCOUNTER_STATUS,
-          buildLabelObjectFilter(criterion.encounterStatus)
-        ),
-        filtersBuilders(
-          criterion.type === CriteriaType.MEDICATION_REQUEST
-            ? PrescriptionParamsKeys.DATE
-            : AdministrationParamsKeys.DATE,
-          buildDateFilter(criterion.startOccurrence[0], 'ge')
-        ),
-        filtersBuilders(
-          criterion.type === CriteriaType.MEDICATION_REQUEST
-            ? PrescriptionParamsKeys.DATE
-            : AdministrationParamsKeys.DATE,
-          buildDateFilter(criterion.startOccurrence[1], 'le')
-        ),
-        filtersBuilders(PrescriptionParamsKeys.END_DATE, buildDateFilter(criterion.endOccurrence?.[0], 'ge')),
-        filtersBuilders(PrescriptionParamsKeys.END_DATE, buildDateFilter(criterion.endOccurrence?.[1], 'le')),
-        criterion.type === CriteriaType.MEDICATION_REQUEST
-          ? filtersBuilders(
-              PrescriptionParamsKeys.PRESCRIPTION_TYPES,
-              buildLabelObjectFilter(criterion.prescriptionType)
-            )
-          : '',
-        buildEncounterDateFilter(
-          criterion.type,
-          criterion.includeEncounterStartDateNull,
-          criterion.encounterStartDate,
-          true
-        ),
-        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
-      ].filter((elem) => elem)
-      filterFhir =
-        unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
-      break
-    }
+const buildImagingFilter = (criterion: ImagingDataType): string[] => {
+  return [
+    'patient.active=true',
+    filtersBuilders(ImagingParamsKeys.DATE, buildDateFilter(criterion.studyStartDate, 'ge')),
+    filtersBuilders(ImagingParamsKeys.DATE, buildDateFilter(criterion.studyEndDate, 'le')),
+    filtersBuilders(ImagingParamsKeys.SERIES_DATE, buildDateFilter(criterion.seriesStartDate, 'ge')),
+    filtersBuilders(ImagingParamsKeys.SERIES_DATE, buildDateFilter(criterion.seriesEndDate, 'le')),
+    filtersBuilders(ImagingParamsKeys.STUDY_DESCRIPTION, buildSearchFilter(criterion.studyDescription)),
+    filtersBuilders(ImagingParamsKeys.STUDY_PROCEDURE, buildSearchFilter(criterion.studyProcedure)),
+    filtersBuilders(ImagingParamsKeys.SERIES_DESCRIPTION, buildSearchFilter(criterion.seriesDescription)),
+    filtersBuilders(ImagingParamsKeys.SERIES_PROTOCOL, buildSearchFilter(criterion.seriesProtocol)),
+    filtersBuilders(ImagingParamsKeys.MODALITY, buildLabelObjectFilter(criterion.studyModalities)),
+    filtersBuilders(ImagingParamsKeys.SERIES_MODALITIES, buildLabelObjectFilter(criterion.seriesModalities)),
+    filtersBuilders(ImagingParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
+    filtersBuilders(
+      ImagingParamsKeys.NB_OF_SERIES,
+      buildComparatorFilter(criterion.numberOfSeries, criterion.seriesComparator)
+    ),
+    filtersBuilders(
+      ImagingParamsKeys.NB_OF_INS,
+      buildComparatorFilter(criterion.numberOfIns, criterion.instancesComparator)
+    ),
+    filtersBuilders(ImagingParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
+    buildWithDocumentFilter(criterion, ImagingParamsKeys.WITH_DOCUMENT),
+    buildSimpleFilter(criterion.studyUid, ImagingParamsKeys.STUDY_UID, IMAGING_STUDY_UID_URL),
+    buildSimpleFilter(criterion.seriesUid, ImagingParamsKeys.SERIES_UID),
+    buildEncounterDateFilter(
+      criterion.type,
+      criterion.includeEncounterStartDateNull,
+      criterion.encounterStartDate,
+      true
+    ),
+    buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
+  ]
+}
 
-    case CriteriaType.OBSERVATION: {
-      const unreducedFilterFhir = [
-        `subject.active=true&${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`,
-        filtersBuilders(
-          ObservationParamsKeys.ANABIO_LOINC,
-          buildLabelObjectFilter(criterion.code, BIOLOGY_HIERARCHY_ITM_ANABIO)
-        ),
-        filtersBuilders(ObservationParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
-        filtersBuilders(ObservationParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
-        filtersBuilders(ObservationParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
-        filtersBuilders(ObservationParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
-        buildObservationValueFilter(criterion, ObservationParamsKeys.VALUE),
-        buildEncounterDateFilter(
-          criterion.type,
-          criterion.includeEncounterStartDateNull,
-          criterion.encounterStartDate,
-          true
-        ),
-        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
-      ].filter((elem) => elem)
-      filterFhir =
-        unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
-      break
-    }
+const buildPregnancyFilter = (criterion: PregnancyDataType): string[] => {
+  return [
+    'subject.active=true',
+    `questionnaire.name=${FormNames.PREGNANCY}`,
+    'status=in-progress,completed',
+    filtersBuilders(
+      QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS,
+      buildLabelObjectFilter(criterion.encounterStatus)
+    ),
+    questionnaireFiltersBuilders(
+      pregnancyForm.pregnancyStartDate,
+      buildDateFilter(criterion.pregnancyStartDate, 'ge', true)
+    ),
+    questionnaireFiltersBuilders(
+      pregnancyForm.pregnancyEndDate,
+      buildDateFilter(criterion.pregnancyEndDate, 'le', true)
+    ),
+    questionnaireFiltersBuilders(pregnancyForm.pregnancyMode, buildLabelObjectFilter(criterion.pregnancyMode)),
+    questionnaireFiltersBuilders(
+      pregnancyForm.foetus,
+      buildComparatorFilter(criterion.foetus, criterion.foetusComparator)
+    ),
+    questionnaireFiltersBuilders(
+      pregnancyForm.parity,
+      buildComparatorFilter(criterion.parity, criterion.parityComparator)
+    ),
+    questionnaireFiltersBuilders(pregnancyForm.maternalRisks, buildLabelObjectFilter(criterion.maternalRisks)),
+    questionnaireFiltersBuilders(
+      pregnancyForm.maternalRisksPrecision,
+      buildSearchFilter(criterion.maternalRisksPrecision)
+    ),
+    questionnaireFiltersBuilders(
+      pregnancyForm.risksRelatedToObstetricHistory,
+      buildLabelObjectFilter(criterion.risksRelatedToObstetricHistory)
+    ),
+    questionnaireFiltersBuilders(
+      pregnancyForm.risksRelatedToObstetricHistoryPrecision,
+      buildSearchFilter(criterion.risksRelatedToObstetricHistoryPrecision)
+    ),
+    questionnaireFiltersBuilders(
+      pregnancyForm.risksOrComplicationsOfPregnancy,
+      buildLabelObjectFilter(criterion.risksOrComplicationsOfPregnancy)
+    ),
+    questionnaireFiltersBuilders(
+      pregnancyForm.risksOrComplicationsOfPregnancyPrecision,
+      buildSearchFilter(criterion.risksOrComplicationsOfPregnancyPrecision)
+    ),
+    questionnaireFiltersBuilders(pregnancyForm.corticotherapie, buildLabelObjectFilter(criterion.corticotherapie)),
+    questionnaireFiltersBuilders(pregnancyForm.prenatalDiagnosis, buildLabelObjectFilter(criterion.prenatalDiagnosis)),
+    questionnaireFiltersBuilders(
+      pregnancyForm.ultrasoundMonitoring,
+      buildLabelObjectFilter(criterion.ultrasoundMonitoring)
+    ),
+    questionnaireFiltersBuilders(
+      { id: QuestionnaireResponseParamsKeys.EXECUTIVE_UNITS, type: 'valueCoding' },
+      buildEncounterServiceFilter(criterion.encounterService)
+    )
+  ]
+}
 
-    case CriteriaType.IPP_LIST: {
-      const unreducedFilterFhir = [
+const buildHospitFilter = (criterion: HospitDataType): string[] => {
+  return [
+    'subject.active=true',
+    `questionnaire.name=${FormNames.HOSPIT}`,
+    'status=in-progress,completed',
+    filtersBuilders(
+      QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS,
+      buildLabelObjectFilter(criterion.encounterStatus)
+    ),
+    questionnaireFiltersBuilders(hospitForm.hospitReason, buildSearchFilter(criterion.hospitReason)),
+    questionnaireFiltersBuilders(hospitForm.inUteroTransfer, buildLabelObjectFilter(criterion.inUteroTransfer)),
+    questionnaireFiltersBuilders(hospitForm.pregnancyMonitoring, buildLabelObjectFilter(criterion.pregnancyMonitoring)),
+    questionnaireFiltersBuilders(hospitForm.vme, buildLabelObjectFilter(criterion.vme)),
+    questionnaireFiltersBuilders(
+      hospitForm.maturationCorticotherapie,
+      buildLabelObjectFilter(criterion.maturationCorticotherapie)
+    ),
+    questionnaireFiltersBuilders(hospitForm.chirurgicalGesture, buildLabelObjectFilter(criterion.chirurgicalGesture)),
+    questionnaireFiltersBuilders(hospitForm.childbirth, buildLabelObjectFilter(criterion.childbirth)),
+    questionnaireFiltersBuilders(
+      hospitForm.hospitalChildBirthPlace,
+      buildLabelObjectFilter(criterion.hospitalChildBirthPlace)
+    ),
+    questionnaireFiltersBuilders(
+      hospitForm.otherHospitalChildBirthPlace,
+      buildLabelObjectFilter(criterion.otherHospitalChildBirthPlace)
+    ),
+    questionnaireFiltersBuilders(hospitForm.homeChildBirthPlace, buildLabelObjectFilter(criterion.homeChildBirthPlace)),
+    questionnaireFiltersBuilders(hospitForm.childbirthMode, buildLabelObjectFilter(criterion.childbirthMode)),
+    questionnaireFiltersBuilders(hospitForm.maturationReason, buildLabelObjectFilter(criterion.maturationReason)),
+    questionnaireFiltersBuilders(hospitForm.maturationModality, buildLabelObjectFilter(criterion.maturationModality)),
+    questionnaireFiltersBuilders(hospitForm.imgIndication, buildLabelObjectFilter(criterion.imgIndication)),
+    questionnaireFiltersBuilders(
+      hospitForm.laborOrCesareanEntry,
+      buildLabelObjectFilter(criterion.laborOrCesareanEntry)
+    ),
+    questionnaireFiltersBuilders(
+      hospitForm.pathologyDuringLabor,
+      buildLabelObjectFilter(criterion.pathologyDuringLabor)
+    ),
+    questionnaireFiltersBuilders(
+      hospitForm.obstetricalGestureDuringLabor,
+      buildLabelObjectFilter(criterion.obstetricalGestureDuringLabor)
+    ),
+    questionnaireFiltersBuilders(hospitForm.analgesieType, buildLabelObjectFilter(criterion.analgesieType)),
+    questionnaireFiltersBuilders(
+      hospitForm.birthDeliveryStartDate,
+      buildDateFilter(criterion.birthDeliveryStartDate, 'ge', true)
+    ),
+    questionnaireFiltersBuilders(
+      hospitForm.birthDeliveryEndDate,
+      buildDateFilter(criterion.birthDeliveryEndDate, 'le', true)
+    ),
+    questionnaireFiltersBuilders(
+      hospitForm.birthDeliveryWeeks,
+      buildComparatorFilter(criterion.birthDeliveryWeeks, criterion.birthDeliveryWeeksComparator)
+    ),
+    questionnaireFiltersBuilders(
+      hospitForm.birthDeliveryDays,
+      buildComparatorFilter(criterion.birthDeliveryDays, criterion.birthDeliveryDaysComparator)
+    ),
+    questionnaireFiltersBuilders(hospitForm.birthDeliveryWay, buildLabelObjectFilter(criterion.birthDeliveryWay)),
+    questionnaireFiltersBuilders(hospitForm.instrumentType, buildLabelObjectFilter(criterion.instrumentType)),
+    questionnaireFiltersBuilders(hospitForm.cSectionModality, buildLabelObjectFilter(criterion.cSectionModality)),
+    questionnaireFiltersBuilders(
+      hospitForm.presentationAtDelivery,
+      buildLabelObjectFilter(criterion.presentationAtDelivery)
+    ),
+    questionnaireFiltersBuilders(
+      hospitForm.birthMensurationsGrams,
+      buildComparatorFilter(criterion.birthMensurationsGrams, criterion.birthMensurationsGramsComparator)
+    ),
+    questionnaireFiltersBuilders(
+      hospitForm.birthMensurationsPercentil,
+      buildComparatorFilter(criterion.birthMensurationsPercentil, criterion.birthMensurationsPercentilComparator)
+    ),
+    questionnaireFiltersBuilders(
+      hospitForm.apgar1,
+      buildComparatorFilter(criterion.apgar1, criterion.apgar1Comparator)
+    ),
+    questionnaireFiltersBuilders(
+      hospitForm.apgar3,
+      buildComparatorFilter(criterion.apgar3, criterion.apgar3Comparator)
+    ),
+    questionnaireFiltersBuilders(
+      hospitForm.apgar5,
+      buildComparatorFilter(criterion.apgar5, criterion.apgar5Comparator)
+    ),
+    questionnaireFiltersBuilders(
+      hospitForm.apgar10,
+      buildComparatorFilter(criterion.apgar10, criterion.apgar10Comparator)
+    ),
+    questionnaireFiltersBuilders(
+      hospitForm.arterialPhCord,
+      buildComparatorFilter(criterion.arterialPhCord, criterion.arterialPhCordComparator)
+    ),
+    questionnaireFiltersBuilders(
+      hospitForm.arterialCordLactates,
+      buildComparatorFilter(criterion.arterialCordLactates, criterion.arterialCordLactatesComparator)
+    ),
+    questionnaireFiltersBuilders(hospitForm.birthStatus, buildLabelObjectFilter(criterion.birthStatus)),
+    questionnaireFiltersBuilders(
+      hospitForm.postpartumHemorrhage,
+      buildLabelObjectFilter(criterion.postpartumHemorrhage)
+    ),
+    questionnaireFiltersBuilders(hospitForm.conditionPerineum, buildLabelObjectFilter(criterion.conditionPerineum)),
+    questionnaireFiltersBuilders(hospitForm.exitPlaceType, buildLabelObjectFilter(criterion.exitPlaceType)),
+    questionnaireFiltersBuilders(hospitForm.feedingType, buildLabelObjectFilter(criterion.feedingType)),
+    questionnaireFiltersBuilders(hospitForm.complication, buildLabelObjectFilter(criterion.complication)),
+    questionnaireFiltersBuilders(hospitForm.exitFeedingMode, buildLabelObjectFilter(criterion.exitFeedingMode)),
+    questionnaireFiltersBuilders(hospitForm.exitDiagnostic, buildLabelObjectFilter(criterion.exitDiagnostic)),
+    questionnaireFiltersBuilders(
+      { id: QuestionnaireResponseParamsKeys.EXECUTIVE_UNITS, type: 'valueCoding' },
+      buildEncounterServiceFilter(criterion.encounterService)
+    )
+  ]
+}
+
+const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: boolean): string => {
+  const filterReducer = (accumulator: string, currentValue: string): string =>
+    accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
+
+  const filterBuilders: Partial<{ [K in CriteriaType]: (c: SelectedCriteriaType, b: boolean) => string[] }> = {
+    [CriteriaType.PATIENT]: (c, b) => buildPatientFilter(c as DemographicDataType, b),
+    [CriteriaType.ENCOUNTER]: (c, b) => buildEncounterFilter(c as EncounterDataType, b),
+    [CriteriaType.DOCUMENTS]: (c) => buildDocumentFilter(c as DocumentDataType),
+    [CriteriaType.CONDITION]: (c) => buildConditionFilter(c as Cim10DataType),
+    [CriteriaType.PROCEDURE]: (c) => buildProcedureFilter(c as CcamDataType),
+    [CriteriaType.CLAIM]: (c) => buildClaimFilter(c as GhmDataType),
+    [CriteriaType.MEDICATION_REQUEST]: (c) => buildMedicationFilter(c as MedicationDataType),
+    [CriteriaType.MEDICATION_ADMINISTRATION]: (c) => buildMedicationFilter(c as MedicationDataType),
+    [CriteriaType.OBSERVATION]: (c) => buildObvserationFilter(c as ObservationDataType),
+    [CriteriaType.IPP_LIST]: (c) =>
+      ((criterion: IPPListDataType) => [
         `${criterion.search ? `${IppParamsKeys.IPP_LIST_FHIR}=${criterion.search}` : ''}`
-      ].filter((elem) => elem)
-      filterFhir =
-        unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
-      break
-    }
-
-    case CriteriaType.IMAGING: {
-      filterFhir = [
-        'patient.active=true',
-        filtersBuilders(ImagingParamsKeys.DATE, buildDateFilter(criterion.studyStartDate, 'ge')),
-        filtersBuilders(ImagingParamsKeys.DATE, buildDateFilter(criterion.studyEndDate, 'le')),
-        filtersBuilders(ImagingParamsKeys.SERIES_DATE, buildDateFilter(criterion.seriesStartDate, 'ge')),
-        filtersBuilders(ImagingParamsKeys.SERIES_DATE, buildDateFilter(criterion.seriesEndDate, 'le')),
-        filtersBuilders(ImagingParamsKeys.STUDY_DESCRIPTION, buildSearchFilter(criterion.studyDescription)),
-        filtersBuilders(ImagingParamsKeys.STUDY_PROCEDURE, buildSearchFilter(criterion.studyProcedure)),
-        filtersBuilders(ImagingParamsKeys.SERIES_DESCRIPTION, buildSearchFilter(criterion.seriesDescription)),
-        filtersBuilders(ImagingParamsKeys.SERIES_PROTOCOL, buildSearchFilter(criterion.seriesProtocol)),
-        filtersBuilders(ImagingParamsKeys.MODALITY, buildLabelObjectFilter(criterion.studyModalities)),
-        filtersBuilders(ImagingParamsKeys.SERIES_MODALITIES, buildLabelObjectFilter(criterion.seriesModalities)),
-        filtersBuilders(ImagingParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
-        filtersBuilders(
-          ImagingParamsKeys.NB_OF_SERIES,
-          buildComparatorFilter(criterion.numberOfSeries, criterion.seriesComparator)
-        ),
-        filtersBuilders(
-          ImagingParamsKeys.NB_OF_INS,
-          buildComparatorFilter(criterion.numberOfIns, criterion.instancesComparator)
-        ),
-        filtersBuilders(ImagingParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
-        buildWithDocumentFilter(criterion, ImagingParamsKeys.WITH_DOCUMENT),
-        buildSimpleFilter(criterion.studyUid, ImagingParamsKeys.STUDY_UID, IMAGING_STUDY_UID_URL),
-        buildSimpleFilter(criterion.seriesUid, ImagingParamsKeys.SERIES_UID),
-        buildEncounterDateFilter(
-          criterion.type,
-          criterion.includeEncounterStartDateNull,
-          criterion.encounterStartDate,
-          true
-        ),
-        buildEncounterDateFilter(criterion.type, criterion.includeEncounterEndDateNull, criterion.encounterEndDate)
-      ]
-        .filter((elem) => elem)
-        .reduce(filterReducer)
-      break
-    }
-
-    case CriteriaType.PREGNANCY:
-      filterFhir = [
-        'subject.active=true',
-        `questionnaire.name=${FormNames.PREGNANCY}`,
-        'status=in-progress,completed',
-        filtersBuilders(
-          QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS,
-          buildLabelObjectFilter(criterion.encounterStatus)
-        ),
-        questionnaireFiltersBuilders(
-          pregnancyForm.pregnancyStartDate,
-          buildDateFilter(criterion.pregnancyStartDate, 'ge', true)
-        ),
-        questionnaireFiltersBuilders(
-          pregnancyForm.pregnancyEndDate,
-          buildDateFilter(criterion.pregnancyEndDate, 'le', true)
-        ),
-        questionnaireFiltersBuilders(pregnancyForm.pregnancyMode, buildLabelObjectFilter(criterion.pregnancyMode)),
-        questionnaireFiltersBuilders(
-          pregnancyForm.foetus,
-          buildComparatorFilter(criterion.foetus, criterion.foetusComparator)
-        ),
-        questionnaireFiltersBuilders(
-          pregnancyForm.parity,
-          buildComparatorFilter(criterion.parity, criterion.parityComparator)
-        ),
-        questionnaireFiltersBuilders(pregnancyForm.maternalRisks, buildLabelObjectFilter(criterion.maternalRisks)),
-        questionnaireFiltersBuilders(
-          pregnancyForm.maternalRisksPrecision,
-          buildSearchFilter(criterion.maternalRisksPrecision)
-        ),
-        questionnaireFiltersBuilders(
-          pregnancyForm.risksRelatedToObstetricHistory,
-          buildLabelObjectFilter(criterion.risksRelatedToObstetricHistory)
-        ),
-        questionnaireFiltersBuilders(
-          pregnancyForm.risksRelatedToObstetricHistoryPrecision,
-          buildSearchFilter(criterion.risksRelatedToObstetricHistoryPrecision)
-        ),
-        questionnaireFiltersBuilders(
-          pregnancyForm.risksOrComplicationsOfPregnancy,
-          buildLabelObjectFilter(criterion.risksOrComplicationsOfPregnancy)
-        ),
-        questionnaireFiltersBuilders(
-          pregnancyForm.risksOrComplicationsOfPregnancyPrecision,
-          buildSearchFilter(criterion.risksOrComplicationsOfPregnancyPrecision)
-        ),
-        questionnaireFiltersBuilders(pregnancyForm.corticotherapie, buildLabelObjectFilter(criterion.corticotherapie)),
-        questionnaireFiltersBuilders(
-          pregnancyForm.prenatalDiagnosis,
-          buildLabelObjectFilter(criterion.prenatalDiagnosis)
-        ),
-        questionnaireFiltersBuilders(
-          pregnancyForm.ultrasoundMonitoring,
-          buildLabelObjectFilter(criterion.ultrasoundMonitoring)
-        ),
-        questionnaireFiltersBuilders(
-          { id: QuestionnaireResponseParamsKeys.EXECUTIVE_UNITS, type: 'valueCoding' },
-          buildEncounterServiceFilter(criterion.encounterService)
-        )
-      ]
-        .filter((elem) => elem)
-        .reduce(filterReducer)
-      break
-    case CriteriaType.HOSPIT:
-      filterFhir = [
-        'subject.active=true',
-        `questionnaire.name=${FormNames.HOSPIT}`,
-        'status=in-progress,completed',
-        filtersBuilders(
-          QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS,
-          buildLabelObjectFilter(criterion.encounterStatus)
-        ),
-        questionnaireFiltersBuilders(hospitForm.hospitReason, buildSearchFilter(criterion.hospitReason)),
-        questionnaireFiltersBuilders(hospitForm.inUteroTransfer, buildLabelObjectFilter(criterion.inUteroTransfer)),
-        questionnaireFiltersBuilders(
-          hospitForm.pregnancyMonitoring,
-          buildLabelObjectFilter(criterion.pregnancyMonitoring)
-        ),
-        questionnaireFiltersBuilders(hospitForm.vme, buildLabelObjectFilter(criterion.vme)),
-        questionnaireFiltersBuilders(
-          hospitForm.maturationCorticotherapie,
-          buildLabelObjectFilter(criterion.maturationCorticotherapie)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.chirurgicalGesture,
-          buildLabelObjectFilter(criterion.chirurgicalGesture)
-        ),
-        questionnaireFiltersBuilders(hospitForm.childbirth, buildLabelObjectFilter(criterion.childbirth)),
-        questionnaireFiltersBuilders(
-          hospitForm.hospitalChildBirthPlace,
-          buildLabelObjectFilter(criterion.hospitalChildBirthPlace)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.otherHospitalChildBirthPlace,
-          buildLabelObjectFilter(criterion.otherHospitalChildBirthPlace)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.homeChildBirthPlace,
-          buildLabelObjectFilter(criterion.homeChildBirthPlace)
-        ),
-        questionnaireFiltersBuilders(hospitForm.childbirthMode, buildLabelObjectFilter(criterion.childbirthMode)),
-        questionnaireFiltersBuilders(hospitForm.maturationReason, buildLabelObjectFilter(criterion.maturationReason)),
-        questionnaireFiltersBuilders(
-          hospitForm.maturationModality,
-          buildLabelObjectFilter(criterion.maturationModality)
-        ),
-        questionnaireFiltersBuilders(hospitForm.imgIndication, buildLabelObjectFilter(criterion.imgIndication)),
-        questionnaireFiltersBuilders(
-          hospitForm.laborOrCesareanEntry,
-          buildLabelObjectFilter(criterion.laborOrCesareanEntry)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.pathologyDuringLabor,
-          buildLabelObjectFilter(criterion.pathologyDuringLabor)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.obstetricalGestureDuringLabor,
-          buildLabelObjectFilter(criterion.obstetricalGestureDuringLabor)
-        ),
-        questionnaireFiltersBuilders(hospitForm.analgesieType, buildLabelObjectFilter(criterion.analgesieType)),
-        questionnaireFiltersBuilders(
-          hospitForm.birthDeliveryStartDate,
-          buildDateFilter(criterion.birthDeliveryStartDate, 'ge', true)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.birthDeliveryEndDate,
-          buildDateFilter(criterion.birthDeliveryEndDate, 'le', true)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.birthDeliveryWeeks,
-          buildComparatorFilter(criterion.birthDeliveryWeeks, criterion.birthDeliveryWeeksComparator)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.birthDeliveryDays,
-          buildComparatorFilter(criterion.birthDeliveryDays, criterion.birthDeliveryDaysComparator)
-        ),
-        questionnaireFiltersBuilders(hospitForm.birthDeliveryWay, buildLabelObjectFilter(criterion.birthDeliveryWay)),
-        questionnaireFiltersBuilders(hospitForm.instrumentType, buildLabelObjectFilter(criterion.instrumentType)),
-        questionnaireFiltersBuilders(hospitForm.cSectionModality, buildLabelObjectFilter(criterion.cSectionModality)),
-        questionnaireFiltersBuilders(
-          hospitForm.presentationAtDelivery,
-          buildLabelObjectFilter(criterion.presentationAtDelivery)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.birthMensurationsGrams,
-          buildComparatorFilter(criterion.birthMensurationsGrams, criterion.birthMensurationsGramsComparator)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.birthMensurationsPercentil,
-          buildComparatorFilter(criterion.birthMensurationsPercentil, criterion.birthMensurationsPercentilComparator)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.apgar1,
-          buildComparatorFilter(criterion.apgar1, criterion.apgar1Comparator)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.apgar3,
-          buildComparatorFilter(criterion.apgar3, criterion.apgar3Comparator)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.apgar5,
-          buildComparatorFilter(criterion.apgar5, criterion.apgar5Comparator)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.apgar10,
-          buildComparatorFilter(criterion.apgar10, criterion.apgar10Comparator)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.arterialPhCord,
-          buildComparatorFilter(criterion.arterialPhCord, criterion.arterialPhCordComparator)
-        ),
-        questionnaireFiltersBuilders(
-          hospitForm.arterialCordLactates,
-          buildComparatorFilter(criterion.arterialCordLactates, criterion.arterialCordLactatesComparator)
-        ),
-        questionnaireFiltersBuilders(hospitForm.birthStatus, buildLabelObjectFilter(criterion.birthStatus)),
-        questionnaireFiltersBuilders(
-          hospitForm.postpartumHemorrhage,
-          buildLabelObjectFilter(criterion.postpartumHemorrhage)
-        ),
-        questionnaireFiltersBuilders(hospitForm.conditionPerineum, buildLabelObjectFilter(criterion.conditionPerineum)),
-        questionnaireFiltersBuilders(hospitForm.exitPlaceType, buildLabelObjectFilter(criterion.exitPlaceType)),
-        questionnaireFiltersBuilders(hospitForm.feedingType, buildLabelObjectFilter(criterion.feedingType)),
-        questionnaireFiltersBuilders(hospitForm.complication, buildLabelObjectFilter(criterion.complication)),
-        questionnaireFiltersBuilders(hospitForm.exitFeedingMode, buildLabelObjectFilter(criterion.exitFeedingMode)),
-        questionnaireFiltersBuilders(hospitForm.exitDiagnostic, buildLabelObjectFilter(criterion.exitDiagnostic)),
-        questionnaireFiltersBuilders(
-          { id: QuestionnaireResponseParamsKeys.EXECUTIVE_UNITS, type: 'valueCoding' },
-          buildEncounterServiceFilter(criterion.encounterService)
-        )
-      ]
-        .filter((elem) => elem)
-        .reduce(filterReducer)
-      break
-
-    default:
-      break
+      ])(c as IPPListDataType),
+    [CriteriaType.IMAGING]: (c) => buildImagingFilter(c as ImagingDataType),
+    [CriteriaType.PREGNANCY]: (c) => buildPregnancyFilter(c as PregnancyDataType),
+    [CriteriaType.HOSPIT]: (c) => buildHospitFilter(c as HospitDataType)
   }
 
-  return filterFhir
+  return (filterBuilders[criterion.type]?.(criterion, deidentified) || [])
+    .filter((elem) => elem)
+    .reduce(filterReducer, '')
 }
 
 const mapCriteriaToResource = (criteriaType: CriteriaType): ResourceType => {
