@@ -41,6 +41,8 @@ import services from 'services/aphp'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
+import { useSearchParams } from 'react-router-dom'
+import { checkIfPageAvailable } from 'utils/paginationUtils'
 
 type PatientBiologyProps = {
   groupId?: string
@@ -48,6 +50,9 @@ type PatientBiologyProps = {
 
 const PatientBiology = ({ groupId }: PatientBiologyProps) => {
   const { classes } = useStyles()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const getPageParam = searchParams.get('page')
+
   const theme = useTheme()
   const isMd = useMediaQuery(theme.breakpoints.down('lg'))
   const dispatch = useAppDispatch()
@@ -82,7 +87,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
     label: 'résultat(s)'
   }
 
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const [
     {
       orderBy,
@@ -108,6 +113,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
+  const isFirstRender = useRef(true)
 
   const _fetchBiology = async () => {
     try {
@@ -126,6 +132,9 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
           signal: controllerRef.current?.signal
         })
       )
+      if (response) {
+        checkIfPageAvailable(searchResults.total, page, setPage)
+      }
       if (response.payload.error) {
         throw response.payload.error
       }
@@ -148,12 +157,19 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
   }, [])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
-    setPage(1)
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+    } else {
+      setLoadingStatus(LoadingStatus.IDDLE)
+      setPage(1)
+    }
   }, [nda, loinc, anabio, startDate, endDate, executiveUnits, validatedStatus, orderBy, searchInput, encounterStatus])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
+    const updatedSearchParams = new URLSearchParams(searchParams)
+    updatedSearchParams.set('page', page.toString())
+    setSearchParams(updatedSearchParams)
   }, [page])
 
   useEffect(() => {

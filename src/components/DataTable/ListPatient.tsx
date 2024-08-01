@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { CircularProgress, Grid, ListItemIcon, ListItemText, Pagination, Typography } from '@mui/material'
+import { Box, CircularProgress, Grid, ListItemIcon, ListItemText, Typography } from '@mui/material'
 
 import { CohortPatient } from 'types'
 
@@ -13,6 +13,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import GenderIcon from 'components/ui/GenderIcon'
 import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
 import { VitalStatusLabel } from 'types/requestCriterias'
+import { Pagination } from 'components/ui/Pagination'
 
 type ListPatientProps = {
   loading: boolean
@@ -34,8 +35,6 @@ const ListPatient: React.FC<ListPatientProps> = ({
   total,
   onCloseDrawer
 }) => {
-  const { classes } = useStyles()
-
   return (
     <Grid container direction="column" alignItems="center">
       {loading ? (
@@ -62,13 +61,14 @@ const ListPatient: React.FC<ListPatientProps> = ({
           )}
         </ListWrapper>
       )}
-      <Pagination
-        className={classes.pagination}
-        count={Math.ceil((total ?? 0) / (rowsPerPage ?? 20))}
-        shape="circular"
-        onChange={(event, page: number) => setPage && setPage(page)}
-        page={page}
-      />
+      <Box marginBottom="1em" width="100%" display="flex" justifyContent="center">
+        <Pagination
+          currentPage={page ?? 0}
+          count={Math.ceil((total ?? 0) / (rowsPerPage ?? 20))}
+          onPageChange={(page: number) => setPage && setPage(page)}
+          smallSize
+        />
+      </Box>
     </Grid>
   )
 }
