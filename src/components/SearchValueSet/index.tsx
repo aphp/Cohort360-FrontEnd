@@ -34,21 +34,15 @@ const SearchValueSet = ({ references }: SearchValueSetProps) => {
   ]
 
   const {
-    /* hierarchyData: {
-      hierarchies: { list, arboresence },
-      loadingStatus,
-      selectAllStatus,
-      selectedCodes
-    },
-    hierarchyActions: { expand, select, selectAll, deleteCode },*/
-    arborescences,
+    hierarchyData: { hierarchy, loadingStatus, selectAllStatus, selectedCodes },
+    hierarchyActions: { expand, select, selectAll, deleteCode },
     parametersData: { count, page, searchInput, totalPages, refs },
     parametersActions: { onChangeRefs, onChangePage, onChangeSearchInput, onChangeSearchMode }
   } = useSearchValueSet(references)
 
   useEffect(() => {
-    console.log('test arbo', arborescences)
-  }, [arborescences])
+    onChangeRefs.hierarchy(references[0])
+  }, [])
 
   return (
     <>
@@ -69,11 +63,7 @@ const SearchValueSet = ({ references }: SearchValueSetProps) => {
           {activeTab.id === SearchValueSetTab.HIERARCHY && (
             <Grid item xs={12}>
               <Paper sx={{ padding: '10px' }}>
-                <ReferencesParameters
-                  onSelect={onChangeRefs.arboresence}
-                  type={Type.SINGLE}
-                  values={refs.arboresence}
-                />
+                <ReferencesParameters onSelect={onChangeRefs.hierarchy} type={Type.SINGLE} values={refs.hierarchy} />
               </Paper>
             </Grid>
           )}
@@ -118,13 +108,15 @@ const SearchValueSet = ({ references }: SearchValueSetProps) => {
             height="92%"
             style={{ overflowX: 'auto' }}
           >
-            {/*<ValueSetTable
+            {activeTab.id === SearchValueSetTab.HIERARCHY && (
+              <ValueSetTable
                 loading={loadingStatus}
-                hierarchy={arboresence}
+                hierarchy={hierarchy}
                 onSelect={select}
                 onSelectAll={selectAll}
                 onExpand={expand}
-            />*/}
+              />
+            )}
             {/*activeTab.id === SearchValueSetTab.HIERARCHY && (
               <ValueSetTable
                 loading={{ search: LoadingStatus.SUCCESS, expand: LoadingStatus.SUCCESS }}

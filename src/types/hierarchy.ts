@@ -35,6 +35,7 @@ export type Hierarchy<T = {}, S = string> = AbstractTree<
     label: string
     above_levels_ids: string
     inferior_levels_ids: string
+    system: string
     status?: SelectedStatus
   }
 >
@@ -48,23 +49,7 @@ export type HierarchyLoadingStatus = {
   expand: LoadingStatus
 }
 
-export type UseHierarchy<T> = {
-  hierarchyRepresentation: Hierarchy<T, string>[]
-  hierarchyDisplay: Hierarchy<T, string>[]
-  loadingStatus: HierarchyLoadingStatus
-  selectAllStatus: SelectedStatus
-  search: (
-    searchValue: string,
-    page: number,
-    fetchSearch: (search: string, page: number) => Promise<Hierarchy<T, string>[]>
-  ) => Promise<void>
-  select: (node: Hierarchy<T, string>, toAdd: boolean) => void
-  selectAll: (toAdd: boolean) => void
-  expand: (node: Hierarchy<T, string>) => Promise<void>
-  deleteCode: (node: Hierarchy<T, string>) => void
-}
-
-export type HierarchyRoots<T, S> = {
-  id: string
-  baseTree: Hierarchy<T, S>[]
+export type GroupedBySystem<T> = {
+  system: string
+  codes: Hierarchy<T, string>[]
 }

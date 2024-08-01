@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Hierarchy } from 'types/hierarchy'
 import { useSearchParameters } from '../search/useSearchParameters'
 import { ScopeElement } from 'types'
-import { SourceType } from 'types/scope'
+import { SourceType, System } from 'types/scope'
 import { useAppDispatch, useAppSelector } from 'state'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import { saveFetchedPerimeters, saveFetchedRights } from 'state/scope'
@@ -43,9 +43,30 @@ export const useScopeTree = (
     [practitionerId, sourceType]
   )
 
-  const { hierarchy, selectedCodes, loadingStatus, selectAllStatus, search, expand, select, selectAll, deleteCode } =
-    useHierarchy(baseTree, selectedNodes, codes, handleSaveCodes, fetchChildren)
+  const {
+    hierarchies,
+    list,
+    selectedCodes,
+    loadingStatus,
+    selectAllStatus,
+    initTree,
+    search,
+    expand,
+    select,
+    selectAll,
+    deleteCode
+  } = useHierarchy(selectedNodes, codes, handleSaveCodes, fetchChildren)
   const controllerRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    initTree(System.ScopeTree, async () => baseTree)
+  }, [baseTree])
+
+  const currentHierarchy = useMemo(() => {
+    const found = hierarchies.get(System.ScopeTree)
+    if (found) return found
+    return []
+  }, [hierarchies])
 
   useEffect(() => {
     search(searchInput, page, fetchSearch)
@@ -84,7 +105,8 @@ export const useScopeTree = (
 
   return {
     hierarchyData: {
-      hierarchy,
+      list,
+      hierarchy: currentHierarchy,
       loadingStatus,
       selectAllStatus,
       selectedCodes

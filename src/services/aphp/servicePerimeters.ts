@@ -21,7 +21,7 @@ import { fetchAccessExpirations, fetchEncounter, fetchPatient, fetchPerimeterAcc
 
 import { AxiosResponse } from 'axios'
 import apiBackend from '../apiBackend'
-import { FetchScopeOptions, Rights, SourceType } from 'types/scope'
+import { FetchScopeOptions, Rights, SourceType, System } from 'types/scope'
 import { scopeLevelsToRequestParam } from 'utils/perimeters'
 import { mapParamsToNetworkParams } from 'utils/url'
 import { Hierarchy } from 'types/hierarchy'
@@ -212,7 +212,8 @@ const servicesPerimeters: IServicePerimeters = {
             type: '',
             cohort_id: '',
             cohort_size: '',
-            full_path: ''
+            full_path: '',
+            system: System.ScopeTree
           }
         ]
       else population = response
@@ -240,6 +241,7 @@ const servicesPerimeters: IServicePerimeters = {
     return {
       ...perimeter,
       id: perimeter.id.toString(),
+      system: System.ScopeTree,
       label: `${perimeter.source_value} - ${perimeter.name}`,
       access: servicesPerimeters.getAccessFromRights(rights),
       rights
@@ -263,6 +265,7 @@ const servicesPerimeters: IServicePerimeters = {
     return {
       id: id.toString(),
       name,
+      system: System.ScopeTree,
       label: `${source_value} - ${name}`,
       source_value,
       type,

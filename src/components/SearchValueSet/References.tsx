@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Checkbox, FormControlLabel, Grid, Paper, Radio, Typography } from '@mui/material'
-import { Reference, References } from 'types/searchValueSet'
+import { Reference } from 'types/searchValueSet'
 import { Check, Warning } from '@mui/icons-material'
 import { InputWrapper } from 'components/ui/Inputs'
 
@@ -13,23 +13,17 @@ export enum Type {
 type ReferencesProps = {
   type: Type
   values: Reference[]
-  onSelect: (values: Reference[]) => void
+  onSelect: (ref: Reference) => void
 }
 
 const ReferencesParameters = ({ values, onSelect, type }: ReferencesProps) => {
-  const handleSelectReference = (id: References) => {
-    const newReferences = values.map((ref) => ({
-      ...ref,
-      checked: type === Type.SINGLE ? id === ref.id : id === ref.id ? !ref.checked : ref.checked
-    }))
-    onSelect(newReferences)
-  }
-
   return (
     <Grid padding="5px">
       <Grid item marginBottom={1}>
         <InputWrapper>
-          <Typography color="#0063AF" variant="h3">Référentiels :</Typography>
+          <Typography color="#0063AF" variant="h3">
+            Référentiels :
+          </Typography>
         </InputWrapper>
       </Grid>
       <Grid item>
@@ -39,12 +33,14 @@ const ReferencesParameters = ({ values, onSelect, type }: ReferencesProps) => {
               key={ref.id}
               control={
                 type === Type.MULTIPLE ? (
-                  <Checkbox checked={ref.checked} onChange={() => handleSelectReference(ref.id)} />
-                ) : ref.isHierarchy ? (
-                  <Radio checked={ref.checked} onChange={() => handleSelectReference(ref.id)} />
+                  <Checkbox checked={ref.checked} onChange={() => onSelect(ref)} />
                 ) : (
-                  <Radio disabled checked={ref.checked} onChange={() => handleSelectReference(ref.id)} />
+                  /*ref.isHierarchy ? (*/
+                  <Radio checked={ref.checked} onChange={() => onSelect(ref)} />
                 )
+                /*) : (
+                  <Radio disabled checked={ref.checked} onChange={() => handleSelectReference(ref.id)} />
+                )*/
               }
               label={
                 <Grid container alignItems="center">

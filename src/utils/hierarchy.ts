@@ -1,5 +1,5 @@
 import { SelectedStatus } from 'types'
-import { Hierarchy, InfiniteMap, Mode } from 'types/hierarchy'
+import { GroupedBySystem, Hierarchy, InfiniteMap, Mode } from 'types/hierarchy'
 import { arrayToMap } from './arrays'
 
 export const cleanNodes = <T>(nodes: Hierarchy<T, string>[]) => {
@@ -27,12 +27,30 @@ const addAllFetchedIds = <T>(codes: Map<string, Hierarchy<T, string>>, results: 
   return new Map([...codes, ...resultsMap])
 }
 
+export const getMissingCodesWithSystems = async <T>(
+  trees: Map<string, Hierarchy<T, string>[]>,
+  groupBySystem: GroupedBySystem<T>[],
+  prevCodes: Map<string, Hierarchy<T, string>>,
+  fetchHandler: (ids: string, system: string) => Promise<Hierarchy<T, string>[]>
+) => {
+  let allCodes: Map<string, Hierarchy<T, string>> = new Map()
+  for (const group of groupBySystem) {
+    const tree = trees.get(group.system)
+    if (tree) {
+      const newCodes = await getMissingCodes(tree, prevCodes, group.codes, group.system, Mode.SEARCH, fetchHandler)
+      allCodes = new Map([...allCodes, ...newCodes])
+    }
+  }
+  return allCodes
+}
+
 export const getMissingCodes = async <T>(
   baseTree: Hierarchy<T, string>[],
   prevCodes: Map<string, Hierarchy<T, string>>,
   newCodes: Hierarchy<T, string>[],
+  system: string,
   mode: Mode,
-  fetchHandler: (ids: string) => Promise<Hierarchy<T, string>[]>
+  fetchHandler: (ids: string, system: string) => Promise<Hierarchy<T, string>[]>
 ) => {
   const newCodesMap = mapHierarchyToMap(newCodes)
   let allCodes = new Map([...prevCodes, ...newCodesMap])
@@ -45,7 +63,7 @@ export const getMissingCodes = async <T>(
   }
   if (missingIds.length) {
     const ids = missingIds.join(',')
-    const fetched = await fetchHandler(ids)
+    const fetched = await fetchHandler(ids, system)
     allCodes = addAllFetchedIds(allCodes, fetched)
   }
   if (mode !== Mode.EXPAND) {
@@ -53,7 +71,7 @@ export const getMissingCodes = async <T>(
     missingIds = getMissingIds(allCodes, arrayToMap(children, null))
     if (missingIds.length) {
       const ids = missingIds.join(',')
-      const childrenResponse = await fetchHandler(ids)
+      const childrenResponse = await fetchHandler(ids, system)
       allCodes = addAllFetchedIds(allCodes, childrenResponse)
     }
   }
@@ -76,7 +94,25 @@ const getMissingSubItems = <T>(node: Hierarchy<T, string>, codes: Map<string, Hi
   return subItems.length ? subItems : []
 }
 
-export const buildHierarchy = <T>(
+export const buildMultipleTrees = <T>(
+  trees: Map<string, Hierarchy<T, string>[]>,
+  groupBySystem: GroupedBySystem<T>[],
+  codes: Map<string, Hierarchy<T, string>>,
+  selected: Hierarchy<T, string>[],
+  mode: Mode
+) => {
+  let newTrees: Map<string, Hierarchy<T, string>[]> = new Map()
+  for (const group of groupBySystem) {
+    const tree = trees.get(group.system)
+    if (tree) {
+      const newTree = buildTree(tree, group.codes, codes, selected, mode)
+      newTrees.set(group.system, newTree)
+    }
+  }
+  return newTrees
+}
+
+export const buildTree = <T>(
   baseTree: Hierarchy<T, string>[],
   endCodes: Hierarchy<T, string>[],
   codes: Map<string, Hierarchy<T, string>>,
@@ -127,6 +163,22 @@ export const buildHierarchy = <T>(
   return [...baseTree]
 }
 
+export const groupBySystem = <T>(codes: Hierarchy<T, string>[]) => {
+  const systemMap = new Map<string, Hierarchy<T, string>[]>()
+  for (const hierarchy of codes) {
+    const system = hierarchy.system
+    if (!systemMap.has(system)) {
+      systemMap.set(system, [])
+    }
+    systemMap.get(system)!.push(hierarchy)
+  }
+  const groupedHierarchies: GroupedBySystem<T>[] = []
+  systemMap.forEach((codes, system) => {
+    groupedHierarchies.push({ system, codes })
+  })
+  return groupedHierarchies
+}
+
 export const getHierarchyDisplay = <T>(defaultLevels: Hierarchy<T, string>[], tree: Hierarchy<T, string>[]) => {
   let branches: Hierarchy<T, string>[] = []
   if (defaultLevels.length && tree.length)
@@ -134,6 +186,21 @@ export const getHierarchyDisplay = <T>(defaultLevels: Hierarchy<T, string>[], tr
       const path = item.above_levels_ids ? [...getAboveLevelsWithRights(item, tree), ...[item.id]] : [item.id]
       return findBranch(path, tree) || { id: 'notFound' }
     })
+  return branches
+}
+
+export const getListDisplay = <T>(
+  toDisplay: Hierarchy<T, string>[],
+  trees: Map<string, Hierarchy<T, string>[]>
+) => {
+  let branches: Hierarchy<T, string>[] = []
+  toDisplay.forEach((node) => {
+    const currentTree = trees.get(node.system)
+    if (currentTree) {
+      const foundNode = getHierarchyDisplay([node], currentTree)[0]
+      branches.push(foundNode)
+    }
+  })
   return branches
 }
 

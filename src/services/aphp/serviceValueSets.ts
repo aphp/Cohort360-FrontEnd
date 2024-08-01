@@ -28,6 +28,7 @@ export const mapFhirHierarchyToHierarchyWithLabelAndSystem = (
 ): Hierarchy<FhirHierarchy, string> => {
   const label = fhirHierarchy.id === '*' ? fhirHierarchy.label : `${fhirHierarchy.id} - ${fhirHierarchy.label}`
   return {
+    //id: `${fhirHierarchy.id} - ${fhirHierarchy.system}`,
     id: fhirHierarchy.id,
     label: label,
     system: fhirHierarchy.system,

@@ -18,7 +18,7 @@ type ScopeTreeProps = {
 
 const ScopeTree = ({ baseTree, selectedNodes, sourceType, onSelect }: ScopeTreeProps) => {
   const {
-    hierarchyData: { hierarchy, loadingStatus, selectAllStatus, selectedCodes },
+    hierarchyData: { hierarchy, list, loadingStatus, selectAllStatus, selectedCodes },
     hierarchyActions: { expand, select, selectAll, deleteCode },
     parametersData: { page, searchInput, searchMode, totalPages },
     parametersActions: { onChangePage, onChangeSearchInput }
@@ -55,7 +55,7 @@ const ScopeTree = ({ baseTree, selectedNodes, sourceType, onSelect }: ScopeTreeP
               selectAllStatus={selectAllStatus}
               sourceType={sourceType}
               searchMode={searchMode}
-              hierarchy={hierarchy}
+              hierarchy={searchMode ? list : hierarchy}
               onExpand={expand}
               onSelect={select}
               onSelectAll={selectAll}

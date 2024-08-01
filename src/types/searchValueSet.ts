@@ -24,8 +24,8 @@ export enum ReferencesLabel {
 }
 
 export type Reference = {
-  id: References
-  label: ReferencesLabel
+  id: string
+  label: string
   standard: boolean
   url: string
   checked: boolean
@@ -34,11 +34,9 @@ export type Reference = {
 }
 
 export type SearchParameters = {
-  //loadingStatus: LoadingStatus
   searchReferences: Reference[]
   hierarchyReferences: Reference[]
   search: string
-  // exactSearch: boolean
   title?: string
   offset?: number
   limit?: number
