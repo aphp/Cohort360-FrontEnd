@@ -39,17 +39,17 @@ export const PERIMETER_SOURCE_TYPE_HIERARCHY = import.meta.env.DEV
   ? import.meta.env.VITE_PERIMETER_SOURCE_TYPE_HIERARCHY
   : '{VITE_PERIMETER_SOURCE_TYPE_HIERARCHY}'
 
-export const CLAIM_HIERARCHY = import.meta.env.DEV
+export const CLAIM_HIERARCHY = import.meta.env.DEV /* à utiliser - label: GHM standard */
   ? import.meta.env.VITE_VALUE_SET_URL_CLAIM_HIERARCHY
   : '{VITE_VALUE_SET_URL_CLAIM_HIERARCHY}'
-export const CONDITION_HIERARCHY = import.meta.env.DEV
+export const CONDITION_HIERARCHY = import.meta.env.DEV /* à utiliser - label: CIM10 standard */
   ? import.meta.env.VITE_VALUE_SET_URL_CONDITION_HIERARCHY
   : '{VITE_VALUE_SET_URL_CONDITION_HIERARCHY}'
 export const CONDITION_STATUS = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_CONDITION_STATUS
   : '{VITE_VALUE_SET_URL_CONDITION_STATUS}'
 
-export const PROCEDURE_HIERARCHY = import.meta.env.DEV
+export const PROCEDURE_HIERARCHY = import.meta.env.DEV /* à utiliser - label: CCAM standard */
   ? import.meta.env.VITE_VALUE_SET_URL_PROCEDURE_HIERARCHY
   : '{VITE_VALUE_SET_URL_PROCEDURE_HIERARCHY}'
 
@@ -99,13 +99,18 @@ export const MEDICATION_ATC_ORBIS = import.meta.env.DEV
   ? import.meta.env.VITE_MEDICATION_ATC_ORBIS
   : '{VITE_MEDICATION_ATC_ORBIS}'
 
-export const MEDICATION_ATC = import.meta.env.DEV
+
+export const MEDICATION_ATC = import.meta.env.DEV   /* à utiliser - label: ATC standard */
   ? import.meta.env.VITE_VALUE_SET_URL_MEDICATION_ATC
   : '{VITE_VALUE_SET_URL_MEDICATION_ATC}'
 
-export const MEDICATION_UCD = import.meta.env.DEV
+export const MEDICATION_UCD = import.meta.env.DEV /* à utiliser - label: UCD standard */
   ? import.meta.env.VITE_VALUE_SET_URL_MEDICATION_UCD
   : '{VITE_VALUE_SET_URL_MEDICATION_UCD}'
+  
+export const MEDICATION_UCD_13 = import.meta.env.DEV ? /* à utiliser - label UCD 13 non standard*/
+  import.meta.env.VITE_VALUE_SET_URL_MEDICATION_UCD_13
+  : '{VITE_VALUE_SET_URL_MEDICATION_UCD_13}'
 
 export const MEDICATION_PRESCRIPTION_TYPES = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_MEDICATION_PRESCRIPTION_TYPES
@@ -115,10 +120,10 @@ export const MEDICATION_ADMINISTRATIONS = import.meta.env.DEV
   ? import.meta.env.VITE_VALUE_SET_URL_MEDICATION_ADMINISTRATIONS
   : '{VITE_VALUE_SET_URL_MEDICATION_ADMINISTRATIONS}'
 
-export const BIOLOGY_HIERARCHY_ITM_ANABIO = import.meta.env.DEV
+export const BIOLOGY_HIERARCHY_ITM_ANABIO = import.meta.env.DEV /* à utiliser - label: Anabio */
   ? import.meta.env.VITE_VALUE_SET_URL_BIOLOGY_ANABIO
   : '{VITE_VALUE_SET_URL_BIOLOGY_ANABIO}'
-export const BIOLOGY_HIERARCHY_ITM_LOINC = import.meta.env.DEV
+export const BIOLOGY_HIERARCHY_ITM_LOINC = import.meta.env.DEV /* à utiliser - label: Loinc */
   ? import.meta.env.VITE_VALUE_SET_URL_BIOLOGY_LOINC
   : '{VITE_VALUE_SET_URL_BIOLOGY_LOINC}'
 export const IMAGING_MODALITIES = import.meta.env.DEV

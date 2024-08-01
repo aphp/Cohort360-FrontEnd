@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { EXPLORATION } from 'constants.js'
 import { Comparators, ObservationDataType, CriteriaType } from 'types/requestCriterias'
 import { CriteriaDrawerComponentProps } from 'types'
-import { Hierarchy } from 'types/hierarchy'
+import { Hierarchy, HierarchyElementWithSystem } from 'types/hierarchy'
 
 export const defaultBiology: Omit<ObservationDataType, 'id'> = {
   type: CriteriaType.OBSERVATION,
@@ -46,13 +46,17 @@ const Index = (props: CriteriaDrawerComponentProps) => {
   const biologyHierarchy = useAppSelector((state) => state.biology.list || {})
 
   const _onChangeSelectedHierarchy = (
-    newSelectedItems: Hierarchy<any, any>[] | null | undefined,
-    newHierarchy?: Hierarchy<any, any>[]
+    newSelectedItems: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
   ) => {
     _onChangeFormValue('code', newSelectedItems, newHierarchy)
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const _onChangeFormValue = async (key: string, value: any, newHierarchy: Hierarchy<any, any>[] = biologyHierarchy) =>
+  const _onChangeFormValue = async (
+    key: string,
+    value: any,
+    newHierarchy: HierarchyElementWithSystem[] = biologyHierarchy
+  ) =>
     await syncOnChangeFormValue(
       key,
       value,

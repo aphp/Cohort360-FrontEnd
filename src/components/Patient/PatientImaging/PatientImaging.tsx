@@ -34,7 +34,7 @@ import { BlockWrapper } from 'components/ui/Layout'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { MAIL_SUPPORT } from '../../../constants'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 
 const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
@@ -46,8 +46,8 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
-  const [allModalities, setAllModalities] = useState<Hierarchy<any, any>[]>([])
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [allModalities, setAllModalities] = useState<HierarchyElementWithSystem[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElementWithSystem[]>([])
 
   const searchResults = {
     deidentified: patient?.deidentified || false,

@@ -1,23 +1,26 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Reference } from 'types/searchValueSet'
 
 export const useSearchParameters = () => {
-  const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [searchMode, setSearchMode] = useState(false)
   const [page, setPage] = useState(0)
   const [limit, setLimit] = useState(20)
   const [count, setCount] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
+  const [references, setReferences] = useState<Reference[]>([])
 
   const options = useMemo(
     () => ({
       page,
-      search,
+      searchInput,
       searchMode,
       limit,
       count,
-      totalPages
+      totalPages,
+      references
     }),
-    [search, page, limit, count, totalPages, searchMode]
+    [searchInput, page, limit, count, totalPages, searchMode, references]
   )
 
   useEffect(() => {
@@ -29,7 +32,7 @@ export const useSearchParameters = () => {
   }
 
   const onChangeSearchInput = (newValue: string) => {
-    setSearch(newValue)
+    setSearchInput(newValue)
   }
 
   const onChangePage = (newValue: number) => {
@@ -44,12 +47,17 @@ export const useSearchParameters = () => {
     setSearchMode(newValue)
   }
 
+    const onChangeReferences = (references: Reference[]) => {
+      setReferences(references)
+    }
+
   return {
     options,
     onChangeSearchInput,
     onChangeSearchMode,
     onChangePage,
     onChangeLimit,
-    onChangeCount
+    onChangeCount,
+    onChangeReferences
   }
 }

@@ -35,12 +35,15 @@ import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import { defaultProcedure } from '../../index'
 import { HierarchyTree } from 'types'
 import { CcamDataType } from 'types/requestCriterias'
-import { Hierarchy } from 'types/hierarchy'
+import { Hierarchy, HierarchyElementWithSystem } from 'types/hierarchy'
 
 type ProcedureListItemProps = {
-  procedureItem: Hierarchy<any, any>
-  selectedItems?: Hierarchy<any, any>[] | null
-  handleClick: (procedureItem: Hierarchy<any, any>[] | null | undefined, newHierarchy?: Hierarchy<any, any>[]) => void
+  procedureItem: HierarchyElementWithSystem
+  selectedItems?: HierarchyElementWithSystem[] | null
+  handleClick: (
+    procedureItem: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
+  ) => void
 }
 
 const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
@@ -76,7 +79,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = async (procedureItem: Hierarchy<any, any>) => {
+  const handleClickOnHierarchy = async (procedureItem: HierarchyElementWithSystem) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getHierarchySelection(procedureItem, selectedItems || [], procedureHierarchy)
@@ -131,7 +134,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((subItem: Hierarchy<any, any>, index: number) =>
+            subItems.map((subItem: HierarchyElementWithSystem, index: number) =>
               subItem.id === 'loading' ? (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
@@ -155,8 +158,8 @@ type ProcedureHierarchyProps = {
   selectedCriteria: CcamDataType
   goBack: () => void
   onChangeSelectedHierarchy: (
-    data: Hierarchy<any, any>[] | null | undefined,
-    newHierarchy?: Hierarchy<any, any>[]
+    data: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
   ) => void
   isEdition?: boolean
   onConfirm: () => void
@@ -180,14 +183,14 @@ const ProcedureHierarchy: React.FC<ProcedureHierarchyProps> = (props) => {
       newList.code = selectedCriteria.code
     }
     newList.code?.map(
-      (item: Hierarchy<any, any>) => findEquivalentRowInItemAndSubItems(item, ccamHierarchy).equivalentRow
+      (item: HierarchyElementWithSystem) => findEquivalentRowInItemAndSubItems(item, ccamHierarchy).equivalentRow
     )
     setCurrentState(newList)
   }, [initialState, ccamHierarchy])
 
   const _handleClick = (
-    newSelectedItems: Hierarchy<any, any>[] | null | undefined,
-    newHierarchy?: Hierarchy<any, any>[]
+    newSelectedItems: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
   ) => {
     onChangeSelectedHierarchy(newSelectedItems, newHierarchy)
   }

@@ -1,135 +1,182 @@
-import React, { PropsWithChildren, useContext, useEffect, useState } from 'react'
+import React, { Fragment, ReactElement, useContext, useEffect, useRef, useState } from 'react'
 import Modal, { FormContext } from 'components/ui/Modal'
 import Button from 'components/ui/Button'
 import { DeleteOutline, Edit, Visibility } from '@mui/icons-material'
-import { Checkbox, FormControlLabel, Grid, Typography } from '@mui/material'
-import { Item } from 'components/ui/List/ListItem'
-import ListItems from 'components/ui/List/ListItems'
+import { Checkbox, FormControlLabel, Grid, ListItemIcon, Typography, List as ListMui } from '@mui/material'
+import ListItem from 'components/ui/List/ListItem'
+import { ListItemWrapper } from './styles'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { v4 as uuidv4 } from 'uuid'
+
+const ELEMS_TO_RENDER_STEP = 10
 
 type id = string
 
+export enum ListType {
+  SINGLE,
+  MULTIPLE
+}
+
 type ListProps = {
-  values: Item[]
+  allElements: ReactElement<typeof ListItem>[]
   count: number
-  onSelect: (value: id) => void
+  type: ListType
+  selectedIds: Map<string, true>
+  onSelect: (value: id[] | id) => void
   onDisplay?: () => void
   onEdit?: () => void
   onDelete?: (value: id[]) => void
+  onSelectAll?: () => void
   fetchPaginateData: () => void
 }
 
 const List = ({
-  children,
-  values,
   count,
+  allElements,
+  type,
+  selectedIds,
   onDelete,
   onSelect,
   onDisplay,
   onEdit,
+  onSelectAll,
   fetchPaginateData
-}: PropsWithChildren<ListProps>) => {
+}: ListProps) => {
   const context = useContext(FormContext)
-  const [allElements, setAllElements] = useState<Item[]>([])
-  const [selectedElements, setSelectedElements] = useState<string[]>([])
+  const [elemsToRenderLimit, setElemsToRenderLimit] = useState(ELEMS_TO_RENDER_STEP)
+  const [fetchMore, setFetchMore] = useState(false)
   const [toggleDeleteModal, setToggleDeleteModal] = useState(false)
   const [toggleSelectAll, setToggleSelectAll] = useState(false)
+  const scrollableUuid = useRef(uuidv4())
 
-  useEffect(() => {
-    setAllElements(
-      values.map((e) => {
-        return { ...e, checked: Boolean(selectedElements.find((selected) => selected === e.id)) }
-      })
-    )
-  }, [values])
+  const handleCheck = (id: string) => {
+    if (type === ListType.SINGLE && !selectedIds.size) {
+      onSelect(id)
+    } else if (type === ListType.MULTIPLE) {
+      onSelect([id])
+    }
+  }
 
-  useEffect(() => {
-    context?.updateError(false)
-    setSelectedElements(allElements.filter((elem) => elem.checked)?.map((e) => e.id))
-  }, [allElements])
+  const handleFetchNext = () => {
+    const newLimit = elemsToRenderLimit + ELEMS_TO_RENDER_STEP
+    setElemsToRenderLimit(newLimit)
+    if (elemsToRenderLimit >= allElements.length) {
+      fetchPaginateData()
+      setFetchMore(true)
+    }
+  }
+
+  /*useEffect(() => {
+    const boolValue = toggleSelectAll
+    const selected = allElements.map((elem) => elem.props.id)
+    if (type === ListType.SINGLE && selected.length === 1) {
+      onSelect(selected[0])
+    } else if (type === ListType.MULTIPLE) {
+      onSelect(selected)
+    }
+  }, [toggleSelectAll])*/
 
   useEffect(() => {
     context?.updateError(true)
-    if (selectedElements.length === 1) {
+    if (type === ListType.SINGLE && selectedIds.size < 2) {
       context?.updateError(false)
-      onSelect(selectedElements[0])
+    } else if (type === ListType.MULTIPLE) {
+      context?.updateError(false)
     }
-  }, [selectedElements])
+  }, [selectedIds])
+
+  useEffect(() => {
+    if (!fetchMore) {
+      setElemsToRenderLimit(ELEMS_TO_RENDER_STEP)
+    }
+    setFetchMore(false)
+  }, [allElements])
 
   return (
-    <Grid container gap={4} marginTop={2}>
-      <Grid container item xs={12} alignItems="center" gap={1}>
-        {onDisplay && (
-          <Grid item xs={3}>
-            <Button color="info" icon={<Visibility />} onClick={onDisplay} disabled={selectedElements.length !== 1}>
-              Voir
-            </Button>
-          </Grid>
-        )}
-        {onEdit && (
-          <Grid item xs={4}>
-            <Button color="info" icon={<Edit />} onClick={onEdit} disabled={selectedElements.length !== 1}>
-              Modifier
-            </Button>
-          </Grid>
-        )}
-        {onDelete && (
-          <Grid item xs={1}>
-            <Button
-              color="warning"
-              onClick={() => {
-                setToggleDeleteModal(true)
-                context?.updateError(true)
-              }}
-              disabled={selectedElements.length < 1}
-            >
-              <DeleteOutline />
-            </Button>
-          </Grid>
-        )}
-      </Grid>
+    <Grid container>
+      {(onDisplay || onEdit || onDelete) && (
+        <Grid container item xs={12} alignItems="center" gap={1} marginBottom={4}>
+          {onDisplay && (
+            <Grid item xs={3}>
+              <Button color="info" icon={<Visibility />} onClick={onDisplay} disabled={selectedIds.size !== 1}>
+                Voir
+              </Button>
+            </Grid>
+          )}
+          {onEdit && (
+            <Grid item xs={4}>
+              <Button color="info" icon={<Edit />} onClick={onEdit} disabled={selectedIds.size !== 1}>
+                Modifier
+              </Button>
+            </Grid>
+          )}
+          {onDelete && (
+            <Grid item xs={1}>
+              <Button
+                color="warning"
+                onClick={() => {
+                  setToggleDeleteModal(true)
+                  context?.updateError(true)
+                }}
+                disabled={selectedIds.size < 1}
+              >
+                <DeleteOutline />
+              </Button>
+            </Grid>
+          )}
+        </Grid>
+      )}
       <Grid container>
-        {Boolean(allElements.length) ? (
+        {allElements.length > 0 ? (
           <Grid item xs={12}>
             <FormControlLabel
               labelPlacement="end"
               color="warning"
               style={{ margin: 0 }}
-              control={
-                <Checkbox
-                  color="info"
-                  onChange={() => {
-                    setAllElements(
-                      allElements.map((e) => {
-                        return { ...e, checked: toggleSelectAll ? false : true }
-                      })
-                    )
-                    setToggleSelectAll(!toggleSelectAll)
-                  }}
-                />
-              }
+              control={<Checkbox color="info" onChange={() => setToggleSelectAll(!toggleSelectAll)} />}
               label={
-                <Typography variant="h3" textTransform="uppercase" color="#0288d1">
+                <Typography fontSize="14" fontWeight={800} textTransform="uppercase" color="#0288d1">
                   Tout {toggleSelectAll ? 'désélectionner' : 'sélectionner'}
                 </Typography>
               }
             />
-            <ListItems
-              values={allElements}
-              multiple
-              count={count}
-              onchange={(newItems) => setAllElements(newItems)}
-              fetchPaginateData={fetchPaginateData}
-            />
+            <ListMui
+              id={scrollableUuid.current}
+              component="nav"
+              aria-labelledby="nested-list-subheader"
+              style={{ maxHeight: '40vh', overflow: 'auto' }}
+            >
+              <InfiniteScroll
+                scrollableTarget={scrollableUuid.current}
+                dataLength={elemsToRenderLimit}
+                next={handleFetchNext}
+                hasMore={elemsToRenderLimit < count}
+                scrollThreshold={0.9}
+                loader={<Fragment />}
+              >
+                {allElements.slice(0, elemsToRenderLimit).map((elem) => (
+                  <ListItemWrapper key={elem.props.id} divider disableGutters sx={{ cursor: 'default' }}>
+                    <ListItemIcon>
+                      <Checkbox
+                        checked={selectedIds.get(elem.props.id)}
+                        onChange={() => handleCheck(elem.props.id)}
+                        color="info"
+                      />
+                    </ListItemIcon>
+                    {elem}
+                  </ListItemWrapper>
+                ))}
+              </InfiniteScroll>
+            </ListMui>
           </Grid>
         ) : (
-          <Grid item xs={12}>
+          <Grid item xs={12} container alignItems="center" justifyContent="center">
             <Typography fontWeight="700" align="center" sx={{ padding: '8px' }}>
-              Aucun élément n'a été enregistré
+              Aucun élément trouvé.
             </Typography>
           </Grid>
         )}
       </Grid>
-      {children}
 
       {onDelete && (
         <Modal
@@ -140,7 +187,7 @@ const List = ({
             setToggleDeleteModal(false)
           }}
           onSubmit={() => {
-            onDelete(selectedElements)
+            onDelete(Object.keys(selectedIds))
             context?.updateError(false)
           }}
         >

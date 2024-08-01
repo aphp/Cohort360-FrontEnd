@@ -40,7 +40,7 @@ import {
 import services from 'services/aphp'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 
 type PatientBiologyProps = {
   groupId?: string
@@ -57,7 +57,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElementWithSystem[]>([])
   const {
     allSavedFilters,
     savedFiltersErrors,

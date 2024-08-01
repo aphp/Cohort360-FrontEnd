@@ -35,12 +35,15 @@ import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable 
 import { defaultCondition } from '../../index'
 import { HierarchyTree } from 'types'
 import { Cim10DataType } from 'types/requestCriterias'
-import { Hierarchy } from 'types/hierarchy'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 
 type CimListItemProps = {
-  cim10Item: Hierarchy<any, any>
-  selectedItems?: Hierarchy<any, any>[] | null
-  handleClick: (cimItem: Hierarchy<any, any>[] | null | undefined, newHierarchy?: Hierarchy<any, any>[]) => void
+  cim10Item: HierarchyElementWithSystem
+  selectedItems?: HierarchyElementWithSystem[] | null
+  handleClick: (
+    cimItem: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
+  ) => void
 }
 
 const CimListItem: React.FC<CimListItemProps> = (props) => {
@@ -72,7 +75,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = async (cim10Item: Hierarchy<any, any>) => {
+  const handleClickOnHierarchy = async (cim10Item: HierarchyElementWithSystem) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getHierarchySelection(cim10Item, selectedItems || [], cim10Hierarchy)
@@ -123,7 +126,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((cimHierarchySubItem: Hierarchy<any, any>, index: number) =>
+            subItems.map((cimHierarchySubItem: HierarchyElementWithSystem, index: number) =>
               cimHierarchySubItem.id === 'loading' ? (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
@@ -151,8 +154,8 @@ type Cim10HierarchyProps = {
   selectedCriteria: Cim10DataType
   goBack: () => void
   onChangeSelectedHierarchy: (
-    data: Hierarchy<any, any>[] | null | undefined,
-    newHierarchy?: Hierarchy<any, any>[]
+    data: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
   ) => void
   isEdition?: boolean
   onConfirm: () => void
@@ -176,14 +179,14 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
       newList.code = selectedCriteria.code
     }
     newList.code?.map(
-      (item: Hierarchy<any, any>) => findEquivalentRowInItemAndSubItems(item, cim10Hierarchy).equivalentRow
+      (item: HierarchyElementWithSystem) => findEquivalentRowInItemAndSubItems(item, cim10Hierarchy).equivalentRow
     )
     setCurrentState(newList)
   }, [initialState, cim10Hierarchy])
 
   const _handleClick = (
-    newSelectedItems: Hierarchy<any, any>[] | null | undefined,
-    newHierarchy?: Hierarchy<any, any>[]
+    newSelectedItems: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
   ) => {
     onChangeSelectedHierarchy(newSelectedItems, newHierarchy)
   }

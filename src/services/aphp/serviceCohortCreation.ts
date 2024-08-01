@@ -1,12 +1,10 @@
 import { AxiosResponse } from 'axios'
 import apiBack from '../apiBackend'
-
 import {
   Cohort,
   CountCohort,
   DatedMeasure,
   FetchRequest,
-  HierarchyElementWithSystem,
   QuerySnapshotInfo,
   RequestType,
   SimpleCodeType,
@@ -62,10 +60,11 @@ import {
   EXIT_DIAGNOSTIC,
   ENCOUNTER_STATUS
 } from '../../constants'
-import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
-import { VitalStatusLabel } from 'types/searchCriterias'
+import { fetchValueSet } from './callApi'
 import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
-import { Hierarchy } from 'types/hierarchy'
+import { Hierarchy, HierarchyElementWithSystem } from 'types/hierarchy'
+import { Direction, Order, VitalStatusLabel } from 'types/searchCriterias'
+import { getFhirCodes } from './serviceValueSets'
 
 export interface IServiceCohortCreation {
   /**
@@ -108,80 +107,80 @@ export interface IServiceCohortCreation {
 
   fetchSnapshot: (snapshotId: string) => Promise<Snapshot>
 
-  fetchAdmissionModes: () => Promise<Hierarchy<any, any>[]>
-  fetchEntryModes: () => Promise<Hierarchy<any, any>[]>
-  fetchExitModes: () => Promise<Hierarchy<any, any>[]>
-  fetchPriseEnChargeType: () => Promise<Hierarchy<any, any>[]>
-  fetchTypeDeSejour: () => Promise<Hierarchy<any, any>[]>
-  fetchFileStatus: () => Promise<Hierarchy<any, any>[]>
-  fetchReason: () => Promise<Hierarchy<any, any>[]>
-  fetchDestination: () => Promise<Hierarchy<any, any>[]>
-  fetchProvenance: () => Promise<Hierarchy<any, any>[]>
-  fetchAdmission: () => Promise<Hierarchy<any, any>[]>
-  fetchGender: () => Promise<Hierarchy<any, any>[]>
-  fetchStatus: () => Promise<Hierarchy<any, any>[]>
-  fetchStatusDiagnostic: () => Promise<Hierarchy<any, any>[]>
-  fetchDiagnosticTypes: () => Promise<Hierarchy<any, any>[]>
-  fetchCim10Diagnostic: (searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<Hierarchy<any, any>[]>
-  fetchCim10Hierarchy: (cim10Parent?: string) => Promise<Hierarchy<any, any>[]>
-  fetchCcamData: (searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<Hierarchy<any, any>[]>
-  fetchCcamHierarchy: (ccamParent: string) => Promise<Hierarchy<any, any>[]>
-  fetchGhmData: (searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<Hierarchy<any, any>[]>
-  fetchGhmHierarchy: (ghmParent: string) => Promise<Hierarchy<any, any>[]>
+  fetchAdmissionModes: () => Promise<HierarchyElementWithSystem[]>
+  fetchEntryModes: () => Promise<HierarchyElementWithSystem[]>
+  fetchExitModes: () => Promise<HierarchyElementWithSystem[]>
+  fetchPriseEnChargeType: () => Promise<HierarchyElementWithSystem[]>
+  fetchTypeDeSejour: () => Promise<HierarchyElementWithSystem[]>
+  fetchFileStatus: () => Promise<HierarchyElementWithSystem[]>
+  fetchReason: () => Promise<HierarchyElementWithSystem[]>
+  fetchDestination: () => Promise<HierarchyElementWithSystem[]>
+  fetchProvenance: () => Promise<HierarchyElementWithSystem[]>
+  fetchAdmission: () => Promise<HierarchyElementWithSystem[]>
+  fetchGender: () => Promise<HierarchyElementWithSystem[]>
+  fetchStatus: () => Promise<HierarchyElementWithSystem[]>
+  fetchStatusDiagnostic: () => Promise<HierarchyElementWithSystem[]>
+  fetchDiagnosticTypes: () => Promise<HierarchyElementWithSystem[]>
+  fetchCim10Diagnostic: (searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<HierarchyElementWithSystem[]>
+  fetchCim10Hierarchy: (cim10Parent?: string) => Promise<HierarchyElementWithSystem[]>
+  fetchCcamData: (searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<HierarchyElementWithSystem[]>
+  fetchCcamHierarchy: (ccamParent: string) => Promise<HierarchyElementWithSystem[]>
+  fetchGhmData: (searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<HierarchyElementWithSystem[]>
+  fetchGhmHierarchy: (ghmParent: string) => Promise<HierarchyElementWithSystem[]>
   fetchDocTypes: () => Promise<SimpleCodeType[]>
   fetchMedicationData: (
     searchValue?: string,
-    noStar?: boolean,
+    exactSearch?: boolean,
     signal?: AbortSignal
   ) => Promise<HierarchyElementWithSystem[]>
   fetchSingleCodeHierarchy: (resourceType: string, code: string) => Promise<string[]>
-  fetchAtcHierarchy: (atcParent: string) => Promise<Hierarchy<any, any>[]>
-  fetchUCDList: (ucd?: string) => Promise<Hierarchy<any, any>[]>
-  fetchPrescriptionTypes: () => Promise<Hierarchy<any, any>[]>
-  fetchAdministrations: () => Promise<Hierarchy<any, any>[]>
-  fetchBiologyData: () => Promise<Hierarchy<any, any>[]>
-  fetchBiologyHierarchy: (biologyParent?: string) => Promise<Hierarchy<any, any>[]>
+  fetchAtcHierarchy: (atcParent: string) => Promise<HierarchyElementWithSystem[]>
+  fetchUCDList: (ucd?: string) => Promise<HierarchyElementWithSystem[]>
+  fetchPrescriptionTypes: () => Promise<HierarchyElementWithSystem[]>
+  fetchAdministrations: () => Promise<HierarchyElementWithSystem[]>
+  fetchBiologyData: () => Promise<HierarchyElementWithSystem[]>
+  fetchBiologyHierarchy: (biologyParent?: string) => Promise<HierarchyElementWithSystem[]>
   fetchBiologySearch: (
     searchInput: string
   ) => Promise<{ anabio: ValueSetWithHierarchy[]; loinc: ValueSetWithHierarchy[] }>
-  fetchModalities: () => Promise<Hierarchy<any, any>[]>
-  fetchPregnancyMode: () => Promise<Hierarchy<any, any>[]>
-  fetchMaternalRisks: () => Promise<Hierarchy<any, any>[]>
-  fetchRisksRelatedToObstetricHistory: () => Promise<Hierarchy<any, any>[]>
-  fetchRisksOrComplicationsOfPregnancy: () => Promise<Hierarchy<any, any>[]>
-  fetchCorticotherapie: () => Promise<Hierarchy<any, any>[]>
-  fetchPrenatalDiagnosis: () => Promise<Hierarchy<any, any>[]>
-  fetchUltrasoundMonitoring: () => Promise<Hierarchy<any, any>[]>
-  fetchInUteroTransfer: () => Promise<Hierarchy<any, any>[]>
-  fetchPregnancyMonitoring: () => Promise<Hierarchy<any, any>[]>
-  fetchMaturationCorticotherapie: () => Promise<Hierarchy<any, any>[]>
-  fetchChirurgicalGesture: () => Promise<Hierarchy<any, any>[]>
-  fetchVme: () => Promise<Hierarchy<any, any>[]>
-  fetchChildbirth: () => Promise<Hierarchy<any, any>[]>
-  fetchHospitalChildBirthPlace: () => Promise<Hierarchy<any, any>[]>
-  fetchOtherHospitalChildBirthPlace: () => Promise<Hierarchy<any, any>[]>
-  fetchHomeChildBirthPlace: () => Promise<Hierarchy<any, any>[]>
-  fetchChildbirthMode: () => Promise<Hierarchy<any, any>[]>
-  fetchMaturationReason: () => Promise<Hierarchy<any, any>[]>
-  fetchMaturationModality: () => Promise<Hierarchy<any, any>[]>
-  fetchImgIndication: () => Promise<Hierarchy<any, any>[]>
-  fetchLaborOrCesareanEntry: () => Promise<Hierarchy<any, any>[]>
-  fetchPathologyDuringLabor: () => Promise<Hierarchy<any, any>[]>
-  fetchObstetricalGestureDuringLabor: () => Promise<Hierarchy<any, any>[]>
-  fetchAnalgesieType: () => Promise<Hierarchy<any, any>[]>
-  fetchBirthDeliveryWay: () => Promise<Hierarchy<any, any>[]>
-  fetchInstrumentType: () => Promise<Hierarchy<any, any>[]>
-  fetchCSectionModality: () => Promise<Hierarchy<any, any>[]>
-  fetchPresentationAtDelivery: () => Promise<Hierarchy<any, any>[]>
-  fetchBirthStatus: () => Promise<Hierarchy<any, any>[]>
-  fetchSetPostpartumHemorrhage: () => Promise<Hierarchy<any, any>[]>
-  fetchConditionPerineum: () => Promise<Hierarchy<any, any>[]>
-  fetchExitPlaceType: () => Promise<Hierarchy<any, any>[]>
-  fetchFeedingType: () => Promise<Hierarchy<any, any>[]>
-  fetchComplication: () => Promise<Hierarchy<any, any>[]>
-  fetchExitFeedingMode: () => Promise<Hierarchy<any, any>[]>
-  fetchExitDiagnostic: () => Promise<Hierarchy<any, any>[]>
-  fetchEncounterStatus: () => Promise<Hierarchy<any, any>[]>
+  fetchModalities: () => Promise<HierarchyElementWithSystem[]>
+  fetchPregnancyMode: () => Promise<HierarchyElementWithSystem[]>
+  fetchMaternalRisks: () => Promise<HierarchyElementWithSystem[]>
+  fetchRisksRelatedToObstetricHistory: () => Promise<HierarchyElementWithSystem[]>
+  fetchRisksOrComplicationsOfPregnancy: () => Promise<HierarchyElementWithSystem[]>
+  fetchCorticotherapie: () => Promise<HierarchyElementWithSystem[]>
+  fetchPrenatalDiagnosis: () => Promise<HierarchyElementWithSystem[]>
+  fetchUltrasoundMonitoring: () => Promise<HierarchyElementWithSystem[]>
+  fetchInUteroTransfer: () => Promise<HierarchyElementWithSystem[]>
+  fetchPregnancyMonitoring: () => Promise<HierarchyElementWithSystem[]>
+  fetchMaturationCorticotherapie: () => Promise<HierarchyElementWithSystem[]>
+  fetchChirurgicalGesture: () => Promise<HierarchyElementWithSystem[]>
+  fetchVme: () => Promise<HierarchyElementWithSystem[]>
+  fetchChildbirth: () => Promise<HierarchyElementWithSystem[]>
+  fetchHospitalChildBirthPlace: () => Promise<HierarchyElementWithSystem[]>
+  fetchOtherHospitalChildBirthPlace: () => Promise<HierarchyElementWithSystem[]>
+  fetchHomeChildBirthPlace: () => Promise<HierarchyElementWithSystem[]>
+  fetchChildbirthMode: () => Promise<HierarchyElementWithSystem[]>
+  fetchMaturationReason: () => Promise<HierarchyElementWithSystem[]>
+  fetchMaturationModality: () => Promise<HierarchyElementWithSystem[]>
+  fetchImgIndication: () => Promise<HierarchyElementWithSystem[]>
+  fetchLaborOrCesareanEntry: () => Promise<HierarchyElementWithSystem[]>
+  fetchPathologyDuringLabor: () => Promise<HierarchyElementWithSystem[]>
+  fetchObstetricalGestureDuringLabor: () => Promise<HierarchyElementWithSystem[]>
+  fetchAnalgesieType: () => Promise<HierarchyElementWithSystem[]>
+  fetchBirthDeliveryWay: () => Promise<HierarchyElementWithSystem[]>
+  fetchInstrumentType: () => Promise<HierarchyElementWithSystem[]>
+  fetchCSectionModality: () => Promise<HierarchyElementWithSystem[]>
+  fetchPresentationAtDelivery: () => Promise<HierarchyElementWithSystem[]>
+  fetchBirthStatus: () => Promise<HierarchyElementWithSystem[]>
+  fetchSetPostpartumHemorrhage: () => Promise<HierarchyElementWithSystem[]>
+  fetchConditionPerineum: () => Promise<HierarchyElementWithSystem[]>
+  fetchExitPlaceType: () => Promise<HierarchyElementWithSystem[]>
+  fetchFeedingType: () => Promise<HierarchyElementWithSystem[]>
+  fetchComplication: () => Promise<HierarchyElementWithSystem[]>
+  fetchExitFeedingMode: () => Promise<HierarchyElementWithSystem[]>
+  fetchExitDiagnostic: () => Promise<HierarchyElementWithSystem[]>
+  fetchEncounterStatus: () => Promise<HierarchyElementWithSystem[]>
 }
 
 const servicesCohortCreation: IServiceCohortCreation = {
@@ -321,21 +320,59 @@ const servicesCohortCreation: IServiceCohortCreation = {
   },
 
   fetchAdmissionModes: async () =>
-    fetchValueSet(ENCOUNTER_ADMISSION_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchEntryModes: async () => fetchValueSet(ENCOUNTER_ENTRY_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchExitModes: async () => fetchValueSet(ENCOUNTER_EXIT_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+    fetchValueSet(ENCOUNTER_ADMISSION_MODE, {
+      joinDisplayWithCode: false
+    }),
+  fetchEntryModes: async () =>
+    fetchValueSet(ENCOUNTER_ENTRY_MODE, {
+      joinDisplayWithCode: false,
+      orderBy: { orderBy: Order.CODE, orderDirection: Direction.ASC }
+    }),
+  fetchExitModes: async () =>
+    fetchValueSet(ENCOUNTER_EXIT_MODE, {
+      joinDisplayWithCode: false,
+      orderBy: { orderBy: Order.CODE, orderDirection: Direction.ASC }
+    }),
   fetchPriseEnChargeType: async () =>
     fetchValueSet(ENCOUNTER_VISIT_TYPE, {
       joinDisplayWithCode: false,
       filterOut: (value) => value.id === 'nachstationär' || value.id === 'z.zt. verlegt'
     }),
-  fetchTypeDeSejour: async () => fetchValueSet(ENCOUNTER_SEJOUR_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchFileStatus: async () => fetchValueSet(ENCOUNTER_FILE_STATUS, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchReason: async () => fetchValueSet(ENCOUNTER_EXIT_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchDestination: async () => fetchValueSet(ENCOUNTER_DESTINATION, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchProvenance: async () => fetchValueSet(ENCOUNTER_PROVENANCE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchAdmission: async () => fetchValueSet(ENCOUNTER_ADMISSION, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchGender: async () => fetchValueSet(DEMOGRAPHIC_GENDER, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchTypeDeSejour: async () =>
+    fetchValueSet(ENCOUNTER_SEJOUR_TYPE, {
+      joinDisplayWithCode: false,
+      orderBy: { orderBy: Order.CODE, orderDirection: Direction.ASC }
+    }),
+  fetchFileStatus: async () =>
+    fetchValueSet(ENCOUNTER_FILE_STATUS, {
+      joinDisplayWithCode: false,
+      orderBy: { orderBy: Order.CODE, orderDirection: Direction.ASC }
+    }),
+  fetchReason: async () =>
+    fetchValueSet(ENCOUNTER_EXIT_TYPE, {
+      joinDisplayWithCode: false,
+      orderBy: { orderBy: Order.CODE, orderDirection: Direction.ASC }
+    }),
+  fetchDestination: async () =>
+    fetchValueSet(ENCOUNTER_DESTINATION, {
+      joinDisplayWithCode: false,
+      orderBy: { orderBy: Order.CODE, orderDirection: Direction.ASC }
+    }),
+  fetchProvenance: async () =>
+    fetchValueSet(ENCOUNTER_PROVENANCE, {
+      joinDisplayWithCode: false,
+      orderBy: { orderBy: Order.CODE, orderDirection: Direction.ASC }
+    }),
+  fetchAdmission: async () =>
+    fetchValueSet(ENCOUNTER_ADMISSION, {
+      joinDisplayWithCode: false,
+      orderBy: { orderBy: Order.CODE, orderDirection: Direction.ASC }
+    }),
+  fetchGender: async () =>
+    fetchValueSet(DEMOGRAPHIC_GENDER, {
+      joinDisplayWithCode: false,
+      orderBy: { orderBy: Order.CODE, orderDirection: Direction.ASC }
+    }),
   fetchStatus: async () => {
     return [
       {
@@ -361,38 +398,42 @@ const servicesCohortCreation: IServiceCohortCreation = {
     ]
   },
   fetchDiagnosticTypes: async () => fetchValueSet(CONDITION_STATUS),
-  fetchCim10Diagnostic: async (searchValue?: string, noStar?: boolean, signal?: AbortSignal) =>
+  fetchCim10Diagnostic: async (searchValue?: string, exactSearch?: boolean, signal?: AbortSignal) =>
     fetchValueSet(
       CONDITION_HIERARCHY,
       {
         valueSetTitle: 'Toute la hiérarchie',
         search: searchValue || '',
-        noStar
+        exactSearch
       },
       signal
     ),
   fetchCim10Hierarchy: async (cim10Parent?: string) =>
-    fetchValueSet(CONDITION_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie CIM10', code: cim10Parent }),
-  fetchCcamData: async (searchValue?: string, noStar?: boolean, signal?: AbortSignal) =>
+    fetchValueSet(CONDITION_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie CIM10', codes: [cim10Parent] }),
+  fetchCcamData: async (searchValue?: string, exactSearch?: boolean, signal?: AbortSignal) =>
     fetchValueSet(
       PROCEDURE_HIERARCHY,
-      { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', noStar },
+      { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', exactSearch },
       signal
     ),
   fetchCcamHierarchy: async (ccamParent?: string) =>
-    fetchValueSet(PROCEDURE_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie CCAM', code: ccamParent }),
-  fetchGhmData: async (searchValue?: string, noStar?: boolean, signal?: AbortSignal) =>
-    fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', noStar }, signal),
+    fetchValueSet(PROCEDURE_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie CCAM', codes: [ccamParent] }),
+  fetchGhmData: async (searchValue?: string, exactSearch?: boolean, signal?: AbortSignal) =>
+    fetchValueSet(
+      CLAIM_HIERARCHY,
+      { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', exactSearch },
+      signal
+    ),
   fetchGhmHierarchy: async (ghmParent?: string) =>
-    fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie GHM', code: ghmParent }),
+    fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie GHM', codes: [ghmParent] }),
   fetchDocTypes: () => Promise.resolve(docTypes && docTypes.docTypes.length > 0 ? docTypes.docTypes : []),
-  fetchMedicationData: async (searchValue?: string, noStar?: boolean, signal?: AbortSignal) =>
+  fetchMedicationData: async (searchValue?: string, exactSearch?: boolean, signal?: AbortSignal) =>
     fetchValueSet(
       `${MEDICATION_ATC},${MEDICATION_UCD}`,
       {
         valueSetTitle: 'Toute la hiérarchie',
         search: searchValue || '',
-        noStar
+        exactSearch
       },
       signal
     ),
@@ -409,37 +450,38 @@ const servicesCohortCreation: IServiceCohortCreation = {
       // TODO log error
       return Promise.resolve([] as string[])
     }
-    return fetchSingleCodeHierarchy(codeSystemPerResourceType[resourceType], code)
+    const fhirCode = await getFhirCodes(codeSystemPerResourceType[resourceType], [code])
+    return fhirCode.results[0]?.parentIds || []
   },
   fetchAtcHierarchy: async (atcParent?: string) =>
     fetchValueSet(MEDICATION_ATC, {
       valueSetTitle: 'Toute la hiérarchie Médicament',
-      code: atcParent,
-      sortingKey: 'id',
+      codes: [atcParent],
+      orderBy: { orderBy: Order.CODE, orderDirection: Direction.ASC },
       filterRoots: (atcData) =>
         // V--[ @TODO: This is a hot fix, remove this after a clean of data ]--V
         atcData.label.search(new RegExp(/^[A-Z] - /, 'gi')) !== -1 &&
         atcData.label.search(new RegExp(/^[X-Y] - /, 'gi')) !== 0
     }),
-  fetchUCDList: async (ucd?: string) => fetchValueSet(MEDICATION_UCD, { code: ucd }),
+  fetchUCDList: async (ucd?: string) => fetchValueSet(MEDICATION_UCD, { codes: [ucd] }),
   fetchPrescriptionTypes: async () => fetchValueSet(MEDICATION_PRESCRIPTION_TYPES, { joinDisplayWithCode: false }),
   fetchAdministrations: async () => {
     const administrations = await fetchValueSet(MEDICATION_ADMINISTRATIONS, { joinDisplayWithCode: false })
-    return administrations.map((administration) =>
+    return (administrations.results || []).map((administration) =>
       administration.id === 'GASTROTOMIE.' ? { ...administration, label: 'Gastrotomie.' } : administration
     )
   },
-  fetchBiologyData: async (searchValue?: string, noStar?: boolean) =>
+  fetchBiologyData: async (searchValue?: string, exactSearch?: boolean) =>
     fetchValueSet(`${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}`, {
       valueSetTitle: 'Toute la hiérarchie',
       search: searchValue || '',
-      noStar,
+      exactSearch,
       joinDisplayWithCode: false
     }),
   fetchBiologyHierarchy: async (biologyParent?: string) =>
     fetchValueSet(BIOLOGY_HIERARCHY_ITM_ANABIO, {
       valueSetTitle: 'Toute la hiérarchie de Biologie',
-      code: biologyParent,
+      codes: [biologyParent],
       joinDisplayWithCode: false,
       filterRoots: (biologyItem) =>
         biologyItem.id !== '527941' &&

@@ -7,11 +7,12 @@ import { InputWrapper } from 'components/ui/Inputs'
 import EditIcon from '@mui/icons-material/Edit'
 import { ExecutiveUnitsWrapper } from './styles'
 import { SourceType } from 'types/scope'
-import PopulationRightPanel from 'components/CreationCohort/DiagramView/components/PopulationCard/components/PopulationRightPanel'
 import { Hierarchy } from 'types/hierarchy'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import { getScopeLevelBySourceType } from 'utils/perimeters'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
+import ScopeTree from 'components/ScopeTree'
+import Panel from 'components/ui/Panel'
 
 type ExecutiveUnitsFilterProps = {
   value: Hierarchy<ScopeElement, string>[]
@@ -32,13 +33,15 @@ const ExecutiveUnitsFilter = ({
 }: ExecutiveUnitsFilterProps) => {
   const context = useContext(FormContext)
   const [population, setPopulation] = useState<Hierarchy<ScopeElement, string>[]>([])
-  const [selectedPopulation, setSelectedPopulation] = useState<Hierarchy<ScopeElement, string>[]>(value)
+  const [selectedPopulation, setSelectedPopulation] = useState<Hierarchy<ScopeElement, string>[]>([])
+  const [confirmedPopulation, setConfirmedPopulation] = useState<Hierarchy<ScopeElement, string>[]>(value)
   const [loading, setLoading] = useState(disabled ? LoadingStatus.SUCCESS : LoadingStatus.FETCHING)
   const [open, setOpen] = useState(false)
 
   const handleDelete = (id: string) => {
     const newSelectedPopulation = selectedPopulation.filter((item) => item.id !== id)
     setSelectedPopulation(newSelectedPopulation)
+    setConfirmedPopulation(newSelectedPopulation)
   }
 
   useEffect(() => {
@@ -51,9 +54,10 @@ const ExecutiveUnitsFilter = ({
   }, [])
 
   useEffect(() => {
-    if (context?.updateFormData) context.updateFormData(name, selectedPopulation)
-    if (onChange) onChange(selectedPopulation)
-  }, [selectedPopulation])
+    if (context?.updateFormData) context.updateFormData(name, confirmedPopulation)
+    if (onChange) onChange(confirmedPopulation)
+  }, [confirmedPopulation])
+
   return (
     <InputWrapper>
       <Grid item container alignContent="center" alignItems={'center'}>
@@ -81,8 +85,8 @@ const ExecutiveUnitsFilter = ({
       <Grid item container direction="row" alignItems="center">
         <ExecutiveUnitsWrapper>
           <Grid container>
-            {!selectedPopulation.length && 'Sélectionner une unité exécutrice'}
-            {selectedPopulation.map((unit) => (
+            {!confirmedPopulation.length && 'Sélectionner une unité exécutrice'}
+            {confirmedPopulation.map((unit) => (
               <Chip
                 disabled={disabled}
                 sx={{
@@ -106,18 +110,22 @@ const ExecutiveUnitsFilter = ({
             {loading === LoadingStatus.FETCHING && <CircularProgress size={24} />}
           </IconButton>
         </ExecutiveUnitsWrapper>
-        <PopulationRightPanel
+        <Panel
           title="Sélectionner une unité exécutrice"
           open={open}
-          population={population}
-          selectedPopulation={selectedPopulation}
-          sourceType={sourceType}
-          onConfirm={(value) => {
-            setSelectedPopulation(value)
+          onConfirm={() => {
+            setConfirmedPopulation(selectedPopulation)
             setOpen(false)
           }}
           onClose={() => setOpen(false)}
-        />
+        >
+          <ScopeTree
+            baseTree={population}
+            selectedNodes={confirmedPopulation}
+            onSelect={setSelectedPopulation}
+            sourceType={sourceType}
+          />
+        </Panel>
       </Grid>
     </InputWrapper>
   )

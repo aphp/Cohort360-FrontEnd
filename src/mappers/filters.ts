@@ -291,7 +291,7 @@ const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
     const allDiagnosticTypes = await services.cohortCreation.fetchDiagnosticTypes()
     diagnosticTypes = diagnosticTypesParams?.split(',')?.map((elem) => {
       const toParse = elem.split('|')?.[1]
-      return { id: toParse, label: allDiagnosticTypes.find((diag) => diag.id === toParse)?.label || '' }
+      return { id: toParse, label: (allDiagnosticTypes.results || []).find((diag) => diag.id === toParse)?.label || '' }
     })
   }
   const source = parameters.get(ConditionParamsKeys.SOURCE) || ''
