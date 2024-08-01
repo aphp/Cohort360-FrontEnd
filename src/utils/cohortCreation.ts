@@ -289,8 +289,10 @@ const buildPatientFilter = (criterion: DemographicDataType, deidentified: boolea
     filtersBuilders(PatientsParamsKeys.DEATHDATE, buildDateFilter(criterion.deathDates[0], 'ge')),
     filtersBuilders(PatientsParamsKeys.DEATHDATE, buildDateFilter(criterion.deathDates[1], 'le')),
     criterion.birthdates[0] === null && criterion.birthdates[1] === null
-      ? (buildDurationFilter(criterion.age[0], isDeidentified, 'ge', deidentified),
-        buildDurationFilter(criterion.age[1], isDeidentified, 'le', deidentified))
+      ? buildDurationFilter(criterion.age[0], isDeidentified, 'ge', deidentified)
+      : '',
+    criterion.birthdates[0] === null && criterion.birthdates[1] === null
+      ? buildDurationFilter(criterion.age[1], isDeidentified, 'le', deidentified)
       : ''
   ]
 }
