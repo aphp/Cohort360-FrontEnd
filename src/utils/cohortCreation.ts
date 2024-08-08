@@ -46,7 +46,8 @@ import {
   MedicationDataType,
   GhmDataType,
   CcamDataType,
-  HospitDataType
+  HospitDataType,
+  SelectedCriteriaTypesWithOccurrences
 } from 'types/requestCriterias'
 import { parseOccurence } from './valueComparator'
 import { parseDocumentAttachment } from './documentAttachment'
@@ -874,7 +875,28 @@ const unbuildCommonCriteria = (element: RequeteurCriteriaType): Omit<CommonCrite
   }
 }
 
-const unbuildPatientCriteria = (element: RequeteurCriteriaType): DemographicDataType => {
+const unbuildCriteria = async <T extends SelectedCriteriaTypesWithOccurrences | SelectedCriteriaType>(
+  element: RequeteurCriteriaType,
+  emptyCriterion: T,
+  filterUnbuilders: Partial<{ [key: string]: (c: T, v: string | null) => Promise<void> | void }>
+): Promise<T> => {
+  if (emptyCriterion.type !== CriteriaType.PATIENT && emptyCriterion.type !== CriteriaType.IPP_LIST)
+    unbuildOccurrence(element, emptyCriterion as SelectedCriteriaTypesWithOccurrences)
+
+  if (element.filterFhir) {
+    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+
+    for (const filter of filters) {
+      const key = filter[0] ?? null
+      const value = filter[1] ?? null
+      if (key !== null) await filterUnbuilders[key]?.(emptyCriterion, value)
+      else emptyCriterion.error = true
+    }
+  }
+  return emptyCriterion
+}
+
+const unbuildPatientCriteria = async (element: RequeteurCriteriaType): Promise<DemographicDataType> => {
   const currentCriterion: DemographicDataType = {
     ...unbuildCommonCriteria(element),
     type: CriteriaType.PATIENT,
@@ -886,7 +908,7 @@ const unbuildPatientCriteria = (element: RequeteurCriteriaType): DemographicData
     deathDates: [null, null]
   }
 
-  const filterUnbuilders: Partial<{ [key: string]: (c: DemographicDataType, v: string) => void }> = {
+  return await unbuildCriteria(element, currentCriterion, {
     [PatientsParamsKeys.DATE_IDENTIFIED]: (c, v) => {
       if (v?.includes('ge')) {
         c.age[0] = unbuildDurationFilter(v, false)
@@ -921,18 +943,7 @@ const unbuildPatientCriteria = (element: RequeteurCriteriaType): DemographicData
     [PatientsParamsKeys.VITAL_STATUS]: (c, v) => {
       unbuildLabelObjectFilter(c, 'vitalStatus', v)
     }
-  }
-
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-    for (const filter of filters) {
-      const key = filter[0] ?? null
-      const value = filter[1] ?? null
-      if (key !== null) filterUnbuilders[key]?.(currentCriterion, value)
-      else currentCriterion.error = true
-    }
-  }
-  return currentCriterion
+  })
 }
 
 const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise<EncounterDataType> => {
@@ -958,7 +969,8 @@ const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise
     encounterEndDate: [null, null],
     encounterStatus: []
   }
-  const filterUnbuilders: Partial<{ [key: string]: (c: EncounterDataType, v: string) => Promise<void> | void }> = {
+
+  return await unbuildCriteria(element, currentCriterion, {
     [EncounterParamsKeys.DURATION]: (c, v) => {
       if (v?.includes('ge')) {
         c.duration[0] = unbuildDurationFilter(v)
@@ -967,13 +979,13 @@ const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise
       }
     },
     [EncounterParamsKeys.MIN_BIRTHDATE_DAY]: (c, v) => {
-      c.age[0] = unbuildDurationFilter(v, false)
+      c.age[0] = v ? unbuildDurationFilter(v, false) : null
     },
     [EncounterParamsKeys.MIN_BIRTHDATE_MONTH]: (c, v) => {
-      c.age[0] = unbuildDurationFilter(v, true)
+      c.age[0] = v ? unbuildDurationFilter(v, true) : null
     },
     [EncounterParamsKeys.MAX_BIRTHDATE_DAY]: (c, v) => {
-      c.age[1] = unbuildDurationFilter(v, false)
+      c.age[1] = v ? unbuildDurationFilter(v, false) : null
     },
     [EncounterParamsKeys.MAX_BIRTHDATE_MONTH]: (c, v) => {
       c.age[1] = v ? unbuildDurationFilter(v, true) : null
@@ -1028,21 +1040,7 @@ const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise
     ['_filter']: (c, v) => {
       unbuildEncounterDatesFilters(c, v)
     }
-  }
-
-  unbuildOccurrence(element, currentCriterion)
-
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    for (const filter of filters) {
-      const key = filter[0] ?? null
-      const value = filter[1] ?? null
-      if (key !== null) filterUnbuilders[key]?.(currentCriterion, value)
-      else currentCriterion.error = true
-    }
-  }
-  return currentCriterion
+  })
 }
 
 const unbuildDocumentReferenceCriteria = async (element: RequeteurCriteriaType): Promise<DocumentDataType> => {
@@ -1062,8 +1060,7 @@ const unbuildDocumentReferenceCriteria = async (element: RequeteurCriteriaType):
     encounterStartDate: [null, null],
     encounterStatus: []
   }
-
-  const filterUnbuilders: Partial<{ [key: string]: (c: DocumentDataType, v: string) => Promise<void> | void }> = {
+  return await unbuildCriteria(element, currentCriterion, {
     [SearchByTypes.DESCRIPTION]: (c, v) => {
       c.search = unbuildSearchFilter(v)
       c.searchBy = SearchByTypes.DESCRIPTION
@@ -1108,21 +1105,7 @@ const unbuildDocumentReferenceCriteria = async (element: RequeteurCriteriaType):
     ['_filter']: (c, v) => {
       unbuildEncounterDatesFilters(c, v)
     }
-  }
-
-  unbuildOccurrence(element, currentCriterion)
-
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    for (const filter of filters) {
-      const key = filter[0] ?? null
-      const value = filter[1] ?? null
-      if (key !== null) filterUnbuilders[key]?.(currentCriterion, value)
-      else currentCriterion.error = true
-    }
-  }
-  return currentCriterion
+  })
 }
 
 const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise<Cim10DataType> => {
@@ -1143,7 +1126,7 @@ const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise
     encounterStatus: []
   }
 
-  const filterUnbuilders: Partial<{ [key: string]: (c: Cim10DataType, v: string | null) => Promise<void> | void }> = {
+  return await unbuildCriteria(element, currentCriterion, {
     [ConditionParamsKeys.CODE]: (c, v) => unbuildLabelObjectFilter(c, 'code', v),
     [ConditionParamsKeys.SOURCE]: (c, v) => (c.source = v),
     [ConditionParamsKeys.DIAGNOSTIC_TYPES]: (c, v) => unbuildLabelObjectFilter(c, 'diagnosticType', v),
@@ -1172,21 +1155,7 @@ const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise
       }
     },
     ['_filter']: (c, v) => unbuildEncounterDatesFilters(c, v)
-  }
-
-  unbuildOccurrence(element, currentCriterion)
-
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    for (const filter of filters) {
-      const key = filter ? filter[0] : null
-      const value = filter ? filter[1] : null
-      if (key !== null) await filterUnbuilders[key]?.(currentCriterion, value)
-      else currentCriterion.error = true
-    }
-  }
-  return currentCriterion
+  })
 }
 
 const unbuildProcedureCriteria = async (element: RequeteurCriteriaType): Promise<CcamDataType> => {
@@ -1207,7 +1176,7 @@ const unbuildProcedureCriteria = async (element: RequeteurCriteriaType): Promise
     encounterEndDate: [null, null]
   }
 
-  const filterUnbuilders: Partial<{ [key: string]: (c: CcamDataType, v: string | null) => Promise<void> | void }> = {
+  return await unbuildCriteria(element, currentCriterion, {
     [ProcedureParamsKeys.CODE]: (c, v) => unbuildLabelObjectFilter(c, 'code', v),
     [ProcedureParamsKeys.EXECUTIVE_UNITS]: async (c, v) =>
       await unbuildEncounterServiceCriterias(c, 'encounterService', v),
@@ -1235,21 +1204,7 @@ const unbuildProcedureCriteria = async (element: RequeteurCriteriaType): Promise
       }
     },
     ['_filter']: (c, v) => unbuildEncounterDatesFilters(c, v)
-  }
-
-  unbuildOccurrence(element, currentCriterion)
-
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    for (const filter of filters) {
-      const key = filter[0] ?? null
-      const value = filter[1] ?? null
-      if (key !== null) await filterUnbuilders[key]?.(currentCriterion, value)
-      else currentCriterion.error = true
-    }
-  }
-  return currentCriterion
+  })
 }
 
 const unbuildClaimCriteria = async (element: RequeteurCriteriaType): Promise<GhmDataType> => {
@@ -1267,7 +1222,7 @@ const unbuildClaimCriteria = async (element: RequeteurCriteriaType): Promise<Ghm
     encounterEndDate: [null, null]
   }
 
-  const filterUnbuilders: Partial<{ [key: string]: (c: GhmDataType, v: string | null) => Promise<void> | void }> = {
+  return await unbuildCriteria(element, currentCriterion, {
     [ClaimParamsKeys.CODE]: (c, v) => unbuildLabelObjectFilter(c, 'code', v),
     [ClaimParamsKeys.EXECUTIVE_UNITS]: async (c, v) => await unbuildEncounterServiceCriterias(c, 'encounterService', v),
     [ClaimParamsKeys.ENCOUNTER_STATUS]: (c, v) => unbuildLabelObjectFilter(c, 'encounterStatus', v),
@@ -1293,21 +1248,7 @@ const unbuildClaimCriteria = async (element: RequeteurCriteriaType): Promise<Ghm
       }
     },
     ['_filter']: (c, v) => unbuildEncounterDatesFilters(c, v)
-  }
-
-  unbuildOccurrence(element, currentCriterion)
-
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    for (const filter of filters) {
-      const key = filter ? filter[0] : null
-      const value = filter ? filter[1] : null
-      if (key !== null) await filterUnbuilders[key]?.(currentCriterion, value)
-      else currentCriterion.error = true
-    }
-  }
-  return currentCriterion
+  })
 }
 const unbuildMedicationCriteria = async (element: RequeteurCriteriaType): Promise<MedicationDataType> => {
   const currentCriterion: MedicationDataType = {
@@ -1329,9 +1270,7 @@ const unbuildMedicationCriteria = async (element: RequeteurCriteriaType): Promis
     encounterEndDate: [null, null]
   }
 
-  const filterUnbuilders: Partial<{
-    [key: string]: (c: MedicationDataType, v: string | null) => Promise<void> | void
-  }> = {
+  return await unbuildCriteria(element, currentCriterion, {
     [PrescriptionParamsKeys.CODE]: (c, v) => {
       const codeIds = v?.replace(/https:\/\/.*?\|/g, '')
       unbuildLabelObjectFilter(c, 'code', codeIds)
@@ -1376,20 +1315,7 @@ const unbuildMedicationCriteria = async (element: RequeteurCriteriaType): Promis
       }
     },
     ['_filter']: (c, v) => unbuildEncounterDatesFilters(c, v)
-  }
-
-  unbuildOccurrence(element, currentCriterion)
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    for (const filter of filters) {
-      const key = filter[0] ?? null
-      const value = filter[1] ?? null
-      if (key !== null) await filterUnbuilders[key]?.(currentCriterion, value)
-      else currentCriterion.error = true
-    }
-  }
-  return currentCriterion
+  })
 }
 const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promise<ObservationDataType> => {
   const currentCriterion: ObservationDataType = {
@@ -1408,9 +1334,7 @@ const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promi
     encounterEndDate: [null, null]
   }
 
-  const filterUnbuilders: Partial<{
-    [key: string]: (c: ObservationDataType, v: string | null) => Promise<void> | void
-  }> = {
+  return await unbuildCriteria(element, currentCriterion, {
     [ObservationParamsKeys.ANABIO_LOINC]: async (c, v) => {
       unbuildLabelObjectFilter(c, 'code', v)
 
@@ -1452,25 +1376,9 @@ const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promi
       }
     },
     ['_filter']: (c, v) => unbuildEncounterDatesFilters(c, v)
-  }
-
-  unbuildOccurrence(element, currentCriterion)
-
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    unbuildObservationValueFilter(filters, currentCriterion)
-
-    for (const filter of filters) {
-      const key = filter[0] ?? null
-      const value = filter[1] ?? null
-      if (key !== null) await filterUnbuilders[key]?.(currentCriterion, value)
-      else currentCriterion.error = true
-    }
-  }
-  return currentCriterion
+  })
 }
-const unbuildIPPListCriteria = (element: RequeteurCriteriaType): IPPListDataType => {
+const unbuildIPPListCriteria = async (element: RequeteurCriteriaType): Promise<IPPListDataType> => {
   const currentCriterion: IPPListDataType = {
     ...unbuildCommonCriteria(element),
     type: CriteriaType.IPP_LIST,
@@ -1478,25 +1386,13 @@ const unbuildIPPListCriteria = (element: RequeteurCriteriaType): IPPListDataType
     search: ''
   }
 
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    const filterUnbuilders: Partial<{ [key: string]: (c: IPPListDataType, v: string | null) => void }> = {
-      [IppParamsKeys.IPP_LIST_FHIR]: (c, v) => {
-        c.search = v ?? ''
-      }
+  return await unbuildCriteria(element, currentCriterion, {
+    [IppParamsKeys.IPP_LIST_FHIR]: (c, v) => {
+      c.search = v ?? ''
     }
-
-    for (const filter of filters) {
-      const key = filter ? filter[0] : null
-      const value = filter ? filter[1] : null
-
-      if (key !== null) filterUnbuilders[key]?.(currentCriterion, value)
-      else currentCriterion.error = true
-    }
-  }
-  return currentCriterion
+  })
 }
+
 const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<ImagingDataType> => {
   const currentCriterion: ImagingDataType = {
     ...unbuildCommonCriteria(element),
@@ -1528,11 +1424,11 @@ const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<I
     encounterStatus: []
   }
 
-  const filterUnbuilders: Partial<{ [key: string]: (c: ImagingDataType, v: string) => Promise<void> | void }> = {
+  return await unbuildCriteria(element, currentCriterion, {
     [ImagingParamsKeys.DATE]: (c, v) => {
-      if (v.includes('ge')) {
+      if (v?.includes('ge')) {
         c.studyStartDate = unbuildDateFilter(v)
-      } else if (v.includes('le')) {
+      } else if (v?.includes('le')) {
         c.studyEndDate = unbuildDateFilter(v)
       }
     },
@@ -1547,14 +1443,14 @@ const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<I
       c.studyProcedure = unbuildSearchFilter(v)
     },
     [ImagingParamsKeys.NB_OF_SERIES]: (c, v) => {
-      const parsedOccurence = parseOccurence(v)
-      c.numberOfSeries = parsedOccurence.value
-      c.seriesComparator = parsedOccurence.comparator
+      const parsedOccurence = v ? parseOccurence(v) : null
+      c.numberOfSeries = parsedOccurence !== null ? parsedOccurence.value : 1
+      c.seriesComparator = parsedOccurence !== null ? parsedOccurence.comparator : Comparators.GREATER_OR_EQUAL
     },
     [ImagingParamsKeys.NB_OF_INS]: (c, v) => {
-      const parsedOccurence = parseOccurence(v)
-      c.numberOfIns = parsedOccurence.value
-      c.instancesComparator = parsedOccurence.comparator
+      const parsedOccurence = v ? parseOccurence(v) : null
+      c.numberOfIns = parsedOccurence !== null ? parsedOccurence.value : 1
+      c.instancesComparator = parsedOccurence !== null ? parsedOccurence.comparator : Comparators.GREATER_OR_EQUAL
     },
     [ImagingParamsKeys.WITH_DOCUMENT]: (c, v) => {
       const parsedDocumentAttachment = parseDocumentAttachment(v as DocumentAttachmentMethod)
@@ -1562,12 +1458,12 @@ const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<I
       c.daysOfDelay = parsedDocumentAttachment.daysOfDelay
     },
     [ImagingParamsKeys.STUDY_UID]: (c, v) => {
-      c.studyUid = v.replace(`${IMAGING_STUDY_UID_URL}|`, '') ?? ''
+      c.studyUid = v?.replace(`${IMAGING_STUDY_UID_URL}|`, '') ?? ''
     },
     [ImagingParamsKeys.SERIES_DATE]: (c, v) => {
-      if (v.includes('ge')) {
+      if (v?.includes('ge')) {
         c.seriesStartDate = unbuildDateFilter(v)
-      } else if (v.includes('le')) {
+      } else if (v?.includes('le')) {
         c.seriesEndDate = unbuildDateFilter(v)
       }
     },
@@ -1607,21 +1503,7 @@ const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<I
     ['_filter']: (c, v) => {
       unbuildEncounterDatesFilters(c, v)
     }
-  }
-
-  unbuildOccurrence(element, currentCriterion)
-
-  if (element.filterFhir) {
-    const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
-    for (const filter of filters) {
-      const key = filter[0] ?? null
-      const value = filter[1] ?? null
-      if (key !== null) await filterUnbuilders[key]?.(currentCriterion, value)
-      else currentCriterion.error = true
-    }
-  }
-  return currentCriterion
+  })
 }
 
 const unbuildPregnancyQuestionnaireResponseCriteria = async (
