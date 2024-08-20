@@ -9,7 +9,12 @@ import LeftSideBar from '../LeftSideBar/LeftSideBar'
 import AutoLogoutContainer from '../AutoLogoutContainer'
 import { WebSocketProvider } from 'components/WebSocket/WebSocketProvider'
 
-const Layout = (props) => {
+type LayoutProps = {
+  displaySideBar: boolean
+  children: any
+}
+
+const Layout = (props: LayoutProps) => {
   const me = useAppSelector((state) => state.me)
 
   return (
@@ -28,21 +33,20 @@ const AppNavigation = () => (
     <Routes>
       {configRoutes.map((route, index) => {
         return route.isPrivate ? (
-          <Route key={index} element={<PrivateRoute />}>
+          <Route key={index + route.name} element={<PrivateRoute />}>
             <Route
-              key={index}
+              key={index + route.name}
               path={route.path}
               element={
                 <WebSocketProvider>
                   <Layout displaySideBar={route.displaySideBar}>{route.element}</Layout>
                 </WebSocketProvider>
               }
-              param
             />
           </Route>
         ) : (
           <Route
-            key={index}
+            key={index + route.name}
             path={route.path}
             element={<Layout displaySideBar={route.displaySideBar}>{route.element}</Layout>}
           />

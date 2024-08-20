@@ -187,7 +187,9 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
     margin: 2,
     cursor: 'pointer',
     fontWeight: 'bold',
-    textDecoration: 'underline'
+    textDecoration: 'underline',
+    backgroundColor: '#fff',
+    border: 'none'
   },
   leftElements: {
     position: 'relative',

@@ -50,16 +50,12 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
   const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
 
-  const procedureHierarchy = useAppSelector((state) => state.pmsi.procedure.list || {})
-  const isLoadingsyncHierarchyTable = useAppSelector((state) => state.syncHierarchyTable.loading || 0)
-  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)
+  const procedureHierarchy = useAppSelector((state) => state.pmsi.procedure.list)
+  const isLoadingsyncHierarchyTable = useAppSelector((state) => state.syncHierarchyTable.loading ?? 0)
+  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading ?? 0)
 
   const [open, setOpen] = useState(false)
-  const isSelected = findSelectedInListAndSubItems(
-    selectedItems ? selectedItems : [],
-    procedureItem,
-    procedureHierarchy
-  )
+  const isSelected = findSelectedInListAndSubItems(selectedItems ?? [], procedureItem, procedureHierarchy)
   const isIndeterminated = checkIfIndeterminated(procedureItem, selectedItems)
   const _onExpand = async (procedureCode: string) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
@@ -72,15 +68,15 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
       defaultProcedure.type,
       dispatch
     )
-    await handleClick(selectedItems, newHierarchy)
+    handleClick(selectedItems, newHierarchy)
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = async (procedureItem: Hierarchy<any, any>) => {
+  const handleClickOnHierarchy = (procedureItem: Hierarchy<any, any>) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getHierarchySelection(procedureItem, selectedItems || [], procedureHierarchy)
-    await handleClick(newSelectedItems)
+    handleClick(newSelectedItems)
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
@@ -88,7 +84,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
     return (
       <ListItem className={classes.procedureItem}>
         <ListItemIcon>
-          <div
+          <button
             onClick={() => handleClickOnHierarchy(procedureItem)}
             className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
@@ -112,7 +108,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
     <>
       <ListItem className={classes.procedureItem}>
         <ListItemIcon>
-          <div
+          <button
             onClick={() => handleClickOnHierarchy(procedureItem)}
             className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
@@ -130,20 +126,19 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
       <Collapse in={id === '*' ? true : open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
-          {subItems &&
-            subItems.map((subItem: Hierarchy<any, any>, index: number) =>
-              subItem.id === 'loading' ? (
-                <Fragment key={index}>
-                  <div className={classes.subItemsIndicator} />
-                  <Skeleton style={{ flex: 1, margin: '2px 32px' }} height={32} />
-                </Fragment>
-              ) : (
-                <Fragment key={index}>
-                  <div className={classes.subItemsIndicator} />
-                  <ProcedureListItem procedureItem={subItem} selectedItems={selectedItems} handleClick={handleClick} />
-                </Fragment>
-              )
-            )}
+          {subItems?.map((subItem: Hierarchy<any, any>, index: number) =>
+            subItem.id === 'loading' ? (
+              <Fragment key={index + subItem.id}>
+                <div className={classes.subItemsIndicator} />
+                <Skeleton style={{ flex: 1, margin: '2px 32px' }} height={32} />
+              </Fragment>
+            ) : (
+              <Fragment key={index + subItem.id}>
+                <div className={classes.subItemsIndicator} />
+                <ProcedureListItem procedureItem={subItem} selectedItems={selectedItems} handleClick={handleClick} />
+              </Fragment>
+            )
+          )}
         </List>
       </Collapse>
     </>
@@ -168,14 +163,14 @@ const ProcedureHierarchy: React.FC<ProcedureHierarchyProps> = (props) => {
   const { classes } = useStyles()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const isLoadingSyncHierarchyTable = initialState?.loading ?? 0
-  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)
+  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading ?? 0)
   const [currentState, setCurrentState] = useState({ ...selectedCriteria, ...initialState })
   const [loading, setLoading] = useState(isLoadingSyncHierarchyTable > 0 || isLoadingPmsi > 0)
 
   const ccamHierarchy = useAppSelector((state) => state.pmsi.procedure.list || {})
 
   useEffect(() => {
-    const newList = { ...selectedCriteria, ...initialState } ?? {}
+    const newList = { ...selectedCriteria, ...initialState }
     if (!newList.code) {
       newList.code = selectedCriteria.code
     }
@@ -183,7 +178,7 @@ const ProcedureHierarchy: React.FC<ProcedureHierarchyProps> = (props) => {
       (item: Hierarchy<any, any>) => findEquivalentRowInItemAndSubItems(item, ccamHierarchy).equivalentRow
     )
     setCurrentState(newList)
-  }, [initialState, ccamHierarchy])
+  }, [initialState, ccamHierarchy, selectedCriteria])
 
   const _handleClick = (
     newSelectedItems: Hierarchy<any, any>[] | null | undefined,
@@ -200,46 +195,43 @@ const ProcedureHierarchy: React.FC<ProcedureHierarchyProps> = (props) => {
   }, [isLoadingSyncHierarchyTable, isLoadingPmsi])
 
   return isOpen ? (
-    <>
-      <Grid className={classes.root}>
-        <Grid className={classes.actionContainer}>
-          {!isEdition ? (
-            <>
-              <IconButton className={classes.backButton} onClick={goBack}>
-                <KeyboardBackspaceIcon />
-              </IconButton>
-              <Divider className={classes.divider} orientation="vertical" flexItem />
-              <Typography className={classes.titleLabel}>Ajouter un critère d'acte CCAM</Typography>
-            </>
-          ) : (
-            <Typography className={classes.titleLabel}>Modifier un critère d'acte CCAM</Typography>
-          )}
-        </Grid>
-        <div className={classes.loader}>{loading && <LinearProgress />}</div>
-        <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-          {ccamHierarchy &&
-            ccamHierarchy.map((procedureItem, index) => (
-              <ProcedureListItem
-                key={index}
-                procedureItem={procedureItem}
-                selectedItems={currentState.code}
-                handleClick={_handleClick}
-              />
-            ))}
-        </List>
-
-        <Grid className={classes.procedureHierarchyActionContainer}>
-          {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
-              Annuler
-            </Button>
-          )}
-          <Button onClick={() => onConfirm()} type="submit" form="procedure-form" color="primary" variant="contained">
-            Suivant
-          </Button>
-        </Grid>
+    <Grid className={classes.root}>
+      <Grid className={classes.actionContainer}>
+        {!isEdition ? (
+          <>
+            <IconButton className={classes.backButton} onClick={goBack}>
+              <KeyboardBackspaceIcon />
+            </IconButton>
+            <Divider className={classes.divider} orientation="vertical" flexItem />
+            <Typography className={classes.titleLabel}>Ajouter un critère d'acte CCAM</Typography>
+          </>
+        ) : (
+          <Typography className={classes.titleLabel}>Modifier un critère d'acte CCAM</Typography>
+        )}
       </Grid>
-    </>
+      <div className={classes.loader}>{loading && <LinearProgress />}</div>
+      <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
+        {ccamHierarchy?.map((procedureItem, index) => (
+          <ProcedureListItem
+            key={index + procedureItem.id}
+            procedureItem={procedureItem}
+            selectedItems={currentState.code}
+            handleClick={_handleClick}
+          />
+        ))}
+      </List>
+
+      <Grid className={classes.procedureHierarchyActionContainer}>
+        {!isEdition && (
+          <Button onClick={goBack} color="primary" variant="outlined">
+            Annuler
+          </Button>
+        )}
+        <Button onClick={() => onConfirm()} type="submit" form="procedure-form" color="primary" variant="contained">
+          Suivant
+        </Button>
+      </Grid>
+    </Grid>
   ) : (
     <></>
   )

@@ -55,12 +55,10 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
   let timeout: NodeJS.Timeout | null = null
 
-  const [isExpanded, onExpand] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   return (
     <>
-      {isExpanded && <div className={classes.backDrop} onClick={() => onExpand(false)} />}
-
       <LogicalOperatorItem itemId={itemId} />
 
       <Grid
@@ -75,45 +73,44 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
         </AvatarWrapper>
       </Grid>
       <div className={classes.operatorChild}>
-        {displayingItem &&
-          displayingItem.map(({ criteriaIds }) => {
-            const children: (CriteriaGroup | SelectedCriteriaType | undefined)[] = criteriaIds
-              .map((criteriaId: number) => {
-                let foundItem: CriteriaGroup | SelectedCriteriaType | undefined = criteriaGroup.find(
-                  ({ id }) => id === criteriaId
-                )
-                if (!foundItem) {
-                  foundItem = selectedCriteria.find(({ id }) => id === criteriaId)
-                }
-                return foundItem
-              })
-              .filter((elem) => elem !== undefined)
-            if (!children) return <></>
-
-            return children.map((child) => {
-              if (!child || child?.id === undefined) return <></>
-
-              return child?.id > 0 ? (
-                <CriteriaCardItem
-                  key={child?.id}
-                  criterion={child as SelectedCriteriaType}
-                  duplicateCriteria={duplicateCriteria}
-                  deleteCriteria={deleteCriteria}
-                  editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
-                />
-              ) : (
-                <OperatorItem
-                  key={child?.id}
-                  itemId={child?.id}
-                  addNewCriteria={addNewCriteria}
-                  addNewGroup={addNewGroup}
-                  duplicateCriteria={duplicateCriteria}
-                  deleteCriteria={deleteCriteria}
-                  editCriteria={editCriteria}
-                />
+        {displayingItem?.map(({ criteriaIds }) => {
+          const children: (CriteriaGroup | SelectedCriteriaType | undefined)[] = criteriaIds
+            .map((criteriaId: number) => {
+              let foundItem: CriteriaGroup | SelectedCriteriaType | undefined = criteriaGroup.find(
+                ({ id }) => id === criteriaId
               )
+              if (!foundItem) {
+                foundItem = selectedCriteria.find(({ id }) => id === criteriaId)
+              }
+              return foundItem
             })
-          })}
+            .filter((elem) => elem !== undefined)
+          if (!children) return <></>
+
+          return children.map((child) => {
+            if (!child || child?.id === undefined) return <></>
+
+            return child?.id > 0 ? (
+              <CriteriaCardItem
+                key={child?.id}
+                criterion={child as SelectedCriteriaType}
+                duplicateCriteria={duplicateCriteria}
+                deleteCriteria={deleteCriteria}
+                editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
+              />
+            ) : (
+              <OperatorItem
+                key={child?.id}
+                itemId={child?.id}
+                addNewCriteria={addNewCriteria}
+                addNewGroup={addNewGroup}
+                duplicateCriteria={duplicateCriteria}
+                deleteCriteria={deleteCriteria}
+                editCriteria={editCriteria}
+              />
+            )
+          })
+        })}
       </div>
       <div className={classes.operatorChild} style={{ height: 12, marginBottom: -14 }} />
 
@@ -121,12 +118,11 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
         <IconButton
           size="small"
           className={classes.addButton}
-          onClick={() => onExpand(true)}
           onMouseEnter={() => {
-            onExpand(true)
+            setIsExpanded(true)
             if (timeout) clearInterval(timeout)
           }}
-          onMouseLeave={() => (timeout = setTimeout(() => onExpand(false), 1500))}
+          onMouseLeave={() => (timeout = setTimeout(() => setIsExpanded(false), 1500))}
         >
           <AddIcon />
         </IconButton>
@@ -148,7 +144,12 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
               color="inherit"
               onClick={() => {
                 addNewCriteria(itemId)
-                onExpand(false)
+                setIsExpanded(false)
+              }}
+              onMouseLeave={() => (timeout = setTimeout(() => setIsExpanded(false), 800))}
+              onMouseEnter={() => {
+                setIsExpanded(true)
+                if (timeout) clearInterval(timeout)
               }}
               style={{ borderRadius: '18px 0 0 18px' }}
               disabled={maintenanceIsActive}
@@ -161,7 +162,12 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
               color="inherit"
               onClick={() => {
                 addNewGroup(itemId)
-                onExpand(false)
+                setIsExpanded(false)
+              }}
+              onMouseLeave={() => (timeout = setTimeout(() => setIsExpanded(false), 800))}
+              onMouseEnter={() => {
+                setIsExpanded(true)
+                if (timeout) clearInterval(timeout)
               }}
               style={{ borderRadius: '0 18px 18px 0' }}
               disabled={maintenanceIsActive}
@@ -221,7 +227,7 @@ const LogicalOperator: React.FC = () => {
       type:
         currentParent.type === CriteriaGroupType.OR_GROUP ? CriteriaGroupType.AND_GROUP : CriteriaGroupType.OR_GROUP,
       criteriaIds: [],
-      isSubGroup: parentId === 0 ? false : true,
+      isSubGroup: parentId !== 0,
       isInclusive: true
     }
     dispatch(addNewCriteriaGroup(newOperator))

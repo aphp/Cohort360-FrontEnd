@@ -28,7 +28,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
 
   const isMainOperator = itemId === 0
 
-  const [isOpen, setOpen] = useState<boolean>(false)
+  const [isOpen, setIsOpen] = useState<boolean>(false)
   const [groupType, setGroupType] = useState<CriteriaGroupType>(CriteriaGroupType.AND_GROUP)
   const [openConfirmationDialog, setOpenConfirmationDialog] = useState<boolean>(false)
 
@@ -69,22 +69,22 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
     } parmi ${currentLogicalOperator?.criteriaIds.length}`
   }
 
-  let boxWidth = 50
+  let boxWidth: number
   if (currentLogicalOperator.type === CriteriaGroupType.N_AMONG_M) {
     boxWidth = isOpen ? 500 : 75
   } else {
     boxWidth = isOpen ? 400 : 50
   }
   if (!isOpen && !currentLogicalOperator.isInclusive) {
-    boxWidth += 30
+    boxWidth = 80
   }
 
   const _buildCohortCreation = () => {
     dispatch(buildCohortCreation({ selectedPopulation: null }))
   }
 
-  const _deleteLogicalOperator = async () => {
-    await dispatch(deleteCriteriaGroup(itemId))
+  const _deleteLogicalOperator = () => {
+    dispatch(deleteCriteriaGroup(itemId))
     _buildCohortCreation()
   }
 
@@ -202,8 +202,6 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
 
   return (
     <>
-      {isOpen && <div className={classes.backDrop} onClick={() => setOpen(false)} />}
-
       <Box
         className={isMainOperator ? classes.mainLogicalOperator : classes.logicalOperator}
         style={{
@@ -211,12 +209,11 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
           color: !currentLogicalOperator.isInclusive ? '#19235a' : 'white',
           width: boxWidth
         }}
-        onClick={() => setOpen(true)}
         onMouseEnter={() => {
-          setOpen(true)
+          setIsOpen(true)
           if (timeout) clearInterval(timeout)
         }}
-        onMouseLeave={() => (timeout = setTimeout(() => setOpen(false), 1500))}
+        onMouseLeave={() => (timeout = setTimeout(() => setIsOpen(false), 800))}
       >
         {isOpen ? (
           <>

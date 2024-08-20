@@ -96,30 +96,24 @@ const DataTablePatientLine: React.FC<{
   search?: string
 }> = ({ deidentified, patient, groupId, search }) => {
   const { classes } = useStyles()
+  const _groupId = groupId ? `?groupId=${groupId}` : ''
+  const _search = search ? `&search=${search}` : ''
+  const _patientName = patient.name?.[0].given?.[0]
+    ? capitalizeFirstLetter(patient.name?.[0].given?.[0])
+    : 'Non renseigné'
   return (
     <TableRow
       key={patient.id}
       className={classes.tableBodyRows}
       hover
-      onClick={() =>
-        window.open(
-          `/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}${search ? `&search=${search}` : ''}`,
-          '_blank'
-        )
-      }
+      onClick={() => window.open(`/patients/${patient.id}${_groupId}${_search}`, '_blank')}
     >
       <TableCellWrapper>
         {patient.gender && (
           <GenderIcon gender={patient.gender.toLocaleUpperCase() as GenderStatus} className={classes.genderIcon} />
         )}
       </TableCellWrapper>
-      <TableCellWrapper align="left">
-        {deidentified
-          ? 'Prénom'
-          : patient.name?.[0].given?.[0]
-          ? capitalizeFirstLetter(patient.name?.[0].given?.[0])
-          : 'Non renseigné'}
-      </TableCellWrapper>
+      <TableCellWrapper align="left">{deidentified ? 'Prénom' : _patientName}</TableCellWrapper>
       <TableCellWrapper align="left">
         {deidentified
           ? 'Nom'
@@ -129,7 +123,7 @@ const DataTablePatientLine: React.FC<{
                   return e.family ?? 'Non renseigné'
                 }
                 if (e.use === 'maiden') {
-                  return `(${patient.gender === 'female' ? 'née' : 'né'} : ${e.family})` ?? 'Non renseigné'
+                  return `(${patient.gender === 'female' ? 'née' : 'né'} : ${e.family})`
                 }
               })
               .join(' ') ?? 'Non renseigné'}
@@ -147,7 +141,7 @@ const DataTablePatientLine: React.FC<{
         )}
       </TableCellWrapper>
       <TableCellWrapper align="left">
-        {patient.extension && patient.extension.find((extension) => extension.url.includes('last-encounter'))
+        {patient.extension?.find((extension) => extension.url.includes('last-encounter'))
           ? patient.extension.find((extension) => extension.url.includes('last-encounter'))?.valueReference?.display
           : 'Non renseigné'}
       </TableCellWrapper>

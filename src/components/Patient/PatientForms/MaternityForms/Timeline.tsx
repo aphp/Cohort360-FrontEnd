@@ -1,6 +1,5 @@
 import React from 'react'
 import { CircularProgress, Grid, Typography } from '@mui/material'
-// import TimelineArrow from '../../../ui/TimelineArrow.tsx'
 import { FormNames } from 'types/searchCriterias'
 import HospitCard from './HospitCard'
 import { CohortQuestionnaireResponse } from 'types'
@@ -32,7 +31,41 @@ const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses, ma
   const yearGroups = groupEventsByYear(questionnaireResponses)
   const pregnancyFormId = maternityFormNamesIds.find((form) => form.name === FormNames.PREGNANCY)?.id ?? ''
 
-  const years = Object.keys(yearGroups).sort()
+  const years = Object.keys(yearGroups).sort((a, b) => a.localeCompare(b))
+
+  const render = () => {
+    return (
+      <>
+        {console.log('manelle tait toi')}
+        {questionnaireResponses.length === 0 ? (
+          <Grid container justifyContent="center">
+            <Typography variant="button">Aucun formulaire à afficher</Typography>
+          </Grid>
+        ) : (
+          <>
+            {console.log('manelle tu es MON canard')}
+            {/* <TimelineArrow /> */}
+            <div style={{ flexGrow: 1, marginLeft: '1em' }}>
+              {years.reverse().map((year) => (
+                <div key={year}>
+                  <Typography variant="h6" style={{ margin: '10px 0', fontSize: 15 }}>
+                    {year}
+                  </Typography>
+                  {yearGroups[year].map((form) =>
+                    form.questionnaire?.includes(pregnancyFormId) ? (
+                      <PregnancyCard key={form.id} form={form} />
+                    ) : (
+                      <HospitCard key={form.id} form={form} />
+                    )
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </>
+    )
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -40,30 +73,8 @@ const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses, ma
         <Grid container justifyContent="center">
           <CircularProgress />
         </Grid>
-      ) : questionnaireResponses.length === 0 ? (
-        <Grid container justifyContent="center">
-          <Typography variant="button">Aucun formulaire à afficher</Typography>
-        </Grid>
       ) : (
-        <>
-          {/* <TimelineArrow /> */}
-          <div style={{ flexGrow: 1, marginLeft: '1em' }}>
-            {years.reverse().map((year) => (
-              <div key={year}>
-                <Typography variant="h6" style={{ margin: '10px 0', fontSize: 15 }}>
-                  {year}
-                </Typography>
-                {yearGroups[year].map((form) =>
-                  form.questionnaire?.includes(pregnancyFormId) ? (
-                    <PregnancyCard key={form.id} form={form} />
-                  ) : (
-                    <HospitCard key={form.id} form={form} />
-                  )
-                )}
-              </div>
-            ))}
-          </div>
-        </>
+        render()
       )}
     </div>
   )

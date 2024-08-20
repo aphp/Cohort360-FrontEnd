@@ -96,7 +96,7 @@ const ListPatientLine: React.FC<{
             return e.family ?? 'Non renseigné'
           }
           if (e.use === 'maiden') {
-            return `(${patient.gender === 'female' ? 'née' : 'né'} : ${e.family})` ?? 'Non renseigné'
+            return `(${patient.gender === 'female' ? 'née' : 'né'} : ${e.family})`
           }
         })
         .join(' ') ?? ''
@@ -106,6 +106,7 @@ const ListPatientLine: React.FC<{
     : `IPP: ${
         patient.identifier?.find((identifier) => identifier.type?.coding?.[0].code === 'IPP')?.value ?? 'inconnu'
       }`
+  const _tabName = tabName ? `/${tabName}` : ''
 
   return (
     <ListItemWrapper
@@ -113,7 +114,7 @@ const ListPatientLine: React.FC<{
       divider
       selected={patientId === patient.id}
       onClick={() => {
-        navigate(`/patients/${patient.id}${tabName ? `/${tabName}` : ''}${search}`)
+        navigate(`/patients/${patient.id}${_tabName}${search}`)
         onCloseDrawer()
       }}
     >

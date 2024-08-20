@@ -27,7 +27,7 @@ const IPPForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   )
   const [ippList, setIppList] = useState<string[]>([])
 
-  const isEdition = selectedCriteria !== null ? true : false
+  const isEdition = selectedCriteria !== null
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const _onChangeValue = (key: string, value: any) => {
@@ -47,7 +47,7 @@ const IPPForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   }
 
   useEffect(() => {
-    const ippMatches = (defaultValues.search || '').matchAll(/(?:^|\D+)?(8\d{9})(?:$|\D+)/gm) || []
+    const ippMatches = (defaultValues.search || '').matchAll(/(:^|\D+)?(8\d{9})(?:$|\D+)/gm) || []
     const ippList = []
 
     for (const match of ippMatches) {

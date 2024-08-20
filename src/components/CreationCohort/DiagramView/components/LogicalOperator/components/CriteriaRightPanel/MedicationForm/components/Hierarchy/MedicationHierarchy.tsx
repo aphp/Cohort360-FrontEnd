@@ -56,12 +56,12 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
   const dispatch = useAppDispatch()
 
   const medicationHierarchy = useAppSelector((state) => state.medication.list || {})
-  const isLoadingsyncHierarchyTable = useAppSelector((state) => state.syncHierarchyTable.loading || 0)
-  const isLoadingMedication = useAppSelector((state) => state.medication.syncLoading || 0)
+  const isLoadingsyncHierarchyTable = useAppSelector((state) => state.syncHierarchyTable.loading ?? 0)
+  const isLoadingMedication = useAppSelector((state) => state.medication.syncLoading ?? 0)
 
   const [open, setOpen] = useState(false)
   const isSelected = findSelectedInListAndSubItems(
-    selectedItems ? selectedItems : [],
+    selectedItems ?? [],
     medicationItem,
     medicationHierarchy,
     valueSetSystem
@@ -79,7 +79,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
       defaultMedication.type,
       dispatch
     )
-    await handleClick(selectedItems, newHierarchy)
+    handleClick(selectedItems, newHierarchy)
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
@@ -95,7 +95,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
     return (
       <ListItem className={classes.medicationItem}>
         <ListItemIcon>
-          <div
+          <button
             onClick={() => handleClickOnHierarchy(medicationItem)}
             className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
@@ -119,7 +119,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
     <>
       <ListItem className={classes.medicationItem}>
         <ListItemIcon>
-          <div
+          <button
             onClick={() => handleClickOnHierarchy(medicationItem)}
             className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
@@ -142,25 +142,24 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
       <Collapse in={id === '*' ? true : open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
-          {subItems &&
-            subItems.map((medicationHierarchySubItem: Hierarchy<any, any>, index: number) =>
-              medicationHierarchySubItem.id === 'loading' ? (
-                <Fragment key={index}>
-                  <div className={classes.subItemsIndicator} />
-                  <Skeleton style={{ flex: 1, margin: '2px 32px' }} height={32} />
-                </Fragment>
-              ) : (
-                <Fragment key={index}>
-                  <div className={classes.subItemsIndicator} />
-                  <MedicationListItem
-                    medicationItem={medicationHierarchySubItem}
-                    selectedItems={selectedItems}
-                    handleClick={handleClick}
-                    setLoading={setLoading}
-                  />
-                </Fragment>
-              )
-            )}
+          {subItems?.map((medicationHierarchySubItem: Hierarchy<any, any>, index: number) =>
+            medicationHierarchySubItem.id === 'loading' ? (
+              <Fragment key={index + medicationHierarchySubItem.id}>
+                <div className={classes.subItemsIndicator} />
+                <Skeleton style={{ flex: 1, margin: '2px 32px' }} height={32} />
+              </Fragment>
+            ) : (
+              <Fragment key={index + medicationHierarchySubItem.id}>
+                <div className={classes.subItemsIndicator} />
+                <MedicationListItem
+                  medicationItem={medicationHierarchySubItem}
+                  selectedItems={selectedItems}
+                  handleClick={handleClick}
+                  setLoading={setLoading}
+                />
+              </Fragment>
+            )
+          )}
         </List>
       </Collapse>
     </>
@@ -185,7 +184,7 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
   const { classes } = useStyles()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const isLoadingSyncHierarchyTable: number = initialState?.loading ?? 0
-  const isLoadingMedication: number = useAppSelector((state) => state.medication.syncLoading || 0)
+  const isLoadingMedication: number = useAppSelector((state) => state.medication.syncLoading ?? 0)
   const [currentState, setCurrentState] = useState({ ...selectedCriteria, ...initialState })
   const [loading, setLoading] = useState(isLoadingSyncHierarchyTable > 0 || isLoadingMedication > 0)
   const [selectState, setSelectState] = useState<'ATC' | 'UCD'>('ATC')
@@ -213,7 +212,7 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
   }, [])
 
   useEffect(() => {
-    const newList = { ...selectedCriteria, ...initialState } ?? {}
+    const newList = { ...selectedCriteria, ...initialState }
     if (!newList.code) {
       newList.code = selectedCriteria.code
     }
@@ -221,7 +220,7 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
       (item: Hierarchy<any, any>) => findEquivalentRowInItemAndSubItems(item, medicationHierarchy).equivalentRow
     )
     setCurrentState(newList)
-  }, [initialState, medicationHierarchy])
+  }, [initialState, medicationHierarchy, selectedCriteria])
 
   useEffect(() => {
     if (isLoadingSyncHierarchyTable > 0 || isLoadingMedication > 0) {
@@ -265,7 +264,7 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
         <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
           {medicationHierarchy.map((medicationItem, index) => (
             <MedicationListItem
-              key={index}
+              key={index + medicationItem.id}
               medicationItem={medicationItem}
               selectedItems={currentState.code}
               handleClick={_handleClick}
@@ -293,7 +292,7 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
           >
             {paginateData.map((medicationItem, index) => (
               <MedicationListItem
-                key={index}
+                key={index + medicationItem.id}
                 medicationItem={medicationItem}
                 selectedItems={currentState.code}
                 handleClick={_handleClick}

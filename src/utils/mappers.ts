@@ -26,7 +26,7 @@ import { Hierarchy } from 'types/hierarchy'
 import { EncounterParamsKeys, ObservationParamsKeys, mapDocumentStatusesFromRequestParam } from 'mappers/filters'
 
 const searchReducer = (accumulator: string, currentValue: string): string =>
-  accumulator || !!accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
+  accumulator || !!accumulator === false ? `${accumulator},${currentValue}` : currentValue || accumulator
 const comparator = /(le|ge)/gi
 
 const replaceTime = (date?: string) => {
