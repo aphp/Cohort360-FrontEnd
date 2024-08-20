@@ -885,6 +885,8 @@ const unbuildCriteria = async <T extends SelectedCriteriaTypesWithOccurrences | 
 
   if (element.filterFhir) {
     const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+    if (emptyCriterion.type === CriteriaType.OBSERVATION)
+      unbuildObservationValueFilter(filters, emptyCriterion as ObservationDataType)
 
     for (const filter of filters) {
       const key = filter[0] ?? null
