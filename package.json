@@ -62,7 +62,8 @@
     "build": "vite build",
     "serve": "vite preview",
     "lint": "eslint --ext .jsx,.js,.ts,.tsx src/",
-    "test": "vitest"
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "browserslist": {
     "production": [
@@ -102,6 +103,7 @@
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
     "@vitejs/plugin-react": "^4.0.0",
+    "@vitest/coverage-v8": "^2.0.5",
     "eslint": "^8.36.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.27.5",
@@ -119,7 +121,7 @@
     "vite-plugin-svgr": "^4.2.0",
     "vite-plugin-top-level-await": "^1.4.1",
     "vite-tsconfig-paths": "^4.2.0",
-    "vitest": "^0.34.4"
+    "vitest": "^2.0.5"
   },
   "jest": {
     "clearMocks": true

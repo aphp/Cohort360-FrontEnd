@@ -12,25 +12,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+
       - uses: actions/setup-node@v3
         with:
           node-version: 20.x
           cache: 'npm'
       - name: Install Dependencies
         run: npm install
-      - name: Test
-#        run: npm run test
-        run: echo "No tests ATM"
       - name: Lint
         run: npm run lint && npx tsc --noEmit
-
-  sonarcloud:
-    name: SonarCloud
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Test
+        run: npm run coverage
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
