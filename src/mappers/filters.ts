@@ -61,9 +61,7 @@ export enum PatientsParamsKeys {
 export enum EncounterParamsKeys {
   DURATION = 'length',
   MIN_BIRTHDATE_DAY = 'start-age-visit',
-  MAX_BIRTHDATE_DAY = 'end-age-visit',
   MIN_BIRTHDATE_MONTH = 'start-age-visit-month',
-  MAX_BIRTHDATE_MONTH = 'end-age-visit-month',
   ENTRYMODE = 'admission-mode',
   EXITMODE = 'discharge-disposition-mode',
   PRISENCHARGETYPE = 'class',
