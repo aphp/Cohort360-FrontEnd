@@ -33,11 +33,6 @@ export default defineConfig(() => {
           { src: standardFontsDir, dest: '' }
         ]
       })
-    ],
-    test: {
-      globals: true,
-      environment: 'jsdom', // tells Vitest to run our tests in a mock browser environment rather than the default Node environment
-      setupFiles: './src/__tests__/setup.ts'
-    }
+    ]
   }
 })
