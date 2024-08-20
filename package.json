@@ -18,7 +18,7 @@
     "ace-builds": "^1.16.0",
     "antlr4": "^4.13.1-patch-1",
     "apollo-boost": "^0.4.9",
-    "axios": "^1.6.0",
+    "axios": "^1.7.4",
     "buffer": "^6.0.3",
     "client-oauth2": "^4.2.4",
     "d3": "^7.8.2",
