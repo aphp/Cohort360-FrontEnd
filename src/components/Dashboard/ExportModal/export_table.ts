@@ -139,13 +139,7 @@ const exportTable: ExportTableType[] = [
     compatibleResourceTypes: ['imaging_study - imaging_series', 'person', 'visit_occurrence']
   },
   {
-    id: [
-      'questionnaire',
-      'questionnaire__item',
-      'questionnaireresponse',
-      'questionnaireresponse__item',
-      'questionnaireresponse__item__answer'
-    ],
+    id: ['questionnaire', 'questionnaireresponse'],
     name: 'Formulaires',
     label:
       'questionnaire - questionnaire__item - questionnaireresponse - questionnaireresponse__item - questionnaireresponse__item__answer',
