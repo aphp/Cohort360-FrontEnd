@@ -69,7 +69,7 @@ const defaultIPPCriteria: SelectedCriteriaType = {
   search: ''
 }
 
-export const checkNominativeCriteria1: SelectedCriteriaType[] = [
+export const procedurePeudonimizedCriteria: SelectedCriteriaType[] = [
   {
     ...defaultProcedureCriteria,
     startOccurrence: ['2024-08-15', '2024-08-22'],
@@ -84,14 +84,22 @@ export const checkNominativeCriteria1: SelectedCriteriaType[] = [
     encounterEndDate: ['2024-08-22', '2024-08-22'],
     code: [
       {
-        id: 'salut',
-        label: 'salut'
+        id: '000212',
+        label: "000212 - Actes Diagnostiques Sur L'oreille",
+        system:
+          'https://www.atih.sante.fr/plateformes-de-transmission-et-logiciels/logiciels-espace-de-telechargement/id_lot/3550'
+      },
+      {
+        id: '000489',
+        label: '000489 - Actes Thérapeutiques Sur Les Vaisseaux Intracrâniens',
+        system:
+          'https://www.atih.sante.fr/plateformes-de-transmission-et-logiciels/logiciels-espace-de-telechargement/id_lot/3550'
       }
     ]
   }
 ]
 
-export const checkNominativeCriteria2: SelectedCriteriaType[] = [
+export const patientPseudonimizedCriteria: SelectedCriteriaType[] = [
   {
     ...defaultPatientCriteria,
     genders: [
@@ -109,43 +117,43 @@ export const checkNominativeCriteria2: SelectedCriteriaType[] = [
   }
 ]
 
-export const checkNominativeCriteria3: SelectedCriteriaType[] = [
+export const patientPseudonimizedAgeCriteria: SelectedCriteriaType[] = [
   {
     ...defaultPatientCriteria,
     age: ['0/2/12', '0/5/15']
   }
 ]
 
-export const checkNominativeCriteria4: SelectedCriteriaType[] = [
+export const patientNominativeAge0Criteria: SelectedCriteriaType[] = [
   {
     ...defaultPatientCriteria,
     age: ['7/2/12', '0/5/15']
   }
 ]
 
-export const checkNominativeCriteria5: SelectedCriteriaType[] = [
+export const patientNominativeAge1Criteria: SelectedCriteriaType[] = [
   {
     ...defaultPatientCriteria,
     age: ['0/2/12', '8/5/15']
   }
 ]
 
-export const checkNominativeCriteria6: SelectedCriteriaType[] = [
+export const patientNominativeBirthdates: SelectedCriteriaType[] = [
   {
     ...defaultPatientCriteria,
     birthdates: ['2024-08-15', '2024-08-15']
   }
 ]
 
-export const checkNominativeCriteria7: SelectedCriteriaType[] = [
+export const patientNominativeDeathDates: SelectedCriteriaType[] = [
   {
     ...defaultPatientCriteria,
     deathDates: ['2024-08-15', '2024-08-15']
   }
 ]
 
-export const checkNominativeCriteria8: SelectedCriteriaType[] = [
-  ...checkNominativeCriteria1,
+export const criteriasArrayWtihNominativeData: SelectedCriteriaType[] = [
+  ...procedurePeudonimizedCriteria,
   {
     ...defaultPatientCriteria,
     genders: [
@@ -164,8 +172,8 @@ export const checkNominativeCriteria8: SelectedCriteriaType[] = [
   }
 ]
 
-export const checkNominativeCriteria9: SelectedCriteriaType[] = [
-  ...checkNominativeCriteria1,
+export const criteriaArrayWithNoNominativeData: SelectedCriteriaType[] = [
+  ...procedurePeudonimizedCriteria,
   {
     ...defaultPatientCriteria,
     genders: [
@@ -184,33 +192,33 @@ export const checkNominativeCriteria9: SelectedCriteriaType[] = [
   }
 ]
 
-export const checkNominativeCriteria10: SelectedCriteriaType[] = [
+export const ippNominativeCriteria: SelectedCriteriaType[] = [
   {
     ...defaultIPPCriteria,
     search: '800000000, 800000001,8514257145'
   }
 ]
 
-export const checkNominativeCriteria11: SelectedCriteriaType[] = [
+export const ippEmptyCriteria: SelectedCriteriaType[] = [
   {
     ...defaultIPPCriteria
   }
 ]
 
-export const checkNominativeCriteria12: SelectedCriteriaType[] = [
+export const encounterPseudonimizedCriteria: SelectedCriteriaType[] = [
   {
     ...defaultEncounterCriteria
   }
 ]
 
-export const checkNominativeCriteria13: SelectedCriteriaType[] = [
+export const encounterPseudoAgeCriteria: SelectedCriteriaType[] = [
   {
     ...defaultEncounterCriteria,
     age: ['0/1/2', '0/5/15']
   }
 ]
 
-export const checkNominativeCriteria14: SelectedCriteriaType[] = [
+export const encounterNominativeAgeCriteria: SelectedCriteriaType[] = [
   {
     ...defaultEncounterCriteria,
     age: ['2/1/2', '5/5/15']
