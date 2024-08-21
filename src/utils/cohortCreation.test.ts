@@ -14,7 +14,7 @@ import {
   checkNominativeCriteria7,
   checkNominativeCriteria8,
   checkNominativeCriteria9
-} from '../__tests__/object/cohortCreation.'
+} from '../__tests__/data/cohortCreation.'
 import { checkNominativeCriteria } from './cohortCreation'
 
 describe('test of checkNominativeCriteria', () => {

@@ -12,8 +12,7 @@ export default defineConfig((configEnv) =>
         coverage: {
           provider: 'v8',
           reporter: ['text', 'lcov', 'html']
-        },
-        threads: false // disable worker threads so that canvas runs in main thread
+        }
       }
     })
   )
