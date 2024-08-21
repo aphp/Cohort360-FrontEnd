@@ -275,7 +275,6 @@ export type EncounterDataType = CommonCriteriaDataType &
     destination: LabelObject[] | null
     provenance: LabelObject[] | null
     admission: LabelObject[] | null
-    encounterService: Hierarchy<ScopeElement, string>[] | null
   }
 
 export type PregnancyDataType = CommonCriteriaDataType &

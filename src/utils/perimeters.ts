@@ -2,7 +2,7 @@ import { SourceType } from 'types/scope'
 import { Back_API_Response, CustomError } from 'types'
 import { PERIMETER_SOURCE_TYPE_HIERARCHY } from 'constants.js'
 
-const SOURCE_TYPES_LEVELS: string[] = PERIMETER_SOURCE_TYPE_HIERARCHY.split(',')
+const SOURCE_TYPES_LEVELS: string[] = (PERIMETER_SOURCE_TYPE_HIERARCHY || '').split(',')
 
 export const getScopeLevelBySourceType = (type: SourceType) => {
   // TODO: Refactor this function to use an external mapping file/configuration
