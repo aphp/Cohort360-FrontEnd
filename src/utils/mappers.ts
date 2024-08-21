@@ -68,7 +68,7 @@ export const unbuildLabelObjectFilter = (currentCriterion: any, filterName: stri
   }
 }
 
-export const buildEncounterServiceFilter = (criterion: Hierarchy<ScopeElement, string>[] | undefined) => {
+export const buildEncounterServiceFilter = (criterion?: Hierarchy<ScopeElement, string>[]) => {
   return criterion && criterion.length > 0 ? `${criterion.map((item) => item.id).reduce(searchReducer)}` : ''
 }
 
