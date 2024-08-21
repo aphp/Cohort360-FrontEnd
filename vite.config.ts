@@ -33,9 +33,6 @@ export default defineConfig(() => {
           { src: standardFontsDir, dest: '' }
         ]
       })
-    ],
-    test: {
-      threads: false // disable worker threads so that canvas runs in main thread
-    }
+    ]
   }
 })
