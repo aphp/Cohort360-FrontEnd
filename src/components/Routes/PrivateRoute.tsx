@@ -44,7 +44,7 @@ const PrivateRoute: React.FC = () => {
 
   useEffect(() => {
     if (window.clarity && me?.id) {
-      window.clarity('identify', me?.id)
+      window.clarity('identify', me?.id, undefined, undefined, me?.id)
       if (USER_TRACKING_BLACKLIST_LIST.includes(me?.id)) {
         window.clarity('set', 'exclude', 'true')
       }
