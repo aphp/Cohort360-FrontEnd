@@ -369,7 +369,7 @@ const buildDocumentFilter = (criterion: DocumentDataType): string[] => {
         })
       )
     ),
-    filtersBuilders(DocumentsParamsKeys.DOC_STATUSES, buildLabelObjectFilter(criterion.encounterStatus)),
+    filtersBuilders(DocumentsParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
     filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
     filtersBuilders(DocumentsParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[1], 'le')),
     buildEncounterDateFilter(
