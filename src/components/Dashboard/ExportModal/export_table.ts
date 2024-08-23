@@ -14,7 +14,7 @@ export type label =
   | 'measurement'
   | 'care_site - fact_relationship'
   | 'imaging_study - imaging_series'
-  | 'questionnaire - questionnaire__item - questionnaireresponse - questionnaireresponse__item - questionnaireresponse__item__answer'
+  | 'questionnaire - questionnaireresponse'
 
 export type ExportTableType = {
   id: string[]
@@ -40,7 +40,8 @@ const exportTable: ExportTableType[] = [
       'drug_exposure_prescription',
       'drug_exposure_administration',
       'measurement',
-      'imaging_study - imaging_series'
+      'imaging_study - imaging_series',
+      'questionnaire - questionnaireresponse'
     ]
   },
   {
@@ -65,7 +66,8 @@ const exportTable: ExportTableType[] = [
       'drug_exposure_prescription',
       'drug_exposure_administration',
       'measurement',
-      'imaging_study - imaging_series'
+      'imaging_study - imaging_series',
+      'questionnaire - questionnaireresponse'
     ]
   },
   {
@@ -141,10 +143,9 @@ const exportTable: ExportTableType[] = [
   {
     id: ['questionnaire', 'questionnaireresponse'],
     name: 'Formulaires',
-    label:
-      'questionnaire - questionnaire__item - questionnaireresponse - questionnaireresponse__item - questionnaireresponse__item__answer',
+    label: 'questionnaire - questionnaireresponse',
     resourceType: ResourceType.QUESTIONNAIRE_RESPONSE,
-    compatibleResourceTypes: []
+    compatibleResourceTypes: ['questionnaire - questionnaireresponse', 'person', 'visit_occurrence']
   }
 ]
 
