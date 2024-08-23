@@ -438,30 +438,32 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
               </IconButton>
             </Grid>
 
-            <Grid item whiteSpace="nowrap">
-              <FormControlLabel
-                className={classes.selectAllTables}
-                control={
-                  <Checkbox
-                    color="secondary"
-                    className={classes.checkbox}
-                    indeterminate={
-                      settings.tables.filter((table) => table.checked).length !== settings.tables.length &&
-                      settings.tables.filter((table) => table.checked).length > 0
-                    }
-                    indeterminateIcon={<IndeterminateCheckBoxOutlined style={{ color: 'rgba(0,0,0,0.6)' }} />}
-                    checked={settings.tables.filter((table) => table.checked).length === settings.tables.length}
-                    onChange={handleSelectAllTables}
-                  />
-                }
-                label={
-                  settings.tables.filter((table) => table.checked).length === settings.tables.length
-                    ? 'Tout désélectionner'
-                    : 'Tout sélectionner'
-                }
-                labelPlacement="start"
-              />
-            </Grid>
+            {!isChecked && (
+              <Grid item whiteSpace="nowrap">
+                <FormControlLabel
+                  className={classes.selectAllTables}
+                  control={
+                    <Checkbox
+                      color="secondary"
+                      className={classes.checkbox}
+                      indeterminate={
+                        settings.tables.filter((table) => table.checked).length !== settings.tables.length &&
+                        settings.tables.filter((table) => table.checked).length > 0
+                      }
+                      indeterminateIcon={<IndeterminateCheckBoxOutlined style={{ color: 'rgba(0,0,0,0.6)' }} />}
+                      checked={settings.tables.filter((table) => table.checked).length === settings.tables.length}
+                      onChange={handleSelectAllTables}
+                    />
+                  }
+                  label={
+                    settings.tables.filter((table) => table.checked).length === settings.tables.length
+                      ? 'Tout désélectionner'
+                      : 'Tout sélectionner'
+                  }
+                  labelPlacement="start"
+                />
+              </Grid>
+            )}
           </Grid>
           <Grid item container>
             {settings.tables.map(renderExportTable)}
