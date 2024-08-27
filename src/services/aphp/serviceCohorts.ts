@@ -48,6 +48,7 @@ import services from '.'
 import { ErrorDetails, SearchInputError } from 'types/error'
 import { getResourceInfos } from 'utils/fillElement'
 import { substructAgeString } from 'utils/age'
+import { getExtension } from 'utils/fhir'
 
 export interface IServiceCohorts {
   /**
@@ -266,30 +267,23 @@ const servicesCohorts: IServiceCohorts = {
 
       const agePyramidData =
         patientsResp.data.resourceType === 'Bundle'
-          ? getAgeRepartitionMapAphp(
-              patientsResp.data.meta?.extension?.find((facet) => facet.url === ChartCode.AGE_PYRAMID)?.extension
-            )
+          ? getAgeRepartitionMapAphp(getExtension(patientsResp.data.meta, ChartCode.AGE_PYRAMID)?.extension)
           : undefined
 
       const genderRepartitionMap =
         patientsResp.data.resourceType === 'Bundle'
-          ? getGenderRepartitionMapAphp(
-              patientsResp.data.meta?.extension?.find((facet) => facet.url === ChartCode.GENDER_REPARTITION)?.extension
-            )
+          ? getGenderRepartitionMapAphp(getExtension(patientsResp.data.meta, ChartCode.GENDER_REPARTITION)?.extension)
           : undefined
 
       const monthlyVisitData =
         encountersResp.data.resourceType === 'Bundle'
-          ? getVisitRepartitionMapAphp(
-              encountersResp.data.meta?.extension?.find((facet) => facet.url === ChartCode.MONTHLY_VISITS)?.extension
-            )
+          ? getVisitRepartitionMapAphp(getExtension(encountersResp.data.meta, ChartCode.MONTHLY_VISITS)?.extension)
           : undefined
 
       const visitTypeRepartitionData =
         encountersResp.data.resourceType === 'Bundle'
           ? getEncounterRepartitionMapAphp(
-              encountersResp.data.meta?.extension?.find((facet) => facet.url === ChartCode.VISIT_TYPE_REPARTITION)
-                ?.extension
+              getExtension(encountersResp.data.meta, ChartCode.VISIT_TYPE_REPARTITION)?.extension
             )
           : undefined
 
@@ -372,16 +366,12 @@ const servicesCohorts: IServiceCohorts = {
 
       const agePyramidData =
         patientsResp.data.resourceType === 'Bundle'
-          ? getAgeRepartitionMapAphp(
-              patientsResp.data.meta?.extension?.find((facet) => facet.url === ChartCode.AGE_PYRAMID)?.extension
-            )
+          ? getAgeRepartitionMapAphp(getExtension(patientsResp.data.meta, ChartCode.AGE_PYRAMID)?.extension)
           : undefined
 
       const genderRepartitionMap =
         patientsResp.data.resourceType === 'Bundle'
-          ? getGenderRepartitionMapAphp(
-              patientsResp.data.meta?.extension?.find((facet) => facet.url === ChartCode.GENDER_REPARTITION)?.extension
-            )
+          ? getGenderRepartitionMapAphp(getExtension(patientsResp.data.meta, ChartCode.GENDER_REPARTITION)?.extension)
           : undefined
 
       return {
@@ -542,7 +532,7 @@ const servicesCohorts: IServiceCohorts = {
     const totalPatientDocs =
       docsList?.data?.resourceType === 'Bundle'
         ? (
-            docsList?.data?.meta?.extension?.find((extension) => extension.url === 'unique-subject') || {
+            getExtension(docsList?.data?.meta, 'unique-subject') || {
               valueDecimal: 0
             }
           ).valueDecimal
@@ -550,7 +540,7 @@ const servicesCohorts: IServiceCohorts = {
     const totalAllPatientDocs =
       allDocsList !== null
         ? (
-            allDocsList?.data?.meta?.extension?.find((extension) => extension.url === 'unique-subject') || {
+            getExtension(allDocsList?.data?.meta, 'unique-subject') || {
               valueDecimal: 0
             }
           ).valueDecimal

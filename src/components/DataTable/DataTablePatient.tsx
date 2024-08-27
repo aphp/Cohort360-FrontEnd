@@ -17,6 +17,8 @@ import { PatientTableLabels } from 'types/patient'
 import GenderIcon from 'components/ui/GenderIcon'
 import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
 import { VitalStatusLabel } from 'types/requestCriterias'
+import { getExtension } from 'utils/fhir'
+import { PATIENT_LAST_ENCOUNTER_EXTENSION_NAME } from 'constants.js'
 
 type DataTablePatientProps = {
   loading: boolean
@@ -141,9 +143,7 @@ const DataTablePatientLine: React.FC<{
         )}
       </TableCellWrapper>
       <TableCellWrapper align="left">
-        {patient.extension?.find((extension) => extension.url.includes('last-encounter'))
-          ? patient.extension.find((extension) => extension.url.includes('last-encounter'))?.valueReference?.display
-          : 'Non renseigné'}
+        {getExtension(patient, PATIENT_LAST_ENCOUNTER_EXTENSION_NAME)?.valueReference?.display || 'Non renseigné'}
       </TableCellWrapper>
       <TableCellWrapper>
         <StatusChip

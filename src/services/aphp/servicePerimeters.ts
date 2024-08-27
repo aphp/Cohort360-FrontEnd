@@ -26,6 +26,7 @@ import { scopeLevelsToRequestParam } from 'utils/perimeters'
 import { mapParamsToNetworkParams } from 'utils/url'
 import { Hierarchy } from 'types/hierarchy'
 import { Group } from 'fhir/r4'
+import { getExtension } from 'utils/fhir'
 
 export interface IServicePerimeters {
   /**
@@ -150,30 +151,27 @@ const servicesPerimeters: IServicePerimeters = {
 
     const originalPatients = getApiResponseResources(patientsResp)
 
-    const ageFacet = patientsResp.data.meta?.extension?.filter((facet) => facet.url === ChartCode.AGE_PYRAMID)
-    const deceasedFacet = patientsResp.data.meta?.extension?.filter(
-      (facet) => facet.url === ChartCode.GENDER_REPARTITION
-    )
-    const visitFacet = encountersResp.data.meta?.extension?.filter((facet) => facet.url === ChartCode.MONTHLY_VISITS)
-    const classFacet = encountersResp.data.meta?.extension?.filter(
-      (facet) => facet.url === ChartCode.VISIT_TYPE_REPARTITION
-    )
+    const ageFacet = getExtension(patientsResp.data.meta, ChartCode.AGE_PYRAMID)
+    const deceasedFacet = getExtension(patientsResp.data.meta, ChartCode.GENDER_REPARTITION)
+
+    const visitFacet = getExtension(encountersResp.data.meta, ChartCode.MONTHLY_VISITS)
+    const classFacet = getExtension(encountersResp.data.meta, ChartCode.VISIT_TYPE_REPARTITION)
 
     const agePyramidData =
       patientsResp?.data?.resourceType === 'Bundle'
-        ? getAgeRepartitionMapAphp(ageFacet && ageFacet[0] && ageFacet[0].extension)
+        ? getAgeRepartitionMapAphp(ageFacet && ageFacet.extension)
         : undefined
     const genderRepartitionMap =
       patientsResp?.data?.resourceType === 'Bundle'
-        ? getGenderRepartitionMapAphp(deceasedFacet && deceasedFacet[0] && deceasedFacet[0].extension)
+        ? getGenderRepartitionMapAphp(deceasedFacet && deceasedFacet.extension)
         : undefined
     const monthlyVisitData =
       encountersResp?.data?.resourceType === 'Bundle'
-        ? getVisitRepartitionMapAphp(visitFacet && visitFacet[0] && visitFacet[0].extension)
+        ? getVisitRepartitionMapAphp(visitFacet && visitFacet.extension)
         : undefined
     const visitTypeRepartitionData =
       encountersResp?.data?.resourceType === 'Bundle'
-        ? getEncounterRepartitionMapAphp(classFacet && classFacet[0] && classFacet[0].extension)
+        ? getEncounterRepartitionMapAphp(classFacet && classFacet.extension)
         : undefined
 
     return {

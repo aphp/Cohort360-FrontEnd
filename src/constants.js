@@ -32,6 +32,16 @@ export const CODE_HIERARCHY_EXTENSION_NAME =
   'https://terminology.eds.aphp.fr/fhir/profile/valueSet/extension/hierarchy-path-id'
 export const CONCEPT_MAP_HIERARCHY_EXTENSION_NAME =
   'https://terminology.eds.aphp.fr/fhir/profile/conceptMap/extension/group-source-hierarchy-path'
+export const ORBIS_STATUS_EXTENSION_NAME =
+  'https://terminology.eds.aphp.fr/fhir/profile/condition/extension/orbis-status'
+export const SERIES_PROTOCOL_EXTENSION_NAME =
+  'https://terminology.eds.aphp.fr/fhir/profile/imagingStudy/extension/series-protocol-name'
+export const PATIENT_LAST_ENCOUNTER_EXTENSION_NAME =
+  'https://terminology.eds.aphp.fr/fhir/profile/patient/extension/last-encounter'
+export const PATIENT_TOTAL_AGE_DAYS_EXTENSION_NAME =
+  'https://terminology.eds.aphp.fr/fhir/profile/patient/extension/total-age-day'
+export const PATIENT_TOTAL_AGE_MONTHS_EXTENSION_NAME =
+  'https://terminology.eds.aphp.fr/fhir/profile/patient/extension/total-age-month'
 
 export const DOC_STATUS_CODE_SYSTEM = 'http://hl7.org/fhir/CodeSystem/composition-status'
 

@@ -48,6 +48,7 @@ import {
 import { Direction, FormNames, Filters, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
 import { ResourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
+import { getExtension } from 'utils/fhir'
 
 export interface IServicePatients {
   /*
@@ -394,34 +395,23 @@ const servicesPatients: IServicePatients = {
 
     const agePyramidData =
       myPatientsResp.data.resourceType === 'Bundle'
-        ? getAgeRepartitionMapAphp(
-            myPatientsResp.data.meta?.extension?.filter((facet) => facet?.url === ChartCode?.AGE_PYRAMID)?.[0]
-              ?.extension
-          )
+        ? getAgeRepartitionMapAphp(getExtension(myPatientsResp.data.meta, ChartCode?.AGE_PYRAMID)?.extension)
         : undefined
 
     const genderRepartitionMap =
       myPatientsResp.data.resourceType === 'Bundle'
-        ? getGenderRepartitionMapAphp(
-            myPatientsResp.data.meta?.extension?.filter((facet) => facet?.url === ChartCode?.GENDER_REPARTITION)?.[0]
-              ?.extension
-          )
+        ? getGenderRepartitionMapAphp(getExtension(myPatientsResp.data.meta, ChartCode?.GENDER_REPARTITION)?.extension)
         : undefined
 
     const monthlyVisitData =
       myPatientsEncounters.data.resourceType === 'Bundle'
-        ? getVisitRepartitionMapAphp(
-            myPatientsEncounters.data.meta?.extension?.filter((facet) => facet?.url === ChartCode?.MONTHLY_VISITS)?.[0]
-              ?.extension
-          )
+        ? getVisitRepartitionMapAphp(getExtension(myPatientsEncounters.data.meta, ChartCode?.MONTHLY_VISITS)?.extension)
         : undefined
 
     const visitTypeRepartitionData =
       myPatientsEncounters.data.resourceType === 'Bundle'
         ? getEncounterRepartitionMapAphp(
-            myPatientsEncounters.data.meta?.extension?.filter(
-              (facet) => facet?.url === ChartCode?.VISIT_TYPE_REPARTITION
-            )?.[0]?.extension
+            getExtension(myPatientsEncounters.data.meta, ChartCode?.VISIT_TYPE_REPARTITION)?.extension
           )
         : undefined
 
@@ -835,10 +825,8 @@ const servicesPatients: IServicePatients = {
       const perimeterRights = await servicesPerimeters.fetchPerimetersRights(
         perimetersResponse.results as unknown as Group[]
       )
-      return perimeterRights.some((right) =>
-        (right.extension || []).some(
-          ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
-        )
+      return perimeterRights.some(
+        (right) => getExtension(right, 'READ_ACCESS')?.valueString === 'DATA_PSEUDOANONYMISED'
       )
     } else {
       const cohortRights = await servicesCohorts.fetchCohortsRights([{ group_id: groupId }])

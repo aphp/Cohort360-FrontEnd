@@ -9,6 +9,7 @@ import services from 'services/aphp'
 import servicesPerimeters from '../services/aphp/servicePerimeters'
 import { GroupMember, Patient } from 'fhir/r4'
 import { isCustomError } from 'utils/perimeters'
+import { getExtension } from 'utils/fhir'
 
 export type ExploredCohortState = {
   importedPatients: Patient[]
@@ -179,10 +180,8 @@ const fetchExploredCohortInBackground = createAsyncThunk<
           cohort.canMakeExport = false
           cohort.deidentifiedBoolean =
             cohort.cohort && cohort.cohort && Array.isArray(cohort.cohort)
-              ? cohort.cohort.some((cohort) =>
-                  cohort.extension?.some(
-                    ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
-                  )
+              ? cohort.cohort.some(
+                  (cohort) => getExtension(cohort, 'READ_ACCESS')?.valueString === 'DATA_PSEUDOANONYMISED'
                 ) ?? true
               : true
         }

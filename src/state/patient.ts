@@ -58,8 +58,10 @@ import {
   BIOLOGY_HIERARCHY_ITM_LOINC,
   CLAIM_HIERARCHY,
   CONDITION_HIERARCHY,
+  ORBIS_STATUS_EXTENSION_NAME,
   PROCEDURE_HIERARCHY
 } from '../constants'
+import { getExtension } from 'utils/fhir'
 
 export type Medication = {
   administration?: IPatientMedication<MedicationAdministration>
@@ -822,7 +824,8 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
           lastGhm: claimList ? (claimList[0] as Claim) : undefined,
           lastProcedure: procedureList ? (procedureList[0] as Procedure) : undefined,
           mainDiagnosis: conditionList.filter(
-            (condition) => condition.extension?.[0]?.valueCodeableConcept?.coding?.[0]?.code === 'dp'
+            (condition) =>
+              getExtension(condition, ORBIS_STATUS_EXTENSION_NAME)?.valueCodeableConcept?.coding?.[0]?.code === 'dp'
           ) as Condition[]
         },
         pmsi: {

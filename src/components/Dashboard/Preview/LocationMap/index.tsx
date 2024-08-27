@@ -22,6 +22,7 @@ import * as d3 from 'd3'
 import { CircularProgress, Slider, Typography } from '@mui/material'
 import CircularProgressWithLabel from 'components/ui/CircularProgressWithLabel'
 import useMultipartDataLoading from './useMultipartDataLoading'
+import { getExtension } from 'utils/fhir'
 
 const DEBUG_SHOW_LOADED_BOUNDS = false
 const SHOW_OPACITY_CONTROL = false
@@ -148,12 +149,9 @@ const IrisZones = (props: IrisZonesProps) => {
                 (acc, ft) => {
                   if (ft.id && !Object.prototype.hasOwnProperty.call(acc, ft.id)) {
                     acc[ft.id] = {
-                      shape:
-                        parseShape(
-                          ft.extension?.find((ext) => ext.url === LOCATION_SHAPE_EXTENSION_URL)?.valueString
-                        ) || [],
+                      shape: parseShape(getExtension(ft, LOCATION_SHAPE_EXTENSION_URL)?.valueString) || [],
                       meta: {
-                        count: ft.extension?.find((ext) => ext.url === LOCATION_COUNT_EXTENSION_URL)?.valueInteger || 0,
+                        count: getExtension(ft, LOCATION_COUNT_EXTENSION_URL)?.valueInteger || 0,
                         name: ft.name || '',
                         id: ft.id || ''
                       }

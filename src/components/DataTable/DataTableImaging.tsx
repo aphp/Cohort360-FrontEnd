@@ -22,6 +22,8 @@ import { CohortImaging, Column } from 'types'
 import { Order, OrderBy } from 'types/searchCriterias'
 
 import useStyles from './styles'
+import { getExtension } from 'utils/fhir'
+import { SERIES_PROTOCOL_EXTENSION_NAME } from 'constants.js'
 
 type DataTableImagingProps = {
   loading: boolean
@@ -110,7 +112,7 @@ const DataTableImagingLine: React.FC<{
   const nbSeries = imagingItem.numberOfSeries ?? '-'
   const accessNumber =
     imagingItem.identifier?.find((identifier) => identifier.system?.includes('accessNumber'))?.value ?? '-'
-  const documentId = imagingItem.extension?.find((extension) => extension.url.includes('docId'))?.valueString
+  const documentId = getExtension(imagingItem, 'docId')?.valueString
   const serviceProvider = imagingItem.serviceProvider
 
   return (
@@ -208,7 +210,9 @@ const InnerDataTableImaging: React.FC<{
             </TableCellWrapper>
             <TableCellWrapper>{serie.modality?.code ?? '-'}</TableCellWrapper>
             <TableCellWrapper>{serie.description ?? '-'}</TableCellWrapper>
-            <TableCellWrapper>{serie.extension?.[0].valueString ?? '-'}</TableCellWrapper>
+            <TableCellWrapper>
+              {getExtension(serie, SERIES_PROTOCOL_EXTENSION_NAME)?.valueString || '-'}
+            </TableCellWrapper>
             <TableCellWrapper>{serie.numberOfInstances ?? '-'}</TableCellWrapper>
             <TableCellWrapper>{serie.bodySite?.display ?? '-'}</TableCellWrapper>
           </TableRow>
