@@ -108,7 +108,7 @@ const EncounterForm = ({
 
   const { classes } = useStyles()
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
-  const isEdition = selectedCriteria !== null ? true : false
+  const isEdition = selectedCriteria !== null || false
   const [error, setError] = useState(Error.NO_ERROR)
   const selectedPopulation = useAppSelector((state) => state.cohortCreation.request.selectedPopulation || [])
 
