@@ -107,7 +107,17 @@ const generateTimelineFormattedData = (
 
   diagnostics = diagnostics?.filter((item) =>
     selectedTypes && selectedTypes.length > 0
-      ? selectedTypes.find((selectedType) => selectedType.id === item.extension?.[0].valueString) !== undefined
+      ? selectedTypes.find(
+          (selectedType) =>
+            selectedType.id ===
+            item.extension
+              ?.find((elem) =>
+                elem.url.includes('https://terminology.eds.aphp.fr/fhir/profile/condition/extension/orbis-status')
+              )
+              ?.valueCodeableConcept?.coding?.find((elem) =>
+                elem?.system?.includes('https://terminology.eds.aphp.fr/aphp-orbis-condition-status')
+              )?.code
+        ) !== undefined
       : true
   )
   diagnostics = diagnostics?.filter((item) => item.code?.coding?.[0].display !== 'No matching concept')
