@@ -12,12 +12,13 @@ import Typography from '@mui/material/Typography'
 
 import { Document, Page, pdfjs } from 'react-pdf'
 import services from 'services/aphp'
-import { FHIR_API_URL, ACCESS_TOKEN } from '../../constants'
+import { ACCESS_TOKEN } from '../../constants'
 
 import { Tab, Tabs } from '@mui/material'
 import Watermark from 'assets/images/watermark_pseudo.svg?react'
 import { DocumentReference } from 'fhir/r4'
 import { getAuthorizationMethod } from 'services/apiFhir'
+import { getConfig } from 'config'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 
@@ -87,7 +88,8 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
   }
 
   const url = useMemo(() => {
-    return { url: `${FHIR_API_URL}/Binary/${documentId}` }
+    const apiUrl = getConfig().system.fhirUrl
+    return { url: `${apiUrl}/Binary/${documentId}` }
   }, [documentId])
 
   const options = useMemo(() => {

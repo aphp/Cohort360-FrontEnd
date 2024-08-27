@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useContext } from 'react'
 import useSearchCriterias, { initImagingCriterias } from 'reducers/searchCriteriasReducer'
 import services from 'services/aphp'
 
@@ -32,9 +32,9 @@ import List from 'components/ui/List'
 import { useAppSelector } from 'state'
 import { BlockWrapper } from 'components/ui/Layout'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
-import { MAIL_SUPPORT } from '../../../constants'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
+import { AppConfig } from 'config'
 
 type ImagingListProps = {
   groupId?: string
@@ -42,6 +42,7 @@ type ImagingListProps = {
 }
 
 const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
+  const appConfig = useContext(AppConfig)
   const [searchResults, setSearchResults] = useState<ResultsType>({ nb: 0, total: 0, label: 'résultats' })
   const [imagingList, setImagingList] = useState<CohortImaging[]>([])
 
@@ -170,7 +171,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
           actuellement disponibles. Le flux alimentant les métadonnées associées aux séries et aux examens est suspendu
           depuis le 01/02/2023 suite à la migration du PACS AP-HP. Aucun examen produit après cette date n'est
           disponible via Cohort360. Pour tout besoin d'examen post 01/02/2023, merci de contacter le support Cohort360 :{' '}
-          {MAIL_SUPPORT}.
+          {appConfig.system.mailSupport}.
         </AlertWrapper>
       </BlockWrapper>
       <Grid container justifyContent="flex-end" gap="10px">

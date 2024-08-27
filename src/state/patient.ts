@@ -53,15 +53,8 @@ import {
 import { isCustomError } from 'utils/perimeters'
 import { ResourceType } from 'types/requestCriterias'
 import { mapToAttribute } from 'mappers/pmsi'
-import {
-  BIOLOGY_HIERARCHY_ITM_ANABIO,
-  BIOLOGY_HIERARCHY_ITM_LOINC,
-  CLAIM_HIERARCHY,
-  CONDITION_HIERARCHY,
-  ORBIS_STATUS_EXTENSION_NAME,
-  PROCEDURE_HIERARCHY
-} from '../constants'
 import { getExtension } from 'utils/fhir'
+import { getConfig } from 'config'
 
 export type Medication = {
   administration?: IPatientMedication<MedicationAdministration>
@@ -136,10 +129,10 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const searchInput = options.searchCriterias.searchInput === '' ? '' : options.searchCriterias.searchInput
       const codeUrl =
         selectedTab === ResourceType.CLAIM
-          ? CLAIM_HIERARCHY
+          ? getConfig().features.claim.valueSets.claimHierarchy.url
           : selectedTab === ResourceType.PROCEDURE
-          ? PROCEDURE_HIERARCHY
-          : CONDITION_HIERARCHY
+          ? getConfig().features.procedure.valueSets.procedureHierarchy.url
+          : getConfig().features.condition.valueSets.conditionHierarchy.url
       const code = options.searchCriterias.filters.code.map((e) => encodeURIComponent(`${codeUrl}|`) + e.id).join(',')
       const source = options.searchCriterias.filters.source ?? ''
       const diagnosticTypes = options.searchCriterias.filters.diagnosticTypes?.map((type) => type.id) ?? []
@@ -240,10 +233,14 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
       const searchInput = searchCriterias.searchInput
       const nda = searchCriterias.filters.nda
       const loinc = searchCriterias.filters.loinc
-        .map((e) => encodeURIComponent(`${BIOLOGY_HIERARCHY_ITM_LOINC}|`) + e.id)
+        .map(
+          (e) => encodeURIComponent(`${getConfig().features.observation.valueSets.biologyHierarchyLoinc.url}|`) + e.id
+        )
         .join(',')
       const anabio = searchCriterias.filters.anabio
-        .map((e) => encodeURIComponent(`${BIOLOGY_HIERARCHY_ITM_ANABIO}|`) + e.id)
+        .map(
+          (e) => encodeURIComponent(`${getConfig().features.observation.valueSets.biologyHierarchyAnabio.url}|`) + e.id
+        )
         .join(',')
       const startDate = searchCriterias.filters.startDate
       const endDate = searchCriterias.filters.endDate
@@ -825,7 +822,8 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
           lastProcedure: procedureList ? (procedureList[0] as Procedure) : undefined,
           mainDiagnosis: conditionList.filter(
             (condition) =>
-              getExtension(condition, ORBIS_STATUS_EXTENSION_NAME)?.valueCodeableConcept?.coding?.[0]?.code === 'dp'
+              getExtension(condition, getConfig().features.condition.extensions.orbisStatus)?.valueCodeableConcept
+                ?.coding?.[0]?.code === 'dp'
           ) as Condition[]
         },
         pmsi: {

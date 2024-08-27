@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import { CircularProgress, Grid, Typography, TableRow } from '@mui/material'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
@@ -8,8 +8,8 @@ import DataTable from 'components/DataTable/DataTable'
 import { Column, CohortObservation } from 'types'
 
 import useStyles from './styles'
-import { BIOLOGY_HIERARCHY_ITM_LOINC, BIOLOGY_HIERARCHY_ITM_ANABIO } from '../../constants'
 import { Order, OrderBy } from 'types/searchCriterias'
+import { AppConfig } from 'config'
 
 type DataTableObservationProps = {
   loading: boolean
@@ -85,17 +85,18 @@ const DataTableObservationLine: React.FC<{
   observation: CohortObservation
 }> = ({ observation }) => {
   const { classes } = useStyles()
+  const appConfig = useContext(AppConfig)
 
   const nda = observation.NDA
   const date = observation.effectiveDateTime
   const libelleANABIO = observation.code?.coding?.find(
-    (code) => code.system === BIOLOGY_HIERARCHY_ITM_ANABIO && code.userSelected
+    (code) => code.system === appConfig.features.observation.valueSets.biologyHierarchyAnabio.url && code.userSelected
   )?.display
   const codeLOINC = observation.code?.coding?.find(
-    (code) => code.system === BIOLOGY_HIERARCHY_ITM_LOINC && code.userSelected
+    (code) => code.system === appConfig.features.observation.valueSets.biologyHierarchyLoinc.url && code.userSelected
   )?.code
   const libelleLOINC = observation.code?.coding?.find(
-    (code) => code.system === BIOLOGY_HIERARCHY_ITM_LOINC && code.userSelected
+    (code) => code.system === appConfig.features.observation.valueSets.biologyHierarchyLoinc.url && code.userSelected
   )?.display
   const result =
     observation.valueQuantity?.value !== null

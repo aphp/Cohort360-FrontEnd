@@ -2,10 +2,10 @@ import { Element as FhirElement, Extension } from 'fhir/r4'
 
 export const getExtension = (
   resource: FhirElement | undefined,
-  url: string,
+  url?: string,
   ...alternativeUrls: string[]
 ): Extension | undefined => {
-  if (resource && resource.extension) {
+  if (resource && resource.extension && url) {
     return resource.extension.find((item) => item.url === url || alternativeUrls.includes(item.url || ''))
   }
   return undefined

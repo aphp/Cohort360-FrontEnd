@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { JSXElementConstructor, PropsWithChildren, ReactElement, useState } from 'react'
-import { JTOOL_USERS } from '../../constants.js'
+import React, { JSXElementConstructor, PropsWithChildren, ReactElement, useContext, useState } from 'react'
 import { useAppSelector } from 'state'
+import { AppConfig } from 'config'
 
 export type JToolEggProps = {
   clickCount: number
@@ -16,7 +16,7 @@ type JToolEggWrapperClickProps = {
 export function JToolEggWrapper(props: PropsWithChildren<JToolEggWrapperClickProps>) {
   const { Egg, eggProps } = props
   const me = useAppSelector((state) => state.me)
-  const jtoolUsers = JTOOL_USERS.split(',').map((id: string) => id.trim())
+  const appConfig = useContext(AppConfig)
   const [clickCount, setClickCount] = useState(0)
   const [originalHandler, setOriginalHandler] = useState<ReactElement<any, string | JSXElementConstructor<any>>>()
 
@@ -26,7 +26,7 @@ export function JToolEggWrapper(props: PropsWithChildren<JToolEggWrapperClickPro
     setOriginalHandler(child)
   }
 
-  if (!!jtoolUsers.find((id: string) => id === me?.id)) {
+  if (!!appConfig.system.jToolUsers.find((id: string) => id === me?.id)) {
     return (
       <div
         style={{
@@ -53,9 +53,9 @@ export function JToolEggWrapper(props: PropsWithChildren<JToolEggWrapperClickPro
 export function JToolComponentEggWrapper(props: PropsWithChildren<{}>) {
   const { children } = props
   const me = useAppSelector((state) => state.me)
-  const jtoolUsers = JTOOL_USERS.split(',').map((id: string) => id.trim())
+  const appConfig = useContext(AppConfig)
 
-  if (!!jtoolUsers.find((id: string) => id === me?.id)) {
+  if (!!appConfig.system.jToolUsers.find((id: string) => id === me?.id)) {
     return <>{children}</>
   }
   return <div />

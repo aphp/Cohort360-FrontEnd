@@ -3,13 +3,12 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { impersonate, login, logout } from './me'
 import { RootState } from 'state'
 
-import { ODD_EXPORT } from '../constants'
-
 import services from 'services/aphp'
 import servicesPerimeters from '../services/aphp/servicePerimeters'
 import { GroupMember, Patient } from 'fhir/r4'
 import { isCustomError } from 'utils/perimeters'
 import { getExtension } from 'utils/fhir'
+import { getConfig } from 'config'
 
 export type ExploredCohortState = {
   importedPatients: Patient[]
@@ -120,6 +119,7 @@ const fetchExploredCohortInBackground = createAsyncThunk<
   { state: RootState }
 >('exploredCohort/fetchExploredCohortInBackground', async ({ context, id }, { getState }) => {
   const state = getState()
+  const appConfig = getConfig()
 
   let cohort
   switch (context) {
@@ -136,7 +136,9 @@ const fetchExploredCohortInBackground = createAsyncThunk<
             ) {
               throw new Error("You don't have any rights on this cohort")
             } else {
-              cohort.canMakeExport = !!ODD_EXPORT ? cohortRights?.[0]?.rights?.export_csv_nomi : false
+              cohort.canMakeExport = !!appConfig.features.export.enabled
+                ? cohortRights?.[0]?.rights?.export_csv_nomi
+                : false
 
               cohort.deidentifiedBoolean = cohortRights?.[0]?.rights?.read_patient_pseudo
                 ? cohortRights?.[0]?.rights?.read_patient_nomi

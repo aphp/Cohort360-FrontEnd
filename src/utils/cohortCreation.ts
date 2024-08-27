@@ -11,15 +11,6 @@ import {
 } from 'types'
 
 import {
-  BIOLOGY_HIERARCHY_ITM_ANABIO,
-  CLAIM_HIERARCHY,
-  CONDITION_HIERARCHY,
-  MEDICATION_ATC,
-  IMAGING_STUDY_UID_URL,
-  PROCEDURE_HIERARCHY,
-  DOC_STATUS_CODE_SYSTEM
-} from '../constants'
-import {
   DocumentAttachmentMethod,
   DocumentStatuses,
   FormNames,
@@ -97,10 +88,9 @@ import {
   ProcedureParamsKeys,
   QuestionnaireResponseParamsKeys
 } from 'mappers/filters'
+import { getConfig } from 'config'
 
 const REQUETEUR_VERSION = 'v1.4.5'
-
-export const STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE = 'Structure hospitalière de prise en charge'
 
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   id: 0,
@@ -338,12 +328,13 @@ const buildEncounterFilter = (criterion: EncounterDataType, deidentified: boolea
 }
 
 const buildDocumentFilter = (criterion: DocumentDataType): string[] => {
+  const docStatusCodeSystem = getConfig().core.codeSystems.docStatus
   const joinDocStatuses = (docStatuses: string[]): string => {
     const filterDocStatuses: string[] = []
     for (const _status of docStatuses) {
       const status =
         _status === FilterByDocumentStatus.VALIDATED ? DocumentStatuses.FINAL : DocumentStatuses.PRELIMINARY
-      filterDocStatuses.push(`${DOC_STATUS_CODE_SYSTEM}|${status}`)
+      filterDocStatuses.push(`${docStatusCodeSystem}|${status}`)
     }
     return filterDocStatuses.join(',')
   }
@@ -382,7 +373,10 @@ const buildDocumentFilter = (criterion: DocumentDataType): string[] => {
 const buildConditionFilter = (criterion: Cim10DataType): string[] => {
   return [
     'subject.active=true',
-    filtersBuilders(ConditionParamsKeys.CODE, buildLabelObjectFilter(criterion.code, CONDITION_HIERARCHY)),
+    filtersBuilders(
+      ConditionParamsKeys.CODE,
+      buildLabelObjectFilter(criterion.code, getConfig().features.condition.valueSets.conditionHierarchy.url)
+    ),
     filtersBuilders(ConditionParamsKeys.DIAGNOSTIC_TYPES, buildLabelObjectFilter(criterion.diagnosticType)),
     criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : '',
     filtersBuilders(ConditionParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
@@ -402,7 +396,10 @@ const buildConditionFilter = (criterion: Cim10DataType): string[] => {
 const buildProcedureFilter = (criterion: CcamDataType): string[] => {
   return [
     'subject.active=true',
-    filtersBuilders(ProcedureParamsKeys.CODE, buildLabelObjectFilter(criterion.code, PROCEDURE_HIERARCHY)),
+    filtersBuilders(
+      ProcedureParamsKeys.CODE,
+      buildLabelObjectFilter(criterion.code, getConfig().features.procedure.valueSets.procedureHierarchy.url)
+    ),
     filtersBuilders(ProcedureParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
     filtersBuilders(ProcedureParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
     filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
@@ -421,7 +418,10 @@ const buildProcedureFilter = (criterion: CcamDataType): string[] => {
 const buildClaimFilter = (criterion: GhmDataType): string[] => {
   return [
     'patient.active=true',
-    filtersBuilders(ClaimParamsKeys.CODE, buildLabelObjectFilter(criterion.code, CLAIM_HIERARCHY)),
+    filtersBuilders(
+      ClaimParamsKeys.CODE,
+      buildLabelObjectFilter(criterion.code, getConfig().features.claim.valueSets.claimHierarchy.url)
+    ),
     filtersBuilders(ClaimParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
     filtersBuilders(ClaimParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
     filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
@@ -451,7 +451,10 @@ const buildMedicationFilter = (criterion: MedicationDataType): string[] => {
         : AdministrationParamsKeys.EXECUTIVE_UNITS,
       buildEncounterServiceFilter(criterion.encounterService)
     ),
-    filtersBuilders(PrescriptionParamsKeys.CODE, buildLabelObjectFilter(criterion.code, MEDICATION_ATC, true)),
+    filtersBuilders(
+      PrescriptionParamsKeys.CODE,
+      buildLabelObjectFilter(criterion.code, getConfig().features.medication.valueSets.medicationAtc.url, true)
+    ),
     filtersBuilders(
       criterion.type === CriteriaType.MEDICATION_REQUEST
         ? PrescriptionParamsKeys.ENCOUNTER_STATUS
@@ -486,7 +489,7 @@ const buildObservationFilter = (criterion: ObservationDataType): string[] => {
     `subject.active=true&${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`,
     filtersBuilders(
       ObservationParamsKeys.ANABIO_LOINC,
-      buildLabelObjectFilter(criterion.code, BIOLOGY_HIERARCHY_ITM_ANABIO)
+      buildLabelObjectFilter(criterion.code, getConfig().features.observation.valueSets.biologyHierarchyAnabio.url)
     ),
     filtersBuilders(ObservationParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
     filtersBuilders(ObservationParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
@@ -527,7 +530,11 @@ const buildImagingFilter = (criterion: ImagingDataType): string[] => {
     ),
     filtersBuilders(ImagingParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
     buildWithDocumentFilter(criterion, ImagingParamsKeys.WITH_DOCUMENT),
-    buildSimpleFilter(criterion.studyUid, ImagingParamsKeys.STUDY_UID, IMAGING_STUDY_UID_URL),
+    buildSimpleFilter(
+      criterion.studyUid,
+      ImagingParamsKeys.STUDY_UID,
+      getConfig().features.imaging.extensions.imagingStudyUidUrl
+    ),
     buildSimpleFilter(criterion.seriesUid, ImagingParamsKeys.SERIES_UID),
     buildEncounterDateFilter(
       criterion.type,
@@ -1459,7 +1466,7 @@ const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<I
       c.daysOfDelay = parsedDocumentAttachment.daysOfDelay
     },
     [ImagingParamsKeys.STUDY_UID]: (c, v) => {
-      c.studyUid = v?.replace(`${IMAGING_STUDY_UID_URL}|`, '') ?? ''
+      c.studyUid = v?.replace(`${getConfig().features.imaging.extensions.imagingStudyUidUrl}|`, '') ?? ''
     },
     [ImagingParamsKeys.SERIES_DATE]: (c, v) => {
       if (v?.includes('ge')) {

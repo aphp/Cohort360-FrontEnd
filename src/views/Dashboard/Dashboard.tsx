@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Link, useParams, useLocation } from 'react-router-dom'
 import { Grid, Tabs, Tab } from '@mui/material'
 
@@ -17,8 +17,7 @@ import useStyles from './styles'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import ImagingList from 'components/Dashboard/ImagingList'
-import { ODD_IMAGING } from '../../constants'
-import { MeState } from 'state/me'
+import { AppConfig } from 'config'
 
 type Tabs = { label: string; value: string; to: string; disabled: boolean | undefined } | undefined
 
@@ -33,6 +32,8 @@ const Dashboard: React.FC<{
   const dispatch = useAppDispatch()
   const { classes, cx } = useStyles()
   const location = useLocation()
+  const appConfig = useContext(AppConfig)
+  const ODD_IMAGING = appConfig.features.imaging.enabled
 
   const perimetreIds = location.search.substr(1)
 

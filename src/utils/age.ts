@@ -3,7 +3,7 @@ import moment from 'moment'
 import { DurationType } from 'types/dates'
 import { DurationRangeType } from 'types/searchCriterias'
 import { getExtension } from './fhir'
-import { PATIENT_TOTAL_AGE_DAYS_EXTENSION_NAME, PATIENT_TOTAL_AGE_MONTHS_EXTENSION_NAME } from 'constants.js'
+import { getConfig } from 'config'
 
 export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'months'): string => {
   if (ageValue === 0 && momentUnit === 'months') return '< 1 mois'
@@ -30,8 +30,9 @@ export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'm
 }
 
 export const getAge = (patient: CohortPatient): string => {
-  const totalDays = getExtension(patient, PATIENT_TOTAL_AGE_DAYS_EXTENSION_NAME)
-  const totalMonths = getExtension(patient, PATIENT_TOTAL_AGE_MONTHS_EXTENSION_NAME)
+  const appConfig = getConfig()
+  const totalDays = getExtension(patient, appConfig.core.extensions.patientTotalAgeDaysExtensionUrl)
+  const totalMonths = getExtension(patient, appConfig.core.extensions.patientTotalAgeMonthsExtensionUrl)
   if (totalDays) {
     return getAgeAphp(totalDays.valueInteger, 'days')
   } else if (totalMonths) {

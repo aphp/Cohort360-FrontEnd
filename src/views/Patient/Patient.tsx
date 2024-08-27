@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { IconButton, Grid, Tabs, Tab, CircularProgress } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
@@ -17,17 +17,21 @@ import TopBar from 'components/TopBar/TopBar'
 import useStyles from './styles'
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPatientInfo } from 'state/patient'
-import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION, ODD_QUESTIONNAIRE } from '../../constants'
+import { AppConfig } from 'config'
 
 const Patient = () => {
   const dispatch = useAppDispatch()
   const location = useLocation()
   const { classes, cx } = useStyles()
+  const config = useContext(AppConfig)
   const open = useAppSelector((state) => state.drawer)
   const cohort = useAppSelector((state) => state.exploredCohort)
   const patient = useAppSelector((state) => state.patient)
   const loading = patient !== null ? patient.loading : false
   const deidentified = patient !== null ? patient.deidentified ?? false : false
+  const ODD_MEDICATION = config.features.medication.enabled
+  const ODD_BIOLOGY = config.features.observation.enabled
+  const ODD_IMAGING = config.features.imaging.enabled
 
   const search = new URLSearchParams(location.search)
   const groupId = search.get('groupId') ?? undefined
@@ -151,7 +155,7 @@ const Patient = () => {
                 to={`/patients/${patientId}/imaging${groupId ? `?groupId=${groupId}` : ''}`}
               />
             )}
-            {ODD_QUESTIONNAIRE && !deidentified && (
+            {config.features.questionnaires.enabled && !deidentified && (
               <Tab
                 className={classes.tabTitle}
                 label="Formulaires"
@@ -181,7 +185,9 @@ const Patient = () => {
           {ODD_MEDICATION && selectedTab === 'medication' && <PatientMedication groupId={groupId} />}
           {ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology groupId={groupId} />}
           {ODD_IMAGING && selectedTab === 'imaging' && <PatientImaging groupId={groupId} />}
-          {ODD_QUESTIONNAIRE && selectedTab === 'forms' && !deidentified && <PatientForms groupId={groupId} />}
+          {config.features.questionnaires.enabled && selectedTab === 'forms' && !deidentified && (
+            <PatientForms groupId={groupId} />
+          )}
         </Grid>
 
         <PatientSidebar

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 import {
   CircularProgress,
@@ -23,7 +23,7 @@ import { Order, OrderBy } from 'types/searchCriterias'
 
 import useStyles from './styles'
 import { getExtension } from 'utils/fhir'
-import { SERIES_PROTOCOL_EXTENSION_NAME } from 'constants.js'
+import { AppConfig } from 'config'
 
 type DataTableImagingProps = {
   loading: boolean
@@ -183,7 +183,7 @@ const InnerDataTableImaging: React.FC<{
     { label: "Nombre d'instances" },
     { label: 'Partie du corps' }
   ]
-
+  const appConfig = useContext(AppConfig)
   const series = imagingItem.series?.slice()
   const sortedSeries = series?.sort((a, b) => (a.number ?? 0) - (b.number ?? 0))
 
@@ -211,7 +211,7 @@ const InnerDataTableImaging: React.FC<{
             <TableCellWrapper>{serie.modality?.code ?? '-'}</TableCellWrapper>
             <TableCellWrapper>{serie.description ?? '-'}</TableCellWrapper>
             <TableCellWrapper>
-              {getExtension(serie, SERIES_PROTOCOL_EXTENSION_NAME)?.valueString || '-'}
+              {getExtension(serie, appConfig.features.imaging.extensions.seriesProtocolUrl)?.valueString || '-'}
             </TableCellWrapper>
             <TableCellWrapper>{serie.numberOfInstances ?? '-'}</TableCellWrapper>
             <TableCellWrapper>{serie.bodySite?.display ?? '-'}</TableCellWrapper>

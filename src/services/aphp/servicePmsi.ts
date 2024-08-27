@@ -1,9 +1,9 @@
-import { CLAIM_HIERARCHY, CONDITION_HIERARCHY, PROCEDURE_HIERARCHY } from '../../constants'
+import { getConfig } from 'config'
 import { fetchValueSet } from './callApi'
 
 export const fetchConditionCodes = async (text: string, noStar = false, signal?: AbortSignal) => {
   const response = await fetchValueSet(
-    CONDITION_HIERARCHY,
+    getConfig().features.condition.valueSets.conditionHierarchy.url,
     { joinDisplayWithCode: false, search: text, noStar: noStar },
     signal
   )
@@ -13,7 +13,7 @@ export const fetchConditionCodes = async (text: string, noStar = false, signal?:
 }
 export const fetchProcedureCodes = async (text: string, noStar = false, signal?: AbortSignal) => {
   const response = await fetchValueSet(
-    PROCEDURE_HIERARCHY,
+    getConfig().features.procedure.valueSets.procedureHierarchy.url,
     { joinDisplayWithCode: false, search: text, noStar: noStar },
     signal
   )
@@ -24,7 +24,7 @@ export const fetchProcedureCodes = async (text: string, noStar = false, signal?:
 
 export const fetchClaimCodes = async (text: string, noStar = false, signal?: AbortSignal) => {
   const response = await fetchValueSet(
-    CLAIM_HIERARCHY,
+    getConfig().features.claim.valueSets.claimHierarchy.url,
     { joinDisplayWithCode: false, search: text, noStar: noStar },
     signal
   )

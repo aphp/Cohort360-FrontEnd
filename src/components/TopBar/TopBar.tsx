@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -43,9 +43,8 @@ import services from 'services/aphp'
 
 import displayDigit from 'utils/displayDigit'
 
-import { ODD_EXPORT } from '../../constants'
-
 import useStyles from './styles'
+import { AppConfig } from 'config'
 
 type TopBarProps = {
   context: 'patients' | 'cohort' | 'perimeters' | 'patient_info'
@@ -59,6 +58,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
+  const appConfig = useContext(AppConfig)
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
   const dashboard = useAppSelector((state) => state.exploredCohort)
 
@@ -293,7 +293,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                   >
                     Modifier
                   </MenuItem>
-                  {!!ODD_EXPORT && dashboard.canMakeExport && (
+                  {!!appConfig.features.export.enabled && dashboard.canMakeExport && (
                     <MenuItem
                       onClick={() => {
                         setAnchorEl(null)
@@ -321,7 +321,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         )}
       </Grid>
 
-      {!!ODD_EXPORT && openModal === 'edit' && (
+      {!!appConfig.features.export.enabled && openModal === 'edit' && (
         <ModalEditCohort
           open
           onClose={() => {

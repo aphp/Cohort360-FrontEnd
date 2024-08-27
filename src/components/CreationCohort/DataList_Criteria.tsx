@@ -16,247 +16,253 @@ import HospitForm from './DiagramView/components/LogicalOperator/components/Crit
 
 import services from 'services/aphp'
 
-import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION, ODD_QUESTIONNAIRE } from '../../constants'
 import { CriteriaType, CriteriaTypeLabels } from 'types/requestCriterias'
+import { getConfig } from 'config'
 
-const criteriaList: CriteriaItemType[] = [
-  {
-    id: CriteriaType.REQUEST,
-    title: CriteriaTypeLabels.REQUEST,
-    color: '#0063AF',
-    fontWeight: 'bold',
-    components: RequestForm
-  },
-  {
-    id: CriteriaType.IPP_LIST,
-    title: CriteriaTypeLabels.IPP_LIST,
-    color: '#0063AF',
-    fontWeight: 'bold',
-    components: IPPForm,
-    disabled: true
-  },
-  {
-    id: CriteriaType.PATIENT,
-    title: CriteriaTypeLabels.PATIENT,
-    color: '#0063AF',
-    fontWeight: 'bold',
-    components: DemographicForm,
-    fetch: { gender: services.cohortCreation.fetchGender, status: services.cohortCreation.fetchStatus }
-  },
-  {
-    id: CriteriaType.ENCOUNTER,
-    title: CriteriaTypeLabels.ENCOUNTER,
-    color: '#0063AF',
-    fontWeight: 'bold',
-    components: EncounterForm,
-    fetch: {
-      admissionModes: services.cohortCreation.fetchAdmissionModes,
-      entryModes: services.cohortCreation.fetchEntryModes,
-      exitModes: services.cohortCreation.fetchExitModes,
-      priseEnChargeType: services.cohortCreation.fetchPriseEnChargeType,
-      typeDeSejour: services.cohortCreation.fetchTypeDeSejour,
-      fileStatus: services.cohortCreation.fetchFileStatus,
-      reason: services.cohortCreation.fetchReason,
-      destination: services.cohortCreation.fetchDestination,
-      provenance: services.cohortCreation.fetchProvenance,
-      admission: services.cohortCreation.fetchAdmission,
-      encounterStatus: services.cohortCreation.fetchEncounterStatus
-    }
-  },
-  {
-    id: CriteriaType.DOCUMENTS,
-    title: CriteriaTypeLabels.DOCUMENTS,
-    color: '#0063AF',
-    fontWeight: 'bold',
-    components: DocumentsForm,
-    fetch: {
-      docTypes: services.cohortCreation.fetchDocTypes,
-      encounterStatus: services.cohortCreation.fetchEncounterStatus
-    }
-  },
-  {
-    id: CriteriaType.PMSI,
-    title: CriteriaTypeLabels.PMSI,
-    color: '#0063AF',
-    fontWeight: 'bold',
-    components: null,
-    subItems: [
-      {
-        id: CriteriaType.CONDITION,
-        title: CriteriaTypeLabels.CONDITION,
-        color: '#0063AF',
-        fontWeight: 'normal',
-        components: Cim10Form,
-        fetch: {
-          statusDiagnostic: services.cohortCreation.fetchStatusDiagnostic,
-          diagnosticTypes: services.cohortCreation.fetchDiagnosticTypes,
-          cim10Diagnostic: services.cohortCreation.fetchCim10Diagnostic,
-          encounterStatus: services.cohortCreation.fetchEncounterStatus
-        }
-      },
-      {
-        id: CriteriaType.PROCEDURE,
-        title: CriteriaTypeLabels.PROCEDURE,
-        color: '#0063AF',
-        fontWeight: 'normal',
-        components: CCAMForm,
-        fetch: {
-          ccamData: services.cohortCreation.fetchCcamData,
-          encounterStatus: services.cohortCreation.fetchEncounterStatus
-        }
-      },
-      {
-        id: CriteriaType.CLAIM,
-        title: CriteriaTypeLabels.CLAIM,
-        color: '#0063AF',
-        fontWeight: 'normal',
-        components: GhmForm,
-        fetch: {
-          ghmData: services.cohortCreation.fetchGhmData,
-          encounterStatus: services.cohortCreation.fetchEncounterStatus
-        }
+const criteriaList: () => CriteriaItemType[] = () => {
+  const ODD_QUESTIONNAIRE = getConfig().features.questionnaires.enabled
+  const ODD_BIOLOGY = getConfig().features.observation.enabled
+  const ODD_IMAGING = getConfig().features.imaging.enabled
+  const ODD_MEDICATION = getConfig().features.medication.enabled
+  return [
+    {
+      id: CriteriaType.REQUEST,
+      title: CriteriaTypeLabels.REQUEST,
+      color: '#0063AF',
+      fontWeight: 'bold',
+      components: RequestForm
+    },
+    {
+      id: CriteriaType.IPP_LIST,
+      title: CriteriaTypeLabels.IPP_LIST,
+      color: '#0063AF',
+      fontWeight: 'bold',
+      components: IPPForm,
+      disabled: true
+    },
+    {
+      id: CriteriaType.PATIENT,
+      title: CriteriaTypeLabels.PATIENT,
+      color: '#0063AF',
+      fontWeight: 'bold',
+      components: DemographicForm,
+      fetch: { gender: services.cohortCreation.fetchGender, status: services.cohortCreation.fetchStatus }
+    },
+    {
+      id: CriteriaType.ENCOUNTER,
+      title: CriteriaTypeLabels.ENCOUNTER,
+      color: '#0063AF',
+      fontWeight: 'bold',
+      components: EncounterForm,
+      fetch: {
+        admissionModes: services.cohortCreation.fetchAdmissionModes,
+        entryModes: services.cohortCreation.fetchEntryModes,
+        exitModes: services.cohortCreation.fetchExitModes,
+        priseEnChargeType: services.cohortCreation.fetchPriseEnChargeType,
+        typeDeSejour: services.cohortCreation.fetchTypeDeSejour,
+        fileStatus: services.cohortCreation.fetchFileStatus,
+        reason: services.cohortCreation.fetchReason,
+        destination: services.cohortCreation.fetchDestination,
+        provenance: services.cohortCreation.fetchProvenance,
+        admission: services.cohortCreation.fetchAdmission,
+        encounterStatus: services.cohortCreation.fetchEncounterStatus
       }
-    ]
-  },
-  {
-    id: CriteriaType.MEDICATION,
-    title: 'Médicaments (Prescription - Administration)',
-    color: ODD_MEDICATION ? '#0063AF' : '#808080',
-    fontWeight: 'bold',
-    components: MedicationForm,
-    disabled: !ODD_MEDICATION,
-    fetch: {
-      medicationData: services.cohortCreation.fetchMedicationData,
-      prescriptionTypes: services.cohortCreation.fetchPrescriptionTypes,
-      administrations: services.cohortCreation.fetchAdministrations,
-      encounterStatus: services.cohortCreation.fetchEncounterStatus
-    }
-  },
-  {
-    id: CriteriaType.BIO_MICRO,
-    title: CriteriaTypeLabels.BIO_MICRO,
-    color: ODD_BIOLOGY ? '#0063AF' : '#808080',
-    fontWeight: 'bold',
-    components: null,
-    subItems: [
-      {
-        id: CriteriaType.OBSERVATION,
-        title: CriteriaTypeLabels.OBSERVATION,
-        color: ODD_BIOLOGY ? '#0063AF' : '#808080',
-        fontWeight: 'normal',
-        components: BiologyForm,
-        disabled: !ODD_BIOLOGY,
-        fetch: {
-          biologyData: services.cohortCreation.fetchBiologyData,
-          encounterStatus: services.cohortCreation.fetchEncounterStatus
-        }
-      },
-      {
-        id: CriteriaType.MICROBIOLOGIE,
-        title: CriteriaTypeLabels.MICROBIOLOGIE,
-        components: null,
-        color: '#808080',
-        fontWeight: 'normal',
-        disabled: true
+    },
+    {
+      id: CriteriaType.DOCUMENTS,
+      title: CriteriaTypeLabels.DOCUMENTS,
+      color: '#0063AF',
+      fontWeight: 'bold',
+      components: DocumentsForm,
+      fetch: {
+        docTypes: services.cohortCreation.fetchDocTypes,
+        encounterStatus: services.cohortCreation.fetchEncounterStatus
       }
-    ]
-  },
-  {
-    id: CriteriaType.SPECIALITY,
-    title: 'Dossiers de spécialité',
-    color: '#0063AF',
-    fontWeight: 'bold',
-    components: null,
-    subItems: [
-      {
-        id: CriteriaType.MATERNITY,
-        title: 'Maternité',
-        components: null,
-        color: '#0063AF',
-        fontWeight: 'normal',
-        subItems: [
-          {
-            id: CriteriaType.PREGNANCY,
-            title: 'Fiche Grossesse',
-            color: ODD_QUESTIONNAIRE ? '#0063AF' : '#808080',
-            fontWeight: 'normal',
-            disabled: !ODD_QUESTIONNAIRE,
-            components: PregnantForm,
-            fetch: {
-              pregnancyMode: services.cohortCreation.fetchPregnancyMode,
-              maternalRisks: services.cohortCreation.fetchMaternalRisks,
-              risksRelatedToObstetricHistory: services.cohortCreation.fetchRisksRelatedToObstetricHistory,
-              risksOrComplicationsOfPregnancy: services.cohortCreation.fetchRisksOrComplicationsOfPregnancy,
-              corticotherapie: services.cohortCreation.fetchCorticotherapie,
-              prenatalDiagnosis: services.cohortCreation.fetchPrenatalDiagnosis,
-              ultrasoundMonitoring: services.cohortCreation.fetchUltrasoundMonitoring,
-              encounterStatus: services.cohortCreation.fetchEncounterStatus
-            }
-          },
-          {
-            id: CriteriaType.HOSPIT,
-            title: 'Hospitalisation',
-            color: ODD_QUESTIONNAIRE ? '#0063AF' : '#808080',
-            fontWeight: 'normal',
-            disabled: !ODD_QUESTIONNAIRE,
-            components: HospitForm,
-            fetch: {
-              inUteroTransfer: services.cohortCreation.fetchInUteroTransfer,
-              pregnancyMonitoring: services.cohortCreation.fetchPregnancyMonitoring,
-              maturationCorticotherapie: services.cohortCreation.fetchMaturationCorticotherapie,
-              chirurgicalGesture: services.cohortCreation.fetchChirurgicalGesture,
-              vme: services.cohortCreation.fetchVme,
-              childbirth: services.cohortCreation.fetchChildbirth,
-              hospitalChildBirthPlace: services.cohortCreation.fetchHospitalChildBirthPlace,
-              otherHospitalChildBirthPlace: services.cohortCreation.fetchOtherHospitalChildBirthPlace,
-              homeChildBirthPlace: services.cohortCreation.fetchHomeChildBirthPlace,
-              childbirthMode: services.cohortCreation.fetchChildbirthMode,
-              maturationReason: services.cohortCreation.fetchMaturationReason,
-              maturationModality: services.cohortCreation.fetchMaturationModality,
-              imgIndication: services.cohortCreation.fetchImgIndication,
-              laborOrCesareanEntry: services.cohortCreation.fetchLaborOrCesareanEntry,
-              pathologyDuringLabor: services.cohortCreation.fetchPathologyDuringLabor,
-              obstetricalGestureDuringLabor: services.cohortCreation.fetchObstetricalGestureDuringLabor,
-              analgesieType: services.cohortCreation.fetchAnalgesieType,
-              birthDeliveryWay: services.cohortCreation.fetchBirthDeliveryWay,
-              instrumentType: services.cohortCreation.fetchInstrumentType,
-              cSectionModality: services.cohortCreation.fetchCSectionModality,
-              presentationAtDelivery: services.cohortCreation.fetchPresentationAtDelivery,
-              birthStatus: services.cohortCreation.fetchBirthStatus,
-              postpartumHemorrhage: services.cohortCreation.fetchSetPostpartumHemorrhage,
-              conditionPerineum: services.cohortCreation.fetchConditionPerineum,
-              exitPlaceType: services.cohortCreation.fetchExitPlaceType,
-              feedingType: services.cohortCreation.fetchFeedingType,
-              complication: services.cohortCreation.fetchComplication,
-              exitFeedingMode: services.cohortCreation.fetchExitFeedingMode,
-              exitDiagnostic: services.cohortCreation.fetchExitDiagnostic,
-              encounterStatus: services.cohortCreation.fetchEncounterStatus
-            }
+    },
+    {
+      id: CriteriaType.PMSI,
+      title: CriteriaTypeLabels.PMSI,
+      color: '#0063AF',
+      fontWeight: 'bold',
+      components: null,
+      subItems: [
+        {
+          id: CriteriaType.CONDITION,
+          title: CriteriaTypeLabels.CONDITION,
+          color: '#0063AF',
+          fontWeight: 'normal',
+          components: Cim10Form,
+          fetch: {
+            statusDiagnostic: services.cohortCreation.fetchStatusDiagnostic,
+            diagnosticTypes: services.cohortCreation.fetchDiagnosticTypes,
+            cim10Diagnostic: services.cohortCreation.fetchCim10Diagnostic,
+            encounterStatus: services.cohortCreation.fetchEncounterStatus
           }
-        ]
+        },
+        {
+          id: CriteriaType.PROCEDURE,
+          title: CriteriaTypeLabels.PROCEDURE,
+          color: '#0063AF',
+          fontWeight: 'normal',
+          components: CCAMForm,
+          fetch: {
+            ccamData: services.cohortCreation.fetchCcamData,
+            encounterStatus: services.cohortCreation.fetchEncounterStatus
+          }
+        },
+        {
+          id: CriteriaType.CLAIM,
+          title: CriteriaTypeLabels.CLAIM,
+          color: '#0063AF',
+          fontWeight: 'normal',
+          components: GhmForm,
+          fetch: {
+            ghmData: services.cohortCreation.fetchGhmData,
+            encounterStatus: services.cohortCreation.fetchEncounterStatus
+          }
+        }
+      ]
+    },
+    {
+      id: CriteriaType.MEDICATION,
+      title: 'Médicaments (Prescription - Administration)',
+      color: ODD_MEDICATION ? '#0063AF' : '#808080',
+      fontWeight: 'bold',
+      components: MedicationForm,
+      disabled: !ODD_MEDICATION,
+      fetch: {
+        medicationData: services.cohortCreation.fetchMedicationData,
+        prescriptionTypes: services.cohortCreation.fetchPrescriptionTypes,
+        administrations: services.cohortCreation.fetchAdministrations,
+        encounterStatus: services.cohortCreation.fetchEncounterStatus
       }
-    ]
-  },
-  {
-    id: CriteriaType.IMAGING,
-    title: CriteriaTypeLabels.IMAGING,
-    color: ODD_IMAGING ? '#0063AF' : '#808080',
-    fontWeight: 'bold',
-    components: ImagingForm,
-    disabled: !ODD_IMAGING,
-    fetch: {
-      modalities: services.cohortCreation.fetchModalities,
-      encounterStatus: services.cohortCreation.fetchEncounterStatus
+    },
+    {
+      id: CriteriaType.BIO_MICRO,
+      title: CriteriaTypeLabels.BIO_MICRO,
+      color: ODD_BIOLOGY ? '#0063AF' : '#808080',
+      fontWeight: 'bold',
+      components: null,
+      subItems: [
+        {
+          id: CriteriaType.OBSERVATION,
+          title: CriteriaTypeLabels.OBSERVATION,
+          color: ODD_BIOLOGY ? '#0063AF' : '#808080',
+          fontWeight: 'normal',
+          components: BiologyForm,
+          disabled: !ODD_BIOLOGY,
+          fetch: {
+            biologyData: services.cohortCreation.fetchBiologyData,
+            encounterStatus: services.cohortCreation.fetchEncounterStatus
+          }
+        },
+        {
+          id: CriteriaType.MICROBIOLOGIE,
+          title: CriteriaTypeLabels.MICROBIOLOGIE,
+          components: null,
+          color: '#808080',
+          fontWeight: 'normal',
+          disabled: true
+        }
+      ]
+    },
+    {
+      id: CriteriaType.SPECIALITY,
+      title: 'Dossiers de spécialité',
+      color: '#0063AF',
+      fontWeight: 'bold',
+      components: null,
+      subItems: [
+        {
+          id: CriteriaType.MATERNITY,
+          title: 'Maternité',
+          components: null,
+          color: '#0063AF',
+          fontWeight: 'normal',
+          subItems: [
+            {
+              id: CriteriaType.PREGNANCY,
+              title: 'Fiche Grossesse',
+              color: ODD_QUESTIONNAIRE ? '#0063AF' : '#808080',
+              fontWeight: 'normal',
+              disabled: !ODD_QUESTIONNAIRE,
+              components: PregnantForm,
+              fetch: {
+                pregnancyMode: services.cohortCreation.fetchPregnancyMode,
+                maternalRisks: services.cohortCreation.fetchMaternalRisks,
+                risksRelatedToObstetricHistory: services.cohortCreation.fetchRisksRelatedToObstetricHistory,
+                risksOrComplicationsOfPregnancy: services.cohortCreation.fetchRisksOrComplicationsOfPregnancy,
+                corticotherapie: services.cohortCreation.fetchCorticotherapie,
+                prenatalDiagnosis: services.cohortCreation.fetchPrenatalDiagnosis,
+                ultrasoundMonitoring: services.cohortCreation.fetchUltrasoundMonitoring,
+                encounterStatus: services.cohortCreation.fetchEncounterStatus
+              }
+            },
+            {
+              id: CriteriaType.HOSPIT,
+              title: 'Hospitalisation',
+              color: ODD_QUESTIONNAIRE ? '#0063AF' : '#808080',
+              fontWeight: 'normal',
+              disabled: !ODD_QUESTIONNAIRE,
+              components: HospitForm,
+              fetch: {
+                inUteroTransfer: services.cohortCreation.fetchInUteroTransfer,
+                pregnancyMonitoring: services.cohortCreation.fetchPregnancyMonitoring,
+                maturationCorticotherapie: services.cohortCreation.fetchMaturationCorticotherapie,
+                chirurgicalGesture: services.cohortCreation.fetchChirurgicalGesture,
+                vme: services.cohortCreation.fetchVme,
+                childbirth: services.cohortCreation.fetchChildbirth,
+                hospitalChildBirthPlace: services.cohortCreation.fetchHospitalChildBirthPlace,
+                otherHospitalChildBirthPlace: services.cohortCreation.fetchOtherHospitalChildBirthPlace,
+                homeChildBirthPlace: services.cohortCreation.fetchHomeChildBirthPlace,
+                childbirthMode: services.cohortCreation.fetchChildbirthMode,
+                maturationReason: services.cohortCreation.fetchMaturationReason,
+                maturationModality: services.cohortCreation.fetchMaturationModality,
+                imgIndication: services.cohortCreation.fetchImgIndication,
+                laborOrCesareanEntry: services.cohortCreation.fetchLaborOrCesareanEntry,
+                pathologyDuringLabor: services.cohortCreation.fetchPathologyDuringLabor,
+                obstetricalGestureDuringLabor: services.cohortCreation.fetchObstetricalGestureDuringLabor,
+                analgesieType: services.cohortCreation.fetchAnalgesieType,
+                birthDeliveryWay: services.cohortCreation.fetchBirthDeliveryWay,
+                instrumentType: services.cohortCreation.fetchInstrumentType,
+                cSectionModality: services.cohortCreation.fetchCSectionModality,
+                presentationAtDelivery: services.cohortCreation.fetchPresentationAtDelivery,
+                birthStatus: services.cohortCreation.fetchBirthStatus,
+                postpartumHemorrhage: services.cohortCreation.fetchSetPostpartumHemorrhage,
+                conditionPerineum: services.cohortCreation.fetchConditionPerineum,
+                exitPlaceType: services.cohortCreation.fetchExitPlaceType,
+                feedingType: services.cohortCreation.fetchFeedingType,
+                complication: services.cohortCreation.fetchComplication,
+                exitFeedingMode: services.cohortCreation.fetchExitFeedingMode,
+                exitDiagnostic: services.cohortCreation.fetchExitDiagnostic,
+                encounterStatus: services.cohortCreation.fetchEncounterStatus
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: CriteriaType.IMAGING,
+      title: CriteriaTypeLabels.IMAGING,
+      color: ODD_IMAGING ? '#0063AF' : '#808080',
+      fontWeight: 'bold',
+      components: ImagingForm,
+      disabled: !ODD_IMAGING,
+      fetch: {
+        modalities: services.cohortCreation.fetchModalities,
+        encounterStatus: services.cohortCreation.fetchEncounterStatus
+      }
+    },
+    {
+      id: CriteriaType.PHYSIOLOGIE,
+      title: CriteriaTypeLabels.PHYSIOLOGIE,
+      color: '#808080',
+      fontWeight: 'bold',
+      disabled: true,
+      components: null
     }
-  },
-  {
-    id: CriteriaType.PHYSIOLOGIE,
-    title: CriteriaTypeLabels.PHYSIOLOGIE,
-    color: '#808080',
-    fontWeight: 'bold',
-    disabled: true,
-    components: null
-  }
-]
+  ]
+}
 
 export default criteriaList

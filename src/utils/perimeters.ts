@@ -1,20 +1,14 @@
 import { SourceType } from 'types/scope'
 import { Back_API_Response, CustomError } from 'types'
-import { PERIMETER_SOURCE_TYPE_HIERARCHY } from 'constants.js'
-
-const SOURCE_TYPES_LEVELS: string[] = (PERIMETER_SOURCE_TYPE_HIERARCHY || '').split(',')
+import { getConfig } from 'config'
 
 export const getScopeLevelBySourceType = (type: SourceType) => {
+  const sourceTypeLevels = getConfig().core.perimeterSourceTypeHierarchy
   // TODO: Refactor this function to use an external mapping file/configuration
-  const level0 = SOURCE_TYPES_LEVELS[0]
+  const level0 = sourceTypeLevels[0]
   const level1 =
-    SOURCE_TYPES_LEVELS.length > 3
-      ? SOURCE_TYPES_LEVELS[3]
-      : SOURCE_TYPES_LEVELS.length > 1
-      ? SOURCE_TYPES_LEVELS[1]
-      : level0
-  const level2 =
-    SOURCE_TYPES_LEVELS.length > 5 ? SOURCE_TYPES_LEVELS[5] : SOURCE_TYPES_LEVELS[SOURCE_TYPES_LEVELS.length - 1]
+    sourceTypeLevels.length > 3 ? sourceTypeLevels[3] : sourceTypeLevels.length > 1 ? sourceTypeLevels[1] : level0
+  const level2 = sourceTypeLevels.length > 5 ? sourceTypeLevels[5] : sourceTypeLevels[sourceTypeLevels.length - 1]
   switch (type) {
     case SourceType.APHP:
       return level0
@@ -37,16 +31,18 @@ export const getScopeLevelBySourceType = (type: SourceType) => {
 }
 
 export const isSourceTypeInScopeLevel = (sourceType: SourceType, type: string) => {
+  const sourceTypeLevels = getConfig().core.perimeterSourceTypeHierarchy
   const scopeLevel = getScopeLevelBySourceType(sourceType)
-  const sourceTypeIndex = SOURCE_TYPES_LEVELS.find((level) => level === scopeLevel) ?? -1
-  const typeIndex = SOURCE_TYPES_LEVELS.find((level) => level === type) ?? -1
+  const sourceTypeIndex = sourceTypeLevels.find((level) => level === scopeLevel) ?? -1
+  const typeIndex = sourceTypeLevels.find((level) => level === type) ?? -1
   if (typeIndex > sourceTypeIndex) return false
   return true
 }
 
 export const scopeLevelsToRequestParam = (sourceType: SourceType) => {
+  const sourceTypeLevels = getConfig().core.perimeterSourceTypeHierarchy
   const levels: string[] = []
-  for (const element of SOURCE_TYPES_LEVELS) {
+  for (const element of sourceTypeLevels) {
     levels.push(element)
     if (element === getScopeLevelBySourceType(sourceType)) break
   }

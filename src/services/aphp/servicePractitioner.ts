@@ -1,7 +1,8 @@
 import apiBackend from 'services/apiBackend'
-import { OIDC_REDIRECT_URI, REFRESH_TOKEN } from '../../constants'
+import { REFRESH_TOKEN } from '../../constants'
 import { Authentication, MaintenanceInfo } from 'types'
 import { AxiosError, AxiosResponse } from 'axios'
+import { getConfig } from 'config'
 
 export interface IServicePractitioner {
   /**
@@ -51,7 +52,7 @@ const servicePractitioner: IServicePractitioner = {
         `/auth/oidc/login`,
         {
           auth_code: authCode,
-          redirect_uri: OIDC_REDIRECT_URI
+          redirect_uri: getConfig().system.oidc?.redirectUri
         },
         {
           headers: { authorizationMethod: 'OIDC' }

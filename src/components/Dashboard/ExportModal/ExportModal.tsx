@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useContext } from 'react'
 import { isAxiosError } from 'axios'
 
 import {
@@ -43,8 +43,8 @@ import { ResourceType } from 'types/requestCriterias'
 import { getProviderFilters } from 'services/aphp/serviceFilters'
 import { ExportTableAccordion, ExportTableAccordionSummary } from './ExportTableAccordion'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
-import { EXPORT_LINES_LIMIT, MAIL_SUPPORT } from '../../../constants'
 import { fetchResourceCount, fetchAllResourcesCount, getRightCount, ResourcesWithExportTables } from './exportUtils'
+import { AppConfig } from 'config'
 
 const initialState: ExportCSVForm = {
   motif: '',
@@ -78,6 +78,7 @@ type ExportModalProps = {
 const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, handleClose }) => {
   const { classes } = useStyles()
   const [loading, setLoading] = useState(false)
+  const appConfig = useContext(AppConfig)
   const [countLoading, setCountLoading] = useState<boolean | string>(false)
   const [settings, setSettings] = useState(initialState)
   const checkedTables = settings.tables.filter((table) => table.checked)
@@ -87,6 +88,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
   const [expandedTableIds, setExpandedTableIds] = useState<string[]>(['person'])
 
   const dialogRef = useRef<HTMLHeadingElement>(null)
+  const exportLinesLimit = appConfig.features.export.exportLinesLimit
 
   useEffect(() => {
     setSettings(initialState)
@@ -102,9 +104,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
   useEffect(() => {
     setError(
       settings.tables.some((table) => {
-        return (
-          table.checked && table.count > (table.resourceType === ResourceType.DOCUMENTS ? 5000 : EXPORT_LINES_LIMIT)
-        )
+        return table.checked && table.count > (table.resourceType === ResourceType.DOCUMENTS ? 5000 : exportLinesLimit)
       })
         ? Error.ERROR_TABLE_LIMIT
         : null
@@ -176,7 +176,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
         .filter(
           (table) =>
             table.checked &&
-            (table.count > (table.resourceType === ResourceType.DOCUMENTS ? 5000 : EXPORT_LINES_LIMIT) ||
+            (table.count > (table.resourceType === ResourceType.DOCUMENTS ? 5000 : exportLinesLimit) ||
               !resourcesWithNoFilters.includes(table.resourceType))
         )
         .map((table) => table.label)
@@ -241,7 +241,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
     const { name, checked, label, resourceType, count } = exportTable
     const isItemExpanded = expandedTableIds.includes(label)
     const _countLoading = !!((countLoading && typeof countLoading === 'boolean') || countLoading === label)
-    const setLimitError = resourceType === ResourceType.DOCUMENTS ? 5000 : EXPORT_LINES_LIMIT
+    const setLimitError = resourceType === ResourceType.DOCUMENTS ? 5000 : exportLinesLimit
 
     return (
       <ExportTableAccordion key={label} expanded={isItemExpanded} error={checked && count > setLimitError}>
@@ -322,7 +322,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
         <CancelIcon style={{ fontSize: 52 }} htmlColor="#FC5656" />
         <DialogContentText style={{ marginBottom: 0, width: 'calc(100% - 62px)' }}>
           Une erreur réseau empêche les exports de fonctionner correctement. Veuillez réessayer plus tard ou contacter
-          le support ({MAIL_SUPPORT}) si l'erreur persiste.
+          le support ({appConfig.system.mailSupport}) si l'erreur persiste.
         </DialogContentText>
       </Grid>
     </DialogContent>
@@ -342,7 +342,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
       <CancelIcon style={{ fontSize: 52 }} htmlColor="#FC5656" />
       <DialogContentText style={{ marginBottom: 0, width: 'calc(100% - 62px)' }}>
         Une erreur est survenue lors de votre demande d'export. Veuillez{' '}
-        <a href={`mailto:${MAIL_SUPPORT}`}>contacter le support</a> pour plus d'informations
+        <a href={`mailto:${appConfig.system.mailSupport}`}>contacter le support</a> pour plus d'informations
         {exportResponse?.detail && (
           <Accordion id="reason-accordion" square className={classes.accordion}>
             <AccordionSummary
@@ -615,7 +615,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
   setError
 }) => {
   const { classes } = useStyles()
-
+  const exportLinesLimit = useContext(AppConfig).features.export.exportLinesLimit
   const [filtersOptions, setFiltersOptions] = useState<SavedFilter[]>([])
 
   const meState = useAppSelector((state) => state.me)
@@ -705,11 +705,11 @@ const ExportTable: React.FC<ExportTableProps> = ({
         </Grid>
       </Grid>
       {exportTable.checked &&
-        exportTable.count > (exportTable.resourceType === ResourceType.DOCUMENTS ? 5000 : EXPORT_LINES_LIMIT) && (
+        exportTable.count > (exportTable.resourceType === ResourceType.DOCUMENTS ? 5000 : exportLinesLimit) && (
           <Typography color={'red'} fontWeight={'bold'} fontSize={12}>
             La table sélectionnée dépasse la limite de{' '}
-            {exportTable.resourceType === ResourceType.DOCUMENTS ? 5000 : EXPORT_LINES_LIMIT} lignes autorisées.
-            Veuillez affiner votre sélection à l'aide de filtres ou désélectionner la table.
+            {exportTable.resourceType === ResourceType.DOCUMENTS ? 5000 : exportLinesLimit} lignes autorisées. Veuillez
+            affiner votre sélection à l'aide de filtres ou désélectionner la table.
           </Typography>
         )}
     </Grid>

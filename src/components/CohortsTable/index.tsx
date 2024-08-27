@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -46,10 +46,9 @@ import { Cohort, CohortJobStatus } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
-import { ODD_EXPORT } from '../../constants'
-
 import useStyles from './styles'
 import { Direction, Order, OrderBy } from 'types/searchCriterias'
+import { AppConfig } from 'config'
 
 type FavStarProps = {
   favorite?: boolean
@@ -89,6 +88,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
+  const appConfig = useContext(AppConfig)
   const [dialogOpen, setOpenDialog] = useState(false)
   const [selectedCohort, setSelectedCohort] = useState<Cohort | undefined>()
   const [selectedExportableCohort, setSelectedExportableCohort] = useState<Cohort | undefined>()
@@ -257,7 +257,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
             </TableHead>
             <TableBody>
               {data?.map((row: Cohort) => {
-                const canExportThisCohort = !!ODD_EXPORT ? row?.rights?.export_csv_nomi : false
+                const canExportThisCohort = !!appConfig.features.export.enabled ? row?.rights?.export_csv_nomi : false
 
                 return (
                   <TableRow
@@ -520,7 +520,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
 
       <ModalEditCohort open={selectedCohortState !== null} onClose={onEditCohort} />
 
-      {!!ODD_EXPORT && (
+      {!!appConfig.features.export.enabled && (
         <ExportModal
           cohortId={selectedExportableCohort?.uuid ?? ''}
           open={!!selectedExportableCohort}

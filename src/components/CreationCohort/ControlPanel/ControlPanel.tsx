@@ -55,12 +55,12 @@ import {
 import useStyle from './styles'
 
 import displayDigit from 'utils/displayDigit'
-import { ODD_FEASABILITY_REPORT, SHORT_COHORT_LIMIT } from '../../../constants'
 import services from 'services/aphp'
 import ValidationDialog from 'components/ui/ValidationDialog'
 import { JToolComponentEggWrapper } from 'components/Impersonation/JTool'
 import { Egg3 } from 'components/Impersonation/Eggs'
 import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
+import { AppConfig } from 'config'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -69,6 +69,7 @@ const ControlPanel: React.FC<{
 }> = ({ onExecute, onUndo, onRedo }) => {
   const { classes, cx } = useStyle()
   const dispatch = useAppDispatch()
+  const appConfig = useContext(AppConfig)
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
   const [oldCount, setOldCount] = useState<CohortCreationCounterType | null>(null)
   const [openShareRequestModal, setOpenShareRequestModal] = useState<boolean>(false)
@@ -101,7 +102,6 @@ const ControlPanel: React.FC<{
     snapshotsHistory
   } = useAppSelector((state) => state.cohortCreation.request || {})
   const { uuid, includePatient, status, jobFailMsg } = count
-
   const [requestShare, setRequestShare] = useState<RequestType | null>({
     currentSnapshot,
     requestId,
@@ -112,7 +112,7 @@ const ControlPanel: React.FC<{
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
-  const cohortLimit = shortCohortLimit ?? SHORT_COHORT_LIMIT
+  const cohortLimit = shortCohortLimit ?? appConfig.features.cohort.shortCohortLimit
 
   const accessIsPseudonymize: boolean | null =
     selectedPopulation === null
@@ -264,7 +264,7 @@ const ControlPanel: React.FC<{
               <>Créer la cohorte</>
             )}
           </Button>
-          {ODD_FEASABILITY_REPORT && (
+          {appConfig.features.feasabilityReport.enabled && (
             <Button
               disabled={isLoading || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated}
               onClick={handleGenerateReport}

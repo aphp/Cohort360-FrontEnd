@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactElement } from 'react'
+import React, { useState, useEffect, ReactElement, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -38,12 +38,12 @@ import { logout as logoutAction } from 'state/me'
 import { open as openAction, close as closeAction } from 'state/drawer'
 import { resetCohortCreation } from 'state/cohortCreation'
 
-import { ODD_CONTACT } from '../../../constants'
 import useStyles from './styles'
 import versionInfo from 'data/version.json'
 import Impersonation from 'components/Impersonation'
 import { Egg1, Egg2 } from 'components/Impersonation/Eggs'
 import JToolEggWrapper from 'components/Impersonation/JTool'
+import { AppConfig } from 'config'
 
 const smallDrawerWidth = 52
 const largeDrawerWidth = 260
@@ -54,6 +54,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
+  const appConfig = useContext(AppConfig)
   const practitioner = useAppSelector((state) => state.me)
   const open = useAppSelector((state) => state.drawer)
   const cohortCreation = useAppSelector((state) => state.cohortCreation)
@@ -380,7 +381,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             </Box>
           )}
 
-          {ODD_CONTACT &&
+          {appConfig.features.contact.enabled &&
             (open ? (
               <Button
                 onClick={() => navigate('/contact')}

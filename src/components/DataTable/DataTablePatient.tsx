@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import moment from 'moment'
 
 import { CircularProgress, Grid, TableRow, Typography } from '@mui/material'
@@ -18,7 +18,7 @@ import GenderIcon from 'components/ui/GenderIcon'
 import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
 import { VitalStatusLabel } from 'types/requestCriterias'
 import { getExtension } from 'utils/fhir'
-import { PATIENT_LAST_ENCOUNTER_EXTENSION_NAME } from 'constants.js'
+import { AppConfig } from 'config'
 
 type DataTablePatientProps = {
   loading: boolean
@@ -98,6 +98,7 @@ const DataTablePatientLine: React.FC<{
   search?: string
 }> = ({ deidentified, patient, groupId, search }) => {
   const { classes } = useStyles()
+  const appConfig = useContext(AppConfig)
   const _groupId = groupId ? `?groupId=${groupId}` : ''
   const _search = search ? `&search=${search}` : ''
   const _patientName = patient.name?.[0].given?.[0]
@@ -143,7 +144,8 @@ const DataTablePatientLine: React.FC<{
         )}
       </TableCellWrapper>
       <TableCellWrapper align="left">
-        {getExtension(patient, PATIENT_LAST_ENCOUNTER_EXTENSION_NAME)?.valueReference?.display || 'Non renseigné'}
+        {getExtension(patient, appConfig.core.extensions.patientLastEnconterUrl)?.valueReference?.display ||
+          'Non renseigné'}
       </TableCellWrapper>
       <TableCellWrapper>
         <StatusChip

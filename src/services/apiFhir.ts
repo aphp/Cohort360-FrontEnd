@@ -1,12 +1,16 @@
 import axios, { InternalAxiosRequestConfig } from 'axios'
-import { ACCESS_TOKEN, FHIR_API_URL, BOOLEANTRUE } from '../constants'
+import { ACCESS_TOKEN } from '../constants'
+import { getConfig, onUpdateConfig } from 'config'
 
 const apiFhir = axios.create({
-  baseURL: FHIR_API_URL,
+  baseURL: getConfig().system.fhirUrl,
   headers: {
     Accept: 'application/fhir+json',
     'Content-Type': 'application/json'
   }
+})
+onUpdateConfig((newConfig) => {
+  apiFhir.defaults.baseURL = newConfig.system.fhirUrl
 })
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,7 +23,7 @@ export const addRequestConfigHook = (hook: (config: InternalAxiosRequestConfig<a
 
 export const getAuthorizationMethod = () => {
   const oidcAuthState = localStorage.getItem('oidcAuth')
-  return oidcAuthState === `${BOOLEANTRUE}` ? 'OIDC' : 'JWT'
+  return oidcAuthState === 'true' ? 'OIDC' : 'JWT'
 }
 
 apiFhir.interceptors.request.use((config) => {

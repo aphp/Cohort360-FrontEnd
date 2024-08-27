@@ -1,11 +1,15 @@
 import axios, { InternalAxiosRequestConfig } from 'axios'
-import { ACCESS_TOKEN, BACK_API_URL, BOOLEANTRUE } from '../constants'
+import { ACCESS_TOKEN } from '../constants'
+import { getConfig, onUpdateConfig } from 'config'
 
 const apiBackend = axios.create({
-  baseURL: BACK_API_URL,
+  baseURL: getConfig().system.backendUrl,
   headers: {
     Accept: 'application/json'
   }
+})
+onUpdateConfig((newConfig) => {
+  apiBackend.defaults.baseURL = newConfig.system.backendUrl
 })
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,7 +24,7 @@ apiBackend.interceptors.request.use((config) => {
   const oidcAuthState = localStorage.getItem('oidcAuth')
   const token = localStorage.getItem(ACCESS_TOKEN)
   config.headers.Authorization = `Bearer ${token}`
-  config.headers.authorizationMethod = oidcAuthState === `${BOOLEANTRUE}` ? 'OIDC' : 'JWT'
+  config.headers.authorizationMethod = oidcAuthState === 'true' ? 'OIDC' : 'JWT'
   requestsConfigHooks.forEach((hook) => hook(config))
   return config
 })

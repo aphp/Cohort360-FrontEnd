@@ -161,7 +161,7 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
     return updatedCriteriaItem
   }
 
-  const criteriaListWithConfig = criteriaList.map((criteriaItem) =>
+  const criteriaListWithConfig = criteriaList().map((criteriaItem) =>
     applyConfigToCriteriaItem(criteriaItem, criteria.config)
   )
 
