@@ -360,7 +360,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType, deidentified: bool
               deidentified
             )
           : '',
-        criterion.birthdates[1] === null && criterion.birthdates[1] === null
+        criterion.birthdates[0] === null && criterion.birthdates[1] === null
           ? buildDurationFilter(
               criterion.age[1],
               deidentified ? PATIENT_AGE_MONTH : PATIENT_AGE_DAY,

@@ -74,7 +74,7 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
 
   const [error, setError] = useState(Error.NO_ERROR)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
-  const isEdition = selectedCriteria !== null ? true : false
+  const isEdition = selectedCriteria !== null || false
 
   const onSubmit = () => {
     onChangeSelectedCriteria({
@@ -137,7 +137,7 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
             <Switch
               id="criteria-inclusive"
               checked={!isInclusive}
-              onChange={(event) => setIsInclusive(!event.target.checked as boolean)}
+              onChange={(event) => setIsInclusive(!event.target.checked)}
               color="secondary"
             />
           </Grid>

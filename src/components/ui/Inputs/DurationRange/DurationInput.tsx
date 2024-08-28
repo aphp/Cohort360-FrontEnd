@@ -10,23 +10,16 @@ type DurationProps = {
   label: string
   disabled?: boolean
   deidentified?: boolean
-  placeholderType?: string
   onChange: (newDuration: DurationType) => void
-  name?: string
 }
 
-const DurationInput = ({
-  value,
-  label,
-  deidentified = false,
-  disabled = false,
-  placeholderType,
-  onChange,
-  name
-}: DurationProps) => {
+const DurationInput = ({ value, label, deidentified = false, disabled = false, onChange }: DurationProps) => {
   const [duration, setDuration] = useState(value)
 
   useEffect(() => {
+    if (duration.year === 0 && duration.month === 0 && duration.day === 0) {
+      setDuration({ ...duration, year: null, month: null, day: null })
+    }
     onChange(duration)
   }, [duration])
 
@@ -41,15 +34,7 @@ const DurationInput = ({
             <TextFieldWrapper
               activated={!disabled && !!duration.year}
               disabled={disabled}
-              placeholder={
-                placeholderType === 'encounter' && name === 'max'
-                  ? '0'
-                  : duration.year
-                  ? undefined
-                  : name === 'max'
-                  ? '130'
-                  : '0'
-              }
+              placeholder={'0'}
               value={duration.year}
               variant="standard"
               type={disabled ? 'text' : 'number'}
@@ -63,7 +48,7 @@ const DurationInput = ({
                 if (!isNaN(+e.target.value) && +e.target.value <= 130) {
                   setDuration({
                     ...duration,
-                    year: e.target.value !== '' ? Math.floor(Math.abs(+e.target.value)) : null
+                    year: e.target.value !== '' ? Math.floor(Math.abs(+e.target.value)) : 0
                   })
                 }
               }}
@@ -94,7 +79,7 @@ const DurationInput = ({
                 if (!isNaN(+e.target.value) && +e.target.value <= 12) {
                   setDuration({
                     ...duration,
-                    month: e.target.value !== '' ? Math.floor(Math.abs(+e.target.value)) : null
+                    month: e.target.value !== '' ? Math.floor(Math.abs(+e.target.value)) : 0
                   })
                 }
               }}
@@ -126,7 +111,7 @@ const DurationInput = ({
                   if (!isNaN(+e.target.value) && +e.target.value <= 31) {
                     setDuration({
                       ...duration,
-                      day: e.target.value !== '' ? Math.floor(Math.abs(+e.target.value)) : null
+                      day: e.target.value !== '' ? Math.floor(Math.abs(+e.target.value)) : 0
                     })
                   }
                 }}

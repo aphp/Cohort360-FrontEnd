@@ -114,10 +114,8 @@ export const buildDurationFilter = (
   comparator: 'le' | 'ge',
   deidentified?: boolean
 ) => {
-  const convertedRange = convertDurationToTimestamp(
-    convertStringToDuration(age) || { year: comparator === 'ge' ? 0 : 130, month: 0, day: 0 },
-    deidentified
-  )
+  const convertedRange = convertDurationToTimestamp(convertStringToDuration(age), deidentified)
+  if (convertedRange === null) return ''
   return `${fhirKey}=${comparator}${convertedRange}`
 }
 

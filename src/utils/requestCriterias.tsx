@@ -153,7 +153,11 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
         labels.push(
           getLabelFromCriteriaObject(criteriaState, selectedCriteria.vitalStatus, CriteriaDataKey.VITALSTATUS, type)
         )
-      if (selectedCriteria.birthdates[0] === null && selectedCriteria.birthdates[1] === null)
+      if (
+        selectedCriteria.birthdates[0] === null &&
+        selectedCriteria.birthdates[1] === null &&
+        (selectedCriteria.age[0] !== null || selectedCriteria.age[1] !== null)
+      )
         labels.push(getDurationRangeLabel(selectedCriteria.age, 'Âge'))
       if (selectedCriteria.birthdates[0] || selectedCriteria.birthdates[1])
         labels.push(getDatesLabel(selectedCriteria.birthdates, 'Naissance'))

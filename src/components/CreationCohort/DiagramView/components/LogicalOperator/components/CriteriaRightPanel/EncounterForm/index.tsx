@@ -247,9 +247,6 @@ const EncounterForm = ({
             <FormLabel component="legend" className={classes.durationLegend}>
               <BlockWrapper container justifyItems="center">
                 Âge au moment de la prise en charge
-                <Tooltip title="La valeur par défaut sera prise en compte si le sélecteur d'âge n'a pas été modifié.">
-                  <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-                </Tooltip>
               </BlockWrapper>
             </FormLabel>
 
@@ -258,7 +255,6 @@ const EncounterForm = ({
               onChange={(value) => setAge(value)}
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
               deidentified={deidentified}
-              placeholderType="encounter"
             />
           </BlockWrapper>
 
@@ -271,7 +267,6 @@ const EncounterForm = ({
               unit={'Durée'}
               onChange={(value) => setDuration(value)}
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
-              placeholderType="encounter"
             />
           </BlockWrapper>
 
