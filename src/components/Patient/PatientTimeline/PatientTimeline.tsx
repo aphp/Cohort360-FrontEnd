@@ -30,6 +30,8 @@ import useStyles from './styles'
 import { Condition, DocumentReference, Encounter, Period, Procedure } from 'fhir/r4'
 import { FilterKeys, LabelObject } from 'types/searchCriterias'
 import { Hierarchy } from 'types/hierarchy'
+import { getExtension } from 'utils/fhir'
+import { CONDITION_STATUS, ORBIS_STATUS_EXTENSION_NAME } from 'constants.js'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -105,20 +107,15 @@ const generateTimelineFormattedData = (
       }
       data[yearStr][monthStr].pmsi.push({ ...dataItem, data: item })
     })
-
   diagnostics = diagnostics?.filter((item) =>
     selectedTypes && selectedTypes.length > 0
-      ? selectedTypes.find(
+      ? !!selectedTypes.find(
           (selectedType) =>
             selectedType.id ===
-            item.extension
-              ?.find((elem) =>
-                elem.url.includes('https://terminology.eds.aphp.fr/fhir/profile/condition/extension/orbis-status')
-              )
-              ?.valueCodeableConcept?.coding?.find((elem) =>
-                elem?.system?.includes('https://terminology.eds.aphp.fr/aphp-orbis-condition-status')
-              )?.code
-        ) !== undefined
+            getExtension(item, ORBIS_STATUS_EXTENSION_NAME)?.valueCodeableConcept?.coding?.find(
+              (elem) => elem?.system === CONDITION_STATUS
+            )?.code
+        )
       : true
   )
   diagnostics = diagnostics?.filter((item) => item.code?.coding?.[0].display !== 'No matching concept')

@@ -8,6 +8,7 @@ import apiFhir from 'services/apiFhir'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import { FHIR_Bundle_Response, ValueSet } from 'types'
 import { ConceptMap } from 'fhir/r4'
+import { getExtension } from 'utils/fhir'
 
 export type ValueSetWithHierarchy = ValueSet & { hierarchyDisplay: string }
 
@@ -54,9 +55,10 @@ const getSourceData = (codeSystem: string, data?: ConceptMap[]): Array<ValueSetW
           ({
             code: element.group?.[0].element?.[0].target?.[0].code,
             display: element.group?.[0].element?.[0].target?.[0].display,
-            hierarchyDisplay: element.extension
-              ?.find((e) => e.url === CONCEPT_MAP_HIERARCHY_EXTENSION_NAME)
-              ?.valueString?.replaceAll(/\d+-|\w\d+-/g, '')
+            hierarchyDisplay: getExtension(element, CONCEPT_MAP_HIERARCHY_EXTENSION_NAME)?.valueString?.replaceAll(
+              /\d+-|\w\d+-/g,
+              ''
+            )
           } as ValueSetWithHierarchy)
       )
       .filter((el) => !!el) ?? []

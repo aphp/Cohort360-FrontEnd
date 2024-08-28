@@ -65,6 +65,7 @@ import {
 } from '../../mappers/filters'
 import { ResourceType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
+import { getExtension } from 'utils/fhir'
 
 const paramValuesReducer = (accumulator: string, currentValue: string): string =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -1140,8 +1141,7 @@ export const fetchSingleCodeHierarchy = async (codeSystem: string, code: string)
     return []
   }
   return (
-    codeList[0].extension
-      ?.find((e) => e.url === CODE_HIERARCHY_EXTENSION_NAME)
+    getExtension(codeList[0], CODE_HIERARCHY_EXTENSION_NAME)
       ?.valueCodeableConcept?.coding?.map((c) => c.code || '')
       .filter((c) => !!c) || []
   )

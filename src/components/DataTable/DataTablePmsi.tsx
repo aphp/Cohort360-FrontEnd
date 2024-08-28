@@ -11,6 +11,8 @@ import useStyles from './styles'
 import { Claim, Condition, Procedure } from 'fhir/r4'
 import { Order, OrderBy } from 'types/searchCriterias'
 import { ResourceType } from 'types/requestCriterias'
+import { getExtension } from 'utils/fhir'
+import { ORBIS_STATUS_EXTENSION_NAME } from 'constants.js'
 
 type DataTablePmsiProps = {
   loading: boolean
@@ -105,7 +107,8 @@ const DataTablePmsiLine: React.FC<{
 
   const source = pmsi.meta?.source ?? 'Non renseigné'
 
-  const type = pmsi.extension ? pmsi.extension[0].valueCodeableConcept?.coding?.[0].code?.toUpperCase() : '-'
+  const type =
+    getExtension(pmsi, ORBIS_STATUS_EXTENSION_NAME)?.valueCodeableConcept?.coding?.[0].code?.toUpperCase() || '-'
   const serviceProvider = pmsi.serviceProvider ?? 'Non renseigné'
 
   return (

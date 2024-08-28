@@ -2,6 +2,7 @@ import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteR
 import { getStringMonth, getStringMonthAphp } from './formatDate'
 import { Encounter, Extension, Patient } from 'fhir/r4'
 import { GenderStatus, VitalStatusLabel } from 'types/searchCriterias'
+import { getExtension } from './fhir'
 
 function getRandomColor(): string {
   const letters = '0123456789ABCDEF'
@@ -67,13 +68,9 @@ export const getGenderRepartitionMapAphp = (facet?: Extension[]): GenderRepartit
   }
 
   facet?.forEach((extension) => {
-    const isDeceased = extension.extension?.filter((extension) => {
-      return extension.url === 'true' || extension.url === 'false'
-    })[0].url
+    const isDeceased = getExtension(extension, 'true', 'false')?.url
 
-    const genderData = extension.extension?.filter((extension) => {
-      return extension.url === 'gender.display'
-    })[0].extension
+    const genderData = getExtension(extension, 'gender.display')?.extension
 
     if (isDeceased === 'true') {
       genderData?.forEach((gender) => {
@@ -180,13 +177,9 @@ export const getAgeRepartitionMapAphp = (facet?: Extension[]): AgeRepartitionTyp
   const repartitionMap: AgeRepartitionMap[] = []
 
   facet?.forEach((extension) => {
-    const ageObj = extension.extension?.filter((object) => {
-      return object.url !== 'gender.display'
-    })?.[0].url
+    const ageObj = getExtension(extension, 'gender.display')?.url
 
-    const genderValuesObj = extension.extension?.filter((object) => {
-      return object.url === 'gender.display'
-    })?.[0]
+    const genderValuesObj = getExtension(extension, 'gender.display')
 
     if (ageObj) {
       const age: number = parseInt(ageObj, 10) / 12
