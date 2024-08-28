@@ -41,20 +41,32 @@ export const getAge = (patient: CohortPatient): string => {
 }
 
 export const getDurationRangeLabel = (dates: DurationRangeType, keyword: string) => {
-  const minDate: DurationType = convertStringToDuration(dates[0]) ?? { year: 0, month: 0, day: 0 }
-  const maxDate: DurationType = convertStringToDuration(dates[1]) ?? { year: 130, month: 0, day: 0 }
-  return `${keyword} entre
-    ${
-      minDate.year || minDate.month || minDate.day
-        ? `${(minDate.year ?? 0) > 0 ? `${minDate.year} an(s) ` : ``}
+  const minDate: DurationType = convertStringToDuration(dates[0]) || { year: 0, month: 0, day: 0 }
+  const maxDate: DurationType = convertStringToDuration(dates[1]) || { year: 0, month: 0, day: 0 }
+
+  if (dates[0] && dates[1]) {
+    return `${keyword} entre
+    ${`${(minDate.year ?? 0) > 0 ? `${minDate.year} an(s) ` : ``}
           ${(minDate.month ?? 0) > 0 ? `${minDate.month} mois ` : ``}
-          ${(minDate.day ?? 0) > 0 ? `${minDate.day} jour(s) ` : ``}`
-        : 0
-    }
+          ${(minDate.day ?? 0) > 0 ? `${minDate.day} jour(s) ` : ``}`}
   et
     ${(maxDate.year ?? 0) > 0 ? `${maxDate.year} an(s) ` : ``}
     ${(maxDate.month ?? 0) > 0 ? `${maxDate.month} mois ` : ``}
     ${(maxDate.day ?? 0) > 0 ? `${maxDate.day} jour(s) ` : ``}`
+  }
+  if (dates[0] && !dates[1]) {
+    return `${keyword} à partir de
+    ${`${(minDate.year ?? 0) > 0 ? `${minDate.year} an(s) ` : ``}
+          ${(minDate.month ?? 0) > 0 ? `${minDate.month} mois ` : ``}
+          ${(minDate.day ?? 0) > 0 ? `${minDate.day} jour(s) ` : ``}`}`
+  }
+  if (!dates[0] && dates[1]) {
+    return `${keyword} au maximum de
+      ${(maxDate.year ?? 0) > 0 ? `${maxDate.year} an(s) ` : ``}
+      ${(maxDate.month ?? 0) > 0 ? `${maxDate.month} mois ` : ``}
+      ${(maxDate.day ?? 0) > 0 ? `${maxDate.day} jour(s) ` : ``}`
+  }
+  return ''
 }
 
 export const substructDurationType = (ageDate: DurationType): Date => {
@@ -106,8 +118,8 @@ export const checkMinMaxValue = (min: DurationType, max: DurationType) => {
   return true
 }
 
-export const convertDurationToTimestamp = (duration: DurationType | null, deidentified?: boolean): number => {
-  if (!duration) return 0
+export const convertDurationToTimestamp = (duration: DurationType | null, deidentified?: boolean): number | null => {
+  if (!duration) return null
   const year = duration.year ?? 0
   const month = duration.month ?? 0
   const day = duration.day ?? 0
