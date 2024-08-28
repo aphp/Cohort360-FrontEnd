@@ -246,7 +246,6 @@ const EncounterForm = ({
               onChange={(value) => setAge(value)}
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
               deidentified={deidentified}
-              placeholderType="encounter"
             />
           </BlockWrapper>
 
@@ -257,7 +256,6 @@ const EncounterForm = ({
               unit={'Durée'}
               onChange={(value) => setDuration(value)}
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
-              placeholderType="encounter"
             />
           </BlockWrapper>
 
