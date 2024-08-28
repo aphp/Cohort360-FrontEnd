@@ -237,7 +237,7 @@ const EncounterForm = ({
 
           <BlockWrapper className={classes.inputItem}>
             <CriteriaLabel
-              label="Âge au moment de la prise en charge"
+              label="Âge au début de la prise en charge"
               infoIcon="La valeur par défaut sera prise en compte si le sélecteur d'âge n'a pas été modifié."
             />
 

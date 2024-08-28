@@ -302,9 +302,6 @@ const buildEncounterFilter = (criterion: EncounterDataType, deidentified: boolea
   const isMinBirthdateDeidentified = deidentified
     ? EncounterParamsKeys.MIN_BIRTHDATE_MONTH
     : EncounterParamsKeys.MIN_BIRTHDATE_DAY
-  const isMaxBirthdateDeidentified = deidentified
-    ? EncounterParamsKeys.MAX_BIRTHDATE_MONTH
-    : EncounterParamsKeys.MAX_BIRTHDATE_DAY
   return [
     'subject.active=true',
     filtersBuilders(EncounterParamsKeys.ADMISSIONMODE, buildLabelObjectFilter(criterion.admissionMode)),
@@ -328,7 +325,7 @@ const buildEncounterFilter = (criterion: EncounterDataType, deidentified: boolea
       ? buildDurationFilter(criterion?.age[0], isMinBirthdateDeidentified, 'ge', deidentified)
       : '',
     criterion.age[1] !== null
-      ? buildDurationFilter(criterion?.age[1], isMaxBirthdateDeidentified, 'le', deidentified)
+      ? buildDurationFilter(criterion?.age[1], isMinBirthdateDeidentified, 'le', deidentified)
       : '',
     buildEncounterDateFilter(
       criterion.type,
@@ -981,16 +978,18 @@ const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise
       }
     },
     [EncounterParamsKeys.MIN_BIRTHDATE_DAY]: (c, v) => {
-      c.age[0] = v ? unbuildDurationFilter(v, false) : null
+      if (v?.includes('ge')) {
+        c.age[0] = unbuildDurationFilter(v)
+      } else if (v?.includes('le')) {
+        c.age[1] = unbuildDurationFilter(v)
+      }
     },
     [EncounterParamsKeys.MIN_BIRTHDATE_MONTH]: (c, v) => {
-      c.age[0] = v ? unbuildDurationFilter(v, true) : null
-    },
-    [EncounterParamsKeys.MAX_BIRTHDATE_DAY]: (c, v) => {
-      c.age[1] = v ? unbuildDurationFilter(v, false) : null
-    },
-    [EncounterParamsKeys.MAX_BIRTHDATE_MONTH]: (c, v) => {
-      c.age[1] = v ? unbuildDurationFilter(v, true) : null
+      if (v?.includes('ge')) {
+        c.age[0] = unbuildDurationFilter(v, true)
+      } else if (v?.includes('le')) {
+        c.age[1] = unbuildDurationFilter(v, true)
+      }
     },
     [EncounterParamsKeys.ENTRYMODE]: (c, v) => {
       unbuildLabelObjectFilter(c, 'entryMode', v)
