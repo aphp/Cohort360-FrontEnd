@@ -304,8 +304,6 @@ export const onUpdateConfig = (hook: (newConfig: AppConfig) => void) => {
 export const initConfig = async (root: Root, app: () => ReactNode) => {
   const initApp = (fetchedConfig: AppConfig) => {
     config = R.mergeDeepRight(config, fetchedConfig)
-    console.log(fetchedConfig)
-    console.log(config)
     updateHooks.forEach((hook) => hook(config))
     root.render(<AppConfig.Provider value={config}>{app()}</AppConfig.Provider>)
   }

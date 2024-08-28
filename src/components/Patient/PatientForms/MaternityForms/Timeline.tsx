@@ -36,7 +36,6 @@ const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses, ma
   const render = () => {
     return (
       <>
-        {console.log('manelle tait toi')}
         {questionnaireResponses.length === 0 ? (
           <Grid container justifyContent="center">
             <Typography variant="button">Aucun formulaire à afficher</Typography>

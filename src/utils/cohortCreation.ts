@@ -269,7 +269,7 @@ export const cleanNominativeCriterias = (
   }
 }
 
-const buildPatientFilter = (criterion: DemographicDataType, deidentified: boolean): string[] => {
+export const buildPatientFilter = (criterion: DemographicDataType, deidentified: boolean): string[] => {
   const isDeidentified = deidentified ? PatientsParamsKeys.DATE_DEIDENTIFIED : PatientsParamsKeys.DATE_IDENTIFIED
   return [
     'active=true',
@@ -288,7 +288,7 @@ const buildPatientFilter = (criterion: DemographicDataType, deidentified: boolea
   ]
 }
 
-const buildEncounterFilter = (criterion: EncounterDataType, deidentified: boolean): string[] => {
+export const buildEncounterFilter = (criterion: EncounterDataType, deidentified: boolean): string[] => {
   const isMinBirthdateDeidentified = deidentified
     ? EncounterParamsKeys.MIN_BIRTHDATE_MONTH
     : EncounterParamsKeys.MIN_BIRTHDATE_DAY
@@ -327,7 +327,7 @@ const buildEncounterFilter = (criterion: EncounterDataType, deidentified: boolea
   ]
 }
 
-const buildDocumentFilter = (criterion: DocumentDataType): string[] => {
+export const buildDocumentFilter = (criterion: DocumentDataType): string[] => {
   const docStatusCodeSystem = getConfig().core.codeSystems.docStatus
   const joinDocStatuses = (docStatuses: string[]): string => {
     const filterDocStatuses: string[] = []
@@ -370,7 +370,7 @@ const buildDocumentFilter = (criterion: DocumentDataType): string[] => {
   ]
 }
 
-const buildConditionFilter = (criterion: Cim10DataType): string[] => {
+export const buildConditionFilter = (criterion: Cim10DataType): string[] => {
   return [
     'subject.active=true',
     filtersBuilders(
@@ -393,7 +393,7 @@ const buildConditionFilter = (criterion: Cim10DataType): string[] => {
   ]
 }
 
-const buildProcedureFilter = (criterion: CcamDataType): string[] => {
+export const buildProcedureFilter = (criterion: CcamDataType): string[] => {
   return [
     'subject.active=true',
     filtersBuilders(
@@ -415,7 +415,7 @@ const buildProcedureFilter = (criterion: CcamDataType): string[] => {
   ]
 }
 
-const buildClaimFilter = (criterion: GhmDataType): string[] => {
+export const buildClaimFilter = (criterion: GhmDataType): string[] => {
   return [
     'patient.active=true',
     filtersBuilders(
@@ -436,7 +436,7 @@ const buildClaimFilter = (criterion: GhmDataType): string[] => {
   ]
 }
 
-const buildMedicationFilter = (criterion: MedicationDataType): string[] => {
+export const buildMedicationFilter = (criterion: MedicationDataType): string[] => {
   return [
     'subject.active=true',
     filtersBuilders(
@@ -484,7 +484,7 @@ const buildMedicationFilter = (criterion: MedicationDataType): string[] => {
   ]
 }
 
-const buildObservationFilter = (criterion: ObservationDataType): string[] => {
+export const buildObservationFilter = (criterion: ObservationDataType): string[] => {
   return [
     `subject.active=true&${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`,
     filtersBuilders(
@@ -506,7 +506,7 @@ const buildObservationFilter = (criterion: ObservationDataType): string[] => {
   ]
 }
 
-const buildImagingFilter = (criterion: ImagingDataType): string[] => {
+export const buildImagingFilter = (criterion: ImagingDataType): string[] => {
   return [
     'patient.active=true',
     filtersBuilders(ImagingParamsKeys.DATE, buildDateFilter(criterion.studyStartDate, 'ge')),
@@ -546,7 +546,7 @@ const buildImagingFilter = (criterion: ImagingDataType): string[] => {
   ]
 }
 
-const buildPregnancyFilter = (criterion: PregnancyDataType): string[] => {
+export const buildPregnancyFilter = (criterion: PregnancyDataType): string[] => {
   return [
     'subject.active=true',
     `questionnaire.name=${FormNames.PREGNANCY}`,
@@ -606,7 +606,7 @@ const buildPregnancyFilter = (criterion: PregnancyDataType): string[] => {
   ]
 }
 
-const buildHospitFilter = (criterion: HospitDataType): string[] => {
+export const buildHospitFilter = (criterion: HospitDataType): string[] => {
   return [
     'subject.active=true',
     `questionnaire.name=${FormNames.HOSPIT}`,
