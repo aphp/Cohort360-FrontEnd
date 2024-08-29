@@ -224,15 +224,15 @@ const ControlPanel: React.FC<{
   useEffect(() => {
     const listener = (message: WebSocketMessage) => {
       let response = {}
-      if (message.status !== WebSocketJobStatus.pending) {
+      if (message.status !== WebSocketJobStatus.pending && message.uuid === count.uuid) {
         setCountLoading(LoadingStatus.SUCCESS)
         response = {
           includePatient: message.extra_info?.measure,
           status: message.status,
           jobFailMsg: message.extra_info?.request_job_fail_msg
         }
+        dispatch(updateCount(response))
       }
-      dispatch(updateCount(response))
     }
 
     webSocketContext?.addListener(listener)
