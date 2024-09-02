@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import L, { LatLngBounds, LatLngTuple } from 'leaflet'
 // https://github.com/PaulLeCam/react-leaflet/issues/1077
 //@ts-ignore
@@ -23,6 +23,7 @@ import { CircularProgress, Slider, Typography } from '@mui/material'
 import CircularProgressWithLabel from 'components/ui/CircularProgressWithLabel'
 import useMultipartDataLoading from './useMultipartDataLoading'
 import { getExtension } from 'utils/fhir'
+import { AppConfig } from 'config'
 
 const DEBUG_SHOW_LOADED_BOUNDS = false
 const SHOW_OPACITY_CONTROL = false
@@ -35,8 +36,6 @@ const MIN_ZOOM = 7
 const DEFAULT_MAP_CENTER: LatLngTuple = [48.8575, 2.3514]
 const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 const MAP_COPYRIGHTS = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-const LOCATION_SHAPE_EXTENSION_URL = 'https://terminology.eds.aphp.fr/fhir/profile/location/extension/position'
-const LOCATION_COUNT_EXTENSION_URL = 'https://terminology.eds.aphp.fr/fhir/profile/location/extension/count'
 const COLOR_PALETTE = [
   '#fad370',
   '#fac55c',
@@ -63,6 +62,7 @@ type IrisZonesProps = {
 
 const IrisZones = (props: IrisZonesProps) => {
   const { cohortId } = props
+  const appConfig = useContext(AppConfig)
   const { dataLoading, dataLoadingProgress, updateLoadingProgress, setDataLoading } = useMultipartDataLoading()
   const [zones, setZones] = useState<{ [id: string]: ZoneInfo }>({})
   const [visibleZones, setVisibleZones] = useState<Array<ZoneInfo>>([])
@@ -149,9 +149,13 @@ const IrisZones = (props: IrisZonesProps) => {
                 (acc, ft) => {
                   if (ft.id && !Object.prototype.hasOwnProperty.call(acc, ft.id)) {
                     acc[ft.id] = {
-                      shape: parseShape(getExtension(ft, LOCATION_SHAPE_EXTENSION_URL)?.valueString) || [],
+                      shape:
+                        parseShape(
+                          getExtension(ft, appConfig.features.locationMap.extensions.locationShapeUrl)?.valueString
+                        ) || [],
                       meta: {
-                        count: getExtension(ft, LOCATION_COUNT_EXTENSION_URL)?.valueInteger || 0,
+                        count:
+                          getExtension(ft, appConfig.features.locationMap.extensions.locationCount)?.valueInteger || 0,
                         name: ft.name || '',
                         id: ft.id || ''
                       }
@@ -183,7 +187,16 @@ const IrisZones = (props: IrisZonesProps) => {
     return () => {
       cancelPendingRequest(abortController)
     }
-  }, [cohortId, bounds, updateLoadingProgress, setDataLoading, map, loadedBounds])
+  }, [
+    cohortId,
+    bounds,
+    updateLoadingProgress,
+    setDataLoading,
+    map,
+    loadedBounds,
+    appConfig.features.locationMap.extensions.locationShapeUrl,
+    appConfig.features.locationMap.extensions.locationCount
+  ])
 
   // Update visible zones (and max visible count) when zones or bounds change
   useEffect(() => {

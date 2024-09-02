@@ -98,6 +98,10 @@ type AppConfig = {
     }
     locationMap: {
       enabled: boolean
+      extensions: {
+        locationShapeUrl?: string
+        locationCount?: string
+      }
     }
     feasabilityReport: {
       enabled: boolean
@@ -262,7 +266,11 @@ let config: AppConfig = {
       }
     },
     locationMap: {
-      enabled: false
+      enabled: false,
+      extensions: {
+        locationShapeUrl: 'https://terminology.eds.aphp.fr/fhir/profile/location/extension/position',
+        locationCount: 'https://terminology.eds.aphp.fr/fhir/profile/location/extension/count'
+      }
     },
     feasabilityReport: {
       enabled: false
