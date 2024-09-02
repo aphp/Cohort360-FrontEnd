@@ -1,0 +1,313 @@
+import React, { createContext, ReactNode } from 'react'
+import { Root } from 'react-dom/client'
+import * as R from 'ramda'
+import { CONFIG_URL } from 'constants.js'
+
+type ValueSetConfig = {
+  url: string
+}
+
+type AppConfig = {
+  labels: {
+    exploration: string
+  }
+  features: {
+    cohort: {
+      enabled: boolean
+      shortCohortLimit: number
+    }
+    export: {
+      enabled: boolean
+      exportLinesLimit: number
+    }
+    observation: {
+      enabled: boolean
+      valueSets: {
+        biologyHierarchyAnabio: ValueSetConfig
+        biologyHierarchyLoinc: ValueSetConfig
+      }
+    }
+    medication: {
+      enabled: boolean
+      valueSets: {
+        medicationAdministrations: ValueSetConfig
+        medicationAtc: ValueSetConfig
+        medicationAtcOrbis: ValueSetConfig
+        medicationPrescriptionTypes: ValueSetConfig
+        medicationUcd: ValueSetConfig
+      }
+    }
+    condition: {
+      enabled: boolean
+      valueSets: {
+        conditionHierarchy: ValueSetConfig
+        conditionStatus: ValueSetConfig
+      }
+      extensions: {
+        orbisStatus?: string
+      }
+    }
+    procedure: {
+      enabled: boolean
+      valueSets: {
+        procedureHierarchy: ValueSetConfig
+      }
+    }
+    claim: {
+      enabled: boolean
+      valueSets: {
+        claimHierarchy: ValueSetConfig
+      }
+    }
+    imaging: {
+      enabled: boolean
+      valueSets: {
+        imagingModalities: ValueSetConfig
+      }
+      extensions: {
+        imagingStudyUidUrl: string
+        seriesProtocolUrl?: string
+      }
+    }
+    questionnaires: {
+      enabled: boolean
+      valueSets: {
+        analgesieType: ValueSetConfig
+        birthDeliveryWay: ValueSetConfig
+        cSectionModality: ValueSetConfig
+        childBirthMode: ValueSetConfig
+        chirurgicalGesture: ValueSetConfig
+        conditionPerineum: ValueSetConfig
+        exitDiagnostic: ValueSetConfig
+        exitFeedingMode: ValueSetConfig
+        exitPlaceType: ValueSetConfig
+        feedingType: ValueSetConfig
+        imgIndication: ValueSetConfig
+        instrumentType: ValueSetConfig
+        laborOrCesareanEntry: ValueSetConfig
+        maternalRisks: ValueSetConfig
+        maturationModality: ValueSetConfig
+        maturationReason: ValueSetConfig
+        obstetricalGestureDuringLabor: ValueSetConfig
+        pathologyDuringLabor: ValueSetConfig
+        pregnancyMode: ValueSetConfig
+        presentationAtDelivery: ValueSetConfig
+        risksOrComplicationsOfPregnancy: ValueSetConfig
+        risksRelatedToObstetricHistory: ValueSetConfig
+      }
+    }
+    locationMap: {
+      enabled: boolean
+    }
+    feasabilityReport: {
+      enabled: boolean
+    }
+    contact: {
+      enabled: boolean
+    }
+  }
+  core: {
+    perimeterSourceTypeHierarchy: string[]
+    codeSystems: {
+      docStatus: string
+    }
+    valueSets: {
+      demographicGender: ValueSetConfig
+      encounterAdmission: ValueSetConfig
+      encounterAdmissionMode: ValueSetConfig
+      encounterDestination: ValueSetConfig
+      encounterEntryMode: ValueSetConfig
+      encounterExitMode: ValueSetConfig
+      encounterExitType: ValueSetConfig
+      encounterFileStatus: ValueSetConfig
+      encounterProvenance: ValueSetConfig
+      encounterSejourType: ValueSetConfig
+      encounterStatus: ValueSetConfig
+      encounterVisitType: ValueSetConfig
+    }
+    extensions: {
+      codeHierarchy?: string
+      conceptMapHierarchy?: string
+      patientLastEnconterUrl?: string
+      patientTotalAgeDaysExtensionUrl?: string
+      patientTotalAgeMonthsExtensionUrl?: string
+    }
+  }
+  system: {
+    wsProtocol: string
+    fhirUrl: string
+    backendUrl: string
+    oidc?: {
+      issuer: string
+      redirectUri: string
+      scope: string
+      clientId: string
+      responseType: string
+      state: string
+    }
+    codeDisplayJWT: string
+    sessionTimeout: number
+    refreshTokenInterval: number
+    jToolUsers: string[]
+    userTrackingBlacklist: string[]
+    mailSupport?: string
+  }
+}
+
+let config: AppConfig = {
+  labels: {
+    exploration: 'Exploration'
+  },
+  core: {
+    perimeterSourceTypeHierarchy: [],
+    codeSystems: {
+      docStatus: 'http://hl7.org/fhir/CodeSystem/composition-status'
+    },
+    valueSets: {
+      demographicGender: { url: '' },
+      encounterAdmission: { url: '' },
+      encounterAdmissionMode: { url: '' },
+      encounterDestination: { url: '' },
+      encounterEntryMode: { url: '' },
+      encounterExitMode: { url: '' },
+      encounterExitType: { url: '' },
+      encounterFileStatus: { url: '' },
+      encounterProvenance: { url: '' },
+      encounterSejourType: { url: '' },
+      encounterStatus: { url: '' },
+      encounterVisitType: { url: '' }
+    },
+    extensions: {}
+  },
+  features: {
+    cohort: {
+      enabled: true,
+      shortCohortLimit: 2000
+    },
+    export: {
+      enabled: true,
+      exportLinesLimit: 300000
+    },
+    observation: {
+      enabled: true,
+      valueSets: {
+        biologyHierarchyAnabio: { url: '' },
+        biologyHierarchyLoinc: { url: '' }
+      }
+    },
+    medication: {
+      enabled: true,
+      valueSets: {
+        medicationAdministrations: { url: '' },
+        medicationAtc: { url: '' },
+        medicationAtcOrbis: { url: '' },
+        medicationPrescriptionTypes: { url: '' },
+        medicationUcd: { url: '' }
+      }
+    },
+    condition: {
+      enabled: true,
+      valueSets: {
+        conditionHierarchy: { url: '' },
+        conditionStatus: { url: '' }
+      },
+      extensions: {}
+    },
+    procedure: {
+      enabled: true,
+      valueSets: {
+        procedureHierarchy: { url: '' }
+      }
+    },
+    claim: {
+      enabled: true,
+      valueSets: {
+        claimHierarchy: { url: '' }
+      }
+    },
+    imaging: {
+      enabled: true,
+      valueSets: {
+        imagingModalities: { url: '' }
+      },
+      extensions: {
+        imagingStudyUidUrl: ''
+      }
+    },
+    questionnaires: {
+      enabled: false,
+      valueSets: {
+        analgesieType: { url: '' },
+        birthDeliveryWay: { url: '' },
+        cSectionModality: { url: '' },
+        childBirthMode: { url: '' },
+        chirurgicalGesture: { url: '' },
+        conditionPerineum: { url: '' },
+        exitDiagnostic: { url: '' },
+        exitFeedingMode: { url: '' },
+        exitPlaceType: { url: '' },
+        feedingType: { url: '' },
+        imgIndication: { url: '' },
+        instrumentType: { url: '' },
+        laborOrCesareanEntry: { url: '' },
+        maternalRisks: { url: '' },
+        maturationModality: { url: '' },
+        maturationReason: { url: '' },
+        obstetricalGestureDuringLabor: { url: '' },
+        pathologyDuringLabor: { url: '' },
+        pregnancyMode: { url: '' },
+        presentationAtDelivery: { url: '' },
+        risksOrComplicationsOfPregnancy: { url: '' },
+        risksRelatedToObstetricHistory: { url: '' }
+      }
+    },
+    locationMap: {
+      enabled: false
+    },
+    feasabilityReport: {
+      enabled: false
+    },
+    contact: {
+      enabled: false
+    }
+  },
+  system: {
+    wsProtocol: 'ws://',
+    backendUrl: '/api/back',
+    fhirUrl: '/api/fhir',
+    sessionTimeout: 780000,
+    refreshTokenInterval: 180000,
+    codeDisplayJWT: 'ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,b,a,Enter',
+    jToolUsers: [],
+    userTrackingBlacklist: []
+  }
+}
+
+export const getConfig = (): Readonly<AppConfig> => {
+  return { ...config }
+}
+export const AppConfig = createContext<AppConfig>(config)
+
+const updateHooks: Array<(appConfig: AppConfig) => void> = []
+export const onUpdateConfig = (hook: (newConfig: AppConfig) => void) => {
+  updateHooks.push(hook)
+}
+
+export const initConfig = async (root: Root, app: () => ReactNode) => {
+  const initApp = (fetchedConfig: AppConfig) => {
+    config = R.mergeDeepRight(config, fetchedConfig)
+    console.log(fetchedConfig)
+    console.log(config)
+    updateHooks.forEach((hook) => hook(config))
+    root.render(<AppConfig.Provider value={config}>{app()}</AppConfig.Provider>)
+  }
+  try {
+    const res = await fetch(CONFIG_URL)
+    // can potentially fetch other config files and merge them here
+    // TODO check type of res.data : eg. https://stackoverflow.com/questions/77848430/axios-typescript-no-error-when-typed-post-returns-different-property-names
+    initApp(await res.json())
+  } catch (e) {
+    console.error('Error while fetching config', e)
+    initApp(config)
+  }
+}

@@ -1,10 +1,10 @@
-import { MEDICATION_ATC, MEDICATION_UCD } from '../constants'
+import { getConfig } from 'config'
 
 export const displaySystem = (system?: string) => {
   switch (system) {
-    case MEDICATION_ATC:
+    case getConfig().features.medication.valueSets.medicationAtc.url:
       return 'ATC: '
-    case MEDICATION_UCD:
+    case getConfig().features.medication.valueSets.medicationUcd.url:
       return 'UCD: '
     default:
       return ''

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { CanceledError } from 'axios'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchImaging } from 'state/patient'
@@ -32,13 +32,14 @@ import List from 'components/ui/List'
 import services from 'services/aphp'
 import { BlockWrapper } from 'components/ui/Layout'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
-import { MAIL_SUPPORT } from '../../../constants'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
+import { AppConfig } from 'config'
 
 const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
 
+  const appConfig = useContext(AppConfig)
   const patient = useAppSelector((state) => state.patient)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
@@ -156,7 +157,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
           actuellement disponibles. Le flux alimentant les métadonnées associées aux séries et aux examens est suspendu
           depuis le 01/02/2023 suite à la migration du PACS AP-HP. Aucun examen produit après cette date n'est
           disponible via Cohort360. Pour tout besoin d'examen post 01/02/2023, merci de contacter le support Cohort360 :{' '}
-          {MAIL_SUPPORT}.
+          {appConfig.system.mailSupport}.
         </AlertWrapper>
       </BlockWrapper>
       <Grid container justifyContent="flex-end" gap="10px">

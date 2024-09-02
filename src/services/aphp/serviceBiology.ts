@@ -1,9 +1,9 @@
-import { BIOLOGY_HIERARCHY_ITM_ANABIO, BIOLOGY_HIERARCHY_ITM_LOINC } from '../../constants'
+import { getConfig } from 'config'
 import { fetchValueSet } from './callApi'
 
 export const fetchAnabioCodes = async (text: string, noStar = false, signal?: AbortSignal) => {
   const response = await fetchValueSet(
-    BIOLOGY_HIERARCHY_ITM_ANABIO,
+    getConfig().features.observation.valueSets.biologyHierarchyLoinc.url,
     { joinDisplayWithCode: false, search: text, noStar: noStar },
     signal
   )
@@ -14,7 +14,7 @@ export const fetchAnabioCodes = async (text: string, noStar = false, signal?: Ab
 
 export const fetchLoincCodes = async (text: string, noStar = false, signal?: AbortSignal) => {
   const response = await fetchValueSet(
-    BIOLOGY_HIERARCHY_ITM_LOINC,
+    getConfig().features.observation.valueSets.biologyHierarchyLoinc.url,
     { joinDisplayWithCode: false, search: text, noStar: noStar },
     signal
   )

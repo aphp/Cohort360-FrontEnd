@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { useIdleTimer } from 'react-idle-timer'
 import { useNavigate } from 'react-router-dom'
 
@@ -8,16 +8,18 @@ import { close as closeAction, open as openAction } from 'state/autoLogout'
 import { useAppDispatch, useAppSelector } from 'state'
 import { logout as logoutAction } from 'state/me'
 
-import { ACCESS_TOKEN, REFRESH_TOKEN, REFRESH_TOKEN_INTERVAL, SESSION_TIMEOUT } from '../../constants'
+import { ACCESS_TOKEN, REFRESH_TOKEN } from '../../constants'
 import apiBackend from 'services/apiBackend'
 
 import useStyles from './styles'
+import { AppConfig } from 'config'
 
 const AutoLogoutContainer = () => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
+  const appConfig = useContext(AppConfig)
   const me = useAppSelector((state) => state.me)
   const isOpen = useAppSelector((state) => state.autoLogout.isOpen)
 
@@ -41,7 +43,7 @@ const AutoLogoutContainer = () => {
   const { reset, pause, start } = useIdleTimer({
     crossTab: true,
     syncTimers: 0,
-    timeout: SESSION_TIMEOUT,
+    timeout: appConfig.system.sessionTimeout,
     promptBeforeIdle: 1 * 60 * 1000,
     throttle: 1 * 60 * 1000,
     onPrompt: handleOnPrompt,
@@ -88,12 +90,12 @@ const AutoLogoutContainer = () => {
     start()
     const interval = setInterval(() => {
       refreshToken()
-    }, REFRESH_TOKEN_INTERVAL)
+    }, appConfig.system.refreshTokenInterval)
     return () => {
       clearInterval(interval)
       pause()
     }
-  }, [me])
+  }, [me, appConfig.system.refreshTokenInterval])
 
   if (!me) return <></>
 

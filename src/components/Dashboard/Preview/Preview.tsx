@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import {
   CircularProgress,
   Grid,
@@ -30,7 +30,7 @@ import displayDigit from 'utils/displayDigit'
 
 import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
 import LocationMap from 'components/Dashboard/Preview/LocationMap'
-import { ODD_MAP } from 'constants.js'
+import { AppConfig } from 'config'
 
 const MAP_WARNING_PERSON_COUNT_THRESHOLD = 1000000
 
@@ -112,7 +112,7 @@ const Preview: React.FC<PreviewProps> = ({
   loading
 }) => {
   const { classes } = useStyles()
-
+  const appConfig = useContext(AppConfig)
   const { vitalStatusData, genderData } = getGenderRepartitionSimpleData(genderRepartitionMap)
 
   return (
@@ -238,7 +238,7 @@ const Preview: React.FC<PreviewProps> = ({
         </Grid>
       </Grid>
 
-      {ODD_MAP && cohortId && (
+      {appConfig.features.locationMap.enabled && cohortId && (
         <Grid container item justifyContent="space-between" alignItems="center">
           <Grid item xs={12} sm={12} md={12} justifyContent="center">
             <Paper id="location-map" className={classes.chartOverlay}>

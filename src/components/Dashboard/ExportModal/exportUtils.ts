@@ -1,10 +1,4 @@
-import {
-  BIOLOGY_HIERARCHY_ITM_ANABIO,
-  BIOLOGY_HIERARCHY_ITM_LOINC,
-  CLAIM_HIERARCHY,
-  CONDITION_HIERARCHY,
-  PROCEDURE_HIERARCHY
-} from '../../../constants'
+import { getConfig } from 'config'
 import { mapRequestParamsToSearchCriteria } from 'mappers/filters'
 import moment from 'moment'
 import {
@@ -101,7 +95,9 @@ const fetchConditionCount = async (cohortId: string, conditionFilters?: SearchCr
       const { diagnosticTypes, code, source, nda, startDate, endDate, executiveUnits, encounterStatus } =
         conditionFilters.filters
 
-      const _code = code.map((e) => encodeURIComponent(`${CONDITION_HIERARCHY}|`) + e.id).join(',')
+      const _code = code
+        .map((e) => encodeURIComponent(`${getConfig().features.condition.valueSets.conditionHierarchy.url}|`) + e.id)
+        .join(',')
 
       conditionResp = await fetchCondition({
         size: 0,
@@ -134,7 +130,9 @@ const fetchProcedureCount = async (cohortId: string, procedureFilters?: SearchCr
     if (procedureFilters && procedureFilters !== null) {
       const { code, source, nda, startDate, endDate, executiveUnits, encounterStatus } = procedureFilters.filters
 
-      const _code = code.map((e) => encodeURIComponent(`${PROCEDURE_HIERARCHY}|`) + e.id).join(',')
+      const _code = code
+        .map((e) => encodeURIComponent(`${getConfig().features.procedure.valueSets.procedureHierarchy.url}|`) + e.id)
+        .join(',')
 
       procedureResp = await fetchProcedure({
         size: 0,
@@ -166,7 +164,9 @@ const fetchClaimCount = async (cohortId: string, claimFilters?: SearchCriterias<
     if (claimFilters && claimFilters !== null) {
       const { code, nda, startDate, endDate, executiveUnits, encounterStatus } = claimFilters.filters
 
-      const _code = code.map((e) => encodeURIComponent(`${CLAIM_HIERARCHY}|`) + e.id).join(',')
+      const _code = code
+        .map((e) => encodeURIComponent(`${getConfig().features.claim.valueSets.claimHierarchy.url}|`) + e.id)
+        .join(',')
 
       claimResp = await fetchClaim({
         size: 0,
@@ -336,8 +336,17 @@ const fetchObservationCount = async (cohortId: string, observationFilters?: Sear
         _list: [cohortId],
         _text: observationFilters.searchInput,
         encounter: nda,
-        loinc: loinc.map((e) => encodeURIComponent(`${BIOLOGY_HIERARCHY_ITM_LOINC}|`) + e.id).join(','),
-        anabio: anabio.map((e) => encodeURIComponent(`${BIOLOGY_HIERARCHY_ITM_ANABIO}|`) + e.id).join(','),
+        loinc: loinc
+          .map(
+            (e) => encodeURIComponent(`${getConfig().features.observation.valueSets.biologyHierarchyLoinc.url}|`) + e.id
+          )
+          .join(','),
+        anabio: anabio
+          .map(
+            (e) =>
+              encodeURIComponent(`${getConfig().features.observation.valueSets.biologyHierarchyAnabio.url}|`) + e.id
+          )
+          .join(','),
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
         rowStatus: validatedStatus,

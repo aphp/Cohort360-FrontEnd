@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import Button from '@mui/material/Button'
@@ -7,9 +7,8 @@ import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
 import WarningIcon from '@mui/icons-material/Report'
 
-import { MAIL_SUPPORT } from '../../constants'
-
 import useStyles from './styles'
+import { AppConfig } from 'config'
 
 type NoRightsProps = {
   oidcCode: string | null
@@ -18,6 +17,8 @@ type NoRightsProps = {
 const NoRights: React.FC<NoRightsProps> = ({ oidcCode }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
+  const appConfig = useContext(AppConfig)
+
   return (
     <Grid
       container
@@ -39,7 +40,8 @@ const NoRights: React.FC<NoRightsProps> = ({ oidcCode }) => {
               l'application.
             </Typography>
             <Typography align="center">
-              S'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante: {MAIL_SUPPORT}.
+              S'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante:{' '}
+              {appConfig.system.mailSupport}.
             </Typography>
             <div style={{ width: '100%', textAlign: 'center' }}>
               <Link

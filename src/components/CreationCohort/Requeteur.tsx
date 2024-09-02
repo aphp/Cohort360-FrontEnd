@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react'
+import React, { useCallback, useEffect, useState, useRef, useContext } from 'react'
 import { CircularProgress } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -21,7 +21,7 @@ import { getDataFromFetch, cleanNominativeCriterias } from 'utils/cohortCreation
 import useStyles from './styles'
 import services from 'services/aphp'
 import { setCriteriaData } from 'state/criteria'
-import { ODD_QUESTIONNAIRE } from '../../constants'
+import { AppConfig } from 'config'
 
 const Requeteur = () => {
   const {
@@ -38,7 +38,7 @@ const Requeteur = () => {
     allowSearchIpp = false
   } = useAppSelector((state) => state.cohortCreation.request || {})
   const criteriaData = useAppSelector((state) => state.cohortCreation.criteria || {})
-
+  const config = useContext(AppConfig)
   const params = useParams<{
     requestId: string
     snapshotId: string
@@ -81,10 +81,10 @@ const Requeteur = () => {
       setCriteriaLoading((criteriaLoading) => criteriaLoading + 1)
     }
     try {
-      const criteriaCache = await getDataFromFetch(criteriaList, selectedCriteria, criteriaData.cache)
+      const criteriaCache = await getDataFromFetch(criteriaList(), selectedCriteria, criteriaData.cache)
 
       const allowMaternityForms = selectedPopulation?.every((population) => population?.access === 'Nominatif')
-
+      const questionnairesEnabled = config.features.questionnaires.enabled
       dispatch(
         setCriteriaData({
           config: {
@@ -93,12 +93,12 @@ const Requeteur = () => {
               disabled: !allowSearchIpp
             },
             Pregnancy: {
-              color: allowMaternityForms && ODD_QUESTIONNAIRE ? '#0063AF' : '#808080',
-              disabled: !allowMaternityForms || !ODD_QUESTIONNAIRE
+              color: allowMaternityForms && questionnairesEnabled ? '#0063AF' : '#808080',
+              disabled: !allowMaternityForms || !questionnairesEnabled
             },
             Hospit: {
-              color: allowMaternityForms && ODD_QUESTIONNAIRE ? '#0063AF' : '#808080',
-              disabled: !allowMaternityForms || !ODD_QUESTIONNAIRE
+              color: allowMaternityForms && questionnairesEnabled ? '#0063AF' : '#808080',
+              disabled: !allowMaternityForms || !questionnairesEnabled
             }
           },
           cache: criteriaCache

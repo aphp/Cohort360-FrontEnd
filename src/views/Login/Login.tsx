@@ -1,4 +1,11 @@
-import React, { KeyboardEvent as ReactKeyboardEvent, SyntheticEvent, UIEvent, useEffect, useState } from 'react'
+import React, {
+  KeyboardEvent as ReactKeyboardEvent,
+  SyntheticEvent,
+  UIEvent,
+  useContext,
+  useEffect,
+  useState
+} from 'react'
 import { useNavigate } from 'react-router-dom'
 import localforage from 'localforage'
 import {
@@ -25,28 +32,17 @@ import Keycloak from 'assets/icones/keycloak.svg?react'
 
 import { useAppDispatch } from 'state'
 import { MeState, login as loginAction } from 'state/me'
-import {
-  ACCESS_TOKEN,
-  REFRESH_TOKEN,
-  OIDC_CLIENT_ID,
-  OIDC_PROVIDER_URL,
-  OIDC_REDIRECT_URI,
-  OIDC_RESPONSE_TYPE,
-  OIDC_SCOPE,
-  OIDC_STATE,
-  CODE_DISPLAY_JWT,
-  MAIL_SUPPORT
-} from 'constants.js'
+import { ACCESS_TOKEN, REFRESH_TOKEN } from 'constants.js'
 
 import services from 'services/aphp'
 
 import useStyles from './styles'
 import { getDaysLeft } from 'utils/formatDate'
-import { isCustomError } from 'utils/perimeters'
 import { AccessExpiration, User } from 'types'
 import { isAxiosError } from 'axios'
 import { saveRights } from 'state/scope'
 import { updatePerimeters } from './utils'
+import { AppConfig } from 'config'
 
 type ErrorSnackBarAlertProps = {
   open?: boolean
@@ -117,6 +113,7 @@ const LegalMentionDialog = ({ open, setOpen }: LegalMentionDialogProps) => {
 const Login = () => {
   const navigate = useNavigate()
   const { classes, cx } = useStyles()
+  const appConfig = useContext(AppConfig)
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
   const [username, setUsername] = useState('')
@@ -139,10 +136,11 @@ const Login = () => {
 
     if (maintenanceResponse.status !== 200 || isAxiosError(maintenanceResponse)) {
       setLoading(false)
+      const mailSupport = appConfig.system.mailSupport
       return (
         setError(true),
         setErrorMessage(
-          `Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : ${MAIL_SUPPORT}.`
+          `Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : ${mailSupport}.`
         )
       )
     }
@@ -180,7 +178,7 @@ const Login = () => {
           return (
             setError(true),
             setErrorMessage(
-              `Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : ${MAIL_SUPPORT}.`
+              `Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : ${appConfig.system.mailSupport}.`
             )
           )
         } else if (error.errorType === 'back') {
@@ -188,7 +186,7 @@ const Login = () => {
           return (
             setError(true),
             setErrorMessage(
-              `Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : ${MAIL_SUPPORT}.`
+              `Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : ${appConfig.system.mailSupport}.`
             )
           )
         } else if (error.errorType === 'noRight') {
@@ -235,7 +233,7 @@ const Login = () => {
       return (
         setError(true),
         setErrorMessage(
-          `Erreur d'authentification. Si elle persiste, veuillez contacter le support au: ${MAIL_SUPPORT}.`
+          `Erreur d'authentification. Si elle persiste, veuillez contacter le support au: ${appConfig.system.mailSupport}.`
         )
       )
     }
@@ -262,12 +260,18 @@ const Login = () => {
 
   const oidcLogin = (event: SyntheticEvent) => {
     event.preventDefault()
-    window.location.href =
-      `${OIDC_PROVIDER_URL}?state=${OIDC_STATE}&` +
-      `client_id=${OIDC_CLIENT_ID}&` +
-      `redirect_uri=${OIDC_REDIRECT_URI}&` +
-      `response_type=${OIDC_RESPONSE_TYPE}&` +
-      `scope=${OIDC_SCOPE}`
+    const oidcConfig = appConfig.system.oidc
+    if (oidcConfig) {
+      window.location.href =
+        `${oidcConfig.issuer}?state=${oidcConfig.state}&` +
+        `client_id=${oidcConfig.clientId}&` +
+        `redirect_uri=${oidcConfig.redirectUri}&` +
+        `response_type=${oidcConfig.responseType}&` +
+        `scope=${oidcConfig.scope}`
+    } else {
+      setError(true)
+      setErrorMessage('OIDC configuration is missing')
+    }
   }
 
   const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
@@ -275,7 +279,7 @@ const Login = () => {
   }
 
   useEffect(() => {
-    const code_display_jwt = CODE_DISPLAY_JWT.split(',')
+    const code_display_jwt = appConfig.system.codeDisplayJWT.split(',')
     let code_display_jwtPosition = 0
 
     const keyHandler = (event: KeyboardEvent) => {

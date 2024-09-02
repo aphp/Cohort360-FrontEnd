@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Tabs, Tab } from '@mui/material'
 
 import useStyles from './styles'
@@ -9,10 +9,10 @@ import BiologySearch from './components/BiologySearch/BiologySearch'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchBiology } from 'state/biology'
 import { useAppDispatch, useAppSelector } from 'state'
-import { EXPLORATION } from 'constants.js'
 import { Comparators, ObservationDataType, CriteriaType } from 'types/requestCriterias'
 import { CriteriaDrawerComponentProps } from 'types'
 import { Hierarchy } from 'types/hierarchy'
+import { AppConfig } from 'config'
 
 export const defaultBiology: Omit<ObservationDataType, 'id'> = {
   type: CriteriaType.OBSERVATION,
@@ -32,7 +32,7 @@ export const defaultBiology: Omit<ObservationDataType, 'id'> = {
 
 const Index = (props: CriteriaDrawerComponentProps) => {
   const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-
+  const config = useContext(AppConfig)
   const { classes } = useStyles()
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy' | 'search'>(
     selectedCriteria ? 'form' : 'hierarchy'
@@ -83,7 +83,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         value={selectedTab}
         onChange={(e, tab) => setSelectedTab(tab)}
       >
-        <Tab label={EXPLORATION} value="hierarchy" />
+        <Tab label={config.labels.exploration} value="hierarchy" />
         <Tab label="Recherche" value="search" />
         <Tab label="Formulaire" value="form" />
       </Tabs>

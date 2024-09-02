@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 import { CircularProgress, Grid, IconButton, Typography, TableRow, Tooltip } from '@mui/material'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
@@ -14,9 +14,9 @@ import { Column, CohortMedication } from 'types'
 
 import useStyles from './styles'
 import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
-import { MEDICATION_ATC, MEDICATION_ATC_ORBIS, MEDICATION_UCD } from '../../constants'
 import { OrderBy } from 'types/searchCriterias'
 import { ResourceType } from 'types/requestCriterias'
+import { AppConfig } from 'config'
 
 type DataTableMedicationProps = {
   loading: boolean
@@ -111,6 +111,7 @@ const DataTableMedicationLine: React.FC<{
   deidentified: boolean
 }> = ({ medication, deidentified }) => {
   const { classes } = useStyles()
+  const appConfig = useContext(AppConfig)
 
   const [open, setOpen] = useState<string | null>(null)
 
@@ -120,8 +121,16 @@ const DataTableMedicationLine: React.FC<{
       ? medication.dispenseRequest?.validityPeriod?.start
       : medication.effectivePeriod?.start
 
-  const [codeATC, displayATC, isATCStandard, codeATCSystem] = getCodes(medication, MEDICATION_ATC, MEDICATION_ATC_ORBIS)
-  const [codeUCD, displayUCD, isUCDStandard, codeUCDSystem] = getCodes(medication, MEDICATION_UCD, '.*-ucd')
+  const [codeATC, displayATC, isATCStandard, codeATCSystem] = getCodes(
+    medication,
+    appConfig.features.medication.valueSets.medicationAtc.url,
+    appConfig.features.medication.valueSets.medicationAtcOrbis.url
+  )
+  const [codeUCD, displayUCD, isUCDStandard, codeUCDSystem] = getCodes(
+    medication,
+    appConfig.features.medication.valueSets.medicationUcd.url,
+    '.*-ucd'
+  )
 
   const prescriptionType =
     medication.resourceType === 'MedicationRequest' && medication.category?.[0].coding?.[0].display

@@ -32,22 +32,10 @@ import {
 } from 'utils/age'
 import { fetchClaimCodes, fetchConditionCodes, fetchProcedureCodes } from 'services/aphp/servicePmsi'
 import { fetchAnabioCodes, fetchLoincCodes } from 'services/aphp/serviceBiology'
-import {
-  CONDITION_HIERARCHY,
-  CLAIM_HIERARCHY,
-  PROCEDURE_HIERARCHY,
-  CONDITION_STATUS,
-  BIOLOGY_HIERARCHY_ITM_ANABIO,
-  BIOLOGY_HIERARCHY_ITM_LOINC,
-  IMAGING_MODALITIES,
-  MEDICATION_ADMINISTRATIONS,
-  MEDICATION_PRESCRIPTION_TYPES,
-  DOC_STATUS_CODE_SYSTEM,
-  ENCOUNTER_STATUS
-} from '../constants'
 import services from 'services/aphp'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import { Hierarchy } from 'types/hierarchy'
+import { getConfig } from 'config'
 
 export enum PatientsParamsKeys {
   GENDERS = 'gender',
@@ -373,7 +361,7 @@ const mapBiologyFromRequestParams = async (parameters: URLSearchParams) => {
   const anabioLoinc = parameters.get(ObservationParamsKeys.ANABIO_LOINC)?.split(',') || []
 
   const anabioIds = anabioLoinc
-    ?.filter((e) => e.includes(BIOLOGY_HIERARCHY_ITM_ANABIO))
+    ?.filter((e) => e.includes(getConfig().features.observation.valueSets.biologyHierarchyAnabio.url))
     ?.map((e) => e.split('|')?.[1])
     ?.join(',')
   const fetchAnabioResults = await fetchAnabioCodes(anabioIds, true)
@@ -381,7 +369,7 @@ const mapBiologyFromRequestParams = async (parameters: URLSearchParams) => {
     return { id: e.id, label: e.label }
   })
   const loincIds = anabioLoinc
-    ?.filter((e) => e.includes(BIOLOGY_HIERARCHY_ITM_LOINC))
+    ?.filter((e) => e.includes(getConfig().features.observation.valueSets.biologyHierarchyLoinc.url))
     ?.map((e) => e.split('|')?.[1])
     ?.join(',')
   const fetchLoincResults = await fetchLoincCodes(loincIds, true)
@@ -467,7 +455,7 @@ const mapGenericToRequestParams = (filters: GenericFilter, type: ResourceType) =
       `${getGenericKeyFromResourceType(type, 'EXECUTIVE_UNITS')}=${executiveUnits.map((unit) => unit.id)}`
     )
   if (encounterStatus && encounterStatus.length > 0) {
-    const encounterStatusUrl = `${ENCOUNTER_STATUS}|`
+    const encounterStatusUrl = `${getConfig().core.valueSets.encounterStatus.url}|`
     const urlString = encounterStatus.map((elem) => encounterStatusUrl + elem.id).join(',')
     requestParams.push(`${getGenericKeyFromResourceType(type, 'ENCOUNTER_STATUS')}=${encodeURIComponent(urlString)}`)
   }
@@ -494,12 +482,13 @@ const mapPatientToRequestParams = (filters: PatientsFilters, deidentified: boole
 
 const mapDocumentsToRequestParams = (filters: DocumentsFilters) => {
   const { ipp, docStatuses, docTypes, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
+  const docStatusCodeSystem = getConfig().core.codeSystems.docStatus
   const requestParams: string[] = []
   if (ipp) requestParams.push(`${DocumentsParamsKeys.IPP}=${encodeURIComponent(ipp)}`)
   if (docStatuses && docStatuses.length > 0) {
     requestParams.push(
       `${DocumentsParamsKeys.DOC_STATUSES}=${encodeURIComponent(
-        docStatuses.map((status) => `${DOC_STATUS_CODE_SYSTEM}|${mapDocumentStatusesToRequestParam(status)}`).toString()
+        docStatuses.map((status) => `${docStatusCodeSystem}|${mapDocumentStatusesToRequestParam(status)}`).toString()
       )}`
     )
   }
@@ -517,13 +506,15 @@ const mapConditionToRequestParams = (filters: PMSIFilters) => {
   const { diagnosticTypes, code, source, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (diagnosticTypes && diagnosticTypes.length > 0) {
-    const diagnosticTypesUrl = `${CONDITION_STATUS}|`
+    const diagnosticTypesUrl = `${getConfig().features.condition.valueSets.conditionStatus.url}|`
     const urlString = diagnosticTypes.map((elem) => diagnosticTypesUrl + elem.id).join(',')
     requestParams.push(`${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${encodeURIComponent(urlString)}`)
   }
   if (code && code.length > 0)
     requestParams.push(
-      `${ConditionParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${CONDITION_HIERARCHY}|${e.id}`).join(','))}`
+      `${ConditionParamsKeys.CODE}=${encodeURIComponent(
+        code.map((e) => `${getConfig().features.condition.valueSets.conditionHierarchy.url}|${e.id}`).join(',')
+      )}`
     )
   if (source) requestParams.push(`${ProcedureParamsKeys.SOURCE}=${source}`)
   requestParams.push(
@@ -537,7 +528,9 @@ const mapClaimToRequestParams = (filters: PMSIFilters) => {
   const requestParams: string[] = []
   if (code && code.length > 0)
     requestParams.push(
-      `${ClaimParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${CLAIM_HIERARCHY}|${e.id}`).join(','))}`
+      `${ClaimParamsKeys.CODE}=${encodeURIComponent(
+        code.map((e) => `${getConfig().features.claim.valueSets.claimHierarchy.url}|${e.id}`).join(',')
+      )}`
     )
   requestParams.push(
     ...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits, encounterStatus }, ResourceType.CLAIM)
@@ -550,7 +543,9 @@ const mapProcedureToRequestParams = (filters: PMSIFilters) => {
   const requestParams: string[] = []
   if (code && code.length > 0)
     requestParams.push(
-      `${ProcedureParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${PROCEDURE_HIERARCHY}|${e.id}`).join(','))}`
+      `${ProcedureParamsKeys.CODE}=${encodeURIComponent(
+        code.map((e) => `${getConfig().features.procedure.valueSets.procedureHierarchy.url}|${e.id}`).join(',')
+      )}`
     )
   if (source) requestParams.push(`${ProcedureParamsKeys.SOURCE}=${source}`)
   requestParams.push(
@@ -563,7 +558,7 @@ const mapPrescriptionToRequestParams = (filters: MedicationFilters) => {
   const { prescriptionTypes, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (prescriptionTypes && prescriptionTypes.length > 0) {
-    const prescriptionTypesUrl = `${MEDICATION_PRESCRIPTION_TYPES}|`
+    const prescriptionTypesUrl = `${getConfig().features.medication.valueSets.medicationPrescriptionTypes.url}|`
     const urlString = prescriptionTypes.map((elem) => prescriptionTypesUrl + elem.id).join(',')
     requestParams.push(`${PrescriptionParamsKeys.PRESCRIPTION_TYPES}=${encodeURIComponent(urlString)}`)
   }
@@ -580,7 +575,7 @@ const mapAdministrationToRequestParams = (filters: MedicationFilters) => {
   const { administrationRoutes, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (administrationRoutes && administrationRoutes.length > 0) {
-    const administrationRoutesUrl = `${MEDICATION_ADMINISTRATIONS}|`
+    const administrationRoutesUrl = `${getConfig().features.medication.valueSets.medicationAdministrations.url}|`
     const urlString = administrationRoutes.map((elem) => administrationRoutesUrl + elem.id).join(',')
     requestParams.push(`${AdministrationParamsKeys.ADMINISTRATION_ROUTES}=${encodeURIComponent(urlString)}`)
   }
@@ -602,10 +597,14 @@ const mapBiologyToRequestParams = (filters: BiologyFilters) => {
     let _loinc = ''
 
     if (anabio && anabio.length > 0) {
-      _anabio = anabio.map((e) => `${BIOLOGY_HIERARCHY_ITM_ANABIO}|` + e.id).join(',')
+      _anabio = anabio
+        .map((e) => `${getConfig().features.observation.valueSets.biologyHierarchyAnabio.url}|` + e.id)
+        .join(',')
     }
     if (loinc && loinc.length > 0) {
-      _loinc = loinc.map((e) => `${BIOLOGY_HIERARCHY_ITM_LOINC}|` + e.id).join(',')
+      _loinc = loinc
+        .map((e) => `${getConfig().features.observation.valueSets.biologyHierarchyLoinc.url}|` + e.id)
+        .join(',')
     }
 
     _anabio && _loinc
@@ -632,7 +631,9 @@ const mapImagingToRequestParams = (filters: ImagingFilters) => {
   if (modality && modality.length > 0)
     requestParams.push(
       `${ImagingParamsKeys.MODALITY}=${encodeURIComponent(
-        modality.map((labelObject) => `${IMAGING_MODALITIES}|${labelObject.id}`).join(',')
+        modality
+          .map((labelObject) => `${getConfig().features.imaging.valueSets.imagingModalities.url}|${labelObject.id}`)
+          .join(',')
       )}`
     )
   requestParams.push(

@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Dialog, DialogContent, DialogActions, Button, Typography, CircularProgress, Grid } from '@mui/material'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import WarningIcon from '@mui/icons-material/Warning'
-import { MAIL_SUPPORT } from '../../../constants'
 
 import { LoadingStatus } from 'types'
 import useStyles from './styles'
+import { AppConfig } from 'config'
 
 type ValidationDialogProps = {
   open: boolean
@@ -17,6 +17,7 @@ type ValidationDialogProps = {
 
 const ValidationDialog: React.FC<ValidationDialogProps> = ({ open, onClose, message, loading, error }) => {
   const { classes } = useStyles()
+  const appConfig = useContext(AppConfig)
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -32,7 +33,7 @@ const ValidationDialog: React.FC<ValidationDialogProps> = ({ open, onClose, mess
             <WarningIcon htmlColor="#FF9800" style={{ fontSize: 52 }} />
             <Typography className={classes.typographyMargin}>
               Erreur lors de votre demande. Veuillez réessayer ultérieurement ou{' '}
-              <a href={`mailto:${MAIL_SUPPORT}`}>contacter le support</a> pour plus d'informations.
+              <a href={`mailto:${appConfig.system.mailSupport}`}>contacter le support</a> pour plus d'informations.
             </Typography>
           </>
         )}

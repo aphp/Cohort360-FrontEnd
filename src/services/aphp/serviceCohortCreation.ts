@@ -14,58 +14,11 @@ import {
 } from 'types'
 import docTypes from 'assets/docTypes.json'
 import { ValueSetWithHierarchy, fetchBiologySearch } from './cohortCreation/fetchObservation'
-import {
-  BIOLOGY_HIERARCHY_ITM_ANABIO,
-  BIOLOGY_HIERARCHY_ITM_LOINC,
-  CLAIM_HIERARCHY,
-  CONDITION_HIERARCHY,
-  CONDITION_STATUS,
-  DEMOGRAPHIC_GENDER,
-  ENCOUNTER_ADMISSION,
-  ENCOUNTER_ADMISSION_MODE,
-  ENCOUNTER_DESTINATION,
-  ENCOUNTER_ENTRY_MODE,
-  ENCOUNTER_EXIT_MODE,
-  ENCOUNTER_EXIT_TYPE,
-  ENCOUNTER_FILE_STATUS,
-  ENCOUNTER_PROVENANCE,
-  ENCOUNTER_SEJOUR_TYPE,
-  ENCOUNTER_VISIT_TYPE,
-  IMAGING_MODALITIES,
-  MEDICATION_ADMINISTRATIONS,
-  MEDICATION_ATC,
-  MEDICATION_UCD,
-  MEDICATION_PRESCRIPTION_TYPES,
-  PROCEDURE_HIERARCHY,
-  SHORT_COHORT_LIMIT,
-  PREGNANCY_MODE,
-  MATERNAL_RISKS,
-  RISKSORCOMPLICATIONSOFPREGNANCY,
-  RISKSRELATEDTOOBSTETRICHISTORY,
-  CHIRURGICAL_GESTURE,
-  CHILD_BIRTH_MODE,
-  MATURATION_REASON,
-  MATURATION_MODALITY,
-  IMG_INDICATION,
-  LABOR_OR_CESAREAN_ENTRY,
-  PATHOLOGY_DURING_LABOR,
-  OBSTETRICAL_GESTURE_DURING_LABOR,
-  ANALGESIE_TYPE,
-  BIRTH_DELIVERY_WAY,
-  INSTRUMENT_TYPE,
-  C_SECTION_MODALITY,
-  PRESENTATION_AT_DELIVERY,
-  CONDITION_PERINEUM,
-  EXIT_PLACE_TYPE,
-  FEEDING_TYPE,
-  EXIT_FEEDING_MODE,
-  EXIT_DIAGNOSTIC,
-  ENCOUNTER_STATUS
-} from '../../constants'
 import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
 import { VitalStatusLabel } from 'types/searchCriterias'
 import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
 import { Hierarchy } from 'types/hierarchy'
+import { getConfig } from 'config'
 
 export interface IServiceCohortCreation {
   /**
@@ -282,7 +235,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
     let currentSnapshot: Snapshot | null = currentSnapshotResponse?.data ? currentSnapshotResponse?.data : null
 
     let result = null
-    let shortCohortLimit = SHORT_COHORT_LIMIT
+    let shortCohortLimit = getConfig().features.cohort.shortCohortLimit
     let count_outdated = false
 
     if (currentSnapshot) {
@@ -321,21 +274,36 @@ const servicesCohortCreation: IServiceCohortCreation = {
   },
 
   fetchAdmissionModes: async () =>
-    fetchValueSet(ENCOUNTER_ADMISSION_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchEntryModes: async () => fetchValueSet(ENCOUNTER_ENTRY_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchExitModes: async () => fetchValueSet(ENCOUNTER_EXIT_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+    fetchValueSet(getConfig().core.valueSets.encounterAdmissionMode.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
+  fetchEntryModes: async () =>
+    fetchValueSet(getConfig().core.valueSets.encounterEntryMode.url, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchExitModes: async () =>
+    fetchValueSet(getConfig().core.valueSets.encounterExitMode.url, { joinDisplayWithCode: false, sortingKey: 'id' }),
   fetchPriseEnChargeType: async () =>
-    fetchValueSet(ENCOUNTER_VISIT_TYPE, {
+    fetchValueSet(getConfig().core.valueSets.encounterVisitType.url, {
       joinDisplayWithCode: false,
       filterOut: (value) => value.id === 'nachstationär' || value.id === 'z.zt. verlegt'
     }),
-  fetchTypeDeSejour: async () => fetchValueSet(ENCOUNTER_SEJOUR_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchFileStatus: async () => fetchValueSet(ENCOUNTER_FILE_STATUS, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchReason: async () => fetchValueSet(ENCOUNTER_EXIT_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchDestination: async () => fetchValueSet(ENCOUNTER_DESTINATION, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchProvenance: async () => fetchValueSet(ENCOUNTER_PROVENANCE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchAdmission: async () => fetchValueSet(ENCOUNTER_ADMISSION, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchGender: async () => fetchValueSet(DEMOGRAPHIC_GENDER, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchTypeDeSejour: async () =>
+    fetchValueSet(getConfig().core.valueSets.encounterSejourType.url, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchFileStatus: async () =>
+    fetchValueSet(getConfig().core.valueSets.encounterFileStatus.url, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchReason: async () =>
+    fetchValueSet(getConfig().core.valueSets.encounterExitType.url, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchDestination: async () =>
+    fetchValueSet(getConfig().core.valueSets.encounterDestination.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
+  fetchProvenance: async () =>
+    fetchValueSet(getConfig().core.valueSets.encounterProvenance.url, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchAdmission: async () =>
+    fetchValueSet(getConfig().core.valueSets.encounterAdmission.url, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchGender: async () =>
+    fetchValueSet(getConfig().core.valueSets.demographicGender.url, { joinDisplayWithCode: false, sortingKey: 'id' }),
   fetchStatus: async () => {
     return [
       {
@@ -360,10 +328,10 @@ const servicesCohortCreation: IServiceCohortCreation = {
       }
     ]
   },
-  fetchDiagnosticTypes: async () => fetchValueSet(CONDITION_STATUS),
+  fetchDiagnosticTypes: async () => fetchValueSet(getConfig().features.condition.valueSets.conditionStatus.url),
   fetchCim10Diagnostic: async (searchValue?: string, noStar?: boolean, signal?: AbortSignal) =>
     fetchValueSet(
-      CONDITION_HIERARCHY,
+      getConfig().features.condition.valueSets.conditionHierarchy.url,
       {
         valueSetTitle: 'Toute la hiérarchie',
         search: searchValue || '',
@@ -372,23 +340,38 @@ const servicesCohortCreation: IServiceCohortCreation = {
       signal
     ),
   fetchCim10Hierarchy: async (cim10Parent?: string) =>
-    fetchValueSet(CONDITION_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie CIM10', code: cim10Parent }),
+    fetchValueSet(getConfig().features.condition.valueSets.conditionHierarchy.url, {
+      valueSetTitle: 'Toute la hiérarchie CIM10',
+      code: cim10Parent
+    }),
   fetchCcamData: async (searchValue?: string, noStar?: boolean, signal?: AbortSignal) =>
     fetchValueSet(
-      PROCEDURE_HIERARCHY,
+      getConfig().features.procedure.valueSets.procedureHierarchy.url,
       { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', noStar },
       signal
     ),
   fetchCcamHierarchy: async (ccamParent?: string) =>
-    fetchValueSet(PROCEDURE_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie CCAM', code: ccamParent }),
+    fetchValueSet(getConfig().features.procedure.valueSets.procedureHierarchy.url, {
+      valueSetTitle: 'Toute la hiérarchie CCAM',
+      code: ccamParent
+    }),
   fetchGhmData: async (searchValue?: string, noStar?: boolean, signal?: AbortSignal) =>
-    fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', noStar }, signal),
+    fetchValueSet(
+      getConfig().features.claim.valueSets.claimHierarchy.url,
+      { valueSetTitle: 'Toute la hiérarchie', search: searchValue || '', noStar },
+      signal
+    ),
   fetchGhmHierarchy: async (ghmParent?: string) =>
-    fetchValueSet(CLAIM_HIERARCHY, { valueSetTitle: 'Toute la hiérarchie GHM', code: ghmParent }),
+    fetchValueSet(getConfig().features.claim.valueSets.claimHierarchy.url, {
+      valueSetTitle: 'Toute la hiérarchie GHM',
+      code: ghmParent
+    }),
   fetchDocTypes: () => Promise.resolve(docTypes && docTypes.docTypes.length > 0 ? docTypes.docTypes : []),
   fetchMedicationData: async (searchValue?: string, noStar?: boolean, signal?: AbortSignal) =>
     fetchValueSet(
-      `${MEDICATION_ATC},${MEDICATION_UCD}`,
+      `${getConfig().features.medication.valueSets.medicationAtc.url},${
+        getConfig().features.medication.valueSets.medicationUcd.url
+      }`,
       {
         valueSetTitle: 'Toute la hiérarchie',
         search: searchValue || '',
@@ -398,12 +381,18 @@ const servicesCohortCreation: IServiceCohortCreation = {
     ),
   fetchSingleCodeHierarchy: async (resourceType: string, code: string) => {
     const codeSystemPerResourceType: { [type: string]: string } = {
-      Claim: CLAIM_HIERARCHY,
-      Condition: CONDITION_HIERARCHY,
-      MedicationAdministration: `${MEDICATION_ATC},${MEDICATION_UCD}`,
-      MedicationRequest: `${MEDICATION_ATC},${MEDICATION_UCD}`,
-      Observation: `${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}`,
-      Procedure: PROCEDURE_HIERARCHY
+      Claim: getConfig().features.claim.valueSets.claimHierarchy.url,
+      Condition: getConfig().features.condition.valueSets.conditionHierarchy.url,
+      MedicationAdministration: `${getConfig().features.medication.valueSets.medicationAtc.url},${
+        getConfig().features.medication.valueSets.medicationUcd.url
+      }`,
+      MedicationRequest: `${getConfig().features.medication.valueSets.medicationAtc.url},${
+        getConfig().features.medication.valueSets.medicationUcd.url
+      }`,
+      Observation: `${getConfig().features.observation.valueSets.biologyHierarchyAnabio.url},${
+        getConfig().features.observation.valueSets.biologyHierarchyLoinc.url
+      }`,
+      Procedure: getConfig().features.procedure.valueSets.procedureHierarchy.url
     }
     if (!(resourceType in codeSystemPerResourceType)) {
       // TODO log error
@@ -412,7 +401,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
     return fetchSingleCodeHierarchy(codeSystemPerResourceType[resourceType], code)
   },
   fetchAtcHierarchy: async (atcParent?: string) =>
-    fetchValueSet(MEDICATION_ATC, {
+    fetchValueSet(getConfig().features.medication.valueSets.medicationAtc.url, {
       valueSetTitle: 'Toute la hiérarchie Médicament',
       code: atcParent,
       sortingKey: 'id',
@@ -421,23 +410,37 @@ const servicesCohortCreation: IServiceCohortCreation = {
         atcData.label.search(new RegExp(/^[A-Z] - /, 'gi')) !== -1 &&
         atcData.label.search(new RegExp(/^[X-Y] - /, 'gi')) !== 0
     }),
-  fetchUCDList: async (ucd?: string) => fetchValueSet(MEDICATION_UCD, { code: ucd }),
-  fetchPrescriptionTypes: async () => fetchValueSet(MEDICATION_PRESCRIPTION_TYPES, { joinDisplayWithCode: false }),
+  fetchUCDList: async (ucd?: string) =>
+    fetchValueSet(getConfig().features.medication.valueSets.medicationUcd.url, { code: ucd }),
+  fetchPrescriptionTypes: async () =>
+    fetchValueSet(getConfig().features.medication.valueSets.medicationPrescriptionTypes.url, {
+      joinDisplayWithCode: false
+    }),
   fetchAdministrations: async () => {
-    const administrations = await fetchValueSet(MEDICATION_ADMINISTRATIONS, { joinDisplayWithCode: false })
+    const administrations = await fetchValueSet(
+      getConfig().features.medication.valueSets.medicationAdministrations.url,
+      {
+        joinDisplayWithCode: false
+      }
+    )
     return administrations.map((administration) =>
       administration.id === 'GASTROTOMIE.' ? { ...administration, label: 'Gastrotomie.' } : administration
     )
   },
   fetchBiologyData: async (searchValue?: string, noStar?: boolean) =>
-    fetchValueSet(`${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}`, {
-      valueSetTitle: 'Toute la hiérarchie',
-      search: searchValue || '',
-      noStar,
-      joinDisplayWithCode: false
-    }),
+    fetchValueSet(
+      `${getConfig().features.observation.valueSets.biologyHierarchyAnabio.url},${
+        getConfig().features.observation.valueSets.biologyHierarchyLoinc.url
+      }`,
+      {
+        valueSetTitle: 'Toute la hiérarchie',
+        search: searchValue || '',
+        noStar,
+        joinDisplayWithCode: false
+      }
+    ),
   fetchBiologyHierarchy: async (biologyParent?: string) =>
-    fetchValueSet(BIOLOGY_HIERARCHY_ITM_ANABIO, {
+    fetchValueSet(getConfig().features.observation.valueSets.biologyHierarchyAnabio.url, {
       valueSetTitle: 'Toute la hiérarchie de Biologie',
       code: biologyParent,
       joinDisplayWithCode: false,
@@ -454,15 +457,31 @@ const servicesCohortCreation: IServiceCohortCreation = {
     }),
   fetchBiologySearch: fetchBiologySearch,
   fetchModalities: async () => {
-    const modalities = await fetchValueSet(IMAGING_MODALITIES, { joinDisplayWithCode: false })
+    const modalities = await fetchValueSet(getConfig().features.imaging.valueSets.imagingModalities.url, {
+      joinDisplayWithCode: false
+    })
     return modalities.map((modality) => ({ ...modality, label: `${modality.id} - ${modality.label}` }))
   },
-  fetchPregnancyMode: async () => fetchValueSet(PREGNANCY_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchMaternalRisks: async () => fetchValueSet(MATERNAL_RISKS, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchPregnancyMode: async () =>
+    fetchValueSet(getConfig().features.questionnaires.valueSets.pregnancyMode.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
+  fetchMaternalRisks: async () =>
+    fetchValueSet(getConfig().features.questionnaires.valueSets.maternalRisks.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
   fetchRisksRelatedToObstetricHistory: async () =>
-    fetchValueSet(RISKSRELATEDTOOBSTETRICHISTORY, { joinDisplayWithCode: false, sortingKey: 'id' }),
+    fetchValueSet(getConfig().features.questionnaires.valueSets.risksRelatedToObstetricHistory.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
   fetchRisksOrComplicationsOfPregnancy: async () =>
-    fetchValueSet(RISKSORCOMPLICATIONSOFPREGNANCY, { joinDisplayWithCode: false, sortingKey: 'id' }),
+    fetchValueSet(getConfig().features.questionnaires.valueSets.risksOrComplicationsOfPregnancy.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
   fetchCorticotherapie: async () => {
     return booleanFieldsData
   },
@@ -482,7 +501,10 @@ const servicesCohortCreation: IServiceCohortCreation = {
     return booleanOpenChoiceFieldsData
   },
   fetchChirurgicalGesture: async () =>
-    fetchValueSet(CHIRURGICAL_GESTURE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+    fetchValueSet(getConfig().features.questionnaires.valueSets.chirurgicalGesture.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
   fetchVme: async () => {
     return vmeData
   },
@@ -498,25 +520,65 @@ const servicesCohortCreation: IServiceCohortCreation = {
   fetchHomeChildBirthPlace: async () => {
     return booleanFieldsData
   },
-  fetchChildbirthMode: async () => fetchValueSet(CHILD_BIRTH_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchMaturationReason: async () => fetchValueSet(MATURATION_REASON, { joinDisplayWithCode: false, sortingKey: 'id' }),
+  fetchChildbirthMode: async () =>
+    fetchValueSet(getConfig().features.questionnaires.valueSets.childBirthMode.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
+  fetchMaturationReason: async () =>
+    fetchValueSet(getConfig().features.questionnaires.valueSets.maturationReason.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
 
   fetchMaturationModality: async () =>
-    fetchValueSet(MATURATION_MODALITY, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchImgIndication: async () => fetchValueSet(IMG_INDICATION, { joinDisplayWithCode: false, sortingKey: 'id' }),
+    fetchValueSet(getConfig().features.questionnaires.valueSets.maturationModality.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
+  fetchImgIndication: async () =>
+    fetchValueSet(getConfig().features.questionnaires.valueSets.imgIndication.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
   fetchLaborOrCesareanEntry: async () =>
-    fetchValueSet(LABOR_OR_CESAREAN_ENTRY, { joinDisplayWithCode: false, sortingKey: 'id' }),
+    fetchValueSet(getConfig().features.questionnaires.valueSets.laborOrCesareanEntry.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
   fetchPathologyDuringLabor: async () =>
-    fetchValueSet(PATHOLOGY_DURING_LABOR, { joinDisplayWithCode: false, sortingKey: 'id' }),
+    fetchValueSet(getConfig().features.questionnaires.valueSets.pathologyDuringLabor.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
   fetchObstetricalGestureDuringLabor: async () =>
-    fetchValueSet(OBSTETRICAL_GESTURE_DURING_LABOR, { joinDisplayWithCode: false }),
-  fetchAnalgesieType: async () => fetchValueSet(ANALGESIE_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+    fetchValueSet(getConfig().features.questionnaires.valueSets.obstetricalGestureDuringLabor.url, {
+      joinDisplayWithCode: false
+    }),
+  fetchAnalgesieType: async () =>
+    fetchValueSet(getConfig().features.questionnaires.valueSets.analgesieType.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
   fetchBirthDeliveryWay: async () =>
-    fetchValueSet(BIRTH_DELIVERY_WAY, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchInstrumentType: async () => fetchValueSet(INSTRUMENT_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+    fetchValueSet(getConfig().features.questionnaires.valueSets.birthDeliveryWay.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
+  fetchInstrumentType: async () =>
+    fetchValueSet(getConfig().features.questionnaires.valueSets.instrumentType.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
   fetchCSectionModality: async () =>
-    fetchValueSet(C_SECTION_MODALITY, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchPresentationAtDelivery: async () => fetchValueSet(PRESENTATION_AT_DELIVERY, { joinDisplayWithCode: false }),
+    fetchValueSet(getConfig().features.questionnaires.valueSets.cSectionModality.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
+  fetchPresentationAtDelivery: async () =>
+    fetchValueSet(getConfig().features.questionnaires.valueSets.presentationAtDelivery.url, {
+      joinDisplayWithCode: false
+    }),
   fetchBirthStatus: async () => {
     return birthStatusData
   },
@@ -524,15 +586,35 @@ const servicesCohortCreation: IServiceCohortCreation = {
     return booleanOpenChoiceFieldsData
   },
   fetchConditionPerineum: async () =>
-    fetchValueSet(CONDITION_PERINEUM, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchExitPlaceType: async () => fetchValueSet(EXIT_PLACE_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchFeedingType: async () => fetchValueSet(FEEDING_TYPE, { joinDisplayWithCode: false, sortingKey: 'id' }),
+    fetchValueSet(getConfig().features.questionnaires.valueSets.conditionPerineum.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
+  fetchExitPlaceType: async () =>
+    fetchValueSet(getConfig().features.questionnaires.valueSets.exitPlaceType.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
+  fetchFeedingType: async () =>
+    fetchValueSet(getConfig().features.questionnaires.valueSets.feedingType.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
   fetchComplication: async () => {
     return booleanFieldsData
   },
-  fetchExitFeedingMode: async () => fetchValueSet(EXIT_FEEDING_MODE, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchExitDiagnostic: async () => fetchValueSet(EXIT_DIAGNOSTIC, { joinDisplayWithCode: false, sortingKey: 'id' }),
-  fetchEncounterStatus: async () => fetchValueSet(ENCOUNTER_STATUS, { joinDisplayWithCode: false, sortingKey: 'id' })
+  fetchExitFeedingMode: async () =>
+    fetchValueSet(getConfig().features.questionnaires.valueSets.exitFeedingMode.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
+  fetchExitDiagnostic: async () =>
+    fetchValueSet(getConfig().features.questionnaires.valueSets.exitDiagnostic.url, {
+      joinDisplayWithCode: false,
+      sortingKey: 'id'
+    }),
+  fetchEncounterStatus: async () =>
+    fetchValueSet(getConfig().core.valueSets.encounterStatus.url, { joinDisplayWithCode: false, sortingKey: 'id' })
 }
 
 export default servicesCohortCreation

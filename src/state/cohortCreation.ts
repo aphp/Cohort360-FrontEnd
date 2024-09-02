@@ -18,9 +18,9 @@ import { addRequest, deleteRequest } from './request'
 import { deleteProject } from './project'
 
 import services from 'services/aphp'
-import { SHORT_COHORT_LIMIT } from '../constants'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
+import { getConfig } from 'config'
 
 export type CohortCreationState = {
   loading: boolean
@@ -48,12 +48,12 @@ export type CohortCreationState = {
   requestName?: string
 }
 
-const defaultInitialState: CohortCreationState = {
+const defaultInitialState: () => CohortCreationState = () => ({
   loading: false,
   saveLoading: false,
   countLoading: false,
   count_outdated: false,
-  shortCohortLimit: SHORT_COHORT_LIMIT,
+  shortCohortLimit: getConfig().features.cohort.shortCohortLimit,
   requestId: '',
   cohortName: '',
   json: '',
@@ -84,7 +84,7 @@ const defaultInitialState: CohortCreationState = {
   ],
   nextCriteriaId: 1,
   nextGroupId: -1
-}
+})
 
 /**
  * fetchRequestCohortCreation
@@ -275,9 +275,9 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
       const _criteriaGroup: CriteriaGroup[] =
         state.cohortCreation.request.criteriaGroup && state.cohortCreation.request.criteriaGroup.length > 0
           ? state.cohortCreation.request.criteriaGroup
-          : defaultInitialState.criteriaGroup
+          : defaultInitialState().criteriaGroup
       const _temporalConstraints =
-        state.cohortCreation.request.temporalConstraints ?? defaultInitialState.temporalConstraints
+        state.cohortCreation.request.temporalConstraints ?? defaultInitialState().temporalConstraints
 
       const json = buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
       if (json !== state?.cohortCreation?.request?.json) {
@@ -297,7 +297,7 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
       let _initTemporalConstraints
 
       if (_temporalConstraints?.length === 0) {
-        _initTemporalConstraints = defaultInitialState.temporalConstraints
+        _initTemporalConstraints = defaultInitialState().temporalConstraints
       } else {
         _initTemporalConstraints = _temporalConstraints
       }
@@ -358,7 +358,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
           }
         })
       } else {
-        _temporalConstraints = defaultInitialState.temporalConstraints
+        _temporalConstraints = defaultInitialState().temporalConstraints
       }
 
       let allowSearchIpp = false
@@ -396,7 +396,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
         temporalConstraints: _temporalConstraints,
         selectedCriteria: criteria,
         isCriteriaNominative: isCriteriaNominative,
-        criteriaGroup: criteriaGroup.length > 0 ? criteriaGroup : defaultInitialState.criteriaGroup,
+        criteriaGroup: criteriaGroup.length > 0 ? criteriaGroup : defaultInitialState().criteriaGroup,
         nextCriteriaId: criteria.length + 1,
         nextGroupId: -(criteriaGroup.length + 1)
       }
@@ -459,9 +459,9 @@ const addRequestToCohortCreation = createAsyncThunk<
 
 const cohortCreationSlice = createSlice({
   name: 'cohortCreation',
-  initialState: defaultInitialState,
+  initialState: defaultInitialState(),
   reducers: {
-    resetCohortCreation: () => defaultInitialState,
+    resetCohortCreation: () => defaultInitialState(),
     setCohortName: (state: CohortCreationState, action: PayloadAction<string>) => {
       state.cohortName = action.payload
     },
@@ -721,9 +721,9 @@ const cohortCreationSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(login, () => defaultInitialState)
-    builder.addCase(logout.fulfilled, () => defaultInitialState)
-    builder.addCase(impersonate, () => defaultInitialState)
+    builder.addCase(login, () => defaultInitialState())
+    builder.addCase(logout.fulfilled, () => defaultInitialState())
+    builder.addCase(impersonate, () => defaultInitialState())
     // buildCohortCreation
     builder.addCase(buildCohortCreation.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(buildCohortCreation.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
@@ -774,8 +774,8 @@ const cohortCreationSlice = createSlice({
       return { ...state, requestId: newRequestId, requestName: newRequestName, loading: false }
     })
     // When you delete a request | folder => reset cohort create (if current request is edited state)
-    builder.addCase(deleteRequest.fulfilled, () => defaultInitialState)
-    builder.addCase(deleteProject.fulfilled, () => defaultInitialState)
+    builder.addCase(deleteRequest.fulfilled, () => defaultInitialState())
+    builder.addCase(deleteProject.fulfilled, () => defaultInitialState())
   }
 })
 

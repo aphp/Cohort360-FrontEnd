@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import { CircularProgress, Grid, Typography, TableRow } from '@mui/material'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
@@ -12,7 +12,7 @@ import { Claim, Condition, Procedure } from 'fhir/r4'
 import { Order, OrderBy } from 'types/searchCriterias'
 import { ResourceType } from 'types/requestCriterias'
 import { getExtension } from 'utils/fhir'
-import { ORBIS_STATUS_EXTENSION_NAME } from 'constants.js'
+import { AppConfig } from 'config'
 
 type DataTablePmsiProps = {
   loading: boolean
@@ -90,6 +90,7 @@ const DataTablePmsiLine: React.FC<{
   selectedTab: ResourceType.CONDITION | ResourceType.PROCEDURE | ResourceType.CLAIM
 }> = ({ pmsi, selectedTab }) => {
   const { classes } = useStyles()
+  const appConfig = useContext(AppConfig)
 
   const nda = pmsi.NDA
   const date =
@@ -108,7 +109,10 @@ const DataTablePmsiLine: React.FC<{
   const source = pmsi.meta?.source ?? 'Non renseigné'
 
   const type =
-    getExtension(pmsi, ORBIS_STATUS_EXTENSION_NAME)?.valueCodeableConcept?.coding?.[0].code?.toUpperCase() || '-'
+    getExtension(
+      pmsi,
+      appConfig.features.condition.extensions.orbisStatus
+    )?.valueCodeableConcept?.coding?.[0].code?.toUpperCase() || '-'
   const serviceProvider = pmsi.serviceProvider ?? 'Non renseigné'
 
   return (

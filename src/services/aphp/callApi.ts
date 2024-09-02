@@ -41,14 +41,6 @@ import {
 import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 import { idSort, labelSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
-import {
-  CODE_HIERARCHY_EXTENSION_NAME,
-  CONDITION_STATUS,
-  IMAGING_MODALITIES,
-  MEDICATION_ADMINISTRATIONS,
-  MEDICATION_PRESCRIPTION_TYPES,
-  DOC_STATUS_CODE_SYSTEM
-} from '../../constants'
 import { Direction, Order, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
 import {
   AdministrationParamsKeys,
@@ -66,6 +58,7 @@ import {
 import { ResourceType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
 import { getExtension } from 'utils/fhir'
+import { getConfig } from 'config'
 
 const paramValuesReducer = (accumulator: string, currentValue: string): string =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -272,6 +265,7 @@ export const fetchDocumentReference = async (
     executiveUnits,
     encounterStatus
   } = args
+  const docStatusCodeSystem = getConfig().core.codeSystems.docStatus
   const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list, facet, uniqueFacet, _elements } = args
   const encounterIdentifier = args['encounter-identifier']
@@ -307,7 +301,7 @@ export const fetchDocumentReference = async (
       }`
     ]
   if (docStatuses && docStatuses.length > 0) {
-    const docStatusesUrl = DOC_STATUS_CODE_SYSTEM
+    const docStatusesUrl = docStatusCodeSystem
     const urlString = docStatuses
       .map((status) => `${docStatusesUrl}|${mapDocumentStatusesToRequestParam(status)}`)
       .join(',')
@@ -476,6 +470,7 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
     executiveUnits,
     encounterStatus
   } = args
+  const docStatusCodeSystem = getConfig().core.codeSystems.docStatus
   const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list } = args
   const encounterIdentifier = args['encounter-identifier']
@@ -491,7 +486,7 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (code) options = [...options, `${ProcedureParamsKeys.CODE}=${code}`] // eslint-disable-line
   if (source) options = [...options, `${ProcedureParamsKeys.SOURCE}=${source}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
-  if (status) options = [...options, `status=${encodeURIComponent(`${DOC_STATUS_CODE_SYSTEM}|${status}`)}`]
+  if (status) options = [...options, `status=${encodeURIComponent(`${docStatusCodeSystem}|${status}`)}`]
   if (encounterIdentifier) options = [...options, `${ProcedureParamsKeys.NDA}=${encounterIdentifier}`]
   if (minDate) options = [...options, `date=ge${minDate}`]
   if (maxDate) options = [...options, `date=le${maxDate}`]
@@ -632,7 +627,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
   if (type && type.length > 0) {
-    const diagnosticTypesUrl = `${CONDITION_STATUS}|`
+    const diagnosticTypesUrl = `${getConfig().features.condition.valueSets.conditionStatus.url}|`
     const urlString = type.map((id) => diagnosticTypesUrl + id).join(',')
     options = [...options, `orbis-status=${encodeURIComponent(urlString)}`]
   }
@@ -772,7 +767,7 @@ export const fetchMedicationRequest = async (
   if (encounter) options = [...options, `${PrescriptionParamsKeys.NDA}=${encounter}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
   if (type && type.length > 0) {
-    const routeUrl = `${MEDICATION_PRESCRIPTION_TYPES}|`
+    const routeUrl = `${getConfig().features.medication.valueSets.medicationPrescriptionTypes.url}|`
     const urlString = type.map((id) => routeUrl + id).join(',')
     options = [...options, `${PrescriptionParamsKeys.PRESCRIPTION_TYPES}=${encodeURIComponent(urlString)}`]
   }
@@ -846,7 +841,7 @@ export const fetchMedicationAdministration = async (
   if (encounter) options = [...options, `${AdministrationParamsKeys.NDA}=${encounter}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
   if (route && route.length > 0) {
-    const routeUrl = `${MEDICATION_ADMINISTRATIONS}|`
+    const routeUrl = `${getConfig().features.medication.valueSets.medicationAdministrations.url}|`
     const urlString = route.map((id) => routeUrl + id).join(',')
     options = [...options, `${AdministrationParamsKeys.ADMINISTRATION_ROUTES}=${encodeURIComponent(urlString)}`]
   }
@@ -919,7 +914,7 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   if (minDate) options = [...options, `${ImagingParamsKeys.DATE}=ge${minDate}`]
   if (maxDate) options = [...options, `${ImagingParamsKeys.DATE}=le${maxDate}`]
   if (modalities && modalities.length > 0) {
-    const modalitiesUrl = `${IMAGING_MODALITIES}|`
+    const modalitiesUrl = `${getConfig().features.imaging.valueSets.imagingModalities.url}|`
     const urlString = modalities.map((id) => modalitiesUrl + id).join(',')
     options = [...options, `${ImagingParamsKeys.MODALITY}=${encodeURIComponent(urlString)}`]
   }
@@ -1141,7 +1136,7 @@ export const fetchSingleCodeHierarchy = async (codeSystem: string, code: string)
     return []
   }
   return (
-    getExtension(codeList[0], CODE_HIERARCHY_EXTENSION_NAME)
+    getExtension(codeList[0], getConfig().core.extensions.codeHierarchy)
       ?.valueCodeableConcept?.coding?.map((c) => c.code || '')
       .filter((c) => !!c) || []
   )

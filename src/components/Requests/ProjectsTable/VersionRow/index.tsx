@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 
@@ -34,13 +34,14 @@ import { Cohort, CohortJobStatus } from 'types'
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from '../styles'
-import { ODD_EXPORT } from '../../../../constants'
+import { AppConfig } from 'config'
 
 const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
+  const appConfig = useContext(AppConfig)
   const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<Cohort | null>(null)
 
   const cohorts: Cohort[] =
@@ -87,7 +88,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                 cohort.request_job_status === CohortJobStatus.NEW ||
                 !!cohort.request_job_fail_msg
 
-              const canExportThisCohort = !!ODD_EXPORT && !isError ? cohort.rights?.export_csv_nomi : false
+              const canExportThisCohort =
+                !!appConfig.features.export.enabled && !isError ? cohort.rights?.export_csv_nomi : false
 
               return (
                 <TableRow key={cohort.uuid}>
@@ -178,7 +180,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
         </TableBody>
       </Table>
 
-      {!!ODD_EXPORT && (
+      {!!appConfig.features.export.enabled && (
         <ExportModal
           cohortId={selectedExportableCohort?.uuid ?? ''}
           fhirGroupId={selectedExportableCohort?.group_id ?? ''}

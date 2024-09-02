@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import Button from '@mui/material/Button'
@@ -8,13 +8,14 @@ import Typography from '@mui/material/Typography'
 import WarningIcon from '@mui/icons-material/Report'
 
 import { useAppSelector } from 'state'
-import { MAIL_SUPPORT } from '../../constants'
 
 import useStyles from './styles'
+import { AppConfig } from 'config'
 
 const CohortRightOrNotExist = () => {
   const { classes, cx } = useStyles()
   const navigate = useNavigate()
+  const appConfig = useContext(AppConfig)
 
   const { openDrawer } = useAppSelector((state) => ({ openDrawer: state.drawer }))
 
@@ -37,8 +38,8 @@ const CohortRightOrNotExist = () => {
               Vous tentez d'accéder à des données qui n'existent pas, ou vous ne disposez pas de droits suffisants
             </Typography>
             <Typography style={{ marginBottom: 16 }} align="center">
-              S'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante : {MAIL_SUPPORT}
-              .
+              S'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante :{' '}
+              {appConfig.system.mailSupport}.
             </Typography>
           </Grid>
         </Grid>

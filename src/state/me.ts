@@ -3,7 +3,7 @@ import { RootState } from 'state'
 
 import services from 'services/aphp'
 import { AccessExpiration, User } from '../types'
-import { IMPERSONATED_USER } from 'components/Impersonation'
+import { IMPERSONATED_USER } from 'constants.js'
 
 export type MeState = null | {
   id: string

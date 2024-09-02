@@ -31,7 +31,7 @@ import { Condition, DocumentReference, Encounter, Period, Procedure } from 'fhir
 import { FilterKeys, LabelObject } from 'types/searchCriterias'
 import { Hierarchy } from 'types/hierarchy'
 import { getExtension } from 'utils/fhir'
-import { CONDITION_STATUS, ORBIS_STATUS_EXTENSION_NAME } from 'constants.js'
+import { getConfig } from 'config'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -112,8 +112,11 @@ const generateTimelineFormattedData = (
       ? !!selectedTypes.find(
           (selectedType) =>
             selectedType.id ===
-            getExtension(item, ORBIS_STATUS_EXTENSION_NAME)?.valueCodeableConcept?.coding?.find(
-              (elem) => elem?.system === CONDITION_STATUS
+            getExtension(
+              item,
+              getConfig().features.condition.extensions.orbisStatus
+            )?.valueCodeableConcept?.coding?.find(
+              (elem) => elem?.system === getConfig().features.condition.valueSets.conditionStatus.url
             )?.code
         )
       : true

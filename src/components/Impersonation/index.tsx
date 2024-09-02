@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { InternalAxiosRequestConfig } from 'axios'
 import ModalImpersonation from './ModalImpersonation'
 import Overlay from './Overlay'
@@ -9,12 +9,11 @@ import { useAppDispatch, useAppSelector } from 'state'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import { IconButton } from '@mui/material'
 import { User } from 'types'
-import { CODE_DISPLAY_JWT } from 'constants.js'
 import { impersonate, updatePerimeters as updatePerimetersAction } from 'state/me'
 import { updatePerimeters } from 'views/Login/utils'
 import { saveRights } from 'state/scope'
-
-export const IMPERSONATED_USER = 'impersonated_user'
+import { AppConfig } from 'config'
+import { IMPERSONATED_USER } from 'constants.js'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const addImpersonationToken = (config: InternalAxiosRequestConfig<any>) => {
@@ -34,6 +33,7 @@ type ImpersonationProps = {
 const Impersonation = (props: ImpersonationProps) => {
   const { UserInfo } = props
   const dispatch = useAppDispatch()
+  const appConfig = useContext(AppConfig)
   const me = useAppSelector((state) => state.me)
   const [modalOpen, setModalOpen] = useState(false)
   const [haveRightFullAdmin, setHaveRightFullAdmin] = useState(false)
@@ -69,7 +69,7 @@ const Impersonation = (props: ImpersonationProps) => {
   }, [me?.userName])
 
   useEffect(() => {
-    const code_display_jwt = CODE_DISPLAY_JWT.split(',')
+    const code_display_jwt = appConfig.system.codeDisplayJWT.split(',')
     let code_display_jwtPosition = 0
 
     const keyHandler = (event: KeyboardEvent) => {
