@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'state'
 
 import { Chip, CircularProgress, CssBaseline, Grid, Pagination, Typography } from '@mui/material'
@@ -13,7 +13,7 @@ import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import { BlockWrapper } from 'components/ui/Layout'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import { LoadingStatus, WebSocketJobName, WebSocketJobStatus, WebSocketMessage } from 'types'
+import { LoadingStatus } from 'types'
 import { CohortsType } from 'types/cohorts'
 import { FilterKeys, OrderBy } from 'types/searchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
@@ -24,8 +24,7 @@ import { cancelPendingRequest } from 'utils/abortController'
 import Modal from 'components/ui/Modal'
 import Button from 'components/ui/Button'
 import ResearchTable from 'components/CohortsTable'
-import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
-import servicesCohorts from 'services/aphp/serviceCohorts'
+import useCohortList from 'hooks/useCohortList'
 
 const statusOptions = [
   {
@@ -53,9 +52,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
 
   const dispatch = useAppDispatch()
 
-  const webSocketContext = useContext(WebSocketContext)
-
-  const [cohortList, setCohortList] = useState(cohortState.cohortsList)
+  const cohortList = useCohortList()
   const [toggleModal, setToggleModal] = useState(false)
   const [page, setPage] = useState(1)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
@@ -95,36 +92,6 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
       }
     }
   }
-
-  useEffect(() => {
-    setCohortList(cohortState.cohortsList)
-  }, [cohortState.cohortsList])
-
-  useEffect(() => {
-    const listener = async (message: WebSocketMessage) => {
-      if (message.job_name === WebSocketJobName.CREATE && message.status === WebSocketJobStatus.finished) {
-        const websocketUpdatedCohorts = cohortList.map((cohort) => {
-          const temp = Object.assign({}, cohort)
-          if (temp.uuid === message.uuid) {
-            if (temp.dated_measure_global) {
-              temp.dated_measure_global = {
-                ...temp.dated_measure_global,
-                measure_min: message.extra_info?.global ? message.extra_info.global.measure_min : null,
-                measure_max: message.extra_info?.global ? message.extra_info.global.measure_max : null
-              }
-            }
-            temp.request_job_status = message.status
-            temp.group_id = message.extra_info?.group_id
-          }
-          return temp
-        })
-        const newCohortList = await servicesCohorts.fetchCohortsRights(websocketUpdatedCohorts)
-        setCohortList(newCohortList)
-      }
-    }
-    webSocketContext?.addListener(listener)
-    return () => webSocketContext?.removeListener(listener)
-  }, [cohortList, webSocketContext])
 
   useEffect(() => {
     addFilters({ ...filters, favorite: favoriteUrl ? CohortsType.FAVORITE : CohortsType.ALL })

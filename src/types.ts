@@ -94,6 +94,8 @@ export type MaintenanceInfo = {
   maintenance_end: string
   active: boolean
   subject: string
+  type: string
+  message: string
 }
 
 export type FHIR_API_Response<T extends Resource> = T | OperationOutcome
@@ -825,7 +827,9 @@ export type SavedFilter = {
 }
 
 export enum WebSocketMessageType {
-  STATUS = 'status'
+  ANY = 'any',
+  JOB_STATUS = 'job_status',
+  MAINTENANCE = 'maintenance'
 }
 
 export enum WebSocketJobName {
@@ -833,10 +837,12 @@ export enum WebSocketJobName {
   CREATE = 'create'
 }
 
-export type WebSocketMessage = {
-  status: WebSocketJobStatus
+export type WebSocketMessage<T = {}> = {
   type: WebSocketMessageType
-  client_id?: string
+} & T
+
+export type WSJobStatus = WebSocketMessage<{
+  status: WebSocketJobStatus
   uuid?: string
   details?: string
   job_name?: WebSocketJobName
@@ -847,7 +853,7 @@ export type WebSocketMessage = {
     measure?: number
     global?: { measure_min: number; measure_max: number }
   }
-}
+}> & { type: WebSocketMessageType.JOB_STATUS }
 
 export enum SelectedStatus {
   NOT_SELECTED,

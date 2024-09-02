@@ -49,7 +49,7 @@ import {
   RequestType,
   SimpleStatus,
   Snapshot,
-  WebSocketMessage
+  WSJobStatus
 } from 'types'
 
 import useStyle from './styles'
@@ -222,7 +222,7 @@ const ControlPanel: React.FC<{
   }, [dispatch, status, uuid, jobFailMsg, includePatient])
 
   useEffect(() => {
-    const listener = (message: WebSocketMessage) => {
+    const listener = (message: WSJobStatus) => {
       let response = {}
       if (message.status !== WebSocketJobStatus.pending && message.uuid === count.uuid) {
         setCountLoading(LoadingStatus.SUCCESS)
@@ -237,7 +237,7 @@ const ControlPanel: React.FC<{
 
     webSocketContext?.addListener(listener)
     return () => webSocketContext?.removeListener(listener)
-  }, [webSocketContext])
+  }, [webSocketContext, count.uuid, dispatch])
 
   return (
     <>
