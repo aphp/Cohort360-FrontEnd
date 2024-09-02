@@ -82,14 +82,14 @@ export enum ConditionParamsKeys {
   DIAGNOSTIC_TYPES = 'orbis-status',
   DATE = 'recorded-date',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  SOURCE = 'source',
+  SOURCE = '_source',
   ENCOUNTER_STATUS = 'encounter.status'
 }
 
 export enum ProcedureParamsKeys {
   NDA = 'encounter.identifier',
   CODE = 'code',
-  SOURCE = 'source',
+  SOURCE = '_source',
   DATE = 'date',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
   ENCOUNTER_STATUS = 'encounter.status'
