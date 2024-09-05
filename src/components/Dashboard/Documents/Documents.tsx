@@ -37,13 +37,13 @@ import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import List from 'components/ui/List'
-import { useAppSelector } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import Modal from 'components/ui/Modal'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable } from 'utils/paginationUtils'
+import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
 type DocumentsProps = {
   groupId?: string
@@ -51,6 +51,7 @@ type DocumentsProps = {
 }
 
 const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
+  const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
 
@@ -171,7 +172,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
         }))
         setDocuments(documentsList)
 
-        checkIfPageAvailable(totalDocs, page, setPage)
+        checkIfPageAvailable(totalDocs, page, setPage, dispatch)
       } else {
         setDocuments([])
       }
@@ -229,6 +230,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setSearchParams({ page: page.toString() })
+
+    handlePageError(page, setPage, dispatch)
   }, [page])
 
   useEffect(() => {

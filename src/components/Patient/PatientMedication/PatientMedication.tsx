@@ -41,7 +41,7 @@ import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable } from 'utils/paginationUtils'
+import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
 type PatientMedicationProps = {
   groupId?: string
@@ -169,7 +169,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
         })
       )
       if (response) {
-        checkIfPageAvailable(searchResults.total, page, setPage)
+        checkIfPageAvailable(searchResults.total, page, setPage, dispatch)
       }
       if (response.payload.error) {
         throw response.payload.error
@@ -224,6 +224,8 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
     const updatedSearchParams = new URLSearchParams(searchParams)
     updatedSearchParams.set('page', page.toString())
     setSearchParams(updatedSearchParams)
+
+    handlePageError(page, setPage, dispatch)
   }, [page])
 
   useEffect(() => {

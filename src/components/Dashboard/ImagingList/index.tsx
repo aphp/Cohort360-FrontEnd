@@ -29,14 +29,14 @@ import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
-import { useAppSelector } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import { BlockWrapper } from 'components/ui/Layout'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { AppConfig } from 'config'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable } from 'utils/paginationUtils'
+import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
 type ImagingListProps = {
   groupId?: string
@@ -45,6 +45,7 @@ type ImagingListProps = {
 
 const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   const appConfig = useContext(AppConfig)
+  const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
 
@@ -128,7 +129,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
           total: totalAllImaging
         }))
 
-        checkIfPageAvailable(totalImaging, page, setPage)
+        checkIfPageAvailable(totalImaging, page, setPage, dispatch)
       }
 
       setLoadingStatus(LoadingStatus.SUCCESS)
@@ -167,6 +168,8 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setSearchParams({ page: page.toString() })
+
+    handlePageError(page, setPage, dispatch)
   }, [page])
 
   useEffect(() => {

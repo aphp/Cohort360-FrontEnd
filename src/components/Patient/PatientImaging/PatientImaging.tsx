@@ -36,7 +36,7 @@ import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { AppConfig } from 'config'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable } from 'utils/paginationUtils'
+import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
 const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
@@ -113,7 +113,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
         })
       )
       if (response) {
-        checkIfPageAvailable(searchResults.total, page, setPage)
+        checkIfPageAvailable(searchResults.total, page, setPage, dispatch)
       }
       if (response.payload.error) {
         throw response.payload.error
@@ -155,6 +155,8 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
     const updatedSearchParams = new URLSearchParams(searchParams)
     updatedSearchParams.set('page', page.toString())
     setSearchParams(updatedSearchParams)
+
+    handlePageError(page, setPage, dispatch)
   }, [page])
 
   useEffect(() => {

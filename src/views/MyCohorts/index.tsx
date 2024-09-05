@@ -27,7 +27,7 @@ import ResearchTable from 'components/CohortsTable'
 import useCohortList from 'hooks/useCohortList'
 import { Pagination } from 'components/ui/Pagination'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable } from 'utils/paginationUtils'
+import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
 const statusOptions = [
   {
@@ -93,7 +93,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
         })
       )
       if (response) {
-        checkIfPageAvailable(cohortState.count, page, setPage)
+        checkIfPageAvailable(cohortState.count, page, setPage, dispatch)
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {
@@ -119,6 +119,8 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setSearchParams({ page: page.toString() })
+
+    handlePageError(page, setPage, dispatch)
   }, [page])
 
   useEffect(() => {

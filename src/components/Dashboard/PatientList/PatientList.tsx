@@ -47,9 +47,9 @@ import TextInput from 'components/Filters/TextInput'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { ResourceType } from 'types/requestCriterias'
 import List from 'components/ui/List'
-import { useAppSelector } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable } from 'utils/paginationUtils'
+import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
 type PatientListProps = {
   total: number
@@ -58,6 +58,7 @@ type PatientListProps = {
 }
 
 const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
+  const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
 
@@ -141,7 +142,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
         }
         setPatientsResult((ps) => ({ ...ps, nb: totalPatients, label: 'patient(s)' }))
 
-        checkIfPageAvailable(totalPatients, page, setPage)
+        checkIfPageAvailable(totalPatients, page, setPage, dispatch)
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {
@@ -166,6 +167,8 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setSearchParams({ page: page.toString() })
+
+    handlePageError(page, setPage, dispatch)
   }, [page])
 
   useEffect(() => {
