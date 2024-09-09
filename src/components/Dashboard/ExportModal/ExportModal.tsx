@@ -161,7 +161,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
       checked: table.label === 'person'
     }))
     handleChangeSettings('tables', newSelectedTables)
-    setExpandedTableIds([])
+    setExpandedTableIds(['person'])
   }
 
   const handleSelectAllTables = () => {
@@ -416,9 +416,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
           <Tooltip
             title={
               <span>
-                Par exemple, il coche prescription, alors seules les tables person et visit_occurrence restent cochables
-                Par exemple, il coche person, alors tout est cochable, mais si ensuite il coche prescription, alors
-                seule visit_occurrence reste cochable, le reste se grise
+                Cette fonctionnalité permet d'intégrer, dans chaque fichier généré correspondant à une table
+                sélectionnée, les données patient et visites associées.
               </span>
             }
           >
@@ -480,7 +479,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
             onChange={(event) => setSelectState(event.target.value as 'csv' | 'xlsx')}
           >
             <MenuItem value={'csv'}>{'Fichier csv'}</MenuItem>
-            <MenuItem value={'xlsx'}>{'Fichier xlsx'}</MenuItem>
+            <MenuItem value={'xlsx'}>{'Fichier exel (.xlsx)'}</MenuItem>
           </Select>
         </Grid>
 
