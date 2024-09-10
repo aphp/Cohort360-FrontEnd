@@ -378,12 +378,12 @@ const Login = () => {
               id="oidc-login"
               startIcon={<Keycloak height="25px" />}
             >
-              Connexion via Keycloak
+              Connexion via OIDC
             </Button>
 
             <Typography align="center">
               <Link href="#" onClick={() => setOpen(true)} underline="hover">
-                En cliquant sur &quot;connexion&quot;, vous acceptez la mention légale.
+                En vous connectant, vous acceptez la mention légale.
               </Link>
             </Typography>
           </Grid>
