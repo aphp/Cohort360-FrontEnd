@@ -672,6 +672,8 @@ type fetchObservationProps = {
   signal?: AbortSignal
   executiveUnits?: string[]
   encounterStatus?: string[]
+  uniqueFacet?: 'subject'[]
+  'patient-identifier'?: string
 }
 export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle_Promise_Response<Observation> => {
   const {
@@ -693,12 +695,14 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
     encounterStatus
   } = args
   const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
-  let { _list } = args
+  let { _list, uniqueFacet } = args
+  const patientIdentifier = args['patient-identifier']
 
   _list = _list ? _list.filter(uniq) : []
+  uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
 
   // By default, all the calls to `/Observation` will have 'value-quantity-value=ge0,le0' and 'patient.active=true' in the parameters
-  let options: string[] = ['value-quantity=ge0,le0', 'subject.active=true']
+  let options: string[] = [`${ObservationParamsKeys.VALUE}=ge0,le0`, 'subject.active=true']
   if (id) options = [...options, `_id=${id}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
@@ -715,9 +719,12 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   if (maxDate) options = [...options, `${ObservationParamsKeys.DATE}=le${maxDate}`] // eslint-disable-line
   if (rowStatus) options = [...options, `${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0)
-    options = [...options, `encounter.encounter-care-site=${executiveUnits}`]
+    options = [...options, `${ObservationParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${ObservationParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
+  if (patientIdentifier) options = [...options, `${ObservationParamsKeys.IPP}=${patientIdentifier}`]
+  if (uniqueFacet && uniqueFacet.length > 0)
+    options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer, '')}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 

@@ -20,6 +20,7 @@ import ImagingList from 'components/Dashboard/ImagingList'
 import { AppConfig } from 'config'
 import PMSIList from 'components/Dashboard/PMSIList'
 import MedicationList from 'components/Dashboard/MedicationList'
+import BiologyList from 'components/Dashboard/BiologyList'
 
 type Tabs = { label: string; value: string; to: string; disabled: boolean | undefined } | undefined
 
@@ -56,6 +57,7 @@ const Dashboard: React.FC<{
           { label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false },
           { label: 'PMSI', value: 'pmsi', to: '/my-patients/pmsi', disabled: false },
           { label: 'Médicaments', value: 'medication', to: '/my-patients/medication', disabled: false },
+          { label: 'Biologie', value: 'biology', to: '/my-patients/biology', disabled: false },
           ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging', disabled: false }] : [])
         ])
         break
@@ -72,6 +74,7 @@ const Dashboard: React.FC<{
           { label: 'Documents cliniques', value: 'documents', to: `/cohort/${cohortId}/documents`, disabled: false },
           { label: 'PMSI', value: 'pmsi', to: `/cohort/${cohortId}/pmsi`, disabled: false },
           { label: 'Médicaments', value: 'medication', to: `/cohort/${cohortId}/medication`, disabled: false },
+          { label: 'Biologie', value: 'biology', to: `/cohort/${cohortId}/biology`, disabled: false },
           ...(ODD_IMAGING
             ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/${cohortId}/imaging`, disabled: false }]
             : [])
@@ -85,6 +88,7 @@ const Dashboard: React.FC<{
           { label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true },
           { label: 'PMSI', value: 'pmsi', to: `/cohort/new/pmsi`, disabled: false },
           { label: 'Médicaments', value: 'medication', to: `/cohort/new/medication`, disabled: false },
+          { label: 'Biologie', value: 'biology', to: `/cohort/new/biology`, disabled: false },
           ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/new/imaging`, disabled: true }] : [])
         ])
         break
@@ -106,6 +110,7 @@ const Dashboard: React.FC<{
           },
           { label: 'PMSI', value: 'pmsi', to: `/perimeters/pmsi${location.search}`, disabled: false },
           { label: 'Médicaments', value: 'medication', to: `/perimeters/new/medication`, disabled: false },
+          { label: 'Biologie', value: 'biology', to: `/perimeters/biology${location.search}`, disabled: false },
           ...(ODD_IMAGING
             ? [{ label: 'Imagerie', value: 'imaging', to: `/perimeters/imaging${location.search}`, disabled: false }]
             : [])
@@ -223,10 +228,13 @@ const Dashboard: React.FC<{
           <Documents groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />
         )}
         {selectedTab === 'pmsi' && (
-          <PMSIList groupId={cohortId || perimetreIds} deidentified={dashboard.deidentifiedBoolean ?? false} />
+          <PMSIList groupId={cohortId ?? perimetreIds} deidentified={dashboard.deidentifiedBoolean ?? false} />
         )}
         {selectedTab === 'medication' && (
           <MedicationList groupId={cohortId ?? perimetreIds} deidentified={dashboard.deidentifiedBoolean ?? false} />
+        )}
+        {selectedTab === 'biology' && (
+          <BiologyList groupId={cohortId ?? perimetreIds} deidentified={dashboard.deidentifiedBoolean ?? false} />
         )}
         {selectedTab === 'imaging' && (
           <ImagingList groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />

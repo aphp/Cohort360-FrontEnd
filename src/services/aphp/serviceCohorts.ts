@@ -16,7 +16,9 @@ import {
   FHIR_Bundle_Response,
   CohortPMSI,
   MedicationData,
-  CohortMedication
+  CohortMedication,
+  BiologyData,
+  CohortObservation
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -40,7 +42,8 @@ import {
   fetchProcedure,
   fetchClaim,
   fetchMedicationRequest,
-  fetchMedicationAdministration
+  fetchMedicationAdministration,
+  fetchObservation
 } from './callApi'
 
 import apiBackend from '../apiBackend'
@@ -52,6 +55,7 @@ import {
   ImagingStudy,
   MedicationAdministration,
   MedicationRequest,
+  Observation,
   ParametersParameter,
   Patient,
   Procedure
@@ -65,7 +69,8 @@ import {
   SearchByTypes,
   ImagingFilters,
   PMSIFilters,
-  MedicationFilters
+  MedicationFilters,
+  BiologyFilters
 } from 'types/searchCriterias'
 import services from '.'
 import { ErrorDetails, SearchInputError } from 'types/error'
@@ -211,6 +216,19 @@ export interface IServiceCohorts {
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<MedicationData>
+
+  /**
+   * Retourne la liste d'objets de biologie liés à une cohorte
+   */
+  fetchBiologyList: (
+    options: {
+      deidentified: boolean
+      page: number
+      searchCriterias: SearchCriterias<BiologyFilters>
+    },
+    groupId?: string,
+    signal?: AbortSignal
+  ) => Promise<BiologyData>
 
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
@@ -685,6 +703,95 @@ const servicesCohorts: IServiceCohorts = {
         totalPatientMedication: 0,
         totalAllPatientsMedication: 0,
         medicationList: []
+      }
+    }
+  },
+
+  fetchBiologyList: async (options, groupId, signal) => {
+    const {
+      deidentified,
+      page,
+      searchCriterias: {
+        orderBy,
+        searchInput,
+        filters: { validatedStatus, nda, ipp, loinc, anabio, startDate, endDate, executiveUnits, encounterStatus }
+      }
+    } = options
+    try {
+      const atLeastAFilter =
+        !!searchInput ||
+        !!ipp ||
+        !!nda ||
+        !!startDate ||
+        !!endDate ||
+        executiveUnits.length > 0 ||
+        encounterStatus.length > 0 ||
+        (loinc && loinc.length > 0) ||
+        (anabio && anabio.length > 0)
+
+      const [biologyList, allBiologyList] = await Promise.all([
+        fetchObservation({
+          _list: groupId ? [groupId] : [],
+          size: 20,
+          offset: page ? (page - 1) * 20 : 0,
+          _sort: orderBy.orderBy,
+          sortDirection: orderBy.orderDirection,
+          _text: searchInput === '' ? '' : searchInput,
+          encounter: nda,
+          'patient-identifier': ipp,
+          signal: signal,
+          executiveUnits: executiveUnits.map((unit) => unit.id),
+          encounterStatus: encounterStatus.map(({ id }) => id),
+          uniqueFacet: ['subject'],
+          minDate: startDate ?? '',
+          maxDate: endDate ?? '',
+          loinc: loinc.map((code) => code.id).join(),
+          anabio: anabio.map((code) => code.id).join(),
+          rowStatus: validatedStatus
+        }),
+        atLeastAFilter
+          ? fetchObservation({
+              size: 0,
+              signal: signal,
+              _list: groupId ? [groupId] : [],
+              uniqueFacet: ['subject'],
+              rowStatus: validatedStatus
+            })
+          : null
+      ])
+
+      const _biologyList =
+        getApiResponseResources(biologyList as AxiosResponse<FHIR_Bundle_Response<Observation>, any>) ?? []
+      const filledBiologyList = await getResourceInfos(_biologyList, deidentified, groupId, signal)
+
+      const totalBiology = biologyList?.data?.resourceType === 'Bundle' ? biologyList.data.total : 0
+      const totalAllBiology =
+        allBiologyList?.data?.resourceType === 'Bundle' ? allBiologyList.data?.total ?? totalBiology : totalBiology
+
+      const totalPatientBiology =
+        biologyList?.data?.resourceType === 'Bundle'
+          ? (getExtension(biologyList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
+          : 0
+      const totalAllPatientsBiology =
+        allBiologyList !== null
+          ? (getExtension(allBiologyList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
+          : totalPatientBiology
+
+      return {
+        totalBiology: totalBiology ?? 0,
+        totalAllBiology: totalAllBiology ?? 0,
+        totalPatientBiology: totalPatientBiology ?? 0,
+        totalAllPatientsBiology: totalAllPatientsBiology ?? 0,
+        biologyList: filledBiologyList as CohortObservation[]
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération de la liste de Biologie :', error)
+      return {
+        totalBiology: 0,
+        totalAllBiology: 0,
+        totalPatientBiology: 0,
+        totalAllPatientsBiology: 0,
+        biologyList: []
       }
     }
   },

@@ -308,6 +308,14 @@ export type MedicationData = {
   medicationList: CohortMedication<MedicationRequest | MedicationAdministration>[]
 }
 
+export type BiologyData = {
+  totalBiology: number
+  totalAllBiology: number
+  totalPatientBiology: number
+  totalAllPatientsBiology: number
+  biologyList: CohortObservation[]
+}
+
 export type PatientData = {
   patient?: CohortPatient
   hospit?: (CohortEncounter | Encounter)[]
@@ -673,6 +681,8 @@ export type CohortQuestionnaireResponse = QuestionnaireResponse & {
 export type CohortObservation = Observation & {
   serviceProvider?: string
   NDA?: string
+  IPP?: string
+  idPatient?: string
 }
 
 export type IPatientObservation<T extends CohortObservation> = {

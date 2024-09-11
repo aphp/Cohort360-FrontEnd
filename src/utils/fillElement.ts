@@ -9,11 +9,19 @@ import {
   ImagingStudy,
   MedicationAdministration,
   MedicationRequest,
+  Observation,
   Patient,
   Procedure
 } from 'fhir/r4'
 import { fetchPatient, fetchEncounter } from 'services/aphp/callApi'
-import { CohortComposition, CohortImaging, CohortMedication, CohortPMSI, FHIR_API_Response } from 'types'
+import {
+  CohortComposition,
+  CohortImaging,
+  CohortMedication,
+  CohortObservation,
+  CohortPMSI,
+  FHIR_API_Response
+} from 'types'
 import { ResourceType } from 'types/requestCriterias'
 import { getApiResponseResources } from './apiHelpers'
 
@@ -25,6 +33,7 @@ type ResourceToFill =
   | Claim
   | MedicationRequest
   | MedicationAdministration
+  | Observation
 
 const getPatientIdPath = (element: ResourceToFill) => {
   const patientIdPath = {
@@ -37,7 +46,8 @@ const getPatientIdPath = (element: ResourceToFill) => {
     [ResourceType.MEDICATION_ADMINISTRATION]: (element as MedicationAdministration).subject?.reference?.replace(
       /^Patient\//,
       ''
-    )
+    ),
+    [ResourceType.OBSERVATION]: (element as Observation).subject?.reference?.replace(/^Patient\//, '')
   }
 
   return patientIdPath[element.resourceType]
@@ -57,7 +67,8 @@ const getEncounterIdPath = (element: ResourceToFill) => {
     [ResourceType.MEDICATION_ADMINISTRATION]: (element as MedicationAdministration).context?.reference?.replace(
       /^Encounter\//,
       ''
-    )
+    ),
+    [ResourceType.OBSERVATION]: (element as Observation).encounter?.reference?.replace(/^Encounter\//, '')
   }
 
   return encounterIdPath[element.resourceType]
@@ -94,6 +105,7 @@ export const getResourceInfos = async <
     | CohortImaging
     | CohortPMSI
     | CohortMedication<MedicationRequest | MedicationAdministration>
+    | CohortObservation
 >(
   elementEntries: T[],
   deidentifiedBoolean: boolean,
