@@ -220,6 +220,9 @@ const Dashboard: React.FC<{
         {selectedTab === 'pmsi' && (
           <PMSIList groupId={cohortId || perimetreIds} deidentified={dashboard.deidentifiedBoolean ?? false} />
         )}
+        {selectedTab === 'pmsi' && (
+          <PMSIList groupId={cohortId || perimetreIds} deidentified={dashboard.deidentifiedBoolean ?? false} />
+        )}
         {selectedTab === 'imaging' && (
           <ImagingList groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />
         )}
