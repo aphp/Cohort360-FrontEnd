@@ -83,7 +83,8 @@ export enum ConditionParamsKeys {
   DATE = 'recorded-date',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
   SOURCE = '_source',
-  ENCOUNTER_STATUS = 'encounter.status'
+  ENCOUNTER_STATUS = 'encounter.status',
+  IPP = 'subject.identifier'
 }
 
 export enum ProcedureParamsKeys {
@@ -92,7 +93,8 @@ export enum ProcedureParamsKeys {
   SOURCE = '_source',
   DATE = 'date',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status'
+  ENCOUNTER_STATUS = 'encounter.status',
+  IPP = 'subject.identifier'
 }
 
 export enum ClaimParamsKeys {
@@ -100,7 +102,8 @@ export enum ClaimParamsKeys {
   CODE = 'diagnosis',
   DATE = 'created',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status'
+  ENCOUNTER_STATUS = 'encounter.status',
+  IPP = 'patient.identifier'
 }
 
 export enum PrescriptionParamsKeys {

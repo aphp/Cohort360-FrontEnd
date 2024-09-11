@@ -1,43 +1,76 @@
 import { AxiosResponse } from 'axios'
-import { Bundle, DocumentReference, Encounter, Identifier, ImagingStudy, Patient } from 'fhir/r4'
+import {
+  Bundle,
+  Claim,
+  Condition,
+  DocumentReference,
+  Encounter,
+  Identifier,
+  ImagingStudy,
+  Patient,
+  Procedure
+} from 'fhir/r4'
 import { fetchPatient, fetchEncounter } from 'services/aphp/callApi'
-import { CohortComposition, CohortImaging, FHIR_API_Response } from 'types'
+import { CohortComposition, CohortImaging, CohortPMSI, FHIR_API_Response } from 'types'
 import { ResourceType } from 'types/requestCriterias'
 import { getApiResponseResources } from './apiHelpers'
 
-const retrieveEncounterIds = (elementEntries: (DocumentReference | ImagingStudy)[]) => {
+type ResourceToFill = DocumentReference | ImagingStudy | Condition | Procedure | Claim
+
+const getPatientIdPath = (element: ResourceToFill) => {
+  const patientIdPath = {
+    [ResourceType.DOCUMENTS]: (element as DocumentReference).subject?.reference?.replace(/^Patient\//, ''),
+    [ResourceType.IMAGING]: (element as ImagingStudy).subject?.reference?.replace(/^Patient\//, ''),
+    [ResourceType.CONDITION]: (element as Condition).subject?.reference?.replace(/^Patient\//, ''),
+    [ResourceType.PROCEDURE]: (element as Procedure).subject?.reference?.replace(/^Patient\//, ''),
+    [ResourceType.CLAIM]: (element as Claim).patient?.reference?.replace(/^Patient\//, '')
+  }
+
+  return patientIdPath[element.resourceType]
+}
+
+const getEncounterIdPath = (element: ResourceToFill) => {
+  const encounterIdPath = {
+    [ResourceType.DOCUMENTS]: (element as DocumentReference).context?.encounter?.[0]?.reference?.replace(
+      /^Encounter\//,
+      ''
+    ),
+    [ResourceType.IMAGING]: (element as ImagingStudy).encounter?.reference?.replace(/^Encounter\//, ''),
+    [ResourceType.CONDITION]: (element as Condition).encounter?.reference?.replace(/^Encounter\//, ''),
+    [ResourceType.PROCEDURE]: (element as Procedure).encounter?.reference?.replace(/^Encounter\//, ''),
+    [ResourceType.CLAIM]: (element as Claim).item?.[0].encounter?.[0]?.reference?.replace(/^Encounter\//, '')
+  }
+
+  return encounterIdPath[element.resourceType]
+}
+
+const retrieveEncounterIds = (elementEntries: ResourceToFill[]) => {
   return elementEntries
-    .map((e) =>
-      e.resourceType === ResourceType.DOCUMENTS
-        ? e.context?.encounter?.[0]?.reference?.replace(/^Encounter\//, '')
-        : e.encounter?.reference?.replace(/^Encounter\//, '')
-    )
+    .map((e) => getEncounterIdPath(e))
     .filter((item, index, array) => array.indexOf(item) === index)
     .join()
 }
 
-const retrievePatientIds = (elementEntries: (DocumentReference | ImagingStudy)[]) => {
+const retrievePatientIds = (elementEntries: ResourceToFill[]) => {
   return elementEntries
-    .map((e) => e.subject?.reference?.replace(/^Patient\//, ''))
+    .map((e) => getPatientIdPath(e))
     .filter((item, index, array) => array.indexOf(item) === index)
     .join()
 }
 
-const getLinkedPatient = (patients: Patient[], entry: DocumentReference | ImagingStudy) => {
-  const patientId = entry.subject?.reference?.replace(/^Patient\//, '')
+const getLinkedPatient = (patients: Patient[], entry: ResourceToFill) => {
+  const patientId = getPatientIdPath(entry)
   return patients.find((patient) => patient.id === patientId)
 }
 
-const getLinkedEncounter = (encounters: Encounter[], entry: DocumentReference | ImagingStudy) => {
-  const encounterLocation =
-    entry.resourceType === ResourceType.DOCUMENTS ? entry.context?.encounter?.[0] : entry.encounter
-  const encounterId = encounterLocation?.reference?.replace(/^Encounter\//, '')
+const getLinkedEncounter = (encounters: Encounter[], entry: ResourceToFill) => {
+  const encounterId = getEncounterIdPath(entry)
   return encounters.find((encounter) => encounter.id === encounterId)
 }
 
 export const getResourceInfos = async <
-  T extends DocumentReference | ImagingStudy,
-  U extends CohortComposition | CohortImaging
+  T extends ResourceToFill,
+  U extends CohortComposition | CohortImaging | CohortPMSI
 >(
   elementEntries: T[],
   deidentifiedBoolean: boolean,
@@ -72,31 +105,25 @@ export const getResourceInfos = async <
   const _encounters = getApiResponseResources(encounters)?.filter((encounter) => !encounter.partOf) ?? []
 
   const filledEntries: U[] = elementEntries.map((entry) => {
-    const linkedPatient = !deidentifiedBoolean ? getLinkedPatient(_patients, entry) : undefined
-    const linkedEncounter = getLinkedEncounter(_encounters, entry)
-
     const idPatient = retrievePatientIds([entry])
-    const IPP = !deidentifiedBoolean
-      ? linkedPatient?.identifier?.find((object: Identifier) => object?.type?.coding?.[0].code === 'IPP')?.value ??
-        'Inconnu'
-      : retrievePatientIds([entry]) !== ''
-      ? retrievePatientIds([entry])
-      : 'Inconnu'
+    const IPP = deidentifiedBoolean
+      ? idPatient
+      : getLinkedPatient(_patients, entry)?.identifier?.find(
+          (object: Identifier) => object?.type?.coding?.[0].code === 'IPP'
+        )?.value
 
-    const NDA = !deidentifiedBoolean
-      ? linkedEncounter?.identifier?.find((object: Identifier) => object?.type?.coding?.[0].code === 'NDA')?.value ??
-        'Inconnu'
-      : retrieveEncounterIds([entry]) !== ''
+    const linkedEncounter = getLinkedEncounter(_encounters, entry)
+    const NDA = deidentifiedBoolean
       ? retrieveEncounterIds([entry])
-      : 'Inconnu'
+      : linkedEncounter?.identifier?.find((object: Identifier) => object?.type?.coding?.[0].code === 'NDA')?.value
 
     const serviceProvider = linkedEncounter?.serviceProvider?.display ?? 'Non renseigné'
 
     return {
       ...entry,
       idPatient,
-      IPP,
-      NDA,
+      IPP: IPP ?? 'Inconnu',
+      NDA: NDA ?? 'Inconnu',
       serviceProvider
     } as unknown as U
   })

@@ -22,10 +22,18 @@ import {
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
 import { SearchInputError } from 'types/error'
-import { Comparators, CriteriaDataKey, CriteriaType, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
+import {
+  Comparators,
+  CriteriaDataKey,
+  CriteriaType,
+  PMSIResourceTypes,
+  ResourceType,
+  SelectedCriteriaType
+} from 'types/requestCriterias'
 import { ExportTableType } from 'components/Dashboard/ExportModal/export_table'
 import { Hierarchy } from 'types/hierarchy'
 import { SearchByTypes } from 'types/searchCriterias'
+import { PMSILabel } from 'types/patient'
 
 export enum JobStatus {
   new = 'new',
@@ -281,6 +289,14 @@ export type ImagingData = {
   totalImaging: number
   totalAllImaging: number
   imagingList: CohortImaging[]
+}
+
+export type PmsiData = {
+  totalPMSI: number
+  totalAllPMSI: number
+  totalPatientPMSI: number
+  totalAllPatientsPMSI: number
+  pmsiList: CohortPMSI[]
 }
 
 export type PatientData = {
@@ -670,6 +686,13 @@ export type IPatientObservation<T extends CohortObservation> = {
   }
 }
 
+export type CohortPMSI = (Condition | Procedure | Claim) & {
+  serviceProvider?: string
+  idPatient?: string
+  NDA?: string
+  IPP?: string
+}
+
 export type CohortImaging = ImagingStudy & {
   idPatient?: string
   serviceProvider?: string
@@ -690,6 +713,10 @@ export type TabType<T, TL> = {
   icon?: ReactElement
   wrapped?: boolean
 }
+
+export type PmsiTab = TabType<PMSIResourceTypes, PMSILabel>
+
+export type PmsiTabs = PmsiTab[]
 
 export type DTTB_ResultsType = {
   nb: number
@@ -761,18 +788,6 @@ export type DataRights = {
   right_export_jupyter_pseudonymized: boolean
   right_search_opposed_patients: boolean
   right_search_patients_by_ipp: boolean
-}
-
-export enum CriteriaName {
-  Cim10 = 'cim10',
-  Ccam = 'ccam',
-  Ghm = 'ghm',
-  Document = 'document',
-  Medication = 'medication',
-  Biology = 'biology',
-  VisitSupport = 'supported',
-  Imaging = 'imaging',
-  Form = 'questionnaireResponse'
 }
 
 export type AccessExpirationsProps = {

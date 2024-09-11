@@ -46,7 +46,7 @@ import {
   QuestionnaireResponse
 } from 'fhir/r4'
 import { Direction, FormNames, Filters, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
-import { ResourceType } from 'types/requestCriterias'
+import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
 import { getExtension } from 'utils/fhir'
 
@@ -114,7 +114,7 @@ export interface IServicePatients {
   fetchPMSI: (
     page: number,
     patientId: string,
-    selectedTab: ResourceType.CLAIM | ResourceType.CONDITION | ResourceType.PROCEDURE,
+    selectedTab: PMSIResourceTypes,
     searchInput: string,
     nda: string,
     code: string,

@@ -1,71 +1,50 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useAppSelector } from 'state'
 
-import { CircularProgress, Grid, Tooltip } from '@mui/material'
-import Chip from 'components/ui/Chip'
-import FilterList from 'assets/icones/filter.svg?react'
-
-import DataTablePmsi from 'components/DataTable/DataTablePmsi'
-
-import { useAppSelector, useAppDispatch } from 'state'
-import { fetchPmsi } from 'state/patient'
-import { CohortPMSI, LoadingStatus, PmsiTab, PmsiTabs } from 'types'
-import useStyles from './styles'
-import { cancelPendingRequest } from 'utils/abortController'
-import { CanceledError } from 'axios'
-import Searchbar from 'components/ui/Searchbar'
-import SearchInput from 'components/ui/Searchbar/SearchInput'
-import DisplayDigits from 'components/ui/Display/DisplayDigits'
-import Tabs from 'components/ui/Tabs'
-import { Direction, FilterKeys, Order, PMSIFilters } from 'types/searchCriterias'
-import Button from 'components/ui/Button'
-import Modal from 'components/ui/Modal'
-import { PMSILabel } from 'types/patient'
-import { selectFiltersAsArray } from 'utils/filters'
+import { Chip, CircularProgress, Grid, Tooltip } from '@mui/material'
+import { Save, SavedSearch, FilterList } from '@mui/icons-material'
+import { AlertWrapper } from 'components/ui/Alert'
 import { BlockWrapper } from 'components/ui/Layout'
-import useSearchCriterias, { initPmsiSearchCriterias } from 'reducers/searchCriteriasReducer'
-import services from 'services/aphp'
+import Button from 'components/ui/Button'
 import CodeFilter from 'components/Filters/CodeFilter'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
+import DataTablePmsi from 'components/DataTable/DataTablePmsi'
 import DiagnosticTypesFilter from 'components/Filters/DiagnosticTypesFilter'
-import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
-import NdaFilter from 'components/Filters/NdaFilter'
-import SourceFilter from 'components/Filters/SourceFilter'
-import { ResourceType } from 'types/requestCriterias'
-import { useSavedFilters } from 'hooks/filters/useSavedFilters'
-import { Save, SavedSearch } from '@mui/icons-material'
-import TextInput from 'components/Filters/TextInput'
-import { mapToAttribute, mapToLabel, mapToSourceType } from 'mappers/pmsi'
-import List from 'components/ui/List'
-import { fetchClaimCodes, fetchConditionCodes, fetchProcedureCodes } from 'services/aphp/servicePmsi'
+import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
-import { AlertWrapper } from 'components/ui/Alert'
+import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
+import IppFilter from 'components/Filters/IppFilter'
+import List from 'components/ui/List'
+import Modal from 'components/ui/Modal'
+import NdaFilter from 'components/Filters/NdaFilter'
+import { PMSITabs } from 'components/Patient/PatientPMSI/PatientPMSI'
+import SourceFilter from 'components/Filters/SourceFilter'
+import Searchbar from 'components/ui/Searchbar'
+import SearchInput from 'components/ui/Searchbar/SearchInput'
+import Tabs from 'components/ui/Tabs'
+import TextInput from 'components/Filters/TextInput'
+
+import { PMSILabel } from 'types/patient'
+import { ResourceType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
-import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { CohortPMSI, DTTB_ResultsType as ResultsType, LoadingStatus, PmsiTab } from 'types'
+import { Direction, FilterKeys, Order, PMSIFilters } from 'types/searchCriterias'
 
-type PatientPMSIProps = {
+import { CanceledError } from 'axios'
+import { useSavedFilters } from 'hooks/filters/useSavedFilters'
+import services from 'services/aphp'
+import { fetchClaimCodes, fetchConditionCodes, fetchProcedureCodes } from 'services/aphp/servicePmsi'
+import useSearchCriterias, { initPmsiSearchCriterias } from 'reducers/searchCriteriasReducer'
+import { cancelPendingRequest } from 'utils/abortController'
+import { selectFiltersAsArray } from 'utils/filters'
+import { mapToLabel, mapToSourceType } from 'mappers/pmsi'
+
+type PMSIListProps = {
   groupId?: string
+  deidentified?: boolean
 }
 
-type PmsiSearchResults = {
-  deidentified: boolean
-  list: CohortPMSI[]
-  nb: number
-  total: number
-  label: PMSILabel
-}
-
-export const PMSITabs: PmsiTabs = [
-  { label: PMSILabel.DIAGNOSTIC, id: ResourceType.CONDITION },
-  { label: PMSILabel.CCAM, id: ResourceType.PROCEDURE },
-  { label: PMSILabel.GHM, id: ResourceType.CLAIM }
-]
-
-const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
-  const { classes } = useStyles()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const getPageParam = searchParams.get('page')
-
+const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
@@ -73,14 +52,11 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [triggerClean, setTriggerClean] = useState<boolean>(false)
   const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
-  const dispatch = useAppDispatch()
 
   const [selectedTab, setSelectedTab] = useState<PmsiTab>({
     id: ResourceType.CONDITION,
     label: PMSILabel.DIAGNOSTIC
   })
-  const [oldTabs, setOldTabs] = useState<PmsiTab | null>(null)
-
   const sourceType = mapToSourceType(selectedTab.id)
 
   const [page, setPage] = useState(1)
@@ -104,56 +80,72 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
       orderBy,
       searchInput,
       filters,
-      filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus }
+      filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus, ipp }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias, addSearchCriterias }
   ] = useSearchCriterias(initPmsiSearchCriterias)
   const filtersAsArray = useMemo(
     () =>
-      selectFiltersAsArray({ code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus }),
-    [code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus]
+      selectFiltersAsArray({
+        code,
+        nda,
+        diagnosticTypes,
+        source,
+        startDate,
+        endDate,
+        executiveUnits,
+        encounterStatus,
+        ipp
+      }),
+    [code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus, ipp]
   )
 
   const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<Hierarchy<any, any>[]>([])
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
-  const patient = useAppSelector((state) => state.patient)
-  const [searchResults, setSearchResults] = useState<PmsiSearchResults>({
-    deidentified: false,
-    list: [],
+  const [searchResults, setSearchResults] = useState<ResultsType>({
     nb: 0,
     total: 0,
     label: PMSILabel.DIAGNOSTIC
   })
+  const [pmsiList, setPmsiList] = useState<CohortPMSI[]>([])
+  const [patientsResults, setPatientsResults] = useState<ResultsType>({ nb: 0, total: 0, label: 'patient(s)' })
 
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
-  const isFirstRender = useRef(true)
 
   const _fetchPMSI = async () => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
-      const response = await dispatch(
-        fetchPmsi({
-          options: {
-            selectedTab: selectedTab.id,
-            oldTab: oldTabs ? oldTabs.id : null,
-            page,
-            searchCriterias: {
-              orderBy,
-              searchInput,
-              filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus }
-            }
-          },
-          groupId,
-          signal: controllerRef.current?.signal
-        })
+      const response = await services.cohorts.fetchPMSIList(
+        {
+          selectedTab: selectedTab.id,
+          deidentified: !!deidentified,
+          page,
+          searchCriterias: {
+            orderBy,
+            searchInput,
+            filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus, ipp }
+          }
+        },
+        groupId,
+        controllerRef.current?.signal
       )
+
       if (response) {
-        checkIfPageAvailable(searchResults.total, page, setPage, dispatch)
-      }
-      if (response.payload.error) {
-        throw response.payload.error
+        const { totalPMSI, totalAllPMSI, totalPatientPMSI, totalAllPatientsPMSI, pmsiList } = response
+        setSearchResults((prevState) => ({
+          ...prevState,
+          nb: totalPMSI,
+          total: totalAllPMSI,
+          label: mapToLabel(selectedTab.id)
+        }))
+        setPmsiList(pmsiList)
+        setPatientsResults((prevState) => ({
+          ...prevState,
+          nb: totalPatientPMSI,
+          total: totalAllPatientsPMSI
+        }))
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {
@@ -161,9 +153,22 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
         setLoadingStatus(LoadingStatus.FETCHING)
       } else {
         setLoadingStatus(LoadingStatus.SUCCESS)
+        setSearchResults((prevState) => ({
+          ...prevState,
+          nb: 0,
+          total: 0,
+          label: mapToLabel(selectedTab.id)
+        }))
+        setPmsiList([])
+        setPatientsResults((prevState) => ({
+          ...prevState,
+          nb: 0,
+          total: 0
+        }))
       }
     }
   }
+
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -177,32 +182,32 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
         /* empty */
       }
     }
-    setOldTabs(selectedTab)
     getSavedFilters()
     fetch()
   }, [])
 
   useEffect(() => {
-    if (!isFirstRender.current) {
-      setLoadingStatus(LoadingStatus.IDDLE)
-      setPage(1)
-      setOldTabs(selectedTab)
-    }
-  }, [searchInput, nda, code, startDate, endDate, diagnosticTypes, source, orderBy, executiveUnits, encounterStatus])
+    setLoadingStatus(LoadingStatus.IDDLE)
+    setPage(1)
+  }, [
+    searchInput,
+    nda,
+    code,
+    startDate,
+    endDate,
+    diagnosticTypes,
+    source,
+    orderBy,
+    executiveUnits,
+    encounterStatus,
+    ipp
+  ])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
-    setOldTabs(selectedTab)
-
-    const updatedSearchParams = new URLSearchParams(searchParams)
-    updatedSearchParams.set('page', page.toString())
-    setSearchParams(updatedSearchParams)
-
-    handlePageError(page, setPage, dispatch)
   }, [page])
 
   useEffect(() => {
-    setOldTabs(selectedTab)
     if (loadingStatus === LoadingStatus.IDDLE) {
       controllerRef.current = cancelPendingRequest(controllerRef.current)
       _fetchPMSI()
@@ -210,26 +215,11 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   }, [loadingStatus])
 
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false
-    } else {
-      setPage(1)
-    }
+    setPage(1)
     removeSearchCriterias()
     setTriggerClean(!triggerClean)
     setLoadingStatus(LoadingStatus.IDDLE)
   }, [selectedTab])
-
-  useEffect(() => {
-    const pmsiIndex = mapToAttribute(selectedTab.id)
-    setSearchResults({
-      deidentified: patient?.deidentified || false,
-      list: patient?.pmsi?.[pmsiIndex]?.list || [],
-      nb: patient?.pmsi?.[pmsiIndex]?.count ?? 0,
-      total: patient?.pmsi?.[pmsiIndex]?.total ?? 0,
-      label: mapToLabel(selectedTab.id)
-    })
-  }, [patient, selectedTab.id])
 
   const fetchCodes = useCallback(() => {
     switch (selectedTab.id) {
@@ -243,17 +233,16 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   }, [selectedTab.id])
 
   return (
-    <Grid container className={classes.documentTable} gap="20px">
-      {(selectedTab.id === ResourceType.PROCEDURE || selectedTab.id === ResourceType.CONDITION) && (
-        <BlockWrapper item xs={12}>
-          <AlertWrapper severity="warning">
-            {`Attention : Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/12/2022. Seuls
+    <Grid container justifyContent="flex-end" gap="20px">
+      <BlockWrapper item xs={12}>
+        <AlertWrapper severity="warning">
+          {`Attention : Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/12/2022. Seuls
             les ${
               selectedTab.id === ResourceType.CONDITION ? 'diagnostics' : 'actes'
             } rattachés à une visite Orbis (avec un Dossier Administratif - NDA) sont actuellement disponibles.`}
-          </AlertWrapper>
-        </BlockWrapper>
-      )}
+        </AlertWrapper>
+      </BlockWrapper>
+
       <Grid container justifyContent="flex-end">
         <Grid container item xs={12} md={10} lg={7} xl={5} justifyContent="flex-end" spacing={1}>
           {(filtersAsArray.length > 0 || searchInput) && (
@@ -273,7 +262,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
               </Tooltip>
             </Grid>
           )}
-          <Grid container item xs={12} md={!!allSavedFilters?.count ? 7 : 4} justifyContent="space-between">
+          <Grid container item xs={12} md={allSavedFilters?.count ? 7 : 4} justifyContent="space-between">
             {!!allSavedFilters?.count && (
               <Button icon={<SavedSearch fill="#FFF" />} width="49%" onClick={() => setToggleSavedFiltersModal(true)}>
                 Vos filtres
@@ -281,7 +270,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
             )}
             <Button
               icon={<FilterList height="15px" fill="#FFF" />}
-              width={!!allSavedFilters?.count ? '49%' : '100%'}
+              width={allSavedFilters?.count ? '49%' : '100%'}
               onClick={() => setToggleFilterByModal(true)}
             >
               Filtrer
@@ -297,7 +286,6 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                 values={PMSITabs}
                 active={selectedTab}
                 onchange={(value: PmsiTab) => {
-                  setOldTabs(selectedTab)
                   setSelectedTab(value)
                 }}
               />
@@ -307,7 +295,14 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                 <CircularProgress />
               )}
               {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
-                <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label} />
+                <Grid container flexDirection={'column'} alignItems={'center'}>
+                  <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label ?? ''} />
+                  <DisplayDigits
+                    nb={patientsResults.nb}
+                    total={patientsResults.total}
+                    label={patientsResults.label ?? ''}
+                  />
+                </Grid>
               )}
             </Grid>
 
@@ -334,13 +329,15 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
         <DataTablePmsi
           loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
           selectedTab={selectedTab.id}
-          pmsiList={searchResults.list}
-          deidentified={searchResults.deidentified}
+          pmsiList={pmsiList}
+          deidentified={!!deidentified}
           orderBy={orderBy}
           setOrderBy={(orderBy) => changeOrderBy(orderBy)}
           page={page}
           setPage={(newPage) => setPage(newPage)}
           total={searchResults.nb}
+          showIpp
+          groupId={groupId}
         />
       </Grid>
 
@@ -352,7 +349,8 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
         onClean={triggerClean}
       >
-        {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+        {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+        {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp ?? ''} />}
         <CodeFilter name={FilterKeys.CODE} value={code} onFetch={fetchCodes()} />
         {selectedTab.id === ResourceType.CONDITION && (
           <DiagnosticTypesFilter
@@ -361,7 +359,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
             allDiagnosticTypesList={allDiagnosticTypesList}
           />
         )}
-        {selectedTab.id !== ResourceType.CLAIM && <SourceFilter name={FilterKeys.SOURCE} value={source || ''} />}
+        {selectedTab.id !== ResourceType.CLAIM && <SourceFilter name={FilterKeys.SOURCE} value={source ?? ''} />}
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter sourceType={sourceType} value={executiveUnits} name={FilterKeys.EXECUTIVE_UNITS} />
         <EncounterStatusFilter
@@ -385,7 +383,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
       >
         <List
           values={allSavedFiltersAsListItems}
-          count={allSavedFilters?.count || 0}
+          count={allSavedFilters?.count ?? 0}
           onDisplay={() => {
             setToggleFilterInfoModal(true)
             setIsReadonlyFilterInfoModal(true)
@@ -418,16 +416,27 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
               startDate,
               endDate,
               executiveUnits,
-              encounterStatus
+              encounterStatus,
+              ipp
             }) => {
               patchSavedFilter(
                 filterName,
                 {
                   searchInput,
                   orderBy: { orderBy: Order.DATE, orderDirection: Direction.DESC },
-                  filters: { code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus }
+                  filters: {
+                    code,
+                    nda,
+                    diagnosticTypes,
+                    source,
+                    startDate,
+                    endDate,
+                    executiveUnits,
+                    encounterStatus,
+                    ipp
+                  }
                 },
-                searchResults.deidentified ?? true
+                deidentified ?? true
               )
             }}
             validationText="Sauvegarder"
@@ -453,12 +462,21 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                   value={selectedSavedFilter?.filterParams.searchInput}
                 />
               </Grid>
-              {!searchResults.deidentified && (
+              {!deidentified && (
                 <Grid item xs={12}>
                   <NdaFilter
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.NDA}
-                    value={selectedSavedFilter?.filterParams.filters.nda || ''}
+                    value={selectedSavedFilter?.filterParams.filters.nda ?? ''}
+                  />
+                </Grid>
+              )}
+              {!deidentified && (
+                <Grid item>
+                  <IppFilter
+                    disabled={isReadonlyFilterInfoModal}
+                    name={FilterKeys.IPP}
+                    value={selectedSavedFilter?.filterParams.filters.ipp ?? ''}
                   />
                 </Grid>
               )}
@@ -466,7 +484,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                 <CodeFilter
                   disabled={isReadonlyFilterInfoModal}
                   name={FilterKeys.CODE}
-                  value={selectedSavedFilter?.filterParams.filters.code || []}
+                  value={selectedSavedFilter?.filterParams.filters.code ?? []}
                   onFetch={fetchCodes()}
                 />
               </Grid>
@@ -475,7 +493,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                   <DiagnosticTypesFilter
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.DIAGNOSTIC_TYPES}
-                    value={selectedSavedFilter?.filterParams.filters.diagnosticTypes || []}
+                    value={selectedSavedFilter?.filterParams.filters.diagnosticTypes ?? []}
                     allDiagnosticTypesList={allDiagnosticTypesList}
                   />
                 </Grid>
@@ -485,7 +503,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                   <SourceFilter
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.SOURCE}
-                    value={selectedSavedFilter?.filterParams.filters.source || ''}
+                    value={selectedSavedFilter?.filterParams.filters.source ?? ''}
                   />
                 </Grid>
               )}
@@ -503,14 +521,14 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                 <ExecutiveUnitsFilter
                   sourceType={sourceType}
                   disabled={isReadonlyFilterInfoModal}
-                  value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
+                  value={selectedSavedFilter?.filterParams.filters.executiveUnits ?? []}
                   name={FilterKeys.EXECUTIVE_UNITS}
                 />
               </Grid>
               <Grid item xs={12}>
                 <EncounterStatusFilter
                   disabled={isReadonlyFilterInfoModal}
-                  value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
+                  value={selectedSavedFilter?.filterParams.filters.encounterStatus ?? []}
                   name={FilterKeys.ENCOUNTER_STATUS}
                   encounterStatusList={encounterStatusList}
                 />
@@ -528,7 +546,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
           resetSavedFilterError()
         }}
         onSubmit={({ filtersName }) =>
-          postSavedFilter(filtersName, { searchInput, filters, orderBy }, searchResults.deidentified ?? true)
+          postSavedFilter(filtersName, { searchInput, filters, orderBy }, deidentified ?? true)
         }
       >
         <TextInput name="filtersName" error={savedFiltersErrors} label="Nom" minLimit={2} maxLimit={50} />
@@ -536,4 +554,5 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
     </Grid>
   )
 }
-export default PatientPMSI
+
+export default PMSIList
