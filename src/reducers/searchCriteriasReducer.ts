@@ -90,6 +90,7 @@ export const initMedSearchCriterias: SearchCriterias<MedicationFilters> = {
   searchBy: SearchByTypes.TEXT,
   filters: {
     nda: '',
+    ipp: '',
     startDate: null,
     endDate: null,
     executiveUnits: [],

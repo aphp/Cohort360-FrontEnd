@@ -7,6 +7,7 @@ import CommentIcon from '@mui/icons-material/Comment'
 
 import DataTable from 'components/DataTable/DataTable'
 import ModalAdministrationComment from 'components/Patient/PatientMedication/ModalAdministrationComment/ModalAdministrationComment'
+import SearchIcon from 'assets/icones/search.svg?react'
 
 import displayDigit from 'utils/displayDigit'
 
@@ -14,7 +15,7 @@ import { Column, CohortMedication } from 'types'
 
 import useStyles from './styles'
 import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
-import { OrderBy } from 'types/searchCriterias'
+import { Order, OrderBy } from 'types/searchCriterias'
 import { ResourceType } from 'types/requestCriterias'
 import { AppConfig } from 'config'
 
@@ -28,6 +29,8 @@ type DataTableMedicationProps = {
   page?: number
   setPage?: (page: number) => void
   total?: number
+  showIpp?: boolean
+  groupId?: string
 }
 const DataTableMedication: React.FC<DataTableMedicationProps> = ({
   loading,
@@ -38,20 +41,25 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
   setOrderBy,
   page,
   setPage,
-  total
+  total,
+  showIpp,
+  groupId
 }) => {
   const { classes } = useStyles()
 
   const columns = [
-    { label: `NDA${deidentified ? ' chiffré' : ''}`, code: 'encounter' },
+    ...(showIpp ? [{ label: `IPP${deidentified ? ' chiffré' : ''}`, align: 'left' }] : []),
+    { label: `NDA${deidentified ? ' chiffré' : ''}`, align: showIpp ? 'center' : 'left', code: Order.ENCOUNTER },
     {
       label: selectedTab === ResourceType.MEDICATION_REQUEST ? 'Date de prescription' : "Date d'administration",
-      code: 'Period-start'
+      code: Order.PERIOD_START
     },
-    { label: 'Code ATC', code: 'medication-atc' },
-    { label: 'Code UCD', code: 'medication-ucd' },
-    selectedTab === ResourceType.MEDICATION_REQUEST ? { label: 'Type de prescription', code: 'category-name' } : null,
-    { label: "Voie d'administration", code: 'route' },
+    { label: 'Code ATC', code: Order.MEDICATION_ATC },
+    { label: 'Code UCD', code: Order.MEDICATION_UCD },
+    selectedTab === ResourceType.MEDICATION_REQUEST
+      ? { label: 'Type de prescription', code: Order.PRESCRIPTION_TYPES }
+      : null,
+    { label: "Voie d'administration", code: Order.ADMINISTRATION_MODE },
     selectedTab === ResourceType.MEDICATION_ADMINISTRATION ? { label: 'Quantité' } : null,
     { label: 'Unité exécutrice' },
     selectedTab === ResourceType.MEDICATION_ADMINISTRATION && !deidentified ? { label: 'Commentaire' } : null
@@ -62,12 +70,20 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
       {!loading && medicationsList && medicationsList.length > 0 ? (
         <>
           {medicationsList.map((medication) => {
-            return <DataTableMedicationLine key={medication.id} deidentified={deidentified} medication={medication} />
+            return (
+              <DataTableMedicationLine
+                key={medication.id}
+                deidentified={deidentified}
+                medication={medication}
+                showIpp={showIpp}
+                groupId={groupId}
+              />
+            )
           })}
         </>
       ) : (
         <TableRow className={classes.emptyTableRow}>
-          <TableCellWrapper colSpan={8} align="left">
+          <TableCellWrapper colSpan={columns.length} align="left">
             <Grid container justifyContent="center">
               {loading ? (
                 <CircularProgress />
@@ -99,8 +115,8 @@ const getCodes = (
     )
 
   return [
-    coding && coding.code ? coding.code : 'Non Renseigné',
-    coding && coding.display ? coding.display : 'Non Renseigné',
+    coding?.code ? coding.code : 'Non Renseigné',
+    coding?.display ? coding.display : 'Non Renseigné',
     !!standardCoding,
     coding?.system
   ]
@@ -109,12 +125,15 @@ const getCodes = (
 const DataTableMedicationLine: React.FC<{
   medication: CohortMedication<MedicationRequest | MedicationAdministration>
   deidentified: boolean
-}> = ({ medication, deidentified }) => {
+  showIpp?: boolean
+  groupId?: string
+}> = ({ medication, deidentified, showIpp, groupId }) => {
   const { classes } = useStyles()
   const appConfig = useContext(AppConfig)
 
   const [open, setOpen] = useState<string | null>(null)
 
+  const ipp = medication.IPP
   const nda = medication.NDA
   const date =
     medication.resourceType === 'MedicationRequest'
@@ -144,8 +163,21 @@ const DataTableMedicationLine: React.FC<{
 
   const comment = medication.resourceType === 'MedicationAdministration' ? medication.dosage?.text : null
 
+  const groupIdSearch = groupId ? `?groupId=${groupId}` : ''
+
   return (
     <TableRow className={classes.tableBodyRows} key={medication.id}>
+      {showIpp && (
+        <TableCellWrapper style={{ minWidth: 150 }}>
+          {ipp}
+          <IconButton
+            onClick={() => window.open(`/patients/${medication.idPatient}${groupIdSearch}`, '_blank')}
+            className={classes.searchIcon}
+          >
+            <SearchIcon height="15px" fill="#ED6D91" className={classes.iconMargin} />
+          </IconButton>
+        </TableCellWrapper>
+      )}
       <TableCellWrapper align="left">{nda ?? 'Inconnu'}</TableCellWrapper>
       <TableCellWrapper>{date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}</TableCellWrapper>
       <TableCellWrapper>

@@ -739,6 +739,7 @@ type fetchMedicationRequestProps = {
   sortDirection?: Direction
   _text?: string
   encounter?: string
+  patientIds?: string
   subject?: string
   type?: string[]
   minDate: string | null
@@ -747,6 +748,7 @@ type fetchMedicationRequestProps = {
   signal?: AbortSignal
   executiveUnits?: string[]
   encounterStatus?: string[]
+  uniqueFacet?: string[]
 }
 export const fetchMedicationRequest = async (
   args: fetchMedicationRequestProps
@@ -768,9 +770,10 @@ export const fetchMedicationRequest = async (
     encounterStatus
   } = args
   const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
-  let { _list } = args
+  let { _list, uniqueFacet } = args
 
   _list = _list ? _list.filter(uniq) : []
+  uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
 
   // By default, all the calls to `/MedicationRequest` will have 'patient.active=true' in parameter
   let options: string[] = ['subject.active=true']
@@ -792,6 +795,8 @@ export const fetchMedicationRequest = async (
     options = [...options, `${PrescriptionParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${PrescriptionParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
+  if (uniqueFacet && uniqueFacet.length > 0)
+    options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer, '')}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
@@ -821,6 +826,7 @@ type fetchMedicationAdministrationProps = {
   signal?: AbortSignal
   executiveUnits?: string[]
   encounterStatus?: string[]
+  uniqueFacet?: string[]
 }
 export const fetchMedicationAdministration = async (
   args: fetchMedicationAdministrationProps
@@ -842,9 +848,10 @@ export const fetchMedicationAdministration = async (
     encounterStatus
   } = args
   const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
-  let { _list } = args
+  let { _list, uniqueFacet } = args
 
   _list = _list ? _list.filter(uniq) : []
+  uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
 
   // By default, all the calls to `/MedicationAdministration` will have 'patient.active=true' in parameter
   let options: string[] = ['subject.active=true']
@@ -866,6 +873,8 @@ export const fetchMedicationAdministration = async (
     options = [...options, `${AdministrationParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`] // eslint-disable-line
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${AdministrationParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
+  if (uniqueFacet && uniqueFacet.length > 0)
+    options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer, '')}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
