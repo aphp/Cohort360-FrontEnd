@@ -911,6 +911,7 @@ type fetchImagingProps = {
   modalities?: string[]
   executiveUnits?: string[]
   encounterStatus?: string[]
+  uniqueFacet?: string[]
 }
 export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise_Response<ImagingStudy> => {
   const {
@@ -930,8 +931,9 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
     encounterStatus
   } = args
   const _orderDirection = orderDirection === Direction.DESC ? '-' : ''
-  let { _list } = args
+  let { _list, uniqueFacet } = args
   _list = _list ? _list.filter(uniq) : []
+  uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
 
   // By default, all the calls to `/ImagingStudy` will have 'patient.active=true' in parameter
   let options: string[] = ['patient.active=true']
@@ -954,6 +956,8 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${ImagingParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
+  if (uniqueFacet && uniqueFacet.length > 0)
+    options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer, '')}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<ImagingStudy>>(
     `/ImagingStudy?${options.reduce(paramsReducer)}`,

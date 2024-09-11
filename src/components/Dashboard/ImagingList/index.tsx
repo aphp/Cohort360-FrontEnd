@@ -17,7 +17,7 @@ import ModalityFilter from 'components/Filters/ModalityFilter/ModalityFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 
-import { CohortImaging, ImagingData, LoadingStatus, DTTB_ResultsType as ResultsType } from 'types'
+import { CohortImaging, LoadingStatus, DTTB_ResultsType as ResultsType } from 'types'
 import { Direction, FilterKeys, ImagingFilters, Order } from 'types/searchCriterias'
 
 import { cancelPendingRequest } from 'utils/abortController'
@@ -50,6 +50,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   const getPageParam = searchParams.get('page')
 
   const [searchResults, setSearchResults] = useState<ResultsType>({ nb: 0, total: 0, label: 'résultats' })
+  const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total: 0, label: 'patient(s)' })
   const [imagingList, setImagingList] = useState<CohortImaging[]>([])
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
@@ -121,7 +122,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
       )
 
       if (response) {
-        const { totalImaging, totalAllImaging, imagingList } = response as ImagingData
+        const { totalImaging, totalAllImaging, totalPatientImaging, totalAllPatientImaging, imagingList } = response
         setImagingList(imagingList)
         setSearchResults((prevState) => ({
           ...prevState,
@@ -130,6 +131,12 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
         }))
 
         checkIfPageAvailable(totalImaging, page, setPage, dispatch)
+
+        setPatientsResult((prevState) => ({
+          ...prevState,
+          nb: totalPatientImaging,
+          total: totalAllPatientImaging
+        }))
       }
 
       setLoadingStatus(LoadingStatus.SUCCESS)
@@ -138,6 +145,16 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
         setLoadingStatus(LoadingStatus.FETCHING)
       } else {
         setImagingList([])
+        setSearchResults((prevState) => ({
+          ...prevState,
+          nb: 0,
+          total: 0
+        }))
+        setPatientsResult((prevState) => ({
+          ...prevState,
+          nb: 0,
+          total: 0
+        }))
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
     }
@@ -190,7 +207,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
           {appConfig.system.mailSupport}.
         </AlertWrapper>
       </BlockWrapper>
-      <Grid container justifyContent="flex-end" gap="10px">
+      <Grid container justifyContent="flex-end">
         <Grid container item xs={12} md={10} lg={7} xl={5} justifyContent="flex-end" spacing={1}>
           {(filtersAsArray.length > 0 || searchInput) && (
             <Grid container item xs={12} md={5}>
@@ -209,7 +226,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
               </Tooltip>
             </Grid>
           )}
-          <Grid container item xs={12} md={!!allSavedFilters?.count ? 7 : 3} justifyContent="space-between">
+          <Grid container item xs={12} md={allSavedFilters?.count ? 7 : 3} justifyContent="space-between">
             {!!allSavedFilters?.count && (
               <Button icon={<SavedSearch fill="#FFF" />} width="49%" onClick={() => setToggleSavedFiltersModal(true)}>
                 Vos filtres
@@ -217,7 +234,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
             )}
             <Button
               icon={<FilterList height="15px" fill="#FFF" />}
-              width={!!allSavedFilters?.count ? '49%' : '100%'}
+              width={allSavedFilters?.count ? '49%' : '100%'}
               onClick={() => setToggleFilterByModal(true)}
             >
               Filtrer
@@ -229,7 +246,11 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
         <Grid container item xs={12} lg={5}>
           {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && <CircularProgress />}
           {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
-            <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label as string} />
+            <Grid item xs={12} container>
+              <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label as string} />
+              <span style={{ width: '25px' }} />
+              <DisplayDigits nb={patientsResult.nb} total={patientsResult.total} label={patientsResult.label ?? ''} />
+            </Grid>
           )}
         </Grid>
 
@@ -270,7 +291,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
       >
         {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-        {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp || ''} />}
+        {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp ?? ''} />}
         <ModalityFilter value={modality} name={FilterKeys.MODALITY} modalitiesList={allModalities} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
@@ -298,7 +319,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
       >
         <List
           values={allSavedFiltersAsListItems}
-          count={allSavedFilters?.count || 0}
+          count={allSavedFilters?.count ?? 0}
           onDisplay={() => {
             setToggleFilterInfoModal(true)
             setIsReadonlyFilterInfoModal(true)
@@ -373,7 +394,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
                   <NdaFilter
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.NDA}
-                    value={selectedSavedFilter?.filterParams.filters.nda || ''}
+                    value={selectedSavedFilter?.filterParams.filters.nda ?? ''}
                   />
                 )}
                 <ModalityFilter
