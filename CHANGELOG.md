@@ -1,368 +1,997 @@
-# [2.31.0-SNAPSHOT](https://github.com/aphp/Cohort360/compare/2.29.1...2.31.0-SNAPSHOT) (2024-01-09)
-
-
-### Bug Fixes
-
-* add new type and fix attribute name ([0548738](https://github.com/aphp/Cohort360/commit/0548738c31d52c1835fd390473965cffca4a4cf6))
-* apply ODD_IMAGING to imagerie tab into cohort or perimeter ([36d579f](https://github.com/aphp/Cohort360/commit/36d579fdda59288f8d450c47740151fef4f75820))
-* change a param and route for perimeter right ([7fe0fd2](https://github.com/aphp/Cohort360/commit/7fe0fd232870214dccc1feb9d35e75e91d087d65))
-* fix deidentied use case for date range into patient and encounter ([5bb121d](https://github.com/aphp/Cohort360/commit/5bb121d929619f508147b72d86ce1217ee3f9e20))
-* fix several bug ([19cd6b7](https://github.com/aphp/Cohort360/commit/19cd6b777e2065323a9a0c1bebcb4064ab23694b))
-* fix several bug and add cancel request into requestor autocomplete ([7fc03b0](https://github.com/aphp/Cohort360/commit/7fc03b0081b90bdd1d82fbba79f18101b44ca6b2))
-* fix some bug with cohort-rights and pass biology research value in float ([c00bffb](https://github.com/aphp/Cohort360/commit/c00bffb4da071c20a72a86eda1d3e5af19d60a33))
-* make changes for rights routes following backend refacto ([#906](https://github.com/aphp/Cohort360/issues/906)) ([8c6a656](https://github.com/aphp/Cohort360/commit/8c6a656ebc184971f7dfd463bafe1ad648486c10))
-
-
-
-## [2.29.1](https://github.com/aphp/Cohort360/compare/2.29.0...2.29.1) (2023-12-20)
-
-
-### Bug Fixes
-
-* apply ODD_IMAGING to imagerie tab into cohort or perimeter ([14b729a](https://github.com/aphp/Cohort360/commit/14b729abcd6f9c416c2f3ba8aa213d9f2103991b))
-
-
-
-# [2.29.0](https://github.com/aphp/Cohort360/compare/2.22.4...2.29.0) (2023-12-20)
-
-
-### Bug Fixes
-
-* @Mehdi-BOUYAHIA fix: call to the right valueSet for medication and biology - Ref gestion-de-projet[#2154](https://github.com/aphp/Cohort360/issues/2154) ([a306d15](https://github.com/aphp/Cohort360/commit/a306d15fb09bfaf2f698848f9b1aaf6407e15e94))
-* adapt documentReference params type to type-name ([67c1c9d](https://github.com/aphp/Cohort360/commit/67c1c9d21aea3032f404ff00a874c3cf28766e96))
-* annoying console errors in Login, redux and newscard ([c7b0696](https://github.com/aphp/Cohort360/commit/c7b0696ccd436bc536c4640ebfd696b69657f73b))
-* Aucun patient where there is and fix age filters - Ref gestion-de-projet[#2211](https://github.com/aphp/Cohort360/issues/2211) ([83c5547](https://github.com/aphp/Cohort360/commit/83c554736487f0da45d4300bec90d3cd9d8df5b6))
-* biology expand - Ref gestion-de-projet[#2272](https://github.com/aphp/Cohort360/issues/2272) ([#872](https://github.com/aphp/Cohort360/issues/872)) ([b720543](https://github.com/aphp/Cohort360/commit/b720543384eca2d5c35e3d0ff1398cd78079a7b7))
-* biology values border - Ref gestion-de-projet[#2270](https://github.com/aphp/Cohort360/issues/2270) ([#863](https://github.com/aphp/Cohort360/issues/863)) ([f62f96e](https://github.com/aphp/Cohort360/commit/f62f96e242ed1eca7363adc165755717807d3c7f))
-* block creation of request or cohort with blank name - Ref gestion-de-projet[#2213](https://github.com/aphp/Cohort360/issues/2213) ([adf7ee1](https://github.com/aphp/Cohort360/commit/adf7ee1b190d8efebe4939321a8f6e0177a67ebe))
-* capslock caractere remove from error alerting - Ref gestion-de-projet[#2204](https://github.com/aphp/Cohort360/issues/2204) gestion-de-projet[#2205](https://github.com/aphp/Cohort360/issues/2205) ([3bdea2b](https://github.com/aphp/Cohort360/commit/3bdea2bdcba64803ad4e5d0f253045b71cf02d95))
-* chang type-name param by type ([0e0bf60](https://github.com/aphp/Cohort360/commit/0e0bf60a78593677e85cf5c7453cac1f12d73e8e))
-* change docker entry point for pheadra - Ref gestion-de-projet[#2175](https://github.com/aphp/Cohort360/issues/2175) ([6d0bc86](https://github.com/aphp/Cohort360/commit/6d0bc866731a7e0372ebf65f90f0061ab620c35a))
-* cleaning console log ([1f9d21a](https://github.com/aphp/Cohort360/commit/1f9d21a4f5e2b84bb21707f25636b18e98ae42d7))
-* correct fhir param names - Ref gestion-de-projet[#2330](https://github.com/aphp/Cohort360/issues/2330) ([3c74578](https://github.com/aphp/Cohort360/commit/3c745784c601f279ca8c3bb886d2354cbe3b72b7))
-* correcting caps caracter on a word - Ref gestion-de-projet[#2205](https://github.com/aphp/Cohort360/issues/2205) ([3d06fbe](https://github.com/aphp/Cohort360/commit/3d06fbe6821d8e1bb7b01e6738235a8ae605e813))
-* fix age undefined when 0-130 years - Ref gestion-de-projet[#2039](https://github.com/aphp/Cohort360/issues/2039) ([202a187](https://github.com/aphp/Cohort360/commit/202a1876c3283910546931a8f3b2b6578a36eaf5))
-* fix bugs n6 n8 and n16 - Ref gestion-de-projet[#2330](https://github.com/aphp/Cohort360/issues/2330) ([742eec3](https://github.com/aphp/Cohort360/commit/742eec3287cd9866c59ba047ad68fc5fceb2888a))
-* fix double import ([c51f290](https://github.com/aphp/Cohort360/commit/c51f29052f5e3866f837b7f30b01cf369b73585f))
-* fix env variable ([5f1b467](https://github.com/aphp/Cohort360/commit/5f1b467bc7f4b08d36f0ff8b51206fa390a777b6))
-* fix error management demographic criteria ([#910](https://github.com/aphp/Cohort360/issues/910)) ([a8e69c3](https://github.com/aphp/Cohort360/commit/a8e69c38b383c57ac486daaf9360f862a0e9fdc4))
-* fix error when user has no rights ([9e9ace6](https://github.com/aphp/Cohort360/commit/9e9ace6b95f959818b0f632c934edd7096e8134b))
-* fix infinite loop into search bar and add cancel request - Ref gestion-de-projet[#2166](https://github.com/aphp/Cohort360/issues/2166) ([4dd28a8](https://github.com/aphp/Cohort360/commit/4dd28a8fb21d827ed78d20761a2e196bac5b3318))
-* fix mispell fault - Ref gestion-de-projet[#2149](https://github.com/aphp/Cohort360/issues/2149) ([1d2471f](https://github.com/aphp/Cohort360/commit/1d2471f940dcf3238631c00304c05d279109f9ee))
-* fix mispelling word - Ref gestion-de-projet[#1986](https://github.com/aphp/Cohort360/issues/1986) ([11f0d25](https://github.com/aphp/Cohort360/commit/11f0d251ca84bf2a7c3afa8d8da9a0528ca244d9))
-* fix npm packages vulnerabilities - Ref gestion-de-projet[#2164](https://github.com/aphp/Cohort360/issues/2164) ([b6ad3e6](https://github.com/aphp/Cohort360/commit/b6ad3e6588434316cc0ca6864d6adac619cf595d))
-* fix regression on shareRequest ([ee834b9](https://github.com/aphp/Cohort360/commit/ee834b934490cfe7e07136d27cce2a9d062d06cc))
-* fix selectedCriteria?.encounterService?.length undefined ([29cdc0f](https://github.com/aphp/Cohort360/commit/29cdc0fc59d0363bd4b7d8fb2cb37c200d743a68))
-* fix several bug ([c4ea229](https://github.com/aphp/Cohort360/commit/c4ea22927e0626753461ff9fb3a560413cfccc50))
-* fix some bug ([eb5f647](https://github.com/aphp/Cohort360/commit/eb5f6477a4b682e0cec8aee0ba0a06322e103141)), closes [gestion-de-projet#2271](https://github.com/gestion-de-projet/issues/2271)
-* fix some bug on 2.29.0 ([#919](https://github.com/aphp/Cohort360/issues/919)) ([4314790](https://github.com/aphp/Cohort360/commit/43147909ee07e9d1cde8f77bb4c49fa70c5dae56)), closes [gestion-de-projet#2406](https://github.com/gestion-de-projet/issues/2406) [gestion-de-projet#2236](https://github.com/gestion-de-projet/issues/2236)
-* fix version 2.29.0 ([56eddd0](https://github.com/aphp/Cohort360/commit/56eddd09373a02d9a59eefd3c6008333b8611395)), closes [gestion-de-projet#2406](https://github.com/gestion-de-projet/issues/2406) [gestion-de-projet#2236](https://github.com/gestion-de-projet/issues/2236)
-* fixe some bug into release 2.27.0 ([336131f](https://github.com/aphp/Cohort360/commit/336131f2d2760b7b7b5fcff3d71959e37d1600d9)), closes [gestion-de-projet#2385](https://github.com/gestion-de-projet/issues/2385) [gestion-de-projet#2373](https://github.com/gestion-de-projet/issues/2373)
-* fixed biology search by code value - Ref gestion-de-projet[#2216](https://github.com/aphp/Cohort360/issues/2216) ([4f906dc](https://github.com/aphp/Cohort360/commit/4f906dc96aa6d26c4a2f3ff1529c5d5ee8a05643))
-* fixed bug in cohort creation title errors - Ref gestion-de-projet[#2268](https://github.com/aphp/Cohort360/issues/2268) ([1644655](https://github.com/aphp/Cohort360/commit/16446551b21b0ee12f9fe98837e498b7947c49f7))
-* fixes some bug ([cca20a4](https://github.com/aphp/Cohort360/commit/cca20a4a40d9f30a2e8be70fb8f41a87597897f1))
-* hot fix for delete pmsi filters and negative value for biology criteria ([#861](https://github.com/aphp/Cohort360/issues/861)) ([6960ce1](https://github.com/aphp/Cohort360/commit/6960ce1967b6d1b2a1a289e0c74e0609bb616238)), closes [gestion-de-projet#2271](https://github.com/gestion-de-projet/issues/2271)
-* manage right to export cohort - Ref gestion-de-projet[#1986](https://github.com/aphp/Cohort360/issues/1986) ([#819](https://github.com/aphp/Cohort360/issues/819)) ([11767b8](https://github.com/aphp/Cohort360/commit/11767b8370622b734cff7b167960b9907b28c60b))
-* **medication:** add fallback codesystem code display when standard is missing ([7656f60](https://github.com/aphp/Cohort360/commit/7656f606413de7eb1f098a968d412d625b5a4cd4))
-* **medicationCriteria:** correct param route name ([afc4d95](https://github.com/aphp/Cohort360/commit/afc4d95401a9b40323d7f1f79bc737f1fa739f75))
-* put table in warning in italic - Ref gestion-de-projet[#2106](https://github.com/aphp/Cohort360/issues/2106) ([ae0706d](https://github.com/aphp/Cohort360/commit/ae0706d4b8c1a854f2f1a6a79f3ade1d95a91e55))
-* removed bodysite, fixed cohort creation ([0ddfc21](https://github.com/aphp/Cohort360/commit/0ddfc21d62f992e15ed58e4e6acc59e6a0ba9fdb))
-* Resolve alert on shared request - Ref gestion-de-projet[#2141](https://github.com/aphp/Cohort360/issues/2141) ([27bda08](https://github.com/aphp/Cohort360/commit/27bda08f640332d96e59b605a230dba4032bf279))
-* resolve alerting whem double non sens - Ref gestion-de-projet[#2204](https://github.com/aphp/Cohort360/issues/2204) ([f325917](https://github.com/aphp/Cohort360/commit/f32591706721a579b2813d7216af07aabd3a0e4e))
-* resolve alerting whem double non sens - Ref gestion-de-projet[#2204](https://github.com/aphp/Cohort360/issues/2204) ([c7ed91a](https://github.com/aphp/Cohort360/commit/c7ed91a5ea6575bf8866ec2a48b18c36fbecd56a))
-* resolve bug n13 - Ref gestion-de-projet[#2330](https://github.com/aphp/Cohort360/issues/2330) ([75af225](https://github.com/aphp/Cohort360/commit/75af225411873a9278d228ed8814ee1c43219919))
-* resolve bug n15 - Ref gestion-de-projet[#2330](https://github.com/aphp/Cohort360/issues/2330) ([a361def](https://github.com/aphp/Cohort360/commit/a361def89a2aba183120c76ff1bb4d9a15ef0432))
-* resolve bug n8 - Ref gestion-de-projet[#2330](https://github.com/aphp/Cohort360/issues/2330) ([eb50666](https://github.com/aphp/Cohort360/commit/eb506660b37fa97f19a6038e0d11c59cb9c119ce))
-* resolve confirm supported criteria with just an encounterService ([1fd9858](https://github.com/aphp/Cohort360/commit/1fd98582cf2d2b15d18b926dc373ef8227d9a114))
-* resolve packages vulnerabilities ([501d4e6](https://github.com/aphp/Cohort360/commit/501d4e65e7f069c5dc49612815c8fb73a2349d66))
-* resolve remaining bug on refacto ([26c90ea](https://github.com/aphp/Cohort360/commit/26c90ea99788bae06693f156415403d554d21d0a))
-* resolve remaining bug on refacto - Ref gestion-de-projet[#1799](https://github.com/aphp/Cohort360/issues/1799) gestion-de-projet[#2373](https://github.com/aphp/Cohort360/issues/2373) gestion-de-projet[#2385](https://github.com/aphp/Cohort360/issues/2385) ([#908](https://github.com/aphp/Cohort360/issues/908)) ([0389672](https://github.com/aphp/Cohort360/commit/0389672667ca7a399a10370098afc51fa73b4373)), closes [gestion-de-projet#2375](https://github.com/gestion-de-projet/issues/2375)
-* resolve repartitionMap for graph ([5007c2a](https://github.com/aphp/Cohort360/commit/5007c2ab1d8c39cb69b5d55eaa46d2b1fe925605))
-* resolve select caresite when use research mode ([2aea9cf](https://github.com/aphp/Cohort360/commit/2aea9cf20e18a263e7f16a16c66ccef9127ebeff))
-* resolve several bug ([70588fa](https://github.com/aphp/Cohort360/commit/70588faa258c25a9bfc9b323f403897b7ff69c32))
-* resolve unbuild pmsi criteria always return all hierarchy ([6509909](https://github.com/aphp/Cohort360/commit/6509909c3a1216e21d8f1a3f0047da96b8134fa6))
-* resolve wildcard into pmsi _text when no research ([#895](https://github.com/aphp/Cohort360/issues/895)) ([1fd0549](https://github.com/aphp/Cohort360/commit/1fd0549782bb6dd9eabd203674f875f0667fffc6))
-* retrieve encounterService for imaging criteria ([698521f](https://github.com/aphp/Cohort360/commit/698521f44af4f3126fda3661aae981748a5c0976))
-* retrieve encounterService for imaging criteria ([aec3162](https://github.com/aphp/Cohort360/commit/aec3162f7c25bb87ae8f42c2270db4529d21923f))
-* retrieve encounterService for imaging criteria ([05a6c1d](https://github.com/aphp/Cohort360/commit/05a6c1d9f86a5673a270300aaeea886da6007126))
-* retrive equals on type for fetchcohortRights ([ff9eaa5](https://github.com/aphp/Cohort360/commit/ff9eaa58413299283a594a55d203a704e2fb5d87))
-* retrive other filter chip Ref - gestion-de-projet[#2119](https://github.com/aphp/Cohort360/issues/2119) ([6387e04](https://github.com/aphp/Cohort360/commit/6387e04d144edffc1e743abcb62b72406d5426ca))
-* some fixes - Ref gestion-de-projet[#2204](https://github.com/aphp/Cohort360/issues/2204) gestion-de-projet[#2205](https://github.com/aphp/Cohort360/issues/2205) gestion-de-projet[#2149](https://github.com/aphp/Cohort360/issues/2149) ([30576b9](https://github.com/aphp/Cohort360/commit/30576b96ed6a91aa24e5b6e63f21feaba970672a))
-* supportedForm scope type and add scope type limit to scope search  ([69c8880](https://github.com/aphp/Cohort360/commit/69c8880b0a279bcee7a200db7e7e27a30ce27aa3)), closes [gestion-de-projet#2168](https://github.com/gestion-de-projet/issues/2168)
-* **ts:** add ts type for svg images ([ca5c164](https://github.com/aphp/Cohort360/commit/ca5c164a8c978027006b64ae8ceeb4b6e3d47586))
-* update sort names for resource search ([3f78446](https://github.com/aphp/Cohort360/commit/3f78446e12f0674fbdbd7d2583491ffa887aa1e7))
-* **valueset:** properly override only-roots param ([8910cea](https://github.com/aphp/Cohort360/commit/8910cea40d4af8ca9394c9ea377e911e2cdfa515))
-* **valuesets:** correct code searching and display + add some typing ([4f024d0](https://github.com/aphp/Cohort360/commit/4f024d05e3a7cece9b1b284a74ca337f8089208a))
-
-
-### Features
-
-* add executive units filters in resources browsing  ([#825](https://github.com/aphp/Cohort360/issues/825)) ([6588816](https://github.com/aphp/Cohort360/commit/6588816ba7e42ac4557c47781b4dffeb764852c5)), closes [gestion-de-projet#2149](https://github.com/gestion-de-projet/issues/2149)
-* add information data Médicaments - Ref gestion-de-projet[#2107](https://github.com/aphp/Cohort360/issues/2107) ([1cf9e75](https://github.com/aphp/Cohort360/commit/1cf9e7598c646cd5c59c5328266ae42dd2f9c6c7))
-* add information data PMSI in CCAM, GHM & CIM10 ([#816](https://github.com/aphp/Cohort360/issues/816)) ([27e4d51](https://github.com/aphp/Cohort360/commit/27e4d51623e436da21bfdef5bf81e707588dfe6e)), closes [gestion-de-projet#2108](https://github.com/gestion-de-projet/issues/2108)
-* add information export csv with new style - Ref gestion-de-projet[#2106](https://github.com/aphp/Cohort360/issues/2106) ([92a0628](https://github.com/aphp/Cohort360/commit/92a0628221843c97526c0793d13577065b0dc8d6))
-* add news of next release - Ref gestion-de-projet[#2214](https://github.com/aphp/Cohort360/issues/2214) ([8aa591b](https://github.com/aphp/Cohort360/commit/8aa591b4de4f7a89a1eb08a7f9ebd46f268d0aa9))
-* add view textual pdf not available - Ref gestion-de-projet[#1390](https://github.com/aphp/Cohort360/issues/1390) ([bb78bbf](https://github.com/aphp/Cohort360/commit/bb78bbfd57a2d93c6f817206590f0544ec074e28))
-* add wildcard to search - Ref gestion-de-projet[#1135](https://github.com/aphp/Cohort360/issues/1135) ([bddf28d](https://github.com/aphp/Cohort360/commit/bddf28d8589d5918ab364114c732ba3f183fb5d5))
-* added imaging view in dashboard - Ref gestion-de-projet[#2224](https://github.com/aphp/Cohort360/issues/2224) ([fe18a92](https://github.com/aphp/Cohort360/commit/fe18a92bb8f601417e66d0276f019cd9c4ec7207))
-* added imaging viewing for a patient and imaging requestor - Ref gestion-de-projet[#1151](https://github.com/aphp/Cohort360/issues/1151) gestion-de-projet[#2100](https://github.com/aphp/Cohort360/issues/2100) ([9956ef1](https://github.com/aphp/Cohort360/commit/9956ef1daa408d5ac1f8b42ec377c2438b7a776a))
-* added partial temporal constraints - Ref gestion-de-projet[#2033](https://github.com/aphp/Cohort360/issues/2033) ([01fb6b6](https://github.com/aphp/Cohort360/commit/01fb6b6ee5751573dba56ad9ba927bcc2a751915))
-* adding AREM in data visualisation and requestor - Ref gestion-de-projet[#2183](https://github.com/aphp/Cohort360/issues/2183) ([#911](https://github.com/aphp/Cohort360/issues/911)) ([def2646](https://github.com/aphp/Cohort360/commit/def26468aa34833f3715f43e97d35ec2b07e14bc)), closes [gestion-de-projet#2279](https://github.com/gestion-de-projet/issues/2279) [gestion-de-projet#2279](https://github.com/gestion-de-projet/issues/2279)
-* change label for exportable tables - Ref gestion-de-projet[#2048](https://github.com/aphp/Cohort360/issues/2048) ([1e77c50](https://github.com/aphp/Cohort360/commit/1e77c50a4be1dcf61f5cabe2f520e728c3d19019))
-* change the way to present list of criteria - Ref gestion-de-projet[#2195](https://github.com/aphp/Cohort360/issues/2195) ([55233db](https://github.com/aphp/Cohort360/commit/55233db3857907c2fba9c4fc0545070e8cd27780))
-* improve inderminate icons - Ref gestion-de-projet-[#2272](https://github.com/aphp/Cohort360/issues/2272) ([#874](https://github.com/aphp/Cohort360/issues/874)) ([0b37677](https://github.com/aphp/Cohort360/commit/0b3767775b5b9034072cfe64de073af6c17d7df9))
-* new requestor navigation - Ref gestion-de-projet[#2039](https://github.com/aphp/Cohort360/issues/2039) ([90c6c7b](https://github.com/aphp/Cohort360/commit/90c6c7baf640602017a8e647b731ee9c78571689))
-* on enter key down then connect - Ref gestion-de-projet[#2237](https://github.com/aphp/Cohort360/issues/2237) ([#866](https://github.com/aphp/Cohort360/issues/866)) ([d59435e](https://github.com/aphp/Cohort360/commit/d59435e7ded8b1cc13ff9a50f34b5662fa3c8a3c))
-* phedra adaptation and some fixes - Ref gestion-de-projet[#2175](https://github.com/aphp/Cohort360/issues/2175) ([#875](https://github.com/aphp/Cohort360/issues/875)) ([69063cb](https://github.com/aphp/Cohort360/commit/69063cb622b78c243cfb193468f666c7fd6bb3fb))
-* possibility sort patients ipp - Ref gestion-de-projet[#1128](https://github.com/aphp/Cohort360/issues/1128) ([4110040](https://github.com/aphp/Cohort360/commit/4110040be3c146e0a73f268273327a64b05e7637))
-* remove names variables in query - Ref: gestion-de-projet[#2006](https://github.com/aphp/Cohort360/issues/2006) ([43fa6b3](https://github.com/aphp/Cohort360/commit/43fa6b361916d4c9c51c1e917c9b45229d1ece76))
-* remove the jwt form and connection - Ref gestion-de-projet[#2256](https://github.com/aphp/Cohort360/issues/2256) ([ea82621](https://github.com/aphp/Cohort360/commit/ea82621ee052dfffb5b12949348b53d3dedf82b4))
-* remove the jwt form and connection - Ref gestion-de-projet[#2256](https://github.com/aphp/Cohort360/issues/2256) ([52b5861](https://github.com/aphp/Cohort360/commit/52b58610720348ca0c473e91667d70fd9c7d158f))
-* rename criteria tabs from hierarchy to exploration - Ref gestion-de-projet[#2238](https://github.com/aphp/Cohort360/issues/2238) ([592e685](https://github.com/aphp/Cohort360/commit/592e685a3bbe705c184e03b1742ac3f5d00b8024))
-* **requests:** add notify by email option in sharing modal - Refs: gestion-de-projet[#2062](https://github.com/aphp/Cohort360/issues/2062) ([#815](https://github.com/aphp/Cohort360/issues/815)) ([f0699a6](https://github.com/aphp/Cohort360/commit/f0699a6066e32b8aea880493637cf6f6bec77051))
-* responsive pdf display - Ref gestion-de-projet[#2223](https://github.com/aphp/Cohort360/issues/2223) ([9f46642](https://github.com/aphp/Cohort360/commit/9f46642ee12e6a1fdadbf6864fe3d720f7a52d39))
-* reverse icons - Ref gestion-de-projet[#2236](https://github.com/aphp/Cohort360/issues/2236) ([9e6cf70](https://github.com/aphp/Cohort360/commit/9e6cf701b292f23924270a8cb1cc9c22f459929a))
-* unify date and time formats on cohort and query lists - Ref gestion-de-projet[#1165](https://github.com/aphp/Cohort360/issues/1165) ([3d9005b](https://github.com/aphp/Cohort360/commit/3d9005b329f4c087ef518399080d5a56f65b4236))
-
-
-
-## [2.22.2](https://github.com/aphp/Cohort360/compare/2.22.0...2.22.2) (2023-07-21)
-
-
-
-# [2.22.0](https://github.com/aphp/Cohort360/compare/2.22.1...2.22.0) (2023-07-21)
-
-
-### Bug Fixes
-
-* add error alert on login failure ([3a9593e](https://github.com/aphp/Cohort360/commit/3a9593ec076a8178b05ea9d9143c9b2599831df6))
-* add missing type import ([#778](https://github.com/aphp/Cohort360/issues/778)) ([f791547](https://github.com/aphp/Cohort360/commit/f791547756adfb9475b699ee530d2f464b3a74b8))
-* added valueSet URL to all hierarchy criteria - Ref gestion-de-projet[#2148](https://github.com/aphp/Cohort360/issues/2148) ([fd4ad0c](https://github.com/aphp/Cohort360/commit/fd4ad0cafb4e3b71e5641f2e18f35fbc71c4b549))
-* **binary:** add authorization method header ([2eaa0d6](https://github.com/aphp/Cohort360/commit/2eaa0d6cd7005736855a3a5389565c188d9698af))
-* call to the right valueSet for medication and biology - Ref gestion-de-projet[#2154](https://github.com/aphp/Cohort360/issues/2154) ([5e3751c](https://github.com/aphp/Cohort360/commit/5e3751c830c5624ac89fb12d87314f06f80faf1d))
-* changed size to _count in all fhir resources - Ref gestion-de-projet[#2148](https://github.com/aphp/Cohort360/issues/2148) ([247c9cf](https://github.com/aphp/Cohort360/commit/247c9cf9ce0a65ff909941d57b45886c8edf9d6a))
-* changed status to docstatus in documentreference  - Ref gestion-de-projet[#2148](https://github.com/aphp/Cohort360/issues/2148) ([ed8e75b](https://github.com/aphp/Cohort360/commit/ed8e75b42b4f1964e4076632feee7da4ac0e4c25))
-* cleaning console.log ([35cce90](https://github.com/aphp/Cohort360/commit/35cce9061ab3bf6f527b8fb0b7f3be00e8624912))
-* **cohorts-rights:** use new rights system when fetching in background ([5beb8d7](https://github.com/aphp/Cohort360/commit/5beb8d7ade05b5c26277ac1055f640d49d2e4ac2))
-* correcting Authorization Method in headers ([923220c](https://github.com/aphp/Cohort360/commit/923220c8ba58c37351d0aa400073e2329551edb6))
-* correcting Authorization Method in headers ([39a32c7](https://github.com/aphp/Cohort360/commit/39a32c782677630d81ce87b3ea07b8a4716594a4))
-* correcting Authorization Method in headers ([aa83665](https://github.com/aphp/Cohort360/commit/aa83665acbe3d79595ec258e7eaf32815f4c39fa))
-* correcting Authorization Method in headers ([4663826](https://github.com/aphp/Cohort360/commit/4663826b9b7df91b19458f38650a285dce8cb5fa))
-* correcting Authorization Method in headers ([a5285de](https://github.com/aphp/Cohort360/commit/a5285debe5652e8da8345ce9e3490ee1f74889ac))
-* disabled biology status checkbox and added it to requestor - Ref gestion-de-projet[#1174](https://github.com/aphp/Cohort360/issues/1174) ([4475845](https://github.com/aphp/Cohort360/commit/44758455c7d26a9055a27be6bdb402b75a069c36))
-* fixed age display of patient demographic - Ref gestion-de-projet[#2148](https://github.com/aphp/Cohort360/issues/2148) ([9ebe070](https://github.com/aphp/Cohort360/commit/9ebe070b66f9f7e53d251f7f0ce8ffdf8c421e0d))
-* fixed age range in patient demographic - Ref gestion-de-projet[#2148](https://github.com/aphp/Cohort360/issues/2148) ([4572501](https://github.com/aphp/Cohort360/commit/45725014ae3026adef19a8858b0a2191438d5e1f))
-* fixed charts display - Ref gestion-de-projet[#2148](https://github.com/aphp/Cohort360/issues/2148) ([a8a1f55](https://github.com/aphp/Cohort360/commit/a8a1f556e268a6d18a8accfc2046e9102adf1eda))
-* initResourceHierarchy reset on reload ([de56930](https://github.com/aphp/Cohort360/commit/de569307922b41ed554518d7e7bcbfe502cf68e2))
-* logout first then clear local storage  ([3538aa7](https://github.com/aphp/Cohort360/commit/3538aa7db6961db5e7d57a7a2cf5c8392ab4f2d6))
-* modify when oidcAuth is set in localStorage ([f2997bc](https://github.com/aphp/Cohort360/commit/f2997bce6be9de0ec28890a2ba5805057a1283c8))
-* occurence number error[#1502](https://github.com/aphp/Cohort360/issues/1502) ([194c5ed](https://github.com/aphp/Cohort360/commit/194c5edb5b2339e4f05fb66e410bed050511ab14))
-* **occurenceForm:** add min value validator ([bb539e7](https://github.com/aphp/Cohort360/commit/bb539e72cb1c049c48ac4831a4e95c779e573f70))
-* **occurenceForm:** change align input when error message is displayed ([cbc2871](https://github.com/aphp/Cohort360/commit/cbc28716eebbdc08af7bd12a64cced68c777ed9f))
-* **perimeters:** filter correct value when searching minimum scope level ([e185f7d](https://github.com/aphp/Cohort360/commit/e185f7d8e03cae3a17cda2e9e146966fa4123012))
-* prise-en-charge => change default value by years - Ref gestion-de-projet[#1499](https://github.com/aphp/Cohort360/issues/1499) ([#801](https://github.com/aphp/Cohort360/issues/801)) ([b8aeaa7](https://github.com/aphp/Cohort360/commit/b8aeaa76e396bc6a8147bada942394a5a8954d93))
-* removed ability to sort by serviceProvider in medication - Ref gestion-de-projet[#2148](https://github.com/aphp/Cohort360/issues/2148) ([9bffc0a](https://github.com/aphp/Cohort360/commit/9bffc0a357728120da0976e630fd616000ff9d6a))
-* rename ipplist query param ([a2dc0cb](https://github.com/aphp/Cohort360/commit/a2dc0cbe5c539225ff4cb611fa40d4d6f34bd487))
-* resolve NaN on screen when no expire access - Ref gestion-de-projet[#1999](https://github.com/aphp/Cohort360/issues/1999) ([a2fdda6](https://github.com/aphp/Cohort360/commit/a2fdda61235a39fd452941aee8ceba955d481e5a))
-* resolve refresh token after logout - Ref gestion-de-projet[#2124](https://github.com/aphp/Cohort360/issues/2124) ([00fcbe3](https://github.com/aphp/Cohort360/commit/00fcbe3dcaeae6746e5236c57c764ee49756682f))
-* resolve unknown chipset into patient data table ([be9f3da](https://github.com/aphp/Cohort360/commit/be9f3dacfed4c97cce0bf4d9545eb2300e43f21b))
-* **scopetree:** limit expand to min scope type ([299f2a3](https://github.com/aphp/Cohort360/commit/299f2a3be4184b674589c4737b888ecd4d5cb161))
-* send the right message when credential is wrong - Ref gestion-de-projet[#2168](https://github.com/aphp/Cohort360/issues/2168) ([d2d36a7](https://github.com/aphp/Cohort360/commit/d2d36a7c832cacfd03468825dce7f3886a6b4aa1))
-* show select population button when no rights on older caresite - Ref gestion-de-projet[#1603](https://github.com/aphp/Cohort360/issues/1603) ([d5addcf](https://github.com/aphp/Cohort360/commit/d5addcfb3af81f15c472415fd40dae4e34a29295))
-* supportedForm scope type and add scope type limit to scope search ([9bafa4b](https://github.com/aphp/Cohort360/commit/9bafa4b6cdfcdf5593c15100b9eaef222d0869c2))
-* typescript errors - Ref gestion-de-projet[#2070](https://github.com/aphp/Cohort360/issues/2070) ([afbf65a](https://github.com/aphp/Cohort360/commit/afbf65a63dccd1fa4634a469a8346b8f5e5acffb))
-* update package-lock.json ([b5c01a7](https://github.com/aphp/Cohort360/commit/b5c01a7b8228d06e39328d50a21b083008c76038))
-* updated encounter exit mode - Ref gestion-de-projet[#2148](https://github.com/aphp/Cohort360/issues/2148) ([c66e0ca](https://github.com/aphp/Cohort360/commit/c66e0ca50c962981660f9c0273b070c7f9609464))
-
-
-### Features
-
-* add access expiration alert ([#774](https://github.com/aphp/Cohort360/issues/774)) ([ccbf7bb](https://github.com/aphp/Cohort360/commit/ccbf7bb06039cb937f466390043c12cc7aaeefaa)), closes [gestion-de-projet#1999](https://github.com/gestion-de-projet/issues/1999) [gestion-de-projet#1999](https://github.com/gestion-de-projet/issues/1999)
-* add checkbox with validated analysis - Ref gestion-de-projet[#1174](https://github.com/aphp/Cohort360/issues/1174) ([e036d5a](https://github.com/aphp/Cohort360/commit/e036d5a332aa376a51475377257c145ef9110a2c))
-* add header for request if auth is jwt or oidc ([7176791](https://github.com/aphp/Cohort360/commit/7176791c3e369e32ea7717637e90ad1fc6029753))
-* add new OIDC variables in docker-entrypoint - Ref gestion-de-projet[#2117](https://github.com/aphp/Cohort360/issues/2117) ([b710aaf](https://github.com/aphp/Cohort360/commit/b710aafc3dbe0c37bb0004105b18c5074c4d4ce6))
-* add new OIDC variables in docker-entrypoint - Ref gestion-de-projet[#2117](https://github.com/aphp/Cohort360/issues/2117) ([d98cbc5](https://github.com/aphp/Cohort360/commit/d98cbc588a2adba1f742a73066ad51173df61633))
-* add OIDC auth - Ref gestion-de-projet[#2091](https://github.com/aphp/Cohort360/issues/2091) ([0a11361](https://github.com/aphp/Cohort360/commit/0a1136139b01b682ab4ae8e8974dd57ca16cbf48))
-* add prise en charge [age, duration] fields - Ref gestion-de-projet[#1499](https://github.com/aphp/Cohort360/issues/1499) ([a4a14da](https://github.com/aphp/Cohort360/commit/a4a14daa5a64180db8792aa9878dd72a3dabf7df)), closes [gestion-de-projet#1174](https://github.com/gestion-de-projet/issues/1174)
-* create criteria without empty filter - Ref … ([#772](https://github.com/aphp/Cohort360/issues/772)) ([dbdd5a1](https://github.com/aphp/Cohort360/commit/dbdd5a1d8fc0b62c1f56c349e7a3d73ab0f9c146)), closes [gestion-de-projet#1773](https://github.com/gestion-de-projet/issues/1773) [gestion-de-projet#1773](https://github.com/gestion-de-projet/issues/1773) [gestion-de-projet#1773](https://github.com/gestion-de-projet/issues/1773) [gestion-de-projet#1773](https://github.com/gestion-de-projet/issues/1773) [gestion-de-projet#1773](https://github.com/gestion-de-projet/issues/1773)
-* fix selected population modal right error - Ref gestion-de-projet[#1603](https://github.com/aphp/Cohort360/issues/1603) ([b85a3dd](https://github.com/aphp/Cohort360/commit/b85a3dded3364d3fd9b830a710286844b780ab8d))
-* fix selection (1) - Ref gestion-de-projet[#1603](https://github.com/aphp/Cohort360/issues/1603) ([d46877f](https://github.com/aphp/Cohort360/commit/d46877f7863631acb378fbd2e7d5a8b389e3f549))
-* preload EU selected items (2) - Ref gestion-de-projet[#1603](https://github.com/aphp/Cohort360/issues/1603) ([5e862e7](https://github.com/aphp/Cohort360/commit/5e862e7defdcbcc20586c291d31c887771900673))
-* preload EU selected items (2) - Ref gestion-de-projet[#1603](https://github.com/aphp/Cohort360/issues/1603) ([6f954d6](https://github.com/aphp/Cohort360/commit/6f954d607cecff29897abe0a0269d53d0b7269dd))
-* replace href by navigate for SPA ([3c1706b](https://github.com/aphp/Cohort360/commit/3c1706b2cd078abee72fe9b8b3a98ce81563f6f0))
-* select between day month and year for encounter duration into a request - Ref gestion-de-projet[#1499](https://github.com/aphp/Cohort360/issues/1499) ([cec05ec](https://github.com/aphp/Cohort360/commit/cec05ecf7758b0bf49bae35d8d50b6bbaece3a3b)), closes [gestion-de-projet#1174](https://github.com/gestion-de-projet/issues/1174)
-* selected population having right error, replace its name with '?'  - Ref gestion-de-projet[#1603](https://github.com/aphp/Cohort360/issues/1603) ([0a12e65](https://github.com/aphp/Cohort360/commit/0a12e65ee5ae8b821cfb835414075653514dc9e6))
-* upgrade requester version ([1eb09d9](https://github.com/aphp/Cohort360/commit/1eb09d9d35a3f2bb73d01833203b1cf53367e534))
-* use new request snapshot model ([f807b45](https://github.com/aphp/Cohort360/commit/f807b45a070b3b7f53e32ac62ac141e1c60e474e))
+# Changelog
 
+All notable changes to this project will be documented in this file.
 
+## [2.39.5](https://github.com/aphp/Cohort360-FrontEnd/compare/2.39.4..2.39.5) - 2024-09-09
 
-## [2.21.4](https://github.com/aphp/Cohort360/compare/2.21.3...2.21.4) (2023-05-22)
+### 🐛 Bug Fixes
 
+- Resolve add filter to patient table for export when one file - ([ba84e85](https://github.com/aphp/Cohort360-FrontEnd/commit/ba84e85952918428dc75f4c7166895ee3e80a8f4))
 
-### Bug Fixes
+## [2.39.4](https://github.com/aphp/Cohort360-FrontEnd/compare/2.39.3..2.39.4) - 2024-08-28
 
-* adding filter types into perimeters/read-patient/  ([d67601c](https://github.com/aphp/Cohort360/commit/d67601c6ce2c6da18ecab9a7f267d2579bbb5e4e))
-* age range limit min max, fix displaying date filter Ref gestion-de-projet[#1786](https://github.com/aphp/Cohort360/issues/1786) ([16ee629](https://github.com/aphp/Cohort360/commit/16ee629748939a0fd3edf43b3db3fa08658fa717))
-* blocked confirm on documents criteria when search check is loading Ref gestion-de-projet[#1806](https://github.com/aphp/Cohort360/issues/1806) ([12e7482](https://github.com/aphp/Cohort360/commit/12e74828e9caf0c32debf849cb7d0492e8748f4e))
-* can't edit type in medication query - Ref gestion-de-projet[#1916](https://github.com/aphp/Cohort360/issues/1916) ([#725](https://github.com/aphp/Cohort360/issues/725)) ([f372b18](https://github.com/aphp/Cohort360/commit/f372b185edc8d93465d955f0acdaab15893d87f1)), closes [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495)
-* cancelling on encounter and patient resources and composition when canceling a research Ref gestion-de-projet[#1212](https://github.com/aphp/Cohort360/issues/1212) ([9d1a736](https://github.com/aphp/Cohort360/commit/9d1a736d11cd244cdab626679f00d0c2b9a99ced))
-* expand loading after cancelling request - Ref gestion-de-projet[#1495](https://github.com/aphp/Cohort360/issues/1495) ([#724](https://github.com/aphp/Cohort360/issues/724)) ([eded7ce](https://github.com/aphp/Cohort360/commit/eded7cef08fc8843b3b8b906fe1963ad59864a9c))
-* fix double call into population card ([e7591b4](https://github.com/aphp/Cohort360/commit/e7591b416be5ce317a26bf4c4a9aaa928d159628))
-* fixed cohort edition modal not closing - Ref gestion-de-projet[#1874](https://github.com/aphp/Cohort360/issues/1874) ([341278a](https://github.com/aphp/Cohort360/commit/341278abb2ebb20323723c3d29137d16d3dadf14))
-* fixed medication pagination - Ref gestion-de-projet[#1790](https://github.com/aphp/Cohort360/issues/1790) ([17a3104](https://github.com/aphp/Cohort360/commit/17a3104b01ea37023bbd4fc26bb78bf1bdbf016b))
-* fixed temporalconstraints deletion - Ref gestion-de-projet[#1286](https://github.com/aphp/Cohort360/issues/1286) ([9a8f31c](https://github.com/aphp/Cohort360/commit/9a8f31c513460c73a0dce4c972a868a03379c171))
-* fixed temporalConstraintsIds config - Ref gestion-de-projet[#1286](https://github.com/aphp/Cohort360/issues/1286) ([ec9c77a](https://github.com/aphp/Cohort360/commit/ec9c77a8caf31dd63a1c789662bc911b86b228da))
-* fixed temporalConstraintsIds updating - Ref gestion-de-projet[#1286](https://github.com/aphp/Cohort360/issues/1286) ([8da18d3](https://github.com/aphp/Cohort360/commit/8da18d330288c5ac5b3dcbec04129cdaa7a6542c))
-* missing props into cohort type and into debounce.ts ([ff51dcb](https://github.com/aphp/Cohort360/commit/ff51dcbcfc1c9f508ef0b6a489e2b8e8a1569348))
-* modifying django url for maintenances and adding username param to fetchPractitioner ([21b7dd4](https://github.com/aphp/Cohort360/commit/21b7dd4c3af8a1f92f51761d84534fd446db0768))
-* perimeter textual search bug resolution, Ref gestion-de-projet[#1495](https://github.com/aphp/Cohort360/issues/1495) ([2186a48](https://github.com/aphp/Cohort360/commit/2186a483dce7260a10dac81c822527ac45481040))
-* prevent temporalconstraints duplicates - Ref gestion-de-projet[#1286](https://github.com/aphp/Cohort360/issues/1286) ([64e93f3](https://github.com/aphp/Cohort360/commit/64e93f371abc09cec81728a5689c62c2ac466f27))
-* removed differentEncounter from temporal constraints - Ref gestion-de-projet[#1286](https://github.com/aphp/Cohort360/issues/1286) ([5e81477](https://github.com/aphp/Cohort360/commit/5e81477745f8a596df7352350ac82dbf4dd5c1b2))
-* removed other visits in encounter repartition graph Ref gestion-de-projet[#1462](https://github.com/aphp/Cohort360/issues/1462) ([#715](https://github.com/aphp/Cohort360/issues/715)) ([739a628](https://github.com/aphp/Cohort360/commit/739a628c88d92cffb7ca558ee968747d6b4d9ee8))
-* Replace route pop-children by read-patient ([065026f](https://github.com/aphp/Cohort360/commit/065026f48ff617885bcef4dfa98bd08a3985e43b))
-* resolve loose of criteria on request Ref gestion-de-projet[#1917](https://github.com/aphp/Cohort360/issues/1917) ([b0a6211](https://github.com/aphp/Cohort360/commit/b0a6211230ca84a13d40d3204ea05f02dcb9032f)), closes [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1916](https://github.com/gestion-de-projet/issues/1916) [#720](https://github.com/aphp/Cohort360/issues/720)
-* reversed expand/collapse icon in request list, ref [#1602](https://github.com/aphp/Cohort360/issues/1602) ([c13b1ba](https://github.com/aphp/Cohort360/commit/c13b1ba8fcbf3119785a897529bf901fc52e076e))
-* secure perimeter.id when perimeter is undefined Ref gestion-de-projet[#1744](https://github.com/aphp/Cohort360/issues/1744) ([57a64f5](https://github.com/aphp/Cohort360/commit/57a64f550028f16864b2836f17b4f109630c5622))
-* started to fix temporal constraints - Ref gestion-de-projet[#1286](https://github.com/aphp/Cohort360/issues/1286) ([9788282](https://github.com/aphp/Cohort360/commit/9788282aef9d9a6585ddcae7b10b6ecdf78af973))
-* update urls and job status - Ref gestion-de-projet[#2002](https://github.com/aphp/Cohort360/issues/2002) ([#767](https://github.com/aphp/Cohort360/issues/767)) ([6e7e6ab](https://github.com/aphp/Cohort360/commit/6e7e6ab126056a2fc53ff53240f51544c854d291))
+### 🐛 Bug Fixes
 
+- Retrive questionnaire table from export - ([3cb3852](https://github.com/aphp/Cohort360-FrontEnd/commit/3cb38528d45f2a46cb885801691a33e41439cce4))
 
-### Features
+### ⚙️ Miscellaneous Tasks
 
-* add executive unit component - Ref gestion-de-projet[#1603](https://github.com/aphp/Cohort360/issues/1603) ([b962d3d](https://github.com/aphp/Cohort360/commit/b962d3d951c6d3f334f6ef84e691732220b903c6))
-* add iris table and remove observation table for csv export - Ref gestion-de-projet[#1926](https://github.com/aphp/Cohort360/issues/1926) gestion-de-projet[#2068](https://github.com/aphp/Cohort360/issues/2068) ([1904b6e](https://github.com/aphp/Cohort360/commit/1904b6e5f7eb0b6fb120b641797c24c603b88697))
-* add news of 05/2023 mep -Ref gestion-de-projet[#2046](https://github.com/aphp/Cohort360/issues/2046) ([6643cae](https://github.com/aphp/Cohort360/commit/6643cae3ebea8d2e0ea8a9e565f957fa6ba5febc))
-* add temporal constraints directChronologicalOrdering for cohort creation Ref gestion-de-projet[#1286](https://github.com/aphp/Cohort360/issues/1286) ([2c40ddd](https://github.com/aphp/Cohort360/commit/2c40ddddcb13dc3919baa0765914ac9a27c52488))
-* adding cancel request for composition research into a patient and for patient research into cohort Ref gestion-de-projet[#1212](https://github.com/aphp/Cohort360/issues/1212) ([8923b79](https://github.com/aphp/Cohort360/commit/8923b79327c5490354017ec43f38056139a756e1))
-* adding news for next mep 03/2023 Ref gestion-de-projet[#1927](https://github.com/aphp/Cohort360/issues/1927) ([#729](https://github.com/aphp/Cohort360/issues/729)) ([bf2336b](https://github.com/aphp/Cohort360/commit/bf2336ba9841b834fb40726c2474ad953ea784e7)), closes [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1916](https://github.com/gestion-de-projet/issues/1916) [#720](https://github.com/aphp/Cohort360/issues/720) [gestion-de-projet#1917](https://github.com/gestion-de-projet/issues/1917) [#726](https://github.com/aphp/Cohort360/issues/726) [gestion-de-projet#1917](https://github.com/gestion-de-projet/issues/1917) [gestion-de-projet#1917](https://github.com/gestion-de-projet/issues/1917)
-* adding patient.active=true when requesting fhir ressources and in the requestor into fhirfilter Ref gestion-de-projet[#1907](https://github.com/aphp/Cohort360/issues/1907) ([12038a6](https://github.com/aphp/Cohort360/commit/12038a6170032abe4efc75ec393e55f1dbdaa2e4))
-* adding shared_by information in myRequest criteria Ref gestion-de-projet[#1696](https://github.com/aphp/Cohort360/issues/1696) ([455484c](https://github.com/aphp/Cohort360/commit/455484cd5a76d7e81dc0b4a5bacc52f356f991a5))
-* don't send error message when request is canceled Ref gestion-de-projet[#1212](https://github.com/aphp/Cohort360/issues/1212) ([abd881b](https://github.com/aphp/Cohort360/commit/abd881b7b73ca0900a9a077940775c6094971c58))
-* open new tab when click on document list patient - Ref gestion-de-projet[#1893](https://github.com/aphp/Cohort360/issues/1893) ([1cb2327](https://github.com/aphp/Cohort360/commit/1cb232765f99b8bf2dc3202b200269b5ad751788))
-* preload EU selected items - Ref gestion-de-projet[#1603](https://github.com/aphp/Cohort360/issues/1603) ([d03b939](https://github.com/aphp/Cohort360/commit/d03b9390c425a438627d0f9a7ab9b12a342530b9))
-* set new develop version 2.22.0-SNAPSHOT ([#743](https://github.com/aphp/Cohort360/issues/743)) ([279b6ad](https://github.com/aphp/Cohort360/commit/279b6ad1234aedb939a8817f6cdf5a62e9122325)), closes [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1916](https://github.com/gestion-de-projet/issues/1916) [#720](https://github.com/aphp/Cohort360/issues/720) [gestion-de-projet#1917](https://github.com/gestion-de-projet/issues/1917) [#726](https://github.com/aphp/Cohort360/issues/726) [gestion-de-projet#1917](https://github.com/gestion-de-projet/issues/1917) [gestion-de-projet#1917](https://github.com/gestion-de-projet/issues/1917) [gestion-de-projet#1927](https://github.com/gestion-de-projet/issues/1927) [#728](https://github.com/aphp/Cohort360/issues/728) [#733](https://github.com/aphp/Cohort360/issues/733) [gestion-de-projet#1965](https://github.com/gestion-de-projet/issues/1965) [gestion-de-projet#1965](https://github.com/gestion-de-projet/issues/1965)
-* update package-lock.json ([ce3fcc7](https://github.com/aphp/Cohort360/commit/ce3fcc7ee85b7040ebe79d1adb6e519c6e9a7262))
+- Release version 2.39.4 - ([a2b4a12](https://github.com/aphp/Cohort360-FrontEnd/commit/a2b4a12887bdf0c1183c3e06e9ea5f385189cf51))
 
+## [2.39.3](https://github.com/aphp/Cohort360-FrontEnd/compare/2.39.2..2.39.3) - 2024-08-23
 
+### 🚀 Features
 
-## [2.21.5](https://github.com/aphp/Cohort360/compare/2.21.4...2.21.5) (2023-06-06)
+- *(clarity)* Add friendly name to identify call - ([a47d3f8](https://github.com/aphp/Cohort360-FrontEnd/commit/a47d3f8c92baa84db69be5b07daa91249d4f7103))
 
+### 🐛 Bug Fixes
 
+- Add mater to export one-file - ([ee2db35](https://github.com/aphp/Cohort360-FrontEnd/commit/ee2db3560963564e490bc53ae1b4d34e99add805))
 
-## [2.21.4](https://github.com/aphp/Cohort360/compare/2.21.3...2.21.4) (2023-05-22)
+### ⚙️ Miscellaneous Tasks
 
+- Release version 2.39.3 - ([645b9ca](https://github.com/aphp/Cohort360-FrontEnd/commit/645b9ca2d98a0bb9c1303826c0279faeabac3eb2))
 
-### Features
+## [2.39.2](https://github.com/aphp/Cohort360-FrontEnd/compare/2.39.1..2.39.2) - 2024-08-23
 
-* add iris table and remove observation table for csv export - Ref gestion-de-projet[#1926](https://github.com/aphp/Cohort360/issues/1926) gestion-de-projet[#2068](https://github.com/aphp/Cohort360/issues/2068) ([1904b6e](https://github.com/aphp/Cohort360/commit/1904b6e5f7eb0b6fb120b641797c24c603b88697))
-* add news of 05/2023 mep -Ref gestion-de-projet[#2046](https://github.com/aphp/Cohort360/issues/2046) ([d58f2a8](https://github.com/aphp/Cohort360/commit/d58f2a8ca2811f2e2aacc35e6a4ab58fa8f51645))
+### 🐛 Bug Fixes
 
+- Export one file disabled `tous selectionner` when one file - Ref gestion-de-projet#2610 - ([cc9b110](https://github.com/aphp/Cohort360-FrontEnd/commit/cc9b1100dc908fba9944b3e3ac76507e6423710c))
 
+### ⚙️ Miscellaneous Tasks
 
-## [2.21.3](https://github.com/aphp/Cohort360/compare/2.21.2...2.21.3) (2023-04-19)
+- Release version 2.39.2 - ([eb3f0ea](https://github.com/aphp/Cohort360-FrontEnd/commit/eb3f0ea2e3de42f8b903a02ec7ecd381622afa7f))
 
+## [2.39.1](https://github.com/aphp/Cohort360-FrontEnd/compare/2.39.0..2.39.1) - 2024-08-20
 
-### Bug Fixes
+### 🐛 Bug Fixes
 
-* removed differentEncounter from temporal constraints - Ref gestion-de-projet[#1286](https://github.com/aphp/Cohort360/issues/1286) ([72b1cdb](https://github.com/aphp/Cohort360/commit/72b1cdb752340e5d4ce91641ccd3ae3744ffabbf))
+- Modify questionnaire tableID - ([0dab871](https://github.com/aphp/Cohort360-FrontEnd/commit/0dab871420bb9f6ce64b5736bdfc06e14728d57e))
 
+## [2.39.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.37.11..2.39.0) - 2024-08-12
 
+### 🚀 Features
 
-## [2.21.2](https://github.com/aphp/Cohort360/compare/2.21.1...2.21.2) (2023-04-18)
+- Add clarity tracking code - ([ed658f8](https://github.com/aphp/Cohort360-FrontEnd/commit/ed658f87a95914d0097a1fd723f9b2851b02c955))
+- *(clarity)* Add tag to tracking blacklisted users - ([d35b1b3](https://github.com/aphp/Cohort360-FrontEnd/commit/d35b1b33707d13ea59d93f2e62ac1c14c351fee3))
+- Add export one file and xlsx format file - Ref gestion-de-projet#2610 (#1017) - ([bb3af3c](https://github.com/aphp/Cohort360-FrontEnd/commit/bb3af3cb4a65730f647373e544e40538392eff74))
+- Changed occurences dates labels - Ref gestion-de-projet#2578 - ([05e1bb8](https://github.com/aphp/Cohort360-FrontEnd/commit/05e1bb8daf21cd12b6c7418d0e8fbb8a4e1c1c36))
+- *(oidclogin)* Add redirection uri to oidc login request - ([18f047c](https://github.com/aphp/Cohort360-FrontEnd/commit/18f047c8d718d138c754681de547ae9abbe0fc03))
+- Added start and end to encounter dates in advanced criteria - Ref gestion-de-projet#2580 (#1019) - ([581b9c1](https://github.com/aphp/Cohort360-FrontEnd/commit/581b9c13dec85c36f8ad2e6bc493aa727561e39f))
+- Added prescription end date - Ref gestion-de-projet#2681 (#1022) - ([7fbeb70](https://github.com/aphp/Cohort360-FrontEnd/commit/7fbeb70e03e640032ec2d84a0057f373d787b23b))
 
+### 🐛 Bug Fixes
 
-### Bug Fixes
+- Jtools - ([be9e09c](https://github.com/aphp/Cohort360-FrontEnd/commit/be9e09c37b6171b03216f7a0f0f9b448cdcaee80))
+- Typo in criteria type label - ([b2c074f](https://github.com/aphp/Cohort360-FrontEnd/commit/b2c074f1a7db079eb13d390b75d1123dfa6c6df1))
+- Add export limit env variable to docker entry point - ([2d8942f](https://github.com/aphp/Cohort360-FrontEnd/commit/2d8942f5c95f56d3b9b63db46d85037431f6d693))
+- Fix visit repartition graph - ([bc68f78](https://github.com/aphp/Cohort360-FrontEnd/commit/bc68f788624620a6b2b871d4d7c880690b6e72f3))
+- Export limitation to 5000 lines and fix documentReference encounter link - Ref gestion-de-projet#2601 gestion-de-projet#2663 - ([b72801c](https://github.com/aphp/Cohort360-FrontEnd/commit/b72801c8a3ff11d9cb917f858be56b85e920e387))
+- Part-of:missing - ([b293e38](https://github.com/aphp/Cohort360-FrontEnd/commit/b293e38ee91fd0395e2361fc94a255341d1f5725))
+- *(impersonifcation)* Retrieve current impersonification info in local storage - ([96187ee](https://github.com/aphp/Cohort360-FrontEnd/commit/96187eee9faec90acf10a52c175f48cb116b5de7))
+- Add value-quantity to requestor and saveFilters for observation - ([79510b6](https://github.com/aphp/Cohort360-FrontEnd/commit/79510b6dd50bea7a81378de5794aa726bb07053b))
+- Fix value-quantity default into observation - ([fcbad3f](https://github.com/aphp/Cohort360-FrontEnd/commit/fcbad3f702c983d8123bc67e2a2498a3de75c739))
+- Value-quatity default unbuild - ([acdb76a](https://github.com/aphp/Cohort360-FrontEnd/commit/acdb76a7e536b837128af5d023a65f11259e7457))
+- Fixed modified dates of requests - Ref gestion-de-projet#2261 (#1021) - ([decf61c](https://github.com/aphp/Cohort360-FrontEnd/commit/decf61c7b557c58d20cc4bd752785409ab813fd4))
+- *(impersonation)* Load init perimeter data on impersonation (#1026) - ([f796dd4](https://github.com/aphp/Cohort360-FrontEnd/commit/f796dd47177f6d6e18f9745c4673425b5084d59d))
+- Fixed deletion of pseudo criterias in a request - Ref gestion-de-projet#2684 (#1025) - ([12b2cf5](https://github.com/aphp/Cohort360-FrontEnd/commit/12b2cf5fbd209858e8b0e78a22d1aaf24f299ce0))
+- Set authentication method header to oidc login - ([91bbab3](https://github.com/aphp/Cohort360-FrontEnd/commit/91bbab32b90f384888ff8fd3ea1f93caa4407300))
 
-* fixed temporalConstraintsIds config - Ref gestion-de-projet[#1286](https://github.com/aphp/Cohort360/issues/1286) ([#754](https://github.com/aphp/Cohort360/issues/754)) ([50aa5da](https://github.com/aphp/Cohort360/commit/50aa5da0781242b980c3fe2a22aadc96aa0663f2))
+### 🚜 Refactor
 
+- New scope tree  - ([d5815ed](https://github.com/aphp/Cohort360-FrontEnd/commit/d5815ed1dc7b88b14bfbbd96e270ff78b1006607))
+- Replaced formlabel with criterialabel component - Ref gestion-de-projet#2683 (#1023) - ([d141820](https://github.com/aphp/Cohort360-FrontEnd/commit/d141820ae6b725d151674db7f21d6db9b6b68a6a))
+- Set configurable source type perimeters - ([32b2cc2](https://github.com/aphp/Cohort360-FrontEnd/commit/32b2cc2b948ad7eeb8ce504786f311abdfbfdd4e))
+- *(cohortCreation)* Split up filter building function (#1028) - ([79c4216](https://github.com/aphp/Cohort360-FrontEnd/commit/79c4216ab0610db900437a523892839617ae927b))
 
+### ⚡ Performance
 
-## [2.21.1](https://github.com/aphp/Cohort360/compare/2.21.0...2.21.1) (2023-04-14)
+- *(locationMap)* Improve loading and zones data preprocessing - ([958903c](https://github.com/aphp/Cohort360-FrontEnd/commit/958903cb15b6b82eb35399a88a646c016ab0713b))
 
+### ⚙️ Miscellaneous Tasks
 
-### Features
+- Release version 2.39.0-SNAPSHOT - ([4116822](https://github.com/aphp/Cohort360-FrontEnd/commit/4116822aa0a4e03ceb2327cac1fd1205a10be916))
+- Rename project name cohort360-react => cohort360 - ([e75dbb3](https://github.com/aphp/Cohort360-FrontEnd/commit/e75dbb399ad02699c200199fb84a26e1a401ee8e))
+- Update build status url - ([8b666b0](https://github.com/aphp/Cohort360-FrontEnd/commit/8b666b07a1e8b75505c9439a9fe3a36cc8a96109))
+- Clean up old endpoints - ([93ffbfe](https://github.com/aphp/Cohort360-FrontEnd/commit/93ffbfe8d7c8cb79992fcba954994fbd07b4599c))
+- Add latest tag for main docker build - ([510822c](https://github.com/aphp/Cohort360-FrontEnd/commit/510822c05cf9568bdd4e7f599449d76bcef280b4))
+- Add build step in docker (#1024) - ([7fe000b](https://github.com/aphp/Cohort360-FrontEnd/commit/7fe000b37c2695b4bda1adaf1bd5e3d92b0641a0))
 
-* update release version 2.21.0 => 2.21.1 ([f1dba65](https://github.com/aphp/Cohort360/commit/f1dba65a32c7209ac8e22f1d214901ef9565dc40))
 
+## [2.38.9](https://github.com/aphp/Cohort360-FrontEnd/compare/2.38.8..2.38.9) - 2024-07-19
 
+### 🐛 Bug Fixes
 
-# [2.21.0](https://github.com/aphp/Cohort360/compare/2.20.5...2.21.0) (2023-04-03)
+- Value-quatity default unbuild - ([67cc7e9](https://github.com/aphp/Cohort360-FrontEnd/commit/67cc7e948feb9b4e1b5792dde4193dff098b8b2f))
 
+### ⚙️ Miscellaneous Tasks
 
-### Features
+- Release version 2.38.9 - ([5ac4233](https://github.com/aphp/Cohort360-FrontEnd/commit/5ac42330446aefbb3ff5f266fcb207122ba95815))
 
-* release version 2.21.0 ([df54023](https://github.com/aphp/Cohort360/commit/df5402317c9a379dee65bb0562cc234937daea12)), closes [gestion-de-projet#1722](https://github.com/gestion-de-projet/issues/1722) [gestion-de-projet#1722](https://github.com/gestion-de-projet/issues/1722) [gestion-de-projet#1212](https://github.com/gestion-de-projet/issues/1212) [#1602](https://github.com/aphp/Cohort360/issues/1602) [gestion-de-projet#1452](https://github.com/gestion-de-projet/issues/1452) [gestion-de-projet#1722](https://github.com/gestion-de-projet/issues/1722) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1462](https://github.com/gestion-de-projet/issues/1462) [#715](https://github.com/aphp/Cohort360/issues/715) [gestion-de-projet#1462](https://github.com/gestion-de-projet/issues/1462) [gestion-de-projet#1916](https://github.com/gestion-de-projet/issues/1916) [#725](https://github.com/aphp/Cohort360/issues/725) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1495](https://github.com/gestion-de-projet/issues/1495) [gestion-de-projet#1916](https://github.com/gestion-de-projet/issues/1916) [gestion-de-projet#1916](https://github.com/gestion-de-projet/issues/1916)
+## [2.38.8](https://github.com/aphp/Cohort360-FrontEnd/compare/2.38.7..2.38.8) - 2024-07-18
 
+### 🐛 Bug Fixes
 
+- Fix value-quantity default into observation - ([e73c76e](https://github.com/aphp/Cohort360-FrontEnd/commit/e73c76e3abbdf50020fb351c031b7ed53f5e3629))
 
-## [2.20.5](https://github.com/aphp/Cohort360/compare/2.20.4...2.20.5) (2023-03-29)
+### ⚙️ Miscellaneous Tasks
 
+- Release 2.38.8 - ([7e162dc](https://github.com/aphp/Cohort360-FrontEnd/commit/7e162dcc9525bb4dcb6411b1479007801192bd37))
 
-### Bug Fixes
+## [2.38.7](https://github.com/aphp/Cohort360-FrontEnd/compare/2.38.6..2.38.7) - 2024-07-12
 
-* biology tab flow when click on next button - Ref gestion-de-proj… ([#733](https://github.com/aphp/Cohort360/issues/733)) ([4bde6bc](https://github.com/aphp/Cohort360/commit/4bde6bce300561455ca80e4db7724b8ec45a66e2)), closes [gestion-de-projet#1965](https://github.com/gestion-de-projet/issues/1965) [gestion-de-projet#1965](https://github.com/gestion-de-projet/issues/1965)
-* resolve loose of criteria on request Ref gestion-de-projet[#1917](https://github.com/aphp/Cohort360/issues/1917) ([#726](https://github.com/aphp/Cohort360/issues/726)) ([1139302](https://github.com/aphp/Cohort360/commit/1139302916b6b4c4745870adb470bbe23a96aaa2))
+### 🐛 Bug Fixes
 
+- *(impersonifcation)* Retrieve current impersonification info in local storage - ([53195ee](https://github.com/aphp/Cohort360-FrontEnd/commit/53195ee0746f35e5c7eba16f5cdfe2d6ef03a730))
+- Add value-quantity to requestor and saveFilters for observation - ([9391c3a](https://github.com/aphp/Cohort360-FrontEnd/commit/9391c3a0a51b9b7fa1db7484dc433ee516be27d5))
 
-### Features
+### ⚡ Performance
 
-* adding news for next mep Ref gestion-de-projet[#1927](https://github.com/aphp/Cohort360/issues/1927) ([#728](https://github.com/aphp/Cohort360/issues/728)) ([db8e2f4](https://github.com/aphp/Cohort360/commit/db8e2f468a8035d8c82f72559bb3a556dab32aec))
+- *(locationMap)* Improve loading and zones data preprocessing - ([066c11f](https://github.com/aphp/Cohort360-FrontEnd/commit/066c11f29723c4fb68f634c7f5acd64035e24c05))
 
+### ⚙️ Miscellaneous Tasks
 
+- Release version  2.38.7 - ([5a50d5d](https://github.com/aphp/Cohort360-FrontEnd/commit/5a50d5d6e1e9e3097a0346d5ce8c0be25683d754))
 
-## [2.20.4](https://github.com/aphp/Cohort360/compare/2.20.3...2.20.4) (2023-03-15)
+## [2.38.6](https://github.com/aphp/Cohort360-FrontEnd/compare/2.38.5..2.38.6) - 2024-07-11
 
+### 🐛 Bug Fixes
 
-### Bug Fixes
+- Part-of:missing - ([577b00b](https://github.com/aphp/Cohort360-FrontEnd/commit/577b00bfa74cdc149d988d33050eb02ff5d3bd0c))
 
-* can't edit type in medication query - Ref gestion-de-projet[#1916](https://github.com/aphp/Cohort360/issues/1916) ([#720](https://github.com/aphp/Cohort360/issues/720)) ([495be9a](https://github.com/aphp/Cohort360/commit/495be9a35fce0d31b83f1aea16093670fccbb8d0))
-* expand loading after cancelling request - Ref gestion-de-projet[#1495](https://github.com/aphp/Cohort360/issues/1495) ([b120a8b](https://github.com/aphp/Cohort360/commit/b120a8b47df3f073c4b3e37dece33f821bbff7fc))
-* expand loading after cancelling request (1) - Ref gestion-de-projet[#1495](https://github.com/aphp/Cohort360/issues/1495) ([5897303](https://github.com/aphp/Cohort360/commit/589730397420a35b40c616dd10878d74401bad7c))
-* expand loading after cancelling request (2) - Ref gestion-de-projet[#1495](https://github.com/aphp/Cohort360/issues/1495) ([24d2eff](https://github.com/aphp/Cohort360/commit/24d2eff1168878c20d5b5c3197ecbd2965e7d507))
+### ⚙️ Miscellaneous Tasks
 
+- Release version 2.38.6 - ([601102e](https://github.com/aphp/Cohort360-FrontEnd/commit/601102ead2b973d76bb2ca397d105632c291999b))
 
+## [2.38.5](https://github.com/aphp/Cohort360-FrontEnd/compare/2.38.4..2.38.5) - 2024-07-10
 
-## [2.20.3](https://github.com/aphp/Cohort360/compare/2.20.2...2.20.3) (2023-03-09)
+### 🐛 Bug Fixes
 
+- Export limitation to 5000 lines and fix documentReference encounter link - Ref gestion-de-projet#2601 gestion-de-projet#2663 - ([e882fa0](https://github.com/aphp/Cohort360-FrontEnd/commit/e882fa0520e3bd663a82b0ddb7be237272b5a989))
 
-### Bug Fixes
+### ⚙️ Miscellaneous Tasks
 
-* Replace route pop-children by read-patient ([9b3b593](https://github.com/aphp/Cohort360/commit/9b3b5931acee58f623888d90e0d79066888443c3))
+- Release 2.38.5 - ([149fe61](https://github.com/aphp/Cohort360-FrontEnd/commit/149fe619a8b6449c587315e8c39c512368460585))
 
+## [2.38.4](https://github.com/aphp/Cohort360-FrontEnd/compare/2.38.3..2.38.4) - 2024-07-10
 
+### 🐛 Bug Fixes
 
-## [2.19.1](https://github.com/aphp/Cohort360/compare/2.19.0...2.19.1) (2023-01-09)
+- Fix visit repartition graph - ([6e14e5e](https://github.com/aphp/Cohort360-FrontEnd/commit/6e14e5ee9e2365f2caf94d22300b78e391611484))
 
+### ⚙️ Miscellaneous Tasks
 
-### Reverts
+- Release version 2.38.4 - ([6b54fd4](https://github.com/aphp/Cohort360-FrontEnd/commit/6b54fd4994acd4324f42717ef8befebc3011060b))
 
-* Revert "[2.13][Fix] - error with exports display" ([ef5365c](https://github.com/aphp/Cohort360/commit/ef5365c7a28d992a5b6d5ebe4a3b4dd864a8ed33))
-* Revert "Delete .gitlab directory" ([c1e134f](https://github.com/aphp/Cohort360/commit/c1e134f09e5e46a51a05049c4c6cf8c3973ab586))
-* Revert "Delete docker directory" ([3d9774e](https://github.com/aphp/Cohort360/commit/3d9774e5880be1b56691858371135c86e27f4d90))
-* Revert "Delete .gitlab-ci.yml" ([22aa22d](https://github.com/aphp/Cohort360/commit/22aa22dcc6b6637a34526e68ed90ce129a6032fb))
-* Revert "[1147] Add variable in nginx conf" ([d5a1120](https://github.com/aphp/Cohort360/commit/d5a11201d568a46cfda0091bd3c6e0c092f9336c))
+## [2.38.3](https://github.com/aphp/Cohort360-FrontEnd/compare/2.38.2..2.38.3) - 2024-07-09
 
+### 🚀 Features
 
+- *(clarity)* Add tag to tracking blacklisted users - ([061db8b](https://github.com/aphp/Cohort360-FrontEnd/commit/061db8b664a22f9e67468bd25db70f1e6beddee0))
 
-## [2.14.12](https://github.com/aphp/Cohort360/compare/2.14.11...2.14.12) (2022-06-22)
+### ⚙️ Miscellaneous Tasks
 
+- Release version 2.38.3 - ([23c49cf](https://github.com/aphp/Cohort360-FrontEnd/commit/23c49cfbc0dfb87406bdebd8ed740b5344d8d65f))
 
+## [2.38.2](https://github.com/aphp/Cohort360-FrontEnd/compare/2.38.1..2.38.2) - 2024-07-09
 
-## [2.14.10](https://github.com/aphp/Cohort360/compare/2.14.9...2.14.10) (2022-06-17)
+### 🚀 Features
 
+- Add clarity tracking code - ([f3d5807](https://github.com/aphp/Cohort360-FrontEnd/commit/f3d580797b724a5d17a9c01acddb5ec80363d1a0))
 
+### 🐛 Bug Fixes
 
-## [2.14.6](https://github.com/aphp/Cohort360/compare/2.14.5...2.14.6) (2022-05-30)
+- Add export limit env variable to docker entry point - ([0851328](https://github.com/aphp/Cohort360-FrontEnd/commit/0851328aeb36b0ae72689ec619ca25ea084c23fc))
 
+### ⚙️ Miscellaneous Tasks
 
+- Release version 2.38.2 - ([76e3d61](https://github.com/aphp/Cohort360-FrontEnd/commit/76e3d61bb6b1cca81bd65723aa25aeca8652dc78))
 
-## [2.14.4](https://github.com/aphp/Cohort360/compare/2.14.0...2.14.4) (2022-05-30)
+## [2.38.1](https://github.com/aphp/Cohort360-FrontEnd/compare/2.38.0..2.38.1) - 2024-07-08
 
+### 🐛 Bug Fixes
 
-### Reverts
+- Jtools - ([467c464](https://github.com/aphp/Cohort360-FrontEnd/commit/467c464ca23f9f089f00bf18eaed81b8e0f60ec9))
 
-* Revert "[2.3][Feat] - Start development of Export Modal" ([22bd5d8](https://github.com/aphp/Cohort360/commit/22bd5d868dd23a486c2dd885a197b7f9049f95c9))
+### ⚙️ Miscellaneous Tasks
 
+- Release version 2.38.1 - ([608df53](https://github.com/aphp/Cohort360-FrontEnd/commit/608df533f10808072a0fff0ab1490f4d8ecdf3c0))
 
+## [2.38.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.37.6..2.38.0) - 2024-07-07
 
+### 🚀 Features
+
+- Add leaflet css to local resources - ([fe8dd7d](https://github.com/aphp/Cohort360-FrontEnd/commit/fe8dd7d2a31f0c84162d3f10ac07a8ea5ff0dc25))
+- Added line limits in exports - Ref gestion-de-projet#2616 (#1010) - ([2cff50c](https://github.com/aphp/Cohort360-FrontEnd/commit/2cff50cc22d1cd9a5cad99ce029cb01a605c5eef))
+- *(locationMap)* Add info on map + better color palette management - ([ec75e11](https://github.com/aphp/Cohort360-FrontEnd/commit/ec75e11ee0d2d469ab41eab6f73506d9333738c3))
+
+### 🐛 Bug Fixes
+
+- Fix display digit when request failed or cancel - ([49ec724](https://github.com/aphp/Cohort360-FrontEnd/commit/49ec72456bfedf21ca1b6f17fbc0f0428aa8da0c))
+- *(locationMap)* Colorpalette max index + infinite loading - ([1bdbf53](https://github.com/aphp/Cohort360-FrontEnd/commit/1bdbf533e8e443c70613be67280b555f6985c5f0))
+- Sonar reliability bug - ([84d090c](https://github.com/aphp/Cohort360-FrontEnd/commit/84d090c81cd40f94d4d768cd019fed558cde58a0))
+- Add error management to socket - Ref gestion-de-projet#2469 - ([0352488](https://github.com/aphp/Cohort360-FrontEnd/commit/03524883acd332881ee9605517d37b125dda2b3a))
+- *(locationMap)* Duplicate zones + color palette for low max - ([015dabd](https://github.com/aphp/Cohort360-FrontEnd/commit/015dabd31d402e54f30b2a3945bc9b9724e1bbc0))
+- Fix dom error for jtools - ([2bd2326](https://github.com/aphp/Cohort360-FrontEnd/commit/2bd2326bfa73d9e9ec0e904900a72e085b986972))
+- Fix store when revieve response from socket - Ref gestion-de-projet#2469 - ([2790b4f](https://github.com/aphp/Cohort360-FrontEnd/commit/2790b4f79fc8e7f96022fafbf8ae8d61e8da3ead))
+
+### 🚜 Refactor
+
+- *(cohorts)* Rename fhir_group_id to group_id - ([2774bf8](https://github.com/aphp/Cohort360-FrontEnd/commit/2774bf86d74f2916affb1297503fa0a992be8318))
+
+### 📚 Documentation
+
+- Remove coverage badge - ([76ca870](https://github.com/aphp/Cohort360-FrontEnd/commit/76ca870581eb74911e1b81c80609f0e841d94832))
+
+### ⚡ Performance
+
+- *(locationMap)* Load only uncovered mesh units in parallel - ([c3de433](https://github.com/aphp/Cohort360-FrontEnd/commit/c3de433e777f85671dbd651dfe5d6b00debe9746))
+
+### ⚙️ Miscellaneous Tasks
+
+- Add docker publish and sonar jobs - ([eba6a4c](https://github.com/aphp/Cohort360-FrontEnd/commit/eba6a4c70a5e256e02154ab73a252af39b41a696))
+- Release version 2.38.0 - ([1796319](https://github.com/aphp/Cohort360-FrontEnd/commit/1796319e3ac57f07562919cc7831c169300a77bd))
+
+
+## [2.37.11](https://github.com/aphp/Cohort360-FrontEnd/compare/2.37.10..2.37.11) - 2024-08-08
+
+### 🐛 Bug Fixes
+
+- Down the app - ([e1e3aec](https://github.com/aphp/Cohort360-FrontEnd/commit/e1e3aec4136b3e5a78d56b7d6af6b94573815a90))
+
+## [2.37.10](https://github.com/aphp/Cohort360-FrontEnd/compare/2.37.9..2.37.10) - 2024-07-10
+
+### 🐛 Bug Fixes
+
+- Fix visit repartition graph - ([ae0a53c](https://github.com/aphp/Cohort360-FrontEnd/commit/ae0a53cd49a98f40b2246b702ee2b4b09ccd1886))
+
+### ⚙️ Miscellaneous Tasks
+
+- Release version 2.37.10 - ([556cff8](https://github.com/aphp/Cohort360-FrontEnd/commit/556cff87af8ada8189193c0b74ab18239b5751a2))
+
+## [2.37.9](https://github.com/aphp/Cohort360-FrontEnd/compare/2.37.8..2.37.9) - 2024-07-09
+
+### 🚀 Features
+
+- *(clarity)* Add tag to tracking blacklisted users - ([e8ded05](https://github.com/aphp/Cohort360-FrontEnd/commit/e8ded057936498caf62c73b1697f3bb0a34d2828))
+
+### ⚙️ Miscellaneous Tasks
+
+- Release version 2.37.9 - ([6d9e048](https://github.com/aphp/Cohort360-FrontEnd/commit/6d9e04843e6e0fd9b09d75eb22a1c1c3690fe730))
+
+## [2.37.8](https://github.com/aphp/Cohort360-FrontEnd/compare/2.37.7..2.37.8) - 2024-07-09
+
+### 🚀 Features
+
+- Add clarity tracking code - ([db496a3](https://github.com/aphp/Cohort360-FrontEnd/commit/db496a388cfedad55bd1bc2004da070aec34b4f7))
+
+### ⚙️ Miscellaneous Tasks
+
+- Release 2.37.8 - ([925bf87](https://github.com/aphp/Cohort360-FrontEnd/commit/925bf87c1bee248c7be894ab5799c86533489315))
+
+## [2.37.7](https://github.com/aphp/Cohort360-FrontEnd/compare/2.37.6..2.37.7) - 2024-07-08
+
+### 🐛 Bug Fixes
+
+- Jtools - ([0bcd720](https://github.com/aphp/Cohort360-FrontEnd/commit/0bcd720fde93b4177b3d5b76a1ee93bdd28fa11c))
+
+### ⚙️ Miscellaneous Tasks
+
+- Release version 2.37.7 - ([f993f9a](https://github.com/aphp/Cohort360-FrontEnd/commit/f993f9a69b57160618d124fffd7fb5743774a5ce))
+
+## [2.37.6](https://github.com/aphp/Cohort360-FrontEnd/compare/2.37.5..2.37.6) - 2024-07-07
+
+### 🐛 Bug Fixes
+
+- *(locationMap)* Duplicate zones + color palette for low max - ([3946210](https://github.com/aphp/Cohort360-FrontEnd/commit/3946210da4bcf7594c9dae1dc4d1a6b9b3ffc3d7))
+- Fix store when revieve response from socket - Ref gestion-de-projet#2469 - ([1dd5a6a](https://github.com/aphp/Cohort360-FrontEnd/commit/1dd5a6a6b08d368644be7dccd3ce4ff70409b039))
+- Fix dom error for jtools - ([7551dcd](https://github.com/aphp/Cohort360-FrontEnd/commit/7551dcd0e882f7010367d127fe1ace0bee009db7))
+
+### ⚙️ Miscellaneous Tasks
+
+- Release version 2.37.6 - ([871fa8a](https://github.com/aphp/Cohort360-FrontEnd/commit/871fa8a8fbebc308d1efb478e1c82715fa8c8054))
+
+## [2.37.5](https://github.com/aphp/Cohort360-FrontEnd/compare/2.37.4..2.37.5) - 2024-07-04
+
+### 🚀 Features
+
+- *(locationMap)* Add info on map + better color palette management - ([27de534](https://github.com/aphp/Cohort360-FrontEnd/commit/27de5344bbacb2372f1a16f7001125a46e32f1f7))
+
+### ⚙️ Miscellaneous Tasks
+
+- Release version 2.37.5 - ([126c333](https://github.com/aphp/Cohort360-FrontEnd/commit/126c33308e0b166bf209fa7c96656fd19b1a48fc))
+
+## [2.37.4](https://github.com/aphp/Cohort360-FrontEnd/compare/2.37.3..2.37.4) - 2024-07-04
+
+### 🐛 Bug Fixes
+
+- Add error management to socket - Ref gestion-de-projet#2469 - ([6037d92](https://github.com/aphp/Cohort360-FrontEnd/commit/6037d9222be9126c8625c17d8de9db7f692503ce))
+
+### ⚙️ Miscellaneous Tasks
+
+- Release version 2.37.4 - ([8c388fb](https://github.com/aphp/Cohort360-FrontEnd/commit/8c388fb90aaefd9da719a13fb85cfa1888cc1e57))
+
+## [2.37.3](https://github.com/aphp/Cohort360-FrontEnd/compare/2.37.2..2.37.3) - 2024-07-03
+
+### 🚀 Features
+
+- Add leaflet css to local resources - ([807e258](https://github.com/aphp/Cohort360-FrontEnd/commit/807e258d677f8e92f4fdc8eddc80b87fa852f3f3))
+
+### ⚙️ Miscellaneous Tasks
+
+- Release version 2.37.3 - ([fdbb514](https://github.com/aphp/Cohort360-FrontEnd/commit/fdbb514a0fdda255db29cdab8cf5e4ba9d207a1c))
+
+## [2.37.2](https://github.com/aphp/Cohort360-FrontEnd/compare/2.37.1..2.37.2) - 2024-07-02
+
+### 🐛 Bug Fixes
+
+- *(locationMap)* Colorpalette max index + infinite loading - ([4faf1fc](https://github.com/aphp/Cohort360-FrontEnd/commit/4faf1fc7b622d50edb6c784f48487e1b7e53a54f))
+
+### ⚙️ Miscellaneous Tasks
+
+- Release version 2.37.2 - ([f93c82e](https://github.com/aphp/Cohort360-FrontEnd/commit/f93c82eca0f62423a0afedf2ba12451b4d4e90e7))
+
+## [2.37.1](https://github.com/aphp/Cohort360-FrontEnd/compare/2.37.0..2.37.1) - 2024-07-02
+
+### 🐛 Bug Fixes
+
+- Fix display digit when request failed or cancel - ([52da4b7](https://github.com/aphp/Cohort360-FrontEnd/commit/52da4b7d139aa3a97348960ee291a0ddeba02831))
+
+### ⚡ Performance
+
+- *(locationMap)* Load only uncovered mesh units in parallel - ([57fa724](https://github.com/aphp/Cohort360-FrontEnd/commit/57fa724da9d2a97b39a4c1f51a4ce16ae4192900))
+
+### ⚙️ Miscellaneous Tasks
+
+- Release version 2.37.1 - ([416171c](https://github.com/aphp/Cohort360-FrontEnd/commit/416171c5b92a24541852d09d39b0f2dd6d789e0d))
+
+## [2.37.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.36.5..2.37.0) - 2024-06-26
+
+### 🚀 Features
+
+- Added arem disclaimers - Ref gestion-de-projet#2627  - ([daea2c2](https://github.com/aphp/Cohort360-FrontEnd/commit/daea2c212a7ac186d52f05985e6b99fa93c2b823))
+- Add jtools (#1000) - ([59dd844](https://github.com/aphp/Cohort360-FrontEnd/commit/59dd844e7016a658842bb5c4c8c2d12ded27b752))
+- Added arem disclaimer in patient cim10 and ccam - Ref gestion-de-projet#2638 - ([4bce8aa](https://github.com/aphp/Cohort360-FrontEnd/commit/4bce8aadeb53fb619bb812c7bf606fd390abd75b))
+- Websocket count/create cohort to replace intervals calls - Ref gestion-de-projet#2469 - ([c62bb57](https://github.com/aphp/Cohort360-FrontEnd/commit/c62bb578c694edfdf97104d4630b51b6b555a60c))
+- *(map)* Add location map - ([4daa155](https://github.com/aphp/Cohort360-FrontEnd/commit/4daa155a6d4ce33cf432d2766688a80b33a52be5))
+
+### 🐛 Bug Fixes
+
+- Change mail support and make it a constant - Ref gestion-de-projet#2588 - ([62cd1db](https://github.com/aphp/Cohort360-FrontEnd/commit/62cd1dbc38d13747df162f5cb4a4d1c8588e8434))
+- Resolve unbuild executive units - Ref gestion-de-projet#2633 - ([464d79a](https://github.com/aphp/Cohort360-FrontEnd/commit/464d79a564f94b83ecdff1c833407608274f7558))
+- Fixed error in patient infos - ([f01bc15](https://github.com/aphp/Cohort360-FrontEnd/commit/f01bc150014719088282638f245dbfe69a11e4ec))
+- Adapt export formula to match dataModel - ([8fbeffc](https://github.com/aphp/Cohort360-FrontEnd/commit/8fbeffc519b13b95c0b3223b7be20f44022f2c9a))
+- Fixed biology for value inputs - Ref gestion-de-projet#2595 - ([73d3dd6](https://github.com/aphp/Cohort360-FrontEnd/commit/73d3dd6f0e49949770809c07ce0789ec76065ddb))
+- Remove default range for encounter.duration and encounter.age - Ref gestion-de-projet#2622 - ([65a73a9](https://github.com/aphp/Cohort360-FrontEnd/commit/65a73a93d87c8132c16b4be6aa1c1fee97c27598))
+- Fixed biology for value inputs - Ref gestion-de-projet#2595 - ([3f32cd4](https://github.com/aphp/Cohort360-FrontEnd/commit/3f32cd4f9980d54d431144bfd599ccf391de7c67))
+- Remove fixed position for caresite view - ([58c236a](https://github.com/aphp/Cohort360-FrontEnd/commit/58c236a7815feb3f068ddf23e7d927978d2b179f))
+- Fixed typos in age display in days, last 3 diagnosis displaying with duplicates, put back general section in encounter form - ([1a6ef95](https://github.com/aphp/Cohort360-FrontEnd/commit/1a6ef95715582f5bae81fdcbe1b071d84c1b35d4))
+- Fix some bugs - Ref gestion-de-projet#2642 gestion-de-projet#2588 - ([0e681c0](https://github.com/aphp/Cohort360-FrontEnd/commit/0e681c0db6846f3ea7d74a7220c8ee4288908dd6))
+- Fix some bugs - Ref gestion-de-projet#2642 gestion-de-projet#2588 - ([3e89436](https://github.com/aphp/Cohort360-FrontEnd/commit/3e894368597ca898088a8666d10ed65c54651034))
+- Double encode when save sone filter - ([2fa10ed](https://github.com/aphp/Cohort360-FrontEnd/commit/2fa10ed421bae6d387b1215f9fa1661858b93cc0))
+- Use env for set ws socket - ([eec6e5b](https://github.com/aphp/Cohort360-FrontEnd/commit/eec6e5b082f52dbc5584f360b25888e6188a5f7b))
+
+### 🚜 Refactor
+
+- Cleaned types - Ref gestion-de-projet#2070 - ([a606c8d](https://github.com/aphp/Cohort360-FrontEnd/commit/a606c8d80fce612de9c6465180fb0da001da0621))
+
+### ⚡ Performance
+
+- *(location)* Add viewbox limited loading + cache already loaded areas - ([95f7491](https://github.com/aphp/Cohort360-FrontEnd/commit/95f749184aba3c2f37dc0fb978de901185975d45))
+
+### ⚙️ Miscellaneous Tasks
+
+- Release version 2.37.0-SNAPSHOT - ([cbfe843](https://github.com/aphp/Cohort360-FrontEnd/commit/cbfe843fb0d46f369f926ce32b06d7c413e04cb2))
+- Update node version - ([e8f7b0a](https://github.com/aphp/Cohort360-FrontEnd/commit/e8f7b0af6b19af8cd7080bc2f904958a35bfff00))
+
+
+## [2.36.0](https://github.com/aphp/Cohort360-FrontEnd/compare/mater..2.36.0) - 2024-06-07
+
+### 🚀 Features
+
+- Add docStatus filter into filters and saveFilters - Ref gestion-de-projet#2475 - ([3045a1b](https://github.com/aphp/Cohort360-FrontEnd/commit/3045a1b1793adbb1911a3d6093f041a1d0512a9e))
+- *(leftmenu)* Add version info - ([1234ac5](https://github.com/aphp/Cohort360-FrontEnd/commit/1234ac55869d12666e2b728d6f355ec01d897a2e))
+- Changed commitlint limit size to 300 char - ([c7fbabf](https://github.com/aphp/Cohort360-FrontEnd/commit/c7fbabf32369d5142de6fe66e263b6ea91e925b2))
+- Manage forwarding to download CSV export (#964) - ([0c38cc3](https://github.com/aphp/Cohort360-FrontEnd/commit/0c38cc348ad6dec5c538d16ee2e2d72e729ce148))
+- Add arem source for diagnostic cim10 view and requestor - Ref gestion-de-projet#2439 gestion-de-projet#2438 - ([7547665](https://github.com/aphp/Cohort360-FrontEnd/commit/754766503f58b55664befcc5daa3ddee77622d91))
+- Enable export mater - ([5b852dd](https://github.com/aphp/Cohort360-FrontEnd/commit/5b852dd07a6a5df3fdb1229ed12637a672956eb3))
+- *(nginx)* Add gzip compression - ([67de01d](https://github.com/aphp/Cohort360-FrontEnd/commit/67de01d9529d05a80725dea428f306d8894e2d47))
+- New version of requestion json - ([2d3bbdc](https://github.com/aphp/Cohort360-FrontEnd/commit/2d3bbdc65516f62fe1aeaaf79c3e078823d90c07))
+- Added filter by encounterStatus in all resources (#978) - ([4c8ac20](https://github.com/aphp/Cohort360-FrontEnd/commit/4c8ac2094097475653ec1ed43a85f7c9ad466222))
+- Request cleanup if pseudo - Ref gestion-de-projet#2563 (#980) - ([2de4b6a](https://github.com/aphp/Cohort360-FrontEnd/commit/2de4b6ad76dca4061e42229672d11b3168170c7f))
+- Added new input for numeric comparators with floats - Ref gestion-de-projet#2595 - ([1b3f87a](https://github.com/aphp/Cohort360-FrontEnd/commit/1b3f87af8e3bec9d3077fad756e8bc73190f88b2))
+- *(login)* Add impersonation modal and header - ([be70205](https://github.com/aphp/Cohort360-FrontEnd/commit/be70205ebbd05c6a612681a60d1feb49d34bd3a0))
+
+### 🐛 Bug Fixes
+
+- Fixed typo in imaging info - Ref gestion-de-projet#2534 - ([0927b77](https://github.com/aphp/Cohort360-FrontEnd/commit/0927b773acc48a7b08326d4a991efa0358a61ffb))
+- Added maiden name in patient sidebar - Ref gestion-de-projet#2535 - ([f731051](https://github.com/aphp/Cohort360-FrontEnd/commit/f73105125a9231e95ef864a818880343ece379b0))
+- Resolve selection of code filters - Ref gestion-de-projet#2538 - ([5b9e73e](https://github.com/aphp/Cohort360-FrontEnd/commit/5b9e73efc380e01719dd9d4883e6ec90755684ab))
+- *(questionnaireResponse)* Remove open choice boolean valueset translation - ([24014c6](https://github.com/aphp/Cohort360-FrontEnd/commit/24014c6bd1fdd3de08ac4c5d7b2d6cb2abaf1666))
+- *(questionnaireFilter)* Correct array search function... - ([2d031f3](https://github.com/aphp/Cohort360-FrontEnd/commit/2d031f394a7d887ea495be24c6bd8fc92118d77e))
+- *(questionnaireResponse)* Add new boolean field data type - ([8b44a2e](https://github.com/aphp/Cohort360-FrontEnd/commit/8b44a2ef2b8b6553d55c35002b9b02410e2c846b))
+- Fixe empty chips - Ref gestion-de-projet#2537, erase cohort_definition of export_table - Ref gestion-de-projet#2540 - ([4ae1081](https://github.com/aphp/Cohort360-FrontEnd/commit/4ae1081d9371e41f945cbadd85efac090b461651))
+- Fix mater - Ref gestion-de-projet#2535, Ref gestion-de-projet#2415 - ([0437cdb](https://github.com/aphp/Cohort360-FrontEnd/commit/0437cdb27d158cce8b0556e7225851ef388f6825))
+- Deleted a field in hospit card - Ref gestion-de-projet#2545 (#972) - ([601772b](https://github.com/aphp/Cohort360-FrontEnd/commit/601772b603d75550916b97b59c6a8ba37a200d1d))
+- *(observation)* Use userselected code + remove obsolete id filter - ([9982630](https://github.com/aphp/Cohort360-FrontEnd/commit/99826301fc16236436a3a3ed1ec529a281e63f01))
+- Fixed executive units in mater vizu - Ref gestion-de-projet#2392 - ([997637e](https://github.com/aphp/Cohort360-FrontEnd/commit/997637e21dbaa024bf2d52e5c9e0954125f9ddc8))
+- Merge branch 'release_2.33.1' - ([3362ff7](https://github.com/aphp/Cohort360-FrontEnd/commit/3362ff7f7e580e840b10fa843451e9df4fe5b3d6))
+- Fixed hospit details - ([bcba96a](https://github.com/aphp/Cohort360-FrontEnd/commit/bcba96a664748ce9811f49e034444c98821ee382))
+- Merge branch 'release_2.33.1' - ([b61de5a](https://github.com/aphp/Cohort360-FrontEnd/commit/b61de5a41dc211c04f63184ca52d3c939626350f))
+- DocStatus and export mater and pseudo mater visu - ([807055a](https://github.com/aphp/Cohort360-FrontEnd/commit/807055a2a1bea6e909c213a1012816a140804d2b))
+- Mater request check right on pop source - ([37e99c4](https://github.com/aphp/Cohort360-FrontEnd/commit/37e99c42268553cedad7e059657ab1d2dbcc656d))
+- Refacto of fhir search params- Ref gestion-de-projet#2522 (#966) - ([2506f91](https://github.com/aphp/Cohort360-FrontEnd/commit/2506f91dcdaaa12a384777a0c1a7f06b111c9125))
+- Disable mater export and fix empty chips for docStatus - ([8627f46](https://github.com/aphp/Cohort360-FrontEnd/commit/8627f46be881dad496d41a75d2294a6a6945999c))
+- Empty chips for docStatus into requestor view - ([c97d048](https://github.com/aphp/Cohort360-FrontEnd/commit/c97d048607019fbe615eaf0731afcdc68d8c083c))
+- Text bug fixed-Ref gestion-de-projet#2561 - ([e85d444](https://github.com/aphp/Cohort360-FrontEnd/commit/e85d444fff7c46999f799e63622c44919002a632))
+- Text bug fixed-Ref gestion-de-projet#2561 (#983) - ([70dd6ff](https://github.com/aphp/Cohort360-FrontEnd/commit/70dd6ffdf39da7ecf2afab44028576d5b63a8daa))
+- Fixed flow cohorts - Ref gestion-de-projet#2551 (#986) - ([9556300](https://github.com/aphp/Cohort360-FrontEnd/commit/9556300d1e9cb2b6056d7a0aa13eade7888b9fbe))
+- Refacto of fhir search params- Ref gestion-de-projet#2522 (#984) - ([9094ed3](https://github.com/aphp/Cohort360-FrontEnd/commit/9094ed3149b711d0dab27f906bc9c9f81b45df1a))
+- Fix use of part-of:missing=true - Ref gestion-de-projet#2557 - ([c02a5d0](https://github.com/aphp/Cohort360-FrontEnd/commit/c02a5d08337eef260125dff0f79196867ae4e377))
+- Remove source cim10 warning and reactivate legal mention - Ref gestion-de-projet#2581 gestion-de-projet#2576 - ([13178d0](https://github.com/aphp/Cohort360-FrontEnd/commit/13178d091063e8c16e469ea2d5a2eb02102c4ec6))
+- Added tags to search with _text - Ref gestion-de-projet#2522 - ([b29e9da](https://github.com/aphp/Cohort360-FrontEnd/commit/b29e9dac11a2b02939402b9f800a3b68cf5ee325))
+- NoOptionText form hospit and pregnancy - ([bee0c0b](https://github.com/aphp/Cohort360-FrontEnd/commit/bee0c0b62bd02dfa897f5b32490144744d412db4))
+- *(request)* Add missing useeffect dep causing breadcrumb misrendering - ([861a21c](https://github.com/aphp/Cohort360-FrontEnd/commit/861a21ccba14c611d12d97817dc8bddcb204365f))
+- NoOptionText form hospit and pregnancy - ([1759031](https://github.com/aphp/Cohort360-FrontEnd/commit/17590310309a53af591155347d29fb16fbad6166))
+- Change url for export - ([e210d73](https://github.com/aphp/Cohort360-FrontEnd/commit/e210d731dcb0472213d2f99040368f68db269eee))
+- Fixed pseudonymization of age criteria - Ref gestion-de-projet#2563 - ([1353f54](https://github.com/aphp/Cohort360-FrontEnd/commit/1353f54df48de883d3ce3c5fac8c98f9bfc170e4))
+- Resolve conversion to month when pseudo access - ([017685b](https://github.com/aphp/Cohort360-FrontEnd/commit/017685bb45b1c75a74ca5129d6fb4a83de512159))
+- Resolve clean request nomi => pseudo - Ref gestion-de-projet#2563 - ([6633b65](https://github.com/aphp/Cohort360-FrontEnd/commit/6633b65f8c3f15fc5450e90649035d4deaf40878))
+
+### 🚜 Refactor
+
+- *(callApi)* Use correct new _offset param - ([cb83374](https://github.com/aphp/Cohort360-FrontEnd/commit/cb833746c98f9c1380fc6625212d24e77d973bdf))
+- *(criteriaBuilder)* Extract criteria unbuilder + limit usage of criteria type enum - ([ec92b16](https://github.com/aphp/Cohort360-FrontEnd/commit/ec92b16fb302d1f6168f0125934789bef61ed868))
+- Updated fhir search - Ref gestion-de-projet#2522 - ([6349f7c](https://github.com/aphp/Cohort360-FrontEnd/commit/6349f7c7fe9dc0bd47fcae17d53c2f68cc1e497f))
+- *(sidebar)* Remove some duplicated code - ([a24e96e](https://github.com/aphp/Cohort360-FrontEnd/commit/a24e96ecff00ea68d537d8276d2d6e81266bf6db))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update packages version - ([b0d979b](https://github.com/aphp/Cohort360-FrontEnd/commit/b0d979bc06d01ca149b152384957641601d0cf26))
+- Update packages version - ([a1743e9](https://github.com/aphp/Cohort360-FrontEnd/commit/a1743e96040d76d9cf5480eb395e775b7c774c03))
+- Upgrade package - ([6bd2a0c](https://github.com/aphp/Cohort360-FrontEnd/commit/6bd2a0c6085c02938ee4eb1e3fbcd9cb50a2b1ba))
+- Change docker entrypoint for new env variables encounter_status - ([2bb5d80](https://github.com/aphp/Cohort360-FrontEnd/commit/2bb5d804ac77a09b48145f9ca94d09b2d262d92b))
+- *(commitlint)* Fix commitlint cli with package of type module (#998) - ([a02c4f9](https://github.com/aphp/Cohort360-FrontEnd/commit/a02c4f9c95f07be5f53a8c32896ffbe0bd6ed634))
+- Release version 2.36.0 - ([c5c0418](https://github.com/aphp/Cohort360-FrontEnd/commit/c5c0418a75d2e4a8e946ed153e171951ab621209))
+
+## [mater](https://github.com/aphp/Cohort360-FrontEnd/compare/2.31.1..mater) - 2024-03-21
+
+### 🚀 Features
+
+- Adding warning messages for imaging view and criteria - Ref gestion-de-projet#2479 - ([7edc7b1](https://github.com/aphp/Cohort360-FrontEnd/commit/7edc7b15076cb581e7a8d7f00149943488c8953e))
+- Add imaging export table in mocked data - Ref gestion-de-projet#2492 (#956) - ([655a462](https://github.com/aphp/Cohort360-FrontEnd/commit/655a462e012dc9224d225306dd6856f8b90bf795))
+- Renaming 'procédure' into 'code procédure' - Ref gestion-de-pro… (#951) - ([76e8f0f](https://github.com/aphp/Cohort360-FrontEnd/commit/76e8f0f2b5812bba90322a6c4af8c98731ecd15e))
+- Maternity - Ref gestion-de-projet#2392 gestion-de-projet#2415 - ([42f3d3d](https://github.com/aphp/Cohort360-FrontEnd/commit/42f3d3df215d681bcbf4e386ef1e037ba97197ce))
+- Regex fix for multiple IPP list - Ref gestion-de-projet#2458 - ([c3e0a61](https://github.com/aphp/Cohort360-FrontEnd/commit/c3e0a61a3e6df1236375319cd670649568b9b1cc))
+
+### 🐛 Bug Fixes
+
+- Remove `-` of escape char into getCodeList asked by npuchois - ([5bbe2c6](https://github.com/aphp/Cohort360-FrontEnd/commit/5bbe2c6b001a7461fa77cf34e9984e377c4cd5ca))
+- Correction faute ortographe - Ref gestion-de-projet#2446 - ([3fdcc6e](https://github.com/aphp/Cohort360-FrontEnd/commit/3fdcc6e289089ad492e41c337581da500bacf27b))
+- *(perimeters)* Set base permission to pseudo - ([b2c1fd9](https://github.com/aphp/Cohort360-FrontEnd/commit/b2c1fd9973eb9320f24e5f12a05c7337f33ea3df))
+- Repare redirection flow after wrong login -Ref gestion-de-project#2451 - ([afb97d1](https://github.com/aphp/Cohort360-FrontEnd/commit/afb97d1b838fbe17d9823f4f61ed2fc6a1e32e00))
+- *(documenttable)* Sanitize document html - ([aef120c](https://github.com/aphp/Cohort360-FrontEnd/commit/aef120cedc830c6b2275e9cf70dd0c0e57caa29c))
+- Resolve regression of 2.32.0  - Ref gestion-de-project#2531 - ([94652b1](https://github.com/aphp/Cohort360-FrontEnd/commit/94652b1c7424b372b30a7637131b60c173ccc569))
+- Fixed imaging search fails - Ref gestion-de-projet#2531 - ([3c2fba4](https://github.com/aphp/Cohort360-FrontEnd/commit/3c2fba4e6010222d20c38bf8dcb18868db477e98))
+
+### 🚜 Refactor
+
+- Fix requests after login #2473 (#953) - ([510ef7f](https://github.com/aphp/Cohort360-FrontEnd/commit/510ef7f49e72250b9277fcd9e3c99dc7c6438ef5))
+- Change 'any' types (#952) - ([eb2e975](https://github.com/aphp/Cohort360-FrontEnd/commit/eb2e9756113093aa5ca094928157020258849c46))
+- Remove some more any types - Ref gestion-de-projet#2070 (#955) - ([e0bf497](https://github.com/aphp/Cohort360-FrontEnd/commit/e0bf497e084b8544745febcba143a6b796d8f886))
+- New flow delete saved filters (#948) - ([85b407e](https://github.com/aphp/Cohort360-FrontEnd/commit/85b407eaeddeca495d564fb2a62056f6400933f6))
+
+### ⚙️ Miscellaneous Tasks
+
+- Fix version extraction - ([a3b181b](https://github.com/aphp/Cohort360-FrontEnd/commit/a3b181b578ebf9a385811615b4608d1234e6867b))
+
+## [2.31.1](https://github.com/aphp/Cohort360-FrontEnd/compare/2.31.0..2.31.1) - 2024-02-20
+
+### 🚀 Features
+
+- *(feasability)* Add feature flag to disable feasability report button - ([08bc1bb](https://github.com/aphp/Cohort360-FrontEnd/commit/08bc1bbc706f572e67c57e0c1463e9fc6c22029e))
+
+## [2.31.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.29.1..2.31.0) - 2024-01-25
+
+### 🚀 Features
+
+- Added feasability report button - Ref gestion-de-projet#2365 - ([525b8c7](https://github.com/aphp/Cohort360-FrontEnd/commit/525b8c76b4c209bec161c160fd172aa719ebc6ea))
+
+### 🐛 Bug Fixes
+
+- Apply ODD_IMAGING to imagerie tab into cohort or perimeter - ([36d579f](https://github.com/aphp/Cohort360-FrontEnd/commit/36d579fdda59288f8d450c47740151fef4f75820))
+- Apply ODD_IMAGING to imagerie tab into cohort or perimeter - ([6d284a5](https://github.com/aphp/Cohort360-FrontEnd/commit/6d284a5ef0b1e86305f5b21dc54dd7a82cab5f17))
+- Fix deidentied use case for date range into patient and encounter - ([5bb121d](https://github.com/aphp/Cohort360-FrontEnd/commit/5bb121d929619f508147b72d86ce1217ee3f9e20))
+- Fix some bug with cohort-rights and pass biology research value in float - ([c00bffb](https://github.com/aphp/Cohort360-FrontEnd/commit/c00bffb4da071c20a72a86eda1d3e5af19d60a33))
+- Fix several bug and add cancel request into requestor autocomplete - ([7fc03b0](https://github.com/aphp/Cohort360-FrontEnd/commit/7fc03b0081b90bdd1d82fbba79f18101b44ca6b2))
+- Remove quote for contenttype into compostion_status for documentReference build cohortCreation (#938) - ([9a1d1cb](https://github.com/aphp/Cohort360-FrontEnd/commit/9a1d1cb8fd8da9980f2eb665c86be1fa940078b3))
+- *(topbar)* Add abort controller to prevent fetching patients after dashboard count update (#940) - ([ad19223](https://github.com/aphp/Cohort360-FrontEnd/commit/ad19223ae624fff4c30552300c753b2240f2f41f))
+- Fixed ipp list not showing when editing - Ref gestion-de-projet#2454 - ([79f9339](https://github.com/aphp/Cohort360-FrontEnd/commit/79f9339a07e01cfe56d6e76b7ddb6526b58c8bc1))
+- Fixed isInclusive switch - Ref gestion-de-projet#2454 - ([7222195](https://github.com/aphp/Cohort360-FrontEnd/commit/7222195253964b65b7cc019fcfaf13e44da2e482))
+- Fixed documents description not showing in timeline - Ref gestion-de-projet#2454 - ([a4321ef](https://github.com/aphp/Cohort360-FrontEnd/commit/a4321ef2393292c25fc19db66c017613e9c6ee55))
+- Fixed error in age criteria - Ref gestion-de-projet#2454 - ([c08bdb4](https://github.com/aphp/Cohort360-FrontEnd/commit/c08bdb424987893bb0a45425515f1ab54f6d4b9f))
+- Fixed error not showing when no rights - Ref gestion-de-projet#2454 - ([93d5166](https://github.com/aphp/Cohort360-FrontEnd/commit/93d5166d4f18af70f09e61b36178450c6e4340d0))
+- Fixed error in observation search by value - Ref gestion-de-projet#2454 - ([59fd1ee](https://github.com/aphp/Cohort360-FrontEnd/commit/59fd1ee09a4b899f049a851c6cce4d10a3de1a3c))
+- Fixed error in age when deidentified - Ref gestion-de-projet#2454 - ([c2ad9fd](https://github.com/aphp/Cohort360-FrontEnd/commit/c2ad9fde8a767e533235e936316c729c3e1361d2))
+- Adaptation name and family retrive - ([0a8a46f](https://github.com/aphp/Cohort360-FrontEnd/commit/0a8a46fd7a17681fb81cffc901532f22a1b2e1e2))
+- Export cohort when explore it - ([e9cbf7f](https://github.com/aphp/Cohort360-FrontEnd/commit/e9cbf7fac7b4005053a86118777a1f590c79af9c))
+- Fixed error in observation criteria - ([11424bd](https://github.com/aphp/Cohort360-FrontEnd/commit/11424bddad66d49170b58a92448f83843ad1b1c3))
+
+### 🚜 Refactor
+
+- Refactor of cohortCreation - Ref gestion-de-projet#2420 - ([aac8025](https://github.com/aphp/Cohort360-FrontEnd/commit/aac80258d04523ec8a931186b67e1871d12bb660))
+
+### 📚 Documentation
+
+- Add changelog (#935) - ([08e2e54](https://github.com/aphp/Cohort360-FrontEnd/commit/08e2e54f64f7bcc7d9a6ee470a29ec11022043ac))
+
+## [2.29.1](https://github.com/aphp/Cohort360-FrontEnd/compare/2.29.0..2.29.1) - 2023-12-20
+
+### 🐛 Bug Fixes
+
+- Apply ODD_IMAGING to imagerie tab into cohort or perimeter - ([14b729a](https://github.com/aphp/Cohort360-FrontEnd/commit/14b729abcd6f9c416c2f3ba8aa213d9f2103991b))
+
+### ⚙️ Miscellaneous Tasks
+
+- Nerge fix-2.29.1 into main - ([777cb85](https://github.com/aphp/Cohort360-FrontEnd/commit/777cb8512a54fd99491b397b758734f63b144f80))
+
+## [2.29.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.22.4..2.29.0) - 2023-12-20
+
+### 🚀 Features
+
+- Add news of next release - Ref gestion-de-projet#2214 - ([8aa591b](https://github.com/aphp/Cohort360-FrontEnd/commit/8aa591b4de4f7a89a1eb08a7f9ebd46f268d0aa9))
+- On enter key down then connect - Ref gestion-de-projet#2237 (#866) - ([d59435e](https://github.com/aphp/Cohort360-FrontEnd/commit/d59435e7ded8b1cc13ff9a50f34b5662fa3c8a3c))
+- Reverse icons - Ref gestion-de-projet#2236 - ([9e6cf70](https://github.com/aphp/Cohort360-FrontEnd/commit/9e6cf701b292f23924270a8cb1cc9c22f459929a))
+- Added partial temporal constraints - Ref gestion-de-projet#2033 - ([01fb6b6](https://github.com/aphp/Cohort360-FrontEnd/commit/01fb6b6ee5751573dba56ad9ba927bcc2a751915))
+- Improve inderminate icons - Ref gestion-de-projet-#2272 (#874) - ([0b37677](https://github.com/aphp/Cohort360-FrontEnd/commit/0b3767775b5b9034072cfe64de073af6c17d7df9))
+- Phedra adaptation and some fixes - Ref gestion-de-projet#2175 (#875) - ([69063cb](https://github.com/aphp/Cohort360-FrontEnd/commit/69063cb622b78c243cfb193468f666c7fd6bb3fb))
+- Change label for exportable tables - Ref gestion-de-projet#2048 - ([1e77c50](https://github.com/aphp/Cohort360-FrontEnd/commit/1e77c50a4be1dcf61f5cabe2f520e728c3d19019))
+- Remove the jwt form and connection - Ref gestion-de-projet#2256 - ([52b5861](https://github.com/aphp/Cohort360-FrontEnd/commit/52b58610720348ca0c473e91667d70fd9c7d158f))
+- Remove the jwt form and connection - Ref gestion-de-projet#2256 - ([ea82621](https://github.com/aphp/Cohort360-FrontEnd/commit/ea82621ee052dfffb5b12949348b53d3dedf82b4))
+- Responsive pdf display - Ref gestion-de-projet#2223 - ([9f46642](https://github.com/aphp/Cohort360-FrontEnd/commit/9f46642ee12e6a1fdadbf6864fe3d720f7a52d39))
+- Rename criteria tabs from hierarchy to exploration - Ref gestion-de-projet#2238 - ([592e685](https://github.com/aphp/Cohort360-FrontEnd/commit/592e685a3bbe705c184e03b1742ac3f5d00b8024))
+- Adding AREM in data visualisation and requestor - Ref gestion-de-projet#2183 (#911) - ([def2646](https://github.com/aphp/Cohort360-FrontEnd/commit/def26468aa34833f3715f43e97d35ec2b07e14bc))
+- Added imaging viewing for a patient and imaging requestor - Ref gestion-de-projet#1151 gestion-de-projet#2100 - ([9956ef1](https://github.com/aphp/Cohort360-FrontEnd/commit/9956ef1daa408d5ac1f8b42ec377c2438b7a776a))
+- Added imaging view in dashboard - Ref gestion-de-projet#2224 - ([fe18a92](https://github.com/aphp/Cohort360-FrontEnd/commit/fe18a92bb8f601417e66d0276f019cd9c4ec7207))
+
+### 🐛 Bug Fixes
+
+- Fix regression on shareRequest - ([ee834b9](https://github.com/aphp/Cohort360-FrontEnd/commit/ee834b934490cfe7e07136d27cce2a9d062d06cc))
+- Block creation of request or cohort with blank name - Ref gestion-de-projet#2213 - ([adf7ee1](https://github.com/aphp/Cohort360-FrontEnd/commit/adf7ee1b190d8efebe4939321a8f6e0177a67ebe))
+- Fix mispell fault - Ref gestion-de-projet#2149 - ([1d2471f](https://github.com/aphp/Cohort360-FrontEnd/commit/1d2471f940dcf3238631c00304c05d279109f9ee))
+- Resolve alerting whem double non sens - Ref gestion-de-projet#2204 - ([c7ed91a](https://github.com/aphp/Cohort360-FrontEnd/commit/c7ed91a5ea6575bf8866ec2a48b18c36fbecd56a))
+- Resolve alerting whem double non sens - Ref gestion-de-projet#2204 - ([f325917](https://github.com/aphp/Cohort360-FrontEnd/commit/f32591706721a579b2813d7216af07aabd3a0e4e))
+- Correcting caps caracter on a word - Ref gestion-de-projet#2205 - ([3d06fbe](https://github.com/aphp/Cohort360-FrontEnd/commit/3d06fbe6821d8e1bb7b01e6738235a8ae605e813))
+- Aucun patient where there is and fix age filters - Ref gestion-de-projet#2211 - ([83c5547](https://github.com/aphp/Cohort360-FrontEnd/commit/83c554736487f0da45d4300bec90d3cd9d8df5b6))
+- Put table in warning in italic - Ref gestion-de-projet#2106 - ([ae0706d](https://github.com/aphp/Cohort360-FrontEnd/commit/ae0706d4b8c1a854f2f1a6a79f3ade1d95a91e55))
+- Fix several bug - ([cfd3aac](https://github.com/aphp/Cohort360-FrontEnd/commit/cfd3aacc9e08cea6e965d62bc0b67fb51d591ed9))
+- Fix several bug - ([d9e2da5](https://github.com/aphp/Cohort360-FrontEnd/commit/d9e2da5350603cb99a1548acb5eb11632a1ccdaf))
+- Capslock caractere remove from error alerting - Ref gestion-de-projet#2204 gestion-de-projet#2205 - ([3bdea2b](https://github.com/aphp/Cohort360-FrontEnd/commit/3bdea2bdcba64803ad4e5d0f253045b71cf02d95))
+- Fix mispelling word - Ref gestion-de-projet#1986 - ([11f0d25](https://github.com/aphp/Cohort360-FrontEnd/commit/11f0d251ca84bf2a7c3afa8d8da9a0528ca244d9))
+- Fix age undefined when 0-130 years - Ref gestion-de-projet#2039 - ([202a187](https://github.com/aphp/Cohort360-FrontEnd/commit/202a1876c3283910546931a8f3b2b6578a36eaf5))
+- Fixed biology search by code value - Ref gestion-de-projet#2216 - ([4f906dc](https://github.com/aphp/Cohort360-FrontEnd/commit/4f906dc96aa6d26c4a2f3ff1529c5d5ee8a05643))
+- Fixed biology search by code value - Ref gestion-de-projet#2216 - ([628ec83](https://github.com/aphp/Cohort360-FrontEnd/commit/628ec834ad002c998f5da67fbb4d39ac6dca1bb5))
+- Fixed bug in cohort creation title errors - Ref gestion-de-projet#2268 - ([1644655](https://github.com/aphp/Cohort360-FrontEnd/commit/16446551b21b0ee12f9fe98837e498b7947c49f7))
+- Hot fix for delete pmsi filters and negative value for biology criteria (#861) - ([6960ce1](https://github.com/aphp/Cohort360-FrontEnd/commit/6960ce1967b6d1b2a1a289e0c74e0609bb616238))
+- Fix some bug - ([eb5f647](https://github.com/aphp/Cohort360-FrontEnd/commit/eb5f6477a4b682e0cec8aee0ba0a06322e103141))
+- Biology values border - Ref gestion-de-projet#2270 (#863) - ([f62f96e](https://github.com/aphp/Cohort360-FrontEnd/commit/f62f96e242ed1eca7363adc165755717807d3c7f))
+- *(valuesets)* Correct code searching and display + add some typing - ([4f024d0](https://github.com/aphp/Cohort360-FrontEnd/commit/4f024d05e3a7cece9b1b284a74ca337f8089208a))
+- Update sort names for resource search - ([3f78446](https://github.com/aphp/Cohort360-FrontEnd/commit/3f78446e12f0674fbdbd7d2583491ffa887aa1e7))
+- Biology expand - Ref gestion-de-projet#2272 (#872) - ([b720543](https://github.com/aphp/Cohort360-FrontEnd/commit/b720543384eca2d5c35e3d0ff1398cd78079a7b7))
+- Change docker entry point for pheadra - Ref gestion-de-projet#2175 - ([6d0bc86](https://github.com/aphp/Cohort360-FrontEnd/commit/6d0bc866731a7e0372ebf65f90f0061ab620c35a))
+- Fixes some bug - ([cca20a4](https://github.com/aphp/Cohort360-FrontEnd/commit/cca20a4a40d9f30a2e8be70fb8f41a87597897f1))
+- Resolve bug n15 - Ref gestion-de-projet#2330 - ([a361def](https://github.com/aphp/Cohort360-FrontEnd/commit/a361def89a2aba183120c76ff1bb4d9a15ef0432))
+- *(medication)* Add fallback codesystem code display when standard is missing - ([7656f60](https://github.com/aphp/Cohort360-FrontEnd/commit/7656f606413de7eb1f098a968d412d625b5a4cd4))
+- *(medicationCriteria)* Correct param route name - ([afc4d95](https://github.com/aphp/Cohort360-FrontEnd/commit/afc4d95401a9b40323d7f1f79bc737f1fa739f75))
+- Resolve bug n13 - Ref gestion-de-projet#2330 - ([75af225](https://github.com/aphp/Cohort360-FrontEnd/commit/75af225411873a9278d228ed8814ee1c43219919))
+- Correct fhir param names - Ref gestion-de-projet#2330 - ([3c74578](https://github.com/aphp/Cohort360-FrontEnd/commit/3c745784c601f279ca8c3bb886d2354cbe3b72b7))
+- Fix bugs n6 n8 and n16 - Ref gestion-de-projet#2330 - ([742eec3](https://github.com/aphp/Cohort360-FrontEnd/commit/742eec3287cd9866c59ba047ad68fc5fceb2888a))
+- Resolve bug n8 - Ref gestion-de-projet#2330 - ([eb50666](https://github.com/aphp/Cohort360-FrontEnd/commit/eb506660b37fa97f19a6038e0d11c59cb9c119ce))
+- Fix double import - ([c51f290](https://github.com/aphp/Cohort360-FrontEnd/commit/c51f29052f5e3866f837b7f30b01cf369b73585f))
+- Adapt documentReference params type to type-name - ([67c1c9d](https://github.com/aphp/Cohort360-FrontEnd/commit/67c1c9d21aea3032f404ff00a874c3cf28766e96))
+- Resolve repartitionMap for graph - ([5007c2a](https://github.com/aphp/Cohort360-FrontEnd/commit/5007c2ab1d8c39cb69b5d55eaa46d2b1fe925605))
+- Chang type-name param by type - ([0e0bf60](https://github.com/aphp/Cohort360-FrontEnd/commit/0e0bf60a78593677e85cf5c7453cac1f12d73e8e))
+- Resolve unbuild pmsi criteria always return all hierarchy - ([6509909](https://github.com/aphp/Cohort360-FrontEnd/commit/6509909c3a1216e21d8f1a3f0047da96b8134fa6))
+- Resolve several bug - ([70588fa](https://github.com/aphp/Cohort360-FrontEnd/commit/70588faa258c25a9bfc9b323f403897b7ff69c32))
+- Resolve wildcard into pmsi _text when no research (#895) - ([1fd0549](https://github.com/aphp/Cohort360-FrontEnd/commit/1fd0549782bb6dd9eabd203674f875f0667fffc6))
+- Resolve select caresite when use research mode - ([2aea9cf](https://github.com/aphp/Cohort360-FrontEnd/commit/2aea9cf20e18a263e7f16a16c66ccef9127ebeff))
+- Fixe some bug into release 2.27.0 - ([336131f](https://github.com/aphp/Cohort360-FrontEnd/commit/336131f2d2760b7b7b5fcff3d71959e37d1600d9))
+- Resolve remaining bug on refacto - Ref gestion-de-projet#1799 gestion-de-projet#2373 gestion-de-projet#2385 (#908) - ([0389672](https://github.com/aphp/Cohort360-FrontEnd/commit/0389672667ca7a399a10370098afc51fa73b4373))
+- Resolve remaining bug on refacto - ([26c90ea](https://github.com/aphp/Cohort360-FrontEnd/commit/26c90ea99788bae06693f156415403d554d21d0a))
+- Fix error management demographic criteria (#910) - ([a8e69c3](https://github.com/aphp/Cohort360-FrontEnd/commit/a8e69c38b383c57ac486daaf9360f862a0e9fdc4))
+- Retrive equals on type for fetchcohortRights - ([ff9eaa5](https://github.com/aphp/Cohort360-FrontEnd/commit/ff9eaa58413299283a594a55d203a704e2fb5d87))
+- Fix env variable - ([5f1b467](https://github.com/aphp/Cohort360-FrontEnd/commit/5f1b467bc7f4b08d36f0ff8b51206fa390a777b6))
+- Fix version 2.29.0 - ([56eddd0](https://github.com/aphp/Cohort360-FrontEnd/commit/56eddd09373a02d9a59eefd3c6008333b8611395))
+- Fix selectedCriteria?.encounterService?.length undefined - ([29cdc0f](https://github.com/aphp/Cohort360-FrontEnd/commit/29cdc0fc59d0363bd4b7d8fb2cb37c200d743a68))
+- Fix some bug on 2.29.0 (#919) - ([4314790](https://github.com/aphp/Cohort360-FrontEnd/commit/43147909ee07e9d1cde8f77bb4c49fa70c5dae56))
+- *(valueset)* Properly override only-roots param - ([8910cea](https://github.com/aphp/Cohort360-FrontEnd/commit/8910cea40d4af8ca9394c9ea377e911e2cdfa515))
+- Resolve packages vulnerabilities - ([501d4e6](https://github.com/aphp/Cohort360-FrontEnd/commit/501d4e65e7f069c5dc49612815c8fb73a2349d66))
+- Retrieve encounterService for imaging criteria - ([05a6c1d](https://github.com/aphp/Cohort360-FrontEnd/commit/05a6c1d9f86a5673a270300aaeea886da6007126))
+- Retrieve encounterService for imaging criteria - ([aec3162](https://github.com/aphp/Cohort360-FrontEnd/commit/aec3162f7c25bb87ae8f42c2270db4529d21923f))
+- Fix several bug - ([19cd6b7](https://github.com/aphp/Cohort360-FrontEnd/commit/19cd6b777e2065323a9a0c1bebcb4064ab23694b))
+- Make changes for rights routes following backend refacto (#906) - ([8c6a656](https://github.com/aphp/Cohort360-FrontEnd/commit/8c6a656ebc184971f7dfd463bafe1ad648486c10))
+- Change a param and route for perimeter right - ([7fe0fd2](https://github.com/aphp/Cohort360-FrontEnd/commit/7fe0fd232870214dccc1feb9d35e75e91d087d65))
+- Add new type and fix attribute name - ([0548738](https://github.com/aphp/Cohort360-FrontEnd/commit/0548738c31d52c1835fd390473965cffca4a4cf6))
+- Retrieve encounterService for imaging criteria - ([698521f](https://github.com/aphp/Cohort360-FrontEnd/commit/698521f44af4f3126fda3661aae981748a5c0976))
+- Fix several bug - ([c4ea229](https://github.com/aphp/Cohort360-FrontEnd/commit/c4ea22927e0626753461ff9fb3a560413cfccc50))
+- Removed bodysite, fixed cohort creation - ([0ddfc21](https://github.com/aphp/Cohort360-FrontEnd/commit/0ddfc21d62f992e15ed58e4e6acc59e6a0ba9fdb))
+
+### 🚜 Refactor
+
+- Change label in DocumentViewer - ([5358fd2](https://github.com/aphp/Cohort360-FrontEnd/commit/5358fd2955c1afeb5010ba1c942cb353756acf51))
+- *(fhirApi)* Adapt to new fhir resource query param and refactor valueset - ([b0c55f5](https://github.com/aphp/Cohort360-FrontEnd/commit/b0c55f5fc122b9aecad4ee6be8f5456e3929cd95))
+- Change type sort by type-name in dataTableComposition - ([2328b3a](https://github.com/aphp/Cohort360-FrontEnd/commit/2328b3acb619f786059b0c26128405b8e0498416))
+- New scope tree - Ref gestion-de-projet#2027 - ([152d7e6](https://github.com/aphp/Cohort360-FrontEnd/commit/152d7e61d80d7918c2fe20903921093e1fb084dd))
+- Refacto of several code parts by Alizé and fix by Manelle and Salah - Ref gestion-de-projet#2186 gestion-de-projet#2197 gestion-de-projet#1799 gestion-de-projet#2334 (#901) - ([13347bd](https://github.com/aphp/Cohort360-FrontEnd/commit/13347bdfb9c1192c4a8c1a50a6cc7efe96385809))
+- *(ui)* Use DesktopDatePicker to fix e2e tests - ([1635119](https://github.com/aphp/Cohort360-FrontEnd/commit/1635119e92ace2deffe2c873ace687eaf734966d))
+- Remove and replace all call to fhir resource Group - Ref gestion-de-projet#2379 - ([7aa1087](https://github.com/aphp/Cohort360-FrontEnd/commit/7aa1087bd36429aef68b02f0e790904c297046c7))
+- Extract data cache and config from criteria list - Ref gestion-de-projet#2408 - ([085c83e](https://github.com/aphp/Cohort360-FrontEnd/commit/085c83e4d0514d7f74b7ec64904faee054a04847))
+- Refacto some selectors with same result but different reference - Ref gestion-de-projet#2410 - ([b30ec03](https://github.com/aphp/Cohort360-FrontEnd/commit/b30ec0377fe01eab0797742b1e6ab876e6ae0356))
+
+### 📚 Documentation
+
+- Fix links of partners in README.md (#822) - ([8e31f5e](https://github.com/aphp/Cohort360-FrontEnd/commit/8e31f5e8e7e0153500ea79269c2ceb8c7ead7ae6))
+- Scope tree, code comments (#894) - ([106e4c5](https://github.com/aphp/Cohort360-FrontEnd/commit/106e4c5190fbc1a8275d98c578089f1653e27102))
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove reference to branch develop - ([d84d4b4](https://github.com/aphp/Cohort360-FrontEnd/commit/d84d4b4550c982f6b2afe484acee31843ba5688c))
+- Upgrade 2.27.0-snapshot into 2.28.0-snapshot - ([e9f569d](https://github.com/aphp/Cohort360-FrontEnd/commit/e9f569d770f0b96ff67a61daf5627db87396b592))
+- Add explicit only-root param to valueset api call - ([f881f59](https://github.com/aphp/Cohort360-FrontEnd/commit/f881f595f18b1a26b6afee49463478aaa0b6a35b))
+- Update docker-entrypoint for imaging - ([fa6b20c](https://github.com/aphp/Cohort360-FrontEnd/commit/fa6b20c37a2b49cb31f5f7015c6a7f685431cdd3))
+- Disable some commit lint rules + protect tagged build creation - ([647d15b](https://github.com/aphp/Cohort360-FrontEnd/commit/647d15b93b18654dc40a92806f0f13dac3e8d383))
+- Put version to 2.30.0-SNAPSHOT - ([be8f71c](https://github.com/aphp/Cohort360-FrontEnd/commit/be8f71c376ebb8c14e24ef9be5e22563c27b6d84))
+- Release version 2.30.0 - ([410b2a9](https://github.com/aphp/Cohort360-FrontEnd/commit/410b2a992d383b3c116ec2090d32ff9e7d322cc2))
+
+## [2.22.4](https://github.com/aphp/Cohort360-FrontEnd/compare/2.22.3..2.22.4) - 2023-07-28
+
+### 🚀 Features
+
+- Remove names variables in query - Ref: gestion-de-projet#2006 - ([43fa6b3](https://github.com/aphp/Cohort360-FrontEnd/commit/43fa6b361916d4c9c51c1e917c9b45229d1ece76))
+- Unify date and time formats on cohort and query lists - Ref gestion-de-projet#1165 - ([3d9005b](https://github.com/aphp/Cohort360-FrontEnd/commit/3d9005b329f4c087ef518399080d5a56f65b4236))
+- Possibility sort patients ipp - Ref gestion-de-projet#1128 - ([4110040](https://github.com/aphp/Cohort360-FrontEnd/commit/4110040be3c146e0a73f268273327a64b05e7637))
+- Change the way to present list of criteria - Ref gestion-de-projet#2195 - ([55233db](https://github.com/aphp/Cohort360-FrontEnd/commit/55233db3857907c2fba9c4fc0545070e8cd27780))
+- Add executive units filters in resources browsing  (#825) - ([6588816](https://github.com/aphp/Cohort360-FrontEnd/commit/6588816ba7e42ac4557c47781b4dffeb764852c5))
+- New requestor navigation - Ref gestion-de-projet#2039 - ([90c6c7b](https://github.com/aphp/Cohort360-FrontEnd/commit/90c6c7baf640602017a8e647b731ee9c78571689))
+
+### 🐛 Bug Fixes
+
+- Retrive hot-fix from main - ([59890c3](https://github.com/aphp/Cohort360-FrontEnd/commit/59890c31e8a6c88b6e0b1f8c1c5c02b1e79c4e40))
+- Fixed display error in criteria - Ref gestion-de-projet#2198 - ([6f12cc2](https://github.com/aphp/Cohort360-FrontEnd/commit/6f12cc2e409f546d06a6ec41b5e76947e300177e))
+- Retrive other filter chip Ref - gestion-de-projet#2119 - ([6387e04](https://github.com/aphp/Cohort360-FrontEnd/commit/6387e04d144edffc1e743abcb62b72406d5426ca))
+- Fix infinite loop into search bar and add cancel request - Ref gestion-de-projet#2166 - ([4dd28a8](https://github.com/aphp/Cohort360-FrontEnd/commit/4dd28a8fb21d827ed78d20761a2e196bac5b3318))
+- Some fixes - Ref gestion-de-projet#2204 gestion-de-projet#2205 gestion-de-projet#2149 - ([30576b9](https://github.com/aphp/Cohort360-FrontEnd/commit/30576b96ed6a91aa24e5b6e63f21feaba970672a))
+- Fixed display error in criteria  - Ref gestion-de-projet#2198 - ([b79e2e2](https://github.com/aphp/Cohort360-FrontEnd/commit/b79e2e264b1bc34e8337d10b6b599529d516ac8e))
+
+### 🚜 Refactor
+
+- Refacto of patientfilter and chip - Ref gestion-de-projet#2119 - ([6752f0d](https://github.com/aphp/Cohort360-FrontEnd/commit/6752f0d4a56631ef18dca907a25b1c727a80f4f8))
+- Refacto patientfilters and chip - Ref gestion-de-projet#2119 - ([109b24d](https://github.com/aphp/Cohort360-FrontEnd/commit/109b24d2fd8e51b557e7ad0aa57c6f110dad9dbf))
+- Change label in DocumentViewer - ([a9cf8d0](https://github.com/aphp/Cohort360-FrontEnd/commit/a9cf8d002670bdeebe30939ab810ecdc76f66d79))
+
+### 🎨 Styling
+
+- Fixed style of tree in requestor - Ref gestion-de-projet#2044 - ([815bc44](https://github.com/aphp/Cohort360-FrontEnd/commit/815bc44c14971aa628766da5dc9362333d3e0d4f))
+
+## [2.22.3](https://github.com/aphp/Cohort360-FrontEnd/compare/2.22.2..2.22.3) - 2023-07-26
+
+### 🐛 Bug Fixes
+
+- Resolve confirm supported criteria with just an encounterService - ([1fd9858](https://github.com/aphp/Cohort360-FrontEnd/commit/1fd98582cf2d2b15d18b926dc373ef8227d9a114))
+- Fix error when user has no rights - ([9e9ace6](https://github.com/aphp/Cohort360-FrontEnd/commit/9e9ace6b95f959818b0f632c934edd7096e8134b))
+- Cleaning console log - ([1f9d21a](https://github.com/aphp/Cohort360-FrontEnd/commit/1f9d21a4f5e2b84bb21707f25636b18e98ae42d7))
+
+## [2.22.2](https://github.com/aphp/Cohort360-FrontEnd/compare/2.22.0..2.22.2) - 2023-07-21
+
+### ⚙️ Miscellaneous Tasks
+
+- Update hot-fix release version - ([1547bf3](https://github.com/aphp/Cohort360-FrontEnd/commit/1547bf32b7f57983d0062dd3ca5ebcffa9c12e73))
+
+## [2.22.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.22.1..2.22.0) - 2023-07-21
+
+### 🐛 Bug Fixes
+
+- SupportedForm scope type and add scope type limit to scope search  - ([69c8880](https://github.com/aphp/Cohort360-FrontEnd/commit/69c8880b0a279bcee7a200db7e7e27a30ce27aa3))
+- SupportedForm scope type and add scope type limit to scope search - ([9bafa4b](https://github.com/aphp/Cohort360-FrontEnd/commit/9bafa4b6cdfcdf5593c15100b9eaef222d0869c2))
+- Send the right message when credential is wrong - Ref gestion-de-projet#2168 - ([d2d36a7](https://github.com/aphp/Cohort360-FrontEnd/commit/d2d36a7c832cacfd03468825dce7f3886a6b4aa1))
+
+### ⚙️ Miscellaneous Tasks
+
+- Change url to pull nginx - ([5b64578](https://github.com/aphp/Cohort360-FrontEnd/commit/5b6457802546ca1b8ed6911a3556cf9eb23e6a49))
+
+## [2.22.1](https://github.com/aphp/Cohort360-FrontEnd/compare/2.21.5..2.22.1) - 2023-07-17
+
+### 🚀 Features
+
+- Add view textual pdf not available - Ref gestion-de-projet#1390 - ([bb78bbf](https://github.com/aphp/Cohort360-FrontEnd/commit/bb78bbfd57a2d93c6f817206590f0544ec074e28))
+- *(requests)* Add notify by email option in sharing modal - Refs: gestion-de-projet#2062 (#815) - ([f0699a6](https://github.com/aphp/Cohort360-FrontEnd/commit/f0699a6066e32b8aea880493637cf6f6bec77051))
+- Add information data PMSI in CCAM, GHM & CIM10 (#816) - ([27e4d51](https://github.com/aphp/Cohort360-FrontEnd/commit/27e4d51623e436da21bfdef5bf81e707588dfe6e))
+- Add wildcard to search - Ref gestion-de-projet#1135 - ([bddf28d](https://github.com/aphp/Cohort360-FrontEnd/commit/bddf28d8589d5918ab364114c732ba3f183fb5d5))
+- Add information data Médicaments - Ref gestion-de-projet#2107 - ([1cf9e75](https://github.com/aphp/Cohort360-FrontEnd/commit/1cf9e7598c646cd5c59c5328266ae42dd2f9c6c7))
+- Add information export csv with new style - Ref gestion-de-projet#2106 - ([92a0628](https://github.com/aphp/Cohort360-FrontEnd/commit/92a0628221843c97526c0793d13577065b0dc8d6))
+
+### 🐛 Bug Fixes
+
+- @Mehdi-BOUYAHIA fix: call to the right valueSet for medication and biology - Ref gestion-de-projet#2154 - ([a306d15](https://github.com/aphp/Cohort360-FrontEnd/commit/a306d15fb09bfaf2f698848f9b1aaf6407e15e94))
+- *(ts)* Add ts type for svg images - ([ca5c164](https://github.com/aphp/Cohort360-FrontEnd/commit/ca5c164a8c978027006b64ae8ceeb4b6e3d47586))
+- Annoying console errors in Login, redux and newscard - ([c7b0696](https://github.com/aphp/Cohort360-FrontEnd/commit/c7b0696ccd436bc536c4640ebfd696b69657f73b))
+- Fix npm packages vulnerabilities - Ref gestion-de-projet#2164 - ([b6ad3e6](https://github.com/aphp/Cohort360-FrontEnd/commit/b6ad3e6588434316cc0ca6864d6adac619cf595d))
+- *(cohorts-rights)* Use new rights system when fetching in background - ([5beb8d7](https://github.com/aphp/Cohort360-FrontEnd/commit/5beb8d7ade05b5c26277ac1055f640d49d2e4ac2))
+- *(cohort-rights)* Use new rights system when fetching in background (#814) - ([a9a121e](https://github.com/aphp/Cohort360-FrontEnd/commit/a9a121ea444d3461a255a1721d7be5940916ba27))
+- Resolve alert on shared request - Ref gestion-de-projet#2141 - ([27bda08](https://github.com/aphp/Cohort360-FrontEnd/commit/27bda08f640332d96e59b605a230dba4032bf279))
+- Manage right to export cohort - Ref gestion-de-projet#1986 (#819) - ([11767b8](https://github.com/aphp/Cohort360-FrontEnd/commit/11767b8370622b734cff7b167960b9907b28c60b))
+- *(cohort-rights)* Use new rights system when fetching in background (#813) - ([dd5af9e](https://github.com/aphp/Cohort360-FrontEnd/commit/dd5af9ec13baaf7fefdbc1ee6fc0a03f287e2e44))
+
+### 🚜 Refactor
+
+- Remove console log - ([a3afee6](https://github.com/aphp/Cohort360-FrontEnd/commit/a3afee651a6eb4a52d4bb1e78548400e7523de4f))
+
+## [2.21.5](https://github.com/aphp/Cohort360-FrontEnd/compare/2.21.4..2.21.5) - 2023-06-06
+
+### 🚀 Features
+
+- Add iris table and remove observation table for csv export - Ref gestion-de-projet#1926 gestion-de-projet#2068 - ([39d5aaf](https://github.com/aphp/Cohort360-FrontEnd/commit/39d5aaf1492a40ca09f9f86ef350d313e38ef967))
+- Add access expiration alert (#774) - ([ccbf7bb](https://github.com/aphp/Cohort360-FrontEnd/commit/ccbf7bb06039cb937f466390043c12cc7aaeefaa))
+- Replace href by navigate for SPA - ([3c1706b](https://github.com/aphp/Cohort360-FrontEnd/commit/3c1706b2cd078abee72fe9b8b3a98ce81563f6f0))
+- Add executive unit component - Ref gestion-de-projet#1603 - ([b962d3d](https://github.com/aphp/Cohort360-FrontEnd/commit/b962d3d951c6d3f334f6ef84e691732220b903c6))
+- Preload EU selected items - Ref gestion-de-projet#1603 - ([d03b939](https://github.com/aphp/Cohort360-FrontEnd/commit/d03b9390c425a438627d0f9a7ab9b12a342530b9))
+- Preload EU selected items (2) - Ref gestion-de-projet#1603 - ([6f954d6](https://github.com/aphp/Cohort360-FrontEnd/commit/6f954d607cecff29897abe0a0269d53d0b7269dd))
+- Preload EU selected items (2) - Ref gestion-de-projet#1603 - ([5e862e7](https://github.com/aphp/Cohort360-FrontEnd/commit/5e862e7defdcbcc20586c291d31c887771900673))
+- Fix selection (1) - Ref gestion-de-projet#1603 - ([d46877f](https://github.com/aphp/Cohort360-FrontEnd/commit/d46877f7863631acb378fbd2e7d5a8b389e3f549))
+- Fix selected population modal right error - Ref gestion-de-projet#1603 - ([b85a3dd](https://github.com/aphp/Cohort360-FrontEnd/commit/b85a3dded3364d3fd9b830a710286844b780ab8d))
+- Selected population having right error, replace its name with '?'  - Ref gestion-de-projet#1603 - ([0a12e65](https://github.com/aphp/Cohort360-FrontEnd/commit/0a12e65ee5ae8b821cfb835414075653514dc9e6))
+- Add executiveUnits into criteria - Ref gestion-de-projet#1603 - ([c5891a8](https://github.com/aphp/Cohort360-FrontEnd/commit/c5891a8f0e034fda39107d7ffbf6cbe9d137ae17))
+- Add checkbox with validated analysis - Ref gestion-de-projet#1174 - ([e036d5a](https://github.com/aphp/Cohort360-FrontEnd/commit/e036d5a332aa376a51475377257c145ef9110a2c))
+- Create criteria without empty filter - Ref … (#772) - ([dbdd5a1](https://github.com/aphp/Cohort360-FrontEnd/commit/dbdd5a1d8fc0b62c1f56c349e7a3d73ab0f9c146))
+- Add OIDC auth - Ref gestion-de-projet#2091 - ([0a11361](https://github.com/aphp/Cohort360-FrontEnd/commit/0a1136139b01b682ab4ae8e8974dd57ca16cbf48))
+- Add new OIDC variables in docker-entrypoint - Ref gestion-de-projet#2117 - ([d98cbc5](https://github.com/aphp/Cohort360-FrontEnd/commit/d98cbc588a2adba1f742a73066ad51173df61633))
+- Add new OIDC variables in docker-entrypoint - Ref gestion-de-projet#2117 - ([b710aaf](https://github.com/aphp/Cohort360-FrontEnd/commit/b710aafc3dbe0c37bb0004105b18c5074c4d4ce6))
+- Add header for request if auth is jwt or oidc - ([7176791](https://github.com/aphp/Cohort360-FrontEnd/commit/7176791c3e369e32ea7717637e90ad1fc6029753))
+- Add prise en charge [age, duration] fields - Ref gestion-de-projet#1499 - ([a4a14da](https://github.com/aphp/Cohort360-FrontEnd/commit/a4a14daa5a64180db8792aa9878dd72a3dabf7df))
+- Use new request snapshot model - ([f807b45](https://github.com/aphp/Cohort360-FrontEnd/commit/f807b45a070b3b7f53e32ac62ac141e1c60e474e))
+- Upgrade requester version - ([1eb09d9](https://github.com/aphp/Cohort360-FrontEnd/commit/1eb09d9d35a3f2bb73d01833203b1cf53367e534))
+- Select between day month and year for encounter duration into a request - Ref gestion-de-projet#1499 - ([cec05ec](https://github.com/aphp/Cohort360-FrontEnd/commit/cec05ecf7758b0bf49bae35d8d50b6bbaece3a3b))
+
+### 🐛 Bug Fixes
+
+- Add missing type import (#778) - ([f791547](https://github.com/aphp/Cohort360-FrontEnd/commit/f791547756adfb9475b699ee530d2f464b3a74b8))
+- Show select population button when no rights on older caresite - Ref gestion-de-projet#1603 - ([d5addcf](https://github.com/aphp/Cohort360-FrontEnd/commit/d5addcfb3af81f15c472415fd40dae4e34a29295))
+- Resolve NaN on screen when no expire access - Ref gestion-de-projet#1999 - ([a2fdda6](https://github.com/aphp/Cohort360-FrontEnd/commit/a2fdda61235a39fd452941aee8ceba955d481e5a))
+- Occurence number error#1502 - ([194c5ed](https://github.com/aphp/Cohort360-FrontEnd/commit/194c5edb5b2339e4f05fb66e410bed050511ab14))
+- Occurence number error#1502 - ([29e124c](https://github.com/aphp/Cohort360-FrontEnd/commit/29e124c189e08aa72e7d167a3397be1269f17500))
+- Resolve unknown chipset into patient data table - ([be9f3da](https://github.com/aphp/Cohort360-FrontEnd/commit/be9f3dacfed4c97cce0bf4d9545eb2300e43f21b))
+- Update package-lock.json - ([b5c01a7](https://github.com/aphp/Cohort360-FrontEnd/commit/b5c01a7b8228d06e39328d50a21b083008c76038))
+- Typescript errors - Ref gestion-de-projet#2070 - ([afbf65a](https://github.com/aphp/Cohort360-FrontEnd/commit/afbf65a63dccd1fa4634a469a8346b8f5e5acffb))
+- Resolve refresh token after logout - Ref gestion-de-projet#2124 - ([00fcbe3](https://github.com/aphp/Cohort360-FrontEnd/commit/00fcbe3dcaeae6746e5236c57c764ee49756682f))
+- Modify when oidcAuth is set in localStorage - ([f2997bc](https://github.com/aphp/Cohort360-FrontEnd/commit/f2997bce6be9de0ec28890a2ba5805057a1283c8))
+- Correcting Authorization Method in headers - ([a5285de](https://github.com/aphp/Cohort360-FrontEnd/commit/a5285debe5652e8da8345ce9e3490ee1f74889ac))
+- Correcting Authorization Method in headers - ([4663826](https://github.com/aphp/Cohort360-FrontEnd/commit/4663826b9b7df91b19458f38650a285dce8cb5fa))
+- Correcting Authorization Method in headers - ([aa83665](https://github.com/aphp/Cohort360-FrontEnd/commit/aa83665acbe3d79595ec258e7eaf32815f4c39fa))
+- Correcting Authorization Method in headers - ([39a32c7](https://github.com/aphp/Cohort360-FrontEnd/commit/39a32c782677630d81ce87b3ea07b8a4716594a4))
+- Correcting Authorization Method in headers - ([923220c](https://github.com/aphp/Cohort360-FrontEnd/commit/923220c8ba58c37351d0aa400073e2329551edb6))
+- Cleaning console.log - ([35cce90](https://github.com/aphp/Cohort360-FrontEnd/commit/35cce9061ab3bf6f527b8fb0b7f3be00e8624912))
+- Logout first then clear local storage  - ([3538aa7](https://github.com/aphp/Cohort360-FrontEnd/commit/3538aa7db6961db5e7d57a7a2cf5c8392ab4f2d6))
+- *(binary)* Add authorization method header - ([2eaa0d6](https://github.com/aphp/Cohort360-FrontEnd/commit/2eaa0d6cd7005736855a3a5389565c188d9698af))
+- Add error alert on login failure - ([3a9593e](https://github.com/aphp/Cohort360-FrontEnd/commit/3a9593ec076a8178b05ea9d9143c9b2599831df6))
+- Rename ipplist query param - ([a2dc0cb](https://github.com/aphp/Cohort360-FrontEnd/commit/a2dc0cbe5c539225ff4cb611fa40d4d6f34bd487))
+- Changed status to docstatus in documentreference  - Ref gestion-de-projet#2148 - ([ed8e75b](https://github.com/aphp/Cohort360-FrontEnd/commit/ed8e75b42b4f1964e4076632feee7da4ac0e4c25))
+- Changed size to _count in all fhir resources - Ref gestion-de-projet#2148 - ([247c9cf](https://github.com/aphp/Cohort360-FrontEnd/commit/247c9cf9ce0a65ff909941d57b45886c8edf9d6a))
+- Removed ability to sort by serviceProvider in medication - Ref gestion-de-projet#2148 - ([9bffc0a](https://github.com/aphp/Cohort360-FrontEnd/commit/9bffc0a357728120da0976e630fd616000ff9d6a))
+- Fixed age range in patient demographic - Ref gestion-de-projet#2148 - ([4572501](https://github.com/aphp/Cohort360-FrontEnd/commit/45725014ae3026adef19a8858b0a2191438d5e1f))
+- Fixed age display of patient demographic - Ref gestion-de-projet#2148 - ([9ebe070](https://github.com/aphp/Cohort360-FrontEnd/commit/9ebe070b66f9f7e53d251f7f0ce8ffdf8c421e0d))
+- Fixed charts display - Ref gestion-de-projet#2148 - ([a8a1f55](https://github.com/aphp/Cohort360-FrontEnd/commit/a8a1f556e268a6d18a8accfc2046e9102adf1eda))
+- Added valueSet URL to all hierarchy criteria - Ref gestion-de-projet#2148 - ([fd4ad0c](https://github.com/aphp/Cohort360-FrontEnd/commit/fd4ad0cafb4e3b71e5641f2e18f35fbc71c4b549))
+- Updated encounter exit mode - Ref gestion-de-projet#2148 - ([c66e0ca](https://github.com/aphp/Cohort360-FrontEnd/commit/c66e0ca50c962981660f9c0273b070c7f9609464))
+- Call to the right valueSet for medication and biology - Ref gestion-de-projet#2154 - ([5e3751c](https://github.com/aphp/Cohort360-FrontEnd/commit/5e3751c830c5624ac89fb12d87314f06f80faf1d))
+- InitResourceHierarchy reset on reload - ([de56930](https://github.com/aphp/Cohort360-FrontEnd/commit/de569307922b41ed554518d7e7bcbfe502cf68e2))
+- Prise-en-charge => change default value by years - Ref gestion-de-projet#1499 (#801) - ([b8aeaa7](https://github.com/aphp/Cohort360-FrontEnd/commit/b8aeaa76e396bc6a8147bada942394a5a8954d93))
+- *(perimeters)* Filter correct value when searching minimum scope level - ([e185f7d](https://github.com/aphp/Cohort360-FrontEnd/commit/e185f7d8e03cae3a17cda2e9e146966fa4123012))
+- *(occurenceForm)* Add min value validator - ([bb539e7](https://github.com/aphp/Cohort360-FrontEnd/commit/bb539e72cb1c049c48ac4831a4e95c779e573f70))
+- *(occurenceForm)* Change align input when error message is displayed - ([cbc2871](https://github.com/aphp/Cohort360-FrontEnd/commit/cbc28716eebbdc08af7bd12a64cced68c777ed9f))
+- Disabled biology status checkbox and added it to requestor - Ref gestion-de-projet#1174 - ([4475845](https://github.com/aphp/Cohort360-FrontEnd/commit/44758455c7d26a9055a27be6bdb402b75a069c36))
+- *(scopetree)* Limit expand to min scope type - ([299f2a3](https://github.com/aphp/Cohort360-FrontEnd/commit/299f2a3be4184b674589c4737b888ecd4d5cb161))
+
+### 🚜 Refactor
+
+- Replace ahryman40k fhir types with standard fhir types  - ([8953b64](https://github.com/aphp/Cohort360-FrontEnd/commit/8953b64fc34203e29af1783ecb9ebc8faec501b4))
+- Remove some any types + add some function typing - ([6b15bfc](https://github.com/aphp/Cohort360-FrontEnd/commit/6b15bfc32bda93eca7de1a85a813a894ba956b33))
+- Remove tooltip from population card to `criteriaRightPanel/AdvencedInputs` - Ref gestion-de-projet#1603 - ([3064ff7](https://github.com/aphp/Cohort360-FrontEnd/commit/3064ff783f7bbbec3c2091590da06ea37794206a))
+- Removing filterScopeTree function - Ref gestion-de-projet#1603 - ([0d99d1e](https://github.com/aphp/Cohort360-FrontEnd/commit/0d99d1eb7058f4b4c72777d5373cea4f2d9b1e2b))
+- Reorganize import on advancedInputs.tsx - ([07014ee](https://github.com/aphp/Cohort360-FrontEnd/commit/07014eed54d63d70e61ac3658ba3642ef1b6c846))
+- Switched to tss for styling - Ref gestion-de-projet#2096 - ([de0b411](https://github.com/aphp/Cohort360-FrontEnd/commit/de0b41162d85bc840d799a5b0df513db28bc0701))
+- Remove clsx package and replace by cx into login view - ([2f69d94](https://github.com/aphp/Cohort360-FrontEnd/commit/2f69d94d9866bb3a6e647317cc57b45afaf57014))
+- Standardisation variables fetch patients- Ref gestion-de-projet#2050 - ([1ee07aa](https://github.com/aphp/Cohort360-FrontEnd/commit/1ee07aa3b1c1115d68fd7b0018edb875446a5e66))
+- Use apiBackend axios instance for refresh token - ([2d00bab](https://github.com/aphp/Cohort360-FrontEnd/commit/2d00bab8e923211de7a65f173aaaf0e6767eaa13))
+- Changing names parameters for encounter and patient in other resources - Ref gestion-de-projet#2129 - ([84ba412](https://github.com/aphp/Cohort360-FrontEnd/commit/84ba41291be589fc6488366c5c70401a30061684))
+- *(occurenceForm)* Set min for operators - ([6d325dc](https://github.com/aphp/Cohort360-FrontEnd/commit/6d325dc225cde9ae8db76148d1df2081f453eb6b))
+- Use new endpoint to retrieve rights on cohort patient and caresite - Ref gestion-de-projet#2085 - ([db43329](https://github.com/aphp/Cohort360-FrontEnd/commit/db4332960fad3695c3fa2a35f397b9ad89ad79e4))
+
+### 📚 Documentation
+
+- Add news for next mep - ([afa2fc6](https://github.com/aphp/Cohort360-FrontEnd/commit/afa2fc606aa88e2a8eba0a84f5c247ea20e2dcfd))
+
+### 🎨 Styling
+
+- Added tss package and changed imports to makeStyles - Ref gestion-de-projet#2096 - ([f30e997](https://github.com/aphp/Cohort360-FrontEnd/commit/f30e997ba4309e7d7fcc0ae3bfc9d24285227cc2))
+- Changed import of classes - Ref gestion-de-projet#2096 - ([19660f2](https://github.com/aphp/Cohort360-FrontEnd/commit/19660f25890a85bf6706827833b13c8f7ff3fc4a))
+- Changed makeStyles structure - Ref gestion-de-projet#2096 - ([5705580](https://github.com/aphp/Cohort360-FrontEnd/commit/57055805e1f0f864b7640a5a84dcd75d0b5530aa))
+- Switched clsx calls by cx - Ref gestion-de-projet#2096 - ([183d735](https://github.com/aphp/Cohort360-FrontEnd/commit/183d7353cc1169bbb9b6622b12302f7cdfaf4c6b))
+- Fixed style regressions - Ref gestion-de-projet#2096 - ([b7b8e7b](https://github.com/aphp/Cohort360-FrontEnd/commit/b7b8e7bbdd0065a67fbb1857b2b6642658bfb2b4))
+- Fixed timeline style - Ref gestion-de-projet#2096 - ([7fe46f4](https://github.com/aphp/Cohort360-FrontEnd/commit/7fe46f482e63f5697ac817d8c5bb8ee9b448b54a))
+
+### ⚙️ Miscellaneous Tasks
+
+- Add bullet point to last news - ([5aa32b7](https://github.com/aphp/Cohort360-FrontEnd/commit/5aa32b721feacca2a9ea1667f4e0f281cca747d7))
+
+## [2.21.4](https://github.com/aphp/Cohort360-FrontEnd/compare/2.21.3..2.21.4) - 2023-05-22
+
+### 🚀 Features
+
+- Add news of 05/2023 mep -Ref gestion-de-projet#2046 - ([6643cae](https://github.com/aphp/Cohort360-FrontEnd/commit/6643cae3ebea8d2e0ea8a9e565f957fa6ba5febc))
+- Merge feat/2046 into develop - ([ad327ef](https://github.com/aphp/Cohort360-FrontEnd/commit/ad327efd63d3c159db49b4fdd2ac00b895a70169))
+- Add news of 05/2023 mep -Ref gestion-de-projet#2046 - ([d58f2a8](https://github.com/aphp/Cohort360-FrontEnd/commit/d58f2a8ca2811f2e2aacc35e6a4ab58fa8f51645))
+- Add iris table and remove observation table for csv export - Ref gestion-de-projet#1926 gestion-de-projet#2068 - ([1904b6e](https://github.com/aphp/Cohort360-FrontEnd/commit/1904b6e5f7eb0b6fb120b641797c24c603b88697))
+
+### 🐛 Bug Fixes
+
+- Update urls and job status - Ref gestion-de-projet#2002 (#767) - ([6e7e6ab](https://github.com/aphp/Cohort360-FrontEnd/commit/6e7e6ab126056a2fc53ff53240f51544c854d291))
+
+### 🚜 Refactor
+
+- Switch CRA  => viteJS - Ref gestion-de-projet#2061 - ([3517a66](https://github.com/aphp/Cohort360-FrontEnd/commit/3517a66766186f59d83c450a6b4dcc92bda5c612))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(eslint)* Remove max statements rule (#770) - ([f14061b](https://github.com/aphp/Cohort360-FrontEnd/commit/f14061b7b51afec911eaa2d7dfa108000cf56bf7))
+
+## [2.21.3](https://github.com/aphp/Cohort360-FrontEnd/compare/2.21.2..2.21.3) - 2023-04-19
+
+### 🐛 Bug Fixes
+
+- Removed differentEncounter from temporal constraints - Ref gestion-de-projet#1286 - ([5e81477](https://github.com/aphp/Cohort360-FrontEnd/commit/5e81477745f8a596df7352350ac82dbf4dd5c1b2))
+- Removed differentEncounter from temporal constraints - Ref gestion-de-projet#1286 - ([72b1cdb](https://github.com/aphp/Cohort360-FrontEnd/commit/72b1cdb752340e5d4ce91641ccd3ae3744ffabbf))
+
+### 🚜 Refactor
+
+- *(store)* Remove deprecated createStore method - ([4b45df9](https://github.com/aphp/Cohort360-FrontEnd/commit/4b45df9f9c216c073a0387fe18d7c223f226fd04))
+- Remove dispatch any - ([f6ece0c](https://github.com/aphp/Cohort360-FrontEnd/commit/f6ece0cded75aad36b39619933ae028edd180119))
+- *(theme)* Extract theme into a separate file - ([2517073](https://github.com/aphp/Cohort360-FrontEnd/commit/25170730fa749cde2c3af9010ddab8fb1ed288c2))
+
+## [2.21.2](https://github.com/aphp/Cohort360-FrontEnd/compare/2.21.1..2.21.2) - 2023-04-18
+
+### 🚀 Features
+
+- Open new tab when click on document list patient - Ref gestion-de-projet#1893 - ([1cb2327](https://github.com/aphp/Cohort360-FrontEnd/commit/1cb232765f99b8bf2dc3202b200269b5ad751788))
+
+### 🐛 Bug Fixes
+
+- Fixed temporalConstraintsIds config - Ref gestion-de-projet#1286 - ([ec9c77a](https://github.com/aphp/Cohort360-FrontEnd/commit/ec9c77a8caf31dd63a1c789662bc911b86b228da))
+- Merge fix/1286 into develop - ([e54fb26](https://github.com/aphp/Cohort360-FrontEnd/commit/e54fb267cf8517ce3316742e2922601e366f6df6))
+- Fixed medication pagination - Ref gestion-de-projet#1790 - ([17a3104](https://github.com/aphp/Cohort360-FrontEnd/commit/17a3104b01ea37023bbd4fc26bb78bf1bdbf016b))
+- Fixed cohort edition modal not closing - Ref gestion-de-projet#1874 - ([341278a](https://github.com/aphp/Cohort360-FrontEnd/commit/341278abb2ebb20323723c3d29137d16d3dadf14))
+- Fixed temporalConstraintsIds config - Ref gestion-de-projet#1286 (#754) - ([50aa5da](https://github.com/aphp/Cohort360-FrontEnd/commit/50aa5da0781242b980c3fe2a22aadc96aa0663f2))
+
+### 🚜 Refactor
+
+- WIP on change of route Composition by DocumentReference Ref gestion-de-projet#1489 - ([51d8d88](https://github.com/aphp/Cohort360-FrontEnd/commit/51d8d88900301eff6878f7e24c2f538420e7010b))
+- Change of route Composition by DocumentReference Ref gestion-de-projet#1489 - ([6739a98](https://github.com/aphp/Cohort360-FrontEnd/commit/6739a983d35ebfed85349e468e9b7efcd1963dd8))
+- Change of route Composition by DocumentReference Ref gestion-de-projet#1489 - ([f4c3197](https://github.com/aphp/Cohort360-FrontEnd/commit/f4c3197fe772795bbdfe479a026d75e2fa03f1c6))
+
+## [2.21.1](https://github.com/aphp/Cohort360-FrontEnd/compare/2.21.0..2.21.1) - 2023-04-14
+
+### 🚀 Features
+
+- Update package-lock.json - ([ce3fcc7](https://github.com/aphp/Cohort360-FrontEnd/commit/ce3fcc7ee85b7040ebe79d1adb6e519c6e9a7262))
+- Update release version 2.21.0 => 2.21.1 - ([f1dba65](https://github.com/aphp/Cohort360-FrontEnd/commit/f1dba65a32c7209ac8e22f1d214901ef9565dc40))
+
+### 🐛 Bug Fixes
+
+- Started to fix temporal constraints - Ref gestion-de-projet#1286 - ([9788282](https://github.com/aphp/Cohort360-FrontEnd/commit/9788282aef9d9a6585ddcae7b10b6ecdf78af973))
+- Fixed temporalconstraints deletion - Ref gestion-de-projet#1286 - ([9a8f31c](https://github.com/aphp/Cohort360-FrontEnd/commit/9a8f31c513460c73a0dce4c972a868a03379c171))
+- Prevent temporalconstraints duplicates - Ref gestion-de-projet#1286 - ([64e93f3](https://github.com/aphp/Cohort360-FrontEnd/commit/64e93f371abc09cec81728a5689c62c2ac466f27))
+- Fixed temporalConstraintsIds updating - Ref gestion-de-projet#1286 - ([8da18d3](https://github.com/aphp/Cohort360-FrontEnd/commit/8da18d330288c5ac5b3dcbec04129cdaa7a6542c))
+- Fix double call into population card - ([e7591b4](https://github.com/aphp/Cohort360-FrontEnd/commit/e7591b416be5ce317a26bf4c4a9aaa928d159628))
+- Resole merge conflict - ([47fb591](https://github.com/aphp/Cohort360-FrontEnd/commit/47fb591b44bb1249074963c62bc2fbb6995fa0f5))
+- Adding filter types into perimeters/read-patient/ - ([3c98fe1](https://github.com/aphp/Cohort360-FrontEnd/commit/3c98fe199c7a8aa805242046e8868cdc22a4b13e))
+
+### 🚜 Refactor
+
+- Fix some merge error - ([fc5c8df](https://github.com/aphp/Cohort360-FrontEnd/commit/fc5c8df7006876b2a21f0b7617fe12c43e0eb325))
+- Adding filter types into perimeters/read-patient/ - ([4eca382](https://github.com/aphp/Cohort360-FrontEnd/commit/4eca3826607d0e5e24757a5c93aaddc6bf393dd9))
+
+## [2.21.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.20.5..2.21.0) - 2023-04-03
+
+### 🚀 Features
+
+- Release version 2.21.0 - ([df54023](https://github.com/aphp/Cohort360-FrontEnd/commit/df5402317c9a379dee65bb0562cc234937daea12))
+
+## [2.20.5](https://github.com/aphp/Cohort360-FrontEnd/compare/2.20.4..2.20.5) - 2023-03-29
+
+### 🚀 Features
+
+- Adding news for next mep Ref gestion-de-projet#1927 (#728) - ([db8e2f4](https://github.com/aphp/Cohort360-FrontEnd/commit/db8e2f468a8035d8c82f72559bb3a556dab32aec))
+
+### 🐛 Bug Fixes
+
+- Resolve loose of criteria on request Ref gestion-de-projet#1917 (#726) - ([1139302](https://github.com/aphp/Cohort360-FrontEnd/commit/1139302916b6b4c4745870adb470bbe23a96aaa2))
+- Biology tab flow when click on next button - Ref gestion-de-proj… (#733) - ([4bde6bc](https://github.com/aphp/Cohort360-FrontEnd/commit/4bde6bce300561455ca80e4db7724b8ec45a66e2))
+
+## [2.20.4](https://github.com/aphp/Cohort360-FrontEnd/compare/2.20.3..2.20.4) - 2023-03-15
+
+### 🐛 Bug Fixes
+
+- Can't edit type in medication query - Ref gestion-de-projet#1916 (#720) - ([495be9a](https://github.com/aphp/Cohort360-FrontEnd/commit/495be9a35fce0d31b83f1aea16093670fccbb8d0))
+- Expand loading after cancelling request - Ref gestion-de-projet#1495 - ([b120a8b](https://github.com/aphp/Cohort360-FrontEnd/commit/b120a8b47df3f073c4b3e37dece33f821bbff7fc))
+- Expand loading after cancelling request (1) - Ref gestion-de-projet#1495 - ([5897303](https://github.com/aphp/Cohort360-FrontEnd/commit/589730397420a35b40c616dd10878d74401bad7c))
+- Expand loading after cancelling request (2) - Ref gestion-de-projet#1495 - ([24d2eff](https://github.com/aphp/Cohort360-FrontEnd/commit/24d2eff1168878c20d5b5c3197ecbd2965e7d507))
+- Expand loading after cancelling request - Ref gestion-de-projet… (#722) - ([baf33e1](https://github.com/aphp/Cohort360-FrontEnd/commit/baf33e17cd996cd138a6a07cb190d3752136e039))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update release version 2.20.3 => 2.20.4 - ([ca6c5b4](https://github.com/aphp/Cohort360-FrontEnd/commit/ca6c5b4fa60fac2181b6f5ed45113f7953813fdc))
+
+## [2.20.3](https://github.com/aphp/Cohort360-FrontEnd/compare/2.20.2..2.20.3) - 2023-03-09
+
+### 🐛 Bug Fixes
+
+- Replace route pop-children by read-patient - ([9b3b593](https://github.com/aphp/Cohort360-FrontEnd/commit/9b3b5931acee58f623888d90e0d79066888443c3))
+
+### ⚙️ Miscellaneous Tasks
+
+- Upgrade release version 2.20.2 =>2.20.3 - ([a8027af](https://github.com/aphp/Cohort360-FrontEnd/commit/a8027afd5726f8ce7d8fb28c65d8af49dd14f4c2))
+
+## [2.20.2](https://github.com/aphp/Cohort360-FrontEnd/compare/2.20.0..2.20.2) - 2023-03-06
+
+### 🚀 Features
+
+- Adding news for next mep 03/2023 Ref gestion-de-projet#1927 (#729) - ([bf2336b](https://github.com/aphp/Cohort360-FrontEnd/commit/bf2336ba9841b834fb40726c2474ad953ea784e7))
+- Adding cancel request for composition research into a patient and for patient research into cohort Ref gestion-de-projet#1212 - ([8923b79](https://github.com/aphp/Cohort360-FrontEnd/commit/8923b79327c5490354017ec43f38056139a756e1))
+- Don't send error message when request is canceled Ref gestion-de-projet#1212 - ([abd881b](https://github.com/aphp/Cohort360-FrontEnd/commit/abd881b7b73ca0900a9a077940775c6094971c58))
+- Research into names document's Ref gestion-de-projet#1212 (#731) - ([a647456](https://github.com/aphp/Cohort360-FrontEnd/commit/a647456c00d31c41a0d7f14799ed6df3589ab53a))
+- Add temporal constraints directChronologicalOrdering for cohort creation Ref gestion-de-projet#1286 - ([2c40ddd](https://github.com/aphp/Cohort360-FrontEnd/commit/2c40ddddcb13dc3919baa0765914ac9a27c52488))
+- Adding shared_by information in myRequest criteria Ref gestion-de-projet#1696 - ([455484c](https://github.com/aphp/Cohort360-FrontEnd/commit/455484cd5a76d7e81dc0b4a5bacc52f356f991a5))
+- Adding shared_by information in myRequest criteria Ref gestion-de-projet#1696 - ([0209086](https://github.com/aphp/Cohort360-FrontEnd/commit/0209086532bb24245c52d58d7a355f9198ddffe7))
+- Adding patient.active=true when requesting fhir ressources and in the requestor into fhirfilter Ref gestion-de-projet#1907 - ([12038a6](https://github.com/aphp/Cohort360-FrontEnd/commit/12038a6170032abe4efc75ec393e55f1dbdaa2e4))
+- Set new develop version 2.22.0-SNAPSHOT (#743) - ([279b6ad](https://github.com/aphp/Cohort360-FrontEnd/commit/279b6ad1234aedb939a8817f6cdf5a62e9122325))
+
+### 🐛 Bug Fixes
+
+- Reversed expand/collapse icon in request list, ref #1602 - ([c13b1ba](https://github.com/aphp/Cohort360-FrontEnd/commit/c13b1ba8fcbf3119785a897529bf901fc52e076e))
+- Perimeter textual search bug resolution, Ref gestion-de-projet#1495 - ([2186a48](https://github.com/aphp/Cohort360-FrontEnd/commit/2186a483dce7260a10dac81c822527ac45481040))
+- Replace route pop-children by read-patient - ([065026f](https://github.com/aphp/Cohort360-FrontEnd/commit/065026f48ff617885bcef4dfa98bd08a3985e43b))
+- Removed other visits in encounter repartition graph Ref gestion-de-projet#1462 (#715) - ([739a628](https://github.com/aphp/Cohort360-FrontEnd/commit/739a628c88d92cffb7ca558ee968747d6b4d9ee8))
+- Can't edit type in medication query - Ref gestion-de-projet#1916 (#725) - ([f372b18](https://github.com/aphp/Cohort360-FrontEnd/commit/f372b185edc8d93465d955f0acdaab15893d87f1))
+- Expand loading after cancelling request - Ref gestion-de-projet#1495 (#724) - ([eded7ce](https://github.com/aphp/Cohort360-FrontEnd/commit/eded7cef08fc8843b3b8b906fe1963ad59864a9c))
+- Resolve loose of criteria on request Ref gestion-de-projet#1917 - ([b0a6211](https://github.com/aphp/Cohort360-FrontEnd/commit/b0a6211230ca84a13d40d3204ea05f02dcb9032f))
+- Blocked confirm on documents criteria when search check is loading Ref gestion-de-projet#1806 - ([12e7482](https://github.com/aphp/Cohort360-FrontEnd/commit/12e74828e9caf0c32debf849cb7d0492e8748f4e))
+- Cancelling on encounter and patient resources and composition when canceling a research Ref gestion-de-projet#1212 - ([9d1a736](https://github.com/aphp/Cohort360-FrontEnd/commit/9d1a736d11cd244cdab626679f00d0c2b9a99ced))
+- Age range limit min max, fix displaying date filter Ref gestion-de-projet#1786 - ([16ee629](https://github.com/aphp/Cohort360-FrontEnd/commit/16ee629748939a0fd3edf43b3db3fa08658fa717))
+- Secure perimeter.id when perimeter is undefined Ref gestion-de-projet#1744 - ([57a64f5](https://github.com/aphp/Cohort360-FrontEnd/commit/57a64f550028f16864b2836f17b4f109630c5622))
+- Secure perimeter.id when perimeter is undefined Ref gestion-de-projet#1744 (#734) - ([d35e038](https://github.com/aphp/Cohort360-FrontEnd/commit/d35e038bcef6eae1835703a9b091d8b481aced4c))
+- Modifying django url for maintenances and adding username param to fetchPractitioner - ([21b7dd4](https://github.com/aphp/Cohort360-FrontEnd/commit/21b7dd4c3af8a1f92f51761d84534fd446db0768))
+- Missing props into cohort type and into debounce.ts - ([ff51dcb](https://github.com/aphp/Cohort360-FrontEnd/commit/ff51dcbcfc1c9f508ef0b6a489e2b8e8a1569348))
+- Adding filter types into perimeters/read-patient/  - ([d67601c](https://github.com/aphp/Cohort360-FrontEnd/commit/d67601c6ce2c6da18ecab9a7f267d2579bbb5e4e))
+
+### 🚜 Refactor
+
+- Refactor some backEnd call into servicePractitionner and change url for getting users info  Ref gestion-de-projet#1979 - ([555b61f](https://github.com/aphp/Cohort360-FrontEnd/commit/555b61f9ac0da5b2b457b78a5963f4ff1865b358))
+- Remove unused apiFhir/practitionner call Ref gestion-de-projet#1979 - ([e1417a1](https://github.com/aphp/Cohort360-FrontEnd/commit/e1417a18ab8c35af2903862ae528c39522740497))
+- Change url fhir to django for getting users info and refacto some django call Ref gestion-de-projet#1979 (#736) - ([d756c63](https://github.com/aphp/Cohort360-FrontEnd/commit/d756c63d79005cf11f39858a5e2ff297aed33fdc))
+- Remove id_list from binary call Ref gestion-de-projet#1914 - ([c485526](https://github.com/aphp/Cohort360-FrontEnd/commit/c485526fe86ebb3fca33604ee1af9f9d07fd7129))
+- Remove id_list from binary call Ref gestion-de-projet#1914 - ([a6d9642](https://github.com/aphp/Cohort360-FrontEnd/commit/a6d96426796d0e658013f688f0b0cda0af0a8666))
+- Report mourads fix on main into develop - ([1079c5b](https://github.com/aphp/Cohort360-FrontEnd/commit/1079c5bc978ce9ab878fad91e6f719b4b3ae3f66))
+- Update packages and remove last vulnerabilities - ([0957e6e](https://github.com/aphp/Cohort360-FrontEnd/commit/0957e6e198ddbf5310e174e4a3f0081a219a5683))
+- Remove react-script from dependencies - ([63394be](https://github.com/aphp/Cohort360-FrontEnd/commit/63394be1811d18f3e7bedb322e312d7e98e2e198))
+- Adding typescript-eslint/eslint-plugin to dependencies - ([f0ac547](https://github.com/aphp/Cohort360-FrontEnd/commit/f0ac54745c7dd8c57027b5408e731d84d82c6fdb))
+- Adding typescript-eslint/eslint-plugin to dependencies - ([69db842](https://github.com/aphp/Cohort360-FrontEnd/commit/69db84224d5f46171395cb37e9846c0fbb13e93f))
+- Adding react-scripts to devDependencies - ([776c02b](https://github.com/aphp/Cohort360-FrontEnd/commit/776c02bdbcbec0811ec8c4e4e1015012fe56a7ce))
+- Change of route composition by documentreference Ref gestion-de-projet#1489 - ([3c8b263](https://github.com/aphp/Cohort360-FrontEnd/commit/3c8b263c1a840fb2ceeed1f58572c43d842e2419))
+
+### ⚙️ Miscellaneous Tasks
+
+- Add dependency check job - ref gestion-de-projet#1897 - ([27640b0](https://github.com/aphp/Cohort360-FrontEnd/commit/27640b0cc160397e88eef0739127818e82508b5f))
+- Update npm packages Ref gestion-de-projet#1810 - ([23f6c1a](https://github.com/aphp/Cohort360-FrontEnd/commit/23f6c1a0e23e1cd7beb59a78fde7d189a4b05bd6))
+- Add commit lint check for github - ([8dbba94](https://github.com/aphp/Cohort360-FrontEnd/commit/8dbba944bfd7a748110a42041113583f98b7e2c7))
+- Update release version 2.20.0 => 2.20.1 - ([277d44d](https://github.com/aphp/Cohort360-FrontEnd/commit/277d44d1fb69e0ce7671fb475cec5cd0d9cb1b81))
+- Update release version 2.20.1 => 2.20.2 - ([36b19e4](https://github.com/aphp/Cohort360-FrontEnd/commit/36b19e406d14ac28c79b09684ce7e7369aa6852d))
+- Update release version 2.20.1 => 2.20.2 - ([8d02e1e](https://github.com/aphp/Cohort360-FrontEnd/commit/8d02e1e20c1674393e54fc71e6020e018929ba7c))
