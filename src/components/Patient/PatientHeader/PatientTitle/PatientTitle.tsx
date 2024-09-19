@@ -9,6 +9,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
+import { ScopeElement } from 'types'
 
 type PatientTitleProps = {
   firstName: string | undefined
@@ -30,9 +31,9 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
   const goBacktoCohort = () => {
     const path =
       cohort.cohort && Array.isArray(cohort.cohort) && cohort.cohort.length > 0
-        ? `/perimeters/patients?${cohort.cohort.map((e) => e.id).join()}`
-        : !Array.isArray(cohort.cohort) && cohort.cohort?.id
-        ? `/cohort/${cohort.cohort?.id}/patients`
+        ? `/perimeters/patients?${cohort.cohort.map((e: ScopeElement) => e.cohort_id).join()}`
+        : !Array.isArray(cohort.cohort) && cohort.cohort?.cohort_id
+        ? `/cohort/${cohort.cohort?.cohort_id}/patients`
         : groupId
         ? `/perimeters/patients?${groupId}`
         : '/my-patients/patients'

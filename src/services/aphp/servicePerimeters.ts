@@ -91,7 +91,7 @@ export interface IServicePerimeters {
    * Arguments:
    *   - perimetersId: ID du périmètre (liste d'ID séparé par des virgules)
    */
-  fetchPerimetersRights: (perimetersResponse: Group[]) => Promise<Group[]>
+  fetchPerimetersRights: (perimetersResponse: ScopeElement[]) => Promise<ScopeElement[]>
 
   /**
    * à travers un ScopePage on retourne 'Nominatif' ou 'Pseudonymisé' selon les droits d'accès
@@ -145,7 +145,7 @@ const servicesPerimeters: IServicePerimeters = {
 
     const perimeters = djangoResponse.results
 
-    const cohort = await servicesPerimeters.fetchPerimetersRights(perimeters as unknown as Group[])
+    const cohort = await servicesPerimeters.fetchPerimetersRights(perimeters)
 
     const totalPatients = patientsResp?.data?.resourceType === 'Bundle' ? patientsResp.data.total : 0
 

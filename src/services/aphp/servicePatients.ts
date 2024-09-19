@@ -822,9 +822,7 @@ const servicesPatients: IServicePatients = {
     const perimetersResponse = await servicesPerimeters.getPerimeters({ cohortIds: groupId })
 
     if (perimetersResponse.results.length > 0) {
-      const perimeterRights = await servicesPerimeters.fetchPerimetersRights(
-        perimetersResponse.results as unknown as Group[]
-      )
+      const perimeterRights = await servicesPerimeters.fetchPerimetersRights(perimetersResponse.results)
       return perimeterRights.some(
         (right) => getExtension(right, 'READ_ACCESS')?.valueString === 'DATA_PSEUDOANONYMISED'
       )
