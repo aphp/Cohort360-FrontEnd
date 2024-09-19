@@ -251,7 +251,7 @@ export type VisiteRepartitionType = {
 export type CohortData = {
   name?: string
   description?: string
-  cohort?: Group | Group[]
+  cohort?: ScopeElement | ScopeElement[]
   totalPatients?: number
   originalPatients?: CohortPatient[]
   totalDocs?: number
