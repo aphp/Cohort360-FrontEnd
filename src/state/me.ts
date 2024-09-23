@@ -16,7 +16,7 @@ export type MeState = null | {
   nominativeGroupsIds?: string[]
   topLevelCareSites?: string[]
   lastConnection?: string
-  maintenance?: { active: boolean; maintenance_end: string; maintenance_start: string }
+  maintenance?: { active: boolean; maintenance_end: string; maintenance_start: string; type: string; message: string }
   impersonation?: User
 }
 
@@ -61,6 +61,24 @@ const meSlice = createSlice({
         }
       }
       return state
+    },
+    updateMaintenance: (
+      state,
+      action: PayloadAction<{
+        active: boolean
+        maintenance_end: string
+        maintenance_start: string
+        type: string
+        message: string
+      }>
+    ) => {
+      if (state) {
+        return {
+          ...state,
+          maintenance: action.payload
+        }
+      }
+      return state
     }
   },
   extraReducers: (builder) => {
@@ -77,4 +95,4 @@ const meSlice = createSlice({
 
 export default meSlice.reducer
 export { logout }
-export const { login, updatePerimeters } = meSlice.actions
+export const { login, updateMaintenance, updatePerimeters } = meSlice.actions

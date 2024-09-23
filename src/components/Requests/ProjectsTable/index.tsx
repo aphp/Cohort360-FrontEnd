@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import {
   Checkbox,
@@ -17,15 +17,14 @@ import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import ProjectRow from './ProjectRow'
 
-import { ProjectType, RequestType, WebSocketJobName, WebSocketJobStatus, WebSocketMessage } from 'types'
+import { ProjectType, RequestType } from 'types'
 
 import { useAppSelector } from 'state'
 
 import useStyles from './styles'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 import { Direction, Order } from 'types/searchCriterias'
-import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
-import servicesCohorts from 'services/aphp/serviceCohorts'
+import useCohortList from 'hooks/useCohortList'
 
 type ProjectTableProps = {
   searchInput?: string
@@ -39,49 +38,14 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
 
   const projectsList = useAppSelector((state) => state.project.projectsList)
   const requestsList = useAppSelector((state) => state.request.requestsList)
-  const cohortsListState = useAppSelector((state) => state.cohort.cohortsList)
 
   const [sortBy, setSortBy] = useState<'name' | 'updated_at'>('name')
   const [sortDirection, setSortDirection] = useState<Direction>(Direction.ASC)
 
   const [searchProjectList, setSearchProjectList] = useState(projectsList || [])
   const [currentRequestList, setSearchRequestList] = useState(requestsList || [])
-  const [searchCohortList, setSearchCohortList] = useState(cohortsListState || [])
-
-  const [cohortList, setCohortList] = useState(cohortsListState)
-
-  const webSocketContext = useContext(WebSocketContext)
-
-  useEffect(() => {
-    setCohortList(cohortsListState)
-  }, [cohortsListState])
-
-  useEffect(() => {
-    const listener = async (message: WebSocketMessage) => {
-      if (message.job_name === WebSocketJobName.CREATE && message.status === WebSocketJobStatus.finished) {
-        const websocketUpdatedCohorts = cohortList.map((cohort) => {
-          const temp = Object.assign({}, cohort)
-          if (temp.uuid === message.uuid) {
-            if (temp.dated_measure_global) {
-              temp.dated_measure_global = {
-                ...temp.dated_measure_global,
-                measure_min: message.extra_info?.global ? message.extra_info.global.measure_min : null,
-                measure_max: message.extra_info?.global ? message.extra_info.global.measure_max : null
-              }
-            }
-            temp.request_job_status = message.status
-            temp.group_id = message.extra_info?.group_id
-          }
-          return temp
-        })
-        const newCohortList = await servicesCohorts.fetchCohortsRights(websocketUpdatedCohorts)
-        setCohortList(newCohortList)
-      }
-    }
-
-    webSocketContext?.addListener(listener)
-    return () => webSocketContext?.removeListener(listener)
-  }, [cohortList, webSocketContext])
+  const cohortList = useCohortList()
+  const [searchCohortList, setSearchCohortList] = useState(cohortList || [])
 
   useEffect(() => {
     // eslint-disable-next-line

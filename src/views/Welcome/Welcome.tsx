@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import moment from 'moment'
 
@@ -19,12 +19,11 @@ import { fetchRequests } from 'state/request'
 import { initPmsiHierarchy } from 'state/pmsi'
 import { initMedicationHierarchy } from 'state/medication'
 import { initBiologyHierarchy } from 'state/biology'
-import { AccessExpiration, RequestType, WebSocketJobName, WebSocketJobStatus, WebSocketMessage } from 'types'
+import { AccessExpiration, RequestType } from 'types'
 import useStyles from './styles'
 import { CohortsType } from 'types/cohorts'
 import { Direction, Order } from 'types/searchCriterias'
-import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
-import servicesCohorts from 'services/aphp/serviceCohorts'
+import useCohortList from 'hooks/useCohortList'
 
 const Welcome = () => {
   const { classes, cx } = useStyles()
@@ -36,11 +35,9 @@ const Welcome = () => {
   const requestState = useAppSelector((state) => state.request)
   const meState = useAppSelector((state) => state.me)
   const [lastRequest, setLastRequest] = useState<RequestType[]>([])
-  const [cohortList, setCohortList] = useState(cohortState.cohortsList)
+  const cohortList = useCohortList()
   const accessExpirations: AccessExpiration[] = meState?.accessExpirations ?? []
   const maintenanceIsActive = meState?.maintenance?.active
-
-  const webSocketContext = useContext(WebSocketContext)
 
   const lastConnection = practitioner?.lastConnection
     ? moment(practitioner.lastConnection).format('[Dernière connexion : ]ddd DD MMMM YYYY[, à ]HH:mm')
@@ -93,37 +90,6 @@ const Welcome = () => {
         : []
     setLastRequest(_lastRequest)
   }, [requestState])
-
-  useEffect(() => {
-    setCohortList(cohortState.cohortsList)
-  }, [cohortState.cohortsList])
-
-  useEffect(() => {
-    const listener = async (message: WebSocketMessage) => {
-      if (message.job_name === WebSocketJobName.CREATE && message.status === WebSocketJobStatus.finished) {
-        const websocketUpdatedCohorts = cohortList.map((cohort) => {
-          const temp = Object.assign({}, cohort)
-          if (temp.uuid === message.uuid) {
-            if (temp.dated_measure_global) {
-              temp.dated_measure_global = {
-                ...temp.dated_measure_global,
-                measure_min: message.extra_info?.global ? message.extra_info.global.measure_min : null,
-                measure_max: message.extra_info?.global ? message.extra_info.global.measure_max : null
-              }
-            }
-            temp.request_job_status = message.status
-            temp.group_id = message.extra_info?.group_id
-          }
-          return temp
-        })
-        const newCohortList = await servicesCohorts.fetchCohortsRights(websocketUpdatedCohorts)
-        setCohortList(newCohortList)
-      }
-    }
-
-    webSocketContext?.addListener(listener)
-    return () => webSocketContext?.removeListener(listener)
-  }, [cohortList, webSocketContext])
 
   return practitioner ? (
     <Grid
