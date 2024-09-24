@@ -32,10 +32,10 @@ import {
 import useStyles from './styles'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
-import { defaultCondition } from '../../index'
 import { HierarchyTree } from 'types'
-import { Cim10DataType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
+import { Cim10DataType } from '../../../forms/Cim10Form'
+import { CriteriaType } from 'types/requestCriterias'
 
 type CimListItemProps = {
   cim10Item: Hierarchy<any, any>
@@ -65,7 +65,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
       cim10Code,
       selectedItems || [],
       cim10Hierarchy,
-      defaultCondition.type,
+      CriteriaType.CONDITION,
       dispatch
     )
     await handleClick(selectedItems, newHierarchy)

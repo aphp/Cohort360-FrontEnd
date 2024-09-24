@@ -10,10 +10,11 @@ import {
 import { expandMedicationElement } from '../state/medication'
 import { expandBiologyElement } from '../state/biology'
 import services from 'services/aphp'
-import { CommonCriteriaDataType, CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
+import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 import { Condition } from 'fhir/r4'
 import { Hierarchy } from 'types/hierarchy'
 import { LabelObject } from 'types/searchCriterias'
+import { CommonCriteriaData } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
 
 /**
  * @description : get the last diagnosis labels
@@ -341,17 +342,6 @@ export const initSyncHierarchyTableEffect = async (
   dispatch(decrementLoadingSyncHierarchyTable())
 }
 
-export const onChangeSelectedCriteriaEffect = async (
-  codesToExpand: Hierarchy<any, any>[],
-  selectedCodes: Hierarchy<any, any>[],
-  resourceHierarchy: Hierarchy<any, any>[],
-  resourceType: CriteriaType,
-  dispatch: AppDispatch
-): Promise<void> => {
-  await expandHierarchyCodes(codesToExpand, selectedCodes, resourceHierarchy, resourceType, dispatch)
-  dispatch(pushSyncHierarchyTable({ code: selectedCodes }))
-}
-
 const isExpanded = (itemToExpand: Hierarchy<any, any> | undefined): boolean => {
   if (itemToExpand?.subItems?.length > 0 && itemToExpand?.subItems[0].id !== 'loading') {
     return true
@@ -521,7 +511,7 @@ const expandHierarchyCodes = async (
   resourceHierarchy = newResourceHierarchy
   return resourceHierarchy
 }
-export const syncOnChangeFormValue = async <T extends CommonCriteriaDataType>(
+export const syncOnChangeFormValue = async <T extends CommonCriteriaData>(
   key: string,
   value: any,
   resourceHierarchy: Hierarchy<any, any>[],
