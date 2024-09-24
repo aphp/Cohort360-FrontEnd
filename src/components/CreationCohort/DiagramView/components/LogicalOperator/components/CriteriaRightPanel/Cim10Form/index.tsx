@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Tab, Tabs } from '@mui/material'
 
 import Cim10Form from './components/Form/Cim10Form'
@@ -12,6 +12,7 @@ import { EXPLORATION } from '../../../../../../../../constants'
 import { CriteriaDrawerComponentProps } from 'types'
 import { Cim10DataType, Comparators, CriteriaType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
+import { AppConfig } from 'config'
 
 export const defaultCondition: Omit<Cim10DataType, 'id'> = {
   type: CriteriaType.CONDITION,
@@ -31,7 +32,10 @@ export const defaultCondition: Omit<Cim10DataType, 'id'> = {
 
 const Index = (props: CriteriaDrawerComponentProps) => {
   const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
+  const appConfig = useContext(AppConfig)
+  const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(
+    selectedCriteria || !appConfig.core.fhir.valueSetExploration ? 'form' : 'hierarchy'
+  )
   const [defaultCriteria, setDefaultCriteria] = useState<Cim10DataType>(
     (selectedCriteria as Cim10DataType) || defaultCondition
   )
@@ -80,7 +84,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         value={selectedTab}
         onChange={(e, tab) => setSelectedTab(tab)}
       >
-        <Tab label={EXPLORATION} value="hierarchy" />
+        {appConfig.core.fhir.valueSetExploration && <Tab label={EXPLORATION} value="hierarchy" />}
         <Tab label="Formulaire" value="form" />
       </Tabs>
 

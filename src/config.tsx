@@ -26,6 +26,8 @@ type AppConfig = {
         biologyHierarchyAnabio: ValueSetConfig
         biologyHierarchyLoinc: ValueSetConfig
       }
+      useObservationValueRestriction: boolean
+      useObservationDefaultValidated: boolean
     }
     medication: {
       enabled: boolean
@@ -36,6 +38,7 @@ type AppConfig = {
         medicationPrescriptionTypes: ValueSetConfig
         medicationUcd: ValueSetConfig
       }
+      useMedicationAtcUcdCodes: boolean
     }
     condition: {
       enabled: boolean
@@ -136,6 +139,17 @@ type AppConfig = {
       patientTotalAgeDaysExtensionUrl?: string
       patientTotalAgeMonthsExtensionUrl?: string
     }
+    fhir: {
+      valueSetExploration: boolean
+      facetsExtensions: boolean
+      filterActive: boolean
+      totalCount: boolean
+      selectedCodeOnly: boolean
+      extraSearchParams: boolean
+      resourceLists: boolean
+      textSearch: boolean
+      valuesetExpansion: boolean
+    }
   }
   system: {
     wsProtocol: string
@@ -167,6 +181,17 @@ let config: AppConfig = {
     codeSystems: {
       docStatus: 'http://hl7.org/fhir/CodeSystem/composition-status'
     },
+    fhir: {
+      valueSetExploration: true,
+      facetsExtensions: true,
+      filterActive: true,
+      totalCount: false,
+      selectedCodeOnly: true,
+      extraSearchParams: true,
+      resourceLists: true,
+      textSearch: true,
+      valuesetExpansion: true
+    },
     valueSets: {
       demographicGender: { url: '' },
       encounterAdmission: { url: '' },
@@ -197,7 +222,9 @@ let config: AppConfig = {
       valueSets: {
         biologyHierarchyAnabio: { url: '' },
         biologyHierarchyLoinc: { url: '' }
-      }
+      },
+      useObservationValueRestriction: true,
+      useObservationDefaultValidated: true
     },
     medication: {
       enabled: true,
@@ -207,7 +234,8 @@ let config: AppConfig = {
         medicationAtcOrbis: { url: '' },
         medicationPrescriptionTypes: { url: '' },
         medicationUcd: { url: '' }
-      }
+      },
+      useMedicationAtcUcdCodes: true
     },
     condition: {
       enabled: true,

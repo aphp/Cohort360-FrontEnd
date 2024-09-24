@@ -11,7 +11,8 @@ import {
   CohortImaging,
   CohortComposition,
   Export,
-  ExportCSVTable
+  ExportCSVTable,
+  CohortPatient
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -363,6 +364,25 @@ const servicesCohorts: IServiceCohorts = {
       const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
 
       const originalPatients = getApiResponseResources(patientsResp)
+      const relatedEncountersResponse = await fetchEncounter({
+        patient: originalPatients?.map((patient) => patient.id).reduce((acc, id) => `${acc},${id}`),
+        _elements: ['serviceProvider', 'subject'],
+        _sort: 'date',
+        size: 1000
+      })
+      const relatedEncounters = getApiResponseResources(relatedEncountersResponse)
+      originalPatients?.forEach((patient: CohortPatient) => {
+        const lastEncounter = relatedEncounters
+          ?.filter((encounter) => encounter.subject?.reference === `Patient/${patient.id}`)
+          .at(-1)
+        if (lastEncounter) {
+          patient.lastOrganization = lastEncounter.serviceProvider
+        } else {
+          patient.lastOrganization = patient.extension?.find((extension) =>
+            extension.url.includes('last-encounter')
+          )?.valueReference
+        }
+      })
 
       const agePyramidData =
         patientsResp.data.resourceType === 'Bundle'

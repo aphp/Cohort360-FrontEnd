@@ -22,7 +22,7 @@ import useStyles from './styles'
 import { SourceType } from 'types/scope'
 import { sort } from 'utils/arrays'
 import { v4 as uuidv4 } from 'uuid'
-import { isSourceTypeInScopeLevel } from 'utils/perimeters'
+import { isSourceTypeInScopeLevel, perimeterDisplay } from 'utils/perimeters'
 import { every } from 'lodash'
 
 type HierarchyItemProps = {
@@ -101,9 +101,9 @@ const ScopeTreeRow = ({ item, path, sourceType, searchMode, loading, onSelect, o
         )}
         {!searchMode && (
           <TableCell style={{ cursor: 'pointer' }}>
-            <Typography
-              onClick={() => (open ? setOpen(false) : handleOpen())}
-            >{`${source_value} - ${name}`}</Typography>
+            <Typography onClick={() => (open ? setOpen(false) : handleOpen())}>
+              {perimeterDisplay(source_value, name)}
+            </Typography>
           </TableCell>
         )}
         <TableCell align="center">

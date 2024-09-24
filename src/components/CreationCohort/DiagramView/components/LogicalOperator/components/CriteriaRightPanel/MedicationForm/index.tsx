@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Tabs, Tab } from '@mui/material'
 
 import MedicationForm from './components/Form/MedicationForm'
@@ -13,6 +13,7 @@ import { fetchMedication } from 'state/medication'
 import { EXPLORATION } from '../../../../../../../../constants'
 import { Comparators, MedicationDataType, CriteriaType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
+import { AppConfig } from 'config'
 
 export const defaultMedication: Omit<MedicationDataType, 'id'> = {
   type: CriteriaType.MEDICATION_REQUEST,
@@ -31,7 +32,10 @@ export const defaultMedication: Omit<MedicationDataType, 'id'> = {
 
 const Index = (props: CriteriaDrawerComponentProps) => {
   const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const [selectedTab, setSelectedTab] = useState<'form' | 'exploration'>(selectedCriteria ? 'form' : 'exploration')
+  const appConfig = useContext(AppConfig)
+  const [selectedTab, setSelectedTab] = useState<'form' | 'exploration'>(
+    selectedCriteria || !appConfig.core.fhir.valueSetExploration ? 'form' : 'exploration'
+  )
   const [defaultCriteria, setDefaultCriteria] = useState<MedicationDataType>(
     (selectedCriteria as MedicationDataType) || defaultMedication
   )
@@ -74,7 +78,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         value={selectedTab}
         onChange={(e, tab) => setSelectedTab(tab)}
       >
-        <Tab label={EXPLORATION} value="exploration" />
+        {appConfig.core.fhir.valueSetExploration && <Tab label={EXPLORATION} value="exploration" />}
         <Tab label="Formulaire" value="form" />
       </Tabs>
 

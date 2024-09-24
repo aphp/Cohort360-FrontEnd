@@ -14,7 +14,7 @@ import { Column, CohortMedication } from 'types'
 
 import useStyles from './styles'
 import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
-import { OrderBy } from 'types/searchCriterias'
+import { Order, OrderBy } from 'types/searchCriterias'
 import { ResourceType } from 'types/requestCriterias'
 import { AppConfig } from 'config'
 
@@ -41,15 +41,19 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
   total
 }) => {
   const { classes } = useStyles()
-
+  const appConfig = useContext(AppConfig)
   const columns = [
     { label: `NDA${deidentified ? ' chiffré' : ''}`, code: 'encounter' },
     {
       label: selectedTab === ResourceType.MEDICATION_REQUEST ? 'Date de prescription' : "Date d'administration",
-      code: 'Period-start'
+      code: selectedTab === ResourceType.MEDICATION_REQUEST ? Order.DATE : Order.EFFECTIVE_TIME
     },
-    { label: 'Code ATC', code: 'medication-atc' },
-    { label: 'Code UCD', code: 'medication-ucd' },
+    ...(appConfig.features.medication.useMedicationAtcUcdCodes
+      ? [
+          { label: 'Code ATC', code: 'medication-atc' },
+          { label: 'Code UCD', code: 'medication-ucd' }
+        ]
+      : [{ label: 'Code', code: 'code' }]),
     selectedTab === ResourceType.MEDICATION_REQUEST ? { label: 'Type de prescription', code: 'category-name' } : null,
     { label: "Voie d'administration", code: 'route' },
     selectedTab === ResourceType.MEDICATION_ADMINISTRATION ? { label: 'Quantité' } : null,
@@ -117,9 +121,7 @@ const DataTableMedicationLine: React.FC<{
 
   const nda = medication.NDA
   const date =
-    medication.resourceType === 'MedicationRequest'
-      ? medication.dispenseRequest?.validityPeriod?.start
-      : medication.effectivePeriod?.start
+    medication.resourceType === ResourceType.MEDICATION_REQUEST ? medication.authoredOn : medication.effectiveDateTime
 
   const [codeATC, displayATC, isATCStandard, codeATCSystem] = getCodes(
     medication,
@@ -131,6 +133,7 @@ const DataTableMedicationLine: React.FC<{
     appConfig.features.medication.valueSets.medicationUcd.url,
     '.*-ucd'
   )
+  const defaultCode = medication.medicationCodeableConcept?.coding?.at(0)
 
   const prescriptionType =
     medication.resourceType === 'MedicationRequest' && medication.category?.[0].coding?.[0].display
@@ -148,26 +151,38 @@ const DataTableMedicationLine: React.FC<{
     <TableRow className={classes.tableBodyRows} key={medication.id}>
       <TableCellWrapper align="left">{nda ?? 'Inconnu'}</TableCellWrapper>
       <TableCellWrapper>{date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}</TableCellWrapper>
-      <TableCellWrapper>
-        <Tooltip title={codeATCSystem}>
-          <Typography style={{ fontStyle: isATCStandard ? 'normal' : 'italic' }}>
-            {codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : codeATC ?? ''}
-          </Typography>
-        </Tooltip>
-        <Typography className={classes.libelle}>
-          {displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}
-        </Typography>
-      </TableCellWrapper>
-      <TableCellWrapper>
-        <Tooltip title={codeUCDSystem}>
-          <Typography style={{ fontStyle: isUCDStandard ? 'normal' : 'italic' }}>
-            {codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : codeUCD ?? ''}
-          </Typography>
-        </Tooltip>
-        <Typography className={classes.libelle}>
-          {displayUCD === 'No matching concept' ? '-' : displayUCD ?? '-'}
-        </Typography>
-      </TableCellWrapper>
+      {appConfig.features.medication.useMedicationAtcUcdCodes ? (
+        <>
+          <TableCellWrapper>
+            <Tooltip title={codeATCSystem}>
+              <Typography style={{ fontStyle: isATCStandard ? 'normal' : 'italic' }}>
+                {codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : codeATC ?? ''}
+              </Typography>
+            </Tooltip>
+            <Typography className={classes.libelle}>
+              {displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}
+            </Typography>
+          </TableCellWrapper>
+          <TableCellWrapper>
+            <Tooltip title={codeUCDSystem}>
+              <Typography style={{ fontStyle: isUCDStandard ? 'normal' : 'italic' }}>
+                {codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : codeUCD ?? ''}
+              </Typography>
+            </Tooltip>
+            <Typography className={classes.libelle}>
+              {displayUCD === 'No matching concept' ? '-' : displayUCD ?? '-'}
+            </Typography>
+          </TableCellWrapper>
+        </>
+      ) : (
+        <TableCellWrapper>
+          <Tooltip title={'Code'}>
+            <Typography>{defaultCode?.code}</Typography>
+          </Tooltip>
+          <Typography className={classes.libelle}>{defaultCode?.display}</Typography>
+        </TableCellWrapper>
+      )}
+
       {medication.resourceType === 'MedicationRequest' && (
         <TableCellWrapper>{prescriptionType ?? '-'}</TableCellWrapper>
       )}

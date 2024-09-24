@@ -36,131 +36,134 @@ import services from 'services/aphp'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import { Hierarchy } from 'types/hierarchy'
 import { getConfig } from 'config'
+import { USE_FHIR_ENCOUNTER_CARE_SITE } from 'constants.js'
 
-export enum PatientsParamsKeys {
-  GENDERS = 'gender',
-  DATE_DEIDENTIFIED = 'age-month',
-  DATE_IDENTIFIED = 'age-day',
-  VITAL_STATUS = 'deceased',
-  BIRTHDATE = 'birthdate',
-  DEATHDATE = 'death-date'
+const ENCOUNTER_CARE_SITE = USE_FHIR_ENCOUNTER_CARE_SITE ? 'encounter-care-site' : 'service-provider'
+
+export const PatientsParamsKeys = {
+  GENDERS: 'gender',
+  DATE_DEIDENTIFIED: 'age-month',
+  DATE_IDENTIFIED: 'age-day',
+  VITAL_STATUS: 'deceased',
+  BIRTHDATE: 'birthdate',
+  DEATHDATE: 'death-date'
 }
 
-export enum EncounterParamsKeys {
-  DURATION = 'length',
-  MIN_BIRTHDATE_DAY = 'start-age-visit',
-  MIN_BIRTHDATE_MONTH = 'start-age-visit-month',
-  ENTRYMODE = 'admission-mode',
-  EXITMODE = 'discharge-disposition-mode',
-  PRISENCHARGETYPE = 'class',
-  TYPEDESEJOUR = 'stay',
-  ADMISSIONMODE = 'reason-code',
-  REASON = 'admission-destination-type',
-  DESTINATION = 'discharge-disposition',
-  PROVENANCE = 'admit-source',
-  ADMISSION = 'admission-type',
-  SERVICE_PROVIDER = 'encounter-care-site',
-  STATUS = 'status',
-  START_DATE = 'period-start',
-  END_DATE = 'period-end'
+export const EncounterParamsKeys = {
+  DURATION: 'length',
+  MIN_BIRTHDATE_DAY: 'start-age-visit',
+  MIN_BIRTHDATE_MONTH: 'start-age-visit-month',
+  ENTRYMODE: 'admission-mode',
+  EXITMODE: 'discharge-disposition-mode',
+  PRISENCHARGETYPE: 'class',
+  TYPEDESEJOUR: 'stay',
+  ADMISSIONMODE: 'reason-code',
+  REASON: 'admission-destination-type',
+  DESTINATION: 'discharge-disposition',
+  PROVENANCE: 'admit-source',
+  ADMISSION: 'admission-type',
+  SERVICE_PROVIDER: ENCOUNTER_CARE_SITE,
+  STATUS: 'status',
+  START_DATE: 'period-start',
+  END_DATE: 'period-end'
 }
 
-export enum DocumentsParamsKeys {
-  IPP = 'subject.identifier',
-  DOC_STATUSES = 'docstatus',
-  DOC_TYPES = 'type',
-  ONLY_PDF_AVAILABLE = 'onlyPdfAvailable',
-  NDA = 'encounter.identifier',
-  DATE = 'date',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status'
+export const DocumentsParamsKeys = {
+  IPP: 'subject.identifier',
+  DOC_STATUSES: 'docstatus',
+  DOC_TYPES: 'type',
+  ONLY_PDF_AVAILABLE: 'onlyPdfAvailable',
+  NDA: 'encounter.identifier',
+  DATE: 'date',
+  EXECUTIVE_UNITS: `encounter.${ENCOUNTER_CARE_SITE}`,
+  ENCOUNTER_STATUS: 'encounter.status'
 }
 
-export enum ConditionParamsKeys {
-  NDA = 'encounter.identifier',
-  CODE = 'code',
-  DIAGNOSTIC_TYPES = 'orbis-status',
-  DATE = 'recorded-date',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  SOURCE = '_source',
-  ENCOUNTER_STATUS = 'encounter.status'
+export const ConditionParamsKeys = {
+  NDA: 'encounter.identifier',
+  CODE: 'code',
+  DIAGNOSTIC_TYPES: 'orbis-status',
+  DATE: 'recorded-date',
+  EXECUTIVE_UNITS: `encounter.${ENCOUNTER_CARE_SITE}`,
+  SOURCE: '_source',
+  ENCOUNTER_STATUS: 'encounter.status'
 }
 
-export enum ProcedureParamsKeys {
-  NDA = 'encounter.identifier',
-  CODE = 'code',
-  SOURCE = '_source',
-  DATE = 'date',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status'
+export const ProcedureParamsKeys = {
+  NDA: 'encounter.identifier',
+  CODE: 'code',
+  SOURCE: '_source',
+  DATE: 'date',
+  EXECUTIVE_UNITS: `encounter.${ENCOUNTER_CARE_SITE}`,
+  ENCOUNTER_STATUS: 'encounter.status'
 }
 
-export enum ClaimParamsKeys {
-  NDA = 'encounter.identifier',
-  CODE = 'diagnosis',
-  DATE = 'created',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status'
+export const ClaimParamsKeys = {
+  NDA: 'encounter.identifier',
+  CODE: 'diagnosis',
+  DATE: 'created',
+  EXECUTIVE_UNITS: `encounter.${ENCOUNTER_CARE_SITE}`,
+  ENCOUNTER_STATUS: 'encounter.status'
 }
 
-export enum PrescriptionParamsKeys {
-  NDA = 'encounter.identifier',
-  PRESCRIPTION_TYPES = 'category',
-  DATE = 'validity-period-start',
-  END_DATE = 'validity-period-end',
-  CODE = 'code',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status',
-  PRESCRIPTION_ROUTES = 'dosage-instruction-route'
+export const PrescriptionParamsKeys = {
+  NDA: 'encounter.identifier',
+  PRESCRIPTION_TYPES: 'category',
+  DATE: 'validity-period-start',
+  END_DATE: 'validity-period-end',
+  CODE: 'code',
+  EXECUTIVE_UNITS: `encounter.${ENCOUNTER_CARE_SITE}`,
+  ENCOUNTER_STATUS: 'encounter.status',
+  PRESCRIPTION_ROUTES: 'dosage-instruction-route'
 }
 
-export enum AdministrationParamsKeys {
-  NDA = 'context.identifier',
-  ADMINISTRATION_ROUTES = 'dosage-route',
-  DATE = 'effective-time',
-  EXECUTIVE_UNITS = 'context.encounter-care-site',
-  ENCOUNTER_STATUS = 'context.status'
+export const AdministrationParamsKeys = {
+  NDA: 'context.identifier',
+  ADMINISTRATION_ROUTES: 'dosage-route',
+  DATE: 'effective-time',
+  EXECUTIVE_UNITS: `context.${ENCOUNTER_CARE_SITE}`,
+  ENCOUNTER_STATUS: 'context.status'
 }
 
-export enum ObservationParamsKeys {
-  NDA = 'encounter.identifier',
-  ANABIO_LOINC = 'code',
-  VALIDATED_STATUS = 'status',
-  DATE = 'date',
-  VALUE = 'value-quantity',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status'
+export const ObservationParamsKeys = {
+  NDA: 'encounter.identifier',
+  ANABIO_LOINC: 'code',
+  VALIDATED_STATUS: 'status',
+  DATE: 'date',
+  VALUE: 'value-quantity',
+  EXECUTIVE_UNITS: `encounter.${ENCOUNTER_CARE_SITE}`,
+  ENCOUNTER_STATUS: 'encounter.status'
 }
 
-export enum ImagingParamsKeys {
-  IPP = 'patient.identifier',
-  MODALITY = 'modality',
-  NDA = 'encounter.identifier',
-  DATE = 'started',
-  STUDY_DESCRIPTION = 'description',
-  STUDY_PROCEDURE = 'procedureCode',
-  NB_OF_SERIES = 'numberOfSeries',
-  NB_OF_INS = 'numberOfInstances',
-  WITH_DOCUMENT = 'with-document',
-  STUDY_UID = 'identifier',
-  SERIES_DATE = 'series-started',
-  SERIES_DESCRIPTION = 'series-description',
-  SERIES_PROTOCOL = 'series-protocol',
-  SERIES_MODALITIES = 'series-modality',
-  SERIES_UID = 'series',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status'
+export const ImagingParamsKeys = {
+  IPP: 'patient.identifier',
+  MODALITY: 'modality',
+  NDA: 'encounter.identifier',
+  DATE: 'started',
+  STUDY_DESCRIPTION: 'description',
+  STUDY_PROCEDURE: 'procedureCode',
+  NB_OF_SERIES: 'numberOfSeries',
+  NB_OF_INS: 'numberOfInstances',
+  WITH_DOCUMENT: 'with-document',
+  STUDY_UID: 'identifier',
+  SERIES_DATE: 'series-started',
+  SERIES_DESCRIPTION: 'series-description',
+  SERIES_PROTOCOL: 'series-protocol',
+  SERIES_MODALITIES: 'series-modality',
+  SERIES_UID: 'series',
+  EXECUTIVE_UNITS: `encounter.${ENCOUNTER_CARE_SITE}`,
+  ENCOUNTER_STATUS: 'encounter.status'
 }
 
-export enum QuestionnaireResponseParamsKeys {
-  NAME = 'questionnaire.name',
-  DATE = 'authored',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status'
+export const QuestionnaireResponseParamsKeys = {
+  NAME: 'questionnaire.name',
+  DATE: 'authored',
+  EXECUTIVE_UNITS: `encounter.${ENCOUNTER_CARE_SITE}`,
+  ENCOUNTER_STATUS: 'encounter.status'
 }
 
-export enum IppParamsKeys {
-  IPP_LIST_FHIR = 'identifier.value'
+export const IppParamsKeys = {
+  IPP_LIST_FHIR: 'identifier.value'
 }
 
 const getGenericKeyFromResourceType = (
@@ -590,7 +593,10 @@ const mapAdministrationToRequestParams = (filters: MedicationFilters) => {
 
 const mapBiologyToRequestParams = (filters: BiologyFilters) => {
   const { anabio, loinc, validatedStatus, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
-  const requestParams: string[] = ['value-quantity=ge0,le0', 'subject.active=true']
+  const appConfig = getConfig()
+  const requestParams: string[] = []
+  if (appConfig.core.fhir.filterActive) requestParams.push('subject.active=true')
+  if (appConfig.features.observation.useObservationValueRestriction) requestParams.push('value-quantity=ge0,le0')
   if ((anabio && anabio.length > 0) || (loinc && loinc.length > 0)) {
     const key = `${ObservationParamsKeys.ANABIO_LOINC}=`
     let _anabio = ''
@@ -703,9 +709,13 @@ const getDefaultOrderBy = (type: ResourceType) => {
         orderDirection: Direction.DESC
       }
     case ResourceType.MEDICATION_REQUEST:
+      return {
+        orderBy: Order.DATE,
+        orderDirection: Direction.DESC
+      }
     case ResourceType.MEDICATION_ADMINISTRATION:
       return {
-        orderBy: Order.PERIOD_START,
+        orderBy: Order.EFFECTIVE_TIME,
         orderDirection: Direction.DESC
       }
     case ResourceType.OBSERVATION:
@@ -765,7 +775,7 @@ const mapSearchByAndSearchInputFromRequestParams = (parameters: URLSearchParams)
   return [searchBy, searchInput]
 }
 
-function mapBirthdatesRangesFromRequestParams(key: PatientsParamsKeys, parameters: URLSearchParams): DurationRangeType {
+function mapBirthdatesRangesFromRequestParams(key: string, parameters: URLSearchParams): DurationRangeType {
   const birthdatesRanges: DurationRangeType = [null, null]
   const dates = parameters.getAll(key)
   dates.forEach((date) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useContext } from 'react'
 
 import { CircularProgress, Grid, Tooltip } from '@mui/material'
 
@@ -48,6 +48,7 @@ import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { ResourceType } from 'types/requestCriterias'
 import List from 'components/ui/List'
 import { useAppSelector } from 'state'
+import { AppConfig } from 'config'
 
 type PatientListProps = {
   total: number
@@ -57,6 +58,7 @@ type PatientListProps = {
 }
 
 const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
+  const appConfig = useContext(AppConfig)
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
@@ -95,7 +97,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
       filters: { genders, birthdatesRanges, vitalStatuses }
     },
     { changeOrderBy, changeSearchBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
-  ] = useSearchCriterias(initPatientsSearchCriterias)
+  ] = useSearchCriterias(initPatientsSearchCriterias())
 
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ genders, vitalStatuses, birthdatesRanges })
@@ -165,15 +167,17 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   return (
     <Grid container gap="25px">
       <Grid item xs={12}>
-        <PatientCharts
-          agePyramid={
-            loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE ? [] : agePyramid
-          }
-          patientData={
-            loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE ? {} : patientData
-          }
-          loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
-        />
+        {appConfig.core.fhir.facetsExtensions && (
+          <PatientCharts
+            agePyramid={
+              loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE ? [] : agePyramid
+            }
+            patientData={
+              loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE ? {} : patientData
+            }
+            loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
+          />
+        )}
       </Grid>
       <Grid container justifyContent="flex-end" gap="10px">
         <Grid container item xs={12} md={10} lg={7} xl={5} justifyContent="flex-end" spacing={1}>
@@ -232,7 +236,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
                   value={searchBy || SearchByTypes.TEXT}
                   label="Rechercher dans :"
                   width={'150px'}
-                  items={searchByListPatients}
+                  items={searchByListPatients()}
                   onchange={(newValue: SearchByTypes) => changeSearchBy(newValue)}
                 />
                 <SearchInput
@@ -284,11 +288,13 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
       >
         <GendersFilter name={FilterKeys.GENDERS} value={genders} />
         <VitalStatusesFilter name={FilterKeys.VITAL_STATUSES} value={vitalStatuses} />
-        <BirthdatesRangesFilter
-          name={FilterKeys.BIRTHDATES}
-          value={birthdatesRanges}
-          deidentified={deidentified ?? false}
-        />
+        {appConfig.core.fhir.extraSearchParams && (
+          <BirthdatesRangesFilter
+            name={FilterKeys.BIRTHDATES}
+            value={birthdatesRanges}
+            deidentified={deidentified ?? false}
+          />
+        )}
       </Modal>
       <Modal
         title="Filtres sauvegardés"
@@ -366,7 +372,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
                     width="60%"
                     disabled={isReadonlyFilterInfoModal}
                     value={selectedSavedFilter?.filterParams.searchBy}
-                    items={searchByListPatients}
+                    items={searchByListPatients()}
                     name="searchBy"
                   />
                 </Grid>

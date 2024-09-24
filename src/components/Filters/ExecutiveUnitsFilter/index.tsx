@@ -10,7 +10,7 @@ import { SourceType } from 'types/scope'
 import PopulationRightPanel from 'components/CreationCohort/DiagramView/components/PopulationCard/components/PopulationRightPanel'
 import { Hierarchy } from 'types/hierarchy'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
-import { getScopeLevelBySourceType } from 'utils/perimeters'
+import { getScopeLevelBySourceType, perimeterDisplay } from 'utils/perimeters'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 
 type ExecutiveUnitsFilterProps = {
@@ -94,7 +94,7 @@ const ExecutiveUnitsFilter = ({
                   marginTop: '4px'
                 }}
                 key={unit.id}
-                label={`${unit.source_value} - ${unit.name}`}
+                label={perimeterDisplay(unit.source_value, unit.name)}
                 onDelete={() => {
                   handleDelete(unit.id)
                 }}

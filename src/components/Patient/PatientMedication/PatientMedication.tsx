@@ -109,7 +109,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
       filters: { nda, prescriptionTypes, startDate, endDate, administrationRoutes, executiveUnits, encounterStatus }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias, addSearchCriterias }
-  ] = useSearchCriterias(initMedSearchCriterias)
+  ] = useSearchCriterias(initMedSearchCriterias(selectedTab.id))
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({
       nda,
@@ -412,7 +412,10 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
                 filterName,
                 {
                   searchInput,
-                  orderBy: { orderBy: Order.PERIOD_START, orderDirection: Direction.DESC },
+                  orderBy: {
+                    orderBy: selectedTab.id === ResourceType.MEDICATION_REQUEST ? Order.DATE : Order.EFFECTIVE_TIME,
+                    orderDirection: Direction.DESC
+                  },
                   filters: {
                     nda,
                     prescriptionTypes,
