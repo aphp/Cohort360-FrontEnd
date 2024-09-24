@@ -12,7 +12,7 @@ import { DurationLabel } from './styles'
 type DurationRangeProps = {
   value: DurationRangeType
   label?: string
-  deidentified?: boolean
+  includeDays?: boolean
   active?: boolean
   unit?: string
   // placeholderType?: string
@@ -32,7 +32,7 @@ const defaultMaxDuration: DurationType = {
 const DurationRange: React.FC<DurationRangeProps> = ({
   value,
   label,
-  deidentified = false,
+  includeDays = true,
   active = true,
   unit = 'Âge',
   onChange,
@@ -65,7 +65,7 @@ const DurationRange: React.FC<DurationRangeProps> = ({
         <DurationInput
           disabled={!active}
           value={minDuration}
-          deidentified={deidentified}
+          includeDays={includeDays}
           label={`${unit} minimum`}
           onChange={(newDuration) => setMinDuration(newDuration)}
         />
@@ -73,7 +73,7 @@ const DurationRange: React.FC<DurationRangeProps> = ({
       <DurationInput
         disabled={!active}
         value={maxDuration}
-        deidentified={deidentified}
+        includeDays={includeDays}
         label={`${unit} maximum`}
         onChange={(newDuration) => setMaxDuration(newDuration)}
       />

@@ -32,3 +32,6 @@ yarn-error.log*
 .mp4
 public/config.dev.json
 public/config.local.json
+public/config.example.json
+public/config.qualif.json
+*storybook.log

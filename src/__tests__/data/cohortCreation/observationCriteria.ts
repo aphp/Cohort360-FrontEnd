@@ -1,46 +1,31 @@
-import { ObservationDataType, Comparators, CriteriaType } from 'types/requestCriterias'
-import { System } from 'types/scope'
+import {
+  ObservationDataType,
+  form
+} from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/BiologyForm'
+import { Comparators } from 'types/requestCriterias'
 
 export const defaultObservationCriteria: ObservationDataType = {
   id: 1,
-  type: CriteriaType.OBSERVATION,
-  isInclusive: true,
-  title: 'Observation',
-  occurrence: null,
-  occurrenceComparator: null,
-  startOccurrence: [null, null],
-  endOccurrence: [null, null],
-  encounterStartDate: [null, null],
-  includeEncounterStartDateNull: false,
-  encounterEndDate: [null, null],
-  includeEncounterEndDateNull: false,
-  encounterStatus: [],
-  code: [],
-  searchByValue: [null, null],
-  valueComparator: Comparators.EQUAL,
-  encounterService: []
+  ...form().initialData
 }
 
 export const completeObservationCriteria: ObservationDataType = {
   ...defaultObservationCriteria,
-  occurrence: 1,
-  occurrenceComparator: Comparators.GREATER,
-  startOccurrence: ['2024-09-03', '2024-09-04'],
-  encounterStartDate: ['2024-09-04', '2024-09-07'],
-  includeEncounterStartDateNull: true,
-  encounterEndDate: ['2024-09-02', '2024-09-06'],
-  includeEncounterEndDateNull: false,
-  encounterStatus: [{ id: 'cancelled', label: 'Cancelled', system: 'http://hl7.org/fhir/CodeSystem/encounter-status' }],
+  occurrence: { value: 1, comparator: Comparators.GREATER },
+  startOccurrence: { start: '2024-09-03', end: '2024-09-04' },
+  encounterStartDate: { start: '2024-09-04', end: '2024-09-07', includeNull: true },
+  encounterEndDate: { start: '2024-09-02', end: '2024-09-06' },
+  encounterStatus: ['cancelled'],
   code: [
     {
       id: 'I3356',
       label: 'I3356 - Erythrocytes Foetaux /érythrocytes Adultes_sang_cytochimie_hf/10000 Ha',
       system: 'https://terminology.eds.aphp.fr/aphp-itm-anabio',
-      above_levels_ids: '*',
-      inferior_levels_ids: ''
+      isLeaf: true
     }
   ],
-  searchByValue: [3, null],
+  enableSearchByValue: true,
+  searchByValue: { value: 3, comparator: Comparators.EQUAL },
   encounterService: [
     {
       label: 'GH RCP',

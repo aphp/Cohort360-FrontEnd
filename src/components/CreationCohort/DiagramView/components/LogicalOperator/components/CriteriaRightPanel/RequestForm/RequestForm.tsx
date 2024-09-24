@@ -28,7 +28,7 @@ const RequestForm: React.FC<CriteriaDrawerComponentProps> = ({ parentId, goBack 
       return setError(true)
     }
 
-    dispatch(addRequestToCohortCreation({ parentId, selectedRequestId }))
+    dispatch(addRequestToCohortCreation({ parentId: parentId ?? null, selectedRequestId }))
   }
 
   return (
