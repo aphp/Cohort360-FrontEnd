@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Tab, Tabs } from '@mui/material'
 
-import GHMForm from './components/Form/GhmForm'
 import GHMHierarchy from './components/Hierarchy/GhmHierarchy'
 
 import useStyles from './styles'
@@ -10,27 +9,18 @@ import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchClaim } from 'state/pmsi'
 import { EXPLORATION } from '../../../../../../../../constants'
 import { CriteriaDrawerComponentProps } from 'types'
-import { Comparators, GhmDataType, CriteriaType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
-
-export const defaultClaim: Omit<GhmDataType, 'id'> = {
-  type: CriteriaType.CLAIM,
-  title: 'Critères GHM',
-  code: [],
-  label: undefined,
-  occurrence: 1,
-  occurrenceComparator: Comparators.GREATER_OR_EQUAL,
-  startOccurrence: [null, null],
-  isInclusive: true,
-  encounterStartDate: [null, null],
-  encounterEndDate: [null, null],
-  encounterStatus: []
-}
+import { form, GhmDataType } from '../forms/GHMForm'
+import { CriteriaType } from 'types/requestCriterias'
+import { fetchValueSet } from 'services/aphp/callApi'
+import CriteriaForm from '../CriteriaForm'
 
 const Index = (props: CriteriaDrawerComponentProps) => {
-  const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
-  const [defaultCriteria, setDefaultCriteria] = useState<GhmDataType>((selectedCriteria as GhmDataType) || defaultClaim)
+  const [defaultCriteria, setDefaultCriteria] = useState<GhmDataType>(
+    (selectedCriteria as GhmDataType) || { ...form().initialData }
+  )
 
   const isEdition = selectedCriteria !== null
   const dispatch = useAppDispatch()
@@ -47,7 +37,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const _onChangeFormValue = async (key: string, value: any, newHierarchy: Hierarchy<any, any>[] = ghmHierarchy) =>
-    await syncOnChangeFormValue(key, value, newHierarchy, setDefaultCriteria, selectedTab, defaultClaim.type, dispatch)
+    await syncOnChangeFormValue(key, value, newHierarchy, setDefaultCriteria, selectedTab, CriteriaType.CLAIM, dispatch)
 
   const _initSyncHierarchyTableEffect = async () => {
     await initSyncHierarchyTableEffect(
@@ -55,7 +45,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       selectedCriteria,
       defaultCriteria && defaultCriteria.code ? defaultCriteria.code : [],
       fetchClaim,
-      defaultClaim.type,
+      CriteriaType.CLAIM,
       dispatch
     )
   }
@@ -75,17 +65,21 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         <Tab label="Formulaire" value="form" />
       </Tabs>
 
-      {
-        <GHMForm
-          isOpen={selectedTab === 'form'}
-          isEdition={isEdition}
-          criteriaData={criteriaData}
-          selectedCriteria={defaultCriteria}
-          onChangeValue={_onChangeFormValue}
-          onChangeSelectedCriteria={onChangeSelectedCriteria}
+      {selectedTab === 'form' ? (
+        <CriteriaForm
+          {...form()}
+          updateData={onChangeSelectedCriteria}
           goBack={goBack}
+          data={defaultCriteria || undefined}
+          searchCode={(code: string, codeSystemUrl: string, abortSignal: AbortSignal) =>
+            fetchValueSet(
+              codeSystemUrl,
+              { valueSetTitle: 'Toute la hiérarchie', search: code, noStar: false },
+              abortSignal
+            )
+          }
         />
-      }
+      ) : null}
       {
         <GHMHierarchy
           isOpen={selectedTab === 'hierarchy'}
