@@ -11,6 +11,7 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
 import { Document, Page, pdfjs } from 'react-pdf'
+import 'react-pdf/dist/Page/TextLayer.css'
 import services from 'services/aphp'
 import { FHIR_API_URL, ACCESS_TOKEN } from '../../constants'
 
@@ -135,23 +136,31 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
             </>
             <>
               {selectedTab === 'pdf' && (
-                <Grid ref={gridRef} style={pdfViewerContainerStyle}>
-                  <Document
-                    error={'Le document est introuvable.'}
-                    loading={'PDF en cours de chargement...'}
-                    file={url}
-                    options={options}
-                    onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                  >
-                    {Array.from(new Array(numPages), (el, index) => (
-                      <Page
-                        width={gridWidth}
-                        key={`page_${index + 1}`}
-                        pageNumber={index + 1}
-                        loading={'Pages en cours de chargement...'}
-                      />
-                    ))}
-                  </Document>
+                <Grid id="salut" ref={gridRef} style={pdfViewerContainerStyle}>
+                  <div id="document">
+                    <Document
+                      error={'Le document est introuvable.'}
+                      loading={'PDF en cours de chargement...'}
+                      file={url}
+                      options={options}
+                      onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                    >
+                      <>{console.log('url', url)}</>
+                      <div id="array">
+                        {Array.from(new Array(numPages), (el, index) => (
+                          <div id="page" key={index + 1}>
+                            <Page
+                              width={gridWidth}
+                              key={`page_${index + 1}`}
+                              pageNumber={index + 1}
+                              loading={'Pages en cours de chargement...'}
+                              renderAnnotationLayer={false}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </Document>
+                  </div>
                 </Grid>
               )}
             </>
