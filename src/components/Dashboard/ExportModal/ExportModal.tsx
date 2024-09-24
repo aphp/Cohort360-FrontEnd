@@ -479,7 +479,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
             onChange={(event) => setSelectState(event.target.value as 'csv' | 'xlsx')}
           >
             <MenuItem value={'csv'}>{'Fichier csv'}</MenuItem>
-            <MenuItem value={'xlsx'}>{'Fichier exel (.xlsx)'}</MenuItem>
+            <MenuItem value={'xlsx'}>{'Fichier excel (.xlsx)'}</MenuItem>
           </Select>
         </Grid>
 
