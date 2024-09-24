@@ -14,10 +14,11 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { useAppSelector } from 'state'
 
 import useStyles from './styles'
-import { criteriasAsArray } from 'utils/requestCriterias'
 import { ChipWrapper } from 'components/ui/Chip/styles'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 import theme from 'theme'
+import criteriaList, { getAllCriteriaItems } from 'components/CreationCohort/DataList_Criteria'
+import { criteriasAsArray } from '../LogicalOperator/components/CriteriaRightPanel/CriteriaForm/mappers'
 
 type CriteriaCardProps = {
   criterion: SelectedCriteriaType
@@ -29,8 +30,9 @@ type CriteriaCardProps = {
 const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriteria }: CriteriaCardProps) => {
   const { classes } = useStyles()
 
-  const { criteria } = useAppSelector((state) => state.cohortCreation)
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active || false)
+  const { entities, cache } = useAppSelector((state) => state.valueSets)
+  const criteriaDefinitions = getAllCriteriaItems(criteriaList())
 
   const [needCollapse, setNeedCollapse] = useState(false)
   const [openCollapse, setOpenCollapse] = useState(false)
@@ -81,7 +83,7 @@ const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriter
         className={classes.secondItem}
       >
         <Grid item xs={11} container ref={childrenRef} style={{ overflow: 'hidden' }}>
-          {criteriasAsArray(criterion, criteria).map((label, index) => (
+          {criteriasAsArray(criterion, criteriaDefinitions, { entities, cache }).map((label, index) => (
             <ChipWrapper
               key={index}
               label={label}

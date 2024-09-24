@@ -1,34 +1,21 @@
-import { GhmDataType, Comparators, CriteriaType } from 'types/requestCriterias'
+import {
+  GhmDataType,
+  form
+} from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/GHMForm'
+import { Comparators } from 'types/requestCriterias'
 
 export const defaultClaimCriteria: GhmDataType = {
   id: 1,
-  type: CriteriaType.CLAIM,
-  isInclusive: true,
-  title: 'Claim',
-  occurrence: null,
-  occurrenceComparator: null,
-  startOccurrence: [null, null],
-  endOccurrence: [null, null],
-  encounterStartDate: [null, null],
-  includeEncounterStartDateNull: false,
-  encounterEndDate: [null, null],
-  includeEncounterEndDateNull: false,
-  encounterStatus: [],
-  code: [],
-  label: undefined,
-  encounterService: undefined
+  ...form().initialData
 }
 
 export const completeClaimCriteria: GhmDataType = {
   ...defaultClaimCriteria,
-  occurrence: 1,
-  occurrenceComparator: Comparators.GREATER,
-  startOccurrence: ['2024-09-03', '2024-09-04'],
-  encounterStartDate: ['2024-09-04', '2024-09-07'],
-  includeEncounterStartDateNull: true,
-  encounterEndDate: ['2024-09-02', '2024-09-06'],
-  includeEncounterEndDateNull: false,
-  encounterStatus: [{ id: 'cancelled', label: 'Cancelled', system: 'http://hl7.org/fhir/CodeSystem/encounter-status' }],
+  occurrence: { value: 1, comparator: Comparators.GREATER },
+  startOccurrence: { start: '2024-09-03', end: '2024-09-04' },
+  encounterStartDate: { start: '2024-09-04', end: '2024-09-07', includeNull: true },
+  encounterEndDate: { start: '2024-09-02', end: '2024-09-06' },
+  encounterStatus: ['cancelled'],
   code: [
     {
       id: '05C021',

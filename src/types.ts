@@ -25,7 +25,6 @@ import { AxiosResponse } from 'axios'
 import { SearchInputError } from 'types/error'
 import {
   Comparators,
-  CriteriaDataKey,
   CriteriaType,
   MedicationLabel,
   PMSIResourceTypes,
@@ -35,6 +34,9 @@ import {
 import { ExportTableType } from 'components/Dashboard/ExportModal/export_table'
 import { SearchByTypes } from 'types/searchCriterias'
 import { PMSILabel } from 'types/patient'
+import { CriteriaForm } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
+
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
 export enum JobStatus {
   new = 'new',
@@ -358,28 +360,28 @@ export type TemporalConstraintsType = {
 }
 
 export type CriteriaDrawerComponentProps = {
-  parentId: number | null
-  criteriaData: CriteriaItemDataCache
+  isOpen?: boolean
+  parentId?: number | null
   selectedCriteria: SelectedCriteriaType | null
+  // TODO remove this when we have the new code search component
+  onChangeValue?: (key: string, value: any, hierarchy: Hierarchy<any, any>[]) => void
   onChangeSelectedCriteria: (newCriteria: SelectedCriteriaType) => void
   goBack: () => void
 }
 
-export type CriteriaItemDataCache = {
-  criteriaType: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: { [key in CriteriaDataKey]?: any }
-}
-
 export type CriteriaItemType = {
   id: CriteriaType
+  types?: CriteriaType[]
   title: string
   color: string
   fontWeight?: string
-  components: React.FC<CriteriaDrawerComponentProps> | null
   disabled?: boolean
-  fetch?: { [key in CriteriaDataKey]?: any }
   subItems?: CriteriaItemType[]
+  // here we can't know which type of form data we will have, it could really be anything
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  formDefinition?: CriteriaForm<any>
+  // component will always be prefered to formDefinition for rendering the form
+  component?: React.FC<CriteriaDrawerComponentProps>
 }
 
 export type ResearchType = string | boolean | AbortSignal | undefined
