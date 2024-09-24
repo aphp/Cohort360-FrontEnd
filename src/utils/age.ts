@@ -100,7 +100,7 @@ export const convertStringToDuration = (age: string | null | undefined): Duratio
 
 export const convertDurationToString = (ageDate: DurationType): string | null => {
   if (ageDate.year === null && ageDate.month === null && ageDate.day === null) return null
-  if ((ageDate.year === 130 || ageDate.year === 0) && !ageDate.month && !ageDate.day) return null
+  if (ageDate.year === 0 && !ageDate.month && !ageDate.day) return null
   return `${ageDate.day || 0}/${ageDate.month || 0}/${ageDate.year || 0}`
 }
 
