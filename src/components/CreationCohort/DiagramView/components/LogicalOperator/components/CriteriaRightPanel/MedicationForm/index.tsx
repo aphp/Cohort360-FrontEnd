@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Tabs, Tab } from '@mui/material'
 
-import MedicationForm from './components/Form/MedicationForm'
 import MedicationExploration from './components/Hierarchy/MedicationHierarchy'
 
 import { CriteriaDrawerComponentProps } from 'types'
@@ -11,29 +10,17 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchMedication } from 'state/medication'
 import { EXPLORATION } from '../../../../../../../../constants'
-import { Comparators, MedicationDataType, CriteriaType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
-
-export const defaultMedication: Omit<MedicationDataType, 'id'> = {
-  type: CriteriaType.MEDICATION_REQUEST,
-  title: 'Critère de médicament',
-  code: [],
-  administration: [],
-  occurrence: 1,
-  occurrenceComparator: Comparators.GREATER_OR_EQUAL,
-  startOccurrence: [null, null],
-  endOccurrence: [null, null],
-  encounterEndDate: [null, null],
-  encounterStartDate: [null, null],
-  isInclusive: true,
-  encounterStatus: []
-}
+import { MedicationDataType, form } from '../forms/MedicationForm'
+import { CriteriaType } from 'types/requestCriterias'
+import CriteriaForm from '../CriteriaForm'
+import { fetchValueSet } from 'services/aphp/callApi'
 
 const Index = (props: CriteriaDrawerComponentProps) => {
-  const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [selectedTab, setSelectedTab] = useState<'form' | 'exploration'>(selectedCriteria ? 'form' : 'exploration')
   const [defaultCriteria, setDefaultCriteria] = useState<MedicationDataType>(
-    (selectedCriteria as MedicationDataType) || defaultMedication
+    (selectedCriteria as MedicationDataType) || { ...form().initialData }
   )
 
   const isEdition = selectedCriteria !== null
@@ -50,7 +37,15 @@ const Index = (props: CriteriaDrawerComponentProps) => {
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const _onChangeFormValue = (key: string, value: any, hierarchy: Hierarchy<any, any>[] = medicationHierarchy) =>
-    syncOnChangeFormValue(key, value, hierarchy, setDefaultCriteria, selectedTab, defaultMedication.type, dispatch)
+    syncOnChangeFormValue(
+      key,
+      value,
+      hierarchy,
+      setDefaultCriteria,
+      selectedTab,
+      CriteriaType.MEDICATION_REQUEST,
+      dispatch
+    )
 
   const _initSyncHierarchyTableEffect = async () => {
     await initSyncHierarchyTableEffect(
@@ -58,7 +53,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       selectedCriteria,
       defaultCriteria && defaultCriteria.code ? defaultCriteria.code : [],
       fetchMedication,
-      defaultMedication.type,
+      CriteriaType.MEDICATION_REQUEST,
       dispatch
     )
   }
@@ -78,17 +73,21 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         <Tab label="Formulaire" value="form" />
       </Tabs>
 
-      {
-        <MedicationForm
-          isOpen={selectedTab === 'form'}
-          isEdition={isEdition}
-          criteriaData={criteriaData}
-          selectedCriteria={defaultCriteria}
-          onChangeValue={_onChangeFormValue}
-          onChangeSelectedCriteria={onChangeSelectedCriteria}
+      {selectedTab === 'form' && (
+        <CriteriaForm
+          {...form()}
+          updateData={onChangeSelectedCriteria}
           goBack={goBack}
+          data={defaultCriteria || undefined}
+          searchCode={(code: string, codeSystemUrl: string, abortSignal: AbortSignal) =>
+            fetchValueSet(
+              codeSystemUrl,
+              { valueSetTitle: 'Toute la hiérarchie', search: code, noStar: false },
+              abortSignal
+            )
+          }
         />
-      }
+      )}
       {
         <MedicationExploration
           isOpen={selectedTab === 'exploration'}

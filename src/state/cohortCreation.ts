@@ -484,7 +484,7 @@ const cohortCreationSlice = createSlice({
       state.criteriaGroup = state.criteriaGroup.map((item) => ({ ...item, criteriaIds: [] }))
 
       state.selectedCriteria = state.selectedCriteria
-        .filter(({ id }) => id !== criteriaId)
+        .filter(({ id }) => id !== criteriaId && id !== undefined)
         .map((selectedCriteria, index) => {
           // Get the parent of current criteria
           const parentGroup = criteriaGroupSaved.find((criteriaGroup) =>

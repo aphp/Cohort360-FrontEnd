@@ -222,11 +222,14 @@ export enum DocumentAttachmentMethodLabel {
   INFERENCE_TEMPOREL = 'Inférence temporelle'
 }
 
+// TODO replace this by NewDurationRangeType, this will need the refacto of filters (with a more generic CriteriaForm)
 export type DurationRangeType = [string | null | undefined, string | null | undefined]
 export type LabelObject = {
   id: string
   label: string
   system?: string
+  isLeaf?: boolean
+  type?: string
 }
 export interface OrderBy {
   orderBy: Order
