@@ -45,7 +45,7 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
               }}
               size="small"
               onChange={(e) => {
-                if (!isNaN(+e.target.value) && +e.target.value <= 130) {
+                if (!isNaN(+e.target.value)) {
                   setDuration({
                     ...duration,
                     year: e.target.value !== '' ? Math.floor(Math.abs(+e.target.value)) : 0
