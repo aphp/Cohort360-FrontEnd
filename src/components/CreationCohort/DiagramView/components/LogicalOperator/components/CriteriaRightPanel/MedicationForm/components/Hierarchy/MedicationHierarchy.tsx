@@ -35,10 +35,10 @@ import {
 import useStyles from './styles'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
-import { defaultMedication } from '../../index'
 import { HierarchyTree } from 'types'
-import { MedicationDataType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
+import { MedicationDataType } from '../../../forms/MedicationForm'
+import { CriteriaType } from 'types/requestCriterias'
 
 type MedicationListItemProps = {
   medicationItem: Hierarchy<any, any>
@@ -76,7 +76,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
       medicationCode,
       selectedItems || [],
       medicationHierarchy,
-      defaultMedication.type,
+      CriteriaType.MEDICATION_REQUEST,
       dispatch
     )
     handleClick(selectedItems, newHierarchy)

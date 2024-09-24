@@ -1,17 +1,11 @@
-import { CriteriaType, DemographicDataType } from 'types/requestCriterias'
+import {
+  DemographicDataType,
+  form
+} from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/DemographicForm'
 
 export const defaultPatientCriteria: DemographicDataType = {
   id: 1,
-  error: undefined,
-  type: CriteriaType.PATIENT,
-  encounterService: undefined,
-  isInclusive: true,
-  title: 'Demographic',
-  genders: null,
-  vitalStatus: null,
-  age: [null, null],
-  birthdates: [null, null],
-  deathDates: [null, null]
+  ...form().initialData
 }
 
 export const patientGenderFemaleCriteria: DemographicDataType = {
@@ -63,17 +57,17 @@ export const patientVitalStatusCriteria: DemographicDataType = {
 
 export const patientNominativeAgeCriteria: DemographicDataType = {
   ...defaultPatientCriteria,
-  age: ['12/5/8', '25/7/25']
+  age: { start: '12/5/8', end: '25/7/25' }
 }
 
 export const patientNominativeBirthDatesCriteria: DemographicDataType = {
   ...defaultPatientCriteria,
-  birthdates: ['2020-01-01', '2020-12-31']
+  birthdates: { start: '2020-01-01', end: '2020-12-31' }
 }
 
 export const patientNominativeDeathDatesCriteria: DemographicDataType = {
   ...defaultPatientCriteria,
-  deathDates: ['2020-01-01', '2020-12-31']
+  deathDates: { start: '2020-01-01', end: '2020-12-31' }
 }
 
 export const completePatientCriteria: DemographicDataType = {
@@ -98,7 +92,7 @@ export const completePatientCriteria: DemographicDataType = {
       label: 'alive'
     }
   ],
-  age: ['12/5/8', '25/7/25'],
-  birthdates: ['2020-01-01', '2020-12-31'],
-  deathDates: ['2020-01-01', '2020-12-31']
+  //age: { start: '12/5/8', end: '25/7/25' },
+  birthdates: { start: '2020-01-01', end: '2020-12-31' },
+  deathDates: { start: '2020-01-01', end: '2020-12-31' }
 }

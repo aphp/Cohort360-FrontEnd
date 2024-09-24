@@ -3,7 +3,6 @@ import { Tab, Tabs } from '@mui/material'
 
 import useStyles from './styles'
 
-import CcamForm from './components/Form/CCAMForm'
 import CcamHierarchy from './components/Hierarchy/CCAMHierarchy'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { useAppDispatch, useAppSelector } from 'state'
@@ -11,30 +10,17 @@ import { fetchProcedure } from 'state/pmsi'
 import { EXPLORATION } from '../../../../../../../..//constants'
 
 import { CriteriaDrawerComponentProps } from 'types'
-import { CcamDataType, Comparators, CriteriaType } from 'types/requestCriterias'
+import { CriteriaType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
-
-export const defaultProcedure: Omit<CcamDataType, 'id'> = {
-  type: CriteriaType.PROCEDURE,
-  title: "Critères d'actes CCAM",
-  label: undefined,
-  code: [],
-  source: 'AREM',
-  occurrence: 1,
-  hierarchy: undefined,
-  occurrenceComparator: Comparators.GREATER_OR_EQUAL,
-  startOccurrence: [null, null],
-  isInclusive: true,
-  encounterStartDate: [null, null],
-  encounterEndDate: [null, null],
-  encounterStatus: []
-}
+import { CcamDataType, form } from '../forms/CCAMForm'
+import CriteriaForm from '../CriteriaForm'
+import { fetchValueSet } from 'services/aphp/callApi'
 
 const Index = (props: CriteriaDrawerComponentProps) => {
-  const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
   const [defaultCriteria, setDefaultCriteria] = useState<CcamDataType>(
-    (selectedCriteria as CcamDataType) || defaultProcedure
+    (selectedCriteria as CcamDataType) || { ...form().initialData }
   )
 
   const isEdition = selectedCriteria !== null
@@ -56,7 +42,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       newHierarchy,
       setDefaultCriteria,
       selectedTab,
-      defaultProcedure.type,
+      CriteriaType.PROCEDURE,
       dispatch
     )
   const _initSyncHierarchyTableEffect = async () => {
@@ -65,7 +51,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       selectedCriteria,
       defaultCriteria && defaultCriteria.code ? defaultCriteria.code : [],
       fetchProcedure,
-      defaultProcedure.type,
+      CriteriaType.PROCEDURE,
       dispatch
     )
   }
@@ -85,17 +71,21 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         <Tab label="Formulaire" value="form" />
       </Tabs>
 
-      {
-        <CcamForm
-          isOpen={selectedTab === 'form'}
-          isEdition={isEdition}
-          criteriaData={criteriaData}
-          selectedCriteria={defaultCriteria}
-          onChangeValue={_onChangeFormValue}
-          onChangeSelectedCriteria={onChangeSelectedCriteria}
+      {selectedTab === 'form' && (
+        <CriteriaForm
+          {...form()}
+          updateData={onChangeSelectedCriteria}
           goBack={goBack}
+          data={defaultCriteria || undefined}
+          searchCode={(code: string, codeSystemUrl: string, abortSignal: AbortSignal) =>
+            fetchValueSet(
+              codeSystemUrl,
+              { valueSetTitle: 'Toute la hiérarchie', search: code, noStar: false },
+              abortSignal
+            )
+          }
         />
-      }
+      )}
       {
         <CcamHierarchy
           isOpen={selectedTab === 'hierarchy'}

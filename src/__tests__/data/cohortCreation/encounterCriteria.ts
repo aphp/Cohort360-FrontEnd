@@ -1,43 +1,20 @@
-import { Comparators, CriteriaType, EncounterDataType } from 'types/requestCriterias'
+import {
+  EncounterDataType,
+  form
+} from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/EncounterForm'
+import { Comparators } from 'types/requestCriterias'
 
 export const defaultEncounterCriteira: EncounterDataType = {
   id: 1,
-  type: CriteriaType.ENCOUNTER,
-  isInclusive: true,
-  title: 'Encouter',
-  occurrence: null,
-  occurrenceComparator: null,
-  startOccurrence: [null, null],
-  endOccurrence: [null, null],
-  encounterStartDate: [null, null],
-  includeEncounterStartDateNull: false,
-  encounterEndDate: [null, null],
-  includeEncounterEndDateNull: false,
-  encounterStatus: [],
-  age: [null, null],
-  duration: [null, null],
-  admissionMode: null,
-  entryMode: null,
-  exitMode: null,
-  priseEnChargeType: null,
-  typeDeSejour: null,
-  reason: null,
-  destination: null,
-  provenance: null,
-  admission: null,
-  encounterService: undefined
+  ...form().initialData
 }
 
 export const completeEncounterCriteria: EncounterDataType = {
   ...defaultEncounterCriteira,
-  occurrence: 1,
-  occurrenceComparator: Comparators.GREATER,
-  startOccurrence: [null, null],
-  endOccurrence: [null, null],
-  encounterStartDate: ['2024-09-05', '2024-09-05'],
-  includeEncounterStartDateNull: true,
-  encounterEndDate: ['2024-09-06', '2024-09-07'],
-  includeEncounterEndDateNull: true,
+  occurrence: { value: 1, comparator: Comparators.GREATER },
+  startOccurrence: null,
+  encounterStartDate: { start: '2024-09-05', end: '2024-09-05', includeNull: true },
+  encounterEndDate: { start: '2024-09-06', end: '2024-09-07', includeNull: true },
   encounterStatus: [
     {
       id: 'status1',
@@ -48,8 +25,8 @@ export const completeEncounterCriteria: EncounterDataType = {
       label: 'status2'
     }
   ],
-  age: ['3/2/1', '3/2/1'],
-  duration: ['6/5/4', '6/5/4'],
+  age: { start: '3/2/1', end: '3/2/1' },
+  duration: { start: '6/5/4', end: '6/5/4' },
   admissionMode: [
     {
       id: 'mode1',

@@ -32,10 +32,10 @@ import {
 import useStyles from './styles'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
-import { defaultProcedure } from '../../index'
 import { HierarchyTree } from 'types'
-import { CcamDataType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
+import { CcamDataType } from '../../../forms/CCAMForm'
+import { CriteriaType } from 'types/requestCriterias'
 
 type ProcedureListItemProps = {
   procedureItem: Hierarchy<any, any>
@@ -65,7 +65,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
       procedureCode,
       selectedItems || [],
       procedureHierarchy,
-      defaultProcedure.type,
+      CriteriaType.PROCEDURE,
       dispatch
     )
     handleClick(selectedItems, newHierarchy)

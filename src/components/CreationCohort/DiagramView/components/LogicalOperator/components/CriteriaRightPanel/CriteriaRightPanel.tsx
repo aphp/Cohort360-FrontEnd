@@ -23,12 +23,14 @@ import CribIcon from '@mui/icons-material/Crib'
 import PregnantWomanIcon from '@mui/icons-material/PregnantWoman'
 import DomainAddIcon from '@mui/icons-material/DomainAdd'
 
-import { CriteriaItemDataCache, CriteriaItemType } from 'types'
+import { CriteriaItemType } from 'types'
 import useStyles from './styles'
 import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 import { PhotoCameraFront } from '@mui/icons-material'
 import { CriteriaState } from 'state/criteria'
 import criteriaList from 'components/CreationCohort/DataList_Criteria'
+import CriteriaForm from './CriteriaForm'
+import { fetchValueSet } from 'services/aphp/callApi'
 
 type CriteriaTypesWithIcons = Exclude<
   CriteriaType,
@@ -45,7 +47,7 @@ type CriteriaListItemProps = {
 
 const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
   const { criteriaItem, handleClick } = props
-  const { color, title, components, subItems, disabled, id, fontWeight } = criteriaItem
+  const { color, title, formDefinition, subItems, disabled, id, fontWeight } = criteriaItem
 
   const { classes } = useStyles()
   const [open, setOpen] = useState(true)
@@ -78,7 +80,7 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
 
   const svgIcon = getCriteriaIcon(id as CriteriaTypesWithIcons)
 
-  const pointer = components ? 'pointer' : 'default'
+  const pointer = formDefinition ? 'pointer' : 'default'
 
   const cursor = disabled ? 'not-allowed' : pointer
 
@@ -168,8 +170,6 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
   const { classes } = useStyles()
   const [action, setAction] = useState<CriteriaItemType | null>(null)
 
-  const DrawerComponent = action ? action.components : null
-
   const _onChangeSelectedCriteria = (newSelectedCriteria: SelectedCriteriaType) => {
     const _newSelectedCriteria = {
       ...newSelectedCriteria,
@@ -213,21 +213,39 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
     }
   }, [open]) // eslint-disable-line
 
+  const renderCriteriaForm = (criteriaItem: CriteriaItemType) => {
+    if (criteriaItem.component) {
+      return React.createElement(criteriaItem.component, {
+        parentId,
+        selectedCriteria,
+        onChangeSelectedCriteria: _onChangeSelectedCriteria,
+        goBack: () => setAction(null)
+      })
+    } else if (criteriaItem.formDefinition) {
+      return (
+        <CriteriaForm
+          {...criteriaItem.formDefinition}
+          updateData={_onChangeSelectedCriteria}
+          goBack={() => setAction(null)}
+          data={selectedCriteria ?? undefined}
+          searchCode={(code: string, codeSystemUrl: string, abortSignal: AbortSignal) =>
+            fetchValueSet(
+              codeSystemUrl,
+              { valueSetTitle: 'Toute la hiérarchie', search: code, noStar: false },
+              abortSignal
+            )
+          }
+        />
+      )
+    }
+    return null
+  }
+
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
       <div className={classes.root}>
-        {/* DrawerComponent = action.components */}
-        {DrawerComponent && action ? (
-          <DrawerComponent
-            parentId={parentId}
-            criteriaData={
-              criteria.cache.find((c) => c.criteriaType === action.id) ||
-              ({ criteriaType: action.id, data: {} } as CriteriaItemDataCache)
-            }
-            selectedCriteria={selectedCriteria}
-            onChangeSelectedCriteria={_onChangeSelectedCriteria}
-            goBack={() => setAction(null)}
-          />
+        {action ? (
+          renderCriteriaForm(action)
         ) : (
           <>
             <Grid className={classes.drawerTitleContainer}>

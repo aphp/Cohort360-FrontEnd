@@ -3,42 +3,28 @@ import { Tabs, Tab } from '@mui/material'
 
 import useStyles from './styles'
 
-import BiologyForm from './components/Form/BiologyForm'
 import BiologyHierarchy from './components/Hierarchy/BiologyHierarchy'
 import BiologySearch from './components/BiologySearch/BiologySearch'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchBiology } from 'state/biology'
 import { useAppDispatch, useAppSelector } from 'state'
-import { Comparators, ObservationDataType, CriteriaType } from 'types/requestCriterias'
+import { CriteriaType } from 'types/requestCriterias'
 import { CriteriaDrawerComponentProps } from 'types'
 import { Hierarchy } from 'types/hierarchy'
 import { AppConfig } from 'config'
-
-export const defaultBiology: Omit<ObservationDataType, 'id'> = {
-  type: CriteriaType.OBSERVATION,
-  title: 'Critères de biologie',
-  code: [],
-  isLeaf: false,
-  valueComparator: Comparators.GREATER_OR_EQUAL,
-  searchByValue: [null, null],
-  occurrence: 1,
-  occurrenceComparator: Comparators.GREATER_OR_EQUAL,
-  startOccurrence: [null, null],
-  isInclusive: true,
-  encounterStartDate: [null, null],
-  encounterEndDate: [null, null],
-  encounterStatus: []
-}
+import { ObservationDataType, form } from '../forms/BiologyForm'
+import { fetchValueSet } from 'services/aphp/callApi'
+import CriteriaForm from '../CriteriaForm'
 
 const Index = (props: CriteriaDrawerComponentProps) => {
-  const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const config = useContext(AppConfig)
   const { classes } = useStyles()
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy' | 'search'>(
     selectedCriteria ? 'form' : 'hierarchy'
   )
   const [defaultCriteria, setDefaultCriteria] = useState<ObservationDataType>(
-    (selectedCriteria as ObservationDataType) || defaultBiology
+    (selectedCriteria as ObservationDataType) || { ...form().initialData }
   )
 
   const isEdition = selectedCriteria !== null
@@ -59,7 +45,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       newHierarchy,
       setDefaultCriteria,
       selectedTab,
-      defaultBiology.type,
+      CriteriaType.OBSERVATION,
       dispatch
     )
   const _initSyncHierarchyTableEffect = async () => {
@@ -68,7 +54,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       selectedCriteria,
       defaultCriteria && defaultCriteria.code ? defaultCriteria.code : [],
       fetchBiology,
-      defaultBiology.type,
+      CriteriaType.OBSERVATION,
       dispatch
     )
   }
@@ -88,17 +74,21 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         <Tab label="Formulaire" value="form" />
       </Tabs>
 
-      {
-        <BiologyForm
-          isOpen={selectedTab === 'form'}
-          isEdition={isEdition}
-          criteriaData={criteriaData}
-          selectedCriteria={defaultCriteria}
-          onChangeValue={_onChangeFormValue}
-          onChangeSelectedCriteria={onChangeSelectedCriteria}
+      {selectedTab === 'form' && (
+        <CriteriaForm
+          {...form()}
+          updateData={onChangeSelectedCriteria}
           goBack={goBack}
+          data={defaultCriteria || undefined}
+          searchCode={(code: string, codeSystemUrl: string, abortSignal: AbortSignal) =>
+            fetchValueSet(
+              codeSystemUrl,
+              { valueSetTitle: 'Toute la hiérarchie', search: code, noStar: false },
+              abortSignal
+            )
+          }
         />
-      }
+      )}
       {selectedTab === 'search' && (
         <BiologySearch
           isEdition={isEdition}

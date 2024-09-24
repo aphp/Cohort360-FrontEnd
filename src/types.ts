@@ -25,7 +25,6 @@ import { AxiosResponse } from 'axios'
 import { SearchInputError } from 'types/error'
 import {
   Comparators,
-  CriteriaDataKey,
   CriteriaType,
   MedicationLabel,
   PMSIResourceTypes,
@@ -36,6 +35,9 @@ import { ExportTableType } from 'components/Dashboard/ExportModal/export_table'
 import { Hierarchy } from 'types/hierarchy'
 import { SearchByTypes } from 'types/searchCriterias'
 import { PMSILabel } from 'types/patient'
+import { CriteriaForm } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
+
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
 export enum JobStatus {
   new = 'new',
@@ -359,17 +361,13 @@ export type TemporalConstraintsType = {
 }
 
 export type CriteriaDrawerComponentProps = {
-  parentId: number | null
-  criteriaData: CriteriaItemDataCache
+  isOpen?: boolean
+  parentId?: number | null
   selectedCriteria: SelectedCriteriaType | null
+  // TODO remove this when we have the new code search component
+  onChangeValue?: (key: string, value: any, hierarchy: Hierarchy<any, any>[]) => void
   onChangeSelectedCriteria: (newCriteria: SelectedCriteriaType) => void
   goBack: () => void
-}
-
-export type CriteriaItemDataCache = {
-  criteriaType: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: { [key in CriteriaDataKey]?: any }
 }
 
 export type CriteriaItemType = {
@@ -377,15 +375,14 @@ export type CriteriaItemType = {
   title: string
   color: string
   fontWeight?: string
-  components: React.FC<CriteriaDrawerComponentProps> | null
   disabled?: boolean
-  fetch?: { [key in CriteriaDataKey]?: FetchFunctionVariant }
   subItems?: CriteriaItemType[]
+  // here we can't know which type of form data we will have, it could really be anything
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  formDefinition?: CriteriaForm<any>
+  // component will always be prefered to formDefinition for rendering the form
+  component?: React.FC<CriteriaDrawerComponentProps>
 }
-
-type FetchFunctionVariant =
-  | (() => Promise<SimpleCodeType[]>)
-  | ((searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<Hierarchy<any, any>[]>)
 
 export type ValueSet = {
   code: string
@@ -745,7 +742,7 @@ export type HierarchyTree = null | {
   loading?: number
 }
 
-export type HierarchyElementWithSystem = Hierarchy<any, any> & { system?: string }
+export type HierarchyElementWithSystem = Hierarchy<any, string> & { system?: string }
 
 export type ScopeElement = {
   id: string

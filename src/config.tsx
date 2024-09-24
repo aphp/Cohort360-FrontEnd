@@ -2,9 +2,13 @@ import React, { createContext, ReactNode } from 'react'
 import { Root } from 'react-dom/client'
 import * as R from 'ramda'
 import { CONFIG_URL } from 'constants.js'
+import { DocumentAttachmentMethod, DocumentAttachmentMethodLabel, LabelObject } from 'types/searchCriterias'
+import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
 
 type ValueSetConfig = {
   url: string
+  title?: string
+  data?: LabelObject[]
 }
 
 type AppConfig = {
@@ -70,6 +74,7 @@ type AppConfig = {
       enabled: boolean
       valueSets: {
         imagingModalities: ValueSetConfig
+        documentAttachementMethod: ValueSetConfig
       }
       extensions: {
         imagingStudyUidUrl: string
@@ -101,6 +106,10 @@ type AppConfig = {
         presentationAtDelivery: ValueSetConfig
         risksOrComplicationsOfPregnancy: ValueSetConfig
         risksRelatedToObstetricHistory: ValueSetConfig
+        booleanOpenChoiceFields: ValueSetConfig
+        booleanFields: ValueSetConfig
+        vme: ValueSetConfig
+        birthStatus: ValueSetConfig
       }
     }
     locationMap: {
@@ -220,10 +229,10 @@ let config: AppConfig = {
       enabled: true,
       valueSets: {
         medicationAdministrations: { url: '' },
-        medicationAtc: { url: '' },
+        medicationAtc: { url: '', title: 'ATC' },
         medicationAtcOrbis: { url: '' },
         medicationPrescriptionTypes: { url: '' },
-        medicationUcd: { url: '' }
+        medicationUcd: { url: '', title: 'UCD' }
       }
     },
     condition: {
@@ -254,7 +263,24 @@ let config: AppConfig = {
     imaging: {
       enabled: true,
       valueSets: {
-        imagingModalities: { url: '' }
+        imagingModalities: { url: '' },
+        documentAttachementMethod: {
+          url: 'documentAttachementMethod',
+          data: [
+            {
+              id: DocumentAttachmentMethod.NONE,
+              label: DocumentAttachmentMethodLabel.NONE
+            },
+            {
+              id: DocumentAttachmentMethod.ACCESS_NUMBER,
+              label: DocumentAttachmentMethodLabel.ACCESS_NUMBER
+            },
+            {
+              id: DocumentAttachmentMethod.INFERENCE_TEMPOREL,
+              label: DocumentAttachmentMethodLabel.INFERENCE_TEMPOREL
+            }
+          ]
+        }
       },
       extensions: {
         imagingStudyUidUrl: ''
@@ -284,7 +310,23 @@ let config: AppConfig = {
         pregnancyMode: { url: '' },
         presentationAtDelivery: { url: '' },
         risksOrComplicationsOfPregnancy: { url: '' },
-        risksRelatedToObstetricHistory: { url: '' }
+        risksRelatedToObstetricHistory: { url: '' },
+        booleanOpenChoiceFields: {
+          url: 'booleanOpenChoiceFields',
+          data: booleanOpenChoiceFieldsData
+        },
+        booleanFields: {
+          url: 'booleanFields',
+          data: booleanFieldsData
+        },
+        vme: {
+          url: 'vme',
+          data: vmeData
+        },
+        birthStatus: {
+          url: 'birthStatus',
+          data: birthStatusData
+        }
       }
     },
     locationMap: {

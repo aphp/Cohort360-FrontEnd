@@ -1,0 +1,345 @@
+import { ReactNode } from 'react'
+import { ScopeElement } from 'types'
+import { Hierarchy } from 'types/hierarchy'
+import { Comparators, CriteriaType } from 'types/requestCriterias'
+import { SourceType } from 'types/scope'
+import { LabelObject } from 'types/searchCriterias'
+import { CHIPS_DISPLAY_METHODS } from './mappers/chipDisplayMapper'
+import { BUILD_MAPPERS, UNBUILD_MAPPERS } from './mappers/buildMappers'
+
+/********************************************************************************/
+/*                                  Criteria Types                              */
+/********************************************************************************/
+// When adding a new criteria type you must complete the following steps:
+// 1. **REQUIRED** create a new CriteriaItem type (with required props "type") and then add the new type to the CriteriaItems union type
+// 2. Optionnaly create the new data type definition and add it to the DataType union type
+// 3. **REQUIRED** Update the DataTypeMapping type with the new type mapping
+
+/****************************************************************/
+/*               Criteria Item Definition Types                 */
+/****************************************************************/
+
+export type Context = {
+  deidentified: boolean
+}
+
+type BaseCriteriaItem = {
+  label?: string
+  labelAltStyle?: boolean
+  info?: string
+  // these are used to display external label and info on top of the component
+  extraLabel?: string | ((data: Record<string, DataTypes>, context: Context) => string)
+  extraInfo?: string
+  // for conditionnal fields
+  displayCondition?: ((data: Record<string, DataTypes>, context: Context) => boolean) | string
+  disableCondition?: ((data: Record<string, DataTypes>, context: Context) => boolean) | string
+}
+
+type WithLabel = {
+  label: string
+}
+
+type WithErrorType = {
+  errorType: string
+}
+
+export type TextCriteriaItem = BaseCriteriaItem & {
+  type: 'text'
+}
+
+export type TextWithRegexCriteriaItem = BaseCriteriaItem & {
+  type: 'textWithRegex'
+  regex: string
+  checkErrorMessage?: string
+  placeholder?: string
+  multiline?: boolean
+  inverseCheck?: boolean
+  extractValidValues?: boolean
+}
+
+export type InfoCriteriaItem = BaseCriteriaItem & {
+  type: 'info'
+  content: string
+  contentType: 'info' | 'warning' | 'error'
+}
+
+export type NumberCriteriaItem = BaseCriteriaItem & {
+  type: 'number'
+}
+
+export type BooleanCriteriaItem = BaseCriteriaItem & {
+  type: 'boolean'
+}
+
+export type RadioChoiceCriteriaItem = BaseCriteriaItem & {
+  type: 'radioChoice'
+  choices: LabelObject[]
+}
+
+export type NumberWithComparatorCriteriaItem = BaseCriteriaItem &
+  WithLabel & {
+    type: 'numberAndComparator'
+    withHierarchyInfo?: boolean
+    floatValues?: boolean
+    allowBetween?: boolean
+  }
+
+export type DurationItem = BaseCriteriaItem & {
+  type: 'durationRange'
+}
+
+export type CalendarItem = BaseCriteriaItem &
+  WithErrorType & {
+    type: 'calendarRange'
+    withOptionIncludeNull?: boolean
+  }
+
+export type AutoCompleteItem = BaseCriteriaItem & {
+  type: 'autocomplete'
+  noOptionsText: string
+  singleChoice?: boolean
+  valueSetId: string
+  valueSetData?: LabelObject[]
+  groupBy?: 'system' | 'type'
+}
+
+/**
+ * Code search criteria item
+ */
+export type CodeSearchItem = BaseCriteriaItem & {
+  type: 'codeSearch'
+  noOptionsText: string
+  checkIsLeaf?: boolean
+  /** Ids (urls) of valuesets that are allowed to be used for this code search */
+  valueSetIds: string[]
+}
+
+export type ExecutiveUnitItem = BaseCriteriaItem &
+  WithLabel & {
+    type: 'executiveUnit'
+    sourceType: SourceType
+  }
+
+export type TextWithCheckItem = BaseCriteriaItem &
+  WithErrorType & {
+    type: 'textWithCheck'
+    placeholder: string
+  }
+
+// Union of all criteria item types
+export type CriteriaItems =
+  | CalendarItem
+  | AutoCompleteItem
+  | ExecutiveUnitItem
+  | TextWithCheckItem
+  | BooleanCriteriaItem
+  | TextCriteriaItem
+  | NumberCriteriaItem
+  | CodeSearchItem
+  | NumberWithComparatorCriteriaItem
+  | TextWithRegexCriteriaItem
+  | RadioChoiceCriteriaItem
+  | DurationItem
+  | InfoCriteriaItem
+
+/****************************************************************/
+/*                     Criteria Data Types                      */
+/****************************************************************/
+
+export type NewDurationRangeType = {
+  start: string | null
+  end: string | null
+  includeNull?: boolean
+}
+
+export type NumberAndComparatorDataType = {
+  value: number
+  comparator: Comparators
+  maxValue?: number
+}
+
+// Union of all criteria data types
+export type DataTypes =
+  | NewDurationRangeType
+  | string
+  | LabelObject[]
+  | number
+  | Hierarchy<ScopeElement, string>[]
+  | NumberAndComparatorDataType
+  | boolean
+  | null
+
+/****************************************************************/
+/*                 Type Mapping / Criteria Item type            */
+/****************************************************************/
+
+type CriteriaTypeMapping<T extends CriteriaItems, U extends DataTypes> = {
+  definition: T
+  dataType: U
+}
+
+// Mapping of criteria item types to their respective data types and definitions
+export type DataTypeMapping = {
+  calendarRange: CriteriaTypeMapping<CalendarItem, NewDurationRangeType>
+  durationRange: CriteriaTypeMapping<DurationItem, NewDurationRangeType>
+  text: CriteriaTypeMapping<TextCriteriaItem, string>
+  autocomplete: CriteriaTypeMapping<AutoCompleteItem, LabelObject[]>
+  number: CriteriaTypeMapping<NumberCriteriaItem, number>
+  executiveUnit: CriteriaTypeMapping<ExecutiveUnitItem, Hierarchy<ScopeElement, string>[]>
+  numberAndComparator: CriteriaTypeMapping<NumberWithComparatorCriteriaItem, NumberAndComparatorDataType>
+  boolean: CriteriaTypeMapping<BooleanCriteriaItem, boolean>
+  textWithCheck: CriteriaTypeMapping<TextWithCheckItem, string>
+  codeSearch: CriteriaTypeMapping<CodeSearchItem, LabelObject[]>
+  textWithRegex: CriteriaTypeMapping<TextWithRegexCriteriaItem, string>
+  radioChoice: CriteriaTypeMapping<RadioChoiceCriteriaItem, string>
+  info: CriteriaTypeMapping<InfoCriteriaItem, string>
+}
+
+// List of criteria item types
+export type CriteriaFormItemType = keyof DataTypeMapping
+
+export type DataTypeMappings = DataTypeMapping[CriteriaFormItemType]
+
+/********************************************************************************/
+/*                                  Criteria Form Types                         */
+/********************************************************************************/
+
+/****************************************************************/
+/*                     Criteria Form Data                       */
+/****************************************************************/
+
+/**
+ * Common criteria data for criteria form
+ */
+export type CommonCriteriaData = {
+  /** Criteria id */
+  id: number
+  /** Type of the criteria */
+  type: CriteriaType
+  title: string
+  isInclusive: boolean
+  encounterService: Hierarchy<ScopeElement, string>[] | null
+  error?: boolean
+}
+
+// helpers
+export type WithOccurenceCriteriaDataType = {
+  occurrence: NumberAndComparatorDataType
+  startOccurrence: NewDurationRangeType | null
+}
+
+export type WithEncounterDateDataType = {
+  encounterStartDate: NewDurationRangeType | null
+  encounterEndDate: NewDurationRangeType | null
+}
+
+export type WithEncounterStatusDataType = {
+  encounterStatus: LabelObject[]
+}
+
+/****************************************************************/
+/*                  Criteria Form Definition                    */
+/****************************************************************/
+
+export type BuildMethodExtraParam =
+  | {
+      type: 'string'
+      value: string
+    }
+  | {
+      type: 'number'
+      value: number
+    }
+  | {
+      type: 'boolean'
+      value: boolean
+    }
+  | {
+      type: 'null'
+      value: null
+    }
+  | {
+      type: 'method'
+      value: keyof typeof BUILD_MAPPERS | keyof typeof UNBUILD_MAPPERS | keyof typeof CHIPS_DISPLAY_METHODS
+    }
+  | {
+      type: 'reference'
+      value: string
+    }
+
+export type FhirKey =
+  | string
+  | { id: string; type: string }
+  | { main: string; deid: string }
+  | { main: string; alt: string; value1: BuildMethodExtraParam; value2: BuildMethodExtraParam }
+
+export type CriteriaItemBuildInfo = {
+  buildInfo?: {
+    fhirKey?: FhirKey
+    buildMethod?: keyof typeof BUILD_MAPPERS
+    buildMethodExtraArgs?: Array<BuildMethodExtraParam>
+    unbuildMethod?: keyof typeof UNBUILD_MAPPERS
+    chipDisplayMethod?: keyof typeof CHIPS_DISPLAY_METHODS
+    chipDisplayMethodExtraArgs?: Array<BuildMethodExtraParam>
+  }
+}
+
+export type GenericCriteriaItem = CriteriaItems & CriteriaItemBuildInfo
+
+export type WithBuildInfo<T extends DataTypeMappings> = T extends CriteriaTypeMapping<
+  infer DefinitionType,
+  // Used to be useful for the buildInfo type but not anymore, though didn't find a typing replacement to extract the DefintionType without The DataType
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  infer DataType
+>
+  ? DefinitionType & CriteriaItemBuildInfo
+  : never
+
+/**
+ * Criteria item definition
+ */
+export type CriteriaItem<T, U extends DataTypeMappings> = {
+  /** key of the related value in the data object */
+  valueKey?: keyof T
+} & WithBuildInfo<U>
+
+// Criteria section listing criteria items
+export type CriteriaSection<T> = {
+  title?: string
+  info?: string
+  defaulCollapsed?: boolean
+  items: CriteriaItem<T, DataTypeMappings>[]
+}
+
+// Criteria form definition
+export type CriteriaForm<T> = {
+  label: string
+  warningAlert?: ReactNode[]
+  initialData: Omit<T, 'id'>
+  errorMessages: { [key: string]: string }
+  buildInfo?: {
+    defaultFilter?: string
+    criteriaType: CriteriaType | CriteriaType[]
+    resourceType: string | string[]
+    // should return true if the criteria is to be unbuild for the current fhir filter
+    subType?: string
+  }
+  itemSections: CriteriaSection<T>[]
+}
+
+/****************************************************************/
+/*                     Criteria Item Render                     */
+/****************************************************************/
+
+export type CriteriaFormItemViewProps<T extends CriteriaFormItemType> = {
+  value: DataTypeMapping[T]['dataType']
+  definition: DataTypeMapping[T]['definition']
+  disabled: boolean
+  getValueSetOptions: (valueSetId: string) => LabelObject[]
+  searchCode: (code: string, codeSystemUrl: string, abortSignal: AbortSignal) => Promise<LabelObject[]>
+  updateData: (value: DataTypeMapping[T]['dataType'] | null) => void
+  setError: (error?: string) => void
+  deidentified: boolean
+}
+
+export type CriteriaFormItemView<T extends CriteriaFormItemType> = React.FC<CriteriaFormItemViewProps<T>>

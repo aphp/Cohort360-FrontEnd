@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Tab, Tabs } from '@mui/material'
 
-import Cim10Form from './components/Form/Cim10Form'
 import Cim10Hierarchy from './components/Hierarchy/Cim10Hierarchy'
 
 import useStyles from './styles'
@@ -10,30 +9,17 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition } from 'state/pmsi'
 import { EXPLORATION } from '../../../../../../../../constants'
 import { CriteriaDrawerComponentProps } from 'types'
-import { Cim10DataType, Comparators, CriteriaType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
-
-export const defaultCondition: Omit<Cim10DataType, 'id'> = {
-  type: CriteriaType.CONDITION,
-  title: 'Critère de diagnostic',
-  code: [],
-  source: 'AREM',
-  label: undefined,
-  diagnosticType: [],
-  occurrence: 1,
-  occurrenceComparator: Comparators.GREATER_OR_EQUAL,
-  startOccurrence: [null, null],
-  isInclusive: true,
-  encounterStartDate: [null, null],
-  encounterEndDate: [null, null],
-  encounterStatus: []
-}
+import { Cim10DataType, form } from '../forms/Cim10Form'
+import { CriteriaType } from 'types/requestCriterias'
+import CriteriaForm from '../CriteriaForm'
+import { fetchValueSet } from 'services/aphp/callApi'
 
 const Index = (props: CriteriaDrawerComponentProps) => {
-  const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
   const [defaultCriteria, setDefaultCriteria] = useState<Cim10DataType>(
-    (selectedCriteria as Cim10DataType) || defaultCondition
+    (selectedCriteria as Cim10DataType) || { ...form().initialData }
   )
 
   const isEdition = selectedCriteria !== null
@@ -55,7 +41,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       newHierarchy,
       setDefaultCriteria,
       selectedTab,
-      defaultCondition.type,
+      CriteriaType.CONDITION,
       dispatch
     )
   const _initSyncHierarchyTableEffect = async () => {
@@ -64,7 +50,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       selectedCriteria,
       defaultCriteria && defaultCriteria.code ? defaultCriteria.code : [],
       fetchCondition,
-      defaultCondition.type,
+      CriteriaType.CONDITION,
       dispatch
     )
   }
@@ -84,17 +70,21 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         <Tab label="Formulaire" value="form" />
       </Tabs>
 
-      {
-        <Cim10Form
-          isOpen={selectedTab === 'form'}
-          isEdition={isEdition}
-          criteriaData={criteriaData}
-          selectedCriteria={defaultCriteria}
-          onChangeValue={_onChangeFormValue}
-          onChangeSelectedCriteria={onChangeSelectedCriteria}
+      {selectedTab === 'form' && (
+        <CriteriaForm
+          {...form()}
+          updateData={onChangeSelectedCriteria}
           goBack={goBack}
+          data={defaultCriteria || undefined}
+          searchCode={(code: string, codeSystemUrl: string, abortSignal: AbortSignal) =>
+            fetchValueSet(
+              codeSystemUrl,
+              { valueSetTitle: 'Toute la hiérarchie', search: code, noStar: false },
+              abortSignal
+            )
+          }
         />
-      }
+      )}
       {
         <Cim10Hierarchy
           isOpen={selectedTab === 'hierarchy'}

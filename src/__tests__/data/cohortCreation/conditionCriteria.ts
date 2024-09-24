@@ -1,34 +1,21 @@
-import { Cim10DataType, Comparators, CriteriaType } from 'types/requestCriterias'
+import {
+  Cim10DataType,
+  form
+} from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/Cim10Form'
+import { Comparators } from 'types/requestCriterias'
 
 export const defaultConditionCriteria: Cim10DataType = {
   id: 1,
-  type: CriteriaType.CONDITION,
-  isInclusive: true,
-  title: 'Condition',
-  occurrence: null,
-  occurrenceComparator: null,
-  startOccurrence: [null, null],
-  endOccurrence: [null, null],
-  encounterStartDate: [null, null],
-  includeEncounterStartDateNull: false,
-  encounterEndDate: [null, null],
-  includeEncounterEndDateNull: false,
-  encounterStatus: [],
-  code: [],
-  source: null,
-  diagnosticType: null,
-  label: undefined
+  ...form().initialData,
+  source: null
 }
 
 export const completeConditionCriteria: Cim10DataType = {
   ...defaultConditionCriteria,
-  occurrence: 1,
-  occurrenceComparator: Comparators.GREATER,
-  startOccurrence: [null, null],
-  encounterStartDate: ['2024-09-05', '2024-09-05'],
-  includeEncounterStartDateNull: true,
-  encounterEndDate: ['2024-09-06', '2024-09-07'],
-  includeEncounterEndDateNull: false,
+  occurrence: { value: 1, comparator: Comparators.GREATER },
+  startOccurrence: { start: null, end: null },
+  encounterStartDate: { start: '2024-09-05', end: '2024-09-05', includeNull: true },
+  encounterEndDate: { start: '2024-09-06', end: '2024-09-07' },
   encounterStatus: [{ id: 'finished', label: 'Finished', system: 'http://hl7.org/fhir/CodeSystem/encounter-status' }],
   code: [
     {
