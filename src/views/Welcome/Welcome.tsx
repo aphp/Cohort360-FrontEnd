@@ -24,6 +24,7 @@ import useStyles from './styles'
 import { CohortsType } from 'types/cohorts'
 import { Direction, Order } from 'types/searchCriterias'
 import useCohortList from 'hooks/useCohortList'
+import { infoMessages } from 'data/infoMessage'
 
 const Welcome = () => {
   const { classes, cx } = useStyles()
@@ -133,6 +134,11 @@ const Welcome = () => {
             </Typography>
           </Grid>
           <Grid item>
+            {infoMessages.map((infoMessage) => (
+              <Alert key={'alertMessage' + infoMessage.id} severity={infoMessage.level} className={classes.alert}>
+                {infoMessage.message}
+              </Alert>
+            ))}
             {maintenanceIsActive && (
               <Alert severity="warning" className={classes.alert}>
                 Une maintenance est en cours. Seules les consultations de cohortes, requêtes et données patients sont

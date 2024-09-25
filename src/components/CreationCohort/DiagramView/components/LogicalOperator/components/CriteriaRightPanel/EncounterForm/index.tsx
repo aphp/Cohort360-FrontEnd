@@ -19,9 +19,11 @@ import InfoIcon from '@mui/icons-material/Info'
 import useStyles from './styles'
 import { useAppSelector } from 'state'
 
+import { infoMessages } from 'data/infoMessage'
+
 import { CriteriaDrawerComponentProps, ScopeElement } from 'types'
 import { DurationRangeType, LabelObject } from 'types/searchCriterias'
-import { Comparators, CriteriaDataKey, EncounterDataType, CriteriaType } from 'types/requestCriterias'
+import { Comparators, CriteriaDataKey, EncounterDataType, CriteriaType, ResourceType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import Collapse from 'components/ui/Collapse'
@@ -176,15 +178,15 @@ const EncounterForm = ({
 
       <Grid className={classes.formContainer}>
         {error === Error.NO_ERROR && !multiFields && (
-          <Alert
-            severity="info"
-            onClose={() => {
-              localStorage.setItem('multiple_fields', 'ok')
-              setMultiFields('ok')
-            }}
-          >
-            Tous les éléments des champs multiples sont liés par une contrainte OU
-          </Alert>
+          <Alert severity="info">Tous les éléments des champs multiples sont liés par une contrainte OU</Alert>
+        )}
+        {infoMessages.map(
+          (infoMessage) =>
+            infoMessage.resourceType === ResourceType.ENCOUNTER && (
+              <Alert key={'alertMessage' + infoMessage.id} severity={infoMessage.level}>
+                {infoMessage.message}
+              </Alert>
+            )
         )}
         {error === Error.EMPTY_FORM && (
           <Alert severity="error">Merci de renseigner au moins un nombre d'occurence supérieur ou égal à 1</Alert>
