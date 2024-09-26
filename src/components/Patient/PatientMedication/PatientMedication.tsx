@@ -40,6 +40,8 @@ import services from 'services/aphp'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
+import { useSearchParams } from 'react-router-dom'
+import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
 type PatientMedicationProps = {
   groupId?: string
@@ -55,6 +57,8 @@ type MedicationSearchResults = {
 
 const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   const { classes } = useStyles()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const getPageParam = searchParams.get('page')
   const theme = useTheme()
   const isSm = useMediaQuery(theme.breakpoints.down('md'))
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
@@ -69,7 +73,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   const patient = useAppSelector((state) => state.patient)
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const [selectedTab, setSelectedTab] = useState<
     TabType<ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST, MedicationLabel>
   >({
@@ -135,6 +139,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
+  const isFirstRender = useRef(true)
 
   const _fetchMedication = async () => {
     try {
@@ -163,6 +168,9 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
           signal: controllerRef.current?.signal
         })
       )
+      if (response) {
+        checkIfPageAvailable(searchResults.total, page, setPage, dispatch)
+      }
       if (response.payload.error) {
         throw response.payload.error
       }
@@ -192,9 +200,11 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   }, [])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
-    setPage(1)
-    setOldTabs(selectedTab)
+    if (!isFirstRender.current) {
+      setLoadingStatus(LoadingStatus.IDDLE)
+      setPage(1)
+      setOldTabs(selectedTab)
+    }
   }, [
     searchInput,
     nda,
@@ -210,6 +220,12 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setOldTabs(selectedTab)
+
+    const updatedSearchParams = new URLSearchParams(searchParams)
+    updatedSearchParams.set('page', page.toString())
+    setSearchParams(updatedSearchParams)
+
+    handlePageError(page, setPage, dispatch)
   }, [page])
 
   useEffect(() => {
@@ -221,7 +237,11 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   }, [loadingStatus])
 
   useEffect(() => {
-    setPage(1)
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+    } else {
+      setPage(1)
+    }
     removeSearchCriterias()
     setTriggerClean(!triggerClean)
     setLoadingStatus(LoadingStatus.IDDLE)

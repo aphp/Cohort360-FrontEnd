@@ -137,6 +137,8 @@ const Dashboard: React.FC<{
     return <CohortNoPatient />
   }
 
+  const groupId = context !== 'patients' ? cohortId || perimetreIds : undefined
+
   return (
     <Grid
       container
@@ -202,16 +204,16 @@ const Dashboard: React.FC<{
         )}
         {selectedTab === 'patients' && (
           <PatientList
-            groupId={cohortId || perimetreIds}
+            groupId={groupId}
             total={dashboard.totalPatients || 0}
             deidentified={dashboard.deidentifiedBoolean}
           />
         )}
         {selectedTab === 'documents' && (
-          <Documents groupId={cohortId || perimetreIds} deidentified={dashboard.deidentifiedBoolean ?? false} />
+          <Documents groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />
         )}
         {selectedTab === 'imaging' && (
-          <ImagingList groupId={cohortId || perimetreIds} deidentified={dashboard.deidentifiedBoolean ?? false} />
+          <ImagingList groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />
         )}
       </Grid>
     </Grid>

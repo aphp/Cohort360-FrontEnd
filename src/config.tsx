@@ -111,6 +111,9 @@ type AppConfig = {
     }
   }
   core: {
+    pagination: {
+      limit: number
+    }
     perimeterSourceTypeHierarchy: string[]
     codeSystems: {
       docStatus: string
@@ -163,6 +166,9 @@ let config: AppConfig = {
     exploration: 'Exploration'
   },
   core: {
+    pagination: {
+      limit: 1000
+    },
     perimeterSourceTypeHierarchy: [],
     codeSystems: {
       docStatus: 'http://hl7.org/fhir/CodeSystem/composition-status'

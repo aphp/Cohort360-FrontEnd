@@ -8,6 +8,7 @@ import moment from 'moment'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 
 import AppNavigation from './components/Routes/AppNavigation/AppNavigation'
+import WarningDialog from 'components/ui/WarningDialog'
 
 import { store, persistor } from './state/store'
 
@@ -18,6 +19,7 @@ moment.locale('fr')
 const App = () => (
   <LocalizationProvider dateAdapter={MomentUtils}>
     <Provider store={store}>
+      <WarningDialog />
       <PersistGate loading={null} persistor={persistor}>
         <CssBaseline />
 

@@ -37,11 +37,13 @@ import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import List from 'components/ui/List'
-import { useAppSelector } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import Modal from 'components/ui/Modal'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
+import { useSearchParams } from 'react-router-dom'
+import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
 type DocumentsProps = {
   groupId?: string
@@ -49,6 +51,10 @@ type DocumentsProps = {
 }
 
 const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
+  const dispatch = useAppDispatch()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const getPageParam = searchParams.get('page')
+
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
@@ -72,7 +78,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total: 0, label: 'patient(s)' })
   const [documents, setDocuments] = useState<CohortComposition[]>([])
 
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const [searchInputError, setSearchInputError] = useState<SearchInputError | null>(null)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
@@ -119,6 +125,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   }, [nda, ipp, executiveUnits, onlyPdfAvailable, docStatuses, docTypes, startDate, endDate, encounterStatus])
 
   const controllerRef = useRef<AbortController>(new AbortController())
+  const isFirstRender = useRef(true)
 
   const docStatusesList = [FilterByDocumentStatus.VALIDATED, FilterByDocumentStatus.NOT_VALIDATED]
 
@@ -164,6 +171,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
           total: totalAllPatientDocs
         }))
         setDocuments(documentsList)
+
+        checkIfPageAvailable(totalDocs, page, setPage, dispatch)
       } else {
         setDocuments([])
       }
@@ -196,8 +205,12 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   }, [])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
-    setPage(1)
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+    } else {
+      setLoadingStatus(LoadingStatus.IDDLE)
+      setPage(1)
+    }
   }, [
     nda,
     ipp,
@@ -216,6 +229,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
+    setSearchParams({ page: page.toString() })
+
+    handlePageError(page, setPage, dispatch)
   }, [page])
 
   useEffect(() => {

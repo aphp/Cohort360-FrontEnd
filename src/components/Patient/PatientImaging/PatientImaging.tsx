@@ -35,9 +35,13 @@ import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { AppConfig } from 'config'
+import { useSearchParams } from 'react-router-dom'
+import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
 const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const getPageParam = searchParams.get('page')
 
   const appConfig = useContext(AppConfig)
   const patient = useAppSelector((state) => state.patient)
@@ -58,7 +62,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
     label: 'résultat(s)'
   }
 
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const [
     {
       orderBy,
@@ -89,6 +93,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
+  const isFirstRender = useRef(true)
 
   const _fetchImaging = async () => {
     try {
@@ -107,6 +112,9 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
           signal: controllerRef.current?.signal
         })
       )
+      if (response) {
+        checkIfPageAvailable(searchResults.total, page, setPage, dispatch)
+      }
       if (response.payload.error) {
         throw response.payload.error
       }
@@ -134,12 +142,21 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   }, [])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
-    setPage(1)
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+    } else {
+      setLoadingStatus(LoadingStatus.IDDLE)
+      setPage(1)
+    }
   }, [nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality, encounterStatus])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
+    const updatedSearchParams = new URLSearchParams(searchParams)
+    updatedSearchParams.set('page', page.toString())
+    setSearchParams(updatedSearchParams)
+
+    handlePageError(page, setPage, dispatch)
   }, [page])
 
   useEffect(() => {

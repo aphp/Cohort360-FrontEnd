@@ -23,6 +23,7 @@ import scope from './scope'
 import pmsi from './pmsi'
 import me from './me'
 import syncHierarchyTable from './syncHierarchyTable'
+import warningDialog from './warningDialog'
 
 const cohortCreationReducer = combineReducers({
   criteria,
@@ -44,7 +45,8 @@ const rootReducer = combineReducers({
   biology,
   patient,
   autoLogout,
-  syncHierarchyTable
+  syncHierarchyTable,
+  warningDialog
 })
 
 const persistConfig = {

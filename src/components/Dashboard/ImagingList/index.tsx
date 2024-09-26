@@ -29,12 +29,14 @@ import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
-import { useAppSelector } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import { BlockWrapper } from 'components/ui/Layout'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { AppConfig } from 'config'
+import { useSearchParams } from 'react-router-dom'
+import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
 type ImagingListProps = {
   groupId?: string
@@ -43,6 +45,10 @@ type ImagingListProps = {
 
 const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   const appConfig = useContext(AppConfig)
+  const dispatch = useAppDispatch()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const getPageParam = searchParams.get('page')
+
   const [searchResults, setSearchResults] = useState<ResultsType>({ nb: 0, total: 0, label: 'résultats' })
   const [imagingList, setImagingList] = useState<CohortImaging[]>([])
 
@@ -55,7 +61,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   const [allModalities, setAllModalities] = useState<Hierarchy<any, any>[]>([])
   const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
 
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const [
     {
       orderBy,
@@ -86,6 +92,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
+  const isFirstRender = useRef(true)
 
   const _fetchImaging = async () => {
     try {
@@ -121,6 +128,8 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
           nb: totalImaging,
           total: totalAllImaging
         }))
+
+        checkIfPageAvailable(totalImaging, page, setPage, dispatch)
       }
 
       setLoadingStatus(LoadingStatus.SUCCESS)
@@ -148,12 +157,19 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   }, [])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
-    setPage(1)
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+    } else {
+      setLoadingStatus(LoadingStatus.IDDLE)
+      setPage(1)
+    }
   }, [ipp, nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality, groupId, encounterStatus])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
+    setSearchParams({ page: page.toString() })
+
+    handlePageError(page, setPage, dispatch)
   }, [page])
 
   useEffect(() => {

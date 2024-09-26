@@ -2,7 +2,6 @@ import React, { ReactNode } from 'react'
 
 import {
   Grid,
-  Pagination,
   Paper,
   Table,
   TableBody,
@@ -12,6 +11,7 @@ import {
   TableSortLabel,
   Typography
 } from '@mui/material'
+import { Pagination } from 'components/ui/Pagination'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import useStyles from './styles'
@@ -51,7 +51,7 @@ const DataTable: React.FC<DataTableProps> = ({
     }
   }
   return (
-    <Grid container justifyContent="flex-end">
+    <Grid container justifyContent="flex-end" marginBottom={8}>
       <TableContainer component={Paper}>
         <Table className={classes.table}>
           <TableHead>
@@ -111,13 +111,17 @@ const DataTable: React.FC<DataTableProps> = ({
       </TableContainer>
 
       {props.noPagination !== true && (
-        <Pagination
-          className={classes.pagination}
-          count={Math.ceil((total ?? 0) / (rowsPerPage ?? 20))}
-          shape="circular"
-          onChange={(event, page: number) => setPage && setPage(page)}
-          page={page}
-        />
+        <Grid
+          container
+          justifyContent="center"
+          style={{ position: 'fixed', bottom: 0, right: 0, backgroundColor: '#E6F1FD' }}
+        >
+          <Pagination
+            count={Math.ceil((total ?? 0) / (rowsPerPage ?? 20))}
+            currentPage={page ?? 0}
+            onPageChange={(page: number) => setPage && setPage(page)}
+          />
+        </Grid>
       )}
     </Grid>
   )

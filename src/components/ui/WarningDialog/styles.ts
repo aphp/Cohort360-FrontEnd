@@ -1,12 +1,10 @@
 import { makeStyles } from 'tss-react/mui'
 
 const useStyles = makeStyles()(() => ({
-  dialogContent: {
-    minWidth: 650
-  },
-  loading: {
-    position: 'absolute',
-    left: '50%'
+  warningIcon: {
+    fontSize: 40,
+    color: '#FF9800',
+    margin: 12
   }
 }))
 
