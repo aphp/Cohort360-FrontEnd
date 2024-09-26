@@ -21,9 +21,9 @@ import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import { mappingCriteria } from '../DemographicForm'
 import CriteriaLayout from 'components/ui/CriteriaLayout'
 import { SourceType } from 'types/scope'
-import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import { Hierarchy } from 'types/hierarchy'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
+import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnit'
 
 enum Error {
   EMPTY_FORM,
@@ -174,12 +174,10 @@ const PregnantForm = ({
         />
       </BlockWrapper>
       <BlockWrapper style={{ margin: '0 1em 1em' }}>
-        <ExecutiveUnitsFilter
+        <ExecutiveUnitsInput
           sourceType={SourceType.MATERNITY}
           value={encounterService}
-          name="PregancyForm"
           onChange={setEncounterService}
-          isCriterion
         />
       </BlockWrapper>
       <BlockWrapper style={{ margin: '0 1em 1em' }}>

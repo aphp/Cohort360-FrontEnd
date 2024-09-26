@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment, useRef, SyntheticEvent } from 'react'
+import React, { useEffect, useState, Fragment, useRef, SyntheticEvent, ReactNode } from 'react'
 
 import { Autocomplete, CircularProgress, TextField } from '@mui/material'
 import { cancelPendingRequest } from 'utils/abortController'
@@ -7,7 +7,7 @@ import { useDebounce } from 'utils/debounce'
 
 type AsyncAutocompleteProps = {
   variant?: 'standard' | 'filled' | 'outlined'
-  label?: string
+  label?: ReactNode
   className?: string
   values?: LabelObject[]
   noOptionsText?: string

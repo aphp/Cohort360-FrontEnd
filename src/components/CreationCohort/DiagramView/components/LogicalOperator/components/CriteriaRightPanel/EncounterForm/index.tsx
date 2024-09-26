@@ -30,10 +30,10 @@ import Collapse from 'components/ui/Collapse'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { mappingCriteria } from '../DemographicForm'
-import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
+import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnit'
 
 enum Error {
   EMPTY_FORM,
@@ -228,12 +228,10 @@ const EncounterForm = ({
           </BlockWrapper>
 
           <BlockWrapper className={classes.inputItem}>
-            <ExecutiveUnitsFilter
+            <ExecutiveUnitsInput
               sourceType={SourceType.DOCUMENT}
               value={encounterService}
-              name="DocumentForm"
               onChange={setEncounterService}
-              isCriterion
             />
           </BlockWrapper>
 

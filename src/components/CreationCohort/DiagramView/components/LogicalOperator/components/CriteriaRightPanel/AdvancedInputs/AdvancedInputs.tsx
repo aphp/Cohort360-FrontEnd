@@ -6,7 +6,6 @@ import InfoIcon from '@mui/icons-material/Info'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
-import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { ScopeElement } from 'types'
@@ -17,6 +16,7 @@ import { BlockWrapper } from 'components/ui/Layout'
 import { DurationRangeType } from 'types/searchCriterias'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 import { getOccurenceDateLabel } from 'utils/requestCriterias'
+import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnit'
 
 type AdvancedInputsProps = {
   sourceType: SourceType
@@ -64,12 +64,10 @@ const AdvancedInputs = ({ sourceType, selectedCriteria, onChangeValue, onError }
 
       <Collapse in={checked} unmountOnExit>
         <BlockWrapper style={{ margin: '1em 1em 2em', width: 'calc(100% - 2em)' }}>
-          <ExecutiveUnitsFilter
+          <ExecutiveUnitsInput
             sourceType={sourceType}
             value={selectedCriteria?.encounterService || []}
-            name="AdvancedInputs"
             onChange={_onSubmitExecutiveUnits}
-            isCriterion
           />
         </BlockWrapper>
 

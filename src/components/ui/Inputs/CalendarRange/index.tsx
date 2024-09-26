@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 import { Checkbox, FormControlLabel, Grid } from '@mui/material'
 
 import moment from 'moment'
@@ -8,10 +8,11 @@ import { ErrorMessage } from '../Errors'
 import { ErrorType } from 'types/error'
 import { DurationRangeType } from 'types/searchCriterias'
 import { CalendarLabel } from './styles'
+import { isString } from 'lodash'
 
 interface CalendarRangeProps {
   value: DurationRangeType
-  label?: string
+  label?: ReactNode
   inline?: boolean
   disabled?: boolean
   onChange: (newDuration: DurationRangeType) => void
@@ -52,10 +53,12 @@ const CalendarRange = ({
 
   return (
     <BlockWrapper>
-      {label && (
+      {isString(label) ? (
         <BlockWrapper item xs={12} margin="0px 0px 10px 0px">
           <CalendarLabel variant="h3">{label} :</CalendarLabel>
         </BlockWrapper>
+      ) : (
+        label
       )}
       <Grid item xs={12} container spacing={2}>
         <Grid item xs={12} md={inline ? 6 : 12}>
