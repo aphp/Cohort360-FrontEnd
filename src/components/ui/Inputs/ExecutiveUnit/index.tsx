@@ -42,7 +42,7 @@ const ExecutiveUnitsInput = ({ value, sourceType, disabled = false, onChange, la
 
   useEffect(() => {
     if (onChange) onChange(selectedPopulation)
-  }, [selectedPopulation, onChange])
+  }, [selectedPopulation])
   return (
     <InputWrapper>
       <Grid item container alignContent="center" alignItems={'center'}>
