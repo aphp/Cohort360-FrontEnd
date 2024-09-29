@@ -451,8 +451,10 @@ type fetchProcedureProps = {
   status?: string
   signal?: AbortSignal
   'encounter-identifier'?: string
+  'patient-identifier'?: string
   executiveUnits?: string[]
   encounterStatus?: string[]
+  uniqueFacet?: string[]
 }
 export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Promise_Response<Procedure> => {
   const {
@@ -472,10 +474,12 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   } = args
   const docStatusCodeSystem = getConfig().core.codeSystems.docStatus
   const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
-  let { _list } = args
+  let { _list, uniqueFacet } = args
   const encounterIdentifier = args['encounter-identifier']
+  const patientIdentifier = args['patient-identifier']
 
   _list = _list ? _list.filter(uniq) : []
+  uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
 
   // By default, all the calls to `/Procedure` will have 'patient.active=true' in parameter
   let options: string[] = ['subject.active=true']
@@ -488,13 +492,16 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
   if (status) options = [...options, `status=${encodeURIComponent(`${docStatusCodeSystem}|${status}`)}`]
   if (encounterIdentifier) options = [...options, `${ProcedureParamsKeys.NDA}=${encounterIdentifier}`]
-  if (minDate) options = [...options, `date=ge${minDate}`]
-  if (maxDate) options = [...options, `date=le${maxDate}`]
+  if (patientIdentifier) options = [...options, `${ProcedureParamsKeys.IPP}=${patientIdentifier}`]
+  if (minDate) options = [...options, `${ProcedureParamsKeys.DATE}=ge${minDate}`]
+  if (maxDate) options = [...options, `${ProcedureParamsKeys.DATE}=le${maxDate}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `${ProcedureParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${ProcedureParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
+  if (uniqueFacet && uniqueFacet.length > 0)
+    options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer, '')}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Procedure>>(`/Procedure?${options.reduce(paramsReducer)}`, {
     signal: args.signal
@@ -518,11 +525,12 @@ type fetchClaimProps = {
   minCreated?: string
   maxCreated?: string
   _text?: string
-  status?: string
   'encounter-identifier'?: string
+  'patient-identifier'?: string
   signal?: AbortSignal
   executiveUnits?: string[]
   encounterStatus?: string[]
+  uniqueFacet?: string[]
 }
 export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Response<Claim> => {
   const {
@@ -533,17 +541,18 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
     patient,
     diagnosis,
     _text,
-    status,
     minCreated,
     maxCreated,
     executiveUnits,
     encounterStatus
   } = args
   const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
-  let { _list } = args
+  let { _list, uniqueFacet } = args
   const encounterIdentifier = args['encounter-identifier']
+  const patientIdentifier = args['patient-identifier']
 
   _list = _list ? _list.filter(uniq) : []
+  uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
 
   // By default, all the calls to `/Claim` will have 'patient.active=true' in parameter
   let options: string[] = ['patient.active=true']
@@ -553,17 +562,16 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
   if (diagnosis) options = [...options, `${ClaimParamsKeys.CODE}=${diagnosis}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`] // eslint-disable-line
-  if (status)
-    options = [
-      ...options,
-      `status=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-ghm-cost-status|') + status}`
-    ]
   if (encounterIdentifier) options = [...options, `${ClaimParamsKeys.NDA}=${encounterIdentifier}`]
+  if (patientIdentifier) options = [...options, `${ClaimParamsKeys.IPP}=${patientIdentifier}`]
   if (minCreated) options = [...options, `${ClaimParamsKeys.DATE}=ge${minCreated}`]
   if (maxCreated) options = [...options, `${ClaimParamsKeys.DATE}=le${maxCreated}`]
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `${ClaimParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
-  if (encounterStatus && encounterStatus.length > 0) options = [...options, `encounter.status=${encounterStatus}`]
+  if (encounterStatus && encounterStatus.length > 0)
+    options = [...options, `${ClaimParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
+  if (uniqueFacet && uniqueFacet.length > 0)
+    options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer, '')}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`]
 
@@ -593,19 +601,23 @@ type fetchConditionProps = {
   'min-recorded-date'?: string
   'max-recorded-date'?: string
   'encounter-identifier'?: string
+  'patient-identifier'?: string
   signal?: AbortSignal
   executiveUnits?: string[]
   encounterStatus?: string[]
+  uniqueFacet?: string[]
 }
 export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Promise_Response<Condition> => {
   const { size, offset, _sort, sortDirection, subject, code, source, _text, executiveUnits, encounterStatus } = args
   const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
-  let { _list, type } = args
+  let { _list, type, uniqueFacet } = args
   const encounterIdentifier = args['encounter-identifier']
+  const patientIdentifier = args['patient-identifier']
   const minRecordedDate = args['min-recorded-date']
   const maxRecordedDate = args['max-recorded-date']
 
   _list = _list ? _list.filter(uniq) : []
+  uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   type = type ? type.filter(uniq) : []
 
   // By default, all the calls to `/Condition` will have 'patient.active=true' in parameter
@@ -618,18 +630,21 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   if (source) options = [...options, `${ConditionParamsKeys.SOURCE}=${source}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`] // eslint-disable-line
   if (encounterIdentifier) options = [...options, `${ConditionParamsKeys.NDA}=${encounterIdentifier}`] // eslint-disable-line
+  if (patientIdentifier) options = [...options, `${ConditionParamsKeys.IPP}=${patientIdentifier}`]
   if (minRecordedDate) options = [...options, `${ConditionParamsKeys.DATE}=ge${minRecordedDate}`] // eslint-disable-line
   if (maxRecordedDate) options = [...options, `${ConditionParamsKeys.DATE}=le${maxRecordedDate}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `${ConditionParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${ConditionParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
+  if (uniqueFacet && uniqueFacet.length > 0)
+    options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer, '')}`]
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
   if (type && type.length > 0) {
     const diagnosticTypesUrl = `${getConfig().features.condition.valueSets.conditionStatus.url}|`
     const urlString = type.map((id) => diagnosticTypesUrl + id).join(',')
-    options = [...options, `orbis-status=${encodeURIComponent(urlString)}`]
+    options = [...options, `${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${encodeURIComponent(urlString)}`]
   }
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Condition>>(`/Condition?${options.reduce(paramsReducer)}`, {

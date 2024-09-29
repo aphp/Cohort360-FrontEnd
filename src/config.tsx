@@ -221,7 +221,9 @@ let config: AppConfig = {
         conditionHierarchy: { url: '' },
         conditionStatus: { url: '' }
       },
-      extensions: {}
+      extensions: {
+        orbisStatus: ''
+      }
     },
     procedure: {
       enabled: true,

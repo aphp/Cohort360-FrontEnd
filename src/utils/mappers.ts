@@ -1,4 +1,4 @@
-import { CriteriaName, ScopeElement, SimpleCodeType } from 'types'
+import { ScopeElement, SimpleCodeType } from 'types'
 import { DocumentAttachmentMethod, DurationRangeType, LabelObject } from 'types/searchCriterias'
 import {
   convertDurationToString,
@@ -31,16 +31,6 @@ const comparator = /(le|ge)/gi
 
 const replaceTime = (date?: string) => {
   return date?.replace('T00:00:00Z', '') ?? null
-}
-
-export const mapToCriteriaName = (criteria: string): CriteriaName => {
-  const mapping: { [key: string]: CriteriaName } = {
-    diagnostic: CriteriaName.Cim10,
-    ghm: CriteriaName.Ghm,
-    ccam: CriteriaName.Ccam
-  }
-  if (criteria in mapping) return mapping[criteria]
-  throw new Error(`Unknown criteria ${criteria}`)
 }
 
 export const buildLabelObjectFilter = (

@@ -51,8 +51,8 @@ import {
   SearchCriterias
 } from 'types/searchCriterias'
 import { isCustomError } from 'utils/perimeters'
-import { ResourceType } from 'types/requestCriterias'
-import { mapToAttribute } from 'mappers/pmsi'
+import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
+import { mapToAttribute, mapToUrlCode } from 'mappers/pmsi'
 import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
 
@@ -94,8 +94,8 @@ export type PatientState = null | {
  */
 type FetchPmsiParams = {
   options: {
-    selectedTab: ResourceType.CLAIM | ResourceType.PROCEDURE | ResourceType.CONDITION
-    oldTab: ResourceType.CLAIM | ResourceType.PROCEDURE | ResourceType.CONDITION | null
+    selectedTab: PMSIResourceTypes
+    oldTab: PMSIResourceTypes | null
     page: number
     searchCriterias: SearchCriterias<PMSIFilters>
   }
@@ -127,12 +127,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const sortDirection = options.searchCriterias.orderBy.orderDirection
       const page = options.page ?? 1
       const searchInput = options.searchCriterias.searchInput === '' ? '' : options.searchCriterias.searchInput
-      const codeUrl =
-        selectedTab === ResourceType.CLAIM
-          ? getConfig().features.claim.valueSets.claimHierarchy.url
-          : selectedTab === ResourceType.PROCEDURE
-          ? getConfig().features.procedure.valueSets.procedureHierarchy.url
-          : getConfig().features.condition.valueSets.conditionHierarchy.url
+      const codeUrl = mapToUrlCode(selectedTab)
       const code = options.searchCriterias.filters.code.map((e) => encodeURIComponent(`${codeUrl}|`) + e.id).join(',')
       const source = options.searchCriterias.filters.source ?? ''
       const diagnosticTypes = options.searchCriterias.filters.diagnosticTypes?.map((type) => type.id) ?? []

@@ -1,29 +1,32 @@
 import React, { useContext } from 'react'
+import { Claim, Condition, Procedure } from 'fhir/r4'
+import { AppConfig } from 'config'
 
-import { CircularProgress, Grid, Typography, TableRow } from '@mui/material'
+import { CircularProgress, Grid, Typography, TableRow, IconButton } from '@mui/material'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
-
 import DataTable from 'components/DataTable/DataTable'
+import SearchIcon from 'assets/icones/search.svg?react'
 
-import { Column, PMSIEntry } from 'types'
+import { CohortPMSI, Column, PMSIEntry } from 'types'
+import { Order, OrderBy } from 'types/searchCriterias'
+import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
+import { getExtension } from 'utils/fhir'
 
 import useStyles from './styles'
-import { Claim, Condition, Procedure } from 'fhir/r4'
-import { Order, OrderBy } from 'types/searchCriterias'
-import { ResourceType } from 'types/requestCriterias'
-import { getExtension } from 'utils/fhir'
-import { AppConfig } from 'config'
+import { mapToDate, mapToLabelSingular } from 'mappers/pmsi'
 
 type DataTablePmsiProps = {
   loading: boolean
   deidentified: boolean
-  selectedTab: ResourceType.CONDITION | ResourceType.PROCEDURE | ResourceType.CLAIM
+  selectedTab: PMSIResourceTypes
   pmsiList: PMSIEntry<Procedure | Condition | Claim>[]
   orderBy: OrderBy
   setOrderBy?: (order: OrderBy) => void
   page?: number
   setPage?: (page: number) => void
   total?: number
+  showIpp?: boolean
+  groupId?: string
 }
 const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
   loading,
@@ -34,12 +37,15 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
   setOrderBy,
   page,
   setPage,
-  total
+  total,
+  showIpp,
+  groupId
 }) => {
   const { classes } = useStyles()
 
   const columns = [
-    { label: `NDA${deidentified ? ' chiffré' : ''}`, align: 'left' },
+    ...(showIpp ? [{ label: `IPP${deidentified ? ' chiffré' : ''}`, align: 'left' }] : []),
+    { label: `NDA${deidentified ? ' chiffré' : ''}`, align: showIpp ? 'center' : 'left' },
     { label: 'Codage le', code: Order.DATE },
     { label: 'source' },
     { label: 'Code', code: Order.CODE },
@@ -53,28 +59,30 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
       {!loading && pmsiList?.length > 0 && (
         <>
           {pmsiList.map((pmsi) => {
-            return <DataTablePmsiLine key={pmsi.id} pmsi={pmsi} selectedTab={selectedTab} />
+            return (
+              <DataTablePmsiLine
+                key={pmsi.id}
+                pmsi={pmsi}
+                selectedTab={selectedTab}
+                showIpp={showIpp}
+                groupId={groupId}
+              />
+            )
           })}
         </>
       )}
       {!loading && pmsiList?.length < 1 && (
         <TableRow className={classes.emptyTableRow}>
-          <TableCellWrapper colSpan={selectedTab === ResourceType.CONDITION ? 7 : 6} align="left">
+          <TableCellWrapper colSpan={columns.length} align="left">
             <Grid container justifyContent="center">
-              <Typography variant="button">{`Aucun ${
-                selectedTab !== ResourceType.CONDITION
-                  ? selectedTab !== ResourceType.PROCEDURE
-                    ? 'GHM'
-                    : 'acte'
-                  : 'diagnostic'
-              } à afficher`}</Typography>
+              <Typography variant="button">{`Aucun ${mapToLabelSingular(selectedTab)}  à afficher`}</Typography>
             </Grid>
           </TableCellWrapper>
         </TableRow>
       )}
       {loading && (
         <TableRow className={classes.emptyTableRow}>
-          <TableCellWrapper colSpan={selectedTab === ResourceType.CONDITION ? 7 : 6} align="left">
+          <TableCellWrapper colSpan={columns.length} align="left">
             <Grid container justifyContent="center">
               <CircularProgress />
             </Grid>
@@ -86,21 +94,17 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
 }
 
 const DataTablePmsiLine: React.FC<{
-  pmsi: PMSIEntry<Procedure | Condition | Claim>
-  selectedTab: ResourceType.CONDITION | ResourceType.PROCEDURE | ResourceType.CLAIM
-}> = ({ pmsi, selectedTab }) => {
+  pmsi: CohortPMSI
+  selectedTab: PMSIResourceTypes
+  showIpp?: boolean
+  groupId?: string
+}> = ({ pmsi, selectedTab, showIpp, groupId }) => {
   const { classes } = useStyles()
   const appConfig = useContext(AppConfig)
 
+  const ipp = pmsi.IPP
   const nda = pmsi.NDA
-  const date =
-    pmsi.resourceType === ResourceType.CONDITION && pmsi.recordedDate
-      ? new Date(pmsi.recordedDate).toLocaleDateString('fr-FR') ?? 'Date inconnue'
-      : pmsi.resourceType === ResourceType.CLAIM && pmsi.created
-      ? new Date(pmsi.created).toLocaleDateString('fr-FR') ?? 'Date inconnue'
-      : pmsi.resourceType === ResourceType.PROCEDURE && pmsi.performedDateTime
-      ? new Date(pmsi.performedDateTime).toLocaleDateString('fr-FR') ?? 'Date inconnue'
-      : 'Date inconnue'
+  const date = mapToDate(selectedTab, pmsi)
 
   const filterCode = pmsi.resourceType === ResourceType.CLAIM ? pmsi.diagnosis?.[0]?.packageCode : pmsi.code
 
@@ -112,12 +116,25 @@ const DataTablePmsiLine: React.FC<{
     getExtension(
       pmsi,
       appConfig.features.condition.extensions.orbisStatus
-    )?.valueCodeableConcept?.coding?.[0].code?.toUpperCase() || '-'
+    )?.valueCodeableConcept?.coding?.[0].code?.toUpperCase() ?? '-'
   const serviceProvider = pmsi.serviceProvider ?? 'Non renseigné'
+
+  const groupIdSearch = groupId ? `?groupId=${groupId}` : ''
 
   return (
     <TableRow className={classes.tableBodyRows} key={pmsi.id}>
-      <TableCellWrapper align="left">{nda ?? 'Inconnu'}</TableCellWrapper>
+      {showIpp && (
+        <TableCellWrapper style={{ minWidth: 150 }}>
+          {ipp}
+          <IconButton
+            onClick={() => window.open(`/patients/${pmsi.idPatient}${groupIdSearch}`, '_blank')}
+            className={classes.searchIcon}
+          >
+            <SearchIcon height="15px" fill="#ED6D91" className={classes.iconMargin} />
+          </IconButton>
+        </TableCellWrapper>
+      )}
+      <TableCellWrapper align={showIpp ? 'center' : 'left'}>{nda ?? 'Inconnu'}</TableCellWrapper>
       <TableCellWrapper>{date}</TableCellWrapper>
       <TableCellWrapper>
         <Typography className={classes.libelle}>{source}</Typography>

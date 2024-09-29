@@ -24,6 +24,8 @@ export enum ResourceType {
   QUESTIONNAIRE_RESPONSE = 'QuestionnaireResponse'
 }
 
+export type PMSIResourceTypes = ResourceType.CONDITION | ResourceType.PROCEDURE | ResourceType.CLAIM
+
 export enum CriteriaType {
   REQUEST = 'Request',
   IPP_LIST = 'IPPList',

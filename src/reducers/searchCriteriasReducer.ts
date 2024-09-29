@@ -71,6 +71,7 @@ export const initPmsiSearchCriterias: SearchCriterias<PMSIFilters> = {
   filters: {
     code: [],
     nda: '',
+    ipp: '',
     source: '',
     diagnosticTypes: [],
     startDate: null,

@@ -11,7 +11,10 @@ import {
   CohortImaging,
   CohortComposition,
   Export,
-  ExportCSVTable
+  ExportCSVTable,
+  PmsiData,
+  FHIR_Bundle_Response,
+  CohortPMSI
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -30,11 +33,23 @@ import {
   fetchCheckDocumentSearchInput,
   fetchCohortInfo,
   fetchCohortAccesses,
-  fetchImaging
+  fetchImaging,
+  fetchCondition,
+  fetchProcedure,
+  fetchClaim
 } from './callApi'
 
 import apiBackend from '../apiBackend'
-import { Binary, DocumentReference, ImagingStudy, ParametersParameter, Patient } from 'fhir/r4'
+import {
+  Binary,
+  Claim,
+  Condition,
+  DocumentReference,
+  ImagingStudy,
+  ParametersParameter,
+  Patient,
+  Procedure
+} from 'fhir/r4'
 import { AxiosError, AxiosResponse, CanceledError, isAxiosError } from 'axios'
 import {
   VitalStatus,
@@ -42,13 +57,16 @@ import {
   PatientsFilters,
   DocumentsFilters,
   SearchByTypes,
-  ImagingFilters
+  ImagingFilters,
+  PMSIFilters
 } from 'types/searchCriterias'
 import services from '.'
 import { ErrorDetails, SearchInputError } from 'types/error'
 import { getResourceInfos } from 'utils/fillElement'
 import { substructAgeString } from 'utils/age'
 import { getExtension } from 'utils/fhir'
+import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
+import { mapToOrderByCode, mapToUrlCode } from 'mappers/pmsi'
 
 export interface IServiceCohorts {
   /**
@@ -157,6 +175,20 @@ export interface IServiceCohorts {
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<ImagingData>
+
+  /**
+   * Retourne la liste d'objets PMSI liés à une cohorte
+   */
+  fetchPMSIList: (
+    options: {
+      selectedTab: PMSIResourceTypes
+      deidentified: boolean
+      page: number
+      searchCriterias: SearchCriterias<PMSIFilters>
+    },
+    groupId?: string,
+    signal?: AbortSignal
+  ) => Promise<PmsiData>
 
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
@@ -384,6 +416,131 @@ const servicesCohorts: IServiceCohorts = {
       console.error(error)
       if (error instanceof CanceledError) {
         throw error
+      }
+    }
+  },
+
+  fetchPMSIList: async (options, groupId, signal) => {
+    const {
+      selectedTab,
+      deidentified,
+      page,
+      searchCriterias: {
+        orderBy,
+        searchInput,
+        filters: { ipp, nda, startDate, endDate, executiveUnits, encounterStatus, diagnosticTypes, code, source }
+      }
+    } = options
+    try {
+      const fetchers = {
+        [ResourceType.CONDITION]: fetchCondition,
+        [ResourceType.PROCEDURE]: fetchProcedure,
+        [ResourceType.CLAIM]: fetchClaim
+      }
+
+      const commonFilters = () => ({
+        _list: groupId ? [groupId] : [],
+        size: 20,
+        offset: page ? (page - 1) * 20 : 0,
+        _sort: mapToOrderByCode(orderBy.orderBy, selectedTab),
+        sortDirection: orderBy.orderDirection,
+        _text: searchInput === '' ? '' : searchInput,
+        'encounter-identifier': nda,
+        'patient-identifier': ipp,
+        signal: signal,
+        executiveUnits: executiveUnits.map((unit) => unit.id),
+        encounterStatus: encounterStatus.map(({ id }) => id)
+      })
+
+      // Filtres spécifiques par ressource
+      const filtersMapper = {
+        [ResourceType.CONDITION]: () => ({
+          ...commonFilters(),
+          code: code.map((e) => encodeURIComponent(`${mapToUrlCode(selectedTab)}|`) + e.id).join(','),
+          source: source,
+          type: diagnosticTypes?.map((type) => type.id),
+          'min-recorded-date': startDate ?? '',
+          'max-recorded-date': endDate ?? '',
+          uniqueFacet: ['subject']
+        }),
+        [ResourceType.PROCEDURE]: () => ({
+          ...commonFilters(),
+          code: code.map((e) => encodeURIComponent(`${mapToUrlCode(selectedTab)}|`) + e.id).join(','),
+          source: source,
+          minDate: startDate ?? '',
+          maxDate: endDate ?? '',
+          uniqueFacet: ['subject']
+        }),
+        [ResourceType.CLAIM]: () => ({
+          ...commonFilters(),
+          diagnosis: code.map((e) => encodeURIComponent(`${mapToUrlCode(selectedTab)}|`) + e.id).join(','),
+          minCreated: startDate ?? '',
+          maxCreated: endDate ?? '',
+          uniqueFacet: ['patient']
+        })
+      }
+
+      const fetcher = fetchers[selectedTab]
+      const filters = filtersMapper[selectedTab]()
+
+      const atLeastAFilter =
+        !!searchInput ||
+        !!ipp ||
+        !!nda ||
+        !!startDate ||
+        !!endDate ||
+        executiveUnits.length > 0 ||
+        encounterStatus.length > 0 ||
+        (diagnosticTypes && diagnosticTypes.length > 0) ||
+        code.length > 0 ||
+        !!source
+
+      const [pmsiList, allPMSIList] = await Promise.all([
+        fetcher(filters),
+        atLeastAFilter
+          ? fetcher({
+              size: 0,
+              signal: signal,
+              _list: groupId ? [groupId] : [],
+              uniqueFacet: [selectedTab === ResourceType.CLAIM ? 'patient' : 'subject']
+            })
+          : null
+      ])
+
+      const _pmsiList =
+        getApiResponseResources(pmsiList as AxiosResponse<FHIR_Bundle_Response<Condition | Procedure | Claim>, any>) ??
+        []
+      const filledPmsiList = await getResourceInfos(_pmsiList, deidentified, groupId, signal)
+
+      const totalPMSI = pmsiList?.data?.resourceType === 'Bundle' ? pmsiList.data.total : 0
+      const totalAllPMSI =
+        allPMSIList?.data?.resourceType === 'Bundle' ? allPMSIList.data?.total ?? totalPMSI : totalPMSI
+
+      const uniquePatientFacet = selectedTab === ResourceType.CLAIM ? 'unique-patient' : 'unique-subject'
+      const totalPatientPMSI =
+        pmsiList?.data?.resourceType === 'Bundle'
+          ? (getExtension(pmsiList?.data?.meta, uniquePatientFacet) || { valueDecimal: 0 }).valueDecimal
+          : 0
+      const totalAllPatientsPMSI =
+        allPMSIList !== null
+          ? (getExtension(allPMSIList?.data?.meta, uniquePatientFacet) || { valueDecimal: 0 }).valueDecimal
+          : totalPatientPMSI
+
+      return {
+        totalPMSI: totalPMSI ?? 0,
+        totalAllPMSI: totalAllPMSI ?? 0,
+        totalPatientPMSI: totalPatientPMSI ?? 0,
+        totalAllPatientsPMSI: totalAllPatientsPMSI ?? 0,
+        pmsiList: filledPmsiList as CohortPMSI[]
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération de la liste PMSI :', error)
+      return {
+        totalPMSI: 0,
+        totalAllPMSI: 0,
+        totalPatientPMSI: 0,
+        totalAllPatientsPMSI: 0,
+        pmsiList: []
       }
     }
   },

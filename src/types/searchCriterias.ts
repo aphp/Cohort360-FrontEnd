@@ -227,6 +227,7 @@ export type PMSIFilters = GenericFilter & {
   diagnosticTypes?: LabelObject[]
   code: LabelObject[]
   source?: string
+  ipp?: string
 }
 
 export type MedicationFilters = GenericFilter & {
