@@ -289,6 +289,8 @@ export type DocumentsData = {
 export type ImagingData = {
   totalImaging: number
   totalAllImaging: number
+  totalPatientImaging: number
+  totalAllPatientImaging: number
   imagingList: CohortImaging[]
 }
 

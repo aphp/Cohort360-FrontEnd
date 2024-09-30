@@ -822,13 +822,15 @@ const servicesCohorts: IServiceCohorts = {
           signal,
           modalities: modality.map(({ id }) => id),
           executiveUnits: executiveUnits.map((unit) => unit.id),
-          encounterStatus: encounterStatus.map(({ id }) => id)
+          encounterStatus: encounterStatus.map(({ id }) => id),
+          uniqueFacet: ['subject']
         }),
         !!searchInput || !!ipp || !!nda || !!startDate || !!endDate || executiveUnits.length > 0 || modality.length > 0
           ? fetchImaging({
               size: 0,
               _list: groupId ? [groupId] : [],
-              signal: signal
+              signal: signal,
+              uniqueFacet: ['subject']
             })
           : null
       ])
@@ -843,14 +845,22 @@ const servicesCohorts: IServiceCohorts = {
 
       const totalImaging = imagingResponse.data?.resourceType === 'Bundle' ? imagingResponse.data?.total : 0
       const totalAllImaging =
+        allImagingResponse?.data?.resourceType === 'Bundle' ? allImagingResponse.data.total : totalImaging
+
+      const totalPatientImaging =
+        imagingResponse.data?.resourceType === 'Bundle'
+          ? (getExtension(imagingResponse?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
+          : 0
+      const totalAllPatientsImaging =
         allImagingResponse !== null
-          ? allImagingResponse.data?.resourceType === 'Bundle'
-            ? allImagingResponse.data.total
-            : totalImaging
-          : totalImaging
+          ? (getExtension(allImagingResponse?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
+          : totalPatientImaging
+
       return {
         totalImaging: totalImaging ?? 0,
         totalAllImaging: totalAllImaging ?? 0,
+        totalPatientImaging: totalPatientImaging ?? 0,
+        totalAllPatientImaging: totalAllPatientsImaging ?? 0,
         imagingList: completeImagingList ?? []
       }
     } catch (error) {
@@ -858,6 +868,8 @@ const servicesCohorts: IServiceCohorts = {
       return {
         totalImaging: 0,
         totalAllImaging: 0,
+        totalPatientImaging: 0,
+        totalAllPatientImaging: 0,
         imagingList: []
       }
     }
