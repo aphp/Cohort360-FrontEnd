@@ -246,6 +246,7 @@ export type BiologyFilters = GenericFilter & {
   loinc: LabelObject[]
   anabio: LabelObject[]
   validatedStatus: boolean
+  ipp?: string
 }
 
 export type ImagingFilters = GenericFilter & {

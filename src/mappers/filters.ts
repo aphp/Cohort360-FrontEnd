@@ -132,7 +132,8 @@ export enum ObservationParamsKeys {
   DATE = 'date',
   VALUE = 'value-quantity',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status'
+  ENCOUNTER_STATUS = 'encounter.status',
+  IPP = 'subject.identifier'
 }
 
 export enum ImagingParamsKeys {

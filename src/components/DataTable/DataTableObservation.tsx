@@ -1,6 +1,8 @@
 import React, { useContext } from 'react'
 
-import { CircularProgress, Grid, Typography, TableRow } from '@mui/material'
+import { CircularProgress, Grid, Typography, TableRow, IconButton } from '@mui/material'
+import SearchIcon from 'assets/icones/search.svg?react'
+
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import DataTable from 'components/DataTable/DataTable'
@@ -20,6 +22,8 @@ type DataTableObservationProps = {
   page?: number
   setPage?: (page: number) => void
   total?: number
+  showIpp?: boolean
+  groupId?: string
 }
 const DataTableObservation: React.FC<DataTableObservationProps> = ({
   loading,
@@ -29,32 +33,40 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
   setOrderBy,
   page,
   setPage,
-  total
+  total,
+  showIpp,
+  groupId
 }) => {
   const { classes } = useStyles()
 
   const columns: Column[] = [
-    { label: `NDA${deidentified ? ' chiffré' : ''}`, align: 'left' },
+    ...(showIpp ? [{ label: `IPP${deidentified ? ' chiffré' : ''}`, align: 'left' }] : []),
+    { label: `NDA${deidentified ? ' chiffré' : ''}`, align: showIpp ? 'center' : 'left' },
     { label: 'Date de prélèvement', code: Order.DATE },
     { label: 'ANABIO', code: Order.ANABIO },
     { label: 'LOINC', code: Order.LOINC },
     { label: 'Résultat' },
     { label: 'Valeurs de référence' },
     { label: 'Unité exécutrice' }
-  ]
+  ].filter((elem) => elem !== null) as Column[]
 
   return (
     <DataTable columns={columns} order={orderBy} setOrder={setOrderBy} page={page} setPage={setPage} total={total}>
       {!loading && observationsList?.length > 0 && (
         <>
           {observationsList.map((observation) => (
-            <DataTableObservationLine key={observation.id} observation={observation} />
+            <DataTableObservationLine
+              key={observation.id}
+              observation={observation}
+              showIpp={showIpp}
+              groupId={groupId}
+            />
           ))}
         </>
       )}
       {!loading && observationsList?.length < 1 && (
         <TableRow className={classes.emptyTableRow}>
-          <TableCellWrapper colSpan={7} align="left">
+          <TableCellWrapper colSpan={columns.length} align="left">
             <Grid container justifyContent="center">
               <Typography variant="button">Aucun résultat de biologie à afficher</Typography>
             </Grid>
@@ -63,7 +75,7 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
       )}
       {loading && (
         <TableRow className={classes.emptyTableRow}>
-          <TableCellWrapper colSpan={7} align="left">
+          <TableCellWrapper colSpan={columns.length} align="left">
             <Grid container justifyContent="center">
               <CircularProgress />
             </Grid>
@@ -76,17 +88,20 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
 
 const formatValueRange = (value?: string | number, valueUnit?: string): string => {
   if (value) {
-    return `${value} ${valueUnit || ''}`
+    return `${value} ${valueUnit ?? ''}`
   }
   return '_'
 }
 
 const DataTableObservationLine: React.FC<{
   observation: CohortObservation
-}> = ({ observation }) => {
+  showIpp?: boolean
+  groupId?: string
+}> = ({ observation, showIpp, groupId }) => {
   const { classes } = useStyles()
   const appConfig = useContext(AppConfig)
 
+  const ipp = observation.IPP
   const nda = observation.NDA
   const date = observation.effectiveDateTime
   const libelleANABIO = observation.code?.coding?.find(
@@ -100,7 +115,7 @@ const DataTableObservationLine: React.FC<{
   )?.display
   const result =
     observation.valueQuantity?.value !== null
-      ? `${observation.valueQuantity?.value} ${observation.valueQuantity?.unit || ''}`
+      ? `${observation.valueQuantity?.value} ${observation.valueQuantity?.unit ?? ''}`
       : '-'
   const valueUnit = observation.valueQuantity?.unit ?? ''
   const serviceProvider = observation.serviceProvider
@@ -111,10 +126,22 @@ const DataTableObservationLine: React.FC<{
         valueUnit
       )}`
     : '-'
+  const groupIdSearch = groupId ? `?groupId=${groupId}` : ''
 
   return (
     <TableRow className={classes.tableBodyRows} key={observation.id}>
-      <TableCellWrapper align="left">{nda ?? 'Inconnu'}</TableCellWrapper>
+      {showIpp && (
+        <TableCellWrapper style={{ minWidth: 150 }}>
+          {ipp}
+          <IconButton
+            onClick={() => window.open(`/patients/${observation.idPatient}${groupIdSearch}`, '_blank')}
+            className={classes.searchIcon}
+          >
+            <SearchIcon height="15px" fill="#ED6D91" className={classes.iconMargin} />
+          </IconButton>
+        </TableCellWrapper>
+      )}
+      <TableCellWrapper align={showIpp ? 'center' : 'left'}>{nda ?? 'Inconnu'}</TableCellWrapper>
       <TableCellWrapper>{date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}</TableCellWrapper>
       <TableCellWrapper>
         <Typography className={classes.libelle}>
