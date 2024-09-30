@@ -95,7 +95,13 @@ export enum Order {
   DESCRIPTION = 'description',
   PROCEDURE = 'procedureCode',
   STUDY_DATE = 'started',
-  CREATED_AT = 'created_at'
+  CREATED_AT = 'created_at',
+  ENCOUNTER = 'encounter',
+  EFFECTIVE_TIME = 'effective-time',
+  MEDICATION_ATC = 'medication-atc',
+  MEDICATION_UCD = 'medication-ucd',
+  PRESCRIPTION_TYPES = 'category-name',
+  ADMINISTRATION_MODE = 'route'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -233,6 +239,7 @@ export type PMSIFilters = GenericFilter & {
 export type MedicationFilters = GenericFilter & {
   prescriptionTypes?: LabelObject[]
   administrationRoutes?: LabelObject[]
+  ipp?: string
 }
 
 export type BiologyFilters = GenericFilter & {

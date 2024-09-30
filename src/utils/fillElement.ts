@@ -7,15 +7,24 @@ import {
   Encounter,
   Identifier,
   ImagingStudy,
+  MedicationAdministration,
+  MedicationRequest,
   Patient,
   Procedure
 } from 'fhir/r4'
 import { fetchPatient, fetchEncounter } from 'services/aphp/callApi'
-import { CohortComposition, CohortImaging, CohortPMSI, FHIR_API_Response } from 'types'
+import { CohortComposition, CohortImaging, CohortMedication, CohortPMSI, FHIR_API_Response } from 'types'
 import { ResourceType } from 'types/requestCriterias'
 import { getApiResponseResources } from './apiHelpers'
 
-type ResourceToFill = DocumentReference | ImagingStudy | Condition | Procedure | Claim
+type ResourceToFill =
+  | DocumentReference
+  | ImagingStudy
+  | Condition
+  | Procedure
+  | Claim
+  | MedicationRequest
+  | MedicationAdministration
 
 const getPatientIdPath = (element: ResourceToFill) => {
   const patientIdPath = {
@@ -23,7 +32,12 @@ const getPatientIdPath = (element: ResourceToFill) => {
     [ResourceType.IMAGING]: (element as ImagingStudy).subject?.reference?.replace(/^Patient\//, ''),
     [ResourceType.CONDITION]: (element as Condition).subject?.reference?.replace(/^Patient\//, ''),
     [ResourceType.PROCEDURE]: (element as Procedure).subject?.reference?.replace(/^Patient\//, ''),
-    [ResourceType.CLAIM]: (element as Claim).patient?.reference?.replace(/^Patient\//, '')
+    [ResourceType.CLAIM]: (element as Claim).patient?.reference?.replace(/^Patient\//, ''),
+    [ResourceType.MEDICATION_REQUEST]: (element as MedicationRequest).subject?.reference?.replace(/^Patient\//, ''),
+    [ResourceType.MEDICATION_ADMINISTRATION]: (element as MedicationAdministration).subject?.reference?.replace(
+      /^Patient\//,
+      ''
+    )
   }
 
   return patientIdPath[element.resourceType]
@@ -38,7 +52,12 @@ const getEncounterIdPath = (element: ResourceToFill) => {
     [ResourceType.IMAGING]: (element as ImagingStudy).encounter?.reference?.replace(/^Encounter\//, ''),
     [ResourceType.CONDITION]: (element as Condition).encounter?.reference?.replace(/^Encounter\//, ''),
     [ResourceType.PROCEDURE]: (element as Procedure).encounter?.reference?.replace(/^Encounter\//, ''),
-    [ResourceType.CLAIM]: (element as Claim).item?.[0].encounter?.[0]?.reference?.replace(/^Encounter\//, '')
+    [ResourceType.CLAIM]: (element as Claim).item?.[0].encounter?.[0]?.reference?.replace(/^Encounter\//, ''),
+    [ResourceType.MEDICATION_REQUEST]: (element as MedicationRequest).encounter?.reference?.replace(/^Encounter\//, ''),
+    [ResourceType.MEDICATION_ADMINISTRATION]: (element as MedicationAdministration).context?.reference?.replace(
+      /^Encounter\//,
+      ''
+    )
   }
 
   return encounterIdPath[element.resourceType]
@@ -70,7 +89,11 @@ const getLinkedEncounter = (encounters: Encounter[], entry: ResourceToFill) => {
 
 export const getResourceInfos = async <
   T extends ResourceToFill,
-  U extends CohortComposition | CohortImaging | CohortPMSI
+  U extends
+    | CohortComposition
+    | CohortImaging
+    | CohortPMSI
+    | CohortMedication<MedicationRequest | MedicationAdministration>
 >(
   elementEntries: T[],
   deidentifiedBoolean: boolean,

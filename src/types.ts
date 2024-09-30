@@ -26,6 +26,7 @@ import {
   Comparators,
   CriteriaDataKey,
   CriteriaType,
+  MedicationLabel,
   PMSIResourceTypes,
   ResourceType,
   SelectedCriteriaType
@@ -297,6 +298,14 @@ export type PmsiData = {
   totalPatientPMSI: number
   totalAllPatientsPMSI: number
   pmsiList: CohortPMSI[]
+}
+
+export type MedicationData = {
+  totalMedication: number
+  totalAllMedication: number
+  totalPatientMedication: number
+  totalAllPatientsMedication: number
+  medicationList: CohortMedication<MedicationRequest | MedicationAdministration>[]
 }
 
 export type PatientData = {
@@ -624,6 +633,8 @@ export type IPatientPmsi<T extends Procedure | Condition | Claim> = {
 export type CohortMedication<T extends MedicationRequest | MedicationAdministration> = T & {
   serviceProvider?: string
   NDA?: string
+  IPP?: string
+  idPatient?: string
 }
 
 export type IPatientMedication<T extends MedicationRequest | MedicationAdministration> = {
@@ -717,6 +728,11 @@ export type TabType<T, TL> = {
 export type PmsiTab = TabType<PMSIResourceTypes, PMSILabel>
 
 export type PmsiTabs = PmsiTab[]
+
+export type MedicationTab = TabType<
+  ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST,
+  MedicationLabel
+>
 
 export type DTTB_ResultsType = {
   nb: number

@@ -14,7 +14,9 @@ import {
   ExportCSVTable,
   PmsiData,
   FHIR_Bundle_Response,
-  CohortPMSI
+  CohortPMSI,
+  MedicationData,
+  CohortMedication
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -36,7 +38,9 @@ import {
   fetchImaging,
   fetchCondition,
   fetchProcedure,
-  fetchClaim
+  fetchClaim,
+  fetchMedicationRequest,
+  fetchMedicationAdministration
 } from './callApi'
 
 import apiBackend from '../apiBackend'
@@ -46,6 +50,8 @@ import {
   Condition,
   DocumentReference,
   ImagingStudy,
+  MedicationAdministration,
+  MedicationRequest,
   ParametersParameter,
   Patient,
   Procedure
@@ -58,7 +64,8 @@ import {
   DocumentsFilters,
   SearchByTypes,
   ImagingFilters,
-  PMSIFilters
+  PMSIFilters,
+  MedicationFilters
 } from 'types/searchCriterias'
 import services from '.'
 import { ErrorDetails, SearchInputError } from 'types/error'
@@ -67,6 +74,7 @@ import { substructAgeString } from 'utils/age'
 import { getExtension } from 'utils/fhir'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { mapToOrderByCode, mapToUrlCode } from 'mappers/pmsi'
+import { mapMedicationToOrderByCode } from 'mappers/medication'
 
 export interface IServiceCohorts {
   /**
@@ -189,6 +197,20 @@ export interface IServiceCohorts {
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<PmsiData>
+
+  /**
+   * Retourne la liste d'objets Medication liés à une cohorte
+   */
+  fetchMedicationList: (
+    options: {
+      selectedTab: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION
+      deidentified: boolean
+      page: number
+      searchCriterias: SearchCriterias<MedicationFilters>
+    },
+    groupId?: string,
+    signal?: AbortSignal
+  ) => Promise<MedicationData>
 
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
@@ -541,6 +563,128 @@ const servicesCohorts: IServiceCohorts = {
         totalPatientPMSI: 0,
         totalAllPatientsPMSI: 0,
         pmsiList: []
+      }
+    }
+  },
+
+  fetchMedicationList: async (options, groupId, signal) => {
+    const {
+      selectedTab,
+      deidentified,
+      page,
+      searchCriterias: {
+        orderBy,
+        searchInput,
+        filters: {
+          nda,
+          ipp,
+          startDate,
+          endDate,
+          executiveUnits,
+          encounterStatus,
+          administrationRoutes,
+          prescriptionTypes
+        }
+      }
+    } = options
+    try {
+      const fetchers = {
+        [ResourceType.MEDICATION_REQUEST]: fetchMedicationRequest,
+        [ResourceType.MEDICATION_ADMINISTRATION]: fetchMedicationAdministration
+      }
+
+      const commonFilters = () => ({
+        _list: groupId ? [groupId] : [],
+        size: 20,
+        offset: page ? (page - 1) * 20 : 0,
+        _sort: mapMedicationToOrderByCode(orderBy.orderBy, selectedTab),
+        sortDirection: orderBy.orderDirection,
+        _text: searchInput === '' ? '' : searchInput,
+        encounter: nda,
+        patientIds: ipp,
+        signal: signal,
+        executiveUnits: executiveUnits.map((unit) => unit.id),
+        encounterStatus: encounterStatus.map(({ id }) => id),
+        minDate: startDate ?? '',
+        maxDate: endDate ?? '',
+        uniqueFacet: ['subject']
+      })
+
+      const filtersMapper = {
+        [ResourceType.MEDICATION_REQUEST]: () => ({
+          ...commonFilters(),
+          type: prescriptionTypes?.map((type) => type.id)
+        }),
+        [ResourceType.MEDICATION_ADMINISTRATION]: () => ({
+          ...commonFilters(),
+          route: administrationRoutes?.map((route) => route.id)
+        })
+      }
+
+      const fetcher = fetchers[selectedTab]
+      const filters = filtersMapper[selectedTab]()
+
+      const atLeastAFilter =
+        !!searchInput ||
+        !!ipp ||
+        !!nda ||
+        !!startDate ||
+        !!endDate ||
+        executiveUnits.length > 0 ||
+        encounterStatus.length > 0 ||
+        (administrationRoutes && administrationRoutes.length > 0) ||
+        (prescriptionTypes && prescriptionTypes.length > 0)
+
+      const [medicationList, allMedicationList] = await Promise.all([
+        fetcher(filters),
+        atLeastAFilter
+          ? fetcher({
+              size: 0,
+              signal: signal,
+              _list: groupId ? [groupId] : [],
+              uniqueFacet: ['subject'],
+              minDate: null,
+              maxDate: null
+            })
+          : null
+      ])
+
+      const _medicationList =
+        getApiResponseResources(
+          medicationList as AxiosResponse<FHIR_Bundle_Response<MedicationRequest | MedicationAdministration>, any>
+        ) ?? []
+      const filledMedicationList = await getResourceInfos(_medicationList, deidentified, groupId, signal)
+
+      const totalMedication = medicationList?.data?.resourceType === 'Bundle' ? medicationList.data.total : 0
+      const totalAllMedication =
+        allMedicationList?.data?.resourceType === 'Bundle'
+          ? allMedicationList.data?.total ?? totalMedication
+          : totalMedication
+
+      const totalPatientMedication =
+        medicationList?.data?.resourceType === 'Bundle'
+          ? (getExtension(medicationList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
+          : 0
+      const totalAllPatientsMedication =
+        allMedicationList !== null
+          ? (getExtension(allMedicationList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
+          : totalPatientMedication
+
+      return {
+        totalMedication: totalMedication ?? 0,
+        totalAllMedication: totalAllMedication ?? 0,
+        totalPatientMedication: totalPatientMedication ?? 0,
+        totalAllPatientsMedication: totalAllPatientsMedication ?? 0,
+        medicationList: filledMedicationList as CohortMedication<MedicationRequest | MedicationAdministration>[]
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération de la liste Medication :', error)
+      return {
+        totalMedication: 0,
+        totalAllMedication: 0,
+        totalPatientMedication: 0,
+        totalAllPatientsMedication: 0,
+        medicationList: []
       }
     }
   },
