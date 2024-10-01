@@ -97,7 +97,7 @@ import {
   QuestionnaireResponseParamsKeys
 } from 'mappers/filters'
 
-const REQUETEUR_VERSION = 'v1.4.5'
+const REQUETEUR_VERSION = 'v1.5.0'
 
 export const STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE = 'Structure hospitalière de prise en charge'
 
