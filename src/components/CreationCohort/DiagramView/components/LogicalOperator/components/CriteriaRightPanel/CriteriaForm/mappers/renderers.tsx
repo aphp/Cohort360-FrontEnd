@@ -16,7 +16,6 @@ import {
 } from '@mui/material'
 import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnits'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
-import SearchbarWithCheck from 'components/ui/Inputs/SearchbarWithCheck'
 import CheckedTextfield from 'components/ui/Inputs/CheckedTextfield'
 import _, { isArray } from 'lodash'
 import useStyles from '../style'
@@ -30,6 +29,8 @@ import SimpleSelect from 'components/ui/Inputs/SimpleSelect'
 import ValueSetField from 'components/SearchValueSet/ValueSetField'
 import { checkIsLeaf } from 'utils/valueSets'
 import { selectValueSetCodes } from 'state/valueSets'
+import SearchbarWithCheck from 'components/ui/Searchbar/SearchbarWithChecks'
+import { SearchbarWithCheckWrapper } from 'components/ui/Searchbar/styles'
 
 /************************************************************************************/
 /*                        Criteria Form Item Renderer                               */
@@ -76,7 +77,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     return (
       <DurationRange
         value={props.value ? [props.value.start, props.value.end] : [null, null]}
-        active={!props.disabled}
+        disabled={props.disabled}
         onChange={(range) =>
           !range[0] && !range[1]
             ? props.updateData(null)
@@ -268,12 +269,14 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     )
   },
   textWithCheck: (props) => (
-    <SearchbarWithCheck
-      searchInput={props.value}
-      setSearchInput={(value) => props.updateData(value)}
-      placeholder={props.definition.placeholder}
-      onError={(isError) => props.setError(isError ? props.definition.errorType : undefined)}
-    />
+    <SearchbarWithCheckWrapper>
+      <SearchbarWithCheck
+        value={props.value}
+        onChange={(value) => props.updateData(value)}
+        placeholder={props.definition.placeholder}
+        onError={(isError) => props.setError(isError ? props.definition.errorType : undefined)}
+      />
+    </SearchbarWithCheckWrapper>
   ),
   codeSearch: (props) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks

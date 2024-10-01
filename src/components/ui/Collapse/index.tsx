@@ -11,7 +11,6 @@ type CollapseProps = {
   value?: boolean
   title: string
   children: ReactNode
-  margin?: string
   info?: React.ReactNode
 }
 

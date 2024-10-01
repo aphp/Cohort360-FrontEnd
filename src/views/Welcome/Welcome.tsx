@@ -56,8 +56,7 @@ const Welcome = () => {
               status: [],
               minPatients: null,
               maxPatients: null,
-              startDate: null,
-              endDate: null,
+              durationRange: [null, null],
               favorite: CohortsType.FAVORITE
             }
           }

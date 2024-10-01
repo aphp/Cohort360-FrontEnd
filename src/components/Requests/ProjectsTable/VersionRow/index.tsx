@@ -31,7 +31,7 @@ import { editCohort, setSelectedCohort } from 'state/cohort'
 
 import { Cohort, CohortJobStatus } from 'types'
 
-import displayDigit from 'utils/displayDigit'
+import { format } from 'utils/numbers'
 
 import useStyles from '../styles'
 import { AppConfig } from 'config'
@@ -152,7 +152,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                       {cohort.request_query_snapshot?.split('-')[0]}
                     </Link>
                   </TableCellWrapper>
-                  <TableCellWrapper>{displayDigit(cohort.result_size)}</TableCellWrapper>
+                  <TableCellWrapper>{format(cohort.result_size)}</TableCellWrapper>
                   <Hidden lgDown>
                     <TableCellWrapper>{moment(cohort.modified_at).format('DD/MM/YYYY [à] HH:mm')}</TableCellWrapper>
                   </Hidden>

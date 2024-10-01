@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
-import { Grid, Paper, Collapse, Typography, Input, IconButton } from '@mui/material'
-import Tabs from 'components/ui/Tabs'
+import { Grid, Paper, Collapse, Typography, Input, IconButton, Tabs, Tab } from '@mui/material'
 import { LoadingStatus, TabType } from 'types'
 import ReferencesParameters, { Type } from './References'
 import ValueSetTable from './ValueSetTable'
@@ -51,13 +50,11 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
     >
       <Grid container padding="30px 30px 8px 30px">
         <Grid item xs={12} marginBottom={'20px'}>
-          <Tabs
-            variant="pink"
-            values={tabs}
-            disabled={loadingStatus.init === LoadingStatus.FETCHING}
-            active={tabs[mode]}
-            onchange={(elem) => onChangeMode(elem.id)}
-          />
+          <Tabs value={mode} onChange={(_, elem) => onChangeMode(elem)}>
+            {tabs.map((tab) => (
+              <Tab sx={{ fontSize: 12 }} key={tab.id} label={tab.label} value={tab.id} />
+            ))}
+          </Tabs>
         </Grid>
         <Grid item xs={12}>
           <Paper sx={{ padding: '20px' }}>
@@ -82,6 +79,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
                     <Input
                       value={searchInput}
                       placeholder="Rechercher un code"
+                      disabled={loadingStatus.search === LoadingStatus.FETCHING}
                       fullWidth
                       onChange={(event) => onChangeSearchInput(event.target.value)}
                       endAdornment={

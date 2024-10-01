@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { CohortComposition } from 'types'
 import { DocumentReference } from 'fhir/r4'
 
-import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
+import StatusChip, { Status } from 'components/ui/StatusChip'
 
 import {
   Grid,
@@ -53,7 +53,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
         return (
           <StatusChip
             icon={<CancelIcon height="15px" fill="#FFF" />}
-            status={ChipStyles.CANCELLED}
+            status={Status.CANCELLED}
             label={getDocumentStatus(type)}
           />
         )

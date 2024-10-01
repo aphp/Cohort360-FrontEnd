@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode } from 'react'
+import { ReactElement } from 'react'
 import {
   Bundle,
   Claim,
@@ -23,18 +23,10 @@ import {
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
 import { SearchInputError } from 'types/error'
-import {
-  Comparators,
-  CriteriaType,
-  MedicationLabel,
-  PMSIResourceTypes,
-  ResourceType,
-  SelectedCriteriaType
-} from 'types/requestCriterias'
+import { Comparators, CriteriaType, ResourceType, SelectedCriteriaType } from 'types/requestCriterias'
 import { ExportTableType } from 'components/Dashboard/ExportModal/export_table'
-import { SearchByTypes } from 'types/searchCriterias'
-import { PMSILabel } from 'types/patient'
 import { CriteriaForm } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
+import { ScopeElement } from 'types/scope'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
@@ -71,6 +63,11 @@ export enum CohortJobStatus {
 export enum LoadingStatus {
   FETCHING = 'FETCHING',
   IDDLE = 'IDLE',
+  SUCCESS = 'SUCCESS'
+}
+
+export enum FetchStatus {
+  ERROR = 'ERROR',
   SUCCESS = 'SUCCESS'
 }
 
@@ -178,12 +175,6 @@ export type PMSIEntry<T extends Procedure | Condition | Claim> = T & {
   NDA?: string
 }
 
-export type MedicationEntry<T extends MedicationRequest | MedicationAdministration> = T & {
-  documents?: CohortComposition[]
-  serviceProvider?: string
-  NDA?: string
-}
-
 export type SimpleCodeType = { code: string; label: string; type: string }
 
 export type CohortGroup = Group & {
@@ -208,17 +199,6 @@ export enum Month {
   NOVEMBER = 'Novembre',
   DECEMBER = 'Décembre'
 }
-
-export type Column =
-  | {
-      label: string | ReactNode
-      code?: string
-      align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
-      multiple?: undefined
-    }
-  | {
-      multiple: Column[]
-    }
 
 export enum ChartCode {
   AGE_PYRAMID = 'facet-extension.ageMonth',
@@ -286,29 +266,12 @@ export type CohortData = {
   uuid?: string
 }
 
-export type CohortResults<T> = {
-  total: number
-  totalAllResults: number
-  totalPatients: number
-  totalAllPatients: number
+export type ExplorationResults<T> = {
+  total: number | null
+  totalAllResults: number | null
+  totalPatients: number | null
+  totalAllPatients: number | null
   list: T[]
-}
-
-export type PatientData = {
-  patient?: CohortPatient
-  hospit?: (CohortEncounter | Encounter)[]
-  documents?: CohortComposition[]
-  documentsTotal?: number
-  consult?: PMSIEntry<Procedure>[]
-  consultTotal?: number
-  diagnostic?: PMSIEntry<Condition>[]
-  diagnosticTotal?: number
-  ghm?: PMSIEntry<Claim>[]
-  ghmTotal?: number
-  medicationRequest?: MedicationRequest[]
-  medicationRequestTotal?: number
-  medicationAdministration?: MedicationAdministration[]
-  medicationAdministrationTotal?: number
 }
 
 export enum CriteriaGroupType {
@@ -652,6 +615,7 @@ export type CohortQuestionnaireResponse = QuestionnaireResponse & {
   IPP?: string
   hospitDates?: Period
   idPatient?: string
+  formName?: string
 }
 
 export type CohortObservation = Observation & {
@@ -713,45 +677,6 @@ export type TabType<T = string, TL = string> = {
   wrapped?: boolean
 }
 
-export type PmsiTab = TabType<PMSIResourceTypes, PMSILabel>
-
-export type MedicationTab = TabType<
-  ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST,
-  MedicationLabel
->
-
-export type DTTB_ResultsType = {
-  nb: number
-  total: number
-  label?: string
-}
-export type DTTB_SearchBarType = {
-  type: 'simple' | 'patient' | 'document'
-  value: string | undefined
-  onSearch: (newSearch: string, newSearchBy: SearchByTypes) => void
-  searchBy?: any
-  error?: SearchInputError
-  fullWidth?: boolean
-}
-export type DTTB_ButtonType = {
-  label: string
-  icon?: ReactElement
-  onClick: (args?: any) => void
-}
-export type ScopeElement = {
-  id: string
-  name: string
-  source_value: string
-  type: string
-  parent_id: string
-  above_levels_ids: string
-  inferior_levels_ids: string
-  cohort_id: string
-  cohort_size: string
-  full_path: string
-  rights?: ReadRightPerimeter
-  access?: 'Nominatif' | 'Pseudonymisé'
-}
 export type ReadRightPerimeter = {
   perimeter: ScopeElement
   read_role: string
@@ -864,9 +789,3 @@ export type WSJobStatus = WebSocketMessage<{
     global?: { measure_min: number; measure_max: number }
   }
 }> & { type: WebSocketMessageType.JOB_STATUS }
-
-export enum SelectedStatus {
-  NOT_SELECTED,
-  SELECTED,
-  INDETERMINATE
-}

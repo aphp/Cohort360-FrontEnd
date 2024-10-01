@@ -8,8 +8,7 @@ import {
   QuerySnapshotInfo,
   CurrentSnapshot,
   CohortJobStatus,
-  CriteriaGroupType,
-  ScopeElement
+  CriteriaGroupType
 } from 'types'
 import { buildRequest, unbuildRequest, joinRequest, checkNominativeCriteria } from 'utils/cohortCreation'
 
@@ -21,6 +20,7 @@ import services from 'services/aphp'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
 import { getConfig } from 'config'
+import { ScopeElement } from 'types/scope'
 
 export type CohortCreationState = {
   loading: boolean

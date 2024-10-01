@@ -44,7 +44,7 @@ import { deleteCohort, editCohort, setSelectedCohort as setSelectedCohortState }
 
 import { Cohort, CohortJobStatus } from 'types'
 
-import displayDigit from 'utils/displayDigit'
+import { format } from 'utils/numbers'
 
 import useStyles from './styles'
 import { Direction, Order, OrderBy } from 'types/searchCriterias'
@@ -320,14 +320,14 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       )}
                     </TableCell>
                     <TableCell onClick={() => onClickRow(row)} align="center">
-                      {displayDigit(row.result_size)}
+                      {format(row.result_size)}
                     </TableCell>
                     <TableCell onClick={() => onClickRow(row)} align="center">
                       {row.dated_measure_global
                         ? row.dated_measure_global?.measure_min === null ||
                           row.dated_measure_global?.measure_max === null
                           ? '-'
-                          : `${displayDigit(row.dated_measure_global?.measure_min)} - ${displayDigit(
+                          : `${format(row.dated_measure_global?.measure_min)} - ${format(
                               row.dated_measure_global?.measure_max
                             )}`
                         : '-'}

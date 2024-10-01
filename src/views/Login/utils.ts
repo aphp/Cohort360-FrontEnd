@@ -1,5 +1,6 @@
 import services from 'services/aphp'
-import { CustomError, ScopeElement } from 'types'
+import { CustomError } from 'types'
+import { ScopeElement } from 'types/scope'
 import { isCustomError } from 'utils/perimeters'
 
 export const updatePerimeters = async (

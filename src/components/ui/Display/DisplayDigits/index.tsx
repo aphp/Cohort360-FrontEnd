@@ -1,8 +1,7 @@
 import { Typography } from '@mui/material'
-import React from 'react'
-
-import displayDigit from 'utils/displayDigit'
+import React, { useMemo } from 'react'
 import { DisplayDigitsWrapper } from './styles'
+import { format } from 'utils/numbers'
 
 type DisplayDigitsProps = {
   nb: number
@@ -12,16 +11,13 @@ type DisplayDigitsProps = {
 }
 
 const DisplayDigits = ({ nb, total, label, color = '#153D8A' }: DisplayDigitsProps) => {
+  const formattedNb = useMemo(() => format(nb), [nb])
+  const formattedTotal = useMemo(() => format(total), [total])
+
   return (
-    <DisplayDigitsWrapper color={color} id="DTTB_result">
-      <Typography variant="button">
-        {displayDigit(nb ?? 0)}
-        {total !== undefined && (
-          <>
-            <span style={{ color: color, fontSize: 12 }}> /</span> {displayDigit(total ?? 0)}{' '}
-          </>
-        )}
-        <span style={{ color: color, fontSize: 14 }}>&nbsp;{label}</span>
+    <DisplayDigitsWrapper color={color} id={`digit-${label}`}>
+      <Typography fontWeight={800} fontSize={15}>
+        {[formattedNb, total && `/ ${formattedTotal}`, label].filter(Boolean).join(' ')}
       </Typography>
     </DisplayDigitsWrapper>
   )

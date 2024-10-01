@@ -1,27 +1,32 @@
 import React from 'react'
-import { FormControlLabel, Radio, RadioGroup as RadioGroupMui, SxProps } from '@mui/material'
+import { FormControlLabel, Radio, RadioGroup as RadioGroupMui, SxProps, Typography } from '@mui/material'
+import { InputWrapper } from '../Inputs/styles'
 
 type RadioProps<T> = {
-  selectedValue: T
-  items: { id: T; label: string; disabled?: boolean }[]
-  onchange: (value: T) => void
+  value: T
+  label?: string
+  options: { id: T; label: string; disabled?: boolean }[]
+  onChange: (value: T) => void
   row?: boolean
   style?: SxProps
 }
 
-const RadioGroup = <T,>({ selectedValue, items, onchange, row, style }: RadioProps<T>) => {
+const RadioGroup = <T,>({ value, options, onChange, row, style, label }: RadioProps<T>) => {
   return (
-    <RadioGroupMui value={selectedValue} onChange={(event, value) => onchange(value as T)} row={row} sx={style}>
-      {items.map((item) => (
-        <FormControlLabel
-          key={item.id as string}
-          value={item.id}
-          control={<Radio color="secondary" />}
-          label={item.label}
-          disabled={item.disabled}
-        />
-      ))}
-    </RadioGroupMui>
+    <InputWrapper>
+      {label && <Typography variant="h3">{label}</Typography>}
+      <RadioGroupMui value={value} onChange={(event, value) => onChange(value as T)} row={row} sx={style}>
+        {options.map((option) => (
+          <FormControlLabel
+            key={option.id as string}
+            value={option.id}
+            control={<Radio color="secondary" />}
+            label={option.label}
+            disabled={option.disabled}
+          />
+        ))}
+      </RadioGroupMui>
+    </InputWrapper>
   )
 }
 

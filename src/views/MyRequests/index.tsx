@@ -172,8 +172,7 @@ const MyRequests = () => {
                 <SearchInput
                   value={searchInput}
                   placeholder="Rechercher"
-                  width={'75%'}
-                  onchange={(newValue) => setSearchInput(newValue)}
+                  onChange={(newValue) => setSearchInput(newValue)}
                 />
 
                 <Hidden only={['xs', 'sm', 'md']}>

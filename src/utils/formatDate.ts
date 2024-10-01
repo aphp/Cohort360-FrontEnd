@@ -1,6 +1,14 @@
 import { Month } from 'types'
 import moment from 'moment/moment'
 
+export const sortByDateKey = <T>(array: T[], key: keyof T, order: 'ASC' | 'DESC' = 'DESC') => {
+  return [...array].sort((a, b) => {
+    const dateA = new Date(a[key] as string).getTime()
+    const dateB = new Date(b[key] as string).getTime()
+    return order === 'ASC' ? dateA - dateB : dateB - dateA
+  })
+}
+
 const getStringMonth = (monthNumber: number): Month | undefined => {
   switch (monthNumber) {
     case 0:

@@ -1,4 +1,4 @@
-import { IconButton, Pagination, styled } from '@mui/material'
+import { Grid, IconButton, Pagination, styled } from '@mui/material'
 import { NumberInput } from '../NumberInput'
 
 type ColorProps = {
@@ -32,4 +32,16 @@ export const PaginationInput = styled(NumberInput)<ColorProps>(({ elemColor = '#
 export const StyledButton = styled(IconButton)<ColorProps>(({ elemColor = '#5BC5F2' }) => ({
   color: elemColor,
   padding: 0
+}))
+
+export const StickyContainer = styled(Grid)(() => ({
+  position: 'sticky',
+  bottom: 0,
+  right: 0,
+  backgroundColor: '#fff',
+  maxWidth: '100%',
+  width: '100%',
+  zIndex: 10,
+  padding: '0px 0px 10px 0px',
+  boxShadow: '0px -2px 5px rgba(0, 0, 0, 0.1)'
 }))

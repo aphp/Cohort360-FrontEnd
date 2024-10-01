@@ -41,14 +41,14 @@ import { deleteCohort, setSelectedCohort } from 'state/cohort'
 
 import services from 'services/aphp'
 
-import displayDigit from 'utils/displayDigit'
+import { format } from 'utils/numbers'
 
 import useStyles from './styles'
 import { AppConfig } from 'config'
-import { Cohort } from 'types'
+import { URLS } from 'types/exploration'
 
 type TopBarProps = {
-  context: 'patients' | 'cohort' | 'perimeters' | 'patient_info'
+  context: URLS
   patientsNb?: number
   access?: string
   afterEdit?: () => void
@@ -105,7 +105,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
     showActionButton?: boolean
   } = { name: '-', perimeters: [] }
   switch (context) {
-    case 'patients':
+    case URLS.PATIENTS:
       cohort = {
         name: 'Tous mes patients',
         description: '',
@@ -115,7 +115,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         showActionButton: false
       }
       break
-    case 'patient_info':
+    case URLS.PATIENT:
       cohort = {
         name: 'Information patient',
         description: '',
@@ -125,7 +125,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         showActionButton: false
       }
       break
-    case 'cohort':
+    case URLS.COHORT:
       cohort = {
         name: dashboard.name ?? '-',
         description: dashboard.description ?? '',
@@ -135,7 +135,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         showActionButton: true
       }
       break
-    case 'perimeters':
+    case URLS.PERIMETERS:
       cohort = {
         name: 'Exploration de périmètres',
         description: '',
@@ -259,7 +259,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                 ) : (
                   <>
                     <Typography id="cohort-patient-number" align="right" noWrap>
-                      Nb de patients : {displayDigit(patientsNumber)}
+                      Nb de patients : {format(patientsNumber)}
                     </Typography>
                     <Typography id="cohort-access-type" align="right" noWrap>
                       Accès : {access}
@@ -294,9 +294,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                 </IconButton>
                 <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
                   <MenuItem
-                    onClick={async () => {
+                    onClick={() => {
                       setAnchorEl(null)
-                      await dispatch(setSelectedCohort(dashboard ?? null))
+                      dispatch(setSelectedCohort(dashboard ?? null))
                       setOpenModal('edit')
                     }}
                   >
@@ -324,7 +324,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
             )}
           </Grid>
         </Grid>
-        {context !== 'patient_info' && (
+        {context !== URLS.PATIENT && (
           <Divider orientation="horizontal" variant="middle" style={{ width: 'calc(100% - 32px)' }} />
         )}
       </Grid>
