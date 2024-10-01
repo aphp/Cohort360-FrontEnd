@@ -16,9 +16,6 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCohorts } from 'state/cohort'
 import { fetchProjects } from 'state/project'
 import { fetchRequests } from 'state/request'
-import { initPmsiHierarchy } from 'state/pmsi'
-import { initMedicationHierarchy } from 'state/medication'
-import { initBiologyHierarchy } from 'state/biology'
 import { AccessExpiration, RequestType } from 'types'
 import useStyles from './styles'
 import { CohortsType } from 'types/cohorts'
@@ -76,9 +73,6 @@ const Welcome = () => {
   useEffect(() => {
     dispatch(fetchProjects())
     dispatch(fetchRequests())
-    dispatch(initPmsiHierarchy())
-    dispatch(initMedicationHierarchy())
-    dispatch(initBiologyHierarchy())
     fetchCohortsPreview()
   }, [])
 

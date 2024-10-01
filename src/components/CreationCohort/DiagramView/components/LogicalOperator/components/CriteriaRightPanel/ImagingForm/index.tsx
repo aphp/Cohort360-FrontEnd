@@ -3,11 +3,10 @@ import { Autocomplete, Grid, MenuItem, Select, TextField } from '@mui/material'
 import { BlockWrapper } from 'components/ui/Layout'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import Collapse from 'components/ui/Collapse'
-import { DurationUnitWrapper } from 'components/ui/Inputs/DurationRange/styles'
-import { TextFieldWrapper } from 'components/ui/Inputs/DurationRange/styles'
+import { TextFieldWrapper, DurationUnitWrapper } from 'components/ui/Inputs/DurationRange/styles'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import CriteriaLayout from 'components/ui/CriteriaLayout'
-import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
+import AdvancedInputs from '../AdvancedInputs'
 
 import { CriteriaDrawerComponentProps } from 'types'
 import { CalendarRequestLabel } from 'types/dates'
@@ -18,7 +17,6 @@ import {
   DurationRangeType,
   LabelObject
 } from 'types/searchCriterias'
-import useStyles from './styles'
 import { mappingCriteria } from '../DemographicForm'
 import SearchbarWithCheck from 'components/ui/Inputs/SearchbarWithCheck'
 import UidTextfield from 'components/ui/Inputs/UidTextfield'
@@ -50,7 +48,6 @@ export const withDocumentOptions = [
 ]
 
 const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
-  const { classes } = useStyles()
   const appConfig = useContext(AppConfig)
   const { criteriaData, onChangeSelectedCriteria, goBack } = props
   const selectedCriteria = props.selectedCriteria as ImagingDataType

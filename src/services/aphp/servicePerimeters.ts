@@ -21,7 +21,7 @@ import { fetchAccessExpirations, fetchEncounter, fetchPatient, fetchPerimeterAcc
 
 import { AxiosResponse } from 'axios'
 import apiBackend from '../apiBackend'
-import { FetchScopeOptions, Rights, SourceType } from 'types/scope'
+import { FetchScopeOptions, Rights, SourceType, System } from 'types/scope'
 import { scopeLevelsToRequestParam } from 'utils/perimeters'
 import { mapParamsToNetworkParams } from 'utils/url'
 import { Hierarchy } from 'types/hierarchy'
@@ -37,7 +37,7 @@ export interface IServicePerimeters {
    * Retour:
    *   - booléen
    */
-  allowSearchIpp: (selectedPopulation: Hierarchy<ScopeElement, string>[]) => Promise<boolean>
+  allowSearchIpp: (selectedPopulation: Hierarchy<ScopeElement>[]) => Promise<boolean>
 
   /**
    * Cette fonction retourne les informations lié à un (ou plusieurs) périmètre(s)
@@ -60,7 +60,7 @@ export interface IServicePerimeters {
    * Retour:
    *   - ScopeTreeTableRow | undefined
    */
-  fetchPopulationForRequeteur: (perimeterId: string[]) => Promise<Hierarchy<ScopeElement, string>[]>
+  fetchPopulationForRequeteur: (perimeterId: string[]) => Promise<Hierarchy<ScopeElement>[]>
 
   /**
    * Cette fonction retourne l'ensemble des perimetres auquels un practitioner a le droit
@@ -72,13 +72,16 @@ export interface IServicePerimeters {
    *   - IOrganization[]
    */
 
-  mapRightsToScopeElement: (item: ReadRightPerimeter) => ScopeElement
+  mapRightsToScopeElement: (item: ReadRightPerimeter) => Hierarchy<ScopeElement>
 
-  mapPerimeterToScopeElement: (item: ScopeElement) => ScopeElement
+  mapPerimeterToScopeElement: (item: ScopeElement) => Hierarchy<ScopeElement>
 
-  getRights: (options: FetchScopeOptions, signal?: AbortSignal) => Promise<Back_API_Response<ScopeElement>>
+  getRights: (options: FetchScopeOptions, signal?: AbortSignal) => Promise<Back_API_Response<Hierarchy<ScopeElement>>>
 
-  getPerimeters: (options?: FetchScopeOptions, signal?: AbortSignal) => Promise<Back_API_Response<ScopeElement>>
+  getPerimeters: (
+    options?: FetchScopeOptions,
+    signal?: AbortSignal
+  ) => Promise<Back_API_Response<Hierarchy<ScopeElement>>>
 
   getAccessExpirations: (accessExpirationsProps: AccessExpirationsProps) => Promise<AccessExpiration[]>
 
@@ -185,7 +188,7 @@ const servicesPerimeters: IServicePerimeters = {
   },
 
   fetchPopulationForRequeteur: async (cohortIds) => {
-    let population: Hierarchy<ScopeElement, string>[] = []
+    let population: Hierarchy<ScopeElement>[] = []
     const ids = cohortIds.join(',')
     if (ids) {
       const response = (await servicesPerimeters.getRights({ limit: -1, cohortIds: ids, sourceType: SourceType.ALL }))
@@ -195,6 +198,7 @@ const servicesPerimeters: IServicePerimeters = {
           {
             id: Rights.EXPIRED,
             name: '',
+            label: '',
             source_value: '',
             above_levels_ids: '',
             inferior_levels_ids: '',
@@ -202,7 +206,8 @@ const servicesPerimeters: IServicePerimeters = {
             type: '',
             cohort_id: '',
             cohort_size: '',
-            full_path: ''
+            full_path: '',
+            system: System.ScopeTree
           }
         ]
       else population = response
@@ -210,7 +215,7 @@ const servicesPerimeters: IServicePerimeters = {
     return population
   },
 
-  mapRightsToScopeElement: (item: ReadRightPerimeter): ScopeElement => {
+  mapRightsToScopeElement: (item: ReadRightPerimeter): Hierarchy<ScopeElement> => {
     const {
       perimeter,
       read_role,
@@ -230,12 +235,14 @@ const servicesPerimeters: IServicePerimeters = {
     return {
       ...perimeter,
       id: perimeter.id.toString(),
+      system: System.ScopeTree,
+      label: `${perimeter.source_value} - ${perimeter.name}`,
       access: servicesPerimeters.getAccessFromRights(rights),
       rights
     }
   },
 
-  mapPerimeterToScopeElement: (item: ScopeElement): ScopeElement => {
+  mapPerimeterToScopeElement: (item: ScopeElement): Hierarchy<ScopeElement> => {
     const {
       id,
       name,
@@ -252,6 +259,8 @@ const servicesPerimeters: IServicePerimeters = {
     return {
       id: id.toString(),
       name,
+      system: System.ScopeTree,
+      label: `${source_value} - ${name}`,
       source_value,
       type,
       parent_id,
@@ -263,8 +272,11 @@ const servicesPerimeters: IServicePerimeters = {
     }
   },
 
-  getRights: async (options?: FetchScopeOptions, signal?: AbortSignal): Promise<Back_API_Response<ScopeElement>> => {
-    const response: Back_API_Response<ScopeElement> = { results: [], count: 0 }
+  getRights: async (
+    options?: FetchScopeOptions,
+    signal?: AbortSignal
+  ): Promise<Back_API_Response<Hierarchy<ScopeElement>>> => {
+    const response: Back_API_Response<Hierarchy<ScopeElement>> = { results: [], count: 0 }
     try {
       let baseUrl = 'accesses/perimeters/patient-data/rights/'
       const params = []
@@ -293,8 +305,8 @@ const servicesPerimeters: IServicePerimeters = {
   getPerimeters: async (
     options?: FetchScopeOptions,
     signal?: AbortSignal
-  ): Promise<Back_API_Response<ScopeElement>> => {
-    const response: Back_API_Response<ScopeElement> = { results: [], count: 0 }
+  ): Promise<Back_API_Response<Hierarchy<ScopeElement>>> => {
+    const response: Back_API_Response<Hierarchy<ScopeElement>> = { results: [], count: 0 }
     try {
       let baseUrl = 'accesses/perimeters/'
       const params = []

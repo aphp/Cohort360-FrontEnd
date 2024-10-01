@@ -34,7 +34,6 @@ import {
   Condition,
   DocumentReference,
   Encounter,
-  Group,
   Identifier,
   ImagingStudy,
   MedicationAdministration,
@@ -178,6 +177,7 @@ export interface IServicePatients {
     sortDirection: Direction,
     searchInput: string,
     nda: string,
+    code: string,
     selectedPrescriptionTypeIds: string[],
     selectedAdministrationRouteIds: string[],
     startDate: string | null,
@@ -220,8 +220,7 @@ export interface IServicePatients {
     rowStatus: boolean,
     searchInput: string,
     nda: string,
-    loinc: string,
-    anabio: string,
+    code: string,
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string,
@@ -457,7 +456,7 @@ const servicesPatients: IServicePatients = {
           _sort: sortBy === Order.CODE ? Order.CODE : Order.RECORDED_DATE,
           sortDirection: sortDirection,
           'encounter-identifier': nda,
-          code: code,
+          code,
           source: source,
           type: diagnosticTypes,
           'min-recorded-date': startDate ?? '',
@@ -477,7 +476,7 @@ const servicesPatients: IServicePatients = {
           _sort: sortBy === Order.CODE ? Order.CODE : Order.DATE,
           sortDirection: sortDirection,
           'encounter-identifier': nda,
-          code: code,
+          code,
           source: source,
           minDate: startDate ?? '',
           maxDate: endDate ?? '',
@@ -556,6 +555,7 @@ const servicesPatients: IServicePatients = {
     sortDirection,
     searchInput,
     nda,
+    code,
     selectedPrescriptionTypeIds,
     selectedAdministrationRouteIds,
     startDate,
@@ -579,6 +579,7 @@ const servicesPatients: IServicePatients = {
           _sort: sortBy,
           sortDirection,
           type: selectedPrescriptionTypeIds,
+          code,
           minDate: startDate,
           maxDate: endDate,
           signal,
@@ -601,7 +602,8 @@ const servicesPatients: IServicePatients = {
           maxDate: endDate,
           signal,
           executiveUnits,
-          encounterStatus
+          encounterStatus,
+          code
         })
         break
       default:
@@ -626,8 +628,7 @@ const servicesPatients: IServicePatients = {
     rowStatus: boolean,
     searchInput: string,
     nda: string,
-    loinc: string,
-    anabio: string,
+    code: string,
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string,
@@ -644,8 +645,7 @@ const servicesPatients: IServicePatients = {
       offset: page ? (page - 1) * 20 : 0,
       _text: searchInput,
       encounter: nda,
-      loinc: loinc,
-      anabio: anabio,
+      code,
       minDate: startDate ?? '',
       maxDate: endDate ?? '',
       rowStatus,
@@ -905,8 +905,8 @@ export const postFiltersService = async (
   return response.data
 }
 
-export const getFiltersService = async (fhir_resource: ResourceType, next?: string | null) => {
-  const LIMIT = 10
+export const getFiltersService = async (fhir_resource: ResourceType, next?: string | null, limit = 10) => {
+  const LIMIT = limit
   const OFFSET = 0
   try {
     const response = await getFilters(fhir_resource, LIMIT, OFFSET, next)

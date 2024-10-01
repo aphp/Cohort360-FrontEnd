@@ -7,7 +7,7 @@ type ChipProps<T> = {
   onDelete: () => void
 }
 const Chip = <T,>({ label, style, onDelete }: ChipProps<T>) => {
-  return <ChipWrapper label={label as string} style={style} onDelete={() => onDelete()} />
+  return <ChipWrapper label={label as string} style={style} onDelete={onDelete} />
 }
 
 export default Chip
