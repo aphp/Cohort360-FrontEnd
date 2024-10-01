@@ -13,6 +13,8 @@ import CareSiteView from 'views/Scope/CareSiteView'
 import MyCohorts from 'views/MyCohorts'
 import MyRequests from 'views/MyRequests'
 import DownloadPopup from 'views/DownloadPopup/DownloadPopup'
+import Export from 'pages/Export'
+import FeasibilityReports from 'pages/FeasibilityReports'
 
 // import { ODD_CONTACT } from '../../../constants'
 
@@ -217,6 +219,34 @@ const configRoutes: configRoute[] = [
     element: <Patient />,
     exact: false
   },
+
+  /**
+   * Cohort360: Export Page
+   */
+  {
+    path: '/exports',
+    name: '/exports',
+    isPrivate: true,
+    element: <Export />,
+    exact: true,
+    displaySideBar: true
+  },
+
+  /**
+   * Cohort360: Feasibility Reports Page
+   */
+  {
+    path: '/feasibility-reports',
+    name: '/feasibility-reports',
+    isPrivate: true,
+    element: <FeasibilityReports />,
+    exact: true,
+    displaySideBar: true
+  },
+
+  /**
+   * Cohort360: Export download Page
+   */
   {
     path: '/download/:resource/:itemId',
     name: '/download/:resource/:itemId',
