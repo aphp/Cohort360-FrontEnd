@@ -1,10 +1,9 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 import {
   Breadcrumbs,
   Checkbox,
   CircularProgress,
   Grid,
-  ListItem,
   Table,
   TableBody,
   TableCell,
@@ -14,29 +13,29 @@ import {
   Typography
 } from '@mui/material'
 import { LoadingStatus, ScopeElement, SelectedStatus } from 'types'
-import { Hierarchy } from 'types/hierarchy'
+import { Hierarchy, HierarchyInfo } from 'types/hierarchy'
 import { IndeterminateCheckBoxOutlined, KeyboardArrowDown, KeyboardArrowRight } from '@mui/icons-material'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import displayDigit from 'utils/displayDigit'
-import useStyles from './styles'
+import { CellWrapper, RowContainerWrapper, RowWrapper } from '../Hierarchy/styles'
 import { SourceType } from 'types/scope'
-import { sort } from 'utils/arrays'
 import { v4 as uuidv4 } from 'uuid'
 import { isSourceTypeInScopeLevel } from 'utils/perimeters'
 import { every } from 'lodash'
+import { sortArray } from 'utils/arrays'
+import { SearchMode } from 'types/searchValueSet'
 
 type HierarchyItemProps = {
   item: Hierarchy<ScopeElement, string>
   path: string[]
-  searchMode: boolean
+  mode: SearchMode
   sourceType: SourceType
   loading: { search: LoadingStatus; expand: LoadingStatus }
   onSelect: (node: Hierarchy<ScopeElement, string>, toAdd: boolean) => void
   onExpand: (node: Hierarchy<ScopeElement, string>) => void
 }
 
-const ScopeTreeRow = ({ item, path, sourceType, searchMode, loading, onSelect, onExpand }: HierarchyItemProps) => {
-  const { classes } = useStyles()
+const ScopeTreeRow = ({ item, path, sourceType, mode, loading, onSelect, onExpand }: HierarchyItemProps) => {
   const [open, setOpen] = useState(false)
   const [internalLoading, setInternalLoading] = useState(false)
   const { id, name, subItems, rights, status, source_value, type, cohort_size, full_path } = item
@@ -56,80 +55,89 @@ const ScopeTreeRow = ({ item, path, sourceType, searchMode, loading, onSelect, o
   }, [loading.expand])
 
   return (
-    <Fragment>
-      <TableRow className={path.length % 2 === 0 ? classes.secondRow : ''}>
-        <TableCell className={classes.expandCell} style={{ cursor: 'pointer', color: 'rgb(91, 197, 242)' }}>
-          <ListItem
-            className={classes.expandIcon}
-            style={path.length > 1 ? { marginLeft: path.length * 24 - 24 + 'px' } : { margin: '0' }}
-          >
-            {canExpand && (
-              <>
-                {internalLoading && <CircularProgress size={'15px'} color="info" />}
-                {!internalLoading && (
-                  <>
-                    {open && <KeyboardArrowDown onClick={() => setOpen(false)} />}
-                    {!open && <KeyboardArrowRight onClick={handleOpen} />}
-                  </>
-                )}
-              </>
-            )}
-          </ListItem>
-        </TableCell>
-        <TableCell align="center" className={classes.checkbox}>
-          <Checkbox
-            checked={status === SelectedStatus.SELECTED}
-            indeterminate={status === SelectedStatus.INDETERMINATE}
-            color="secondary"
-            indeterminateIcon={<IndeterminateCheckBoxOutlined />}
-            onChange={(event, checked) => onSelect(item, checked)}
-            inputProps={{ 'aria-labelledby': name }}
-          />
-        </TableCell>
-        {searchMode && full_path && (
-          <TableCell>
-            <Breadcrumbs maxItems={2}>
-              {(full_path.split('/').length > 1 ? full_path.split('/').slice(1) : full_path.split('/').slice(0)).map(
-                (full_path: string) => (
-                  <Typography key={uuidv4()} style={{ color: '#153D8A' }}>
-                    {full_path}
-                  </Typography>
-                )
+    <>
+      <RowContainerWrapper container color={path.length % 2 === 0 ? '#f3f5f9' : '#fff'}>
+        <RowWrapper
+          size={mode === SearchMode.RESEARCH ? '75px' : '55px'}
+          container
+          alignItems="center"
+          marginLeft={path.length > 1 ? path.length * 20 - 20 + 'px' : '0'}
+        >
+          <CellWrapper item xs={1} cursor>
+            <>
+              {internalLoading && <CircularProgress size={'15px'} color="info" />}
+              {!internalLoading && (
+                <>
+                  {open && <KeyboardArrowDown onClick={() => setOpen(false)} color="secondary" />}
+                  {!open && <KeyboardArrowRight onClick={handleOpen} color="secondary" />}
+                </>
               )}
-            </Breadcrumbs>
-          </TableCell>
-        )}
-        {!searchMode && (
-          <TableCell style={{ cursor: 'pointer' }}>
-            <Typography
+            </>
+          </CellWrapper>
+
+          {mode === SearchMode.RESEARCH && full_path && (
+            <CellWrapper cursor item xs={5}>
+              <Breadcrumbs maxItems={2}>
+                {(full_path.split('/').length > 1 ? full_path.split('/').slice(1) : full_path.split('/').slice(0)).map(
+                  (full_path: string, index, arr) => {
+                    const last = index === arr.length - 1
+                    return (
+                      <Typography fontWeight={last ? 700 : 600} fontSize={last ? 12.5 : 11.5} key={uuidv4()}>
+                        {full_path}
+                      </Typography>
+                    )
+                  }
+                )}
+              </Breadcrumbs>
+            </CellWrapper>
+          )}
+          {mode === SearchMode.EXPLORATION && (
+            <CellWrapper
+              cursor
+              item
+              xs={5}
               onClick={() => (open ? setOpen(false) : handleOpen())}
-            >{`${source_value} - ${name}`}</Typography>
-          </TableCell>
-        )}
-        <TableCell align="center">
-          <Typography onClick={() => (open ? setOpen(false) : handleOpen())}>{displayDigit(+cohort_size)}</Typography>
-        </TableCell>
-        {sourceType === SourceType.ALL && (
-          <TableCell align="center">
-            {rights && <Typography>{servicesPerimeters.getAccessFromRights(rights)}</Typography>}
-          </TableCell>
-        )}
-        {sourceType !== SourceType.ALL && (
-          <TableCell align="center">
-            <Typography>{type}</Typography>
-          </TableCell>
-        )}
-      </TableRow>
+              fontSize={12.5}
+              fontWeight={700}
+            >
+              {`${source_value} - ${name}`}
+            </CellWrapper>
+          )}
+          <CellWrapper item xs={2} textAlign="center" fontSize={11.5}>
+            {displayDigit(+cohort_size)}
+          </CellWrapper>
+          {sourceType === SourceType.ALL && (
+            <CellWrapper item xs={3} textAlign="center" fontSize={11.5}>
+              {rights && <Fragment>{servicesPerimeters.getAccessFromRights(rights)}</Fragment>}
+            </CellWrapper>
+          )}
+          {sourceType !== SourceType.ALL && (
+            <CellWrapper item xs={3} textAlign="center" fontSize={11.5}>
+              {type}
+            </CellWrapper>
+          )}
+          <CellWrapper item xs={1} container justifyContent="flex-end">
+            <Checkbox
+              checked={status === SelectedStatus.SELECTED}
+              indeterminate={status === SelectedStatus.INDETERMINATE}
+              color="secondary"
+              indeterminateIcon={<IndeterminateCheckBoxOutlined />}
+              onChange={(event, checked) => onSelect(item, checked)}
+              inputProps={{ 'aria-labelledby': name }}
+            />
+          </CellWrapper>
+        </RowWrapper>
+      </RowContainerWrapper>
       {!internalLoading &&
         open &&
-        sort(subItems || [], 'source_value').map((subItem: Hierarchy<ScopeElement, string>) => {
+        sortArray(subItems || [], 'source_value').map((subItem: Hierarchy<ScopeElement, string>) => {
           if (isSourceTypeInScopeLevel(sourceType, subItem.type)) {
             return (
               <ScopeTreeRow
                 loading={loading}
                 sourceType={sourceType}
                 path={[...path, id]}
-                searchMode={searchMode}
+                mode={mode}
                 key={subItem.id}
                 item={subItem}
                 onSelect={onSelect}
@@ -138,13 +146,13 @@ const ScopeTreeRow = ({ item, path, sourceType, searchMode, loading, onSelect, o
             )
           }
         })}
-    </Fragment>
+    </>
   )
 }
 
 type HierarchyProps = {
-  hierarchy: Hierarchy<ScopeElement, string>[]
-  searchMode: boolean
+  hierarchy: HierarchyInfo<ScopeElement>
+  mode: SearchMode
   selectAllStatus: SelectedStatus
   sourceType: SourceType
   loading: { search: LoadingStatus; expand: LoadingStatus }
@@ -155,7 +163,7 @@ type HierarchyProps = {
 
 const ScopeTreeTable = ({
   hierarchy,
-  searchMode,
+  mode,
   selectAllStatus,
   sourceType,
   loading,
@@ -163,15 +171,22 @@ const ScopeTreeTable = ({
   onSelectAll,
   onExpand
 }: HierarchyProps) => {
-  const { classes } = useStyles()
-
   return (
     <TableContainer style={{ overflowX: 'hidden', background: 'white' }}>
       <Table>
         <TableHead>
-          <TableRow className={classes.tableHead}>
-            <TableCell className={classes.emptyTableHeadCell}></TableCell>
-            <TableCell align="center" className={classes.emptyTableHeadCell}>
+          <RowContainerWrapper alignItems="center" container color="#e1e1e1" height={'60px'}>
+            <CellWrapper item xs={1}></CellWrapper>
+            <CellWrapper item xs={5} color="#0063AF">
+              Nom
+            </CellWrapper>
+            <CellWrapper item xs={2} textAlign="center" color="#0063AF">
+              Nombre de patients
+            </CellWrapper>
+            <CellWrapper item xs={3} textAlign="center" color="#0063AF">
+              {sourceType === SourceType.ALL ? 'Accès' : 'Type'}
+            </CellWrapper>
+            <CellWrapper item xs={1} container justifyContent="flex-end">
               <Checkbox
                 color="secondary"
                 checked={selectAllStatus === SelectedStatus.SELECTED}
@@ -179,44 +194,37 @@ const ScopeTreeTable = ({
                 indeterminateIcon={<IndeterminateCheckBoxOutlined style={{ color: 'rgba(0,0,0,0.6)' }} />}
                 onChange={(event, checked) => onSelectAll(checked)}
               />
-            </TableCell>
-            <TableCell align="left" className={classes.tableHeadCell}>
-              Nom
-            </TableCell>
-
-            <TableCell align="center" className={classes.tableHeadCell}>
-              Nombre de patients
-            </TableCell>
-
-            <TableCell align="center" className={classes.tableHeadCell}>
-              {sourceType === SourceType.ALL ? 'Accès' : 'Type'}
-            </TableCell>
-          </TableRow>
+            </CellWrapper>
+          </RowContainerWrapper>
         </TableHead>
         <TableBody style={{ height: '100%' }}>
-          {loading.search === LoadingStatus.SUCCESS && !hierarchy.length && (
+          {loading.search === LoadingStatus.SUCCESS && !hierarchy.tree.length && (
             <TableRow>
               <TableCell colSpan={7} align="center">
                 <Typography>Aucun résultat à afficher</Typography>
               </TableCell>
             </TableRow>
           )}
-          {loading.search !== LoadingStatus.FETCHING &&
-            hierarchy.map((item) => {
-              if (!item) return <h1 key={uuidv4()}>Missing</h1>
-              return (
-                <ScopeTreeRow
-                  loading={loading}
-                  path={[item.id]}
-                  searchMode={searchMode}
-                  key={item.id}
-                  item={item}
-                  sourceType={sourceType}
-                  onExpand={onExpand}
-                  onSelect={onSelect}
-                />
-              )
-            })}
+          {loading.search !== LoadingStatus.FETCHING && (
+            <div style={{ maxHeight: '65vh', overflow: 'auto' }}>
+              {hierarchy.tree.map((item) =>
+                item ? (
+                  <ScopeTreeRow
+                    loading={loading}
+                    path={[item.id]}
+                    mode={mode}
+                    key={item.id}
+                    item={item}
+                    sourceType={sourceType}
+                    onExpand={onExpand}
+                    onSelect={onSelect}
+                  />
+                ) : (
+                  <h1 key={uuidv4()}>Missing</h1>
+                )
+              )}
+            </div>
+          )}
         </TableBody>
       </Table>
       {loading.search === LoadingStatus.FETCHING && (

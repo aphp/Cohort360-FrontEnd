@@ -26,3 +26,7 @@ export enum SourceType {
 export enum Rights {
   EXPIRED = 'expired'
 }
+
+export enum System {
+  ScopeTree = "scope_tree"
+}

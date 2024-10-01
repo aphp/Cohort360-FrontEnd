@@ -41,11 +41,13 @@ import { useAppDispatch, useAppSelector } from 'state'
 import Modal from 'components/ui/Modal'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 import { CanceledError } from 'axios'
 import { DocumentReference } from 'fhir/r4'
+import { HierarchyWithLabelAndSystem } from 'types/hierarchy'
+import { getCodeList } from 'services/aphp/serviceValueSets'
+import { getConfig } from 'config'
 
 type DocumentsProps = {
   groupId?: string
@@ -83,7 +85,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const [searchInputError, setSearchInputError] = useState<SearchInputError | null>(null)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyWithLabelAndSystem[]>([])
 
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
@@ -203,8 +205,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
 
   useEffect(() => {
     const fetch = async () => {
-      const encounterStatus = await services.cohortCreation.fetchEncounterStatus()
-      setEncounterStatusList(encounterStatus)
+      const encounterStatus = await getCodeList(getConfig().core.valueSets.encounterStatus.url)
+      setEncounterStatusList(encounterStatus.results)
     }
     fetch()
     getSavedFilters()

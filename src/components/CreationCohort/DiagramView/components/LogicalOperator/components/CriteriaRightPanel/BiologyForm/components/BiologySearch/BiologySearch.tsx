@@ -30,7 +30,7 @@ import { ValueSetWithHierarchy } from 'services/aphp/cohortCreation/fetchObserva
 import services from 'services/aphp'
 import { ObservationDataType } from 'types/requestCriterias'
 import { ValueSet } from 'types'
-import { Hierarchy } from 'types/hierarchy'
+import { Hierarchy, HierarchyElementWithSystem } from 'types/hierarchy'
 
 type BiologySearchListItemProps = {
   label: string
@@ -88,7 +88,7 @@ const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
 type BiologySearchProps = {
   isEdition?: boolean
   goBack: () => void
-  onChangeSelectedCriteria: (data: Hierarchy<any, any>[] | undefined | null) => void
+  onChangeSelectedCriteria: (data: HierarchyElementWithSystem[] | undefined | null) => void
   selectedCriteria: ObservationDataType
   onConfirm: () => void
 }

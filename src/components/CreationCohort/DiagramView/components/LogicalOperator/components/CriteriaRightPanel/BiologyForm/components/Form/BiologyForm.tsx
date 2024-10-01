@@ -24,12 +24,15 @@ import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchBiology } from 'state/biology'
 import { CriteriaItemDataCache, HierarchyTree } from 'types'
-import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
+import AdvancedInputs from '../../../AdvancedInputs'
 import { ObservationDataType, Comparators, SelectedCriteriaType } from 'types/requestCriterias'
 import services from 'services/aphp'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import { ErrorWrapper } from 'components/ui/Searchbar/styles'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
+import { SourceType } from 'types/scope'
+import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 
 enum Error {
   NO_ERROR,
@@ -38,9 +41,6 @@ enum Error {
   MISSING_VALUE_ERROR,
   ADVANCED_INPUTS_ERROR
 }
-import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
-import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 
 type BiologyFormProps = {
   isOpen: boolean
@@ -90,7 +90,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {
         const criteriaCode = criteriaData.data.biologyData
-          ? criteriaData.data.biologyData.find((g: Hierarchy<any, any>) => g.id === code.id)
+          ? criteriaData.data.biologyData.find((g: HierarchyElementWithSystem) => g.id === code.id)
           : null
         return {
           id: code.id,

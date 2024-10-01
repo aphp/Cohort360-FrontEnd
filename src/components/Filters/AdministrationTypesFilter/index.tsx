@@ -2,14 +2,14 @@ import { Autocomplete, TextField, Typography } from '@mui/material'
 import { InputWrapper } from 'components/ui/Inputs'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
-import { Hierarchy } from 'types/hierarchy'
+import { FhirItem } from 'types/hierarchy'
 import { LabelObject } from 'types/searchCriterias'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 type AdministrationTypesFilterProps = {
   value: LabelObject[]
   name: string
-  allAdministrationTypes: Hierarchy<any, any>[]
+  allAdministrationTypes: FhirItem[]
   disabled?: boolean
 }
 

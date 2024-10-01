@@ -32,11 +32,9 @@ import AnabioFilter from 'components/Filters/AnabioFilter'
 import LoincFilter from 'components/Filters/LoincFilter'
 import { useSearchParams } from 'react-router-dom'
 import { SourceType } from 'types/scope'
-import {
-  fetchLoincCodes as fetchLoincCodesApi,
-  fetchAnabioCodes as fetchAnabioCodesApi
-} from 'services/aphp/serviceBiology'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { getCodeList } from 'services/aphp/serviceValueSets'
+import { getConfig } from 'config'
 
 type BiologyListProps = {
   groupId?: string
@@ -170,7 +168,7 @@ const BiologyList = ({ groupId, deidentified }: BiologyListProps) => {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const encounterStatus = await services.cohortCreation.fetchEncounterStatus()
+        const encounterStatus = (await getCodeList(getConfig().core.valueSets.encounterStatus.url)).results
         setEncounterStatusList(encounterStatus)
       } catch (e) {
         /* empty */
@@ -318,8 +316,8 @@ const BiologyList = ({ groupId, deidentified }: BiologyListProps) => {
       >
         {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
         {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp ?? ''} />}
-        <AnabioFilter name={FilterKeys.ANABIO} value={anabio} onFetch={fetchAnabioCodesApi} />
-        <LoincFilter name={FilterKeys.LOINC} value={loinc} onFetch={fetchLoincCodesApi} />
+        <AnabioFilter name={FilterKeys.ANABIO} value={anabio} onFetch={() => {}} />
+        <LoincFilter name={FilterKeys.LOINC} value={loinc} onFetch={() => {}} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
           sourceType={SourceType.BIOLOGY}
@@ -448,7 +446,7 @@ const BiologyList = ({ groupId, deidentified }: BiologyListProps) => {
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.ANABIO}
                     value={selectedSavedFilter?.filterParams.filters.anabio || []}
-                    onFetch={fetchAnabioCodesApi}
+                    onFetch={() => {}}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -456,7 +454,7 @@ const BiologyList = ({ groupId, deidentified }: BiologyListProps) => {
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.LOINC}
                     value={selectedSavedFilter?.filterParams.filters.loinc || []}
-                    onFetch={fetchLoincCodesApi}
+                    onFetch={() => {}}
                   />
                 </Grid>
                 <Grid item xs={12}>

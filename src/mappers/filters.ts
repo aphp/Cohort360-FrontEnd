@@ -30,12 +30,11 @@ import {
   convertStringToDuration,
   convertTimestampToDuration
 } from 'utils/age'
-import { fetchClaimCodes, fetchConditionCodes, fetchProcedureCodes } from 'services/aphp/servicePmsi'
-import { fetchAnabioCodes, fetchLoincCodes } from 'services/aphp/serviceBiology'
 import services from 'services/aphp'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import { Hierarchy } from 'types/hierarchy'
 import { getConfig } from 'config'
+import { getChildrenFromCodes, getCodeList } from 'services/aphp/serviceValueSets'
 
 export enum PatientsParamsKeys {
   GENDERS = 'gender',
@@ -208,7 +207,7 @@ const mapGenericFromRequestParams = async (parameters: URLSearchParams, type: Re
   )
   let encounterStatus: LabelObject[] = []
   if (encounterStatusParams) {
-    const allEncounterStatus = await services.cohortCreation.fetchEncounterStatus()
+    const allEncounterStatus = (await getCodeList(getConfig().core.valueSets.encounterStatus.url)).results
     encounterStatus = encounterStatusParams?.split(',')?.map((elem) => {
       return {
         id: elem.split('|')?.[1],
@@ -269,19 +268,20 @@ const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
   const codeIds =
     decodeURIComponent(parameters.get(ConditionParamsKeys.CODE) ?? '')
       ?.split(',')
-      ?.map((e) => e.split('|')?.[1])
-      ?.join(',') || ''
-  const fetchCodesResults = await fetchConditionCodes(codeIds, true)
+      ?.map((e) => e.split('|')?.[1]) || []
+  const fetchCodesResults = (
+    await getChildrenFromCodes(getConfig().features.condition.valueSets.conditionHierarchy.url, codeIds)
+  ).results
   const code = fetchCodesResults.map((e) => {
     return { id: e.id, label: e.label }
   })
   const diagnosticTypesParams = decodeURIComponent(parameters.get(ConditionParamsKeys.DIAGNOSTIC_TYPES) ?? '')
   let diagnosticTypes: LabelObject[] = []
   if (diagnosticTypesParams) {
-    const allDiagnosticTypes = await services.cohortCreation.fetchDiagnosticTypes()
+    const allDiagnosticTypes = await getCodeList(getConfig().features.condition.valueSets.conditionStatus.url)
     diagnosticTypes = diagnosticTypesParams?.split(',')?.map((elem) => {
       const toParse = elem.split('|')?.[1]
-      return { id: toParse, label: allDiagnosticTypes.find((diag) => diag.id === toParse)?.label || '' }
+      return { id: toParse, label: (allDiagnosticTypes.results || []).find((diag) => diag.id === toParse)?.label || '' }
     })
   }
   const source = parameters.get(ConditionParamsKeys.SOURCE) ?? ''
@@ -296,9 +296,10 @@ const mapProcedureFromRequestParams = async (parameters: URLSearchParams) => {
   const codeIds =
     decodeURIComponent(parameters.get(ProcedureParamsKeys.CODE) ?? '')
       ?.split(',')
-      ?.map((e) => e.split('|')?.[1])
-      ?.join(',') || ''
-  const fetchCodesResults = await fetchProcedureCodes(codeIds, true)
+      ?.map((e) => e.split('|')?.[1]) || []
+  const fetchCodesResults = (
+    await getChildrenFromCodes(getConfig().features.procedure.valueSets.procedureHierarchy.url, codeIds)
+  ).results
   const code = fetchCodesResults.map((e) => {
     return { id: e.id, label: e.label }
   })
@@ -314,9 +315,10 @@ const mapClaimFromRequestParams = async (parameters: URLSearchParams) => {
   const codeIds =
     decodeURIComponent(parameters.get(ClaimParamsKeys.CODE) ?? '')
       ?.split(',')
-      ?.map((e) => e.split('|')?.[1])
-      ?.join(',') || ''
-  const fetchCodesResults = await fetchClaimCodes(codeIds, true)
+      ?.map((e) => e.split('|')?.[1]) || []
+  const fetchCodesResults = (
+    await getChildrenFromCodes(getConfig().features.claim.valueSets.claimHierarchy.url, codeIds)
+  ).results
   const code = fetchCodesResults.map((e) => {
     return { id: e.id, label: e.label }
   })
@@ -331,7 +333,7 @@ const mapPrescriptionFromRequestParams = async (parameters: URLSearchParams) => 
   const prescriptionTypesParam = decodeURIComponent(parameters.get(PrescriptionParamsKeys.PRESCRIPTION_TYPES) ?? '')
   let prescriptionTypes: LabelObject[] = []
   if (prescriptionTypesParam) {
-    const types = await services.cohortCreation.fetchPrescriptionTypes()
+    const types = (await getCodeList(getConfig().features.medication.valueSets.medicationPrescriptionTypes.url)).results
     prescriptionTypes = prescriptionTypesParam?.split(',')?.map((elem) => {
       return { id: elem.split('|')?.[1], label: types.find((type) => type.id === elem.split('|')?.[1])?.label || '' }
     })
@@ -349,7 +351,7 @@ const mapAdministrationFromRequestParams = async (parameters: URLSearchParams) =
   )
   let administrationRoutes: LabelObject[] = []
   if (administrationRoutesParam) {
-    const routes = await services.cohortCreation.fetchAdministrations()
+    const routes = (await getCodeList(getConfig().features.medication.valueSets.medicationAdministrations.url)).results
     administrationRoutes = administrationRoutesParam?.split(',')?.map((elem) => {
       return { id: elem.split('|')?.[1], label: routes.find((route) => route.id === elem.split('|')?.[1])?.label || '' }
     })
@@ -363,24 +365,18 @@ const mapAdministrationFromRequestParams = async (parameters: URLSearchParams) =
 
 const mapBiologyFromRequestParams = async (parameters: URLSearchParams) => {
   const anabioLoinc = parameters.get(ObservationParamsKeys.ANABIO_LOINC)?.split(',') || []
-
   const anabioIds = anabioLoinc
     ?.filter((e) => e.includes(getConfig().features.observation.valueSets.biologyHierarchyAnabio.url))
     ?.map((e) => e.split('|')?.[1])
-    ?.join(',')
-  const fetchAnabioResults = await fetchAnabioCodes(anabioIds, true)
-  const anabio = fetchAnabioResults.map((e) => {
-    return { id: e.id, label: e.label }
-  })
+  const anabio = (
+    await getChildrenFromCodes(getConfig().features.observation.valueSets.biologyHierarchyAnabio.url, anabioIds)
+  ).results
   const loincIds = anabioLoinc
     ?.filter((e) => e.includes(getConfig().features.observation.valueSets.biologyHierarchyLoinc.url))
     ?.map((e) => e.split('|')?.[1])
-    ?.join(',')
-  const fetchLoincResults = await fetchLoincCodes(loincIds, true)
-  const loinc = fetchLoincResults.map((e) => {
-    return { id: e.id, label: e.label }
-  })
-
+  const loinc = (
+    await getChildrenFromCodes(getConfig().features.observation.valueSets.biologyHierarchyLoinc.url, loincIds)
+  ).results
   const validatedStatus = true
   const { nda, startDate, endDate, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
     parameters,
@@ -394,7 +390,8 @@ const mapImagingFromRequestParams = async (parameters: URLSearchParams) => {
   const ipp = decodeURIComponent(parameters.get(ImagingParamsKeys.IPP) ?? '')
   let modality: LabelObject[] = []
   if (modalityParams) {
-    const allModalities = await services.cohortCreation.fetchModalities()
+    const allModalities = (await getCodeList(getConfig().features.imaging.valueSets.imagingModalities.url, true))
+      .results
     modality = modalityParams?.split(',')?.map((elem) => {
       return {
         id: elem.split('|')?.[1],

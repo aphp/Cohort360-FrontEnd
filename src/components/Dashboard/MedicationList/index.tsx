@@ -14,7 +14,7 @@ import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import IppFilter from 'components/Filters/IppFilter'
 import List from 'components/ui/List'
 import Modal from 'components/ui/Modal'
-import { medicationTabs } from 'components/Patient/PatientMedication/PatientMedication'
+import { medicationTabs } from 'components/Patient/PatientMedication'
 import NdaFilter from 'components/Filters/NdaFilter'
 import PrescriptionTypesFilter from 'components/Filters/PrescriptionTypesFilter'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
@@ -36,6 +36,8 @@ import { selectFiltersAsArray } from 'utils/filters'
 import { mapToLabel } from 'mappers/pmsi'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { getCodeList } from 'services/aphp/serviceValueSets'
+import { getConfig } from 'config'
 
 type MedicationListProps = {
   groupId?: string
@@ -197,13 +199,13 @@ const MedicationList = ({ groupId, deidentified }: MedicationListProps) => {
   useEffect(() => {
     const fetch = async () => {
       const [administrations, prescriptions, encounterStatus] = await Promise.all([
-        services.cohortCreation.fetchAdministrations(),
-        services.cohortCreation.fetchPrescriptionTypes(),
-        services.cohortCreation.fetchEncounterStatus()
+        getCodeList(getConfig().features.medication.valueSets.medicationAdministrations.url),
+        getCodeList(getConfig().features.medication.valueSets.medicationPrescriptionTypes.url),
+        getCodeList(getConfig().core.valueSets.encounterStatus.url)
       ])
-      setAllAdministrationRoutes(administrations)
-      setAllPrescriptionTypes(prescriptions)
-      setEncounterStatusList(encounterStatus)
+      setAllAdministrationRoutes(administrations.results)
+      setAllPrescriptionTypes(prescriptions.results)
+      setEncounterStatusList(encounterStatus.results)
     }
     fetch()
   }, [])

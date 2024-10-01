@@ -32,7 +32,7 @@ import {
   SelectedCriteriaType
 } from 'types/requestCriterias'
 import { ExportTableType } from 'components/Dashboard/ExportModal/export_table'
-import { Hierarchy } from 'types/hierarchy'
+import { Hierarchy, HierarchyElementWithSystem } from 'types/hierarchy'
 import { SearchByTypes } from 'types/searchCriterias'
 import { PMSILabel } from 'types/patient'
 
@@ -378,7 +378,13 @@ export type CriteriaItemType = {
 
 type FetchFunctionVariant =
   | (() => Promise<SimpleCodeType[]>)
-  | ((searchValue?: string, noStar?: boolean, signal?: AbortSignal) => Promise<Hierarchy<any, any>[]>)
+  | ((
+      searchValue?: string,
+      exactSearch?: boolean,
+      signal?: AbortSignal
+    ) => Promise<Back_API_Response<Promise<HierarchyElementWithSystem[]>>>)
+
+export type ResearchType = string | boolean | AbortSignal | undefined
 
 export type ValueSet = {
   code: string
@@ -698,9 +704,10 @@ export type IPatientImaging<T extends CohortImaging> = {
   page: number
 }
 
-export type TabType<T, TL> = {
+export type TabType<T = string, TL = string> = {
   label: TL
   id: T
+  active?: boolean
   icon?: ReactElement
   wrapped?: boolean
 }
@@ -733,11 +740,9 @@ export type DTTB_ButtonType = {
   onClick: (args?: any) => void
 }
 export type HierarchyTree = null | {
-  code?: Hierarchy<any, any>[]
+  code?: HierarchyElementWithSystem[]
   loading?: number
 }
-
-export type HierarchyElementWithSystem = Hierarchy<any, any> & { system?: string }
 
 export type ScopeElement = {
   id: string

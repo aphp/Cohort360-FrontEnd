@@ -38,19 +38,26 @@ import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable 
 import { defaultMedication } from '../../index'
 import { HierarchyTree } from 'types'
 import { MedicationDataType } from 'types/requestCriterias'
-import { Hierarchy } from 'types/hierarchy'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 
 type MedicationListItemProps = {
-  medicationItem: Hierarchy<any, any>
-  selectedItems?: Hierarchy<any, any>[] | null
-  handleClick: (medicationItem: Hierarchy<any, any>[] | null | undefined, newHierarchy?: Hierarchy<any, any>[]) => void
+  medicationItem: HierarchyElementWithSystem
+  selectedItems?: HierarchyElementWithSystem[] | null
+  handleClick: (
+    medicationItem: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
+  ) => void
   setLoading: (isLoading: boolean) => void
   valueSetSystem?: 'ATC' | 'UCD'
 }
 
 const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
   const { medicationItem, selectedItems, handleClick, setLoading, valueSetSystem } = props
-  const { id, label, subItems } = medicationItem
+  const {
+    id,
+    id: { label },
+    subItems
+  } = medicationItem
 
   const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
@@ -83,7 +90,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = (medicationItem: Hierarchy<any, any>) => {
+  const handleClickOnHierarchy = (medicationItem: HierarchyElementWithSystem) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingMedication > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getHierarchySelection(medicationItem, selectedItems || [], medicationHierarchy)
@@ -142,7 +149,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
       <Collapse in={id === '*' ? true : open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
-          {subItems?.map((medicationHierarchySubItem: Hierarchy<any, any>, index: number) =>
+          {subItems?.map((medicationHierarchySubItem: HierarchyElementWithSystem, index: number) =>
             medicationHierarchySubItem.id === 'loading' ? (
               <Fragment key={index + medicationHierarchySubItem.id}>
                 <div className={classes.subItemsIndicator} />
@@ -171,8 +178,8 @@ type MedicationExplorationProps = {
   selectedCriteria: MedicationDataType
   goBack: () => void
   onChangeSelectedHierarchy: (
-    data: Hierarchy<any, any>[] | null | undefined,
-    newHierarchy?: Hierarchy<any, any>[]
+    data: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
   ) => void
   onConfirm: () => void
   isEdition?: boolean
@@ -190,13 +197,13 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
   const [selectState, setSelectState] = useState<'ATC' | 'UCD'>('ATC')
   const medicationHierarchy = useAppSelector((state) => state.medication.list || {})
   const medicationListUCD = useAppSelector((state) => state.medication.ucdList || {})
-  const [paginateData, setPaginateData] = useState<Hierarchy<any, any>[]>([])
+  const [paginateData, setPaginateData] = useState<HierarchyElementWithSystem[]>([])
   const [page, setPage] = useState<number>(1)
   const page_size = 30
 
   const _handleClick = async (
-    newSelectedItems: Hierarchy<any, any>[] | null | undefined,
-    hierarchy?: Hierarchy<any, any>[]
+    newSelectedItems: HierarchyElementWithSystem[] | null | undefined,
+    hierarchy?: HierarchyElementWithSystem[]
   ) => {
     onChangeSelectedHierarchy(newSelectedItems, hierarchy)
   }
@@ -216,9 +223,7 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
     if (!newList.code) {
       newList.code = selectedCriteria.code
     }
-    newList.code?.map(
-      (item: Hierarchy<any, any>) => findEquivalentRowInItemAndSubItems(item, medicationHierarchy).equivalentRow
-    )
+    newList.code?.map((item) => findEquivalentRowInItemAndSubItems(item, medicationHierarchy).equivalentRow)
     setCurrentState(newList)
   }, [initialState, medicationHierarchy, selectedCriteria])
 

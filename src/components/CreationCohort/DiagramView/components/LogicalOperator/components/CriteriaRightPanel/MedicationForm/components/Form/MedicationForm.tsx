@@ -15,23 +15,22 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
-
-import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
-
+import AdvancedInputs from '../../../AdvancedInputs'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchMedication } from 'state/medication'
-import { CriteriaItemDataCache, HierarchyElementWithSystem, HierarchyTree } from 'types'
-import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
-import services from 'services/aphp'
+import { CriteriaItemDataCache, HierarchyTree } from 'types'
 import { Comparators, CriteriaType, MedicationDataType, SelectedCriteriaType } from 'types/requestCriterias'
-import { displaySystem } from 'utils/displayValueSetSystem'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
+import { HierarchyWithLabel, HierarchyWithLabelAndSystem } from 'types/hierarchy'
+import { SearchOutlined } from '@mui/icons-material'
+import { Reference, References, ReferencesLabel } from 'types/searchValueSet'
+import Panel from 'components/ui/Panel'
+import SearchValueSet from 'components/SearchValueSet'
+import { getConfig } from 'config'
 
 type MedicationFormProps = {
   isOpen: boolean
@@ -63,6 +62,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
     currentState.occurrenceComparator || Comparators.GREATER_OR_EQUAL
   )
   const [error, setError] = useState(Error.NO_ERROR)
+  const [openCodeResearch, setOpenCodeResearch] = useState(false)
 
   useEffect(() => {
     if (currentState.type === CriteriaType.MEDICATION_ADMINISTRATION) {
@@ -70,12 +70,12 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
     }
   }, [currentState.type])
 
-  const getMedicationOptions = async (searchValue: string, signal: AbortSignal) => {
+  /*const getMedicationOptions = async (searchValue: string, signal: AbortSignal) => {
     const response = await services.cohortCreation.fetchMedicationData(searchValue, false, signal)
     return response.map((elem) => {
       return { ...elem, label: displaySystem(elem.system) + elem.label }
     })
-  }
+  }*/
 
   const _onSubmit = () => {
     onChangeSelectedCriteria({ ...currentState, occurrence: occurrence, occurrenceComparator: occurrenceComparator })
@@ -90,7 +90,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
     currentState.type === CriteriaType.MEDICATION_REQUEST && currentState.prescriptionType
       ? currentState.prescriptionType.map((prescriptionType) => {
           const criteriaPrescriptionType = criteriaData.data.prescriptionTypes
-            ? criteriaData.data.prescriptionTypes.find((p: Hierarchy<any, any>) => p.id === prescriptionType.id)
+            ? criteriaData.data.prescriptionTypes.find((p: HierarchyWithLabelAndSystem) => p.id === prescriptionType.id)
             : null
           return {
             id: prescriptionType.id,
@@ -102,7 +102,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
   const selectedCriteriaAdministration = currentState.administration
     ? currentState.administration.map((administration) => {
         const criteriaAdministration = criteriaData.data.administrations
-          ? criteriaData.data.administrations.find((p: Hierarchy<any, any>) => p.id === administration.id)
+          ? criteriaData.data.administrations.find((p: HierarchyWithLabelAndSystem) => p.id === administration.id)
           : null
         return {
           id: administration.id,
@@ -112,9 +112,9 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
     : []
 
   const defaultValuesCode = currentState.code
-    ? currentState.code.map((code: HierarchyElementWithSystem) => {
+    ? currentState.code.map((code: HierarchyWithLabelAndSystem) => {
         const criteriaCode = criteriaData.data.medicationData
-          ? criteriaData.data.medicationData.find((g: HierarchyElementWithSystem) => g.id === code.id)
+          ? criteriaData.data.medicationData.find((g: HierarchyWithLabelAndSystem) => g.id === code.id)
           : null
         return {
           id: code.id,
@@ -123,6 +123,39 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
         }
       })
     : []
+  const medicationReferences: Reference[] = [
+    {
+      id: References.ATC,
+      title: 'Toute la hiérarchie',
+      label: ReferencesLabel.ATC,
+      standard: true,
+      url: getConfig().features.medication.valueSets.medicationAtc.url,
+      checked: true,
+      isHierarchy: true,
+      filterRoots: (code: HierarchyWithLabel) =>
+        code.label.search(new RegExp(/^[A-Z] - /, 'gi')) !== -1 &&
+        code.label.search(new RegExp(/^[X-Y] - /, 'gi')) !== 0
+    },
+    {
+      id: References.UCD,
+      title: 'Toute la hiérarchie',
+      label: ReferencesLabel.UCD,
+      standard: true,
+      url: getConfig().features.medication.valueSets.medicationUcd.url,
+      checked: true,
+      isHierarchy: false,
+      filterRoots: () => true
+    } /*,
+    {
+      id: References.UCD_13,
+      label: ReferencesLabel.UCD_13,
+      standard: false,
+      url: `${MEDICATION_UCD_13}`,
+      checked: false,
+      isHierarchy: false,
+      filterRoots: () => true
+    }*/
+  ]
 
   return isOpen ? (
     <Grid className={classes.root}>
@@ -207,7 +240,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             />
           </RadioGroup>
 
-          <AsyncAutocomplete
+          {/*<AsyncAutocomplete
             label="Code(s) sélectionné(s)"
             variant="outlined"
             noOptionsText="Veuillez entrer un code de médicament"
@@ -230,18 +263,59 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               onChange={(e, value) => onChangeValue('prescriptionType', value)}
               renderInput={(params) => <TextField {...params} label="Type de prescription" />}
             />
+          )*/}
+
+          <Grid container justifyContent="space-between" alignItems="center" marginBottom={1} marginTop={1}>
+            <Grid item xs={10}>
+              {selectedCriteriaPrescriptionType.length < 1 && (
+                <FormLabel style={{ margin: 'auto 1em' }} component="legend">
+                  Résultats
+                </FormLabel>
+              )}
+              {selectedCriteriaPrescriptionType.length > 0 && (
+                <FormLabel style={{ margin: 'auto 1em' }} component="legend" onClick={() => setOpenCodeResearch(true)}>
+                  Sélectionner les codes
+                </FormLabel>
+              )}
+            </Grid>
+
+            <IconButton color="primary" onClick={() => setOpenCodeResearch(true)}>
+              <SearchOutlined />
+            </IconButton>
+          </Grid>
+          <Panel
+            onClose={() => setOpenCodeResearch(false)}
+            onConfirm={() => setOpenCodeResearch(false)}
+            open={openCodeResearch}
+          >
+            <SearchValueSet references={medicationReferences} />
+          </Panel>
+          {currentState.type === CriteriaType.MEDICATION_REQUEST && (
+            <Autocomplete
+              multiple
+              id="criteria-prescription-type-autocomplete"
+              className={classes.inputItem}
+              options={criteriaData?.data?.prescriptionTypes || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={selectedCriteriaPrescriptionType}
+              onChange={(e, value) => onChangeValue('prescriptionType', value)}
+              renderInput={(params) => <TextField {...params} label="Type de prescription" />}
+            />
           )}
-          <Autocomplete
-            multiple
-            id="criteria-prescription-type-autocomplete"
-            className={classes.inputItem}
-            options={criteriaData.data.administrations || []}
-            getOptionLabel={(option) => option.label}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            value={selectedCriteriaAdministration}
-            onChange={(e, value) => onChangeValue('administration', value)}
-            renderInput={(params) => <TextField {...params} label="Voie d'administration" />}
-          />
+          {currentState.type === CriteriaType.MEDICATION_ADMINISTRATION && (
+            <Autocomplete
+              multiple
+              id="criteria-prescription-type-autocomplete"
+              className={classes.inputItem}
+              options={criteriaData.data.administrations || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={selectedCriteriaAdministration}
+              onChange={(e, value) => onChangeValue('administration', value)}
+              renderInput={(params) => <TextField {...params} label="Voie d'administration" />}
+            />
+          )}
           <Autocomplete
             multiple
             options={criteriaData.data.encounterStatus || []}

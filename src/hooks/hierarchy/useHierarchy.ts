@@ -1,35 +1,54 @@
 import {
-  buildHierarchy,
+  buildTree,
+  buildMultipleTrees,
   getHierarchyDisplay,
   getItemSelectedStatus,
+  getListDisplay,
   getMissingCodes,
-  mapHierarchyToMap
-} from './../../utils/hierarchy'
+  getMissingCodesWithSystems,
+  groupBySystem,
+  mapHierarchyToMap,
+  getHierarchyRootCodes
+} from '../../utils/hierarchy/hierarchy'
 import { useEffect, useRef, useState } from 'react'
-import { LoadingStatus, SelectedStatus } from 'types'
-import { getSelectedCodes } from 'utils/hierarchy'
-import { Hierarchy, Mode } from '../../types/hierarchy'
+import { Back_API_Response, LoadingStatus, SelectedStatus } from 'types'
+import { getSelectedCodes } from 'utils/hierarchy/hierarchy'
+import { CodeKey, Hierarchy, HierarchyInfo, HierarchyLoadingStatus, Mode } from '../../types/hierarchy'
 import { removeElement } from 'utils/arrays'
-
+import { replaceInMap } from 'utils/map'
+import { SearchMode } from 'types/searchValueSet'
+/**
+ * @param {Hierarchy<T>[]} selectedNodes - Nodes selected in the hierarchy.
+ * @param {Hierarchy<T>[]} fetchedCodes - All the codes that have already been fetched and saved.
+ * @param {(codes: Hierarchy<T>[]) => void} onCache - A cache function to store the codes you fetch in the useHierarchy hook.
+ * @param {(ids: string, system: string) => Promise<Hierarchy<T>[]>} fetchHandler - A callback function that returns fetched hierarchies.
+ */
 export const useHierarchy = <T>(
-  baseTree: Hierarchy<T, string>[],
-  selectedNodes: Hierarchy<T, string>[],
-  _codes: Hierarchy<T, string>[],
-  onCache: (codes: Hierarchy<T, string>[]) => void,
-  fetchHandler: (ids: string) => Promise<Hierarchy<T, string>[]>
+  selectedNodes: Hierarchy<T>[],
+  fetchedCodes: Hierarchy<T>[],
+  onCache: (codes: Hierarchy<T>[]) => void,
+  fetchHandler: (ids: string, system: string) => Promise<Hierarchy<T>[]>
 ) => {
-  const [hierarchyRepresentation, setHierarchyRepresentation] = useState<Hierarchy<T, string>[]>([])
-  const [hierarchyDisplay, setHierarchyDisplay] = useState<Hierarchy<T, string>[]>([])
-  const [selectedCodes, setSelectedCodes] = useState<Hierarchy<T, string>[]>(selectedNodes)
-  const [codes, setCodes] = useState<Map<string, Hierarchy<T, string>>>(
-    mapHierarchyToMap(_codes.map((code) => ({ ...code, subItems: undefined })))
+  const DEFAULT_HIERARCHY_INFO = {
+    tree: [],
+    count: 0,
+    page: 1
+  }
+  const [trees, setTrees] = useState<Map<string, Hierarchy<T>[]>>(new Map())
+  const [hierarchies, setHierarchies] = useState<Map<string, HierarchyInfo<T>>>(new Map())
+  const [searchResults, setSearchResults] = useState<HierarchyInfo<T>>(DEFAULT_HIERARCHY_INFO)
+  const [selectedCodes, setSelectedCodes] = useState<Hierarchy<T>[]>(selectedNodes)
+  const [codes, setCodes] = useState<Map<CodeKey, Hierarchy<T>>>(
+    mapHierarchyToMap(fetchedCodes.map((code) => ({ ...code, subItems: undefined })))
   )
   const latestCodes = useRef(codes)
-  const [loadingStatus, setLoadingStatus] = useState({
-    search: LoadingStatus.FETCHING,
+  const [loadingStatus, setLoadingStatus] = useState<HierarchyLoadingStatus>({
+    init: LoadingStatus.FETCHING,
+    search: LoadingStatus.SUCCESS,
     expand: LoadingStatus.SUCCESS
   })
   const [selectAllStatus, setSelectAllStatus] = useState(SelectedStatus.NOT_SELECTED)
+
   useEffect(() => {
     latestCodes.current = codes
   }, [codes])
@@ -38,94 +57,125 @@ export const useHierarchy = <T>(
     return () => onCache(Array.from(latestCodes.current.values()))
   }, [])
 
-  useEffect(() => {
-    if (hierarchyDisplay.length) {
-      const node = { id: 'parent', subItems: hierarchyDisplay } as Hierarchy<T, string>
-      const status = getItemSelectedStatus(node)
-      setSelectAllStatus(status)
+  const initTrees = async (
+    initHandlers: { system: string; fetchBaseTree: () => Promise<Back_API_Response<Hierarchy<T>>> }[]
+  ) => {
+    const newTrees: Map<string, Hierarchy<T>[]> = new Map()
+    const newHierarchies: Map<string, HierarchyInfo<T>> = new Map()
+    let newCodes: Map<CodeKey, Hierarchy<T>> = new Map()
+    for (const handler of initHandlers) {
+      const { results: baseTree, count } = await handler.fetchBaseTree()
+      const prevCodes = [...baseTree, ...selectedCodes]
+      newCodes = new Map([
+        ...newCodes,
+        ...(await getMissingCodes(baseTree, codes, prevCodes, handler.system, Mode.INIT, fetchHandler))
+      ])
+      const newTree = buildTree(baseTree, handler.system, prevCodes, newCodes, selectedCodes, Mode.INIT)
+      const newHierarchy = getHierarchyDisplay(baseTree, newTree)
+      newTrees.set(handler.system, newTree)
+      newHierarchies.set(handler.system, { tree: newHierarchy, count, page: 1 })
+      newCodes = new Map([...newCodes, ...getHierarchyRootCodes(newTree)])
     }
-  }, [hierarchyDisplay])
+    setTrees(newTrees)
+    setHierarchies(newHierarchies)
+    setCodes(newCodes)
+    setLoadingStatus((prevLoadingStatus) => ({ ...prevLoadingStatus, init: LoadingStatus.SUCCESS }))
+  }
 
-  useEffect(() => {
-    const init = async () => {
-      const fetchedCodes = [...baseTree, ...selectedCodes]
-      const newCodes = await getMissingCodes(baseTree, codes, fetchedCodes, Mode.INIT, fetchHandler)
-      const newTree = buildHierarchy(baseTree, fetchedCodes, newCodes, selectedCodes, Mode.INIT)
-      const newDisplay = getHierarchyDisplay(baseTree, newTree)
-      setCodes(newCodes)
-      setHierarchyRepresentation(newTree)
-      setHierarchyDisplay(newDisplay)
-      setLoadingStatus({ ...loadingStatus, search: LoadingStatus.SUCCESS })
-    }
-    init()
-  }, [])
+  const search = async (fetchSearch: () => Promise<Back_API_Response<Hierarchy<T>>>) => {
+    const { results: endCodes, count } = await fetchSearch()
+    const bySystem = groupBySystem(endCodes)
+    const newCodes = await getMissingCodesWithSystems(trees, bySystem, codes, fetchHandler)
+    const newTrees = buildMultipleTrees(trees, bySystem, newCodes, selectedCodes, Mode.SEARCH)
+    //console.log('test search newTrees', newTrees)
+    setCodes(newCodes)
+    setTrees(newTrees)
+    return { display: getListDisplay(endCodes, newTrees), count }
+  }
 
-  const search = async (
-    searchValue: string,
+  const fetchMore = async (
+    fetchSearch: () => Promise<Back_API_Response<Hierarchy<T>>>,
     page: number,
-    fetchSearch: (search: string, page: number) => Promise<Hierarchy<T, string>[]>
+    mode: SearchMode,
+    id?: string
   ) => {
     setLoadingStatus({ ...loadingStatus, search: LoadingStatus.FETCHING })
-    const endCodes = searchValue ? await fetchSearch(searchValue, page) : []
-    const newCodes = searchValue ? await getMissingCodes(baseTree, codes, endCodes, Mode.SEARCH, fetchHandler) : codes
-    const toDisplay = searchValue ? endCodes : baseTree
-    const newTree = buildHierarchy(hierarchyRepresentation, endCodes, newCodes, selectedCodes, Mode.SEARCH)
-    const newDisplay = getHierarchyDisplay(toDisplay, newTree)
-    setCodes(newCodes)
-    setHierarchyRepresentation(newTree)
-    setHierarchyDisplay(newDisplay)
+    const { display, count } = await search(fetchSearch)
+    if (mode == SearchMode.EXPLORATION && id) {
+      const currentHierarchy = hierarchies.get(id) || DEFAULT_HIERARCHY_INFO
+      setHierarchies(replaceInMap(id, { ...currentHierarchy, tree: display, page }, hierarchies))
+    } else setSearchResults({ tree: display, count, page })
     setLoadingStatus({ ...loadingStatus, search: LoadingStatus.SUCCESS })
   }
 
-  const select = (node: Hierarchy<T, string>, toAdd: boolean) => {
+  const select = (node: Hierarchy<T>, toAdd: boolean) => {
+    console.log("test select node", node)
+    const hierarchyId = node.system
+    const currentTree = trees.get(hierarchyId) || []
+    const currentHierarchy = hierarchies.get(hierarchyId) || DEFAULT_HIERARCHY_INFO
     const mode = toAdd ? Mode.SELECT : Mode.UNSELECT
-    const newTree = buildHierarchy(hierarchyRepresentation, [node], codes, selectedCodes, mode)
-    const newDisplay = getHierarchyDisplay(hierarchyDisplay, newTree)
+    const newTree = buildTree(currentTree, node.system, [node], codes, selectedCodes, mode)
+    console.log("test select newTree", newTree)
+    const display = getHierarchyDisplay(currentHierarchy.tree, newTree)
     const newSelectedCodes = getSelectedCodes(newTree)
-    setHierarchyRepresentation(newTree)
-    setHierarchyDisplay(newDisplay)
+    setTrees(replaceInMap(hierarchyId, newTree, trees))
+    setHierarchies(replaceInMap(hierarchyId, { ...currentHierarchy, tree: display }, hierarchies))
     setSelectedCodes(newSelectedCodes)
   }
 
   const selectAll = (toAdd: boolean) => {
-    const mode = toAdd ? Mode.SELECT_ALL : Mode.UNSELECT_ALL
-    const newTree = buildHierarchy(hierarchyRepresentation, hierarchyDisplay, codes, selectedCodes, mode)
-    const newDisplay = getHierarchyDisplay(hierarchyDisplay, newTree)
+    /* const mode = toAdd ? Mode.SELECT_ALL : Mode.UNSELECT_ALL
+    const newTree = buildHierarchy(currentHierarchy.tree, currentHierarchy.display, codes, selectedCodes, mode)
+    const newDisplay = getHierarchyDisplay(currentHierarchy.display, newTree)
     const newSelectedCodes = getSelectedCodes(newTree)
-    setHierarchyRepresentation(newTree)
-    setHierarchyDisplay(newDisplay)
-    setSelectedCodes(newSelectedCodes)
+    setElemInHierarchies(currentHierarchy.id, newTree, newDisplay)
+    setSelectedCodes(newSelectedCodes)*/
   }
 
-  const deleteCode = (node: Hierarchy<T, string>) => {
+  const deleteCode = (node: Hierarchy<T>) => {
+    const hierarchyId = node.system
+    const currentTree = trees.get(hierarchyId) || []
+    const currentHierarchy = hierarchies.get(hierarchyId) || DEFAULT_HIERARCHY_INFO
     const newCodes = removeElement(node, selectedCodes)
-    const newTree = buildHierarchy(hierarchyRepresentation, [node], codes, selectedCodes, Mode.UNSELECT)
-    const newDisplay = getHierarchyDisplay(hierarchyDisplay, newTree)
-    setHierarchyRepresentation(newTree)
-    setHierarchyDisplay(newDisplay)
+    const newTree = buildTree(currentTree, node.system, [node], codes, selectedCodes, Mode.UNSELECT)
+    const display = getHierarchyDisplay(currentHierarchy.tree, newTree)
+    setTrees(replaceInMap(hierarchyId, newTree, trees))
+    setHierarchies(replaceInMap(hierarchyId, { ...currentHierarchy, tree: display }, hierarchies))
     setSelectedCodes(newCodes)
   }
 
-  const expand = async (node: Hierarchy<T, string>) => {
+  const expand = async (node: Hierarchy<T>) => {
     setLoadingStatus({ ...loadingStatus, expand: LoadingStatus.FETCHING })
-    const newCodes = await getMissingCodes(baseTree, codes, [node], Mode.EXPAND, fetchHandler)
-    const newTree = buildHierarchy(hierarchyRepresentation, [node], newCodes, selectedCodes, Mode.EXPAND)
-    const newDisplay = getHierarchyDisplay(hierarchyDisplay, newTree)
+    console.log(
+      'test root',
+      node.inferior_levels_ids,
+      node.inferior_levels_ids.split(',').length,
+      node.subItems?.length
+    )
+    const hierarchyId = node.system
+    const currentTree = trees.get(hierarchyId) || []
+    const currentHierarchy = hierarchies.get(hierarchyId) || DEFAULT_HIERARCHY_INFO
+    const newCodes = await getMissingCodes(currentTree, codes, [node], hierarchyId, Mode.EXPAND, fetchHandler)
+    //console.log('test expand', node, newCodes)
+    const newTree = buildTree(currentTree, node.system, [node], newCodes, selectedCodes, Mode.EXPAND)
+    const display = getHierarchyDisplay(currentHierarchy.tree, newTree)
     setCodes(newCodes)
-    setHierarchyRepresentation(newTree)
-    setHierarchyDisplay(newDisplay)
+    setTrees(replaceInMap(hierarchyId, newTree, trees))
+    setHierarchies(replaceInMap(hierarchyId, { ...currentHierarchy, tree: display }, hierarchies))
     setLoadingStatus({ ...loadingStatus, search: LoadingStatus.SUCCESS })
   }
 
   return {
-    hierarchy: hierarchyDisplay,
+    hierarchies,
+    searchResults,
     selectedCodes,
     loadingStatus,
     selectAllStatus,
-    search,
+    initTrees,
     select,
-    selectAll,
+    //selectAll,
     expand,
+    fetchMore,
     deleteCode
   }
 }
