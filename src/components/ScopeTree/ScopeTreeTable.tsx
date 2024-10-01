@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 import {
   Breadcrumbs,
   Checkbox,
@@ -13,7 +13,7 @@ import {
   Typography
 } from '@mui/material'
 import { LoadingStatus, ScopeElement, SelectedStatus } from 'types'
-import { Hierarchy } from 'types/hierarchy'
+import { Hierarchy, HierarchyInfo } from 'types/hierarchy'
 import { IndeterminateCheckBoxOutlined, KeyboardArrowDown, KeyboardArrowRight } from '@mui/icons-material'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import displayDigit from 'utils/displayDigit'
@@ -23,6 +23,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { isSourceTypeInScopeLevel } from 'utils/perimeters'
 import { every } from 'lodash'
 import { sortArray } from 'utils/arrays'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 type HierarchyItemProps = {
   item: Hierarchy<ScopeElement, string>
@@ -140,7 +141,7 @@ const ScopeTreeRow = ({ item, path, sourceType, searchMode, loading, onSelect, o
 }
 
 type HierarchyProps = {
-  hierarchy: Hierarchy<ScopeElement, string>[]
+  hierarchy: HierarchyInfo<ScopeElement>
   searchMode: boolean
   selectAllStatus: SelectedStatus
   sourceType: SourceType
@@ -148,6 +149,7 @@ type HierarchyProps = {
   onExpand: (node: Hierarchy<ScopeElement, string>) => void
   onSelect: (node: Hierarchy<ScopeElement, string>, toAdd: boolean) => void
   onSelectAll: (toAdd: boolean) => void
+  onFetchMore: () => void
 }
 
 const ScopeTreeTable = ({
@@ -158,8 +160,10 @@ const ScopeTreeTable = ({
   loading,
   onSelect,
   onSelectAll,
-  onExpand
+  onExpand,
+  onFetchMore
 }: HierarchyProps) => {
+  const scrollableUuid = useRef(uuidv4())
   return (
     <TableContainer style={{ overflowX: 'hidden', background: 'white' }}>
       <Table>
@@ -187,29 +191,41 @@ const ScopeTreeTable = ({
           </RowContainerWrapper>
         </TableHead>
         <TableBody style={{ height: '100%' }}>
-          {loading.search === LoadingStatus.SUCCESS && !hierarchy.length && (
+          {loading.search === LoadingStatus.SUCCESS && !hierarchy.tree.length && (
             <TableRow>
               <TableCell colSpan={7} align="center">
                 <Typography>Aucun résultat à afficher</Typography>
               </TableCell>
             </TableRow>
           )}
-          {loading.search !== LoadingStatus.FETCHING &&
-            hierarchy.map((item) => {
-              if (!item) return <h1 key={uuidv4()}>Missing</h1>
-              return (
-                <ScopeTreeRow
-                  loading={loading}
-                  path={[item.id]}
-                  searchMode={searchMode}
-                  key={item.id}
-                  item={item}
-                  sourceType={sourceType}
-                  onExpand={onExpand}
-                  onSelect={onSelect}
-                />
-              )
-            })}
+          {loading.search !== LoadingStatus.FETCHING && (
+            <div id={scrollableUuid.current} style={{ maxHeight: '70vh', overflow: 'auto' }}>
+              <InfiniteScroll
+                scrollableTarget={scrollableUuid.current}
+                dataLength={hierarchy.tree.length}
+                next={onFetchMore}
+                hasMore={hierarchy.tree.length < hierarchy.count}
+                scrollThreshold={0.9}
+                loader={<Fragment />}
+              >
+                {hierarchy.tree.map((item) => {
+                  if (!item) return <h1 key={uuidv4()}>Missing</h1>
+                  return (
+                    <ScopeTreeRow
+                      loading={loading}
+                      path={[item.id]}
+                      searchMode={searchMode}
+                      key={item.id}
+                      item={item}
+                      sourceType={sourceType}
+                      onExpand={onExpand}
+                      onSelect={onSelect}
+                    />
+                  )
+                })}
+              </InfiniteScroll>
+            </div>
+          )}
         </TableBody>
       </Table>
       {loading.search === LoadingStatus.FETCHING && (

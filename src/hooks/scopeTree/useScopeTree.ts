@@ -40,7 +40,7 @@ export const useScopeTree = (
   )
 
   const fetchSearch = async (search: string, page: number) => {
-    const { results, count } =
+    const results =
       sourceType === SourceType.ALL
         ? await servicesPerimeters.getRights({
             practitionerId,
@@ -80,7 +80,7 @@ export const useScopeTree = (
 
   const {
     hierarchies,
-    list,
+    searchResults,
     selectedCodes,
     loadingStatus,
     selectAllStatus,
@@ -93,18 +93,24 @@ export const useScopeTree = (
   } = useHierarchy(selectedNodes, codes, handleSaveCodes, fetchChildren)
 
   useEffect(() => {
-    initTrees([{ system: System.ScopeTree, fetchBaseTree: async () => baseTree }])
+    initTrees([
+      { system: System.ScopeTree, fetchBaseTree: async () => ({ results: baseTree, count: baseTree.length }) }
+    ])
   }, [baseTree])
 
   const currentHierarchy = useMemo(() => {
     const found = hierarchies.get(System.ScopeTree)
-    if (found) return found
-    return []
+    return (
+      found || {
+        tree: [],
+        count: 0
+      }
+    )
   }, [hierarchies])
 
   return {
     hierarchyData: {
-      list,
+      searchResults,
       hierarchy: currentHierarchy,
       loadingStatus,
       selectAllStatus,

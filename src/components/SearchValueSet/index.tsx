@@ -9,7 +9,6 @@ import SelectedCodes from 'components/Hierarchy/SelectedCodes'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { useSearchValueSet } from 'hooks/valueSet/useSearchValueSet'
 import { Displayer } from 'components/ui/Displayer/styles'
-import { InputWrapper } from 'components/ui/Inputs'
 
 type SearchValueSetProps = {
   references: Reference[]

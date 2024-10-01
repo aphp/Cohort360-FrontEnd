@@ -129,7 +129,7 @@ const ValueSetTable = ({
           {loading.list === LoadingStatus.SUCCESS && !hierarchy.tree.length && (
             <TableRow>
               <TableCell colSpan={7} align="center">
-                <Typography>{isHierarchy ? 'Aucun résultat à afficher' : 'Hiérarchie non disponible'}</Typography>
+                <Typography>Aucun résultat à afficher</Typography>
               </TableCell>
             </TableRow>
           )}

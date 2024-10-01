@@ -17,7 +17,7 @@ import IppFilter from 'components/Filters/IppFilter'
 import List from 'components/ui/List'
 import Modal from 'components/ui/Modal'
 import NdaFilter from 'components/Filters/NdaFilter'
-import { PMSITabs } from 'components/Patient/PatientPMSI/PatientPMSI'
+import { PMSITabs } from 'components/Patient/PatientPMSI'
 import SourceFilter from 'components/Filters/SourceFilter'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
@@ -33,11 +33,12 @@ import { Direction, FilterKeys, Order, PMSIFilters } from 'types/searchCriterias
 import { CanceledError } from 'axios'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import services from 'services/aphp'
-import { fetchClaimCodes, fetchConditionCodes, fetchProcedureCodes } from 'services/aphp/servicePmsi'
 import useSearchCriterias, { initPmsiSearchCriterias } from 'reducers/searchCriteriasReducer'
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { mapToLabel, mapToSourceType } from 'mappers/pmsi'
+import { getCodeList } from 'services/aphp/serviceValueSets'
+import { getConfig } from 'config'
 
 type PMSIListProps = {
   groupId?: string
@@ -173,11 +174,11 @@ const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
     const fetch = async () => {
       try {
         const [diagnosticTypes, encounterStatus] = await Promise.all([
-          services.cohortCreation.fetchDiagnosticTypes(),
-          services.cohortCreation.fetchEncounterStatus()
+          getCodeList(getConfig().features.condition.valueSets.conditionStatus.url),
+          getCodeList(getConfig().core.valueSets.encounterStatus.url)
         ])
-        setAllDiagnosticTypesList(diagnosticTypes)
-        setEncounterStatusList(encounterStatus)
+        setAllDiagnosticTypesList(diagnosticTypes.results)
+        setEncounterStatusList(encounterStatus.results)
       } catch (e) {
         /* empty */
       }
@@ -224,11 +225,11 @@ const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
   const fetchCodes = useCallback(() => {
     switch (selectedTab.id) {
       case ResourceType.CONDITION:
-        return fetchConditionCodes
+        return /*fetchConditionCodes*/ () => []
       case ResourceType.PROCEDURE:
-        return fetchProcedureCodes
+        return /*fetchProcedureCodes*/ () => []
       default:
-        return fetchClaimCodes
+        return () => []
     }
   }, [selectedTab.id])
 

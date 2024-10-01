@@ -44,6 +44,8 @@ import { SourceType } from 'types/scope'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 import { HierarchyWithLabelAndSystem } from 'types/hierarchy'
+import { getCodeList } from 'services/aphp/serviceValueSets'
+import { getConfig } from 'config'
 
 type DocumentsProps = {
   groupId?: string
@@ -197,8 +199,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
 
   useEffect(() => {
     const fetch = async () => {
-      const encounterStatus = await services.cohortCreation.fetchEncounterStatus()
-      setEncounterStatusList(encounterStatus)
+      const encounterStatus = await getCodeList(getConfig().core.valueSets.encounterStatus.url)
+      setEncounterStatusList(encounterStatus.results)
     }
     fetch()
     getSavedFilters()

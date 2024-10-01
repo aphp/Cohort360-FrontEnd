@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Alert, Button, Grid } from '@mui/material'
 
-import LogicalOperator from './components/LogicalOperator/LogicalOperator'
+import LogicalOperator from './components/LogicalOperator'
 import TemporalConstraintCard from './components/TemporalConstraintCard/TemporalConstraintCard'
 import CohortCreationBreadcrumbs from './components/Breadcrumbs/Breadcrumbs'
 import { useAppDispatch, useAppSelector } from 'state'

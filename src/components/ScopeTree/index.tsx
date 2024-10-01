@@ -18,7 +18,7 @@ type ScopeTreeProps = {
 
 const ScopeTree = ({ baseTree, selectedNodes, sourceType, onSelect }: ScopeTreeProps) => {
   const {
-    hierarchyData: { hierarchy, list, loadingStatus, selectAllStatus, selectedCodes },
+    hierarchyData: { hierarchy, searchResults, loadingStatus, selectAllStatus, selectedCodes },
     hierarchyActions: { expand, select, selectAll, deleteCode },
     parametersData: { page, searchInput, searchMode, totalPages },
     parametersActions: { onChangePage, onChangeSearchInput }
@@ -39,27 +39,29 @@ const ScopeTree = ({ baseTree, selectedNodes, sourceType, onSelect }: ScopeTreeP
           </Grid>
         </Grid>
 
-        <Grid container direction="column" wrap="wrap" height="100%" overflow="auto">
+        <Grid container direction="column" wrap="wrap" height="100%" overflow="auto" padding={'0px 20px'}>
           <Grid
             item
             container
             direction="column"
             justifyContent="space-between"
             wrap="nowrap"
-            height="100%"
-            overflow="auto"
-            padding={'0px 20px'}
+            height="97%"
+            style={{ overflow: 'hidden' }}
           >
-            <ScopeTreeTable
-              loading={loadingStatus}
-              selectAllStatus={selectAllStatus}
-              sourceType={sourceType}
-              searchMode={searchMode}
-              hierarchy={searchMode ? list : hierarchy}
-              onExpand={expand}
-              onSelect={select}
-              onSelectAll={selectAll}
-            />
+            <Grid>
+              <ScopeTreeTable
+                loading={loadingStatus}
+                selectAllStatus={selectAllStatus}
+                sourceType={sourceType}
+                searchMode={searchMode}
+                hierarchy={searchMode ? searchResults : hierarchy}
+                onExpand={expand}
+                onSelect={select}
+                onSelectAll={selectAll}
+                onFetchMore={() => {}}
+              />
+            </Grid>
           </Grid>
         </Grid>
         {totalPages > 1 && (

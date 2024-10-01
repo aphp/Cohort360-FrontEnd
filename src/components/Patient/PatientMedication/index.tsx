@@ -41,7 +41,9 @@ import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
-import { HierarchyElementWithSystem } from 'types/hierarchy'
+import { FhirItem, HierarchyElementWithSystem } from 'types/hierarchy'
+import { getConfig } from 'config'
+import { getCodeList } from 'services/aphp/serviceValueSets'
 
 type PatientMedicationProps = {
   groupId?: string
@@ -72,7 +74,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [triggerClean, setTriggerClean] = useState<boolean>(false)
-  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElementWithSystem[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<FhirItem[]>([])
 
   const dispatch = useAppDispatch()
   const patient = useAppSelector((state) => state.patient)
@@ -122,8 +124,8 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
     })
   }, [nda, prescriptionTypes, administrationRoutes, startDate, endDate, executiveUnits, encounterStatus])
 
-  const [allAdministrationRoutes, setAllAdministrationRoutes] = useState<HierarchyElementWithSystem[]>([])
-  const [allPrescriptionTypes, setAllPrescriptionTypes] = useState<HierarchyElementWithSystem[]>([])
+  const [allAdministrationRoutes, setAllAdministrationRoutes] = useState<FhirItem[]>([])
+  const [allPrescriptionTypes, setAllPrescriptionTypes] = useState<FhirItem[]>([])
   const [searchResults, setSearchResults] = useState<MedicationSearchResults>({
     deidentified: false,
     list: [],
@@ -183,13 +185,13 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   useEffect(() => {
     const fetch = async () => {
       const [administrations, prescriptions, encounterStatus] = await Promise.all([
-        services.cohortCreation.fetchAdministrations(),
-        services.cohortCreation.fetchPrescriptionTypes(),
-        services.cohortCreation.fetchEncounterStatus()
+        getCodeList(getConfig().features.medication.valueSets.medicationAdministrations.url),
+        getCodeList(getConfig().features.medication.valueSets.medicationPrescriptionTypes.url),
+        getCodeList(getConfig().core.valueSets.encounterStatus.url)
       ])
-      setAllAdministrationRoutes(administrations)
-      setAllPrescriptionTypes(prescriptions)
-      setEncounterStatusList(encounterStatus)
+      setAllAdministrationRoutes(administrations.results)
+      setAllPrescriptionTypes(prescriptions.results)
+      setEncounterStatusList(encounterStatus.results)
     }
     fetch()
     setOldTabs(selectedTab)

@@ -1,6 +1,5 @@
 import { Chip, CircularProgress, Grid, IconButton, Tooltip, Typography } from '@mui/material'
-import { FormContext } from 'components/ui/Modal'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { LoadingStatus, ScopeElement } from 'types'
 import InfoIcon from '@mui/icons-material/Info'
 import { InputWrapper } from 'components/ui/Inputs'
@@ -14,24 +13,21 @@ import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 import ScopeTree from 'components/ScopeTree'
 import Panel from 'components/ui/Panel'
 
-type ExecutiveUnitsFilterProps = {
+type ExecutiveUnitsProps = {
   value: Hierarchy<ScopeElement, string>[]
   sourceType: SourceType
-  name: string
   disabled?: boolean
-  onChange?: (value: Hierarchy<ScopeElement, string>[]) => void
+  onChange: (value: Hierarchy<ScopeElement, string>[]) => void
   isCriterion?: boolean
 }
 
-const ExecutiveUnitsFilter = ({
-  name,
+const ExecutiveUnits = ({
   value,
   sourceType,
   disabled = false,
   onChange,
   isCriterion = false
-}: ExecutiveUnitsFilterProps) => {
-  const context = useContext(FormContext)
+}: ExecutiveUnitsProps) => {
   const [population, setPopulation] = useState<Hierarchy<ScopeElement, string>[]>([])
   const [selectedPopulation, setSelectedPopulation] = useState<Hierarchy<ScopeElement, string>[]>([])
   const [confirmedPopulation, setConfirmedPopulation] = useState<Hierarchy<ScopeElement, string>[]>(value)
@@ -54,8 +50,7 @@ const ExecutiveUnitsFilter = ({
   }, [])
 
   useEffect(() => {
-    if (context?.updateFormData) context.updateFormData(name, confirmedPopulation)
-    if (onChange) onChange(confirmedPopulation)
+    onChange(confirmedPopulation)
   }, [confirmedPopulation])
 
   return (
@@ -131,4 +126,4 @@ const ExecutiveUnitsFilter = ({
   )
 }
 
-export default ExecutiveUnitsFilter
+export default ExecutiveUnits

@@ -1,5 +1,5 @@
 import { createSlice, createEntityAdapter, PayloadAction } from '@reduxjs/toolkit'
-import { HierarchyElementWithSystem } from 'types'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 import { logout } from './me'
 import { LabelObject } from 'types/searchCriterias'
 

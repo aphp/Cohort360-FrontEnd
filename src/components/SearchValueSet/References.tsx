@@ -1,10 +1,8 @@
 import React from 'react'
 
-import { Checkbox, FormControlLabel, Grid, Paper, Radio, Typography } from '@mui/material'
+import { Checkbox, FormControlLabel, Grid, Radio } from '@mui/material'
 import { Reference } from 'types/searchValueSet'
 import { Check, Warning } from '@mui/icons-material'
-import { InputWrapper } from 'components/ui/Inputs'
-import { LoadingStatus } from 'types'
 
 export enum Type {
   SINGLE,

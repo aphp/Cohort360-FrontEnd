@@ -29,14 +29,14 @@ import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
-import services from 'services/aphp'
 import { BlockWrapper } from 'components/ui/Layout'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
-import { AppConfig } from 'config'
+import { AppConfig, getConfig } from 'config'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
-import { HierarchyElementWithSystem } from 'types/hierarchy'
+import { FhirItem } from 'types/hierarchy'
+import { getCodeList } from 'services/aphp/serviceValueSets'
 
 const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
@@ -51,8 +51,8 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
-  const [allModalities, setAllModalities] = useState<HierarchyElementWithSystem[]>([])
-  const [encounterStatusList, setEncounterStatusList] = useState<HierarchyElementWithSystem[]>([])
+  const [allModalities, setAllModalities] = useState<FhirItem[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<FhirItem[]>([])
 
   const searchResults = {
     deidentified: patient?.deidentified || false,
@@ -131,12 +131,12 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   useEffect(() => {
     const fetch = async () => {
       const [modalities, encounterStatus] = await Promise.all([
-        services.cohortCreation.fetchModalities(),
-        services.cohortCreation.fetchEncounterStatus()
+        getCodeList(getConfig().features.imaging.valueSets.imagingModalities.url, true),
+        getCodeList(getConfig().core.valueSets.encounterStatus.url)
       ])
 
-      setAllModalities(modalities)
-      setEncounterStatusList(encounterStatus)
+      setAllModalities(modalities.results)
+      setEncounterStatusList(encounterStatus.results)
     }
     fetch()
   }, [])

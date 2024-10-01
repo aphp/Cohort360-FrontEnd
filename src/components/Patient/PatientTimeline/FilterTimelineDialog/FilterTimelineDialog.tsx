@@ -13,20 +13,18 @@ import {
 } from '@mui/material'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
-
 import useStyles from './styles'
-import { LabelObject } from 'types/searchCriterias'
-import { HierarchyElementWithSystem } from 'types/hierarchy'
+import { FhirItem } from 'types/hierarchy'
 
 type FilterTimelineDialogProps = {
   open: boolean
   onClose: () => void
-  diagnosticTypesList: HierarchyElementWithSystem[]
-  selectedDiagnosticTypes: LabelObject[]
-  onChangeSelectedDiagnosticTypes: (selectedDiagnosticTypes: LabelObject[]) => void
-  encounterStatusList: HierarchyElementWithSystem[]
-  encounterStatus: LabelObject[]
-  onChangeEncounterStatus: (encounterStatus: LabelObject[]) => void
+  diagnosticTypesList: FhirItem[]
+  selectedDiagnosticTypes: FhirItem[]
+  onChangeSelectedDiagnosticTypes: (selectedDiagnosticTypes: FhirItem[]) => void
+  encounterStatusList: FhirItem[]
+  encounterStatus: FhirItem[]
+  onChangeEncounterStatus: (encounterStatus: FhirItem[]) => void
 }
 const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
   open,
@@ -40,10 +38,10 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
 }) => {
   const { classes } = useStyles()
 
-  const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<LabelObject[]>(selectedDiagnosticTypes)
-  const [_encounterStatus, setEncounterStatus] = useState<LabelObject[]>(encounterStatus)
+  const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<FhirItem[]>(selectedDiagnosticTypes)
+  const [_encounterStatus, setEncounterStatus] = useState<FhirItem[]>(encounterStatus)
 
-  const _onChangeSelectedDiagnosticTypes = (event: React.ChangeEvent<{}>, value: LabelObject[]) => {
+  const _onChangeSelectedDiagnosticTypes = (event: React.ChangeEvent<{}>, value: FhirItem[]) => {
     setSelectedDiagnosticTypes(value)
   }
 
@@ -93,8 +91,8 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
             options={encounterStatusList}
             value={_encounterStatus}
             disableCloseOnSelect
-            getOptionLabel={(encounterStatus: LabelObject) => encounterStatus.label}
-            renderOption={(props, encounterStatus: LabelObject) => <li {...props}>{encounterStatus.label}</li>}
+            getOptionLabel={(encounterStatus: FhirItem) => encounterStatus.label}
+            renderOption={(props, encounterStatus: FhirItem) => <li {...props}>{encounterStatus.label}</li>}
             renderInput={(params) => (
               <TextField {...params} placeholder="Sélectionner le statut de la visite associée" />
             )}

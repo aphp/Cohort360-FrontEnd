@@ -16,7 +16,7 @@ import {
   Typography
 } from '@mui/material'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
-import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
+import AdvancedInputs from '../../../AdvancedInputs'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchMedication } from 'state/medication'

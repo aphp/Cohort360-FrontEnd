@@ -16,7 +16,7 @@ import { BlockWrapper } from 'components/ui/Layout'
 import { DurationRangeType } from 'types/searchCriterias'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 import { getOccurenceDateLabel } from 'utils/requestCriterias'
-import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnit'
+import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnits'
 
 type AdvancedInputsProps = {
   sourceType: SourceType

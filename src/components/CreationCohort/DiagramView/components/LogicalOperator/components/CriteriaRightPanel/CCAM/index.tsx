@@ -12,7 +12,7 @@ import { EXPLORATION } from '../../../../../../../..//constants'
 
 import { CriteriaDrawerComponentProps } from 'types'
 import { CcamDataType, Comparators, CriteriaType } from 'types/requestCriterias'
-import { Hierarchy, HierarchyElementWithSystem } from 'types/hierarchy'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 
 export const defaultProcedure: Omit<CcamDataType, 'id'> = {
   type: CriteriaType.PROCEDURE,

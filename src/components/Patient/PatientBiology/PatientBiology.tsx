@@ -147,7 +147,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
 
   useEffect(() => {
     const fetchEncounterStatusList = async () => {
-      const encounterStatus = await (await getCodeList(getConfig().core.valueSets.encounterStatus.url)).results
+      const encounterStatus = (await getCodeList(getConfig().core.valueSets.encounterStatus.url)).results
       setEncounterStatusList(encounterStatus)
     }
     fetchEncounterStatusList()
