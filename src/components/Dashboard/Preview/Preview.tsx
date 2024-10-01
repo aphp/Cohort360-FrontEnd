@@ -26,7 +26,7 @@ import useStyles from './styles'
 import clsx from 'clsx'
 
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
-import displayDigit from 'utils/displayDigit'
+import { format } from 'utils/numbers'
 
 import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
 import LocationMap from 'components/Dashboard/Preview/LocationMap'
@@ -79,15 +79,15 @@ const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMa
             <TableCellWrapper align="left" component="th" scope="row" className={classes.tableHeadCell}>
               Femmes
             </TableCellWrapper>
-            <TableCellWrapper id="female-alive-cell">{displayDigit(femaleAlive)}</TableCellWrapper>
-            <TableCellWrapper id="female-deceased-cell">{displayDigit(femaleDeceased)}</TableCellWrapper>
+            <TableCellWrapper id="female-alive-cell">{format(femaleAlive)}</TableCellWrapper>
+            <TableCellWrapper id="female-deceased-cell">{format(femaleDeceased)}</TableCellWrapper>
           </TableRow>
           <TableRow>
             <TableCellWrapper align="left" component="th" scope="row" className={classes.tableHeadCell}>
               Hommes
             </TableCellWrapper>
-            <TableCellWrapper id="male-alive-cell">{displayDigit(maleAlive)}</TableCellWrapper>
-            <TableCellWrapper id="male-deceased-cell">{displayDigit(maleDeceased)}</TableCellWrapper>
+            <TableCellWrapper id="male-alive-cell">{format(maleAlive)}</TableCellWrapper>
+            <TableCellWrapper id="male-deceased-cell">{format(maleDeceased)}</TableCellWrapper>
           </TableRow>
         </TableBody>
       </Table>
@@ -140,7 +140,7 @@ const Preview: React.FC<PreviewProps> = ({
               </Grid>
             ) : (
               <Typography id="patient-number-card-value" variant="h4" className={classes.nbPatients}>
-                {displayDigit(total)} patients
+                {format(total)} patients
               </Typography>
             )}
           </Paper>

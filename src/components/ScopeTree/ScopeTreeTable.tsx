@@ -12,13 +12,13 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
-import { LoadingStatus, ScopeElement, SelectedStatus } from 'types'
-import { Hierarchy, HierarchyInfo, Mode, SearchMode } from 'types/hierarchy'
+import { LoadingStatus } from 'types'
+import { Hierarchy, HierarchyInfo, Mode, SearchMode, SelectedStatus } from 'types/hierarchy'
 import { IndeterminateCheckBoxOutlined, KeyboardArrowDown, KeyboardArrowRight } from '@mui/icons-material'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
-import displayDigit from 'utils/displayDigit'
+import { format } from 'utils/numbers'
 import { CellWrapper, RowContainerWrapper, RowWrapper } from '../Hierarchy/styles'
-import { SourceType } from 'types/scope'
+import { ScopeElement, SourceType } from 'types/scope'
 import { v4 as uuidv4 } from 'uuid'
 import { isSourceTypeInScopeLevel } from 'utils/perimeters'
 import { sortArray } from 'utils/arrays'
@@ -99,7 +99,7 @@ const ScopeTreeRow = ({ item, path, sourceType, mode, loading, onSelect, onExpan
             </CellWrapper>
           )}
           <CellWrapper item xs={2} textAlign="center" fontSize={11.5}>
-            {displayDigit(+cohort_size)}
+            {format(+cohort_size)}
           </CellWrapper>
           {sourceType === SourceType.ALL && (
             <CellWrapper item xs={3} textAlign="center" fontSize={11.5}>

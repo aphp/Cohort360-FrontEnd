@@ -10,38 +10,17 @@ type TextInputProps = {
   disabled?: boolean
   minLimit?: number
   maxLimit?: number
+  errorMessage?: string
   onChange: (newInput: string) => void
   onError?: (isError: boolean) => void
 }
 
-const TextInput = ({
-  value = '',
-  placeholder = '',
-  label,
-  disabled,
-  minLimit,
-  maxLimit,
-  onChange,
-  onError
-}: TextInputProps) => {
+const TextInput = ({ value = '', placeholder = '', label, disabled, errorMessage, onChange }: TextInputProps) => {
   const [input, setInput] = useState(value)
-  const [isError, setIsError] = useState({ min: false, max: false })
 
   useEffect(() => {
-    if (onError) {
-      onError(false)
-      if (isError.min || isError.max) onError(true)
-    }
-  }, [isError])
-
-  useEffect(() => {
-    let min = false
-    let max = false
-    if (maxLimit && input.length > maxLimit) max = true
-    else if (minLimit && input.length < minLimit) min = true
     onChange(input)
-    setIsError({ min, max })
-  }, [input])
+  }, [input, onChange])
 
   return (
     <>
@@ -57,9 +36,9 @@ const TextInput = ({
           onChange={(event) => setInput(event.target.value)}
         />
       </InputWrapper>
-      {isError.max && (
+      {errorMessage && (
         <Grid>
-          <ErrorMessage>Le champ dépasse la limite de {maxLimit} caractères.</ErrorMessage>
+          <ErrorMessage>{errorMessage}</ErrorMessage>
         </Grid>
       )}
     </>

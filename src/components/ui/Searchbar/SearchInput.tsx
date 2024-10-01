@@ -16,20 +16,20 @@ type SearchInputProps = {
   searchOnClick?: boolean
   displayHelpIcon?: boolean
   error?: SearchInputError | null
-  width?: string
   disabled?: boolean
-  onchange: (value: string) => void
+  radius?: number
+  onChange: (value: string) => void
 }
 
 const SearchInput = ({
   placeholder,
   value,
   searchOnClick = false,
-  width = '100%',
   displayHelpIcon = false,
   error = null,
   disabled = false,
-  onchange
+  radius,
+  onChange
 }: SearchInputProps) => {
   const [searchInput, setSearchInput] = useState(value)
   const debouncedSearchValue = useDebounce(500, searchInput)
@@ -40,16 +40,17 @@ const SearchInput = ({
   }, [value])
 
   useEffect(() => {
-    if (!searchOnClick) onchange(debouncedSearchValue)
+    if (!searchOnClick) onChange?.(debouncedSearchValue)
   }, [debouncedSearchValue])
 
   return (
     <>
-      <SearchInputWrapper width={width} error={error?.isError}>
+      <SearchInputWrapper error={error?.isError} radius={radius}>
         <InputBase
           disabled={disabled}
           placeholder={placeholder}
           value={searchInput}
+          sx={{ color: '#303030' }}
           onChange={(event) => {
             if (!searchInput && event.target.value === ' ') setSearchInput('')
             else setSearchInput(event.target.value)
@@ -57,10 +58,9 @@ const SearchInput = ({
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
               event.preventDefault()
-              onchange(searchInput)
+              onChange(searchInput)
             }
           }}
-          startAdornment={<InputAdornment position="start"></InputAdornment>}
           endAdornment={
             <InputAdornment position="end" style={{ padding: '0px 25px' }}>
               {error?.isError && <WarningIcon style={{ fill: '#F44336', height: 20 }} />}
@@ -70,8 +70,8 @@ const SearchInput = ({
                 </IconButton>
               )}
               {searchOnClick && (
-                <IconButton style={{ padding: 2 }} onClick={() => onchange(searchInput)}>
-                  <SearchIcon style={{ fill: '#5bc5f2', height: 16 }} />
+                <IconButton style={{ padding: 2 }} onClick={() => onChange(searchInput)}>
+                  <SearchIcon style={{ fill: '#ED6D91', height: 16 }} />
                 </IconButton>
               )}
               {searchInput && (
