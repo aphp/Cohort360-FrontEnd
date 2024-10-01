@@ -15,8 +15,8 @@ import { Pagination } from 'components/ui/Pagination'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import useStyles from './styles'
-import { Column } from 'types'
 import { Direction, OrderBy, Order } from 'types/searchCriterias'
+import { Column } from 'types/table'
 
 type DataTableProps = {
   columns: Column[]

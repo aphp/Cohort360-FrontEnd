@@ -79,8 +79,8 @@ const StayConstraints: React.FC<StayConstraintsProps> = ({ constraints, onChange
         <Typography variant="h3">Contraintes sur les séjours</Typography>
         <RadioGroup
           row
-          selectedValue={radioValues}
-          onchange={(e) => {
+          value={radioValues}
+          onChange={(e) => {
             if (
               radioValues === TemporalConstraintsKind.PARTIAL_CONSTRAINT &&
               constraints.find((constraint) => constraint.constraintType === TemporalConstraintsKind.SAME_ENCOUNTER)
@@ -91,7 +91,7 @@ const StayConstraints: React.FC<StayConstraintsProps> = ({ constraints, onChange
               onChangeValue(e as TemporalConstraintsKind)
             }
           }}
-          items={temporalConstraintsTypes}
+          options={temporalConstraintsTypes}
           style={{ margin: '1em', justifyContent: 'space-around' }}
         />
       </Grid>

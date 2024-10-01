@@ -1,19 +1,21 @@
+import { Typography } from '@mui/material'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
-import { BlockWrapper } from 'components/ui/Layout'
+import { InputWrapper } from 'components/ui/Inputs/styles'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import { DurationRangeType } from 'types/searchCriterias'
 
 type DatesRangeFilterProps = {
-  values: DurationRangeType
+  label?: string
+  value: DurationRangeType
   names: string[]
   disabled?: boolean
 }
 
-const DatesRangeFilter = ({ names, values, disabled }: DatesRangeFilterProps) => {
+const DatesRangeFilter = ({ names, value, label, disabled }: DatesRangeFilterProps) => {
   const context = useContext(FormContext)
-  const [startDate, setStartDate] = useState(values[0])
-  const [endDate, setEndDate] = useState(values[1])
+  const [startDate, setStartDate] = useState(value[0])
+  const [endDate, setEndDate] = useState(value[1])
 
   const onError = (isError: boolean) => {
     context?.updateError(isError)
@@ -28,7 +30,8 @@ const DatesRangeFilter = ({ names, values, disabled }: DatesRangeFilterProps) =>
   }, [endDate])
 
   return (
-    <BlockWrapper>
+    <InputWrapper>
+      <Typography variant="h3">{label}</Typography>
       <CalendarRange
         disabled={disabled}
         label="Date"
@@ -39,7 +42,7 @@ const DatesRangeFilter = ({ names, values, disabled }: DatesRangeFilterProps) =>
         }}
         onError={onError}
       />
-    </BlockWrapper>
+    </InputWrapper>
   )
 }
 

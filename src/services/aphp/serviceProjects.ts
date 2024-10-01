@@ -412,7 +412,7 @@ const servicesProjects: IServiceProjects = {
 
     let options: string[] = []
     const { status, favorite, minPatients, maxPatients, startDate, endDate } = filters
-    const _status = status.map((stat) => stat.code)
+    const _status = status.map((stat) => stat.id)
 
     if (limit) options = [...options, `limit=${limit}`]
     if (offset) options = [...options, `offset=${offset}`]

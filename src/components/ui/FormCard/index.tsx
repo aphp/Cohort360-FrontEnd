@@ -12,7 +12,7 @@ import {
   styled
 } from '@mui/material'
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material'
-import FormDetails from '../FormDetails'
+import FormDetails from '../Lines'
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean

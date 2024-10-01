@@ -32,7 +32,7 @@ import {
   SelectedCriteriaType
 } from 'types/requestCriterias'
 import { ExportTableType } from 'components/Dashboard/ExportModal/export_table'
-import { SearchByTypes } from 'types/searchCriterias'
+import { FormNames, SearchByTypes } from 'types/searchCriterias'
 import { PMSILabel } from 'types/patient'
 import { CriteriaForm } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
 
@@ -71,6 +71,11 @@ export enum CohortJobStatus {
 export enum LoadingStatus {
   FETCHING = 'FETCHING',
   IDDLE = 'IDLE',
+  SUCCESS = 'SUCCESS'
+}
+
+export enum FetchStatus {
+  ERROR = 'ERROR',
   SUCCESS = 'SUCCESS'
 }
 
@@ -208,17 +213,6 @@ export enum Month {
   NOVEMBER = 'Novembre',
   DECEMBER = 'Décembre'
 }
-
-export type Column =
-  | {
-      label: string | ReactNode
-      code?: string
-      align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
-      multiple?: undefined
-    }
-  | {
-      multiple: Column[]
-    }
 
 export enum ChartCode {
   AGE_PYRAMID = 'facet-extension.ageMonth',
@@ -652,6 +646,7 @@ export type CohortQuestionnaireResponse = QuestionnaireResponse & {
   IPP?: string
   hospitDates?: Period
   idPatient?: string
+  formName?: string
 }
 
 export type CohortObservation = Observation & {
