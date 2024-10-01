@@ -398,6 +398,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
               startDate,
               endDate,
               docTypes,
+              docStatuses,
               onlyPdfAvailable,
               encounterStatus
             }) => {
@@ -407,7 +408,16 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
                   searchInput,
                   searchBy,
                   orderBy: { orderBy: Order.DATE, orderDirection: Direction.ASC },
-                  filters: { nda, executiveUnits, startDate, endDate, docTypes, onlyPdfAvailable, encounterStatus }
+                  filters: {
+                    nda,
+                    executiveUnits,
+                    startDate,
+                    endDate,
+                    docStatuses,
+                    docTypes,
+                    onlyPdfAvailable,
+                    encounterStatus
+                  }
                 },
                 searchResults.deidentified ?? true
               )
