@@ -48,9 +48,7 @@ import {
   buildClaimFilter,
   buildMedicationFilter,
   buildObservationFilter,
-  buildImagingFilter,
-  buildPregnancyFilter,
-  buildHospitFilter
+  buildImagingFilter
 } from 'utils/cohortCreation'
 import { completeDocumentCriteria, defaultDocumentCriteria } from '__tests__/data/cohortCreation/documentCriteria'
 import { completeConditionCriteria, defaultConditionCriteria } from '__tests__/data/cohortCreation/conditionCriteria'
@@ -301,7 +299,7 @@ describe('test of buildConditionFilter', () => {
     const selectedCriteria: Cim10DataType = completeConditionCriteria
     const result = [
       'subject.active=true',
-      'code=I841,I842',
+      'code=https://smt.esante.gouv.fr/terminologie-cim-10/|I841,https://smt.esante.gouv.fr/terminologie-cim-10/|I842',
       'orbis-status=fp,f',
       '_source=AREM',
       'encounter.encounter-care-site=8312016825',
@@ -325,7 +323,7 @@ describe('test of buildProcedureFilter', () => {
     const selectedCriteria: CcamDataType = completeProcedureCriteria
     const result = [
       'subject.active=true',
-      'code=000126,000127',
+      'code=https://www.atih.sante.fr/plateformes-de-transmiss…ls/logiciels-espace-de-telechargement/id_lot/3550|000126,https://www.atih.sante.fr/plateformes-de-transmiss…ls/logiciels-espace-de-telechargement/id_lot/3550|000127',
       'encounter.encounter-care-site=8312016825',
       'encounter.status=entered-in-error',
       'date=ge2024-09-06T00:00:00Z',
@@ -348,7 +346,7 @@ describe('test of buildClaimFilter', () => {
     const selectedCriteria: GhmDataType = completeClaimCriteria
     const result = [
       'patient.active=true',
-      'diagnosis=05C021,05C022,05C023,05C024',
+      'diagnosis=https://terminology.eds.aphp.fr/aphp-orbis-ghm|05C021,https://terminology.eds.aphp.fr/aphp-orbis-ghm|05C022,https://terminology.eds.aphp.fr/aphp-orbis-ghm|05C023,https://terminology.eds.aphp.fr/aphp-orbis-ghm|05C024',
       'encounter.encounter-care-site=8312016825',
       'encounter.status=cancelled',
       'created=ge2024-09-03T00:00:00Z',
@@ -414,7 +412,7 @@ describe('test of buildObservationFilter', () => {
     const selectedCriteria: ObservationDataType = completeObservationCriteria
     const result = [
       'subject.active=true&status=Val',
-      'code=I3356',
+      'code=https://terminology.eds.aphp.fr/aphp-itm-anabio|I3356',
       'encounter.encounter-care-site=8312016825',
       'encounter.status=cancelled',
       'date=ge2024-09-03T00:00:00Z',

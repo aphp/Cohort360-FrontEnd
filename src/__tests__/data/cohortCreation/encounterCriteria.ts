@@ -1,4 +1,5 @@
 import { Comparators, CriteriaType, EncounterDataType } from 'types/requestCriterias'
+import { System } from 'types/scope'
 
 export const defaultEncounterCriteira: EncounterDataType = {
   id: 1,
@@ -142,6 +143,7 @@ export const completeEncounterCriteria: EncounterDataType = {
   ],
   encounterService: [
     {
+      label: 'ASSISTANCE PUBLIQUE AP-HP',
       above_levels_ids: '',
       cohort_id: '118',
       cohort_size: '19215',
@@ -154,7 +156,8 @@ export const completeEncounterCriteria: EncounterDataType = {
       source_value: 'APHP',
       status: undefined,
       subItems: undefined,
-      type: 'AP-HP'
+      type: 'AP-HP',
+      system: System.ScopeTree
     }
   ]
 }

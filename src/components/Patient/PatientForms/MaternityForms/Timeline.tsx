@@ -42,7 +42,6 @@ const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses, qu
           </Grid>
         ) : (
           <>
-            {console.log('manelle tu es MON canard')}
             <div style={{ flexGrow: 1, marginLeft: '1em' }}>
               {years.reverse().map((year) => (
                 <div key={year}>

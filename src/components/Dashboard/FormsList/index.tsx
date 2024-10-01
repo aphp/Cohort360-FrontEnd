@@ -9,9 +9,8 @@ import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import IppFilter from 'components/Filters/IppFilter'
 import Modal from 'components/ui/Modal'
-import { Hierarchy } from 'types/hierarchy'
 import { DTTB_ResultsType as ResultsType, LoadingStatus } from 'types'
-import { FilterKeys } from 'types/searchCriterias'
+import { FilterKeys, LabelObject } from 'types/searchCriterias'
 import { CanceledError } from 'axios'
 import services from 'services/aphp'
 import useSearchCriterias, { initFormsCriterias } from 'reducers/searchCriteriasReducer'
@@ -24,6 +23,8 @@ import DataTableForms from 'components/DataTable/DataTableForms'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
 import Chip from 'components/ui/Chip'
+import { getCodeList } from 'services/aphp/serviceValueSets'
+import { getConfig } from 'config'
 
 const FormsList = () => {
   const theme = useTheme()
@@ -34,9 +35,8 @@ const FormsList = () => {
   const groupId = searchParams.get('groupId') ?? undefined
 
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<LabelObject[]>([])
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([])
-
   const [page, setPage] = useState(pageParam ? parseInt(pageParam, 10) : 1)
 
   const [
@@ -120,10 +120,10 @@ const FormsList = () => {
   const fetch = async () => {
     const [_questionnaires, encounterStatus] = await Promise.all([
       services.patients.fetchQuestionnaires(),
-      services.cohortCreation.fetchEncounterStatus()
+      getCodeList(getConfig().core.valueSets.encounterStatus.url)
     ])
     setQuestionnaires(_questionnaires)
-    setEncounterStatusList(encounterStatus)
+    setEncounterStatusList(encounterStatus.results)
   }
 
   useEffect(() => {

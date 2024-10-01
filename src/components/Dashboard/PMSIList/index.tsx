@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'state'
 
 import { Chip, CircularProgress, Grid, Tooltip } from '@mui/material'
@@ -17,7 +17,7 @@ import IppFilter from 'components/Filters/IppFilter'
 import List from 'components/ui/List'
 import Modal from 'components/ui/Modal'
 import NdaFilter from 'components/Filters/NdaFilter'
-import { PMSITabs } from 'components/Patient/PatientPMSI/PatientPMSI'
+import { PMSITabs } from 'components/Patient/PatientPMSI'
 import SourceFilter from 'components/Filters/SourceFilter'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
@@ -26,20 +26,21 @@ import TextInput from 'components/Filters/TextInput'
 
 import { PMSILabel } from 'types/patient'
 import { ResourceType } from 'types/requestCriterias'
-import { Hierarchy } from 'types/hierarchy'
 import { CohortPMSI, DTTB_ResultsType as ResultsType, LoadingStatus, PmsiTab } from 'types'
-import { Direction, FilterKeys, Order, PMSIFilters } from 'types/searchCriterias'
+import { Direction, FilterKeys, LabelObject, Order, PMSIFilters } from 'types/searchCriterias'
 
 import { CanceledError } from 'axios'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import services from 'services/aphp'
-import { fetchClaimCodes, fetchConditionCodes, fetchProcedureCodes } from 'services/aphp/servicePmsi'
 import useSearchCriterias, { initPmsiSearchCriterias } from 'reducers/searchCriteriasReducer'
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { mapToLabel, mapToSourceType } from 'mappers/pmsi'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
+import { checkIfPageAvailable, handlePageError, cleanSearchParams } from 'utils/paginationUtils'
+import { getCodeList } from 'services/aphp/serviceValueSets'
+import { getConfig } from 'config'
+import { getValueSetsFromSystems } from 'utils/valueSets'
 import { getPMSITab } from 'utils/tabsUtils'
 
 type PMSIListProps = {
@@ -53,17 +54,15 @@ const PMSIList = ({ deidentified }: PMSIListProps) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [triggerClean, setTriggerClean] = useState<boolean>(false)
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<LabelObject[]>([])
   const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
   const groupId = searchParams.get('groupId') ?? undefined
   const tabId = searchParams.get('tabId') ?? undefined
   const existingParams = Object.fromEntries(searchParams.entries())
-
   const [selectedTab, setSelectedTab] = useState<PmsiTab>(getPMSITab(tabId))
   const sourceType = mapToSourceType(selectedTab.id)
-
   const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const {
     allSavedFilters,
@@ -105,7 +104,7 @@ const PMSIList = ({ deidentified }: PMSIListProps) => {
     [code, nda, diagnosticTypes, source, startDate, endDate, executiveUnits, encounterStatus, ipp]
   )
 
-  const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<Hierarchy<any, any>[]>([])
+  const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<LabelObject[]>([])
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [searchResults, setSearchResults] = useState<ResultsType>({
     nb: 0,
@@ -180,12 +179,12 @@ const PMSIList = ({ deidentified }: PMSIListProps) => {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const [diagnosticTypes, encounterStatus] = await Promise.all([
-          services.cohortCreation.fetchDiagnosticTypes(),
-          services.cohortCreation.fetchEncounterStatus()
+        const [diagnosticTypes, encounterStatusList] = await Promise.all([
+          getCodeList(getConfig().features.condition.valueSets.conditionStatus.url),
+          getCodeList(getConfig().core.valueSets.encounterStatus.url)
         ])
-        setAllDiagnosticTypesList(diagnosticTypes)
-        setEncounterStatusList(encounterStatus)
+        setAllDiagnosticTypesList(diagnosticTypes.results)
+        setEncounterStatusList(encounterStatusList.results)
       } catch (e) {
         /* empty */
       }
@@ -238,14 +237,14 @@ const PMSIList = ({ deidentified }: PMSIListProps) => {
     setTriggerClean(!triggerClean)
   }, [selectedTab])
 
-  const fetchCodes = useCallback(() => {
+  const references = useMemo(() => {
     switch (selectedTab.id) {
       case ResourceType.CONDITION:
-        return fetchConditionCodes
+        return getValueSetsFromSystems([getConfig().features.condition.valueSets.conditionHierarchy.url])
       case ResourceType.PROCEDURE:
-        return fetchProcedureCodes
+        return getValueSetsFromSystems([getConfig().features.procedure.valueSets.procedureHierarchy.url])
       default:
-        return fetchClaimCodes
+        return getValueSetsFromSystems([getConfig().features.claim.valueSets.claimHierarchy.url])
     }
   }, [selectedTab.id])
 
@@ -371,7 +370,7 @@ const PMSIList = ({ deidentified }: PMSIListProps) => {
       >
         {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
         {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp ?? ''} />}
-        <CodeFilter name={FilterKeys.CODE} value={code} onFetch={fetchCodes()} />
+        <CodeFilter name={FilterKeys.CODE} value={code} references={references} />
         {selectedTab.id === ResourceType.CONDITION && (
           <DiagnosticTypesFilter
             name={FilterKeys.DIAGNOSTIC_TYPES}
@@ -502,10 +501,10 @@ const PMSIList = ({ deidentified }: PMSIListProps) => {
               )}
               <Grid item xs={12}>
                 <CodeFilter
+                  references={references}
                   disabled={isReadonlyFilterInfoModal}
                   name={FilterKeys.CODE}
                   value={selectedSavedFilter?.filterParams.filters.code ?? []}
-                  onFetch={fetchCodes()}
                 />
               </Grid>
               {selectedTab.id === ResourceType.CONDITION && (

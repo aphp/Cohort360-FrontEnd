@@ -1,38 +1,35 @@
 import { Typography } from '@mui/material'
+import ValueSetField from 'components/SearchValueSet/ValueSetField'
 import { InputWrapper } from 'components/ui/Inputs'
-import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
-import { LabelObject } from 'types/searchCriterias'
+import { Hierarchy } from 'types/hierarchy'
+import { FhirItem, Reference } from 'types/valueSet'
 
 type CodeFilterProps = {
-  value: LabelObject[]
+  value: Hierarchy<FhirItem>[]
+  references: Reference[]
   name: string
   disabled?: boolean
-  onFetch: (text: string, noStar: boolean, signal: AbortSignal) => Promise<LabelObject[]>
 }
 
-const CodeFilter = ({ name, value, disabled = false, onFetch }: CodeFilterProps) => {
+const CodeFilter = ({ name, value, references, disabled = false }: CodeFilterProps) => {
   const context = useContext(FormContext)
   const [code, setCode] = useState(value)
 
   useEffect(() => {
     if (context?.updateFormData) context.updateFormData(name, code)
-  }, [code])
+  }, [code, name])
 
   return (
     <InputWrapper>
       <Typography variant="h3">Code :</Typography>
-      <AsyncAutocomplete
+      <ValueSetField
         disabled={disabled}
-        label="Code(s) sélectionné(s)"
-        variant="outlined"
-        noOptionsText="Veuillez entrer un code"
-        values={code}
-        onFetch={(text, signal) => onFetch(text, false, signal)}
-        onChange={(newValue) => {
-          setCode(newValue)
-        }}
+        value={code}
+        references={references}
+        placeholder="Sélectionner des codes"
+        onSelect={setCode}
       />
     </InputWrapper>
   )
