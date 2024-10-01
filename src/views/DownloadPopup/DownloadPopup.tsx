@@ -14,9 +14,10 @@ import useStyles from './styles'
 import apiBackend from '../../services/apiBackend'
 import { useNavigate, useParams } from 'react-router-dom'
 
-const ExportDownload: React.FC = () => {
+const DownloadPopup: React.FC = () => {
   const navigate = useNavigate()
-  const { exportId } = useParams<{ exportId?: string }>()
+  const { resource } = useParams<{ resource?: 'exports' | 'feasibility-studies' }>()
+  const { itemId } = useParams<{ itemId?: string }>()
   const { classes } = useStyles()
   const [open, setOpen] = useState<boolean>(true)
   const [downloading, setDownloading] = useState<boolean | null>(false)
@@ -24,17 +25,21 @@ const ExportDownload: React.FC = () => {
   const extractFilename = (contentDisposition: string): string => {
     const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
     const matches = filenameRegex.exec(contentDisposition)
-    let filename = 'Export.zip'
+    let default_filename = 'Download.zip'
     if (matches != null && matches[1]) {
-      filename = matches[1].replace(/['"]/g, '')
+      default_filename = matches[1].replace(/['"]/g, '')
     }
-    return filename
+    return default_filename
   }
 
-  const downloadExport = async (exportId: string) => {
+  const downloadItem = async (itemId: string) => {
     try {
       setDownloading(true)
-      const downloadResponse = await apiBackend.get(`/exports/${exportId}/download/`, {
+      let path = `/${resource}/${itemId}/download/`
+      if (resource === 'feasibility-studies') {
+        path = `/cohort/${resource}/${itemId}/download/`
+      }
+      const downloadResponse = await apiBackend.get(path, {
         responseType: 'blob',
         onDownloadProgress: (progressEvent) => {
           if (progressEvent.progress === 1) setDownloading(null)
@@ -66,8 +71,8 @@ const ExportDownload: React.FC = () => {
   }
 
   useEffect(() => {
-    if (exportId) downloadExport(exportId)
-  }, [exportId])
+    if (itemId) downloadItem(itemId)
+  }, [itemId])
 
   const _quit = () => {
     setOpen(false)
@@ -121,4 +126,4 @@ const ExportDownload: React.FC = () => {
   )
 }
 
-export default ExportDownload
+export default DownloadPopup

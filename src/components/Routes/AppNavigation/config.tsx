@@ -12,7 +12,7 @@ import PageNotFound from 'views/PageNotFound/PageNotFound'
 import CareSiteView from 'views/Scope/CareSiteView'
 import MyCohorts from 'views/MyCohorts'
 import MyRequests from 'views/MyRequests'
-import ExportDownload from 'views/ExportDownload/ExportDownload'
+import DownloadPopup from 'views/DownloadPopup/DownloadPopup'
 
 // import { ODD_CONTACT } from '../../../constants'
 
@@ -218,10 +218,10 @@ const configRoutes: configRoute[] = [
     exact: false
   },
   {
-    path: '/exports/:exportId/download',
-    name: '/exports/:exportId/download',
+    path: '/download/:resource/:itemId',
+    name: '/download/:resource/:itemId',
     isPrivate: true,
-    element: <ExportDownload />,
+    element: <DownloadPopup />,
     exact: false,
     displaySideBar: false
   },
