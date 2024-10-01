@@ -15,7 +15,7 @@ import { DurationRangeType } from 'types/searchCriterias'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 import { getOccurenceDateLabel } from 'utils/requestCriterias'
 import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnits'
-import { InputWrapper } from 'components/ui/Inputs'
+import { InputWrapper } from 'components/ui/Inputs/styles'
 
 type AdvancedInputsProps = {
   sourceType: SourceType
