@@ -204,7 +204,6 @@ const mapCriteriaToResource = (criteriaType: CriteriaType): ResourceType => {
     [CriteriaType.MEDICATION_ADMINISTRATION]: ResourceType.MEDICATION_ADMINISTRATION,
     [CriteriaType.OBSERVATION]: ResourceType.OBSERVATION,
     [CriteriaType.IMAGING]: ResourceType.IMAGING,
-    [CriteriaType.QUESTIONNAIRE]: ResourceType.QUESTIONNAIRE,
     [CriteriaType.QUESTIONNAIRE_RESPONSE]: ResourceType.QUESTIONNAIRE_RESPONSE,
     [CriteriaType.PREGNANCY]: ResourceType.QUESTIONNAIRE_RESPONSE,
     [CriteriaType.HOSPIT]: ResourceType.QUESTIONNAIRE_RESPONSE

@@ -1,7 +1,13 @@
 import { medicationTabs } from 'components/Patient/PatientMedication'
-import { PMSITabs } from 'components/Patient/PatientPMSI'
+import { PmsiTab } from 'types'
 import { PMSILabel } from 'types/patient'
 import { MedicationLabel, ResourceType } from 'types/requestCriterias'
+
+const PMSITabs: PmsiTab[] = [
+  { label: PMSILabel.DIAGNOSTIC, id: ResourceType.CONDITION },
+  { label: PMSILabel.CCAM, id: ResourceType.PROCEDURE },
+  { label: PMSILabel.GHM, id: ResourceType.CLAIM }
+]
 
 export const getPMSITab = (tabId?: string) => {
   return (

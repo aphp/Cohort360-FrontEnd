@@ -73,6 +73,25 @@ export enum VitalStatusLabel {
   ALL = 'Tous les patients'
 }
 
+export const genderOptions = [
+  {
+    id: GenderStatus.FEMALE,
+    label: GenderStatusLabel.FEMALE
+  },
+  {
+    id: GenderStatus.MALE,
+    label: GenderStatusLabel.MALE
+  },
+  {
+    id: GenderStatus.OTHER,
+    label: GenderStatusLabel.OTHER
+  },
+  {
+    id: GenderStatus.UNKNOWN,
+    label: GenderStatusLabel.UNKNOWN
+  }
+]
+
 export enum VitalStatusOptions {
   birth = 'birth',
   age = 'age',
@@ -92,6 +111,17 @@ export enum VitalStatus {
   DECEASED = 'DECEASED'
 }
 
+export const vitalStatusesOptions = [
+  {
+    id: VitalStatus.ALIVE,
+    label: VitalStatusLabel.ALIVE
+  },
+  {
+    id: VitalStatus.DECEASED,
+    label: VitalStatusLabel.DECEASED
+  }
+]
+
 export enum Direction {
   ASC = 'asc',
   DESC = 'desc'
@@ -101,29 +131,25 @@ export enum DirectionLabel {
   DESC = 'Décroissant'
 }
 export enum Order {
-  AGE_MONTH = 'age-month',
-  AUTHORED = 'authored',
   LABEL = 'label',
-  CODE = 'code',
-  RESULT_SIZE = 'result_size',
-  RECORDED_DATE = 'recorded-date',
-  FAMILY = 'family',
-  DATE = 'date',
-  CREATED = 'created',
-  DIAGNOSIS = 'diagnosis',
   ANABIO = 'code-anabio',
-  TYPE = 'type-name',
+  LOINC = 'code-loinc',
+  GENDER = 'gender',
   LASTNAME = 'lastname',
+  AGE_MONTH = 'age-month',
   BIRTHDATE = 'birthdate',
+  CODE = 'code',
+  CREATED = 'created',
   CREATED_AT = 'created_at',
+  DATE = 'date',
   DESCRIPTION = 'description',
+  DIAGNOSIS = 'diagnosis',
   EFFECTIVE_TIME = 'effective-time',
   ENCOUNTER = 'encounter',
+  FAMILY = 'family',
   FAVORITE = 'favorite',
-  GENDER = 'gender',
   ID = 'id',
   IPP = 'identifier',
-  LOINC = 'code-loinc',
   MEDICATION_ATC = 'medication-atc',
   MEDICATION_UCD = 'medication-ucd',
   MODALITY = 'modality',
@@ -131,12 +157,16 @@ export enum Order {
   NAME = 'name',
   PERIOD_START = 'Period-start',
   PRESCRIPTION_TYPES = 'category-name',
-  PROCEDURE = 'procedureCode',
-  STUDY_DATE = 'started',
   SUBJECT_IDENTIFIER = 'subject-identifier',
   UPDATED = 'updated_at',
   ADMINISTRATION_MODE = 'route',
-  DISPLAY = 'display'
+  AUTHORED = 'authored',
+  DISPLAY = 'display',
+  PROCEDURE = 'procedureCode',
+  RECORDED_DATE = 'recorded-date',
+  RESULT_SIZE = 'result_size',
+  STUDY_DATE = 'started',
+  TYPE = 'type-name'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -193,6 +223,7 @@ export enum FilterKeys {
   DIAGNOSTIC_TYPES = 'diagnosticTypes',
   START_DATE = 'startDate',
   END_DATE = 'endDate',
+  DURATION_RANGE = 'durationRange',
   ONLY_PDF_AVAILABLE = 'onlyPdfAvailable',
   SOURCE = 'source',
   EXECUTIVE_UNITS = 'executiveUnits',
@@ -205,6 +236,11 @@ export enum FilterKeys {
   MODALITY = 'modality',
   FORM_NAME = 'formName',
   ENCOUNTER_STATUS = 'encounterStatus'
+}
+
+export enum SearchCriteriaKeys {
+  SEARCH_INPUT,
+  SEARCH_BY
 }
 
 export enum OrderByKeys {
@@ -224,7 +260,11 @@ export enum DocumentAttachmentMethodLabel {
   INFERENCE_TEMPOREL = 'Inférence temporelle'
 }
 
-// TODO replace this by NewDurationRangeType, this will need the refacto of filters (with a more generic CriteriaForm)
+export enum Sources {
+  AREM = 'AREM',
+  ORBIS = 'ORBIS'
+}
+
 export type DurationRangeType = [string | null | undefined, string | null | undefined]
 export type LabelObject = {
   id: string
@@ -267,14 +307,15 @@ export type Filters =
   | MaternityFormFilters
 
 export type GenericFilter = {
-  nda: string
-  startDate: string | null
-  endDate: string | null
+  nda?: string
+  durationRange?: DurationRangeType
+  startDate?: string | null
+  endDate?: string | null
   executiveUnits: Hierarchy<ScopeElement>[]
   encounterStatus: LabelObject[]
 }
 
-export interface PatientsFilters {
+export type PatientsFilters = {
   genders: GenderStatus[]
   birthdatesRanges: DurationRangeType
   vitalStatuses: VitalStatus[]
@@ -283,7 +324,7 @@ export interface PatientsFilters {
 export type PMSIFilters = GenericFilter & {
   diagnosticTypes?: LabelObject[]
   code: Hierarchy<FhirItem>[]
-  source?: string
+  source?: Sources[]
   ipp?: string
 }
 
@@ -305,23 +346,19 @@ export type ImagingFilters = GenericFilter & {
   modality: LabelObject[]
 }
 
-export type MaternityFormFilters = {
-  formName: FormNames[]
-  startDate: string | null
-  endDate: string | null
-  encounterStatus: LabelObject[]
-  executiveUnits: Hierarchy<ScopeElement>[]
+export type MaternityFormFilters = GenericFilter & {
   ipp?: string
+  formName: FormNames[]
 }
 
 export type DocumentsFilters = GenericFilter & {
   ipp?: string
   docTypes: SimpleCodeType[]
-  docStatuses: string[]
+  docStatuses: LabelObject[]
   onlyPdfAvailable: boolean
 }
 export interface CohortsFilters {
-  status: ValueSet[]
+  status: LabelObject[]
   favorite: CohortsType
   minPatients: null | string
   maxPatients: null | string
@@ -331,7 +368,7 @@ export interface CohortsFilters {
 
 export interface SearchCriterias<F> {
   searchBy?: SearchByTypes
-  searchInput: string
+  searchInput?: string
   orderBy: OrderBy
   filters: F
 }
@@ -371,7 +408,12 @@ export type ActionFilters<F> =
   | ActionRemoveSearchCriterias
   | ActionAddSearchCriterias<F>
 
-export const searchByListPatients = [
+export type SearchBy = {
+  id: SearchByTypes
+  label: SearchByTypesLabelPatients | SearchByTypesLabelDocuments
+}
+
+export const searchByListPatients: SearchBy[] = [
   {
     id: SearchByTypes.TEXT,
     label: SearchByTypesLabelPatients.TEXT
@@ -387,6 +429,17 @@ export const searchByListPatients = [
   {
     id: SearchByTypes.IDENTIFIER,
     label: SearchByTypesLabelPatients.IDENTIFIER
+  }
+]
+
+export const searchByListDocuments: SearchBy[] = [
+  {
+    id: SearchByTypes.TEXT,
+    label: SearchByTypesLabelDocuments.TEXT
+  },
+  {
+    id: SearchByTypes.DESCRIPTION,
+    label: SearchByTypesLabelDocuments.DESCRIPTION
   }
 ]
 
@@ -416,17 +469,6 @@ export const orderByListPatientsDeidentified = [
   {
     id: Order.BIRTHDATE,
     label: PatientTableLabels.BIRTHDATE
-  }
-]
-
-export const searchByListDocuments = [
-  {
-    id: SearchByTypes.TEXT,
-    label: SearchByTypesLabelDocuments.TEXT
-  },
-  {
-    id: SearchByTypes.DESCRIPTION,
-    label: SearchByTypesLabelDocuments.DESCRIPTION
   }
 ]
 

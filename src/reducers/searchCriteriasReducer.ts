@@ -47,7 +47,7 @@ export const initSearchPatientsSearchCriterias: SearchCriterias<null> = {
   filters: null
 }
 
-export const initPatientsSearchCriterias: SearchCriterias<PatientsFilters> = {
+export const initPatientsSearchCriterias = (): SearchCriterias<PatientsFilters> => ({
   orderBy: {
     orderBy: Order.FAMILY,
     orderDirection: Direction.ASC
@@ -59,29 +59,27 @@ export const initPatientsSearchCriterias: SearchCriterias<PatientsFilters> = {
     birthdatesRanges: [null, null],
     vitalStatuses: []
   }
-}
+})
 
-export const initPmsiSearchCriterias: SearchCriterias<PMSIFilters> = {
+export const initPmsiSearchCriterias = (): SearchCriterias<PMSIFilters> => ({
   orderBy: {
     orderBy: Order.DATE,
     orderDirection: Direction.DESC
   },
   searchInput: '',
-  searchBy: SearchByTypes.TEXT,
   filters: {
     code: [],
-    nda: '',
+    source: [],
     ipp: '',
-    source: '',
+    nda: '',
     diagnosticTypes: [],
-    startDate: null,
-    endDate: null,
+    durationRange: [null, null],
     executiveUnits: [],
     encounterStatus: []
   }
-}
+})
 
-export const initMedSearchCriterias: SearchCriterias<MedicationFilters> = {
+export const initMedSearchCriterias = (): SearchCriterias<MedicationFilters> => ({
   orderBy: {
     orderBy: Order.PERIOD_START,
     orderDirection: Direction.DESC
@@ -92,16 +90,15 @@ export const initMedSearchCriterias: SearchCriterias<MedicationFilters> = {
     nda: '',
     ipp: '',
     code: [],
-    startDate: null,
-    endDate: null,
+    durationRange: [null, null],
     executiveUnits: [],
     administrationRoutes: [],
     prescriptionTypes: [],
     encounterStatus: []
   }
-}
+})
 
-export const initBioSearchCriterias: SearchCriterias<BiologyFilters> = {
+export const initBioSearchCriterias = (): SearchCriterias<BiologyFilters> => ({
   orderBy: {
     orderBy: Order.DATE,
     orderDirection: Direction.ASC
@@ -111,13 +108,13 @@ export const initBioSearchCriterias: SearchCriterias<BiologyFilters> = {
   filters: {
     validatedStatus: true,
     nda: '',
-    startDate: null,
-    endDate: null,
+    ipp: '',
+    durationRange: [null, null],
     executiveUnits: [],
     encounterStatus: [],
     code: []
   }
-}
+})
 
 export const initPatientDocsSearchCriterias: SearchCriterias<DocumentsFilters> = {
   orderBy: {
@@ -138,7 +135,7 @@ export const initPatientDocsSearchCriterias: SearchCriterias<DocumentsFilters> =
   }
 }
 
-export const initAllDocsSearchCriterias: SearchCriterias<DocumentsFilters> = {
+export const initAllDocsSearchCriterias = (): SearchCriterias<DocumentsFilters> => ({
   orderBy: {
     orderBy: Order.DATE,
     orderDirection: Direction.DESC
@@ -151,14 +148,13 @@ export const initAllDocsSearchCriterias: SearchCriterias<DocumentsFilters> = {
     docStatuses: [],
     docTypes: [],
     onlyPdfAvailable: true,
-    startDate: null,
-    endDate: null,
+    durationRange: [null, null],
     executiveUnits: [],
     encounterStatus: []
   }
-}
+})
 
-export const initImagingCriterias: SearchCriterias<ImagingFilters> = {
+export const initImagingCriterias = (): SearchCriterias<ImagingFilters> => ({
   orderBy: {
     orderBy: Order.STUDY_DATE,
     orderDirection: Direction.DESC
@@ -168,15 +164,14 @@ export const initImagingCriterias: SearchCriterias<ImagingFilters> = {
   filters: {
     ipp: '',
     nda: '',
-    startDate: null,
-    endDate: null,
+    durationRange: [null, null],
     executiveUnits: [],
     modality: [],
     encounterStatus: []
   }
-}
+})
 
-export const initFormsCriterias: SearchCriterias<MaternityFormFilters> = {
+export const initFormsCriterias = (): SearchCriterias<MaternityFormFilters> => ({
   orderBy: {
     orderBy: Order.AUTHORED,
     orderDirection: Direction.DESC
@@ -185,17 +180,17 @@ export const initFormsCriterias: SearchCriterias<MaternityFormFilters> = {
   filters: {
     ipp: '',
     formName: [],
-    startDate: null,
-    endDate: null,
+    durationRange: [null, null],
     encounterStatus: [],
     executiveUnits: []
   }
-}
+})
 
 const searchCriteriasReducer = <F>(
   initState: () => SearchCriterias<F>
 ): ((state: SearchCriterias<F> | undefined, action: ActionFilters<F>) => SearchCriterias<F>) => {
   return (state: SearchCriterias<F> = initState(), action: ActionFilters<F>): SearchCriterias<F> => {
+    console.log('test update reducer', action)
     switch (action.type) {
       case ActionTypes.CHANGE_ORDER_BY:
         return { ...state, orderBy: action.payload }
@@ -234,7 +229,6 @@ const useSearchCriterias = <F>(
     searchCriteriasReducer<F>(() => initState),
     initState
   )
-
   return [
     state,
     {

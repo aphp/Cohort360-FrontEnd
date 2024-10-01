@@ -8,13 +8,14 @@ import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import DataTable from 'components/DataTable/DataTable'
 
-import { Column, CohortQuestionnaireResponse } from 'types'
+import {  CohortQuestionnaireResponse } from 'types'
 
 import useStyles from './styles'
 import { FormNames, Order, OrderBy } from 'types/searchCriterias'
-import FormDetails from 'components/ui/FormDetails'
+import FormDetails from 'components/ui/Lines'
 import { Questionnaire } from 'fhir/r4'
 import { getFormDetails, getFormLabel, getFormName } from 'utils/formUtils'
+import { Column } from 'types/table'
 
 type DataTableFormsProps = {
   loading: boolean
@@ -128,7 +129,7 @@ const DataTableFormsLine: React.FC<{
           }}
         >
           <Collapse in={open} timeout="auto" unmountOnExit>
-            {formDetails.length === 0 ? 'Aucune donnée à afficher' : <FormDetails content={formDetails} />}
+            {formDetails.length === 0 ? 'Aucune donnée à afficher' : <FormDetails value={formDetails} />}
           </Collapse>
         </TableCellWrapper>
       </TableRow>
