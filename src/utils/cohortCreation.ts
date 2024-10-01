@@ -90,7 +90,7 @@ import {
 } from 'mappers/filters'
 import { getConfig } from 'config'
 
-const REQUETEUR_VERSION = 'v1.4.5'
+const REQUETEUR_VERSION = 'v1.5.0'
 
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   id: 0,
