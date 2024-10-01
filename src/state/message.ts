@@ -11,16 +11,7 @@ import {
 import { fetchProjects } from './project'
 import { addRequest, fetchRequests } from './request'
 import { fetchExploredCohort } from './exploredCohort'
-import {
-  fetchAllProcedures,
-  fetchBiology as fetchBiologyPatient,
-  fetchDocuments,
-  fetchLastPmsiInfo,
-  fetchMedication as fetchMedicationPatient,
-  fetchPatientInfo,
-  fetchPmsi
-} from './patient'
-import { CanceledError } from 'axios'
+import { fetchAllProcedures, fetchLastPmsiInfo, fetchPatientInfo } from './patient'
 
 export type MessageState = null | {
   type?: 'success' | 'error' | 'warning' | 'info'
@@ -88,22 +79,6 @@ const setMessageSlice = createSlice({
     builder.addCase(fetchAllProcedures.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la récupération des PMSI du patient'
-    }))
-    builder.addCase(fetchDocuments.rejected, (state, action) => {
-      if (action?.error instanceof CanceledError) return null
-      return { type: 'error', content: 'Une erreur est survenue lors de la récupération des documents du patient' }
-    })
-    builder.addCase(fetchPmsi.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération des PMSI du patient'
-    }))
-    builder.addCase(fetchMedicationPatient.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération des données médicament du patient'
-    }))
-    builder.addCase(fetchBiologyPatient.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération des données de biologie du patient'
     }))
     builder.addCase(fetchProjects.rejected, () => ({
       type: 'error',

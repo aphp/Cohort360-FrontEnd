@@ -17,7 +17,6 @@ export const checkIfPageAvailable = (
         showDialog({
           isOpen: true,
           message: `Le numéro de page indiqué dans l'url est supérieur au nombre de pages possible pour ce tableau qui est de ${totalPagesAvalaible}. En cliquant sur OK, vous serez redirigé vers la dernière page disponible.`,
-          status: 'warning',
           onConfirm: () => setPage(totalPagesAvalaible)
         })
       )
@@ -39,7 +38,6 @@ export const handlePageError = (
       showDialog({
         isOpen: true,
         message: `La sélection est limitée à ${config.core.pagination.limit} pages. En cliquant sur OK, vous serez redirigé vers la page 1.`,
-        status: 'warning',
         onConfirm: () => setPage(1)
       })
     )

@@ -2,7 +2,7 @@ import React from 'react'
 
 import { TableRow, Typography } from '@mui/material'
 import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
-import DataTable from 'components/DataTable/DataTable'
+import DataTable from 'components/DataTable'
 import IconButtonWithTooltip from 'components/ui/IconButtonWithTooltip'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 

@@ -48,7 +48,7 @@ import { CohortCount, JobStatus, CurrentSnapshot, LoadingStatus, RequestType, Sn
 
 import useStyle from './styles'
 
-import displayDigit from 'utils/displayDigit'
+import { format } from 'utils/numbers'
 import services from 'services/aphp'
 import ValidationDialog from 'components/ui/ValidationDialog'
 import { JToolComponentEggWrapper } from 'components/Impersonation/JTool'
@@ -393,7 +393,7 @@ const ControlPanel: React.FC<{
             ) : (
               <Grid container alignItems="center" style={{ width: 'fit-content' }}>
                 <Typography className={cx(classes.boldText, classes.patientTypo, classes.blueText)}>
-                  {displayDigit(includePatient ?? prevCountDisplay)}
+                  {format(includePatient ?? prevCountDisplay)}
                   {oldCount !== null && !!oldCount.includePatient
                     ? (includePatient ?? 0) - oldCount.includePatient > 0
                       ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`

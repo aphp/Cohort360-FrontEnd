@@ -2,24 +2,24 @@ import React, { useEffect, useState } from 'react'
 import InputBase, { InputBaseProps } from '@mui/material/InputBase'
 
 type NumberInputProps = InputBaseProps & {
-  currentvalue: string
-  onChangeCurrentValue: (newValue: string) => void
+  value: string
+  onChange: (newValue: string) => void
 }
 
-export const NumberInput = (props: NumberInputProps) => {
-  const [number, setNumber] = useState(props.currentvalue)
+export const NumberInput = ({ value, onChange }: NumberInputProps) => {
+  const [number, setNumber] = useState(value)
 
   useEffect(() => {
-    setNumber(props.currentvalue)
-  }, [props.currentvalue])
+    setNumber(value)
+  }, [value])
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value
     if (newValue === '' || RegExp(/^\d+$/).exec(newValue)) {
       setNumber(newValue)
-      props.onChangeCurrentValue(newValue)
+      onChange(newValue)
     }
   }
 
-  return <InputBase type="text" value={number} onChange={handleNumberChange} {...props} />
+  return <InputBase type="text" value={number} onChange={handleNumberChange} />
 }

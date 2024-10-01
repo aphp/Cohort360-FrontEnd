@@ -461,9 +461,9 @@ const servicesProjects: IServiceProjects = {
       const { status, favorite, minPatients, maxPatients, startDate, endDate } = filters
       const _status =
         status?.map((stat) =>
-          stat.code === JobStatus.PENDING
+          stat.id === JobStatus.PENDING
             ? `${JobStatus.LONG_PENDING},${JobStatus.PENDING},${JobStatus.STARTED}`
-            : stat.code
+            : stat.id
         ) ?? []
 
       if (limit || limit === 0) options = [...options, `limit=${limit}`]

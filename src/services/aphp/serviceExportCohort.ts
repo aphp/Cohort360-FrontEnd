@@ -4,6 +4,7 @@ import { AxiosResponse } from 'axios'
 import { Export, Cohort } from 'types'
 import apiBackend from 'services/apiBackend'
 import { TableSetting } from 'types/export'
+import { Direction, OrderBy } from 'types/searchCriterias'
 
 export const fetchExportTablesInfo = () => {
   try {
@@ -36,24 +37,36 @@ export const fetchExportTablesRelationsInfo = async (tableList: string[]) => {
 }
 
 export const fetchExportsList = async (
-  user: string,
-  page?: number,
-  search?: string | null, //TODO change variable name
-  ordering?: string,
+  {
+    user,
+    page,
+    input,
+    orderBy,
+    offset = 20
+  }: {
+    user: string
+    page: number
+    input?: string
+    orderBy: OrderBy
+    offset?: number
+  },
   signal?: AbortSignal
 ) => {
   try {
-    const offset = page ? (page - 1) * 20 : 0
+    const _orderBy = orderBy.orderDirection === Direction.ASC ? orderBy.orderBy : `-${orderBy.orderBy}`
     const response = await fetchExportList({
-      user: user,
-      offset: offset,
-      search: search,
-      ordering: ordering,
-      signal: signal
+      user,
+      offset: page ? (page - 1) * offset : 0,
+      search: input,
+      ordering: _orderBy,
+      signal
     })
     return response
   } catch (error) {
-    return console.error(error)
+    return {
+      count: 0,
+      results: []
+    }
   }
 }
 

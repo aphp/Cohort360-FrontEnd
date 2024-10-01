@@ -7,17 +7,21 @@ import {
   GenderStatus,
   GenderStatusLabel,
   LabelObject,
+  SearchCriteriaKeys,
+  SearchCriterias,
   VitalStatus,
   VitalStatusLabel
 } from 'types/searchCriterias'
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
-import { ScopeElement, SimpleCodeType, ValueSet } from 'types'
-import { getDurationRangeLabel } from './age'
+import { SimpleCodeType } from 'types'
+import { getAgeLabel } from './age'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
 import { Hierarchy } from 'types/hierarchy'
 import labels from 'labels.json'
 import { getFullLabelFromCode } from './valueSets'
+import { getDurationRangeLabel } from 'mappers/dates'
+import { ScopeElement } from 'types/scope'
 
 export const isChecked = <T>(value: T, arr: T[]): boolean => {
   return arr.includes(value)
@@ -61,6 +65,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.IPP:
         castedFilters[key] = removeElementInArray((castedFilters[key] as string).split(','), value as string).join(',')
         break
+      case FilterKeys.DURATION_RANGE:
       case FilterKeys.BIRTHDATES:
         castedFilters[key] = [null, null]
         break
@@ -68,12 +73,11 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.END_DATE:
       case FilterKeys.MIN_PATIENTS:
       case FilterKeys.MAX_PATIENTS:
-      case FilterKeys.SOURCE:
         castedFilters[key] = null
         break
     }
   }
-  return castedFilters
+  return { ...castedFilters }
 }
 
 export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
@@ -81,7 +85,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return CohortsTypeLabel[value as CohortsType]
   }
   if (key === FilterKeys.BIRTHDATES) {
-    return getDurationRangeLabel(value as DurationRangeType, 'Âge')
+    return getAgeLabel(value as DurationRangeType, 'Âge')
   }
   if (key === FilterKeys.GENDERS) {
     return GenderStatusLabel[value as GenderStatus]
@@ -95,6 +99,9 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   }
   if (key === FilterKeys.VITAL_STATUSES) {
     return VitalStatusLabel[value as VitalStatus]
+  }
+  if (key === FilterKeys.DURATION_RANGE) {
+    return getDurationRangeLabel(value as DurationRangeType)
   }
   if (key === FilterKeys.START_DATE) {
     return `Après le : ${moment(value as string).format('DD/MM/YYYY')}`
@@ -135,7 +142,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return `Type de prescription : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
   }
   if (key === FilterKeys.STATUS) {
-    return `Statut : ${(value as ValueSet)?.display}`
+    return `Statut : ${(value as LabelObject)?.label}`
   }
   if (key === FilterKeys.MIN_PATIENTS) {
     return `Au moins ${value} patients`
@@ -149,12 +156,25 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.ENCOUNTER_STATUS) {
     return `Statut de la visite associée : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
   }
+  if (key === FilterKeys.VALIDATED_STATUS) {
+    return `Analyses dont les résultats ont été validés`
+  }
+  if (key === FilterKeys.ONLY_PDF_AVAILABLE) {
+    return `Documents dont les PDF sont disponibles`
+  }
   return ''
 }
 
-export const selectFiltersAsArray = (filters: Filters) => {
-  const result: { value: FilterValue; category: FilterKeys; label: string }[] = []
+export const selectFiltersAsArray = (filters: Filters, searchInput: string | undefined) => {
+  const result: { value: FilterValue; category: FilterKeys | SearchCriteriaKeys; label: string; disabled?: boolean }[] =
+    []
 
+  if (searchInput)
+    result.push({
+      category: SearchCriteriaKeys.SEARCH_INPUT,
+      value: searchInput,
+      label: `Recherche de : "${searchInput}"`
+    })
   for (const key in filters) {
     const value = filters[key as keyof Filters]
     if (value) {
@@ -165,10 +185,6 @@ export const selectFiltersAsArray = (filters: Filters) => {
         case FilterKeys.ADMINISTRATION_ROUTES:
         case FilterKeys.PRESCRIPTION_TYPES:
         case FilterKeys.DOC_STATUSES:
-          ;(value as []).forEach((elem) => {
-            result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
-          })
-          break
         case FilterKeys.DOC_TYPES:
         case FilterKeys.EXECUTIVE_UNITS:
         case FilterKeys.STATUS:
@@ -177,11 +193,13 @@ export const selectFiltersAsArray = (filters: Filters) => {
         case FilterKeys.FORM_NAME:
         case FilterKeys.ENCOUNTER_STATUS:
         case FilterKeys.FAVORITE:
-          ;(value as []).forEach((elem) =>
-            result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
-          )
+        case FilterKeys.SOURCE:
+          ;(value as []).forEach((elem) => {
+            if (elem) result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
+          })
           break
         case FilterKeys.BIRTHDATES:
+        case FilterKeys.DURATION_RANGE:
           if (value[0] || value[1]) {
             result.push({
               category: key,
@@ -190,7 +208,6 @@ export const selectFiltersAsArray = (filters: Filters) => {
             })
           }
           break
-        case FilterKeys.SOURCE:
         case FilterKeys.START_DATE:
         case FilterKeys.END_DATE:
         case FilterKeys.MIN_PATIENTS:
@@ -211,8 +228,48 @@ export const selectFiltersAsArray = (filters: Filters) => {
             })
           )
           break
+        case FilterKeys.VALIDATED_STATUS:
+          result.push({
+            category: key,
+            value: value as FilterValue,
+            label: getFilterLabel(key, value),
+            disabled: true
+          })
+          break
+        case FilterKeys.ONLY_PDF_AVAILABLE:
+          result.push({
+            category: key,
+            value: value as FilterValue,
+            label: getFilterLabel(key, value)
+          })
       }
     }
   }
   return result
+}
+
+export const atLeastOneSearchCriteria = (searchCriterias: SearchCriterias<Filters>) => {
+  const { searchInput, filters } = searchCriterias
+
+  return (
+    !!searchInput ||
+    ('ipp' in filters && !!filters.ipp) ||
+    ('nda' in filters && !!filters.nda) ||
+    ('durationRange' in filters && (!!filters.durationRange?.[0] || !!filters.durationRange?.[1])) ||
+    ('birthdatesRanges' in filters && (!!filters.birthdatesRanges?.[0] || !!filters.birthdatesRanges?.[1])) ||
+    ('genders' in filters && filters.genders?.length > 0) ||
+    ('vitalStatuses' in filters && filters.vitalStatuses?.length > 0) ||
+    ('executiveUnits' in filters && filters.executiveUnits?.length > 0) ||
+    ('encounterStatus' in filters && filters.encounterStatus?.length > 0) ||
+    ('code' in filters && filters.code?.length > 0) ||
+    ('modality' in filters && filters.modality?.length > 0) ||
+    ('docTypes' in filters && filters.docTypes?.length > 0) ||
+    ('docStatuses' in filters && filters.docStatuses?.length > 0) ||
+    ('onlyPdfAvailable' in filters && !!filters.onlyPdfAvailable) ||
+    ('formName' in filters && filters.formName.length > 0) ||
+    ('administrationRoutes' in filters && filters.administrationRoutes && filters.administrationRoutes.length > 0) ||
+    ('prescriptionTypes' in filters && filters.prescriptionTypes && filters.prescriptionTypes.length > 0) ||
+    ('diagnosticTypes' in filters && filters.diagnosticTypes && filters.diagnosticTypes.length > 0) ||
+    ('source' in filters && filters.source && filters.source.length > 0)
+  )
 }

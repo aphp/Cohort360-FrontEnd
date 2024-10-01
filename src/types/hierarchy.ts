@@ -1,4 +1,10 @@
-import { LoadingStatus, SelectedStatus } from 'types'
+import { LoadingStatus } from 'types'
+
+export enum SelectedStatus {
+  NOT_SELECTED,
+  SELECTED,
+  INDETERMINATE
+}
 
 export enum Mode {
   EXPAND,

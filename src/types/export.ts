@@ -1,4 +1,5 @@
 import { JobStatus } from 'types'
+import { OrderBy } from './searchCriterias'
 
 export type TableSetting = {
   tableName: string
@@ -40,4 +41,10 @@ export type ExportList = {
   request_job_status: JobStatus | null
   target_datalab: string | null
   target_name: string | null
+}
+
+export type FetchExportArgs = {
+  input: string
+  orderBy: OrderBy
+  page: number
 }

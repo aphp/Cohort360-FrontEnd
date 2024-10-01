@@ -4,10 +4,9 @@ import useStyles from './styles'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from 'state'
 import { closeAllOpenedPopulation } from 'state/scope'
-import { ScopeElement } from 'types'
 import ScopeTree from 'components/ScopeTree'
 import { Hierarchy } from 'types/hierarchy'
-import { SourceType } from 'types/scope'
+import { ScopeElement, SourceType } from 'types/scope'
 
 const CareSiteView = () => {
   const { classes, cx } = useStyles()

@@ -45,7 +45,8 @@ import {
   Order,
   SavedFilter,
   SavedFiltersResults,
-  SearchByTypes
+  SearchByTypes,
+  Sources
 } from 'types/searchCriterias'
 import {
   AdministrationParamsKeys,
@@ -61,7 +62,6 @@ import {
 } from 'types/requestCriterias'
 import { ResourceType } from 'types/requestCriterias'
 import { getConfig } from 'config'
-import { none } from 'ramda'
 
 const paramValuesReducer = (accumulator: string, currentValue: string): string =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -450,7 +450,7 @@ type fetchProcedureProps = {
   sortDirection?: Direction
   subject?: string
   code?: string
-  source?: string
+  source?: Sources[]
   minDate?: string
   maxDate?: string
   _text?: string
@@ -494,7 +494,7 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `${ProcedureParamsKeys.CODE}=${code}`] // eslint-disable-line
-  if (source) options = [...options, `${ProcedureParamsKeys.SOURCE}=${source}`]
+  if (source?.length) options = [...options, `${ProcedureParamsKeys.SOURCE}=${source.join(',')}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
   if (status) options = [...options, `status=${encodeURIComponent(`${docStatusCodeSystem}|${status}`)}`]
   if (encounterIdentifier) options = [...options, `${ProcedureParamsKeys.NDA}=${encounterIdentifier}`]
@@ -604,7 +604,7 @@ type fetchConditionProps = {
   sortDirection?: Direction
   subject?: string
   code?: string
-  source?: string
+  source?: Sources[]
   type?: string[]
   _text?: string
   'min-recorded-date'?: string
@@ -636,7 +636,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `${ConditionParamsKeys.CODE}=${code}`] // eslint-disable-line
-  if (source) options = [...options, `${ConditionParamsKeys.SOURCE}=${source}`]
+  if (source?.length) options = [...options, `${ConditionParamsKeys.SOURCE}=${source}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`] // eslint-disable-line
   if (encounterIdentifier) options = [...options, `${ConditionParamsKeys.NDA}=${encounterIdentifier}`] // eslint-disable-line
   if (patientIdentifier) options = [...options, `${ConditionParamsKeys.IPP}=${patientIdentifier}`]
@@ -696,8 +696,8 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
     _text,
     encounter,
     code,
-    subject,
     minDate,
+    subject,
     maxDate,
     rowStatus,
     signal,
@@ -917,8 +917,8 @@ type fetchImagingProps = {
   patient?: string
   size?: number
   offset?: number
-  order?: Order
-  orderDirection?: Direction
+  _sort?: string
+  sortDirection?: Direction
   _text?: string
   encounter?: string
   ipp?: string
@@ -936,8 +936,8 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
     patient,
     size,
     offset,
-    order,
-    orderDirection,
+    _sort,
+    sortDirection,
     _text,
     encounter,
     ipp,
@@ -948,7 +948,7 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
     executiveUnits,
     encounterStatus
   } = args
-  const _orderDirection = orderDirection === Direction.DESC ? '-' : ''
+  const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list, uniqueFacet } = args
   _list = _list ? _list.filter(uniq) : []
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
@@ -958,7 +958,7 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   if (patient) options = [...options, `patient=${patient}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
-  if (order) options = [...options, `_sort=${_orderDirection}${order}`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
   if (encounter) options = [...options, `${ImagingParamsKeys.NDA}=${encounter}`]
   if (ipp) options = [...options, `${ImagingParamsKeys.IPP}=${ipp}`]
@@ -997,8 +997,8 @@ type fetchFormsProps = {
   encounterStatus?: string[]
   size?: number
   offset?: number
-  order?: Order
-  orderDirection?: Direction
+  _sort?: Order
+  sortDirection?: Direction
   ipp?: string
   signal?: AbortSignal
   uniqueFacet?: string[]
@@ -1014,14 +1014,14 @@ export const fetchForms = async (args: fetchFormsProps) => {
     encounterStatus,
     size,
     offset,
-    order,
-    orderDirection,
+    _sort,
+    sortDirection,
     ipp,
     signal
   } = args
   let { uniqueFacet } = args
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
-  const _orderDirection = orderDirection === Direction.DESC ? '-' : ''
+  const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
 
   let options: string[] = ['status=in-progress,completed']
   if (patient) options = [...options, `subject=${patient}`]
@@ -1035,7 +1035,7 @@ export const fetchForms = async (args: fetchFormsProps) => {
     options = [...options, `${QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
-  if (order) options = [...options, `_sort=${_orderDirection}${order}`]
+  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`]
   if (ipp) options = [...options, `${QuestionnaireResponseParamsKeys.IPP}=${ipp}`]
 
   if (uniqueFacet && uniqueFacet.length > 0)
@@ -1228,19 +1228,16 @@ type fetchExportListProps = {
 
 export const fetchExportList = async (args: fetchExportListProps) => {
   const { offset, user, search, ordering, signal } = args
-
   let options: string[] = [`output_format=${encodeURIComponent('csv,xlsx')}`]
   if (offset !== undefined) options = [...options, `offset=${offset}`]
   if (user !== undefined) options = [...options, `owner=${user}`]
   if (search && search !== undefined) options = [...options, `search=${encodeURIComponent(search)}`]
   if (ordering !== undefined) options = [...options, `ordering=${ordering}`]
-
   let queryParams = ''
   if (options.length != 0) {
     queryParams = `?${options.reduce(paramsReducer, '')}`
   }
-
-  const response = await apiBackend.get<Back_API_Response<ExportList>>(`/exports/${queryParams}`, { signal: signal })
+  const response = await apiBackend.get<Back_API_Response<ExportList>>(`/exports/${queryParams}`, { signal })
   return response.data
 }
 

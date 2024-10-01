@@ -16,12 +16,12 @@ import {
   SearchByTypes
 } from 'types/searchCriterias'
 import { Hierarchy } from 'types/hierarchy'
-import { ScopeElement } from 'types'
+import { ScopeElement } from 'types/scope'
 import { Tooltip, Typography } from '@mui/material'
 import { Comparators } from 'types/requestCriterias'
 import allDocTypes from 'assets/docTypes.json'
 import moment from 'moment'
-import { getDurationRangeLabel } from 'utils/age'
+import { getAgeLabel } from 'utils/age'
 import { getConfig } from 'config'
 
 /************************************************************************************/
@@ -244,7 +244,7 @@ export const CHIPS_DISPLAY_METHODS = {
     args: Array<ChipDisplayMethod | DataTypes>
   ) => {
     const typedVal = val as NewDurationRangeType
-    return getDurationRangeLabel([typedVal.start, typedVal.end], args[0] as string)
+    return getAgeLabel([typedVal.start, typedVal.end], args[0] as string)
   },
   raw: (
     val: DataTypes,

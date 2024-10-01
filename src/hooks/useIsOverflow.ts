@@ -1,4 +1,4 @@
-import { MutableRefObject, useLayoutEffect, useState } from 'react'
+import React, { MutableRefObject, useLayoutEffect, useState } from 'react'
 
 type UseIsOverflowArgs = {
   ref: MutableRefObject<HTMLDivElement | null>

@@ -4,7 +4,6 @@ import { useAppSelector } from 'state'
 import { Divider, Grid, Typography } from '@mui/material'
 
 import useStyles from './styles'
-import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { useNavigate } from 'react-router-dom'
 import DisplayLocked from 'components/ui/Display/DisplayLocked'
@@ -30,15 +29,13 @@ const SearchPatientCard = () => {
       {deidentifiedBoolean ? (
         <DisplayLocked />
       ) : (
-        <Grid container direction="column" justifyContent="space-evenly" style={{ height: '100%', marginTop: 8 }}>
-          <Searchbar>
-            <SearchInput
-              value={searchInput}
-              searchOnClick
-              placeholder="Cherchez un ipp, nom et/ou prénom"
-              onchange={(newValue) => setSearchInput(newValue)}
-            />
-          </Searchbar>
+        <Grid container direction="column" justifyContent="flex-end" height={30} marginTop="4px">
+          <SearchInput
+            value={searchInput}
+            searchOnClick
+            placeholder="Cherchez un ipp, nom et/ou prénom"
+            onChange={(newValue) => setSearchInput(newValue)}
+          />
         </Grid>
       )}
     </>
