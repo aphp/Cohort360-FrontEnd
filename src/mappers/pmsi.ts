@@ -74,14 +74,14 @@ export const mapToSourceType = (tabId: PMSIResourceTypes) => {
   return tabIdMapper[tabId]
 }
 
-export const mapToDate = (tabId: PMSIResourceTypes, pmsiItem: CohortPMSI) => {
+export const getPmsiDate = (tabId: PMSIResourceTypes, pmsiItem: CohortPMSI) => {
   const dateMapper = {
     [ResourceType.CONDITION]: (pmsiItem as Condition).recordedDate,
     [ResourceType.PROCEDURE]: (pmsiItem as Procedure).performedDateTime,
     [ResourceType.CLAIM]: (pmsiItem as Claim).created
   }
 
-  return dateMapper[tabId] ? new Date(dateMapper[tabId] as string).toLocaleDateString('fr-FR') : 'Date inconnue'
+  return dateMapper[tabId]
 }
 
 export const mapToOrderByCode = (code: Order, resourceType: PMSIResourceTypes) => {
