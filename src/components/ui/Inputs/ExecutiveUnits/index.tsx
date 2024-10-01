@@ -2,7 +2,7 @@ import { CircularProgress, FormLabel, Grid, IconButton, Tooltip } from '@mui/mat
 import React, { ReactNode, useEffect, useState } from 'react'
 import { LoadingStatus, ScopeElement } from 'types'
 import InfoIcon from '@mui/icons-material/Info'
-import { InputWrapper } from 'components/ui/Inputs'
+import { InputWrapper } from 'components/ui/Inputs/styles'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
