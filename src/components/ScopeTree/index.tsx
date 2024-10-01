@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
-import { LoadingStatus, ScopeElement } from 'types'
+import { LoadingStatus } from 'types'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { Grid, SxProps, Theme } from '@mui/material'
 import SelectedCodes from '../Hierarchy/SelectedCodes'
-import { SourceType } from 'types/scope'
+import { ScopeElement, SourceType } from 'types/scope'
 import { Hierarchy, Mode } from 'types/hierarchy'
 import ScopeTreeTable from './ScopeTreeTable'
 import { useScopeTree } from 'hooks/scopeTree/useScopeTree'
@@ -41,7 +41,7 @@ const ScopeTree = ({ baseTree, selectedNodes, sourceType, onSelect, sx }: ScopeT
       justifyContent={'space-between'}
     >
       <Grid container padding={'24px 20px'}>
-        <SearchInput value={searchInput} placeholder={'Rechercher'} onchange={onChangeSearchInput} />
+        <SearchInput value={searchInput} placeholder={'Rechercher'} onChange={onChangeSearchInput} />
       </Grid>
       <Grid container direction="column" wrap="wrap" height="100vh" overflow="auto" padding={'0px 20px'}>
         <Grid

@@ -1,5 +1,5 @@
 import services from 'services/aphp'
-import { CriteriaGroup, TemporalConstraintsType, CriteriaItemType, CriteriaGroupType, ScopeElement } from 'types'
+import { CriteriaGroup, TemporalConstraintsType, CriteriaItemType, CriteriaGroupType } from 'types'
 
 import { LabelObject } from 'types/searchCriterias'
 import {
@@ -22,6 +22,7 @@ import criteriaList, { getAllCriteriaItems } from 'components/CreationCohort/Dat
 import { getChildrenFromCodes, HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
 import { createHierarchyRoot } from './hierarchy'
 import { FhirItem } from 'types/valueSet'
+import { ScopeElement } from 'types/scope'
 
 const REQUETEUR_VERSION = 'v1.6.1'
 
@@ -203,7 +204,6 @@ const mapCriteriaToResource = (criteriaType: CriteriaType): ResourceType => {
     [CriteriaType.MEDICATION_ADMINISTRATION]: ResourceType.MEDICATION_ADMINISTRATION,
     [CriteriaType.OBSERVATION]: ResourceType.OBSERVATION,
     [CriteriaType.IMAGING]: ResourceType.IMAGING,
-    [CriteriaType.QUESTIONNAIRE]: ResourceType.QUESTIONNAIRE,
     [CriteriaType.QUESTIONNAIRE_RESPONSE]: ResourceType.QUESTIONNAIRE_RESPONSE,
     [CriteriaType.PREGNANCY]: ResourceType.QUESTIONNAIRE_RESPONSE,
     [CriteriaType.HOSPIT]: ResourceType.QUESTIONNAIRE_RESPONSE

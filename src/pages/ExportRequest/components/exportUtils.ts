@@ -66,7 +66,7 @@ const fetchConditionCount = async (cohortId: string, conditionFilters?: SearchCr
   try {
     let conditionResp
     if (conditionFilters && conditionFilters !== null) {
-      const { code, diagnosticTypes, source, nda, startDate, endDate, executiveUnits, encounterStatus } =
+      const { code, diagnosticTypes, source, nda, durationRange, executiveUnits, encounterStatus } =
         conditionFilters.filters
 
       conditionResp = await fetchCondition({
@@ -75,8 +75,8 @@ const fetchConditionCount = async (cohortId: string, conditionFilters?: SearchCr
         code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
         source: source,
         type: diagnosticTypes?.map((type) => type.id) ?? [],
-        'min-recorded-date': startDate ?? '',
-        'max-recorded-date': endDate ?? '',
+        'min-recorded-date': durationRange[0] ?? '',
+        'max-recorded-date': durationRange[1] ?? '',
         executiveUnits: executiveUnits.map((unit) => unit.id),
         'encounter-identifier': nda,
         _text: conditionFilters.searchInput,
@@ -98,15 +98,15 @@ const fetchProcedureCount = async (cohortId: string, procedureFilters?: SearchCr
     let procedureResp
 
     if (procedureFilters && procedureFilters !== null) {
-      const { code, source, nda, startDate, endDate, executiveUnits, encounterStatus } = procedureFilters.filters
+      const { code, source, nda, durationRange, executiveUnits, encounterStatus } = procedureFilters.filters
 
       procedureResp = await fetchProcedure({
         size: 0,
         _list: [cohortId],
         code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
         source: source,
-        minDate: startDate ?? '',
-        maxDate: endDate ?? '',
+        minDate: durationRange[0] ?? '',
+        maxDate: durationRange[1] ?? '',
         executiveUnits: executiveUnits.map((unit) => unit.id),
         'encounter-identifier': nda,
         _text: procedureFilters.searchInput,
@@ -128,14 +128,14 @@ const fetchClaimCount = async (cohortId: string, claimFilters?: SearchCriterias<
   try {
     let claimResp
     if (claimFilters && claimFilters !== null) {
-      const { code, nda, startDate, endDate, executiveUnits, encounterStatus } = claimFilters.filters
+      const { code, nda, durationRange, executiveUnits, encounterStatus } = claimFilters.filters
 
       claimResp = await fetchClaim({
         size: 0,
         _list: [cohortId],
         diagnosis: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
-        minCreated: startDate ?? '',
-        maxCreated: endDate ?? '',
+        minCreated: durationRange[0] ?? '',
+        maxCreated: durationRange[1] ?? '',
         _text: claimFilters.searchInput,
         'encounter-identifier': nda,
         executiveUnits: executiveUnits.map((unit) => unit.id),
@@ -161,16 +161,8 @@ const fetchMedicationCount = async (
   try {
     let medicationResp
     if (medicationFilters && medicationFilters !== null) {
-      const {
-        nda,
-        startDate,
-        endDate,
-        executiveUnits,
-        code,
-        encounterStatus,
-        prescriptionTypes,
-        administrationRoutes
-      } = medicationFilters.filters
+      const { nda, durationRange, executiveUnits, code, encounterStatus, prescriptionTypes, administrationRoutes } =
+        medicationFilters.filters
 
       medicationResp =
         resourceType === ResourceType.MEDICATION_REQUEST
@@ -181,8 +173,8 @@ const fetchMedicationCount = async (
               _text: medicationFilters.searchInput,
               code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
               type: prescriptionTypes?.map(({ id }) => id),
-              minDate: startDate,
-              maxDate: endDate,
+              minDate: durationRange[0] ?? '',
+              maxDate: durationRange[1] ?? '',
               executiveUnits: executiveUnits.map((unit) => unit.id),
               encounterStatus: encounterStatus.map((status) => status.id)
             })
@@ -193,8 +185,8 @@ const fetchMedicationCount = async (
               _text: medicationFilters.searchInput,
               code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
               route: administrationRoutes?.map(({ id }) => id),
-              minDate: startDate,
-              maxDate: endDate,
+              minDate: durationRange[0] ?? '',
+              maxDate: durationRange[1] ?? '',
               executiveUnits: executiveUnits.map((unit) => unit.id),
               encounterStatus: encounterStatus.map((status) => status.id)
             })
@@ -216,15 +208,15 @@ const fetchImagingCount = async (cohortId: string, imagingFilters?: SearchCriter
   try {
     let claimResp
     if (imagingFilters && imagingFilters !== null) {
-      const { nda, startDate, endDate, executiveUnits, encounterStatus, modality } = imagingFilters.filters
+      const { nda, durationRange, executiveUnits, encounterStatus, modality } = imagingFilters.filters
 
       claimResp = await fetchImaging({
         size: 0,
         _list: [cohortId],
         _text: imagingFilters.searchInput,
         encounter: nda,
-        minDate: startDate ?? '',
-        maxDate: endDate ?? '',
+        minDate: durationRange[0] ?? '',
+        maxDate: durationRange[1] ?? '',
         modalities: modality.map(({ id }) => id),
         executiveUnits: executiveUnits.map((unit) => unit.id),
         encounterStatus: encounterStatus.map((status) => status.id)
@@ -245,7 +237,7 @@ const fetchDocumentsCount = async (cohortId: string, documentsFilters?: SearchCr
   try {
     let docResp
     if (documentsFilters && documentsFilters !== null) {
-      const { nda, startDate, endDate, executiveUnits, encounterStatus, ipp, docTypes, docStatuses } =
+      const { nda, durationRange, executiveUnits, encounterStatus, ipp, docTypes, docStatuses } =
         documentsFilters.filters
 
       docResp = await fetchDocumentReference({
@@ -257,8 +249,8 @@ const fetchDocumentsCount = async (cohortId: string, documentsFilters?: SearchCr
         type: docTypes.map((docType) => docType.code).join(),
         'encounter-identifier': nda,
         'patient-identifier': ipp,
-        minDate: startDate ?? '',
-        maxDate: endDate ?? '',
+        minDate: durationRange[0] ?? '',
+        maxDate: durationRange[1] ?? '',
         executiveUnits: executiveUnits.map((unit) => unit.id),
         encounterStatus: encounterStatus.map((status) => status.id)
       })
@@ -278,8 +270,7 @@ const fetchObservationCount = async (cohortId: string, observationFilters?: Sear
   try {
     let observationResp
     if (observationFilters && observationFilters !== null) {
-      const { nda, code, startDate, endDate, executiveUnits, encounterStatus, validatedStatus } =
-        observationFilters.filters
+      const { nda, code, durationRange, executiveUnits, encounterStatus, validatedStatus } = observationFilters.filters
 
       observationResp = await fetchObservation({
         size: 0,
@@ -287,8 +278,8 @@ const fetchObservationCount = async (cohortId: string, observationFilters?: Sear
         _text: observationFilters.searchInput,
         encounter: nda,
         code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
-        minDate: startDate ?? '',
-        maxDate: endDate ?? '',
+        minDate: durationRange[0] ?? '',
+        maxDate: durationRange[1] ?? '',
         rowStatus: validatedStatus,
         executiveUnits: executiveUnits.map((unit) => unit.id),
         encounterStatus: encounterStatus.map((status) => status.id)

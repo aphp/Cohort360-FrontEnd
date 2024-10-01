@@ -9,6 +9,7 @@ import { Patient } from 'fhir/r4'
 import { isCustomError } from 'utils/perimeters'
 import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
+import { URLS } from 'types/exploration'
 
 export type ExploredCohortState = {
   importedPatients: Patient[]
@@ -57,7 +58,7 @@ const defaultInitialState = {
 
 const fetchExploredCohort = createAsyncThunk<
   CohortData,
-  { context: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'; id?: string; forceReload?: boolean },
+  { context: URLS; id?: string; forceReload?: boolean },
   { state: RootState }
 >('exploredCohort/fetchExploredCohort', async ({ context, id, forceReload }, { getState, dispatch }) => {
   const state = getState()
@@ -66,11 +67,11 @@ const fetchExploredCohort = createAsyncThunk<
   let shouldRefreshData = true
 
   switch (context) {
-    case 'cohort': {
+    case URLS.COHORT: {
       shouldRefreshData = !stateCohort || Array.isArray(stateCohort) || stateCohort.id !== id
       break
     }
-    case 'perimeters': {
+    case URLS.PERIMETERS: {
       if (!id) {
         throw new Error('No given perimeter ids')
       }
@@ -86,7 +87,7 @@ const fetchExploredCohort = createAsyncThunk<
         statePerimeterIds.some((id: string) => !perimeterIds.includes(id))
       break
     }
-    case 'patients': {
+    case URLS.PATIENTS: {
       shouldRefreshData = stateCohort !== undefined && state.exploredCohort.originalPatients !== undefined
       break
     }
@@ -103,7 +104,7 @@ const fetchExploredCohort = createAsyncThunk<
 
 const fetchExploredCohortInBackground = createAsyncThunk<
   CohortData,
-  { context: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'; id?: string },
+  { context: URLS; id?: string },
   { state: RootState }
 >('exploredCohort/fetchExploredCohortInBackground', async ({ context, id }, { getState }) => {
   const state = getState()
@@ -111,7 +112,7 @@ const fetchExploredCohortInBackground = createAsyncThunk<
 
   let cohort
   switch (context) {
-    case 'cohort': {
+    case URLS.COHORT: {
       if (id) {
         cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
         if (cohort) {
@@ -141,7 +142,7 @@ const fetchExploredCohortInBackground = createAsyncThunk<
       }
       break
     }
-    case 'patients': {
+    case URLS.PATIENTS: {
       cohort = (await services.patients.fetchMyPatients()) as ExploredCohortState
       const rights = await services.perimeters.getRights({})
 
@@ -158,7 +159,7 @@ const fetchExploredCohortInBackground = createAsyncThunk<
       }
       break
     }
-    case 'perimeters': {
+    case URLS.PERIMETERS: {
       if (id) {
         cohort = (await services.perimeters.fetchPerimetersInfos(id)) as ExploredCohortState
         if (cohort) {

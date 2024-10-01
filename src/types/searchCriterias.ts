@@ -1,9 +1,10 @@
-import { ScopeElement, SimpleCodeType, ValueSet } from 'types'
+import { SimpleCodeType, ValueSet } from 'types'
 import { PatientTableLabels } from './patient'
 import { CohortsType } from './cohorts'
 import { ResourceType } from './requestCriterias'
 import { Hierarchy } from './hierarchy'
 import { FhirItem } from './valueSet'
+import { ScopeElement } from './scope'
 
 export enum FormNames {
   PREGNANCY = 'APHPEDSQuestionnaireFicheGrossesse',
@@ -131,29 +132,25 @@ export enum DirectionLabel {
   DESC = 'Décroissant'
 }
 export enum Order {
-  AGE_MONTH = 'age-month',
-  AUTHORED = 'authored',
   LABEL = 'label',
-  CODE = 'code',
-  RESULT_SIZE = 'result_size',
-  RECORDED_DATE = 'recorded-date',
-  FAMILY = 'family',
-  DATE = 'date',
-  CREATED = 'created',
-  DIAGNOSIS = 'diagnosis',
   ANABIO = 'code-anabio',
-  TYPE = 'type-name',
+  LOINC = 'code-loinc',
+  GENDER = 'gender',
   LASTNAME = 'lastname',
+  AGE_MONTH = 'age-month',
   BIRTHDATE = 'birthdate',
+  CODE = 'code',
+  CREATED = 'created',
   CREATED_AT = 'created_at',
+  DATE = 'date',
   DESCRIPTION = 'description',
+  DIAGNOSIS = 'diagnosis',
   EFFECTIVE_TIME = 'effective-time',
   ENCOUNTER = 'encounter',
+  FAMILY = 'family',
   FAVORITE = 'favorite',
-  GENDER = 'gender',
   ID = 'id',
   IPP = 'identifier',
-  LOINC = 'code-loinc',
   MEDICATION_ATC = 'medication-atc',
   MEDICATION_UCD = 'medication-ucd',
   MODALITY = 'modality',
@@ -162,15 +159,19 @@ export enum Order {
   PARENT_FOLDER = 'parent_folder',
   PERIOD_START = 'Period-start',
   PRESCRIPTION_TYPES = 'category-name',
-  PROCEDURE = 'procedureCode',
-  STUDY_DATE = 'started',
   SUBJECT_IDENTIFIER = 'subject-identifier',
   REQUEST = 'request',
   UPDATED = 'updated_at',
   ADMINISTRATION_MODE = 'route',
-  DISPLAY = 'display',
   STATUS = 'status',
-  OUTPUT_FORMAT = 'output_format'
+  OUTPUT_FORMAT = 'output_format',
+  AUTHORED = 'authored',
+  DISPLAY = 'display',
+  PROCEDURE = 'procedureCode',
+  RECORDED_DATE = 'recorded-date',
+  RESULT_SIZE = 'result_size',
+  STUDY_DATE = 'started',
+  TYPE = 'type-name'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -227,6 +228,7 @@ export enum FilterKeys {
   DIAGNOSTIC_TYPES = 'diagnosticTypes',
   START_DATE = 'startDate',
   END_DATE = 'endDate',
+  DURATION_RANGE = 'durationRange',
   ONLY_PDF_AVAILABLE = 'onlyPdfAvailable',
   SOURCE = 'source',
   EXECUTIVE_UNITS = 'executiveUnits',
@@ -238,7 +240,13 @@ export enum FilterKeys {
   MAX_PATIENTS = 'maxPatients',
   MODALITY = 'modality',
   FORM_NAME = 'formName',
-  ENCOUNTER_STATUS = 'encounterStatus'
+  ENCOUNTER_STATUS = 'encounterStatus',
+  VALIDATED_STATUS = 'validatedStatus'
+}
+
+export enum SearchCriteriaKeys {
+  SEARCH_INPUT,
+  SEARCH_BY
 }
 
 export enum OrderByKeys {
@@ -258,7 +266,11 @@ export enum DocumentAttachmentMethodLabel {
   INFERENCE_TEMPOREL = 'Inférence temporelle'
 }
 
-// TODO replace this by NewDurationRangeType, this will need the refacto of filters (with a more generic CriteriaForm)
+export enum Sources {
+  AREM = 'AREM',
+  ORBIS = 'ORBIS'
+}
+
 export type DurationRangeType = [string | null | undefined, string | null | undefined]
 export type LabelObject = {
   id: string
@@ -301,9 +313,8 @@ export type Filters =
   | MaternityFormFilters
 
 export type GenericFilter = {
-  nda: string
-  startDate: string | null
-  endDate: string | null
+  nda?: string
+  durationRange: DurationRangeType
   executiveUnits: Hierarchy<ScopeElement>[]
   encounterStatus: LabelObject[]
 }
@@ -317,7 +328,7 @@ export type PatientsFilters = {
 export type PMSIFilters = GenericFilter & {
   diagnosticTypes?: LabelObject[]
   code: Hierarchy<FhirItem>[]
-  source?: string
+  source?: Sources[]
   ipp?: string
 }
 
@@ -339,13 +350,9 @@ export type ImagingFilters = GenericFilter & {
   modality: LabelObject[]
 }
 
-export type MaternityFormFilters = {
+export type MaternityFormFilters = GenericFilter & {
+  ipp: string
   formName: FormNames[]
-  startDate: string | null
-  endDate: string | null
-  encounterStatus: LabelObject[]
-  executiveUnits: Hierarchy<ScopeElement>[]
-  ipp?: string
 }
 
 export type DocumentsFilters = GenericFilter & {
@@ -356,7 +363,7 @@ export type DocumentsFilters = GenericFilter & {
 }
 
 export interface CohortsFilters {
-  status: ValueSet[]
+  status: LabelObject[]
   favorite: CohortsType[]
   minPatients?: null | string
   maxPatients?: null | string
@@ -371,7 +378,7 @@ export type ProjectsFilters = {
 
 export interface SearchCriterias<F> {
   searchBy?: SearchByTypes
-  searchInput: string
+  searchInput?: string
   orderBy: OrderBy
   filters: F
 }
@@ -411,7 +418,12 @@ export type ActionFilters<F> =
   | ActionRemoveSearchCriterias
   | ActionAddSearchCriterias<F>
 
-export const searchByListPatients = [
+export type SearchBy = {
+  id: SearchByTypes
+  label: SearchByTypesLabelPatients | SearchByTypesLabelDocuments
+}
+
+export const searchByListPatients: SearchBy[] = [
   {
     id: SearchByTypes.TEXT,
     label: SearchByTypesLabelPatients.TEXT
@@ -427,6 +439,17 @@ export const searchByListPatients = [
   {
     id: SearchByTypes.IDENTIFIER,
     label: SearchByTypesLabelPatients.IDENTIFIER
+  }
+]
+
+export const searchByListDocuments: SearchBy[] = [
+  {
+    id: SearchByTypes.TEXT,
+    label: SearchByTypesLabelDocuments.TEXT
+  },
+  {
+    id: SearchByTypes.DESCRIPTION,
+    label: SearchByTypesLabelDocuments.DESCRIPTION
   }
 ]
 
@@ -456,17 +479,6 @@ export const orderByListPatientsDeidentified = [
   {
     id: Order.BIRTHDATE,
     label: PatientTableLabels.BIRTHDATE
-  }
-]
-
-export const searchByListDocuments = [
-  {
-    id: SearchByTypes.TEXT,
-    label: SearchByTypesLabelDocuments.TEXT
-  },
-  {
-    id: SearchByTypes.DESCRIPTION,
-    label: SearchByTypesLabelDocuments.DESCRIPTION
   }
 ]
 

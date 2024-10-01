@@ -18,7 +18,7 @@ import {
   getSelectedCodesFromTrees,
   createHierarchyRoot
 } from 'utils/hierarchy' // Remplacez par le nom de votre fichier
-import { SelectedStatus } from 'types'
+import { SelectedStatus } from 'types/hierarchy'
 import { Codes, CodesCache, GroupedBySystem, Hierarchy, Mode } from 'types/hierarchy'
 import { vi } from 'vitest'
 

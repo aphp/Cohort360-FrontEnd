@@ -6,7 +6,7 @@ export default makeStyles()((theme) => ({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#E6F1FD',
+    //backgroundColor: '#E6F1FD',
     boxShadow: 'none'
   },
   perimetersChipsDiv: {

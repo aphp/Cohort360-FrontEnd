@@ -7,11 +7,9 @@ type RightPanelProps = {
   title?: string
   mandatory?: boolean
   children: ReactNode
-  cancelText?: string
-  confirmText?: string
   size?: string
-  onConfirm?: () => void
-  onClose?: () => void
+  onConfirm: () => void
+  onClose: () => void
 }
 
 const Panel = ({
@@ -21,8 +19,6 @@ const Panel = ({
   mandatory = false,
   children,
   size = '650px',
-  cancelText = 'Annuler',
-  confirmText = 'Confirmer',
   onConfirm,
   onClose
 }: PropsWithChildren<RightPanelProps>) => {
@@ -59,17 +55,13 @@ const Panel = ({
           borderTop="1px solid grey"
           marginTop={'auto'}
         >
-          <Grid item xs={5} gap={1} container justifyContent="center">
-            {onClose && (
-              <Button onClick={onClose} variant="outlined">
-                {cancelText}
-              </Button>
-            )}
-            {onConfirm && (
-              <Button disabled={mandatory} onClick={onConfirm} variant="contained">
-                {confirmText}
-              </Button>
-            )}
+          <Grid item xs={4} container justifyContent="space-between">
+            <Button onClick={onClose} variant="outlined">
+              Annuler
+            </Button>
+            <Button disabled={mandatory} onClick={onConfirm} variant="contained">
+              Confirmer
+            </Button>
           </Grid>
         </Grid>
       </Grid>

@@ -5,7 +5,6 @@ import {
   Back_API_Response,
   ChartCode,
   CohortData,
-  ScopeElement,
   ReadRightPerimeter,
   UserAccesses
 } from 'types'
@@ -21,7 +20,7 @@ import { fetchAccessExpirations, fetchEncounter, fetchPatient, fetchPerimeterAcc
 
 import { AxiosResponse } from 'axios'
 import apiBackend from '../apiBackend'
-import { FetchScopeOptions, Rights, SourceType, System } from 'types/scope'
+import { FetchScopeOptions, Rights, ScopeElement, SourceType, System } from 'types/scope'
 import { scopeLevelsToRequestParam } from 'utils/perimeters'
 import { mapParamsToNetworkParams } from 'utils/url'
 import { Hierarchy } from 'types/hierarchy'

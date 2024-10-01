@@ -9,7 +9,7 @@ import DeleteIcon from 'assets/icones/delete.svg?react'
 import DriveFileMoveIcon from 'assets/icones/drive-file-move.svg?react'
 import FilterList from '@mui/icons-material/FilterList'
 
-import { FilterKeys, FilterValue } from 'types/searchCriterias'
+import { FilterKeys, FilterValue, SearchCriteriaKeys } from 'types/searchCriterias'
 
 type ActionBarProps = {
   loading: boolean
@@ -19,8 +19,8 @@ type ActionBarProps = {
   onDelete: () => void
   onMove?: () => void
   onFilter?: () => void
-  filters?: { value: FilterValue; category: FilterKeys; label: string }[]
-  onRemoveFilters?: (key: FilterKeys, value: FilterValue) => void
+  filters?: { value: FilterValue; category: FilterKeys | SearchCriteriaKeys; label: string }[]
+  onRemoveFilters?: (key: FilterKeys | SearchCriteriaKeys, value: FilterValue) => void
   onAddRequest?: () => void
   onAddSample?: () => void
   disabled?: boolean
