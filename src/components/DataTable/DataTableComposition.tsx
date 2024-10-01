@@ -22,14 +22,15 @@ import Watermark from 'assets/images/watermark_pseudo.svg?react'
 
 import { getDocumentStatus } from 'utils/documentsFormatter'
 
-import { Column, CohortComposition } from 'types'
+import {  CohortComposition } from 'types'
 
 import useStyles from './styles'
 import { Visibility } from '@mui/icons-material'
 import { DocumentStatuses, Order, OrderBy } from 'types/searchCriterias'
-import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
+import StatusChip, { Status } from 'components/ui/StatusChip'
 import { DocumentReference } from 'fhir/r4'
 import moment from 'moment'
+import { Column } from 'types/table'
 
 type DataTableCompositionProps = {
   loading: boolean
@@ -225,7 +226,7 @@ const getStatusChip = (type?: DocumentReference['docStatus']) => {
     case DocumentStatuses.PRELIMINARY:
       return (
         <StatusChip
-          status={ChipStyles.CANCELLED}
+          status={Status.CANCELLED}
           icon={<CancelIcon height="15px" fill="#FFF" />}
           label={getDocumentStatus(type)}
         />

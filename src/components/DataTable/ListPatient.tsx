@@ -11,7 +11,7 @@ import useStyles, { ListItemWrapper, ListWrapper } from './styles'
 import { GenderStatus } from 'types/searchCriterias'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import GenderIcon from 'components/ui/GenderIcon'
-import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
+import StatusChip, { Status } from 'components/ui/StatusChip'
 import { VitalStatusLabel } from 'types/requestCriterias'
 import { Pagination } from 'components/ui/Pagination'
 
@@ -123,7 +123,7 @@ const ListPatientLine: React.FC<{
       </ListItemIcon>
       <ListItemText primary={`${capitalizeFirstLetter(firstName)} ${lastName}`} secondary={`${age} - ${ipp}`} />
       <StatusChip
-        status={patient.deceasedDateTime ? ChipStyles.CANCELLED : ChipStyles.VALID}
+        status={patient.deceasedDateTime ? Status.CANCELLED : Status.VALID}
         label={patient.deceasedDateTime ? VitalStatusLabel.DECEASED : VitalStatusLabel.ALIVE}
       />
     </ListItemWrapper>

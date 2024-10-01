@@ -6,7 +6,7 @@ import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import DataTable from 'components/DataTable/DataTable'
 
-import { CohortPatient, Column } from 'types'
+import { CohortPatient } from 'types'
 
 import { getAge } from 'utils/age'
 import { capitalizeFirstLetter } from 'utils/capitalize'
@@ -15,10 +15,11 @@ import useStyles from './styles'
 import { GenderStatus, Order, OrderBy } from 'types/searchCriterias'
 import { PatientTableLabels } from 'types/patient'
 import GenderIcon from 'components/ui/GenderIcon'
-import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
+import StatusChip, { Status } from 'components/ui/StatusChip'
 import { VitalStatusLabel } from 'types/requestCriterias'
 import { getExtension } from 'utils/fhir'
 import { AppConfig } from 'config'
+import { Column } from 'types/table'
 
 type DataTablePatientProps = {
   loading: boolean
@@ -149,7 +150,7 @@ const DataTablePatientLine: React.FC<{
       </TableCellWrapper>
       <TableCellWrapper>
         <StatusChip
-          status={patient.deceasedDateTime || patient.deceasedBoolean ? ChipStyles.CANCELLED : ChipStyles.VALID}
+          status={patient.deceasedDateTime || patient.deceasedBoolean ? Status.CANCELLED : Status.VALID}
           label={
             patient.deceasedDateTime || patient.deceasedBoolean ? VitalStatusLabel.DECEASED : VitalStatusLabel.ALIVE
           }

@@ -80,6 +80,8 @@ import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { mapToOrderByCode } from 'mappers/pmsi'
 import { mapMedicationToOrderByCode } from 'mappers/medication'
 import { linkToDiagnosticReport } from './serviceImaging'
+import { PatientsResponse } from 'types/patient'
+import { getFormName } from 'utils/formUtils'
 
 export interface IServiceCohorts {
   /**
@@ -136,16 +138,7 @@ export interface IServiceCohorts {
     groupId?: string,
     includeFacets?: boolean,
     signal?: AbortSignal
-  ) => Promise<
-    | {
-        totalPatients: number
-        totalAllPatients: number
-        originalPatients: Patient[] | undefined
-        agePyramidData?: AgeRepartitionType
-        genderRepartitionMap?: GenderRepartitionType
-      }
-    | undefined
-  >
+  ) => Promise<PatientsResponse | undefined>
 
   /**
    * Retourne la liste de documents liés à une cohorte
@@ -242,6 +235,12 @@ export interface IServiceCohorts {
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<CohortQuestionnaireResponse>>
+
+  /**
+   *
+   * Retourne le service de récupération de donnée en fonction de la ressource
+   */
+  getExplorationFetcher: (resourceType: ResourceType) => Function
 
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
@@ -440,7 +439,7 @@ const servicesCohorts: IServiceCohorts = {
           _list: groupId ? [groupId] : [],
           gender: filters && filters.genders.join(','),
           searchBy,
-          _text: searchInput.trim(),
+          _text: (searchInput || '').trim(),
           minBirthdate: minBirthdate,
           maxBirthdate: maxBirthdate,
           deceased:
@@ -501,7 +500,7 @@ const servicesCohorts: IServiceCohorts = {
       searchCriterias: {
         orderBy,
         searchInput,
-        filters: { ipp, nda, startDate, endDate, executiveUnits, encounterStatus, diagnosticTypes, code, source }
+        filters: { ipp, nda, durationRange, executiveUnits, encounterStatus, diagnosticTypes, code, source }
       }
     } = options
     const fetchers = {
@@ -531,23 +530,23 @@ const servicesCohorts: IServiceCohorts = {
         code: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(','),
         source: source,
         type: diagnosticTypes?.map((type) => type.id),
-        'min-recorded-date': startDate ?? '',
-        'max-recorded-date': endDate ?? '',
+        'min-recorded-date': (durationRange && durationRange[0]) ?? '',
+        'max-recorded-date': (durationRange && durationRange[1]) ?? '',
         uniqueFacet: ['subject']
       }),
       [ResourceType.PROCEDURE]: () => ({
         ...commonFilters(),
         code: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(','),
         source: source,
-        minDate: startDate ?? '',
-        maxDate: endDate ?? '',
+        minDate: (durationRange && durationRange[0]) ?? '',
+        maxDate: (durationRange && durationRange[1]) ?? '',
         uniqueFacet: ['subject']
       }),
       [ResourceType.CLAIM]: () => ({
         ...commonFilters(),
         diagnosis: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(','),
-        minCreated: startDate ?? '',
-        maxCreated: endDate ?? '',
+        minCreated: (durationRange && durationRange[0]) ?? '',
+        maxCreated: (durationRange && durationRange[1]) ?? '',
         uniqueFacet: ['patient']
       })
     }
@@ -559,8 +558,7 @@ const servicesCohorts: IServiceCohorts = {
       !!searchInput ||
       !!ipp ||
       !!nda ||
-      !!startDate ||
-      !!endDate ||
+      !!durationRange ||
       executiveUnits.length > 0 ||
       encounterStatus.length > 0 ||
       (diagnosticTypes && diagnosticTypes.length > 0) ||
@@ -800,12 +798,12 @@ const servicesCohorts: IServiceCohorts = {
       page,
       searchCriterias: {
         orderBy,
-        filters: { ipp, formName, executiveUnits, encounterStatus }
+        filters: { ipp, formName, durationRange, executiveUnits, encounterStatus }
       }
     } = options
 
     const atLeastAFilter = !!ipp || executiveUnits.length > 0 || encounterStatus.length > 0 || formName.length > 0
-
+    console.log("test date", durationRange)
     const [formsList, allFormsList] = await Promise.all([
       fetchForms({
         _list: groupId ? [groupId] : [],
@@ -813,7 +811,9 @@ const servicesCohorts: IServiceCohorts = {
         offset: page ? (page - 1) * 20 : 0,
         order: orderBy.orderBy,
         orderDirection: orderBy.orderDirection,
-        ipp: ipp,
+        ipp,
+        startDate: durationRange?.[0] ?? '',
+        endDate: durationRange?.[1] ?? '',
         signal: signal,
         executiveUnits: executiveUnits.map((unit) => unit.id),
         encounterStatus: encounterStatus.map((status) => status.id),
@@ -831,11 +831,16 @@ const servicesCohorts: IServiceCohorts = {
     ])
 
     const _formsList = getApiResponseResources(formsList) ?? []
-    const filledFormsList = await getResourceInfos(_formsList, false, groupId, signal)
-
+    const filledFormsList = (await getResourceInfos(
+      _formsList,
+      false,
+      groupId,
+      signal
+    )) as CohortQuestionnaireResponse[]
+    const questionnaires = await services.patients.fetchQuestionnaires()
+    const listWithFormTypes = filledFormsList.map((elem) => ({ ...elem, formName: getFormName(elem, questionnaires) }))
     const totalForms = formsList?.data?.resourceType === 'Bundle' ? formsList.data.total : 0
     const totalAllForms = allFormsList?.data?.resourceType === 'Bundle' ? allFormsList?.data?.total : totalForms
-
     const totalPatientForms =
       formsList?.data?.resourceType === 'Bundle'
         ? (getExtension(formsList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
@@ -850,7 +855,7 @@ const servicesCohorts: IServiceCohorts = {
       totalAllResults: totalAllForms ?? 0,
       totalPatients: totalPatientForms ?? 0,
       totalAllPatients: totalAllPatientsForms ?? 0,
-      list: filledFormsList as CohortQuestionnaireResponse[]
+      list: listWithFormTypes
     }
   },
 
@@ -957,7 +962,7 @@ const servicesCohorts: IServiceCohorts = {
         searchBy: searchBy,
         _sort: orderBy.orderBy,
         sortDirection: orderBy.orderDirection,
-        docStatuses: docStatuses,
+        docStatuses: docStatuses.map((obj) => obj.id),
         _elements: searchInput ? [] : undefined,
         _list: groupId ? [groupId] : [],
         _text: searchInput,
@@ -1092,6 +1097,36 @@ const servicesCohorts: IServiceCohorts = {
         ]
       }
     }
+  },
+
+  getExplorationFetcher: (resourceType: ResourceType) => {
+    switch (resourceType) {
+      case ResourceType.PATIENT:
+        return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
+          servicesCohorts.fetchPatientList({ searchCriterias, page }, deidentified, groupId)
+      case ResourceType.QUESTIONNAIRE_RESPONSE:
+        return ({ searchCriterias, page, groupId }) =>
+          servicesCohorts.fetchFormsList({ searchCriterias, page }, groupId)
+      case ResourceType.CONDITION:
+      case ResourceType.CLAIM:
+      case ResourceType.PROCEDURE:
+        return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
+          servicesCohorts.fetchPMSIList({ selectedTab: resourceType, searchCriterias, page, deidentified }, groupId)
+      case ResourceType.DOCUMENTS:
+        return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
+          servicesCohorts.fetchDocuments({ searchCriterias, page, deidentified }, groupId)
+      case ResourceType.MEDICATION_ADMINISTRATION:
+      case ResourceType.MEDICATION_REQUEST:
+        return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
+          servicesCohorts.fetchMedicationList({ selectedTab: resourceType, searchCriterias, page, deidentified }, groupId)
+      case ResourceType.IMAGING:
+        return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
+          servicesCohorts.fetchImagingList({ searchCriterias, page, deidentified }, groupId)
+      case ResourceType.OBSERVATION:
+        return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
+          servicesCohorts.fetchBiologyList({searchCriterias, page, deidentified }, groupId)
+    }
+    return () => {}
   },
 
   fetchDocumentContent: async (compositionId) => {
