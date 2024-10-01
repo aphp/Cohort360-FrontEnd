@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom'
-import { Grid, Tabs, Tab } from '@mui/material'
+import { Grid, Tabs as TabsMui, Tab } from '@mui/material'
 
 import CohortPreview from 'components/Dashboard/Preview/Preview'
 import PatientList from 'components/Dashboard/PatientList'
@@ -23,8 +23,20 @@ import MedicationList from 'components/Dashboard/MedicationList'
 import BiologyList from 'components/Dashboard/BiologyList'
 import FormsList from 'components/Dashboard/FormsList'
 import { getCleanGroupId } from 'utils/paginationUtils'
+import ExplorationBoard from 'components/ExplorationBoard'
+import { ResourceType } from 'types/requestCriterias'
+import { PmsiTab } from 'types'
+import { PMSILabel } from 'types/patient'
+import Tabs from 'components/ui/Tabs'
+import { getPMSITab } from 'utils/tabsUtils'
 
 type Tabs = { label: string; value: string; to: string; disabled?: boolean } | undefined
+
+export const PMSITabs: PmsiTab[] = [
+  { label: PMSILabel.DIAGNOSTIC, id: ResourceType.CONDITION },
+  { label: PMSILabel.CCAM, id: ResourceType.PROCEDURE },
+  { label: PMSILabel.GHM, id: ResourceType.CLAIM }
+]
 
 const Dashboard: React.FC<{
   context: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'
@@ -136,7 +148,7 @@ const Dashboard: React.FC<{
                 }
               ]
             : []),
-          { label: 'PMSI', value: 'pmsi', to: `/perimeters/pmsi${location.search}` },
+          { label: 'PMSI', value: 'Condition', to: `/perimeters/pmsi${location.search}` },
           {
             label: 'Médicaments',
             value: 'medication',
@@ -185,6 +197,23 @@ const Dashboard: React.FC<{
     return <CohortNoPatient />
   }
 
+  const getResourceTypeFromTab = (tab: string) => {
+    switch (tab) {
+      case 'Condition':
+        return ResourceType.CONDITION
+      case 'Procedure':
+        return ResourceType.PROCEDURE
+      case 'Claim':
+        return ResourceType.CLAIM
+      case 'patients':
+        return ResourceType.PATIENT
+      case 'imaging':
+        return ResourceType.IMAGING
+      default:
+        return ResourceType.DOCUMENTS
+    }
+  }
+
   return (
     <Grid
       container
@@ -194,40 +223,54 @@ const Dashboard: React.FC<{
         [classes.appBarShift]: open
       })}
     >
-      <TopBar
-        context={context}
-        access={
-          dashboard.deidentifiedBoolean === undefined
-            ? '-'
-            : dashboard.deidentifiedBoolean
-            ? 'Pseudonymisé'
-            : 'Nominatif'
-        }
-        afterEdit={() => forceReload()}
-      />
+      {
+        <TopBar
+          context={context}
+          access={
+            dashboard.deidentifiedBoolean === undefined
+              ? '-'
+              : dashboard.deidentifiedBoolean
+              ? 'Pseudonymisé'
+              : 'Nominatif'
+          }
+          afterEdit={() => forceReload()}
+        />
+      }
 
       <Grid container justifyContent="center" className={classes.tabs}>
-        <Grid container item xs={11}>
-          <Tabs value={selectedTab} onChange={handleChangeTabs} classes={{ indicator: classes.indicator }}>
-            {tabs.map(
-              (tab) =>
-                tab && (
-                  <Tab
-                    disabled={tab.disabled}
-                    classes={{ selected: classes.selected }}
-                    className={classes.tabTitle}
-                    label={tab.label}
-                    value={tab.value}
-                    component={Link}
-                    to={tab.to}
-                    key={tab.value}
-                  />
-                )
-            )}
-          </Tabs>
+        <Grid container item xs={11} minHeight={'96px'}>
+          <Grid item xs={12}>
+            <TabsMui value={selectedTab} onChange={handleChangeTabs} classes={{ indicator: classes.indicator }}>
+              {tabs.map(
+                (tab) =>
+                  tab && (
+                    <Tab
+                      disabled={tab.disabled}
+                      classes={{ selected: classes.selected }}
+                      className={classes.tabTitle}
+                      label={tab.label}
+                      value={tab.value}
+                      component={Link}
+                      to={tab.to}
+                      key={tab.value}
+                    />
+                  )
+              )}
+            </TabsMui>
+          </Grid>
+          {(selectedTab === 'Condition' || selectedTab === 'Claim' || selectedTab === 'Procedure') && (
+            <Tabs
+              values={PMSITabs}
+              active={getPMSITab(selectedTab)}
+              onchange={(value: PmsiTab) => {
+                setSelectedTab(value.id)
+                // setSearchParams({ ...searchParams, tabId: value.id })
+              }}
+            />
+          )}
         </Grid>
       </Grid>
-      <Grid container xs={11} alignItems="center" direction="column">
+      <Grid container xs={12} alignItems="center" direction="column">
         {selectedTab === 'preview' && (
           <CohortPreview
             cohortId={
@@ -245,15 +288,19 @@ const Dashboard: React.FC<{
             loading={dashboard.loading}
           />
         )}
-        {selectedTab === 'patients' && (
-          <PatientList total={dashboard.totalPatients ?? 0} deidentified={dashboard.deidentifiedBoolean} />
+        {(selectedTab === 'patients' ||
+          selectedTab === 'Condition' ||
+          selectedTab === 'Procedure' ||
+          selectedTab === 'Claim' ||
+          selectedTab === 'imaging') && (
+          <ExplorationBoard deidentified={dashboard.deidentifiedBoolean} type={getResourceTypeFromTab(selectedTab)} />
         )}
 
         {selectedTab === 'documents' && <Documents deidentified={dashboard.deidentifiedBoolean ?? false} />}
-        {selectedTab === 'pmsi' && <PMSIList deidentified={dashboard.deidentifiedBoolean ?? false} />}
+        {/*selectedTab === 'pmsi' && <PMSIList deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
         {selectedTab === 'medication' && <MedicationList deidentified={dashboard.deidentifiedBoolean ?? false} />}
         {selectedTab === 'biology' && <BiologyList deidentified={dashboard.deidentifiedBoolean ?? false} />}
-        {selectedTab === 'imaging' && <ImagingList deidentified={dashboard.deidentifiedBoolean ?? false} />}
+        {/*selectedTab === 'imaging' && <ImagingList deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
         {ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean && selectedTab === 'forms' && <FormsList />}
       </Grid>
     </Grid>

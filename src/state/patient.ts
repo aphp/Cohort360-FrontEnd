@@ -526,7 +526,7 @@ const fetchDocuments = createAsyncThunk<
       patientId,
       searchInput,
       selectedDocTypes,
-      docStatuses,
+      docStatuses.map((obj) => obj.id),
       nda,
       onlyPdfAvailable,
       startDate,
