@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ScopeElement } from 'types'
+import { ScopeElement } from 'types/scope'
 import { DocumentAttachmentMethod, LabelObject } from 'types/searchCriterias'
 import {
   convertDurationToString,
