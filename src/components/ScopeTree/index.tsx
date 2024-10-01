@@ -1,91 +1,49 @@
-import React, { useCallback, useEffect } from 'react'
-import { useAppDispatch, useAppSelector } from 'state'
-import { ScopeElement } from 'types'
+import React, { useEffect } from 'react'
+import { LoadingStatus, ScopeElement } from 'types'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import { Grid, Pagination, Paper } from '@mui/material'
-import { useHierarchy } from '../../hooks/hierarchy/useHierarchy'
-import servicesPerimeters from '../../services/aphp/servicePerimeters'
-import SelectedCodes from './SelectedCodes'
-import { useSearchParameters } from 'hooks/useSearchParameters'
+import { Grid, SxProps, Theme } from '@mui/material'
+import SelectedCodes from '../Hierarchy/SelectedCodes'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
+import { Hierarchy, Mode } from 'types/hierarchy'
 import ScopeTreeTable from './ScopeTreeTable'
-import { saveFetchedPerimeters, saveFetchedRights } from 'state/scope'
-import { cleanNodes } from 'utils/hierarchy'
+import { useScopeTree } from 'hooks/scopeTree/useScopeTree'
+import { Pagination } from 'components/ui/Pagination'
+import { LIMIT_PER_PAGE } from 'hooks/search/useSearchParameters'
+import { cleanNode } from 'utils/hierarchy'
 
 type ScopeTreeProps = {
-  baseTree: Hierarchy<ScopeElement, string>[]
-  selectedNodes: Hierarchy<ScopeElement, string>[]
+  baseTree: Hierarchy<ScopeElement>[]
+  selectedNodes: Hierarchy<ScopeElement>[]
   sourceType: SourceType
-  onSelect: (selectedItems: Hierarchy<ScopeElement, string>[]) => void
+  onSelect: (selectedItems: Hierarchy<ScopeElement>[]) => void
+  sx?: SxProps<Theme>
 }
 
-const ScopeTree = ({ baseTree, selectedNodes, sourceType, onSelect }: ScopeTreeProps) => {
-  const practitionerId = useAppSelector((state) => state.me)?.id || ''
-  const codes = useAppSelector((state) =>
-    sourceType === SourceType.ALL ? state.scope.codes.rights : state.scope.codes.perimeters
-  )
-  const dispatch = useAppDispatch()
-  const { options, onChangeSearchInput, onChangePage, onChangeCount, onChangeSearchMode } = useSearchParameters()
-  const fetchChildren = useCallback(
-    async (ids: string) => {
-      const { results } =
-        sourceType === SourceType.ALL
-          ? await servicesPerimeters.getRights({ practitionerId, ids, limit: -1, sourceType })
-          : await servicesPerimeters.getPerimeters({ practitionerId, ids, limit: -1, sourceType })
-      return results
-    },
-    [practitionerId, sourceType]
-  )
-
-  const fetchSearch = useCallback(
-    async (search: string, page: number) => {
-      const { results, count } =
-        sourceType === SourceType.ALL
-          ? await servicesPerimeters.getRights({ practitionerId, search, page, limit: options.limit, sourceType })
-          : await servicesPerimeters.getPerimeters({ practitionerId, search, page, limit: options.limit, sourceType })
-      onChangeCount(count)
-      return results
-    },
-    [practitionerId, sourceType]
-  )
-
-  const handleSaveCodes = useCallback((codes: Hierarchy<ScopeElement, string>[]) => {
-    if (sourceType === SourceType.ALL) dispatch(saveFetchedRights(cleanNodes(codes)))
-    else dispatch(saveFetchedPerimeters(cleanNodes(codes)))
-  }, [])
-
-  const { hierarchy, selectedCodes, loadingStatus, selectAllStatus, search, expand, select, selectAll, deleteCode } =
-    useHierarchy(baseTree, selectedNodes, codes, handleSaveCodes, fetchChildren)
-
-  const handleSearch = (searchValue: string, page: number) => {
-    if (searchValue === '') onChangeCount(baseTree.length)
-    onChangeSearchInput(searchValue)
-    onChangePage(page)
-    onChangeSearchMode(searchValue !== '')
-    search(searchValue, page, fetchSearch)
-  }
+const ScopeTree = ({ baseTree, selectedNodes, sourceType, onSelect, sx }: ScopeTreeProps) => {
+  const {
+    hierarchyData: { hierarchy, loadingStatus, selectAllStatus, selectedCodes },
+    hierarchyActions: { expand, select },
+    parametersData: { searchInput, mode },
+    parametersActions: { onChangePage, onChangeSearchInput }
+  } = useScopeTree(baseTree, selectedNodes, sourceType)
 
   useEffect(() => {
-    onSelect(cleanNodes(selectedCodes))
+    onSelect(selectedCodes.map((e) => cleanNode(e)))
   }, [selectedCodes])
 
   return (
-    <Grid container direction="column" wrap="nowrap" height="100%" overflow="hidden">
-      <Grid container padding={'20px'}>
-        <Grid container sx={{ marginBottom: '15px' }}>
-          <SearchInput
-            value={options.search}
-            placeholder={'Rechercher'}
-            onchange={(newValue) => handleSearch(newValue, 0)}
-          />
-        </Grid>
-        <Grid container>
-          <SelectedCodes values={selectedCodes} onDelete={deleteCode} />
-        </Grid>
+    <Grid
+      container
+      direction="column"
+      wrap="nowrap"
+      height={'calc(100% - 20px)'}
+      overflow="hidden"
+      justifyContent={'space-between'}
+    >
+      <Grid container padding={'24px 20px'}>
+        <SearchInput value={searchInput} placeholder={'Rechercher'} onchange={onChangeSearchInput} />
       </Grid>
-
-      <Grid container direction="column" wrap="wrap" height="100%" overflow="auto">
+      <Grid container direction="column" wrap="wrap" height="100vh" overflow="auto" padding={'0px 20px'}>
         <Grid
           item
           container
@@ -93,33 +51,32 @@ const ScopeTree = ({ baseTree, selectedNodes, sourceType, onSelect }: ScopeTreeP
           justifyContent="space-between"
           wrap="nowrap"
           height="100%"
-          style={{ overflowX: 'auto' }}
+          style={{ overflow: 'hidden' }}
         >
           <ScopeTreeTable
             loading={loadingStatus}
             selectAllStatus={selectAllStatus}
             sourceType={sourceType}
-            searchMode={options.searchMode}
+            mode={mode}
             hierarchy={hierarchy}
             onExpand={expand}
             onSelect={select}
-            onSelectAll={selectAll}
           />
-          {options.totalPages > 1 && (
-            <Grid item alignSelf="bottom">
-              <Paper elevation={5}>
-                <Grid item container justifyContent="center" style={{ padding: '10px 40px' }}>
-                  <Pagination
-                    count={options.totalPages || 1}
-                    color="primary"
-                    onChange={(event, page: number) => handleSearch(options.search, page - 1)}
-                    page={options.page + 1}
-                  />
-                </Grid>
-              </Paper>
-            </Grid>
-          )}
         </Grid>
+      </Grid>
+      <Grid container direction={'column'} style={{ backgroundColor: 'transparent' }}>
+        {loadingStatus.search === LoadingStatus.SUCCESS && hierarchy.count / LIMIT_PER_PAGE > 1 && (
+          <Grid container justifyContent={'center'}>
+            <Pagination
+              count={Math.ceil(hierarchy.count / LIMIT_PER_PAGE)}
+              currentPage={hierarchy.page}
+              onPageChange={onChangePage}
+              color="#0063AF"
+              centered
+            />
+          </Grid>
+        )}
+        <SelectedCodes values={selectedCodes} onDelete={(code) => select(Mode.SELECT, false, [code])} sx={sx} />
       </Grid>
     </Grid>
   )

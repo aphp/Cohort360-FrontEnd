@@ -1,4 +1,5 @@
 import { ObservationDataType, Comparators, CriteriaType } from 'types/requestCriterias'
+import { System } from 'types/scope'
 
 export const defaultObservationCriteria: ObservationDataType = {
   id: 1,
@@ -15,7 +16,6 @@ export const defaultObservationCriteria: ObservationDataType = {
   includeEncounterEndDateNull: false,
   encounterStatus: [],
   code: [],
-  isLeaf: false,
   searchByValue: [null, null],
   valueComparator: Comparators.EQUAL,
   encounterService: []
@@ -35,13 +35,15 @@ export const completeObservationCriteria: ObservationDataType = {
     {
       id: 'I3356',
       label: 'I3356 - Erythrocytes Foetaux /érythrocytes Adultes_sang_cytochimie_hf/10000 Ha',
-      system: 'https://terminology.eds.aphp.fr/aphp-itm-anabio'
+      system: 'https://terminology.eds.aphp.fr/aphp-itm-anabio',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
     }
   ],
-  isLeaf: true,
   searchByValue: [3, null],
   encounterService: [
     {
+      label: 'GH RCP',
       above_levels_ids: '8312002244',
       cohort_id: '6935',
       cohort_size: '23',
@@ -53,7 +55,8 @@ export const completeObservationCriteria: ObservationDataType = {
       source_value: 'H01',
       status: undefined,
       subItems: undefined,
-      type: 'Groupe hospitalier (GH)'
+      type: 'Groupe hospitalier (GH)',
+      system: System.ScopeTree
     }
   ]
 }

@@ -10,10 +10,8 @@ import {
 } from './cohortCreation'
 import { addProject, editProject, deleteProject, fetchProjects } from './project'
 import { addRequest, editRequest, deleteRequest, fetchRequests, moveRequests, deleteRequests } from './request'
-import { expandBiologyElement, fetchBiology, initBiologyHierarchy } from './biology'
 import { addCohort, deleteCohort, editCohort, fetchCohorts } from './cohort'
 import { favoriteExploredCohort, fetchExploredCohort } from './exploredCohort'
-import { expandMedicationElement, fetchMedication, initMedicationHierarchy } from './medication'
 import {
   fetchAllProcedures,
   fetchBiology as fetchBiologyPatient,
@@ -23,7 +21,6 @@ import {
   fetchPatientInfo,
   fetchPmsi
 } from './patient'
-import { expandPmsiElement, fetchClaim, fetchCondition, fetchProcedure, initPmsiHierarchy } from './pmsi'
 import { CanceledError } from 'axios'
 
 export type MessageState = null | {
@@ -97,30 +94,6 @@ const setMessageSlice = createSlice({
       type: 'error',
       content: 'Une erreur est survenue lors de la sauvegarde de la requête'
     }))
-    builder.addCase(initBiologyHierarchy.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération de la hiérarchie de biologie'
-    }))
-    builder.addCase(fetchBiology.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération de la hiérarchie de biologie'
-    }))
-    builder.addCase(expandBiologyElement.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération des enfants dans la hiérarchie de biologie'
-    }))
-    builder.addCase(initMedicationHierarchy.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération de la hiérarchie des médicaments'
-    }))
-    builder.addCase(fetchMedication.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération de la hiérarchie des médicaments'
-    }))
-    builder.addCase(expandMedicationElement.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération des enfants la hiérarchie des médicaments'
-    }))
     builder.addCase(fetchCohorts.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la récupération des cohortes'
@@ -176,26 +149,6 @@ const setMessageSlice = createSlice({
     builder.addCase(fetchBiologyPatient.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la récupération des données de biologie du patient'
-    }))
-    builder.addCase(initPmsiHierarchy.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération de la hiérarchie des PMSI'
-    }))
-    builder.addCase(fetchCondition.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération de la hiérarchie des diagnostics CIM10'
-    }))
-    builder.addCase(fetchClaim.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération de la hiérarchie des GHM'
-    }))
-    builder.addCase(fetchProcedure.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération de la hiérarchie des actes'
-    }))
-    builder.addCase(expandPmsiElement.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération des enfants de la hiérarchie des PMSI'
     }))
     builder.addCase(fetchProjects.rejected, () => ({
       type: 'error',

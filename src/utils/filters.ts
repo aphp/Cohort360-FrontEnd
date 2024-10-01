@@ -17,6 +17,7 @@ import { getDurationRangeLabel } from './age'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
 import { Hierarchy } from 'types/hierarchy'
 import labels from 'labels.json'
+import { getFullLabelFromCode } from './valueSets'
 
 export const getCohortsTypeLabel = (type: CohortsType): string => {
   switch (type) {
@@ -62,8 +63,6 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.DOC_TYPES:
       case FilterKeys.STATUS:
       case FilterKeys.MODALITY:
-      case FilterKeys.LOINC:
-      case FilterKeys.ANABIO:
       case FilterKeys.CODE:
       case FilterKeys.FORM_NAME:
       case FilterKeys.ENCOUNTER_STATUS:
@@ -124,14 +123,14 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return `IPP : ${value}`
   }
   if (key === FilterKeys.CODE) {
-    return `Code : ${(value as LabelObject).label}`
+    return `Code : ${getFullLabelFromCode(value as LabelObject)}`
   }
   if (key === FilterKeys.SOURCE) {
     return `Source : ${value}`
   }
   if (key === FilterKeys.EXECUTIVE_UNITS) {
-    return `Unité exécutrice :  ${(value as Hierarchy<ScopeElement, string>).source_value} - ${
-      (value as Hierarchy<ScopeElement, string>).name
+    return `Unité exécutrice :  ${(value as Hierarchy<ScopeElement>).source_value} - ${
+      (value as Hierarchy<ScopeElement>).name
     }`
   }
   if (key === FilterKeys.DOC_STATUSES) {
@@ -148,12 +147,6 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   }
   if (key === FilterKeys.PRESCRIPTION_TYPES) {
     return `Type de prescription : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
-  }
-  if (key === FilterKeys.ANABIO) {
-    return `Code ANABIO : ${(value as LabelObject).label}`
-  }
-  if (key === FilterKeys.LOINC) {
-    return `Code LOINC : ${(value as LabelObject).label}`
   }
   if (key === FilterKeys.STATUS) {
     return `Statut : ${(value as ValueSet)?.display}`
@@ -194,8 +187,6 @@ export const selectFiltersAsArray = (filters: Filters) => {
         case FilterKeys.EXECUTIVE_UNITS:
         case FilterKeys.STATUS:
         case FilterKeys.MODALITY:
-        case FilterKeys.LOINC:
-        case FilterKeys.ANABIO:
         case FilterKeys.CODE:
         case FilterKeys.FORM_NAME:
         case FilterKeys.ENCOUNTER_STATUS:
