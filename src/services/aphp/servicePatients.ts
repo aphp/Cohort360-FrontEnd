@@ -901,37 +901,29 @@ export const postFiltersService = async (
 ) => {
   const criteriasString = mapSearchCriteriasToRequestParams(criterias, fhir_resource, deidentified)
   const response = await postFilters(fhir_resource, name, criteriasString)
-
+  if (response.status < 200 || response.status >= 300) throw new Error()
   return response.data
 }
 
 export const getFiltersService = async (fhir_resource: ResourceType, next?: string | null, limit = 10) => {
   const LIMIT = limit
   const OFFSET = 0
-  try {
-    const response = await getFilters(fhir_resource, LIMIT, OFFSET, next)
-    return response.data
-  } catch {
-    throw "Les filtres sauvegardés n'ont pas pu être récupérés."
-  }
+  const response = await getFilters(fhir_resource, LIMIT, OFFSET, next)
+  if (response.status < 200 || response.status >= 300)
+    throw new Error()
+  return response.data
 }
 
 export const deleteFilterService = async (fhir_resource_uuid: string) => {
-  try {
-    const response = await deleteFilter(fhir_resource_uuid)
-    return response
-  } catch {
-    throw "Le filtre n'a pas pu être supprimé."
-  }
+  const response = await deleteFilter(fhir_resource_uuid)
+  if (response.status < 200 || response.status >= 300) throw new Error()
+  return response
 }
 
 export const deleteFiltersService = async (fhir_resource_uuids: string[]) => {
-  try {
-    const response = await deleteFilters(fhir_resource_uuids)
-    return response
-  } catch {
-    throw "Les filtres n'ont pas pu être supprimés."
-  }
+  const response = await deleteFilters(fhir_resource_uuids)
+  if (response.status < 200 || response.status >= 300) throw new Error()
+  return response
 }
 
 export const patchFiltersService = async (
@@ -943,6 +935,6 @@ export const patchFiltersService = async (
 ) => {
   const criteriasString = mapSearchCriteriasToRequestParams(criterias, fhir_resource, deidentified)
   const response = await patchFilters(fhir_resource, uuid, name, criteriasString)
-
+  if (response.status < 200 || response.status >= 300) throw new Error()
   return response
 }

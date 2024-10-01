@@ -100,6 +100,10 @@ const mapGenericFromRequestParams = async (parameters: URLSearchParams, type: Re
   const dates = parameters.getAll(getGenericKeyFromResourceType(type, 'DATE'))
   const startDate = dates.find((e) => e.includes('ge'))?.split('ge')?.[1] ?? null
   const endDate = dates.find((e) => e.includes('le'))?.split('le')?.[1] ?? null
+  const durationRange: DurationRangeType = [
+    dates.find((e) => e.includes('ge'))?.split('ge')?.[1] ?? null,
+    dates.find((e) => e.includes('le'))?.split('le')?.[1] ?? null
+  ]
   const executiveUnitsParams = parameters.get(getGenericKeyFromResourceType(type, 'EXECUTIVE_UNITS'))
   let executiveUnits: Hierarchy<ScopeElement>[] = []
   if (executiveUnitsParams) {
@@ -119,7 +123,7 @@ const mapGenericFromRequestParams = async (parameters: URLSearchParams, type: Re
       }
     })
   }
-  return { nda, startDate, endDate, executiveUnits, encounterStatus }
+  return { nda, startDate, endDate, durationRange, executiveUnits, encounterStatus }
 }
 
 const mapPatientFromRequestParams = (parameters: URLSearchParams) => {
@@ -144,7 +148,7 @@ const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
   const docTypesParams = parameters.get(DocumentsParamsKeys.DOC_TYPES)
   const docStatusesParams = parameters.get(DocumentsParamsKeys.DOC_STATUSES)
   let docTypes: SimpleCodeType[] = []
-  let docStatuses: string[] = []
+  let docStatuses: LabelObject[] = []
   if (docTypesParams) {
     docTypes = decodeURIComponent(docTypesParams)
       ?.split(',')
@@ -158,14 +162,17 @@ const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
   if (docStatusesParams) {
     docStatuses = decodeURIComponent(docStatusesParams)
       ?.split(',')
-      ?.map((e) => mapDocumentStatusesFromRequestParam(e.split('|')?.[1]))
+      ?.map((e) => ({
+        id: mapDocumentStatusesFromRequestParam(e.split('|')?.[1]),
+        label: mapDocumentStatusesFromRequestParam(e.split('|')?.[1])
+      }))
   }
   const onlyPdfAvailable = true
-  const { nda, startDate, endDate, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
+  const { nda, durationRange, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
     parameters,
     ResourceType.DOCUMENTS
   )
-  return { docStatuses, docTypes, ipp, onlyPdfAvailable, nda, startDate, endDate, executiveUnits, encounterStatus }
+  return { docStatuses, docTypes, ipp, onlyPdfAvailable, nda, durationRange, executiveUnits, encounterStatus }
 }
 
 const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
@@ -179,31 +186,43 @@ const mapConditionFromRequestParams = async (parameters: URLSearchParams) => {
       return { id: toParse, label: (allDiagnosticTypes.results || []).find((diag) => diag.id === toParse)?.label ?? '' }
     })
   }
-  const source = parameters.get(ConditionParamsKeys.SOURCE) ?? ''
-  const { nda, startDate, endDate, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
+  const source =
+    parameters
+      .get(ProcedureParamsKeys.SOURCE)
+      ?.split(',')
+      .filter((elem) => elem) ?? []
+  const ipp = decodeURIComponent(parameters.get(ConditionParamsKeys.IPP) ?? '')
+  const { nda, durationRange, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
     parameters,
     ResourceType.CONDITION
   )
-  return { code, source, diagnosticTypes, nda, startDate, endDate, executiveUnits, encounterStatus }
+  return { code, source, ipp, durationRange, diagnosticTypes, nda, executiveUnits, encounterStatus }
 }
 
 const mapProcedureFromRequestParams = async (parameters: URLSearchParams) => {
   const code = await getValueSetCodes(parameters, ProcedureParamsKeys.CODE)
-  const source = parameters.get(ProcedureParamsKeys.SOURCE) ?? ''
-  const { nda, startDate, endDate, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
+  const source =
+    parameters
+      .get(ProcedureParamsKeys.SOURCE)
+      ?.split(',')
+      .filter((elem) => elem) ?? []
+  const ipp = decodeURIComponent(parameters.get(ConditionParamsKeys.IPP) ?? '')
+  const { nda, durationRange, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
     parameters,
     ResourceType.PROCEDURE
   )
-  return { code, source, nda, startDate, endDate, executiveUnits, encounterStatus }
+  return { code, source, nda, ipp, durationRange, executiveUnits, encounterStatus }
 }
 
 const mapClaimFromRequestParams = async (parameters: URLSearchParams) => {
   const code = await getValueSetCodes(parameters, ClaimParamsKeys.CODE)
-  const { nda, startDate, endDate, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
+  const ipp = decodeURIComponent(parameters.get(ConditionParamsKeys.IPP) ?? '')
+
+  const { nda, durationRange, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
     parameters,
     ResourceType.CLAIM
   )
-  return { code, nda, startDate, endDate, executiveUnits, encounterStatus }
+  return { code, nda, ipp, durationRange, executiveUnits, encounterStatus }
 }
 
 const mapPrescriptionFromRequestParams = async (parameters: URLSearchParams) => {
@@ -305,19 +324,23 @@ export const mapRequestParamsToSearchCriteria = async (
   const filters = await mapFiltersFromRequestParams(parameters, type)
   const orderBy = getDefaultOrderBy(type)
   return {
+    orderBy,
     searchBy,
     searchInput,
-    orderBy: orderBy,
     filters
   }
 }
 
 const mapGenericToRequestParams = (filters: GenericFilter, type: ResourceType) => {
-  const { nda, startDate, endDate, executiveUnits, encounterStatus } = filters
+  const { nda, startDate, endDate, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (nda) requestParams.push(`${getGenericKeyFromResourceType(type, 'NDA')}=${encodeURIComponent(nda)}`)
   if (startDate) requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=ge${startDate}`)
   if (endDate) requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=le${endDate}`)
+  if (durationRange && durationRange[0])
+    requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=ge${durationRange[0]}`)
+  if (durationRange && durationRange[1])
+    requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=le${durationRange[1]}`)
   if (executiveUnits && executiveUnits.length > 0)
     requestParams.push(
       `${getGenericKeyFromResourceType(type, 'EXECUTIVE_UNITS')}=${executiveUnits.map((unit) => unit.id)}`
@@ -349,14 +372,14 @@ const mapPatientToRequestParams = (filters: PatientsFilters, deidentified: boole
 }
 
 const mapDocumentsToRequestParams = (filters: DocumentsFilters) => {
-  const { ipp, docStatuses, docTypes, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
+  const { ipp, docStatuses, docTypes, nda, durationRange, executiveUnits, encounterStatus } = filters
   const docStatusCodeSystem = getConfig().core.codeSystems.docStatus
   const requestParams: string[] = []
   if (ipp) requestParams.push(`${DocumentsParamsKeys.IPP}=${encodeURIComponent(ipp)}`)
   if (docStatuses && docStatuses.length > 0) {
     requestParams.push(
       `${DocumentsParamsKeys.DOC_STATUSES}=${encodeURIComponent(
-        docStatuses.map((status) => `${docStatusCodeSystem}|${mapDocumentStatusesToRequestParam(status)}`).toString()
+        docStatuses.map((status) => `${docStatusCodeSystem}|${mapDocumentStatusesToRequestParam(status.id)}`).toString()
       )}`
     )
   }
@@ -365,13 +388,13 @@ const mapDocumentsToRequestParams = (filters: DocumentsFilters) => {
       `${DocumentsParamsKeys.DOC_TYPES}=${encodeURIComponent(docTypes.map((codeType) => codeType.code).toString())}`
     )
   requestParams.push(
-    ...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits, encounterStatus }, ResourceType.DOCUMENTS)
+    ...mapGenericToRequestParams({ nda, durationRange, executiveUnits, encounterStatus }, ResourceType.DOCUMENTS)
   )
   return requestParams
 }
 
 const mapConditionToRequestParams = (filters: PMSIFilters) => {
-  const { diagnosticTypes, code, source, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
+  const { diagnosticTypes, code, source, nda, ipp, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (diagnosticTypes && diagnosticTypes.length > 0) {
     const diagnosticTypesUrl = `${getConfig().features.condition.valueSets.conditionStatus.url}|`
@@ -382,42 +405,45 @@ const mapConditionToRequestParams = (filters: PMSIFilters) => {
     requestParams.push(
       `${ConditionParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${e.system}|${e.id}`).join(','))}`
     )
-  if (source) requestParams.push(`${ProcedureParamsKeys.SOURCE}=${source}`)
+  if (source?.length) requestParams.push(`${ProcedureParamsKeys.SOURCE}=${source}`)
+  if (ipp) requestParams.push(`${ProcedureParamsKeys.IPP}=${ipp}`)
   requestParams.push(
-    ...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits, encounterStatus }, ResourceType.CONDITION)
+    ...mapGenericToRequestParams({ nda, durationRange, executiveUnits, encounterStatus }, ResourceType.CONDITION)
   )
   return requestParams
 }
 
 const mapClaimToRequestParams = (filters: PMSIFilters) => {
-  const { code, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
+  const { code, nda, ipp, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (code.length)
     requestParams.push(
       `${ClaimParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${e.system}|${e.id}`).join(','))}`
     )
+  if (ipp) requestParams.push(`${ProcedureParamsKeys.IPP}=${ipp}`)
   requestParams.push(
-    ...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits, encounterStatus }, ResourceType.CLAIM)
+    ...mapGenericToRequestParams({ nda, durationRange, executiveUnits, encounterStatus }, ResourceType.CLAIM)
   )
   return requestParams
 }
 
 const mapProcedureToRequestParams = (filters: PMSIFilters) => {
-  const { source, code, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
+  const { source, code, nda, ipp, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (code.length)
     requestParams.push(
       `${ProcedureParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${e.system}|${e.id}`).join(','))}`
     )
-  if (source) requestParams.push(`${ProcedureParamsKeys.SOURCE}=${source}`)
+  if (source?.length) requestParams.push(`${ProcedureParamsKeys.SOURCE}=${source}`)
+  if (ipp) requestParams.push(`${ProcedureParamsKeys.IPP}=${ipp}`)
   requestParams.push(
-    ...mapGenericToRequestParams({ nda, startDate, endDate, executiveUnits, encounterStatus }, ResourceType.PROCEDURE)
+    ...mapGenericToRequestParams({ nda, durationRange, executiveUnits, encounterStatus }, ResourceType.PROCEDURE)
   )
   return requestParams
 }
 
 const mapPrescriptionToRequestParams = (filters: MedicationFilters) => {
-  const { code, prescriptionTypes, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
+  const { code, prescriptionTypes, ipp, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (prescriptionTypes && prescriptionTypes.length > 0) {
     const prescriptionTypesUrl = `${getConfig().features.medication.valueSets.medicationPrescriptionTypes.url}|`
@@ -603,7 +629,7 @@ const mapSearchByAndSearchInputFromRequestParams = (parameters: URLSearchParams)
     SearchByTypes.IDENTIFIER,
     SearchByTypes.DESCRIPTION
   ]
-  const [searchBy, searchInput] = (keysToCheck
+  let [searchBy, searchInput]: [SearchByTypes | undefined, string] = (keysToCheck
     .map((key) => [key, parameters.getAll(key).join(' ')])
     .find(([, values]) => values) as [SearchByTypes, string]) ?? [SearchByTypes.TEXT, '']
   return [searchBy, searchInput]

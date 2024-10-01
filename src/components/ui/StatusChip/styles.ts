@@ -1,13 +1,13 @@
 import { Chip, styled } from '@mui/material'
-import { ChipStyles } from '.'
+import { Status } from '.'
 
 type CustomProps = {
-  status?: ChipStyles
+  status?: Status
 }
 
-export const ChipWrapper = styled(Chip)<CustomProps>(({ status = ChipStyles.VALID }) => ({
+export const ChipWrapper = styled(Chip)<CustomProps>(({ status = Status.VALID }) => ({
   fontSize: 11,
-  backgroundColor: status === ChipStyles.VALID ? '#5BC5F2' : '#D0D7D8',
+  backgroundColor: status === Status.VALID ? '#5BC5F2' : '#D0D7D8',
   color: '#FFF',
   fontWeight: 'bold',
   width: 95,
