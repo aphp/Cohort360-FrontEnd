@@ -3,6 +3,7 @@ import React from 'react'
 import { Grid, CssBaseline } from '@mui/material'
 
 import HeaderPage from 'components/ui/HeaderPage'
+import Tables from 'components/Tables'
 
 import { useAppSelector } from 'state'
 
@@ -24,6 +25,7 @@ const Export: React.FC = () => {
         <CssBaseline />
         <Grid container item xs={11}>
           <HeaderPage id="export-page-title" title="Mes exports" />
+          <Tables />
         </Grid>
       </Grid>
     </Grid>
