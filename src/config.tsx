@@ -103,7 +103,7 @@ type AppConfig = {
         locationCount?: string
       }
     }
-    feasabilityReport: {
+    feasibilityReport: {
       enabled: boolean
     }
     contact: {
@@ -280,7 +280,7 @@ let config: AppConfig = {
         locationCount: 'https://terminology.eds.aphp.fr/fhir/profile/location/extension/count'
       }
     },
-    feasabilityReport: {
+    feasibilityReport: {
       enabled: false
     },
     contact: {
