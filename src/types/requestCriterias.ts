@@ -155,7 +155,6 @@ export enum CriteriaDataKey {
   BIOLOGY_DATA = 'biologyData',
   MODALITIES = 'modalities',
   DOC_TYPES = 'docTypes',
-  STATUS_DIAGNOSTIC = 'statusDiagnostic',
   PREGNANCY_MODE = 'pregnancyMode',
   MATERNAL_RISKS = 'maternalRisks',
   RISKS_RELATED_TO_OBSTETRIC_HISTORY = 'risksRelatedToObstetricHistory',

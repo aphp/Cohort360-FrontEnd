@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 
-import { CircularProgress, Grid, Tooltip } from '@mui/material'
+import { CircularProgress, Grid, Tooltip, Typography } from '@mui/material'
 
 import DataTablePatient from 'components/DataTable/DataTablePatient'
 
@@ -46,10 +46,10 @@ import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter'
 import TextInput from 'components/Filters/TextInput'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { ResourceType } from 'types/requestCriterias'
-import List from 'components/ui/List'
 import { useAppDispatch, useAppSelector } from 'state'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import List from 'components/ui/List'
 
 type PatientListProps = {
   total: number
@@ -68,10 +68,10 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const {
+    allSavedFiltersAsListItems,
     allSavedFilters,
     savedFiltersErrors,
     selectedSavedFilter,
-    allSavedFiltersAsListItems,
     methods: {
       getSavedFilters,
       postSavedFilter,

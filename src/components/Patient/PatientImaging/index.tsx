@@ -1,92 +1,80 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { CanceledError } from 'axios'
+import { useAppDispatch, useAppSelector } from 'state'
+import { fetchImaging } from 'state/patient'
+import useSearchCriterias, { initImagingCriterias } from 'reducers/searchCriteriasReducer'
 
-import Grid from '@mui/material/Grid'
-
+import { CircularProgress, Grid, Tooltip } from '@mui/material'
 import FilterList from 'assets/icones/filter.svg?react'
 
-import DataTableMedication from 'components/DataTable/DataTableMedication'
-
-import { LoadingStatus, MedicationTab, TabType } from 'types'
-
-import { useAppSelector, useAppDispatch } from 'state'
-import { fetchMedication } from 'state/patient'
-
-import useStyles from './styles'
-import { cancelPendingRequest } from 'utils/abortController'
-import { CanceledError } from 'axios'
-import { CircularProgress, Tooltip, useMediaQuery, useTheme } from '@mui/material'
-import DisplayDigits from 'components/ui/Display/DisplayDigits'
-import SearchInput from 'components/ui/Searchbar/SearchInput'
-import Tabs from 'components/ui/Tabs'
-import { Direction, FilterKeys, MedicationFilters, Order } from 'types/searchCriterias'
 import Button from 'components/ui/Button'
-import Modal from 'components/ui/Modal'
-import { selectFiltersAsArray } from 'utils/filters'
-import useSearchCriterias, { initMedSearchCriterias } from 'reducers/searchCriteriasReducer'
-import Chip from 'components/ui/Chip'
-import AdministrationTypesFilter from 'components/Filters/AdministrationTypesFilter'
+import Chip from 'components/ui/Chip/'
+import DataTableImaging from 'components/DataTable/DataTableImaging'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
+import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
+import Modal from 'components/ui/Modal'
+import ModalityFilter from 'components/Filters/ModalityFilter/ModalityFilter'
 import NdaFilter from 'components/Filters/NdaFilter'
-import PrescriptionTypesFilter from 'components/Filters/PrescriptionTypesFilter'
-import { Save, SavedSearch } from '@mui/icons-material'
-import { MedicationLabel, ResourceType } from 'types/requestCriterias'
+import SearchInput from 'components/ui/Searchbar/SearchInput'
+
+import { cancelPendingRequest } from 'utils/abortController'
+import { selectFiltersAsArray } from 'utils/filters'
+import { LoadingStatus } from 'types'
+import { PatientTypes } from 'types/patient'
+import { AlertWrapper } from 'components/ui/Alert'
+import { Direction, FilterKeys, ImagingFilters, Order } from 'types/searchCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
-import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
+import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
-import { mapToAttribute, mapToLabel } from 'mappers/pmsi'
-import services from 'services/aphp'
+import { BlockWrapper } from 'components/ui/Layout'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
+import { AppConfig, getConfig } from 'config'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { FhirItem } from 'types/hierarchy'
+import { getCodeList } from 'services/aphp/serviceValueSets'
 
-type PatientMedicationProps = {
-  groupId?: string
-}
-
-type MedicationSearchResults = {
-  deidentified: boolean
-  list: MedicationRequest[] | MedicationAdministration[]
-  nb: number
-  total: number
-  label: string
-}
-
-export const medicationTabs: MedicationTab[] = [
-  { id: ResourceType.MEDICATION_REQUEST, label: MedicationLabel.PRESCRIPTION },
-  { id: ResourceType.MEDICATION_ADMINISTRATION, label: MedicationLabel.ADMINISTRATION }
-]
-
-const PatientMedication = ({ groupId }: PatientMedicationProps) => {
-  const { classes } = useStyles()
+const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
+  const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
-  const theme = useTheme()
-  const isSm = useMediaQuery(theme.breakpoints.down('md'))
+
+  const appConfig = useContext(AppConfig)
+  const patient = useAppSelector((state) => state.patient)
+  const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
-  const [triggerClean, setTriggerClean] = useState<boolean>(false)
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [allModalities, setAllModalities] = useState<FhirItem[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<FhirItem[]>([])
 
-  const dispatch = useAppDispatch()
-  const patient = useAppSelector((state) => state.patient)
+  const searchResults = {
+    deidentified: patient?.deidentified || false,
+    list: patient?.imaging?.list ?? [],
+    nb: patient?.imaging?.count ?? 0,
+    total: patient?.imaging?.total ?? 0,
+    label: 'résultat(s)'
+  }
 
-  const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
-  const [selectedTab, setSelectedTab] = useState<
-    TabType<ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST, MedicationLabel>
-  >({
-    id: ResourceType.MEDICATION_REQUEST,
-    label: MedicationLabel.PRESCRIPTION
-  })
-  const [oldTabs, setOldTabs] = useState<MedicationTab | null>(null)
-
+  const [
+    {
+      orderBy,
+      searchInput,
+      filters,
+      filters: { nda, startDate, endDate, executiveUnits, modality, encounterStatus }
+    },
+    { changeOrderBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
+  ] = useSearchCriterias(initImagingCriterias)
+  const filtersAsArray = useMemo(() => {
+    return selectFiltersAsArray({ nda, startDate, endDate, executiveUnits, modality, encounterStatus })
+  }, [nda, startDate, endDate, executiveUnits, modality, encounterStatus])
   const {
     allSavedFilters,
     savedFiltersErrors,
@@ -100,64 +88,24 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
       selectFilter,
       resetSavedFilterError
     }
-  } = useSavedFilters<MedicationFilters>(selectedTab.id)
-  const [
-    {
-      orderBy,
-      searchInput,
-      filters,
-      filters: { nda, prescriptionTypes, startDate, endDate, administrationRoutes, executiveUnits, encounterStatus }
-    },
-    { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias, addSearchCriterias }
-  ] = useSearchCriterias(initMedSearchCriterias)
-  const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({
-      nda,
-      prescriptionTypes,
-      administrationRoutes,
-      startDate,
-      endDate,
-      executiveUnits,
-      encounterStatus
-    })
-  }, [nda, prescriptionTypes, administrationRoutes, startDate, endDate, executiveUnits, encounterStatus])
-
-  const [allAdministrationRoutes, setAllAdministrationRoutes] = useState<Hierarchy<any, any>[]>([])
-  const [allPrescriptionTypes, setAllPrescriptionTypes] = useState<Hierarchy<any, any>[]>([])
-  const [searchResults, setSearchResults] = useState<MedicationSearchResults>({
-    deidentified: false,
-    list: [],
-    nb: 0,
-    total: 0,
-    label: mapToLabel(ResourceType.MEDICATION_REQUEST)
-  })
+  } = useSavedFilters<ImagingFilters>(ResourceType.IMAGING)
 
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
   const isFirstRender = useRef(true)
 
-  const _fetchMedication = async () => {
+  const _fetchImaging = async () => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
       const response = await dispatch(
-        fetchMedication({
+        fetchImaging({
           options: {
-            selectedTab: selectedTab.id,
-            oldTab: oldTabs ? oldTabs.id : null,
             page,
             searchCriterias: {
               orderBy,
               searchInput,
-              filters: {
-                nda,
-                administrationRoutes,
-                prescriptionTypes,
-                startDate,
-                endDate,
-                executiveUnits,
-                encounterStatus
-              }
+              filters: { nda, startDate, endDate, executiveUnits, modality, encounterStatus }
             }
           },
           groupId,
@@ -182,40 +130,27 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
 
   useEffect(() => {
     const fetch = async () => {
-      const [administrations, prescriptions, encounterStatus] = await Promise.all([
-        services.cohortCreation.fetchAdministrations(),
-        services.cohortCreation.fetchPrescriptionTypes(),
-        services.cohortCreation.fetchEncounterStatus()
+      const [modalities, encounterStatus] = await Promise.all([
+        getCodeList(getConfig().features.imaging.valueSets.imagingModalities.url, true),
+        getCodeList(getConfig().core.valueSets.encounterStatus.url)
       ])
-      setAllAdministrationRoutes(administrations)
-      setAllPrescriptionTypes(prescriptions)
-      setEncounterStatusList(encounterStatus)
+
+      setAllModalities(modalities.results)
+      setEncounterStatusList(encounterStatus.results)
     }
     fetch()
-    setOldTabs(selectedTab)
   }, [])
 
   useEffect(() => {
-    if (!isFirstRender.current) {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+    } else {
       setLoadingStatus(LoadingStatus.IDDLE)
       setPage(1)
-      setOldTabs(selectedTab)
     }
-  }, [
-    searchInput,
-    nda,
-    startDate,
-    endDate,
-    prescriptionTypes,
-    administrationRoutes,
-    orderBy,
-    executiveUnits,
-    encounterStatus
-  ])
+  }, [nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality, encounterStatus])
 
   useEffect(() => {
-    setOldTabs(selectedTab)
-
     const updatedSearchParams = new URLSearchParams(searchParams)
     updatedSearchParams.set('page', page.toString())
     setSearchParams(updatedSearchParams)
@@ -226,36 +161,22 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   useEffect(() => {
     if (loadingStatus === LoadingStatus.IDDLE) {
       controllerRef.current = cancelPendingRequest(controllerRef.current)
-      _fetchMedication()
+      _fetchImaging()
     }
-    setOldTabs(selectedTab)
   }, [loadingStatus])
 
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false
-    } else {
-      setLoadingStatus(LoadingStatus.IDDLE)
-      setPage(1)
-    }
-    removeSearchCriterias()
-    setTriggerClean(!triggerClean)
-  }, [selectedTab])
-
-  useEffect(() => {
-    const medicationIndex = mapToAttribute(selectedTab.id)
-    setSearchResults({
-      deidentified: patient?.deidentified || false,
-      list: patient?.medication?.[medicationIndex]?.list || [],
-      nb: patient?.medication?.[medicationIndex]?.count ?? 0,
-      total: patient?.medication?.[medicationIndex]?.total ?? 0,
-      label: mapToLabel(selectedTab.id)
-    })
-  }, [patient, selectedTab.id])
-
   return (
-    <Grid container className={classes.documentTable} gap="20px">
-      <Grid container justifyContent="flex-end">
+    <Grid container justifyContent="flex-end" gap="20px">
+      <BlockWrapper item xs={12}>
+        <AlertWrapper severity="warning">
+          Seuls les examens présents dans le PACS Philips et rattachés à un Dossier Administratif (NDA) sont
+          actuellement disponibles. Le flux alimentant les métadonnées associées aux séries et aux examens est suspendu
+          depuis le 01/02/2023 suite à la migration du PACS AP-HP. Aucun examen produit après cette date n'est
+          disponible via Cohort360. Pour tout besoin d'examen post 01/02/2023, merci de contacter le support Cohort360 :{' '}
+          {appConfig.system.mailSupport}.
+        </AlertWrapper>
+      </BlockWrapper>
+      <Grid container justifyContent="flex-end" gap="10px">
         <Grid container item xs={12} md={10} lg={7} xl={5} justifyContent="flex-end" spacing={1}>
           {(filtersAsArray.length > 0 || searchInput) && (
             <Grid container item xs={12} md={5}>
@@ -291,26 +212,15 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
         </Grid>
       </Grid>
 
-      <Grid container item xs={12} style={isSm ? { flexWrap: 'wrap-reverse' } : {}}>
-        <Grid item xs={12} md={4}>
-          <Tabs
-            values={medicationTabs}
-            active={selectedTab}
-            onchange={(
-              value: TabType<ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST, MedicationLabel>
-            ) => {
-              setOldTabs(selectedTab)
-              setSelectedTab(value)
-            }}
-          />
-        </Grid>
-        <Grid container justifyContent="center" item xs={12} md={4}>
+      <Grid container alignItems="center" item xs={12}>
+        <Grid container item xs={12} lg={5}>
           {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && <CircularProgress />}
           {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
-            <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label} />
+            <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label as string} />
           )}
         </Grid>
-        <Grid container item xs={12} md={4} justifyContent="flex-end">
+
+        <Grid container item xs={12} lg={7} justifyContent="flex-end">
           <SearchInput
             value={searchInput}
             placeholder={'Rechercher'}
@@ -318,7 +228,6 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
           />
         </Grid>
       </Grid>
-
       {filtersAsArray.length > 0 && (
         <Grid item xs={12}>
           {filtersAsArray.map((filter, index) => (
@@ -326,17 +235,17 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
           ))}
         </Grid>
       )}
+
       <Grid item xs={12}>
-        <DataTableMedication
+        <DataTableImaging
           loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
-          selectedTab={selectedTab.id}
-          medicationsList={searchResults.list}
           deidentified={searchResults.deidentified}
+          imagingList={searchResults.list}
           orderBy={orderBy}
           setOrderBy={(orderBy) => changeOrderBy(orderBy)}
           page={page}
-          setPage={(newPage) => setPage(newPage)}
-          total={searchResults.nb}
+          setPage={setPage}
+          total={searchResults.total}
         />
       </Grid>
 
@@ -346,26 +255,12 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
         color="secondary"
         onClose={() => setToggleFilterByModal(false)}
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
-        onClean={triggerClean}
       >
         {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-        {selectedTab.id === ResourceType.MEDICATION_REQUEST && prescriptionTypes && (
-          <PrescriptionTypesFilter
-            value={prescriptionTypes}
-            name={FilterKeys.PRESCRIPTION_TYPES}
-            allPrescriptionTypes={allPrescriptionTypes}
-          />
-        )}
-        {selectedTab.id === ResourceType.MEDICATION_ADMINISTRATION && administrationRoutes && (
-          <AdministrationTypesFilter
-            value={administrationRoutes}
-            name={FilterKeys.ADMINISTRATION_ROUTES}
-            allAdministrationTypes={allAdministrationRoutes}
-          />
-        )}
+        <ModalityFilter value={modality} name={FilterKeys.MODALITY} modalitiesList={allModalities} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
-          sourceType={SourceType.MEDICATION}
+          sourceType={SourceType.IMAGING}
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
         />
@@ -408,18 +303,17 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
         >
           <Modal
             title={isReadonlyFilterInfoModal ? 'Informations' : 'Modifier le filtre'}
-            open={toggleFilterInfoModal}
             color="secondary"
+            open={toggleFilterInfoModal}
             readonly={isReadonlyFilterInfoModal}
             onClose={() => setToggleFilterInfoModal(false)}
             onSubmit={({
               filterName,
               searchInput,
+              modality,
               nda,
-              prescriptionTypes,
               startDate,
               endDate,
-              administrationRoutes,
               executiveUnits,
               encounterStatus
             }) => {
@@ -427,16 +321,11 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
                 filterName,
                 {
                   searchInput,
-                  orderBy: { orderBy: Order.PERIOD_START, orderDirection: Direction.DESC },
-                  filters: {
-                    nda,
-                    prescriptionTypes,
-                    startDate,
-                    endDate,
-                    administrationRoutes,
-                    executiveUnits,
-                    encounterStatus
-                  }
+                  orderBy: {
+                    orderBy: Order.STUDY_DATE,
+                    orderDirection: Direction.DESC
+                  },
+                  filters: { modality, nda, startDate, endDate, executiveUnits, encounterStatus }
                 },
                 searchResults.deidentified ?? true
               )
@@ -473,22 +362,12 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
                     value={selectedSavedFilter?.filterParams.filters.nda || ''}
                   />
                 )}
-                {selectedTab.id === ResourceType.MEDICATION_REQUEST && (
-                  <PrescriptionTypesFilter
-                    value={selectedSavedFilter?.filterParams.filters.prescriptionTypes || []}
-                    name={FilterKeys.PRESCRIPTION_TYPES}
-                    allPrescriptionTypes={allPrescriptionTypes}
-                    disabled={isReadonlyFilterInfoModal}
-                  />
-                )}
-                {selectedTab.id === ResourceType.MEDICATION_ADMINISTRATION && (
-                  <AdministrationTypesFilter
-                    disabled={isReadonlyFilterInfoModal}
-                    value={selectedSavedFilter?.filterParams.filters.administrationRoutes || []}
-                    name={FilterKeys.ADMINISTRATION_ROUTES}
-                    allAdministrationTypes={allAdministrationRoutes}
-                  />
-                )}
+                <ModalityFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.filters.modality || []}
+                  name={FilterKeys.MODALITY}
+                  modalitiesList={allModalities}
+                />
                 <DatesRangeFilter
                   disabled={isReadonlyFilterInfoModal}
                   values={[
@@ -498,7 +377,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
                   names={[FilterKeys.START_DATE, FilterKeys.END_DATE]}
                 />
                 <ExecutiveUnitsFilter
-                  sourceType={SourceType.MEDICATION}
+                  sourceType={SourceType.IMAGING}
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
@@ -531,4 +410,5 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
     </Grid>
   )
 }
-export default PatientMedication
+
+export default PatientImaging

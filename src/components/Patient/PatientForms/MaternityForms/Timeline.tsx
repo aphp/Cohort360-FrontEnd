@@ -42,7 +42,6 @@ const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses, ma
           </Grid>
         ) : (
           <>
-            {console.log('manelle tu es MON canard')}
             {/* <TimelineArrow /> */}
             <div style={{ flexGrow: 1, marginLeft: '1em' }}>
               {years.reverse().map((year) => (

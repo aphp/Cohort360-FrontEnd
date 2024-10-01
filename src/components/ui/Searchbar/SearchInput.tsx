@@ -17,6 +17,7 @@ type SearchInputProps = {
   displayHelpIcon?: boolean
   error?: SearchInputError | null
   width?: string
+  disabled?: boolean
   onchange: (value: string) => void
 }
 
@@ -27,6 +28,7 @@ const SearchInput = ({
   width = '100%',
   displayHelpIcon = false,
   error = null,
+  disabled = false,
   onchange
 }: SearchInputProps) => {
   const [searchInput, setSearchInput] = useState(value)
@@ -45,6 +47,7 @@ const SearchInput = ({
     <>
       <SearchInputWrapper width={width} error={error?.isError}>
         <InputBase
+          disabled={disabled}
           placeholder={placeholder}
           value={searchInput}
           onChange={(event) => {

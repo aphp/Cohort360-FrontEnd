@@ -3,8 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { ScopeElement } from 'types'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
-import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnit'
-import { Typography } from '@mui/material'
+import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnits'
 
 type ExecutiveUnitsFilterProps = {
   value: Hierarchy<ScopeElement, string>[]
@@ -27,11 +26,6 @@ const ExecutiveUnitsFilter = ({ name, value, sourceType, disabled = false }: Exe
       sourceType={sourceType}
       disabled={disabled}
       onChange={(selectedPopulation) => setPopulation(selectedPopulation)}
-      label={
-        <Typography variant="h3" alignSelf="center">
-          Unité exécutrice :
-        </Typography>
-      }
     />
   )
 }

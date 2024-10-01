@@ -29,9 +29,10 @@ import services from 'services/aphp'
 import useStyles from './styles'
 import { Condition, DocumentReference, Encounter, Period, Procedure } from 'fhir/r4'
 import { FilterKeys, LabelObject } from 'types/searchCriterias'
-import { Hierarchy } from 'types/hierarchy'
 import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
+import { FhirItem, HierarchyElementWithSystem } from 'types/hierarchy'
+import { getCodeList } from 'services/aphp/serviceValueSets'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -166,10 +167,10 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   const [dialogDocuments, setDialogDocuments] = useState<CohortComposition[] | undefined>([])
   const [openFilter, setOpenFilter] = useState(false)
 
-  const [selectedTypes, setSelectedTypes] = useState<Hierarchy<any, any>[]>([])
-  const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>([])
-  const [diagnosticTypesList, setDiagnosticTypesList] = useState<Hierarchy<any, any>[]>([])
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [selectedTypes, setSelectedTypes] = useState<FhirItem[]>([])
+  const [encounterStatus, setEncounterStatus] = useState<FhirItem[]>([])
+  const [diagnosticTypesList, setDiagnosticTypesList] = useState<FhirItem[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<FhirItem[]>([])
 
   const [loading, setLoading] = useState(false)
   const yearComponentSize: { [year: number]: number } = {}
@@ -192,16 +193,16 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   useEffect(() => {
     const _fetch = async () => {
       const [diagnosticTypes, encounterStatus] = await Promise.all([
-        services.cohortCreation.fetchDiagnosticTypes(),
-        services.cohortCreation.fetchEncounterStatus()
+       getCodeList(getConfig().features.condition.valueSets.conditionStatus.url),
+        getCodeList(getConfig().core.valueSets.encounterStatus.url)
       ])
       if (!diagnosticTypes) return
 
-      setEncounterStatusList(encounterStatus)
+      setEncounterStatusList(encounterStatus.results)
       // Find main diagnosis
-      const foundItem = diagnosticTypes.find((diagnosticTypes) => diagnosticTypes.id === 'dp')
+      const foundItem = diagnosticTypes.results.find((diagnosticTypes) => diagnosticTypes.id === 'dp')
       foundItem && setSelectedTypes([foundItem])
-      setDiagnosticTypesList(diagnosticTypes)
+      setDiagnosticTypesList(diagnosticTypes.results)
     }
 
     _fetch()

@@ -23,7 +23,7 @@ import CriteriaLayout from 'components/ui/CriteriaLayout'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
-import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnit'
+import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnits'
 
 enum Error {
   EMPTY_FORM,

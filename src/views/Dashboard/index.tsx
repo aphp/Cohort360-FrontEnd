@@ -3,8 +3,8 @@ import { Link, useParams, useLocation } from 'react-router-dom'
 import { Grid, Tabs, Tab } from '@mui/material'
 
 import CohortPreview from 'components/Dashboard/Preview/Preview'
-import PatientList from 'components/Dashboard/PatientList/PatientList'
-import Documents from 'components/Dashboard/Documents/Documents'
+import PatientList from 'components/Dashboard/PatientList'
+import Documents from 'components/Dashboard/Documents'
 import TopBar from 'components/TopBar/TopBar'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 

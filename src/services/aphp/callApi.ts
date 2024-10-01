@@ -11,8 +11,7 @@ import {
   Cohort,
   DataRights,
   CohortRights,
-  UserAccesses,
-  HierarchyElementWithSystem
+  UserAccesses
 } from 'types'
 
 import { AxiosError, AxiosResponse } from 'axios'
@@ -23,7 +22,6 @@ import {
   Condition,
   DocumentReference,
   Encounter,
-  Extension,
   ImagingStudy,
   Location,
   MedicationAdministration,
@@ -35,13 +33,9 @@ import {
   Patient,
   Procedure,
   Questionnaire,
-  QuestionnaireResponse,
-  ValueSet
+  QuestionnaireResponse
 } from 'fhir/r4'
-import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
-import { idSort, labelSort } from 'utils/alphabeticalSort'
-import { capitalizeFirstLetter } from 'utils/capitalize'
-import { Direction, Order, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
+import { Direction, Order, OrderBy, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
 import {
   AdministrationParamsKeys,
   ClaimParamsKeys,
@@ -56,9 +50,9 @@ import {
   QuestionnaireResponseParamsKeys
 } from '../../mappers/filters'
 import { ResourceType } from 'types/requestCriterias'
-import { Hierarchy } from 'types/hierarchy'
-import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
+import { FhirHierarchy, HierarchyElementWithSystem, HierarchyWithLabel } from 'types/hierarchy'
+import { getHierarchyRoots } from './serviceValueSets'
 
 const paramValuesReducer = (accumulator: string, currentValue: string): string =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -67,7 +61,7 @@ const paramsReducer = (accumulator: string, currentValue: string): string =>
 
 const uniq = (item: string, index: number, array: string[]) => array.indexOf(item) === index && item
 
-const lowToleranceTag = encodeURIComponent('https://terminology.eds.aphp.fr/text-fault-tolerant|LOW')
+export const LOW_TOLERANCE_TAG = encodeURIComponent('https://terminology.eds.aphp.fr/text-fault-tolerant|LOW')
 
 /**
  * Patient Resource
@@ -489,7 +483,7 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `${ProcedureParamsKeys.CODE}=${code}`] // eslint-disable-line
   if (source) options = [...options, `${ProcedureParamsKeys.SOURCE}=${source}`]
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
   if (status) options = [...options, `status=${encodeURIComponent(`${docStatusCodeSystem}|${status}`)}`]
   if (encounterIdentifier) options = [...options, `${ProcedureParamsKeys.NDA}=${encounterIdentifier}`]
   if (patientIdentifier) options = [...options, `${ProcedureParamsKeys.IPP}=${patientIdentifier}`]
@@ -561,7 +555,7 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
   if (diagnosis) options = [...options, `${ClaimParamsKeys.CODE}=${diagnosis}`] // eslint-disable-line
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`] // eslint-disable-line
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`] // eslint-disable-line
   if (encounterIdentifier) options = [...options, `${ClaimParamsKeys.NDA}=${encounterIdentifier}`]
   if (patientIdentifier) options = [...options, `${ClaimParamsKeys.IPP}=${patientIdentifier}`]
   if (minCreated) options = [...options, `${ClaimParamsKeys.DATE}=ge${minCreated}`]
@@ -628,7 +622,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `${ConditionParamsKeys.CODE}=${code}`] // eslint-disable-line
   if (source) options = [...options, `${ConditionParamsKeys.SOURCE}=${source}`]
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`] // eslint-disable-line
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`] // eslint-disable-line
   if (encounterIdentifier) options = [...options, `${ConditionParamsKeys.NDA}=${encounterIdentifier}`] // eslint-disable-line
   if (patientIdentifier) options = [...options, `${ConditionParamsKeys.IPP}=${patientIdentifier}`]
   if (minRecordedDate) options = [...options, `${ConditionParamsKeys.DATE}=ge${minRecordedDate}`] // eslint-disable-line
@@ -707,7 +701,7 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort},id`}`]
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
   if (encounter) options = [...options, `${ObservationParamsKeys.NDA}=${encounter}`]
   if (anabio || loinc)
     options = [
@@ -790,7 +784,7 @@ export const fetchMedicationRequest = async (
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (subject) options = [...options, `subject=${subject}`]
   if (encounter) options = [...options, `${PrescriptionParamsKeys.NDA}=${encounter}`]
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
   if (type && type.length > 0) {
     const routeUrl = `${getConfig().features.medication.valueSets.medicationPrescriptionTypes.url}|`
     const urlString = type.map((id) => routeUrl + id).join(',')
@@ -868,7 +862,7 @@ export const fetchMedicationAdministration = async (
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (subject) options = [...options, `subject=${subject}`]
   if (encounter) options = [...options, `${AdministrationParamsKeys.NDA}=${encounter}`]
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
   if (route && route.length > 0) {
     const routeUrl = `${getConfig().features.medication.valueSets.medicationAdministrations.url}|`
     const urlString = route.map((id) => routeUrl + id).join(',')
@@ -941,7 +935,7 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   if (size !== undefined) options = [...options, `_count=${size}`]
   if (offset) options = [...options, `_offset=${offset}`]
   if (order) options = [...options, `_sort=${_orderDirection}${order}`]
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
+  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
   if (encounter) options = [...options, `${ImagingParamsKeys.NDA}=${encounter}`]
   if (ipp) options = [...options, `patient.identifier=${ipp}`]
   if (minDate) options = [...options, `${ImagingParamsKeys.DATE}=ge${minDate}`]
@@ -1048,133 +1042,19 @@ export const fetchLocation = async (args: fetchLocationProps) => {
   return response
 }
 
-/**
- *
- * Retrieve the codeList from FHIR api either from expanding a code or fetching the roots of the valueSet
- * @param codeSystem
- * @param code
- * @param search
- * @param noStar
- * @param signal
- * @returns
- */
-const getCodeList = async (
-  codeSystem: string,
-  expandCode?: string,
-  search?: string,
-  noStar = true,
-  signal?: AbortSignal
-): Promise<{ code?: string; display?: string; extension?: Extension[]; codeSystem?: string }[] | undefined> => {
-  if (!expandCode) {
-    if (search !== undefined && !search.trim()) {
-      return []
-    }
-    let searchParam = '&only-roots=true'
-    // if search is * then we fetch the roots of the valueSet
-    if (search !== '*' && search !== undefined) {
-      // if noStar is true then we search for the code, else we search for the display
-      searchParam = `&only-roots=false&${
-        noStar ? 'code' : `_tag=text-search-rank&_tag=${lowToleranceTag}&_text`
-      }=${encodeURIComponent(search.trim())}`
-    }
-    // TODO test if it returns all the codes without specifying the count
-    const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}${searchParam}`, {
-      signal: signal
-    })
-    const valueSetBundle = getApiResponseResourcesOrThrow(res)
-    return valueSetBundle.length > 0
-      ? valueSetBundle
-          .map((entry) => {
-            return (
-              entry.compose?.include[0].concept?.map((code) => ({
-                ...code,
-                codeSystem: entry.compose?.include[0].system
-              })) || []
-            ) //eslint-disable-line
-          })
-          .filter((valueSetPerSystem) => !!valueSetPerSystem)
-          .reduce((acc, val) => acc.concat(val), [])
-      : []
-  } else {
-    const json = {
-      resourceType: 'ValueSet',
-      url: codeSystem,
-      compose: {
-        include: [
-          {
-            filter: [
-              {
-                op: 'is-a',
-                value: expandCode
-              }
-            ]
-          }
-        ]
-      }
-    }
-    const res = await apiFhir.post<FHIR_API_Response<ValueSet>>(`/ValueSet/$expand`, JSON.stringify(json))
-    const valueSetExpansion = getApiResponseResourceOrThrow(res).expansion
-    return valueSetExpansion?.contains?.map((code) => ({ ...code, codeSystem: codeSystem }))
-  }
-}
-
 export type FetchValueSetOptions = {
-  valueSetTitle?: string
-  code?: string
-  sortingKey?: 'id' | 'label'
-  search?: string
-  noStar?: boolean
-  joinDisplayWithCode?: boolean
-  filterRoots?: (code: Hierarchy<any, any>) => boolean
-  filterOut?: (code: Hierarchy<any, any>) => boolean
-}
-
-export const fetchValueSet = async (
-  codeSystem: string,
-  options?: FetchValueSetOptions,
-  signal?: AbortSignal
-): Promise<HierarchyElementWithSystem[]> => {
-  const {
-    code,
-    valueSetTitle,
-    sortingKey = 'label',
-    search,
-    noStar,
-    joinDisplayWithCode = true,
-    filterRoots = () => true,
-    filterOut = (value: Hierarchy<any, any>) => value.id === 'APHP generated'
-  } = options || {}
-  const codeList = await getCodeList(codeSystem, code, search, noStar, signal)
-  const sortingFunc = sortingKey === 'id' ? idSort : labelSort
-  const formattedCodeList =
-    codeList
-      ?.map((code) => ({
-        id: code.code || '',
-        label: joinDisplayWithCode
-          ? `${code.code} - ${capitalizeFirstLetter(code.display)}`
-          : capitalizeFirstLetter(code.display),
-        system: code.codeSystem,
-        subItems: [{ id: 'loading', label: 'loading', subItems: [] as Hierarchy<any, any>[] }]
-      }))
-      .filter((code) => !filterOut(code))
-      .sort(sortingFunc) || []
-  if (!code && (search === undefined || search === '*') && valueSetTitle) {
-    return [{ id: '*', label: valueSetTitle, subItems: formattedCodeList.filter((code) => filterRoots(code)) }]
-  } else {
-    return formattedCodeList
-  }
-}
-
-export const fetchSingleCodeHierarchy = async (codeSystem: string, code: string): Promise<string[]> => {
-  const codeList = await getCodeList(codeSystem, undefined, code)
-  if (!codeList || codeList.length === 0) {
-    return []
-  }
-  return (
-    getExtension(codeList[0], getConfig().core.extensions.codeHierarchy)
-      ?.valueCodeableConcept?.coding?.map((c) => c.code || '')
-      .filter((c) => !!c) || []
-  )
+  // the first 3 param are mutually exclusive
+  valueSetTitle?: string // an optional valueset node title for fetching valueset roots
+  codes?: string[] // an optional list of codes to fetch
+  search?: string // an optional search query
+  // other optional params
+  exactSearch?: boolean // legacy param, if set to true, the search param will be considered to be a single code
+  joinDisplayWithCode?: boolean // join the code and display for the label of nodes
+  offset?: number // offset for pagination (only used for searching codes or query search), default = 0
+  count?: number // count for pagination (only used for searching codes or query search), default = 100
+  orderBy?: OrderBy // legacy param, unused for now with the new search endpoint TODO: should be passed someway if needed
+  filterRoots?: (code: HierarchyWithLabel) => boolean // legacy param used to filter in only some roots results (for some broken valuesets)
+  filterOut?: (code: HierarchyWithLabel) => boolean // same usage as filterRoots but to filter out some results (should be merged with prev param ...)
 }
 
 export const fetchAccessExpirations: (

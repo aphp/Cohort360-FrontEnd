@@ -22,7 +22,9 @@ import Timeline from './Timeline'
 import services from 'services/aphp'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
+import { FhirItem, HierarchyElementWithSystem } from 'types/hierarchy'
+import { getCodeList } from 'services/aphp/serviceValueSets'
+import { getConfig } from 'config'
 
 type PatientFormsProps = {
   groupId?: string
@@ -36,7 +38,7 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [maternityFormNamesIds, setMaternityFormNamesIds] = useState<Questionnaire[]>([])
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<FhirItem[]>([])
 
   const [
     {
@@ -85,10 +87,10 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
   const fetch = async () => {
     const [maternityFormNamesIds, encounterStatus] = await Promise.all([
       services.patients.fetchMaternityFormNamesIds(),
-      services.cohortCreation.fetchEncounterStatus()
+      getCodeList(getConfig().core.valueSets.encounterStatus.url)
     ])
     setMaternityFormNamesIds(maternityFormNamesIds)
-    setEncounterStatusList(encounterStatus)
+    setEncounterStatusList(encounterStatus.results)
   }
 
   useEffect(() => {

@@ -47,11 +47,12 @@ import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
 import DocStatusFilter from '../../Filters/DocStatusFilter'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
-import services from 'services/aphp'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { FhirItem } from 'types/hierarchy'
+import { getCodeList } from 'services/aphp/serviceValueSets'
+import { getConfig } from 'config'
 
 const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   const dispatch = useAppDispatch()
@@ -62,7 +63,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<FhirItem[]>([])
   const patient = useAppSelector((state) => state.patient)
   const searchResults = {
     deidentified: patient?.deidentified || false,
@@ -162,8 +163,8 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
 
   useEffect(() => {
     const fetch = async () => {
-      const encounterStatus = await services.cohortCreation.fetchEncounterStatus()
-      setEncounterStatusList(encounterStatus)
+      const encounterStatus = await getCodeList(getConfig().core.valueSets.encounterStatus.url)
+      setEncounterStatusList(encounterStatus.results)
     }
     fetch()
   }, [])

@@ -62,12 +62,14 @@ export const completeClaimCriteria: GhmDataType = {
       full_path: 'APHP-ASSISTANCE PUBLIQUE AP-HP/H01-GH RCP',
       id: '8312016825',
       inferior_levels_ids: '8312016826',
+      label: 'GH RCP',
       name: 'GH RCP',
       parent_id: '8312002244',
       source_value: 'H01',
       status: undefined,
       subItems: undefined,
-      type: 'Groupe hospitalier (GH)'
+      type: 'Groupe hospitalier (GH)',
+      system: 'nan'
     }
   ]
 }

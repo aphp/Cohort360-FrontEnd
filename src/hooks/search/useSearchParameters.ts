@@ -1,23 +1,42 @@
 import { useEffect, useMemo, useState } from 'react'
+import { TabType } from 'types'
+import { Reference } from 'types/searchValueSet'
+
+export const LIMIT_PER_PAGE = 1
+
+export type SearchParameters = {
+  searchInput?: string,
+  searchMode?: boolean,
+  page?: number,
+  limit?: number,
+  count?: number,
+  totalPages?: number,
+  references?: Reference[],
+  tabs?: TabType[]
+}
 
 export const useSearchParameters = () => {
-  const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [searchMode, setSearchMode] = useState(false)
   const [page, setPage] = useState(0)
-  const [limit, setLimit] = useState(20)
+  const [limit, setLimit] = useState(LIMIT_PER_PAGE) 
   const [count, setCount] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
+  const [references, setReferences] = useState<Reference[]>([])
+  const [tabs, setTabs] = useState<TabType[]>([])
 
   const options = useMemo(
     () => ({
       page,
-      search,
+      searchInput,
       searchMode,
       limit,
       count,
-      totalPages
+      totalPages,
+      references,
+      tabs
     }),
-    [search, page, limit, count, totalPages, searchMode]
+    [searchInput, page, limit, count, totalPages, searchMode, references, tabs]
   )
 
   useEffect(() => {
@@ -29,7 +48,7 @@ export const useSearchParameters = () => {
   }
 
   const onChangeSearchInput = (newValue: string) => {
-    setSearch(newValue)
+    setSearchInput(newValue)
   }
 
   const onChangePage = (newValue: number) => {
@@ -44,12 +63,22 @@ export const useSearchParameters = () => {
     setSearchMode(newValue)
   }
 
+  const onChangeReferences = (references: Reference[]) => {
+    setReferences(references)
+  }
+
+  const onChangeTabs = (tabs: TabType[]) => {
+    setTabs(tabs)
+  }
+
   return {
     options,
     onChangeSearchInput,
     onChangeSearchMode,
     onChangePage,
     onChangeLimit,
-    onChangeCount
+    onChangeCount,
+    onChangeReferences,
+    onChangeTabs
   }
 }
