@@ -6,7 +6,7 @@ import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import DataTable from 'components/DataTable/DataTable'
 
-import { CohortPatient, Column } from 'types'
+import { CohortPatient } from 'types'
 
 import { getAge } from 'utils/age'
 import { capitalizeFirstLetter } from 'utils/capitalize'
@@ -19,6 +19,7 @@ import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
 import { VitalStatusLabel } from 'types/requestCriterias'
 import { getExtension } from 'utils/fhir'
 import { AppConfig } from 'config'
+import { Column } from 'types/table'
 
 type DataTablePatientProps = {
   loading: boolean

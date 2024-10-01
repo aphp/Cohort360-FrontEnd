@@ -7,13 +7,14 @@ import { TableCellWrapper } from 'components/ui/TableCell/styles'
 import DataTable from 'components/DataTable/DataTable'
 import SearchIcon from 'assets/icones/search.svg?react'
 
-import { CohortPMSI, Column, PMSIEntry } from 'types'
+import { CohortPMSI, PMSIEntry } from 'types'
 import { Order, OrderBy } from 'types/searchCriterias'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { getExtension } from 'utils/fhir'
 
 import useStyles from './styles'
 import { mapToDate, mapToLabelSingular } from 'mappers/pmsi'
+import { Column } from 'types/table'
 
 type DataTablePmsiProps = {
   loading: boolean

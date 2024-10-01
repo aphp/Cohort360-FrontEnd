@@ -47,7 +47,7 @@ export const initSearchPatientsSearchCriterias: SearchCriterias<null> = {
   filters: null
 }
 
-export const initPatientsSearchCriterias: SearchCriterias<PatientsFilters> = {
+export const initPatientsSearchCriterias = (): SearchCriterias<PatientsFilters> => ({
   orderBy: {
     orderBy: Order.FAMILY,
     orderDirection: Direction.ASC
@@ -59,27 +59,25 @@ export const initPatientsSearchCriterias: SearchCriterias<PatientsFilters> = {
     birthdatesRanges: [null, null],
     vitalStatuses: []
   }
-}
+})
 
-export const initPmsiSearchCriterias: SearchCriterias<PMSIFilters> = {
+export const initPmsiSearchCriterias = (): SearchCriterias<PMSIFilters> => ({
   orderBy: {
     orderBy: Order.DATE,
     orderDirection: Direction.DESC
   },
   searchInput: '',
-  searchBy: SearchByTypes.TEXT,
   filters: {
     code: [],
-    nda: '',
+    source: [],
     ipp: '',
-    source: '',
+    nda: '',
     diagnosticTypes: [],
-    startDate: null,
-    endDate: null,
+    durationRange: [null, null],
     executiveUnits: [],
     encounterStatus: []
   }
-}
+})
 
 export const initMedSearchCriterias: SearchCriterias<MedicationFilters> = {
   orderBy: {
@@ -196,6 +194,7 @@ const searchCriteriasReducer = <F>(
   initState: () => SearchCriterias<F>
 ): ((state: SearchCriterias<F> | undefined, action: ActionFilters<F>) => SearchCriterias<F>) => {
   return (state: SearchCriterias<F> = initState(), action: ActionFilters<F>): SearchCriterias<F> => {
+    console.log("test update reducer", action)
     switch (action.type) {
       case ActionTypes.CHANGE_ORDER_BY:
         return { ...state, orderBy: action.payload }
@@ -234,7 +233,6 @@ const useSearchCriterias = <F>(
     searchCriteriasReducer<F>(() => initState),
     initState
   )
-
   return [
     state,
     {

@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material'
 import ValueSetField from 'components/SearchValueSet/ValueSetField'
-import { InputWrapper } from 'components/ui/Inputs'
+import { InputWrapper } from 'components/ui/Inputs/styles'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import { Hierarchy } from 'types/hierarchy'
@@ -18,7 +18,7 @@ const CodeFilter = ({ name, value, references, disabled = false }: CodeFilterPro
   const [code, setCode] = useState(value)
 
   useEffect(() => {
-    context?.updateFormData(name, code)
+    if (context?.updateFormData) context.updateFormData(name, code)
   }, [code, name])
 
   return (
