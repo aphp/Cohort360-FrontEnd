@@ -65,7 +65,6 @@ export const Pagination = ({
       )
     }
   }
-
   return (
     <Grid
       container
