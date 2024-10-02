@@ -11,9 +11,14 @@ import { useAppSelector } from 'state'
 import sideBarTransition from 'styles/sideBarTransition'
 
 const exportColumnsTable = [
-  {}
+  { label: 'N° de cohorte' },
+  { label: 'Nom de la cohorte' },
+  { label: 'Nombre de patient' },
+  { label: "Nom de l'export" },
+  { label: 'Date de l’export' },
+  { label: 'Statut' },
+  { label: 'Actions' }
 ]
-
 
 const Export: React.FC = () => {
   const { classes, cx } = sideBarTransition()
@@ -31,7 +36,9 @@ const Export: React.FC = () => {
         <CssBaseline />
         <Grid container item xs={11}>
           <HeaderPage id="export-page-title" title="Mes exports" />
-          {/* <DataTable /> */}
+          <DataTable columns={exportColumnsTable}>
+            <p>salut</p>
+          </DataTable>
         </Grid>
       </Grid>
     </Grid>
