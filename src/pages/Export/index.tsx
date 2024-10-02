@@ -3,11 +3,17 @@ import React from 'react'
 import { Grid, CssBaseline } from '@mui/material'
 
 import HeaderPage from 'components/ui/HeaderPage'
+import DataTable from 'components/DataTable/DataTable'
 import Tables from 'components/Tables'
 
 import { useAppSelector } from 'state'
 
 import sideBarTransition from 'styles/sideBarTransition'
+
+const exportColumnsTable = [
+  {}
+]
+
 
 const Export: React.FC = () => {
   const { classes, cx } = sideBarTransition()
@@ -25,7 +31,7 @@ const Export: React.FC = () => {
         <CssBaseline />
         <Grid container item xs={11}>
           <HeaderPage id="export-page-title" title="Mes exports" />
-          <Tables />
+          {/* <DataTable /> */}
         </Grid>
       </Grid>
     </Grid>
