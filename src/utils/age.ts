@@ -128,7 +128,7 @@ export const convertDurationToTimestamp = (duration: DurationType | null, deiden
 }
 
 export const convertTimestampToDuration = (timestamp: number | null, deidentified?: boolean): DurationType => {
-  const duration: DurationType = { year: 130, month: 0, day: 0 }
+  const duration: DurationType = { year: 0, month: 0, day: 0 }
   if (!timestamp) return duration
   duration.year = Math.floor(timestamp / (deidentified ? 12 : 365))
   timestamp = timestamp % (deidentified ? 12 : 365)
