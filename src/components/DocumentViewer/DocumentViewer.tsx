@@ -145,7 +145,6 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
                       options={options}
                       onLoadSuccess={({ numPages }) => setNumPages(numPages)}
                     >
-                      <>{console.log('url', url)}</>
                       <div id="array">
                         {Array.from(new Array(numPages), (el, index) => (
                           <div id="page" key={index + 1}>
