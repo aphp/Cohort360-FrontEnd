@@ -264,7 +264,7 @@ const ControlPanel: React.FC<{
               <>Créer la cohorte</>
             )}
           </Button>
-          {appConfig.features.feasabilityReport.enabled && (
+          {appConfig.features.feasibilityReport.enabled && (
             <Button
               disabled={isLoading || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated}
               onClick={handleGenerateReport}
