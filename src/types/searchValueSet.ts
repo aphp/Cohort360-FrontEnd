@@ -35,12 +35,12 @@ export type Reference = {
   filterRoots: (code: HierarchyWithLabel) => boolean
 }
 
-export enum SearchValueSetTab {
+export enum SearchMode {
   EXPLORATION,
   RESEARCH
 }
 
-export enum SearchValueSetTabLabel {
+export enum SearchModeLabel {
   EXPLORATION = 'Exploration',
   RESEARCH = 'Recherche'
 }

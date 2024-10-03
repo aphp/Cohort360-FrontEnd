@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Reference, SearchValueSetTab } from 'types/searchValueSet'
+import { Reference, SearchMode } from 'types/searchValueSet'
 import { LIMIT_PER_PAGE, SearchParameters, useSearchParameters } from '../search/useSearchParameters'
 import { useHierarchy } from 'hooks/hierarchy/useHierarchy'
 import { getChildrenFromCodes, getHierarchyRoots, searchInValueSets } from 'services/aphp/serviceValueSets'
@@ -7,7 +7,7 @@ import { getChildrenFromCodes, getHierarchyRoots, searchInValueSets } from 'serv
 export const useSearchValueSet = (references: Reference[]) => {
   const researchParameters = useSearchParameters()
   const explorationParameters = useSearchParameters()
-  const [mode, setMode] = useState(SearchValueSetTab.EXPLORATION)
+  const [mode, setMode] = useState(SearchMode.EXPLORATION)
 
   const fetchChildren = useCallback(
     async (ids: string, system: string) => (await getChildrenFromCodes(system, ids.split(','))).results,
@@ -85,13 +85,11 @@ export const useSearchValueSet = (references: Reference[]) => {
   }
 
   const getSearchParameter = (param: keyof SearchParameters) => {
-    return mode === SearchValueSetTab.EXPLORATION
-      ? explorationParameters.options[param]
-      : researchParameters.options[param]
+    return mode === SearchMode.EXPLORATION ? explorationParameters.options[param] : researchParameters.options[param]
   }
 
   const handleChangeMode = () => {
-    const newMode = mode === SearchValueSetTab.EXPLORATION ? SearchValueSetTab.RESEARCH : SearchValueSetTab.EXPLORATION
+    const newMode = mode === SearchMode.EXPLORATION ? SearchMode.RESEARCH : SearchMode.EXPLORATION
     setMode(newMode)
   }
 
@@ -100,22 +98,20 @@ export const useSearchValueSet = (references: Reference[]) => {
     search(() => fetchSearch(searchInput, page, searchInRefs))
   }
 
-  const handleFetchMore = (mode: SearchValueSetTab) => {
-    if (mode === SearchValueSetTab.EXPLORATION) {
-      const selectedReference = explorationParameters.options.references.find((ref) => ref.checked)?.url || ''
-      const cb = async () =>
-        (await searchInValueSets([selectedReference], '', currentHierarchy.tree.length, LIMIT_PER_PAGE)).results
-      fetchMore(selectedReference, cb)
-    } else {
-      const references = researchParameters.options.references.filter((ref) => ref.checked).map((ref) => ref.url)
-      const cb = () =>
-        searchInValueSets(references, researchParameters.options.searchInput, searchResults.tree.length, LIMIT_PER_PAGE)
-      search(cb)
-    }
+  const handleFetchMore = (mode: SearchMode) => {
+    const offset = SearchMode.EXPLORATION ? currentHierarchy.tree.length : searchResults.tree.length
+    const refs = SearchMode.EXPLORATION
+      ? explorationParameters.options.references
+      : researchParameters.options.references
+    const selectedRefs = refs.filter((ref) => ref.checked).map((ref) => ref.url)
+    const system = SearchMode.EXPLORATION ? selectedRefs?.[0] : ''
+    const cb = async () =>
+      (await searchInValueSets(selectedRefs, researchParameters.options.searchInput, offset, LIMIT_PER_PAGE)).results
+    fetchMore(system, mode, cb)
   }
 
   const handleChangeReferences = (references: Reference[]) => {
-    if (mode === SearchValueSetTab.EXPLORATION) explorationParameters.onChangeReferences(references)
+    if (mode === SearchMode.EXPLORATION) explorationParameters.onChangeReferences(references)
     else {
       researchParameters.onChangeReferences(references)
       handleSearch(references, researchParameters.options.searchInput, 0)

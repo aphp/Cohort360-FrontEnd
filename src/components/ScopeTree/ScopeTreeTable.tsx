@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react'
+import React, { CSSProperties, Fragment, useEffect, useRef, useState } from 'react'
 import {
   Breadcrumbs,
   Checkbox,
@@ -14,28 +14,31 @@ import {
 } from '@mui/material'
 import { LoadingStatus, ScopeElement, SelectedStatus } from 'types'
 import { Hierarchy, HierarchyInfo } from 'types/hierarchy'
-import { IndeterminateCheckBoxOutlined, KeyboardArrowDown, KeyboardArrowRight } from '@mui/icons-material'
+import { IndeterminateCheckBoxOutlined, KeyboardArrowDown, KeyboardArrowRight, Mode } from '@mui/icons-material'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import displayDigit from 'utils/displayDigit'
-import { CellWrapper, RowContainerWrapper, RowWrapper } from '../Hierarchy/styles'
+import { CellWrapper, RowContainerWrapper } from '../Hierarchy/styles'
 import { SourceType } from 'types/scope'
 import { v4 as uuidv4 } from 'uuid'
 import { isSourceTypeInScopeLevel } from 'utils/perimeters'
 import { every } from 'lodash'
 import { sortArray } from 'utils/arrays'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { VariableSizeList as List } from 'react-window'
+import { LIMIT_PER_PAGE } from 'hooks/search/useSearchParameters'
+import { SearchMode } from 'types/searchValueSet'
 
 type HierarchyItemProps = {
   item: Hierarchy<ScopeElement, string>
   path: string[]
-  searchMode: boolean
+  mode: SearchMode
   sourceType: SourceType
   loading: { search: LoadingStatus; expand: LoadingStatus }
   onSelect: (node: Hierarchy<ScopeElement, string>, toAdd: boolean) => void
   onExpand: (node: Hierarchy<ScopeElement, string>) => void
 }
 
-const ScopeTreeRow = ({ item, path, sourceType, searchMode, loading, onSelect, onExpand }: HierarchyItemProps) => {
+const ScopeTreeRow = ({ item, path, sourceType, mode, loading, onSelect, onExpand }: HierarchyItemProps) => {
   const [open, setOpen] = useState(false)
   const [internalLoading, setInternalLoading] = useState(false)
   const { id, name, subItems, rights, status, source_value, type, cohort_size, full_path } = item
@@ -45,10 +48,13 @@ const ScopeTreeRow = ({ item, path, sourceType, searchMode, loading, onSelect, o
   )
 
   const handleOpen = () => {
+    console.log("test clicked", subItems, open)
     setOpen(true)
     setInternalLoading(true)
     onExpand(item)
   }
+
+  console.log("test open", open)
 
   useEffect(() => {
     if (loading.expand === LoadingStatus.SUCCESS) setInternalLoading(false)
@@ -56,78 +62,92 @@ const ScopeTreeRow = ({ item, path, sourceType, searchMode, loading, onSelect, o
 
   return (
     <>
-      <RowContainerWrapper container color={path.length % 2 === 0 ? '#f3f5f9' : '#fff'}>
-        <RowWrapper
-          size={searchMode ? '75px' : '55px'}
-          container
-          alignItems="center"
-          marginLeft={path.length > 1 ? path.length * 20 - 20 + 'px' : '0'}
-        >
-          <CellWrapper item xs={1} cursor>
-            <>
-              {internalLoading && <CircularProgress size={'15px'} color="info" />}
-              {!internalLoading && (
-                <>
-                  {open && <KeyboardArrowDown onClick={() => setOpen(false)} color="secondary" />}
-                  {!open && <KeyboardArrowRight onClick={handleOpen} color="secondary" />}
-                </>
-              )}
-            </>
-          </CellWrapper>
+      <RowContainerWrapper
+        container
+        height="100%"
+        alignItems="center"
+        color={path.length % 2 === 0 ? '#f3f5f9' : '#fff'}
+        marginLeft={path.length > 1 ? path.length * 20 - 20 + 'px' : '0'}
+        fontSize={12}
+        zIndex={10}
+        position="relative"
+        style={{ pointerEvents: 'auto' }}
+      >
+        <CellWrapper item xs={1} cursor>
+          <>
+            {internalLoading && <CircularProgress size={'15px'} color="info" />}
+            {!internalLoading && (
+              <>
+                {open && <KeyboardArrowDown onClick={() => setOpen(false)} color="secondary" />}
+                {!open && <KeyboardArrowRight onClick={handleOpen} color="secondary" />}
+              </>
+            )}
+          </>
+        </CellWrapper>
 
-          {searchMode && full_path && (
-            <CellWrapper cursor item xs={5}>
-              <Breadcrumbs maxItems={2}>
-                {(full_path.split('/').length > 1 ? full_path.split('/').slice(1) : full_path.split('/').slice(0)).map(
-                  (full_path: string) => (
-                    <Typography fontWeight={600} key={uuidv4()}>
+        {mode === SearchMode.RESEARCH && full_path && (
+          <CellWrapper cursor item xs={5}>
+            <Breadcrumbs maxItems={2}>
+              {(full_path.split('/').length > 1 ? full_path.split('/').slice(1) : full_path.split('/').slice(0)).map(
+                (full_path: string, index, arr) => {
+                  const last = index === arr.length - 1
+                  return (
+                    <Typography
+                      fontWeight={last ? 700 : 600}
+                      fontSize={last ? 12.5 : 11.5}
+                      color={last ? 'primary' : 'info'}
+                      key={uuidv4()}
+                    >
                       {full_path}
                     </Typography>
                   )
-                )}
-              </Breadcrumbs>
-            </CellWrapper>
-          )}
-          {!searchMode && (
-            <CellWrapper cursor item xs={5} onClick={() => (open ? setOpen(false) : handleOpen())}>
+                }
+              )}
+            </Breadcrumbs>
+          </CellWrapper>
+        )}
+        {mode === SearchMode.EXPLORATION && (
+          <CellWrapper cursor item xs={5} onClick={() => (open ? setOpen(false) : handleOpen())}>
+            <Typography fontWeight={700} fontSize={12.5} color="primary">
+              {' '}
               {`${source_value} - ${name}`}
-            </CellWrapper>
-          )}
-          <CellWrapper item xs={2} textAlign="center">
-            {displayDigit(+cohort_size)}
+            </Typography>
           </CellWrapper>
-          {sourceType === SourceType.ALL && (
-            <CellWrapper item xs={3} textAlign="center">
-              {rights && <Fragment>{servicesPerimeters.getAccessFromRights(rights)}</Fragment>}
-            </CellWrapper>
-          )}
-          {sourceType !== SourceType.ALL && (
-            <CellWrapper item xs={3} textAlign="center">
-              {type}
-            </CellWrapper>
-          )}
-          <CellWrapper item xs={1} container justifyContent="flex-end">
-            <Checkbox
-              checked={status === SelectedStatus.SELECTED}
-              indeterminate={status === SelectedStatus.INDETERMINATE}
-              color="secondary"
-              indeterminateIcon={<IndeterminateCheckBoxOutlined />}
-              onChange={(event, checked) => onSelect(item, checked)}
-              inputProps={{ 'aria-labelledby': name }}
-            />
+        )}
+        <CellWrapper item xs={2} textAlign="center">
+          {displayDigit(+cohort_size)}
+        </CellWrapper>
+        {sourceType === SourceType.ALL && (
+          <CellWrapper item xs={3} textAlign="center">
+            {rights && <Fragment>{servicesPerimeters.getAccessFromRights(rights)}</Fragment>}
           </CellWrapper>
-        </RowWrapper>
+        )}
+        {sourceType !== SourceType.ALL && (
+          <CellWrapper item xs={3} textAlign="center">
+            {type}
+          </CellWrapper>
+        )}
+        <CellWrapper item xs={1}>
+          <Checkbox
+            checked={status === SelectedStatus.SELECTED}
+            indeterminate={status === SelectedStatus.INDETERMINATE}
+            color="secondary"
+            indeterminateIcon={<IndeterminateCheckBoxOutlined />}
+            onChange={(event, checked) => onSelect(item, checked)}
+            inputProps={{ 'aria-labelledby': name }}
+          />
+        </CellWrapper>
       </RowContainerWrapper>
-      {!internalLoading &&
-        open &&
+      {open &&
         sortArray(subItems || [], 'source_value').map((subItem: Hierarchy<ScopeElement, string>) => {
+          console.log("test opzen")
           if (isSourceTypeInScopeLevel(sourceType, subItem.type)) {
             return (
               <ScopeTreeRow
                 loading={loading}
                 sourceType={sourceType}
                 path={[...path, id]}
-                searchMode={searchMode}
+                mode={mode}
                 key={subItem.id}
                 item={subItem}
                 onSelect={onSelect}
@@ -140,9 +160,15 @@ const ScopeTreeRow = ({ item, path, sourceType, searchMode, loading, onSelect, o
   )
 }
 
+type ListItems = {
+  data: Hierarchy<ScopeElement, string>[]
+  index: number
+  style: CSSProperties
+}
+
 type HierarchyProps = {
   hierarchy: HierarchyInfo<ScopeElement>
-  searchMode: boolean
+  mode: SearchMode
   selectAllStatus: SelectedStatus
   sourceType: SourceType
   loading: { search: LoadingStatus; expand: LoadingStatus }
@@ -154,7 +180,7 @@ type HierarchyProps = {
 
 const ScopeTreeTable = ({
   hierarchy,
-  searchMode,
+  mode,
   selectAllStatus,
   sourceType,
   loading,
@@ -163,7 +189,6 @@ const ScopeTreeTable = ({
   onExpand,
   onFetchMore
 }: HierarchyProps) => {
-  const scrollableUuid = useRef(uuidv4())
   return (
     <TableContainer style={{ overflowX: 'hidden', background: 'white' }}>
       <Table>
@@ -190,7 +215,7 @@ const ScopeTreeTable = ({
             </CellWrapper>
           </RowContainerWrapper>
         </TableHead>
-        <TableBody style={{ height: '100%' }}>
+        <TableBody>
           {loading.search === LoadingStatus.SUCCESS && !hierarchy.tree.length && (
             <TableRow>
               <TableCell colSpan={7} align="center">
@@ -199,7 +224,49 @@ const ScopeTreeTable = ({
             </TableRow>
           )}
           {loading.search !== LoadingStatus.FETCHING && (
-            <div id={scrollableUuid.current} style={{ maxHeight: '70vh', overflow: 'auto' }}>
+            <List
+              itemData={hierarchy.tree}
+              innerElementType="div"
+              itemCount={hierarchy.tree.length}
+              itemSize={() => 70}
+              height={700}
+              width="100%"
+              overscanCount={5}
+            >
+              {({ data, index, style }: ListItems) =>
+                data[index] ? (
+                  <div style={{ ...style, pointerEvents: 'none', zIndex: 1 }}>
+                    <ScopeTreeRow
+                      loading={loading}
+                      path={[data[index].id]}
+                      mode={mode}
+                      key={data[index].id}
+                      item={data[index]}
+                      sourceType={sourceType}
+                      onExpand={onExpand}
+                      onSelect={onSelect}
+                    />
+                  </div>
+                ) : (
+                  <div style={style} key={index}>
+                    Missing
+                  </div>
+                )
+              }
+            </List>
+          )}
+        </TableBody>
+      </Table>
+      {loading.search === LoadingStatus.FETCHING && (
+        <Grid container justifyContent="center" alignContent="center" height={500}>
+          <CircularProgress />
+        </Grid>
+      )}
+    </TableContainer>
+  )
+}
+
+/*<div id={scrollableUuid.current} style={{ maxHeight: '70vh', overflow: 'auto' }}>
               <InfiniteScroll
                 scrollableTarget={scrollableUuid.current}
                 dataLength={hierarchy.tree.length}
@@ -224,17 +291,6 @@ const ScopeTreeTable = ({
                   )
                 })}
               </InfiniteScroll>
-            </div>
-          )}
-        </TableBody>
-      </Table>
-      {loading.search === LoadingStatus.FETCHING && (
-        <Grid container justifyContent="center" alignContent="center" height={500}>
-          <CircularProgress />
-        </Grid>
-      )}
-    </TableContainer>
-  )
-}
+              </div>*/
 
 export default ScopeTreeTable

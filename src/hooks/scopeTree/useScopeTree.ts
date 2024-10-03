@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Hierarchy } from 'types/hierarchy'
-import { useSearchParameters } from '../search/useSearchParameters'
+import { LIMIT_PER_PAGE, useSearchParameters } from '../search/useSearchParameters'
 import { ScopeElement } from 'types'
 import { SourceType, System } from 'types/scope'
 import { useAppDispatch, useAppSelector } from 'state'
@@ -8,6 +8,7 @@ import servicesPerimeters from 'services/aphp/servicePerimeters'
 import { saveFetchedPerimeters, saveFetchedRights } from 'state/scope'
 import { cleanNodes } from 'utils/hierarchy/hierarchy'
 import { useHierarchy } from 'hooks/hierarchy/useHierarchy'
+import { SearchMode } from 'types/searchValueSet'
 
 export const useScopeTree = (
   baseTree: Hierarchy<ScopeElement, string>[],
@@ -20,13 +21,8 @@ export const useScopeTree = (
   )
   const controllerRef = useRef<AbortController | null>(null)
   const dispatch = useAppDispatch()
-  const {
-    options: { searchInput, page, limit, count, totalPages, searchMode },
-    onChangePage,
-    onChangeCount,
-    onChangeSearchMode,
-    onChangeSearchInput
-  } = useSearchParameters()
+  const [searchInput, setSearchInput] = useState('')
+  const [mode, setMode] = useState(SearchMode.EXPLORATION)
 
   const fetchChildren = useCallback(
     async (ids: string) => {
@@ -40,43 +36,19 @@ export const useScopeTree = (
   )
 
   const fetchSearch = async (search: string, page: number) => {
+    const options = { practitionerId, search, page, LIMIT_PER_PAGE, sourceType }
     const results =
       sourceType === SourceType.ALL
-        ? await servicesPerimeters.getRights({
-            practitionerId,
-            search,
-            page,
-            limit: limit,
-            sourceType
-          })
-        : await servicesPerimeters.getPerimeters({
-            practitionerId,
-            search,
-            page,
-            limit: limit,
-            sourceType
-          })
-    onChangeCount(count)
+        ? await servicesPerimeters.getRights(options)
+        : await servicesPerimeters.getPerimeters(options)
+    // onChangeCount(count)
     return results
-  }
-
-  const handleChangePage = (page: number) => {
-    onChangePage(page)
-    search(() => fetchSearch(searchInput, page))
   }
 
   const handleSaveCodes = useCallback((codes: Hierarchy<ScopeElement, string>[]) => {
     if (sourceType === SourceType.ALL) dispatch(saveFetchedRights(cleanNodes(codes)))
     else dispatch(saveFetchedPerimeters(cleanNodes(codes)))
   }, [])
-
-  const handleChangeSearchInput = (searchInput: string) => {
-    onChangePage(0)
-    onChangeSearchInput(searchInput)
-    onChangeSearchMode(searchInput !== '')
-    if (searchInput === '') onChangeCount(baseTree.length)
-    else search(() => fetchSearch(searchInput, 0))
-  }
 
   const {
     hierarchies,
@@ -88,6 +60,7 @@ export const useScopeTree = (
     search,
     expand,
     select,
+    fetchMore,
     selectAll,
     deleteCode
   } = useHierarchy(selectedNodes, codes, handleSaveCodes, fetchChildren)
@@ -98,20 +71,33 @@ export const useScopeTree = (
     ])
   }, [baseTree])
 
-  const currentHierarchy = useMemo(() => {
-    const found = hierarchies.get(System.ScopeTree)
+  const current = useMemo(() => {
+    const found = mode === SearchMode.EXPLORATION ? hierarchies.get(System.ScopeTree) : searchResults
     return (
       found || {
         tree: [],
         count: 0
       }
     )
-  }, [hierarchies])
+  }, [mode, hierarchies, searchResults])
+
+  const handleFetchMore = () => {
+    const page = searchResults.tree.length / LIMIT_PER_PAGE
+    fetchMore(System.ScopeTree, mode, async () => (await fetchSearch(searchInput, page)).results)
+  }
+
+  const handleChangeSearchInput = (searchInput: string) => {
+    setSearchInput(searchInput)
+    if (searchInput === '') setMode(SearchMode.EXPLORATION)
+    else {
+      setMode(SearchMode.RESEARCH)
+      search(() => fetchSearch(searchInput, 0))
+    }
+  }
 
   return {
     hierarchyData: {
-      searchResults,
-      hierarchy: currentHierarchy,
+      hierarchy: current,
       loadingStatus,
       selectAllStatus,
       selectedCodes
@@ -123,13 +109,11 @@ export const useScopeTree = (
       deleteCode
     },
     parametersData: {
-      page,
       searchInput,
-      searchMode,
-      totalPages
+      mode
     },
     parametersActions: {
-      onChangePage: handleChangePage,
+      onFetchMore: handleFetchMore,
       onChangeSearchInput: handleChangeSearchInput
     }
   }

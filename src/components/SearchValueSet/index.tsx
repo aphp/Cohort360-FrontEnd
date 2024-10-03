@@ -4,7 +4,7 @@ import Tabs from 'components/ui/Tabs'
 import { LoadingStatus, TabType } from 'types'
 import ReferencesParameters, { Type } from './References'
 import ValueSetTable from './ValueSetTable'
-import { Reference, SearchValueSetTab, SearchValueSetTabLabel } from 'types/searchValueSet'
+import { Reference, SearchMode, SearchModeLabel } from 'types/searchValueSet'
 import SelectedCodes from 'components/Hierarchy/SelectedCodes'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { useSearchValueSet } from 'hooks/valueSet/useSearchValueSet'
@@ -24,9 +24,9 @@ const SearchValueSet = ({ references }: SearchValueSetProps) => {
     hierarchy: { exploration, research, expand, select, deleteCode, selectAll, onFetchMore }
   } = useSearchValueSet(references)
 
-  const tabs: TabType<SearchValueSetTab, SearchValueSetTabLabel>[] = [
-    { id: SearchValueSetTab.EXPLORATION, label: SearchValueSetTabLabel.EXPLORATION },
-    { id: SearchValueSetTab.RESEARCH, label: SearchValueSetTabLabel.RESEARCH }
+  const tabs: TabType<SearchMode, SearchModeLabel>[] = [
+    { id: SearchMode.EXPLORATION, label: SearchModeLabel.EXPLORATION },
+    { id: SearchMode.RESEARCH, label: SearchModeLabel.RESEARCH }
   ]
 
   return (
@@ -52,12 +52,12 @@ const SearchValueSet = ({ references }: SearchValueSetProps) => {
                   <ReferencesParameters
                     disabled={loadingStatus.init === LoadingStatus.FETCHING}
                     onSelect={onChangeReferences}
-                    type={mode === SearchValueSetTab.EXPLORATION ? Type.SINGLE : Type.MULTIPLE}
+                    type={mode === SearchMode.EXPLORATION ? Type.SINGLE : Type.MULTIPLE}
                     values={refs}
                   />
                 </Grid>
                 <Grid item xs={6}>
-                  <Collapse in={mode === SearchValueSetTab.RESEARCH && !!refs.find((ref) => ref.checked)}>
+                  <Collapse in={mode === SearchMode.RESEARCH && !!refs.find((ref) => ref.checked)}>
                     <Typography color="#0063AF" variant="h3">
                       Rechercher un code :
                     </Typography>
@@ -77,9 +77,7 @@ const SearchValueSet = ({ references }: SearchValueSetProps) => {
         </Grid>
 
         <Grid container direction="column" wrap="wrap" height="100%" overflow="auto" padding={'0px 30px'}>
-          <Displayer
-            isDisplayed={mode === SearchValueSetTab.RESEARCH && loadingStatus.search === LoadingStatus.SUCCESS}
-          >
+          <Displayer isDisplayed={mode === SearchMode.RESEARCH && loadingStatus.search === LoadingStatus.SUCCESS}>
             <Grid item paddingLeft="20px" marginBottom="10px">
               <Typography fontWeight={800} color="info" fontSize={14}>
                 {research.count} résultat(s)
@@ -95,21 +93,21 @@ const SearchValueSet = ({ references }: SearchValueSetProps) => {
             height="92%"
             style={{ overflow: 'hidden' }}
           >
-            <Displayer isDisplayed={mode === SearchValueSetTab.EXPLORATION}>
+            <Displayer isDisplayed={mode === SearchMode.EXPLORATION}>
               <ValueSetTable
                 isHierarchy={refs.find((ref) => ref.checked)?.isHierarchy}
                 loading={{ list: loadingStatus.init, expand: loadingStatus.expand }}
                 hierarchy={exploration}
-                onFetchMore={() => onFetchMore(SearchValueSetTab.EXPLORATION)}
+                onFetchMore={() => onFetchMore(SearchMode.EXPLORATION)}
                 onSelect={select}
                 onSelectAll={selectAll}
                 onExpand={expand}
               />
             </Displayer>
-            <Displayer isDisplayed={mode === SearchValueSetTab.RESEARCH}>
+            <Displayer isDisplayed={mode === SearchMode.RESEARCH}>
               <ValueSetTable
                 searchMode={true}
-                onFetchMore={() => onFetchMore(SearchValueSetTab.RESEARCH)}
+                onFetchMore={() => onFetchMore(SearchMode.RESEARCH)}
                 loading={{ list: loadingStatus.search, expand: loadingStatus.expand }}
                 hierarchy={research}
                 onSelect={select}

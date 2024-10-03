@@ -15,6 +15,7 @@ import { getSelectedCodes } from 'utils/hierarchy/hierarchy'
 import { CodeKey, Hierarchy, HierarchyInfo, HierarchyLoadingStatus, Mode } from '../../types/hierarchy'
 import { removeElement } from 'utils/arrays'
 import { replaceInMap } from 'utils/map'
+import { SearchMode } from 'types/searchValueSet'
 /**
  * @param {Hierarchy<T>[]} selectedNodes - Nodes selected in the hierarchy.
  * @param {Hierarchy<T>[]} fetchedCodes - All the codes that have already been fetched and saved.
@@ -74,17 +75,24 @@ export const useHierarchy = <T>(
     setLoadingStatus((prevLoadingStatus) => ({ ...prevLoadingStatus, init: LoadingStatus.SUCCESS }))
   }
 
-  const fetchMore = async (system: string, fetchMore: () => Promise<Hierarchy<T>[]>) => {
-    setLoadingStatus({ ...loadingStatus, search: LoadingStatus.FETCHING })
+  const fetchMore = async (system: string, mode: SearchMode, fetchMore: () => Promise<Hierarchy<T>[]>) => {
+   // setLoadingStatus({ ...loadingStatus, search: LoadingStatus.FETCHING })
     const endCodes = await fetchMore()
     const bySystem = groupBySystem(endCodes)
     const newCodes = await getMissingCodesWithSystems(trees, bySystem, codes, fetchHandler)
     const newTrees = buildMultipleTrees(trees, bySystem, newCodes, selectedCodes, Mode.SEARCH)
-    const currentHierarchy = { tree: newTrees.get(system) || [], count: hierarchies.get(system)?.count || 0 }
     setCodes(newCodes)
     setTrees(newTrees)
-    setHierarchies(replaceInMap(system, currentHierarchy, hierarchies))
-    setLoadingStatus({ ...loadingStatus, search: LoadingStatus.SUCCESS })
+    if (mode === SearchMode.EXPLORATION) {
+      const currentHierarchy = { tree: newTrees.get(system) || [], count: hierarchies.get(system)?.count || 0 }
+      setHierarchies(replaceInMap(system, currentHierarchy, hierarchies))
+    } else {
+      setSearchResults({
+        tree: getListDisplay([...searchResults.tree, ...endCodes], newTrees),
+        count: searchResults.count
+      })
+    }
+  //  setLoadingStatus({ ...loadingStatus, search: LoadingStatus.SUCCESS })
   }
 
   const search = async (fetchSearch: () => Promise<Back_API_Response<Hierarchy<T>>>) => {
@@ -93,7 +101,10 @@ export const useHierarchy = <T>(
     const bySystem = groupBySystem(endCodes)
     const newCodes = await getMissingCodesWithSystems(trees, bySystem, codes, fetchHandler)
     const newTrees = buildMultipleTrees(trees, bySystem, newCodes, selectedCodes, Mode.SEARCH)
-    const newSearchResults = { tree: getListDisplay(/*[...searchResults.tree, ...endCodes]*/endCodes, newTrees), count: count }
+    const newSearchResults = {
+      tree: getListDisplay(/*[...searchResults.tree, ...endCodes]*/ endCodes, newTrees),
+      count: count
+    }
     setCodes(newCodes)
     setTrees(newTrees)
     setSearchResults(newSearchResults)
