@@ -2,7 +2,7 @@ FROM node:20 AS build
 
 COPY . .
 RUN npm install
-RUN VERSION=$(cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/"version"://g' | sed 's/[",]//g' | tr -d '[[:space:]]') CI_COMMIT_SHORT_SHA=$(git rev-parse --short HEAD) echo "{\"commit\": \"$CI_COMMIT_SHORT_SHA\", \"version\": \"$VERSION\"}" > src/data/version.json
+RUN bash ./scripts/createVersionJson.sh
 RUN npm run build
 
 
@@ -10,6 +10,7 @@ FROM nginx:1.25.1
 
 WORKDIR /app
 COPY --from=build build build
+COPY --from=build src/data/version.json build/data/version.json
 
 # Configure the nginx inside the docker image
 COPY .templates/nginx.conf /etc/nginx/conf.d/
