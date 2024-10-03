@@ -29,16 +29,19 @@ describe('handlePageError', () => {
     const page = 1
     const setPage = vi.fn()
     const dispatch = vi.fn()
+    const setLoadingStatus = vi.fn()
 
-    handlePageError(page, setPage, dispatch)
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
     expect(dispatch).not.toHaveBeenCalled()
+    expect(setLoadingStatus).toHaveBeenCalled()
   })
   it('should return dispatch with error', () => {
     const page = 1001
     const setPage = vi.fn()
     const dispatch = vi.fn()
+    const setLoadingStatus = vi.fn()
 
-    handlePageError(page, setPage, dispatch)
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
     expect(dispatch).toHaveBeenCalled()
   })
 })

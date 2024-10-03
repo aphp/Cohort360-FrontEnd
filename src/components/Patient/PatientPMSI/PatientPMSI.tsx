@@ -83,7 +83,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
 
   const sourceType = mapToSourceType(selectedTab.id)
 
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const {
     allSavedFilters,
     savedFiltersErrors,
@@ -191,14 +191,13 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   }, [searchInput, nda, code, startDate, endDate, diagnosticTypes, source, orderBy, executiveUnits, encounterStatus])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
     setOldTabs(selectedTab)
 
     const updatedSearchParams = new URLSearchParams(searchParams)
     updatedSearchParams.set('page', page.toString())
     setSearchParams(updatedSearchParams)
 
-    handlePageError(page, setPage, dispatch)
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 
   useEffect(() => {

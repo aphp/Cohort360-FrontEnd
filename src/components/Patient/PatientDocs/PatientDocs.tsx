@@ -190,12 +190,11 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   ])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
     const updatedSearchParams = new URLSearchParams(searchParams)
     updatedSearchParams.set('page', page.toString())
     setSearchParams(updatedSearchParams)
 
-    handlePageError(page, setPage, dispatch)
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 
   useEffect(() => {

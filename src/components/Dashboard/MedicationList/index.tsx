@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { useAppSelector } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
 
 import { Chip, CircularProgress, Grid, Tooltip, useMediaQuery, useTheme } from '@mui/material'
@@ -34,6 +34,8 @@ import useSearchCriterias, { initMedSearchCriterias } from 'reducers/searchCrite
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { mapToLabel } from 'mappers/pmsi'
+import { useSearchParams } from 'react-router-dom'
+import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
 type MedicationListProps = {
   groupId?: string
@@ -50,13 +52,16 @@ const MedicationList = ({ groupId, deidentified }: MedicationListProps) => {
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [triggerClean, setTriggerClean] = useState<boolean>(false)
   const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const dispatch = useAppDispatch()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const getPageParam = searchParams.get('page')
 
   const [selectedTab, setSelectedTab] = useState<MedicationTab>({
     id: ResourceType.MEDICATION_REQUEST,
     label: MedicationLabel.PRESCRIPTION
   })
 
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const {
     allSavedFilters,
     savedFiltersErrors,
@@ -121,6 +126,7 @@ const MedicationList = ({ groupId, deidentified }: MedicationListProps) => {
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
+  const isFirstRender = useRef(true)
 
   const _fetchMedication = async () => {
     try {
@@ -169,9 +175,11 @@ const MedicationList = ({ groupId, deidentified }: MedicationListProps) => {
           nb: totalPatientMedication,
           total: totalAllPatientsMedication
         }))
+        checkIfPageAvailable(totalMedication, page, setPage, dispatch)
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {
+      console.error('Erreur lors de la récupération de la liste Medication :', error)
       if (error instanceof CanceledError) {
         setLoadingStatus(LoadingStatus.FETCHING)
       } else {
@@ -207,8 +215,10 @@ const MedicationList = ({ groupId, deidentified }: MedicationListProps) => {
   }, [])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
-    setPage(1)
+    if (!isFirstRender.current) {
+      setLoadingStatus(LoadingStatus.IDDLE)
+      setPage(1)
+    }
   }, [
     searchInput,
     orderBy,
@@ -219,11 +229,16 @@ const MedicationList = ({ groupId, deidentified }: MedicationListProps) => {
     executiveUnits,
     encounterStatus,
     administrationRoutes,
-    prescriptionTypes
+    prescriptionTypes,
+    groupId
   ])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
+
+    const updatedSearchParams = new URLSearchParams(searchParams)
+    updatedSearchParams.set('page', page.toString())
+    setSearchParams(updatedSearchParams)
   }, [page])
 
   useEffect(() => {
@@ -234,10 +249,14 @@ const MedicationList = ({ groupId, deidentified }: MedicationListProps) => {
   }, [loadingStatus])
 
   useEffect(() => {
-    setPage(1)
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+    } else {
+      setPage(1)
+      setLoadingStatus(LoadingStatus.IDDLE)
+    }
     removeSearchCriterias()
     setTriggerClean(!triggerClean)
-    setLoadingStatus(LoadingStatus.IDDLE)
   }, [selectedTab])
 
   return (

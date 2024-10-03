@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useAppSelector } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 
 import { Chip, CircularProgress, Grid, Tooltip } from '@mui/material'
 import { Save, SavedSearch, FilterList } from '@mui/icons-material'
@@ -38,6 +38,8 @@ import useSearchCriterias, { initPmsiSearchCriterias } from 'reducers/searchCrit
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { mapToLabel, mapToSourceType } from 'mappers/pmsi'
+import { useSearchParams } from 'react-router-dom'
+import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
 type PMSIListProps = {
   groupId?: string
@@ -52,6 +54,9 @@ const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [triggerClean, setTriggerClean] = useState<boolean>(false)
   const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const dispatch = useAppDispatch()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const getPageParam = searchParams.get('page')
 
   const [selectedTab, setSelectedTab] = useState<PmsiTab>({
     id: ResourceType.CONDITION,
@@ -59,7 +64,7 @@ const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
   })
   const sourceType = mapToSourceType(selectedTab.id)
 
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const {
     allSavedFilters,
     savedFiltersErrors,
@@ -113,6 +118,7 @@ const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
+  const isFirstRender = useRef(true)
 
   const _fetchPMSI = async () => {
     try {
@@ -146,9 +152,11 @@ const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
           nb: totalPatientPMSI,
           total: totalAllPatientsPMSI
         }))
+        checkIfPageAvailable(totalPMSI, page, setPage, dispatch)
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {
+      console.error('Erreur lors de la récupération de la liste PMSI :', error)
       if (error instanceof CanceledError) {
         setLoadingStatus(LoadingStatus.FETCHING)
       } else {
@@ -187,8 +195,10 @@ const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
   }, [])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
-    setPage(1)
+    if (!isFirstRender.current) {
+      setLoadingStatus(LoadingStatus.IDDLE)
+      setPage(1)
+    }
   }, [
     searchInput,
     nda,
@@ -200,11 +210,16 @@ const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
     orderBy,
     executiveUnits,
     encounterStatus,
-    ipp
+    ipp,
+    groupId
   ])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
+    const updatedSearchParams = new URLSearchParams(searchParams)
+    updatedSearchParams.set('page', page.toString())
+    setSearchParams(updatedSearchParams)
+
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 
   useEffect(() => {
@@ -215,10 +230,14 @@ const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
   }, [loadingStatus])
 
   useEffect(() => {
-    setPage(1)
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+    } else {
+      setPage(1)
+      setLoadingStatus(LoadingStatus.IDDLE)
+    }
     removeSearchCriterias()
     setTriggerClean(!triggerClean)
-    setLoadingStatus(LoadingStatus.IDDLE)
   }, [selectedTab])
 
   const fetchCodes = useCallback(() => {
@@ -234,14 +253,16 @@ const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
 
   return (
     <Grid container justifyContent="flex-end" gap="20px">
-      <BlockWrapper item xs={12}>
-        <AlertWrapper severity="warning">
-          {`Attention : Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/12/2022. Seuls
+      {(selectedTab.id === ResourceType.PROCEDURE || selectedTab.id === ResourceType.CONDITION) && (
+        <BlockWrapper item xs={12}>
+          <AlertWrapper severity="warning">
+            {`Attention : Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/12/2022. Seuls
             les ${
               selectedTab.id === ResourceType.CONDITION ? 'diagnostics' : 'actes'
             } rattachés à une visite Orbis (avec un Dossier Administratif - NDA) sont actuellement disponibles.`}
-        </AlertWrapper>
-      </BlockWrapper>
+          </AlertWrapper>
+        </BlockWrapper>
+      )}
 
       <Grid container justifyContent="flex-end">
         <Grid container item xs={12} md={10} lg={7} xl={5} justifyContent="flex-end" spacing={1}>

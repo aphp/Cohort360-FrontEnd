@@ -214,14 +214,13 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   ])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
     setOldTabs(selectedTab)
 
     const updatedSearchParams = new URLSearchParams(searchParams)
     updatedSearchParams.set('page', page.toString())
     setSearchParams(updatedSearchParams)
 
-    handlePageError(page, setPage, dispatch)
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 
   useEffect(() => {
@@ -236,11 +235,11 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
     if (isFirstRender.current) {
       isFirstRender.current = false
     } else {
+      setLoadingStatus(LoadingStatus.IDDLE)
       setPage(1)
     }
     removeSearchCriterias()
     setTriggerClean(!triggerClean)
-    setLoadingStatus(LoadingStatus.IDDLE)
   }, [selectedTab])
 
   useEffect(() => {

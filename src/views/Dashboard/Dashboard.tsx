@@ -152,7 +152,7 @@ const Dashboard: React.FC<{
     return <CohortNoPatient />
   }
 
-  const groupId = context !== 'patients' ? cohortId || perimetreIds : undefined
+  const groupId = context !== 'patients' ? cohortId ?? perimetreIds : undefined
 
   return (
     <Grid
@@ -227,14 +227,12 @@ const Dashboard: React.FC<{
         {selectedTab === 'documents' && (
           <Documents groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />
         )}
-        {selectedTab === 'pmsi' && (
-          <PMSIList groupId={cohortId ?? perimetreIds} deidentified={dashboard.deidentifiedBoolean ?? false} />
-        )}
+        {selectedTab === 'pmsi' && <PMSIList groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />}
         {selectedTab === 'medication' && (
-          <MedicationList groupId={cohortId ?? perimetreIds} deidentified={dashboard.deidentifiedBoolean ?? false} />
+          <MedicationList groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />
         )}
         {selectedTab === 'biology' && (
-          <BiologyList groupId={cohortId ?? perimetreIds} deidentified={dashboard.deidentifiedBoolean ?? false} />
+          <BiologyList groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />
         )}
         {selectedTab === 'imaging' && (
           <ImagingList groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />

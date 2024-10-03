@@ -44,6 +44,7 @@ import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { CanceledError } from 'axios'
 
 type DocumentsProps = {
   groupId?: string
@@ -179,19 +180,23 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {
       console.error('Erreur lors de la récupération des documents', error)
-      setDocuments([])
-      setSearchInputError(error as SearchInputError)
-      setLoadingStatus(LoadingStatus.SUCCESS)
-      setDocumentsResult((prevState) => ({
-        ...prevState,
-        nb: 0,
-        total: 0
-      }))
-      setPatientsResult((prevState) => ({
-        ...prevState,
-        nb: 0,
-        total: 0
-      }))
+      if (error instanceof CanceledError) {
+        setLoadingStatus(LoadingStatus.FETCHING)
+      } else {
+        setDocuments([])
+        setSearchInputError(error as SearchInputError)
+        setLoadingStatus(LoadingStatus.SUCCESS)
+        setDocumentsResult((prevState) => ({
+          ...prevState,
+          nb: 0,
+          total: 0
+        }))
+        setPatientsResult((prevState) => ({
+          ...prevState,
+          nb: 0,
+          total: 0
+        }))
+      }
     }
   }
 
@@ -228,10 +233,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   ])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
     setSearchParams({ page: page.toString() })
 
-    handlePageError(page, setPage, dispatch)
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 
   useEffect(() => {

@@ -114,7 +114,7 @@ const DataTableObservationLine: React.FC<{
     (code) => code.system === appConfig.features.observation.valueSets.biologyHierarchyLoinc.url && code.userSelected
   )?.display
   const result =
-    observation.valueQuantity?.value !== null
+    observation.valueQuantity && observation.valueQuantity?.value !== null
       ? `${observation.valueQuantity?.value} ${observation.valueQuantity?.unit ?? ''}`
       : '-'
   const valueUnit = observation.valueQuantity?.unit ?? ''

@@ -471,117 +471,104 @@ const servicesCohorts: IServiceCohorts = {
         filters: { ipp, nda, startDate, endDate, executiveUnits, encounterStatus, diagnosticTypes, code, source }
       }
     } = options
-    try {
-      const fetchers = {
-        [ResourceType.CONDITION]: fetchCondition,
-        [ResourceType.PROCEDURE]: fetchProcedure,
-        [ResourceType.CLAIM]: fetchClaim
-      }
+    const fetchers = {
+      [ResourceType.CONDITION]: fetchCondition,
+      [ResourceType.PROCEDURE]: fetchProcedure,
+      [ResourceType.CLAIM]: fetchClaim
+    }
 
-      const commonFilters = () => ({
-        _list: groupId ? [groupId] : [],
-        size: 20,
-        offset: page ? (page - 1) * 20 : 0,
-        _sort: mapToOrderByCode(orderBy.orderBy, selectedTab),
-        sortDirection: orderBy.orderDirection,
-        _text: searchInput === '' ? '' : searchInput,
-        'encounter-identifier': nda,
-        'patient-identifier': ipp,
-        signal: signal,
-        executiveUnits: executiveUnits.map((unit) => unit.id),
-        encounterStatus: encounterStatus.map(({ id }) => id)
+    const commonFilters = () => ({
+      _list: groupId ? [groupId] : [],
+      size: 20,
+      offset: page ? (page - 1) * 20 : 0,
+      _sort: mapToOrderByCode(orderBy.orderBy, selectedTab),
+      sortDirection: orderBy.orderDirection,
+      _text: searchInput === '' ? '' : searchInput,
+      'encounter-identifier': nda,
+      'patient-identifier': ipp,
+      signal: signal,
+      executiveUnits: executiveUnits.map((unit) => unit.id),
+      encounterStatus: encounterStatus.map(({ id }) => id)
+    })
+
+    // Filtres spécifiques par ressource
+    const filtersMapper = {
+      [ResourceType.CONDITION]: () => ({
+        ...commonFilters(),
+        code: code.map((e) => encodeURIComponent(`${mapToUrlCode(selectedTab)}|`) + e.id).join(','),
+        source: source,
+        type: diagnosticTypes?.map((type) => type.id),
+        'min-recorded-date': startDate ?? '',
+        'max-recorded-date': endDate ?? '',
+        uniqueFacet: ['subject']
+      }),
+      [ResourceType.PROCEDURE]: () => ({
+        ...commonFilters(),
+        code: code.map((e) => encodeURIComponent(`${mapToUrlCode(selectedTab)}|`) + e.id).join(','),
+        source: source,
+        minDate: startDate ?? '',
+        maxDate: endDate ?? '',
+        uniqueFacet: ['subject']
+      }),
+      [ResourceType.CLAIM]: () => ({
+        ...commonFilters(),
+        diagnosis: code.map((e) => encodeURIComponent(`${mapToUrlCode(selectedTab)}|`) + e.id).join(','),
+        minCreated: startDate ?? '',
+        maxCreated: endDate ?? '',
+        uniqueFacet: ['patient']
       })
+    }
 
-      // Filtres spécifiques par ressource
-      const filtersMapper = {
-        [ResourceType.CONDITION]: () => ({
-          ...commonFilters(),
-          code: code.map((e) => encodeURIComponent(`${mapToUrlCode(selectedTab)}|`) + e.id).join(','),
-          source: source,
-          type: diagnosticTypes?.map((type) => type.id),
-          'min-recorded-date': startDate ?? '',
-          'max-recorded-date': endDate ?? '',
-          uniqueFacet: ['subject']
-        }),
-        [ResourceType.PROCEDURE]: () => ({
-          ...commonFilters(),
-          code: code.map((e) => encodeURIComponent(`${mapToUrlCode(selectedTab)}|`) + e.id).join(','),
-          source: source,
-          minDate: startDate ?? '',
-          maxDate: endDate ?? '',
-          uniqueFacet: ['subject']
-        }),
-        [ResourceType.CLAIM]: () => ({
-          ...commonFilters(),
-          diagnosis: code.map((e) => encodeURIComponent(`${mapToUrlCode(selectedTab)}|`) + e.id).join(','),
-          minCreated: startDate ?? '',
-          maxCreated: endDate ?? '',
-          uniqueFacet: ['patient']
-        })
-      }
+    const fetcher = fetchers[selectedTab]
+    const filters = filtersMapper[selectedTab]()
 
-      const fetcher = fetchers[selectedTab]
-      const filters = filtersMapper[selectedTab]()
+    const atLeastAFilter =
+      !!searchInput ||
+      !!ipp ||
+      !!nda ||
+      !!startDate ||
+      !!endDate ||
+      executiveUnits.length > 0 ||
+      encounterStatus.length > 0 ||
+      (diagnosticTypes && diagnosticTypes.length > 0) ||
+      code.length > 0 ||
+      !!source
 
-      const atLeastAFilter =
-        !!searchInput ||
-        !!ipp ||
-        !!nda ||
-        !!startDate ||
-        !!endDate ||
-        executiveUnits.length > 0 ||
-        encounterStatus.length > 0 ||
-        (diagnosticTypes && diagnosticTypes.length > 0) ||
-        code.length > 0 ||
-        !!source
+    const [pmsiList, allPMSIList] = await Promise.all([
+      fetcher(filters),
+      atLeastAFilter
+        ? fetcher({
+            size: 0,
+            signal: signal,
+            _list: groupId ? [groupId] : [],
+            uniqueFacet: [selectedTab === ResourceType.CLAIM ? 'patient' : 'subject']
+          })
+        : null
+    ])
 
-      const [pmsiList, allPMSIList] = await Promise.all([
-        fetcher(filters),
-        atLeastAFilter
-          ? fetcher({
-              size: 0,
-              signal: signal,
-              _list: groupId ? [groupId] : [],
-              uniqueFacet: [selectedTab === ResourceType.CLAIM ? 'patient' : 'subject']
-            })
-          : null
-      ])
+    const _pmsiList =
+      getApiResponseResources(pmsiList as AxiosResponse<FHIR_Bundle_Response<Condition | Procedure | Claim>, any>) ?? []
+    const filledPmsiList = await getResourceInfos(_pmsiList, deidentified, groupId, signal)
 
-      const _pmsiList =
-        getApiResponseResources(pmsiList as AxiosResponse<FHIR_Bundle_Response<Condition | Procedure | Claim>, any>) ??
-        []
-      const filledPmsiList = await getResourceInfos(_pmsiList, deidentified, groupId, signal)
+    const totalPMSI = pmsiList?.data?.resourceType === 'Bundle' ? pmsiList.data.total : 0
+    const totalAllPMSI = allPMSIList?.data?.resourceType === 'Bundle' ? allPMSIList.data?.total ?? totalPMSI : totalPMSI
 
-      const totalPMSI = pmsiList?.data?.resourceType === 'Bundle' ? pmsiList.data.total : 0
-      const totalAllPMSI =
-        allPMSIList?.data?.resourceType === 'Bundle' ? allPMSIList.data?.total ?? totalPMSI : totalPMSI
+    const uniquePatientFacet = selectedTab === ResourceType.CLAIM ? 'unique-patient' : 'unique-subject'
+    const totalPatientPMSI =
+      pmsiList?.data?.resourceType === 'Bundle'
+        ? (getExtension(pmsiList?.data?.meta, uniquePatientFacet) || { valueDecimal: 0 }).valueDecimal
+        : 0
+    const totalAllPatientsPMSI =
+      allPMSIList !== null
+        ? (getExtension(allPMSIList?.data?.meta, uniquePatientFacet) || { valueDecimal: 0 }).valueDecimal
+        : totalPatientPMSI
 
-      const uniquePatientFacet = selectedTab === ResourceType.CLAIM ? 'unique-patient' : 'unique-subject'
-      const totalPatientPMSI =
-        pmsiList?.data?.resourceType === 'Bundle'
-          ? (getExtension(pmsiList?.data?.meta, uniquePatientFacet) || { valueDecimal: 0 }).valueDecimal
-          : 0
-      const totalAllPatientsPMSI =
-        allPMSIList !== null
-          ? (getExtension(allPMSIList?.data?.meta, uniquePatientFacet) || { valueDecimal: 0 }).valueDecimal
-          : totalPatientPMSI
-
-      return {
-        totalPMSI: totalPMSI ?? 0,
-        totalAllPMSI: totalAllPMSI ?? 0,
-        totalPatientPMSI: totalPatientPMSI ?? 0,
-        totalAllPatientsPMSI: totalAllPatientsPMSI ?? 0,
-        pmsiList: filledPmsiList as CohortPMSI[]
-      }
-    } catch (error) {
-      console.error('Erreur lors de la récupération de la liste PMSI :', error)
-      return {
-        totalPMSI: 0,
-        totalAllPMSI: 0,
-        totalPatientPMSI: 0,
-        totalAllPatientsPMSI: 0,
-        pmsiList: []
-      }
+    return {
+      totalPMSI: totalPMSI ?? 0,
+      totalAllPMSI: totalAllPMSI ?? 0,
+      totalPatientPMSI: totalPatientPMSI ?? 0,
+      totalAllPatientsPMSI: totalAllPatientsPMSI ?? 0,
+      pmsiList: filledPmsiList as CohortPMSI[]
     }
   },
 
@@ -605,105 +592,94 @@ const servicesCohorts: IServiceCohorts = {
         }
       }
     } = options
-    try {
-      const fetchers = {
-        [ResourceType.MEDICATION_REQUEST]: fetchMedicationRequest,
-        [ResourceType.MEDICATION_ADMINISTRATION]: fetchMedicationAdministration
-      }
+    const fetchers = {
+      [ResourceType.MEDICATION_REQUEST]: fetchMedicationRequest,
+      [ResourceType.MEDICATION_ADMINISTRATION]: fetchMedicationAdministration
+    }
 
-      const commonFilters = () => ({
-        _list: groupId ? [groupId] : [],
-        size: 20,
-        offset: page ? (page - 1) * 20 : 0,
-        _sort: mapMedicationToOrderByCode(orderBy.orderBy, selectedTab),
-        sortDirection: orderBy.orderDirection,
-        _text: searchInput === '' ? '' : searchInput,
-        encounter: nda,
-        patientIds: ipp,
-        signal: signal,
-        executiveUnits: executiveUnits.map((unit) => unit.id),
-        encounterStatus: encounterStatus.map(({ id }) => id),
-        minDate: startDate ?? '',
-        maxDate: endDate ?? '',
-        uniqueFacet: ['subject']
+    const commonFilters = () => ({
+      _list: groupId ? [groupId] : [],
+      size: 20,
+      offset: page ? (page - 1) * 20 : 0,
+      _sort: mapMedicationToOrderByCode(orderBy.orderBy, selectedTab),
+      sortDirection: orderBy.orderDirection,
+      _text: searchInput === '' ? '' : searchInput,
+      encounter: nda,
+      patientIds: ipp,
+      signal: signal,
+      executiveUnits: executiveUnits.map((unit) => unit.id),
+      encounterStatus: encounterStatus.map(({ id }) => id),
+      minDate: startDate ?? '',
+      maxDate: endDate ?? '',
+      uniqueFacet: ['subject']
+    })
+
+    const filtersMapper = {
+      [ResourceType.MEDICATION_REQUEST]: () => ({
+        ...commonFilters(),
+        type: prescriptionTypes?.map((type) => type.id)
+      }),
+      [ResourceType.MEDICATION_ADMINISTRATION]: () => ({
+        ...commonFilters(),
+        route: administrationRoutes?.map((route) => route.id)
       })
+    }
 
-      const filtersMapper = {
-        [ResourceType.MEDICATION_REQUEST]: () => ({
-          ...commonFilters(),
-          type: prescriptionTypes?.map((type) => type.id)
-        }),
-        [ResourceType.MEDICATION_ADMINISTRATION]: () => ({
-          ...commonFilters(),
-          route: administrationRoutes?.map((route) => route.id)
-        })
-      }
+    const fetcher = fetchers[selectedTab]
+    const filters = filtersMapper[selectedTab]()
 
-      const fetcher = fetchers[selectedTab]
-      const filters = filtersMapper[selectedTab]()
+    const atLeastAFilter =
+      !!searchInput ||
+      !!ipp ||
+      !!nda ||
+      !!startDate ||
+      !!endDate ||
+      executiveUnits.length > 0 ||
+      encounterStatus.length > 0 ||
+      (administrationRoutes && administrationRoutes.length > 0) ||
+      (prescriptionTypes && prescriptionTypes.length > 0)
 
-      const atLeastAFilter =
-        !!searchInput ||
-        !!ipp ||
-        !!nda ||
-        !!startDate ||
-        !!endDate ||
-        executiveUnits.length > 0 ||
-        encounterStatus.length > 0 ||
-        (administrationRoutes && administrationRoutes.length > 0) ||
-        (prescriptionTypes && prescriptionTypes.length > 0)
+    const [medicationList, allMedicationList] = await Promise.all([
+      fetcher(filters),
+      atLeastAFilter
+        ? fetcher({
+            size: 0,
+            signal: signal,
+            _list: groupId ? [groupId] : [],
+            uniqueFacet: ['subject'],
+            minDate: null,
+            maxDate: null
+          })
+        : null
+    ])
 
-      const [medicationList, allMedicationList] = await Promise.all([
-        fetcher(filters),
-        atLeastAFilter
-          ? fetcher({
-              size: 0,
-              signal: signal,
-              _list: groupId ? [groupId] : [],
-              uniqueFacet: ['subject'],
-              minDate: null,
-              maxDate: null
-            })
-          : null
-      ])
+    const _medicationList =
+      getApiResponseResources(
+        medicationList as AxiosResponse<FHIR_Bundle_Response<MedicationRequest | MedicationAdministration>, any>
+      ) ?? []
+    const filledMedicationList = await getResourceInfos(_medicationList, deidentified, groupId, signal)
 
-      const _medicationList =
-        getApiResponseResources(
-          medicationList as AxiosResponse<FHIR_Bundle_Response<MedicationRequest | MedicationAdministration>, any>
-        ) ?? []
-      const filledMedicationList = await getResourceInfos(_medicationList, deidentified, groupId, signal)
+    const totalMedication = medicationList?.data?.resourceType === 'Bundle' ? medicationList.data.total : 0
+    const totalAllMedication =
+      allMedicationList?.data?.resourceType === 'Bundle'
+        ? allMedicationList.data?.total ?? totalMedication
+        : totalMedication
 
-      const totalMedication = medicationList?.data?.resourceType === 'Bundle' ? medicationList.data.total : 0
-      const totalAllMedication =
-        allMedicationList?.data?.resourceType === 'Bundle'
-          ? allMedicationList.data?.total ?? totalMedication
-          : totalMedication
+    const totalPatientMedication =
+      medicationList?.data?.resourceType === 'Bundle'
+        ? (getExtension(medicationList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
+        : 0
+    const totalAllPatientsMedication =
+      allMedicationList !== null
+        ? (getExtension(allMedicationList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
+        : totalPatientMedication
 
-      const totalPatientMedication =
-        medicationList?.data?.resourceType === 'Bundle'
-          ? (getExtension(medicationList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
-          : 0
-      const totalAllPatientsMedication =
-        allMedicationList !== null
-          ? (getExtension(allMedicationList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
-          : totalPatientMedication
-
-      return {
-        totalMedication: totalMedication ?? 0,
-        totalAllMedication: totalAllMedication ?? 0,
-        totalPatientMedication: totalPatientMedication ?? 0,
-        totalAllPatientsMedication: totalAllPatientsMedication ?? 0,
-        medicationList: filledMedicationList as CohortMedication<MedicationRequest | MedicationAdministration>[]
-      }
-    } catch (error) {
-      console.error('Erreur lors de la récupération de la liste Medication :', error)
-      return {
-        totalMedication: 0,
-        totalAllMedication: 0,
-        totalPatientMedication: 0,
-        totalAllPatientsMedication: 0,
-        medicationList: []
-      }
+    return {
+      totalMedication: totalMedication ?? 0,
+      totalAllMedication: totalAllMedication ?? 0,
+      totalPatientMedication: totalPatientMedication ?? 0,
+      totalAllPatientsMedication: totalAllPatientsMedication ?? 0,
+      medicationList: filledMedicationList as CohortMedication<MedicationRequest | MedicationAdministration>[]
     }
   },
 
@@ -717,82 +693,71 @@ const servicesCohorts: IServiceCohorts = {
         filters: { validatedStatus, nda, ipp, loinc, anabio, startDate, endDate, executiveUnits, encounterStatus }
       }
     } = options
-    try {
-      const atLeastAFilter =
-        !!searchInput ||
-        !!ipp ||
-        !!nda ||
-        !!startDate ||
-        !!endDate ||
-        executiveUnits.length > 0 ||
-        encounterStatus.length > 0 ||
-        (loinc && loinc.length > 0) ||
-        (anabio && anabio.length > 0)
+    const atLeastAFilter =
+      !!searchInput ||
+      !!ipp ||
+      !!nda ||
+      !!startDate ||
+      !!endDate ||
+      executiveUnits.length > 0 ||
+      encounterStatus.length > 0 ||
+      (loinc && loinc.length > 0) ||
+      (anabio && anabio.length > 0)
 
-      const [biologyList, allBiologyList] = await Promise.all([
-        fetchObservation({
-          _list: groupId ? [groupId] : [],
-          size: 20,
-          offset: page ? (page - 1) * 20 : 0,
-          _sort: orderBy.orderBy,
-          sortDirection: orderBy.orderDirection,
-          _text: searchInput === '' ? '' : searchInput,
-          encounter: nda,
-          'patient-identifier': ipp,
-          signal: signal,
-          executiveUnits: executiveUnits.map((unit) => unit.id),
-          encounterStatus: encounterStatus.map(({ id }) => id),
-          uniqueFacet: ['subject'],
-          minDate: startDate ?? '',
-          maxDate: endDate ?? '',
-          loinc: loinc.map((code) => code.id).join(),
-          anabio: anabio.map((code) => code.id).join(),
-          rowStatus: validatedStatus
-        }),
-        atLeastAFilter
-          ? fetchObservation({
-              size: 0,
-              signal: signal,
-              _list: groupId ? [groupId] : [],
-              uniqueFacet: ['subject'],
-              rowStatus: validatedStatus
-            })
-          : null
-      ])
+    const [biologyList, allBiologyList] = await Promise.all([
+      fetchObservation({
+        _list: groupId ? [groupId] : [],
+        size: 20,
+        offset: page ? (page - 1) * 20 : 0,
+        _sort: orderBy.orderBy,
+        sortDirection: orderBy.orderDirection,
+        _text: searchInput === '' ? '' : searchInput,
+        encounter: nda,
+        'patient-identifier': ipp,
+        signal: signal,
+        executiveUnits: executiveUnits.map((unit) => unit.id),
+        encounterStatus: encounterStatus.map(({ id }) => id),
+        uniqueFacet: ['subject'],
+        minDate: startDate ?? '',
+        maxDate: endDate ?? '',
+        loinc: loinc.map((code) => code.id).join(),
+        anabio: anabio.map((code) => code.id).join(),
+        rowStatus: validatedStatus
+      }),
+      atLeastAFilter
+        ? fetchObservation({
+            size: 0,
+            signal: signal,
+            _list: groupId ? [groupId] : [],
+            uniqueFacet: ['subject'],
+            rowStatus: validatedStatus
+          })
+        : null
+    ])
 
-      const _biologyList =
-        getApiResponseResources(biologyList as AxiosResponse<FHIR_Bundle_Response<Observation>, any>) ?? []
-      const filledBiologyList = await getResourceInfos(_biologyList, deidentified, groupId, signal)
+    const _biologyList =
+      getApiResponseResources(biologyList as AxiosResponse<FHIR_Bundle_Response<Observation>, any>) ?? []
+    const filledBiologyList = await getResourceInfos(_biologyList, deidentified, groupId, signal)
 
-      const totalBiology = biologyList?.data?.resourceType === 'Bundle' ? biologyList.data.total : 0
-      const totalAllBiology =
-        allBiologyList?.data?.resourceType === 'Bundle' ? allBiologyList.data?.total ?? totalBiology : totalBiology
+    const totalBiology = biologyList?.data?.resourceType === 'Bundle' ? biologyList.data.total : 0
+    const totalAllBiology =
+      allBiologyList?.data?.resourceType === 'Bundle' ? allBiologyList.data?.total ?? totalBiology : totalBiology
 
-      const totalPatientBiology =
-        biologyList?.data?.resourceType === 'Bundle'
-          ? (getExtension(biologyList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
-          : 0
-      const totalAllPatientsBiology =
-        allBiologyList !== null
-          ? (getExtension(allBiologyList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
-          : totalPatientBiology
+    const totalPatientBiology =
+      biologyList?.data?.resourceType === 'Bundle'
+        ? (getExtension(biologyList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
+        : 0
+    const totalAllPatientsBiology =
+      allBiologyList !== null
+        ? (getExtension(allBiologyList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
+        : totalPatientBiology
 
-      return {
-        totalBiology: totalBiology ?? 0,
-        totalAllBiology: totalAllBiology ?? 0,
-        totalPatientBiology: totalPatientBiology ?? 0,
-        totalAllPatientsBiology: totalAllPatientsBiology ?? 0,
-        biologyList: filledBiologyList as CohortObservation[]
-      }
-    } catch (error) {
-      console.error('Erreur lors de la récupération de la liste de Biologie :', error)
-      return {
-        totalBiology: 0,
-        totalAllBiology: 0,
-        totalPatientBiology: 0,
-        totalAllPatientsBiology: 0,
-        biologyList: []
-      }
+    return {
+      totalBiology: totalBiology ?? 0,
+      totalAllBiology: totalAllBiology ?? 0,
+      totalPatientBiology: totalPatientBiology ?? 0,
+      totalAllPatientsBiology: totalAllPatientsBiology ?? 0,
+      biologyList: filledBiologyList as CohortObservation[]
     }
   },
 
@@ -806,72 +771,61 @@ const servicesCohorts: IServiceCohorts = {
         filters: { ipp, nda, startDate, endDate, executiveUnits, modality, encounterStatus }
       }
     } = options
-    try {
-      const [imagingResponse, allImagingResponse] = await Promise.all([
-        fetchImaging({
-          size: 20,
-          offset: page ? (page - 1) * 20 : 0,
-          order: orderBy.orderBy,
-          orderDirection: orderBy.orderDirection,
-          _text: searchInput,
-          encounter: nda,
-          ipp,
-          minDate: startDate ?? '',
-          maxDate: endDate ?? '',
-          _list: groupId ? [groupId] : [],
-          signal,
-          modalities: modality.map(({ id }) => id),
-          executiveUnits: executiveUnits.map((unit) => unit.id),
-          encounterStatus: encounterStatus.map(({ id }) => id),
-          uniqueFacet: ['subject']
-        }),
-        !!searchInput || !!ipp || !!nda || !!startDate || !!endDate || executiveUnits.length > 0 || modality.length > 0
-          ? fetchImaging({
-              size: 0,
-              _list: groupId ? [groupId] : [],
-              signal: signal,
-              uniqueFacet: ['subject']
-            })
-          : null
-      ])
+    const [imagingResponse, allImagingResponse] = await Promise.all([
+      fetchImaging({
+        size: 20,
+        offset: page ? (page - 1) * 20 : 0,
+        order: orderBy.orderBy,
+        orderDirection: orderBy.orderDirection,
+        _text: searchInput,
+        encounter: nda,
+        ipp,
+        minDate: startDate ?? '',
+        maxDate: endDate ?? '',
+        _list: groupId ? [groupId] : [],
+        signal,
+        modalities: modality.map(({ id }) => id),
+        executiveUnits: executiveUnits.map((unit) => unit.id),
+        encounterStatus: encounterStatus.map(({ id }) => id),
+        uniqueFacet: ['subject']
+      }),
+      !!searchInput || !!ipp || !!nda || !!startDate || !!endDate || executiveUnits.length > 0 || modality.length > 0
+        ? fetchImaging({
+            size: 0,
+            _list: groupId ? [groupId] : [],
+            signal: signal,
+            uniqueFacet: ['subject']
+          })
+        : null
+    ])
 
-      const imagingList = getApiResponseResources(imagingResponse) ?? []
-      const completeImagingList = await getResourceInfos<ImagingStudy, CohortImaging>(
-        imagingList,
-        deidentified,
-        groupId,
-        signal
-      )
+    const imagingList = getApiResponseResources(imagingResponse) ?? []
+    const completeImagingList = await getResourceInfos<ImagingStudy, CohortImaging>(
+      imagingList,
+      deidentified,
+      groupId,
+      signal
+    )
 
-      const totalImaging = imagingResponse.data?.resourceType === 'Bundle' ? imagingResponse.data?.total : 0
-      const totalAllImaging =
-        allImagingResponse?.data?.resourceType === 'Bundle' ? allImagingResponse.data.total : totalImaging
+    const totalImaging = imagingResponse.data?.resourceType === 'Bundle' ? imagingResponse.data?.total : 0
+    const totalAllImaging =
+      allImagingResponse?.data?.resourceType === 'Bundle' ? allImagingResponse.data.total : totalImaging
 
-      const totalPatientImaging =
-        imagingResponse.data?.resourceType === 'Bundle'
-          ? (getExtension(imagingResponse?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
-          : 0
-      const totalAllPatientsImaging =
-        allImagingResponse !== null
-          ? (getExtension(allImagingResponse?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
-          : totalPatientImaging
+    const totalPatientImaging =
+      imagingResponse.data?.resourceType === 'Bundle'
+        ? (getExtension(imagingResponse?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
+        : 0
+    const totalAllPatientsImaging =
+      allImagingResponse !== null
+        ? (getExtension(allImagingResponse?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
+        : totalPatientImaging
 
-      return {
-        totalImaging: totalImaging ?? 0,
-        totalAllImaging: totalAllImaging ?? 0,
-        totalPatientImaging: totalPatientImaging ?? 0,
-        totalAllPatientImaging: totalAllPatientsImaging ?? 0,
-        imagingList: completeImagingList ?? []
-      }
-    } catch (error) {
-      console.error("Erreur lors de la récupération de la liste d'imagerie :", error)
-      return {
-        totalImaging: 0,
-        totalAllImaging: 0,
-        totalPatientImaging: 0,
-        totalAllPatientImaging: 0,
-        imagingList: []
-      }
+    return {
+      totalImaging: totalImaging ?? 0,
+      totalAllImaging: totalAllImaging ?? 0,
+      totalPatientImaging: totalPatientImaging ?? 0,
+      totalAllPatientImaging: totalAllPatientsImaging ?? 0,
+      imagingList: completeImagingList ?? []
     }
   },
 

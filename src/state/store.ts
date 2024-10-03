@@ -61,7 +61,17 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
+        ignoredActions: [
+          FLUSH,
+          REHYDRATE,
+          PAUSE,
+          PERSIST,
+          PURGE,
+          REGISTER,
+          'warningDialog/showDialog',
+          'warningDialog/onConfirm'
+        ],
+        ignoredPaths: ['warningDialog.showDialog', 'warningDialog.onConfirm']
       }
     })
       .prepend(

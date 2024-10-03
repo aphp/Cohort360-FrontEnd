@@ -117,10 +117,9 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
   }, [status, startDate, endDate, minPatients, maxPatients, searchInput, orderBy, favorite])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
     setSearchParams({ page: page.toString() })
 
-    handlePageError(page, setPage, dispatch)
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 
   useEffect(() => {

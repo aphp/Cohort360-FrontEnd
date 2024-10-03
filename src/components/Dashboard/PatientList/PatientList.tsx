@@ -165,10 +165,9 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   }, [genders, vitalStatuses, birthdatesRanges, orderBy, searchBy, searchInput, groupId])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
     setSearchParams({ page: page.toString() })
 
-    handlePageError(page, setPage, dispatch)
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 
   useEffect(() => {
