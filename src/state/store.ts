@@ -24,6 +24,7 @@ import pmsi from './pmsi'
 import me from './me'
 import syncHierarchyTable from './syncHierarchyTable'
 import warningDialog from './warningDialog'
+import valueSets from './valueSets'
 
 const cohortCreationReducer = combineReducers({
   criteria,
@@ -33,6 +34,7 @@ const cohortCreationReducer = combineReducers({
 const rootReducer = combineReducers({
   me,
   cohortCreation: cohortCreationReducer,
+  valueSets,
   exploredCohort,
   drawer,
   message,
