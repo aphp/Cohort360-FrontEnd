@@ -1,6 +1,7 @@
 import { AppDispatch } from 'state'
 import { getConfig } from 'config'
 import { showDialog } from 'state/warningDialog'
+import { LoadingStatus } from 'types'
 
 export const checkIfPageAvailable = (
   count: number,
@@ -23,9 +24,14 @@ export const checkIfPageAvailable = (
   }
 }
 
-export const handlePageError = (page: number, setPage: (page: number) => void, dispatch: AppDispatch) => {
+export const handlePageError = (
+  page: number,
+  setPage: (page: number) => void,
+  dispatch: AppDispatch,
+  setLoadingStatus: (loadingStatus: LoadingStatus) => void
+) => {
   const config = getConfig()
-  if (isNaN(page)) {
+  if (isNaN(page) || page <= 0) {
     setPage(1)
   } else if (page > config.core.pagination.limit) {
     dispatch(
@@ -35,5 +41,7 @@ export const handlePageError = (page: number, setPage: (page: number) => void, d
         onConfirm: () => setPage(1)
       })
     )
+  } else {
+    setLoadingStatus(LoadingStatus.IDDLE)
   }
 }

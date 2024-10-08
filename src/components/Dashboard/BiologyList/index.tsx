@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { useAppSelector } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 
 import { Checkbox, Chip, CircularProgress, Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { Save, SavedSearch, FilterList } from '@mui/icons-material'
@@ -30,11 +30,13 @@ import { selectFiltersAsArray } from 'utils/filters'
 import DataTableObservation from 'components/DataTable/DataTableObservation'
 import AnabioFilter from 'components/Filters/AnabioFilter'
 import LoincFilter from 'components/Filters/LoincFilter'
+import { useSearchParams } from 'react-router-dom'
 import { SourceType } from 'types/scope'
 import {
   fetchLoincCodes as fetchLoincCodesApi,
   fetchAnabioCodes as fetchAnabioCodesApi
 } from 'services/aphp/serviceBiology'
+import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
 type BiologyListProps = {
   groupId?: string
@@ -44,6 +46,9 @@ type BiologyListProps = {
 const BiologyList = ({ groupId, deidentified }: BiologyListProps) => {
   const theme = useTheme()
   const isMd = useMediaQuery(theme.breakpoints.down('lg'))
+  const dispatch = useAppDispatch()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const getPageParam = searchParams.get('page')
 
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
@@ -52,7 +57,7 @@ const BiologyList = ({ groupId, deidentified }: BiologyListProps) => {
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
 
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const {
     allSavedFilters,
     savedFiltersErrors,
@@ -105,6 +110,7 @@ const BiologyList = ({ groupId, deidentified }: BiologyListProps) => {
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
+  const isFirstRender = useRef(true)
 
   const _fetchBiology = async () => {
     try {
@@ -136,9 +142,12 @@ const BiologyList = ({ groupId, deidentified }: BiologyListProps) => {
           nb: totalPatientBiology,
           total: totalAllPatientsBiology
         }))
+
+        checkIfPageAvailable(totalBiology, page, setPage, dispatch)
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {
+      console.error('Erreur lors de la récupération de la liste de Biologie :', error)
       if (error instanceof CanceledError) {
         setLoadingStatus(LoadingStatus.FETCHING)
       } else {
@@ -172,8 +181,12 @@ const BiologyList = ({ groupId, deidentified }: BiologyListProps) => {
   }, [])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
-    setPage(1)
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+    } else {
+      setLoadingStatus(LoadingStatus.IDDLE)
+      setPage(1)
+    }
   }, [
     searchInput,
     orderBy,
@@ -185,11 +198,13 @@ const BiologyList = ({ groupId, deidentified }: BiologyListProps) => {
     startDate,
     endDate,
     executiveUnits,
-    encounterStatus
+    encounterStatus,
+    groupId
   ])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
+    setSearchParams({ page: page.toString() })
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 
   useEffect(() => {

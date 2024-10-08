@@ -151,12 +151,11 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   }, [nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality, encounterStatus])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
     const updatedSearchParams = new URLSearchParams(searchParams)
     updatedSearchParams.set('page', page.toString())
     setSearchParams(updatedSearchParams)
 
-    handlePageError(page, setPage, dispatch)
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 
   useEffect(() => {

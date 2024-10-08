@@ -141,6 +141,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
 
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {
+      console.error("Erreur lors de la récupération de la liste d'imagerie :", error)
       if (error instanceof CanceledError) {
         setLoadingStatus(LoadingStatus.FETCHING)
       } else {
@@ -183,10 +184,9 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   }, [ipp, nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality, groupId, encounterStatus])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
     setSearchParams({ page: page.toString() })
 
-    handlePageError(page, setPage, dispatch)
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 
   useEffect(() => {

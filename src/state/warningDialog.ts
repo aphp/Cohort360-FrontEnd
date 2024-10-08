@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-export type ConfirmationDialogState = {
+export type WarningDialogState = {
   isOpen: boolean
   message?: string
   onConfirm?: () => void
@@ -13,10 +13,10 @@ const initialState = {
 }
 
 const setWarningDialogSlice = createSlice({
-  name: 'confirmationDialog',
+  name: 'warningDialog',
   initialState,
   reducers: {
-    showDialog: (state: ConfirmationDialogState, action: PayloadAction<ConfirmationDialogState>) => {
+    showDialog: (state: WarningDialogState, action: PayloadAction<WarningDialogState>) => {
       state.isOpen = true
       state.message = action.payload.message
       state.onConfirm = action.payload.onConfirm

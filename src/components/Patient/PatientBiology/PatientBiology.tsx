@@ -166,12 +166,10 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
   }, [nda, loinc, anabio, startDate, endDate, executiveUnits, validatedStatus, orderBy, searchInput, encounterStatus])
 
   useEffect(() => {
-    setLoadingStatus(LoadingStatus.IDDLE)
     const updatedSearchParams = new URLSearchParams(searchParams)
     updatedSearchParams.set('page', page.toString())
     setSearchParams(updatedSearchParams)
-
-    handlePageError(page, setPage, dispatch)
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 
   useEffect(() => {
