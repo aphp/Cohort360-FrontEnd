@@ -156,26 +156,20 @@ const MedicationList = ({ groupId, deidentified }: MedicationListProps) => {
       )
 
       if (response) {
-        const {
-          totalMedication,
-          totalAllMedication,
-          totalPatientMedication,
-          totalAllPatientsMedication,
-          medicationList
-        } = response
+        const { total, totalAllResults, totalPatients, totalAllPatients, list } = response
         setSearchResults((prevState) => ({
           ...prevState,
-          nb: totalMedication,
-          total: totalAllMedication,
+          nb: total,
+          total: totalAllResults,
           label: mapToLabel(selectedTab.id)
         }))
-        setMedicationList(medicationList)
+        setMedicationList(list)
         setPatientsResults((prevState) => ({
           ...prevState,
-          nb: totalPatientMedication,
-          total: totalAllPatientsMedication
+          nb: totalPatients,
+          total: totalAllPatients
         }))
-        checkIfPageAvailable(totalMedication, page, setPage, dispatch)
+        checkIfPageAvailable(total, page, setPage, dispatch)
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {

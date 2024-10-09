@@ -139,20 +139,20 @@ const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
       )
 
       if (response) {
-        const { totalPMSI, totalAllPMSI, totalPatientPMSI, totalAllPatientsPMSI, pmsiList } = response
+        const { total, totalAllResults, totalPatients, totalAllPatients, list } = response
         setSearchResults((prevState) => ({
           ...prevState,
-          nb: totalPMSI,
-          total: totalAllPMSI,
+          nb: total,
+          total: totalAllResults,
           label: mapToLabel(selectedTab.id)
         }))
-        setPmsiList(pmsiList)
+        setPmsiList(list)
         setPatientsResults((prevState) => ({
           ...prevState,
-          nb: totalPatientPMSI,
-          total: totalAllPatientsPMSI
+          nb: totalPatients,
+          total: totalAllPatients
         }))
-        checkIfPageAvailable(totalPMSI, page, setPage, dispatch)
+        checkIfPageAvailable(total, page, setPage, dispatch)
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {

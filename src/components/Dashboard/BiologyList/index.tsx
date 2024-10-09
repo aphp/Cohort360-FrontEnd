@@ -130,20 +130,20 @@ const BiologyList = ({ groupId, deidentified }: BiologyListProps) => {
       )
 
       if (response) {
-        const { totalBiology, totalAllBiology, totalPatientBiology, totalAllPatientsBiology, biologyList } = response
+        const { total, totalAllResults, totalPatients, totalAllPatients, list } = response
         setSearchResults((prevState) => ({
           ...prevState,
-          nb: totalBiology,
-          total: totalAllBiology
+          nb: total,
+          total: totalAllResults
         }))
-        setBiologyList(biologyList)
+        setBiologyList(list)
         setPatientsResults((prevState) => ({
           ...prevState,
-          nb: totalPatientBiology,
-          total: totalAllPatientsBiology
+          nb: totalPatients,
+          total: totalAllPatients
         }))
 
-        checkIfPageAvailable(totalBiology, page, setPage, dispatch)
+        checkIfPageAvailable(total, page, setPage, dispatch)
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {

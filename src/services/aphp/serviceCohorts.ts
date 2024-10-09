@@ -6,18 +6,14 @@ import {
   AgeRepartitionType,
   GenderRepartitionType,
   ChartCode,
-  DocumentsData,
-  ImagingData,
+  CohortResults,
   CohortImaging,
   CohortComposition,
   Export,
   ExportCSVTable,
-  PmsiData,
   FHIR_Bundle_Response,
   CohortPMSI,
-  MedicationData,
   CohortMedication,
-  BiologyData,
   CohortObservation
 } from 'types'
 import {
@@ -173,7 +169,7 @@ export interface IServiceCohorts {
     },
     groupId?: string,
     signal?: AbortSignal
-  ) => Promise<DocumentsData> | Promise<SearchInputError>
+  ) => Promise<CohortResults<DocumentReference>> | Promise<SearchInputError>
 
   /**
    * Retourne la liste d'objets d'Imagerie liés à une cohorte
@@ -187,7 +183,7 @@ export interface IServiceCohorts {
     },
     groupId?: string,
     signal?: AbortSignal
-  ) => Promise<ImagingData>
+  ) => Promise<CohortResults<CohortImaging>>
 
   /**
    * Retourne la liste d'objets PMSI liés à une cohorte
@@ -201,7 +197,7 @@ export interface IServiceCohorts {
     },
     groupId?: string,
     signal?: AbortSignal
-  ) => Promise<PmsiData>
+  ) => Promise<CohortResults<CohortPMSI>>
 
   /**
    * Retourne la liste d'objets Medication liés à une cohorte
@@ -215,7 +211,7 @@ export interface IServiceCohorts {
     },
     groupId?: string,
     signal?: AbortSignal
-  ) => Promise<MedicationData>
+  ) => Promise<CohortResults<CohortMedication<MedicationRequest | MedicationAdministration>>>
 
   /**
    * Retourne la liste d'objets de biologie liés à une cohorte
@@ -228,7 +224,7 @@ export interface IServiceCohorts {
     },
     groupId?: string,
     signal?: AbortSignal
-  ) => Promise<BiologyData>
+  ) => Promise<CohortResults<CohortObservation>>
 
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
@@ -564,11 +560,11 @@ const servicesCohorts: IServiceCohorts = {
         : totalPatientPMSI
 
     return {
-      totalPMSI: totalPMSI ?? 0,
-      totalAllPMSI: totalAllPMSI ?? 0,
-      totalPatientPMSI: totalPatientPMSI ?? 0,
-      totalAllPatientsPMSI: totalAllPatientsPMSI ?? 0,
-      pmsiList: filledPmsiList as CohortPMSI[]
+      total: totalPMSI ?? 0,
+      totalAllResults: totalAllPMSI ?? 0,
+      totalPatients: totalPatientPMSI ?? 0,
+      totalAllPatients: totalAllPatientsPMSI ?? 0,
+      list: filledPmsiList as CohortPMSI[]
     }
   },
 
@@ -675,11 +671,11 @@ const servicesCohorts: IServiceCohorts = {
         : totalPatientMedication
 
     return {
-      totalMedication: totalMedication ?? 0,
-      totalAllMedication: totalAllMedication ?? 0,
-      totalPatientMedication: totalPatientMedication ?? 0,
-      totalAllPatientsMedication: totalAllPatientsMedication ?? 0,
-      medicationList: filledMedicationList as CohortMedication<MedicationRequest | MedicationAdministration>[]
+      total: totalMedication ?? 0,
+      totalAllResults: totalAllMedication ?? 0,
+      totalPatients: totalPatientMedication ?? 0,
+      totalAllPatients: totalAllPatientsMedication ?? 0,
+      list: filledMedicationList as CohortMedication<MedicationRequest | MedicationAdministration>[]
     }
   },
 
@@ -753,11 +749,11 @@ const servicesCohorts: IServiceCohorts = {
         : totalPatientBiology
 
     return {
-      totalBiology: totalBiology ?? 0,
-      totalAllBiology: totalAllBiology ?? 0,
-      totalPatientBiology: totalPatientBiology ?? 0,
-      totalAllPatientsBiology: totalAllPatientsBiology ?? 0,
-      biologyList: filledBiologyList as CohortObservation[]
+      total: totalBiology ?? 0,
+      totalAllResults: totalAllBiology ?? 0,
+      totalPatients: totalPatientBiology ?? 0,
+      totalAllPatients: totalAllPatientsBiology ?? 0,
+      list: filledBiologyList as CohortObservation[]
     }
   },
 
@@ -821,11 +817,11 @@ const servicesCohorts: IServiceCohorts = {
         : totalPatientImaging
 
     return {
-      totalImaging: totalImaging ?? 0,
-      totalAllImaging: totalAllImaging ?? 0,
-      totalPatientImaging: totalPatientImaging ?? 0,
-      totalAllPatientImaging: totalAllPatientsImaging ?? 0,
-      imagingList: completeImagingList ?? []
+      total: totalImaging ?? 0,
+      totalAllResults: totalAllImaging ?? 0,
+      totalPatients: totalPatientImaging ?? 0,
+      totalAllPatients: totalAllPatientsImaging ?? 0,
+      list: completeImagingList ?? []
     }
   },
 
@@ -929,11 +925,11 @@ const servicesCohorts: IServiceCohorts = {
     )
 
     return {
-      totalDocs: totalDocs ?? 0,
-      totalAllDocs: totalAllDocs ?? 0,
-      totalPatientDocs: totalPatientDocs ?? 0,
-      totalAllPatientDocs: totalAllPatientDocs ?? 0,
-      documentsList: filledDocumentsList ?? []
+      total: totalDocs ?? 0,
+      totalAllResults: totalAllDocs ?? 0,
+      totalPatients: totalPatientDocs ?? 0,
+      totalAllPatients: totalAllPatientDocs ?? 0,
+      list: filledDocumentsList ?? []
     }
   },
 

@@ -122,20 +122,20 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
       )
 
       if (response) {
-        const { totalImaging, totalAllImaging, totalPatientImaging, totalAllPatientImaging, imagingList } = response
-        setImagingList(imagingList)
+        const { total, totalAllResults, totalPatients, totalAllPatients, list } = response
+        setImagingList(list)
         setSearchResults((prevState) => ({
           ...prevState,
-          nb: totalImaging,
-          total: totalAllImaging
+          nb: total,
+          total: totalAllResults
         }))
 
-        checkIfPageAvailable(totalImaging, page, setPage, dispatch)
+        checkIfPageAvailable(total, page, setPage, dispatch)
 
         setPatientsResult((prevState) => ({
           ...prevState,
-          nb: totalPatientImaging,
-          total: totalAllPatientImaging
+          nb: totalPatients,
+          total: totalAllPatients
         }))
       }
 
