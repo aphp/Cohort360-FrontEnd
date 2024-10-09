@@ -278,44 +278,12 @@ export type CohortData = {
   uuid?: string
 }
 
-export type DocumentsData = {
-  totalDocs: number
-  totalAllDocs: number
-  totalPatientDocs: number
-  totalAllPatientDocs: number
-  documentsList: DocumentReference[]
-}
-
-export type ImagingData = {
-  totalImaging: number
-  totalAllImaging: number
-  totalPatientImaging: number
-  totalAllPatientImaging: number
-  imagingList: CohortImaging[]
-}
-
-export type PmsiData = {
-  totalPMSI: number
-  totalAllPMSI: number
-  totalPatientPMSI: number
-  totalAllPatientsPMSI: number
-  pmsiList: CohortPMSI[]
-}
-
-export type MedicationData = {
-  totalMedication: number
-  totalAllMedication: number
-  totalPatientMedication: number
-  totalAllPatientsMedication: number
-  medicationList: CohortMedication<MedicationRequest | MedicationAdministration>[]
-}
-
-export type BiologyData = {
-  totalBiology: number
-  totalAllBiology: number
-  totalPatientBiology: number
-  totalAllPatientsBiology: number
-  biologyList: CohortObservation[]
+export type CohortResults<T> = {
+  total: number
+  totalAllResults: number
+  totalPatients: number
+  totalAllPatients: number
+  list: T[]
 }
 
 export type PatientData = {
