@@ -645,7 +645,9 @@ export enum BiologyStatus {
 export type CohortQuestionnaireResponse = QuestionnaireResponse & {
   serviceProvider?: string
   NDA?: string
+  IPP?: string
   hospitDates?: Period
+  idPatient?: string
 }
 
 export type CohortObservation = Observation & {

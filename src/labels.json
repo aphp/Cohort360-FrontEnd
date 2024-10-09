@@ -1,0 +1,8 @@
+{
+  "formNames": {
+    "pregnancy": "Fiche de grossesse",
+    "pregnancy_pural": "Fiches de grossesse",
+    "hospit": "Formulaire d'hospitalisation",
+    "hospit_plural": "Formulaires d'hospitalisation"
+  }
+}

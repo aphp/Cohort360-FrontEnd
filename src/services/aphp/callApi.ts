@@ -949,7 +949,7 @@ export const fetchImaging = async (args: fetchImagingProps): FHIR_Bundle_Promise
   if (order) options = [...options, `_sort=${_orderDirection}${order}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
   if (encounter) options = [...options, `${ImagingParamsKeys.NDA}=${encounter}`]
-  if (ipp) options = [...options, `patient.identifier=${ipp}`]
+  if (ipp) options = [...options, `${ImagingParamsKeys.IPP}=${ipp}`]
   if (minDate) options = [...options, `${ImagingParamsKeys.DATE}=ge${minDate}`]
   if (maxDate) options = [...options, `${ImagingParamsKeys.DATE}=le${maxDate}`]
   if (modalities && modalities.length > 0) {
@@ -984,9 +984,33 @@ type fetchFormsProps = {
   executiveUnits?: string[]
   encounterStatus?: string[]
   size?: number
+  offset?: number
+  order?: Order
+  orderDirection?: Direction
+  ipp?: string
+  signal?: AbortSignal
+  uniqueFacet?: string[]
 }
 export const fetchForms = async (args: fetchFormsProps) => {
-  const { patient, formName, _list, startDate, endDate, executiveUnits, encounterStatus, size } = args
+  const {
+    patient,
+    formName,
+    _list,
+    startDate,
+    endDate,
+    executiveUnits,
+    encounterStatus,
+    size,
+    offset,
+    order,
+    orderDirection,
+    ipp,
+    signal
+  } = args
+  let { uniqueFacet } = args
+  uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
+  const _orderDirection = orderDirection === Direction.DESC ? '-' : ''
+
   let options: string[] = ['status=in-progress,completed']
   if (patient) options = [...options, `subject=${patient}`]
   if (formName) options = [...options, `${QuestionnaireResponseParamsKeys.NAME}=${formName}`]
@@ -998,9 +1022,16 @@ export const fetchForms = async (args: fetchFormsProps) => {
   if (encounterStatus && encounterStatus.length > 0)
     options = [...options, `${QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS}=${encounterStatus}`]
   if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset) options = [...options, `_offset=${offset}`]
+  if (order) options = [...options, `_sort=${_orderDirection}${order}`]
+  if (ipp) options = [...options, `${QuestionnaireResponseParamsKeys.IPP}=${ipp}`]
+
+  if (uniqueFacet && uniqueFacet.length > 0)
+    options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer, '')}`]
 
   const response = await apiFhir.get<FHIR_Bundle_Response<QuestionnaireResponse>>(
-    `/QuestionnaireResponse?${options.reduce(paramsReducer)}`
+    `/QuestionnaireResponse?${options.reduce(paramsReducer)}`,
+    { signal: signal }
   )
 
   return response

@@ -4,7 +4,6 @@ import {
   FilterValue,
   Filters,
   FormNames,
-  FormNamesLabel,
   GenderStatus,
   GenderStatusLabel,
   LabelObject,
@@ -17,6 +16,7 @@ import { ScopeElement, SimpleCodeType, ValueSet } from 'types'
 import { getDurationRangeLabel } from './age'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
 import { Hierarchy } from 'types/hierarchy'
+import labels from 'labels.json'
 
 export const getCohortsTypeLabel = (type: CohortsType): string => {
   switch (type) {
@@ -103,9 +103,9 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   }
   if (key === FilterKeys.FORM_NAME) {
     if (value === FormNames.HOSPIT) {
-      return FormNamesLabel.HOSPIT
+      return labels.formNames.hospit_plural
     } else if (value === FormNames.PREGNANCY) {
-      return FormNamesLabel.PREGNANCY
+      return labels.formNames.pregnancy_pural
     }
   }
   if (key === FilterKeys.VITAL_STATUSES) {
