@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { Checkbox, CircularProgress, Grid, Tooltip, Typography } from '@mui/material'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
 import FilterList from 'assets/icones/filter.svg?react'
-import { CohortComposition, DocumentsData, LoadingStatus, DTTB_ResultsType as ResultsType } from 'types'
+import { CohortComposition, CohortResults, LoadingStatus, DTTB_ResultsType as ResultsType } from 'types'
 import services from 'services/aphp'
 import {
   DocumentsFilters,
@@ -45,6 +45,7 @@ import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 import { CanceledError } from 'axios'
+import { DocumentReference } from 'fhir/r4'
 
 type DocumentsProps = {
   groupId?: string
@@ -159,21 +160,21 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
         controllerRef.current?.signal
       )
       if (result) {
-        const { totalDocs, totalAllDocs, documentsList, totalPatientDocs, totalAllPatientDocs } =
-          result as DocumentsData
+        const { total, totalAllResults, list, totalPatients, totalAllPatients } =
+          result as CohortResults<DocumentReference>
         setDocumentsResult((prevState) => ({
           ...prevState,
-          nb: totalDocs,
-          total: totalAllDocs
+          nb: total,
+          total: totalAllResults
         }))
         setPatientsResult((prevState) => ({
           ...prevState,
-          nb: totalPatientDocs,
-          total: totalAllPatientDocs
+          nb: totalPatients,
+          total: totalAllPatients
         }))
-        setDocuments(documentsList)
+        setDocuments(list)
 
-        checkIfPageAvailable(totalDocs, page, setPage, dispatch)
+        checkIfPageAvailable(total, page, setPage, dispatch)
       } else {
         setDocuments([])
       }
