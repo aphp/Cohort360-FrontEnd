@@ -250,8 +250,8 @@ export const buildEncounterDateFilter = (
   if (includeNullDates && encounterDateExists) {
     const dateFilter = `(${getDateFilters(
       encounterDate,
-      criterionDateFilterName.replace('-', '.')
-    )}) or not (${criterionDateFilterName.replace('-', '.')} eq "*")`
+      criterionDateFilterName
+    )}) or not (${criterionDateFilterName} eq "*")`
 
     return filtersBuilders(FILTER_PARAM_NAME, dateFilter)
   } else if (encounterDateExists) {
@@ -303,10 +303,10 @@ export const unbuildEncounterDatesFilters = (
   criterion: SelectedCriteriaTypesWithAdvancedInputs | EncounterDataType,
   value: string | null
 ) => {
-  if (value?.includes(EncounterParamsKeys.START_DATE.replace('-', '.'))) {
+  if (value?.includes(EncounterParamsKeys.START_DATE)) {
     criterion.encounterStartDate = unbuildEncounterDateFilters(value)
     criterion.includeEncounterStartDateNull = true
-  } else if (value?.includes(EncounterParamsKeys.END_DATE.replace('-', '.'))) {
+  } else if (value?.includes(EncounterParamsKeys.END_DATE)) {
     criterion.encounterEndDate = unbuildEncounterDateFilters(value)
     criterion.includeEncounterEndDateNull = true
   }
