@@ -14,7 +14,8 @@ import {
   FHIR_Bundle_Response,
   CohortPMSI,
   CohortMedication,
-  CohortObservation
+  CohortObservation,
+  CohortQuestionnaireResponse
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -39,7 +40,8 @@ import {
   fetchClaim,
   fetchMedicationRequest,
   fetchMedicationAdministration,
-  fetchObservation
+  fetchObservation,
+  fetchForms
 } from './callApi'
 
 import apiBackend from '../apiBackend'
@@ -66,7 +68,8 @@ import {
   ImagingFilters,
   PMSIFilters,
   MedicationFilters,
-  BiologyFilters
+  BiologyFilters,
+  MaternityFormFilters
 } from 'types/searchCriterias'
 import services from '.'
 import { ErrorDetails, SearchInputError } from 'types/error'
@@ -225,6 +228,18 @@ export interface IServiceCohorts {
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<CohortObservation>>
+
+  /**
+   * Retourne la liste de formulaires liés à une cohorte
+   */
+  fetchFormsList: (
+    options: {
+      page: number
+      searchCriterias: SearchCriterias<MaternityFormFilters>
+    },
+    groupId?: string,
+    signal?: AbortSignal
+  ) => Promise<CohortResults<CohortQuestionnaireResponse>>
 
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
@@ -754,6 +769,65 @@ const servicesCohorts: IServiceCohorts = {
       totalPatients: totalPatientBiology ?? 0,
       totalAllPatients: totalAllPatientsBiology ?? 0,
       list: filledBiologyList as CohortObservation[]
+    }
+  },
+
+  fetchFormsList: async (options, groupId, signal) => {
+    const {
+      page,
+      searchCriterias: {
+        orderBy,
+        filters: { ipp, formName, executiveUnits, encounterStatus }
+      }
+    } = options
+
+    const atLeastAFilter = !!ipp || executiveUnits.length > 0 || encounterStatus.length > 0 || formName.length > 0
+
+    const [formsList, allFormsList] = await Promise.all([
+      fetchForms({
+        _list: groupId ? [groupId] : [],
+        size: 20,
+        offset: page ? (page - 1) * 20 : 0,
+        order: orderBy.orderBy,
+        orderDirection: orderBy.orderDirection,
+        ipp: ipp,
+        signal: signal,
+        executiveUnits: executiveUnits.map((unit) => unit.id),
+        encounterStatus: encounterStatus.map((status) => status.id),
+        formName: formName.join(),
+        uniqueFacet: ['subject']
+      }),
+      atLeastAFilter
+        ? fetchForms({
+            _list: groupId ? [groupId] : [],
+            size: 0,
+            signal: signal,
+            uniqueFacet: ['subject']
+          })
+        : null
+    ])
+
+    const _formsList = getApiResponseResources(formsList) ?? []
+    const filledFormsList = await getResourceInfos(_formsList, false, groupId, signal)
+
+    const totalForms = formsList?.data?.resourceType === 'Bundle' ? formsList.data.total : 0
+    const totalAllForms = allFormsList?.data?.resourceType === 'Bundle' ? allFormsList?.data?.total : totalForms
+
+    const totalPatientForms =
+      formsList?.data?.resourceType === 'Bundle'
+        ? (getExtension(formsList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
+        : 0
+    const totalAllPatientsForms =
+      allFormsList !== null
+        ? (getExtension(allFormsList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
+        : totalPatientForms
+
+    return {
+      total: totalForms ?? 0,
+      totalAllResults: totalAllForms ?? 0,
+      totalPatients: totalPatientForms ?? 0,
+      totalAllPatients: totalAllPatientsForms ?? 0,
+      list: filledFormsList as CohortQuestionnaireResponse[]
     }
   },
 

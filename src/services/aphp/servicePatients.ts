@@ -298,12 +298,12 @@ export interface IServicePatients {
   ) => Promise<QuestionnaireResponse[]>
 
   /*
-   ** Cette fonction permet de récupérer les ids des formulaires de maternité
+   ** Cette fonction permet de récupérer les ids des formulaires
    **
    ** Retour:
-   **   - questionnairesList: liste des ids des formulaires de maternité
+   **   - questionnairesList: liste des ids des formulaires
    */
-  fetchMaternityFormNamesIds: () => Promise<Questionnaire[]>
+  fetchQuestionnaires: () => Promise<Questionnaire[]>
 
   /*
    ** Cette fonction permet de récupérer les élèments de Composition lié à un patient
@@ -724,9 +724,9 @@ const servicesPatients: IServicePatients = {
     return getApiResponseResources(formsResp) ?? []
   },
 
-  fetchMaternityFormNamesIds: async () => {
-    const maternityFormNames = `${FormNames.PREGNANCY},${FormNames.HOSPIT}`
-    const questionnaireList = await fetchQuestionnaires({ name: maternityFormNames, _elements: ['id', 'name'] })
+  fetchQuestionnaires: async () => {
+    const maternityQuestionnaires = `${FormNames.PREGNANCY},${FormNames.HOSPIT}`
+    const questionnaireList = await fetchQuestionnaires({ name: maternityQuestionnaires, _elements: ['id', 'name'] })
 
     return getApiResponseResources(questionnaireList) ?? []
   },
