@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 
-import { Collapse, FormLabel, Grid, IconButton, Tooltip, Typography } from '@mui/material'
+import { Collapse, FormLabel, Grid, IconButton, Typography } from '@mui/material'
 
-import InfoIcon from '@mui/icons-material/Info'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
@@ -72,7 +71,7 @@ const AdvancedInputs = ({ sourceType, selectedCriteria, onChangeValue, onError }
         </BlockWrapper>
 
         <BlockWrapper style={{ margin: '1em 1em 2em', width: 'calc(100% - 2em)' }}>
-          <CriteriaLabel label="Prise en charge" />
+          <CriteriaLabel label="Prise en charge" infoIcon="Ne concerne pas les consultations" />
           <FormLabel style={{ padding: '0 0 1em', fontWeight: 600, fontSize: 12 }} component="legend">
             Début de prise en charge
           </FormLabel>
@@ -88,14 +87,8 @@ const AdvancedInputs = ({ sourceType, selectedCriteria, onChangeValue, onError }
               onChangeValue('includeEncounterStartDateNull', includeNullValues)
             }
           />
-          <FormLabel
-            style={{ padding: '1em 0', fontWeight: 600, fontSize: 12, display: 'flex', alignItems: 'center' }}
-            component="legend"
-          >
+          <FormLabel style={{ padding: '1em 0', fontWeight: 600, fontSize: 12 }} component="legend">
             Fin de prise en charge
-            <Tooltip title={'Ne concerne pas les consultations'}>
-              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-            </Tooltip>
           </FormLabel>
           <CalendarRange
             inline

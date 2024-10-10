@@ -11,10 +11,8 @@ import {
   IconButton,
   Switch,
   TextField,
-  Tooltip,
   Typography
 } from '@mui/material'
-import InfoIcon from '@mui/icons-material/Info'
 
 import useStyles from './styles'
 import { useAppSelector } from 'state'
@@ -250,7 +248,7 @@ const EncounterForm = ({
           </BlockWrapper>
 
           <BlockWrapper container className={classes.inputItem}>
-            <CriteriaLabel label="Durée de la prise en charge" />
+            <CriteriaLabel label="Durée de la prise en charge" infoIcon="Ne concerne pas les consultations" />
             <DurationRange
               value={duration}
               unit={'Durée'}
@@ -260,7 +258,8 @@ const EncounterForm = ({
           </BlockWrapper>
 
           <BlockWrapper className={classes.inputItem}>
-            <CriteriaLabel label="Date de prise en charge" />
+            <CriteriaLabel label="Date de prise en charge" infoIcon="Ne concerne pas les consultations" />
+
             <FormLabel style={{ padding: '0 0 0.5em', fontWeight: 600, fontSize: 12 }} component="legend">
               Début de prise en charge
             </FormLabel>
@@ -272,14 +271,8 @@ const EncounterForm = ({
               includeNullValues={includeEncounterStartDateNull}
               onChangeIncludeNullValues={(includeNullValues) => setIncludeEncounterStartDateNull(includeNullValues)}
             />
-            <FormLabel
-              style={{ padding: '1em 0 0.5em', fontWeight: 600, fontSize: 12, display: 'flex', alignItems: 'center' }}
-              component="legend"
-            >
+            <FormLabel style={{ padding: '1em 0 0.5em', fontWeight: 600, fontSize: 12 }} component="legend">
               Fin de prise en charge
-              <Tooltip title={'Ne concerne pas les consultations'}>
-                <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-              </Tooltip>
             </FormLabel>
             <CalendarRange
               inline
