@@ -34,7 +34,7 @@ const MIN_ZOOM = 7
 const DEFAULT_MAP_CENTER: LatLngTuple = [48.8575, 2.3514]
 const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 const MAP_COPYRIGHTS = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-const LOCATION_SHAPE_EXTENSION_URL = 'https://terminology.eds.aphp.fr/fhir/profile/location/extension/position'
+const LOCATION_SHAPE_EXTENSION_URL = 'https://terminology.eds.aphp.fr/fhir/profile/location/extension/shape'
 const LOCATION_COUNT_EXTENSION_URL = 'https://terminology.eds.aphp.fr/fhir/profile/location/extension/count'
 const COLOR_PALETTE = [
   '#fad370',
