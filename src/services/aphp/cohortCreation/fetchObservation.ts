@@ -1,10 +1,10 @@
-import { displaySort } from 'utils/alphabeticalSort'
 import apiFhir from 'services/apiFhir'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import { FHIR_Bundle_Response, ValueSet } from 'types'
 import { ConceptMap } from 'fhir/r4'
 import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
+import { sortArray } from 'utils/arrays'
 
 export type ValueSetWithHierarchy = ValueSet & { hierarchyDisplay: string }
 
@@ -32,14 +32,15 @@ export const fetchBiologySearch = async (
 
   const data = getApiResponseResources(res)
 
-  const loincResults = getSourceData(getConfig().features.observation.valueSets.biologyHierarchyLoinc.url, data).sort(
-    displaySort
+  const loincResults = sortArray(
+    getSourceData(getConfig().features.observation.valueSets.biologyHierarchyLoinc.url, data),
+    'display'
   )
   const uniqueLoincResults = getUniqueLoincResults(loincResults)
-  const anabioResults = getSourceData(getConfig().features.observation.valueSets.biologyHierarchyAnabio.url, data).sort(
-    displaySort
+  const anabioResults = sortArray(
+    getSourceData(getConfig().features.observation.valueSets.biologyHierarchyAnabio.url, data),
+    'display'
   )
-
   return {
     anabio: anabioResults ?? [],
     loinc: uniqueLoincResults ?? []

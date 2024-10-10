@@ -7,7 +7,7 @@ import { DurationUnitWrapper } from 'components/ui/Inputs/DurationRange/styles'
 import { TextFieldWrapper } from 'components/ui/Inputs/DurationRange/styles'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import CriteriaLayout from 'components/ui/CriteriaLayout'
-import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
+import AdvancedInputs from '../AdvancedInputs'
 
 import { CriteriaDrawerComponentProps } from 'types'
 import { CalendarRequestLabel } from 'types/dates'

@@ -12,7 +12,7 @@ import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchMedication } from 'state/medication'
 import { EXPLORATION } from '../../../../../../../../constants'
 import { Comparators, MedicationDataType, CriteriaType } from 'types/requestCriterias'
-import { Hierarchy } from 'types/hierarchy'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 
 export const defaultMedication: Omit<MedicationDataType, 'id'> = {
   type: CriteriaType.MEDICATION_REQUEST,
@@ -43,13 +43,13 @@ const Index = (props: CriteriaDrawerComponentProps) => {
   const { classes } = useStyles()
 
   const _onChangeSelectedHierarchy = (
-    newSelectedItems: Hierarchy<any, any>[] | null | undefined,
-    newHierarchy?: Hierarchy<any, any>[]
+    newSelectedItems: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
   ) => {
     _onChangeFormValue('code', newSelectedItems, newHierarchy)
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const _onChangeFormValue = (key: string, value: any, hierarchy: Hierarchy<any, any>[] = medicationHierarchy) =>
+  const _onChangeFormValue = (key: string, value: any, hierarchy: HierarchyElementWithSystem[] = medicationHierarchy) =>
     syncOnChangeFormValue(key, value, hierarchy, setDefaultCriteria, selectedTab, defaultMedication.type, dispatch)
 
   const _initSyncHierarchyTableEffect = async () => {
@@ -59,7 +59,8 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       defaultCriteria && defaultCriteria.code ? defaultCriteria.code : [],
       fetchMedication,
       defaultMedication.type,
-      dispatch
+      dispatch,
+      true
     )
   }
   useEffect(() => {

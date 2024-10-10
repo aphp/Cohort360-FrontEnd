@@ -33,10 +33,11 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { BlockWrapper } from 'components/ui/Layout'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
-import { AppConfig } from 'config'
+import { AppConfig, getConfig } from 'config'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { FhirItem, HierarchyElementWithSystem } from 'types/hierarchy'
+import { getCodeList } from 'services/aphp/serviceValueSets'
 
 type ImagingListProps = {
   groupId?: string
@@ -59,8 +60,8 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
-  const [allModalities, setAllModalities] = useState<Hierarchy<any, any>[]>([])
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [allModalities, setAllModalities] = useState<FhirItem[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<FhirItem[]>([])
 
   const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const [
@@ -164,12 +165,11 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   useEffect(() => {
     const fetch = async () => {
       const [modalities, encounterStatus] = await Promise.all([
-        services.cohortCreation.fetchModalities(),
-        services.cohortCreation.fetchEncounterStatus()
+        getCodeList(getConfig().features.imaging.valueSets.imagingModalities.url, true),
+        getCodeList(getConfig().core.valueSets.encounterStatus.url)
       ])
-
-      setAllModalities(modalities)
-      setEncounterStatusList(encounterStatus)
+      setAllModalities(modalities.results)
+      setEncounterStatusList(encounterStatus.results)
     }
     fetch()
   }, [])

@@ -39,7 +39,7 @@ export const arrayToMap = <T, S>(array: T[], value: S): Map<T, S> => {
   return resultMap
 }
 
-export const sort = <T extends { [key: string]: any }>(array: T[], attr: keyof T): T[] => {
+export const sortArray = <T extends { [key: string]: any }>(array: T[], attr: keyof T): T[] => {
   try {
     array.sort((a, b) => a[attr].localeCompare(b[attr]))
   } catch {

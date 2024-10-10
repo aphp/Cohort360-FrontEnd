@@ -20,14 +20,14 @@ import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchClaim } from 'state/pmsi'
 import { CriteriaItemDataCache, HierarchyTree } from 'types'
-import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
+import AdvancedInputs from '../../../AdvancedInputs'
 import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import services from 'services/aphp'
 import { Comparators, GhmDataType, SelectedCriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
+import { Hierarchy, HierarchyElementWithSystem } from 'types/hierarchy'
 
 type GHMFormProps = {
   isOpen: boolean
@@ -68,7 +68,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {
         const criteriaCode = criteriaData.data.ghmData
-          ? criteriaData.data.ghmData.find((g: Hierarchy<any, any>) => g.id === code.id)
+          ? criteriaData.data.ghmData.find((g: HierarchyElementWithSystem) => g.id === code.id)
           : null
         return {
           id: code.id,

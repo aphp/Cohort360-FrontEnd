@@ -35,12 +35,15 @@ import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import { defaultClaim } from '../../index'
 import { HierarchyTree } from 'types'
 import { GhmDataType } from 'types/requestCriterias'
-import { Hierarchy } from 'types/hierarchy'
+import { HierarchyElementWithSystem } from 'types/hierarchy'
 
 type GhmListItemProps = {
-  ghmItem: Hierarchy<any, any>
-  selectedItems?: Hierarchy<any, any>[] | null
-  handleClick: (ghmItem: Hierarchy<any, any>[] | null | undefined, newHierarchy?: Hierarchy<any, any>[]) => void
+  ghmItem: HierarchyElementWithSystem
+  selectedItems?: HierarchyElementWithSystem[] | null
+  handleClick: (
+    ghmItem: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
+  ) => void
 }
 
 const GhmListItem: React.FC<GhmListItemProps> = (props) => {
@@ -66,7 +69,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
     dispatch(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = async (ghmItem: Hierarchy<any, any>) => {
+  const handleClickOnHierarchy = async (ghmItem: HierarchyElementWithSystem) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getHierarchySelection(ghmItem, selectedItems || [], ghmHierarchy)
@@ -116,7 +119,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
       <Collapse in={id === '*' ? true : open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
-          {subItems?.map((ghmHierarchySubItem: Hierarchy<any, any>, index: number) =>
+          {subItems?.map((ghmHierarchySubItem: HierarchyElementWithSystem, index: number) =>
             ghmHierarchySubItem.id === 'loading' ? (
               <Fragment key={index + ghmHierarchySubItem.id}>
                 <div className={classes.subItemsIndicator} />
@@ -140,8 +143,8 @@ type GhmHierarchyProps = {
   selectedCriteria: GhmDataType
   goBack: () => void
   onChangeSelectedHierarchy: (
-    data: Hierarchy<any, any>[] | null | undefined,
-    newHierarchy?: Hierarchy<any, any>[]
+    data: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
   ) => void
   onConfirm: () => void
   isEdition?: boolean
@@ -160,8 +163,8 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
   const ghmHierarchy = useAppSelector((state) => state.pmsi.claim.list || {})
 
   const _handleClick = (
-    newSelectedItems: Hierarchy<any, any>[] | null | undefined,
-    newHierarchy?: Hierarchy<any, any>[]
+    newSelectedItems: HierarchyElementWithSystem[] | null | undefined,
+    newHierarchy?: HierarchyElementWithSystem[]
   ) => {
     onChangeSelectedHierarchy(newSelectedItems, newHierarchy)
   }
@@ -172,7 +175,7 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
       newList.code = selectedCriteria.code
     }
     newList.code?.map(
-      (item: Hierarchy<any, any>) => findEquivalentRowInItemAndSubItems(item, ghmHierarchy).equivalentRow
+      (item: HierarchyElementWithSystem) => findEquivalentRowInItemAndSubItems(item, ghmHierarchy).equivalentRow
     )
     setCurrentState(newList)
   }, [initialState, ghmHierarchy, selectedCriteria])
