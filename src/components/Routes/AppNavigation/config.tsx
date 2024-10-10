@@ -14,6 +14,7 @@ import MyCohorts from 'views/MyCohorts'
 import MyRequests from 'views/MyRequests'
 import DownloadPopup from 'views/DownloadPopup/DownloadPopup'
 import Export from 'pages/Export'
+import ExportRequest from 'pages/ExportRequest'
 import FeasibilityReports from 'pages/FeasibilityReports'
 
 // import { ODD_CONTACT } from '../../../constants'
@@ -228,6 +229,14 @@ const configRoutes: configRoute[] = [
     name: '/exports',
     isPrivate: true,
     element: <Export />,
+    exact: true,
+    displaySideBar: true
+  },
+  {
+    path: '/exports/new',
+    name: '/exports/new',
+    isPrivate: true,
+    element: <ExportRequest />,
     exact: true,
     displaySideBar: true
   },
