@@ -41,20 +41,26 @@ import {
 import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 import { idSort, labelSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
-import { Direction, Order, SavedFilter, SavedFiltersResults, SearchByTypes } from 'types/searchCriterias'
+import {
+  Direction,
+  mapDocumentStatusesToRequestParam,
+  Order,
+  SavedFilter,
+  SavedFiltersResults,
+  SearchByTypes
+} from 'types/searchCriterias'
 import {
   AdministrationParamsKeys,
   ClaimParamsKeys,
   ConditionParamsKeys,
   DocumentsParamsKeys,
   ImagingParamsKeys,
-  mapDocumentStatusesToRequestParam,
   ObservationParamsKeys,
   PatientsParamsKeys,
   PrescriptionParamsKeys,
   ProcedureParamsKeys,
   QuestionnaireResponseParamsKeys
-} from '../../mappers/filters'
+} from 'types/requestCriterias'
 import { ResourceType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
 import { getExtension } from 'utils/fhir'

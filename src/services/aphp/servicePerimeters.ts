@@ -25,7 +25,6 @@ import { FetchScopeOptions, Rights, SourceType } from 'types/scope'
 import { scopeLevelsToRequestParam } from 'utils/perimeters'
 import { mapParamsToNetworkParams } from 'utils/url'
 import { Hierarchy } from 'types/hierarchy'
-import { Group } from 'fhir/r4'
 import { getExtension } from 'utils/fhir'
 
 export interface IServicePerimeters {

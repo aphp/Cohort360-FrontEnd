@@ -1,5 +1,10 @@
 import { ScopeElement, SimpleCodeType } from 'types'
-import { DocumentAttachmentMethod, DurationRangeType, LabelObject } from 'types/searchCriterias'
+import {
+  DocumentAttachmentMethod,
+  DurationRangeType,
+  LabelObject,
+  mapDocumentStatusesFromRequestParam
+} from 'types/searchCriterias'
 import {
   convertDurationToString,
   convertDurationToTimestamp,
@@ -17,13 +22,14 @@ import {
   ObservationDataType,
   SelectedCriteriaTypesWithOccurrences,
   SelectedCriteriaTypesWithAdvancedInputs,
-  EncounterDataType
+  EncounterDataType,
+  EncounterParamsKeys,
+  ObservationParamsKeys
 } from 'types/requestCriterias'
 import { comparatorToFilter, parseOccurence } from './valueComparator'
 import services from 'services/aphp'
 import extractFilterParams, { FhirFilterValue } from './fhirFilterParser'
 import { Hierarchy } from 'types/hierarchy'
-import { EncounterParamsKeys, ObservationParamsKeys, mapDocumentStatusesFromRequestParam } from 'mappers/filters'
 
 const searchReducer = (accumulator: string, currentValue: string): string =>
   accumulator || !!accumulator === false ? `${accumulator},${currentValue}` : currentValue || accumulator
