@@ -9,9 +9,19 @@ import { LOW_TOLERANCE_TAG } from './callApi'
 import { sortArray } from 'utils/arrays'
 
 export const UNKOWN_CHAPTER = 'UNKNOWN'
+const ROOT = '*'
+
+const isDataNonQuali = (system: string) => {
+  switch (system) {
+    case getConfig().features.observation.valueSets.biologyHierarchyAnabio.url:
+    case getConfig().features.medication.valueSets.medicationAtc.url:
+      return true
+  }
+  return false
+}
 
 const getParentIds = (extensions?: Extension[], id?: string): string[] => {
-  const parentIds = ['*']
+  const parentIds = [ROOT]
   extensions
     ?.find((ext) => ext.url === getConfig().core.extensions.codeHierarchy)
     ?.valueCodeableConcept?.coding?.forEach((code) => {
@@ -28,10 +38,18 @@ const getParentIds = (extensions?: Extension[], id?: string): string[] => {
  * @returns
  */
 
+const mapAbandonedChildren = (children: Hierarchy<FhirHierarchy, string>[]) => {
+  return children.map((child) =>
+    child.above_levels_ids === ROOT && !child.inferior_levels_ids && isDataNonQuali(child.system)
+      ? { ...child, above_levels_ids: `${ROOT},${UNKOWN_CHAPTER}` }
+      : child
+  )
+}
+
 const mapFhirHierarchyToHierarchyWithLabelAndSystem = (
   fhirHierarchy: FhirHierarchy
 ): Hierarchy<FhirHierarchy, string> => {
-  const label = fhirHierarchy.id === '*' ? fhirHierarchy.label : `${fhirHierarchy.id} - ${fhirHierarchy.label}`
+  const label = fhirHierarchy.id === ROOT ? fhirHierarchy.label : `${fhirHierarchy.id} - ${fhirHierarchy.label}`
   return {
     id: fhirHierarchy.id,
     label: label,
@@ -115,6 +133,10 @@ export const getChildrenFromCodes = async (
     resourceType: 'Parameters',
     parameter: [
       {
+        name: 'count',
+        valueInteger: 999
+      },
+      {
         name: 'valueSet',
         resource: {
           resourceType: 'ValueSet',
@@ -164,7 +186,7 @@ export const searchInValueSets = async (
   let options = ''
   if (offset !== undefined) options += `&offset=${offset}`
   if (count !== undefined) options += `&count=${count}`
-  const searchValue = search || '*'
+  const searchValue = search || ROOT
   const res = await apiFhir.get<FHIR_API_Response<ValueSet>>(
     `/ValueSet/$expand?url=${codeSystems.join(',')}&filter=${encodeURIComponent(
       searchValue
@@ -173,7 +195,10 @@ export const searchInValueSets = async (
       signal: signal
     }
   )
-  return formatValuesetExpansion(getApiResponseResourceOrThrow(res).expansion)
+  const response = formatValuesetExpansion(getApiResponseResourceOrThrow(res).expansion)
+  response.results = mapAbandonedChildren(response.results)
+  console.log('test resp', response)
+  return response
 }
 
 /**
@@ -237,18 +262,16 @@ export const getHierarchyRoots = async (
   let subItems: Hierarchy<FhirHierarchy>[] | undefined = undefined
   if (toBeAdoptedCodes.length) {
     childrenIds.push(UNKOWN_CHAPTER)
-    const unknownChildren = (
-      await getChildrenFromCodes(
-        codeSystem,
-        toBeAdoptedCodes.map((code) => code.id)
-      )
-    ).results.map((child) => ({ ...child, above_levels_ids: `*,${UNKOWN_CHAPTER}` }))
+    const unknownChildren = toBeAdoptedCodes.map((child) => ({
+      ...child,
+      above_levels_ids: `${ROOT},${UNKOWN_CHAPTER}`
+    }))
     const unknownChapter: Hierarchy<FhirHierarchy> = {
       id: UNKOWN_CHAPTER,
       label: `U - ${UNKOWN_CHAPTER}`,
       system: codeSystem,
-      above_levels_ids: '*',
-      inferior_levels_ids: toBeAdoptedCodes.map((code) => code.id).join(','),
+      above_levels_ids: ROOT,
+      inferior_levels_ids: unknownChildren.map((code) => code.id).join(','),
       subItems: unknownChildren
     }
     const chaptersEntities = (await getChildrenFromCodes(codeSystem, childrenIds)).results
@@ -256,7 +279,7 @@ export const getHierarchyRoots = async (
   }
   let results = [
     {
-      id: '*',
+      id: ROOT,
       label: valueSetTitle,
       system: codeSystem,
       childrenIds,

@@ -74,12 +74,8 @@ export const getMissingCodes = async <T>(
   else {
     above = getAboveLevels(newCodes, baseTree)
     missingIds = getMissingIds(allCodes, arrayToMap(above, null))
-    //console.log('test search prev', newCodes, baseTree)
-    //console.log('test search above', above)
-    //console.log('test search missing', missingIds)
   }
-  //console.log('test expand', missingIds)
-
+  console.log('test missing', missingIds)
   if (missingIds.length) {
     const ids = missingIds.map((id) => id.split('|')[1]).join(',')
     const fetched = await fetchHandler(ids, system)
@@ -94,7 +90,6 @@ export const getMissingCodes = async <T>(
       allCodes = addAllFetchedIds(allCodes, childrenResponse)
     }
   }
-  //console.log('test search allCodes', allCodes)
   return allCodes
 }
 
@@ -115,7 +110,6 @@ export const getMissingSubItems = <T>(node: Hierarchy<T, string>, codes: Map<Cod
   const levels = node.inferior_levels_ids?.split(',').map((id) => `${node.system}|${id}`)
   levels.forEach((key) => {
     const foundCode = codes.get(key)
-    // console.log("test search find node", id, foundCode)
     if (foundCode) subItems.push({ ...foundCode })
   })
   return subItems.length ? subItems : []
@@ -165,18 +159,10 @@ export const buildTree = <T>(
   ) => {
     const [currentPath, nextPath] = path
     node = getMissingNode(system, currentPath, node, codes)
-    // console.log('test node', node.id, nextPath)
-
     if (nextPath.size) {
       if (!node.subItems) node.subItems = getMissingSubItems(node, codes)
-      // console.log('test subitems', node.inferior_levels_ids, node.subItems)
       for (const [nextKey, nextValue] of nextPath) {
         let index = node.subItems.findIndex((elem) => elem.id === nextKey)
-        // console.log('test index', index, codes)
-        /*if (index === -1) {
-          node.subItems.push(codes.get(nextKey))
-          index = node.subItems.length - 1
-        }*/
         if (index > -1) {
           const item = buildBranch(node.subItems[index], system, [nextKey, nextValue], codes, selected, mode)
           node.subItems[index] = item
@@ -202,14 +188,10 @@ export const buildTree = <T>(
   if (mode === Mode.INIT) baseTree = []
   for (const [key, value] of uniquePaths) {
     const index = baseTree.findIndex((elem) => elem.id === key)
-    // console.log('test search index', index, key)
     const branch = buildBranch(baseTree[index] || null, system, [key, value], codes, mapHierarchyToMap(selected), mode)
-    //console.log('test search branch', branch)
     if (branch && index > -1) baseTree[index] = branch
     else if (index === -1) baseTree.push(branch)
-    //if (branch && index === -1) baseTree.push(branch)
   }
-  //console.log("test search baseTree", baseTree)
   return [...baseTree]
 }
 
@@ -234,7 +216,6 @@ export const getHierarchyDisplay = <T>(defaultLevels: Hierarchy<T, string>[], tr
   if (defaultLevels.length && tree.length)
     branches = defaultLevels.map((item) => {
       const path = item.above_levels_ids ? [...getAboveLevelsWithRights(item, tree), ...[item.id]] : [item.id]
-      //console.log("test find", item, path)
       return findBranch(path, tree) || { id: 'notFound' }
     })
   return branches

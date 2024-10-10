@@ -103,6 +103,7 @@ const ValueSetRow = ({ item, loading, path, mode, isHierarchy, onSelect, onExpan
 
 type ValueSetTableProps = {
   hierarchy: HierarchyInfo<FhirHierarchy>
+  selectAllStatus: SelectedStatus
   loading: { expand: LoadingStatus; list: LoadingStatus }
   isHierarchy?: boolean
   mode: SearchMode
@@ -114,10 +115,12 @@ type ValueSetTableProps = {
 
 const ValueSetTable = ({
   hierarchy,
+  selectAllStatus,
   loading,
   mode,
   isHierarchy = true,
   onSelect,
+  onSelectAll,
   onExpand,
   onChangePage
 }: ValueSetTableProps) => {
@@ -130,9 +133,18 @@ const ValueSetTable = ({
               {loading.list === LoadingStatus.SUCCESS && mode === SearchMode.RESEARCH && (
                 <TableRow>
                   <TableCell colSpan={7}>
-                    <Typography color={hierarchy.count ? 'primary' : '#4f4f4f'} fontWeight={600}>
-                      {hierarchy.count ? `${hierarchy.count} résultat(s)` : ` Aucun résultat à afficher`}
-                    </Typography>
+                    <Grid container alignItems="center" justifyContent="space-between">
+                      <Typography color={hierarchy.count ? 'primary' : '#4f4f4f'} fontWeight={600}>
+                        {hierarchy.count ? `${hierarchy.count} résultat(s)` : ` Aucun résultat à afficher`}
+                      </Typography>
+                      <Checkbox
+                        color="secondary"
+                        checked={selectAllStatus === SelectedStatus.SELECTED}
+                        indeterminate={selectAllStatus === SelectedStatus.INDETERMINATE}
+                        indeterminateIcon={<IndeterminateCheckBoxOutlined style={{ color: 'rgba(0,0,0,0.6)' }} />}
+                        onChange={(event, checked) => onSelectAll(checked)}
+                      />
+                    </Grid>
                   </TableCell>
                 </TableRow>
               )}
@@ -163,16 +175,18 @@ const ValueSetTable = ({
               <CircularProgress />
             </Grid>
           )}
-          {!isHierarchy && loading.list === LoadingStatus.SUCCESS && Math.ceil(hierarchy.count / LIMIT_PER_PAGE) > 1 && (
-            <Paper sx={{ padding: '20px 0px', position: 'absolute' }}>
-              <Pagination
-                count={Math.ceil(hierarchy.count / LIMIT_PER_PAGE)}
-                currentPage={hierarchy.page}
-                onPageChange={onChangePage}
-                color="#0063AF"
-              />
-            </Paper>
-          )}
+          {!isHierarchy &&
+            loading.list === LoadingStatus.SUCCESS &&
+            Math.ceil(hierarchy.count / LIMIT_PER_PAGE) > 1 && (
+              <Paper sx={{ padding: '20px 0px', position: 'absolute' }}>
+                <Pagination
+                  count={Math.ceil(hierarchy.count / LIMIT_PER_PAGE)}
+                  currentPage={hierarchy.page}
+                  onPageChange={onChangePage}
+                  color="#0063AF"
+                />
+              </Paper>
+            )}
         </TableContainer>
       </Grid>
     </Grid>
