@@ -2,6 +2,17 @@ import { ScopeElement, SimpleCodeType } from 'types'
 import { Hierarchy } from './hierarchy'
 import { DocumentAttachmentMethod, DurationRangeType, LabelObject, SearchByTypes } from './searchCriterias'
 
+export enum QuestionnaireResponseParamsKeys {
+  NAME = 'questionnaire.name',
+  DATE = 'authored',
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
+  ENCOUNTER_STATUS = 'encounter.status'
+}
+
+export enum IppParamsKeys {
+  IPP_LIST_FHIR = 'identifier.value'
+}
+
 export enum MedicationLabel {
   PRESCRIPTION = 'Prescription',
   ADMINISTRATION = 'Administration'
@@ -25,6 +36,125 @@ export enum ResourceType {
 }
 
 export type PMSIResourceTypes = ResourceType.CONDITION | ResourceType.PROCEDURE | ResourceType.CLAIM
+
+export enum PatientsParamsKeys {
+  GENDERS = 'gender',
+  DATE_DEIDENTIFIED = 'age-month',
+  DATE_IDENTIFIED = 'age-day',
+  VITAL_STATUS = 'deceased',
+  BIRTHDATE = 'birthdate',
+  DEATHDATE = 'death-date'
+}
+
+export enum EncounterParamsKeys {
+  DURATION = 'length',
+  MIN_BIRTHDATE_DAY = 'start-age-visit',
+  MIN_BIRTHDATE_MONTH = 'start-age-visit-month',
+  ENTRYMODE = 'admission-mode',
+  EXITMODE = 'discharge-disposition-mode',
+  PRISENCHARGETYPE = 'class',
+  TYPEDESEJOUR = 'stay',
+  ADMISSIONMODE = 'reason-code',
+  REASON = 'admission-destination-type',
+  DESTINATION = 'discharge-disposition',
+  PROVENANCE = 'admit-source',
+  ADMISSION = 'admission-type',
+  SERVICE_PROVIDER = 'encounter-care-site',
+  STATUS = 'status',
+  START_DATE = 'period-start',
+  END_DATE = 'period-end'
+}
+
+export enum DocumentsParamsKeys {
+  IPP = 'subject.identifier',
+  DOC_STATUSES = 'docstatus',
+  DOC_TYPES = 'type',
+  ONLY_PDF_AVAILABLE = 'onlyPdfAvailable',
+  NDA = 'encounter.identifier',
+  DATE = 'date',
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
+  ENCOUNTER_STATUS = 'encounter.status'
+}
+
+export enum ConditionParamsKeys {
+  NDA = 'encounter.identifier',
+  CODE = 'code',
+  DIAGNOSTIC_TYPES = 'orbis-status',
+  DATE = 'recorded-date',
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
+  SOURCE = '_source',
+  ENCOUNTER_STATUS = 'encounter.status',
+  IPP = 'subject.identifier'
+}
+
+export enum ProcedureParamsKeys {
+  NDA = 'encounter.identifier',
+  CODE = 'code',
+  SOURCE = '_source',
+  DATE = 'date',
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
+  ENCOUNTER_STATUS = 'encounter.status',
+  IPP = 'subject.identifier'
+}
+
+export enum ClaimParamsKeys {
+  NDA = 'encounter.identifier',
+  CODE = 'diagnosis',
+  DATE = 'created',
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
+  ENCOUNTER_STATUS = 'encounter.status',
+  IPP = 'patient.identifier'
+}
+
+export enum PrescriptionParamsKeys {
+  NDA = 'encounter.identifier',
+  PRESCRIPTION_TYPES = 'category',
+  DATE = 'validity-period-start',
+  END_DATE = 'validity-period-end',
+  CODE = 'code',
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
+  ENCOUNTER_STATUS = 'encounter.status',
+  PRESCRIPTION_ROUTES = 'dosage-instruction-route'
+}
+
+export enum AdministrationParamsKeys {
+  NDA = 'context.identifier',
+  ADMINISTRATION_ROUTES = 'dosage-route',
+  DATE = 'effective-time',
+  EXECUTIVE_UNITS = 'context.encounter-care-site',
+  ENCOUNTER_STATUS = 'context.status'
+}
+
+export enum ObservationParamsKeys {
+  NDA = 'encounter.identifier',
+  ANABIO_LOINC = 'code',
+  VALIDATED_STATUS = 'status',
+  DATE = 'date',
+  VALUE = 'value-quantity',
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
+  ENCOUNTER_STATUS = 'encounter.status',
+  IPP = 'subject.identifier'
+}
+
+export enum ImagingParamsKeys {
+  IPP = 'patient.identifier',
+  MODALITY = 'modality',
+  NDA = 'encounter.identifier',
+  DATE = 'started',
+  STUDY_DESCRIPTION = 'description',
+  STUDY_PROCEDURE = 'procedureCode',
+  NB_OF_SERIES = 'numberOfSeries',
+  NB_OF_INS = 'numberOfInstances',
+  WITH_DOCUMENT = 'with-document',
+  STUDY_UID = 'identifier',
+  SERIES_DATE = 'series-started',
+  SERIES_DESCRIPTION = 'series-description',
+  SERIES_PROTOCOL = 'series-protocol',
+  SERIES_MODALITIES = 'series-modality',
+  SERIES_UID = 'series',
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
+  ENCOUNTER_STATUS = 'encounter.status'
+}
 
 export enum CriteriaType {
   REQUEST = 'Request',

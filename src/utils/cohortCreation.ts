@@ -38,7 +38,19 @@ import {
   GhmDataType,
   CcamDataType,
   HospitDataType,
-  SelectedCriteriaTypesWithOccurrences
+  SelectedCriteriaTypesWithOccurrences,
+  AdministrationParamsKeys,
+  ClaimParamsKeys,
+  ConditionParamsKeys,
+  DocumentsParamsKeys,
+  EncounterParamsKeys,
+  ImagingParamsKeys,
+  IppParamsKeys,
+  ObservationParamsKeys,
+  PatientsParamsKeys,
+  PrescriptionParamsKeys,
+  ProcedureParamsKeys,
+  QuestionnaireResponseParamsKeys
 } from 'types/requestCriterias'
 import { parseOccurence } from './valueComparator'
 import { parseDocumentAttachment } from './documentAttachment'
@@ -74,20 +86,6 @@ import { hospitForm } from 'data/hospitData'
 import { editAllCriteria, editAllCriteriaGroup, pseudonimizeCriteria, buildCohortCreation } from 'state/cohortCreation'
 import { AppDispatch } from 'state'
 import { Hierarchy } from 'types/hierarchy'
-import {
-  AdministrationParamsKeys,
-  ClaimParamsKeys,
-  ConditionParamsKeys,
-  DocumentsParamsKeys,
-  EncounterParamsKeys,
-  ImagingParamsKeys,
-  IppParamsKeys,
-  ObservationParamsKeys,
-  PatientsParamsKeys,
-  PrescriptionParamsKeys,
-  ProcedureParamsKeys,
-  QuestionnaireResponseParamsKeys
-} from 'mappers/filters'
 import { getConfig } from 'config'
 
 const REQUETEUR_VERSION = 'v1.6.0'

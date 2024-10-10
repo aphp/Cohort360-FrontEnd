@@ -29,6 +29,40 @@ export enum GenderCodes {
   UNDETERMINED = 'i',
   NOT_SPECIFIED = 'NON RENSEIGNE'
 }
+
+export function mapGenderStatusToGenderCodes(status: GenderStatus): GenderCodes {
+  switch (status) {
+    case GenderStatus.MALE:
+      return GenderCodes.MALE
+    case GenderStatus.FEMALE:
+      return GenderCodes.FEMALE
+    case GenderStatus.OTHER:
+    case GenderStatus.OTHER_UNKNOWN:
+      return GenderCodes.OTHER
+    case GenderStatus.UNKNOWN:
+      return GenderCodes.UNKNOWN
+    default:
+      return GenderCodes.NOT_SPECIFIED
+  }
+}
+
+export function mapGenderCodesToGenderStatus(code: GenderCodes): GenderStatus {
+  switch (code) {
+    case GenderCodes.MALE:
+      return GenderStatus.MALE
+    case GenderCodes.FEMALE:
+      return GenderStatus.FEMALE
+    case GenderCodes.OTHER:
+      return GenderStatus.OTHER
+    case GenderCodes.UNKNOWN:
+      return GenderStatus.UNKNOWN
+    case GenderCodes.UNDETERMINED:
+    case GenderCodes.NOT_SPECIFIED:
+    default:
+      return GenderStatus.OTHER_UNKNOWN
+  }
+}
+
 export enum GenderStatusLabel {
   MALE = 'Hommes',
   FEMALE = 'Femmes',
@@ -129,6 +163,23 @@ export enum DocumentStatuses {
   FINAL = 'final',
   PRELIMINARY = 'preliminary'
 }
+
+export function mapDocumentStatusesToRequestParam(docStatus: string): string {
+  return docStatus === FilterByDocumentStatus.VALIDATED
+    ? DocumentStatuses.FINAL
+    : docStatus === FilterByDocumentStatus.NOT_VALIDATED
+    ? DocumentStatuses.PRELIMINARY
+    : ''
+}
+
+export function mapDocumentStatusesFromRequestParam(docStatus: string): string {
+  return docStatus === DocumentStatuses.FINAL
+    ? FilterByDocumentStatus.VALIDATED
+    : docStatus === DocumentStatuses.PRELIMINARY
+    ? FilterByDocumentStatus.NOT_VALIDATED
+    : ''
+}
+
 export enum FilterKeys {
   IPP = 'ipp',
   GENDERS = 'genders',
