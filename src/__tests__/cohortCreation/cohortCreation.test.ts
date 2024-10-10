@@ -260,8 +260,8 @@ describe('test of buildEncounterFilter', () => {
       'length=le1616',
       'start-age-visit=ge428',
       'start-age-visit=le428',
-      '_filter=(period.start ge 2024-09-05T00:00:00Z and period.start le 2024-09-05T00:00:00Z) or not (period.start eq "*")',
-      '_filter=(period.end ge 2024-09-06T00:00:00Z and period.end le 2024-09-07T00:00:00Z) or not (period.end eq "*")'
+      '_filter=(period-start ge 2024-09-05T00:00:00Z and period-start le 2024-09-05T00:00:00Z) or not (period-start eq "*")',
+      '_filter=(period-end ge 2024-09-06T00:00:00Z and period-end le 2024-09-07T00:00:00Z) or not (period-end eq "*")'
     ]
     expect(buildEncounterFilter(selectedCriteria, false)).toEqual(result)
   })
@@ -284,8 +284,8 @@ describe('test of buildDocumentFilter', () => {
       'encounter.status=cancelled',
       'date=ge2024-09-02T00:00:00Z',
       'date=le2024-09-04T00:00:00Z',
-      '_filter=(encounter.period.start ge 2024-09-05T00:00:00Z and encounter.period.start le 2024-09-05T00:00:00Z) or not (encounter.period.start eq "*")',
-      '_filter=(encounter.period.end ge 2024-09-06T00:00:00Z and encounter.period.end le 2024-09-07T00:00:00Z) or not (encounter.period.end eq "*")'
+      '_filter=(encounter.period-start ge 2024-09-05T00:00:00Z and encounter.period-start le 2024-09-05T00:00:00Z) or not (encounter.period-start eq "*")',
+      '_filter=(encounter.period-end ge 2024-09-06T00:00:00Z and encounter.period-end le 2024-09-07T00:00:00Z) or not (encounter.period-end eq "*")'
     ]
     expect(buildDocumentFilter(selectedCriteria)).toEqual(result)
   })
@@ -308,7 +308,7 @@ describe('test of buildConditionFilter', () => {
       'encounter.status=finished',
       '',
       '',
-      '_filter=(encounter.period.start ge 2024-09-05T00:00:00Z and encounter.period.start le 2024-09-05T00:00:00Z) or not (encounter.period.start eq "*")',
+      '_filter=(encounter.period-start ge 2024-09-05T00:00:00Z and encounter.period-start le 2024-09-05T00:00:00Z) or not (encounter.period-start eq "*")',
       'encounter.period-end=ge2024-09-06T00:00:00Z&encounter.period-end=le2024-09-07T00:00:00Z'
     ]
     expect(buildConditionFilter(selectedCriteria)).toEqual(result)
@@ -332,7 +332,7 @@ describe('test of buildProcedureFilter', () => {
       'date=le2024-09-06T00:00:00Z',
       '_source=ORBIS',
       'encounter.period-start=ge2024-09-05T00:00:00Z&encounter.period-start=le2024-09-05T00:00:00Z',
-      '_filter=(encounter.period.end ge 2024-09-06T00:00:00Z and encounter.period.end le 2024-09-07T00:00:00Z) or not (encounter.period.end eq "*")'
+      '_filter=(encounter.period-end ge 2024-09-06T00:00:00Z and encounter.period-end le 2024-09-07T00:00:00Z) or not (encounter.period-end eq "*")'
     ]
     expect(buildProcedureFilter(selectedCriteria)).toEqual(result)
   })
@@ -353,7 +353,7 @@ describe('test of buildClaimFilter', () => {
       'encounter.status=cancelled',
       'created=ge2024-09-03T00:00:00Z',
       'created=le2024-09-04T00:00:00Z',
-      '_filter=(encounter.period.start ge 2024-09-04T00:00:00Z and encounter.period.start le 2024-09-07T00:00:00Z) or not (encounter.period.start eq "*")',
+      '_filter=(encounter.period-start ge 2024-09-04T00:00:00Z and encounter.period-start le 2024-09-07T00:00:00Z) or not (encounter.period-start eq "*")',
       'encounter.period-end=ge2024-09-02T00:00:00Z&encounter.period-end=le2024-09-06T00:00:00Z'
     ]
     expect(buildClaimFilter(selectedCriteria)).toEqual(result)
@@ -379,7 +379,7 @@ describe('test of buildMedicationFilter', () => {
       '',
       '',
       '',
-      '_filter=(context.period.start ge 2024-09-04T00:00:00Z and context.period.start le 2024-09-07T00:00:00Z) or not (context.period.start eq "*")',
+      '_filter=(context.period-start ge 2024-09-04T00:00:00Z and context.period-start le 2024-09-07T00:00:00Z) or not (context.period-start eq "*")',
       'context.period-end=ge2024-09-02T00:00:00Z&context.period-end=le2024-09-06T00:00:00Z'
     ]
     expect(buildMedicationFilter(selectedCriteria)).toEqual(result)
@@ -397,7 +397,7 @@ describe('test of buildMedicationFilter', () => {
       '',
       '',
       'category=172641',
-      '_filter=(encounter.period.start ge 2024-09-04T00:00:00Z and encounter.period.start le 2024-09-07T00:00:00Z) or not (encounter.period.start eq "*")',
+      '_filter=(encounter.period-start ge 2024-09-04T00:00:00Z and encounter.period-start le 2024-09-07T00:00:00Z) or not (encounter.period-start eq "*")',
       'encounter.period-end=ge2024-09-02T00:00:00Z&encounter.period-end=le2024-09-06T00:00:00Z'
     ]
     expect(buildMedicationFilter(selectedCriteria)).toEqual(result)
@@ -420,7 +420,7 @@ describe('test of buildObservationFilter', () => {
       'date=ge2024-09-03T00:00:00Z',
       'date=le2024-09-04T00:00:00Z',
       'value-quantity=3',
-      '_filter=(encounter.period.start ge 2024-09-04T00:00:00Z and encounter.period.start le 2024-09-07T00:00:00Z) or not (encounter.period.start eq "*")',
+      '_filter=(encounter.period-start ge 2024-09-04T00:00:00Z and encounter.period-start le 2024-09-07T00:00:00Z) or not (encounter.period-start eq "*")',
       'encounter.period-end=ge2024-09-02T00:00:00Z&encounter.period-end=le2024-09-06T00:00:00Z'
     ]
     expect(buildObservationFilter(selectedCriteria)).toEqual(result)
@@ -475,7 +475,7 @@ describe('test of buildImagingFilter', () => {
       '',
       '',
       '',
-      '_filter=(encounter.period.start ge 2024-09-04T00:00:00Z and encounter.period.start le 2024-09-07T00:00:00Z) or not (encounter.period.start eq "*")',
+      '_filter=(encounter.period-start ge 2024-09-04T00:00:00Z and encounter.period-start le 2024-09-07T00:00:00Z) or not (encounter.period-start eq "*")',
       'encounter.period-end=ge2024-09-02T00:00:00Z&encounter.period-end=le2024-09-06T00:00:00Z'
     ]
     expect(buildImagingFilter(selectedCriteria)).toEqual(result)
