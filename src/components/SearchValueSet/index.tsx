@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, Divider, Paper, Collapse, Typography, Input } from '@mui/material'
+import { Grid, Divider, Paper, Collapse, Typography, Input, IconButton } from '@mui/material'
 import Tabs from 'components/ui/Tabs'
 import { LoadingStatus, TabType } from 'types'
 import ReferencesParameters, { Type } from './References'
@@ -8,6 +8,7 @@ import { Reference, SearchMode, SearchModeLabel } from 'types/searchValueSet'
 import SelectedCodes from 'components/Hierarchy/SelectedCodes'
 import { useSearchValueSet } from 'hooks/valueSet/useSearchValueSet'
 import { Displayer } from 'components/ui/Displayer/styles'
+import ClearIcon from '@mui/icons-material/Clear'
 
 type SearchValueSetProps = {
   references: Reference[]
@@ -16,18 +17,19 @@ type SearchValueSetProps = {
 const SearchValueSet = ({ references }: SearchValueSetProps) => {
   const {
     mode,
+    searchInput,
     onChangeMode,
     selectedCodes,
     loadingStatus,
     parameters: { refs, onChangeReferences, onChangeSearchInput, onChangePage },
-    hierarchy: { exploration, research, expand, select, deleteCode, selectAll }
+    hierarchy: { exploration, research, selectAllStatus, expand, select, deleteCode, selectAll }
   } = useSearchValueSet(references)
 
   const tabs: TabType<SearchMode, SearchModeLabel>[] = [
     { id: SearchMode.EXPLORATION, label: SearchModeLabel.EXPLORATION },
     { id: SearchMode.RESEARCH, label: SearchModeLabel.RESEARCH }
   ]
-
+  console.log('test hierarchy', exploration)
   return (
     <>
       <Grid container direction="column" wrap="nowrap" sx={{ overflow: 'hidden' }}>
@@ -49,7 +51,10 @@ const SearchValueSet = ({ references }: SearchValueSetProps) => {
                     Référentiels :
                   </Typography>
                   <ReferencesParameters
-                    disabled={loadingStatus.init === LoadingStatus.FETCHING}
+                    disabled={
+                      loadingStatus.init === LoadingStatus.FETCHING ||
+                      (mode === SearchMode.RESEARCH && loadingStatus.search === LoadingStatus.FETCHING)
+                    }
                     onSelect={onChangeReferences}
                     type={mode === SearchMode.EXPLORATION ? Type.SINGLE : Type.MULTIPLE}
                     values={refs}
@@ -59,10 +64,16 @@ const SearchValueSet = ({ references }: SearchValueSetProps) => {
                   <Collapse in={mode === SearchMode.RESEARCH && !!refs.find((ref) => ref.checked)}>
                     <Grid height="42px" container alignItems="center">
                       <Input
+                        value={searchInput}
                         placeholder="Rechercher un code"
                         disabled={loadingStatus.search === LoadingStatus.FETCHING}
                         fullWidth
                         onChange={(event) => onChangeSearchInput(event.target.value)}
+                        endAdornment={
+                          <IconButton onClick={() => onChangeSearchInput('')}>
+                            <ClearIcon style={{ fill: '#6f6f6f', height: 18 }} />
+                          </IconButton>
+                        }
                       />
                     </Grid>
                   </Collapse>
@@ -78,6 +89,7 @@ const SearchValueSet = ({ references }: SearchValueSetProps) => {
               isHierarchy={refs.find((ref) => ref.checked)?.isHierarchy}
               loading={{ list: loadingStatus.init, expand: loadingStatus.expand }}
               hierarchy={exploration}
+              selectAllStatus={selectAllStatus}
               onSelect={select}
               onSelectAll={selectAll}
               onExpand={expand}
@@ -87,6 +99,7 @@ const SearchValueSet = ({ references }: SearchValueSetProps) => {
           <Displayer isDisplayed={mode === SearchMode.RESEARCH}>
             <ValueSetTable
               mode={SearchMode.RESEARCH}
+              selectAllStatus={selectAllStatus}
               isHierarchy={false}
               loading={{ list: loadingStatus.search, expand: loadingStatus.expand }}
               hierarchy={research}

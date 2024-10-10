@@ -3,10 +3,12 @@ import { Reference, SearchMode } from 'types/searchValueSet'
 import { LIMIT_PER_PAGE, SearchParameters, useSearchParameters } from '../search/useSearchParameters'
 import { useHierarchy } from 'hooks/hierarchy/useHierarchy'
 import { getChildrenFromCodes, getHierarchyRoots, searchInValueSets } from 'services/aphp/serviceValueSets'
+import { useDebounceAction } from 'hooks/useDebounceAction'
 
 export const useSearchValueSet = (references: Reference[]) => {
   const researchParameters = useSearchParameters()
   const explorationParameters = useSearchParameters()
+  const [searchInput, setSearchInput] = useState('')
   const [mode, setMode] = useState(SearchMode.EXPLORATION)
   const [initialized, setInitialized] = useState({ exploration: false, research: false })
 
@@ -91,12 +93,11 @@ export const useSearchValueSet = (references: Reference[]) => {
     else {
       researchParameters.onChangeReferences(references)
       const refs = references.filter((ref) => ref.checked).map((ref) => ref.url)
-      fetchMore(() => fetchSearch(researchParameters.options.searchInput, 0, refs), 1, mode)
+      fetchMore(() => fetchSearch(searchInput, 0, refs), 1, mode)
     }
   }
 
-  const handleChangeSearchInput = (newSearchInput: string) => {
-    researchParameters.onChangeSearchInput(newSearchInput)
+  const search = (newSearchInput: string) => {
     const refs = researchParameters.options.references.filter((ref) => ref.checked).map((ref) => ref.url)
     fetchMore(() => fetchSearch(newSearchInput, 0, refs), 1, SearchMode.RESEARCH)
   }
@@ -106,8 +107,14 @@ export const useSearchValueSet = (references: Reference[]) => {
       mode === SearchMode.EXPLORATION
         ? explorationParameters.options.references.filter((ref) => ref.checked).map((ref) => ref.url)
         : researchParameters.options.references.filter((ref) => ref.checked).map((ref) => ref.url)
-    const searchInput = mode === SearchMode.EXPLORATION ? '' : researchParameters.options.searchInput
-    fetchMore(() => fetchSearch(searchInput, page - 1, refs), page, mode, refs?.[0])
+    const input = mode === SearchMode.EXPLORATION ? '' : searchInput
+    fetchMore(() => fetchSearch(input, page - 1, refs), page, mode, refs?.[0])
+  }
+
+  const debouncedSearch = useDebounceAction(search, 500)
+  const handleChangeSearchInput = (newInput: string) => {
+    setSearchInput(newInput)
+    debouncedSearch(newInput)
   }
 
   useEffect(() => {
@@ -119,10 +126,10 @@ export const useSearchValueSet = (references: Reference[]) => {
     selectedCodes,
     mode,
     loadingStatus,
+    searchInput,
     onChangeMode: setMode,
     parameters: {
       refs: getSearchParameter('references') as Reference[],
-      searchInput: researchParameters.options.searchInput,
       onChangeSearchInput: handleChangeSearchInput,
       onChangePage: handleChangePage,
       onChangeReferences: handleChangeReferences
@@ -130,6 +137,7 @@ export const useSearchValueSet = (references: Reference[]) => {
     hierarchy: {
       exploration: currentHierarchy,
       research: searchResults,
+      selectAllStatus,
       expand,
       select,
       selectAll,

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { TabType } from 'types'
 import { Reference } from 'types/searchValueSet'
 
-export const LIMIT_PER_PAGE = 1
+export const LIMIT_PER_PAGE = 20
 
 export type SearchParameters = {
   searchInput?: string,

@@ -84,10 +84,10 @@ export const useHierarchy = <T>(
 
   const search = async (fetchSearch: () => Promise<Back_API_Response<Hierarchy<T>>>) => {
     const { results: endCodes, count } = await fetchSearch()
+    console.log("test end codes", endCodes)
     const bySystem = groupBySystem(endCodes)
     const newCodes = await getMissingCodesWithSystems(trees, bySystem, codes, fetchHandler)
     const newTrees = buildMultipleTrees(trees, bySystem, newCodes, selectedCodes, Mode.SEARCH)
-    //console.log('test search newTrees', newTrees)
     setCodes(newCodes)
     setTrees(newTrees)
     return { display: getListDisplay(endCodes, newTrees), count }
@@ -109,17 +109,17 @@ export const useHierarchy = <T>(
   }
 
   const select = (node: Hierarchy<T>, toAdd: boolean) => {
-    console.log("test select node", node)
     const hierarchyId = node.system
     const currentTree = trees.get(hierarchyId) || []
     const currentHierarchy = hierarchies.get(hierarchyId) || DEFAULT_HIERARCHY_INFO
     const mode = toAdd ? Mode.SELECT : Mode.UNSELECT
     const newTree = buildTree(currentTree, node.system, [node], codes, selectedCodes, mode)
-    console.log("test select newTree", newTree)
-    const display = getHierarchyDisplay(currentHierarchy.tree, newTree)
+    const displayHierarchy = getHierarchyDisplay(currentHierarchy.tree, newTree)
+    const displaySearch = getHierarchyDisplay(searchResults.tree, newTree)
     const newSelectedCodes = getSelectedCodes(newTree)
     setTrees(replaceInMap(hierarchyId, newTree, trees))
-    setHierarchies(replaceInMap(hierarchyId, { ...currentHierarchy, tree: display }, hierarchies))
+    setHierarchies(replaceInMap(hierarchyId, { ...currentHierarchy, tree: displayHierarchy }, hierarchies))
+    setSearchResults({ ...searchResults, tree: displaySearch })
     setSelectedCodes(newSelectedCodes)
   }
 
@@ -146,17 +146,10 @@ export const useHierarchy = <T>(
 
   const expand = async (node: Hierarchy<T>) => {
     setLoadingStatus({ ...loadingStatus, expand: LoadingStatus.FETCHING })
-    console.log(
-      'test root',
-      node.inferior_levels_ids,
-      node.inferior_levels_ids.split(',').length,
-      node.subItems?.length
-    )
     const hierarchyId = node.system
     const currentTree = trees.get(hierarchyId) || []
     const currentHierarchy = hierarchies.get(hierarchyId) || DEFAULT_HIERARCHY_INFO
     const newCodes = await getMissingCodes(currentTree, codes, [node], hierarchyId, Mode.EXPAND, fetchHandler)
-    //console.log('test expand', node, newCodes)
     const newTree = buildTree(currentTree, node.system, [node], newCodes, selectedCodes, Mode.EXPAND)
     const display = getHierarchyDisplay(currentHierarchy.tree, newTree)
     setCodes(newCodes)
@@ -173,7 +166,7 @@ export const useHierarchy = <T>(
     selectAllStatus,
     initTrees,
     select,
-    //selectAll,
+    selectAll,
     expand,
     fetchMore,
     deleteCode
