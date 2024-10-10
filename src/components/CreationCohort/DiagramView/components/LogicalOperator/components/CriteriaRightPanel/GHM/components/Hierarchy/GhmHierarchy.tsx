@@ -32,10 +32,10 @@ import {
 import useStyles from './styles'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
-import { defaultClaim } from '../../index'
 import { HierarchyTree } from 'types'
-import { GhmDataType } from 'types/requestCriterias'
 import { Hierarchy } from 'types/hierarchy'
+import { GhmDataType, form } from '../../../forms/GHMForm'
+import { CriteriaType } from 'types/requestCriterias'
 
 type GhmListItemProps = {
   ghmItem: Hierarchy<any, any>
@@ -61,7 +61,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
     setOpen(!open)
-    const newHierarchy = await expandItem(ghmCode, selectedItems || [], ghmHierarchy, defaultClaim.type, dispatch)
+    const newHierarchy = await expandItem(ghmCode, selectedItems || [], ghmHierarchy, CriteriaType.CLAIM, dispatch)
     handleClick(selectedItems, newHierarchy)
     dispatch(decrementLoadingSyncHierarchyTable())
   }

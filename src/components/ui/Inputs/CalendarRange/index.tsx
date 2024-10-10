@@ -15,7 +15,7 @@ interface CalendarRangeProps {
   label?: ReactNode
   inline?: boolean
   disabled?: boolean
-  onChange: (newDuration: DurationRangeType) => void
+  onChange: (newDuration: DurationRangeType, includeNullValues: boolean) => void
   onError: (isError: boolean) => void
   includeNullValues?: boolean
   onChangeIncludeNullValues?: (includeNullValues: boolean) => void
@@ -44,7 +44,7 @@ const CalendarRange = ({
       setError({ isError: true, errorMessage: 'La date maximale doit être supérieure à la date minimale.' })
       onError(true)
     } else {
-      onChange([startDate, endDate])
+      onChange([startDate, endDate], isNullValuesChecked)
       if (onChangeIncludeNullValues) {
         onChangeIncludeNullValues(isNullValuesChecked)
       }
@@ -52,7 +52,7 @@ const CalendarRange = ({
   }, [startDate, endDate, isNullValuesChecked])
 
   return (
-    <BlockWrapper>
+    <>
       {isString(label) ? (
         <BlockWrapper item xs={12} margin="0px 0px 10px 0px">
           <CalendarLabel variant="h3">{label} :</CalendarLabel>
@@ -97,7 +97,7 @@ const CalendarRange = ({
           <ErrorMessage>{error.errorMessage}</ErrorMessage>
         </BlockWrapper>
       )}
-    </BlockWrapper>
+    </>
   )
 }
 

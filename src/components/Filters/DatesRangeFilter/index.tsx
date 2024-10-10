@@ -1,4 +1,5 @@
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
+import { BlockWrapper } from 'components/ui/Layout'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import { DurationRangeType } from 'types/searchCriterias'
@@ -27,16 +28,18 @@ const DatesRangeFilter = ({ names, values, disabled }: DatesRangeFilterProps) =>
   }, [endDate])
 
   return (
-    <CalendarRange
-      disabled={disabled}
-      label="Date"
-      value={[startDate, endDate]}
-      onChange={(value) => {
-        setStartDate(value[0])
-        setEndDate(value[1])
-      }}
-      onError={onError}
-    />
+    <BlockWrapper>
+      <CalendarRange
+        disabled={disabled}
+        label="Date"
+        value={[startDate, endDate]}
+        onChange={(value) => {
+          setStartDate(value[0])
+          setEndDate(value[1])
+        }}
+        onError={onError}
+      />
+    </BlockWrapper>
   )
 }
 

@@ -16,7 +16,7 @@ const DocStatusFilter = ({ name, value, docStatusesList, disabled = false }: Doc
 
   useEffect(() => {
     if (context?.updateFormData) context.updateFormData(name, docStatuses)
-  }, [docStatuses])
+  }, [docStatuses, context, name])
 
   return (
     <InputWrapper>
