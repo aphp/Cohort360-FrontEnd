@@ -21,6 +21,7 @@ import { AppConfig } from 'config'
 import PMSIList from 'components/Dashboard/PMSIList'
 import MedicationList from 'components/Dashboard/MedicationList'
 import BiologyList from 'components/Dashboard/BiologyList'
+import FormsList from 'components/Dashboard/FormsList'
 
 type Tabs = { label: string; value: string; to: string; disabled: boolean | undefined } | undefined
 
@@ -37,6 +38,7 @@ const Dashboard: React.FC<{
   const location = useLocation()
   const appConfig = useContext(AppConfig)
   const ODD_IMAGING = appConfig.features.imaging.enabled
+  const ODD_QUESTIONNAIRES = appConfig.features.questionnaires.enabled
 
   const perimetreIds = location.search.substr(1)
 
@@ -58,7 +60,12 @@ const Dashboard: React.FC<{
           { label: 'PMSI', value: 'pmsi', to: '/my-patients/pmsi', disabled: false },
           { label: 'Médicaments', value: 'medication', to: '/my-patients/medication', disabled: false },
           { label: 'Biologie', value: 'biology', to: '/my-patients/biology', disabled: false },
-          ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging', disabled: false }] : [])
+          ...(ODD_IMAGING
+            ? [{ label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging', disabled: false }]
+            : []),
+          ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
+            ? [{ label: 'Formulaires', value: 'forms', to: `/my-patients/forms`, disabled: false }]
+            : [])
         ])
         break
       case 'cohort':
@@ -77,6 +84,9 @@ const Dashboard: React.FC<{
           { label: 'Biologie', value: 'biology', to: `/cohort/${cohortId}/biology`, disabled: false },
           ...(ODD_IMAGING
             ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/${cohortId}/imaging`, disabled: false }]
+            : []),
+          ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
+            ? [{ label: 'Formulaires', value: 'forms', to: `/cohort/${cohortId}/forms`, disabled: false }]
             : [])
         ])
         break
@@ -89,7 +99,10 @@ const Dashboard: React.FC<{
           { label: 'PMSI', value: 'pmsi', to: `/cohort/new/pmsi`, disabled: false },
           { label: 'Médicaments', value: 'medication', to: `/cohort/new/medication`, disabled: false },
           { label: 'Biologie', value: 'biology', to: `/cohort/new/biology`, disabled: false },
-          ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/new/imaging`, disabled: true }] : [])
+          ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/new/imaging`, disabled: true }] : []),
+          ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
+            ? [{ label: 'Formulaires', value: 'forms', to: `/cohort/new/forms`, disabled: false }]
+            : [])
         ])
         break
       case 'perimeters':
@@ -113,6 +126,9 @@ const Dashboard: React.FC<{
           { label: 'Biologie', value: 'biology', to: `/perimeters/biology${location.search}`, disabled: false },
           ...(ODD_IMAGING
             ? [{ label: 'Imagerie', value: 'imaging', to: `/perimeters/imaging${location.search}`, disabled: false }]
+            : []),
+          ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
+            ? [{ label: 'Formulaires', value: 'forms', to: `/perimeters/forms${location.search}`, disabled: false }]
             : [])
         ])
         break
@@ -236,6 +252,9 @@ const Dashboard: React.FC<{
         )}
         {selectedTab === 'imaging' && (
           <ImagingList groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />
+        )}
+        {ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean && selectedTab === 'forms' && (
+          <FormsList groupId={groupId} />
         )}
       </Grid>
     </Grid>
