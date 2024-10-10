@@ -277,7 +277,7 @@ let config: AppConfig = {
     locationMap: {
       enabled: false,
       extensions: {
-        locationShapeUrl: 'https://terminology.eds.aphp.fr/fhir/profile/location/extension/position',
+        locationShapeUrl: 'https://terminology.eds.aphp.fr/fhir/profile/location/extension/shape',
         locationCount: 'https://terminology.eds.aphp.fr/fhir/profile/location/extension/count'
       }
     },
