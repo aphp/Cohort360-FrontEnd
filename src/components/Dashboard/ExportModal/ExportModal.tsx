@@ -60,6 +60,17 @@ const initialState: ExportCSVForm = {
 
 const resourcesWithNoFilters = [ResourceType.ENCOUNTER, ResourceType.QUESTIONNAIRE_RESPONSE, ResourceType.UNKNOWN]
 
+const AlertLimitXlsx: React.FC = () => {
+  const message =
+    "Attention, le format excel étant limité à 32.000 caractères par cellule, le contenu de certains comptes rendus peut être limité aux 32.000 premiers caractères. Si vous souhaitez tout de même obtenir l'intégralité du texte, vous pouvez choisir le format csv qui n'est pas limité en taille."
+
+  return (
+    <Alert severity="warning" style={{ marginBottom: 16 }}>
+      {message}
+    </Alert>
+  )
+}
+
 enum Error {
   ERROR_MOTIF,
   ERROR_CONDITION,
@@ -134,7 +145,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
   }
 
   const [isChecked, setIsChecked] = useState(false)
-  const [selectState, setSelectState] = useState<'csv' | 'xlsx'>('csv')
+  const [selectState, setSelectState] = useState<'csv' | 'xlsx'>('xlsx')
 
   const compatibilities = (exportTable: ExportCSVTable) => {
     const checkedResources = checkedTables.map((table) => {
@@ -299,6 +310,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
             </Typography>
           </Grid>
         </ExportTableAccordionSummary>
+        {selectState === 'xlsx' && resourceType === ResourceType.DOCUMENTS && <AlertLimitXlsx />}
         {!resourcesWithNoFilters.includes(resourceType) && (
           <AccordionDetails className={classes.accordionContent}>
             <ExportTable
@@ -425,6 +437,20 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
           </Tooltip>
         </Grid>
 
+        <Grid container className={classes.referentielContainer}>
+          <Typography variant="h3">Type de fichier : </Typography>
+          <Select
+            className={classes.select}
+            style={{ height: 32 }}
+            id="file-type-selector"
+            value={selectState}
+            onChange={(event) => setSelectState(event.target.value as 'csv' | 'xlsx')}
+          >
+            <MenuItem value={'csv'}>{'Fichier csv'}</MenuItem>
+            <MenuItem value={'xlsx'}>{'Fichier excel (.xlsx)'}</MenuItem>
+          </Select>
+        </Grid>
+
         <Grid container py="28px" gap="16px">
           <Grid item container alignItems="center" flexWrap="nowrap" pr="33px">
             <Grid item container>
@@ -432,7 +458,15 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
                 Tables exportées
               </Typography>
 
-              <IconButton size="small" onClick={() => window.open(`https://doc.eds.aphp.fr/omop/tables`, '_blank')}>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  window.open(
+                    `https://id.pages.data.aphp.fr/pfm/bigdata/eds-central-database/latest/data_catalog/`,
+                    '_blank'
+                  )
+                }
+              >
                 <InfoIcon />
               </IconButton>
             </Grid>
@@ -467,20 +501,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, fhirGroupId, open, 
           <Grid item container>
             {settings.tables.map(renderExportTable)}
           </Grid>
-        </Grid>
-
-        <Grid container className={classes.referentielContainer}>
-          <Typography variant="h3">Type de fichier : </Typography>
-          <Select
-            className={classes.select}
-            style={{ height: 32 }}
-            id="file-type-selector"
-            value={selectState}
-            onChange={(event) => setSelectState(event.target.value as 'csv' | 'xlsx')}
-          >
-            <MenuItem value={'csv'}>{'Fichier csv'}</MenuItem>
-            <MenuItem value={'xlsx'}>{'Fichier excel (.xlsx)'}</MenuItem>
-          </Select>
         </Grid>
 
         <Grid container gap="12px" pb="10px">
