@@ -113,6 +113,7 @@ const useStyles = makeStyles()(() => ({
     fontWeight: '600'
   },
   referentielContainer: {
+    marginTop: 12,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
