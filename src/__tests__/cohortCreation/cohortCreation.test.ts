@@ -10,6 +10,35 @@ import {
   ObservationDataType,
   SelectedCriteriaType
 } from 'types/requestCriterias'
+
+import {
+  checkNominativeCriteria,
+  buildPatientFilter,
+  buildEncounterFilter,
+  buildDocumentFilter,
+  buildConditionFilter,
+  buildProcedureFilter,
+  buildClaimFilter,
+  buildMedicationFilter,
+  buildObservationFilter,
+  buildImagingFilter,
+  buildPregnancyFilter,
+  buildHospitFilter,
+  unbuildClaimCriteria,
+  unbuildConditionCriteria,
+  unbuildDocumentReferenceCriteria,
+  unbuildEncounterCriteria,
+  unbuildHospitQuestionnaireResponseCriteria,
+  unbuildIPPListCriteria,
+  unbuildImagingCriteria,
+  unbuildMedicationCriteria,
+  unbuildObservationCriteria,
+  unbuildPatientCriteria,
+  unbuildProcedureCriteria,
+  unbuildPregnancyQuestionnaireResponseCriteria,
+  unbuildQuestionnaireResponseCriteria
+} from 'utils/cohortCreation'
+
 import {
   procedurePeudonimizedCriteria,
   ippNominativeCriteria,
@@ -26,6 +55,7 @@ import {
   criteriasArrayWtihNominativeData,
   criteriaArrayWithNoNominativeData
 } from '__tests__/data/cohortCreation/cohortCreation'
+
 import {
   completePatientCriteria,
   defaultPatientCriteria,
@@ -37,35 +67,46 @@ import {
   patientNominativeDeathDatesCriteria,
   patientVitalStatusCriteria
 } from '__tests__/data/cohortCreation/patientCriteria'
+
 import { completeEncounterCriteria, defaultEncounterCriteira } from '__tests__/data/cohortCreation/encounterCriteria'
-import {
-  checkNominativeCriteria,
-  buildPatientFilter,
-  buildEncounterFilter,
-  buildDocumentFilter,
-  buildConditionFilter,
-  buildProcedureFilter,
-  buildClaimFilter,
-  buildMedicationFilter,
-  buildObservationFilter,
-  buildImagingFilter,
-  buildPregnancyFilter,
-  buildHospitFilter
-} from 'utils/cohortCreation'
+
 import { completeDocumentCriteria, defaultDocumentCriteria } from '__tests__/data/cohortCreation/documentCriteria'
 import { completeConditionCriteria, defaultConditionCriteria } from '__tests__/data/cohortCreation/conditionCriteria'
 import { completeProcedureCriteria, defaultProcedureCriteria } from '__tests__/data/cohortCreation/procedureCriteria'
 import { completeClaimCriteria, defaultClaimCriteria } from '__tests__/data/cohortCreation/claimCriteria'
+
 import {
   completeMedicationAdministrationCriteria,
   completeMedicationPrescriptionCriteria,
   defaultMedicationCriteria
 } from '__tests__/data/cohortCreation/medicationCriteria'
+
 import {
   completeObservationCriteria,
   defaultObservationCriteria
 } from '__tests__/data/cohortCreation/observationCriteria'
+
 import { completeImagingCriteria, defaultImagingCriteria } from '__tests__/data/cohortCreation/imagingCriteria'
+
+import {
+  completeClaimJson,
+  completeConditionJson,
+  completeDocumentJson,
+  completeEncounterJson,
+  completeImagingJson,
+  completeMedicationAdministrationJson,
+  completeMedicationRequestJson,
+  completeObservationJson,
+  completeProcedureJson,
+  emptyClaimJson,
+  emptyConditionJson,
+  emptyDocumentJson,
+  emptyEncounterJson,
+  emptyImagingJson,
+  emptyMedicationJson,
+  emptyObservationJson,
+  emptyProcedureJson
+} from '__tests__/data/cohortCreation/json'
 
 describe('test of checkNominativeCriteria', () => {
   it('should return false if selectedCriteria is an empty array', () => {
@@ -493,3 +534,112 @@ describe('test of buildImagingFilter', () => {
 //     expect().toEqual()
 //   })
 // })
+
+
+describe('test of unbuildEncounterCriteria', () => {
+  it('test of empty encounter json', async () => {
+    const encounterJson = emptyEncounterJson
+    const result = defaultEncounterCriteira
+    expect(await unbuildEncounterCriteria(encounterJson)).toEqual(result)
+  })
+  it('test of complete encounter json', async () => {
+    const encounterJson = completeEncounterJson
+    const result = completeEncounterCriteria
+    expect(await unbuildEncounterCriteria(encounterJson)).toEqual(result)
+  })
+})
+
+describe('test of unbuildDocumentCriteria', () => {
+  it('test of empty Document json', async () => {
+    const DocumentJson = emptyDocumentJson
+    const result = defaultDocumentCriteria
+    expect(await unbuildDocumentReferenceCriteria(DocumentJson)).toEqual(result)
+  })
+  it('test of complete Document json', async () => {
+    const DocumentJson = completeDocumentJson
+    const result = completeDocumentCriteria
+    expect(await unbuildDocumentReferenceCriteria(DocumentJson)).toEqual(result)
+  })
+})
+describe('test of unbuildConditionCriteria', () => {
+  it('test of empty Condition json', async () => {
+    const ConditionJson = emptyConditionJson
+    const result = defaultConditionCriteria
+    expect(await unbuildConditionCriteria(ConditionJson)).toEqual(result)
+  })
+  it('test of complete Condition json', async () => {
+    const ConditionJson = completeConditionJson
+    const result = completeConditionCriteria
+    expect(await unbuildConditionCriteria(ConditionJson)).toEqual(result)
+  })
+})
+
+describe('test of unbuildProcedureCriteria', () => {
+  it('test of empty Procedure json', async () => {
+    const ProcedureJson = emptyProcedureJson
+    const result = defaultProcedureCriteria
+    expect(await unbuildProcedureCriteria(ProcedureJson)).toEqual(result)
+  })
+  it('test of complete Procedure json', async () => {
+    const ProcedureJson = completeProcedureJson
+    const result = completeProcedureCriteria
+    expect(await unbuildProcedureCriteria(ProcedureJson)).toEqual(result)
+  })
+})
+
+describe('test of unbuildClaimCriteria', () => {
+  it('test of empty Claim json', async () => {
+    const ClaimJson = emptyClaimJson
+    const result = defaultClaimCriteria
+    expect(await unbuildClaimCriteria(ClaimJson)).toEqual(result)
+  })
+  it('test of complete Claim json', async () => {
+    const ClaimJson = completeClaimJson
+    const result = completeClaimCriteria
+    expect(await unbuildClaimCriteria(ClaimJson)).toEqual(result)
+  })
+})
+
+describe('test of unbuildMedicationCriteria', () => {
+  it('test of empty Medication json', async () => {
+    const MedicationJson = emptyMedicationJson
+    const result = defaultMedicationCriteria
+    expect(await unbuildMedicationCriteria(MedicationJson)).toEqual(result)
+  })
+  it('test of complete Medication administration json', async () => {
+    const MedicationJson = completeMedicationAdministrationJson
+    const result = completeMedicationAdministrationCriteria
+    expect(await unbuildMedicationCriteria(MedicationJson)).toEqual(result)
+  })
+  it('test of complete Medication request json', async () => {
+    const MedicationJson = completeMedicationRequestJson
+    const result = completeMedicationPrescriptionCriteria
+    expect(await unbuildMedicationCriteria(MedicationJson)).toEqual(result)
+  })
+})
+
+describe('test of unbuildObservationCriteria', () => {
+  it('test of empty Observation json', async () => {
+    const ObservationJson = emptyObservationJson
+    const result = defaultObservationCriteria
+    expect(await unbuildObservationCriteria(ObservationJson)).toEqual(result)
+  })
+  it('test of complete Observation json', async () => {
+    const ObservationJson = completeObservationJson
+    const result = completeObservationCriteria
+    expect(await unbuildObservationCriteria(ObservationJson)).toEqual(result)
+  })
+})
+
+describe('test of unbuildImagingCriteria', () => {
+  it('test of empty Imaging json', async () => {
+    const ImagingJson = emptyImagingJson
+    const result = defaultImagingCriteria
+    expect(await unbuildImagingCriteria(ImagingJson)).toEqual(result)
+  })
+  it('test of complete Imaging json', async () => {
+    const ImagingJson = completeImagingJson
+    const result = completeImagingCriteria
+    expect(await unbuildImagingCriteria(ImagingJson)).toEqual(result)
+  })
+})

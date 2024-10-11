@@ -4,7 +4,7 @@ export const defaultEncounterCriteira: EncounterDataType = {
   id: 1,
   type: CriteriaType.ENCOUNTER,
   isInclusive: true,
-  title: 'Encouter',
+  title: 'Encounter',
   occurrence: null,
   occurrenceComparator: null,
   startOccurrence: [null, null],

@@ -900,7 +900,7 @@ const unbuildCriteria = async <T extends SelectedCriteriaTypesWithOccurrences | 
   return emptyCriterion
 }
 
-const unbuildPatientCriteria = async (element: RequeteurCriteriaType): Promise<DemographicDataType> => {
+export const unbuildPatientCriteria = async (element: RequeteurCriteriaType): Promise<DemographicDataType> => {
   const currentCriterion: DemographicDataType = {
     ...unbuildCommonCriteria(element),
     type: CriteriaType.PATIENT,
@@ -950,7 +950,7 @@ const unbuildPatientCriteria = async (element: RequeteurCriteriaType): Promise<D
   })
 }
 
-const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise<EncounterDataType> => {
+export const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise<EncounterDataType> => {
   const currentCriterion: EncounterDataType = {
     ...unbuildCommonCriteria(element),
     type: CriteriaType.ENCOUNTER,
@@ -1049,7 +1049,7 @@ const unbuildEncounterCriteria = async (element: RequeteurCriteriaType): Promise
   })
 }
 
-const unbuildDocumentReferenceCriteria = async (element: RequeteurCriteriaType): Promise<DocumentDataType> => {
+export const unbuildDocumentReferenceCriteria = async (element: RequeteurCriteriaType): Promise<DocumentDataType> => {
   const currentCriterion: DocumentDataType = {
     ...unbuildCommonCriteria(element),
     type: CriteriaType.DOCUMENTS,
@@ -1114,7 +1114,7 @@ const unbuildDocumentReferenceCriteria = async (element: RequeteurCriteriaType):
   })
 }
 
-const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise<Cim10DataType> => {
+export const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise<Cim10DataType> => {
   const currentCriterion: Cim10DataType = {
     ...unbuildCommonCriteria(element),
     type: CriteriaType.CONDITION,
@@ -1164,7 +1164,7 @@ const unbuildConditionCriteria = async (element: RequeteurCriteriaType): Promise
   })
 }
 
-const unbuildProcedureCriteria = async (element: RequeteurCriteriaType): Promise<CcamDataType> => {
+export const unbuildProcedureCriteria = async (element: RequeteurCriteriaType): Promise<CcamDataType> => {
   const currentCriterion: CcamDataType = {
     ...unbuildCommonCriteria(element),
     type: CriteriaType.PROCEDURE,
@@ -1213,7 +1213,7 @@ const unbuildProcedureCriteria = async (element: RequeteurCriteriaType): Promise
   })
 }
 
-const unbuildClaimCriteria = async (element: RequeteurCriteriaType): Promise<GhmDataType> => {
+export const unbuildClaimCriteria = async (element: RequeteurCriteriaType): Promise<GhmDataType> => {
   const currentCriterion: GhmDataType = {
     ...unbuildCommonCriteria(element),
     type: CriteriaType.CLAIM,
@@ -1256,7 +1256,7 @@ const unbuildClaimCriteria = async (element: RequeteurCriteriaType): Promise<Ghm
     ['_filter']: (c, v) => unbuildEncounterDatesFilters(c, v)
   })
 }
-const unbuildMedicationCriteria = async (element: RequeteurCriteriaType): Promise<MedicationDataType> => {
+export const unbuildMedicationCriteria = async (element: RequeteurCriteriaType): Promise<MedicationDataType> => {
   const currentCriterion: MedicationDataType = {
     ...unbuildCommonCriteria(element),
     title: element.name ?? 'Critère de médicament',
@@ -1323,7 +1323,7 @@ const unbuildMedicationCriteria = async (element: RequeteurCriteriaType): Promis
     ['_filter']: (c, v) => unbuildEncounterDatesFilters(c, v)
   })
 }
-const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promise<ObservationDataType> => {
+export const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promise<ObservationDataType> => {
   const currentCriterion: ObservationDataType = {
     ...unbuildCommonCriteria(element),
     type: CriteriaType.OBSERVATION,
@@ -1384,7 +1384,7 @@ const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promi
     ['_filter']: (c, v) => unbuildEncounterDatesFilters(c, v)
   })
 }
-const unbuildIPPListCriteria = async (element: RequeteurCriteriaType): Promise<IPPListDataType> => {
+export const unbuildIPPListCriteria = async (element: RequeteurCriteriaType): Promise<IPPListDataType> => {
   const currentCriterion: IPPListDataType = {
     ...unbuildCommonCriteria(element),
     type: CriteriaType.IPP_LIST,
@@ -1399,7 +1399,7 @@ const unbuildIPPListCriteria = async (element: RequeteurCriteriaType): Promise<I
   })
 }
 
-const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<ImagingDataType> => {
+export const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<ImagingDataType> => {
   const currentCriterion: ImagingDataType = {
     ...unbuildCommonCriteria(element),
     type: CriteriaType.IMAGING,
@@ -1512,7 +1512,7 @@ const unbuildImagingCriteria = async (element: RequeteurCriteriaType): Promise<I
   })
 }
 
-const unbuildPregnancyQuestionnaireResponseCriteria = async (
+export const unbuildPregnancyQuestionnaireResponseCriteria = async (
   element: RequeteurCriteriaType
 ): Promise<PregnancyDataType> => {
   const currentCriterion: PregnancyDataType = {
@@ -1617,7 +1617,9 @@ const unbuildPregnancyQuestionnaireResponseCriteria = async (
   return currentCriterion
 }
 
-const unbuildHospitQuestionnaireResponseCriteria = async (element: RequeteurCriteriaType): Promise<HospitDataType> => {
+export const unbuildHospitQuestionnaireResponseCriteria = async (
+  element: RequeteurCriteriaType
+): Promise<HospitDataType> => {
   const currentCriterion: HospitDataType = {
     ...unbuildCommonCriteria(element),
     title: "Critère de Fiche d'hospitalisation",
@@ -1872,7 +1874,9 @@ const unbuildHospitQuestionnaireResponseCriteria = async (element: RequeteurCrit
   return currentCriterion
 }
 
-const unbuildQuestionnaireResponseCriteria = async (element: RequeteurCriteriaType): Promise<SelectedCriteriaType> => {
+export const unbuildQuestionnaireResponseCriteria = async (
+  element: RequeteurCriteriaType
+): Promise<SelectedCriteriaType> => {
   if (element.filterFhir) {
     const splittedFilters = element.filterFhir.split('&')
     const findRessource = findQuestionnaireName(splittedFilters)
