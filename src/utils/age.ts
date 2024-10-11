@@ -7,7 +7,7 @@ import { getConfig } from 'config'
 
 export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'months'): string => {
   if (ageValue === 0 && momentUnit === 'months') return '< 1 mois'
-  if (!ageValue) return 'Âge inconnu'
+  if (ageValue === undefined) return 'Âge inconnu'
   let ageUnit: 'year' | 'month' | 'day' = 'year'
   let ageUnitDisplay = ''
   const momentAge = moment().subtract(ageValue, momentUnit)
@@ -15,7 +15,7 @@ export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'm
 
   if (today.diff(momentAge, 'year') > 0) {
     ageUnit = 'year'
-    ageUnitDisplay = 'ans'
+    ageUnitDisplay = today.diff(momentAge, 'year') <= 1 ? 'an' : 'ans'
   } else if (today.diff(momentAge, 'month') > 0) {
     ageUnit = 'month'
     ageUnitDisplay = 'mois'
