@@ -6,7 +6,8 @@ import { Hierarchy } from './hierarchy'
 
 export enum FormNames {
   PREGNANCY = 'APHPEDSQuestionnaireFicheGrossesse',
-  HOSPIT = 'APHPEDSQuestionnaireFicheHospitalisation'
+  HOSPIT = 'APHPEDSQuestionnaireFicheHospitalisation',
+  UNKNOWN = 'Inconnu'
 }
 
 export enum GenderStatus {

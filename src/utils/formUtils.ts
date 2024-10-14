@@ -50,22 +50,28 @@ export const getDataFromForm = (
 
 export const getFormName = (form: CohortQuestionnaireResponse, questionnairesList: Questionnaire[]) => {
   const formQuestionnaireId = form.questionnaire?.replace('Questionnaire/', '')
-  return questionnairesList.find((questionnaire) => questionnaire.id === formQuestionnaireId)?.name
+  const formName = questionnairesList.find((questionnaire) => questionnaire.id === formQuestionnaireId)?.name
+
+  return formName && Object.values(FormNames).includes(formName as FormNames) ? formName : FormNames.UNKNOWN
 }
 
-export const getFormLabel = (formName: FormNames) => {
-  const mapToFormLabels = {
-    [FormNames.HOSPIT]: labels.formNames.hospit,
-    [FormNames.PREGNANCY]: labels.formNames.pregnancy
-  }
+export const getFormLabel = (formName: FormNames = FormNames.UNKNOWN) => {
+  if (formName) {
+    const mapToFormLabels = {
+      [FormNames.HOSPIT]: labels.formNames.hospit,
+      [FormNames.PREGNANCY]: labels.formNames.pregnancy,
+      [FormNames.UNKNOWN]: 'Inconnu'
+    }
 
-  return mapToFormLabels[formName]
+    return mapToFormLabels[formName]
+  }
 }
 
 export const getFormDetails = (form: CohortQuestionnaireResponse, formName: FormNames) => {
   const mapToFormDetails = {
     [FormNames.HOSPIT]: generateHospitDetails(form),
-    [FormNames.PREGNANCY]: generatePregnancyDetails(form)
+    [FormNames.PREGNANCY]: generatePregnancyDetails(form),
+    [FormNames.UNKNOWN]: []
   }
 
   return mapToFormDetails[formName]
@@ -85,10 +91,12 @@ export const getBirthDeliveryDate = (
 }
 
 export const formatHospitalisationDates = (start?: string, end?: string) => {
-  if (start && end) {
-    return `Hospitalisation du ${moment(start).format('DD/MM/YYYY')} au ${moment(end).format('DD/MM/YYYY')}`
-  } else if (start && !end) {
-    return `Début d'hospitalisation le ${moment(start).format('DD/MM/YYYY')}`
+  const _start = start && moment(start).isValid() ? moment(start).format('DD/MM/YYYY') : undefined
+  const _end = end && moment(end).isValid() ? moment(end).format('DD/MM/YYYY') : undefined
+  if (_start && _end) {
+    return `Hospitalisation du ${_start} au ${_end}`
+  } else if (_start && !_end) {
+    return `Début d'hospitalisation le ${_start}`
   }
 }
 
