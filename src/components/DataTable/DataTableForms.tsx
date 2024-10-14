@@ -118,9 +118,17 @@ const DataTableFormsLine: React.FC<{
         </TableCellWrapper>
       </TableRow>
       <TableRow>
-        <TableCellWrapper colSpan={5} style={{ padding: 0, borderBottom: open ? undefined : 0 }}>
+        <TableCellWrapper
+          colSpan={5}
+          style={{
+            padding: open && formDetails.length === 0 ? 16 : 0,
+            borderBottom: open ? undefined : 0,
+            borderTop: open ? '2px solid #FFF' : undefined,
+            backgroundColor: formDetails.length === 0 ? '#F6FAFE' : undefined
+          }}
+        >
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <FormDetails content={formDetails} />
+            {formDetails.length === 0 ? 'Aucune donnée à afficher' : <FormDetails content={formDetails} />}
           </Collapse>
         </TableCellWrapper>
       </TableRow>

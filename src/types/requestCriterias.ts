@@ -6,7 +6,8 @@ export enum QuestionnaireResponseParamsKeys {
   NAME = 'questionnaire.name',
   DATE = 'authored',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status'
+  ENCOUNTER_STATUS = 'encounter.status',
+  IPP = 'subject.identifier'
 }
 
 export enum IppParamsKeys {
