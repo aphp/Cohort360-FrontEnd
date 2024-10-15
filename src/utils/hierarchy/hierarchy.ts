@@ -1,5 +1,5 @@
 import { SelectedStatus } from 'types'
-import { CodeKey, GroupedBySystem, Hierarchy, InfiniteMap, Mode } from 'types/hierarchy'
+import { CodeKey, Codes, GroupedBySystem, Hierarchy, InfiniteMap, Mode } from 'types/hierarchy'
 import { arrayToMap } from '../arrays'
 import { UNKOWN_CHAPTER } from 'services/aphp/serviceValueSets'
 
@@ -20,7 +20,7 @@ export const cleanNodes = <T>(nodes: Hierarchy<T, string>[]) => {
   return nodes.map((item) => ({ ...item, subItems: undefined, status: undefined }))
 }
 
-export const mapHierarchyToMap = <T>(hierarchy: Hierarchy<T, string>[]) => {
+const mapHierarchyToMap = <T>(hierarchy: Hierarchy<T, string>[]) => {
   return hierarchy.reduce((resultMap: Map<CodeKey, Hierarchy<T, string>>, item) => {
     resultMap.set(`${item.system}|${item.id}`, item)
     return resultMap
@@ -44,16 +44,15 @@ const addAllFetchedIds = <T>(codes: Map<CodeKey, Hierarchy<T, string>>, results:
 export const getMissingCodesWithSystems = async <T>(
   trees: Map<string, Hierarchy<T, string>[]>,
   groupBySystem: GroupedBySystem<T>[],
-  prevCodes: Map<CodeKey, Hierarchy<T, string>>,
+  codes: Codes<Hierarchy<T>>,
   fetchHandler: (ids: string, system: string) => Promise<Hierarchy<T, string>[]>
 ) => {
-  let allCodes: Map<CodeKey, Hierarchy<T, string>> = new Map()
+  let allCodes: Codes<Hierarchy<T>> = new Map(codes)
   for (const group of groupBySystem) {
-    const tree = trees.get(group.system)
-    if (tree) {
-      const newCodes = await getMissingCodes(tree, prevCodes, group.codes, group.system, Mode.SEARCH, fetchHandler)
-      allCodes = new Map([...allCodes, ...newCodes])
-    }
+    const tree = trees.get(group.system) || []
+    const codesBySystem = codes.get(group.system) || new Map()
+    const newCodes = await getMissingCodes(tree, codesBySystem, group.codes, group.system, Mode.SEARCH, fetchHandler)
+    allCodes.set(group.system, newCodes)
   }
   return allCodes
 }
@@ -118,16 +117,15 @@ export const getMissingSubItems = <T>(node: Hierarchy<T, string>, codes: Map<Cod
 export const buildMultipleTrees = <T>(
   trees: Map<string, Hierarchy<T, string>[]>,
   groupBySystem: GroupedBySystem<T>[],
-  codes: Map<CodeKey, Hierarchy<T, string>>,
+  codes: Codes<Hierarchy<T>>,
   selected: Hierarchy<T, string>[],
   mode: Mode
 ) => {
   for (const group of groupBySystem) {
-    const tree = trees.get(group.system)
-    if (tree) {
-      const newTree = buildTree([...tree], group.system, group.codes, codes, selected, mode)
-      trees.set(group.system, newTree)
-    }
+    const tree = trees.get(group.system) || []
+    const codesBySystem = codes.get(group.system) || new Map()
+    const newTree = buildTree([...tree], group.system, group.codes, codesBySystem, selected, mode)
+    trees.set(group.system, newTree)
   }
   return new Map(trees)
 }

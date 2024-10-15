@@ -4,6 +4,10 @@ import { LIMIT_PER_PAGE, SearchParameters, useSearchParameters } from '../search
 import { useHierarchy } from 'hooks/hierarchy/useHierarchy'
 import { getChildrenFromCodes, getHierarchyRoots, searchInValueSets } from 'services/aphp/serviceValueSets'
 import { useDebounceAction } from 'hooks/useDebounceAction'
+import { Codes, FhirItem, Hierarchy } from 'types/hierarchy'
+import { saveValueSet } from 'state/valueSets'
+import { cleanNodes } from 'utils/hierarchy/hierarchy'
+import { useAppDispatch } from 'state'
 
 export const useSearchValueSet = (references: Reference[]) => {
   const researchParameters = useSearchParameters()
@@ -11,14 +15,18 @@ export const useSearchValueSet = (references: Reference[]) => {
   const [searchInput, setSearchInput] = useState('')
   const [mode, setMode] = useState(SearchMode.EXPLORATION)
   const [initialized, setInitialized] = useState({ exploration: false, research: false })
+  const dispatch = useAppDispatch()
 
   const fetchChildren = useCallback(
     async (ids: string, system: string) => (await getChildrenFromCodes(system, ids.split(','))).results,
     []
   )
 
-  const onCache = useCallback(() => {}, [])
-  const fetchedCodes = useMemo(() => [], [])
+  const handleSaveCodes = useCallback((codes: Codes<Hierarchy<FhirItem>>) => {
+    console.log('test all codes', codes)
+      dispatch(saveValueSet(codes))
+  }, [])
+  const fetchedCodes = useMemo(() => new Map(), [])
   const selectedNodes = useMemo(() => [], [])
 
   const {
@@ -33,7 +41,7 @@ export const useSearchValueSet = (references: Reference[]) => {
     select,
     selectAll,
     deleteCode
-  } = useHierarchy(selectedNodes, fetchedCodes, onCache, fetchChildren)
+  } = useHierarchy(selectedNodes, fetchedCodes, handleSaveCodes, fetchChildren)
 
   const controllerRef = useRef<AbortController | null>(null)
   const currentHierarchy = useMemo(() => {

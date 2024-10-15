@@ -62,3 +62,5 @@ export type GroupedBySystem<T> = {
 }
 
 export type CodeKey = string
+
+export type Codes<T> = Map<string, Map<CodeKey, Hierarchy<T>>>
