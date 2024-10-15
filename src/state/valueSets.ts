@@ -19,7 +19,7 @@ const valueSetsSlice = createSlice({
     cache: {} as { [system: string]: LabelObject[] }
   }),
   reducers: {
-    addValueSets: valueSetsAdapter.addMany,
+    saveValueSet: valueSetsAdapter.setMany,
     updateCache: (state, action: PayloadAction<{ [system: string]: LabelObject[] }>) => {
       return {
         ...state,
@@ -34,5 +34,5 @@ const valueSetsSlice = createSlice({
   }
 })
 
-export const { addValueSets, updateCache } = valueSetsSlice.actions
+export const { saveValueSet, updateCache } = valueSetsSlice.actions
 export default valueSetsSlice.reducer
