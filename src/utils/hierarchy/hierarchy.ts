@@ -2,6 +2,20 @@ import { SelectedStatus } from 'types'
 import { CodeKey, Codes, GroupedBySystem, Hierarchy, InfiniteMap, Mode } from 'types/hierarchy'
 import { arrayToMap } from '../arrays'
 import { UNKOWN_CHAPTER } from 'services/aphp/serviceValueSets'
+import { ValueSetOptions } from 'state/valueSets'
+
+export const mapHierarchyToValueSetOptions = <T>(codes: Codes<Hierarchy<T>>) => {
+  const valueSetOptions: ValueSetOptions[] = []
+  codes.forEach((innerMap, outerKey) => {
+    const options: Record<string, Hierarchy<T>> = {}
+    innerMap.forEach((hierarchy, innerKey) => (options[innerKey] = cleanNode(hierarchy)))
+    valueSetOptions.push({
+      id: outerKey,
+      options
+    })
+  })
+  return valueSetOptions
+}
 
 export const getHierarchyRootCodes = <T>(tree: Hierarchy<T, string>[]) => {
   let codes: Map<CodeKey, Hierarchy<T>> = new Map()
@@ -16,8 +30,8 @@ export const getHierarchyRootCodes = <T>(tree: Hierarchy<T, string>[]) => {
   return codes
 }
 
-export const cleanNodes = <T>(nodes: Hierarchy<T, string>[]) => {
-  return nodes.map((item) => ({ ...item, subItems: undefined, status: undefined }))
+export const cleanNode = <T>(node: Hierarchy<T, string>) => {
+  return  ({ ...node, subItems: undefined, status: undefined })
 }
 
 const mapHierarchyToMap = <T>(hierarchy: Hierarchy<T, string>[]) => {
