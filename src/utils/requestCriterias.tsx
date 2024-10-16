@@ -930,9 +930,9 @@ export const criteriasAsArray = (selectedCriteria: SelectedCriteriaType, criteri
           getDatesLabel(
             selectedCriteria.endOccurrence ?? [null, null],
             getOccurenceDateLabel(
-              selectedCriteria.type as Exclude<CriteriaTypesWithAdvancedInputs, CriteriaType.IMAGING>
-            ),
-            true
+              selectedCriteria.type as Exclude<CriteriaTypesWithAdvancedInputs, CriteriaType.IMAGING>,
+              true
+            )
           )
         )
       if (selectedCriteria.encounterService && selectedCriteria.encounterService.length > 0)
