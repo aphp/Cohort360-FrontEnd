@@ -239,8 +239,9 @@ const criteriaList: () => CriteriaItemType[] = () => {
                 inUteroTransfer: () => booleanOpenChoiceFieldsData,
                 pregnancyMonitoring: () => booleanFieldsData,
                 maturationCorticotherapie: () => booleanOpenChoiceFieldsData,
-                chirurgicalGesture: () =>
-                  async(() => getCodeList(getConfig().features.questionnaires.valueSets.chirurgicalGesture.url)),
+                chirurgicalGesture: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.chirurgicalGesture.url)
+                ),
                 vme: () => vmeData,
                 childbirth: () => booleanOpenChoiceFieldsData,
                 hospitalChildBirthPlace: () => booleanFieldsData,

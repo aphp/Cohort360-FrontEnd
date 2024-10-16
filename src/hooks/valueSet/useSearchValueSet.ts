@@ -5,9 +5,9 @@ import { useHierarchy } from 'hooks/hierarchy/useHierarchy'
 import { getChildrenFromCodes, getHierarchyRoots, searchInValueSets } from 'services/aphp/serviceValueSets'
 import { useDebounceAction } from 'hooks/useDebounceAction'
 import { Codes, FhirItem, Hierarchy } from 'types/hierarchy'
-import { saveValueSet } from 'state/valueSets'
-import { cleanNodes } from 'utils/hierarchy/hierarchy'
-import { useAppDispatch } from 'state'
+import { saveValueSets, selectByIdsMapped } from 'state/valueSets'
+import { mapHierarchyToValueSetOptions } from 'utils/hierarchy/hierarchy'
+import { useAppDispatch, useAppSelector } from 'state'
 
 export const useSearchValueSet = (references: Reference[]) => {
   const researchParameters = useSearchParameters()
@@ -23,11 +23,18 @@ export const useSearchValueSet = (references: Reference[]) => {
   )
 
   const handleSaveCodes = useCallback((codes: Codes<Hierarchy<FhirItem>>) => {
-    console.log('test all codes', codes)
-      dispatch(saveValueSet(codes))
+    const entities = mapHierarchyToValueSetOptions(codes)
+    dispatch(saveValueSets(entities))
   }, [])
-  const fetchedCodes = useMemo(() => new Map(), [])
+
+  const urls = useMemo(() => {
+    return references.map((ref) => ref.url)
+  }, [references])
+
+  const codes = useAppSelector((state) => selectByIdsMapped(state, urls))
   const selectedNodes = useMemo(() => [], [])
+
+  useEffect(() => console.log('test store', codes), [codes])
 
   const {
     hierarchies,
@@ -41,7 +48,7 @@ export const useSearchValueSet = (references: Reference[]) => {
     select,
     selectAll,
     deleteCode
-  } = useHierarchy(selectedNodes, fetchedCodes, handleSaveCodes, fetchChildren)
+  } = useHierarchy(selectedNodes, codes, handleSaveCodes, fetchChildren)
 
   const controllerRef = useRef<AbortController | null>(null)
   const currentHierarchy = useMemo(() => {

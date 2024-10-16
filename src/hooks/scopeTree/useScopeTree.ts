@@ -6,7 +6,6 @@ import { SourceType, System } from 'types/scope'
 import { useAppDispatch, useAppSelector } from 'state'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 import { saveFetchedPerimeters, saveFetchedRights } from 'state/scope'
-import { cleanNodes } from 'utils/hierarchy/hierarchy'
 import { useHierarchy } from 'hooks/hierarchy/useHierarchy'
 import { SearchMode } from 'types/searchValueSet'
 
@@ -45,8 +44,8 @@ export const useScopeTree = (
   }
 
   const handleSaveCodes = useCallback((codes: Hierarchy<ScopeElement, string>[]) => {
-    if (sourceType === SourceType.ALL) dispatch(saveFetchedRights(cleanNodes(codes)))
-    else dispatch(saveFetchedPerimeters(cleanNodes(codes)))
+    if (sourceType === SourceType.ALL) dispatch(saveFetchedRights(codes))
+    else dispatch(saveFetchedPerimeters(codes))
   }, [])
 
   const {

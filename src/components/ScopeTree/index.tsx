@@ -6,7 +6,6 @@ import SelectedCodes from '../Hierarchy/SelectedCodes'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import ScopeTreeTable from './ScopeTreeTable'
-import { cleanNodes } from 'utils/hierarchy/hierarchy'
 import { useScopeTree } from 'hooks/scopeTree/useScopeTree'
 import { Pagination } from 'components/ui/Pagination'
 import { LIMIT_PER_PAGE } from 'hooks/search/useSearchParameters'
@@ -27,7 +26,7 @@ const ScopeTree = ({ baseTree, selectedNodes, sourceType, onSelect }: ScopeTreeP
   } = useScopeTree(baseTree, selectedNodes, sourceType)
 
   useEffect(() => {
-    onSelect(cleanNodes(selectedCodes))
+    onSelect(selectedCodes)
   }, [selectedCodes])
 
   return (
