@@ -178,11 +178,12 @@ export const initImagingCriterias: SearchCriterias<ImagingFilters> = {
 
 export const initFormsCriterias: SearchCriterias<MaternityFormFilters> = {
   orderBy: {
-    orderBy: Order.DATE,
+    orderBy: Order.AUTHORED,
     orderDirection: Direction.DESC
   },
   searchInput: '',
   filters: {
+    ipp: '',
     formName: [],
     startDate: null,
     endDate: null,

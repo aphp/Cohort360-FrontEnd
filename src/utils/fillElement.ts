@@ -11,7 +11,8 @@ import {
   MedicationRequest,
   Observation,
   Patient,
-  Procedure
+  Procedure,
+  QuestionnaireResponse
 } from 'fhir/r4'
 import { fetchPatient, fetchEncounter } from 'services/aphp/callApi'
 import {
@@ -20,6 +21,7 @@ import {
   CohortMedication,
   CohortObservation,
   CohortPMSI,
+  CohortQuestionnaireResponse,
   FHIR_API_Response
 } from 'types'
 import { ResourceType } from 'types/requestCriterias'
@@ -34,6 +36,7 @@ type ResourceToFill =
   | MedicationRequest
   | MedicationAdministration
   | Observation
+  | QuestionnaireResponse
 
 const getPatientIdPath = (element: ResourceToFill) => {
   const patientIdPath = {
@@ -47,7 +50,11 @@ const getPatientIdPath = (element: ResourceToFill) => {
       /^Patient\//,
       ''
     ),
-    [ResourceType.OBSERVATION]: (element as Observation).subject?.reference?.replace(/^Patient\//, '')
+    [ResourceType.OBSERVATION]: (element as Observation).subject?.reference?.replace(/^Patient\//, ''),
+    [ResourceType.QUESTIONNAIRE_RESPONSE]: (element as QuestionnaireResponse).subject?.reference?.replace(
+      /^Patient\//,
+      ''
+    )
   }
 
   return patientIdPath[element.resourceType]
@@ -68,7 +75,11 @@ const getEncounterIdPath = (element: ResourceToFill) => {
       /^Encounter\//,
       ''
     ),
-    [ResourceType.OBSERVATION]: (element as Observation).encounter?.reference?.replace(/^Encounter\//, '')
+    [ResourceType.OBSERVATION]: (element as Observation).encounter?.reference?.replace(/^Encounter\//, ''),
+    [ResourceType.QUESTIONNAIRE_RESPONSE]: (element as QuestionnaireResponse).encounter?.reference?.replace(
+      /^Encounter\//,
+      ''
+    )
   }
 
   return encounterIdPath[element.resourceType]
@@ -106,6 +117,7 @@ export const getResourceInfos = async <
     | CohortPMSI
     | CohortMedication<MedicationRequest | MedicationAdministration>
     | CohortObservation
+    | CohortQuestionnaireResponse
 >(
   elementEntries: T[],
   deidentifiedBoolean: boolean,

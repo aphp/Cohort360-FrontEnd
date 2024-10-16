@@ -6,12 +6,8 @@ import { Hierarchy } from './hierarchy'
 
 export enum FormNames {
   PREGNANCY = 'APHPEDSQuestionnaireFicheGrossesse',
-  HOSPIT = 'APHPEDSQuestionnaireFicheHospitalisation'
-}
-
-export enum FormNamesLabel {
-  PREGNANCY = 'Fiches de grossesse',
-  HOSPIT = "Formulaires d'hospitalisation"
+  HOSPIT = 'APHPEDSQuestionnaireFicheHospitalisation',
+  UNKNOWN = 'Inconnu'
 }
 
 export enum GenderStatus {
@@ -135,7 +131,8 @@ export enum Order {
   MEDICATION_ATC = 'medication-atc',
   MEDICATION_UCD = 'medication-ucd',
   PRESCRIPTION_TYPES = 'category-name',
-  ADMINISTRATION_MODE = 'route'
+  ADMINISTRATION_MODE = 'route',
+  AUTHORED = 'authored'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -311,6 +308,7 @@ export type MaternityFormFilters = {
   endDate: string | null
   encounterStatus: LabelObject[]
   executiveUnits: Hierarchy<ScopeElement, string>[]
+  ipp?: string
 }
 
 export type DocumentsFilters = GenericFilter & {
