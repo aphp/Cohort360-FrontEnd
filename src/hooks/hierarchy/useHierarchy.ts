@@ -48,7 +48,6 @@ export const useHierarchy = <T>(
   const [selectAllStatus, setSelectAllStatus] = useState(SelectedStatus.NOT_SELECTED)
 
   useEffect(() => {
-    console.log("test new codes", codes)
     latestCodes.current = codes
   }, [codes])
 
@@ -61,20 +60,22 @@ export const useHierarchy = <T>(
   ) => {
     const newTrees: Map<string, Hierarchy<T>[]> = new Map()
     const newHierarchies: Map<string, HierarchyInfo<T>> = new Map()
-    let codes: Codes<Hierarchy<T>> = new Map()
+    let allCodes: Codes<Hierarchy<T>> = new Map()
     for (const handler of initHandlers) {
       const { results: baseTree, count } = await handler.fetchBaseTree()
-      const prevCodes = [...baseTree, ...selectedCodes]
-      const newCodes = await getMissingCodes(baseTree, new Map(), prevCodes, handler.system, Mode.INIT, fetchHandler)
-      const newTree = buildTree(baseTree, handler.system, prevCodes, newCodes, selectedCodes, Mode.INIT)
+      const toFindCodes = [...baseTree, ...selectedCodes]
+      const currentCodes = codes.get(handler.system) || new Map()
+      const newCodes = await getMissingCodes(baseTree, currentCodes, toFindCodes, handler.system, Mode.INIT, fetchHandler)
+      const newTree = buildTree(baseTree, handler.system, toFindCodes, newCodes, selectedCodes, Mode.INIT)
       const newHierarchy = getHierarchyDisplay(baseTree, newTree)
       newTrees.set(handler.system, newTree)
       newHierarchies.set(handler.system, { tree: newHierarchy, count, page: 1 })
-      codes.set(handler.system, new Map([...newCodes, ...getHierarchyRootCodes(newTree)]))
+      allCodes.set(handler.system, new Map([...newCodes, ...getHierarchyRootCodes(newTree)]))
     }
     setTrees(newTrees)
     setHierarchies(newHierarchies)
-    setCodes(codes)
+    console.log('test missing init', allCodes)
+    setCodes(allCodes)
     setLoadingStatus((prevLoadingStatus) => ({ ...prevLoadingStatus, init: LoadingStatus.SUCCESS }))
   }
 
@@ -121,7 +122,7 @@ export const useHierarchy = <T>(
   }
 
   const selectAll = (toAdd: boolean) => {
-    /* const mode = toAdd ? Mode.SELECT_ALL : Mode.UNSELECT_ALL
+    /*const mode = toAdd ? Mode.SELECT_ALL : Mode.UNSELECT_ALL
     const newTree = buildHierarchy(currentHierarchy.tree, currentHierarchy.display, codes, selectedCodes, mode)
     const newDisplay = getHierarchyDisplay(currentHierarchy.display, newTree)
     const newSelectedCodes = getSelectedCodes(newTree)

@@ -1,15 +1,12 @@
 import { createSlice, createEntityAdapter, PayloadAction, createSelector } from '@reduxjs/toolkit'
-import { Codes, Hierarchy } from 'types/hierarchy'
+import { CodesCache, FhirItem } from 'types/hierarchy'
 import { logout } from './me'
 import { LabelObject } from 'types/searchCriterias'
 import { RootState } from 'state'
+import { mapCacheToCodes } from 'utils/hierarchy/hierarchy'
 
-export type ValueSetOptions = {
-  id: string
-  options: { [key: string]: Hierarchy<any> }
-}
 
-const valueSetsAdapter = createEntityAdapter<ValueSetOptions>()
+const valueSetsAdapter = createEntityAdapter<CodesCache<FhirItem>>()
 
 const valueSetsSlice = createSlice({
   name: 'valueSets',
@@ -42,18 +39,7 @@ const selectByIds = createSelector(
   (valueSets, ids) => valueSets.filter((valueSet) => ids.includes(valueSet.id))
 )
 
-const mapValueSetOptionsToCodes = <T>(valueSets: ValueSetOptions[]): Codes<Hierarchy<T>> => {
-  console.log("test passage")
-  const codes: Codes<Hierarchy<T>> = new Map()
-  valueSets.forEach((valueSet) => {
-    const innerMap: Map<string, Hierarchy<T>> = new Map()
-    Object.entries(valueSet.options).forEach(([key, hierarchy]) => innerMap.set(key, hierarchy))
-    codes.set(valueSet.id, innerMap)
-  })
-  return codes
-}
-
-export const selectByIdsMapped = createSelector([selectByIds], (valueSets) => mapValueSetOptionsToCodes(valueSets))
+export const selectValueSetCodes = createSelector([selectByIds], (valueSets) => mapCacheToCodes(valueSets))
 
 export const { updateCache, saveValueSets } = valueSetsSlice.actions
 export default valueSetsSlice.reducer
