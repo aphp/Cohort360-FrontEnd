@@ -5,9 +5,9 @@ import { useHierarchy } from 'hooks/hierarchy/useHierarchy'
 import { getChildrenFromCodes, getHierarchyRoots, searchInValueSets } from 'services/aphp/serviceValueSets'
 import { useDebounceAction } from 'hooks/useDebounceAction'
 import { Codes, FhirItem, Hierarchy } from 'types/hierarchy'
-import { saveValueSets, selectByIdsMapped } from 'state/valueSets'
-import { mapHierarchyToValueSetOptions } from 'utils/hierarchy/hierarchy'
+import { saveValueSets, selectValueSetCodes } from 'state/valueSets'
 import { useAppDispatch, useAppSelector } from 'state'
+import { mapCodesToCache } from 'utils/hierarchy/hierarchy'
 
 export const useSearchValueSet = (references: Reference[]) => {
   const researchParameters = useSearchParameters()
@@ -23,7 +23,7 @@ export const useSearchValueSet = (references: Reference[]) => {
   )
 
   const handleSaveCodes = useCallback((codes: Codes<Hierarchy<FhirItem>>) => {
-    const entities = mapHierarchyToValueSetOptions(codes)
+    const entities = mapCodesToCache(codes)
     dispatch(saveValueSets(entities))
   }, [])
 
@@ -31,7 +31,7 @@ export const useSearchValueSet = (references: Reference[]) => {
     return references.map((ref) => ref.url)
   }, [references])
 
-  const codes = useAppSelector((state) => selectByIdsMapped(state, urls))
+  const codes = useAppSelector((state) => selectValueSetCodes(state, urls))
   const selectedNodes = useMemo(() => [], [])
 
   useEffect(() => console.log('test store', codes), [codes])
@@ -96,7 +96,7 @@ export const useSearchValueSet = (references: Reference[]) => {
     const searchRefs = references.map((ref) => ref.url)
     const searchCb = () => fetchSearch('', 0, searchRefs)
     setInitialized({ ...initialized, research: true })
-    fetchMore(searchCb, 0, SearchMode.RESEARCH)
+    fetchMore(searchCb, 1, SearchMode.RESEARCH)
   }
 
   const getSearchParameter = (param: keyof SearchParameters) => {
@@ -133,6 +133,7 @@ export const useSearchValueSet = (references: Reference[]) => {
   }
 
   useEffect(() => {
+    console.log("test hierarchy", hierarchies)
     if (mode === SearchMode.EXPLORATION && !initialized.exploration) initExploration(references)
     if (mode === SearchMode.RESEARCH && !initialized.research) initResearch(references)
   }, [mode])

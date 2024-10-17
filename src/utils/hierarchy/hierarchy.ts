@@ -1,11 +1,10 @@
 import { SelectedStatus } from 'types'
-import { CodeKey, Codes, GroupedBySystem, Hierarchy, InfiniteMap, Mode } from 'types/hierarchy'
+import { Codes, CodesCache, GroupedBySystem, Hierarchy, InfiniteMap, Mode } from 'types/hierarchy'
 import { arrayToMap } from '../arrays'
 import { UNKOWN_CHAPTER } from 'services/aphp/serviceValueSets'
-import { ValueSetOptions } from 'state/valueSets'
 
-export const mapHierarchyToValueSetOptions = <T>(codes: Codes<Hierarchy<T>>) => {
-  const valueSetOptions: ValueSetOptions[] = []
+export const mapCodesToCache = <T>(codes: Codes<Hierarchy<T>>) => {
+  const valueSetOptions: CodesCache<T>[] = []
   codes.forEach((innerMap, outerKey) => {
     const options: Record<string, Hierarchy<T>> = {}
     innerMap.forEach((hierarchy, innerKey) => (options[innerKey] = cleanNode(hierarchy)))
@@ -17,8 +16,18 @@ export const mapHierarchyToValueSetOptions = <T>(codes: Codes<Hierarchy<T>>) => 
   return valueSetOptions
 }
 
+export const mapCacheToCodes = <T>(valueSets: CodesCache<T>[]): Codes<Hierarchy<T>> => {
+  const codes: Codes<Hierarchy<T>> = new Map()
+  valueSets.forEach((valueSet) => {
+    const innerMap: Map<string, Hierarchy<T>> = new Map()
+    Object.entries(valueSet.options).forEach(([key, hierarchy]) => innerMap.set(key, hierarchy))
+    codes.set(valueSet.id, innerMap)
+  })
+  return codes
+}
+
 export const getHierarchyRootCodes = <T>(tree: Hierarchy<T, string>[]) => {
-  let codes: Map<CodeKey, Hierarchy<T>> = new Map()
+  let codes: Map<string, Hierarchy<T>> = new Map()
   for (const root of tree) {
     if (root.subItems) {
       codes = new Map([...codes, ...mapHierarchyToMap(root.subItems)])
@@ -31,26 +40,27 @@ export const getHierarchyRootCodes = <T>(tree: Hierarchy<T, string>[]) => {
 }
 
 export const cleanNode = <T>(node: Hierarchy<T, string>) => {
-  return  ({ ...node, subItems: undefined, status: undefined })
+  return { ...node, subItems: undefined, status: undefined }
 }
 
 const mapHierarchyToMap = <T>(hierarchy: Hierarchy<T, string>[]) => {
-  return hierarchy.reduce((resultMap: Map<CodeKey, Hierarchy<T, string>>, item) => {
+  return hierarchy.reduce((resultMap: Map<string, Hierarchy<T, string>>, item) => {
     resultMap.set(`${item.system}|${item.id}`, item)
     return resultMap
   }, new Map())
 }
 
-const getMissingIds = <T>(prevCodes: Map<CodeKey, Hierarchy<T, string>>, codes: Map<CodeKey, null>) => {
-  const missingCodes: CodeKey[] = []
+const getMissingIds = <T>(prevCodes: Map<string, Hierarchy<T, string>>, codes: Map<string, null>) => {
+  const missingCodes: string[] = []
   for (const [key] of codes) {
+     // console.log('test missing', prevCodes.get(key), key, prevCodes)
     const isFound = prevCodes.get(key)
     if (!isFound) missingCodes.push(key)
   }
   return missingCodes
 }
 
-const addAllFetchedIds = <T>(codes: Map<CodeKey, Hierarchy<T, string>>, results: Hierarchy<T, string>[]) => {
+const addAllFetchedIds = <T>(codes: Map<string, Hierarchy<T, string>>, results: Hierarchy<T, string>[]) => {
   const resultsMap = mapHierarchyToMap(results)
   return new Map([...codes, ...resultsMap])
 }
@@ -73,7 +83,7 @@ export const getMissingCodesWithSystems = async <T>(
 
 export const getMissingCodes = async <T>(
   baseTree: Hierarchy<T, string>[],
-  prevCodes: Map<CodeKey, Hierarchy<T, string>>,
+  prevCodes: Map<string, Hierarchy<T, string>>,
   newCodes: Hierarchy<T, string>[],
   system: string,
   mode: Mode,
@@ -81,14 +91,14 @@ export const getMissingCodes = async <T>(
 ) => {
   const newCodesMap = mapHierarchyToMap(newCodes)
   let allCodes = new Map([...prevCodes, ...newCodesMap])
-  let missingIds: CodeKey[] = []
-  let above: CodeKey[] = []
+  let missingIds: string[] = []
+  let above: string[] = []
   if (mode === Mode.EXPAND) missingIds = getMissingIds(allCodes, arrayToMap(getInferiorLevels(newCodes), null))
   else {
     above = getAboveLevels(newCodes, baseTree)
     missingIds = getMissingIds(allCodes, arrayToMap(above, null))
   }
-  console.log('test missing', missingIds)
+  console.log('test missing', missingIds, newCodes, prevCodes)
   if (missingIds.length) {
     const ids = missingIds.map((id) => id.split('|')[1]).join(',')
     const fetched = await fetchHandler(ids, system)
@@ -110,14 +120,14 @@ export const getMissingNode = <T>(
   system: string,
   id: string,
   node: Hierarchy<T, string>,
-  codes: Map<CodeKey, Hierarchy<T, string>>
+  codes: Map<string, Hierarchy<T, string>>
 ) => {
   const code = codes.get(`${system}|${id}`) ?? null
   if (!node) if (code) node = { ...code }
   return node
 }
 
-export const getMissingSubItems = <T>(node: Hierarchy<T, string>, codes: Map<CodeKey, Hierarchy<T, string>>) => {
+export const getMissingSubItems = <T>(node: Hierarchy<T, string>, codes: Map<string, Hierarchy<T, string>>) => {
   const subItems: Hierarchy<T, string>[] = []
   console.log('test expand subitems', node.inferior_levels_ids)
   const levels = node.inferior_levels_ids?.split(',').map((id) => `${node.system}|${id}`)
@@ -157,7 +167,7 @@ export const buildTree = <T>(
   baseTree: Hierarchy<T, string>[],
   system: string,
   endCodes: Hierarchy<T, string>[],
-  codes: Map<CodeKey, Hierarchy<T, string>>,
+  codes: Map<string, Hierarchy<T, string>>,
   selected: Hierarchy<T, string>[],
   mode: Mode
 ) => {
@@ -165,8 +175,8 @@ export const buildTree = <T>(
     node: Hierarchy<T, string>,
     system: string,
     path: [string, InfiniteMap],
-    codes: Map<CodeKey, Hierarchy<T, string>>,
-    selected: Map<CodeKey, Hierarchy<T, string>>,
+    codes: Map<string, Hierarchy<T, string>>,
+    selected: Map<string, Hierarchy<T, string>>,
     mode: Mode
   ) => {
     const [currentPath, nextPath] = path

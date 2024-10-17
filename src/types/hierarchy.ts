@@ -61,6 +61,9 @@ export type GroupedBySystem<T> = {
   codes: Hierarchy<T, string>[]
 }
 
-export type CodeKey = string
+export type Codes<T> = Map<string, Map<string, Hierarchy<T>>>
 
-export type Codes<T> = Map<string, Map<CodeKey, Hierarchy<T>>>
+export type CodesCache<T> = {
+  id: string
+  options: { [key: string]: Hierarchy<T> }
+}

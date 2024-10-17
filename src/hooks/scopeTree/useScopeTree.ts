@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Hierarchy } from 'types/hierarchy'
+import { Codes, Hierarchy } from 'types/hierarchy'
 import { LIMIT_PER_PAGE } from '../search/useSearchParameters'
 import { ScopeElement } from 'types'
 import { SourceType, System } from 'types/scope'
 import { useAppDispatch, useAppSelector } from 'state'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
-import { saveFetchedPerimeters, saveFetchedRights } from 'state/scope'
+import { saveScopeCodes, selectScopeCodes } from 'state/scope'
 import { useHierarchy } from 'hooks/hierarchy/useHierarchy'
 import { SearchMode } from 'types/searchValueSet'
+import { mapCodesToCache } from 'utils/hierarchy/hierarchy'
 
 export const useScopeTree = (
   baseTree: Hierarchy<ScopeElement, string>[],
@@ -15,13 +16,20 @@ export const useScopeTree = (
   sourceType: SourceType
 ) => {
   const practitionerId = useAppSelector((state) => state.me)?.id || ''
-  const codes = useAppSelector((state) =>
-    sourceType === SourceType.ALL ? state.scope.codes.rights : state.scope.codes.perimeters
-  )
+  const codes = useAppSelector((state) => selectScopeCodes(state, sourceType === SourceType.ALL))
   const controllerRef = useRef<AbortController | null>(null)
   const dispatch = useAppDispatch()
   const [searchInput, setSearchInput] = useState('')
   const [mode, setMode] = useState(SearchMode.EXPLORATION)
+
+  useEffect(() => {
+    codes.forEach((innerMap, outerKey) => {
+      innerMap.forEach((hier) => {
+        if (hier.subItems) console.log('test subs', hier.id, hier.name)
+      })
+    })
+    console.log('test store', codes)
+  }, [codes])
 
   const fetchChildren = useCallback(
     async (ids: string) => {
@@ -43,9 +51,9 @@ export const useScopeTree = (
     return results
   }
 
-  const handleSaveCodes = useCallback((codes: Hierarchy<ScopeElement, string>[]) => {
-    if (sourceType === SourceType.ALL) dispatch(saveFetchedRights(codes))
-    else dispatch(saveFetchedPerimeters(codes))
+  const handleSaveCodes = useCallback((codes: Codes<Hierarchy<ScopeElement>>) => {
+    const entity = mapCodesToCache(codes)?.[0]
+    dispatch(saveScopeCodes({ isRights: sourceType === SourceType.ALL, values: entity }))
   }, [])
 
   const {
@@ -63,6 +71,7 @@ export const useScopeTree = (
   } = useHierarchy(selectedNodes, codes, handleSaveCodes, fetchChildren)
 
   useEffect(() => {
+    console.log('test baseTree', baseTree)
     initTrees([
       { system: System.ScopeTree, fetchBaseTree: async () => ({ results: baseTree, count: baseTree.length }) }
     ])

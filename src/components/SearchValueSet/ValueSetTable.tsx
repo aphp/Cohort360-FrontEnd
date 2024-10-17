@@ -13,7 +13,7 @@ import {
   Typography
 } from '@mui/material'
 import { LoadingStatus, SelectedStatus } from 'types'
-import { FhirHierarchy, Hierarchy, HierarchyInfo } from 'types/hierarchy'
+import { FhirHierarchy, Hierarchy, HierarchyInfo, Mode } from 'types/hierarchy'
 import { KeyboardArrowDown, KeyboardArrowRight, IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 import { CellWrapper, RowContainerWrapper, RowWrapper } from '../Hierarchy/styles'
 import { sortArray } from 'utils/arrays'
@@ -25,6 +25,7 @@ import { Pagination } from 'components/ui/Pagination'
 type ValueSetRowProps = {
   item: Hierarchy<FhirHierarchy, string>
   loading: { expand: LoadingStatus; list: LoadingStatus }
+  selectionDisabled?: boolean
   path: string[]
   mode: SearchMode
   isHierarchy: boolean
@@ -32,7 +33,16 @@ type ValueSetRowProps = {
   onSelect: (node: Hierarchy<FhirHierarchy, string>, toAdd: boolean) => void
 }
 
-const ValueSetRow = ({ item, loading, path, mode, isHierarchy, onSelect, onExpand }: ValueSetRowProps) => {
+const ValueSetRow = ({
+  item,
+  loading,
+  selectionDisabled = false,
+  path,
+  mode,
+  isHierarchy,
+  onSelect,
+  onExpand
+}: ValueSetRowProps) => {
   const [open, setOpen] = useState(false)
   const [internalLoading, setInternalLoading] = useState(false)
   const { label, subItems, status, id } = item
@@ -70,6 +80,7 @@ const ValueSetRow = ({ item, loading, path, mode, isHierarchy, onSelect, onExpan
           </CellWrapper>
           <CellWrapper item xs={1} container>
             <Checkbox
+              disabled={selectionDisabled}
               checked={status === SelectedStatus.SELECTED}
               indeterminate={status === SelectedStatus.INDETERMINATE}
               indeterminateIcon={<IndeterminateCheckBoxOutlined />}
@@ -130,9 +141,9 @@ const ValueSetTable = ({
         <TableContainer style={{ background: 'white' }}>
           <Table>
             <TableBody>
-              {loading.list === LoadingStatus.SUCCESS && mode === SearchMode.RESEARCH && (
+              {loading.list === LoadingStatus.SUCCESS && !isHierarchy && (
                 <TableRow>
-                  <TableCell colSpan={7}>
+                  <TableCell colSpan={6}>
                     <Grid container alignItems="center" justifyContent="space-between">
                       <Typography color={hierarchy.count ? 'primary' : '#4f4f4f'} fontWeight={600}>
                         {hierarchy.count ? `${hierarchy.count} résultat(s)` : ` Aucun résultat à afficher`}
@@ -148,13 +159,14 @@ const ValueSetTable = ({
                   </TableCell>
                 </TableRow>
               )}
-              {loading.list !== LoadingStatus.FETCHING && (
+              {loading.list === LoadingStatus.SUCCESS && (
                 <div style={{ maxHeight: '70vh', overflow: 'auto' }}>
                   {hierarchy.tree.map((item) =>
                     item ? (
                       <ValueSetRow
                         mode={mode}
                         loading={loading}
+                        selectionDisabled={mode === SearchMode.EXPLORATION && !isHierarchy}
                         isHierarchy={isHierarchy}
                         path={[item.id]}
                         key={item.id}

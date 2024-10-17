@@ -197,7 +197,6 @@ export const searchInValueSets = async (
   )
   const response = formatValuesetExpansion(getApiResponseResourceOrThrow(res).expansion)
   response.results = mapAbandonedChildren(response.results)
-  console.log('test resp', response)
   return response
 }
 
