@@ -127,7 +127,7 @@ export const useHierarchy = <T>(
     const newDisplay = getHierarchyDisplay(currentHierarchy.display, newTree)
     const newSelectedCodes = getSelectedCodes(newTree)
     setElemInHierarchies(currentHierarchy.id, newTree, newDisplay)
-    setSelectedCodes(newSelectedCodes)*/
+    setSelectedCodes(newSelectedCodes)*/ /* test*/
   }
 
   const deleteCode = (node: Hierarchy<T>) => {
