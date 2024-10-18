@@ -11,7 +11,8 @@ import {
   MedicationRequest,
   Observation,
   Patient,
-  Procedure
+  Procedure,
+  QuestionnaireResponse
 } from 'fhir/r4'
 import { fetchPatient, fetchEncounter } from 'services/aphp/callApi'
 import {
@@ -20,6 +21,7 @@ import {
   CohortMedication,
   CohortObservation,
   CohortPMSI,
+  CohortQuestionnaireResponse,
   FHIR_API_Response
 } from 'types'
 import { ResourceType } from 'types/requestCriterias'
@@ -34,8 +36,9 @@ type ResourceToFill =
   | MedicationRequest
   | MedicationAdministration
   | Observation
+  | QuestionnaireResponse
 
-const getPatientIdPath = (element: ResourceToFill) => {
+export const getPatientIdPath = (element: ResourceToFill) => {
   const patientIdPath = {
     [ResourceType.DOCUMENTS]: (element as DocumentReference).subject?.reference?.replace(/^Patient\//, ''),
     [ResourceType.IMAGING]: (element as ImagingStudy).subject?.reference?.replace(/^Patient\//, ''),
@@ -47,13 +50,17 @@ const getPatientIdPath = (element: ResourceToFill) => {
       /^Patient\//,
       ''
     ),
-    [ResourceType.OBSERVATION]: (element as Observation).subject?.reference?.replace(/^Patient\//, '')
+    [ResourceType.OBSERVATION]: (element as Observation).subject?.reference?.replace(/^Patient\//, ''),
+    [ResourceType.QUESTIONNAIRE_RESPONSE]: (element as QuestionnaireResponse).subject?.reference?.replace(
+      /^Patient\//,
+      ''
+    )
   }
 
   return patientIdPath[element.resourceType]
 }
 
-const getEncounterIdPath = (element: ResourceToFill) => {
+export const getEncounterIdPath = (element: ResourceToFill) => {
   const encounterIdPath = {
     [ResourceType.DOCUMENTS]: (element as DocumentReference).context?.encounter?.[0]?.reference?.replace(
       /^Encounter\//,
@@ -68,32 +75,36 @@ const getEncounterIdPath = (element: ResourceToFill) => {
       /^Encounter\//,
       ''
     ),
-    [ResourceType.OBSERVATION]: (element as Observation).encounter?.reference?.replace(/^Encounter\//, '')
+    [ResourceType.OBSERVATION]: (element as Observation).encounter?.reference?.replace(/^Encounter\//, ''),
+    [ResourceType.QUESTIONNAIRE_RESPONSE]: (element as QuestionnaireResponse).encounter?.reference?.replace(
+      /^Encounter\//,
+      ''
+    )
   }
 
   return encounterIdPath[element.resourceType]
 }
 
-const retrieveEncounterIds = (elementEntries: ResourceToFill[]) => {
+export const retrieveEncounterIds = (elementEntries: ResourceToFill[]) => {
   return elementEntries
     .map((e) => getEncounterIdPath(e))
     .filter((item, index, array) => array.indexOf(item) === index)
     .join()
 }
 
-const retrievePatientIds = (elementEntries: ResourceToFill[]) => {
+export const retrievePatientIds = (elementEntries: ResourceToFill[]) => {
   return elementEntries
     .map((e) => getPatientIdPath(e))
     .filter((item, index, array) => array.indexOf(item) === index)
     .join()
 }
 
-const getLinkedPatient = (patients: Patient[], entry: ResourceToFill) => {
+export const getLinkedPatient = (patients: Patient[], entry: ResourceToFill) => {
   const patientId = getPatientIdPath(entry)
   return patients.find((patient) => patient.id === patientId)
 }
 
-const getLinkedEncounter = (encounters: Encounter[], entry: ResourceToFill) => {
+export const getLinkedEncounter = (encounters: Encounter[], entry: ResourceToFill) => {
   const encounterId = getEncounterIdPath(entry)
   return encounters.find((encounter) => encounter.id === encounterId)
 }
@@ -106,6 +117,7 @@ export const getResourceInfos = async <
     | CohortPMSI
     | CohortMedication<MedicationRequest | MedicationAdministration>
     | CohortObservation
+    | CohortQuestionnaireResponse
 >(
   elementEntries: T[],
   deidentifiedBoolean: boolean,
