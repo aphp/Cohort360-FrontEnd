@@ -38,7 +38,7 @@ type ResourceToFill =
   | Observation
   | QuestionnaireResponse
 
-const getPatientIdPath = (element: ResourceToFill) => {
+export const getPatientIdPath = (element: ResourceToFill) => {
   const patientIdPath = {
     [ResourceType.DOCUMENTS]: (element as DocumentReference).subject?.reference?.replace(/^Patient\//, ''),
     [ResourceType.IMAGING]: (element as ImagingStudy).subject?.reference?.replace(/^Patient\//, ''),
@@ -60,7 +60,7 @@ const getPatientIdPath = (element: ResourceToFill) => {
   return patientIdPath[element.resourceType]
 }
 
-const getEncounterIdPath = (element: ResourceToFill) => {
+export const getEncounterIdPath = (element: ResourceToFill) => {
   const encounterIdPath = {
     [ResourceType.DOCUMENTS]: (element as DocumentReference).context?.encounter?.[0]?.reference?.replace(
       /^Encounter\//,
@@ -85,26 +85,26 @@ const getEncounterIdPath = (element: ResourceToFill) => {
   return encounterIdPath[element.resourceType]
 }
 
-const retrieveEncounterIds = (elementEntries: ResourceToFill[]) => {
+export const retrieveEncounterIds = (elementEntries: ResourceToFill[]) => {
   return elementEntries
     .map((e) => getEncounterIdPath(e))
     .filter((item, index, array) => array.indexOf(item) === index)
     .join()
 }
 
-const retrievePatientIds = (elementEntries: ResourceToFill[]) => {
+export const retrievePatientIds = (elementEntries: ResourceToFill[]) => {
   return elementEntries
     .map((e) => getPatientIdPath(e))
     .filter((item, index, array) => array.indexOf(item) === index)
     .join()
 }
 
-const getLinkedPatient = (patients: Patient[], entry: ResourceToFill) => {
+export const getLinkedPatient = (patients: Patient[], entry: ResourceToFill) => {
   const patientId = getPatientIdPath(entry)
   return patients.find((patient) => patient.id === patientId)
 }
 
-const getLinkedEncounter = (encounters: Encounter[], entry: ResourceToFill) => {
+export const getLinkedEncounter = (encounters: Encounter[], entry: ResourceToFill) => {
   const encounterId = getEncounterIdPath(entry)
   return encounters.find((encounter) => encounter.id === encounterId)
 }

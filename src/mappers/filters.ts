@@ -17,9 +17,7 @@ import {
   GenderCodes,
   Order,
   PatientsFilters,
-  SearchBy,
   SearchCriterias,
-  SearchInput,
   VitalStatus,
   SearchByTypes,
   DurationRangeType,
@@ -612,11 +610,7 @@ const getDefaultOrderBy = (type: ResourceType) => {
   }
 }
 
-const mapSearchByAndSearchInputToRequestParams = (
-  searchBy: SearchByTypes,
-  searchInput: SearchInput,
-  type: ResourceType
-) => {
+const mapSearchByAndSearchInputToRequestParams = (searchBy: SearchByTypes, searchInput: string, type: ResourceType) => {
   const inputs = searchInput.split(' ').filter((elem: string) => elem)
   const params: string[] = []
 
@@ -637,7 +631,7 @@ const mapSearchByAndSearchInputToRequestParams = (
   return params
 }
 
-const mapSearchByAndSearchInputFromRequestParams = (parameters: URLSearchParams): [SearchBy, SearchInput] => {
+const mapSearchByAndSearchInputFromRequestParams = (parameters: URLSearchParams): [SearchByTypes, string] => {
   const keysToCheck = [
     SearchByTypes.TEXT,
     SearchByTypes.FAMILY,

@@ -222,7 +222,6 @@ export enum DocumentAttachmentMethodLabel {
   INFERENCE_TEMPOREL = 'Inférence temporelle'
 }
 
-export type SearchBy = SearchByTypes
 export type DurationRangeType = [string | null | undefined, string | null | undefined]
 export type LabelObject = {
   id: string
@@ -233,7 +232,6 @@ export interface OrderBy {
   orderBy: Order
   orderDirection: Direction
 }
-export type SearchInput = string
 export type FilterValue =
   | string
   | string[]
@@ -327,8 +325,8 @@ export interface CohortsFilters {
 }
 
 export interface SearchCriterias<F> {
-  searchBy?: SearchBy
-  searchInput: SearchInput
+  searchBy?: SearchByTypes
+  searchInput: string
   orderBy: OrderBy
   filters: F
 }
@@ -353,8 +351,8 @@ type RemoveFilter = {
 }
 
 export type ActionOrderBy = Action<ActionTypes.CHANGE_ORDER_BY, OrderBy>
-export type ActionSearchInput = Action<ActionTypes.CHANGE_SEARCH_INPUT, SearchInput>
-export type ActionSearchBy = Action<ActionTypes.CHANGE_SEARCH_BY, SearchBy>
+export type ActionSearchInput = Action<ActionTypes.CHANGE_SEARCH_INPUT, string>
+export type ActionSearchBy = Action<ActionTypes.CHANGE_SEARCH_BY, SearchByTypes>
 export type ActionFilterBy<F> = Action<ActionTypes.ADD_FILTERS, F>
 export type ActionRemoveFilter = Action<ActionTypes.REMOVE_FILTER, RemoveFilter>
 export type ActionRemoveSearchCriterias = Action<ActionTypes.REMOVE_SEARCH_CRITERIAS, null>
