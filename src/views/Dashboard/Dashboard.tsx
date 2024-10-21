@@ -67,7 +67,16 @@ const Dashboard: React.FC<{
           },
           { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/${cohortId}/preview`, disabled: false },
           { label: 'Données patient', value: 'patients', to: `/cohort/${cohortId}/patients`, disabled: false },
-          { label: 'Documents cliniques', value: 'documents', to: `/cohort/${cohortId}/documents`, disabled: false },
+          ...(ODD_DOCUMENT_REFERENCE
+            ? [
+                {
+                  label: 'Documents cliniques',
+                  value: 'documents',
+                  to: `/cohort/${cohortId}/documents`,
+                  disabled: false
+                }
+              ]
+            : []),
           ...(ODD_IMAGING
             ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/${cohortId}/imaging`, disabled: false }]
             : [])
@@ -78,7 +87,9 @@ const Dashboard: React.FC<{
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/new/preview`, disabled: true },
           { label: 'Données patient', value: 'patients', to: `/cohort/new/patients`, disabled: true },
-          { label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true },
+          ...(ODD_DOCUMENT_REFERENCE
+            ? [{ label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true }]
+            : []),
           ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/new/imaging`, disabled: true }] : [])
         ])
         break
@@ -92,12 +103,16 @@ const Dashboard: React.FC<{
             to: `/perimeters/patients${location.search}`,
             disabled: false
           },
-          {
-            label: 'Documents cliniques',
-            value: 'documents',
-            to: `/perimeters/documents${location.search}`,
-            disabled: false
-          },
+          ...(ODD_DOCUMENT_REFERENCE
+            ? [
+                {
+                  label: 'Documents cliniques',
+                  value: 'documents',
+                  to: `/perimeters/documents${location.search}`,
+                  disabled: false
+                }
+              ]
+            : []),
           ...(ODD_IMAGING
             ? [{ label: 'Imagerie', value: 'imaging', to: `/perimeters/imaging${location.search}`, disabled: false }]
             : [])
