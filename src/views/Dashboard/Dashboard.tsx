@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useParams, useLocation } from 'react-router-dom'
-import { Grid, Tabs, Tab } from '@mui/material'
+import { Grid, Tabs, Tab, Alert } from '@mui/material'
 
 import CohortPreview from 'components/Dashboard/Preview/Preview'
 import PatientList from 'components/Dashboard/PatientList/PatientList'
@@ -17,8 +17,9 @@ import useStyles from './styles'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import ImagingList from 'components/Dashboard/ImagingList'
-import { ODD_IMAGING } from '../../constants'
+import { ODD_DOCUMENT_REFERENCE, ODD_IMAGING } from '../../constants'
 import { MeState } from 'state/me'
+import { infoMessages } from 'data/infoMessage'
 
 type Tabs = { label: string; value: string; to: string; disabled: boolean | undefined } | undefined
 
@@ -50,7 +51,9 @@ const Dashboard: React.FC<{
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu', value: 'preview', to: '/my-patients/preview', disabled: false },
           { label: 'Patients', value: 'patients', to: '/my-patients/patients', disabled: false },
-          { label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false },
+          ...(ODD_DOCUMENT_REFERENCE
+            ? [{ label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false }]
+            : []),
           ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging', disabled: false }] : [])
         ])
         break
@@ -156,6 +159,12 @@ const Dashboard: React.FC<{
         }
         afterEdit={() => forceReload()}
       />
+
+      <Grid item>
+        <Alert key={'alertMessage' + infoMessages[0].id} severity={infoMessages[0].level} className={classes.alert}>
+          {infoMessages[0].message}
+        </Alert>
+      </Grid>
 
       <Grid container justifyContent="center" className={classes.tabs}>
         <Grid container item xs={11}>

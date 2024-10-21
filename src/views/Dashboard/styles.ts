@@ -41,5 +41,6 @@ export default makeStyles()((theme: Theme) => ({
   },
   selected: {
     color: '#0063AF'
-  }
+  },
+  alert: { marginTop: '5px', width: '100%' }
 }))

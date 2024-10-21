@@ -210,9 +210,9 @@ export const ODD_IMAGING = import.meta.env.DEV
   ? import.meta.env.VITE_ODD_IMAGING == `${BOOLEANTRUE}`
   : '{VITE_ODD_IMAGING}' == `${BOOLEANTRUE}`
 
-export const ODD_COMPOSITION = import.meta.env.DEV
-  ? import.meta.env.VITE_ODD_COMPOSITION == `${BOOLEANTRUE}`
-  : '{VITE_ODD_COMPOSITION}' == `${BOOLEANTRUE}`
+export const ODD_DOCUMENT_REFERENCE = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_DOCUMENT_REFERENCE == `${BOOLEANTRUE}`
+  : '{VITE_ODD_DOCUMENT_REFERENCE}' == `${BOOLEANTRUE}`
 export const ODD_PROCEDURE = import.meta.env.DEV
   ? import.meta.env.VITE_OODD_PROCEDURE == `${BOOLEANTRUE}`
   : '{VITE_OODD_PROCEDURE}' == `${BOOLEANTRUE}`

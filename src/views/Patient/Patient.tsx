@@ -17,7 +17,7 @@ import TopBar from 'components/TopBar/TopBar'
 import useStyles from './styles'
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPatientInfo } from 'state/patient'
-import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION, ODD_QUESTIONNAIRE } from '../../constants'
+import { ODD_BIOLOGY, ODD_DOCUMENT_REFERENCE, ODD_IMAGING, ODD_MEDICATION, ODD_QUESTIONNAIRE } from '../../constants'
 
 const Patient = () => {
   const dispatch = useAppDispatch()
@@ -110,13 +110,15 @@ const Patient = () => {
               component={Link}
               to={`/patients/${patientId}/timeline${groupId ? `?groupId=${groupId}` : ''}`}
             />
-            <Tab
-              className={classes.tabTitle}
-              label="Documents cliniques"
-              value="clinical-documents"
-              component={Link}
-              to={`/patients/${patientId}/clinical-documents${groupId ? `?groupId=${groupId}` : ''}`}
-            />
+            {ODD_DOCUMENT_REFERENCE && (
+              <Tab
+                className={classes.tabTitle}
+                label="Documents cliniques"
+                value="clinical-documents"
+                component={Link}
+                to={`/patients/${patientId}/clinical-documents${groupId ? `?groupId=${groupId}` : ''}`}
+              />
+            )}
             <Tab
               className={classes.tabTitle}
               label="PMSI"

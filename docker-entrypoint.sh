@@ -71,7 +71,7 @@ sed -i "s@{VITE_MAIL_SUPPORT}@$VITE_MAIL_SUPPORT@g" /app/build/assets/*.js
 sed -i "s@{VITE_EXPORT_TABLE_LIMIT}@$VITE_EXPORT_TABLE_LIMIT@g" /app/build/assets/*.js
 sed -i "s@{VITE_CODE_DISPLAY_JWT}@$VITE_CODE_DISPLAY_JWT@g" /app/build/assets/*.js
 sed -i "s@{VITE_ODD_BIOLOGY}@$VITE_ODD_BIOLOGY@g" /app/build/assets/*.js
-sed -i "s@{VITE_ODD_COMPOSITION}@$VITE_ODD_COMPOSITION@g" /app/build/assets/*.js
+sed -i "s@{VITE_ODD_DOCUMENT_REFERENCE}@$VITE_ODD_DOCUMENT_REFERENCE@g" /app/build/assets/*.js
 sed -i "s@{VITE_ODD_PROCEDURE}@$VITE_ODD_PROCEDURE@g" /app/build/assets/*.js
 sed -i "s@{VITE_ODD_CLAIM}@$VITE_ODD_CLAIM@g" /app/build/assets/*.js
 sed -i "s@{VITE_ODD_CONDITION}@$VITE_ODD_CONDITION@g" /app/build/assets/*.js

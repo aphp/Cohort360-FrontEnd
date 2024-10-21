@@ -16,7 +16,7 @@ import HospitForm from './DiagramView/components/LogicalOperator/components/Crit
 
 import services from 'services/aphp'
 
-import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION } from '../../constants'
+import { ODD_BIOLOGY, ODD_IMAGING, ODD_MEDICATION, ODD_DOCUMENT_REFERENCE } from '../../constants'
 import { CriteriaType, CriteriaTypeLabels } from 'types/requestCriterias'
 
 const criteriaList: CriteriaItemType[] = [
@@ -66,9 +66,10 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: CriteriaType.DOCUMENTS,
     title: CriteriaTypeLabels.DOCUMENTS,
-    color: '#0063AF',
     fontWeight: 'bold',
     components: DocumentsForm,
+    color: !ODD_DOCUMENT_REFERENCE ? '#0063AF' : '#808080',
+    disabled: !!ODD_DOCUMENT_REFERENCE ?? false,
     fetch: {
       docTypes: services.cohortCreation.fetchDocTypes,
       encounterStatus: services.cohortCreation.fetchEncounterStatus

@@ -13,6 +13,7 @@ import PopulationRightPanel from './components/PopulationCard/components/Populat
 import PopulationCard from './components/PopulationCard/PopulationCard'
 import ModalRightError from './components/PopulationCard/components/ModalRightError'
 import { checkNominativeCriteria, cleanNominativeCriterias } from 'utils/cohortCreation'
+import { infoMessages } from 'data/infoMessage'
 
 const DiagramView = () => {
   const dispatch = useAppDispatch()
@@ -68,6 +69,17 @@ const DiagramView = () => {
             activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
           </Alert>
         )}
+
+        <Grid item>
+          <Alert
+            key={'alertMessage' + infoMessages[0].id}
+            severity={infoMessages[0].level}
+            style={{ marginTop: '5px', width: '100%' }}
+          >
+            {infoMessages[0].message}
+          </Alert>
+        </Grid>
+
         <CohortCreationBreadcrumbs />
 
         <Grid container justifyContent="center">
