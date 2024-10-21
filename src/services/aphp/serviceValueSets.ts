@@ -191,9 +191,7 @@ export const searchInValueSets = async (
     `/ValueSet/$expand?url=${codeSystems.join(',')}&filter=${encodeURIComponent(
       searchValue
     )}&excludeNested=false&_tag=text-search-rank&_tag=${LOW_TOLERANCE_TAG}${options}`,
-    {
-      signal: signal
-    }
+    { signal }
   )
   const response = formatValuesetExpansion(getApiResponseResourceOrThrow(res).expansion)
   response.results = mapAbandonedChildren(response.results)

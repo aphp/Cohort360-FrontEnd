@@ -80,7 +80,7 @@ const ValueSetRow = ({
           </CellWrapper>
           <CellWrapper item xs={1} container>
             <Checkbox
-              disabled={selectionDisabled}
+              /*disabled={selectionDisabled}*/
               checked={status === SelectedStatus.SELECTED}
               indeterminate={status === SelectedStatus.INDETERMINATE}
               indeterminateIcon={<IndeterminateCheckBoxOutlined />}

@@ -26,11 +26,9 @@ import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import { SourceType } from 'types/scope'
 import { HierarchyWithLabel, HierarchyWithLabelAndSystem } from 'types/hierarchy'
-import { SearchOutlined } from '@mui/icons-material'
 import { Reference, References, ReferencesLabel } from 'types/searchValueSet'
-import Panel from 'components/ui/Panel'
-import SearchValueSet from 'components/SearchValueSet'
 import { getConfig } from 'config'
+import ValueSetField from 'components/SearchValueSet/ValueSetField'
 
 type MedicationFormProps = {
   isOpen: boolean
@@ -62,13 +60,16 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
     currentState.occurrenceComparator || Comparators.GREATER_OR_EQUAL
   )
   const [error, setError] = useState(Error.NO_ERROR)
-  const [openCodeResearch, setOpenCodeResearch] = useState(false)
 
   useEffect(() => {
     if (currentState.type === CriteriaType.MEDICATION_ADMINISTRATION) {
       onChangeValue('endOccurrence', [null, null])
     }
   }, [currentState.type])
+
+  useEffect(() => {
+    console.log('test criteria', selectedCriteria)
+  }, [criteriaData, selectedCriteria])
 
   /*const getMedicationOptions = async (searchValue: string, signal: AbortSignal) => {
     const response = await services.cohortCreation.fetchMedicationData(searchValue, false, signal)
@@ -111,7 +112,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
       })
     : []
 
-  const defaultValuesCode = currentState.code
+  /*const defaultValuesCode = currentState.code
     ? currentState.code.map((code: HierarchyWithLabelAndSystem) => {
         const criteriaCode = criteriaData.data.medicationData
           ? criteriaData.data.medicationData.find((g: HierarchyWithLabelAndSystem) => g.id === code.id)
@@ -122,7 +123,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
           system: code.system ? code.system : criteriaCode?.system ?? '?'
         }
       })
-    : []
+    : []*/
   const medicationReferences: Reference[] = [
     {
       id: References.ATC,
@@ -250,46 +251,17 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             onChange={(value) => {
               onChangeValue('code', value)
             }}
-          />
-          {currentState.type === CriteriaType.MEDICATION_REQUEST && (
-            <Autocomplete
-              multiple
-              id="criteria-prescription-type-autocomplete"
-              className={classes.inputItem}
-              options={criteriaData?.data?.prescriptionTypes || []}
-              getOptionLabel={(option) => option.label}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={selectedCriteriaPrescriptionType}
-              onChange={(e, value) => onChangeValue('prescriptionType', value)}
-              renderInput={(params) => <TextField {...params} label="Type de prescription" />}
+          />*/}
+
+          <Grid container marginBottom={1} marginTop={1} className={classes.inputItem}>
+            <ValueSetField
+              value={selectedCriteria.code}
+              references={medicationReferences}
+              onSelect={(value) => onChangeValue('code', value)}
+              placeholder="Sélectionner les codes"
             />
-          )*/}
-
-          <Grid container justifyContent="space-between" alignItems="center" marginBottom={1} marginTop={1}>
-            <Grid item xs={10}>
-              {selectedCriteriaPrescriptionType.length < 1 && (
-                <FormLabel style={{ margin: 'auto 1em' }} component="legend">
-                  Résultats
-                </FormLabel>
-              )}
-              {selectedCriteriaPrescriptionType.length > 0 && (
-                <FormLabel style={{ margin: 'auto 1em' }} component="legend" onClick={() => setOpenCodeResearch(true)}>
-                  Sélectionner les codes
-                </FormLabel>
-              )}
-            </Grid>
-
-            <IconButton color="primary" onClick={() => setOpenCodeResearch(true)}>
-              <SearchOutlined />
-            </IconButton>
           </Grid>
-          <Panel
-            onClose={() => setOpenCodeResearch(false)}
-            onConfirm={() => setOpenCodeResearch(false)}
-            open={openCodeResearch}
-          >
-            <SearchValueSet references={medicationReferences} />
-          </Panel>
+
           {currentState.type === CriteriaType.MEDICATION_REQUEST && (
             <Autocomplete
               multiple

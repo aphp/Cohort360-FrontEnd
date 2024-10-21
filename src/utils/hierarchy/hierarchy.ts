@@ -43,7 +43,7 @@ export const cleanNode = <T>(node: Hierarchy<T, string>) => {
   return { ...node, subItems: undefined, status: undefined }
 }
 
-const mapHierarchyToMap = <T>(hierarchy: Hierarchy<T, string>[]) => {
+export const mapHierarchyToMap = <T>(hierarchy: Hierarchy<T, string>[]) => {
   return hierarchy.reduce((resultMap: Map<string, Hierarchy<T, string>>, item) => {
     resultMap.set(`${item.system}|${item.id}`, item)
     return resultMap
@@ -53,7 +53,6 @@ const mapHierarchyToMap = <T>(hierarchy: Hierarchy<T, string>[]) => {
 const getMissingIds = <T>(prevCodes: Map<string, Hierarchy<T, string>>, codes: Map<string, null>) => {
   const missingCodes: string[] = []
   for (const [key] of codes) {
-     // console.log('test missing', prevCodes.get(key), key, prevCodes)
     const isFound = prevCodes.get(key)
     if (!isFound) missingCodes.push(key)
   }
@@ -142,13 +141,14 @@ export const buildMultipleTrees = <T>(
   trees: Map<string, Hierarchy<T, string>[]>,
   groupBySystem: GroupedBySystem<T>[],
   codes: Codes<Hierarchy<T>>,
-  selected: Hierarchy<T, string>[],
+  selected: Codes<Hierarchy<T>>,
   mode: Mode
 ) => {
   for (const group of groupBySystem) {
     const tree = trees.get(group.system) || []
     const codesBySystem = codes.get(group.system) || new Map()
-    const newTree = buildTree([...tree], group.system, group.codes, codesBySystem, selected, mode)
+    const selectedBySystem = selected.get(group.system) || new Map()
+    const newTree = buildTree([...tree], group.system, group.codes, codesBySystem, selectedBySystem, mode)
     trees.set(group.system, newTree)
   }
   return new Map(trees)
@@ -168,7 +168,7 @@ export const buildTree = <T>(
   system: string,
   endCodes: Hierarchy<T, string>[],
   codes: Map<string, Hierarchy<T, string>>,
-  selected: Hierarchy<T, string>[],
+  selected: Map<string, Hierarchy<T, string>>,
   mode: Mode
 ) => {
   const buildBranch = <T>(
@@ -205,12 +205,12 @@ export const buildTree = <T>(
   }
   const paths = getPaths(baseTree, endCodes, mode === Mode.UNSELECT_ALL || mode === Mode.SELECT_ALL)
   const uniquePaths = getUniquePath(paths)
-  //console.log('test search endCodes', endCodes)
-  //console.log('test search paths', uniquePaths)
+  console.log('test search endCodes', endCodes)
+  console.log('test search paths', uniquePaths)
   if (mode === Mode.INIT) baseTree = []
   for (const [key, value] of uniquePaths) {
     const index = baseTree.findIndex((elem) => elem.id === key)
-    const branch = buildBranch(baseTree[index] || null, system, [key, value], codes, mapHierarchyToMap(selected), mode)
+    const branch = buildBranch(baseTree[index] || null, system, [key, value], codes, selected, mode)
     if (branch && index > -1) baseTree[index] = branch
     else if (index === -1) baseTree.push(branch)
   }
@@ -318,14 +318,32 @@ export const getItemSelectedStatus = <T, S>(item: Hierarchy<T, S>): SelectedStat
   return SelectedStatus.INDETERMINATE
 }
 
-export const getSelectedCodes = <T>(list: Hierarchy<T, string>[]) => {
-  const get = <T>(hierarchy: Hierarchy<T, string>, selectedCodes: Hierarchy<T, string>[]) => {
-    if (hierarchy.status === SelectedStatus.INDETERMINATE)
-      hierarchy.subItems?.forEach((subItem) => get(subItem, selectedCodes))
-    if (hierarchy.status === SelectedStatus.SELECTED) selectedCodes.push(hierarchy)
+/*export const getSelectedCodes = <T>(
+  system: string,
+  list: Hierarchy<T, string>[],
+  prevCodes: Hierarchy<T, string>[]
+) => {
+  const get = <T>(node: Hierarchy<T, string>, selectedCodes: Hierarchy<T, string>[]) => {
+    if (node.status === SelectedStatus.INDETERMINATE) node.subItems?.forEach((subItem) => get(subItem, selectedCodes))
+    if (node.status === SelectedStatus.SELECTED) selectedCodes.push(node)
     return selectedCodes
   }
-  const selectedCodes = list.flatMap((hierarchy) => get(hierarchy, []))
+  const groupedCodes = groupBySystem(prevCodes)
+  const foundSystem = groupedCodes.findIndex((group) => group.system === system)
+  const newCodes = list.flatMap((node) => get(node, []))
+  if (foundSystem > -1) groupedCodes[foundSystem].codes = newCodes
+  else groupedCodes.push({ system: system, codes: newCodes })
+  return groupedCodes.flatMap((group) => group.codes)
+}*/
+
+export const getSelectedCodes = <T>(list: Hierarchy<T, string>[]) => {
+  const get = <T>(node: Hierarchy<T, string>, selectedCodes: Map<string, Hierarchy<T>[]>) => {
+    if (node.status === SelectedStatus.INDETERMINATE)
+      node.subItems?.forEach((subItem) => get(subItem, selectedCodes))
+    if (node.status === SelectedStatus.SELECTED) selectedCodes.set(node.id, node)
+    return selectedCodes
+  }
+  const selectedCodes = list.flatMap((hierarchy) => get(hierarchy, new Map()))
   return selectedCodes
 }
 

@@ -1,5 +1,5 @@
 import { ScopeElement, SimpleCodeType } from 'types'
-import { Hierarchy } from './hierarchy'
+import { FhirItem, Hierarchy } from './hierarchy'
 import { DocumentAttachmentMethod, DurationRangeType, LabelObject, SearchByTypes } from './searchCriterias'
 
 export enum MedicationLabel {
@@ -362,7 +362,7 @@ export type MedicationDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
   WithEncounterDateDataType &
   WithEncounterStatusDataType & {
-    code: LabelObject[] | null
+    code: Hierarchy<FhirItem>[]
     administration: LabelObject[] | null
   } & (
     | {

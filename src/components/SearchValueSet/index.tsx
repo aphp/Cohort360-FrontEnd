@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Grid, Divider, Paper, Collapse, Typography, Input, IconButton } from '@mui/material'
 import Tabs from 'components/ui/Tabs'
 import { LoadingStatus, TabType } from 'types'
@@ -9,12 +9,16 @@ import SelectedCodes from 'components/Hierarchy/SelectedCodes'
 import { useSearchValueSet } from 'hooks/valueSet/useSearchValueSet'
 import { Displayer } from 'components/ui/Displayer/styles'
 import ClearIcon from '@mui/icons-material/Clear'
+import { FhirItem, Hierarchy } from 'types/hierarchy'
+import { cleanNode } from 'utils/hierarchy/hierarchy'
 
 type SearchValueSetProps = {
   references: Reference[]
+  selectedNodes: Hierarchy<FhirItem, string>[]
+  onSelect: (selectedItems: Hierarchy<FhirItem>[]) => void
 }
 
-const SearchValueSet = ({ references }: SearchValueSetProps) => {
+const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetProps) => {
   const {
     mode,
     searchInput,
@@ -23,13 +27,17 @@ const SearchValueSet = ({ references }: SearchValueSetProps) => {
     loadingStatus,
     parameters: { refs, onChangeReferences, onChangeSearchInput, onChangePage },
     hierarchy: { exploration, research, selectAllStatus, expand, select, deleteCode, selectAll }
-  } = useSearchValueSet(references)
+  } = useSearchValueSet(references, selectedNodes)
 
   const tabs: TabType<SearchMode, SearchModeLabel>[] = [
     { id: SearchMode.EXPLORATION, label: SearchModeLabel.EXPLORATION },
     { id: SearchMode.RESEARCH, label: SearchModeLabel.RESEARCH }
   ]
-  console.log('test hierarchy', exploration)
+
+  useEffect(() => {
+    onSelect(selectedCodes.map((e) => cleanNode(e)))
+  }, [selectedCodes])
+
   return (
     <>
       <Grid container direction="column" wrap="nowrap" sx={{ overflow: 'hidden' }}>

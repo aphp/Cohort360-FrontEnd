@@ -9,7 +9,7 @@ import { saveValueSets, selectValueSetCodes } from 'state/valueSets'
 import { useAppDispatch, useAppSelector } from 'state'
 import { mapCodesToCache } from 'utils/hierarchy/hierarchy'
 
-export const useSearchValueSet = (references: Reference[]) => {
+export const useSearchValueSet = (references: Reference[], selectedNodes: Hierarchy<FhirItem, string>[]) => {
   const researchParameters = useSearchParameters()
   const explorationParameters = useSearchParameters()
   const [searchInput, setSearchInput] = useState('')
@@ -32,7 +32,6 @@ export const useSearchValueSet = (references: Reference[]) => {
   }, [references])
 
   const codes = useAppSelector((state) => selectValueSetCodes(state, urls))
-  const selectedNodes = useMemo(() => [], [])
 
   useEffect(() => console.log('test store', codes), [codes])
 
@@ -133,7 +132,7 @@ export const useSearchValueSet = (references: Reference[]) => {
   }
 
   useEffect(() => {
-    console.log("test hierarchy", hierarchies)
+    console.log('test hierarchy', hierarchies)
     if (mode === SearchMode.EXPLORATION && !initialized.exploration) initExploration(references)
     if (mode === SearchMode.RESEARCH && !initialized.research) initResearch(references)
   }, [mode])

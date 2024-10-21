@@ -7,7 +7,8 @@ import {
   getMissingCodes,
   getMissingCodesWithSystems,
   groupBySystem,
-  getHierarchyRootCodes
+  getHierarchyRootCodes,
+  mapHierarchyToMap
 } from '../../utils/hierarchy/hierarchy'
 import { useEffect, useRef, useState } from 'react'
 import { Back_API_Response, LoadingStatus, SelectedStatus } from 'types'
@@ -36,7 +37,9 @@ export const useHierarchy = <T>(
   const [trees, setTrees] = useState<Map<string, Hierarchy<T>[]>>(new Map())
   const [hierarchies, setHierarchies] = useState<Map<string, HierarchyInfo<T>>>(new Map())
   const [searchResults, setSearchResults] = useState<HierarchyInfo<T>>(DEFAULT_HIERARCHY_INFO)
-  const [selectedCodes, setSelectedCodes] = useState<Hierarchy<T>[]>(selectedNodes)
+  const [selectedCodes, setSelectedCodes] = useState<Codes<Hierarchy<T>>>(
+    new Map(groupBySystem(selectedNodes).map((item) => [item.system, mapHierarchyToMap(item.codes)]))
+  )
   const [codes, setCodes] = useState<Codes<Hierarchy<T>>>(fetchedCodes)
 
   const latestCodes = useRef(codes)
@@ -60,14 +63,24 @@ export const useHierarchy = <T>(
   ) => {
     const newTrees: Map<string, Hierarchy<T>[]> = new Map()
     const newHierarchies: Map<string, HierarchyInfo<T>> = new Map()
+    // const newSelectedCodes: Map<string, Hierarchy<T>[]> = new Map()
     let allCodes: Codes<Hierarchy<T>> = new Map()
     for (const handler of initHandlers) {
       const { results: baseTree, count } = await handler.fetchBaseTree()
-      const toFindCodes = [...baseTree, ...selectedCodes]
+      const currentSelected: Map<string, Hierarchy<T>[]> = selectedCodes.get(handler.system) || new Map()
+      const toFindCodes = [...baseTree, Array.from(currentSelected.values())]
       const currentCodes = codes.get(handler.system) || new Map()
-      const newCodes = await getMissingCodes(baseTree, currentCodes, toFindCodes, handler.system, Mode.INIT, fetchHandler)
-      const newTree = buildTree(baseTree, handler.system, toFindCodes, newCodes, selectedCodes, Mode.INIT)
+      const newCodes = await getMissingCodes(
+        baseTree,
+        currentCodes,
+        toFindCodes,
+        handler.system,
+        Mode.INIT,
+        fetchHandler
+      )
+      const newTree = buildTree(baseTree, handler.system, toFindCodes, newCodes, currentSelected, Mode.INIT)
       const newHierarchy = getHierarchyDisplay(baseTree, newTree)
+      // newSelectedCodes.set(handler.system, currentSelectedCodes)
       newTrees.set(handler.system, newTree)
       newHierarchies.set(handler.system, { tree: newHierarchy, count, page: 1 })
       allCodes.set(handler.system, new Map([...newCodes, ...getHierarchyRootCodes(newTree)]))
@@ -75,6 +88,7 @@ export const useHierarchy = <T>(
     setTrees(newTrees)
     setHierarchies(newHierarchies)
     console.log('test missing init', allCodes)
+    //setSelectedCodes(newSelectedCodes)
     setCodes(allCodes)
     setLoadingStatus((prevLoadingStatus) => ({ ...prevLoadingStatus, init: LoadingStatus.SUCCESS }))
   }
@@ -110,15 +124,16 @@ export const useHierarchy = <T>(
     const currentTree = trees.get(hierarchyId) || []
     const currentHierarchy = hierarchies.get(hierarchyId) || DEFAULT_HIERARCHY_INFO
     const currentCodes = codes.get(hierarchyId) || new Map()
+    const currentSelected = selectedCodes.get(hierarchyId) || new Map()
     const mode = toAdd ? Mode.SELECT : Mode.UNSELECT
-    const newTree = buildTree(currentTree, node.system, [node], currentCodes, selectedCodes, mode)
+    const newTree = buildTree(currentTree, node.system, [node], currentCodes, currentSelected, mode)
     const displayHierarchy = getHierarchyDisplay(currentHierarchy.tree, newTree)
     const displaySearch = getHierarchyDisplay(searchResults.tree, newTree)
     const newSelectedCodes = getSelectedCodes(newTree)
     setTrees(replaceInMap(hierarchyId, newTree, trees))
     setHierarchies(replaceInMap(hierarchyId, { ...currentHierarchy, tree: displayHierarchy }, hierarchies))
     setSearchResults({ ...searchResults, tree: displaySearch })
-    setSelectedCodes(newSelectedCodes)
+    setSelectedCodes(replaceInMap(hierarchyId, newSelectedCodes, selectedCodes))
   }
 
   const selectAll = (toAdd: boolean) => {
@@ -127,7 +142,8 @@ export const useHierarchy = <T>(
     const newDisplay = getHierarchyDisplay(currentHierarchy.display, newTree)
     const newSelectedCodes = getSelectedCodes(newTree)
     setElemInHierarchies(currentHierarchy.id, newTree, newDisplay)
-    setSelectedCodes(newSelectedCodes)*/ /* test*/
+    setSelectedCodes(newSelectedCodes)*/
+    /* test*/
   }
 
   const deleteCode = (node: Hierarchy<T>) => {
