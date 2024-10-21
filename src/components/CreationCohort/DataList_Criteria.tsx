@@ -68,8 +68,8 @@ const criteriaList: CriteriaItemType[] = [
     title: CriteriaTypeLabels.DOCUMENTS,
     fontWeight: 'bold',
     components: DocumentsForm,
-    color: !ODD_DOCUMENT_REFERENCE ? '#0063AF' : '#808080',
-    disabled: !!ODD_DOCUMENT_REFERENCE ?? false,
+    color: ODD_DOCUMENT_REFERENCE ? '#0063AF' : '#808080',
+    disabled: !ODD_DOCUMENT_REFERENCE ?? false,
     fetch: {
       docTypes: services.cohortCreation.fetchDocTypes,
       encounterStatus: services.cohortCreation.fetchEncounterStatus
