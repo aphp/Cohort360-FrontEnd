@@ -53,6 +53,9 @@ type AppConfig = {
         procedureHierarchy: ValueSetConfig
       }
     }
+    documentReference: {
+      enabled: boolean
+    }
     claim: {
       enabled: boolean
       valueSets: {
@@ -230,6 +233,9 @@ let config: AppConfig = {
       valueSets: {
         procedureHierarchy: { url: '' }
       }
+    },
+    documentReference: {
+      enabled: true
     },
     claim: {
       enabled: true,

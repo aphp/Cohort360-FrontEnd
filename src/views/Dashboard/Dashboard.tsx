@@ -37,6 +37,7 @@ const Dashboard: React.FC<{
   const location = useLocation()
   const appConfig = useContext(AppConfig)
   const ODD_IMAGING = appConfig.features.imaging.enabled
+  const ODD_DOCUMENT_REFERENCE = appConfig.features.documentReference.enabled
 
   const perimetreIds = location.search.substr(1)
 
@@ -54,7 +55,9 @@ const Dashboard: React.FC<{
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu', value: 'preview', to: '/my-patients/preview', disabled: false },
           { label: 'Patients', value: 'patients', to: '/my-patients/patients', disabled: false },
-          { label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false },
+          ...(ODD_DOCUMENT_REFERENCE
+            ? [{ label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false }]
+            : []),
           { label: 'PMSI', value: 'pmsi', to: '/my-patients/pmsi', disabled: false },
           { label: 'Médicaments', value: 'medication', to: '/my-patients/medication', disabled: false },
           { label: 'Biologie', value: 'biology', to: '/my-patients/biology', disabled: false },
@@ -71,7 +74,16 @@ const Dashboard: React.FC<{
           },
           { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/${cohortId}/preview`, disabled: false },
           { label: 'Données patient', value: 'patients', to: `/cohort/${cohortId}/patients`, disabled: false },
-          { label: 'Documents cliniques', value: 'documents', to: `/cohort/${cohortId}/documents`, disabled: false },
+          ...(ODD_DOCUMENT_REFERENCE
+            ? [
+                {
+                  label: 'Documents cliniques',
+                  value: 'documents',
+                  to: `/cohort/${cohortId}/documents`,
+                  disabled: false
+                }
+              ]
+            : []),
           { label: 'PMSI', value: 'pmsi', to: `/cohort/${cohortId}/pmsi`, disabled: false },
           { label: 'Médicaments', value: 'medication', to: `/cohort/${cohortId}/medication`, disabled: false },
           { label: 'Biologie', value: 'biology', to: `/cohort/${cohortId}/biology`, disabled: false },
@@ -85,7 +97,9 @@ const Dashboard: React.FC<{
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/new/preview`, disabled: true },
           { label: 'Données patient', value: 'patients', to: `/cohort/new/patients`, disabled: true },
-          { label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true },
+          ...(ODD_DOCUMENT_REFERENCE
+            ? [{ label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true }]
+            : []),
           { label: 'PMSI', value: 'pmsi', to: `/cohort/new/pmsi`, disabled: false },
           { label: 'Médicaments', value: 'medication', to: `/cohort/new/medication`, disabled: false },
           { label: 'Biologie', value: 'biology', to: `/cohort/new/biology`, disabled: false },
@@ -102,12 +116,16 @@ const Dashboard: React.FC<{
             to: `/perimeters/patients${location.search}`,
             disabled: false
           },
-          {
-            label: 'Documents cliniques',
-            value: 'documents',
-            to: `/perimeters/documents${location.search}`,
-            disabled: false
-          },
+          ...(ODD_DOCUMENT_REFERENCE
+            ? [
+                {
+                  label: 'Documents cliniques',
+                  value: 'documents',
+                  to: `/perimeters/documents${location.search}`,
+                  disabled: false
+                }
+              ]
+            : []),
           { label: 'PMSI', value: 'pmsi', to: `/perimeters/pmsi${location.search}`, disabled: false },
           { label: 'Médicaments', value: 'medication', to: `/perimeters/new/medication`, disabled: false },
           { label: 'Biologie', value: 'biology', to: `/perimeters/biology${location.search}`, disabled: false },
