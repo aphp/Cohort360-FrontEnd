@@ -1,15 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import { Tabs, Tab } from '@mui/material'
+import React, { useState } from 'react'
 
 import MedicationForm from './components/Form/MedicationForm'
 import MedicationExploration from './components/Hierarchy/MedicationHierarchy'
 
 import { CriteriaDrawerComponentProps } from 'types'
 
-import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
-import { fetchMedication } from 'state/medication'
 import { EXPLORATION } from '../../../../../../../../constants'
 import { Comparators, MedicationDataType, CriteriaType } from 'types/requestCriterias'
 import { HierarchyElementWithSystem } from 'types/hierarchy'
@@ -40,8 +37,6 @@ const Index = (props: CriteriaDrawerComponentProps) => {
   const dispatch = useAppDispatch()
   const medicationHierarchy = useAppSelector((state) => state.medication.list || {})
 
-  const { classes } = useStyles()
-
   const _onChangeSelectedHierarchy = (
     newSelectedItems: HierarchyElementWithSystem[] | null | undefined,
     newHierarchy?: HierarchyElementWithSystem[]
@@ -50,9 +45,10 @@ const Index = (props: CriteriaDrawerComponentProps) => {
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const _onChangeFormValue = (key: string, value: any, hierarchy: HierarchyElementWithSystem[] = medicationHierarchy) =>
+
     syncOnChangeFormValue(key, value, hierarchy, setDefaultCriteria, selectedTab, defaultMedication.type, dispatch)
 
-  const _initSyncHierarchyTableEffect = async () => {
+  /*const _initSyncHierarchyTableEffect = async () => {
     await initSyncHierarchyTableEffect(
       medicationHierarchy,
       selectedCriteria,
@@ -65,32 +61,19 @@ const Index = (props: CriteriaDrawerComponentProps) => {
   }
   useEffect(() => {
     _initSyncHierarchyTableEffect()
-  }, [])
+  }, [])*/
 
   return (
     <>
-      <Tabs
-        indicatorColor="secondary"
-        className={classes.tabs}
-        value={selectedTab}
-        onChange={(e, tab) => setSelectedTab(tab)}
-      >
-        <Tab label={EXPLORATION} value="exploration" />
-        <Tab label="Formulaire" value="form" />
-      </Tabs>
-
-      {
-        <MedicationForm
-          isOpen={selectedTab === 'form'}
-          isEdition={isEdition}
-          criteriaData={criteriaData}
-          selectedCriteria={defaultCriteria}
-          onChangeValue={_onChangeFormValue}
-          onChangeSelectedCriteria={onChangeSelectedCriteria}
-          goBack={goBack}
-        />
-      }
-      {
+      <MedicationForm
+        isEdition={isEdition}
+        criteriaData={criteriaData}
+        selectedCriteria={defaultCriteria}
+        onChangeValue={_onChangeFormValue}
+        onChangeSelectedCriteria={onChangeSelectedCriteria}
+        goBack={goBack}
+      />
+      {/*
         <MedicationExploration
           isOpen={selectedTab === 'exploration'}
           isEdition={isEdition}
@@ -99,7 +82,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
           onConfirm={() => setSelectedTab('form')}
           goBack={goBack}
         />
-      }
+    */}
     </>
   )
 }

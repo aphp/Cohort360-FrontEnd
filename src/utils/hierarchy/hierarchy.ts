@@ -337,13 +337,13 @@ export const getItemSelectedStatus = <T, S>(item: Hierarchy<T, S>): SelectedStat
 }*/
 
 export const getSelectedCodes = <T>(list: Hierarchy<T, string>[]) => {
-  const get = <T>(node: Hierarchy<T, string>, selectedCodes: Map<string, Hierarchy<T>[]>) => {
+  const get = <T>(node: Hierarchy<T, string>, selectedCodes: Hierarchy<T>[]) => {
     if (node.status === SelectedStatus.INDETERMINATE)
       node.subItems?.forEach((subItem) => get(subItem, selectedCodes))
-    if (node.status === SelectedStatus.SELECTED) selectedCodes.set(node.id, node)
+    if (node.status === SelectedStatus.SELECTED) selectedCodes.push(node)
     return selectedCodes
   }
-  const selectedCodes = list.flatMap((hierarchy) => get(hierarchy, new Map()))
+  const selectedCodes = mapHierarchyToMap(list.flatMap((hierarchy) => get(hierarchy, [])))
   return selectedCodes
 }
 

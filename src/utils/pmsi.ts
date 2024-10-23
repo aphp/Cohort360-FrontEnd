@@ -7,7 +7,6 @@ import {
   initSyncHierarchyTable,
   pushSyncHierarchyTable
 } from '../state/syncHierarchyTable'
-import { expandMedicationElement } from '../state/medication'
 import { expandBiologyElement } from '../state/biology'
 import services from 'services/aphp'
 import { CommonCriteriaDataType, CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'

@@ -13,7 +13,6 @@ import { addRequest, editRequest, deleteRequest, fetchRequests, moveRequests, de
 import { expandBiologyElement, fetchBiology, initBiologyHierarchy } from './biology'
 import { addCohort, deleteCohort, editCohort, fetchCohorts } from './cohort'
 import { favoriteExploredCohort, fetchExploredCohort } from './exploredCohort'
-import { expandMedicationElement, fetchMedication, initMedicationHierarchy } from './medication'
 import {
   fetchAllProcedures,
   fetchBiology as fetchBiologyPatient,
@@ -140,18 +139,6 @@ const setMessageSlice = createSlice({
     builder.addCase(expandBiologyElement.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la récupération des enfants dans la hiérarchie de biologie'
-    }))
-    builder.addCase(initMedicationHierarchy.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération de la hiérarchie des médicaments'
-    }))
-    builder.addCase(fetchMedication.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération de la hiérarchie des médicaments'
-    }))
-    builder.addCase(expandMedicationElement.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération des enfants la hiérarchie des médicaments'
     }))
     builder.addCase(fetchCohorts.rejected, () => ({
       type: 'error',

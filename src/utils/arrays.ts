@@ -15,8 +15,8 @@ export const addElement = <T, S>(toAdd: WithId<T, S>, elems: WithId<T, S>[]) => 
   return [...elems]
 }
 
-export const removeElement = <T, S>(toAdd: WithId<T, S>, elems: WithId<T, S>[]) => {
-  const existingIndex = elems.findIndex((elem) => elem.id === toAdd.id)
+export const removeElement = <T, S>(toRemove: WithId<T, S>, elems: WithId<T, S>[]) => {
+  const existingIndex = elems.findIndex((elem) => elem.id === toRemove.id)
   if (existingIndex > -1) {
     elems.splice(existingIndex, 1)
   }

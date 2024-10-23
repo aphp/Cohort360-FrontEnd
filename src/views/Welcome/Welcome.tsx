@@ -17,7 +17,6 @@ import { fetchCohorts } from 'state/cohort'
 import { fetchProjects } from 'state/project'
 import { fetchRequests } from 'state/request'
 import { initPmsiHierarchy } from 'state/pmsi'
-import { initMedicationHierarchy } from 'state/medication'
 import { initBiologyHierarchy } from 'state/biology'
 import { AccessExpiration, RequestType } from 'types'
 import useStyles from './styles'
@@ -77,7 +76,6 @@ const Welcome = () => {
     dispatch(fetchProjects())
     dispatch(fetchRequests())
     dispatch(initPmsiHierarchy())
-    dispatch(initMedicationHierarchy())
     dispatch(initBiologyHierarchy())
     fetchCohortsPreview()
   }, [])

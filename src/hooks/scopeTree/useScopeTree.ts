@@ -22,15 +22,6 @@ export const useScopeTree = (
   const [searchInput, setSearchInput] = useState('')
   const [mode, setMode] = useState(SearchMode.EXPLORATION)
 
-  useEffect(() => {
-    codes.forEach((innerMap, outerKey) => {
-      innerMap.forEach((hier) => {
-        if (hier.subItems) console.log('test subs', hier.id, hier.name)
-      })
-    })
-    console.log('test store', codes)
-  }, [codes])
-
   const fetchChildren = useCallback(
     async (ids: string) => {
       const { results } =
@@ -71,7 +62,6 @@ export const useScopeTree = (
   } = useHierarchy(selectedNodes, codes, handleSaveCodes, fetchChildren)
 
   useEffect(() => {
-    console.log('test baseTree', baseTree)
     initTrees([
       { system: System.ScopeTree, fetchBaseTree: async () => ({ results: baseTree, count: baseTree.length }) }
     ])
@@ -87,6 +77,10 @@ export const useScopeTree = (
       }
     )
   }, [mode, hierarchies, searchResults])
+
+  const selected: Hierarchy<ScopeElement>[] = useMemo(() => {
+    return [...(selectedCodes.get(System.ScopeTree) || new Map()).values()]
+  }, [selectedCodes])
 
   const handleChangePage = (page: number) => {
     fetchMore(() => fetchSearch(searchInput, page - 1), page, SearchMode.RESEARCH)
@@ -106,7 +100,7 @@ export const useScopeTree = (
       hierarchy: current,
       loadingStatus,
       selectAllStatus,
-      selectedCodes
+      selectedCodes: selected
     },
     hierarchyActions: {
       expand,

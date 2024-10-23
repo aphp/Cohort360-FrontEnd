@@ -35,7 +35,7 @@ const ValueSetField = ({ value, references, placeholder, onSelect }: ValueSetFie
             {value.length > 0 && (
               <Grid container alignItems="center">
                 {value.slice(0, isExtended ? value.length : MAX_CHIP_NUMBER).map((code) => (
-                  <Chip label={code.label} sx={{ marginBottom: '2px', marginRight: '2px' }} />
+                  <Chip key={code.id} label={code.label} sx={{ marginBottom: '2px', marginRight: '2px' }} />
                 ))}
               </Grid>
             )}

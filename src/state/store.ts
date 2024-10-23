@@ -10,7 +10,6 @@ import localforage from 'localforage'
 import cohortCreation from './cohortCreation'
 import exploredCohort from './exploredCohort'
 import autoLogout from './autoLogout'
-import medication from './medication'
 import criteria from './criteria'
 import message from './message'
 import patient from './patient'
@@ -43,7 +42,6 @@ const rootReducer = combineReducers({
   cohort,
   scope,
   pmsi,
-  medication,
   biology,
   patient,
   autoLogout,

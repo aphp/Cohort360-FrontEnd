@@ -16,8 +16,8 @@ import HospitForm from './DiagramView/components/LogicalOperator/components/Crit
 
 import { CriteriaType, CriteriaTypeLabels } from 'types/requestCriterias'
 import { getConfig } from 'config'
-import { getCodeList } from 'services/aphp/serviceValueSets'
-import { FhirItem } from 'types/hierarchy'
+import { getChildrenFromCodes, getCodeList } from 'services/aphp/serviceValueSets'
+import { FhirItem, Hierarchy } from 'types/hierarchy'
 import docTypes from 'assets/docTypes.json'
 import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
 import { VitalStatusLabel } from 'types/searchCriterias'
@@ -149,7 +149,18 @@ const criteriaList: () => CriteriaItemType[] = () => {
       components: MedicationForm,
       disabled: !ODD_MEDICATION,
       fetch: {
-        medicationData: /*services.cohortCreation.fetchMedicationData*/ [],
+        medicationData: async (code: string) => {
+          let results: Hierarchy<FhirItem>[] = []
+          try {
+            results = (await getChildrenFromCodes(getConfig().features.medication.valueSets.medicationUcd.url, [code])).results
+          } catch (e) {
+            results = (await getChildrenFromCodes(getConfig().features.medication.valueSets.medicationAtc.url, [code])).results
+          } finally {
+            console.log("test fetch code", code)
+             console.log('test fetch results', results)
+            return results
+          }
+        },
         prescriptionTypes: async(() =>
           getCodeList(getConfig().features.medication.valueSets.medicationPrescriptionTypes.url)
         ),

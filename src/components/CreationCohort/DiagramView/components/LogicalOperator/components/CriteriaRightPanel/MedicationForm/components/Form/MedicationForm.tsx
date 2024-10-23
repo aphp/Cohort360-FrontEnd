@@ -19,7 +19,6 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import AdvancedInputs from '../../../AdvancedInputs'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
-import { fetchMedication } from 'state/medication'
 import { CriteriaItemDataCache, HierarchyTree } from 'types'
 import { Comparators, CriteriaType, MedicationDataType, SelectedCriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
@@ -31,7 +30,6 @@ import { getConfig } from 'config'
 import ValueSetField from 'components/SearchValueSet/ValueSetField'
 
 type MedicationFormProps = {
-  isOpen: boolean
   isEdition: boolean
   criteriaData: CriteriaItemDataCache
   selectedCriteria: MedicationDataType
@@ -47,13 +45,13 @@ enum Error {
 }
 
 const MedicationForm: React.FC<MedicationFormProps> = (props) => {
-  const { isOpen, isEdition, criteriaData, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
+  const { isEdition, criteriaData, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
-  const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
-  const currentState = { ...selectedCriteria, ...initialState }
+  //const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
+  const currentState = { ...selectedCriteria /*, ...initialState*/ }
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const [occurrence, setOccurrence] = useState(currentState.occurrence || 1)
   const [occurrenceComparator, setOccurrenceComparator] = useState(
@@ -66,10 +64,6 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
       onChangeValue('endOccurrence', [null, null])
     }
   }, [currentState.type])
-
-  useEffect(() => {
-    console.log('test criteria', selectedCriteria)
-  }, [criteriaData, selectedCriteria])
 
   /*const getMedicationOptions = async (searchValue: string, signal: AbortSignal) => {
     const response = await services.cohortCreation.fetchMedicationData(searchValue, false, signal)
@@ -158,7 +152,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
     }*/
   ]
 
-  return isOpen ? (
+  return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
         {!isEdition ? (
@@ -325,8 +319,6 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
         </Grid>
       </Grid>
     </Grid>
-  ) : (
-    <></>
   )
 }
 

@@ -33,8 +33,6 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
 
   const codes = useAppSelector((state) => selectValueSetCodes(state, urls))
 
-  useEffect(() => console.log('test store', codes), [codes])
-
   const {
     hierarchies,
     searchResults,
@@ -61,6 +59,10 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
       }
     )
   }, [hierarchies, explorationParameters.options.references])
+
+  const selected = useMemo(() => {
+    return [...selectedCodes.values()].flatMap((innerMap) => [...innerMap.values()])
+  }, [selectedCodes])
 
   const fetchSearch = async (searchInput: string, page: number, references: string[]) => {
     if (references.length) {
@@ -132,13 +134,12 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
   }
 
   useEffect(() => {
-    console.log('test hierarchy', hierarchies)
     if (mode === SearchMode.EXPLORATION && !initialized.exploration) initExploration(references)
     if (mode === SearchMode.RESEARCH && !initialized.research) initResearch(references)
   }, [mode])
 
   return {
-    selectedCodes,
+    selectedCodes: selected,
     mode,
     loadingStatus,
     searchInput,
