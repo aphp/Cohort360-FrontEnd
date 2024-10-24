@@ -72,7 +72,7 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
 
   const fetchBaseTree = async (ref: Reference) => {
     const fetch = ref.isHierarchy
-      ? () => getHierarchyRoots(ref.url, ref.title, true, ref.filterRoots)
+      ? () => getHierarchyRoots(ref.url, ref.title, ref.joinDisplayWithCode, ref.filterRoots)
       : () => searchInValueSets([ref.url], '', 0, LIMIT_PER_PAGE)
     try {
       return await fetch()

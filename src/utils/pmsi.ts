@@ -7,7 +7,6 @@ import {
   initSyncHierarchyTable,
   pushSyncHierarchyTable
 } from '../state/syncHierarchyTable'
-import { expandBiologyElement } from '../state/biology'
 import services from 'services/aphp'
 import { CommonCriteriaDataType, CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 import { Condition } from 'fhir/r4'

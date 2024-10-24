@@ -8,8 +8,8 @@ import { getConfig } from 'config'
 import { LOW_TOLERANCE_TAG } from './callApi'
 import { sortArray } from 'utils/arrays'
 
-export const UNKOWN_CHAPTER = 'UNKNOWN'
-const ROOT = '*'
+export const UNKOWN_HIERARCHY_CHAPTER = 'UNKNOWN'
+export const HIERARCHY_ROOT = '*'
 
 const isDataNonQuali = (system: string) => {
   switch (system) {
@@ -21,7 +21,7 @@ const isDataNonQuali = (system: string) => {
 }
 
 const getParentIds = (extensions?: Extension[], id?: string): string[] => {
-  const parentIds = [ROOT]
+  const parentIds = [HIERARCHY_ROOT]
   extensions
     ?.find((ext) => ext.url === getConfig().core.extensions.codeHierarchy)
     ?.valueCodeableConcept?.coding?.forEach((code) => {
@@ -40,8 +40,8 @@ const getParentIds = (extensions?: Extension[], id?: string): string[] => {
 
 const mapAbandonedChildren = (children: Hierarchy<FhirHierarchy, string>[]) => {
   return children.map((child) =>
-    child.above_levels_ids === ROOT && !child.inferior_levels_ids && isDataNonQuali(child.system)
-      ? { ...child, above_levels_ids: `${ROOT},${UNKOWN_CHAPTER}` }
+    child.above_levels_ids === HIERARCHY_ROOT && !child.inferior_levels_ids && isDataNonQuali(child.system)
+      ? { ...child, above_levels_ids: `${HIERARCHY_ROOT},${UNKOWN_HIERARCHY_CHAPTER}` }
       : child
   )
 }
@@ -49,10 +49,9 @@ const mapAbandonedChildren = (children: Hierarchy<FhirHierarchy, string>[]) => {
 const mapFhirHierarchyToHierarchyWithLabelAndSystem = (
   fhirHierarchy: FhirHierarchy
 ): Hierarchy<FhirHierarchy, string> => {
-  const label = fhirHierarchy.id === ROOT ? fhirHierarchy.label : `${fhirHierarchy.id} - ${fhirHierarchy.label}`
   return {
     id: fhirHierarchy.id,
-    label: label,
+    label: fhirHierarchy.label,
     system: fhirHierarchy.system,
     above_levels_ids: fhirHierarchy.parentIds?.join(',') || '',
     inferior_levels_ids: fhirHierarchy.childrenIds?.join(',') || ''
@@ -186,7 +185,7 @@ export const searchInValueSets = async (
   let options = ''
   if (offset !== undefined) options += `&offset=${offset}`
   if (count !== undefined) options += `&count=${count}`
-  const searchValue = search || ROOT
+  const searchValue = search || HIERARCHY_ROOT
   const res = await apiFhir.get<FHIR_API_Response<ValueSet>>(
     `/ValueSet/$expand?url=${codeSystems.join(',')}&filter=${encodeURIComponent(
       searchValue
@@ -225,11 +224,12 @@ export const getCodeList = async (
 export const getHierarchyRoots = async (
   codeSystem: string,
   valueSetTitle: string,
-  joinDisplayWithCode = true,
+  joinDisplayWithCode: boolean,
   filterRoots: (code: HierarchyWithLabel) => boolean = () => true,
   filterOut: (code: HierarchyWithLabel) => boolean = (value: HierarchyWithLabel) => value.id === 'APHP generated',
   signal?: AbortSignal
 ): Promise<Back_API_Response<Hierarchy<FhirHierarchy, string>>> => {
+  console.log('test join', codeSystem, joinDisplayWithCode)
   const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(
     `/ValueSet?only-roots=true&reference=${codeSystem}&_sort=code`,
     { signal }
@@ -240,49 +240,46 @@ export const getHierarchyRoots = async (
     .reduce((acc, val) => acc.concat(val), [])
     .map((code) => ({
       id: code.code,
-      label: joinDisplayWithCode
-        ? `${code.code} - ${capitalizeFirstLetter(code.display)}`
-        : capitalizeFirstLetter(code.display),
+      label: capitalizeFirstLetter(code.display),
       system: codeSystem
     }))
     .filter((code) => !filterOut(code))
 
   const chapters = codeList
     .filter((code) => filterRoots(code))
-    .sort((a, b) => a.label.localeCompare(b.label))
     .map((e) => mapFhirHierarchyToHierarchyWithLabelAndSystem(e))
   let toBeAdoptedCodes = codeList
     .filter((code) => !filterRoots(code))
-    .sort((a, b) => a.label.localeCompare(b.label))
     .map((e) => mapFhirHierarchyToHierarchyWithLabelAndSystem(e))
   const childrenIds = chapters.map((code) => code.id)
   let subItems: Hierarchy<FhirHierarchy>[] | undefined = undefined
   if (toBeAdoptedCodes.length) {
-    childrenIds.push(UNKOWN_CHAPTER)
     const unknownChildren = toBeAdoptedCodes.map((child) => ({
       ...child,
-      above_levels_ids: `${ROOT},${UNKOWN_CHAPTER}`
+      above_levels_ids: `${HIERARCHY_ROOT},${UNKOWN_HIERARCHY_CHAPTER}`
     }))
     const unknownChapter: Hierarchy<FhirHierarchy> = {
-      id: UNKOWN_CHAPTER,
-      label: `U - ${UNKOWN_CHAPTER}`,
+      id: UNKOWN_HIERARCHY_CHAPTER,
+      label: `${UNKOWN_HIERARCHY_CHAPTER}`,
       system: codeSystem,
-      above_levels_ids: ROOT,
+      above_levels_ids: HIERARCHY_ROOT,
       inferior_levels_ids: unknownChildren.map((code) => code.id).join(','),
       subItems: unknownChildren
     }
     const chaptersEntities = (await getChildrenFromCodes(codeSystem, childrenIds)).results
+    childrenIds.push(UNKOWN_HIERARCHY_CHAPTER)
     subItems = [...chaptersEntities, unknownChapter]
   }
   let results = [
     {
-      id: ROOT,
+      id: HIERARCHY_ROOT,
       label: valueSetTitle,
       system: codeSystem,
       childrenIds,
       parentIds: []
     }
   ].map((e) => ({ ...mapFhirHierarchyToHierarchyWithLabelAndSystem(e), subItems }))
+
   return {
     results: results,
     count: codeList.length

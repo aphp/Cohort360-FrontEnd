@@ -13,7 +13,7 @@ import {
   Typography
 } from '@mui/material'
 import { LoadingStatus, SelectedStatus } from 'types'
-import { FhirHierarchy, Hierarchy, HierarchyInfo, Mode } from 'types/hierarchy'
+import { FhirHierarchy, FhirItem, Hierarchy, HierarchyInfo, Mode } from 'types/hierarchy'
 import { KeyboardArrowDown, KeyboardArrowRight, IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 import { CellWrapper, RowContainerWrapper, RowWrapper } from '../Hierarchy/styles'
 import { sortArray } from 'utils/arrays'
@@ -21,6 +21,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { SearchMode } from 'types/searchValueSet'
 import { LIMIT_PER_PAGE } from 'hooks/search/useSearchParameters'
 import { Pagination } from 'components/ui/Pagination'
+import { HIERARCHY_ROOT, UNKOWN_HIERARCHY_CHAPTER } from 'services/aphp/serviceValueSets'
 
 type ValueSetRowProps = {
   item: Hierarchy<FhirHierarchy, string>
@@ -29,6 +30,7 @@ type ValueSetRowProps = {
   path: string[]
   mode: SearchMode
   isHierarchy: boolean
+  joinDisplayWithCode: (code: Hierarchy<FhirItem>) => boolean
   onExpand: (node: Hierarchy<FhirHierarchy, string>) => void
   onSelect: (node: Hierarchy<FhirHierarchy, string>, toAdd: boolean) => void
 }
@@ -40,12 +42,14 @@ const ValueSetRow = ({
   path,
   mode,
   isHierarchy,
+  joinDisplayWithCode,
   onSelect,
   onExpand
 }: ValueSetRowProps) => {
   const [open, setOpen] = useState(false)
   const [internalLoading, setInternalLoading] = useState(false)
   const { label, subItems, status, id } = item
+  const isCodeDisplayed = joinDisplayWithCode(item)
   const canExpand = !(subItems?.length === 0 || subItems)
 
   const handleOpen = () => {
@@ -76,6 +80,7 @@ const ValueSetRow = ({
             )}
           </CellWrapper>
           <CellWrapper item xs={10} cursor onClick={() => (open ? setOpen(false) : handleOpen())}>
+            {isCodeDisplayed && id !== HIERARCHY_ROOT && id !== UNKOWN_HIERARCHY_CHAPTER && <>{id} - </>}
             {label}
           </CellWrapper>
           <CellWrapper item xs={1} container>
@@ -94,7 +99,7 @@ const ValueSetRow = ({
       {!internalLoading &&
         open &&
         isHierarchy &&
-        sortArray(subItems || [], 'label').map((subItem) => {
+        sortArray(subItems || [], isCodeDisplayed ? 'id' : 'label').map((subItem) => {
           return (
             <ValueSetRow
               mode={mode}
@@ -103,6 +108,7 @@ const ValueSetRow = ({
               path={[...path, id]}
               key={subItem.id}
               item={subItem}
+              joinDisplayWithCode={joinDisplayWithCode}
               onSelect={onSelect}
               onExpand={onExpand}
             />
@@ -118,6 +124,7 @@ type ValueSetTableProps = {
   loading: { expand: LoadingStatus; list: LoadingStatus }
   isHierarchy?: boolean
   mode: SearchMode
+  joinDisplayWithCode: (code: Hierarchy<FhirItem>) => boolean
   onExpand: (node: Hierarchy<FhirHierarchy, string>) => void
   onSelect: (node: Hierarchy<FhirHierarchy, string>, toAdd: boolean) => void
   onSelectAll: (toAdd: boolean) => void
@@ -130,6 +137,7 @@ const ValueSetTable = ({
   loading,
   mode,
   isHierarchy = true,
+  joinDisplayWithCode,
   onSelect,
   onSelectAll,
   onExpand,
@@ -171,6 +179,7 @@ const ValueSetTable = ({
                         path={[item.id]}
                         key={item.id}
                         item={item}
+                        joinDisplayWithCode={joinDisplayWithCode}
                         onExpand={onExpand}
                         onSelect={onSelect}
                       />

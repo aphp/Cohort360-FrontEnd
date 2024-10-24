@@ -377,7 +377,7 @@ export type ObservationDataType = CommonCriteriaDataType &
   WithEncounterDateDataType &
   WithEncounterStatusDataType & {
     type: CriteriaType.OBSERVATION
-    code: LabelObject[] | null
+    code: Hierarchy<FhirItem>[]
     isLeaf: boolean
     searchByValue: [number | null, number | null]
     valueComparator: Comparators

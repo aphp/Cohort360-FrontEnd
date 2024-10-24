@@ -80,7 +80,7 @@ export const useHierarchy = <T>(
     }
     setTrees(newTrees)
     setHierarchies(newHierarchies)
-    console.log('test missing init', allCodes)
+    //console.log('test missing init', allCodes)
     //setSelectedCodes(newSelectedCodes)
     setCodes(allCodes)
     setLoadingStatus((prevLoadingStatus) => ({ ...prevLoadingStatus, init: LoadingStatus.SUCCESS }))
@@ -88,7 +88,7 @@ export const useHierarchy = <T>(
 
   const search = async (fetchSearch: () => Promise<Back_API_Response<Hierarchy<T>>>) => {
     const { results: endCodes, count } = await fetchSearch()
-    console.log('test end codes', endCodes)
+    //console.log('test end codes', endCodes)
     const bySystem = groupBySystem(endCodes)
     const newCodes = await getMissingCodesWithSystems(trees, bySystem, codes, fetchHandler)
     const newTrees = buildMultipleTrees(trees, bySystem, newCodes, selectedCodes, Mode.SEARCH)

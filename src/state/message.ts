@@ -10,7 +10,6 @@ import {
 } from './cohortCreation'
 import { addProject, editProject, deleteProject, fetchProjects } from './project'
 import { addRequest, editRequest, deleteRequest, fetchRequests, moveRequests, deleteRequests } from './request'
-import { expandBiologyElement, fetchBiology, initBiologyHierarchy } from './biology'
 import { addCohort, deleteCohort, editCohort, fetchCohorts } from './cohort'
 import { favoriteExploredCohort, fetchExploredCohort } from './exploredCohort'
 import {
@@ -127,18 +126,6 @@ const setMessageSlice = createSlice({
     builder.addCase(countCohortCreation.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la sauvegarde de la requête'
-    }))
-    builder.addCase(initBiologyHierarchy.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération de la hiérarchie de biologie'
-    }))
-    builder.addCase(fetchBiology.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération de la hiérarchie de biologie'
-    }))
-    builder.addCase(expandBiologyElement.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération des enfants dans la hiérarchie de biologie'
     }))
     builder.addCase(fetchCohorts.rejected, () => ({
       type: 'error',

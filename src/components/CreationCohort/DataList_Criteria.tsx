@@ -152,12 +152,12 @@ const criteriaList: () => CriteriaItemType[] = () => {
         medicationData: async (code: string) => {
           let results: Hierarchy<FhirItem>[] = []
           try {
-            results = (await getChildrenFromCodes(getConfig().features.medication.valueSets.medicationUcd.url, [code])).results
+            results = (await getChildrenFromCodes(getConfig().features.medication.valueSets.medicationUcd.url, [code]))
+              .results
           } catch (e) {
-            results = (await getChildrenFromCodes(getConfig().features.medication.valueSets.medicationAtc.url, [code])).results
+            results = (await getChildrenFromCodes(getConfig().features.medication.valueSets.medicationAtc.url, [code]))
+              .results
           } finally {
-            console.log("test fetch code", code)
-             console.log('test fetch results', results)
             return results
           }
         },

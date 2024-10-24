@@ -172,9 +172,9 @@ const MedicationForm = (props: CriteriaDrawerComponentProps) => {
       url: getConfig().features.medication.valueSets.medicationAtc.url,
       checked: true,
       isHierarchy: true,
-      filterRoots: (code: HierarchyWithLabel) =>
-        code.label.search(new RegExp(/^[A-Z] - /, 'gi')) !== -1 &&
-        code.label.search(new RegExp(/^[X-Y] - /, 'gi')) !== 0
+      joinDisplayWithCode: true,
+      filterRoots: (code: HierarchyWithLabel) => /^[A-WZ]$/.test(code.id)
+      /*code.id.search(new RegExp(/^[A-Z] - /, 'gi')) !== -1 && code.id.search(new RegExp(/^[X-Y] - /, 'gi')) !== 0*/
     },
     {
       id: References.UCD,
@@ -183,15 +183,11 @@ const MedicationForm = (props: CriteriaDrawerComponentProps) => {
       standard: true,
       url: getConfig().features.medication.valueSets.medicationUcd.url,
       checked: true,
+      joinDisplayWithCode: true,
       isHierarchy: false,
       filterRoots: () => true
     }
   ]
-
-  useEffect(() => {
-    console.log('test onchange', currentCriteria)
-  }, [currentCriteria])
-
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>

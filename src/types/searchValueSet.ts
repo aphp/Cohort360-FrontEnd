@@ -31,7 +31,7 @@ export type Reference = {
   url: string
   checked: boolean
   isHierarchy: boolean
-  totalCount?: number
+  joinDisplayWithCode: boolean
   filterRoots?: (code: HierarchyWithLabel) => boolean
 }
 

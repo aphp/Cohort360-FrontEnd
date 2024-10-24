@@ -15,7 +15,6 @@ import message from './message'
 import patient from './patient'
 import project from './project'
 import request from './request'
-import biology from './biology'
 import cohort from './cohort'
 import drawer from './drawer'
 import scope from './scope'
@@ -42,7 +41,6 @@ const rootReducer = combineReducers({
   cohort,
   scope,
   pmsi,
-  biology,
   patient,
   autoLogout,
   syncHierarchyTable,

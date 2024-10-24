@@ -21,18 +21,17 @@ import {
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
-import { useAppDispatch, useAppSelector } from 'state'
-import { fetchBiology } from 'state/biology'
-import { CriteriaItemDataCache, HierarchyTree } from 'types'
+import { CriteriaItemDataCache } from 'types'
 import AdvancedInputs from '../../../AdvancedInputs'
 import { ObservationDataType, Comparators, SelectedCriteriaType } from 'types/requestCriterias'
-import services from 'services/aphp'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import { ErrorWrapper } from 'components/ui/Searchbar/styles'
-import { HierarchyElementWithSystem } from 'types/hierarchy'
 import { SourceType } from 'types/scope'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
+import ValueSetField from 'components/SearchValueSet/ValueSetField'
+import { Reference, References, ReferencesLabel } from 'types/searchValueSet'
+import { getConfig } from 'config'
 
 enum Error {
   NO_ERROR,
@@ -43,7 +42,6 @@ enum Error {
 }
 
 type BiologyFormProps = {
-  isOpen: boolean
   isEdition: boolean
   criteriaData: CriteriaItemDataCache
   selectedCriteria: ObservationDataType
@@ -54,12 +52,12 @@ type BiologyFormProps = {
 }
 
 const BiologyForm: React.FC<BiologyFormProps> = (props) => {
-  const { isOpen, isEdition, criteriaData, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
+  const { isEdition, criteriaData, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
   const { classes } = useStyles()
-  const dispatch = useAppDispatch()
-  const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
-  const currentState = { ...selectedCriteria, ...initialState }
+  //const dispatch = useAppDispatch()
+  //const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
+  const currentState = { ...selectedCriteria }
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const [allowSearchByValue, setAllowSearchByValue] = useState(
     typeof currentState.searchByValue[0] === 'number' || typeof currentState.searchByValue[1] === 'number'
@@ -84,10 +82,9 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       occurrenceComparator: occurrenceComparator,
       searchByValue: parseSearchByValue(_searchByValues)
     })
-    dispatch(fetchBiology())
   }
 
-  const defaultValuesCode = currentState.code
+  /*const defaultValuesCode = currentState.code
     ? currentState.code.map((code) => {
         const criteriaCode = criteriaData.data.biologyData
           ? criteriaData.data.biologyData.find((g: HierarchyElementWithSystem) => g.id === code.id)
@@ -97,9 +94,9 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
           label: code.label ? code.label : criteriaCode?.label ?? '?'
         }
       })
-    : []
+    : []*/
 
-  useEffect(() => {
+  /*useEffect(() => {
     const checkChildren = async () => {
       try {
         const getChildrenResp = await services.cohortCreation.fetchBiologyHierarchy(selectedCriteria.code?.[0].id)
@@ -113,13 +110,13 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
     selectedCriteria?.code?.length === 1 && selectedCriteria?.code[0].id !== '*'
       ? checkChildren()
       : onChangeValue('isLeaf', false)
-  }, [currentState?.code])
+  }, [currentState?.code])*/
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (!currentState.isLeaf) {
       setAllowSearchByValue(false)
     }
-  }, [currentState.isLeaf])
+  }, [currentState.isLeaf])*/
 
   useEffect(() => {
     if (!allowSearchByValue) {
@@ -162,7 +159,41 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
     }
   }
 
-  return isOpen ? (
+  const biologyReferences: Reference[] = [
+    {
+      id: References.ANABIO,
+      title: 'Toute la hiérarchie',
+      label: ReferencesLabel.ANABIO,
+      standard: true,
+      url: getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
+      checked: true,
+      isHierarchy: true,
+      joinDisplayWithCode: false,
+      filterRoots: (biologyItem) =>
+        biologyItem.id !== '527941' &&
+        biologyItem.id !== '547289' &&
+        biologyItem.id !== '528247' &&
+        biologyItem.id !== '981945' &&
+        biologyItem.id !== '834019' &&
+        biologyItem.id !== '528310' &&
+        biologyItem.id !== '528049' &&
+        biologyItem.id !== '527570' &&
+        biologyItem.id !== '527614'
+    },
+    {
+      id: References.LOINC,
+      title: 'Toute la hiérarchie',
+      label: ReferencesLabel.LOINC,
+      standard: true,
+      url: getConfig().features.observation.valueSets.biologyHierarchyLoinc.url,
+      checked: true,
+      isHierarchy: false,
+      joinDisplayWithCode: true,
+      filterRoots: () => true
+    }
+  ]
+
+  return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
         {!isEdition ? (
@@ -241,7 +272,16 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
           <Grid className={classes.inputContainer}>
             <CriteriaLabel label="Codes de biologie" />
 
-            <Grid container item style={{ marginBottom: '1em', width: 'calc(100%-2em)' }}>
+            <Grid container marginBottom={2} marginTop={1}>
+              <ValueSetField
+                value={currentState.code}
+                references={biologyReferences}
+                onSelect={(value) => /*setCurrentCriteria({ ...currentCriteria, code: value })*/ console.log('select')}
+                placeholder="Sélectionner les codes"
+              />
+            </Grid>
+
+            {/*<Grid container item style={{ marginBottom: '1em', width: 'calc(100%-2em)' }}>
               {defaultValuesCode.length > 0 ? (
                 defaultValuesCode.map((valueCode, index: number) => (
                   <Chip
@@ -267,7 +307,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                   Veuillez ajouter des codes de biologie via les onglets Hiérarchie ou Recherche.
                 </FormLabel>
               )}
-            </Grid>
+              </Grid>*/}
 
             <CriteriaLabel
               label="Recherche par valeur"
@@ -395,8 +435,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
         </Grid>
       </Grid>
     </Grid>
-  ) : (
-    <></>
   )
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { Grid, Divider, Paper, Collapse, Typography, Input, IconButton } from '@mui/material'
 import Tabs from 'components/ui/Tabs'
 import { LoadingStatus, TabType } from 'types'
@@ -33,6 +33,11 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
     { id: SearchMode.EXPLORATION, label: SearchModeLabel.EXPLORATION },
     { id: SearchMode.RESEARCH, label: SearchModeLabel.RESEARCH }
   ]
+
+  const joinDisplayWithCode = useCallback(
+    (node: Hierarchy<FhirItem>) => references.find((ref) => ref.url === node.system)?.joinDisplayWithCode || false,
+    [references]
+  )
 
   useEffect(() => {
     onSelect(selectedCodes.map((e) => cleanNode(e)))
@@ -97,6 +102,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
               isHierarchy={refs.find((ref) => ref.checked)?.isHierarchy}
               loading={{ list: loadingStatus.init, expand: loadingStatus.expand }}
               hierarchy={exploration}
+              joinDisplayWithCode={joinDisplayWithCode}
               selectAllStatus={selectAllStatus}
               onSelect={select}
               onSelectAll={selectAll}
@@ -110,6 +116,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
               selectAllStatus={selectAllStatus}
               isHierarchy={false}
               loading={{ list: loadingStatus.search, expand: loadingStatus.expand }}
+              joinDisplayWithCode={joinDisplayWithCode}
               hierarchy={research}
               onSelect={select}
               onSelectAll={selectAll}

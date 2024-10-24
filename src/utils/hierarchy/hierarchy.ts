@@ -1,7 +1,7 @@
 import { SelectedStatus } from 'types'
 import { Codes, CodesCache, GroupedBySystem, Hierarchy, InfiniteMap, Mode } from 'types/hierarchy'
 import { arrayToMap } from '../arrays'
-import { UNKOWN_CHAPTER } from 'services/aphp/serviceValueSets'
+import { UNKOWN_HIERARCHY_CHAPTER } from 'services/aphp/serviceValueSets'
 
 export const mapCodesToCache = <T>(codes: Codes<Hierarchy<T>>) => {
   const valueSetOptions: CodesCache<T>[] = []
@@ -31,7 +31,7 @@ export const getHierarchyRootCodes = <T>(tree: Hierarchy<T, string>[]) => {
   for (const root of tree) {
     if (root.subItems) {
       codes = new Map([...codes, ...mapHierarchyToMap(root.subItems)])
-      const unknownChapter = root.subItems.find((item) => item.id === UNKOWN_CHAPTER)
+      const unknownChapter = root.subItems.find((item) => item.id === UNKOWN_HIERARCHY_CHAPTER)
       if (unknownChapter && unknownChapter.subItems)
         codes = new Map([...codes, ...mapHierarchyToMap(unknownChapter.subItems)])
     }
@@ -97,7 +97,7 @@ export const getMissingCodes = async <T>(
     above = getAboveLevels(newCodes, baseTree)
     missingIds = getMissingIds(allCodes, arrayToMap(above, null))
   }
-  console.log('test missing', missingIds, newCodes, prevCodes)
+  console.log('test missing', system, missingIds)
   if (missingIds.length) {
     const ids = missingIds.map((id) => id.split('|')[1]).join(',')
     const fetched = await fetchHandler(ids, system)
@@ -128,7 +128,7 @@ export const getMissingNode = <T>(
 
 export const getMissingSubItems = <T>(node: Hierarchy<T, string>, codes: Map<string, Hierarchy<T, string>>) => {
   const subItems: Hierarchy<T, string>[] = []
-  console.log('test expand subitems', node.inferior_levels_ids)
+  //console.log('test expand subitems', node.inferior_levels_ids)
   const levels = node.inferior_levels_ids?.split(',').map((id) => `${node.system}|${id}`)
   levels.forEach((key) => {
     const foundCode = codes.get(key)
@@ -205,8 +205,8 @@ export const buildTree = <T>(
   }
   const paths = getPaths(baseTree, endCodes, mode === Mode.UNSELECT_ALL || mode === Mode.SELECT_ALL)
   const uniquePaths = getUniquePath(paths)
-  console.log('test search endCodes', endCodes)
-  console.log('test search paths', uniquePaths)
+ // console.log('test search endCodes', endCodes)
+  //console.log('test search paths', uniquePaths)
   if (mode === Mode.INIT) baseTree = []
   for (const [key, value] of uniquePaths) {
     const index = baseTree.findIndex((elem) => elem.id === key)

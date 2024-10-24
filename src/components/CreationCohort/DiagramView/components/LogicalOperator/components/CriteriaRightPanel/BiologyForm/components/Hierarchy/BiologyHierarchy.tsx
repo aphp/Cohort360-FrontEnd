@@ -24,7 +24,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 
 import { expandItem, findEquivalentRowInItemAndSubItems, getHierarchySelection } from 'utils/pmsi'
 
-import useStyles from './styles'
+import useStyles from '../../styles'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import { defaultBiology } from '../../index'
