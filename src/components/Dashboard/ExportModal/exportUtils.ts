@@ -378,8 +378,8 @@ export const fetchAllResourcesCount = async (cohortId: string) => {
       observationCount,
       imagingCount,
       encounterVisitCount,
-      encounterDetailsCounts,
-      questionnaireResponseCount
+      encounterDetailsCounts
+      // questionnaireResponseCount
     ] = await Promise.all([
       fetchPatientCount(cohortId),
       fetchConditionCount(cohortId),
@@ -391,8 +391,8 @@ export const fetchAllResourcesCount = async (cohortId: string) => {
       fetchObservationCount(cohortId),
       fetchImagingCount(cohortId),
       fetchEncounterCount(cohortId, true),
-      fetchEncounterCount(cohortId),
-      fetchQuestionnaireCount(cohortId)
+      fetchEncounterCount(cohortId)
+      // fetchQuestionnaireCount(cohortId)
     ])
 
     return {
@@ -406,8 +406,8 @@ export const fetchAllResourcesCount = async (cohortId: string) => {
       observationCount,
       imagingCount,
       encounterVisitCount,
-      encounterDetailsCounts,
-      questionnaireResponseCount
+      encounterDetailsCounts
+      // questionnaireResponseCount
     }
   } catch (error) {
     console.error('Erreur lors de fetchQuestionnaireCount', error)

@@ -1,4 +1,5 @@
 import apiFhir from '../apiFhir'
+import apiDatamodel from 'services/apiDatamodel'
 import {
   AccessExpiration,
   AccessExpirationsProps,
@@ -1215,4 +1216,10 @@ export const fetchCohortAccesses = async (cohortIds: string[]) => {
 export const fetchCohortInfo = async (cohortId: string) => {
   const response = await apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?group_id=${cohortId}`)
   return response
+}
+
+export const fetchExportTableInfo = async () => {
+  const response = await apiDatamodel.get('/models')
+
+  return response.data
 }
