@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, Divider, Paper, Collapse, Typography, Input, IconButton } from '@mui/material'
+import { Grid, Paper, Collapse, Typography, Input, IconButton } from '@mui/material'
 import Tabs from 'components/ui/Tabs'
 import { LoadingStatus, TabType } from 'types'
 import ReferencesParameters, { Type } from './References'
@@ -41,7 +41,6 @@ const SearchValueSet = ({ references }: SearchValueSetProps) => {
               active={tabs[mode]}
               onchange={(elem) => onChangeMode(elem.id)}
             />
-            <Divider />
           </Grid>
           <Grid item xs={12}>
             <Paper sx={{ padding: '20px' }}>

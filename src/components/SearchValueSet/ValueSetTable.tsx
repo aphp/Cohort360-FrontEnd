@@ -61,7 +61,12 @@ const ValueSetRow = ({
   return (
     <>
       <RowContainerWrapper container color={path.length % 2 === 0 ? '#f3f5f9' : '#fff'}>
-        <RowWrapper container alignItems="center" marginLeft={path.length > 1 ? path.length * 20 - 20 + 'px' : '0'}>
+        <RowWrapper
+          container
+          alignItems="center"
+          marginLeft={path.length > 1 ? path.length * 20 - 20 + 'px' : '0'}
+          style={{ paddingRight: 10 }}
+        >
           <CellWrapper item xs={1} cursor>
             {mode === SearchMode.EXPLORATION && isHierarchy && (
               <>
@@ -146,7 +151,7 @@ const ValueSetTable = ({
                   <TableCell colSpan={6}>
                     <Grid container alignItems="center" justifyContent="space-between">
                       <Typography color={hierarchy.count ? 'primary' : '#4f4f4f'} fontWeight={600}>
-                        {hierarchy.count ? `${hierarchy.count} résultat(s)` : ` Aucun résultat à afficher`}
+                        {hierarchy.count ? `${hierarchy.count} résultat(s)` : `Aucun résultat à afficher`}
                       </Typography>
                       <Checkbox
                         color="secondary"

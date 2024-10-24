@@ -26,6 +26,7 @@ const SelectedCodes = <T, S>({ values, onDelete }: SelectedCodesProps<T, S>) => 
         >
           {values?.length > 0 && (
             <Grid item xs={12} container marginTop={2}>
+              {/* TODO: limiter la width d'une chip */}
               {values.map((code) => (
                 <Chip
                   key={uuidv4()}

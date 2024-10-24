@@ -265,21 +265,24 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             />
           )*/}
 
-          <Grid container justifyContent="space-between" alignItems="center" marginBottom={1} marginTop={1}>
+          <Grid
+            container
+            justifyContent="space-between"
+            alignItems="center"
+            marginBottom={1}
+            marginTop={1}
+            className={classes.inputItem}
+          >
             <Grid item xs={10}>
-              {selectedCriteriaPrescriptionType.length < 1 && (
-                <FormLabel style={{ margin: 'auto 1em' }} component="legend">
-                  Résultats
-                </FormLabel>
-              )}
+              {selectedCriteriaPrescriptionType.length < 1 && <FormLabel component="legend">Résultats</FormLabel>}
               {selectedCriteriaPrescriptionType.length > 0 && (
-                <FormLabel style={{ margin: 'auto 1em' }} component="legend" onClick={() => setOpenCodeResearch(true)}>
+                <FormLabel component="legend" onClick={() => setOpenCodeResearch(true)}>
                   Sélectionner les codes
                 </FormLabel>
               )}
             </Grid>
 
-            <IconButton color="primary" onClick={() => setOpenCodeResearch(true)}>
+            <IconButton color="primary" onClick={() => setOpenCodeResearch(true)} style={{ padding: 0 }}>
               <SearchOutlined />
             </IconButton>
           </Grid>

@@ -25,6 +25,10 @@ export const TabWrapper = styled(Tab)<TabCustomProps>(({ width, color }) => ({
   padding: '0px 6px',
   fontWeight: 700,
   fontSize: 13,
+  // TODO: implémenter un deuxième style pour les tabs de la visu
+  borderBottomWidth: 'thin',
+  borderColor: 'rgba(0,0,0,0.12)',
+  borderStyle: 'solid',
   width: width,
   '&.Mui-selected': {
     backgroundColor: 'transparent',
