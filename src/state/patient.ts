@@ -70,6 +70,7 @@ export type Pmsi = {
 export type PatientState = null | {
   loading: boolean
   deidentified?: boolean
+  groupId?: string
   patientInfo?: IPatientDetails
   hospits?: {
     loading: boolean
@@ -865,6 +866,7 @@ type FetchPatientReturn = {
     lastEncounter?: Encounter
   }
   deidentified?: boolean
+  groupId?: string
   hospits?: {
     loading: boolean
     list: (CohortEncounter | Encounter)[]
@@ -877,7 +879,12 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
     try {
       const patientState = getState().patient
 
-      if (patientState && patientState.patientInfo && patientState.patientInfo.id === patientId) {
+      if (
+        patientState &&
+        patientState.patientInfo &&
+        patientState.patientInfo.id === patientId &&
+        patientState.groupId === groupId
+      ) {
         return {
           patientInfo: patientState.patientInfo,
           deidentified: patientState.deidentified,
@@ -932,7 +939,8 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
         hospits: {
           loading: false,
           list: hospits ?? []
-        }
+        },
+        groupId: groupId
       }
     } catch (error) {
       console.error(error)
@@ -982,6 +990,7 @@ const patientSlice = createSlice({
             ...state,
             loading: false,
             deidentified: action.payload.deidentified,
+            groupId: action.payload.groupId,
             patientInfo: {
               ...(state?.patientInfo ?? {}),
               ...action.payload.patientInfo
@@ -992,6 +1001,7 @@ const patientSlice = createSlice({
             ...state,
             loading: false,
             deidentified: action.payload.deidentified,
+            groupId: action.payload.groupId,
             patientInfo: {
               ...state?.patientInfo,
               ...action.payload.patientInfo

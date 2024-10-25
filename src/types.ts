@@ -709,8 +709,6 @@ export type TabType<T, TL> = {
 
 export type PmsiTab = TabType<PMSIResourceTypes, PMSILabel>
 
-export type PmsiTabs = PmsiTab[]
-
 export type MedicationTab = TabType<
   ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST,
   MedicationLabel

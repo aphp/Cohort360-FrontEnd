@@ -36,18 +36,18 @@ import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { AppConfig } from 'config'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
 
 type ImagingListProps = {
-  groupId?: string
   deidentified?: boolean
 }
 
-const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
+const ImagingList = ({ deidentified }: ImagingListProps) => {
   const appConfig = useContext(AppConfig)
   const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
+  const groupId = searchParams.get('groupId') ?? undefined
 
   const [searchResults, setSearchResults] = useState<ResultsType>({ nb: 0, total: 0, label: 'résultats' })
   const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total: 0, label: 'patient(s)' })
@@ -184,7 +184,7 @@ const ImagingList = ({ groupId, deidentified }: ImagingListProps) => {
   }, [ipp, nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality, groupId, encounterStatus])
 
   useEffect(() => {
-    setSearchParams({ page: page.toString() })
+    setSearchParams(cleanSearchParams({ page: page.toString(), groupId: groupId }))
 
     handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])

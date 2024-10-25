@@ -22,19 +22,17 @@ import { Questionnaire } from 'fhir/r4'
 import MaternityFormFilter from 'components/Filters/MaternityFormFilter'
 import DataTableForms from 'components/DataTable/DataTableForms'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
 import Chip from 'components/ui/Chip'
 
-type FormsListProps = {
-  groupId?: string
-}
-
-const FormsList = ({ groupId }: FormsListProps) => {
+const FormsList = () => {
   const theme = useTheme()
   const isSm = useMediaQuery(theme.breakpoints.down('md'))
   const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const pageParam = searchParams.get('page')
+  const groupId = searchParams.get('groupId') ?? undefined
+
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([])
@@ -142,7 +140,8 @@ const FormsList = ({ groupId }: FormsListProps) => {
   }, [orderBy, formName, startDate, endDate, executiveUnits, encounterStatus, ipp, groupId])
 
   useEffect(() => {
-    setSearchParams({ page: page.toString() })
+    setSearchParams(cleanSearchParams({ page: page.toString(), groupId: groupId }))
+
     handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 

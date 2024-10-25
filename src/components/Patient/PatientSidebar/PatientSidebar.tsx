@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 
 import { Divider, Drawer, Grid, IconButton, Typography } from '@mui/material'
 import { ChevronRight, Sort } from '@mui/icons-material'
@@ -7,6 +7,7 @@ import FilterList from 'assets/icones/filter.svg?react'
 
 import { selectFiltersAsArray } from 'utils/filters'
 import { cancelPendingRequest } from 'utils/abortController'
+import { getCleanGroupId } from 'utils/paginationUtils'
 import services from 'services/aphp'
 import { CohortPatient, DTTB_ResultsType as ResultsType, LoadingStatus } from 'types'
 
@@ -52,6 +53,7 @@ type PatientSidebarProps = {
 
 const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBoolean }: PatientSidebarProps) => {
   const { classes } = useStyles()
+  const [searchParams] = useSearchParams()
   const [toggleFiltersModal, setToggleFiltersModal] = useState(false)
   const [toggleSortModal, setToggleSortModal] = useState(false)
   const [page, setPage] = useState(1)
@@ -76,9 +78,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
 
   const controllerRef = useRef<AbortController | null>(null)
 
-  const location = useLocation()
-  const { search } = location
-  const groupId = new URLSearchParams(search).get('groupId') ?? ''
+  const groupId = getCleanGroupId(searchParams.get('groupId')) ?? undefined
 
   const fetchPatients = async () => {
     try {

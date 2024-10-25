@@ -1,7 +1,3 @@
-export type PatientTypes = {
-  groupId?: string
-}
-
 export enum PatientTableLabels {
   GENDER = 'Sexe',
   FIRSTNAME = 'Prénom',

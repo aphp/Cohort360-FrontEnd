@@ -39,14 +39,14 @@ import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { mapToLabel, mapToSourceType } from 'mappers/pmsi'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
+import { getPMSITab } from 'utils/tabsUtils'
 
 type PMSIListProps = {
-  groupId?: string
   deidentified?: boolean
 }
 
-const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
+const PMSIList = ({ deidentified }: PMSIListProps) => {
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
@@ -57,11 +57,11 @@ const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
   const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
+  const groupId = searchParams.get('groupId') ?? undefined
+  const tabId = searchParams.get('tabId') ?? undefined
+  const existingParams = Object.fromEntries(searchParams.entries())
 
-  const [selectedTab, setSelectedTab] = useState<PmsiTab>({
-    id: ResourceType.CONDITION,
-    label: PMSILabel.DIAGNOSTIC
-  })
+  const [selectedTab, setSelectedTab] = useState<PmsiTab>(getPMSITab(tabId))
   const sourceType = mapToSourceType(selectedTab.id)
 
   const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
@@ -215,9 +215,7 @@ const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
   ])
 
   useEffect(() => {
-    const updatedSearchParams = new URLSearchParams(searchParams)
-    updatedSearchParams.set('page', page.toString())
-    setSearchParams(updatedSearchParams)
+    setSearchParams(cleanSearchParams({ page: page.toString(), tabId: selectedTab.id, groupId: groupId }))
 
     handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
@@ -308,6 +306,7 @@ const PMSIList = ({ groupId, deidentified }: PMSIListProps) => {
                 active={selectedTab}
                 onchange={(value: PmsiTab) => {
                   setSelectedTab(value)
+                  setSearchParams({ ...existingParams, tabId: value.id })
                 }}
               />
             </Grid>

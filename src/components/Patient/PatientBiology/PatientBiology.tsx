@@ -42,16 +42,13 @@ import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
 
-type PatientBiologyProps = {
-  groupId?: string
-}
-
-const PatientBiology = ({ groupId }: PatientBiologyProps) => {
+const PatientBiology = () => {
   const { classes } = useStyles()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
+  const groupId = searchParams.get('groupId') ?? undefined
 
   const theme = useTheme()
   const isMd = useMediaQuery(theme.breakpoints.down('lg'))
@@ -166,9 +163,8 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
   }, [nda, loinc, anabio, startDate, endDate, executiveUnits, validatedStatus, orderBy, searchInput, encounterStatus])
 
   useEffect(() => {
-    const updatedSearchParams = new URLSearchParams(searchParams)
-    updatedSearchParams.set('page', page.toString())
-    setSearchParams(updatedSearchParams)
+    setSearchParams(cleanSearchParams({ page: page.toString(), groupId: groupId }))
+
     handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 

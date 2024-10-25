@@ -24,7 +24,6 @@ import {
   SearchByTypes,
   FilterByDocumentStatus
 } from 'types/searchCriterias'
-import { PatientTypes } from 'types/patient'
 import Modal from 'components/ui/Modal'
 import Button from 'components/ui/Button'
 import Searchbar from 'components/ui/Searchbar'
@@ -51,12 +50,13 @@ import services from 'services/aphp'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
 
-const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
+const PatientDocs = () => {
   const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
+  const groupId = searchParams.get('groupId') ?? undefined
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
@@ -190,9 +190,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
   ])
 
   useEffect(() => {
-    const updatedSearchParams = new URLSearchParams(searchParams)
-    updatedSearchParams.set('page', page.toString())
-    setSearchParams(updatedSearchParams)
+    setSearchParams(cleanSearchParams({ page: page.toString(), groupId: groupId }))
 
     handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])

@@ -41,11 +41,8 @@ import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
-
-type PatientMedicationProps = {
-  groupId?: string
-}
+import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
+import { getMedicationTab } from 'utils/tabsUtils'
 
 type MedicationSearchResults = {
   deidentified: boolean
@@ -60,10 +57,13 @@ export const medicationTabs: MedicationTab[] = [
   { id: ResourceType.MEDICATION_ADMINISTRATION, label: MedicationLabel.ADMINISTRATION }
 ]
 
-const PatientMedication = ({ groupId }: PatientMedicationProps) => {
+const PatientMedication = () => {
   const { classes } = useStyles()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
+  const groupId = searchParams.get('groupId') ?? undefined
+  const tabId = searchParams.get('tabId') ?? undefined
+  const existingParams = Object.fromEntries(searchParams.entries())
   const theme = useTheme()
   const isSm = useMediaQuery(theme.breakpoints.down('md'))
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
@@ -81,10 +81,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const [selectedTab, setSelectedTab] = useState<
     TabType<ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST, MedicationLabel>
-  >({
-    id: ResourceType.MEDICATION_REQUEST,
-    label: MedicationLabel.PRESCRIPTION
-  })
+  >(getMedicationTab(tabId))
   const [oldTabs, setOldTabs] = useState<MedicationTab | null>(null)
 
   const {
@@ -215,10 +212,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
 
   useEffect(() => {
     setOldTabs(selectedTab)
-
-    const updatedSearchParams = new URLSearchParams(searchParams)
-    updatedSearchParams.set('page', page.toString())
-    setSearchParams(updatedSearchParams)
+    setSearchParams(cleanSearchParams({ page: page.toString(), tabId: selectedTab.id, groupId: groupId }))
 
     handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
@@ -301,6 +295,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
             ) => {
               setOldTabs(selectedTab)
               setSelectedTab(value)
+              setSearchParams({ ...existingParams, tabId: value.id })
             }}
           />
         </Grid>

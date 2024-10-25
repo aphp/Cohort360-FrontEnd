@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { IconButton, Grid, Tabs, Tab, CircularProgress } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import PatientNotExist from 'components/ErrorView/PatientNotExist'
@@ -18,6 +18,7 @@ import useStyles from './styles'
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPatientInfo } from 'state/patient'
 import { AppConfig } from 'config'
+import { getCleanGroupId } from 'utils/paginationUtils'
 
 const Patient = () => {
   const dispatch = useAppDispatch()
@@ -33,20 +34,16 @@ const Patient = () => {
   const ODD_BIOLOGY = config.features.observation.enabled
   const ODD_IMAGING = config.features.imaging.enabled
 
-  const search = new URLSearchParams(location.search)
-  const groupId = search.get('groupId') ?? undefined
+  const [searchParams] = useSearchParams()
+  const groupId = getCleanGroupId(searchParams.get('groupId'))
 
   const { patientId, tabName } = useParams<{
     patientId: string
     tabName: string
   }>()
 
-  const [selectedTab, selectTab] = useState('preview')
-  const [isSidebarOpened, setSidebarOpened] = useState(false)
-
-  useEffect(() => {
-    selectTab(tabName || 'preview')
-  }, [tabName])
+  const [selectedTab, setSelectedTab] = useState(tabName ?? 'preview')
+  const [isSidebarOpened, setIsSidebarOpened] = useState(false)
 
   useEffect(() => {
     const _fetchPatient = async () => {
@@ -67,7 +64,7 @@ const Patient = () => {
   }
 
   const handleChangeTabs = (event: React.SyntheticEvent<Element, Event>, newTab: string) => {
-    selectTab(newTab)
+    setSelectedTab(newTab)
   }
 
   return loading ? (
@@ -90,7 +87,7 @@ const Patient = () => {
       >
         {!isSidebarOpened && (
           <div className={classes.openLeftBar}>
-            <IconButton onClick={() => setSidebarOpened(true)}>
+            <IconButton onClick={() => setIsSidebarOpened(true)}>
               <ChevronLeftIcon color="action" width="20px" />
             </IconButton>
           </div>
@@ -105,28 +102,28 @@ const Patient = () => {
               label="Aperçu patient"
               value="preview"
               component={Link}
-              to={`/patients/${patientId}/preview${groupId ? `?groupId=${groupId}` : ''}`}
+              to={`/patients/${patientId}/preview${location.search}`}
             />
             <Tab
               className={classes.tabTitle}
               label="Parcours patient"
               value="timeline"
               component={Link}
-              to={`/patients/${patientId}/timeline${groupId ? `?groupId=${groupId}` : ''}`}
+              to={`/patients/${patientId}/timeline${location.search}`}
             />
             <Tab
               className={classes.tabTitle}
               label="Documents cliniques"
-              value="clinical-documents"
+              value="documents"
               component={Link}
-              to={`/patients/${patientId}/clinical-documents${groupId ? `?groupId=${groupId}` : ''}`}
+              to={`/patients/${patientId}/documents${location.search}`}
             />
             <Tab
               className={classes.tabTitle}
               label="PMSI"
               value="pmsi"
               component={Link}
-              to={`/patients/${patientId}/pmsi${groupId ? `?groupId=${groupId}` : ''}`}
+              to={`/patients/${patientId}/pmsi${location.search}`}
             />
             {ODD_MEDICATION && (
               <Tab
@@ -134,7 +131,7 @@ const Patient = () => {
                 label="Médicaments"
                 value="medication"
                 component={Link}
-                to={`/patients/${patientId}/medication${groupId ? `?groupId=${groupId}` : ''}`}
+                to={`/patients/${patientId}/medication${location.search}`}
               />
             )}
             {ODD_BIOLOGY && (
@@ -143,7 +140,7 @@ const Patient = () => {
                 label="Biologie"
                 value="biology"
                 component={Link}
-                to={`/patients/${patientId}/biology${groupId ? `?groupId=${groupId}` : ''}`}
+                to={`/patients/${patientId}/biology${location.search}`}
               />
             )}
             {ODD_IMAGING && (
@@ -152,7 +149,7 @@ const Patient = () => {
                 label="Imagerie"
                 value="imaging"
                 component={Link}
-                to={`/patients/${patientId}/imaging${groupId ? `?groupId=${groupId}` : ''}`}
+                to={`/patients/${patientId}/imaging${location.search}`}
               />
             )}
             {config.features.questionnaires.enabled && !deidentified && (
@@ -161,7 +158,7 @@ const Patient = () => {
                 label="Formulaires"
                 value="forms"
                 component={Link}
-                to={`/patients/${patientId}/forms${groupId ? `?groupId=${groupId}` : ''}`}
+                to={`/patients/${patientId}/forms${location.search}`}
               />
             )}
           </Tabs>
@@ -180,21 +177,19 @@ const Patient = () => {
               deidentified={deidentified}
             />
           )}
-          {selectedTab === 'clinical-documents' && <PatientDocs groupId={groupId} />}
-          {selectedTab === 'pmsi' && <PatientPMSI groupId={groupId} />}
-          {ODD_MEDICATION && selectedTab === 'medication' && <PatientMedication groupId={groupId} />}
-          {ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology groupId={groupId} />}
-          {ODD_IMAGING && selectedTab === 'imaging' && <PatientImaging groupId={groupId} />}
-          {config.features.questionnaires.enabled && selectedTab === 'forms' && !deidentified && (
-            <PatientForms groupId={groupId} />
-          )}
+          {selectedTab === 'documents' && <PatientDocs />}
+          {selectedTab === 'pmsi' && <PatientPMSI />}
+          {ODD_MEDICATION && selectedTab === 'medication' && <PatientMedication />}
+          {ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology />}
+          {ODD_IMAGING && selectedTab === 'imaging' && <PatientImaging />}
+          {config.features.questionnaires.enabled && selectedTab === 'forms' && !deidentified && <PatientForms />}
         </Grid>
 
         <PatientSidebar
           openDrawer={isSidebarOpened}
           patients={cohort.originalPatients}
           total={cohort.totalPatients ?? 0}
-          onClose={() => setSidebarOpened(false)}
+          onClose={() => setIsSidebarOpened(false)}
           deidentifiedBoolean={deidentified}
         />
       </Grid>

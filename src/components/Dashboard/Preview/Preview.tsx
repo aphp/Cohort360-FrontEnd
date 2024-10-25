@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import {
   CircularProgress,
   Grid,
@@ -31,6 +31,8 @@ import displayDigit from 'utils/displayDigit'
 import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
 import LocationMap from 'components/Dashboard/Preview/LocationMap'
 import { AppConfig } from 'config'
+import { useSearchParams } from 'react-router-dom'
+import { getCleanGroupId } from 'utils/paginationUtils'
 
 const MAP_WARNING_PERSON_COUNT_THRESHOLD = 1000000
 
@@ -113,7 +115,13 @@ const Preview: React.FC<PreviewProps> = ({
 }) => {
   const { classes } = useStyles()
   const appConfig = useContext(AppConfig)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const groupIds = searchParams.get('groupId') ?? undefined
   const { vitalStatusData, genderData } = getGenderRepartitionSimpleData(genderRepartitionMap)
+
+  useEffect(() => {
+    setSearchParams({ ...(groupIds && getCleanGroupId(groupIds) && { groupId: getCleanGroupId(groupIds) }) })
+  }, [])
 
   return (
     <Grid container direction="column" alignItems="center" className={classes.root}>

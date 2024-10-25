@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import moment from 'moment'
 
 import Chip from 'components/ui/Chip'
@@ -32,6 +32,7 @@ import { FilterKeys, LabelObject } from 'types/searchCriterias'
 import { Hierarchy } from 'types/hierarchy'
 import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
+import { getCleanGroupId } from 'utils/paginationUtils'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -161,6 +162,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
 }) => {
   const dispatch = useAppDispatch()
   const { classes } = useStyles({})
+  const [searchParams, setSearchParams] = useSearchParams()
   const [timelineData, setTimelineData] = useState<TimelineData>({})
   const [openHospitDialog, setOpenHospitDialog] = useState(false)
   const [dialogDocuments, setDialogDocuments] = useState<CohortComposition[] | undefined>([])
@@ -174,12 +176,13 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   const [loading, setLoading] = useState(false)
   const yearComponentSize: { [year: number]: number } = {}
 
-  const search = new URLSearchParams(location.search)
-  const groupId = search.get('groupId') ?? undefined
+  const groupId = searchParams.get('groupId') ?? undefined
 
   const { patientId } = useParams<{ patientId: string }>()
 
   useEffect(() => {
+    setSearchParams({ ...(groupId && getCleanGroupId(groupId) && { groupId: getCleanGroupId(groupId) }) })
+
     dispatch(
       fetchAllProcedures({
         // @ts-ignore

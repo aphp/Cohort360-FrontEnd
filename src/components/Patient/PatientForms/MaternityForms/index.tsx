@@ -23,16 +23,16 @@ import services from 'services/aphp'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
+import { useSearchParams } from 'react-router-dom'
+import { getCleanGroupId } from 'utils/paginationUtils'
 
-type PatientFormsProps = {
-  groupId?: string
-}
-
-const MaternityForm = ({ groupId }: PatientFormsProps) => {
+const MaternityForm = () => {
   const [toggleModal, setToggleModal] = useState(false)
 
   const dispatch = useAppDispatch()
+  const [searchParams, setSearchParams] = useSearchParams()
   const patient = useAppSelector((state) => state.patient)
+  const groupId = searchParams.get('groupId') ?? undefined
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([])
@@ -93,6 +93,8 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
+    setSearchParams({ ...(groupId && getCleanGroupId(groupId) && { groupId: getCleanGroupId(groupId) }) })
+
     fetch()
   }, [])
 

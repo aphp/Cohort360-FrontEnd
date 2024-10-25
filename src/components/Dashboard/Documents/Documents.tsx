@@ -43,19 +43,19 @@ import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
 import { CanceledError } from 'axios'
 import { DocumentReference } from 'fhir/r4'
 
 type DocumentsProps = {
-  groupId?: string
   deidentified: boolean
 }
 
-const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
+const Documents: React.FC<DocumentsProps> = ({ deidentified }) => {
   const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
+  const groupId = searchParams.get('groupId') ?? undefined
 
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
@@ -234,7 +234,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentified }) => {
   ])
 
   useEffect(() => {
-    setSearchParams({ page: page.toString() })
+    setSearchParams(cleanSearchParams({ page: page.toString(), groupId: groupId }))
 
     handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
