@@ -9,7 +9,7 @@ import { Questionnaire } from 'fhir/r4'
 interface TimelineProps {
   loading: boolean
   questionnaireResponses: CohortQuestionnaireResponse[]
-  maternityFormNamesIds: Questionnaire[]
+  questionnaires: Questionnaire[]
 }
 
 interface YearGroup {
@@ -27,9 +27,9 @@ const groupEventsByYear = (data: CohortQuestionnaireResponse[]): YearGroup => {
   }, {} as YearGroup)
 }
 
-const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses, maternityFormNamesIds }) => {
+const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses, questionnaires }) => {
   const yearGroups = groupEventsByYear(questionnaireResponses)
-  const pregnancyFormId = maternityFormNamesIds.find((form) => form.name === FormNames.PREGNANCY)?.id ?? ''
+  const pregnancyFormId = questionnaires.find((form) => form.name === FormNames.PREGNANCY)?.id ?? ''
 
   const years = Object.keys(yearGroups).sort((a, b) => a.localeCompare(b))
 
@@ -43,7 +43,6 @@ const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses, ma
         ) : (
           <>
             {console.log('manelle tu es MON canard')}
-            {/* <TimelineArrow /> */}
             <div style={{ flexGrow: 1, marginLeft: '1em' }}>
               {years.reverse().map((year) => (
                 <div key={year}>

@@ -35,7 +35,7 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
   const patient = useAppSelector((state) => state.patient)
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
-  const [maternityFormNamesIds, setMaternityFormNamesIds] = useState<Questionnaire[]>([])
+  const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([])
   const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
 
   const [
@@ -83,11 +83,11 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
   }
 
   const fetch = async () => {
-    const [maternityFormNamesIds, encounterStatus] = await Promise.all([
-      services.patients.fetchMaternityFormNamesIds(),
+    const [_questionnaires, encounterStatus] = await Promise.all([
+      services.patients.fetchQuestionnaires(),
       services.cohortCreation.fetchEncounterStatus()
     ])
-    setMaternityFormNamesIds(maternityFormNamesIds)
+    setQuestionnaires(_questionnaires)
     setEncounterStatusList(encounterStatus)
   }
 
@@ -152,7 +152,7 @@ const MaternityForm = ({ groupId }: PatientFormsProps) => {
         <Timeline
           loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
           questionnaireResponses={searchResults.maternityFormList ?? []}
-          maternityFormNamesIds={maternityFormNamesIds}
+          questionnaires={questionnaires}
         />
       </Grid>
     </Grid>

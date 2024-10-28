@@ -2,8 +2,9 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Checkbox, FormControlLabel, FormGroup, Typography } from '@mui/material'
 import { InputWrapper } from 'components/ui/Inputs'
 import { FormContext } from 'components/ui/Modal'
-import { FormNames, FormNamesLabel } from 'types/searchCriterias'
+import { FormNames } from 'types/searchCriterias'
 import { isChecked, toggleFilter } from 'utils/filters'
+import labels from 'labels.json'
 
 type MaternityFormFilterProps = {
   value: FormNames[]
@@ -31,14 +32,14 @@ const MaternityFormFilter = ({ name, value, disabled = false }: MaternityFormFil
           checked={isChecked(FormNames.PREGNANCY, formName)}
           value={FormNames.PREGNANCY}
           control={<Checkbox color="secondary" />}
-          label={FormNamesLabel.PREGNANCY}
+          label={labels.formNames.pregnancy_pural}
         />
         <FormControlLabel
           disabled={disabled}
           checked={isChecked(FormNames.HOSPIT, formName)}
           value={FormNames.HOSPIT}
           control={<Checkbox color="secondary" />}
-          label={FormNamesLabel.HOSPIT}
+          label={labels.formNames.hospit_plural}
         />
       </FormGroup>
     </InputWrapper>
