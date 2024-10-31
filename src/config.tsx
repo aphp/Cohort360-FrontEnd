@@ -19,6 +19,7 @@ type AppConfig = {
     export: {
       enabled: boolean
       exportLinesLimit: number
+      exportTables: string
     }
     observation: {
       enabled: boolean
@@ -197,7 +198,8 @@ let config: AppConfig = {
     },
     export: {
       enabled: true,
-      exportLinesLimit: 300000
+      exportLinesLimit: 300000,
+      exportTables: ''
     },
     observation: {
       enabled: true,

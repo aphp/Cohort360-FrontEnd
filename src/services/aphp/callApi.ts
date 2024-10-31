@@ -1218,8 +1218,20 @@ export const fetchCohortInfo = async (cohortId: string) => {
   return response
 }
 
-export const fetchExportTableInfo = async () => {
-  const response = await apiDatamodel.get('/models')
+export const fetchExportTableInfo = async (args?: any) => {
+  console.log('manelle args', args)
+  const { tableNames, relationLink } = args
+
+  let options: string[] = []
+  if (tableNames) options = [...options, `tables=${tableNames}`]
+  if (relationLink) options = [...options, `relations=${relationLink}`]
+
+  let queryParams = ''
+  if (options.length != 0) {
+    queryParams = `?${options.reduce(paramsReducer)}`
+  }
+
+  const response = await apiDatamodel.get(`/models${queryParams}`)
 
   return response.data
 }
