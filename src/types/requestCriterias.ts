@@ -14,11 +14,6 @@ export enum IppParamsKeys {
   IPP_LIST_FHIR = 'identifier.value'
 }
 
-export enum MedicationLabel {
-  PRESCRIPTION = 'Prescription',
-  ADMINISTRATION = 'Administration'
-}
-
 export enum ResourceType {
   UNKNOWN = 'Unknown',
   IPP_LIST = 'IPPList',
@@ -194,26 +189,6 @@ export type CriteriaTypesWithAdvancedInputs = Extract<
   | CriteriaType.OBSERVATION
   | CriteriaType.IMAGING
 >
-
-export enum CriteriaTypeLabels {
-  REQUEST = 'Mes requêtes',
-  IPP_LIST = "Liste d'IPP",
-  PATIENT = 'Démographie',
-  ENCOUNTER = 'Prise en charge',
-  DOCUMENTS = 'Documents cliniques',
-  PMSI = 'PMSI',
-  CONDITION = 'Diagnostics',
-  PROCEDURE = 'Actes',
-  CLAIM = 'GHM',
-  MEDICATION = 'Médicaments',
-  BIO_MICRO = 'Biologie/Microbiologie',
-  OBSERVATION = 'Biologie',
-  MICROBIOLOGIE = 'Microbiologie',
-  PHYSIOLOGIE = 'Physiologie',
-  IMAGING = 'Imagerie',
-  PREGNANCY = 'Fiche grossesse',
-  HOSPIT = "Fiche d'hospitalisation"
-}
 
 export type CommonCriteriaDataType = {
   id: number
@@ -539,9 +514,3 @@ export type ImagingDataType = CommonCriteriaDataType &
     seriesModalities: LabelObject[] | null
     seriesUid: string
   }
-
-export enum VitalStatusLabel {
-  ALIVE = 'Vivant(e)',
-  DECEASED = 'Décédé(e)',
-  ALL = 'Tous les patients'
-}

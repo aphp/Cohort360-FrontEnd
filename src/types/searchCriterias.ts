@@ -1,8 +1,8 @@
 import { ScopeElement, SimpleCodeType, ValueSet } from 'types'
-import { PatientTableLabels } from './patient'
 import { CohortsType } from './cohorts'
 import { ResourceType } from './requestCriterias'
 import { Hierarchy } from './hierarchy'
+import labels from 'labels.json'
 
 export enum FormNames {
   PREGNANCY = 'APHPEDSQuestionnaireFicheGrossesse',
@@ -59,31 +59,11 @@ export function mapGenderCodesToGenderStatus(code: GenderCodes): GenderStatus {
   }
 }
 
-export enum GenderStatusLabel {
-  MALE = 'Hommes',
-  FEMALE = 'Femmes',
-  OTHER = 'Autres',
-  UNKNOWN = 'Inconnu',
-  OTHER_UNKNOWN = 'Autres'
-}
-export enum VitalStatusLabel {
-  ALIVE = 'Patients vivants',
-  DECEASED = 'Patients décédés',
-  ALL = 'Tous les patients'
-}
-
 export enum VitalStatusOptions {
   birth = 'birth',
   age = 'age',
   deceasedAge = 'deceasedAge',
   deceasedDate = 'deceasedDate'
-}
-
-export enum VitalStatusOptionsLabel {
-  birth = 'Date de naissance',
-  age = 'Âge actuel',
-  deceasedAge = 'Âge au décès',
-  deceasedDate = 'Date de décès'
 }
 
 export enum VitalStatus {
@@ -94,10 +74,6 @@ export enum VitalStatus {
 export enum Direction {
   ASC = 'asc',
   DESC = 'desc'
-}
-export enum DirectionLabel {
-  ASC = 'Croissant',
-  DESC = 'Décroissant'
 }
 export enum Order {
   CODE = 'code',
@@ -214,12 +190,6 @@ export enum DocumentAttachmentMethod {
   NONE = 'NONE',
   ACCESS_NUMBER = 'ACCESS_NUMBER',
   INFERENCE_TEMPOREL = 'INFERENCE_TEMPOREL'
-}
-
-export enum DocumentAttachmentMethodLabel {
-  NONE = 'Aucune',
-  ACCESS_NUMBER = "Numéro d'accession",
-  INFERENCE_TEMPOREL = 'Inférence temporelle'
 }
 
 export type DurationRangeType = [string | null | undefined, string | null | undefined]
@@ -388,29 +358,29 @@ export const searchByListPatients = [
 export const orderByListPatients = [
   {
     id: `${Order.GENDER},${Order.ID}` as Order,
-    label: PatientTableLabels.GENDER
+    label: labels.patient.gender
   },
   {
     id: Order.FIRSTNAME,
-    label: PatientTableLabels.FIRSTNAME
+    label: labels.patient.firstname
   },
   {
     id: Order.FAMILY,
-    label: PatientTableLabels.LASTNAME
+    label: labels.patient.lastname
   },
   {
     id: `${Order.BIRTHDATE},${Order.ID}` as Order,
-    label: PatientTableLabels.BIRTHDATE
+    label: labels.patient.birthdate
   }
 ]
 export const orderByListPatientsDeidentified = [
   {
     id: Order.GENDER,
-    label: PatientTableLabels.GENDER
+    label: labels.patient.gender
   },
   {
     id: Order.BIRTHDATE,
-    label: PatientTableLabels.BIRTHDATE
+    label: labels.patient.birthdate
   }
 ]
 
@@ -428,11 +398,11 @@ export const searchByListDocuments = [
 export const orderDirection = [
   {
     id: Direction.ASC,
-    label: DirectionLabel.ASC
+    label: labels.directions.asc
   },
   {
     id: Direction.DESC,
-    label: DirectionLabel.DESC
+    label: labels.directions.desc
   }
 ]
 

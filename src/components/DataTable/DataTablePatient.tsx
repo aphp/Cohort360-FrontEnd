@@ -13,12 +13,11 @@ import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
 import { GenderStatus, Order, OrderBy } from 'types/searchCriterias'
-import { PatientTableLabels } from 'types/patient'
 import GenderIcon from 'components/ui/GenderIcon'
 import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
-import { VitalStatusLabel } from 'types/requestCriterias'
 import { getExtension } from 'utils/fhir'
 import { AppConfig } from 'config'
+import labels from 'labels.json'
 
 type DataTablePatientProps = {
   loading: boolean
@@ -47,17 +46,17 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
   const { classes } = useStyles()
 
   const columns: Column[] = [
-    { label: PatientTableLabels.GENDER, code: `${Order.GENDER},${Order.ID}` },
-    { label: PatientTableLabels.FIRSTNAME, code: !deidentified ? Order.FIRSTNAME : undefined },
-    { label: PatientTableLabels.LASTNAME, code: !deidentified ? Order.FAMILY : undefined, align: 'left' },
+    { label: labels.patient.gender, code: `${Order.GENDER},${Order.ID}` },
+    { label: labels.patient.firstname, code: !deidentified ? Order.FIRSTNAME : undefined },
+    { label: labels.patient.lastname, code: !deidentified ? Order.FAMILY : undefined, align: 'left' },
     {
-      label: !deidentified ? PatientTableLabels.BIRTHDATE : PatientTableLabels.AGE,
+      label: !deidentified ? labels.patient.birthdate : labels.patient.age,
       code: `${Order.BIRTHDATE},${Order.ID}`
     },
-    { label: PatientTableLabels.LAST_ENCOUNTER, align: 'left' },
-    { label: PatientTableLabels.VITAL_STATUS },
+    { label: labels.patient.last_encounter, align: 'left' },
+    { label: labels.patient.vital_status },
     {
-      label: `${PatientTableLabels.IPP}${!deidentified ? '' : ' chiffré'}`,
+      label: `${labels.patient.ipp}${!deidentified ? '' : ' chiffré'}`,
       code: !deidentified ? Order.IPP : undefined
     }
   ]
@@ -151,7 +150,9 @@ const DataTablePatientLine: React.FC<{
         <StatusChip
           status={patient.deceasedDateTime || patient.deceasedBoolean ? ChipStyles.CANCELLED : ChipStyles.VALID}
           label={
-            patient.deceasedDateTime || patient.deceasedBoolean ? VitalStatusLabel.DECEASED : VitalStatusLabel.ALIVE
+            patient.deceasedDateTime || patient.deceasedBoolean
+              ? labels.vitalStatusChips.deceased
+              : labels.vitalStatusChips.alive
           }
         />
       </TableCellWrapper>

@@ -1,8 +1,92 @@
 {
+  "criteriaTypes": {
+    "request": "Mes requêtes",
+    "ippList": "Liste d'IPP",
+    "patient": "Démographie",
+    "encounter": "Prise en charge",
+    "documents": "Documents cliniques",
+    "pmsi": "PMSI",
+    "condition": "Diagnostics",
+    "procedure": "Actes",
+    "claim": "GHM",
+    "medication": "Médicaments",
+    "bio_micro": "Biologie / Microbiologie",
+    "observation": "Biologie",
+    "microbiology": "Microbiologie",
+    "physiology": "Physiologie",
+    "imaging": "Imagerie",
+    "pregnancy": "Fiche grossesse",
+    "hospit": "Fiche d'hospitalisation"
+  },
   "formNames": {
     "pregnancy": "Fiche de grossesse",
     "pregnancy_pural": "Fiches de grossesse",
     "hospit": "Formulaire d'hospitalisation",
     "hospit_plural": "Formulaires d'hospitalisation"
+  },
+  "pmsi": {
+    "diagnostic": "Diagnostics CIM10",
+    "ghm": "GHM",
+    "ccam": "Actes CCAM"
+  },
+  "medication": {
+    "prescription": "Prescription",
+    "administration": "Administration"
+  },
+  "patient": {
+    "gender": "Sexe",
+    "firstname": "Prénom",
+    "lastname": "Nom",
+    "birthdate": "Date de naissance",
+    "age": "Âge",
+    "last_encounter": "Dernier lieu de prise en charge",
+    "vital_status": "Statut vital",
+    "ipp": "IPP"
+  },
+  "vitalStatus": {
+    "alive": "Patients vivants",
+    "deceased": "Patients décédés",
+    "all": "Tous les patients"
+  },
+  "vitalStatusChips": {
+    "alive": "Vivant(e)",
+    "deceased": "Décédé(e)"
+  },
+  "vitalStatusOptions": {
+    "birth": "Date de naissance",
+    "age": "Âge actuel",
+    "deceasedAge": "Âge au décès",
+    "deceasedDate": "Date de décès"
+  },
+  "directions": {
+    "asc": "Croissant",
+    "desc": "Décroissant"
+  },
+  "documentAttachmentMethod": {
+    "none": "Aucune",
+    "acces_number": "Numéro d'accession",
+    "inference_temporel": "Inférence temporelle"
+  },
+  "exploration": {
+    "exploration": "Exploration"
+  },
+  "calendarRequest": {
+    "year": "an(s)",
+    "month": "mois",
+    "day": "jour(s)",
+    "week": "semaine(s)",
+    "hour": "heure(s)"
+  },
+  "gender": {
+    "male": "Hommes",
+    "female": "Femmes",
+    "other": "Autres",
+    "unknown": "Inconnu"
+  },
+  "cohortsTypes": {
+    "all": "Toutes les cohortes",
+    "favorite": "Cohortes favorites",
+    "last": "Dernières cohortes",
+    "not_favorite": "Cohortes non favorites"
   }
 }
