@@ -134,13 +134,13 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
         controllerRef.current?.signal
       )
       if (result) {
-        const { totalPatients, originalPatients, genderRepartitionMap, agePyramidData } = result
+        const { totalPatients, totalAllPatients, originalPatients, genderRepartitionMap, agePyramidData } = result
         if (originalPatients) setPatientsList(originalPatients)
         if (includeFacets) {
           if (genderRepartitionMap) setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
           if (agePyramidData) setAgePyramid(agePyramidData)
         }
-        setPatientsResult((ps) => ({ ...ps, nb: totalPatients, label: 'patient(s)' }))
+        setPatientsResult((ps) => ({ ...ps, nb: totalPatients, total: totalAllPatients, label: 'patient(s)' }))
 
         checkIfPageAvailable(totalPatients, page, setPage, dispatch)
       }
