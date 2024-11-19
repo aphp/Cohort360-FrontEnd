@@ -5,6 +5,7 @@ set -e
 sed -i "s@{FHIR_URL}@$FHIR_URL@g" /etc/nginx/conf.d/nginx.conf
 sed -i "s@{BACK_URL}@$BACK_URL@g" /etc/nginx/conf.d/nginx.conf
 
+sed -i "s@{VITE_CONFIG_URL}@$VITE_CONFIG_URL@g" /app/build/assets/*.js
 
 sed -i "s@{VITE_CLARITY_APP_ID}@$VITE_CLARITY_APP_ID@g" /app/build/index.html
 
