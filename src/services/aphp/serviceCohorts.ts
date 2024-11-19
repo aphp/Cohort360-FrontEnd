@@ -107,6 +107,7 @@ export interface IServiceCohorts {
   ) => Promise<
     | {
         totalPatients: number
+        totalAllPatients: number
         originalPatients: Patient[] | undefined
         agePyramidData?: AgeRepartitionType
         genderRepartitionMap?: GenderRepartitionType
@@ -343,30 +344,49 @@ const servicesCohorts: IServiceCohorts = {
         birthdates && Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
       const maxBirthdate =
         birthdates && Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
-      const patientsResp = await fetchPatient({
-        size: 20,
-        offset: page ? (page - 1) * 20 : 0,
-        _sort: orderBy.orderBy,
-        sortDirection: orderBy.orderDirection,
-        pivotFacet: includeFacets ? ['age-month_gender', 'deceased_gender'] : [],
-        _list: groupId ? [groupId] : [],
-        gender: filters && filters.genders.join(','),
-        searchBy,
-        _text: searchInput.trim(),
-        minBirthdate: minBirthdate,
-        maxBirthdate: maxBirthdate,
-        deceased:
-          filters && filters.vitalStatuses && filters.vitalStatuses.length === 1
-            ? filters.vitalStatuses.includes(VitalStatus.DECEASED)
-              ? true
-              : false
-            : undefined,
-        deidentified: deidentified,
-        signal: signal,
-        _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
-      })
+
+      const atLeastAFilter =
+        !!searchInput ||
+        (filters?.genders && filters?.genders.length > 0) ||
+        filters?.birthdatesRanges?.[0] ||
+        filters?.birthdatesRanges?.[1] ||
+        (filters?.vitalStatuses && filters?.vitalStatuses.length > 0)
+
+      const [patientsResp, allPatientsResp] = await Promise.all([
+        fetchPatient({
+          size: 20,
+          offset: page ? (page - 1) * 20 : 0,
+          _sort: orderBy.orderBy,
+          sortDirection: orderBy.orderDirection,
+          pivotFacet: includeFacets ? ['age-month_gender', 'deceased_gender'] : [],
+          _list: groupId ? [groupId] : [],
+          gender: filters && filters.genders.join(','),
+          searchBy,
+          _text: searchInput.trim(),
+          minBirthdate: minBirthdate,
+          maxBirthdate: maxBirthdate,
+          deceased:
+            filters && filters.vitalStatuses && filters.vitalStatuses.length === 1
+              ? filters.vitalStatuses.includes(VitalStatus.DECEASED)
+                ? true
+                : false
+              : undefined,
+          deidentified: deidentified,
+          signal: signal,
+          _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
+        }),
+        atLeastAFilter
+          ? fetchPatient({
+              size: 0,
+              _list: groupId ? [groupId] : [],
+              signal: signal
+            })
+          : null
+      ])
 
       const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
+      const totalAllPatients =
+        allPatientsResp?.data?.resourceType === 'Bundle' ? allPatientsResp.data.total ?? totalPatients : totalPatients
 
       const originalPatients = getApiResponseResources(patientsResp)
 
@@ -386,6 +406,7 @@ const servicesCohorts: IServiceCohorts = {
 
       return {
         totalPatients: totalPatients ?? 0,
+        totalAllPatients: totalAllPatients ?? 0,
         originalPatients,
         genderRepartitionMap,
         agePyramidData

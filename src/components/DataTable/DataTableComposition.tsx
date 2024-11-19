@@ -29,6 +29,7 @@ import { Visibility } from '@mui/icons-material'
 import { DocumentStatuses, Order, OrderBy } from 'types/searchCriterias'
 import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
 import { DocumentReference } from 'fhir/r4'
+import moment from 'moment'
 
 type DataTableCompositionProps = {
   loading: boolean
@@ -137,22 +138,14 @@ const DataTableCompositionLine: React.FC<{
   const documentContent = findContent?.attachment?.data
     ? Buffer.from(findContent?.attachment.data, 'base64').toString('utf-8')
     : ''
+  const date = document.date ? moment(document.date).format('DD/MM/YYYY [à] HH:mm') : 'Date inconnue'
 
-  const date = document.date ? new Date(document.date).toLocaleDateString('fr-FR') : ''
-  const hour = document.date
-    ? new Date(document.date).toLocaleTimeString('fr-FR', {
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    : ''
   return (
     <React.Fragment key={documentId}>
       <TableRow className={classes.tableBodyRows}>
         <TableCellWrapper align="left">
           <Typography variant="button">{title ?? 'Document sans titre'}</Typography>
-          <Typography>
-            {date} à {hour}
-          </Typography>
+          <Typography>{date}</Typography>
           {getStatusChip(status)}
         </TableCellWrapper>
 
