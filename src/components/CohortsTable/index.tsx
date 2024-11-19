@@ -106,7 +106,12 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
       row.request_job_status === CohortJobStatus.FAILED
     )
       return
-    navigate(`/cohort/${row.group_id}`)
+
+    const searchParams = new URLSearchParams()
+    if (row.group_id) {
+      searchParams.set('groupId', row.group_id)
+    }
+    navigate(`/cohort?${searchParams.toString()}`)
   }
 
   const handleClickOpenDialog = () => {

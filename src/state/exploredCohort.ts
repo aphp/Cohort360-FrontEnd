@@ -90,7 +90,7 @@ const fetchExploredCohort = createAsyncThunk<
       const statePerimeterIds =
         stateCohort &&
         Array.isArray(stateCohort) &&
-        (stateCohort.map((group) => group.id).filter((id) => id !== undefined) as string[])
+        stateCohort.map((group) => group.id).filter((id) => id !== undefined)
 
       shouldRefreshData =
         !statePerimeterIds ||

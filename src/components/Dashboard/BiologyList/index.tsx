@@ -36,19 +36,19 @@ import {
   fetchLoincCodes as fetchLoincCodesApi,
   fetchAnabioCodes as fetchAnabioCodesApi
 } from 'services/aphp/serviceBiology'
-import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
 
 type BiologyListProps = {
-  groupId?: string
   deidentified?: boolean
 }
 
-const BiologyList = ({ groupId, deidentified }: BiologyListProps) => {
+const BiologyList = ({ deidentified }: BiologyListProps) => {
   const theme = useTheme()
   const isMd = useMediaQuery(theme.breakpoints.down('lg'))
   const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
+  const groupId = searchParams.get('groupId') ?? undefined
 
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
@@ -203,7 +203,8 @@ const BiologyList = ({ groupId, deidentified }: BiologyListProps) => {
   ])
 
   useEffect(() => {
-    setSearchParams({ page: page.toString() })
+    setSearchParams(cleanSearchParams({ page: page.toString(), groupId: groupId }))
+
     handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 

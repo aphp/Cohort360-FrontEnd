@@ -21,7 +21,6 @@ import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { LoadingStatus } from 'types'
-import { PatientTypes } from 'types/patient'
 import { AlertWrapper } from 'components/ui/Alert'
 import { Direction, FilterKeys, ImagingFilters, Order } from 'types/searchCriterias'
 import { ResourceType } from 'types/requestCriterias'
@@ -36,12 +35,13 @@ import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { AppConfig } from 'config'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
 
-const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
+const PatientImaging = () => {
   const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
+  const groupId = searchParams.get('groupId') ?? undefined
 
   const appConfig = useContext(AppConfig)
   const patient = useAppSelector((state) => state.patient)
@@ -151,9 +151,7 @@ const PatientImaging: React.FC<PatientTypes> = ({ groupId }) => {
   }, [nda, startDate, endDate, orderBy, searchInput, executiveUnits, modality, encounterStatus])
 
   useEffect(() => {
-    const updatedSearchParams = new URLSearchParams(searchParams)
-    updatedSearchParams.set('page', page.toString())
-    setSearchParams(updatedSearchParams)
+    setSearchParams(cleanSearchParams({ page: page.toString(), groupId: groupId }))
 
     handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])

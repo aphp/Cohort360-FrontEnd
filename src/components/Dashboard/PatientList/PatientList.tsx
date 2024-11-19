@@ -49,18 +49,18 @@ import { ResourceType } from 'types/requestCriterias'
 import List from 'components/ui/List'
 import { useAppDispatch, useAppSelector } from 'state'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
+import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
 
 type PatientListProps = {
   total: number
-  groupId?: string
   deidentified?: boolean | null
 }
 
-const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
+const PatientList = ({ total, deidentified }: PatientListProps) => {
   const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
+  const groupId = searchParams.get('groupId') ?? undefined
 
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
@@ -165,7 +165,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   }, [genders, vitalStatuses, birthdatesRanges, orderBy, searchBy, searchInput, groupId])
 
   useEffect(() => {
-    setSearchParams({ page: page.toString() })
+    setSearchParams(cleanSearchParams({ page: page.toString(), groupId: groupId }))
 
     handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])

@@ -8,7 +8,7 @@ import DataTablePmsi from 'components/DataTable/DataTablePmsi'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPmsi } from 'state/patient'
-import { CohortPMSI, LoadingStatus, PmsiTab, PmsiTabs } from 'types'
+import { CohortPMSI, LoadingStatus, PmsiTab } from 'types'
 import useStyles from './styles'
 import { cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
@@ -41,11 +41,8 @@ import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { AlertWrapper } from 'components/ui/Alert'
 import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
-
-type PatientPMSIProps = {
-  groupId?: string
-}
+import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
+import { getPMSITab } from 'utils/tabsUtils'
 
 type PmsiSearchResults = {
   deidentified: boolean
@@ -55,16 +52,19 @@ type PmsiSearchResults = {
   label: PMSILabel
 }
 
-export const PMSITabs: PmsiTabs = [
+export const PMSITabs: PmsiTab[] = [
   { label: PMSILabel.DIAGNOSTIC, id: ResourceType.CONDITION },
   { label: PMSILabel.CCAM, id: ResourceType.PROCEDURE },
   { label: PMSILabel.GHM, id: ResourceType.CLAIM }
 ]
 
-const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
+const PatientPMSI = () => {
   const { classes } = useStyles()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
+  const groupId = searchParams.get('groupId') ?? undefined
+  const tabId = searchParams.get('tabId') ?? undefined
+  const existingParams = Object.fromEntries(searchParams.entries())
 
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
   const [toggleSaveFiltersModal, setToggleSaveFiltersModal] = useState(false)
@@ -75,10 +75,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
   const dispatch = useAppDispatch()
 
-  const [selectedTab, setSelectedTab] = useState<PmsiTab>({
-    id: ResourceType.CONDITION,
-    label: PMSILabel.DIAGNOSTIC
-  })
+  const [selectedTab, setSelectedTab] = useState<PmsiTab>(getPMSITab(tabId))
   const [oldTabs, setOldTabs] = useState<PmsiTab | null>(null)
 
   const sourceType = mapToSourceType(selectedTab.id)
@@ -193,9 +190,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   useEffect(() => {
     setOldTabs(selectedTab)
 
-    const updatedSearchParams = new URLSearchParams(searchParams)
-    updatedSearchParams.set('page', page.toString())
-    setSearchParams(updatedSearchParams)
+    setSearchParams(cleanSearchParams({ page: page.toString(), tabId: selectedTab.id, groupId: groupId }))
 
     handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
@@ -298,6 +293,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
                 onchange={(value: PmsiTab) => {
                   setOldTabs(selectedTab)
                   setSelectedTab(value)
+                  setSearchParams({ ...existingParams, tabId: value.id })
                 }}
               />
             </Grid>

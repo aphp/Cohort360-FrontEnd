@@ -95,7 +95,16 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                 <TableRow key={cohort.uuid}>
                   <TableCellWrapper align="left" className={classes.tdName}>
                     {cohort.group_id ? (
-                      <Link onClick={() => navigate(`/cohort/${cohort.group_id}`)} underline="hover">
+                      <Link
+                        onClick={() => {
+                          const searchParams = new URLSearchParams()
+                          if (cohort.group_id) {
+                            searchParams.set('groupId', cohort.group_id)
+                          }
+                          navigate(`/cohort?${searchParams.toString()}`)
+                        }}
+                        underline="hover"
+                      >
                         {cohort.name}
                       </Link>
                     ) : (

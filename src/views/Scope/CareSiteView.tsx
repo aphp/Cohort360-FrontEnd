@@ -19,8 +19,9 @@ const CareSiteView = () => {
   const open = useAppSelector((state) => state.drawer)
 
   const handleNavigation = () => {
-    const perimetresIds = selectedCodes.map((code) => code.cohort_id ?? null)
-    navigate(`/perimeters?${perimetresIds}`)
+    const perimetresIds = selectedCodes.map((code) => code.cohort_id ?? null).filter(Boolean)
+    const searchParams = new URLSearchParams({ groupId: perimetresIds.join(',') }).toString()
+    navigate(`/perimeters?${searchParams}`)
   }
 
   useEffect(() => {

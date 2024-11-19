@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 import { Grid, Paper } from '@mui/material'
 
 import PatientField from './PatientField/PatientField'
 
 import { getAge } from 'utils/age'
+import { getCleanGroupId } from 'utils/paginationUtils'
 import { getLastDiagnosisLabels } from 'utils/pmsi'
 import { CohortPatient, IPatientDetails } from 'types'
 
@@ -16,6 +18,12 @@ type PatientPreviewProps = {
 }
 const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBoolean }) => {
   const { classes } = useStyles()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const groupId = searchParams.get('groupId') ?? undefined
+
+  useEffect(() => {
+    setSearchParams({ ...(groupId && getCleanGroupId(groupId) && { groupId: getCleanGroupId(groupId) }) })
+  }, [])
 
   if (!patient) return <></>
 

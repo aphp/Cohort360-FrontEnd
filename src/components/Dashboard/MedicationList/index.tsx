@@ -34,15 +34,15 @@ import useSearchCriterias, { initMedSearchCriterias } from 'reducers/searchCrite
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { mapToLabel } from 'mappers/pmsi'
+import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
+import { getMedicationTab } from 'utils/tabsUtils'
 import { useSearchParams } from 'react-router-dom'
-import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
 type MedicationListProps = {
-  groupId?: string
   deidentified?: boolean
 }
 
-const MedicationList = ({ groupId, deidentified }: MedicationListProps) => {
+const MedicationList = ({ deidentified }: MedicationListProps) => {
   const theme = useTheme()
   const isSm = useMediaQuery(theme.breakpoints.down('md'))
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
@@ -55,11 +55,11 @@ const MedicationList = ({ groupId, deidentified }: MedicationListProps) => {
   const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
+  const groupId = searchParams.get('groupId') ?? undefined
+  const tabId = searchParams.get('tabId') ?? undefined
+  const existingParams = Object.fromEntries(searchParams.entries())
 
-  const [selectedTab, setSelectedTab] = useState<MedicationTab>({
-    id: ResourceType.MEDICATION_REQUEST,
-    label: MedicationLabel.PRESCRIPTION
-  })
+  const [selectedTab, setSelectedTab] = useState<MedicationTab>(getMedicationTab(tabId))
 
   const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const {
@@ -228,11 +228,9 @@ const MedicationList = ({ groupId, deidentified }: MedicationListProps) => {
   ])
 
   useEffect(() => {
-    handlePageError(page, setPage, dispatch, setLoadingStatus)
+    setSearchParams(cleanSearchParams({ page: page.toString(), tabId: selectedTab.id, groupId: groupId }))
 
-    const updatedSearchParams = new URLSearchParams(searchParams)
-    updatedSearchParams.set('page', page.toString())
-    setSearchParams(updatedSearchParams)
+    handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page])
 
   useEffect(() => {
@@ -300,6 +298,7 @@ const MedicationList = ({ groupId, deidentified }: MedicationListProps) => {
               value: TabType<ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST, MedicationLabel>
             ) => {
               setSelectedTab(value)
+              setSearchParams({ ...existingParams, tabId: value.id })
             }}
           />
         </Grid>

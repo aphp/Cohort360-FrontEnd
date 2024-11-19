@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { Link, useParams, useLocation } from 'react-router-dom'
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { Grid, Tabs, Tab } from '@mui/material'
 
 import CohortPreview from 'components/Dashboard/Preview/Preview'
@@ -22,15 +22,15 @@ import PMSIList from 'components/Dashboard/PMSIList'
 import MedicationList from 'components/Dashboard/MedicationList'
 import BiologyList from 'components/Dashboard/BiologyList'
 import FormsList from 'components/Dashboard/FormsList'
+import { getCleanGroupId } from 'utils/paginationUtils'
 
-type Tabs = { label: string; value: string; to: string; disabled: boolean | undefined } | undefined
+type Tabs = { label: string; value: string; to: string; disabled?: boolean } | undefined
 
 const Dashboard: React.FC<{
   context: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'
 }> = ({ context }) => {
-  const { cohortId, tabName } = useParams<{
-    cohortId?: string | undefined
-    tabName?: string | undefined
+  const { tabName } = useParams<{
+    tabName?: string
   }>()
 
   const dispatch = useAppDispatch()
@@ -40,9 +40,10 @@ const Dashboard: React.FC<{
   const ODD_IMAGING = appConfig.features.imaging.enabled
   const ODD_QUESTIONNAIRES = appConfig.features.questionnaires.enabled
 
-  const perimetreIds = location.search.substr(1)
+  const [searchParams] = useSearchParams()
+  const groupIds = getCleanGroupId(searchParams.get('groupId'))
 
-  const [selectedTab, selectTab] = useState(tabName || 'preview')
+  const [selectedTab, setSelectedTab] = useState(tabName ?? 'preview')
   const [tabs, setTabs] = useState<Tabs[]>([])
 
   const open = useAppSelector((state) => state.drawer)
@@ -54,17 +55,15 @@ const Dashboard: React.FC<{
       case 'patients':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'preview', to: '/my-patients/preview', disabled: false },
-          { label: 'Patients', value: 'patients', to: '/my-patients/patients', disabled: false },
-          { label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false },
-          { label: 'PMSI', value: 'pmsi', to: '/my-patients/pmsi', disabled: false },
-          { label: 'Médicaments', value: 'medication', to: '/my-patients/medication', disabled: false },
-          { label: 'Biologie', value: 'biology', to: '/my-patients/biology', disabled: false },
-          ...(ODD_IMAGING
-            ? [{ label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging', disabled: false }]
-            : []),
+          { label: 'Aperçu', value: 'preview', to: '/my-patients/preview' },
+          { label: 'Patients', value: 'patients', to: '/my-patients/patients' },
+          { label: 'Documents', value: 'documents', to: '/my-patients/documents' },
+          { label: 'PMSI', value: 'pmsi', to: '/my-patients/pmsi' },
+          { label: 'Médicaments', value: 'medication', to: '/my-patients/medication' },
+          { label: 'Biologie', value: 'biology', to: '/my-patients/biology' },
+          ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging' }] : []),
           ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/my-patients/forms`, disabled: false }]
+            ? [{ label: 'Formulaires', value: 'forms', to: `/my-patients/forms` }]
             : [])
         ])
         break
@@ -73,20 +72,21 @@ const Dashboard: React.FC<{
           {
             label: 'Modifier la requête',
             value: 'creation',
-            to: `/cohort/new/${dashboard.requestId}/${dashboard.snapshotId}`,
-            disabled: false
+            to: `/cohort/new/${dashboard.requestId}/${dashboard.snapshotId}`
           },
-          { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/${cohortId}/preview`, disabled: false },
-          { label: 'Données patient', value: 'patients', to: `/cohort/${cohortId}/patients`, disabled: false },
-          { label: 'Documents cliniques', value: 'documents', to: `/cohort/${cohortId}/documents`, disabled: false },
-          { label: 'PMSI', value: 'pmsi', to: `/cohort/${cohortId}/pmsi`, disabled: false },
-          { label: 'Médicaments', value: 'medication', to: `/cohort/${cohortId}/medication`, disabled: false },
-          { label: 'Biologie', value: 'biology', to: `/cohort/${cohortId}/biology`, disabled: false },
-          ...(ODD_IMAGING
-            ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/${cohortId}/imaging`, disabled: false }]
-            : []),
+          { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/preview?groupId=${groupIds}` },
+          { label: 'Données patient', value: 'patients', to: `/cohort/patients${location.search}` },
+          {
+            label: 'Documents cliniques',
+            value: 'documents',
+            to: `/cohort/documents${location.search}`
+          },
+          { label: 'PMSI', value: 'pmsi', to: `/cohort/pmsi${location.search}` },
+          { label: 'Médicaments', value: 'medication', to: `/cohort/medication${location.search}` },
+          { label: 'Biologie', value: 'biology', to: `/cohort/biology${location.search}` },
+          ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/imaging${location.search}` }] : []),
           ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/cohort/${cohortId}/forms`, disabled: false }]
+            ? [{ label: 'Formulaires', value: 'forms', to: `/cohort/forms${location.search}` }]
             : [])
         ])
         break
@@ -96,66 +96,66 @@ const Dashboard: React.FC<{
           { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/new/preview`, disabled: true },
           { label: 'Données patient', value: 'patients', to: `/cohort/new/patients`, disabled: true },
           { label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true },
-          { label: 'PMSI', value: 'pmsi', to: `/cohort/new/pmsi`, disabled: false },
-          { label: 'Médicaments', value: 'medication', to: `/cohort/new/medication`, disabled: false },
-          { label: 'Biologie', value: 'biology', to: `/cohort/new/biology`, disabled: false },
+          { label: 'PMSI', value: 'pmsi', to: `/cohort/new/pmsi` },
+          { label: 'Médicaments', value: 'medication', to: `/cohort/new/medication` },
+          { label: 'Biologie', value: 'biology', to: `/cohort/new/biology` },
           ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/new/imaging`, disabled: true }] : []),
           ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/cohort/new/forms`, disabled: false }]
+            ? [{ label: 'Formulaires', value: 'forms', to: `/cohort/new/forms` }]
             : [])
         ])
         break
-      case 'perimeters':
+      case 'perimeters': {
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'preview', to: `/perimeters/preview${location.search}`, disabled: false },
+          { label: 'Aperçu', value: 'preview', to: `/perimeters/preview?groupId=${groupIds}` },
           {
             label: 'Données patient',
             value: 'patients',
-            to: `/perimeters/patients${location.search}`,
-            disabled: false
+            to: `/perimeters/patients${location.search}`
           },
           {
             label: 'Documents cliniques',
             value: 'documents',
-            to: `/perimeters/documents${location.search}`,
-            disabled: false
+            to: `/perimeters/documents${location.search}`
           },
-          { label: 'PMSI', value: 'pmsi', to: `/perimeters/pmsi${location.search}`, disabled: false },
-          { label: 'Médicaments', value: 'medication', to: `/perimeters/new/medication`, disabled: false },
-          { label: 'Biologie', value: 'biology', to: `/perimeters/biology${location.search}`, disabled: false },
+          { label: 'PMSI', value: 'pmsi', to: `/perimeters/pmsi${location.search}` },
+          {
+            label: 'Médicaments',
+            value: 'medication',
+            to: `/perimeters/medication${location.search}`
+          },
+          { label: 'Biologie', value: 'biology', to: `/perimeters/biology${location.search}` },
           ...(ODD_IMAGING
-            ? [{ label: 'Imagerie', value: 'imaging', to: `/perimeters/imaging${location.search}`, disabled: false }]
+            ? [{ label: 'Imagerie', value: 'imaging', to: `/perimeters/imaging${location.search}` }]
             : []),
           ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/perimeters/forms${location.search}`, disabled: false }]
+            ? [{ label: 'Formulaires', value: 'forms', to: `/perimeters/forms${location.search}` }]
             : [])
         ])
         break
+      }
       default:
         break
     }
   }
 
   useEffect(() => {
-    const id = context === 'cohort' ? cohortId : context === 'perimeters' ? perimetreIds : undefined
-
     if (context !== 'new_cohort') {
-      dispatch(fetchExploredCohort({ context, id }))
+      dispatch(fetchExploredCohort({ context, id: groupIds }))
     }
-  }, [context, cohortId]) // eslint-disable-line
+  }, [context, groupIds]) // eslint-disable-line
 
   useEffect(() => {
     onChangeTabs()
   }, [dashboard])
 
   const forceReload = () => {
-    const id = context === 'cohort' ? cohortId : context === 'perimeters' ? perimetreIds : undefined
-    dispatch(fetchExploredCohort({ context, id, forceReload: true }))
+    dispatch(fetchExploredCohort({ context, id: groupIds, forceReload: true }))
   }
 
   const handleChangeTabs = (event: React.SyntheticEvent<Element, Event>, newTab: string) => {
-    selectTab(newTab)
+    setSelectedTab(newTab)
   }
 
   if (context === 'new_cohort') {
@@ -167,8 +167,6 @@ const Dashboard: React.FC<{
   } else if (dashboard.loading === false && dashboard.totalPatients === 0) {
     return <CohortNoPatient />
   }
-
-  const groupId = context !== 'patients' ? cohortId ?? perimetreIds : undefined
 
   return (
     <Grid
@@ -194,22 +192,21 @@ const Dashboard: React.FC<{
       <Grid container justifyContent="center" className={classes.tabs}>
         <Grid container item xs={11}>
           <Tabs value={selectedTab} onChange={handleChangeTabs} classes={{ indicator: classes.indicator }}>
-            {tabs &&
-              tabs.map(
-                (tab) =>
-                  tab && (
-                    <Tab
-                      disabled={tab.disabled}
-                      classes={{ selected: classes.selected }}
-                      className={classes.tabTitle}
-                      label={tab.label}
-                      value={tab.value}
-                      component={Link}
-                      to={tab.to}
-                      key={tab.value}
-                    />
-                  )
-              )}
+            {tabs.map(
+              (tab) =>
+                tab && (
+                  <Tab
+                    disabled={tab.disabled}
+                    classes={{ selected: classes.selected }}
+                    className={classes.tabTitle}
+                    label={tab.label}
+                    value={tab.value}
+                    component={Link}
+                    to={tab.to}
+                    key={tab.value}
+                  />
+                )
+            )}
           </Tabs>
         </Grid>
       </Grid>
@@ -217,10 +214,8 @@ const Dashboard: React.FC<{
         {selectedTab === 'preview' && (
           <CohortPreview
             cohortId={
-              context === 'cohort'
-                ? cohortId
-                : context === 'perimeters'
-                ? perimetreIds
+              context === 'cohort' || context === 'perimeters'
+                ? groupIds
                 : context === 'patients'
                 ? me?.topLevelCareSites?.join(',')
                 : undefined
@@ -234,28 +229,15 @@ const Dashboard: React.FC<{
           />
         )}
         {selectedTab === 'patients' && (
-          <PatientList
-            groupId={groupId}
-            total={dashboard.totalPatients || 0}
-            deidentified={dashboard.deidentifiedBoolean}
-          />
+          <PatientList total={dashboard.totalPatients ?? 0} deidentified={dashboard.deidentifiedBoolean} />
         )}
-        {selectedTab === 'documents' && (
-          <Documents groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />
-        )}
-        {selectedTab === 'pmsi' && <PMSIList groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />}
-        {selectedTab === 'medication' && (
-          <MedicationList groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />
-        )}
-        {selectedTab === 'biology' && (
-          <BiologyList groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />
-        )}
-        {selectedTab === 'imaging' && (
-          <ImagingList groupId={groupId} deidentified={dashboard.deidentifiedBoolean ?? false} />
-        )}
-        {ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean && selectedTab === 'forms' && (
-          <FormsList groupId={groupId} />
-        )}
+
+        {selectedTab === 'documents' && <Documents deidentified={dashboard.deidentifiedBoolean ?? false} />}
+        {selectedTab === 'pmsi' && <PMSIList deidentified={dashboard.deidentifiedBoolean ?? false} />}
+        {selectedTab === 'medication' && <MedicationList deidentified={dashboard.deidentifiedBoolean ?? false} />}
+        {selectedTab === 'biology' && <BiologyList deidentified={dashboard.deidentifiedBoolean ?? false} />}
+        {selectedTab === 'imaging' && <ImagingList deidentified={dashboard.deidentifiedBoolean ?? false} />}
+        {ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean && selectedTab === 'forms' && <FormsList />}
       </Grid>
     </Grid>
   )

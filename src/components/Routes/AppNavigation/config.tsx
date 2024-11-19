@@ -147,16 +147,16 @@ const configRoutes: configRoute[] = [
   {
     exact: true,
     displaySideBar: true,
-    path: '/cohort/:cohortId/:tabName',
-    name: 'cohort/:cohortId/:tabName',
+    path: '/cohort/:tabName',
+    name: 'cohort/:tabName',
     isPrivate: true,
     element: <Dashboard context={'cohort'} />
   },
   {
     exact: true,
     displaySideBar: true,
-    path: '/cohort/:cohortId',
-    name: 'cohort/:cohortId',
+    path: '/cohort',
+    name: 'cohort',
     isPrivate: true,
     element: <Dashboard context={'cohort'} />
   },
