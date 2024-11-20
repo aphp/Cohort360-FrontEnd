@@ -3,7 +3,7 @@ import { fetchValueSet } from './callApi'
 
 export const fetchAnabioCodes = async (text: string, noStar = false, signal?: AbortSignal) => {
   const response = await fetchValueSet(
-    getConfig().features.observation.valueSets.biologyHierarchyLoinc.url,
+    getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
     { joinDisplayWithCode: false, search: text, noStar: noStar },
     signal
   )
