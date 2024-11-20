@@ -1218,8 +1218,12 @@ export const fetchCohortInfo = async (cohortId: string) => {
   return response
 }
 
+export const fetchExportableCohorts = async () => {
+  const response = await apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?exportable=true`)
+  return response.data.results
+}
+
 export const fetchExportTableInfo = async (args?: any) => {
-  console.log('manelle args', args)
   const { tableNames, relationLink } = args
 
   let options: string[] = []

@@ -695,7 +695,9 @@ const ExportTable: React.FC<ExportTableProps> = ({
               renderOption={(props, option) => <li {...props}>{option.name}</li>}
               renderInput={(params) => <TextField {...params} label="Sélectionnez un filtre" />}
               value={exportTable.fhir_filter}
-              onChange={(_, value) => _onChangeValue(value)}
+              onChange={(_, value) => {
+                _onChangeValue(value)
+              }}
             />
           </Grid>
         </Grid>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 
 import {
   Grid,
@@ -11,7 +11,8 @@ import {
   Tooltip,
   IconButton,
   Button,
-  Card
+  Card,
+  Autocomplete
 } from '@mui/material'
 
 import InfoIcon from '@mui/icons-material/Info'
@@ -21,43 +22,129 @@ import ExportTable from '../ExportTable'
 
 import { fakeExportTable, fakeCohortList } from 'pages/ExportRequest/fakedata/fakeExportTable'
 
-import { exportTablesInfo } from 'services/aphp/serviceExportCohort'
+import { fetchExportableCohorts } from 'services/aphp/callApi'
 
 import useStyles from '../../styles'
 
+export type ExportPayload = {
+  motivation: string
+  outputFormat: 'csv' | 'xlsx'
+  nominative: true
+  shiftDate: true
+  groupTables: boolean
+  exportTables:
+    | [
+        {
+          tableName: string
+          columns: string[] | []
+          cohortResultSource: string
+          fhirFilter: string
+          respectTableRelationships: true
+        }
+      ]
+    | []
+}
+
+export type TableSetting = {
+  tableName: string | null
+  isChecked: boolean | null
+  columns: string[] | null
+  fhirFilter: {
+    uuid: string
+    owner: string
+    deleted: boolean | null
+    deleted_by_cascade: boolean
+    created_at: string
+    modified_at: string
+    fhir_resource: string
+    fhir_version: string
+    query_version: string
+    name: string
+    filter: string
+    auto_generated: boolean
+  } | null
+  respectTableRelationships: boolean
+}
+
+export type TableSettings = TableSetting[]
+
+const initialPayloadState: ExportPayload = {
+  motivation: '',
+  outputFormat: 'csv',
+  nominative: true,
+  shiftDate: true,
+  groupTables: false,
+  exportTables: []
+}
+
+const tableSettingsInitialState: TableSettings = [
+  {
+    tableName: 'person',
+    isChecked: false,
+    columns: null,
+    fhirFilter: {
+      uuid: 'bcdf1e9b-e4c1-4817-a38f-31dd82537ea9',
+      owner: 'Salah BOUYAHIA (7017143)',
+      deleted: null,
+      deleted_by_cascade: false,
+      created_at: '2024-03-28T18:22:26.330990Z',
+      modified_at: '2024-03-28T18:22:26.330996Z',
+      fhir_resource: 'Condition',
+      fhir_version: '4.0',
+      query_version: 'v1.4.4',
+      name: 'bandiedfg',
+      filter:
+        'orbis-status=https%253A%252F%252Fterminology.eds.aphp.fr%252Faphp-orbis-condition-status%257Cdas&code=https%3A%2F%2Fterminology.eds.aphp.fr%2Faphp-orbis-cim10%7CE1198',
+      auto_generated: false
+    },
+    respectTableRelationships: true
+  }
+]
+
 const ExportForm: React.FC = () => {
-  const initialState: any = {
-    motif: '',
-    conditions: false,
-    tables: fakeExportTable.map<any>((table) => ({
-      ...table,
-      checked: table.name === 'person',
-      fhir_filter: null,
-      respect_table_relationships: true,
-      count: 0
-    }))
-  }
-
   const { classes } = useStyles()
-  const [error, setError] = useState<boolean>(false)
+  const [error, setError] = useState<any>('')
+  const [payload, setPayload] = useState<ExportPayload>(initialPayloadState)
   const [oneFile, setOneFile] = useState<boolean>(false)
-  const [exportTableSettings, setExportTableSettings] = useState<any>(initialState)
   const [exportTypeFile, setExportTypeFile] = useState<'csv' | 'xlsx'>('csv')
+  const [tableSettings, setTablesSettings] = useState<TableSettings>(tableSettingsInitialState)
+  const [exportCohort, setExportCohort] = useState<any>(null)
+  const [exportCohortList, setExportCohortList] = useState<any>(null)
 
-  const resetSelectedTables = () => {
-    console.log('manelle veux reinitialiser les tables selectionne')
+  const _fetchExportableCohorts = useCallback(async () => {
+    try {
+      const response = await fetchExportableCohorts()
+      setExportCohortList(response)
+    } catch (error) {
+      console.error(error)
+    }
+  }, [])
+
+  useEffect(() => {
+    _fetchExportableCohorts()
+  }, [_fetchExportableCohorts])
+
+  console.log('manelle exportCohort', exportCohortList)
+
+  const addNewTableSetting = (arg: TableSetting) => {
+    setTablesSettings([...tableSettings, arg])
   }
 
-  const handleSubmitPayload = () => {
-    console.log('manelle veux submit le payload pour envoie au back', exportTableSettings)
+  const onChangeTableSettings = (tableName: string, key: any, value: any) => {
+    const newTableSettings: TableSettings = tableSettings.map((tableSetting) => {
+      if (tableSetting.tableName === tableName) {
+        return {
+          ...tableSetting,
+          [key]: value
+        }
+      } else {
+        return tableSetting
+      }
+    })
+    setTablesSettings(newTableSettings)
   }
 
-  const handleChangeExportTableSettings = (key: string, value: any) => {
-    return console.log('manelle change des params de la table', key, value)
-    // setExportExportSettings({ ...exportSettings, [key]: value })
-  }
-
-  exportTablesInfo()
+  console.log('manelle rend combien de fois')
 
   return (
     <Grid container flexDirection={'column'}>
@@ -90,13 +177,21 @@ const ExportForm: React.FC = () => {
 
       <Grid container>
         <Typography variant="h2">Sélectionner la cohorte à exporter</Typography>
-        <Select>
-          {fakeCohortList.map((cohort, index) => (
-            <MenuItem key={index + cohort.name} value={cohort.name}>
-              {cohort.name}
-            </MenuItem>
-          ))}
-        </Select>
+        <Autocomplete
+          className={classes.autocomplete}
+          size="small"
+          // disabled={tableSetting?.isChecked === false}
+          options={exportCohortList}
+          noOptionsText="Aucune cohorte disponible"
+          getOptionLabel={(option) => {
+            return `${option.name}`
+          }}
+          renderInput={(params) => <TextField {...params} label="Sélectionnez une Cohorte" />}
+          value={exportCohort}
+          onChange={(_, value) => {
+            setExportCohort(value)
+          }}
+        />
       </Grid>
 
       <Grid>
@@ -106,7 +201,7 @@ const ExportForm: React.FC = () => {
               checked={oneFile}
               onClick={() => {
                 setOneFile(!oneFile)
-                resetSelectedTables()
+                // resetSelectedTables()
               }}
             />
           }
@@ -124,10 +219,10 @@ const ExportForm: React.FC = () => {
         </Tooltip>
       </Grid>
 
-      <Grid container className={classes.referentielContainer}>
+      <Grid container className={classes.fileType}>
         <Typography variant="h3">Type de fichier : </Typography>
         <Select
-          className={classes.select}
+          className={classes.selectFileType}
           style={{ height: 32 }}
           id="file-type-selector"
           value={exportTypeFile}
@@ -138,8 +233,8 @@ const ExportForm: React.FC = () => {
         </Select>
       </Grid>
 
-      <Grid item container alignItems="center" flexWrap="nowrap" pr="33px">
-        <Grid item container>
+      <Grid item container alignItems="center" flexWrap="nowrap">
+        <Grid item container xs={10}>
           <Typography className={classes.dialogHeader} variant="h5">
             Tables exportées
           </Typography>
@@ -158,20 +253,21 @@ const ExportForm: React.FC = () => {
         </Grid>
 
         {
-          /*!isChecked &&*/ <Grid item whiteSpace="nowrap">
+          /*!isChecked &&*/ <Grid item xs={2} container justifyContent={'end'} whiteSpace="nowrap" pr={'12px'}>
+            {/* <Grid justifyContent={'end'}> */}
             <FormControlLabel
-              className={classes.selectAllTables}
+              // className={classes.selectAllTables}
               control={
                 <Checkbox
                   color="secondary"
-                  className={classes.selectAllExportTablesCheckbox}
+                  // className={classes.selectAllExportTablesCheckbox}
                   // indeterminate={
                   //   settings.tables.filter((table) => table.checked).length !== settings.tables.length &&
                   //   settings.tables.filter((table) => table.checked).length > 0
                   // }
                   indeterminateIcon={<IndeterminateCheckBoxOutlined style={{ color: 'rgba(0,0,0,0.6)' }} />}
                   // checked={settings.tables.filter((table) => table.checked).length === settings.tables.length}
-                  onChange={resetSelectedTables}
+                  // onChange={resetSelectedTables}
                 />
               }
               label={
@@ -183,21 +279,28 @@ const ExportForm: React.FC = () => {
               labelPlacement="start"
             />
           </Grid>
+          // </Grid>
         }
       </Grid>
 
       <Grid>
-        <Card>
-          {fakeExportTable.map((_exportTable: any, index: number) => (
+        {fakeExportTable.map((_exportTable: any, index: number) => (
+          <div
+            style={{ padding: '5px 0px 5px 12px', backgroundColor: 'white', marginBottom: '10px' }}
+            key={_exportTable.name + index}
+          >
+            {/* <Card key={_exportTable.name + index} style={{ marginBottom: '10px' }}> */}
             <ExportTable
-              key={_exportTable.name + index}
+              exportCohort={exportCohort}
               exportTable={_exportTable}
-              exportTableSettings={exportTableSettings}
+              exportTableSettings={tableSettings}
               setError={setError}
-              setExportTableSettings={setExportTableSettings}
+              addNewTableSetting={addNewTableSetting}
+              onChangeTableSettings={onChangeTableSettings}
             />
-          ))}
-        </Card>
+          </div>
+          // </Card>
+        ))}
       </Grid>
 
       <Grid container gap="12px" pb="10px">
@@ -263,7 +366,7 @@ const ExportForm: React.FC = () => {
               </Typography>
             }
           />
-          <Button onClick={handleSubmitPayload}>Confirmer</Button>
+          <Button /*onClick={handleSubmitPayload}*/>Confirmer</Button>
         </Grid>
       </Grid>
     </Grid>

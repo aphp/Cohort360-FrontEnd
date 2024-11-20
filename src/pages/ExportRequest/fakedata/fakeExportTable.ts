@@ -1,498 +1,442 @@
 export const fakeExportTable = [
   {
-    name: 'person',
-    canBeExported: true,
-    fhirReference: 'Patient',
-    isOmopStandard: true,
-    isFhirStandard: false,
-    parentTable: null,
-    tableClassification: 'Fact',
+    name: 'visit_occurrence',
     columns: [
-      {
-        name: 'person_id',
-        columnType: null,
-        fieldCategory: {}
-      },
-      {
-        name: 'person_source_value',
-        columnType: null,
-        isNullable: true,
-        fieldCategory: {}
-      },
-      {
-        name: 'location_id',
-        primaryKey: {
-          name: 'location_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'provider_id',
-        primaryKey: {
-          name: 'provider_id',
-          columnType: null,
-          fieldCategory: {}
-        },
-        isNullable: true,
-        foreignDataCategory: {}
-      },
-      {
-        name: 'care_site_id',
-        primaryKey: {
-          name: 'care_site_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'year_of_birth',
-        columnType: null,
-        isNullable: true,
-        fieldCategory: {}
-      },
-      {
-        name: 'month_of_birth',
-        columnType: null,
-        isNullable: true,
-        fieldCategory: {}
-      },
-      {
-        name: 'day_of_birth',
-        columnType: null,
-        isNullable: true,
-        fieldCategory: {}
-      },
-      {
-        name: 'birth_datetime',
-        columnType: null,
-        isNullable: true,
-        fieldCategory: {}
-      },
-      {
-        name: 'death_datetime',
-        columnType: null,
-        isNullable: true,
-        fieldCategory: {}
-      },
-      {
-        name: 'race_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'race_source_value',
-        columnType: null,
-        isNullable: true
-      },
-      {
-        name: 'race_source_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'ethnicity_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'ethnicity_source_value',
-        columnType: null,
-        isNullable: true
-      },
-      {
-        name: 'ethnicity_source_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'gender_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'gender_source_value',
-        columnType: null,
-        isNullable: true
-      },
-      {
-        name: 'gender_source_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'status_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'status_source_value',
-        columnType: null,
-        isNullable: true
-      },
-      {
-        name: 'status_source_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'cdm_source',
-        columnType: null,
-        isNullable: true
-      }
+      'key',
+      'visit_occurrence_id',
+      'visit_occurrence_source_value',
+      'person_id',
+      'preceding_visit_occurrence_id',
+      'provider_id',
+      'care_site_id',
+      'visit_start_date',
+      'visit_start_datetime',
+      'visit_end_date',
+      'visit_end_datetime',
+      'visit_concept_id',
+      'visit_source_value',
+      'visit_source_concept_id',
+      'visit_type_concept_id',
+      'visit_type_source_value',
+      'visit_type_source_concept_id',
+      'admitted_from_concept_id',
+      'admitted_from_source_value',
+      'admitted_from_source_concept_id',
+      'discharge_to_concept_id',
+      'discharge_to_source_value',
+      'discharge_to_source_concept_id',
+      'admission_type_concept_id',
+      'admission_type_source_value',
+      'admission_type_source_concept_id',
+      'discharge_type_concept_id',
+      'discharge_type_source_value',
+      'discharge_type_source_concept_id',
+      'admission_reason_concept_id',
+      'admission_reason_source_value',
+      'admission_reason_source_concept_id',
+      'provenance_concept_id',
+      'provenance_source_value',
+      'provenance_source_concept_id',
+      'destination_concept_id',
+      'destination_source_value',
+      'destination_source_concept_id',
+      'stay_concept_id',
+      'stay_source_value',
+      'stay_source_concept_id',
+      'row_status_concept_id',
+      'row_status_source_value',
+      'row_status_source_concept_id',
+      'cdm_source'
     ]
   },
   {
-    name: 'procedure_occurrence',
-    canBeExported: true,
-    fhirReference: 'Procedure',
-    isOmopStandard: true,
-    isFhirStandard: false,
-    parentTable: null,
-    tableClassification: 'Fact',
+    name: 'iris',
     columns: [
-      {
-        name: 'procedure_occurrence_id',
-        columnType: null,
-        fieldCategory: {}
-      },
-      {
-        name: 'person_id',
-        primaryKey: {
-          name: 'person_id',
-          columnType: null,
-          fieldCategory: {}
-        },
-        isNullable: true,
-        foreignDataCategory: {}
-      },
-      {
-        name: 'visit_occurrence_id',
-        primaryKey: {
-          name: 'visit_occurrence_id',
-          columnType: null,
-          fieldCategory: {}
-        },
-        isNullable: true,
-        foreignDataCategory: {}
-      },
-      {
-        name: 'visit_detail_id',
-        primaryKey: {
-          name: 'visit_detail_id',
-          columnType: null,
-          fieldCategory: {}
-        },
-        isNullable: true,
-        foreignDataCategory: {}
-      },
-      {
-        name: 'provider_id',
-        primaryKey: {
-          name: 'provider_id',
-          columnType: null,
-          fieldCategory: {}
-        },
-        isNullable: true,
-        foreignDataCategory: {}
-      },
-      {
-        name: 'procedure_date',
-        columnType: null,
-        isNullable: true,
-        fieldCategory: {}
-      },
-      {
-        name: 'procedure_datetime',
-        columnType: null,
-        isNullable: true,
-        fieldCategory: {}
-      },
-      {
-        name: 'procedure_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'procedure_source_value',
-        columnType: null,
-        isNullable: true
-      },
-      {
-        name: 'procedure_source_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'procedure_type_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'procedure_type_source_value',
-        columnType: null,
-        isNullable: true
-      },
-      {
-        name: 'procedure_type_source_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'modifier_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'modifier_source_value',
-        columnType: null,
-        isNullable: true
-      },
-      {
-        name: 'quantity',
-        columnType: null,
-        isNullable: true
-      },
-      {
-        name: 'row_status_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'row_status_source_value',
-        columnType: null,
-        isNullable: true
-      },
-      {
-        name: 'row_status_source_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'cdm_source',
-        columnType: null,
-        isNullable: true
-      }
+      'person_id',
+      'code_iris',
+      'score',
+      'same_city',
+      'address_has_num_init',
+      'address_has_num_geoloc',
+      'hospital',
+      'hostel',
+      'hosted',
+      'date_geoloc',
+      'date_orbis'
+    ]
+  },
+  {
+    name: 'fact_relationship',
+    columns: [
+      'domain_concept_id_1',
+      'fact_id_1',
+      'domain_concept_id_2',
+      'fact_id_2',
+      'relationship_concept_id',
+      'cdm_source'
+    ]
+  },
+  {
+    name: 'note',
+    columns: [
+      'key',
+      'note_id',
+      'note_source_value',
+      'note_source_sub_value',
+      'person_id',
+      'visit_occurrence_id',
+      'visit_detail_id',
+      'provider_id',
+      'note_event_id',
+      'note_event_field_concept_id',
+      'care_site_id',
+      'note_date',
+      'note_datetime',
+      'note_type_concept_id',
+      'note_type_source_value',
+      'note_type_source_concept_id',
+      'note_class_concept_id',
+      'note_class_source_value',
+      'note_class_source_concept_id',
+      'note_title',
+      'note_text',
+      'hash_note_text',
+      'note_status_concept_id',
+      'note_status_source_value',
+      'note_status_source_concept_id',
+      'note_security_label_concept_id',
+      'note_security_label_source_value',
+      'note_security_label_source_concept_id',
+      'encoding_concept_id',
+      'is_pdf_available',
+      'language_concept_id',
+      'row_status_concept_id',
+      'row_status_source_value',
+      'row_status_source_concept_id',
+      'cdm_source'
+    ]
+  },
+  {
+    name: 'drug_exposure_administration',
+    columns: [
+      'drug_exposure_id',
+      'person_id',
+      'visit_occurrence_id',
+      'visit_detail_id',
+      'provider_id',
+      'drug_exposure_start_date',
+      'drug_exposure_start_datetime',
+      'drug_exposure_end_date',
+      'drug_exposure_end_datetime',
+      'verbatim_end_date',
+      'drug_type_concept_id',
+      'drug_type_source_value',
+      'stop_reason',
+      'refills',
+      'quantity',
+      'days_supply',
+      'sig',
+      'lot_number',
+      'drug_class_concept_id',
+      'drug_class_source_value',
+      'drug_class_source_concept_id',
+      'drug_concept_id',
+      'drug_source_value',
+      'drug_source_concept_id',
+      'drug_ucd_concept_id',
+      'drug_ucd_source_value',
+      'drug_ucd_source_concept_id',
+      'route_concept_id',
+      'route_source_value',
+      'route_source_concept_id',
+      'dose_unit_source_value',
+      'dose_unit_source_concept_id',
+      'row_status_concept_id',
+      'row_status_source_value',
+      'row_status_source_concept_id',
+      'cdm_source'
+    ]
+  },
+  {
+    name: 'measurement',
+    columns: [
+      'measurement_id',
+      'person_id',
+      'visit_occurrence_id',
+      'visit_detail_id',
+      'provider_id',
+      'specimen_id',
+      'measurement_date',
+      'measurement_datetime',
+      'measurement_time',
+      'measurement_concept_id',
+      'measurement_source_value',
+      'measurement_source_concept_id',
+      'measurement_type_concept_id',
+      'measurement_type_source_value',
+      'measurement_type_source_concept_id',
+      'operator_concept_id',
+      'operator_source_value',
+      'operator_source_concept_id',
+      'value_as_number',
+      'value_source_as_number',
+      'value_as_concept_id',
+      'value_as_source_concept_id',
+      'value_as_concept_source_value',
+      'value_source_value',
+      'range_low',
+      'range_high',
+      'unit_concept_id',
+      'unit_source_value',
+      'unit_source_concept_id',
+      'row_status_concept_id',
+      'row_status_source_value',
+      'row_status_source_concept_id',
+      'cdm_source'
+    ]
+  },
+  {
+    name: 'drug_exposure_prescription',
+    columns: [
+      'drug_exposure_id',
+      'person_id',
+      'visit_occurrence_id',
+      'visit_detail_id',
+      'provider_id',
+      'drug_exposure_start_date',
+      'drug_exposure_start_datetime',
+      'drug_exposure_end_date',
+      'drug_exposure_end_datetime',
+      'verbatim_end_date',
+      'drug_type_concept_id',
+      'drug_type_source_value',
+      'stop_reason',
+      'refills',
+      'quantity',
+      'days_supply',
+      'sig',
+      'lot_number',
+      'drug_class_concept_id',
+      'drug_class_source_value',
+      'drug_class_source_concept_id',
+      'drug_concept_id',
+      'drug_source_value',
+      'drug_source_concept_id',
+      'drug_ucd_concept_id',
+      'drug_ucd_source_value',
+      'drug_ucd_source_concept_id',
+      'route_concept_id',
+      'route_source_value',
+      'route_source_concept_id',
+      'dose_unit_source_value',
+      'dose_unit_source_concept_id',
+      'prescription_type_concept_id',
+      'prescription_type_source_value',
+      'prescription_type_source_concept_id',
+      'row_status_concept_id',
+      'row_status_source_value',
+      'row_status_source_concept_id',
+      'cdm_source'
+    ]
+  },
+  {
+    name: 'visit_detail',
+    columns: [
+      'visit_detail_id',
+      'person_id',
+      'visit_occurrence_id',
+      'preceding_visit_detail_id',
+      'visit_detail_parent_id',
+      'provider_id',
+      'care_site_id',
+      'visit_detail_start_date',
+      'visit_detail_start_datetime',
+      'visit_detail_end_date',
+      'visit_detail_end_datetime',
+      'visit_detail_concept_id',
+      'visit_detail_source_value',
+      'visit_detail_source_concept_id',
+      'visit_detail_type_concept_id',
+      'visit_detail_type_source_value',
+      'visit_detail_type_source_concept_id',
+      'admitted_from_concept_id',
+      'admitted_from_source_value',
+      'admitted_from_source_concept_id',
+      'discharge_to_concept_id',
+      'discharge_to_source_value',
+      'discharge_to_source_concept_id',
+      'row_status_concept_id',
+      'row_status_source_value',
+      'row_status_source_concept_id',
+      'cdm_source'
+    ]
+  },
+  {
+    name: 'person',
+    columns: [
+      'person_id',
+      'person_source_value',
+      'location_id',
+      'provider_id',
+      'care_site_id',
+      'year_of_birth',
+      'month_of_birth',
+      'day_of_birth',
+      'birth_datetime',
+      'death_datetime',
+      'race_concept_id',
+      'race_source_value',
+      'race_source_concept_id',
+      'ethnicity_concept_id',
+      'ethnicity_source_value',
+      'ethnicity_source_concept_id',
+      'gender_concept_id',
+      'gender_source_value',
+      'gender_source_concept_id',
+      'status_concept_id',
+      'status_source_value',
+      'status_source_concept_id',
+      'cdm_source'
     ]
   },
   {
     name: 'condition_occurrence',
-    canBeExported: true,
-    fhirReference: 'Condition',
-    isOmopStandard: true,
-    isFhirStandard: false,
-    parentTable: null,
-    tableClassification: 'Fact',
     columns: [
-      {
-        name: 'condition_occurrence_id',
-        columnType: null,
-        fieldCategory: {}
-      },
-      {
-        name: 'person_id',
-        primaryKey: {
-          name: 'person_id',
-          columnType: null,
-          fieldCategory: {}
-        },
-        isNullable: true,
-        foreignDataCategory: {}
-      },
-      {
-        name: 'visit_occurrence_id',
-        primaryKey: {
-          name: 'visit_occurrence_id',
-          columnType: null,
-          fieldCategory: {}
-        },
-        isNullable: true,
-        foreignDataCategory: {}
-      },
-      {
-        name: 'visit_detail_id',
-        primaryKey: {
-          name: 'visit_detail_id',
-          columnType: null,
-          fieldCategory: {}
-        },
-        isNullable: true,
-        foreignDataCategory: {}
-      },
-      {
-        name: 'provider_id',
-        primaryKey: {
-          name: 'provider_id',
-          columnType: null,
-          fieldCategory: {}
-        },
-        isNullable: true,
-        foreignDataCategory: {}
-      },
-      {
-        name: 'condition_start_date',
-        columnType: null,
-        isNullable: true,
-        fieldCategory: {}
-      },
-      {
-        name: 'condition_start_datetime',
-        columnType: null,
-        isNullable: true,
-        fieldCategory: {}
-      },
-      {
-        name: 'condition_end_date',
-        columnType: null,
-        isNullable: true,
-        fieldCategory: {}
-      },
-      {
-        name: 'condition_end_datetime',
-        columnType: null,
-        isNullable: true,
-        fieldCategory: {}
-      },
-      {
-        name: 'condition_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'condition_source_value',
-        columnType: null,
-        isNullable: true
-      },
-      {
-        name: 'condition_source_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'condition_type_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'condition_type_source_value',
-        columnType: null,
-        isNullable: true
-      },
-      {
-        name: 'condition_type_source_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'condition_status_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'condition_status_source_value',
-        columnType: null,
-        isNullable: true
-      },
-      {
-        name: 'condition_status_source_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'stop_reason',
-        columnType: null,
-        isNullable: true,
-        fieldCategory: {}
-      },
-      {
-        name: 'row_status_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'row_status_source_value',
-        columnType: null,
-        isNullable: true
-      },
-      {
-        name: 'row_status_source_concept_id',
-        primaryKey: {
-          name: 'concept_id',
-          columnType: null
-        },
-        isNullable: true
-      },
-      {
-        name: 'cdm_source',
-        columnType: null,
-        isNullable: true
-      }
+      'condition_occurrence_id',
+      'person_id',
+      'visit_occurrence_id',
+      'visit_detail_id',
+      'provider_id',
+      'condition_start_date',
+      'condition_start_datetime',
+      'condition_end_date',
+      'condition_end_datetime',
+      'condition_concept_id',
+      'condition_source_value',
+      'condition_source_concept_id',
+      'condition_type_concept_id',
+      'condition_type_source_value',
+      'condition_type_source_concept_id',
+      'condition_status_concept_id',
+      'condition_status_source_value',
+      'condition_status_source_concept_id',
+      'stop_reason',
+      'row_status_concept_id',
+      'row_status_source_value',
+      'row_status_source_concept_id',
+      'cdm_source'
+    ]
+  },
+  {
+    name: 'imaging_study',
+    columns: [
+      'imaging_study_id',
+      'imaging_study_uid',
+      'person_id',
+      'visit_occurrence_id',
+      'study_datetime',
+      'procedure_code_source_value',
+      'procedure_code_source_concept_id',
+      'modality',
+      'status_source_value',
+      'status_source_concept_id',
+      'description',
+      'number_of_instances',
+      'number_of_series',
+      'access_number',
+      'aet_device',
+      'is_study_online',
+      'is_key_images_exist',
+      'row_status_source_value',
+      'row_status_source_concept_id',
+      'note_id',
+      'note_matching_method',
+      'note_study_sharing',
+      'cdm_source'
+    ]
+  },
+  {
+    name: 'imaging_series',
+    columns: [
+      'imaging_series_id',
+      'imaging_series_uid',
+      'person_id',
+      'visit_occurrence_id',
+      'imaging_study_id',
+      'series_datetime',
+      'number',
+      'modality_concept_id',
+      'modality_source_value',
+      'modality_source_concept_id',
+      'body_site_source_value',
+      'body_site_source_concept_id',
+      'number_of_instances',
+      'description',
+      'is_key_series',
+      'modality_additional',
+      'protocol_name',
+      'row_status_source_value',
+      'row_status_source_concept_id',
+      'cdm_source'
+    ]
+  },
+  {
+    name: 'cost',
+    columns: [
+      'cost_id',
+      'person_id',
+      'cost_event_id',
+      'cost_event_field_concept_id',
+      'cost_concept_id',
+      'cost_source_value',
+      'cost_source_concept_id',
+      'cost_type_concept_id',
+      'cost_type_source_value',
+      'cost_type_source_concept_id',
+      'cost_status_concept_id',
+      'cost_status_source_value',
+      'cost_status_source_concept_id',
+      'currency_concept_id',
+      'cost',
+      'incurred_date',
+      'incurred_datetime',
+      'billed_date',
+      'paid_date',
+      'revenue_code_concept_id',
+      'drg_concept_id',
+      'drg_source_value',
+      'drg_source_concept_id',
+      'revenue_code_source_value',
+      'payer_plan_period_id',
+      'row_status_concept_id',
+      'row_status_source_value',
+      'row_status_source_concept_id',
+      'cdm_source'
+    ]
+  },
+  {
+    name: 'procedure_occurrence',
+    columns: [
+      'procedure_occurrence_id',
+      'person_id',
+      'visit_occurrence_id',
+      'visit_detail_id',
+      'provider_id',
+      'procedure_date',
+      'procedure_datetime',
+      'procedure_concept_id',
+      'procedure_source_value',
+      'procedure_source_concept_id',
+      'procedure_type_concept_id',
+      'procedure_type_source_value',
+      'procedure_type_source_concept_id',
+      'modifier_concept_id',
+      'modifier_source_value',
+      'quantity',
+      'row_status_concept_id',
+      'row_status_source_value',
+      'row_status_source_concept_id',
+      'cdm_source'
     ]
   }
 ]
