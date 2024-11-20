@@ -177,7 +177,9 @@ export const getAgeRepartitionMapAphp = (facet?: Extension[]): AgeRepartitionTyp
   const repartitionMap: AgeRepartitionMap[] = []
 
   facet?.forEach((extension) => {
-    const ageObj = getExtension(extension, 'gender.display')?.url
+    const ageObj = extension.extension?.filter((object) => {
+      return object.url !== 'gender.display'
+    })?.[0].url
 
     const genderValuesObj = getExtension(extension, 'gender.display')
 
