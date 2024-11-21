@@ -9,7 +9,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
-import { ScopeElement } from 'types'
 
 type PatientTitleProps = {
   firstName: string | undefined
@@ -22,6 +21,7 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
   const location = useLocation()
   const search = new URLSearchParams(location.search)
   const groupId = search.get('groupId') ?? undefined
+  console.log('manelle groupId', groupId)
 
   const cohort = useAppSelector((state) => state.exploredCohort)
   const [anchorEl, setAnchorEl] = useState(null)
@@ -30,14 +30,11 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
 
   const goBacktoCohort = () => {
     const path =
-      cohort.cohort && Array.isArray(cohort.cohort) && cohort.cohort.length > 0
-        ? `/perimeters/patients?${cohort.cohort.map((e: ScopeElement) => e.cohort_id).join()}`
-        : !Array.isArray(cohort.cohort) && cohort.cohort?.cohort_id
-        ? `/cohort/${cohort.cohort?.cohort_id}/patients`
-        : groupId
-        ? `/perimeters/patients?${groupId}`
-        : '/my-patients/patients'
-
+      cohort.cohortId && groupId === cohort.cohortId
+        ? `/cohort/patients?groupId=${cohort.cohortId}`
+        : groupId && groupId !== cohort.cohortId
+        ? `/perimeters/patients?groupId=${groupId}`
+        : `/my-patients/patients`
     navigate(path)
   }
 
