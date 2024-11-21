@@ -32,14 +32,14 @@ const MaternityFormFilter = ({ name, value, disabled = false }: MaternityFormFil
           checked={isChecked(FormNames.PREGNANCY, formName)}
           value={FormNames.PREGNANCY}
           control={<Checkbox color="secondary" />}
-          label={labels.formNames.pregnancy_pural}
+          label={labels.formNames.pregnancy}
         />
         <FormControlLabel
           disabled={disabled}
           checked={isChecked(FormNames.HOSPIT, formName)}
           value={FormNames.HOSPIT}
           control={<Checkbox color="secondary" />}
-          label={labels.formNames.hospit_plural}
+          label={labels.formNames.hospit}
         />
       </FormGroup>
     </InputWrapper>
