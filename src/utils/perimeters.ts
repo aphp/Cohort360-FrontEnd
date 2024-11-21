@@ -18,11 +18,11 @@ export const getScopeLevelBySourceType = (type: SourceType) => {
     case SourceType.DOCUMENT:
     case SourceType.IMAGING:
     case SourceType.MATERNITY:
+    case SourceType.FORM_RESPONSE:
       return level1
     case SourceType.CCAM:
     case SourceType.CIM10:
     case SourceType.SUPPORTED:
-    case SourceType.FORM_RESPONSE:
     case SourceType.ALL:
       return level2
     default:
