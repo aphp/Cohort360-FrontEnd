@@ -177,7 +177,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             }}
           >
             <Alert severity="warning">
-              Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/12/2022.
+              Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/07/2024.
             </Alert>
             <Alert severity="warning">
               Seuls les actes rattachés à une visite Orbis (avec un Dossier Administratif - NDA) sont actuellement
