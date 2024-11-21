@@ -51,7 +51,7 @@ const IPPForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
     const ippList = []
 
     for (const match of ippMatches) {
-      ippList.push(match[1])
+      ippList.push(match[2])
     }
 
     setIppList(ippList)
