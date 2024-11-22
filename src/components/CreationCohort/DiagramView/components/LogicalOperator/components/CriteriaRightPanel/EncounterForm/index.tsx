@@ -227,7 +227,7 @@ const EncounterForm = ({
 
           <BlockWrapper className={classes.inputItem}>
             <ExecutiveUnitsInput
-              sourceType={SourceType.DOCUMENT}
+              sourceType={SourceType.SUPPORTED}
               value={encounterService}
               onChange={setEncounterService}
             />
