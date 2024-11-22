@@ -103,9 +103,9 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   }
   if (key === FilterKeys.FORM_NAME) {
     if (value === FormNames.HOSPIT) {
-      return labels.formNames.hospit_plural
+      return labels.formNames.hospit
     } else if (value === FormNames.PREGNANCY) {
-      return labels.formNames.pregnancy_pural
+      return labels.formNames.pregnancy
     }
   }
   if (key === FilterKeys.VITAL_STATUSES) {
