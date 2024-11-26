@@ -3,8 +3,7 @@ import { Autocomplete, Grid, MenuItem, Select, TextField } from '@mui/material'
 import { BlockWrapper } from 'components/ui/Layout'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import Collapse from 'components/ui/Collapse'
-import { DurationUnitWrapper } from 'components/ui/Inputs/DurationRange/styles'
-import { TextFieldWrapper } from 'components/ui/Inputs/DurationRange/styles'
+import { DurationUnitWrapper, TextFieldWrapper } from 'components/ui/Inputs/DurationRange/styles'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import CriteriaLayout from 'components/ui/CriteriaLayout'
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
@@ -18,7 +17,6 @@ import {
   DurationRangeType,
   LabelObject
 } from 'types/searchCriterias'
-import useStyles from './styles'
 import { mappingCriteria } from '../DemographicForm'
 import SearchbarWithCheck from 'components/ui/Inputs/SearchbarWithCheck'
 import UidTextfield from 'components/ui/Inputs/UidTextfield'
@@ -50,7 +48,6 @@ export const withDocumentOptions = [
 ]
 
 const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
-  const { classes } = useStyles()
   const appConfig = useContext(AppConfig)
   const { criteriaData, onChangeSelectedCriteria, goBack } = props
   const selectedCriteria = props.selectedCriteria as ImagingDataType
@@ -225,7 +222,13 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
 
       {/* critères de study : */}
       <BlockWrapper margin="1em">
-        <Collapse title="Critères liés à une étude" margin="0">
+        <Collapse
+          title="Critères liés à une étude"
+          info={
+            "Une étude est un examen. Il s'agit, au sens DICOM, de l'ensemble des acquisitions réalisées durant la visite d'un patient et, s'il existe, le compte-rendu (SR) DICOM associé."
+          }
+          margin="0"
+        >
           <BlockWrapper style={{ margin: '0 2em 1em 0' }}>
             <CriteriaLabel label="Date de l'étude" style={{ padding: 0 }} />
             <CalendarRange
@@ -348,7 +351,12 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
 
         {/*critères de série : */}
         <BlockWrapper style={{ marginTop: 26 }}>
-          <Collapse title="Critères liés à une série" value={isSeriesUsed} margin="0">
+          <Collapse
+            title="Critères liés à une série"
+            value={isSeriesUsed}
+            margin="0"
+            info="Une série est une des acquisitions lors d'un examen."
+          >
             <BlockWrapper style={{ margin: '0 2em 1em 0' }}>
               <CriteriaLabel label="Date de la série" style={{ padding: 0 }} />
               <CalendarRange
