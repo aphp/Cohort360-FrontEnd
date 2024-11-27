@@ -48,11 +48,11 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
 
   const columns: Column[] = [
     { label: PatientTableLabels.GENDER, code: `${Order.GENDER},${Order.ID}` },
-    { label: PatientTableLabels.FIRSTNAME, code: !deidentified ? Order.FIRSTNAME : undefined },
+    { label: PatientTableLabels.FIRSTNAME, code: !deidentified ? Order.NAME : undefined },
     { label: PatientTableLabels.LASTNAME, code: !deidentified ? Order.FAMILY : undefined, align: 'left' },
     {
       label: !deidentified ? PatientTableLabels.BIRTHDATE : PatientTableLabels.AGE,
-      code: `${Order.BIRTHDATE},${Order.ID}`
+      code: `${!deidentified ? Order.BIRTHDATE : Order.AGE_MONTH},${Order.ID}`
     },
     { label: PatientTableLabels.LAST_ENCOUNTER, align: 'left' },
     { label: PatientTableLabels.VITAL_STATUS },
