@@ -127,7 +127,6 @@ export const form: () => CriteriaForm<HospitDataType> = () => ({
           valueKey: 'occurrence',
           type: 'numberAndComparator',
           label: "Nombre d'occurences",
-          withHierarchyInfo: true,
           buildInfo: {
             chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'occurences" }]
           }

@@ -100,9 +100,8 @@ const OccurenceInput = ({
       <Grid
         style={{
           display: 'grid',
-          gridTemplateColumns: comparatorValue === Comparators.BETWEEN ? '50px 1fr 1fr' : '50px 1fr',
-          alignItems: 'start',
-          margin: '1em 0'
+          gridTemplateColumns: comparatorValue === Comparators.BETWEEN ? '50px 1fr 1fr' : '100px 1fr',
+          alignItems: 'start'
         }}
       >
         <Select

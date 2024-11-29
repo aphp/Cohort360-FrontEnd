@@ -79,7 +79,6 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           valueKey: 'occurrence',
           type: 'numberAndComparator',
           label: "Nombre d'occurrences",
-          withHierarchyInfo: true,
           buildInfo: {
             chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'occurences" }]
           }
@@ -148,7 +147,6 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           valueKey: 'numberOfSeries',
           type: 'numberAndComparator',
           label: 'Nombre de séries',
-          withHierarchyInfo: true,
           buildInfo: {
             fhirKey: ImagingParamsKeys.NB_OF_SERIES,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Nombre de séries : ' }]
@@ -158,7 +156,6 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           valueKey: 'numberOfIns',
           type: 'numberAndComparator',
           label: "Nombre d'instances",
-          withHierarchyInfo: true,
           buildInfo: {
             fhirKey: ImagingParamsKeys.NB_OF_INS,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'instances : " }]
@@ -287,6 +284,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           type: 'calendarRange',
           errorType: 'ADVANCED_INPUTS_ERROR',
           label: 'Début de prise en charge',
+          extraInfo: 'Ne concerne pas les consultations',
           labelAltStyle: true,
           extraLabel: () => 'Prise en charge',
           withOptionIncludeNull: true,

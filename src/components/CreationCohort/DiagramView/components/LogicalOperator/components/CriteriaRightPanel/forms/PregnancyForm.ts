@@ -73,8 +73,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => ({
         {
           valueKey: 'occurrence',
           type: 'numberAndComparator',
-          label: 'Occurrence',
-          allowBetween: true,
+          label: "Nombre d'occurrences",
           buildInfo: {
             chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'occurences" }]
           }

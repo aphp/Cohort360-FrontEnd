@@ -47,7 +47,7 @@ type CriteriaListItemProps = {
 
 const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
   const { criteriaItem, handleClick } = props
-  const { color, title, formDefinition, subItems, disabled, id, fontWeight } = criteriaItem
+  const { color, title, formDefinition, subItems, disabled, id, fontWeight, component } = criteriaItem
 
   const { classes } = useStyles()
   const [open, setOpen] = useState(true)
@@ -80,7 +80,7 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
 
   const svgIcon = getCriteriaIcon(id as CriteriaTypesWithIcons)
 
-  const pointer = formDefinition ? 'pointer' : 'default'
+  const pointer = formDefinition || component ? 'pointer' : 'default'
 
   const cursor = disabled ? 'not-allowed' : pointer
 
@@ -166,7 +166,6 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
   const criteriaListWithConfig = criteriaList().map((criteriaItem) =>
     applyConfigToCriteriaItem(criteriaItem, criteria.config)
   )
-
   const { classes } = useStyles()
   const [action, setAction] = useState<CriteriaItemType | null>(null)
 
