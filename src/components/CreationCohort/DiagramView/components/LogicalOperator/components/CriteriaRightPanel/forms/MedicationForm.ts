@@ -66,7 +66,7 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
           type: 'numberAndComparator',
           label: "Nombre d'occurrences",
           buildInfo: {
-            chipDisplayMethodExtraArgs: [{ type: 'reference', value: "Nombre d'occurences" }]
+            chipDisplayMethodExtraArgs: [{ type: 'reference', value: "Nombre d'occurrences" }]
           }
         },
         {

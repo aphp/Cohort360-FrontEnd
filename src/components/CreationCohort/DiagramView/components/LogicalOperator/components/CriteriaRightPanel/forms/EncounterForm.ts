@@ -77,7 +77,7 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           type: 'numberAndComparator',
           label: "Nombre d'occurrences",
           buildInfo: {
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'occurences" }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'occurrences" }]
           }
         },
         {

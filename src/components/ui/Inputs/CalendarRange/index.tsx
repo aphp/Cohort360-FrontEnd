@@ -60,7 +60,13 @@ const CalendarRange = ({
       ) : (
         label
       )}
-      <Grid item xs={12} container spacing={2}>
+      <Grid
+        item
+        xs={12}
+        container
+        //TODO: trouver un moyen autre que spacing pour espacer les deux calendar input car rajoute maxWidth : 100% - 16px
+        spacing={2}
+      >
         <Grid item xs={12} md={inline ? 6 : 12}>
           <CalendarInput
             disabled={disabled}

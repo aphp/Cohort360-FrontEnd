@@ -72,7 +72,7 @@ export const Default: Story = {
             label: "Nombre d'occurrences",
             withHierarchyInfo: true,
             buildInfo: {
-              chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'occurences" }]
+              chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'occurrences" }]
             }
           },
           {

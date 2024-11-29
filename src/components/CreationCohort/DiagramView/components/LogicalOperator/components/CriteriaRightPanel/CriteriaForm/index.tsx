@@ -41,7 +41,7 @@ export default function CriteriaForm<T extends CommonCriteriaData>(props: Criter
   }, [criteriaData, onDataChange])
 
   console.log('rendering form')
-
+  console.log('test itemSections', itemSections)
   return (
     <CriteriaLayout
       criteriaLabel={`${label}`}
