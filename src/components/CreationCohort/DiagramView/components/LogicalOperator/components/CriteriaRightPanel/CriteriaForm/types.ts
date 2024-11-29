@@ -314,6 +314,7 @@ export type CriteriaSection<T> = {
 // Criteria form definition
 export type CriteriaForm<T> = {
   label: string
+  infoAlert?: ReactNode[]
   warningAlert?: ReactNode[]
   initialData: Omit<T, 'id'>
   errorMessages: { [key: string]: string }
