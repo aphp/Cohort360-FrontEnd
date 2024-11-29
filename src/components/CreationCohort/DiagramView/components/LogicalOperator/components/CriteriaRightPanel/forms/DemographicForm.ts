@@ -30,6 +30,7 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
     birthdates: null,
     deathDates: null
   },
+  infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   errorMessages: {
     INCOHERENT_VALUE_ERROR: 'La valeur minimale ne peut pas être supérieure à la valeur maximale.',
     INVALID_VALUE_ERROR: 'Veuillez entrer un nombre valide.',

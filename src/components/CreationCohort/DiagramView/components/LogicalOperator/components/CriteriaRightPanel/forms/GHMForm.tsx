@@ -37,6 +37,7 @@ export const form: () => CriteriaForm<GhmDataType> = () => ({
     encounterEndDate: null,
     code: []
   },
+  infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   warningAlert: [
     <div key="1">
       Données actuellement disponibles : PMSI ORBIS. Pour plus d'informations sur les prochaines intégrations de

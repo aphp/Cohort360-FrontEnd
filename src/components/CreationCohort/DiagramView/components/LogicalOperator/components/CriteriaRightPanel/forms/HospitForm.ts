@@ -113,6 +113,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => ({
     exitFeedingMode: null,
     exitDiagnostic: null
   },
+  infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   errorMessages: {},
   buildInfo: {
     criteriaType: CriteriaType.HOSPIT,

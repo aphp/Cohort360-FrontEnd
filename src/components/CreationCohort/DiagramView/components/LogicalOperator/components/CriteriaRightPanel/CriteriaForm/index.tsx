@@ -26,7 +26,7 @@ export default function CriteriaForm<T extends CommonCriteriaData>(props: Criter
   const [criteriaData, setCriteriaData] = useState<T>(props.data ?? (props.initialData as T))
   const valueSets = useAppSelector((state) => state.valueSets)
   const selectedPopulation = useAppSelector((state) => state.cohortCreation.request.selectedPopulation || [])
-  const { goBack, updateData, label, warningAlert, itemSections, errorMessages, onDataChange } = props
+  const { goBack, updateData, label, infoAlert, warningAlert, itemSections, errorMessages, onDataChange } = props
   const isEdition = !!props.data
   const [error, setError] = useState<string>()
 
@@ -53,7 +53,7 @@ export default function CriteriaForm<T extends CommonCriteriaData>(props: Criter
       disabled={error !== undefined}
       isInclusive={!!criteriaData.isInclusive}
       onChangeIsInclusive={(isInclusive) => setCriteriaData({ ...criteriaData, isInclusive: isInclusive })}
-      infoAlert={['Tous les éléments des champs multiples sont liés par une contrainte OU']}
+      infoAlert={infoAlert}
       warningAlert={warningAlert}
       errorAlert={error ? [errorMessages[error]] : undefined}
     >
