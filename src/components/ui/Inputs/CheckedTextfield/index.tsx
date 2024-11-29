@@ -51,6 +51,8 @@ const CheckedTextfield = ({
       setError(true)
       onError(true)
     }
+    // only bufferValue can change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bufferValue])
 
   return (

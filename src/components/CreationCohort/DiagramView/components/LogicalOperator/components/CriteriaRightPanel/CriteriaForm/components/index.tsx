@@ -1,5 +1,5 @@
-import { FormLabel, Tooltip } from '@mui/material'
-import React, { PropsWithChildren } from 'react'
+import { FormLabel, Tooltip, Typography } from '@mui/material'
+import React, { PropsWithChildren, useEffect, useState } from 'react'
 import {
   Context,
   CriteriaFormItemView,
@@ -11,7 +11,6 @@ import {
   DataTypeMappings,
   DataTypes
 } from '../types'
-import useStyles from '../style'
 import { BlockWrapper } from 'components/ui/Layout'
 import Collapse from 'components/ui/Collapse'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
@@ -70,23 +69,31 @@ export const CFItem = <T, V extends DataTypeMappings, U extends CriteriaItem<T, 
     ((isFunction(disableCondition) && disableCondition(data as Record<string, DataTypes>, context)) ||
       (isString(disableCondition) && eval(disableCondition)(data, context)))
   return (
-    <View
+    <CFItemWrapper
+      label={props.extraLabel}
+      info={props.extraInfo}
+      displayValueSummary={props.displayValueSummary}
+      data={data}
       value={fieldValue}
-      disabled={disabled}
-      definition={props}
-      updateData={(value) => valueKey && updateData({ ...data, [valueKey]: value })}
-      getValueSetOptions={getValueSetOptions}
-      searchCode={searchCode}
-      setError={setError}
-      deidentified={props.deidentified}
-    />
+      context={context}
+    >
+      <View
+        value={fieldValue}
+        disabled={disabled}
+        definition={props}
+        updateData={(value) => valueKey && updateData({ ...data, [valueKey]: value })}
+        getValueSetOptions={getValueSetOptions}
+        searchCode={searchCode}
+        setError={setError}
+        deidentified={props.deidentified}
+      />
+    </CFItemWrapper>
   )
 }
 
 export function CFSection<T extends SelectedCriteriaType>(
   props: PropsWithChildren<Omit<CriteriaSection<T>, 'items'> & { collapsed?: boolean }>
 ) {
-  const { classes } = useStyles()
   return props.title ? (
     <BlockWrapper
       margin="1em"
@@ -106,10 +113,23 @@ export function CFItemWrapper<T>(
     label?: string | ((data: Record<string, DataTypes>, context: Context) => string)
     info?: string
     data: T
+    value: DataTypes
+    displayValueSummary?: string | ((value: DataTypes) => string)
     context: Context
   }>
 ) {
-  const { label, data, context } = props
+  const { label, data, context, displayValueSummary, value } = props
+  const [valueSummary, setValueSummary] = useState<string | undefined>(undefined)
+
+  useEffect(() => {
+    if (isFunction(displayValueSummary)) {
+      setValueSummary(displayValueSummary(value))
+    } else if (isString(displayValueSummary)) {
+      setValueSummary(eval(displayValueSummary)(value))
+    }
+    // only value can change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
   const labelValue =
     label &&
     ((isFunction(label) && label(data as Record<string, DataTypes>, context)) ||
@@ -126,6 +146,7 @@ export function CFItemWrapper<T>(
       ) : (
         ''
       )}
+      {valueSummary && <Typography style={{ fontWeight: 'bold', marginBottom: '1em' }}>{valueSummary}</Typography>}
       {props.children}
     </BlockWrapper>
   )
