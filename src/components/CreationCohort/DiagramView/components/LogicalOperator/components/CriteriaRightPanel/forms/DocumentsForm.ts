@@ -57,7 +57,7 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
         {
           valueKey: 'occurrence',
           type: 'numberAndComparator',
-          label: 'Occurrence',
+          label: "Nombre d'occurrences",
           buildInfo: {
             chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'occurences" }]
           }
@@ -71,6 +71,21 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
             { id: 'DESCRIPTION', label: 'Titre du document' }
           ]
         },
+        // {
+        //   valueKey: 'searchBy',
+        //   type: 'autocomplete',
+        //   label: 'Rechercher dans :',
+        //   valueSetId: 'docSearchBy',
+        //   singleChoice: true,
+        //   valueSetData: [
+        //     { id: SearchByTypes.TEXT, label: 'Corps du document' },
+        //     { id: SearchByTypes.DESCRIPTION, label: 'Titre du document' }
+        //   ],
+        //   noOptionsText: 'Veuillez sélectionner le type de recherche désiré'
+        //   // buildInfo: {
+        //   //   // fhirKey: SearchByTypes.TEXT
+        //   // }
+        // },
         {
           valueKey: 'search',
           type: 'textWithCheck',

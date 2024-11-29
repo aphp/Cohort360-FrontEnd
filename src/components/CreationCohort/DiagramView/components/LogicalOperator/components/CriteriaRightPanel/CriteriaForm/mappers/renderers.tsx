@@ -20,14 +20,13 @@ import OccurenceInput from 'components/ui/Inputs/Occurences'
 import SearchbarWithCheck from 'components/ui/Inputs/SearchbarWithCheck'
 import AsyncAutocomplete from 'components/ui/Inputs/AsyncAutocomplete'
 import CheckedTextfield from 'components/ui/Inputs/CheckedTextfield'
-import { isArray } from 'lodash'
+import _, { isArray } from 'lodash'
 import useStyles from '../style'
 import { useAppSelector } from 'state'
 import { BlockWrapper } from 'components/ui/Layout'
 import { fetchValueSet } from 'services/aphp/callApi'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
-import _ from 'lodash'
 
 /************************************************************************************/
 /*                        Criteria Form Item Renderer                               */

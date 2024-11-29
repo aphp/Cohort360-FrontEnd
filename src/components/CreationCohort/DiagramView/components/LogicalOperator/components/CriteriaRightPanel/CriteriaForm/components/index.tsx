@@ -38,7 +38,7 @@ export const renderLabel = (label: string, tooltip?: string, altStyle?: boolean)
         style={{ padding: '0 0 1em', fontWeight: 600, fontSize: 12, display: 'flex', alignItems: 'center' }}
         component="legend"
       >
-        Fin de prise en charge
+        {label}
         {tooltip && (
           <Tooltip title={tooltip}>
             <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
@@ -88,7 +88,10 @@ export function CFSection<T extends SelectedCriteriaType>(
 ) {
   const { classes } = useStyles()
   return props.title ? (
-    <BlockWrapper className={classes.inputItem}>
+    <BlockWrapper
+      margin="1em"
+      // className={classes.inputItem}
+    >
       <Collapse title={props.title} info={props.info} value={!props.defaulCollapsed || !props.collapsed} margin="0">
         {props.children}
       </Collapse>
@@ -107,21 +110,19 @@ export function CFItemWrapper<T>(
   }>
 ) {
   const { label, data, context } = props
-  const { classes } = useStyles()
   const labelValue =
     label &&
     ((isFunction(label) && label(data as Record<string, DataTypes>, context)) ||
       (isString(label) && eval(label)(data, context)))
   return (
-    <BlockWrapper className={classes.inputItem}>
+    <BlockWrapper
+      // ICI ON EST BON SUR LA LARGEUR, NE PAS TOUCHEOOOOOOOOO
+      // margin={'1em'}
+      // j'ai touché quand même mais ne fonctionne pas sur les criteria label car la marge des collapse prend le dessus
+      margin={'1em 1em 0'}
+    >
       {labelValue ? (
-        <CriteriaLabel label={labelValue} style={{ padding: 0, marginTop: '1em' }}>
-          {props.info && (
-            <Tooltip title={props.info}>
-              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-            </Tooltip>
-          )}
-        </CriteriaLabel>
+        <CriteriaLabel label={labelValue} style={{ padding: 0, marginTop: '1em' }} infoIcon={props.info} />
       ) : (
         ''
       )}
