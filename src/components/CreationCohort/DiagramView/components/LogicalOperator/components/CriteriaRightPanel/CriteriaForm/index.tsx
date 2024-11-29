@@ -5,12 +5,14 @@ import {
   CriteriaFormItemViewProps,
   NumberAndComparatorDataType,
   NewDurationRangeType,
-  CommonCriteriaData
+  CommonCriteriaData,
+  DataTypes
 } from './types'
-import { CFItem, CFItemWrapper, CFSection } from './components'
+import { CFItem, CFSection } from './components'
 import FORM_ITEM_RENDERER from './mappers/renderers'
 import { useAppSelector } from 'state'
 import { LabelObject } from 'types/searchCriterias'
+import { isFunction, isString } from 'lodash'
 
 export type CriteriaFormRuntimeProps<T> = {
   goBack: () => void
@@ -26,7 +28,17 @@ export default function CriteriaForm<T extends CommonCriteriaData>(props: Criter
   const [criteriaData, setCriteriaData] = useState<T>(props.data ?? (props.initialData as T))
   const valueSets = useAppSelector((state) => state.valueSets)
   const selectedPopulation = useAppSelector((state) => state.cohortCreation.request.selectedPopulation || [])
-  const { goBack, updateData, label, infoAlert, warningAlert, itemSections, errorMessages, onDataChange } = props
+  const {
+    goBack,
+    updateData,
+    label,
+    infoAlert,
+    warningAlert,
+    itemSections,
+    errorMessages,
+    globalErrorCheck,
+    onDataChange
+  } = props
   const isEdition = !!props.data
   const [error, setError] = useState<string>()
 
@@ -35,6 +47,19 @@ export default function CriteriaForm<T extends CommonCriteriaData>(props: Criter
     selectedPopulation
       .map((population) => population && population.access)
       .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
+
+  if (globalErrorCheck) {
+    const context = { deidentified }
+    let globalError: string | undefined = undefined
+    if (isFunction(globalErrorCheck)) {
+      globalError = globalErrorCheck(criteriaData as Record<string, DataTypes>, context)
+    } else if (isString(globalErrorCheck)) {
+      globalError = eval(globalErrorCheck)(criteriaData, context)
+    }
+    if (globalError !== error) {
+      setError(globalError)
+    }
+  }
 
   useEffect(() => {
     onDataChange?.(criteriaData)
@@ -81,30 +106,23 @@ export default function CriteriaForm<T extends CommonCriteriaData>(props: Criter
           })}
         >
           {section.items.map((item, index) => (
-            <CFItemWrapper
+            <CFItem
               key={index}
-              label={item.extraLabel}
-              info={item.extraInfo}
-              data={criteriaData}
-              context={{ deidentified }}
-            >
-              <CFItem
-                {...{
-                  viewRenderers: FORM_ITEM_RENDERER,
-                  ...item,
-                  data: criteriaData,
-                  getValueSetOptions: (valueSetId) => {
-                    return (valueSets.entities[valueSetId]?.options || []) as LabelObject[]
-                  },
-                  searchCode: props.searchCode,
-                  updateData: (newData: T) => {
-                    setCriteriaData({ ...criteriaData, ...newData })
-                  },
-                  deidentified,
-                  setError
-                }}
-              />
-            </CFItemWrapper>
+              {...{
+                viewRenderers: FORM_ITEM_RENDERER,
+                ...item,
+                data: criteriaData,
+                getValueSetOptions: (valueSetId) => {
+                  return (valueSets.entities[valueSetId]?.options || []) as LabelObject[]
+                },
+                searchCode: props.searchCode,
+                updateData: (newData: T) => {
+                  setCriteriaData({ ...criteriaData, ...newData })
+                },
+                deidentified,
+                setError
+              }}
+            />
           ))}
         </CFSection>
       ))}

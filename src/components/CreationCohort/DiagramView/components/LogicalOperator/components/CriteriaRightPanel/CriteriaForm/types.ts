@@ -33,6 +33,7 @@ type BaseCriteriaItem = {
   // for conditionnal fields
   displayCondition?: ((data: Record<string, DataTypes>, context: Context) => boolean) | string
   disableCondition?: ((data: Record<string, DataTypes>, context: Context) => boolean) | string
+  displayValueSummary?: (data: DataTypes) => string | string
 }
 
 type WithLabel = {
@@ -325,6 +326,7 @@ export type CriteriaForm<T> = {
     // should return true if the criteria is to be unbuild for the current fhir filter
     subType?: string
   }
+  globalErrorCheck?: ((data: Record<string, DataTypes>, context: Context) => string | undefined) | string
   itemSections: CriteriaSection<T>[]
 }
 

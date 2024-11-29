@@ -19,17 +19,32 @@ export const form: () => CriteriaForm<IPPListDataType> = () => ({
     criteriaType: CriteriaType.IPP_LIST,
     resourceType: ResourceType.IPP_LIST // TODO should be ResourceType.PATIENT
   },
-  errorMessages: {},
+  errorMessages: {
+    AT_LEAST_ONE_IPP: 'Merci de renseigner au moins un IPP'
+  },
+  globalErrorCheck: (data) => {
+    console.log('errocheck', data)
+    if (data.search && (data.search as string).length > 0) {
+      return undefined
+    }
+    return 'AT_LEAST_ONE_IPP'
+  },
   itemSections: [
     {
       items: [
         {
           valueKey: 'search',
           type: 'textWithRegex',
-          label: "Recherche par uid d'étude",
           regex: '(?:^|\\D+)?(8\\d{9})(?:$|\\D+)',
           placeholder: "Ajouter une liste d'IPP",
           extractValidValues: true,
+          displayValueSummary: (value) => {
+            const ippList = (value as string)
+              .trim()
+              .split(',')
+              .filter((ipp) => ipp.length > 0)
+            return `${ippList.length} IPP détecté${ippList.length > 1 ? 's' : ''}.`
+          },
           multiline: true,
           buildInfo: {
             fhirKey: IppParamsKeys.IPP_LIST_FHIR,
