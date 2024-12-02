@@ -22,7 +22,8 @@ export type ObservationDataType = CommonCriteriaData &
   }
 
 export const form: () => CriteriaForm<ObservationDataType> = () => ({
-  label: 'Biologie',
+  label: 'de biologie',
+  title: 'Biologie',
   initialData: {
     id: undefined,
     type: CriteriaType.OBSERVATION,

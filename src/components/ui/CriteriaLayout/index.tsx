@@ -10,6 +10,7 @@ type CriteriaLayoutProps = {
   onSubmit: () => void
   disabled: boolean
   criteriaLabel: string
+  mainTitle: string
   title: string
   onChangeTitle: (title: string) => void
   isInclusive: boolean
@@ -26,6 +27,7 @@ const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
   disabled,
   criteriaLabel,
   children,
+  mainTitle,
   title,
   onChangeTitle,
   isInclusive,
@@ -85,7 +87,7 @@ const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
           )}
 
         <Grid className={classes.inputContainer} container>
-          <Typography variant="h6">{criteriaLabel}</Typography>
+          <Typography variant="h6">{mainTitle}</Typography>
 
           <TextField
             required

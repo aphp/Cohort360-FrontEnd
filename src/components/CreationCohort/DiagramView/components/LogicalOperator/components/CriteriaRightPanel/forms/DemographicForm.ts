@@ -13,7 +13,8 @@ export type DemographicDataType = CommonCriteriaData & {
 }
 
 export const form: () => CriteriaForm<DemographicDataType> = () => ({
-  label: 'Démographie patient',
+  label: 'démographique',
+  title: 'Démographie patient',
   initialData: {
     type: CriteriaType.PATIENT,
     title: 'Critère démographique',

@@ -21,7 +21,8 @@ export type GhmDataType = CommonCriteriaData &
   }
 
 export const form: () => CriteriaForm<GhmDataType> = () => ({
-  label: 'GHM',
+  label: 'de GHM',
+  title: 'GHM',
   initialData: {
     title: 'Critères GHM',
     type: CriteriaType.CLAIM,
