@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 import { Grid, MenuItem, Select, SelectChangeEvent, TextField } from '@mui/material'
 import { Comparators } from 'types/requestCriterias'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
@@ -11,6 +11,7 @@ type OccurenceInputProps = {
   enableNegativeValues?: boolean
   floatValues?: boolean
   label?: string
+  info?: ReactNode
   withHierarchyInfo?: boolean
   allowBetween?: boolean
   disabled?: boolean
@@ -24,6 +25,7 @@ const OccurenceInput = ({
   floatValues = false,
   enableNegativeValues = false,
   label,
+  info,
   withHierarchyInfo = false,
   allowBetween = false,
   disabled = false
@@ -86,14 +88,16 @@ const OccurenceInput = ({
         <CriteriaLabel
           label={label}
           infoIcon={
-            withHierarchyInfo && (
-              <span>
-                Si vous choisissez un chapitre, le nombre d'occurrences ne s'applique pas sur un unique élément de ce
-                chapitre, mais sur l'ensemble des éléments de ce chapitre. <br /> Exemple: Nombre d'occurrences &ge; 3
-                sur un chapitre signifie que l'on inclus les patients qui ont eu au moins 3 éléments de ce chapitre,
-                distincts ou non.
-              </span>
-            )
+            info
+              ? info
+              : withHierarchyInfo && (
+                  <span>
+                    Si vous choisissez un chapitre, le nombre d'occurrences ne s'applique pas sur un unique élément de
+                    ce chapitre, mais sur l'ensemble des éléments de ce chapitre. <br /> Exemple: Nombre d'occurrences
+                    &ge; 3 sur un chapitre signifie que l'on inclus les patients qui ont eu au moins 3 éléments de ce
+                    chapitre, distincts ou non.
+                  </span>
+                )
           }
         />
       )}
