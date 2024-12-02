@@ -280,6 +280,7 @@ export type CriteriaItemBuildInfo = {
     fhirKey?: FhirKey
     buildMethod?: keyof typeof BUILD_MAPPERS
     buildMethodExtraArgs?: Array<BuildMethodExtraParam>
+    ignoreIf?: ((data: Record<string, DataTypes>, context: Context) => boolean) | string
     unbuildMethod?: keyof typeof UNBUILD_MAPPERS
     unbuildMethodExtraArgs?: Array<DataTypes>
     chipDisplayMethod?: keyof typeof CHIPS_DISPLAY_METHODS
