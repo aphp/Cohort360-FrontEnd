@@ -59,7 +59,7 @@ export type HospitDataType = CommonCriteriaData &
   }
 
 export const form: () => CriteriaForm<HospitDataType> = () => ({
-  label: "Critère de Fiche d'hopsitalisation",
+  label: "Critère de Fiche d'hospitalisation",
   initialData: {
     title: "Critère de Fiche d'hospitalisation",
     type: CriteriaType.HOSPIT,
@@ -447,7 +447,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => ({
         {
           valueKey: 'birthDeliveryDate',
           type: 'calendarRange',
-          label: "Date/heure de l'accouchement",
+          extraLabel: () => "Date/heure de l'accouchement",
           errorType: 'INCOHERENT_AGE_ERROR',
           buildInfo: {
             fhirKey: {

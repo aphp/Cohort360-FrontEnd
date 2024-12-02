@@ -2,8 +2,7 @@ import { makeStyles } from 'tss-react/mui'
 
 const useStyles = makeStyles()(() => ({
   inputItem: {
-    margin: '1em'
-    // width: 'calc(100% - 2em)'
+    margin: '1em 1em 0'
   }
 }))
 

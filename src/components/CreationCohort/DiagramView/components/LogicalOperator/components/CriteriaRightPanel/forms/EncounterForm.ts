@@ -93,7 +93,7 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           valueKey: 'age',
           type: 'durationRange',
           extraLabel: () => 'Âge au début de la prise en charge',
-          info: "La valeur par défaut sera prise en compte si le sélecteur d'âge n'a pas été modifié.",
+          extraInfo: "La valeur par défaut sera prise en compte si le sélecteur d'âge n'a pas été modifié.",
           buildInfo: {
             fhirKey: {
               main: EncounterParamsKeys.MIN_BIRTHDATE_DAY,
@@ -106,6 +106,7 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           valueKey: 'duration',
           type: 'durationRange',
           extraLabel: () => 'Durée de la prise en charge',
+          extraInfo: 'Ne concerne pas les consultations.',
           buildInfo: {
             fhirKey: EncounterParamsKeys.DURATION,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Prise en charge : ' }]
@@ -115,7 +116,8 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           valueKey: 'encounterStartDate',
           type: 'calendarRange',
           label: 'Début de prise en charge',
-          extraLabel: () => 'Durée de prise en charge',
+          extraLabel: () => 'Date de prise en charge',
+          extraInfo: 'Ne concerne pas les consultations.',
           labelAltStyle: true,
           withOptionIncludeNull: true,
           errorType: 'INCOHERENT_VALUE_ERROR',

@@ -54,6 +54,7 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
           valueKey: 'occurrence',
           type: 'numberAndComparator',
           label: "Nombre d'occurrences",
+          withHierarchyInfo: true,
           buildInfo: {
             chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'occurrences" }]
           }
@@ -134,6 +135,7 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
           label: 'Début de prise en charge',
           labelAltStyle: true,
           extraLabel: () => 'Prise en charge',
+          extraInfo: 'Ne concerne pas les consultations.',
           withOptionIncludeNull: true,
           buildInfo: {
             fhirKey: 'encounter.period-start',
@@ -156,7 +158,7 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
           valueKey: 'startOccurrence',
           type: 'calendarRange',
           errorType: 'ADVANCED_INPUTS_ERROR',
-          extraLabel: () => 'Date de classement en GHM',
+          extraLabel: () => "Date de l'acte CCAM",
           buildInfo: {
             fhirKey: ProcedureParamsKeys.DATE,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Date de classement en GHM' }]

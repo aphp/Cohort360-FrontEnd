@@ -56,6 +56,7 @@ export const form: () => CriteriaForm<Cim10DataType> = () => ({
           valueKey: 'occurrence',
           type: 'numberAndComparator',
           label: "Nombre d'occurrences",
+          withHierarchyInfo: true,
           buildInfo: {
             chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'occurrences" }]
           }
@@ -146,6 +147,7 @@ export const form: () => CriteriaForm<Cim10DataType> = () => ({
           label: 'Début de prise en charge',
           labelAltStyle: true,
           extraLabel: () => 'Prise en charge',
+          extraInfo: 'Ne concerne pas les consultations.',
           withOptionIncludeNull: true,
           buildInfo: {
             fhirKey: 'encounter.period-start',

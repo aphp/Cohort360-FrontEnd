@@ -110,8 +110,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => ({
         {
           valueKey: 'pregnancyDate',
           type: 'calendarRange',
-          label: 'Date de début de grossesse',
-          withOptionIncludeNull: true,
+          extraLabel: () => 'Date de début de grossesse',
           errorType: 'INCOHERENT_VALUE_ERROR',
           buildInfo: {
             fhirKey: {
@@ -179,7 +178,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => ({
           valueKey: 'maternalRisksPrecision',
           type: 'textWithCheck',
           label: 'Risques liés aux antécédents maternels - Précision autre',
-          placeholder: 'Précision autre',
+          placeholder: 'Risques liés aux antécédents maternels - Précision autre',
           errorType: 'SEARCHINPUT_ERROR',
           buildInfo: {
             fhirKey: {
@@ -207,7 +206,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => ({
           valueKey: 'risksRelatedToObstetricHistoryPrecision',
           type: 'textWithCheck',
           label: 'Risques liés aux antécédents obstétricaux - précision autre',
-          placeholder: 'Précision autre',
+          placeholder: 'Risques liés aux antécédents obstétricaux - Précision autre',
           errorType: 'SEARCHINPUT_ERROR',
           buildInfo: {
             fhirKey: {
@@ -272,7 +271,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => ({
           valueKey: 'risksOrComplicationsOfPregnancyPrecision',
           type: 'textWithCheck',
           label: 'Risques ou complications de la grossesse - Précision autre',
-          placeholder: 'Précision autre',
+          placeholder: 'Risques ou complications de la grossesse - Précision autre',
           errorType: 'SEARCHINPUT_ERROR',
           buildInfo: {
             fhirKey: {

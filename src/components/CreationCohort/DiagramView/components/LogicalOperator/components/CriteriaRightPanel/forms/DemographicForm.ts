@@ -79,7 +79,7 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
         {
           valueKey: 'birthdates',
           type: 'calendarRange',
-          label: 'Date de naissance',
+          extraLabel: () => 'Date de naissance',
           errorType: 'INCOHERENT_VALUE_ERROR',
           displayCondition: (data, context) => {
             return !context.deidentified
@@ -129,7 +129,7 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
         {
           valueKey: 'deathDates',
           type: 'calendarRange',
-          label: 'Date de décès',
+          extraLabel: () => 'Date de décès',
           errorType: 'INCOHERENT_VALUE_ERROR',
           displayCondition: (data, context) => {
             const typedData = data as DemographicDataType
