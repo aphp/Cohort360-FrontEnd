@@ -98,6 +98,10 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
           },
           buildInfo: {
             fhirKey: ObservationParamsKeys.VALUE,
+            ignoreIf: (data) => {
+              const typedData = data as ObservationDataType
+              return typedData.code?.length !== 1 || !typedData.code[0].isLeaf
+            },
             buildMethodExtraArgs: [{ type: 'string', value: 'le0,ge0' }],
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Valeur' }]
           }
