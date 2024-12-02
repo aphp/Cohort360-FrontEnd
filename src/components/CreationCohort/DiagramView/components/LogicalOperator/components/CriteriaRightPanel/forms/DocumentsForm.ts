@@ -17,7 +17,7 @@ export type DocumentDataType = CommonCriteriaData &
   WithEncounterStatusDataType & {
     type: CriteriaType.DOCUMENTS
     search: string
-    searchBy: string // SearchByTypes.TEXT | SearchByTypes.DESCRIPTION
+    searchBy: LabelObject[] | null
     docType: LabelObject[] | null
     docStatuses: LabelObject[] | null
   }
@@ -35,7 +35,7 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
     encounterEndDate: null,
     encounterStatus: [],
     search: '',
-    searchBy: 'TEXT', // Default to SearchByTypes.TEXT
+    searchBy: [{ id: SearchByTypes.TEXT, label: 'Titre du document' }],
     docType: null,
     docStatuses: null
   },
@@ -65,28 +65,16 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
         },
         {
           valueKey: 'searchBy',
-          type: 'radioChoice',
+          type: 'autocomplete',
           label: 'Rechercher dans :',
-          choices: [
-            { id: 'TEXT', label: 'Corps du document' },
-            { id: 'DESCRIPTION', label: 'Titre du document' }
-          ]
+          valueSetId: 'docSearchBy',
+          singleChoice: true,
+          valueSetData: [
+            { id: SearchByTypes.TEXT, label: 'Corps du document' },
+            { id: SearchByTypes.DESCRIPTION, label: 'Titre du document' }
+          ],
+          noOptionsText: 'Veuillez sélectionner le type de recherche désiré'
         },
-        // {
-        //   valueKey: 'searchBy',
-        //   type: 'autocomplete',
-        //   label: 'Rechercher dans :',
-        //   valueSetId: 'docSearchBy',
-        //   singleChoice: true,
-        //   valueSetData: [
-        //     { id: SearchByTypes.TEXT, label: 'Corps du document' },
-        //     { id: SearchByTypes.DESCRIPTION, label: 'Titre du document' }
-        //   ],
-        //   noOptionsText: 'Veuillez sélectionner le type de recherche désiré'
-        //   // buildInfo: {
-        //   //   // fhirKey: SearchByTypes.TEXT
-        //   // }
-        // },
         {
           valueKey: 'search',
           type: 'textWithCheck',
