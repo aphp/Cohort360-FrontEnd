@@ -31,9 +31,11 @@ type BaseCriteriaItem = {
   extraLabel?: string | ((data: Record<string, DataTypes>, context: Context) => string)
   extraInfo?: string
   // for conditionnal fields
-  displayCondition?: ((data: Record<string, DataTypes>, context: Context) => boolean) | string
-  disableCondition?: ((data: Record<string, DataTypes>, context: Context) => boolean) | string
-  displayValueSummary?: (data: DataTypes) => string | string
+  displayCondition?: ((data: Record<string, DataTypes>, context: Context) => boolean) | string // the displayCondition is used to hide the field
+  disableCondition?: ((data: Record<string, DataTypes>, context: Context) => boolean) | string // the disableCondition is used to disable the field
+  displayValueSummary?: (data: DataTypes) => string | string // the displayValueSummary is used to display a summary of the value
+  // for resetting the value of the field
+  resetCondition?: ((data: Record<string, DataTypes>, context: Context) => boolean) | string // the resetCondition is used to reset the value of the field
 }
 
 type WithLabel = {
@@ -77,14 +79,13 @@ export type RadioChoiceCriteriaItem = BaseCriteriaItem & {
   choices: LabelObject[]
 }
 
-export type NumberWithComparatorCriteriaItem = BaseCriteriaItem &
-  WithLabel & {
-    type: 'numberAndComparator'
-    withHierarchyInfo?: boolean
-    withInfo?: ReactNode
-    floatValues?: boolean
-    allowBetween?: boolean
-  }
+export type NumberWithComparatorCriteriaItem = BaseCriteriaItem & {
+  type: 'numberAndComparator'
+  withHierarchyInfo?: boolean
+  withInfo?: ReactNode
+  floatValues?: boolean
+  allowBetween?: boolean
+}
 
 export type DurationItem = BaseCriteriaItem & {
   type: 'durationRange'
@@ -277,14 +278,15 @@ export type FhirKey =
 
 export type CriteriaItemBuildInfo = {
   buildInfo?: {
-    fhirKey?: FhirKey
-    buildMethod?: keyof typeof BUILD_MAPPERS
-    buildMethodExtraArgs?: Array<BuildMethodExtraParam>
-    ignoreIf?: ((data: Record<string, DataTypes>, context: Context) => boolean) | string
-    unbuildMethod?: keyof typeof UNBUILD_MAPPERS
-    unbuildMethodExtraArgs?: Array<DataTypes>
-    chipDisplayMethod?: keyof typeof CHIPS_DISPLAY_METHODS
-    chipDisplayMethodExtraArgs?: Array<BuildMethodExtraParam>
+    fhirKey?: FhirKey // the key (fhir param name) to use in the fhir filter
+    buildMethod?: keyof typeof BUILD_MAPPERS // one of the build mappers, if not provided the default build method for this type of criteria will be used
+    buildMethodExtraArgs?: Array<BuildMethodExtraParam> // extra arguments to pass to the build method
+    ignoreIf?: ((data: Record<string, DataTypes>) => boolean) | string // if true, the criteria value will be set to null and therefore ignored in the build / chip display process
+    unbuildMethod?: keyof typeof UNBUILD_MAPPERS // one of the unbuild mappers, if not provided the default unbuild method for this type of criteria will be used
+    unbuildMethodExtraArgs?: Array<DataTypes> // extra arguments to pass to the unbuild method
+    unbuildIgnoreValues?: DataTypes[] // if the filter raw value is found in this list, unbuilding (setting the value to the criteria data object from the filter) will be ignored for this criteria. It is mainly used to match default values
+    chipDisplayMethod?: keyof typeof CHIPS_DISPLAY_METHODS // one of the chip display mappers, if not provided the default chip display method for this type of criteria will be used
+    chipDisplayMethodExtraArgs?: Array<BuildMethodExtraParam> // extra arguments to pass to the chip display method
   }
 }
 

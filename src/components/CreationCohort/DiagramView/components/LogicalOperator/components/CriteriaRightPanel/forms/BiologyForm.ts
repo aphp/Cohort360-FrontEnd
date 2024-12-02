@@ -19,6 +19,7 @@ export type ObservationDataType = CommonCriteriaData &
     type: CriteriaType.OBSERVATION
     code: LabelObject[] | null
     searchByValue: NumberAndComparatorDataType | null
+    enableSearchByValue: boolean
   }
 
 export const form: () => CriteriaForm<ObservationDataType> = () => ({
@@ -37,7 +38,8 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
     encounterEndDate: null,
     encounterStatus: [],
     code: null,
-    searchByValue: null
+    searchByValue: null,
+    enableSearchByValue: false
   },
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   warningAlert: [
@@ -85,14 +87,34 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
           }
         },
         {
-          // TODO: ajouter une checkbox (??? l'UX était pas top en vrai) pour valider l'ajout d'une recherche par valeur
+          valueKey: 'enableSearchByValue',
+          label: 'Activer la recherche par valeur',
+          info: 'Pour pouvoir rechercher par valeur, vous devez sélectionner un seul et unique analyte (élement le plus fin de la hiérarchie).',
+          type: 'boolean',
+          displayCondition: (data) => {
+            const typedData = data as ObservationDataType
+            return typedData.code?.length === 1 && !!typedData.code[0].isLeaf
+          },
+          resetCondition: (data) => {
+            const typedData = data as ObservationDataType
+            return typedData.code?.length !== 1 || !typedData.code[0].isLeaf
+          },
+          buildInfo: {
+            fhirKey: ObservationParamsKeys.VALUE,
+            buildMethod: 'noop',
+            chipDisplayMethod: 'noop',
+            unbuildMethod: 'unbuildBooleanFromDataNonNullStatus'
+          }
+        },
+        {
           valueKey: 'searchByValue',
           type: 'numberAndComparator',
-          label: 'Recherche par valeur',
-          info: 'Pour pouvoir rechercher par valeur, vous devez sélectionner un seul et unique analyte (élement le plus fin de la hiérarchie).',
           allowBetween: true,
           withHierarchyInfo: false,
-          disableCondition: (data) => {
+          displayCondition: (data) => {
+            return !!data.enableSearchByValue
+          },
+          resetCondition: (data) => {
             const typedData = data as ObservationDataType
             return typedData.code?.length !== 1 || !typedData.code[0].isLeaf
           },
@@ -100,16 +122,18 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
             fhirKey: ObservationParamsKeys.VALUE,
             ignoreIf: (data) => {
               const typedData = data as ObservationDataType
-              return typedData.code?.length !== 1 || !typedData.code[0].isLeaf
+              return typedData.code?.length !== 1 || !typedData.code[0].isLeaf || !data.enableSearchByValue
             },
             buildMethodExtraArgs: [{ type: 'string', value: 'le0,ge0' }],
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Valeur' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Valeur' }],
+            unbuildIgnoreValues: ['le0,ge0']
           }
         },
         {
           valueKey: 'encounterStatus',
           type: 'autocomplete',
           label: 'Statut de la visite associée',
+          extraLabel: () => 'Statut de la visite',
           valueSetId: getConfig().core.valueSets.encounterStatus.url,
           noOptionsText: 'Veuillez entrer un statut de visite associée',
           buildInfo: {

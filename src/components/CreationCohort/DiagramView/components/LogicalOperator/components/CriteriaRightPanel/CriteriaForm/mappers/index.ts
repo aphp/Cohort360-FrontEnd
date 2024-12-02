@@ -5,7 +5,7 @@ import extractFilterParams, { FhirFilter } from 'utils/fhirFilterParser'
 import { CriteriaItemType } from 'types'
 import { ValueSetStore } from 'state/valueSets'
 import { ReactNode } from 'react'
-import { isArray, isString } from 'lodash'
+import { isArray, isFunction, isString } from 'lodash'
 import { BUILD_MAPPERS, BuilderMethod, UNBUILD_MAPPERS } from './buildMappers'
 
 /************************************************************************************/
@@ -199,7 +199,15 @@ export const constructFhirFilterForType = <T extends SelectedCriteriaType>(
           ? parseFhirKey(buildInfo.fhirKey, deidentified, criteria)
           : buildInfo.fhirKey
       const buildMethod = buildInfo.buildMethod ? BUILD_MAPPERS[buildInfo.buildMethod] : DEFAULT_BUILD_METHOD[item.type]
-      const value = criteria[item.valueKey] as DataTypes
+      let value = criteria[item.valueKey] as DataTypes
+      if (buildInfo.ignoreIf) {
+        const ignore = isFunction(buildInfo.ignoreIf)
+          ? buildInfo.ignoreIf(criteria)
+          : eval(buildInfo.ignoreIf)(criteria)
+        if (ignore) {
+          value = null
+        }
+      }
       const filterValues = buildMethod(
         value,
         fhirKey,
@@ -267,21 +275,31 @@ export const unbuildCriteriaDataFromDefinition = async <T extends SelectedCriter
         const key = filter[0] ?? null
         const value = filter[1] ?? null
         if (key !== null) {
-          const item = criteriaItems.find((item) => matchFhirKey(key, item.buildInfo?.fhirKey))
-          if (item?.buildInfo?.fhirKey && item?.valueKey) {
-            const unbuildMethod = item.buildInfo.unbuildMethod
-              ? UNBUILD_MAPPERS[item.buildInfo.unbuildMethod]
-              : DEFAULT_UNBUILD_METHOD[item.type]
-            const dataValue = await unbuildMethod(
-              value,
-              !isString(item.buildInfo.fhirKey) &&
-                'deid' in item.buildInfo.fhirKey &&
-                item.buildInfo?.fhirKey.deid === key,
-              emptyCriterion[item?.valueKey] as DataTypes,
-              key,
-              item.buildInfo.unbuildMethodExtraArgs || []
-            )
-            emptyCriterion[item?.valueKey] = dataValue as T[keyof T]
+          const matchingItems = criteriaItems.filter((item) => matchFhirKey(key, item.buildInfo?.fhirKey))
+          for (const item of matchingItems) {
+            if (item?.buildInfo?.fhirKey && item?.valueKey) {
+              if (
+                item.buildInfo.unbuildIgnoreValues &&
+                item.buildInfo.unbuildIgnoreValues.find(
+                  (ignoreValue) => JSON.stringify(ignoreValue) === JSON.stringify(value)
+                )
+              ) {
+                continue
+              }
+              const unbuildMethod = item.buildInfo.unbuildMethod
+                ? UNBUILD_MAPPERS[item.buildInfo.unbuildMethod]
+                : DEFAULT_UNBUILD_METHOD[item.type]
+              const dataValue = await unbuildMethod(
+                value,
+                !isString(item.buildInfo.fhirKey) &&
+                  'deid' in item.buildInfo.fhirKey &&
+                  item.buildInfo?.fhirKey.deid === key,
+                emptyCriterion[item.valueKey] as DataTypes,
+                key,
+                item.buildInfo.unbuildMethodExtraArgs || []
+              )
+              emptyCriterion[item.valueKey] = dataValue as T[keyof T]
+            }
           }
         }
       }
@@ -309,7 +327,15 @@ export const criteriasAsArray = (
     .flatMap((section) => section.items)
     .map((item) => {
       if (!item.buildInfo || !item.valueKey) return null
-      const val = selectedCriteria[item.valueKey as keyof typeof selectedCriteria]
+      let val = selectedCriteria[item.valueKey as keyof typeof selectedCriteria]
+      if (item.buildInfo.ignoreIf) {
+        const ignore = isFunction(item.buildInfo.ignoreIf)
+          ? item.buildInfo.ignoreIf(selectedCriteria)
+          : eval(item.buildInfo.ignoreIf)(selectedCriteria)
+        if (ignore) {
+          val = null
+        }
+      }
       if (!val || (isArray(val) && val.length === 0)) return null
       const chipBuilder = item.buildInfo?.chipDisplayMethod
         ? CHIPS_DISPLAY_METHODS[item.buildInfo?.chipDisplayMethod]

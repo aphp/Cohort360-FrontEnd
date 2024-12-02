@@ -258,7 +258,14 @@ export const UNBUILD_MAPPERS = {
     args: Array<DataTypes>
   ) => {
     Promise.resolve((args[0] as LabelObject[]).find((l) => l.id === fhirkey))
-  }
+  },
+  unbuildBooleanFromDataNonNullStatus: async (
+    val: string,
+    deid: boolean,
+    existingValue: DataTypes,
+    fhirkey: string,
+    args: Array<DataTypes>
+  ) => Promise.resolve(!!val)
 }
 
 export const BUILD_MAPPERS = {

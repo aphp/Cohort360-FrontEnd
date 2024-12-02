@@ -7,7 +7,6 @@ import {
   Autocomplete,
   Checkbox,
   FormControlLabel,
-  FormLabel,
   Grid,
   Radio,
   RadioGroup,
@@ -27,6 +26,8 @@ import { BlockWrapper } from 'components/ui/Layout'
 import { fetchValueSet } from 'services/aphp/callApi'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
+import { CriteriaLabel } from 'components/ui/CriteriaLabel'
+import { Comparators } from 'types/requestCriterias'
 
 /************************************************************************************/
 /*                        Criteria Form Item Renderer                               */
@@ -203,7 +204,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     )
   },
   numberAndComparator: (props) => {
-    const nonNullValue = props.value ?? { value: 0, comparator: 'GREATER_OR_EQUAL' }
+    const nonNullValue = props.value ?? { value: 0, comparator: Comparators.GREATER_OR_EQUAL }
     return (
       <OccurenceInput
         floatValues={props.definition.floatValues}
@@ -223,11 +224,19 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
   },
   boolean: (props) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { classes } = useStyles()
     return (
-      <BlockWrapper className={classes.inputItem} container alignItems="center">
-        <FormLabel component="legend">{props.definition.label}</FormLabel>
-        <Switch checked={props.value} onChange={(event) => props.updateData(event.target.checked)} color="secondary" />
+      <BlockWrapper container alignItems="center">
+        <CriteriaLabel
+          label={props.definition.label || ''}
+          infoIcon={props.definition.extraInfo}
+          style={{ padding: 0 }}
+        >
+          <Switch
+            checked={props.value}
+            onChange={(event) => props.updateData(event.target.checked)}
+            disabled={props.disabled}
+          />
+        </CriteriaLabel>
       </BlockWrapper>
     )
   },

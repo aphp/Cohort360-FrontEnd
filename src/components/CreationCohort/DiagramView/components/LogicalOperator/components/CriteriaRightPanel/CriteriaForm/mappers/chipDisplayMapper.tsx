@@ -133,7 +133,7 @@ const getLabelsForCodeSearchItem = (
     .map((value) => {
       return (
         (value.system ? valueSets.cache[value.system] : item.valueSetIds.flatMap((vid) => valueSets.cache[vid])) || []
-      ).find((code) => code.id === value.id) as LabelObject
+      ).find((code) => code && code.id === value.id) as LabelObject
     })
     .filter((code) => code !== undefined)
 }
