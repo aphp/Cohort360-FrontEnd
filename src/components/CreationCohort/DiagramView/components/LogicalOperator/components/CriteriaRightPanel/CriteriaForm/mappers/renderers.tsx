@@ -217,6 +217,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         onchange={(newCount, newComparator, maxValue) => {
           props.updateData({ value: newCount, comparator: newComparator, maxValue: maxValue })
         }}
+        info={props.definition.info}
         withHierarchyInfo={props.definition.withHierarchyInfo}
         disabled={props.disabled}
       />

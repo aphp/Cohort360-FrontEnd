@@ -86,6 +86,7 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
           valueKey: 'searchByValue',
           type: 'numberAndComparator',
           label: 'Recherche par valeur',
+          info: 'Pour pouvoir rechercher par valeur, vous devez sélectionner un seul et unique analyte (élement le plus fin de la hiérarchie).',
           allowBetween: true,
           withHierarchyInfo: false,
           disableCondition: (data) => {
