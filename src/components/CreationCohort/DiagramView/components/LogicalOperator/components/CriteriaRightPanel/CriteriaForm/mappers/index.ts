@@ -142,7 +142,13 @@ const DEFAULT_BUILD_METHOD: Record<CriteriaFormItemType, BuilderMethod> = {
 
 const DEFAULT_UNBUILD_METHOD: Record<
   CriteriaFormItemType,
-  (arg: string, deidentified: boolean, existingValue?: DataTypes) => Promise<DataTypes>
+  (
+    arg: string,
+    deidentified: boolean,
+    existingValue: DataTypes,
+    fhirKey: string,
+    args: Array<DataTypes>
+  ) => Promise<DataTypes>
 > = {
   calendarRange: UNBUILD_MAPPERS.unbuildDate,
   durationRange: UNBUILD_MAPPERS.unbuildDuration,
@@ -271,7 +277,9 @@ export const unbuildCriteriaDataFromDefinition = async <T extends SelectedCriter
               !isString(item.buildInfo.fhirKey) &&
                 'deid' in item.buildInfo.fhirKey &&
                 item.buildInfo?.fhirKey.deid === key,
-              emptyCriterion[item?.valueKey] as DataTypes
+              emptyCriterion[item?.valueKey] as DataTypes,
+              key,
+              item.buildInfo.unbuildMethodExtraArgs || []
             )
             emptyCriterion[item?.valueKey] = dataValue as T[keyof T]
           }

@@ -73,7 +73,24 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
             { id: SearchByTypes.TEXT, label: 'Corps du document' },
             { id: SearchByTypes.DESCRIPTION, label: 'Titre du document' }
           ],
-          noOptionsText: 'Veuillez sélectionner le type de recherche désiré'
+          noOptionsText: 'Veuillez sélectionner le type de recherche désiré',
+          buildInfo: {
+            fhirKey: {
+              main: SearchByTypes.TEXT,
+              alt: SearchByTypes.DESCRIPTION,
+              value1: { type: 'string', value: SearchByTypes.TEXT },
+              value2: { type: 'reference', value: 'searchBy' }
+            },
+            buildMethod: 'noop', // the filter will be ignored
+            unbuildMethod: 'unbuildFromLabelObjectFromKey',
+            unbuildMethodExtraArgs: [
+              [
+                { id: SearchByTypes.TEXT, label: 'Corps du document' },
+                { id: SearchByTypes.DESCRIPTION, label: 'Titre du document' }
+              ]
+            ],
+            chipDisplayMethod: 'noop'
+          }
         },
         {
           valueKey: 'search',

@@ -298,5 +298,6 @@ export const CHIPS_DISPLAY_METHODS = {
           valueSets,
           args.slice(3).filter((arg, i) => i % 2 === 1)
         )
-  }
+  },
+  noop: () => undefined
 }
