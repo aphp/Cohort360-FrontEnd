@@ -116,12 +116,7 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
           displayCondition: (data) => data.type === CriteriaType.MEDICATION_REQUEST,
           buildInfo: {
             fhirKey: PrescriptionParamsKeys.PRESCRIPTION_TYPES,
-            buildMethodExtraArgs: [
-              { type: 'method', value: 'buildLabelObject' },
-              { type: 'reference', value: 'type' },
-              { type: 'string', value: ResourceType.MEDICATION_ADMINISTRATION }
-            ],
-            buildMethod: 'skipIf'
+            ignoreIf: (data) => data.type === CriteriaType.MEDICATION_ADMINISTRATION
           }
         },
         {

@@ -51,12 +51,21 @@ export const renderLabel = (label: string, tooltip?: string, altStyle?: boolean)
 }
 
 export const CFItem = <T, V extends DataTypeMappings, U extends CriteriaItem<T, V>>(props: CritieraItemProps<T, V>) => {
-  const { valueKey, updateData, data, setError, getValueSetOptions, searchCode, viewRenderers } = props
+  const { valueKey, updateData, data, setError, getValueSetOptions, searchCode, viewRenderers, resetCondition } = props
   const View = viewRenderers[props.type] as CriteriaFormItemView<U['type']>
-  const fieldValue = (valueKey ? data[valueKey] : undefined) as DataTypeMapping[U['type']]['dataType']
+  const fieldValue = (valueKey ? data[valueKey] : undefined) as DataTypeMapping[U['type']]['dataType'] | null
   const context = { deidentified: props.deidentified }
   const displayCondition = props.displayCondition
-  console.log('rerendering', props.label, data)
+
+  if (
+    valueKey &&
+    fieldValue !== null &&
+    resetCondition &&
+    ((isFunction(resetCondition) && resetCondition(data as Record<string, DataTypes>, context)) ||
+      (isString(resetCondition) && eval(resetCondition)(data, context)))
+  ) {
+    updateData({ ...data, [valueKey]: null })
+  }
   if (
     displayCondition &&
     ((isFunction(displayCondition) && !displayCondition(data as Record<string, DataTypes>, context)) ||
@@ -79,7 +88,7 @@ export const CFItem = <T, V extends DataTypeMappings, U extends CriteriaItem<T, 
       context={context}
     >
       <View
-        value={fieldValue}
+        value={fieldValue as DataTypeMapping[U['type']]['dataType']}
         disabled={disabled}
         definition={props}
         updateData={(value) => valueKey && updateData({ ...data, [valueKey]: value })}
