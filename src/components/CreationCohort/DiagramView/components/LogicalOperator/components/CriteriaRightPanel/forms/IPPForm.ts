@@ -7,7 +7,8 @@ export type IPPListDataType = CommonCriteriaData & {
 }
 
 export const form: () => CriteriaForm<IPPListDataType> = () => ({
-  label: "Liste d'IPP",
+  label: "de liste d'IPP",
+  title: "Liste d'IPP",
   initialData: {
     type: CriteriaType.IPP_LIST,
     title: "Liste d'IPP",

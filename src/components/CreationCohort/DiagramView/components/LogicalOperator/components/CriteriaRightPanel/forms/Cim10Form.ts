@@ -21,7 +21,8 @@ export type Cim10DataType = CommonCriteriaData &
   }
 
 export const form: () => CriteriaForm<Cim10DataType> = () => ({
-  label: 'Diagnostic',
+  label: 'de diagnostic',
+  title: 'Diagnostic',
   initialData: {
     type: CriteriaType.CONDITION,
     title: 'Critère de diagnostic',

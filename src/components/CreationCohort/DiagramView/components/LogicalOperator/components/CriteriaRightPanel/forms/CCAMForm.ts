@@ -20,7 +20,8 @@ export type CcamDataType = CommonCriteriaData &
   }
 
 export const form: () => CriteriaForm<CcamDataType> = () => ({
-  label: 'Actes CCAM',
+  label: "d'actes CCAM",
+  title: 'Actes CCAM',
   initialData: {
     type: CriteriaType.PROCEDURE,
     title: "Critères d'actes CCAM",

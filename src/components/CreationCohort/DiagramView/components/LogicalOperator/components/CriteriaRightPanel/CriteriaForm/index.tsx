@@ -32,6 +32,7 @@ export default function CriteriaForm<T extends CommonCriteriaData>(props: Criter
     goBack,
     updateData,
     label,
+    title,
     infoAlert,
     warningAlert,
     itemSections,
@@ -70,6 +71,7 @@ export default function CriteriaForm<T extends CommonCriteriaData>(props: Criter
   return (
     <CriteriaLayout
       criteriaLabel={`${label}`}
+      mainTitle={title}
       title={criteriaData.title}
       onChangeTitle={(title) => setCriteriaData({ ...criteriaData, title })}
       isEdition={isEdition}

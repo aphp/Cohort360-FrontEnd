@@ -29,7 +29,8 @@ export type MedicationDataType = CommonCriteriaData &
   }
 
 export const form: () => CriteriaForm<MedicationDataType> = () => ({
-  label: 'Médicaments',
+  label: 'de médicament',
+  title: 'Médicaments',
   initialData: {
     type: CriteriaType.MEDICATION_REQUEST,
     title: 'Critère de médicament',

@@ -30,7 +30,8 @@ export type EncounterDataType = CommonCriteriaData &
   }
 
 export const form: () => CriteriaForm<EncounterDataType> = () => ({
-  label: 'Prise en charge',
+  label: 'de prise en charge',
+  title: 'Prise en charge',
   initialData: {
     type: CriteriaType.ENCOUNTER,
     title: 'Critère de prise en charge',
