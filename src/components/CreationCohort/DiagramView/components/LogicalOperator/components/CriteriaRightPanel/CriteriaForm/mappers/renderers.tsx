@@ -198,6 +198,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         onChange={(e) => props.updateData(e.target.value ? parseFloat(e.target.value) : null)}
         placeholder={props.definition.label}
         disabled={props.disabled}
+        fullWidth
       />
     )
   },

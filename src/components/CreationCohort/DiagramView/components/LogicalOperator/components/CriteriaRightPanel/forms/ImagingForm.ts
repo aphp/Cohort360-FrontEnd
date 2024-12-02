@@ -171,6 +171,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           valueKey: 'withDocument',
           type: 'autocomplete',
           label: 'Méthode de rattachement à un document',
+          extraLabel: () => 'Méthode de rattachement à un document',
           valueSetId: 'documentAttachementMethod',
           singleChoice: true,
           valueSetData: getConfig().features.imaging.valueSets.documentAttachementMethod.data,
@@ -186,13 +187,14 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           valueKey: 'daysOfDelay',
           type: 'number',
           label: 'Plage de jours',
+          extraLabel: () => 'Plage de jours',
           errorType: 'INCOHERENT_AGE_ERROR',
           displayCondition: (data) => (data.withDocument as LabelObject[])?.at(0)?.id === 'INFERENCE_TEMPOREL'
         },
         {
           valueKey: 'studyUid',
           type: 'textWithRegex',
-          label: "Recherche par uid d'étude",
+          extraLabel: () => "Recherche par uid d'étude",
           regex: '[^0-9.,]',
           inverseCheck: true,
           checkErrorMessage: 'Seuls les chiffres, points, ou les virgules sont autorisés.',
@@ -260,7 +262,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
         {
           valueKey: 'seriesUid',
           type: 'textWithRegex',
-          label: 'Recherche par uid de série',
+          extraLabel: () => 'Recherche par uid de série',
           regex: '[^0-9.,]',
           checkErrorMessage: 'Seuls les chiffres, points, ou les virgules sont autorisés.',
           placeholder: "Ajouter une liste d'uid séparés par des virgules",
