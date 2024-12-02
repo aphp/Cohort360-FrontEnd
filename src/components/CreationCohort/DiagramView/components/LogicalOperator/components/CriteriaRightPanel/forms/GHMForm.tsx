@@ -64,6 +64,7 @@ export const form: () => CriteriaForm<GhmDataType> = () => ({
           valueKey: 'occurrence',
           type: 'numberAndComparator',
           label: "Nombre d'occurrences",
+          withHierarchyInfo: true,
           buildInfo: {
             chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'occurrences" }]
           }
@@ -112,6 +113,7 @@ export const form: () => CriteriaForm<GhmDataType> = () => ({
           label: 'Début de prise en charge',
           labelAltStyle: true,
           extraLabel: () => 'Prise en charge',
+          extraInfo: 'Ne concerne pas les consultations.',
           withOptionIncludeNull: true,
           buildInfo: {
             fhirKey: 'encounter.period-start',
@@ -134,7 +136,7 @@ export const form: () => CriteriaForm<GhmDataType> = () => ({
           valueKey: 'startOccurrence',
           type: 'calendarRange',
           errorType: 'ADVANCED_INPUTS_ERROR',
-          extraLabel: () => "Date d'acte CCAM",
+          extraLabel: () => 'Date du classement en GHM',
           buildInfo: {
             fhirKey: ClaimParamsKeys.DATE,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: "Date de l'acte CCAM" }]

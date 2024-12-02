@@ -17,6 +17,7 @@ import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 import InfoIcon from '@mui/icons-material/Info'
 import { isFunction, isString } from 'lodash'
 import { SelectedCriteriaType } from 'types/requestCriterias'
+import useStyles from '../style'
 
 type CriteriaItemRuntimeProps<T> = {
   setError: (error?: string) => void
@@ -94,12 +95,10 @@ export const CFItem = <T, V extends DataTypeMappings, U extends CriteriaItem<T, 
 export function CFSection<T extends SelectedCriteriaType>(
   props: PropsWithChildren<Omit<CriteriaSection<T>, 'items'> & { collapsed?: boolean }>
 ) {
+  const { classes } = useStyles()
   return props.title ? (
-    <BlockWrapper
-      margin="1em"
-      // className={classes.inputItem}
-    >
-      <Collapse title={props.title} info={props.info} value={!props.defaulCollapsed || !props.collapsed} margin="0">
+    <BlockWrapper className={classes.inputItem}>
+      <Collapse title={props.title} info={props.info} value={!props.defaulCollapsed || !props.collapsed}>
         {props.children}
       </Collapse>
     </BlockWrapper>
@@ -118,6 +117,7 @@ export function CFItemWrapper<T>(
     context: Context
   }>
 ) {
+  const { classes } = useStyles()
   const { label, data, context, displayValueSummary, value } = props
   const [valueSummary, setValueSummary] = useState<string | undefined>(undefined)
 
@@ -135,17 +135,8 @@ export function CFItemWrapper<T>(
     ((isFunction(label) && label(data as Record<string, DataTypes>, context)) ||
       (isString(label) && eval(label)(data, context)))
   return (
-    <BlockWrapper
-      // ICI ON EST BON SUR LA LARGEUR, NE PAS TOUCHEOOOOOOOOO
-      // margin={'1em'}
-      // j'ai touché quand même mais ne fonctionne pas sur les criteria label car la marge des collapse prend le dessus
-      margin={'1em 1em 0'}
-    >
-      {labelValue ? (
-        <CriteriaLabel label={labelValue} style={{ padding: 0, marginTop: '1em' }} infoIcon={props.info} />
-      ) : (
-        ''
-      )}
+    <BlockWrapper className={classes.inputItem}>
+      {labelValue ? <CriteriaLabel label={labelValue} style={{ marginTop: '1em' }} infoIcon={props.info} /> : ''}
       {valueSummary && <Typography style={{ fontWeight: 'bold', marginBottom: '1em' }}>{valueSummary}</Typography>}
       {props.children}
     </BlockWrapper>

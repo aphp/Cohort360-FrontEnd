@@ -109,7 +109,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
         {
           valueKey: 'studyDate',
           type: 'calendarRange',
-          label: "Date de l'étude",
+          extraLabel: () => "Date de l'étude",
           errorType: 'INCOHERENT_AGE_ERROR',
           buildInfo: {
             fhirKey: ImagingParamsKeys.DATE,
@@ -217,7 +217,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
         {
           valueKey: 'seriesDate',
           type: 'calendarRange',
-          label: 'Date de la série',
+          extraLabel: () => 'Date de la série',
           errorType: 'INCOHERENT_AGE_ERROR',
           buildInfo: {
             fhirKey: ImagingParamsKeys.SERIES_DATE,
@@ -291,7 +291,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           type: 'calendarRange',
           errorType: 'ADVANCED_INPUTS_ERROR',
           label: 'Début de prise en charge',
-          extraInfo: 'Ne concerne pas les consultations',
+          extraInfo: 'Ne concerne pas les consultations.',
           labelAltStyle: true,
           extraLabel: () => 'Prise en charge',
           withOptionIncludeNull: true,

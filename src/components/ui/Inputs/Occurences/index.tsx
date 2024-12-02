@@ -11,7 +11,7 @@ type OccurenceInputProps = {
   enableNegativeValues?: boolean
   floatValues?: boolean
   label?: string
-  info?: ReactNode
+  withInfo?: ReactNode
   withHierarchyInfo?: boolean
   allowBetween?: boolean
   disabled?: boolean
@@ -25,7 +25,7 @@ const OccurenceInput = ({
   floatValues = false,
   enableNegativeValues = false,
   label,
-  info,
+  withInfo,
   withHierarchyInfo = false,
   allowBetween = false,
   disabled = false
@@ -82,29 +82,29 @@ const OccurenceInput = ({
     }
   }
 
+  const getInfoText = () => {
+    if (withInfo) {
+      return withInfo
+    } else if (withHierarchyInfo) {
+      return (
+        <span>
+          Si vous choisissez un chapitre, le nombre d'occurrences ne s'applique pas sur un unique élément de ce
+          chapitre, mais sur l'ensemble des éléments de ce chapitre. <br /> Exemple: Nombre d'occurrences &ge; 3 sur un
+          chapitre signifie que l'on inclus les patients qui ont eu au moins 3 éléments de ce chapitre, distincts ou
+          non.
+        </span>
+      )
+    }
+    return null
+  }
+
   return (
     <>
-      {label && (
-        <CriteriaLabel
-          label={label}
-          infoIcon={
-            info
-              ? info
-              : withHierarchyInfo && (
-                  <span>
-                    Si vous choisissez un chapitre, le nombre d'occurrences ne s'applique pas sur un unique élément de
-                    ce chapitre, mais sur l'ensemble des éléments de ce chapitre. <br /> Exemple: Nombre d'occurrences
-                    &ge; 3 sur un chapitre signifie que l'on inclus les patients qui ont eu au moins 3 éléments de ce
-                    chapitre, distincts ou non.
-                  </span>
-                )
-          }
-        />
-      )}
+      {label && <CriteriaLabel label={label} infoIcon={getInfoText()} />}
       <Grid
         style={{
           display: 'grid',
-          gridTemplateColumns: comparatorValue === Comparators.BETWEEN ? '50px 1fr 1fr' : '100px 1fr',
+          gridTemplateColumns: comparatorValue === Comparators.BETWEEN ? '100px 1fr 1fr' : '100px 1fr',
           alignItems: 'start'
         }}
       >

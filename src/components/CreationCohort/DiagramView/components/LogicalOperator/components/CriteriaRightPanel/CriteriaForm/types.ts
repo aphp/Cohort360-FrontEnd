@@ -81,6 +81,7 @@ export type NumberWithComparatorCriteriaItem = BaseCriteriaItem &
   WithLabel & {
     type: 'numberAndComparator'
     withHierarchyInfo?: boolean
+    withInfo?: ReactNode
     floatValues?: boolean
     allowBetween?: boolean
   }

@@ -65,6 +65,7 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
           valueKey: 'occurrence',
           type: 'numberAndComparator',
           label: "Nombre d'occurrences",
+          withHierarchyInfo: true,
           buildInfo: {
             chipDisplayMethodExtraArgs: [{ type: 'reference', value: "Nombre d'occurrences" }]
           }
@@ -180,6 +181,7 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
           label: 'Début de prise en charge',
           labelAltStyle: true,
           extraLabel: () => 'Prise en charge',
+          extraInfo: 'Ne concerne pas les consultations.',
           withOptionIncludeNull: true,
           buildInfo: {
             fhirKey: {
@@ -212,7 +214,7 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
           valueKey: 'startOccurrence',
           type: 'calendarRange',
           errorType: 'ADVANCED_INPUTS_ERROR',
-          extraLabel: () => 'Date de classement en GHM',
+          extraLabel: () => 'Date de début de prescription',
           buildInfo: {
             fhirKey: {
               main: PrescriptionParamsKeys.DATE,
@@ -234,7 +236,7 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
           valueKey: 'endOccurrence',
           type: 'calendarRange',
           errorType: 'ADVANCED_INPUTS_ERROR',
-          extraLabel: () => 'Date de classement en GHM',
+          extraLabel: () => 'Date de fin de prescription',
           displayCondition: (data) => data.type === CriteriaType.MEDICATION_REQUEST,
           buildInfo: {
             fhirKey: PrescriptionParamsKeys.END_DATE,

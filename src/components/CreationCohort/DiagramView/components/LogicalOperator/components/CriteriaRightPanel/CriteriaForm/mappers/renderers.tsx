@@ -166,13 +166,10 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     )
   },
   radioChoice: (props) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { classes } = useStyles()
     return (
       <RadioGroup
         row
         style={{ justifyContent: 'space-around' }}
-        className={classes.inputItem}
         aria-label="mode"
         name="criteria-mode-radio"
         value={props.value}
@@ -217,8 +214,8 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         onchange={(newCount, newComparator, maxValue) => {
           props.updateData({ value: newCount, comparator: newComparator, maxValue: maxValue })
         }}
-        info={props.definition.info}
         withHierarchyInfo={props.definition.withHierarchyInfo}
+        withInfo={props.definition.info}
         disabled={props.disabled}
       />
     )

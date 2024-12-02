@@ -11,11 +11,17 @@ type CollapseProps = {
   value?: boolean
   title: string
   children: ReactNode
+<<<<<<< HEAD
   margin?: string
   info?: React.ReactNode
 }
 
 const Collapse = ({ value = true, title, children, margin = '0 0 5px 0', info }: PropsWithChildren<CollapseProps>) => {
+=======
+}
+
+const Collapse = ({ value = true, title, children }: PropsWithChildren<CollapseProps>) => {
+>>>>>>> adf08d4d (fix: fixed some criteria label info - Ref gestion-de-projet#2354)
   const [checked, setChecked] = useState(value)
   console.log('test children', children)
 
@@ -43,7 +49,7 @@ const Collapse = ({ value = true, title, children, margin = '0 0 5px 0', info }:
         </IconButton>
       </Grid>
 
-      <CollapseWrapper in={checked} unmountOnExit margin={margin}>
+      <CollapseWrapper in={checked} unmountOnExit>
         {children}
       </CollapseWrapper>
     </Grid>
