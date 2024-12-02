@@ -213,18 +213,52 @@ const buildWithDocumentFilter = (withDocument: LabelObject[], daysOfDelay: numbe
 /********************************************************************************************* */
 
 export const UNBUILD_MAPPERS = {
-  unbuildLabelObject: async (val: string, deid: boolean, existingValue?: DataTypes) =>
-    Promise.resolve(unbuildLabelObjectFilterValue(val, existingValue as LabelObject[])),
-  unbuildEncounterService: async (val: string, deid: boolean, existingValue?: DataTypes) =>
-    unbuildEncounterServiceFilter(val, existingValue as Hierarchy<ScopeElement, string>[]),
-  unbuildDate: async (val: string, deid: boolean, existingValue?: DataTypes) =>
+  unbuildLabelObject: async (
+    val: string,
+    deid: boolean,
+    existingValue: DataTypes,
+    fhirkey: string,
+    args: Array<DataTypes>
+  ) => Promise.resolve(unbuildLabelObjectFilterValue(val, existingValue as LabelObject[])),
+  unbuildEncounterService: async (
+    val: string,
+    deid: boolean,
+    existingValue: DataTypes,
+    fhirkey: string,
+    args: Array<DataTypes>
+  ) => unbuildEncounterServiceFilter(val, existingValue as Hierarchy<ScopeElement, string>[]),
+  unbuildDate: async (val: string, deid: boolean, existingValue: DataTypes, fhirkey: string, args: Array<DataTypes>) =>
     Promise.resolve(unbuildDateFilter(val, existingValue as NewDurationRangeType)),
-  unbuildDuration: async (val: string, deid: boolean, existingValue?: DataTypes) =>
-    Promise.resolve(unbuildDurationFilter(val, deid, existingValue as NewDurationRangeType)),
-  unbuildSearch: async (val: string, deid: boolean, existingValue?: DataTypes) =>
-    Promise.resolve(unbuildSearchFilter(val)),
-  unbuildComparator: async (val: string, deid: boolean, existingValue?: DataTypes) =>
-    Promise.resolve(parseOccurence(val))
+  unbuildDuration: async (
+    val: string,
+    deid: boolean,
+    existingValue: DataTypes,
+    fhirkey: string,
+    args: Array<DataTypes>
+  ) => Promise.resolve(unbuildDurationFilter(val, deid, existingValue as NewDurationRangeType)),
+  unbuildSearch: async (
+    val: string,
+    deid: boolean,
+    existingValue: DataTypes,
+    fhirkey: string,
+    args: Array<DataTypes>
+  ) => Promise.resolve(unbuildSearchFilter(val)),
+  unbuildComparator: async (
+    val: string,
+    deid: boolean,
+    existingValue: DataTypes,
+    fhirkey: string,
+    args: Array<DataTypes>
+  ) => Promise.resolve(parseOccurence(val)),
+  unbuildFromLabelObjectFromKey: async (
+    val: string,
+    deid: boolean,
+    existingValue: DataTypes,
+    fhirkey: string,
+    args: Array<DataTypes>
+  ) => {
+    Promise.resolve((args[0] as LabelObject[]).find((l) => l.id === fhirkey))
+  }
 }
 
 export const BUILD_MAPPERS = {
@@ -249,5 +283,6 @@ export const BUILD_MAPPERS = {
   // utility meta functions
   skipIf: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) => {
     return args[1] === args[2] ? undefined : (args[0] as BuilderMethod)(val, key, deidentified, args.slice(3))
-  }
+  },
+  noop: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) => undefined
 }

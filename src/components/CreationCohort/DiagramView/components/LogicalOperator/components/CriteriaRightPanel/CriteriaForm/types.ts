@@ -281,6 +281,7 @@ export type CriteriaItemBuildInfo = {
     buildMethod?: keyof typeof BUILD_MAPPERS
     buildMethodExtraArgs?: Array<BuildMethodExtraParam>
     unbuildMethod?: keyof typeof UNBUILD_MAPPERS
+    unbuildMethodExtraArgs?: Array<DataTypes>
     chipDisplayMethod?: keyof typeof CHIPS_DISPLAY_METHODS
     chipDisplayMethodExtraArgs?: Array<BuildMethodExtraParam>
   }
