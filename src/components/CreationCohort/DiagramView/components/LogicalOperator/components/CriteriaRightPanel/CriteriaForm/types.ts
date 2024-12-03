@@ -103,6 +103,7 @@ export type AutoCompleteItem = BaseCriteriaItem & {
   singleChoice?: boolean
   valueSetId: string
   valueSetData?: LabelObject[]
+  prependCode?: boolean
   groupBy?: 'system' | 'type'
 }
 

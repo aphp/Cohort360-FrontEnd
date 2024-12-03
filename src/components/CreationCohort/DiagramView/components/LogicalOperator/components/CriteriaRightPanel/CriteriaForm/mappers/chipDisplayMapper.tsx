@@ -24,6 +24,7 @@ import allDocTypes from 'assets/docTypes.json'
 import moment from 'moment'
 import { getDurationRangeLabel } from 'utils/age'
 import { getConfig } from 'config'
+import { prepend } from 'ramda'
 
 /************************************************************************************/
 /*                        Criteria Form Item Chip Display                           */
@@ -73,8 +74,8 @@ const chipForDateLabel = (dateRange: NewDurationRangeType, word?: string) => {
   )
 }
 
-const getSearchDocumentLabel = (value: string, searchBy: string) => {
-  const loc = searchBy === SearchByTypes.TEXT ? 'document' : 'titre du document'
+const getSearchDocumentLabel = (value: string, searchBy: LabelObject[]) => {
+  const loc = searchBy.find((l) => l.id === SearchByTypes.TEXT) ? 'document' : 'titre du document'
   return `Contient "${value}" dans le ${loc}`
 }
 
@@ -156,18 +157,20 @@ const chipFromAutoComplete = (
   val: LabelObject[] | null,
   item: AutoCompleteItem,
   valueSets: ValueSetStore,
-  label?: string
+  label?: string,
+  prependCode?: boolean
 ) => {
-  return chipFromLabelObject(val, item, getLabelsForAutoCompleteItem, valueSets, label)
+  return chipFromLabelObject(val, item, getLabelsForAutoCompleteItem, valueSets, label, prependCode)
 }
 
 const chipFromCodeSearch = (
   val: LabelObject[] | null,
   item: CodeSearchItem,
   valueSets: ValueSetStore,
-  label?: string
+  label?: string,
+  prependCode?: boolean
 ) => {
-  return chipFromLabelObject(val, item, getLabelsForCodeSearchItem, valueSets, label)
+  return chipFromLabelObject(val, item, getLabelsForCodeSearchItem, valueSets, label, prependCode)
 }
 
 // TODO refacto this to be more generic using config
@@ -187,12 +190,13 @@ const chipFromLabelObject = <T extends AutoCompleteItem | CodeSearchItem>(
   item: T,
   getLabel: (val: LabelObject[], item: T, valueSets: ValueSetStore) => LabelObject[],
   valueSets: ValueSetStore,
-  label?: string
+  label?: string,
+  prependCode?: boolean
 ) => {
-  console.log('val', val)
   if (val === null) return null
-  const labels = getLabel(val, item, valueSets).map((code) => `${displaySystem(code.system)} ${code.label}`)
-  console.log('label', labels)
+  const labels = getLabel(val, item, valueSets).map(
+    (code) => `${displaySystem(code.system)} ${prependCode ? code.id + ' - ' : ''}${code.label}`
+  )
   const tooltipTitle = labels.join(' - ')
   return (
     <Tooltip title={tooltipTitle}>
@@ -224,13 +228,20 @@ export const CHIPS_DISPLAY_METHODS = {
     item: GenericCriteriaItem,
     valueSets: ValueSetStore,
     args: Array<ChipDisplayMethod | DataTypes>
-  ) => `${args[0] ? args[0] : ''}${val as string}`,
+  ) => `${args[0] ? args[0] : ''} ${val as string}`,
   autocomplete: (
     val: DataTypes,
     item: GenericCriteriaItem,
     valueSets: ValueSetStore,
     args: Array<ChipDisplayMethod | DataTypes>
-  ) => chipFromAutoComplete(val as LabelObject[], item as AutoCompleteItem, valueSets, args[0] as string),
+  ) =>
+    chipFromAutoComplete(
+      val as LabelObject[],
+      item as AutoCompleteItem,
+      valueSets,
+      args[0] as string,
+      args[1] as boolean
+    ),
   executiveUnit: (
     val: DataTypes,
     item: GenericCriteriaItem,
@@ -248,7 +259,8 @@ export const CHIPS_DISPLAY_METHODS = {
     item: GenericCriteriaItem,
     valueSets: ValueSetStore,
     args: Array<ChipDisplayMethod | DataTypes>
-  ) => chipFromCodeSearch(val as LabelObject[], item as CodeSearchItem, valueSets, args[0] as string),
+  ) =>
+    chipFromCodeSearch(val as LabelObject[], item as CodeSearchItem, valueSets, args[0] as string, args[1] as boolean),
   idListLabel: (
     val: DataTypes,
     item: GenericCriteriaItem,
@@ -266,7 +278,7 @@ export const CHIPS_DISPLAY_METHODS = {
     item: GenericCriteriaItem,
     valueSets: ValueSetStore,
     args: Array<ChipDisplayMethod | DataTypes>
-  ) => getSearchDocumentLabel(val as string, args[0] as string),
+  ) => getSearchDocumentLabel(val as string, args[0] as LabelObject[]),
   getDocumentTypesLabel: (
     val: DataTypes,
     item: GenericCriteriaItem,

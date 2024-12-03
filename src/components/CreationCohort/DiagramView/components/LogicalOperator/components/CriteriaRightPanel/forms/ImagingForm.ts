@@ -114,10 +114,14 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           type: 'autocomplete',
           label: 'Modalités',
           valueSetId: getConfig().features.imaging.valueSets.imagingModalities.url,
+          prependCode: true,
           noOptionsText: 'Veuillez entrer des modalités',
           buildInfo: {
             fhirKey: ImagingParamsKeys.MODALITY,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: "Modalités d'étude :" }]
+            chipDisplayMethodExtraArgs: [
+              { type: 'string', value: "Modalités d'étude :" },
+              { type: 'boolean', value: true }
+            ]
           }
         },
         {
@@ -245,10 +249,14 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           type: 'autocomplete',
           label: 'Modalités',
           valueSetId: getConfig().features.imaging.valueSets.imagingModalities.url,
+          prependCode: true,
           noOptionsText: 'Veuillez entrer des modalités',
           buildInfo: {
             fhirKey: ImagingParamsKeys.SERIES_MODALITIES,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Modalités de la série : ' }]
+            chipDisplayMethodExtraArgs: [
+              { type: 'string', value: 'Modalités de la série : ' },
+              { type: 'boolean', value: true }
+            ]
           }
         },
         {
@@ -256,6 +264,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           type: 'textWithRegex',
           extraLabel: () => 'Recherche par uid de série',
           regex: '[^0-9.,]',
+          inverseCheck: true,
           checkErrorMessage: 'Seuls les chiffres, points, ou les virgules sont autorisés.',
           placeholder: "Ajouter une liste d'uid séparés par des virgules",
           multiline: true,

@@ -1,4 +1,4 @@
-import { Comparators, CriteriaType, RequeteurCriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
+import { Comparators, RequeteurCriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 import { BuildMethodExtraParam, CriteriaForm, CriteriaFormItemType, DataTypes, FhirKey } from '../types'
 import { ChipDisplayMethod, CHIPS_DISPLAY_METHODS } from './chipDisplayMapper'
 import extractFilterParams, { FhirFilter } from 'utils/fhirFilterParser'
