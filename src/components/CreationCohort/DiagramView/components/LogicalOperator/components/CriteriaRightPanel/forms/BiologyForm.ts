@@ -45,13 +45,6 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
   warningAlert: [
     "Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondants aux analyses les plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020."
   ],
-  errorMessages: {
-    INCOHERENT_VALUE_ERROR: 'La valeur minimale ne peut pas être supérieure à la valeur maximale.',
-    INVALID_VALUE_ERROR: 'Veuillez entrer un nombre valide.',
-    MISSING_VALUE_ERROR: 'Veuillez entrer 2 valeurs avec ce comparateur.',
-    ADVANCED_INPUTS_ERROR: 'Erreur dans les options avancées.',
-    NO_ERROR: ''
-  },
   buildInfo: {
     type: { [ResourceType.OBSERVATION]: CriteriaType.OBSERVATION },
     defaultFilter: `subject.active=true&${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`
