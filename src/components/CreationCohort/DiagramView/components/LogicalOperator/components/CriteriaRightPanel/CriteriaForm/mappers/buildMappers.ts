@@ -63,7 +63,13 @@ const buildLabelObjectFilter = (
 
 const unbuildLabelObjectFilterValue = (values: string | null, prevValues: LabelObject[] | null) => {
   const valuesIds = values?.split(',') || []
-  const newArray = valuesIds?.map((value) => (value.includes('|*') ? { id: '*', label: '' } : { id: value, label: '' }))
+  const newArray = valuesIds?.map((value) => {
+    const valueElements = value.split('|')
+    if (valueElements.length > 1) {
+      return { id: valueElements[1], system: valueElements[0], label: '' }
+    }
+    return { id: valueElements[0], label: '' }
+  })
   if (newArray) {
     return [...(prevValues || []), ...newArray]
   }

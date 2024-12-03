@@ -82,7 +82,8 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
           buildInfo: {
             fhirKey: ObservationParamsKeys.ANABIO_LOINC,
             buildMethodExtraArgs: [
-              { type: 'string', value: getConfig().features.observation.valueSets.biologyHierarchyAnabio.url }
+              { type: 'string', value: getConfig().features.observation.valueSets.biologyHierarchyAnabio.url },
+              { type: 'boolean', value: true }
             ]
           }
         },

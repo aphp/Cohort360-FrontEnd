@@ -556,10 +556,16 @@ export const fetchCriteriasCodes = async (
               const codeSystem = code.system || defaultValueSet
               const valueSetCodeCache = updatedCriteriaData[codeSystem] ?? []
               if (!valueSetCodeCache.find((data) => data.id === code.id)) {
-                const fetchedCode = (await fetchValueSet(codeSystem, {
-                  code: code.id || ''
-                })) as LabelObject[]
-                valueSetCodeCache.push(...fetchedCode)
+                try {
+                  const fetchedCode = (await fetchValueSet(codeSystem, {
+                    search: code.id || '',
+                    noStar: true
+                  })) as LabelObject[]
+                  valueSetCodeCache.push(...fetchedCode)
+                } catch (e) {
+                  // fail silently
+                  console.error(`Error fetching code ${code.id} from system ${codeSystem}`, e)
+                }
               }
               updatedCriteriaData[codeSystem] = valueSetCodeCache
             }
