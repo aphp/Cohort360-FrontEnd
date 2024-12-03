@@ -552,22 +552,24 @@ export const fetchCriteriasCodes = async (
             const dataKey = item.valueKey as string
             // TODO remove this type casting when using the proper entry type, also make sure that the dataKey is a valid key
             const labelValues = criterion[dataKey as keyof SelectedCriteriaType] as unknown as LabelObject[]
-            for (const code of labelValues) {
-              const codeSystem = code.system || defaultValueSet
-              const valueSetCodeCache = updatedCriteriaData[codeSystem] ?? []
-              if (!valueSetCodeCache.find((data) => data.id === code.id)) {
-                try {
-                  const fetchedCode = (await fetchValueSet(codeSystem, {
-                    search: code.id || '',
-                    noStar: true
-                  })) as LabelObject[]
-                  valueSetCodeCache.push(...fetchedCode)
-                } catch (e) {
-                  // fail silently
-                  console.error(`Error fetching code ${code.id} from system ${codeSystem}`, e)
+            if (labelValues && labelValues.length > 0) {
+              for (const code of labelValues) {
+                const codeSystem = code.system || defaultValueSet
+                const valueSetCodeCache = updatedCriteriaData[codeSystem] ?? []
+                if (!valueSetCodeCache.find((data) => data.id === code.id)) {
+                  try {
+                    const fetchedCode = (await fetchValueSet(codeSystem, {
+                      search: code.id || '',
+                      noStar: true
+                    })) as LabelObject[]
+                    valueSetCodeCache.push(...fetchedCode)
+                  } catch (e) {
+                    // fail silently
+                    console.error(`Error fetching code ${code.id} from system ${codeSystem}`, e)
+                  }
                 }
+                updatedCriteriaData[codeSystem] = valueSetCodeCache
               }
-              updatedCriteriaData[codeSystem] = valueSetCodeCache
             }
           }
         }
