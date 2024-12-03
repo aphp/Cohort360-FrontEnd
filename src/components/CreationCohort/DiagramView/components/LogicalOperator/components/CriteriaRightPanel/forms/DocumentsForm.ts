@@ -49,8 +49,7 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
     NO_ERROR: ''
   },
   buildInfo: {
-    criteriaType: CriteriaType.DOCUMENTS,
-    resourceType: ResourceType.DOCUMENTS,
+    type: { [ResourceType.DOCUMENTS]: CriteriaType.DOCUMENTS },
     defaultFilter: 'type:not=doc-impor&contenttype=text/plain&subject.active=true'
   },
   itemSections: [

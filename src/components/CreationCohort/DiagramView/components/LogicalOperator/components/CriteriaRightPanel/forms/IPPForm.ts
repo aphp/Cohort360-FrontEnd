@@ -17,8 +17,7 @@ export const form: () => CriteriaForm<IPPListDataType> = () => ({
     search: ''
   },
   buildInfo: {
-    criteriaType: CriteriaType.IPP_LIST,
-    resourceType: ResourceType.IPP_LIST // TODO should be ResourceType.PATIENT
+    type: { [ResourceType.IPP_LIST]: CriteriaType.IPP_LIST } // TODO should be ResourceType.PATIENT
   },
   errorMessages: {
     AT_LEAST_ONE_IPP: 'Merci de renseigner au moins un IPP'

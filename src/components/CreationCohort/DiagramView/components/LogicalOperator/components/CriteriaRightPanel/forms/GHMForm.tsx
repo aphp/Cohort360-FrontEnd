@@ -53,8 +53,7 @@ export const form: () => CriteriaForm<GhmDataType> = () => ({
     </div>
   ],
   buildInfo: {
-    criteriaType: CriteriaType.CLAIM,
-    resourceType: ResourceType.CLAIM,
+    type: { [ResourceType.CLAIM]: CriteriaType.CLAIM },
     defaultFilter: 'patient.active=true'
   },
   errorMessages: {},

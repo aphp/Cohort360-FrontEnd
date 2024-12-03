@@ -44,8 +44,7 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
     NO_ERROR: ''
   },
   buildInfo: {
-    criteriaType: CriteriaType.PROCEDURE,
-    resourceType: ResourceType.PROCEDURE,
+    type: { [ResourceType.PROCEDURE]: CriteriaType.PROCEDURE },
     defaultFilter: 'subject.active=true'
   },
   itemSections: [

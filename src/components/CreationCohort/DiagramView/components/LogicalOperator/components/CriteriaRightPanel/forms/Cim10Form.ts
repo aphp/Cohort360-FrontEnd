@@ -46,8 +46,7 @@ export const form: () => CriteriaForm<Cim10DataType> = () => ({
     NO_ERROR: ''
   },
   buildInfo: {
-    criteriaType: CriteriaType.CONDITION,
-    resourceType: ResourceType.CONDITION,
+    type: { [ResourceType.CONDITION]: CriteriaType.CONDITION },
     defaultFilter: 'subject.active=true'
   },
   itemSections: [

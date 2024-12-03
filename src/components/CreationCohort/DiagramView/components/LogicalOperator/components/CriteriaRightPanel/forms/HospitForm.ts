@@ -117,8 +117,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => ({
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   errorMessages: {},
   buildInfo: {
-    criteriaType: CriteriaType.HOSPIT,
-    resourceType: ResourceType.QUESTIONNAIRE_RESPONSE,
+    type: { [ResourceType.QUESTIONNAIRE_RESPONSE]: CriteriaType.HOSPIT },
     defaultFilter: `subject.active=true&questionnaire.name=${FormNames.HOSPIT}&status=in-progress,completed`,
     subType: FormNames.HOSPIT
   },

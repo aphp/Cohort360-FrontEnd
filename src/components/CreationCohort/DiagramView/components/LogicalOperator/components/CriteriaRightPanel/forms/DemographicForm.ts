@@ -40,8 +40,7 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
     NO_ERROR: ''
   },
   buildInfo: {
-    criteriaType: CriteriaType.PATIENT,
-    resourceType: ResourceType.PATIENT,
+    type: { [ResourceType.PATIENT]: CriteriaType.PATIENT },
     defaultFilter: 'active=true'
   },
   itemSections: [

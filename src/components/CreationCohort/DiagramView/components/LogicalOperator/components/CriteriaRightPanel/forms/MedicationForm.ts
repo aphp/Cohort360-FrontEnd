@@ -55,8 +55,10 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
     NO_ERROR: ''
   },
   buildInfo: {
-    criteriaType: [CriteriaType.MEDICATION_ADMINISTRATION, CriteriaType.MEDICATION_REQUEST],
-    resourceType: [ResourceType.MEDICATION_ADMINISTRATION, ResourceType.MEDICATION_REQUEST],
+    type: {
+      [ResourceType.MEDICATION_ADMINISTRATION]: CriteriaType.MEDICATION_ADMINISTRATION,
+      [ResourceType.MEDICATION_REQUEST]: CriteriaType.MEDICATION_REQUEST
+    },
     defaultFilter: 'subject.active=true'
   },
   itemSections: [

@@ -227,18 +227,17 @@ export const constructFhirFilterForType = <T extends SelectedCriteriaType>(
     .reduce(
       (accumulator: string, currentValue: string): string =>
         accumulator ? `${accumulator}&${currentValue}` : currentValue,
-      criteriaForm.buildInfo?.defaultFilter ?? ''
+      criteriaForm.buildInfo.defaultFilter ?? ''
     )
 }
 
 export const unbuildCriteriaDataFromDefinition = async <T extends SelectedCriteriaType>(
   element: RequeteurCriteriaType,
-  type: CriteriaType,
   criteriaDefinition: CriteriaForm<T>
 ): Promise<SelectedCriteriaType> => {
   const emptyCriterion: T = { ...criteriaDefinition.initialData } as T
   emptyCriterion.id = element._id
-  emptyCriterion.type = type as SelectedCriteriaType['type']
+  emptyCriterion.type = criteriaDefinition.buildInfo.type[element.resourceType] as SelectedCriteriaType['type']
   emptyCriterion.title = element.name
   emptyCriterion.isInclusive = element.isInclusive
 
@@ -317,9 +316,7 @@ export const criteriasAsArray = (
   valuesets: ValueSetStore
 ): ReactNode[] => {
   const criteriaDef = criteriaDefinitions.find((criterion) =>
-    isString(criterion.formDefinition?.buildInfo?.criteriaType)
-      ? criterion.formDefinition?.buildInfo?.criteriaType === selectedCriteria.type
-      : criterion.formDefinition?.buildInfo?.criteriaType.includes(selectedCriteria.type)
+    Object.values(criterion.formDefinition?.buildInfo?.type || {}).includes(selectedCriteria.type)
   )?.formDefinition
   if (!criteriaDef) return []
 
