@@ -11,7 +11,6 @@ import {
   Tooltip,
   IconButton,
   Button,
-  Card,
   Autocomplete
 } from '@mui/material'
 
@@ -20,30 +19,16 @@ import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 import ExportTable from '../ExportTable'
 
-import { fakeExportTable, fakeCohortList } from 'pages/ExportRequest/fakedata/fakeExportTable'
-
 import { fetchExportableCohorts } from 'services/aphp/callApi'
+import {
+  fetchExportTablesRelationsInfo,
+  fetchExportTablesInfo,
+  postExportCohort
+} from 'services/aphp/serviceExportCohort'
+
+import { Cohort } from 'types'
 
 import useStyles from '../../styles'
-
-export type ExportPayload = {
-  motivation: string
-  outputFormat: 'csv' | 'xlsx'
-  nominative: true
-  shiftDate: true
-  groupTables: boolean
-  exportTables:
-    | [
-        {
-          tableName: string
-          columns: string[] | []
-          cohortResultSource: string
-          fhirFilter: string
-          respectTableRelationships: true
-        }
-      ]
-    | []
-}
 
 export type TableSetting = {
   tableName: string | null
@@ -66,37 +51,12 @@ export type TableSetting = {
   respectTableRelationships: boolean
 }
 
-export type TableSettings = TableSetting[]
-
-const initialPayloadState: ExportPayload = {
-  motivation: '',
-  outputFormat: 'csv',
-  nominative: true,
-  shiftDate: true,
-  groupTables: false,
-  exportTables: []
-}
-
-const tableSettingsInitialState: TableSettings = [
+const tableSettingsInitialState: TableSetting[] = [
   {
     tableName: 'person',
-    isChecked: false,
+    isChecked: true,
     columns: null,
-    fhirFilter: {
-      uuid: 'bcdf1e9b-e4c1-4817-a38f-31dd82537ea9',
-      owner: 'Salah BOUYAHIA (7017143)',
-      deleted: null,
-      deleted_by_cascade: false,
-      created_at: '2024-03-28T18:22:26.330990Z',
-      modified_at: '2024-03-28T18:22:26.330996Z',
-      fhir_resource: 'Condition',
-      fhir_version: '4.0',
-      query_version: 'v1.4.4',
-      name: 'bandiedfg',
-      filter:
-        'orbis-status=https%253A%252F%252Fterminology.eds.aphp.fr%252Faphp-orbis-condition-status%257Cdas&code=https%3A%2F%2Fterminology.eds.aphp.fr%2Faphp-orbis-cim10%7CE1198',
-      auto_generated: false
-    },
+    fhirFilter: null,
     respectTableRelationships: true
   }
 ]
@@ -104,12 +64,18 @@ const tableSettingsInitialState: TableSettings = [
 const ExportForm: React.FC = () => {
   const { classes } = useStyles()
   const [error, setError] = useState<any>('')
-  const [payload, setPayload] = useState<ExportPayload>(initialPayloadState)
   const [oneFile, setOneFile] = useState<boolean>(false)
   const [exportTypeFile, setExportTypeFile] = useState<'csv' | 'xlsx'>('csv')
-  const [tableSettings, setTablesSettings] = useState<TableSettings>(tableSettingsInitialState)
-  const [exportCohort, setExportCohort] = useState<any>(null)
-  const [exportCohortList, setExportCohortList] = useState<any>(null)
+  const [tablesSettings, setTablesSettings] = useState<TableSetting[]>(tableSettingsInitialState)
+  const [exportCohort, setExportCohort] = useState<Cohort | null>(null)
+  const [exportCohortList, setExportCohortList] = useState<Cohort[] | []>([])
+  const [exportTableList, setExportTableList] = useState<any>(null)
+  const checkedTables = tablesSettings.filter((tableSetting) => tableSetting.isChecked)
+  const [compatibilitiesTables, setCompatibilitiesTables] = useState<string[] | null>(null)
+  const [conditions, setConditions] = useState<boolean>(false)
+  const [motivation, setMotivation] = useState<string>('')
+
+  console.log('manelle compatibilitiesTables', compatibilitiesTables)
 
   const _fetchExportableCohorts = useCallback(async () => {
     try {
@@ -120,18 +86,50 @@ const ExportForm: React.FC = () => {
     }
   }, [])
 
+  const _fetchExportTablesInfo = useCallback(async () => {
+    try {
+      const response = await fetchExportTablesInfo()
+      setExportTableList(response)
+    } catch (error) {
+      return []
+    }
+  }, [])
+
+  const _fetchCompatibilitiesTables = useCallback(async () => {
+    const tableList = tablesSettings
+      .map((tableSetting) => {
+        if (tableSetting.isChecked) {
+          return tableSetting.tableName
+        }
+      })
+      .filter((table) => table !== undefined)
+    try {
+      const response = await fetchExportTablesRelationsInfo(tableList)
+      console.log('manelle type response', response)
+      setCompatibilitiesTables(response)
+    } catch (e) {
+      console.log('error', e)
+      return []
+    }
+  }, [tablesSettings])
+
   useEffect(() => {
     _fetchExportableCohorts()
-  }, [_fetchExportableCohorts])
+    _fetchExportTablesInfo()
+  }, [_fetchExportableCohorts, _fetchExportTablesInfo])
 
-  console.log('manelle exportCohort', exportCohortList)
+  useEffect(() => {
+    if (oneFile) {
+      _fetchCompatibilitiesTables()
+    }
+  }, [oneFile, _fetchCompatibilitiesTables])
 
   const addNewTableSetting = (arg: TableSetting) => {
-    setTablesSettings([...tableSettings, arg])
+    setTablesSettings([...tablesSettings, arg])
   }
 
   const onChangeTableSettings = (tableName: string, key: any, value: any) => {
-    const newTableSettings: TableSettings = tableSettings.map((tableSetting) => {
+    const newTableSettings: TableSetting[] = tablesSettings.map((tableSetting) => {
       if (tableSetting.tableName === tableName) {
         return {
           ...tableSetting,
@@ -144,7 +142,42 @@ const ExportForm: React.FC = () => {
     setTablesSettings(newTableSettings)
   }
 
-  console.log('manelle rend combien de fois')
+  const resetSelectedTables = () => {
+    const newSelectedTables = tablesSettings.map((tableSetting) => ({
+      ...tableSetting,
+      isChecked: tableSetting.tableName === 'person'
+    }))
+    setTablesSettings(newSelectedTables)
+  }
+
+  const handleSelectAllTables = () => {
+    const newSelectedTables = tablesSettings.map((tableSetting) => ({
+      ...tableSetting,
+      isChecked: tableSetting.tableName !== 'person' ? tablesSettings.length !== checkedTables.length : true
+    }))
+    setTablesSettings(newSelectedTables)
+  }
+
+  const handleSubmitPayload = () => {
+    console.log('manelle tableSettings', tablesSettings)
+    console.log('manelle reason', motivation)
+    console.log('manelle conditions', conditions)
+    console.log('manelle exportCohort', exportCohort)
+    console.log('manelle veux un export')
+    console.log('manelle exportTypeFile', exportTypeFile)
+    console.log('manelle oneFile', oneFile)
+
+    const tableToExport = tablesSettings.filter((tableSetting) => tableSetting.isChecked)
+    console.log('manelle tableToExport', tableToExport)
+
+    postExportCohort({
+      cohortId: exportCohort ?? { uuid: '' },
+      motivation: motivation,
+      group_tables: oneFile,
+      outputFormat: exportTypeFile,
+      tables: tableToExport
+    })
+  }
 
   return (
     <Grid container flexDirection={'column'}>
@@ -162,12 +195,11 @@ const ExportForm: React.FC = () => {
         minRows={3}
         maxRows={5}
         style={{ marginTop: '20px', backgroundColor: 'white' }}
-        // value={settings.motif}
-        // helperText="Le motif doit comporter au moins 10 caractères"
-        // FormHelperTextProps={{ className: classes.helperText }}
+        value={motivation}
+        FormHelperTextProps={{ className: classes.helperText }}
         label="Motif de l'export"
-        // variant="filled"
-        // onChange={(e) => handleChangeSettings('motif', e.target.value)}
+        variant="outlined"
+        onChange={(e) => setMotivation(e.target.value)}
         error={error}
       />
 
@@ -201,7 +233,7 @@ const ExportForm: React.FC = () => {
               checked={oneFile}
               onClick={() => {
                 setOneFile(!oneFile)
-                // resetSelectedTables()
+                resetSelectedTables()
               }}
             />
           }
@@ -252,54 +284,54 @@ const ExportForm: React.FC = () => {
           </IconButton>
         </Grid>
 
-        {
-          /*!isChecked &&*/ <Grid item xs={2} container justifyContent={'end'} whiteSpace="nowrap" pr={'12px'}>
-            {/* <Grid justifyContent={'end'}> */}
+        {oneFile !== true && (
+          <Grid item xs={2} container justifyContent={'end'} whiteSpace="nowrap" pr={'12px'}>
             <FormControlLabel
               // className={classes.selectAllTables}
               control={
                 <Checkbox
                   color="secondary"
-                  // className={classes.selectAllExportTablesCheckbox}
-                  // indeterminate={
-                  //   settings.tables.filter((table) => table.checked).length !== settings.tables.length &&
-                  //   settings.tables.filter((table) => table.checked).length > 0
-                  // }
+                  className={classes.selectAllExportTablesCheckbox}
+                  indeterminate={
+                    tablesSettings.filter((tableSetting) => tableSetting.isChecked).length !== tablesSettings.length &&
+                    tablesSettings.filter((tableSetting) => tableSetting.isChecked).length > 0
+                  }
                   indeterminateIcon={<IndeterminateCheckBoxOutlined style={{ color: 'rgba(0,0,0,0.6)' }} />}
-                  // checked={settings.tables.filter((table) => table.checked).length === settings.tables.length}
-                  // onChange={resetSelectedTables}
+                  checked={
+                    tablesSettings.filter((tableSetting) => tableSetting.isChecked).length === tablesSettings.length
+                  }
+                  onChange={handleSelectAllTables}
                 />
               }
               label={
-                'test'
-                // settings.tables.filter((table) => table.checked).length === settings.tables.length
-                //   ? 'Tout désélectionner'
-                //   : 'Tout sélectionner'
+                tablesSettings.filter((tableSetting) => tableSetting.isChecked).length === tablesSettings.length
+                  ? 'Tout désélectionner'
+                  : 'Tout sélectionner'
               }
               labelPlacement="start"
             />
           </Grid>
-          // </Grid>
-        }
+        )}
       </Grid>
 
       <Grid>
-        {fakeExportTable.map((_exportTable: any, index: number) => (
+        {exportTableList?.map((_exportTable: any, index: number) => (
           <div
             style={{ padding: '5px 0px 5px 12px', backgroundColor: 'white', marginBottom: '10px' }}
             key={_exportTable.name + index}
           >
-            {/* <Card key={_exportTable.name + index} style={{ marginBottom: '10px' }}> */}
             <ExportTable
               exportCohort={exportCohort}
               exportTable={_exportTable}
-              exportTableSettings={tableSettings}
+              exportTableSettings={tablesSettings}
               setError={setError}
               addNewTableSetting={addNewTableSetting}
               onChangeTableSettings={onChangeTableSettings}
+              compatibilitiesTables={compatibilitiesTables}
+              exportTypeFile={exportTypeFile}
+              oneFile={oneFile}
             />
           </div>
-          // </Card>
         ))}
       </Grid>
 
@@ -355,8 +387,8 @@ const ExportForm: React.FC = () => {
                 color="secondary"
                 className={classes.agreeCheckbox}
                 name="conditions"
-                // checked={settings.conditions}
-                // onChange={() => handleChangeSettings('conditions', !settings.conditions)}
+                checked={conditions}
+                onChange={() => setConditions(!conditions)}
               />
             }
             labelPlacement="end"
@@ -366,7 +398,9 @@ const ExportForm: React.FC = () => {
               </Typography>
             }
           />
-          <Button /*onClick={handleSubmitPayload}*/>Confirmer</Button>
+          <Button disabled={conditions === false} onClick={handleSubmitPayload}>
+            Confirmer
+          </Button>
         </Grid>
       </Grid>
     </Grid>

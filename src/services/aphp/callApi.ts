@@ -1223,16 +1223,21 @@ export const fetchExportableCohorts = async () => {
   return response.data.results
 }
 
-export const fetchExportTableInfo = async (args?: any) => {
+type fetchExportTableInfoProps = {
+  tableNames?: string
+  relationLink?: (string | null)[]
+}
+
+export const fetchExportTableInfo = async (args: fetchExportTableInfoProps) => {
   const { tableNames, relationLink } = args
 
   let options: string[] = []
-  if (tableNames) options = [...options, `tables=${tableNames}`]
-  if (relationLink) options = [...options, `relations=${relationLink}`]
+  if (tableNames) options = [...options, `?tables=${tableNames}`]
+  if (relationLink) options = [...options, `/relations?tables=${relationLink}`]
 
   let queryParams = ''
   if (options.length != 0) {
-    queryParams = `?${options.reduce(paramsReducer)}`
+    queryParams = `${options.reduce(paramsReducer)}`
   }
 
   const response = await apiDatamodel.get(`/models${queryParams}`)

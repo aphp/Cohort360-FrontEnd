@@ -508,7 +508,7 @@ export const getResourceType = (tableName: string): ResourceType => {
     questionnaireresponse: ResourceType.UNKNOWN
   }[tableName]
 
-  return resourceType || ResourceType.UNKNOWN
+  return resourceType ?? ResourceType.UNKNOWN
 }
 
 export const getExportTableLabel = (tableName: string) => {
@@ -528,7 +528,7 @@ export const getExportTableLabel = (tableName: string) => {
     cost: 'Fait - PMSI - GHM',
     procedure_occurrence: 'Fait - PMSI - Actes',
     drug_exposure_prescription: 'Fait - Médicaments - Prescription',
-    questionnaireresponse: 'Formulaires'
+    QuestionnaireResponse: 'Formulaires'
   }[tableName]
-  return tableLabel || '-'
+  return tableLabel ?? '-'
 }
