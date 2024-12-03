@@ -74,8 +74,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
     ADVANCED_INPUTS_ERROR: "Erreur d'entrées avancées"
   },
   buildInfo: {
-    criteriaType: CriteriaType.IMAGING,
-    resourceType: ResourceType.IMAGING,
+    type: { [ResourceType.IMAGING]: CriteriaType.IMAGING },
     defaultFilter: 'patient.active=true'
   },
   itemSections: [

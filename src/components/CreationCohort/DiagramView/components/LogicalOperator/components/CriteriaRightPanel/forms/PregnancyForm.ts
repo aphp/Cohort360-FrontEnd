@@ -64,8 +64,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => ({
     NO_ERROR: ''
   },
   buildInfo: {
-    criteriaType: CriteriaType.PREGNANCY,
-    resourceType: ResourceType.QUESTIONNAIRE_RESPONSE,
+    type: { [ResourceType.QUESTIONNAIRE_RESPONSE]: CriteriaType.PREGNANCY },
     defaultFilter: `subject.active=true&questionnaire.name=${FormNames.PREGNANCY}&status=in-progress,completed`,
     subType: FormNames.PREGNANCY
   },

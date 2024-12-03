@@ -181,9 +181,7 @@ export const constructFhirFilter = (
   allcriterias: CriteriaItemType[]
 ): string => {
   const formDefinition = allcriterias.find((crit) =>
-    isString(crit.formDefinition?.buildInfo?.criteriaType)
-      ? crit.formDefinition?.buildInfo?.criteriaType === criteria.type
-      : crit.formDefinition?.buildInfo?.criteriaType.includes(criteria.type)
+    Object.values(crit.formDefinition?.buildInfo?.type || {}).includes(criteria.type)
   )?.formDefinition
   if (!formDefinition) {
     console.error('No form definition found for criteria type', criteria.type)
@@ -229,9 +227,7 @@ export const unbuildCriteriaData = async (
   critieriaDefinitions: CriteriaItemType[]
 ): Promise<SelectedCriteriaType> => {
   const criteriaDefinition = critieriaDefinitions.filter((item) =>
-    isString(item.formDefinition?.buildInfo?.resourceType)
-      ? item.formDefinition?.buildInfo?.resourceType === element.resourceType
-      : item.formDefinition?.buildInfo?.resourceType.includes(element.resourceType)
+    Object.keys(item.formDefinition?.buildInfo.type || {}).includes(element.resourceType)
   )
 
   if (criteriaDefinition.length === 0) {
@@ -239,7 +235,7 @@ export const unbuildCriteriaData = async (
   }
 
   if (criteriaDefinition.length === 1 && criteriaDefinition[0].formDefinition) {
-    return unbuildCriteriaDataFromDefinition(element, criteriaDefinition[0].id, criteriaDefinition[0].formDefinition)
+    return unbuildCriteriaDataFromDefinition(element, criteriaDefinition[0].formDefinition)
   }
 
   const splittedFilters = element.filterFhir.split('&')
@@ -249,11 +245,7 @@ export const unbuildCriteriaData = async (
       (item) => item.formDefinition?.buildInfo?.subType === subType
     )
     if (questionnaireDefinition?.formDefinition) {
-      return unbuildCriteriaDataFromDefinition(
-        element,
-        questionnaireDefinition.id,
-        questionnaireDefinition.formDefinition
-      )
+      return unbuildCriteriaDataFromDefinition(element, questionnaireDefinition.formDefinition)
     }
   }
   throw new Error('Criteria subtype definition not found')

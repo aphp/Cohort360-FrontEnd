@@ -53,8 +53,7 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
     NO_ERROR: ''
   },
   buildInfo: {
-    criteriaType: CriteriaType.OBSERVATION,
-    resourceType: ResourceType.OBSERVATION,
+    type: { [ResourceType.OBSERVATION]: CriteriaType.OBSERVATION },
     defaultFilter: `subject.active=true&${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`
   },
   itemSections: [

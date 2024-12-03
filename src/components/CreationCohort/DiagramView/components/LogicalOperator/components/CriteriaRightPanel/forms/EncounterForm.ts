@@ -66,8 +66,7 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
     NO_ERROR: ''
   },
   buildInfo: {
-    criteriaType: CriteriaType.ENCOUNTER,
-    resourceType: ResourceType.ENCOUNTER,
+    type: { [ResourceType.ENCOUNTER]: CriteriaType.ENCOUNTER },
     defaultFilter: 'subject.active=true'
   },
   itemSections: [

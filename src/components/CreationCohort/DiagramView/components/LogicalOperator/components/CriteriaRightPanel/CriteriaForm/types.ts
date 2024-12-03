@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 import { ScopeElement } from 'types'
 import { Hierarchy } from 'types/hierarchy'
-import { Comparators, CriteriaType } from 'types/requestCriterias'
+import { Comparators, CriteriaType, ResourceType } from 'types/requestCriterias'
 import { SourceType } from 'types/scope'
 import { LabelObject } from 'types/searchCriterias'
 import { CHIPS_DISPLAY_METHODS } from './mappers/chipDisplayMapper'
@@ -325,10 +325,9 @@ export type CriteriaForm<T> = {
   warningAlert?: ReactNode[]
   initialData: Omit<T, 'id'>
   errorMessages: { [key: string]: string }
-  buildInfo?: {
+  buildInfo: {
     defaultFilter?: string
-    criteriaType: CriteriaType | CriteriaType[]
-    resourceType: string | string[]
+    type: Partial<Record<ResourceType, CriteriaType>>
     // should return true if the criteria is to be unbuild for the current fhir filter
     subType?: string
   }
