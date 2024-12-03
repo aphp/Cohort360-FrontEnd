@@ -153,7 +153,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => ({
               id: QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS,
               type: 'valueCoding'
             },
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée :' }]
           }
         }
       ]
@@ -232,7 +232,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => ({
               id: 'F_MATER_007006',
               type: 'valueCoding'
             },
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Corticothérapie pour maturation foetal faite :' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Corticothérapie pour maturation foetale faite :' }]
           }
         },
         {

@@ -123,7 +123,7 @@ export const form: () => CriteriaForm<Cim10DataType> = () => ({
           noOptionsText: 'Veuillez entrer un statut de visite associée',
           buildInfo: {
             fhirKey: ConditionParamsKeys.ENCOUNTER_STATUS,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée :' }]
           }
         }
       ]

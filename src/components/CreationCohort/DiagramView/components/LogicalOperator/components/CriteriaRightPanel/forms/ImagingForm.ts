@@ -97,7 +97,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           noOptionsText: 'Veuillez entrer un statut de visite associée',
           buildInfo: {
             fhirKey: ImagingParamsKeys.ENCOUNTER_STATUS,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée :' }]
           }
         }
       ]

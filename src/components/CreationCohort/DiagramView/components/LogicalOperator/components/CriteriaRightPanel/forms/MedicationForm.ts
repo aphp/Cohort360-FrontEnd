@@ -68,7 +68,7 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
           label: "Nombre d'occurrences",
           withHierarchyInfo: true,
           buildInfo: {
-            chipDisplayMethodExtraArgs: [{ type: 'reference', value: "Nombre d'occurrences" }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'occurrences" }]
           }
         },
         {
@@ -147,7 +147,7 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
               value1: { type: 'reference', value: 'type' },
               value2: { type: 'string', value: ResourceType.MEDICATION_REQUEST }
             },
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée :' }]
           }
         }
       ]

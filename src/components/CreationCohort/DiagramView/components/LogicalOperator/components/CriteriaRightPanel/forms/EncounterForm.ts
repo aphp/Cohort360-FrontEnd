@@ -168,12 +168,12 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
         {
           valueKey: 'encounterStatus',
           type: 'autocomplete',
-          label: 'Statut de la visite associée',
+          label: 'Statut de la visite',
           valueSetId: getConfig().core.valueSets.encounterStatus.url,
-          noOptionsText: 'Veuillez entrer un statut de visite associée',
+          noOptionsText: 'Veuillez entrer un statut de visite',
           buildInfo: {
             fhirKey: EncounterParamsKeys.STATUS,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite :' }]
           }
         }
       ]
