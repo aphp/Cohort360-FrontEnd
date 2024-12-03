@@ -32,13 +32,6 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
     deathDates: null
   },
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
-  errorMessages: {
-    INCOHERENT_VALUE_ERROR: 'La valeur minimale ne peut pas être supérieure à la valeur maximale.',
-    INVALID_VALUE_ERROR: 'Veuillez entrer un nombre valide.',
-    MISSING_VALUE_ERROR: 'Veuillez entrer 2 valeurs avec ce comparateur.',
-    ADVANCED_INPUTS_ERROR: 'Erreur dans les options avancées.',
-    NO_ERROR: ''
-  },
   buildInfo: {
     type: { [ResourceType.PATIENT]: CriteriaType.PATIENT },
     defaultFilter: 'active=true'

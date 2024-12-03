@@ -58,13 +58,6 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
     'Tous les éléments des champs multiples sont liés par une contrainte OU',
     "Le critère de prise en charge se base sur tous les séjours et passages. Les consultations étant des prises en charge non clôturées, elles n'ont pas de date de fin. Indiquer une durée ou une date de fin de prise en charge exclue ainsi les consultations."
   ],
-  errorMessages: {
-    INCOHERENT_VALUE_ERROR: 'La valeur minimale ne peut pas être supérieure à la valeur maximale.',
-    INVALID_VALUE_ERROR: 'Veuillez entrer un nombre valide.',
-    MISSING_VALUE_ERROR: 'Veuillez entrer 2 valeurs avec ce comparateur.',
-    ADVANCED_INPUTS_ERROR: 'Erreur dans les options avancées.',
-    NO_ERROR: ''
-  },
   buildInfo: {
     type: { [ResourceType.ENCOUNTER]: CriteriaType.ENCOUNTER },
     defaultFilter: 'subject.active=true'

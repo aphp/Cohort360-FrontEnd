@@ -82,7 +82,7 @@ export default function CriteriaForm<T extends CommonCriteriaData>(props: Criter
       onChangeIsInclusive={(isInclusive) => setCriteriaData({ ...criteriaData, isInclusive: isInclusive })}
       infoAlert={infoAlert}
       warningAlert={warningAlert}
-      errorAlert={error ? [errorMessages[error]] : undefined}
+      errorAlert={error && errorMessages ? [errorMessages[error]] : undefined}
     >
       {itemSections.map((section, index) => (
         <CFSection

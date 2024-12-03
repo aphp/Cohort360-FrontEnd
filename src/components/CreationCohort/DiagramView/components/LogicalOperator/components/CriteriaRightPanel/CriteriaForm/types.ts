@@ -324,7 +324,7 @@ export type CriteriaForm<T> = {
   infoAlert?: ReactNode[]
   warningAlert?: ReactNode[]
   initialData: Omit<T, 'id'>
-  errorMessages: { [key: string]: string }
+  errorMessages?: { [key: string]: string }
   buildInfo: {
     defaultFilter?: string
     type: Partial<Record<ResourceType, CriteriaType>>
