@@ -205,7 +205,7 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
           valueKey: 'startOccurrence',
           type: 'calendarRange',
           errorType: 'ADVANCED_INPUTS_ERROR',
-          extraLabel: () => 'Date de début de prescription',
+          extraLabel: () => "Date de début d'administration/prescription",
           buildInfo: {
             fhirKey: {
               main: PrescriptionParamsKeys.DATE,

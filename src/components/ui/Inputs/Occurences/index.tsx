@@ -30,36 +30,38 @@ const OccurenceInput = ({
   allowBetween = false,
   disabled = false
 }: OccurenceInputProps) => {
-  const [occurrenceValue, setOccurrenceValue] = useState<number>(value)
-  const [upperRangeValue, setUpperRangeValue] = useState<number | undefined>(maxValue)
+  const [occurrenceValue, setOccurrenceValue] = useState<string>(value.toString())
+  const [upperRangeValue, setUpperRangeValue] = useState<string | undefined>(maxValue?.toString())
   const [comparatorValue, setComparatorValue] = useState(comparator)
   const [error, setError] = useState<string | undefined>()
 
   useEffect(() => {
-    if (upperRangeValue !== undefined && occurrenceValue > upperRangeValue) {
+    const typedOccurenceValue = parseFloat(occurrenceValue)
+    const typedUpperRangeValue = upperRangeValue ? parseFloat(upperRangeValue) : undefined
+    if (typedUpperRangeValue !== undefined && typedOccurenceValue > typedUpperRangeValue) {
       setError('INCOHERENT_VALUE_ERROR')
-    } else if (comparatorValue === Comparators.BETWEEN && upperRangeValue === undefined) {
+    } else if (comparatorValue === Comparators.BETWEEN && typedUpperRangeValue === undefined) {
       setError('MISSING_VALUE_ERROR')
     } else {
       setError(undefined)
-      onchange(occurrenceValue, comparatorValue, upperRangeValue)
+      onchange(typedOccurenceValue, comparatorValue, typedUpperRangeValue)
     }
   }, [comparatorValue, occurrenceValue, upperRangeValue])
 
   const checkedValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value === '' ? '0' : e.target.value
     if (floatValues && newValue.match(enableNegativeValues ? /^-?\d*\.?\d*$/ : /^\d*\.?\d*$/)) {
-      return parseFloat(newValue)
+      return newValue
     } else if (
       newValue.match(/^\d+$/) ||
       (enableNegativeValues && newValue === '0' && comparatorValue === Comparators.LESS)
     ) {
-      return parseInt(newValue, 10)
+      return newValue
     }
     return undefined
   }
 
-  const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>, setter: (value: number) => void) => {
+  const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>, setter: (value: string) => void) => {
     const newValue = checkedValue(e)
     if (newValue !== undefined) {
       setter(newValue)
@@ -77,8 +79,9 @@ const OccurenceInput = ({
   const handleComparatorChange = (event: SelectChangeEvent<Comparators>) => {
     const newComparator = event.target.value as Comparators
     setComparatorValue(newComparator)
-    if (!enableNegativeValues && newComparator === Comparators.LESS && occurrenceValue === 0) {
-      setOccurrenceValue(1)
+    const typedOccurenceValue = parseFloat(occurrenceValue)
+    if (!enableNegativeValues && newComparator === Comparators.LESS && typedOccurenceValue === 0) {
+      setOccurrenceValue('1')
     }
   }
 

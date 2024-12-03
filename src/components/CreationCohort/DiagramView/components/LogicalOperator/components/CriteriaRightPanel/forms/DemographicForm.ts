@@ -136,7 +136,16 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
           },
           buildInfo: {
             fhirKey: PatientsParamsKeys.DEATHDATE,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Décès' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Décès' }],
+            ignoreIf: (data) => {
+              const typedData = data as DemographicDataType
+              const vitalStatus = typedData.vitalStatus
+              return (
+                vitalStatus === null ||
+                vitalStatus.length === 0 ||
+                (vitalStatus.length === 1 && !!vitalStatus.find((status: LabelObject) => status.id === 'true'))
+              )
+            }
           }
         }
       ]

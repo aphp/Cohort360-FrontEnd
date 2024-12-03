@@ -121,7 +121,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         disableClearable={props.definition.singleChoice}
         options={codeSystem}
         noOptionsText={props.definition.noOptionsText}
-        getOptionLabel={(option) => option.label}
+        getOptionLabel={(option) => `${props.definition.prependCode ? option.id + ' - ' : ''}${option.label}`}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         value={value}
         onChange={(e, value) => props.updateData(value ? (isArray(value) ? value : [value]) : null)}
