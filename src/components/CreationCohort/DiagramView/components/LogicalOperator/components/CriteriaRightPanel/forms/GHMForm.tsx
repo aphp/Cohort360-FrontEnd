@@ -89,7 +89,7 @@ export const form: () => CriteriaForm<GhmDataType> = () => ({
           noOptionsText: 'Aucun statut trouvé',
           buildInfo: {
             fhirKey: ClaimParamsKeys.ENCOUNTER_STATUS,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée :' }]
           }
         }
       ]

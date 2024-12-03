@@ -160,7 +160,7 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
           noOptionsText: 'Veuillez entrer un statut de visite associée',
           buildInfo: {
             fhirKey: DocumentsParamsKeys.ENCOUNTER_STATUS,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée :' }]
           }
         }
       ]

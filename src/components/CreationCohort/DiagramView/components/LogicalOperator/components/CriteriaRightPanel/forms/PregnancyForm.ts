@@ -43,8 +43,8 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => ({
     encounterStatus: [],
     pregnancyDate: null,
     pregnancyMode: null,
-    foetus: { value: 1, comparator: Comparators.GREATER_OR_EQUAL },
-    parity: { value: 1, comparator: Comparators.GREATER_OR_EQUAL },
+    foetus: { value: 0, comparator: Comparators.GREATER_OR_EQUAL },
+    parity: { value: 0, comparator: Comparators.GREATER_OR_EQUAL },
     maternalRisks: null,
     maternalRisksPrecision: '',
     risksRelatedToObstetricHistory: null,
@@ -100,7 +100,7 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => ({
           noOptionsText: 'Veuillez entrer un statut de visite associée',
           buildInfo: {
             fhirKey: QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée :' }]
           }
         }
       ]
