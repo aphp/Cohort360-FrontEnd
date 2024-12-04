@@ -170,6 +170,7 @@ export type NumberAndComparatorDataType = {
 export type DataTypes =
   | NewDurationRangeType
   | string
+  | string[]
   | LabelObject[]
   | number
   | Hierarchy<ScopeElement, string>[]
@@ -191,7 +192,7 @@ export type DataTypeMapping = {
   calendarRange: CriteriaTypeMapping<CalendarItem, NewDurationRangeType>
   durationRange: CriteriaTypeMapping<DurationItem, NewDurationRangeType>
   text: CriteriaTypeMapping<TextCriteriaItem, string>
-  autocomplete: CriteriaTypeMapping<AutoCompleteItem, LabelObject[]>
+  autocomplete: CriteriaTypeMapping<AutoCompleteItem, string[] | string>
   number: CriteriaTypeMapping<NumberCriteriaItem, number>
   executiveUnit: CriteriaTypeMapping<ExecutiveUnitItem, Hierarchy<ScopeElement, string>[]>
   numberAndComparator: CriteriaTypeMapping<NumberWithComparatorCriteriaItem, NumberAndComparatorDataType>
