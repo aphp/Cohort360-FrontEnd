@@ -371,6 +371,7 @@ export type CriteriaDrawerComponentProps = {
 
 export type CriteriaItemType = {
   id: CriteriaType
+  types?: CriteriaType[]
   title: string
   color: string
   fontWeight?: string

@@ -110,6 +110,7 @@ const criteriaList: () => CriteriaItemType[] = () => {
     },
     {
       id: CriteriaType.MEDICATION,
+      types: [CriteriaType.MEDICATION_REQUEST, CriteriaType.MEDICATION_ADMINISTRATION],
       title: 'Médicaments (Prescription - Administration)',
       color: ODD_MEDICATION ? '#0063AF' : '#808080',
       fontWeight: 'bold',

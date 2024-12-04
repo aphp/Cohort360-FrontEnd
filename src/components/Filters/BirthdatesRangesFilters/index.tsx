@@ -32,7 +32,7 @@ const BirthdatesRangesFilter = ({
     <InputWrapper>
       <DurationRange
         active={!disabled}
-        deidentified={deidentified}
+        includeDays={!deidentified}
         label="Âge"
         onError={onError}
         value={birthdatesRanges}

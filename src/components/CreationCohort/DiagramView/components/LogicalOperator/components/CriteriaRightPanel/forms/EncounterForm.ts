@@ -99,6 +99,8 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           valueKey: 'duration',
           type: 'durationRange',
           extraLabel: () => 'Durée de la prise en charge',
+          unit: 'Durée',
+          includeDays: true,
           buildInfo: {
             fhirKey: EncounterParamsKeys.DURATION,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Prise en charge : ' }]

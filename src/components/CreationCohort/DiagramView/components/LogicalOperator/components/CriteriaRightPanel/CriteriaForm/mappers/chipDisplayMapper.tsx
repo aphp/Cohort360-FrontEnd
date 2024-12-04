@@ -75,7 +75,7 @@ const chipForDateLabel = (dateRange: NewDurationRangeType, word?: string) => {
 }
 
 const getSearchDocumentLabel = (value: string, searchBy: LabelObject[]) => {
-  const loc = searchBy.find((l) => l.id === SearchByTypes.TEXT) ? 'document' : 'titre du document'
+  const loc = searchBy && searchBy.find((l) => l.id === SearchByTypes.TEXT) ? 'document' : 'titre du document'
   return `Contient "${value}" dans le ${loc}`
 }
 
@@ -113,12 +113,13 @@ const getIdsListLabels = (values: string, name: string) => {
   return `Contient les ${name} : ${labels}`
 }
 
-const getAttachmentMethod = (value: DocumentAttachmentMethod, daysOfDelay: string | null) => {
-  if (value === DocumentAttachmentMethod.INFERENCE_TEMPOREL) {
+const getAttachmentMethod = (value: LabelObject[], daysOfDelay: string | null) => {
+  const documentAttachementMethod = value.at(0)?.id
+  if (documentAttachementMethod === DocumentAttachmentMethod.INFERENCE_TEMPOREL) {
     return `Rattachement aux documents par ${DocumentAttachmentMethodLabel.INFERENCE_TEMPOREL.toLocaleLowerCase()}${
       daysOfDelay !== '' && daysOfDelay !== null ? ` de ${daysOfDelay} jour(s)` : ''
     }`
-  } else if (value === DocumentAttachmentMethod.ACCESS_NUMBER) {
+  } else if (documentAttachementMethod === DocumentAttachmentMethod.ACCESS_NUMBER) {
     return `Rattachement aux documents par ${DocumentAttachmentMethodLabel.ACCESS_NUMBER.toLocaleLowerCase()}`
   } else {
     return ''
@@ -177,9 +178,9 @@ const chipFromCodeSearch = (
 const displaySystem = (system?: string) => {
   switch (system) {
     case getConfig().features.medication.valueSets.medicationAtc.url:
-      return `${getConfig().features.medication.valueSets.medicationAtc.title}: '`
+      return `${getConfig().features.medication.valueSets.medicationAtc.title}: `
     case getConfig().features.medication.valueSets.medicationUcd.url:
-      return `${getConfig().features.medication.valueSets.medicationUcd.title}: '`
+      return `${getConfig().features.medication.valueSets.medicationUcd.title}: `
     default:
       return ''
   }
@@ -272,7 +273,7 @@ export const CHIPS_DISPLAY_METHODS = {
     item: GenericCriteriaItem,
     valueSets: ValueSetStore,
     args: Array<ChipDisplayMethod | DataTypes>
-  ) => getAttachmentMethod(val as DocumentAttachmentMethod, args[0] as string),
+  ) => getAttachmentMethod(val as LabelObject[], args[0] as string),
   getSearchDocumentLabel: (
     val: DataTypes,
     item: GenericCriteriaItem,
@@ -298,18 +299,8 @@ export const CHIPS_DISPLAY_METHODS = {
     args: Array<ChipDisplayMethod | DataTypes>
   ) => {
     return args[1] === args[2]
-      ? (args[0] as ChipDisplayMethod)(
-          val,
-          item,
-          valueSets,
-          args.slice(3).filter((arg, i) => i % 2 === 0)
-        )
-      : (args[0] as ChipDisplayMethod)(
-          val,
-          item,
-          valueSets,
-          args.slice(3).filter((arg, i) => i % 2 === 1)
-        )
+      ? (args[0] as ChipDisplayMethod)(args.slice(3).find((arg, i) => i % 2 === 0) as DataTypes, item, valueSets, [])
+      : (args[0] as ChipDisplayMethod)(args.slice(3).find((arg, i) => i % 2 === 1) as DataTypes, item, valueSets, [])
   },
   noop: () => undefined
 }

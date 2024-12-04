@@ -147,10 +147,7 @@ export const form: () => CriteriaForm<HospitDataType> = () => ({
           valueSetId: getConfig().core.valueSets.encounterStatus.url,
           noOptionsText: 'Veuillez entrer un statut de visite associée',
           buildInfo: {
-            fhirKey: {
-              id: QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS,
-              type: 'valueCoding'
-            },
+            fhirKey: QuestionnaireResponseParamsKeys.ENCOUNTER_STATUS,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Statut de la visite associée :' }]
           }
         }
