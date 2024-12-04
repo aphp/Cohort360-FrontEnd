@@ -32,7 +32,7 @@ export const completeDocumentCriteria: DocumentDataType = {
     { type: 'Comptes Rendus Hospitalisation', label: 'CRH Chirurgie', id: 'crh-chir' }
   ],
   search: 'cancer',
-  searchBy: SearchByTypes.TEXT,
+  searchBy: [{ id: SearchByTypes.TEXT, label: 'Corps du document' }],
   encounterService: [
     {
       above_levels_ids: '8312002244',

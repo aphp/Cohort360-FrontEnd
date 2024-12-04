@@ -5,7 +5,7 @@ import extractFilterParams, { FhirFilter } from 'utils/fhirFilterParser'
 import { CriteriaItemType } from 'types'
 import { ValueSetStore } from 'state/valueSets'
 import { ReactNode } from 'react'
-import { isArray, isFunction, isString } from 'lodash'
+import { isArray, isFunction, isObject, isString } from 'lodash'
 import { BUILD_MAPPERS, BuilderMethod, UNBUILD_MAPPERS } from './buildMappers'
 
 /************************************************************************************/
@@ -46,9 +46,11 @@ const parseFhirKey = (
   if ('deid' in fhirKey) {
     return deidentified ? fhirKey.deid : fhirKey.main
   }
-  return parseExtraArgs(fhirKey.value1, obj, BUILD_MAPPERS) === parseExtraArgs(fhirKey.value2, obj, BUILD_MAPPERS)
-    ? fhirKey.main
-    : fhirKey.alt
+  const arg1 = parseExtraArgs(fhirKey.value1, obj, BUILD_MAPPERS)
+  const arg2 = parseExtraArgs(fhirKey.value2, obj, BUILD_MAPPERS)
+  const simplifiedArg1 = isArray(arg1) && arg1.length > 0 && isObject(arg1[0]) && 'id' in arg1[0] ? arg1[0].id : arg1
+  const simplifiedArg2 = isArray(arg2) && arg2.length > 0 && isObject(arg2[0]) && 'id' in arg2[0] ? arg2[0].id : arg2
+  return simplifiedArg1 === simplifiedArg2 ? fhirKey.main : fhirKey.alt
 }
 
 const buildFilter = (fhirKey: string, value?: string | { filterValue: string; filterKey: string } | null): string => {
@@ -255,7 +257,7 @@ export const unbuildCriteriaDataFromDefinition = async <T extends SelectedCriter
       const allFilters = filters.flatMap((filter) => {
         if (filter[0] === FILTER_PARAM_NAME) {
           const filterContent = filter[1]
-          const extractedFilterElements = extractFilterParams(filterContent, { omitOperatorEq: true })
+          const extractedFilterElements = extractFilterParams(filterContent, { omitOperatorEq: false })
           if (extractedFilterElements) {
             return (extractQuestionnaireFilterParams(extractedFilterElements) || extractedFilterElements).map(
               (filterParam) => {
@@ -340,7 +342,6 @@ export const criteriasAsArray = (
       const extraArgs = (item.buildInfo?.chipDisplayMethodExtraArgs || []).map((arg) =>
         parseExtraArgs(arg, selectedCriteria, CHIPS_DISPLAY_METHODS)
       )
-      console.log('displaying chip', item, val, extraArgs)
       return chipBuilder(val, item, valuesets, extraArgs)
     })
     .filter((label) => !!label)

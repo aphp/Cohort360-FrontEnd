@@ -61,6 +61,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         multiline={props.definition.multiline}
         inverseCheck={props.definition.inverseCheck}
         extractValidValues={props.definition.extractValidValues}
+        displayCheckError={props.definition.displayCheckError}
         regex={props.definition.regex}
         errorMessage={props.definition.checkErrorMessage}
         placeholder={props.definition.placeholder}
@@ -79,8 +80,9 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
             ? props.updateData(null)
             : props.updateData({ start: range[0] ?? null, end: range[1] ?? null, includeNull: false })
         }
+        unit={props.definition.unit}
         onError={(isError) => props.setError(isError ? 'error' : undefined)}
-        deidentified={props.deidentified}
+        includeDays={!props.deidentified || !!props.definition.includeDays}
       />
     )
   },
@@ -200,6 +202,11 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         placeholder={props.definition.label}
         disabled={props.disabled}
         fullWidth
+        InputProps={{
+          inputProps: {
+            min: props.definition.min
+          }
+        }}
       />
     )
   },

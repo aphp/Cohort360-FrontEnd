@@ -178,7 +178,9 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
             fhirKey: ImagingParamsKeys.WITH_DOCUMENT,
             buildMethod: 'buildWithDocument',
             buildMethodExtraArgs: [{ type: 'reference', value: 'daysOfDelay' }],
-            chipDisplayMethodExtraArgs: [{ type: 'reference', value: 'daysOfDelay' }]
+            chipDisplayMethod: 'getAttachmentMethod',
+            chipDisplayMethodExtraArgs: [{ type: 'reference', value: 'daysOfDelay' }],
+            unbuildMethod: 'unbuildDocumentAttachment'
           }
         },
         {
@@ -187,7 +189,13 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           label: 'Plage de jours',
           extraLabel: () => 'Plage de jours',
           errorType: 'INCOHERENT_AGE_ERROR',
-          displayCondition: (data) => (data.withDocument as LabelObject[])?.at(0)?.id === 'INFERENCE_TEMPOREL'
+          displayCondition: (data) => (data.withDocument as LabelObject[])?.at(0)?.id === 'INFERENCE_TEMPOREL',
+          buildInfo: {
+            fhirKey: ImagingParamsKeys.WITH_DOCUMENT,
+            buildMethod: 'noop',
+            chipDisplayMethod: 'noop',
+            unbuildMethod: 'unbuildDaysOfDelay'
+          }
         },
         {
           valueKey: 'studyUid',

@@ -57,6 +57,7 @@ export type TextWithRegexCriteriaItem = BaseCriteriaItem & {
   placeholder?: string
   multiline?: boolean
   inverseCheck?: boolean
+  displayCheckError?: boolean
   extractValidValues?: boolean
 }
 
@@ -68,6 +69,7 @@ export type InfoCriteriaItem = BaseCriteriaItem & {
 
 export type NumberCriteriaItem = BaseCriteriaItem & {
   type: 'number'
+  min?: number
 }
 
 export type BooleanCriteriaItem = BaseCriteriaItem & {
@@ -89,6 +91,8 @@ export type NumberWithComparatorCriteriaItem = BaseCriteriaItem & {
 
 export type DurationItem = BaseCriteriaItem & {
   type: 'durationRange'
+  unit?: string
+  includeDays?: boolean
 }
 
 export type CalendarItem = BaseCriteriaItem &

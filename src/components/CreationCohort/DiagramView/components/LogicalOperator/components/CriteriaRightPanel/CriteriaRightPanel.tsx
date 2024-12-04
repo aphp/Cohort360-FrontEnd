@@ -184,16 +184,8 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
         if (!_criteria) return null
 
         for (const criteriaItem of _criteria) {
-          const { id, subItems } = criteriaItem
-          // For medication, we match request and medication administration
-          if (
-            id === 'Medication' &&
-            [CriteriaType.MEDICATION_REQUEST, CriteriaType.MEDICATION_ADMINISTRATION].includes(selectedCriteria.type)
-          ) {
-            return criteriaItem
-          }
-          // For others the id should match the selected criteria type
-          if (id === selectedCriteria.type) return criteriaItem
+          const { id, types, subItems } = criteriaItem
+          if (id === selectedCriteria.type || types?.includes(selectedCriteria.type)) return criteriaItem
 
           // Search subcriterias
           if (subItems) {

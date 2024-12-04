@@ -532,10 +532,13 @@ export const fetchCriteriasCodes = async (
   selectedCriteria: SelectedCriteriaType[],
   oldCriteriaCache?: CodeCache
 ): Promise<CodeCache> => {
+  console.log('fetching criteria codes')
   const updatedCriteriaData: CodeCache = { ...oldCriteriaCache }
   const allCriterias = getAllCriteriaItems(criteriaList)
   for (const criteria of allCriterias) {
-    const criteriaValues = selectedCriteria.filter((criterion) => criterion.type === criteria.id)
+    const criteriaValues = selectedCriteria.filter(
+      (criterion) => criterion.type === criteria.id || criteria.types?.includes(criterion.type)
+    )
     for (const section of criteria.formDefinition?.itemSections || []) {
       for (const item of section.items || []) {
         if (item.type === 'codeSearch') {
@@ -546,6 +549,7 @@ export const fetchCriteriasCodes = async (
             const labelValues = criterion[dataKey as keyof SelectedCriteriaType] as unknown as LabelObject[]
             if (labelValues && labelValues.length > 0) {
               for (const code of labelValues) {
+                console.log('fetching code', code)
                 const codeSystem = code.system || defaultValueSet
                 const valueSetCodeCache = updatedCriteriaData[codeSystem] ?? []
                 if (!valueSetCodeCache.find((data) => data.id === code.id)) {

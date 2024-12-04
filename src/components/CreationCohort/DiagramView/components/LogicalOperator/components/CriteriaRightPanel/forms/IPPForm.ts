@@ -37,6 +37,7 @@ export const form: () => CriteriaForm<IPPListDataType> = () => ({
           type: 'textWithRegex',
           regex: '(?:^|\\D+)?(8\\d{9})(?:$|\\D+)',
           placeholder: "Ajouter une liste d'IPP",
+          displayCheckError: false,
           extractValidValues: true,
           displayValueSummary: (value) => {
             const ippList = (value as string)

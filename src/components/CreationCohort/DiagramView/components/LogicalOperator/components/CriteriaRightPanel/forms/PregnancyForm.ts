@@ -131,7 +131,6 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => ({
           valueKey: 'foetus',
           type: 'numberAndComparator',
           label: 'Nombre de fœtus',
-          allowBetween: true,
           buildInfo: {
             fhirKey: {
               id: 'F_MATER_001017',
@@ -144,7 +143,6 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => ({
           valueKey: 'parity',
           type: 'numberAndComparator',
           label: 'Parité',
-          allowBetween: true,
           buildInfo: {
             fhirKey: {
               id: 'F_MATER_001192',

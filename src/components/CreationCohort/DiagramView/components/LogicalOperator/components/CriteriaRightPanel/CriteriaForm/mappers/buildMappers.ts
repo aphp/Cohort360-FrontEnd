@@ -140,13 +140,24 @@ const buildDateFilterValue = (
 }
 
 const unbuildDateFilter = (value: string, existingValue?: NewDurationRangeType) => {
+  const values = value.split(',')
+  if (values.length > 1) {
+    const res: NewDurationRangeType = values.reduce(
+      (acc, val) => unbuildDateFilter(val, acc),
+      existingValue
+    ) as NewDurationRangeType
+    return res
+  }
+
   const date = replaceTime(value.replace(COMPARATORS_REGEX, ''))
   const updatedValue = existingValue || { start: null, end: null, includeNull: false }
   if (value.includes('ge')) {
     updatedValue.start = date
   } else if (value.includes('le')) {
     updatedValue.end = date
-  } else if (value.includes('not*')) {
+  } else if (value.includes('eq*')) {
+    // TODO this is really bad, but it's the only way to handle the includeNull case for now
+    // the value matched is derived from the param 'not (xxx eq "*")'
     updatedValue.includeNull = true
   }
   return updatedValue
@@ -214,6 +225,32 @@ const buildWithDocumentFilter = (withDocument: LabelObject[], daysOfDelay: numbe
   return ''
 }
 
+const parseDocumentAttachment = (value: string) => {
+  const documentAttachment: { documentAttachmentMethod: DocumentAttachmentMethod; daysOfDelay: string | null } = {
+    documentAttachmentMethod: DocumentAttachmentMethod.NONE,
+    daysOfDelay: null
+  }
+  if (value === DocumentAttachmentMethod.ACCESS_NUMBER) {
+    documentAttachment.documentAttachmentMethod = value
+  } else if (value.startsWith(DocumentAttachmentMethod.INFERENCE_TEMPOREL)) {
+    documentAttachment.documentAttachmentMethod = DocumentAttachmentMethod.INFERENCE_TEMPOREL
+    const matchNumber = value.match(/\d+/)
+    if (matchNumber) {
+      documentAttachment.daysOfDelay = matchNumber[0]
+    }
+  }
+
+  return documentAttachment
+}
+
+const unbuildDocumentAttachment = (value: string) => {
+  return [{ id: parseDocumentAttachment(value).documentAttachmentMethod, label: '' }]
+}
+
+const unbuildDaysOfDelay = (value: string) => {
+  return parseDocumentAttachment(value).daysOfDelay
+}
+
 /********************************************************************************************* */
 /*                                Item mapper list                                             */
 /********************************************************************************************* */
@@ -263,8 +300,22 @@ export const UNBUILD_MAPPERS = {
     fhirkey: string,
     args: Array<DataTypes>
   ) => {
-    Promise.resolve((args[0] as LabelObject[]).find((l) => l.id === fhirkey))
+    return Promise.resolve((args[0] as LabelObject[]).filter((l) => l.id === fhirkey))
   },
+  unbuildDocumentAttachment: async (
+    val: string,
+    deid: boolean,
+    existingValue: DataTypes,
+    fhirkey: string,
+    args: Array<DataTypes>
+  ) => Promise.resolve(unbuildDocumentAttachment(val)),
+  unbuildDaysOfDelay: async (
+    val: string,
+    deid: boolean,
+    existingValue: DataTypes,
+    fhirkey: string,
+    args: Array<DataTypes>
+  ) => Promise.resolve(unbuildDaysOfDelay(val)),
   unbuildBooleanFromDataNonNullStatus: async (
     val: string,
     deid: boolean,

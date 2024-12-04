@@ -169,7 +169,6 @@ export enum ImagingParamsKeys {
 }
 
 export enum CriteriaType {
-  UNKNOWN = 'Unknown',
   REQUEST = 'Request',
   IPP_LIST = 'IPPList',
   PATIENT = 'Patient',

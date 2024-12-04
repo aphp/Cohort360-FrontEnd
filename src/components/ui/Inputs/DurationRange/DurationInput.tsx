@@ -9,11 +9,11 @@ type DurationProps = {
   value: DurationType
   label: string
   disabled?: boolean
-  deidentified?: boolean
+  includeDays?: boolean
   onChange: (newDuration: DurationType) => void
 }
 
-const DurationInput = ({ value, label, deidentified = false, disabled = false, onChange }: DurationProps) => {
+const DurationInput = ({ value, label, includeDays = true, disabled = false, onChange }: DurationProps) => {
   const [duration, setDuration] = useState(value)
 
   useEffect(() => {
@@ -25,11 +25,11 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
 
   return (
     <BlockWrapper container justifyContent="space-between" alignItems="flex-end">
-      <Grid item xs={deidentified ? 4 : 3} container alignItems="flex-start">
+      <Grid item xs={!includeDays ? 4 : 3} container alignItems="flex-start">
         <DurationLegendWrapper variant="h5">{label}</DurationLegendWrapper>
       </Grid>
-      <Grid item xs={deidentified ? 8 : 9} container justifyContent="space-between">
-        <Grid container item xs={deidentified ? 5 : 3} alignItems="center">
+      <Grid item xs={!includeDays ? 8 : 9} container justifyContent="space-between">
+        <Grid container item xs={!includeDays ? 5 : 3} alignItems="center">
           <Grid item xs={7}>
             <TextFieldWrapper
               activated={!disabled && !!duration.year}
@@ -60,7 +60,7 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
             </DurationUnitWrapper>
           </Grid>
         </Grid>
-        <Grid container item xs={deidentified ? 5 : 3} alignItems="center">
+        <Grid container item xs={!includeDays ? 5 : 3} alignItems="center">
           <Grid item xs={6}>
             <TextFieldWrapper
               activated={!disabled && !!duration.month}
@@ -91,7 +91,7 @@ const DurationInput = ({ value, label, deidentified = false, disabled = false, o
             </DurationUnitWrapper>
           </Grid>
         </Grid>
-        {!deidentified && (
+        {includeDays && (
           <Grid container item xs={3} alignItems="center">
             <Grid item xs={6}>
               <TextFieldWrapper
