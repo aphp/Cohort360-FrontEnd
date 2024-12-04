@@ -79,23 +79,31 @@ const getSearchDocumentLabel = (value: string, searchBy: LabelObject[]) => {
   return `Contient "${value}" dans le ${loc}`
 }
 
-const getDocumentTypesLabel = (values: LabelObject[]) => {
+const getDocumentTypesLabel = (values: string[]) => {
   const allTypes = new Set(allDocTypes.docTypes.map((docType) => docType.type))
+  const typeGroups = allDocTypes.docTypes.reduce((acc, docType) => {
+    acc[docType.type] = acc[docType.type] ? [...acc[docType.type], docType.code] : [docType.code]
+    return acc
+  }, {} as Record<string, string[]>)
+  const typeMap = allDocTypes.docTypes.reduce((acc, docType) => {
+    acc[docType.code] = docType
+    return acc
+  }, {} as Record<string, { type: string; label: string; code: string }>)
+  return values
+    .reduce((acc, selectedDocType) => {
+      const selectedDocTypeGroup = typeMap[selectedDocType].type
+      const numberOfElementFromGroup =
+        selectedDocTypeGroup && selectedDocTypeGroup in typeGroups ? typeGroups[selectedDocTypeGroup].length : 0
+      const numberOfElementSelected = values.filter((doc) => typeMap[doc].type === selectedDocTypeGroup).length
 
-  const displayingSelectedDocTypes = values.reduce((acc, selectedDocType) => {
-    const numberOfElementFromGroup = selectedDocType.type && allTypes.has(selectedDocType.type) ? allTypes.size : 0
-    const numberOfElementSelected = values.filter((doc) => doc.type === selectedDocType.type).length
-
-    if (numberOfElementFromGroup === numberOfElementSelected) {
-      return acc
-    } else {
-      return [...acc, selectedDocType]
-    }
-  }, [] as LabelObject[])
-
-  const currentDocTypes = displayingSelectedDocTypes.map(({ label }) => label).join(' - ')
-
-  return currentDocTypes
+      if (numberOfElementFromGroup === numberOfElementSelected) {
+        return [...acc, selectedDocTypeGroup]
+      } else {
+        return [...acc, typeMap[selectedDocType].label]
+      }
+    }, [] as string[])
+    .filter((value, index, self) => self.indexOf(value) === index)
+    .join(' - ')
 }
 
 const chipForNumberAndComparator = (value: NumberAndComparatorDataType, name: string) => {
@@ -113,8 +121,8 @@ const getIdsListLabels = (values: string, name: string) => {
   return `Contient les ${name} : ${labels}`
 }
 
-const getAttachmentMethod = (value: LabelObject[], daysOfDelay: string | null) => {
-  const documentAttachementMethod = value.at(0)?.id
+const getAttachmentMethod = (value: string[], daysOfDelay: string | null) => {
+  const documentAttachementMethod = value.at(0)
   if (documentAttachementMethod === DocumentAttachmentMethod.INFERENCE_TEMPOREL) {
     return `Rattachement aux documents par ${DocumentAttachmentMethodLabel.INFERENCE_TEMPOREL.toLocaleLowerCase()}${
       daysOfDelay !== '' && daysOfDelay !== null ? ` de ${daysOfDelay} jour(s)` : ''
@@ -155,13 +163,20 @@ const getLabelsForAutoCompleteItem = (
 }
 
 const chipFromAutoComplete = (
-  val: LabelObject[] | null,
+  val: string[] | null,
   item: AutoCompleteItem,
   valueSets: ValueSetStore,
   label?: string,
   prependCode?: boolean
 ) => {
-  return chipFromLabelObject(val, item, getLabelsForAutoCompleteItem, valueSets, label, prependCode)
+  return chipFromLabelObject(
+    (val as string[]).map((v) => ({ id: v, label: v })),
+    item,
+    getLabelsForAutoCompleteItem,
+    valueSets,
+    label,
+    prependCode
+  )
 }
 
 const chipFromCodeSearch = (
@@ -236,13 +251,7 @@ export const CHIPS_DISPLAY_METHODS = {
     valueSets: ValueSetStore,
     args: Array<ChipDisplayMethod | DataTypes>
   ) =>
-    chipFromAutoComplete(
-      val as LabelObject[],
-      item as AutoCompleteItem,
-      valueSets,
-      args[0] as string,
-      args[1] as boolean
-    ),
+    chipFromAutoComplete(val as string[], item as AutoCompleteItem, valueSets, args[0] as string, args[1] as boolean),
   executiveUnit: (
     val: DataTypes,
     item: GenericCriteriaItem,
@@ -273,7 +282,7 @@ export const CHIPS_DISPLAY_METHODS = {
     item: GenericCriteriaItem,
     valueSets: ValueSetStore,
     args: Array<ChipDisplayMethod | DataTypes>
-  ) => getAttachmentMethod(val as LabelObject[], args[0] as string),
+  ) => getAttachmentMethod(val as string[], args[0] as string),
   getSearchDocumentLabel: (
     val: DataTypes,
     item: GenericCriteriaItem,
@@ -285,7 +294,7 @@ export const CHIPS_DISPLAY_METHODS = {
     item: GenericCriteriaItem,
     valueSets: ValueSetStore,
     args: Array<ChipDisplayMethod | DataTypes>
-  ) => getDocumentTypesLabel(val as LabelObject[]),
+  ) => getDocumentTypesLabel(val as string[]),
   getDocumentStatusLabel: (
     val: DataTypes,
     item: GenericCriteriaItem,

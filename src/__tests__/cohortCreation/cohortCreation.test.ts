@@ -433,7 +433,7 @@ describe('test of buildObservationFilter', () => {
     const selectedCriteria: ObservationDataType = completeObservationCriteria
     const result = [
       'status=Val&subject.active=true',
-      'code=I3356',
+      'code=https://terminology.eds.aphp.fr/aphp-itm-anabio|I3356',
       'encounter.encounter-care-site=8312016825',
       'encounter.status=cancelled',
       'date=ge2024-09-03T00:00:00Z',

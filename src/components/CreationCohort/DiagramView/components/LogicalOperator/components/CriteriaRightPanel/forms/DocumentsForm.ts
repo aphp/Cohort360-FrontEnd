@@ -6,7 +6,7 @@ import {
   WithEncounterStatusDataType,
   WithOccurenceCriteriaDataType
 } from '../CriteriaForm/types'
-import { DocumentStatuses, FilterByDocumentStatus, LabelObject, SearchByTypes } from 'types/searchCriterias'
+import { DocumentStatuses, FilterByDocumentStatus, SearchByTypes } from 'types/searchCriterias'
 import { getConfig } from 'config'
 import docTypes from 'assets/docTypes.json'
 import { SourceType } from 'types/scope'
@@ -17,9 +17,9 @@ export type DocumentDataType = CommonCriteriaData &
   WithEncounterStatusDataType & {
     type: CriteriaType.DOCUMENTS
     search: string
-    searchBy: LabelObject[] | null
-    docType: LabelObject[] | null
-    docStatuses: LabelObject[] | null
+    searchBy: string[] | null
+    docType: string[] | null
+    docStatuses: string[] | null
   }
 
 export const form: () => CriteriaForm<DocumentDataType> = () => ({
@@ -36,7 +36,7 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
     encounterEndDate: null,
     encounterStatus: [],
     search: '',
-    searchBy: [{ id: SearchByTypes.TEXT, label: 'Titre du document' }],
+    searchBy: [SearchByTypes.TEXT],
     docType: null,
     docStatuses: null
   },
@@ -75,13 +75,7 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
               value2: { type: 'reference', value: 'searchBy' }
             },
             buildMethod: 'noop', // the filter will be ignored
-            unbuildMethod: 'unbuildFromLabelObjectFromKey',
-            unbuildMethodExtraArgs: [
-              [
-                { id: SearchByTypes.TEXT, label: 'Corps du document' },
-                { id: SearchByTypes.DESCRIPTION, label: 'Titre du document' }
-              ]
-            ],
+            unbuildMethod: 'unbuildFromKey',
             chipDisplayMethod: 'noop'
           }
         },

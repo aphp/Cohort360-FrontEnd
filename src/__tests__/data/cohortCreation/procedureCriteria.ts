@@ -16,9 +16,7 @@ export const completeProcedureCriteria: CcamDataType = {
   startOccurrence: { start: '2024-09-06', end: '2024-09-06' },
   encounterStartDate: { start: '2024-09-05', end: '2024-09-05' },
   encounterEndDate: { start: '2024-09-06', end: '2024-09-07', includeNull: true },
-  encounterStatus: [
-    { id: 'entered-in-error', label: 'Entered In Error', system: 'http://hl7.org/fhir/CodeSystem/encounter-status' }
-  ],
+  encounterStatus: ['entered-in-error'],
   code: [
     {
       id: '000126',

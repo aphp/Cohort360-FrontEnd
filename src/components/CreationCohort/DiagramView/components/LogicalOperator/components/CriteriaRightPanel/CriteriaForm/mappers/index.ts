@@ -48,8 +48,8 @@ const parseFhirKey = (
   }
   const arg1 = parseExtraArgs(fhirKey.value1, obj, BUILD_MAPPERS)
   const arg2 = parseExtraArgs(fhirKey.value2, obj, BUILD_MAPPERS)
-  const simplifiedArg1 = isArray(arg1) && arg1.length > 0 && isObject(arg1[0]) && 'id' in arg1[0] ? arg1[0].id : arg1
-  const simplifiedArg2 = isArray(arg2) && arg2.length > 0 && isObject(arg2[0]) && 'id' in arg2[0] ? arg2[0].id : arg2
+  const simplifiedArg1 = isArray(arg1) && arg1.length > 0 ? arg1[0] : arg1
+  const simplifiedArg2 = isArray(arg2) && arg2.length > 0 ? arg2[0] : arg2
   return simplifiedArg1 === simplifiedArg2 ? fhirKey.main : fhirKey.alt
 }
 
@@ -130,7 +130,7 @@ const DEFAULT_BUILD_METHOD: Record<CriteriaFormItemType, BuilderMethod> = {
   calendarRange: BUILD_MAPPERS.buildDate,
   durationRange: BUILD_MAPPERS.buildDuration,
   text: BUILD_MAPPERS.buildSearch,
-  autocomplete: BUILD_MAPPERS.buildLabelObject,
+  autocomplete: BUILD_MAPPERS.buildSelect,
   number: BUILD_MAPPERS.buildSearch,
   executiveUnit: BUILD_MAPPERS.buildLabelObject,
   numberAndComparator: BUILD_MAPPERS.buildComparator,
@@ -155,7 +155,7 @@ const DEFAULT_UNBUILD_METHOD: Record<
   calendarRange: UNBUILD_MAPPERS.unbuildDate,
   durationRange: UNBUILD_MAPPERS.unbuildDuration,
   text: UNBUILD_MAPPERS.unbuildSearch,
-  autocomplete: UNBUILD_MAPPERS.unbuildLabelObject,
+  autocomplete: UNBUILD_MAPPERS.unbuildSelect,
   number: UNBUILD_MAPPERS.unbuildSearch,
   executiveUnit: UNBUILD_MAPPERS.unbuildEncounterService,
   numberAndComparator: UNBUILD_MAPPERS.unbuildComparator,

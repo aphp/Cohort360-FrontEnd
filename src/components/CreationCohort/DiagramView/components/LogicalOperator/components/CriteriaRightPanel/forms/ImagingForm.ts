@@ -7,7 +7,7 @@ import {
   WithEncounterDateDataType,
   WithEncounterStatusDataType
 } from '../CriteriaForm/types'
-import { LabelObject } from 'types/searchCriterias'
+import { DocumentAttachmentMethod } from 'types/searchCriterias'
 import { getConfig } from 'config'
 import { SourceType } from 'types/scope'
 
@@ -17,18 +17,18 @@ export type ImagingDataType = CommonCriteriaData &
     type: CriteriaType.IMAGING
     occurrence: NumberAndComparatorDataType
     studyDate: NewDurationRangeType | null
-    studyModalities: LabelObject[] | null
+    studyModalities: string[] | null
     studyDescription: string
     studyProcedure: string
     numberOfSeries: NumberAndComparatorDataType
     numberOfIns: NumberAndComparatorDataType
-    withDocument: LabelObject[]
+    withDocument: string[]
     daysOfDelay: string | null
     studyUid: string
     seriesDate: NewDurationRangeType | null
     seriesDescription: string
     seriesProtocol: string
-    seriesModalities: LabelObject[] | null
+    seriesModalities: string[] | null
     seriesUid: string
   }
 
@@ -53,7 +53,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
     studyProcedure: '',
     numberOfSeries: { value: 1, comparator: Comparators.GREATER_OR_EQUAL },
     numberOfIns: { value: 1, comparator: Comparators.GREATER_OR_EQUAL },
-    withDocument: [{ id: 'NONE', label: 'Aucun' }],
+    withDocument: [DocumentAttachmentMethod.NONE],
     daysOfDelay: null,
     studyUid: '',
     seriesDate: null,
@@ -189,7 +189,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           label: 'Plage de jours',
           extraLabel: () => 'Plage de jours',
           errorType: 'INCOHERENT_AGE_ERROR',
-          displayCondition: (data) => (data.withDocument as LabelObject[])?.at(0)?.id === 'INFERENCE_TEMPOREL',
+          displayCondition: (data) => (data.withDocument as string[])?.at(0) === 'INFERENCE_TEMPOREL',
           buildInfo: {
             fhirKey: ImagingParamsKeys.WITH_DOCUMENT,
             buildMethod: 'noop',

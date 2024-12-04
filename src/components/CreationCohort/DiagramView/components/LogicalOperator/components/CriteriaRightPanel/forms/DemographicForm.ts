@@ -1,12 +1,12 @@
 import { Comparators, CriteriaType, PatientsParamsKeys, ResourceType } from 'types/requestCriterias'
 import { CommonCriteriaData, CriteriaForm, NewDurationRangeType } from '../CriteriaForm/types'
-import { LabelObject, VitalStatusOptionsLabel } from 'types/searchCriterias'
+import { VitalStatusOptionsLabel } from 'types/searchCriterias'
 import { getConfig } from 'config'
 
 export type DemographicDataType = CommonCriteriaData & {
   type: CriteriaType.PATIENT
-  genders: LabelObject[] | null
-  vitalStatus: LabelObject[] | null
+  genders: string[] | null
+  vitalStatus: string[] | null
   age: NewDurationRangeType | null
   birthdates: NewDurationRangeType | null
   deathDates: NewDurationRangeType | null
@@ -92,9 +92,7 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
           extraLabel: (data) => {
             const typedData = data as DemographicDataType
             const vitalStatus = typedData.vitalStatus
-            return vitalStatus &&
-              vitalStatus.length === 1 &&
-              vitalStatus.find((status: LabelObject) => status.id === 'false')
+            return vitalStatus && vitalStatus.length === 1 && vitalStatus.find((status) => status === 'false')
               ? VitalStatusOptionsLabel.deceasedAge
               : VitalStatusOptionsLabel.age
           },
@@ -131,7 +129,7 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
               !context.deidentified &&
               (vitalStatus === null ||
                 vitalStatus.length === 0 ||
-                (vitalStatus.length === 1 && !!vitalStatus.find((status: LabelObject) => status.id === 'false')))
+                (vitalStatus.length === 1 && !!vitalStatus.find((status) => status === 'false')))
             )
           },
           buildInfo: {
@@ -141,9 +139,7 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
               const typedData = data as DemographicDataType
               const vitalStatus = typedData.vitalStatus
               return (
-                vitalStatus === null ||
-                vitalStatus.length === 0 ||
-                (vitalStatus.length === 1 && !!vitalStatus.find((status: LabelObject) => status.id === 'true'))
+                vitalStatus !== null && vitalStatus.length === 1 && !!vitalStatus.find((status) => status === 'true')
               )
             }
           }

@@ -192,7 +192,7 @@ export type DataTypeMapping = {
   calendarRange: CriteriaTypeMapping<CalendarItem, NewDurationRangeType>
   durationRange: CriteriaTypeMapping<DurationItem, NewDurationRangeType>
   text: CriteriaTypeMapping<TextCriteriaItem, string>
-  autocomplete: CriteriaTypeMapping<AutoCompleteItem, string[] | string>
+  autocomplete: CriteriaTypeMapping<AutoCompleteItem, string[]>
   number: CriteriaTypeMapping<NumberCriteriaItem, number>
   executiveUnit: CriteriaTypeMapping<ExecutiveUnitItem, Hierarchy<ScopeElement, string>[]>
   numberAndComparator: CriteriaTypeMapping<NumberWithComparatorCriteriaItem, NumberAndComparatorDataType>
@@ -243,7 +243,7 @@ export type WithEncounterDateDataType = {
 }
 
 export type WithEncounterStatusDataType = {
-  encounterStatus: LabelObject[]
+  encounterStatus: string[]
 }
 
 /****************************************************************/

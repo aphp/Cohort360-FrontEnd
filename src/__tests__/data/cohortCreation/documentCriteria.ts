@@ -3,7 +3,7 @@ import {
   form
 } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/DocumentsForm'
 import { Comparators } from 'types/requestCriterias'
-import { DocumentStatuses, FilterByDocumentStatus, SearchByTypes } from 'types/searchCriterias'
+import { DocumentStatuses, SearchByTypes } from 'types/searchCriterias'
 
 export const defaultDocumentCriteria: DocumentDataType = {
   id: 1,
@@ -16,23 +16,11 @@ export const completeDocumentCriteria: DocumentDataType = {
   startOccurrence: { start: '2024-09-02', end: '2024-09-04' },
   encounterStartDate: { start: '2024-09-05', end: '2024-09-05', includeNull: true },
   encounterEndDate: { start: '2024-09-06', end: '2024-09-07', includeNull: true },
-  encounterStatus: [{ id: 'cancelled', label: 'Cancelled', system: 'http://hl7.org/fhir/CodeSystem/encounter-status' }],
-  docStatuses: [
-    {
-      id: DocumentStatuses.FINAL,
-      label: FilterByDocumentStatus.VALIDATED
-    },
-    {
-      id: DocumentStatuses.PRELIMINARY,
-      label: FilterByDocumentStatus.NOT_VALIDATED
-    }
-  ],
-  docType: [
-    { type: 'Comptes Rendus Hospitalisation', label: 'CR de Jour', id: 'crh-j' },
-    { type: 'Comptes Rendus Hospitalisation', label: 'CRH Chirurgie', id: 'crh-chir' }
-  ],
+  encounterStatus: ['cancelled'],
+  docStatuses: [DocumentStatuses.FINAL, DocumentStatuses.PRELIMINARY],
+  docType: ['crh-j', 'crh-chir'],
   search: 'cancer',
-  searchBy: [{ id: SearchByTypes.TEXT, label: 'Corps du document' }],
+  searchBy: [SearchByTypes.TEXT],
   encounterService: [
     {
       above_levels_ids: '8312002244',

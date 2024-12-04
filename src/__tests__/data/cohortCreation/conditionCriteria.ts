@@ -16,7 +16,7 @@ export const completeConditionCriteria: Cim10DataType = {
   startOccurrence: { start: null, end: null },
   encounterStartDate: { start: '2024-09-05', end: '2024-09-05', includeNull: true },
   encounterEndDate: { start: '2024-09-06', end: '2024-09-07' },
-  encounterStatus: [{ id: 'finished', label: 'Finished', system: 'http://hl7.org/fhir/CodeSystem/encounter-status' }],
+  encounterStatus: ['finished'],
   code: [
     {
       id: 'I841',
@@ -30,18 +30,7 @@ export const completeConditionCriteria: Cim10DataType = {
     }
   ],
   source: 'AREM',
-  diagnosticType: [
-    {
-      id: 'fp',
-      label: 'fp - Finalité Principale De Prise En Charge',
-      system: 'https://terminology.eds.aphp.fr/aphp-orbis-condition-status'
-    },
-    {
-      id: 'f',
-      label: 'f - Finalité De Prise En Charge',
-      system: 'https://terminology.eds.aphp.fr/aphp-orbis-condition-status'
-    }
-  ],
+  diagnosticType: ['fp', 'f'],
   encounterService: [
     {
       above_levels_ids: '8312002244',

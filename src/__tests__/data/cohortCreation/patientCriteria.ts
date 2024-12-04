@@ -10,49 +10,22 @@ export const defaultPatientCriteria: DemographicDataType = {
 
 export const patientGenderFemaleCriteria: DemographicDataType = {
   ...defaultPatientCriteria,
-  genders: [
-    {
-      id: 'f',
-      label: 'femme'
-    }
-  ]
+  genders: ['f']
 }
 
 export const patientGendersCriteria: DemographicDataType = {
   ...defaultPatientCriteria,
-  genders: [
-    {
-      id: 'f',
-      label: 'femme'
-    },
-    {
-      id: 'm',
-      label: 'homme'
-    }
-  ]
+  genders: ['f', 'm']
 }
 
 export const patientDeceasedVitalStatusCriteria: DemographicDataType = {
   ...defaultPatientCriteria,
-  vitalStatus: [
-    {
-      id: 'true',
-      label: 'deceased'
-    }
-  ]
+  vitalStatus: ['true']
 }
+
 export const patientVitalStatusCriteria: DemographicDataType = {
   ...defaultPatientCriteria,
-  vitalStatus: [
-    {
-      id: 'true',
-      label: 'deceased'
-    },
-    {
-      id: 'false',
-      label: 'alive'
-    }
-  ]
+  vitalStatus: ['true', 'false']
 }
 
 export const patientNominativeAgeCriteria: DemographicDataType = {
@@ -72,26 +45,8 @@ export const patientNominativeDeathDatesCriteria: DemographicDataType = {
 
 export const completePatientCriteria: DemographicDataType = {
   ...defaultPatientCriteria,
-  genders: [
-    {
-      id: 'f',
-      label: 'femme'
-    },
-    {
-      id: 'm',
-      label: 'homme'
-    }
-  ],
-  vitalStatus: [
-    {
-      id: 'true',
-      label: 'deceased'
-    },
-    {
-      id: 'false',
-      label: 'alive'
-    }
-  ],
+  genders: ['f', 'm'],
+  vitalStatus: ['true', 'false'],
   //age: { start: '12/5/8', end: '25/7/25' },
   birthdates: { start: '2020-01-01', end: '2020-12-31' },
   deathDates: { start: '2020-01-01', end: '2020-12-31' }

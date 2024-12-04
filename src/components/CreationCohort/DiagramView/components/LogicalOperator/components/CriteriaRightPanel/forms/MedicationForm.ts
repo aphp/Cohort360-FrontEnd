@@ -22,9 +22,9 @@ export type MedicationDataType = CommonCriteriaData &
   WithEncounterDateDataType &
   WithEncounterStatusDataType & {
     code: LabelObject[] | null
-    administration: LabelObject[] | null
+    administration: string[] | null
     type: CriteriaType.MEDICATION_REQUEST | CriteriaType.MEDICATION_ADMINISTRATION
-    prescriptionType: LabelObject[] | null
+    prescriptionType: string[] | null
     endOccurrence: NewDurationRangeType | null
   }
 
