@@ -21,7 +21,6 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
   const location = useLocation()
   const search = new URLSearchParams(location.search)
   const groupId = search.get('groupId') ?? undefined
-  console.log('manelle groupId', groupId)
 
   const cohort = useAppSelector((state) => state.exploredCohort)
   const [anchorEl, setAnchorEl] = useState(null)

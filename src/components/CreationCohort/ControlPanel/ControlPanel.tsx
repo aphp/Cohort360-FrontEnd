@@ -25,8 +25,6 @@ import ShareIcon from '@mui/icons-material/Share'
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
 import UpdateSharpIcon from '@mui/icons-material/UpdateSharp'
 
-import { WebSocketJobStatus } from 'types'
-
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
 
@@ -49,7 +47,8 @@ import {
   RequestType,
   SimpleStatus,
   Snapshot,
-  WSJobStatus
+  WSJobStatus,
+  WebSocketJobStatus
 } from 'types'
 
 import useStyle from './styles'
@@ -70,7 +69,7 @@ const ControlPanel: React.FC<{
   const { classes, cx } = useStyle()
   const dispatch = useAppDispatch()
   const appConfig = useContext(AppConfig)
-  const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
+  const [openModal, setOpenModal] = useState<'executeCohortConfirmation' | null>(null)
   const [oldCount, setOldCount] = useState<CohortCreationCounterType | null>(null)
   const [openShareRequestModal, setOpenShareRequestModal] = useState<boolean>(false)
   const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
@@ -122,7 +121,7 @@ const ControlPanel: React.FC<{
           .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
 
   const checkIfLogicalOperatorIsEmpty = () => {
-    let _criteriaGroup = criteriaGroup ? criteriaGroup : []
+    let _criteriaGroup = criteriaGroup || []
     _criteriaGroup = _criteriaGroup.filter(({ id }) => id !== 0)
 
     return _criteriaGroup && _criteriaGroup.length > 0
@@ -131,7 +130,7 @@ const ControlPanel: React.FC<{
   }
 
   const cleanLogicalOperator = () => {
-    let _criteriaGroup = criteriaGroup ? criteriaGroup : []
+    let _criteriaGroup = criteriaGroup || []
     _criteriaGroup = _criteriaGroup.filter(({ id }) => id !== 0)
 
     const logicalOperatorNeedToBeErase =
@@ -215,11 +214,15 @@ const ControlPanel: React.FC<{
   const webSocketContext = useContext(WebSocketContext)
 
   useEffect(() => {
-    if (status && (status === CohortJobStatus.NEW || status === CohortJobStatus.PENDING)) {
+    if (
+      status &&
+      (status === CohortJobStatus.NEW || status === CohortJobStatus.PENDING || status === CohortJobStatus.STARTED)
+    ) {
       setCountLoading(LoadingStatus.FETCHING)
-      dispatch(countCohortCreation({ uuid: uuid }))
-    }
-  }, [dispatch, status, uuid, jobFailMsg, includePatient])
+      //TODO: refacto the lunch of the count in the app colision with buildCohortCreation and unbuildCohortCreation
+      // dispatch(countCohortCreation({ uuid: uuid }))
+    } else setCountLoading(LoadingStatus.SUCCESS)
+  }, [status /*dispatch, status, uuid*/])
 
   useEffect(() => {
     const listener = (message: WSJobStatus) => {
@@ -251,7 +254,7 @@ const ControlPanel: React.FC<{
               count_outdated ||
               includePatient === 0
             }
-            onClick={() => onSetOpenModal('executeCohortConfirmation')}
+            onClick={() => setOpenModal('executeCohortConfirmation')}
             className={classes.requestExecution}
             style={{ marginTop: 12, marginBottom: 6 }}
           >
@@ -496,7 +499,7 @@ const ControlPanel: React.FC<{
       {openModal === 'executeCohortConfirmation' && (
         <ModalCohortTitle
           onExecute={onExecute}
-          onClose={() => onSetOpenModal(null)}
+          onClose={() => setOpenModal(null)}
           longCohort={includePatient ? includePatient > cohortLimit : false}
           cohortLimit={cohortLimit}
         />
