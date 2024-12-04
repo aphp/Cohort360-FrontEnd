@@ -215,7 +215,7 @@ const ControlPanel: React.FC<{
   const webSocketContext = useContext(WebSocketContext)
 
   useEffect(() => {
-    if (status && status === CohortJobStatus.NEW) {
+    if (status && (status === CohortJobStatus.NEW || status === CohortJobStatus.PENDING)) {
       setCountLoading(LoadingStatus.FETCHING)
       dispatch(countCohortCreation({ uuid: uuid }))
     }
