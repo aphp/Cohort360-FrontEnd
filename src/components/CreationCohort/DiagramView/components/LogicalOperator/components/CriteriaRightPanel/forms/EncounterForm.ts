@@ -99,7 +99,6 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           valueKey: 'duration',
           type: 'durationRange',
           extraLabel: () => 'Durée de la prise en charge',
-          extraInfo: 'Ne concerne pas les consultations.',
           buildInfo: {
             fhirKey: EncounterParamsKeys.DURATION,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Prise en charge : ' }]
@@ -110,7 +109,6 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           type: 'calendarRange',
           label: 'Début de prise en charge',
           extraLabel: () => 'Date de prise en charge',
-          extraInfo: 'Ne concerne pas les consultations.',
           labelAltStyle: true,
           withOptionIncludeNull: true,
           errorType: 'INCOHERENT_VALUE_ERROR',
@@ -123,6 +121,7 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           valueKey: 'encounterEndDate',
           type: 'calendarRange',
           label: 'Fin de prise en charge',
+          info: 'Ne concerne pas les consultations.',
           labelAltStyle: true,
           withOptionIncludeNull: true,
           errorType: 'INCOHERENT_VALUE_ERROR',
