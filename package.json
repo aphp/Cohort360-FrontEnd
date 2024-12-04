@@ -1,6 +1,6 @@
 {
   "name": "cohort360",
-  "version": "2.40.5",
+  "version": "2.40.6",
   "private": true,
   "type": "module",
   "dependencies": {
