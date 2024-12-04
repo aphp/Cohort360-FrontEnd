@@ -7,7 +7,6 @@ import {
   WithEncounterStatusDataType,
   WithOccurenceCriteriaDataType
 } from '../CriteriaForm/types'
-import { LabelObject } from 'types/searchCriterias'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
 
@@ -18,15 +17,15 @@ export type EncounterDataType = CommonCriteriaData &
     type: CriteriaType.ENCOUNTER
     age: NewDurationRangeType | null
     duration: NewDurationRangeType | null
-    admissionMode: LabelObject[] | null
-    entryMode: LabelObject[] | null
-    exitMode: LabelObject[] | null
-    priseEnChargeType: LabelObject[] | null
-    typeDeSejour: LabelObject[] | null
-    reason: LabelObject[] | null
-    destination: LabelObject[] | null
-    provenance: LabelObject[] | null
-    admission: LabelObject[] | null
+    admissionMode: string[] | null
+    entryMode: string[] | null
+    exitMode: string[] | null
+    priseEnChargeType: string[] | null
+    typeDeSejour: string[] | null
+    reason: string[] | null
+    destination: string[] | null
+    provenance: string[] | null
+    admission: string[] | null
   }
 
 export const form: () => CriteriaForm<EncounterDataType> = () => ({

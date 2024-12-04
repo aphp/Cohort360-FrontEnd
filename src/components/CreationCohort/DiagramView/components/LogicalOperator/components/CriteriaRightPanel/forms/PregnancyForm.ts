@@ -7,7 +7,7 @@ import {
   WithEncounterStatusDataType,
   WithOccurenceCriteriaDataType
 } from '../CriteriaForm/types'
-import { FormNames, LabelObject } from 'types/searchCriterias'
+import { FormNames } from 'types/searchCriterias'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
 
@@ -16,18 +16,18 @@ export type PregnancyDataType = CommonCriteriaData &
   WithEncounterStatusDataType & {
     type: CriteriaType.PREGNANCY
     pregnancyDate: NewDurationRangeType | null
-    pregnancyMode: LabelObject[] | null
+    pregnancyMode: string[] | null
     foetus: NumberAndComparatorDataType
     parity: NumberAndComparatorDataType
-    maternalRisks: LabelObject[] | null
+    maternalRisks: string[] | null
     maternalRisksPrecision: string
-    risksRelatedToObstetricHistory: LabelObject[] | null
+    risksRelatedToObstetricHistory: string[] | null
     risksRelatedToObstetricHistoryPrecision: string
-    risksOrComplicationsOfPregnancy: LabelObject[] | null
+    risksOrComplicationsOfPregnancy: string[] | null
     risksOrComplicationsOfPregnancyPrecision: string
-    corticotherapie: LabelObject[] | null
-    prenatalDiagnosis: LabelObject[] | null
-    ultrasoundMonitoring: LabelObject[] | null
+    corticotherapie: string[] | null
+    prenatalDiagnosis: string[] | null
+    ultrasoundMonitoring: string[] | null
   }
 
 export const form: () => CriteriaForm<PregnancyDataType> = () => ({

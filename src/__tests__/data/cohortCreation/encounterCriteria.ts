@@ -15,108 +15,18 @@ export const completeEncounterCriteria: EncounterDataType = {
   startOccurrence: null,
   encounterStartDate: { start: '2024-09-05', end: '2024-09-05', includeNull: true },
   encounterEndDate: { start: '2024-09-06', end: '2024-09-07', includeNull: true },
-  encounterStatus: [
-    {
-      id: 'status1',
-      label: 'status1'
-    },
-    {
-      id: 'status2',
-      label: 'status2'
-    }
-  ],
+  encounterStatus: ['status1', 'status2'],
   age: { start: '3/2/1', end: '3/2/1' },
   duration: { start: '6/5/4', end: '6/5/4' },
-  admissionMode: [
-    {
-      id: 'mode1',
-      label: 'mode1'
-    },
-    {
-      id: 'mode2',
-      label: 'mode2'
-    }
-  ],
-  entryMode: [
-    {
-      id: 'entry1',
-      label: 'entry1'
-    },
-    {
-      id: 'entry2',
-      label: 'entry2'
-    }
-  ],
-  exitMode: [
-    {
-      id: 'exit1',
-      label: 'exit1'
-    },
-    {
-      id: 'exit2',
-      label: 'exit2'
-    }
-  ],
-  priseEnChargeType: [
-    {
-      id: 'prise1',
-      label: 'prise1'
-    },
-    {
-      id: 'prise2',
-      label: 'prise2'
-    }
-  ],
-  typeDeSejour: [
-    {
-      id: 'sejour1',
-      label: 'sejour1'
-    },
-    {
-      id: 'sejour2',
-      label: 'sejour2'
-    }
-  ],
-  reason: [
-    {
-      id: 'reason1',
-      label: 'reason1'
-    },
-    {
-      id: 'reason2',
-      label: 'reason2'
-    }
-  ],
-  destination: [
-    {
-      id: 'destination1',
-      label: 'destination1'
-    },
-    {
-      id: 'destination2',
-      label: 'destination2'
-    }
-  ],
-  provenance: [
-    {
-      id: 'provenance1',
-      label: 'provenance1'
-    },
-    {
-      id: 'provenance2',
-      label: 'provenance2'
-    }
-  ],
-  admission: [
-    {
-      id: 'admission1',
-      label: 'admission1'
-    },
-    {
-      id: 'admission2',
-      label: 'admission2'
-    }
-  ],
+  admissionMode: ['mode1', 'mode2'],
+  entryMode: ['entry1', 'entry2'],
+  exitMode: ['exit1', 'exit2'],
+  priseEnChargeType: ['prise1', 'prise2'],
+  typeDeSejour: ['sejour1', 'sejour2'],
+  reason: ['reason1', 'reason2'],
+  destination: ['destination1', 'destination2'],
+  provenance: ['provenance1', 'provenance2'],
+  admission: ['admission1', 'admission2'],
   encounterService: [
     {
       above_levels_ids: '',

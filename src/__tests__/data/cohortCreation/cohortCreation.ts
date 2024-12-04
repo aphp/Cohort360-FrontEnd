@@ -41,13 +41,7 @@ export const procedurePeudonimizedCriteria: SelectedCriteriaType[] = [
     ...defaultProcedureCriteria,
     startOccurrence: { start: '2024-08-15', end: '2024-08-22' },
     encounterStartDate: { start: '2024-08-07', end: '2024-08-21' },
-    encounterStatus: [
-      {
-        id: 'cancelled',
-        label: 'Cancelled',
-        system: 'http://hl7.org/fhir/CodeSystem/encounter-status'
-      }
-    ],
+    encounterStatus: ['cancelled'],
     encounterEndDate: { start: '2024-08-22', end: '2024-08-22' },
     code: [
       {
@@ -69,18 +63,8 @@ export const procedurePeudonimizedCriteria: SelectedCriteriaType[] = [
 export const patientPseudonimizedCriteria: SelectedCriteriaType[] = [
   {
     ...defaultPatientCriteria,
-    genders: [
-      {
-        id: 'f',
-        label: 'Femme'
-      }
-    ],
-    vitalStatus: [
-      {
-        id: 'alive',
-        label: 'Vivant'
-      }
-    ]
+    genders: ['f'],
+    vitalStatus: ['alive']
   }
 ]
 
@@ -123,18 +107,8 @@ export const criteriasArrayWtihNominativeData: SelectedCriteriaType[] = [
   ...procedurePeudonimizedCriteria,
   {
     ...defaultPatientCriteria,
-    genders: [
-      {
-        id: 'f',
-        label: 'Femme'
-      }
-    ],
-    vitalStatus: [
-      {
-        id: 'alive',
-        label: 'Vivant'
-      }
-    ],
+    genders: ['f'],
+    vitalStatus: ['true'],
     deathDates: { start: '2024-08-15', end: '2024-08-15' }
   }
 ]
@@ -143,18 +117,8 @@ export const criteriaArrayWithNoNominativeData: SelectedCriteriaType[] = [
   ...procedurePeudonimizedCriteria,
   {
     ...defaultPatientCriteria,
-    genders: [
-      {
-        id: 'f',
-        label: 'Femme'
-      }
-    ],
-    vitalStatus: [
-      {
-        id: 'alive',
-        label: 'Vivant'
-      }
-    ],
+    genders: ['f'],
+    vitalStatus: ['false'],
     age: { start: '0/1/2', end: '0/5/15' }
   }
 ]

@@ -13,6 +13,7 @@ import { comparatorToFilter, parseOccurence } from 'utils/valueComparator'
 import services from 'services/aphp'
 import { Hierarchy } from 'types/hierarchy'
 import { DataTypes, FhirKey, NewDurationRangeType, NumberAndComparatorDataType } from '../types'
+import { b } from 'vitest/dist/chunks/suite.CcK46U-P'
 
 /************************************************************************************/
 /*                        Criteria Form Item Mappers                                */
@@ -41,6 +42,17 @@ const COMPARATORS_REGEX = /(le|ge)/gi
 
 const replaceTime = (date?: string) => {
   return date?.replace('T00:00:00Z', '') ?? null
+}
+
+const unbuildSelect = (value: string, existingValue?: string[]) => {
+  const values = value ? value.split(',').map((v) => v.trim()) : null
+  return [...(existingValue || []), ...(values || [])]
+}
+
+const buildSelect = (criterion: string[] | null, hierarchyUrl?: string) => {
+  return criterion && criterion.length > 0
+    ? criterion.map((item) => (hierarchyUrl ? `${hierarchyUrl}|${item}` : item)).reduce(searchReducer, '')
+    : ''
 }
 
 const buildLabelObjectFilter = (
@@ -214,10 +226,10 @@ const buildNumberComparatorFilter = (
   return `${comparatorToFilter(numberAndComparator.comparator)}${numberAndComparator.value}`
 }
 
-const buildWithDocumentFilter = (withDocument: LabelObject[], daysOfDelay: number | null) => {
-  if (withDocument && withDocument.length === 1 && withDocument.at(0)?.id !== DocumentAttachmentMethod.NONE) {
+const buildWithDocumentFilter = (withDocument: string[], daysOfDelay: number | null) => {
+  if (withDocument && withDocument.length === 1 && withDocument.at(0) !== DocumentAttachmentMethod.NONE) {
     return `${
-      withDocument.at(0)?.id === DocumentAttachmentMethod.ACCESS_NUMBER
+      withDocument.at(0) === DocumentAttachmentMethod.ACCESS_NUMBER
         ? DocumentAttachmentMethod.ACCESS_NUMBER
         : `INFERENCE_TEMPOREL${daysOfDelay ? `_${daysOfDelay}_J` : ''}`
     }`
@@ -244,7 +256,7 @@ const parseDocumentAttachment = (value: string) => {
 }
 
 const unbuildDocumentAttachment = (value: string) => {
-  return [{ id: parseDocumentAttachment(value).documentAttachmentMethod, label: '' }]
+  return [parseDocumentAttachment(value).documentAttachmentMethod]
 }
 
 const unbuildDaysOfDelay = (value: string) => {
@@ -263,6 +275,13 @@ export const UNBUILD_MAPPERS = {
     fhirkey: string,
     args: Array<DataTypes>
   ) => Promise.resolve(unbuildLabelObjectFilterValue(val, existingValue as LabelObject[])),
+  unbuildSelect: async (
+    val: string,
+    deid: boolean,
+    existingValue: DataTypes,
+    fhirkey: string,
+    args: Array<DataTypes>
+  ) => Promise.resolve(unbuildSelect(val, existingValue as string[])),
   unbuildEncounterService: async (
     val: string,
     deid: boolean,
@@ -293,14 +312,14 @@ export const UNBUILD_MAPPERS = {
     fhirkey: string,
     args: Array<DataTypes>
   ) => Promise.resolve(parseOccurence(val)),
-  unbuildFromLabelObjectFromKey: async (
+  unbuildFromKey: async (
     val: string,
     deid: boolean,
     existingValue: DataTypes,
     fhirkey: string,
     args: Array<DataTypes>
   ) => {
-    return Promise.resolve((args[0] as LabelObject[]).filter((l) => l.id === fhirkey))
+    return Promise.resolve([fhirkey])
   },
   unbuildDocumentAttachment: async (
     val: string,
@@ -326,6 +345,8 @@ export const UNBUILD_MAPPERS = {
 }
 
 export const BUILD_MAPPERS = {
+  buildSelect: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) =>
+    buildSelect(val as string[], args[0] as string),
   buildLabelObject: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) =>
     buildLabelObjectFilter(val as LabelObject[], args[0] as string, args[1] as boolean),
   buildEncounterService: (
@@ -343,7 +364,7 @@ export const BUILD_MAPPERS = {
   buildComparator: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) =>
     buildNumberComparatorFilter(val as NumberAndComparatorDataType, args[0] as string),
   buildWithDocument: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) =>
-    buildWithDocumentFilter(val as LabelObject[], args[0] as number | null),
+    buildWithDocumentFilter(val as string[], args[0] as number | null),
   // utility meta functions
   skipIf: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) => {
     return args[1] === args[2] ? undefined : (args[0] as BuilderMethod)(val, key, deidentified, args.slice(3))

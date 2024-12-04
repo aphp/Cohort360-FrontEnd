@@ -17,7 +17,7 @@ export const completeMedicationAdministrationCriteria: MedicationDataType = {
   startOccurrence: { start: '2024-09-03', end: '2024-09-04' },
   encounterStartDate: { start: '2024-09-04', end: '2024-09-07', includeNull: true },
   encounterEndDate: { start: '2024-09-02', end: '2024-09-06' },
-  encounterStatus: [{ id: 'cancelled', label: 'Cancelled', system: 'http://hl7.org/fhir/CodeSystem/encounter-status' }],
+  encounterStatus: ['cancelled'],
   code: [
     { id: 'D01AA01', label: 'D01AA01 - Nystatin; Topical', system: 'https://terminology.eds.aphp.fr/atc' },
     { id: 'D01AA02', label: 'D01AA02 - Natamycin; Topical', system: 'https://terminology.eds.aphp.fr/atc' },
@@ -27,13 +27,7 @@ export const completeMedicationAdministrationCriteria: MedicationDataType = {
       system: 'https://terminology.eds.aphp.fr/smt-medicament-ucd'
     }
   ],
-  administration: [
-    {
-      id: 'CUTAN',
-      label: 'Cutanée',
-      system: 'https://terminology.eds.aphp.fr/aphp-orbis-medicament-voie-administration'
-    }
-  ],
+  administration: ['CUTAN'],
   encounterService: [
     {
       above_levels_ids: '8312002244',
@@ -59,7 +53,7 @@ export const completeMedicationPrescriptionCriteria: MedicationDataType = {
   startOccurrence: { start: '2024-09-03', end: '2024-09-04' },
   encounterStartDate: { start: '2024-09-04', end: '2024-09-07', includeNull: true },
   encounterEndDate: { start: '2024-09-02', end: '2024-09-06' },
-  encounterStatus: [{ id: 'cancelled', label: 'Cancelled', system: 'http://hl7.org/fhir/CodeSystem/encounter-status' }],
+  encounterStatus: ['cancelled'],
   code: [
     { id: 'D01AA01', label: 'D01AA01 - Nystatin; Topical', system: 'https://terminology.eds.aphp.fr/atc' },
     { id: 'D01AA02', label: 'D01AA02 - Natamycin; Topical', system: 'https://terminology.eds.aphp.fr/atc' },
@@ -69,13 +63,7 @@ export const completeMedicationPrescriptionCriteria: MedicationDataType = {
       system: 'https://terminology.eds.aphp.fr/smt-medicament-ucd'
     }
   ],
-  prescriptionType: [
-    {
-      id: '172641',
-      label: 'Prescription Hospitalière',
-      system: 'https://terminology.eds.aphp.fr/aphp-medicament-type-prescription'
-    }
-  ],
+  prescriptionType: ['172641'],
   encounterService: [
     {
       above_levels_ids: '8312002244',

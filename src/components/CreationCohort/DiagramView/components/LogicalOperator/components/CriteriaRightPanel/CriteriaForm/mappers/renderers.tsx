@@ -141,9 +141,9 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
 
                 const onClick = () => {
                   if (groupChildren.length === selectedWithinGroup.length) {
-                    props.updateData(valueWithLabels.filter((doc) => doc[groupBy] !== group))
+                    props.updateData(valueWithLabels.filter((doc) => doc[groupBy] !== group).map((doc) => doc.id))
                   } else {
-                    props.updateData(_.uniqWith([...valueWithLabels, ...groupChildren], _.isEqual))
+                    props.updateData(_.uniqWith([...valueWithLabels, ...groupChildren], _.isEqual).map((doc) => doc.id))
                   }
                 }
 

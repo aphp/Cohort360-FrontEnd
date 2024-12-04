@@ -17,7 +17,7 @@ export type Cim10DataType = CommonCriteriaData &
     type: CriteriaType.CONDITION
     code: LabelObject[] | null
     source: string | null
-    diagnosticType: LabelObject[] | null
+    diagnosticType: string[] | null
   }
 
 export const form: () => CriteriaForm<Cim10DataType> = () => ({

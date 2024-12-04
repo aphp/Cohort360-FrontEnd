@@ -7,7 +7,7 @@ import {
   WithEncounterStatusDataType,
   WithOccurenceCriteriaDataType
 } from '../CriteriaForm/types'
-import { FormNames, LabelObject } from 'types/searchCriterias'
+import { FormNames } from 'types/searchCriterias'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
 
@@ -16,30 +16,30 @@ export type HospitDataType = CommonCriteriaData &
   WithEncounterStatusDataType & {
     type: CriteriaType.HOSPIT
     hospitReason: string
-    inUteroTransfer: LabelObject[] | null
-    pregnancyMonitoring: LabelObject[] | null
-    vme: LabelObject[] | null
-    maturationCorticotherapie: LabelObject[] | null
-    chirurgicalGesture: LabelObject[] | null
-    childbirth: LabelObject[] | null
-    hospitalChildBirthPlace: LabelObject[] | null
-    otherHospitalChildBirthPlace: LabelObject[] | null
-    homeChildBirthPlace: LabelObject[] | null
-    childbirthMode: LabelObject[] | null
-    maturationReason: LabelObject[] | null
-    maturationModality: LabelObject[] | null
-    imgIndication: LabelObject[] | null
-    laborOrCesareanEntry: LabelObject[] | null
-    pathologyDuringLabor: LabelObject[] | null
-    obstetricalGestureDuringLabor: LabelObject[] | null
-    analgesieType: LabelObject[] | null
+    inUteroTransfer: string[] | null
+    pregnancyMonitoring: string[] | null
+    vme: string[] | null
+    maturationCorticotherapie: string[] | null
+    chirurgicalGesture: string[] | null
+    childbirth: string[] | null
+    hospitalChildBirthPlace: string[] | null
+    otherHospitalChildBirthPlace: string[] | null
+    homeChildBirthPlace: string[] | null
+    childbirthMode: string[] | null
+    maturationReason: string[] | null
+    maturationModality: string[] | null
+    imgIndication: string[] | null
+    laborOrCesareanEntry: string[] | null
+    pathologyDuringLabor: string[] | null
+    obstetricalGestureDuringLabor: string[] | null
+    analgesieType: string[] | null
     birthDeliveryDate: NewDurationRangeType | null
     birthDeliveryWeeks: NumberAndComparatorDataType
     birthDeliveryDays: NumberAndComparatorDataType
-    birthDeliveryWay: LabelObject[] | null
-    instrumentType: LabelObject[] | null
-    cSectionModality: LabelObject[] | null
-    presentationAtDelivery: LabelObject[] | null
+    birthDeliveryWay: string[] | null
+    instrumentType: string[] | null
+    cSectionModality: string[] | null
+    presentationAtDelivery: string[] | null
     birthMensurationsGrams: NumberAndComparatorDataType
     birthMensurationsPercentil: NumberAndComparatorDataType
     apgar1: NumberAndComparatorDataType
@@ -48,14 +48,14 @@ export type HospitDataType = CommonCriteriaData &
     apgar10: NumberAndComparatorDataType
     arterialPhCord: NumberAndComparatorDataType
     arterialCordLactates: NumberAndComparatorDataType
-    birthStatus: LabelObject[] | null
-    postpartumHemorrhage: LabelObject[] | null
-    conditionPerineum: LabelObject[] | null
-    exitPlaceType: LabelObject[] | null
-    feedingType: LabelObject[] | null
-    complication: LabelObject[] | null
-    exitFeedingMode: LabelObject[] | null
-    exitDiagnostic: LabelObject[] | null
+    birthStatus: string[] | null
+    postpartumHemorrhage: string[] | null
+    conditionPerineum: string[] | null
+    exitPlaceType: string[] | null
+    feedingType: string[] | null
+    complication: string[] | null
+    exitFeedingMode: string[] | null
+    exitDiagnostic: string[] | null
   }
 
 export const form: () => CriteriaForm<HospitDataType> = () => ({

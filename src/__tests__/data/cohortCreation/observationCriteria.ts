@@ -15,7 +15,7 @@ export const completeObservationCriteria: ObservationDataType = {
   startOccurrence: { start: '2024-09-03', end: '2024-09-04' },
   encounterStartDate: { start: '2024-09-04', end: '2024-09-07', includeNull: true },
   encounterEndDate: { start: '2024-09-02', end: '2024-09-06' },
-  encounterStatus: [{ id: 'cancelled', label: 'Cancelled', system: 'http://hl7.org/fhir/CodeSystem/encounter-status' }],
+  encounterStatus: ['cancelled'],
   code: [
     {
       id: 'I3356',
@@ -24,6 +24,7 @@ export const completeObservationCriteria: ObservationDataType = {
       isLeaf: true
     }
   ],
+  enableSearchByValue: true,
   searchByValue: { value: 3, comparator: Comparators.EQUAL },
   encounterService: [
     {
