@@ -11,9 +11,6 @@ const useStyles = makeStyles()(() => ({
   subtitle: {
     margin: '8px 0px'
   },
-  helper: {
-    margin: '8px 0px'
-  },
   table: {
     minWidth: '650'
   },
