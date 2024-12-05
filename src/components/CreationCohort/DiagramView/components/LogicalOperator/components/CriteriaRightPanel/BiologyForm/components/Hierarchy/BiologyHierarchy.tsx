@@ -32,9 +32,9 @@ import {
 import useStyles from './styles'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
-import { defaultBiology } from '../../index'
 import { HierarchyTree } from 'types'
 import { Hierarchy } from 'types/hierarchy'
+import { CriteriaType } from 'types/requestCriterias'
 
 type BiologyListItemProps = {
   biologyItem: Hierarchy<any, any>
@@ -64,7 +64,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
       biologyCode,
       selectedItems || [],
       biologyHierarchy,
-      defaultBiology.type,
+      CriteriaType.OBSERVATION,
       dispatch
     )
     handleClick(selectedItems, newHierarchy)

@@ -28,9 +28,9 @@ import useStyles from './styles'
 import { useDebounce } from 'utils/debounce'
 import { ValueSetWithHierarchy } from 'services/aphp/cohortCreation/fetchObservation'
 import services from 'services/aphp'
-import { ObservationDataType } from 'types/requestCriterias'
 import { ValueSet } from 'types'
 import { Hierarchy } from 'types/hierarchy'
+import { ObservationDataType } from '../../../forms/BiologyForm'
 
 type BiologySearchListItemProps = {
   label: string

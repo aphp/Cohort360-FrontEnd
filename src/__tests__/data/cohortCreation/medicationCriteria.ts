@@ -1,34 +1,23 @@
-import { MedicationDataType, Comparators, CriteriaType } from 'types/requestCriterias'
+import {
+  MedicationDataType,
+  form
+} from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/MedicationForm'
+import { Comparators, CriteriaType } from 'types/requestCriterias'
 
 export const defaultMedicationCriteria: MedicationDataType = {
   id: 1,
-  type: CriteriaType.MEDICATION_ADMINISTRATION,
-  isInclusive: true,
-  title: 'Medciation',
-  occurrence: null,
-  occurrenceComparator: null,
-  startOccurrence: [null, null],
-  endOccurrence: [null, null],
-  encounterStartDate: [null, null],
-  includeEncounterStartDateNull: false,
-  encounterEndDate: [null, null],
-  includeEncounterEndDateNull: false,
-  encounterStatus: [],
-  code: [],
-  administration: [],
-  encounterService: []
+  ...form().initialData,
+  type: CriteriaType.MEDICATION_ADMINISTRATION
 }
 
 export const completeMedicationAdministrationCriteria: MedicationDataType = {
   ...defaultMedicationCriteria,
-  occurrence: 1,
-  occurrenceComparator: Comparators.GREATER,
-  startOccurrence: ['2024-09-03', '2024-09-04'],
-  encounterStartDate: ['2024-09-04', '2024-09-07'],
-  includeEncounterStartDateNull: true,
-  encounterEndDate: ['2024-09-02', '2024-09-06'],
-  includeEncounterEndDateNull: false,
-  encounterStatus: [{ id: 'cancelled', label: 'Cancelled', system: 'http://hl7.org/fhir/CodeSystem/encounter-status' }],
+  type: CriteriaType.MEDICATION_ADMINISTRATION,
+  occurrence: { value: 1, comparator: Comparators.GREATER },
+  startOccurrence: { start: '2024-09-03', end: '2024-09-04' },
+  encounterStartDate: { start: '2024-09-04', end: '2024-09-07', includeNull: true },
+  encounterEndDate: { start: '2024-09-02', end: '2024-09-06' },
+  encounterStatus: ['cancelled'],
   code: [
     { id: 'D01AA01', label: 'D01AA01 - Nystatin; Topical', system: 'https://terminology.eds.aphp.fr/atc' },
     { id: 'D01AA02', label: 'D01AA02 - Natamycin; Topical', system: 'https://terminology.eds.aphp.fr/atc' },
@@ -38,13 +27,7 @@ export const completeMedicationAdministrationCriteria: MedicationDataType = {
       system: 'https://terminology.eds.aphp.fr/smt-medicament-ucd'
     }
   ],
-  administration: [
-    {
-      id: 'CUTAN',
-      label: 'Cutanée',
-      system: 'https://terminology.eds.aphp.fr/aphp-orbis-medicament-voie-administration'
-    }
-  ],
+  administration: ['CUTAN'],
   encounterService: [
     {
       above_levels_ids: '8312002244',
@@ -66,14 +49,11 @@ export const completeMedicationAdministrationCriteria: MedicationDataType = {
 export const completeMedicationPrescriptionCriteria: MedicationDataType = {
   ...defaultMedicationCriteria,
   type: CriteriaType.MEDICATION_REQUEST,
-  occurrence: 1,
-  occurrenceComparator: Comparators.GREATER,
-  startOccurrence: ['2024-09-03', '2024-09-04'],
-  encounterStartDate: ['2024-09-04', '2024-09-07'],
-  includeEncounterStartDateNull: true,
-  encounterEndDate: ['2024-09-02', '2024-09-06'],
-  includeEncounterEndDateNull: false,
-  encounterStatus: [{ id: 'cancelled', label: 'Cancelled', system: 'http://hl7.org/fhir/CodeSystem/encounter-status' }],
+  occurrence: { value: 1, comparator: Comparators.GREATER },
+  startOccurrence: { start: '2024-09-03', end: '2024-09-04' },
+  encounterStartDate: { start: '2024-09-04', end: '2024-09-07', includeNull: true },
+  encounterEndDate: { start: '2024-09-02', end: '2024-09-06' },
+  encounterStatus: ['cancelled'],
   code: [
     { id: 'D01AA01', label: 'D01AA01 - Nystatin; Topical', system: 'https://terminology.eds.aphp.fr/atc' },
     { id: 'D01AA02', label: 'D01AA02 - Natamycin; Topical', system: 'https://terminology.eds.aphp.fr/atc' },
@@ -83,13 +63,7 @@ export const completeMedicationPrescriptionCriteria: MedicationDataType = {
       system: 'https://terminology.eds.aphp.fr/smt-medicament-ucd'
     }
   ],
-  prescriptionType: [
-    {
-      id: '172641',
-      label: 'Prescription Hospitalière',
-      system: 'https://terminology.eds.aphp.fr/aphp-medicament-type-prescription'
-    }
-  ],
+  prescriptionType: ['172641'],
   encounterService: [
     {
       above_levels_ids: '8312002244',

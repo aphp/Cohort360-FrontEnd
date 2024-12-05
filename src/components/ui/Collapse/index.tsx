@@ -9,11 +9,11 @@ type CollapseProps = {
   value?: boolean
   title: string
   children: ReactNode
-  margin?: string
 }
 
-const Collapse = ({ value = true, title, children, margin = '0 0 5px 0' }: PropsWithChildren<CollapseProps>) => {
+const Collapse = ({ value = true, title, children }: PropsWithChildren<CollapseProps>) => {
   const [checked, setChecked] = useState(value)
+  console.log('test children', children)
 
   return (
     <Grid container direction="column">
@@ -34,7 +34,7 @@ const Collapse = ({ value = true, title, children, margin = '0 0 5px 0' }: Props
         </IconButton>
       </Grid>
 
-      <CollapseWrapper in={checked} unmountOnExit margin={margin}>
+      <CollapseWrapper in={checked} unmountOnExit>
         {children}
       </CollapseWrapper>
     </Grid>

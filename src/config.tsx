@@ -2,9 +2,13 @@ import React, { createContext, ReactNode } from 'react'
 import { Root } from 'react-dom/client'
 import * as R from 'ramda'
 import { CONFIG_URL } from 'constants.js'
+import { LabelObject } from 'types/searchCriterias'
+import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
 
 type ValueSetConfig = {
   url: string
+  title?: string
+  data?: LabelObject[]
 }
 
 type AppConfig = {
@@ -94,6 +98,10 @@ type AppConfig = {
         presentationAtDelivery: ValueSetConfig
         risksOrComplicationsOfPregnancy: ValueSetConfig
         risksRelatedToObstetricHistory: ValueSetConfig
+        booleanOpenChoiceFields: ValueSetConfig
+        booleanFields: ValueSetConfig
+        vme: ValueSetConfig
+        birthStatus: ValueSetConfig
       }
     }
     locationMap: {
@@ -209,10 +217,10 @@ let config: AppConfig = {
       enabled: true,
       valueSets: {
         medicationAdministrations: { url: '' },
-        medicationAtc: { url: '' },
+        medicationAtc: { url: '', title: 'ATC' },
         medicationAtcOrbis: { url: '' },
         medicationPrescriptionTypes: { url: '' },
-        medicationUcd: { url: '' }
+        medicationUcd: { url: '', title: 'UCD' }
       }
     },
     condition: {
@@ -270,7 +278,23 @@ let config: AppConfig = {
         pregnancyMode: { url: '' },
         presentationAtDelivery: { url: '' },
         risksOrComplicationsOfPregnancy: { url: '' },
-        risksRelatedToObstetricHistory: { url: '' }
+        risksRelatedToObstetricHistory: { url: '' },
+        booleanOpenChoiceFields: {
+          url: 'booleanOpenChoiceFields',
+          data: booleanOpenChoiceFieldsData
+        },
+        booleanFields: {
+          url: 'booleanFields',
+          data: booleanFieldsData
+        },
+        vme: {
+          url: 'vme',
+          data: vmeData
+        },
+        birthStatus: {
+          url: 'birthStatus',
+          data: birthStatusData
+        }
       }
     },
     locationMap: {
