@@ -1,8 +1,10 @@
 import React, { PropsWithChildren, ReactNode, useState } from 'react'
 
-import { Grid, IconButton, Typography } from '@mui/material'
+import { Grid, IconButton, Tooltip, Typography } from '@mui/material'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import InfoIcon from '@mui/icons-material/Info'
+
 import { CollapseWrapper } from './styles'
 
 type CollapseProps = {
@@ -10,9 +12,10 @@ type CollapseProps = {
   title: string
   children: ReactNode
   margin?: string
+  info?: React.ReactNode
 }
 
-const Collapse = ({ value = true, title, children, margin = '0 0 5px 0' }: PropsWithChildren<CollapseProps>) => {
+const Collapse = ({ value = true, title, children, margin = '0 0 5px 0', info }: PropsWithChildren<CollapseProps>) => {
   const [checked, setChecked] = useState(value)
 
   return (
@@ -28,6 +31,11 @@ const Collapse = ({ value = true, title, children, margin = '0 0 5px 0' }: Props
         <Typography style={{ cursor: 'pointer' }} variant="h6">
           {title}
         </Typography>
+        {info && (
+          <Tooltip title={info}>
+            <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+          </Tooltip>
+        )}
 
         <IconButton size="small">
           {checked ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
