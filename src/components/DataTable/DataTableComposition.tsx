@@ -63,7 +63,8 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
     { multiple: [{ label: 'Nom' }, { label: 'Date', code: Order.DATE }] },
     showIpp
       ? {
-          label: `IPP${deidentified ? ' chiffré' : ''}`
+          label: `IPP${deidentified ? ' chiffré' : ''}`,
+          code: Order.SUBJECT_IDENTIFIER
         }
       : null,
     { label: `NDA${deidentified ? ' chiffré' : ''}` },
