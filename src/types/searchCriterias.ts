@@ -131,6 +131,7 @@ export enum Order {
   RECORDED_DATE = 'recorded-date',
   RESULT_SIZE = 'result_size',
   STUDY_DATE = 'started',
+  SUBJECT_IDENTIFIER = 'subject-identifier'
   TYPE = 'type-name',
   UPDATED = 'updated_at'
 }
