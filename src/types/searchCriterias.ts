@@ -132,7 +132,8 @@ export enum Order {
   MEDICATION_UCD = 'medication-ucd',
   PRESCRIPTION_TYPES = 'category-name',
   ADMINISTRATION_MODE = 'route',
-  AUTHORED = 'authored'
+  AUTHORED = 'authored',
+  SUBJECT_IDENTIFIER = 'subject-identifier'
 }
 export enum SearchByTypes {
   TEXT = '_text',
