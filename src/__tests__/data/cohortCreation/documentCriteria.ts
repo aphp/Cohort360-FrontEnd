@@ -20,7 +20,7 @@ export const completeDocumentCriteria: DocumentDataType = {
   docStatuses: [DocumentStatuses.FINAL, DocumentStatuses.PRELIMINARY],
   docType: ['crh-j', 'crh-chir'],
   search: 'cancer',
-  searchBy: [SearchByTypes.TEXT],
+  searchBy: SearchByTypes.TEXT,
   encounterService: [
     {
       above_levels_ids: '8312002244',

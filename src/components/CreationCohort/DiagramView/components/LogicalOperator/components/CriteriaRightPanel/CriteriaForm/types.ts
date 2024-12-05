@@ -101,6 +101,11 @@ export type CalendarItem = BaseCriteriaItem &
     withOptionIncludeNull?: boolean
   }
 
+export type SelectItem = BaseCriteriaItem & {
+  type: 'select'
+  choices: LabelObject[]
+}
+
 export type AutoCompleteItem = BaseCriteriaItem & {
   type: 'autocomplete'
   noOptionsText: string
@@ -137,6 +142,7 @@ export type TextWithCheckItem = BaseCriteriaItem &
 // Union of all criteria item types
 export type CriteriaItems =
   | CalendarItem
+  | SelectItem
   | AutoCompleteItem
   | ExecutiveUnitItem
   | TextWithCheckItem
@@ -192,6 +198,7 @@ export type DataTypeMapping = {
   calendarRange: CriteriaTypeMapping<CalendarItem, NewDurationRangeType>
   durationRange: CriteriaTypeMapping<DurationItem, NewDurationRangeType>
   text: CriteriaTypeMapping<TextCriteriaItem, string>
+  select: CriteriaTypeMapping<SelectItem, string>
   autocomplete: CriteriaTypeMapping<AutoCompleteItem, string[]>
   number: CriteriaTypeMapping<NumberCriteriaItem, number>
   executiveUnit: CriteriaTypeMapping<ExecutiveUnitItem, Hierarchy<ScopeElement, string>[]>

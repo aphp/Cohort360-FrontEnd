@@ -67,7 +67,6 @@ type AppConfig = {
       enabled: boolean
       valueSets: {
         imagingModalities: ValueSetConfig
-        documentAttachementMethod: ValueSetConfig
       }
       extensions: {
         imagingStudyUidUrl: string
@@ -249,24 +248,7 @@ let config: AppConfig = {
     imaging: {
       enabled: true,
       valueSets: {
-        imagingModalities: { url: '' },
-        documentAttachementMethod: {
-          url: 'documentAttachementMethod',
-          data: [
-            {
-              id: DocumentAttachmentMethod.NONE,
-              label: DocumentAttachmentMethodLabel.NONE
-            },
-            {
-              id: DocumentAttachmentMethod.ACCESS_NUMBER,
-              label: DocumentAttachmentMethodLabel.ACCESS_NUMBER
-            },
-            {
-              id: DocumentAttachmentMethod.INFERENCE_TEMPOREL,
-              label: DocumentAttachmentMethodLabel.INFERENCE_TEMPOREL
-            }
-          ]
-        }
+        imagingModalities: { url: '' }
       },
       extensions: {
         imagingStudyUidUrl: ''

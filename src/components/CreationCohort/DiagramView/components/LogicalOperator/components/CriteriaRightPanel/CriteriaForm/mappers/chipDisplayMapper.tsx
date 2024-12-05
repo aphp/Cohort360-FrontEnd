@@ -74,13 +74,12 @@ const chipForDateLabel = (dateRange: NewDurationRangeType, word?: string) => {
   )
 }
 
-const getSearchDocumentLabel = (value: string, searchBy: LabelObject[]) => {
-  const loc = searchBy && searchBy.find((l) => l.id === SearchByTypes.TEXT) ? 'document' : 'titre du document'
+const getSearchDocumentLabel = (value: string, searchBy: string | null) => {
+  const loc = searchBy === SearchByTypes.DESCRIPTION ? 'titre du document' : 'document'
   return `Contient "${value}" dans le ${loc}`
 }
 
 const getDocumentTypesLabel = (values: string[]) => {
-  const allTypes = new Set(allDocTypes.docTypes.map((docType) => docType.type))
   const typeGroups = allDocTypes.docTypes.reduce((acc, docType) => {
     acc[docType.type] = acc[docType.type] ? [...acc[docType.type], docType.code] : [docType.code]
     return acc
@@ -121,8 +120,7 @@ const getIdsListLabels = (values: string, name: string) => {
   return `Contient les ${name} : ${labels}`
 }
 
-const getAttachmentMethod = (value: string[], daysOfDelay: string | null) => {
-  const documentAttachementMethod = value.at(0)
+const getAttachmentMethod = (documentAttachementMethod: string, daysOfDelay: string | null) => {
   if (documentAttachementMethod === DocumentAttachmentMethod.INFERENCE_TEMPOREL) {
     return `Rattachement aux documents par ${DocumentAttachmentMethodLabel.INFERENCE_TEMPOREL.toLocaleLowerCase()}${
       daysOfDelay !== '' && daysOfDelay !== null ? ` de ${daysOfDelay} jour(s)` : ''
@@ -163,14 +161,16 @@ const getLabelsForAutoCompleteItem = (
 }
 
 const chipFromAutoComplete = (
-  val: string[] | null,
+  val: string[] | string | null,
   item: AutoCompleteItem,
   valueSets: ValueSetStore,
   label?: string,
   prependCode?: boolean
 ) => {
+  if (val === null) return null
+  const values = Array.isArray(val) ? val : [val]
   return chipFromLabelObject(
-    (val as string[]).map((v) => ({ id: v, label: v })),
+    values.map((v) => ({ id: v, label: v })),
     item,
     getLabelsForAutoCompleteItem,
     valueSets,
@@ -251,7 +251,13 @@ export const CHIPS_DISPLAY_METHODS = {
     valueSets: ValueSetStore,
     args: Array<ChipDisplayMethod | DataTypes>
   ) =>
-    chipFromAutoComplete(val as string[], item as AutoCompleteItem, valueSets, args[0] as string, args[1] as boolean),
+    chipFromAutoComplete(
+      val as string[] | string,
+      item as AutoCompleteItem,
+      valueSets,
+      args[0] as string,
+      args[1] as boolean
+    ),
   executiveUnit: (
     val: DataTypes,
     item: GenericCriteriaItem,
@@ -282,13 +288,13 @@ export const CHIPS_DISPLAY_METHODS = {
     item: GenericCriteriaItem,
     valueSets: ValueSetStore,
     args: Array<ChipDisplayMethod | DataTypes>
-  ) => getAttachmentMethod(val as string[], args[0] as string),
+  ) => getAttachmentMethod(val as string, args[0] as string),
   getSearchDocumentLabel: (
     val: DataTypes,
     item: GenericCriteriaItem,
     valueSets: ValueSetStore,
     args: Array<ChipDisplayMethod | DataTypes>
-  ) => getSearchDocumentLabel(val as string, args[0] as LabelObject[]),
+  ) => getSearchDocumentLabel(val as string, args[0] as string),
   getDocumentTypesLabel: (
     val: DataTypes,
     item: GenericCriteriaItem,
