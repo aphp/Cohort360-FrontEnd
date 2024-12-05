@@ -162,9 +162,7 @@ const DocumentSearchHelp: React.FC<DocumentSearchHelpProps> = ({ open, onClose }
           <Typography variant="button" className={classes.subtitle}>
             Recherche textuelle basique
           </Typography>
-          <Typography variant="caption" className={classes.helper}>
-            Les opérateurs logiques ne fonctionnent qu'en majuscule
-          </Typography>
+          <Typography className={classes.subtitle}>Les opérateurs logiques ne fonctionnent qu'en majuscule</Typography>
 
           <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="customized table">
@@ -527,68 +525,6 @@ const DocumentSearchHelp: React.FC<DocumentSearchHelpProps> = ({ open, onClose }
                       <span className={classes.bold}>pulmonaire</span> mais ces deux mots peuvent être{' '}
                       <span className={classes.bold}>séparés au maximum par 3 mots</span>
                     </Typography>
-                  </TableCellWrapper>
-                </TableRow>
-
-                <TableRow className={classes.tableBodyRows}>
-                  <TableCellWrapper>
-                    <Typography className={classes.bold}>^nombre</Typography>
-                  </TableCellWrapper>
-                  <TableCellWrapper align="left">
-                    <Typography>
-                      Permet de rechercher un terme en renforçant sa valeur en lui accordant un facteur.
-                    </Typography>
-                    <Typography align="justify">
-                      Il est utile pour booster la recherche d'un mot par rapport aux autres
-                    </Typography>
-                  </TableCellWrapper>
-                  <TableCellWrapper>
-                    <Typography>
-                      mot1<span className={classes.bold}>^3</span> mot2<span className={classes.bold}>^4</span>
-                    </Typography>
-                  </TableCellWrapper>
-                  <TableCellWrapper align="left">
-                    <Typography>
-                      embolie<span className={classes.bold}>^3</span> pulmonaire<span className={classes.bold}>^4</span>
-                    </Typography>
-                    <Typography align="justify">
-                      Recherche dans les documents le mot{' '}
-                      <span className={classes.bold}>embolie avec le niveau de pertinence 3</span> et le mot{' '}
-                      <span className={classes.bold}>pulmonaire avec le niveau de pertinence 2</span>
-                    </Typography>
-                    <Typography>Le mot embolie sera considéré plus pertinent que le mot pulmonaire</Typography>
-                  </TableCellWrapper>
-                </TableRow>
-
-                <TableRow className={classes.tableBodyRows}>
-                  <TableCellWrapper>
-                    <Typography className={classes.bold}>{'( ... ... )^=nombre'}</Typography>
-                  </TableCellWrapper>
-                  <TableCellWrapper align="left">
-                    <Typography>
-                      Permet de rechercher un <span className={classes.bold}>groupe de mots</span> en renforçant sa
-                      valeur en lui accordant un facteur.
-                    </Typography>
-                    <Typography align="justify">
-                      Il est utile pour booster la recherche d'un groupe de mots par rapport aux autres
-                    </Typography>
-                  </TableCellWrapper>
-                  <TableCellWrapper>
-                    <Typography>
-                      (mot1 mot2)<span className={classes.bold}>^=3</span>
-                    </Typography>
-                  </TableCellWrapper>
-                  <TableCellWrapper align="left">
-                    <Typography className={classes.bold}>
-                      (embolie AND pulmonaire)^=3 OR (cancer AND ovaire)^=2
-                    </Typography>
-                    <Typography align="justify">
-                      Recherche dans les documents le groupe de mots{' '}
-                      <span className={classes.bold}>embolie et pulmonaire avec un niveau de pertinence de 3</span> et
-                      le groupe de mots{' '}
-                      <span className={classes.bold}>cancer et ovaire avec un niveau de pertinence 2</span>.
-                    </Typography>
-                    <Typography>Le premier groupe de mots sera considéré plus pertinent que le second</Typography>
                   </TableCellWrapper>
                 </TableRow>
               </TableBody>
