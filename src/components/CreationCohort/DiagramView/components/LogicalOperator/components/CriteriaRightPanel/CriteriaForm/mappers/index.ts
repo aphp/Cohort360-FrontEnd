@@ -5,7 +5,7 @@ import extractFilterParams, { FhirFilter } from 'utils/fhirFilterParser'
 import { CriteriaItemType } from 'types'
 import { ValueSetStore } from 'state/valueSets'
 import { ReactNode } from 'react'
-import { isArray, isFunction, isObject, isString } from 'lodash'
+import { isArray, isFunction, isString } from 'lodash'
 import { BUILD_MAPPERS, BuilderMethod, UNBUILD_MAPPERS } from './buildMappers'
 
 /************************************************************************************/

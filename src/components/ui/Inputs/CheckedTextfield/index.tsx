@@ -45,7 +45,7 @@ const CheckedTextfield = ({
   useEffect(() => {
     const regexp = new RegExp(regex, 'gm')
 
-    if (!bufferValue || !!bufferValue.match(regexp) === !inverseCheck) {
+    if (!bufferValue || !!regexp.exec(bufferValue) === !inverseCheck) {
       setError(false)
       onError(false)
       if (extractValidValues && !inverseCheck) {

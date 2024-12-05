@@ -20,7 +20,6 @@ import { Hierarchy } from 'types/hierarchy'
 import { fetchValueSet } from 'services/aphp/callApi'
 import { CodeCache } from 'state/valueSets'
 import { NewDurationRangeType } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
-import { isString } from 'lodash'
 import criteriaList, { getAllCriteriaItems } from 'components/CreationCohort/DataList_Criteria'
 
 const REQUETEUR_VERSION = 'v1.5.1'
@@ -214,8 +213,9 @@ const mapCriteriaToResource = (criteriaType: CriteriaType): ResourceType => {
 }
 
 const findQuestionnaireName = (filters: string[]) => {
+  const regex = /questionnaire.name=(.*)/
   for (const item of filters) {
-    const match = item.match(/questionnaire.name=(.*)/)
+    const match = regex.exec(item)
     if (match?.[1]) {
       return match[1]
     }
@@ -544,13 +544,12 @@ export const fetchCriteriasCodes = async (
         if (item.type === 'codeSearch') {
           const defaultValueSet = item.valueSetIds[0]
           for (const criterion of criteriaValues) {
-            const dataKey = item.valueKey as string
-            // TODO remove this type casting when using the proper entry type, also make sure that the dataKey is a valid key
-            const labelValues = criterion[dataKey as keyof SelectedCriteriaType] as unknown as LabelObject[]
+            const dataKey = item.valueKey as keyof SelectedCriteriaType
+            const labelValues = criterion[dataKey] as unknown as LabelObject[]
             if (labelValues && labelValues.length > 0) {
               for (const code of labelValues) {
                 console.log('fetching code', code)
-                const codeSystem = code.system || defaultValueSet
+                const codeSystem = code.system ?? defaultValueSet
                 const valueSetCodeCache = updatedCriteriaData[codeSystem] ?? []
                 if (!valueSetCodeCache.find((data) => data.id === code.id)) {
                   try {

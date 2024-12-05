@@ -50,10 +50,9 @@ const OccurenceInput = ({
 
   const checkedValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value === '' ? '0' : e.target.value
-    if (floatValues && newValue.match(enableNegativeValues ? /^-?\d*\.?\d*$/ : /^\d*\.?\d*$/)) {
-      return newValue
-    } else if (
-      newValue.match(/^\d+$/) ||
+    if (
+      (floatValues && (enableNegativeValues ? /^-?\d*\.?\d*$/ : /^\d*\.?\d*$/).exec(newValue)) ||
+      /^\d+$/.exec(newValue) ||
       (enableNegativeValues && newValue === '0' && comparatorValue === Comparators.LESS)
     ) {
       return newValue
@@ -121,8 +120,8 @@ const OccurenceInput = ({
         >
           {(Object.keys(Comparators) as (keyof typeof Comparators)[])
             .filter((key) => allowBetween || Comparators[key] !== Comparators.BETWEEN)
-            .map((key, index) => (
-              <MenuItem key={index} value={Comparators[key]}>
+            .map((key) => (
+              <MenuItem key={key} value={Comparators[key]}>
                 {Comparators[key]}
               </MenuItem>
             ))}

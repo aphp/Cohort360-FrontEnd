@@ -109,12 +109,13 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
             )
           },
           buildInfo: {
-            // TODO there is orignially a condition where
-            // criterion.birthdates[0] === null && criterion.birthdates[1] === null
-            // must be true for the filter to be applied
-            // check if this is still necessary (cause the durationRange / calendarRange set the value to null when inner fields are null now)
             fhirKey: { main: PatientsParamsKeys.DATE_IDENTIFIED, deid: PatientsParamsKeys.DATE_DEIDENTIFIED },
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Âge' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Âge' }],
+            ignoreIf: (data) => {
+              const typedData = data as DemographicDataType
+              const birthdates = typedData.birthdates
+              return birthdates !== null && (birthdates.start !== null || birthdates.end !== null)
+            }
           }
         },
         {
