@@ -24,6 +24,7 @@ const criteriaList: () => CriteriaItemType[] = () => {
   const ODD_BIOLOGY = getConfig().features.observation.enabled
   const ODD_IMAGING = getConfig().features.imaging.enabled
   const ODD_MEDICATION = getConfig().features.medication.enabled
+  const ODD_DOCUMENT_REFERENCE = getConfig().features.documentReference.enabled
   return [
     {
       id: CriteriaType.REQUEST,
@@ -71,7 +72,8 @@ const criteriaList: () => CriteriaItemType[] = () => {
     {
       id: CriteriaType.DOCUMENTS,
       title: CriteriaTypeLabels.DOCUMENTS,
-      color: '#0063AF',
+      color: ODD_DOCUMENT_REFERENCE ? '#0063AF' : '#808080',
+      disabled: !ODD_DOCUMENT_REFERENCE,
       fontWeight: 'bold',
       components: DocumentsForm,
       fetch: {

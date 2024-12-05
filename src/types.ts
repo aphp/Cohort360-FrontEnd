@@ -52,11 +52,17 @@ export enum WebSocketJobStatus {
 }
 
 export enum CohortJobStatus {
-  LONG_PENDING = 'long_pending',
-  FAILED = 'failed',
-  FINISHED = 'finished',
-  PENDING = 'pending',
   NEW = 'new',
+  DENIED = 'denied',
+  VALIDATED = 'validated',
+  PENDING = 'pending',
+  LONG_PENDING = 'long_pending',
+  STARTED = 'started',
+  FAILED = 'failed',
+  CANCELLED = 'cancelled',
+  FINISHED = 'finished',
+  CLEANDED = 'cleaned',
+  UNKNOWN = 'unknown',
   SUSPENDED = 'suspended'
 }
 

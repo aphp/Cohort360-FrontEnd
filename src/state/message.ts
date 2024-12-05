@@ -53,10 +53,6 @@ const setMessageSlice = createSlice({
       type: 'error',
       content: 'Une erreur est survenue lors de la déconnexion'
     }))
-    builder.addCase(buildCohortCreation.pending, () => ({
-      type: 'info',
-      content: 'Sauvegarde de la requête'
-    }))
     builder.addCase(buildCohortCreation.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la récupération de la requête'
@@ -65,57 +61,29 @@ const setMessageSlice = createSlice({
       type: 'error',
       content: 'Une erreur est survenue lors de la déconstruction de la requête'
     }))
-    builder.addCase(saveJson.fulfilled, () => ({
-      type: 'success',
-      content: 'Requête sauvegardée'
-    }))
     builder.addCase(saveJson.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la sauvegarde de la requête'
-    }))
-    builder.addCase(addProject.fulfilled, () => ({
-      type: 'success',
-      content: 'Projet de recherche ajouté'
     }))
     builder.addCase(addProject.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la création du projet de recherche'
     }))
-    builder.addCase(editProject.fulfilled, () => ({
-      type: 'success',
-      content: 'Projet de recherche modifié'
-    }))
     builder.addCase(editProject.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la modification du projet de recherche'
-    }))
-    builder.addCase(deleteProject.fulfilled, () => ({
-      type: 'success',
-      content: 'Projet de recherche supprimé'
     }))
     builder.addCase(deleteProject.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la suppression de votre projet de recherche'
     }))
-    builder.addCase(addRequest.fulfilled, () => ({
-      type: 'success',
-      content: 'Requête ajoutée'
-    }))
     builder.addCase(addRequest.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la création de la requête'
     }))
-    builder.addCase(editRequest.fulfilled, () => ({
-      type: 'success',
-      content: 'Requête modifiée'
-    }))
     builder.addCase(editRequest.rejected, () => ({
       type: 'error',
       content: "Une erreur est survenue lors de l'édition de la requête"
-    }))
-    builder.addCase(deleteRequest.fulfilled, () => ({
-      type: 'success',
-      content: 'Requête supprimée'
     }))
     builder.addCase(deleteRequest.rejected, () => ({
       type: 'error',
@@ -237,7 +205,6 @@ const setMessageSlice = createSlice({
       type: 'error',
       content: 'Une erreur est survenue lors de la récupération des requêtes'
     }))
-
     builder.addCase(moveRequests.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la migration de la requête'

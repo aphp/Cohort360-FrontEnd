@@ -172,7 +172,6 @@ const countCohortCreation = createAsyncThunk<
         return { count: countResult, snapshotsHistory }
       }
     }
-
     return {
       count: countResult,
       snapshotsHistory: newSnapshotsHistory,
@@ -687,13 +686,13 @@ const cohortCreationSlice = createSlice({
     },
     suspendCount: (state: CohortCreationState) => {
       state.count = {
-        ...(state.count || {}),
+        ...state.count,
         status:
-          (state.count || {}).status === CohortJobStatus.PENDING ||
-          (state.count || {}).status === CohortJobStatus.NEW ||
-          (state.count || {}).status === CohortJobStatus.SUSPENDED
+          state.count?.status === CohortJobStatus.PENDING ||
+          state.count?.status === CohortJobStatus.NEW ||
+          state.count?.status === CohortJobStatus.SUSPENDED
             ? CohortJobStatus.SUSPENDED
-            : (state.count || {}).status
+            : state.count?.status
       }
     },
     unsuspendCount: (state: CohortCreationState) => {
