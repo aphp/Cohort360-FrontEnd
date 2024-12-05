@@ -39,6 +39,7 @@ const Dashboard: React.FC<{
   const appConfig = useContext(AppConfig)
   const ODD_IMAGING = appConfig.features.imaging.enabled
   const ODD_QUESTIONNAIRES = appConfig.features.questionnaires.enabled
+  const ODD_DOCUMENT_REFERENCE = appConfig.features.documentReference.enabled
 
   const [searchParams] = useSearchParams()
   const groupIds = getCleanGroupId(searchParams.get('groupId'))
@@ -55,15 +56,19 @@ const Dashboard: React.FC<{
       case 'patients':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'preview', to: '/my-patients/preview' },
-          { label: 'Patients', value: 'patients', to: '/my-patients/patients' },
-          { label: 'Documents', value: 'documents', to: '/my-patients/documents' },
-          { label: 'PMSI', value: 'pmsi', to: '/my-patients/pmsi' },
-          { label: 'Médicaments', value: 'medication', to: '/my-patients/medication' },
-          { label: 'Biologie', value: 'biology', to: '/my-patients/biology' },
-          ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging' }] : []),
+          { label: 'Aperçu', value: 'preview', to: '/my-patients/preview', disabled: false },
+          { label: 'Patients', value: 'patients', to: '/my-patients/patients', disabled: false },
+          ...(ODD_DOCUMENT_REFERENCE
+            ? [{ label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false }]
+            : []),
+          { label: 'PMSI', value: 'pmsi', to: '/my-patients/pmsi', disabled: false },
+          { label: 'Médicaments', value: 'medication', to: '/my-patients/medication', disabled: false },
+          { label: 'Biologie', value: 'biology', to: '/my-patients/biology', disabled: false },
+          ...(ODD_IMAGING
+            ? [{ label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging', disabled: false }]
+            : []),
           ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/my-patients/forms` }]
+            ? [{ label: 'Formulaires', value: 'forms', to: `/my-patients/forms`, disabled: false }]
             : [])
         ])
         break
@@ -76,11 +81,16 @@ const Dashboard: React.FC<{
           },
           { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/preview?groupId=${groupIds}` },
           { label: 'Données patient', value: 'patients', to: `/cohort/patients${location.search}` },
-          {
-            label: 'Documents cliniques',
-            value: 'documents',
-            to: `/cohort/documents${location.search}`
-          },
+          ...(ODD_DOCUMENT_REFERENCE
+            ? [
+                {
+                  label: 'Documents cliniques',
+                  value: 'documents',
+                  to: `/cohort/documents${location.search}`,
+                  disabled: false
+                }
+              ]
+            : []),
           { label: 'PMSI', value: 'pmsi', to: `/cohort/pmsi${location.search}` },
           { label: 'Médicaments', value: 'medication', to: `/cohort/medication${location.search}` },
           { label: 'Biologie', value: 'biology', to: `/cohort/biology${location.search}` },
@@ -95,7 +105,9 @@ const Dashboard: React.FC<{
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/new/preview`, disabled: true },
           { label: 'Données patient', value: 'patients', to: `/cohort/new/patients`, disabled: true },
-          { label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true },
+          ...(ODD_DOCUMENT_REFERENCE
+            ? [{ label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true }]
+            : []),
           { label: 'PMSI', value: 'pmsi', to: `/cohort/new/pmsi` },
           { label: 'Médicaments', value: 'medication', to: `/cohort/new/medication` },
           { label: 'Biologie', value: 'biology', to: `/cohort/new/biology` },
@@ -114,11 +126,16 @@ const Dashboard: React.FC<{
             value: 'patients',
             to: `/perimeters/patients${location.search}`
           },
-          {
-            label: 'Documents cliniques',
-            value: 'documents',
-            to: `/perimeters/documents${location.search}`
-          },
+          ...(ODD_DOCUMENT_REFERENCE
+            ? [
+                {
+                  label: 'Documents cliniques',
+                  value: 'documents',
+                  to: `/perimeters/documents${location.search}`,
+                  disabled: false
+                }
+              ]
+            : []),
           { label: 'PMSI', value: 'pmsi', to: `/perimeters/pmsi${location.search}` },
           {
             label: 'Médicaments',
