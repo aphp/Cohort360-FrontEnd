@@ -9,6 +9,7 @@ import LeftSideBar from '../LeftSideBar/LeftSideBar'
 import AutoLogoutContainer from '../AutoLogoutContainer'
 import { WebSocketProvider } from 'components/WebSocket/WebSocketProvider'
 import Maintenance from 'views/Maintenance'
+import Snackbar from 'components/Snackbar/Snackbar'
 
 type LayoutProps = {
   displaySideBar: boolean
@@ -20,10 +21,9 @@ const Layout = (props: PropsWithChildren<LayoutProps>) => {
   return (
     <>
       {me && <AutoLogoutContainer />}
-
       {props.displaySideBar && <LeftSideBar open />}
-
       {props.children}
+      <Snackbar />
     </>
   )
 }
