@@ -152,32 +152,32 @@ describe('test of buildPatientFilter', () => {
   it('should return default build Patient', () => {
     const selectedCriteria: DemographicDataType = defaultPatientCriteria
     const result = ['active=true', '', '', '', '', '', '', '', '']
-    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return gender female build Patient', () => {
     const selectedCriteria: DemographicDataType = patientGenderFemaleCriteria
     const result = ['active=true', 'gender=f', '', '', '', '', '', '', '']
-    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return genders build Patient', () => {
     const selectedCriteria: DemographicDataType = patientGendersCriteria
     const result = ['active=true', 'gender=f,m', '', '', '', '', '', '', '']
-    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return deceased vitalStatus build Patient', () => {
     const selectedCriteria: DemographicDataType = patientDeceasedVitalStatusCriteria
     const result = ['active=true', '', 'deceased=true', '', '', '', '', '', '']
-    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return vitalStatus build Patient', () => {
     const selectedCriteria: DemographicDataType = patientVitalStatusCriteria
     const result = ['active=true', '', 'deceased=true,false', '', '', '', '', '', '']
-    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return age build Patient', () => {
     const selectedCriteria: DemographicDataType = patientNominativeAgeCriteria
     const result = ['active=true', '', '', '', '', '', '', 'age-day=ge3082', 'age-day=le9360']
-    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return birthdates build Patient', () => {
     const selectedCriteria: DemographicDataType = patientNominativeBirthDatesCriteria
@@ -192,7 +192,7 @@ describe('test of buildPatientFilter', () => {
       '',
       ''
     ]
-    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return deathdates build Patient', () => {
     const selectedCriteria: DemographicDataType = patientNominativeDeathDatesCriteria
@@ -207,7 +207,7 @@ describe('test of buildPatientFilter', () => {
       '',
       ''
     ]
-    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return complete build Patient', () => {
     const selectedCriteria: DemographicDataType = completePatientCriteria
@@ -233,7 +233,7 @@ describe('test of buildPatientFilter', () => {
       'age-day=ge3082',
       'age-day=le9360'
     ]
-    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
     expect(buildFilter(selectedCriteria, false)).not.toEqual(error)
   })
   it('should return complete build Patient with no age', () => {
@@ -257,7 +257,7 @@ describe('test of buildEncounterFilter', () => {
   it('should return default build Encounter', () => {
     const selectedCriteria: EncounterDataType = defaultEncounterCriteira
     const result = ['subject.active=true', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
-    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return complete build Encounter', () => {
     const selectedCriteria: EncounterDataType = completeEncounterCriteria
@@ -281,7 +281,7 @@ describe('test of buildEncounterFilter', () => {
       '_filter=(period-start ge 2024-09-05T00:00:00Z and period-start le 2024-09-05T00:00:00Z) or not (period-start eq "*")',
       '_filter=(period-end ge 2024-09-06T00:00:00Z and period-end le 2024-09-07T00:00:00Z) or not (period-end eq "*")'
     ]
-    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria, false).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
 })
 
@@ -289,7 +289,7 @@ describe('test of buildDocumentFilter', () => {
   it('should return default documentCriteria', () => {
     const selectedCriteria: DocumentDataType = defaultDocumentCriteria
     const result = ['contenttype=text/plain&subject.active=true&type:not=doc-impor', '', '', '', '', '', '', '', '', '']
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return complete documentCriteria', () => {
     const selectedCriteria: DocumentDataType = completeDocumentCriteria
@@ -306,7 +306,7 @@ describe('test of buildDocumentFilter', () => {
       '_filter=(encounter.period-start ge 2024-09-05T00:00:00Z and encounter.period-start le 2024-09-05T00:00:00Z) or not (encounter.period-start eq "*")',
       '_filter=(encounter.period-end ge 2024-09-06T00:00:00Z and encounter.period-end le 2024-09-07T00:00:00Z) or not (encounter.period-end eq "*")'
     ]
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
 })
 
@@ -314,7 +314,7 @@ describe('test of buildConditionFilter', () => {
   it('should return default conditionCriteria', () => {
     const selectedCriteria: Cim10DataType = defaultConditionCriteria
     const result = ['subject.active=true', '', '', '', '', '', '', '', '', '']
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return complete conditionCriteria', () => {
     const selectedCriteria: Cim10DataType = completeConditionCriteria
@@ -330,7 +330,7 @@ describe('test of buildConditionFilter', () => {
       '_filter=(encounter.period-start ge 2024-09-05T00:00:00Z and encounter.period-start le 2024-09-05T00:00:00Z) or not (encounter.period-start eq "*")',
       'encounter.period-end=ge2024-09-06T00:00:00Z&encounter.period-end=le2024-09-07T00:00:00Z'
     ]
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
 })
 
@@ -338,7 +338,7 @@ describe('test of buildProcedureFilter', () => {
   it('should return default procedureCriteria', () => {
     const selectedCriteria: CcamDataType = defaultProcedureCriteria
     const result = ['subject.active=true', '', '', '', '', '', '', '', '']
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return complete procedureCriteria ', () => {
     const selectedCriteria: CcamDataType = completeProcedureCriteria
@@ -353,7 +353,7 @@ describe('test of buildProcedureFilter', () => {
       'encounter.period-start=ge2024-09-05T00:00:00Z&encounter.period-start=le2024-09-05T00:00:00Z',
       '_filter=(encounter.period-end ge 2024-09-06T00:00:00Z and encounter.period-end le 2024-09-07T00:00:00Z) or not (encounter.period-end eq "*")'
     ]
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
 })
 
@@ -361,7 +361,7 @@ describe('test of buildClaimFilter', () => {
   it('should return default claimCriteria', () => {
     const selectedCriteria: GhmDataType = defaultClaimCriteria
     const result = ['patient.active=true', '', '', '', '', '', '', '']
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return complete claimCriteria', () => {
     const selectedCriteria: GhmDataType = completeClaimCriteria
@@ -375,7 +375,7 @@ describe('test of buildClaimFilter', () => {
       '_filter=(encounter.period-start ge 2024-09-04T00:00:00Z and encounter.period-start le 2024-09-07T00:00:00Z) or not (encounter.period-start eq "*")',
       'encounter.period-end=ge2024-09-02T00:00:00Z&encounter.period-end=le2024-09-06T00:00:00Z'
     ]
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
 })
 
@@ -383,7 +383,7 @@ describe('test of buildMedicationFilter', () => {
   it('should return default Medication administation criteria', () => {
     const selectedCriteria: MedicationDataType = defaultMedicationCriteria
     const result = ['subject.active=true', '', '', '', '', '', '', '', '', '', '', '']
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return complete Medication administation criteria', () => {
     const selectedCriteria: MedicationDataType = completeMedicationAdministrationCriteria
@@ -401,7 +401,7 @@ describe('test of buildMedicationFilter', () => {
       '_filter=(context.period-start ge 2024-09-04T00:00:00Z and context.period-start le 2024-09-07T00:00:00Z) or not (context.period-start eq "*")',
       'context.period-end=ge2024-09-02T00:00:00Z&context.period-end=le2024-09-06T00:00:00Z'
     ]
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return default Medication administation criteria', () => {
     const selectedCriteria: MedicationDataType = completeMedicationPrescriptionCriteria
@@ -419,7 +419,7 @@ describe('test of buildMedicationFilter', () => {
       '_filter=(encounter.period-start ge 2024-09-04T00:00:00Z and encounter.period-start le 2024-09-07T00:00:00Z) or not (encounter.period-start eq "*")',
       'encounter.period-end=ge2024-09-02T00:00:00Z&encounter.period-end=le2024-09-06T00:00:00Z'
     ]
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
 })
 
@@ -427,7 +427,7 @@ describe('test of buildObservationFilter', () => {
   it('should return build default observation criteria', () => {
     const selectedCriteria: ObservationDataType = defaultObservationCriteria
     const result = ['status=Val&subject.active=true', '', '', '', '', '', 'value-quantity=le0,ge0', '', '']
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return build complete obervation criteria', () => {
     const selectedCriteria: ObservationDataType = completeObservationCriteria
@@ -442,7 +442,7 @@ describe('test of buildObservationFilter', () => {
       '_filter=(encounter.period-start ge 2024-09-04T00:00:00Z and encounter.period-start le 2024-09-07T00:00:00Z) or not (encounter.period-start eq "*")',
       'encounter.period-end=ge2024-09-02T00:00:00Z&encounter.period-end=le2024-09-06T00:00:00Z'
     ]
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
 })
 
@@ -471,7 +471,7 @@ describe('test of buildImagingFilter', () => {
       '',
       ''
     ]
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
   it('should return build complete imaging criteria', () => {
     const selectedCriteria: ImagingDataType = completeImagingCriteria
@@ -497,7 +497,7 @@ describe('test of buildImagingFilter', () => {
       '_filter=(encounter.period-start ge 2024-09-04T00:00:00Z and encounter.period-start le 2024-09-07T00:00:00Z) or not (encounter.period-start eq "*")',
       'encounter.period-end=ge2024-09-02T00:00:00Z&encounter.period-end=le2024-09-06T00:00:00Z'
     ]
-    expect(buildFilter(selectedCriteria).filter(el => !!el).sort().join("&")).toEqual(result.filter(el => !!el).sort().join("&"))
+    expect(buildFilter(selectedCriteria).filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&")).toEqual(result.filter(el => !!el).sort((a, b) => a.localeCompare(b)).join("&"))
   })
 })
 

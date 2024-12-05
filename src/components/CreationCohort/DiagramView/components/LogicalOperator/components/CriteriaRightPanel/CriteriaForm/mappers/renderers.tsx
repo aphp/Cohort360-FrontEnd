@@ -192,8 +192,13 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         value={props.value}
         onChange={(e, value) => props.updateData(value)}
       >
-        {props.definition.choices.map((choice, index) => (
-          <FormControlLabel key={index} value={choice.id} control={<Radio color="secondary" />} label={choice.label} />
+        {props.definition.choices.map((choice) => (
+          <FormControlLabel
+            key={choice.id}
+            value={choice.id}
+            control={<Radio color="secondary" />}
+            label={choice.label}
+          />
         ))}
       </RadioGroup>
     )
@@ -248,7 +253,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     return (
       <BlockWrapper container alignItems="center">
         <CriteriaLabel
-          label={props.definition.label || ''}
+          label={props.definition.label ?? ''}
           infoIcon={props.definition.extraInfo}
           style={{ padding: 0 }}
         >
@@ -282,7 +287,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     )
     return (
       <AsyncAutocomplete
-        label={props.definition.label || 'Code(s) sélectionné(s)'}
+        label={props.definition.label ?? 'Code(s) sélectionné(s)'}
         variant="outlined"
         noOptionsText={props.definition.noOptionsText}
         values={valueWithLabels}

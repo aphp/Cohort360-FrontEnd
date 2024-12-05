@@ -2,7 +2,7 @@ import React, { createContext, ReactNode } from 'react'
 import { Root } from 'react-dom/client'
 import * as R from 'ramda'
 import { CONFIG_URL } from 'constants.js'
-import { DocumentAttachmentMethod, DocumentAttachmentMethodLabel, LabelObject } from 'types/searchCriterias'
+import { LabelObject } from 'types/searchCriterias'
 import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
 
 type ValueSetConfig = {

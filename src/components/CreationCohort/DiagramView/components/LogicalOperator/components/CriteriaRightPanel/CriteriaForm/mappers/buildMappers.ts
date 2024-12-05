@@ -13,7 +13,6 @@ import { comparatorToFilter, parseOccurence } from 'utils/valueComparator'
 import services from 'services/aphp'
 import { Hierarchy } from 'types/hierarchy'
 import { DataTypes, FhirKey, NewDurationRangeType, NumberAndComparatorDataType } from '../types'
-import { b } from 'vitest/dist/chunks/suite.CcK46U-P'
 
 /************************************************************************************/
 /*                        Criteria Form Item Mappers                                */
@@ -248,7 +247,7 @@ const parseDocumentAttachment = (value: string) => {
     documentAttachment.documentAttachmentMethod = value
   } else if (value.startsWith(DocumentAttachmentMethod.INFERENCE_TEMPOREL)) {
     documentAttachment.documentAttachmentMethod = DocumentAttachmentMethod.INFERENCE_TEMPOREL
-    const matchNumber = value.match(/\d+/)
+    const matchNumber = /\d+/.exec(value)
     if (matchNumber) {
       documentAttachment.daysOfDelay = matchNumber[0]
     }

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react'
 import { ValueSetStore } from 'state/valueSets'
 import {
   AutoCompleteItem,
@@ -9,7 +8,7 @@ import {
   NewDurationRangeType,
   NumberAndComparatorDataType
 } from '../types'
-import { ReactNode } from 'react'
+import React, { ReactNode } from 'react'
 import {
   DocumentAttachmentMethod,
   DocumentAttachmentMethodLabel,
@@ -24,7 +23,6 @@ import allDocTypes from 'assets/docTypes.json'
 import moment from 'moment'
 import { getDurationRangeLabel } from 'utils/age'
 import { getConfig } from 'config'
-import { prepend } from 'ramda'
 
 /************************************************************************************/
 /*                        Criteria Form Item Chip Display                           */

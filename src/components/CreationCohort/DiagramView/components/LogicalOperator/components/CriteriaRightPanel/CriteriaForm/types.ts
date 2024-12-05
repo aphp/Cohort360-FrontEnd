@@ -33,7 +33,7 @@ type BaseCriteriaItem = {
   // for conditionnal fields
   displayCondition?: ((data: Record<string, DataTypes>, context: Context) => boolean) | string // the displayCondition is used to hide the field
   disableCondition?: ((data: Record<string, DataTypes>, context: Context) => boolean) | string // the disableCondition is used to disable the field
-  displayValueSummary?: (data: DataTypes) => string | string // the displayValueSummary is used to display a summary of the value
+  displayValueSummary?: (data: DataTypes) => string // the displayValueSummary is used to display a summary of the value
   // for resetting the value of the field
   resetCondition?: ((data: Record<string, DataTypes>, context: Context) => boolean) | string // the resetCondition is used to reset the value of the field
 }
