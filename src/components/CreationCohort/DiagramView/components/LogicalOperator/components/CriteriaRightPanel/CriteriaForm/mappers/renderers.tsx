@@ -28,6 +28,7 @@ import DurationRange from 'components/ui/Inputs/DurationRange'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 import { Comparators } from 'types/requestCriterias'
+import SimpleSelect from 'components/ui/Inputs/SimpleSelect'
 
 /************************************************************************************/
 /*                        Criteria Form Item Renderer                               */
@@ -111,6 +112,16 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
       }
     />
   ),
+  select: (props) => {
+    return (
+      <SimpleSelect
+        value={props.value}
+        label={props.definition.label}
+        options={props.definition.choices}
+        onChange={(val) => props.updateData(val)}
+      />
+    )
+  },
   autocomplete: (props) => {
     const arrayPropValue = isArray(props.value) ? props.value : [props.value]
     const codeSystem = props.getValueSetOptions(props.definition.valueSetId)

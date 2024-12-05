@@ -7,7 +7,7 @@ import {
   WithEncounterDateDataType,
   WithEncounterStatusDataType
 } from '../CriteriaForm/types'
-import { DocumentAttachmentMethod } from 'types/searchCriterias'
+import { DocumentAttachmentMethod, DocumentAttachmentMethodLabel } from 'types/searchCriterias'
 import { getConfig } from 'config'
 import { SourceType } from 'types/scope'
 
@@ -22,7 +22,7 @@ export type ImagingDataType = CommonCriteriaData &
     studyProcedure: string
     numberOfSeries: NumberAndComparatorDataType
     numberOfIns: NumberAndComparatorDataType
-    withDocument: string[]
+    withDocument: string
     daysOfDelay: string | null
     studyUid: string
     seriesDate: NewDurationRangeType | null
@@ -53,7 +53,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
     studyProcedure: '',
     numberOfSeries: { value: 1, comparator: Comparators.GREATER_OR_EQUAL },
     numberOfIns: { value: 1, comparator: Comparators.GREATER_OR_EQUAL },
-    withDocument: [DocumentAttachmentMethod.NONE],
+    withDocument: DocumentAttachmentMethod.NONE,
     daysOfDelay: null,
     studyUid: '',
     seriesDate: null,
@@ -167,13 +167,22 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
         },
         {
           valueKey: 'withDocument',
-          type: 'autocomplete',
+          type: 'select',
           label: 'Méthode de rattachement à un document',
-          extraLabel: () => 'Méthode de rattachement à un document',
-          valueSetId: 'documentAttachementMethod',
-          singleChoice: true,
-          valueSetData: getConfig().features.imaging.valueSets.documentAttachementMethod.data,
-          noOptionsText: 'Veuillez entrer une méthode de rattachement',
+          choices: [
+            {
+              id: DocumentAttachmentMethod.NONE,
+              label: DocumentAttachmentMethodLabel.NONE
+            },
+            {
+              id: DocumentAttachmentMethod.ACCESS_NUMBER,
+              label: DocumentAttachmentMethodLabel.ACCESS_NUMBER
+            },
+            {
+              id: DocumentAttachmentMethod.INFERENCE_TEMPOREL,
+              label: DocumentAttachmentMethodLabel.INFERENCE_TEMPOREL
+            }
+          ],
           buildInfo: {
             fhirKey: ImagingParamsKeys.WITH_DOCUMENT,
             buildMethod: 'buildWithDocument',

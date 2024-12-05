@@ -17,7 +17,7 @@ export type DocumentDataType = CommonCriteriaData &
   WithEncounterStatusDataType & {
     type: CriteriaType.DOCUMENTS
     search: string
-    searchBy: string[] | null
+    searchBy: string | null
     docType: string[] | null
     docStatuses: string[] | null
   }
@@ -36,7 +36,7 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
     encounterEndDate: null,
     encounterStatus: [],
     search: '',
-    searchBy: [SearchByTypes.TEXT],
+    searchBy: SearchByTypes.TEXT,
     docType: null,
     docStatuses: null
   },
@@ -58,11 +58,9 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
         },
         {
           valueKey: 'searchBy',
-          type: 'autocomplete',
+          type: 'select',
           label: 'Rechercher dans :',
-          valueSetId: 'docSearchBy',
-          singleChoice: true,
-          valueSetData: [
+          choices: [
             { id: SearchByTypes.TEXT, label: 'Corps du document' },
             { id: SearchByTypes.DESCRIPTION, label: 'Titre du document' }
           ],
