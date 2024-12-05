@@ -1,4 +1,5 @@
 import { MedicationDataType, Comparators, CriteriaType } from 'types/requestCriterias'
+import { System } from 'types/scope'
 
 export const defaultMedicationCriteria: MedicationDataType = {
   id: 1,
@@ -30,12 +31,26 @@ export const completeMedicationAdministrationCriteria: MedicationDataType = {
   includeEncounterEndDateNull: false,
   encounterStatus: [{ id: 'cancelled', label: 'Cancelled', system: 'http://hl7.org/fhir/CodeSystem/encounter-status' }],
   code: [
-    { id: 'D01AA01', label: 'D01AA01 - Nystatin; Topical', system: 'https://terminology.eds.aphp.fr/atc' },
-    { id: 'D01AA02', label: 'D01AA02 - Natamycin; Topical', system: 'https://terminology.eds.aphp.fr/atc' },
+    {
+      id: 'D01AA01',
+      label: 'D01AA01 - Nystatin; Topical',
+      system: 'https://terminology.eds.aphp.fr/atc',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
+    },
+    {
+      id: 'D01AA02',
+      label: 'D01AA02 - Natamycin; Topical',
+      system: 'https://terminology.eds.aphp.fr/atc',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
+    },
     {
       id: '3400890000055',
       label: '3400890000055 - Sawis 2mg Cpr',
-      system: 'https://terminology.eds.aphp.fr/smt-medicament-ucd'
+      system: 'https://terminology.eds.aphp.fr/smt-medicament-ucd',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
     }
   ],
   administration: [
@@ -47,6 +62,7 @@ export const completeMedicationAdministrationCriteria: MedicationDataType = {
   ],
   encounterService: [
     {
+      label: 'GH RCP',
       above_levels_ids: '8312002244',
       cohort_id: '6935',
       cohort_size: '23',
@@ -58,7 +74,8 @@ export const completeMedicationAdministrationCriteria: MedicationDataType = {
       source_value: 'H01',
       status: undefined,
       subItems: undefined,
-      type: 'Groupe hospitalier (GH)'
+      type: 'Groupe hospitalier (GH)',
+      system: System.ScopeTree
     }
   ]
 }
@@ -75,12 +92,26 @@ export const completeMedicationPrescriptionCriteria: MedicationDataType = {
   includeEncounterEndDateNull: false,
   encounterStatus: [{ id: 'cancelled', label: 'Cancelled', system: 'http://hl7.org/fhir/CodeSystem/encounter-status' }],
   code: [
-    { id: 'D01AA01', label: 'D01AA01 - Nystatin; Topical', system: 'https://terminology.eds.aphp.fr/atc' },
-    { id: 'D01AA02', label: 'D01AA02 - Natamycin; Topical', system: 'https://terminology.eds.aphp.fr/atc' },
+    {
+      id: 'D01AA01',
+      label: 'D01AA01 - Nystatin; Topical',
+      system: 'https://terminology.eds.aphp.fr/atc',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
+    },
+    {
+      id: 'D01AA02',
+      label: 'D01AA02 - Natamycin; Topical',
+      system: 'https://terminology.eds.aphp.fr/atc',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
+    },
     {
       id: '3400890000055',
       label: '3400890000055 - Sawis 2mg Cpr',
-      system: 'https://terminology.eds.aphp.fr/smt-medicament-ucd'
+      system: 'https://terminology.eds.aphp.fr/smt-medicament-ucd',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
     }
   ],
   prescriptionType: [
@@ -92,6 +123,7 @@ export const completeMedicationPrescriptionCriteria: MedicationDataType = {
   ],
   encounterService: [
     {
+      label: 'GH RCP',
       above_levels_ids: '8312002244',
       cohort_id: '6935',
       cohort_size: '23',
@@ -103,7 +135,8 @@ export const completeMedicationPrescriptionCriteria: MedicationDataType = {
       source_value: 'H01',
       status: undefined,
       subItems: undefined,
-      type: 'Groupe hospitalier (GH)'
+      type: 'Groupe hospitalier (GH)',
+      system: System.ScopeTree
     }
   ]
 }

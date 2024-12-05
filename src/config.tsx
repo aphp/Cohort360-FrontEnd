@@ -7,7 +7,7 @@ type ValueSetConfig = {
   url: string
 }
 
-type AppConfig = {
+export type AppConfig = {
   labels: {
     exploration: string
   }

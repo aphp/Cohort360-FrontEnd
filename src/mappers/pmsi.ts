@@ -1,4 +1,3 @@
-import { getConfig } from 'config'
 import { Claim, Condition, Procedure } from 'fhir/r4'
 import { Medication, Pmsi } from 'state/patient'
 import { CohortPMSI } from 'types'
@@ -6,6 +5,16 @@ import { PMSILabel } from 'types/patient'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { SourceType } from 'types/scope'
 import { Order } from 'types/searchCriterias'
+
+export const getLastDiagnosisLabels = (mainDiagnosisList: Condition[]) => {
+  const mainDiagnosisLabels = mainDiagnosisList.map((diagnosis) => diagnosis.code?.coding?.[0].display)
+  const lastThreeDiagnosisLabels = mainDiagnosisLabels
+    .filter((diagnosis, index) => mainDiagnosisLabels.indexOf(diagnosis) === index)
+    .slice(0, 3)
+    .join(' - ')
+
+  return lastThreeDiagnosisLabels
+}
 
 export function mapToAttribute(
   type: ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST
@@ -53,16 +62,6 @@ export const mapToLabelSingular = (tabId: PMSIResourceTypes) => {
   }
 
   return mapToLabel[tabId]
-}
-
-export const mapToUrlCode = (tabId: PMSIResourceTypes) => {
-  const mapToUrlCode = {
-    [ResourceType.CONDITION]: getConfig().features.condition.valueSets.conditionHierarchy.url,
-    [ResourceType.PROCEDURE]: getConfig().features.procedure.valueSets.procedureHierarchy.url,
-    [ResourceType.CLAIM]: getConfig().features.claim.valueSets.claimHierarchy.url
-  }
-
-  return mapToUrlCode[tabId]
 }
 
 export const mapToSourceType = (tabId: PMSIResourceTypes) => {

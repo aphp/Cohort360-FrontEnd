@@ -14,7 +14,7 @@ export type PopulationCardPropsType = {
   label?: string
   loading: boolean
   onEditDisabled: boolean
-  population: Hierarchy<ScopeElement, string>[]
+  population: Hierarchy<ScopeElement>[]
   onEdit: () => void
 }
 
@@ -47,7 +47,7 @@ const PopulationCard = ({ label, onEditDisabled, population, loading, onEdit }: 
         <Grid item>
           {population
             .slice(0, isExtended ? population.length : 4)
-            .map((pop, index: number) =>
+            .map((pop) =>
               pop.id !== Rights.EXPIRED ? (
                 <Chip
                   sx={{ margin: '4px', fontSize: 11, fontWeight: 'bold' }}

@@ -3,6 +3,7 @@ import { PatientTableLabels } from './patient'
 import { CohortsType } from './cohorts'
 import { ResourceType } from './requestCriterias'
 import { Hierarchy } from './hierarchy'
+import { FhirItem } from './valueSet'
 
 export enum FormNames {
   PREGNANCY = 'APHPEDSQuestionnaireFicheGrossesse',
@@ -100,6 +101,7 @@ export enum DirectionLabel {
   DESC = 'Décroissant'
 }
 export enum Order {
+  LABEL = 'label',
   CODE = 'code',
   RESULT_SIZE = 'result_size',
   FAVORITE = 'favorite',
@@ -132,7 +134,8 @@ export enum Order {
   MEDICATION_UCD = 'medication-ucd',
   PRESCRIPTION_TYPES = 'category-name',
   ADMINISTRATION_MODE = 'route',
-  AUTHORED = 'authored'
+  AUTHORED = 'authored',
+  DISPLAY = 'display'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -186,8 +189,6 @@ export enum FilterKeys {
   PRESCRIPTION_TYPES = 'prescriptionTypes',
   CODE = 'code',
   NDA = 'nda',
-  ANABIO = 'anabio',
-  LOINC = 'loinc',
   DIAGNOSTIC_TYPES = 'diagnosticTypes',
   START_DATE = 'startDate',
   END_DATE = 'endDate',
@@ -245,8 +246,8 @@ export type FilterValue =
   | GenderStatus[]
   | VitalStatus
   | VitalStatus[]
-  | Hierarchy<ScopeElement, string>
-  | Hierarchy<ScopeElement, string>[]
+  | Hierarchy<ScopeElement>
+  | Hierarchy<ScopeElement>[]
   | SimpleCodeType
   | SimpleCodeType[]
   | null
@@ -265,7 +266,7 @@ export type GenericFilter = {
   nda: string
   startDate: string | null
   endDate: string | null
-  executiveUnits: Hierarchy<ScopeElement, string>[]
+  executiveUnits: Hierarchy<ScopeElement>[]
   encounterStatus: LabelObject[]
 }
 
@@ -277,7 +278,7 @@ export interface PatientsFilters {
 
 export type PMSIFilters = GenericFilter & {
   diagnosticTypes?: LabelObject[]
-  code: LabelObject[]
+  code: Hierarchy<FhirItem>[]
   source?: string
   ipp?: string
 }
@@ -286,11 +287,11 @@ export type MedicationFilters = GenericFilter & {
   prescriptionTypes?: LabelObject[]
   administrationRoutes?: LabelObject[]
   ipp?: string
+  code: Hierarchy<FhirItem>[]
 }
 
 export type BiologyFilters = GenericFilter & {
-  loinc: LabelObject[]
-  anabio: LabelObject[]
+  code: Hierarchy<FhirItem>[]
   validatedStatus: boolean
   ipp?: string
 }
@@ -305,7 +306,7 @@ export type MaternityFormFilters = {
   startDate: string | null
   endDate: string | null
   encounterStatus: LabelObject[]
-  executiveUnits: Hierarchy<ScopeElement, string>[]
+  executiveUnits: Hierarchy<ScopeElement>[]
   ipp?: string
 }
 

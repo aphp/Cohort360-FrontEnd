@@ -22,7 +22,7 @@ import {
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
-import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
+import AdvancedInputs from '../AdvancedInputs'
 
 import useStyles from './styles'
 
