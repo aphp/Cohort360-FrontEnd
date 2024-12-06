@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 import {
   Alert,
@@ -31,6 +31,7 @@ import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
+import { AppConfig } from 'config'
 
 type Cim10FormProps = {
   isOpen: boolean
@@ -50,7 +51,7 @@ enum Error {
 
 const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const { isOpen, isEdition, criteriaData, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
-
+  const appConfig = useContext(AppConfig)
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
@@ -205,17 +206,19 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               onChangeValue('code', value)
             }}
           />
-          <Autocomplete
-            multiple
-            id="criteria-cim10-type-autocomplete"
-            className={classes.inputItem}
-            options={criteriaData.data.diagnosticTypes || []}
-            getOptionLabel={(option) => option.label}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            value={defaultValuesType}
-            onChange={(e, value) => onChangeValue('diagnosticType', value)}
-            renderInput={(params) => <TextField {...params} label="Type de diagnostic" />}
-          />
+          {appConfig.core.fhir.extraSearchParams && (
+            <Autocomplete
+              multiple
+              id="criteria-cim10-type-autocomplete"
+              className={classes.inputItem}
+              options={criteriaData.data.diagnosticTypes || []}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={defaultValuesType}
+              onChange={(e, value) => onChangeValue('diagnosticType', value)}
+              renderInput={(params) => <TextField {...params} label="Type de diagnostic" />}
+            />
+          )}
           <Autocomplete
             multiple
             options={criteriaData.data.encounterStatus || []}

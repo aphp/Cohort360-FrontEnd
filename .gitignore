@@ -31,3 +31,4 @@ yarn-error.log*
 !.env.example
 .mp4
 public/config.dev.json
+public/config.example.json

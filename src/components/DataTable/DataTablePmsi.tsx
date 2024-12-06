@@ -14,6 +14,7 @@ import { getExtension } from 'utils/fhir'
 
 import useStyles from './styles'
 import { mapToDate, mapToLabelSingular } from 'mappers/pmsi'
+import { getPreferedCode } from 'utils/mappers'
 
 type DataTablePmsiProps = {
   loading: boolean
@@ -108,7 +109,7 @@ const DataTablePmsiLine: React.FC<{
 
   const filterCode = pmsi.resourceType === ResourceType.CLAIM ? pmsi.diagnosis?.[0]?.packageCode : pmsi.code
 
-  const codeToDisplay = filterCode?.coding?.find((code) => code.userSelected === true)
+  const codeToDisplay = getPreferedCode(filterCode)
 
   const source = pmsi.meta?.source ?? 'Non renseigné'
 

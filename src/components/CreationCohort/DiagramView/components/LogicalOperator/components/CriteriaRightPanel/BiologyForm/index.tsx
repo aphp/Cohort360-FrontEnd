@@ -32,10 +32,10 @@ export const defaultBiology: Omit<ObservationDataType, 'id'> = {
 
 const Index = (props: CriteriaDrawerComponentProps) => {
   const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const config = useContext(AppConfig)
+  const appConfig = useContext(AppConfig)
   const { classes } = useStyles()
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy' | 'search'>(
-    selectedCriteria ? 'form' : 'hierarchy'
+    selectedCriteria || !appConfig.core.fhir.valueSetExploration ? 'form' : 'hierarchy'
   )
   const [defaultCriteria, setDefaultCriteria] = useState<ObservationDataType>(
     (selectedCriteria as ObservationDataType) || defaultBiology
@@ -83,8 +83,8 @@ const Index = (props: CriteriaDrawerComponentProps) => {
         value={selectedTab}
         onChange={(e, tab) => setSelectedTab(tab)}
       >
-        <Tab label={config.labels.exploration} value="hierarchy" />
-        <Tab label="Recherche" value="search" />
+        {appConfig.core.fhir.valueSetExploration && <Tab label={appConfig.labels.exploration} value="hierarchy" />}
+        {appConfig.core.fhir.valueSetExploration && <Tab label="Recherche" value="search" />}
         <Tab label="Formulaire" value="form" />
       </Tabs>
 

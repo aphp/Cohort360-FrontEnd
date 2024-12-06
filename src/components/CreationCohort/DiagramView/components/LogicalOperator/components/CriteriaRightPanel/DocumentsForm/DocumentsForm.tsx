@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import _ from 'lodash'
 
 import {
@@ -38,6 +38,7 @@ import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import { SourceType } from 'types/scope'
+import { AppConfig } from 'config'
 
 const defaultComposition: Omit<DocumentDataType, 'id'> = {
   type: CriteriaType.DOCUMENTS,
@@ -64,7 +65,7 @@ enum Error {
 
 const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-
+  const appConfig = useContext(AppConfig)
   const { classes } = useStyles()
   const [defaultValues, setDefaultValues] = useState<DocumentDataType>(
     (selectedCriteria as DocumentDataType) || defaultComposition
@@ -272,16 +273,18 @@ const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             }}
           />
 
-          <FormControl variant="outlined" className={classes.inputItem}>
-            <Autocomplete
-              disableCloseOnSelect
-              multiple
-              onChange={(e, value) => _onChangeValue('docStatuses', value)}
-              options={docStatuses}
-              value={defaultValues.docStatuses || undefined}
-              renderInput={(params) => <TextField {...params} placeholder="Statut de documents" />}
-            />
-          </FormControl>
+          {appConfig.core.fhir.extraSearchParams && (
+            <FormControl variant="outlined" className={classes.inputItem}>
+              <Autocomplete
+                disableCloseOnSelect
+                multiple
+                onChange={(e, value) => _onChangeValue('docStatuses', value)}
+                options={docStatuses}
+                value={defaultValues.docStatuses || undefined}
+                renderInput={(params) => <TextField {...params} placeholder="Statut de documents" />}
+              />
+            </FormControl>
+          )}
 
           <FormControl variant="outlined" className={classes.inputItem}>
             <Autocomplete

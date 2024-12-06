@@ -253,14 +253,16 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             style={{ marginBottom: '1em' }}
           />
 
-          <BlockWrapper style={{ marginBottom: '1em' }}>
-            <SearchbarWithCheck
-              searchInput={studyDescription}
-              setSearchInput={setStudyDescription}
-              placeholder="Rechercher dans les descriptions"
-              onError={(isError) => setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)}
-            />
-          </BlockWrapper>
+          {appConfig.core.fhir.extraSearchParams && (
+            <BlockWrapper style={{ marginBottom: '1em' }}>
+              <SearchbarWithCheck
+                searchInput={studyDescription}
+                setSearchInput={setStudyDescription}
+                placeholder="Rechercher dans les descriptions"
+                onError={(isError) => setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)}
+              />
+            </BlockWrapper>
+          )}
 
           <BlockWrapper style={{ marginBottom: '1em' }}>
             <SearchbarWithCheck
@@ -271,75 +273,79 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             />
           </BlockWrapper>
 
-          <BlockWrapper style={{ marginBottom: '1em' }}>
-            <OccurenceInput
-              label="Nombre de séries"
-              value={numberOfSeries}
-              comparator={seriesComparator}
-              onchange={(newOccurence, newComparator) => {
-                setNumberOfSeries(newOccurence)
-                setSeriesComparator(newComparator)
-              }}
-            />
-          </BlockWrapper>
-
-          <BlockWrapper style={{ marginBottom: '1em' }}>
-            <OccurenceInput
-              label="Nombre d'instances"
-              value={numberOfIns}
-              comparator={instancesComparator}
-              onchange={(newOccurence, newComparator) => {
-                setNumberOfIns(newOccurence)
-                setInstancesComparator(newComparator)
-              }}
-            />
-          </BlockWrapper>
-
-          <BlockWrapper style={{ marginBottom: '1em' }}>
-            <CriteriaLabel label="Méthode de rattachement à un document" />
-            <Grid container alignItems="center">
-              <Grid item xs={withDocument === DocumentAttachmentMethod.INFERENCE_TEMPOREL ? 6 : 12}>
-                <Select
-                  value={withDocument}
-                  onChange={(event) => setWithDocument(event.target.value as DocumentAttachmentMethod)}
-                  style={{ width: '100%' }}
-                >
-                  {withDocumentOptions.map((option) => (
-                    <MenuItem key={option.id} value={option.id}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </Grid>
-              {withDocument === DocumentAttachmentMethod.INFERENCE_TEMPOREL && (
-                <Grid item xs={6} padding={'0 12px'}>
-                  <Grid container>
-                    <Grid item xs={4}>
-                      <DurationUnitWrapper>Plage de </DurationUnitWrapper>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <TextFieldWrapper
-                        activated={!!daysOfDelay}
-                        value={daysOfDelay}
-                        variant="standard"
-                        size="small"
-                        onChange={(event) => setDaysOfDelay(event.target.value)}
-                        type="number"
-                        InputProps={{
-                          inputProps: {
-                            min: 0
-                          }
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <DurationUnitWrapper>{CalendarRequestLabel.DAY}</DurationUnitWrapper>
+          {appConfig.core.fhir.extraSearchParams && (
+            <BlockWrapper style={{ marginBottom: '1em' }}>
+              <OccurenceInput
+                label="Nombre de séries"
+                value={numberOfSeries}
+                comparator={seriesComparator}
+                onchange={(newOccurence, newComparator) => {
+                  setNumberOfSeries(newOccurence)
+                  setSeriesComparator(newComparator)
+                }}
+              />
+            </BlockWrapper>
+          )}
+          {appConfig.core.fhir.extraSearchParams && (
+            <BlockWrapper style={{ marginBottom: '1em' }}>
+              <OccurenceInput
+                label="Nombre d'instances"
+                value={numberOfIns}
+                comparator={instancesComparator}
+                onchange={(newOccurence, newComparator) => {
+                  setNumberOfIns(newOccurence)
+                  setInstancesComparator(newComparator)
+                }}
+              />
+            </BlockWrapper>
+          )}
+          {appConfig.core.fhir.extraSearchParams && (
+            <BlockWrapper style={{ marginBottom: '1em' }}>
+              <CriteriaLabel label="Méthode de rattachement à un document" />
+              <Grid container alignItems="center">
+                <Grid item xs={withDocument === DocumentAttachmentMethod.INFERENCE_TEMPOREL ? 6 : 12}>
+                  <Select
+                    value={withDocument}
+                    onChange={(event) => setWithDocument(event.target.value as DocumentAttachmentMethod)}
+                    style={{ width: '100%' }}
+                  >
+                    {withDocumentOptions.map((option) => (
+                      <MenuItem key={option.id} value={option.id}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Grid>
+                {withDocument === DocumentAttachmentMethod.INFERENCE_TEMPOREL && (
+                  <Grid item xs={6} padding={'0 12px'}>
+                    <Grid container>
+                      <Grid item xs={4}>
+                        <DurationUnitWrapper>Plage de </DurationUnitWrapper>
+                      </Grid>
+                      <Grid item xs={4}>
+                        <TextFieldWrapper
+                          activated={!!daysOfDelay}
+                          value={daysOfDelay}
+                          variant="standard"
+                          size="small"
+                          onChange={(event) => setDaysOfDelay(event.target.value)}
+                          type="number"
+                          InputProps={{
+                            inputProps: {
+                              min: 0
+                            }
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <DurationUnitWrapper>{CalendarRequestLabel.DAY}</DurationUnitWrapper>
+                      </Grid>
                     </Grid>
                   </Grid>
-                </Grid>
-              )}
-            </Grid>
-          </BlockWrapper>
+                )}
+              </Grid>
+            </BlockWrapper>
+          )}
 
           <CriteriaLabel label="Recherche par uid d'étude" />
           <UidTextfield
@@ -350,63 +356,65 @@ const ImagingForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
         </Collapse>
 
         {/*critères de série : */}
-        <BlockWrapper style={{ marginTop: 26 }}>
-          <Collapse
-            title="Critères liés à une série"
-            value={isSeriesUsed}
-            margin="0"
-            info="Une série est une des acquisitions lors d'un examen."
-          >
-            <BlockWrapper style={{ margin: '0 2em 1em 0' }}>
-              <CriteriaLabel label="Date de la série" style={{ padding: 0 }} />
-              <CalendarRange
-                inline
-                value={[seriesStartDate, seriesEndDate]}
-                onChange={([start, end]) => {
-                  setSeriesStartDate(start || null)
-                  setSeriesEndDate(end || null)
-                }}
-                onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+        {appConfig.core.fhir.extraSearchParams && (
+          <BlockWrapper style={{ marginTop: 26 }}>
+            <Collapse
+              title="Critères liés à une série"
+              value={isSeriesUsed}
+              margin="0"
+              info="Une série est une des acquisitions lors d'un examen."
+            >
+              <BlockWrapper style={{ margin: '0 2em 1em 0' }}>
+                <CriteriaLabel label="Date de la série" style={{ padding: 0 }} />
+                <CalendarRange
+                  inline
+                  value={[seriesStartDate, seriesEndDate]}
+                  onChange={([start, end]) => {
+                    setSeriesStartDate(start || null)
+                    setSeriesEndDate(end || null)
+                  }}
+                  onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
+                />
+              </BlockWrapper>
+
+              <BlockWrapper style={{ marginBottom: '1em' }}>
+                <SearchbarWithCheck
+                  searchInput={seriesDescription}
+                  setSearchInput={setSeriesDescription}
+                  placeholder="Rechercher dans les descriptions"
+                  onError={(isError) => setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)}
+                />
+              </BlockWrapper>
+
+              <BlockWrapper style={{ marginBottom: '1em' }}>
+                <SearchbarWithCheck
+                  searchInput={seriesProtocol}
+                  setSearchInput={setSeriesProtocol}
+                  placeholder="Rechercher dans les protocoles"
+                  onError={(isError) => setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)}
+                />
+              </BlockWrapper>
+
+              <Autocomplete
+                multiple
+                options={criteriaData?.data.modalities || []}
+                getOptionLabel={(option) => option.label}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                value={seriesModalities}
+                onChange={(e, value) => setSeriesModalities(value)}
+                renderInput={(params) => <TextField {...params} label="Modalités" />}
+                style={{ marginBottom: '1em' }}
               />
-            </BlockWrapper>
 
-            <BlockWrapper style={{ marginBottom: '1em' }}>
-              <SearchbarWithCheck
-                searchInput={seriesDescription}
-                setSearchInput={setSeriesDescription}
-                placeholder="Rechercher dans les descriptions"
-                onError={(isError) => setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)}
+              <CriteriaLabel label="Recherche par uid de série" />
+              <UidTextfield
+                value={seriesUid}
+                onChange={setSeriesUid}
+                onError={(isError) => setError(isError ? Error.UID_ERROR : Error.NO_ERROR)}
               />
-            </BlockWrapper>
-
-            <BlockWrapper style={{ marginBottom: '1em' }}>
-              <SearchbarWithCheck
-                searchInput={seriesProtocol}
-                setSearchInput={setSeriesProtocol}
-                placeholder="Rechercher dans les protocoles"
-                onError={(isError) => setError(isError ? Error.SEARCHINPUT_ERROR : Error.NO_ERROR)}
-              />
-            </BlockWrapper>
-
-            <Autocomplete
-              multiple
-              options={criteriaData?.data.modalities || []}
-              getOptionLabel={(option) => option.label}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={seriesModalities}
-              onChange={(e, value) => setSeriesModalities(value)}
-              renderInput={(params) => <TextField {...params} label="Modalités" />}
-              style={{ marginBottom: '1em' }}
-            />
-
-            <CriteriaLabel label="Recherche par uid de série" />
-            <UidTextfield
-              value={seriesUid}
-              onChange={setSeriesUid}
-              onError={(isError) => setError(isError ? Error.UID_ERROR : Error.NO_ERROR)}
-            />
-          </Collapse>
-        </BlockWrapper>
+            </Collapse>
+          </BlockWrapper>
+        )}
       </BlockWrapper>
 
       <AdvancedInputs

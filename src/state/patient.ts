@@ -53,8 +53,8 @@ import {
 import { isCustomError } from 'utils/perimeters'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { mapToAttribute, mapToUrlCode } from 'mappers/pmsi'
-import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
+import { getMainDiagnosis } from 'utils/mappers'
 
 export type Medication = {
   administration?: IPatientMedication<MedicationAdministration>
@@ -815,12 +815,8 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
       return {
         patientInfo: {
           lastGhm: claimList ? (claimList[0] as Claim) : undefined,
-          lastProcedure: procedureList ? (procedureList[0] as Procedure) : undefined,
-          mainDiagnosis: conditionList.filter(
-            (condition) =>
-              getExtension(condition, getConfig().features.condition.extensions.orbisStatus)?.valueCodeableConcept
-                ?.coding?.[0]?.code === 'dp'
-          ) as Condition[]
+          lastProcedure: procedureList ? procedureList[0] : undefined,
+          mainDiagnosis: getMainDiagnosis(conditionList)
         },
         pmsi: {
           condition: {

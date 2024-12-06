@@ -17,6 +17,7 @@ import { getDurationRangeLabel } from './age'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
 import { Hierarchy } from 'types/hierarchy'
 import labels from 'labels.json'
+import { perimeterDisplay } from './perimeters'
 
 export const getCohortsTypeLabel = (type: CohortsType): string => {
   switch (type) {
@@ -130,9 +131,10 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return `Source : ${value}`
   }
   if (key === FilterKeys.EXECUTIVE_UNITS) {
-    return `Unité exécutrice :  ${(value as Hierarchy<ScopeElement, string>).source_value} - ${
+    return `Unité exécutrice :  ${perimeterDisplay(
+      (value as Hierarchy<ScopeElement, string>).source_value,
       (value as Hierarchy<ScopeElement, string>).name
-    }`
+    )}`
   }
   if (key === FilterKeys.DOC_STATUSES) {
     return `Documents : ${value}`
