@@ -27,8 +27,7 @@ import Chip from 'components/ui/Chip'
 import AdministrationTypesFilter from 'components/Filters/AdministrationTypesFilter'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
-import NdaFilter from 'components/Filters/NdaFilter'
-import PrescriptionTypesFilter from 'components/Filters/PrescriptionTypesFilter'
+import SelectInput from 'components/Filters/SelectInput'
 import { Save, SavedSearch } from '@mui/icons-material'
 import { MedicationLabel, ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
@@ -37,7 +36,6 @@ import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
 import { mapToAttribute, mapToLabel } from 'mappers/pmsi'
 import services from 'services/aphp'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
@@ -343,12 +341,15 @@ const PatientMedication = () => {
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
         onClean={triggerClean}
       >
-        {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+        {!searchResults.deidentified && (
+          <TextInput name={FilterKeys.NDA} value={nda} label="NDA :" placeholder="Exemple: 6601289264,141740347" />
+        )}
         {selectedTab.id === ResourceType.MEDICATION_REQUEST && prescriptionTypes && (
-          <PrescriptionTypesFilter
+          <SelectInput
             value={prescriptionTypes}
             name={FilterKeys.PRESCRIPTION_TYPES}
-            allPrescriptionTypes={allPrescriptionTypes}
+            options={allPrescriptionTypes}
+            label="Type de prescriptions :"
           />
         )}
         {selectedTab.id === ResourceType.MEDICATION_ADMINISTRATION && administrationRoutes && (
@@ -364,10 +365,11 @@ const PatientMedication = () => {
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
         />
-        <EncounterStatusFilter
+        <SelectInput
           value={encounterStatus}
           name={FilterKeys.ENCOUNTER_STATUS}
-          encounterStatusList={encounterStatusList}
+          options={encounterStatusList}
+          label="Statut de la visite associée :"
         />
       </Modal>
       <Modal
@@ -462,17 +464,20 @@ const PatientMedication = () => {
               )}
               <Grid item>
                 {!searchResults.deidentified && (
-                  <NdaFilter
+                  <TextInput
+                    name="nda"
                     disabled={isReadonlyFilterInfoModal}
-                    name={FilterKeys.NDA}
                     value={selectedSavedFilter?.filterParams.filters.nda || ''}
+                    label="NDA :"
+                    placeholder="Exemple: 6601289264,141740347"
                   />
                 )}
                 {selectedTab.id === ResourceType.MEDICATION_REQUEST && (
-                  <PrescriptionTypesFilter
+                  <SelectInput
                     value={selectedSavedFilter?.filterParams.filters.prescriptionTypes || []}
                     name={FilterKeys.PRESCRIPTION_TYPES}
-                    allPrescriptionTypes={allPrescriptionTypes}
+                    label="Type de prescriptions :"
+                    options={allPrescriptionTypes}
                     disabled={isReadonlyFilterInfoModal}
                   />
                 )}
@@ -498,11 +503,12 @@ const PatientMedication = () => {
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
                 />
-                <EncounterStatusFilter
+                <SelectInput
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
                   name={FilterKeys.ENCOUNTER_STATUS}
-                  encounterStatusList={encounterStatusList}
+                  options={encounterStatusList}
+                  label="Statut de la visite associée :"
                 />
               </Grid>
             </Grid>

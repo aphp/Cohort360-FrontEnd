@@ -27,7 +27,6 @@ import AnabioFilter from 'components/Filters/AnabioFilter'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import LoincFilter from 'components/Filters/LoincFilter'
-import NdaFilter from 'components/Filters/NdaFilter'
 import { Save, SavedSearch } from '@mui/icons-material'
 import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
@@ -38,11 +37,11 @@ import {
   fetchAnabioCodes as fetchAnabioCodesApi
 } from 'services/aphp/serviceBiology'
 import services from 'services/aphp'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
+import SelectInput from 'components/Filters/SelectInput'
 
 const PatientBiology = () => {
   const { classes } = useStyles()
@@ -267,7 +266,9 @@ const PatientBiology = () => {
         onClose={() => setToggleFilterByModal(false)}
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
       >
-        {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+        {!searchResults.deidentified && (
+          <TextInput name={FilterKeys.NDA} value={nda} label="NDA :" placeholder="Exemple: 6601289264,141740347" />
+        )}
         <AnabioFilter name={FilterKeys.ANABIO} value={anabio} onFetch={fetchAnabioCodesApi} />
         <LoincFilter name={FilterKeys.LOINC} value={loinc} onFetch={fetchLoincCodesApi} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
@@ -276,10 +277,11 @@ const PatientBiology = () => {
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
         />
-        <EncounterStatusFilter
+        <SelectInput
           value={encounterStatus}
           name={FilterKeys.ENCOUNTER_STATUS}
-          encounterStatusList={encounterStatusList}
+          options={encounterStatusList}
+          label="Statut de la visite associée :"
         />
       </Modal>
       <Modal
@@ -365,10 +367,12 @@ const PatientBiology = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <NdaFilter
+                  <TextInput
                     name="nda"
                     disabled={isReadonlyFilterInfoModal}
                     value={selectedSavedFilter?.filterParams.filters.nda || ''}
+                    label="NDA :"
+                    placeholder="Exemple: 6601289264,141740347"
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -406,11 +410,12 @@ const PatientBiology = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <EncounterStatusFilter
+                  <SelectInput
                     disabled={isReadonlyFilterInfoModal}
                     value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
                     name={FilterKeys.ENCOUNTER_STATUS}
-                    encounterStatusList={encounterStatusList}
+                    options={encounterStatusList}
+                    label="Statut de la visite associée :"
                   />
                 </Grid>
               </Grid>
