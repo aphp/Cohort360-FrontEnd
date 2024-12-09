@@ -1,4 +1,5 @@
 import apiFhir from '../apiFhir'
+import apiDatamodel from 'services/apiDatamodel'
 import {
   AccessExpiration,
   AccessExpirationsProps,
@@ -1246,4 +1247,31 @@ export const fetchCohortAccesses = async (cohortIds: string[]) => {
 export const fetchCohortInfo = async (cohortId: string) => {
   const response = await apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?group_id=${cohortId}`)
   return response
+}
+
+export const fetchExportableCohorts = async () => {
+  const response = await apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?exportable=true`)
+  return response.data.results
+}
+
+type fetchExportTableInfoProps = {
+  tableNames?: string
+  relationLink?: string[]
+}
+
+export const fetchExportTableInfo = async (args: fetchExportTableInfoProps) => {
+  const { tableNames, relationLink } = args
+
+  let options: string[] = []
+  if (tableNames) options = [...options, `?tables=${tableNames}`]
+  if (relationLink) options = [...options, `/relations?tables=${relationLink}`]
+
+  let queryParams = ''
+  if (options.length != 0) {
+    queryParams = `${options.reduce(paramsReducer)}`
+  }
+
+  const response = await apiDatamodel.get(`/models${queryParams}`)
+
+  return response.data
 }
