@@ -79,6 +79,7 @@ import { getExtension } from 'utils/fhir'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { mapToOrderByCode, mapToUrlCode } from 'mappers/pmsi'
 import { mapMedicationToOrderByCode } from 'mappers/medication'
+import { linkToDiagnosticReport } from './serviceImaging'
 
 export interface IServiceCohorts {
   /**
@@ -897,6 +898,7 @@ const servicesCohorts: IServiceCohorts = {
       groupId,
       signal
     )
+    const imagingListWithDiagnosticReport = await linkToDiagnosticReport(completeImagingList, signal)
 
     const totalImaging = imagingResponse.data?.resourceType === 'Bundle' ? imagingResponse.data?.total : 0
     const totalAllImaging =
@@ -916,7 +918,7 @@ const servicesCohorts: IServiceCohorts = {
       totalAllResults: totalAllImaging ?? 0,
       totalPatients: totalPatientImaging ?? 0,
       totalAllPatients: totalAllPatientsImaging ?? 0,
-      list: completeImagingList ?? []
+      list: imagingListWithDiagnosticReport ?? []
     }
   },
 

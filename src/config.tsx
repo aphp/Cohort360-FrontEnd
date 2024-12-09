@@ -16,6 +16,10 @@ type AppConfig = {
       enabled: boolean
       shortCohortLimit: number
     }
+    diagnosticReport: {
+      enabled: boolean
+      useStudyParam: boolean
+    }
     export: {
       enabled: boolean
       exportLinesLimit: number
@@ -196,6 +200,10 @@ let config: AppConfig = {
     cohort: {
       enabled: true,
       shortCohortLimit: 2000
+    },
+    diagnosticReport: {
+      enabled: false,
+      useStudyParam: false
     },
     export: {
       enabled: true,

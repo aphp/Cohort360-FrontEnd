@@ -55,6 +55,7 @@ import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { mapToAttribute, mapToUrlCode } from 'mappers/pmsi'
 import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
+import { linkToDiagnosticReport } from 'services/aphp/serviceImaging'
 
 export type Medication = {
   administration?: IPatientMedication<MedicationAdministration>
@@ -445,13 +446,14 @@ const fetchImaging = createAsyncThunk<FetchImagingReturn, FetchImagingParams, { 
       )
 
       const imagingList = linkElementWithEncounter(imagingResponse.imagingList, hospits, deidentified)
+      const imagingListWithDiagnosticReport = await linkToDiagnosticReport(imagingList, signal)
 
       return {
         imaging: {
           loading: false,
           count: imagingResponse.imagingTotal,
           total: patientState?.imaging?.total ? patientState?.imaging?.total : imagingResponse.imagingTotal,
-          list: imagingList,
+          list: imagingListWithDiagnosticReport,
           page,
           options
         } as IPatientImaging<CohortImaging>
