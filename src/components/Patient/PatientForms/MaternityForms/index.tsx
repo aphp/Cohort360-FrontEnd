@@ -20,12 +20,15 @@ import { LoadingStatus } from 'types'
 import { FilterKeys, LabelObject } from 'types/searchCriterias'
 import Timeline from './Timeline'
 import services from 'services/aphp'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { useSearchParams } from 'react-router-dom'
 import { getCleanGroupId } from 'utils/paginationUtils'
+<<<<<<< HEAD
 import { getCodeList } from 'services/aphp/serviceValueSets'
 import { getConfig } from 'config'
+=======
+import MultiSelectInput from 'components/Filters/MultiSelectInput'
+>>>>>>> 3de84b27 (ref: 2490-refacto filters - Ref gestion-de-projet#2371)
 
 const MaternityForm = () => {
   const [toggleModal, setToggleModal] = useState(false)
@@ -133,10 +136,11 @@ const MaternityForm = () => {
                   value={executiveUnits}
                   name={FilterKeys.EXECUTIVE_UNITS}
                 />
-                <EncounterStatusFilter
+                <MultiSelectInput
                   value={encounterStatus}
                   name={FilterKeys.ENCOUNTER_STATUS}
-                  encounterStatusList={encounterStatusList}
+                  options={encounterStatusList}
+                  label="Statut de la visite associée :"
                 />
               </Modal>
             )}

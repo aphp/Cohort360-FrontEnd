@@ -5,9 +5,7 @@ import { CircularProgress, Grid, useMediaQuery, useTheme } from '@mui/material'
 import { FilterList } from '@mui/icons-material'
 import Button from 'components/ui/Button'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
-import IppFilter from 'components/Filters/IppFilter'
 import Modal from 'components/ui/Modal'
 import { DTTB_ResultsType as ResultsType, LoadingStatus } from 'types'
 import { FilterKeys, LabelObject } from 'types/searchCriterias'
@@ -25,6 +23,8 @@ import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/
 import Chip from 'components/ui/Chip'
 import { getCodeList } from 'services/aphp/serviceValueSets'
 import { getConfig } from 'config'
+import TextInput from 'components/Filters/TextInput'
+import MultiSelectInput from 'components/Filters/MultiSelectInput'
 
 const FormsList = () => {
   const theme = useTheme()
@@ -206,17 +206,23 @@ const FormsList = () => {
         onClose={() => setToggleFilterByModal(false)}
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
       >
-        <IppFilter name={FilterKeys.IPP} value={ipp ?? ''} />
+        <TextInput
+          name={FilterKeys.IPP}
+          value={ipp}
+          label="IPP :"
+          placeholder="'Exemple: 8000000000001,8000000000002'"
+        />
         <MaternityFormFilter name={FilterKeys.FORM_NAME} value={formName} />
         <ExecutiveUnitsFilter
           sourceType={SourceType.FORM_RESPONSE}
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
         />
-        <EncounterStatusFilter
+        <MultiSelectInput
+          label="Statut de la visite associée :"
           value={encounterStatus}
           name={FilterKeys.ENCOUNTER_STATUS}
-          encounterStatusList={encounterStatusList}
+          options={encounterStatusList}
         />
       </Modal>
     </Grid>

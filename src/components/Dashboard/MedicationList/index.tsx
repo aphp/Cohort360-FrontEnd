@@ -4,19 +4,15 @@ import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
 
 import { Chip, CircularProgress, Grid, Tooltip, useMediaQuery, useTheme } from '@mui/material'
 import { Save, SavedSearch, FilterList } from '@mui/icons-material'
-import AdministrationTypesFilter from 'components/Filters/AdministrationTypesFilter'
 import Button from 'components/ui/Button'
 import DataTableMedication from 'components/DataTable/DataTableMedication'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
-import IppFilter from 'components/Filters/IppFilter'
 import List from 'components/ui/List'
 import Modal from 'components/ui/Modal'
 import { medicationTabs } from 'components/Patient/PatientMedication'
-import NdaFilter from 'components/Filters/NdaFilter'
-import PrescriptionTypesFilter from 'components/Filters/PrescriptionTypesFilter'
+import MultiSelectInput from 'components/Filters/MultiSelectInput'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Tabs from 'components/ui/Tabs'
 import TextInput from 'components/Filters/TextInput'
@@ -369,20 +365,31 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
         onClean={triggerClean}
       >
-        {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-        {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp ?? ''} />}
+        {!deidentified && (
+          <TextInput name={FilterKeys.NDA} value={nda} label="NDA :" placeholder="Exemple: 6601289264,141740347" />
+        )}
+        {!deidentified && (
+          <TextInput
+            name={FilterKeys.IPP}
+            value={ipp}
+            label="IPP :"
+            placeholder="'Exemple: 8000000000001,8000000000002'"
+          />
+        )}
         {selectedTab.id === ResourceType.MEDICATION_REQUEST && prescriptionTypes && (
-          <PrescriptionTypesFilter
+          <MultiSelectInput
             value={prescriptionTypes}
             name={FilterKeys.PRESCRIPTION_TYPES}
-            allPrescriptionTypes={allPrescriptionTypes}
+            options={allPrescriptionTypes}
+            label="Type de prescriptions :"
           />
         )}
         {selectedTab.id === ResourceType.MEDICATION_ADMINISTRATION && administrationRoutes && (
-          <AdministrationTypesFilter
+          <MultiSelectInput
             value={administrationRoutes}
             name={FilterKeys.ADMINISTRATION_ROUTES}
-            allAdministrationTypes={allAdministrationRoutes}
+            options={allAdministrationRoutes}
+            label="Voie d'administration :"
           />
         )}
         <CodeFilter name={FilterKeys.CODE} value={code} references={references} />
@@ -392,10 +399,11 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
         />
-        <EncounterStatusFilter
+        <MultiSelectInput
           value={encounterStatus}
           name={FilterKeys.ENCOUNTER_STATUS}
-          encounterStatusList={encounterStatusList}
+          options={encounterStatusList}
+          label="Statut de la visite associée :"
         />
       </Modal>
       <Modal
@@ -436,7 +444,6 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
             readonly={isReadonlyFilterInfoModal}
             onClose={() => setToggleFilterInfoModal(false)}
             onSubmit={({
-              code,
               filterName,
               searchInput,
               nda,
@@ -471,79 +478,94 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
             validationText="Sauvegarder"
           >
             <Grid container direction="column" gap="8px">
-              <TextInput
-                name="filterName"
-                label="Nom :"
-                value={selectedSavedFilter?.filterName}
-                error={savedFiltersErrors}
-                disabled={isReadonlyFilterInfoModal}
-                minLimit={2}
-                maxLimit={50}
-              />
-              {!deidentified && (
+              <Grid item container direction="column">
                 <TextInput
-                  name="searchInput"
-                  label="Recherche textuelle :"
+                  name="filterName"
+                  label="Nom :"
+                  value={selectedSavedFilter?.filterName}
+                  error={savedFiltersErrors}
                   disabled={isReadonlyFilterInfoModal}
-                  value={selectedSavedFilter?.filterParams.searchInput}
+                  minLimit={2}
+                  maxLimit={50}
                 />
-              )}
+              </Grid>
               {!deidentified && (
-                <NdaFilter
-                  disabled={isReadonlyFilterInfoModal}
-                  name={FilterKeys.NDA}
-                  value={selectedSavedFilter?.filterParams.filters.nda ?? ''}
-                />
+                <Grid item container direction="column" paddingBottom="8px">
+                  <TextInput
+                    name="searchInput"
+                    label="Recherche textuelle :"
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.searchInput}
+                  />
+                </Grid>
               )}
-              {!deidentified && (
-                <IppFilter
+              <Grid item>
+                {!deidentified && (
+                  <TextInput
+                    name="nda"
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.filters.nda || ''}
+                    label="NDA :"
+                    placeholder="Exemple: 6601289264,141740347"
+                  />
+                )}
+                {!deidentified && (
+                  <Grid item>
+                    <TextInput
+                      disabled={isReadonlyFilterInfoModal}
+                      name={FilterKeys.IPP}
+                      value={selectedSavedFilter?.filterParams.filters.ipp ?? ''}
+                      label="IPP :"
+                      placeholder="'Exemple: 8000000000001,8000000000002'"
+                    />
+                  </Grid>
+                )}
+                {selectedTab.id === ResourceType.MEDICATION_REQUEST && (
+                  <MultiSelectInput
+                    label="Type de prescriptions :"
+                    value={selectedSavedFilter?.filterParams.filters.prescriptionTypes || []}
+                    name={FilterKeys.PRESCRIPTION_TYPES}
+                    options={allPrescriptionTypes}
+                    disabled={isReadonlyFilterInfoModal}
+                  />
+                )}
+                {selectedTab.id === ResourceType.MEDICATION_ADMINISTRATION && (
+                  <MultiSelectInput
+                    disabled={isReadonlyFilterInfoModal}
+                    value={selectedSavedFilter?.filterParams.filters.administrationRoutes || []}
+                    name={FilterKeys.ADMINISTRATION_ROUTES}
+                    options={allAdministrationRoutes}
+                    label="Voie d'administration :"
+                  />
+                )}
+                <CodeFilter
+                  references={references}
                   disabled={isReadonlyFilterInfoModal}
-                  name={FilterKeys.IPP}
-                  value={selectedSavedFilter?.filterParams.filters.ipp ?? ''}
+                  name={FilterKeys.CODE}
+                  value={selectedSavedFilter?.filterParams.filters.code ?? []}
                 />
-              )}
-              {selectedTab.id === ResourceType.MEDICATION_REQUEST && (
-                <PrescriptionTypesFilter
-                  value={selectedSavedFilter?.filterParams.filters.prescriptionTypes || []}
-                  name={FilterKeys.PRESCRIPTION_TYPES}
-                  allPrescriptionTypes={allPrescriptionTypes}
+                <DatesRangeFilter
                   disabled={isReadonlyFilterInfoModal}
+                  values={[
+                    selectedSavedFilter?.filterParams.filters.startDate,
+                    selectedSavedFilter?.filterParams.filters.endDate
+                  ]}
+                  names={[FilterKeys.START_DATE, FilterKeys.END_DATE]}
                 />
-              )}
-              {selectedTab.id === ResourceType.MEDICATION_ADMINISTRATION && (
-                <AdministrationTypesFilter
+                <ExecutiveUnitsFilter
+                  sourceType={SourceType.MEDICATION}
                   disabled={isReadonlyFilterInfoModal}
-                  value={selectedSavedFilter?.filterParams.filters.administrationRoutes || []}
-                  name={FilterKeys.ADMINISTRATION_ROUTES}
-                  allAdministrationTypes={allAdministrationRoutes}
+                  value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
+                  name={FilterKeys.EXECUTIVE_UNITS}
                 />
-              )}
-              <CodeFilter
-                references={references}
-                disabled={isReadonlyFilterInfoModal}
-                name={FilterKeys.CODE}
-                value={selectedSavedFilter?.filterParams.filters.code ?? []}
-              />
-              <DatesRangeFilter
-                disabled={isReadonlyFilterInfoModal}
-                values={[
-                  selectedSavedFilter?.filterParams.filters.startDate,
-                  selectedSavedFilter?.filterParams.filters.endDate
-                ]}
-                names={[FilterKeys.START_DATE, FilterKeys.END_DATE]}
-              />
-              <ExecutiveUnitsFilter
-                sourceType={SourceType.MEDICATION}
-                disabled={isReadonlyFilterInfoModal}
-                value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
-                name={FilterKeys.EXECUTIVE_UNITS}
-              />
-              <EncounterStatusFilter
-                disabled={isReadonlyFilterInfoModal}
-                value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
-                name={FilterKeys.ENCOUNTER_STATUS}
-                encounterStatusList={encounterStatusList}
-              />
+                <MultiSelectInput
+                  label="Statut de la visite associée :"
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
+                  name={FilterKeys.ENCOUNTER_STATUS}
+                  options={encounterStatusList}
+                />
+              </Grid>
             </Grid>
           </Modal>
         </List>
