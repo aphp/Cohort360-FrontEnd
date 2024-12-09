@@ -112,7 +112,13 @@ const DataTableImagingLine: React.FC<{
   const nbSeries = imagingItem.numberOfSeries ?? '-'
   const accessNumber =
     imagingItem.identifier?.find((identifier) => identifier.system?.includes('accessNumber'))?.value ?? '-'
-  const documentId = getExtension(imagingItem, 'docId')?.valueString
+  // TODO remove the fetch by extension when fhir drop it (expected in 2.21.0 or 2.22.0)
+  const documentId = imagingItem.diagnosticReport
+    ? imagingItem.diagnosticReport.presentedForm
+        ?.find((el) => el.contentType === 'application/pdf')
+        ?.url?.split('/')
+        .pop()
+    : getExtension(imagingItem, 'docId')?.valueString
   const serviceProvider = imagingItem.serviceProvider
 
   return (

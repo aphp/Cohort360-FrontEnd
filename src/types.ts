@@ -3,6 +3,7 @@ import {
   Bundle,
   Claim,
   Condition,
+  DiagnosticReport,
   DocumentReference,
   Encounter,
   Extension,
@@ -696,6 +697,7 @@ export type CohortImaging = ImagingStudy & {
   serviceProvider?: string
   NDA?: string
   IPP?: string
+  diagnosticReport?: DiagnosticReport
 }
 export type IPatientImaging<T extends CohortImaging> = {
   loading: boolean

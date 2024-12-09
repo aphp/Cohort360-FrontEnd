@@ -20,6 +20,7 @@ import {
   Binary,
   Claim,
   Condition,
+  DiagnosticReport,
   DocumentReference,
   Encounter,
   ImagingStudy,
