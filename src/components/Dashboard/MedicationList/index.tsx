@@ -9,14 +9,11 @@ import Button from 'components/ui/Button'
 import DataTableMedication from 'components/DataTable/DataTableMedication'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
-import IppFilter from 'components/Filters/IppFilter'
 import List from 'components/ui/List'
 import Modal from 'components/ui/Modal'
 import { medicationTabs } from 'components/Patient/PatientMedication/PatientMedication'
-import NdaFilter from 'components/Filters/NdaFilter'
-import PrescriptionTypesFilter from 'components/Filters/PrescriptionTypesFilter'
+import SelectInput from 'components/Filters/SelectInput'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Tabs from 'components/ui/Tabs'
 import TextInput from 'components/Filters/TextInput'
@@ -355,13 +352,23 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
         onClean={triggerClean}
       >
-        {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-        {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp ?? ''} />}
+        {!deidentified && (
+          <TextInput name={FilterKeys.NDA} value={nda} label="NDA :" placeholder="Exemple: 6601289264,141740347" />
+        )}
+        {!deidentified && (
+          <TextInput
+            name={FilterKeys.IPP}
+            value={ipp}
+            label="IPP :"
+            placeholder="'Exemple: 8000000000001,8000000000002'"
+          />
+        )}
         {selectedTab.id === ResourceType.MEDICATION_REQUEST && prescriptionTypes && (
-          <PrescriptionTypesFilter
+          <SelectInput
             value={prescriptionTypes}
             name={FilterKeys.PRESCRIPTION_TYPES}
-            allPrescriptionTypes={allPrescriptionTypes}
+            options={allPrescriptionTypes}
+            label="Type de prescriptions :"
           />
         )}
         {selectedTab.id === ResourceType.MEDICATION_ADMINISTRATION && administrationRoutes && (
@@ -377,10 +384,11 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
         />
-        <EncounterStatusFilter
+        <SelectInput
           value={encounterStatus}
           name={FilterKeys.ENCOUNTER_STATUS}
-          encounterStatusList={encounterStatusList}
+          options={encounterStatusList}
+          label="Statut de la visite associée :"
         />
       </Modal>
       <Modal
@@ -477,26 +485,31 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
               )}
               <Grid item>
                 {!deidentified && (
-                  <NdaFilter
+                  <TextInput
+                    name="nda"
                     disabled={isReadonlyFilterInfoModal}
-                    name={FilterKeys.NDA}
-                    value={selectedSavedFilter?.filterParams.filters.nda ?? ''}
+                    value={selectedSavedFilter?.filterParams.filters.nda || ''}
+                    label="NDA :"
+                    placeholder="Exemple: 6601289264,141740347"
                   />
                 )}
                 {!deidentified && (
                   <Grid item>
-                    <IppFilter
+                    <TextInput
                       disabled={isReadonlyFilterInfoModal}
                       name={FilterKeys.IPP}
                       value={selectedSavedFilter?.filterParams.filters.ipp ?? ''}
+                      label="IPP :"
+                      placeholder="'Exemple: 8000000000001,8000000000002'"
                     />
                   </Grid>
                 )}
                 {selectedTab.id === ResourceType.MEDICATION_REQUEST && (
-                  <PrescriptionTypesFilter
+                  <SelectInput
+                    label="Type de prescriptions :"
                     value={selectedSavedFilter?.filterParams.filters.prescriptionTypes || []}
                     name={FilterKeys.PRESCRIPTION_TYPES}
-                    allPrescriptionTypes={allPrescriptionTypes}
+                    options={allPrescriptionTypes}
                     disabled={isReadonlyFilterInfoModal}
                   />
                 )}
@@ -522,11 +535,12 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
                 />
-                <EncounterStatusFilter
+                <SelectInput
+                  label="Statut de la visite associée :"
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
                   name={FilterKeys.ENCOUNTER_STATUS}
-                  encounterStatusList={encounterStatusList}
+                  options={encounterStatusList}
                 />
               </Grid>
             </Grid>
