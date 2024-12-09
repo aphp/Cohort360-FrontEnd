@@ -14,8 +14,6 @@ import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import Modal from 'components/ui/Modal'
-import ModalityFilter from 'components/Filters/ModalityFilter/ModalityFilter'
-import NdaFilter from 'components/Filters/NdaFilter'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 
 import { cancelPendingRequest } from 'utils/abortController'
@@ -30,12 +28,12 @@ import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
 import services from 'services/aphp'
 import { BlockWrapper } from 'components/ui/Layout'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { AppConfig } from 'config'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
+import MultiSelectInput from 'components/Filters/MultiSelectInput'
 
 const PatientImaging = () => {
   const dispatch = useAppDispatch()
@@ -254,18 +252,21 @@ const PatientImaging = () => {
         onClose={() => setToggleFilterByModal(false)}
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
       >
-        {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-        <ModalityFilter value={modality} name={FilterKeys.MODALITY} modalitiesList={allModalities} />
+        {!searchResults.deidentified && (
+          <TextInput name={FilterKeys.NDA} value={nda} label="NDA :" placeholder="Exemple: 6601289264,141740347" />
+        )}
+        <MultiSelectInput value={modality} name={FilterKeys.MODALITY} options={allModalities} label="Modalités :" />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
           sourceType={SourceType.IMAGING}
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
         />
-        <EncounterStatusFilter
+        <MultiSelectInput
           value={encounterStatus}
           name={FilterKeys.ENCOUNTER_STATUS}
-          encounterStatusList={encounterStatusList}
+          options={encounterStatusList}
+          label="Statut de la visite associée :"
         />
       </Modal>
       <Modal
@@ -354,17 +355,20 @@ const PatientImaging = () => {
               )}
               <Grid item>
                 {!searchResults.deidentified && (
-                  <NdaFilter
+                  <TextInput
+                    name="nda"
                     disabled={isReadonlyFilterInfoModal}
-                    name={FilterKeys.NDA}
                     value={selectedSavedFilter?.filterParams.filters.nda || ''}
+                    label="NDA :"
+                    placeholder="Exemple: 6601289264,141740347"
                   />
                 )}
-                <ModalityFilter
+                <MultiSelectInput
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.modality || []}
                   name={FilterKeys.MODALITY}
-                  modalitiesList={allModalities}
+                  options={allModalities}
+                  label="Modalités :"
                 />
                 <DatesRangeFilter
                   disabled={isReadonlyFilterInfoModal}
@@ -380,11 +384,12 @@ const PatientImaging = () => {
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
                   name={FilterKeys.EXECUTIVE_UNITS}
                 />
-                <EncounterStatusFilter
+                <MultiSelectInput
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
                   name={FilterKeys.ENCOUNTER_STATUS}
-                  encounterStatusList={encounterStatusList}
+                  options={encounterStatusList}
+                  label="Statut de la visite associée :"
                 />
               </Grid>
             </Grid>

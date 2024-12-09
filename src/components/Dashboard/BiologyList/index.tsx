@@ -8,12 +8,9 @@ import { BlockWrapper } from 'components/ui/Layout'
 import Button from 'components/ui/Button'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
-import IppFilter from 'components/Filters/IppFilter'
 import List from 'components/ui/List'
 import Modal from 'components/ui/Modal'
-import NdaFilter from 'components/Filters/NdaFilter'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import TextInput from 'components/Filters/TextInput'
 
@@ -37,6 +34,7 @@ import {
   fetchAnabioCodes as fetchAnabioCodesApi
 } from 'services/aphp/serviceBiology'
 import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
+import MultiSelectInput from 'components/Filters/MultiSelectInput'
 
 type BiologyListProps = {
   deidentified?: boolean
@@ -82,6 +80,7 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
   ] = useSearchCriterias(initBioSearchCriterias)
+  console.log("test filters", filters)
   const filtersAsArray = useMemo(
     () =>
       selectFiltersAsArray({
@@ -317,8 +316,17 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
         onClose={() => setToggleFilterByModal(false)}
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
       >
-        {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-        {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp ?? ''} />}
+        {!deidentified && (
+          <TextInput name={FilterKeys.NDA} value={nda} label="NDA :" placeholder="Exemple: 6601289264,141740347" />
+        )}
+        {!deidentified && (
+          <TextInput
+            name={FilterKeys.IPP}
+            value={ipp}
+            label="IPP :"
+            placeholder="'Exemple: 8000000000001,8000000000002'"
+          />
+        )}
         <AnabioFilter name={FilterKeys.ANABIO} value={anabio} onFetch={fetchAnabioCodesApi} />
         <LoincFilter name={FilterKeys.LOINC} value={loinc} onFetch={fetchLoincCodesApi} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
@@ -327,10 +335,11 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
         />
-        <EncounterStatusFilter
+        <MultiSelectInput
           value={encounterStatus}
           name={FilterKeys.ENCOUNTER_STATUS}
-          encounterStatusList={encounterStatusList}
+          options={encounterStatusList}
+          label="Statut de la visite associée :"
         />
       </Modal>
       <Modal
@@ -428,19 +437,23 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
                 </Grid>
                 {!deidentified && (
                   <Grid item xs={12}>
-                    <NdaFilter
+                    <TextInput
                       name="nda"
                       disabled={isReadonlyFilterInfoModal}
-                      value={selectedSavedFilter?.filterParams.filters.nda ?? ''}
+                      value={selectedSavedFilter?.filterParams.filters.nda || ''}
+                      label="NDA :"
+                      placeholder="Exemple: 6601289264,141740347"
                     />
                   </Grid>
                 )}
                 {!deidentified && (
                   <Grid item xs={12}>
-                    <IppFilter
+                    <TextInput
                       disabled={isReadonlyFilterInfoModal}
                       name={FilterKeys.IPP}
                       value={selectedSavedFilter?.filterParams.filters.ipp ?? ''}
+                      label="IPP :"
+                      placeholder="'Exemple: 8000000000001,8000000000002'"
                     />
                   </Grid>
                 )}
@@ -479,11 +492,12 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <EncounterStatusFilter
+                  <MultiSelectInput
                     disabled={isReadonlyFilterInfoModal}
                     value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
                     name={FilterKeys.ENCOUNTER_STATUS}
-                    encounterStatusList={encounterStatusList}
+                    options={encounterStatusList}
+                    label="Statut de la visite associée :"
                   />
                 </Grid>
               </Grid>
