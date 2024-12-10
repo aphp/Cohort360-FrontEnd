@@ -23,6 +23,7 @@ type AppConfig = {
     export: {
       enabled: boolean
       exportLinesLimit: number
+      exportTables: string
     }
     observation: {
       enabled: boolean
@@ -151,6 +152,7 @@ type AppConfig = {
     wsProtocol: string
     fhirUrl: string
     backendUrl: string
+    datamodelUrl: string
     oidc?: {
       issuer: string
       redirectUri: string
@@ -207,7 +209,8 @@ let config: AppConfig = {
     },
     export: {
       enabled: true,
-      exportLinesLimit: 300000
+      exportLinesLimit: 300000,
+      exportTables: ''
     },
     observation: {
       enabled: true,
@@ -305,6 +308,7 @@ let config: AppConfig = {
     wsProtocol: 'ws://',
     backendUrl: '/api/back',
     fhirUrl: '/api/fhir',
+    datamodelUrl: '/api/datamodel2',
     sessionTimeout: 780000,
     refreshTokenInterval: 180000,
     codeDisplayJWT: 'ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,b,a,Enter',
