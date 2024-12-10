@@ -1,11 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-
 import { CircularProgress, Grid, Tooltip } from '@mui/material'
 import Chip from 'components/ui/Chip'
 import FilterList from 'assets/icones/filter.svg?react'
-
 import DataTablePmsi from 'components/DataTable/DataTablePmsi'
-
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPmsi } from 'state/patient'
 import { CohortPMSI, LoadingStatus, PmsiTab } from 'types'
@@ -26,10 +23,7 @@ import useSearchCriterias, { initPmsiSearchCriterias } from 'reducers/searchCrit
 import services from 'services/aphp'
 import CodeFilter from 'components/Filters/CodeFilter'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
-import DiagnosticTypesFilter from 'components/Filters/DiagnosticTypesFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
-import NdaFilter from 'components/Filters/NdaFilter'
-import SourceFilter from 'components/Filters/SourceFilter'
 import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { Save, SavedSearch } from '@mui/icons-material'
@@ -37,12 +31,29 @@ import TextInput from 'components/Filters/TextInput'
 import { mapToAttribute, mapToLabel, mapToSourceType } from 'mappers/pmsi'
 import List from 'components/ui/List'
 import { fetchClaimCodes, fetchConditionCodes, fetchProcedureCodes } from 'services/aphp/servicePmsi'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { AlertWrapper } from 'components/ui/Alert'
 import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
 import { getPMSITab } from 'utils/tabsUtils'
+import MultiSelectInput from 'components/Filters/MultiSelectInput'
+import RadioGroupFilter from 'components/Filters/RadioGroupFilter'
+
+enum Source {
+  AREM = 'AREM',
+  ORBIS = 'ORBIS'
+}
+
+const sourceOptions = [
+  {
+    id: Source.AREM,
+    label: Source.AREM
+  },
+  {
+    id: Source.ORBIS,
+    label: Source.ORBIS
+  }
+]
 
 type PmsiSearchResults = {
   deidentified: boolean
@@ -347,22 +358,28 @@ const PatientPMSI = () => {
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
         onClean={triggerClean}
       >
-        {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+        {!searchResults.deidentified && (
+          <TextInput name={FilterKeys.NDA} value={nda} label="NDA :" placeholder="Exemple: 6601289264,141740347" />
+        )}
         <CodeFilter name={FilterKeys.CODE} value={code} onFetch={fetchCodes()} />
         {selectedTab.id === ResourceType.CONDITION && (
-          <DiagnosticTypesFilter
+          <MultiSelectInput
             name={FilterKeys.DIAGNOSTIC_TYPES}
             value={diagnosticTypes || []}
-            allDiagnosticTypesList={allDiagnosticTypesList}
+            options={allDiagnosticTypesList}
+            label="Type de diagnostics :"
           />
         )}
-        {selectedTab.id !== ResourceType.CLAIM && <SourceFilter name={FilterKeys.SOURCE} value={source || ''} />}
+        {selectedTab.id !== ResourceType.CLAIM && (
+          <RadioGroupFilter label="Source :" name={FilterKeys.SOURCE} value={source || ''} options={sourceOptions} />
+        )}
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter sourceType={sourceType} value={executiveUnits} name={FilterKeys.EXECUTIVE_UNITS} />
-        <EncounterStatusFilter
+        <MultiSelectInput
           value={encounterStatus}
           name={FilterKeys.ENCOUNTER_STATUS}
-          encounterStatusList={encounterStatusList}
+          options={encounterStatusList}
+          label="Statut de la visite associée :"
         />
       </Modal>
 
@@ -450,10 +467,12 @@ const PatientPMSI = () => {
               </Grid>
               {!searchResults.deidentified && (
                 <Grid item xs={12}>
-                  <NdaFilter
+                  <TextInput
+                    name="nda"
                     disabled={isReadonlyFilterInfoModal}
-                    name={FilterKeys.NDA}
                     value={selectedSavedFilter?.filterParams.filters.nda || ''}
+                    label="NDA :"
+                    placeholder="Exemple: 6601289264,141740347"
                   />
                 </Grid>
               )}
@@ -467,20 +486,23 @@ const PatientPMSI = () => {
               </Grid>
               {selectedTab.id === ResourceType.CONDITION && (
                 <Grid item xs={12}>
-                  <DiagnosticTypesFilter
+                  <MultiSelectInput
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.DIAGNOSTIC_TYPES}
                     value={selectedSavedFilter?.filterParams.filters.diagnosticTypes || []}
-                    allDiagnosticTypesList={allDiagnosticTypesList}
+                    options={allDiagnosticTypesList}
+                    label="Type de diagnostics :"
                   />
                 </Grid>
               )}
               {selectedTab.id !== ResourceType.CLAIM && (
                 <Grid item xs={12}>
-                  <SourceFilter
+                  <RadioGroupFilter
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.SOURCE}
                     value={selectedSavedFilter?.filterParams.filters.source || ''}
+                    label="Source :"
+                    options={sourceOptions}
                   />
                 </Grid>
               )}
@@ -503,11 +525,12 @@ const PatientPMSI = () => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <EncounterStatusFilter
+                <MultiSelectInput
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
                   name={FilterKeys.ENCOUNTER_STATUS}
-                  encounterStatusList={encounterStatusList}
+                  options={encounterStatusList}
+                  label="Statut de la visite associée :"
                 />
               </Grid>
             </Grid>

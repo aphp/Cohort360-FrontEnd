@@ -20,11 +20,11 @@ import { LoadingStatus } from 'types'
 import { FilterKeys } from 'types/searchCriterias'
 import Timeline from './Timeline'
 import services from 'services/aphp'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
 import { getCleanGroupId } from 'utils/paginationUtils'
+import MultiSelectInput from 'components/Filters/MultiSelectInput'
 
 const MaternityForm = () => {
   const [toggleModal, setToggleModal] = useState(false)
@@ -132,10 +132,11 @@ const MaternityForm = () => {
                   value={executiveUnits}
                   name={FilterKeys.EXECUTIVE_UNITS}
                 />
-                <EncounterStatusFilter
+                <MultiSelectInput
                   value={encounterStatus}
                   name={FilterKeys.ENCOUNTER_STATUS}
-                  encounterStatusList={encounterStatusList}
+                  options={encounterStatusList}
+                  label="Statut de la visite associée :"
                 />
               </Modal>
             )}
