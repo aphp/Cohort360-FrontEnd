@@ -1097,6 +1097,44 @@ export const fetchAccessExpirations: (
   return response
 }
 
+type fetchDiagnosticReportProps = {
+  _elements?: string[]
+  size?: number
+  offset?: number
+  code?: string
+  date?: string
+  patient?: string[]
+  study?: string[]
+  encounter?: string[]
+  _list?: string[]
+  signal?: AbortSignal
+}
+export const fetchDiagnosticReport = async (args: fetchDiagnosticReportProps) => {
+  const { _list, _elements, code, date, patient, study, encounter, size, offset, signal } = args
+  const config = getConfig()
+
+  let options: string[] = []
+  if (size !== undefined) options = [...options, `_count=${size}`]
+  if (offset) options = [...options, `_offset=${offset}`]
+  if (config.features.diagnosticReport.useStudyParam && study)
+    options = [...options, `study=${study.reduce(paramValuesReducer, '')}`]
+  if (encounter) options = [...options, `encounter=${encounter.reduce(paramValuesReducer, '')}`]
+  if (patient) options = [...options, `patient=${patient.reduce(paramValuesReducer, '')}`]
+  if (date) options = [...options, `date=${date}`]
+  if (code) options = [...options, `code=${code}`]
+  if (_elements && _elements.length > 0)
+    options = [...options, `_elements=${_elements.filter(uniq).reduce(paramValuesReducer, '')}`]
+
+  if (_list && _list.length > 0) options = [...options, `_list=${_list.filter(uniq).reduce(paramValuesReducer, '')}`]
+
+  const queryString = options.length > 0 ? `?${options.reduce(paramsReducer, '')}` : ''
+  const response = await apiFhir.get<FHIR_Bundle_Response<DiagnosticReport>>(`/DiagnosticReport${queryString}`, {
+    signal
+  })
+
+  return response
+}
+
 export const fetchPerimeterAccesses = async (perimeter: string): Promise<AxiosResponse<DataRights[]>> => {
   const response = await apiBackend.get<DataRights[]>(`accesses/accesses/my-data-rights/?perimeters_ids=${perimeter}`)
   return response

@@ -23,12 +23,9 @@ import services from 'services/aphp'
 import { SourceType } from 'types/scope'
 import { useSearchParams } from 'react-router-dom'
 import { getCleanGroupId } from 'utils/paginationUtils'
-<<<<<<< HEAD
 import { getCodeList } from 'services/aphp/serviceValueSets'
 import { getConfig } from 'config'
-=======
 import MultiSelectInput from 'components/Filters/MultiSelectInput'
->>>>>>> 3de84b27 (ref: 2490-refacto filters - Ref gestion-de-projet#2371)
 
 const MaternityForm = () => {
   const [toggleModal, setToggleModal] = useState(false)
