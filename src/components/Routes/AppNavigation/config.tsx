@@ -227,7 +227,7 @@ const configRoutes: configRoute[] = [
   {
     path: '/exports',
     name: '/exports',
-    isPrivate: true,
+    isPrivate: false,
     element: <Export />,
     exact: true,
     displaySideBar: true

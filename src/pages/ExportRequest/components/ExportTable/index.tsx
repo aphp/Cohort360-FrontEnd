@@ -57,7 +57,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
   const tableSetting = exportTableSettings.filter((e) => e.tableName === exportTable.name)[0]
   const exportTableResourceType = getResourceType(exportTable.name)
   const tableLabel = getExportTableLabel(exportTable.name)
-  const [checkedTable, setCheckedTable] = useState<boolean>(tableSetting.isChecked || false)
+  const [checkedTable, setCheckedTable] = useState<boolean>(tableSetting?.isChecked || false)
   const appConfig = useContext(AppConfig)
   const limit = appConfig.features.export.exportLinesLimit
 
