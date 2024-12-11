@@ -1,5 +1,5 @@
 import { Autocomplete, TextField, Typography } from '@mui/material'
-import { InputWrapper } from 'components/ui/Inputs'
+import { InputWrapper } from 'components/ui/Inputs/styles'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import { LabelObject } from 'types/searchCriterias'
@@ -13,7 +13,7 @@ type PrescriptionTypesFilterProps = {
   disabled?: boolean
 }
 
-const SelectInput = ({ name, value, label, options, disabled = false }: PrescriptionTypesFilterProps) => {
+const MultiSelectInput = ({ name, value, label, options, disabled = false }: PrescriptionTypesFilterProps) => {
   const context = useContext(FormContext)
   const [input, setInput] = useState(value)
 
@@ -41,4 +41,4 @@ const SelectInput = ({ name, value, label, options, disabled = false }: Prescrip
   )
 }
 
-export default SelectInput
+export default MultiSelectInput

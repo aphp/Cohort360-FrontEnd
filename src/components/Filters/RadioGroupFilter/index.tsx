@@ -1,5 +1,5 @@
 import { Typography } from '@mui/material'
-import { InputWrapper } from 'components/ui/Inputs'
+import { InputWrapper } from 'components/ui/Inputs/styles'
 import { FormContext } from 'components/ui/Modal'
 import RadioGroup from 'components/ui/RadioGroup'
 import React, { useContext, useEffect, useState } from 'react'

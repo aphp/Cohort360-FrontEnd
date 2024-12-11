@@ -8,7 +8,7 @@ import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import Modal from 'components/ui/Modal'
 import { DTTB_ResultsType as ResultsType, LoadingStatus } from 'types'
-import { FilterKeys, LabelObject } from 'types/searchCriterias'
+import { FilterKeys, FormNames, LabelObject } from 'types/searchCriterias'
 import { CanceledError } from 'axios'
 import services from 'services/aphp'
 import useSearchCriterias, { initFormsCriterias } from 'reducers/searchCriteriasReducer'
@@ -16,7 +16,6 @@ import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { SourceType } from 'types/scope'
 import { Questionnaire } from 'fhir/r4'
-import MaternityFormFilter from 'components/Filters/MaternityFormFilter'
 import DataTableForms from 'components/DataTable/DataTableForms'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
@@ -25,6 +24,19 @@ import { getCodeList } from 'services/aphp/serviceValueSets'
 import { getConfig } from 'config'
 import TextInput from 'components/Filters/TextInput'
 import MultiSelectInput from 'components/Filters/MultiSelectInput'
+import labels from 'labels.json'
+import CheckboxsFilter from 'components/Filters/CheckboxsFilter'
+
+const formOptions = [
+  {
+    id: FormNames.PREGNANCY,
+    label: labels.formNames.pregnancy
+  },
+  {
+    id: FormNames.HOSPIT,
+    label: labels.formNames.hospit
+  }
+]
 
 const FormsList = () => {
   const theme = useTheme()
@@ -212,7 +224,8 @@ const FormsList = () => {
           label="IPP :"
           placeholder="'Exemple: 8000000000001,8000000000002'"
         />
-        <MaternityFormFilter name={FilterKeys.FORM_NAME} value={formName} />
+        <CheckboxsFilter name={FilterKeys.FORM_NAME} value={formName} label="Formulaire :" options={formOptions} />
+        {/*<MaternityFormFilter name={FilterKeys.FORM_NAME} value={formName} />*/}
         <ExecutiveUnitsFilter
           sourceType={SourceType.FORM_RESPONSE}
           value={executiveUnits}
