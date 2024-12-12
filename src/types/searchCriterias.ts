@@ -301,7 +301,7 @@ export type GenericFilter = {
   encounterStatus: LabelObject[]
 }
 
-export interface PatientsFilters {
+export type PatientsFilters = {
   genders: GenderStatus[]
   birthdatesRanges: DurationRangeType
   vitalStatuses: VitalStatus[]

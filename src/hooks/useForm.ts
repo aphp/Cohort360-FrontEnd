@@ -1,22 +1,39 @@
-import { useState } from 'react'
-import { T } from 'vitest/dist/chunks/environment.C5eAp3K6'
+import { useMemo, useState } from 'react'
 
-type InputName = string
-
-type Inputs<T> = {
-  [key in InputName]: T
+type InputValue<T> = {
+  isError: boolean
+  value: T
 }
 
-export const useForm = <T>(values: Inputs<T>) => {
-  const [inputs, setInputs] = useState(values)
+type Inputs<T> = {
+  [key in keyof T]: InputValue<T[key]>
+}
 
-  const changeInput = <T>(name: string, value: T) => {
-    const newInputs = { ...inputs }
-    newInputs[name] = value
-    setInputs(newInputs)
+export const useForm = <T extends object>(values: T) => {
+  const [inputs, setInputs] = useState<Inputs<T>>(
+    Object.fromEntries(Object.entries(values).map(([key, value]) => [key, { value, isError: false }])) as Inputs<T>
+  )
+  const [hasErrors, setHasErrors] = useState(false)
+
+  const inputsValues = useMemo(() => {
+    return Object.fromEntries(
+      Object.entries(inputs).map(([key, value]) => [key, (value as InputValue<T[keyof T]>).value])
+    )
+  }, [inputs])
+
+  const changeFormError = (hasError: boolean) => setHasErrors(hasError)
+
+  const changeInput = <K extends keyof T>(name: K, value: T[K], isError = false) => {
+    setInputs((prev) => ({
+      ...prev,
+      [name]: { value, isError }
+    }))
   }
 
   return {
-    changeInput
+    inputs: inputsValues,
+    hasErrors,
+    changeInput,
+    changeFormError
   }
 }

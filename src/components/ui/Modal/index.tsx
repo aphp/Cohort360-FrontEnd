@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { PropsWithChildren, createContext, useEffect, useState } from 'react'
+import React, { PropsWithChildren, createContext } from 'react'
 
 import { Button, Dialog, DialogActions, DialogTitle, Divider, Grid, Typography } from '@mui/material'
 import { DialogContentWrapper } from './styles'
@@ -12,11 +12,13 @@ type ModalProps = {
   title?: string
   width?: string
   color?: 'success' | 'secondary' | 'primary' | 'error' | 'warning' | 'info'
-  noActions?: boolean
+  // noActions?: boolean
   readonly?: boolean
-  validationText?: string
+  submitText?: string
+  cancelText?: string
+  isError?: boolean
   onSubmit?: (value: any) => void
-  onClean?: boolean
+  //onClean?: boolean
   onClose?: () => void
 }
 
@@ -26,14 +28,16 @@ const Modal = ({
   open,
   width = '550px',
   color = 'primary',
-  noActions = false,
+  //  noActions = false,
   readonly = false,
-  validationText = 'Valider',
+  submitText = 'Valider',
+  cancelText = 'Annuler',
+  isError = false,
   onSubmit,
-  onClean,
+  //onClean,
   onClose
 }: PropsWithChildren<ModalProps>) => {
-  const [formData, setFormData] = useState<Record<string, any>>({})
+  /*const [formData, setFormData] = useState<Record<string, any>>({})
   const [isError, setIsError] = useState(false)
 
   const updateFormData = (name: string, value: any) => {
@@ -59,53 +63,53 @@ const Modal = ({
     } catch {
       // Nothing to do if reaching here
     }
-  }
+  }*/
+
+  console.log("test modal", isError)
 
   return (
-    <FormContext.Provider value={{ updateFormData, updateError }}>
-      <Dialog open={open} onClose={onClose}>
-        {title && (
-          <>
-            <DialogTitle sx={{ padding: '25px 30px' }}>
-              <Typography textTransform="uppercase" fontSize={20} fontWeight={700} textAlign="center" color={color}>
-                {title}
-              </Typography>
-            </DialogTitle>
-            <Grid container justifyContent="center">
-              <Grid item xs={6}>
-                <Divider />
-              </Grid>
+    <Dialog open={open} onClose={onClose}>
+      {title && (
+        <>
+          <DialogTitle sx={{ padding: '25px 30px' }}>
+            <Typography textTransform="uppercase" fontSize={20} fontWeight={700} textAlign="center" color={color}>
+              {title}
+            </Typography>
+          </DialogTitle>
+          <Grid container justifyContent="center">
+            <Grid item xs={6}>
+              <Divider />
             </Grid>
-          </>
-        )}
-        <DialogContentWrapper width={width} style={{ padding: '25px 30px' }}>
-          {children}
-        </DialogContentWrapper>
-        {!noActions &&
-          (!readonly ? (
-            <DialogActions style={{ backgroundColor: '#00000011', padding: '10px 30px' }}>
-              <Button color="info" onClick={onClose}>
-                <Typography fontSize="15px" fontWeight="600" color="#5B5E63">
-                  Annuler
-                </Typography>
-              </Button>
-              <Button disabled={isError} color={color} onClick={submit}>
-                <Typography fontSize="15px" fontWeight="900">
-                  {validationText}
-                </Typography>
-              </Button>
-            </DialogActions>
-          ) : (
-            <DialogActions style={{ backgroundColor: '#00000011', padding: '10px 30px' }}>
-              <Button color={color} onClick={onClose}>
-                <Typography fontSize="15px" fontWeight="600" color="#5B5E63">
-                  Retour
-                </Typography>
-              </Button>
-            </DialogActions>
-          ))}
-      </Dialog>
-    </FormContext.Provider>
+          </Grid>
+        </>
+      )}
+      <DialogContentWrapper width={width} style={{ padding: '25px 30px' }}>
+        {children}
+      </DialogContentWrapper>
+      {!readonly && (
+        <DialogActions style={{ backgroundColor: '#00000011', padding: '10px 30px' }}>
+          <Button color="info" onClick={onClose}>
+            <Typography fontSize="15px" fontWeight="600" color="#5B5E63">
+              {cancelText}
+            </Typography>
+          </Button>
+          <Button disabled={isError} color={color} onClick={onSubmit}>
+            <Typography fontSize="15px" fontWeight="900">
+              {submitText}
+            </Typography>
+          </Button>
+        </DialogActions>
+      )}
+      {readonly && (
+        <DialogActions style={{ backgroundColor: '#00000011', padding: '10px 30px' }}>
+          <Button color="info" onClick={onClose}>
+            <Typography fontSize="15px" fontWeight="600" color="#5B5E63">
+              {cancelText}
+            </Typography>
+          </Button>
+        </DialogActions>
+      )}
+    </Dialog>
   )
 }
 

@@ -40,13 +40,18 @@ import Chip from 'components/ui/Chip'
 import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters'
 import CheckboxsFilter from 'components/Filters/CheckboxsFilter'
 import TextInput from 'components/Filters/TextInput'
-import { useSavedFilters } from 'hooks/filters/useSavedFilters'
+import { SelectedFilter, useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { ResourceType } from 'types/requestCriterias'
 import { useAppDispatch, useAppSelector } from 'state'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError, cleanSearchParams } from 'utils/paginationUtils'
 import List from 'components/ui/List'
 import { v4 as uuidv4 } from 'uuid'
+import { useForm } from 'hooks/useForm'
+import CheckboxGroup from 'components/ui/Inputs/CheckboxGroup'
+import DurationRange from 'components/ui/Inputs/DurationRange'
+import Text from 'components/ui/Inputs/Text'
+import { ErrorMessage } from 'components/ui/Inputs/Errors'
 
 type PatientListProps = {
   total: number
@@ -98,7 +103,9 @@ const PatientList = ({ total, deidentified }: PatientListProps) => {
     },
     { changeOrderBy, changeSearchBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
   ] = useSearchCriterias(initPatientsSearchCriterias)
-
+  const searchCriteriaForm = useForm(filters)
+  const saveFilterForm = useForm({ filtersName: '' })
+  const savedFiltersForm = useForm(selectedSavedFilter ?? {})
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ genders, vitalStatuses, birthdatesRanges })
   }, [genders, vitalStatuses, birthdatesRanges])
@@ -289,20 +296,31 @@ const PatientList = ({ total, deidentified }: PatientListProps) => {
         title="Filtrer par :"
         open={toggleFilterByModal}
         color="secondary"
+        isError={searchCriteriaForm.hasErrors}
         onClose={() => setToggleFilterByModal(false)}
-        onSubmit={(newFilters) => addFilters({ genders, birthdatesRanges, vitalStatuses, ...newFilters })}
+        onSubmit={() => {
+          addFilters(searchCriteriaForm.inputs as PatientsFilters)
+          setToggleFilterByModal(false)
+        }}
       >
-        <CheckboxsFilter name={FilterKeys.GENDERS} value={genders} label="Genre :" options={genderOptions} />
-        <CheckboxsFilter
-          name={FilterKeys.VITAL_STATUSES}
+        <CheckboxGroup
+          value={genders}
+          label="Genre :"
+          options={genderOptions}
+          onChange={(value) => searchCriteriaForm.changeInput(FilterKeys.GENDERS, value)}
+        />
+        <CheckboxGroup
           value={vitalStatuses}
           label="Statut vital :"
           options={vitalStatusesOptions}
+          onChange={(value) => searchCriteriaForm.changeInput(FilterKeys.VITAL_STATUSES, value)}
         />
-        <BirthdatesRangesFilter
-          name={FilterKeys.BIRTHDATES}
+        <DurationRange
           value={birthdatesRanges}
+          label="Âge :"
           deidentified={deidentified ?? false}
+          onChange={(value) => searchCriteriaForm.changeInput(FilterKeys.BIRTHDATES, value)}
+          onError={searchCriteriaForm.changeFormError}
         />
       </Modal>
       <Modal
@@ -313,9 +331,11 @@ const PatientList = ({ total, deidentified }: PatientListProps) => {
           resetSavedFilterError()
         }}
         onSubmit={() => {
-          if (selectedSavedFilter) addSearchCriterias(selectedSavedFilter.filterParams)
+          addSearchCriterias(selectedSavedFilter!.filterParams)
+          setToggleSavedFiltersModal(false)
         }}
-        validationText="Appliquer le filtre"
+        isError={!selectedSavedFilter}
+        submitText="Appliquer le filtre"
       >
         <List
           values={allSavedFiltersAsListItems}
@@ -354,7 +374,7 @@ const PatientList = ({ total, deidentified }: PatientListProps) => {
                 deidentified ?? true
               )
             }}
-            validationText="Sauvegarder"
+            submitText="Sauvegarder"
           >
             <Grid container direction="column" gap="8px">
               <Grid item container direction="column">
@@ -366,6 +386,13 @@ const PatientList = ({ total, deidentified }: PatientListProps) => {
                   disabled={isReadonlyFilterInfoModal}
                   minLimit={2}
                   maxLimit={50}
+                />
+                <Text
+                  placeholder="Choisir un nom compris entre 2 et 50 caractères"
+                  minLimit={2}
+                  maxLimit={50}
+                  disabled={isReadonlyFilterInfoModal}
+                  onChange={(value) => savedFiltersForm.changeInput('filterName', value)}
                 />
               </Grid>
               {!deidentified && (
@@ -394,6 +421,12 @@ const PatientList = ({ total, deidentified }: PatientListProps) => {
                   label="Genre :"
                   options={genderOptions}
                 />
+                <CheckboxGroup
+                  value={genders}
+                  label="Genre :"
+                  options={genderOptions}
+                  onChange={(value) => searchCriteriaForm.changeInput(FilterKeys.GENDERS, value)}
+                />
                 <CheckboxsFilter
                   disabled={isReadonlyFilterInfoModal}
                   name={FilterKeys.VITAL_STATUSES}
@@ -416,15 +449,30 @@ const PatientList = ({ total, deidentified }: PatientListProps) => {
         title="Sauvegarder le filtre"
         color="secondary"
         open={toggleSaveFiltersModal}
-        onClose={() => {
-          setToggleSaveFiltersModal(false)
-          resetSavedFilterError()
+        onClose={() => setToggleSaveFiltersModal(false)}
+        onSubmit={() => {
+          postSavedFilter(
+            saveFilterForm.inputs.filtersName,
+            { searchBy, searchInput, filters, orderBy },
+            deidentified ?? true
+          ).then(() => setToggleSaveFiltersModal(false))
         }}
-        onSubmit={({ filtersName }) =>
-          postSavedFilter(filtersName, { searchBy, searchInput, filters, orderBy }, deidentified ?? true)
+        isError={
+          saveFilterForm.inputs.filtersName.length < 2 ||
+          saveFilterForm.inputs.filtersName.length > 50 ||
+          savedFiltersErrors.isError
         }
       >
-        <TextInput name="filtersName" error={savedFiltersErrors} label="Nom" minLimit={2} maxLimit={50} />
+        <Text
+          placeholder="Choisir un nom compris entre 2 et 50 caractères"
+          minLimit={2}
+          maxLimit={50}
+          onChange={(value) => {
+            saveFilterForm.changeInput('filtersName', value)
+            resetSavedFilterError()
+          }}
+        />
+        {savedFiltersErrors.isError && <ErrorMessage>{savedFiltersErrors.errorMessage}</ErrorMessage>}
       </Modal>
     </Grid>
   )
