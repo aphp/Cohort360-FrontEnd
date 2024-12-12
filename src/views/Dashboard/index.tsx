@@ -23,6 +23,7 @@ import MedicationList from 'components/Dashboard/MedicationList'
 import BiologyList from 'components/Dashboard/BiologyList'
 import FormsList from 'components/Dashboard/FormsList'
 import { getCleanGroupId } from 'utils/paginationUtils'
+import PatientsBoard from 'components/PatientsBoard'
 
 type Tabs = { label: string; value: string; to: string; disabled?: boolean } | undefined
 
@@ -246,7 +247,8 @@ const Dashboard: React.FC<{
           />
         )}
         {selectedTab === 'patients' && (
-          <PatientList total={dashboard.totalPatients ?? 0} deidentified={dashboard.deidentifiedBoolean} />
+          //<PatientList total={dashboard.totalPatients ?? 0} deidentified={dashboard.deidentifiedBoolean} />
+          <PatientsBoard deidentified={dashboard.deidentifiedBoolean ?? false} />
         )}
 
         {selectedTab === 'documents' && <Documents deidentified={dashboard.deidentifiedBoolean ?? false} />}
