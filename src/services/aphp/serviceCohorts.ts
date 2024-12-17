@@ -637,7 +637,7 @@ const servicesCohorts: IServiceCohorts = {
       sortDirection: orderBy.orderDirection,
       _text: searchInput === '' ? '' : searchInput,
       encounter: nda,
-      patientIds: ipp,
+      ipp: ipp,
       signal: signal,
       executiveUnits: executiveUnits.map((unit) => unit.id),
       encounterStatus: encounterStatus.map(({ id }) => id),
