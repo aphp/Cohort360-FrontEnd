@@ -753,7 +753,7 @@ type fetchMedicationRequestProps = {
   sortDirection?: Direction
   _text?: string
   encounter?: string
-  patientIds?: string
+  ipp?: string
   subject?: string
   type?: string[]
   minDate: string | null
@@ -775,6 +775,7 @@ export const fetchMedicationRequest = async (
     sortDirection,
     _text,
     encounter,
+    ipp,
     subject,
     type,
     minDate,
@@ -796,6 +797,7 @@ export const fetchMedicationRequest = async (
   if (offset !== undefined) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (subject) options = [...options, `subject=${subject}`]
+  if (ipp) options = [...options, `${PrescriptionParamsKeys.IPP}=${ipp}`]
   if (encounter) options = [...options, `${PrescriptionParamsKeys.NDA}=${encounter}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
   if (type && type.length > 0) {
@@ -832,6 +834,7 @@ type fetchMedicationAdministrationProps = {
   sortDirection?: Direction
   _text?: string
   encounter?: string
+  ipp?: string
   subject?: string
   route?: string[]
   minDate: string | null
@@ -853,6 +856,7 @@ export const fetchMedicationAdministration = async (
     sortDirection,
     _text,
     encounter,
+    ipp,
     subject,
     route,
     minDate,
@@ -874,6 +878,7 @@ export const fetchMedicationAdministration = async (
   if (offset) options = [...options, `_offset=${offset}`]
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`]
   if (subject) options = [...options, `subject=${subject}`]
+  if (ipp) options = [...options, `${AdministrationParamsKeys.IPP}=${ipp}`]
   if (encounter) options = [...options, `${AdministrationParamsKeys.NDA}=${encounter}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${lowToleranceTag}`]
   if (route && route.length > 0) {

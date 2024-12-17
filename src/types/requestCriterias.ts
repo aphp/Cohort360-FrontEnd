@@ -110,6 +110,7 @@ export enum ClaimParamsKeys {
 export enum PrescriptionParamsKeys {
   NDA = 'encounter.identifier',
   PRESCRIPTION_TYPES = 'category',
+  IPP = 'subject.identifier',
   DATE = 'validity-period-start',
   END_DATE = 'validity-period-end',
   CODE = 'code',
@@ -120,6 +121,7 @@ export enum PrescriptionParamsKeys {
 
 export enum AdministrationParamsKeys {
   NDA = 'context.identifier',
+  IPP = 'subject.identifier',
   ADMINISTRATION_ROUTES = 'dosage-route',
   DATE = 'effective-time',
   EXECUTIVE_UNITS = 'context.encounter-care-site',
