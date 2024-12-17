@@ -1,34 +1,42 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Grid } from '@mui/material'
 import FilterAction from './FilterAction'
-import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/searchCriteriasReducer'
 import OccurrencesSearch from './OccurrenceSearch'
-import { SearchByTypes, SearchCriterias } from 'types/searchCriterias'
+import { Filters, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
 
-type SearchSectionProps<T> = {
+type SearchSectionProps = {
   deidentified: boolean
-  onSearch: (searchCriterias: SearchCriterias<T>) => void
+  criterias: SearchCriterias<Filters>
+  onSearch: (searchCriterias: SearchCriterias<Filters>) => void
 }
 
-const SearchSection = <T,>({ deidentified, onSearch }: SearchSectionProps<T>) => {
-  const [{ searchBy, searchInput, filters }, { changeSearchBy, changeSearchInput, addFilters }] =
-    useSearchCriterias(initPatientsSearchCriterias)
-
-  useEffect(() => onSearch({ searchBy, searchInput, filters }), [searchBy, searchInput, filters])
-
+const SearchSection = ({ deidentified, criterias, onSearch }: SearchSectionProps) => {
+  console.log("test criteria", criterias)
+  
   return (
     <Grid container justifyContent="space-between">
       <Grid container item xs={8}>
         <OccurrencesSearch
-          search={{ searchBy: searchBy ?? SearchByTypes.TEXT, searchInput }}
+          deidentified={deidentified}
+          search={{
+            searchBy: criterias.searchBy ?? SearchByTypes.TEXT,
+            searchInput: criterias.searchInput
+          }}
           onChange={(newSearch) => {
-            changeSearchBy(newSearch.searchBy)
-            changeSearchInput(newSearch.searchInput)
+            onSearch({
+              ...criterias,
+              searchBy: newSearch.searchBy,
+              searchInput: newSearch.searchInput
+            })
           }}
         />
       </Grid>
       <Grid container item xs={3}>
-        <FilterAction deidentified={deidentified} filters={filters} onSubmit={(newFilters) => addFilters(newFilters)} />
+        <FilterAction
+          deidentified={deidentified}
+          filters={criterias.filters as Filters}
+          onSubmit={(newFilters) => onSearch({ ...criterias, filters: newFilters })}
+        />
       </Grid>
     </Grid>
   )

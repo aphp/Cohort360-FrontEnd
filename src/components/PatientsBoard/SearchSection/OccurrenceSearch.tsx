@@ -46,7 +46,7 @@ const OccurrencesSearch = ({ search, deidentified, onChange }: OccurrencesSearch
         </>
       )}
       {deidentified && (
-        <Grid container justifyContent="flex-end">
+        <Grid container>
           <DisplayLocked />
         </Grid>
       )}

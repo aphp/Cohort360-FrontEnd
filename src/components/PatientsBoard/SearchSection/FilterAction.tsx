@@ -2,15 +2,15 @@ import React, { useState } from 'react'
 import CheckboxGroup from 'components/ui/Inputs/CheckboxGroup'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import Modal from 'components/ui/Modal'
-import { FilterKeys, PatientsFilters, genderOptions, vitalStatusesOptions } from 'types/searchCriterias'
+import { FilterKeys, Filters, genderOptions, vitalStatusesOptions } from 'types/searchCriterias'
 import { useForm } from 'hooks/useForm'
-import Button from 'components/ui/Button'
 import FilterList from 'assets/icones/filter.svg?react'
+import { Button } from '@mui/material'
 
 type FilterActionProps = {
-  filters: PatientsFilters
+  filters: Filters
   deidentified?: boolean
-  onSubmit: (filters: PatientsFilters) => void
+  onSubmit: (filters: Filters) => void
 }
 
 const FilterAction = ({ filters, deidentified, onSubmit }: FilterActionProps) => {
@@ -23,10 +23,15 @@ const FilterAction = ({ filters, deidentified, onSubmit }: FilterActionProps) =>
   } = useForm(filters)
   const [toggleModal, setToggleModal] = useState(false)
 
+  console.log('test criteria', filters, inputs)
+
   return (
     <>
       <Button
-        icon={<FilterList height="15px" fill="#FFF" />}
+        size="small"
+        fullWidth
+        endIcon={<FilterList height="15px" fill="#FFF" />}
+        variant="contained"
         onClick={() => setToggleModal(true)}
       >
         Filtrer

@@ -1,21 +1,27 @@
-import { useMemo, useState } from 'react'
-import { SearchCriterias } from 'types/searchCriterias'
+import { useMemo } from 'react'
+import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/searchCriteriasReducer'
+import { Filters, SearchCriterias } from 'types/searchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
 
-export const usePatientBoard = <T>() => {
-  const [searchCriterias, setSearchCriterias] = useState<SearchCriterias<T>>()
+export const usePatientBoard = () => {
+  const [{ searchBy, orderBy, searchInput, filters }, { changeSearchBy, changeSearchInput, addFilters, removeFilter }] =
+    useSearchCriterias(initPatientsSearchCriterias)
 
   const criterias = useMemo(() => {
-    return searchCriterias?.filters ? selectFiltersAsArray(searchCriterias.filters) : []
-  }, [searchCriterias])
+    return filters ? selectFiltersAsArray(filters) : []
+  }, [filters])
 
-  const onSaveSearchCriterias = (searchCriterias: SearchCriterias<T>) => {
-    setSearchCriterias(searchCriterias)
+  const onSaveSearchCriterias = ({ searchBy, searchInput, filters }: SearchCriterias<Filters>) => {
+    console.log('test apply', filters)
+    if (searchBy) changeSearchBy(searchBy)
+    if (searchInput) changeSearchInput(searchInput)
+    if (filters) addFilters(filters)
   }
 
   return {
-    searchCriterias,
+    searchCriterias: { orderBy, searchBy, searchInput, filters },
     criterias,
-    onSaveSearchCriterias
+    onSaveSearchCriterias,
+    removeFilter
   }
 }

@@ -62,9 +62,9 @@ type PatientsBoardProps = {
 }
 
 const PatientsBoard = ({ deidentified }: PatientsBoardProps) => {
-  const { criterias, searchCriterias, onSaveSearchCriterias } = usePatientBoard()
+  const { criterias, searchCriterias, onSaveSearchCriterias, removeFilter } = usePatientBoard()
   //const dispatch = useAppDispatch()
-  const [searchParams, setSearchParams] = useSearchParams()
+ // const [searchParams, setSearchParams] = useSearchParams()
   // const getPageParam = searchParams.get('page')
   // const groupId = searchParams.get('groupId') ?? undefined
 
@@ -199,10 +199,15 @@ const PatientsBoard = ({ deidentified }: PatientsBoardProps) => {
       <Grid container gap="25px">
         <SearchSection
           deidentified={deidentified ?? false}
+          criterias={searchCriterias}
           onSearch={(searchCriterias) => onSaveSearchCriterias(searchCriterias)}
         />
-        <SavedFiltersSection deidentified={deidentified ?? false} />
-        <CriteriasSection onDelete={() => {}} value={criterias} />
+        <SavedFiltersSection
+          deidentified={deidentified ?? false}
+          criterias={searchCriterias}
+          onSelect={onSaveSearchCriterias}
+        />
+        <CriteriasSection onDelete={removeFilter} value={criterias} />
         {/*(filtersAsArray.length > 0 || searchInput) && (
             <Grid container item xs={12} md={5}>
               <Tooltip title={maintenanceIsActive ? "Ce bouton est desactivé en fonction d'une maintenance." : ''}>

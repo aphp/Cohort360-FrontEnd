@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
-import { Grid, Tooltip } from '@mui/material'
-import Button from 'components/ui/Button'
+import { Grid, Tooltip, Button } from '@mui/material'
 import { Save } from '@mui/icons-material'
 import Modal from 'components/ui/Modal'
 import { useForm } from 'hooks/useForm'
@@ -25,8 +24,11 @@ const SaveFilterActionProps = ({ disabled = false, onSubmit }: SaveFilterActionP
       <Tooltip title="" /*title={maintenanceIsActive ? "Ce bouton est desactivé en fonction d'une maintenance." : ''}*/>
         <Grid container>
           <Button
-            width="100%"
-            icon={<Save height="15px" fill="#FFF" />}
+            sx={{ borderRadius: 25 }}
+            size="small"
+            variant="contained"
+            fullWidth
+            startIcon={<Save height="15px" fill="#FFF" />}
             onClick={() => setToggleModal(true)}
             color="secondary"
             disabled={disabled}

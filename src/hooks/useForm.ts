@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 type InputValue<T> = {
   isError: boolean
@@ -10,15 +10,27 @@ type Inputs<T> = {
 }
 
 export const useForm = <T extends object>(values: T) => {
-  const [inputs, setInputs] = useState<Inputs<T>>(
-    Object.fromEntries(Object.entries(values).map(([key, value]) => [key, { value, isError: false }])) as Inputs<T>
-  )
+  const initializeInputs = (): Inputs<T> => {
+    const result = {} as Inputs<T>
+    for (const key in values) {
+      result[key] = { value: values[key], isError: false }
+    }
+    return result
+  }
+
+  const [inputs, setInputs] = useState<Inputs<T>>(initializeInputs())
   const [hasErrors, setHasErrors] = useState(false)
 
+  useEffect(() => {
+    //setInputs(initializeInputs())
+  }, [values])
+
   const inputsValues = useMemo(() => {
-    return Object.fromEntries(
-      Object.entries(inputs).map(([key, value]) => [key, (value as InputValue<T[keyof T]>).value])
-    )
+    const valuesResult = {} as T
+    for (const key in inputs) {
+      valuesResult[key] = inputs[key].value
+    }
+    return valuesResult
   }, [inputs])
 
   const changeFormError = (hasError: boolean) => setHasErrors(hasError)

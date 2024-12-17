@@ -1,11 +1,17 @@
 import React from 'react'
 import { Chip, Grid } from '@mui/material'
-import { LabelObject } from 'types/searchCriterias'
+import { FilterKeys, FilterValue } from 'types/searchCriterias'
 import { v4 as uuidv4 } from 'uuid'
 
+type Criteria = {
+  value: FilterValue
+  category: FilterKeys
+  label: string
+}
+
 type CriteriasSectionProps = {
-  value: LabelObject[]
-  onDelete: () => void
+  value: Criteria[]
+  onDelete: (category: FilterKeys, value: FilterValue) => void
 }
 
 const CriteriasSection = ({ value, onDelete }: CriteriasSectionProps) => {
@@ -16,7 +22,7 @@ const CriteriasSection = ({ value, onDelete }: CriteriasSectionProps) => {
           {value
             .filter((filter) => filter.label)
             .map((filter) => (
-              <Chip key={uuidv4()} label={filter.label} onDelete={onDelete} />
+              <Chip key={uuidv4()} label={filter.label} onDelete={() => onDelete(filter.category, filter.value)} />
             ))}
         </Grid>
       )}
