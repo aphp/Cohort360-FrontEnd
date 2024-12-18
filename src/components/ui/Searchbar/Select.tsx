@@ -1,40 +1,25 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React from 'react'
 import { FormControl, InputLabel, MenuItem, Select as SelectMui } from '@mui/material'
 import { SelectInputWrapper, SelectWrapper } from './styles'
-import { FormContext } from '../Modal'
 
 type SelectProps<T> = {
   value: T
   label: string
   items: { id: T; label: string }[]
-  width?: string
   disabled?: boolean
-  name?: string
   onchange?: (value: T) => void
 }
 
-const Select = <T,>({ value, label, items, width = '100%', disabled, name, onchange }: SelectProps<T>) => {
-  const context = useContext(FormContext)
-  const [activeValue, setActiveValue] = useState<T>(value)
-
-  useEffect(() => {
-    if (context?.updateFormData && name) context.updateFormData(name, activeValue)
-    if (onchange) onchange(activeValue)
-  }, [activeValue])
-
-  useEffect(() => {
-    setActiveValue(value)
-  }, [value])
-
+const Select = <T,>({ value, label, items, disabled, onchange }: SelectProps<T>) => {
   return (
-    <SelectWrapper width={width}>
+    <SelectWrapper width="100%">
       <FormControl variant="outlined">
         <InputLabel>{label}</InputLabel>
         <SelectInputWrapper>
           <SelectMui
             disabled={disabled}
-            value={activeValue}
-            onChange={(event) => setActiveValue(event.target.value as T)}
+            value={value}
+            onChange={(event) => onchange?.(event.target.value as T)}
             variant="outlined"
             label={label}
           >

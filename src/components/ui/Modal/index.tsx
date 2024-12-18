@@ -12,13 +12,11 @@ type ModalProps = {
   title?: string
   width?: string
   color?: 'success' | 'secondary' | 'primary' | 'error' | 'warning' | 'info'
-  // noActions?: boolean
   readonly?: boolean
   submitText?: string
   cancelText?: string
   isError?: boolean
   onSubmit?: (value: any) => void
-  //onClean?: boolean
   onClose?: () => void
 }
 
@@ -28,45 +26,13 @@ const Modal = ({
   open,
   width = '550px',
   color = 'primary',
-  //  noActions = false,
   readonly = false,
   submitText = 'Valider',
   cancelText = 'Annuler',
   isError = false,
   onSubmit,
-  //onClean,
   onClose
 }: PropsWithChildren<ModalProps>) => {
-  /*const [formData, setFormData] = useState<Record<string, any>>({})
-  const [isError, setIsError] = useState(false)
-
-  const updateFormData = (name: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const updateError = (isError: boolean) => {
-    setIsError(isError)
-  }
-
-  const deleteFormData = () => {
-    setFormData({})
-  }
-
-  useEffect(() => {
-    deleteFormData()
-  }, [onClean])
-
-  const submit = async () => {
-    try {
-      if (onSubmit) await onSubmit(formData)
-      if (onClose) onClose()
-    } catch {
-      // Nothing to do if reaching here
-    }
-  }*/
-
-  console.log("test modal", isError)
-
   return (
     <Dialog open={open} onClose={onClose}>
       {title && (

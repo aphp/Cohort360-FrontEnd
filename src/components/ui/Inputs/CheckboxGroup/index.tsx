@@ -9,7 +9,7 @@ type CheckboxGroupProps<T> = {
   label?: string
   disabled?: boolean
   options: LabelObject[]
-  onChange: (value: T[]) => void
+  onChange?: (value: T[]) => void
 }
 
 const CheckboxGroup = <T extends string>({
@@ -22,7 +22,7 @@ const CheckboxGroup = <T extends string>({
   const [inputs, setInputs] = useState(value)
 
   useEffect(() => {
-    onChange(inputs)
+    onChange?.(inputs)
   }, [inputs])
 
   return (

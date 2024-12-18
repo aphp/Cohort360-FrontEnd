@@ -23,8 +23,6 @@ const FilterAction = ({ filters, deidentified, onSubmit }: FilterActionProps) =>
   } = useForm(filters)
   const [toggleModal, setToggleModal] = useState(false)
 
-  console.log('test criteria', filters, inputs)
-
   return (
     <>
       <Button

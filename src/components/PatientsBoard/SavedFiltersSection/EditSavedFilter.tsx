@@ -1,109 +1,151 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Grid } from '@mui/material'
 import CheckboxGroup from 'components/ui/Inputs/CheckboxGroup'
 import Modal from 'components/ui/Modal'
 import Text from 'components/ui/Inputs/Text'
-import { genderOptions, vitalStatusesOptions, SearchCriterias, searchByListPatients } from 'types/searchCriterias'
+import {
+  genderOptions,
+  vitalStatusesOptions,
+  SearchCriterias,
+  searchByListPatients,
+  SearchByTypes
+} from 'types/searchCriterias'
 import { SelectedFilter } from 'hooks/filters/useSavedFilters'
-import { useForm } from 'hooks/useForm'
+/*import { useForm } from 'hooks/useForm'*/
 import Select from 'components/ui/Searchbar/Select'
 import DurationRange from 'components/ui/Inputs/DurationRange'
+import { Controller, useForm } from 'react-hook-form'
 
-type EditSavedFilterProps<T> = {
+type EditSavedFilterProps = {
   deidentified: boolean
-  readonly: boolean
+  readonly?: boolean
   open: boolean
-  criteria: SelectedFilter<T>
+  criteria: SelectedFilter<DynamicFilters>
   disabled?: boolean
-  onEdit: (name: string, newSearchCriterias: SearchCriterias<T>, deidentified: boolean) => void
+  onEdit: (name: string, newSearchCriterias: SearchCriterias<DynamicFilters>, deidentified: boolean) => void
+  onClose: () => void
 }
 
-const EditSavedFilter = <T,>({ deidentified, criteria, readonly, open, onEdit }: EditSavedFilterProps<T>) => {
-  const [toggleInfoModal, setToggleInfoModal] = useState(open)
+type DynamicFilters = {
+  [key: string]: string[] // ou tout autre type selon vos données
+}
+
+export type DynamicSelectedFilter = SelectedFilter<DynamicFilters>
+
+const EditSavedFilter = <T,>({
+  deidentified,
+  criteria,
+  readonly = false,
+  open,
+  onEdit,
+  onClose
+}: EditSavedFilterProps) => {
+
   const {
-    inputs: {
-      filterName,
-      filterParams,
-      filterParams: { orderBy, searchInput, searchBy, filters }
-    },
-    changeFormError,
-    changeInput,
-    hasErrors
-  } = useForm<SelectedFilter<T>>(criteria)
+    control,
+    handleSubmit,
+    reset,
+    formState: { isDirty, errors, isValid }
+  } = useForm<DynamicSelectedFilter>({
+    defaultValues: criteria,
+    mode: 'onChange',
+    reValidateMode: 'onChange'
+  })
+  
+  useEffect(() => {
+    reset(criteria)
+  }, [criteria, reset])
 
   return (
     <Modal
-      title={readonly ? 'Informations' : 'Modifier le filtre'}
       open={open}
-      isError={hasErrors}
+      isError={!isValid}
       color="secondary"
-      readonly={readonly ?? false}
-      onClose={() => setToggleInfoModal(false)}
-      onSubmit={() => onEdit(filterName, filterParams, deidentified ?? true)}
+      readonly={readonly || !isDirty}
+      onClose={onClose}
+      onSubmit={handleSubmit((data) => onEdit(data.filterName, data.filterParams, deidentified ?? true))}
       submitText="Sauvegarder"
     >
       <Grid container direction="column" gap="8px">
-        <Grid item container direction="column">
-          <Text
-            value={filterName}
-            label="Nom :"
-            placeholder="Choisir un nom compris entre 2 et 50 caractères"
-            minLimit={2}
-            maxLimit={50}
-            disabled={readonly}
-            onError={changeFormError}
-            onChange={(value) => changeInput('filterName', value)}
-          />
-        </Grid>
-        {!deidentified && (
-          <Grid item container direction="column" paddingBottom="8px">
+        <Controller
+          name="filterName"
+          control={control}
+          //defaultValue={criteria.filterName}
+          rules={{
+            required: 'Ce champ est requis.',
+            minLength: {
+              value: 2,
+              message: 'Le nom doit contenir au moins 2 caractères.'
+            },
+            maxLength: {
+              value: 50,
+              message: 'Le nom ne peut pas dépasser 50 caractères.'
+            }
+          }}
+          render={({ field }) => (
             <Text
-              label="Recherche textuelle :"
-              disabled={readonly}
-              value={searchInput}
-              onChange={(value) => changeInput('filterParams', { searchInput: value, searchBy, orderBy, filters })}
+              {...field}
+              label="Nom :"
+              placeholder="Choisir un nom compris entre 2 et 50 caractères"
+              errorMessage={errors.filterName?.message}
             />
-            {/*
-              <Select
-                label="Rechercher dans"
-                disabled={readonly}
-                value={searchBy}
-                items={searchByListPatients}
-                name="searchBy"
-              />
-        */}
-          </Grid>
+          )}
+        />
+        {!deidentified && (
+          <>
+            <Controller
+              name="filterParams.searchInput"
+              control={control}
+              render={({ field }) => <Text {...field} label="Recherche textuelle :" />}
+            />
+            <Controller
+              name="filterParams.searchBy"
+              control={control}
+              render={({ field }) => (
+                <Select<SearchByTypes | undefined>
+                  value={field.value}
+                  label="Rechercher dans"
+                  items={searchByListPatients}
+                  onchange={field.onChange}
+                />
+              )}
+            />
+          </>
         )}
-        <Grid item>
-          <CheckboxGroup
-            disabled={readonly}
-            value={filters.genders}
-            label="Genre :"
-            options={genderOptions}
-            onChange={(value) =>
-              changeInput('filterParams', { searchInput, searchBy, orderBy, filters: { genders: value } })
+        <Controller
+          name="filterParams.filters.genders"
+          control={control}
+          render={({ field }) => (
+            <CheckboxGroup {...field} disabled={readonly} label="Genre :" options={genderOptions} />
+          )}
+        />
+        <Controller
+          name="filterParams.filters.vitalStatuses"
+          control={control}
+          render={({ field }) => (
+            <CheckboxGroup {...field} disabled={readonly} label="Statut vital :" options={vitalStatusesOptions} />
+          )}
+        />
+        {/*<Controller
+          name="filterParams.filters.birthdatesRanges"
+          control={control}
+          rules={{
+            validate: (value) => {
+              if (value[0] > value[1]) {
+                return 'La date de début doit être antérieure à la date de fin.'
+              }
+              return true
             }
-          />
-          <CheckboxGroup
-            disabled={readonly}
-            value={filters.vitalStatuses}
-            label="Statut vital :"
-            options={vitalStatusesOptions}
-            onChange={(value) =>
-              changeInput('filterParams', { searchInput, searchBy, orderBy, filters: { vitalStatuses: value } })
-            }
-          />
-          <DurationRange
-            disabled={readonly}
-            value={filters.birthdatesRanges}
-            label="Âge :"
-            deidentified={deidentified ?? false}
-            onChange={(value) =>
-              changeInput('filterParams', { searchInput, searchBy, orderBy, filters: { birthdatesRanges: value } })
-            }
-            onError={changeFormError}
-          />
-        </Grid>
+          }}
+          render={({ field }) => (
+            <DurationRange
+              {...field}
+              label="Âge :"
+              deidentified={deidentified ?? false}
+              // onError={changeFormError}
+            />
+          )}
+          />*/}
       </Grid>
     </Modal>
   )

@@ -2,22 +2,22 @@ import React, { useState } from 'react'
 import { Grid, Tooltip, Button } from '@mui/material'
 import { Save } from '@mui/icons-material'
 import Modal from 'components/ui/Modal'
-import { useForm } from 'hooks/useForm'
 import Text from 'components/ui/Inputs/Text'
+import { useForm } from 'react-hook-form'
 
 type SaveFilterActionProps = {
   disabled?: boolean
   onSubmit: (name: string) => void
 }
 
-const InputKey = 'filtersName'
-
-const SaveFilterActionProps = ({ disabled = false, onSubmit }: SaveFilterActionProps) => {
-  const {
-    inputs: { filtersName },
-    changeInput
-  } = useForm({ [InputKey]: '' })
+const SaveFilterAction = ({ disabled = false, onSubmit }: SaveFilterActionProps) => {
   const [toggleModal, setToggleModal] = useState(false)
+  const {
+    getValues,
+    register,
+    handleSubmit,
+    formState: { errors, isDirty, isValid }
+  } = useForm<{name: string}>()
 
   return (
     <>
@@ -41,29 +41,30 @@ const SaveFilterActionProps = ({ disabled = false, onSubmit }: SaveFilterActionP
         title="Sauvegarder le filtre"
         color="secondary"
         open={toggleModal}
+        readonly={false}
+        //readonly={disabled || !isDirty}
         onClose={() => setToggleModal(false)}
-        onSubmit={() => {
-          onSubmit(filtersName)
-          setToggleModal(false)
-        }}
-        isError={
-          filtersName.length < 2 || filtersName.length > 50 /*||
-          savedFiltersErrors.isError*/
-        }
+        onSubmit={handleSubmit((data) => console.log(data))}
+        //isError={!isValid}
       >
         <Text
+          {...register('name', {
+            required: 'Ce champ est requis.',
+            minLength: {
+              value: 2,
+              message: 'Le texte doit contenir au moins 2 caractères.'
+            },
+            maxLength: {
+              value: 50,
+              message: 'Le texte ne peut pas dépasser 50 caractères.'
+            }
+          })}
+          //  errorMessage={errors.textInput?.message}
           placeholder="Choisir un nom compris entre 2 et 50 caractères"
-          minLimit={2}
-          maxLimit={50}
-          onChange={(value) => {
-            changeInput(InputKey, value)
-            //resetSavedFilterError()
-          }}
         />
-        {/*savedFiltersErrors.isError && <ErrorMessage>{savedFiltersErrors.errorMessage}</ErrorMessage>*/}
       </Modal>
     </>
   )
 }
 
-export default SaveFilterActionProps
+export default SaveFilterAction

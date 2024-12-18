@@ -1,12 +1,16 @@
-import React, { useState } from 'react'
-import { Button } from '@mui/material'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Button, Grid, Typography } from '@mui/material'
 import List from 'components/ui/List'
 import Modal from 'components/ui/Modal'
-import Text from 'components/ui/Inputs/Text'
 import { Item } from 'components/ui/List/ListItem'
-import { SavedSearch } from '@mui/icons-material'
+import { DeleteOutline, Edit, SavedSearch, Visibility } from '@mui/icons-material'
+import { SelectedFilter } from 'hooks/filters/useSavedFilters'
+import { Filters, SearchCriterias } from 'types/searchCriterias'
+import EditSavedFilter, { DynamicSelectedFilter } from './EditSavedFilter'
 
-type SavedFiltersProps<T> = {
+type SavedFiltersProps = {
+  deidentified: boolean
+  selectedFilter: SelectedFilter<Filters> | null
   criterias: Item[]
   count: number
   disabled?: boolean
@@ -14,20 +18,29 @@ type SavedFiltersProps<T> = {
   onSubmit: () => void
   onDelete: (ids: string[]) => void
   onSelect: (id: string) => void
-  onDisplay: (readonly: boolean) => void
+  onEdit: (name: string, newSearchCriterias: SearchCriterias<Filters>, deidentified: boolean) => void
 }
 
-const SavedFilters = <T,>({
+const SavedFilters = ({
+  deidentified,
   count,
   criterias,
   disabled = false,
-  onDisplay,
+  selectedFilter,
   onNext,
   onSelect,
   onSubmit,
-  onDelete
-}: SavedFiltersProps<T>) => {
+  onDelete,
+  onEdit
+}: SavedFiltersProps) => {
   const [toggleModal, setToggleModal] = useState(false)
+  const [toggleDeleteModal, setToggleDeleteModal] = useState(false)
+  const [toggleDisplayModal, setToggleDisplayModal] = useState(false)
+  const [selectedItems, setSelectedItems] = useState<string[]>([])
+
+  useEffect(() => {
+    if (selectedItems.length === 1) onSelect(selectedItems[0])
+  }, [selectedItems])
 
   return (
     <>
@@ -50,23 +63,68 @@ const SavedFilters = <T,>({
           setToggleModal(false)
           // resetSavedFilterError()
         }}
+        isError={selectedItems.length !== 1}
         onSubmit={() => {
           onSubmit()
           setToggleModal(false)
         }}
-        //  isError={!selectedSavedFilter}
         submitText="Appliquer le filtre"
       >
-        <List
-          values={criterias}
-          count={count}
-          onDisplay={() => onDisplay(true)}
-          onEdit={disabled ? undefined : () => onDisplay(false)}
-          onDelete={disabled ? undefined : onDelete}
-          onSelect={(id) => onSelect(id)}
-          fetchPaginateData={onNext}
-        />
+        <Grid container item xs={12} alignItems="center" gap={1}>
+          <Grid item xs={3}>
+            <Button
+              sx={{ borderRadius: 25 }}
+              fullWidth
+              size="small"
+              variant="contained"
+              color="info"
+              startIcon={<Visibility />}
+              onClick={() => setToggleDisplayModal(true)}
+              disabled={selectedItems.length !== 1}
+            >
+              Voir
+            </Button>
+          </Grid>
+          <Grid item xs={1}>
+            <Button
+              color="warning"
+              size="small"
+              variant="contained"
+              sx={{ borderRadius: 25 }}
+              onClick={() => setToggleDeleteModal(true)}
+              disabled={disabled || !selectedItems.length}
+            >
+              <DeleteOutline />
+            </Button>
+          </Grid>
+        </Grid>
+        <List values={criterias} count={count} onSelect={setSelectedItems} fetchPaginateData={onNext} />
       </Modal>
+
+      <Modal
+        width="250px"
+        open={toggleDeleteModal}
+        onClose={() => setToggleDeleteModal(false)}
+        onSubmit={() => onDelete(selectedItems)}
+      >
+        <Typography sx={{ color: '#00000099' }} fontWeight={600} fontSize={14}>
+          Êtes-vous sur de vouloir supprimer les éléments sélectionnés ?
+        </Typography>
+      </Modal>
+
+      {selectedFilter && (
+        <EditSavedFilter
+          open={toggleDisplayModal}
+          readonly={disabled}
+          criteria={selectedFilter! as DynamicSelectedFilter}
+          onEdit={(name, filters, deidentified) => {
+            onEdit(name, filters, deidentified)
+            setToggleDisplayModal(false)
+          }}
+          onClose={() => setToggleDisplayModal(false)}
+          deidentified={deidentified}
+        />
+      )}
     </>
   )
 }

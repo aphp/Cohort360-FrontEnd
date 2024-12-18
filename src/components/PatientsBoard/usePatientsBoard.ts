@@ -12,7 +12,6 @@ export const usePatientBoard = () => {
   }, [filters])
 
   const onSaveSearchCriterias = ({ searchBy, searchInput, filters }: SearchCriterias<Filters>) => {
-    console.log('test apply', filters)
     if (searchBy) changeSearchBy(searchBy)
     if (searchInput) changeSearchInput(searchInput)
     if (filters) addFilters(filters)

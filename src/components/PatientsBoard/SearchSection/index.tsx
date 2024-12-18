@@ -11,7 +11,6 @@ type SearchSectionProps = {
 }
 
 const SearchSection = ({ deidentified, criterias, onSearch }: SearchSectionProps) => {
-  console.log("test criteria", criterias)
   
   return (
     <Grid container justifyContent="space-between">

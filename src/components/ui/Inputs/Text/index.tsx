@@ -10,6 +10,7 @@ type TextInputProps = {
   disabled?: boolean
   minLimit?: number
   maxLimit?: number
+  errorMessage?: string
   onChange: (newInput: string) => void
   onError?: (isError: boolean) => void
 }
@@ -19,28 +20,33 @@ const TextInput = ({
   placeholder = '',
   label,
   disabled,
+  errorMessage,
   minLimit,
   maxLimit,
   onChange,
   onError
 }: TextInputProps) => {
-  const [input, setFiltersName] = useState(value)
-  const [isError, setIsError] = useState({ min: false, max: false })
+  const [input, setInput] = useState(value)
+  //const [isError, setIsError] = useState({ min: false, max: false })
 
-  useEffect(() => {
+  /*  useEffect(() => {
     if (onError) {
       onError(false)
       if (isError.min || isError.max) onError(true)
     }
-  }, [isError])
+  }, [isError])*/
 
-  useEffect(() => {
+  /*useEffect(() => {
     let min = false
     let max = false
     if (maxLimit && input.length > maxLimit) max = true
     else if (minLimit && input.length < minLimit) min = true
     onChange(input)
     setIsError({ min, max })
+  }, [input])*/
+
+  useEffect(() => {
+    onChange(input)
   }, [input])
 
   return (
@@ -54,14 +60,19 @@ const TextInput = ({
           disabled={disabled}
           value={input}
           placeholder={placeholder || 'Non renseigné'}
-          onChange={(event) => setFiltersName(event.target.value)}
+          onChange={(event) => setInput(event.target.value)}
         />
       </InputWrapper>
-      {isError.max && (
+      {errorMessage && (
+        <Grid>
+          <ErrorMessage>{errorMessage}</ErrorMessage>
+        </Grid>
+      )}
+      {/*isError.max && (
         <Grid>
           <ErrorMessage>Le champ dépasse la limite de {maxLimit} caractères.</ErrorMessage>
         </Grid>
-      )}
+      )*/}
     </>
   )
 }
