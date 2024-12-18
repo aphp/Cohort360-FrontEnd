@@ -47,9 +47,9 @@ export function mapToLabel(type: ResourceType) {
 
 export const mapToLabelSingular = (tabId: PMSIResourceTypes) => {
   const mapToLabel = {
-    [ResourceType.CONDITION]: 'GHM',
+    [ResourceType.CONDITION]: 'diagnostic CIM10',
     [ResourceType.PROCEDURE]: 'acte',
-    [ResourceType.CLAIM]: 'diagnostic'
+    [ResourceType.CLAIM]: 'GHM'
   }
 
   return mapToLabel[tabId]
