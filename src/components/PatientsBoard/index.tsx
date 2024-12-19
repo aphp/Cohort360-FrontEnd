@@ -20,7 +20,7 @@ const PatientsBoard = ({ deidentified }: PatientsBoardProps) => {
           onSearch={(searchCriterias) => onSaveSearchCriterias(searchCriterias)}
         />
         <SavedFiltersSection
-          canSave={criterias.length > 0 || searchCriterias.searchInput !== ""}
+          canSave={criterias.length > 0 || searchCriterias.searchInput.length > 0}
           deidentified={deidentified ?? false}
           criterias={searchCriterias}
           onSelect={onSaveSearchCriterias}

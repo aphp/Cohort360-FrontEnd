@@ -13,7 +13,7 @@ export const usePatientBoard = () => {
 
   const onSaveSearchCriterias = ({ searchBy, searchInput, filters }: SearchCriterias<Filters>) => {
     if (searchBy) changeSearchBy(searchBy)
-    if (searchInput) changeSearchInput(searchInput)
+    if (searchInput !== undefined) changeSearchInput(searchInput)
     if (filters) addFilters(filters)
   }
 

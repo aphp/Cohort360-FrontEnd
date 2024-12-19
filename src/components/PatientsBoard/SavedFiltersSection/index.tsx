@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Grid } from '@mui/material'
+import { Alert, Grid, Snackbar } from '@mui/material'
 import SaveFilterAction from './SaveFilterAction'
 import { Filters, PatientsFilters, SearchCriterias } from 'types/searchCriterias'
 import { ResourceType } from 'types/requestCriterias'
@@ -38,6 +38,14 @@ const SavedFiltersSection = ({ deidentified, criterias, canSave, onSelect }: Sav
           />
         </Grid>
       )}
+      <Snackbar
+        open={savedFiltersErrors.isError}
+        onClose={() => resetSavedFilterError()}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        autoHideDuration={6000}
+      >
+        <Alert severity="error">{savedFiltersErrors.errorMessage}</Alert>
+      </Snackbar>
       <Grid item xs={3}>
         {asListItems.length > 0 && (
           <SavedFilters

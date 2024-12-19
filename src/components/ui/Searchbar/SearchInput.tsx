@@ -16,7 +16,6 @@ type SearchInputProps = {
   searchOnClick?: boolean
   displayHelpIcon?: boolean
   error?: SearchInputError | null
-  width?: string
   disabled?: boolean
   onchange: (value: string) => void
 }
@@ -25,7 +24,6 @@ const SearchInput = ({
   placeholder,
   value,
   searchOnClick = false,
-  width = '100%',
   displayHelpIcon = false,
   error = null,
   disabled = false,
@@ -40,12 +38,12 @@ const SearchInput = ({
   }, [value])
 
   useEffect(() => {
-    if (!searchOnClick) onchange(debouncedSearchValue)
+    if (!searchOnClick) onchange?.(debouncedSearchValue)
   }, [debouncedSearchValue])
 
   return (
     <>
-      <SearchInputWrapper width={width} error={error?.isError}>
+      <SearchInputWrapper error={error?.isError}>
         <InputBase
           disabled={disabled}
           placeholder={placeholder}

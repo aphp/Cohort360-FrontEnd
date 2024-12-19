@@ -1,23 +1,35 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Grid, Tooltip, Button } from '@mui/material'
 import { Save } from '@mui/icons-material'
 import Modal from 'components/ui/Modal'
 import Text from 'components/ui/Inputs/Text'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
+import { ErrorType } from 'types/error'
 
 type SaveFilterActionProps = {
   disabled?: boolean
   onSubmit: (name: string) => void
 }
 
-const SaveFilterAction = ({ disabled = false, onSubmit }: SaveFilterActionProps) => {
+const SaveFilterAction = ({ disabled = false, error, onSubmit }: SaveFilterActionProps) => {
   const [toggleModal, setToggleModal] = useState(false)
   const {
-    getValues,
-    register,
+    control,
     handleSubmit,
-    formState: { errors, isDirty, isValid }
-  } = useForm<{name: string}>()
+    reset,
+    formState: { errors, isValid, isDirty }
+  } = useForm<{ name: string }>({
+    mode: 'onChange',
+    reValidateMode: 'onChange'
+  })
+
+  useEffect(() => {
+    reset({ name: '' })
+  }, [toggleModal])
+
+  useEffect(() => {
+    console.log('test save name', errors.name, isValid, errors)
+  }, [isValid])
 
   return (
     <>
@@ -41,26 +53,37 @@ const SaveFilterAction = ({ disabled = false, onSubmit }: SaveFilterActionProps)
         title="Sauvegarder le filtre"
         color="secondary"
         open={toggleModal}
-        readonly={false}
-        //readonly={disabled || !isDirty}
+        readonly={disabled}
         onClose={() => setToggleModal(false)}
-        onSubmit={handleSubmit((data) => console.log(data))}
-        //isError={!isValid}
+        onSubmit={handleSubmit((data) => {
+          onSubmit(data.name)
+          setToggleModal(false)
+          reset()
+        })}
+        isError={!isValid}
       >
-        <Text
-          {...register('name', {
+        <Controller
+          name="name"
+          control={control}
+          rules={{
             required: 'Ce champ est requis.',
             minLength: {
               value: 2,
-              message: 'Le texte doit contenir au moins 2 caractères.'
+              message: 'Le nom doit contenir au moins 2 caractères.'
             },
             maxLength: {
               value: 50,
-              message: 'Le texte ne peut pas dépasser 50 caractères.'
+              message: 'Le nom ne peut pas dépasser 50 caractères.'
             }
-          })}
-          //  errorMessage={errors.textInput?.message}
-          placeholder="Choisir un nom compris entre 2 et 50 caractères"
+          }}
+          render={({ field }) => (
+            <Text
+              {...field}
+              label="Nom :"
+              placeholder="Choisir un nom compris entre 2 et 50 caractères"
+              errorMessage={isDirty && errors.name?.message}
+            />
+          )}
         />
       </Modal>
     </>

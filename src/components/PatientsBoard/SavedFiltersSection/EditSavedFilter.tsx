@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Grid } from '@mui/material'
 import CheckboxGroup from 'components/ui/Inputs/CheckboxGroup'
 import Modal from 'components/ui/Modal'
@@ -11,7 +11,6 @@ import {
   SearchByTypes
 } from 'types/searchCriterias'
 import { SelectedFilter } from 'hooks/filters/useSavedFilters'
-/*import { useForm } from 'hooks/useForm'*/
 import Select from 'components/ui/Searchbar/Select'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { Controller, useForm } from 'react-hook-form'
@@ -27,7 +26,7 @@ type EditSavedFilterProps = {
 }
 
 type DynamicFilters = {
-  [key: string]: string[] // ou tout autre type selon vos données
+  [key: string]: string[]
 }
 
 export type DynamicSelectedFilter = SelectedFilter<DynamicFilters>
@@ -40,7 +39,6 @@ const EditSavedFilter = <T,>({
   onEdit,
   onClose
 }: EditSavedFilterProps) => {
-
   const {
     control,
     handleSubmit,
@@ -51,7 +49,7 @@ const EditSavedFilter = <T,>({
     mode: 'onChange',
     reValidateMode: 'onChange'
   })
-  
+
   useEffect(() => {
     reset(criteria)
   }, [criteria, reset])
@@ -70,7 +68,6 @@ const EditSavedFilter = <T,>({
         <Controller
           name="filterName"
           control={control}
-          //defaultValue={criteria.filterName}
           rules={{
             required: 'Ce champ est requis.',
             minLength: {

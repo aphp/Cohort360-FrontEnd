@@ -3,7 +3,6 @@ import CheckboxGroup from 'components/ui/Inputs/CheckboxGroup'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import Modal from 'components/ui/Modal'
 import { FilterKeys, Filters, genderOptions, vitalStatusesOptions } from 'types/searchCriterias'
-import { useForm } from 'hooks/useForm'
 import FilterList from 'assets/icones/filter.svg?react'
 import { Button } from '@mui/material'
 
@@ -14,13 +13,13 @@ type FilterActionProps = {
 }
 
 const FilterAction = ({ filters, deidentified, onSubmit }: FilterActionProps) => {
-  const {
+  /*const {
     inputs,
     inputs: { genders, vitalStatuses, birthdatesRanges },
     changeFormError,
     changeInput,
     hasErrors
-  } = useForm(filters)
+  } = useForm(filters)*/
   const [toggleModal, setToggleModal] = useState(false)
 
   return (
@@ -34,7 +33,7 @@ const FilterAction = ({ filters, deidentified, onSubmit }: FilterActionProps) =>
       >
         Filtrer
       </Button>
-      <Modal
+      {/*<Modal
         title="Filtrer par :"
         open={toggleModal}
         color="secondary"
@@ -64,7 +63,7 @@ const FilterAction = ({ filters, deidentified, onSubmit }: FilterActionProps) =>
           onChange={(value) => changeInput(FilterKeys.BIRTHDATES, value)}
           onError={changeFormError}
         />
-      </Modal>
+      </Modal>*/}
     </>
   )
 }
