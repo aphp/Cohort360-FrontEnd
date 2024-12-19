@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CheckboxGroup from 'components/ui/Inputs/CheckboxGroup'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import Modal from 'components/ui/Modal'
 import { FilterKeys, Filters, genderOptions, vitalStatusesOptions } from 'types/searchCriterias'
 import FilterList from 'assets/icones/filter.svg?react'
 import { Button } from '@mui/material'
+import { Controller, useForm } from 'react-hook-form'
 
 type FilterActionProps = {
   filters: Filters
@@ -13,14 +14,21 @@ type FilterActionProps = {
 }
 
 const FilterAction = ({ filters, deidentified, onSubmit }: FilterActionProps) => {
-  /*const {
-    inputs,
-    inputs: { genders, vitalStatuses, birthdatesRanges },
-    changeFormError,
-    changeInput,
-    hasErrors
-  } = useForm(filters)*/
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isDirty, errors, isValid }
+  } = useForm<Filters>({
+    defaultValues: filters,
+    mode: 'onChange',
+    reValidateMode: 'onChange'
+  })
   const [toggleModal, setToggleModal] = useState(false)
+
+  useEffect(() => {
+    reset(filters)
+  }, [filters])
 
   return (
     <>
@@ -33,37 +41,40 @@ const FilterAction = ({ filters, deidentified, onSubmit }: FilterActionProps) =>
       >
         Filtrer
       </Button>
-      {/*<Modal
+      <Modal
         title="Filtrer par :"
         open={toggleModal}
+        readonly={!isDirty}
         color="secondary"
-        isError={hasErrors}
+        isError={!isValid}
         onClose={() => setToggleModal(false)}
-        onSubmit={() => {
-          onSubmit(inputs)
+        onSubmit={handleSubmit((data) => {
+          onSubmit(data)
           setToggleModal(false)
-        }}
+        })}
       >
-        <CheckboxGroup
-          value={genders}
-          label="Genre :"
-          options={genderOptions}
-          onChange={(value) => changeInput(FilterKeys.GENDERS, value)}
-        />
-        <CheckboxGroup
-          value={vitalStatuses}
-          label="Statut vital :"
-          options={vitalStatusesOptions}
-          onChange={(value) => changeInput(FilterKeys.VITAL_STATUSES, value)}
-        />
-        <DurationRange
+        {FilterKeys.GENDERS in filters && (
+          <Controller
+            name={FilterKeys.GENDERS}
+            control={control}
+            render={({ field }) => <CheckboxGroup {...field} label="Genre :" options={genderOptions} />}
+          />
+        )}
+        {FilterKeys.VITAL_STATUSES in filters && (
+          <Controller
+            name={FilterKeys.VITAL_STATUSES}
+            control={control}
+            render={({ field }) => <CheckboxGroup {...field} label="Statut vital :" options={vitalStatusesOptions} />}
+          />
+        )}
+        {/*<DurationRange
           value={birthdatesRanges}
           label="Âge :"
           deidentified={deidentified ?? false}
           onChange={(value) => changeInput(FilterKeys.BIRTHDATES, value)}
           onError={changeFormError}
-        />
-      </Modal>*/}
+      />*/}
+      </Modal>
     </>
   )
 }

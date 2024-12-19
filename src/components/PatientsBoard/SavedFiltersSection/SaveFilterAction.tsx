@@ -11,7 +11,7 @@ type SaveFilterActionProps = {
   onSubmit: (name: string) => void
 }
 
-const SaveFilterAction = ({ disabled = false, error, onSubmit }: SaveFilterActionProps) => {
+const SaveFilterAction = ({ disabled = false, onSubmit }: SaveFilterActionProps) => {
   const [toggleModal, setToggleModal] = useState(false)
   const {
     control,
@@ -26,10 +26,6 @@ const SaveFilterAction = ({ disabled = false, error, onSubmit }: SaveFilterActio
   useEffect(() => {
     reset({ name: '' })
   }, [toggleModal])
-
-  useEffect(() => {
-    console.log('test save name', errors.name, isValid, errors)
-  }, [isValid])
 
   return (
     <>
@@ -81,7 +77,7 @@ const SaveFilterAction = ({ disabled = false, error, onSubmit }: SaveFilterActio
               {...field}
               label="Nom :"
               placeholder="Choisir un nom compris entre 2 et 50 caractères"
-              errorMessage={isDirty && errors.name?.message}
+              errorMessage={isDirty ? errors.name?.message : ''}
             />
           )}
         />

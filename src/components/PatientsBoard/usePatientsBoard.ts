@@ -11,6 +11,11 @@ export const usePatientBoard = () => {
     return filters ? selectFiltersAsArray(filters) : []
   }, [filters])
 
+  const searchCriterias = useMemo(
+    () => ({ orderBy, searchBy, searchInput, filters }),
+    [orderBy, searchBy, searchInput, filters]
+  )
+
   const onSaveSearchCriterias = ({ searchBy, searchInput, filters }: SearchCriterias<Filters>) => {
     if (searchBy) changeSearchBy(searchBy)
     if (searchInput !== undefined) changeSearchInput(searchInput)
@@ -18,7 +23,7 @@ export const usePatientBoard = () => {
   }
 
   return {
-    searchCriterias: { orderBy, searchBy, searchInput, filters },
+    searchCriterias,
     criterias,
     onSaveSearchCriterias,
     removeFilter

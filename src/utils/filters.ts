@@ -87,7 +87,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
         break
     }
   }
-  return castedFilters
+  return {...castedFilters}
 }
 
 export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {

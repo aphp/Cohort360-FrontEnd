@@ -11,7 +11,6 @@ type SearchSectionProps = {
 }
 
 const SearchSection = ({ deidentified, criterias, onSearch }: SearchSectionProps) => {
-  
   return (
     <Grid container justifyContent="space-between">
       <Grid container item xs={8}>

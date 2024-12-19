@@ -5,6 +5,7 @@ import { Filters, PatientsFilters, SearchCriterias } from 'types/searchCriterias
 import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import SavedFilters from './SavedFilters'
+import { FetchStatus } from 'types'
 
 type SavedFiltersSectionProps = {
   deidentified: boolean
@@ -16,9 +17,9 @@ type SavedFiltersSectionProps = {
 const SavedFiltersSection = ({ deidentified, criterias, canSave, onSelect }: SavedFiltersSectionProps) => {
   const {
     allSavedFilters,
-    savedFiltersErrors,
+    fetchStatus,
     selectedSavedFilter,
-    methods: { next, postSavedFilter, deleteSavedFilters, patchSavedFilter, selectFilter, resetSavedFilterError }
+    methods: { next, postSavedFilter, deleteSavedFilters, patchSavedFilter, selectFilter, resetFetchStatus }
   } = useSavedFilters<PatientsFilters>(ResourceType.PATIENT)
 
   const asListItems = useMemo(
@@ -38,14 +39,18 @@ const SavedFiltersSection = ({ deidentified, criterias, canSave, onSelect }: Sav
           />
         </Grid>
       )}
-      <Snackbar
-        open={savedFiltersErrors.isError}
-        onClose={() => resetSavedFilterError()}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        autoHideDuration={6000}
-      >
-        <Alert severity="error">{savedFiltersErrors.errorMessage}</Alert>
-      </Snackbar>
+      {fetchStatus && (
+        <Snackbar
+          open={fetchStatus !== null}
+          onClose={() => resetFetchStatus()}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          autoHideDuration={6000}
+        >
+          <Alert severity={fetchStatus?.status === FetchStatus.SUCCESS ? 'success' : 'error'}>
+            {fetchStatus?.message}
+          </Alert>
+        </Snackbar>
+      )}
       <Grid item xs={3}>
         {asListItems.length > 0 && (
           <SavedFilters

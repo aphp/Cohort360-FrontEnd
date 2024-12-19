@@ -2,30 +2,35 @@ import { Item } from 'components/ui/List/ListItem'
 import { mapRequestParamsToSearchCriteria } from 'mappers/filters'
 import { useEffect, useState } from 'react'
 import {
+  deleteFilterService,
   deleteFiltersService,
   getFiltersService,
   patchFiltersService,
   postFiltersService
 } from 'services/aphp/servicePatients'
-import { ErrorType } from 'types/error'
+import { FetchStatus } from 'types'
 import { ResourceType } from 'types/requestCriterias'
 import { Filters, SavedFilter, SavedFiltersResults, SearchCriterias } from 'types/searchCriterias'
+
+type FetchResponse = {
+  status: FetchStatus
+  message: string
+}
 
 export type SelectedFilter<T> = {
   filterUuid: string
   filterName: string
-  filterParams: SearchCriterias<T> 
+  filterParams: SearchCriterias<T>
 }
 
 export const useSavedFilters = <T>(type: ResourceType) => {
   const [allSavedFilters, setAllSavedFilters] = useState<SavedFiltersResults | null>(null)
-  const [savedFiltersErrors, setSavedFiltersErrors] = useState<ErrorType>({ isError: false })
+  const [fetchStatus, setFetchStatus] = useState<FetchResponse | null>(null)
   const [selectedSavedFilter, setSelectedSavedFilter] = useState<SelectedFilter<T> | null>(null)
 
   useEffect(() => {
     getSavedFilters()
   }, [type])
-
 
   const getSavedFilters = async (next?: string | null) => {
     try {
@@ -40,23 +45,31 @@ export const useSavedFilters = <T>(type: ResourceType) => {
       }
     } catch (err) {
       setAllSavedFilters(null)
+      setFetchStatus({ status: FetchStatus.ERROR, message: 'Erreur lors de la récupération des filtres.' })
     }
   }
 
   const postSavedFilter = async (name: string, searchCriterias: SearchCriterias<Filters>, deidentified: boolean) => {
     try {
       await postFiltersService(type, name, searchCriterias, deidentified)
-      setSavedFiltersErrors({ isError: false })
+      setFetchStatus({ status: FetchStatus.SUCCESS, message: 'Le filtre a bien été sauvegardé.' })
       await getSavedFilters()
     } catch {
-      setSavedFiltersErrors({ isError: true, errorMessage: "Il y a eu une erreur lors de l'enregistrement du filtre. Vérifiez que le nom n'existe pas déjà." })
-      throw 'Nom déjà existant'
+      setFetchStatus({
+        status: FetchStatus.ERROR,
+        message: "Erreur lors de l'enregistrement du filtre. Vérifiez que le nom n'existe pas déjà."
+      })
     }
   }
 
   const deleteSavedFilters = async (filtersUuids: string[]) => {
-    await deleteFiltersService(filtersUuids)
-    await getSavedFilters()
+    try {
+      if (filtersUuids.length > 1) await deleteFiltersService(filtersUuids)
+      else deleteFilterService(filtersUuids[0])
+      await getSavedFilters()
+    } catch {
+      setFetchStatus({ status: FetchStatus.ERROR, message: 'Erreur lors de la suppression des filtres.' })
+    }
   }
 
   const patchSavedFilter = async (
@@ -65,8 +78,13 @@ export const useSavedFilters = <T>(type: ResourceType) => {
     deidentified: boolean
   ): Promise<void> => {
     if (selectedSavedFilter) {
-      await patchFiltersService(type, selectedSavedFilter?.filterUuid, name, newSearchCriterias, deidentified)
-      await getSavedFilters()
+      try {
+        await patchFiltersService(type, selectedSavedFilter?.filterUuid, name, newSearchCriterias, deidentified)
+      } catch {
+        setFetchStatus({ status: FetchStatus.ERROR, message: 'Erreur lors de la modification du filtre.' })
+      } finally {
+        await getSavedFilters()
+      }
     }
   }
 
@@ -84,21 +102,21 @@ export const useSavedFilters = <T>(type: ResourceType) => {
     else setSelectedSavedFilter(null)
   }
 
-  const resetSavedFilterError = () => {
-    setSavedFiltersErrors({ isError: false })
+  const resetFetchStatus = () => {
+    setFetchStatus(null)
   }
 
   return {
     allSavedFilters,
     selectedSavedFilter,
-    savedFiltersErrors,
+    fetchStatus,
     methods: {
       next: () => getSavedFilters(allSavedFilters?.next),
       postSavedFilter,
       deleteSavedFilters,
       patchSavedFilter,
       selectFilter,
-      resetSavedFilterError,
+      resetFetchStatus,
       mapToSelectedFilter
     }
   }

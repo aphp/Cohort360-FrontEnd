@@ -8,7 +8,8 @@ import {
   vitalStatusesOptions,
   SearchCriterias,
   searchByListPatients,
-  SearchByTypes
+  SearchByTypes,
+  Filters
 } from 'types/searchCriterias'
 import { SelectedFilter } from 'hooks/filters/useSavedFilters'
 import Select from 'components/ui/Searchbar/Select'
@@ -19,17 +20,11 @@ type EditSavedFilterProps = {
   deidentified: boolean
   readonly?: boolean
   open: boolean
-  criteria: SelectedFilter<DynamicFilters>
+  criteria: SelectedFilter<Filters>
   disabled?: boolean
-  onEdit: (name: string, newSearchCriterias: SearchCriterias<DynamicFilters>, deidentified: boolean) => void
+  onEdit: (name: string, newSearchCriterias: SearchCriterias<Filters>, deidentified: boolean) => void
   onClose: () => void
 }
-
-type DynamicFilters = {
-  [key: string]: string[]
-}
-
-export type DynamicSelectedFilter = SelectedFilter<DynamicFilters>
 
 const EditSavedFilter = <T,>({
   deidentified,
@@ -44,7 +39,7 @@ const EditSavedFilter = <T,>({
     handleSubmit,
     reset,
     formState: { isDirty, errors, isValid }
-  } = useForm<DynamicSelectedFilter>({
+  } = useForm<SelectedFilter<Filters>>({
     defaultValues: criteria,
     mode: 'onChange',
     reValidateMode: 'onChange'
@@ -52,7 +47,7 @@ const EditSavedFilter = <T,>({
 
   useEffect(() => {
     reset(criteria)
-  }, [criteria, reset])
+  }, [criteria])
 
   return (
     <Modal

@@ -6,7 +6,7 @@ import { Item } from 'components/ui/List/ListItem'
 import { DeleteOutline, Edit, SavedSearch, Visibility } from '@mui/icons-material'
 import { SelectedFilter } from 'hooks/filters/useSavedFilters'
 import { Filters, SearchCriterias } from 'types/searchCriterias'
-import EditSavedFilter, { DynamicSelectedFilter } from './EditSavedFilter'
+import EditSavedFilter from './EditSavedFilter'
 
 type SavedFiltersProps = {
   deidentified: boolean
@@ -105,7 +105,10 @@ const SavedFilters = ({
         width="250px"
         open={toggleDeleteModal}
         onClose={() => setToggleDeleteModal(false)}
-        onSubmit={() => onDelete(selectedItems)}
+        onSubmit={() => {
+          onDelete(selectedItems)
+          setToggleDeleteModal(false)
+        }}
       >
         <Typography sx={{ color: '#00000099' }} fontWeight={600} fontSize={14}>
           Êtes-vous sur de vouloir supprimer les éléments sélectionnés ?
@@ -116,7 +119,7 @@ const SavedFilters = ({
         <EditSavedFilter
           open={toggleDisplayModal}
           readonly={disabled}
-          criteria={selectedFilter! as DynamicSelectedFilter}
+          criteria={selectedFilter!}
           onEdit={(name, filters, deidentified) => {
             onEdit(name, filters, deidentified)
             setToggleDisplayModal(false)

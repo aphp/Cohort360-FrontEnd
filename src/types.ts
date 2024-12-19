@@ -72,6 +72,11 @@ export enum LoadingStatus {
   SUCCESS = 'SUCCESS'
 }
 
+export enum FetchStatus {
+  ERROR = 'ERROR',
+  SUCCESS = 'SUCCESS'
+}
+
 export enum TemporalConstraintsKind {
   NONE = 'none',
   SAME_ENCOUNTER = 'sameEncounter',

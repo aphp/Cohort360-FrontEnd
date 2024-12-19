@@ -244,6 +244,12 @@ export interface IServiceCohorts {
   ) => Promise<CohortResults<CohortQuestionnaireResponse>>
 
   /**
+   *
+   * Retourne le service de récupération de donnée en fonction de la ressource
+   */
+  getPatientBoardFetcher: (resourceType: ResourceType) => Function
+
+  /**
    * Permet de vérifier si le champ de recherche textuelle est correct
    *
    * Argument:
@@ -1092,6 +1098,15 @@ const servicesCohorts: IServiceCohorts = {
         ]
       }
     }
+  },
+
+  getPatientBoardFetcher: (resourceType: ResourceType) => {
+    switch (resourceType) {
+      case ResourceType.PATIENT:
+        return ({ searchCriterias, page }, deidentified: boolean) =>
+          servicesCohorts.fetchPatientList({ searchCriterias, page }, deidentified)
+    }
+    return () => {}
   },
 
   fetchDocumentContent: async (compositionId) => {
