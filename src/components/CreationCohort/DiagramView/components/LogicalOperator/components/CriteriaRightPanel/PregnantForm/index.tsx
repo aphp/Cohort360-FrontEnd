@@ -23,7 +23,7 @@ import CriteriaLayout from 'components/ui/CriteriaLayout'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
-import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnit'
+import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnits'
 
 enum Error {
   EMPTY_FORM,
@@ -91,9 +91,7 @@ const PregnantForm = ({
   const [ultrasoundMonitoring, setUltrasoundMonitoring] = useState<LabelObject[]>(
     mappingCriteria(criteria?.ultrasoundMonitoring, CriteriaDataKey.ULTRASOUND_MONITORING, criteriaData) || []
   )
-  const [encounterService, setEncounterService] = useState<Hierarchy<ScopeElement, string>[]>(
-    criteria?.encounterService || []
-  )
+  const [encounterService, setEncounterService] = useState<Hierarchy<ScopeElement>[]>(criteria?.encounterService || [])
   const [occurrence, setOccurrence] = useState<number>(criteria?.occurrence || 1)
   const [occurrenceComparator, setOccurrenceComparator] = useState<Comparators>(
     criteria?.occurrenceComparator || Comparators.GREATER_OR_EQUAL

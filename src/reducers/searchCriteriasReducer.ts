@@ -91,6 +91,7 @@ export const initMedSearchCriterias: SearchCriterias<MedicationFilters> = {
   filters: {
     nda: '',
     ipp: '',
+    code: [],
     startDate: null,
     endDate: null,
     executiveUnits: [],
@@ -110,12 +111,11 @@ export const initBioSearchCriterias: SearchCriterias<BiologyFilters> = {
   filters: {
     validatedStatus: true,
     nda: '',
-    loinc: [],
-    anabio: [],
     startDate: null,
     endDate: null,
     executiveUnits: [],
-    encounterStatus: []
+    encounterStatus: [],
+    code: []
   }
 }
 

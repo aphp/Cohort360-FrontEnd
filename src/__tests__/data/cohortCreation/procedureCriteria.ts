@@ -1,4 +1,5 @@
 import { CcamDataType, Comparators, CriteriaType } from 'types/requestCriterias'
+import { System } from 'types/scope'
 
 export const defaultProcedureCriteria: CcamDataType = {
   id: 1,
@@ -14,7 +15,6 @@ export const defaultProcedureCriteria: CcamDataType = {
   encounterEndDate: [null, null],
   includeEncounterEndDateNull: false,
   encounterStatus: [],
-  hierarchy: undefined,
   code: [],
   source: null,
   label: undefined,
@@ -37,18 +37,23 @@ export const completeProcedureCriteria: CcamDataType = {
     {
       id: '000126',
       label: "000126 - Explorations Électrophysiologiques De L'oeil",
-      system: 'https://www.atih.sante.fr/plateformes-de-transmiss…ls/logiciels-espace-de-telechargement/id_lot/3550'
+      system: 'https://www.atih.sante.fr/plateformes-de-transmiss…ls/logiciels-espace-de-telechargement/id_lot/3550',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
     },
 
     {
       id: '000127',
       label: "000127 - Échographie De L'oeil",
-      system: 'https://www.atih.sante.fr/plateformes-de-transmiss…ls/logiciels-espace-de-telechargement/id_lot/3550'
+      system: 'https://www.atih.sante.fr/plateformes-de-transmiss…ls/logiciels-espace-de-telechargement/id_lot/3550',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
     }
   ],
   source: 'ORBIS',
   encounterService: [
     {
+      label: 'GH RCP',
       above_levels_ids: '8312002244',
       cohort_id: '6935',
       cohort_size: '23',
@@ -60,7 +65,8 @@ export const completeProcedureCriteria: CcamDataType = {
       source_value: 'H01',
       status: undefined,
       subItems: undefined,
-      type: 'Groupe hospitalier (GH)'
+      type: 'Groupe hospitalier (GH)',
+      system: System.ScopeTree
     }
   ]
 }
