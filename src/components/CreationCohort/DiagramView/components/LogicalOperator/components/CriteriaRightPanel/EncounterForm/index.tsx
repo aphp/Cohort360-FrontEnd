@@ -27,11 +27,11 @@ import OccurenceInput from 'components/ui/Inputs/Occurences'
 import Collapse from 'components/ui/Collapse'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
-import { mappingCriteria } from '../DemographicForm'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
-import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnit'
+import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnits'
+import { mappingCriteria } from 'utils/mappers'
 
 enum Error {
   EMPTY_FORM,
@@ -82,9 +82,7 @@ const EncounterForm = ({
   const [admission, setAdmission] = useState<LabelObject[]>(
     mappingCriteria(criteria?.admission, CriteriaDataKey.ADMISSION, criteriaData) || []
   )
-  const [encounterService, setEncounterService] = useState<Hierarchy<ScopeElement, string>[]>(
-    criteria?.encounterService || []
-  )
+  const [encounterService, setEncounterService] = useState<Hierarchy<ScopeElement>[]>(criteria?.encounterService || [])
   const [encounterStartDate, setEncounterStartDate] = useState<DurationRangeType>(
     criteria?.encounterStartDate || [null, null]
   )
@@ -107,7 +105,7 @@ const EncounterForm = ({
   )
 
   const { classes } = useStyles()
-  const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
+  const [multiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const isEdition = selectedCriteria !== null || false
   const [error, setError] = useState(Error.NO_ERROR)
   const selectedPopulation = useAppSelector((state) => state.cohortCreation.request.selectedPopulation || [])

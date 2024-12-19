@@ -41,25 +41,22 @@ const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses, qu
             <Typography variant="button">Aucun formulaire à afficher</Typography>
           </Grid>
         ) : (
-          <>
-            {console.log('manelle tu es MON canard')}
-            <div style={{ flexGrow: 1, marginLeft: '1em' }}>
-              {years.reverse().map((year) => (
-                <div key={year}>
-                  <Typography variant="h6" style={{ margin: '10px 0', fontSize: 15 }}>
-                    {year}
-                  </Typography>
-                  {yearGroups[year].map((form) =>
-                    form.questionnaire?.includes(pregnancyFormId) ? (
-                      <PregnancyCard key={form.id} form={form} />
-                    ) : (
-                      <HospitCard key={form.id} form={form} />
-                    )
-                  )}
-                </div>
-              ))}
-            </div>
-          </>
+          <div style={{ flexGrow: 1, marginLeft: '1em' }}>
+            {years.reverse().map((year) => (
+              <div key={year}>
+                <Typography variant="h6" style={{ margin: '10px 0', fontSize: 15 }}>
+                  {year}
+                </Typography>
+                {yearGroups[year].map((form) =>
+                  form.questionnaire?.includes(pregnancyFormId) ? (
+                    <PregnancyCard key={form.id} form={form} />
+                  ) : (
+                    <HospitCard key={form.id} form={form} />
+                  )
+                )}
+              </div>
+            ))}
+          </div>
         )}
       </>
     )

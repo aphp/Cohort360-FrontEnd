@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import Grid from '@mui/material/Grid'
 
 import ControlPanel from './ControlPanel/ControlPanel'
-import DiagramView from './DiagramView/DiagramView'
+import DiagramView from './DiagramView'
 import ModalCreateNewRequest from './Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 
 import { useAppDispatch, useAppSelector } from 'state'
@@ -82,7 +82,6 @@ const Requeteur = () => {
     }
     try {
       const criteriaCache = await getDataFromFetch(criteriaList(), selectedCriteria, criteriaData.cache)
-
       const allowMaternityForms = selectedPopulation?.every((population) => population?.access === 'Nominatif')
       const questionnairesEnabled = config.features.questionnaires.enabled
       dispatch(

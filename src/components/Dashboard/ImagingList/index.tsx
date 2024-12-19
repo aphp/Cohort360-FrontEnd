@@ -18,7 +18,7 @@ import NdaFilter from 'components/Filters/NdaFilter'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 
 import { CohortImaging, LoadingStatus, DTTB_ResultsType as ResultsType } from 'types'
-import { Direction, FilterKeys, ImagingFilters, Order } from 'types/searchCriterias'
+import { Direction, FilterKeys, ImagingFilters, LabelObject, Order } from 'types/searchCriterias'
 
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
@@ -33,10 +33,10 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { BlockWrapper } from 'components/ui/Layout'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
-import { AppConfig } from 'config'
+import { AppConfig, getConfig } from 'config'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
+import { getCodeList } from 'services/aphp/serviceValueSets'
 
 type ImagingListProps = {
   deidentified?: boolean
@@ -59,8 +59,8 @@ const ImagingList = ({ deidentified }: ImagingListProps) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
-  const [allModalities, setAllModalities] = useState<Hierarchy<any, any>[]>([])
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [allModalities, setAllModalities] = useState<LabelObject[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<LabelObject[]>([])
 
   const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const [
@@ -164,12 +164,11 @@ const ImagingList = ({ deidentified }: ImagingListProps) => {
   useEffect(() => {
     const fetch = async () => {
       const [modalities, encounterStatus] = await Promise.all([
-        services.cohortCreation.fetchModalities(),
-        services.cohortCreation.fetchEncounterStatus()
+        getCodeList(getConfig().features.imaging.valueSets.imagingModalities.url, true),
+        getCodeList(getConfig().core.valueSets.encounterStatus.url)
       ])
-
-      setAllModalities(modalities)
-      setEncounterStatusList(encounterStatus)
+      setAllModalities(modalities.results)
+      setEncounterStatusList(encounterStatus.results)
     }
     fetch()
   }, [])

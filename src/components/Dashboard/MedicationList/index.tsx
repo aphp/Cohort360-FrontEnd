@@ -14,7 +14,7 @@ import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
 import IppFilter from 'components/Filters/IppFilter'
 import List from 'components/ui/List'
 import Modal from 'components/ui/Modal'
-import { medicationTabs } from 'components/Patient/PatientMedication/PatientMedication'
+import { medicationTabs } from 'components/Patient/PatientMedication'
 import NdaFilter from 'components/Filters/NdaFilter'
 import PrescriptionTypesFilter from 'components/Filters/PrescriptionTypesFilter'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
@@ -22,10 +22,9 @@ import Tabs from 'components/ui/Tabs'
 import TextInput from 'components/Filters/TextInput'
 
 import { MedicationLabel, ResourceType } from 'types/requestCriterias'
-import { Hierarchy } from 'types/hierarchy'
 import { DTTB_ResultsType as ResultsType, LoadingStatus, TabType, MedicationTab, CohortMedication } from 'types'
 import { SourceType } from 'types/scope'
-import { Direction, FilterKeys, MedicationFilters, Order } from 'types/searchCriterias'
+import { Direction, FilterKeys, LabelObject, MedicationFilters, Order } from 'types/searchCriterias'
 
 import { CanceledError } from 'axios'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
@@ -37,6 +36,10 @@ import { mapToLabel } from 'mappers/pmsi'
 import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
 import { getMedicationTab } from 'utils/tabsUtils'
 import { useSearchParams } from 'react-router-dom'
+import { getCodeList } from 'services/aphp/serviceValueSets'
+import { getConfig } from 'config'
+import { getValueSetsFromSystems } from 'utils/valueSets'
+import CodeFilter from 'components/Filters/CodeFilter'
 
 type MedicationListProps = {
   deidentified?: boolean
@@ -51,7 +54,7 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
   const [triggerClean, setTriggerClean] = useState<boolean>(false)
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<LabelObject[]>([])
   const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
@@ -83,6 +86,7 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
       searchInput,
       filters,
       filters: {
+        code,
         nda,
         ipp,
         startDate,
@@ -98,6 +102,7 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
   const filtersAsArray = useMemo(
     () =>
       selectFiltersAsArray({
+        code,
         nda,
         ipp,
         startDate,
@@ -107,11 +112,11 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
         administrationRoutes,
         prescriptionTypes
       }),
-    [nda, ipp, startDate, endDate, executiveUnits, encounterStatus, administrationRoutes, prescriptionTypes]
+    [code, nda, ipp, startDate, endDate, executiveUnits, encounterStatus, administrationRoutes, prescriptionTypes]
   )
 
-  const [allAdministrationRoutes, setAllAdministrationRoutes] = useState<Hierarchy<any, any>[]>([])
-  const [allPrescriptionTypes, setAllPrescriptionTypes] = useState<Hierarchy<any, any>[]>([])
+  const [allAdministrationRoutes, setAllAdministrationRoutes] = useState<LabelObject[]>([])
+  const [allPrescriptionTypes, setAllPrescriptionTypes] = useState<LabelObject[]>([])
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [searchResults, setSearchResults] = useState<ResultsType>({
     nb: 0,
@@ -140,6 +145,7 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
             orderBy,
             searchInput,
             filters: {
+              code,
               nda,
               ipp,
               startDate,
@@ -197,13 +203,13 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
   useEffect(() => {
     const fetch = async () => {
       const [administrations, prescriptions, encounterStatus] = await Promise.all([
-        services.cohortCreation.fetchAdministrations(),
-        services.cohortCreation.fetchPrescriptionTypes(),
-        services.cohortCreation.fetchEncounterStatus()
+        getCodeList(getConfig().features.medication.valueSets.medicationAdministrations.url),
+        getCodeList(getConfig().features.medication.valueSets.medicationPrescriptionTypes.url),
+        getCodeList(getConfig().core.valueSets.encounterStatus.url)
       ])
-      setAllAdministrationRoutes(administrations)
-      setAllPrescriptionTypes(prescriptions)
-      setEncounterStatusList(encounterStatus)
+      setAllAdministrationRoutes(administrations.results)
+      setAllPrescriptionTypes(prescriptions.results)
+      setEncounterStatusList(encounterStatus.results)
     }
     fetch()
   }, [])
@@ -214,6 +220,7 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
       setPage(1)
     }
   }, [
+    code,
     searchInput,
     orderBy,
     nda,
@@ -250,6 +257,13 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
     removeSearchCriterias()
     setTriggerClean(!triggerClean)
   }, [selectedTab])
+
+  const references = useMemo(() => {
+    return getValueSetsFromSystems([
+      getConfig().features.medication.valueSets.medicationAtc.url,
+      getConfig().features.medication.valueSets.medicationUcd.url
+    ])
+  }, [])
 
   return (
     <Grid container gap="20px">
@@ -371,6 +385,7 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
             allAdministrationTypes={allAdministrationRoutes}
           />
         )}
+        <CodeFilter name={FilterKeys.CODE} value={code} references={references} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
           sourceType={SourceType.MEDICATION}
@@ -421,6 +436,7 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
             readonly={isReadonlyFilterInfoModal}
             onClose={() => setToggleFilterInfoModal(false)}
             onSubmit={({
+              code,
               filterName,
               searchInput,
               nda,
@@ -438,6 +454,7 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
                   searchInput,
                   orderBy: { orderBy: Order.PERIOD_START, orderDirection: Direction.DESC },
                   filters: {
+                    code,
                     nda,
                     ipp,
                     prescriptionTypes,
@@ -454,81 +471,79 @@ const MedicationList = ({ deidentified }: MedicationListProps) => {
             validationText="Sauvegarder"
           >
             <Grid container direction="column" gap="8px">
-              <Grid item container direction="column">
-                <TextInput
-                  name="filterName"
-                  label="Nom :"
-                  value={selectedSavedFilter?.filterName}
-                  error={savedFiltersErrors}
-                  disabled={isReadonlyFilterInfoModal}
-                  minLimit={2}
-                  maxLimit={50}
-                />
-              </Grid>
+              <TextInput
+                name="filterName"
+                label="Nom :"
+                value={selectedSavedFilter?.filterName}
+                error={savedFiltersErrors}
+                disabled={isReadonlyFilterInfoModal}
+                minLimit={2}
+                maxLimit={50}
+              />
               {!deidentified && (
-                <Grid item container direction="column" paddingBottom="8px">
-                  <TextInput
-                    name="searchInput"
-                    label="Recherche textuelle :"
-                    disabled={isReadonlyFilterInfoModal}
-                    value={selectedSavedFilter?.filterParams.searchInput}
-                  />
-                </Grid>
+                <TextInput
+                  name="searchInput"
+                  label="Recherche textuelle :"
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.searchInput}
+                />
               )}
-              <Grid item>
-                {!deidentified && (
-                  <NdaFilter
-                    disabled={isReadonlyFilterInfoModal}
-                    name={FilterKeys.NDA}
-                    value={selectedSavedFilter?.filterParams.filters.nda ?? ''}
-                  />
-                )}
-                {!deidentified && (
-                  <Grid item>
-                    <IppFilter
-                      disabled={isReadonlyFilterInfoModal}
-                      name={FilterKeys.IPP}
-                      value={selectedSavedFilter?.filterParams.filters.ipp ?? ''}
-                    />
-                  </Grid>
-                )}
-                {selectedTab.id === ResourceType.MEDICATION_REQUEST && (
-                  <PrescriptionTypesFilter
-                    value={selectedSavedFilter?.filterParams.filters.prescriptionTypes || []}
-                    name={FilterKeys.PRESCRIPTION_TYPES}
-                    allPrescriptionTypes={allPrescriptionTypes}
-                    disabled={isReadonlyFilterInfoModal}
-                  />
-                )}
-                {selectedTab.id === ResourceType.MEDICATION_ADMINISTRATION && (
-                  <AdministrationTypesFilter
-                    disabled={isReadonlyFilterInfoModal}
-                    value={selectedSavedFilter?.filterParams.filters.administrationRoutes || []}
-                    name={FilterKeys.ADMINISTRATION_ROUTES}
-                    allAdministrationTypes={allAdministrationRoutes}
-                  />
-                )}
-                <DatesRangeFilter
+              {!deidentified && (
+                <NdaFilter
                   disabled={isReadonlyFilterInfoModal}
-                  values={[
-                    selectedSavedFilter?.filterParams.filters.startDate,
-                    selectedSavedFilter?.filterParams.filters.endDate
-                  ]}
-                  names={[FilterKeys.START_DATE, FilterKeys.END_DATE]}
+                  name={FilterKeys.NDA}
+                  value={selectedSavedFilter?.filterParams.filters.nda ?? ''}
                 />
-                <ExecutiveUnitsFilter
-                  sourceType={SourceType.MEDICATION}
+              )}
+              {!deidentified && (
+                <IppFilter
                   disabled={isReadonlyFilterInfoModal}
-                  value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
-                  name={FilterKeys.EXECUTIVE_UNITS}
+                  name={FilterKeys.IPP}
+                  value={selectedSavedFilter?.filterParams.filters.ipp ?? ''}
                 />
-                <EncounterStatusFilter
+              )}
+              {selectedTab.id === ResourceType.MEDICATION_REQUEST && (
+                <PrescriptionTypesFilter
+                  value={selectedSavedFilter?.filterParams.filters.prescriptionTypes || []}
+                  name={FilterKeys.PRESCRIPTION_TYPES}
+                  allPrescriptionTypes={allPrescriptionTypes}
                   disabled={isReadonlyFilterInfoModal}
-                  value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
-                  name={FilterKeys.ENCOUNTER_STATUS}
-                  encounterStatusList={encounterStatusList}
                 />
-              </Grid>
+              )}
+              {selectedTab.id === ResourceType.MEDICATION_ADMINISTRATION && (
+                <AdministrationTypesFilter
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.filters.administrationRoutes || []}
+                  name={FilterKeys.ADMINISTRATION_ROUTES}
+                  allAdministrationTypes={allAdministrationRoutes}
+                />
+              )}
+              <CodeFilter
+                references={references}
+                disabled={isReadonlyFilterInfoModal}
+                name={FilterKeys.CODE}
+                value={selectedSavedFilter?.filterParams.filters.code ?? []}
+              />
+              <DatesRangeFilter
+                disabled={isReadonlyFilterInfoModal}
+                values={[
+                  selectedSavedFilter?.filterParams.filters.startDate,
+                  selectedSavedFilter?.filterParams.filters.endDate
+                ]}
+                names={[FilterKeys.START_DATE, FilterKeys.END_DATE]}
+              />
+              <ExecutiveUnitsFilter
+                sourceType={SourceType.MEDICATION}
+                disabled={isReadonlyFilterInfoModal}
+                value={selectedSavedFilter?.filterParams.filters.executiveUnits || []}
+                name={FilterKeys.EXECUTIVE_UNITS}
+              />
+              <EncounterStatusFilter
+                disabled={isReadonlyFilterInfoModal}
+                value={selectedSavedFilter?.filterParams.filters.encounterStatus || []}
+                name={FilterKeys.ENCOUNTER_STATUS}
+                encounterStatusList={encounterStatusList}
+              />
             </Grid>
           </Modal>
         </List>

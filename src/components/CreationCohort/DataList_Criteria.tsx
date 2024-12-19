@@ -1,12 +1,12 @@
-import { CriteriaItemType } from 'types'
+import { Back_API_Response, CriteriaItemType } from 'types'
 
 import RequestForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/RequestForm/RequestForm'
 import IPPForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/IPPForm/IPPForm'
-import DocumentsForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DocumentsForm/DocumentsForm'
+import DocumentsForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DocumentsForm'
 import EncounterForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/EncounterForm'
-import CCAMForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CCAM'
+import CCAMForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CcamForm'
 import Cim10Form from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/Cim10Form'
-import GhmForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/GHM'
+import GhmForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/GHMForm'
 import MedicationForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/MedicationForm'
 import BiologyForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/BiologyForm'
 import DemographicForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicForm'
@@ -14,10 +14,28 @@ import ImagingForm from './DiagramView/components/LogicalOperator/components/Cri
 import PregnantForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/PregnantForm'
 import HospitForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/HospitForm'
 
-import services from 'services/aphp'
-
 import { CriteriaType, CriteriaTypeLabels } from 'types/requestCriterias'
 import { getConfig } from 'config'
+import { HIERARCHY_ROOT, getChildrenFromCodes, getCodeList } from 'services/aphp/serviceValueSets'
+
+import docTypes from 'assets/docTypes.json'
+import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
+import { VitalStatusLabel } from 'types/searchCriterias'
+import { FhirItem } from 'types/valueSet'
+import { createHierarchyRoot } from 'utils/hierarchy'
+
+const async = (fetch: () => Promise<Back_API_Response<FhirItem>>) => async () => (await fetch()).results
+
+const getCodesForValueSet = async (code: string, systems: string[]) => {
+  if (code === HIERARCHY_ROOT && systems.length) return [createHierarchyRoot(systems[0])]
+  for (const system of systems) {
+    try {
+      return (await getChildrenFromCodes(system, [code])).results
+    } catch {
+      console.error("Ce n'est pas une erreur.")
+    }
+  }
+}
 
 const criteriaList: () => CriteriaItemType[] = () => {
   const ODD_QUESTIONNAIRE = getConfig().features.questionnaires.enabled
@@ -47,7 +65,21 @@ const criteriaList: () => CriteriaItemType[] = () => {
       color: '#0063AF',
       fontWeight: 'bold',
       components: DemographicForm,
-      fetch: { gender: services.cohortCreation.fetchGender, status: services.cohortCreation.fetchStatus }
+      fetch: {
+        gender: async(() => getCodeList(getConfig().core.valueSets.demographicGender.url)),
+        status: () => [
+          {
+            id: 'false',
+            label: VitalStatusLabel.ALIVE,
+            system: 'status'
+          },
+          {
+            id: 'true',
+            label: VitalStatusLabel.DECEASED,
+            system: 'status'
+          }
+        ]
+      }
     },
     {
       id: CriteriaType.ENCOUNTER,
@@ -56,17 +88,17 @@ const criteriaList: () => CriteriaItemType[] = () => {
       fontWeight: 'bold',
       components: EncounterForm,
       fetch: {
-        admissionModes: services.cohortCreation.fetchAdmissionModes,
-        entryModes: services.cohortCreation.fetchEntryModes,
-        exitModes: services.cohortCreation.fetchExitModes,
-        priseEnChargeType: services.cohortCreation.fetchPriseEnChargeType,
-        typeDeSejour: services.cohortCreation.fetchTypeDeSejour,
-        fileStatus: services.cohortCreation.fetchFileStatus,
-        reason: services.cohortCreation.fetchReason,
-        destination: services.cohortCreation.fetchDestination,
-        provenance: services.cohortCreation.fetchProvenance,
-        admission: services.cohortCreation.fetchAdmission,
-        encounterStatus: services.cohortCreation.fetchEncounterStatus
+        admissionModes: async(() => getCodeList(getConfig().core.valueSets.encounterAdmissionMode.url)),
+        entryModes: async(() => getCodeList(getConfig().core.valueSets.encounterEntryMode.url)),
+        exitModes: async(() => getCodeList(getConfig().core.valueSets.encounterExitMode.url)),
+        priseEnChargeType: async(() => getCodeList(getConfig().core.valueSets.encounterVisitType.url)),
+        typeDeSejour: async(() => getCodeList(getConfig().core.valueSets.encounterSejourType.url)),
+        fileStatus: async(() => getCodeList(getConfig().core.valueSets.encounterFileStatus.url)),
+        reason: async(() => getCodeList(getConfig().core.valueSets.encounterExitType.url)),
+        destination: async(() => getCodeList(getConfig().core.valueSets.encounterDestination.url)),
+        provenance: async(() => getCodeList(getConfig().core.valueSets.encounterProvenance.url)),
+        admission: async(() => getCodeList(getConfig().core.valueSets.encounterAdmission.url)),
+        encounterStatus: async(() => getCodeList(getConfig().core.valueSets.encounterStatus.url))
       }
     },
     {
@@ -77,8 +109,8 @@ const criteriaList: () => CriteriaItemType[] = () => {
       fontWeight: 'bold',
       components: DocumentsForm,
       fetch: {
-        docTypes: services.cohortCreation.fetchDocTypes,
-        encounterStatus: services.cohortCreation.fetchEncounterStatus
+        docTypes: () => (docTypes && docTypes.docTypes.length > 0 ? docTypes.docTypes : []),
+        encounterStatus: async(() => getCodeList(getConfig().core.valueSets.encounterStatus.url))
       }
     },
     {
@@ -95,10 +127,10 @@ const criteriaList: () => CriteriaItemType[] = () => {
           fontWeight: 'normal',
           components: Cim10Form,
           fetch: {
-            statusDiagnostic: services.cohortCreation.fetchStatusDiagnostic,
-            diagnosticTypes: services.cohortCreation.fetchDiagnosticTypes,
-            cim10Diagnostic: services.cohortCreation.fetchCim10Diagnostic,
-            encounterStatus: services.cohortCreation.fetchEncounterStatus
+            diagnosticTypes: async(() => getCodeList(getConfig().features.condition.valueSets.conditionStatus.url)),
+            cim10Diagnostic: (code: string, system: string) =>
+              getCodesForValueSet(code, [system ?? getConfig().features.condition.valueSets.conditionHierarchy.url]),
+            encounterStatus: async(() => getCodeList(getConfig().core.valueSets.encounterStatus.url))
           }
         },
         {
@@ -108,8 +140,9 @@ const criteriaList: () => CriteriaItemType[] = () => {
           fontWeight: 'normal',
           components: CCAMForm,
           fetch: {
-            ccamData: services.cohortCreation.fetchCcamData,
-            encounterStatus: services.cohortCreation.fetchEncounterStatus
+            ccamData: (code: string, system: string) =>
+              getCodesForValueSet(code, [system ?? getConfig().features.procedure.valueSets.procedureHierarchy.url]),
+            encounterStatus: async(() => getCodeList(getConfig().core.valueSets.encounterStatus.url))
           }
         },
         {
@@ -119,8 +152,9 @@ const criteriaList: () => CriteriaItemType[] = () => {
           fontWeight: 'normal',
           components: GhmForm,
           fetch: {
-            ghmData: services.cohortCreation.fetchGhmData,
-            encounterStatus: services.cohortCreation.fetchEncounterStatus
+            ghmData: (code: string, system: string) =>
+              getCodesForValueSet(code, [system ?? getConfig().features.claim.valueSets.claimHierarchy.url]),
+            encounterStatus: async(() => getCodeList(getConfig().core.valueSets.encounterStatus.url))
           }
         }
       ]
@@ -133,10 +167,22 @@ const criteriaList: () => CriteriaItemType[] = () => {
       components: MedicationForm,
       disabled: !ODD_MEDICATION,
       fetch: {
-        medicationData: services.cohortCreation.fetchMedicationData,
-        prescriptionTypes: services.cohortCreation.fetchPrescriptionTypes,
-        administrations: services.cohortCreation.fetchAdministrations,
-        encounterStatus: services.cohortCreation.fetchEncounterStatus
+        medicationData: (code: string, system: string) => {
+          const valueSets = system
+            ? [system]
+            : [
+                getConfig().features.medication.valueSets.medicationAtc.url,
+                getConfig().features.medication.valueSets.medicationUcd.url
+              ]
+          return getCodesForValueSet(code, valueSets)
+        },
+        prescriptionTypes: async(() =>
+          getCodeList(getConfig().features.medication.valueSets.medicationPrescriptionTypes.url)
+        ),
+        administrations: async(() =>
+          getCodeList(getConfig().features.medication.valueSets.medicationAdministrations.url)
+        ),
+        encounterStatus: async(() => getCodeList(getConfig().core.valueSets.encounterStatus.url))
       }
     },
     {
@@ -154,8 +200,16 @@ const criteriaList: () => CriteriaItemType[] = () => {
           components: BiologyForm,
           disabled: !ODD_BIOLOGY,
           fetch: {
-            biologyData: services.cohortCreation.fetchBiologyData,
-            encounterStatus: services.cohortCreation.fetchEncounterStatus
+            biologyData: (code: string, system: string) => {
+              const valueSets = system
+                ? [system]
+                : [
+                    getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
+                    getConfig().features.observation.valueSets.biologyHierarchyLoinc.url
+                  ]
+              return getCodesForValueSet(code, valueSets)
+            },
+            encounterStatus: async(() => getCodeList(getConfig().core.valueSets.encounterStatus.url))
           }
         },
         {
@@ -190,14 +244,22 @@ const criteriaList: () => CriteriaItemType[] = () => {
               disabled: !ODD_QUESTIONNAIRE,
               components: PregnantForm,
               fetch: {
-                pregnancyMode: services.cohortCreation.fetchPregnancyMode,
-                maternalRisks: services.cohortCreation.fetchMaternalRisks,
-                risksRelatedToObstetricHistory: services.cohortCreation.fetchRisksRelatedToObstetricHistory,
-                risksOrComplicationsOfPregnancy: services.cohortCreation.fetchRisksOrComplicationsOfPregnancy,
-                corticotherapie: services.cohortCreation.fetchCorticotherapie,
-                prenatalDiagnosis: services.cohortCreation.fetchPrenatalDiagnosis,
-                ultrasoundMonitoring: services.cohortCreation.fetchUltrasoundMonitoring,
-                encounterStatus: services.cohortCreation.fetchEncounterStatus
+                pregnancyMode: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.pregnancyMode.url)
+                ),
+                maternalRisks: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.maternalRisks.url)
+                ),
+                risksRelatedToObstetricHistory: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.risksRelatedToObstetricHistory.url)
+                ),
+                risksOrComplicationsOfPregnancy: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.risksOrComplicationsOfPregnancy.url)
+                ),
+                corticotherapie: () => booleanFieldsData,
+                prenatalDiagnosis: () => booleanFieldsData,
+                ultrasoundMonitoring: () => booleanFieldsData,
+                encounterStatus: async(() => getCodeList(getConfig().core.valueSets.encounterStatus.url))
               }
             },
             {
@@ -208,36 +270,70 @@ const criteriaList: () => CriteriaItemType[] = () => {
               disabled: !ODD_QUESTIONNAIRE,
               components: HospitForm,
               fetch: {
-                inUteroTransfer: services.cohortCreation.fetchInUteroTransfer,
-                pregnancyMonitoring: services.cohortCreation.fetchPregnancyMonitoring,
-                maturationCorticotherapie: services.cohortCreation.fetchMaturationCorticotherapie,
-                chirurgicalGesture: services.cohortCreation.fetchChirurgicalGesture,
-                vme: services.cohortCreation.fetchVme,
-                childbirth: services.cohortCreation.fetchChildbirth,
-                hospitalChildBirthPlace: services.cohortCreation.fetchHospitalChildBirthPlace,
-                otherHospitalChildBirthPlace: services.cohortCreation.fetchOtherHospitalChildBirthPlace,
-                homeChildBirthPlace: services.cohortCreation.fetchHomeChildBirthPlace,
-                childbirthMode: services.cohortCreation.fetchChildbirthMode,
-                maturationReason: services.cohortCreation.fetchMaturationReason,
-                maturationModality: services.cohortCreation.fetchMaturationModality,
-                imgIndication: services.cohortCreation.fetchImgIndication,
-                laborOrCesareanEntry: services.cohortCreation.fetchLaborOrCesareanEntry,
-                pathologyDuringLabor: services.cohortCreation.fetchPathologyDuringLabor,
-                obstetricalGestureDuringLabor: services.cohortCreation.fetchObstetricalGestureDuringLabor,
-                analgesieType: services.cohortCreation.fetchAnalgesieType,
-                birthDeliveryWay: services.cohortCreation.fetchBirthDeliveryWay,
-                instrumentType: services.cohortCreation.fetchInstrumentType,
-                cSectionModality: services.cohortCreation.fetchCSectionModality,
-                presentationAtDelivery: services.cohortCreation.fetchPresentationAtDelivery,
-                birthStatus: services.cohortCreation.fetchBirthStatus,
-                postpartumHemorrhage: services.cohortCreation.fetchSetPostpartumHemorrhage,
-                conditionPerineum: services.cohortCreation.fetchConditionPerineum,
-                exitPlaceType: services.cohortCreation.fetchExitPlaceType,
-                feedingType: services.cohortCreation.fetchFeedingType,
-                complication: services.cohortCreation.fetchComplication,
-                exitFeedingMode: services.cohortCreation.fetchExitFeedingMode,
-                exitDiagnostic: services.cohortCreation.fetchExitDiagnostic,
-                encounterStatus: services.cohortCreation.fetchEncounterStatus
+                inUteroTransfer: () => booleanOpenChoiceFieldsData,
+                pregnancyMonitoring: () => booleanFieldsData,
+                maturationCorticotherapie: () => booleanOpenChoiceFieldsData,
+                chirurgicalGesture: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.chirurgicalGesture.url)
+                ),
+                vme: () => vmeData,
+                childbirth: () => booleanOpenChoiceFieldsData,
+                hospitalChildBirthPlace: () => booleanFieldsData,
+                otherHospitalChildBirthPlace: () => booleanFieldsData,
+                homeChildBirthPlace: () => booleanFieldsData,
+                childbirthMode: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.childBirthMode.url)
+                ),
+                maturationReason: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.maturationReason.url)
+                ),
+                maturationModality: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.maturationModality.url)
+                ),
+                imgIndication: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.imgIndication.url)
+                ),
+                laborOrCesareanEntry: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.laborOrCesareanEntry.url)
+                ),
+                pathologyDuringLabor: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.pathologyDuringLabor.url)
+                ),
+                obstetricalGestureDuringLabor: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.obstetricalGestureDuringLabor.url)
+                ),
+                analgesieType: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.analgesieType.url)
+                ),
+                birthDeliveryWay: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.birthDeliveryWay.url)
+                ),
+                instrumentType: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.instrumentType.url)
+                ),
+                cSectionModality: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.cSectionModality.url)
+                ),
+                presentationAtDelivery: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.presentationAtDelivery.url)
+                ),
+                birthStatus: () => birthStatusData,
+                postpartumHemorrhage: () => booleanOpenChoiceFieldsData,
+                conditionPerineum: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.conditionPerineum.url)
+                ),
+                exitPlaceType: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.exitPlaceType.url)
+                ),
+                feedingType: async(() => getCodeList(getConfig().features.questionnaires.valueSets.feedingType.url)),
+                complication: () => booleanFieldsData,
+                exitFeedingMode: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.exitFeedingMode.url)
+                ),
+                exitDiagnostic: async(() =>
+                  getCodeList(getConfig().features.questionnaires.valueSets.exitDiagnostic.url)
+                ),
+                encounterStatus: async(() => getCodeList(getConfig().core.valueSets.encounterStatus.url))
               }
             }
           ]
@@ -252,8 +348,8 @@ const criteriaList: () => CriteriaItemType[] = () => {
       components: ImagingForm,
       disabled: !ODD_IMAGING,
       fetch: {
-        modalities: services.cohortCreation.fetchModalities,
-        encounterStatus: services.cohortCreation.fetchEncounterStatus
+        modalities: async(() => getCodeList(getConfig().features.imaging.valueSets.imagingModalities.url, true)),
+        encounterStatus: async(() => getCodeList(getConfig().core.valueSets.encounterStatus.url))
       }
     },
     {

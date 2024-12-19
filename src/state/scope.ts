@@ -1,29 +1,34 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
 import { impersonate, login, logout } from './me'
 import { ScopeElement } from 'types'
-import { Hierarchy } from 'types/hierarchy'
+import { CodesCache, Hierarchy } from 'types/hierarchy'
+import { RootState } from 'state'
+import { mapCacheToCodes } from 'utils/hierarchy'
 
 export type ScopeState = {
-  rights: Hierarchy<ScopeElement, string>[]
+  rights: Hierarchy<ScopeElement>[]
   codes: {
-    rights: Hierarchy<ScopeElement, string>[]
-    perimeters: Hierarchy<ScopeElement, string>[]
+    rights: ReturnType<typeof fetchedRightsAdapter.getInitialState>
+    perimeters: ReturnType<typeof fetchedPerimetersAdapter.getInitialState>
   }
   openPopulation: number[]
 }
 
+const fetchedRightsAdapter = createEntityAdapter<CodesCache<ScopeElement>>()
+const fetchedPerimetersAdapter = createEntityAdapter<CodesCache<ScopeElement>>()
+
 const defaultInitialState: ScopeState = {
   rights: [],
   codes: {
-    rights: [],
-    perimeters: []
+    rights: fetchedRightsAdapter.getInitialState(),
+    perimeters: fetchedPerimetersAdapter.getInitialState()
   },
   openPopulation: []
 }
 
 const scopeSlice = createSlice({
   name: 'scope',
-  initialState: defaultInitialState as ScopeState,
+  initialState: defaultInitialState,
   reducers: {
     closeAllOpenedPopulation: (state) => {
       return {
@@ -37,17 +42,10 @@ const scopeSlice = createSlice({
         rights: action.payload.rights || []
       }
     },
-    saveFetchedRights: (state, action) => {
-      return {
-        ...state,
-        codes: { ...state.codes, rights: action.payload || [] }
-      }
-    },
-    saveFetchedPerimeters: (state, action) => {
-      return {
-        ...state,
-        codes: { ...state.codes, perimeters: action.payload || [] }
-      }
+    saveScopeCodes: (state, action) => {
+      action.payload.isRights
+        ? fetchedRightsAdapter.setOne(state.codes.rights, action.payload.values)
+        : fetchedPerimetersAdapter.setOne(state.codes.perimeters, action.payload.values)
     }
   },
   extraReducers: (builder) => {
@@ -57,5 +55,19 @@ const scopeSlice = createSlice({
   }
 })
 
+const selectPerimeterCodes = fetchedPerimetersAdapter.getSelectors((state: RootState) => state.scope.codes.perimeters)
+const selectRightsCodes = fetchedRightsAdapter.getSelectors((state: RootState) => state.scope.codes.rights)
+
+const selectByAccess = createSelector(
+  [
+    selectPerimeterCodes.selectAll,
+    selectRightsCodes.selectAll,
+    (state: RootState, isRights: boolean) => ({ isRights })
+  ],
+  (perimeterCodes, rightsCodes, { isRights }) => (isRights ? rightsCodes : perimeterCodes)
+)
+
+export const selectScopeCodes = createSelector([selectByAccess], (codes) => mapCacheToCodes(codes))
+
 export default scopeSlice.reducer
-export const { closeAllOpenedPopulation, saveRights, saveFetchedRights, saveFetchedPerimeters } = scopeSlice.actions
+export const { closeAllOpenedPopulation, saveRights, saveScopeCodes } = scopeSlice.actions

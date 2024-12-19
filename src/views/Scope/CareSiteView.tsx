@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Grid } from '@mui/material'
+import { Button, Grid, Typography } from '@mui/material'
 import useStyles from './styles'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from 'state'
 import { closeAllOpenedPopulation } from 'state/scope'
 import { ScopeElement } from 'types'
-import Typography from '@mui/material/Typography'
 import ScopeTree from 'components/ScopeTree'
 import { Hierarchy } from 'types/hierarchy'
 import { SourceType } from 'types/scope'
@@ -15,7 +14,7 @@ const CareSiteView = () => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const population = useAppSelector((state) => state.scope.rights)
-  const [selectedCodes, setSelectedCodes] = useState<Hierarchy<ScopeElement, string>[]>([])
+  const [selectedCodes, setSelectedCodes] = useState<Hierarchy<ScopeElement>[]>([])
   const open = useAppSelector((state) => state.drawer)
 
   const handleNavigation = () => {
@@ -31,34 +30,28 @@ const CareSiteView = () => {
   return (
     <Grid
       container
-      direction="column"
       className={cx(classes.appBar, {
         [classes.appBarShift]: open
       })}
-      style={{ height: '100%' }}
+      justifyContent={'center'}
     >
-      <Grid container justifyContent="center" alignItems="center">
-        <Grid container item xs={11} direction="column">
-          <Typography variant="h1" color="primary" className={classes.title}>
-            Explorer un périmètre
-          </Typography>
-          <ScopeTree
-            selectedNodes={[]}
-            baseTree={population}
-            onSelect={(items) => setSelectedCodes(items)}
-            sourceType={SourceType.ALL}
-          />
-        </Grid>
+      <Grid container xs={11} alignItems="center" height={'calc(100vh - 175px)'}>
+        <Typography variant="h1" color="primary" className={classes.title}>
+          Explorer un périmètre
+        </Typography>
+        <ScopeTree
+          selectedNodes={[]}
+          baseTree={population}
+          onSelect={(items) => setSelectedCodes(items)}
+          sourceType={SourceType.ALL}
+          sx={{ backgroundColor: '#E6F1FD' }}
+        />
         <Grid
           container
-          item
-          xs={11}
           justifyContent="center"
-          className={cx(classes.bottomBar, {
-            [classes.bottomBarShift]: open
-          })}
+          style={{ position: 'fixed', bottom: 0, right: 0, backgroundColor: '#E6F1FD' }}
         >
-          <Grid container item justifyContent="flex-end" className={classes.buttons}>
+          <Grid container justifyContent={'flex-end'} xs={11}>
             <Button
               variant="contained"
               disableElevation

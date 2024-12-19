@@ -85,8 +85,9 @@ import { pregnancyForm } from 'data/pregnancyData'
 import { hospitForm } from 'data/hospitData'
 import { editAllCriteria, editAllCriteriaGroup, pseudonimizeCriteria, buildCohortCreation } from 'state/cohortCreation'
 import { AppDispatch } from 'state'
-import { Hierarchy } from 'types/hierarchy'
 import { getConfig } from 'config'
+import { Hierarchy } from 'types/hierarchy'
+import { FhirItem } from 'types/valueSet'
 
 const REQUETEUR_VERSION = 'v1.6.0'
 
@@ -261,7 +262,7 @@ export const cleanNominativeCriterias = (
   dispatch(editAllCriteria(cleanedSelectedCriteria))
   dispatch(pseudonimizeCriteria())
   if (selectedPopulation != undefined && selectedPopulation.length > 0) {
-    dispatch(buildCohortCreation({ selectedPopulation: selectedPopulation }))
+    dispatch(buildCohortCreation({ selectedPopulation: selectedPopulation as Hierarchy<ScopeElement>[] }))
   } else {
     dispatch(buildCohortCreation({ selectedPopulation: null }))
   }
@@ -371,10 +372,7 @@ export const buildDocumentFilter = (criterion: DocumentDataType): string[] => {
 export const buildConditionFilter = (criterion: Cim10DataType): string[] => {
   return [
     'subject.active=true',
-    filtersBuilders(
-      ConditionParamsKeys.CODE,
-      buildLabelObjectFilter(criterion.code, getConfig().features.condition.valueSets.conditionHierarchy.url)
-    ),
+    filtersBuilders(ConditionParamsKeys.CODE, buildLabelObjectFilter(criterion.code, true)),
     filtersBuilders(ConditionParamsKeys.DIAGNOSTIC_TYPES, buildLabelObjectFilter(criterion.diagnosticType)),
     criterion.source ? buildSimpleFilter(criterion.source, ProcedureParamsKeys.SOURCE) : '',
     filtersBuilders(ConditionParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
@@ -394,10 +392,7 @@ export const buildConditionFilter = (criterion: Cim10DataType): string[] => {
 export const buildProcedureFilter = (criterion: CcamDataType): string[] => {
   return [
     'subject.active=true',
-    filtersBuilders(
-      ProcedureParamsKeys.CODE,
-      buildLabelObjectFilter(criterion.code, getConfig().features.procedure.valueSets.procedureHierarchy.url)
-    ),
+    filtersBuilders(ProcedureParamsKeys.CODE, buildLabelObjectFilter(criterion.code, true)),
     filtersBuilders(ProcedureParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
     filtersBuilders(ProcedureParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
     filtersBuilders(ProcedureParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
@@ -416,10 +411,7 @@ export const buildProcedureFilter = (criterion: CcamDataType): string[] => {
 export const buildClaimFilter = (criterion: GhmDataType): string[] => {
   return [
     'patient.active=true',
-    filtersBuilders(
-      ClaimParamsKeys.CODE,
-      buildLabelObjectFilter(criterion.code, getConfig().features.claim.valueSets.claimHierarchy.url)
-    ),
+    filtersBuilders(ClaimParamsKeys.CODE, buildLabelObjectFilter(criterion.code, true)),
     filtersBuilders(ClaimParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
     filtersBuilders(ClaimParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
     filtersBuilders(ClaimParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
@@ -449,10 +441,7 @@ export const buildMedicationFilter = (criterion: MedicationDataType): string[] =
         : AdministrationParamsKeys.EXECUTIVE_UNITS,
       buildEncounterServiceFilter(criterion.encounterService)
     ),
-    filtersBuilders(
-      PrescriptionParamsKeys.CODE,
-      buildLabelObjectFilter(criterion.code, getConfig().features.medication.valueSets.medicationAtc.url, true)
-    ),
+    filtersBuilders(PrescriptionParamsKeys.CODE, buildLabelObjectFilter(criterion.code, true)),
     filtersBuilders(
       criterion.type === CriteriaType.MEDICATION_REQUEST
         ? PrescriptionParamsKeys.ENCOUNTER_STATUS
@@ -485,10 +474,7 @@ export const buildMedicationFilter = (criterion: MedicationDataType): string[] =
 export const buildObservationFilter = (criterion: ObservationDataType): string[] => {
   return [
     `subject.active=true&${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`,
-    filtersBuilders(
-      ObservationParamsKeys.ANABIO_LOINC,
-      buildLabelObjectFilter(criterion.code, getConfig().features.observation.valueSets.biologyHierarchyAnabio.url)
-    ),
+    filtersBuilders(ObservationParamsKeys.CODE, buildLabelObjectFilter(criterion.code, true)),
     filtersBuilders(ObservationParamsKeys.EXECUTIVE_UNITS, buildEncounterServiceFilter(criterion.encounterService)),
     filtersBuilders(ObservationParamsKeys.ENCOUNTER_STATUS, buildLabelObjectFilter(criterion.encounterStatus)),
     filtersBuilders(ObservationParamsKeys.DATE, buildDateFilter(criterion.startOccurrence[0], 'ge')),
@@ -774,7 +760,7 @@ const mapCriteriaToResource = (criteriaType: CriteriaType): ResourceType => {
 }
 
 export function buildRequest(
-  selectedPopulation: (Hierarchy<ScopeElement, string> | undefined)[] | null,
+  selectedPopulation: (Hierarchy<ScopeElement> | undefined)[] | null,
   selectedCriteria: SelectedCriteriaType[],
   criteriaGroup: CriteriaGroup[],
   temporalConstraints: TemporalConstraintsType[]
@@ -1174,7 +1160,6 @@ const unbuildProcedureCriteria = async (element: RequeteurCriteriaType): Promise
     startOccurrence: [null, null],
     source: null,
     label: undefined,
-    hierarchy: undefined,
     encounterService: [],
     occurrenceComparator: null,
     encounterStatus: [],
@@ -1277,10 +1262,7 @@ const unbuildMedicationCriteria = async (element: RequeteurCriteriaType): Promis
   }
 
   return await unbuildCriteria(element, currentCriterion, {
-    [PrescriptionParamsKeys.CODE]: (c, v) => {
-      const codeIds = v?.replace(/https:\/\/.*?\|/g, '')
-      unbuildLabelObjectFilter(c, 'code', codeIds)
-    },
+    [PrescriptionParamsKeys.CODE]: (c, v) => unbuildLabelObjectFilter(c, 'code', v),
     [PrescriptionParamsKeys.PRESCRIPTION_TYPES]: (c, v) => unbuildLabelObjectFilter(c, 'prescriptionType', v),
     [PrescriptionParamsKeys.PRESCRIPTION_ROUTES || AdministrationParamsKeys.ADMINISTRATION_ROUTES]: (c, v) =>
       unbuildLabelObjectFilter(c, 'administration', v),
@@ -1329,7 +1311,6 @@ const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promi
     type: CriteriaType.OBSERVATION,
     title: element.name ?? 'Critère de biologie',
     code: [],
-    isLeaf: false,
     occurrence: null,
     startOccurrence: [null, null],
     encounterService: [],
@@ -1341,21 +1322,8 @@ const unbuildObservationCriteria = async (element: RequeteurCriteriaType): Promi
   }
 
   return await unbuildCriteria(element, currentCriterion, {
-    [ObservationParamsKeys.ANABIO_LOINC]: async (c, v) => {
+    [ObservationParamsKeys.CODE]: async (c, v) => {
       unbuildLabelObjectFilter(c, 'code', v)
-
-      // TODO: pas propre vvvv
-      if (currentCriterion.code && currentCriterion.code.length === 1) {
-        try {
-          const checkChildrenResp = await services.cohortCreation.fetchBiologyHierarchy(currentCriterion.code?.[0].id)
-
-          if (checkChildrenResp.length === 0) {
-            currentCriterion.isLeaf = true
-          }
-        } catch (error) {
-          console.error('Erreur lors du check des enfants du code de biologie sélectionné', error)
-        }
-      }
     },
     [ObservationParamsKeys.EXECUTIVE_UNITS]: async (c, v) =>
       await unbuildEncounterServiceCriterias(c, 'encounterService', v),
@@ -2111,7 +2079,6 @@ export const getDataFromFetch = async (
                   (criterion.type === CriteriaType.MEDICATION_REQUEST ||
                     criterion.type === CriteriaType.MEDICATION_ADMINISTRATION))
             )
-
             if (currentSelectedCriteria) {
               for (const currentcriterion of currentSelectedCriteria) {
                 if (
@@ -2129,10 +2096,12 @@ export const getDataFromFetch = async (
                   currentcriterion.code.length > 0
                 ) {
                   for (const code of currentcriterion.code) {
-                    const prevData = prevDataCache[dataKey]?.find((data: any) => data.id === code?.id)
-                    const codeData = prevData ? [prevData] : await _criterion.fetch[dataKey]?.(code?.id, true)
+                    const prevData = prevDataCache[dataKey]?.find(
+                      (data: any) => data.id === code?.id && data.system === code?.system
+                    )
+                    const codeData = prevData ? [prevData] : await _criterion.fetch[dataKey]?.(code?.id, code?.system)
                     const existingCodes = criteriaDataCache.data[dataKey] || []
-                    criteriaDataCache.data[dataKey] = [...existingCodes, ...(codeData || [])]
+                    criteriaDataCache.data[dataKey] = [...existingCodes, ...((codeData as Hierarchy<FhirItem>[]) || [])]
                   }
                 }
               }
@@ -2223,45 +2192,4 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
     criteria,
     criteriaGroup
   }
-}
-
-export const findSelectedInListAndSubItems = (
-  selectedItems: Hierarchy<any, any>[],
-  searchedItem: Hierarchy<any, any> | undefined,
-  pmsiHierarchy: Hierarchy<any, any>[],
-  valueSetSystem?: string
-): boolean => {
-  if (!searchedItem || !selectedItems || selectedItems.length === 0) return false
-  selectedItems = selectedItems.filter(({ id }) => id !== 'loading')
-  const foundItem = selectedItems.find((selectedItem) => {
-    if (selectedItem.id === searchedItem.id || (selectedItem.id == '*' && valueSetSystem !== 'UCD')) {
-      return true
-    }
-    return selectedItem.subItems
-      ? findSelectedInListAndSubItems(selectedItem.subItems, searchedItem, pmsiHierarchy)
-      : false
-  })
-  if (foundItem) {
-    return true
-  }
-  if (
-    searchedItem.subItems &&
-    searchedItem.subItems.length > 0 &&
-    !(searchedItem.subItems.length === 1 && searchedItem.subItems[0].id === 'loading')
-  ) {
-    const numberOfSubItemsSelected = searchedItem.subItems?.filter((searchedSubItem: any) =>
-      selectedItems.find((selectedItem) => selectedItem.id === searchedSubItem.id)
-    )?.length
-    if (searchedItem.subItems?.length === numberOfSubItemsSelected) {
-      return true
-    }
-    const isSingleItemNotSelected = (searchedItem.subItems?.length ?? 0 - (numberOfSubItemsSelected ?? 0)) === 1
-    if (isSingleItemNotSelected) {
-      const singleItemNotSelected = searchedItem.subItems?.find((searchedSubItem: any) =>
-        selectedItems.find((selectedItem) => selectedItem.id !== searchedSubItem.id)
-      )
-      return findSelectedInListAndSubItems(selectedItems, singleItemNotSelected, pmsiHierarchy)
-    }
-  }
-  return false
 }

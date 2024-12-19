@@ -1,4 +1,5 @@
 import { Comparators, CriteriaType, DocumentDataType } from 'types/requestCriterias'
+import { System } from 'types/scope'
 import { SearchByTypes } from 'types/searchCriterias'
 
 export const defaultDocumentCriteria: DocumentDataType = {
@@ -42,6 +43,7 @@ export const completeDocumentCriteria: DocumentDataType = {
   searchBy: SearchByTypes.TEXT,
   encounterService: [
     {
+      label: 'GH RCP',
       above_levels_ids: '8312002244',
       cohort_id: '6935',
       cohort_size: '23',
@@ -53,7 +55,8 @@ export const completeDocumentCriteria: DocumentDataType = {
       source_value: 'H01',
       status: undefined,
       subItems: undefined,
-      type: 'Groupe hospitalier (GH)'
+      type: 'Groupe hospitalier (GH)',
+      system: System.ScopeTree
     }
   ]
 }

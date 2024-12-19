@@ -100,7 +100,7 @@ const ControlPanel: React.FC<{
     count_outdated,
     snapshotsHistory
   } = useAppSelector((state) => state.cohortCreation.request || {})
-  const { uuid, includePatient, status, jobFailMsg } = count
+  const { includePatient, status, jobFailMsg } = count
   const [requestShare, setRequestShare] = useState<RequestType | null>({
     currentSnapshot,
     requestId,

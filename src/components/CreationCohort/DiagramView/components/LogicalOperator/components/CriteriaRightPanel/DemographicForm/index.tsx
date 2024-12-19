@@ -24,27 +24,13 @@ import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { CriteriaDataKey, DemographicDataType, CriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
-import { CriteriaDrawerComponentProps, CriteriaItemDataCache } from 'types'
+import { CriteriaDrawerComponentProps } from 'types'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
+import { mappingCriteria } from 'utils/mappers'
 
 enum Error {
   INCOHERENT_AGE_ERROR,
   NO_ERROR
-}
-
-export const mappingCriteria = (
-  criteriaToMap: LabelObject[] | null,
-  key: CriteriaDataKey,
-  mapping: CriteriaItemDataCache
-) => {
-  if (criteriaToMap) {
-    return criteriaToMap.map((criteria) => {
-      const mappedCriteria = mapping.data?.[key]?.find((c: LabelObject) => c?.id === criteria?.id)
-      return mappedCriteria
-    })
-  } else {
-    return []
-  }
 }
 
 const DemographicForm = (props: CriteriaDrawerComponentProps) => {

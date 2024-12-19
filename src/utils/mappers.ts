@@ -1,4 +1,4 @@
-import { ScopeElement, SimpleCodeType } from 'types'
+import { CriteriaItemDataCache, ScopeElement, SimpleCodeType } from 'types'
 import {
   DocumentAttachmentMethod,
   DurationRangeType,
@@ -24,12 +24,23 @@ import {
   SelectedCriteriaTypesWithAdvancedInputs,
   EncounterDataType,
   EncounterParamsKeys,
-  ObservationParamsKeys
+  ObservationParamsKeys,
+  CriteriaDataKey
 } from 'types/requestCriterias'
 import { comparatorToFilter, parseOccurence } from './valueComparator'
 import services from 'services/aphp'
 import extractFilterParams, { FhirFilterValue } from './fhirFilterParser'
-import { Hierarchy } from 'types/hierarchy'
+import { Condition } from 'fhir/r4'
+
+export const getLastDiagnosisLabels = (mainDiagnosisList: Condition[]) => {
+  const mainDiagnosisLabels = mainDiagnosisList.map((diagnosis) => diagnosis.code?.coding?.[0].display)
+  const lastThreeDiagnosisLabels = mainDiagnosisLabels
+    .filter((diagnosis, index) => mainDiagnosisLabels.indexOf(diagnosis) === index)
+    .slice(0, 3)
+    .join(' - ')
+
+  return lastThreeDiagnosisLabels
+}
 
 const searchReducer = (accumulator: string, currentValue: string): string =>
   accumulator || !!accumulator === false ? `${accumulator},${currentValue}` : currentValue || accumulator
@@ -39,18 +50,10 @@ const replaceTime = (date?: string) => {
   return date?.replace('T00:00:00Z', '') ?? null
 }
 
-export const buildLabelObjectFilter = (
-  criterion: LabelObject[] | undefined | null,
-  hierarchyUrl?: string,
-  system?: boolean
-) => {
+export const buildLabelObjectFilter = (criterion: LabelObject[] | undefined | null, system?: boolean) => {
   if (criterion && criterion.length > 0) {
     let filter = ''
-    criterion.find((code) => code.id === '*')
-      ? (filter = `${hierarchyUrl}|*`)
-      : (filter = `${criterion
-          .map((item) => (system && item.system ? `${item.system}|${item.id}` : item.id))
-          .reduce(searchReducer)}`)
+    filter = `${criterion.map((item) => (system && item.system ? `${item.system}|${item.id}` : item.id)).join(',')}`
     return filter
   }
   return ''
@@ -58,13 +61,15 @@ export const buildLabelObjectFilter = (
 
 export const unbuildLabelObjectFilter = (currentCriterion: any, filterName: string, values?: string | null) => {
   const valuesIds = values?.split(',') || []
-  const newArray = valuesIds?.map((value) => (value.includes('|*') ? { id: '*' } : { id: value }))
+  const newArray = valuesIds?.map((value) =>
+    value.includes('|') ? { system: value.split('|')?.[0], id: value.split('|')?.[1] } : { id: value }
+  )
   if (newArray) {
     currentCriterion[filterName] = currentCriterion ? [...currentCriterion[filterName], ...newArray] : newArray
   }
 }
 
-export const buildEncounterServiceFilter = (criterion?: Hierarchy<ScopeElement, string>[]) => {
+export const buildEncounterServiceFilter = (criterion?: LabelObject[]) => {
   return criterion && criterion.length > 0 ? `${criterion.map((item) => item.id).reduce(searchReducer)}` : ''
 }
 
@@ -123,8 +128,8 @@ export const unbuildSearchFilter = (value: string | null) => {
 
 export const buildObservationValueFilter = (criterion: ObservationDataType, fhirKey: string) => {
   const valueComparatorFilter = comparatorToFilter(criterion.valueComparator)
+  const filter = `${fhirKey}=le0,ge0`
   if (
-    criterion.isLeaf &&
     criterion.code &&
     criterion.code.length === 1 &&
     criterion.valueComparator &&
@@ -136,7 +141,7 @@ export const buildObservationValueFilter = (criterion: ObservationDataType, fhir
       return `${fhirKey}=${valueComparatorFilter}${criterion.searchByValue[0]}`
     }
   }
-  return `${fhirKey}=le0,ge0`
+  return filter
 }
 
 export const unbuildObservationValueFilter = (filters: string[][], currentCriterion: ObservationDataType) => {
@@ -381,4 +386,37 @@ export const unbuildQuestionnaireFilters = (
 
 export const filtersBuilders = (fhirKey: string, value?: string) => {
   return value ? `${fhirKey}=${value}` : ''
+}
+
+export const mappingCriteria = (
+  criteriaToMap: LabelObject[] | null,
+  key: CriteriaDataKey,
+  mapping: CriteriaItemDataCache
+) => {
+  if (criteriaToMap) {
+    return criteriaToMap.map((criteria) => {
+      const mappedCriteria = mapping.data?.[key]?.find((c: LabelObject) => c?.id === criteria?.id)
+      return mappedCriteria
+    })
+  } else {
+    return []
+  }
+}
+
+export const mappingHierarchyCriteria = (
+  criteriaToMap: LabelObject[] | null,
+  key: CriteriaDataKey,
+  mapping: CriteriaItemDataCache
+) => {
+  if (criteriaToMap) {
+    return criteriaToMap.map((criteria) => {
+      const mappedCriteria = mapping.data?.[key]?.find((c: LabelObject) => {
+        if (criteria.system) return c?.id === criteria?.id && c?.system === criteria?.system
+        else return c?.id === criteria?.id
+      })
+      return mappedCriteria
+    })
+  } else {
+    return []
+  }
 }

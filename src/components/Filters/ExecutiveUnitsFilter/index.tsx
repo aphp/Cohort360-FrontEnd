@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { ScopeElement } from 'types'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
-import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnit'
+import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnits'
 import { Typography } from '@mui/material'
 
 type ExecutiveUnitsFilterProps = {
@@ -19,7 +19,7 @@ const ExecutiveUnitsFilter = ({ name, value, sourceType, disabled = false }: Exe
 
   useEffect(() => {
     context?.updateFormData(name, population)
-  }, [population, context, name])
+  }, [population, name])
 
   return (
     <ExecutiveUnitsInput
@@ -29,7 +29,7 @@ const ExecutiveUnitsFilter = ({ name, value, sourceType, disabled = false }: Exe
       onChange={(selectedPopulation) => setPopulation(selectedPopulation)}
       label={
         <Typography variant="h3" alignSelf="center">
-          Unité exécutrice :
+          Unité exécutrice
         </Typography>
       }
     />

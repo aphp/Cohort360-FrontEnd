@@ -77,7 +77,7 @@ import { getResourceInfos } from 'utils/fillElement'
 import { substructAgeString } from 'utils/age'
 import { getExtension } from 'utils/fhir'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
-import { mapToOrderByCode, mapToUrlCode } from 'mappers/pmsi'
+import { mapToOrderByCode } from 'mappers/pmsi'
 import { mapMedicationToOrderByCode } from 'mappers/medication'
 import { linkToDiagnosticReport } from './serviceImaging'
 
@@ -528,7 +528,7 @@ const servicesCohorts: IServiceCohorts = {
     const filtersMapper = {
       [ResourceType.CONDITION]: () => ({
         ...commonFilters(),
-        code: code.map((e) => encodeURIComponent(`${mapToUrlCode(selectedTab)}|`) + e.id).join(','),
+        code: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(','),
         source: source,
         type: diagnosticTypes?.map((type) => type.id),
         'min-recorded-date': startDate ?? '',
@@ -537,7 +537,7 @@ const servicesCohorts: IServiceCohorts = {
       }),
       [ResourceType.PROCEDURE]: () => ({
         ...commonFilters(),
-        code: code.map((e) => encodeURIComponent(`${mapToUrlCode(selectedTab)}|`) + e.id).join(','),
+        code: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(','),
         source: source,
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
@@ -545,7 +545,7 @@ const servicesCohorts: IServiceCohorts = {
       }),
       [ResourceType.CLAIM]: () => ({
         ...commonFilters(),
-        diagnosis: code.map((e) => encodeURIComponent(`${mapToUrlCode(selectedTab)}|`) + e.id).join(','),
+        diagnosis: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(','),
         minCreated: startDate ?? '',
         maxCreated: endDate ?? '',
         uniqueFacet: ['patient']
@@ -614,6 +614,7 @@ const servicesCohorts: IServiceCohorts = {
         orderBy,
         searchInput,
         filters: {
+          code,
           nda,
           ipp,
           startDate,
@@ -644,6 +645,7 @@ const servicesCohorts: IServiceCohorts = {
       encounterStatus: encounterStatus.map(({ id }) => id),
       minDate: startDate ?? '',
       maxDate: endDate ?? '',
+      code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
       uniqueFacet: ['subject']
     })
 
@@ -670,7 +672,8 @@ const servicesCohorts: IServiceCohorts = {
       executiveUnits.length > 0 ||
       encounterStatus.length > 0 ||
       (administrationRoutes && administrationRoutes.length > 0) ||
-      (prescriptionTypes && prescriptionTypes.length > 0)
+      (prescriptionTypes && prescriptionTypes.length > 0) ||
+      code.length
 
     const [medicationList, allMedicationList] = await Promise.all([
       fetcher(filters),
@@ -723,7 +726,7 @@ const servicesCohorts: IServiceCohorts = {
       searchCriterias: {
         orderBy,
         searchInput,
-        filters: { validatedStatus, nda, ipp, loinc, anabio, startDate, endDate, executiveUnits, encounterStatus }
+        filters: { validatedStatus, nda, ipp, code, startDate, endDate, executiveUnits, encounterStatus }
       }
     } = options
     const atLeastAFilter =
@@ -734,8 +737,7 @@ const servicesCohorts: IServiceCohorts = {
       !!endDate ||
       executiveUnits.length > 0 ||
       encounterStatus.length > 0 ||
-      (loinc && loinc.length > 0) ||
-      (anabio && anabio.length > 0)
+      code.length
 
     const [biologyList, allBiologyList] = await Promise.all([
       fetchObservation({
@@ -753,8 +755,7 @@ const servicesCohorts: IServiceCohorts = {
         uniqueFacet: ['subject'],
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
-        loinc: loinc.map((code) => code.id).join(),
-        anabio: anabio.map((code) => code.id).join(),
+        code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
         rowStatus: validatedStatus
       }),
       atLeastAFilter

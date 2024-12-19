@@ -4,7 +4,7 @@ import Button from 'components/ui/Button'
 import { DeleteOutline, Edit, Visibility } from '@mui/icons-material'
 import { Checkbox, FormControlLabel, Grid, Typography } from '@mui/material'
 import { Item } from 'components/ui/List/ListItem'
-import ListItems from 'components/ui/List/ListItems'
+import ListItems from './ListItems'
 
 type id = string
 
