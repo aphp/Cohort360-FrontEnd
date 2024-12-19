@@ -1,6 +1,7 @@
 import { ScopeElement, SimpleCodeType } from 'types'
 import { Hierarchy } from './hierarchy'
 import { DocumentAttachmentMethod, DurationRangeType, LabelObject, SearchByTypes } from './searchCriterias'
+import { FhirItem } from './valueSet'
 
 export enum QuestionnaireResponseParamsKeys {
   NAME = 'questionnaire.name',
@@ -124,19 +125,20 @@ export enum AdministrationParamsKeys {
   IPP = 'subject.identifier',
   ADMINISTRATION_ROUTES = 'dosage-route',
   DATE = 'effective-time',
+  CODE = 'code',
   EXECUTIVE_UNITS = 'context.encounter-care-site',
   ENCOUNTER_STATUS = 'context.status'
 }
 
 export enum ObservationParamsKeys {
   NDA = 'encounter.identifier',
-  ANABIO_LOINC = 'code',
   VALIDATED_STATUS = 'status',
   DATE = 'date',
   VALUE = 'value-quantity',
   EXECUTIVE_UNITS = 'encounter.encounter-care-site',
   ENCOUNTER_STATUS = 'encounter.status',
-  IPP = 'subject.identifier'
+  IPP = 'subject.identifier',
+  CODE = 'code'
 }
 
 export enum ImagingParamsKeys {
@@ -221,7 +223,7 @@ export type CommonCriteriaDataType = {
   id: number
   error?: boolean
   type: CriteriaType
-  encounterService?: Hierarchy<ScopeElement, string>[]
+  encounterService?: Hierarchy<ScopeElement>[]
   isInclusive?: boolean
   title: string
 }
@@ -288,7 +290,6 @@ export enum CriteriaDataKey {
   BIOLOGY_DATA = 'biologyData',
   MODALITIES = 'modalities',
   DOC_TYPES = 'docTypes',
-  STATUS_DIAGNOSTIC = 'statusDiagnostic',
   PREGNANCY_MODE = 'pregnancyMode',
   MATERNAL_RISKS = 'maternalRisks',
   RISKS_RELATED_TO_OBSTETRIC_HISTORY = 'risksRelatedToObstetricHistory',
@@ -334,8 +335,7 @@ export type CcamDataType = CommonCriteriaDataType &
   WithEncounterDateDataType &
   WithEncounterStatusDataType & {
     type: CriteriaType.PROCEDURE
-    hierarchy: undefined
-    code: LabelObject[] | null
+    code: Hierarchy<FhirItem>[]
     source: string | null
     label: undefined
   }
@@ -345,7 +345,7 @@ export type Cim10DataType = CommonCriteriaDataType &
   WithEncounterDateDataType &
   WithEncounterStatusDataType & {
     type: CriteriaType.CONDITION
-    code: LabelObject[] | null
+    code: Hierarchy<FhirItem>[]
     source: string | null
     diagnosticType: LabelObject[] | null
     label: undefined
@@ -381,7 +381,7 @@ export type GhmDataType = CommonCriteriaDataType &
   WithEncounterDateDataType &
   WithEncounterStatusDataType & {
     type: CriteriaType.CLAIM
-    code: LabelObject[] | null
+    code: Hierarchy<FhirItem>[]
     label: undefined
   }
 
@@ -496,7 +496,7 @@ export type MedicationDataType = CommonCriteriaDataType &
   WithOccurenceCriteriaDataType &
   WithEncounterDateDataType &
   WithEncounterStatusDataType & {
-    code: LabelObject[] | null
+    code: Hierarchy<FhirItem>[]
     administration: LabelObject[] | null
   } & (
     | {
@@ -511,8 +511,7 @@ export type ObservationDataType = CommonCriteriaDataType &
   WithEncounterDateDataType &
   WithEncounterStatusDataType & {
     type: CriteriaType.OBSERVATION
-    code: LabelObject[] | null
-    isLeaf: boolean
+    code: Hierarchy<FhirItem>[]
     searchByValue: [number | null, number | null]
     valueComparator: Comparators
   }

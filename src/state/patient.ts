@@ -52,7 +52,7 @@ import {
 } from 'types/searchCriterias'
 import { isCustomError } from 'utils/perimeters'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
-import { mapToAttribute, mapToUrlCode } from 'mappers/pmsi'
+import { mapToAttribute } from 'mappers/pmsi'
 import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
 import { linkToDiagnosticReport } from 'services/aphp/serviceImaging'
@@ -129,8 +129,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const sortDirection = options.searchCriterias.orderBy.orderDirection
       const page = options.page ?? 1
       const searchInput = options.searchCriterias.searchInput === '' ? '' : options.searchCriterias.searchInput
-      const codeUrl = mapToUrlCode(selectedTab)
-      const code = options.searchCriterias.filters.code.map((e) => encodeURIComponent(`${codeUrl}|`) + e.id).join(',')
+      const code = options.searchCriterias.filters.code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(',')
       const source = options.searchCriterias.filters.source ?? ''
       const diagnosticTypes = options.searchCriterias.filters.diagnosticTypes?.map((type) => type.id) ?? []
       const nda = options.searchCriterias.filters.nda
@@ -229,16 +228,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
       const sortDirection = searchCriterias.orderBy.orderDirection
       const searchInput = searchCriterias.searchInput
       const nda = searchCriterias.filters.nda
-      const loinc = searchCriterias.filters.loinc
-        .map(
-          (e) => encodeURIComponent(`${getConfig().features.observation.valueSets.biologyHierarchyLoinc.url}|`) + e.id
-        )
-        .join(',')
-      const anabio = searchCriterias.filters.anabio
-        .map(
-          (e) => encodeURIComponent(`${getConfig().features.observation.valueSets.biologyHierarchyAnabio.url}|`) + e.id
-        )
-        .join(',')
+      const code = options.searchCriterias.filters.code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(',')
       const startDate = searchCriterias.filters.startDate
       const endDate = searchCriterias.filters.endDate
       const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
@@ -253,8 +243,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
         rowStatus,
         searchInput,
         nda,
-        loinc,
-        anabio,
+        code,
         startDate,
         endDate,
         groupId,
@@ -335,6 +324,7 @@ const fetchMedication = createAsyncThunk<
       const endDate = searchCriterias.filters.endDate
       const executiveUnits = searchCriterias.filters.executiveUnits.map((unit) => unit.id)
       const encounterStatus = searchCriterias.filters.encounterStatus?.map(({ id }) => id)
+      const code = options.searchCriterias.filters.code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(',')
 
       const medicationResponse = await services.patients.fetchMedication(
         page,
@@ -344,6 +334,7 @@ const fetchMedication = createAsyncThunk<
         sortDirection,
         searchInput,
         nda,
+        code,
         prescriptionTypes,
         administrationRoutes,
         startDate,

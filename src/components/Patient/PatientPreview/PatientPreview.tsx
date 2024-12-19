@@ -7,10 +7,10 @@ import PatientField from './PatientField/PatientField'
 
 import { getAge } from 'utils/age'
 import { getCleanGroupId } from 'utils/paginationUtils'
-import { getLastDiagnosisLabels } from 'utils/pmsi'
 import { CohortPatient, IPatientDetails } from 'types'
 
 import useStyles from './styles'
+import { getLastDiagnosisLabels } from 'mappers/pmsi'
 
 type PatientPreviewProps = {
   patient?: IPatientDetails

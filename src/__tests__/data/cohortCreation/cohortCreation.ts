@@ -16,7 +16,6 @@ const defaultProcedureCriteria: SelectedCriteriaType = {
   encounterEndDate: [null, null],
   includeEncounterEndDateNull: true,
   encounterStatus: [],
-  hierarchy: undefined,
   code: [],
   source: null,
   label: undefined
@@ -86,12 +85,16 @@ export const procedurePeudonimizedCriteria: SelectedCriteriaType[] = [
       {
         id: '000212',
         label: "000212 - Actes Diagnostiques Sur L'oreille",
+        above_levels_ids: '*',
+        inferior_levels_ids: '',
         system:
           'https://www.atih.sante.fr/plateformes-de-transmission-et-logiciels/logiciels-espace-de-telechargement/id_lot/3550'
       },
       {
         id: '000489',
         label: '000489 - Actes Thérapeutiques Sur Les Vaisseaux Intracrâniens',
+        above_levels_ids: '*',
+        inferior_levels_ids: '',
         system:
           'https://www.atih.sante.fr/plateformes-de-transmission-et-logiciels/logiciels-espace-de-telechargement/id_lot/3550'
       }
