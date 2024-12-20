@@ -17,7 +17,7 @@ import {
 } from 'types/searchCriterias'
 import allDocTypes from 'assets/docTypes.json'
 import { getDurationRangeLabel } from './age'
-import { displaySystem } from './displayValueSetSystem'
+import { getFullLabelFromCode } from './valueSets'
 import { CriteriaState } from 'state/criteria'
 import { Tooltip, Typography } from '@mui/material'
 import { Hierarchy } from 'types/hierarchy'
@@ -58,17 +58,28 @@ const getLabelFromCriteriaObject = (
 ) => {
   const criterionData = criteriaState.cache.find((criteriaCache) => criteriaCache.criteriaType === resourceType)?.data
   if (criterionData === null || values === null) return ''
-
-  const criterion = criterionData?.[name] || []
-  if (criterion !== 'loading') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const removeDuplicates = (array: any[], key: string) => {
-      return array.filter((obj, index, self) => index === self.findIndex((el) => el[key] === obj[key]))
-    }
-    const labels = removeDuplicates(criterion, 'id')
-      .filter((obj) => values.map((value) => value.id).includes(obj.id))
-      .map((obj: LabelObject) => `${displaySystem(obj.system)} ${obj.label}`)
-
+  const cache = criterionData?.[name] || []
+  if (cache !== 'loading') {
+    const labels = values
+      .map((code) =>
+        cache.find((cacheCode: any) => {
+          if (cacheCode.id === code.id) {
+            if (
+              (name === CriteriaDataKey.MEDICATION_DATA ||
+                name === CriteriaDataKey.BIOLOGY_DATA ||
+                name === CriteriaDataKey.CIM_10_DIAGNOSTIC ||
+                name === CriteriaDataKey.GHM_DATA ||
+                name === CriteriaDataKey.CCAM_DATA) &&
+              code.system
+            )
+              return cacheCode.system === code.system
+            else return true
+          }
+          return false
+        })
+      )
+      .filter((e) => e)
+      .map((found: LabelObject) => getFullLabelFromCode(found))
     const tooltipTitle = labels.join(' - ')
     return (
       <Tooltip title={tooltipTitle}>
@@ -80,7 +91,7 @@ const getLabelFromCriteriaObject = (
   }
 }
 
-const getLabelFromName = (values: Hierarchy<ScopeElement, string>[]) => {
+const getLabelFromName = (values: Hierarchy<ScopeElement>[]) => {
   const labels = values.map((value) => `${value.source_value} - ${value.name}`).join(' - ')
   return labels
 }

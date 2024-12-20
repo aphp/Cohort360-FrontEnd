@@ -1,24 +1,46 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { Tabs, Tab } from '@mui/material'
-
-import useStyles from './styles'
-
-import BiologyForm from './components/Form/BiologyForm'
-import BiologyHierarchy from './components/Hierarchy/BiologyHierarchy'
-import BiologySearch from './components/BiologySearch/BiologySearch'
-import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
-import { fetchBiology } from 'state/biology'
-import { useAppDispatch, useAppSelector } from 'state'
-import { Comparators, ObservationDataType, CriteriaType } from 'types/requestCriterias'
+import React, { useState, useMemo, useEffect } from 'react'
+import {
+  TextField,
+  Grid,
+  IconButton,
+  Divider,
+  Typography,
+  Alert,
+  FormLabel,
+  Switch,
+  Select,
+  MenuItem,
+  Autocomplete,
+  Button
+} from '@mui/material'
+import useStyles from '../formStyles'
+import { Comparators, ObservationDataType, CriteriaType, CriteriaDataKey } from 'types/requestCriterias'
 import { CriteriaDrawerComponentProps } from 'types'
-import { Hierarchy } from 'types/hierarchy'
-import { AppConfig } from 'config'
+import { getConfig } from 'config'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
+import { BlockWrapper } from 'components/ui/Layout'
+import OccurenceInput from 'components/ui/Inputs/Occurences'
+import { CriteriaLabel } from 'components/ui/CriteriaLabel'
+import ValueSetField from 'components/SearchValueSet/ValueSetField'
+import { ErrorWrapper } from 'components/ui/Searchbar/styles'
+import AdvancedInputs from '../AdvancedInputs'
+import { SourceType } from 'types/scope'
+import { getValueSetsFromSystems } from 'utils/valueSets'
+import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
+import { mappingCriteria, mappingHierarchyCriteria } from 'utils/mappers'
+
+enum Error {
+  NO_ERROR,
+  INCOHERENT_VALUE_ERROR,
+  INVALID_VALUE_ERROR,
+  MISSING_VALUE_ERROR,
+  ADVANCED_INPUTS_ERROR
+}
 
 export const defaultBiology: Omit<ObservationDataType, 'id'> = {
   type: CriteriaType.OBSERVATION,
   title: 'Critères de biologie',
   code: [],
-  isLeaf: false,
   valueComparator: Comparators.GREATER_OR_EQUAL,
   searchByValue: [null, null],
   occurrence: 1,
@@ -30,95 +52,280 @@ export const defaultBiology: Omit<ObservationDataType, 'id'> = {
   encounterStatus: []
 }
 
-const Index = (props: CriteriaDrawerComponentProps) => {
+const BiologyForm = (props: CriteriaDrawerComponentProps) => {
   const { criteriaData, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const config = useContext(AppConfig)
   const { classes } = useStyles()
-  const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy' | 'search'>(
-    selectedCriteria ? 'form' : 'hierarchy'
-  )
-  const [defaultCriteria, setDefaultCriteria] = useState<ObservationDataType>(
-    (selectedCriteria as ObservationDataType) || defaultBiology
-  )
-
+  const [currentCriteria, setCurrentCriteria] = useState((selectedCriteria as ObservationDataType) ?? defaultBiology)
+  const [searchByValueInput, setSearchByValueInput] = useState([
+    currentCriteria.searchByValue[0]?.toString() ?? '',
+    currentCriteria.searchByValue[1]?.toString() ?? ''
+  ])
   const isEdition = selectedCriteria !== null
-  const dispatch = useAppDispatch()
-  const biologyHierarchy = useAppSelector((state) => state.biology.list || {})
+  const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
+  const [error, setError] = useState(Error.NO_ERROR)
+  const [isLeaf, setIsLeaf] = useState(false)
 
-  const _onChangeSelectedHierarchy = (
-    newSelectedItems: Hierarchy<any, any>[] | null | undefined,
-    newHierarchy?: Hierarchy<any, any>[]
-  ) => {
-    _onChangeFormValue('code', newSelectedItems, newHierarchy)
+  const handleSearchValues = (newValue: string, index: number) => {
+    const invalidCharRegex = /[^0-9.-]/
+    if (invalidCharRegex.exec(newValue)) return
+    const rawValues = searchByValueInput
+    rawValues[index] = newValue
+    setSearchByValueInput(rawValues)
+    const parsedValue = isNaN(parseFloat(newValue)) ? null : parseFloat(newValue)
+    const values: [number | null, number | null] =
+      index === 0 ? [parsedValue, currentCriteria.searchByValue[1]] : [currentCriteria.searchByValue[0], parsedValue]
+    checkSearchValues(values, currentCriteria.valueComparator)
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const _onChangeFormValue = async (key: string, value: any, newHierarchy: Hierarchy<any, any>[] = biologyHierarchy) =>
-    await syncOnChangeFormValue(
-      key,
-      value,
-      newHierarchy,
-      setDefaultCriteria,
-      selectedTab,
-      defaultBiology.type,
-      dispatch
-    )
-  const _initSyncHierarchyTableEffect = async () => {
-    await initSyncHierarchyTableEffect(
-      biologyHierarchy,
-      selectedCriteria,
-      defaultCriteria && defaultCriteria.code ? defaultCriteria.code : [],
-      fetchBiology,
-      defaultBiology.type,
-      dispatch
-    )
+
+  const checkSearchValues = (values: [null | number, null | number], comparator: Comparators) => {
+    setError(Error.NO_ERROR)
+    let val1 = values[1]
+    if (comparator !== Comparators.BETWEEN) {
+      val1 = null
+      setSearchByValueInput([searchByValueInput[0], ''])
+    }
+    if (values[0] !== null && val1 !== null && values[0] > val1) {
+      setError(Error.INCOHERENT_VALUE_ERROR)
+    } else if (comparator === Comparators.BETWEEN && (values[0] === null || val1 === null)) {
+      setError(Error.MISSING_VALUE_ERROR)
+    }
+    setCurrentCriteria({
+      ...currentCriteria,
+      searchByValue: [values[0], val1],
+      valueComparator: comparator
+    })
   }
+
   useEffect(() => {
-    _initSyncHierarchyTableEffect()
-  }, [])
-  return (
-    <>
-      <Tabs
-        indicatorColor="secondary"
-        className={classes.tabs}
-        value={selectedTab}
-        onChange={(e, tab) => setSelectedTab(tab)}
-      >
-        <Tab label={config.labels.exploration} value="hierarchy" />
-        <Tab label="Recherche" value="search" />
-        <Tab label="Formulaire" value="form" />
-      </Tabs>
+    setError(Error.NO_ERROR)
+    if (
+      currentCriteria.code.length === 1 &&
+      !currentCriteria.code?.[0]?.inferior_levels_ids &&
+      currentCriteria.code?.[0]?.id !== HIERARCHY_ROOT
+    )
+      setIsLeaf(true)
+    else {
+      setIsLeaf(false)
+      setCurrentCriteria({
+        ...currentCriteria,
+        searchByValue: [null, null]
+      })
+    }
+  }, [currentCriteria.code])
 
-      {
-        <BiologyForm
-          isOpen={selectedTab === 'form'}
-          isEdition={isEdition}
-          criteriaData={criteriaData}
-          selectedCriteria={defaultCriteria}
-          onChangeValue={_onChangeFormValue}
-          onChangeSelectedCriteria={onChangeSelectedCriteria}
-          goBack={goBack}
-        />
-      }
-      {selectedTab === 'search' && (
-        <BiologySearch
-          isEdition={isEdition}
-          selectedCriteria={defaultCriteria}
-          onChangeSelectedCriteria={_onChangeSelectedHierarchy}
-          onConfirm={() => setSelectedTab('form')}
-          goBack={goBack}
-        />
-      )}
-      {
-        <BiologyHierarchy
-          isOpen={selectedTab === 'hierarchy'}
-          isEdition={isEdition}
-          selectedCriteria={defaultCriteria}
-          onChangeSelectedHierarchy={_onChangeSelectedHierarchy}
-          onConfirm={() => setSelectedTab('form')}
-          goBack={goBack}
-        />
-      }
-    </>
+  const biologyReferences = useMemo(() => {
+    return getValueSetsFromSystems([
+      getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
+      getConfig().features.observation.valueSets.biologyHierarchyLoinc.url
+    ])
+  }, [])
+
+  useEffect(() => {
+    const encounterStatus =
+      mappingCriteria(currentCriteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
+    const code = mappingHierarchyCriteria(currentCriteria?.code, CriteriaDataKey.BIOLOGY_DATA, criteriaData) || []
+    setCurrentCriteria({ ...currentCriteria, code, encounterStatus })
+  }, [])
+
+  return (
+    <Grid className={classes.root}>
+      <Grid className={classes.actionContainer}>
+        {!isEdition ? (
+          <>
+            <IconButton className={classes.backButton} onClick={goBack}>
+              <KeyboardBackspaceIcon />
+            </IconButton>
+            <Divider className={classes.divider} orientation="vertical" flexItem />
+            <Typography className={classes.titleLabel}>Ajouter un critère de biologie</Typography>
+          </>
+        ) : (
+          <Typography className={classes.titleLabel}>Modifier un critère de biologie</Typography>
+        )}
+      </Grid>
+
+      <Grid className={classes.formContainer}>
+        {!multiFields && (
+          <Alert
+            severity="info"
+            onClose={() => {
+              localStorage.setItem('multiple_fields', 'ok')
+              setMultiFields('ok')
+            }}
+          >
+            Tous les éléments des champs multiples sont liés par une contrainte OU
+          </Alert>
+        )}
+
+        <Alert severity="warning">
+          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondants aux analyses les
+          plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses
+          quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020.
+        </Alert>
+
+        <Grid className={classes.inputContainer} container>
+          <Typography variant="h6">Biologie</Typography>
+
+          <TextField
+            required
+            className={classes.inputItem}
+            id="criteria-name-required"
+            placeholder="Nom du critère"
+            variant="outlined"
+            value={currentCriteria.title}
+            onChange={(e) => setCurrentCriteria({ ...currentCriteria, title: e.target.value })}
+          />
+
+          <Grid style={{ display: 'flex' }}>
+            <FormLabel
+              onClick={() => setCurrentCriteria({ ...currentCriteria, isInclusive: !currentCriteria.isInclusive })}
+              style={{ margin: 'auto 1em' }}
+              component="legend"
+            >
+              Exclure les patients qui suivent les règles suivantes
+            </FormLabel>
+            <Switch
+              id="criteria-inclusive"
+              checked={!currentCriteria.isInclusive}
+              onChange={(e) => setCurrentCriteria({ ...currentCriteria, isInclusive: !e.target.checked })}
+              color="secondary"
+            />
+          </Grid>
+
+          <BlockWrapper className={classes.inputItem}>
+            <OccurenceInput
+              value={currentCriteria.occurrence ?? 1}
+              comparator={currentCriteria.occurrenceComparator ?? Comparators.GREATER_OR_EQUAL}
+              onchange={(newOccurence, newComparator) =>
+                setCurrentCriteria({
+                  ...currentCriteria,
+                  occurrence: newOccurence,
+                  occurrenceComparator: newComparator
+                })
+              }
+              withHierarchyInfo
+            />
+          </BlockWrapper>
+
+          <Grid container className={classes.inputItem}>
+            <CriteriaLabel label="Codes de biologie" />
+            <ValueSetField
+              value={currentCriteria.code}
+              references={biologyReferences}
+              onSelect={(value) => setCurrentCriteria({ ...currentCriteria, code: value })}
+              placeholder="Sélectionner les codes"
+            />
+          </Grid>
+
+          <Grid className={classes.inputContainer}>
+            <CriteriaLabel
+              label="Recherche par valeur"
+              infoIcon="Pour pouvoir rechercher par valeur, vous devez sélectionner un seul et unique analyte (élement le plus
+                fin de la hiérarchie)."
+            />
+            <Grid
+              style={{
+                display: 'grid',
+                gridTemplateColumns:
+                  currentCriteria.valueComparator === Comparators.BETWEEN ? '100px 1fr 1fr' : '100px 1fr',
+                alignItems: 'center',
+                margin: '1em 0'
+              }}
+            >
+              <Select
+                style={{ marginRight: '1em' }}
+                id="biology-value-comparator-select"
+                value={currentCriteria.valueComparator ?? Comparators.GREATER_OR_EQUAL}
+                onChange={(event) =>
+                  checkSearchValues(currentCriteria.searchByValue, event.target.value as Comparators)
+                }
+                disabled={!isLeaf}
+              >
+                {(Object.keys(Comparators) as (keyof typeof Comparators)[]).map((key) => (
+                  <MenuItem key={key} value={Comparators[key]}>
+                    {Comparators[key]}
+                  </MenuItem>
+                ))}
+              </Select>
+
+              <TextField
+                type="text"
+                id="criteria-value"
+                variant="outlined"
+                value={searchByValueInput[0]}
+                onChange={(e) => handleSearchValues(e.target.value, 0)}
+                placeholder={currentCriteria.valueComparator === Comparators.BETWEEN ? 'Valeur minimale' : '0'}
+                disabled={!isLeaf}
+                error={error !== Error.NO_ERROR && error !== Error.ADVANCED_INPUTS_ERROR}
+              />
+              {currentCriteria.valueComparator === Comparators.BETWEEN && (
+                <TextField
+                  required
+                  type="text"
+                  id="criteria-value"
+                  variant="outlined"
+                  value={searchByValueInput[1]}
+                  onChange={(e) => handleSearchValues(e.target.value, 1)}
+                  sx={{ marginLeft: '10px' }}
+                  placeholder="Valeur maximale"
+                  disabled={!isLeaf}
+                  error={error !== Error.NO_ERROR && error !== Error.ADVANCED_INPUTS_ERROR}
+                />
+              )}
+            </Grid>
+            <Grid container style={{ margin: '0 0 1em', textAlign: 'end' }}>
+              <ErrorWrapper>
+                {error === Error.INCOHERENT_VALUE_ERROR && (
+                  <Typography style={{ fontWeight: 'bold' }}>
+                    La valeur minimale ne peut pas être supérieure à la valeur maximale.
+                  </Typography>
+                )}
+                {error === Error.INVALID_VALUE_ERROR && (
+                  <Typography style={{ fontWeight: 'bold' }}>Veuillez entrer un nombre valide.</Typography>
+                )}
+                {error === Error.MISSING_VALUE_ERROR && (
+                  <Typography style={{ fontWeight: 'bold' }}>Veuillez entrer 2 valeurs avec ce comparateur.</Typography>
+                )}
+              </ErrorWrapper>
+            </Grid>
+
+            <Autocomplete
+              multiple
+              options={criteriaData.data.encounterStatus ?? []}
+              noOptionsText="Veuillez entrer un statut de visite associée"
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={currentCriteria.encounterStatus}
+              onChange={(e, value) => setCurrentCriteria({ ...currentCriteria, encounterStatus: value })}
+              renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
+            />
+          </Grid>
+
+          <AdvancedInputs
+            sourceType={SourceType.BIOLOGY}
+            selectedCriteria={currentCriteria}
+            onChangeValue={(key, value) => setCurrentCriteria((prevValues) => ({ ...prevValues, [key]: value }))}
+            onError={(isError) => setError(isError ? Error.ADVANCED_INPUTS_ERROR : Error.NO_ERROR)}
+          />
+        </Grid>
+
+        <Grid className={classes.criteriaActionContainer}>
+          {!isEdition && (
+            <Button onClick={goBack} variant="outlined">
+              Annuler
+            </Button>
+          )}
+          <Button
+            onClick={() => onChangeSelectedCriteria(currentCriteria)}
+            type="submit"
+            form="biology-form"
+            variant="contained"
+            disabled={error !== Error.NO_ERROR}
+          >
+            Confirmer
+          </Button>
+        </Grid>
+      </Grid>
+    </Grid>
   )
 }
-export default Index
+export default BiologyForm

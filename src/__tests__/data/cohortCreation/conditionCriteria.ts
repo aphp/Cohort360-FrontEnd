@@ -1,4 +1,5 @@
 import { Cim10DataType, Comparators, CriteriaType } from 'types/requestCriterias'
+import { System } from 'types/scope'
 
 export const defaultConditionCriteria: Cim10DataType = {
   id: 1,
@@ -34,12 +35,16 @@ export const completeConditionCriteria: Cim10DataType = {
     {
       id: 'I841',
       label: 'I841 - *** Su14 *** Hémorroïdes Internes Avec Autres Complications',
-      system: 'https://smt.esante.gouv.fr/terminologie-cim-10/'
+      system: 'https://smt.esante.gouv.fr/terminologie-cim-10/',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
     },
     {
       id: 'I842',
       label: 'I842 - *** Su15 *** Hémorroïdes Internes Sans Autres Complications',
-      system: 'https://smt.esante.gouv.fr/terminologie-cim-10/'
+      system: 'https://smt.esante.gouv.fr/terminologie-cim-10/',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
     }
   ],
   source: 'AREM',
@@ -57,6 +62,7 @@ export const completeConditionCriteria: Cim10DataType = {
   ],
   encounterService: [
     {
+      label: 'GH RCP',
       above_levels_ids: '8312002244',
       cohort_id: '6935',
       cohort_size: '23',
@@ -68,7 +74,8 @@ export const completeConditionCriteria: Cim10DataType = {
       source_value: 'H01',
       status: undefined,
       subItems: undefined,
-      type: 'Groupe hospitalier (GH)'
+      type: 'Groupe hospitalier (GH)',
+      system: System.ScopeTree
     }
   ]
 }

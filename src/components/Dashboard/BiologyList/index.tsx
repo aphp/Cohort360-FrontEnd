@@ -18,9 +18,8 @@ import SearchInput from 'components/ui/Searchbar/SearchInput'
 import TextInput from 'components/Filters/TextInput'
 
 import { ResourceType } from 'types/requestCriterias'
-import { Hierarchy } from 'types/hierarchy'
 import { DTTB_ResultsType as ResultsType, LoadingStatus, CohortObservation } from 'types'
-import { BiologyFilters, Direction, FilterKeys, Order } from 'types/searchCriterias'
+import { BiologyFilters, Direction, FilterKeys, LabelObject, Order } from 'types/searchCriterias'
 import { CanceledError } from 'axios'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import services from 'services/aphp'
@@ -28,15 +27,13 @@ import useSearchCriterias, { initBioSearchCriterias } from 'reducers/searchCrite
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import DataTableObservation from 'components/DataTable/DataTableObservation'
-import AnabioFilter from 'components/Filters/AnabioFilter'
-import LoincFilter from 'components/Filters/LoincFilter'
 import { useSearchParams } from 'react-router-dom'
 import { SourceType } from 'types/scope'
-import {
-  fetchLoincCodes as fetchLoincCodesApi,
-  fetchAnabioCodes as fetchAnabioCodesApi
-} from 'services/aphp/serviceBiology'
 import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
+import { getCodeList } from 'services/aphp/serviceValueSets'
+import { getConfig } from 'config'
+import CodeFilter from 'components/Filters/CodeFilter'
+import { getValueSetsFromSystems } from 'utils/valueSets'
 
 type BiologyListProps = {
   deidentified?: boolean
@@ -55,7 +52,7 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
   const [toggleSavedFiltersModal, setToggleSavedFiltersModal] = useState(false)
   const [toggleFilterInfoModal, setToggleFilterInfoModal] = useState(false)
   const [isReadonlyFilterInfoModal, setIsReadonlyFilterInfoModal] = useState(true)
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<LabelObject[]>([])
 
   const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
   const {
@@ -78,24 +75,23 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
       orderBy,
       searchInput,
       filters,
-      filters: { validatedStatus, nda, ipp, loinc, anabio, startDate, endDate, executiveUnits, encounterStatus }
+      filters: { code, validatedStatus, nda, ipp, startDate, endDate, executiveUnits, encounterStatus }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
   ] = useSearchCriterias(initBioSearchCriterias)
   const filtersAsArray = useMemo(
     () =>
       selectFiltersAsArray({
+        code,
         validatedStatus,
         nda,
         ipp,
-        loinc,
-        anabio,
         startDate,
         endDate,
         executiveUnits,
         encounterStatus
       }),
-    [validatedStatus, nda, ipp, loinc, anabio, startDate, endDate, executiveUnits, encounterStatus]
+    [validatedStatus, code, nda, ipp, startDate, endDate, executiveUnits, encounterStatus]
   )
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
@@ -122,7 +118,7 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
           searchCriterias: {
             orderBy,
             searchInput,
-            filters: { validatedStatus, nda, ipp, loinc, anabio, startDate, endDate, executiveUnits, encounterStatus }
+            filters: { validatedStatus, nda, ipp, code, startDate, endDate, executiveUnits, encounterStatus }
           }
         },
         groupId,
@@ -170,8 +166,8 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const encounterStatus = await services.cohortCreation.fetchEncounterStatus()
-        setEncounterStatusList(encounterStatus)
+        const encounterStatusList = (await getCodeList(getConfig().core.valueSets.encounterStatus.url)).results
+        setEncounterStatusList(encounterStatusList)
       } catch (e) {
         /* empty */
       }
@@ -193,8 +189,7 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
     validatedStatus,
     nda,
     ipp,
-    loinc,
-    anabio,
+    code,
     startDate,
     endDate,
     executiveUnits,
@@ -214,6 +209,13 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
       _fetchBiology()
     }
   }, [loadingStatus])
+
+  const references = useMemo(() => {
+    return getValueSetsFromSystems([
+      getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
+      getConfig().features.observation.valueSets.biologyHierarchyLoinc.url
+    ])
+  }, [])
 
   return (
     <Grid container justifyContent="flex-end" gap="20px">
@@ -319,8 +321,7 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
       >
         {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
         {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp ?? ''} />}
-        <AnabioFilter name={FilterKeys.ANABIO} value={anabio} onFetch={fetchAnabioCodesApi} />
-        <LoincFilter name={FilterKeys.LOINC} value={loinc} onFetch={fetchLoincCodesApi} />
+        <CodeFilter name={FilterKeys.CODE} value={code} references={references} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
           sourceType={SourceType.BIOLOGY}
@@ -375,8 +376,7 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
               searchInput,
               nda,
               ipp,
-              anabio,
-              loinc,
+              code,
               startDate,
               endDate,
               validatedStatus,
@@ -391,8 +391,7 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
                   filters: {
                     nda,
                     ipp,
-                    anabio,
-                    loinc,
+                    code,
                     startDate,
                     endDate,
                     validatedStatus,
@@ -445,19 +444,11 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
                   </Grid>
                 )}
                 <Grid item xs={12}>
-                  <AnabioFilter
+                  <CodeFilter
+                    references={references}
                     disabled={isReadonlyFilterInfoModal}
-                    name={FilterKeys.ANABIO}
-                    value={selectedSavedFilter?.filterParams.filters.anabio || []}
-                    onFetch={fetchAnabioCodesApi}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <LoincFilter
-                    disabled={isReadonlyFilterInfoModal}
-                    name={FilterKeys.LOINC}
-                    value={selectedSavedFilter?.filterParams.filters.loinc || []}
-                    onFetch={fetchLoincCodesApi}
+                    name={FilterKeys.CODE}
+                    value={selectedSavedFilter?.filterParams.filters.code ?? []}
                   />
                 </Grid>
                 <Grid item xs={12}>

@@ -1,6 +1,6 @@
 export enum PatientTableLabels {
   GENDER = 'Sexe',
-  FIRSTNAME = 'Prénom',
+  NAME = 'Prénom',
   LASTNAME = 'Nom',
   BIRTHDATE = 'Date de naissance',
   AGE = 'Âge',
