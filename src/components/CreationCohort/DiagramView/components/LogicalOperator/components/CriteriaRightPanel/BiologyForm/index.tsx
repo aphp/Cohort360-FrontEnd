@@ -14,7 +14,7 @@ import {
   Button
 } from '@mui/material'
 import useStyles from '../formStyles'
-import { Comparators, ObservationDataType, CriteriaType } from 'types/requestCriterias'
+import { Comparators, ObservationDataType, CriteriaType, CriteriaDataKey } from 'types/requestCriterias'
 import { CriteriaDrawerComponentProps } from 'types'
 import { getConfig } from 'config'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
@@ -27,6 +27,7 @@ import AdvancedInputs from '../AdvancedInputs'
 import { SourceType } from 'types/scope'
 import { getValueSetsFromSystems } from 'utils/valueSets'
 import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
+import { mappingCriteria } from '../DemographicForm'
 
 enum Error {
   NO_ERROR,
@@ -127,7 +128,9 @@ const BiologyForm = (props: CriteriaDrawerComponentProps) => {
         )
       )
       .filter((e) => e)
-    setCurrentCriteria({ ...currentCriteria, code: foundCodes })
+    const encounterStatus =
+      mappingCriteria(currentCriteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
+    setCurrentCriteria({ ...currentCriteria, code: foundCodes, encounterStatus })
   }, [])
 
   return (

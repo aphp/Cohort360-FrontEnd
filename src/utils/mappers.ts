@@ -59,13 +59,13 @@ export const buildLabelObjectFilter = (criterion: LabelObject[] | undefined | nu
 }
 
 export const unbuildLabelObjectFilter = (currentCriterion: any, filterName: string, values?: string | null) => {
-  const valuesIds = values?.split(',') || []
-  const newArray = valuesIds?.map((url) => ({
-    system: url.split('|')?.[0],
-    id: url.split('|')?.[1]
-  }))
-  if (newArray)
+ const valuesIds = values?.split(',') || []
+  const newArray = valuesIds?.map((value) =>
+    value.includes('|') ? { system: value.split('|')?.[0], id: value.split('|')?.[1] } : { id: value }
+  )
+  if (newArray) {
     currentCriterion[filterName] = currentCriterion ? [...currentCriterion[filterName], ...newArray] : newArray
+  }
 }
 
 export const buildEncounterServiceFilter = (criterion?: LabelObject[]) => {

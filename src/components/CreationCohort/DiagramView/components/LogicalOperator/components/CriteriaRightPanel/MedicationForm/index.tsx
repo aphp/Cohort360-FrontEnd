@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 
 import { CriteriaDrawerComponentProps } from 'types'
-import { Comparators, MedicationDataType, CriteriaType } from 'types/requestCriterias'
+import { Comparators, MedicationDataType, CriteriaType, CriteriaDataKey } from 'types/requestCriterias'
 import {
   Grid,
   IconButton,
@@ -27,6 +27,7 @@ import AdvancedInputs from '../AdvancedInputs'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import { getValueSetsFromSystems } from 'utils/valueSets'
 import { LabelObject } from 'types/searchCriterias'
+import { mappingCriteria } from '../DemographicForm'
 
 enum Error {
   ADVANCED_INPUTS_ERROR,
@@ -77,7 +78,10 @@ const MedicationForm = (props: CriteriaDrawerComponentProps) => {
         )
       )
       .filter((e) => e)
-    setCurrentCriteria({ ...currentCriteria, code: foundCodes })
+      .filter((e) => e)
+    const encounterStatus =
+      mappingCriteria(currentCriteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
+    setCurrentCriteria({ ...currentCriteria, code: foundCodes, encounterStatus })
   }, [])
 
   if (criteriaData?.data?.prescriptionTypes === 'loading' || criteriaData?.data?.administrations === 'loading') {

@@ -19,7 +19,7 @@ import useStyles from '../formStyles'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { CriteriaDrawerComponentProps } from 'types'
-import { CcamDataType, Comparators, CriteriaType } from 'types/requestCriterias'
+import { CcamDataType, Comparators, CriteriaDataKey, CriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import AdvancedInputs from '../AdvancedInputs'
@@ -27,6 +27,7 @@ import { SourceType } from 'types/scope'
 import ValueSetField from 'components/SearchValueSet/ValueSetField'
 import { getConfig } from 'config'
 import { getValueSetsFromSystems } from 'utils/valueSets'
+import { mappingCriteria } from '../DemographicForm'
 
 enum Error {
   ADVANCED_INPUTS_ERROR,
@@ -70,7 +71,9 @@ const CcamForm = (props: CriteriaDrawerComponentProps) => {
         )
       )
       .filter((e) => e)
-    setCurrentCriteria({ ...currentCriteria, code: foundCodes })
+    const encounterStatus =
+      mappingCriteria(currentCriteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
+    setCurrentCriteria({ ...currentCriteria, code: foundCodes, encounterStatus })
   }, [])
 
   return (

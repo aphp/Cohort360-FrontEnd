@@ -32,12 +32,13 @@ import { useDebounce } from 'utils/debounce'
 import { SearchByTypes, FilterByDocumentStatus } from 'types/searchCriterias'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 import { SearchInputError } from 'types/error'
-import { Comparators, DocumentDataType, CriteriaType } from 'types/requestCriterias'
+import { Comparators, DocumentDataType, CriteriaType, CriteriaDataKey } from 'types/requestCriterias'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import { SourceType } from 'types/scope'
+import { mappingCriteria } from '../DemographicForm'
 
 const defaultComposition: Omit<DocumentDataType, 'id'> = {
   type: CriteriaType.DOCUMENTS,
@@ -290,7 +291,7 @@ const DocumentsForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               noOptionsText="Veuillez entrer un statut de visite associée"
               getOptionLabel={(option) => option.label}
               isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={defaultValues.encounterStatus}
+              value={mappingCriteria(defaultValues?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData)}
               onChange={(e, value) => _onChangeValue('encounterStatus', value)}
               renderInput={(params) => <TextField {...params} label="Statut de la visite associée" />}
             />

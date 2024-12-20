@@ -19,7 +19,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from '../formStyles'
 import { CriteriaDrawerComponentProps } from 'types'
-import { Cim10DataType, Comparators, CriteriaType } from 'types/requestCriterias'
+import { Cim10DataType, Comparators, CriteriaDataKey, CriteriaType } from 'types/requestCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import AdvancedInputs from '../AdvancedInputs'
@@ -28,6 +28,7 @@ import { getConfig } from 'config'
 import ValueSetField from 'components/SearchValueSet/ValueSetField'
 import { getValueSetsFromSystems } from 'utils/valueSets'
 import { LabelObject } from 'types/searchCriterias'
+import { mappingCriteria } from '../DemographicForm'
 
 enum Error {
   ADVANCED_INPUTS_ERROR,
@@ -83,7 +84,9 @@ const Cim10Form = (props: CriteriaDrawerComponentProps) => {
         )
       )
       .filter((e) => e)
-    setCurrentCriteria({ ...currentCriteria, code: foundCodes })
+    const encounterStatus =
+      mappingCriteria(currentCriteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
+    setCurrentCriteria({ ...currentCriteria, code: foundCodes, encounterStatus })
   }, [])
   return (
     <Grid className={classes.root}>

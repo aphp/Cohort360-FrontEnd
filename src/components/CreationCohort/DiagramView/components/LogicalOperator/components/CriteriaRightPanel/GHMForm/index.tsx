@@ -15,7 +15,7 @@ import {
 
 import useStyles from '../formStyles'
 import { CriteriaDrawerComponentProps } from 'types'
-import { Comparators, GhmDataType, CriteriaType } from 'types/requestCriterias'
+import { Comparators, GhmDataType, CriteriaType, CriteriaDataKey } from 'types/requestCriterias'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
@@ -24,6 +24,7 @@ import { SourceType } from 'types/scope'
 import ValueSetField from 'components/SearchValueSet/ValueSetField'
 import { getConfig } from 'config'
 import { getValueSetsFromSystems } from 'utils/valueSets'
+import { mappingCriteria } from '../DemographicForm'
 
 enum Error {
   ADVANCED_INPUTS_ERROR,
@@ -63,7 +64,9 @@ const GhmForm = (props: CriteriaDrawerComponentProps) => {
         criteriaData.data.ghmData.find((cacheCode: any) => cacheCode.id === code.id && cacheCode.system === code.system)
       )
       .filter((e) => e)
-    setCurrentCriteria({ ...currentCriteria, code: foundCodes })
+    const encounterStatus =
+      mappingCriteria(currentCriteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
+    setCurrentCriteria({ ...currentCriteria, code: foundCodes, encounterStatus })
   }, [])
 
   return (
