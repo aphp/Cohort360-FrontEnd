@@ -1,4 +1,4 @@
-import { ScopeElement, SimpleCodeType } from 'types'
+import { CriteriaItemDataCache, ScopeElement, SimpleCodeType } from 'types'
 import {
   DocumentAttachmentMethod,
   DurationRangeType,
@@ -24,7 +24,8 @@ import {
   SelectedCriteriaTypesWithAdvancedInputs,
   EncounterDataType,
   EncounterParamsKeys,
-  ObservationParamsKeys
+  ObservationParamsKeys,
+  CriteriaDataKey
 } from 'types/requestCriterias'
 import { comparatorToFilter, parseOccurence } from './valueComparator'
 import services from 'services/aphp'
@@ -59,7 +60,7 @@ export const buildLabelObjectFilter = (criterion: LabelObject[] | undefined | nu
 }
 
 export const unbuildLabelObjectFilter = (currentCriterion: any, filterName: string, values?: string | null) => {
- const valuesIds = values?.split(',') || []
+  const valuesIds = values?.split(',') || []
   const newArray = valuesIds?.map((value) =>
     value.includes('|') ? { system: value.split('|')?.[0], id: value.split('|')?.[1] } : { id: value }
   )
@@ -385,4 +386,37 @@ export const unbuildQuestionnaireFilters = (
 
 export const filtersBuilders = (fhirKey: string, value?: string) => {
   return value ? `${fhirKey}=${value}` : ''
+}
+
+export const mappingCriteria = (
+  criteriaToMap: LabelObject[] | null,
+  key: CriteriaDataKey,
+  mapping: CriteriaItemDataCache
+) => {
+  if (criteriaToMap) {
+    return criteriaToMap.map((criteria) => {
+      const mappedCriteria = mapping.data?.[key]?.find((c: LabelObject) => c?.id === criteria?.id)
+      return mappedCriteria
+    })
+  } else {
+    return []
+  }
+}
+
+export const mappingHierarchyCriteria = (
+  criteriaToMap: LabelObject[] | null,
+  key: CriteriaDataKey,
+  mapping: CriteriaItemDataCache
+) => {
+  if (criteriaToMap) {
+    return criteriaToMap.map((criteria) => {
+      const mappedCriteria = mapping.data?.[key]?.find((c: LabelObject) => {
+        if (criteria.system) return c?.id === criteria?.id && c?.system === criteria?.system
+        else return c?.id === criteria?.id
+      })
+      return mappedCriteria
+    })
+  } else {
+    return []
+  }
 }

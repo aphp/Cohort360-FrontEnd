@@ -27,7 +27,7 @@ import AdvancedInputs from '../AdvancedInputs'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import { getValueSetsFromSystems } from 'utils/valueSets'
 import { LabelObject } from 'types/searchCriterias'
-import { mappingCriteria } from '../DemographicForm'
+import { mappingCriteria, mappingHierarchyCriteria } from 'utils/mappers'
 
 enum Error {
   ADVANCED_INPUTS_ERROR,
@@ -71,17 +71,10 @@ const MedicationForm = (props: CriteriaDrawerComponentProps) => {
   }, [])
 
   useEffect(() => {
-    const foundCodes = currentCriteria.code
-      .map((code) =>
-        criteriaData.data.medicationData.find(
-          (cacheCode: any) => cacheCode.id === code.id && cacheCode.system === code.system
-        )
-      )
-      .filter((e) => e)
-      .filter((e) => e)
     const encounterStatus =
       mappingCriteria(currentCriteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
-    setCurrentCriteria({ ...currentCriteria, code: foundCodes, encounterStatus })
+    const code = mappingHierarchyCriteria(currentCriteria?.code, CriteriaDataKey.MEDICATION_DATA, criteriaData) || []
+    setCurrentCriteria({ ...currentCriteria, code, encounterStatus })
   }, [])
 
   if (criteriaData?.data?.prescriptionTypes === 'loading' || criteriaData?.data?.administrations === 'loading') {

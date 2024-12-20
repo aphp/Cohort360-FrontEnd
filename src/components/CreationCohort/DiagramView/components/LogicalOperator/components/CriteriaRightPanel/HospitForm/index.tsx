@@ -12,7 +12,6 @@ import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import Collapse from 'components/ui/Collapse'
 import SearchbarWithCheck from 'components/ui/Inputs/SearchbarWithCheck'
-import { mappingCriteria } from '../DemographicForm'
 import CriteriaLayout from 'components/ui/CriteriaLayout'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import NumericConditionInput from 'components/ui/Inputs/OccurencesWithFloats'
@@ -20,6 +19,7 @@ import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnits'
+import { mappingCriteria } from 'utils/mappers'
 
 enum Error {
   EMPTY_FORM,

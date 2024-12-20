@@ -28,7 +28,7 @@ import { getConfig } from 'config'
 import ValueSetField from 'components/SearchValueSet/ValueSetField'
 import { getValueSetsFromSystems } from 'utils/valueSets'
 import { LabelObject } from 'types/searchCriterias'
-import { mappingCriteria } from '../DemographicForm'
+import { mappingCriteria, mappingHierarchyCriteria } from 'utils/mappers'
 
 enum Error {
   ADVANCED_INPUTS_ERROR,
@@ -77,16 +77,10 @@ const Cim10Form = (props: CriteriaDrawerComponentProps) => {
   }, [])
 
   useEffect(() => {
-    const foundCodes = currentCriteria.code
-      .map((code) =>
-        criteriaData.data.cim10Diagnostic.find(
-          (cacheCode: any) => cacheCode.id === code.id && cacheCode.system === code.system
-        )
-      )
-      .filter((e) => e)
+    const code = mappingHierarchyCriteria(currentCriteria?.code, CriteriaDataKey.CIM_10_DIAGNOSTIC, criteriaData) || []
     const encounterStatus =
       mappingCriteria(currentCriteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
-    setCurrentCriteria({ ...currentCriteria, code: foundCodes, encounterStatus })
+    setCurrentCriteria({ ...currentCriteria, code, encounterStatus })
   }, [])
   return (
     <Grid className={classes.root}>

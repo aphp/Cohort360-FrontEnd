@@ -65,14 +65,15 @@ const getLabelFromCriteriaObject = (
         cache.find((cacheCode: any) => {
           if (cacheCode.id === code.id) {
             if (
-              name === CriteriaDataKey.MEDICATION_DATA ||
-              name === CriteriaDataKey.BIOLOGY_DATA ||
-              name === CriteriaDataKey.CIM_10_DIAGNOSTIC ||
-              name === CriteriaDataKey.GHM_DATA ||
-              name === CriteriaDataKey.CCAM_DATA
+              (name === CriteriaDataKey.MEDICATION_DATA ||
+                name === CriteriaDataKey.BIOLOGY_DATA ||
+                name === CriteriaDataKey.CIM_10_DIAGNOSTIC ||
+                name === CriteriaDataKey.GHM_DATA ||
+                name === CriteriaDataKey.CCAM_DATA) &&
+              code.system
             )
               return cacheCode.system === code.system
-            return true
+            else return true
           }
           return false
         })

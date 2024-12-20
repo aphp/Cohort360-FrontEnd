@@ -1,5 +1,5 @@
 import { FormLabel, Grid, IconButton } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Hierarchy } from 'types/hierarchy'
 import { FhirItem, Reference } from 'types/valueSet'
 import SearchValueSet from '.'
@@ -8,6 +8,7 @@ import { SearchOutlined } from '@mui/icons-material'
 import CloseIcon from '@mui/icons-material/Close'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import CodesWithSystems from 'components/Hierarchy/CodesWithSystems'
+import { mappingCriteria } from 'utils/mappers'
 
 type ValueSetFieldProps = {
   value: Hierarchy<FhirItem>[]

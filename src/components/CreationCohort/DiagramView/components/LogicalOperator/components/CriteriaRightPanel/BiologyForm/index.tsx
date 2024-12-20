@@ -27,7 +27,7 @@ import AdvancedInputs from '../AdvancedInputs'
 import { SourceType } from 'types/scope'
 import { getValueSetsFromSystems } from 'utils/valueSets'
 import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
-import { mappingCriteria } from '../DemographicForm'
+import { mappingCriteria, mappingHierarchyCriteria } from 'utils/mappers'
 
 enum Error {
   NO_ERROR,
@@ -121,16 +121,10 @@ const BiologyForm = (props: CriteriaDrawerComponentProps) => {
   }, [])
 
   useEffect(() => {
-    const foundCodes = currentCriteria.code
-      .map((code) =>
-        criteriaData.data.biologyData.find(
-          (cacheCode: any) => cacheCode.id === code.id && cacheCode.system === code.system
-        )
-      )
-      .filter((e) => e)
     const encounterStatus =
       mappingCriteria(currentCriteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
-    setCurrentCriteria({ ...currentCriteria, code: foundCodes, encounterStatus })
+    const code = mappingHierarchyCriteria(currentCriteria?.code, CriteriaDataKey.BIOLOGY_DATA, criteriaData) || []
+    setCurrentCriteria({ ...currentCriteria, code, encounterStatus })
   }, [])
 
   return (

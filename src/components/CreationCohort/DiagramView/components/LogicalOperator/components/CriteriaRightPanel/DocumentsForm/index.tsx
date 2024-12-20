@@ -38,7 +38,7 @@ import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { BlockWrapper } from 'components/ui/Layout'
 import OccurenceInput from 'components/ui/Inputs/Occurences'
 import { SourceType } from 'types/scope'
-import { mappingCriteria } from '../DemographicForm'
+import { mappingCriteria } from 'utils/mappers'
 
 const defaultComposition: Omit<DocumentDataType, 'id'> = {
   type: CriteriaType.DOCUMENTS,

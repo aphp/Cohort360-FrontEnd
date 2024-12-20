@@ -24,7 +24,7 @@ import { SourceType } from 'types/scope'
 import ValueSetField from 'components/SearchValueSet/ValueSetField'
 import { getConfig } from 'config'
 import { getValueSetsFromSystems } from 'utils/valueSets'
-import { mappingCriteria } from '../DemographicForm'
+import { mappingCriteria, mappingHierarchyCriteria } from 'utils/mappers'
 
 enum Error {
   ADVANCED_INPUTS_ERROR,
@@ -59,14 +59,10 @@ const GhmForm = (props: CriteriaDrawerComponentProps) => {
   }, [])
 
   useEffect(() => {
-    const foundCodes = currentCriteria.code
-      .map((code) =>
-        criteriaData.data.ghmData.find((cacheCode: any) => cacheCode.id === code.id && cacheCode.system === code.system)
-      )
-      .filter((e) => e)
+    const code = mappingHierarchyCriteria(currentCriteria?.code, CriteriaDataKey.GHM_DATA, criteriaData) || []
     const encounterStatus =
       mappingCriteria(currentCriteria?.encounterStatus, CriteriaDataKey.ENCOUNTER_STATUS, criteriaData) || []
-    setCurrentCriteria({ ...currentCriteria, code: foundCodes, encounterStatus })
+    setCurrentCriteria({ ...currentCriteria, code, encounterStatus })
   }, [])
 
   return (

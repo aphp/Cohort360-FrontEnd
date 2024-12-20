@@ -26,12 +26,12 @@ import { createHierarchyRoot } from 'utils/hierarchy'
 
 const async = (fetch: () => Promise<Back_API_Response<FhirItem>>) => async () => (await fetch()).results
 
-const getCodesForValueSet = async (code: string, system: string) => {
-  try {
-    if (code === HIERARCHY_ROOT) return [createHierarchyRoot(system)]
-    else return (await getChildrenFromCodes(system, [code])).results
-  } catch {
-    return []
+const getCodesForValueSet = async (code: string, systems: string[]) => {
+  if (code === HIERARCHY_ROOT && systems.length) return [createHierarchyRoot(systems[0])]
+  for (const system of systems) {
+    try {
+      return (await getChildrenFromCodes(system, [code])).results
+    } catch {}
   }
 }
 
@@ -126,7 +126,8 @@ const criteriaList: () => CriteriaItemType[] = () => {
           components: Cim10Form,
           fetch: {
             diagnosticTypes: async(() => getCodeList(getConfig().features.condition.valueSets.conditionStatus.url)),
-            cim10Diagnostic: (code: string, system: string) => getCodesForValueSet(code, system),
+            cim10Diagnostic: (code: string, system: string) =>
+              getCodesForValueSet(code, [system ?? getConfig().features.condition.valueSets.conditionHierarchy.url]),
             encounterStatus: async(() => getCodeList(getConfig().core.valueSets.encounterStatus.url))
           }
         },
@@ -137,7 +138,8 @@ const criteriaList: () => CriteriaItemType[] = () => {
           fontWeight: 'normal',
           components: CCAMForm,
           fetch: {
-            ccamData: (code: string, system: string) => getCodesForValueSet(code, system),
+            ccamData: (code: string, system: string) =>
+              getCodesForValueSet(code, [system ?? getConfig().features.procedure.valueSets.procedureHierarchy.url]),
             encounterStatus: async(() => getCodeList(getConfig().core.valueSets.encounterStatus.url))
           }
         },
@@ -148,7 +150,8 @@ const criteriaList: () => CriteriaItemType[] = () => {
           fontWeight: 'normal',
           components: GhmForm,
           fetch: {
-            ghmData: (code: string, system: string) => getCodesForValueSet(code, system),
+            ghmData: (code: string, system: string) =>
+              getCodesForValueSet(code, [system ?? getConfig().features.claim.valueSets.claimHierarchy.url]),
             encounterStatus: async(() => getCodeList(getConfig().core.valueSets.encounterStatus.url))
           }
         }
@@ -162,7 +165,15 @@ const criteriaList: () => CriteriaItemType[] = () => {
       components: MedicationForm,
       disabled: !ODD_MEDICATION,
       fetch: {
-        medicationData: (code: string, system: string) => getCodesForValueSet(code, system),
+        medicationData: (code: string, system: string) => {
+          const valueSets = system
+            ? [system]
+            : [
+                getConfig().features.medication.valueSets.medicationAtc.url,
+                getConfig().features.medication.valueSets.medicationUcd.url
+              ]
+          return getCodesForValueSet(code, valueSets)
+        },
         prescriptionTypes: async(() =>
           getCodeList(getConfig().features.medication.valueSets.medicationPrescriptionTypes.url)
         ),
@@ -187,7 +198,15 @@ const criteriaList: () => CriteriaItemType[] = () => {
           components: BiologyForm,
           disabled: !ODD_BIOLOGY,
           fetch: {
-            biologyData: (code: string, system: string) => getCodesForValueSet(code, system),
+            biologyData: (code: string, system: string) => {
+              const valueSets = system
+                ? [system]
+                : [
+                    getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
+                    getConfig().features.observation.valueSets.biologyHierarchyLoinc.url
+                  ]
+              return getCodesForValueSet(code, valueSets)
+            },
             encounterStatus: async(() => getCodeList(getConfig().core.valueSets.encounterStatus.url))
           }
         },

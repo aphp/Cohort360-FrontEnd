@@ -2096,7 +2096,9 @@ export const getDataFromFetch = async (
                   currentcriterion.code.length > 0
                 ) {
                   for (const code of currentcriterion.code) {
-                    const prevData = prevDataCache[dataKey]?.find((data: any) => data.id === code?.id)
+                    const prevData = prevDataCache[dataKey]?.find(
+                      (data: any) => data.id === code?.id && data.system && code?.system
+                    )
                     const codeData = prevData ? [prevData] : await _criterion.fetch[dataKey]?.(code?.id, code?.system)
                     const existingCodes = criteriaDataCache.data[dataKey] || []
                     criteriaDataCache.data[dataKey] = [...existingCodes, ...((codeData as Hierarchy<FhirItem>[]) || [])]

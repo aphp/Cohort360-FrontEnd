@@ -27,11 +27,11 @@ import OccurenceInput from 'components/ui/Inputs/Occurences'
 import Collapse from 'components/ui/Collapse'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import DurationRange from 'components/ui/Inputs/DurationRange'
-import { mappingCriteria } from '../DemographicForm'
 import { SourceType } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 import ExecutiveUnitsInput from 'components/ui/Inputs/ExecutiveUnits'
+import { mappingCriteria } from 'utils/mappers'
 
 enum Error {
   EMPTY_FORM,
