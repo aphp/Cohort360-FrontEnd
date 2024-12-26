@@ -13,6 +13,11 @@ import CareSiteView from 'views/Scope/CareSiteView'
 import MyCohorts from 'views/MyCohorts'
 import MyRequests from 'views/MyRequests'
 import DownloadPopup from 'views/DownloadPopup/DownloadPopup'
+import MyResearches from 'views/MyResearches'
+import ProjectsList from 'components/Exploration/components/ProjectsList'
+import RequestsList from 'components/Exploration/components/RequestsList'
+import CohortsList from 'components/Exploration/components/CohortsList'
+import SamplesList from 'components/Exploration/components/SamplesList'
 
 // import { ODD_CONTACT } from '../../../constants'
 
@@ -113,6 +118,35 @@ const configRoutes: configRoute[] = [
     name: 'my-requests',
     isPrivate: true,
     element: <MyRequests />
+  },
+  /**
+   * Cohort360: My Researches
+   */
+  {
+    exact: true,
+    displaySideBar: true,
+    path: '/researches',
+    name: 'researches',
+    isPrivate: true,
+    element: <MyResearches />,
+    children: [
+      {
+        path: 'projects',
+        element: <ProjectsList />
+      },
+      {
+        path: 'requests',
+        element: <RequestsList />
+      },
+      {
+        path: 'cohorts',
+        element: <CohortsList />
+      },
+      {
+        path: 'samples',
+        element: <SamplesList />
+      }
+    ]
   },
   /**
    * Cohort360: Cohorts Creation Page

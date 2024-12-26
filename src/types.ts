@@ -53,16 +53,11 @@ export enum WebSocketJobStatus {
 
 export enum CohortJobStatus {
   NEW = 'new',
-  DENIED = 'denied',
-  VALIDATED = 'validated',
   PENDING = 'pending',
   LONG_PENDING = 'long_pending',
   STARTED = 'started',
   FAILED = 'failed',
-  CANCELLED = 'cancelled',
   FINISHED = 'finished',
-  CLEANDED = 'cleaned',
-  UNKNOWN = 'unknown',
   SUSPENDED = 'suspended'
 }
 
@@ -207,16 +202,12 @@ export enum Month {
   DECEMBER = 'Décembre'
 }
 
-export type Column =
-  | {
-      label: string | ReactNode
-      code?: string
-      align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
-      multiple?: undefined
-    }
-  | {
-      multiple: Column[]
-    }
+export type Column = {
+  label: string | ReactNode
+  code?: string
+  align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
+  multiple?: Column[]
+}
 
 export enum ChartCode {
   AGE_PYRAMID = 'facet-extension.ageMonth',
@@ -712,6 +703,8 @@ export type TabType<T = string, TL = string> = {
   icon?: ReactElement
   wrapped?: boolean
 }
+
+export type ExplorationTabs = TabType<string, ReactNode>
 
 export type PmsiTab = TabType<PMSIResourceTypes, PMSILabel>
 

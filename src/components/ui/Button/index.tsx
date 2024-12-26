@@ -10,6 +10,7 @@ type ButtonProps = {
   variant?: 'contained' | 'text' | 'outlined'
   disabled?: boolean
   onClick: () => void
+  endIcon?: ReactNode
 }
 
 const Button = ({
@@ -19,7 +20,8 @@ const Button = ({
   disabled = false,
   color = 'primary',
   variant = 'contained',
-  onClick
+  onClick,
+  endIcon
 }: ButtonProps) => {
   return (
     <ButtonWrapper
@@ -30,6 +32,7 @@ const Button = ({
       disableElevation
       onClick={onClick}
       startIcon={icon}
+      endIcon={endIcon}
       disabled={disabled}
     >
       {children}
