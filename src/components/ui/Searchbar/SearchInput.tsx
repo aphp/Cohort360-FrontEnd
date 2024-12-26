@@ -71,7 +71,7 @@ const SearchInput = ({
               )}
               {searchOnClick && (
                 <IconButton style={{ padding: 2 }} onClick={() => onchange(searchInput)}>
-                  <SearchIcon style={{ fill: '#ED6D91', height: 16 }} />
+                  <SearchIcon style={{ fill: '#5bc5f2', height: 16 }} />
                 </IconButton>
               )}
               {searchInput && (

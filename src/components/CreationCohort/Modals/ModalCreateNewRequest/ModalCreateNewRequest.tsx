@@ -1,16 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import {
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  Typography
-} from '@mui/material'
+import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material'
 
 import RequestForm from './components/RequestForm'
 import RequestList from './components/RequestList'
@@ -19,8 +10,8 @@ import { RequestType } from 'types'
 import services from 'services/aphp'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { fetchProjects } from 'state/project'
-import { fetchRequests, addRequest, editRequest, deleteRequest } from 'state/request'
+import { fetchProjects, setSelectedProject } from 'state/project'
+import { fetchRequests, addRequest } from 'state/request'
 import { fetchRequestCohortCreation } from 'state/cohortCreation'
 
 const ERROR_TITLE = 'error_title'
@@ -37,58 +28,54 @@ const ModalCreateNewRequest: React.FC<{
 }> = ({ onClose }) => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
-  const url = window.location.href && window.location.href.includes('/cohort/new') ? true : false
+  const url = window.location.href?.includes('/cohort/new')
   const requestState = useAppSelector((state) => state.request)
-  const _projectsList = useAppSelector((state) => state.project.projectsList)
+  const { projectsList, selectedProject } = useAppSelector((state) => state.project)
 
   const { requestsList, selectedRequest } = requestState
 
-  const isEdition = selectedRequest ? selectedRequest.uuid : false
-
   const [tab, setTab] = useState<'form' | 'open'>('form')
-  const [deletionConfirmation, setDeletionConfirmation] = useState(false)
-
   const [loading, setLoading] = useState(true)
 
   const [currentRequest, setCurrentRequest] = useState<RequestType | null>(selectedRequest)
-  const [projectName, onChangeProjectName] = useState<string>('Projet de recherche')
+  const [projectName, setProjectName] = useState<string>('Projet de recherche')
   const [openRequest, setOpenRequest] = useState<string | null>(null)
 
   const [error, setError] = useState<'error_title' | 'error_project' | 'error_project_name' | 'error_regex' | null>(
     null
   )
 
-  const _onChangeValue = (key: 'name' | 'parent_folder' | 'description', value: string) => {
+  const _onChangeValue = (key: 'name' | 'parent_folder' | 'description', value: string | { uuid: string }) => {
     setCurrentRequest((prevState) =>
       prevState ? { ...prevState, [key]: value } : { uuid: '', name: '', [key]: value }
     )
   }
 
   const _fetchProject = async () => {
-    let projectsList = []
-    if (_projectsList && _projectsList.length > 0) {
-      projectsList = _projectsList
+    let _projectsList = []
+    if (projectsList && projectsList.length > 0) {
+      _projectsList = projectsList
     } else {
       const myProjects = (await dispatch(fetchProjects()).unwrap()) || []
-      projectsList = myProjects.projectsList
+      _projectsList = myProjects.projectsList
     }
     // Auto select newset project folder
     // + Auto set the new project folder with 'Projet de recherche ...'
-    if (projectsList && projectsList.length > 0) {
-      if (!isEdition && !selectedRequest?.parent_folder) {
-        _onChangeValue('parent_folder', projectsList[0].uuid)
+    if (_projectsList && _projectsList.length > 0) {
+      if (selectedProject) {
+        _onChangeValue('parent_folder', selectedProject)
+      } else if (!selectedRequest?.parent_folder) {
+        _onChangeValue('parent_folder', { uuid: _projectsList[0].uuid })
       }
-      onChangeProjectName(`Projet de recherche ${projectsList.length || ''}`)
+      setProjectName(`Projet de recherche ${_projectsList.length || ''}`)
     } else {
       _onChangeValue('parent_folder', NEW_PROJECT_ID)
-      onChangeProjectName(`Projet de recherche par défaut`)
+      setProjectName(`Projet de recherche par défaut`)
     }
   }
 
   const _fetchRequestNumber = async () => {
-    if (isEdition) return
-
-    if (requestState && requestState.requestsList) {
+    if (requestState?.requestsList) {
       _onChangeValue('name', `Nouvelle requête ${(requestState?.requestsList.length || 0) + 1}`)
     } else {
       const requestResponse = await dispatch(fetchRequests()).unwrap()
@@ -107,7 +94,7 @@ const ModalCreateNewRequest: React.FC<{
 
     fetcher()
     return () => {
-      onChangeProjectName('')
+      setProjectName('')
     }
   }, [])
 
@@ -140,20 +127,17 @@ const ModalCreateNewRequest: React.FC<{
       return setError(ERROR_PROJECT_NAME)
     }
 
-    if (currentRequest.parent_folder === NEW_PROJECT_ID) {
+    if (currentRequest.parent_folder.uuid === NEW_PROJECT_ID) {
       // Create a project before
-      const newProject = await services.projects.addProject({ uuid: '', name: projectName })
+      const newProject = await services.projects.addProject({ name: projectName })
       if (newProject) {
-        currentRequest.parent_folder = newProject.uuid
+        currentRequest.parent_folder.uuid = newProject.uuid
       }
       dispatch(fetchProjects())
     }
 
-    if (isEdition) {
-      dispatch(editRequest({ editedRequest: currentRequest }))
-    } else {
-      dispatch(addRequest({ newRequest: currentRequest }))
-    }
+    dispatch(addRequest({ newRequest: currentRequest }))
+    dispatch(setSelectedProject(null))
   }
 
   const handleConfirmOpen = () => {
@@ -162,109 +146,70 @@ const ModalCreateNewRequest: React.FC<{
     }
   }
 
-  const handleConfirmDeletion = () => {
-    if (loading || !isEdition || !selectedRequest) return
-    setLoading(true)
-
-    dispatch(deleteRequest({ deletedRequest: selectedRequest }))
-  }
-
   return (
-    <>
-      <Dialog
-        fullWidth
-        onClose={() => onClose && typeof onClose === 'function' && onClose()}
-        maxWidth="sm"
-        open
-        aria-labelledby="form-dialog-title"
-      >
-        {tab === 'form' ? (
-          <DialogTitle>{isEdition ? 'Modification' : 'Création'} d'une requête</DialogTitle>
-        ) : (
-          <DialogTitle>Ouvrir une requête</DialogTitle>
-        )}
-        <DialogContent>
-          {loading || currentRequest === null ? (
-            <Grid container direction="column" justifyContent="center" alignItems="center" marginBottom={3}>
-              <CircularProgress />
-            </Grid>
-          ) : tab === 'form' ? (
-            <RequestForm
-              currentRequest={currentRequest}
-              onChangeValue={_onChangeValue}
-              error={error}
-              projectName={projectName}
-              onChangeProjectName={onChangeProjectName}
-              projectList={_projectsList}
-            />
-          ) : (
-            <RequestList
-              projectList={_projectsList}
-              requestsList={requestsList}
-              selectedItem={openRequest}
-              onSelectedItem={(newOpenRequest: string) =>
-                setOpenRequest(newOpenRequest === openRequest ? null : newOpenRequest)
-              }
-            />
-          )}
-        </DialogContent>
-
-        <DialogActions>
-          {isEdition ? (
-            <Button disabled={loading} onClick={() => setDeletionConfirmation(true)} style={{ color: '#dc3545' }}>
-              Supprimer
-            </Button>
-          ) : url ? (
-            <Button variant="contained" disabled={loading} onClick={() => setTab(tab === 'form' ? 'open' : 'form')}>
-              {tab === 'form' ? 'Ouvrir' : 'Nouvelle requête'}
-            </Button>
-          ) : (
-            <></>
-          )}
-
-          <Grid style={{ flex: 1 }} />
-
-          <Button disabled={loading} onClick={handleClose} color="secondary">
-            Annuler
-          </Button>
-          {tab === 'form' ? (
-            <Button disabled={loading} onClick={handleConfirm}>
-              {isEdition ? 'Modifier' : 'Créer'}
-            </Button>
-          ) : (
-            <Button disabled={loading || openRequest === null} onClick={handleConfirmOpen}>
-              Ouvrir
-            </Button>
-          )}
-        </DialogActions>
-      </Dialog>
-
-      {isEdition && (
-        <Dialog
-          fullWidth
-          maxWidth="xs"
-          open={deletionConfirmation}
-          onClose={handleClose}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle>Supprimer une requête</DialogTitle>
-
-          <DialogContent>
-            <Typography>Êtes-vous sûr(e) de vouloir supprimer cette requête ?</Typography>
-          </DialogContent>
-
-          <DialogActions>
-            <Button disabled={loading} onClick={handleClose}>
-              Annuler
-            </Button>
-
-            <Button disabled={loading} onClick={handleConfirmDeletion} style={{ color: '#dc3545' }}>
-              Supprimer
-            </Button>
-          </DialogActions>
-        </Dialog>
+    <Dialog
+      fullWidth
+      onClose={() => onClose && typeof onClose === 'function' && onClose()}
+      maxWidth="sm"
+      open
+      aria-labelledby="form-dialog-title"
+    >
+      {tab === 'form' ? (
+        <DialogTitle>Création d'une requête</DialogTitle>
+      ) : (
+        <DialogTitle>Ouvrir une requête</DialogTitle>
       )}
-    </>
+      <DialogContent>
+        {loading || currentRequest === null ? (
+          <Grid container direction="column" justifyContent="center" alignItems="center" marginBottom={3}>
+            <CircularProgress />
+          </Grid>
+        ) : tab === 'form' ? (
+          <RequestForm
+            currentRequest={currentRequest}
+            onChangeValue={_onChangeValue}
+            error={error}
+            projectName={projectName}
+            onChangeProjectName={setProjectName}
+            projectList={projectsList}
+          />
+        ) : (
+          <RequestList
+            projectList={projectsList}
+            requestsList={requestsList}
+            selectedItem={openRequest}
+            onSelectedItem={(newOpenRequest: string) =>
+              setOpenRequest(newOpenRequest === openRequest ? null : newOpenRequest)
+            }
+          />
+        )}
+      </DialogContent>
+
+      <DialogActions>
+        {url ? (
+          <Button variant="contained" disabled={loading} onClick={() => setTab(tab === 'form' ? 'open' : 'form')}>
+            {tab === 'form' ? 'Ouvrir' : 'Nouvelle requête'}
+          </Button>
+        ) : (
+          <></>
+        )}
+
+        <Grid style={{ flex: 1 }} />
+
+        <Button disabled={loading} onClick={handleClose} color="secondary">
+          Annuler
+        </Button>
+        {tab === 'form' ? (
+          <Button disabled={loading} onClick={handleConfirm}>
+            Créer
+          </Button>
+        ) : (
+          <Button disabled={loading || openRequest === null} onClick={handleConfirmOpen}>
+            Ouvrir
+          </Button>
+        )}
+      </DialogActions>
+    </Dialog>
   )
 }
 

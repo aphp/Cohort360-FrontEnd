@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import moment from 'moment'
 
 import {
@@ -26,7 +26,7 @@ import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
 import UpdateSharpIcon from '@mui/icons-material/UpdateSharp'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
-import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
+import ModalShareRequest from 'components/Researches/Modals/ModalShareRequest'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import {
@@ -41,14 +41,12 @@ import {
 
 import {
   CohortCreationCounterType,
-  CohortJobStatus,
+  JobStatus,
   CurrentSnapshot,
   LoadingStatus,
   RequestType,
-  SimpleStatus,
   Snapshot,
-  WSJobStatus,
-  WebSocketJobStatus
+  WSJobStatus
 } from 'types'
 
 import useStyle from './styles'
@@ -72,13 +70,6 @@ const ControlPanel: React.FC<{
   const [openModal, setOpenModal] = useState<'executeCohortConfirmation' | null>(null)
   const [oldCount, setOldCount] = useState<CohortCreationCounterType | null>(null)
   const [openShareRequestModal, setOpenShareRequestModal] = useState<boolean>(false)
-  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
-  const wrapperSetShareSuccessOrFailMessage = useCallback(
-    (val: SimpleStatus) => {
-      setShareSuccessOrFailMessage(val)
-    },
-    [setShareSuccessOrFailMessage]
-  )
   const [countLoading, setCountLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
   const [reportLoading, setReportLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
   const [reportError, setReportError] = useState(false)
@@ -214,10 +205,7 @@ const ControlPanel: React.FC<{
   const webSocketContext = useContext(WebSocketContext)
 
   useEffect(() => {
-    if (
-      status &&
-      (status === CohortJobStatus.NEW || status === CohortJobStatus.PENDING || status === CohortJobStatus.STARTED)
-    ) {
+    if (status && (status === JobStatus.NEW || status === JobStatus.PENDING || status === JobStatus.STARTED)) {
       setCountLoading(LoadingStatus.FETCHING)
       //TODO: refacto the lunch of the count in the app colision with buildCohortCreation and unbuildCohortCreation
       // dispatch(countCohortCreation({ uuid: uuid }))
@@ -227,7 +215,7 @@ const ControlPanel: React.FC<{
   useEffect(() => {
     const listener = (message: WSJobStatus) => {
       let response = {}
-      if (message.status !== WebSocketJobStatus.pending && message.uuid === count.uuid) {
+      if (message.status !== JobStatus.PENDING && message.uuid === count.uuid) {
         setCountLoading(LoadingStatus.SUCCESS)
         response = {
           includePatient: message.extra_info?.measure,
@@ -483,7 +471,7 @@ const ControlPanel: React.FC<{
                     <div style={{ width: 135 }}>{moment(snapshot.created_at).format('DD/MM/YYYY - HH:mm:ss')}</div>
                   </Link>
                   <Grid container alignItems="center" style={{ width: 24, margin: '0 4px' }}>
-                    {snapshot.has_linked_cohorts && (
+                    {snapshot.cohorts_count > 0 && (
                       <Tooltip title="Une ou plusieurs cohortes ont été créées à partir de cette version.">
                         <SupervisedUserCircleIcon fontSize="small" color="action" sx={{ color: '#f7a600b3' }} />
                       </Tooltip>
@@ -517,11 +505,10 @@ const ControlPanel: React.FC<{
         />
       )}
 
-      {openShareRequestModal && requestShare !== null && requestShare?.currentSnapshot !== undefined && (
+      {requestShare?.currentSnapshot !== undefined && (
         <ModalShareRequest
-          shareSuccessOrFailMessage={shareSuccessOrFailMessage}
-          parentStateSetter={wrapperSetShareSuccessOrFailMessage}
-          requestShare={requestShare}
+          open={openShareRequestModal}
+          requestToShare={requestShare}
           onClose={() => handleCloseSharedModal()}
         />
       )}
@@ -535,32 +522,6 @@ const ControlPanel: React.FC<{
         >
           <Alert severity="error" onClose={() => handleCloseSharedModal()}>
             Votre requête ne possède aucun critère. Elle ne peut donc pas être partagée.
-          </Alert>
-        </Snackbar>
-      )}
-
-      {shareSuccessOrFailMessage === 'success' && (
-        <Snackbar
-          open
-          onClose={() => setShareSuccessOrFailMessage(null)}
-          autoHideDuration={5000}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert severity="success" onClose={() => setShareSuccessOrFailMessage(null)}>
-            Votre requête a été partagée.
-          </Alert>
-        </Snackbar>
-      )}
-
-      {shareSuccessOrFailMessage === 'error' && (
-        <Snackbar
-          open
-          onClose={() => setShareSuccessOrFailMessage(null)}
-          autoHideDuration={5000}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert severity="error" onClose={() => setShareSuccessOrFailMessage(null)}>
-            Une erreur est survenue, votre requête n'a pas pu être partagée.
           </Alert>
         </Snackbar>
       )}
