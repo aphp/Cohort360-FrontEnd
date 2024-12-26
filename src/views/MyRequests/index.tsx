@@ -42,6 +42,7 @@ const MyRequests = () => {
   const [searchInput, setSearchInput] = useState('')
   const [selectedRequests, setSelectedRequests] = useState<RequestType[]>([])
   const [openModal, setOpenModal] = useState<'move_to_folder' | 'delete_items' | null>(null)
+
   const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
   const wrapperSetShareSuccessOrFailMessage = useCallback(
     (val: SimpleStatus) => {
@@ -49,7 +50,6 @@ const MyRequests = () => {
     },
     [setShareSuccessOrFailMessage]
   )
-
   const projectState = useAppSelector((state) => state.project)
   const requestState = useAppSelector((state) => state.request)
   const cohortState = useAppSelector((state) => state.cohort)
@@ -178,7 +178,7 @@ const MyRequests = () => {
 
                 <Hidden only={['xs', 'sm', 'md']}>
                   <Button
-                    icon={<AddIcon />}
+                    startIcon={<AddIcon />}
                     width="200px"
                     onClick={() => handleClickAddProject()}
                     disabled={maintenanceIsActive}
@@ -227,7 +227,6 @@ const MyRequests = () => {
               selectedRequestShare?.shared_query_snapshot !== undefined &&
               selectedRequestShare?.shared_query_snapshot?.length > 0 && (
                 <ModalShareRequest
-                  shareSuccessOrFailMessage={shareSuccessOrFailMessage}
                   parentStateSetter={wrapperSetShareSuccessOrFailMessage}
                   onClose={() => dispatch(setSelectedRequestShare(null))}
                 />

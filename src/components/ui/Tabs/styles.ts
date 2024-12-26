@@ -1,18 +1,31 @@
 import { Tab, Tabs } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
-type TabCustomProps = {
-  width: string
-  variant: 'pink' | 'blue'
+export type TabVariant = 'pink' | 'blue' | 'pill'
+
+type TabsCustomProps = {
+  _variant: TabVariant
 }
 
-export const TabsWrapper = styled(Tabs)(() => ({
+type TabCustomProps = {
+  width: string
+  variant: TabVariant
+}
+
+export const TabsWrapper = styled(Tabs)<TabsCustomProps>(({ _variant }) => ({
   minHeight: 32,
   borderRadius: 8,
-  '.MuiTabs-indicator': {
-    backgroundColor: '#ED6D91',
-    height: '4px'
-  }
+  ...(_variant !== 'pill' && {
+    '.MuiTabs-indicator': {
+      backgroundColor: '#ED6D91',
+      height: '4px'
+    }
+  }),
+  ...(_variant === 'pill' && {
+    width: '100%',
+    '.MuiTabs-indicator': { bottom: undefined, visibility: 'hidden' },
+    '.MuiTabs-flexContainer': { justifyContent: 'space-between' }
+  })
 }))
 
 export const TabWrapper = styled(Tab)<TabCustomProps>(({ width, variant }) => ({
@@ -47,6 +60,24 @@ export const TabWrapper = styled(Tab)<TabCustomProps>(({ width, variant }) => ({
       backgroundColor: '#0063AF',
       color: '#FFF',
       fontSize: 12
+    }
+  }),
+  ...(variant === 'pill' && {
+    position: 'relative',
+    borderRadius: '30px',
+    textAlign: 'center',
+    padding: '10px 15px',
+    color: '#232E6A',
+    height: 'auto',
+    float: 'none',
+    fontFamily: "'Montserrat', sans-serif",
+    fontSize: '16px',
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    [`&.Mui-selected, &:hover`]: {
+      backgroundColor: '#FFF',
+      color: 'inherit',
+      padding: '16px 0'
     }
   })
 }))

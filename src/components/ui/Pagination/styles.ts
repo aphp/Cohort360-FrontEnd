@@ -14,8 +14,7 @@ export const StyledPagination = styled(Pagination)<ColorProps>(({ elemColor = '#
   },
   '& .MuiPaginationItem-page.Mui-selected': {
     color: '#fff',
-    backgroundColor: elemColor,
-    height: 25
+    backgroundColor: elemColor
   }
 }))
 

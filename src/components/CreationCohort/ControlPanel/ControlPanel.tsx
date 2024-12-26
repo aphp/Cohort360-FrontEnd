@@ -483,7 +483,7 @@ const ControlPanel: React.FC<{
                     <div style={{ width: 135 }}>{moment(snapshot.created_at).format('DD/MM/YYYY - HH:mm:ss')}</div>
                   </Link>
                   <Grid container alignItems="center" style={{ width: 24, margin: '0 4px' }}>
-                    {snapshot.has_linked_cohorts && (
+                    {snapshot.cohorts_count > 0 && (
                       <Tooltip title="Une ou plusieurs cohortes ont été créées à partir de cette version.">
                         <SupervisedUserCircleIcon fontSize="small" color="action" sx={{ color: '#f7a600b3' }} />
                       </Tooltip>
@@ -519,7 +519,6 @@ const ControlPanel: React.FC<{
 
       {openShareRequestModal && requestShare !== null && requestShare?.currentSnapshot !== undefined && (
         <ModalShareRequest
-          shareSuccessOrFailMessage={shareSuccessOrFailMessage}
           parentStateSetter={wrapperSetShareSuccessOrFailMessage}
           requestShare={requestShare}
           onClose={() => handleCloseSharedModal()}

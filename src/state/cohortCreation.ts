@@ -213,11 +213,11 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
             const uuid = newSnapshot.uuid
             const created_at = newSnapshot.created_at
             const title = newSnapshot.title
-            const has_linked_cohorts = newSnapshot.has_linked_cohorts
+            const cohorts_count = newSnapshot.cohorts_count
             const version = newSnapshot.version
 
             currentSnapshot = { ...newSnapshot, navHistoryIndex: navHistory.length }
-            snapshotsHistory = [{ uuid, created_at, title, has_linked_cohorts, version }]
+            snapshotsHistory = [{ uuid, created_at, title, cohorts_count, version }]
             _navHistory.push(currentSnapshot)
           }
         }
@@ -228,11 +228,11 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
           const uuid = newSnapshot.uuid
           const created_at = newSnapshot.created_at
           const title = newSnapshot.title
-          const has_linked_cohorts = newSnapshot.has_linked_cohorts
+          const cohorts_count = newSnapshot.cohorts_count
           const version = newSnapshot.version
 
           currentSnapshot = { ...newSnapshot, navHistoryIndex: navHistory.length }
-          snapshotsHistory = [{ uuid, created_at, title, has_linked_cohorts, version }, ...snapshotsHistory]
+          snapshotsHistory = [{ uuid, created_at, title, cohorts_count, version }, ...snapshotsHistory]
           _navHistory.push(currentSnapshot)
         }
       }

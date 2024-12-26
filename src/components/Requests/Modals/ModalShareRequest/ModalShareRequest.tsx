@@ -25,7 +25,6 @@ const ERROR_USER_SHARE_LIST = 'error_user_share_list'
 
 const ModalShareRequest: React.FC<{
   requestShare?: RequestType | null
-  shareSuccessOrFailMessage?: SimpleStatus
   parentStateSetter: (val: SimpleStatus) => void
   onClose: () => void
 }> = ({ requestShare, onClose, parentStateSetter }) => {
@@ -112,7 +111,9 @@ const ModalShareRequest: React.FC<{
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Annuler</Button>
+        <Button color="secondary" onClick={handleClose}>
+          Annuler
+        </Button>
         <Button onClick={handleConfirm}>Valider</Button>
       </DialogActions>
     </Dialog>

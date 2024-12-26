@@ -71,7 +71,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
           <MenuItem value={NEW_PROJECT_ID}>Nouveau projet</MenuItem>
         </Select>
 
-        {currentRequest.parent_folder === NEW_PROJECT_ID && (
+        {currentRequest.parent_folder?.uuid === NEW_PROJECT_ID && (
           <TextField
             placeholder="Nom du nouveau projet"
             value={projectName}

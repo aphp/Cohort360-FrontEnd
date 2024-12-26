@@ -13,7 +13,7 @@ import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import { BlockWrapper } from 'components/ui/Layout'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import { LoadingStatus } from 'types'
+import { LoadingStatus, ValueSet } from 'types'
 import { CohortsType } from 'types/cohorts'
 import { FilterKeys, OrderBy } from 'types/searchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
@@ -28,21 +28,7 @@ import useCohortList from 'hooks/useCohortList'
 import { Pagination } from 'components/ui/Pagination'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
-
-const statusOptions = [
-  {
-    display: 'Terminé',
-    code: 'finished'
-  },
-  {
-    display: 'En attente',
-    code: 'pending,started'
-  },
-  {
-    display: 'Erreur',
-    code: 'failed'
-  }
-]
+import { statusOptions } from 'utils/explorationUtils'
 
 type MyCohortsProps = {
   favoriteUrl?: boolean
@@ -104,7 +90,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
   }
 
   useEffect(() => {
-    addFilters({ ...filters, favorite: favoriteUrl ? CohortsType.FAVORITE : CohortsType.ALL })
+    addFilters({ ...filters, favorite: favoriteUrl ? [CohortsType.FAVORITE] : [] })
   }, [favoriteUrl])
 
   useEffect(() => {
@@ -177,7 +163,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
                 />
                 <Button
                   width={'150px'}
-                  icon={<FilterList height="15px" fill="#FFF" />}
+                  startIcon={<FilterList height="15px" fill="#FFF" />}
                   onClick={() => setToggleModal(true)}
                 >
                   Filtrer
@@ -192,7 +178,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
               onClose={() => setToggleModal(false)}
               onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
             >
-              <CohortStatusFilter value={status} name={FilterKeys.STATUS} allStatus={statusOptions} />
+              <CohortStatusFilter value={status as ValueSet[]} name={FilterKeys.STATUS} allStatus={statusOptions} />
               <CohortsTypesFilter value={favorite} name={FilterKeys.FAVORITE} />
               <PatientsNbFilter
                 values={[minPatients, maxPatients]}
@@ -213,7 +199,11 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
           <Grid container justifyContent="flex-end">
             <ResearchTable
               loading={loadingStatus !== LoadingStatus.SUCCESS}
-              data={favorite === CohortsType.ALL ? cohortList : cohortState.favoriteCohortsList}
+              data={
+                favorite?.length === 0 || (favorite?.length === 1 && favorite[0] === CohortsType.FAVORITE)
+                  ? cohortList
+                  : cohortState.favoriteCohortsList
+              }
               orderBy={orderBy.orderBy}
               orderDirection={orderBy.orderDirection}
               onChangeOrder={(orderBy: OrderBy) => changeOrderBy(orderBy)}

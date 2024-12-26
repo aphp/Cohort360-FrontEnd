@@ -25,14 +25,12 @@ import BusinessIcon from '@mui/icons-material/Business'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import FaceIcon from '@mui/icons-material/Face'
 import CloseIcon from '@mui/icons-material/Close'
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
-
-import StarIcon from 'assets/icones/star.svg?react'
-import StarFullIcon from 'assets/icones/star full.svg?react'
 import MoreButton from '@mui/icons-material/MoreVert'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
 import { AvatarWrapper } from 'components/ui/Avatar/styles'
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
+import FavStar from 'components/ui/FavStar'
 import ModalEditCohort from 'components/Requests/Modals/ModalEditCohort/ModalEditCohort'
 
 import { useAppSelector, useAppDispatch } from 'state'
@@ -277,11 +275,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
             {cohort.showActionButton && !dashboard.loading && (
               <Grid container item justifyContent="flex-end" style={{ width: 120 }}>
                 <IconButton onClick={handleFavorite} color="secondary" disabled={maintenanceIsActive}>
-                  {dashboard.favorite ? (
-                    <StarFullIcon height={18} fill="currentColor" />
-                  ) : (
-                    <StarIcon height={18} fill="currentColor" />
-                  )}
+                  <FavStar favorite={dashboard.favorite} height={18} />
                 </IconButton>
 
                 <IconButton
