@@ -16,6 +16,11 @@ import DownloadPopup from 'views/DownloadPopup/DownloadPopup'
 import Export from 'pages/Export'
 import ExportRequest from 'pages/ExportRequest'
 import FeasibilityReports from 'pages/FeasibilityReports'
+import MyResearches from 'views/MyResearches'
+import ProjectsList from 'components/Exploration/components/ProjectsList'
+import RequestsList from 'components/Exploration/components/RequestsList'
+import CohortsList from 'components/Exploration/components/CohortsList'
+import SamplesList from 'components/Exploration/components/SamplesList'
 
 // import { ODD_CONTACT } from '../../../constants'
 
@@ -116,6 +121,59 @@ const configRoutes: configRoute[] = [
     name: 'my-requests',
     isPrivate: true,
     element: <MyRequests />
+  },
+  /**
+   * Cohort360: My Researches
+   */
+  {
+    exact: true,
+    displaySideBar: true,
+    path: '/researches',
+    name: 'researches',
+    isPrivate: true,
+    element: <MyResearches />,
+    children: [
+      {
+        path: 'projects',
+        element: <ProjectsList />
+      },
+      {
+        path: 'projects/:projectId',
+        element: <RequestsList />
+      },
+      {
+        path: 'projects/:projectId/:requestId',
+        element: <CohortsList />
+      },
+      {
+        path: 'projects/:projectId/:requestId/:cohortId',
+        element: <SamplesList />
+      },
+
+      {
+        path: 'requests',
+        element: <RequestsList />
+      },
+      {
+        path: 'requests/:requestId',
+        element: <CohortsList />
+      },
+      {
+        path: 'requests/:requestId/:cohortId',
+        element: <SamplesList />
+      },
+
+      {
+        path: 'cohorts',
+        element: <CohortsList />
+      },
+      { path: 'cohorts/:cohortId', element: <SamplesList /> },
+
+      {
+        path: 'samples',
+        element: <SamplesList />
+      }
+    ]
   },
   /**
    * Cohort360: Cohorts Creation Page

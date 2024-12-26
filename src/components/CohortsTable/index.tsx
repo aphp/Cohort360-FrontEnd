@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 
 import {
   Button,
-  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -29,46 +28,30 @@ import {
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import InfoIcon from '@mui/icons-material/Info'
 
-import Star from 'assets/icones/star.svg?react'
-import StarFull from 'assets/icones/star full.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
 import ExportIcon from '@mui/icons-material/GetApp'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
-import UpdateIcon from '@mui/icons-material/Update'
 
-import ModalEditCohort from 'components/Requests/Modals/ModalEditCohort/ModalEditCohort'
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
+import FavStar from 'components/ui/FavStar'
+import { getCohortStatusChip } from 'components/Exploration/components/CohortsTableContent'
+import ModalEditCohort from 'components/Requests/Modals/ModalEditCohort/ModalEditCohort'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { deleteCohort, editCohort, setSelectedCohort as setSelectedCohortState } from 'state/cohort'
 
 import { Cohort, CohortJobStatus } from 'types'
 
+import useCohortsWebSocket from 'components/Exploration/hooks/useCohortsWebSocket'
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from './styles'
 import { Direction, Order, OrderBy } from 'types/searchCriterias'
 import { AppConfig } from 'config'
-
-type FavStarProps = {
-  favorite?: boolean
-}
-const FavStar: React.FC<FavStarProps> = ({ favorite }) => {
-  if (favorite) {
-    return <StarFull height="15px" fill="#ED6D91" />
-  }
-  return <Star height="15px" fill="#ED6D91" />
-}
-
-const DisabledFavStar: React.FC<FavStarProps> = ({ favorite }) => {
-  if (favorite) {
-    return <StarFull height="15px" fill="#CBCFCF" />
-  }
-  return <Star height="15px" fill="#CBCFCF" />
-}
+import { formatDate } from 'utils/formatDate'
+import { getExportTooltip, getGlobalEstimation } from 'utils/explorationUtils'
 
 type ResearchTableProps = {
-  simplified?: boolean
   data: Cohort[]
   orderBy?: Order
   orderDirection?: Direction
@@ -98,6 +81,8 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   const selectedCohortState = useAppSelector((state) => state.cohort.selectedCohort)
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
+
+  useCohortsWebSocket()
 
   const onClickRow = (row: Cohort) => {
     if (
@@ -289,61 +274,24 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                         }}
                         disabled={maintenanceIsActive || !row.uuid}
                       >
-                        {maintenanceIsActive ? (
-                          <DisabledFavStar favorite={row.favorite} />
-                        ) : (
-                          <FavStar favorite={row.favorite} />
-                        )}
+                        <FavStar
+                          favorite={row.favorite}
+                          height={16}
+                          color={maintenanceIsActive ? '#CBCFCF' : undefined}
+                        />
                       </IconButton>
                     </TableCell>
                     <TableCell onClick={() => onClickRow(row)} align="center">
-                      {row.request_job_status === CohortJobStatus.FINISHED ? (
-                        <Chip label="Terminé" size="small" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                      ) : row.request_job_status === CohortJobStatus.PENDING ||
-                        row.request_job_status === CohortJobStatus.NEW ? (
-                        <Chip label="En cours" size="small" style={{ backgroundColor: '#ffc107', color: 'black' }} />
-                      ) : row.request_job_status === CohortJobStatus.LONG_PENDING ? (
-                        <Tooltip title="Cohorte volumineuse: sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.">
-                          <Chip
-                            label="En cours"
-                            size="small"
-                            style={{ backgroundColor: '#ffc107', color: 'black' }}
-                            icon={<UpdateIcon />}
-                          />
-                        </Tooltip>
-                      ) : row.request_job_fail_msg ? (
-                        <Tooltip title={row.request_job_fail_msg}>
-                          <Chip label="Erreur" size="small" style={{ backgroundColor: '#dc3545', color: 'black' }} />
-                        </Tooltip>
-                      ) : (
-                        <Chip label="Erreur" size="small" style={{ backgroundColor: '#dc3545', color: 'black' }} />
-                      )}
+                      {getCohortStatusChip(row.request_job_status, row.request_job_fail_msg)}
                     </TableCell>
                     <TableCell onClick={() => onClickRow(row)} align="center">
                       {displayDigit(row.result_size)}
                     </TableCell>
                     <TableCell onClick={() => onClickRow(row)} align="center">
-                      {row.dated_measure_global
-                        ? row.dated_measure_global?.measure_min === null ||
-                          row.dated_measure_global?.measure_max === null
-                          ? '-'
-                          : `${displayDigit(row.dated_measure_global?.measure_min)} - ${displayDigit(
-                              row.dated_measure_global?.measure_max
-                            )}`
-                        : '-'}
+                      {getGlobalEstimation(row)}
                     </TableCell>
                     <TableCell onClick={() => onClickRow(row)} align="center">
-                      {row.modified_at ? (
-                        <>
-                          {new Date(row.modified_at).toLocaleDateString('fr-FR')} {'à'}{' '}
-                          {new Date(row.modified_at).toLocaleTimeString('fr-FR', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </>
-                      ) : (
-                        '-'
-                      )}
+                      {formatDate(row.modified_at, true)}
                     </TableCell>
                     <TableCell align="center">
                       <Hidden lgDown>
@@ -355,19 +303,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                           style={{ width: 'max-content', margin: 'auto' }}
                         >
                           <Grid item>
-                            <Tooltip
-                              title={
-                                !row.exportable
-                                  ? 'Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé.'
-                                  : !canExportThisCohort && row.request_job_status === CohortJobStatus.FINISHED
-                                  ? "Vous n'avez pas les droits suffisants pour exporter cette cohorte."
-                                  : row.request_job_status === CohortJobStatus.FAILED
-                                  ? 'Cette cohorte ne peut pas être exportée car elle a échoué lors de sa création'
-                                  : row.request_job_status === CohortJobStatus.PENDING
-                                  ? 'Cette cohorte ne peut pas être exportée car elle est en cours de création'
-                                  : ''
-                              }
-                            >
+                            <Tooltip title={getExportTooltip(row, !!canExportThisCohort)}>
                               <div>
                                 <IconButton
                                   size="small"

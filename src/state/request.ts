@@ -32,15 +32,15 @@ const fetchRequests = createAsyncThunk<FetchRequestListReturn, void, { state: Ro
   'request/fetchRequests',
   async () => {
     try {
-      const requests = (await services.projects.fetchRequestsList(100, 0)) || []
+      const requests = (await services.projects.fetchRequestsList({ limit: 100, offset: 0 })) || []
 
       let requestList = requests.results || []
       // requestList.length <= 100, check fetchRequestsList() for more information
       if (requests.count > requestList.length) {
-        const newResult = await services.projects.fetchRequestsList(
-          requests.count - requestList.length,
-          requestList.length
-        )
+        const newResult = await services.projects.fetchRequestsList({
+          limit: requests.count - requestList.length,
+          offset: requestList.length
+        })
         // Add elements to requestList array and filter doublon
         requestList = [...requestList, ...(newResult.results || [])]
         requestList = requestList.filter((item, index, array) => {
@@ -203,7 +203,7 @@ const moveRequests = createAsyncThunk<MoveRequestReturn, MoveRequestParams, { st
         if (foundItem) {
           return {
             ...requestItem,
-            parent_folder
+            parent_folder: { uuid: parent_folder ?? '', name: '' }
           }
         } else {
           return requestItem
@@ -240,10 +240,10 @@ const deleteRequests = createAsyncThunk<DeleteRequestsReturn, DeleteRequestsPara
       const state = getState().request
       let requestsList: RequestType[] = state.requestsList ? [...state.requestsList] : []
 
-      const results = await services.projects.deleteRequests(deletedRequests)
+      await services.projects.deleteRequests(deletedRequests)
 
       requestsList = requestsList.filter((requestItem) => {
-        const foundItem = results.find((result) => result.uuid === requestItem.uuid)
+        const foundItem = deletedRequests.find((result) => result.uuid === requestItem.uuid)
         return foundItem === undefined
       })
 
@@ -260,7 +260,7 @@ const deleteRequests = createAsyncThunk<DeleteRequestsReturn, DeleteRequestsPara
 
 const setRequestSlice = createSlice({
   name: 'request',
-  initialState: defaultInitialState as RequestState,
+  initialState: defaultInitialState,
   reducers: {
     clearRequest: () => {
       return defaultInitialState

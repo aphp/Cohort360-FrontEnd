@@ -51,7 +51,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
 
   const handleAddRequest = () => {
     onSelectedRow([])
-    dispatch(setSelectedRequest({ uuid: '', name: '', parent_folder: row.uuid }))
+    dispatch(setSelectedRequest({ uuid: '', name: '', parent_folder: { uuid: row.uuid, name: row.name } }))
   }
 
   // eslint-disable-next-line
@@ -106,7 +106,8 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
                   isSearch={
                     !!searchInput &&
                     cohortsList.some(
-                      ({ name, ...cohortItem }) => name?.search(regexp) !== -1 && cohortItem.request === request.uuid
+                      ({ name, ...cohortItem }) =>
+                        name?.search(regexp) !== -1 && cohortItem.request?.uuid === request.uuid
                     )
                   }
                   selectedRequests={selectedRequests}

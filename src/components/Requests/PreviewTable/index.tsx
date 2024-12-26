@@ -45,6 +45,7 @@ import { RequestType, SimpleStatus } from 'types'
 
 import useStyles from '../../CohortsTable/styles'
 import ModalShareRequest from '../Modals/ModalShareRequest/ModalShareRequest'
+import { getRequestName } from 'utils/explorationUtils'
 
 type RequestsTableProps = {
   data: RequestType[]
@@ -118,15 +119,7 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
             <TableBody>
               {data?.map((row: RequestType) => (
                 <TableRow className={classes.pointerHover} hover key={row.uuid}>
-                  <TableCell onClick={() => _onClickRow(row)}>
-                    {row.shared_by?.display_name ? (
-                      <>
-                        {row.name} - Envoyée par : {row.shared_by.firstname} {row.shared_by.lastname?.toUpperCase()}
-                      </>
-                    ) : (
-                      <>{row.name}</>
-                    )}
-                  </TableCell>
+                  <TableCell onClick={() => _onClickRow(row)}>{getRequestName(row)}</TableCell>
                   <TableCell onClick={() => _onClickRow(row)} align="center">
                     {moment(row.updated_at).format('DD/MM/YYYY [à] HH:mm')}
                   </TableCell>
@@ -266,7 +259,6 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
         selectedRequestShareState?.shared_query_snapshot !== undefined &&
         selectedRequestShareState?.shared_query_snapshot?.length > 0 && (
           <ModalShareRequest
-            shareSuccessOrFailMessage={shareSuccessOrFailMessage}
             parentStateSetter={wrapperSetShareSuccessOrFailMessage}
             onClose={() => dispatch(setSelectedRequestShareState(null))}
           />

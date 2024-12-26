@@ -221,7 +221,7 @@ const PatientDocs = () => {
                 <Grid container>
                   <Button
                     width="100%"
-                    icon={<Save height="15px" fill="#FFF" />}
+                    startIcon={<Save height="15px" fill="#FFF" />}
                     onClick={() => setToggleSaveFiltersModal(true)}
                     color="secondary"
                     disabled={maintenanceIsActive}
@@ -234,12 +234,16 @@ const PatientDocs = () => {
           )}
           <Grid container item xs={12} md={allSavedFilters?.count ? 7 : 3} justifyContent="space-between">
             {!!allSavedFilters?.count && (
-              <Button icon={<SavedSearch fill="#FFF" />} width="49%" onClick={() => setToggleSavedFiltersModal(true)}>
+              <Button
+                startIcon={<SavedSearch fill="#FFF" />}
+                width="49%"
+                onClick={() => setToggleSavedFiltersModal(true)}
+              >
                 Vos filtres
               </Button>
             )}
             <Button
-              icon={<FilterList height="15px" fill="#FFF" />}
+              startIcon={<FilterList height="15px" fill="#FFF" />}
               width={allSavedFilters?.count ? '49%' : '100%'}
               onClick={() => setToggleFilterByModal(true)}
             >

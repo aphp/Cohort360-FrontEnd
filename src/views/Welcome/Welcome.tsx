@@ -1,26 +1,23 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router'
 import moment from 'moment'
 
 import { Alert, Container, Grid, Paper, Typography } from '@mui/material'
 
+import CohortsList from 'components/Exploration/components/CohortsList'
 import NewsCard from 'components/Welcome/NewsCard/NewsCard'
 import PatientsCard from 'components/Welcome/PatientsCard/PatientsCard'
 import SearchPatientCard from 'components/Welcome/SearchPatientCard/SearchPatientCard'
 import TutorialsCard from 'components/Welcome/TutorialsCard/TutorialsCard'
-import CohortsTable from 'components/CohortsTable'
-import RequestsTable from 'components/Requests/PreviewTable'
 import PreviewCard from 'components/ui/Cards/PreviewCard'
+import RequestsList from 'components/Exploration/components/RequestsList'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { fetchCohorts } from 'state/cohort'
 import { fetchProjects } from 'state/project'
 import { fetchRequests } from 'state/request'
-import { AccessExpiration, RequestType } from 'types'
+import { AccessExpiration } from 'types'
 import useStyles from './styles'
 import { CohortsType } from 'types/cohorts'
-import { Direction, Order } from 'types/searchCriterias'
-import useCohortList from 'hooks/useCohortList'
 import { infoMessages } from 'data/infoMessage'
 
 const Welcome = () => {
@@ -29,11 +26,8 @@ const Welcome = () => {
   const navigate = useNavigate()
   const practitioner = useAppSelector((state) => state.me)
   const open = useAppSelector((state) => state.drawer)
-  const cohortState = useAppSelector((state) => state.cohort)
-  const requestState = useAppSelector((state) => state.request)
   const meState = useAppSelector((state) => state.me)
-  const [lastRequest, setLastRequest] = useState<RequestType[]>([])
-  const cohortList = useCohortList()
+
   const accessExpirations: AccessExpiration[] = meState?.accessExpirations ?? []
   const maintenanceIsActive = meState?.maintenance?.active
 
@@ -41,50 +35,10 @@ const Welcome = () => {
     ? moment(practitioner.lastConnection).format('[Dernière connexion : ]ddd DD MMMM YYYY[, à ]HH:mm')
     : ''
 
-  const fetchCohortsPreview = () => {
-    dispatch(
-      fetchCohorts({
-        options: {
-          limit: 5,
-          searchCriterias: {
-            searchInput: '',
-            orderBy: { orderBy: Order.MODIFIED, orderDirection: Direction.DESC },
-            filters: {
-              status: [],
-              minPatients: null,
-              maxPatients: null,
-              startDate: null,
-              endDate: null,
-              favorite: CohortsType.FAVORITE
-            }
-          }
-        }
-      })
-    )
-    dispatch(
-      fetchCohorts({
-        options: {
-          limit: 5
-        }
-      })
-    )
-  }
-
   useEffect(() => {
     dispatch(fetchProjects())
     dispatch(fetchRequests())
-    fetchCohortsPreview()
   }, [])
-
-  useEffect(() => {
-    const _lastRequest =
-      requestState.requestsList?.length > 0
-        ? [...requestState.requestsList]
-            .sort((a, b) => +moment(b?.updated_at).format('X') - +moment(a.updated_at).format('X'))
-            .splice(0, 5)
-        : []
-    setLastRequest(_lastRequest)
-  }, [requestState])
 
   return practitioner ? (
     <Grid
@@ -203,14 +157,9 @@ const Welcome = () => {
               <PreviewCard
                 title={'Mes cohortes favorites'}
                 linkLabel={'Voir toutes mes cohortes favorites'}
-                onClickLink={() => navigate('/my-cohorts/favorites')}
+                onClickLink={() => navigate(`/researches/cohorts/?favorite=${CohortsType.FAVORITE}`)}
               >
-                <CohortsTable
-                  data={cohortState.favoriteCohortsList}
-                  loading={cohortState.loading}
-                  simplified
-                  onUpdate={() => fetchCohortsPreview()}
-                />
+                <CohortsList showHeader={false} rowsPerPage={5} favorites />
               </PreviewCard>
             </Paper>
           </Grid>
@@ -221,14 +170,9 @@ const Welcome = () => {
               <PreviewCard
                 title={'Mes dernières cohortes créées'}
                 linkLabel={'Voir toutes mes cohortes'}
-                onClickLink={() => navigate('/my-cohorts')}
+                onClickLink={() => navigate('/researches/cohorts')}
               >
-                <CohortsTable
-                  data={cohortList}
-                  loading={cohortState.loading}
-                  simplified
-                  onUpdate={() => fetchCohortsPreview()}
-                />
+                <CohortsList showHeader={false} rowsPerPage={5} />
               </PreviewCard>
             </Paper>
           </Grid>
@@ -239,9 +183,9 @@ const Welcome = () => {
               <PreviewCard
                 title={'Mes dernières requêtes créées'}
                 linkLabel={'Voir toutes mes requêtes'}
-                onClickLink={() => navigate('/my-requests')}
+                onClickLink={() => navigate('/researches/requests')}
               >
-                <RequestsTable data={lastRequest} loading={requestState.loading} />
+                <RequestsList showHeader={false} rowsPerPage={5} />
               </PreviewCard>
             </Paper>
           </Grid>

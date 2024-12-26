@@ -140,11 +140,11 @@ const ModalCreateNewRequest: React.FC<{
       return setError(ERROR_PROJECT_NAME)
     }
 
-    if (currentRequest.parent_folder === NEW_PROJECT_ID) {
+    if (currentRequest.parent_folder.uuid === NEW_PROJECT_ID) {
       // Create a project before
-      const newProject = await services.projects.addProject({ uuid: '', name: projectName })
+      const newProject = await services.projects.addProject({ name: projectName })
       if (newProject) {
-        currentRequest.parent_folder = newProject.uuid
+        currentRequest.parent_folder.uuid = newProject.uuid
       }
       dispatch(fetchProjects())
     }

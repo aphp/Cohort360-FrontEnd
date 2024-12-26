@@ -57,14 +57,15 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
       ? requestsList
       : requestsList.filter(
           ({ name, uuid }) =>
-            name.search(regexp) !== -1 || !!newSearchCohortList.find(({ request }) => request === uuid)
+            name.search(regexp) !== -1 || !!newSearchCohortList.find(({ request }) => request?.uuid === uuid)
         )
 
     const newSearchProjectList = !searchInput
       ? projectsList
       : projectsList.filter(
           ({ name, uuid }) =>
-            name.search(regexp) !== -1 || !!newSearchRequestList.find(({ parent_folder }) => parent_folder === uuid)
+            name.search(regexp) !== -1 ||
+            !!newSearchRequestList.find(({ parent_folder }) => parent_folder?.uuid === uuid)
         )
 
     setSearchCohortList(newSearchCohortList && newSearchCohortList.length > 0 ? newSearchCohortList : [])
@@ -112,7 +113,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
         })
 
         newSearchProjectList = newSearchProjectList.sort((a: ProjectType, b: ProjectType) => {
-          if (a.modified_at && b.modified_at && a.modified_at > b.modified_at) {
+          if (a.created_at && b.created_at && a.created_at > b.created_at) {
             return sortDirection === Direction.ASC ? 1 : -1
           } else {
             return sortDirection === Direction.ASC ? -1 : 1
@@ -209,7 +210,9 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
                   key={project.uuid}
                   row={project}
                   searchInput={searchInput}
-                  requestOfProject={currentRequestList.filter(({ parent_folder }) => parent_folder === project.uuid)}
+                  requestOfProject={currentRequestList.filter(
+                    ({ parent_folder }) => parent_folder?.uuid === project.uuid
+                  )}
                   cohortsList={searchCohortList && searchCohortList.length > 0 ? searchCohortList : cohortList}
                   selectedRequests={selectedRequests}
                   onSelectedRow={_onSelectedRow}

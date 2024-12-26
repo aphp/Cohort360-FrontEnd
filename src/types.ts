@@ -55,16 +55,11 @@ export enum WebSocketJobStatus {
 
 export enum CohortJobStatus {
   NEW = 'new',
-  DENIED = 'denied',
-  VALIDATED = 'validated',
   PENDING = 'pending',
   LONG_PENDING = 'long_pending',
   STARTED = 'started',
   FAILED = 'failed',
-  CANCELLED = 'cancelled',
   FINISHED = 'finished',
-  CLEANDED = 'cleaned',
-  UNKNOWN = 'unknown',
   SUSPENDED = 'suspended'
 }
 
@@ -209,16 +204,12 @@ export enum Month {
   DECEMBER = 'Décembre'
 }
 
-export type Column =
-  | {
-      label: string | ReactNode
-      code?: string
-      align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
-      multiple?: undefined
-    }
-  | {
-      multiple: Column[]
-    }
+export type Column = {
+  label: string | ReactNode
+  code?: string
+  align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
+  multiple?: Column[]
+}
 
 export enum ChartCode {
   AGE_PYRAMID = 'facet-extension.ageMonth',
@@ -394,26 +385,23 @@ export type ProjectType = {
   name: string
   description?: string
   created_at?: string
-  modified_at?: string
-  favorite?: boolean
-  owner_id?: string
+  requests_count?: number
+}
+
+export type ParentInfo = {
+  uuid: string
+  name: string
 }
 
 export type RequestType = {
   uuid: string
-  owner?: string
   query_snapshots?: QuerySnapshotInfo[]
-  shared_by?: User
-  parent_folder?: string
-  deleted?: string
-  deleted_by_cascade?: boolean
-  created_at?: string
-  modified_at?: string
+  shared_by?: string
+  parent_folder?: ParentInfo
   updated_at?: string
   name: string
   description?: string
   favorite?: boolean
-  data_type_of_query?: 'PATIENT' | 'ENCOUNTER'
   currentSnapshot?: Snapshot
   requestId?: string
   requestName?: string
@@ -425,7 +413,7 @@ export type QuerySnapshotInfo = {
   uuid: string
   created_at: string
   title: string
-  has_linked_cohorts: boolean
+  cohorts_count: number
   version: number
 }
 
@@ -492,26 +480,19 @@ export type Cohort = {
   uuid?: string
   owner?: string
   result_size?: number
-  request?: string
+  measure_min?: number
+  measure_max?: number
+  request?: ParentInfo
   request_query_snapshot?: string
-  dated_measure?: DatedMeasure
-  dated_measure_global?: DatedMeasure
-  global_estimate?: boolean
   group_id?: string
   exportable?: boolean
-  deleted?: string
-  deleted_by_cascade?: boolean
-  request_job_id?: string
-  request_job_status?: string
+  request_job_status?: CohortJobStatus
   request_job_fail_msg?: string
-  request_job_duration?: string
   created_at?: string
   modified_at?: string
   name?: string
   description?: string
   favorite?: boolean
-  create_task_id?: string
-  type?: 'IMPORT_I2B2' | 'MY_ORGANIZATIONS' | 'MY_PATIENTS' | 'MY_COHORTS'
   extension?: Extension[]
   rights?: GroupRights
 }
@@ -712,6 +693,8 @@ export type TabType<T = string, TL = string> = {
   icon?: ReactElement
   wrapped?: boolean
 }
+
+export type ExplorationTabs = TabType<string, ReactNode>
 
 export type PmsiTab = TabType<PMSIResourceTypes, PMSILabel>
 

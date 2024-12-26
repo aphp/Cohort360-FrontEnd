@@ -324,10 +324,16 @@ export type DocumentsFilters = GenericFilter & {
 }
 
 export interface CohortsFilters {
-  status: ValueSet[]
-  favorite: CohortsType
-  minPatients: null | string
-  maxPatients: null | string
+  status?: ValueSet[]
+  favorite: CohortsType[]
+  minPatients?: null | string
+  maxPatients?: null | string
+  startDate?: null | string
+  endDate?: null | string
+  parentId?: string
+}
+
+export type ProjectsFilters = {
   startDate: null | string
   endDate: null | string
 }

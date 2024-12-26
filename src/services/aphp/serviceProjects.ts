@@ -4,14 +4,47 @@ import apiBack from '../apiBackend'
 import { ProjectType, RequestType, Cohort, User } from 'types'
 
 import servicesCohorts from './serviceCohorts'
-import { CohortsFilters, Direction, OrderBy } from 'types/searchCriterias'
+import { CohortsFilters, Direction, Order, OrderBy, ProjectsFilters } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
 
+type FetchProjectsListProps = {
+  filters?: ProjectsFilters
+  searchInput?: string
+  order?: OrderBy
+  limit?: number
+  offset?: number
+}
+
+type FetchRequestsListProps = {
+  orderBy?: OrderBy
+  parentId?: string
+  searchInput?: string
+  startDate?: string | null
+  endDate?: string | null
+  limit?: number
+  offset?: number
+}
+
+type FetchCohortsListProps = {
+  filters: CohortsFilters
+  searchInput?: string
+  orderBy: OrderBy
+  limit?: number
+  offset?: number
+  signal?: AbortSignal
+}
+
+const optionsReducer = (accumulator: string, currentValue: string) =>
+  accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
+
 export interface IServiceProjects {
+  fetchProject: (projectId: string) => Promise<ProjectType>
   /**
    * Retourne la liste de projet de recherche d'un practitioner
    *
    * Argument:
+   *   - filters: Indique les filtres choisis sur les projets
+   *   - searchInput: Indique la chaîne de caractère recherchée par l'utilisateur
    *   - limit: Determine une limite de projet demandé
    *   - offset: Determine un index de départ
    *
@@ -21,10 +54,7 @@ export interface IServiceProjects {
    *   - previous: URL d'appel pour récupérer les projet de recherche précédent
    *   - results: Liste de projet de recherche récupéré
    */
-  fetchProjectsList: (
-    limit?: number,
-    offset?: number
-  ) => Promise<{
+  fetchProjectsList: (args: FetchProjectsListProps) => Promise<{
     count: number
     next: string | null
     previous: string | null
@@ -40,7 +70,7 @@ export interface IServiceProjects {
    * Retourne:
    *   - Projet de recherche ajouté
    */
-  addProject: (newProject: ProjectType) => Promise<ProjectType>
+  addProject: (newProject: Omit<ProjectType, 'uuid'>) => Promise<ProjectType>
 
   /**
    * Cette fonction modifie un projet de recherche existant
@@ -64,6 +94,8 @@ export interface IServiceProjects {
    */
   deleteProject: (deletedProject: ProjectType) => Promise<ProjectType>
 
+  fetchRequest: (request_id: string) => Promise<RequestType>
+
   /**
    * Retourne la liste de requete d'un practitioner
    *
@@ -77,10 +109,7 @@ export interface IServiceProjects {
    *   - previous: URL d'appel pour récupérer les requete précédent
    *   - results: Liste de requete récupéré
    */
-  fetchRequestsList: (
-    limit?: number,
-    offset?: number
-  ) => Promise<{
+  fetchRequestsList: (args: FetchRequestsListProps) => Promise<{
     count: number
     next: string | null
     previous: string | null
@@ -152,7 +181,7 @@ export interface IServiceProjects {
    * Retourne:
    *   - Requete supprimée
    */
-  deleteRequests: (deletedRequests: RequestType[]) => Promise<RequestType[]>
+  deleteRequests: (deletedRequests: RequestType[]) => Promise<RequestType>
 
   /**
    * Retourne la liste de Cohort d'un practitioner
@@ -170,14 +199,7 @@ export interface IServiceProjects {
    *   - previous: URL d'appel pour récupérer les cohortes précédentes
    *   - results: Liste de cohortes récupérées
    */
-  fetchCohortsList: (
-    filters: CohortsFilters,
-    searchInput: string,
-    orderBy: OrderBy,
-    limit?: number,
-    offset?: number,
-    signal?: AbortSignal
-  ) => Promise<{
+  fetchCohortsList: (args: FetchCohortsListProps) => Promise<{
     count: number
     next: string | null
     previous: string | null
@@ -215,30 +237,44 @@ export interface IServiceProjects {
    * Retourne:
    *   - Cohorte supprimée
    */
-  deleteCohort: (deletedCohort: Cohort) => Promise<Cohort>
+  deleteCohorts: (deletedCohorts: Cohort[]) => Promise<Cohort>
 }
 
 const servicesProjects: IServiceProjects = {
-  fetchProjectsList: async (limit, offset) => {
-    let search = `?ordering=created_at`
-    if (limit) {
-      search += `&limit=${limit}`
+  fetchProject: async (projectId) => {
+    try {
+      return (await apiBack.get(`/cohort/folders/${projectId}/`)).data
+    } catch (error) {
+      console.error(error)
     }
-    if (offset) {
-      search += `&offset=${offset}`
-    }
+  },
+  //TODO: temp, à clean
+  fetchRequest: async (requestId) => {
+    return (await apiBack.get(`/cohort/requests/${requestId}/`)).data
+  },
+  fetchProjectsList: async (args) => {
+    try {
+      const { filters, searchInput, order, limit, offset } = args
+      const _orderBy = order ?? { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC }
+      const orderDirection = _orderBy.orderDirection === Direction.DESC ? '-' : ''
+      let options: string[] = []
+      if (_orderBy) options = [...options, `ordering=${orderDirection}${_orderBy.orderBy}`]
+      if (limit) options = [...options, `limit=${limit}`]
+      if (offset) options = [...options, `offset=${offset}`]
+      if (searchInput) options = [...options, `search=${searchInput}`]
+      if (filters?.startDate) options = [...options, `min_created_at=${filters.startDate}`]
+      if (filters?.endDate) options = [...options, `max_created_at=${filters.endDate}`]
 
-    const fetchProjectsResponse = (await apiBack.get<{
-      count: number
-      next: string | null
-      previous: string | null
-      results: ProjectType[]
-    }>(`/cohort/folders/${search}`)) ?? { status: 400 }
+      const fetchProjectsResponse = await apiBack.get<{
+        count: number
+        next: string | null
+        previous: string | null
+        results: ProjectType[]
+      }>(`/cohort/folders/?${options.reduce(optionsReducer)}`)
 
-    if (fetchProjectsResponse.status === 200) {
-      const { data } = fetchProjectsResponse
-      return data
-    } else {
+      return fetchProjectsResponse.data
+    } catch (error) {
+      console.error(error)
       return {
         count: 0,
         next: '',
@@ -248,59 +284,72 @@ const servicesProjects: IServiceProjects = {
     }
   },
   addProject: async (newProject) => {
-    const addProjectResponse = (await apiBack.post(`/cohort/folders/`, newProject)) ?? { status: 400 }
-
-    if (addProjectResponse.status === 201) {
-      return addProjectResponse.data as ProjectType
-    } else {
-      throw new Error('Impossible de créer le projet de recherche')
+    try {
+      const addProjectResponse = await apiBack.post(`/cohort/folders/`, newProject)
+      if (addProjectResponse.status !== 201) {
+        throw new Error("Erreur lors de l'ajout du projet")
+      }
+      return addProjectResponse.data
+    } catch (error) {
+      console.error(error)
+      throw error
     }
   },
   editProject: async (editedProject) => {
-    const editProjectResponse = (await apiBack.patch(`/cohort/folders/${editedProject.uuid}/`, {
-      name: editedProject.name,
-      parent_folder: editedProject.uuid
-    })) ?? {
-      data: { results: [] }
-    }
-
-    if (editProjectResponse.status === 200) {
-      return editProjectResponse.data as ProjectType
-    } else {
-      throw new Error('Impossible de modifier le projet de recherche')
+    try {
+      const editProjectResponse = await apiBack.patch(`/cohort/folders/${editedProject.uuid}/`, {
+        parent_folder: editedProject.uuid,
+        name: editedProject.name,
+        description: editedProject.description
+      })
+      if (editProjectResponse.status !== 200) {
+        throw new Error("Erreur lors de l'édition du projet")
+      }
+      return editProjectResponse.data
+    } catch (error) {
+      console.error(error)
+      throw error
     }
   },
   deleteProject: async (deletedProject) => {
-    const deleteProjectResponse = (await apiBack.delete(`/cohort/folders/${deletedProject.uuid}/`)) ?? {
-      data: { results: [] }
-    }
-
-    if (deleteProjectResponse.status === 204) {
-      return deleteProjectResponse.data as ProjectType
-    } else {
-      throw new Error('Impossible de supprimer le projet de recherche')
+    try {
+      const deleteProjectResponse = (await apiBack.delete(`/cohort/folders/${deletedProject.uuid}/`)) ?? {
+        data: { results: [] }
+      }
+      if (deleteProjectResponse.status !== 204) {
+        throw new Error('Erreur lors de la suppression du projet')
+      }
+      return deleteProjectResponse.data
+    } catch (error) {
+      console.error(error)
+      throw error
     }
   },
 
-  fetchRequestsList: async (limit, offset) => {
-    let search = `?`
-    if (limit) {
-      search += `limit=${limit}`
-    }
-    if (offset) {
-      search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
-    }
+  fetchRequestsList: async (args) => {
+    try {
+      const { orderBy, parentId, searchInput, startDate, endDate, limit, offset } = args
+      const _orderBy = orderBy ?? { orderBy: Order.UPDATED, orderDirection: Direction.DESC }
+      const _sortDirection = _orderBy.orderDirection === Direction.DESC ? '-' : ''
+      let options: string[] = []
+      if (limit || limit === 0) options = [...options, `limit=${limit}`]
+      if (offset) options = [...options, `offset=${offset}`]
+      if (_orderBy) options = [...options, `ordering=${_sortDirection}${_orderBy.orderBy}`]
+      if (!parentId && searchInput && searchInput !== '') options = [...options, `search=${searchInput}`]
+      if (!parentId && startDate) options = [...options, `min_updated_at=${startDate}`]
+      if (!parentId && endDate) options = [...options, `max_updated_at=${endDate}`]
+      if (parentId) options = [...options, `parent_folder=${parentId}`]
 
-    const fetchRequestsListResponse = (await apiBack.get<{
-      count: number
-      next: string | null
-      previous: string | null
-      results: RequestType[]
-    }>(`/cohort/requests/${search}`)) ?? { status: 400 }
+      const fetchRequestsListResponse = await apiBack.get<{
+        count: number
+        next: string | null
+        previous: string | null
+        results: RequestType[]
+      }>(`/cohort/requests/?${options.reduce(optionsReducer)}`)
 
-    if (fetchRequestsListResponse.status === 200) {
       return fetchRequestsListResponse.data
-    } else {
+    } catch (error) {
+      console.error(error)
       return {
         count: 0,
         next: null,
@@ -315,21 +364,26 @@ const servicesProjects: IServiceProjects = {
       parent_folder: newRequest.parent_folder
     })) ?? { status: 400 }
     if (addRequestResponse.status === 201) {
-      return addRequestResponse.data as ProjectType
+      return addRequestResponse.data
     } else {
       throw new Error('Impossible de créer la requête')
     }
+    // TODO: l'ajout d'une requête lorsque le parent est à créer ne fonctionne plus
   },
   editRequest: async (editedRequest) => {
-    const editProjectResponse = (await apiBack.patch(`/cohort/requests/${editedRequest.uuid}/`, {
-      name: editedRequest.name,
-      description: editedRequest.description,
-      parent_folder: editedRequest.parent_folder
-    })) ?? { status: 400 }
-    if (editProjectResponse.status === 200) {
-      return editProjectResponse.data as ProjectType
-    } else {
-      throw new Error('Impossible de modifier la requête')
+    try {
+      const editProjectResponse = await apiBack.patch(`/cohort/requests/${editedRequest.uuid}/`, {
+        name: editedRequest.name,
+        description: editedRequest.description,
+        parent_folder: editedRequest.parent_folder
+      })
+      if (editProjectResponse.status !== 200) {
+        throw new Error("Erreur lors de l'édition de la requête")
+      }
+      return editProjectResponse.data
+    } catch (error) {
+      console.error(error)
+      throw error
     }
   },
   shareRequest: async (sharedRequest, notify_by_email): Promise<AxiosResponse<ProjectType>> => {
@@ -354,93 +408,97 @@ const servicesProjects: IServiceProjects = {
     }
   },
   deleteRequest: async (deletedRequest) => {
-    const deleteProjectResponse = (await apiBack.delete(`/cohort/requests/${deletedRequest.uuid}/`)) ?? {
-      status: 400
-    }
-    if (deleteProjectResponse.status === 204) {
+    try {
+      const deleteProjectResponse = await apiBack.delete(`/cohort/requests/${deletedRequest.uuid}zesrtyuhio/`)
+      if (deleteProjectResponse.status !== 204) {
+        throw new Error('Erreur lors de la suppression de la requête')
+      }
       return deleteProjectResponse.data
-    } else {
-      throw new Error('Impossible de supprimer la requête')
+    } catch (error) {
+      console.error(error)
+      throw error
     }
   },
 
   moveRequests: async (selectedRequests, parent_folder) => {
-    if (!parent_folder) return []
-
-    const moveRequestsResponse = await Promise.all(
-      selectedRequests.map((selectedRequest) =>
-        new Promise((resolve) => {
-          resolve(
-            apiBack.patch(`/cohort/requests/${selectedRequest.uuid}/`, {
-              parent_folder
-            })
-          )
-        })
-          .then((values) => {
-            return values
+    try {
+      const moveRequestsResponse = await Promise.all(
+        selectedRequests.map((selectedRequest) =>
+          apiBack.patch(`/cohort/requests/${selectedRequest.uuid}/`, {
+            parent_folder
           })
-          .catch((error) => {
-            return error
-          })
+        )
       )
-    )
-    return moveRequestsResponse && moveRequestsResponse.length > 0
-      ? // @ts-ignore
-        moveRequestsResponse.map((moveRequestResponse) => moveRequestResponse?.data as RequestType)
-      : []
+      if (moveRequestsResponse.some((response) => response.status !== 200)) {
+        throw new Error('Erreur lors du déplacement de requête')
+      }
+      return moveRequestsResponse.map((moveRequestResponse) => moveRequestResponse?.data)
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
   },
 
   deleteRequests: async (deletedRequests) => {
-    const deleteRequestsResponse = await Promise.all(
-      deletedRequests.map(
-        (deletedRequest) =>
-          new Promise((resolve) => {
-            resolve(apiBack.delete(`/cohort/requests/${deletedRequest.uuid}/`))
-          })
-      )
-    )
+    try {
+      const requestsIds = deletedRequests.map((request) => request.uuid).join()
+      const deleteRequestsResponse = await apiBack.delete(`/cohort/requests/${requestsIds}/`)
 
-    // @ts-ignore
-    const checkResponse = deleteRequestsResponse.filter(({ status }) => status === 204)
-    return checkResponse.length === deletedRequests.length ? deletedRequests : []
+      if (deleteRequestsResponse.status !== 204) {
+        throw new Error('Erreur lors de la suppression de la requête')
+      }
+      return deleteRequestsResponse.data
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
   },
 
-  fetchCohortsList: async (filters, searchInput, orderBy, limit, offset, signal) => {
-    const _sortDirection = orderBy.orderDirection === Direction.DESC ? '-' : ''
-    const optionsReducer = (accumulator: string, currentValue: string) =>
-      accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
+  fetchCohortsList: async (args) => {
+    try {
+      const { filters, searchInput, orderBy, limit, offset, signal } = args
+      const _sortDirection = orderBy.orderDirection === Direction.DESC ? '-' : ''
 
-    let options: string[] = []
-    const { status, favorite, minPatients, maxPatients, startDate, endDate } = filters
-    const _status = status.map((stat) => stat.code)
+      let options: string[] = []
+      const { status, favorite, minPatients, maxPatients, startDate, endDate, parentId } = filters
+      const _status = status?.map((stat) => (stat.code === 'pending' ? 'pending,started' : stat.code)) ?? []
 
-    if (limit) options = [...options, `limit=${limit}`]
-    if (offset) options = [...options, `offset=${offset}`]
-    if (orderBy) options = [...options, `ordering=${_sortDirection}${orderBy.orderBy}`]
-    if (searchInput !== '') options = [...options, `search=${searchInput}`]
-    if (_status.length > 0) options = [...options, `status=${_status.join()}`]
-    if (minPatients) options = [...options, `min_result_size=${minPatients}`]
-    if (maxPatients) options = [...options, `max_result_size=${maxPatients}`]
-    if (startDate) options = [...options, `min_fhir_datetime=${startDate}`]
-    if (endDate) options = [...options, `max_fhir_datetime=${endDate}`]
-    if (favorite !== CohortsType.ALL)
-      options = [...options, `favorite=${favorite === CohortsType.FAVORITE ? 'true' : 'false'}`]
+      if (limit) options = [...options, `limit=${limit}`]
+      if (offset) options = [...options, `offset=${offset}`]
+      if (orderBy) options = [...options, `ordering=${_sortDirection}${orderBy.orderBy}`]
+      if (searchInput !== '') options = [...options, `search=${searchInput}`]
+      if (_status.length > 0) options = [...options, `status=${_status.join()}`]
+      if (minPatients) options = [...options, `min_result_size=${minPatients}`]
+      if (maxPatients) options = [...options, `max_result_size=${maxPatients}`]
+      if (startDate) options = [...options, `min_created_at=${startDate}`]
+      if (endDate) options = [...options, `max_created_at=${endDate}`]
+      if (parentId) options = [...options, `request_id=${parentId}`]
+      if (favorite?.length === 1)
+        options = [...options, `favorite=${favorite[0] === CohortsType.FAVORITE ? 'true' : 'false'}`]
 
-    const { data } = (await apiBack.get<{
-      count: number
-      next: string | null
-      previous: string | null
-      results: Cohort[]
-    }>(`/cohort/cohorts/?${options.reduce(optionsReducer)}`, {
-      signal: signal
-    })) ?? { data: { results: [] } }
+      const cohortListResponse = await apiBack.get<{
+        count: number
+        next: string | null
+        previous: string | null
+        results: Cohort[]
+      }>(`/cohort/cohorts/?${options.reduce(optionsReducer)}`, {
+        signal: signal
+      })
 
-    // Récupère les droits
-    const cohortList = await servicesCohorts.fetchCohortsRights(data.results)
-    if (cohortList.length === 0) return data
-    return {
-      ...data,
-      results: cohortList
+      // Récupère les droits
+      const cohortList = await servicesCohorts.fetchCohortsRights(cohortListResponse.data.results)
+      return {
+        ...cohortListResponse.data,
+        results: cohortList
+      }
+    } catch (error) {
+      console.error(error)
+      return {
+        count: 0,
+        next: '',
+        previous: '',
+        results: []
+      }
     }
   },
   addCohort: async (newCohort) => {
@@ -453,27 +511,34 @@ const servicesProjects: IServiceProjects = {
     }
   },
   editCohort: async (editedCohort) => {
-    const editCohortResponse = (await apiBack.patch(`/cohort/cohorts/${editedCohort.uuid}/`, {
-      name: editedCohort.name,
-      description: editedCohort.description,
-      favorite: editedCohort.favorite !== undefined ? !!editedCohort.favorite : undefined
-    })) ?? { status: 400 }
+    try {
+      const editCohortResponse = await apiBack.patch(`/cohort/cohorts/${editedCohort.uuid}/`, {
+        name: editedCohort.name,
+        description: editedCohort.description,
+        favorite: editedCohort.favorite !== undefined ? !!editedCohort.favorite : undefined
+      })
 
-    if (editCohortResponse.status === 200) {
-      return editCohortResponse.data as Cohort
-    } else {
-      throw new Error('Impossible de modifier la liste de patients')
+      if (editCohortResponse.status !== 200) {
+        throw new Error("Erreur lors de l'édition de la cohorte")
+      }
+      return editCohortResponse.data
+    } catch (error) {
+      console.error(error)
+      throw error
     }
   },
-  deleteCohort: async (deletedCohort) => {
-    const deleteCohortResponse = (await apiBack.delete(`/cohort/cohorts/${deletedCohort.uuid}/`)) ?? {
-      status: 400
-    }
+  deleteCohorts: async (deletedCohorts) => {
+    try {
+      const cohortsIds = deletedCohorts.map((cohort) => cohort.uuid).join()
+      const deleteCohortResponse = await apiBack.delete(`/cohort/cohorts/${cohortsIds}/`)
 
-    if (deleteCohortResponse.status === 204) {
+      if (deleteCohortResponse.status !== 204) {
+        throw new Error('Erreur lors de la suppression de la cohorte')
+      }
       return deleteCohortResponse.data as Cohort
-    } else {
-      throw new Error('Impossible de supprimer la liste de patients')
+    } catch (error) {
+      console.error(error)
+      throw error
     }
   }
 }
