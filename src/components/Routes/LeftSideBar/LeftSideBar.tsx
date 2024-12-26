@@ -370,6 +370,47 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     Mes requêtes
                   </Link>
                 </ListItem>
+                {/* TODO: refacto ce menu burger là c'est la crise wesh */}
+                <ListItem>
+                  <Link
+                    id="myProject-link"
+                    onClick={() => navigate('/researches')}
+                    underline="hover"
+                    className={classes.nestedTitle}
+                  >
+                    Mes projets
+                  </Link>
+                </ListItem>
+                <ListItem>
+                  <Link
+                    id="myProject-link"
+                    onClick={() => navigate('/requests')}
+                    underline="hover"
+                    className={classes.nestedTitle}
+                  >
+                    Mes requêtes
+                  </Link>
+                </ListItem>
+                <ListItem>
+                  <Link
+                    id="myProject-link"
+                    onClick={() => navigate('/cohorts')}
+                    underline="hover"
+                    className={classes.nestedTitle}
+                  >
+                    Mes cohortes
+                  </Link>
+                </ListItem>
+                <ListItem>
+                  <Link
+                    id="myProject-link"
+                    onClick={() => navigate('/samples')}
+                    underline="hover"
+                    className={classes.nestedTitle}
+                  >
+                    Mes échantillons
+                  </Link>
+                </ListItem>
               </List>
             </Collapse>
           </List>
