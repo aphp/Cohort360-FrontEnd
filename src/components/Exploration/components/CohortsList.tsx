@@ -28,8 +28,7 @@ const CohortsList = () => {
     { label: 'requête parent', align: 'left' }, // TODO: conditionner à si onglet cohortes, cliquable ou pas?
     { label: 'statut' },
     { label: 'nb de patients' },
-    { label: 'estimation du nombre de patients ap-hp' }, // TODO: conditionner à si niveau cohortes
-    { label: 'pourcentage du total' }, // TODO: conditionner à si niveau échantillons
+    { label: 'estimation du nombre de patients ap-hp' },
     { label: 'date de création' },
     { label: 'échantillons' } // TODO: conditionner à si niveau cohortes
   ]
@@ -51,13 +50,12 @@ const CohortsList = () => {
             </TableCellWrapper>
             <TableCellWrapper>{cohort.parentRequest}</TableCellWrapper>
             <TableCellWrapper>{cohort.status}</TableCellWrapper>
-            <TableCellWrapper>{cohort.creationDate}</TableCellWrapper>
             <TableCellWrapper>{cohort.totalPatients}</TableCellWrapper>
             <TableCellWrapper>{cohort.aphpEstimation}</TableCellWrapper>
             <TableCellWrapper>{cohort.creationDate}</TableCellWrapper>
             <TableCellWrapper>
               <Button endIcon={<ArrowRightAltIcon />} onClick={() => console.log('hey coucou')}>
-                {cohort.samples} cohortes
+                {cohort.samples} échantillons
               </Button>
             </TableCellWrapper>
           </TableRow>
