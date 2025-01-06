@@ -10,10 +10,10 @@ import useStyles from './styles'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import MenuButtonFilter from 'components/Exploration/components/MenuButtonFilter'
 
-import { Outlet, useLocation, useNavigate } from 'react-router'
-import { useSearchParams } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import useCounts from 'components/Exploration/hooks/useCounts'
 import Badge from 'components/ui/Badge'
+import Breadcrumb from 'components/Exploration/components/Breadcrumb'
 
 const MyResearches = () => {
   const { classes, cx } = useStyles()
@@ -48,9 +48,13 @@ const MyResearches = () => {
   //   // TODO
   // }
 
+  searchParams.set('page', '1')
   // TODO: gérer en cas d'erreur d'url (quoi que, p-e redirection auto vers 404 déjà en place)
   const handleTabChange = (newTab: ExplorationTabs) => {
-    navigate(`/researches/${newTab.id}`)
+    navigate({
+      pathname: `/researches/${newTab.id}`,
+      search: location.search
+    })
   }
 
   // TODO: à externaliser aussi malgré le tsx? (+ refactor)
@@ -125,6 +129,7 @@ const MyResearches = () => {
       </Grid>
       <Tabs variant="pill" values={explorationTabs} active={selectedTab} onchange={handleTabChange} />
       <Grid container bgcolor={'#FFF'} height={'100%'} justifyContent={'center'}>
+        <Breadcrumb />
         <Outlet />
       </Grid>
     </Grid>

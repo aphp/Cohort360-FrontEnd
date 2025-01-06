@@ -1,20 +1,23 @@
 import React, { useState } from 'react'
 
-import { Grid, TableRow, Typography } from '@mui/material'
-import { useSearchParams } from 'react-router-dom'
+import { CircularProgress, Grid, TableRow, Typography } from '@mui/material'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { Column } from 'types'
 import ResearchesTable from './Table'
-import { requests } from 'views/MyResearches/data'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 import Button from 'components/ui/Button'
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt'
+import useRequests from '../hooks/useRequests'
 
 const RequestsList = () => {
+  const { projectId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const searchInput = searchParams.get('searchInput') ?? ''
   const startDate = searchParams.get('startDate') ?? undefined
   const endDate = searchParams.get('endDate') ?? undefined
   const page = parseInt(searchParams.get('page') ?? '1', 10)
+
+  const { requestsList, total, loading } = useRequests(projectId, searchInput, startDate, endDate, page)
 
   const handlePageChange = (newPage: number) => {
     searchParams.set('page', String(newPage))
@@ -28,28 +31,41 @@ const RequestsList = () => {
     { label: 'nb de cohortes' }
   ]
 
+  const getCohortTotal = (requestSnapshots: any[]) => {
+    const snapshotsWithLinkedCohorts = requestSnapshots.filter((snapshot) => snapshot.has_linked_cohorts === true)
+    return snapshotsWithLinkedCohorts.length
+  }
+
   return (
     <Grid container xs={11} gap="50px">
       <Typography>RequestsList</Typography>
 
       {/* TODO: add circular progress */}
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <ResearchesTable columns={columns} page={page} setPage={handlePageChange} total={total}>
+          {requestsList.map((request) => {
+            const cohortTotal = getCohortTotal(request.query_snapshots)
 
-      <ResearchesTable columns={columns}>
-        {requests.map((request) => (
-          <TableRow key={request.name} sx={{ borderBottom: '1px solid #000', borderRadius: 20 }}>
-            <TableCellWrapper align="left" headCell>
-              {request.name} *icônes action*
-            </TableCellWrapper>
-            <TableCellWrapper>{request.parentProject}</TableCellWrapper>
-            <TableCellWrapper>{request.modificationDate}</TableCellWrapper>
-            <TableCellWrapper>
-              <Button endIcon={<ArrowRightAltIcon />} onClick={() => console.log('hey coucou')}>
-                {request.cohortTotal} cohortes
-              </Button>
-            </TableCellWrapper>
-          </TableRow>
-        ))}
-      </ResearchesTable>
+            return (
+              <TableRow key={request.uuid} sx={{ borderBottom: '1px solid #000', borderRadius: 20 }}>
+                <TableCellWrapper align="left" headCell>
+                  {request.name} *icônes action*
+                </TableCellWrapper>
+                <TableCellWrapper>{request.parent_folder}</TableCellWrapper>
+                <TableCellWrapper>{request.created_at}</TableCellWrapper>
+                <TableCellWrapper>
+                  {/* TODO: rendre non cliquable si pas d'enfant dispo */}
+                  <Button endIcon={cohortTotal >= 1 && <ArrowRightAltIcon />} onClick={() => console.log('hey coucou')}>
+                    {cohortTotal} cohorte{cohortTotal > 1 && 's'}
+                  </Button>
+                </TableCellWrapper>
+              </TableRow>
+            )
+          })}
+        </ResearchesTable>
+      )}
     </Grid>
   )
 }
