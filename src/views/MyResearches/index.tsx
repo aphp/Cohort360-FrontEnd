@@ -15,6 +15,8 @@ import useCounts from 'components/Exploration/hooks/useCounts'
 import Badge from 'components/ui/Badge'
 import Breadcrumb from 'components/Exploration/components/Breadcrumb'
 
+//  TODO: PENSER AUSSI A FAIRE FONCTIONNER LES TABLEAUX QUAND UNE MAINTENANCE EST EN COURS
+
 const MyResearches = () => {
   const { classes, cx } = useStyles()
   const openDrawer = useAppSelector((state) => state.drawer)
@@ -129,8 +131,13 @@ const MyResearches = () => {
       </Grid>
       <Tabs variant="pill" values={explorationTabs} active={selectedTab} onchange={handleTabChange} />
       <Grid container bgcolor={'#FFF'} height={'100%'} justifyContent={'center'}>
-        <Breadcrumb />
-        <Outlet />
+        <Grid container xs={11}>
+          {/* TODO: pitetre un peu trop de grid, remplacer par qqch ? */}
+          <Grid container>
+            <Breadcrumb />
+          </Grid>
+          <Outlet />
+        </Grid>
       </Grid>
     </Grid>
   )

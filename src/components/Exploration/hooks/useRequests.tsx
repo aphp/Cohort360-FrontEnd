@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import services from 'services/aphp'
+import { RequestType } from 'types'
 
-const useRequests = (projectId: string, searchTerm: string, startDate?: string, endDate?: string, page = 1) => {
-  const [requestsList, setRequestsList] = useState<any[]>([])
+const useRequests = (
+  projectId: string | undefined,
+  searchInput: string,
+  startDate?: string,
+  endDate?: string,
+  page = 1
+) => {
+  const [requestsList, setRequestsList] = useState<RequestType[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
 
@@ -20,7 +27,7 @@ const useRequests = (projectId: string, searchTerm: string, startDate?: string, 
   useEffect(() => {
     // setLoading(true)
     console.log('test fetchRequestsList()', fetchRequestsList())
-  }, [projectId, searchTerm, startDate, endDate, page])
+  }, [projectId, searchInput, startDate, endDate, page])
 
   return { requestsList, total, loading }
 }

@@ -3,6 +3,7 @@ import { Box, Typography } from '@mui/material'
 import { ProjectTitle, StyledCard } from './style'
 import FolderIcon from 'assets/icones/folder.svg?react'
 import OpenedFolderIcon from 'assets/icones/openedfolder.svg?react'
+import { formatDate } from 'utils/formatDate'
 
 type ProjectCardProps = {
   title: string
@@ -20,7 +21,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ title, creationDate, requestN
       <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
         <ProjectTitle>{title}</ProjectTitle>
         <Typography fontSize={'12px'} fontFamily={"'Montserrat', sans-serif"} color={'#6d6d6d'}>
-          Créé le {creationDate}
+          Créé le {formatDate(creationDate)}
         </Typography>
       </Box>
       <Box display={'flex'} flexDirection={'column'} justifyContent={'center'} alignContent={'center'}>

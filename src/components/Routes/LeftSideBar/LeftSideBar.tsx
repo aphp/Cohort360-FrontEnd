@@ -329,7 +329,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   </Link>
                 </ListItem>
               </List>
-              `
             </Collapse>
 
             <ListItem id="research" className={classes.listItem} button onClick={handleDisplaySearchList}>
@@ -374,7 +373,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 <ListItem>
                   <Link
                     id="myProject-link"
-                    onClick={() => navigate('/researches')}
+                    onClick={() => navigate('/researches/projects')}
                     underline="hover"
                     className={classes.nestedTitle}
                   >
@@ -384,7 +383,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 <ListItem>
                   <Link
                     id="myProject-link"
-                    onClick={() => navigate('/requests')}
+                    onClick={() => navigate('/researches/requests')}
                     underline="hover"
                     className={classes.nestedTitle}
                   >
@@ -394,7 +393,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 <ListItem>
                   <Link
                     id="myProject-link"
-                    onClick={() => navigate('/cohorts')}
+                    onClick={() => navigate('/researches/cohorts')}
                     underline="hover"
                     className={classes.nestedTitle}
                   >
@@ -404,7 +403,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 <ListItem>
                   <Link
                     id="myProject-link"
-                    onClick={() => navigate('/samples')}
+                    onClick={() => navigate('/researches/samples')}
                     underline="hover"
                     className={classes.nestedTitle}
                   >
