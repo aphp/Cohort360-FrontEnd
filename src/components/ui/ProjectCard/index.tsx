@@ -1,18 +1,24 @@
 import React, { useState } from 'react'
-import { Box, Typography } from '@mui/material'
+import { Box, IconButton, Typography } from '@mui/material'
 import { ProjectTitle, StyledCard } from './style'
 import FolderIcon from 'assets/icones/folder.svg?react'
 import OpenedFolderIcon from 'assets/icones/openedfolder.svg?react'
 import { formatDate } from 'utils/formatDate'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 
 type ProjectCardProps = {
   title: string
-  creationDate: string
+  creationDate?: string
   requestNumber: number
   onclick: () => void
+  onedit: () => void
+  ondelete: () => void
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ title, creationDate, requestNumber, onclick }) => {
+//TODO: revoir l'UX/UI pour les actions
+
+const ProjectCard: React.FC<ProjectCardProps> = ({ title, creationDate, requestNumber, onclick, onedit, ondelete }) => {
   const [hover, setHover] = useState(false)
 
   return (
@@ -30,6 +36,26 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ title, creationDate, requestN
         </Typography>
         <Typography color={'#6d6d6d'}>requête{requestNumber > 1 ? 's' : ''}</Typography>
       </Box>
+      {hover && (
+        <Box display={'flex'} alignItems={'center'}>
+          <IconButton
+            onClick={(event) => {
+              event.stopPropagation()
+              onedit()
+            }}
+          >
+            <EditIcon />
+          </IconButton>
+          <IconButton
+            onClick={(event) => {
+              event.stopPropagation()
+              ondelete()
+            }}
+          >
+            <DeleteOutlineIcon />
+          </IconButton>
+        </Box>
+      )}
     </StyledCard>
   )
 }

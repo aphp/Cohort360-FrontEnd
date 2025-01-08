@@ -1,26 +1,28 @@
-import React, { useEffect, useState } from 'react'
 import services from 'services/aphp'
+import { useQuery } from '@tanstack/react-query'
 
-const useProjects = (searchTerm: string, startDate?: string, endDate?: string) => {
-  const [projectsList, setProjectsList] = useState<any[]>([])
-  const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(false)
-
-  // TODO: à externaliser
+const useProjects = (searchInput: string, startDate?: string, endDate?: string) => {
   const fetchProjectsList = async () => {
-    // TODO: modifier le service de sorte à ajouter les filtres + try/catch
-    const projectsList = await services.projects.fetchProjectsList()
-    console.log('test projectsList', projectsList)
-    setProjectsList(projectsList.results)
-    setTotal(projectsList.count)
+    const projectsList = await services.projects.fetchProjectsList(searchInput, startDate, endDate)
+    return projectsList
   }
 
-  useEffect(() => {
-    // setLoading(true)
-    console.log('test fetchPRoejctsList()', fetchProjectsList())
-  }, [searchTerm, startDate, endDate])
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ['projects', searchInput, startDate, endDate],
+    queryFn: fetchProjectsList
+  })
 
-  return { projectsList, total, loading }
+  const projectsList = data?.results ?? []
+  const total = data?.count ?? 0
+
+  return {
+    projectsList,
+    total,
+    loading: isLoading,
+    isError,
+    error,
+    refetch
+  }
 }
 
 export default useProjects

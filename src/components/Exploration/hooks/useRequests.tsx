@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import services from 'services/aphp'
-import { RequestType } from 'types'
 
 const useRequests = (
   projectId: string | undefined,
@@ -9,27 +8,24 @@ const useRequests = (
   endDate?: string,
   page = 1
 ) => {
-  const [requestsList, setRequestsList] = useState<RequestType[]>([])
-  const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(false)
-
-  // TODO: à externaliser
+  // TODO: à externaliser ?
   const fetchRequestsList = async () => {
     // TODO: modifier le service de sorte à ajouter les filtres + try/catch
     const rowsPerPage = 20
     const offset = (page - 1) * rowsPerPage
     const requestsList = await services.projects.fetchRequestsList(rowsPerPage, offset)
-    console.log('test requestsList', requestsList)
-    setRequestsList(requestsList.results)
-    setTotal(requestsList.count)
+    return requestsList
   }
 
-  useEffect(() => {
-    // setLoading(true)
-    console.log('test fetchRequestsList()', fetchRequestsList())
-  }, [projectId, searchInput, startDate, endDate, page])
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ['requests', searchInput, startDate, endDate],
+    queryFn: fetchRequestsList
+  })
 
-  return { requestsList, total, loading }
+  const requestsList = data?.results ?? []
+  const total = data?.count ?? 0
+
+  return { requestsList, total, loading: isLoading, isError, error, refetch }
 }
 
 export default useRequests

@@ -74,7 +74,7 @@ const fetchProjects = createAsyncThunk<FetchProjectListReturn, void, { state: Ro
  *
  */
 type AddProjectParams = {
-  newProject: ProjectType
+  newProject: Omit<ProjectType, 'uuid'>
 }
 type AddProjectReturn = {
   selectedProject: null

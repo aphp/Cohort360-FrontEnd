@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import { Box, CircularProgress, Grid, IconButton, TableRow, Tooltip, Typography } from '@mui/material'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
@@ -16,6 +16,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import ShareIcon from '@mui/icons-material/Share'
 import { useAppDispatch, useAppSelector } from 'state'
 import { setSelectedRequestShare } from 'state/request'
+import useProject from '../hooks/useProject'
 
 // TODO: J'AVAIS OUBLIÉ MAIS PRÉVOIR LE SUPER FLOW DE DÉLÉTION MULTIPLE
 
@@ -30,12 +31,16 @@ const RequestsList = () => {
   const page = parseInt(searchParams.get('page') ?? '1', 10)
   const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
 
+  console.log('test useProject(projectId)', useProject(projectId))
+  const { project: parentProject, projectLoading, projectIsError } = useProject(projectId)
   const { requestsList, total, loading } = useRequests(projectId, searchInput, startDate, endDate, page)
 
   const handlePageChange = (newPage: number) => {
     searchParams.set('page', String(newPage))
     setSearchParams(searchParams)
   }
+
+  console.log('test parentProject', parentProject)
 
   const columns: Column[] = [
     { label: 'nom de la requête', align: 'left' },
@@ -79,24 +84,27 @@ const RequestsList = () => {
     return `${request.name}${sharedByDetails}`
   }
 
+  // TODO: ajouter action pour déplacer la requête de projet
+
   return (
     <Grid container gap="20px">
-      {/* TODO: n'afficher que si onglet projets */}
-      {/* TODO: fetch le nom du projet */}
-      <Box display={'flex'} justifyContent={'center'} width={'100%'} alignItems={'center'}>
-        <Typography fontWeight={'bold'} fontSize={'24px'} fontFamily={"'Montserrat', sans-serif"}>
-          RequestsList
-        </Typography>
-        {/* TODO: ajouter les actions sur projet parent */}
-        <IconButton>
-          <Edit />
-        </IconButton>
-        <IconButton>
-          <Delete />
-        </IconButton>
-      </Box>
+      {/* TODO: demander à Hicham d'ajouter une descr */}
+      {projectId && (
+        <Box display={'flex'} justifyContent={'center'} width={'100%'} alignItems={'center'}>
+          <Typography fontWeight={'bold'} fontSize={'24px'} fontFamily={"'Montserrat', sans-serif"}>
+            {parentProject?.name}
+          </Typography>
+          <Typography>{parentProject?.description}</Typography>
+          {/* TODO: ajouter les actions sur projet parent */}
+          <IconButton>
+            <Edit />
+          </IconButton>
+          <IconButton>
+            <Delete />
+          </IconButton>
+        </Box>
+      )}
 
-      {/* TODO: add circular progress */}
       {loading ? (
         <CircularProgress />
       ) : (
@@ -114,7 +122,6 @@ const RequestsList = () => {
                   {getRequestName(request)}
                   <Tooltip title="Partager la requête">
                     <IconButton
-                      // className={classes.editButton}
                       size="small"
                       onClick={() => onShareRequest(request.uuid)}
                       disabled={maintenanceIsActive}
