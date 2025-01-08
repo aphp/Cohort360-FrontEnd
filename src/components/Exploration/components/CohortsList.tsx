@@ -48,6 +48,11 @@ const CohortsList = () => {
     { label: 'échantillons' }
   ]
 
+  const handlePageChange = (newPage: number) => {
+    searchParams.set('page', String(newPage))
+    setSearchParams(searchParams)
+  }
+
   const onClickRow = (cohort: Cohort) => {
     const searchParams = new URLSearchParams()
     if (cohort.group_id) {
@@ -90,7 +95,7 @@ const CohortsList = () => {
 
       {/* TODO: add circular progress */}
 
-      <ResearchesTable columns={columns}>
+      <ResearchesTable columns={columns} page={page} setPage={handlePageChange} total={total}>
         {cohortsList.map((cohort) => {
           const isExportable = appConfig.features.export.enabled ? cohort?.rights?.export_csv_nomi : false
           const actions = [

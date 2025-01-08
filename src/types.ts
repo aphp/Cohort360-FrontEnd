@@ -388,6 +388,7 @@ export type ProjectType = {
   modified_at?: string
   favorite?: boolean
   owner_id?: string
+  requests?: string[]
 }
 
 export type RequestType = {

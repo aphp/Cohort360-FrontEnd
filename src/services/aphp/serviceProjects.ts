@@ -8,6 +8,7 @@ import { CohortsFilters, Direction, OrderBy } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
 
 export interface IServiceProjects {
+  fetchProject: (projectId: string) => Promise<ProjectType>
   /**
    * Retourne la liste de projet de recherche d'un practitioner
    *
@@ -22,6 +23,10 @@ export interface IServiceProjects {
    *   - results: Liste de projet de recherche récupéré
    */
   fetchProjectsList: (
+    // TODO: filters implem is temp, à clean
+    searchInput: string,
+    startDate?: string,
+    endDate?: string,
     limit?: number,
     offset?: number
   ) => Promise<{
@@ -40,7 +45,7 @@ export interface IServiceProjects {
    * Retourne:
    *   - Projet de recherche ajouté
    */
-  addProject: (newProject: ProjectType) => Promise<ProjectType>
+  addProject: (newProject: Omit<ProjectType, 'uuid'>) => Promise<ProjectType>
 
   /**
    * Cette fonction modifie un projet de recherche existant
@@ -219,13 +224,26 @@ export interface IServiceProjects {
 }
 
 const servicesProjects: IServiceProjects = {
-  fetchProjectsList: async (limit, offset) => {
+  //TODO: temp, à clean
+  fetchProject: async (projectId) => {
+    return (await apiBack.get(`/cohort/folders/${projectId}/`)).data
+  },
+  fetchProjectsList: async (searchInput, startDate, endDate, limit, offset) => {
     let search = `?ordering=created_at`
     if (limit) {
       search += `&limit=${limit}`
     }
     if (offset) {
       search += `&offset=${offset}`
+    }
+    if (searchInput) {
+      search += `&search=${searchInput}`
+    }
+    if (startDate) {
+      search += `&min_fhir_datetime=${startDate}`
+    }
+    if (endDate) {
+      search += `&max_fhir_datetime=${endDate}`
     }
 
     const fetchProjectsResponse = (await apiBack.get<{
