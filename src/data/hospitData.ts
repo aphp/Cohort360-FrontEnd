@@ -185,10 +185,6 @@ export const hospitForm: { [key: string]: { id: string; type: keyof Questionnair
     id: 'F_MATER_005032',
     type: 'valueCoding'
   },
-  birthVitalStatus: {
-    id: 'F_MATER_7030',
-    type: 'valueCoding'
-  },
   bloodLossEstimation: {
     id: 'F_MATER_005249',
     type: 'valueInteger'
