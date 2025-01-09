@@ -5,7 +5,7 @@ import { LoadingStatus } from 'types'
 import { ResourceType } from 'types/requestCriterias'
 import { Filters, SearchCriterias } from 'types/searchCriterias'
 
-export const useData = (type: ResourceType, searchCriterias: SearchCriterias<Filters>, page: number) => {
+export const useData = (type: ResourceType, searchCriterias: SearchCriterias<Filters>, page: number, groupId?: string) => {
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.IDDLE)
   const [data, setData] = useState<any | null>(null)
 
@@ -13,7 +13,7 @@ export const useData = (type: ResourceType, searchCriterias: SearchCriterias<Fil
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
       const fetcher = servicesCohorts.getPatientBoardFetcher(type)
-      const results = await fetcher({ page, searchCriterias })
+      const results = await fetcher({ page, searchCriterias, groupId })
       setData(results)
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {

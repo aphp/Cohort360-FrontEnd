@@ -212,17 +212,6 @@ export enum Month {
   DECEMBER = 'Décembre'
 }
 
-export type Column =
-  | {
-      label: string | ReactNode
-      code?: string
-      align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
-      multiple?: undefined
-    }
-  | {
-      multiple: Column[]
-    }
-
 export enum ChartCode {
   AGE_PYRAMID = 'facet-extension.ageMonth',
   GENDER_REPARTITION = 'facet-deceased',

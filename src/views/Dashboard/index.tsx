@@ -248,7 +248,7 @@ const Dashboard: React.FC<{
         )}
         {selectedTab === 'patients' && (
           //<PatientList total={dashboard.totalPatients ?? 0} deidentified={dashboard.deidentifiedBoolean} />
-          <PatientsBoard deidentified={dashboard.deidentifiedBoolean ?? false} />
+          <PatientsBoard deidentified={dashboard.deidentifiedBoolean} />
         )}
 
         {selectedTab === 'documents' && <Documents deidentified={dashboard.deidentifiedBoolean ?? false} />}

@@ -80,6 +80,7 @@ import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { mapToOrderByCode } from 'mappers/pmsi'
 import { mapMedicationToOrderByCode } from 'mappers/medication'
 import { linkToDiagnosticReport } from './serviceImaging'
+import { PatientsResponse } from 'types/patient'
 
 export interface IServiceCohorts {
   /**
@@ -137,13 +138,7 @@ export interface IServiceCohorts {
     includeFacets?: boolean,
     signal?: AbortSignal
   ) => Promise<
-    | {
-        totalPatients: number
-        totalAllPatients: number
-        originalPatients: Patient[] | undefined
-        agePyramidData?: AgeRepartitionType
-        genderRepartitionMap?: GenderRepartitionType
-      }
+    | PatientsResponse
     | undefined
   >
 
@@ -1103,8 +1098,8 @@ const servicesCohorts: IServiceCohorts = {
   getPatientBoardFetcher: (resourceType: ResourceType) => {
     switch (resourceType) {
       case ResourceType.PATIENT:
-        return ({ searchCriterias, page }, deidentified: boolean) =>
-          servicesCohorts.fetchPatientList({ searchCriterias, page }, deidentified)
+        return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
+          servicesCohorts.fetchPatientList({ searchCriterias, page }, deidentified, groupId)
     }
     return () => {}
   },
