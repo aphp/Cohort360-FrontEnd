@@ -46,8 +46,7 @@ export default makeStyles()((theme) => ({
     backgroundColor: '#5BC5F2',
     color: '#FFF',
     borderRadius: '25px',
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(4),
+    margin: '12px 10px',
     '&:hover': {
       backgroundColor: '#499cbf'
     }

@@ -17,14 +17,15 @@ import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { Questionnaire } from 'fhir/r4'
 import { LoadingStatus } from 'types'
-import { FilterKeys } from 'types/searchCriterias'
+import { FilterKeys, LabelObject } from 'types/searchCriterias'
 import Timeline from './Timeline'
 import services from 'services/aphp'
 import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
-import { Hierarchy } from 'types/hierarchy'
 import { useSearchParams } from 'react-router-dom'
 import { getCleanGroupId } from 'utils/paginationUtils'
+import { getCodeList } from 'services/aphp/serviceValueSets'
+import { getConfig } from 'config'
 
 const MaternityForm = () => {
   const [toggleModal, setToggleModal] = useState(false)
@@ -36,7 +37,7 @@ const MaternityForm = () => {
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([])
-  const [encounterStatusList, setEncounterStatusList] = useState<Hierarchy<any, any>[]>([])
+  const [encounterStatusList, setEncounterStatusList] = useState<LabelObject[]>([])
 
   const [
     {
@@ -85,10 +86,10 @@ const MaternityForm = () => {
   const fetch = async () => {
     const [_questionnaires, encounterStatus] = await Promise.all([
       services.patients.fetchQuestionnaires(),
-      services.cohortCreation.fetchEncounterStatus()
+      getCodeList(getConfig().core.valueSets.encounterStatus.url)
     ])
     setQuestionnaires(_questionnaires)
-    setEncounterStatusList(encounterStatus)
+    setEncounterStatusList(encounterStatus.results)
   }
 
   useEffect(() => {

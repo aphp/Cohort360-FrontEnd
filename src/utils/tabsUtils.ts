@@ -1,5 +1,5 @@
-import { medicationTabs } from 'components/Patient/PatientMedication/PatientMedication'
-import { PMSITabs } from 'components/Patient/PatientPMSI/PatientPMSI'
+import { medicationTabs } from 'components/Patient/PatientMedication'
+import { PMSITabs } from 'components/Patient/PatientPMSI'
 import { PMSILabel } from 'types/patient'
 import { MedicationLabel, ResourceType } from 'types/requestCriterias'
 

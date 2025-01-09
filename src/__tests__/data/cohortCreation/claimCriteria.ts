@@ -33,25 +33,33 @@ export const completeClaimCriteria: GhmDataType = {
     {
       id: '05C021',
       label: '05C021 - Chirurgie De Remplacement Valvulaire Avec…thétérisme Cardiaque Ou Coronarographie, Niveau 1',
-      system: 'https://terminology.eds.aphp.fr/aphp-orbis-ghm'
+      system: 'https://terminology.eds.aphp.fr/aphp-orbis-ghm',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
     },
 
     {
       id: '05C022',
       label: '05C022 - Chirurgie De Remplacement Valvulaire Avec…thétérisme Cardiaque Ou Coronarographie, Niveau 2',
-      system: 'https://terminology.eds.aphp.fr/aphp-orbis-ghm'
+      system: 'https://terminology.eds.aphp.fr/aphp-orbis-ghm',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
     },
 
     {
       id: '05C023',
       label: '05C023 - Chirurgie De Remplacement Valvulaire Avec…thétérisme Cardiaque Ou Coronarographie, Niveau 3',
-      system: 'https://terminology.eds.aphp.fr/aphp-orbis-ghm'
+      system: 'https://terminology.eds.aphp.fr/aphp-orbis-ghm',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
     },
 
     {
       id: '05C024',
       label: '05C024 - Chirurgie De Remplacement Valvulaire Avec…thétérisme Cardiaque Ou Coronarographie, Niveau 4',
-      system: 'https://terminology.eds.aphp.fr/aphp-orbis-ghm'
+      system: 'https://terminology.eds.aphp.fr/aphp-orbis-ghm',
+      above_levels_ids: '*',
+      inferior_levels_ids: ''
     }
   ],
   encounterService: [
@@ -62,12 +70,14 @@ export const completeClaimCriteria: GhmDataType = {
       full_path: 'APHP-ASSISTANCE PUBLIQUE AP-HP/H01-GH RCP',
       id: '8312016825',
       inferior_levels_ids: '8312016826',
+      label: 'GH RCP',
       name: 'GH RCP',
       parent_id: '8312002244',
       source_value: 'H01',
       status: undefined,
       subItems: undefined,
-      type: 'Groupe hospitalier (GH)'
+      type: 'Groupe hospitalier (GH)',
+      system: 'nan'
     }
   ]
 }

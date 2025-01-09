@@ -35,8 +35,8 @@ export type CohortCreationState = {
   navHistory: CurrentSnapshot[]
   snapshotsHistory: QuerySnapshotInfo[]
   count: CohortCreationCounterType
-  selectedPopulation: Hierarchy<ScopeElement, string>[] | null
-  executiveUnits: (Hierarchy<ScopeElement, string> | undefined)[] | null
+  selectedPopulation: Hierarchy<ScopeElement>[] | null
+  executiveUnits: (Hierarchy<ScopeElement> | undefined)[] | null
   allowSearchIpp: boolean
   selectedCriteria: SelectedCriteriaType[]
   isCriteriaNominative: boolean
