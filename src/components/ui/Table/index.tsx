@@ -1,6 +1,6 @@
 import React from 'react'
 import { Table as TableType } from 'types/table'
-import { Table as TableMui, Grid, Paper, TableBody, TableContainer, TableSortLabel, Typography } from '@mui/material'
+import { Table as TableMui, Paper, TableBody, TableContainer } from '@mui/material'
 import TableRow from './TableRow'
 import TableHead from './TableHead'
 import { OrderBy } from 'types/searchCriterias'

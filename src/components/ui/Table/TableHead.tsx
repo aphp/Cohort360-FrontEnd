@@ -1,7 +1,7 @@
 import React from 'react'
 import { Column } from 'types/table'
 import { SxProps, TableCell, TableHead as TableHeadMui, TableRow, TableSortLabel, Theme } from '@mui/material'
-import { Direction, OrderBy } from 'types/searchCriterias'
+import { Direction, Order, OrderBy } from 'types/searchCriterias'
 
 type RowProps = {
   columns: Column[]
@@ -11,12 +11,13 @@ type RowProps = {
 }
 
 const TableHead = ({ columns, orderBy, sx, onSort }: RowProps) => {
-  /*const createSortHandler = (property: Order) => () => {
-    setOrder({
+  const handleChangeSort = (property: Order) => {
+    onSort({
       orderBy: property,
-      orderDirection: order?.orderDirection === Direction.ASC ? Direction.DESC : Direction.ASC
+      orderDirection: orderBy?.orderDirection === Direction.ASC ? Direction.DESC : Direction.ASC
     })
-  }*/
+  }
+
   return (
     <TableHeadMui>
       <TableRow sx={{ ...sx }}>
@@ -25,7 +26,6 @@ const TableHead = ({ columns, orderBy, sx, onSort }: RowProps) => {
             sx={{ fontSize: 11, fontWeight: 600 }}
             size="small"
             key={col.label}
-            // sortDirection={order?.orderBy === col.code ? order?.orderDirection : false}
             align="left"
             // className={classes.tableHeadCell}
           >
@@ -34,7 +34,7 @@ const TableHead = ({ columns, orderBy, sx, onSort }: RowProps) => {
               <TableSortLabel
                 active={orderBy.orderBy === col.code}
                 direction={orderBy.orderBy === col.code ? orderBy?.orderDirection : Direction.ASC}
-                onClick={() => onSort({ orderBy: col.code, orderDirection: Direction.ASC })}
+                onClick={() => handleChangeSort(col.code)}
               />
             )}
           </TableCell>
