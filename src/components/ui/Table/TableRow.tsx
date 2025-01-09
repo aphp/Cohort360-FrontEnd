@@ -1,6 +1,5 @@
 import React from 'react'
 import { CellType, ColumnKey, Row } from 'types/table'
-import TextCell from './Cells/TextCell'
 import { SxProps, TableCell, TableRow as TableRowMui, Theme } from '@mui/material'
 import GenderIcon from '../GenderIcon'
 import { GenderStatus } from 'types/searchCriterias'
@@ -14,9 +13,9 @@ type RowProps = {
 
 const TableRow = ({ row, sx }: RowProps) => {
   return (
-    <TableRowMui sx={{ ...sx, borderBottom: '1px solid grey' }}>
+    <TableRowMui sx={{ ...sx }}>
       {row.map((cell) => (
-        <TableCell scope="row" align='center'>
+        <TableCell scope="row" align="left">
           {cell.type == CellType.ICON && cell.key === ColumnKey.GENDER && (
             <GenderIcon key={cell.id} gender={cell.value as GenderStatus} />
           )}

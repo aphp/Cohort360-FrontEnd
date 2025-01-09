@@ -18,7 +18,7 @@ const PatientsBoard = ({ deidentified = true }: PatientsBoardProps) => {
   const [searchParams] = useSearchParams()
   const groupId = searchParams.get('groupId') ?? undefined
   const page = +searchParams.get('page') ?? 0
-  const { criterias, searchCriterias, onSaveSearchCriterias, removeFilter } = usePatientBoard()
+  const { criterias, searchCriterias, onSaveSearchCriterias, onSort, removeFilter } = usePatientBoard()
   const { data, loadingStatus } = useData(ResourceType.PATIENT, searchCriterias, page, groupId)
   const { tableData } = useDataToTable(data, deidentified)
 
@@ -42,7 +42,7 @@ const PatientsBoard = ({ deidentified = true }: PatientsBoardProps) => {
           onSelect={onSaveSearchCriterias}
         />
         <CriteriasSection onDelete={removeFilter} value={criterias} />
-        <DataSection deidentified={deidentified} loadingStatus={loadingStatus} data={tableData} />
+        <DataSection loadingStatus={loadingStatus} data={tableData} orderBy={searchCriterias.orderBy} onSort={onSort} />
       </Grid>
     </Grid>
   )

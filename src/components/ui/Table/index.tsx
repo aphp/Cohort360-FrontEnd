@@ -1,29 +1,40 @@
 import React from 'react'
 import { Table as TableType } from 'types/table'
-import {
-  Table as TableMui,
-  Grid,
-  Paper,
-  TableBody,
-  TableContainer,
-  TableHead,
-  TableSortLabel,
-  Typography
-} from '@mui/material'
+import { Table as TableMui, Grid, Paper, TableBody, TableContainer, TableSortLabel, Typography } from '@mui/material'
 import TableRow from './TableRow'
+import TableHead from './TableHead'
+import { OrderBy } from 'types/searchCriterias'
 
 type TableProps = {
   value: TableType
+  orderBy: OrderBy
+  onSort: (orderBy: OrderBy) => void
 }
 
-const Table = ({ value }: TableProps) => {
+const Table = ({ value, orderBy, onSort }: TableProps) => {
   return (
     <TableContainer component={Paper}>
       <TableMui>
-        <TableHead></TableHead>
+        <TableHead
+          columns={value.columns}
+          sx={{
+            height: 42,
+            backgroundColor: '#D1E2F4',
+            textTransform: 'uppercase'
+          }}
+          orderBy={orderBy}
+          onSort={onSort}
+        />
         <TableBody>
           {value.rows.map((row, index) => (
-            <TableRow row={row} sx={index % 2 === 0 ? {} : { backgroundColor: '#f3f5f9' }} />
+            <TableRow
+              row={row}
+              sx={
+                index % 2 === 0
+                  ? { borderBottom: '1px solid grey' }
+                  : { backgroundColor: '#f3f5f9', borderBottom: '1px solid grey' }
+              }
+            />
           ))}
         </TableBody>
       </TableMui>

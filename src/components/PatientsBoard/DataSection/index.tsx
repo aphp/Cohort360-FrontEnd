@@ -3,34 +3,25 @@ import { CircularProgress, Grid, Typography } from '@mui/material'
 import DataTable from 'components/ui/Table'
 import { LoadingStatus } from 'types'
 import { Table } from 'types/table'
+import { OrderBy } from 'types/searchCriterias'
 
 type DataSectionProps = {
   data: Table
-  deidentified: boolean
+  orderBy: OrderBy
   loadingStatus: LoadingStatus
+  onSort: (orderBy: OrderBy) => void
 }
 
-const DataSection = ({ data, deidentified, loadingStatus }: DataSectionProps) => {
+const DataSection = ({ data, orderBy, loadingStatus, onSort }: DataSectionProps) => {
   return (
-    <Grid item xs={12}>
+    <Grid container justifyContent="center" item xs={12}>
       {loadingStatus === LoadingStatus.FETCHING && <CircularProgress />}
-      {loadingStatus === LoadingStatus.SUCCESS && !data.rows.length && (
-        <Typography variant="button">Aucun patient à afficher</Typography>
+      {data.rows && loadingStatus === LoadingStatus.SUCCESS && (
+        <>
+          {data.rows.length < 1 && <Typography variant="button">Aucun patient à afficher</Typography>}
+          {data.rows.length > 0 && <DataTable value={data} orderBy={orderBy} onSort={onSort} />}
+        </>
       )}
-      {loadingStatus === LoadingStatus.SUCCESS && data.rows.length && <DataTable value={data} />}
-      {/*
-        <DataTablePatient
-          loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
-          // groupId={groupId}
-          deidentified={deidentified ?? false}
-          patientsList={data}
-          orderBy={orderBy}
-          setOrderBy={(orderBy) => changeOrderBy(orderBy)}
-          page={page}
-          setPage={(newPage) => setPage(newPage)}
-          total={patientsResult.nb}
-        />
-  */}
     </Grid>
   )
 }

@@ -4,7 +4,7 @@ import { Filters, SearchCriterias } from 'types/searchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
 
 export const usePatientBoard = () => {
-  const [{ searchBy, orderBy, searchInput, filters }, { changeSearchBy, changeSearchInput, addFilters, removeFilter }] =
+  const [{ searchBy, orderBy, searchInput, filters }, { changeSearchBy, changeOrderBy, changeSearchInput, addFilters, removeFilter }] =
     useSearchCriterias(initPatientsSearchCriterias)
 
   const criterias = useMemo(() => {
@@ -26,6 +26,7 @@ export const usePatientBoard = () => {
     searchCriterias,
     criterias,
     onSaveSearchCriterias,
+    onSort: changeOrderBy,
     removeFilter
   }
 }

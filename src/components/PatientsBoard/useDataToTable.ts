@@ -1,9 +1,10 @@
 import { Patient } from 'fhir/r4'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
-import { PatientsResponse } from 'types/patient'
+import { PatientTableLabels, PatientsResponse } from 'types/patient'
 import { VitalStatusLabel } from 'types/requestCriterias'
-import { CellType, ColumnKey, Row, Table } from 'types/table'
+import { Order } from 'types/searchCriterias'
+import { CellType, Column, ColumnKey, Row, Table } from 'types/table'
 import { getAge } from 'utils/age'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
@@ -11,6 +12,24 @@ export const useDataToTable = (data: PatientsResponse, deidentified: boolean) =>
   const [tableData, setTableData] = useState<Table>({ rows: [], columns: [] })
 
   useEffect(() => map(data), [data])
+
+  const mapPatientsToColumns = (): Column[] => {
+    return [
+      { label: PatientTableLabels.GENDER, code: `${Order.GENDER},${Order.ID}` },
+      { label: PatientTableLabels.NAME, code: !deidentified ? Order.NAME : undefined },
+      { label: PatientTableLabels.LASTNAME, code: !deidentified ? Order.FAMILY : undefined, align: 'left' },
+      {
+        label: !deidentified ? PatientTableLabels.BIRTHDATE : PatientTableLabels.AGE,
+        code: `${!deidentified ? Order.BIRTHDATE : Order.AGE_MONTH},${Order.ID}`
+      },
+      { label: PatientTableLabels.LAST_ENCOUNTER, align: 'left' },
+      { label: PatientTableLabels.VITAL_STATUS },
+      {
+        label: `${PatientTableLabels.IPP}${!deidentified ? '' : ' chiffré'}`,
+        code: !deidentified ? Order.IPP : undefined
+      }
+    ]
+  }
 
   const mapPatientsToRows = (patients: Patient[]) => {
     const rows: Row[] = []
@@ -24,7 +43,11 @@ export const useDataToTable = (data: PatientsResponse, deidentified: boolean) =>
         },
         {
           id: `${patient.id}-name`,
-          value: deidentified ? 'Prénom' : patient.name?.[0].given?.[0] ? capitalizeFirstLetter(patient.name?.[0].given?.[0]) : 'Non renseigné',
+          value: deidentified
+            ? 'Prénom'
+            : patient.name?.[0].given?.[0]
+            ? capitalizeFirstLetter(patient.name?.[0].given?.[0])
+            : 'Non renseigné',
           type: CellType.TEXT,
           key: ColumnKey.NAME
         },
@@ -86,7 +109,7 @@ export const useDataToTable = (data: PatientsResponse, deidentified: boolean) =>
     if (data?.originalPatients) {
       const table = {
         rows: mapPatientsToRows(data.originalPatients),
-        columns: []
+        columns: mapPatientsToColumns()
       }
       setTableData(table)
     }
