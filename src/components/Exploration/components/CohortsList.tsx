@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import { useAppSelector } from 'state'
 
 import { Box, Grid, IconButton, TableRow, Tooltip, Typography } from '@mui/material'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import ResearchesTable from './Table'
 import { Cohort, CohortJobStatus, Column } from 'types'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
@@ -19,12 +19,14 @@ import ColorizeIcon from '@mui/icons-material/Colorize'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import ActionMenu from './ActionMenu'
+import useRequest from '../hooks/useRequest'
 
 // TODO: il y a un hook useCohortsList, à checker à la rentrée
 
 const CohortsList = () => {
   const appConfig = useContext(AppConfig)
   const navigate = useNavigate()
+  const { projectId, requestId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const searchInput = searchParams.get('searchInput') ?? ''
   const startDate = searchParams.get('startDate') ?? undefined
@@ -32,7 +34,8 @@ const CohortsList = () => {
   const page = parseInt(searchParams.get('page') ?? '1', 10)
   const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
 
-  const { cohortsList, total, loading } = useCohorts('', searchInput, startDate, endDate)
+  const { request: parentRequest, requestLoading, requestIsError } = useRequest(requestId)
+  const { cohortsList, total, loading } = useCohorts(requestId ?? '', searchInput, startDate, endDate)
 
   // TODO: add les params pour les filtres exclusifs aux cohortes + bien penser à les suppr en changeant d'onglet
   // TODO: ne pas oublier les websockets
@@ -40,7 +43,7 @@ const CohortsList = () => {
   const columns: Column[] = [
     { label: '', align: 'left' },
     { label: 'nom de la cohorte', align: 'left' },
-    { label: 'requête parent' }, // TODO: conditionner à si onglet cohortes, cliquable ou pas?
+    ...(!requestId ? [{ label: 'requête parent' }] : []), //TODO: cliquable ou pas?
     { label: 'statut' },
     { label: 'nb de patients' },
     { label: 'estimation du nombre de patients ap-hp' },
@@ -90,9 +93,22 @@ const CohortsList = () => {
   }
 
   return (
-    <Grid container gap="50px">
-      <Typography>CohortsList</Typography>
-
+    <Grid container gap="20px">
+      {requestId && (
+        <Box display={'flex'} justifyContent={'center'} width={'100%'} alignItems={'center'}>
+          <Typography fontWeight={'bold'} fontSize={'24px'} fontFamily={"'Montserrat', sans-serif"}>
+            {parentRequest?.name}
+          </Typography>
+          <Typography>{parentRequest?.description}</Typography>
+          {/* TODO: ajouter les actions sur projet parent */}
+          <IconButton>
+            <EditIcon />
+          </IconButton>
+          <IconButton>
+            <DeleteOutlineIcon />
+          </IconButton>
+        </Box>
+      )}
       {/* TODO: add circular progress */}
 
       <ResearchesTable columns={columns} page={page} setPage={handlePageChange} total={total}>
@@ -119,7 +135,7 @@ const CohortsList = () => {
             <TableRow
               key={cohort.name}
               sx={{ borderBottom: '1px solid #000', borderRadius: 20 }}
-              onClick={() => onClickRow(cohort)}
+              // onClick={() => onClickRow(cohort)}
             >
               <TableCellWrapper align="left" headCell>
                 <IconButton
@@ -186,14 +202,27 @@ const CohortsList = () => {
                   <ActionMenu actions={actions} />
                 </Box>
               </TableCellWrapper>
-              <TableCellWrapper>{cohort.request}</TableCellWrapper>
+              {!requestId && <TableCellWrapper>{cohort.request}</TableCellWrapper>}
               <TableCellWrapper>{cohort.request_job_status}</TableCellWrapper>
               <TableCellWrapper>{displayDigit(cohort.result_size)}</TableCellWrapper>
               <TableCellWrapper>{getGlobalEstimation(cohort)}</TableCellWrapper>
               <TableCellWrapper>{formatDate(cohort.created_at, true)}</TableCellWrapper>
               <TableCellWrapper>
-                <Button endIcon={<ArrowRightAltIcon />} onClick={() => console.log('hey coucou')}>
-                  {/* {cohort.samples} échantillons */}
+                {/* TODO: rendre non cliquable si pas d'enfant dispo */}
+                <Button
+                  // endIcon={cohortTotal >= 1 && <ArrowRightAltIcon />}
+                  onClick={() =>
+                    // TODO: pourquoi le preventDefault ne fonctionne pas ?
+                    {
+                      if (projectId && requestId)
+                        navigate(`/researches/projects/${projectId}/${requestId}/${cohort.uuid}${location.search}`)
+                      if (!projectId && requestId)
+                        navigate(`/researches/requests/${requestId}/${cohort.uuid}${location.search}`)
+                      if (!projectId && !requestId) navigate(`/researches/cohorts/${cohort.uuid}${location.search}`)
+                    }
+                  }
+                >
+                  0 échantillon
                 </Button>
               </TableCellWrapper>
             </TableRow>

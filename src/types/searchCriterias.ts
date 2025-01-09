@@ -324,6 +324,7 @@ export interface CohortsFilters {
   maxPatients: null | string
   startDate: null | string
   endDate: null | string
+  parentId?: string
 }
 
 export interface SearchCriterias<F> {

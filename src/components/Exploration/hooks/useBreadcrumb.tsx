@@ -1,25 +1,48 @@
-import React from 'react'
-import { useLocation } from 'react-router'
+import { useLocation, useParams } from 'react-router-dom'
+import useProject from './useProject'
+import useRequest from './useRequest'
 
 const useBreadCrumb = () => {
+  const { projectId, requestId, cohortId } = useParams()
   const location = useLocation()
-  const pathParts = location.pathname.split('/').filter(Boolean)
-  console.log('test pathParts', pathParts)
+
+  const { project } = useProject(projectId)
+  const { request } = useRequest(requestId)
+  // TODO: same with cohorts
 
   const items = []
+  if (location.pathname.includes('/projects')) {
+    items.push({ label: 'Tous mes projets', url: '/researches/projects' })
 
-  // TODO: clean et externaliser
-  // TODO: faire une fonction plus jolie pour trouver où je suis et récup les noms
-  if (pathParts[1] === 'projects') {
-    items.push({ label: 'Mes projets', url: 'researches/projects' })
-  } else if (pathParts[1] === 'requests') {
-    items.push({ label: 'Mes requêtes', url: 'researches/requests' })
-  } else if (pathParts[1] === 'cohorts') {
-    items.push({ label: 'Mes cohortes', url: 'researches/cohorts' })
-  } else if (pathParts[1] === 'samples') {
-    items.push({ label: 'Mes échantillons', url: 'researches/samples' })
+    if (projectId && project) {
+      items.push({
+        label: `Projet ${project.name}`,
+        url: `/researches/projects/${projectId}`
+      })
+
+      if (requestId && request) {
+        items.push({
+          label: `Requête ${request.name}`,
+          url: `/researches/projects/${projectId}/${requestId}`
+        })
+      }
+    }
   }
 
+  if (location.pathname.includes('/requests')) {
+    items.push({ label: 'Requêtes', url: '/researches/requests' })
+    if (requestId && request) {
+      items.push({
+        label: `Requête ${request.name}`,
+        url: `/researches/${requestId}`
+      })
+    }
+  }
+
+  if (location.pathname.includes('/cohorts')) {
+    items.push({ label: 'Mes Cohortes', url: '/researches/requests' })
+    // TODO: a adapter
+  }
   return items
 }
 

@@ -32,8 +32,8 @@ const MyResearches = () => {
 
   const { projectsCount, requestsCount, cohortsCount, samplesCount } = useCounts(
     searchInput,
-    startDateParam,
-    endDateParam
+    startDateParam ?? '',
+    endDateParam ?? ''
   )
 
   // TODO: tout ça à externaliser

@@ -1,39 +1,76 @@
-import React, { useEffect, useState } from 'react'
+import { useQueries } from '@tanstack/react-query'
+import services from 'services/aphp'
+import { CohortsType } from 'types/cohorts'
+import { Direction, Order } from 'types/searchCriterias'
 
-const useCounts = (searchTerm: string, startDate?: string | null, endDate?: string | null) => {
-  const [data, setData] = useState<{
-    projectsCount: number
-    requestsCount: number
-    cohortsCount: number
-    samplesCount: number
-  }>({
-    projectsCount: 0,
-    requestsCount: 0,
-    cohortsCount: 0,
-    samplesCount: 0
+const useCounts = (searchInput: string, startDate?: string, endDate?: string) => {
+  const results = useQueries({
+    queries: [
+      {
+        queryKey: ['projectsCount', searchInput, startDate, endDate],
+        queryFn: async () => {
+          const res = await services.projects.fetchProjectsList(searchInput, startDate, endDate, 0)
+          return res.count ?? 0
+        }
+      },
+      {
+        queryKey: ['requestsCount', searchInput, startDate, endDate],
+        queryFn: async () => {
+          const res = await services.projects.fetchRequestsList('', searchInput, startDate, endDate, 0)
+          return res.count ?? 0
+        }
+      },
+      {
+        queryKey: ['cohortsCount', searchInput, startDate, endDate],
+        queryFn: async () => {
+          const res = await services.projects.fetchCohortsList(
+            {
+              startDate: startDate ?? null,
+              endDate: endDate ?? null,
+              status: [],
+              favorite: CohortsType.ALL,
+              minPatients: null,
+              maxPatients: null
+            },
+            searchInput,
+            { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
+            0
+          )
+          return res.count ?? 0
+        }
+      },
+      {
+        queryKey: ['samplesCount', searchInput, startDate, endDate],
+        queryFn: async () => {
+          // TODO: A COMPLETER PLUS TARD
+          return 3
+        }
+      }
+    ]
   })
 
-  useEffect(() => {
-    if (!searchTerm && !startDate && !endDate) {
-      setData({ projectsCount: 0, requestsCount: 0, cohortsCount: 0, samplesCount: 0 })
-      return
-    }
+  const projectsCountQuery = results[0]
+  const requestsCountQuery = results[1]
+  const cohortsCountQuery = results[2]
+  const samplesCountQuery = results[3]
 
-    const fetchCounts = async () => {
-      // TODO: API call
+  const loading =
+    projectsCountQuery.isLoading ||
+    requestsCountQuery.isLoading ||
+    cohortsCountQuery.isLoading ||
+    samplesCountQuery.isLoading
 
-      setData({
-        projectsCount: searchTerm ? 5 : 0,
-        requestsCount: searchTerm ? 20 : 0,
-        cohortsCount: searchTerm ? 3 : 0,
-        samplesCount: searchTerm ? 4 : 0
-      })
-    }
+  const isError =
+    projectsCountQuery.isError || requestsCountQuery.isError || cohortsCountQuery.isError || samplesCountQuery.isError
 
-    fetchCounts()
-  }, [searchTerm, startDate, endDate])
-
-  return data
+  return {
+    loading,
+    isError,
+    projectsCount: projectsCountQuery.data ?? 0,
+    requestsCount: requestsCountQuery.data ?? 0,
+    cohortsCount: cohortsCountQuery.data ?? 0,
+    samplesCount: samplesCountQuery.data ?? 0
+  }
 }
 
 export default useCounts
