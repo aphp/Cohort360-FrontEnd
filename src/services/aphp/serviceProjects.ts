@@ -69,6 +69,8 @@ export interface IServiceProjects {
    */
   deleteProject: (deletedProject: ProjectType) => Promise<ProjectType>
 
+  fetchRequest: (request_id: string) => Promise<RequestType>
+
   /**
    * Retourne la liste de requete d'un practitioner
    *
@@ -83,6 +85,10 @@ export interface IServiceProjects {
    *   - results: Liste de requete récupéré
    */
   fetchRequestsList: (
+    parentId?: string,
+    searchInput?: string,
+    startDate?: string,
+    endDate?: string,
     limit?: number,
     offset?: number
   ) => Promise<{
@@ -228,6 +234,10 @@ const servicesProjects: IServiceProjects = {
   fetchProject: async (projectId) => {
     return (await apiBack.get(`/cohort/folders/${projectId}/`)).data
   },
+  //TODO: temp, à clean
+  fetchRequest: async (requestId) => {
+    return (await apiBack.get(`/cohort/requests/${requestId}/`)).data
+  },
   fetchProjectsList: async (searchInput, startDate, endDate, limit, offset) => {
     let search = `?ordering=created_at`
     if (limit) {
@@ -300,13 +310,26 @@ const servicesProjects: IServiceProjects = {
     }
   },
 
-  fetchRequestsList: async (limit, offset) => {
+  fetchRequestsList: async (parentId, searchInput, startDate, endDate, limit, offset) => {
+    // TODO: temp, à clean
     let search = `?`
     if (limit) {
       search += `limit=${limit}`
     }
     if (offset) {
       search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
+    }
+    if (!parentId && searchInput !== '') {
+      search += `&search=${searchInput}`
+    }
+    if (!parentId && startDate) {
+      search += `&min_fhir_datetime=${startDate}`
+    }
+    if (!parentId && endDate) {
+      search += `&max_fhir_datetime=${endDate}`
+    }
+    if (parentId) {
+      search += `&parent_folder=${parentId}`
     }
 
     const fetchRequestsListResponse = (await apiBack.get<{
@@ -429,7 +452,7 @@ const servicesProjects: IServiceProjects = {
       accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
 
     let options: string[] = []
-    const { status, favorite, minPatients, maxPatients, startDate, endDate } = filters
+    const { status, favorite, minPatients, maxPatients, startDate, endDate, parentId } = filters
     const _status = status.map((stat) => stat.code)
 
     if (limit) options = [...options, `limit=${limit}`]
@@ -441,6 +464,7 @@ const servicesProjects: IServiceProjects = {
     if (maxPatients) options = [...options, `max_result_size=${maxPatients}`]
     if (startDate) options = [...options, `min_fhir_datetime=${startDate}`]
     if (endDate) options = [...options, `max_fhir_datetime=${endDate}`]
+    if (parentId) options = [...options, `request_id=${parentId}`]
     if (favorite !== CohortsType.ALL)
       options = [...options, `favorite=${favorite === CohortsType.FAVORITE ? 'true' : 'false'}`]
 

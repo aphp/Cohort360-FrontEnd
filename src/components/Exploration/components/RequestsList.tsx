@@ -9,7 +9,6 @@ import Button from 'components/ui/Button'
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt'
 import useRequests from '../hooks/useRequests'
 import { formatDate } from 'utils/formatDate'
-import { Delete, Edit } from '@mui/icons-material'
 import ActionMenu from './ActionMenu'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
@@ -31,7 +30,6 @@ const RequestsList = () => {
   const page = parseInt(searchParams.get('page') ?? '1', 10)
   const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
 
-  console.log('test useProject(projectId)', useProject(projectId))
   const { project: parentProject, projectLoading, projectIsError } = useProject(projectId)
   const { requestsList, total, loading } = useRequests(projectId, searchInput, startDate, endDate, page)
 
@@ -40,11 +38,9 @@ const RequestsList = () => {
     setSearchParams(searchParams)
   }
 
-  console.log('test parentProject', parentProject)
-
   const columns: Column[] = [
     { label: 'nom de la requête', align: 'left' },
-    { label: 'projet' }, // TODO: conditionner à si onglet requêtes + réfléchir si cliquable ou pas?
+    ...(!projectId ? [{ label: 'projet' }] : []), // TODO: réfléchir si cliquable ou pas?
     { label: 'date de modification' },
     { label: 'nb de cohortes' }
   ]
@@ -97,10 +93,10 @@ const RequestsList = () => {
           <Typography>{parentProject?.description}</Typography>
           {/* TODO: ajouter les actions sur projet parent */}
           <IconButton>
-            <Edit />
+            <EditIcon />
           </IconButton>
           <IconButton>
-            <Delete />
+            <DeleteOutlineIcon />
           </IconButton>
         </Box>
       )}
@@ -116,7 +112,7 @@ const RequestsList = () => {
               <TableRow
                 key={request.uuid}
                 sx={{ borderBottom: '1px solid #000', borderRadius: 20 }}
-                onClick={() => navigate(`/cohort/new/${request.uuid}`)}
+                // onClick={() => navigate(`/cohort/new/${request.uuid}`)}
               >
                 <TableCellWrapper align="left" headCell>
                   {getRequestName(request)}
@@ -131,16 +127,21 @@ const RequestsList = () => {
                   </Tooltip>
                   <ActionMenu actions={actions} />
                 </TableCellWrapper>
-                <TableCellWrapper>{request.parent_folder}</TableCellWrapper>
+                {!projectId && <TableCellWrapper>{request.parent_folder}</TableCellWrapper>}
                 <TableCellWrapper>{formatDate(request.created_at, true)}</TableCellWrapper>
                 <TableCellWrapper>
                   {/* TODO: rendre non cliquable si pas d'enfant dispo */}
                   <Button
                     endIcon={cohortTotal >= 1 && <ArrowRightAltIcon />}
                     onClick={() =>
+                      // TODO: pourquoi le preventDefault ne fonctionne pas ?
                       // TODO: gérer où on navigate en fonction de l'onglet où l'on se trouve
                       // à obtenir à partir de l'url
-                      navigate('')
+                      navigate(
+                        projectId
+                          ? `/researches/projects/${projectId}/${request.uuid}${location.search}`
+                          : `/researches/requests/${request.uuid}${location.search}`
+                      )
                     }
                   >
                     {cohortTotal} cohorte{cohortTotal > 1 && 's'}

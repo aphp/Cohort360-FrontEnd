@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import services from 'services/aphp'
 
 const useRequests = (
-  projectId: string | undefined,
+  parentId: string | undefined,
   searchInput: string,
   startDate?: string,
   endDate?: string,
@@ -13,12 +13,19 @@ const useRequests = (
     // TODO: modifier le service de sorte à ajouter les filtres + try/catch
     const rowsPerPage = 20
     const offset = (page - 1) * rowsPerPage
-    const requestsList = await services.projects.fetchRequestsList(rowsPerPage, offset)
+    const requestsList = await services.projects.fetchRequestsList(
+      parentId,
+      searchInput,
+      startDate,
+      endDate,
+      rowsPerPage,
+      offset
+    )
     return requestsList
   }
 
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['requests', searchInput, startDate, endDate],
+    queryKey: ['requests', searchInput, startDate, endDate, page],
     queryFn: fetchRequestsList
   })
 

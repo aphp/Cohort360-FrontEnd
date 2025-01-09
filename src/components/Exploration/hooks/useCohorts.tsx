@@ -1,45 +1,52 @@
-import React, { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import services from 'services/aphp'
-import { Cohort } from 'types'
 import { CohortsType } from 'types/cohorts'
 import { Direction, Order } from 'types/searchCriterias'
 
-const useCohorts = (parentRequestId: string, searchInput: string, startDate?: string, endDate?: string, page = 1) => {
-  const [cohortsList, setCohortsList] = useState<Cohort[]>([])
-  const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(false)
-
+const useCohorts = (parentId: string, searchInput: string, startDate?: string, endDate?: string, page = 1) => {
   // TODO: à externaliser
   const fetchCohortsList = async () => {
     // TODO: modifier le service de sorte à ajouter les filtres + try/catch
     const rowsPerPage = 20
     const offset = (page - 1) * rowsPerPage
     const cohortsList = await services.projects.fetchCohortsList(
-      {
-        startDate: startDate ?? null,
-        endDate: endDate ?? null,
-        status: [],
-        favorite: CohortsType.ALL,
-        minPatients: null,
-        maxPatients: null
-      },
-      searchInput,
+      parentId
+        ? {
+            startDate: null,
+            endDate: null,
+            status: [],
+            favorite: CohortsType.ALL,
+            minPatients: null,
+            maxPatients: null,
+            parentId
+          }
+        : {
+            startDate: startDate ?? null,
+            endDate: endDate ?? null,
+            status: [],
+            favorite: CohortsType.ALL,
+            minPatients: null,
+            maxPatients: null,
+            parentId
+          },
+      !parentId ? searchInput : '',
       { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
       rowsPerPage,
       offset
       //   AbortSignal???
     )
-    console.log('test cohortsList', cohortsList)
-    setCohortsList(cohortsList.results)
-    setTotal(cohortsList.count)
+    return cohortsList
   }
 
-  useEffect(() => {
-    // setLoading(true)
-    console.log('test fetchCohortsList()', fetchCohortsList())
-  }, [parentRequestId, searchInput, startDate, endDate, page])
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ['cohorts', searchInput, startDate, endDate, page],
+    queryFn: fetchCohortsList
+  })
 
-  return { cohortsList, total, loading }
+  const cohortsList = data?.results ?? []
+  const total = data?.count ?? 0
+
+  return { cohortsList, total, loading: isLoading, isError, error, refetch }
 }
 
 export default useCohorts
