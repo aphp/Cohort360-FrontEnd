@@ -1,5 +1,5 @@
 import { Grid, TextField, Typography } from '@mui/material'
-import { InputWrapper } from 'components/ui/Inputs'
+import { InputWrapper } from 'components/ui/Inputs/styles'
 import { ErrorMessage } from 'components/ui/Inputs/Errors'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
