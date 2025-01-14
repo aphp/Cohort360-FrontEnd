@@ -1,38 +1,23 @@
-import { CcamDataType, Comparators, CriteriaType } from 'types/requestCriterias'
+import {
+  CcamDataType,
+  form
+} from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/CCAMForm'
+import { Comparators } from 'types/requestCriterias'
 import { System } from 'types/scope'
 
 export const defaultProcedureCriteria: CcamDataType = {
   id: 1,
-  type: CriteriaType.PROCEDURE,
-  isInclusive: true,
-  title: 'Procedure',
-  occurrence: null,
-  occurrenceComparator: null,
-  startOccurrence: [null, null],
-  endOccurrence: [null, null],
-  encounterStartDate: [null, null],
-  includeEncounterStartDateNull: false,
-  encounterEndDate: [null, null],
-  includeEncounterEndDateNull: false,
-  encounterStatus: [],
-  code: [],
-  source: null,
-  label: undefined,
-  encounterService: undefined
+  ...form().initialData,
+  source: null
 }
 
 export const completeProcedureCriteria: CcamDataType = {
   ...defaultProcedureCriteria,
-  occurrence: 1,
-  occurrenceComparator: Comparators.GREATER,
-  startOccurrence: ['2024-09-06', '2024-09-06'],
-  encounterStartDate: ['2024-09-05', '2024-09-05'],
-  includeEncounterStartDateNull: false,
-  encounterEndDate: ['2024-09-06', '2024-09-07'],
-  includeEncounterEndDateNull: true,
-  encounterStatus: [
-    { id: 'entered-in-error', label: 'Entered In Error', system: 'http://hl7.org/fhir/CodeSystem/encounter-status' }
-  ],
+  occurrence: { value: 1, comparator: Comparators.GREATER },
+  startOccurrence: { start: '2024-09-06', end: '2024-09-06' },
+  encounterStartDate: { start: '2024-09-05', end: '2024-09-05' },
+  encounterEndDate: { start: '2024-09-06', end: '2024-09-07', includeNull: true },
+  encounterStatus: ['entered-in-error'],
   code: [
     {
       id: '000126',

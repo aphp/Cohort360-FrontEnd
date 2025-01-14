@@ -1,86 +1,48 @@
-import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
+import {
+  CcamDataType,
+  form as ccamForm
+} from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/CCAMForm'
+import {
+  DemographicDataType,
+  form as demographicForm
+} from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/DemographicForm'
+import {
+  EncounterDataType,
+  form as encounterForm
+} from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/EncounterForm'
+import {
+  IPPListDataType,
+  form as ippForm
+} from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/IPPForm'
+import { SelectedCriteriaType } from 'types/requestCriterias'
 
-const defaultProcedureCriteria: SelectedCriteriaType = {
+const defaultProcedureCriteria: CcamDataType = {
   id: 1,
-  error: undefined,
-  type: CriteriaType.PROCEDURE,
-  encounterService: undefined,
-  isInclusive: true,
-  title: 'Procedure',
-  occurrence: null,
-  occurrenceComparator: null,
-  startOccurrence: [null, null],
-  endOccurrence: undefined,
-  encounterStartDate: [null, null],
-  includeEncounterStartDateNull: true,
-  encounterEndDate: [null, null],
-  includeEncounterEndDateNull: true,
-  encounterStatus: [],
-  code: [],
-  source: null,
-  label: undefined
+  ...ccamForm().initialData
 }
 
-const defaultPatientCriteria: SelectedCriteriaType = {
+const defaultPatientCriteria: DemographicDataType = {
   id: 1,
-  title: 'Patient',
-  type: CriteriaType.PATIENT,
-  genders: [],
-  vitalStatus: [],
-  age: [null, null],
-  birthdates: [null, null],
-  deathDates: [null, null]
+  ...demographicForm().initialData
 }
 
-const defaultEncounterCriteria: SelectedCriteriaType = {
+const defaultEncounterCriteria: EncounterDataType = {
   id: 1,
-  type: CriteriaType.ENCOUNTER,
-  isInclusive: true,
-  title: 'critere encouter',
-  occurrence: null,
-  occurrenceComparator: null,
-  startOccurrence: [null, null],
-  endOccurrence: [null, null],
-  encounterStartDate: [null, null],
-  includeEncounterStartDateNull: false,
-  encounterEndDate: [null, null],
-  includeEncounterEndDateNull: false,
-  encounterStatus: [],
-  age: [null, null],
-  duration: [null, null],
-  admissionMode: null,
-  entryMode: null,
-  exitMode: null,
-  priseEnChargeType: null,
-  typeDeSejour: null,
-  reason: null,
-  destination: null,
-  provenance: null,
-  admission: null,
-  encounterService: undefined
+  ...encounterForm().initialData
 }
 
-const defaultIPPCriteria: SelectedCriteriaType = {
+const defaultIPPCriteria: IPPListDataType = {
   id: 1,
-  type: CriteriaType.IPP_LIST,
-  isInclusive: true,
-  title: 'critere IPP',
-  search: ''
+  ...ippForm().initialData
 }
 
 export const procedurePeudonimizedCriteria: SelectedCriteriaType[] = [
   {
     ...defaultProcedureCriteria,
-    startOccurrence: ['2024-08-15', '2024-08-22'],
-    encounterStartDate: ['2024-08-07', '2024-08-21'],
-    encounterStatus: [
-      {
-        id: 'cancelled',
-        label: 'Cancelled',
-        system: 'http://hl7.org/fhir/CodeSystem/encounter-status'
-      }
-    ],
-    encounterEndDate: ['2024-08-22', '2024-08-22'],
+    startOccurrence: { start: '2024-08-15', end: '2024-08-22' },
+    encounterStartDate: { start: '2024-08-07', end: '2024-08-21' },
+    encounterStatus: ['cancelled'],
+    encounterEndDate: { start: '2024-08-22', end: '2024-08-22' },
     code: [
       {
         id: '000212',
@@ -105,53 +67,43 @@ export const procedurePeudonimizedCriteria: SelectedCriteriaType[] = [
 export const patientPseudonimizedCriteria: SelectedCriteriaType[] = [
   {
     ...defaultPatientCriteria,
-    genders: [
-      {
-        id: 'f',
-        label: 'Femme'
-      }
-    ],
-    vitalStatus: [
-      {
-        id: 'alive',
-        label: 'Vivant'
-      }
-    ]
+    genders: ['f'],
+    vitalStatus: ['alive']
   }
 ]
 
 export const patientPseudonimizedAgeCriteria: SelectedCriteriaType[] = [
   {
     ...defaultPatientCriteria,
-    age: ['0/2/12', '0/5/15']
+    age: { start: '0/2/12', end: '0/5/15' }
   }
 ]
 
 export const patientNominativeAge0Criteria: SelectedCriteriaType[] = [
   {
     ...defaultPatientCriteria,
-    age: ['7/2/12', '0/5/15']
+    age: { start: '7/2/12', end: '0/5/15' }
   }
 ]
 
 export const patientNominativeAge1Criteria: SelectedCriteriaType[] = [
   {
     ...defaultPatientCriteria,
-    age: ['0/2/12', '8/5/15']
+    age: { start: '0/2/12', end: '8/5/15' }
   }
 ]
 
 export const patientNominativeBirthdates: SelectedCriteriaType[] = [
   {
     ...defaultPatientCriteria,
-    birthdates: ['2024-08-15', '2024-08-15']
+    birthdates: { start: '2024-08-15', end: '2024-08-15' }
   }
 ]
 
 export const patientNominativeDeathDates: SelectedCriteriaType[] = [
   {
     ...defaultPatientCriteria,
-    deathDates: ['2024-08-15', '2024-08-15']
+    deathDates: { start: '2024-08-15', end: '2024-08-15' }
   }
 ]
 
@@ -159,19 +111,9 @@ export const criteriasArrayWtihNominativeData: SelectedCriteriaType[] = [
   ...procedurePeudonimizedCriteria,
   {
     ...defaultPatientCriteria,
-    genders: [
-      {
-        id: 'f',
-        label: 'Femme'
-      }
-    ],
-    vitalStatus: [
-      {
-        id: 'alive',
-        label: 'Vivant'
-      }
-    ],
-    deathDates: ['2024-08-15', '2024-08-15']
+    genders: ['f'],
+    vitalStatus: ['true'],
+    deathDates: { start: '2024-08-15', end: '2024-08-15' }
   }
 ]
 
@@ -179,19 +121,9 @@ export const criteriaArrayWithNoNominativeData: SelectedCriteriaType[] = [
   ...procedurePeudonimizedCriteria,
   {
     ...defaultPatientCriteria,
-    genders: [
-      {
-        id: 'f',
-        label: 'Femme'
-      }
-    ],
-    vitalStatus: [
-      {
-        id: 'alive',
-        label: 'Vivant'
-      }
-    ],
-    age: ['0/1/2', '0/5/15']
+    genders: ['f'],
+    vitalStatus: ['false'],
+    age: { start: '0/1/2', end: '0/5/15' }
   }
 ]
 
@@ -217,13 +149,13 @@ export const encounterPseudonimizedCriteria: SelectedCriteriaType[] = [
 export const encounterPseudoAgeCriteria: SelectedCriteriaType[] = [
   {
     ...defaultEncounterCriteria,
-    age: ['0/1/2', '0/5/15']
+    age: { start: '0/1/2', end: '0/5/15' }
   }
 ]
 
 export const encounterNominativeAgeCriteria: SelectedCriteriaType[] = [
   {
     ...defaultEncounterCriteria,
-    age: ['2/1/2', '5/5/15']
+    age: { start: '2/1/2', end: '5/5/15' }
   }
 ]
