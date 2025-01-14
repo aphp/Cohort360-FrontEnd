@@ -23,7 +23,6 @@ export const form: () => CriteriaForm<IPPListDataType> = () => ({
     AT_LEAST_ONE_IPP: 'Merci de renseigner au moins un IPP'
   },
   globalErrorCheck: (data) => {
-    console.log('errocheck', data)
     if (data.search && (data.search as string).length > 0) {
       return undefined
     }

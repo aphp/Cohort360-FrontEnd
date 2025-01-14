@@ -99,7 +99,6 @@ const OccurenceInput = ({
     }
     return null
   }
-  console.log('comparatorValue', comparatorValue)
 
   return (
     <>

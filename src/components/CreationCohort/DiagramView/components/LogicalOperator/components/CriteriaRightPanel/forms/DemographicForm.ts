@@ -98,11 +98,6 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
           },
           disableCondition: (data) => {
             const typedData = data as DemographicDataType
-            console.log(
-              'disabled',
-              typedData.birthdates !== null &&
-                (typedData.birthdates.start !== null || typedData.birthdates.end !== null)
-            )
             return (
               typedData.birthdates !== null &&
               (typedData.birthdates.start !== null || typedData.birthdates.end !== null)

@@ -3,6 +3,7 @@ import {
   form
 } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/CCAMForm'
 import { Comparators } from 'types/requestCriterias'
+import { System } from 'types/scope'
 
 export const defaultProcedureCriteria: CcamDataType = {
   id: 1,

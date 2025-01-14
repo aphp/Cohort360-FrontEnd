@@ -189,7 +189,6 @@ const Requeteur = () => {
   useEffect(() => {
     ;(async () => {
       if (!valueSets.loading && !valueSets.loaded) {
-        console.log('fetching valuesets')
         await dispatch(initValueSets(criteriaList())).unwrap()
       }
       setValueSetsLoading(false)

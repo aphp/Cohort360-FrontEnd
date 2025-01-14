@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import CriteriaLayout from 'components/ui/CriteriaLayout'
 import {
   CriteriaForm as CriteriaFormDefinition,
-  CriteriaFormItemViewProps,
   NumberAndComparatorDataType,
   NewDurationRangeType,
   CommonCriteriaData,
@@ -11,7 +10,6 @@ import {
 import { CFItem, CFSection } from './components'
 import FORM_ITEM_RENDERER from './mappers/renderers'
 import { useAppSelector } from 'state'
-import { LabelObject } from 'types/searchCriterias'
 import { isFunction, isString } from 'lodash'
 
 export type CriteriaFormRuntimeProps<T> = {
@@ -65,8 +63,6 @@ export default function CriteriaForm<T extends CommonCriteriaData>(props: Criter
     onDataChange?.(criteriaData)
   }, [criteriaData, onDataChange])
 
-  console.log('rendering form')
-  console.log('test itemSections', itemSections)
   return (
     <CriteriaLayout
       criteriaLabel={`${label}`}
@@ -99,8 +95,6 @@ export default function CriteriaForm<T extends CommonCriteriaData>(props: Criter
                 const duration = value as NewDurationRangeType
                 isNull = isNull || (duration.start === null && duration.end === null)
               }
-              if (!isNull) console.log(isNull, item.valueKey, value)
-
               return isNull
             }
             return true
@@ -109,12 +103,13 @@ export default function CriteriaForm<T extends CommonCriteriaData>(props: Criter
           {section.items.map((item, index) => (
             <CFItem
               key={index}
+              withinTitledSection={!!section.title}
               {...{
                 viewRenderers: FORM_ITEM_RENDERER,
                 ...item,
                 data: criteriaData,
                 getValueSetOptions: (valueSetId) => {
-                  return (valueSets.entities[valueSetId]?.options || []) as LabelObject[]
+                  return Object.values(valueSets.entities[valueSetId]?.options || {})
                 },
                 updateData: (newData: T) => {
                   setCriteriaData({ ...criteriaData, ...newData })

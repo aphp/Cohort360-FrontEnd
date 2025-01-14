@@ -7,17 +7,19 @@ import {
   WithEncounterStatusDataType,
   WithOccurenceCriteriaDataType
 } from '../CriteriaForm/types'
-import { LabelObject } from 'types/searchCriterias'
 import { Link } from '@mui/material'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
+import { getValueSetsFromSystems } from 'utils/valueSets'
+import { Hierarchy } from 'types/hierarchy'
+import { FhirItem } from 'types/valueSet'
 
 export type GhmDataType = CommonCriteriaData &
   WithOccurenceCriteriaDataType &
   WithEncounterDateDataType &
   WithEncounterStatusDataType & {
     type: CriteriaType.CLAIM
-    code: LabelObject[] | null
+    code: Hierarchy<FhirItem>[] | null
   }
 
 export const form: () => CriteriaForm<GhmDataType> = () => ({
@@ -71,7 +73,7 @@ export const form: () => CriteriaForm<GhmDataType> = () => ({
         {
           valueKey: 'code',
           type: 'codeSearch',
-          valueSetIds: [getConfig().features.claim.valueSets.claimHierarchy.url],
+          valueSetsInfo: getValueSetsFromSystems([getConfig().features.claim.valueSets.claimHierarchy.url]),
           noOptionsText: 'Aucun GHM trouvé',
           label: 'Code GHM',
           buildInfo: {

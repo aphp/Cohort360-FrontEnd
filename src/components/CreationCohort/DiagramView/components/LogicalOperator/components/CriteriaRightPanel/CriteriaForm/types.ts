@@ -6,7 +6,7 @@ import { SourceType } from 'types/scope'
 import { LabelObject } from 'types/searchCriterias'
 import { CHIPS_DISPLAY_METHODS } from './mappers/chipDisplayMapper'
 import { BUILD_MAPPERS, UNBUILD_MAPPERS } from './mappers/buildMappers'
-import { Reference } from 'types/valueSet'
+import { FhirItem, Reference } from 'types/valueSet'
 
 /********************************************************************************/
 /*                                  Criteria Types                              */
@@ -124,8 +124,6 @@ export type CodeSearchItem = BaseCriteriaItem & {
   type: 'codeSearch'
   noOptionsText: string
   checkIsLeaf?: boolean
-  /** Ids (urls) of valuesets that are allowed to be used for this code search */
-  valueSetIds: string[]
   valueSetsInfo: Reference[]
 }
 
@@ -180,6 +178,7 @@ export type DataTypes =
   | string
   | string[]
   | LabelObject[]
+  | Hierarchy<FhirItem>[]
   | number
   | Hierarchy<ScopeElement, string>[]
   | NumberAndComparatorDataType
@@ -207,7 +206,7 @@ export type DataTypeMapping = {
   numberAndComparator: CriteriaTypeMapping<NumberWithComparatorCriteriaItem, NumberAndComparatorDataType>
   boolean: CriteriaTypeMapping<BooleanCriteriaItem, boolean>
   textWithCheck: CriteriaTypeMapping<TextWithCheckItem, string>
-  codeSearch: CriteriaTypeMapping<CodeSearchItem, LabelObject[]>
+  codeSearch: CriteriaTypeMapping<CodeSearchItem, Hierarchy<FhirItem>[]>
   textWithRegex: CriteriaTypeMapping<TextWithRegexCriteriaItem, string>
   radioChoice: CriteriaTypeMapping<RadioChoiceCriteriaItem, string>
   info: CriteriaTypeMapping<InfoCriteriaItem, string>

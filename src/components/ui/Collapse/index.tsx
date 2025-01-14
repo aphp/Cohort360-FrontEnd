@@ -17,7 +17,6 @@ type CollapseProps = {
 
 const Collapse = ({ value = true, title, children, info }: PropsWithChildren<CollapseProps>) => {
   const [checked, setChecked] = useState(value)
-  console.log('test children', children)
 
   return (
     <Grid container direction="column">

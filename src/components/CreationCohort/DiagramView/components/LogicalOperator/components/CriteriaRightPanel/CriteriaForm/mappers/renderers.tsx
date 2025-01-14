@@ -28,6 +28,7 @@ import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 import { Comparators } from 'types/requestCriterias'
 import SimpleSelect from 'components/ui/Inputs/SimpleSelect'
 import ValueSetField from 'components/SearchValueSet/ValueSetField'
+import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
 
 /************************************************************************************/
 /*                        Criteria Form Item Renderer                               */
@@ -122,7 +123,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     )
   },
   autocomplete: (props) => {
-    const arrayPropValue = isArray(props.value) ? props.value : [props.value]
+    const arrayPropValue = isArray(props.value) ? props.value : !!props.value ? [props.value] : []
     const codeSystem = props.getValueSetOptions(props.definition.valueSetId)
     const groupBy = props.definition.groupBy
     const valueWithLabels = (arrayPropValue ?? []).map(
@@ -288,7 +289,19 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
       <ValueSetField
         value={valueWithLabels}
         references={props.definition.valueSetsInfo}
-        onSelect={(value) => props.updateData(value)}
+        onSelect={(value) => {
+          if (props.definition.checkIsLeaf) {
+            const valuesWithLeafInfo = value.map((v) => {
+              return {
+                ...v,
+                isLeaf: !v.inferior_levels_ids && v.id !== HIERARCHY_ROOT
+              }
+            })
+            props.updateData(valuesWithLeafInfo)
+          } else {
+            props.updateData(value)
+          }
+        }}
         placeholder={props.definition.label ?? 'Code(s) sélectionné(s)'}
       />
       // <AsyncAutocomplete

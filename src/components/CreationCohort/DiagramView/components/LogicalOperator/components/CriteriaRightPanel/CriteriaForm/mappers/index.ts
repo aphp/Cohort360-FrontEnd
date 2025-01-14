@@ -133,7 +133,7 @@ const DEFAULT_BUILD_METHOD: Record<CriteriaFormItemType, BuilderMethod> = {
   select: BUILD_MAPPERS.buildSelect,
   autocomplete: BUILD_MAPPERS.buildSelect,
   number: BUILD_MAPPERS.buildSearch,
-  executiveUnit: BUILD_MAPPERS.buildLabelObject,
+  executiveUnit: BUILD_MAPPERS.buildEncounterService,
   numberAndComparator: BUILD_MAPPERS.buildComparator,
   boolean: BUILD_MAPPERS.buildSearch,
   textWithCheck: BUILD_MAPPERS.buildSearch,
@@ -243,7 +243,7 @@ export const unbuildCriteriaDataFromDefinition = async <T extends SelectedCriter
   const emptyCriterion: T = { ...criteriaDefinition.initialData } as T
   emptyCriterion.id = element._id
   emptyCriterion.type = criteriaDefinition.buildInfo.type[element.resourceType] as SelectedCriteriaType['type']
-  emptyCriterion.title = element.name
+  emptyCriterion.title = element.name ?? criteriaDefinition.title
   emptyCriterion.isInclusive = element.isInclusive
 
   if (element.occurrence && 'occurrence' in emptyCriterion) {

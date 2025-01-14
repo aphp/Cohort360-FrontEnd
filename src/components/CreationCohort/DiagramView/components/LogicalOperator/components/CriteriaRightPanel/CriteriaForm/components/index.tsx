@@ -26,6 +26,7 @@ type CriteriaItemRuntimeProps<T> = {
   getValueSetOptions: CriteriaFormItemViewProps<never>['getValueSetOptions']
   viewRenderers: { [key in CriteriaFormItemType]: CriteriaFormItemView<key> }
   deidentified: boolean
+  withinTitledSection?: boolean
 }
 
 type CritieraItemProps<T, U extends DataTypeMappings> = CriteriaItemRuntimeProps<T> & CriteriaItem<T, U>
@@ -85,6 +86,7 @@ export const CFItem = <T, V extends DataTypeMappings, U extends CriteriaItem<T, 
       data={data}
       value={fieldValue}
       context={context}
+      withinTitledSection={props.withinTitledSection}
     >
       <View
         value={fieldValue as DataTypeMapping[U['type']]['dataType']}
@@ -121,6 +123,7 @@ export function CFItemWrapper<T>(
     data: T
     value: DataTypes
     displayValueSummary?: string | ((value: DataTypes) => string)
+    withinTitledSection?: boolean
     context: Context
   }>
 ) {
@@ -142,7 +145,7 @@ export function CFItemWrapper<T>(
     ((isFunction(label) && label(data as Record<string, DataTypes>, context)) ||
       (isString(label) && eval(label)(data, context)))
   return (
-    <BlockWrapper className={classes.inputItem}>
+    <BlockWrapper className={classes.inputItem} style={props.withinTitledSection ? { maxWidth: '100%' } : {}}>
       {labelValue ? <CriteriaLabel label={labelValue} style={{ marginTop: '1em' }} infoIcon={props.info} /> : ''}
       {valueSummary && <Typography style={{ fontWeight: 'bold', marginBottom: '1em' }}>{valueSummary}</Typography>}
       {props.children}
