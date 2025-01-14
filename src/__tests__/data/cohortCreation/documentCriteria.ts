@@ -3,6 +3,7 @@ import {
   form
 } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/DocumentsForm'
 import { Comparators } from 'types/requestCriterias'
+import { System } from 'types/scope'
 import { DocumentStatuses, SearchByTypes } from 'types/searchCriterias'
 
 export const defaultDocumentCriteria: DocumentDataType = {

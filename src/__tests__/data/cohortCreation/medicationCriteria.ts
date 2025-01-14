@@ -3,6 +3,7 @@ import {
   form
 } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/MedicationForm'
 import { Comparators, CriteriaType } from 'types/requestCriterias'
+import { System } from 'types/scope'
 
 export const defaultMedicationCriteria: MedicationDataType = {
   id: 1,

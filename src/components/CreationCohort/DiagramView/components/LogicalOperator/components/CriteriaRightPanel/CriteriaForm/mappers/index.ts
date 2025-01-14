@@ -133,7 +133,7 @@ const DEFAULT_BUILD_METHOD: Record<CriteriaFormItemType, BuilderMethod> = {
   select: BUILD_MAPPERS.buildSelect,
   autocomplete: BUILD_MAPPERS.buildSelect,
   number: BUILD_MAPPERS.buildSearch,
-  executiveUnit: BUILD_MAPPERS.buildLabelObject,
+  executiveUnit: BUILD_MAPPERS.buildEncounterService,
   numberAndComparator: BUILD_MAPPERS.buildComparator,
   boolean: BUILD_MAPPERS.buildSearch,
   textWithCheck: BUILD_MAPPERS.buildSearch,

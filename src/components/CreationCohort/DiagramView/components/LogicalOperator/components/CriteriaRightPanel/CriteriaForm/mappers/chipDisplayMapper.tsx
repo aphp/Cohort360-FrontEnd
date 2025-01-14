@@ -23,6 +23,7 @@ import allDocTypes from 'assets/docTypes.json'
 import moment from 'moment'
 import { getDurationRangeLabel } from 'utils/age'
 import { getConfig } from 'config'
+import { FhirItem } from 'types/valueSet'
 
 /************************************************************************************/
 /*                        Criteria Form Item Chip Display                           */
@@ -138,7 +139,9 @@ const getLabelsForCodeSearchItem = (
   return val
     .map((value) => {
       return (
-        (value.system ? valueSets.cache[value.system] : item.valueSetIds.flatMap((vid) => valueSets.cache[vid])) || []
+        (value.system
+          ? valueSets.cache[value.system]
+          : item.valueSetsInfo.flatMap((valueset) => valueSets.cache[valueset.url])) || []
       ).find((code) => code && code.id === value.id) as LabelObject
     })
     .filter((code) => code !== undefined)
@@ -151,11 +154,14 @@ const getLabelsForAutoCompleteItem = (
 ): LabelObject[] => {
   return val
     .map((value) => {
-      return (item.valueSetData || Object.values(valueSets.entities[item.valueSetId]?.options || {}) || []).find(
-        (code) => code.id === value.id
-      )
+      return (
+        item.valueSetData ||
+        Object.values(valueSets.entities[item.valueSetId]?.options || {}).map((i) => i as LabelObject) ||
+        []
+      ).find((code) => code.id === value.id)
     })
     .filter((code) => code !== undefined)
+    .map((code) => code as LabelObject)
 }
 
 const chipFromAutoComplete = (

@@ -363,8 +363,6 @@ export type CriteriaDrawerComponentProps = {
   isOpen?: boolean
   parentId?: number | null
   selectedCriteria: SelectedCriteriaType | null
-  // TODO remove this when we have the new code search component
-  onChangeValue?: (key: string, value: any, hierarchy: Hierarchy<any, any>[]) => void
   onChangeSelectedCriteria: (newCriteria: SelectedCriteriaType) => void
   goBack: () => void
 }

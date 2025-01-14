@@ -1,4 +1,4 @@
-import { Back_API_Response, CriteriaItemType } from 'types'
+import { CriteriaItemType } from 'types'
 
 import RequestForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/RequestForm/RequestForm'
 
@@ -16,7 +16,6 @@ import { form as biologyForm } from './DiagramView/components/LogicalOperator/co
 import { form as pregnantForm } from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/PregnancyForm'
 import { form as medicationForm } from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/MedicationForm'
 import { form as ippForm } from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/IPPForm'
-import { HIERARCHY_ROOT, getChildrenFromCodes, getCodeList } from 'services/aphp/serviceValueSets'
 
 export enum CriteriaTypeLabels {
   REQUEST = 'Mes requêtes',
@@ -36,25 +35,6 @@ export enum CriteriaTypeLabels {
   IMAGING = 'Imagerie',
   PREGNANCY = 'Fiche grossesse',
   HOSPIT = "Fiche d'hospitalisation"
-}
-
-import docTypes from 'assets/docTypes.json'
-import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
-import { VitalStatusLabel } from 'types/searchCriterias'
-import { FhirItem } from 'types/valueSet'
-import { createHierarchyRoot } from 'utils/hierarchy'
-
-const async = (fetch: () => Promise<Back_API_Response<FhirItem>>) => async () => (await fetch()).results
-
-const getCodesForValueSet = async (code: string, systems: string[]) => {
-  if (code === HIERARCHY_ROOT && systems.length) return [createHierarchyRoot(systems[0])]
-  for (const system of systems) {
-    try {
-      return (await getChildrenFromCodes(system, [code])).results
-    } catch {
-      console.error("Ce n'est pas une erreur.")
-    }
-  }
 }
 
 const criteriaList: () => CriteriaItemType[] = () => {

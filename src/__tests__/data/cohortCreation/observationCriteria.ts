@@ -3,6 +3,7 @@ import {
   form
 } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/BiologyForm'
 import { Comparators } from 'types/requestCriterias'
+import { System } from 'types/scope'
 
 export const defaultObservationCriteria: ObservationDataType = {
   id: 1,
@@ -21,6 +22,8 @@ export const completeObservationCriteria: ObservationDataType = {
       id: 'I3356',
       label: 'I3356 - Erythrocytes Foetaux /érythrocytes Adultes_sang_cytochimie_hf/10000 Ha',
       system: 'https://terminology.eds.aphp.fr/aphp-itm-anabio',
+      above_levels_ids: '*',
+      inferior_levels_ids: '',
       isLeaf: true
     }
   ],

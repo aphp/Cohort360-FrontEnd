@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import CriteriaLayout from 'components/ui/CriteriaLayout'
 import {
   CriteriaForm as CriteriaFormDefinition,
-  CriteriaFormItemViewProps,
   NumberAndComparatorDataType,
   NewDurationRangeType,
   CommonCriteriaData,
@@ -11,7 +10,6 @@ import {
 import { CFItem, CFSection } from './components'
 import FORM_ITEM_RENDERER from './mappers/renderers'
 import { useAppSelector } from 'state'
-import { LabelObject } from 'types/searchCriterias'
 import { isFunction, isString } from 'lodash'
 
 export type CriteriaFormRuntimeProps<T> = {
@@ -114,7 +112,7 @@ export default function CriteriaForm<T extends CommonCriteriaData>(props: Criter
                 ...item,
                 data: criteriaData,
                 getValueSetOptions: (valueSetId) => {
-                  return (valueSets.entities[valueSetId]?.options || []) as LabelObject[]
+                  return Object.values(valueSets.entities[valueSetId]?.options || {})
                 },
                 updateData: (newData: T) => {
                   setCriteriaData({ ...criteriaData, ...newData })

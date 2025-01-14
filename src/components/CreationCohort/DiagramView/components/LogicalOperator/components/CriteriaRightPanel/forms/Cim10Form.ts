@@ -6,16 +6,18 @@ import {
   WithEncounterStatusDataType,
   WithOccurenceCriteriaDataType
 } from '../CriteriaForm/types'
-import { LabelObject } from 'types/searchCriterias'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
+import { getValueSetsFromSystems } from 'utils/valueSets'
+import { FhirItem } from 'types/valueSet'
+import { Hierarchy } from 'types/hierarchy'
 
 export type Cim10DataType = CommonCriteriaData &
   WithOccurenceCriteriaDataType &
   WithEncounterDateDataType &
   WithEncounterStatusDataType & {
     type: CriteriaType.CONDITION
-    code: LabelObject[] | null
+    code: Hierarchy<FhirItem>[] | null
     source: string | null
     diagnosticType: string[] | null
   }
@@ -87,7 +89,7 @@ export const form: () => CriteriaForm<Cim10DataType> = () => ({
         {
           valueKey: 'code',
           type: 'codeSearch',
-          valueSetIds: [getConfig().features.condition.valueSets.conditionHierarchy.url],
+          valueSetsInfo: getValueSetsFromSystems([getConfig().features.condition.valueSets.conditionHierarchy.url]),
           noOptionsText: 'Veuillez entrer un code ou un diagnostic CIM10',
           label: 'Code CIM10',
           buildInfo: {

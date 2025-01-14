@@ -17,10 +17,12 @@ import {
 import { editAllCriteria, editAllCriteriaGroup, pseudonimizeCriteria, buildCohortCreation } from 'state/cohortCreation'
 import { AppDispatch } from 'state'
 import { Hierarchy } from 'types/hierarchy'
-import { fetchValueSet } from 'services/aphp/callApi'
 import { CodeCache } from 'state/valueSets'
 import { NewDurationRangeType } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
 import criteriaList, { getAllCriteriaItems } from 'components/CreationCohort/DataList_Criteria'
+import { getChildrenFromCodes, HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
+import { createHierarchyRoot } from './hierarchy'
+import { FhirItem } from 'types/valueSet'
 
 const REQUETEUR_VERSION = 'v1.5.1'
 
@@ -520,6 +522,17 @@ export async function unbuildRequest(_json: string): Promise<any> {
   }
 }
 
+const getCodesForValueSet = async (code: string, systems: string[]): Promise<Hierarchy<FhirItem>[] | undefined> => {
+  if (code === HIERARCHY_ROOT && systems.length) return [createHierarchyRoot(systems[0])]
+  for (const system of systems) {
+    try {
+      return (await getChildrenFromCodes(system, [code])).results
+    } catch {
+      console.error("Ce n'est pas une erreur.")
+    }
+  }
+}
+
 /**
  * Fetches all codes for the criteria within the query
  * @param criteriaList list of criteria definitions
@@ -542,7 +555,7 @@ export const fetchCriteriasCodes = async (
     for (const section of criteria.formDefinition?.itemSections || []) {
       for (const item of section.items || []) {
         if (item.type === 'codeSearch') {
-          const defaultValueSet = item.valueSetIds[0]
+          const defaultValueSet = item.valueSetsInfo[0].url
           for (const criterion of criteriaValues) {
             const dataKey = item.valueKey as keyof SelectedCriteriaType
             const labelValues = criterion[dataKey] as unknown as LabelObject[]
@@ -553,11 +566,12 @@ export const fetchCriteriasCodes = async (
                 const valueSetCodeCache = updatedCriteriaData[codeSystem] ?? []
                 if (!valueSetCodeCache.find((data) => data.id === code.id)) {
                   try {
-                    const fetchedCode = (await fetchValueSet(codeSystem, {
-                      search: code.id || '',
-                      noStar: true
-                    })) as LabelObject[]
-                    valueSetCodeCache.push(...fetchedCode)
+                    const fetchedCode = await getCodesForValueSet(code.id, [codeSystem])
+                    if (fetchedCode) {
+                      valueSetCodeCache.push(...fetchedCode)
+                    } else {
+                      console.warn(`Code ${code.id} not found in system ${codeSystem}`)
+                    }
                   } catch (e) {
                     // fail silently
                     console.error(`Error fetching code ${code.id} from system ${codeSystem}`, e)

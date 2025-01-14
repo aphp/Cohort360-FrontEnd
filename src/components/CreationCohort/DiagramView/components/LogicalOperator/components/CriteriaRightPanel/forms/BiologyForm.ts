@@ -7,17 +7,19 @@ import {
   WithEncounterStatusDataType,
   WithOccurenceCriteriaDataType
 } from '../CriteriaForm/types'
-import { LabelObject } from 'types/searchCriterias'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
 import { BiologyStatus } from 'types'
+import { getValueSetsFromSystems } from 'utils/valueSets'
+import { FhirItem } from 'types/valueSet'
+import { Hierarchy } from 'types/hierarchy'
 
 export type ObservationDataType = CommonCriteriaData &
   WithOccurenceCriteriaDataType &
   WithEncounterDateDataType &
   WithEncounterStatusDataType & {
     type: CriteriaType.OBSERVATION
-    code: LabelObject[] | null
+    code: Hierarchy<FhirItem & { isLeaf?: boolean }>[] | null
     searchByValue: NumberAndComparatorDataType | null
     enableSearchByValue: boolean
   }
@@ -66,13 +68,13 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
           type: 'codeSearch',
           label: 'Codes de biologie',
           checkIsLeaf: true,
-          valueSetIds: [
+          valueSetsInfo: getValueSetsFromSystems([
             getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
             getConfig().features.observation.valueSets.biologyHierarchyLoinc.url
-          ],
+          ]),
           noOptionsText: 'Veuillez entrer un code de biologie',
           buildInfo: {
-            fhirKey: ObservationParamsKeys.ANABIO_LOINC,
+            fhirKey: ObservationParamsKeys.CODE,
             buildMethodExtraArgs: [
               { type: 'string', value: getConfig().features.observation.valueSets.biologyHierarchyAnabio.url },
               { type: 'boolean', value: true }

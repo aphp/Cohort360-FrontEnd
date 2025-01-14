@@ -13,15 +13,17 @@ import {
   WithEncounterStatusDataType,
   WithOccurenceCriteriaDataType
 } from '../CriteriaForm/types'
-import { LabelObject } from 'types/searchCriterias'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
+import { getValueSetsFromSystems } from 'utils/valueSets'
+import { Hierarchy } from 'types/hierarchy'
+import { FhirItem } from 'types/valueSet'
 
 export type MedicationDataType = CommonCriteriaData &
   WithOccurenceCriteriaDataType &
   WithEncounterDateDataType &
   WithEncounterStatusDataType & {
-    code: LabelObject[] | null
+    code: Hierarchy<FhirItem>[] | null
     administration: string[] | null
     type: CriteriaType.MEDICATION_REQUEST | CriteriaType.MEDICATION_ADMINISTRATION
     prescriptionType: string[] | null
@@ -90,10 +92,10 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
           type: 'codeSearch',
           label: 'Code(s) sélectionné(s)',
           noOptionsText: 'Veuillez entrer un code de médicament',
-          valueSetIds: [
+          valueSetsInfo: getValueSetsFromSystems([
             getConfig().features.medication.valueSets.medicationAtc.url,
             getConfig().features.medication.valueSets.medicationUcd.url
-          ],
+          ]),
           buildInfo: {
             fhirKey: PrescriptionParamsKeys.CODE,
             buildMethodExtraArgs: [

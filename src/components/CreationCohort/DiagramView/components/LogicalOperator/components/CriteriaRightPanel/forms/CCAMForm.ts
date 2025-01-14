@@ -6,16 +6,18 @@ import {
   WithEncounterStatusDataType,
   WithOccurenceCriteriaDataType
 } from '../CriteriaForm/types'
-import { LabelObject } from 'types/searchCriterias'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
+import { getValueSetsFromSystems } from 'utils/valueSets'
+import { Hierarchy } from 'types/hierarchy'
+import { FhirItem } from 'types/valueSet'
 
 export type CcamDataType = CommonCriteriaData &
   WithOccurenceCriteriaDataType &
   WithEncounterDateDataType &
   WithEncounterStatusDataType & {
     type: CriteriaType.PROCEDURE
-    code: LabelObject[] | null
+    code: Hierarchy<FhirItem>[] | null
     source: string | null
   }
 
@@ -86,7 +88,7 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
           valueKey: 'code',
           type: 'codeSearch',
           label: "Codes d'actes CCAM",
-          valueSetIds: [getConfig().features.procedure.valueSets.procedureHierarchy.url],
+          valueSetsInfo: getValueSetsFromSystems([getConfig().features.procedure.valueSets.procedureHierarchy.url]),
           noOptionsText: 'Veuillez entrer un code ou un acte CCAM',
           buildInfo: {
             fhirKey: ProcedureParamsKeys.CODE,
