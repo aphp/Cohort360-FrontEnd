@@ -216,19 +216,17 @@ const MedicationForm = (props: CriteriaDrawerComponentProps) => {
               renderInput={(params) => <TextField {...params} label="Type de prescription" />}
             />
           )}
-          {currentCriteria.type === CriteriaType.MEDICATION_ADMINISTRATION && (
-            <Autocomplete
-              multiple
-              id="criteria-prescription-type-autocomplete"
-              className={classes.inputItem}
-              options={criteriaData.data.administrations ?? []}
-              getOptionLabel={(option) => option.label}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={selectedCriteriaAdministration}
-              onChange={(e, value) => setCurrentCriteria({ ...currentCriteria, administration: value })}
-              renderInput={(params) => <TextField {...params} label="Voie d'administration" />}
-            />
-          )}
+          <Autocomplete
+            multiple
+            id="criteria-prescription-type-autocomplete"
+            className={classes.inputItem}
+            options={criteriaData.data.administrations ?? []}
+            getOptionLabel={(option) => option.label}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            value={selectedCriteriaAdministration}
+            onChange={(e, value) => setCurrentCriteria({ ...currentCriteria, administration: value })}
+            renderInput={(params) => <TextField {...params} label="Voie d'administration" />}
+          />
           <Autocomplete
             multiple
             options={criteriaData.data.encounterStatus ?? []}

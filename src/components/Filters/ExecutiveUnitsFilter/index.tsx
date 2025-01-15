@@ -15,7 +15,7 @@ type ExecutiveUnitsFilterProps = {
 
 const ExecutiveUnitsFilter = ({ name, value, sourceType, disabled = false }: ExecutiveUnitsFilterProps) => {
   const context = useContext(FormContext)
-  const [population, setPopulation] = useState<Hierarchy<ScopeElement, string>[]>(value)
+  const [population, setPopulation] = useState(value)
 
   useEffect(() => {
     context?.updateFormData(name, population)
@@ -23,10 +23,10 @@ const ExecutiveUnitsFilter = ({ name, value, sourceType, disabled = false }: Exe
 
   return (
     <ExecutiveUnitsInput
-      value={value}
+      value={population}
       sourceType={sourceType}
       disabled={disabled}
-      onChange={(selectedPopulation) => setPopulation(selectedPopulation)}
+      onChange={setPopulation}
       label={
         <Typography variant="h3" alignSelf="center">
           Unité exécutrice
