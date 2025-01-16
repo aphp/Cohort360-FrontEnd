@@ -22,17 +22,20 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ actions }) => {
 
   return (
     <>
-      <IconButton
-        id="long-button"
-        onClick={(event) => {
-          event.stopPropagation()
-          // @ts-ignore
-          setAnchorEl(event.currentTarget)
-          //   setSelectedCohort(row)
-        }}
-      >
-        <MoreVertIcon />
-      </IconButton>
+      <Tooltip title="Autres actions">
+        <IconButton
+          id="long-button"
+          style={{ color: '#000' }}
+          onClick={(event) => {
+            event.stopPropagation()
+            // @ts-ignore
+            setAnchorEl(event.currentTarget)
+            //   setSelectedCohort(row)
+          }}
+        >
+          <MoreVertIcon />
+        </IconButton>
+      </Tooltip>
       <Menu
         anchorEl={anchorEl}
         open={

@@ -11,6 +11,7 @@ type ButtonProps = {
   disabled?: boolean
   onClick: () => void
   endIcon?: ReactNode
+  clearVariant?: boolean
 }
 
 const Button = ({
@@ -21,7 +22,8 @@ const Button = ({
   color = 'primary',
   variant = 'contained',
   onClick,
-  endIcon
+  endIcon,
+  clearVariant
 }: ButtonProps) => {
   return (
     <ButtonWrapper
@@ -34,6 +36,7 @@ const Button = ({
       startIcon={icon}
       endIcon={endIcon}
       disabled={disabled}
+      clearVariant={clearVariant}
     >
       {children}
     </ButtonWrapper>

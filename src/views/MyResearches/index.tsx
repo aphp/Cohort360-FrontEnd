@@ -115,7 +115,7 @@ const MyResearches = () => {
       bgcolor={'#e6f1fd'}
       alignItems={'center'}
     >
-      <Grid container justifyContent={'space-between'} xs={11}>
+      <Grid container justifyContent={'space-between'} xs={11} style={{ padding: '20px 0 12px' }} gap="30px">
         <Typography variant="h1">Mes recherches</Typography>
         <Box display="flex" alignItems="center">
           <MenuButtonFilter buttonLabel={'Toutes les dates'} />
@@ -128,14 +128,11 @@ const MyResearches = () => {
             />
           </Searchbar>
         </Box>
+        <Tabs variant="pill" values={explorationTabs} active={selectedTab} onchange={handleTabChange} />
       </Grid>
-      <Tabs variant="pill" values={explorationTabs} active={selectedTab} onchange={handleTabChange} />
       <Grid container bgcolor={'#FFF'} height={'100%'} justifyContent={'center'}>
-        <Grid container xs={11}>
-          {/* TODO: pitetre un peu trop de grid, remplacer par qqch ? */}
-          <Grid container>
-            <Breadcrumb />
-          </Grid>
+        <Grid container xs={11} style={{ padding: '20px 0' }}>
+          <Breadcrumb />
           <Outlet />
         </Grid>
       </Grid>

@@ -10,18 +10,46 @@ import Button from 'components/ui/Button'
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt'
 import { formatDate } from 'utils/formatDate'
 import FavStar from 'components/ui/FavStar'
-import useCohorts from '../hooks/useCohorts'
 import displayDigit from 'utils/displayDigit'
 import { AppConfig } from 'config'
-import ExportIcon from '@mui/icons-material/GetApp'
 import RequestTree from 'assets/icones/schema.svg?react'
-import ColorizeIcon from '@mui/icons-material/Colorize'
+import Download from 'assets/icones/download.svg?react'
+import Picker from 'assets/icones/color-picker.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import ActionMenu from './ActionMenu'
 import useRequest from '../hooks/useRequest'
+import useCohorts from '../hooks/useCohorts'
+import StatusChip from './StatusChip'
+import UpdateIcon from '@mui/icons-material/Update'
 
 // TODO: il y a un hook useCohortsList, à checker à la rentrée
+
+export const getCohortStatusChip = (status?: CohortJobStatus, jobFailMessage?: string) => {
+  if (jobFailMessage) {
+    return (
+      <Tooltip title={jobFailMessage}>
+        <StatusChip label="Erreur" status={'error'} />
+      </Tooltip>
+    )
+  }
+
+  switch (status) {
+    case CohortJobStatus.FINISHED:
+      return <StatusChip label="Terminé" status={'finished'} />
+    case CohortJobStatus.PENDING:
+    case CohortJobStatus.NEW:
+      return <StatusChip label="En cours" status={'in-progress'} />
+    case CohortJobStatus.LONG_PENDING:
+      return (
+        <Tooltip title="Cohorte volumineuse : sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.">
+          <StatusChip label="En cours" status={'in-progress'} icon={<UpdateIcon />} />
+        </Tooltip>
+      )
+    default:
+      return <StatusChip label="Erreur" status={'error'} />
+  }
+}
 
 const CohortsList = () => {
   const appConfig = useContext(AppConfig)
@@ -112,7 +140,7 @@ const CohortsList = () => {
       {/* TODO: add circular progress */}
 
       <ResearchesTable columns={columns} page={page} setPage={handlePageChange} total={total}>
-        {cohortsList.map((cohort) => {
+        {cohortsList.map((cohort: Cohort) => {
           const isExportable = appConfig.features.export.enabled ? cohort?.rights?.export_csv_nomi : false
           const actions = [
             {
@@ -134,7 +162,6 @@ const CohortsList = () => {
           return (
             <TableRow
               key={cohort.name}
-              sx={{ borderBottom: '1px solid #000', borderRadius: 20 }}
               // onClick={() => onClickRow(cohort)}
             >
               <TableCellWrapper align="left" headCell>
@@ -145,72 +172,81 @@ const CohortsList = () => {
                     // setSelectedExportableCohort(row ?? undefined)
                   }}
                 >
-                  <FavStar favorite={cohort.favorite} />
+                  <FavStar favorite={cohort.favorite} height={20} />
                 </IconButton>
               </TableCellWrapper>
               <TableCellWrapper align="left" headCell>
-                {cohort.name}
-                <Box display="flex">
-                  <Tooltip title={getExportTooltip(cohort, !!isExportable)}>
-                    <div>
-                      <IconButton
-                        size="small"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          // setSelectedExportableCohort(row ?? undefined)
-                        }}
-                        disabled={
-                          !isExportable ||
-                          !cohort.exportable ||
-                          maintenanceIsActive ||
-                          cohort.request_job_status === CohortJobStatus.LONG_PENDING ||
-                          cohort.request_job_status === CohortJobStatus.FAILED ||
-                          cohort.request_job_status === CohortJobStatus.PENDING
-                        }
-                      >
-                        <ExportIcon />
-                      </IconButton>
-                    </div>
-                  </Tooltip>
-                  <Tooltip title={'Accéder à la version de la requête ayant créé la cohorte'}>
-                    <div>
-                      <IconButton
-                        size="small"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          navigate(`/cohort/new/${cohort.request}/${cohort.request_query_snapshot}`)
-                        }}
-                        disabled={maintenanceIsActive}
-                      >
-                        <RequestTree />
-                      </IconButton>
-                    </div>
-                  </Tooltip>
-                  <Tooltip title={'Créer un échantillon à partir de la cohorte'}>
-                    <div>
-                      <IconButton
-                        size="small"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                        }}
-                        disabled={maintenanceIsActive}
-                      >
-                        <ColorizeIcon />
-                      </IconButton>
-                    </div>
-                  </Tooltip>
-                  <ActionMenu actions={actions} />
-                </Box>
+                <Grid container alignItems={'center'}>
+                  <Box display="flex" alignItems="center" maxWidth={'75%'}>
+                    {cohort.name}
+                  </Box>
+                  <Box display={'flex'} alignItems={'center'}>
+                    <Tooltip title={getExportTooltip(cohort, !!isExportable)}>
+                      <div>
+                        <IconButton
+                          style={{ color: '#000' }}
+                          size="small"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            // setSelectedExportableCohort(row ?? undefined)
+                          }}
+                          disabled={
+                            !isExportable ||
+                            !cohort.exportable ||
+                            maintenanceIsActive ||
+                            cohort.request_job_status === CohortJobStatus.LONG_PENDING ||
+                            cohort.request_job_status === CohortJobStatus.FAILED ||
+                            cohort.request_job_status === CohortJobStatus.PENDING
+                          }
+                        >
+                          <Download />
+                        </IconButton>
+                      </div>
+                    </Tooltip>
+                    <Tooltip title={'Créer un échantillon à partir de la cohorte'}>
+                      <div>
+                        <IconButton
+                          size="small"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                          }}
+                          disabled={maintenanceIsActive}
+                          style={{ color: '#000' }}
+                        >
+                          <Picker />
+                        </IconButton>
+                      </div>
+                    </Tooltip>
+                    <Tooltip title={'Accéder à la version de la requête ayant créé la cohorte'}>
+                      <div>
+                        <IconButton
+                          size="small"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            navigate(`/cohort/new/${cohort.request}/${cohort.request_query_snapshot}`)
+                          }}
+                          disabled={maintenanceIsActive}
+                        >
+                          <RequestTree />
+                        </IconButton>
+                      </div>
+                    </Tooltip>
+                    <ActionMenu actions={actions} />
+                  </Box>
+                </Grid>
               </TableCellWrapper>
               {!requestId && <TableCellWrapper>{cohort.request}</TableCellWrapper>}
-              <TableCellWrapper>{cohort.request_job_status}</TableCellWrapper>
+              <TableCellWrapper>
+                {getCohortStatusChip(cohort.request_job_status as CohortJobStatus, cohort.request_job_fail_msg)}
+              </TableCellWrapper>
               <TableCellWrapper>{displayDigit(cohort.result_size)}</TableCellWrapper>
               <TableCellWrapper>{getGlobalEstimation(cohort)}</TableCellWrapper>
               <TableCellWrapper>{formatDate(cohort.created_at, true)}</TableCellWrapper>
               <TableCellWrapper>
                 {/* TODO: rendre non cliquable si pas d'enfant dispo */}
                 <Button
-                  // endIcon={cohortTotal >= 1 && <ArrowRightAltIcon />}
+                  endIcon={<ArrowRightAltIcon />}
+                  clearVariant
                   onClick={() =>
                     // TODO: pourquoi le preventDefault ne fonctionne pas ?
                     {

@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 
-import { Grid, Table, TableBody, TableContainer, TableHead, TableRow, TableSortLabel, Typography } from '@mui/material'
+import { Grid, Table, TableBody, TableContainer, TableHead, TableRow, TableSortLabel } from '@mui/material'
 import { Pagination } from 'components/ui/Pagination'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
@@ -48,7 +48,7 @@ const ResearchesTable: React.FC<ResearchesTableProps> = ({
       <TableContainer>
         <Table className={classes.table}>
           <TableHead>
-            <TableRow>
+            <TableRow sx={{ borderRadius: '40px', overflow: 'clip' }}>
               {columns.map((column, index) => (
                 <TableCellWrapper
                   key={index}

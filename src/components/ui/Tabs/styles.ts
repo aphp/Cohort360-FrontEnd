@@ -69,7 +69,6 @@ export const TabWrapper = styled(Tab)<TabCustomProps>(({ width, variant }) => ({
     padding: '10px 15px',
     color: '#232E6A',
     height: 'auto',
-    margin: '0px 20px',
     float: 'none',
     fontFamily: "'Montserrat', sans-serif",
     fontSize: '16px',
@@ -78,7 +77,7 @@ export const TabWrapper = styled(Tab)<TabCustomProps>(({ width, variant }) => ({
     [`&.Mui-selected, &:hover`]: {
       backgroundColor: '#FFF',
       color: 'inherit',
-      padding: '20px 0'
+      padding: '16px 0'
     }
   })
 }))

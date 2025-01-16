@@ -111,13 +111,13 @@ const RequestsList = () => {
             return (
               <TableRow
                 key={request.uuid}
-                sx={{ borderBottom: '1px solid #000', borderRadius: 20 }}
                 // onClick={() => navigate(`/cohort/new/${request.uuid}`)}
               >
                 <TableCellWrapper align="left" headCell>
                   {getRequestName(request)}
                   <Tooltip title="Partager la requête">
                     <IconButton
+                      style={{ color: '#000' }}
                       size="small"
                       onClick={() => onShareRequest(request.uuid)}
                       disabled={maintenanceIsActive}
@@ -130,8 +130,9 @@ const RequestsList = () => {
                 {!projectId && <TableCellWrapper>{request.parent_folder}</TableCellWrapper>}
                 <TableCellWrapper>{formatDate(request.created_at, true)}</TableCellWrapper>
                 <TableCellWrapper>
-                  {/* TODO: rendre non cliquable si pas d'enfant dispo */}
                   <Button
+                    clearVariant
+                    disabled={cohortTotal < 1}
                     endIcon={cohortTotal >= 1 && <ArrowRightAltIcon />}
                     onClick={() =>
                       // TODO: pourquoi le preventDefault ne fonctionne pas ?

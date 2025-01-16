@@ -9,6 +9,7 @@ import Button from 'components/ui/Button'
 import useCreateProject from '../hooks/useCreateProject'
 import useEditProject from '../hooks/useEditProject'
 import useDeleteProject from '../hooks/useDeleteProject'
+import AddIcon from '@mui/icons-material/Add'
 
 const ProjectsList = () => {
   const navigate = useNavigate()
@@ -40,25 +41,33 @@ const ProjectsList = () => {
     deleteProjectMutation.mutate(project)
   }
   return (
-    <Grid container xs={11} gap="50px">
-      <Button onClick={handleAddProject}>Ajouter un projet</Button>
-      <Typography>{total} projets</Typography>
-
-      {loading ? (
-        <CircularProgress />
-      ) : (
-        projectsList.map((project: ProjectType) => (
-          <ProjectCard
-            key={project.uuid}
-            title={project.name}
-            creationDate={project.created_at}
-            requestNumber={project.requests?.length ?? 0}
-            onclick={() => navigate(`/researches/projects/${project.uuid}${location.search}`)}
-            onedit={() => handleEditProject(project)}
-            ondelete={() => handleDeleteProject(project)}
-          />
-        ))
-      )}
+    <Grid container style={{ padding: '20px 0' }} gap="20px">
+      <Grid container justifyContent={'space-between'} alignItems={'center'}>
+        <Typography>Tri par :</Typography>
+        <Typography fontWeight={'bold'} fontSize={14}>
+          {total} projets
+        </Typography>
+        <Button width="fit-content" onClick={handleAddProject} endIcon={<AddIcon />}>
+          Ajouter un projet
+        </Button>
+      </Grid>
+      <Grid container gap="50px">
+        {loading ? (
+          <CircularProgress /> /* TODO: regarder pour ajouter un Suspense? */
+        ) : (
+          projectsList.map((project: ProjectType) => (
+            <ProjectCard
+              key={project.uuid}
+              title={project.name}
+              creationDate={project.created_at}
+              requestNumber={project.requests?.length ?? 0}
+              onclick={() => navigate(`/researches/projects/${project.uuid}${location.search}`)}
+              onedit={() => handleEditProject(project)}
+              ondelete={() => handleDeleteProject(project)}
+            />
+          ))
+        )}
+      </Grid>
     </Grid>
   )
 }

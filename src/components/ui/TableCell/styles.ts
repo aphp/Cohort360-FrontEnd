@@ -8,19 +8,20 @@ type CustomProps = {
 export const TableCellWrapper = styled(TableCell)<CustomProps>(({ align = 'center', headCell = false }) => ({
   textAlign: align,
   [`&.${tableCellClasses.head}`]: {
+    borderBottom: 0,
     // TODO: ajouter pour head et body des variants pour exploration et les autres (quoi que Alizé a fait son composant générique??)
     backgroundColor: '#153d8a',
     color: '#FFF',
     fontWeight: 'bold',
     textTransform: 'uppercase',
     fontSize: 11,
-    padding: 12
+    padding: '12px 16px'
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    padding: 12,
-    // TODO: ajouter une props pour dire que si c'est la headcell, text en bleu
+    padding: '4px 16px',
     color: headCell ? '#153d8a' : '#000',
-    fontWeight: headCell ? 700 : 400
+    fontWeight: headCell ? 700 : 400,
+    borderBottom: '1px solid rgba(0,0,0,0.25)'
   }
 }))
