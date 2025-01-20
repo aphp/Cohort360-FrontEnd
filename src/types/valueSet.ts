@@ -15,11 +15,11 @@ export enum ReferencesLabel {
   ATC = 'ATC',
   UCD = 'UCD',
   UCD_13 = 'UCD 13',
-  LOINC = 'Loinc',
-  ANABIO = 'Anabio',
-  GHM = 'Ghm',
-  CIM10 = 'Cim10',
-  CCAM = 'Ccam'
+  LOINC = 'LOINC',
+  ANABIO = 'ANABIO',
+  GHM = 'GHM',
+  CIM10 = 'CIIM10',
+  CCAM = 'CCAM'
 }
 
 export type Reference = {

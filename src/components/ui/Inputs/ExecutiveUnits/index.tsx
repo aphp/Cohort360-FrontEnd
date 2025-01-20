@@ -14,6 +14,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import CodesWithSystems from 'components/Hierarchy/CodesWithSystems'
 import { SearchOutlined } from '@mui/icons-material'
+import { isEqual, sortBy } from 'lodash'
 
 type ExecutiveUnitsProps = {
   value: Hierarchy<ScopeElement>[]
@@ -25,16 +26,14 @@ type ExecutiveUnitsProps = {
 
 const ExecutiveUnits = ({ value, sourceType, disabled = false, onChange, label }: ExecutiveUnitsProps) => {
   const [population, setPopulation] = useState<Hierarchy<ScopeElement>[]>([])
-  const [selectedPopulation, setSelectedPopulation] = useState<Hierarchy<ScopeElement>[]>([])
   const [confirmedPopulation, setConfirmedPopulation] = useState<Hierarchy<ScopeElement>[]>(value)
   const [loading, setLoading] = useState(disabled ? LoadingStatus.SUCCESS : LoadingStatus.FETCHING)
   const [open, setOpen] = useState(false)
   const [isExtended, setIsExtended] = useState(false)
 
   const handleDelete = (node: Hierarchy<ScopeElement>) => {
-    const newSelectedPopulation = selectedPopulation.filter((item) => item.id !== node.id)
-    setSelectedPopulation(newSelectedPopulation)
-    setConfirmedPopulation(newSelectedPopulation)
+    const newSelectedPopulation = value.filter((item) => item.id !== node.id)
+    onChange(newSelectedPopulation)
   }
 
   useEffect(() => {
@@ -45,10 +44,6 @@ const ExecutiveUnits = ({ value, sourceType, disabled = false, onChange, label }
     }
     if (!disabled) handleFetchPopulation()
   }, [])
-
-  useEffect(() => {
-    onChange(confirmedPopulation)
-  }, [confirmedPopulation])
 
   return (
     <InputWrapper>
@@ -75,44 +70,48 @@ const ExecutiveUnits = ({ value, sourceType, disabled = false, onChange, label }
         padding="9px 3px 9px 12px"
       >
         <Grid container alignItems="center" item xs={10}>
-          {!confirmedPopulation.length && <FormLabel component="legend">Sélectionner une unité exécutrice</FormLabel>}
-          <CodesWithSystems
-            disabled={disabled}
-            codes={confirmedPopulation}
-            isExtended={isExtended}
-            onDelete={handleDelete}
-          />
+          {!value.length && <FormLabel component="legend">Sélectionner une unité exécutrice</FormLabel>}
+          <CodesWithSystems disabled={disabled} codes={value} isExtended={isExtended} onDelete={handleDelete} />
         </Grid>
         <Grid item xs={2} container justifyContent="flex-end">
-          {confirmedPopulation.length > 0 && isExtended && (
+          {value.length > 0 && isExtended && (
             <IconButton size="small" sx={{ color: '#5BC5F2' }} onClick={() => setIsExtended(false)}>
               <CloseIcon />
             </IconButton>
           )}
-          {confirmedPopulation.length > 0 && !isExtended && (
+          {value.length > 0 && !isExtended && (
             <IconButton size="small" sx={{ color: '#5BC5F2' }} onClick={() => setIsExtended(true)}>
               <MoreHorizIcon />
             </IconButton>
           )}
-          <IconButton sx={{ color: '#5BC5F2' }} size="small" onClick={() => setOpen(true)} disabled={disabled}>
+          <IconButton
+            sx={{ color: '#5BC5F2' }}
+            size="small"
+            onClick={() => {
+              setOpen(true)
+              setIsExtended(false)
+            }}
+            disabled={disabled}
+          >
             {loading === LoadingStatus.FETCHING && <CircularProgress size={24} />}
             {loading === LoadingStatus.SUCCESS && <SearchOutlined />}
           </IconButton>
         </Grid>
       </Grid>
       <Panel
+        mandatory={isEqual(sortBy(confirmedPopulation), sortBy(value))}
         title="Sélectionner une unité exécutrice"
         open={open}
         onConfirm={() => {
-          setConfirmedPopulation(selectedPopulation)
+          onChange(confirmedPopulation)
           setOpen(false)
         }}
         onClose={() => setOpen(false)}
       >
         <ScopeTree
           baseTree={population}
-          selectedNodes={confirmedPopulation}
-          onSelect={setSelectedPopulation}
+          selectedNodes={value}
+          onSelect={setConfirmedPopulation}
           sourceType={sourceType}
         />
       </Panel>

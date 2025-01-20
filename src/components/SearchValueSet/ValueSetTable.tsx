@@ -21,6 +21,7 @@ import { LIMIT_PER_PAGE } from 'hooks/search/useSearchParameters'
 import { Pagination } from 'components/ui/Pagination'
 import { getLabelFromCode, isDisplayedWithCode } from 'utils/valueSets'
 import { FhirItem } from 'types/valueSet'
+import TruncatedText from 'components/ui/TruncatedText'
 
 type ValueSetRowProps = {
   item: Hierarchy<FhirItem>
@@ -80,7 +81,7 @@ const ValueSetRow = ({
             )}
           </CellWrapper>
           <CellWrapper item xs={10} cursor onClick={() => (open ? setOpen(false) : handleOpen())}>
-            {getLabelFromCode(item)}
+            <TruncatedText lineNb={2} text={getLabelFromCode(item)}></TruncatedText>
           </CellWrapper>
           <CellWrapper item xs={1} container>
             <Checkbox

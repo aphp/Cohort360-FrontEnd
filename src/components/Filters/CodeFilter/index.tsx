@@ -18,12 +18,12 @@ const CodeFilter = ({ name, value, references, disabled = false }: CodeFilterPro
   const [code, setCode] = useState(value)
 
   useEffect(() => {
-    if (context?.updateFormData) context.updateFormData(name, code)
+    context?.updateFormData(name, code)
   }, [code, name])
 
   return (
     <InputWrapper>
-      <Typography variant="h3">Code :</Typography>
+      <Typography variant="h3">Codes :</Typography>
       <ValueSetField
         disabled={disabled}
         value={code}
