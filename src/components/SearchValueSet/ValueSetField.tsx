@@ -8,6 +8,7 @@ import { SearchOutlined } from '@mui/icons-material'
 import CloseIcon from '@mui/icons-material/Close'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import CodesWithSystems from 'components/Hierarchy/CodesWithSystems'
+import { isEqual, sortBy } from 'lodash'
 
 type ValueSetFieldProps = {
   value: Hierarchy<FhirItem>[]
@@ -20,6 +21,7 @@ type ValueSetFieldProps = {
 const ValueSetField = ({ value, references, placeholder, disabled = false, onSelect }: ValueSetFieldProps) => {
   const [openCodeResearch, setOpenCodeResearch] = useState(false)
   const [isExtended, setIsExtended] = useState(false)
+  const [confirmedValueSets, setConfirmedValueSets] = useState<Hierarchy<FhirItem>[]>(value)
 
   const handleDelete = (node: Hierarchy<FhirItem>) => {
     const newCodes = value.filter((item) => !(item.id === node.id && item.system === node.system))
@@ -53,7 +55,10 @@ const ValueSetField = ({ value, references, placeholder, disabled = false, onSel
           <IconButton
             sx={{ color: '#5BC5F2' }}
             size="small"
-            onClick={() => setOpenCodeResearch(true)}
+            onClick={() => {
+              setOpenCodeResearch(true)
+              setIsExtended(false)
+            }}
             disabled={disabled}
           >
             <SearchOutlined />
@@ -61,11 +66,15 @@ const ValueSetField = ({ value, references, placeholder, disabled = false, onSel
         </Grid>
       </Grid>
       <Panel
+        mandatory={isEqual(sortBy(confirmedValueSets), sortBy(value))}
+        onConfirm={() => {
+          onSelect(confirmedValueSets)
+          setOpenCodeResearch(false)
+        }}
         onClose={() => setOpenCodeResearch(false)}
-        onConfirm={() => setOpenCodeResearch(false)}
         open={openCodeResearch}
       >
-        <SearchValueSet references={references} onSelect={onSelect} selectedNodes={value} />
+        <SearchValueSet references={references} onSelect={setConfirmedValueSets} selectedNodes={value} />
       </Panel>
     </>
   )
