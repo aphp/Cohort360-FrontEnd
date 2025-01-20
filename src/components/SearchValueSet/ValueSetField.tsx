@@ -18,6 +18,8 @@ type ValueSetFieldProps = {
   onSelect: (selectedItems: Hierarchy<FhirItem>[]) => void
 }
 
+const PANEL_WIDTH = '900px'
+
 const ValueSetField = ({ value, references, placeholder, disabled = false, onSelect }: ValueSetFieldProps) => {
   const [openCodeResearch, setOpenCodeResearch] = useState(false)
   const [isExtended, setIsExtended] = useState(false)
@@ -26,6 +28,11 @@ const ValueSetField = ({ value, references, placeholder, disabled = false, onSel
   const handleDelete = (node: Hierarchy<FhirItem>) => {
     const newCodes = value.filter((item) => !(item.id === node.id && item.system === node.system))
     onSelect(newCodes)
+  }
+
+  const handleOpen = () => {
+    setOpenCodeResearch(true)
+    setIsExtended(false)
   }
 
   return (
@@ -37,7 +44,16 @@ const ValueSetField = ({ value, references, placeholder, disabled = false, onSel
         borderRadius="4px"
         padding="9px 3px 9px 12px"
       >
-        <Grid container alignItems="center" item xs={10}>
+        <Grid
+          container
+          alignItems="center"
+          item
+          xs={10}
+          role="button"
+          tabIndex={0}
+          style={{ cursor: 'pointer' }}
+          onClick={handleOpen}
+        >
           <CodesWithSystems disabled={disabled} codes={value} isExtended={isExtended} onDelete={handleDelete} />
           {!value.length && <FormLabel component="legend">{placeholder}</FormLabel>}
         </Grid>
@@ -52,20 +68,13 @@ const ValueSetField = ({ value, references, placeholder, disabled = false, onSel
               <MoreHorizIcon />
             </IconButton>
           )}
-          <IconButton
-            sx={{ color: '#5BC5F2' }}
-            size="small"
-            onClick={() => {
-              setOpenCodeResearch(true)
-              setIsExtended(false)
-            }}
-            disabled={disabled}
-          >
+          <IconButton sx={{ color: '#5BC5F2' }} size="small" onClick={handleOpen} disabled={disabled}>
             <SearchOutlined />
           </IconButton>
         </Grid>
       </Grid>
       <Panel
+        size={PANEL_WIDTH}
         mandatory={isEqual(sortBy(confirmedValueSets), sortBy(value))}
         onConfirm={() => {
           onSelect(confirmedValueSets)

@@ -19,6 +19,7 @@ export const TabWrapper = styled(Tab)<TabCustomProps>(({ width, variant }) => ({
   padding: '0px 6px',
   fontSize: 13,
   width: width,
+  maxWidth: '100%',
   '&.MuiButtonBase-root.MuiTab-root': {
     minHeight: 40
   },
