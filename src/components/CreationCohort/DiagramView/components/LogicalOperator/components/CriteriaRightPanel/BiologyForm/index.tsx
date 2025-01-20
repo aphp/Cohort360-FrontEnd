@@ -25,9 +25,10 @@ import ValueSetField from 'components/SearchValueSet/ValueSetField'
 import { ErrorWrapper } from 'components/ui/Searchbar/styles'
 import AdvancedInputs from '../AdvancedInputs'
 import { SourceType } from 'types/scope'
-import { getValueSetsFromSystems } from 'utils/valueSets'
-import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
+import { checkIsLeaf, getValueSetsFromSystems } from 'utils/valueSets'
 import { mappingCriteria, mappingHierarchyCriteria } from 'utils/mappers'
+import { useAppSelector } from 'state'
+import { selectValueSetCodes } from 'state/valueSets'
 
 enum Error {
   NO_ERROR,
@@ -64,6 +65,18 @@ const BiologyForm = (props: CriteriaDrawerComponentProps) => {
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const [error, setError] = useState(Error.NO_ERROR)
   const [isLeaf, setIsLeaf] = useState(false)
+  const biologyReferences = useMemo(() => {
+    return getValueSetsFromSystems([
+      getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
+      getConfig().features.observation.valueSets.biologyHierarchyLoinc.url
+    ])
+  }, [])
+  const cachedCodes = useAppSelector((state) =>
+    selectValueSetCodes(
+      state,
+      biologyReferences.map((ref) => ref.url)
+    )
+  )
 
   const handleSearchValues = (newValue: string, index: number) => {
     const invalidCharRegex = /[^0-9.-]/
@@ -98,27 +111,19 @@ const BiologyForm = (props: CriteriaDrawerComponentProps) => {
 
   useEffect(() => {
     setError(Error.NO_ERROR)
-    if (
-      currentCriteria.code.length === 1 &&
-      !currentCriteria.code?.[0]?.inferior_levels_ids &&
-      currentCriteria.code?.[0]?.id !== HIERARCHY_ROOT
-    )
-      setIsLeaf(true)
-    else {
-      setIsLeaf(false)
-      setCurrentCriteria({
-        ...currentCriteria,
-        searchByValue: [null, null]
-      })
-    }
+    checkIsLeaf(currentCriteria.code, cachedCodes).then((isLeaf) => {
+      if (isLeaf) setIsLeaf(true)
+      else {
+        setIsLeaf(false)
+        setCurrentCriteria({
+          ...currentCriteria,
+          searchByValue: [null, null],
+          valueComparator: Comparators.GREATER_OR_EQUAL
+        })
+        setSearchByValueInput(['', ''])
+      }
+    })
   }, [currentCriteria.code])
-
-  const biologyReferences = useMemo(() => {
-    return getValueSetsFromSystems([
-      getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
-      getConfig().features.observation.valueSets.biologyHierarchyLoinc.url
-    ])
-  }, [])
 
   useEffect(() => {
     const encounterStatus =
