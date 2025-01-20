@@ -192,7 +192,7 @@ const Cim10Form = (props: CriteriaDrawerComponentProps) => {
               value={currentCriteria.code}
               references={cim10References}
               onSelect={(value) => setCurrentCriteria({ ...currentCriteria, code: value })}
-              placeholder="Sélectionner les codes Cim10"
+              placeholder="Sélectionner les codes CIM10"
             />
           </Grid>
           <Autocomplete

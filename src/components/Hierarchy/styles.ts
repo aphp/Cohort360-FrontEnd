@@ -1,7 +1,7 @@
 import { Grid, styled } from '@mui/material'
 
 type RowContainerProps = {
-  color: string
+  color?: string
 }
 
 type RowWrapperProps = {
@@ -14,7 +14,7 @@ type CellWrapperProps = {
   fontWeight?: number
 }
 
-export const RowContainerWrapper = styled(Grid)<RowContainerProps>(({ color }) => ({
+export const RowContainerWrapper = styled(Grid)<RowContainerProps>(({ color = '#fff' }) => ({
   backgroundColor: color,
   borderBottom: '1px solid rgba(224, 224, 224, 1)',
   padding: '0 8px'
