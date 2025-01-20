@@ -9,6 +9,7 @@ type RightPanelProps = {
   children: ReactNode
   cancelText?: string
   confirmText?: string
+  size?: string
   onConfirm?: () => void
   onClose?: () => void
 }
@@ -19,6 +20,7 @@ const Panel = ({
   anchor = 'right',
   mandatory = false,
   children,
+  size = '650px',
   cancelText = 'Annuler',
   confirmText = 'Confirmer',
   onConfirm,
@@ -28,11 +30,11 @@ const Panel = ({
     <Drawer
       anchor={anchor}
       open={open}
-      PaperProps={{ style: { width: '650px' } }}
+      PaperProps={{ style: { width: size } }}
       onClose={onClose}
       sx={{ zIndex: 1300, overflowY: 'unset' }}
     >
-      <Grid container direction="column" maxWidth="650px" height="100%" flexWrap="nowrap">
+      <Grid container direction="column" maxWidth={size} height="100%" flexWrap="nowrap">
         <Grid item container flexDirection="column" flexWrap="nowrap" overflow="auto">
           <Paper>
             <Grid container justifyContent="center" width="100%">

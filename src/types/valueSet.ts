@@ -18,7 +18,7 @@ export enum ReferencesLabel {
   LOINC = 'LOINC',
   ANABIO = 'ANABIO',
   GHM = 'GHM',
-  CIM10 = 'CIIM10',
+  CIM10 = 'CIM10',
   CCAM = 'CCAM'
 }
 

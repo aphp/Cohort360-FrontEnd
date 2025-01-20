@@ -6,9 +6,8 @@ import {
   Grid,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
-  TableRow,
+  TableHead,
   Typography
 } from '@mui/material'
 import { LoadingStatus, SelectedStatus } from 'types'
@@ -155,14 +154,17 @@ const ValueSetTable = ({
       <Grid container item flexGrow={1}>
         <TableContainer style={{ background: 'white' }}>
           <Table>
-            <TableBody>
+            <TableHead>
               {loading.list === LoadingStatus.SUCCESS && !isHierarchy && (
-                <TableRow>
-                  <TableCell colSpan={6}>
-                    <Grid container alignItems="center" justifyContent="space-between">
+                <RowContainerWrapper container>
+                  <RowWrapper container alignItems="center" justifyContent="space-between" style={{ paddingRight: 10 }}>
+                    <CellWrapper item xs={1} />
+                    <CellWrapper item xs={10}>
                       <Typography color={hierarchy.count ? 'primary' : '#4f4f4f'} fontWeight={600}>
                         {hierarchy.count ? `${hierarchy.count} résultat(s)` : `Aucun résultat à afficher`}
                       </Typography>
+                    </CellWrapper>
+                    <CellWrapper item xs={1} container>
                       {hierarchy.count > 0 && (
                         <Checkbox
                           disabled={
@@ -176,11 +178,13 @@ const ValueSetTable = ({
                           style={{ paddingRight: 16 }}
                         />
                       )}
-                    </Grid>
-                  </TableCell>
-                </TableRow>
+                    </CellWrapper>
+                  </RowWrapper>
+                </RowContainerWrapper>
               )}
-              {loading.list === LoadingStatus.SUCCESS && (
+            </TableHead>
+            {loading.list === LoadingStatus.SUCCESS && (
+              <TableBody>
                 <div style={{ maxHeight: '20vh' }}>
                   {hierarchy.tree.map((item) =>
                     item ? (
@@ -200,8 +204,8 @@ const ValueSetTable = ({
                     )
                   )}
                 </div>
-              )}
-            </TableBody>
+              </TableBody>
+            )}
           </Table>
           {loading.list === LoadingStatus.FETCHING && (
             <Grid container justifyContent="center" alignContent="center" height={500}>
