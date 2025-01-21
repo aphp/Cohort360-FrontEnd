@@ -20,7 +20,18 @@ const Breadcrumb = () => {
         }
 
         return (
-          <Link key={index} component={RouterLink} to={item.url} style={{ color: '#BFBABA', textUnderlineOffset: 2 }}>
+          <Link
+            key={index}
+            component={RouterLink}
+            to={item.url}
+            style={{
+              color: '#BFBABA',
+              fontSize: 14,
+              fontWeight: 'bold',
+              textUnderlineOffset: 3,
+              textDecorationColor: '#BFBABA'
+            }}
+          >
             {item.label}
           </Link>
         )

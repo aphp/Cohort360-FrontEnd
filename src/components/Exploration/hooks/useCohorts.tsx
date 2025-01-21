@@ -39,7 +39,7 @@ const useCohorts = (parentId: string, searchInput: string, startDate?: string, e
   }
 
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['cohorts', searchInput, startDate, endDate, page],
+    queryKey: ['cohorts', 'projectsCount', searchInput, startDate, endDate, page],
     queryFn: fetchCohortsList
   })
 

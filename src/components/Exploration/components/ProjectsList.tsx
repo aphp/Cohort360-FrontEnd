@@ -10,9 +10,11 @@ import useCreateProject from '../hooks/useCreateProject'
 import useEditProject from '../hooks/useEditProject'
 import useDeleteProject from '../hooks/useDeleteProject'
 import AddIcon from '@mui/icons-material/Add'
+import { useAppSelector } from 'state'
 
 const ProjectsList = () => {
   const navigate = useNavigate()
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
   const [searchParams] = useSearchParams()
   const searchInput = searchParams.get('searchInput') ?? ''
   const startDate = searchParams.get('startDate') ?? undefined
@@ -64,6 +66,7 @@ const ProjectsList = () => {
               onclick={() => navigate(`/researches/projects/${project.uuid}${location.search}`)}
               onedit={() => handleEditProject(project)}
               ondelete={() => handleDeleteProject(project)}
+              disabled={maintenanceIsActive}
             />
           ))
         )}

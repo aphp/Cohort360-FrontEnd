@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-import { Box, CircularProgress, Grid, IconButton, TableRow, Tooltip, Typography } from '@mui/material'
+import { Box, Checkbox, CircularProgress, Grid, IconButton, TableRow, Tooltip, Typography } from '@mui/material'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Column, QuerySnapshotInfo, RequestType } from 'types'
 import ResearchesTable from './Table'
@@ -30,6 +30,8 @@ const RequestsList = () => {
   const page = parseInt(searchParams.get('page') ?? '1', 10)
   const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
 
+  const [deleteMode, setDeleteMode] = useState(false)
+
   const { project: parentProject, projectLoading, projectIsError } = useProject(projectId)
   const { requestsList, total, loading } = useRequests(projectId, searchInput, startDate, endDate, page)
 
@@ -38,7 +40,15 @@ const RequestsList = () => {
     setSearchParams(searchParams)
   }
 
+  const handleDelete = () => {
+    setDeleteMode(!deleteMode)
+  }
+  const handleConfirmDelete = () => {
+    alert('êtes vous sûr de vouloir supprimer les requêtes ')
+  }
+
   const columns: Column[] = [
+    ...(deleteMode ? [{ label: <Checkbox /> }] : []),
     { label: 'nom de la requête', align: 'left' },
     ...(!projectId ? [{ label: 'projet' }] : []), // TODO: réfléchir si cliquable ou pas?
     { label: 'date de modification' },
@@ -59,14 +69,14 @@ const RequestsList = () => {
       label: 'Éditer',
       onclick: () => console.log('edit'),
       tooltip: '',
-      disabled: false
+      disabled: maintenanceIsActive
     },
     {
       icon: <DeleteOutlineIcon />,
       label: 'Supprimer',
-      onclick: () => console.log('delete'),
+      onclick: handleDelete,
       tooltip: '',
-      disabled: false
+      disabled: maintenanceIsActive
     }
   ]
 
@@ -92,13 +102,29 @@ const RequestsList = () => {
           </Typography>
           <Typography>{parentProject?.description}</Typography>
           {/* TODO: ajouter les actions sur projet parent */}
-          <IconButton>
-            <EditIcon />
-          </IconButton>
-          <IconButton>
-            <DeleteOutlineIcon />
-          </IconButton>
+          {!deleteMode && (
+            <>
+              <IconButton>
+                <EditIcon />
+              </IconButton>
+              <IconButton>
+                <DeleteOutlineIcon />
+              </IconButton>
+            </>
+          )}
         </Box>
+      )}
+
+      {deleteMode && (
+        <Grid container justifyContent={'flex-end'}>
+          {/* TODO: a custom */}
+          <Button onClick={handleConfirmDelete} clearVariant endIcon={<DeleteOutlineIcon />}>
+            Supprimer la ou les requêtes
+          </Button>
+          <Button onClick={() => setDeleteMode(false)} clearVariant>
+            Annuler la suppression
+          </Button>
+        </Grid>
       )}
 
       {loading ? (
@@ -113,19 +139,28 @@ const RequestsList = () => {
                 key={request.uuid}
                 // onClick={() => navigate(`/cohort/new/${request.uuid}`)}
               >
+                {deleteMode && (
+                  <TableCellWrapper sx={{ width: deleteMode ? 50 : 0, overflow: 'hidden', transition: 'width 0.3s' }}>
+                    <Checkbox />
+                  </TableCellWrapper>
+                )}
                 <TableCellWrapper align="left" headCell>
                   {getRequestName(request)}
-                  <Tooltip title="Partager la requête">
-                    <IconButton
-                      style={{ color: '#000' }}
-                      size="small"
-                      onClick={() => onShareRequest(request.uuid)}
-                      disabled={maintenanceIsActive}
-                    >
-                      <ShareIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <ActionMenu actions={actions} />
+                  {!deleteMode && (
+                    <>
+                      <Tooltip title="Partager la requête">
+                        <IconButton
+                          style={{ color: '#000' }}
+                          size="small"
+                          onClick={() => onShareRequest(request.uuid)}
+                          disabled={maintenanceIsActive}
+                        >
+                          <ShareIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <ActionMenu actions={actions} />
+                    </>
+                  )}
                 </TableCellWrapper>
                 {!projectId && <TableCellWrapper>{request.parent_folder}</TableCellWrapper>}
                 <TableCellWrapper>{formatDate(request.created_at, true)}</TableCellWrapper>
@@ -133,7 +168,7 @@ const RequestsList = () => {
                   <Button
                     clearVariant
                     disabled={cohortTotal < 1}
-                    endIcon={cohortTotal >= 1 && <ArrowRightAltIcon />}
+                    endIcon={<ArrowRightAltIcon />}
                     onClick={() =>
                       // TODO: pourquoi le preventDefault ne fonctionne pas ?
                       // TODO: gérer où on navigate en fonction de l'onglet où l'on se trouve

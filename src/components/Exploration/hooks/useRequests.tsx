@@ -25,7 +25,7 @@ const useRequests = (
   }
 
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['requests', searchInput, startDate, endDate, page],
+    queryKey: ['requests', 'projectsCount', searchInput, startDate, endDate, page],
     queryFn: fetchRequestsList
   })
 

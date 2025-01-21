@@ -9,13 +9,14 @@ import StarFull from 'assets/icones/star full.svg?react'
 type FavStarProps = {
   favorite?: boolean
   height?: number
+  color?: string
 }
 
-const FavStar: React.FC<FavStarProps> = ({ favorite, height = 15 }) => {
+const FavStar: React.FC<FavStarProps> = ({ favorite, height = 15, color = '#ED6D91' }) => {
   if (favorite) {
-    return <StarFull height={height} fill="#ED6D91" />
+    return <StarFull height={height} fill={color} />
   }
-  return <Star height={height} fill="#ED6D91" />
+  return <Star height={height} fill={color} />
 }
 
 export default FavStar

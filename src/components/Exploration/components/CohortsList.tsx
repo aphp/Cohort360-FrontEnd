@@ -22,6 +22,7 @@ import useRequest from '../hooks/useRequest'
 import useCohorts from '../hooks/useCohorts'
 import StatusChip from './StatusChip'
 import UpdateIcon from '@mui/icons-material/Update'
+import useCohortsWebSocket from '../hooks/useCohortsWebSocket'
 
 // TODO: il y a un hook useCohortsList, à checker à la rentrée
 
@@ -64,9 +65,11 @@ const CohortsList = () => {
 
   const { request: parentRequest, requestLoading, requestIsError } = useRequest(requestId)
   const { cohortsList, total, loading } = useCohorts(requestId ?? '', searchInput, startDate, endDate)
+  useCohortsWebSocket(requestId)
+
+  // TODO: deux appels a cohorts-rights se font, pourquoi?
 
   // TODO: add les params pour les filtres exclusifs aux cohortes + bien penser à les suppr en changeant d'onglet
-  // TODO: ne pas oublier les websockets
 
   const columns: Column[] = [
     { label: '', align: 'left' },
@@ -148,14 +151,14 @@ const CohortsList = () => {
               label: 'Éditer',
               onclick: () => console.log('edit'),
               tooltip: '',
-              disabled: false
+              disabled: maintenanceIsActive
             },
             {
               icon: <DeleteOutlineIcon />,
               label: 'Supprimer',
               onclick: () => console.log('delete'),
               tooltip: '',
-              disabled: false
+              disabled: maintenanceIsActive
             }
           ]
 
@@ -171,8 +174,9 @@ const CohortsList = () => {
                     console.log('favorite')
                     // setSelectedExportableCohort(row ?? undefined)
                   }}
+                  disabled={maintenanceIsActive}
                 >
-                  <FavStar favorite={cohort.favorite} height={20} />
+                  <FavStar favorite={cohort.favorite} height={20} color={maintenanceIsActive ? '#CBCFCF' : undefined} />
                 </IconButton>
               </TableCellWrapper>
               <TableCellWrapper align="left" headCell>
@@ -182,54 +186,46 @@ const CohortsList = () => {
                   </Box>
                   <Box display={'flex'} alignItems={'center'}>
                     <Tooltip title={getExportTooltip(cohort, !!isExportable)}>
-                      <div>
-                        <IconButton
-                          style={{ color: '#000' }}
-                          size="small"
-                          onClick={(event) => {
-                            event.stopPropagation()
-                            // setSelectedExportableCohort(row ?? undefined)
-                          }}
-                          disabled={
-                            !isExportable ||
-                            !cohort.exportable ||
-                            maintenanceIsActive ||
-                            cohort.request_job_status === CohortJobStatus.LONG_PENDING ||
-                            cohort.request_job_status === CohortJobStatus.FAILED ||
-                            cohort.request_job_status === CohortJobStatus.PENDING
-                          }
-                        >
-                          <Download />
-                        </IconButton>
-                      </div>
+                      <IconButton
+                        size="small"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          // setSelectedExportableCohort(row ?? undefined)
+                        }}
+                        disabled={
+                          !isExportable ||
+                          !cohort.exportable ||
+                          maintenanceIsActive ||
+                          cohort.request_job_status === CohortJobStatus.LONG_PENDING ||
+                          cohort.request_job_status === CohortJobStatus.FAILED ||
+                          cohort.request_job_status === CohortJobStatus.PENDING
+                        }
+                      >
+                        <Download fill={maintenanceIsActive ? '#CBCFCF' : 'black'} />
+                      </IconButton>
                     </Tooltip>
                     <Tooltip title={'Créer un échantillon à partir de la cohorte'}>
-                      <div>
-                        <IconButton
-                          size="small"
-                          onClick={(event) => {
-                            event.stopPropagation()
-                          }}
-                          disabled={maintenanceIsActive}
-                          style={{ color: '#000' }}
-                        >
-                          <Picker />
-                        </IconButton>
-                      </div>
+                      <IconButton
+                        size="small"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                        }}
+                        disabled={maintenanceIsActive}
+                      >
+                        <Picker stroke={maintenanceIsActive ? '#CBCFCF' : 'black'} />
+                      </IconButton>
                     </Tooltip>
                     <Tooltip title={'Accéder à la version de la requête ayant créé la cohorte'}>
-                      <div>
-                        <IconButton
-                          size="small"
-                          onClick={(event) => {
-                            event.stopPropagation()
-                            navigate(`/cohort/new/${cohort.request}/${cohort.request_query_snapshot}`)
-                          }}
-                          disabled={maintenanceIsActive}
-                        >
-                          <RequestTree />
-                        </IconButton>
-                      </div>
+                      <IconButton
+                        size="small"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          navigate(`/cohort/new/${cohort.request}/${cohort.request_query_snapshot}`)
+                        }}
+                        disabled={maintenanceIsActive}
+                      >
+                        <RequestTree fill={maintenanceIsActive ? '#CBCFCF' : 'black'} />
+                      </IconButton>
                     </Tooltip>
                     <ActionMenu actions={actions} />
                   </Box>

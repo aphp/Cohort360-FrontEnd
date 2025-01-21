@@ -18,17 +18,17 @@ type ActionMenuProps = {
 // TODO: à revoir je pense, pas adapté
 
 const ActionMenu: React.FC<ActionMenuProps> = ({ actions }) => {
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [anchorEl, setAnchorEl] = useState<(EventTarget & HTMLButtonElement) | null>(null)
 
   return (
     <>
       <Tooltip title="Autres actions">
         <IconButton
           id="long-button"
-          style={{ color: '#000' }}
+          size="small"
+          style={{ color: '#000', padding: 0 }}
           onClick={(event) => {
             event.stopPropagation()
-            // @ts-ignore
             setAnchorEl(event.currentTarget)
             //   setSelectedCohort(row)
           }}
@@ -42,7 +42,10 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ actions }) => {
           !!anchorEl
           // && row.uuid === selectedCohort?.uuid
         }
-        onClose={() => setAnchorEl(null)}
+        onClose={() => {
+          // TODO: handle onClose with stop propagation?
+          setAnchorEl(null)
+        }}
       >
         {actions.map((action, index) => (
           <Tooltip title={action.tooltipText} key={index}>

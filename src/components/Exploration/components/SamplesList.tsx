@@ -11,6 +11,8 @@ import { formatDate } from 'utils/formatDate'
 import FavStar from 'components/ui/FavStar'
 import displayDigit from 'utils/displayDigit'
 
+// TODO: prévoir le tableau en cas de maintenance
+
 const SamplesList = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const searchInput = searchParams.get('searchInput') ?? ''

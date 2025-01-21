@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useRef } from 'react'
 import { useAppSelector } from 'state'
 
-import { Box, Grid, Typography } from '@mui/material'
+import { Box, Grid, Slide, Typography } from '@mui/material'
 import Searchbar from 'components/ui/Searchbar'
 import Tabs from 'components/ui/Tabs'
 
@@ -15,7 +15,9 @@ import useCounts from 'components/Exploration/hooks/useCounts'
 import Badge from 'components/ui/Badge'
 import Breadcrumb from 'components/Exploration/components/Breadcrumb'
 
-//  TODO: PENSER AUSSI A FAIRE FONCTIONNER LES TABLEAUX QUAND UNE MAINTENANCE EST EN COURS
+const getPathDepth = (pathname: string) => {
+  return pathname.split('/').filter(Boolean).length
+}
 
 const MyResearches = () => {
   const { classes, cx } = useStyles()
@@ -36,6 +38,16 @@ const MyResearches = () => {
     endDateParam ?? ''
   )
 
+  // Partie pour handle la direction du slider
+  const prevDepthRef = useRef<number | null>(null)
+  const currentDepth = getPathDepth(location.pathname)
+  let direction: 'left' | 'right' = 'left'
+  if (prevDepthRef.current !== null) {
+    const goingForward = currentDepth > prevDepthRef.current
+    direction = goingForward ? 'left' : 'right'
+  }
+  prevDepthRef.current = currentDepth
+
   // TODO: tout ça à externaliser
   const handleSearchTermChange = (newSearchInput: string) => {
     if (!newSearchInput) {
@@ -44,6 +56,12 @@ const MyResearches = () => {
       searchParams.set('searchInput', newSearchInput)
     }
     setSearchParams(searchParams)
+    navigate({
+      // revenir au niveau principal en cas de recherche
+      // TODO: faire la même chose en cas de changement de date
+      pathname: `/researches/${selectedTab?.id}`,
+      search: `?${searchParams.toString()}`
+    })
   }
 
   // const handleDateChange = () => {
@@ -121,19 +139,24 @@ const MyResearches = () => {
           <MenuButtonFilter buttonLabel={'Toutes les dates'} />
           <Searchbar>
             <SearchInput
-              placeholder="Recherche par texte"
+              placeholder="Rechercher dans tous les niveaux"
               value={searchInput}
               onchange={(newInput) => handleSearchTermChange(newInput)}
               searchOnClick
+              width="296px"
             />
           </Searchbar>
         </Box>
         <Tabs variant="pill" values={explorationTabs} active={selectedTab} onchange={handleTabChange} />
       </Grid>
       <Grid container bgcolor={'#FFF'} height={'100%'} justifyContent={'center'}>
-        <Grid container xs={11} style={{ padding: '20px 0' }}>
+        <Grid key={location.pathname} container xs={11} style={{ padding: '20px 0' }}>
           <Breadcrumb />
-          <Outlet />
+          <Slide direction={direction} in={true} mountOnEnter unmountOnExit appear timeout={300}>
+            <Grid container key={location.pathname}>
+              <Outlet />
+            </Grid>
+          </Slide>
         </Grid>
       </Grid>
     </Grid>
