@@ -15,7 +15,8 @@ export const TableCellWrapper = styled(TableCell)<CustomProps>(({ align = 'cente
     fontWeight: 'bold',
     textTransform: 'uppercase',
     fontSize: 11,
-    padding: '12px 16px'
+    padding: '12px 16px',
+    maxWidth: 160
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,

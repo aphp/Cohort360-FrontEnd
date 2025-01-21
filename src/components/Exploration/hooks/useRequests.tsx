@@ -24,7 +24,7 @@ const useRequests = (
     return requestsList
   }
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
+  const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ['requests', 'projectsCount', searchInput, startDate, endDate, page],
     queryFn: fetchRequestsList
   })
@@ -32,7 +32,7 @@ const useRequests = (
   const requestsList = data?.results ?? []
   const total = data?.count ?? 0
 
-  return { requestsList, total, loading: isLoading, isError, error, refetch }
+  return { requestsList, total, loading: isLoading || isFetching, isError, error, refetch }
 }
 
 export default useRequests

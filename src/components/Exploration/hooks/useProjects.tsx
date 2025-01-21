@@ -7,7 +7,7 @@ const useProjects = (searchInput: string, startDate?: string, endDate?: string) 
     return projectsList
   }
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
+  const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ['projects', searchInput, startDate, endDate],
     queryFn: fetchProjectsList
   })
@@ -18,7 +18,7 @@ const useProjects = (searchInput: string, startDate?: string, endDate?: string) 
   return {
     projectsList,
     total,
-    loading: isLoading,
+    loading: isLoading || isFetching,
     isError,
     error,
     refetch

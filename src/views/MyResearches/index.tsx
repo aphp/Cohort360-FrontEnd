@@ -150,7 +150,7 @@ const MyResearches = () => {
         <Tabs variant="pill" values={explorationTabs} active={selectedTab} onchange={handleTabChange} />
       </Grid>
       <Grid container bgcolor={'#FFF'} height={'100%'} justifyContent={'center'}>
-        <Grid key={location.pathname} container xs={11} style={{ padding: '20px 0' }}>
+        <Grid key={location.pathname} container xs={11} style={{ padding: '20px 0' }} gap={'20px'}>
           <Breadcrumb />
           <Slide direction={direction} in={true} mountOnEnter unmountOnExit appear timeout={300}>
             <Grid container key={location.pathname}>

@@ -16,6 +16,7 @@ import ShareIcon from '@mui/icons-material/Share'
 import { useAppDispatch, useAppSelector } from 'state'
 import { setSelectedRequestShare } from 'state/request'
 import useProject from '../hooks/useProject'
+import AddIcon from '@mui/icons-material/Add'
 
 // TODO: J'AVAIS OUBLIÉ MAIS PRÉVOIR LE SUPER FLOW DE DÉLÉTION MULTIPLE
 
@@ -94,7 +95,6 @@ const RequestsList = () => {
 
   return (
     <Grid container gap="20px">
-      {/* TODO: demander à Hicham d'ajouter une descr */}
       {projectId && (
         <Box display={'flex'} justifyContent={'center'} width={'100%'} alignItems={'center'}>
           <Typography fontWeight={'bold'} fontSize={'24px'} fontFamily={"'Montserrat', sans-serif"}>
@@ -115,17 +115,31 @@ const RequestsList = () => {
         </Box>
       )}
 
-      {deleteMode && (
-        <Grid container justifyContent={'flex-end'}>
-          {/* TODO: a custom */}
-          <Button onClick={handleConfirmDelete} clearVariant endIcon={<DeleteOutlineIcon />}>
-            Supprimer la ou les requêtes
+      <Grid container justifyContent={'space-between'} alignItems={'center'}>
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <Typography fontWeight={'bold'} fontSize={14}>
+            {total} requête{total > 1 ? 's' : ''}
+          </Typography>
+        )}
+        {!deleteMode && (
+          <Button width="fit-content" onClick={() => console.log('euh a faire')} endIcon={<AddIcon />}>
+            Ajouter une requête
           </Button>
-          <Button onClick={() => setDeleteMode(false)} clearVariant>
-            Annuler la suppression
-          </Button>
-        </Grid>
-      )}
+        )}
+        {deleteMode && (
+          <Box display={'flex'} justifyContent={'flex-end'}>
+            {/* TODO: a custom */}
+            <Button onClick={handleConfirmDelete} clearVariant endIcon={<DeleteOutlineIcon />}>
+              Supprimer la ou les requêtes
+            </Button>
+            <Button onClick={() => setDeleteMode(false)} clearVariant>
+              Annuler la suppression
+            </Button>
+          </Box>
+        )}
+      </Grid>
 
       {loading ? (
         <CircularProgress />
@@ -135,10 +149,7 @@ const RequestsList = () => {
             const cohortTotal = getCohortTotal(request.query_snapshots)
 
             return (
-              <TableRow
-                key={request.uuid}
-                // onClick={() => navigate(`/cohort/new/${request.uuid}`)}
-              >
+              <TableRow key={request.uuid} onClick={() => navigate(`/cohort/new/${request.uuid}`)}>
                 {deleteMode && (
                   <TableCellWrapper sx={{ width: deleteMode ? 50 : 0, overflow: 'hidden', transition: 'width 0.3s' }}>
                     <Checkbox />
@@ -152,7 +163,10 @@ const RequestsList = () => {
                         <IconButton
                           style={{ color: '#000' }}
                           size="small"
-                          onClick={() => onShareRequest(request.uuid)}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            onShareRequest(request.uuid)
+                          }}
                           disabled={maintenanceIsActive}
                         >
                           <ShareIcon />
@@ -170,9 +184,6 @@ const RequestsList = () => {
                     disabled={cohortTotal < 1}
                     endIcon={<ArrowRightAltIcon />}
                     onClick={() =>
-                      // TODO: pourquoi le preventDefault ne fonctionne pas ?
-                      // TODO: gérer où on navigate en fonction de l'onglet où l'on se trouve
-                      // à obtenir à partir de l'url
                       navigate(
                         projectId
                           ? `/researches/projects/${projectId}/${request.uuid}${location.search}`

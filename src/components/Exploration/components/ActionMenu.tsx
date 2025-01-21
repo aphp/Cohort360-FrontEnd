@@ -42,8 +42,8 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ actions }) => {
           !!anchorEl
           // && row.uuid === selectedCohort?.uuid
         }
-        onClose={() => {
-          // TODO: handle onClose with stop propagation?
+        onClose={(event: React.MouseEvent) => {
+          event.stopPropagation()
           setAnchorEl(null)
         }}
       >

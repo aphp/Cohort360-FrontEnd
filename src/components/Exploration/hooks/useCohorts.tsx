@@ -38,7 +38,7 @@ const useCohorts = (parentId: string, searchInput: string, startDate?: string, e
     return cohortsList
   }
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
+  const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ['cohorts', 'projectsCount', searchInput, startDate, endDate, page],
     queryFn: fetchCohortsList
   })
@@ -46,7 +46,7 @@ const useCohorts = (parentId: string, searchInput: string, startDate?: string, e
   const cohortsList = data?.results ?? []
   const total = data?.count ?? 0
 
-  return { cohortsList, total, loading: isLoading, isError, error, refetch }
+  return { cohortsList, total, loading: isLoading || isFetching, isError, error, refetch }
 }
 
 export default useCohorts

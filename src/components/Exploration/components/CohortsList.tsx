@@ -52,6 +52,8 @@ export const getCohortStatusChip = (status?: CohortJobStatus, jobFailMessage?: s
   }
 }
 
+// TODO: vérifier websockets, pas sûre que ça fonctionne finalement
+
 const CohortsList = () => {
   const appConfig = useContext(AppConfig)
   const navigate = useNavigate()

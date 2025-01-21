@@ -30,7 +30,7 @@ const useBreadCrumb = () => {
   }
 
   if (location.pathname.includes('/requests')) {
-    items.push({ label: 'Requêtes', url: '/researches/requests' })
+    items.push({ label: 'Toutes mes requêtes', url: '/researches/requests' })
     if (requestId && request) {
       items.push({
         label: `Requête ${request.name}`,
@@ -40,7 +40,7 @@ const useBreadCrumb = () => {
   }
 
   if (location.pathname.includes('/cohorts')) {
-    items.push({ label: 'Mes Cohortes', url: '/researches/requests' })
+    items.push({ label: 'Toutes mes cohortes', url: '/researches/requests' })
     // TODO: a adapter
   }
   return items

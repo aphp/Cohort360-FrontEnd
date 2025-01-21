@@ -32,7 +32,10 @@ const Button = ({
       variant={variant}
       color={color}
       disableElevation
-      onClick={onClick}
+      onClick={(event) => {
+        event.stopPropagation()
+        onClick()
+      }}
       startIcon={icon}
       endIcon={endIcon}
       disabled={disabled}
