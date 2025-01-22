@@ -41,7 +41,14 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
   }, [selectedCodes])
 
   return (
-    <Grid container direction="column" wrap="nowrap" justifyContent={'space-between'} height={'100vh'}>
+    <Grid
+      container
+      direction="column"
+      wrap="nowrap"
+      justifyContent={'space-between'}
+      height={'100vh'}
+      className="SearchValueSet"
+    >
       <Grid container padding="30px 30px 8px 30px">
         <Grid item xs={12} marginBottom={'20px'}>
           <Tabs
@@ -91,7 +98,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
         </Grid>
       </Grid>
       <Grid container direction="column" wrap="nowrap" padding={'0px 30px'} height={'100%'}>
-        <Displayer isDisplayed={mode === SearchMode.EXPLORATION} height="100%">
+        <Displayer isDisplayed={mode === SearchMode.EXPLORATION} height="100%" className="ValueSetExploration">
           <ValueSetTable
             mode={SearchMode.EXPLORATION}
             isHierarchy={refs.find((ref) => ref.checked)?.isHierarchy}
@@ -105,7 +112,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
             onChangePage={onChangePage}
           />
         </Displayer>
-        <Displayer isDisplayed={mode === SearchMode.RESEARCH} height={'100%'}>
+        <Displayer isDisplayed={mode === SearchMode.RESEARCH} height={'100%'} className="ValueSetSearch">
           <ValueSetTable
             mode={SearchMode.RESEARCH}
             selectAllStatus={selectAllStatus}

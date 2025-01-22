@@ -43,6 +43,7 @@ const ValueSetField = ({ value, references, placeholder, disabled = false, onSel
         border="1px solid rgba(0, 0, 0, 0.25)"
         borderRadius="4px"
         padding="9px 3px 9px 12px"
+        className="ValueSetField"
       >
         <Grid
           container
