@@ -150,7 +150,7 @@ const ValueSetTable = ({
   }
 
   return (
-    <Grid container direction="column" justifyContent="space-between" height="100%">
+    <Grid container direction="column" justifyContent="space-between" height="100%" className="ValueSetTable">
       <Grid container item flexGrow={1}>
         <TableContainer style={{ background: 'white' }}>
           <Table>
