@@ -131,7 +131,8 @@ const DataTableCompositionLine: React.FC<{
   const nda = document.NDA ?? 'Inconnu'
   const serviceProvider = document.serviceProvider ?? 'Non renseigné'
   const docType = docTypes.docTypes.find(
-    ({ code }) => code === (document?.type?.coding?.[0] ? document.type.coding[0].code : '-')
+    ({ code }) =>
+      code.toLowerCase() === (document?.type?.coding?.[0] ? document.type.coding[0].code : '-')?.toLowerCase()
   )
 
   const findContent = document?.content?.find((content) => content.attachment?.contentType === 'text/plain')
