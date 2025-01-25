@@ -66,7 +66,7 @@ const mapCodesToFhirItems = (
     codes.map((code) => ({
       id: code.code,
       label: codeInLabel
-        ? `${capitalizeFirstLetter(code.code)} - ${capitalizeFirstLetter(code.display)}`
+        ? `${code.code} - ${capitalizeFirstLetter(code.display)}`
         : capitalizeFirstLetter(code.display),
       system: codeSystem
     })),
