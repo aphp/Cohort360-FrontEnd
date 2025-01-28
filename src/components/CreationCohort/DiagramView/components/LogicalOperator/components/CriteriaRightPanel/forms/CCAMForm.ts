@@ -156,7 +156,7 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
           extraLabel: () => "Date de l'acte CCAM",
           buildInfo: {
             fhirKey: ProcedureParamsKeys.DATE,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Date de classement en GHM' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: "Date de l'acte CCAM" }]
           }
         }
       ]

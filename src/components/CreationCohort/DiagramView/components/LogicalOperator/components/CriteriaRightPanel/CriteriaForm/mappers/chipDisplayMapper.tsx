@@ -318,8 +318,14 @@ export const CHIPS_DISPLAY_METHODS = {
     args: Array<ChipDisplayMethod | DataTypes>
   ) => {
     return args[1] === args[2]
-      ? (args[0] as ChipDisplayMethod)(args.slice(3).find((arg, i) => i % 2 === 0) as DataTypes, item, valueSets, [])
-      : (args[0] as ChipDisplayMethod)(args.slice(3).find((arg, i) => i % 2 === 1) as DataTypes, item, valueSets, [])
+      ? (args[0] as ChipDisplayMethod)(val, item, valueSets, [args.slice(3).find((arg, i) => i % 2 === 0) as DataTypes])
+      : (args[0] as ChipDisplayMethod)(val, item, valueSets, [args.slice(3).find((arg, i) => i % 2 === 1) as DataTypes])
   },
+  altArgsRaw: (
+    val: DataTypes,
+    item: GenericCriteriaItem,
+    valueSets: ValueSetStore,
+    args: Array<ChipDisplayMethod | DataTypes>
+  ) => `${args[0]}`,
   noop: () => undefined
 }

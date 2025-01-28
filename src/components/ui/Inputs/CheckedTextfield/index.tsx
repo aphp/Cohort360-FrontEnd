@@ -31,7 +31,8 @@ const CheckedTextfield = ({
   const [error, setError] = useState<boolean>(false)
   const [bufferValue, setBufferValue] = useState<string>(value)
 
-  const extractValue = useCallback((value: string, regexp: RegExp) => {
+  const extractValue = useCallback((value: string, regex: string) => {
+    const regexp = new RegExp(regex, 'gm')
     const matches = value.matchAll(regexp)
     const extractedValues = []
     for (const match of matches) {
@@ -43,19 +44,20 @@ const CheckedTextfield = ({
   }, [])
 
   useEffect(() => {
+    console.log(regex)
     const regexp = new RegExp(regex, 'gm')
 
     if (!bufferValue || !!regexp.exec(bufferValue) === !inverseCheck) {
       setError(false)
       onError(false)
       if (extractValidValues && !inverseCheck) {
-        onChange(extractValue(bufferValue, regexp).join(','))
+        onChange(extractValue(bufferValue, regex).join(','))
       } else {
         onChange(bufferValue)
       }
     } else {
       if (extractValidValues && !inverseCheck) {
-        onChange(extractValue(bufferValue, regexp).join(','))
+        onChange(extractValue(bufferValue, regex).join(','))
       }
       setError(true)
       onError(true)

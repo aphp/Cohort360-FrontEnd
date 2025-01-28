@@ -260,7 +260,7 @@ export const unbuildCriteriaDataFromDefinition = async <T extends SelectedCriter
       const allFilters = filters.flatMap((filter) => {
         if (filter[0] === FILTER_PARAM_NAME) {
           const filterContent = filter[1]
-          const extractedFilterElements = extractFilterParams(filterContent, { omitOperatorEq: false })
+          const extractedFilterElements = extractFilterParams(filterContent, { omitOperatorEq: true })
           if (extractedFilterElements) {
             return (extractQuestionnaireFilterParams(extractedFilterElements) || extractedFilterElements).map(
               (filterParam) => {

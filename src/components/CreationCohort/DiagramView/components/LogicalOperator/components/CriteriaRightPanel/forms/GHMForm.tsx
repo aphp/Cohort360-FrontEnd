@@ -140,7 +140,7 @@ export const form: () => CriteriaForm<GhmDataType> = () => ({
           extraLabel: () => 'Date du classement en GHM',
           buildInfo: {
             fhirKey: ClaimParamsKeys.DATE,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: "Date de l'acte CCAM" }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Date de classement en GHM' }]
           }
         }
       ]

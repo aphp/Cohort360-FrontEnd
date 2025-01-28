@@ -167,7 +167,7 @@ const unbuildDateFilter = (value: string, existingValue?: NewDurationRangeType) 
     updatedValue.start = date
   } else if (value.includes('le')) {
     updatedValue.end = date
-  } else if (value.includes('eq*')) {
+  } else if (value.includes('*')) {
     // TODO this is really bad, but it's the only way to handle the includeNull case for now
     // the value matched is derived from the param 'not (xxx eq "*")'
     updatedValue.includeNull = true

@@ -56,11 +56,11 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
           valueSetId: 'vitalStatus',
           valueSetData: [
             {
-              id: 'true',
+              id: 'false',
               label: 'Patients Vivants'
             },
             {
-              id: 'false',
+              id: 'true',
               label: 'Patient Décédés'
             }
           ],

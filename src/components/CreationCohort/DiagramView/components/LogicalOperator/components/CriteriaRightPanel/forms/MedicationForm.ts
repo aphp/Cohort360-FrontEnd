@@ -79,7 +79,7 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
           buildInfo: {
             chipDisplayMethod: 'altArgs',
             chipDisplayMethodExtraArgs: [
-              { type: 'method', value: 'raw' },
+              { type: 'method', value: 'altArgsRaw' },
               { type: 'reference', value: 'type' },
               { type: 'string', value: CriteriaType.MEDICATION_REQUEST },
               { type: 'string', value: 'Prescription' },

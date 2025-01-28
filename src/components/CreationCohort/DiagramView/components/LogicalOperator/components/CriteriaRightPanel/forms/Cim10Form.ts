@@ -96,6 +96,10 @@ export const form: () => CriteriaForm<Cim10DataType> = () => ({
             fhirKey: ConditionParamsKeys.CODE,
             buildMethodExtraArgs: [
               { type: 'string', value: getConfig().features.condition.valueSets.conditionHierarchy.url }
+            ],
+            chipDisplayMethodExtraArgs: [
+              { type: 'string', value: '' },
+              { type: 'boolean', value: true }
             ]
           }
         },
@@ -106,7 +110,11 @@ export const form: () => CriteriaForm<Cim10DataType> = () => ({
           valueSetId: getConfig().features.condition.valueSets.conditionStatus.url,
           noOptionsText: 'Veuillez entrer un type de diagnostic',
           buildInfo: {
-            fhirKey: ConditionParamsKeys.DIAGNOSTIC_TYPES
+            fhirKey: ConditionParamsKeys.DIAGNOSTIC_TYPES,
+            chipDisplayMethodExtraArgs: [
+              { type: 'string', value: '' },
+              { type: 'boolean', value: true }
+            ]
           }
         },
         {
