@@ -13,9 +13,8 @@ type DurationRangeProps = {
   value: DurationRangeType
   label?: string
   includeDays?: boolean
-  active?: boolean
+  disabled?: boolean
   unit?: string
-  // placeholderType?: string
   onChange: (newDuration: DurationRangeType) => void
   onError: (isError: boolean) => void
 }
@@ -29,15 +28,15 @@ const defaultMaxDuration: DurationType = {
   month: null,
   day: null
 }
-const DurationRange: React.FC<DurationRangeProps> = ({
+const DurationRange = ({
   value,
   label,
   includeDays = true,
-  active = true,
+  disabled = false,
   unit = 'Âge',
   onChange,
   onError
-}) => {
+}: DurationRangeProps) => {
   const [minDuration, setMinDuration] = useState<DurationType>(convertStringToDuration(value[0]) || defaultMinDuration)
   const [maxDuration, setMaxDuration] = useState<DurationType>(convertStringToDuration(value[1]) || defaultMaxDuration)
   const [error, setError] = useState<ErrorType>({ isError: false, errorMessage: '' })
@@ -47,23 +46,21 @@ const DurationRange: React.FC<DurationRangeProps> = ({
     onError(false)
     if (!checkMinMaxValue(minDuration, maxDuration)) {
       setError({ isError: true, errorMessage: 'La date maximale doit être supérieure à la date minimale.' })
+      onChange([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
       onError(true)
-      onChange([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
-    } else {
-      onChange([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
-    }
+    } else onChange([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
   }, [minDuration, maxDuration])
 
   return (
     <BlockWrapper>
       {label && (
         <BlockWrapper margin="0px 0px 10px 0px">
-          <DurationLabel variant="h3">{label} :</DurationLabel>
+          <DurationLabel variant="h3">{label}</DurationLabel>
         </BlockWrapper>
       )}
       <BlockWrapper margin="0px 0px 10px 0px">
         <DurationInput
-          disabled={!active}
+          disabled={disabled}
           value={minDuration}
           includeDays={includeDays}
           label={`${unit} minimum`}
@@ -71,7 +68,7 @@ const DurationRange: React.FC<DurationRangeProps> = ({
         />
       </BlockWrapper>
       <DurationInput
-        disabled={!active}
+        disabled={disabled}
         value={maxDuration}
         includeDays={includeDays}
         label={`${unit} maximum`}

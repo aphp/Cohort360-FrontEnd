@@ -957,7 +957,7 @@ const servicesCohorts: IServiceCohorts = {
         searchBy: searchBy,
         _sort: orderBy.orderBy,
         sortDirection: orderBy.orderDirection,
-        docStatuses: docStatuses,
+        docStatuses: docStatuses.map((obj) => obj.id),
         _elements: searchInput ? [] : undefined,
         _list: groupId ? [groupId] : [],
         _text: searchInput,

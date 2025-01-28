@@ -300,7 +300,7 @@ const fetchDocumentsCount = async (cohortId: string, documentsFilters?: SearchCr
         size: 0,
         _list: [cohortId],
         searchBy: documentsFilters.searchBy,
-        docStatuses: docStatuses,
+        docStatuses: docStatuses.map((obj) => obj.id),
         _text: documentsFilters.searchInput,
         type: docTypes.map((docType) => docType.code).join(),
         'encounter-identifier': nda,

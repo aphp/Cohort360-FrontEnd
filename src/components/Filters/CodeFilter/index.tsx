@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material'
 import ValueSetField from 'components/SearchValueSet/ValueSetField'
-import { InputWrapper } from 'components/ui/Inputs'
+import { InputWrapper } from 'components/ui/Inputs/styles'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import { Hierarchy } from 'types/hierarchy'
