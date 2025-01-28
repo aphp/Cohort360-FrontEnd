@@ -1,23 +1,20 @@
 import React, { useRef } from 'react'
+import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAppSelector } from 'state'
 
 import { Box, Grid, Slide, Typography } from '@mui/material'
-import Searchbar from 'components/ui/Searchbar'
-import Tabs from 'components/ui/Tabs'
-
-import { ExplorationTabs } from 'types'
-import useStyles from './styles'
-import SearchInput from 'components/ui/Searchbar/SearchInput'
-import MenuButtonFilter from 'components/Exploration/components/MenuButtonFilter'
-
-import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import useCounts from 'components/Exploration/hooks/useCounts'
 import Badge from 'components/ui/Badge'
 import Breadcrumb from 'components/Exploration/components/Breadcrumb'
+import MenuButtonFilter from 'components/Exploration/components/MenuButtonFilter'
+import Searchbar from 'components/ui/Searchbar'
+import SearchInput from 'components/ui/Searchbar/SearchInput'
+import Tabs from 'components/ui/Tabs'
 
-const getPathDepth = (pathname: string) => {
-  return pathname.split('/').filter(Boolean).length
-}
+import useCounts from 'components/Exploration/hooks/useCounts'
+
+import { ExplorationTabs } from 'types'
+import { getPathDepth } from 'utils/explorationUtils'
+import useStyles from './styles'
 
 const MyResearches = () => {
   const { classes, cx } = useStyles()
@@ -48,7 +45,6 @@ const MyResearches = () => {
   }
   prevDepthRef.current = currentDepth
 
-  // TODO: tout ça à externaliser
   const handleSearchTermChange = (newSearchInput: string) => {
     if (!newSearchInput) {
       searchParams.delete('searchInput')
@@ -134,6 +130,7 @@ const MyResearches = () => {
       alignItems={'center'}
     >
       <Grid container justifyContent={'space-between'} xs={11} style={{ padding: '20px 0 12px' }} gap="30px">
+        {/* TODO: calculer la height de toute cette grid et la soustraire à celle d'en dessous de 1000vh*/}
         <Typography variant="h1">Mes recherches</Typography>
         <Box display="flex" alignItems="center">
           <MenuButtonFilter buttonLabel={'Toutes les dates'} />
@@ -149,8 +146,9 @@ const MyResearches = () => {
         </Box>
         <Tabs variant="pill" values={explorationTabs} active={selectedTab} onchange={handleTabChange} />
       </Grid>
-      <Grid container bgcolor={'#FFF'} height={'100%'} justifyContent={'center'}>
-        <Grid key={location.pathname} container xs={11} style={{ padding: '20px 0' }} gap={'20px'}>
+      {/* TODO: ui qui bug lorsque tab trop long, à checker */}
+      <Grid container bgcolor={'#FFF'} height="100vh" justifyContent={'center'}>
+        <Grid key={location.pathname} container xs={11} style={{ padding: '20px 0' }} gap={'20px'} direction={'column'}>
           <Breadcrumb />
           <Slide direction={direction} in={true} mountOnEnter unmountOnExit appear timeout={300}>
             <Grid container key={location.pathname}>

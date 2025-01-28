@@ -166,7 +166,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
           <Grid container item alignItems="center" justifyContent="space-between" style={{ marginTop: 4 }}>
             <Button
               width={'45%'}
-              icon={<FilterList height="15px" fill="#FFF" />}
+              startIcon={<FilterList height="15px" fill="#FFF" />}
               onClick={() => setToggleFiltersModal(true)}
             >
               Filtrer
@@ -186,7 +186,11 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
               />
             </Modal>
 
-            <Button width={'45%'} icon={<Sort height="15px" fill="#FFF" />} onClick={() => setToggleSortModal(true)}>
+            <Button
+              width={'45%'}
+              startIcon={<Sort height="15px" fill="#FFF" />}
+              onClick={() => setToggleSortModal(true)}
+            >
               Trier
             </Button>
             <Modal

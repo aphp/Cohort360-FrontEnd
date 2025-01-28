@@ -174,13 +174,14 @@ const RequestsList = () => {
                     clearVariant
                     disabled={cohortTotal < 1}
                     endIcon={<ArrowRightAltIcon />}
-                    onClick={() =>
+                    onClick={(event) => {
+                      event.stopPropagation()
                       navigate(
                         projectId
                           ? `/researches/projects/${projectId}/${request.uuid}${location.search}`
                           : `/researches/requests/${request.uuid}${location.search}`
                       )
-                    }
+                    }}
                   >
                     {cohortTotal} cohorte{cohortTotal > 1 && 's'}
                   </Button>

@@ -177,7 +177,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
                 />
                 <Button
                   width={'150px'}
-                  icon={<FilterList height="15px" fill="#FFF" />}
+                  startIcon={<FilterList height="15px" fill="#FFF" />}
                   onClick={() => setToggleModal(true)}
                 >
                   Filtrer

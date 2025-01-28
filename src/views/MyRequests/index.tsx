@@ -178,7 +178,7 @@ const MyRequests = () => {
 
                 <Hidden only={['xs', 'sm', 'md']}>
                   <Button
-                    icon={<AddIcon />}
+                    startIcon={<AddIcon />}
                     width="200px"
                     onClick={() => handleClickAddProject()}
                     disabled={maintenanceIsActive}

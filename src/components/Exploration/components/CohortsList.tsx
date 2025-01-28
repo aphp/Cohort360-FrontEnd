@@ -215,7 +215,8 @@ const CohortsList = () => {
                   <Button
                     endIcon={<ArrowRightAltIcon />}
                     clearVariant
-                    onClick={() => {
+                    onClick={(event) => {
+                      event?.stopPropagation()
                       if (projectId && requestId)
                         navigate(`/researches/projects/${projectId}/${requestId}/${cohort.uuid}${location.search}`)
                       if (!projectId && requestId)

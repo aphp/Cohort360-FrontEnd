@@ -20,7 +20,7 @@ const MenuButtonFilter: React.FC<MenuButtonFilterProps> = ({ buttonLabel }) => {
 
   return (
     <>
-      <Button icon={<DateRangeIcon />} onClick={(e) => setAnchorEl(e.currentTarget)} width="180px">
+      <Button startIcon={<DateRangeIcon />} onClick={(e) => setAnchorEl(e.currentTarget)} width="180px">
         {buttonLabel}
       </Button>
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)} sx={{ padding: 20 }}>

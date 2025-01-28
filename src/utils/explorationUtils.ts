@@ -1,6 +1,10 @@
 import { Cohort, CohortJobStatus, QuerySnapshotInfo, RequestType } from 'types'
 import displayDigit from './displayDigit'
 
+export const getPathDepth = (pathname: string) => {
+  return pathname.split('/').filter(Boolean).length
+}
+
 export const getGlobalEstimation = (cohort: Cohort) => {
   if (cohort.measure_min === null || cohort.measure_max === null) {
     return 'N/A'

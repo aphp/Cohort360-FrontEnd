@@ -88,6 +88,7 @@ const ProjectsList = () => {
     searchParams.set('direction', findOrder.direction)
     setSearchParams(searchParams)
   }
+
   return (
     <Grid container style={{ padding: '20px 0' }} gap="20px">
       <Grid container justifyContent={'space-between'} alignItems={'center'}>
