@@ -1,11 +1,11 @@
-import { Cohort, CohortData } from 'types'
+import { CohortData } from 'types'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { impersonate, login, logout } from './me'
 import { RootState } from 'state'
 
 import services from 'services/aphp'
 import servicesPerimeters from '../services/aphp/servicePerimeters'
-import { GroupMember, Patient } from 'fhir/r4'
+import { Patient } from 'fhir/r4'
 import { isCustomError } from 'utils/perimeters'
 import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'

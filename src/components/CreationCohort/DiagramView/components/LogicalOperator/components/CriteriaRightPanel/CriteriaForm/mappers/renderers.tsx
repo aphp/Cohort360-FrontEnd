@@ -76,7 +76,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     return (
       <DurationRange
         value={props.value ? [props.value.start, props.value.end] : [null, null]}
-        active={!props.disabled}
+        disabled={props.disabled}
         onChange={(range) =>
           !range[0] && !range[1]
             ? props.updateData(null)

@@ -23,7 +23,6 @@ import allDocTypes from 'assets/docTypes.json'
 import moment from 'moment'
 import { getDurationRangeLabel } from 'utils/age'
 import { getConfig } from 'config'
-import { FhirItem } from 'types/valueSet'
 
 /************************************************************************************/
 /*                        Criteria Form Item Chip Display                           */

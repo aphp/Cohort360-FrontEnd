@@ -10,16 +10,11 @@ import Button from 'components/ui/Button'
 import CodeFilter from 'components/Filters/CodeFilter'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import DataTablePmsi from 'components/DataTable/DataTablePmsi'
-import DiagnosticTypesFilter from 'components/Filters/DiagnosticTypesFilter'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
-import IppFilter from 'components/Filters/IppFilter'
 import List from 'components/ui/List'
 import Modal from 'components/ui/Modal'
-import NdaFilter from 'components/Filters/NdaFilter'
 import { PMSITabs } from 'components/Patient/PatientPMSI'
-import SourceFilter from 'components/Filters/SourceFilter'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Tabs from 'components/ui/Tabs'
@@ -43,10 +38,28 @@ import { getCodeList } from 'services/aphp/serviceValueSets'
 import { getConfig } from 'config'
 import { getValueSetsFromSystems } from 'utils/valueSets'
 import { getPMSITab } from 'utils/tabsUtils'
+import MultiSelectInput from 'components/Filters/MultiSelectInput'
+import RadioGroupFilter from 'components/Filters/RadioGroupFilter'
 
 type PMSIListProps = {
   deidentified?: boolean
 }
+
+enum Source {
+  AREM = 'AREM',
+  ORBIS = 'ORBIS'
+}
+
+const sourceOptions = [
+  {
+    id: Source.AREM,
+    label: Source.AREM
+  },
+  {
+    id: Source.ORBIS,
+    label: Source.ORBIS
+  }
+]
 
 const PMSIList = ({ deidentified }: PMSIListProps) => {
   const [toggleFilterByModal, setToggleFilterByModal] = useState(false)
@@ -374,23 +387,36 @@ const PMSIList = ({ deidentified }: PMSIListProps) => {
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
         onClean={triggerClean}
       >
-        {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-        {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp ?? ''} />}
-        <CodeFilter name={FilterKeys.CODE} value={code} references={references} />
-        {selectedTab.id === ResourceType.CONDITION && (
-          <DiagnosticTypesFilter
-            name={FilterKeys.DIAGNOSTIC_TYPES}
-            value={diagnosticTypes || []}
-            allDiagnosticTypesList={allDiagnosticTypesList}
+        {!deidentified && (
+          <TextInput name={FilterKeys.NDA} value={nda} label="NDA :" placeholder="Exemple: 6601289264,141740347" />
+        )}
+        {!deidentified && (
+          <TextInput
+            name={FilterKeys.IPP}
+            value={ipp}
+            label="IPP :"
+            placeholder="'Exemple: 8000000000001,8000000000002'"
           />
         )}
-        {selectedTab.id !== ResourceType.CLAIM && <SourceFilter name={FilterKeys.SOURCE} value={source ?? ''} />}
+        <CodeFilter name={FilterKeys.CODE} value={code} references={references} />
+        {selectedTab.id === ResourceType.CONDITION && (
+          <MultiSelectInput
+            name={FilterKeys.DIAGNOSTIC_TYPES}
+            value={diagnosticTypes || []}
+            options={allDiagnosticTypesList}
+            label="Type de diagnostics :"
+          />
+        )}
+        {selectedTab.id !== ResourceType.CLAIM && (
+          <RadioGroupFilter value={source ?? ''} name={FilterKeys.SOURCE} label="Source :" options={sourceOptions} />
+        )}
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter sourceType={sourceType} value={executiveUnits} name={FilterKeys.EXECUTIVE_UNITS} />
-        <EncounterStatusFilter
+        <MultiSelectInput
           value={encounterStatus}
           name={FilterKeys.ENCOUNTER_STATUS}
-          encounterStatusList={encounterStatusList}
+          options={encounterStatusList}
+          label="Statut de la visite associée :"
         />
       </Modal>
 
@@ -489,19 +515,23 @@ const PMSIList = ({ deidentified }: PMSIListProps) => {
               </Grid>
               {!deidentified && (
                 <Grid item xs={12}>
-                  <NdaFilter
-                    disabled={isReadonlyFilterInfoModal}
+                  <TextInput
                     name={FilterKeys.NDA}
+                    disabled={isReadonlyFilterInfoModal}
                     value={selectedSavedFilter?.filterParams.filters.nda ?? ''}
+                    label="NDA :"
+                    placeholder="Exemple: 6601289264,141740347"
                   />
                 </Grid>
               )}
               {!deidentified && (
                 <Grid item>
-                  <IppFilter
+                  <TextInput
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.IPP}
                     value={selectedSavedFilter?.filterParams.filters.ipp ?? ''}
+                    label="IPP :"
+                    placeholder="'Exemple: 8000000000001,8000000000002'"
                   />
                 </Grid>
               )}
@@ -515,20 +545,23 @@ const PMSIList = ({ deidentified }: PMSIListProps) => {
               </Grid>
               {selectedTab.id === ResourceType.CONDITION && (
                 <Grid item xs={12}>
-                  <DiagnosticTypesFilter
+                  <MultiSelectInput
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.DIAGNOSTIC_TYPES}
                     value={selectedSavedFilter?.filterParams.filters.diagnosticTypes ?? []}
-                    allDiagnosticTypesList={allDiagnosticTypesList}
+                    options={allDiagnosticTypesList}
+                    label="Type de diagnostics :"
                   />
                 </Grid>
               )}
               {selectedTab.id !== ResourceType.CLAIM && (
                 <Grid item xs={12}>
-                  <SourceFilter
+                  <RadioGroupFilter
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.SOURCE}
                     value={selectedSavedFilter?.filterParams.filters.source ?? ''}
+                    label="Source :"
+                    options={sourceOptions}
                   />
                 </Grid>
               )}
@@ -551,11 +584,12 @@ const PMSIList = ({ deidentified }: PMSIListProps) => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <EncounterStatusFilter
+                <MultiSelectInput
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.encounterStatus ?? []}
                   name={FilterKeys.ENCOUNTER_STATUS}
-                  encounterStatusList={encounterStatusList}
+                  label="Statut de la visite associée :"
+                  options={encounterStatusList}
                 />
               </Grid>
             </Grid>

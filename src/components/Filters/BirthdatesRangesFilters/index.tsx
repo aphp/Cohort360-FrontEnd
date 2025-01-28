@@ -1,4 +1,4 @@
-import { InputWrapper } from 'components/ui/Inputs'
+import { InputWrapper } from 'components/ui/Inputs/styles'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
@@ -31,8 +31,8 @@ const BirthdatesRangesFilter = ({
   return (
     <InputWrapper>
       <DurationRange
-        active={!disabled}
         includeDays={!deidentified}
+        disabled={disabled}
         label="Âge"
         onError={onError}
         value={birthdatesRanges}

@@ -32,20 +32,18 @@ import Chip from 'components/ui/Chip'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import DocTypesFilter from 'components/Filters/DocTypesFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
-import NdaFilter from 'components/Filters/NdaFilter'
 import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
-import DocStatusFilter from '../../Filters/DocStatusFilter'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
 import { getCodeList } from 'services/aphp/serviceValueSets'
 import { getConfig } from 'config'
 import { v4 as uuidv4 } from 'uuid'
+import MultiSelectInput from 'components/Filters/MultiSelectInput'
 
 const PatientDocs = () => {
   const dispatch = useAppDispatch()
@@ -113,7 +111,10 @@ const PatientDocs = () => {
   const maintenanceIsActive = meState?.maintenance?.active
   const isFirstRender = useRef(true)
 
-  const docStatusesList = [FilterByDocumentStatus.VALIDATED, FilterByDocumentStatus.NOT_VALIDATED]
+  const docStatusesList = [
+    { id: FilterByDocumentStatus.VALIDATED, label: FilterByDocumentStatus.VALIDATED },
+    { id: FilterByDocumentStatus.NOT_VALIDATED, label: FilterByDocumentStatus.NOT_VALIDATED }
+  ]
   const fetchDocumentsList = async () => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
@@ -333,8 +334,15 @@ const PatientDocs = () => {
           addFilters({ ...filters, ...newFilters })
         }}
       >
-        {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-        <DocStatusFilter docStatusesList={docStatusesList} name={FilterKeys.DOC_STATUSES} value={docStatuses} />
+        {!searchResults.deidentified && (
+          <TextInput name={FilterKeys.NDA} value={nda} label="NDA :" placeholder="Exemple: 6601289264,141740347" />
+        )}
+        <MultiSelectInput
+          options={docStatusesList}
+          label="Statut de documents :"
+          name={FilterKeys.DOC_STATUSES}
+          value={docStatuses}
+        />
         <DocTypesFilter allDocTypesList={allDocTypesList.docTypes} value={docTypes} name={FilterKeys.DOC_TYPES} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
@@ -342,10 +350,11 @@ const PatientDocs = () => {
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
         />
-        <EncounterStatusFilter
+        <MultiSelectInput
           value={encounterStatus}
           name={FilterKeys.ENCOUNTER_STATUS}
-          encounterStatusList={encounterStatusList}
+          options={encounterStatusList}
+          label="Statut de la visite associée :"
         />
       </Modal>
       <Modal
@@ -452,20 +461,21 @@ const PatientDocs = () => {
 
               <Grid item>
                 {!searchResults.deidentified && (
-                  <NdaFilter
+                  <TextInput
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.NDA}
                     value={selectedSavedFilter?.filterParams.filters.nda ?? ''}
+                    label="NDA :"
+                    placeholder="Exemple: 6601289264,141740347"
                   />
                 )}
-                <Grid item>
-                  <DocStatusFilter
-                    disabled={isReadonlyFilterInfoModal}
-                    docStatusesList={docStatusesList}
-                    value={selectedSavedFilter?.filterParams.filters.docStatuses ?? []}
-                    name={FilterKeys.DOC_STATUSES}
-                  />
-                </Grid>
+                <MultiSelectInput
+                  disabled={isReadonlyFilterInfoModal}
+                  value={selectedSavedFilter?.filterParams.filters.docStatuses ?? []}
+                  options={docStatusesList}
+                  label="Statut de documents :"
+                  name={FilterKeys.DOC_STATUSES}
+                />
                 <DocTypesFilter
                   disabled={isReadonlyFilterInfoModal}
                   allDocTypesList={allDocTypesList.docTypes}
@@ -486,11 +496,12 @@ const PatientDocs = () => {
                   value={selectedSavedFilter?.filterParams.filters.executiveUnits ?? []}
                   name={FilterKeys.EXECUTIVE_UNITS}
                 />
-                <EncounterStatusFilter
+                <MultiSelectInput
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.encounterStatus ?? []}
                   name={FilterKeys.ENCOUNTER_STATUS}
-                  encounterStatusList={encounterStatusList}
+                  options={encounterStatusList}
+                  label="Statut de la visite associée :"
                 />
               </Grid>
             </Grid>

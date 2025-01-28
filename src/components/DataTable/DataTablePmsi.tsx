@@ -10,7 +10,6 @@ import SearchIcon from 'assets/icones/search.svg?react'
 import { CohortPMSI, Column, PMSIEntry } from 'types'
 import { Order, OrderBy } from 'types/searchCriterias'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
-import { getExtension } from 'utils/fhir'
 
 import useStyles from './styles'
 import { mapToDate, mapToLabelSingular } from 'mappers/pmsi'

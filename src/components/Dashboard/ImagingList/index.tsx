@@ -1,28 +1,21 @@
 import React, { useState, useEffect, useRef, useMemo, useContext } from 'react'
 import useSearchCriterias, { initImagingCriterias } from 'reducers/searchCriteriasReducer'
 import services from 'services/aphp'
-
 import { CircularProgress, Grid, Tooltip } from '@mui/material'
 import { FilterList, Save, SavedSearch } from '@mui/icons-material'
-
 import Button from 'components/ui/Button'
 import Chip from 'components/ui/Chip'
 import DataTableImaging from 'components/DataTable/DataTableImaging'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
-import IppFilter from 'components/Filters/IppFilter'
 import Modal from 'components/ui/Modal'
-import ModalityFilter from 'components/Filters/ModalityFilter/ModalityFilter'
-import NdaFilter from 'components/Filters/NdaFilter'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-
 import { CohortImaging, LoadingStatus, DTTB_ResultsType as ResultsType } from 'types'
 import { Direction, FilterKeys, ImagingFilters, LabelObject, Order } from 'types/searchCriterias'
 
 import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
-
 import { CanceledError } from 'axios'
 import { AlertWrapper } from 'components/ui/Alert'
 import { ResourceType } from 'types/requestCriterias'
@@ -31,12 +24,12 @@ import TextInput from 'components/Filters/TextInput'
 import List from 'components/ui/List'
 import { useAppDispatch, useAppSelector } from 'state'
 import { BlockWrapper } from 'components/ui/Layout'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { AppConfig, getConfig } from 'config'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
 import { getCodeList } from 'services/aphp/serviceValueSets'
+import MultiSelectInput from 'components/Filters/MultiSelectInput'
 
 type ImagingListProps = {
   deidentified?: boolean
@@ -292,19 +285,29 @@ const ImagingList = ({ deidentified }: ImagingListProps) => {
         onClose={() => setToggleFilterByModal(false)}
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
       >
-        {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-        {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp ?? ''} />}
-        <ModalityFilter value={modality} name={FilterKeys.MODALITY} modalitiesList={allModalities} />
+        {!deidentified && (
+          <TextInput name={FilterKeys.NDA} value={nda} label="NDA :" placeholder="Exemple: 6601289264,141740347" />
+        )}
+        {!deidentified && (
+          <TextInput
+            name={FilterKeys.IPP}
+            value={ipp}
+            label="IPP :"
+            placeholder="'Exemple: 8000000000001,8000000000002'"
+          />
+        )}
+        <MultiSelectInput value={modality} name={FilterKeys.MODALITY} options={allModalities} label="Modalités :" />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
           sourceType={SourceType.IMAGING}
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
         />
-        <EncounterStatusFilter
+        <MultiSelectInput
           value={encounterStatus}
           name={FilterKeys.ENCOUNTER_STATUS}
-          encounterStatusList={encounterStatusList}
+          options={encounterStatusList}
+          label="Statut de la visite associée :"
         />
       </Modal>
       <Modal
@@ -393,17 +396,20 @@ const ImagingList = ({ deidentified }: ImagingListProps) => {
               )}
               <Grid item>
                 {!deidentified && (
-                  <NdaFilter
-                    disabled={isReadonlyFilterInfoModal}
+                  <TextInput
                     name={FilterKeys.NDA}
+                    disabled={isReadonlyFilterInfoModal}
                     value={selectedSavedFilter?.filterParams.filters.nda ?? ''}
+                    label="NDA :"
+                    placeholder="Exemple: 6601289264,141740347"
                   />
                 )}
-                <ModalityFilter
+                <MultiSelectInput
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.modality || []}
                   name={FilterKeys.MODALITY}
-                  modalitiesList={allModalities}
+                  options={allModalities}
+                  label="Modalités :"
                 />
                 <DatesRangeFilter
                   disabled={isReadonlyFilterInfoModal}
