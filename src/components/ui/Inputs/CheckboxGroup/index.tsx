@@ -6,18 +6,18 @@ import { isChecked, toggleFilter } from 'utils/filters'
 
 type CheckboxGroupProps<T> = {
   value: T[]
-  onChange: (value: T[]) => void
   label?: string
   disabled?: boolean
   options: LabelObject[]
+  onChange: (value: T[]) => void
 }
 
 const CheckboxGroup = <T extends string>({
   value,
-  onChange,
   label,
   options,
-  disabled = false
+  disabled = false,
+  onChange
 }: CheckboxGroupProps<T>) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = toggleFilter(value, event.target.value as T)

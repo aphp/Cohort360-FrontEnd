@@ -1,5 +1,5 @@
 import { Checkbox, FormControlLabel, FormGroup, Typography } from '@mui/material'
-import { InputWrapper } from 'components/ui/Inputs'
+import { InputWrapper } from 'components/ui/Inputs/styles'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
