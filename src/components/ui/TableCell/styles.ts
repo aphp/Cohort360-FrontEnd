@@ -20,7 +20,7 @@ export const TableCellWrapper = styled(TableCell)<CustomProps>(({ align = 'cente
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    padding: '4px 16px',
+    padding: '4px 12px',
     color: headCell ? '#153d8a' : '#000',
     fontWeight: headCell ? 700 : 400,
     borderBottom: '1px solid rgba(0,0,0,0.25)'

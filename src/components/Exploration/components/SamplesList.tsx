@@ -39,7 +39,7 @@ const SamplesList = () => {
 
       <ResearchesTable columns={columns}>
         {samples.map((cohort) => (
-          <TableRow key={cohort.name} sx={{ borderBottom: '1px solid #000', borderRadius: 20 }}>
+          <TableRow key={cohort.name} sx={{ borderBottom: '1px solid #000', borderRadius: 20, cursor: 'pointer' }}>
             <TableCellWrapper align="left" headCell>
               <FavStar favorite={cohort.fav} />
             </TableCellWrapper>
@@ -48,7 +48,7 @@ const SamplesList = () => {
             </TableCellWrapper>
             <TableCellWrapper>{cohort.parentCohort}</TableCellWrapper>
             <TableCellWrapper>{cohort.status}</TableCellWrapper>
-            <TableCellWrapper>{displayDigit(cohort.totalPatients)}</TableCellWrapper>
+            {/* <TableCellWrapper>{displayDigit(cohort.totalPatients)}</TableCellWrapper> */}
             <TableCellWrapper>{cohort.percentage}</TableCellWrapper>
             <TableCellWrapper>{formatDate(cohort.creationDate)}</TableCellWrapper>
           </TableRow>

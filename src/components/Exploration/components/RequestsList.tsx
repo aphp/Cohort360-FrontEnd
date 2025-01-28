@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import { Box, Checkbox, CircularProgress, Grid, IconButton, TableRow, Tooltip, Typography } from '@mui/material'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { Column, QuerySnapshotInfo, RequestType } from 'types'
+import { Column } from 'types'
 import ResearchesTable from './Table'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 import Button from 'components/ui/Button'
@@ -17,6 +17,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { setSelectedRequestShare } from 'state/request'
 import useProject from '../hooks/useProject'
 import AddIcon from '@mui/icons-material/Add'
+import { getCohortTotal, getRequestName } from 'utils/explorationUtils'
 
 // TODO: J'AVAIS OUBLIÉ MAIS PRÉVOIR LE SUPER FLOW DE DÉLÉTION MULTIPLE
 
@@ -34,7 +35,7 @@ const RequestsList = () => {
   const [deleteMode, setDeleteMode] = useState(false)
 
   const { project: parentProject, projectLoading, projectIsError } = useProject(projectId)
-  const { requestsList, total, loading } = useRequests(projectId, searchInput, startDate, endDate, page)
+  const { requestsList, total, loading } = useRequests(projectId, searchInput, startDate, endDate, undefined, page)
 
   const handlePageChange = (newPage: number) => {
     searchParams.set('page', String(newPage))
@@ -55,14 +56,6 @@ const RequestsList = () => {
     { label: 'date de modification' },
     { label: 'nb de cohortes' }
   ]
-
-  const getCohortTotal = (requestSnapshots?: QuerySnapshotInfo[]) => {
-    if (!requestSnapshots) {
-      return 0
-    }
-    const snapshotsWithLinkedCohorts = requestSnapshots.filter((snapshot) => snapshot.has_linked_cohorts === true)
-    return snapshotsWithLinkedCohorts.length
-  }
 
   const actions = [
     {
@@ -85,12 +78,6 @@ const RequestsList = () => {
     // TODO: pas sûre de garder l'ancien comportement (pq utiliser le store?)
     dispatch(setSelectedRequestShare({ uuid: requestId, name: '' }))
   }
-
-  const getRequestName = (request: RequestType) => {
-    const sharedByDetails = request.shared_by?.display_name ? ` - Envoyée par : ${request.shared_by?.display_name}` : ''
-    return `${request.name}${sharedByDetails}`
-  }
-
   // TODO: ajouter action pour déplacer la requête de projet
 
   return (
@@ -149,7 +136,11 @@ const RequestsList = () => {
             const cohortTotal = getCohortTotal(request.query_snapshots)
 
             return (
-              <TableRow key={request.uuid} onClick={() => navigate(`/cohort/new/${request.uuid}`)}>
+              <TableRow
+                key={request.uuid}
+                onClick={() => navigate(`/cohort/new/${request.uuid}`)}
+                style={{ cursor: 'pointer' }}
+              >
                 {deleteMode && (
                   <TableCellWrapper sx={{ width: deleteMode ? 50 : 0, overflow: 'hidden', transition: 'width 0.3s' }}>
                     <Checkbox />
@@ -176,8 +167,8 @@ const RequestsList = () => {
                     </>
                   )}
                 </TableCellWrapper>
-                {!projectId && <TableCellWrapper>{request.parent_folder}</TableCellWrapper>}
-                <TableCellWrapper>{formatDate(request.created_at, true)}</TableCellWrapper>
+                {!projectId && <TableCellWrapper>{request.parent_folder?.name}</TableCellWrapper>}
+                <TableCellWrapper>{formatDate(request.updated_at, true)}</TableCellWrapper>
                 <TableCellWrapper>
                   <Button
                     clearVariant

@@ -1,15 +1,18 @@
 import services from 'services/aphp'
 import { useQuery } from '@tanstack/react-query'
+import { OrderBy, ProjectsFilters } from 'types/searchCriterias'
 
-const useProjects = (searchInput: string, startDate?: string, endDate?: string) => {
+const useProjects = (filters: ProjectsFilters, searchInput: string, orderBy: OrderBy) => {
   const fetchProjectsList = async () => {
-    const projectsList = await services.projects.fetchProjectsList(searchInput, startDate, endDate)
+    const limit = 100
+    const projectsList = await services.projects.fetchProjectsList(filters, searchInput, orderBy, limit)
     return projectsList
   }
 
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
-    queryKey: ['projects', searchInput, startDate, endDate],
-    queryFn: fetchProjectsList
+    queryKey: ['projects', searchInput, filters, orderBy],
+    queryFn: fetchProjectsList,
+    refetchOnWindowFocus: false
   })
 
   const projectsList = data?.results ?? []

@@ -327,6 +327,11 @@ export interface CohortsFilters {
   parentId?: string
 }
 
+export type ProjectsFilters = {
+  startDate: null | string
+  endDate: null | string
+}
+
 export interface SearchCriterias<F> {
   searchBy?: SearchByTypes
   searchInput: string

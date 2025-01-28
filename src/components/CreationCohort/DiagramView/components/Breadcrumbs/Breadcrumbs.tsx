@@ -26,7 +26,7 @@ const CohortCreationBreadcrumbs: React.FC = () => {
       const foundItem = requests.find(({ uuid }) => uuid === requestId)
       if (foundItem) {
         setRequestName(foundItem.name)
-        const foundProject = projects.find(({ uuid }) => uuid === foundItem.parent_folder)
+        const foundProject = projects.find(({ uuid }) => uuid === foundItem.parent_folder?.uuid)
         if (foundProject) {
           setProjectName(foundProject.name)
         }

@@ -3,11 +3,18 @@ import services from 'services/aphp'
 import { CohortsType } from 'types/cohorts'
 import { Direction, Order } from 'types/searchCriterias'
 
-const useCohorts = (parentId: string, searchInput: string, startDate?: string, endDate?: string, page = 1) => {
+const useCohorts = (
+  parentId: string,
+  searchInput: string,
+  startDate?: string,
+  endDate?: string,
+  isFavorite = CohortsType.ALL,
+  page = 1,
+  rowsPerPage = 20
+) => {
   // TODO: à externaliser
   const fetchCohortsList = async () => {
     // TODO: modifier le service de sorte à ajouter les filtres + try/catch
-    const rowsPerPage = 20
     const offset = (page - 1) * rowsPerPage
     const cohortsList = await services.projects.fetchCohortsList(
       parentId
@@ -15,7 +22,7 @@ const useCohorts = (parentId: string, searchInput: string, startDate?: string, e
             startDate: null,
             endDate: null,
             status: [],
-            favorite: CohortsType.ALL,
+            favorite: isFavorite,
             minPatients: null,
             maxPatients: null,
             parentId
@@ -24,7 +31,7 @@ const useCohorts = (parentId: string, searchInput: string, startDate?: string, e
             startDate: startDate ?? null,
             endDate: endDate ?? null,
             status: [],
-            favorite: CohortsType.ALL,
+            favorite: isFavorite,
             minPatients: null,
             maxPatients: null,
             parentId
@@ -39,8 +46,9 @@ const useCohorts = (parentId: string, searchInput: string, startDate?: string, e
   }
 
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
-    queryKey: ['cohorts', 'projectsCount', searchInput, startDate, endDate, page],
-    queryFn: fetchCohortsList
+    queryKey: ['cohorts', 'projectsCount', searchInput, startDate, endDate, page, isFavorite],
+    queryFn: fetchCohortsList,
+    refetchOnWindowFocus: false
   })
 
   const cohortsList = data?.results ?? []

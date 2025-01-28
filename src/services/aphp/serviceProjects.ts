@@ -4,7 +4,7 @@ import apiBack from '../apiBackend'
 import { ProjectType, RequestType, Cohort, User } from 'types'
 
 import servicesCohorts from './serviceCohorts'
-import { CohortsFilters, Direction, OrderBy } from 'types/searchCriterias'
+import { CohortsFilters, Direction, OrderBy, ProjectsFilters } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
 
 export interface IServiceProjects {
@@ -13,6 +13,8 @@ export interface IServiceProjects {
    * Retourne la liste de projet de recherche d'un practitioner
    *
    * Argument:
+   *   - filters: Indique les filtres choisis sur les projets
+   *   - searchInput: Indique la chaîne de caractère recherchée par l'utilisateur
    *   - limit: Determine une limite de projet demandé
    *   - offset: Determine un index de départ
    *
@@ -23,10 +25,9 @@ export interface IServiceProjects {
    *   - results: Liste de projet de recherche récupéré
    */
   fetchProjectsList: (
-    // TODO: filters implem is temp, à clean
+    filters: ProjectsFilters,
     searchInput: string,
-    startDate?: string,
-    endDate?: string,
+    order: OrderBy,
     limit?: number,
     offset?: number
   ) => Promise<{
@@ -238,8 +239,10 @@ const servicesProjects: IServiceProjects = {
   fetchRequest: async (requestId) => {
     return (await apiBack.get(`/cohort/requests/${requestId}/`)).data
   },
-  fetchProjectsList: async (searchInput, startDate, endDate, limit, offset) => {
-    let search = `?ordering=created_at`
+  fetchProjectsList: async (filters, searchInput, order, limit, offset) => {
+    const { startDate, endDate } = filters
+    const orderDirection = order.orderDirection === Direction.DESC ? '-' : ''
+    let search = `?ordering=${orderDirection}${order.orderBy}`
     if (limit) {
       search += `&limit=${limit}`
     }

@@ -5,6 +5,7 @@ import { ProjectType } from 'types'
 import { logout, login, impersonate } from './me'
 
 import services from 'services/aphp'
+import { Direction, Order } from 'types/searchCriterias'
 
 export type ProjectState = {
   loading: boolean
@@ -33,7 +34,14 @@ const fetchProjects = createAsyncThunk<FetchProjectListReturn, void, { state: Ro
       const state = getState().project
 
       const oldProjectList = state.projectsList || []
-      const projects = (await services.projects.fetchProjectsList(100, 0)) || []
+      const projects =
+        (await services.projects.fetchProjectsList(
+          { startDate: null, endDate: null },
+          '',
+          { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
+          100,
+          0
+        )) || []
 
       if (state.count === projects.count) {
         return {
@@ -46,8 +54,11 @@ const fetchProjects = createAsyncThunk<FetchProjectListReturn, void, { state: Ro
       let projectList = projects.results || []
       if (projects.count > projectList.length) {
         const newResult = await services.projects.fetchProjectsList(
-          projects.count - projectList.length,
-          projectList.length
+          { startDate: null, endDate: null },
+          '',
+          { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
+          100,
+          0
         )
         // Add elements to projectList array and filter doublon
         projectList = [...projectList, ...(newResult.results || [])]
@@ -181,8 +192,12 @@ const deleteProject = createAsyncThunk<DeleteProjectReturn, DeleteProjectParams,
 
 const setProjectSlice = createSlice({
   name: 'project',
-  initialState: defaultInitialState as ProjectState,
+  initialState: defaultInitialState,
   reducers: {
+    setProjectsList: (state, action) => {
+      state.projectsList = action.payload.data
+      state.count = action.payload.data
+    },
     clearProject: () => {
       return defaultInitialState
     },
@@ -241,4 +256,4 @@ const setProjectSlice = createSlice({
 
 export default setProjectSlice.reducer
 export { fetchProjects, addProject, editProject, deleteProject }
-export const { clearProject, setSelectedProject } = setProjectSlice.actions
+export const { clearProject, setSelectedProject, setProjectsList } = setProjectSlice.actions

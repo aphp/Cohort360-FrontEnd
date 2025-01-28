@@ -6,12 +6,12 @@ const useRequests = (
   searchInput: string,
   startDate?: string,
   endDate?: string,
+  rowsPerPage = 20,
   page = 1
 ) => {
   // TODO: à externaliser ?
   const fetchRequestsList = async () => {
     // TODO: modifier le service de sorte à ajouter les filtres + try/catch
-    const rowsPerPage = 20
     const offset = (page - 1) * rowsPerPage
     const requestsList = await services.projects.fetchRequestsList(
       parentId,
@@ -26,7 +26,8 @@ const useRequests = (
 
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ['requests', 'projectsCount', searchInput, startDate, endDate, page],
-    queryFn: fetchRequestsList
+    queryFn: fetchRequestsList,
+    refetchOnWindowFocus: false
   })
 
   const requestsList = data?.results ?? []

@@ -16,13 +16,13 @@ const useBreadCrumb = () => {
 
     if (projectId && project) {
       items.push({
-        label: `Projet ${project.name}`,
+        label: `${project.name}`,
         url: `/researches/projects/${projectId}`
       })
 
       if (requestId && request) {
         items.push({
-          label: `Requête ${request.name}`,
+          label: `${request.name}`,
           url: `/researches/projects/${projectId}/${requestId}`
         })
       }
@@ -33,7 +33,7 @@ const useBreadCrumb = () => {
     items.push({ label: 'Toutes mes requêtes', url: '/researches/requests' })
     if (requestId && request) {
       items.push({
-        label: `Requête ${request.name}`,
+        label: `${request.name}`,
         url: `/researches/${requestId}`
       })
     }

@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { useAppSelector } from 'state'
 
-import { Box, Grid, IconButton, TableRow, Tooltip, Typography } from '@mui/material'
+import { Box, CircularProgress, Grid, IconButton, TableRow, Tooltip, Typography } from '@mui/material'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import ResearchesTable from './Table'
 import { Cohort, CohortJobStatus, Column } from 'types'
@@ -23,8 +23,7 @@ import useCohorts from '../hooks/useCohorts'
 import StatusChip from './StatusChip'
 import UpdateIcon from '@mui/icons-material/Update'
 import useCohortsWebSocket from '../hooks/useCohortsWebSocket'
-
-// TODO: il y a un hook useCohortsList, à checker à la rentrée
+import { getExportTooltip, getGlobalEstimation } from 'utils/explorationUtils'
 
 export const getCohortStatusChip = (status?: CohortJobStatus, jobFailMessage?: string) => {
   if (jobFailMessage) {
@@ -52,8 +51,6 @@ export const getCohortStatusChip = (status?: CohortJobStatus, jobFailMessage?: s
   }
 }
 
-// TODO: vérifier websockets, pas sûre que ça fonctionne finalement
-
 const CohortsList = () => {
   const appConfig = useContext(AppConfig)
   const navigate = useNavigate()
@@ -67,9 +64,7 @@ const CohortsList = () => {
 
   const { request: parentRequest, requestLoading, requestIsError } = useRequest(requestId)
   const { cohortsList, total, loading } = useCohorts(requestId ?? '', searchInput, startDate, endDate)
-  useCohortsWebSocket(requestId)
-
-  // TODO: deux appels a cohorts-rights se font, pourquoi?
+  useCohortsWebSocket()
 
   // TODO: add les params pour les filtres exclusifs aux cohortes + bien penser à les suppr en changeant d'onglet
 
@@ -97,34 +92,6 @@ const CohortsList = () => {
     navigate(`/cohort?${searchParams.toString()}`)
   }
 
-  const getExportTooltip = (cohort: Cohort, isExportable: boolean) => {
-    if (!cohort.exportable) {
-      return 'Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé'
-    } else if (!isExportable && cohort.request_job_status === CohortJobStatus.FINISHED) {
-      return "Vous n'avez pas les droits suffisants pour exporter cette cohorte"
-    } else if (cohort.request_job_status === CohortJobStatus.FAILED) {
-      return 'Cette cohorte ne peut pas être exportée car elle a échoué lors de sa création'
-    } else if (cohort.request_job_status === CohortJobStatus.PENDING) {
-      return 'Cette cohorte ne peut pas être exportée car elle est en cours de création'
-    } else {
-      return 'Exporter la cohorte'
-    }
-  }
-
-  const getGlobalEstimation = (cohort: Cohort) => {
-    if (cohort.dated_measure_global) {
-      if (cohort.dated_measure_global?.measure_min === null || cohort.dated_measure_global?.measure_max === null) {
-        return 'N/A'
-      } else {
-        return `${displayDigit(cohort.dated_measure_global?.measure_min)} - ${displayDigit(
-          cohort.dated_measure_global?.measure_max
-        )}`
-      }
-    } else {
-      return 'N/A'
-    }
-  }
-
   return (
     <Grid container gap="20px">
       {requestId && (
@@ -142,127 +109,128 @@ const CohortsList = () => {
           </IconButton>
         </Box>
       )}
-      {/* TODO: add circular progress */}
 
-      <ResearchesTable columns={columns} page={page} setPage={handlePageChange} total={total}>
-        {cohortsList.map((cohort: Cohort) => {
-          const isExportable = appConfig.features.export.enabled ? cohort?.rights?.export_csv_nomi : false
-          const actions = [
-            {
-              icon: <EditIcon />,
-              label: 'Éditer',
-              onclick: () => console.log('edit'),
-              tooltip: '',
-              disabled: maintenanceIsActive
-            },
-            {
-              icon: <DeleteOutlineIcon />,
-              label: 'Supprimer',
-              onclick: () => console.log('delete'),
-              tooltip: '',
-              disabled: maintenanceIsActive
-            }
-          ]
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <ResearchesTable columns={columns} page={page} setPage={handlePageChange} total={total}>
+          {cohortsList.map((cohort: Cohort) => {
+            const isExportable = appConfig.features.export.enabled ? cohort?.rights?.export_csv_nomi : false
+            const actions = [
+              {
+                icon: <EditIcon />,
+                label: 'Éditer',
+                onclick: () => console.log('edit'),
+                tooltip: '',
+                disabled: maintenanceIsActive
+              },
+              {
+                icon: <DeleteOutlineIcon />,
+                label: 'Supprimer',
+                onclick: () => console.log('delete'),
+                tooltip: '',
+                disabled: maintenanceIsActive
+              }
+            ]
 
-          return (
-            <TableRow
-              key={cohort.name}
-              // onClick={() => onClickRow(cohort)}
-            >
-              <TableCellWrapper align="left" headCell>
-                <IconButton
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    console.log('favorite')
-                    // setSelectedExportableCohort(row ?? undefined)
-                  }}
-                  disabled={maintenanceIsActive}
-                >
-                  <FavStar favorite={cohort.favorite} height={20} color={maintenanceIsActive ? '#CBCFCF' : undefined} />
-                </IconButton>
-              </TableCellWrapper>
-              <TableCellWrapper align="left" headCell>
-                <Grid container alignItems={'center'}>
-                  <Box display="flex" alignItems="center" maxWidth={'75%'}>
-                    {cohort.name}
-                  </Box>
-                  <Box display={'flex'} alignItems={'center'}>
-                    <Tooltip title={getExportTooltip(cohort, !!isExportable)}>
-                      <IconButton
-                        size="small"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          // setSelectedExportableCohort(row ?? undefined)
-                        }}
-                        disabled={
-                          !isExportable ||
-                          !cohort.exportable ||
-                          maintenanceIsActive ||
-                          cohort.request_job_status === CohortJobStatus.LONG_PENDING ||
-                          cohort.request_job_status === CohortJobStatus.FAILED ||
-                          cohort.request_job_status === CohortJobStatus.PENDING
-                        }
-                      >
-                        <Download fill={maintenanceIsActive ? '#CBCFCF' : 'black'} />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={'Créer un échantillon à partir de la cohorte'}>
-                      <IconButton
-                        size="small"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                        }}
-                        disabled={maintenanceIsActive}
-                      >
-                        <Picker stroke={maintenanceIsActive ? '#CBCFCF' : 'black'} />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={'Accéder à la version de la requête ayant créé la cohorte'}>
-                      <IconButton
-                        size="small"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          navigate(`/cohort/new/${cohort.request}/${cohort.request_query_snapshot}`)
-                        }}
-                        disabled={maintenanceIsActive}
-                      >
-                        <RequestTree fill={maintenanceIsActive ? '#CBCFCF' : 'black'} />
-                      </IconButton>
-                    </Tooltip>
-                    <ActionMenu actions={actions} />
-                  </Box>
-                </Grid>
-              </TableCellWrapper>
-              {!requestId && <TableCellWrapper>{cohort.request}</TableCellWrapper>}
-              <TableCellWrapper>
-                {getCohortStatusChip(cohort.request_job_status as CohortJobStatus, cohort.request_job_fail_msg)}
-              </TableCellWrapper>
-              <TableCellWrapper>{displayDigit(cohort.result_size)}</TableCellWrapper>
-              <TableCellWrapper>{getGlobalEstimation(cohort)}</TableCellWrapper>
-              <TableCellWrapper>{formatDate(cohort.created_at, true)}</TableCellWrapper>
-              <TableCellWrapper>
+            return (
+              <TableRow key={cohort.name} onClick={() => onClickRow(cohort)} style={{ cursor: 'pointer' }}>
+                <TableCellWrapper align="left" headCell>
+                  <IconButton
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      console.log('favorite')
+                      // setSelectedExportableCohort(row ?? undefined)
+                    }}
+                    disabled={maintenanceIsActive}
+                  >
+                    <FavStar
+                      favorite={cohort.favorite}
+                      height={20}
+                      color={maintenanceIsActive ? '#CBCFCF' : undefined}
+                    />
+                  </IconButton>
+                </TableCellWrapper>
+                <TableCellWrapper align="left" headCell>
+                  <Grid container alignItems={'center'}>
+                    <Box display="flex" alignItems="center" maxWidth={'75%'}>
+                      {cohort.name}
+                    </Box>
+                    <Box display={'flex'} alignItems={'center'}>
+                      <Tooltip title={getExportTooltip(cohort, !!isExportable)}>
+                        <IconButton
+                          size="small"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            // setSelectedExportableCohort(row ?? undefined)
+                          }}
+                          disabled={
+                            !isExportable ||
+                            !cohort.exportable ||
+                            maintenanceIsActive ||
+                            cohort.request_job_status === CohortJobStatus.LONG_PENDING ||
+                            cohort.request_job_status === CohortJobStatus.FAILED ||
+                            cohort.request_job_status === CohortJobStatus.PENDING
+                          }
+                        >
+                          <Download fill={maintenanceIsActive ? '#CBCFCF' : 'black'} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={'Créer un échantillon à partir de la cohorte'}>
+                        <IconButton
+                          size="small"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                          }}
+                          disabled={maintenanceIsActive}
+                        >
+                          <Picker stroke={maintenanceIsActive ? '#CBCFCF' : 'black'} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={'Accéder à la version de la requête ayant créé la cohorte'}>
+                        <IconButton
+                          size="small"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            navigate(`/cohort/new/${cohort.request}/${cohort.request_query_snapshot}`)
+                          }}
+                          disabled={maintenanceIsActive}
+                        >
+                          <RequestTree fill={maintenanceIsActive ? '#CBCFCF' : 'black'} />
+                        </IconButton>
+                      </Tooltip>
+                      <ActionMenu actions={actions} />
+                    </Box>
+                  </Grid>
+                </TableCellWrapper>
+                {!requestId && <TableCellWrapper>{cohort.request?.name}</TableCellWrapper>}
+                <TableCellWrapper>
+                  {getCohortStatusChip(cohort.request_job_status, cohort.request_job_fail_msg)}
+                </TableCellWrapper>
+                <TableCellWrapper>{displayDigit(cohort.result_size)}</TableCellWrapper>
+                <TableCellWrapper>{getGlobalEstimation(cohort)}</TableCellWrapper>
+                <TableCellWrapper>{formatDate(cohort.created_at, true)}</TableCellWrapper>
                 {/* TODO: rendre non cliquable si pas d'enfant dispo */}
-                <Button
-                  endIcon={<ArrowRightAltIcon />}
-                  clearVariant
-                  onClick={() =>
-                    // TODO: pourquoi le preventDefault ne fonctionne pas ?
-                    {
+                <TableCellWrapper>
+                  <Button
+                    endIcon={<ArrowRightAltIcon />}
+                    clearVariant
+                    onClick={() => {
                       if (projectId && requestId)
                         navigate(`/researches/projects/${projectId}/${requestId}/${cohort.uuid}${location.search}`)
                       if (!projectId && requestId)
                         navigate(`/researches/requests/${requestId}/${cohort.uuid}${location.search}`)
                       if (!projectId && !requestId) navigate(`/researches/cohorts/${cohort.uuid}${location.search}`)
-                    }
-                  }
-                >
-                  0 échantillon
-                </Button>
-              </TableCellWrapper>
-            </TableRow>
-          )
-        })}
-      </ResearchesTable>
+                    }}
+                  >
+                    0 échantillon
+                  </Button>
+                </TableCellWrapper>
+              </TableRow>
+            )
+          })}
+        </ResearchesTable>
+      )}
     </Grid>
   )
 }

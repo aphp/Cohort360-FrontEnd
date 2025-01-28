@@ -9,16 +9,23 @@ const useCounts = (searchInput: string, startDate?: string, endDate?: string) =>
       {
         queryKey: ['projectsCount', searchInput, startDate, endDate],
         queryFn: async () => {
-          const res = await services.projects.fetchProjectsList(searchInput, startDate, endDate, 0)
+          const res = await services.projects.fetchProjectsList(
+            { startDate: startDate ?? null, endDate: endDate ?? null },
+            searchInput,
+            { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
+            0
+          )
           return res.count ?? 0
-        }
+        },
+        enabled: !!(searchInput || startDate || endDate)
       },
       {
         queryKey: ['requestsCount', searchInput, startDate, endDate],
         queryFn: async () => {
           const res = await services.projects.fetchRequestsList('', searchInput, startDate, endDate, 0)
           return res.count ?? 0
-        }
+        },
+        enabled: !!(searchInput || startDate || endDate)
       },
       {
         queryKey: ['cohortsCount', searchInput, startDate, endDate],
@@ -37,14 +44,16 @@ const useCounts = (searchInput: string, startDate?: string, endDate?: string) =>
             0
           )
           return res.count ?? 0
-        }
+        },
+        enabled: !!(searchInput || startDate || endDate)
       },
       {
         queryKey: ['samplesCount', searchInput, startDate, endDate],
         queryFn: async () => {
           // TODO: A COMPLETER PLUS TARD
           return 3
-        }
+        },
+        enabled: !!(searchInput || startDate || endDate)
       }
     ]
   })

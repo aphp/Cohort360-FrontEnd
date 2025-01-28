@@ -106,7 +106,8 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
                   isSearch={
                     !!searchInput &&
                     cohortsList.some(
-                      ({ name, ...cohortItem }) => name?.search(regexp) !== -1 && cohortItem.request === request.uuid
+                      ({ name, ...cohortItem }) =>
+                        name?.search(regexp) !== -1 && cohortItem.request?.uuid === request.uuid
                     )
                   }
                   selectedRequests={selectedRequests}
