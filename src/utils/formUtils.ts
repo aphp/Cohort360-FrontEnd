@@ -193,7 +193,7 @@ export const generateHospitDetails = (form: CohortQuestionnaireResponse) => {
     },
     {
       name: 'Statut vital à la naissance',
-      value: getDataFromForm(form, hospitForm.birthVitalStatus)
+      value: getDataFromForm(form, hospitForm.birthStatus)
     },
     {
       name: 'Hémorragie du post-partum',
