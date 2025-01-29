@@ -1,18 +1,20 @@
 import React, { useState } from 'react'
-
-import { CircularProgress, Grid, Typography } from '@mui/material'
-import ProjectCard from 'components/ui/ProjectCard'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import useProjects from '../hooks/useProjects'
-import { ProjectType } from 'types'
-import Button from 'components/ui/Button'
-import useCreateProject from '../hooks/useCreateProject'
-import useEditProject from '../hooks/useEditProject'
-import useDeleteProject from '../hooks/useDeleteProject'
-import AddIcon from '@mui/icons-material/Add'
 import { useAppSelector } from 'state'
-import { Direction, Order, OrderBy } from 'types/searchCriterias'
+
+import { Box, CircularProgress, Grid, Typography } from '@mui/material'
+import Button from 'components/ui/Button'
+import ProjectCard from 'components/ui/ProjectCard'
 import Select from 'components/ui/Searchbar/Select'
+import AddIcon from '@mui/icons-material/Add'
+
+import useCreateProject from '../hooks/useCreateProject'
+import useDeleteProject from '../hooks/useDeleteProject'
+import useEditProject from '../hooks/useEditProject'
+import useProjects from '../hooks/useProjects'
+
+import { ProjectType } from 'types'
+import { Direction, Order, OrderBy } from 'types/searchCriterias'
 
 const ProjectsList = () => {
   const navigate = useNavigate()
@@ -108,7 +110,10 @@ const ProjectsList = () => {
       </Grid>
       <Grid container gap="50px">
         {loading ? (
-          <CircularProgress /> /* TODO: regarder pour ajouter un Suspense? */
+          <Box display="flex" width={'100%'} justifyContent={'center'}>
+            <CircularProgress size={50} />
+            {/* /* TODO: regarder pour ajouter un Suspense? */}
+          </Box>
         ) : (
           projectsList.map((project: ProjectType) => (
             <ProjectCard

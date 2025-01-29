@@ -1,40 +1,63 @@
 import React, { useState } from 'react'
 
-import { InputAdornment, Menu, TextField } from '@mui/material'
-
-import DateRangeIcon from '@mui/icons-material/DateRange'
-import ClearIcon from '@mui/icons-material/Clear'
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import { Box, Menu } from '@mui/material'
 import Button from 'components/ui/Button'
+import DatePicker from '../DatePicker'
+import DateRangeIcon from '@mui/icons-material/DateRange'
+
+import useStyles from './styles'
+import { formatDate } from 'utils/formatDate'
 
 type MenuButtonFilterProps = {
-  buttonLabel: string
+  startDate: string | null
+  onChangeStartDate: (newStartDate: string | null) => void
+  endDate: string | null
+  onChangeEndDate: (newEndDate: string | null) => void
 }
 
-// TODO: tout? ^^'
+const MenuButtonFilter: React.FC<MenuButtonFilterProps> = ({
+  startDate,
+  onChangeStartDate,
+  endDate,
+  onChangeEndDate
+}) => {
+  const { classes } = useStyles()
 
-const MenuButtonFilter: React.FC<MenuButtonFilterProps> = ({ buttonLabel }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
-  const [date, setDate] = useState<string | null>(null)
+  const [innerStartDate, setInnerStartDate] = useState(startDate)
+  const [innerEndDate, setInnerEndDate] = useState(endDate)
+
+  const getLabel = (startDate: string | null, endDate: string | null) => {
+    if (startDate && endDate) {
+      return `Du ${formatDate(startDate)} au ${formatDate(endDate)}`
+    } else if (startDate) {
+      return `À partir du ${formatDate(startDate)}`
+    } else if (endDate) {
+      return `Jusqu'au ${formatDate(endDate)}`
+    } else {
+      return 'Toutes les dates'
+    }
+  }
+
+  const onConfirm = () => {
+    onChangeStartDate(innerStartDate)
+    onChangeEndDate(innerEndDate)
+    setAnchorEl(null)
+  }
+
+  // TODO: set la largeur du menu en fonction de la largeur du bouton
 
   return (
     <>
-      <Button startIcon={<DateRangeIcon />} onClick={(e) => setAnchorEl(e.currentTarget)} width="180px">
-        {buttonLabel}
+      <Button startIcon={<DateRangeIcon />} onClick={(e) => setAnchorEl(e.currentTarget)} width="fit-content">
+        {getLabel(innerStartDate, innerEndDate)}
       </Button>
-      <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)} sx={{ padding: 20 }}>
-        <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
-          <DatePicker
-            onChange={(newValue: string | null) => setDate(newValue)}
-            value={date}
-            renderInput={(params) => <TextField {...params} variant="standard" />}
-          >
-            <InputAdornment position="start">
-              <ClearIcon color="primary" onClick={() => setDate(null)} />{' '}
-            </InputAdornment>
-          </DatePicker>
-        </LocalizationProvider>
+      <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)} className={classes.dateFilterMenu}>
+        <DatePicker buttonLabel="À partir du :" value={innerStartDate} onChangeValue={setInnerStartDate} />
+        <DatePicker buttonLabel="Jusqu'au :" value={innerEndDate} onChangeValue={setInnerEndDate} />
+        <Box style={{ padding: '8px 12px' }}>
+          <Button onClick={onConfirm}>Appliquer</Button>
+        </Box>
       </Menu>
     </>
   )

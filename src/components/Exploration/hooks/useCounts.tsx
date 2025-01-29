@@ -3,7 +3,7 @@ import services from 'services/aphp'
 import { CohortsType } from 'types/cohorts'
 import { Direction, Order } from 'types/searchCriterias'
 
-const useCounts = (searchInput: string, startDate?: string, endDate?: string) => {
+const useCounts = (searchInput: string, startDate: string | null, endDate: string | null) => {
   const results = useQueries({
     queries: [
       {

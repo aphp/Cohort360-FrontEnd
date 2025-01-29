@@ -52,6 +52,7 @@ const RequestsList = () => {
   const columns: Column[] = [
     ...(deleteMode ? [{ label: <Checkbox /> }] : []),
     { label: 'nom de la requête', align: 'left' },
+    { label: '', align: 'left' },
     ...(!projectId ? [{ label: 'projet' }] : []), // TODO: réfléchir si cliquable ou pas?
     { label: 'date de modification' },
     { label: 'nb de cohortes' }
@@ -148,8 +149,10 @@ const RequestsList = () => {
                 )}
                 <TableCellWrapper align="left" headCell>
                   {getRequestName(request)}
+                </TableCellWrapper>
+                <TableCellWrapper>
                   {!deleteMode && (
-                    <>
+                    <Box display={'flex'} flexWrap={'nowrap'}>
                       <Tooltip title="Partager la requête">
                         <IconButton
                           style={{ color: '#000' }}
@@ -164,7 +167,7 @@ const RequestsList = () => {
                         </IconButton>
                       </Tooltip>
                       <ActionMenu actions={actions} />
-                    </>
+                    </Box>
                   )}
                 </TableCellWrapper>
                 {!projectId && <TableCellWrapper>{request.parent_folder?.name}</TableCellWrapper>}
@@ -183,7 +186,9 @@ const RequestsList = () => {
                       )
                     }}
                   >
-                    {cohortTotal} cohorte{cohortTotal > 1 && 's'}
+                    <Typography variant="button" noWrap fontSize={'12px'}>
+                      {cohortTotal} cohorte{cohortTotal > 1 && 's'}
+                    </Typography>
                   </Button>
                 </TableCellWrapper>
               </TableRow>

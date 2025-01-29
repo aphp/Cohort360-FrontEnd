@@ -253,10 +253,10 @@ const servicesProjects: IServiceProjects = {
       search += `&search=${searchInput}`
     }
     if (startDate) {
-      search += `&min_fhir_datetime=${startDate}`
+      search += `&min_created_at=${startDate}`
     }
     if (endDate) {
-      search += `&max_fhir_datetime=${endDate}`
+      search += `&max_created_at=${endDate}`
     }
 
     const fetchProjectsResponse = (await apiBack.get<{
@@ -326,10 +326,10 @@ const servicesProjects: IServiceProjects = {
       search += `&search=${searchInput}`
     }
     if (!parentId && startDate) {
-      search += `&min_fhir_datetime=${startDate}`
+      search += `&min_updated_at=${startDate}`
     }
     if (!parentId && endDate) {
-      search += `&max_fhir_datetime=${endDate}`
+      search += `&max_updated_at=${endDate}`
     }
     if (parentId) {
       search += `&parent_folder=${parentId}`
@@ -465,8 +465,8 @@ const servicesProjects: IServiceProjects = {
     if (_status.length > 0) options = [...options, `status=${_status.join()}`]
     if (minPatients) options = [...options, `min_result_size=${minPatients}`]
     if (maxPatients) options = [...options, `max_result_size=${maxPatients}`]
-    if (startDate) options = [...options, `min_fhir_datetime=${startDate}`]
-    if (endDate) options = [...options, `max_fhir_datetime=${endDate}`]
+    if (startDate) options = [...options, `min_created_at=${startDate}`]
+    if (endDate) options = [...options, `max_created_at=${endDate}`]
     if (parentId) options = [...options, `request_id=${parentId}`]
     if (favorite !== CohortsType.ALL)
       options = [...options, `favorite=${favorite === CohortsType.FAVORITE ? 'true' : 'false'}`]

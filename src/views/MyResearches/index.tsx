@@ -15,6 +15,7 @@ import useCounts from 'components/Exploration/hooks/useCounts'
 import { ExplorationTabs } from 'types'
 import { getPathDepth } from 'utils/explorationUtils'
 import useStyles from './styles'
+import moment from 'moment'
 
 const MyResearches = () => {
   const { classes, cx } = useStyles()
@@ -24,15 +25,13 @@ const MyResearches = () => {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const searchInput = searchParams.get('searchInput') ?? ''
-  const startDateParam = searchParams.get('startDate')
-  const endDateParam = searchParams.get('endDate')
-  // const initialStartDate = moment(startDateParam) ?? null
-  // const initialEndDate = moment(endDateParam) ?? null
+  const startDateParam = searchParams.get('startDate') ?? null
+  const endDateParam = searchParams.get('endDate') ?? null
 
   const { projectsCount, requestsCount, cohortsCount, samplesCount } = useCounts(
     searchInput,
-    startDateParam ?? '',
-    endDateParam ?? ''
+    startDateParam,
+    endDateParam
   )
 
   // Partie pour handle la direction du slider
@@ -53,16 +52,36 @@ const MyResearches = () => {
     }
     setSearchParams(searchParams)
     navigate({
-      // revenir au niveau principal en cas de recherche
-      // TODO: faire la même chose en cas de changement de date
       pathname: `/researches/${selectedTab?.id}`,
       search: `?${searchParams.toString()}`
     })
   }
 
-  // const handleDateChange = () => {
-  //   // TODO
-  // }
+  const handleStartDateChange = (newDate: string | null) => {
+    if (!newDate) {
+      searchParams.delete('startDate')
+    } else {
+      searchParams.set('startDate', moment(newDate).isValid() ? moment(newDate).format('YYYY-MM-DD') : '')
+    }
+    setSearchParams(searchParams)
+    navigate({
+      pathname: `/researches/${selectedTab?.id}`,
+      search: `?${searchParams.toString()}`
+    })
+  }
+
+  const handleEndDateChange = (newDate: string | null) => {
+    if (!newDate) {
+      searchParams.delete('endDate')
+    } else {
+      searchParams.set('endDate', moment(newDate).isValid() ? moment(newDate).format('YYYY-MM-DD') : '')
+    }
+    setSearchParams(searchParams)
+    navigate({
+      pathname: `/researches/${selectedTab?.id}`,
+      search: `?${searchParams.toString()}`
+    })
+  }
 
   searchParams.set('page', '1')
   // TODO: gérer en cas d'erreur d'url (quoi que, p-e redirection auto vers 404 déjà en place)
@@ -133,7 +152,12 @@ const MyResearches = () => {
         {/* TODO: calculer la height de toute cette grid et la soustraire à celle d'en dessous de 1000vh*/}
         <Typography variant="h1">Mes recherches</Typography>
         <Box display="flex" alignItems="center">
-          <MenuButtonFilter buttonLabel={'Toutes les dates'} />
+          <MenuButtonFilter
+            startDate={startDateParam}
+            endDate={endDateParam}
+            onChangeStartDate={handleStartDateChange}
+            onChangeEndDate={handleEndDateChange}
+          />
           <Searchbar>
             <SearchInput
               placeholder="Rechercher dans tous les niveaux"
