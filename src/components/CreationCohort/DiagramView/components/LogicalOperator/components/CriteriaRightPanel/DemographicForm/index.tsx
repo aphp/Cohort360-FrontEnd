@@ -181,7 +181,7 @@ const DemographicForm = (props: CriteriaDrawerComponentProps) => {
             />
             <DurationRange
               value={age}
-              active={!birthdates[0] || !birthdates[1]}
+              //disabled={!birthdates[0] || !birthdates[1]}
               onChange={(value) => setAge(value)}
               onError={(isError) => setError(isError ? Error.INCOHERENT_AGE_ERROR : Error.NO_ERROR)}
               deidentified={deidentified}

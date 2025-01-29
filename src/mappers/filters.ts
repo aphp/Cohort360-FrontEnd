@@ -144,7 +144,7 @@ const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
   const docTypesParams = parameters.get(DocumentsParamsKeys.DOC_TYPES)
   const docStatusesParams = parameters.get(DocumentsParamsKeys.DOC_STATUSES)
   let docTypes: SimpleCodeType[] = []
-  let docStatuses: string[] = []
+  let docStatuses: LabelObject[] = []
   if (docTypesParams) {
     docTypes = decodeURIComponent(docTypesParams)
       ?.split(',')
@@ -158,7 +158,10 @@ const mapDocumentsFromRequestParams = async (parameters: URLSearchParams) => {
   if (docStatusesParams) {
     docStatuses = decodeURIComponent(docStatusesParams)
       ?.split(',')
-      ?.map((e) => mapDocumentStatusesFromRequestParam(e.split('|')?.[1]))
+      ?.map((e) => ({
+        id: mapDocumentStatusesFromRequestParam(e.split('|')?.[1]),
+        label: mapDocumentStatusesFromRequestParam(e.split('|')?.[1])
+      }))
   }
   const onlyPdfAvailable = true
   const { nda, startDate, endDate, executiveUnits, encounterStatus } = await mapGenericFromRequestParams(
@@ -356,7 +359,7 @@ const mapDocumentsToRequestParams = (filters: DocumentsFilters) => {
   if (docStatuses && docStatuses.length > 0) {
     requestParams.push(
       `${DocumentsParamsKeys.DOC_STATUSES}=${encodeURIComponent(
-        docStatuses.map((status) => `${docStatusCodeSystem}|${mapDocumentStatusesToRequestParam(status)}`).toString()
+        docStatuses.map((status) => `${docStatusCodeSystem}|${mapDocumentStatusesToRequestParam(status.id)}`).toString()
       )}`
     )
   }
