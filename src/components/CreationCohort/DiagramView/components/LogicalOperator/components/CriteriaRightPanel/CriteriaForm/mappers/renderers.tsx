@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { CriteriaFormItemView, CriteriaFormItemType } from '../types'
 import { renderLabel } from '../components'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
@@ -29,6 +29,8 @@ import { Comparators } from 'types/requestCriterias'
 import SimpleSelect from 'components/ui/Inputs/SimpleSelect'
 import ValueSetField from 'components/SearchValueSet/ValueSetField'
 import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
+import { checkIsLeaf } from 'utils/valueSets'
+import { selectValueSetCodes } from 'state/valueSets'
 
 /************************************************************************************/
 /*                        Criteria Form Item Renderer                               */
@@ -277,6 +279,13 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
   codeSearch: (props) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const codeCaches = useAppSelector((state) => state.valueSets.cache)
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const cachedCodes = useAppSelector((state) =>
+      selectValueSetCodes(
+        state,
+        props.definition.valueSetsInfo.map((ref) => ref.url)
+      )
+    )
     const valueWithLabels = (props.value ?? []).map(
       (code) =>
         (code.system && codeCaches[code.system]?.find((c) => c.id === code.id)) ||
@@ -285,52 +294,38 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
           .find((c) => c.id === code.id) ||
         code
     )
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [valueBuffer, setValueBuffer] = useState(valueWithLabels)
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      if (props.definition.checkIsLeaf) {
+        ;(async () => {
+          const codesWithLeafInfo = await Promise.all(
+            valueBuffer.map(async (v) => {
+              const isLeaf = await checkIsLeaf([v], cachedCodes)
+              return {
+                ...v,
+                isLeaf
+              }
+            })
+          )
+          props.updateData(codesWithLeafInfo)
+        })()
+      } else {
+        props.updateData(valueBuffer)
+      }
+    }, [valueBuffer])
+
     return (
       <ValueSetField
         value={valueWithLabels}
         references={props.definition.valueSetsInfo}
         onSelect={(value) => {
-          if (props.definition.checkIsLeaf) {
-            const valuesWithLeafInfo = value.map((v) => {
-              return {
-                ...v,
-                isLeaf: !v.inferior_levels_ids && v.id !== HIERARCHY_ROOT
-              }
-            })
-            props.updateData(valuesWithLeafInfo)
-          } else {
-            props.updateData(value)
-          }
+          setValueBuffer(value)
         }}
         placeholder={props.definition.label ?? 'Code(s) sélectionné(s)'}
       />
-      // <AsyncAutocomplete
-      //   label={}
-      //   variant="outlined"
-      //   noOptionsText={props.definition.noOptionsText}
-      //   values={valueWithLabels}
-      //   onFetch={(search, signal) => props.searchCode(search, props.definition.valueSetIds.join(','), signal)}
-      //   onChange={(value) => {
-      //     // TODO this is a temporary fix that should be properly addressed with the new code search component
-      //     if (props.definition.checkIsLeaf) {
-      //       ;(async () => {
-      //         const valuesWithLeafInfo = await Promise.all(
-      //           value.map(async (v) => {
-      //             const res = await fetchValueSet(v.system ?? props.definition.valueSetIds.join(','), {
-      //               valueSetTitle: 'Toute la hiérarchie',
-      //               code: v.id,
-      //               noStar: true
-      //             })
-      //             return { ...v, isLeaf: res?.length === 0 }
-      //           })
-      //         )
-      //         props.updateData(valuesWithLeafInfo)
-      //       })()
-      //     } else {
-      //       props.updateData(value)
-      //     }
-      //   }}
-      // />
     )
   }
 }

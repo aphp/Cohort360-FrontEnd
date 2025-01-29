@@ -36,7 +36,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
   label: "d'imagerie",
   title: "Critère d'imagerie",
   initialData: {
-    title: "Critère d'Imagerie",
+    title: "Critère d'imagerie",
     type: CriteriaType.IMAGING,
     isInclusive: true,
     occurrence: {
