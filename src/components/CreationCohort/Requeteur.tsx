@@ -73,6 +73,12 @@ const Requeteur = () => {
     setRequestLoading((requestLoading) => requestLoading - 1)
   }, [dispatch, requestIdFromUrl, snapshotIdFromUrl])
 
+  useEffect(() => {
+    if (requestId && requestId !== requestIdFromUrl && !requestIdFromUrl) {
+      navigate(`/cohort/new/${requestId}`)
+    }
+  }, [requestIdFromUrl, requestId, navigate])
+
   /**
    * Fetch all criteria to display list + retrieve all data from fetcher
    */
