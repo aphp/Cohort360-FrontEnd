@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropsWithChildren } from 'react'
 import { StyledFormLabel } from './styles'
 import { FormLabelProps, Tooltip } from '@mui/material'
 import InfoIcon from '@mui/icons-material/Info'
@@ -6,9 +6,10 @@ import InfoIcon from '@mui/icons-material/Info'
 type StyledFormLabelProps = FormLabelProps & {
   label: string
   infoIcon?: React.ReactNode
+  style?: React.CSSProperties
 }
 
-export const CriteriaLabel = (props: StyledFormLabelProps) => {
+export const CriteriaLabel = (props: PropsWithChildren<StyledFormLabelProps>) => {
   const { infoIcon, label } = props
   return (
     <StyledFormLabel component="legend" {...props}>
@@ -18,6 +19,7 @@ export const CriteriaLabel = (props: StyledFormLabelProps) => {
           <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
         </Tooltip>
       )}
+      {props.children}
     </StyledFormLabel>
   )
 }

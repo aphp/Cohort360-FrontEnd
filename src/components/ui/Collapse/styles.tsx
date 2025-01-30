@@ -1,11 +1,7 @@
 import { Collapse, styled } from '@mui/material'
 
-type CustomProps = {
-  margin?: string
-}
-
-export const CollapseWrapper = styled(Collapse)<CustomProps>(({ margin }) => ({
-  '& div': {
-    margin: margin
+export const CollapseWrapper = styled(Collapse)(() => ({
+  '& .MuiCollapse-wrapperInner > *': {
+    margin: '0 0 1em'
   }
 }))

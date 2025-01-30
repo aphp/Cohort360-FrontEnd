@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import useStyles from './styles'
 import { Alert, Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@mui/material'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
@@ -10,13 +10,14 @@ type CriteriaLayoutProps = {
   onSubmit: () => void
   disabled: boolean
   criteriaLabel: string
+  mainTitle: string
   title: string
   onChangeTitle: (title: string) => void
   isInclusive: boolean
   onChangeIsInclusive: (isInclusive: boolean) => void
-  infoAlert?: string[]
-  warningAlert?: string[]
-  errorAlert?: string[]
+  infoAlert?: ReactNode[]
+  warningAlert?: ReactNode[]
+  errorAlert?: ReactNode[]
 }
 
 const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
@@ -26,6 +27,7 @@ const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
   disabled,
   criteriaLabel,
   children,
+  mainTitle,
   title,
   onChangeTitle,
   isInclusive,
@@ -85,7 +87,7 @@ const CriteriaLayout: React.FC<PropsWithChildren<CriteriaLayoutProps>> = ({
           )}
 
         <Grid className={classes.inputContainer} container>
-          <Typography variant="h6">Critère {criteriaLabel}</Typography>
+          <Typography variant="h6">{mainTitle}</Typography>
 
           <TextField
             required

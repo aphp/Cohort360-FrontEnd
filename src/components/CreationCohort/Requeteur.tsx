@@ -16,12 +16,13 @@ import { CurrentSnapshot } from 'types'
 
 import criteriaList from './DataList_Criteria'
 
-import { getDataFromFetch, cleanNominativeCriterias } from 'utils/cohortCreation'
+import { cleanNominativeCriterias, fetchCriteriasCodes } from 'utils/cohortCreation'
 
 import useStyles from './styles'
 import services from 'services/aphp'
 import { setCriteriaData } from 'state/criteria'
 import { AppConfig } from 'config'
+import { initValueSets, updateCache } from 'state/valueSets'
 
 const Requeteur = () => {
   const {
@@ -37,7 +38,7 @@ const Requeteur = () => {
     json = '',
     allowSearchIpp = false
   } = useAppSelector((state) => state.cohortCreation.request || {})
-  const criteriaData = useAppSelector((state) => state.cohortCreation.criteria || {})
+  const valueSets = useAppSelector((state) => state.valueSets)
   const config = useContext(AppConfig)
   const params = useParams<{
     requestId: string
@@ -53,6 +54,7 @@ const Requeteur = () => {
 
   const [requestLoading, setRequestLoading] = useState(0)
   const [criteriaLoading, setCriteriaLoading] = useState(0)
+  const [valueSetsLoading, setValueSetsLoading] = useState(true)
   const isRendered = useRef<boolean>(false)
 
   const _fetchRequest = useCallback(async () => {
@@ -87,7 +89,9 @@ const Requeteur = () => {
       setCriteriaLoading((criteriaLoading) => criteriaLoading + 1)
     }
     try {
-      const criteriaCache = await getDataFromFetch(criteriaList(), selectedCriteria, criteriaData.cache)
+      const criteriaCodesCache = await fetchCriteriasCodes(criteriaList(), selectedCriteria, valueSets.cache)
+      dispatch(updateCache(criteriaCodesCache))
+
       const allowMaternityForms = selectedPopulation?.every((population) => population?.access === 'Nominatif')
       const questionnairesEnabled = config.features.questionnaires.enabled
       dispatch(
@@ -105,8 +109,7 @@ const Requeteur = () => {
               color: allowMaternityForms && questionnairesEnabled ? '#0063AF' : '#808080',
               disabled: !allowMaternityForms || !questionnairesEnabled
             }
-          },
-          cache: criteriaCache
+          }
         })
       )
     } catch (error) {
@@ -187,7 +190,16 @@ const Requeteur = () => {
     return true
   }
 
-  // Initial useEffect
+  // Initial useEffects
+
+  useEffect(() => {
+    ;(async () => {
+      if (!valueSets.loading && !valueSets.loaded) {
+        await dispatch(initValueSets(criteriaList())).unwrap()
+      }
+      setValueSetsLoading(false)
+    })()
+  }, [dispatch, valueSets])
 
   useEffect(() => {
     _fetchRequest()
@@ -203,6 +215,7 @@ const Requeteur = () => {
 
   if (
     loading ||
+    valueSetsLoading ||
     criteriaLoading != 0 ||
     requestLoading != 0 ||
     (!!requestIdFromUrl && requestId !== requestIdFromUrl)

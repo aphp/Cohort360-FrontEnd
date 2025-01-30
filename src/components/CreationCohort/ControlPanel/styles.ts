@@ -19,7 +19,7 @@ const useStyles = makeStyles()(() => ({
     alignItems: 'center',
     marginTop: 8,
     padding: 4,
-    '&:first-child': {
+    '&:first-of-type': {
       marginTop: 0
     }
   },
