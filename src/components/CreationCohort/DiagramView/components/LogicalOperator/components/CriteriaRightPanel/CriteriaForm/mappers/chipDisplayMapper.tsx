@@ -106,7 +106,7 @@ const getDocumentTypesLabel = (values: string[]) => {
 
 const chipForNumberAndComparator = (value: NumberAndComparatorDataType, name: string) => {
   if (value.comparator === Comparators.BETWEEN) {
-    return `${name} entre ${value.value} et ${!value.maxValue ? '?' : value.maxValue}`
+    return `${name} comprise entre ${value.value} et ${!value.maxValue ? '?' : value.maxValue}`
   }
   return `${name} ${value.comparator} ${+value.value}`
 }
