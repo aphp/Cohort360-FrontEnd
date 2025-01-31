@@ -31,11 +31,11 @@ export type PregnancyDataType = CommonCriteriaData &
   }
 
 export const form: () => CriteriaForm<PregnancyDataType> = () => ({
-  label: 'de fiche de grossesse',
+  label: 'de Fiche de grossesse',
   title: 'Fiche de grossesse',
   initialData: {
     type: CriteriaType.PREGNANCY,
-    title: 'Critère de fiche de grossesse',
+    title: 'Critère de Fiche de Grossesse',
     isInclusive: true,
     occurrence: { value: 1, comparator: Comparators.GREATER_OR_EQUAL },
     encounterService: null,

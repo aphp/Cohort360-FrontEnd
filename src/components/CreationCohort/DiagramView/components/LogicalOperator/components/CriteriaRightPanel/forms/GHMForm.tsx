@@ -75,10 +75,14 @@ export const form: () => CriteriaForm<GhmDataType> = () => ({
           type: 'codeSearch',
           valueSetsInfo: getValueSetsFromSystems([getConfig().features.claim.valueSets.claimHierarchy.url]),
           noOptionsText: 'Aucun GHM trouvé',
-          label: 'Code GHM',
+          label: 'Sélectionner les codes GHM',
           buildInfo: {
             fhirKey: ClaimParamsKeys.CODE,
-            buildMethodExtraArgs: [{ type: 'string', value: getConfig().features.claim.valueSets.claimHierarchy.url }]
+            buildMethodExtraArgs: [{ type: 'string', value: getConfig().features.claim.valueSets.claimHierarchy.url }],
+            chipDisplayMethodExtraArgs: [
+              { type: 'string', value: '' },
+              { type: 'boolean', value: true }
+            ]
           }
         },
         {

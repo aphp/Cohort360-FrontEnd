@@ -59,7 +59,7 @@ export type HospitDataType = CommonCriteriaData &
   }
 
 export const form: () => CriteriaForm<HospitDataType> = () => ({
-  label: "de fiche d'hospitalisation",
+  label: "de Fiche d'hospitalisation",
   title: "Fiche d'hospitalisation",
   initialData: {
     title: "Critère de Fiche d'hospitalisation",

@@ -33,10 +33,10 @@ export type ImagingDataType = CommonCriteriaData &
   }
 
 export const form: () => CriteriaForm<ImagingDataType> = () => ({
-  label: "d'imagerie",
-  title: "Critère d'imagerie",
+  label: "d'Imagerie",
+  title: "Critère d'Imagerie",
   initialData: {
-    title: "Critère d'imagerie",
+    title: "Critère d'Imagerie",
     type: CriteriaType.IMAGING,
     isInclusive: true,
     occurrence: {

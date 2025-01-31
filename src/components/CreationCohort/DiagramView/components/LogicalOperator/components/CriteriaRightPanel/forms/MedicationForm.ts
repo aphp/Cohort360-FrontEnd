@@ -90,7 +90,7 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
         {
           valueKey: 'code',
           type: 'codeSearch',
-          label: 'Code(s) sélectionné(s)',
+          label: 'Sélectionner les codes',
           noOptionsText: 'Veuillez entrer un code de médicament',
           valueSetsInfo: getValueSetsFromSystems([
             getConfig().features.medication.valueSets.medicationAtc.url,
@@ -100,6 +100,10 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
             fhirKey: PrescriptionParamsKeys.CODE,
             buildMethodExtraArgs: [
               { type: 'string', value: getConfig().features.medication.valueSets.medicationAtc.url },
+              { type: 'boolean', value: true }
+            ],
+            chipDisplayMethodExtraArgs: [
+              { type: 'string', value: '' },
               { type: 'boolean', value: true }
             ]
           }
