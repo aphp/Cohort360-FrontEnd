@@ -112,7 +112,6 @@ const OccurenceInput = ({
       >
         <Select
           style={{ marginRight: '1em' }}
-          id="biology-value-comparator-select"
           value={comparatorValue ?? Comparators.GREATER_OR_EQUAL}
           onChange={handleComparatorChange}
           disabled={disabled}
@@ -129,7 +128,7 @@ const OccurenceInput = ({
         <TextField
           required
           type="text"
-          id="criteria-value"
+          className="number-comparator-value"
           variant="outlined"
           value={occurrenceValue}
           onChange={handleMinValueChange}
@@ -141,7 +140,7 @@ const OccurenceInput = ({
           <TextField
             required
             type="text"
-            id="criteria-value"
+            className="number-comparator-value"
             variant="outlined"
             value={upperRangeValue}
             onChange={handleMaxValueChange}

@@ -221,7 +221,7 @@ const buildNumberComparatorFilter = (
   }
   if (numberAndComparator.comparator === Comparators.BETWEEN) {
     if (numberAndComparator.maxValue) {
-      return `ge${numberAndComparator.value}&le${numberAndComparator.maxValue}`
+      return [`ge${numberAndComparator.value}`, `le${numberAndComparator.maxValue}`]
     } else {
       console.error('Missing max value for between comparator')
       return `ge${numberAndComparator.value}`
