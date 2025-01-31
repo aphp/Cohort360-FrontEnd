@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.42.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.40.00..2.42.0) - 2025-01-30
+
+### 🚀 Features
+
+- Add test classnames for ValuesetCodeSearch view - ([ad72802](https://github.com/aphp/Cohort360-FrontEnd/commit/ad72802e3aea63c8a2723b12000360d74e881a59))
+- Add code prefix to cim10 types filter - ([eb3ae91](https://github.com/aphp/Cohort360-FrontEnd/commit/eb3ae91f1f636841264c50742b9fa201a3fc4dba))
+- Add criteria form builder - Ref gestion-de-projet#2354 (#1059) - ([d722bd7](https://github.com/aphp/Cohort360-FrontEnd/commit/d722bd7724167b9912e945be34aff3e8942ca6f2))
+
+### 🐛 Bug Fixes
+
+- *(harmonisation visuelle)* Corrections - Ref gestion-de-projet#2873 (#1087) - ([2d4d503](https://github.com/aphp/Cohort360-FrontEnd/commit/2d4d503e290887ccd2912c1bcdc2550ba3794f98))
+- *(harmonisation visuelle)* Corrections - Ref gestion-de-projet#2873… (#1088) - ([282e339](https://github.com/aphp/Cohort360-FrontEnd/commit/282e339d0812469fe9e3e4a15d347f75f3ffd9e4))
+- *(docs)* Match doc type code with lowercase - ([c80cb77](https://github.com/aphp/Cohort360-FrontEnd/commit/c80cb77a8319ee61040f7a405f99746eb6189458))
+- *(valuesets)* Remove capitalization on code - ([7851428](https://github.com/aphp/Cohort360-FrontEnd/commit/7851428240790826a1e36664a753ff12c5b6b4c3))
+- *(questionnaire)* Set correct birthstatus field (#1086) - ([4fcfbe4](https://github.com/aphp/Cohort360-FrontEnd/commit/4fcfbe4f3d03c3d745b777af6a6b2c6397af02b9))
+- *(request)* Redirect to proper request url when creating new (#1091) - ([c5eb6b2](https://github.com/aphp/Cohort360-FrontEnd/commit/c5eb6b2bfc4892f9d4d48219c918b1196dbf482f))
+
 ## [2.41.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.40.00..2.41.0) - 2025-01-09
 
 ### 🚀 Features
@@ -39,6 +56,7 @@ All notable changes to this project will be documented in this file.
 
 - Remove PR inner commits name lint check - ([2048fb0](https://github.com/aphp/Cohort360-FrontEnd/commit/2048fb04f0ce4b77ea490dd795fdc256d3fd159c))
 - Update sonar job - ([0330251](https://github.com/aphp/Cohort360-FrontEnd/commit/03302514f280241d5e9a393136b8e161feb511c0))
+
 
 ## [2.40.00](https://github.com/aphp/Cohort360-FrontEnd/compare/2.39.0..2.40.0) - 2024-11-19
 
