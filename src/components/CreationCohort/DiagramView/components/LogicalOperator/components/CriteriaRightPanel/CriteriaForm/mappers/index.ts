@@ -138,7 +138,7 @@ const DEFAULT_BUILD_METHOD: Record<CriteriaFormItemType, BuilderMethod> = {
   boolean: BUILD_MAPPERS.buildSearch,
   textWithCheck: BUILD_MAPPERS.buildSearch,
   codeSearch: BUILD_MAPPERS.buildLabelObject,
-  textWithRegex: BUILD_MAPPERS.buildSearch,
+  textWithRegex: BUILD_MAPPERS.buildRaw,
   radioChoice: BUILD_MAPPERS.buildSearch,
   info: () => undefined
 }

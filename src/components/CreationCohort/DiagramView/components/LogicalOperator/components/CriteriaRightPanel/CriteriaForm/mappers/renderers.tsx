@@ -28,7 +28,6 @@ import { CriteriaLabel } from 'components/ui/CriteriaLabel'
 import { Comparators } from 'types/requestCriterias'
 import SimpleSelect from 'components/ui/Inputs/SimpleSelect'
 import ValueSetField from 'components/SearchValueSet/ValueSetField'
-import { HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
 import { checkIsLeaf } from 'utils/valueSets'
 import { selectValueSetCodes } from 'state/valueSets'
 

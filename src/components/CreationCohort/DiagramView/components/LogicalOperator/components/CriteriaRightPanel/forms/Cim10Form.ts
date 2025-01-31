@@ -91,7 +91,7 @@ export const form: () => CriteriaForm<Cim10DataType> = () => ({
           type: 'codeSearch',
           valueSetsInfo: getValueSetsFromSystems([getConfig().features.condition.valueSets.conditionHierarchy.url]),
           noOptionsText: 'Veuillez entrer un code ou un diagnostic CIM10',
-          label: 'Code CIM10',
+          label: 'Sélectionner les codes CIM10',
           buildInfo: {
             fhirKey: ConditionParamsKeys.CODE,
             buildMethodExtraArgs: [

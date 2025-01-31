@@ -22,7 +22,7 @@ export type CcamDataType = CommonCriteriaData &
   }
 
 export const form: () => CriteriaForm<CcamDataType> = () => ({
-  label: "d'actes CCAM",
+  label: "d'acte CCAM",
   title: 'Actes CCAM',
   initialData: {
     type: CriteriaType.PROCEDURE,
@@ -87,13 +87,17 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
         {
           valueKey: 'code',
           type: 'codeSearch',
-          label: "Codes d'actes CCAM",
+          label: "Sélectionner les codes d'actes CCAM",
           valueSetsInfo: getValueSetsFromSystems([getConfig().features.procedure.valueSets.procedureHierarchy.url]),
           noOptionsText: 'Veuillez entrer un code ou un acte CCAM',
           buildInfo: {
             fhirKey: ProcedureParamsKeys.CODE,
             buildMethodExtraArgs: [
               { type: 'string', value: getConfig().features.procedure.valueSets.procedureHierarchy.url }
+            ],
+            chipDisplayMethodExtraArgs: [
+              { type: 'string', value: '' },
+              { type: 'boolean', value: true }
             ]
           }
         },

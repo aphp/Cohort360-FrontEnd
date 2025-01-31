@@ -23,8 +23,8 @@ export type DocumentDataType = CommonCriteriaData &
   }
 
 export const form: () => CriteriaForm<DocumentDataType> = () => ({
-  label: 'de documents cliniques',
-  title: 'Documents cliniques',
+  label: 'de documents médicaux',
+  title: 'Documents médicaux',
   initialData: {
     type: CriteriaType.DOCUMENTS,
     title: 'Critère de document',

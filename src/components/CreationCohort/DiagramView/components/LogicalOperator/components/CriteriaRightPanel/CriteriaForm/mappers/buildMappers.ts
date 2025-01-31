@@ -200,6 +200,10 @@ const unbuildDurationFilter = (value: string, deid: boolean, existingValue?: New
   return updatedValue
 }
 
+const buildRaw = (value: string) => {
+  return value
+}
+
 const buildSearchFilter = (criterion: string) => {
   return criterion ? `${encodeURIComponent(criterion)}` : ''
 }
@@ -365,5 +369,7 @@ export const BUILD_MAPPERS = {
     buildNumberComparatorFilter(val as NumberAndComparatorDataType, args[0] as string),
   buildWithDocument: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) =>
     buildWithDocumentFilter(val as string, args[0] as number | null),
+  buildRaw: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) =>
+    buildRaw(val as string),
   noop: (val: DataTypes, key: FhirKey, deidentified: boolean, args: Array<DataTypes | BuilderMethod>) => undefined
 }

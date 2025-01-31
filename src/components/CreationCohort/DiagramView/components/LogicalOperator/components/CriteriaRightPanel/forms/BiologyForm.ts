@@ -66,7 +66,7 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
         {
           valueKey: 'code',
           type: 'codeSearch',
-          label: 'Codes de biologie',
+          label: 'Sélectionner les codes',
           checkIsLeaf: true,
           valueSetsInfo: getValueSetsFromSystems([
             getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
