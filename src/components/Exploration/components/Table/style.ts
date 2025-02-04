@@ -27,6 +27,14 @@ const useStyles = makeStyles()(() => ({
     padding: 0,
     top: 2,
     position: 'relative'
+  },
+  tableSortCell: {
+    '& span': {
+      color: 'white'
+    },
+    '& svg': {
+      color: 'white'
+    }
   }
 }))
 

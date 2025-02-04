@@ -1,4 +1,4 @@
-import { TableCell, tableCellClasses, styled } from '@mui/material'
+import { TableCell, tableCellClasses, styled, buttonBaseClasses, tableSortLabelClasses } from '@mui/material'
 
 type CustomProps = {
   align?: string
@@ -16,7 +16,13 @@ export const TableCellWrapper = styled(TableCell)<CustomProps>(({ align = 'cente
     textTransform: 'uppercase',
     fontSize: 11,
     padding: '12px 16px',
-    maxWidth: 160
+    maxWidth: 160,
+    [`& .${buttonBaseClasses.root}`]: {
+      color: '#FFF'
+    },
+    [`& .${tableSortLabelClasses.icon}`]: {
+      fill: '#FFF'
+    }
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,

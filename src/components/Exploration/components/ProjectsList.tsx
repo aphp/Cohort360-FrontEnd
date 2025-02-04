@@ -3,14 +3,13 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAppSelector } from 'state'
 
 import { Box, CircularProgress, Grid, Typography } from '@mui/material'
+import AddOrEditProject from './Modals/AddOrEditProject'
 import Button from 'components/ui/Button'
+import ConfirmDeletion from './Modals/ConfirmDeletion'
 import ProjectCard from 'components/ui/ProjectCard'
 import Select from 'components/ui/Searchbar/Select'
 import AddIcon from '@mui/icons-material/Add'
 
-import useCreateProject from '../hooks/useCreateProject'
-import useDeleteProject from '../hooks/useDeleteProject'
-import useEditProject from '../hooks/useEditProject'
 import useProjects from '../hooks/useProjects'
 
 import { ProjectType } from 'types'
@@ -27,28 +26,11 @@ const ProjectsList = () => {
   const orderDirection = (searchParams.get('direction') as Direction) ?? Direction.DESC
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
 
-  const createProjectMutation = useCreateProject()
-  const editProjectMutation = useEditProject()
-  const deleteProjectMutation = useDeleteProject()
+  const [openEditionModal, setOpenEditionModal] = useState(false)
+  const [openDeletionModal, setOpenDeletionModal] = useState(false)
+  const [selectedProject, setSelectedProject] = useState<ProjectType | null>(null)
 
   const { projectsList, total, loading } = useProjects({ startDate, endDate }, searchInput, { orderBy, orderDirection })
-
-  const handleAddProject = async () => {
-    const newProjectData: Omit<ProjectType, 'uuid'> = {
-      name: 'projet ajouté avec react-query :)',
-      description: "J'apprends, j'apprends!!"
-    }
-    createProjectMutation.mutate(newProjectData)
-  }
-
-  const handleEditProject = async (project: ProjectType) => {
-    const newProjectData = { uuid: project.uuid, name: project.name, description: 'Description ajoutée!' }
-    editProjectMutation.mutate(newProjectData)
-  }
-
-  const handleDeleteProject = async (project: ProjectType) => {
-    deleteProjectMutation.mutate(project)
-  }
 
   const orderByProjects = [
     {
@@ -104,7 +86,7 @@ const ProjectsList = () => {
         <Typography fontWeight={'bold'} fontSize={14}>
           {total} projet{total > 1 ? 's' : ''}
         </Typography>
-        <Button width="fit-content" onClick={handleAddProject} endIcon={<AddIcon />}>
+        <Button width="fit-content" onClick={() => setOpenEditionModal(true)} endIcon={<AddIcon />}>
           Ajouter un projet
         </Button>
       </Grid>
@@ -122,13 +104,36 @@ const ProjectsList = () => {
               creationDate={project.created_at}
               requestNumber={project.requests_count ?? 0}
               onclick={() => navigate(`/researches/projects/${project.uuid}${location.search}`)}
-              onedit={() => handleEditProject(project)}
-              ondelete={() => handleDeleteProject(project)}
+              onedit={() => {
+                setSelectedProject(project)
+                setOpenEditionModal(true)
+              }}
+              ondelete={() => {
+                setSelectedProject(project)
+                setOpenDeletionModal(true)
+              }}
               disabled={maintenanceIsActive}
             />
           ))
         )}
       </Grid>
+
+      <AddOrEditProject
+        open={openEditionModal}
+        selectedProject={selectedProject}
+        onClose={() => {
+          setSelectedProject(null)
+          setOpenEditionModal(false)
+        }}
+      />
+      <ConfirmDeletion
+        open={openDeletionModal}
+        selectedProject={selectedProject}
+        onClose={() => {
+          setOpenDeletionModal(false)
+          setSelectedProject(null)
+        }}
+      />
     </Grid>
   )
 }

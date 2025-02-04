@@ -16,6 +16,7 @@ const useCohortsWebSocket = () => {
       }
     }
 
+    // TODO: au lieu d'invalidate les cohorts, simplement modifier l'objet concerné
     wsContext.addListener(listener, WebSocketMessageType.JOB_STATUS) // pour s'abonner
 
     return () => {

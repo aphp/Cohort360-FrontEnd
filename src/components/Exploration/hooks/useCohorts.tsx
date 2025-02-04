@@ -1,43 +1,22 @@
 import { useQuery } from '@tanstack/react-query'
 import services from 'services/aphp'
-import { CohortsType } from 'types/cohorts'
-import { Direction, Order } from 'types/searchCriterias'
+import { CohortsFilters, OrderBy } from 'types/searchCriterias'
 
-const useCohorts = (
-  parentId: string,
-  searchInput: string,
-  startDate?: string,
-  endDate?: string,
-  isFavorite = CohortsType.ALL,
-  page = 1,
-  rowsPerPage = 20
-) => {
+const useCohorts = (orderBy: OrderBy, searchInput: string, filters: CohortsFilters, page = 1, rowsPerPage = 20) => {
   // TODO: à externaliser
   const fetchCohortsList = async () => {
     // TODO: modifier le service de sorte à ajouter les filtres + try/catch
     const offset = (page - 1) * rowsPerPage
     const cohortsList = await services.projects.fetchCohortsList(
-      parentId
+      filters.parentId
         ? {
+            ...filters,
             startDate: null,
-            endDate: null,
-            status: [],
-            favorite: isFavorite,
-            minPatients: null,
-            maxPatients: null,
-            parentId
+            endDate: null
           }
-        : {
-            startDate: startDate ?? null,
-            endDate: endDate ?? null,
-            status: [],
-            favorite: isFavorite,
-            minPatients: null,
-            maxPatients: null,
-            parentId
-          },
-      !parentId ? searchInput : '',
-      { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
+        : filters,
+      !filters.parentId ? searchInput : '',
+      { orderBy: orderBy.orderBy, orderDirection: orderBy.orderDirection },
       rowsPerPage,
       offset
       //   AbortSignal???
@@ -46,7 +25,7 @@ const useCohorts = (
   }
 
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
-    queryKey: ['cohorts', 'projectsCount', searchInput, startDate, endDate, page, isFavorite],
+    queryKey: ['cohorts', 'projectsCount', searchInput, filters, orderBy, page],
     queryFn: fetchCohortsList,
     refetchOnWindowFocus: false
   })

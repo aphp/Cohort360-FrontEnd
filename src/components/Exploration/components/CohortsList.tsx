@@ -1,28 +1,36 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
+import { AppConfig } from 'config'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAppSelector } from 'state'
 
-import { Box, CircularProgress, Grid, IconButton, TableRow, Tooltip, Typography } from '@mui/material'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import ResearchesTable from './Table'
-import { Cohort, CohortJobStatus, Column } from 'types'
-import { TableCellWrapper } from 'components/ui/TableCell/styles'
+import { Box, CircularProgress, Grid, IconButton, TableRow, Tooltip } from '@mui/material'
 import Button from 'components/ui/Button'
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt'
-import { formatDate } from 'utils/formatDate'
 import FavStar from 'components/ui/FavStar'
-import displayDigit from 'utils/displayDigit'
-import { AppConfig } from 'config'
-import RequestTree from 'assets/icones/schema.svg?react'
-import Download from 'assets/icones/download.svg?react'
-import Picker from 'assets/icones/color-picker.svg?react'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import ActionMenu from './ActionMenu'
-import useRequest from '../hooks/useRequest'
-import useCohorts from '../hooks/useCohorts'
+import ResearchesTable from './Table'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
 import StatusChip from './StatusChip'
+
+import ActionMenu from './ActionMenu'
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import Download from 'assets/icones/download.svg?react'
+import EditIcon from '@mui/icons-material/Edit'
+import LevelHeader from './LevelHeader'
+import Picker from 'assets/icones/color-picker.svg?react'
+import RequestTree from 'assets/icones/schema.svg?react'
+import ShareIcon from '@mui/icons-material/Share'
 import UpdateIcon from '@mui/icons-material/Update'
+
+import useCohorts from '../hooks/useCohorts'
 import useCohortsWebSocket from '../hooks/useCohortsWebSocket'
+import useEditCohort from '../hooks/useEditCohort'
+import useRequest from '../hooks/useRequest'
+
+import { Cohort, CohortJobStatus, Column, ValueSet } from 'types'
+import { CohortsType } from 'types/cohorts'
+import { CohortsFilters, Direction, Order, OrderBy } from 'types/searchCriterias'
+import displayDigit from 'utils/displayDigit'
+import { formatDate } from 'utils/formatDate'
 import { getExportTooltip, getGlobalEstimation } from 'utils/explorationUtils'
 
 export const getCohortStatusChip = (status?: CohortJobStatus, jobFailMessage?: string) => {
@@ -51,31 +59,72 @@ export const getCohortStatusChip = (status?: CohortJobStatus, jobFailMessage?: s
   }
 }
 
+export const getStatusFilter = (status?: string | null) => {
+  if (status) {
+    return status.split(',').map((status) => {
+      return { code: status }
+    }) as ValueSet[]
+  } else {
+    return []
+  }
+}
+
+export const getFavoriteFilters = (favoriteParam?: string | null) => {
+  if (favoriteParam === 'true') {
+    return CohortsType.FAVORITE
+  } else if (favoriteParam === 'false') {
+    return CohortsType.NOT_FAVORITE
+  } else {
+    return CohortsType.ALL
+  }
+}
+
 const CohortsList = () => {
   const appConfig = useContext(AppConfig)
   const navigate = useNavigate()
   const { projectId, requestId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const searchInput = searchParams.get('searchInput') ?? ''
-  const startDate = searchParams.get('startDate') ?? undefined
-  const endDate = searchParams.get('endDate') ?? undefined
+  const startDate = searchParams.get('startDate')
+  const endDate = searchParams.get('endDate')
   const page = parseInt(searchParams.get('page') ?? '1', 10)
+  const orderBy = (searchParams.get('orderBy') as Order) ?? Order.CREATED_AT
+  const orderDirection = (searchParams.get('direction') as Direction) ?? Direction.DESC
+  // TODO: add les params pour les filtres exclusifs aux cohortes + bien penser à les suppr en changeant d'onglet
+  const status = searchParams.get('status')
+  const favorite = searchParams.get('favorite')
+  const minPatients = searchParams.get('minPatients')
+  const maxPatients = searchParams.get('maxPatients')
+
   const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
 
-  const { request: parentRequest, requestLoading, requestIsError } = useRequest(requestId)
-  const { cohortsList, total, loading } = useCohorts(requestId ?? '', searchInput, startDate, endDate)
-  useCohortsWebSocket()
+  const [deleteMode, setDeleteMode] = useState(false)
+  const [toggleModal, setToggleModal] = useState(false)
+  const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
+  const [filters, setFilters] = useState<CohortsFilters>({
+    status: getStatusFilter(status),
+    favorite: getFavoriteFilters(favorite),
+    minPatients,
+    maxPatients,
+    startDate,
+    endDate,
+    parentId: requestId
+  })
 
-  // TODO: add les params pour les filtres exclusifs aux cohortes + bien penser à les suppr en changeant d'onglet
+  const { request: parentRequest, requestLoading, requestIsError } = useRequest(requestId)
+  const { cohortsList, total, loading } = useCohorts(order, searchInput, filters)
+  useCohortsWebSocket()
+  const editCohortMutation = useEditCohort()
 
   const columns: Column[] = [
-    { label: '', align: 'left' },
-    { label: 'nom de la cohorte', align: 'left' },
+    { label: '', code: Order.FAVORITE, align: 'left' },
+    { label: 'nom de la cohorte', code: Order.NAME, align: 'left' },
     ...(!requestId ? [{ label: 'requête parent' }] : []), //TODO: cliquable ou pas?
+    // TODO: ajouter tri par requête parent?
     { label: 'statut' },
-    { label: 'nb de patients' },
+    { label: 'nb de patients', code: Order.RESULT_SIZE },
     { label: 'estimation du nombre de patients ap-hp' },
-    { label: 'date de création' },
+    { label: 'date de création', code: Order.CREATED_AT },
     { label: 'échantillons' }
   ]
 
@@ -92,28 +141,50 @@ const CohortsList = () => {
     navigate(`/cohort?${searchParams.toString()}`)
   }
 
+  const changeOrderBy = (newOrder: OrderBy) => {
+    setOrder(newOrder)
+    searchParams.set('orderBy', newOrder.orderBy)
+    searchParams.set('direction', newOrder.orderDirection)
+    setSearchParams(searchParams)
+  }
+
   return (
     <Grid container gap="20px">
       {requestId && (
-        <Box display={'flex'} justifyContent={'center'} width={'100%'} alignItems={'center'}>
-          <Typography fontWeight={'bold'} fontSize={'24px'} fontFamily={"'Montserrat', sans-serif"}>
-            {parentRequest?.name}
-          </Typography>
-          <Typography>{parentRequest?.description}</Typography>
-          {/* TODO: ajouter les actions sur projet parent */}
-          <IconButton>
-            <EditIcon />
-          </IconButton>
-          <IconButton>
-            <DeleteOutlineIcon />
-          </IconButton>
-        </Box>
+        <LevelHeader
+          loading={requestLoading}
+          name={parentRequest?.name ?? ''}
+          hideActions={!deleteMode}
+          description={parentRequest?.description ?? ''}
+          actions={
+            <>
+              <IconButton>
+                <EditIcon />
+              </IconButton>
+              <IconButton>
+                <DeleteOutlineIcon />
+              </IconButton>
+              <Tooltip title="Partager la requête">
+                <IconButton>
+                  <ShareIcon />
+                </IconButton>
+              </Tooltip>
+            </>
+          }
+        />
       )}
 
       {loading ? (
         <CircularProgress />
       ) : (
-        <ResearchesTable columns={columns} page={page} setPage={handlePageChange} total={total}>
+        <ResearchesTable
+          columns={columns}
+          page={page}
+          setPage={handlePageChange}
+          total={total}
+          order={order}
+          setOrder={(newOrder) => changeOrderBy(newOrder)}
+        >
           {cohortsList.map((cohort: Cohort) => {
             const isExportable = appConfig.features.export.enabled ? cohort?.rights?.export_csv_nomi : false
             const actions = [
@@ -139,8 +210,11 @@ const CohortsList = () => {
                   <IconButton
                     onClick={(event) => {
                       event.stopPropagation()
-                      console.log('favorite')
-                      // setSelectedExportableCohort(row ?? undefined)
+                      editCohortMutation.mutate(
+                        { ...cohort, favorite: !cohort.favorite },
+                        { onError: () => console.log('erreur lors de ledition') }
+                      )
+                      // TODO: gérer en cas d'erreur (state message réinstauré?)
                     }}
                     disabled={maintenanceIsActive}
                   >

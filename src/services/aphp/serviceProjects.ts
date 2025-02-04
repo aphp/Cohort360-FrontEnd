@@ -289,8 +289,9 @@ const servicesProjects: IServiceProjects = {
   },
   editProject: async (editedProject) => {
     const editProjectResponse = (await apiBack.patch(`/cohort/folders/${editedProject.uuid}/`, {
+      parent_folder: editedProject.uuid,
       name: editedProject.name,
-      parent_folder: editedProject.uuid
+      description: editedProject.description
     })) ?? {
       data: { results: [] }
     }

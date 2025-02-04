@@ -1,23 +1,29 @@
 import React, { useState } from 'react'
-
-import { Box, Checkbox, CircularProgress, Grid, IconButton, TableRow, Tooltip, Typography } from '@mui/material'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { Column } from 'types'
-import ResearchesTable from './Table'
-import { TableCellWrapper } from 'components/ui/TableCell/styles'
-import Button from 'components/ui/Button'
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt'
-import useRequests from '../hooks/useRequests'
-import { formatDate } from 'utils/formatDate'
-import ActionMenu from './ActionMenu'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import ShareIcon from '@mui/icons-material/Share'
 import { useAppDispatch, useAppSelector } from 'state'
 import { setSelectedRequestShare } from 'state/request'
-import useProject from '../hooks/useProject'
+
+import { Box, Checkbox, CircularProgress, Grid, IconButton, TableRow, Tooltip, Typography } from '@mui/material'
+import ActionMenu from './ActionMenu'
+import AddOrEditProject from './Modals/AddOrEditProject'
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt'
+import Button from 'components/ui/Button'
+import ConfirmDeletion from './Modals/ConfirmDeletion'
+import LevelHeader from './LevelHeader'
+import ResearchesTable from './Table'
+import { TableCellWrapper } from 'components/ui/TableCell/styles'
+
 import AddIcon from '@mui/icons-material/Add'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import EditIcon from '@mui/icons-material/Edit'
+import ShareIcon from '@mui/icons-material/Share'
+
+import useProject from '../hooks/useProject'
+import useRequests from '../hooks/useRequests'
+
+import { Column, ProjectType, RequestType } from 'types'
 import { getCohortTotal, getRequestName } from 'utils/explorationUtils'
+import { formatDate } from 'utils/formatDate'
 
 // TODO: J'AVAIS OUBLIÉ MAIS PRÉVOIR LE SUPER FLOW DE DÉLÉTION MULTIPLE
 
@@ -33,6 +39,12 @@ const RequestsList = () => {
   const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
 
   const [deleteMode, setDeleteMode] = useState(false)
+  const [openEditProjectModal, setOpenEditProjectModal] = useState(false)
+  const [openProjectDeletionModal, setOpenProjectDeletionModal] = useState(false)
+  const [selectedProject, setSelectedProject] = useState<ProjectType | null>(null)
+  const [openEditionModal, setOpenEditionModal] = useState(false)
+  const [openDeletionModal, setOpenDeletionModal] = useState(false)
+  const [selectedRequest, setSelectedRequest] = useState<RequestType | null>(null)
 
   const { project: parentProject, projectLoading, projectIsError } = useProject(projectId)
   const { requestsList, total, loading } = useRequests(projectId, searchInput, startDate, endDate, undefined, page)
@@ -62,7 +74,9 @@ const RequestsList = () => {
     {
       icon: <EditIcon />,
       label: 'Éditer',
-      onclick: () => console.log('edit'),
+      onclick: () => {
+        setSelectedRequest(request)
+      },
       tooltip: '',
       disabled: maintenanceIsActive
     },
@@ -84,23 +98,35 @@ const RequestsList = () => {
   return (
     <Grid container gap="20px">
       {projectId && (
-        <Box display={'flex'} justifyContent={'center'} width={'100%'} alignItems={'center'}>
-          <Typography fontWeight={'bold'} fontSize={'24px'} fontFamily={"'Montserrat', sans-serif"}>
-            {parentProject?.name}
-          </Typography>
-          <Typography>{parentProject?.description}</Typography>
-          {/* TODO: ajouter les actions sur projet parent */}
-          {!deleteMode && (
+        <LevelHeader
+          loading={projectLoading}
+          name={parentProject?.name ?? ''}
+          hideActions={!deleteMode}
+          description={parentProject?.description ?? ''}
+          actions={
             <>
-              <IconButton>
+              <IconButton
+                style={{ padding: 4 }}
+                onClick={() => {
+                  setSelectedProject(parentProject ?? null)
+                  setOpenEditionModal(true)
+                }}
+              >
                 <EditIcon />
               </IconButton>
-              <IconButton>
+              <IconButton
+                style={{ padding: 4 }}
+                color="secondary"
+                onClick={() => {
+                  setSelectedProject(parentProject ?? null)
+                  setOpenProjectDeletionModal(true)
+                }}
+              >
                 <DeleteOutlineIcon />
               </IconButton>
             </>
-          )}
-        </Box>
+          }
+        />
       )}
 
       <Grid container justifyContent={'space-between'} alignItems={'center'}>
@@ -196,6 +222,23 @@ const RequestsList = () => {
           })}
         </ResearchesTable>
       )}
+
+      <AddOrEditProject
+        open={openEditionModal}
+        selectedProject={selectedProject}
+        onClose={() => {
+          setSelectedProject(null)
+          setOpenEditionModal(false)
+        }}
+      />
+      <ConfirmDeletion
+        open={openProjectDeletionModal}
+        selectedProject={selectedProject}
+        onClose={() => {
+          setOpenProjectDeletionModal(false)
+          setSelectedProject(null)
+        }}
+      />
     </Grid>
   )
 }
