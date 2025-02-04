@@ -220,8 +220,8 @@ let config: AppConfig = {
     observation: {
       enabled: true,
       valueSets: {
-        biologyHierarchyAnabio: { url: '' },
-        biologyHierarchyLoinc: { url: '' }
+        biologyHierarchyAnabio: { url: '', title: 'ANABIO' },
+        biologyHierarchyLoinc: { url: '', title: 'LOINC' }
       }
     },
     medication: {
