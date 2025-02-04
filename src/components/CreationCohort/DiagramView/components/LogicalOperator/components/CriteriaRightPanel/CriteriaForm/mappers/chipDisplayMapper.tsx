@@ -200,6 +200,10 @@ const displaySystem = (system?: string) => {
       return `${getConfig().features.medication.valueSets.medicationAtc.title}: `
     case getConfig().features.medication.valueSets.medicationUcd.url:
       return `${getConfig().features.medication.valueSets.medicationUcd.title}: `
+    case getConfig().features.observation.valueSets.biologyHierarchyAnabio.url:
+      return `${getConfig().features.observation.valueSets.biologyHierarchyAnabio.title}: `
+    case getConfig().features.observation.valueSets.biologyHierarchyLoinc.url:
+      return `${getConfig().features.observation.valueSets.biologyHierarchyLoinc.title}: `
     default:
       return ''
   }
