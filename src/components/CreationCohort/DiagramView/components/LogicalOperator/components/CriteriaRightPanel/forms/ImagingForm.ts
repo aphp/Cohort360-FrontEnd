@@ -65,7 +65,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   warningAlert: [
     'Seuls les examens présents dans le PACS Philips et rattachés à un Dossier Administratif (NDA) sont actuellement disponibles.',
-    "Le flux alimentant les métadonnées associées aux séries et aux examens est suspendu depuis le 01/02/2023 suite à la migration du PACS AP-HP. Aucun examen produit après cette date n'est disponible via Cohort360. Pour tout besoin d'examen post 01/02/2023, merci de contacter le support Cohort360 : id.recherche.support.dsn@aphp.fr"
+    "Le flux alimentant les métadonnées associées aux séries et aux examens est suspendu depuis le 01/02/2023 suite à la migration du PACS AP-HP. Aucun examen produit après cette date n'est disponible via Cohort360."
   ],
   buildInfo: {
     type: { [ResourceType.IMAGING]: CriteriaType.IMAGING },
