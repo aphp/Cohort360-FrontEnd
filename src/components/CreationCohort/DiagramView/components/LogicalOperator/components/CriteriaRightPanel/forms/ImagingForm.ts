@@ -153,7 +153,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           label: 'Nombre de séries',
           buildInfo: {
             fhirKey: ImagingParamsKeys.NB_OF_SERIES,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Nombre de séries : ' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Nombre de séries ' }]
           }
         },
         {
@@ -162,7 +162,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           label: "Nombre d'instances",
           buildInfo: {
             fhirKey: ImagingParamsKeys.NB_OF_INS,
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'instances : " }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'instances " }]
           }
         },
         {
