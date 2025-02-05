@@ -7,17 +7,19 @@ import {
   GenderStatus,
   GenderStatusLabel,
   LabelObject,
+  SearchCriteriaKeys,
   VitalStatus,
   VitalStatusLabel
 } from 'types/searchCriterias'
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
-import { ScopeElement, SimpleCodeType, ValueSet } from 'types'
-import { getDurationRangeLabel } from './age'
+import { ScopeElement, SimpleCodeType } from 'types'
+import { getAgeLabel } from './age'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
 import { Hierarchy } from 'types/hierarchy'
 import labels from 'labels.json'
 import { getFullLabelFromCode } from './valueSets'
+import { getDurationRangeLabel } from 'mappers/dates'
 
 export const getCohortsTypeLabel = (type: CohortsType): string => {
   switch (type) {
@@ -66,12 +68,14 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.CODE:
       case FilterKeys.FORM_NAME:
       case FilterKeys.ENCOUNTER_STATUS:
+      case FilterKeys.SOURCE:
         castedFilters[key] = removeElementInArray(castedFilters[key], value)
         break
       case FilterKeys.NDA:
       case FilterKeys.IPP:
         castedFilters[key] = removeElementInArray((castedFilters[key] as string).split(','), value as string).join(',')
         break
+      case FilterKeys.DURATION_RANGE:
       case FilterKeys.BIRTHDATES:
         castedFilters[key] = [null, null]
         break
@@ -79,7 +83,6 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.END_DATE:
       case FilterKeys.MIN_PATIENTS:
       case FilterKeys.MAX_PATIENTS:
-      case FilterKeys.SOURCE:
         castedFilters[key] = null
         break
       case FilterKeys.FAVORITE:
@@ -87,7 +90,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
         break
     }
   }
-  return castedFilters
+  return { ...castedFilters }
 }
 
 export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
@@ -95,7 +98,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return getCohortsTypeLabel(value as CohortsType)
   }
   if (key === FilterKeys.BIRTHDATES) {
-    return getDurationRangeLabel(value as DurationRangeType, 'Âge')
+    return getAgeLabel(value as DurationRangeType, 'Âge')
   }
   if (key === FilterKeys.GENDERS) {
     return GenderStatusLabel[value as GenderStatus]
@@ -109,6 +112,9 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   }
   if (key === FilterKeys.VITAL_STATUSES) {
     return VitalStatusLabel[value as VitalStatus]
+  }
+  if (key === FilterKeys.DURATION_RANGE) {
+    return getDurationRangeLabel(value as DurationRangeType)
   }
   if (key === FilterKeys.START_DATE) {
     return `Après le : ${moment(value as string).format('DD/MM/YYYY')}`
@@ -134,7 +140,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     }`
   }
   if (key === FilterKeys.DOC_STATUSES) {
-    return `Documents : ${value}`
+    return `Documents :  ${(value as LabelObject).label}`
   }
   if (key === FilterKeys.DOC_TYPES) {
     return (value as SimpleCodeType).label
@@ -149,7 +155,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return `Type de prescription : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
   }
   if (key === FilterKeys.STATUS) {
-    return `Statut : ${(value as ValueSet)?.display}`
+    return `Statut : ${(value as LabelObject)?.label}`
   }
   if (key === FilterKeys.MIN_PATIENTS) {
     return `Au moins ${value} patients`
@@ -166,9 +172,15 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   return ''
 }
 
-export const selectFiltersAsArray = (filters: Filters) => {
-  const result: { value: FilterValue; category: FilterKeys; label: string }[] = []
+export const selectFiltersAsArray = (filters: Filters, searchInput: string | undefined) => {
+  const result: { value: FilterValue; category: FilterKeys | SearchCriteriaKeys; label: string }[] = []
 
+  if (searchInput)
+    result.push({
+      category: SearchCriteriaKeys.SEARCH_INPUT,
+      value: searchInput,
+      label: `Recherche de : "${searchInput}"`
+    })
   for (const key in filters) {
     const value = filters[key as keyof Filters]
     if (value) {
@@ -179,10 +191,6 @@ export const selectFiltersAsArray = (filters: Filters) => {
         case FilterKeys.ADMINISTRATION_ROUTES:
         case FilterKeys.PRESCRIPTION_TYPES:
         case FilterKeys.DOC_STATUSES:
-          ;(value as []).forEach((elem) => {
-            result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
-          })
-          break
         case FilterKeys.DOC_TYPES:
         case FilterKeys.EXECUTIVE_UNITS:
         case FilterKeys.STATUS:
@@ -190,11 +198,13 @@ export const selectFiltersAsArray = (filters: Filters) => {
         case FilterKeys.CODE:
         case FilterKeys.FORM_NAME:
         case FilterKeys.ENCOUNTER_STATUS:
-          ;(value as []).forEach((elem) =>
-            result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
-          )
+        case FilterKeys.SOURCE:
+          ;(value as []).forEach((elem) => {
+            if (elem) result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
+          })
           break
         case FilterKeys.BIRTHDATES:
+        case FilterKeys.DURATION_RANGE:
           if (value[0] || value[1]) {
             result.push({
               category: key,
@@ -203,7 +213,6 @@ export const selectFiltersAsArray = (filters: Filters) => {
             })
           }
           break
-        case FilterKeys.SOURCE:
         case FilterKeys.START_DATE:
         case FilterKeys.END_DATE:
         case FilterKeys.MIN_PATIENTS:

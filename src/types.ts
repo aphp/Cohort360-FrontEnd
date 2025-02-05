@@ -74,6 +74,11 @@ export enum LoadingStatus {
   SUCCESS = 'SUCCESS'
 }
 
+export enum FetchStatus {
+  ERROR = 'ERROR',
+  SUCCESS = 'SUCCESS'
+}
+
 export enum TemporalConstraintsKind {
   NONE = 'none',
   SAME_ENCOUNTER = 'sameEncounter',
@@ -208,17 +213,6 @@ export enum Month {
   NOVEMBER = 'Novembre',
   DECEMBER = 'Décembre'
 }
-
-export type Column =
-  | {
-      label: string | ReactNode
-      code?: string
-      align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
-      multiple?: undefined
-    }
-  | {
-      multiple: Column[]
-    }
 
 export enum ChartCode {
   AGE_PYRAMID = 'facet-extension.ageMonth',
