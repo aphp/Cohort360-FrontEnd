@@ -131,8 +131,8 @@ const CohortsList = () => {
     { label: 'statut' },
     { label: 'nb de patients', code: Order.RESULT_SIZE },
     { label: 'estimation du nombre de patients ap-hp' },
-    { label: 'date de création', code: Order.CREATED_AT },
-    { label: 'échantillons' }
+    { label: 'date de création', code: Order.CREATED_AT }
+    // { label: 'échantillons' }
   ]
 
   const handlePageChange = (newPage: number) => {
@@ -256,7 +256,7 @@ const CohortsList = () => {
                         />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title={'Créer un échantillon à partir de la cohorte'}>
+                    {/* <Tooltip title={'Créer un échantillon à partir de la cohorte'}>
                       <IconButton
                         size="small"
                         onClick={(event) => {
@@ -266,7 +266,7 @@ const CohortsList = () => {
                       >
                         <Picker stroke={maintenanceIsActive ? '#CBCFCF' : 'black'} />
                       </IconButton>
-                    </Tooltip>
+                    </Tooltip> */}
                     <Tooltip title={'Accéder à la version de la requête ayant créé la cohorte'}>
                       <IconButton
                         size="small"
@@ -305,7 +305,7 @@ const CohortsList = () => {
                 <TableCellWrapper>{getGlobalEstimation(cohort)}</TableCellWrapper>
                 <TableCellWrapper>{formatDate(cohort.created_at, true)}</TableCellWrapper>
                 {/* TODO: rendre non cliquable si pas d'enfant dispo */}
-                <TableCellWrapper>
+                {/* <TableCellWrapper>
                   <Button
                     endIcon={<ArrowRightAltIcon />}
                     clearVariant
@@ -320,7 +320,7 @@ const CohortsList = () => {
                   >
                     0 échantillon
                   </Button>
-                </TableCellWrapper>
+                </TableCellWrapper> */}
               </TableRow>
             )
           })}

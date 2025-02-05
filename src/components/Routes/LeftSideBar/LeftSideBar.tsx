@@ -400,7 +400,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     Mes cohortes
                   </Link>
                 </ListItem>
-                <ListItem>
+                {/* <ListItem>
                   <Link
                     id="myProject-link"
                     onClick={() => navigate('/researches/samples')}
@@ -409,7 +409,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   >
                     Mes échantillons
                   </Link>
-                </ListItem>
+                </ListItem> */}
               </List>
             </Collapse>
           </List>
