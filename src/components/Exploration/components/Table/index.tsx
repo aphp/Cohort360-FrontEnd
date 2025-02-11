@@ -53,7 +53,7 @@ const ResearchesTable: React.FC<ResearchesTableProps> = ({
           <TableContainer>
             <Table className={classes.table}>
               <TableHead>
-                <TableRow sx={{ borderRadius: '40px', overflow: 'clip' }}>
+                <TableRow sx={{ borderRadius: '4px', overflow: 'clip' }}>
                   {columns.map((column, index) => (
                     <TableCellWrapper
                       key={index}

@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import services from 'services/aphp'
+import { OrderBy } from 'types/searchCriterias'
 
 const useRequests = (
+  orderBy: OrderBy,
   parentId: string | undefined,
   searchInput: string,
   startDate?: string,
@@ -14,6 +16,7 @@ const useRequests = (
     // TODO: modifier le service de sorte à ajouter les filtres + try/catch
     const offset = (page - 1) * rowsPerPage
     const requestsList = await services.projects.fetchRequestsList(
+      orderBy,
       parentId,
       searchInput,
       startDate,
@@ -23,9 +26,9 @@ const useRequests = (
     )
     return requestsList
   }
-
+  // TODO: tester si maj correcte en cas de changement de parentid
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
-    queryKey: ['requests', 'projectsCount', searchInput, startDate, endDate, page],
+    queryKey: ['requests', 'projectsCount', orderBy, searchInput, startDate, endDate, page],
     queryFn: fetchRequestsList,
     refetchOnWindowFocus: false
   })

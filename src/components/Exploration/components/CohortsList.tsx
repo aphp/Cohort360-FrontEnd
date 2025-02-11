@@ -2,87 +2,38 @@
 import React, { useContext, useState } from 'react'
 import { AppConfig } from 'config'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { useAppSelector } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
+import { setSelectedRequestShare } from 'state/request'
 
-import { Box, Checkbox, CircularProgress, Grid, IconButton, TableRow, Tooltip } from '@mui/material'
-import ActionMenu from './ActionMenu'
-import Button from 'components/ui/Button'
-import FavStar from 'components/ui/FavStar'
+import { Grid, IconButton, Tooltip } from '@mui/material'
+import ActionBar from './ActionBar'
+import AddOrEditItem from './Modals/AddOrEditItem'
+import CohortsTableContent from './CohortsTableContent'
+import ConfirmDeletion from './Modals/ConfirmDeletion'
+import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 import LevelHeader from './LevelHeader'
-import ResearchesTable from './Table'
-import { TableCellWrapper } from 'components/ui/TableCell/styles'
-import StatusChip from './StatusChip'
+import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
 
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import Download from 'assets/icones/download.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
-import Picker from 'assets/icones/color-picker.svg?react'
-import RequestTree from 'assets/icones/schema.svg?react'
 import ShareIcon from '@mui/icons-material/Share'
-import UpdateIcon from '@mui/icons-material/Update'
 
 import useCohorts from '../hooks/useCohorts'
 import useCohortsWebSocket from '../hooks/useCohortsWebSocket'
+import useDeleteCohort from '../hooks/useDeleteCohort'
+import useDeleteRequests from '../hooks/useDeleteRequests'
 import useEditCohort from '../hooks/useEditCohort'
+import useEditRequest from '../hooks/useEditRequest'
 import useRequest from '../hooks/useRequest'
 
-import { Cohort, CohortJobStatus, Column, ValueSet } from 'types'
-import { CohortsType } from 'types/cohorts'
+import { Cohort, RequestType } from 'types'
 import { CohortsFilters, Direction, Order, OrderBy } from 'types/searchCriterias'
-import displayDigit from 'utils/displayDigit'
-import { formatDate } from 'utils/formatDate'
-import { getExportTooltip, getGlobalEstimation } from 'utils/explorationUtils'
-import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
-
-export const getCohortStatusChip = (status?: CohortJobStatus, jobFailMessage?: string) => {
-  if (jobFailMessage) {
-    return (
-      <Tooltip title={jobFailMessage}>
-        <StatusChip label="Erreur" status={'error'} />
-      </Tooltip>
-    )
-  }
-
-  switch (status) {
-    case CohortJobStatus.FINISHED:
-      return <StatusChip label="Terminé" status={'finished'} />
-    case CohortJobStatus.PENDING:
-    case CohortJobStatus.NEW:
-      return <StatusChip label="En cours" status={'in-progress'} />
-    case CohortJobStatus.LONG_PENDING:
-      return (
-        <Tooltip title="Cohorte volumineuse : sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.">
-          <StatusChip label="En cours" status={'in-progress'} icon={<UpdateIcon />} />
-        </Tooltip>
-      )
-    default:
-      return <StatusChip label="Erreur" status={'error'} />
-  }
-}
-
-export const getStatusFilter = (status?: string | null) => {
-  if (status) {
-    return status.split(',').map((status) => {
-      return { code: status }
-    }) as ValueSet[]
-  } else {
-    return []
-  }
-}
-
-export const getFavoriteFilters = (favoriteParam?: string | null) => {
-  if (favoriteParam === 'true') {
-    return CohortsType.FAVORITE
-  } else if (favoriteParam === 'false') {
-    return CohortsType.NOT_FAVORITE
-  } else {
-    return CohortsType.ALL
-  }
-}
+import { getFavoriteFilters, getRequestName, getStatusFilter } from 'utils/explorationUtils'
+import { addElementInArray, removeElementInArray } from 'utils/filters'
 
 const CohortsList = () => {
   const appConfig = useContext(AppConfig)
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { projectId, requestId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -99,9 +50,10 @@ const CohortsList = () => {
   const maxPatients = searchParams.get('maxPatients')
 
   const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
+  const requestState = useAppSelector((state) => state.request)
 
+  const { selectedRequestShare } = requestState
   const [deleteMode, setDeleteMode] = useState(false)
-  const [toggleModal, setToggleModal] = useState(false)
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
   const [filters, setFilters] = useState<CohortsFilters>({
     status: getStatusFilter(status),
@@ -114,26 +66,16 @@ const CohortsList = () => {
   })
   const [openEditionModal, setOpenEditionModal] = useState(false)
   const [openDeletionModal, setOpenDeletionModal] = useState(false)
-  const [selectedCohort, setSelectedCohort] = useState<Cohort | null>(null)
+  const [openExportModal, setOpenExportModal] = useState(false)
+  const [selectedCohorts, setSelectedCohorts] = useState<Cohort[]>([])
 
   const { request: parentRequest, requestLoading, requestIsError } = useRequest(requestId)
   const { cohortsList, total, loading } = useCohorts(order, searchInput, filters)
   useCohortsWebSocket()
+  const editRequestMutation = useEditRequest()
+  const deleteRequestMutation = useDeleteRequests()
   const editCohortMutation = useEditCohort()
-
-  const columns: Column[] = [
-    ...(deleteMode ? [{ label: <Checkbox /> }] : []),
-    { label: '', code: Order.FAVORITE, align: 'left' },
-    { label: 'nom de la cohorte', code: Order.NAME, align: 'left' },
-    { label: '', code: Order.FAVORITE, align: 'left' },
-    ...(!requestId ? [{ label: 'requête parent' }] : []), //TODO: cliquable ou pas?
-    // TODO: ajouter tri par requête parent?
-    { label: 'statut' },
-    { label: 'nb de patients', code: Order.RESULT_SIZE },
-    { label: 'estimation du nombre de patients ap-hp' },
-    { label: 'date de création', code: Order.CREATED_AT }
-    // { label: 'échantillons' }
-  ]
+  const deleteCohortMutation = useDeleteCohort()
 
   const handlePageChange = (newPage: number) => {
     searchParams.set('page', String(newPage))
@@ -155,25 +97,100 @@ const CohortsList = () => {
     setSearchParams(searchParams)
   }
 
+  const onCloseDeletionModal = () => {
+    setOpenDeletionModal(false)
+    setDeleteMode(false)
+    setSelectedCohorts([])
+  }
+
+  const onCloseEditionModal = () => {
+    setOpenEditionModal(false)
+    setSelectedCohorts([])
+  }
+
+  const onSubmitDeletion = () => {
+    deleteCohortMutation.mutate(selectedCohorts, { onSuccess: onCloseDeletionModal })
+  }
+
+  const onSubmitParentRequestDeletion = () => {
+    deleteRequestMutation.mutate([parentRequest as RequestType], {
+      onSuccess: () => {
+        onCloseDeletionModal()
+        navigate(`/researches/projects/${projectId}/`)
+      }
+    })
+  }
+
+  const onShareRequest = () => {
+    dispatch(setSelectedRequestShare({ uuid: requestId ?? '', name: '' }))
+  }
+
+  const onClickFav = (cohort: Cohort) => {
+    editCohortMutation.mutate(
+      { ...cohort, favorite: !cohort.favorite },
+      { onError: () => console.log('erreur lors de ledition') }
+    )
+    // TODO: gérer en cas d'erreur (state message réinstauré?)
+  }
+
+  const onClickExport = (cohort: Cohort) => {
+    setSelectedCohorts([cohort])
+    setOpenExportModal(true)
+  }
+
+  const onClickEdit = (cohort: Cohort) => {
+    setSelectedCohorts([cohort])
+    setOpenEditionModal(true)
+  }
+
+  const onClickDelete = (cohort: Cohort) => {
+    setDeleteMode(true)
+    setSelectedCohorts([cohort])
+  }
+
+  const toggleCohort = (cohort: Cohort) => {
+    if (!selectedCohorts.find((selectedCohort) => selectedCohort === cohort)) {
+      setSelectedCohorts(addElementInArray(selectedCohorts, cohort))
+    } else {
+      setSelectedCohorts(removeElementInArray(selectedCohorts, cohort))
+    }
+  }
+
+  const onSelectAll = () => {
+    if (selectedCohorts.length === cohortsList.length) {
+      setSelectedCohorts([])
+    } else if (selectedCohorts.length <= cohortsList.length) {
+      setSelectedCohorts(cohortsList)
+    }
+  }
+
+  if (requestIsError) {
+    return (
+      <Grid container justifyContent={'center'}>
+        Les détails de cette requête ne sont pas disponibles pour le moment.
+      </Grid>
+    )
+  }
+
   return (
     <Grid container gap="20px">
       {requestId && (
         <LevelHeader
           loading={requestLoading}
-          name={parentRequest?.name ?? ''}
+          name={getRequestName(parentRequest)}
           hideActions={!deleteMode}
           description={parentRequest?.description ?? ''}
           actions={
             <>
               <Tooltip title="Partager la requête">
-                <IconButton>
+                <IconButton onClick={() => onShareRequest()}>
                   <ShareIcon />
                 </IconButton>
               </Tooltip>
-              <IconButton>
+              <IconButton onClick={() => setOpenEditionModal(true)}>
                 <EditIcon />
               </IconButton>
-              <IconButton color="secondary">
+              <IconButton color="secondary" onClick={() => setOpenDeletionModal(true)}>
                 <DeleteOutlineIcon />
               </IconButton>
             </>
@@ -181,158 +198,85 @@ const CohortsList = () => {
         />
       )}
 
-      {loading ? (
-        <CircularProgress />
-      ) : (
-        <ResearchesTable
-          columns={columns}
-          page={page}
-          setPage={handlePageChange}
-          total={total}
-          order={order}
-          setOrder={(newOrder) => changeOrderBy(newOrder)}
-        >
-          {cohortsList.map((cohort: Cohort) => {
-            const isExportable = appConfig.features.export.enabled ? cohort?.rights?.export_csv_nomi : false
-
-            return (
-              <TableRow key={cohort.name} onClick={() => onClickRow(cohort)} style={{ cursor: 'pointer' }}>
-                {deleteMode && (
-                  <TableCellWrapper sx={{ width: deleteMode ? 50 : 0, overflow: 'hidden', transition: 'width 0.3s' }}>
-                    <Checkbox />
-                  </TableCellWrapper>
-                )}
-                <TableCellWrapper align="left" headCell>
-                  <IconButton
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      editCohortMutation.mutate(
-                        { ...cohort, favorite: !cohort.favorite },
-                        { onError: () => console.log('erreur lors de ledition') }
-                      )
-                      // TODO: gérer en cas d'erreur (state message réinstauré?)
-                    }}
-                    disabled={maintenanceIsActive}
-                  >
-                    <FavStar
-                      favorite={cohort.favorite}
-                      height={20}
-                      color={maintenanceIsActive ? '#CBCFCF' : undefined}
-                    />
-                  </IconButton>
-                </TableCellWrapper>
-                <TableCellWrapper align="left" headCell>
-                  {cohort.name}
-                </TableCellWrapper>
-                <TableCellWrapper>
-                  <Box display={'flex'} alignItems={'center'}>
-                    <Tooltip title={getExportTooltip(cohort, !!isExportable)}>
-                      <IconButton
-                        size="small"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          // setSelectedExportableCohort(row ?? undefined)
-                        }}
-                        disabled={
-                          !isExportable ||
-                          !cohort.exportable ||
-                          maintenanceIsActive ||
-                          cohort.request_job_status === CohortJobStatus.LONG_PENDING ||
-                          cohort.request_job_status === CohortJobStatus.FAILED ||
-                          cohort.request_job_status === CohortJobStatus.PENDING
-                        }
-                      >
-                        <Download
-                          fill={
-                            !isExportable ||
-                            !cohort.exportable ||
-                            maintenanceIsActive ||
-                            cohort.request_job_status === CohortJobStatus.LONG_PENDING ||
-                            cohort.request_job_status === CohortJobStatus.FAILED ||
-                            cohort.request_job_status === CohortJobStatus.PENDING
-                              ? '#CBCFCF'
-                              : 'black'
-                          }
-                        />
-                      </IconButton>
-                    </Tooltip>
-                    {/* <Tooltip title={'Créer un échantillon à partir de la cohorte'}>
-                      <IconButton
-                        size="small"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                        }}
-                        disabled={maintenanceIsActive}
-                      >
-                        <Picker stroke={maintenanceIsActive ? '#CBCFCF' : 'black'} />
-                      </IconButton>
-                    </Tooltip> */}
-                    <Tooltip title={'Accéder à la version de la requête ayant créé la cohorte'}>
-                      <IconButton
-                        size="small"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          navigate(`/cohort/new/${cohort.request}/${cohort.request_query_snapshot}`)
-                        }}
-                        disabled={maintenanceIsActive}
-                      >
-                        <RequestTree fill={maintenanceIsActive ? '#CBCFCF' : 'black'} />
-                      </IconButton>
-                    </Tooltip>
-                    <ActionMenu
-                      actions={[
-                        {
-                          key: 'edit',
-                          onclick: () => console.log('edit'),
-                          icon: <EditIcon />,
-                          label: 'Éditer'
-                        },
-                        {
-                          key: 'delete',
-                          onclick: () => setDeleteMode(true),
-                          icon: <DeleteOutlineIcon />,
-                          label: 'Supprimer'
-                        }
-                      ]}
-                    />
-                  </Box>
-                </TableCellWrapper>
-                {!requestId && <TableCellWrapper>{cohort.request?.name}</TableCellWrapper>}
-                <TableCellWrapper>
-                  {getCohortStatusChip(cohort.request_job_status, cohort.request_job_fail_msg)}
-                </TableCellWrapper>
-                <TableCellWrapper>{displayDigit(cohort.result_size)}</TableCellWrapper>
-                <TableCellWrapper>{getGlobalEstimation(cohort)}</TableCellWrapper>
-                <TableCellWrapper>{formatDate(cohort.created_at, true)}</TableCellWrapper>
-                {/* TODO: rendre non cliquable si pas d'enfant dispo */}
-                {/* <TableCellWrapper>
-                  <Button
-                    endIcon={<ArrowRightAltIcon />}
-                    clearVariant
-                    onClick={(event) => {
-                      event?.stopPropagation()
-                      if (projectId && requestId)
-                        navigate(`/researches/projects/${projectId}/${requestId}/${cohort.uuid}${location.search}`)
-                      if (!projectId && requestId)
-                        navigate(`/researches/requests/${requestId}/${cohort.uuid}${location.search}`)
-                      if (!projectId && !requestId) navigate(`/researches/cohorts/${cohort.uuid}${location.search}`)
-                    }}
-                  >
-                    0 échantillon
-                  </Button>
-                </TableCellWrapper> */}
-              </TableRow>
-            )
-          })}
-        </ResearchesTable>
-      )}
+      <ActionBar
+        deleteMode={deleteMode}
+        loading={loading}
+        total={total}
+        label="cohorte"
+        totalSelected={selectedCohorts.length}
+        onConfirmDeletion={() => setOpenDeletionModal(true)}
+        onCancelDeletion={() => {
+          setDeleteMode(false)
+          setSelectedCohorts([])
+        }}
+        filters
+      />
+      <CohortsTableContent
+        cohortsList={cohortsList}
+        deleteMode={deleteMode}
+        page={page}
+        setPage={handlePageChange}
+        total={total}
+        order={order}
+        onChangeOrderBy={changeOrderBy}
+        loading={loading}
+        disabled={maintenanceIsActive}
+        selectedCohorts={selectedCohorts}
+        onSelectAll={onSelectAll}
+        cohortsCallbacks={{
+          onClickRow,
+          onClickFav,
+          onClickExport,
+          onClickDelete,
+          onClickEdit,
+          onSelectCohort: toggleCohort
+        }}
+      />
 
       {!!appConfig.features.export.enabled && (
         <ExportModal
-          cohortId={selectedCohort?.uuid ?? ''}
-          open={!!selectedCohort}
-          handleClose={() => setSelectedCohort(null)}
-          fhirGroupId={selectedCohort?.group_id ?? ''}
+          cohortId={selectedCohorts?.[0]?.uuid ?? ''}
+          open={openExportModal}
+          handleClose={() => setOpenExportModal(false)}
+          fhirGroupId={selectedCohorts?.[0]?.group_id ?? ''}
+        />
+      )}
+      <AddOrEditItem
+        open={openEditionModal}
+        selectedItem={selectedCohorts?.[0]}
+        onClose={onCloseEditionModal}
+        onUpdate={(cohort) => editCohortMutation.mutate(cohort, { onSuccess: onCloseEditionModal })}
+        titleEdit="Modifier la cohorte"
+      />
+      <AddOrEditItem
+        open={openEditionModal}
+        selectedItem={parentRequest ?? {}}
+        onClose={onCloseEditionModal}
+        onUpdate={(request) => editRequestMutation.mutate(request as RequestType, { onSuccess: onCloseEditionModal })}
+        titleEdit="Modifier la requête"
+      />
+      <ConfirmDeletion
+        open={openDeletionModal}
+        onClose={() => setOpenDeletionModal(false)}
+        onSubmit={deleteMode ? onSubmitDeletion : onSubmitParentRequestDeletion}
+        title={
+          deleteMode
+            ? `Supprimer ${selectedCohorts.length <= 1 ? 'une cohorte' : 'des cohortes'}`
+            : 'Supprimer la requête'
+        }
+        message={
+          deleteMode
+            ? `Êtes-vous sûr(e) de vouloir supprimer ${
+                selectedCohorts.length <= 1 ? 'cette cohorte' : 'ces cohortes'
+              } ?`
+            : 'Êtes-vous sûr(e) de vouloir supprimer cette requête ? Sa suppression entraînera également celle des cohortes sous-jacentes.'
+        }
+        // TODO: plus tard, ajouter au message de confirmation le warning pour les échantillons
+      />
+      {selectedRequestShare !== null && (
+        <ModalShareRequest
+          // parentStateSetter={wrapperSetShareSuccessOrFailMessage}
+          onClose={() => dispatch(setSelectedRequestShare(null))}
         />
       )}
     </Grid>

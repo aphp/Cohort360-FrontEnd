@@ -1,5 +1,6 @@
-import { Cohort, CohortJobStatus, QuerySnapshotInfo, RequestType } from 'types'
+import { Cohort, CohortJobStatus, QuerySnapshotInfo, RequestType, ValueSet } from 'types'
 import displayDigit from './displayDigit'
+import { CohortsType } from 'types/cohorts'
 
 export const getPathDepth = (pathname: string) => {
   return pathname.split('/').filter(Boolean).length
@@ -35,7 +36,28 @@ export const getCohortTotal = (requestSnapshots?: QuerySnapshotInfo[]) => {
   return snapshotsWithLinkedCohorts.reduce((sum, a) => sum + a, 0)
 }
 
-export const getRequestName = (request: RequestType) => {
+export const getRequestName = (request?: RequestType | null) => {
+  if (!request) return 'N/A'
   const sharedByDetails = request.shared_by ? ` - Envoyée par : ${request.shared_by}` : ''
   return `${request.name}${sharedByDetails}`
+}
+
+export const getStatusFilter = (status?: string | null) => {
+  if (status) {
+    return status.split(',').map((status) => {
+      return { code: status }
+    }) as ValueSet[]
+  } else {
+    return []
+  }
+}
+
+export const getFavoriteFilters = (favoriteParam?: string | null) => {
+  if (favoriteParam === 'true') {
+    return CohortsType.FAVORITE
+  } else if (favoriteParam === 'false') {
+    return CohortsType.NOT_FAVORITE
+  } else {
+    return CohortsType.ALL
+  }
 }

@@ -32,23 +32,23 @@ import EditIcon from '@mui/icons-material/Edit'
 import ExportIcon from '@mui/icons-material/GetApp'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 
-import ModalEditCohort from 'components/Requests/Modals/ModalEditCohort/ModalEditCohort'
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
+import FavStar from 'components/ui/FavStar'
+import { getCohortStatusChip } from 'components/Exploration/components/CohortsTableContent'
+import ModalEditCohort from 'components/Requests/Modals/ModalEditCohort/ModalEditCohort'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { deleteCohort, editCohort, setSelectedCohort as setSelectedCohortState } from 'state/cohort'
 
 import { Cohort, CohortJobStatus } from 'types'
 
+import useCohortsWebSocket from 'components/Exploration/hooks/useCohortsWebSocket'
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from './styles'
 import { Direction, Order, OrderBy } from 'types/searchCriterias'
 import { AppConfig } from 'config'
-import { getCohortStatusChip } from 'components/Exploration/components/CohortsList'
-import FavStar from 'components/ui/FavStar'
 import { formatDate } from 'utils/formatDate'
-import useCohortsWebSocket from 'components/Exploration/hooks/useCohortsWebSocket'
 import { getExportTooltip, getGlobalEstimation } from 'utils/explorationUtils'
 
 type ResearchTableProps = {

@@ -86,6 +86,7 @@ export interface IServiceProjects {
    *   - results: Liste de requete récupéré
    */
   fetchRequestsList: (
+    orderBy: OrderBy,
     parentId?: string,
     searchInput?: string,
     startDate?: string,
@@ -227,7 +228,7 @@ export interface IServiceProjects {
    * Retourne:
    *   - Cohorte supprimée
    */
-  deleteCohort: (deletedCohort: Cohort) => Promise<Cohort>
+  deleteCohorts: (deletedCohorts: Cohort[]) => Promise<Cohort>
 }
 
 const servicesProjects: IServiceProjects = {
@@ -314,34 +315,28 @@ const servicesProjects: IServiceProjects = {
     }
   },
 
-  fetchRequestsList: async (parentId, searchInput, startDate, endDate, limit, offset) => {
-    // TODO: temp, à clean
-    let search = `?`
-    if (limit) {
-      search += `limit=${limit}`
-    }
-    if (offset) {
-      search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
-    }
-    if (!parentId && searchInput !== '') {
-      search += `&search=${searchInput}`
-    }
-    if (!parentId && startDate) {
-      search += `&min_updated_at=${startDate}`
-    }
-    if (!parentId && endDate) {
-      search += `&max_updated_at=${endDate}`
-    }
-    if (parentId) {
-      search += `&parent_folder=${parentId}`
-    }
+  fetchRequestsList: async (orderBy, parentId, searchInput, startDate, endDate, limit, offset) => {
+    const _sortDirection = orderBy.orderDirection === Direction.DESC ? '-' : ''
+    const optionsReducer = (accumulator: string, currentValue: string) =>
+      accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
 
+    let options: string[] = []
+
+    // TODO: temp, à clean
+    if (limit) options = [...options, `limit=${limit}`]
+    if (offset) options = [...options, `offset=${offset}`]
+    if (orderBy) options = [...options, `order=${_sortDirection}${orderBy.orderBy}`]
+    if (!parentId && searchInput !== '') options = [...options, `search=${searchInput}`]
+    if (!parentId && startDate) options = [...options, `min_updated_at=${startDate}`]
+    if (!parentId && endDate) options = [...options, `max_updated_at=${endDate}`]
+    if (parentId) options = [...options, `parent_folder=${parentId}`]
+    // TODO: quand même, on peut clean ça non? attention aux autres appels
     const fetchRequestsListResponse = (await apiBack.get<{
       count: number
       next: string | null
       previous: string | null
       results: RequestType[]
-    }>(`/cohort/requests/${search}`)) ?? { status: 400 }
+    }>(`/cohort/requests/?${options.reduce(optionsReducer)}`)) ?? { status: 400 }
 
     if (fetchRequestsListResponse.status === 200) {
       return fetchRequestsListResponse.data
@@ -436,18 +431,16 @@ const servicesProjects: IServiceProjects = {
   },
 
   deleteRequests: async (deletedRequests) => {
-    const deleteRequestsResponse = await Promise.all(
-      deletedRequests.map(
-        (deletedRequest) =>
-          new Promise((resolve) => {
-            resolve(apiBack.delete(`/cohort/requests/${deletedRequest.uuid}/`))
-          })
-      )
-    )
+    const requestsIds = deletedRequests.map((request) => request.uuid).join()
+    const deleteRequestsResponse = (await apiBack.delete(`/cohort/requests/${requestsIds}/`)) ?? {
+      status: 400
+    }
 
-    // @ts-ignore
-    const checkResponse = deleteRequestsResponse.filter(({ status }) => status === 204)
-    return checkResponse.length === deletedRequests.length ? deletedRequests : []
+    if (deleteRequestsResponse.status === 204) {
+      return deleteRequestsResponse.data as RequestType
+    } else {
+      throw new Error('Impossible de supprimer la liste de patients')
+    }
   },
 
   fetchCohortsList: async (filters, searchInput, orderBy, limit, offset, signal) => {
@@ -511,8 +504,9 @@ const servicesProjects: IServiceProjects = {
       throw new Error('Impossible de modifier la liste de patients')
     }
   },
-  deleteCohort: async (deletedCohort) => {
-    const deleteCohortResponse = (await apiBack.delete(`/cohort/cohorts/${deletedCohort.uuid}/`)) ?? {
+  deleteCohorts: async (deletedCohorts) => {
+    const cohortsIds = deletedCohorts.map((cohort) => cohort.uuid).join()
+    const deleteCohortResponse = (await apiBack.delete(`/cohort/cohorts/${cohortsIds}/`)) ?? {
       status: 400
     }
 

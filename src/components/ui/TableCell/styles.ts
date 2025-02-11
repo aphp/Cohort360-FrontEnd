@@ -7,6 +7,7 @@ type CustomProps = {
 
 export const TableCellWrapper = styled(TableCell)<CustomProps>(({ align = 'center', headCell = false }) => ({
   textAlign: align,
+  lineHeight: '1rem',
   [`&.${tableCellClasses.head}`]: {
     borderBottom: 0,
     // TODO: ajouter pour head et body des variants pour exploration et les autres (quoi que Alizé a fait son composant générique??)

@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 
-import { Box, CircularProgress, Grid, Typography } from '@mui/material'
+import { Box, Grid, Skeleton, Typography } from '@mui/material'
 
 type LevelHeaderProps = {
   loading: boolean
@@ -17,7 +17,16 @@ const LevelHeader = ({ loading, name, hideActions, description, actions }: Level
         <Box display={'flex'} flexDirection={'column'} justifyContent={'center'} width={'100%'} alignItems={'center'}>
           <Box width="100%" display={'flex'} justifyContent={'center'} alignItems={'center'} gap={'8px'}>
             {loading ? (
-              <CircularProgress />
+              <Box
+                display="flex"
+                width={'100%'}
+                justifyContent={'center'}
+                flexDirection={'column'}
+                alignItems={'center'}
+              >
+                <Skeleton variant="text" sx={{ fontSize: '2rem' }} width={'25%'} />
+                <Skeleton variant="text" sx={{ fontSize: '2rem' }} width={'80%'} />
+              </Box>
             ) : (
               <>
                 <Typography fontWeight={'bold'} fontSize={'24px'} fontFamily={"'Montserrat', sans-serif"}>

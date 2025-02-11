@@ -3,13 +3,16 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAppSelector } from 'state'
 
 import { Box, CircularProgress, Grid, Typography } from '@mui/material'
-import AddOrEditProject from './Modals/AddOrEditProject'
+import AddOrEditItem from './Modals/AddOrEditItem'
 import Button from 'components/ui/Button'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
 import ProjectCard from 'components/ui/ProjectCard'
 import Select from 'components/ui/Searchbar/Select'
 import AddIcon from '@mui/icons-material/Add'
 
+import useCreateProject from '../hooks/useCreateProject'
+import useDeleteProject from '../hooks/useDeleteProject'
+import useEditProject from '../hooks/useEditProject'
 import useProjects from '../hooks/useProjects'
 
 import { ProjectType } from 'types'
@@ -31,6 +34,9 @@ const ProjectsList = () => {
   const [selectedProject, setSelectedProject] = useState<ProjectType | null>(null)
 
   const { projectsList, total, loading } = useProjects({ startDate, endDate }, searchInput, { orderBy, orderDirection })
+  const createProjectMutation = useCreateProject()
+  const deleteProjectMutation = useDeleteProject()
+  const editProjectMutation = useEditProject()
 
   const orderByProjects = [
     {
@@ -71,6 +77,16 @@ const ProjectsList = () => {
     searchParams.set('orderBy', findOrder.orderBy)
     searchParams.set('direction', findOrder.direction)
     setSearchParams(searchParams)
+  }
+
+  const onCloseDeletionModal = () => {
+    setOpenDeletionModal(false)
+    setSelectedProject(null)
+  }
+
+  const onCloseEditionModal = () => {
+    setSelectedProject(null)
+    setOpenEditionModal(false)
   }
 
   return (
@@ -118,21 +134,28 @@ const ProjectsList = () => {
         )}
       </Grid>
 
-      <AddOrEditProject
-        open={openEditionModal}
-        selectedProject={selectedProject}
-        onClose={() => {
-          setSelectedProject(null)
-          setOpenEditionModal(false)
-        }}
+      <AddOrEditItem
+        open={openDeletionModal}
+        onClose={onCloseDeletionModal}
+        selectedItem={selectedProject}
+        onCreate={(projectData) =>
+          editProjectMutation.mutate(projectData as ProjectType, { onSuccess: onCloseEditionModal })
+        }
+        onUpdate={(projectData) =>
+          createProjectMutation.mutate(projectData as Omit<ProjectType, 'uuid'>, { onSuccess: onCloseEditionModal })
+        }
+        titleEdit="Éditer un projet de recherche"
+        titleCreate="Créer un projet de recherche"
       />
       <ConfirmDeletion
         open={openDeletionModal}
-        selectedProject={selectedProject}
-        onClose={() => {
-          setOpenDeletionModal(false)
-          setSelectedProject(null)
+        onClose={onCloseDeletionModal}
+        onSubmit={() => {
+          deleteProjectMutation.mutate(selectedProject as ProjectType, { onSuccess: onCloseDeletionModal })
         }}
+        title="Supprimer un projet de recherche"
+        message="Êtes-vous sûr(e) de vouloir supprimer ce projet? Sa suppression entraînera également celle des requêtes,
+          cohortes et échantillons sous-jacents."
       />
     </Grid>
   )

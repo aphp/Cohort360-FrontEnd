@@ -173,7 +173,7 @@ const MyResearches = () => {
       {/* TODO: ui qui bug lorsque tab trop long, à checker */}
       <Grid container bgcolor={'#FFF'} height="100vh" justifyContent={'center'}>
         <Grid key={location.pathname} container xs={11} style={{ padding: '20px 0' }} gap={'20px'} direction={'column'}>
-          <Breadcrumb />
+          {selectedTab?.id !== 'cohorts' && <Breadcrumb />}
           <Slide direction={direction} in={true} mountOnEnter unmountOnExit appear timeout={300}>
             <Grid container key={location.pathname}>
               <Outlet />

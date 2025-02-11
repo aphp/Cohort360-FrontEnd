@@ -2,16 +2,15 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import services from 'services/aphp'
 import { Cohort } from 'types'
 
-const useEditCohort = () => {
+const useDeleteCohort = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (newCohortData: Cohort) => await services.projects.editCohort(newCohortData),
+    mutationFn: async (cohorts: Cohort[]) => await services.projects.deleteCohort(cohorts),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cohorts'] })
-      queryClient.invalidateQueries({ queryKey: ['cohort'] })
     }
   })
 }
 
-export default useEditCohort
+export default useDeleteCohort

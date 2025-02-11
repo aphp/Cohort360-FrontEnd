@@ -9,6 +9,7 @@ const useEditProject = () => {
     mutationFn: async (newProjectData: ProjectType) => await services.projects.editProject(newProjectData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })
+      queryClient.invalidateQueries({ queryKey: ['project'] })
     }
   })
 }

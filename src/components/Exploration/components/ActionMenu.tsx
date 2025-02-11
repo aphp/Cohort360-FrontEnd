@@ -43,6 +43,7 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ actions }) => {
             onClick={(event) => {
               event.stopPropagation()
               action.onclick()
+              setAnchorEl(null)
             }}
             key={action.key}
           >

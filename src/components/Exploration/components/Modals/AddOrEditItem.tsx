@@ -2,59 +2,58 @@ import React, { useEffect, useState } from 'react'
 
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from '@mui/material'
 
-import { ProjectType } from 'types'
-import useCreateProject from 'components/Exploration/hooks/useCreateProject'
-import useEditProject from 'components/Exploration/hooks/useEditProject'
+import { Cohort, ProjectType, RequestType } from 'types'
 
-const AddOrEditProject: React.FC<{
+const AddOrEditItem: React.FC<{
   open: boolean
-  selectedProject: ProjectType | null
+  selectedItem: ProjectType | RequestType | Cohort | null
+  onCreate?: (data: Omit<ProjectType | RequestType | Cohort, 'uuid'>) => void
+  onUpdate: (data: ProjectType | RequestType | Cohort) => void
+  titleCreate?: string
+  titleEdit: string
   onClose: () => void
-}> = ({ open, selectedProject, onClose }) => {
-  const createProjectMutation = useCreateProject()
-  const editProjectMutation = useEditProject()
-
-  const [name, setName] = useState(selectedProject?.name)
-  const [description, setDescription] = useState(selectedProject?.description)
+}> = ({ open, selectedItem, onCreate, onUpdate, titleCreate, titleEdit, onClose }) => {
+  const [name, setName] = useState(selectedItem?.name)
+  const [description, setDescription] = useState(selectedItem?.description)
   const [error, setError] = useState(false)
 
-  const isEdition = selectedProject
+  const isEdition = selectedItem
 
   const handleSubmit = () => {
     if (!name || (name && name.length > 255)) {
       return setError(true)
     }
 
-    const projectData: ProjectType | Omit<ProjectType, 'uuid'> = {
-      ...(isEdition && { uuid: selectedProject.uuid }),
+    const itemData: ProjectType | Omit<ProjectType, 'uuid'> = {
+      ...(isEdition && { uuid: selectedItem.uuid }),
       name,
       description
     }
     if (isEdition) {
-      editProjectMutation.mutate(projectData as ProjectType, { onSuccess: onClose })
+      onUpdate(itemData)
     } else {
-      createProjectMutation.mutate(projectData, { onSuccess: onClose })
+      onCreate && onCreate(itemData)
     }
     // TODO: gérer les onError
   }
 
   useEffect(() => {
     if (open) {
-      setName(selectedProject?.name ?? '')
-      setDescription(selectedProject?.description ?? '')
+      setName(selectedItem?.name ?? '')
+      setDescription(selectedItem?.description ?? '')
       setError(false)
     }
-  }, [open, selectedProject])
+  }, [open, selectedItem])
 
   return (
     <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose} aria-labelledby="form-dialog-title">
-      <DialogTitle>{isEdition ? 'Modifier ' : 'Créer '} un projet de recherche</DialogTitle>
+      <DialogTitle>{isEdition ? titleEdit : titleCreate}</DialogTitle>
 
       <DialogContent>
         <Grid container direction="column">
-          <Typography variant="h3">Nom du projet :</Typography>
+          <Typography variant="h3">Nom :</Typography>
           <TextField
-            placeholder="Nom du projet"
+            placeholder="Nom"
             value={name}
             onChange={(e) => setName(e.target.value)}
             autoFocus
@@ -65,15 +64,15 @@ const AddOrEditProject: React.FC<{
             helperText={
               error
                 ? name?.length === 0
-                  ? 'Le nom du projet doit comporter au moins un caractère.'
+                  ? 'Le nom doit comporter au moins un caractère.'
                   : 'Le nom est trop long (255 caractères max.)'
                 : ''
             }
           />
 
-          <Typography variant="h3">Description du projet :</Typography>
+          <Typography variant="h3">Description :</Typography>
           <TextField
-            placeholder="Description du projet"
+            placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             id="description"
@@ -99,4 +98,4 @@ const AddOrEditProject: React.FC<{
   )
 }
 
-export default AddOrEditProject
+export default AddOrEditItem
