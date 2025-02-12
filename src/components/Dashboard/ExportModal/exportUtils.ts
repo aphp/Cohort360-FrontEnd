@@ -365,8 +365,8 @@ export const fetchAllResourcesCount = async (cohortId: string) => {
       observationCount,
       imagingCount,
       encounterVisitCount,
-      encounterDetailsCounts,
-      questionnaireResponseCount
+      encounterDetailsCounts
+      // questionnaireResponseCount
     ] = await Promise.all([
       fetchPatientCount(cohortId),
       fetchConditionCount(cohortId),
@@ -378,8 +378,8 @@ export const fetchAllResourcesCount = async (cohortId: string) => {
       fetchObservationCount(cohortId),
       fetchImagingCount(cohortId),
       fetchEncounterCount(cohortId, true),
-      fetchEncounterCount(cohortId),
-      fetchQuestionnaireCount(cohortId)
+      fetchEncounterCount(cohortId)
+      // fetchQuestionnaireCount(cohortId)
     ])
 
     return {
@@ -393,8 +393,8 @@ export const fetchAllResourcesCount = async (cohortId: string) => {
       observationCount,
       imagingCount,
       encounterVisitCount,
-      encounterDetailsCounts,
-      questionnaireResponseCount
+      encounterDetailsCounts
+      // questionnaireResponseCount
     }
   } catch (error) {
     console.error('Erreur lors de fetchQuestionnaireCount', error)
@@ -422,19 +422,7 @@ export const fetchResourceCount = async (cohortId: string, table: ExportCSVTable
       [ResourceType.IMAGING]: fetchImagingCount
     }
 
-    const fetcher =
-      fetchers[
-        resourceType as
-          | ResourceType.PATIENT
-          | ResourceType.CONDITION
-          | ResourceType.PROCEDURE
-          | ResourceType.CLAIM
-          | ResourceType.DOCUMENTS
-          | ResourceType.MEDICATION_REQUEST
-          | ResourceType.MEDICATION_ADMINISTRATION
-          | ResourceType.OBSERVATION
-          | ResourceType.IMAGING
-      ]
+    const fetcher = fetchers[resourceType as keyof typeof fetchers]
 
     return (await fetcher(cohortId, filters)) ?? 0
   } catch (error) {
@@ -457,4 +445,77 @@ export const getRightCount = (counts: Counts, tableResourceType: ResourcesWithEx
   }
 
   return countMapping[tableResourceType] ?? 0
+}
+
+export const fetchResourceCount2 = async (cohortId: string, resourceType: ResourceType, fhirFilter?: any) => {
+  try {
+    const filters = await mapRequestParamsToSearchCriteria(fhirFilter?.filter ?? '', resourceType)
+    const fetchers = {
+      [ResourceType.PATIENT]: fetchPatientCount,
+      [ResourceType.CONDITION]: fetchConditionCount,
+      [ResourceType.PROCEDURE]: fetchProcedureCount,
+      [ResourceType.CLAIM]: fetchClaimCount,
+      [ResourceType.DOCUMENTS]: fetchDocumentsCount,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      [ResourceType.MEDICATION_REQUEST]: (cohortId: string, filters: any) =>
+        fetchMedicationCount(cohortId, ResourceType.MEDICATION_REQUEST, filters),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      [ResourceType.MEDICATION_ADMINISTRATION]: (cohortId: string, filters: any) =>
+        fetchMedicationCount(cohortId, ResourceType.MEDICATION_ADMINISTRATION, filters),
+      [ResourceType.OBSERVATION]: fetchObservationCount,
+      [ResourceType.IMAGING]: fetchImagingCount
+    }
+
+    const fetcher = fetchers[resourceType as keyof typeof fetchers]
+
+    return (await fetcher(cohortId, filters)) ?? 0
+  } catch (error) {
+    console.error('Erreur lors du fetch du count de la ressource', error)
+    throw error
+  }
+}
+
+export const getResourceType = (tableName: string): ResourceType => {
+  const resourceType = {
+    imaging_study: ResourceType.IMAGING,
+    drug_exposure_administration: ResourceType.MEDICATION_ADMINISTRATION,
+    measurement: ResourceType.OBSERVATION,
+    imaging_series: ResourceType.UNKNOWN,
+    condition_occurrence: ResourceType.CONDITION,
+    iris: ResourceType.UNKNOWN,
+    visit_detail: ResourceType.UNKNOWN,
+    person: ResourceType.PATIENT,
+    note: ResourceType.DOCUMENTS,
+    fact_relationship: ResourceType.UNKNOWN,
+    care_site: ResourceType.UNKNOWN,
+    visit_occurrence: ResourceType.UNKNOWN,
+    cost: ResourceType.CLAIM,
+    procedure_occurrence: ResourceType.PROCEDURE,
+    drug_exposure_prescription: ResourceType.MEDICATION_REQUEST,
+    questionnaireresponse: ResourceType.UNKNOWN
+  }[tableName]
+
+  return resourceType ?? ResourceType.UNKNOWN
+}
+
+export const getExportTableLabel = (tableName: string) => {
+  const tableLabel = {
+    imaging_study: 'Fait - Imagerie - Étude',
+    drug_exposure_administration: 'Fait - Médicaments - Administration',
+    measurement: 'Fait - Biologie',
+    imaging_series: 'Fait - Imagerie - Séries',
+    condition_occurrence: 'Fait - PMSI - Diagnostics',
+    care_site: 'Structure hospitalière',
+    iris: 'Zone géographique',
+    visit_detail: 'Détail de prise en charge',
+    person: 'Patient',
+    note: 'Fait - Documents cliniques',
+    fact_relationship: 'Référentiel',
+    visit_occurrence: 'Prise en charge',
+    cost: 'Fait - PMSI - GHM',
+    procedure_occurrence: 'Fait - PMSI - Actes',
+    drug_exposure_prescription: 'Fait - Médicaments - Prescription',
+    QuestionnaireResponse: 'Formulaires'
+  }[tableName]
+  return tableLabel ?? '-'
 }

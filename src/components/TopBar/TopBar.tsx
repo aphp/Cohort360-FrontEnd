@@ -45,6 +45,7 @@ import displayDigit from 'utils/displayDigit'
 
 import useStyles from './styles'
 import { AppConfig } from 'config'
+import { Cohort } from 'types'
 
 type TopBarProps = {
   context: 'patients' | 'cohort' | 'perimeters' | 'patient_info'
@@ -157,6 +158,14 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   const handleConfirmDeletion = () => {
     dispatch(deleteCohort({ deletedCohort: dashboard }))
     navigate('/home')
+  }
+
+  const goToExportPage = (cohortID: string) => {
+    const searchParams = new URLSearchParams()
+    if (cohortID) {
+      searchParams.set('groupId', cohortID)
+    }
+    navigate(`/exports/new?${searchParams}`)
   }
 
   return (
@@ -296,8 +305,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                   {!!appConfig.features.export.enabled && dashboard.canMakeExport && (
                     <MenuItem
                       onClick={() => {
-                        setAnchorEl(null)
-                        setOpenModal('export')
+                        goToExportPage(dashboard.cohortId ?? '')
                       }}
                     >
                       Exporter
