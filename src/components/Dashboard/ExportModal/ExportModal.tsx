@@ -695,12 +695,14 @@ const ExportTable: React.FC<ExportTableProps> = ({
               renderOption={(props, option) => <li {...props}>{option.name}</li>}
               renderInput={(params) => <TextField {...params} label="Sélectionnez un filtre" />}
               value={exportTable.fhir_filter}
-              onChange={(_, value) => _onChangeValue(value)}
+              onChange={(_, value) => {
+                _onChangeValue(value)
+              }}
             />
           </Grid>
         </Grid>
       )}
-      <Grid item container alignItems="center" justifyContent="space-between" display="none">
+      {/* <Grid item container alignItems="center" justifyContent="space-between" display="none">
         <Grid item xs={5}>
           <Typography className={classes.textBody2}>
             Filtrer cette table en respectant les contraintes relationnelles avec les autres tables sélectionnées:
@@ -722,7 +724,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
             </Grid>
           </RadioGroup>
         </Grid>
-      </Grid>
+      </Grid> */}
       {exportTable.checked &&
         exportTable.count > (exportTable.resourceType === ResourceType.DOCUMENTS ? 5000 : exportLinesLimit) && (
           <Typography color={'red'} fontWeight={'bold'} fontSize={12}>

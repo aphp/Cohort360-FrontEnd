@@ -114,6 +114,14 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
     navigate(`/cohort?${searchParams.toString()}`)
   }
 
+  const goToExportPage = (row: Cohort) => {
+    const searchParams = new URLSearchParams()
+    if (row.group_id) {
+      searchParams.set('groupId', row.group_id)
+    }
+    navigate(`/exports/new?${searchParams.toString()}`)
+  }
+
   const handleClickOpenDialog = () => {
     setOpenDialog(true)
   }
@@ -365,7 +373,8 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                   size="small"
                                   onClick={(event) => {
                                     event.stopPropagation()
-                                    setSelectedExportableCohort(row ?? undefined)
+                                    goToExportPage(row)
+                                    // setSelectedExportableCohort(row ?? undefined)
                                   }}
                                   disabled={
                                     !canExportThisCohort ||
@@ -438,8 +447,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                               className={classes.menuItem}
                               onClick={(event) => {
                                 event.stopPropagation()
-                                setSelectedExportableCohort(row ?? undefined)
-                                setAnchorEl(null)
+                                goToExportPage(row)
+                                // setSelectedExportableCohort(row ?? undefined)
+                                // setAnchorEl(null)
                               }}
                               disabled={maintenanceIsActive}
                             >
