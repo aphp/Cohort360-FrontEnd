@@ -33,6 +33,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 
   const actions = [
     {
+      key: 'edit',
       icon: <EditIcon />,
       label: 'Éditer',
       onclick: () => onedit(),
@@ -40,6 +41,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       disabled: disabled
     },
     {
+      key: 'delete',
       icon: <DeleteOutlineIcon />,
       label: 'Supprimer',
       onclick: () => ondelete(),

@@ -42,17 +42,9 @@ const Welcome = () => {
     dispatch(fetchRequests())
   }, [])
 
-  const { cohortsList, loading } = useCohorts('', '', undefined, undefined, CohortsType.FAVORITE, 1, 5)
-  const { cohortsList: favCohorts, loading: favloading } = useCohorts(
-    '',
-    '',
-    undefined,
-    undefined,
-    CohortsType.ALL,
-    1,
-    5
-  )
-  const { requestsList, loading: requestsloading } = useRequests(undefined, '', undefined, undefined, 5)
+  const { cohortsList, loading } = useCohorts({ filters: { favorite: CohortsType.FAVORITE }, rowsPerPage: 5 })
+  const { cohortsList: favCohorts, loading: favloading } = useCohorts({ rowsPerPage: 5 })
+  const { requestsList, loading: requestsloading } = useRequests({ rowsPerPage: 5 })
 
   return practitioner ? (
     <Grid
@@ -172,7 +164,7 @@ const Welcome = () => {
                 title={'Mes cohortes favorites'}
                 linkLabel={'Voir toutes mes cohortes favorites'}
                 // TODO: ajouter filtre sur les favorites dans l'url
-                onClickLink={() => navigate('/researches/cohorts')}
+                onClickLink={() => navigate(`/researches/cohorts/?favorite=${CohortsType.FAVORITE}`)}
               >
                 <CohortsTable data={favCohorts} loading={favloading} onUpdate={() => console.log('ciao')} />
               </PreviewCard>

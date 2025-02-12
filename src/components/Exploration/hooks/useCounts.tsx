@@ -22,7 +22,7 @@ const useCounts = (searchInput: string, startDate: string | null, endDate: strin
       {
         queryKey: ['requestsCount', searchInput, startDate, endDate],
         queryFn: async () => {
-          const res = await services.projects.fetchRequestsList('', searchInput, startDate, endDate, 0)
+          const res = await services.projects.fetchRequestsList({ searchInput, startDate, endDate, limit: 0 })
           return res.count ?? 0
         },
         enabled: !!(searchInput || startDate || endDate)
@@ -30,8 +30,8 @@ const useCounts = (searchInput: string, startDate: string | null, endDate: strin
       {
         queryKey: ['cohortsCount', searchInput, startDate, endDate],
         queryFn: async () => {
-          const res = await services.projects.fetchCohortsList(
-            {
+          const res = await services.projects.fetchCohortsList({
+            filters: {
               startDate: startDate ?? null,
               endDate: endDate ?? null,
               status: [],
@@ -40,9 +40,9 @@ const useCounts = (searchInput: string, startDate: string | null, endDate: strin
               maxPatients: null
             },
             searchInput,
-            { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
-            0
-          )
+            orderBy: { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
+            limit: 0
+          })
           return res.count ?? 0
         },
         enabled: !!(searchInput || startDate || endDate)

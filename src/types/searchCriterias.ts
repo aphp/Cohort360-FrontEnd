@@ -318,12 +318,12 @@ export type DocumentsFilters = GenericFilter & {
   onlyPdfAvailable: boolean
 }
 export interface CohortsFilters {
-  status: ValueSet[]
-  favorite: CohortsType
-  minPatients: null | string
-  maxPatients: null | string
-  startDate: null | string
-  endDate: null | string
+  status?: ValueSet[]
+  favorite?: CohortsType
+  minPatients?: null | string
+  maxPatients?: null | string
+  startDate?: null | string
+  endDate?: null | string
   parentId?: string
 }
 

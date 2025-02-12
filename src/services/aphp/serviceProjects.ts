@@ -4,8 +4,27 @@ import apiBack from '../apiBackend'
 import { ProjectType, RequestType, Cohort, User } from 'types'
 
 import servicesCohorts from './serviceCohorts'
-import { CohortsFilters, Direction, OrderBy, ProjectsFilters } from 'types/searchCriterias'
+import { CohortsFilters, Direction, Order, OrderBy, ProjectsFilters } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
+
+type FetchCohortsListProps = {
+  filters: CohortsFilters
+  searchInput?: string
+  orderBy: OrderBy
+  limit?: number
+  offset?: number
+  signal?: AbortSignal
+}
+
+type FetchRequestsListProps = {
+  orderBy?: OrderBy
+  parentId?: string
+  searchInput?: string
+  startDate?: string | null
+  endDate?: string | null
+  limit?: number
+  offset?: number
+}
 
 export interface IServiceProjects {
   fetchProject: (projectId: string) => Promise<ProjectType>
@@ -85,15 +104,7 @@ export interface IServiceProjects {
    *   - previous: URL d'appel pour récupérer les requete précédent
    *   - results: Liste de requete récupéré
    */
-  fetchRequestsList: (
-    orderBy: OrderBy,
-    parentId?: string,
-    searchInput?: string,
-    startDate?: string,
-    endDate?: string,
-    limit?: number,
-    offset?: number
-  ) => Promise<{
+  fetchRequestsList: (args: FetchRequestsListProps) => Promise<{
     count: number
     next: string | null
     previous: string | null
@@ -183,14 +194,7 @@ export interface IServiceProjects {
    *   - previous: URL d'appel pour récupérer les cohortes précédentes
    *   - results: Liste de cohortes récupérées
    */
-  fetchCohortsList: (
-    filters: CohortsFilters,
-    searchInput: string,
-    orderBy: OrderBy,
-    limit?: number,
-    offset?: number,
-    signal?: AbortSignal
-  ) => Promise<{
+  fetchCohortsList: (args: FetchCohortsListProps) => Promise<{
     count: number
     next: string | null
     previous: string | null
@@ -315,17 +319,16 @@ const servicesProjects: IServiceProjects = {
     }
   },
 
-  fetchRequestsList: async (orderBy, parentId, searchInput, startDate, endDate, limit, offset) => {
-    const _sortDirection = orderBy.orderDirection === Direction.DESC ? '-' : ''
+  fetchRequestsList: async (args) => {
+    const { orderBy, parentId, searchInput, startDate, endDate, limit, offset } = args
+    const _orderBy = orderBy ?? { orderBy: Order.UPDATED, orderDirection: Direction.DESC }
+    const _sortDirection = _orderBy.orderDirection === Direction.DESC ? '-' : ''
     const optionsReducer = (accumulator: string, currentValue: string) =>
       accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
-
     let options: string[] = []
-
-    // TODO: temp, à clean
-    if (limit) options = [...options, `limit=${limit}`]
+    if (limit || limit === 0) options = [...options, `limit=${limit}`]
     if (offset) options = [...options, `offset=${offset}`]
-    if (orderBy) options = [...options, `order=${_sortDirection}${orderBy.orderBy}`]
+    if (_orderBy) options = [...options, `order=${_sortDirection}${_orderBy.orderBy}`]
     if (!parentId && searchInput !== '') options = [...options, `search=${searchInput}`]
     if (!parentId && startDate) options = [...options, `min_updated_at=${startDate}`]
     if (!parentId && endDate) options = [...options, `max_updated_at=${endDate}`]
@@ -443,14 +446,15 @@ const servicesProjects: IServiceProjects = {
     }
   },
 
-  fetchCohortsList: async (filters, searchInput, orderBy, limit, offset, signal) => {
+  fetchCohortsList: async (args) => {
+    const { filters, searchInput, orderBy, limit, offset, signal } = args
     const _sortDirection = orderBy.orderDirection === Direction.DESC ? '-' : ''
     const optionsReducer = (accumulator: string, currentValue: string) =>
       accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
 
     let options: string[] = []
     const { status, favorite, minPatients, maxPatients, startDate, endDate, parentId } = filters
-    const _status = status.map((stat) => stat.code)
+    const _status = status?.map((stat) => (stat.code === 'pending' ? 'pending,started' : stat.code)) ?? []
 
     if (limit) options = [...options, `limit=${limit}`]
     if (offset) options = [...options, `offset=${offset}`]
@@ -462,8 +466,8 @@ const servicesProjects: IServiceProjects = {
     if (startDate) options = [...options, `min_created_at=${startDate}`]
     if (endDate) options = [...options, `max_created_at=${endDate}`]
     if (parentId) options = [...options, `request_id=${parentId}`]
-    if (favorite !== CohortsType.ALL)
-      options = [...options, `favorite=${favorite === CohortsType.FAVORITE ? 'true' : 'false'}`]
+    // TODO: appel a favorite à revoir
+    if (favorite?.length > 0) options = [...options, `favorite=${favorite === CohortsType.FAVORITE ? 'true' : 'false'}`]
 
     const { data } = (await apiBack.get<{
       count: number

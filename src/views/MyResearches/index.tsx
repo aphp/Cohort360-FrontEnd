@@ -13,7 +13,7 @@ import Tabs from 'components/ui/Tabs'
 import useCounts from 'components/Exploration/hooks/useCounts'
 
 import { ExplorationTabs } from 'types'
-import { getPathDepth } from 'utils/explorationUtils'
+import { cleanSearchParams, getPathDepth } from 'utils/explorationUtils'
 import useStyles from './styles'
 import moment from 'moment'
 
@@ -86,9 +86,11 @@ const MyResearches = () => {
   searchParams.set('page', '1')
   // TODO: gérer en cas d'erreur d'url (quoi que, p-e redirection auto vers 404 déjà en place)
   const handleTabChange = (newTab: ExplorationTabs) => {
+    //TODO: en cas de changement de tab, enlever tous les searchParams sauf dates et searchinput
+    cleanSearchParams(searchParams, setSearchParams)
     navigate({
       pathname: `/researches/${newTab.id}`,
-      search: location.search
+      search: `?${searchParams.toString()}`
     })
   }
 

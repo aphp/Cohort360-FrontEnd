@@ -1,6 +1,103 @@
 import { Cohort, CohortJobStatus, QuerySnapshotInfo, RequestType, ValueSet } from 'types'
-import displayDigit from './displayDigit'
 import { CohortsType } from 'types/cohorts'
+import { Direction, Order } from 'types/searchCriterias'
+import displayDigit from './displayDigit'
+import { SetURLSearchParams } from 'react-router-dom'
+
+export const statusOptions = [
+  {
+    display: 'Terminé',
+    code: 'finished'
+  },
+  {
+    display: 'En attente',
+    code: 'pending'
+  },
+  {
+    display: 'Erreur',
+    code: 'failed'
+  }
+]
+
+export const getFoldersSearchParams = (searchParams: URLSearchParams) => {
+  return {
+    searchInput: searchParams.get('searchInput') ?? '',
+    startDate: searchParams.get('startDate'),
+    endDate: searchParams.get('endDate'),
+    orderBy: (searchParams.get('orderBy') as Order) ?? Order.CREATED_AT,
+    orderDirection: (searchParams.get('direction') as Direction) ?? Direction.DESC
+  }
+}
+
+export const getRequestsSearchParams = (searchParams: URLSearchParams) => {
+  return {
+    searchInput: searchParams.get('searchInput') ?? '',
+    startDate: searchParams.get('startDate') ?? undefined,
+    endDate: searchParams.get('endDate') ?? undefined,
+    page: parseInt(searchParams.get('page') ?? '1', 10),
+    orderBy: (searchParams.get('orderBy') as Order) ?? Order.UPDATED,
+    orderDirection: (searchParams.get('direction') as Direction) ?? Direction.DESC
+  }
+}
+
+export const getStatusParam = (searchParam: string | null) => {
+  if (searchParam === null) {
+    return []
+  }
+  const statusParam = searchParam.split(',').map((status) => {
+    const statusIndex = statusOptions.findIndex((option) => status === option.code)
+    if (statusIndex > -1) {
+      return statusOptions[statusIndex]
+    }
+  })
+
+  return statusParam
+}
+
+export const parseSearchParamValue = (searchParam: string | null, options: {}) => {
+  if (searchParam === null) {
+    return null
+  }
+  return searchParam.split(',').map((status) => {
+    if (Object.values(options).includes(status)) return status
+  })
+}
+
+export const parseNumberSearchParam = (searchParam: string | null) => {
+  if (!searchParam) {
+    return null
+  }
+  const parsedNumber = parseInt(searchParam, 10)
+
+  return isNaN(parsedNumber) ? null : parsedNumber
+}
+
+export const cleanSearchParams = (searchParams: URLSearchParams, setSearchParams: SetURLSearchParams) => {
+  const keysToKeep = ['startDate', 'endDate', 'searchInput']
+
+  for (const key of searchParams.keys()) {
+    if (!keysToKeep.includes(key)) {
+      searchParams.delete(key)
+    }
+  }
+
+  setSearchParams(searchParams)
+}
+
+export const getCohortsSearchParams = (searchParams: URLSearchParams) => {
+  return {
+    searchInput: searchParams.get('searchInput') ?? '',
+    startDate: searchParams.get('startDate'),
+    endDate: searchParams.get('endDate'),
+    page: parseInt(searchParams.get('page') ?? '1', 10),
+    orderBy: (searchParams.get('orderBy') as Order) ?? Order.CREATED_AT,
+    orderDirection: (searchParams.get('direction') as Direction) ?? Direction.DESC,
+    status: getStatusParam(searchParams.get('status')) as ValueSet[],
+    favorite: (parseSearchParamValue(searchParams.get('favorite'), CohortsType) ?? []) as CohortsType[],
+    minPatients: searchParams.get('minPatients'),
+    maxPatients: searchParams.get('maxPatients')
+  }
+}
 
 export const getPathDepth = (pathname: string) => {
   return pathname.split('/').filter(Boolean).length
@@ -40,24 +137,4 @@ export const getRequestName = (request?: RequestType | null) => {
   if (!request) return 'N/A'
   const sharedByDetails = request.shared_by ? ` - Envoyée par : ${request.shared_by}` : ''
   return `${request.name}${sharedByDetails}`
-}
-
-export const getStatusFilter = (status?: string | null) => {
-  if (status) {
-    return status.split(',').map((status) => {
-      return { code: status }
-    }) as ValueSet[]
-  } else {
-    return []
-  }
-}
-
-export const getFavoriteFilters = (favoriteParam?: string | null) => {
-  if (favoriteParam === 'true') {
-    return CohortsType.FAVORITE
-  } else if (favoriteParam === 'false') {
-    return CohortsType.NOT_FAVORITE
-  } else {
-    return CohortsType.ALL
-  }
 }

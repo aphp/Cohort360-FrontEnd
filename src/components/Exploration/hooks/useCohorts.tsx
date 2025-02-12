@@ -1,24 +1,50 @@
 import { useQuery } from '@tanstack/react-query'
 import services from 'services/aphp'
-import { CohortsFilters, OrderBy } from 'types/searchCriterias'
+import { CohortsType } from 'types/cohorts'
+import { CohortsFilters, Direction, Order, OrderBy } from 'types/searchCriterias'
 
-const useCohorts = (orderBy: OrderBy, searchInput: string, filters: CohortsFilters, page = 1, rowsPerPage = 20) => {
-  // TODO: à externaliser
+type UseCohortsProps = {
+  orderBy?: OrderBy
+  searchInput?: string
+  filters?: CohortsFilters
+  page?: number
+  rowsPerPage?: number
+}
+
+const useCohorts = ({
+  orderBy = { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
+  searchInput,
+  filters,
+  page = 1,
+  rowsPerPage = 20
+}: UseCohortsProps) => {
+  // TODO: à externaliser ?
   const fetchCohortsList = async () => {
-    // TODO: modifier le service de sorte à ajouter les filtres + try/catch
+    const _filters = {
+      status: filters?.status ?? [],
+      favorite: filters?.favorite ?? CohortsType.ALL,
+      minPatients: filters?.minPatients ?? null,
+      maxPatients: filters?.maxPatients ?? null,
+      startDate: filters?.startDate ?? null,
+      endDate: filters?.endDate ?? null,
+      parentId: filters?.parentId
+    }
+    // TODO: modifier le service de sorte à ajouter try/catch
     const offset = (page - 1) * rowsPerPage
     const cohortsList = await services.projects.fetchCohortsList(
-      filters.parentId
-        ? {
-            ...filters,
-            startDate: null,
-            endDate: null
-          }
-        : filters,
-      !filters.parentId ? searchInput : '',
-      { orderBy: orderBy.orderBy, orderDirection: orderBy.orderDirection },
-      rowsPerPage,
-      offset
+      {
+        filters: _filters.parentId
+          ? {
+              ..._filters,
+              startDate: null,
+              endDate: null
+            }
+          : _filters,
+        searchInput: !_filters.parentId ? searchInput : '',
+        orderBy: { orderBy: orderBy.orderBy, orderDirection: orderBy.orderDirection },
+        limit: rowsPerPage,
+        offset
+      }
       //   AbortSignal???
     )
     return cohortsList

@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-import React, { useContext, useState } from 'react'
+import React, { useContext, useMemo, useState } from 'react'
 import { AppConfig } from 'config'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from 'state'
@@ -8,11 +8,15 @@ import { setSelectedRequestShare } from 'state/request'
 import { Grid, IconButton, Tooltip } from '@mui/material'
 import ActionBar from './ActionBar'
 import AddOrEditItem from './Modals/AddOrEditItem'
+import CohortStatusFilter from 'components/Filters/CohortStatusFilter'
 import CohortsTableContent from './CohortsTableContent'
+import CohortsTypesFilter from 'components/Filters/CohortsTypeFilter'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 import LevelHeader from './LevelHeader'
+import Modal from 'components/ui/Modal'
 import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
+import PatientsNbFilter from 'components/Filters/PatientsNbFilter'
 
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import EditIcon from '@mui/icons-material/Edit'
@@ -25,11 +29,12 @@ import useDeleteRequests from '../hooks/useDeleteRequests'
 import useEditCohort from '../hooks/useEditCohort'
 import useEditRequest from '../hooks/useEditRequest'
 import useRequest from '../hooks/useRequest'
+import useSelectionState from '../hooks/useMultipleSelection'
 
-import { Cohort, RequestType } from 'types'
-import { CohortsFilters, Direction, Order, OrderBy } from 'types/searchCriterias'
-import { getFavoriteFilters, getRequestName, getStatusFilter } from 'utils/explorationUtils'
-import { addElementInArray, removeElementInArray } from 'utils/filters'
+import { Cohort, RequestType, ValueSet } from 'types'
+import { CohortsFilters, FilterKeys, OrderBy } from 'types/searchCriterias'
+import { getCohortsSearchParams, getRequestName, statusOptions } from 'utils/explorationUtils'
+import { selectFiltersAsArray } from 'utils/filters'
 
 const CohortsList = () => {
   const appConfig = useContext(AppConfig)
@@ -37,17 +42,8 @@ const CohortsList = () => {
   const navigate = useNavigate()
   const { projectId, requestId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
-  const searchInput = searchParams.get('searchInput') ?? ''
-  const startDate = searchParams.get('startDate')
-  const endDate = searchParams.get('endDate')
-  const page = parseInt(searchParams.get('page') ?? '1', 10)
-  const orderBy = (searchParams.get('orderBy') as Order) ?? Order.CREATED_AT
-  const orderDirection = (searchParams.get('direction') as Direction) ?? Direction.DESC
-  // TODO: add les params pour les filtres exclusifs aux cohortes + bien penser à les suppr en changeant d'onglet
-  const status = searchParams.get('status')
-  const favorite = searchParams.get('favorite')
-  const minPatients = searchParams.get('minPatients')
-  const maxPatients = searchParams.get('maxPatients')
+  const { searchInput, startDate, endDate, page, orderBy, orderDirection, status, favorite, minPatients, maxPatients } =
+    getCohortsSearchParams(searchParams)
 
   const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
   const requestState = useAppSelector((state) => state.request)
@@ -56,8 +52,8 @@ const CohortsList = () => {
   const [deleteMode, setDeleteMode] = useState(false)
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
   const [filters, setFilters] = useState<CohortsFilters>({
-    status: getStatusFilter(status),
-    favorite: getFavoriteFilters(favorite),
+    status,
+    favorite,
     minPatients,
     maxPatients,
     startDate,
@@ -67,15 +63,33 @@ const CohortsList = () => {
   const [openEditionModal, setOpenEditionModal] = useState(false)
   const [openDeletionModal, setOpenDeletionModal] = useState(false)
   const [openExportModal, setOpenExportModal] = useState(false)
-  const [selectedCohorts, setSelectedCohorts] = useState<Cohort[]>([])
+  const [openFiltersModal, setOpenFiltersModal] = useState(false)
 
   const { request: parentRequest, requestLoading, requestIsError } = useRequest(requestId)
-  const { cohortsList, total, loading } = useCohorts(order, searchInput, filters)
+  const { cohortsList, total, loading } = useCohorts({ orderBy: order, searchInput, filters })
   useCohortsWebSocket()
   const editRequestMutation = useEditRequest()
   const deleteRequestMutation = useDeleteRequests()
   const editCohortMutation = useEditCohort()
   const deleteCohortMutation = useDeleteCohort()
+  const {
+    selected: selectedCohorts,
+    setSelected: setSelectedCohorts,
+    toggle,
+    clearSelection
+  } = useSelectionState<Cohort>()
+  const filtersAsArray = useMemo(
+    () =>
+      selectFiltersAsArray({
+        status,
+        favorite,
+        minPatients,
+        maxPatients,
+        startDate,
+        endDate
+      }),
+    [status, favorite, minPatients, maxPatients, startDate, endDate]
+  )
 
   const handlePageChange = (newPage: number) => {
     searchParams.set('page', String(newPage))
@@ -100,12 +114,12 @@ const CohortsList = () => {
   const onCloseDeletionModal = () => {
     setOpenDeletionModal(false)
     setDeleteMode(false)
-    setSelectedCohorts([])
+    clearSelection()
   }
 
   const onCloseEditionModal = () => {
     setOpenEditionModal(false)
-    setSelectedCohorts([])
+    clearSelection()
   }
 
   const onSubmitDeletion = () => {
@@ -148,17 +162,9 @@ const CohortsList = () => {
     setSelectedCohorts([cohort])
   }
 
-  const toggleCohort = (cohort: Cohort) => {
-    if (!selectedCohorts.find((selectedCohort) => selectedCohort === cohort)) {
-      setSelectedCohorts(addElementInArray(selectedCohorts, cohort))
-    } else {
-      setSelectedCohorts(removeElementInArray(selectedCohorts, cohort))
-    }
-  }
-
   const onSelectAll = () => {
     if (selectedCohorts.length === cohortsList.length) {
-      setSelectedCohorts([])
+      clearSelection()
     } else if (selectedCohorts.length <= cohortsList.length) {
       setSelectedCohorts(cohortsList)
     }
@@ -207,9 +213,10 @@ const CohortsList = () => {
         onConfirmDeletion={() => setOpenDeletionModal(true)}
         onCancelDeletion={() => {
           setDeleteMode(false)
-          setSelectedCohorts([])
+          clearSelection()
         }}
-        filters
+        onFilter={() => setOpenFiltersModal(true)}
+        filters={filtersAsArray}
       />
       <CohortsTableContent
         cohortsList={cohortsList}
@@ -229,7 +236,7 @@ const CohortsList = () => {
           onClickExport,
           onClickDelete,
           onClickEdit,
-          onSelectCohort: toggleCohort
+          onSelectCohort: toggle
         }}
       />
 
@@ -279,6 +286,29 @@ const CohortsList = () => {
           onClose={() => dispatch(setSelectedRequestShare(null))}
         />
       )}
+
+      <Modal
+        title="Filtrer par :"
+        width={'600px'}
+        open={openFiltersModal}
+        onClose={() => setOpenFiltersModal(false)}
+        onSubmit={(newFilters) => {
+          setFilters({ ...filters, ...newFilters })
+          newFilters.status.length > 0 &&
+            searchParams.set('status', newFilters.status.map((status: ValueSet) => status.code).join())
+          newFilters.favorite.length > 0 && searchParams.set('favorite', newFilters.favorite)
+          minPatients && searchParams.set('minPatients', newFilters.minPatients)
+          maxPatients && searchParams.set('maxPatients', newFilters.maxPatients)
+          setSearchParams(searchParams)
+        }}
+      >
+        <CohortStatusFilter value={status} name={FilterKeys.STATUS} allStatus={statusOptions} />
+        <CohortsTypesFilter value={favorite} name={FilterKeys.FAVORITE} />
+        <PatientsNbFilter
+          values={[minPatients, maxPatients]}
+          names={[FilterKeys.MIN_PATIENTS, FilterKeys.MAX_PATIENTS]}
+        />
+      </Modal>
     </Grid>
   )
 }

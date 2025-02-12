@@ -2,10 +2,12 @@ import React from 'react'
 
 import { Box, CircularProgress, Grid, Typography } from '@mui/material'
 import Button from 'components/ui/Button'
+import Chip from 'components/ui/Chip'
 
 import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import FilterList from '@mui/icons-material/FilterList'
+import { FilterKeys, FilterValue } from 'types/searchCriterias'
 
 type ActionBarProps = {
   deleteMode: boolean
@@ -15,7 +17,8 @@ type ActionBarProps = {
   totalSelected: number
   onConfirmDeletion: () => void
   onCancelDeletion: () => void
-  filters?: boolean
+  onFilter?: () => void
+  filters?: { value: FilterValue; category: FilterKeys; label: string }[]
 }
 
 const ActionBar: React.FC<ActionBarProps> = ({
@@ -26,6 +29,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
   totalSelected,
   onCancelDeletion,
   onConfirmDeletion,
+  onFilter,
   filters
 }) => {
   return (
@@ -39,12 +43,8 @@ const ActionBar: React.FC<ActionBarProps> = ({
             {total > 1 ? 's' : ''}
           </Typography>
         ))}
-      {!deleteMode && filters && (
-        <Button
-          startIcon={<FilterList height="15px" fill="#FFF" />}
-          width={'fit-content'}
-          onClick={() => setToggleFilterByModal(true)}
-        >
+      {!deleteMode && onFilter && (
+        <Button startIcon={<FilterList height="15px" fill="#FFF" />} width={'fit-content'} onClick={onFilter}>
           Filtrer
         </Button>
       )}
@@ -53,15 +53,14 @@ const ActionBar: React.FC<ActionBarProps> = ({
           Ajouter une requête
         </Button>
       )}
-      {/* {!deleteMode && 
-        {filtersAsArray.length > 0 && (
-          <Grid item xs={12}>
-            {filtersAsArray.map((filter, index) => (
-              <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
-            ))}
-          </Grid>
-        )}
-      } */}
+      {!deleteMode && filters && (
+        <Grid item xs={12}>
+          {filters.map((filter, index) => (
+            <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
+          ))}
+        </Grid>
+      )}
+      {/* TODO: faire un map sur les boutons sinon, avec une box autour */}
 
       {deleteMode && (
         <>

@@ -32,7 +32,7 @@ const fetchRequests = createAsyncThunk<FetchRequestListReturn, void, { state: Ro
   'request/fetchRequests',
   async () => {
     try {
-      const requests = (await services.projects.fetchRequestsList('', '', undefined, undefined, 100, 0)) || []
+      const requests = (await services.projects.fetchRequestsList({ limit: 100, offset: 0 })) || []
 
       let requestList = requests.results || []
       // requestList.length <= 100, check fetchRequestsList() for more information

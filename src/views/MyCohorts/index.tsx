@@ -28,21 +28,7 @@ import useCohortList from 'hooks/useCohortList'
 import { Pagination } from 'components/ui/Pagination'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
-
-const statusOptions = [
-  {
-    display: 'Terminé',
-    code: 'finished'
-  },
-  {
-    display: 'En attente',
-    code: 'pending,started'
-  },
-  {
-    display: 'Erreur',
-    code: 'failed'
-  }
-]
+import { statusOptions } from 'utils/explorationUtils'
 
 type MyCohortsProps = {
   favoriteUrl?: boolean

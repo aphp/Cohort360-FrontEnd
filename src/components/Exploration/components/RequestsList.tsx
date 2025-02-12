@@ -21,22 +21,18 @@ import useEditProject from '../hooks/useEditProject'
 import useEditRequest from '../hooks/useEditRequest'
 import useProject from '../hooks/useProject'
 import useRequests from '../hooks/useRequests'
+import useSelectionState from '../hooks/useMultipleSelection'
 
 import { ProjectType, RequestType } from 'types'
-import { Direction, Order, OrderBy } from 'types/searchCriterias'
-import useSelectionState from '../hooks/useMultipleSelection'
+import { OrderBy } from 'types/searchCriterias'
+import { getRequestsSearchParams } from 'utils/explorationUtils'
 
 const RequestsList = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { projectId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
-  const searchInput = searchParams.get('searchInput') ?? ''
-  const startDate = searchParams.get('startDate') ?? undefined
-  const endDate = searchParams.get('endDate') ?? undefined
-  const page = parseInt(searchParams.get('page') ?? '1', 10)
-  const orderBy = (searchParams.get('orderBy') as Order) ?? Order.UPDATED
-  const orderDirection = (searchParams.get('direction') as Direction) ?? Direction.DESC
+  const { searchInput, startDate, endDate, page, orderBy, orderDirection } = getRequestsSearchParams(searchParams)
   const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
   const requestState = useAppSelector((state) => state.request)
 
@@ -48,15 +44,14 @@ const RequestsList = () => {
   const [openDeletionModal, setOpenDeletionModal] = useState(false)
 
   const { project: parentProject, projectLoading, projectIsError } = useProject(projectId)
-  const { requestsList, total, loading } = useRequests(
-    order,
-    projectId,
+  const { requestsList, total, loading } = useRequests({
+    orderBy: order,
+    parentId: projectId,
     searchInput,
     startDate,
     endDate,
-    undefined,
     page
-  )
+  })
   const editRequestMutation = useEditRequest()
   const editProjectMutation = useEditProject()
   const deleteRequestsMutation = useDeleteRequests()
@@ -65,7 +60,7 @@ const RequestsList = () => {
     selected: selectedRequests,
     setSelected: setSelectedRequests,
     toggle,
-    clear
+    clearSelection
   } = useSelectionState<RequestType>()
 
   const changeOrderBy = (newOrder: OrderBy) => {
@@ -99,7 +94,7 @@ const RequestsList = () => {
 
   const onSelectAll = () => {
     if (selectedRequests.length === requestsList.length) {
-      clear()
+      clearSelection()
     } else if (selectedRequests.length <= requestsList.length) {
       setSelectedRequests(requestsList)
     }
@@ -108,12 +103,12 @@ const RequestsList = () => {
   const onCloseDeletionModal = () => {
     setOpenDeletionModal(false)
     setDeleteMode(false)
-    clear()
+    clearSelection()
   }
 
   const onCloseEditionModal = () => {
     setOpenEditionModal(false)
-    clear()
+    clearSelection()
     setSelectedProject(null)
   }
 
@@ -181,7 +176,7 @@ const RequestsList = () => {
         onConfirmDeletion={() => setOpenDeletionModal(true)}
         onCancelDeletion={() => {
           setDeleteMode(false)
-          clear()
+          clearSelection()
         }}
       />
 

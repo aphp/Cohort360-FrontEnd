@@ -17,16 +17,13 @@ import useProjects from '../hooks/useProjects'
 
 import { ProjectType } from 'types'
 import { Direction, Order, OrderBy } from 'types/searchCriterias'
+import { getFoldersSearchParams } from 'utils/explorationUtils'
 
 const ProjectsList = () => {
   const navigate = useNavigate()
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
   const [searchParams, setSearchParams] = useSearchParams()
-  const searchInput = searchParams.get('searchInput') ?? ''
-  const startDate = searchParams.get('startDate') ?? null
-  const endDate = searchParams.get('endDate') ?? null
-  const orderBy = (searchParams.get('orderBy') as Order) ?? Order.CREATED_AT
-  const orderDirection = (searchParams.get('direction') as Direction) ?? Direction.DESC
+  const { searchInput, startDate, endDate, orderBy, orderDirection } = getFoldersSearchParams(searchParams)
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
 
   const [openEditionModal, setOpenEditionModal] = useState(false)

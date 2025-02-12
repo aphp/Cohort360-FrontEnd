@@ -7,15 +7,11 @@ const useSelectionState = <T,>() => {
     setSelected((prev) => (prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]))
   }
 
-  const clear = () => {
+  const clearSelection = () => {
     setSelected([])
   }
 
-  const selectAll = (items: T[]) => {
-    setSelected(items)
-  }
-
-  return { selected, setSelected, toggle, clear, selectAll }
+  return { selected, setSelected, toggle, clearSelection }
 }
 
 export default useSelectionState

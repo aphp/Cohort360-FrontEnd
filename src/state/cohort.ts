@@ -64,7 +64,7 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, FetchCohortsParams,
       const searchInput = options?.searchCriterias?.searchInput || ''
 
       const cohorts =
-        (await services.projects.fetchCohortsList(filters, searchInput, orderBy, limit, offset, signal)) || {}
+        (await services.projects.fetchCohortsList({ filters, searchInput, orderBy, limit, offset, signal })) || {}
 
       const cohortsList: Cohort[] = cohorts.results || []
 
