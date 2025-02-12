@@ -4,6 +4,7 @@ set -e
 # Replace all URLs in nginx.conf by environment variables
 sed -i "s@{FHIR_URL}@$FHIR_URL@g" /etc/nginx/conf.d/nginx.conf
 sed -i "s@{BACK_URL}@$BACK_URL@g" /etc/nginx/conf.d/nginx.conf
+sed -i "s@{DATAMODEL_URL}@$DATAMODEL_URL@g" /etc/nginx/conf.d/nginx.conf
 
 sed -i "s@{VITE_CONFIG_URL}@$VITE_CONFIG_URL@g" /app/build/assets/*.js
 
