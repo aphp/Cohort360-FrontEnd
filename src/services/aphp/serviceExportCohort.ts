@@ -46,7 +46,7 @@ export const fetchExportsList = async (
     const response = await fetchExportList({ user: user, offset: offset, search: manelleText, signal: signal })
     return response
   } catch (error) {
-    return /*console.error('manelle error', error),*/ console.log('manelle error', error)
+    return console.error(error)
   }
 }
 

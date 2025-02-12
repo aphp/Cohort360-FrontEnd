@@ -46,20 +46,18 @@ const useStyles = makeStyles()(() => ({
     backgroundColor: 'white',
     width: '60%'
   },
-  agreeCheckbox: {
-    padding: '6px'
-  },
 
   conditionItem: {
     margin: '4px 0 4px 36px',
     position: 'relative',
     color: 'rgba(0, 0, 0, 0.8)',
+    width: 'calc(100%)',
     '&::before': {
       position: 'absolute',
       content: "'•'",
       color: 'rgba(0, 0, 0, 0.7)',
       left: -20,
-      top: 'calc(50% - 11px)',
+      top: 'calc(50% - 0.5em)',
       fontSize: 26,
       lineHeight: '22px'
     }
@@ -70,19 +68,7 @@ const useStyles = makeStyles()(() => ({
     textDecoration: 'underline',
     textUnderlineOffset: '4px'
   },
-  helperText: {
-    marginLeft: 0,
-    fontStyle: 'italic'
-  },
-  selectAgreeConditions: {
-    display: 'flex',
-    gap: '8px',
-    margin: 0,
-    paddingLeft: '3px',
-    '& span': {
-      fontWeight: '800'
-    }
-  },
+
   textBody1: {
     color: 'rgba(0, 0, 0, 0.6)',
     fontWeight: '700'
@@ -91,11 +77,29 @@ const useStyles = makeStyles()(() => ({
     color: 'rgba(0, 0, 0, 0.8)',
     fontWeight: '600'
   },
+  exportTableGrid: {
+    padding: '16px 16px 16px 16px',
+    backgroundColor: 'white',
+    marginBottom: '10px',
+    borderColor: 'grey',
+    borderRadius: 9,
+    border: 'solid',
+    borderWidth: 1.5
+  },
   tableLabel: {
     color: '#888',
     fontStyle: 'italic',
     fontWeight: '600',
     padding: '0 5px 0 4px'
+  },
+  selectedTable: {
+    color: '#0063AF',
+    fontWeight: '700',
+    lineHeight: 1.47
+  },
+  notSelectedTable: {
+    color: '#666',
+    fontWeight: '700'
   }
 }))
 

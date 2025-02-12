@@ -184,7 +184,6 @@ const Export: React.FC = () => {
               <Button
                 className={styles().classes.filterButton}
                 onClick={() => {
-                  console.log('manelle')
                   // navigate('/exports/new')
                 }}
               >

@@ -19,7 +19,7 @@ export type TableSetting = {
     auto_generated: boolean
   } | null
   respectTableRelationships: boolean
-  pivotMerge: boolean | null
+  pivotMerge: boolean
 }
 
 export type TableInfo = {

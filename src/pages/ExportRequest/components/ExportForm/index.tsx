@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import React, { useState, useCallback, useEffect } from 'react'
 
 import {
@@ -11,7 +12,9 @@ import {
   Tooltip,
   IconButton,
   Button,
-  Autocomplete
+  Autocomplete,
+  CircularProgress,
+  Alert
 } from '@mui/material'
 
 import InfoIcon from '@mui/icons-material/Info'
@@ -28,9 +31,25 @@ import {
 
 import { Cohort } from 'types'
 import { TableSetting, TableInfo } from 'types/export'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import useStyles from '../../styles'
+
+export enum Error {
+  ERROR_MOTIF,
+  ERROR_CONDITION,
+  ERROR_TABLE,
+  ERROR_TABLE_LIMIT,
+  ERROR_FETCH,
+  NO_ERROR
+}
+
+type ErrorTables = [
+  {
+    tableName: string
+    error: Error
+  }
+]
 
 const tableSettingsInitialState: TableSetting[] = [
   {
@@ -39,13 +58,21 @@ const tableSettingsInitialState: TableSetting[] = [
     columns: null,
     fhirFilter: null,
     respectTableRelationships: true,
-    pivotMerge: null
+    pivotMerge: false
+  }
+]
+
+const errorTablesInitialState: ErrorTables = [
+  {
+    tableName: 'person',
+    error: Error.NO_ERROR
   }
 ]
 
 const ExportForm: React.FC = () => {
   const { classes } = useStyles()
-  const [error, setError] = useState<any>('')
+  const [error, setError] = useState<Error | null>(null)
+  const [errorTables, setErrorTables] = useState<ErrorTables>(errorTablesInitialState)
   const [oneFile, setOneFile] = useState<boolean>(false)
   const [exportTypeFile, setExportTypeFile] = useState<'csv' | 'xlsx'>('csv')
   const [tablesSettings, setTablesSettings] = useState<TableSetting[]>(tableSettingsInitialState)
@@ -55,9 +82,13 @@ const ExportForm: React.FC = () => {
   const checkedTables = tablesSettings.filter((tableSetting) => tableSetting.isChecked)
   const [compatibilitiesTables, setCompatibilitiesTables] = useState<string[] | null>(null)
   const [conditions, setConditions] = useState<boolean>(false)
-  const [motivation, setMotivation] = useState<string>('')
+  const [motivation, setMotivation] = useState<string | null>(null)
   const [searchParams, setSearchParams] = useSearchParams()
   const cohortID = searchParams.get('groupId')
+  const [loading, setLoading] = useState<boolean>(false)
+  const navigate = useNavigate()
+
+  const limitError = errorTables.some((errorTable) => errorTable.error === Error.ERROR_TABLE_LIMIT)
 
   const _fetchExportableCohorts = useCallback(async () => {
     try {
@@ -70,8 +101,10 @@ const ExportForm: React.FC = () => {
 
   const _fetchExportTablesInfo = useCallback(async () => {
     try {
+      setLoading(true)
       const response = await fetchExportTablesInfo()
       setExportTableList(response)
+      setLoading(false)
     } catch (error) {
       return []
     }
@@ -129,6 +162,20 @@ const ExportForm: React.FC = () => {
     setTablesSettings(newTableSettings)
   }
 
+  const onChangeError = (tableName: string, errorValue: Error) => {
+    const newErrorTableSettings: any = tablesSettings.map((tableSetting) => {
+      if (tableSetting.tableName === tableName) {
+        return {
+          ...tableSetting,
+          error: errorValue
+        }
+      } else {
+        return tableSetting
+      }
+    })
+    setErrorTables(newErrorTableSettings)
+  }
+
   const resetSelectedTables = () => {
     const newSelectedTables = tablesSettings.map((tableSetting) => ({
       ...tableSetting,
@@ -150,11 +197,27 @@ const ExportForm: React.FC = () => {
 
     postExportCohort({
       cohortId: exportCohort ?? { uuid: '' },
-      motivation: motivation,
+      motivation: motivation ?? '',
       group_tables: oneFile,
       outputFormat: exportTypeFile,
       tables: tableToExport
     })
+    navigate(`/home`)
+  }
+
+  const handleChangeMotivation = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (e.target.value.length < 10) {
+      setMotivation(e.target.value)
+      setError(Error.ERROR_MOTIF)
+    }
+    if (e.target.value.length >= 10) {
+      setMotivation(e.target.value)
+      setError(null)
+    }
+    if (e.target.value.length === 0) {
+      setMotivation(null)
+      setError(null)
+    }
   }
 
   return (
@@ -174,14 +237,13 @@ const ExportForm: React.FC = () => {
         maxRows={5}
         style={{ marginTop: '20px', backgroundColor: 'white' }}
         value={motivation}
-        FormHelperTextProps={{ className: classes.helperText }}
         label="Motif de l'export"
         variant="outlined"
-        onChange={(e) => setMotivation(e.target.value)}
-        error={error}
+        onChange={(e) => handleChangeMotivation(e)}
+        error={error === Error.ERROR_MOTIF}
       />
 
-      <Typography style={error ? { color: 'red' } : { color: 'black' }}>
+      <Typography style={error === Error.ERROR_MOTIF ? { color: 'red' } : { color: 'black' }}>
         Le motif doit comporter au moins 10 caractères
       </Typography>
 
@@ -294,34 +356,28 @@ const ExportForm: React.FC = () => {
         )}
       </Grid>
 
-      <Grid>
-        {exportTableList?.map((exportTable, index: number) => (
-          <div
-            style={{
-              padding: '16px 16px 16px 16px',
-              backgroundColor: 'white',
-              marginBottom: '10px',
-              borderColor: 'grey',
-              borderRadius: 9,
-              border: 'solid',
-              borderWidth: 1.5
-            }}
-            key={exportTable.name + index}
-          >
+      {loading ? (
+        <Grid container className={classes.exportTableGrid} justifyContent={'center'}>
+          <CircularProgress />
+        </Grid>
+      ) : (
+        <>
+          {exportTableList?.map((exportTable, index: number) => (
             <ExportTable
+              key={exportTable.name + index}
               exportCohort={exportCohort}
               exportTable={exportTable}
               exportTableSettings={tablesSettings}
-              setError={setError}
+              setError={onChangeError}
               addNewTableSetting={addNewTableSetting}
               onChangeTableSettings={onChangeTableSettings}
               compatibilitiesTables={compatibilitiesTables}
               exportTypeFile={exportTypeFile}
               oneFile={oneFile}
             />
-          </div>
-        ))}
-      </Grid>
+          ))}
+        </>
+      )}
 
       <Grid container gap="12px" pb="10px">
         <Typography className={classes.dialogHeader} variant="h5">
@@ -341,39 +397,37 @@ const ExportForm: React.FC = () => {
             </Typography>
 
             <Typography variant="caption" className={classes.conditionItem}>
-              A stocker temporairement les données extraites sur un répertoire dont l’accès est techniquement restreint
+              À stocker temporairement les données extraites sur un répertoire dont l’accès est techniquement restreint
               aux personnes dûment habilitées et authentifiées, présentes dans les locaux du responsable de la
               recherche.
             </Typography>
 
             <Typography variant="caption" className={classes.conditionItem}>
-              A ne pas utiliser du matériel ou des supports de stockage n’appartenant pas à l’AP-HP, à ne pas sortir les
+              À ne pas utiliser du matériel ou des supports de stockage n’appartenant pas à l’AP-HP, à ne pas sortir les
               données des locaux de l’AP-HP ou sur un support amovible emporté hors AP-HP.
             </Typography>
             <Typography variant="caption" className={classes.conditionItem}>
-              A procéder à la destruction de toutes données exportées, dès qu’il n’y a plus nécessité d’en disposer dans
+              À procéder à la destruction de toutes données exportées, dès qu’il n’y a plus nécessité d’en disposer dans
               le cadre de la recherche dans le périmètre concerné.
             </Typography>
 
             <Typography variant="caption" className={classes.conditionItem}>
-              A ne pas communiquer les données à des tiers non autorisés
+              À ne pas communiquer les données à des tiers non autorisés
             </Typography>
 
             <Typography variant="caption" className={classes.conditionItem}>
-              A informer les chefs de services des UF de Responsabilité où ont été collectées les données exportées
+              À informer les chefs de services des UF de Responsabilité où ont été collectées les données exportées
             </Typography>
 
             <Typography variant="caption" className={classes.conditionItem}>
-              A ne pas croiser les données avec tout autre jeu de données, sans autorisation auprès de la CNIL
+              À ne pas croiser les données avec tout autre jeu de données, sans autorisation auprès de la CNIL
             </Typography>
           </Grid>
 
           <FormControlLabel
-            className={classes.selectAgreeConditions}
             control={
               <Checkbox
                 color="secondary"
-                className={classes.agreeCheckbox}
                 name="conditions"
                 checked={conditions}
                 onChange={() => setConditions(!conditions)}
@@ -386,10 +440,30 @@ const ExportForm: React.FC = () => {
               </Typography>
             }
           />
-          <Button disabled={conditions === false} onClick={handleSubmitPayload}>
+          <Button
+            disabled={conditions === false || motivation === null || error === Error.ERROR_MOTIF || limitError}
+            onClick={handleSubmitPayload}
+          >
             Confirmer
           </Button>
         </Grid>
+      </Grid>
+      <Grid container item mb="12px" justifyContent={'flex-end'}>
+        {error === Error.ERROR_MOTIF && (
+          <Alert severity="error">
+            Merci d'indiquer le motif de votre demande d'export, ce motif doit contenir au moins 10 caractères
+          </Alert>
+        )}
+
+        {error === Error.ERROR_CONDITION && (
+          <Alert severity="error">Merci d'accepter toutes les conditions de l'Entrepôt de données de santé</Alert>
+        )}
+        {error === Error.ERROR_TABLE && (
+          <Alert severity="error">Merci d'indiquer les tables que vous voulez exporter</Alert>
+        )}
+        {limitError && (
+          <Alert severity="error">Merci d'indiquer des tables qui respectent la limite de lignes autorisées</Alert>
+        )}
       </Grid>
     </Grid>
   )

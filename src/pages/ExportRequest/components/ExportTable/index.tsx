@@ -1,6 +1,15 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 
-import { Grid, Typography, TextField, Checkbox, Autocomplete, CircularProgress, Alert } from '@mui/material'
+import {
+  Grid,
+  Typography,
+  TextField,
+  Checkbox,
+  Autocomplete,
+  CircularProgress,
+  Alert,
+  ListItemText
+} from '@mui/material'
 
 import useStyles from '../../styles'
 import { getResourceType, getExportTableLabel, fetchResourceCount2 } from 'components/Dashboard/ExportModal/exportUtils'
@@ -12,11 +21,13 @@ import { AppConfig } from 'config'
 import { Cohort } from 'types'
 import { TableInfo, TableSetting } from 'types/export'
 
+import { Error } from '../ExportForm'
+
 type ExportTableProps = {
   exportTable: TableInfo
   exportTableSettings: TableSetting[]
   exportCohort: Cohort | null
-  setError: (arg: any) => void
+  setError: (tableName: string, errorValue: Error) => void
   addNewTableSetting: (newTableSetting: TableSetting) => void
   onChangeTableSettings: (tableName: string, key: string, value: any) => void
   compatibilitiesTables: string[] | null
@@ -51,7 +62,6 @@ const ExportTable: React.FC<ExportTableProps> = ({
   const [filters, setFilters] = useState<any[]>([])
   const [count, setCount] = useState<number | null>(null)
   const [countLoading, setCountLoading] = useState<boolean>(false)
-  const [countError, setCountError] = useState<boolean>(false)
   const cohortId = exportCohort?.group_id
   const exportColumns = exportTable.columns || []
   const tableSetting = exportTableSettings.filter((e) => e.tableName === exportTable.name)[0]
@@ -80,20 +90,21 @@ const ExportTable: React.FC<ExportTableProps> = ({
       setCount(count)
       setCountLoading(false)
     } catch (error) {
-      setCountError(true)
-      setError(error)
+      console.error(error)
     }
-  }, [cohortId, exportTableResourceType, setError, tableSetting?.fhirFilter])
+  }, [cohortId, exportTableResourceType, tableSetting?.fhirFilter])
 
   useEffect(() => {
     if (tableSetting?.isChecked !== null) {
       setCheckedTable(tableSetting?.isChecked)
     }
-  }, [tableSetting?.isChecked])
-
-  useEffect(() => {
-    onChangeTableSettings(exportTable.name, 'pivotMerge', checkedPivotMerge)
-  }, [checkedPivotMerge])
+    if (tableSetting?.pivotMerge !== null) {
+      setCheckedPivotMerge(tableSetting?.pivotMerge)
+    }
+    if (tableSetting?.pivotMerge) {
+      onChangeTableSettings(exportTable.name, 'columns', null)
+    }
+  }, [tableSetting?.isChecked, tableSetting?.pivotMerge])
 
   useEffect(() => {
     if (exportTableResourceType !== ResourceType.UNKNOWN) {
@@ -109,11 +120,23 @@ const ExportTable: React.FC<ExportTableProps> = ({
         columns: null,
         fhirFilter: null,
         respectTableRelationships: true,
-        pivotMerge: null
+        pivotMerge: false
       }
       addNewTableSetting(newTableSetting)
     }
   })
+
+  useEffect(() => {
+    if (
+      tableSetting?.isChecked === true &&
+      count &&
+      (exportTableResourceType === ResourceType.DOCUMENTS ? count > 5000 : count > limit)
+    ) {
+      setError(tableSetting?.tableName, Error.ERROR_TABLE_LIMIT)
+    } else {
+      setError(tableSetting?.tableName, Error.NO_ERROR)
+    }
+  }, [count, tableSetting?.isChecked])
 
   const isCompatibleTable = (tableName: string) => {
     const table = compatibilitiesTables?.find((table) => table === tableName)
@@ -127,19 +150,19 @@ const ExportTable: React.FC<ExportTableProps> = ({
   }, [exportTableResourceType, getFilterCount])
 
   return (
-    <Grid container>
+    <Grid container className={classes.exportTableGrid}>
       <Grid item container alignItems="center">
         <Grid item container alignItems="center" xs={6}>
           <Typography
             variant="subtitle2"
-            // className={selectExportTable ? classes.selectedTable : classes.notSelectedTable}
+            className={tableSetting?.isChecked ? classes.selectedTable : classes.notSelectedTable}
           >
             {tableLabel} &nbsp;
           </Typography>
           <div>
             <Typography
               variant="subtitle2"
-              // className={selectExportTable ? classes.selectedTable : classes.notSelectedTable}
+              className={tableSetting?.isChecked ? classes.selectedTable : classes.notSelectedTable}
               component="span"
             >
               {'['}
@@ -149,7 +172,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
             </Typography>
             <Typography
               variant="subtitle2"
-              // className={selectExportTable ? classes.selectedTable : classes.notSelectedTable}
+              className={tableSetting?.isChecked ? classes.selectedTable : classes.notSelectedTable}
               component="span"
             >
               {']'}
@@ -161,16 +184,15 @@ const ExportTable: React.FC<ExportTableProps> = ({
           {exportTableResourceType !== ResourceType.UNKNOWN && (
             <>
               {countLoading ? (
-                <CircularProgress />
+                <CircularProgress size={30} />
               ) : (
                 <Typography
                   variant="h3"
                   width={'50%'}
                   fontSize={12}
-                  textAlign={'center'}
-                  color={/*selectExportTable ?*/ '#153D8A' /* : '#888'*/}
+                  color={tableSetting?.isChecked ? '#153D8A' : '#888'}
                 >
-                  {count} ligne(s)
+                  {count} ligne{count && count > 1 ? 's' : ''}
                 </Typography>
               )}
             </>
@@ -193,7 +215,6 @@ const ExportTable: React.FC<ExportTableProps> = ({
                 'isChecked',
                 tableSetting?.isChecked !== undefined ? !tableSetting.isChecked : true
               )
-              setCheckedPivotMerge(!checkedPivotMerge)
             }}
           />
         </Grid>
@@ -204,39 +225,67 @@ const ExportTable: React.FC<ExportTableProps> = ({
         </Grid>
       )}
       <Grid container justifyContent={'space-between'}>
-        <Grid container xs={6} alignItems={'center'}>
-          <Typography marginRight={'5px'} className={classes.textBody2}>
-            Sélectionner les colonnes à exporter :
-          </Typography>
-          <Autocomplete
-            multiple
-            className={classes.autocomplete}
-            size="small"
-            limitTags={4}
-            sx={{ width: '500px' }}
-            disabled={tableSetting?.isChecked === false}
-            disableCloseOnSelect
-            options={exportColumns}
-            noOptionsText="Aucune colonne disponible"
-            getOptionLabel={(option) => {
-              return `${option}`
-            }}
-            renderOption={(props, option, { selected }) => {
-              const { key, ...optionProps } = props
-              return (
-                <li key={key} {...optionProps}>
-                  <Checkbox style={{ marginRight: 8 }} checked={selected} />
-                  {option}
-                </li>
-              )
-            }}
-            renderInput={(params) => {
-              return <TextField {...params} label="Sélectionnez une colonne" />
-            }}
-            value={tableSetting?.columns || []}
-            onChange={(_, value) => onChangeTableSettings(exportTable.name, 'columns', value)}
-          />
-        </Grid>
+        {checkedPivotMerge === false && (
+          <Grid container xs={6} alignItems={'center'}>
+            <Typography marginRight={'5px'} className={classes.textBody2}>
+              Sélectionner les colonnes à exporter :
+            </Typography>
+            <Autocomplete
+              multiple
+              value={tableSetting?.columns || []}
+              className={classes.autocomplete}
+              size="small"
+              limitTags={4}
+              sx={{ width: '500px' }}
+              disabled={tableSetting?.isChecked === false}
+              disableCloseOnSelect
+              options={['Tous selectionner', ...exportColumns]}
+              onChange={(event, newValue) => {
+                if (newValue.includes('Tous selectionner')) {
+                  if (tableSetting?.columns?.length === exportColumns.length) {
+                    onChangeTableSettings(exportTable.name, 'columns', null)
+                  } else {
+                    onChangeTableSettings(exportTable.name, 'columns', exportColumns)
+                  }
+                } else {
+                  onChangeTableSettings(
+                    exportTable.name,
+                    'columns',
+                    newValue.filter((e) => e !== 'Tous selectionner')
+                  )
+                }
+              }}
+              noOptionsText="Aucune colonne disponible"
+              getOptionLabel={(option) => {
+                return `${option}`
+              }}
+              renderOption={(props, option, { selected }) => {
+                const { key, ...optionProps } = props
+                const isChecked =
+                  option === 'Tous selectionner'
+                    ? tableSetting?.columns?.length === exportColumns.length
+                    : tableSetting?.columns?.includes(option)
+                const isIndeterminate =
+                  option === 'Tous selectionner' &&
+                  (tableSetting?.columns?.length ?? 0) > 0 &&
+                  (tableSetting?.columns?.length ?? 0) < exportColumns.length
+                return (
+                  <li key={key} {...optionProps}>
+                    <Checkbox
+                      style={{ marginRight: 8 }}
+                      checked={isChecked || selected}
+                      indeterminate={isIndeterminate}
+                    />
+                    <ListItemText primary={option} />
+                  </li>
+                )
+              }}
+              renderInput={(params) => {
+                return <TextField {...params} label="Sélectionnez une colonne" />
+              }}
+            />
+          </Grid>
+        )}
         <Grid container xs={6} alignItems="center">
           {exportTableResourceType !== ResourceType.UNKNOWN && (
             <>
@@ -266,18 +315,21 @@ const ExportTable: React.FC<ExportTableProps> = ({
         <Grid container alignItems={'center'}>
           <Checkbox
             style={{ padding: '0, 0, 0 ,0' }}
+            color="secondary"
             disabled={!checkedTable}
-            checked={checkedPivotMerge}
+            checked={tableSetting?.pivotMerge || false}
             onClick={(e) => {
               e.stopPropagation()
-              setCheckedPivotMerge(!checkedPivotMerge)
+              onChangeTableSettings(exportTable.name, 'pivotMerge', !tableSetting.pivotMerge)
             }}
           />
-          <Typography>Positionner les questions en colonnes (Pivot)</Typography>
+          <Typography color={tableSetting?.isChecked ? 'rgba(0, 0, 0, 0.8)' : '#888'} fontSize={13} fontWeight={600}>
+            Positionner les questions en colonnes "Pivot" (desactive la selection des colonnes a exporter)
+          </Typography>
         </Grid>
       )}
       {count !== null && (exportTableResourceType === ResourceType.DOCUMENTS ? count > 5000 : count > limit) && (
-        <Grid>
+        <Grid marginTop={'1em'}>
           <Typography color={'red'} fontWeight={'bold'} fontSize={12}>
             La table sélectionnée dépasse la limite de{' '}
             {exportTableResourceType === ResourceType.DOCUMENTS ? 5000 : limit} lignes autorisées. Veuillez affiner
