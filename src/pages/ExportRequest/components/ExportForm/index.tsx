@@ -86,7 +86,7 @@ const ExportForm: React.FC = () => {
       })
       .filter((table) => table !== undefined)
     try {
-      const response = await fetchExportTablesRelationsInfo(tableList)
+      const response = await fetchExportTablesRelationsInfo(tableList as string[])
       setCompatibilitiesTables(response)
     } catch (e) {
       console.log('error', e)
