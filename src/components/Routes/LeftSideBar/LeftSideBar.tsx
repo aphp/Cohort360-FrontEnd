@@ -369,7 +369,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     Mes requêtes
                   </Link>
                 </ListItem>
-                {/* TODO: refacto ce menu burger là c'est la crise wesh */}
+                {/* TODO: refacto ce menu burger parce que là c'est la crise */}
                 <ListItem>
                   <Link
                     id="myProject-link"

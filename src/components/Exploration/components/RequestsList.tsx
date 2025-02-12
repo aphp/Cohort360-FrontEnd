@@ -27,7 +27,12 @@ import { ProjectType, RequestType } from 'types'
 import { OrderBy } from 'types/searchCriterias'
 import { getRequestsSearchParams } from 'utils/explorationUtils'
 
-const RequestsList = () => {
+type RequestsListProps = {
+  showHeader?: boolean
+  rowsPerPage?: number
+}
+
+const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps) => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { projectId } = useParams()
@@ -50,7 +55,8 @@ const RequestsList = () => {
     searchInput,
     startDate,
     endDate,
-    page
+    page,
+    rowsPerPage
   })
   const editRequestMutation = useEditRequest()
   const editProjectMutation = useEditProject()
@@ -135,50 +141,54 @@ const RequestsList = () => {
 
   return (
     <Grid container gap="20px">
-      {projectId && (
-        <LevelHeader
-          loading={projectLoading}
-          name={parentProject?.name ?? ''}
-          hideActions={!deleteMode}
-          description={parentProject?.description ?? ''}
-          actions={
-            <>
-              <IconButton
-                style={{ padding: 4 }}
-                onClick={() => {
-                  setSelectedProject(parentProject ?? null)
-                  setOpenEditionModal(true)
-                }}
-              >
-                <EditIcon />
-              </IconButton>
-              <IconButton
-                style={{ padding: 4 }}
-                color="secondary"
-                onClick={() => {
-                  setSelectedProject(parentProject ?? null)
-                  setOpenDeletionModal(true)
-                }}
-              >
-                <DeleteOutlineIcon />
-              </IconButton>
-            </>
-          }
-        />
-      )}
+      {showHeader && (
+        <>
+          {projectId && (
+            <LevelHeader
+              loading={projectLoading}
+              name={parentProject?.name ?? ''}
+              hideActions={!deleteMode}
+              description={parentProject?.description ?? ''}
+              actions={
+                <>
+                  <IconButton
+                    style={{ padding: 4 }}
+                    onClick={() => {
+                      setSelectedProject(parentProject ?? null)
+                      setOpenEditionModal(true)
+                    }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    style={{ padding: 4 }}
+                    color="secondary"
+                    onClick={() => {
+                      setSelectedProject(parentProject ?? null)
+                      setOpenDeletionModal(true)
+                    }}
+                  >
+                    <DeleteOutlineIcon />
+                  </IconButton>
+                </>
+              }
+            />
+          )}
 
-      <ActionBar
-        deleteMode={deleteMode}
-        loading={loading}
-        total={total}
-        label="requête"
-        totalSelected={selectedRequests.length}
-        onConfirmDeletion={() => setOpenDeletionModal(true)}
-        onCancelDeletion={() => {
-          setDeleteMode(false)
-          clearSelection()
-        }}
-      />
+          <ActionBar
+            deleteMode={deleteMode}
+            loading={loading}
+            total={total}
+            label="requête"
+            totalSelected={selectedRequests.length}
+            onConfirmDeletion={() => setOpenDeletionModal(true)}
+            onCancelDeletion={() => {
+              setDeleteMode(false)
+              clearSelection()
+            }}
+          />
+        </>
+      )}
 
       <RequestsTableContent
         requestsList={requestsList}
@@ -196,6 +206,7 @@ const RequestsList = () => {
         onClickDelete={onClickDelete}
         onSelectAll={onSelectAll}
         disabled={maintenanceIsActive}
+        noPagination={!showHeader}
       />
 
       <AddOrEditItem

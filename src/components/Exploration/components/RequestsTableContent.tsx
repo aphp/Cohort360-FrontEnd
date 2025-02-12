@@ -34,6 +34,7 @@ type RequestsTableContentProps = {
   onClickDelete: (request: RequestType) => void
   onSelectAll: () => void
   disabled: boolean
+  noPagination?: boolean
 }
 
 const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
@@ -51,7 +52,8 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
   onClickEdit,
   onClickDelete,
   onSelectAll,
-  disabled
+  disabled,
+  noPagination
 }) => {
   const navigate = useNavigate()
   const { projectId } = useParams()
@@ -91,6 +93,7 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
       total={total}
       order={order}
       setOrder={(newOrder) => onChangeOrderBy(newOrder)}
+      noPagination={noPagination}
     >
       {requestsList.map((request) => {
         const cohortTotal = getCohortTotal(request.query_snapshots)

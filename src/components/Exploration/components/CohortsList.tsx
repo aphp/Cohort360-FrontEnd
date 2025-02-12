@@ -35,8 +35,15 @@ import { Cohort, RequestType, ValueSet } from 'types'
 import { CohortsFilters, FilterKeys, OrderBy } from 'types/searchCriterias'
 import { getCohortsSearchParams, getRequestName, statusOptions } from 'utils/explorationUtils'
 import { selectFiltersAsArray } from 'utils/filters'
+import { CohortsType } from 'types/cohorts'
 
-const CohortsList = () => {
+type CohortsListProps = {
+  showHeader?: boolean
+  rowsPerPage?: number
+  favorites?: boolean
+}
+
+const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }: CohortsListProps) => {
   const appConfig = useContext(AppConfig)
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
@@ -53,7 +60,7 @@ const CohortsList = () => {
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
   const [filters, setFilters] = useState<CohortsFilters>({
     status,
-    favorite,
+    favorite: favorites ? [CohortsType.FAVORITE] : favorite,
     minPatients,
     maxPatients,
     startDate,
@@ -66,7 +73,7 @@ const CohortsList = () => {
   const [openFiltersModal, setOpenFiltersModal] = useState(false)
 
   const { request: parentRequest, requestLoading, requestIsError } = useRequest(requestId)
-  const { cohortsList, total, loading } = useCohorts({ orderBy: order, searchInput, filters })
+  const { cohortsList, total, loading } = useCohorts({ orderBy: order, searchInput, filters, rowsPerPage })
   useCohortsWebSocket()
   const editRequestMutation = useEditRequest()
   const deleteRequestMutation = useDeleteRequests()
@@ -180,44 +187,48 @@ const CohortsList = () => {
 
   return (
     <Grid container gap="20px">
-      {requestId && (
-        <LevelHeader
-          loading={requestLoading}
-          name={getRequestName(parentRequest)}
-          hideActions={!deleteMode}
-          description={parentRequest?.description ?? ''}
-          actions={
-            <>
-              <Tooltip title="Partager la requête">
-                <IconButton onClick={() => onShareRequest()}>
-                  <ShareIcon />
-                </IconButton>
-              </Tooltip>
-              <IconButton onClick={() => setOpenEditionModal(true)}>
-                <EditIcon />
-              </IconButton>
-              <IconButton color="secondary" onClick={() => setOpenDeletionModal(true)}>
-                <DeleteOutlineIcon />
-              </IconButton>
-            </>
-          }
-        />
-      )}
+      {showHeader && (
+        <>
+          {requestId && (
+            <LevelHeader
+              loading={requestLoading}
+              name={getRequestName(parentRequest)}
+              hideActions={!deleteMode}
+              description={parentRequest?.description ?? ''}
+              actions={
+                <>
+                  <Tooltip title="Partager la requête">
+                    <IconButton onClick={() => onShareRequest()}>
+                      <ShareIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <IconButton onClick={() => setOpenEditionModal(true)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton color="secondary" onClick={() => setOpenDeletionModal(true)}>
+                    <DeleteOutlineIcon />
+                  </IconButton>
+                </>
+              }
+            />
+          )}
 
-      <ActionBar
-        deleteMode={deleteMode}
-        loading={loading}
-        total={total}
-        label="cohorte"
-        totalSelected={selectedCohorts.length}
-        onConfirmDeletion={() => setOpenDeletionModal(true)}
-        onCancelDeletion={() => {
-          setDeleteMode(false)
-          clearSelection()
-        }}
-        onFilter={() => setOpenFiltersModal(true)}
-        filters={filtersAsArray}
-      />
+          <ActionBar
+            deleteMode={deleteMode}
+            loading={loading}
+            total={total}
+            label="cohorte"
+            totalSelected={selectedCohorts.length}
+            onConfirmDeletion={() => setOpenDeletionModal(true)}
+            onCancelDeletion={() => {
+              setDeleteMode(false)
+              clearSelection()
+            }}
+            onFilter={() => setOpenFiltersModal(true)}
+            filters={filtersAsArray}
+          />
+        </>
+      )}
       <CohortsTableContent
         cohortsList={cohortsList}
         deleteMode={deleteMode}
@@ -238,6 +249,7 @@ const CohortsList = () => {
           onClickEdit,
           onSelectCohort: toggle
         }}
+        noPagination={!showHeader}
       />
 
       {!!appConfig.features.export.enabled && (

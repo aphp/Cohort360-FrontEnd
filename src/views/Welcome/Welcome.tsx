@@ -4,13 +4,13 @@ import moment from 'moment'
 
 import { Alert, Container, Grid, Paper, Typography } from '@mui/material'
 
+import CohortsList from 'components/Exploration/components/CohortsList'
 import NewsCard from 'components/Welcome/NewsCard/NewsCard'
 import PatientsCard from 'components/Welcome/PatientsCard/PatientsCard'
 import SearchPatientCard from 'components/Welcome/SearchPatientCard/SearchPatientCard'
 import TutorialsCard from 'components/Welcome/TutorialsCard/TutorialsCard'
-import CohortsTable from 'components/CohortsTable'
-import RequestsTable from 'components/Requests/PreviewTable'
 import PreviewCard from 'components/ui/Cards/PreviewCard'
+import RequestsList from 'components/Exploration/components/RequestsList'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProjects } from 'state/project'
@@ -19,8 +19,6 @@ import { AccessExpiration } from 'types'
 import useStyles from './styles'
 import { CohortsType } from 'types/cohorts'
 import { infoMessages } from 'data/infoMessage'
-import useCohorts from 'components/Exploration/hooks/useCohorts'
-import useRequests from 'components/Exploration/hooks/useRequests'
 
 const Welcome = () => {
   const { classes, cx } = useStyles()
@@ -41,10 +39,6 @@ const Welcome = () => {
     dispatch(fetchProjects())
     dispatch(fetchRequests())
   }, [])
-
-  const { cohortsList, loading } = useCohorts({ filters: { favorite: CohortsType.FAVORITE }, rowsPerPage: 5 })
-  const { cohortsList: favCohorts, loading: favloading } = useCohorts({ rowsPerPage: 5 })
-  const { requestsList, loading: requestsloading } = useRequests({ rowsPerPage: 5 })
 
   return practitioner ? (
     <Grid
@@ -163,10 +157,9 @@ const Welcome = () => {
               <PreviewCard
                 title={'Mes cohortes favorites'}
                 linkLabel={'Voir toutes mes cohortes favorites'}
-                // TODO: ajouter filtre sur les favorites dans l'url
                 onClickLink={() => navigate(`/researches/cohorts/?favorite=${CohortsType.FAVORITE}`)}
               >
-                <CohortsTable data={favCohorts} loading={favloading} onUpdate={() => console.log('ciao')} />
+                <CohortsList showHeader={false} rowsPerPage={5} favorites />
               </PreviewCard>
             </Paper>
           </Grid>
@@ -179,7 +172,7 @@ const Welcome = () => {
                 linkLabel={'Voir toutes mes cohortes'}
                 onClickLink={() => navigate('/researches/cohorts')}
               >
-                <CohortsTable data={cohortsList} loading={loading} onUpdate={() => console.log('ciao')} />
+                <CohortsList showHeader={false} rowsPerPage={5} />
               </PreviewCard>
             </Paper>
           </Grid>
@@ -192,7 +185,7 @@ const Welcome = () => {
                 linkLabel={'Voir toutes mes requêtes'}
                 onClickLink={() => navigate('/researches/requests')}
               >
-                <RequestsTable data={requestsList} loading={requestsloading} />
+                <RequestsList showHeader={false} rowsPerPage={5} />
               </PreviewCard>
             </Paper>
           </Grid>

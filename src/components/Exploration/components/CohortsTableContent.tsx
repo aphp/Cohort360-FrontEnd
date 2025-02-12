@@ -70,6 +70,7 @@ type CohortsTableContentProps = {
   onChangeOrderBy: (newOrder: OrderBy) => void
   onSelectAll: () => void
   cohortsCallbacks: CohortCallbacks
+  noPagination?: boolean
 }
 
 const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
@@ -84,7 +85,8 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
   disabled,
   selectedCohorts,
   onSelectAll,
-  cohortsCallbacks
+  cohortsCallbacks,
+  noPagination
 }) => {
   const appConfig = useContext(AppConfig)
   const navigate = useNavigate()
@@ -128,6 +130,7 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
       total={total}
       order={order}
       setOrder={(newOrder) => onChangeOrderBy(newOrder)}
+      noPagination={noPagination}
     >
       {cohortsList.map((cohort) => {
         const isExportable = appConfig.features.export.enabled ? cohort?.rights?.export_csv_nomi : false
