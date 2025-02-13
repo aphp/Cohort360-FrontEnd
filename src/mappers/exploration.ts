@@ -273,7 +273,7 @@ const mapQuestionnaireToRows = (list: CohortQuestionnaireResponse[], groupId?: s
       {
         id: `${elem.id}-formName`,
         value: formName ? getFormLabel(formName) : 'Non renseigné',
-        type: CellType.TEXT
+        type: CellType.SUBARRAY
       },
       {
         id: `${elem.id}-date`,
