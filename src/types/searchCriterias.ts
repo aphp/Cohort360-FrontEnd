@@ -349,7 +349,7 @@ export type ImagingFilters = GenericFilter & {
 }
 
 export type MaternityFormFilters = GenericFilter & {
-  ipp?: string
+  ipp: string
   formName: FormNames[]
 }
 
