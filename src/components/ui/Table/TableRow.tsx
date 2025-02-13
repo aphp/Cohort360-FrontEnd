@@ -19,7 +19,7 @@ type RowProps = {
 }
 
 const TableRow = ({ row, sx }: RowProps) => {
-  const [subarrayIndex, setSubarrayIndex] = useState<number | null>(null)
+  const [subitemIndex, setSubitemIndex] = useState<number | null>(null)
 
   return (
     <>
@@ -76,24 +76,6 @@ const TableRow = ({ row, sx }: RowProps) => {
                   </>
                 )
               })()}
-            {cell.type === CellType.LINES &&
-              (() => {
-                const [open, setOpen] = useState(false)
-                return (
-                  <>
-                    <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-                      {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-                    </IconButton>
-                    <Collapse in={open} timeout="auto" unmountOnExit>
-                      {(cell.value as Line[]).length === 0 ? (
-                        'Aucune donnée à afficher'
-                      ) : (
-                        <Lines value={cell.value as Line[]} />
-                      )}
-                    </Collapse>
-                  </>
-                )
-              })()}
             {cell.type === CellType.MODAL &&
               (() => {
                 const [open, setOpen] = useState(false)
@@ -110,24 +92,24 @@ const TableRow = ({ row, sx }: RowProps) => {
                   </>
                 )
               })()}
-            {cell.type === CellType.SUBARRAY && (
+            {(cell.type === CellType.SUBARRAY || cell.type === CellType.LINES) && (
               <IconButton
                 aria-label="expand row"
                 size="small"
-                onClick={() => setSubarrayIndex(index === subarrayIndex ? null : index)}
+                onClick={() => setSubitemIndex(index === subitemIndex ? null : index)}
               >
-                {subarrayIndex === index ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                {subitemIndex === index ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
               </IconButton>
             )}
           </TableCell>
         ))}
       </TableRowMui>
-      {subarrayIndex !== null && (
+      {subitemIndex !== null && row[subitemIndex].type === CellType.SUBARRAY && (
         <TableRowMui>
           <TableCell colSpan={row.length} sx={{ padding: 0 }}>
-            <Collapse in={subarrayIndex !== null} unmountOnExit>
+            <Collapse in={subitemIndex !== null} unmountOnExit>
               <DataTable
-                value={row[subarrayIndex].value as TableType}
+                value={row[subitemIndex].value as TableType}
                 sxColumn={{
                   backgroundColor: '#f8fcff',
                   borderBottom: '1px solid 1px solid rgb(224, 224, 224)',
@@ -135,6 +117,19 @@ const TableRow = ({ row, sx }: RowProps) => {
                 }}
                 sxRow={{ backgroundColor: '#fff', borderBottom: '1px solid rgb(224, 224, 224)', fontSize: 12.5 }}
               />
+            </Collapse>
+          </TableCell>
+        </TableRowMui>
+      )}
+      {subitemIndex !== null && row[subitemIndex].type === CellType.LINES && (
+        <TableRowMui>
+          <TableCell colSpan={row.length} sx={{ padding: 0 }}>
+            <Collapse in={subitemIndex !== null} timeout="auto" unmountOnExit>
+              {(row[subitemIndex].value as Line[]).length === 0 ? (
+                'Aucune donnée à afficher'
+              ) : (
+                <Lines value={row[subitemIndex].value as Line[]} />
+              )}
             </Collapse>
           </TableCell>
         </TableRowMui>

@@ -27,6 +27,7 @@ import { getDocumentStatus } from 'utils/documentsFormatter'
 import CheckIcon from 'assets/icones/check.svg?react'
 import CancelIcon from 'assets/icones/times.svg?react'
 import docTypes from 'assets/docTypes.json'
+import { isBiologyCohort, isDocumentsCohort, isImagingCohort, isMedicationCohort, isOtherResourcesResponse, isPatientsResponse, isPmsiCohort, isQuestionnaireCohort } from 'utils/exploration'
 
 const mapPatientsToColumns = (deidentified: boolean): Column[] => {
   return [
@@ -61,11 +62,11 @@ const mapPmsiToColumns = (type: ResourceType, deidentified: boolean): Column[] =
 
 const mapQuestionnaireToColumns = (): Column[] => {
   return [
-    { label: 'Type de formulaire', align: 'left' },
+    { label: 'Type de formulaire' },
     { label: "Date d'écriture", code: Order.AUTHORED },
     { label: `IPP` },
     { label: 'Unité exécutrice' },
-    { label: 'Aperçu' }
+    { label: 'Aperçu', align: 'center' }
   ].filter((elem) => elem) as Column[]
 }
 
@@ -273,7 +274,7 @@ const mapQuestionnaireToRows = (list: CohortQuestionnaireResponse[], groupId?: s
       {
         id: `${elem.id}-formName`,
         value: formName ? getFormLabel(formName) : 'Non renseigné',
-        type: CellType.SUBARRAY
+        type: CellType.TEXT
       },
       {
         id: `${elem.id}-date`,
@@ -298,7 +299,8 @@ const mapQuestionnaireToRows = (list: CohortQuestionnaireResponse[], groupId?: s
       {
         id: `${elem.id}-details`,
         value: getFormDetails(elem, formName),
-        type: CellType.LINES
+        type: CellType.LINES,
+        align: "center"
       }
     ].filter((elem) => elem) as Row
     rows.push(row)
@@ -689,46 +691,6 @@ export const mapMedicationToRows = (
     rows.push(row)
   })
   return rows
-}
-
-const isPatientsResponse = (data: Data): data is PatientsResponse => {
-  return 'originalPatients' in data
-}
-
-const isOtherResourcesResponse = (data: Data): data is CohortResults<any> => {
-  return 'list' in data
-}
-
-const isPmsiCohort = (data: CohortResults<any>): data is CohortResults<CohortPMSI> => {
-  const type = data.list[0].resourceType
-  return type === ResourceType.CONDITION || type === ResourceType.PROCEDURE || type === ResourceType.CLAIM
-}
-
-const isQuestionnaireCohort = (data: CohortResults<any>): data is CohortResults<CohortQuestionnaireResponse> => {
-  const type = data.list[0].resourceType
-  return type === ResourceType.QUESTIONNAIRE_RESPONSE
-}
-
-const isImagingCohort = (data: CohortResults<any>): data is CohortResults<CohortImaging> => {
-  const type = data.list[0].resourceType
-  return type === ResourceType.IMAGING
-}
-
-const isBiologyCohort = (data: CohortResults<any>): data is CohortResults<CohortObservation> => {
-  const type = data.list[0].resourceType
-  return type === ResourceType.OBSERVATION
-}
-
-const isMedicationCohort = (
-  data: CohortResults<any>
-): data is CohortResults<CohortMedication<MedicationRequest | MedicationAdministration>> => {
-  const type = data.list[0].resourceType
-  return type === ResourceType.MEDICATION_ADMINISTRATION || type === ResourceType.MEDICATION_REQUEST
-}
-
-const isDocumentsCohort = (data: CohortResults<any>): data is CohortResults<CohortComposition> => {
-  const type = data.list[0].resourceType
-  return type === ResourceType.DOCUMENTS
 }
 
 export const map = (data: Data, type: ResourceType, deidentified: boolean, groupId?: string) => {

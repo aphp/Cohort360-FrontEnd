@@ -802,8 +802,13 @@ const servicesCohorts: IServiceCohorts = {
       }
     } = options
 
-    const atLeastAFilter = !!ipp || executiveUnits.length > 0 || encounterStatus.length > 0 || formName.length > 0
-    console.log("test date", durationRange)
+    const atLeastAFilter =
+      !!ipp ||
+      executiveUnits.length > 0 ||
+      encounterStatus.length > 0 ||
+      formName.length > 0 ||
+      durationRange[0] !== null ||
+      durationRange[1] !== null
     const [formsList, allFormsList] = await Promise.all([
       fetchForms({
         _list: groupId ? [groupId] : [],
@@ -1118,13 +1123,16 @@ const servicesCohorts: IServiceCohorts = {
       case ResourceType.MEDICATION_ADMINISTRATION:
       case ResourceType.MEDICATION_REQUEST:
         return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
-          servicesCohorts.fetchMedicationList({ selectedTab: resourceType, searchCriterias, page, deidentified }, groupId)
+          servicesCohorts.fetchMedicationList(
+            { selectedTab: resourceType, searchCriterias, page, deidentified },
+            groupId
+          )
       case ResourceType.IMAGING:
         return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
           servicesCohorts.fetchImagingList({ searchCriterias, page, deidentified }, groupId)
       case ResourceType.OBSERVATION:
         return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
-          servicesCohorts.fetchBiologyList({searchCriterias, page, deidentified }, groupId)
+          servicesCohorts.fetchBiologyList({ searchCriterias, page, deidentified }, groupId)
     }
     return () => {}
   },
