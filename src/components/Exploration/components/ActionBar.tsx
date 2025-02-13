@@ -6,35 +6,43 @@ import Chip from 'components/ui/Chip'
 
 import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DriveFileMoveIcon from 'assets/icones/drive-file-move.svg?react'
 import FilterList from '@mui/icons-material/FilterList'
+
 import { FilterKeys, FilterValue } from 'types/searchCriterias'
 
 type ActionBarProps = {
+  multiselectMode: boolean
+  moveMode: boolean
   deleteMode: boolean
   loading: boolean
   total: number
   label: string
   totalSelected: number
   onConfirmDeletion: () => void
-  onCancelDeletion: () => void
+  onCancelMultiselectMode: () => void
+  onMove: () => void
   onFilter?: () => void
   filters?: { value: FilterValue; category: FilterKeys; label: string }[]
 }
 
 const ActionBar: React.FC<ActionBarProps> = ({
+  multiselectMode,
+  moveMode,
   deleteMode,
   loading,
   total,
   label,
   totalSelected,
-  onCancelDeletion,
+  onCancelMultiselectMode,
   onConfirmDeletion,
+  onMove,
   onFilter,
   filters
 }) => {
   return (
     <Grid container justifyContent={'space-between'} alignItems={'center'}>
-      {!deleteMode &&
+      {!multiselectMode &&
         (loading ? (
           <CircularProgress size={20} />
         ) : (
@@ -43,17 +51,17 @@ const ActionBar: React.FC<ActionBarProps> = ({
             {total > 1 ? 's' : ''}
           </Typography>
         ))}
-      {!deleteMode && onFilter && (
+      {!multiselectMode && onFilter && (
         <Button startIcon={<FilterList height="15px" fill="#FFF" />} width={'fit-content'} onClick={onFilter}>
           Filtrer
         </Button>
       )}
-      {!deleteMode && (
+      {!multiselectMode && (
         <Button width="fit-content" onClick={() => console.log('euh a faire')} endIcon={<AddIcon />}>
           Ajouter une requête
         </Button>
       )}
-      {!deleteMode && filters && (
+      {!multiselectMode && filters && (
         <Grid item xs={12}>
           {filters.map((filter, index) => (
             <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
@@ -62,7 +70,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
       )}
       {/* TODO: faire un map sur les boutons sinon, avec une box autour */}
 
-      {deleteMode && (
+      {multiselectMode && (
         <>
           <Typography fontWeight={'bold'} fontSize={14}>
             {totalSelected} {label}
@@ -70,18 +78,38 @@ const ActionBar: React.FC<ActionBarProps> = ({
             {totalSelected > 1 ? 's' : ''}
           </Typography>
           <Box display={'flex'} justifyContent={'flex-end'}>
-            {/* TODO: a custom */}
-            <Button onClick={onCancelDeletion} clearVariant>
-              Annuler la suppression
-            </Button>
-            <Button
-              onClick={onConfirmDeletion}
-              clearVariant
-              endIcon={<DeleteOutlineIcon color={totalSelected === 0 ? 'disabled' : 'secondary'} />}
-              disabled={totalSelected === 0}
-            >
-              Supprimer
-            </Button>
+            {moveMode && (
+              <>
+                <Button onClick={onCancelMultiselectMode} clearVariant>
+                  {/* TODO: a custom */}
+                  Annuler
+                </Button>
+                <Button
+                  onClick={onMove}
+                  clearVariant
+                  endIcon={<DriveFileMoveIcon color={totalSelected === 0 ? 'disabled' : 'secondary'} />}
+                  disabled={totalSelected === 0}
+                >
+                  Déplacer
+                </Button>
+              </>
+            )}
+            {deleteMode && (
+              <>
+                <Button onClick={onCancelMultiselectMode} clearVariant>
+                  {/* TODO: a custom */}
+                  Annuler la suppression
+                </Button>
+                <Button
+                  onClick={onConfirmDeletion}
+                  clearVariant
+                  endIcon={<DeleteOutlineIcon color={totalSelected === 0 ? 'disabled' : 'secondary'} />}
+                  disabled={totalSelected === 0}
+                >
+                  Supprimer
+                </Button>
+              </>
+            )}
           </Box>
         </>
       )}

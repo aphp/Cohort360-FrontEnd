@@ -9,6 +9,7 @@ import ResearchesTable from './Table'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove'
 import EditIcon from '@mui/icons-material/Edit'
 import ShareIcon from '@mui/icons-material/Share'
 
@@ -20,7 +21,7 @@ import { isChecked } from 'utils/filters'
 
 type RequestsTableContentProps = {
   requestsList: RequestType[]
-  deleteMode: boolean
+  multiSelectMode: boolean
   selectedRequests: RequestType[]
   total: number
   page: number
@@ -32,6 +33,7 @@ type RequestsTableContentProps = {
   onShareRequest: (request: RequestType) => void
   onClickEdit: (request: RequestType) => void
   onClickDelete: (request: RequestType) => void
+  onClickMove: (request: RequestType) => void
   onSelectAll: () => void
   disabled: boolean
   noPagination?: boolean
@@ -39,7 +41,7 @@ type RequestsTableContentProps = {
 
 const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
   requestsList,
-  deleteMode,
+  multiSelectMode,
   selectedRequests,
   total,
   page,
@@ -51,6 +53,7 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
   onShareRequest,
   onClickEdit,
   onClickDelete,
+  onClickMove,
   onSelectAll,
   disabled,
   noPagination
@@ -59,7 +62,7 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
   const { projectId } = useParams()
 
   const columns: Column[] = [
-    ...(deleteMode
+    ...(multiSelectMode
       ? [
           {
             label: (
@@ -101,11 +104,11 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
         return (
           <TableRow
             key={request.uuid}
-            onClick={() => (deleteMode ? onSelectRequest(request) : navigate(`/cohort/new/${request.uuid}`))}
+            onClick={() => (multiSelectMode ? onSelectRequest(request) : navigate(`/cohort/new/${request.uuid}`))}
             style={{ cursor: 'pointer' }}
           >
-            {deleteMode && (
-              <TableCellWrapper sx={{ width: deleteMode ? 50 : 0 }}>
+            {multiSelectMode && (
+              <TableCellWrapper sx={{ width: multiSelectMode ? 50 : 0 }}>
                 <Checkbox
                   checked={isChecked(request, selectedRequests)}
                   onClick={(event) => {
@@ -119,7 +122,7 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
               {getRequestName(request)}
             </TableCellWrapper>
             <TableCellWrapper>
-              {!deleteMode && (
+              {!multiSelectMode && (
                 <Box display={'flex'} flexWrap={'nowrap'}>
                   <Tooltip title="Partager la requête">
                     <IconButton
@@ -141,6 +144,12 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
                         icon: <EditIcon />,
                         label: 'Éditer',
                         onclick: () => onClickEdit(request)
+                      },
+                      {
+                        key: 'move',
+                        icon: <DriveFileMoveIcon />,
+                        label: 'Déplacer',
+                        onclick: () => onClickMove(request)
                       },
                       {
                         key: 'delete',

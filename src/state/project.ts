@@ -34,14 +34,7 @@ const fetchProjects = createAsyncThunk<FetchProjectListReturn, void, { state: Ro
       const state = getState().project
 
       const oldProjectList = state.projectsList || []
-      const projects =
-        (await services.projects.fetchProjectsList(
-          { startDate: null, endDate: null },
-          '',
-          { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
-          100,
-          0
-        )) || []
+      const projects = (await services.projects.fetchProjectsList({})) || []
 
       if (state.count === projects.count) {
         return {
@@ -53,13 +46,7 @@ const fetchProjects = createAsyncThunk<FetchProjectListReturn, void, { state: Ro
 
       let projectList = projects.results || []
       if (projects.count > projectList.length) {
-        const newResult = await services.projects.fetchProjectsList(
-          { startDate: null, endDate: null },
-          '',
-          { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
-          100,
-          0
-        )
+        const newResult = await services.projects.fetchProjectsList({})
         // Add elements to projectList array and filter doublon
         projectList = [...projectList, ...(newResult.results || [])]
         projectList = projectList.filter((item, index, array) => {

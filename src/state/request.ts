@@ -37,10 +37,10 @@ const fetchRequests = createAsyncThunk<FetchRequestListReturn, void, { state: Ro
       let requestList = requests.results || []
       // requestList.length <= 100, check fetchRequestsList() for more information
       if (requests.count > requestList.length) {
-        const newResult = await services.projects.fetchRequestsList(
-          requests.count - requestList.length,
-          requestList.length
-        )
+        const newResult = await services.projects.fetchRequestsList({
+          limit: requests.count - requestList.length,
+          offset: requestList.length
+        })
         // Add elements to requestList array and filter doublon
         requestList = [...requestList, ...(newResult.results || [])]
         requestList = requestList.filter((item, index, array) => {

@@ -7,13 +7,12 @@ import servicesCohorts from './serviceCohorts'
 import { CohortsFilters, Direction, Order, OrderBy, ProjectsFilters } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
 
-type FetchCohortsListProps = {
-  filters: CohortsFilters
+type FetchProjectsListProps = {
+  filters?: ProjectsFilters
   searchInput?: string
-  orderBy: OrderBy
+  order?: OrderBy
   limit?: number
   offset?: number
-  signal?: AbortSignal
 }
 
 type FetchRequestsListProps = {
@@ -25,6 +24,18 @@ type FetchRequestsListProps = {
   limit?: number
   offset?: number
 }
+
+type FetchCohortsListProps = {
+  filters: CohortsFilters
+  searchInput?: string
+  orderBy: OrderBy
+  limit?: number
+  offset?: number
+  signal?: AbortSignal
+}
+
+const optionsReducer = (accumulator: string, currentValue: string) =>
+  accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
 
 export interface IServiceProjects {
   fetchProject: (projectId: string) => Promise<ProjectType>
@@ -43,13 +54,7 @@ export interface IServiceProjects {
    *   - previous: URL d'appel pour récupérer les projet de recherche précédent
    *   - results: Liste de projet de recherche récupéré
    */
-  fetchProjectsList: (
-    filters: ProjectsFilters,
-    searchInput: string,
-    order: OrderBy,
-    limit?: number,
-    offset?: number
-  ) => Promise<{
+  fetchProjectsList: (args: FetchProjectsListProps) => Promise<{
     count: number
     next: string | null
     previous: string | null
@@ -244,32 +249,24 @@ const servicesProjects: IServiceProjects = {
   fetchRequest: async (requestId) => {
     return (await apiBack.get(`/cohort/requests/${requestId}/`)).data
   },
-  fetchProjectsList: async (filters, searchInput, order, limit, offset) => {
-    const { startDate, endDate } = filters
-    const orderDirection = order.orderDirection === Direction.DESC ? '-' : ''
-    let search = `?ordering=${orderDirection}${order.orderBy}`
-    if (limit) {
-      search += `&limit=${limit}`
-    }
-    if (offset) {
-      search += `&offset=${offset}`
-    }
-    if (searchInput) {
-      search += `&search=${searchInput}`
-    }
-    if (startDate) {
-      search += `&min_created_at=${startDate}`
-    }
-    if (endDate) {
-      search += `&max_created_at=${endDate}`
-    }
+  fetchProjectsList: async (args) => {
+    const { filters, searchInput, order, limit, offset } = args
+    const _orderBy = order ?? { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC }
+    const orderDirection = _orderBy.orderDirection === Direction.DESC ? '-' : ''
+    let options: string[] = []
+    if (_orderBy) options = [...options, `ordering=${orderDirection}${_orderBy.orderBy}`]
+    if (limit) options = [...options, `limit=${limit}`]
+    if (offset) options = [...options, `offset=${offset}`]
+    if (searchInput) options = [...options, `search=${searchInput}`]
+    if (filters?.startDate) options = [...options, `min_created_at=${filters.startDate}`]
+    if (filters?.endDate) options = [...options, `max_created_at=${filters.endDate}`]
 
     const fetchProjectsResponse = (await apiBack.get<{
       count: number
       next: string | null
       previous: string | null
       results: ProjectType[]
-    }>(`/cohort/folders/${search}`)) ?? { status: 400 }
+    }>(`/cohort/folders/?${options.reduce(optionsReducer)}`)) ?? { status: 400 }
 
     if (fetchProjectsResponse.status === 200) {
       const { data } = fetchProjectsResponse
@@ -323,8 +320,6 @@ const servicesProjects: IServiceProjects = {
     const { orderBy, parentId, searchInput, startDate, endDate, limit, offset } = args
     const _orderBy = orderBy ?? { orderBy: Order.UPDATED, orderDirection: Direction.DESC }
     const _sortDirection = _orderBy.orderDirection === Direction.DESC ? '-' : ''
-    const optionsReducer = (accumulator: string, currentValue: string) =>
-      accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
     let options: string[] = []
     if (limit || limit === 0) options = [...options, `limit=${limit}`]
     if (offset) options = [...options, `offset=${offset}`]
@@ -449,8 +444,6 @@ const servicesProjects: IServiceProjects = {
   fetchCohortsList: async (args) => {
     const { filters, searchInput, orderBy, limit, offset, signal } = args
     const _sortDirection = orderBy.orderDirection === Direction.DESC ? '-' : ''
-    const optionsReducer = (accumulator: string, currentValue: string) =>
-      accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
 
     let options: string[] = []
     const { status, favorite, minPatients, maxPatients, startDate, endDate, parentId } = filters

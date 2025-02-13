@@ -9,12 +9,10 @@ const useCounts = (searchInput: string, startDate: string | null, endDate: strin
       {
         queryKey: ['projectsCount', searchInput, startDate, endDate],
         queryFn: async () => {
-          const res = await services.projects.fetchProjectsList(
-            { startDate: startDate ?? null, endDate: endDate ?? null },
-            searchInput,
-            { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
-            0
-          )
+          const res = await services.projects.fetchProjectsList({
+            filters: { startDate: startDate ?? null, endDate: endDate ?? null },
+            searchInput
+          })
           return res.count ?? 0
         },
         enabled: !!(searchInput || startDate || endDate)

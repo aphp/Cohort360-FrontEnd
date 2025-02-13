@@ -10,6 +10,7 @@ import AddOrEditItem from './Modals/AddOrEditItem'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
 import LevelHeader from './LevelHeader'
 import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
+import MoveRequest from './Modals/MoveRequest'
 import RequestsTableContent from './RequestsTableContent'
 
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
@@ -43,10 +44,12 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
 
   const { selectedRequestShare } = requestState
   const [deleteMode, setDeleteMode] = useState(false)
+  const [moveMode, setMoveMode] = useState(false)
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
   const [selectedProject, setSelectedProject] = useState<ProjectType | null>(null)
   const [openEditionModal, setOpenEditionModal] = useState(false)
   const [openDeletionModal, setOpenDeletionModal] = useState(false)
+  const [openMoveModal, setOpenMoveModal] = useState(false)
 
   const { project: parentProject, projectLoading, projectIsError } = useProject(projectId)
   const { requestsList, total, loading } = useRequests({
@@ -86,7 +89,6 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
     // TODO: pas sûre de garder l'ancien comportement (pq utiliser le store?)
     dispatch(setSelectedRequestShare(request))
   }
-  // TODO: ajouter action pour déplacer la requête de projet
 
   const onClickEdit = (request: RequestType) => {
     setSelectedRequests([request])
@@ -95,6 +97,11 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
 
   const onClickDelete = (request: RequestType) => {
     setDeleteMode(true)
+    setSelectedRequests([request])
+  }
+
+  const onClickMove = (request: RequestType) => {
+    setMoveMode(true)
     setSelectedRequests([request])
   }
 
@@ -147,7 +154,7 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
             <LevelHeader
               loading={projectLoading}
               name={parentProject?.name ?? ''}
-              hideActions={!deleteMode}
+              hideActions={!deleteMode || !moveMode}
               description={parentProject?.description ?? ''}
               actions={
                 <>
@@ -177,22 +184,26 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
 
           <ActionBar
             deleteMode={deleteMode}
-            loading={loading}
-            total={total}
             label="requête"
-            totalSelected={selectedRequests.length}
-            onConfirmDeletion={() => setOpenDeletionModal(true)}
-            onCancelDeletion={() => {
+            loading={loading}
+            multiselectMode={deleteMode || moveMode}
+            moveMode={moveMode}
+            onCancelMultiselectMode={() => {
+              setMoveMode(false)
               setDeleteMode(false)
               clearSelection()
             }}
+            onConfirmDeletion={() => setOpenDeletionModal(true)}
+            onMove={() => setOpenMoveModal(true)}
+            total={total}
+            totalSelected={selectedRequests.length}
           />
         </>
       )}
 
       <RequestsTableContent
         requestsList={requestsList}
-        deleteMode={deleteMode}
+        multiSelectMode={deleteMode || moveMode}
         selectedRequests={selectedRequests}
         total={total}
         page={page}
@@ -207,6 +218,7 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
         onSelectAll={onSelectAll}
         disabled={maintenanceIsActive}
         noPagination={!showHeader}
+        onClickMove={onClickMove}
       />
 
       <AddOrEditItem
@@ -237,6 +249,15 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
             : 'Êtes-vous sûr(e) de vouloir supprimer ce projet ? Sa suppression entraînera également celle des requêtes et cohortes sous-jacentes.'
         }
         // TODO: plus tard, ajouter au message de confirmation le warning pour les échantillons
+      />
+      <MoveRequest
+        open={openMoveModal}
+        onClose={() => {
+          setOpenMoveModal(false)
+          setMoveMode(false)
+          clearSelection()
+        }}
+        selectedRequests={selectedRequests}
       />
       {selectedRequestShare !== null && (
         <ModalShareRequest
