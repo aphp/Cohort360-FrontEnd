@@ -32,7 +32,7 @@ const ExplorationBoard = ({ deidentified = true, type }: ExplorationBoardProps) 
     resetFetchStatus
   } = useExplorationBoard(type, deidentified)
 
-  const { data, pagination, tableData, dataLoading, onChangePage } = useData(
+  const { count, pagination, tableData, dataLoading, onChangePage } = useData(
     type,
     searchCriterias,
     page,
@@ -43,7 +43,7 @@ const ExplorationBoard = ({ deidentified = true, type }: ExplorationBoardProps) 
   useEffect(() => {
     //console.log('test searchCriterias', searchCriterias)
     console.log('test searchCriterias', searchCriterias)
-  }, [data])
+  }, [tableData])
 
   // double fetch au chargement de la ressource ?? peut-être normal
   // IPP et NDA non trouvé en mode deidentified dans le tableau PMSI
@@ -77,7 +77,7 @@ const ExplorationBoard = ({ deidentified = true, type }: ExplorationBoardProps) 
       <DataSection
         isLoading={dataLoading}
         data={tableData}
-        infos={data}
+        count={count}
         orderBy={searchCriterias.orderBy}
         pagination={pagination}
         onChangePage={onChangePage}

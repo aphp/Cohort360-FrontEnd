@@ -5,28 +5,33 @@ import { Table } from 'types/table'
 import { OrderBy } from 'types/searchCriterias'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import { Pagination } from 'components/ui/Pagination'
-import { Data } from '../useData'
+import { ExplorationCount } from '../useData'
 
 type DataSectionProps = {
   data: Table
-  infos: Data | null
+  count: ExplorationCount | null
   orderBy: OrderBy
   isLoading: boolean
-  pagination: {currentPage: number, total: number}
+  pagination: { currentPage: number; total: number }
   onChangePage: (page: number) => void
   onSort: (orderBy: OrderBy) => void
 }
 
-const DataSection = ({ data, infos, orderBy, isLoading, pagination, onChangePage, onSort }: DataSectionProps) => {
+const DataSection = ({ data, count, orderBy, isLoading, pagination, onChangePage, onSort }: DataSectionProps) => {
   return (
     <Grid container justifyContent="center" item xs={12}>
       {isLoading && <CircularProgress />}
       {data.rows && !isLoading && (
         <>
-          {data.rows.length < 1 && <Typography variant="button">Aucun patient à afficher</Typography>}
+          {data.rows.length < 1 && <Typography variant="button">Aucune donnée à afficher</Typography>}
           {data.rows.length > 0 && (
             <Grid container gap={2}>
-              {infos && <DisplayDigits nb={infos.totalPatients} total={infos.totalAllPatients} label={'élément(s)'} />}
+              {count?.ressource && (
+                <DisplayDigits nb={count.ressource.results} total={count.ressource.total} label={'élément(s)'} />
+              )}
+              {count?.patients && (
+                <DisplayDigits nb={count.patients.results} total={count.patients.total} label={'patient(s)'} />
+              )}
 
               <DataTable value={data} orderBy={orderBy} onSort={onSort} />
               {

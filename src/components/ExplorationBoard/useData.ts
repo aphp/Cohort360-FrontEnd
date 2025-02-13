@@ -17,6 +17,7 @@ import { PatientsResponse } from 'types/patient'
 import { ResourceType } from 'types/requestCriterias'
 import { Filters, SearchCriterias } from 'types/searchCriterias'
 import { Table } from 'types/table'
+import { isPatientsResponse } from 'utils/exploration'
 
 export type Data =
   | PatientsResponse
@@ -28,6 +29,17 @@ export type Data =
       | CohortMedication<MedicationRequest | MedicationAdministration>
       | CohortComposition
     >
+
+export type ExplorationCount = {
+  ressource: {
+    results: number
+    total: number
+  } | null
+  patients: {
+    results: number
+    total: number
+  } | null
+}
 
 const RESULTS_PER_PAGE = 20
 
@@ -42,13 +54,15 @@ export const useData = (
   const [data, setData] = useState<Data | null>(null)
   const [tableData, setTableData] = useState<Table>({ rows: [], columns: [] })
   const [pagination, setPagination] = useState({ currentPage: page, total: 0 })
+  const [count, setCount] = useState<ExplorationCount | null>(null)
 
   const fetchData = async (page: number) => {
-    console.log('test update fetching')
+    console.log('test fetching')
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
       const fetcher = servicesCohorts.getExplorationFetcher(type)
       const results = await fetcher({ page, searchCriterias, groupId })
+      console.log('test fetching results', results)
       setData(results)
     } catch (error) {
       if (error instanceof CanceledError) {
@@ -56,6 +70,7 @@ export const useData = (
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
       setData(null)
+      setCount(null)
     }
   }
 
@@ -68,7 +83,20 @@ export const useData = (
   useEffect(() => {
     if (data) {
       setTableData(map(data, type, deidentified, groupId))
-      setPagination({ ...pagination, total: Math.ceil(data.totalPatients / RESULTS_PER_PAGE) })
+      let total = 0
+      const count: ExplorationCount = {
+        ressource: null,
+        patients: {
+          results: data.totalPatients,
+          total: data.totalAllPatients
+        }
+      }
+      if (!isPatientsResponse(data)) count.ressource = { results: data.total, total: data.totalAllResults }
+      setPagination({
+        ...pagination,
+        total: Math.ceil((count.ressource?.results ?? count.patients?.results ?? 0) / RESULTS_PER_PAGE)
+      })
+      setCount(count)
     } else setTableData({ rows: [], columns: [] })
     setLoadingStatus(LoadingStatus.SUCCESS)
   }, [data])
@@ -79,7 +107,7 @@ export const useData = (
   }
 
   return {
-    data,
+    count,
     tableData,
     dataLoading: loadingStatus === LoadingStatus.FETCHING,
     pagination,
