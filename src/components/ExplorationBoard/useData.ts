@@ -61,7 +61,7 @@ export const useData = (
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
       const fetcher = servicesCohorts.getExplorationFetcher(type)
-      const results = await fetcher({ page, searchCriterias, groupId })
+      const results = await fetcher({ page, searchCriterias, groupId, deidentified })
       console.log('test fetching results', results)
       setData(results)
     } catch (error) {
@@ -83,7 +83,6 @@ export const useData = (
   useEffect(() => {
     if (data) {
       setTableData(map(data, type, deidentified, groupId))
-      let total = 0
       const count: ExplorationCount = {
         ressource: null,
         patients: {

@@ -49,23 +49,25 @@ const OccurrencesSearch = ({ search, infos, onChange }: OccurrencesSearchProps) 
         </Grid>
       )}
       <Grid item xs={12} md={'searchBy' in search ? 8 : 12}>
-        {'searchInput' in search ? (
-          <Controller
-            name="searchInput"
-            control={control}
-            render={({ field }) => (
-              <SearchInput
-                {...field}
-                value={field.value ?? ''}
-                radius={5}
-                placeholder="Rechercher"
-                onchange={field.onChange}
-              />
-            )}
-          />
-        ) : (
+        {
+          'searchInput' in search && (
+            <Controller
+              name="searchInput"
+              control={control}
+              render={({ field }) => (
+                <SearchInput
+                  {...field}
+                  value={field.value ?? ''}
+                  radius={5}
+                  placeholder="Rechercher"
+                  onchange={field.onChange}
+                />
+              )}
+            />
+          ) /*: (
           <DisplayLocked />
-        )}
+        )*/
+        }
       </Grid>
     </Grid>
   )

@@ -62,6 +62,7 @@ const ExplorationBoard = ({ deidentified = true, type }: ExplorationBoardProps) 
   // => const _groupId = groupId ? `?groupId=${groupId}` : ''
   // => const _search = search ? `&search=${search}` : ''
   // => pmsiTabs
+  // Vérifier ce qu'on fait pour l'afichage des champs des filtres sauvegardés quand on passe de pseudo à nomi
   return (
     <Grid item xs={12} container gap="25px" padding="50px" sx={{ backgroundColor: '#fff' }}>
       <SearchSection
