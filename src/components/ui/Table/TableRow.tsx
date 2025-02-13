@@ -12,6 +12,7 @@ import DataTable from '.'
 import Paragraphs, { Paragraph } from '../Paragraphs'
 import Modal from '../Modal'
 import { Comment } from '@mui/icons-material'
+import { TableCellWrapper } from './styles'
 
 type RowProps = {
   row: Row
@@ -25,15 +26,12 @@ const TableRow = ({ row, sx }: RowProps) => {
     <>
       <TableRowMui sx={{ ...sx }}>
         {row.map((cell, index) => (
-          <TableCell
+          <TableCellWrapper
+            first={index === 0}
+            last={index === row.length - 1}
             scope="row"
             align={cell.align ?? 'left'}
-            sx={{
-              padding: index === 0 ? '5px 5px 5px 20px' : index === row.length - 1 ? '5px 20px 5px 5px' : '5px',
-              color: '#303030',
-              fontWeight: 400,
-              ...sx
-            }}
+            sx={{ ...cell.sx }}
           >
             {cell.type == CellType.GENDER_ICON && (
               <Grid container>
@@ -101,21 +99,22 @@ const TableRow = ({ row, sx }: RowProps) => {
                 {subitemIndex === index ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
               </IconButton>
             )}
-          </TableCell>
+          </TableCellWrapper>
         ))}
       </TableRowMui>
       {subitemIndex !== null && row[subitemIndex].type === CellType.SUBARRAY && (
         <TableRowMui>
-          <TableCell colSpan={row.length} sx={{ padding: 0 }}>
+          <TableCell colSpan={row.length} sx={{ padding: '0px 30px', backgroundColor: sx.backgroundColor  }}>
             <Collapse in={subitemIndex !== null} unmountOnExit>
               <DataTable
                 value={row[subitemIndex].value as TableType}
                 sxColumn={{
-                  backgroundColor: '#f8fcff',
+                  backgroundColor: sx.backgroundColor ,
+                  color: '153d8a',
                   borderBottom: '1px solid 1px solid rgb(224, 224, 224)',
-                  fontSize: 11
+                  fontSize: 13
                 }}
-                sxRow={{ backgroundColor: '#fff', borderBottom: '1px solid rgb(224, 224, 224)', fontSize: 12.5 }}
+                sxRow={{ backgroundColor: sx.backgroundColor }}
               />
             </Collapse>
           </TableCell>

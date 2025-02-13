@@ -1,5 +1,7 @@
 import { Status as StatusType } from 'components/ui/StatusChip'
 import { Paragraph } from 'components/ui/Paragraphs'
+import { Theme } from '@emotion/react'
+import { SxProps } from '@mui/material'
 
 export type Link = {
   url: string
@@ -39,9 +41,10 @@ export enum CellType {
 
 export type Cell = {
   id: string
-  value: string | Link | Document | Table | Line[] | Paragraph[]| Status
+  value: string | Link | Document | Table | Line[] | Paragraph[] | Status
   type: CellType
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
+  sx?: SxProps<Theme>
 }
 
 export type Row = Cell[]
