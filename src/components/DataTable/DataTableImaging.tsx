@@ -18,12 +18,13 @@ import SearchIcon from 'assets/icones/search.svg?react'
 
 import DataTable from './DataTable'
 
-import { CohortImaging, Column } from 'types'
+import { CohortImaging } from 'types'
 import { Order, OrderBy } from 'types/searchCriterias'
 
 import useStyles from './styles'
 import { getExtension } from 'utils/fhir'
 import { AppConfig } from 'config'
+import { Column } from 'types/table'
 
 type DataTableImagingProps = {
   loading: boolean

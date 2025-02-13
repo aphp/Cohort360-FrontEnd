@@ -82,6 +82,7 @@ import { mapMedicationToOrderByCode } from 'mappers/medication'
 import { linkToDiagnosticReport } from './serviceImaging'
 import { PatientsResponse } from 'types/patient'
 import { getFormName } from 'utils/formUtils'
+import { FetchResourceArgs } from 'types/exploration'
 
 export interface IServiceCohorts {
   /**
@@ -174,11 +175,7 @@ export interface IServiceCohorts {
    */
 
   fetchImagingList: (
-    options: {
-      deidentified: boolean
-      page: number
-      searchCriterias: SearchCriterias<ImagingFilters>
-    },
+    options: FetchResourceArgs<ImagingFilters>,
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<CohortImaging>>
@@ -240,7 +237,7 @@ export interface IServiceCohorts {
    *
    * Retourne le service de récupération de donnée en fonction de la ressource
    */
-  getExplorationFetcher: (resourceType: ResourceType) => Function
+  getExplorationFetcher: <T>(resourceType: ResourceType) => (args: FetchResourceArgs<T>) => void
 
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
@@ -871,7 +868,7 @@ const servicesCohorts: IServiceCohorts = {
       searchCriterias: {
         orderBy,
         searchInput,
-        filters: { ipp, nda, startDate, endDate, executiveUnits, modality, encounterStatus }
+        filters: { ipp, nda, durationRange, executiveUnits, modality, encounterStatus }
       }
     } = options
     const [imagingResponse, allImagingResponse] = await Promise.all([
@@ -883,8 +880,8 @@ const servicesCohorts: IServiceCohorts = {
         _text: searchInput,
         encounter: nda,
         ipp,
-        minDate: startDate ?? '',
-        maxDate: endDate ?? '',
+        minDate: durationRange[0] ?? '',
+        maxDate: durationRange[1] ?? '',
         _list: groupId ? [groupId] : [],
         signal,
         modalities: modality.map(({ id }) => id),
@@ -892,7 +889,13 @@ const servicesCohorts: IServiceCohorts = {
         encounterStatus: encounterStatus.map(({ id }) => id),
         uniqueFacet: ['subject']
       }),
-      !!searchInput || !!ipp || !!nda || !!startDate || !!endDate || executiveUnits.length > 0 || modality.length > 0
+      !!searchInput ||
+      !!ipp ||
+      !!nda ||
+      !!durationRange[0] ||
+      !!durationRange[1] ||
+      executiveUnits.length > 0 ||
+      modality.length > 0
         ? fetchImaging({
             size: 0,
             _list: groupId ? [groupId] : [],
@@ -1128,7 +1131,7 @@ const servicesCohorts: IServiceCohorts = {
             groupId
           )
       case ResourceType.IMAGING:
-        return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
+        return ({ searchCriterias, page, groupId, deidentified }) =>
           servicesCohorts.fetchImagingList({ searchCriterias, page, deidentified }, groupId)
       case ResourceType.OBSERVATION:
         return ({ searchCriterias, page, groupId }, deidentified: boolean) =>

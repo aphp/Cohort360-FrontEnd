@@ -351,7 +351,7 @@ const mapImagingSeries = (series: ImagingStudySeries[]): Table => {
       },
       {
         id: `${elem.uid}-bodySite`,
-        value: elem.bodySite?._display ?? '-',
+        value: elem.bodySite?.display ?? '-',
         type: CellType.TEXT,
         align: 'center'
       }
@@ -399,8 +399,8 @@ const mapImagingToRows = (list: CohortImaging[], deidentified: boolean, groupId?
         id: `${elem.id}-ipp`,
         value: elem.IPP
           ? {
-              label: elem.IPP,
-              url: `/patients/${elem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`
+              label: elem.idPatient,
+              url: `/patients/${elem.IPP}${groupId ? `?groupId=${groupId}` : ''}`
             }
           : 'Non renseigné',
         type: elem.IPP ? CellType.LINK : CellType.TEXT
@@ -425,13 +425,15 @@ const mapImagingToRows = (list: CohortImaging[], deidentified: boolean, groupId?
         id: `${elem.id}-description`,
         value: description,
         type: CellType.TEXT,
-        align: 'center'
+        align: 'center',
+        sx: { fontWeight: 900 }
       },
       {
         id: `${elem.id}-procedure`,
         value: procedure,
         type: CellType.TEXT,
-        align: 'center'
+        align: 'center',
+        sx: { fontWeight: 900 }
       },
       {
         id: `${elem.id}-nbSeries`,
