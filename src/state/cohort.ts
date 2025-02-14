@@ -46,7 +46,7 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, FetchCohortsParams,
   'cohort/fetchCohorts',
   async ({ options, signal }) => {
     try {
-      const cohortsType = options?.searchCriterias?.filters?.favorite || CohortsType.ALL
+      const cohortsType = options?.searchCriterias?.filters?.favorite || []
       const orderBy = options?.searchCriterias?.orderBy || {
         orderBy: Order.MODIFIED,
         orderDirection: Direction.DESC
@@ -71,10 +71,11 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, FetchCohortsParams,
       return {
         count: cohorts.count,
         selectedCohort: null,
-        ...(cohortsType === CohortsType.ALL && { cohortsList: cohortsList }),
-        ...(cohortsType === CohortsType.FAVORITE && { favoriteCohortsList: cohortsList }),
-        ...(cohortsType === CohortsType.NOT_FAVORITE && { favoriteCohortsList: cohortsList }),
-        ...(cohortsType === CohortsType.LAST && { lastCohorts: cohortsList })
+        ...((cohortsType.length === 0 || cohortsType.length === 2) && { cohortsList: cohortsList }),
+        ...(cohortsType.length === 1 &&
+          cohortsType[0] === CohortsType.FAVORITE && { favoriteCohortsList: cohortsList }),
+        ...(cohortsType.length === 1 &&
+          cohortsType[0] === CohortsType.NOT_FAVORITE && { favoriteCohortsList: cohortsList })
       }
     } catch (error) {
       console.error(error)
@@ -146,7 +147,7 @@ const deleteCohort = createAsyncThunk<void, DeleteCohortParams, { state: RootSta
   'cohort/deleteCohort',
   async ({ deletedCohort }) => {
     try {
-      await services.projects.deleteCohort(deletedCohort)
+      await services.projects.deleteCohorts([deletedCohort])
     } catch (error) {
       console.error(error)
       throw error

@@ -1,12 +1,15 @@
 import React, { useState } from 'react'
+
 import { Box, Typography } from '@mui/material'
-import { ProjectTitle, StyledCard } from './style'
+import ActionMenu from 'components/Exploration/components/ActionMenu'
+
+import DeleteIcon from 'assets/icones/delete.svg?react'
+import EditIcon from '@mui/icons-material/Edit'
 import FolderIcon from 'assets/icones/folder.svg?react'
 import OpenedFolderIcon from 'assets/icones/openedfolder.svg?react'
+
 import { formatDate } from 'utils/formatDate'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import ActionMenu from 'components/Exploration/components/ActionMenu'
+import { ProjectTitle, StyledCard } from './style'
 
 type ProjectCardProps = {
   title: string
@@ -17,8 +20,6 @@ type ProjectCardProps = {
   ondelete: () => void
   disabled: boolean
 }
-
-//TODO: revoir l'UX/UI pour les actions
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
   title,
@@ -42,7 +43,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     },
     {
       key: 'delete',
-      icon: <DeleteOutlineIcon />,
+      icon: <DeleteIcon />,
       label: 'Supprimer',
       onclick: () => ondelete(),
       tooltip: '',

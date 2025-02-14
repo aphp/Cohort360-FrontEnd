@@ -17,7 +17,11 @@ import useProjects from '../hooks/useProjects'
 
 import { ProjectType } from 'types'
 import { Direction, Order, OrderBy } from 'types/searchCriterias'
-import { getFoldersSearchParams } from 'utils/explorationUtils'
+import {
+  getFoldersConfirmDeletionMessage,
+  getFoldersConfirmDeletionTitle,
+  getFoldersSearchParams
+} from 'utils/explorationUtils'
 
 const ProjectsList = () => {
   const navigate = useNavigate()
@@ -30,7 +34,11 @@ const ProjectsList = () => {
   const [openDeletionModal, setOpenDeletionModal] = useState(false)
   const [selectedProject, setSelectedProject] = useState<ProjectType | null>(null)
 
-  const { projectsList, total, loading } = useProjects({ startDate, endDate }, searchInput, { orderBy, orderDirection })
+  const { projectsList, total, loading } = useProjects({
+    filters: { startDate, endDate },
+    searchInput,
+    orderBy: { orderBy, orderDirection }
+  })
   const createProjectMutation = useCreateProject()
   const deleteProjectMutation = useDeleteProject()
   const editProjectMutation = useEditProject()
@@ -77,8 +85,8 @@ const ProjectsList = () => {
   }
 
   const onCloseDeletionModal = () => {
-    setOpenDeletionModal(false)
     setSelectedProject(null)
+    setOpenDeletionModal(false)
   }
 
   const onCloseEditionModal = () => {
@@ -132,8 +140,8 @@ const ProjectsList = () => {
       </Grid>
 
       <AddOrEditItem
-        open={openDeletionModal}
-        onClose={onCloseDeletionModal}
+        open={openEditionModal}
+        onClose={onCloseEditionModal}
         selectedItem={selectedProject}
         onCreate={(projectData) =>
           editProjectMutation.mutate(projectData as ProjectType, { onSuccess: onCloseEditionModal })
@@ -150,9 +158,8 @@ const ProjectsList = () => {
         onSubmit={() => {
           deleteProjectMutation.mutate(selectedProject as ProjectType, { onSuccess: onCloseDeletionModal })
         }}
-        title="Supprimer un projet de recherche"
-        message="Êtes-vous sûr(e) de vouloir supprimer ce projet? Sa suppression entraînera également celle des requêtes,
-          cohortes et échantillons sous-jacents."
+        title={getFoldersConfirmDeletionTitle()}
+        message={getFoldersConfirmDeletionMessage()}
       />
     </Grid>
   )

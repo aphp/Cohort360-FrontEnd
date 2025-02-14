@@ -43,7 +43,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
 
   useEffect(() => {
     if (isSearch) {
-      const hasCohorts = cohortsList.some(({ request }) => request === row.uuid)
+      const hasCohorts = cohortsList.some(({ request }) => request?.uuid === row.uuid)
       setOpen(hasCohorts)
     } else {
       setOpen(false)
@@ -76,9 +76,9 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
             </IconButton>
           </TableCellWrapper>
           <TableCellWrapper align="left" className={classes.tdName}>
-            {row?.shared_by?.display_name ? (
+            {row?.shared_by ? (
               <Link onClick={() => navigate(`/cohort/new/${row.uuid}`)} underline="hover" style={{ cursor: 'pointer' }}>
-                {`${row.name} - Envoyée par : ${row?.shared_by?.firstname} ${row?.shared_by?.lastname?.toUpperCase()}`}
+                {`${row.name} - Envoyée par : ${row?.shared_by}`}
               </Link>
             ) : (
               <Link onClick={() => navigate(`/cohort/new/${row.uuid}`)} underline="hover" style={{ cursor: 'pointer' }}>

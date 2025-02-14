@@ -22,7 +22,7 @@ const useCohorts = ({
   const fetchCohortsList = async () => {
     const _filters = {
       status: filters?.status ?? [],
-      favorite: filters?.favorite ?? CohortsType.ALL,
+      favorite: filters?.favorite ?? [],
       minPatients: filters?.minPatients ?? null,
       maxPatients: filters?.maxPatients ?? null,
       startDate: filters?.startDate ?? null,

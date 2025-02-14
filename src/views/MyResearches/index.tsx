@@ -12,7 +12,7 @@ import Tabs from 'components/ui/Tabs'
 
 import useCounts from 'components/Exploration/hooks/useCounts'
 
-import { ExplorationTabs } from 'types'
+import { ExplorationTabs, TabType } from 'types'
 import { cleanSearchParams, getPathDepth } from 'utils/explorationUtils'
 import useStyles from './styles'
 import moment from 'moment'
@@ -150,7 +150,7 @@ const MyResearches = () => {
       bgcolor={'#e6f1fd'}
       alignItems={'center'}
     >
-      <Grid container justifyContent={'space-between'} xs={11} style={{ padding: '20px 0 12px' }} gap="30px">
+      <Grid container justifyContent={'space-between'} xs={11} style={{ padding: '36px 0 12px' }} gap="40px">
         {/* TODO: calculer la height de toute cette grid et la soustraire à celle d'en dessous de 1000vh*/}
         <Typography variant="h1">Mes recherches</Typography>
         <Box display="flex" alignItems="center">
@@ -170,7 +170,12 @@ const MyResearches = () => {
             />
           </Searchbar>
         </Box>
-        <Tabs variant="pill" values={explorationTabs} active={selectedTab} onchange={handleTabChange} />
+        <Tabs
+          variant="pill"
+          values={explorationTabs}
+          active={selectedTab as TabType<string, React.ReactNode>}
+          onchange={handleTabChange}
+        />
       </Grid>
       {/* TODO: ui qui bug lorsque tab trop long, à checker */}
       <Grid container bgcolor={'#FFF'} height="100vh" justifyContent={'center'}>

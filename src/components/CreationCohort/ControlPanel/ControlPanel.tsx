@@ -519,7 +519,6 @@ const ControlPanel: React.FC<{
 
       {openShareRequestModal && requestShare !== null && requestShare?.currentSnapshot !== undefined && (
         <ModalShareRequest
-          shareSuccessOrFailMessage={shareSuccessOrFailMessage}
           parentStateSetter={wrapperSetShareSuccessOrFailMessage}
           requestShare={requestShare}
           onClose={() => handleCloseSharedModal()}

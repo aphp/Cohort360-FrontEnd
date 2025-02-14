@@ -181,7 +181,7 @@ export interface IServiceProjects {
    * Retourne:
    *   - Requete supprimée
    */
-  deleteRequests: (deletedRequests: RequestType[]) => Promise<RequestType[]>
+  deleteRequests: (deletedRequests: RequestType[]) => Promise<RequestType>
 
   /**
    * Retourne la liste de Cohort d'un practitioner
@@ -324,7 +324,7 @@ const servicesProjects: IServiceProjects = {
     if (limit || limit === 0) options = [...options, `limit=${limit}`]
     if (offset) options = [...options, `offset=${offset}`]
     if (_orderBy) options = [...options, `order=${_sortDirection}${_orderBy.orderBy}`]
-    if (!parentId && searchInput !== '') options = [...options, `search=${searchInput}`]
+    if (!parentId && searchInput && searchInput !== '') options = [...options, `search=${searchInput}`]
     if (!parentId && startDate) options = [...options, `min_updated_at=${startDate}`]
     if (!parentId && endDate) options = [...options, `max_updated_at=${endDate}`]
     if (parentId) options = [...options, `parent_folder=${parentId}`]
@@ -460,7 +460,8 @@ const servicesProjects: IServiceProjects = {
     if (endDate) options = [...options, `max_created_at=${endDate}`]
     if (parentId) options = [...options, `request_id=${parentId}`]
     // TODO: appel a favorite à revoir
-    if (favorite?.length > 0) options = [...options, `favorite=${favorite === CohortsType.FAVORITE ? 'true' : 'false'}`]
+    if (favorite?.length === 1)
+      options = [...options, `favorite=${favorite[0] === CohortsType.FAVORITE ? 'true' : 'false'}`]
 
     const { data } = (await apiBack.get<{
       count: number

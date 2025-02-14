@@ -33,7 +33,7 @@ const useCounts = (searchInput: string, startDate: string | null, endDate: strin
               startDate: startDate ?? null,
               endDate: endDate ?? null,
               status: [],
-              favorite: CohortsType.ALL,
+              favorite: [],
               minPatients: null,
               maxPatients: null
             },

@@ -5,15 +5,14 @@ import Button from 'components/ui/Button'
 import Chip from 'components/ui/Chip'
 
 import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteIcon from 'assets/icones/delete.svg?react'
 import DriveFileMoveIcon from 'assets/icones/drive-file-move.svg?react'
 import FilterList from '@mui/icons-material/FilterList'
 
 import { FilterKeys, FilterValue } from 'types/searchCriterias'
 
 type ActionBarProps = {
-  multiselectMode: boolean
-  moveMode: boolean
+  moveMode?: boolean
   deleteMode: boolean
   loading: boolean
   total: number
@@ -21,13 +20,13 @@ type ActionBarProps = {
   totalSelected: number
   onConfirmDeletion: () => void
   onCancelMultiselectMode: () => void
-  onMove: () => void
+  onMove?: () => void
   onFilter?: () => void
   filters?: { value: FilterValue; category: FilterKeys; label: string }[]
+  onRemoveFilters?: (key: FilterKeys, value: FilterValue) => void
 }
 
 const ActionBar: React.FC<ActionBarProps> = ({
-  multiselectMode,
   moveMode,
   deleteMode,
   loading,
@@ -38,8 +37,11 @@ const ActionBar: React.FC<ActionBarProps> = ({
   onConfirmDeletion,
   onMove,
   onFilter,
-  filters
+  filters,
+  onRemoveFilters
 }) => {
+  const multiselectMode = deleteMode || moveMode
+
   return (
     <Grid container justifyContent={'space-between'} alignItems={'center'}>
       {!multiselectMode &&
@@ -63,9 +65,19 @@ const ActionBar: React.FC<ActionBarProps> = ({
       )}
       {!multiselectMode && filters && (
         <Grid item xs={12}>
-          {filters.map((filter, index) => (
-            <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
-          ))}
+          {filters.map((filter, index) => {
+            console.log('test filter', filter)
+            return (
+              <Chip
+                key={index}
+                label={filter.label}
+                onDelete={() => {
+                  console.log('whatsgapenning')
+                  onRemoveFilters && onRemoveFilters(filter.category, filter.value)
+                }}
+              />
+            )
+          })}
         </Grid>
       )}
       {/* TODO: faire un map sur les boutons sinon, avec une box autour */}
@@ -85,7 +97,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
                   Annuler
                 </Button>
                 <Button
-                  onClick={onMove}
+                  onClick={() => (onMove ? onMove() : null)}
                   clearVariant
                   endIcon={<DriveFileMoveIcon color={totalSelected === 0 ? 'disabled' : 'secondary'} />}
                   disabled={totalSelected === 0}
@@ -103,7 +115,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
                 <Button
                   onClick={onConfirmDeletion}
                   clearVariant
-                  endIcon={<DeleteOutlineIcon color={totalSelected === 0 ? 'disabled' : 'secondary'} />}
+                  endIcon={<DeleteIcon color={totalSelected === 0 ? 'disabled' : 'secondary'} />}
                   disabled={totalSelected === 0}
                 >
                   Supprimer

@@ -57,14 +57,15 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, loading, setSe
       ? requestsList
       : requestsList.filter(
           ({ name, uuid }) =>
-            name.search(regexp) !== -1 || !!newSearchCohortList.find(({ request }) => request === uuid)
+            name.search(regexp) !== -1 || !!newSearchCohortList.find(({ request }) => request?.uuid === uuid)
         )
 
     const newSearchProjectList = !searchInput
       ? projectsList
       : projectsList.filter(
           ({ name, uuid }) =>
-            name.search(regexp) !== -1 || !!newSearchRequestList.find(({ parent_folder }) => parent_folder === uuid)
+            name.search(regexp) !== -1 ||
+            !!newSearchRequestList.find(({ parent_folder }) => parent_folder?.uuid === uuid)
         )
 
     setSearchCohortList(newSearchCohortList && newSearchCohortList.length > 0 ? newSearchCohortList : [])

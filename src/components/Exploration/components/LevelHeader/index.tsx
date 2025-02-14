@@ -37,11 +37,11 @@ const LevelHeader = ({ loading, name, hideActions, description, actions }: Level
             )}
           </Box>
           <Typography
-            fontWeight={600}
+            fontStyle={'italic'}
             fontSize={'15px'}
             fontFamily={"'Montserrat', sans-serif"}
             paddingTop={'8px'}
-            color="black"
+            color="#7b7b7b"
           >
             {description}
           </Typography>

@@ -24,7 +24,7 @@ export const TabsWrapper = styled(Tabs)<TabsCustomProps>(({ _variant }) => ({
   ...(_variant === 'pill' && {
     width: '100%',
     '.MuiTabs-indicator': { bottom: undefined, visibility: 'hidden' },
-    '.MuiTabs-flexContainer': { justifyContent: 'space-around' }
+    '.MuiTabs-flexContainer': { justifyContent: 'space-between' }
   })
 }))
 
@@ -72,7 +72,7 @@ export const TabWrapper = styled(Tab)<TabCustomProps>(({ width, variant }) => ({
     float: 'none',
     fontFamily: "'Montserrat', sans-serif",
     fontSize: '16px',
-    fontWeight: '700',
+    fontWeight: '900',
     textTransform: 'uppercase',
     [`&.Mui-selected, &:hover`]: {
       backgroundColor: '#FFF',

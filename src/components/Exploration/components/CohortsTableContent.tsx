@@ -9,7 +9,7 @@ import ResearchesTable from './Table'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 import StatusChip from './StatusChip'
 
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteIcon from 'assets/icones/delete.svg?react'
 import Download from 'assets/icones/download.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
 import RequestTree from 'assets/icones/schema.svg?react'
@@ -224,7 +224,7 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
                       {
                         key: 'delete',
                         onclick: () => onClickDelete(cohort),
-                        icon: <DeleteOutlineIcon />,
+                        icon: <DeleteIcon />,
                         label: 'Supprimer'
                       }
                     ]}

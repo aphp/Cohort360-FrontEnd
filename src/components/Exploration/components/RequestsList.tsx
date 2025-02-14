@@ -13,7 +13,7 @@ import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/Moda
 import MoveRequest from './Modals/MoveRequest'
 import RequestsTableContent from './RequestsTableContent'
 
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteIcon from 'assets/icones/delete.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
 
 import useDeleteProject from '../hooks/useDeleteProject'
@@ -26,7 +26,13 @@ import useSelectionState from '../hooks/useMultipleSelection'
 
 import { ProjectType, RequestType } from 'types'
 import { OrderBy } from 'types/searchCriterias'
-import { getRequestsSearchParams } from 'utils/explorationUtils'
+import {
+  getFoldersConfirmDeletionMessage,
+  getFoldersConfirmDeletionTitle,
+  getRequestsConfirmDeletionMessage,
+  getRequestsConfirmDeletionTitle,
+  getRequestsSearchParams
+} from 'utils/explorationUtils'
 
 type RequestsListProps = {
   showHeader?: boolean
@@ -175,7 +181,7 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
                       setOpenDeletionModal(true)
                     }}
                   >
-                    <DeleteOutlineIcon />
+                    <DeleteIcon />
                   </IconButton>
                 </>
               }
@@ -186,7 +192,6 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
             deleteMode={deleteMode}
             label="requête"
             loading={loading}
-            multiselectMode={deleteMode || moveMode}
             moveMode={moveMode}
             onCancelMultiselectMode={() => {
               setMoveMode(false)
@@ -236,19 +241,10 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
         open={openDeletionModal}
         onClose={() => setOpenDeletionModal(false)}
         onSubmit={deleteMode ? onSubmitDeletion : onSubmitParentProjectDeletion}
-        title={
-          deleteMode
-            ? `Supprimer ${selectedRequests.length <= 1 ? 'une requête' : 'des requêtes'}`
-            : 'Supprimer le projet'
-        }
+        title={deleteMode ? getRequestsConfirmDeletionTitle(selectedRequests.length) : getFoldersConfirmDeletionTitle()}
         message={
-          deleteMode
-            ? `Êtes-vous sûr(e) de vouloir supprimer ${
-                selectedRequests.length <= 1 ? 'cette requête' : 'ces requêtes'
-              } ? Sa suppression entraînera également celle des cohortes sous-jacentes.`
-            : 'Êtes-vous sûr(e) de vouloir supprimer ce projet ? Sa suppression entraînera également celle des requêtes et cohortes sous-jacentes.'
+          deleteMode ? getRequestsConfirmDeletionMessage(selectedRequests.length) : getFoldersConfirmDeletionMessage()
         }
-        // TODO: plus tard, ajouter au message de confirmation le warning pour les échantillons
       />
       <MoveRequest
         open={openMoveModal}

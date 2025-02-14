@@ -8,7 +8,7 @@ import Button from 'components/ui/Button'
 import ResearchesTable from './Table'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteIcon from 'assets/icones/delete.svg?react'
 import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove'
 import EditIcon from '@mui/icons-material/Edit'
 import ShareIcon from '@mui/icons-material/Share'
@@ -82,8 +82,6 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
     { label: 'nb de cohortes' }
   ]
 
-  // TODO: ajouter action pour déplacer la requête de projet
-
   return loading ? (
     <Box display="flex" width={'100%'} justifyContent={'center'}>
       <CircularProgress size={50} />
@@ -153,7 +151,7 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
                       },
                       {
                         key: 'delete',
-                        icon: <DeleteOutlineIcon />,
+                        icon: <DeleteIcon />,
                         label: 'Supprimer',
                         onclick: () => onClickDelete(request)
                       }

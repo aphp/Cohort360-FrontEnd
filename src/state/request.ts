@@ -203,7 +203,7 @@ const moveRequests = createAsyncThunk<MoveRequestReturn, MoveRequestParams, { st
         if (foundItem) {
           return {
             ...requestItem,
-            parent_folder
+            parent_folder: { uuid: parent_folder ?? '', name: '' }
           }
         } else {
           return requestItem
@@ -240,10 +240,10 @@ const deleteRequests = createAsyncThunk<DeleteRequestsReturn, DeleteRequestsPara
       const state = getState().request
       let requestsList: RequestType[] = state.requestsList ? [...state.requestsList] : []
 
-      const results = await services.projects.deleteRequests(deletedRequests)
+      await services.projects.deleteRequests(deletedRequests)
 
       requestsList = requestsList.filter((requestItem) => {
-        const foundItem = results.find((result) => result.uuid === requestItem.uuid)
+        const foundItem = deletedRequests.find((result) => result.uuid === requestItem.uuid)
         return foundItem === undefined
       })
 
@@ -260,7 +260,7 @@ const deleteRequests = createAsyncThunk<DeleteRequestsReturn, DeleteRequestsPara
 
 const setRequestSlice = createSlice({
   name: 'request',
-  initialState: defaultInitialState as RequestState,
+  initialState: defaultInitialState,
   reducers: {
     clearRequest: () => {
       return defaultInitialState

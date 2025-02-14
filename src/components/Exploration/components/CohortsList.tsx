@@ -18,7 +18,7 @@ import Modal from 'components/ui/Modal'
 import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
 import PatientsNbFilter from 'components/Filters/PatientsNbFilter'
 
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteIcon from 'assets/icones/delete.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
 import ShareIcon from '@mui/icons-material/Share'
 
@@ -33,8 +33,16 @@ import useSelectionState from '../hooks/useMultipleSelection'
 
 import { Cohort, RequestType, ValueSet } from 'types'
 import { CohortsFilters, FilterKeys, OrderBy } from 'types/searchCriterias'
-import { getCohortsSearchParams, getRequestName, statusOptions } from 'utils/explorationUtils'
-import { selectFiltersAsArray } from 'utils/filters'
+import {
+  getCohortsConfirmDeletionMessage,
+  getCohortsConfirmDeletionTitle,
+  getCohortsSearchParams,
+  getRequestName,
+  getRequestsConfirmDeletionMessage,
+  removeFromSearchParams,
+  statusOptions
+} from 'utils/explorationUtils'
+import { removeFilter, selectFiltersAsArray } from 'utils/filters'
 import { CohortsType } from 'types/cohorts'
 
 type CohortsListProps = {
@@ -206,7 +214,7 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
                     <EditIcon />
                   </IconButton>
                   <IconButton color="secondary" onClick={() => setOpenDeletionModal(true)}>
-                    <DeleteOutlineIcon />
+                    <DeleteIcon />
                   </IconButton>
                 </>
               }
@@ -220,12 +228,16 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
             label="cohorte"
             totalSelected={selectedCohorts.length}
             onConfirmDeletion={() => setOpenDeletionModal(true)}
-            onCancelDeletion={() => {
+            onCancelMultiselectMode={() => {
               setDeleteMode(false)
               clearSelection()
             }}
             onFilter={() => setOpenFiltersModal(true)}
             filters={filtersAsArray}
+            onRemoveFilters={(key, value) => {
+              removeFromSearchParams(searchParams, setSearchParams, key, value)
+              setFilters(removeFilter(key, value, filters))
+            }}
           />
         </>
       )}
@@ -279,18 +291,11 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
         onClose={() => setOpenDeletionModal(false)}
         onSubmit={deleteMode ? onSubmitDeletion : onSubmitParentRequestDeletion}
         title={
-          deleteMode
-            ? `Supprimer ${selectedCohorts.length <= 1 ? 'une cohorte' : 'des cohortes'}`
-            : 'Supprimer la requête'
+          deleteMode ? getCohortsConfirmDeletionTitle(selectedCohorts.length) : getRequestsConfirmDeletionMessage()
         }
         message={
-          deleteMode
-            ? `Êtes-vous sûr(e) de vouloir supprimer ${
-                selectedCohorts.length <= 1 ? 'cette cohorte' : 'ces cohortes'
-              } ?`
-            : 'Êtes-vous sûr(e) de vouloir supprimer cette requête ? Sa suppression entraînera également celle des cohortes sous-jacentes.'
+          deleteMode ? getCohortsConfirmDeletionMessage(selectedCohorts.length) : getRequestsConfirmDeletionMessage()
         }
-        // TODO: plus tard, ajouter au message de confirmation le warning pour les échantillons
       />
       {selectedRequestShare !== null && (
         <ModalShareRequest
@@ -309,8 +314,8 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
           newFilters.status.length > 0 &&
             searchParams.set('status', newFilters.status.map((status: ValueSet) => status.code).join())
           newFilters.favorite.length > 0 && searchParams.set('favorite', newFilters.favorite)
-          minPatients && searchParams.set('minPatients', newFilters.minPatients)
-          maxPatients && searchParams.set('maxPatients', newFilters.maxPatients)
+          newFilters.minPatients && searchParams.set('minPatients', newFilters.minPatients)
+          newFilters.maxPatients && searchParams.set('maxPatients', newFilters.maxPatients)
           setSearchParams(searchParams)
         }}
       >

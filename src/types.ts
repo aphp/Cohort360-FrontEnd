@@ -391,7 +391,6 @@ export type ProjectType = {
 export type ParentInfo = {
   uuid: string
   name: string
-  description: string
 }
 
 export type RequestType = {

@@ -6,7 +6,7 @@ const useDeleteCohort = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (cohorts: Cohort[]) => await services.projects.deleteCohort(cohorts),
+    mutationFn: async (cohorts: Cohort[]) => await services.projects.deleteCohorts(cohorts),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cohorts'] })
     }

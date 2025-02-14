@@ -2,29 +2,13 @@ import React, { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 
-import {
-  Box,
-  Chip,
-  Hidden,
-  IconButton,
-  Link,
-  Table,
-  TableBody,
-  TableHead,
-  TableRow,
-  Tooltip,
-  Typography
-} from '@mui/material'
+import { Box, Hidden, IconButton, Link, Table, TableBody, TableHead, TableRow, Typography } from '@mui/material'
+import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
+import FavStar from 'components/ui/FavStar'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
-
-import UpdateIcon from '@mui/icons-material/Update'
 
 import EditIcon from '@mui/icons-material/Edit'
 import ExportIcon from '@mui/icons-material/GetApp'
-import Star from 'assets/icones/star.svg?react'
-import StarFull from 'assets/icones/star full.svg?react'
-
-import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 
 import { useAppDispatch } from 'state'
 import { editCohort, setSelectedCohort } from 'state/cohort'
@@ -35,6 +19,7 @@ import displayDigit from 'utils/displayDigit'
 
 import useStyles from '../styles'
 import { AppConfig } from 'config'
+import { getCohortStatusChip } from 'components/Exploration/components/CohortsTableContent'
 
 const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
   const { classes } = useStyles()
@@ -46,7 +31,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
 
   const cohorts: Cohort[] =
     cohortsList
-      .filter(({ request }) => request === requestId)
+      .filter(({ request }) => request?.uuid === requestId)
       .sort((a, b) => +moment(a.created_at).format('x') - +moment(b.created_at).format('x')) || []
 
   const _handleEditCohort = (cohort: Cohort) => {
@@ -122,27 +107,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                     </IconButton>
                   </TableCellWrapper>
                   <TableCellWrapper>
-                    {cohort.request_job_status === CohortJobStatus.FINISHED ? (
-                      <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                    ) : cohort.request_job_status === CohortJobStatus.PENDING ||
-                      cohort.request_job_status === CohortJobStatus.NEW ? (
-                      <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
-                    ) : cohort.request_job_status === CohortJobStatus.LONG_PENDING ? (
-                      <Tooltip title="Cohorte volumineuse: sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.">
-                        <Chip
-                          label="En cours"
-                          size="small"
-                          style={{ backgroundColor: '#ffc107', color: 'black' }}
-                          icon={<UpdateIcon />}
-                        />
-                      </Tooltip>
-                    ) : cohort.request_job_fail_msg ? (
-                      <Tooltip title={cohort.request_job_fail_msg}>
-                        <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
-                      </Tooltip>
-                    ) : (
-                      <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
-                    )}
+                    {getCohortStatusChip(cohort.request_job_status, cohort.request_job_fail_msg)}
                   </TableCellWrapper>
                   <TableCellWrapper>
                     <Link
@@ -199,16 +164,6 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
       )}
     </Box>
   )
-}
-
-type FavStarProps = {
-  favorite?: boolean
-}
-const FavStar: React.FC<FavStarProps> = ({ favorite }) => {
-  if (favorite) {
-    return <StarFull height="15px" fill="#ED6D91" />
-  }
-  return <Star height="15px" fill="#ED6D91" />
 }
 
 export default VersionRow

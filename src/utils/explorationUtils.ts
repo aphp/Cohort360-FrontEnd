@@ -1,8 +1,37 @@
 import { Cohort, CohortJobStatus, QuerySnapshotInfo, RequestType, ValueSet } from 'types'
 import { CohortsType } from 'types/cohorts'
-import { Direction, Order } from 'types/searchCriterias'
+import { Direction, FilterKeys, FilterValue, Order } from 'types/searchCriterias'
 import displayDigit from './displayDigit'
 import { SetURLSearchParams } from 'react-router-dom'
+
+export const getCohortsConfirmDeletionTitle = (quantity = 1) => {
+  const correctWording = quantity <= 1 ? 'une cohorte' : 'des cohortes'
+  return `Supprimer ${correctWording}`
+}
+
+export const getRequestsConfirmDeletionTitle = (quantity = 1) => {
+  const correctWording = quantity <= 1 ? 'une requête' : 'des requêtes'
+  return `Supprimer ${correctWording}`
+}
+
+export const getFoldersConfirmDeletionTitle = () => {
+  return `Supprimer un projet`
+}
+
+// TODO: plus tard, ajouter au message de confirmation le warning pour les échantillons
+export const getCohortsConfirmDeletionMessage = (quantity = 1) => {
+  const correctWording = quantity <= 1 ? 'cette cohorte' : 'ces cohortes'
+  return `Êtes-vous sûr(e) de vouloir supprimer ${correctWording} ?`
+}
+
+export const getRequestsConfirmDeletionMessage = (quantity = 1) => {
+  const correctRequestWording = quantity <= 1 ? 'cette requête' : 'ces requêtes'
+  return `Êtes-vous sûr(e) de vouloir supprimer ${correctRequestWording} ? Cette suppression entraînera également celle des cohortes sous-jacentes.`
+}
+
+export const getFoldersConfirmDeletionMessage = () => {
+  return `Êtes-vous sûr(e) de vouloir supprimer ce projet ? Sa suppression entraînera également celle des requêtes et cohortes sous-jacentes.`
+}
 
 export const statusOptions = [
   {
@@ -63,13 +92,20 @@ export const parseSearchParamValue = (searchParam: string | null, options: {}) =
   })
 }
 
-export const parseNumberSearchParam = (searchParam: string | null) => {
-  if (!searchParam) {
-    return null
-  }
-  const parsedNumber = parseInt(searchParam, 10)
+export const removeFromSearchParams = (
+  searchParams: URLSearchParams,
+  setSearchParams: SetURLSearchParams,
+  keyToRemove: string,
+  value: FilterValue
+) => {
+  const targetSearchParam = searchParams.get(keyToRemove)?.split(',')
+  const cleanedParam = targetSearchParam
+    ?.filter((searchValue) => searchValue !== (keyToRemove === FilterKeys.STATUS ? (value as ValueSet).code : value))
+    .join()
 
-  return isNaN(parsedNumber) ? null : parsedNumber
+  cleanedParam ? searchParams.set(keyToRemove, cleanedParam) : searchParams.delete(keyToRemove)
+
+  setSearchParams(searchParams)
 }
 
 export const cleanSearchParams = (searchParams: URLSearchParams, setSearchParams: SetURLSearchParams) => {

@@ -259,7 +259,6 @@ const RequestsTable = ({ data, loading }: RequestsTableProps) => {
         selectedRequestShareState?.shared_query_snapshot !== undefined &&
         selectedRequestShareState?.shared_query_snapshot?.length > 0 && (
           <ModalShareRequest
-            shareSuccessOrFailMessage={shareSuccessOrFailMessage}
             parentStateSetter={wrapperSetShareSuccessOrFailMessage}
             onClose={() => dispatch(setSelectedRequestShareState(null))}
           />

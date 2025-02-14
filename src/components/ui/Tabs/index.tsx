@@ -11,7 +11,7 @@ type TabsProps<T, TL> = {
 }
 
 const Tabs = <T, TL>({ values, active, disabled = false, onchange, variant = 'blue' }: TabsProps<T, TL>) => {
-  const tabSize = 100 / values.length
+  const tabSize = 100 / values.length - 2
   return (
     <>
       {values && values?.length > 0 && (
