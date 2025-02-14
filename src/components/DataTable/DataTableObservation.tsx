@@ -7,11 +7,12 @@ import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import DataTable from 'components/DataTable/DataTable'
 
-import { Column, CohortObservation } from 'types'
+import {  CohortObservation } from 'types'
 
 import useStyles from './styles'
 import { Order, OrderBy } from 'types/searchCriterias'
 import { AppConfig } from 'config'
+import { Column } from 'types/table'
 
 type DataTableObservationProps = {
   loading: boolean

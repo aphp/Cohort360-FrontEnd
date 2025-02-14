@@ -61,7 +61,7 @@ export const useData = (
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
       const fetcher = servicesCohorts.getExplorationFetcher(type)
-      const results = await fetcher({ page, searchCriterias, groupId, deidentified })
+      const results = await fetcher({ page, searchCriterias, deidentified, type }, groupId)
       console.log('test fetching results', results)
       setData(results)
     } catch (error) {

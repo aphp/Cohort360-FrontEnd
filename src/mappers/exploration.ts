@@ -27,7 +27,17 @@ import { getDocumentStatus } from 'utils/documentsFormatter'
 import CheckIcon from 'assets/icones/check.svg?react'
 import CancelIcon from 'assets/icones/times.svg?react'
 import docTypes from 'assets/docTypes.json'
-import { isBiologyCohort, isDocumentsCohort, isImagingCohort, isMedicationCohort, isOtherResourcesResponse, isPatientsResponse, isPmsiCohort, isQuestionnaireCohort } from 'utils/exploration'
+import {
+  isBiologyCohort,
+  isDocumentsCohort,
+  isImagingCohort,
+  isMedicationCohort,
+  isOtherResourcesResponse,
+  isPatientsResponse,
+  isPmsiCohort,
+  isQuestionnaireCohort
+} from 'utils/exploration'
+import { formatValueRange } from './biology'
 
 const mapPatientsToColumns = (deidentified: boolean): Column[] => {
   return [
@@ -300,7 +310,7 @@ const mapQuestionnaireToRows = (list: CohortQuestionnaireResponse[], groupId?: s
         id: `${elem.id}-details`,
         value: getFormDetails(elem, formName),
         type: CellType.LINES,
-        align: "center"
+        align: 'center'
       }
     ].filter((elem) => elem) as Row
     rows.push(row)
@@ -485,6 +495,13 @@ const mapBiologyToRows = (list: CohortObservation[], groupId?: string) => {
         ? `${elem.valueQuantity?.value} ${elem.valueQuantity?.unit ?? ''}`
         : '-'
     const valueUnit = elem.valueQuantity?.unit ?? ''
+    const referenceRangeArray = elem.referenceRange?.[0]
+    const referenceRange = referenceRangeArray
+      ? `${formatValueRange(referenceRangeArray?.low?.value, valueUnit)} - ${formatValueRange(
+          referenceRangeArray?.high?.value,
+          valueUnit
+        )}`
+      : '-'
     const row: Row = [
       {
         id: `${elem.id}-ipp`,
@@ -509,14 +526,16 @@ const mapBiologyToRows = (list: CohortObservation[], groupId?: string) => {
       {
         id: `${elem.id}-anabio`,
         value: anabio === 'No matching concept' ? '-' : anabio ?? '-',
-        type: CellType.TEXT
+        type: CellType.TEXT,
+        sx: { fontWeight: 900 }
       },
       {
         id: `${elem.id}-loinc`,
         value: `${codeLOINC === 'No matching concept' || codeLOINC === 'Non Renseigné' ? '' : codeLOINC ?? ''} - ${
           libelleLOINC === 'No matching concept' ? '-' : libelleLOINC ?? '-'
         }`,
-        type: CellType.TEXT
+        type: CellType.TEXT,
+        sx: { fontWeight: 900 }
       },
       {
         id: `${elem.id}-result`,
@@ -526,7 +545,7 @@ const mapBiologyToRows = (list: CohortObservation[], groupId?: string) => {
       },
       {
         id: `${elem.id}-valueUnit`,
-        value: valueUnit,
+        value: referenceRange,
         type: CellType.TEXT,
         align: 'center'
       },
