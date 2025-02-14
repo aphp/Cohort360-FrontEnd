@@ -25,10 +25,11 @@ const DataSection = ({ data, count, orderBy, isLoading, pagination, onChangePage
         <>
           {data.rows.length < 1 && <Typography variant="button">Aucune donnée à afficher</Typography>}
           {data.rows.length > 0 && (
-            <Grid container gap={2}>
+            <Grid container gap={2} alignItems="center">
               {count?.ressource && (
                 <DisplayDigits nb={count.ressource.results} total={count.ressource.total} label={'élément(s)'} />
               )}
+              {count?.ressource && count.patients && <Typography fontSize={15}>concernant</Typography>}
               {count?.patients && (
                 <DisplayDigits nb={count.patients.results} total={count.patients.total} label={'patient(s)'} />
               )}

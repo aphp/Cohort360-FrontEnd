@@ -8,13 +8,15 @@ import { useEffect } from 'react'
 import DataSection from './DataSection'
 import { useSearchParams } from 'react-router-dom'
 import { FetchStatus } from 'types'
+import { AlertWrapper } from 'components/ui/Alert'
 
 type ExplorationBoardProps = {
   deidentified?: boolean
   type: ResourceType
+  messages?: string[]
 }
 
-const ExplorationBoard = ({ deidentified = true, type }: ExplorationBoardProps) => {
+const ExplorationBoard = ({ deidentified = true, type, messages }: ExplorationBoardProps) => {
   const [searchParams] = useSearchParams()
   const groupId = searchParams.get('groupId') || undefined
   const page = parseInt(searchParams.get('page') || '1', 10)
@@ -49,6 +51,7 @@ const ExplorationBoard = ({ deidentified = true, type }: ExplorationBoardProps) 
   // IPP et NDA non trouvé en mode deidentified dans le tableau PMSI
   // dernier lieu prise en charge non trouvé en mode deidentified dans le tableau Patients
   // searchParams à verifier pour l'url
+  // ne pas oublier d'afficher les msg d'avertissement
   // => const _groupId = groupId ? `?groupId=${groupId}` : ''
   // => const _search = search ? `&search=${search}` : ''
   // => pmsiTabs
@@ -62,6 +65,7 @@ const ExplorationBoard = ({ deidentified = true, type }: ExplorationBoardProps) 
   // => const _groupId = groupId ? `?groupId=${groupId}` : ''
   // => const _search = search ? `&search=${search}` : ''
   // => pmsiTabs
+  // peut etre un bug où les réferentiels des codes ne sont pas présents (observé sur Biology mais semble random)
   // Vérifier ce qu'on fait pour l'afichage des champs des filtres sauvegardés quand on passe de pseudo à nomi
   return (
     <Grid item xs={12} container gap="25px" padding="50px" sx={{ backgroundColor: '#fff' }}>
@@ -75,6 +79,11 @@ const ExplorationBoard = ({ deidentified = true, type }: ExplorationBoardProps) 
       />
       <Divider sx={{ width: '100%' }} />
       <CriteriasSection onDelete={onRemoveCriteria} onSaveFilters={onSaveFilter} value={criterias} />
+      {messages?.map((msg) => (
+        <AlertWrapper severity="warning" sx={{ color: '#000' }}>
+          {msg}
+        </AlertWrapper>
+      ))}
       <DataSection
         isLoading={dataLoading}
         data={tableData}

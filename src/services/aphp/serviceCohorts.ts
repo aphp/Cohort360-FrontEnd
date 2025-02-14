@@ -69,7 +69,8 @@ import {
   PMSIFilters,
   MedicationFilters,
   BiologyFilters,
-  MaternityFormFilters
+  MaternityFormFilters,
+  Filters
 } from 'types/searchCriterias'
 import services from '.'
 import { ErrorDetails, SearchInputError } from 'types/error'
@@ -82,7 +83,8 @@ import { mapMedicationToOrderByCode } from 'mappers/medication'
 import { linkToDiagnosticReport } from './serviceImaging'
 import { PatientsResponse } from 'types/patient'
 import { getFormName } from 'utils/formUtils'
-import { FetchResourceArgs } from 'types/exploration'
+import { ResourceOptions } from 'types/exploration'
+import { Data } from 'components/ExplorationBoard/useData'
 
 export interface IServiceCohorts {
   /**
@@ -175,7 +177,7 @@ export interface IServiceCohorts {
    */
 
   fetchImagingList: (
-    options: FetchResourceArgs<ImagingFilters>,
+    options: ResourceOptions<ImagingFilters>,
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<CohortImaging>>
@@ -212,11 +214,7 @@ export interface IServiceCohorts {
    * Retourne la liste d'objets de biologie liés à une cohorte
    */
   fetchBiologyList: (
-    options: {
-      deidentified: boolean
-      page: number
-      searchCriterias: SearchCriterias<BiologyFilters>
-    },
+    options: ResourceOptions<BiologyFilters>,
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<CohortObservation>>
@@ -225,10 +223,7 @@ export interface IServiceCohorts {
    * Retourne la liste de formulaires liés à une cohorte
    */
   fetchFormsList: (
-    options: {
-      page: number
-      searchCriterias: SearchCriterias<MaternityFormFilters>
-    },
+    options: ResourceOptions<MaternityFormFilters>,
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<CohortQuestionnaireResponse>>
@@ -237,7 +232,9 @@ export interface IServiceCohorts {
    *
    * Retourne le service de récupération de donnée en fonction de la ressource
    */
-  getExplorationFetcher: <T>(resourceType: ResourceType) => (args: FetchResourceArgs<T>) => void
+  getExplorationFetcher: (
+    resourceType: ResourceType
+  ) => (options: ResourceOptions<Filters>, groupId?: string, signal?: AbortSignal) => Promise<Data>
 
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
@@ -721,15 +718,15 @@ const servicesCohorts: IServiceCohorts = {
       searchCriterias: {
         orderBy,
         searchInput,
-        filters: { validatedStatus, nda, ipp, code, startDate, endDate, executiveUnits, encounterStatus }
+        filters: { validatedStatus, nda, ipp, code, durationRange, executiveUnits, encounterStatus }
       }
     } = options
     const atLeastAFilter =
       !!searchInput ||
       !!ipp ||
       !!nda ||
-      !!startDate ||
-      !!endDate ||
+      !!durationRange[0] ||
+      !!durationRange[1] ||
       executiveUnits.length > 0 ||
       encounterStatus.length > 0 ||
       code.length
@@ -748,8 +745,8 @@ const servicesCohorts: IServiceCohorts = {
         executiveUnits: executiveUnits.map((unit) => unit.id),
         encounterStatus: encounterStatus.map(({ id }) => id),
         uniqueFacet: ['subject'],
-        minDate: startDate ?? '',
-        maxDate: endDate ?? '',
+        minDate: durationRange[0] ?? '',
+        maxDate: durationRange[1] ?? '',
         code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
         rowStatus: validatedStatus
       }),
@@ -1110,34 +1107,24 @@ const servicesCohorts: IServiceCohorts = {
   getExplorationFetcher: (resourceType: ResourceType) => {
     switch (resourceType) {
       case ResourceType.PATIENT:
-        return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
-          servicesCohorts.fetchPatientList({ searchCriterias, page }, deidentified, groupId)
+        return servicesCohorts.fetchPatientList
       case ResourceType.QUESTIONNAIRE_RESPONSE:
-        return ({ searchCriterias, page, groupId }) =>
-          servicesCohorts.fetchFormsList({ searchCriterias, page }, groupId)
+        return servicesCohorts.fetchFormsList
       case ResourceType.CONDITION:
       case ResourceType.CLAIM:
       case ResourceType.PROCEDURE:
-        return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
-          servicesCohorts.fetchPMSIList({ selectedTab: resourceType, searchCriterias, page, deidentified }, groupId)
+        return servicesCohorts.fetchPMSIList
       case ResourceType.DOCUMENTS:
-        return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
-          servicesCohorts.fetchDocuments({ searchCriterias, page, deidentified }, groupId)
+        return servicesCohorts.fetchDocuments
       case ResourceType.MEDICATION_ADMINISTRATION:
       case ResourceType.MEDICATION_REQUEST:
-        return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
-          servicesCohorts.fetchMedicationList(
-            { selectedTab: resourceType, searchCriterias, page, deidentified },
-            groupId
-          )
+        return servicesCohorts.fetchMedicationList
       case ResourceType.IMAGING:
-        return ({ searchCriterias, page, groupId, deidentified }) =>
-          servicesCohorts.fetchImagingList({ searchCriterias, page, deidentified }, groupId)
+        return servicesCohorts.fetchImagingList
       case ResourceType.OBSERVATION:
-        return ({ searchCriterias, page, groupId }, deidentified: boolean) =>
-          servicesCohorts.fetchBiologyList({ searchCriterias, page, deidentified }, groupId)
+        return servicesCohorts.fetchBiologyList
     }
-    return () => {}
+    return servicesCohorts.fetchPatientList
   },
 
   fetchDocumentContent: async (compositionId) => {

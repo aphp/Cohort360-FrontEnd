@@ -12,6 +12,7 @@ import TextInput from 'components/ui/Inputs/Text'
 import MultiSelect from 'components/ui/Inputs/MultiSelect'
 import allDocTypesList from 'assets/docTypes.json'
 import DocTypes from 'components/ui/Inputs/DocTypes'
+import { Checkbox } from '@mui/material'
 
 type ExplorationFiltersProps = {
   filters: Filters
@@ -26,6 +27,12 @@ enum Source {
   AREM = 'AREM',
   ORBIS = 'ORBIS'
 }
+const statusOptions = [
+  {
+    id: 'validatedStatus',
+    label: "N'afficher que les analyses dont les résultats ont été validés"
+  }
+]
 
 const sourceOptions = [
   {
@@ -107,6 +114,13 @@ const ExplorationFilters = ({ filters, deidentified, infos, onSubmit, onError, o
   // )
   return (
     <>
+      {FilterKeys.VALiDATED_STATUS in filters && (
+        <Controller
+          name={FilterKeys.VALiDATED_STATUS}
+          control={control}
+          render={({ field }) => <CheckboxGroup {...field} value={["validatedStatus"]} options={statusOptions} disabled={true} />}
+        />
+      )}
       {FilterKeys.GENDERS in filters && (
         <Controller
           name={FilterKeys.GENDERS}
@@ -148,19 +162,16 @@ const ExplorationFilters = ({ filters, deidentified, infos, onSubmit, onError, o
         <Controller
           name={FilterKeys.DOC_STATUSES}
           control={control}
-          render={({ field }) => (
-            <MultiSelect {...field} options={docStatusesList} label="Statut de documents :" />
-          )}
+          render={({ field }) => <MultiSelect {...field} options={docStatusesList} label="Statut de documents :" />}
         />
       )}
       {FilterKeys.DOC_TYPES in filters && (
         <Controller
           name={FilterKeys.DOC_TYPES}
           control={control}
-          render={({ field }) => (
-            <DocTypes {...field} options={allDocTypesList.docTypes} label="Type de documents :" />
-          )}
-          />)}
+          render={({ field }) => <DocTypes {...field} options={allDocTypesList.docTypes} label="Type de documents :" />}
+        />
+      )}
       {FilterKeys.PRESCRIPTION_TYPES in filters && (
         <Controller
           name={FilterKeys.PRESCRIPTION_TYPES}

@@ -9,6 +9,7 @@ type Criteria = {
   value: FilterValue
   category: FilterKeys | SearchCriteriaKeys
   label: string
+  disabled?: boolean
 }
 
 type CriteriasSectionProps = {
@@ -20,10 +21,11 @@ type CriteriasSectionProps = {
 const CriteriasSection = ({ value, onDelete, onSaveFilters }: CriteriasSectionProps) => {
   const maintenanceIsActive = useAppSelector((state) => state.me)?.maintenance?.active
 
-  const CustomChip = ({ value, category, label }: Criteria) => {
+  const CustomChip = ({ value, category, label, disabled = false }: Criteria) => {
     return (
       <Chip
         label={label}
+        disabled={disabled}
         onDelete={() => onDelete(category, value)}
         sx={{
           color: '#153d8A',
