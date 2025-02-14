@@ -104,7 +104,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return GenderStatusLabel[value as GenderStatus]
   }
   if (key === FilterKeys.FORM_NAME) {
-    console.log("test criteria", value)
+    console.log('test criteria', value)
     if (value === FormNames.HOSPIT) {
       return labels.formNames.hospit
     } else if (value === FormNames.PREGNANCY) {
@@ -170,11 +170,14 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.ENCOUNTER_STATUS) {
     return `Statut de la visite associée : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
   }
+  if (key === FilterKeys.VALiDATED_STATUS) {
+    return `Analyse dont les résultats ont été validés`
+  }
   return ''
 }
 
 export const selectFiltersAsArray = (filters: Filters, searchInput: string | undefined) => {
-  const result: { value: FilterValue; category: FilterKeys | SearchCriteriaKeys; label: string }[] = []
+  const result: { value: FilterValue; category: FilterKeys | SearchCriteriaKeys; label: string, disabled?: boolean }[] = []
 
   if (searchInput)
     result.push({
@@ -242,6 +245,14 @@ export const selectFiltersAsArray = (filters: Filters, searchInput: string | und
               value: value as FilterValue
             })
           }
+          break
+        case FilterKeys.VALiDATED_STATUS:
+          result.push({
+            category: key,
+            value: value as FilterValue,
+            label: getFilterLabel(key, value),
+            disabled: true
+          })
       }
     }
   }

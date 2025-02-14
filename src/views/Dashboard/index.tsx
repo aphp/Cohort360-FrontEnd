@@ -222,6 +222,17 @@ const Dashboard: React.FC<{
     }
   }
 
+  const getAlertMessages = (tab: string) => {
+    if (tab === 'imaging')
+      return [
+        "Seuls les examens présents dans le PACS Philips et rattachés à un Dossier Administratif (NDA) sont actuellement disponibles. Le flux alimentant les métadonnées associées aux séries et aux examens est suspendu depuis le 01/02/2023 suite à la migration du PACS AP-HP. Aucun examen produit après cette date n'est disponible via Cohort360."
+      ]
+    if (tab === 'biology')
+      return [
+        "Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondants aux analyses les plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020."
+      ]
+  }
+
   return (
     <Grid
       container
@@ -324,7 +335,11 @@ const Dashboard: React.FC<{
           selectedTab === 'biology' ||
           selectedTab === 'documents' ||
           (selectedTab === 'forms' && ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean)) && (
-          <ExplorationBoard deidentified={dashboard.deidentifiedBoolean} type={getResourceTypeFromTab(selectedTab)} />
+          <ExplorationBoard
+            deidentified={dashboard.deidentifiedBoolean}
+            type={getResourceTypeFromTab(selectedTab)}
+            messages={getAlertMessages(selectedTab)}
+          />
         )}
 
         {/*selectedTab === 'documents' && <Documents deidentified={dashboard.deidentifiedBoolean ?? false} />*/}

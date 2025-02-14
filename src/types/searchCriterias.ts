@@ -237,7 +237,8 @@ export enum FilterKeys {
   MAX_PATIENTS = 'maxPatients',
   MODALITY = 'modality',
   FORM_NAME = 'formName',
-  ENCOUNTER_STATUS = 'encounterStatus'
+  ENCOUNTER_STATUS = 'encounterStatus',
+  VALiDATED_STATUS = 'validatedStatus'
 }
 
 export enum SearchCriteriaKeys {
