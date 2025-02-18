@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { CellType, Row, Link, Document, Table as TableType, Line, Status } from 'types/table'
-import { Collapse, Grid, IconButton, SxProps, TableCell, TableRow as TableRowMui, Theme } from '@mui/material'
+import { Collapse, Grid, IconButton, TableCell, TableRow as TableRowMui } from '@mui/material'
 import GenderIcon from '../GenderIcon'
 import { GenderStatus } from 'types/searchCriterias'
 import StatusChip from '../StatusChip'
@@ -16,7 +16,7 @@ import { TableCellWrapper } from './styles'
 
 type RowProps = {
   row: Row
-  sx?: SxProps<Theme>
+  sx?: React.CSSProperties
 }
 
 const TableRow = ({ row, sx }: RowProps) => {
@@ -39,6 +39,7 @@ const TableRow = ({ row, sx }: RowProps) => {
               </Grid>
             )}
             {cell.type == CellType.TEXT && <p>{cell.value as string}</p>}
+            {cell.type == CellType.PARAGRAPHS && <Paragraphs value={cell.value as Paragraph[]} />}
             {cell.type == CellType.STATUS_CHIP &&
               (() => {
                 const IconComponent = (cell.value as Status).icon
@@ -79,11 +80,9 @@ const TableRow = ({ row, sx }: RowProps) => {
                 const [open, setOpen] = useState(false)
                 return (
                   <>
-                    <div style={{ display: 'flex' }}>
-                      <IconButton onClick={() => setOpen(true)}>
-                        <Comment height="15px" fill="#ED6D91" />
-                      </IconButton>
-                    </div>
+                    <IconButton onClick={() => setOpen(true)}>
+                      <Comment height="15px" fill="#ED6D91" />
+                    </IconButton>
                     <Modal open={open} title="Commentaires" onClose={() => setOpen(false)} readonly={true}>
                       <Paragraphs value={cell.value as Paragraph[]} />
                     </Modal>
@@ -104,17 +103,17 @@ const TableRow = ({ row, sx }: RowProps) => {
       </TableRowMui>
       {subitemIndex !== null && row[subitemIndex].type === CellType.SUBARRAY && (
         <TableRowMui>
-          <TableCell colSpan={row.length} sx={{ padding: '0px 30px', backgroundColor: sx.backgroundColor  }}>
+          <TableCell colSpan={row.length} sx={{ padding: '0px 30px', backgroundColor: sx?.backgroundColor ?? '#fff' }}>
             <Collapse in={subitemIndex !== null} unmountOnExit>
               <DataTable
                 value={row[subitemIndex].value as TableType}
                 sxColumn={{
-                  backgroundColor: sx.backgroundColor ,
+                  backgroundColor: sx?.backgroundColor ?? '#fff',
                   color: '153d8a',
                   borderBottom: '1px solid 1px solid rgb(224, 224, 224)',
                   fontSize: 13
                 }}
-                sxRow={{ backgroundColor: sx.backgroundColor }}
+                sxRow={{ backgroundColor: sx?.backgroundColor ?? '#fff' }}
               />
             </Collapse>
           </TableCell>
