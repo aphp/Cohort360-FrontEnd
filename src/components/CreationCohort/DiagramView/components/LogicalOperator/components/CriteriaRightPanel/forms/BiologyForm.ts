@@ -106,6 +106,7 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
           type: 'numberAndComparator',
           allowBetween: true,
           withHierarchyInfo: false,
+          floatValues: true,
           displayCondition: (data) => {
             return !!data.enableSearchByValue
           },
