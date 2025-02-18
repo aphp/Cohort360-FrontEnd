@@ -186,12 +186,7 @@ export interface IServiceCohorts {
    * Retourne la liste d'objets PMSI liés à une cohorte
    */
   fetchPMSIList: (
-    options: {
-      selectedTab: PMSIResourceTypes
-      deidentified: boolean
-      page: number
-      searchCriterias: SearchCriterias<PMSIFilters>
-    },
+    options: ResourceOptions<PMSIFilters>,
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<CohortPMSI>>
@@ -483,7 +478,7 @@ const servicesCohorts: IServiceCohorts = {
 
   fetchPMSIList: async (options, groupId, signal) => {
     const {
-      selectedTab,
+      type,
       deidentified,
       page,
       searchCriterias: {
@@ -492,6 +487,7 @@ const servicesCohorts: IServiceCohorts = {
         filters: { ipp, nda, durationRange, executiveUnits, encounterStatus, diagnosticTypes, code, source }
       }
     } = options
+    const _type = type as ResourceType.CONDITION | ResourceType.CLAIM | ResourceType.PROCEDURE
     const fetchers = {
       [ResourceType.CONDITION]: fetchCondition,
       [ResourceType.PROCEDURE]: fetchProcedure,
@@ -502,7 +498,7 @@ const servicesCohorts: IServiceCohorts = {
       _list: groupId ? [groupId] : [],
       size: 20,
       offset: page ? (page - 1) * 20 : 0,
-      _sort: mapToOrderByCode(orderBy.orderBy, selectedTab),
+      _sort: mapToOrderByCode(orderBy.orderBy, _type),
       sortDirection: orderBy.orderDirection,
       _text: searchInput === '' ? '' : searchInput,
       'encounter-identifier': nda,
@@ -540,8 +536,8 @@ const servicesCohorts: IServiceCohorts = {
       })
     }
 
-    const fetcher = fetchers[selectedTab]
-    const filters = filtersMapper[selectedTab]()
+    const fetcher = fetchers[_type]
+    const filters = filtersMapper[_type]()
 
     const atLeastAFilter =
       !!searchInput ||
@@ -561,7 +557,7 @@ const servicesCohorts: IServiceCohorts = {
             size: 0,
             signal: signal,
             _list: groupId ? [groupId] : [],
-            uniqueFacet: [selectedTab === ResourceType.CLAIM ? 'patient' : 'subject']
+            uniqueFacet: [type === ResourceType.CLAIM ? 'patient' : 'subject']
           })
         : null
     ])
@@ -573,7 +569,7 @@ const servicesCohorts: IServiceCohorts = {
     const totalPMSI = pmsiList?.data?.resourceType === 'Bundle' ? pmsiList.data.total : 0
     const totalAllPMSI = allPMSIList?.data?.resourceType === 'Bundle' ? allPMSIList.data?.total ?? totalPMSI : totalPMSI
 
-    const uniquePatientFacet = selectedTab === ResourceType.CLAIM ? 'unique-patient' : 'unique-subject'
+    const uniquePatientFacet = type === ResourceType.CLAIM ? 'unique-patient' : 'unique-subject'
     const totalPatientPMSI =
       pmsiList?.data?.resourceType === 'Bundle'
         ? (getExtension(pmsiList?.data?.meta, uniquePatientFacet) || { valueDecimal: 0 }).valueDecimal
@@ -719,8 +715,7 @@ const servicesCohorts: IServiceCohorts = {
       !!searchInput ||
       !!ipp ||
       !!nda ||
-      !!durationRange[0] ||
-      !!durationRange[1] ||
+      !!durationRange ||
       executiveUnits.length > 0 ||
       encounterStatus.length > 0 ||
       code.length
@@ -791,12 +786,7 @@ const servicesCohorts: IServiceCohorts = {
     } = options
 
     const atLeastAFilter =
-      !!ipp ||
-      executiveUnits.length > 0 ||
-      encounterStatus.length > 0 ||
-      formName.length > 0 ||
-      durationRange[0] !== null ||
-      durationRange[1] !== null
+      !!ipp || executiveUnits.length > 0 || encounterStatus.length > 0 || formName.length > 0 || !!durationRange
     const [formsList, allFormsList] = await Promise.all([
       fetchForms({
         _list: groupId ? [groupId] : [],
@@ -880,13 +870,7 @@ const servicesCohorts: IServiceCohorts = {
         encounterStatus: encounterStatus.map(({ id }) => id),
         uniqueFacet: ['subject']
       }),
-      !!searchInput ||
-      !!ipp ||
-      !!nda ||
-      !!durationRange[0] ||
-      !!durationRange[1] ||
-      executiveUnits.length > 0 ||
-      modality.length > 0
+      !!searchInput || !!ipp || !!nda || !!durationRange || executiveUnits.length > 0 || modality.length > 0
         ? fetchImaging({
             size: 0,
             _list: groupId ? [groupId] : [],
