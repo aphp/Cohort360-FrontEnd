@@ -29,14 +29,14 @@ jobs:
         run: |
           VERSION=$(cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/"version"://g' | sed 's/[",]//g' | tr -d '[[:space:]]')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.projectVersion=${{ env.VERSION }}
+      # - name: SonarCloud Scan
+      #   uses: SonarSource/sonarcloud-github-action@master
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #   with:
+      #     args: >
+      #       -Dsonar.projectVersion=${{ env.VERSION }}
 
   publish:
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
