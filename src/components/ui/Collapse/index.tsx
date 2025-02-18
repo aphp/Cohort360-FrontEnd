@@ -42,7 +42,7 @@ const Collapse = ({ value = true, title, children, info }: PropsWithChildren<Col
         </IconButton>
       </Grid>
 
-      <CollapseWrapper in={checked} unmountOnExit>
+      <CollapseWrapper in={checked} unmountOnExit sx={{ maxWidth: '100%' }}>
         {children}
       </CollapseWrapper>
     </Grid>

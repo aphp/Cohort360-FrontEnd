@@ -30,14 +30,17 @@ const OccurenceInput = ({
   allowBetween = false,
   disabled = false
 }: OccurenceInputProps) => {
+  console.log('Rendering OccurenceInput', value, maxValue)
   const [occurrenceValue, setOccurrenceValue] = useState<string>(value.toString())
   const [upperRangeValue, setUpperRangeValue] = useState<string | undefined>(maxValue?.toString())
   const [comparatorValue, setComparatorValue] = useState(comparator)
   const [error, setError] = useState<string | undefined>()
 
   useEffect(() => {
-    const typedOccurenceValue = parseFloat(occurrenceValue)
-    const typedUpperRangeValue = upperRangeValue ? parseFloat(upperRangeValue) : undefined
+    const typedOccurenceValue = parseFloat(occurrenceValue === '' ? '0' : occurrenceValue)
+    const typedUpperRangeValue = upperRangeValue
+      ? parseFloat(upperRangeValue === '' ? '0' : upperRangeValue)
+      : undefined
     if (typedUpperRangeValue !== undefined && typedOccurenceValue > typedUpperRangeValue) {
       setError('INCOHERENT_VALUE_ERROR')
     } else if (comparatorValue === Comparators.BETWEEN && typedUpperRangeValue === undefined) {
@@ -49,7 +52,7 @@ const OccurenceInput = ({
   }, [comparatorValue, occurrenceValue, upperRangeValue])
 
   const checkedValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value === '' ? '0' : e.target.value
+    const newValue = e.target.value
     if (
       (floatValues && (enableNegativeValues ? /^-?\d*\.?\d*$/ : /^\d*\.?\d*$/).exec(newValue)) ||
       /^\d+$/.exec(newValue) ||
@@ -132,7 +135,7 @@ const OccurenceInput = ({
           variant="outlined"
           value={occurrenceValue}
           onChange={handleMinValueChange}
-          placeholder={comparatorValue === Comparators.BETWEEN ? 'Valeur minimale' : '0'}
+          placeholder={comparatorValue === Comparators.BETWEEN ? 'Valeur minimale (0)' : '0'}
           disabled={disabled}
           error={!!error}
         />
@@ -144,7 +147,7 @@ const OccurenceInput = ({
             variant="outlined"
             value={upperRangeValue}
             onChange={handleMaxValueChange}
-            placeholder="Valeur maximale"
+            placeholder="Valeur maximale (0)"
             disabled={disabled}
             error={!!error}
           />
