@@ -244,17 +244,20 @@ const mapPmsiToRows = (list: CohortPMSI[], type: PMSIResourceTypes, groupId?: st
       {
         id: `${elem.id}-source`,
         value: elem.meta?.source ?? 'Non renseigné',
-        type: CellType.TEXT
+        type: CellType.TEXT,
+        sx: { fontWeight: 900 }
       },
       {
         id: `${elem.id}-code`,
         value: codes.code ?? 'Non renseigné',
-        type: CellType.TEXT
+        type: CellType.TEXT,
+        sx: { fontWeight: 900 }
       },
       {
         id: `${elem.id}-display`,
         value: codes.display ?? 'Non renseigné',
-        type: CellType.TEXT
+        type: CellType.TEXT,
+        sx: { fontWeight: 900 }
       },
       hasDiagnosticType && {
         id: `${elem.id}-type`,
