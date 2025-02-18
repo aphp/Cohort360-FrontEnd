@@ -125,7 +125,7 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
               !context.deidentified &&
               (vitalStatus === null ||
                 vitalStatus.length === 0 ||
-                (vitalStatus.length === 1 && !!vitalStatus.find((status) => status === 'false')))
+                (vitalStatus.length === 1 && !!vitalStatus.find((status) => status === 'true')))
             )
           },
           buildInfo: {
@@ -135,7 +135,7 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
               const typedData = data as DemographicDataType
               const vitalStatus = typedData.vitalStatus
               return (
-                vitalStatus !== null && vitalStatus.length === 1 && !!vitalStatus.find((status) => status === 'true')
+                vitalStatus !== null && vitalStatus.length === 1 && !!vitalStatus.find((status) => status === 'false')
               )
             }
           }
