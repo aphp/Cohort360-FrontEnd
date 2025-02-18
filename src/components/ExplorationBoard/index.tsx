@@ -45,6 +45,7 @@ const ExplorationBoard = ({ deidentified = true, type, messages }: ExplorationBo
   useEffect(() => {
     //console.log('test searchCriterias', searchCriterias)
     console.log('test searchCriterias', searchCriterias)
+    console.log('test infos', additionalInfo.references)
   }, [tableData])
 
   // double fetch au chargement de la ressource ?? peut-être normal

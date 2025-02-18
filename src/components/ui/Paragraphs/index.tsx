@@ -1,7 +1,6 @@
-import { Typography } from '@mui/material'
 import React from 'react'
 
-export type Paragraph = string
+export type Paragraph = { text: string; sx?: React.CSSProperties }
 
 type ParagraphsProps = {
   value: Paragraph[]
@@ -11,7 +10,7 @@ const Paragraphs = ({ value }: ParagraphsProps) => {
   return (
     <>
       {value.map((paragraph) => (
-        <Typography>{paragraph}</Typography>
+        <p style={{ ...paragraph.sx, margin: 0 }}>{paragraph.text}</p>
       ))}
     </>
   )

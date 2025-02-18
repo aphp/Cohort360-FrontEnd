@@ -38,6 +38,7 @@ import {
   isQuestionnaireCohort
 } from 'utils/exploration'
 import { formatValueRange } from './biology'
+import { Paragraph } from 'components/ui/Paragraphs'
 
 const mapPatientsToColumns = (deidentified: boolean): Column[] => {
   return [
@@ -114,8 +115,8 @@ const mapMedicationToColumns = (type: ResourceType, deidentified: boolean): Colu
     { label: `IPP${deidentified ? ' chiffré' : ''}` },
     { label: `NDA${deidentified ? ' chiffré' : ''}` },
     { label: 'Date', code: Order.PERIOD_START },
-    { label: 'Code ATC', code: Order.MEDICATION_ATC },
-    { label: 'Code UCD', code: Order.MEDICATION_UCD },
+    { label: 'Code ATC', code: Order.MEDICATION_ATC, align: 'center' },
+    { label: 'Code UCD', code: Order.MEDICATION_UCD, align: 'center' },
     type === ResourceType.MEDICATION_REQUEST && {
       label: 'Type de prescription',
       code: Order.PRESCRIPTION_TYPES
@@ -620,6 +621,7 @@ const mapDocumentsToRows = (list: CohortComposition[], groupId?: string) => {
 export const mapMedicationToRows = (
   list: CohortMedication<MedicationRequest | MedicationAdministration>[],
   type: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION,
+  deidentified: boolean,
   groupId?: string
 ) => {
   const rows: Row[] = []
@@ -631,26 +633,29 @@ export const mapMedicationToRows = (
       getConfig().features.medication.valueSets.medicationAtc.url,
       getConfig().features.medication.valueSets.medicationAtcOrbis.url
     )
-    const atcDisplay = `[${codeATCSystem ?? 'Non renseigné'}]  [${
-      codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : codeATC ?? ''
-    }] [${displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}]`
+    const atcDisplay: Paragraph[] = [
+      { text: `${codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : codeATC ?? ''}` },
+      { text: `${displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}`, sx: {fontWeight: 900} },
+      { text: `${codeATCSystem ?? 'Non renseigné'}` }
+    ]
     const [codeUCD, displayUCD, , codeUCDSystem] = getCodes(
       elem,
       getConfig().features.medication.valueSets.medicationUcd.url,
       '.*-ucd'
     )
-    const ucdDisplay = `[${codeUCDSystem ?? 'Non renseigné'}]  [${
-      codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : codeUCD ?? ''
-    }] [${displayUCD === 'No matching concept' ? '-' : displayUCD ?? '-'}]`
-    const prescriptionType = type === ResourceType.MEDICATION_REQUEST && (elem.category?.[0].coding?.[0].display ?? '-')
+    const ucdDisplay: Paragraph[] = [
+      { text: `${codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : codeUCD ?? ''}` },
+      { text: `${displayUCD === 'No matching concept' ? '-' : displayUCD ?? '-'}`, sx: { fontWeight: 900 } },
+      { text: `${codeUCDSystem ?? 'Non renseigné'}` }
+    ]
+    const prescriptionType = (elem as MedicationRequest).category?.[0].coding?.[0].display ?? '-'
     const administrationRoute =
-      type === ResourceType.MEDICATION_REQUEST
-        ? elem.dosageInstruction?.[0]?.route?.coding?.[0]?.display
-        : elem.dosage?.route?.coding?.[0]?.display
-    const quantity =
-      type === ResourceType.MEDICATION_ADMINISTRATION &&
-      `${elem?.dosage?.dose?.value ?? '-'} ${elem.dosage?.dose?.unit ?? '-'}`
-    const comment = type === ResourceType.MEDICATION_ADMINISTRATION && (elem.dosage?.text ?? 'Non renseigné')
+      (elem as MedicationRequest).dosageInstruction?.[0]?.route?.coding?.[0]?.display ??
+      (elem as MedicationAdministration).dosage?.route?.coding?.[0]?.display
+    const quantity = ` ${(elem as MedicationAdministration)?.dosage?.dose?.value ?? '-'} ${
+      (elem as MedicationAdministration).dosage?.dose?.unit ?? '-'
+    }`
+    const comment = (elem as MedicationAdministration).dosage?.text ?? 'Non renseigné'
     const row: Row = [
       {
         id: `${elem}-ipp`,
@@ -675,14 +680,16 @@ export const mapMedicationToRows = (
       {
         id: `${elem.id}-atc`,
         value: atcDisplay,
-        type: CellType.TEXT
+        type: CellType.PARAGRAPHS,
+        align: 'center'
       },
       {
         id: `${elem.id}-ucd`,
         value: ucdDisplay,
-        type: CellType.TEXT
+        type: CellType.PARAGRAPHS,
+        align: 'center'
       },
-      prescriptionType && {
+      type === ResourceType.MEDICATION_REQUEST && {
         id: `${elem.id}-prescription`,
         value: prescriptionType,
         type: CellType.TEXT
@@ -693,7 +700,7 @@ export const mapMedicationToRows = (
         type: CellType.TEXT,
         align: 'center'
       },
-      quantity && {
+      type === ResourceType.MEDICATION_ADMINISTRATION && {
         id: `${elem.id}-unit`,
         value: quantity,
         type: CellType.TEXT
@@ -703,11 +710,13 @@ export const mapMedicationToRows = (
         value: elem.serviceProvider ?? '-',
         type: CellType.TEXT
       },
-      comment && {
-        id: `${elem.id}-comment`,
-        value: comment.split('\n'),
-        type: CellType.MODAL
-      }
+      type === ResourceType.MEDICATION_ADMINISTRATION &&
+        !deidentified && {
+          id: `${elem.id}-comment`,
+          value: comment.split('\n'),
+          type: CellType.MODAL,
+          align: 'center'
+        }
     ].filter((elem) => elem) as Row
     rows.push(row)
   })
@@ -742,7 +751,7 @@ export const map = (data: Data, type: ResourceType, deidentified: boolean, group
       if (isMedicationCohort(data)) {
         const _type = type as ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST
         table.columns = mapMedicationToColumns(_type, deidentified)
-        table.rows = mapMedicationToRows(data.list, _type, groupId)
+        table.rows = mapMedicationToRows(data.list, _type, deidentified, groupId)
       }
       if (isDocumentsCohort(data)) {
         table.columns = mapDocumentsToColumns(deidentified)
