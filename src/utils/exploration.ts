@@ -60,9 +60,17 @@ export const narrowSearchCriterias = (
     case ResourceType.PATIENT:
       return mappedPatients(searchCriterias as SearchCriterias<PatientsFilters>, deidentified)
     case ResourceType.CONDITION:
-    case ResourceType.CLAIM:
-    case ResourceType.PROCEDURE:
       return mappedOthers(searchCriterias as SearchCriterias<PMSIFilters>, deidentified)
+    case ResourceType.PROCEDURE:{
+      const narrowed = mappedOthers(searchCriterias as SearchCriterias<PMSIFilters>, deidentified)
+      narrowed.filters = removeKeys(narrowed.filters, ['diagnosticTypes'])
+      return narrowed
+    }
+    case ResourceType.CLAIM: {
+      const narrowed = mappedOthers(searchCriterias as SearchCriterias<PMSIFilters>, deidentified)
+      narrowed.filters = removeKeys(narrowed.filters, ['source', 'diagnosticTypes'])
+      return narrowed
+    }
     case ResourceType.MEDICATION_ADMINISTRATION: {
       const narrowed = mappedOthers(searchCriterias as SearchCriterias<MedicationFilters>, deidentified)
       narrowed.filters = removeKeys(narrowed.filters, ['prescriptionTypes'])
