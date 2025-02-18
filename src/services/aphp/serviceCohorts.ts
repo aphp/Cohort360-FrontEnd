@@ -200,12 +200,7 @@ export interface IServiceCohorts {
    * Retourne la liste d'objets Medication liés à une cohorte
    */
   fetchMedicationList: (
-    options: {
-      selectedTab: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION
-      deidentified: boolean
-      page: number
-      searchCriterias: SearchCriterias<MedicationFilters>
-    },
+    options: ResourceOptions<MedicationFilters>,
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<CohortMedication<MedicationRequest | MedicationAdministration>>>
@@ -599,7 +594,7 @@ const servicesCohorts: IServiceCohorts = {
 
   fetchMedicationList: async (options, groupId, signal) => {
     const {
-      selectedTab,
+      type,
       deidentified,
       page,
       searchCriterias: {
@@ -609,8 +604,7 @@ const servicesCohorts: IServiceCohorts = {
           code,
           nda,
           ipp,
-          startDate,
-          endDate,
+          durationRange,
           executiveUnits,
           encounterStatus,
           administrationRoutes,
@@ -622,12 +616,12 @@ const servicesCohorts: IServiceCohorts = {
       [ResourceType.MEDICATION_REQUEST]: fetchMedicationRequest,
       [ResourceType.MEDICATION_ADMINISTRATION]: fetchMedicationAdministration
     }
-
+    const _type = type as ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION
     const commonFilters = () => ({
       _list: groupId ? [groupId] : [],
       size: 20,
       offset: page ? (page - 1) * 20 : 0,
-      _sort: mapMedicationToOrderByCode(orderBy.orderBy, selectedTab),
+      _sort: mapMedicationToOrderByCode(orderBy.orderBy, _type),
       sortDirection: orderBy.orderDirection,
       _text: searchInput === '' ? '' : searchInput,
       encounter: nda,
@@ -635,8 +629,8 @@ const servicesCohorts: IServiceCohorts = {
       signal: signal,
       executiveUnits: executiveUnits.map((unit) => unit.id),
       encounterStatus: encounterStatus.map(({ id }) => id),
-      minDate: startDate ?? '',
-      maxDate: endDate ?? '',
+      minDate: durationRange[0] ?? '',
+      maxDate: durationRange[1] ?? '',
       code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
       uniqueFacet: ['subject']
     })
@@ -652,15 +646,15 @@ const servicesCohorts: IServiceCohorts = {
       })
     }
 
-    const fetcher = fetchers[selectedTab]
-    const filters = filtersMapper[selectedTab]()
+    const fetcher = fetchers[_type]
+    const filters = filtersMapper[_type]()
 
     const atLeastAFilter =
       !!searchInput ||
       !!ipp ||
       !!nda ||
-      !!startDate ||
-      !!endDate ||
+      !!durationRange[0] ||
+      !!durationRange[1] ||
       executiveUnits.length > 0 ||
       encounterStatus.length > 0 ||
       (administrationRoutes && administrationRoutes.length > 0) ||
