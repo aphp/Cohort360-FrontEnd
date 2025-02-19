@@ -57,11 +57,10 @@ export const useData = (
   const [count, setCount] = useState<ExplorationCount | null>(null)
 
   const fetchData = async (page: number) => {
-    console.log('test fetching')
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
       const fetcher = servicesCohorts.getExplorationFetcher(type)
-      const results = await fetcher({ page, searchCriterias, deidentified, type }, groupId)
+      const results = await fetcher({ page, searchCriterias, deidentified, type, groupId, includeFacets: true })
       console.log('test fetching results', results)
       setData(results)
     } catch (error) {
@@ -86,7 +85,6 @@ export const useData = (
         type === ResourceType.DOCUMENTS &&
         !!searchCriterias.searchInput &&
         searchCriterias.searchBy === SearchByTypes.TEXT
-        console.log("test searchBy", searchCriterias.searchBy) 
       setTableData(map(data, type, deidentified, groupId, hasSearch))
       const count: ExplorationCount = {
         ressource: null,
@@ -112,7 +110,7 @@ export const useData = (
 
   return {
     count,
-    tableData,
+    data: { raw: data, table: tableData },
     dataLoading: loadingStatus === LoadingStatus.FETCHING,
     pagination,
     onChangePage: handlePage

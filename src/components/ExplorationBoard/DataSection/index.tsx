@@ -1,30 +1,63 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { CircularProgress, Grid, Typography } from '@mui/material'
 import DataTable from 'components/ui/Table'
 import { Table } from 'types/table'
 import { OrderBy } from 'types/searchCriterias'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import { Pagination } from 'components/ui/Pagination'
-import { ExplorationCount } from '../useData'
+import { Data, ExplorationCount } from '../useData'
+import Chart from 'components/ui/Chart'
+import PyramidChart from 'components/Dashboard/Preview/Charts/PyramidChart'
+import { PatientsResponse } from 'types/patient'
+import { ResourceType } from 'types/requestCriterias'
+import BarChart from 'components/Dashboard/Preview/Charts/BarChart'
+import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
+import PieChart from 'components/Dashboard/Preview/Charts/PieChart'
 
 type DataSectionProps = {
-  data: Table
+  data: { raw: Data | null; table: Table }
   count: ExplorationCount | null
   orderBy: OrderBy
   isLoading: boolean
+  type: ResourceType
   pagination: { currentPage: number; total: number }
   onChangePage: (page: number) => void
   onSort: (orderBy: OrderBy) => void
 }
 
-const DataSection = ({ data, count, orderBy, isLoading, pagination, onChangePage, onSort }: DataSectionProps) => {
+const DataSection = ({ data, count, type, orderBy, isLoading, pagination, onChangePage, onSort }: DataSectionProps) => {
   return (
     <Grid container justifyContent="center" item xs={12}>
+      {type === ResourceType.PATIENT &&
+        (() => {
+          const patients = (data.raw as PatientsResponse)?.originalPatients
+          const map = getGenderRepartitionSimpleData((data.raw as PatientsResponse)?.genderRepartitionMap)
+          if (patients && !patients.length) return <Fragment />
+          return (
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6} lg={4}>
+                <Chart isLoading={isLoading} title="Répartition par genre">
+                  <BarChart data={map.genderData} width={250} />
+                </Chart>
+              </Grid>
+              <Grid item xs={12} md={6} lg={4}>
+                <Chart isLoading={isLoading} title="Répartition par statut vital">
+                  <PieChart data={map.vitalStatusData ?? []} width={250} />
+                </Chart>
+              </Grid>
+              <Grid item xs={12} md={12} lg={4}>
+                <Chart isLoading={isLoading} title="Pyramide des âges">
+                  <PyramidChart data={(data.raw as PatientsResponse)?.agePyramidData} width={250} />
+                </Chart>
+              </Grid>
+            </Grid>
+          )
+        })()}
       {isLoading && <CircularProgress />}
-      {data.rows && !isLoading && (
+      {data.table.rows && !isLoading && (
         <>
-          {data.rows.length < 1 && <Typography variant="button">Aucune donnée à afficher</Typography>}
-          {data.rows.length > 0 && (
+          {data.table.rows.length < 1 && <Typography variant="button">Aucune donnée à afficher</Typography>}
+          {data.table.rows.length > 0 && (
             <Grid container gap={2} alignItems="center">
               {count?.ressource && (
                 <DisplayDigits nb={count.ressource.results} total={count.ressource.total} label={'élément(s)'} />
@@ -34,27 +67,25 @@ const DataSection = ({ data, count, orderBy, isLoading, pagination, onChangePage
                 <DisplayDigits nb={count.patients.results} total={count.patients.total} label={'patient(s)'} />
               )}
 
-              <DataTable value={data} orderBy={orderBy} onSort={onSort} />
-              {
-                <Grid
-                  container
-                  justifyContent="center"
-                  style={{
-                    position: 'fixed',
-                    bottom: 0,
-                    right: 0,
-                    backgroundColor: '#fff',
-                    width: '100%'
-                  }}
-                >
-                  <Pagination
-                    color="#303030"
-                    count={pagination.total}
-                    currentPage={pagination.currentPage}
-                    onPageChange={onChangePage}
-                  />
-                </Grid>
-              }
+              <DataTable value={data.table} orderBy={orderBy} onSort={onSort} />
+              <Grid
+                container
+                justifyContent="center"
+                style={{
+                  position: 'fixed',
+                  bottom: 0,
+                  right: 0,
+                  backgroundColor: '#fff',
+                  width: '100%'
+                }}
+              >
+                <Pagination
+                  color="#303030"
+                  count={pagination.total}
+                  currentPage={pagination.currentPage}
+                  onPageChange={onChangePage}
+                />
+              </Grid>
             </Grid>
           )}
         </>
