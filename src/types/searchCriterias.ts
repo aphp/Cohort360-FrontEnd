@@ -238,7 +238,7 @@ export enum FilterKeys {
   MODALITY = 'modality',
   FORM_NAME = 'formName',
   ENCOUNTER_STATUS = 'encounterStatus',
-  VALiDATED_STATUS = 'validatedStatus'
+  VALIDATED_STATUS = 'validatedStatus'
 }
 
 export enum SearchCriteriaKeys {

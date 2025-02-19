@@ -235,6 +235,14 @@ const Dashboard: React.FC<{
       return [
         'Attention : Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/07/2024. Seuls les diagnostics rattachés à une visite Orbis (avec un Dossier Administratif - NDA) sont actuellement disponibles.'
       ]
+    if (tab === 'documents' && dashboard.deidentifiedBoolean)
+      return [
+        'Attention : Les données identifiantes des patients sont remplacées par des informations fictives dans les résultats de la recherche et dans les documents prévisualisés.'
+      ]
+    if (tab === 'documents' && !dashboard.deidentifiedBoolean)
+      return [
+        "Attention : La recherche textuelle est pseudonymisée (les données identifiantes des patients sont remplacées par des informations fictives). Vous retrouverez les données personnelles de votre patient en cliquant sur l'aperçu."
+      ]
   }
 
   return (

@@ -163,11 +163,7 @@ export interface IServiceCohorts {
    */
 
   fetchDocuments: (
-    options: {
-      deidentified: boolean
-      page: number
-      searchCriterias: SearchCriterias<DocumentsFilters>
-    },
+    options: ResourceOptions<DocumentsFilters>,
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<DocumentReference>> | Promise<SearchInputError>
@@ -487,7 +483,7 @@ const servicesCohorts: IServiceCohorts = {
         filters: { ipp, nda, durationRange, executiveUnits, encounterStatus, diagnosticTypes, code, source }
       }
     } = options
-    const _type = type as ResourceType.CONDITION | ResourceType.CLAIM | ResourceType.PROCEDURE
+    const _type = type as PMSIResourceTypes
     const fetchers = {
       [ResourceType.CONDITION]: fetchCondition,
       [ResourceType.PROCEDURE]: fetchProcedure,
@@ -543,12 +539,13 @@ const servicesCohorts: IServiceCohorts = {
       !!searchInput ||
       !!ipp ||
       !!nda ||
-      !!durationRange ||
+      !!durationRange[0] ||
+      !!durationRange[1] ||
       executiveUnits.length > 0 ||
       encounterStatus.length > 0 ||
       (diagnosticTypes && diagnosticTypes.length > 0) ||
       code.length > 0 ||
-      !!source
+      (source && source.length > 0)
 
     const [pmsiList, allPMSIList] = await Promise.all([
       fetcher(filters),
@@ -715,7 +712,8 @@ const servicesCohorts: IServiceCohorts = {
       !!searchInput ||
       !!ipp ||
       !!nda ||
-      !!durationRange ||
+      !!durationRange[0] ||
+      !!durationRange[1] ||
       executiveUnits.length > 0 ||
       encounterStatus.length > 0 ||
       code.length
@@ -786,7 +784,12 @@ const servicesCohorts: IServiceCohorts = {
     } = options
 
     const atLeastAFilter =
-      !!ipp || executiveUnits.length > 0 || encounterStatus.length > 0 || formName.length > 0 || !!durationRange
+      !!ipp ||
+      executiveUnits.length > 0 ||
+      encounterStatus.length > 0 ||
+      formName.length > 0 ||
+      !!durationRange[0] ||
+      !!durationRange[1]
     const [formsList, allFormsList] = await Promise.all([
       fetchForms({
         _list: groupId ? [groupId] : [],
@@ -870,7 +873,13 @@ const servicesCohorts: IServiceCohorts = {
         encounterStatus: encounterStatus.map(({ id }) => id),
         uniqueFacet: ['subject']
       }),
-      !!searchInput || !!ipp || !!nda || !!durationRange || executiveUnits.length > 0 || modality.length > 0
+      !!searchInput ||
+      !!ipp ||
+      !!nda ||
+      !!durationRange[0] ||
+      !!durationRange[1] ||
+      executiveUnits.length > 0 ||
+      modality.length > 0
         ? fetchImaging({
             size: 0,
             _list: groupId ? [groupId] : [],
@@ -919,17 +928,7 @@ const servicesCohorts: IServiceCohorts = {
         orderBy,
         searchInput,
         searchBy,
-        filters: {
-          docStatuses,
-          docTypes,
-          endDate,
-          executiveUnits,
-          ipp,
-          nda,
-          onlyPdfAvailable,
-          startDate,
-          encounterStatus
-        }
+        filters: { docStatuses, docTypes, executiveUnits, ipp, nda, onlyPdfAvailable, durationRange, encounterStatus }
       }
     } = options
     if (searchInput) {
@@ -956,8 +955,8 @@ const servicesCohorts: IServiceCohorts = {
         'patient-identifier': ipp,
         onlyPdfAvailable: onlyPdfAvailable,
         signal: signal,
-        minDate: startDate ?? '',
-        maxDate: endDate ?? '',
+        minDate: durationRange[0] ?? '',
+        maxDate: durationRange[1] ?? '',
         uniqueFacet: ['subject'],
         executiveUnits: executiveUnits.map((eu) => eu.id),
         encounterStatus: encounterStatus.map(({ id }) => id)
@@ -966,8 +965,8 @@ const servicesCohorts: IServiceCohorts = {
       docTypes.length > 0 ||
       !!nda ||
       !!ipp ||
-      !!startDate ||
-      !!endDate ||
+      !!durationRange[0] ||
+      !!durationRange[1] ||
       executiveUnits.length > 0 ||
       docStatuses.length > 0 ||
       !!onlyPdfAvailable ||
