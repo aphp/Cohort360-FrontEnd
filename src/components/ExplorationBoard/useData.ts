@@ -15,7 +15,7 @@ import {
 } from 'types'
 import { PatientsResponse } from 'types/patient'
 import { ResourceType } from 'types/requestCriterias'
-import { Filters, SearchCriterias } from 'types/searchCriterias'
+import { Filters, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
 import { Table } from 'types/table'
 import { isPatientsResponse } from 'utils/exploration'
 
@@ -82,7 +82,12 @@ export const useData = (
 
   useEffect(() => {
     if (data) {
-      setTableData(map(data, type, deidentified, groupId))
+      const hasSearch =
+        type === ResourceType.DOCUMENTS &&
+        !!searchCriterias.searchInput &&
+        searchCriterias.searchBy === SearchByTypes.TEXT
+        console.log("test searchBy", searchCriterias.searchBy) 
+      setTableData(map(data, type, deidentified, groupId, hasSearch))
       const count: ExplorationCount = {
         ressource: null,
         patients: {

@@ -6,6 +6,7 @@ import Select from 'components/ui/Searchbar/Select'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { Controller, useForm } from 'react-hook-form'
 import { AdditionalInfo, Search } from '../useExplorationBoard'
+import { ResourceType } from 'types/requestCriterias'
 
 export type SearchType = {
   searchCriterias: SearchCriterias<Filters>
@@ -61,6 +62,7 @@ const OccurrencesSearch = ({ search, infos, onChange }: OccurrencesSearchProps) 
                   radius={5}
                   placeholder="Rechercher"
                   onchange={field.onChange}
+                  displayHelpIcon={infos.type === ResourceType.DOCUMENTS}
                 />
               )}
             />

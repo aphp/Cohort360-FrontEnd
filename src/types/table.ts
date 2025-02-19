@@ -35,7 +35,8 @@ export enum CellType {
   LINES,
   DOCUMENT_VIEWER,
   SUBARRAY,
-  PARAGRAPHS
+  PARAGRAPHS,
+  DOCUMENT_CONTENT
 }
 
 export type Cell = {
@@ -43,7 +44,8 @@ export type Cell = {
   value: string | Link | Document | Table | Line[] | Paragraph[] | Status
   type: CellType
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
-  sx?:  React.CSSProperties
+  sx?: React.CSSProperties
+  isHidden?: boolean
 }
 
 export type Row = Cell[]

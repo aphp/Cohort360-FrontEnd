@@ -52,6 +52,7 @@ export type AdditionalInfo = {
   administrationList?: LabelObject[]
   questionnaires?: LabelObject[]
   modalities?: LabelObject[]
+  type: ResourceType
 }
 
 const getInit = (type: ResourceType) => {
@@ -79,7 +80,7 @@ const getInit = (type: ResourceType) => {
 }
 
 export const useExplorationBoard = (type: ResourceType, deidentified: boolean) => {
-  const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>({})
+  const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>({ type })
   const [
     searchCriterias,
     { changeSearchBy, changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias }
@@ -155,6 +156,7 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean) =
   }
 
   const onSaveSearchCriterias = ({ searchBy, searchInput, filters }: SearchWithFilters) => {
+    console.log('test checkbox', filters)
     if (searchBy) changeSearchBy(searchBy)
     if (searchInput !== undefined) changeSearchInput(searchInput)
     if (filters) addFilters(filters)
@@ -169,6 +171,7 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean) =
         return []
       }
     }
+    let searchByList = undefined
     let diagnosticTypesList = additionalInfo.diagnosticTypesList
     let encounterStatusList = additionalInfo.encounterStatusList
     let prescriptionList = additionalInfo.prescriptionList
@@ -205,6 +208,8 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean) =
       !encounterStatusList
     )
       encounterStatusList = await fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
+    if (type === ResourceType.PATIENT) searchByList = searchByListPatients
+    if (type === ResourceType.DOCUMENTS) searchByList = searchByListDocuments
     setAdditionalInfo({
       references,
       sourceType,
@@ -213,20 +218,15 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean) =
       administrationList,
       prescriptionList,
       questionnaires,
-      modalities
+      modalities,
+      type,
+      searchByList
     })
   }
 
   useEffect(() => {
     removeSearchCriterias()
     fetchAdditionalInfos()
-  }, [type])
-
-  useEffect(() => {
-    let searchByList = undefined
-    if (type === ResourceType.PATIENT) searchByList = searchByListPatients
-    if (type === ResourceType.DOCUMENTS) searchByList = searchByListDocuments
-    setAdditionalInfo({ ...additionalInfo, searchByList })
   }, [type, deidentified])
 
   return {

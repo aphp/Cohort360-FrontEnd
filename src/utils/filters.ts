@@ -88,6 +88,9 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.FAVORITE:
         castedFilters[key] = CohortsType.ALL
         break
+      case FilterKeys.ONLY_PDF_AVAILABLE:
+        castedFilters[key] = false
+        break
     }
   }
   return { ...castedFilters }
@@ -170,14 +173,18 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.ENCOUNTER_STATUS) {
     return `Statut de la visite associée : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
   }
-  if (key === FilterKeys.VALiDATED_STATUS) {
-    return `Analyse dont les résultats ont été validés`
+  if (key === FilterKeys.VALIDATED_STATUS) {
+    return `Analyses dont les résultats ont été validés`
+  }
+  if (key === FilterKeys.ONLY_PDF_AVAILABLE) {
+    return `Documents dont les PDF sont disponibles`
   }
   return ''
 }
 
 export const selectFiltersAsArray = (filters: Filters, searchInput: string | undefined) => {
-  const result: { value: FilterValue; category: FilterKeys | SearchCriteriaKeys; label: string, disabled?: boolean }[] = []
+  const result: { value: FilterValue; category: FilterKeys | SearchCriteriaKeys; label: string; disabled?: boolean }[] =
+    []
 
   if (searchInput)
     result.push({
@@ -246,12 +253,19 @@ export const selectFiltersAsArray = (filters: Filters, searchInput: string | und
             })
           }
           break
-        case FilterKeys.VALiDATED_STATUS:
+        case FilterKeys.VALIDATED_STATUS:
           result.push({
             category: key,
             value: value as FilterValue,
             label: getFilterLabel(key, value),
             disabled: true
+          })
+          break
+        case FilterKeys.ONLY_PDF_AVAILABLE:
+          result.push({
+            category: key,
+            value: value as FilterValue,
+            label: getFilterLabel(key, value)
           })
       }
     }
