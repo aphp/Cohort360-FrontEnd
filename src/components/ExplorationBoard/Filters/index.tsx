@@ -27,10 +27,17 @@ enum Source {
   AREM = 'AREM',
   ORBIS = 'ORBIS'
 }
-const statusOptions = [
+const biologyStatusOptions = [
   {
     id: 'validatedStatus',
     label: "N'afficher que les analyses dont les résultats ont été validés"
+  }
+]
+
+const documentsStatusOptions = [
+  {
+    id: 'onlyPdfAvailable',
+    label: "N'afficher que les documents dont les PDF sont disponibles"
   }
 ]
 
@@ -114,11 +121,29 @@ const ExplorationFilters = ({ filters, deidentified, infos, onSubmit, onError, o
   // )
   return (
     <>
-      {FilterKeys.VALiDATED_STATUS in filters && (
+      {FilterKeys.VALIDATED_STATUS in filters && (
         <Controller
-          name={FilterKeys.VALiDATED_STATUS}
+          name={FilterKeys.VALIDATED_STATUS}
           control={control}
-          render={({ field }) => <CheckboxGroup {...field} value={["validatedStatus"]} options={statusOptions} disabled={true} />}
+          render={({ field }) => (
+            <CheckboxGroup {...field} value={['validatedStatus']} options={biologyStatusOptions} disabled={true} />
+          )}
+        />
+      )}
+      {FilterKeys.ONLY_PDF_AVAILABLE in filters && (
+        <Controller
+          name={FilterKeys.ONLY_PDF_AVAILABLE}
+          control={control}
+          render={({ field }) => (
+            <CheckboxGroup
+              onChange={(newValue) => {
+                const transformedValue = newValue.includes('onlyPdfAvailable')
+                field.onChange(transformedValue)
+              }}
+              value={field.value ?? filters.onlyPdfAvailable ? ['onlyPdfAvailable'] : []}
+              options={documentsStatusOptions}
+            />
+          )}
         />
       )}
       {FilterKeys.GENDERS in filters && (

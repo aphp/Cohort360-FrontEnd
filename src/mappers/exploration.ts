@@ -5,7 +5,7 @@ import { getAge } from 'utils/age'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { PMSIResourceTypes, ResourceType, VitalStatusLabel } from 'types/requestCriterias'
 import { PatientTableLabels, PatientsResponse } from 'types/patient'
-import { DocumentStatuses, FormNames, Order } from 'types/searchCriterias'
+import { DocumentStatuses, Filters, FormNames, Order, SearchCriterias } from 'types/searchCriterias'
 import { getPmsiCodes, getPmsiDate } from './pmsi'
 import { Data } from 'components/ExplorationBoard/useData'
 import { getFormDetails, getFormLabel } from 'utils/formUtils'
@@ -39,6 +39,7 @@ import {
 } from 'utils/exploration'
 import { formatValueRange } from './biology'
 import { Paragraph } from 'components/ui/Paragraphs'
+import { Buffer } from 'buffer'
 
 const mapPatientsToColumns = (deidentified: boolean): Column[] => {
   return [
@@ -565,7 +566,12 @@ const mapBiologyToRows = (list: CohortObservation[], groupId?: string) => {
   return rows
 }
 
-const mapDocumentsToRows = (list: CohortComposition[], groupId?: string) => {
+const mapDocumentsToRows = (
+  list: CohortComposition[],
+  deidentified: boolean,
+  groupId?: string,
+  hasSearch?: boolean
+) => {
   const rows: Row[] = []
   console.log('test data', list)
   list.forEach((elem) => {
@@ -577,6 +583,11 @@ const mapDocumentsToRows = (list: CohortComposition[], groupId?: string) => {
       status: elem.docStatus === DocumentStatuses.FINAL ? Status.VALID : Status.CANCELLED,
       icon: elem.docStatus === DocumentStatuses.FINAL ? CheckIcon : CancelIcon
     }
+    const findContent = elem?.content?.find((content) => content.attachment?.contentType === 'text/plain')
+    const documentContent = findContent?.attachment?.data
+      ? Buffer.from(findContent?.attachment.data, 'base64').toString('utf-8')
+      : ''
+    console.log('test docs', documentContent)
     const row: Row = [
       {
         id: `${elem.id}-status`,
@@ -585,10 +596,11 @@ const mapDocumentsToRows = (list: CohortComposition[], groupId?: string) => {
       },
       {
         id: `${elem.id}-description`,
-        value: `${elem.description ?? 'Document sans titre'} ${
-          elem.date ? mapToDateHours(elem.date) : 'Date inconnue'
-        }`,
-        type: CellType.TEXT
+        value: [
+          { text: `${elem.description ?? 'Document sans titre'}`, sx: { fontWeight: 900 } },
+          { text: `${elem.date ? mapToDateHours(elem.date) : 'Date inconnue'}` }
+        ],
+        type: CellType.PARAGRAPHS
       },
       {
         id: `${elem.id}-ipp`,
@@ -614,6 +626,18 @@ const mapDocumentsToRows = (list: CohortComposition[], groupId?: string) => {
         id: `${elem.id}-docType`,
         value: docType?.label ?? '-',
         type: CellType.TEXT
+      },
+      {
+        id: `${elem.id}-viewDoc`,
+        value: { id: elem.id, deidentified },
+        type: CellType.DOCUMENT_VIEWER,
+        align: 'center'
+      },
+      hasSearch && {
+        id: `${elem.id}-docContent`,
+        value: documentContent,
+        type: CellType.DOCUMENT_CONTENT,
+        isHidden: true
       }
     ].filter((elem) => elem) as Row
     rows.push(row)
@@ -638,7 +662,7 @@ export const mapMedicationToRows = (
     )
     const atcDisplay: Paragraph[] = [
       { text: `${codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : codeATC ?? ''}` },
-      { text: `${displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}`, sx: {fontWeight: 900} },
+      { text: `${displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}`, sx: { fontWeight: 900 } },
       { text: `${codeATCSystem ?? 'Non renseigné'}` }
     ]
     const [codeUCD, displayUCD, , codeUCDSystem] = getCodes(
@@ -726,7 +750,7 @@ export const mapMedicationToRows = (
   return rows
 }
 
-export const map = (data: Data, type: ResourceType, deidentified: boolean, groupId?: string) => {
+export const map = (data: Data, type: ResourceType, deidentified: boolean, groupId?: string, hasSearch?: boolean) => {
   const table: Table = { rows: [], columns: [] }
   if (isPatientsResponse(data) && data.originalPatients) {
     table.columns = mapPatientsToColumns(deidentified)
@@ -758,7 +782,7 @@ export const map = (data: Data, type: ResourceType, deidentified: boolean, group
       }
       if (isDocumentsCohort(data)) {
         table.columns = mapDocumentsToColumns(deidentified)
-        table.rows = mapDocumentsToRows(data.list, groupId)
+        table.rows = mapDocumentsToRows(data.list, deidentified, groupId, hasSearch)
       }
     }
   }
