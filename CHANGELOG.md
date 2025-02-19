@@ -1,6 +1,62 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [2.42.5](https://github.com/aphp/Cohort360-FrontEnd/compare/2.42.4..2.42.5) - 2025-02-19
+
+### 🐛 Bug Fixes
+
+- *(criterias)* Allow removing value in number input + fix max width of collapsable options container - ([133f961](https://github.com/aphp/Cohort360-FrontEnd/commit/133f9612c00451d8c09b3c342ad0537d0ec0f717))
+
+## [2.42.4](https://github.com/aphp/Cohort360-FrontEnd/compare/2.42.3..2.42.4) - 2025-02-18
+
+### 🐛 Bug Fixes
+
+- *(requester)* Invert deceased condition for death date field - ([a790186](https://github.com/aphp/Cohort360-FrontEnd/commit/a7901861489d0187213fc08d483ddd4caf8fdb72))
+- *(requester)* Enable research with float for biology criteria - ([12ce504](https://github.com/aphp/Cohort360-FrontEnd/commit/12ce504b46ae2a95e0e1f74d6f52a7960f80b142))
+
+### ⚙️ Miscellaneous Tasks
+
+- Desable sonar cloud scan - ([81c81f1](https://github.com/aphp/Cohort360-FrontEnd/commit/81c81f1890b9067f10ff072626633624200f35bd))
+
+## [2.42.3](https://github.com/aphp/Cohort360-FrontEnd/compare/2.42.2..2.42.3) - 2025-02-05
+
+### 🐛 Bug Fixes
+
+- *(requests)* Readd anabio/loinc system display - ([4f59da7](https://github.com/aphp/Cohort360-FrontEnd/commit/4f59da773f51d5aed9baf17c5c323971979f3ed5))
+- *(request)* Change chips display for imaging form - ([ec24ac3](https://github.com/aphp/Cohort360-FrontEnd/commit/ec24ac36cd1853abb11f6f9ea09dbbc94a8fb421))
+
+### 📚 Documentation
+
+- Update information messages - ([8ecf82c](https://github.com/aphp/Cohort360-FrontEnd/commit/8ecf82cd08cef721d49cbfa0b0589f5313e4ea9b))
+
+## [2.42.2](https://github.com/aphp/Cohort360-FrontEnd/compare/2.42.1..2.42.2) - 2025-01-31
+
+### 🐛 Bug Fixes
+
+- Observation value field & builder - ([93831e1](https://github.com/aphp/Cohort360-FrontEnd/commit/93831e193cc5a07557f48ad1b33b1dacbcbf5c2e))
+
+## [2.42.1](https://github.com/aphp/Cohort360-FrontEnd/compare/2.42.0..2.42.1) - 2025-01-31
+
+### 🐛 Bug Fixes
+
+- Correct labels + fix textregex build - ([bfaf961](https://github.com/aphp/Cohort360-FrontEnd/commit/bfaf96104ad129b4407f1121fafdac51b973c56d))
+
+## [2.42.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.41.0..2.42.0) - 2025-01-30
+
+### 🚀 Features
+
+- Add test classnames for ValuesetCodeSearch view - ([ad72802](https://github.com/aphp/Cohort360-FrontEnd/commit/ad72802e3aea63c8a2723b12000360d74e881a59))
+- Add code prefix to cim10 types filter - ([eb3ae91](https://github.com/aphp/Cohort360-FrontEnd/commit/eb3ae91f1f636841264c50742b9fa201a3fc4dba))
+- Add criteria form builder - Ref gestion-de-projet#2354 (#1059) - ([d722bd7](https://github.com/aphp/Cohort360-FrontEnd/commit/d722bd7724167b9912e945be34aff3e8942ca6f2))
+
+### 🐛 Bug Fixes
+
+- *(harmonisation visuelle)* Corrections - Ref gestion-de-projet#2873 (#1087) - ([2d4d503](https://github.com/aphp/Cohort360-FrontEnd/commit/2d4d503e290887ccd2912c1bcdc2550ba3794f98))
+- *(harmonisation visuelle)* Corrections - Ref gestion-de-projet#2873… (#1088) - ([282e339](https://github.com/aphp/Cohort360-FrontEnd/commit/282e339d0812469fe9e3e4a15d347f75f3ffd9e4))
+- *(docs)* Match doc type code with lowercase - ([c80cb77](https://github.com/aphp/Cohort360-FrontEnd/commit/c80cb77a8319ee61040f7a405f99746eb6189458))
+- *(valuesets)* Remove capitalization on code - ([7851428](https://github.com/aphp/Cohort360-FrontEnd/commit/7851428240790826a1e36664a753ff12c5b6b4c3))
+- *(questionnaire)* Set correct birthstatus field (#1086) - ([4fcfbe4](https://github.com/aphp/Cohort360-FrontEnd/commit/4fcfbe4f3d03c3d745b777af6a6b2c6397af02b9))
+- *(request)* Redirect to proper request url when creating new (#1091) - ([c5eb6b2](https://github.com/aphp/Cohort360-FrontEnd/commit/c5eb6b2bfc4892f9d4d48219c918b1196dbf482f))
 
 ## [2.41.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.40.00..2.41.0) - 2025-01-09
 
