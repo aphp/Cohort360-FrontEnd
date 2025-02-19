@@ -148,6 +148,7 @@ const mapPatientsToRows = (patients: Patient[], deidentified: boolean, groupId?:
       label: patient.deceasedBoolean || patient.deceasedDateTime ? VitalStatusLabel.DECEASED : VitalStatusLabel.ALIVE,
       status: patient.deceasedBoolean || patient.deceasedDateTime ? Status.CANCELLED : Status.VALID
     }
+    const lastEncounter = patient.extension?.[3]?.valueReference?.display ?? ''
     const row: Row = [
       {
         id: `${patient.id}-ipp`,
@@ -200,7 +201,7 @@ const mapPatientsToRows = (patients: Patient[], deidentified: boolean, groupId?:
       },
       {
         id: `${patient.id}-lastEncounter`,
-        value: patient.extension?.[5]?.valueReference?.display ?? '',
+        value: lastEncounter,
         type: CellType.TEXT
       },
       {

@@ -12,12 +12,10 @@ import TextInput from 'components/ui/Inputs/Text'
 import MultiSelect from 'components/ui/Inputs/MultiSelect'
 import allDocTypesList from 'assets/docTypes.json'
 import DocTypes from 'components/ui/Inputs/DocTypes'
-import { Checkbox } from '@mui/material'
 
 type ExplorationFiltersProps = {
   filters: Filters
   infos: AdditionalInfo
-  deidentified?: boolean
   onSubmit: (filters: Filters) => void
   onError: (isError: boolean) => void
   onChange: (hasChange: boolean) => void
@@ -57,7 +55,7 @@ const docStatusesList = [
   { id: FilterByDocumentStatus.NOT_VALIDATED, label: FilterByDocumentStatus.NOT_VALIDATED }
 ]
 
-const ExplorationFilters = ({ filters, deidentified, infos, onSubmit, onError, onChange }: ExplorationFiltersProps) => {
+const ExplorationFilters = ({ filters, infos, onSubmit, onError, onChange }: ExplorationFiltersProps) => {
   const {
     control,
     handleSubmit,
@@ -164,7 +162,7 @@ const ExplorationFilters = ({ filters, deidentified, infos, onSubmit, onError, o
         <Controller
           name={FilterKeys.BIRTHDATES}
           control={control}
-          render={({ field }) => <DurationRange {...field} label="Âge :" includeDays={!!deidentified} />}
+          render={({ field }) => <DurationRange {...field} label="Âge :" includeDays={!infos.deidentified} />}
         />
       )}
       {FilterKeys.NDA in filters && (

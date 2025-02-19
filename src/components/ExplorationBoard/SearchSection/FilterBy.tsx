@@ -9,11 +9,10 @@ import { Filters } from 'types/searchCriterias'
 type FilterByProps = {
   filters: Filters
   infos: AdditionalInfo
-  deidentified?: boolean
   onSubmit: (filters: Filters) => void
 }
 
-const FilterBy = ({ filters, deidentified, infos, onSubmit }: FilterByProps) => {
+const FilterBy = ({ filters, infos, onSubmit }: FilterByProps) => {
   const [toggleModal, setToggleModal] = useState(false)
   const [isError, setIsError] = useState(false)
   const [hasChanged, setHasChanged] = useState(false)
@@ -46,7 +45,6 @@ const FilterBy = ({ filters, deidentified, infos, onSubmit }: FilterByProps) => 
       >
         <ExplorationFilters
           filters={filters}
-          deidentified={deidentified}
           infos={infos}
           onError={setIsError}
           onSubmit={setForm}

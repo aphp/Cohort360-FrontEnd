@@ -133,13 +133,7 @@ export interface IServiceCohorts {
    *   - genderRepartitionMap: Données liées au graphique de la répartition par genre
    */
   fetchPatientList: (
-    options: {
-      page: number
-      searchCriterias: SearchCriterias<PatientsFilters | null>
-    },
-    deidentified: boolean,
-    groupId?: string,
-    includeFacets?: boolean,
+    options: ResourceOptions<PatientsFilters>,
     signal?: AbortSignal
   ) => Promise<PatientsResponse | undefined>
 
@@ -220,8 +214,8 @@ export interface IServiceCohorts {
    */
   getExplorationFetcher: (
     resourceType: ResourceType
-  ) => (options: ResourceOptions<Filters>, groupId?: string, signal?: AbortSignal) => Promise<Data>
-
+    
+    ) => (options: ResourceOptions<Filters>, signal?: AbortSignal) => Promise<Data>
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
    *
@@ -385,10 +379,7 @@ const servicesCohorts: IServiceCohorts = {
   },
 
   fetchPatientList: async (
-    { page, searchCriterias: { orderBy, searchBy, searchInput, filters } },
-    deidentified,
-    groupId,
-    includeFacets,
+    { page, searchCriterias: { orderBy, searchBy, searchInput, filters }, deidentified, groupId, includeFacets },
     signal
   ) => {
     try {

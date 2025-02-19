@@ -53,6 +53,7 @@ export type AdditionalInfo = {
   questionnaires?: LabelObject[]
   modalities?: LabelObject[]
   type: ResourceType
+  deidentified: boolean
 }
 
 const getInit = (type: ResourceType) => {
@@ -80,7 +81,7 @@ const getInit = (type: ResourceType) => {
 }
 
 export const useExplorationBoard = (type: ResourceType, deidentified: boolean) => {
-  const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>({ type })
+  const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>({ type, deidentified })
   const [
     searchCriterias,
     { changeSearchBy, changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias }
@@ -220,6 +221,7 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean) =
       questionnaires,
       modalities,
       type,
+      deidentified,
       searchByList
     })
   }

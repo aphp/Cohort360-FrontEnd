@@ -10,7 +10,6 @@ import { AdditionalInfo } from '../useExplorationBoard'
 import { useAppSelector } from 'state'
 
 type SavedFiltersProps = {
-  deidentified: boolean
   selectedFilter: SelectedFilter<Filters> | null
   infos: AdditionalInfo
   allFilters: SavedFiltersResults | null
@@ -23,7 +22,6 @@ type SavedFiltersProps = {
 }
 
 const SavedFilters = ({
-  deidentified,
   allFilters,
   infos,
   selectedFilter,
@@ -142,7 +140,6 @@ const SavedFilters = ({
             setToggleDisplayModal(false)
           }}
           onClose={() => setToggleDisplayModal(false)}
-          deidentified={deidentified}
         />
       )}
     </>

@@ -11,7 +11,6 @@ import ExplorationFilters from '../Filters'
 import { useAppSelector } from 'state'
 
 type EditSavedFilterProps = {
-  deidentified: boolean
   open: boolean
   criteria: SelectedFilter<Filters>
   infos: AdditionalInfo
@@ -19,7 +18,7 @@ type EditSavedFilterProps = {
   onClose: () => void
 }
 
-const EditSavedFilter = ({ deidentified, open, criteria, infos, onEdit, onClose }: EditSavedFilterProps) => {
+const EditSavedFilter = ({ open, criteria, infos, onEdit, onClose }: EditSavedFilterProps) => {
   const maintenanceIsActive = useAppSelector((state) => state.me)?.maintenance?.active
   const [isError, setIsError] = useState(false)
   const [hasChanged, setHasChanged] = useState(false)
@@ -53,7 +52,7 @@ const EditSavedFilter = ({ deidentified, open, criteria, infos, onEdit, onClose 
       readonly={(!hasChanged && !isDirty) || maintenanceIsActive}
       onClose={onClose}
       onSubmit={() => {
-        onEdit(filterNameValue, { ...criteria.filterParams, filters: form, searchBy, searchInput }, deidentified)
+        onEdit(filterNameValue, { ...criteria.filterParams, filters: form, searchBy, searchInput }, infos.deidentified)
       }}
       submitText="Sauvegarder"
     >
@@ -106,7 +105,6 @@ const EditSavedFilter = ({ deidentified, open, criteria, infos, onEdit, onClose 
         <ExplorationFilters
           infos={infos}
           filters={criteria.filterParams.filters}
-          deidentified={deidentified}
           onSubmit={setForm}
           onChange={setHasChanged}
           onError={setIsError}

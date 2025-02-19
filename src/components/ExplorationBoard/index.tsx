@@ -34,7 +34,7 @@ const ExplorationBoard = ({ deidentified = true, type, messages }: ExplorationBo
     resetFetchStatus
   } = useExplorationBoard(type, deidentified)
 
-  const { count, pagination, tableData, dataLoading, onChangePage } = useData(
+  const { count, pagination, data, dataLoading, onChangePage } = useData(
     type,
     searchCriterias,
     page,
@@ -45,8 +45,8 @@ const ExplorationBoard = ({ deidentified = true, type, messages }: ExplorationBo
   useEffect(() => {
     //console.log('test searchCriterias', searchCriterias)
     console.log('test searchCriterias', searchCriterias)
-    console.log('test infos', additionalInfo.references)
-  }, [tableData])
+    console.log('test searchbar', additionalInfo.type)
+  }, [data])
 
   // double fetch au chargement de la ressource ?? peut-être normal
   // IPP et NDA non trouvé en mode deidentified dans le tableau PMSI
@@ -71,7 +71,6 @@ const ExplorationBoard = ({ deidentified = true, type, messages }: ExplorationBo
   return (
     <Grid item xs={12} container gap="25px" padding="50px" sx={{ backgroundColor: '#fff' }}>
       <SearchSection
-        deidentified={deidentified}
         searchCriterias={searchCriterias}
         infos={additionalInfo}
         onSearch={(searchCriterias) => onSearch(searchCriterias)}
@@ -85,12 +84,19 @@ const ExplorationBoard = ({ deidentified = true, type, messages }: ExplorationBo
           {msg}
         </AlertWrapper>
       ))}
+
+      {/*<PatientCharts
+          agePyramid={data && isPatientsResponse(data) ? (data as PatientsResponse).agePyramidData ?? [] : []}
+          patientData={data && isPatientsResponse(data) ? (data as PatientsResponse).genderRepartitionMap ?? {} : {}}
+          loading={dataLoading}
+      />*/}
       <DataSection
         isLoading={dataLoading}
-        data={tableData}
+        data={data}
         count={count}
         orderBy={searchCriterias.orderBy}
         pagination={pagination}
+        type={type}
         onChangePage={onChangePage}
         onSort={onSort}
       />
