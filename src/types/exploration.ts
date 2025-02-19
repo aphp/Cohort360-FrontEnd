@@ -6,4 +6,6 @@ export type ResourceOptions<T> = {
   page: number
   searchCriterias: SearchCriterias<T>
   type?: ResourceType
+  groupId?: string
+  includeFacets?: boolean
 }

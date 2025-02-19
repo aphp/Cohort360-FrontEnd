@@ -21,7 +21,6 @@ type SavedFiltersData<T> = {
 }
 
 type SearchSectionProps = {
-  deidentified: boolean
   searchCriterias: SearchCriterias<Filters>
   infos: AdditionalInfo
   savedFiltersActions: SavedFiltersActions
@@ -30,7 +29,6 @@ type SearchSectionProps = {
 }
 
 const SearchSection = ({
-  deidentified,
   searchCriterias,
   infos,
   savedFiltersActions,
@@ -51,14 +49,13 @@ const SearchSection = ({
         <Grid container item xs={12} md={5}>
           <FilterBy
             infos={infos}
-            deidentified={deidentified}
             filters={searchCriterias.filters as Filters}
             onSubmit={(newFilters) => onSearch({ filters: newFilters })}
           />
         </Grid>
         {savedFiltersData.allFilters && savedFiltersData.allFilters.count > 0 && (
           <Grid container item xs={12} md={5}>
-            <SavedFilters deidentified={deidentified} infos={infos} {...savedFiltersActions} {...savedFiltersData} />
+            <SavedFilters infos={infos} {...savedFiltersActions} {...savedFiltersData} />
           </Grid>
         )}
       </Grid>
