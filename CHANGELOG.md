@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.43.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.42.0..2.43.0) - 2025-02-19
+
+### 🐛 Bug Fixes
+
+- Correct labels + fix textregex build - ([ed3bdb0](https://github.com/aphp/Cohort360-FrontEnd/commit/ed3bdb00fbd9db99fba8dc8fe55d6657f0633182))
+- Observation value field & builder - ([db32b28](https://github.com/aphp/Cohort360-FrontEnd/commit/db32b2888d949292ae1b3b0421ab075fcb4d3182))
+- *(requests)* Readd anabio/loinc system display - ([428754b](https://github.com/aphp/Cohort360-FrontEnd/commit/428754bc614ce2fd8378768a5ac0d968ca5d19ce))
+- *(request)* Change chips display for imaging form - ([ccacad8](https://github.com/aphp/Cohort360-FrontEnd/commit/ccacad8630bb434d1d3813439bcd0a4fc24a0ed9))
+- *(requester)* Invert deceased condition for death date field - ([623149d](https://github.com/aphp/Cohort360-FrontEnd/commit/623149d00aa9ad2af3355e72a902a2e5b691ef43))
+- *(requester)* Enable research with float for biology criteria - ([129a7e6](https://github.com/aphp/Cohort360-FrontEnd/commit/129a7e635d5397d056a0f529c010afeb0d4e3f34))
+- *(criterias)* Allow removing value in number input + fix max width of collapsable options container - ([ca15adc](https://github.com/aphp/Cohort360-FrontEnd/commit/ca15adc502296ead6290fb06d0ba51bf9db9e67e))
+
+### 📚 Documentation
+
+- Update changelogs - ([c650b47](https://github.com/aphp/Cohort360-FrontEnd/commit/c650b47543935c9cd9a727ef1528a513e7d4c5d1))
+- Update information messages - ([1294e45](https://github.com/aphp/Cohort360-FrontEnd/commit/1294e45ef38fee6c95505f9b90ce2280aebdb1dc))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update snapshot version to 2.43.0-snapshot - ([7d05af6](https://github.com/aphp/Cohort360-FrontEnd/commit/7d05af609e0eab10a950d6f05f59b8bb25d031f3))
+- Set snapshot version to 2.44.0-SNAPSHOT - ([2b43ac9](https://github.com/aphp/Cohort360-FrontEnd/commit/2b43ac91a9d90bd80d61234084b0840a815ce1eb))
+- Update github action - ([eb2aca8](https://github.com/aphp/Cohort360-FrontEnd/commit/eb2aca89cd2be139d33433db44e850db45e26e23))
+
 ## [2.42.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.40.00..2.42.0) - 2025-01-30
 
 ### 🚀 Features
