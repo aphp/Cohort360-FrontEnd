@@ -24,6 +24,30 @@ import {
 import { PatientsResponse } from 'types/patient'
 import { Data } from 'components/ExplorationBoard/useData'
 
+export const getAlertMessages = (type: string, deidentified: boolean) => {
+  if (type === ResourceType.IMAGING)
+    return [
+      "Seuls les examens présents dans le PACS Philips et rattachés à un Dossier Administratif (NDA) sont actuellement disponibles. Le flux alimentant les métadonnées associées aux séries et aux examens est suspendu depuis le 01/02/2023 suite à la migration du PACS AP-HP. Aucun examen produit après cette date n'est disponible via Cohort360."
+    ]
+  if (type === ResourceType.OBSERVATION)
+    return [
+      "Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondants aux analyses les plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020."
+    ]
+  if (type === ResourceType.CONDITION || type === ResourceType.PROCEDURE)
+    return [
+      'Attention : Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/07/2024. Seuls les diagnostics rattachés à une visite Orbis (avec un Dossier Administratif - NDA) sont actuellement disponibles.'
+    ]
+  if (type === ResourceType.DOCUMENTS) {
+    if (deidentified)
+      return [
+        'Attention : Les données identifiantes des patients sont remplacées par des informations fictives dans les résultats de la recherche et dans les documents prévisualisés.'
+      ]
+    return [
+      "Attention : La recherche textuelle est pseudonymisée (les données identifiantes des patients sont remplacées par des informations fictives). Vous retrouverez les données personnelles de votre patient en cliquant sur l'aperçu."
+    ]
+  }
+}
+
 export const narrowSearchCriterias = (
   deidentified: boolean,
   searchCriterias: SearchCriterias<Filters>,
@@ -61,7 +85,7 @@ export const narrowSearchCriterias = (
       return mappedPatients(searchCriterias as SearchCriterias<PatientsFilters>, deidentified)
     case ResourceType.CONDITION:
       return mappedOthers(searchCriterias as SearchCriterias<PMSIFilters>, deidentified)
-    case ResourceType.PROCEDURE:{
+    case ResourceType.PROCEDURE: {
       const narrowed = mappedOthers(searchCriterias as SearchCriterias<PMSIFilters>, deidentified)
       narrowed.filters = removeKeys(narrowed.filters, ['diagnosticTypes'])
       return narrowed

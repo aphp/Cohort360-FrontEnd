@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useMemo } from 'react'
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { Grid, Tabs as TabsMui, Tab } from '@mui/material'
 import CohortPreview from 'components/Dashboard/Preview/Preview'
@@ -22,6 +22,8 @@ import { MedicationTab, PmsiTab, TabType } from 'types'
 import { PMSILabel } from 'types/patient'
 import Tabs from 'components/ui/Tabs'
 import { getMedicationTab, getPMSITab } from 'utils/tabsUtils'
+import { getAlertMessages } from 'utils/exploration'
+import { URLS } from 'types/exploration'
 
 type Tabs = { label: string; value: string; to: string; disabled?: boolean } | undefined
 
@@ -36,9 +38,11 @@ export const medicationTabs: MedicationTab[] = [
   { id: ResourceType.MEDICATION_ADMINISTRATION, label: MedicationLabel.ADMINISTRATION }
 ]
 
-const Dashboard: React.FC<{
-  context: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'
-}> = ({ context }) => {
+type DashboardProps = {
+  context: URLS
+}
+
+const Dashboard = ({ context }: DashboardProps) => {
   const { tabName } = useParams<{
     tabName?: string
   }>()
@@ -54,134 +58,120 @@ const Dashboard: React.FC<{
   const [searchParams] = useSearchParams()
   const groupIds = getCleanGroupId(searchParams.get('groupId'))
 
-  const [selectedTab, setSelectedTab] = useState(tabName ?? 'preview')
-  const [tabs, setTabs] = useState<Tabs[]>([])
+  const [selectedTab, setSelectedTab] = useState((tabName as ResourceType) ?? ResourceType.PREVIEW)
 
   const open = useAppSelector((state) => state.drawer)
   const dashboard = useAppSelector((state) => state.exploredCohort)
   const me = useAppSelector((state) => state.me)
 
-  const onChangeTabs = () => {
+  const tabs: Tabs[] = useMemo(() => {
     switch (context) {
-      case 'patients':
-        setTabs([
-          // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'preview', to: '/my-patients/preview', disabled: false },
-          { label: 'Patients', value: 'patients', to: '/my-patients/patients', disabled: false },
-          ...(ODD_DOCUMENT_REFERENCE
-            ? [{ label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false }]
-            : []),
-          { label: 'PMSI', value: 'pmsi', to: '/my-patients/pmsi', disabled: false },
-          { label: 'Médicaments', value: 'medication', to: '/my-patients/medication', disabled: false },
-          { label: 'Biologie', value: 'biology', to: '/my-patients/biology', disabled: false },
-          ...(ODD_IMAGING
-            ? [{ label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging', disabled: false }]
-            : []),
-          ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/my-patients/forms`, disabled: false }]
-            : [])
-        ])
-        break
-      case 'cohort':
-        setTabs([
+      case URLS.PATIENTS:
+        return [
+          { label: 'Aperçu', value: ResourceType.PREVIEW, to: '/my-patients/preview' },
+          { label: 'Patients', value: ResourceType.PATIENT, to: '/my-patients/patients' },
+          ODD_DOCUMENT_REFERENCE && { label: 'Documents', value: ResourceType.DOCUMENTS, to: '/my-patients/documents' },
+          { label: 'PMSI', value: ResourceType.CONDITION, to: '/my-patients/pmsi' },
+          { label: 'Médicaments', value: ResourceType.MEDICATION_REQUEST, to: '/my-patients/medication' },
+          { label: 'Biologie', value: ResourceType.OBSERVATION, to: '/my-patients/biology' },
+          ODD_IMAGING && { label: 'Imagerie', value: ResourceType.IMAGING, to: '/my-patients/imaging' },
+          !
+            dashboard.deidentifiedBoolean && {
+              label: 'Formulaires',
+              value: ResourceType.QUESTIONNAIRE_RESPONSE,
+              to: `/my-patients/forms`
+            }
+        ].filter((e) => e) as Tabs[]
+      case URLS.COHORT:
+        return [
           {
             label: 'Modifier la requête',
             value: 'creation',
             to: `/cohort/new/${dashboard.requestId}/${dashboard.snapshotId}`
           },
-          { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/preview?groupId=${groupIds}` },
-          { label: 'Données patient', value: 'patients', to: `/cohort/patients${location.search}` },
-          ...(ODD_DOCUMENT_REFERENCE
-            ? [
-                {
-                  label: 'Documents cliniques',
-                  value: 'documents',
-                  to: `/cohort/documents${location.search}`,
-                  disabled: false
-                }
-              ]
-            : []),
-          { label: 'PMSI', value: 'pmsi', to: `/cohort/pmsi${location.search}` },
-          { label: 'Médicaments', value: 'medication', to: `/cohort/medication${location.search}` },
-          { label: 'Biologie', value: 'biology', to: `/cohort/biology${location.search}` },
-          ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/imaging${location.search}` }] : []),
-          ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/cohort/forms${location.search}` }]
-            : [])
-        ])
-        break
-      case 'new_cohort':
-        setTabs([
-          // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/new/preview`, disabled: true },
-          { label: 'Données patient', value: 'patients', to: `/cohort/new/patients`, disabled: true },
-          ...(ODD_DOCUMENT_REFERENCE
-            ? [{ label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true }]
-            : []),
-          { label: 'PMSI', value: 'pmsi', to: `/cohort/new/pmsi` },
-          { label: 'Médicaments', value: 'medication', to: `/cohort/new/medication` },
-          { label: 'Biologie', value: 'biology', to: `/cohort/new/biology` },
-          ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/new/imaging`, disabled: true }] : []),
-          ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/cohort/new/forms` }]
-            : [])
-        ])
-        break
-      case 'perimeters': {
-        setTabs([
-          // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'preview', to: `/perimeters/preview?groupId=${groupIds}` },
-          {
-            label: 'Données patient',
-            value: 'patients',
-            to: `/perimeters/patients${location.search}`
+          { label: 'Aperçu cohorte', value: ResourceType.PREVIEW, to: `/cohort/preview?groupId=${groupIds}` },
+          { label: 'Données patient', value: ResourceType.PATIENT, to: `/cohort/patients${location.search}` },
+          ODD_DOCUMENT_REFERENCE && {
+            label: 'Documents cliniques',
+            value: ResourceType.DOCUMENTS,
+            to: `/cohort/documents${location.search}`
           },
-          ...(ODD_DOCUMENT_REFERENCE
-            ? [
-                {
-                  label: 'Documents cliniques',
-                  value: 'documents',
-                  to: `/perimeters/documents${location.search}`,
-                  disabled: false
-                }
-              ]
-            : []),
+          { label: 'PMSI', value: ResourceType.CONDITION, to: `/cohort/pmsi${location.search}` },
+          { label: 'Médicaments', value: ResourceType.MEDICATION_REQUEST, to: `/cohort/medication${location.search}` },
+          { label: 'Biologie', value: ResourceType.OBSERVATION, to: `/cohort/biology${location.search}` },
+          ODD_IMAGING && { label: 'Imagerie', value: ResourceType.IMAGING, to: `/cohort/imaging${location.search}` },
+          ODD_QUESTIONNAIRES &&
+            !dashboard.deidentifiedBoolean && {
+              label: 'Formulaires',
+              value: ResourceType.QUESTIONNAIRE_RESPONSE,
+              to: `/cohort/forms${location.search}`
+            }
+        ].filter((e) => e) as Tabs[]
+      case URLS.NEW_COHORT:
+        return [
+          { label: 'Aperçu cohorte', value: ResourceType.PREVIEW, to: `/cohort/new/preview`, disabled: true },
+          { label: 'Données patient', value: ResourceType.PATIENT, to: `/cohort/new/patients`, disabled: true },
+          ODD_DOCUMENT_REFERENCE && {
+            label: 'Documents cliniques',
+            value: ResourceType.DOCUMENTS,
+            to: `/cohort/new/documents`,
+            disabled: true
+          },
+          { label: 'PMSI', value: ResourceType.CONDITION, to: `/cohort/new/pmsi` },
+          { label: 'Médicaments', value: ResourceType.MEDICATION_REQUEST, to: `/cohort/new/medication` },
+          { label: 'Biologie', value: ResourceType.OBSERVATION, to: `/cohort/new/biology` },
+          ODD_IMAGING && { label: 'Imagerie', value: ResourceType.IMAGING, to: `/cohort/new/imaging`, disabled: true },
+          ODD_QUESTIONNAIRES &&
+            !dashboard.deidentifiedBoolean && {
+              label: 'Formulaires',
+              value: ResourceType.QUESTIONNAIRE_RESPONSE,
+              to: `/cohort/new/forms`
+            }
+        ].filter((e) => e) as Tabs[]
+      case URLS.PERIMETERS: {
+        return [
+          { label: 'Aperçu', value: ResourceType.PREVIEW, to: `/perimeters/preview?groupId=${groupIds}` },
+          { label: 'Données patient', value: ResourceType.PATIENT, to: `/perimeters/patients${location.search}` },
+          ODD_DOCUMENT_REFERENCE && {
+            label: 'Documents cliniques',
+            value: ResourceType.DOCUMENTS,
+            to: `/perimeters/documents${location.search}`
+          },
           { label: 'PMSI', value: ResourceType.CONDITION, to: `/perimeters/pmsi${location.search}` },
           {
             label: 'Médicaments',
             value: ResourceType.MEDICATION_REQUEST,
             to: `/perimeters/medication${location.search}`
           },
-          { label: 'Biologie', value: 'biology', to: `/perimeters/biology${location.search}` },
-          ...(ODD_IMAGING
-            ? [{ label: 'Imagerie', value: 'imaging', to: `/perimeters/imaging${location.search}` }]
-            : []),
-          ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/perimeters/forms${location.search}` }]
-            : [])
-        ])
-        break
+          { label: 'Biologie', value: ResourceType.OBSERVATION, to: `/perimeters/biology${location.search}` },
+          ODD_IMAGING && {
+            label: 'Imagerie',
+            value: ResourceType.IMAGING,
+            to: `/perimeters/imaging${location.search}`
+          },
+          ODD_QUESTIONNAIRES &&
+            !dashboard.deidentifiedBoolean && {
+              label: 'Formulaires',
+              value: ResourceType.QUESTIONNAIRE_RESPONSE,
+              to: `/perimeters/forms${location.search}`
+            }
+        ].filter((e) => e) as Tabs[]
       }
-      default:
-        break
     }
-  }
+  }, [dashboard])
 
   useEffect(() => {
-    if (context !== 'new_cohort') {
+    if (context !== URLS.NEW_COHORT) {
       dispatch(fetchExploredCohort({ context, id: groupIds }))
     }
   }, [context, groupIds]) // eslint-disable-line
 
-  useEffect(() => {
-    onChangeTabs()
-  }, [dashboard])
 
   const forceReload = () => {
     dispatch(fetchExploredCohort({ context, id: groupIds, forceReload: true }))
   }
 
-  const handleChangeTabs = (event: React.SyntheticEvent<Element, Event>, newTab: string) => {
+  const handleChangeTabs = (event: React.SyntheticEvent<Element, Event>, newTab: ResourceType) => {
     setSelectedTab(newTab)
   }
 
@@ -189,62 +179,8 @@ const Dashboard: React.FC<{
     return <CohortCreation />
   }
 
-  if (dashboard.loading === false && dashboard.rightToExplore === false) {
-    return <CohortRightOrNotExist />
-  } else if (dashboard.loading === false && dashboard.totalPatients === 0) {
-    return <CohortNoPatient />
-  }
-
-  const getResourceTypeFromTab = (tab: string) => {
-    switch (tab) {
-      case 'Condition':
-        return ResourceType.CONDITION
-      case 'Procedure':
-        return ResourceType.PROCEDURE
-      case 'Claim':
-        return ResourceType.CLAIM
-      case 'patients':
-        return ResourceType.PATIENT
-      case 'documents':
-        return ResourceType.DOCUMENTS
-      case 'MedicationRequest':
-        return ResourceType.MEDICATION_REQUEST
-      case 'MedicationAdministration':
-        return ResourceType.MEDICATION_ADMINISTRATION
-      case 'forms':
-        return ResourceType.QUESTIONNAIRE_RESPONSE
-      case 'imaging':
-        return ResourceType.IMAGING
-      case 'biology':
-        return ResourceType.OBSERVATION
-      default:
-        return ResourceType.DOCUMENTS
-    }
-  }
-
-  const getAlertMessages = (tab: string) => {
-    if (tab === 'imaging')
-      return [
-        "Seuls les examens présents dans le PACS Philips et rattachés à un Dossier Administratif (NDA) sont actuellement disponibles. Le flux alimentant les métadonnées associées aux séries et aux examens est suspendu depuis le 01/02/2023 suite à la migration du PACS AP-HP. Aucun examen produit après cette date n'est disponible via Cohort360."
-      ]
-    if (tab === 'biology')
-      return [
-        "Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondants aux analyses les plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020."
-      ]
-    if (tab === 'Condition' || tab === 'Procedure')
-      return [
-        'Attention : Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/07/2024. Seuls les diagnostics rattachés à une visite Orbis (avec un Dossier Administratif - NDA) sont actuellement disponibles.'
-      ]
-    if (tab === 'documents' && dashboard.deidentifiedBoolean)
-      return [
-        'Attention : Les données identifiantes des patients sont remplacées par des informations fictives dans les résultats de la recherche et dans les documents prévisualisés.'
-      ]
-    if (tab === 'documents' && !dashboard.deidentifiedBoolean)
-      return [
-        "Attention : La recherche textuelle est pseudonymisée (les données identifiantes des patients sont remplacées par des informations fictives). Vous retrouverez les données personnelles de votre patient en cliquant sur l'aperçu."
-      ]
-  }
-
+  if (dashboard.loading === false && dashboard.rightToExplore === false) return <CohortRightOrNotExist />
+  else if (dashboard.loading === false && dashboard.totalPatients === 0) return <CohortNoPatient />
   return (
     <Grid
       container
@@ -320,12 +256,12 @@ const Dashboard: React.FC<{
         </Grid>
       </Grid>
       <Grid container xs={12} alignItems="center" direction="column">
-        {selectedTab === 'preview' && (
+        {selectedTab === ResourceType.PREVIEW ? (
           <CohortPreview
             cohortId={
-              context === 'cohort' || context === 'perimeters'
+              context === URLS.COHORT || context === URLS.PERIMETERS
                 ? groupIds
-                : context === 'patients'
+                : context === URLS.PATIENTS
                 ? me?.topLevelCareSites?.join(',')
                 : undefined
             }
@@ -336,30 +272,36 @@ const Dashboard: React.FC<{
             visitTypeRepartitionData={dashboard.visitTypeRepartitionData}
             loading={dashboard.loading}
           />
+        ) : (
+          <ExplorationBoard
+            deidentified={dashboard.deidentifiedBoolean}
+            type={selectedTab}
+            messages={getAlertMessages(selectedTab, !!dashboard.deidentifiedBoolean)}
+          />
         )}
-        {(selectedTab === 'patients' ||
+        {/*(selectedTab === ResourceType.PATIENT ||
           selectedTab === 'MedicationAdministration' ||
           selectedTab === 'MedicationRequest' ||
           selectedTab === 'Condition' ||
           selectedTab === 'Procedure' ||
           selectedTab === 'Claim' ||
-          selectedTab === 'imaging' ||
-          selectedTab === 'biology' ||
-          selectedTab === 'documents' ||
-          (selectedTab === 'forms' && ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean)) && (
+          selectedTab === ResourceType.IMAGING ||
+          selectedTab === ResourceType.OBSERVATION ||
+          selectedTab === ResourceType.DOCUMENTS ||
+          (selectedTab === ResourceType.QUESTIONNAIRE_RESPONSE && ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean)) && (
           <ExplorationBoard
             deidentified={dashboard.deidentifiedBoolean}
-            type={getResourceTypeFromTab(selectedTab)}
+            type={selectedTab}
             messages={getAlertMessages(selectedTab)}
           />
-        )}
+          )*/}
 
-        {/*selectedTab === 'documents' && <Documents deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
-        {/*selectedTab === 'pmsi' && <PMSIList deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
-        {/*selectedTab === 'medication' && <MedicationList deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
-        {/*ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean && selectedTab === 'forms' && <FormsList />*/}
-        {/*selectedTab === 'imaging' && <ImagingList deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
-        {/*selectedTab === 'biology' && <BiologyList deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
+        {/*selectedTab === ResourceType.DOCUMENTS && <Documents deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
+        {/*selectedTab === ResourceType.CONDITION && <PMSIList deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
+        {/*selectedTab === ResourceType.MEDICATION_REQUEST && <MedicationList deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
+        {/*ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean && selectedTab === ResourceType.QUESTIONNAIRE_RESPONSE && <FormsList />*/}
+        {/*selectedTab === ResourceType.IMAGING && <ImagingList deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
+        {/*selectedTab === ResourceType.OBSERVATION && <BiologyList deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
       </Grid>
     </Grid>
   )

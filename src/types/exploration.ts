@@ -9,3 +9,10 @@ export type ResourceOptions<T> = {
   groupId?: string
   includeFacets?: boolean
 }
+
+export enum URLS {
+  PATIENTS = 'patients',
+  COHORT = 'cohort',
+  PERIMETERS = 'perimeters',
+  NEW_COHORT = 'new_cohort'
+}
