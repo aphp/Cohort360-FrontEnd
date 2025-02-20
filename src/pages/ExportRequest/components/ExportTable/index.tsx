@@ -46,6 +46,16 @@ const AlertLimitXlsx: React.FC = () => {
   )
 }
 
+const handleLegacyColumns = (columns: TableInfo['columns']): string[] => {
+  if (columns === null) {
+    return []
+  }
+  if (columns[0] && typeof columns[0] === 'object') {
+    return columns.map((column) => (column as { name: string }).name)
+  }
+  return columns as string[]
+}
+
 const ExportTable: React.FC<ExportTableProps> = ({
   exportTable,
   exportTableSettings,
@@ -63,7 +73,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
   const [count, setCount] = useState<number | null>(null)
   const [countLoading, setCountLoading] = useState<boolean>(false)
   const cohortId = exportCohort?.group_id
-  const exportColumns = exportTable.columns || []
+  const exportColumns = handleLegacyColumns(exportTable.columns || [])
   const tableSetting = exportTableSettings.filter((e) => e.tableName === exportTable.name)[0]
   const exportTableResourceType = getResourceType(exportTable.name)
   const tableLabel = getExportTableLabel(exportTable.name)

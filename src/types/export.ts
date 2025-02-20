@@ -23,7 +23,7 @@ export type TableSetting = {
 }
 
 export type TableInfo = {
-  columns: string[]
+  columns: Array<string | { name: string; columnType: string }>
   fhirResourceName: string
   isFhirStandard: boolean
   isOmopStandard: boolean

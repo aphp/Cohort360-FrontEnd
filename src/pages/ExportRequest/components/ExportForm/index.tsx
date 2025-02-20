@@ -103,7 +103,11 @@ const ExportForm: React.FC = () => {
     try {
       setLoading(true)
       const response = await fetchExportTablesInfo()
-      setExportTableList(response)
+      if (Array.isArray(response)) {
+        setExportTableList(response)
+      } else if (typeof response === 'object' && response !== null) {
+        setExportTableList(Object.values(response))
+      }
       setLoading(false)
     } catch (error) {
       return []
