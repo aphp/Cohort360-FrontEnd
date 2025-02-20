@@ -2,20 +2,20 @@
 
 set -e
 
+# We could also use instead an arg BUMP_TYPE which would be either "patch" or "minor"
+# and then use return value of git cliff to get the new version number
+# ```
+# `git cliff --bump $BUMP_TYPE --unreleased > temp_changelog.md`
+# VERSION=$(cat temp_changelog.md | grep -oP '## \[\K[^\]]+')
+# ```
+
 # Exit if no version argument provided
-if [ $# -ne 2 ]; then
-    echo "Usage: $0 <version> <bump_type>"
-    echo "bump_type must be either 'minor' or 'patch'"
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <version>"
     exit 1
 fi
 
 VERSION=$1
-BUMP_TYPE=$2
-
-if [ "$BUMP_TYPE" != "minor" ] && [ "$BUMP_TYPE" != "patch" ]; then
-    echo "Error: bump_type must be either 'minor' or 'patch'"
-    exit 1
-fi
 
 echo "Creating release commit for version $VERSION"
 
@@ -24,7 +24,7 @@ npm version $VERSION --no-git-tag-version
 
 # Generate changelog and prepend to CHANGELOG.md
 git fetch --tags # ensure all the tags are fetched
-git cliff --bump $BUMP_TYPE --unreleased > temp_changelog.md
+git cliff --tag $VERSION --unreleased > temp_changelog.md
 tail -n +4 CHANGELOG.md >> temp_changelog.md
 mv temp_changelog.md CHANGELOG.md
 
