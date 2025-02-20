@@ -239,7 +239,7 @@ const PatientPMSI = () => {
       {(selectedTab.id === ResourceType.PROCEDURE || selectedTab.id === ResourceType.CONDITION) && (
         <BlockWrapper item xs={12}>
           <AlertWrapper severity="warning">
-            {`Attention : Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/07/2024. Seuls
+            {`Attention : Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 30/11/2024. Seuls
             les ${
               selectedTab.id === ResourceType.CONDITION ? 'diagnostics' : 'actes'
             } rattachés à une visite Orbis (avec un Dossier Administratif - NDA) sont actuellement disponibles.`}
