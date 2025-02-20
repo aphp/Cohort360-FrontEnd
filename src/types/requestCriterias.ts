@@ -29,6 +29,7 @@ export enum MedicationLabel {
 }
 
 export enum ResourceType {
+  PREVIEW = "preview",
   UNKNOWN = 'Unknown',
   IPP_LIST = 'IPPList',
   PATIENT = 'Patient',
@@ -41,7 +42,6 @@ export enum ResourceType {
   MEDICATION_ADMINISTRATION = 'MedicationAdministration',
   OBSERVATION = 'Observation',
   IMAGING = 'ImagingStudy',
-  QUESTIONNAIRE = 'Questionnaire',
   QUESTIONNAIRE_RESPONSE = 'QuestionnaireResponse'
 }
 
@@ -169,6 +169,14 @@ export enum ImagingParamsKeys {
   ENCOUNTER_STATUS = 'encounter.status'
 }
 
+export enum FormParamsKeys {
+  FORM_NAME = 'questionnaire.name',
+  IPP = 'subject.identifier',
+  DATE = 'authored',
+  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
+  ENCOUNTER_STATUS = 'encounter.status'
+}
+
 export enum CriteriaType {
   REQUEST = 'Request',
   IPP_LIST = 'IPPList',
@@ -188,7 +196,6 @@ export enum CriteriaType {
   PHYSIOLOGIE = 'physiologie',
   IMAGING = 'ImagingStudy',
   SPECIALITY = 'Speciality',
-  QUESTIONNAIRE = 'Questionnaire',
   QUESTIONNAIRE_RESPONSE = 'QuestionnaireResponse',
   MATERNITY = 'Maternity',
   PREGNANCY = 'Pregnancy',

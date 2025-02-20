@@ -3,13 +3,17 @@ import React from 'react'
 import { Grid, Typography } from '@mui/material'
 import { LockIconWrapper } from './styles'
 
-const DisplayLocked = () => {
+type DisplayLockedProps = {
+  label?: string
+}
+
+const DisplayLocked = ({ label = ' Fonctionnalité désactivée en mode pseudonymisé.' }: DisplayLockedProps) => {
   return (
     <Grid padding="0px 15px">
-      <Grid container justifyContent="center">
+      <Grid container>
         <LockIconWrapper />
         <Typography variant="h6" align="center">
-          Fonctionnalité désactivée en mode pseudonymisé.
+          {label}
         </Typography>
       </Grid>
     </Grid>

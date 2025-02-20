@@ -45,7 +45,8 @@ import {
   Order,
   SavedFilter,
   SavedFiltersResults,
-  SearchByTypes
+  SearchByTypes,
+  Sources
 } from 'types/searchCriterias'
 import {
   AdministrationParamsKeys,
@@ -450,7 +451,7 @@ type fetchProcedureProps = {
   sortDirection?: Direction
   subject?: string
   code?: string
-  source?: string
+  source?: Sources[]
   minDate?: string
   maxDate?: string
   _text?: string
@@ -494,7 +495,7 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `${ProcedureParamsKeys.CODE}=${code}`] // eslint-disable-line
-  if (source) options = [...options, `${ProcedureParamsKeys.SOURCE}=${source}`]
+  if (source?.length) options = [...options, `${ProcedureParamsKeys.SOURCE}=${source.join(',')}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`]
   if (status) options = [...options, `status=${encodeURIComponent(`${docStatusCodeSystem}|${status}`)}`]
   if (encounterIdentifier) options = [...options, `${ProcedureParamsKeys.NDA}=${encounterIdentifier}`]
@@ -604,7 +605,7 @@ type fetchConditionProps = {
   sortDirection?: Direction
   subject?: string
   code?: string
-  source?: string
+  source?: Sources
   type?: string[]
   _text?: string
   'min-recorded-date'?: string
@@ -636,7 +637,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (code) options = [...options, `${ConditionParamsKeys.CODE}=${code}`] // eslint-disable-line
-  if (source) options = [...options, `${ConditionParamsKeys.SOURCE}=${source}`]
+  if (source?.length) options = [...options, `${ConditionParamsKeys.SOURCE}=${source}`]
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}&_tag=${LOW_TOLERANCE_TAG}`] // eslint-disable-line
   if (encounterIdentifier) options = [...options, `${ConditionParamsKeys.NDA}=${encounterIdentifier}`] // eslint-disable-line
   if (patientIdentifier) options = [...options, `${ConditionParamsKeys.IPP}=${patientIdentifier}`]
