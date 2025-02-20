@@ -294,9 +294,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                 </IconButton>
                 <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
                   <MenuItem
-                    onClick={async () => {
+                    onClick={() => {
                       setAnchorEl(null)
-                      await dispatch(setSelectedCohort(dashboard ?? null))
+                      dispatch(setSelectedCohort(dashboard ?? null))
                       setOpenModal('edit')
                     }}
                   >

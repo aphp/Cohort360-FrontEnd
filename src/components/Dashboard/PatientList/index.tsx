@@ -121,7 +121,7 @@ const PatientList = ({ total, deidentified }: PatientListProps) => {
         isFirstRender.current = false
       }
       setLoadingStatus(LoadingStatus.FETCHING)
-      const result = await services.cohorts.fetchPatientLi*st(
+      const result = await services.cohorts.fetchPatientList(
         {
           page,
           searchCriterias: {

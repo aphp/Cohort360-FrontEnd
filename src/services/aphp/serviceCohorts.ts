@@ -158,7 +158,6 @@ export interface IServiceCohorts {
 
   fetchDocuments: (
     options: ResourceOptions<DocumentsFilters>,
-    groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<DocumentReference>> | Promise<SearchInputError>
 
@@ -168,7 +167,6 @@ export interface IServiceCohorts {
 
   fetchImagingList: (
     options: ResourceOptions<ImagingFilters>,
-    groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<CohortImaging>>
 
@@ -177,7 +175,6 @@ export interface IServiceCohorts {
    */
   fetchPMSIList: (
     options: ResourceOptions<PMSIFilters>,
-    groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<CohortPMSI>>
 
@@ -186,7 +183,6 @@ export interface IServiceCohorts {
    */
   fetchMedicationList: (
     options: ResourceOptions<MedicationFilters>,
-    groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<CohortMedication<MedicationRequest | MedicationAdministration>>>
 
@@ -195,7 +191,6 @@ export interface IServiceCohorts {
    */
   fetchBiologyList: (
     options: ResourceOptions<BiologyFilters>,
-    groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<CohortObservation>>
 
@@ -204,7 +199,6 @@ export interface IServiceCohorts {
    */
   fetchFormsList: (
     options: ResourceOptions<MaternityFormFilters>,
-    groupId?: string,
     signal?: AbortSignal
   ) => Promise<CohortResults<CohortQuestionnaireResponse>>
 
@@ -463,7 +457,7 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
-  fetchPMSIList: async (options, groupId, signal) => {
+  fetchPMSIList: async (options, signal) => {
     const {
       type,
       deidentified,
@@ -472,7 +466,8 @@ const servicesCohorts: IServiceCohorts = {
         orderBy,
         searchInput,
         filters: { ipp, nda, durationRange, executiveUnits, encounterStatus, diagnosticTypes, code, source }
-      }
+      },
+      groupId
     } = options
     const _type = type as PMSIResourceTypes
     const fetchers = {
@@ -576,7 +571,7 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
-  fetchMedicationList: async (options, groupId, signal) => {
+  fetchMedicationList: async (options, signal) => {
     const {
       type,
       deidentified,
@@ -594,7 +589,8 @@ const servicesCohorts: IServiceCohorts = {
           administrationRoutes,
           prescriptionTypes
         }
-      }
+      },
+      groupId
     } = options
     const fetchers = {
       [ResourceType.MEDICATION_REQUEST]: fetchMedicationRequest,
@@ -689,7 +685,7 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
-  fetchBiologyList: async (options, groupId, signal) => {
+  fetchBiologyList: async (options, signal) => {
     const {
       deidentified,
       page,
@@ -697,7 +693,8 @@ const servicesCohorts: IServiceCohorts = {
         orderBy,
         searchInput,
         filters: { validatedStatus, nda, ipp, code, durationRange, executiveUnits, encounterStatus }
-      }
+      },
+      groupId
     } = options
     const atLeastAFilter =
       !!searchInput ||
@@ -765,13 +762,14 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
-  fetchFormsList: async (options, groupId, signal) => {
+  fetchFormsList: async (options, signal) => {
     const {
       page,
       searchCriterias: {
         orderBy,
         filters: { ipp, formName, durationRange, executiveUnits, encounterStatus }
-      }
+      },
+      groupId
     } = options
 
     const atLeastAFilter =
@@ -836,7 +834,7 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
-  fetchImagingList: async (options, groupId, signal) => {
+  fetchImagingList: async (options, signal) => {
     const {
       deidentified,
       page,
@@ -844,7 +842,8 @@ const servicesCohorts: IServiceCohorts = {
         orderBy,
         searchInput,
         filters: { ipp, nda, durationRange, executiveUnits, modality, encounterStatus }
-      }
+      },
+      groupId
     } = options
     const [imagingResponse, allImagingResponse] = await Promise.all([
       fetchImaging({
@@ -911,7 +910,7 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
-  fetchDocuments: async (options, groupId, signal) => {
+  fetchDocuments: async (options, signal) => {
     const {
       deidentified,
       page,
@@ -920,7 +919,8 @@ const servicesCohorts: IServiceCohorts = {
         searchInput,
         searchBy,
         filters: { docStatuses, docTypes, executiveUnits, ipp, nda, onlyPdfAvailable, durationRange, encounterStatus }
-      }
+      },
+      groupId
     } = options
     if (searchInput) {
       const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)
