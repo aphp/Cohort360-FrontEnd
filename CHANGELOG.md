@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.43.1](https://github.com/aphp/Cohort360-FrontEnd/compare/2.43.0..2.43.1) - 2025-02-20
+
+### 🚀 Features
+
+- *(messages)* Update AREM availability messages - ([bfb9b5d](https://github.com/aphp/Cohort360-FrontEnd/commit/bfb9b5d96e2dfaf4db9da256e8c19fcbea73aaaa))
+
+### ⚙️ Miscellaneous Tasks
+
+- Add helper script for release creation - ([660aeaa](https://github.com/aphp/Cohort360-FrontEnd/commit/660aeaa5a7f8df6a50562565cbde4e45cd271823))
+
 ## [2.43.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.42.0..2.43.0) - 2025-02-19
 
 ### 🐛 Bug Fixes
