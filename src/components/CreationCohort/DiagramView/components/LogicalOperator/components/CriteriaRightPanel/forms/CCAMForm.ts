@@ -69,7 +69,7 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
         },
         {
           type: 'info',
-          content: 'Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 31/07/2024.',
+          content: 'Les données AREM sont disponibles uniquement pour la période du 07/12/2009 au 30/11/2024',
           contentType: 'warning'
         },
         {
