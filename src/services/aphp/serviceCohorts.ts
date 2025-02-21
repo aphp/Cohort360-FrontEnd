@@ -6,7 +6,7 @@ import {
   AgeRepartitionType,
   GenderRepartitionType,
   ChartCode,
-  CohortResults,
+  ExplorationResults,
   CohortImaging,
   CohortComposition,
   Export,
@@ -85,6 +85,7 @@ import { PatientsResponse } from 'types/patient'
 import { getFormName } from 'utils/formUtils'
 import { ResourceOptions } from 'types/exploration'
 import { Data } from 'components/ExplorationBoard/useData'
+import servicesPatients from './servicePatients'
 
 export interface IServiceCohorts {
   /**
@@ -159,7 +160,7 @@ export interface IServiceCohorts {
   fetchDocuments: (
     options: ResourceOptions<DocumentsFilters>,
     signal?: AbortSignal
-  ) => Promise<CohortResults<DocumentReference>> | Promise<SearchInputError>
+  ) => Promise<ExplorationResults<DocumentReference>> | Promise<SearchInputError>
 
   /**
    * Retourne la liste d'objets d'Imagerie liés à une cohorte
@@ -168,15 +169,12 @@ export interface IServiceCohorts {
   fetchImagingList: (
     options: ResourceOptions<ImagingFilters>,
     signal?: AbortSignal
-  ) => Promise<CohortResults<CohortImaging>>
+  ) => Promise<ExplorationResults<CohortImaging>>
 
   /**
    * Retourne la liste d'objets PMSI liés à une cohorte
    */
-  fetchPMSIList: (
-    options: ResourceOptions<PMSIFilters>,
-    signal?: AbortSignal
-  ) => Promise<CohortResults<CohortPMSI>>
+  fetchPMSIList: (options: ResourceOptions<PMSIFilters>, signal?: AbortSignal) => Promise<ExplorationResults<CohortPMSI>>
 
   /**
    * Retourne la liste d'objets Medication liés à une cohorte
@@ -184,7 +182,7 @@ export interface IServiceCohorts {
   fetchMedicationList: (
     options: ResourceOptions<MedicationFilters>,
     signal?: AbortSignal
-  ) => Promise<CohortResults<CohortMedication<MedicationRequest | MedicationAdministration>>>
+  ) => Promise<ExplorationResults<CohortMedication<MedicationRequest | MedicationAdministration>>>
 
   /**
    * Retourne la liste d'objets de biologie liés à une cohorte
@@ -192,7 +190,7 @@ export interface IServiceCohorts {
   fetchBiologyList: (
     options: ResourceOptions<BiologyFilters>,
     signal?: AbortSignal
-  ) => Promise<CohortResults<CohortObservation>>
+  ) => Promise<ExplorationResults<CohortObservation>>
 
   /**
    * Retourne la liste de formulaires liés à une cohorte
@@ -200,16 +198,16 @@ export interface IServiceCohorts {
   fetchFormsList: (
     options: ResourceOptions<MaternityFormFilters>,
     signal?: AbortSignal
-  ) => Promise<CohortResults<CohortQuestionnaireResponse>>
+  ) => Promise<ExplorationResults<CohortQuestionnaireResponse>>
 
   /**
    *
    * Retourne le service de récupération de donnée en fonction de la ressource
    */
   getExplorationFetcher: (
-    resourceType: ResourceType
-    
-    ) => (options: ResourceOptions<Filters>, signal?: AbortSignal) => Promise<Data>
+    resourceType: ResourceType,
+    patientId?: string
+  ) => (options: ResourceOptions<Filters>, signal?: AbortSignal) => Promise<Data>
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
    *
@@ -1072,7 +1070,7 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
-  getExplorationFetcher: (resourceType: ResourceType) => {
+  getExplorationFetcher: (resourceType: ResourceType, patientId?: string) => {
     switch (resourceType) {
       case ResourceType.PATIENT:
         return servicesCohorts.fetchPatientList
@@ -1082,8 +1080,10 @@ const servicesCohorts: IServiceCohorts = {
       case ResourceType.CLAIM:
       case ResourceType.PROCEDURE:
         return servicesCohorts.fetchPMSIList
-      case ResourceType.DOCUMENTS:
+      case ResourceType.DOCUMENTS: {
+        if (patientId) return servicesPatients.fetchDocuments
         return servicesCohorts.fetchDocuments
+      }
       case ResourceType.MEDICATION_ADMINISTRATION:
       case ResourceType.MEDICATION_REQUEST:
         return servicesCohorts.fetchMedicationList

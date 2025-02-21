@@ -22,6 +22,8 @@ export default makeStyles()((theme: Theme) => ({
   },
   tabs: { margin: '8px 0px 0px 0px' },
   tabTitle: {
+    padding: '4px 15px',
+    marginRight: 12,
     minWidth: 0,
     fontWeight: 900,
     color: '#0063af',

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom'
-import { IconButton, Grid, Tabs, Tab, CircularProgress } from '@mui/material'
+import { IconButton, Grid, Tabs as TabsMui, Tab, CircularProgress } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import PatientNotExist from 'components/ErrorView/PatientNotExist'
 import PatientDocs from 'components/Patient/PatientDocs'
@@ -19,6 +19,19 @@ import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPatientInfo } from 'state/patient'
 import { AppConfig } from 'config'
 import { getCleanGroupId } from 'utils/paginationUtils'
+import ExplorationBoard from 'components/ExplorationBoard'
+import { getAlertMessages } from 'utils/exploration'
+import { ResourceType } from 'types/requestCriterias'
+import Tabs from 'components/ui/Tabs'
+import { getPMSITab } from 'utils/tabsUtils'
+import { PmsiTab } from 'types'
+import { PMSILabel } from 'types/patient'
+
+export const PMSITabs: PmsiTab[] = [
+  { label: PMSILabel.DIAGNOSTIC, id: ResourceType.CONDITION },
+  { label: PMSILabel.CCAM, id: ResourceType.PROCEDURE },
+  { label: PMSILabel.GHM, id: ResourceType.CLAIM }
+]
 
 const Patient = () => {
   const dispatch = useAppDispatch()
@@ -64,6 +77,7 @@ const Patient = () => {
   }
 
   const handleChangeTabs = (event: React.SyntheticEvent<Element, Event>, newTab: string) => {
+    console.log('test tab', newTab)
     setSelectedTab(newTab)
   }
 
@@ -95,9 +109,10 @@ const Patient = () => {
 
         <PatientHeader patient={patient?.patientInfo} deidentifiedBoolean={deidentified} />
 
-        <Grid container md={11}>
-          <Tabs value={selectedTab} onChange={handleChangeTabs} textColor="primary" indicatorColor="secondary">
+        <Grid container md={11} className={classes.tabs}>
+          <TabsMui value={selectedTab} onChange={handleChangeTabs} classes={{ indicator: classes.indicator }}>
             <Tab
+              classes={{ selected: classes.selected }}
               className={classes.tabTitle}
               label="Aperçu patient"
               value="preview"
@@ -105,6 +120,7 @@ const Patient = () => {
               to={`/patients/${patientId}/preview${location.search}`}
             />
             <Tab
+              classes={{ selected: classes.selected }}
               className={classes.tabTitle}
               label="Parcours patient"
               value="timeline"
@@ -112,21 +128,24 @@ const Patient = () => {
               to={`/patients/${patientId}/timeline${location.search}`}
             />
             <Tab
+              classes={{ selected: classes.selected }}
               className={classes.tabTitle}
               label="Documents cliniques"
-              value="documents"
+              value={ResourceType.DOCUMENTS}
               component={Link}
               to={`/patients/${patientId}/documents${location.search}`}
             />
             <Tab
+              classes={{ selected: classes.selected }}
               className={classes.tabTitle}
               label="PMSI"
-              value="pmsi"
+              value={ResourceType.CONDITION}
               component={Link}
               to={`/patients/${patientId}/pmsi${location.search}`}
             />
             {ODD_MEDICATION && (
               <Tab
+                classes={{ selected: classes.selected }}
                 className={classes.tabTitle}
                 label="Médicaments"
                 value="medication"
@@ -136,6 +155,7 @@ const Patient = () => {
             )}
             {ODD_BIOLOGY && (
               <Tab
+                classes={{ selected: classes.selected }}
                 className={classes.tabTitle}
                 label="Biologie"
                 value="biology"
@@ -145,6 +165,7 @@ const Patient = () => {
             )}
             {ODD_IMAGING && (
               <Tab
+                classes={{ selected: classes.selected }}
                 className={classes.tabTitle}
                 label="Imagerie"
                 value="imaging"
@@ -154,6 +175,7 @@ const Patient = () => {
             )}
             {config.features.questionnaires.enabled && !deidentified && (
               <Tab
+                classes={{ selected: classes.selected }}
                 className={classes.tabTitle}
                 label="Formulaires"
                 value="forms"
@@ -161,9 +183,22 @@ const Patient = () => {
                 to={`/patients/${patientId}/forms${location.search}`}
               />
             )}
-          </Tabs>
+          </TabsMui>
         </Grid>
+
         <Grid container sm={11} className={classes.tabContainer}>
+          {(selectedTab === ResourceType.CONDITION ||
+            selectedTab === ResourceType.CLAIM ||
+            selectedTab === ResourceType.PROCEDURE) && (
+            <Tabs
+              values={PMSITabs}
+              active={getPMSITab(selectedTab)}
+              onchange={(value: PmsiTab) => {
+                setSelectedTab(value.id)
+                // setSearchParams({ ...searchParams, tabId: value.id })
+              }}
+            />
+          )}
           {selectedTab === 'preview' && (
             <PatientPreview patient={patient?.patientInfo} deidentifiedBoolean={deidentified} />
           )}
@@ -177,8 +212,24 @@ const Patient = () => {
               deidentified={deidentified}
             />
           )}
-          {selectedTab === 'documents' && <PatientDocs />}
-          {selectedTab === 'pmsi' && <PatientPMSI />}
+          {selectedTab === ResourceType.DOCUMENTS && (
+            <ExplorationBoard
+              deidentified={deidentified}
+              type={selectedTab}
+              messages={getAlertMessages(selectedTab, deidentified)}
+            />
+          )}
+          {(selectedTab === ResourceType.CONDITION ||
+            selectedTab === ResourceType.PROCEDURE ||
+            selectedTab === ResourceType.CLAIM) && (
+            <ExplorationBoard
+              deidentified={deidentified}
+              type={selectedTab}
+              messages={getAlertMessages(selectedTab, deidentified)}
+            />
+          )}
+          {/*selectedTab === 'documents' && <PatientDocs />*/}
+          {/*selectedTab === 'pmsi' && <PatientPMSI />*/}
           {ODD_MEDICATION && selectedTab === 'medication' && <PatientMedication />}
           {ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology />}
           {ODD_IMAGING && selectedTab === 'imaging' && <PatientImaging />}

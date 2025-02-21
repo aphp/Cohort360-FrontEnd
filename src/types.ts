@@ -288,6 +288,14 @@ export type CohortResults<T> = {
   list: T[]
 }
 
+export type ExplorationResults<T> = {
+  total: number
+  totalAllResults?: number
+  totalPatients?: number
+  totalAllPatients?: number
+  list: T[]
+}
+
 export type PatientData = {
   patient?: CohortPatient
   hospit?: (CohortEncounter | Encounter)[]

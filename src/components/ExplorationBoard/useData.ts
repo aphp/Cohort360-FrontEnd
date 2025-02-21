@@ -48,7 +48,8 @@ export const useData = (
   searchCriterias: SearchCriterias<Filters>,
   page: number,
   deidentified: boolean,
-  groupId?: string
+  groupId?: string,
+  patientId?: string
 ) => {
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.IDDLE)
   const [data, setData] = useState<Data | null>(null)
@@ -59,8 +60,16 @@ export const useData = (
   const fetchData = async (page: number) => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
-      const fetcher = servicesCohorts.getExplorationFetcher(type)
-      const results = await fetcher({ page, searchCriterias, deidentified, type, groupId, includeFacets: true })
+      const fetcher = servicesCohorts.getExplorationFetcher(type, patientId)
+      const results = await fetcher({
+        page,
+        searchCriterias,
+        deidentified,
+        type,
+        groupId,
+        patientId,
+        includeFacets: true
+      })
       console.log('test fetching results', results)
       setData(results)
     } catch (error) {
@@ -88,10 +97,13 @@ export const useData = (
       setTableData(map(data, type, deidentified, groupId, hasSearch))
       const count: ExplorationCount = {
         ressource: null,
-        patients: {
-          results: data.totalPatients,
-          total: data.totalAllPatients
-        }
+        patients:
+          data.totalPatients && data.totalAllPatients
+            ? {
+                results: data.totalPatients,
+                total: data.totalAllPatients
+              }
+            : null
       }
       if (!isPatientsResponse(data)) count.ressource = { results: data.total, total: data.totalAllResults }
       setPagination({
