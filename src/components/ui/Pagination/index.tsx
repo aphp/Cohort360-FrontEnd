@@ -50,7 +50,8 @@ export const Pagination = ({
         dispatch(
           showDialog({
             isOpen: true,
-            message: `La sélection est limitée à ${config.core.pagination.limit} pages. Merci d'affiner votre recherche à l'aide des filtres à votre disposition.`
+            message: `La sélection est limitée à ${config.core.pagination.limit} pages. Merci d'affiner votre recherche à l'aide des filtres à votre disposition.`,
+            status: 'warning'
           })
         )
       }
@@ -58,7 +59,8 @@ export const Pagination = ({
       dispatch(
         showDialog({
           isOpen: true,
-          message: 'Veuillez entrer un numéro de page valide.'
+          message: 'Veuillez entrer un numéro de page valide.',
+          status: 'warning'
         })
       )
     }

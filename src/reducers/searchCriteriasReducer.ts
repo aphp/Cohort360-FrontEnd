@@ -21,6 +21,15 @@ import {
 } from 'types/searchCriterias'
 import { CohortsType } from 'types/cohorts'
 
+export const initExportSearchCriterias: SearchCriterias<null> = {
+  orderBy: {
+    orderBy: Order.CREATED_AT,
+    orderDirection: Direction.DESC
+  },
+  searchInput: '',
+  filters: null
+}
+
 export const initCohortsSearchCriterias: SearchCriterias<CohortsFilters> = {
   orderBy: {
     orderBy: Order.MODIFIED,

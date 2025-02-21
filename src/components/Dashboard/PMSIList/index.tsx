@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'state'
 
@@ -88,6 +89,7 @@ const PMSIList = ({ deidentified }: PMSIListProps) => {
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias, addSearchCriterias }
   ] = useSearchCriterias(initPmsiSearchCriterias)
+
   const filtersAsArray = useMemo(
     () =>
       selectFiltersAsArray({

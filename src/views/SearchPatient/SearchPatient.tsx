@@ -37,8 +37,7 @@ const SearchPatient: React.FC<{}> = () => {
 
   const controllerRef = useRef<AbortController | null>(null)
 
-  const nominativeGroupsIds =
-    practitioner && practitioner.nominativeGroupsIds ? practitioner.nominativeGroupsIds.join() : ''
+  const nominativeGroupsIds = practitioner?.nominativeGroupsIds ? practitioner.nominativeGroupsIds.join() : ''
 
   const deidentified = useAppSelector((state) => state.me?.deidentified)
   const open = useAppSelector((state) => state.drawer)

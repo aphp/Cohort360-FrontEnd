@@ -21,6 +21,8 @@ import InfoIcon from '@mui/icons-material/Info'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 import ExportTable from '../ExportTable'
+import { useAppDispatch } from 'state'
+import { showDialog } from 'state/warningDialog'
 
 import { fetchExportableCohorts } from 'services/aphp/callApi'
 import {
@@ -32,6 +34,8 @@ import {
 import { Cohort } from 'types'
 import { TableSetting, TableInfo } from 'types/export'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+
+import { getConfig } from 'config'
 
 import useStyles from '../../styles'
 
@@ -73,6 +77,7 @@ const ExportForm: React.FC = () => {
   const { classes } = useStyles()
   const [error, setError] = useState<Error | null>(null)
   const [errorTables, setErrorTables] = useState<ErrorTables>(errorTablesInitialState)
+  const [fetchError, setFetchError] = useState<Error | null>(null)
   const [oneFile, setOneFile] = useState<boolean>(false)
   const [exportTypeFile, setExportTypeFile] = useState<'csv' | 'xlsx'>('csv')
   const [tablesSettings, setTablesSettings] = useState<TableSetting[]>(tableSettingsInitialState)
@@ -87,6 +92,7 @@ const ExportForm: React.FC = () => {
   const cohortID = searchParams.get('groupId')
   const [loading, setLoading] = useState<boolean>(false)
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
 
   const limitError = errorTables.some((errorTable) => errorTable.error === Error.ERROR_TABLE_LIMIT)
 
@@ -110,7 +116,8 @@ const ExportForm: React.FC = () => {
       }
       setLoading(false)
     } catch (error) {
-      return []
+      setLoading(false)
+      setFetchError(Error.ERROR_FETCH)
     }
   }, [])
 
@@ -196,17 +203,31 @@ const ExportForm: React.FC = () => {
     setTablesSettings(newSelectedTables)
   }
 
-  const handleSubmitPayload = () => {
+  const handleSubmitPayload = async () => {
     const tableToExport = tablesSettings.filter((tableSetting) => tableSetting.isChecked)
 
-    postExportCohort({
+    const response = await postExportCohort({
       cohortId: exportCohort ?? { uuid: '' },
       motivation: motivation ?? '',
       group_tables: oneFile,
       outputFormat: exportTypeFile,
       tables: tableToExport
     })
-    navigate(`/home`)
+
+    const error = response.status !== 201
+
+    dispatch(
+      showDialog({
+        isOpen: true,
+        message: error
+          ? `Votre demande d'export a echoué. Veuillez réessayer ultérieurement. Si le problème persiste, veuillez contacter le support: ${
+              getConfig().system.mailSupport
+            }.`
+          : "Votre demande d'export a bien été prise en compte. Vous recevrez un mail de confirmation dès que votre export sera prêt.",
+        status: error ? 'error' : 'success',
+        onConfirm: () => navigate('/home')
+      })
+    )
   }
 
   const handleChangeMotivation = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -359,10 +380,16 @@ const ExportForm: React.FC = () => {
           </Grid>
         )}
       </Grid>
-
       {loading ? (
         <Grid container className={classes.exportTableGrid} justifyContent={'center'}>
           <CircularProgress />
+        </Grid>
+      ) : fetchError === Error.ERROR_FETCH ? (
+        <Grid container className={classes.exportTableGrid} justifyContent={'center'}>
+          <Typography style={{ color: 'red', fontWeight: 'bold' }}>
+            Erreur lors de la récupération des tables à exporter. Veuillez réessayer ultérieurement. Si le problème
+            persiste, veuillez contacter le support ({getConfig().system.mailSupport}).
+          </Typography>
         </Grid>
       ) : (
         <>

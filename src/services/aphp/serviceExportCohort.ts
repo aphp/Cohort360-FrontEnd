@@ -38,12 +38,19 @@ export const fetchExportTablesRelationsInfo = async (tableList: string[]) => {
 export const fetchExportsList = async (
   user: string,
   page?: number,
-  manelleText?: string | null, //TODO change variable name
+  search?: string | null, //TODO change variable name
+  ordering?: string,
   signal?: AbortSignal
 ) => {
   try {
     const offset = page ? (page - 1) * 20 : 0
-    const response = await fetchExportList({ user: user, offset: offset, search: manelleText, signal: signal })
+    const response = await fetchExportList({
+      user: user,
+      offset: offset,
+      search: search,
+      ordering: ordering,
+      signal: signal
+    })
     return response
   } catch (error) {
     return console.error(error)
@@ -62,28 +69,23 @@ export const postExportCohort = async ({
   group_tables: boolean
   outputFormat: string
   tables: TableSetting[]
-}): Promise<AxiosResponse<Export> | AxiosError> => {
-  try {
-    const nominative = true
-    const shift_date = false
+}): Promise<AxiosResponse<Export>> => {
+  const nominative = true
+  const shift_date = false
 
-    return await apiBackend.post<Export>('/exports/', {
-      motivation,
-      export_tables: tables.map((table: TableSetting) => ({
-        table_name: table.tableName,
-        cohort_result_source: cohortId?.uuid,
-        respect_table_relationships: table.respectTableRelationships,
-        columns: table.columns,
-        ...(table.fhirFilter && { fhir_filter: table.fhirFilter?.uuid }),
-        pivot_merge: table.pivotMerge
-      })),
-      nominative: nominative,
-      shift_date: shift_date,
-      output_format: outputFormat,
-      group_tables: group_tables
-    })
-  } catch (error) {
-    if (isAxiosError(error)) return error
-    else throw error
-  }
+  return await apiBackend.post<Export>('/exports/', {
+    motivation,
+    export_tables: tables.map((table: TableSetting) => ({
+      table_name: table.tableName,
+      cohort_result_source: cohortId?.uuid,
+      respect_table_relationships: table.respectTableRelationships,
+      columns: table.columns,
+      ...(table.fhirFilter && { fhir_filter: table.fhirFilter?.uuid }),
+      pivot_merge: table.pivotMerge
+    })),
+    nominative: nominative,
+    shift_date: shift_date,
+    output_format: outputFormat,
+    group_tables: group_tables
+  })
 }
