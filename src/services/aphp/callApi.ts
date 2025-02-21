@@ -1217,16 +1217,18 @@ type fetchExportListProps = {
   user: string
   offset?: number
   search?: string | null
+  ordering?: string
   signal?: AbortSignal
 }
 
 export const fetchExportList = async (args: fetchExportListProps) => {
-  const { offset, user, search, signal } = args
+  const { offset, user, search, ordering, signal } = args
 
   let options: string[] = [`output_format=${encodeURIComponent('csv,xlsx')}`]
   if (offset !== undefined) options = [...options, `offset=${offset}`]
   if (user !== undefined) options = [...options, `owner=${user}`]
   if (search && search !== undefined) options = [...options, `search=${encodeURIComponent(search)}`]
+  if (ordering !== undefined) options = [...options, `ordering=${ordering}`]
 
   let queryParams = ''
   if (options.length != 0) {

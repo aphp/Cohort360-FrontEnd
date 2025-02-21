@@ -136,7 +136,9 @@ export enum Order {
   SUBJECT_IDENTIFIER = 'subject-identifier',
   UPDATED = 'updated_at',
   ADMINISTRATION_MODE = 'route',
-  DISPLAY = 'display'
+  DISPLAY = 'display',
+  STATUS = 'status',
+  OUTPUT_FORMAT = 'output_format'
 }
 export enum SearchByTypes {
   TEXT = '_text',
@@ -320,6 +322,7 @@ export type DocumentsFilters = GenericFilter & {
   docStatuses: string[]
   onlyPdfAvailable: boolean
 }
+
 export interface CohortsFilters {
   status: ValueSet[]
   favorite: CohortsType

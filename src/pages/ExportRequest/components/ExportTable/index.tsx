@@ -328,15 +328,17 @@ const ExportTable: React.FC<ExportTableProps> = ({
           </Typography>
         </Grid>
       )}
-      {count !== null && (exportTableResourceType === ResourceType.DOCUMENTS ? count > 5000 : count > limit) && (
-        <Grid marginTop={'1em'}>
-          <Typography color={'red'} fontWeight={'bold'} fontSize={12}>
-            La table sélectionnée dépasse la limite de{' '}
-            {exportTableResourceType === ResourceType.DOCUMENTS ? 5000 : limit} lignes autorisées. Veuillez affiner
-            votre sélection à l'aide de filtres ou désélectionner la table.
-          </Typography>
-        </Grid>
-      )}
+      {count !== null &&
+        (exportTableResourceType === ResourceType.DOCUMENTS ? count > 5000 : count > limit) &&
+        tableSetting.isChecked && (
+          <Grid marginTop={'1em'}>
+            <Typography color={'red'} fontWeight={'bold'} fontSize={12}>
+              La table sélectionnée dépasse la limite de{' '}
+              {exportTableResourceType === ResourceType.DOCUMENTS ? 5000 : limit} lignes autorisées. Veuillez affiner
+              votre sélection à l'aide de filtres ou désélectionner la table.
+            </Typography>
+          </Grid>
+        )}
     </Grid>
   )
 }

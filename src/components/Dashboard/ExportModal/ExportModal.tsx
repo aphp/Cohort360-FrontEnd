@@ -21,8 +21,6 @@ import {
   TextField,
   Typography,
   Autocomplete,
-  RadioGroup,
-  Radio,
   Select,
   MenuItem,
   Tooltip

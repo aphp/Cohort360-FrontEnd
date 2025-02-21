@@ -30,7 +30,6 @@ const OccurenceInput = ({
   allowBetween = false,
   disabled = false
 }: OccurenceInputProps) => {
-  console.log('Rendering OccurenceInput', value, maxValue)
   const [occurrenceValue, setOccurrenceValue] = useState<string>(value.toString())
   const [upperRangeValue, setUpperRangeValue] = useState<string | undefined>(maxValue?.toString())
   const [comparatorValue, setComparatorValue] = useState(comparator)

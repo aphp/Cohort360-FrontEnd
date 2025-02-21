@@ -18,15 +18,17 @@ import { fetchExportsList } from 'services/aphp/serviceExportCohort'
 import { cleanSearchParams, handlePageError, checkIfPageAvailable } from 'utils/paginationUtils'
 import { CohortJobStatus, LoadingStatus } from 'types'
 import { cancelPendingRequest } from 'utils/abortController'
+import { Order } from 'types/searchCriterias'
+import useSearchCriterias, { initExportSearchCriterias } from 'reducers/searchCriteriasReducer'
 
 const exportColumnsTable = [
   { label: 'N° de cohorte', key: 'cohort_id' },
   { label: 'Nom de la cohorte', key: 'cohort_name' },
   { label: "Nom de l'export", key: 'target_name' },
   { label: 'Nombre de patient', key: 'patients_count' },
-  { label: 'Format', key: 'output_format' },
-  { label: 'Date de l’export', key: 'created_at' },
-  { label: 'Statut', key: 'request_job_status' }
+  { label: 'Format', key: 'output_format', code: Order.OUTPUT_FORMAT },
+  { label: 'Date de l’export', key: 'created_at', code: Order.CREATED_AT },
+  { label: 'Statut', key: 'request_job_status', code: Order.STATUS }
 ]
 
 const getStatusChip = (status: CohortJobStatus) => {
@@ -116,15 +118,16 @@ const Export: React.FC = () => {
   const dispatch = useAppDispatch()
   const controllerRef = useRef<AbortController>(new AbortController())
   const isFirstRender = useRef(true)
-
-  const [manelleText, setManelleText] = useState<string | null>(null)
+  const [{ orderBy }, { changeOrderBy }] = useSearchCriterias(initExportSearchCriterias)
+  const [search, setSearch] = useState<string | null>(null)
 
   const _fetchExportList = useCallback(async () => {
-    const response = await fetchExportsList(user, page, manelleText, controllerRef.current?.signal)
+    const _orderBy = orderBy.orderDirection === 'asc' ? orderBy.orderBy : `-${orderBy.orderBy}`
+    const response = await fetchExportsList(user, page, search, _orderBy, controllerRef.current?.signal)
     if (response) checkIfPageAvailable(exportList?.count ?? 0, page, setPage, dispatch)
     setExportList(response)
     setLoadingStatus(LoadingStatus.SUCCESS)
-  }, [page, user, manelleText, exportList?.count, dispatch])
+  }, [orderBy.orderDirection, orderBy.orderBy, user, page, search, exportList?.count, dispatch])
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -133,7 +136,11 @@ const Export: React.FC = () => {
       setLoadingStatus(LoadingStatus.FETCHING)
       setPage(1)
     }
-  }, [manelleText])
+  }, [search])
+
+  useEffect(() => {
+    _fetchExportList()
+  }, [_fetchExportList, orderBy])
 
   useEffect(() => {
     setSearchParams(cleanSearchParams({ page: page.toString() }))
@@ -145,7 +152,7 @@ const Export: React.FC = () => {
       controllerRef.current = cancelPendingRequest(controllerRef.current)
       _fetchExportList()
     }
-  }, [_fetchExportList, loadingStatus])
+  }, [_fetchExportList, loadingStatus, orderBy])
 
   return (
     <Grid
@@ -173,26 +180,33 @@ const Export: React.FC = () => {
             <Grid container item xs={6} justifyContent={'flex-end'}>
               <Searchbar>
                 <SearchInput
-                  value={manelleText || ''}
+                  value={search || ''}
                   placeholder="Rechercher un export"
                   onchange={(value) => {
-                    setManelleText(value)
+                    setSearch(value)
                   }}
                 />
               </Searchbar>
 
-              <Button
+              {/* <Button
                 className={styles().classes.filterButton}
                 onClick={() => {
                   // navigate('/exports/new')
                 }}
               >
                 Filtrer
-              </Button>
+              </Button> */}
             </Grid>
           </Grid>
 
-          <DataTable columns={exportColumnsTable} page={page} setPage={setPage} total={exportList?.count}>
+          <DataTable
+            columns={exportColumnsTable}
+            order={orderBy}
+            setOrder={(orderBy) => changeOrderBy(orderBy)}
+            page={page}
+            setPage={setPage}
+            total={exportList?.count}
+          >
             <DataTableLine exportList={exportList} exportColumnsTable={exportColumnsTable} loading={loadingStatus} />
           </DataTable>
         </Grid>
