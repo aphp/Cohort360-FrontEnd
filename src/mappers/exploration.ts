@@ -13,7 +13,6 @@ import {
   CohortImaging,
   CohortObservation,
   CohortPMSI,
-  CohortResults,
   CohortQuestionnaireResponse,
   CohortMedication,
   CohortComposition
@@ -28,14 +27,14 @@ import CheckIcon from 'assets/icones/check.svg?react'
 import CancelIcon from 'assets/icones/times.svg?react'
 import docTypes from 'assets/docTypes.json'
 import {
-  isBiologyCohort,
-  isDocumentsCohort,
-  isImagingCohort,
-  isMedicationCohort,
+  isBiology,
+  isDocuments,
+  isImaging,
+  isMedication,
   isOtherResourcesResponse,
   isPatientsResponse,
-  isPmsiCohort,
-  isQuestionnaireCohort
+  isPmsi,
+  isQuestionnaire
 } from 'utils/exploration'
 import { formatValueRange } from './biology'
 import { Paragraph } from 'components/ui/Paragraphs'
@@ -158,7 +157,7 @@ const mapPatientsToRows = (patients: Patient[], deidentified: boolean, groupId?:
             : patient.identifier?.find((identifier) => identifier.type?.coding?.[0].code === 'IPP')?.value ??
               patient.identifier?.[0].value ??
               'IPP inconnnu',
-          url: `/patients/${patient.id}${groupId ?? ''}` /*${_search}*/
+          url: `/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}` /*${_search}*/
         },
         type: CellType.LINK
       },
@@ -588,7 +587,6 @@ const mapDocumentsToRows = (
     const documentContent = findContent?.attachment?.data
       ? Buffer.from(findContent?.attachment.data, 'base64').toString('utf-8')
       : ''
-    console.log('test docs', documentContent)
     const row: Row = [
       {
         id: `${elem.id}-status`,
@@ -755,33 +753,33 @@ export const map = (data: Data, type: ResourceType, deidentified: boolean, group
   const table: Table = { rows: [], columns: [] }
   if (isPatientsResponse(data) && data.originalPatients) {
     table.columns = mapPatientsToColumns(deidentified)
-    table.rows = mapPatientsToRows(data.originalPatients, deidentified)
+    table.rows = mapPatientsToRows(data.originalPatients, deidentified, groupId)
   }
   if (isOtherResourcesResponse(data)) {
     if (data.list.length) {
-      if (isPmsiCohort(data)) {
+      if (isPmsi(data)) {
         const _type = type as PMSIResourceTypes
         table.columns = mapPmsiToColumns(type, deidentified)
         table.rows = mapPmsiToRows(data.list, _type, groupId)
       }
-      if (isQuestionnaireCohort(data)) {
+      if (isQuestionnaire(data)) {
         table.columns = mapQuestionnaireToColumns()
         table.rows = mapQuestionnaireToRows(data.list, groupId)
       }
-      if (isImagingCohort(data)) {
+      if (isImaging(data)) {
         table.columns = mapImagingToColumns(deidentified)
         table.rows = mapImagingToRows(data.list, deidentified, groupId)
       }
-      if (isBiologyCohort(data)) {
+      if (isBiology(data)) {
         table.columns = mapBiologyToColumns(deidentified)
         table.rows = mapBiologyToRows(data.list, groupId)
       }
-      if (isMedicationCohort(data)) {
+      if (isMedication(data)) {
         const _type = type as ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST
         table.columns = mapMedicationToColumns(_type, deidentified)
         table.rows = mapMedicationToRows(data.list, _type, deidentified, groupId)
       }
-      if (isDocumentsCohort(data)) {
+      if (isDocuments(data)) {
         table.columns = mapDocumentsToColumns(deidentified)
         table.rows = mapDocumentsToRows(data.list, deidentified, groupId, hasSearch)
       }

@@ -1,5 +1,14 @@
 import { AxiosResponse } from 'axios'
-import { CohortData, FHIR_Bundle_Response, CohortEncounter, CohortComposition, MedicationEntry, ChartCode } from 'types'
+import {
+  CohortData,
+  FHIR_Bundle_Response,
+  CohortEncounter,
+  CohortComposition,
+  MedicationEntry,
+  ChartCode,
+  IPatientDocuments,
+  ExplorationResults
+} from 'types'
 import {
   getGenderRepartitionMapAphp,
   getEncounterRepartitionMapAphp,
@@ -44,10 +53,22 @@ import {
   Questionnaire,
   QuestionnaireResponse
 } from 'fhir/r4'
-import { Direction, FormNames, Filters, Order, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
+import {
+  Direction,
+  FormNames,
+  Filters,
+  Order,
+  SearchByTypes,
+  SearchCriterias,
+  DocumentsFilters
+} from 'types/searchCriterias'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
 import { getExtension } from 'utils/fhir'
+import { ResourceOptions } from 'types/exploration'
+import services from '.'
+import { linkElementWithEncounter } from 'state/patient'
+import { SearchInputError } from 'types/error'
 
 export interface IServicePatients {
   /*
@@ -304,6 +325,8 @@ export interface IServicePatients {
    */
   fetchQuestionnaires: () => Promise<Questionnaire[]>
 
+  fetchPatientDocuments: (options: ResourceOptions<DocumentsFilters>, signal?: AbortSignal) => Promise<any>
+
   /*
    ** Cette fonction permet de récupérer les élèments de Composition lié à un patient
    **
@@ -328,26 +351,9 @@ export interface IServicePatients {
    **   - docsTotal: Nombre d'élément total par rapport au filtre indiqué
    */
   fetchDocuments: (
-    sortBy: Order,
-    sortDirection: Direction,
-    searchBy: SearchByTypes,
-    page: number,
-    patientId: string,
-    searchInput: string,
-    selectedDocTypes: string[],
-    docStatuses: string[],
-    nda: string,
-    onlyPdfAvailable: boolean,
-    startDate?: string | null,
-    endDate?: string | null,
-    groupId?: string,
-    signal?: AbortSignal,
-    executiveUnits?: string[],
-    encounterStatus?: string[]
-  ) => Promise<{
-    docsList: DocumentReference[]
-    docsTotal: number
-  }>
+    options: ResourceOptions<DocumentsFilters>,
+    signal?: AbortSignal
+  ) => Promise<ExplorationResults<DocumentReference>> | Promise<SearchInputError>
 
   /**
    * Retourne le droit de la vue d'un patient
@@ -731,57 +737,69 @@ const servicesPatients: IServicePatients = {
     return getApiResponseResources(questionnaireList) ?? []
   },
 
-  fetchDocuments: async (
-    sortBy: Order,
-    sortDirection: Direction,
-    searchBy: SearchByTypes,
-    page: number,
-    patientId: string,
-    searchInput: string,
-    selectedDocTypes: string[],
-    docStatuses: string[],
-    nda: string,
-    onlyPdfAvailable?: boolean,
-    startDate?: string | null,
-    endDate?: string | null,
-    groupId?: string,
-    signal?: AbortSignal,
-    executiveUnits?: string[],
-    encounterStatus?: string[]
-  ) => {
+  fetchDocuments: async (options, signal) => {
+    const {
+      deidentified,
+      page,
+      searchCriterias: {
+        orderBy,
+        searchInput,
+        searchBy,
+        filters: { docStatuses, docTypes, executiveUnits, nda, onlyPdfAvailable, durationRange, encounterStatus }
+      },
+      groupId,
+      patientId
+    } = options
+    if (searchInput) {
+      const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)
+      if (searchInputError && searchInputError.isError) {
+        throw searchInputError
+      }
+    }
     const documentLines = 20 // Number of desired lines in the document array
 
     const docsList = await fetchDocumentReference({
       patient: patientId,
       _list: groupId ? [groupId] : [],
       searchBy: searchBy,
-      _sort: sortBy,
-      sortDirection,
+      _sort: orderBy.orderBy,
+      sortDirection: orderBy.orderDirection,
       size: documentLines,
       offset: page ? (page - 1) * documentLines : 0,
-      docStatuses: docStatuses,
+      docStatuses: docStatuses.map((status) => status.id),
       _text: searchInput,
       highlight_search_results: searchBy === SearchByTypes.TEXT ? true : false,
-      type: selectedDocTypes.join(','),
+      type: docTypes.map((docType) => docType.code).join(','),
       'encounter-identifier': nda,
       onlyPdfAvailable: onlyPdfAvailable,
-      minDate: startDate ?? '',
-      maxDate: endDate ?? '',
+      minDate: durationRange?.[0] ?? '',
+      maxDate: durationRange?.[1] ?? '',
       signal: signal,
-      executiveUnits,
-      encounterStatus
+      executiveUnits: executiveUnits.map((unit) => unit.id),
+      encounterStatus: encounterStatus?.map(({ id }) => id)
     })
 
-    if (docsList.data.resourceType !== 'Bundle' || !docsList.data.total) {
-      return {
-        docsTotal: 0,
-        docsList: []
+    let documentsResponse: { docsTotal: number; docsList: DocumentReference[] } = {
+      docsTotal: 0,
+      docsList: []
+    }
+    if (docsList.data.resourceType === 'Bundle' && docsList.data.total) {
+      documentsResponse = {
+        docsTotal: docsList.data.total,
+        docsList: getApiResponseResources(docsList) ?? []
       }
     }
+    const documentsList = linkElementWithEncounter(
+      documentsResponse.docsList as DocumentReference[],
+      /* A VERIFIER hospits*/ [],
+      deidentified
+    )
 
     return {
-      docsTotal: docsList.data.total,
-      docsList: getApiResponseResources(docsList) ?? []
+      totalAllResults: documentsResponse.docsTotal,
+      total:
+        /*A VERIFIER patientState?.documents?.total ? patientState?.documents?.total :*/ documentsResponse.docsTotal,
+      list: documentsList
     }
   },
 
@@ -909,8 +927,7 @@ export const getFiltersService = async (fhir_resource: ResourceType, next?: stri
   const LIMIT = limit
   const OFFSET = 0
   const response = await getFilters(fhir_resource, LIMIT, OFFSET, next)
-  if (response.status < 200 || response.status >= 300)
-    throw new Error()
+  if (response.status < 200 || response.status >= 300) throw new Error()
   return response.data
 }
 

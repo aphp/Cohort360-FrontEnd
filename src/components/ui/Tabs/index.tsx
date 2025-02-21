@@ -30,7 +30,7 @@ const Tabs = <T, TL>({ values, active, disabled = false, onchange, variant = 'bl
               sx={{
                 fontSize: 12,
                 color: '#303030',
-                padding: '4px 8px',
+                padding: '4px 15px',
                 marginRight: '12px'
               }}
               //sx={{ '&.Mui-selected': { color: '#5bc5f2' } }}

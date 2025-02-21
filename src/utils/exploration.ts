@@ -13,7 +13,7 @@ import {
 import { removeKeys } from './map'
 import { MedicationRequest, MedicationAdministration } from 'fhir/r4'
 import {
-  CohortResults,
+  ExplorationResults,
   CohortPMSI,
   CohortQuestionnaireResponse,
   CohortImaging,
@@ -122,38 +122,40 @@ export const isPatientsResponse = (data: Data): data is PatientsResponse => {
   return 'originalPatients' in data
 }
 
-export const isOtherResourcesResponse = (data: Data): data is CohortResults<any> => {
+export const isOtherResourcesResponse = (data: Data): data is ExplorationResults<any> => {
   return 'list' in data
 }
 
-export const isPmsiCohort = (data: CohortResults<any>): data is CohortResults<CohortPMSI> => {
+export const isPmsi = (data: ExplorationResults<any>): data is ExplorationResults<CohortPMSI> => {
   const type = data.list[0].resourceType
   return type === ResourceType.CONDITION || type === ResourceType.PROCEDURE || type === ResourceType.CLAIM
 }
 
-export const isQuestionnaireCohort = (data: CohortResults<any>): data is CohortResults<CohortQuestionnaireResponse> => {
+export const isQuestionnaire = (
+  data: ExplorationResults<any>
+): data is ExplorationResults<CohortQuestionnaireResponse> => {
   const type = data.list[0].resourceType
   return type === ResourceType.QUESTIONNAIRE_RESPONSE
 }
 
-export const isImagingCohort = (data: CohortResults<any>): data is CohortResults<CohortImaging> => {
+export const isImaging = (data: ExplorationResults<any>): data is ExplorationResults<CohortImaging> => {
   const type = data.list[0].resourceType
   return type === ResourceType.IMAGING
 }
 
-export const isBiologyCohort = (data: CohortResults<any>): data is CohortResults<CohortObservation> => {
+export const isBiology = (data: ExplorationResults<any>): data is ExplorationResults<CohortObservation> => {
   const type = data.list[0].resourceType
   return type === ResourceType.OBSERVATION
 }
 
-export const isMedicationCohort = (
-  data: CohortResults<any>
-): data is CohortResults<CohortMedication<MedicationRequest | MedicationAdministration>> => {
+export const isMedication = (
+  data: ExplorationResults<any>
+): data is ExplorationResults<CohortMedication<MedicationRequest | MedicationAdministration>> => {
   const type = data.list[0].resourceType
   return type === ResourceType.MEDICATION_ADMINISTRATION || type === ResourceType.MEDICATION_REQUEST
 }
 
-export const isDocumentsCohort = (data: CohortResults<any>): data is CohortResults<CohortComposition> => {
+export const isDocuments = (data: ExplorationResults<any>): data is ExplorationResults<CohortComposition> => {
   const type = data.list[0].resourceType
   return type === ResourceType.DOCUMENTS
 }

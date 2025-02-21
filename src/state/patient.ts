@@ -1459,7 +1459,7 @@ export {
 }
 export const { clearPatient } = patientSlice.actions
 
-function linkElementWithEncounter<
+export function linkElementWithEncounter<
   T extends
     | Procedure
     | Condition

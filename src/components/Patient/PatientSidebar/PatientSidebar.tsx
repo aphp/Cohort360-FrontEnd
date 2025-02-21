@@ -72,10 +72,10 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
       filters: { genders, birthdatesRanges, vitalStatuses }
     },
     { changeOrderBy, changeSearchInput, changeSearchBy, addFilters, removeFilter }
-  ] = useSearchCriterias(initPatientsSearchCriterias)
+  ] = useSearchCriterias(initPatientsSearchCriterias())
 
   const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({ genders, vitalStatuses, birthdatesRanges })
+    return selectFiltersAsArray({ genders, vitalStatuses, birthdatesRanges }, searchInput)
   }, [genders, vitalStatuses, birthdatesRanges])
 
   const controllerRef = useRef<AbortController | null>(null)
@@ -95,11 +95,12 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
             searchInput,
             searchBy,
             filters: { genders, vitalStatuses, birthdatesRanges }
-          }
+          },
+          deidentified: deidentifiedBoolean ?? true,
+          groupId,
+          includeFacets
         },
-        deidentifiedBoolean ?? true,
-        groupId,
-        includeFacets,
+
         controllerRef.current?.signal
       )
 
@@ -149,7 +150,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
               <Select
                 value={searchBy || SearchByTypes.TEXT}
                 label="Rechercher dans :"
-                width={'40%'}
+               // width={'40%'}
                 items={searchByListPatients}
                 onchange={(newValue: SearchByTypes) => changeSearchBy(newValue)}
               />

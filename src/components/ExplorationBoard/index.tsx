@@ -6,9 +6,10 @@ import { useData } from './useData'
 import { ResourceType } from 'types/requestCriterias'
 import { useEffect } from 'react'
 import DataSection from './DataSection'
-import { useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { FetchStatus } from 'types'
 import { AlertWrapper } from 'components/ui/Alert'
+import { useAppSelector } from 'state'
 
 type ExplorationBoardProps = {
   deidentified?: boolean
@@ -20,6 +21,7 @@ const ExplorationBoard = ({ deidentified = true, type, messages }: ExplorationBo
   const [searchParams] = useSearchParams()
   const groupId = searchParams.get('groupId') || undefined
   const page = parseInt(searchParams.get('page') || '1', 10)
+  const { patientId } = useParams()
   const {
     fetchStatus,
     additionalInfo,
@@ -39,15 +41,18 @@ const ExplorationBoard = ({ deidentified = true, type, messages }: ExplorationBo
     searchCriterias,
     page,
     deidentified,
-    groupId
+    groupId,
+    patientId
   )
 
   useEffect(() => {
     //console.log('test searchCriterias', searchCriterias)
     console.log('test searchCriterias', searchCriterias)
-    console.log('test searchbar', additionalInfo.type)
+    console.log('test patient', patientId)
   }, [data])
 
+  // Garder la donnée du total au premier chargement
+  // Vérifier les données manquantes du state dans servicePatientsd.fetchDocuments
   // double fetch au chargement de la ressource ?? peut-être normal
   // IPP et NDA non trouvé en mode deidentified dans le tableau PMSI
   // dernier lieu prise en charge non trouvé en mode deidentified dans le tableau Patients
@@ -84,12 +89,6 @@ const ExplorationBoard = ({ deidentified = true, type, messages }: ExplorationBo
           {msg}
         </AlertWrapper>
       ))}
-
-      {/*<PatientCharts
-          agePyramid={data && isPatientsResponse(data) ? (data as PatientsResponse).agePyramidData ?? [] : []}
-          patientData={data && isPatientsResponse(data) ? (data as PatientsResponse).genderRepartitionMap ?? {} : {}}
-          loading={dataLoading}
-      />*/}
       <DataSection
         isLoading={dataLoading}
         data={data}
