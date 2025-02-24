@@ -37,6 +37,7 @@
     "react-idle-timer": "^5.5.3",
     "react-infinite-scroll-component": "^6.1.0",
     "react-leaflet": "^4.2.1",
+    "react-markdown": "^10.0.0",
     "react-pdf": "^8.0.2",
     "react-redux": "^8.0.5",
     "react-router": "^6.9.0",

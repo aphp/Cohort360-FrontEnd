@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import moment from 'moment'
 
@@ -21,7 +21,9 @@ import useStyles from './styles'
 import { CohortsType } from 'types/cohorts'
 import { Direction, Order } from 'types/searchCriterias'
 import useCohortList from 'hooks/useCohortList'
-import { infoMessages } from 'data/infoMessage'
+import { getBannerMessageLevel, sortContent } from 'data/infoMessage'
+import { listStaticContents, WebContent } from 'services/aphp/callApi'
+import Markdown from 'react-markdown'
 
 const Welcome = () => {
   const { classes, cx } = useStyles()
@@ -33,6 +35,7 @@ const Welcome = () => {
   const requestState = useAppSelector((state) => state.request)
   const meState = useAppSelector((state) => state.me)
   const [lastRequest, setLastRequest] = useState<RequestType[]>([])
+  const [bannerMessages, setBannerMessages] = useState<WebContent[]>([])
   const cohortList = useCohortList()
   const accessExpirations: AccessExpiration[] = meState?.accessExpirations ?? []
   const maintenanceIsActive = meState?.maintenance?.active
@@ -70,10 +73,16 @@ const Welcome = () => {
     )
   }
 
+  const fetchBannerMessages = useCallback(async () => {
+    const response = await listStaticContents(['BANNER_WARNING', 'BANNER_ERROR', 'BANNER_INFO'])
+    setBannerMessages(response)
+  }, [])
+
   useEffect(() => {
     dispatch(fetchProjects())
     dispatch(fetchRequests())
     fetchCohortsPreview()
+    fetchBannerMessages()
   }, [])
 
   useEffect(() => {
@@ -128,9 +137,13 @@ const Welcome = () => {
             </Typography>
           </Grid>
           <Grid item>
-            {infoMessages.map((infoMessage) => (
-              <Alert key={'alertMessage' + infoMessage.id} severity={infoMessage.level} className={classes.alert}>
-                {infoMessage.message}
+            {sortContent(bannerMessages).map((infoMessage) => (
+              <Alert
+                key={'alertMessage' + infoMessage.id}
+                severity={getBannerMessageLevel(infoMessage)}
+                className={classes.alert}
+              >
+                <Markdown components={{ p: 'span' }}>{infoMessage.content}</Markdown>
               </Alert>
             ))}
             {maintenanceIsActive && (

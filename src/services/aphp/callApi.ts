@@ -1236,3 +1236,32 @@ export const fetchExportList = async (args: fetchExportListProps) => {
   const response = await apiBackend.get<Back_API_Response<ExportList>>(`/exports/${queryParams}`, { signal: signal })
   return response.data
 }
+
+export type WebContent = {
+  id: number
+  created_at: string
+  modified_at: string
+  title: string
+  content: string
+  content_type: string
+  page: string
+  metadata: Record<string, string>
+}
+
+export const listStaticContents = async (contentTypes?: Array<string>, ordering?: string): Promise<WebContent[]> => {
+  try {
+    const contentTypeFilter = contentTypes ? `&content_type=${contentTypes.join(',')}` : ''
+    const orderFilter = ordering ? `ordering=${ordering}` : 'ordering=-created_at'
+    const contents = await apiBackend.get<Back_API_Response<WebContent>>(
+      `/webcontent/contents/?${orderFilter}${contentTypeFilter}`
+    )
+
+    if (contents.status !== 200) {
+      throw new Error('Error while fetching contents')
+    }
+    return contents.data?.results ?? undefined
+  } catch (error) {
+    console.error('Error while fetching contents', error)
+    throw new Error('Error while fetching contents')
+  }
+}
