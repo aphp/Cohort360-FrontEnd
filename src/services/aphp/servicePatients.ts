@@ -60,7 +60,8 @@ import {
   Order,
   SearchByTypes,
   SearchCriterias,
-  DocumentsFilters
+  DocumentsFilters,
+  BiologyFilters
 } from 'types/searchCriterias'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
@@ -234,20 +235,8 @@ export interface IServicePatients {
    **   - biologyTotal: Nombre d'élément total par rapport au filtre indiqué
    */
   fetchObservation: (
-    sortBy: Order,
-    sortDirection: Direction,
-    page: number,
-    patientId: string,
-    rowStatus: boolean,
-    searchInput: string,
-    nda: string,
-    code: string,
-    startDate?: string | null,
-    endDate?: string | null,
-    groupId?: string,
-    signal?: AbortSignal,
-    executiveUnits?: string[],
-    encounterStatus?: string[]
+    options: ResourceOptions<BiologyFilters>,
+    signal?: AbortSignal
   ) => Promise<{
     biologyList: Observation[]
     biologyTotal: number
@@ -324,8 +313,6 @@ export interface IServicePatients {
    **   - questionnairesList: liste des ids des formulaires
    */
   fetchQuestionnaires: () => Promise<Questionnaire[]>
-
-  fetchPatientDocuments: (options: ResourceOptions<DocumentsFilters>, signal?: AbortSignal) => Promise<any>
 
   /*
    ** Cette fonction permet de récupérer les élèments de Composition lié à un patient
@@ -626,45 +613,43 @@ const servicesPatients: IServicePatients = {
     return { medicationData, medicationTotal }
   },
 
-  fetchObservation: async (
-    sortBy: Order,
-    sortDirection: Direction,
-    page: number,
-    patientId: string,
-    rowStatus: boolean,
-    searchInput: string,
-    nda: string,
-    code: string,
-    startDate?: string | null,
-    endDate?: string | null,
-    groupId?: string,
-    signal?: AbortSignal,
-    executiveUnits?: string[],
-    encounterStatus?: string[]
-  ) => {
+  fetchObservation: async (options, signal) => {
+    const {
+      deidentified,
+      page,
+      searchCriterias: {
+        orderBy: { orderBy, orderDirection },
+        searchInput,
+        filters: { code, executiveUnits, nda, durationRange, encounterStatus, validatedStatus }
+      },
+      groupId,
+      patientId
+    } = options
     const observationResp = await fetchObservation({
       subject: patientId,
       _list: groupId ? [groupId] : [],
-      _sort: sortBy,
-      sortDirection,
+      _sort: orderBy,
+      sortDirection: orderDirection,
       size: 20,
       offset: page ? (page - 1) * 20 : 0,
       _text: searchInput,
       encounter: nda,
-      code,
-      minDate: startDate ?? '',
-      maxDate: endDate ?? '',
-      rowStatus,
+      code: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(','),
+      minDate: durationRange?.[0] ?? '',
+      maxDate: durationRange?.[1] ?? '',
+      rowStatus: validatedStatus,
       signal,
-      executiveUnits,
-      encounterStatus
+      executiveUnits: executiveUnits.map((unit) => unit.id),
+      encounterStatus: encounterStatus.map(({ id }) => id)
     })
-
     const biologyTotal = observationResp.data.resourceType === 'Bundle' ? observationResp.data.total : 0
+    const resp = getApiResponseResources(observationResp) ?? []
+    const biologyList = linkElementWithEncounter(resp, /* A REMPLACER  hospits*/ [], deidentified)
 
     return {
-      biologyList: getApiResponseResources(observationResp) ?? [],
-      biologyTotal: biologyTotal ?? 0
+      totalAllResults: biologyTotal,
+      total: /*A VERIFIER patientState?.documents?.total ? patientState?.documents?.total :*/ biologyTotal,
+      list: biologyList
     }
   },
 
