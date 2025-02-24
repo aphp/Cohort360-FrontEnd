@@ -46,6 +46,7 @@ const Patient = () => {
   const ODD_MEDICATION = config.features.medication.enabled
   const ODD_BIOLOGY = config.features.observation.enabled
   const ODD_IMAGING = config.features.imaging.enabled
+  const ODD_FORMS = config.features.questionnaires.enabled
 
   const [searchParams] = useSearchParams()
   const groupId = getCleanGroupId(searchParams.get('groupId'))
@@ -168,7 +169,7 @@ const Patient = () => {
                 classes={{ selected: classes.selected }}
                 className={classes.tabTitle}
                 label="Imagerie"
-                value="imaging"
+                value={ResourceType.IMAGING}
                 component={Link}
                 to={`/patients/${patientId}/imaging${location.search}`}
               />
@@ -214,6 +215,7 @@ const Patient = () => {
           )}
           {(selectedTab === ResourceType.DOCUMENTS ||
             selectedTab === ResourceType.OBSERVATION ||
+            selectedTab === ResourceType.IMAGING ||
             selectedTab === ResourceType.CONDITION ||
             selectedTab === ResourceType.PROCEDURE ||
             selectedTab === ResourceType.CLAIM) && (
@@ -227,8 +229,8 @@ const Patient = () => {
           {/*selectedTab === 'pmsi' && <PatientPMSI />*/}
           {ODD_MEDICATION && selectedTab === 'medication' && <PatientMedication />}
           {/*ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology />*/}
-          {ODD_IMAGING && selectedTab === 'imaging' && <PatientImaging />}
-          {config.features.questionnaires.enabled && selectedTab === 'forms' && !deidentified && <PatientForms />}
+          {/*ODD_IMAGING && selectedTab === 'imaging' && <PatientImaging />*/}
+          {ODD_FORMS && selectedTab === 'forms' && !deidentified && <PatientForms />}
         </Grid>
 
         <PatientSidebar

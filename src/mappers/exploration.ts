@@ -81,10 +81,10 @@ const mapQuestionnaireToColumns = (): Column[] => {
   ].filter((elem) => elem) as Column[]
 }
 
-const mapImagingToColumns = (deidentified: boolean): Column[] => {
+const mapImagingToColumns = (deidentified: boolean, patientId?: string): Column[] => {
   return [
     { label: `` },
-    { label: `IPP${deidentified ? ' chiffré' : ''}` },
+    !patientId && { label: `IPP${deidentified ? ' chiffré' : ''}` },
     { label: `NDA${deidentified ? ' chiffré' : ''}` },
     { label: 'Date', code: `${Order.STUDY_DATE},id` },
     { label: 'Modalité', align: 'center' },
@@ -387,7 +387,7 @@ const mapImagingSeries = (series: ImagingStudySeries[]): Table => {
   }
 }
 
-const mapImagingToRows = (list: CohortImaging[], deidentified: boolean, groupId?: string) => {
+const mapImagingToRows = (list: CohortImaging[], deidentified: boolean, groupId?: string, patientId?: string) => {
   const rows: Row[] = []
   list.forEach((elem) => {
     const date = elem.started
@@ -410,7 +410,7 @@ const mapImagingToRows = (list: CohortImaging[], deidentified: boolean, groupId?
         value: mapImagingSeries(elem.series ?? []),
         type: CellType.SUBARRAY
       },
-      {
+      !patientId && {
         id: `${elem.id}-ipp`,
         value: elem.IPP
           ? {
@@ -775,8 +775,8 @@ export const map = (
         table.rows = mapQuestionnaireToRows(data.list, groupId)
       }
       if (isImaging(data)) {
-        table.columns = mapImagingToColumns(deidentified)
-        table.rows = mapImagingToRows(data.list, deidentified, groupId)
+        table.columns = mapImagingToColumns(deidentified, patientId)
+        table.rows = mapImagingToRows(data.list, deidentified, groupId, patientId)
       }
       if (isBiology(data)) {
         table.columns = mapBiologyToColumns(deidentified, patientId)

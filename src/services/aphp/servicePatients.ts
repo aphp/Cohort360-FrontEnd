@@ -61,7 +61,8 @@ import {
   SearchByTypes,
   SearchCriterias,
   DocumentsFilters,
-  BiologyFilters
+  BiologyFilters,
+  ImagingFilters
 } from 'types/searchCriterias'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
@@ -70,6 +71,7 @@ import { ResourceOptions } from 'types/exploration'
 import services from '.'
 import { linkElementWithEncounter } from 'state/patient'
 import { SearchInputError } from 'types/error'
+import { linkToDiagnosticReport } from './serviceImaging'
 
 export interface IServicePatients {
   /*
@@ -237,10 +239,7 @@ export interface IServicePatients {
   fetchObservation: (
     options: ResourceOptions<BiologyFilters>,
     signal?: AbortSignal
-  ) => Promise<{
-    biologyList: Observation[]
-    biologyTotal: number
-  }>
+  ) => Promise<ExplorationResults<Observation>>
 
   /*
    ** Cette fonction permet de récupérer les élèments de ImagingStudy liés à un patient
@@ -263,23 +262,9 @@ export interface IServicePatients {
    **   - imagingTotal: Nombre d'élément total par rapport au(x) filtre(s) indiqué(s)
    */
   fetchImaging: (
-    orderBy: Order,
-    orderDirection: Direction,
-    page: number,
-    patientId: string,
-    nda: string,
-    searchInput?: string,
-    startDate?: string | null,
-    endDate?: string | null,
-    groupId?: string,
-    signal?: AbortSignal,
-    modalities?: string[],
-    executiveUnits?: string[],
-    encounterStatus?: string[]
-  ) => Promise<{
-    imagingList: ImagingStudy[]
-    imagingTotal: number
-  }>
+    options: ResourceOptions<ImagingFilters>,
+    signal?: AbortSignal
+  ) => Promise<ExplorationResults<ImagingStudy>>
 
   /*
    ** Cette fonction permet de récupérer les formulaires liés à un patient
@@ -642,7 +627,7 @@ const servicesPatients: IServicePatients = {
       executiveUnits: executiveUnits.map((unit) => unit.id),
       encounterStatus: encounterStatus.map(({ id }) => id)
     })
-    const biologyTotal = observationResp.data.resourceType === 'Bundle' ? observationResp.data.total : 0
+    const biologyTotal = observationResp.data.resourceType === 'Bundle' ? observationResp.data.total ?? 0 : 0
     const resp = getApiResponseResources(observationResp) ?? []
     const biologyList = linkElementWithEncounter(resp, /* A REMPLACER  hospits*/ [], deidentified)
 
@@ -653,21 +638,18 @@ const servicesPatients: IServicePatients = {
     }
   },
 
-  fetchImaging: async (
-    orderBy: Order,
-    orderDirection: Direction,
-    page: number,
-    patientId: string,
-    nda: string,
-    searchInput?: string,
-    startDate?: string | null,
-    endDate?: string | null,
-    groupId?: string,
-    signal?: AbortSignal,
-    modalities?: string[],
-    executiveUnits?: string[],
-    encounterStatus?: string[]
-  ) => {
+  fetchImaging: async (options, signal) => {
+    const {
+      deidentified,
+      page,
+      searchCriterias: {
+        orderBy: { orderBy, orderDirection },
+        searchInput,
+        filters: { modality, executiveUnits, nda, durationRange, encounterStatus }
+      },
+      groupId,
+      patientId
+    } = options
     const imagingResp = await fetchImaging({
       patient: patientId,
       size: 20,
@@ -676,20 +658,25 @@ const servicesPatients: IServicePatients = {
       orderDirection,
       _text: searchInput,
       encounter: nda,
-      minDate: startDate ?? '',
-      maxDate: endDate ?? '',
+      minDate: durationRange?.[0] ?? '',
+      maxDate: durationRange?.[1] ?? '',
       _list: groupId ? [groupId] : [],
       signal,
-      modalities,
-      executiveUnits,
-      encounterStatus
+      modalities: modality?.map(({ id }) => id),
+      executiveUnits: executiveUnits.map((unit) => unit.id),
+      encounterStatus: encounterStatus?.map(({ id }) => id)
     })
-
-    const imagingTotal = imagingResp.data.resourceType === 'Bundle' ? imagingResp.data.total : 0
-
-    return {
+    const imagingTotal = imagingResp.data.resourceType === 'Bundle' ? imagingResp.data.total ?? 0 : 0
+    const resp = {
       imagingList: getApiResponseResources(imagingResp) ?? [],
-      imagingTotal: imagingTotal ?? 0
+      imagingTotal: imagingTotal
+    }
+    const imagingList = linkElementWithEncounter(resp.imagingList, /*A REMPLACER hospits*/ [], deidentified)
+    const imagingListWithDiagnosticReport = await linkToDiagnosticReport(imagingList, signal)
+    return {
+      totalAllResults: resp.imagingTotal,
+      total: /*A REMPLACER patientState?.imaging?.total ? patientState?.imaging?.total : */ resp.imagingTotal,
+      list: imagingListWithDiagnosticReport
     }
   },
 
