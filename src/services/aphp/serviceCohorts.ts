@@ -1092,8 +1092,10 @@ const servicesCohorts: IServiceCohorts = {
       case ResourceType.MEDICATION_ADMINISTRATION:
       case ResourceType.MEDICATION_REQUEST:
         return servicesCohorts.fetchMedicationList
-      case ResourceType.IMAGING:
+      case ResourceType.IMAGING: {
+        if (patientId) return servicesPatients.fetchImaging
         return servicesCohorts.fetchImagingList
+      }
       case ResourceType.OBSERVATION: {
         if (patientId) return servicesPatients.fetchObservation
         return servicesCohorts.fetchBiologyList
