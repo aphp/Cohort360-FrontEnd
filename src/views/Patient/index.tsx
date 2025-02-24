@@ -158,7 +158,7 @@ const Patient = () => {
                 classes={{ selected: classes.selected }}
                 className={classes.tabTitle}
                 label="Biologie"
-                value="biology"
+                value={ResourceType.OBSERVATION}
                 component={Link}
                 to={`/patients/${patientId}/biology${location.search}`}
               />
@@ -212,14 +212,9 @@ const Patient = () => {
               deidentified={deidentified}
             />
           )}
-          {selectedTab === ResourceType.DOCUMENTS && (
-            <ExplorationBoard
-              deidentified={deidentified}
-              type={selectedTab}
-              messages={getAlertMessages(selectedTab, deidentified)}
-            />
-          )}
-          {(selectedTab === ResourceType.CONDITION ||
+          {(selectedTab === ResourceType.DOCUMENTS ||
+            selectedTab === ResourceType.OBSERVATION ||
+            selectedTab === ResourceType.CONDITION ||
             selectedTab === ResourceType.PROCEDURE ||
             selectedTab === ResourceType.CLAIM) && (
             <ExplorationBoard
@@ -231,7 +226,7 @@ const Patient = () => {
           {/*selectedTab === 'documents' && <PatientDocs />*/}
           {/*selectedTab === 'pmsi' && <PatientPMSI />*/}
           {ODD_MEDICATION && selectedTab === 'medication' && <PatientMedication />}
-          {ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology />}
+          {/*ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology />*/}
           {ODD_IMAGING && selectedTab === 'imaging' && <PatientImaging />}
           {config.features.questionnaires.enabled && selectedTab === 'forms' && !deidentified && <PatientForms />}
         </Grid>

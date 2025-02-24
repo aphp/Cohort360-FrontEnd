@@ -94,7 +94,7 @@ export const useData = (
         type === ResourceType.DOCUMENTS &&
         !!searchCriterias.searchInput &&
         searchCriterias.searchBy === SearchByTypes.TEXT
-      setTableData(map(data, type, deidentified, groupId, hasSearch))
+      setTableData(map(data, type, deidentified, groupId, patientId, hasSearch))
       const count: ExplorationCount = {
         ressource: null,
         patients:

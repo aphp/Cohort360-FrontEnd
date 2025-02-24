@@ -174,7 +174,10 @@ export interface IServiceCohorts {
   /**
    * Retourne la liste d'objets PMSI liés à une cohorte
    */
-  fetchPMSIList: (options: ResourceOptions<PMSIFilters>, signal?: AbortSignal) => Promise<ExplorationResults<CohortPMSI>>
+  fetchPMSIList: (
+    options: ResourceOptions<PMSIFilters>,
+    signal?: AbortSignal
+  ) => Promise<ExplorationResults<CohortPMSI>>
 
   /**
    * Retourne la liste d'objets Medication liés à une cohorte
@@ -1078,8 +1081,10 @@ const servicesCohorts: IServiceCohorts = {
         return servicesCohorts.fetchFormsList
       case ResourceType.CONDITION:
       case ResourceType.CLAIM:
-      case ResourceType.PROCEDURE:
+      case ResourceType.PROCEDURE: {
+        if (patientId) return servicesPatients.fetchPMSI
         return servicesCohorts.fetchPMSIList
+      }
       case ResourceType.DOCUMENTS: {
         if (patientId) return servicesPatients.fetchDocuments
         return servicesCohorts.fetchDocuments
@@ -1089,8 +1094,10 @@ const servicesCohorts: IServiceCohorts = {
         return servicesCohorts.fetchMedicationList
       case ResourceType.IMAGING:
         return servicesCohorts.fetchImagingList
-      case ResourceType.OBSERVATION:
+      case ResourceType.OBSERVATION: {
+        if (patientId) return servicesPatients.fetchObservation
         return servicesCohorts.fetchBiologyList
+      }
     }
     return servicesCohorts.fetchPatientList
   },
