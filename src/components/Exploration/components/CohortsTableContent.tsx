@@ -2,8 +2,10 @@ import React, { useContext } from 'react'
 import { AppConfig } from 'config'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { Box, Checkbox, CircularProgress, IconButton, TableRow, Tooltip } from '@mui/material'
+import { Box, Checkbox, IconButton, TableRow, Tooltip } from '@mui/material'
+import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
 import FavStar from 'components/ui/FavStar'
+import IconButtonWithTooltip from './IconButtonWithTooltip'
 import ResearchesTable from './Table'
 import StatusChip from './StatusChip'
 import { TableCellWrapper } from './Table/styles'
@@ -111,9 +113,7 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
   ]
 
   return loading ? (
-    <Box display="flex" width={'100%'} justifyContent={'center'}>
-      <CircularProgress size={50} />
-    </Box>
+    <CenteredCircularProgress />
   ) : (
     <ResearchesTable
       columns={columns}
@@ -162,53 +162,30 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
             </TableCellWrapper>
             <TableCellWrapper>
               <Box display={'flex'} alignItems={'center'}>
-                <Tooltip title={getExportTooltip(cohort, !!isExportable)}>
-                  <IconButton
-                    size="small"
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      onClickExport(cohort)
-                    }}
-                    disabled={disableExport}
-                  >
-                    <Download fill={disableExport ? '#CBCFCF' : '#2b2b2b'} />
-                  </IconButton>
-                </Tooltip>
-                {/* <Tooltip title={'Créer un échantillon à partir de la cohorte'}>
-                      <IconButton
-                        size="small"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                        }}
-                        disabled={disabled}
-                      >
-                        <Picker stroke={disabled ? '#CBCFCF' : '#2b2b2b'} />
-                      </IconButton>
-                    </Tooltip> */}
-                <Tooltip title={'Accéder à la version de la requête ayant créé la cohorte'}>
-                  <IconButton
-                    size="small"
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      navigate(`/cohort/new/${cohort.request?.uuid}/${cohort.request_query_snapshot}`)
-                    }}
-                    disabled={disabled}
-                  >
-                    <RequestTree fill={disabled ? '#CBCFCF' : '#2b2b2b'} />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={'Éditer la cohorte'}>
-                  <IconButton
-                    size="small"
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      onClickEdit(cohort)
-                    }}
-                    disabled={disabled}
-                  >
-                    <EditIcon htmlColor={disabled ? '#CBCFCF' : '#2b2b2b'} />
-                  </IconButton>
-                </Tooltip>
+                <IconButtonWithTooltip
+                  title={getExportTooltip(cohort, !!isExportable)}
+                  icon={<Download />}
+                  onClick={() => onClickExport(cohort)}
+                  disabled={disableExport}
+                />
+                {/* <IconButtonWithTooltip
+                  title="Créer un échantillon à partir de la cohorte"
+                  icon={<Picker />}
+                  onClick={() => console.log('todo')}
+                  disabled={disabled}
+                /> */}
+                <IconButtonWithTooltip
+                  title="Accéder à la version de la requête ayant créé la cohorte"
+                  icon={<RequestTree />}
+                  onClick={() => navigate(`/cohort/new/${cohort.request?.uuid}/${cohort.request_query_snapshot}`)}
+                  disabled={disabled}
+                />
+                <IconButtonWithTooltip
+                  title="Éditer la cohorte"
+                  icon={<EditIcon />}
+                  onClick={() => onClickEdit(cohort)}
+                  disabled={disabled}
+                />
               </Box>
             </TableCellWrapper>
             {!requestId && <TableCellWrapper>{cohort.request?.name}</TableCellWrapper>}

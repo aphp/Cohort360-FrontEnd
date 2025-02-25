@@ -6,10 +6,11 @@ import { setMessage } from 'state/message'
 import { setSelectedRequestShare } from 'state/request'
 import { resetCohortCreation } from 'state/cohortCreation'
 
-import { Grid, IconButton, Tooltip } from '@mui/material'
+import { Grid } from '@mui/material'
 import ActionBar from './ActionBar'
 import AddOrEditItem from './Modals/AddOrEditItem'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
+import IconButtonWithTooltip from './IconButtonWithTooltip'
 import LevelHeader from './LevelHeader'
 import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
 import MoveRequest from './Modals/MoveRequest'
@@ -180,16 +181,21 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
             actions={
               projectId && (
                 <>
-                  <Tooltip title="Éditer le projet">
-                    <IconButton style={{ padding: 4 }} onClick={() => setOpenParentEditionModal(true)}>
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Supprimer le projet">
-                    <IconButton style={{ padding: 4 }} color="secondary" onClick={() => setOpenDeletionModal(true)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
+                  <IconButtonWithTooltip
+                    disabled={maintenanceIsActive}
+                    title="Éditer le projet"
+                    icon={<EditIcon />}
+                    onClick={() => setOpenParentEditionModal(true)}
+                    color="#5bc5f2"
+                  />
+                  <IconButtonWithTooltip
+                    disabled={maintenanceIsActive}
+                    title="Supprimer le projet"
+                    icon={<DeleteIcon />}
+                    onClick={() => setOpenDeletionModal(true)}
+                    // TODO: rendre vraiment rose, là ça marche po
+                    color="#ed6d91"
+                  />
                 </>
               )
             }
