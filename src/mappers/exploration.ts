@@ -110,9 +110,9 @@ const mapBiologyToColumns = (deidentified: boolean, patientId?: string): Column[
   ].filter((elem) => elem) as Column[]
 }
 
-const mapMedicationToColumns = (type: ResourceType, deidentified: boolean): Column[] => {
+const mapMedicationToColumns = (type: ResourceType, deidentified: boolean, patientId?: string): Column[] => {
   return [
-    { label: `IPP${deidentified ? ' chiffré' : ''}` },
+    !patientId && { label: `IPP${deidentified ? ' chiffré' : ''}` },
     { label: `NDA${deidentified ? ' chiffré' : ''}` },
     { label: 'Date', code: Order.PERIOD_START },
     { label: 'Code ATC', code: Order.MEDICATION_ATC, align: 'center' },
@@ -649,7 +649,8 @@ export const mapMedicationToRows = (
   list: CohortMedication<MedicationRequest | MedicationAdministration>[],
   type: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION,
   deidentified: boolean,
-  groupId?: string
+  groupId?: string,
+  patientId?: string
 ) => {
   const rows: Row[] = []
   console.log('test data', list)
@@ -684,7 +685,7 @@ export const mapMedicationToRows = (
     }`
     const comment = (elem as MedicationAdministration).dosage?.text ?? 'Non renseigné'
     const row: Row = [
-      {
+      !patientId && {
         id: `${elem}-ipp`,
         value: elem.IPP
           ? {
@@ -784,8 +785,8 @@ export const map = (
       }
       if (isMedication(data)) {
         const _type = type as ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST
-        table.columns = mapMedicationToColumns(_type, deidentified)
-        table.rows = mapMedicationToRows(data.list, _type, deidentified, groupId)
+        table.columns = mapMedicationToColumns(_type, deidentified, patientId)
+        table.rows = mapMedicationToRows(data.list, _type, deidentified, groupId, patientId)
       }
       if (isDocuments(data)) {
         table.columns = mapDocumentsToColumns(deidentified, patientId)
