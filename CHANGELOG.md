@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.42.7](https://github.com/aphp/Cohort360-FrontEnd/compare/2.42.6..2.42.7) - 2025-02-25
+
+### 🐛 Bug Fixes
+
+- Change sourceType for encounter Criteria - ([d6b70cf](https://github.com/aphp/Cohort360-FrontEnd/commit/d6b70cf80d67d8375cfeb5680d9111e9c834d10d))
+
 ## [2.42.6](https://github.com/aphp/Cohort360-FrontEnd/compare/2.42.5..2.42.6) - 2025-02-20
 
 ### 🚀 Features
