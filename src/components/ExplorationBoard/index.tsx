@@ -6,22 +6,22 @@ import { useData } from './useData'
 import { ResourceType } from 'types/requestCriterias'
 import { useEffect } from 'react'
 import DataSection from './DataSection'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { FetchStatus } from 'types'
 import { AlertWrapper } from 'components/ui/Alert'
-import { useAppSelector } from 'state'
+import { PatientState } from 'state/patient'
 
 type ExplorationBoardProps = {
-  deidentified?: boolean
+  deidentified: boolean
   type: ResourceType
   messages?: string[]
+  groupId: string | undefined
+  patient?: PatientState
 }
 
-const ExplorationBoard = ({ deidentified = true, type, messages }: ExplorationBoardProps) => {
+const ExplorationBoard = ({ deidentified = true, type, groupId, patient, messages }: ExplorationBoardProps) => {
   const [searchParams] = useSearchParams()
-  const groupId = searchParams.get('groupId') || undefined
   const page = parseInt(searchParams.get('page') || '1', 10)
-  const { patientId } = useParams()
   const {
     fetchStatus,
     additionalInfo,
@@ -42,13 +42,13 @@ const ExplorationBoard = ({ deidentified = true, type, messages }: ExplorationBo
     page,
     deidentified,
     groupId,
-    patientId
+    patient
   )
 
   useEffect(() => {
     //console.log('test searchCriterias', searchCriterias)
     console.log('test searchCriterias', searchCriterias)
-    console.log('test patient', patientId)
+    console.log('test patient', patient)
   }, [data])
 
   // Garder la donnée du total au premier chargement
@@ -94,7 +94,7 @@ const ExplorationBoard = ({ deidentified = true, type, messages }: ExplorationBo
         infos={additionalInfo}
         data={data}
         count={count}
-        patientId={patientId}
+        isPatient={!!patient}
         orderBy={searchCriterias.orderBy}
         pagination={pagination}
         type={type}

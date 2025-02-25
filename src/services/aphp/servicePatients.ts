@@ -703,7 +703,7 @@ const servicesPatients: IServicePatients = {
         filters: { docStatuses, docTypes, executiveUnits, nda, onlyPdfAvailable, durationRange, encounterStatus }
       },
       groupId,
-      patientId
+      patient
     } = options
     if (searchInput) {
       const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)
@@ -714,7 +714,7 @@ const servicesPatients: IServicePatients = {
     const documentLines = 20 // Number of desired lines in the document array
 
     const docsList = await fetchDocumentReference({
-      patient: patientId,
+      patient: patient?.patientInfo?.id,
       _list: groupId ? [groupId] : [],
       searchBy: searchBy,
       _sort: orderBy.orderBy,
@@ -746,12 +746,12 @@ const servicesPatients: IServicePatients = {
     }
     const documentsList = linkElementWithEncounter(
       documentsResponse.docsList as DocumentReference[],
-      /* A VERIFIER hospits*/ [],
+      patient?.hospits?.list ?? [],
       deidentified
     )
 
     return {
-      totalAllResults: documentsResponse.docsTotal,
+      totalAllResults: patient?.documents?.total,
       total:
         /*A VERIFIER patientState?.documents?.total ? patientState?.documents?.total :*/ documentsResponse.docsTotal,
       list: documentsList
