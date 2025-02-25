@@ -16,7 +16,7 @@ import PatientForms from 'components/Patient/PatientForms'
 import TopBar from 'components/TopBar/TopBar'
 import useStyles from './styles'
 import { useAppSelector, useAppDispatch } from 'state'
-import { fetchPatientInfo } from 'state/patient'
+import { PatientState, fetchPatientInfo } from 'state/patient'
 import { AppConfig } from 'config'
 import { getCleanGroupId } from 'utils/paginationUtils'
 import ExplorationBoard from 'components/ExplorationBoard'
@@ -242,6 +242,8 @@ const Patient = () => {
               deidentified={deidentified}
               type={selectedTab}
               messages={getAlertMessages(selectedTab, deidentified)}
+              groupId={patient?.groupId}
+              patient={patient}
             />
           )}
           {/*selectedTab === 'documents' && <PatientDocs />*/}

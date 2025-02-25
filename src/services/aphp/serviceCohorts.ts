@@ -209,7 +209,7 @@ export interface IServiceCohorts {
    */
   getExplorationFetcher: (
     resourceType: ResourceType,
-    patientId?: string
+    isPatient: boolean
   ) => (options: ResourceOptions<Filters>, signal?: AbortSignal) => Promise<Data>
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
@@ -1073,35 +1073,35 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
-  getExplorationFetcher: (resourceType: ResourceType, patientId?: string) => {
+  getExplorationFetcher: (resourceType: ResourceType, isPatient: boolean) => {
     switch (resourceType) {
       case ResourceType.PATIENT:
         return servicesCohorts.fetchPatientList
       case ResourceType.QUESTIONNAIRE_RESPONSE: {
-        if (patientId) return servicesPatients.fetchMaternityForms
+        if (isPatient) return servicesPatients.fetchMaternityForms
         return servicesCohorts.fetchFormsList
       }
       case ResourceType.CONDITION:
       case ResourceType.CLAIM:
       case ResourceType.PROCEDURE: {
-        if (patientId) return servicesPatients.fetchPMSI
+        if (isPatient) return servicesPatients.fetchPMSI
         return servicesCohorts.fetchPMSIList
       }
       case ResourceType.DOCUMENTS: {
-        if (patientId) return servicesPatients.fetchDocuments
+        if (isPatient) return servicesPatients.fetchDocuments
         return servicesCohorts.fetchDocuments
       }
       case ResourceType.MEDICATION_ADMINISTRATION:
       case ResourceType.MEDICATION_REQUEST: {
-        if (patientId) return servicesPatients.fetchMedication
+        if (isPatient) return servicesPatients.fetchMedication
         return servicesCohorts.fetchMedicationList
       }
       case ResourceType.IMAGING: {
-        if (patientId) return servicesPatients.fetchImaging
+        if (isPatient) return servicesPatients.fetchImaging
         return servicesCohorts.fetchImagingList
       }
       case ResourceType.OBSERVATION: {
-        if (patientId) return servicesPatients.fetchObservation
+        if (isPatient) return servicesPatients.fetchObservation
         return servicesCohorts.fetchBiologyList
       }
     }

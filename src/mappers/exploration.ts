@@ -81,10 +81,10 @@ const mapQuestionnaireToColumns = (): Column[] => {
   ].filter((elem) => elem) as Column[]
 }
 
-const mapImagingToColumns = (deidentified: boolean, patientId?: string): Column[] => {
+const mapImagingToColumns = (deidentified: boolean, isPatient: boolean): Column[] => {
   return [
     { label: `` },
-    !patientId && { label: `IPP${deidentified ? ' chiffré' : ''}` },
+    !isPatient && { label: `IPP${deidentified ? ' chiffré' : ''}` },
     { label: `NDA${deidentified ? ' chiffré' : ''}` },
     { label: 'Date', code: `${Order.STUDY_DATE},id` },
     { label: 'Modalité', align: 'center' },
@@ -97,9 +97,9 @@ const mapImagingToColumns = (deidentified: boolean, patientId?: string): Column[
   ].filter((elem) => elem) as Column[]
 }
 
-const mapBiologyToColumns = (deidentified: boolean, patientId?: string): Column[] => {
+const mapBiologyToColumns = (deidentified: boolean, isPatient: boolean): Column[] => {
   return [
-    !patientId && { label: `IPP${deidentified ? ' chiffré' : ''}` },
+    !isPatient && { label: `IPP${deidentified ? ' chiffré' : ''}` },
     { label: `NDA${deidentified ? ' chiffré' : ''}` },
     { label: 'Date de prélèvement', code: Order.DATE },
     { label: 'ANABIO', code: Order.ANABIO },
@@ -110,9 +110,9 @@ const mapBiologyToColumns = (deidentified: boolean, patientId?: string): Column[
   ].filter((elem) => elem) as Column[]
 }
 
-const mapMedicationToColumns = (type: ResourceType, deidentified: boolean, patientId?: string): Column[] => {
+const mapMedicationToColumns = (type: ResourceType, deidentified: boolean, isPatient: boolean): Column[] => {
   return [
-    !patientId && { label: `IPP${deidentified ? ' chiffré' : ''}` },
+    !isPatient && { label: `IPP${deidentified ? ' chiffré' : ''}` },
     { label: `NDA${deidentified ? ' chiffré' : ''}` },
     { label: 'Date', code: Order.PERIOD_START },
     { label: 'Code ATC', code: Order.MEDICATION_ATC, align: 'center' },
@@ -128,11 +128,11 @@ const mapMedicationToColumns = (type: ResourceType, deidentified: boolean, patie
   ].filter((elem) => elem) as Column[]
 }
 
-const mapDocumentsToColumns = (deidentified: boolean, patientId?: string): Column[] => {
+const mapDocumentsToColumns = (deidentified: boolean, isPatient: boolean): Column[] => {
   return [
     { label: 'Statut' },
     { label: 'Nom / Date', code: Order.DATE },
-    !patientId && { label: `IPP${deidentified ? ' chiffré' : ''}`, code: Order.SUBJECT_IDENTIFIER },
+    !isPatient && { label: `IPP${deidentified ? ' chiffré' : ''}`, code: Order.SUBJECT_IDENTIFIER },
     { label: `NDA${deidentified ? ' chiffré' : ''}` },
     { label: 'Unité exécutrice' },
     { label: 'Type de document', code: Order.TYPE },
@@ -140,7 +140,7 @@ const mapDocumentsToColumns = (deidentified: boolean, patientId?: string): Colum
   ].filter((elem) => elem) as Column[]
 }
 
-const mapPatientsToRows = (patients: Patient[], deidentified: boolean, groupId?: string) => {
+const mapPatientsToRows = (patients: Patient[], deidentified: boolean, groupId: string | undefined) => {
   const rows: Row[] = []
   patients.forEach((patient) => {
     const vitalStatus = {
@@ -214,7 +214,7 @@ const mapPatientsToRows = (patients: Patient[], deidentified: boolean, groupId?:
   return rows
 }
 
-const mapPmsiToRows = (list: CohortPMSI[], type: PMSIResourceTypes, groupId?: string) => {
+const mapPmsiToRows = (list: CohortPMSI[], type: PMSIResourceTypes, groupId: string | undefined) => {
   const rows: Row[] = []
   console.log('test data', list)
   list.forEach((elem) => {
@@ -280,7 +280,7 @@ const mapPmsiToRows = (list: CohortPMSI[], type: PMSIResourceTypes, groupId?: st
   return rows
 }
 
-const mapQuestionnaireToRows = (list: CohortQuestionnaireResponse[], groupId?: string) => {
+const mapQuestionnaireToRows = (list: CohortQuestionnaireResponse[], groupId: string | undefined) => {
   const rows: Row[] = []
   list.forEach((elem) => {
     const formName = elem.formName as FormNames
@@ -387,7 +387,12 @@ const mapImagingSeries = (series: ImagingStudySeries[]): Table => {
   }
 }
 
-const mapImagingToRows = (list: CohortImaging[], deidentified: boolean, groupId?: string, patientId?: string) => {
+const mapImagingToRows = (
+  list: CohortImaging[],
+  deidentified: boolean,
+  isPatient: boolean,
+  groupId: string | undefined
+) => {
   const rows: Row[] = []
   list.forEach((elem) => {
     const date = elem.started
@@ -410,7 +415,7 @@ const mapImagingToRows = (list: CohortImaging[], deidentified: boolean, groupId?
         value: mapImagingSeries(elem.series ?? []),
         type: CellType.SUBARRAY
       },
-      !patientId && {
+      !isPatient && {
         id: `${elem.id}-ipp`,
         value: elem.IPP
           ? {
@@ -480,7 +485,7 @@ const mapImagingToRows = (list: CohortImaging[], deidentified: boolean, groupId?
   return rows
 }
 
-const mapBiologyToRows = (list: CohortObservation[], groupId?: string, patientId?: string) => {
+const mapBiologyToRows = (list: CohortObservation[], isPatient: boolean, groupId: string | undefined) => {
   const rows: Row[] = []
   list.forEach((elem) => {
     const anabio = elem.code?.coding?.find(
@@ -508,7 +513,7 @@ const mapBiologyToRows = (list: CohortObservation[], groupId?: string, patientId
         )}`
       : '-'
     const row: Row = [
-      !patientId && {
+      !isPatient && {
         id: `${elem.id}-ipp`,
         value: elem.IPP
           ? {
@@ -569,8 +574,8 @@ const mapBiologyToRows = (list: CohortObservation[], groupId?: string, patientId
 const mapDocumentsToRows = (
   list: CohortComposition[],
   deidentified: boolean,
-  groupId?: string,
-  patientId?: string,
+  isPatient: boolean,
+  groupId: string | undefined,
   hasSearch?: boolean
 ) => {
   const rows: Row[] = []
@@ -602,7 +607,7 @@ const mapDocumentsToRows = (
         ],
         type: CellType.PARAGRAPHS
       },
-      !patientId && {
+      !isPatient && {
         id: `${elem.id}-ipp`,
         value: elem.IPP
           ? {
@@ -649,8 +654,8 @@ export const mapMedicationToRows = (
   list: CohortMedication<MedicationRequest | MedicationAdministration>[],
   type: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION,
   deidentified: boolean,
-  groupId?: string,
-  patientId?: string
+  isPatient: boolean,
+  groupId: string | undefined
 ) => {
   const rows: Row[] = []
   console.log('test data', list)
@@ -685,7 +690,7 @@ export const mapMedicationToRows = (
     }`
     const comment = (elem as MedicationAdministration).dosage?.text ?? 'Non renseigné'
     const row: Row = [
-      !patientId && {
+      !isPatient && {
         id: `${elem}-ipp`,
         value: elem.IPP
           ? {
@@ -755,8 +760,8 @@ export const map = (
   data: Data,
   type: ResourceType,
   deidentified: boolean,
-  groupId?: string,
-  patientId?: string,
+  isPatient: boolean,
+  groupId: string | undefined,
   hasSearch?: boolean
 ) => {
   const table: Table = { rows: [], columns: [] }
@@ -771,26 +776,26 @@ export const map = (
         table.columns = mapPmsiToColumns(type, deidentified)
         table.rows = mapPmsiToRows(data.list, _type, groupId)
       }
-      if (!patientId && isQuestionnaire(data)) {
+      if (!isPatient && isQuestionnaire(data)) {
         table.columns = mapQuestionnaireToColumns()
         table.rows = mapQuestionnaireToRows(data.list, groupId)
       }
       if (isImaging(data)) {
-        table.columns = mapImagingToColumns(deidentified, patientId)
-        table.rows = mapImagingToRows(data.list, deidentified, groupId, patientId)
+        table.columns = mapImagingToColumns(deidentified, isPatient)
+        table.rows = mapImagingToRows(data.list, deidentified, isPatient, groupId)
       }
       if (isBiology(data)) {
-        table.columns = mapBiologyToColumns(deidentified, patientId)
-        table.rows = mapBiologyToRows(data.list, groupId, patientId)
+        table.columns = mapBiologyToColumns(deidentified, isPatient)
+        table.rows = mapBiologyToRows(data.list, isPatient, groupId)
       }
       if (isMedication(data)) {
         const _type = type as ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST
-        table.columns = mapMedicationToColumns(_type, deidentified, patientId)
-        table.rows = mapMedicationToRows(data.list, _type, deidentified, groupId, patientId)
+        table.columns = mapMedicationToColumns(_type, deidentified, isPatient)
+        table.rows = mapMedicationToRows(data.list, _type, deidentified, isPatient, groupId)
       }
       if (isDocuments(data)) {
-        table.columns = mapDocumentsToColumns(deidentified, patientId)
-        table.rows = mapDocumentsToRows(data.list, deidentified, groupId, patientId, hasSearch)
+        table.columns = mapDocumentsToColumns(deidentified, isPatient)
+        table.rows = mapDocumentsToRows(data.list, deidentified, isPatient, groupId, hasSearch)
       }
     }
   }

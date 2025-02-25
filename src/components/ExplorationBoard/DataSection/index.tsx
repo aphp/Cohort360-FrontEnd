@@ -21,7 +21,7 @@ import { AdditionalInfo } from '../useExplorationBoard'
 type DataSectionProps = {
   data: { raw: Data | null; table: Table }
   infos: AdditionalInfo
-  patientId?: string
+  isPatient: boolean
   count: ExplorationCount | null
   orderBy: OrderBy
   isLoading: boolean
@@ -33,7 +33,7 @@ type DataSectionProps = {
 
 const DataSection = ({
   data,
-  patientId,
+  isPatient,
   infos,
   count,
   type,
@@ -71,16 +71,15 @@ const DataSection = ({
           )
         })()}
       {isLoading && <CircularProgress />}
-      {!isLoading &&
+      {!isLoading && isPatient && 
         type === ResourceType.QUESTIONNAIRE_RESPONSE &&
-        patientId &&
         (() => (
           <Timeline
             questionnaireResponses={(data.raw as ExplorationResults<QuestionnaireResponse>)?.list ?? []}
             questionnaires={infos.questionnaires?.raw ?? []}
           />
         ))()}
-      {!isLoading && data.table.rows && !(type === ResourceType.QUESTIONNAIRE_RESPONSE && patientId) && (
+      {!isLoading && data.table.rows && !(type === ResourceType.QUESTIONNAIRE_RESPONSE && isPatient) && (
         <>
           {data.table.rows.length < 1 && <Typography variant="button">Aucune donnée à afficher</Typography>}
           {data.table.rows.length > 0 && (

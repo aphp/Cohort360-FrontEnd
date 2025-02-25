@@ -3,6 +3,7 @@ import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
 import { map } from 'mappers/exploration'
 import { useEffect, useState } from 'react'
 import servicesCohorts from 'services/aphp/serviceCohorts'
+import { PatientState } from 'state/patient'
 import {
   CohortComposition,
   CohortImaging,
@@ -10,7 +11,6 @@ import {
   CohortObservation,
   CohortPMSI,
   CohortQuestionnaireResponse,
-  CohortResults,
   ExplorationResults,
   LoadingStatus
 } from 'types'
@@ -33,8 +33,8 @@ export type Data =
 
 export type ExplorationCount = {
   ressource: {
-    results: number
-    total: number
+    results?: number
+    total?: number
   } | null
   patients: {
     results: number
@@ -49,8 +49,8 @@ export const useData = (
   searchCriterias: SearchCriterias<Filters>,
   page: number,
   deidentified: boolean,
-  groupId?: string,
-  patientId?: string
+  groupId: string | undefined,
+  patient?: PatientState
 ) => {
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.IDDLE)
   const [data, setData] = useState<Data | null>(null)
@@ -61,14 +61,14 @@ export const useData = (
   const fetchData = async (page: number) => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
-      const fetcher = servicesCohorts.getExplorationFetcher(type, patientId)
+      const fetcher = servicesCohorts.getExplorationFetcher(type, !!patient)
       const results = await fetcher({
         page,
         searchCriterias,
         deidentified,
         type,
         groupId,
-        patientId,
+        patient,
         includeFacets: true
       })
       console.log('test fetching results', results)
@@ -95,7 +95,7 @@ export const useData = (
         type === ResourceType.DOCUMENTS &&
         !!searchCriterias.searchInput &&
         searchCriterias.searchBy === SearchByTypes.TEXT
-      setTableData(map(data, type, deidentified, groupId, patientId, hasSearch))
+      setTableData(map(data, type, deidentified, !!patient, groupId, hasSearch))
       const count: ExplorationCount = {
         ressource: null,
         patients:

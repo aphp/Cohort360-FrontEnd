@@ -1,3 +1,4 @@
+import { PatientState } from 'state/patient'
 import { ResourceType } from './requestCriterias'
 import { SearchCriterias } from './searchCriterias'
 
@@ -7,7 +8,7 @@ export type ResourceOptions<T> = {
   searchCriterias: SearchCriterias<T>
   type?: ResourceType
   groupId?: string
-  patientId?: string
+  patient?: PatientState
   includeFacets?: boolean
 }
 

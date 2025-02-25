@@ -267,9 +267,10 @@ const Dashboard = ({ context }: DashboardProps) => {
           />
         ) : (
           <ExplorationBoard
-            deidentified={dashboard.deidentifiedBoolean}
+            deidentified={!!dashboard.deidentifiedBoolean}
             type={selectedTab}
             messages={getAlertMessages(selectedTab, !!dashboard.deidentifiedBoolean)}
+            groupId={groupIds}
           />
         )}
         {/*(selectedTab === ResourceType.PATIENT ||
