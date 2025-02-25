@@ -2,9 +2,10 @@ import React, { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAppSelector } from 'state'
 
-import { Box, CircularProgress, Grid, Typography } from '@mui/material'
+import { Grid, Typography } from '@mui/material'
 import AddOrEditItem from './Modals/AddOrEditItem'
 import Button from 'components/ui/Button'
+import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
 import ProjectCard from 'components/ui/ProjectCard'
 import Select from 'components/ui/Searchbar/Select'
@@ -113,9 +114,7 @@ const ProjectsList = () => {
       </Grid>
       <Grid container gap="50px">
         {loading ? (
-          <Box display="flex" width={'100%'} justifyContent={'center'}>
-            <CircularProgress size={50} />
-          </Box>
+          <CenteredCircularProgress />
         ) : projectsList.length === 0 ? (
           <Grid container justifyContent={'center'} marginTop={'12px'}>
             <Typography>Aucun projet à afficher</Typography>

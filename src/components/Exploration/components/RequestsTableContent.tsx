@@ -1,9 +1,11 @@
 import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { Box, Checkbox, CircularProgress, IconButton, TableRow, Tooltip, Typography } from '@mui/material'
+import { Box, Checkbox, TableRow, Typography } from '@mui/material'
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt'
 import Button from 'components/ui/Button'
+import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
+import IconButtonWithTooltip from './IconButtonWithTooltip'
 import ResearchesTable from './Table'
 import { TableCellWrapper } from './Table/styles'
 
@@ -72,9 +74,7 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
   ]
 
   return loading ? (
-    <Box display="flex" width={'100%'} justifyContent={'center'}>
-      <CircularProgress size={50} />
-    </Box>
+    <CenteredCircularProgress />
   ) : (
     <ResearchesTable
       columns={columns}
@@ -110,32 +110,18 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
             </TableCellWrapper>
             <TableCellWrapper>
               <Box display={'flex'} flexWrap={'nowrap'}>
-                <Tooltip title="Partager la requête">
-                  <IconButton
-                    style={{ color: '#2b2b2b' }}
-                    size="small"
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      onShareRequest(request)
-                    }}
-                    disabled={disabled}
-                  >
-                    <ShareIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Éditer la requête">
-                  <IconButton
-                    style={{ color: '#2b2b2b' }}
-                    size="small"
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      onClickEdit(request)
-                    }}
-                    disabled={disabled}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                </Tooltip>
+                <IconButtonWithTooltip
+                  title="Partager la requête"
+                  icon={<ShareIcon />}
+                  onClick={() => onShareRequest(request)}
+                  disabled={disabled}
+                />
+                <IconButtonWithTooltip
+                  title="Éditer la requête"
+                  icon={<EditIcon />}
+                  onClick={() => onClickEdit(request)}
+                  disabled={disabled}
+                />
               </Box>
             </TableCellWrapper>
             {!projectId && <TableCellWrapper>{request.parent_folder?.name}</TableCellWrapper>}

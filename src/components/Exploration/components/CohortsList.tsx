@@ -1,19 +1,17 @@
 /* eslint-disable max-statements */
-import React, { useContext, useMemo, useState } from 'react'
-import { AppConfig } from 'config'
+import React, { useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from 'state'
 import { setMessage } from 'state/message'
 import { setSelectedRequestShare } from 'state/request'
 
-import { Grid, IconButton, Tooltip } from '@mui/material'
+import { Grid } from '@mui/material'
 import ActionBar from './ActionBar'
 import AddOrEditItem from './Modals/AddOrEditItem'
 import CohortStatusFilter from 'components/Filters/CohortStatusFilter'
 import CohortsTableContent from './CohortsTableContent'
 import CohortsTypesFilter from 'components/Filters/CohortsTypeFilter'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
-import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 import LevelHeader from './LevelHeader'
 import Modal from 'components/ui/Modal'
 import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
@@ -47,6 +45,7 @@ import {
 } from 'utils/explorationUtils'
 import { removeFilter, selectFiltersAsArray } from 'utils/filters'
 import { CohortsType } from 'types/cohorts'
+import IconButtonWithTooltip from './IconButtonWithTooltip'
 
 type CohortsListProps = {
   showHeader?: boolean
@@ -55,7 +54,6 @@ type CohortsListProps = {
 }
 
 const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }: CohortsListProps) => {
-  const appConfig = useContext(AppConfig)
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { projectId, requestId } = useParams()
@@ -82,7 +80,6 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
   const [openCohortEditionModal, setOpenCohortEditionModal] = useState(false)
   const [openParentEditionModal, setOpenParentEditionModal] = useState(false)
   const [openDeletionModal, setOpenDeletionModal] = useState(false)
-  const [openExportModal, setOpenExportModal] = useState(false)
   const [openFiltersModal, setOpenFiltersModal] = useState(false)
 
   const { request: parentRequest, requestLoading, requestIsError } = useRequest(requestId)
@@ -162,8 +159,11 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
   }
 
   const onClickExport = (cohort: Cohort) => {
-    setSelectedCohorts([cohort])
-    setOpenExportModal(true)
+    const searchParams = new URLSearchParams()
+    if (cohort.group_id) {
+      searchParams.set('groupId', cohort.group_id)
+    }
+    navigate(`/exports/new?${searchParams.toString()}`)
   }
 
   const onClickEdit = (cohort: Cohort) => {
@@ -217,21 +217,28 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
             actions={
               requestId && (
                 <>
-                  <Tooltip title="Partager la requête">
-                    <IconButton onClick={() => onShareRequest()}>
-                      <ShareIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Éditer la requête">
-                    <IconButton onClick={() => setOpenParentEditionModal(true)}>
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Supprimer la requête">
-                    <IconButton color="secondary" onClick={() => setOpenDeletionModal(true)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
+                  <IconButtonWithTooltip
+                    disabled={maintenanceIsActive}
+                    title="Partager la requête"
+                    icon={<ShareIcon />}
+                    onClick={() => onShareRequest()}
+                    color={'#5bc5f2'}
+                  />
+                  <IconButtonWithTooltip
+                    disabled={maintenanceIsActive}
+                    title="Éditer la requête"
+                    icon={<EditIcon />}
+                    onClick={() => setOpenParentEditionModal(true)}
+                    color={'#5bc5f2'}
+                  />
+                  <IconButtonWithTooltip
+                    disabled={maintenanceIsActive}
+                    title="Supprimer la requête"
+                    icon={<DeleteIcon />}
+                    onClick={() => setOpenDeletionModal(true)}
+                    // TODO: rendre vraiment rose, là ça marche po
+                    color={'#ed6d91'}
+                  />
                 </>
               )
             }
@@ -272,15 +279,6 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
         }}
         noPagination={!showHeader}
       />
-
-      {!!appConfig.features.export.enabled && (
-        <ExportModal
-          cohortId={selectedCohorts?.[0]?.uuid ?? ''}
-          open={openExportModal}
-          handleClose={() => setOpenExportModal(false)}
-          fhirGroupId={selectedCohorts?.[0]?.group_id ?? ''}
-        />
-      )}
       <AddOrEditItem
         open={openCohortEditionModal}
         selectedItem={cohortToEdit}
