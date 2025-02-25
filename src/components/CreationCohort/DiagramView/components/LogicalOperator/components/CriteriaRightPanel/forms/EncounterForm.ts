@@ -76,7 +76,7 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           valueKey: 'encounterService',
           type: 'executiveUnit',
           label: 'Service de rencontre',
-          sourceType: SourceType.DOCUMENT, // TODO add a new source type for encounter
+          sourceType: SourceType.CIM10, // TODO add a new source type for encounter
           buildInfo: {
             fhirKey: EncounterParamsKeys.SERVICE_PROVIDER
           }
