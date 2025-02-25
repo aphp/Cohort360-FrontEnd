@@ -340,7 +340,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
       )}
       {count !== null &&
         (exportTableResourceType === ResourceType.DOCUMENTS ? count > 5000 : count > limit) &&
-        tableSetting.isChecked && (
+        tableSetting?.isChecked && (
           <Grid marginTop={'1em'}>
             <Typography color={'red'} fontWeight={'bold'} fontSize={12}>
               La table sélectionnée dépasse la limite de{' '}
