@@ -1077,8 +1077,10 @@ const servicesCohorts: IServiceCohorts = {
     switch (resourceType) {
       case ResourceType.PATIENT:
         return servicesCohorts.fetchPatientList
-      case ResourceType.QUESTIONNAIRE_RESPONSE:
+      case ResourceType.QUESTIONNAIRE_RESPONSE: {
+        if (patientId) return servicesPatients.fetchMaternityForms
         return servicesCohorts.fetchFormsList
+      }
       case ResourceType.CONDITION:
       case ResourceType.CLAIM:
       case ResourceType.PROCEDURE: {

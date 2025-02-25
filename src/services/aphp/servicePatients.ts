@@ -62,7 +62,8 @@ import {
   SearchCriterias,
   DocumentsFilters,
   BiologyFilters,
-  ImagingFilters
+  ImagingFilters,
+  MaternityFormFilters
 } from 'types/searchCriterias'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
@@ -282,14 +283,9 @@ export interface IServicePatients {
    **   - formsList: liste des formulaires liés à un patient
    */
   fetchMaternityForms: (
-    patientId: string,
-    formName: string,
-    groupId?: string,
-    startDate?: string | null,
-    endDate?: string | null,
-    executiveUnits?: string[],
-    encounterStatus?: string[]
-  ) => Promise<QuestionnaireResponse[]>
+    options: ResourceOptions<MaternityFormFilters>,
+    signal?: AbortSignal
+  ) => Promise<ExplorationResults<QuestionnaireResponse>>
 
   /*
    ** Cette fonction permet de récupérer les ids des formulaires
@@ -680,26 +676,37 @@ const servicesPatients: IServicePatients = {
     }
   },
 
-  fetchMaternityForms: async (
-    patientId: string,
-    formName: string,
-    groupId?: string,
-    startDate?: string | null,
-    endDate?: string | null,
-    executiveUnits?: string[],
-    encounterStatus?: string[]
-  ) => {
+  fetchMaternityForms: async (options, signal) => {
+    const {
+      deidentified,
+      searchCriterias: {
+        filters: { formName, executiveUnits, durationRange, encounterStatus }
+      },
+      groupId,
+      patientId
+    } = options
+    const _formName = (formName.length === 0 ? [FormNames.PREGNANCY, FormNames.HOSPIT] : [...formName]).join()
     const formsResp = await fetchForms({
       patient: patientId,
-      formName,
+      formName: _formName,
       _list: groupId ? [groupId] : [],
-      startDate,
-      endDate,
-      executiveUnits,
-      encounterStatus
+      startDate: durationRange?.[0] ?? '',
+      endDate: durationRange?.[1] ?? '',
+      executiveUnits: executiveUnits?.map((unit) => unit.id),
+      encounterStatus: encounterStatus?.map(({ id }) => id)
     })
+    const list = getApiResponseResources(formsResp) ?? []
+    const maternityFormsList = linkElementWithEncounter(list, /*A REMPLACER hospits*/ [], deidentified).sort(
+      (form1, form2) => {
+        const dateForm1 = new Date(form1.authored ?? '').getTime()
+        const dateForm2 = new Date(form2.authored ?? '').getTime()
+        return dateForm2 - dateForm1
+      }
+    )
 
-    return getApiResponseResources(formsResp) ?? []
+    return {
+      list: maternityFormsList
+    }
   },
 
   fetchQuestionnaires: async () => {

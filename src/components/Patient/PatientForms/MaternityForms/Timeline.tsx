@@ -1,77 +1,95 @@
-import React from 'react'
-import { CircularProgress, Grid, Typography } from '@mui/material'
+import React, { useMemo } from 'react'
+import { Grid, Typography } from '@mui/material'
 import { FormNames } from 'types/searchCriterias'
-import HospitCard from './HospitCard'
 import { CohortQuestionnaireResponse } from 'types'
-import PregnancyCard from './PregnancyCard'
 import { Questionnaire } from 'fhir/r4'
+import {
+  formatHospitalisationDates,
+  generateHospitDetails,
+  generatePregnancyDetails,
+  getBirthDeliveryDate,
+  getDataFromForm
+} from 'utils/formUtils'
+import { pregnancyForm } from 'data/pregnancyData'
+import FormCards from 'components/ui/FormCard'
+import { DomainAdd, PregnantWoman } from '@mui/icons-material'
+import labels from 'labels.json'
+import { hospitForm } from 'data/hospitData'
 
 interface TimelineProps {
-  loading: boolean
   questionnaireResponses: CohortQuestionnaireResponse[]
   questionnaires: Questionnaire[]
 }
 
-interface YearGroup {
-  [year: string]: CohortQuestionnaireResponse[]
-}
-
-const groupEventsByYear = (data: CohortQuestionnaireResponse[]): YearGroup => {
-  return data.reduce((acc, curr) => {
+const groupEventsByYear = (data: CohortQuestionnaireResponse[]) => {
+  return data.reduce<Record<string, CohortQuestionnaireResponse[]>>((acc, curr) => {
     const year = new Date(curr.authored ?? '').getFullYear().toString()
-    if (!acc[year]) {
-      acc[year] = []
-    }
+    acc[year] = acc[year] || []
     acc[year].push(curr)
     return acc
-  }, {} as YearGroup)
+  }, {})
 }
 
-const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses, questionnaires }) => {
-  const yearGroups = groupEventsByYear(questionnaireResponses)
-  const pregnancyFormId = questionnaires.find((form) => form.name === FormNames.PREGNANCY)?.id ?? ''
+const Timeline = ({ questionnaireResponses, questionnaires }: TimelineProps) => {
+  const yearGroups = useMemo(() => groupEventsByYear(questionnaireResponses), [questionnaireResponses])
+  const pregnancyFormId = useMemo(
+    () => questionnaires.find((form) => form.name === FormNames.PREGNANCY)?.id ?? '',
+    [questionnaires]
+  )
+  const years = useMemo(() => Object.keys(yearGroups).sort((a, b) => b.localeCompare(a)), [yearGroups])
 
-  const years = Object.keys(yearGroups).sort((a, b) => a.localeCompare(b))
+  const generateFormInfo = (form: CohortQuestionnaireResponse) => {
+    const isPregnancy = form.questionnaire?.includes(pregnancyFormId)
+    const chipsInfo = isPregnancy
+      ? [
+          getDataFromForm(form, pregnancyForm.pregnancyType) ?? getDataFromForm(form, pregnancyForm.twinPregnancyType),
+          `Début de grossesse : ${getDataFromForm(form, pregnancyForm.pregnancyStartDate)}`,
+          `Unité exécutrice : ${form.serviceProvider}`
+        ]
+      : ([
+          getBirthDeliveryDate(form, hospitForm),
+          formatHospitalisationDates(form.hospitDates?.start, form.hospitDates?.end),
+          `Unité exécutrice : ${form.serviceProvider}`
+        ].filter(Boolean) as string[])
 
-  const render = () => {
-    return (
-      <>
-        {questionnaireResponses.length === 0 ? (
-          <Grid container justifyContent="center">
-            <Typography variant="button">Aucun formulaire à afficher</Typography>
-          </Grid>
-        ) : (
-          <div style={{ flexGrow: 1, marginLeft: '1em' }}>
-            {years.reverse().map((year) => (
-              <div key={year}>
-                <Typography variant="h6" style={{ margin: '10px 0', fontSize: 15 }}>
-                  {year}
-                </Typography>
-                {yearGroups[year].map((form) =>
-                  form.questionnaire?.includes(pregnancyFormId) ? (
-                    <PregnancyCard key={form.id} form={form} />
-                  ) : (
-                    <HospitCard key={form.id} form={form} />
-                  )
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </>
-    )
+    const formDetails = isPregnancy ? generatePregnancyDetails(form) : generateHospitDetails(form)
+    const cardColor = isPregnancy ? '#f194b4' : '#A8D178'
+    const avatar = isPregnancy ? <PregnantWoman htmlColor="#F194B4" /> : <DomainAdd htmlColor="#A8D178" />
+    const title = isPregnancy ? labels.formNames.pregnancy : labels.formNames.hospit
+    return { chipsInfo, formDetails, cardColor, avatar, title }
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
-      {loading ? (
+    <>
+      {questionnaireResponses.length === 0 ? (
         <Grid container justifyContent="center">
-          <CircularProgress />
+          <Typography variant="button">Aucun formulaire à afficher</Typography>
         </Grid>
       ) : (
-        render()
+        <div style={{ flexGrow: 1, marginLeft: '1em' }}>
+          {years.map((year) => (
+            <div key={year}>
+              <Typography variant="h6" sx={{ my: 1, fontSize: 15 }}>
+                {year}
+              </Typography>
+              {yearGroups[year].map((form) => {
+                const { chipsInfo, formDetails, cardColor, avatar, title } = generateFormInfo(form)
+                return (
+                  <FormCards
+                    key={form.id}
+                    cardColor={cardColor}
+                    title={title}
+                    chipsInfo={chipsInfo}
+                    formDetails={formDetails}
+                    avatar={avatar}
+                  />
+                )
+              })}
+            </div>
+          ))}
+        </div>
       )}
-    </div>
+    </>
   )
 }
 

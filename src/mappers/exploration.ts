@@ -770,7 +770,7 @@ export const map = (
         table.columns = mapPmsiToColumns(type, deidentified)
         table.rows = mapPmsiToRows(data.list, _type, groupId)
       }
-      if (isQuestionnaire(data)) {
+      if (!patientId && isQuestionnaire(data)) {
         table.columns = mapQuestionnaireToColumns()
         table.rows = mapQuestionnaireToRows(data.list, groupId)
       }

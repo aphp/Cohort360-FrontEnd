@@ -13,9 +13,15 @@ import { ResourceType } from 'types/requestCriterias'
 import BarChart from 'components/Dashboard/Preview/Charts/BarChart'
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import PieChart from 'components/Dashboard/Preview/Charts/PieChart'
+import Timeline from 'components/Patient/PatientForms/MaternityForms/Timeline'
+import { ExplorationResults } from 'types'
+import { QuestionnaireResponse } from 'fhir/r4'
+import { AdditionalInfo } from '../useExplorationBoard'
 
 type DataSectionProps = {
   data: { raw: Data | null; table: Table }
+  infos: AdditionalInfo
+  patientId?: string
   count: ExplorationCount | null
   orderBy: OrderBy
   isLoading: boolean
@@ -25,7 +31,18 @@ type DataSectionProps = {
   onSort: (orderBy: OrderBy) => void
 }
 
-const DataSection = ({ data, count, type, orderBy, isLoading, pagination, onChangePage, onSort }: DataSectionProps) => {
+const DataSection = ({
+  data,
+  patientId,
+  infos,
+  count,
+  type,
+  orderBy,
+  isLoading,
+  pagination,
+  onChangePage,
+  onSort
+}: DataSectionProps) => {
   return (
     <Grid container justifyContent="center" item xs={12}>
       {type === ResourceType.PATIENT &&
@@ -54,7 +71,16 @@ const DataSection = ({ data, count, type, orderBy, isLoading, pagination, onChan
           )
         })()}
       {isLoading && <CircularProgress />}
-      {data.table.rows && !isLoading && (
+      {!isLoading &&
+        type === ResourceType.QUESTIONNAIRE_RESPONSE &&
+        patientId &&
+        (() => (
+          <Timeline
+            questionnaireResponses={(data.raw as ExplorationResults<QuestionnaireResponse>)?.list ?? []}
+            questionnaires={infos.questionnaires?.raw ?? []}
+          />
+        ))()}
+      {!isLoading && data.table.rows && !(type === ResourceType.QUESTIONNAIRE_RESPONSE && patientId) && (
         <>
           {data.table.rows.length < 1 && <Typography variant="button">Aucune donnée à afficher</Typography>}
           {data.table.rows.length > 0 && (
