@@ -1,4 +1,5 @@
 import { getConfig } from 'config'
+import { Questionnaire } from 'fhir/r4'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { useEffect, useMemo, useState } from 'react'
 import useSearchCriterias, {
@@ -50,7 +51,10 @@ export type AdditionalInfo = {
   searchByList?: SearchBy[]
   prescriptionList?: LabelObject[]
   administrationList?: LabelObject[]
-  questionnaires?: LabelObject[]
+  questionnaires?: {
+    display: LabelObject[]
+    raw: Questionnaire[]
+  }
   modalities?: LabelObject[]
   type: ResourceType
   deidentified: boolean
@@ -157,7 +161,6 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean) =
   }
 
   const onSaveSearchCriterias = ({ searchBy, searchInput, filters }: SearchWithFilters) => {
-    console.log('test checkbox', filters)
     if (searchBy) changeSearchBy(searchBy)
     if (searchInput !== undefined) changeSearchInput(searchInput)
     if (filters) addFilters(filters)
@@ -189,10 +192,13 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean) =
         .results
     if (type === ResourceType.QUESTIONNAIRE_RESPONSE && !questionnaires) {
       const resp = await services.patients.fetchQuestionnaires()
-      questionnaires = resp.map((elem) => ({
-        id: elem.name ?? '',
-        label: getFormLabel(elem.name as FormNames) ?? ''
-      }))
+      questionnaires = {
+        raw: resp,
+        display: resp.map((elem) => ({
+          id: elem.name ?? '',
+          label: getFormLabel(elem.name as FormNames) ?? ''
+        }))
+      }
     }
     if (type === ResourceType.IMAGING && !modalities)
       modalities = (await getCodeList(getConfig().features.imaging.valueSets.imagingModalities.url, true)).results

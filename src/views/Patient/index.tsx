@@ -174,12 +174,12 @@ const Patient = () => {
                 to={`/patients/${patientId}/imaging${location.search}`}
               />
             )}
-            {config.features.questionnaires.enabled && !deidentified && (
+            {ODD_FORMS && !deidentified && (
               <Tab
                 classes={{ selected: classes.selected }}
                 className={classes.tabTitle}
                 label="Formulaires"
-                value="forms"
+                value={ResourceType.QUESTIONNAIRE_RESPONSE}
                 component={Link}
                 to={`/patients/${patientId}/forms${location.search}`}
               />
@@ -218,7 +218,8 @@ const Patient = () => {
             selectedTab === ResourceType.IMAGING ||
             selectedTab === ResourceType.CONDITION ||
             selectedTab === ResourceType.PROCEDURE ||
-            selectedTab === ResourceType.CLAIM) && (
+            selectedTab === ResourceType.CLAIM ||
+            (selectedTab === ResourceType.QUESTIONNAIRE_RESPONSE && !deidentified)) && (
             <ExplorationBoard
               deidentified={deidentified}
               type={selectedTab}
@@ -230,7 +231,7 @@ const Patient = () => {
           {ODD_MEDICATION && selectedTab === 'medication' && <PatientMedication />}
           {/*ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology />*/}
           {/*ODD_IMAGING && selectedTab === 'imaging' && <PatientImaging />*/}
-          {ODD_FORMS && selectedTab === 'forms' && !deidentified && <PatientForms />}
+          {/*ODD_FORMS && selectedTab === 'forms' && !deidentified && <PatientForms />*/}
         </Grid>
 
         <PatientSidebar

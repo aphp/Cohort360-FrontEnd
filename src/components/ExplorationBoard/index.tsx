@@ -91,8 +91,10 @@ const ExplorationBoard = ({ deidentified = true, type, messages }: ExplorationBo
       ))}
       <DataSection
         isLoading={dataLoading}
+        infos={additionalInfo}
         data={data}
         count={count}
+        patientId={patientId}
         orderBy={searchCriterias.orderBy}
         pagination={pagination}
         type={type}

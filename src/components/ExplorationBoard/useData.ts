@@ -11,6 +11,7 @@ import {
   CohortPMSI,
   CohortQuestionnaireResponse,
   CohortResults,
+  ExplorationResults,
   LoadingStatus
 } from 'types'
 import { PatientsResponse } from 'types/patient'
@@ -21,7 +22,7 @@ import { isPatientsResponse } from 'utils/exploration'
 
 export type Data =
   | PatientsResponse
-  | CohortResults<
+  | ExplorationResults<
       | CohortPMSI
       | CohortObservation
       | CohortImaging

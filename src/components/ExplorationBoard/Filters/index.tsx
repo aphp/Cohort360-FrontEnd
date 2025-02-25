@@ -273,7 +273,9 @@ const ExplorationFilters = ({ filters, infos, onSubmit, onError, onChange }: Exp
         <Controller
           name={FilterKeys.FORM_NAME}
           control={control}
-          render={({ field }) => <CheckboxGroup {...field} label="Formulaire :" options={infos.questionnaires ?? []} />}
+          render={({ field }) => (
+            <CheckboxGroup {...field} label="Formulaire :" options={infos.questionnaires?.display ?? []} />
+          )}
         />
       )}
       {FilterKeys.MODALITY in filters && (

@@ -58,7 +58,7 @@ const MaternityForm = () => {
       filters: { formName, startDate, endDate, executiveUnits, encounterStatus }
     },
     { addFilters, removeFilter }
-  ] = useSearchCriterias(initFormsCriterias)
+  ] = useSearchCriterias(initFormsCriterias())
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ formName, startDate, endDate, executiveUnits, encounterStatus })
   }, [formName, startDate, endDate, executiveUnits, encounterStatus])

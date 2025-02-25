@@ -289,7 +289,7 @@ export type CohortResults<T> = {
 }
 
 export type ExplorationResults<T> = {
-  total: number
+  total?: number
   totalAllResults?: number
   totalPatients?: number
   totalAllPatients?: number
