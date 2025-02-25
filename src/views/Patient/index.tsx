@@ -21,16 +21,21 @@ import { AppConfig } from 'config'
 import { getCleanGroupId } from 'utils/paginationUtils'
 import ExplorationBoard from 'components/ExplorationBoard'
 import { getAlertMessages } from 'utils/exploration'
-import { ResourceType } from 'types/requestCriterias'
+import { MedicationLabel, ResourceType } from 'types/requestCriterias'
 import Tabs from 'components/ui/Tabs'
-import { getPMSITab } from 'utils/tabsUtils'
-import { PmsiTab } from 'types'
+import { getMedicationTab, getPMSITab } from 'utils/tabsUtils'
+import { MedicationTab, PmsiTab } from 'types'
 import { PMSILabel } from 'types/patient'
 
 export const PMSITabs: PmsiTab[] = [
   { label: PMSILabel.DIAGNOSTIC, id: ResourceType.CONDITION },
   { label: PMSILabel.CCAM, id: ResourceType.PROCEDURE },
   { label: PMSILabel.GHM, id: ResourceType.CLAIM }
+]
+
+export const medicationTabs: MedicationTab[] = [
+  { id: ResourceType.MEDICATION_REQUEST, label: MedicationLabel.PRESCRIPTION },
+  { id: ResourceType.MEDICATION_ADMINISTRATION, label: MedicationLabel.ADMINISTRATION }
 ]
 
 const Patient = () => {
@@ -149,7 +154,7 @@ const Patient = () => {
                 classes={{ selected: classes.selected }}
                 className={classes.tabTitle}
                 label="Médicaments"
-                value="medication"
+                value={ResourceType.MEDICATION_REQUEST}
                 component={Link}
                 to={`/patients/${patientId}/medication${location.search}`}
               />
@@ -200,6 +205,17 @@ const Patient = () => {
               }}
             />
           )}
+          {(selectedTab === ResourceType.MEDICATION_ADMINISTRATION ||
+            selectedTab === ResourceType.MEDICATION_REQUEST) && (
+            <Tabs
+              values={medicationTabs}
+              active={getMedicationTab(selectedTab)}
+              onchange={(value: MedicationTab) => {
+                setSelectedTab(value.id)
+                //setSearchParams({ ...existingParams, tabId: value.id })
+              }}
+            />
+          )}
           {selectedTab === 'preview' && (
             <PatientPreview patient={patient?.patientInfo} deidentifiedBoolean={deidentified} />
           )}
@@ -219,6 +235,8 @@ const Patient = () => {
             selectedTab === ResourceType.CONDITION ||
             selectedTab === ResourceType.PROCEDURE ||
             selectedTab === ResourceType.CLAIM ||
+            selectedTab === ResourceType.MEDICATION_ADMINISTRATION ||
+            selectedTab === ResourceType.MEDICATION_REQUEST ||
             (selectedTab === ResourceType.QUESTIONNAIRE_RESPONSE && !deidentified)) && (
             <ExplorationBoard
               deidentified={deidentified}
@@ -228,7 +246,7 @@ const Patient = () => {
           )}
           {/*selectedTab === 'documents' && <PatientDocs />*/}
           {/*selectedTab === 'pmsi' && <PatientPMSI />*/}
-          {ODD_MEDICATION && selectedTab === 'medication' && <PatientMedication />}
+          {/*ODD_MEDICATION && selectedTab === 'medication' && <PatientMedication />*/}
           {/*ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology />*/}
           {/*ODD_IMAGING && selectedTab === 'imaging' && <PatientImaging />*/}
           {/*ODD_FORMS && selectedTab === 'forms' && !deidentified && <PatientForms />*/}

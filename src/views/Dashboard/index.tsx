@@ -75,12 +75,11 @@ const Dashboard = ({ context }: DashboardProps) => {
           { label: 'Médicaments', value: ResourceType.MEDICATION_REQUEST, to: '/my-patients/medication' },
           { label: 'Biologie', value: ResourceType.OBSERVATION, to: '/my-patients/biology' },
           ODD_IMAGING && { label: 'Imagerie', value: ResourceType.IMAGING, to: '/my-patients/imaging' },
-          !
-            dashboard.deidentifiedBoolean && {
-              label: 'Formulaires',
-              value: ResourceType.QUESTIONNAIRE_RESPONSE,
-              to: `/my-patients/forms`
-            }
+          !dashboard.deidentifiedBoolean && {
+            label: 'Formulaires',
+            value: ResourceType.QUESTIONNAIRE_RESPONSE,
+            to: `/my-patients/forms`
+          }
         ].filter((e) => e) as Tabs[]
       case URLS.COHORT:
         return [
@@ -166,7 +165,6 @@ const Dashboard = ({ context }: DashboardProps) => {
     }
   }, [context, groupIds]) // eslint-disable-line
 
-
   const forceReload = () => {
     dispatch(fetchExploredCohort({ context, id: groupIds, forceReload: true }))
   }
@@ -242,12 +240,7 @@ const Dashboard = ({ context }: DashboardProps) => {
             <Tabs
               values={medicationTabs}
               active={getMedicationTab(selectedTab)}
-              onchange={(
-                value: TabType<
-                  ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST,
-                  MedicationLabel
-                >
-              ) => {
+              onchange={(value: MedicationTab) => {
                 setSelectedTab(value.id)
                 //setSearchParams({ ...existingParams, tabId: value.id })
               }}

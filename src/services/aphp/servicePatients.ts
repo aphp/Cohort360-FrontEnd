@@ -63,7 +63,8 @@ import {
   DocumentsFilters,
   BiologyFilters,
   ImagingFilters,
-  MaternityFormFilters
+  MaternityFormFilters,
+  MedicationFilters
 } from 'types/searchCriterias'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
@@ -195,26 +196,9 @@ export interface IServicePatients {
    */
 
   fetchMedication: (
-    page: number,
-    patientId: string,
-    selectedTab: ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST,
-    sortBy: Order,
-    sortDirection: Direction,
-    searchInput: string,
-    nda: string,
-    code: string,
-    selectedPrescriptionTypeIds: string[],
-    selectedAdministrationRouteIds: string[],
-    startDate: string | null,
-    endDate: string | null,
-    executiveUnits?: string[],
-    groupId?: string,
-    signal?: AbortSignal,
-    encounterStatus?: string[]
-  ) => Promise<{
-    medicationData?: MedicationEntry<MedicationAdministration | MedicationRequest>[]
-    medicationTotal?: number
-  }>
+    options: ResourceOptions<MedicationFilters>,
+    signal?: AbortSignal
+  ) => Promise<ExplorationResults<MedicationEntry<MedicationAdministration | MedicationRequest>>>
 
   /*
    ** Cette fonction permet de récupérer les élèments de Observation lié à un patient
@@ -521,77 +505,69 @@ const servicesPatients: IServicePatients = {
     return diagnosticsData
   },
 
-  fetchMedication: async (
-    page,
-    patientId,
-    selectedTab,
-    sortBy,
-    sortDirection,
-    searchInput,
-    nda,
-    code,
-    selectedPrescriptionTypeIds,
-    selectedAdministrationRouteIds,
-    startDate,
-    endDate,
-    executiveUnits,
-    groupId,
-    signal,
-    encounterStatus
-  ) => {
-    let medicationResp: AxiosResponse<FHIR_Bundle_Response<MedicationRequest | MedicationAdministration>> | null = null
+  fetchMedication: async (options, signal) => {
+    const {
+      type,
+      deidentified,
+      page,
+      searchCriterias: {
+        orderBy: { orderBy, orderDirection },
+        searchInput,
+        filters: { code, executiveUnits, nda, durationRange, encounterStatus, prescriptionTypes, administrationRoutes }
+      },
+      groupId,
+      patientId
+    } = options
 
-    switch (selectedTab) {
-      case ResourceType.MEDICATION_REQUEST:
-        medicationResp = await fetchMedicationRequest({
-          offset: page ? (page - 1) * 20 : 0,
-          size: 20,
-          _list: groupId ? [groupId] : [],
-          encounter: nda,
-          subject: patientId,
-          _text: searchInput,
-          _sort: sortBy,
-          sortDirection,
-          type: selectedPrescriptionTypeIds,
-          code,
-          minDate: startDate,
-          maxDate: endDate,
-          signal,
-          executiveUnits,
-          encounterStatus
-        })
-        break
-      case ResourceType.MEDICATION_ADMINISTRATION:
-        medicationResp = await fetchMedicationAdministration({
-          offset: page ? (page - 1) * 20 : 0,
-          size: 20,
-          _list: groupId ? [groupId] : [],
-          encounter: nda,
-          subject: patientId,
-          _text: searchInput,
-          _sort: sortBy,
-          sortDirection,
-          route: selectedAdministrationRouteIds,
-          minDate: startDate,
-          maxDate: endDate,
-          signal,
-          executiveUnits,
-          encounterStatus,
-          code
-        })
-        break
-      default:
-        medicationResp = null
-        break
+    const medicationResp =
+      type === ResourceType.MEDICATION_REQUEST
+        ? await fetchMedicationRequest({
+            offset: page ? (page - 1) * 20 : 0,
+            size: 20,
+            _list: groupId ? [groupId] : [],
+            encounter: nda,
+            subject: patientId,
+            _text: searchInput,
+            _sort: orderBy,
+            sortDirection: orderDirection,
+            type: prescriptionTypes?.map(({ id }) => id) ?? [],
+            code: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(','),
+            minDate: durationRange?.[0] ?? '',
+            maxDate: durationRange?.[1] ?? '',
+            signal,
+            executiveUnits: executiveUnits.map((unit) => unit.id),
+            encounterStatus: encounterStatus?.map(({ id }) => id)
+          })
+        : await fetchMedicationAdministration({
+            offset: page ? (page - 1) * 20 : 0,
+            size: 20,
+            _list: groupId ? [groupId] : [],
+            encounter: nda,
+            subject: patientId,
+            _text: searchInput,
+            _sort: orderBy,
+            sortDirection: orderDirection,
+            route: administrationRoutes?.map(({ id }) => id) ?? [],
+            minDate: durationRange?.[0] ?? '',
+            maxDate: durationRange?.[1] ?? '',
+            signal,
+            executiveUnits: executiveUnits.map((unit) => unit.id),
+            encounterStatus: encounterStatus?.map(({ id }) => id),
+            code: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(',')
+          })
+
+    const medicationData = getApiResponseResources<MedicationAdministration | MedicationRequest>(medicationResp) ?? []
+    const medicationTotal = medicationResp.data.resourceType === 'Bundle' ? medicationResp.data.total ?? 0 : 0
+    const medicationList = linkElementWithEncounter(
+      medicationData as (MedicationRequest | MedicationAdministration)[],
+      /* A REMPLACER hospits*/ [],
+      deidentified
+    )
+    return {
+      totalAllResults: medicationTotal,
+      total: medicationTotal,
+      list: medicationList
     }
-
-    if (medicationResp === null) return {}
-
-    const medicationData: (MedicationAdministration | MedicationRequest)[] | undefined =
-      getApiResponseResources(medicationResp)
-    const medicationTotal = medicationResp.data.resourceType === 'Bundle' ? medicationResp.data.total : 0
-
-    return { medicationData, medicationTotal }
   },
 
   fetchObservation: async (options, signal) => {
