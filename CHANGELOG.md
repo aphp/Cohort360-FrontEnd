@@ -1,6 +1,12 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [2.43.3](https://github.com/aphp/Cohort360-FrontEnd/compare/2.43.2..2.43.3) - 2025-02-25
+
+### 🐛 Bug Fixes
+
+- Resole error on form and fix tri on table - ([0bbba9b](https://github.com/aphp/Cohort360-FrontEnd/commit/0bbba9b7d347ba128c66a42eaa68c5aa1c89d38a))
+
 
 ## [2.43.2](https://github.com/aphp/Cohort360-FrontEnd/compare/2.43.1..2.43.2) - 2025-02-20
 
