@@ -3,7 +3,7 @@ import { Questionnaire } from 'fhir/r4'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { useEffect, useMemo, useState } from 'react'
 import useSearchCriterias, {
-  initAllDocsSearchCriterias,
+  initDocsSearchCriterias,
   initBioSearchCriterias,
   initFormsCriterias,
   initImagingCriterias,
@@ -65,7 +65,7 @@ const getInit = (type: ResourceType) => {
     case ResourceType.PATIENT:
       return initPatientsSearchCriterias()
     case ResourceType.DOCUMENTS:
-      return initAllDocsSearchCriterias()
+      return initDocsSearchCriterias()
     case ResourceType.OBSERVATION:
       return initBioSearchCriterias()
     case ResourceType.CONDITION:

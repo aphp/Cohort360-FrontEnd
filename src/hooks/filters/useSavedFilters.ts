@@ -1,12 +1,6 @@
 import { mapRequestParamsToSearchCriteria } from 'mappers/filters'
 import { useEffect, useState } from 'react'
-import {
-  deleteFilterService,
-  deleteFiltersService,
-  getFiltersService,
-  patchFiltersService,
-  postFiltersService
-} from 'services/aphp/servicePatients'
+import { getFiltersService, postFiltersService, deleteFiltersService, deleteFilterService, patchFiltersService } from 'services/aphp/serviceFilters'
 import { FetchStatus } from 'types'
 import { ResourceType } from 'types/requestCriterias'
 import { Filters, SavedFilter, SavedFiltersResults, SearchCriterias } from 'types/searchCriterias'

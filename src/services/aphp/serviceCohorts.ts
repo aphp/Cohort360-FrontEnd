@@ -204,14 +204,6 @@ export interface IServiceCohorts {
   ) => Promise<ExplorationResults<CohortQuestionnaireResponse>>
 
   /**
-   *
-   * Retourne le service de récupération de donnée en fonction de la ressource
-   */
-  getExplorationFetcher: (
-    resourceType: ResourceType,
-    isPatient: boolean
-  ) => (options: ResourceOptions<Filters>, signal?: AbortSignal) => Promise<Data>
-  /**
    * Permet de vérifier si le champ de recherche textuelle est correct
    *
    * Argument:
@@ -1072,42 +1064,6 @@ const servicesCohorts: IServiceCohorts = {
       }
     }
   },
-
-  getExplorationFetcher: (resourceType: ResourceType, isPatient: boolean) => {
-    switch (resourceType) {
-      case ResourceType.PATIENT:
-        return servicesCohorts.fetchPatientList
-      case ResourceType.QUESTIONNAIRE_RESPONSE: {
-        if (isPatient) return servicesPatients.fetchMaternityForms
-        return servicesCohorts.fetchFormsList
-      }
-      case ResourceType.CONDITION:
-      case ResourceType.CLAIM:
-      case ResourceType.PROCEDURE: {
-        if (isPatient) return servicesPatients.fetchPMSI
-        return servicesCohorts.fetchPMSIList
-      }
-      case ResourceType.DOCUMENTS: {
-        if (isPatient) return servicesPatients.fetchDocuments
-        return servicesCohorts.fetchDocuments
-      }
-      case ResourceType.MEDICATION_ADMINISTRATION:
-      case ResourceType.MEDICATION_REQUEST: {
-        if (isPatient) return servicesPatients.fetchMedication
-        return servicesCohorts.fetchMedicationList
-      }
-      case ResourceType.IMAGING: {
-        if (isPatient) return servicesPatients.fetchImaging
-        return servicesCohorts.fetchImagingList
-      }
-      case ResourceType.OBSERVATION: {
-        if (isPatient) return servicesPatients.fetchObservation
-        return servicesCohorts.fetchBiologyList
-      }
-    }
-    return servicesCohorts.fetchPatientList
-  },
-
   fetchDocumentContent: async (compositionId) => {
     const documentContent = await fetchDocumentReferenceContent(compositionId)
     return getApiResponseResource(documentContent)

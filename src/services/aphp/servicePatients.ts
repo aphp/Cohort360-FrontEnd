@@ -27,11 +27,6 @@ import {
   fetchMedicationAdministration,
   fetchObservation,
   fetchImaging,
-  postFilters,
-  getFilters,
-  deleteFilters,
-  patchFilters,
-  deleteFilter,
   fetchForms,
   fetchQuestionnaires
 } from './callApi'
@@ -56,10 +51,8 @@ import {
 import {
   Direction,
   FormNames,
-  Filters,
   Order,
   SearchByTypes,
-  SearchCriterias,
   DocumentsFilters,
   BiologyFilters,
   ImagingFilters,
@@ -67,7 +60,6 @@ import {
   MedicationFilters
 } from 'types/searchCriterias'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
-import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
 import { getExtension } from 'utils/fhir'
 import { ResourceOptions } from 'types/exploration'
 import services from '.'
@@ -712,48 +704,73 @@ const servicesPatients: IServicePatients = {
       }
     }
     const documentLines = 20 // Number of desired lines in the document array
-
-    const docsList = await fetchDocumentReference({
-      patient: patient?.patientInfo?.id,
-      _list: groupId ? [groupId] : [],
-      searchBy: searchBy,
-      _sort: orderBy.orderBy,
-      sortDirection: orderBy.orderDirection,
-      size: documentLines,
-      offset: page ? (page - 1) * documentLines : 0,
-      docStatuses: docStatuses.map((status) => status.id),
-      _text: searchInput,
-      highlight_search_results: searchBy === SearchByTypes.TEXT ? true : false,
-      type: docTypes.map((docType) => docType.code).join(','),
-      'encounter-identifier': nda,
-      onlyPdfAvailable: onlyPdfAvailable,
-      minDate: durationRange?.[0] ?? '',
-      maxDate: durationRange?.[1] ?? '',
-      signal: signal,
-      executiveUnits: executiveUnits.map((unit) => unit.id),
-      encounterStatus: encounterStatus?.map(({ id }) => id)
-    })
-
-    let documentsResponse: { docsTotal: number; docsList: DocumentReference[] } = {
-      docsTotal: 0,
-      docsList: []
-    }
-    if (docsList.data.resourceType === 'Bundle' && docsList.data.total) {
-      documentsResponse = {
-        docsTotal: docsList.data.total,
-        docsList: getApiResponseResources(docsList) ?? []
-      }
-    }
+    console.log(
+      'test atLeastFilter',
+      !!searchInput ||
+        docTypes.length > 0 ||
+        !!nda ||
+        !!durationRange[0] ||
+        !!durationRange[1] ||
+        executiveUnits.length > 0 ||
+        docStatuses.length > 0 ||
+        !!onlyPdfAvailable ||
+        encounterStatus.length > 0
+    )
+    const [docsList, allDocsList] = await Promise.all([
+      fetchDocumentReference({
+        patient: patient?.patientInfo?.id,
+        _list: groupId ? [groupId] : [],
+        searchBy: searchBy,
+        _sort: orderBy.orderBy,
+        sortDirection: orderBy.orderDirection,
+        size: documentLines,
+        offset: page ? (page - 1) * documentLines : 0,
+        docStatuses: docStatuses.map((status) => status.id),
+        _text: searchInput,
+        highlight_search_results: searchBy === SearchByTypes.TEXT ? true : false,
+        type: docTypes.map((docType) => docType.code).join(','),
+        'encounter-identifier': nda,
+        onlyPdfAvailable: onlyPdfAvailable,
+        minDate: durationRange?.[0] ?? '',
+        maxDate: durationRange?.[1] ?? '',
+        signal: signal,
+        executiveUnits: executiveUnits.map((unit) => unit.id),
+        encounterStatus: encounterStatus?.map(({ id }) => id)
+      }),
+      !!searchInput ||
+      docTypes.length > 0 ||
+      !!nda ||
+      !!durationRange[0] ||
+      !!durationRange[1] ||
+      executiveUnits.length > 0 ||
+      docStatuses.length > 0 ||
+      !!onlyPdfAvailable ||
+      encounterStatus.length > 0
+        ? fetchDocumentReference({
+            patient: patient?.patientInfo?.id,
+            signal: signal,
+            _list: groupId ? [groupId] : [],
+            size: 0,
+            uniqueFacet: ['subject']
+          })
+        : null
+    ])
+    const docsResponse = getApiResponseResources(docsList) ?? []
     const documentsList = linkElementWithEncounter(
-      documentsResponse.docsList as DocumentReference[],
+      docsResponse as DocumentReference[],
       patient?.hospits?.list ?? [],
       deidentified
     )
+    const totalDocs = docsList?.data?.resourceType === 'Bundle' ? docsList.data.total ?? 0 : 0
+    const totalAllDocs = allDocsList
+      ? allDocsList?.data?.resourceType === 'Bundle'
+        ? allDocsList.data.total ?? 0
+        : 0
+      : totalDocs
 
     return {
-      totalAllResults: patient?.documents?.total,
-      total:
-        /*A VERIFIER patientState?.documents?.total ? patientState?.documents?.total :*/ documentsResponse.docsTotal,
+      totalAllResults: totalAllDocs,
+      total: totalDocs,
       list: documentsList
     }
   },
@@ -864,49 +881,4 @@ export const getEncounterDocuments = async (
   }
 
   return _encounters
-}
-
-export const postFiltersService = async (
-  fhir_resource: ResourceType,
-  name: string,
-  criterias: SearchCriterias<Filters>,
-  deidentified: boolean
-) => {
-  const criteriasString = mapSearchCriteriasToRequestParams(criterias, fhir_resource, deidentified)
-  const response = await postFilters(fhir_resource, name, criteriasString)
-  if (response.status < 200 || response.status >= 300) throw new Error()
-  return response.data
-}
-
-export const getFiltersService = async (fhir_resource: ResourceType, next?: string | null, limit = 10) => {
-  const LIMIT = limit
-  const OFFSET = 0
-  const response = await getFilters(fhir_resource, LIMIT, OFFSET, next)
-  if (response.status < 200 || response.status >= 300) throw new Error()
-  return response.data
-}
-
-export const deleteFilterService = async (fhir_resource_uuid: string) => {
-  const response = await deleteFilter(fhir_resource_uuid)
-  if (response.status < 200 || response.status >= 300) throw new Error()
-  return response
-}
-
-export const deleteFiltersService = async (fhir_resource_uuids: string[]) => {
-  const response = await deleteFilters(fhir_resource_uuids)
-  if (response.status < 200 || response.status >= 300) throw new Error()
-  return response
-}
-
-export const patchFiltersService = async (
-  fhir_resource: ResourceType,
-  uuid: string,
-  name: string,
-  criterias: SearchCriterias<Filters>,
-  deidentified: boolean
-) => {
-  const criteriasString = mapSearchCriteriasToRequestParams(criterias, fhir_resource, deidentified)
-  const response = await patchFilters(fhir_resource, uuid, name, criteriasString)
-  if (response.status < 200 || response.status >= 300) throw new Error()
-  return response
 }

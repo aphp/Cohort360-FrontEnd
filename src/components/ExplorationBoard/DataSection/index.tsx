@@ -71,7 +71,8 @@ const DataSection = ({
           )
         })()}
       {isLoading && <CircularProgress />}
-      {!isLoading && isPatient && 
+      {!isLoading &&
+        isPatient &&
         type === ResourceType.QUESTIONNAIRE_RESPONSE &&
         (() => (
           <Timeline
@@ -84,12 +85,20 @@ const DataSection = ({
           {data.table.rows.length < 1 && <Typography variant="button">Aucune donnée à afficher</Typography>}
           {data.table.rows.length > 0 && (
             <Grid container gap={2} alignItems="center">
-              {count?.ressource && (
-                <DisplayDigits nb={count.ressource.results} total={count.ressource.total} label={'élément(s)'} />
+              {count && (
+                <DisplayDigits
+                  nb={count.ressource.results ?? 0}
+                  total={count.ressource.total ?? 0}
+                  label={'élément(s)'}
+                />
               )}
-              {count?.ressource && count.patients && <Typography fontSize={15}>concernant</Typography>}
-              {count?.patients && (
-                <DisplayDigits nb={count.patients.results} total={count.patients.total} label={'patient(s)'} />
+              {!isPatient && count && <Typography fontSize={15}>concernant</Typography>}
+              {!isPatient && count && (
+                <DisplayDigits
+                  nb={count.patients.results ?? 0}
+                  total={count.patients.total ?? 0}
+                  label={'patient(s)'}
+                />
               )}
 
               <DataTable value={data.table} orderBy={orderBy} onSort={onSort} />
