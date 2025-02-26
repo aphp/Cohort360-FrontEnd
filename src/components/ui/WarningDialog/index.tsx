@@ -18,7 +18,7 @@ const WarningDialog = () => {
   }
 
   return (
-    <Dialog open={isOpen} onClose={handleClose}>
+    <Dialog open={isOpen}>
       <DialogContent style={{ paddingBottom: 0 }}>
         <Grid container alignItems={'center'}>
           <Grid item xs={2}>

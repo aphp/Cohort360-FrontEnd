@@ -100,6 +100,8 @@ const ExportTable: React.FC<ExportTableProps> = ({
       setCount(count)
       setCountLoading(false)
     } catch (error) {
+      setError(exportTable.name, Error.ERROR_FETCH)
+      setCountLoading(false)
       console.error(error)
     }
   }, [cohortId, exportTableResourceType, tableSetting?.fhirFilter])
@@ -251,7 +253,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
               disableCloseOnSelect
               options={['Tous selectionner', ...exportColumns]}
               onChange={(event, newValue) => {
-                if (newValue.includes('Tous selectionner')) {
+                if (newValue.includes('Tous sélectionner')) {
                   if (tableSetting?.columns?.length === exportColumns.length) {
                     onChangeTableSettings(exportTable.name, 'columns', null)
                   } else {
@@ -334,7 +336,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
             }}
           />
           <Typography color={tableSetting?.isChecked ? 'rgba(0, 0, 0, 0.8)' : '#888'} fontSize={13} fontWeight={600}>
-            Positionner les questions en colonnes "Pivot" (desactive la selection des colonnes a exporter)
+            Positionner les questions en colonnes "Pivot" (désactive la sélection des colonnes à exporter)
           </Typography>
         </Grid>
       )}

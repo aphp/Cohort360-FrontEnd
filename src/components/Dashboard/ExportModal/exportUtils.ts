@@ -14,6 +14,7 @@ import {
   fetchProcedure
 } from 'services/aphp/callApi'
 import { ExportCSVTable } from 'types'
+import { TableInfo } from 'types/export'
 import { ResourceType } from 'types/requestCriterias'
 import {
   BiologyFilters,
@@ -518,4 +519,12 @@ export const getExportTableLabel = (tableName: string) => {
     QuestionnaireResponse: 'Formulaires'
   }[tableName]
   return tableLabel ?? '-'
+}
+
+export const sortTables = (tables: TableInfo[]): TableInfo[] => {
+  return tables.sort((a, b) => {
+    if (a.name === 'person') return -1
+    if (b.name === 'person') return 1
+    return a.name.localeCompare(b.name)
+  })
 }
