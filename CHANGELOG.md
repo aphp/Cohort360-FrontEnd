@@ -1,6 +1,12 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [2.43.5](https://github.com/aphp/Cohort360-FrontEnd/compare/2.43.3..2.43.5) - 2025-02-26
+
+### 🐛 Bug Fixes
+
+- Manage count error and modify cohort selection flow - ([8e4cd3f](https://github.com/aphp/Cohort360-FrontEnd/commit/8e4cd3f5bfa9081373524544badf758afe483b1d))
+
 ## [2.43.3](https://github.com/aphp/Cohort360-FrontEnd/compare/2.43.2..2.43.3) - 2025-02-25
 
 ### 🐛 Bug Fixes
