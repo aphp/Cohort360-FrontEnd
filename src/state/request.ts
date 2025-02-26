@@ -265,6 +265,10 @@ const setRequestSlice = createSlice({
     clearRequest: () => {
       return defaultInitialState
     },
+    setRequestsList: (state, action) => {
+      state.requestsList = action.payload.requestsList
+      state.count = action.payload.count
+    },
     setSelectedRequest: (state: RequestState, action: PayloadAction<RequestType | null>) => {
       const requestsList: RequestType[] = state.requestsList ?? []
       const selectedRequest = action.payload
@@ -360,4 +364,4 @@ const setRequestSlice = createSlice({
 
 export default setRequestSlice.reducer
 export { fetchRequests, addRequest, editRequest, deleteRequest, moveRequests, deleteRequests }
-export const { clearRequest, setSelectedRequest, setSelectedRequestShare } = setRequestSlice.actions
+export const { clearRequest, setRequestsList, setSelectedRequest, setSelectedRequestShare } = setRequestSlice.actions

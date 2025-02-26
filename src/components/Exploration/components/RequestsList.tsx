@@ -193,7 +193,6 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
                     title="Supprimer le projet"
                     icon={<DeleteIcon />}
                     onClick={() => setOpenDeletionModal(true)}
-                    // TODO: rendre vraiment rose, là ça marche po
                     color="#ed6d91"
                   />
                 </>

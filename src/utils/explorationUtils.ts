@@ -1,8 +1,29 @@
-import { Cohort, CohortJobStatus, QuerySnapshotInfo, RequestType, ValueSet } from 'types'
+import { Cohort, CohortJobStatus, ProjectType, QuerySnapshotInfo, RequestType, ValueSet } from 'types'
 import { CohortsType } from 'types/cohorts'
 import { Direction, FilterKeys, FilterValue, Order } from 'types/searchCriterias'
 import displayDigit from './displayDigit'
 import { SetURLSearchParams } from 'react-router-dom'
+
+export const replaceItem = <T extends ProjectType | RequestType | Cohort>(item: T, itemsList: T[]) => {
+  const index = itemsList.findIndex(({ uuid }) => uuid === item.uuid)
+  if (index === -1) {
+    return itemsList
+  }
+  const newList = [...itemsList]
+  newList[index] = item
+  return newList
+}
+
+export const replaceParentFolder = (items: RequestType[], itemsList: RequestType[], parent: ProjectType) => {
+  return items.reduce(
+    (acc, item) => replaceItem({ ...item, parent_folder: { name: parent.name, uuid: parent.uuid } }, acc),
+    itemsList
+  )
+}
+
+export const deleteElements = <T extends ProjectType | RequestType | Cohort>(itemsToDelete: T[], itemsList: T[]) => {
+  return itemsList.filter((item) => !itemsToDelete.some(({ uuid }) => uuid === item.uuid))
+}
 
 export const getCohortsConfirmDeletionTitle = (quantity = 1) => {
   const correctWording = quantity <= 1 ? 'une cohorte' : 'des cohortes'
@@ -149,16 +170,21 @@ export const getGlobalEstimation = (cohort: Cohort) => {
 }
 
 export const getExportTooltip = (cohort: Cohort, isExportable: boolean) => {
-  if (!cohort.exportable) {
-    return 'Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé'
-  } else if (!isExportable && cohort.request_job_status === CohortJobStatus.FINISHED) {
-    return "Vous n'avez pas les droits suffisants pour exporter cette cohorte"
-  } else if (cohort.request_job_status === CohortJobStatus.FAILED) {
+  if (cohort.request_job_status === CohortJobStatus.FAILED) {
     return 'Cette cohorte ne peut pas être exportée car elle a échoué lors de sa création'
-  } else if (cohort.request_job_status === CohortJobStatus.PENDING) {
+  } else if (
+    cohort.request_job_status === CohortJobStatus.PENDING ||
+    cohort.request_job_status === CohortJobStatus.LONG_PENDING
+  ) {
     return 'Cette cohorte ne peut pas être exportée car elle est en cours de création'
-  } else {
-    return 'Exporter la cohorte'
+  } else if (cohort.request_job_status === CohortJobStatus.FINISHED) {
+    if (!isExportable) {
+      return "Vous n'avez pas les droits suffisants pour exporter cette cohorte"
+    } else {
+      return 'Exporter la cohorte'
+    }
+  } else if (!cohort.exportable) {
+    return 'Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé'
   }
 }
 

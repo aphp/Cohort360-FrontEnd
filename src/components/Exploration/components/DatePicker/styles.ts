@@ -1,3 +1,4 @@
+import { inputBaseClasses, outlinedInputClasses } from '@mui/material'
 import { makeStyles } from 'tss-react/mui'
 
 const useStyles = makeStyles()(() => ({
@@ -11,7 +12,9 @@ const useStyles = makeStyles()(() => ({
     },
     '& fieldset': {
       borderColor: '#e9e9ed'
-      // TODO: ajouter couleur pour hover
+    },
+    [`& .${inputBaseClasses.root}:hover .${outlinedInputClasses.notchedOutline}`]: {
+      borderColor: '#D1D1D9 !important'
     },
     '& button': {
       color: '#153d8ab3'

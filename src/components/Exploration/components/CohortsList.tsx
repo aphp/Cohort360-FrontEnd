@@ -236,7 +236,6 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
                     title="Supprimer la requête"
                     icon={<DeleteIcon />}
                     onClick={() => setOpenDeletionModal(true)}
-                    // TODO: rendre vraiment rose, là ça marche po
                     color={'#ed6d91'}
                   />
                 </>

@@ -5,7 +5,6 @@ import { ProjectType } from 'types'
 import { logout, login, impersonate } from './me'
 
 import services from 'services/aphp'
-import { Direction, Order } from 'types/searchCriterias'
 
 export type ProjectState = {
   loading: boolean
@@ -182,8 +181,8 @@ const setProjectSlice = createSlice({
   initialState: defaultInitialState,
   reducers: {
     setProjectsList: (state, action) => {
-      state.projectsList = action.payload.data
-      state.count = action.payload.data
+      state.projectsList = action.payload.projectsList
+      state.count = action.payload.count
     },
     clearProject: () => {
       return defaultInitialState
