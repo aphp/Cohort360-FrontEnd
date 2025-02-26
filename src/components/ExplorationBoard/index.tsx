@@ -51,28 +51,15 @@ const ExplorationBoard = ({ deidentified = true, type, groupId, patient, message
     console.log('test patient', patient)
   }, [data])
 
-  // Garder la donnée du total au premier chargement
-  // Vérifier les données manquantes du state dans servicePatientsd.fetchDocuments
-  // double fetch au chargement de la ressource ?? peut-être normal
-  // IPP et NDA non trouvé en mode deidentified dans le tableau PMSI
-  // dernier lieu prise en charge non trouvé en mode deidentified dans le tableau Patients
-  // searchParams à verifier pour l'url
-  // ne pas oublier d'afficher les msg d'avertissement
-  // => const _groupId = groupId ? `?groupId=${groupId}` : ''
-  // => const _search = search ? `&search=${search}` : ''
-  // => pmsiTabs
   // supprimer multiple dans le type Column
   // Supprimer StartDate et EndDate quand tâche terminée
   // Label ExecutiveUnits n'est pas en gras
-  // double fetch au chargement de la ressource ?? peut-être normal
-  // IPP et NDA non trouvé en mode deidentified dans le tableau PMSI
-  // dernier lieu prise en charge non trouvé en mode deidentified dans le tableau Patients
   // searchParams à verifier pour l'url
   // => const _groupId = groupId ? `?groupId=${groupId}` : ''
   // => const _search = search ? `&search=${search}` : ''
-  // => pmsiTabs
-  // peut etre un bug où les réferentiels des codes ne sont pas présents (observé sur Biology mais semble random)
+  // => erreur sur les pmsiTabs / medicationTabs
   // Vérifier ce qu'on fait pour l'afichage des champs des filtres sauvegardés quand on passe de pseudo à nomi
+  // L'option Documents dont les pdf sont disponibles n'est dispo que en non pseudo
   return (
     <Grid item xs={12} container gap="25px" padding="50px" sx={{ backgroundColor: '#fff' }}>
       <SearchSection

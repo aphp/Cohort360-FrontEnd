@@ -1,8 +1,8 @@
 import { CanceledError } from 'axios'
-import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
+import { DocumentReference, ImagingStudy, MedicationAdministration, MedicationRequest } from 'fhir/r4'
 import { map } from 'mappers/exploration'
 import { useEffect, useState } from 'react'
-import servicesCohorts from 'services/aphp/serviceCohorts'
+import { getExplorationFetcher } from 'services/aphp/serviceExploration'
 import { PatientState } from 'state/patient'
 import {
   CohortComposition,
@@ -25,21 +25,21 @@ export type Data =
   | ExplorationResults<
       | CohortPMSI
       | CohortObservation
-      | CohortImaging
+      | ImagingStudy
       | CohortQuestionnaireResponse
       | CohortMedication<MedicationRequest | MedicationAdministration>
-      | CohortComposition
+      | DocumentReference
     >
 
 export type ExplorationCount = {
   ressource: {
-    results?: number
-    total?: number
-  } | null
+    results: number | null
+    total: number | null
+  }
   patients: {
-    results: number
-    total: number
-  } | null
+    results: number | null
+    total: number | null
+  }
 }
 
 const RESULTS_PER_PAGE = 20
@@ -61,7 +61,7 @@ export const useData = (
   const fetchData = async (page: number) => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
-      const fetcher = servicesCohorts.getExplorationFetcher(type, !!patient)
+      const fetcher = getExplorationFetcher(type, !!patient)
       const results = await fetcher({
         page,
         searchCriterias,
@@ -97,14 +97,11 @@ export const useData = (
         searchCriterias.searchBy === SearchByTypes.TEXT
       setTableData(map(data, type, deidentified, !!patient, groupId, hasSearch))
       const count: ExplorationCount = {
-        ressource: null,
-        patients:
-          data.totalPatients && data.totalAllPatients
-            ? {
-                results: data.totalPatients,
-                total: data.totalAllPatients
-              }
-            : null
+        ressource: { results: null, total: null },
+        patients: {
+          results: data.totalPatients,
+          total: data.totalAllPatients
+        }
       }
       if (!isPatientsResponse(data)) count.ressource = { results: data.total, total: data.totalAllResults }
       setPagination({

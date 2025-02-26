@@ -1,5 +1,8 @@
+import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
 import apiBackend from 'services/apiBackend'
 import { ResourceType } from 'types/requestCriterias'
+import { deleteFilter, deleteFilters, getFilters, patchFilters, postFilters } from './callApi'
+import { Filters, SearchCriterias } from 'types/searchCriterias'
 
 export const getProviderFilters = async (provider_source_value?: string, fhir_resource?: ResourceType) => {
   if (!provider_source_value || !fhir_resource) {
@@ -15,4 +18,49 @@ export const getProviderFilters = async (provider_source_value?: string, fhir_re
   }
 
   return filtersResp.data.results ?? []
+}
+
+export const postFiltersService = async (
+  fhir_resource: ResourceType,
+  name: string,
+  criterias: SearchCriterias<Filters>,
+  deidentified: boolean
+) => {
+  const criteriasString = mapSearchCriteriasToRequestParams(criterias, fhir_resource, deidentified)
+  const response = await postFilters(fhir_resource, name, criteriasString)
+  if (response.status < 200 || response.status >= 300) throw new Error()
+  return response.data
+}
+
+export const getFiltersService = async (fhir_resource: ResourceType, next?: string | null, limit = 10) => {
+  const LIMIT = limit
+  const OFFSET = 0
+  const response = await getFilters(fhir_resource, LIMIT, OFFSET, next)
+  if (response.status < 200 || response.status >= 300) throw new Error()
+  return response.data
+}
+
+export const deleteFilterService = async (fhir_resource_uuid: string) => {
+  const response = await deleteFilter(fhir_resource_uuid)
+  if (response.status < 200 || response.status >= 300) throw new Error()
+  return response
+}
+
+export const deleteFiltersService = async (fhir_resource_uuids: string[]) => {
+  const response = await deleteFilters(fhir_resource_uuids)
+  if (response.status < 200 || response.status >= 300) throw new Error()
+  return response
+}
+
+export const patchFiltersService = async (
+  fhir_resource: ResourceType,
+  uuid: string,
+  name: string,
+  criterias: SearchCriterias<Filters>,
+  deidentified: boolean
+) => {
+  const criteriasString = mapSearchCriteriasToRequestParams(criterias, fhir_resource, deidentified)
+  const response = await patchFilters(fhir_resource, uuid, name, criteriasString)
+  if (response.status < 200 || response.status >= 300) throw new Error()
+  return response
 }

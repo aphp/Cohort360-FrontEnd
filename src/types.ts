@@ -289,10 +289,10 @@ export type CohortResults<T> = {
 }
 
 export type ExplorationResults<T> = {
-  total?: number
-  totalAllResults?: number
-  totalPatients?: number
-  totalAllPatients?: number
+  total: number | null
+  totalAllResults: number | null
+  totalPatients: number | null
+  totalAllPatients: number | null
   list: T[]
 }
 

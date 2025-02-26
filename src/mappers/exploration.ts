@@ -419,8 +419,8 @@ const mapImagingToRows = (
         id: `${elem.id}-ipp`,
         value: elem.IPP
           ? {
-              label: elem.idPatient,
-              url: `/patients/${elem.IPP}${groupId ? `?groupId=${groupId}` : ''}`
+              label: elem.IPP,
+              url: `/patients/${elem.idPatient}${groupId ? `?groupId=${groupId}` : ''}`
             }
           : 'Non renseigné',
         type: elem.IPP ? CellType.LINK : CellType.TEXT

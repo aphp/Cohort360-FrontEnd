@@ -125,26 +125,7 @@ export const initBioSearchCriterias = (): SearchCriterias<BiologyFilters> => ({
   }
 })
 
-export const initPatientDocsSearchCriterias: SearchCriterias<DocumentsFilters> = {
-  orderBy: {
-    orderBy: Order.DATE,
-    orderDirection: Direction.DESC
-  },
-  searchInput: '',
-  searchBy: SearchByTypes.TEXT,
-  filters: {
-    nda: '',
-    docStatuses: [],
-    docTypes: [],
-    onlyPdfAvailable: true,
-    startDate: null,
-    endDate: null,
-    executiveUnits: [],
-    encounterStatus: []
-  }
-}
-
-export const initAllDocsSearchCriterias = (): SearchCriterias<DocumentsFilters> => ({
+export const initDocsSearchCriterias = (): SearchCriterias<DocumentsFilters> => ({
   orderBy: {
     orderBy: Order.DATE,
     orderDirection: Direction.DESC
