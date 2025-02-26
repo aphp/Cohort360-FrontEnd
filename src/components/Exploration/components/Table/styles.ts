@@ -10,7 +10,6 @@ export const TableCellWrapper = styled(TableCell)<CustomProps>(({ align = 'cente
   lineHeight: '1rem',
   [`&.${tableCellClasses.head}`]: {
     borderBottom: 0,
-    // TODO: ajouter pour head et body des variants pour exploration et les autres (quoi que Alizé a fait son composant générique??)
     backgroundColor: '#e6f1fd',
     // backgroundColor: '#153d8a',
     color: '#153d8a',

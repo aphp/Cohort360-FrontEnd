@@ -28,7 +28,7 @@ const MoveRequest = ({ open, onClose, selectedRequests }: MoveRequestProps) => {
   const moveRequestMutation = useMoveRequest()
 
   const _onConfirm = async () => {
-    moveRequestMutation.mutate({ selectedRequests, parentId: selectedFolder?.uuid as string })
+    moveRequestMutation.mutate({ selectedRequests, parent: selectedFolder as ProjectType })
     onClose()
   }
 
