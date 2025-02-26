@@ -2,7 +2,7 @@ import { makeStyles } from 'tss-react/mui'
 
 const useStyles = makeStyles()(() => ({
   selectedCohortGrid: {
-    marginTop: '3em'
+    marginBottom: '3em'
   },
   selectedCohortTypography: {
     marginTop: '0.35em'

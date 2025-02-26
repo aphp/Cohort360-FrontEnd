@@ -1170,7 +1170,12 @@ export const fetchCohortInfo = async (cohortId: string) => {
 }
 
 export const fetchExportableCohorts = async () => {
-  const response = await apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?exportable=true`)
+  const response = await apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?exportable=true&limit=-1`)
+  return response.data.results
+}
+
+export const fetchExportableCohort = async (cohortId: string) => {
+  const response = await apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?group_id=${cohortId}`)
   return response.data.results
 }
 
