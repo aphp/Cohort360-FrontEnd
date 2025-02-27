@@ -1,10 +1,18 @@
 import { ResourceOptions } from 'types/exploration'
-import { BiologyFilters, DocumentsFilters, Filters, ImagingFilters, SearchByTypes } from 'types/searchCriterias'
+import {
+  BiologyFilters,
+  DocumentsFilters,
+  Filters,
+  FormNames,
+  ImagingFilters,
+  MaternityFormFilters,
+  SearchByTypes
+} from 'types/searchCriterias'
 import services from '.'
-import { fetchDocumentReference, fetchImaging, fetchObservation } from './callApi'
+import { fetchDocumentReference, fetchForms, fetchImaging, fetchObservation } from './callApi'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import { linkElementWithEncounter } from 'state/patient'
-import { Bundle, DocumentReference, FhirResource, ImagingStudy, Observation } from 'fhir/r4'
+import { Bundle, DocumentReference, FhirResource, ImagingStudy, Observation, QuestionnaireResponse } from 'fhir/r4'
 import { CohortComposition, CohortImaging, ExplorationResults, FHIR_API_Response } from 'types'
 import { SearchInputError } from 'types/error'
 import { ResourceType } from 'types/requestCriterias'
@@ -16,6 +24,8 @@ import { getExtension } from 'utils/fhir'
 import { AxiosResponse } from 'axios'
 import { linkToDiagnosticReport } from './serviceImaging'
 import { atLeastOneSearchCriteria } from 'utils/filters'
+import { getFormName } from 'utils/formUtils'
+import { sortByDateKey } from 'utils/formatDate'
 
 export const getExplorationFetcher = (
   resourceType: ResourceType,
@@ -24,10 +34,8 @@ export const getExplorationFetcher = (
   switch (resourceType) {
     case ResourceType.PATIENT:
       return servicesCohorts.fetchPatientList
-    case ResourceType.QUESTIONNAIRE_RESPONSE: {
-      if (isPatient) return servicesPatients.fetchMaternityForms
-      return servicesCohorts.fetchFormsList
-    }
+    case ResourceType.QUESTIONNAIRE_RESPONSE:
+      return fetchFormsList
     case ResourceType.CONDITION:
     case ResourceType.CLAIM:
     case ResourceType.PROCEDURE: {
@@ -268,5 +276,70 @@ export const fetchBiologyList = async (
       : results.total
   results.totalPatients = getPatientsCount(biologyList)
   results.totalAllPatients = allBiologyList ? getPatientsCount(allBiologyList) : results.totalPatients
+  return results
+}
+
+export const fetchFormsList = async (
+  options: ResourceOptions<MaternityFormFilters>,
+  signal?: AbortSignal
+): Promise<ExplorationResults<QuestionnaireResponse>> => {
+  const {
+    page,
+    searchCriterias: {
+      orderBy,
+      filters: { ipp, formName, durationRange, executiveUnits, encounterStatus }
+    },
+    groupId,
+    patient
+  } = options
+  const size = 20
+  const [formsList, allFormsList] = await Promise.all([
+    fetchForms({
+      _list: groupId ? [groupId] : [],
+      size,
+      offset: page ? (page - 1) * size : 0,
+      order: orderBy.orderBy,
+      orderDirection: orderBy.orderDirection,
+      ipp,
+      startDate: durationRange?.[0] ?? '',
+      endDate: durationRange?.[1] ?? '',
+      signal: signal,
+      executiveUnits: executiveUnits.map((unit) => unit.id),
+      encounterStatus: encounterStatus.map((status) => status.id),
+      formName: formName.join(','),
+      uniqueFacet: ['subject'],
+      patient: patient?.patientInfo?.id
+    }),
+    atLeastOneSearchCriteria(options.searchCriterias)
+      ? fetchForms({
+          _list: groupId ? [groupId] : [],
+          size: 0,
+          signal: signal,
+          uniqueFacet: ['subject'],
+          patient: patient?.patientInfo?.id
+        })
+      : null
+  ])
+  const results: ExplorationResults<QuestionnaireResponse> = {
+    totalAllResults: null,
+    total: null,
+    totalAllPatients: null,
+    totalPatients: null,
+    list: []
+  }
+  const formsResponse = getApiResponseResources(formsList) ?? []
+  const filledFormsList = await getResourceInfos(formsResponse, false, groupId, signal)
+  const questionnaires = await services.patients.fetchQuestionnaires()
+  results.list = patient
+    ? sortByDateKey(linkElementWithEncounter(formsResponse, patient?.hospits?.list ?? [], false), 'authored')
+    : (filledFormsList.map((elem) => ({
+        ...elem,
+        formName: getFormName(elem as QuestionnaireResponse, questionnaires)
+      })) as QuestionnaireResponse[])
+  results.total = formsList?.data?.resourceType === 'Bundle' ? formsList.data.total ?? 0 : 0
+  results.totalAllResults =
+    allFormsList && allFormsList?.data?.resourceType === 'Bundle' ? allFormsList.data.total ?? null : results.total
+  results.totalPatients = getPatientsCount(formsList)
+  results.totalAllPatients = allFormsList ? getPatientsCount(allFormsList) : results.totalPatients
   return results
 }

@@ -11,7 +11,7 @@ import {
   SearchCriterias
 } from 'types/searchCriterias'
 import { removeKeys } from './map'
-import { MedicationRequest, MedicationAdministration } from 'fhir/r4'
+import { MedicationRequest, MedicationAdministration, QuestionnaireResponse, ImagingStudy, Observation, DocumentReference } from 'fhir/r4'
 import {
   ExplorationResults,
   CohortPMSI,
@@ -133,17 +133,17 @@ export const isPmsi = (data: ExplorationResults<any>): data is ExplorationResult
 
 export const isQuestionnaire = (
   data: ExplorationResults<any>
-): data is ExplorationResults<CohortQuestionnaireResponse> => {
+): data is ExplorationResults<QuestionnaireResponse> => {
   const type = data.list[0].resourceType
   return type === ResourceType.QUESTIONNAIRE_RESPONSE
 }
 
-export const isImaging = (data: ExplorationResults<any>): data is ExplorationResults<CohortImaging> => {
+export const isImaging = (data: ExplorationResults<any>): data is ExplorationResults<ImagingStudy> => {
   const type = data.list[0].resourceType
   return type === ResourceType.IMAGING
 }
 
-export const isBiology = (data: ExplorationResults<any>): data is ExplorationResults<CohortObservation> => {
+export const isBiology = (data: ExplorationResults<any>): data is ExplorationResults<Observation> => {
   const type = data.list[0].resourceType
   return type === ResourceType.OBSERVATION
 }
@@ -155,7 +155,7 @@ export const isMedication = (
   return type === ResourceType.MEDICATION_ADMINISTRATION || type === ResourceType.MEDICATION_REQUEST
 }
 
-export const isDocuments = (data: ExplorationResults<any>): data is ExplorationResults<CohortComposition> => {
+export const isDocuments = (data: ExplorationResults<any>): data is ExplorationResults<DocumentReference> => {
   const type = data.list[0].resourceType
   return type === ResourceType.DOCUMENTS
 }

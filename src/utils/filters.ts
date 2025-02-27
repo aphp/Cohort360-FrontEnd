@@ -288,6 +288,7 @@ export const atLeastOneSearchCriteria = (searchCriterias: SearchCriterias<Filter
     ('modality' in filters && filters.modality?.length > 0) ||
     ('docTypes' in filters && filters.docTypes?.length > 0) ||
     ('docStatuses' in filters && filters.docStatuses?.length > 0) ||
-    ('onlyPdfAvailable' in filters && !!filters.onlyPdfAvailable)
+    ('onlyPdfAvailable' in filters && !!filters.onlyPdfAvailable) ||
+    ('formName' in filters && filters.formName.length > 0)
   )
 }
