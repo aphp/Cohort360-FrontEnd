@@ -62,6 +62,7 @@ const ExplorationBoard = ({ type, deidentified, groupId, patient, messages }: Ex
   // Vérifier ce qu'on fait pour l'afichage des champs des filtres sauvegardés quand on passe de pseudo à nomi
   // L'option Documents dont les pdf sont disponibles n'est dispo que en non pseudo
   // Les champs ipp ne doivent plus apparaitre dans l'exploration d'un patient
+  // TOUS LES TYPES des réponses du service et de useData sont mauvais!!
   return (
     <Grid item xs={12} container gap="25px" padding="50px" sx={{ backgroundColor: '#fff' }}>
       <SearchSection

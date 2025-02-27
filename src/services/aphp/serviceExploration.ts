@@ -6,13 +6,30 @@ import {
   FormNames,
   ImagingFilters,
   MaternityFormFilters,
+  MedicationFilters,
   SearchByTypes
 } from 'types/searchCriterias'
 import services from '.'
-import { fetchDocumentReference, fetchForms, fetchImaging, fetchObservation } from './callApi'
+import {
+  fetchDocumentReference,
+  fetchForms,
+  fetchImaging,
+  fetchMedicationAdministration,
+  fetchMedicationRequest,
+  fetchObservation
+} from './callApi'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import { linkElementWithEncounter } from 'state/patient'
-import { Bundle, DocumentReference, FhirResource, ImagingStudy, Observation, QuestionnaireResponse } from 'fhir/r4'
+import {
+  Bundle,
+  DocumentReference,
+  FhirResource,
+  ImagingStudy,
+  MedicationAdministration,
+  MedicationRequest,
+  Observation,
+  QuestionnaireResponse
+} from 'fhir/r4'
 import { CohortComposition, CohortImaging, ExplorationResults, FHIR_API_Response } from 'types'
 import { SearchInputError } from 'types/error'
 import { ResourceType } from 'types/requestCriterias'
@@ -26,6 +43,7 @@ import { linkToDiagnosticReport } from './serviceImaging'
 import { atLeastOneSearchCriteria } from 'utils/filters'
 import { getFormName } from 'utils/formUtils'
 import { sortByDateKey } from 'utils/formatDate'
+import { mapMedicationToOrderByCode } from 'mappers/medication'
 
 export const getExplorationFetcher = (
   resourceType: ResourceType,
@@ -45,10 +63,8 @@ export const getExplorationFetcher = (
     case ResourceType.DOCUMENTS:
       return fetchDocumentsList
     case ResourceType.MEDICATION_ADMINISTRATION:
-    case ResourceType.MEDICATION_REQUEST: {
-      if (isPatient) return servicesPatients.fetchMedication
-      return servicesCohorts.fetchMedicationList
-    }
+    case ResourceType.MEDICATION_REQUEST:
+      return fetchMedicationList
     case ResourceType.IMAGING:
       return fetchImagingList
     case ResourceType.OBSERVATION:
@@ -67,7 +83,7 @@ const getPatientsCount = <T>(list: AxiosResponse<FHIR_API_Response<Bundle<T>>>) 
     : 0
 }
 
-export const fetchDocumentsList = async (
+const fetchDocumentsList = async (
   options: ResourceOptions<DocumentsFilters>,
   signal?: AbortSignal
 ): Promise<ExplorationResults<DocumentReference> | SearchInputError> => {
@@ -143,7 +159,7 @@ export const fetchDocumentsList = async (
   return results
 }
 
-export const fetchImagingList = async (
+const fetchImagingList = async (
   options: ResourceOptions<ImagingFilters>,
   signal?: AbortSignal
 ): Promise<ExplorationResults<ImagingStudy>> => {
@@ -211,7 +227,7 @@ export const fetchImagingList = async (
   return results
 }
 
-export const fetchBiologyList = async (
+const fetchBiologyList = async (
   options: ResourceOptions<BiologyFilters>,
   signal?: AbortSignal
 ): Promise<ExplorationResults<Observation>> => {
@@ -279,7 +295,107 @@ export const fetchBiologyList = async (
   return results
 }
 
-export const fetchFormsList = async (
+const fetchMedicationList = async (
+  options: ResourceOptions<MedicationFilters>,
+  signal?: AbortSignal
+): Promise<ExplorationResults<MedicationRequest | MedicationAdministration>> => {
+  const {
+    type,
+    deidentified,
+    page,
+    searchCriterias: {
+      orderBy,
+      searchInput,
+      filters: {
+        code,
+        nda,
+        ipp,
+        durationRange,
+        executiveUnits,
+        encounterStatus,
+        administrationRoutes,
+        prescriptionTypes
+      }
+    },
+    groupId,
+    patient
+  } = options
+  const fetchers = {
+    [ResourceType.MEDICATION_REQUEST]: fetchMedicationRequest,
+    [ResourceType.MEDICATION_ADMINISTRATION]: fetchMedicationAdministration
+  }
+  const _type = type as ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION
+  const commonFilters = () => ({
+    _list: groupId ? [groupId] : [],
+    size: 20,
+    offset: page ? (page - 1) * 20 : 0,
+    _sort: mapMedicationToOrderByCode(orderBy.orderBy, _type),
+    sortDirection: orderBy.orderDirection,
+    _text: searchInput,
+    encounter: nda,
+    ipp: ipp,
+    signal: signal,
+    executiveUnits: executiveUnits.map((unit) => unit.id),
+    encounterStatus: encounterStatus.map(({ id }) => id),
+    minDate: durationRange[0] ?? '',
+    maxDate: durationRange[1] ?? '',
+    code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
+    uniqueFacet: ['subject'],
+    subject: patient?.patientInfo?.id
+  })
+
+  const filtersMapper = {
+    [ResourceType.MEDICATION_REQUEST]: () => ({
+      ...commonFilters(),
+      type: prescriptionTypes?.map((type) => type.id)
+    }),
+    [ResourceType.MEDICATION_ADMINISTRATION]: () => ({
+      ...commonFilters(),
+      route: administrationRoutes?.map((route) => route.id)
+    })
+  }
+
+  const fetcher = fetchers[_type]
+  const filters = filtersMapper[_type]()
+
+  const [medicationList, allMedicationList] = await Promise.all([
+    fetcher(filters),
+    atLeastOneSearchCriteria(options.searchCriterias)
+      ? fetcher({
+          size: 0,
+          signal: signal,
+          _list: groupId ? [groupId] : [],
+          uniqueFacet: ['subject'],
+          minDate: null,
+          maxDate: null,
+          subject: patient?.patientInfo?.id
+        })
+      : null
+  ])
+  const results: ExplorationResults<MedicationAdministration | MedicationRequest> = {
+    totalAllResults: null,
+    total: null,
+    totalAllPatients: null,
+    totalPatients: null,
+    list: []
+  }
+  const medicationResponse = getApiResponseResources<MedicationAdministration | MedicationRequest>(medicationList) ?? []
+  results.list = patient
+    ? linkElementWithEncounter(medicationResponse, patient?.hospits?.list ?? [], deidentified)
+    : await getResourceInfos(medicationResponse, deidentified, groupId, signal)
+  results.total = medicationList?.data?.resourceType === 'Bundle' ? medicationList.data.total ?? 0 : 0
+  results.totalAllResults =
+    allMedicationList && allMedicationList?.data?.resourceType === 'Bundle'
+      ? allMedicationList.data.total ?? null
+      : results.total
+  results.totalPatients = getPatientsCount<MedicationAdministration | MedicationRequest>(medicationList)
+  results.totalAllPatients = allMedicationList
+    ? getPatientsCount<MedicationAdministration | MedicationRequest>(allMedicationList)
+    : results.totalPatients
+  return results
+}
+
+const fetchFormsList = async (
   options: ResourceOptions<MaternityFormFilters>,
   signal?: AbortSignal
 ): Promise<ExplorationResults<QuestionnaireResponse>> => {

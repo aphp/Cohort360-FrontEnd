@@ -289,6 +289,8 @@ export const atLeastOneSearchCriteria = (searchCriterias: SearchCriterias<Filter
     ('docTypes' in filters && filters.docTypes?.length > 0) ||
     ('docStatuses' in filters && filters.docStatuses?.length > 0) ||
     ('onlyPdfAvailable' in filters && !!filters.onlyPdfAvailable) ||
-    ('formName' in filters && filters.formName.length > 0)
+    ('formName' in filters && filters.formName.length > 0) ||
+    ('administrationRoutes' in filters && filters.administrationRoutes && filters.administrationRoutes.length > 0) ||
+    ('prescriptionTypes' in filters && filters.prescriptionTypes && filters.prescriptionTypes.length > 0)
   )
 }

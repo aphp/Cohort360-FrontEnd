@@ -746,7 +746,7 @@ export const mapMedicationToRows = (
       type === ResourceType.MEDICATION_ADMINISTRATION &&
         !deidentified && {
           id: `${elem.id}-comment`,
-          value: comment.split('\n'),
+          value: comment.split('\n').map((elem) => ({ text: elem })),
           type: CellType.MODAL,
           align: 'center'
         }

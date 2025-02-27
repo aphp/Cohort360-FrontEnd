@@ -88,12 +88,19 @@ const TableRow = ({ row, sx }: RowProps) => {
               {cell.type === CellType.MODAL &&
                 (() => {
                   const [open, setOpen] = useState(false)
+                  console.log('test med', cell)
                   return (
                     <>
                       <IconButton onClick={() => setOpen(true)}>
                         <Comment height="15px" fill="#ED6D91" />
                       </IconButton>
-                      <Modal open={open} title="Commentaires" onClose={() => setOpen(false)} readonly={true}>
+                      <Modal
+                        open={open}
+                        title="Commentaires"
+                        onClose={() => setOpen(false)}
+                        cancelText="Fermer"
+                        readonly={true}
+                      >
                         <Paragraphs value={cell.value as Paragraph[]} />
                       </Modal>
                     </>
