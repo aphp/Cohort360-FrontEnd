@@ -241,9 +241,9 @@ const ExportTable: React.FC<ExportTableProps> = ({
               sx={{ width: '500px' }}
               disabled={tableSetting?.isChecked === false}
               disableCloseOnSelect
-              options={['Tous sélectionner', ...exportColumns]}
+              options={['Tout sélectionner', ...exportColumns]}
               onChange={(event, newValue) => {
-                if (newValue.includes('Tous sélectionner')) {
+                if (newValue.includes('Tout sélectionner')) {
                   if (tableSetting?.columns?.length === exportColumns.length) {
                     onChangeTableSettings(exportTable.name, 'columns', null)
                   } else {
@@ -253,7 +253,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
                   onChangeTableSettings(
                     exportTable.name,
                     'columns',
-                    newValue.filter((e) => e !== 'Tous sélectionner')
+                    newValue.filter((e) => e !== 'Tout sélectionner')
                   )
                 }
               }}
@@ -264,11 +264,11 @@ const ExportTable: React.FC<ExportTableProps> = ({
               renderOption={(props, option, { selected }) => {
                 const { key, ...optionProps } = props
                 const isChecked =
-                  option === 'Tous sélectionner'
+                  option === 'Tout sélectionner'
                     ? tableSetting?.columns?.length === exportColumns.length
                     : tableSetting?.columns?.includes(option)
                 const isIndeterminate =
-                  option === 'Tous sélectionner' &&
+                  option === 'Tout sélectionner' &&
                   (tableSetting?.columns?.length ?? 0) > 0 &&
                   (tableSetting?.columns?.length ?? 0) < exportColumns.length
                 return (

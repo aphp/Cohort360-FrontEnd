@@ -100,7 +100,6 @@ const ExportForm: React.FC = () => {
   const fetchCountError = errorTables.some((errorTable) => errorTable.error === Error.ERROR_FETCH)
 
   const _checkExportableCohortID = useCallback(async () => {
-    console.log('manelle cohortID', cohortID)
     if (cohortID !== null) {
       const response = await fetchExportableCohort(cohortID)
       if (response.length === 0) {
