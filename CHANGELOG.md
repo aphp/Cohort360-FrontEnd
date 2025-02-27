@@ -1,6 +1,11 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [2.43.8](https://github.com/aphp/Cohort360-FrontEnd/compare/2.43.7..2.43.8) - 2025-02-27
+
+### 🐛 Bug Fixes
+
+- Secure pseudo can't access export - ([503c3aa](https://github.com/aphp/Cohort360-FrontEnd/commit/503c3aaab31ba61b26cd76bd698f2913f18f7ff1))
 
 ## [2.43.7](https://github.com/aphp/Cohort360-FrontEnd/compare/2.43.6..2.43.7) - 2025-02-27
 
