@@ -110,6 +110,7 @@ const Export: React.FC = () => {
   const navigate = useNavigate()
   const openDrawer = useAppSelector((state) => state.drawer)
   const user = useAppSelector((state) => state.me?.userName) ?? ''
+  const deidentified = useAppSelector((state) => state.me?.deidentified)
   const [exportList, setExportList] = useState<any>(null)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -139,8 +140,12 @@ const Export: React.FC = () => {
   }, [search])
 
   useEffect(() => {
-    _fetchExportList()
-  }, [_fetchExportList, orderBy])
+    if (deidentified) {
+      navigate('/home')
+    } else {
+      _fetchExportList()
+    }
+  }, [_fetchExportList, orderBy, deidentified, navigate])
 
   useEffect(() => {
     setSearchParams(cleanSearchParams({ page: page.toString() }))
@@ -148,11 +153,15 @@ const Export: React.FC = () => {
   }, [page, dispatch, setSearchParams])
 
   useEffect(() => {
-    if (loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) {
-      controllerRef.current = cancelPendingRequest(controllerRef.current)
-      _fetchExportList()
+    if (deidentified) {
+      navigate('/home')
+    } else {
+      if (loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) {
+        controllerRef.current = cancelPendingRequest(controllerRef.current)
+        _fetchExportList()
+      }
     }
-  }, [_fetchExportList, loadingStatus, orderBy])
+  }, [_fetchExportList, loadingStatus, orderBy, deidentified, navigate])
 
   return (
     <Grid

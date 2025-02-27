@@ -244,14 +244,14 @@ const configRoutes: configRoute[] = [
   /**
    * Cohort360: Feasibility Reports Page
    */
-  {
-    path: '/feasibility-reports',
-    name: '/feasibility-reports',
-    isPrivate: true,
-    element: <FeasibilityReports />,
-    exact: true,
-    displaySideBar: true
-  },
+  // {
+  //   path: '/feasibility-reports',
+  //   name: '/feasibility-reports',
+  //   isPrivate: true,
+  //   element: <FeasibilityReports />,
+  //   exact: true,
+  //   displaySideBar: true
+  // },
 
   /**
    * Cohort360: Export download Page
