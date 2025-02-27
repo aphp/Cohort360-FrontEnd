@@ -1,5 +1,5 @@
 import { CanceledError } from 'axios'
-import { DocumentReference, ImagingStudy, MedicationAdministration, MedicationRequest } from 'fhir/r4'
+import { DocumentReference, ImagingStudy, MedicationAdministration, MedicationRequest, Observation } from 'fhir/r4'
 import { map } from 'mappers/exploration'
 import { useEffect, useState } from 'react'
 import { getExplorationFetcher } from 'services/aphp/serviceExploration'
@@ -24,7 +24,7 @@ export type Data =
   | PatientsResponse
   | ExplorationResults<
       | CohortPMSI
-      | CohortObservation
+      | Observation
       | ImagingStudy
       | CohortQuestionnaireResponse
       | CohortMedication<MedicationRequest | MedicationAdministration>
