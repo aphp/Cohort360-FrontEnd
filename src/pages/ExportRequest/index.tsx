@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import { CssBaseline, Grid } from '@mui/material'
 import sideBarTransition from 'styles/sideBarTransition'
@@ -10,6 +11,14 @@ import ExportForm from './components/ExportForm'
 const ExportRequest = () => {
   const { classes, cx } = sideBarTransition()
   const openDrawer = useAppSelector((state) => state.drawer)
+  const navigate = useNavigate()
+  const deidentified = useAppSelector((state) => state.me?.deidentified)
+
+  useEffect(() => {
+    if (deidentified) {
+      navigate('/home')
+    }
+  }, [deidentified, navigate])
 
   return (
     <Grid
