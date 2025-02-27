@@ -1,10 +1,10 @@
 import { ResourceOptions } from 'types/exploration'
-import { DocumentsFilters, Filters, ImagingFilters, SearchByTypes } from 'types/searchCriterias'
+import { BiologyFilters, DocumentsFilters, Filters, ImagingFilters, SearchByTypes } from 'types/searchCriterias'
 import services from '.'
-import { fetchDocumentReference, fetchImaging } from './callApi'
+import { fetchDocumentReference, fetchImaging, fetchObservation } from './callApi'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import { linkElementWithEncounter } from 'state/patient'
-import { Bundle, DocumentReference, FhirResource, ImagingStudy } from 'fhir/r4'
+import { Bundle, DocumentReference, FhirResource, ImagingStudy, Observation } from 'fhir/r4'
 import { CohortComposition, CohortImaging, ExplorationResults, FHIR_API_Response } from 'types'
 import { SearchInputError } from 'types/error'
 import { ResourceType } from 'types/requestCriterias'
@@ -15,6 +15,7 @@ import { getResourceInfos } from 'utils/fillElement'
 import { getExtension } from 'utils/fhir'
 import { AxiosResponse } from 'axios'
 import { linkToDiagnosticReport } from './serviceImaging'
+import { atLeastOneSearchCriteria } from 'utils/filters'
 
 export const getExplorationFetcher = (
   resourceType: ResourceType,
@@ -42,10 +43,8 @@ export const getExplorationFetcher = (
     }
     case ResourceType.IMAGING:
       return fetchImagingList
-    case ResourceType.OBSERVATION: {
-      if (isPatient) return servicesPatients.fetchObservation
-      return servicesCohorts.fetchBiologyList
-    }
+    case ResourceType.OBSERVATION:
+      return fetchBiologyList
   }
   return servicesCohorts.fetchPatientList
 }
@@ -107,16 +106,7 @@ export const fetchDocumentsList = async (
       maxDate: durationRange[1] ?? '',
       signal: signal
     }),
-    !!searchInput ||
-    ipp ||
-    docTypes.length > 0 ||
-    !!nda ||
-    !!durationRange[0] ||
-    !!durationRange[1] ||
-    executiveUnits.length > 0 ||
-    docStatuses.length > 0 ||
-    !!onlyPdfAvailable ||
-    encounterStatus.length > 0
+    atLeastOneSearchCriteria(options.searchCriterias)
       ? fetchDocumentReference({
           patient: patient?.patientInfo?.id,
           signal: signal,
@@ -139,20 +129,9 @@ export const fetchDocumentsList = async (
     allDocsList && allDocsList?.data?.resourceType === 'Bundle' ? allDocsList.data.total ?? null : results.total
   results.totalPatients = getPatientsCount(docsList)
   results.totalAllPatients = allDocsList ? getPatientsCount(allDocsList) : results.totalPatients
-  if (patient) {
-    results.list = linkElementWithEncounter(
-      docsResponse as DocumentReference[],
-      patient?.hospits?.list ?? [],
-      deidentified
-    )
-  } else {
-    results.list = await getResourceInfos<DocumentReference, CohortComposition>(
-      docsResponse,
-      deidentified,
-      groupId,
-      signal
-    )
-  }
+  results.list = patient
+    ? linkElementWithEncounter(docsResponse as DocumentReference[], patient?.hospits?.list ?? [], deidentified)
+    : await getResourceInfos<DocumentReference, CohortComposition>(docsResponse, deidentified, groupId, signal)
   return results
 }
 
@@ -192,14 +171,9 @@ export const fetchImagingList = async (
       patient: patient?.patientInfo?.id,
       signal
     }),
-    !!searchInput ||
-    !!ipp ||
-    !!nda ||
-    !!durationRange[0] ||
-    !!durationRange[1] ||
-    executiveUnits.length > 0 ||
-    modality.length > 0
+    atLeastOneSearchCriteria(options.searchCriterias)
       ? fetchImaging({
+          patient: patient?.patientInfo?.id,
           size: 0,
           _list: groupId ? [groupId] : [],
           signal: signal,
@@ -226,5 +200,73 @@ export const fetchImagingList = async (
     ? linkElementWithEncounter(imagingResponse, patient?.hospits?.list ?? [], deidentified)
     : await getResourceInfos<ImagingStudy, CohortImaging>(imagingResponse, deidentified, groupId, signal)
   results.list = await linkToDiagnosticReport(completeList, signal)
+  return results
+}
+
+export const fetchBiologyList = async (
+  options: ResourceOptions<BiologyFilters>,
+  signal?: AbortSignal
+): Promise<ExplorationResults<Observation>> => {
+  const {
+    deidentified,
+    page,
+    searchCriterias: {
+      orderBy,
+      searchInput,
+      filters: { validatedStatus, nda, ipp, code, durationRange, executiveUnits, encounterStatus }
+    },
+    groupId,
+    patient
+  } = options
+  const size = 20
+  const [biologyList, allBiologyList] = await Promise.all([
+    fetchObservation({
+      _list: groupId ? [groupId] : [],
+      size,
+      offset: page ? (page - 1) * size : 0,
+      _sort: orderBy.orderBy,
+      sortDirection: orderBy.orderDirection,
+      _text: searchInput === '' ? '' : searchInput,
+      encounter: nda,
+      'patient-identifier': ipp,
+      executiveUnits: executiveUnits.map((unit) => unit.id),
+      encounterStatus: encounterStatus.map(({ id }) => id),
+      uniqueFacet: ['subject'],
+      minDate: durationRange[0] ?? '',
+      maxDate: durationRange[1] ?? '',
+      code: code.map((code) => encodeURI(`${code.system}|${code.id}`)).join(','),
+      rowStatus: validatedStatus,
+      subject: patient?.patientInfo?.id,
+      signal: signal
+    }),
+    atLeastOneSearchCriteria(options.searchCriterias)
+      ? fetchObservation({
+          subject: patient?.patientInfo?.id,
+          size: 0,
+          signal: signal,
+          _list: groupId ? [groupId] : [],
+          uniqueFacet: ['subject'],
+          rowStatus: validatedStatus
+        })
+      : null
+  ])
+  const results: ExplorationResults<Observation> = {
+    totalAllResults: null,
+    total: null,
+    totalAllPatients: null,
+    totalPatients: null,
+    list: []
+  }
+  const bioResponse = getApiResponseResources(biologyList) ?? []
+  results.list = patient
+    ? linkElementWithEncounter(bioResponse, patient?.hospits?.list ?? [], deidentified)
+    : await getResourceInfos(bioResponse, deidentified, groupId, signal)
+  results.total = biologyList?.data?.resourceType === 'Bundle' ? biologyList.data.total ?? 0 : 0
+  results.totalAllResults =
+    allBiologyList && allBiologyList?.data?.resourceType === 'Bundle'
+      ? allBiologyList.data.total ?? null
+      : results.total
+  results.totalPatients = getPatientsCount(biologyList)
+  results.totalAllPatients = allBiologyList ? getPatientsCount(allBiologyList) : results.totalPatients
   return results
 }

@@ -8,6 +8,7 @@ import {
   GenderStatusLabel,
   LabelObject,
   SearchCriteriaKeys,
+  SearchCriterias,
   VitalStatus,
   VitalStatusLabel
 } from 'types/searchCriterias'
@@ -271,4 +272,22 @@ export const selectFiltersAsArray = (filters: Filters, searchInput: string | und
     }
   }
   return result
+}
+
+export const atLeastOneSearchCriteria = (searchCriterias: SearchCriterias<Filters>) => {
+  const { searchInput, filters } = searchCriterias
+
+  return (
+    !!searchInput ||
+    ('ipp' in filters && !!filters.ipp) ||
+    ('nda' in filters && !!filters.nda) ||
+    ('durationRange' in filters && (!!filters.durationRange?.[0] || !!filters.durationRange?.[1])) ||
+    ('executiveUnits' in filters && filters.executiveUnits?.length > 0) ||
+    ('encounterStatus' in filters && filters.encounterStatus?.length > 0) ||
+    ('code' in filters && filters.code?.length > 0) ||
+    ('modality' in filters && filters.modality?.length > 0) ||
+    ('docTypes' in filters && filters.docTypes?.length > 0) ||
+    ('docStatuses' in filters && filters.docStatuses?.length > 0) ||
+    ('onlyPdfAvailable' in filters && !!filters.onlyPdfAvailable)
+  )
 }

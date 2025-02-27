@@ -60,6 +60,7 @@ const ExplorationBoard = ({ deidentified = true, type, groupId, patient, message
   // => erreur sur les pmsiTabs / medicationTabs
   // Vérifier ce qu'on fait pour l'afichage des champs des filtres sauvegardés quand on passe de pseudo à nomi
   // L'option Documents dont les pdf sont disponibles n'est dispo que en non pseudo
+  // Les champs ipp ne doivent plus apparaitre dans l'exploration d'un patient
   return (
     <Grid item xs={12} container gap="25px" padding="50px" sx={{ backgroundColor: '#fff' }}>
       <SearchSection
