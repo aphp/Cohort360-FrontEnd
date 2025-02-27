@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.42.8](https://github.com/aphp/Cohort360-FrontEnd/compare/2.42.7..2.42.8) - 2025-02-27
+
+### 🐛 Bug Fixes
+
+- *(demographicForm)* Age label for deceased/alive patients - ([dfd1c88](https://github.com/aphp/Cohort360-FrontEnd/commit/dfd1c888b7512e1b1b213fa54c14dca5949cf78f))
+
 ## [2.42.7](https://github.com/aphp/Cohort360-FrontEnd/compare/2.42.6..2.42.7) - 2025-02-25
 
 ### 🐛 Bug Fixes
@@ -18,7 +24,7 @@ All notable changes to this project will be documented in this file.
 
 ### 🐛 Bug Fixes
 
-- *(criterias)* Allow removing value in number input + fix max width of collapsable options container - ([133f961](https://github.com/aphp/Cohort360-FrontEnd/commit/133f9612c00451d8c09b3c342ad0537d0ec0f717))
+- *(criterias)* Allow removing value in number input + fix max width of collapsable options container - ([43eb7ea](https://github.com/aphp/Cohort360-FrontEnd/commit/43eb7ea57b4943a287edc48df454bbe9f71bcb3f))
 
 ## [2.42.4](https://github.com/aphp/Cohort360-FrontEnd/compare/2.42.3..2.42.4) - 2025-02-18
 
