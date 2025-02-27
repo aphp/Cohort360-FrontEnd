@@ -12,14 +12,14 @@ import { AlertWrapper } from 'components/ui/Alert'
 import { PatientState } from 'state/patient'
 
 type ExplorationBoardProps = {
-  deidentified: boolean
   type: ResourceType
-  messages?: string[]
+  deidentified: boolean
   groupId: string | undefined
   patient?: PatientState
+  messages?: string[]
 }
 
-const ExplorationBoard = ({ deidentified = true, type, groupId, patient, messages }: ExplorationBoardProps) => {
+const ExplorationBoard = ({ type, deidentified, groupId, patient, messages }: ExplorationBoardProps) => {
   const [searchParams] = useSearchParams()
   const page = parseInt(searchParams.get('page') || '1', 10)
   const {
@@ -58,6 +58,7 @@ const ExplorationBoard = ({ deidentified = true, type, groupId, patient, message
   // => const _groupId = groupId ? `?groupId=${groupId}` : ''
   // => const _search = search ? `&search=${search}` : ''
   // => erreur sur les pmsiTabs / medicationTabs
+  // Vérifier qu'on atterie sur le bon onglet ressource et filtres quand URL
   // Vérifier ce qu'on fait pour l'afichage des champs des filtres sauvegardés quand on passe de pseudo à nomi
   // L'option Documents dont les pdf sont disponibles n'est dispo que en non pseudo
   // Les champs ipp ne doivent plus apparaitre dans l'exploration d'un patient
