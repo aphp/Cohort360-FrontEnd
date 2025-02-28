@@ -1,4 +1,4 @@
-import { Cohort, CohortJobStatus, ProjectType, QuerySnapshotInfo, RequestType, ValueSet } from 'types'
+import { Cohort, JobStatus, ProjectType, QuerySnapshotInfo, RequestType, ValueSet } from 'types'
 import { CohortsType } from 'types/cohorts'
 import { Direction, FilterKeys, FilterValue, Order } from 'types/searchCriterias'
 import displayDigit from './displayDigit'
@@ -170,14 +170,11 @@ export const getGlobalEstimation = (cohort: Cohort) => {
 }
 
 export const getExportTooltip = (cohort: Cohort, isExportable: boolean) => {
-  if (cohort.request_job_status === CohortJobStatus.FAILED) {
+  if (cohort.request_job_status === JobStatus.FAILED) {
     return 'Cette cohorte ne peut pas être exportée car elle a échoué lors de sa création'
-  } else if (
-    cohort.request_job_status === CohortJobStatus.PENDING ||
-    cohort.request_job_status === CohortJobStatus.LONG_PENDING
-  ) {
+  } else if (cohort.request_job_status === JobStatus.PENDING || cohort.request_job_status === JobStatus.LONG_PENDING) {
     return 'Cette cohorte ne peut pas être exportée car elle est en cours de création'
-  } else if (cohort.request_job_status === CohortJobStatus.FINISHED) {
+  } else if (cohort.request_job_status === JobStatus.FINISHED) {
     if (!isExportable) {
       return "Vous n'avez pas les droits suffisants pour exporter cette cohorte"
     } else {

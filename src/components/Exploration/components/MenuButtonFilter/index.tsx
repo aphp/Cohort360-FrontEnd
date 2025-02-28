@@ -45,12 +45,10 @@ const MenuButtonFilter: React.FC<MenuButtonFilterProps> = ({
     setAnchorEl(null)
   }
 
-  // TODO: set la largeur du menu en fonction de la largeur du bouton
-
   return (
     <>
       <Button startIcon={<DateRangeIcon />} onClick={(e) => setAnchorEl(e.currentTarget)} width="fit-content">
-        {getLabel(innerStartDate, innerEndDate)}
+        {getLabel(startDate, endDate)}
       </Button>
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)} className={classes.dateFilterMenu}>
         <DatePicker buttonLabel="À partir du :" value={innerStartDate} onChangeValue={setInnerStartDate} />

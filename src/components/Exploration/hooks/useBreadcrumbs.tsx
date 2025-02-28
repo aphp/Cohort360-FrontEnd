@@ -2,7 +2,7 @@ import { useLocation, useParams } from 'react-router-dom'
 import useProject from './useProject'
 import useRequest from './useRequest'
 
-const useBreadCrumb = () => {
+const useBreadCrumbs = () => {
   const { projectId, requestId, cohortId } = useParams()
   const location = useLocation()
 
@@ -45,4 +45,4 @@ const useBreadCrumb = () => {
   return items
 }
 
-export default useBreadCrumb
+export default useBreadCrumbs

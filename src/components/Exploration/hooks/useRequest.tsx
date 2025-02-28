@@ -1,7 +1,12 @@
+import { useEffect } from 'react'
 import services from 'services/aphp'
 import { useQuery } from '@tanstack/react-query'
+import { setMessage } from 'state/message'
+import { useAppDispatch } from 'state'
 
 const useRequest = (requestId?: string) => {
+  const dispatch = useAppDispatch()
+
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['request', requestId],
     enabled: !!requestId, // ça veut dire qu'on fait pas l'appel si pas de requestId
@@ -11,6 +16,10 @@ const useRequest = (requestId?: string) => {
       return requestData
     }
   })
+
+  useEffect(() => {
+    isError && dispatch(setMessage({ type: 'error', content: 'Erreur lors de la récupération de la requête' }))
+  }, [isError, dispatch])
 
   return {
     request: data,

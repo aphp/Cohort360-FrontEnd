@@ -41,14 +41,13 @@ import {
 
 import {
   CohortCreationCounterType,
-  CohortJobStatus,
+  JobStatus,
   CurrentSnapshot,
   LoadingStatus,
   RequestType,
   SimpleStatus,
   Snapshot,
-  WSJobStatus,
-  WebSocketJobStatus
+  WSJobStatus
 } from 'types'
 
 import useStyle from './styles'
@@ -214,10 +213,7 @@ const ControlPanel: React.FC<{
   const webSocketContext = useContext(WebSocketContext)
 
   useEffect(() => {
-    if (
-      status &&
-      (status === CohortJobStatus.NEW || status === CohortJobStatus.PENDING || status === CohortJobStatus.STARTED)
-    ) {
+    if (status && (status === JobStatus.NEW || status === JobStatus.PENDING || status === JobStatus.STARTED)) {
       setCountLoading(LoadingStatus.FETCHING)
       //TODO: refacto the lunch of the count in the app colision with buildCohortCreation and unbuildCohortCreation
       // dispatch(countCohortCreation({ uuid: uuid }))
@@ -227,7 +223,7 @@ const ControlPanel: React.FC<{
   useEffect(() => {
     const listener = (message: WSJobStatus) => {
       let response = {}
-      if (message.status !== WebSocketJobStatus.pending && message.uuid === count.uuid) {
+      if (message.status !== JobStatus.PENDING && message.uuid === count.uuid) {
         setCountLoading(LoadingStatus.SUCCESS)
         response = {
           includePatient: message.extra_info?.measure,

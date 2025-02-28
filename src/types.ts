@@ -39,28 +39,14 @@ import { CriteriaForm } from 'components/CreationCohort/DiagramView/components/L
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
 export enum JobStatus {
-  new = 'new',
-  pending = 'pending',
-  suspended = 'suspended'
-}
-
-export enum WebSocketJobStatus {
-  new = 'new',
-  pending = 'pending',
-  suspended = 'suspended',
-  accepted = 'accepted',
-  finished = 'finished',
-  failed = 'failed'
-}
-
-export enum CohortJobStatus {
   NEW = 'new',
   PENDING = 'pending',
   LONG_PENDING = 'long_pending',
   STARTED = 'started',
   FAILED = 'failed',
   FINISHED = 'finished',
-  SUSPENDED = 'suspended'
+  SUSPENDED = 'suspended',
+  ACCEPTED = 'accepted'
 }
 
 export enum LoadingStatus {
@@ -486,7 +472,7 @@ export type Cohort = {
   request_query_snapshot?: string
   group_id?: string
   exportable?: boolean
-  request_job_status?: CohortJobStatus
+  request_job_status?: JobStatus
   request_job_fail_msg?: string
   created_at?: string
   modified_at?: string
@@ -835,7 +821,7 @@ export type WebSocketMessage<T = {}> = {
 } & T
 
 export type WSJobStatus = WebSocketMessage<{
-  status: WebSocketJobStatus
+  status: JobStatus
   uuid?: string
   details?: string
   job_name?: WebSocketJobName

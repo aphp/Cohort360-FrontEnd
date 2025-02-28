@@ -7,7 +7,7 @@ import {
   TemporalConstraintsKind,
   QuerySnapshotInfo,
   CurrentSnapshot,
-  CohortJobStatus,
+  JobStatus,
   CriteriaGroupType,
   ScopeElement
 } from 'types'
@@ -688,17 +688,17 @@ const cohortCreationSlice = createSlice({
       state.count = {
         ...state.count,
         status:
-          state.count?.status === CohortJobStatus.PENDING ||
-          state.count?.status === CohortJobStatus.NEW ||
-          state.count?.status === CohortJobStatus.SUSPENDED
-            ? CohortJobStatus.SUSPENDED
+          state.count?.status === JobStatus.PENDING ||
+          state.count?.status === JobStatus.NEW ||
+          state.count?.status === JobStatus.SUSPENDED
+            ? JobStatus.SUSPENDED
             : state.count?.status
       }
     },
     unsuspendCount: (state: CohortCreationState) => {
       state.count = {
         ...state.count,
-        status: CohortJobStatus.PENDING
+        status: JobStatus.PENDING
       }
     },
     updateCount: (state: CohortCreationState, action: PayloadAction<CohortCreationCounterType>) => {
@@ -738,13 +738,13 @@ const cohortCreationSlice = createSlice({
     // countCohortCreation
     builder.addCase(countCohortCreation.pending, (state) => ({
       ...state,
-      status: CohortJobStatus.PENDING,
+      status: JobStatus.PENDING,
       countLoading: true
     }))
     builder.addCase(countCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
-      countLoading: payload?.count?.status === CohortJobStatus.PENDING || payload?.count?.status === CohortJobStatus.NEW
+      countLoading: payload?.count?.status === JobStatus.PENDING || payload?.count?.status === JobStatus.NEW
     }))
     builder.addCase(countCohortCreation.rejected, (state) => ({
       ...state,
