@@ -58,7 +58,7 @@ const ModalCreateNewRequest: React.FC<{
     null
   )
 
-  const _onChangeValue = (key: 'name' | 'parent_folder' | 'description', value: string) => {
+  const _onChangeValue = (key: 'name' | 'parent_folder' | 'description', value: string | { uuid: string }) => {
     setCurrentRequest((prevState) =>
       prevState ? { ...prevState, [key]: value } : { uuid: '', name: '', [key]: value }
     )
@@ -76,7 +76,7 @@ const ModalCreateNewRequest: React.FC<{
     // + Auto set the new project folder with 'Projet de recherche ...'
     if (projectsList && projectsList.length > 0) {
       if (!isEdition && !selectedRequest?.parent_folder) {
-        _onChangeValue('parent_folder', projectsList[0].uuid)
+        _onChangeValue('parent_folder', { uuid: projectsList[0].uuid })
       }
       onChangeProjectName(`Projet de recherche ${projectsList.length || ''}`)
     } else {

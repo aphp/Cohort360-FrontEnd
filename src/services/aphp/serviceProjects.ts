@@ -248,9 +248,12 @@ const servicesProjects: IServiceProjects = {
       console.error(error)
     }
   },
-  //TODO: temp, à clean
   fetchRequest: async (requestId) => {
-    return (await apiBack.get(`/cohort/requests/${requestId}/`)).data
+    try {
+      return (await apiBack.get(`/cohort/requests/${requestId}/`)).data
+    } catch (error) {
+      console.error(error)
+    }
   },
   fetchProjectsList: async (args) => {
     try {
@@ -361,14 +364,13 @@ const servicesProjects: IServiceProjects = {
   addRequest: async (newRequest) => {
     const addRequestResponse = (await apiBack.post(`/cohort/requests/`, {
       ...newRequest,
-      parent_folder: newRequest.parent_folder
+      parent_folder: newRequest.parent_folder?.uuid
     })) ?? { status: 400 }
     if (addRequestResponse.status === 201) {
       return addRequestResponse.data
     } else {
       throw new Error('Impossible de créer la requête')
     }
-    // TODO: l'ajout d'une requête lorsque le parent est à créer ne fonctionne plus
   },
   editRequest: async (editedRequest) => {
     try {

@@ -3,7 +3,10 @@ import { ChipWrapper } from './styles'
 
 export enum ChipStyles {
   VALID = 'valid',
-  CANCELLED = 'cancelled'
+  CANCELLED = 'cancelled',
+  ERROR = 'error',
+  IN_PROGRESS = 'in-progress',
+  FINISHED = 'finished'
 }
 
 type StatusChipProps = {

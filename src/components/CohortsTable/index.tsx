@@ -40,7 +40,7 @@ import ModalEditCohort from 'components/Requests/Modals/ModalEditCohort/ModalEdi
 import { useAppSelector, useAppDispatch } from 'state'
 import { deleteCohort, editCohort, setSelectedCohort as setSelectedCohortState } from 'state/cohort'
 
-import { Cohort, CohortJobStatus } from 'types'
+import { Cohort, JobStatus } from 'types'
 
 import useCohortsWebSocket from 'components/Exploration/hooks/useCohortsWebSocket'
 import displayDigit from 'utils/displayDigit'
@@ -86,9 +86,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
 
   const onClickRow = (row: Cohort) => {
     if (
-      row.request_job_status === CohortJobStatus.PENDING ||
-      row.request_job_status === CohortJobStatus.LONG_PENDING ||
-      row.request_job_status === CohortJobStatus.FAILED
+      row.request_job_status === JobStatus.PENDING ||
+      row.request_job_status === JobStatus.LONG_PENDING ||
+      row.request_job_status === JobStatus.FAILED
     )
       return
 
@@ -255,13 +255,11 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
             </TableHead>
             <TableBody>
               {data?.map((row: Cohort) => {
-                const canExportThisCohort = !!appConfig.features.export.enabled ? row?.rights?.export_csv_nomi : false
+                const canExportThisCohort = appConfig.features.export.enabled ? row?.rights?.export_csv_nomi : false
 
                 return (
                   <TableRow
-                    className={
-                      row.request_job_status === CohortJobStatus.FINISHED ? classes.pointerHover : classes.notAllow
-                    }
+                    className={row.request_job_status === JobStatus.FINISHED ? classes.pointerHover : classes.notAllow}
                     hover
                     key={row.uuid}
                   >
@@ -316,9 +314,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                     !canExportThisCohort ||
                                     !row.exportable ||
                                     maintenanceIsActive ||
-                                    row.request_job_status === CohortJobStatus.LONG_PENDING ||
-                                    row.request_job_status === CohortJobStatus.FAILED ||
-                                    row.request_job_status === CohortJobStatus.PENDING
+                                    row.request_job_status === JobStatus.LONG_PENDING ||
+                                    row.request_job_status === JobStatus.FAILED ||
+                                    row.request_job_status === JobStatus.PENDING
                                   }
                                 >
                                   <ExportIcon />

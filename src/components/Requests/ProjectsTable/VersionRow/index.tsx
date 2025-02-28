@@ -13,7 +13,7 @@ import ExportIcon from '@mui/icons-material/GetApp'
 import { useAppDispatch } from 'state'
 import { editCohort, setSelectedCohort } from 'state/cohort'
 
-import { Cohort, CohortJobStatus } from 'types'
+import { Cohort, JobStatus } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
@@ -69,8 +69,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
 
               const isError =
                 !cohort.group_id ||
-                cohort.request_job_status === CohortJobStatus.PENDING ||
-                cohort.request_job_status === CohortJobStatus.NEW ||
+                cohort.request_job_status === JobStatus.PENDING ||
+                cohort.request_job_status === JobStatus.NEW ||
                 !!cohort.request_job_fail_msg
 
               const canExportThisCohort =

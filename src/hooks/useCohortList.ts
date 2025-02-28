@@ -2,7 +2,7 @@ import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
 import { useContext, useEffect, useState } from 'react'
 import servicesCohorts from 'services/aphp/serviceCohorts'
 import { useAppSelector } from 'state'
-import { WebSocketJobName, WebSocketJobStatus, WebSocketMessageType, WSJobStatus } from 'types'
+import { WebSocketJobName, JobStatus, WebSocketMessageType, WSJobStatus } from 'types'
 
 /**
  * Returns the list of the fetched cohorts (a single 20 element page)
@@ -23,17 +23,12 @@ const useCohortList = () => {
 
   useEffect(() => {
     const listener = async (message: WSJobStatus) => {
-      if (message.job_name === WebSocketJobName.CREATE && message.status === WebSocketJobStatus.finished) {
+      if (message.job_name === WebSocketJobName.CREATE && message.status === JobStatus.FINISHED) {
         const websocketUpdatedCohorts = cohortList.map((cohort) => {
-          const temp = Object.assign({}, cohort)
+          const temp = { ...cohort }
           if (temp.uuid === message.uuid) {
-            if (temp.dated_measure_global) {
-              temp.dated_measure_global = {
-                ...temp.dated_measure_global,
-                measure_min: message.extra_info?.global ? message.extra_info.global.measure_min : null,
-                measure_max: message.extra_info?.global ? message.extra_info.global.measure_max : null
-              }
-            }
+            temp.measure_min = message.extra_info?.global?.measure_min
+            temp.measure_max = message.extra_info?.global?.measure_max
             temp.request_job_status = message.status
             temp.group_id = message.extra_info?.group_id
           }

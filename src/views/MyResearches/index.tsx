@@ -4,7 +4,7 @@ import { useAppSelector } from 'state'
 
 import { Box, Grid, Slide, Typography } from '@mui/material'
 import Badge from 'components/ui/Badge'
-import Breadcrumb from 'components/Exploration/components/Breadcrumb'
+import Breadcrumb from 'components/Exploration/components/Breadcrumbs'
 import MenuButtonFilter from 'components/Exploration/components/MenuButtonFilter'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'

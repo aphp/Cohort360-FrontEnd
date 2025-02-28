@@ -68,7 +68,7 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
     },
     { label: 'nom de la requête', align: 'left', code: Order.NAME },
     { label: '', align: 'left' },
-    ...(!projectId ? [{ label: 'projet' }] : []),
+    ...(!projectId ? [{ label: 'projet', code: Order.PARENT_FOLDER }] : []),
     { label: 'date de modification', code: Order.UPDATED },
     { label: 'nb de cohortes' }
   ]
