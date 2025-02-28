@@ -1,6 +1,26 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [2.44.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.43.0..2.44.0) - 2025-02-28
+
+### 🚀 Features
+
+- *(messages)* Update AREM availability messages - ([cfca5bb](https://github.com/aphp/Cohort360-FrontEnd/commit/cfca5bb86ca60ffe085f67c38a9b9b5859ce7c79))
+- *(messages)* Add new static web content api (#1100) - ([c29b87a](https://github.com/aphp/Cohort360-FrontEnd/commit/c29b87a7fc7c5e93e8f4e208a8b2f944e33ba16f))
+
+### 🐛 Bug Fixes
+
+- Resole error on form and fix tri on table - ([58537bc](https://github.com/aphp/Cohort360-FrontEnd/commit/58537bc818905cf54469da7009d3c9923e3820e3))
+- Fix secure on tableIsCheck for error limit - ([e9ea459](https://github.com/aphp/Cohort360-FrontEnd/commit/e9ea459b978de0cc9d896ad06de938484376b345))
+- Change sourceType for encounter Criteria - ([a87f3d7](https://github.com/aphp/Cohort360-FrontEnd/commit/a87f3d771327d3178a7c2d61de86834e61def071))
+- Manage count error and modify cohort selection flow - ([b390df4](https://github.com/aphp/Cohort360-FrontEnd/commit/b390df4cde2bf52ef66f9c33f039c53a858b13ce))
+- All selected into columns filter - ([7772435](https://github.com/aphp/Cohort360-FrontEnd/commit/777243533538ae330708133553fc2ba75e49af9e))
+- *(demographicForm)* Age label for deceased/alive patients - ([4c2f33a](https://github.com/aphp/Cohort360-FrontEnd/commit/4c2f33a22c479894fea281be05d7f231c041461e))
+
+### ⚙️ Miscellaneous Tasks
+
+- Add helper script for release creation - ([2616e34](https://github.com/aphp/Cohort360-FrontEnd/commit/2616e3499f56a2820e1463018b19ae12317e58ed))
+- Remove bump type in release creation script - ([49c55d2](https://github.com/aphp/Cohort360-FrontEnd/commit/49c55d206c7f1f3ef44516d8f6ea3a750fc6f561))
 
 ## [2.43.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.42.0..2.43.0) - 2025-02-19
 
