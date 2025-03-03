@@ -47,9 +47,8 @@ const ExplorationBoard = ({ type, deidentified, groupId, patient, messages }: Ex
 
   useEffect(() => {
     //console.log('test searchCriterias', searchCriterias)
-    console.log('test searchCriterias', searchCriterias)
-    console.log('test patient', patient)
-  }, [data])
+    console.log('testt board')
+  }, [searchCriterias.filters])
 
   // supprimer multiple dans le type Column
   // Supprimer StartDate et EndDate quand tâche terminée
@@ -63,6 +62,8 @@ const ExplorationBoard = ({ type, deidentified, groupId, patient, messages }: Ex
   // L'option Documents dont les pdf sont disponibles n'est dispo que en non pseudo
   // Les champs ipp ne doivent plus apparaitre dans l'exploration d'un patient
   // TOUS LES TYPES des réponses du service et de useData sont mauvais!!
+  // Le retour en arrière d'un patient sur la liste des patients ne se fait pas correctement
+  // Une recherche se lance (ùmode pseudo) lorsque le selectBy est modifié alors que ce comportement n'est pas souhaité
   return (
     <Grid item xs={12} container gap="25px" padding="50px" sx={{ backgroundColor: '#fff' }}>
       <SearchSection

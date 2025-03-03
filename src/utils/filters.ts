@@ -282,6 +282,9 @@ export const atLeastOneSearchCriteria = (searchCriterias: SearchCriterias<Filter
     ('ipp' in filters && !!filters.ipp) ||
     ('nda' in filters && !!filters.nda) ||
     ('durationRange' in filters && (!!filters.durationRange?.[0] || !!filters.durationRange?.[1])) ||
+    ('birthdatesRanges' in filters && (!!filters.birthdatesRanges?.[0] || !!filters.birthdatesRanges?.[1])) ||
+    ('genders' in filters && filters.genders?.length > 0) ||
+    ('vitalStatuses' in filters && filters.vitalStatuses?.length > 0) ||
     ('executiveUnits' in filters && filters.executiveUnits?.length > 0) ||
     ('encounterStatus' in filters && filters.encounterStatus?.length > 0) ||
     ('code' in filters && filters.code?.length > 0) ||
@@ -291,6 +294,8 @@ export const atLeastOneSearchCriteria = (searchCriterias: SearchCriterias<Filter
     ('onlyPdfAvailable' in filters && !!filters.onlyPdfAvailable) ||
     ('formName' in filters && filters.formName.length > 0) ||
     ('administrationRoutes' in filters && filters.administrationRoutes && filters.administrationRoutes.length > 0) ||
-    ('prescriptionTypes' in filters && filters.prescriptionTypes && filters.prescriptionTypes.length > 0)
+    ('prescriptionTypes' in filters && filters.prescriptionTypes && filters.prescriptionTypes.length > 0) ||
+    ('diagnosticTypes' in filters && filters.diagnosticTypes && filters.diagnosticTypes.length > 0) ||
+    ('source' in filters && filters.source && filters.source.length > 0)
   )
 }
