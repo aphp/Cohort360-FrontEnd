@@ -1,9 +1,6 @@
 import { Claim, Condition, Procedure } from 'fhir/r4'
-import { Medication, Pmsi } from 'state/patient'
 import { CohortPMSI } from 'types'
-import { PMSILabel } from 'types/patient'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
-import { SourceType } from 'types/scope'
 import { Order } from 'types/searchCriterias'
 
 export const getLastDiagnosisLabels = (mainDiagnosisList: Condition[]) => {
@@ -14,64 +11,6 @@ export const getLastDiagnosisLabels = (mainDiagnosisList: Condition[]) => {
     .join(' - ')
 
   return lastThreeDiagnosisLabels
-}
-
-export function mapToAttribute(
-  type: ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST
-): keyof Medication
-export function mapToAttribute(type: PMSIResourceTypes): keyof Pmsi
-export function mapToAttribute(type: ResourceType) {
-  switch (type) {
-    case ResourceType.MEDICATION_ADMINISTRATION:
-      return 'administration'
-    case ResourceType.MEDICATION_REQUEST:
-      return 'prescription'
-    case ResourceType.CONDITION:
-      return 'condition'
-    case ResourceType.CLAIM:
-      return 'claim'
-    case ResourceType.PROCEDURE:
-      return 'procedure'
-  }
-}
-
-export function mapToLabel(
-  type: ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST
-): 'administration(s)' | 'prescription(s)'
-export function mapToLabel(type: PMSIResourceTypes): PMSILabel
-export function mapToLabel(type: ResourceType) {
-  switch (type) {
-    case ResourceType.CONDITION:
-      return PMSILabel.DIAGNOSTIC
-    case ResourceType.PROCEDURE:
-      return PMSILabel.CCAM
-    case ResourceType.CLAIM:
-      return PMSILabel.GHM
-    case ResourceType.MEDICATION_ADMINISTRATION:
-      return 'administration(s)'
-    case ResourceType.MEDICATION_REQUEST:
-      return 'prescription(s)'
-  }
-}
-
-export const mapToLabelSingular = (tabId: PMSIResourceTypes) => {
-  const mapToLabel = {
-    [ResourceType.CONDITION]: 'diagnostic CIM10',
-    [ResourceType.PROCEDURE]: 'acte',
-    [ResourceType.CLAIM]: 'GHM'
-  }
-
-  return mapToLabel[tabId]
-}
-
-export const mapToSourceType = (tabId: PMSIResourceTypes) => {
-  const tabIdMapper = {
-    [ResourceType.CONDITION]: SourceType.CIM10,
-    [ResourceType.PROCEDURE]: SourceType.CCAM,
-    [ResourceType.CLAIM]: SourceType.GHM
-  }
-
-  return tabIdMapper[tabId]
 }
 
 export const getPmsiDate = (tabId: PMSIResourceTypes, pmsiItem: CohortPMSI) => {
