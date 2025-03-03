@@ -3,12 +3,9 @@ import moment from 'moment'
 import {
   CohortData,
   Cohort,
-  AgeRepartitionType,
-  GenderRepartitionType,
   ChartCode,
   ExplorationResults,
   CohortImaging,
-  CohortComposition,
   Export,
   ExportCSVTable,
   FHIR_Bundle_Response,
@@ -28,7 +25,6 @@ import { getApiResponseResource, getApiResponseResources } from 'utils/apiHelper
 import {
   fetchPatient,
   fetchEncounter,
-  fetchDocumentReference,
   fetchDocumentReferenceContent,
   fetchBinary,
   fetchCheckDocumentSearchInput,
@@ -40,8 +36,7 @@ import {
   fetchClaim,
   fetchMedicationRequest,
   fetchMedicationAdministration,
-  fetchObservation,
-  fetchForms
+  fetchObservation
 } from './callApi'
 
 import apiBackend from '../apiBackend'
@@ -55,22 +50,16 @@ import {
   MedicationRequest,
   Observation,
   ParametersParameter,
-  Patient,
   Procedure
 } from 'fhir/r4'
 import { AxiosError, AxiosResponse, CanceledError, isAxiosError } from 'axios'
 import {
   VitalStatus,
-  SearchCriterias,
   PatientsFilters,
-  DocumentsFilters,
-  SearchByTypes,
   ImagingFilters,
   PMSIFilters,
   MedicationFilters,
   BiologyFilters,
-  MaternityFormFilters,
-  Filters
 } from 'types/searchCriterias'
 import services from '.'
 import { ErrorDetails, SearchInputError } from 'types/error'
@@ -82,10 +71,7 @@ import { mapToOrderByCode } from 'mappers/pmsi'
 import { mapMedicationToOrderByCode } from 'mappers/medication'
 import { linkToDiagnosticReport } from './serviceImaging'
 import { PatientsResponse } from 'types/patient'
-import { getFormName } from 'utils/formUtils'
 import { ResourceOptions } from 'types/exploration'
-import { Data } from 'components/ExplorationBoard/useData'
-import servicesPatients from './servicePatients'
 
 export interface IServiceCohorts {
   /**
@@ -139,30 +125,6 @@ export interface IServiceCohorts {
   ) => Promise<PatientsResponse | undefined>
 
   /**
-   * Retourne la liste de documents liés à une cohorte
-   *
-   * Argument:
-   *   - deidentifiedBoolean: = true si la cohorte est pseudo. (permet un traitement particulier des éléments)
-   *   - searchBy: Détermine si l'on recherche par contenu ou titre du document
-   *   - sortBy: Permet le tri
-   *   - sortDirection: Permet le tri dans l'ordre croissant ou décroissant
-   *   - page: Permet la pagination (definit un offset + limit)
-   *   - searchInput: Permet la recherche textuelle
-   *   - selectedDocTypes: Permet de filtrer sur le type de documents
-   *   - nda: Permet de filtrer les documents sur un NDA particulier (uniquement en nominatif)
-   *   - onlyPdfAvailable: permet d'afficher ou non seulement les documents dont le PDF est disponible
-   *   - startDate: Permet de filtrer sur une date
-   *   - endDate: Permet de filtrer sur une date
-   *   - groupId: (optionnel) Périmètre auquel la cohorte est liée
-   *   - signal: (optionnel) paramètre permettant d'identifier si une requête est déjà en cours et de l'annuler si besoin
-   */
-
-  fetchDocuments: (
-    options: ResourceOptions<DocumentsFilters>,
-    signal?: AbortSignal
-  ) => Promise<ExplorationResults<DocumentReference>> | Promise<SearchInputError>
-
-  /**
    * Retourne la liste d'objets d'Imagerie liés à une cohorte
    */
 
@@ -194,14 +156,6 @@ export interface IServiceCohorts {
     options: ResourceOptions<BiologyFilters>,
     signal?: AbortSignal
   ) => Promise<ExplorationResults<CohortObservation>>
-
-  /**
-   * Retourne la liste de formulaires liés à une cohorte
-   */
-  fetchFormsList: (
-    options: ResourceOptions<MaternityFormFilters>,
-    signal?: AbortSignal
-  ) => Promise<ExplorationResults<CohortQuestionnaireResponse>>
 
   /**
    * Permet de vérifier si le champ de recherche textuelle est correct
@@ -755,78 +709,6 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
-  fetchFormsList: async (options, signal) => {
-    const {
-      page,
-      searchCriterias: {
-        orderBy,
-        filters: { ipp, formName, durationRange, executiveUnits, encounterStatus }
-      },
-      groupId
-    } = options
-
-    const atLeastAFilter =
-      !!ipp ||
-      executiveUnits.length > 0 ||
-      encounterStatus.length > 0 ||
-      formName.length > 0 ||
-      !!durationRange[0] ||
-      !!durationRange[1]
-    const [formsList, allFormsList] = await Promise.all([
-      fetchForms({
-        _list: groupId ? [groupId] : [],
-        size: 20,
-        offset: page ? (page - 1) * 20 : 0,
-        order: orderBy.orderBy,
-        orderDirection: orderBy.orderDirection,
-        ipp,
-        startDate: durationRange?.[0] ?? '',
-        endDate: durationRange?.[1] ?? '',
-        signal: signal,
-        executiveUnits: executiveUnits.map((unit) => unit.id),
-        encounterStatus: encounterStatus.map((status) => status.id),
-        formName: formName.join(),
-        uniqueFacet: ['subject']
-      }),
-      atLeastAFilter
-        ? fetchForms({
-            _list: groupId ? [groupId] : [],
-            size: 0,
-            signal: signal,
-            uniqueFacet: ['subject']
-          })
-        : null
-    ])
-
-    const _formsList = getApiResponseResources(formsList) ?? []
-    const filledFormsList = (await getResourceInfos(
-      _formsList,
-      false,
-      groupId,
-      signal
-    )) as CohortQuestionnaireResponse[]
-    const questionnaires = await services.patients.fetchQuestionnaires()
-    const listWithFormTypes = filledFormsList.map((elem) => ({ ...elem, formName: getFormName(elem, questionnaires) }))
-    const totalForms = formsList?.data?.resourceType === 'Bundle' ? formsList.data.total : 0
-    const totalAllForms = allFormsList?.data?.resourceType === 'Bundle' ? allFormsList?.data?.total : totalForms
-    const totalPatientForms =
-      formsList?.data?.resourceType === 'Bundle'
-        ? (getExtension(formsList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
-        : 0
-    const totalAllPatientsForms =
-      allFormsList !== null
-        ? (getExtension(allFormsList?.data?.meta, 'unique-subject') || { valueDecimal: 0 }).valueDecimal
-        : totalPatientForms
-
-    return {
-      total: totalForms ?? 0,
-      totalAllResults: totalAllForms ?? 0,
-      totalPatients: totalPatientForms ?? 0,
-      totalAllPatients: totalAllPatientsForms ?? 0,
-      list: listWithFormTypes
-    }
-  },
-
   fetchImagingList: async (options, signal) => {
     const {
       deidentified,
@@ -900,105 +782,6 @@ const servicesCohorts: IServiceCohorts = {
       totalPatients: totalPatientImaging ?? 0,
       totalAllPatients: totalAllPatientsImaging ?? 0,
       list: imagingListWithDiagnosticReport ?? []
-    }
-  },
-
-  fetchDocuments: async (options, signal) => {
-    const {
-      deidentified,
-      page,
-      searchCriterias: {
-        orderBy,
-        searchInput,
-        searchBy,
-        filters: { docStatuses, docTypes, executiveUnits, ipp, nda, onlyPdfAvailable, durationRange, encounterStatus }
-      },
-      groupId
-    } = options
-    if (searchInput) {
-      const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)
-      if (searchInputError && searchInputError.isError) {
-        throw searchInputError
-      }
-    }
-    const [docsList, allDocsList] = await Promise.all([
-      fetchDocumentReference({
-        size: 20,
-        offset: page ? (page - 1) * 20 : 0,
-        searchBy: searchBy,
-        _sort: orderBy.orderBy,
-        sortDirection: orderBy.orderDirection,
-        docStatuses: docStatuses.map((obj) => obj.id),
-        _elements: searchInput ? [] : undefined,
-        _list: groupId ? [groupId] : [],
-        _text: searchInput,
-        highlight_search_results: searchBy === SearchByTypes.TEXT ? true : false,
-        type:
-          docTypes.map((docType) => docType.code).length > 0 ? docTypes.map((docType) => docType.code).join(',') : '',
-        'encounter-identifier': nda,
-        'patient-identifier': ipp,
-        onlyPdfAvailable: onlyPdfAvailable,
-        signal: signal,
-        minDate: durationRange[0] ?? '',
-        maxDate: durationRange[1] ?? '',
-        uniqueFacet: ['subject'],
-        executiveUnits: executiveUnits.map((eu) => eu.id),
-        encounterStatus: encounterStatus.map(({ id }) => id)
-      }),
-      !!searchInput ||
-      docTypes.length > 0 ||
-      !!nda ||
-      !!ipp ||
-      !!durationRange[0] ||
-      !!durationRange[1] ||
-      executiveUnits.length > 0 ||
-      docStatuses.length > 0 ||
-      !!onlyPdfAvailable ||
-      encounterStatus.length > 0
-        ? fetchDocumentReference({
-            signal: signal,
-            _list: groupId ? [groupId] : [],
-            size: 0,
-            uniqueFacet: ['subject']
-          })
-        : null
-    ])
-
-    const totalDocs = docsList?.data?.resourceType === 'Bundle' ? docsList.data.total : 0
-    const totalAllDocs =
-      allDocsList !== null ? (allDocsList?.data?.resourceType === 'Bundle' ? allDocsList.data.total : 0) : totalDocs
-
-    const totalPatientDocs =
-      docsList?.data?.resourceType === 'Bundle'
-        ? (
-            getExtension(docsList?.data?.meta, 'unique-subject') || {
-              valueDecimal: 0
-            }
-          ).valueDecimal
-        : 0
-    const totalAllPatientDocs =
-      allDocsList !== null
-        ? (
-            getExtension(allDocsList?.data?.meta, 'unique-subject') || {
-              valueDecimal: 0
-            }
-          ).valueDecimal
-        : totalPatientDocs
-
-    const documentsList = getApiResponseResources(docsList) ?? []
-    const filledDocumentsList = await getResourceInfos<DocumentReference, CohortComposition>(
-      documentsList,
-      deidentified,
-      groupId,
-      signal
-    )
-
-    return {
-      total: totalDocs ?? 0,
-      totalAllResults: totalAllDocs ?? 0,
-      totalPatients: totalPatientDocs ?? 0,
-      totalAllPatients: totalAllPatientDocs ?? 0,
-      list: filledDocumentsList ?? []
     }
   },
 

@@ -723,11 +723,6 @@ export type MedicationTab = TabType<
   MedicationLabel
 >
 
-export type DTTB_ResultsType = {
-  nb: number
-  total: number
-  label?: string
-}
 export type DTTB_SearchBarType = {
   type: 'simple' | 'patient' | 'document'
   value: string | undefined
