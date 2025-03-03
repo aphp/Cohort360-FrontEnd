@@ -3,9 +3,9 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { Chip, CircularProgress, CssBaseline, Grid, Typography } from '@mui/material'
 import useStyles from './styles'
 import { FilterList } from '@mui/icons-material'
-import RadioGroupFilter from 'components/Filters/RadioGroupFilter'
+/*import RadioGroupFilter from 'components/Filters/RadioGroupFilter'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
-import PatientsNbFilter from 'components/Filters/PatientsNbFilter'
+import PatientsNbFilter from 'components/Filters/PatientsNbFilter'*/
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import { BlockWrapper } from 'components/ui/Layout'
 import Searchbar from 'components/ui/Searchbar'
@@ -25,7 +25,7 @@ import useCohortList from 'hooks/useCohortList'
 import { Pagination } from 'components/ui/Pagination'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
-import MultiSelectInput from 'components/Filters/MultiSelectInput'
+//import MultiSelectInput from 'components/Filters/MultiSelectInput'
 
 const statusOptions = [
   {
@@ -74,7 +74,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
   ] = useSearchCriterias(initCohortsSearchCriterias)
 
   const filtersAsArray = useMemo(
-    () => selectFiltersAsArray({ status, startDate, endDate, minPatients, maxPatients, favorite }),
+    () => selectFiltersAsArray({ status, startDate, endDate, minPatients, maxPatients, favorite }, searchInput),
     [status, startDate, endDate, minPatients, maxPatients, favorite]
   )
 
@@ -172,7 +172,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
             <Grid item xs={12} md={7}>
               <Searchbar>
                 <SearchInput
-                  value={searchInput}
+                  value={searchInput ?? ''}
                   placeholder={'Rechercher dans les cohortes'}
                   onchange={(newValue) => changeSearchInput(newValue)}
                 />
@@ -193,7 +193,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
               onClose={() => setToggleModal(false)}
               onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
             >
-              <MultiSelectInput
+              {/*<MultiSelectInput
                 value={status}
                 name={FilterKeys.STATUS}
                 options={statusOptions}
@@ -209,7 +209,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
                 values={[minPatients, maxPatients]}
                 names={[FilterKeys.MIN_PATIENTS, FilterKeys.MAX_PATIENTS]}
               />
-              <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
+              <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />*/}
             </Modal>
           </BlockWrapper>
 

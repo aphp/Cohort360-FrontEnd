@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext, useMemo } from 'react'
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { Grid, Tabs as TabsMui, Tab } from '@mui/material'
 import CohortPreview from 'components/Dashboard/Preview/Preview'
-import Documents from 'components/Dashboard/Documents'
 import TopBar from 'components/TopBar/TopBar'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 import CohortRightOrNotExist from 'components/ErrorView/CohortRightOrNotExist'
@@ -18,7 +17,7 @@ import FormsList from 'components/Dashboard/FormsList'
 import { getCleanGroupId } from 'utils/paginationUtils'
 import ExplorationBoard from 'components/ExplorationBoard'
 import { MedicationLabel, ResourceType } from 'types/requestCriterias'
-import { MedicationTab, PmsiTab, TabType } from 'types'
+import { MedicationTab, PmsiTab } from 'types'
 import { PMSILabel } from 'types/patient'
 import Tabs from 'components/ui/Tabs'
 import { getMedicationTab, getPMSITab } from 'utils/tabsUtils'
@@ -273,29 +272,6 @@ const Dashboard = ({ context }: DashboardProps) => {
             groupId={groupIds}
           />
         )}
-        {/*(selectedTab === ResourceType.PATIENT ||
-          selectedTab === 'MedicationAdministration' ||
-          selectedTab === 'MedicationRequest' ||
-          selectedTab === 'Condition' ||
-          selectedTab === 'Procedure' ||
-          selectedTab === 'Claim' ||
-          selectedTab === ResourceType.IMAGING ||
-          selectedTab === ResourceType.OBSERVATION ||
-          selectedTab === ResourceType.DOCUMENTS ||
-          (selectedTab === ResourceType.QUESTIONNAIRE_RESPONSE && ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean)) && (
-          <ExplorationBoard
-            deidentified={dashboard.deidentifiedBoolean}
-            type={selectedTab}
-            messages={getAlertMessages(selectedTab)}
-          />
-          )*/}
-
-        {/*selectedTab === ResourceType.DOCUMENTS && <Documents deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
-        {/*selectedTab === ResourceType.CONDITION && <PMSIList deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
-        {/*selectedTab === ResourceType.MEDICATION_REQUEST && <MedicationList deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
-        {/*ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean && selectedTab === ResourceType.QUESTIONNAIRE_RESPONSE && <FormsList />*/}
-        {/*selectedTab === ResourceType.IMAGING && <ImagingList deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
-        {/*selectedTab === ResourceType.OBSERVATION && <BiologyList deidentified={dashboard.deidentifiedBoolean ?? false} />*/}
       </Grid>
     </Grid>
   )

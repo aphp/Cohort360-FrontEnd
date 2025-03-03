@@ -40,10 +40,6 @@ import useStyles from './styles'
 import ListPatient from 'components/DataTable/ListPatient'
 import DisplayLocked from 'components/ui/Display/DisplayLocked'
 import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/searchCriteriasReducer'
-import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters'
-import CheckboxsFilter from 'components/Filters/CheckboxsFilter'
-import RadioGroupFilter from 'components/Filters/RadioGroupFilter'
-import SelectFilter from 'components/Filters/SelectFilter'
 
 type PatientSidebarProps = {
   total: number
@@ -180,7 +176,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
               onClose={() => setToggleFiltersModal(false)}
               onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
             >
-              <CheckboxsFilter name={FilterKeys.GENDERS} value={genders} label="Genre :" options={genderOptions} />
+             {/*} <CheckboxsFilter name={FilterKeys.GENDERS} value={genders} label="Genre :" options={genderOptions} />
               <CheckboxsFilter
                 name={FilterKeys.VITAL_STATUSES}
                 value={vitalStatuses}
@@ -191,7 +187,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
                 name={FilterKeys.BIRTHDATES}
                 value={birthdatesRanges}
                 deidentified={deidentifiedBoolean}
-              />
+            />*/}
             </Modal>
 
             <Button width={'45%'} icon={<Sort height="15px" fill="#FFF" />} onClick={() => setToggleSortModal(true)}>
@@ -205,7 +201,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
               onSubmit={(newOrder: OrderBy) => changeOrderBy(newOrder)}
             >
               <Grid container direction="column" justifyContent="space-between" gap="30px">
-                <SelectFilter
+                {/*<SelectFilter
                   value={orderBy.orderBy || Order.FAMILY}
                   name={OrderByKeys.ORDER_BY}
                   options={deidentifiedBoolean ? orderByListPatientsDeidentified : orderByListPatients}
@@ -215,7 +211,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
                   value={orderBy.orderDirection || Direction.ASC}
                   name={OrderByKeys.ORDER_DIRECTION}
                   label="Ordre"
-                />
+            />*/}
               </Grid>
             </Modal>
           </Grid>
