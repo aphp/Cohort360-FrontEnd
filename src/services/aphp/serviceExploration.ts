@@ -7,32 +7,42 @@ import {
   ImagingFilters,
   MaternityFormFilters,
   MedicationFilters,
-  SearchByTypes
+  PMSIFilters,
+  PatientsFilters,
+  SearchByTypes,
+  VitalStatus
 } from 'types/searchCriterias'
 import services from '.'
 import {
+  fetchClaim,
+  fetchCondition,
   fetchDocumentReference,
   fetchForms,
   fetchImaging,
   fetchMedicationAdministration,
   fetchMedicationRequest,
-  fetchObservation
+  fetchObservation,
+  fetchPatient,
+  fetchProcedure
 } from './callApi'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import { linkElementWithEncounter } from 'state/patient'
 import {
   Bundle,
+  Claim,
+  Condition,
   DocumentReference,
   FhirResource,
   ImagingStudy,
   MedicationAdministration,
   MedicationRequest,
   Observation,
+  Procedure,
   QuestionnaireResponse
 } from 'fhir/r4'
-import { CohortComposition, CohortImaging, ExplorationResults, FHIR_API_Response } from 'types'
+import { ChartCode, CohortComposition, CohortImaging, CohortPMSI, ExplorationResults, FHIR_API_Response } from 'types'
 import { SearchInputError } from 'types/error'
-import { ResourceType } from 'types/requestCriterias'
+import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import servicesCohorts from './serviceCohorts'
 import servicesPatients from './servicePatients'
 import { Data } from 'components/ExplorationBoard/useData'
@@ -44,22 +54,24 @@ import { atLeastOneSearchCriteria } from 'utils/filters'
 import { getFormName } from 'utils/formUtils'
 import { sortByDateKey } from 'utils/formatDate'
 import { mapMedicationToOrderByCode } from 'mappers/medication'
+import { PatientsResponse } from 'types/patient'
+import { substructAgeString } from 'utils/age'
+import moment from 'moment'
+import { getAgeRepartitionMapAphp, getGenderRepartitionMapAphp } from 'utils/graphUtils'
+import { mapToOrderByCode } from 'mappers/pmsi'
 
 export const getExplorationFetcher = (
-  resourceType: ResourceType,
-  isPatient: boolean
+  resourceType: ResourceType
 ): ((options: ResourceOptions<Filters>, signal?: AbortSignal) => Promise<Data>) => {
   switch (resourceType) {
     case ResourceType.PATIENT:
-      return servicesCohorts.fetchPatientList
+      return fetchPatientList
     case ResourceType.QUESTIONNAIRE_RESPONSE:
       return fetchFormsList
     case ResourceType.CONDITION:
     case ResourceType.CLAIM:
-    case ResourceType.PROCEDURE: {
-      if (isPatient) return servicesPatients.fetchPMSI
-      return servicesCohorts.fetchPMSIList
-    }
+    case ResourceType.PROCEDURE:
+      return fetchPMSIList
     case ResourceType.DOCUMENTS:
       return fetchDocumentsList
     case ResourceType.MEDICATION_ADMINISTRATION:
@@ -73,10 +85,10 @@ export const getExplorationFetcher = (
   return servicesCohorts.fetchPatientList
 }
 
-const getPatientsCount = <T>(list: AxiosResponse<FHIR_API_Response<Bundle<T>>>) => {
+const getPatientsCount = <T>(list: AxiosResponse<FHIR_API_Response<Bundle<T>>>, facet = 'unique-subject') => {
   return list?.data?.resourceType === 'Bundle'
     ? (
-        getExtension(list?.data?.meta, 'unique-subject') || {
+        getExtension(list?.data?.meta, facet) || {
           valueDecimal: 0
         }
       ).valueDecimal ?? 0
@@ -458,4 +470,179 @@ const fetchFormsList = async (
   results.totalPatients = getPatientsCount(formsList)
   results.totalAllPatients = allFormsList ? getPatientsCount(allFormsList) : results.totalPatients
   return results
+}
+
+const fetchPMSIList = async (
+  options: ResourceOptions<PMSIFilters>,
+  signal?: AbortSignal
+): Promise<ExplorationResults<CohortPMSI>> => {
+  const {
+    type,
+    deidentified,
+    page,
+    searchCriterias: {
+      orderBy,
+      searchInput,
+      filters: { ipp, nda, durationRange, executiveUnits, encounterStatus, diagnosticTypes, code, source }
+    },
+    groupId,
+    patient
+  } = options
+  const _type = type as PMSIResourceTypes
+  const fetchers = {
+    [ResourceType.CONDITION]: fetchCondition,
+    [ResourceType.PROCEDURE]: fetchProcedure,
+    [ResourceType.CLAIM]: fetchClaim
+  }
+
+  const commonFilters = () => ({
+    _list: groupId ? [groupId] : [],
+    subject: patient?.patientInfo?.id,
+    size: 20,
+    offset: page ? (page - 1) * 20 : 0,
+    _sort: mapToOrderByCode(orderBy.orderBy, _type),
+    sortDirection: orderBy.orderDirection,
+    _text: searchInput === '' ? '' : searchInput,
+    'encounter-identifier': nda,
+    'patient-identifier': ipp,
+    signal: signal,
+    executiveUnits: executiveUnits.map((unit) => unit.id),
+    encounterStatus: encounterStatus.map(({ id }) => id)
+  })
+
+  // Filtres spécifiques par ressource
+  const filtersMapper = {
+    [ResourceType.CONDITION]: () => ({
+      ...commonFilters(),
+      code: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(','),
+      source: source,
+      type: diagnosticTypes?.map((type) => type.id),
+      'min-recorded-date': (durationRange && durationRange[0]) ?? '',
+      'max-recorded-date': (durationRange && durationRange[1]) ?? '',
+      uniqueFacet: ['subject'],
+      subject: patient?.patientInfo?.id
+    }),
+    [ResourceType.PROCEDURE]: () => ({
+      ...commonFilters(),
+      code: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(','),
+      source: source,
+      minDate: (durationRange && durationRange[0]) ?? '',
+      maxDate: (durationRange && durationRange[1]) ?? '',
+      uniqueFacet: ['subject'],
+      subject: patient?.patientInfo?.id
+    }),
+    [ResourceType.CLAIM]: () => ({
+      ...commonFilters(),
+      diagnosis: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(','),
+      minCreated: (durationRange && durationRange[0]) ?? '',
+      maxCreated: (durationRange && durationRange[1]) ?? '',
+      uniqueFacet: ['patient'],
+      patient: patient?.patientInfo?.id
+    })
+  }
+
+  const fetcher = fetchers[_type]
+  const filters = filtersMapper[_type]()
+
+  const [pmsiList, allPMSIList] = await Promise.all([
+    fetcher(filters),
+    atLeastOneSearchCriteria(options.searchCriterias)
+      ? fetcher({
+          size: 0,
+          signal: signal,
+          _list: groupId ? [groupId] : [],
+          uniqueFacet: [type === ResourceType.CLAIM ? 'patient' : 'subject'],
+          subject: patient?.patientInfo?.id,
+          patient: patient?.patientInfo?.id
+        })
+      : null
+  ])
+  const results: ExplorationResults<Condition | Procedure | Claim> = {
+    totalAllResults: null,
+    total: null,
+    totalAllPatients: null,
+    totalPatients: null,
+    list: []
+  }
+  const pmsiResponse = getApiResponseResources<Condition | Procedure | Claim>(pmsiList) ?? []
+  results.list = patient
+    ? linkElementWithEncounter(pmsiResponse, patient?.hospits?.list ?? [], deidentified)
+    : await getResourceInfos(pmsiResponse, deidentified, groupId, signal)
+  const facet = type === ResourceType.CLAIM ? 'unique-patient' : 'unique-subject'
+  results.total = pmsiList?.data?.resourceType === 'Bundle' ? pmsiList.data.total ?? 0 : 0
+  results.totalAllResults =
+    allPMSIList && allPMSIList?.data?.resourceType === 'Bundle' ? allPMSIList.data.total ?? null : results.total
+  results.totalPatients = getPatientsCount(pmsiList, facet)
+  results.totalAllPatients = allPMSIList ? getPatientsCount(allPMSIList, facet) : results.totalPatients
+  return results
+}
+
+const fetchPatientList = async (
+  options: ResourceOptions<PatientsFilters>,
+  signal?: AbortSignal
+): Promise<PatientsResponse> => {
+  const {
+    deidentified,
+    page,
+    searchCriterias: {
+      searchBy,
+      searchInput,
+      orderBy,
+      filters: { birthdatesRanges, genders, vitalStatuses }
+    },
+    groupId,
+    includeFacets
+  } = options
+  const birthdates: [string, string] = [
+    moment(substructAgeString(birthdatesRanges?.[0] || '')).format('MM/DD/YYYY'),
+    moment(substructAgeString(birthdatesRanges?.[1] || '')).format('MM/DD/YYYY')
+  ]
+  const minBirthdate = birthdates && Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
+  const maxBirthdate = birthdates && Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
+  const size = 20
+  const [patientsList, allPatientsList] = await Promise.all([
+    fetchPatient({
+      size,
+      offset: page ? (page - 1) * size : 0,
+      _sort: orderBy.orderBy,
+      sortDirection: orderBy.orderDirection,
+      pivotFacet: includeFacets ? ['age-month_gender', 'deceased_gender'] : [],
+      _list: groupId ? [groupId] : [],
+      gender: genders.join(','),
+      searchBy,
+      _text: (searchInput || '').trim(),
+      minBirthdate: minBirthdate,
+      maxBirthdate: maxBirthdate,
+      deceased: vitalStatuses.length === 1 ? (vitalStatuses.includes(VitalStatus.DECEASED) ? true : false) : undefined,
+      deidentified: deidentified,
+      signal: signal,
+      _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
+    }),
+    atLeastOneSearchCriteria(options.searchCriterias)
+      ? fetchPatient({
+          size: 0,
+          _list: groupId ? [groupId] : [],
+          signal: signal
+        })
+      : null
+  ])
+  const originalPatients = getApiResponseResources(patientsList) ?? []
+  const totalPatients = patientsList.data.resourceType === 'Bundle' ? patientsList.data.total ?? 0 : 0
+  const totalAllPatients =
+    allPatientsList?.data?.resourceType === 'Bundle' ? allPatientsList.data.total ?? totalPatients : totalPatients
+  const agePyramidData =
+    patientsList.data.resourceType === 'Bundle'
+      ? getAgeRepartitionMapAphp(getExtension(patientsList.data.meta, ChartCode.AGE_PYRAMID)?.extension)
+      : undefined
+  const genderRepartitionMap =
+    patientsList.data.resourceType === 'Bundle'
+      ? getGenderRepartitionMapAphp(getExtension(patientsList.data.meta, ChartCode.GENDER_REPARTITION)?.extension)
+      : undefined
+  return {
+    totalPatients: totalPatients,
+    totalAllPatients: totalAllPatients,
+    originalPatients,
+    genderRepartitionMap,
+    agePyramidData
+  }
 }

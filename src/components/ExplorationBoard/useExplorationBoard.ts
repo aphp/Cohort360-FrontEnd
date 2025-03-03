@@ -161,6 +161,7 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean) =
   }
 
   const onSaveSearchCriterias = ({ searchBy, searchInput, filters }: SearchWithFilters) => {
+    console.log("testt useSearch", filters)
     if (searchBy) changeSearchBy(searchBy)
     if (searchInput !== undefined) changeSearchInput(searchInput)
     if (filters) addFilters(filters)

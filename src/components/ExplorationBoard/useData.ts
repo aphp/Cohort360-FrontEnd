@@ -70,7 +70,7 @@ export const useData = (
   const fetchData = async (page: number) => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
-      const fetcher = getExplorationFetcher(type, !!patient)
+      const fetcher = getExplorationFetcher(type)
       const results = await fetcher({
         page,
         searchCriterias,
@@ -92,11 +92,36 @@ export const useData = (
     }
   }
 
-  useEffect(() => {
+  const refetch = () => {
     const fetch = async () => await fetchData(1)
     fetch()
     setPagination({ ...pagination, currentPage: 1 })
-  }, [searchCriterias])
+  }
+
+  /*useEffect(() => {
+    console.log('testt change search')
+    refetch()
+  }, [searchCriterias.orderBy, searchCriterias.filters, searchCriterias.searchInput])*/
+
+  useEffect(() => {
+    console.log('testt change orderBy')
+    refetch()
+  }, [searchCriterias.orderBy])
+
+  useEffect(() => {
+    console.log('testt change filters', searchCriterias.filters)
+    refetch()
+  }, [searchCriterias.filters])
+
+  useEffect(() => {
+    console.log('testt change search')
+    refetch()
+  }, [searchCriterias.searchInput])
+
+  useEffect(() => {
+    console.log('testt search by', !!searchCriterias.searchInput)
+    if (!!searchCriterias.searchInput) refetch()
+  }, [searchCriterias.searchBy])
 
   useEffect(() => {
     if (data) {

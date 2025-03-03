@@ -45,62 +45,79 @@ const DataSection = ({
 }: DataSectionProps) => {
   return (
     <Grid container justifyContent="center" item xs={12}>
-      {type === ResourceType.PATIENT &&
-        (() => {
-          const patients = (data.raw as PatientsResponse)?.originalPatients
-          const map = getGenderRepartitionSimpleData((data.raw as PatientsResponse)?.genderRepartitionMap)
-          if (patients && !patients.length) return <Fragment />
-          return (
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6} lg={4}>
-                <Chart isLoading={isLoading} title="Répartition par genre">
-                  <BarChart data={map.genderData} width={250} />
-                </Chart>
-              </Grid>
-              <Grid item xs={12} md={6} lg={4}>
-                <Chart isLoading={isLoading} title="Répartition par statut vital">
-                  <PieChart data={map.vitalStatusData ?? []} width={250} />
-                </Chart>
-              </Grid>
-              <Grid item xs={12} md={12} lg={4}>
-                <Chart isLoading={isLoading} title="Pyramide des âges">
-                  <PyramidChart data={(data.raw as PatientsResponse)?.agePyramidData} width={250} />
-                </Chart>
-              </Grid>
-            </Grid>
-          )
-        })()}
-      {isLoading && <CircularProgress />}
-      {!isLoading &&
-        isPatient &&
+      {isPatient &&
         type === ResourceType.QUESTIONNAIRE_RESPONSE &&
         (() => (
-          <Timeline
-            questionnaireResponses={(data.raw as ExplorationResults<QuestionnaireResponse>)?.list ?? []}
-            questionnaires={infos.questionnaires?.raw ?? []}
-          />
+          <>
+            {isLoading && <CircularProgress />}
+            {!isLoading && (
+              <Timeline
+                questionnaireResponses={(data.raw as ExplorationResults<QuestionnaireResponse>)?.list ?? []}
+                questionnaires={infos.questionnaires?.raw ?? []}
+              />
+            )}
+          </>
         ))()}
-      {!isLoading && data.table.rows && !(type === ResourceType.QUESTIONNAIRE_RESPONSE && isPatient) && (
-        <>
-          {data.table.rows.length < 1 && <Typography variant="button">Aucune donnée à afficher</Typography>}
-          {data.table.rows.length > 0 && (
-            <Grid container gap={2} alignItems="center">
-              {count && (
-                <DisplayDigits
-                  nb={count.ressource.results ?? 0}
-                  total={count.ressource.total ?? 0}
-                  label={'élément(s)'}
-                />
+      {!(type === ResourceType.QUESTIONNAIRE_RESPONSE && isPatient) && (
+        <Grid container gap={2} alignItems="center">
+          {!isLoading && (
+            <>
+              {data.table.rows.length < 1 && <Typography variant="button">Aucune donnée à afficher</Typography>}
+              {data.table.rows.length > 0 && (
+                <>
+                  {count && type !== ResourceType.PATIENT && (
+                    <DisplayDigits
+                      nb={count.ressource.results ?? 0}
+                      total={count.ressource.total ?? 0}
+                      label={'élément(s)'}
+                    />
+                  )}
+                  {!isPatient && count && type !== ResourceType.PATIENT && (
+                    <Typography fontSize={15}>concernant</Typography>
+                  )}
+                  {!isPatient && count && (
+                    <DisplayDigits
+                      nb={count.patients.results ?? 0}
+                      total={count.patients.total ?? 0}
+                      label={'patient(s)'}
+                    />
+                  )}
+                </>
               )}
-              {!isPatient && count && <Typography fontSize={15}>concernant</Typography>}
-              {!isPatient && count && (
-                <DisplayDigits
-                  nb={count.patients.results ?? 0}
-                  total={count.patients.total ?? 0}
-                  label={'patient(s)'}
-                />
-              )}
-
+            </>
+          )}
+          {type === ResourceType.PATIENT &&
+            (() => {
+              const patients = (data.raw as PatientsResponse)?.originalPatients
+              const map = getGenderRepartitionSimpleData((data.raw as PatientsResponse)?.genderRepartitionMap)
+              if (patients && patients.length < 1) return <Fragment />
+              return (
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6} lg={4}>
+                    <Chart isLoading={isLoading} title="Répartition par genre">
+                      <BarChart data={map.genderData} width={250} />
+                    </Chart>
+                  </Grid>
+                  <Grid item xs={12} md={6} lg={4}>
+                    <Chart isLoading={isLoading} title="Répartition par statut vital">
+                      <PieChart data={map.vitalStatusData ?? []} width={250} />
+                    </Chart>
+                  </Grid>
+                  <Grid item xs={12} md={12} lg={4}>
+                    <Chart isLoading={isLoading} title="Pyramide des âges">
+                      <PyramidChart data={(data.raw as PatientsResponse)?.agePyramidData} width={250} />
+                    </Chart>
+                  </Grid>
+                </Grid>
+              )
+            })()}
+          {isLoading && (
+            <Grid container justifyContent="center">
+              <CircularProgress />
+            </Grid>
+          )}
+          {!isLoading && data.table.rows.length > 0 && (
+            <>
               <DataTable value={data.table} orderBy={orderBy} onSort={onSort} />
               <Grid
                 container
@@ -120,9 +137,9 @@ const DataSection = ({
                   onPageChange={onChangePage}
                 />
               </Grid>
-            </Grid>
+            </>
           )}
-        </>
+        </Grid>
       )}
     </Grid>
   )

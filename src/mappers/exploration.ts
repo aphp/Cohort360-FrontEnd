@@ -58,9 +58,9 @@ const mapPatientsToColumns = (deidentified: boolean): Column[] => {
   ]
 }
 
-const mapPmsiToColumns = (type: ResourceType, deidentified: boolean): Column[] => {
+const mapPmsiToColumns = (type: ResourceType, deidentified: boolean, isPatient: boolean): Column[] => {
   return [
-    { label: `IPP${deidentified ? ' chiffré' : ''}` },
+    !isPatient && { label: `IPP${deidentified ? ' chiffré' : ''}` },
     { label: `NDA${deidentified ? ' chiffré' : ''}` },
     { label: 'Codage le', code: Order.DATE },
     { label: 'source' },
@@ -214,15 +214,16 @@ const mapPatientsToRows = (patients: Patient[], deidentified: boolean, groupId: 
   return rows
 }
 
-const mapPmsiToRows = (list: CohortPMSI[], type: PMSIResourceTypes, groupId: string | undefined) => {
+const mapPmsiToRows = (list: CohortPMSI[], type: PMSIResourceTypes,  isPatient: boolean, groupId: string | undefined) => {
   const rows: Row[] = []
-  console.log('test data', list)
   list.forEach((elem) => {
     const hasDiagnosticType = type === ResourceType.CONDITION
     const date = getPmsiDate(type, elem)
     const codes = getPmsiCodes(type, elem)
+      console.log('test code', codes.display ?? 'Non renseigné')
+
     const row: Row = [
-      {
+      !isPatient && {
         id: `${elem.id}-ipp`,
         value: elem.IPP
           ? {
@@ -250,13 +251,13 @@ const mapPmsiToRows = (list: CohortPMSI[], type: PMSIResourceTypes, groupId: str
       },
       {
         id: `${elem.id}-code`,
-        value: codes.code ?? 'Non renseigné',
+        value: codes.code || 'Non renseigné',
         type: CellType.TEXT,
         sx: { fontWeight: 900 }
       },
       {
         id: `${elem.id}-display`,
-        value: codes.display ?? 'Non renseigné',
+        value: codes.display || 'Non renseigné',
         type: CellType.TEXT,
         sx: { fontWeight: 900 }
       },
@@ -773,8 +774,8 @@ export const map = (
     if (data.list.length) {
       if (isPmsi(data)) {
         const _type = type as PMSIResourceTypes
-        table.columns = mapPmsiToColumns(type, deidentified)
-        table.rows = mapPmsiToRows(data.list, _type, groupId)
+        table.columns = mapPmsiToColumns(type, deidentified, isPatient)
+        table.rows = mapPmsiToRows(data.list, _type, isPatient, groupId)
       }
       if (!isPatient && isQuestionnaire(data)) {
         table.columns = mapQuestionnaireToColumns()
