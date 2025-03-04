@@ -1,3 +1,4 @@
+import React from 'react'
 import { Alert, Divider, Grid, Snackbar } from '@mui/material'
 import SearchSection from './SearchSection'
 import CriteriasSection from './CriteriasSection'
@@ -12,7 +13,10 @@ import { AlertWrapper } from 'components/ui/Alert'
 import { PatientState } from 'state/patient'
 
 export type DisplayOptions = {
-  filters: boolean
+  myFilters: boolean
+  filterBy: boolean
+  orderBy: boolean
+  saveFilters: boolean
   criterias: boolean
   search: boolean
   diagrams: boolean
@@ -29,7 +33,10 @@ type ExplorationBoardProps = {
 }
 
 const defaultOptions: DisplayOptions = {
-  filters: true,
+  myFilters: true,
+  filterBy: true,
+  orderBy: false,
+  saveFilters: true,
   criterias: true,
   search: true,
   diagrams: true,
@@ -90,7 +97,7 @@ const ExplorationBoard = ({
   // Le retour en arrière d'un patient sur la liste des patients ne se fait pas correctement
   // Une recherche se lance (ùmode pseudo) lorsque le selectBy est modifié alors que ce comportement n'est pas souhaité
   return (
-    <Grid item xs={12} container gap="25px" padding="50px" sx={{ backgroundColor: '#fff' }}>
+    <Grid item xs={12} container gap="25px" sx={{ backgroundColor: '#fff' }}>
       <SearchSection
         searchCriterias={searchCriterias}
         infos={additionalInfo}
@@ -101,10 +108,15 @@ const ExplorationBoard = ({
       />
       <Divider sx={{ width: '100%' }} />
       {displayOptions.criterias && (
-        <CriteriasSection onDelete={onRemoveCriteria} onSaveFilters={onSaveFilter} value={criterias} />
+        <CriteriasSection
+          onDelete={onRemoveCriteria}
+          onSaveFilters={onSaveFilter}
+          value={criterias}
+          displayOptions={displayOptions}
+        />
       )}
-      {messages?.map((msg) => (
-        <AlertWrapper severity="warning" sx={{ color: '#000' }}>
+      {messages?.map((msg, index) => (
+        <AlertWrapper key={index} severity="warning" sx={{ color: '#000' }}>
           {msg}
         </AlertWrapper>
       ))}

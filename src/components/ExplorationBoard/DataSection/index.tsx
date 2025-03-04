@@ -125,13 +125,16 @@ const DataSection = ({
               <DataTable value={data.table} orderBy={orderBy} onSort={onSort} />
               <Grid
                 container
-                justifyContent="center"
-                style={{
-                  position: 'fixed',
+               // justifyContent="center"
+                sx={{
+                  position: 'sticky',
                   bottom: 0,
-                  right: 0,
                   backgroundColor: '#fff',
-                  width: '100%'
+                  maxWidth: '100%', // S'assure qu'elle ne dépasse pas le container
+                  width: '100%', // Pour occuper toute la largeur du parent
+                  zIndex: 10, // Pour s'assurer qu'elle reste au-dessus du reste du contenu
+                  //padding: '8px 10%', // Ajoute un peu d'espace
+                  boxShadow: '0px -2px 5px rgba(0, 0, 0, 0.1)' // Ajoute une légère ombre pour la visibilité
                 }}
               >
                 <Pagination
@@ -139,6 +142,7 @@ const DataSection = ({
                   count={pagination.total}
                   currentPage={pagination.currentPage}
                   onPageChange={onChangePage}
+                 // centered={true}
                 />
               </Grid>
             </>

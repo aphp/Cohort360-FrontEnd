@@ -40,6 +40,9 @@ import useStyles from './styles'
 import ListPatient from 'components/DataTable/ListPatient'
 import DisplayLocked from 'components/ui/Display/DisplayLocked'
 import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/searchCriteriasReducer'
+import ExplorationBoard from 'components/ExplorationBoard'
+import { ResourceType } from 'types/requestCriterias'
+import { useAppSelector } from 'state'
 
 type PatientSidebarProps = {
   total: number
@@ -50,8 +53,9 @@ type PatientSidebarProps = {
 }
 
 const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBoolean }: PatientSidebarProps) => {
+  const patient = useAppSelector((state) => state.patient)
   const { classes } = useStyles()
-  const [searchParams] = useSearchParams()
+  /*const [searchParams] = useSearchParams()
   const [toggleFiltersModal, setToggleFiltersModal] = useState(false)
   const [toggleSortModal, setToggleSortModal] = useState(false)
   const [page, setPage] = useState(1)
@@ -127,7 +131,21 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
       controllerRef.current = cancelPendingRequest(controllerRef.current)
       fetchPatients()
     }
-  }, [loadingStatus])
+  }, [loadingStatus])*/
+
+  const displayOptions = useMemo(
+    () => ({
+      myFilters: false,
+      filterBy: true,
+      criterias: true,
+      search: true,
+      diagrams: false,
+      count: false,
+      orderBy: true,
+      saveFilters: false
+    }),
+    []
+  )
 
   return (
     <Drawer anchor="right" classes={{ paper: classes.paper }} open={openDrawer} onClose={onClose}>
@@ -136,8 +154,13 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
           <ChevronRight color="action" width="20px" />
         </IconButton>
       </div>
-      <BlockWrapper item margin={'4px'}>
-        <Searchbar wrapped>
+      <ExplorationBoard
+        deidentified={deidentifiedBoolean}
+        type={ResourceType.PATIENT}
+        groupId={patient?.groupId ? [patient?.groupId] : []}
+        displayOptions={displayOptions}
+      />
+      {/*<Searchbar wrapped>
           <Typography variant="button" style={{ marginBottom: '8px' }}>
             Rechercher par :
           </Typography>
@@ -176,7 +199,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
               onClose={() => setToggleFiltersModal(false)}
               onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
             >
-             {/*} <CheckboxsFilter name={FilterKeys.GENDERS} value={genders} label="Genre :" options={genderOptions} />
+             { <CheckboxsFilter name={FilterKeys.GENDERS} value={genders} label="Genre :" options={genderOptions} />
               <CheckboxsFilter
                 name={FilterKeys.VITAL_STATUSES}
                 value={vitalStatuses}
@@ -187,7 +210,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
                 name={FilterKeys.BIRTHDATES}
                 value={birthdatesRanges}
                 deidentified={deidentifiedBoolean}
-            />*/}
+            />}
             </Modal>
 
             <Button width={'45%'} icon={<Sort height="15px" fill="#FFF" />} onClick={() => setToggleSortModal(true)}>
@@ -201,7 +224,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
               onSubmit={(newOrder: OrderBy) => changeOrderBy(newOrder)}
             >
               <Grid container direction="column" justifyContent="space-between" gap="30px">
-                {/*<SelectFilter
+                {<SelectFilter
                   value={orderBy.orderBy || Order.FAMILY}
                   name={OrderByKeys.ORDER_BY}
                   options={deidentifiedBoolean ? orderByListPatientsDeidentified : orderByListPatients}
@@ -211,13 +234,13 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
                   value={orderBy.orderDirection || Direction.ASC}
                   name={OrderByKeys.ORDER_DIRECTION}
                   label="Ordre"
-            />*/}
+            />
               </Grid>
             </Modal>
           </Grid>
         </Searchbar>
-      </BlockWrapper>
-      <Grid item style={{ margin: '0 4px 4px' }}>
+        */}
+      {/*<Grid item style={{ margin: '0 4px 4px' }}>
         {filtersAsArray.map((filter, index) => (
           <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
         ))}
@@ -233,7 +256,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
           total={patientsResult.nb}
           onCloseDrawer={onClose}
         />
-      </Grid>
+      </Grid>*/}
     </Drawer>
   )
 }

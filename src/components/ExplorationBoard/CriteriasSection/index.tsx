@@ -4,6 +4,7 @@ import { FilterKeys, FilterValue, SearchCriteriaKeys } from 'types/searchCriteri
 import SaveFilter from './SaveFilter'
 import Truncated from 'components/ui/Truncated'
 import { useAppSelector } from 'state'
+import { DisplayOptions } from '..'
 
 type Criteria = {
   value: FilterValue
@@ -14,11 +15,12 @@ type Criteria = {
 
 type CriteriasSectionProps = {
   value: Criteria[]
+  displayOptions: DisplayOptions
   onDelete: (category: FilterKeys | SearchCriteriaKeys, value: FilterValue) => void
   onSaveFilters: (name: string) => void
 }
 
-const CriteriasSection = ({ value, onDelete, onSaveFilters }: CriteriasSectionProps) => {
+const CriteriasSection = ({ value, displayOptions, onDelete, onSaveFilters }: CriteriasSectionProps) => {
   const maintenanceIsActive = useAppSelector((state) => state.me)?.maintenance?.active
 
   const CustomChip = ({ value, category, label, disabled = false }: Criteria) => {
@@ -44,22 +46,26 @@ const CriteriasSection = ({ value, onDelete, onSaveFilters }: CriteriasSectionPr
             <Grid container item xs={12} sm={6} lg={8} />
             <Grid container item xs={12} sm={5} lg={4} gap={1} justifyContent="flex-end">
               <Grid container item xs={12} md={5} />
-              <Grid container item xs={12} md={5}>
-                {value.length > 0 && (
-                  <Tooltip
-                    title={maintenanceIsActive ? "Ce bouton est desactivé en raison d'une maintenance." : undefined}
-                  >
-                    <Grid container>
-                      <SaveFilter onSubmit={onSaveFilters} disabled={maintenanceIsActive} />
-                    </Grid>
-                  </Tooltip>
-                )}
-              </Grid>
+              {displayOptions.saveFilters && (
+                <Grid container item xs={12} md={5}>
+                  {value.length > 0 && (
+                    <Tooltip
+                      title={maintenanceIsActive ? "Ce bouton est desactivé en raison d'une maintenance." : undefined}
+                    >
+                      <Grid container>
+                        <SaveFilter onSubmit={onSaveFilters} disabled={maintenanceIsActive} />
+                      </Grid>
+                    </Tooltip>
+                  )}
+                </Grid>
+              )}
             </Grid>
           </Grid>
-          <Grid item xs={12} container>
-            <Truncated values={value} component={CustomChip} gap="5px" maxHeight={220} />
-          </Grid>
+          {displayOptions.criterias && (
+            <Grid item xs={12} container>
+              <Truncated values={value} component={CustomChip} gap="5px" maxHeight={220} />
+            </Grid>
+          )}
         </Grid>
         <Divider sx={{ marginTop: '25px' }} />
       </Collapse>

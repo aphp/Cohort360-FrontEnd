@@ -6,13 +6,13 @@ import { AdditionalInfo } from '../useExplorationBoard'
 import ExplorationFilters from '../Filters'
 import { Filters } from 'types/searchCriterias'
 
-type FilterByProps = {
+type OrderByProps = {
   filters: Filters
   infos: AdditionalInfo
   onSubmit: (filters: Filters) => void
 }
 
-const FilterBy = ({ filters, infos, onSubmit }: FilterByProps) => {
+const OrderBy = ({ filters, infos, onSubmit }: OrderByProps) => {
   const [toggleModal, setToggleModal] = useState(false)
   const [isError, setIsError] = useState(false)
   const [hasChanged, setHasChanged] = useState(false)
@@ -55,4 +55,4 @@ const FilterBy = ({ filters, infos, onSubmit }: FilterByProps) => {
   )
 }
 
-export default FilterBy
+export default OrderBy

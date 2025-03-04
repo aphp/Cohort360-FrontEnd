@@ -13,11 +13,14 @@ const SearchPatient = () => {
   const nominativeGroupsIds = practitioner?.nominativeGroupsIds ?? []
   const displayOptions = useMemo(
     () => ({
-      filters: false,
+      myFilters: false,
+      filterBy: false,
       criterias: false,
       search: true,
       diagrams: false,
-      count: false
+      count: false,
+      orderBy: false,
+      saveFilters: false
     }),
     []
   )

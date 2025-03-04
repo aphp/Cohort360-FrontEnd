@@ -24,7 +24,7 @@ const SaveFilter = ({ disabled = false, onSubmit }: SaveFilterProps) => {
 
   useEffect(() => {
     reset({ name: '' })
-  }, [toggleModal])
+  }, [toggleModal, reset])
 
   return (
     <>
