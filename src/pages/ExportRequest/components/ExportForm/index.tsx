@@ -92,6 +92,7 @@ const ExportForm: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const cohortID = searchParams.get('groupId')
   const [loading, setLoading] = useState<boolean>(false)
+  const [cohortListLoading, setCohortListLoading] = useState<boolean>(false)
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const displayForm = cohortID !== null
@@ -117,10 +118,13 @@ const ExportForm: React.FC = () => {
 
   const _fetchExportableCohorts = useCallback(async () => {
     try {
+      setCohortListLoading(true)
       const response = await fetchExportableCohorts()
       setExportCohortList(response)
+      setCohortListLoading(false)
     } catch (error) {
       console.error(error)
+      setCohortListLoading(false)
     }
   }, [])
 
@@ -313,6 +317,7 @@ const ExportForm: React.FC = () => {
                 options={exportCohortList}
                 disabled={displayForm}
                 noOptionsText="Aucune cohorte disponible"
+                loading={cohortListLoading}
                 getOptionLabel={(option) => {
                   return `${option.name}`
                 }}
