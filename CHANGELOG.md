@@ -1,6 +1,12 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [2.44.2](https://github.com/aphp/Cohort360-FrontEnd/compare/2.44.1..2.44.2) - 2025-03-04
+
+### 🐛 Bug Fixes
+
+- Add loading on autocomplete export cohort list - ([0a4d7f0](https://github.com/aphp/Cohort360-FrontEnd/commit/0a4d7f003644d726ba040b9817ae4b91268a938a))
+
 ## [2.44.1](https://github.com/aphp/Cohort360-FrontEnd/compare/2.44.0..2.44.1) - 2025-02-28
 
 ### 🐛 Bug Fixes
