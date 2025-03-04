@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from 'state'
 import { setMessage } from 'state/message'
@@ -31,6 +31,7 @@ import useSelectionState from '../hooks/useMultipleSelection'
 import { ProjectType, RequestType, SimpleStatus } from 'types'
 import { OrderBy } from 'types/searchCriterias'
 import {
+  checkSearchParamsErrors,
   getFoldersConfirmDeletionMessage,
   getFoldersConfirmDeletionTitle,
   getRequestsConfirmDeletionMessage,
@@ -39,11 +40,11 @@ import {
 } from 'utils/explorationUtils'
 
 type RequestsListProps = {
-  showHeader?: boolean
+  simplified?: boolean
   rowsPerPage?: number
 }
 
-const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps) => {
+const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProps) => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { projectId } = useParams()
@@ -53,6 +54,7 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
   const requestState = useAppSelector((state) => state.request)
 
   const { selectedRequestShare } = requestState
+  const [paramsReady, setParamsReady] = useState(false)
   const [deleteMode, setDeleteMode] = useState(false)
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
   const [requestToEdit, setRequestToEdit] = useState<RequestType | null>(null)
@@ -69,7 +71,8 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
     startDate,
     endDate,
     page,
-    rowsPerPage
+    rowsPerPage,
+    paramsReady
   })
   const editRequestMutation = useEditRequest()
   const editProjectMutation = useEditProject()
@@ -81,6 +84,14 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
     toggle,
     clearSelection
   } = useSelectionState<RequestType>()
+
+  useEffect(() => {
+    const { changed, newSearchParams } = checkSearchParamsErrors(searchParams)
+    if (changed) {
+      setSearchParams(newSearchParams)
+    }
+    setParamsReady(true)
+  }, [])
 
   const changeOrderBy = (newOrder: OrderBy) => {
     setOrder(newOrder)
@@ -172,7 +183,7 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
 
   return (
     <Grid container gap="20px">
-      {showHeader && (
+      {!simplified && (
         <>
           <LevelHeader
             loading={projectLoading}
@@ -208,6 +219,7 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
             total={total}
             totalSelected={selectedRequests.length}
             onAddRequest={handleNewRequest}
+            disabled={maintenanceIsActive}
           />
         </>
       )}
@@ -226,7 +238,7 @@ const RequestsList = ({ showHeader = true, rowsPerPage = 20 }: RequestsListProps
         onClickEdit={onClickEdit}
         onSelectAll={onSelectAll}
         disabled={maintenanceIsActive}
-        noPagination={!showHeader}
+        simplified={simplified}
       />
 
       <AddOrEditItem

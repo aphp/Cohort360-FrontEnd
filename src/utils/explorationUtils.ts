@@ -3,6 +3,7 @@ import { CohortsType } from 'types/cohorts'
 import { Direction, FilterKeys, FilterValue, Order } from 'types/searchCriterias'
 import displayDigit from './displayDigit'
 import { SetURLSearchParams } from 'react-router-dom'
+import { isDateValid } from './formatDate'
 
 export const replaceItem = <T extends ProjectType | RequestType | Cohort>(item: T, itemsList: T[]) => {
   const index = itemsList.findIndex(({ uuid }) => uuid === item.uuid)
@@ -108,9 +109,7 @@ export const parseSearchParamValue = (searchParam: string | null, options: {}) =
   if (searchParam === null) {
     return null
   }
-  return searchParam.split(',').map((status) => {
-    if (Object.values(options).includes(status)) return status
-  })
+  return searchParam.split(',').filter((status) => Object.values(options).includes(status))
 }
 
 export const removeFromSearchParams = (
@@ -197,4 +196,77 @@ export const getRequestName = (request?: RequestType | null) => {
   if (!request) return 'N/A'
   const sharedByDetails = request.shared_by ? ` - Envoyée par : ${request.shared_by}` : ''
   return `${request.name}${sharedByDetails}`
+}
+
+const handleInvalidDate = (value: string | null, searchParams: URLSearchParams, paramKey: string) => {
+  if (!isDateValid(value)) {
+    searchParams.delete(paramKey)
+    return true
+  }
+  return false
+}
+
+const handleInvalidNumber = (value: string | null, searchParams: URLSearchParams, paramKey: string) => {
+  if (!value) return false
+  if (!RegExp(/^\d+$/).exec(value)) {
+    searchParams.delete(paramKey)
+    return true
+  }
+  return false
+}
+
+const handleFilteredValues = (
+  value: string | null,
+  searchParams: URLSearchParams,
+  paramKey: string,
+  validOptions: string[]
+) => {
+  if (!value) {
+    return false
+  }
+  const selectedStatusParam = value?.split(',')
+  const selectedStatus = selectedStatusParam?.filter((status) => validOptions.includes(status))
+  if (selectedStatus?.length !== selectedStatusParam?.length) {
+    selectedStatus?.length === 0 ? searchParams.delete(paramKey) : searchParams.set(paramKey, selectedStatus?.join())
+    return true
+  }
+  return false
+}
+
+export const searchParamsMapper: Record<string, (value: string | null, _searchParams: URLSearchParams) => boolean> = {
+  startDate: (value, _searchParams) => handleInvalidDate(value, _searchParams, 'startDate'),
+  endDate: (value, _searchParams) => handleInvalidDate(value, _searchParams, 'endDate'),
+  status: (value, _searchParams) =>
+    handleFilteredValues(
+      value,
+      _searchParams,
+      'status',
+      statusOptions.map((option) => option.code)
+    ),
+  favorite: (value, _searchParams) =>
+    handleFilteredValues(value, _searchParams, 'favorite', Object.values(CohortsType)),
+  minPatients: (value, _searchParams) => handleInvalidDate(value, _searchParams, 'minPatients'),
+  maxPatients: (value, _searchParams) => handleInvalidNumber(value, _searchParams, 'maxPatients')
+}
+
+export const checkSearchParamsErrors = (
+  newSearchParams: URLSearchParams
+): { changed: boolean; newSearchParams: URLSearchParams } => {
+  let changed = false
+  const allKeys = Array.from(newSearchParams.keys())
+
+  for (const key of allKeys) {
+    const validator = searchParamsMapper[key]
+    if (validator) {
+      const value = newSearchParams.get(key)
+      const wasModified = validator(value, newSearchParams)
+      if (wasModified) changed = true
+    } else {
+      // delete tous les params inconnus
+      newSearchParams.delete(key)
+      changed = true
+    }
+  }
+
+  return { changed, newSearchParams }
 }

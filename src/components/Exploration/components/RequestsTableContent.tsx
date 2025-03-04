@@ -32,7 +32,7 @@ type RequestsTableContentProps = {
   onClickEdit: (request: RequestType) => void
   onSelectAll: () => void
   disabled: boolean
-  noPagination?: boolean
+  simplified?: boolean
 }
 
 const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
@@ -49,27 +49,31 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
   onClickEdit,
   onSelectAll,
   disabled,
-  noPagination
+  simplified = false
 }) => {
   const navigate = useNavigate()
   const { projectId } = useParams()
 
   const columns: Column[] = [
-    {
-      label: (
-        <Checkbox
-          size="small"
-          checked={selectedRequests.length === requestsList.length}
-          indeterminate={selectedRequests.length > 0 && selectedRequests.length < requestsList.length}
-          onClick={onSelectAll}
-          sx={{ padding: 0 }}
-        />
-      )
-    },
-    { label: 'nom de la requête', align: 'left', code: Order.NAME },
+    ...(!simplified
+      ? [
+          {
+            label: (
+              <Checkbox
+                size="small"
+                checked={selectedRequests.length === requestsList.length}
+                indeterminate={selectedRequests.length > 0 && selectedRequests.length < requestsList.length}
+                onClick={onSelectAll}
+                sx={{ padding: 0 }}
+              />
+            )
+          }
+        ]
+      : []),
+    { label: 'nom de la requête', align: 'left', code: !simplified ? Order.NAME : undefined },
     { label: '', align: 'left' },
-    ...(!projectId ? [{ label: 'projet', code: Order.PARENT_FOLDER }] : []),
-    { label: 'date de modification', code: Order.UPDATED },
+    ...(!projectId ? [{ label: 'projet', code: !simplified ? Order.PARENT_FOLDER : undefined }] : []),
+    { label: 'date de modification', code: !simplified ? Order.UPDATED : undefined },
     { label: 'nb de cohortes' }
   ]
 
@@ -83,7 +87,7 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
       total={total}
       order={order}
       setOrder={(newOrder) => onChangeOrderBy(newOrder)}
-      noPagination={noPagination}
+      noPagination={simplified}
     >
       {requestsList.map((request) => {
         const cohortTotal = getCohortTotal(request.query_snapshots)
@@ -94,17 +98,19 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
             onClick={() => navigate(`/cohort/new/${request.uuid}`)}
             style={{ cursor: 'pointer' }}
           >
-            <TableCellWrapper>
-              <Checkbox
-                size="small"
-                checked={isChecked(request, selectedRequests)}
-                onClick={(event) => {
-                  event.stopPropagation()
-                  onSelectRequest(request)
-                }}
-                sx={{ padding: 0 }}
-              />
-            </TableCellWrapper>
+            {!simplified && (
+              <TableCellWrapper>
+                <Checkbox
+                  size="small"
+                  checked={isChecked(request, selectedRequests)}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    onSelectRequest(request)
+                  }}
+                  sx={{ padding: 0 }}
+                />
+              </TableCellWrapper>
+            )}
             <TableCellWrapper align="left" accentCell>
               {getRequestName(request)}
             </TableCellWrapper>

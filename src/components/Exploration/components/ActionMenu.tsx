@@ -10,9 +10,10 @@ type ActionMenuProps = {
     icon: ReactNode
     label: string
   }[]
+  disabled?: boolean
 }
 
-const ActionMenu: React.FC<ActionMenuProps> = ({ actions }) => {
+const ActionMenu: React.FC<ActionMenuProps> = ({ actions, disabled = false }) => {
   const [anchorEl, setAnchorEl] = useState<(EventTarget & HTMLButtonElement) | null>(null)
 
   return (
@@ -46,6 +47,7 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ actions }) => {
               setAnchorEl(null)
             }}
             key={action.key}
+            disabled={disabled}
           >
             <ListItemIcon>{action.icon}</ListItemIcon>
             <ListItemText>{action.label}</ListItemText>

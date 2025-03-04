@@ -9,9 +9,10 @@ type UseProjectsProps = {
   filters?: ProjectsFilters
   searchInput?: string
   orderBy?: OrderBy
+  paramsReady: boolean
 }
 
-const useProjects = ({ filters, searchInput, orderBy }: UseProjectsProps) => {
+const useProjects = ({ filters, searchInput, orderBy, paramsReady }: UseProjectsProps) => {
   const dispatch = useAppDispatch()
 
   const fetchProjectsList = async () => {
@@ -23,7 +24,8 @@ const useProjects = ({ filters, searchInput, orderBy }: UseProjectsProps) => {
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ['projects', searchInput, filters, orderBy],
     queryFn: fetchProjectsList,
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
+    enabled: paramsReady
   })
 
   useEffect(() => {

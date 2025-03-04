@@ -11,6 +11,7 @@ type UseCohortsProps = {
   filters?: CohortsFilters
   page?: number
   rowsPerPage?: number
+  paramsReady?: boolean
 }
 
 const useCohorts = ({
@@ -18,7 +19,8 @@ const useCohorts = ({
   searchInput,
   filters,
   page = 1,
-  rowsPerPage = 20
+  rowsPerPage = 20,
+  paramsReady
 }: UseCohortsProps) => {
   const dispatch = useAppDispatch()
 
@@ -52,7 +54,8 @@ const useCohorts = ({
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ['cohorts', 'projectsCount', searchInput, filters, orderBy, page],
     queryFn: fetchCohortsList,
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
+    enabled: paramsReady
   })
 
   useEffect(() => {

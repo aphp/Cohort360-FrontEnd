@@ -19,7 +19,8 @@ const usePageValidation = (
           showDialog({
             isOpen: true,
             message: `Le numéro de page indiqué dans l'url est supérieur au nombre de pages possible pour ce tableau qui est de ${totalPages}. En cliquant sur OK, vous serez redirigé vers la dernière page disponible.`,
-            onConfirm: () => onInvalidPage(totalPages)
+            onConfirm: () => onInvalidPage(totalPages),
+            status: 'warning'
           })
         )
       }

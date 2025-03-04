@@ -172,7 +172,7 @@ const Welcome = () => {
                 linkLabel={'Voir toutes mes cohortes favorites'}
                 onClickLink={() => navigate(`/researches/cohorts/?favorite=${CohortsType.FAVORITE}`)}
               >
-                <CohortsList showHeader={false} rowsPerPage={5} favorites />
+                <CohortsList rowsPerPage={5} favorites simplified />
               </PreviewCard>
             </Paper>
           </Grid>
@@ -185,7 +185,7 @@ const Welcome = () => {
                 linkLabel={'Voir toutes mes cohortes'}
                 onClickLink={() => navigate('/researches/cohorts')}
               >
-                <CohortsList showHeader={false} rowsPerPage={5} />
+                <CohortsList rowsPerPage={5} simplified />
               </PreviewCard>
             </Paper>
           </Grid>
@@ -198,7 +198,7 @@ const Welcome = () => {
                 linkLabel={'Voir toutes mes requêtes'}
                 onClickLink={() => navigate('/researches/requests')}
               >
-                <RequestsList showHeader={false} rowsPerPage={5} />
+                <RequestsList rowsPerPage={5} simplified />
               </PreviewCard>
             </Paper>
           </Grid>

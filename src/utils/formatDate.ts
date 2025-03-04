@@ -1,6 +1,11 @@
 import { Month } from 'types'
 import moment from 'moment/moment'
 
+export const isDateValid = (date?: string | null, format = 'YYYY-MM-DD') => {
+  if (!date) return false
+  return moment(date, format, true).isValid()
+}
+
 const formatDate = (date?: string, withHour?: boolean) => {
   const _date = moment(date)
   const format = `DD/MM/YYYY${withHour ? ' - HH:mm:ss' : ''}`

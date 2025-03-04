@@ -13,6 +13,7 @@ type UseRequestsProps = {
   endDate?: string
   rowsPerPage?: number
   page?: number
+  paramsReady?: boolean
 }
 
 const useRequests = ({
@@ -22,7 +23,8 @@ const useRequests = ({
   startDate,
   endDate,
   rowsPerPage = 20,
-  page = 1
+  page = 1,
+  paramsReady
 }: UseRequestsProps) => {
   const dispatch = useAppDispatch()
 
@@ -43,7 +45,8 @@ const useRequests = ({
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ['requests', 'projectsCount', orderBy, searchInput, startDate, endDate, page],
     queryFn: fetchRequestsList,
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
+    enabled: paramsReady
   })
 
   useEffect(() => {

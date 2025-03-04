@@ -24,7 +24,7 @@ type MoveRequestProps = {
 
 const MoveRequest = ({ open, onClose, selectedRequests }: MoveRequestProps) => {
   const [selectedFolder, setSelectedFolder] = useState<ProjectType | null>(null)
-  const { projectsList, loading } = useProjects({})
+  const { projectsList, loading } = useProjects({ paramsReady: true })
   const moveRequestMutation = useMoveRequest()
 
   const _onConfirm = async () => {

@@ -465,7 +465,7 @@ const servicesProjects: IServiceProjects = {
       const { status, favorite, minPatients, maxPatients, startDate, endDate, parentId } = filters
       const _status = status?.map((stat) => (stat.code === 'pending' ? 'pending,started' : stat.code)) ?? []
 
-      if (limit) options = [...options, `limit=${limit}`]
+      if (limit || limit === 0) options = [...options, `limit=${limit}`]
       if (offset) options = [...options, `offset=${offset}`]
       if (orderBy) options = [...options, `ordering=${_sortDirection}${orderBy.orderBy}`]
       if (searchInput !== '') options = [...options, `search=${searchInput}`]

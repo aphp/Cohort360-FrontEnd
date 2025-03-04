@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from 'state'
 import { setMessage } from 'state/message'
@@ -12,6 +12,7 @@ import CohortStatusFilter from 'components/Filters/CohortStatusFilter'
 import CohortsTableContent from './CohortsTableContent'
 import CohortsTypesFilter from 'components/Filters/CohortsTypeFilter'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
+import IconButtonWithTooltip from './IconButtonWithTooltip'
 import LevelHeader from './LevelHeader'
 import Modal from 'components/ui/Modal'
 import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
@@ -34,6 +35,7 @@ import useSelectionState from '../hooks/useMultipleSelection'
 import { Cohort, RequestType, SimpleStatus, ValueSet } from 'types'
 import { CohortsFilters, FilterKeys, OrderBy } from 'types/searchCriterias'
 import {
+  checkSearchParamsErrors,
   getCohortsConfirmDeletionMessage,
   getCohortsConfirmDeletionTitle,
   getCohortsSearchParams,
@@ -45,15 +47,14 @@ import {
 } from 'utils/explorationUtils'
 import { removeFilter, selectFiltersAsArray } from 'utils/filters'
 import { CohortsType } from 'types/cohorts'
-import IconButtonWithTooltip from './IconButtonWithTooltip'
 
 type CohortsListProps = {
-  showHeader?: boolean
   rowsPerPage?: number
   favorites?: boolean
+  simplified?: boolean
 }
 
-const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }: CohortsListProps) => {
+const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }: CohortsListProps) => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { projectId, requestId } = useParams()
@@ -65,9 +66,10 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
   const requestState = useAppSelector((state) => state.request)
 
   const { selectedRequestShare } = requestState
+  const [paramsReady, setParamsReady] = useState(false)
   const [deleteMode, setDeleteMode] = useState(false)
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
-  const [filters, setFilters] = useState<CohortsFilters>({
+  let filters: CohortsFilters = {
     status,
     favorite: favorites ? [CohortsType.FAVORITE] : favorite,
     minPatients,
@@ -75,15 +77,30 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
     startDate,
     endDate,
     parentId: requestId
-  })
+  }
   const [cohortToEdit, setCohortToEdit] = useState<Cohort | null>(null)
   const [openCohortEditionModal, setOpenCohortEditionModal] = useState(false)
   const [openParentEditionModal, setOpenParentEditionModal] = useState(false)
   const [openDeletionModal, setOpenDeletionModal] = useState(false)
   const [openFiltersModal, setOpenFiltersModal] = useState(false)
 
+  useEffect(() => {
+    const { changed, newSearchParams } = checkSearchParamsErrors(searchParams)
+    if (changed) {
+      setSearchParams(newSearchParams)
+    }
+    setParamsReady(true)
+  }, [])
+
   const { request: parentRequest, requestLoading, requestIsError } = useRequest(requestId)
-  const { cohortsList, total, loading } = useCohorts({ orderBy: order, searchInput, filters, page, rowsPerPage })
+  const { cohortsList, total, loading } = useCohorts({
+    orderBy: order,
+    searchInput,
+    filters,
+    page,
+    rowsPerPage,
+    paramsReady
+  })
   useCohortsWebSocket()
   const editRequestMutation = useEditRequest()
   const deleteRequestMutation = useDeleteRequests()
@@ -208,7 +225,7 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
 
   return (
     <Grid container gap="20px">
-      {showHeader && (
+      {!simplified && (
         <>
           <LevelHeader
             loading={requestLoading}
@@ -253,8 +270,9 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
             filters={filtersAsArray}
             onRemoveFilters={(key, value) => {
               removeFromSearchParams(searchParams, setSearchParams, key, value)
-              setFilters(removeFilter(key, value, filters))
+              filters = removeFilter(key, value, filters)
             }}
+            disabled={maintenanceIsActive}
           />
         </>
       )}
@@ -276,7 +294,7 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
           onClickEdit,
           onSelectCohort: toggle
         }}
-        noPagination={!showHeader}
+        simplified={simplified}
       />
       <AddOrEditItem
         open={openCohortEditionModal}
@@ -319,7 +337,7 @@ const CohortsList = ({ showHeader = true, rowsPerPage = 20, favorites = false }:
         open={openFiltersModal}
         onClose={() => setOpenFiltersModal(false)}
         onSubmit={(newFilters) => {
-          setFilters({ ...filters, ...newFilters })
+          filters = { ...filters, ...newFilters }
           newFilters.status.length > 0 &&
             searchParams.set('status', newFilters.status.map((status: ValueSet) => status.code).join())
           newFilters.favorite.length > 0 && searchParams.set('favorite', newFilters.favorite)

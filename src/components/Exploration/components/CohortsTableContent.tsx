@@ -68,7 +68,7 @@ type CohortsTableContentProps = {
   onChangeOrderBy: (newOrder: OrderBy) => void
   onSelectAll: () => void
   cohortsCallbacks: CohortCallbacks
-  noPagination?: boolean
+  simplified?: boolean
 }
 
 const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
@@ -83,7 +83,7 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
   selectedCohorts,
   onSelectAll,
   cohortsCallbacks,
-  noPagination
+  simplified = false
 }) => {
   const appConfig = useContext(AppConfig)
   const navigate = useNavigate()
@@ -91,24 +91,28 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
   const { onClickRow, onClickFav, onClickExport, onClickEdit, onSelectCohort } = cohortsCallbacks
 
   const columns: Column[] = [
-    {
-      label: (
-        <Checkbox
-          size="small"
-          checked={selectedCohorts.length === cohortsList.length}
-          indeterminate={selectedCohorts.length > 0 && selectedCohorts.length < cohortsList.length}
-          onClick={onSelectAll}
-        />
-      )
-    },
-    { label: '', code: Order.FAVORITE },
-    { label: 'nom de la cohorte', code: Order.NAME, align: 'left' },
+    ...(!simplified
+      ? [
+          {
+            label: (
+              <Checkbox
+                size="small"
+                checked={selectedCohorts.length === cohortsList.length}
+                indeterminate={selectedCohorts.length > 0 && selectedCohorts.length < cohortsList.length}
+                onClick={onSelectAll}
+              />
+            )
+          }
+        ]
+      : []),
+    { label: '', code: !simplified ? Order.FAVORITE : undefined },
+    { label: 'nom de la cohorte', code: !simplified ? Order.NAME : undefined, align: 'left' },
     { label: '' },
-    ...(!requestId ? [{ label: 'requête parent', code: Order.REQUEST }] : []),
+    ...(!requestId ? [{ label: 'requête parent', code: !simplified ? Order.REQUEST : undefined }] : []),
     { label: 'statut' },
-    { label: 'nb de patients', code: Order.RESULT_SIZE },
+    { label: 'nb de patients', code: !simplified ? Order.RESULT_SIZE : undefined },
     { label: 'estimation du nombre de patients ap-hp' },
-    { label: 'date de création', code: Order.CREATED_AT }
+    { label: 'date de création', code: !simplified ? Order.CREATED_AT : undefined }
     // { label: 'échantillons' }
   ]
 
@@ -122,7 +126,7 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
       total={total}
       order={order}
       setOrder={(newOrder) => onChangeOrderBy(newOrder)}
-      noPagination={noPagination}
+      noPagination={simplified}
     >
       {cohortsList.map((cohort) => {
         const isExportable = appConfig.features.export.enabled ? cohort?.rights?.export_csv_nomi : false
@@ -136,16 +140,18 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
 
         return (
           <TableRow key={cohort.uuid} onClick={() => onClickRow(cohort)} style={{ cursor: 'pointer' }}>
-            <TableCellWrapper>
-              <Checkbox
-                size="small"
-                checked={isChecked(cohort, selectedCohorts)}
-                onClick={(event) => {
-                  event.stopPropagation()
-                  onSelectCohort(cohort)
-                }}
-              />
-            </TableCellWrapper>
+            {!simplified && (
+              <TableCellWrapper>
+                <Checkbox
+                  size="small"
+                  checked={isChecked(cohort, selectedCohorts)}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    onSelectCohort(cohort)
+                  }}
+                />
+              </TableCellWrapper>
+            )}
             <TableCellWrapper align="left">
               <IconButton
                 onClick={(event) => {

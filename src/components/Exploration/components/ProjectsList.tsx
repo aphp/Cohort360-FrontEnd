@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAppSelector } from 'state'
 
@@ -19,6 +19,7 @@ import useProjects from '../hooks/useProjects'
 import { ProjectType } from 'types'
 import { Direction, Order, OrderBy } from 'types/searchCriterias'
 import {
+  checkSearchParamsErrors,
   getFoldersConfirmDeletionMessage,
   getFoldersConfirmDeletionTitle,
   getFoldersSearchParams
@@ -31,6 +32,7 @@ const ProjectsList = () => {
   const { searchInput, startDate, endDate, orderBy, orderDirection } = getFoldersSearchParams(searchParams)
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
 
+  const [paramsReady, setParamsReady] = useState(false)
   const [openEditionModal, setOpenEditionModal] = useState(false)
   const [openDeletionModal, setOpenDeletionModal] = useState(false)
   const [selectedProject, setSelectedProject] = useState<ProjectType | null>(null)
@@ -38,11 +40,20 @@ const ProjectsList = () => {
   const { projectsList, total, loading } = useProjects({
     filters: { startDate, endDate },
     searchInput,
-    orderBy: { orderBy, orderDirection }
+    orderBy: { orderBy, orderDirection },
+    paramsReady
   })
   const createProjectMutation = useCreateProject()
   const deleteProjectMutation = useDeleteProject()
   const editProjectMutation = useEditProject()
+
+  useEffect(() => {
+    const { changed, newSearchParams } = checkSearchParamsErrors(searchParams)
+    if (changed) {
+      setSearchParams(newSearchParams)
+    }
+    setParamsReady(true)
+  }, [])
 
   const orderByProjects = [
     {
@@ -108,7 +119,13 @@ const ProjectsList = () => {
         <Typography fontWeight={'bold'} fontSize={14}>
           {total} projet{total > 1 ? 's' : ''}
         </Typography>
-        <Button width="fit-content" onClick={() => setOpenEditionModal(true)} endIcon={<AddIcon />} small>
+        <Button
+          width="fit-content"
+          onClick={() => setOpenEditionModal(true)}
+          endIcon={<AddIcon />}
+          disabled={maintenanceIsActive}
+          small
+        >
           Ajouter un projet
         </Button>
       </Grid>

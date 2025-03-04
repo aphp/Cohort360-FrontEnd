@@ -22,6 +22,7 @@ type ActionBarProps = {
   filters?: { value: FilterValue; category: FilterKeys; label: string }[]
   onRemoveFilters?: (key: FilterKeys, value: FilterValue) => void
   onAddRequest?: () => void
+  disabled?: boolean
 }
 
 const ActionBar: React.FC<ActionBarProps> = ({
@@ -34,7 +35,8 @@ const ActionBar: React.FC<ActionBarProps> = ({
   onFilter,
   filters,
   onRemoveFilters,
-  onAddRequest
+  onAddRequest,
+  disabled = false
 }) => {
   return (
     <Grid container justifyContent={'space-between'} alignItems={'center'}>
@@ -57,12 +59,12 @@ const ActionBar: React.FC<ActionBarProps> = ({
       </Box>
       <Box display="flex" gap={1}>
         {onFilter && (
-          <Button endIcon={<FilterList />} width={'fit-content'} onClick={onFilter} small>
+          <Button endIcon={<FilterList />} width={'fit-content'} onClick={onFilter} disabled={disabled} small>
             Filtrer
           </Button>
         )}
         {onAddRequest && (
-          <Button width="fit-content" onClick={() => onAddRequest()} endIcon={<AddIcon />} small>
+          <Button width="fit-content" onClick={() => onAddRequest()} endIcon={<AddIcon />} disabled={disabled} small>
             Ajouter une requête
           </Button>
         )}
@@ -74,11 +76,19 @@ const ActionBar: React.FC<ActionBarProps> = ({
                 small
                 onClick={() => (onMove ? onMove() : null)}
                 endIcon={<DriveFileMoveIcon />}
+                disabled={disabled}
               >
                 Déplacer
               </Button>
             )}
-            <Button width="fit-content" small onClick={onDelete} endIcon={<DeleteIcon />} customVariant="pink">
+            <Button
+              width="fit-content"
+              small
+              onClick={onDelete}
+              endIcon={<DeleteIcon />}
+              customVariant="pink"
+              disabled={disabled}
+            >
               Supprimer
             </Button>
           </>
