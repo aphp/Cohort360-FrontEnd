@@ -46,7 +46,7 @@ import {
   statusOptions
 } from 'utils/explorationUtils'
 import { removeFilter, selectFiltersAsArray } from 'utils/filters'
-import { CohortsType } from 'types/cohorts'
+import { CohortsType, ExplorationsSearchParams } from 'types/cohorts'
 
 type CohortsListProps = {
   rowsPerPage?: number
@@ -126,7 +126,7 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
   )
 
   const handlePageChange = (newPage: number) => {
-    searchParams.set('page', String(newPage))
+    searchParams.set(ExplorationsSearchParams.PAGE, String(newPage))
     setSearchParams(searchParams)
   }
 
@@ -142,8 +142,8 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
 
   const changeOrderBy = (newOrder: OrderBy) => {
     setOrder(newOrder)
-    searchParams.set('orderBy', newOrder.orderBy)
-    searchParams.set('direction', newOrder.orderDirection)
+    searchParams.set(ExplorationsSearchParams.ORDER_BY, newOrder.orderBy)
+    searchParams.set(ExplorationsSearchParams.DIRECTION, newOrder.orderDirection)
     setSearchParams(searchParams)
   }
 
@@ -339,10 +339,13 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
         onSubmit={(newFilters) => {
           filters = { ...filters, ...newFilters }
           newFilters.status.length > 0 &&
-            searchParams.set('status', newFilters.status.map((status: ValueSet) => status.code).join())
-          newFilters.favorite.length > 0 && searchParams.set('favorite', newFilters.favorite)
-          newFilters.minPatients && searchParams.set('minPatients', newFilters.minPatients)
-          newFilters.maxPatients && searchParams.set('maxPatients', newFilters.maxPatients)
+            searchParams.set(
+              ExplorationsSearchParams.STATUS,
+              newFilters.status.map((status: ValueSet) => status.code).join()
+            )
+          newFilters.favorite.length > 0 && searchParams.set(ExplorationsSearchParams.FAVORITE, newFilters.favorite)
+          newFilters.minPatients && searchParams.set(ExplorationsSearchParams.MIN_PATIENTS, newFilters.minPatients)
+          newFilters.maxPatients && searchParams.set(ExplorationsSearchParams.MAX_PATIENTS, newFilters.maxPatients)
           setSearchParams(searchParams)
         }}
       >

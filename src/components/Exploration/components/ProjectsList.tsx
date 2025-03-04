@@ -24,6 +24,7 @@ import {
   getFoldersConfirmDeletionTitle,
   getFoldersSearchParams
 } from 'utils/explorationUtils'
+import { ExplorationsSearchParams } from 'types/cohorts'
 
 const ProjectsList = () => {
   const navigate = useNavigate()
@@ -91,8 +92,8 @@ const ProjectsList = () => {
       orderBy: findOrder.orderBy ?? Order.CREATED_AT,
       orderDirection: findOrder.direction ?? Direction.DESC
     })
-    searchParams.set('orderBy', findOrder.orderBy)
-    searchParams.set('direction', findOrder.direction)
+    searchParams.set(ExplorationsSearchParams.ORDER_BY, findOrder.orderBy)
+    searchParams.set(ExplorationsSearchParams.DIRECTION, findOrder.direction)
     setSearchParams(searchParams)
   }
 

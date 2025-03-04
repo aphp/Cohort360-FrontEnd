@@ -29,6 +29,7 @@ import useRequests from '../hooks/useRequests'
 import useSelectionState from '../hooks/useMultipleSelection'
 
 import { ProjectType, RequestType, SimpleStatus } from 'types'
+import { ExplorationsSearchParams } from 'types/cohorts'
 import { OrderBy } from 'types/searchCriterias'
 import {
   checkSearchParamsErrors,
@@ -95,13 +96,13 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
 
   const changeOrderBy = (newOrder: OrderBy) => {
     setOrder(newOrder)
-    searchParams.set('orderBy', newOrder.orderBy)
-    searchParams.set('direction', newOrder.orderDirection)
+    searchParams.set(ExplorationsSearchParams.ORDER_BY, newOrder.orderBy)
+    searchParams.set(ExplorationsSearchParams.DIRECTION, newOrder.orderDirection)
     setSearchParams(searchParams)
   }
 
   const handlePageChange = (newPage: number) => {
-    searchParams.set('page', String(newPage))
+    searchParams.set(ExplorationsSearchParams.PAGE, String(newPage))
     setSearchParams(searchParams)
   }
 

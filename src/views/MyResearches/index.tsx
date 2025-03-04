@@ -13,6 +13,7 @@ import Tabs from 'components/ui/Tabs'
 import useCounts from 'components/Exploration/hooks/useCounts'
 
 import { ExplorationTabs, TabType } from 'types'
+import { ExplorationsSearchParams } from 'types/cohorts'
 import { cleanSearchParams, getPathDepth } from 'utils/explorationUtils'
 import useStyles from './styles'
 import moment from 'moment'
@@ -24,9 +25,9 @@ const MyResearches = () => {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const searchInput = searchParams.get('searchInput') ?? ''
-  const startDateParam = searchParams.get('startDate') ?? null
-  const endDateParam = searchParams.get('endDate') ?? null
+  const searchInput = searchParams.get(ExplorationsSearchParams.SEARCH_INPUT) ?? ''
+  const startDateParam = searchParams.get(ExplorationsSearchParams.START_DATE) ?? null
+  const endDateParam = searchParams.get(ExplorationsSearchParams.END_DATE) ?? null
 
   const { projectsCount, requestsCount, cohortsCount, samplesCount } = useCounts(
     searchInput,
@@ -56,9 +57,9 @@ const MyResearches = () => {
 
   const handleSearchTermChange = (newSearchInput: string) => {
     if (!newSearchInput) {
-      searchParams.delete('searchInput')
+      searchParams.delete(ExplorationsSearchParams.SEARCH_INPUT)
     } else {
-      searchParams.set('searchInput', newSearchInput)
+      searchParams.set(ExplorationsSearchParams.SEARCH_INPUT, newSearchInput)
     }
     setSearchParams(searchParams)
     navigate({
@@ -67,24 +68,11 @@ const MyResearches = () => {
     })
   }
 
-  const handleStartDateChange = (newDate: string | null) => {
-    if (!newDate) {
-      searchParams.delete('startDate')
+  const handleDateChange = (date: string | null, key: ExplorationsSearchParams) => {
+    if (!date) {
+      searchParams.delete(key)
     } else {
-      searchParams.set('startDate', moment(newDate).isValid() ? moment(newDate).format('YYYY-MM-DD') : '')
-    }
-    setSearchParams(searchParams)
-    navigate({
-      pathname: `/researches/${selectedTab?.id}`,
-      search: `?${searchParams.toString()}`
-    })
-  }
-
-  const handleEndDateChange = (newDate: string | null) => {
-    if (!newDate) {
-      searchParams.delete('endDate')
-    } else {
-      searchParams.set('endDate', moment(newDate).isValid() ? moment(newDate).format('YYYY-MM-DD') : '')
+      searchParams.set(key, moment(date).isValid() ? moment(date).format('YYYY-MM-DD') : '')
     }
     setSearchParams(searchParams)
     navigate({
@@ -170,8 +158,10 @@ const MyResearches = () => {
           <MenuButtonFilter
             startDate={startDateParam}
             endDate={endDateParam}
-            onChangeStartDate={handleStartDateChange}
-            onChangeEndDate={handleEndDateChange}
+            onChangeStartDate={(newDate: string | null) =>
+              handleDateChange(newDate, ExplorationsSearchParams.START_DATE)
+            }
+            onChangeEndDate={(newDate: string | null) => handleDateChange(newDate, ExplorationsSearchParams.END_DATE)}
           />
           <Searchbar>
             <SearchInput

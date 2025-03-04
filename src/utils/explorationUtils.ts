@@ -1,5 +1,5 @@
 import { Cohort, JobStatus, ProjectType, QuerySnapshotInfo, RequestType, ValueSet } from 'types'
-import { CohortsType } from 'types/cohorts'
+import { CohortsType, ExplorationsSearchParams } from 'types/cohorts'
 import { Direction, FilterKeys, FilterValue, Order } from 'types/searchCriterias'
 import displayDigit from './displayDigit'
 import { SetURLSearchParams } from 'react-router-dom'
@@ -72,22 +72,22 @@ export const statusOptions = [
 
 export const getFoldersSearchParams = (searchParams: URLSearchParams) => {
   return {
-    searchInput: searchParams.get('searchInput') ?? '',
-    startDate: searchParams.get('startDate'),
-    endDate: searchParams.get('endDate'),
-    orderBy: (searchParams.get('orderBy') as Order) ?? Order.CREATED_AT,
-    orderDirection: (searchParams.get('direction') as Direction) ?? Direction.DESC
+    searchInput: searchParams.get(ExplorationsSearchParams.SEARCH_INPUT) ?? '',
+    startDate: searchParams.get(ExplorationsSearchParams.START_DATE),
+    endDate: searchParams.get(ExplorationsSearchParams.END_DATE),
+    orderBy: (searchParams.get(ExplorationsSearchParams.ORDER_BY) as Order) ?? Order.CREATED_AT,
+    orderDirection: (searchParams.get(ExplorationsSearchParams.DIRECTION) as Direction) ?? Direction.DESC
   }
 }
 
 export const getRequestsSearchParams = (searchParams: URLSearchParams) => {
   return {
-    searchInput: searchParams.get('searchInput') ?? '',
-    startDate: searchParams.get('startDate') ?? undefined,
-    endDate: searchParams.get('endDate') ?? undefined,
+    searchInput: searchParams.get(ExplorationsSearchParams.SEARCH_INPUT) ?? '',
+    startDate: searchParams.get(ExplorationsSearchParams.START_DATE) ?? undefined,
+    endDate: searchParams.get(ExplorationsSearchParams.END_DATE) ?? undefined,
     page: parseInt(searchParams.get('page') ?? '1', 10),
-    orderBy: (searchParams.get('orderBy') as Order) ?? Order.UPDATED,
-    orderDirection: (searchParams.get('direction') as Direction) ?? Direction.DESC
+    orderBy: (searchParams.get(ExplorationsSearchParams.ORDER_BY) as Order) ?? Order.UPDATED,
+    orderDirection: (searchParams.get(ExplorationsSearchParams.DIRECTION) as Direction) ?? Direction.DESC
   }
 }
 
@@ -129,7 +129,11 @@ export const removeFromSearchParams = (
 }
 
 export const cleanSearchParams = (searchParams: URLSearchParams) => {
-  const keysToKeep = ['startDate', 'endDate', 'searchInput']
+  const keysToKeep = [
+    ExplorationsSearchParams.START_DATE,
+    ExplorationsSearchParams.END_DATE,
+    ExplorationsSearchParams.SEARCH_INPUT
+  ]
   const newSearchParams = new URLSearchParams()
 
   for (const key of keysToKeep) {
@@ -143,16 +147,17 @@ export const cleanSearchParams = (searchParams: URLSearchParams) => {
 
 export const getCohortsSearchParams = (searchParams: URLSearchParams) => {
   return {
-    searchInput: searchParams.get('searchInput') ?? '',
-    startDate: searchParams.get('startDate'),
-    endDate: searchParams.get('endDate'),
+    searchInput: searchParams.get(ExplorationsSearchParams.SEARCH_INPUT) ?? '',
+    startDate: searchParams.get(ExplorationsSearchParams.START_DATE),
+    endDate: searchParams.get(ExplorationsSearchParams.END_DATE),
     page: parseInt(searchParams.get('page') ?? '1', 10),
-    orderBy: (searchParams.get('orderBy') as Order) ?? Order.CREATED_AT,
-    orderDirection: (searchParams.get('direction') as Direction) ?? Direction.DESC,
-    status: getStatusParam(searchParams.get('status')) as ValueSet[],
-    favorite: (parseSearchParamValue(searchParams.get('favorite'), CohortsType) ?? []) as CohortsType[],
-    minPatients: searchParams.get('minPatients'),
-    maxPatients: searchParams.get('maxPatients')
+    orderBy: (searchParams.get(ExplorationsSearchParams.ORDER_BY) as Order) ?? Order.CREATED_AT,
+    orderDirection: (searchParams.get(ExplorationsSearchParams.DIRECTION) as Direction) ?? Direction.DESC,
+    status: getStatusParam(searchParams.get(ExplorationsSearchParams.STATUS)) as ValueSet[],
+    favorite: (parseSearchParamValue(searchParams.get(ExplorationsSearchParams.FAVORITE), CohortsType) ??
+      []) as CohortsType[],
+    minPatients: searchParams.get(ExplorationsSearchParams.MIN_PATIENTS),
+    maxPatients: searchParams.get(ExplorationsSearchParams.MAX_PATIENTS)
   }
 }
 
@@ -234,19 +239,20 @@ const handleFilteredValues = (
 }
 
 export const searchParamsMapper: Record<string, (value: string | null, _searchParams: URLSearchParams) => boolean> = {
-  startDate: (value, _searchParams) => handleInvalidDate(value, _searchParams, 'startDate'),
-  endDate: (value, _searchParams) => handleInvalidDate(value, _searchParams, 'endDate'),
+  startDate: (value, _searchParams) => handleInvalidDate(value, _searchParams, ExplorationsSearchParams.START_DATE),
+  endDate: (value, _searchParams) => handleInvalidDate(value, _searchParams, ExplorationsSearchParams.END_DATE),
   status: (value, _searchParams) =>
     handleFilteredValues(
       value,
       _searchParams,
-      'status',
+      ExplorationsSearchParams.STATUS,
       statusOptions.map((option) => option.code)
     ),
   favorite: (value, _searchParams) =>
-    handleFilteredValues(value, _searchParams, 'favorite', Object.values(CohortsType)),
-  minPatients: (value, _searchParams) => handleInvalidDate(value, _searchParams, 'minPatients'),
-  maxPatients: (value, _searchParams) => handleInvalidNumber(value, _searchParams, 'maxPatients')
+    handleFilteredValues(value, _searchParams, ExplorationsSearchParams.FAVORITE, Object.values(CohortsType)),
+  minPatients: (value, _searchParams) => handleInvalidDate(value, _searchParams, ExplorationsSearchParams.MIN_PATIENTS),
+  maxPatients: (value, _searchParams) =>
+    handleInvalidNumber(value, _searchParams, ExplorationsSearchParams.MAX_PATIENTS)
 }
 
 export const checkSearchParamsErrors = (
