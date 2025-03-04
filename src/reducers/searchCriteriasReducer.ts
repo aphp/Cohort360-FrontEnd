@@ -46,22 +46,12 @@ export const initCohortsSearchCriterias: SearchCriterias<CohortsFilters> = {
   }
 }
 
-export const initSearchPatientsSearchCriterias: SearchCriterias<null> = {
+export const initPatientsSearchCriterias = (search?: string): SearchCriterias<PatientsFilters> => ({
   orderBy: {
     orderBy: Order.FAMILY,
     orderDirection: Direction.ASC
   },
-  searchInput: '',
-  searchBy: SearchByTypes.TEXT,
-  filters: null
-}
-
-export const initPatientsSearchCriterias = (): SearchCriterias<PatientsFilters> => ({
-  orderBy: {
-    orderBy: Order.FAMILY,
-    orderDirection: Direction.ASC
-  },
-  searchInput: '',
+  searchInput: search ?? '',
   searchBy: SearchByTypes.TEXT,
   filters: {
     genders: [],
@@ -70,12 +60,12 @@ export const initPatientsSearchCriterias = (): SearchCriterias<PatientsFilters> 
   }
 })
 
-export const initPmsiSearchCriterias = (): SearchCriterias<PMSIFilters> => ({
+export const initPmsiSearchCriterias = (search?: string): SearchCriterias<PMSIFilters> => ({
   orderBy: {
     orderBy: Order.DATE,
     orderDirection: Direction.DESC
   },
-  searchInput: '',
+  searchInput: search ?? '',
   filters: {
     code: [],
     source: [],
@@ -88,12 +78,12 @@ export const initPmsiSearchCriterias = (): SearchCriterias<PMSIFilters> => ({
   }
 })
 
-export const initMedSearchCriterias = (): SearchCriterias<MedicationFilters> => ({
+export const initMedSearchCriterias = (search?: string): SearchCriterias<MedicationFilters> => ({
   orderBy: {
     orderBy: Order.PERIOD_START,
     orderDirection: Direction.DESC
   },
-  searchInput: '',
+  searchInput: search ?? '',
   searchBy: SearchByTypes.TEXT,
   filters: {
     nda: '',
@@ -107,12 +97,12 @@ export const initMedSearchCriterias = (): SearchCriterias<MedicationFilters> => 
   }
 })
 
-export const initBioSearchCriterias = (): SearchCriterias<BiologyFilters> => ({
+export const initBioSearchCriterias = (search?: string): SearchCriterias<BiologyFilters> => ({
   orderBy: {
     orderBy: Order.DATE,
     orderDirection: Direction.ASC
   },
-  searchInput: '',
+  searchInput: search ?? '',
   searchBy: SearchByTypes.TEXT,
   filters: {
     validatedStatus: true,
@@ -125,12 +115,12 @@ export const initBioSearchCriterias = (): SearchCriterias<BiologyFilters> => ({
   }
 })
 
-export const initDocsSearchCriterias = (): SearchCriterias<DocumentsFilters> => ({
+export const initDocsSearchCriterias = (search?: string): SearchCriterias<DocumentsFilters> => ({
   orderBy: {
     orderBy: Order.DATE,
     orderDirection: Direction.DESC
   },
-  searchInput: '',
+  searchInput: search ?? '',
   searchBy: SearchByTypes.TEXT,
   filters: {
     ipp: '',
@@ -144,12 +134,12 @@ export const initDocsSearchCriterias = (): SearchCriterias<DocumentsFilters> => 
   }
 })
 
-export const initImagingCriterias = (): SearchCriterias<ImagingFilters> => ({
+export const initImagingCriterias = (search?: string): SearchCriterias<ImagingFilters> => ({
   orderBy: {
     orderBy: Order.STUDY_DATE,
     orderDirection: Direction.DESC
   },
-  searchInput: '',
+  searchInput: search ?? '',
   searchBy: SearchByTypes.TEXT,
   filters: {
     ipp: '',
@@ -161,12 +151,12 @@ export const initImagingCriterias = (): SearchCriterias<ImagingFilters> => ({
   }
 })
 
-export const initFormsCriterias = (): SearchCriterias<MaternityFormFilters> => ({
+export const initFormsCriterias = (search?: string): SearchCriterias<MaternityFormFilters> => ({
   orderBy: {
     orderBy: Order.AUTHORED,
     orderDirection: Direction.DESC
   },
-  searchInput: '',
+  searchInput: search ?? '',
   filters: {
     ipp: '',
     formName: [],
@@ -180,7 +170,6 @@ const searchCriteriasReducer = <F>(
   initState: () => SearchCriterias<F>
 ): ((state: SearchCriterias<F> | undefined, action: ActionFilters<F>) => SearchCriterias<F>) => {
   return (state: SearchCriterias<F> = initState(), action: ActionFilters<F>): SearchCriterias<F> => {
-    console.log('test update reducer', action)
     switch (action.type) {
       case ActionTypes.CHANGE_ORDER_BY:
         return { ...state, orderBy: action.payload }

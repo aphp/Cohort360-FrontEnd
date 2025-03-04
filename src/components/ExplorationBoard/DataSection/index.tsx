@@ -17,6 +17,7 @@ import Timeline from 'components/Patient/MaternityTimeline'
 import { ExplorationResults } from 'types'
 import { QuestionnaireResponse } from 'fhir/r4'
 import { AdditionalInfo } from '../useExplorationBoard'
+import { DisplayOptions } from '..'
 
 type DataSectionProps = {
   data: { raw: Data | null; table: Table }
@@ -27,6 +28,7 @@ type DataSectionProps = {
   isLoading: boolean
   type: ResourceType
   pagination: { currentPage: number; total: number }
+  displayOptions: DisplayOptions
   onChangePage: (page: number) => void
   onSort: (orderBy: OrderBy) => void
 }
@@ -40,6 +42,7 @@ const DataSection = ({
   orderBy,
   isLoading,
   pagination,
+  displayOptions,
   onChangePage,
   onSort
 }: DataSectionProps) => {
@@ -63,7 +66,7 @@ const DataSection = ({
           {!isLoading && (
             <>
               {data.table.rows.length < 1 && <Typography variant="button">Aucune donnée à afficher</Typography>}
-              {data.table.rows.length > 0 && (
+              {data.table.rows.length > 0 && displayOptions.count && (
                 <>
                   {count && type !== ResourceType.PATIENT && (
                     <DisplayDigits
@@ -87,6 +90,7 @@ const DataSection = ({
             </>
           )}
           {type === ResourceType.PATIENT &&
+            displayOptions.diagrams &&
             (() => {
               const patients = (data.raw as PatientsResponse)?.originalPatients
               const map = getGenderRepartitionSimpleData((data.raw as PatientsResponse)?.genderRepartitionMap)

@@ -1,7 +1,7 @@
-import { medicationTabs } from 'components/Patient/PatientMedication'
 import { PmsiTab } from 'types'
 import { PMSILabel } from 'types/patient'
 import { MedicationLabel, ResourceType } from 'types/requestCriterias'
+import { medicationTabs } from 'views/Dashboard'
 
 const PMSITabs: PmsiTab[] = [
   { label: PMSILabel.DIAGNOSTIC, id: ResourceType.CONDITION },

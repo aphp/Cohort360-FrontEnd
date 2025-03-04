@@ -7,13 +7,10 @@ import PatientHeader from 'components/Patient/PatientHeader/PatientHeader'
 import PatientPreview from 'components/Patient/PatientPreview/PatientPreview'
 import PatientSidebar from 'components/Patient/PatientSidebar/PatientSidebar'
 import PatientTimeline from 'components/Patient/PatientTimeline/PatientTimeline'
-import PatientMedication from 'components/Patient/PatientMedication'
-import PatientImaging from 'components/Patient/PatientImaging'
-import PatientPMSI from 'components/Patient/PatientPMSI'
 import TopBar from 'components/TopBar/TopBar'
 import useStyles from './styles'
 import { useAppSelector, useAppDispatch } from 'state'
-import { PatientState, fetchPatientInfo } from 'state/patient'
+import { fetchPatientInfo } from 'state/patient'
 import { AppConfig } from 'config'
 import { getCleanGroupId } from 'utils/paginationUtils'
 import ExplorationBoard from 'components/ExplorationBoard'
@@ -239,7 +236,7 @@ const Patient = () => {
               deidentified={deidentified}
               type={selectedTab}
               messages={getAlertMessages(selectedTab, deidentified)}
-              groupId={patient?.groupId}
+              groupId={patient?.groupId ? [patient?.groupId] : []}
               patient={patient}
             />
           )}

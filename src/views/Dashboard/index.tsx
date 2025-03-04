@@ -265,7 +265,7 @@ const Dashboard = ({ context }: DashboardProps) => {
             deidentified={!!dashboard.deidentifiedBoolean}
             type={selectedTab}
             messages={getAlertMessages(selectedTab, !!dashboard.deidentifiedBoolean)}
-            groupId={groupIds}
+            groupId={groupIds ? [groupIds] : []}
           />
         )}
       </Grid>
