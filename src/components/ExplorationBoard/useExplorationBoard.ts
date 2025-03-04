@@ -60,36 +60,37 @@ export type AdditionalInfo = {
   deidentified: boolean
 }
 
-const getInit = (type: ResourceType) => {
+const getInit = (type: ResourceType, search?: string) => {
+  console.log("test search", search)
   switch (type) {
     case ResourceType.PATIENT:
-      return initPatientsSearchCriterias()
+      return initPatientsSearchCriterias(search)
     case ResourceType.DOCUMENTS:
-      return initDocsSearchCriterias()
+      return initDocsSearchCriterias(search)
     case ResourceType.OBSERVATION:
-      return initBioSearchCriterias()
+      return initBioSearchCriterias(search)
     case ResourceType.CONDITION:
     case ResourceType.CLAIM:
     case ResourceType.PROCEDURE:
-      return initPmsiSearchCriterias()
+      return initPmsiSearchCriterias(search)
     case ResourceType.MEDICATION_ADMINISTRATION:
     case ResourceType.MEDICATION_REQUEST:
-      return initMedSearchCriterias()
+      return initMedSearchCriterias(search)
     case ResourceType.QUESTIONNAIRE_RESPONSE:
-      return initFormsCriterias()
+      return initFormsCriterias(search)
     case ResourceType.IMAGING:
       return initImagingCriterias()
     default:
-      return initPatientsSearchCriterias()
+      return initPatientsSearchCriterias(search)
   }
 }
 
-export const useExplorationBoard = (type: ResourceType, deidentified: boolean) => {
+export const useExplorationBoard = (type: ResourceType, deidentified: boolean, search?: string) => {
   const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>({ type, deidentified })
   const [
     searchCriterias,
     { changeSearchBy, changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias }
-  ] = useSearchCriterias<Filters>(getInit(type))
+  ] = useSearchCriterias<Filters>(getInit(type, search))
 
   const {
     allSavedFilters,
@@ -137,7 +138,7 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean) =
 
   const narrowedSearchCriterias = useMemo(
     () => narrowSearchCriterias(deidentified, searchCriterias, type),
-    [searchCriterias, deidentified]
+    [searchCriterias, deidentified, type]
   )
 
   const narrowedSelectedFilter = useMemo(() => {
@@ -161,7 +162,7 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean) =
   }
 
   const onSaveSearchCriterias = ({ searchBy, searchInput, filters }: SearchWithFilters) => {
-    console.log("testt useSearch", filters)
+    console.log('testt useSearch', filters)
     if (searchBy) changeSearchBy(searchBy)
     if (searchInput !== undefined) changeSearchInput(searchInput)
     if (filters) addFilters(filters)
@@ -234,9 +235,10 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean) =
   }
 
   useEffect(() => {
+    console.log('test search', search)
     removeSearchCriterias()
     fetchAdditionalInfos()
-  }, [type, deidentified])
+  }, [type, deidentified, search])
 
   return {
     savedFiltersData: {

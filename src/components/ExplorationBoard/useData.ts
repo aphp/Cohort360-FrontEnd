@@ -58,7 +58,7 @@ export const useData = (
   searchCriterias: SearchCriterias<Filters>,
   page: number,
   deidentified: boolean,
-  groupId: string | undefined,
+  groupId: string[],
   patient?: PatientState
 ) => {
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.IDDLE)

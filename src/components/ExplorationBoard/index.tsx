@@ -6,22 +6,47 @@ import { useData } from './useData'
 import { ResourceType } from 'types/requestCriterias'
 import { useEffect } from 'react'
 import DataSection from './DataSection'
-import { useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { FetchStatus } from 'types'
 import { AlertWrapper } from 'components/ui/Alert'
 import { PatientState } from 'state/patient'
 
+export type DisplayOptions = {
+  filters: boolean
+  criterias: boolean
+  search: boolean
+  diagrams: boolean
+  count: boolean
+}
+
 type ExplorationBoardProps = {
   type: ResourceType
   deidentified: boolean
-  groupId: string | undefined
+  groupId: string[]
   patient?: PatientState
   messages?: string[]
+  displayOptions?: DisplayOptions
 }
 
-const ExplorationBoard = ({ type, deidentified, groupId, patient, messages }: ExplorationBoardProps) => {
+const defaultOptions: DisplayOptions = {
+  filters: true,
+  criterias: true,
+  search: true,
+  diagrams: true,
+  count: true
+}
+
+const ExplorationBoard = ({
+  type,
+  deidentified,
+  groupId,
+  patient,
+  messages,
+  displayOptions = defaultOptions
+}: ExplorationBoardProps) => {
   const [searchParams] = useSearchParams()
   const page = parseInt(searchParams.get('page') || '1', 10)
+  const { search } = useParams<{ search: string }>()
   const {
     fetchStatus,
     additionalInfo,
@@ -34,7 +59,7 @@ const ExplorationBoard = ({ type, deidentified, groupId, patient, messages }: Ex
     onRemoveCriteria,
     onSaveFilter,
     resetFetchStatus
-  } = useExplorationBoard(type, deidentified)
+  } = useExplorationBoard(type, deidentified, search)
 
   const { count, pagination, data, dataLoading, onChangePage } = useData(
     type,
@@ -47,7 +72,7 @@ const ExplorationBoard = ({ type, deidentified, groupId, patient, messages }: Ex
 
   useEffect(() => {
     //console.log('test searchCriterias', searchCriterias)
-    console.log('testt board')
+    console.log('testt board', search)
   }, [searchCriterias.filters])
 
   // supprimer multiple dans le type Column
@@ -72,9 +97,12 @@ const ExplorationBoard = ({ type, deidentified, groupId, patient, messages }: Ex
         onSearch={(searchCriterias) => onSearch(searchCriterias)}
         savedFiltersActions={savedFiltersActions}
         savedFiltersData={savedFiltersData}
+        displayOptions={displayOptions}
       />
       <Divider sx={{ width: '100%' }} />
-      <CriteriasSection onDelete={onRemoveCriteria} onSaveFilters={onSaveFilter} value={criterias} />
+      {displayOptions.criterias && (
+        <CriteriasSection onDelete={onRemoveCriteria} onSaveFilters={onSaveFilter} value={criterias} />
+      )}
       {messages?.map((msg) => (
         <AlertWrapper severity="warning" sx={{ color: '#000' }}>
           {msg}
@@ -91,6 +119,7 @@ const ExplorationBoard = ({ type, deidentified, groupId, patient, messages }: Ex
         type={type}
         onChangePage={onChangePage}
         onSort={onSort}
+        displayOptions={displayOptions}
       />
       {fetchStatus && (
         <Snackbar

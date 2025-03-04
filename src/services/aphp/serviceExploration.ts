@@ -3,7 +3,6 @@ import {
   BiologyFilters,
   DocumentsFilters,
   Filters,
-  FormNames,
   ImagingFilters,
   MaternityFormFilters,
   MedicationFilters,
@@ -32,7 +31,6 @@ import {
   Claim,
   Condition,
   DocumentReference,
-  FhirResource,
   ImagingStudy,
   MedicationAdministration,
   MedicationRequest,
@@ -43,8 +41,6 @@ import {
 import { ChartCode, CohortComposition, CohortImaging, CohortPMSI, ExplorationResults, FHIR_API_Response } from 'types'
 import { SearchInputError } from 'types/error'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
-import servicesCohorts from './serviceCohorts'
-import servicesPatients from './servicePatients'
 import { Data } from 'components/ExplorationBoard/useData'
 import { getResourceInfos } from 'utils/fillElement'
 import { getExtension } from 'utils/fhir'
@@ -82,7 +78,7 @@ export const getExplorationFetcher = (
     case ResourceType.OBSERVATION:
       return fetchBiologyList
   }
-  return servicesCohorts.fetchPatientList
+  return fetchPatientList
 }
 
 const getPatientsCount = <T>(list: AxiosResponse<FHIR_API_Response<Bundle<T>>>, facet = 'unique-subject') => {
@@ -127,7 +123,7 @@ const fetchDocumentsList = async (
       sortDirection: orderBy.orderDirection,
       docStatuses: docStatuses.map((status) => status.id),
       _elements: searchInput ? [] : undefined,
-      _list: groupId ? [groupId] : [],
+      _list: groupId,
       _text: searchInput,
       highlight_search_results: searchBy === SearchByTypes.TEXT ? true : false,
       type: docTypes.map((docType) => docType.code).join(','),
@@ -146,7 +142,7 @@ const fetchDocumentsList = async (
       ? fetchDocumentReference({
           patient: patient?.patientInfo?.id,
           signal: signal,
-          _list: groupId ? [groupId] : [],
+          _list: groupId,
           size: 0,
           uniqueFacet: ['subject']
         })
@@ -198,7 +194,7 @@ const fetchImagingList = async (
       ipp,
       minDate: durationRange[0] ?? '',
       maxDate: durationRange[1] ?? '',
-      _list: groupId ? [groupId] : [],
+      _list: groupId,
 
       modalities: modality.map(({ id }) => id),
       executiveUnits: executiveUnits.map((unit) => unit.id),
@@ -211,7 +207,7 @@ const fetchImagingList = async (
       ? fetchImaging({
           patient: patient?.patientInfo?.id,
           size: 0,
-          _list: groupId ? [groupId] : [],
+          _list: groupId,
           signal: signal,
           uniqueFacet: ['subject']
         })
@@ -257,7 +253,7 @@ const fetchBiologyList = async (
   const size = 20
   const [biologyList, allBiologyList] = await Promise.all([
     fetchObservation({
-      _list: groupId ? [groupId] : [],
+      _list: groupId,
       size,
       offset: page ? (page - 1) * size : 0,
       _sort: orderBy.orderBy,
@@ -280,7 +276,7 @@ const fetchBiologyList = async (
           subject: patient?.patientInfo?.id,
           size: 0,
           signal: signal,
-          _list: groupId ? [groupId] : [],
+          _list: groupId,
           uniqueFacet: ['subject'],
           rowStatus: validatedStatus
         })
@@ -338,7 +334,7 @@ const fetchMedicationList = async (
   }
   const _type = type as ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION
   const commonFilters = () => ({
-    _list: groupId ? [groupId] : [],
+    _list: groupId,
     size: 20,
     offset: page ? (page - 1) * 20 : 0,
     _sort: mapMedicationToOrderByCode(orderBy.orderBy, _type),
@@ -376,7 +372,7 @@ const fetchMedicationList = async (
       ? fetcher({
           size: 0,
           signal: signal,
-          _list: groupId ? [groupId] : [],
+          _list: groupId,
           uniqueFacet: ['subject'],
           minDate: null,
           maxDate: null,
@@ -423,7 +419,7 @@ const fetchFormsList = async (
   const size = 20
   const [formsList, allFormsList] = await Promise.all([
     fetchForms({
-      _list: groupId ? [groupId] : [],
+      _list: groupId,
       size,
       offset: page ? (page - 1) * size : 0,
       order: orderBy.orderBy,
@@ -440,7 +436,7 @@ const fetchFormsList = async (
     }),
     atLeastOneSearchCriteria(options.searchCriterias)
       ? fetchForms({
-          _list: groupId ? [groupId] : [],
+          _list: groupId,
           size: 0,
           signal: signal,
           uniqueFacet: ['subject'],
@@ -496,7 +492,7 @@ const fetchPMSIList = async (
   }
 
   const commonFilters = () => ({
-    _list: groupId ? [groupId] : [],
+    _list: groupId,
     subject: patient?.patientInfo?.id,
     size: 20,
     offset: page ? (page - 1) * 20 : 0,
@@ -550,7 +546,7 @@ const fetchPMSIList = async (
       ? fetcher({
           size: 0,
           signal: signal,
-          _list: groupId ? [groupId] : [],
+          _list: groupId ,
           uniqueFacet: [type === ResourceType.CLAIM ? 'patient' : 'subject'],
           subject: patient?.patientInfo?.id,
           patient: patient?.patientInfo?.id
@@ -607,7 +603,7 @@ const fetchPatientList = async (
       _sort: orderBy.orderBy,
       sortDirection: orderBy.orderDirection,
       pivotFacet: includeFacets ? ['age-month_gender', 'deceased_gender'] : [],
-      _list: groupId ? [groupId] : [],
+      _list: groupId,
       gender: genders.join(','),
       searchBy,
       _text: (searchInput || '').trim(),
@@ -621,7 +617,7 @@ const fetchPatientList = async (
     atLeastOneSearchCriteria(options.searchCriterias)
       ? fetchPatient({
           size: 0,
-          _list: groupId ? [groupId] : [],
+          _list: groupId,
           signal: signal
         })
       : null

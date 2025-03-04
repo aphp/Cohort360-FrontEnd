@@ -7,7 +7,7 @@ export type ResourceOptions<T> = {
   page: number
   searchCriterias: SearchCriterias<T>
   type?: ResourceType
-  groupId?: string
+  groupId: string[]
   patient?: PatientState
   includeFacets?: boolean
 }

@@ -140,7 +140,7 @@ const mapDocumentsToColumns = (deidentified: boolean, isPatient: boolean): Colum
   ].filter((elem) => elem) as Column[]
 }
 
-const mapPatientsToRows = (patients: Patient[], deidentified: boolean, groupId: string | undefined) => {
+const mapPatientsToRows = (patients: Patient[], deidentified: boolean, groupId: string[]) => {
   const rows: Row[] = []
   patients.forEach((patient) => {
     const vitalStatus = {
@@ -214,7 +214,7 @@ const mapPatientsToRows = (patients: Patient[], deidentified: boolean, groupId: 
   return rows
 }
 
-const mapPmsiToRows = (list: CohortPMSI[], type: PMSIResourceTypes,  isPatient: boolean, groupId: string | undefined) => {
+const mapPmsiToRows = (list: CohortPMSI[], type: PMSIResourceTypes,  isPatient: boolean, groupId: string[]) => {
   const rows: Row[] = []
   list.forEach((elem) => {
     const hasDiagnosticType = type === ResourceType.CONDITION
@@ -281,7 +281,7 @@ const mapPmsiToRows = (list: CohortPMSI[], type: PMSIResourceTypes,  isPatient: 
   return rows
 }
 
-const mapQuestionnaireToRows = (list: CohortQuestionnaireResponse[], groupId: string | undefined) => {
+const mapQuestionnaireToRows = (list: CohortQuestionnaireResponse[], groupId: string[]) => {
   const rows: Row[] = []
   list.forEach((elem) => {
     const formName = elem.formName as FormNames
@@ -392,7 +392,7 @@ const mapImagingToRows = (
   list: CohortImaging[],
   deidentified: boolean,
   isPatient: boolean,
-  groupId: string | undefined
+  groupId: string[]
 ) => {
   const rows: Row[] = []
   list.forEach((elem) => {
@@ -486,7 +486,7 @@ const mapImagingToRows = (
   return rows
 }
 
-const mapBiologyToRows = (list: CohortObservation[], isPatient: boolean, groupId: string | undefined) => {
+const mapBiologyToRows = (list: CohortObservation[], isPatient: boolean, groupId: string[]) => {
   const rows: Row[] = []
   list.forEach((elem) => {
     const anabio = elem.code?.coding?.find(
@@ -576,7 +576,7 @@ const mapDocumentsToRows = (
   list: CohortComposition[],
   deidentified: boolean,
   isPatient: boolean,
-  groupId: string | undefined,
+  groupId: string[],
   hasSearch?: boolean
 ) => {
   const rows: Row[] = []
@@ -656,7 +656,7 @@ export const mapMedicationToRows = (
   type: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION,
   deidentified: boolean,
   isPatient: boolean,
-  groupId: string | undefined
+  groupId: string[]
 ) => {
   const rows: Row[] = []
   console.log('test data', list)
@@ -762,7 +762,7 @@ export const map = (
   type: ResourceType,
   deidentified: boolean,
   isPatient: boolean,
-  groupId: string | undefined,
+  groupId: string[],
   hasSearch?: boolean
 ) => {
   const table: Table = { rows: [], columns: [] }

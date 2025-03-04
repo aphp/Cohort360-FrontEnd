@@ -6,6 +6,7 @@ import { Filters, SavedFiltersResults, SearchCriterias } from 'types/searchCrite
 import { AdditionalInfo, Search, SearchWithFilters } from '../useExplorationBoard'
 import SavedFilters from './SavedFilters'
 import { SelectedFilter } from 'hooks/filters/useSavedFilters'
+import { DisplayOptions } from '..'
 
 type SavedFiltersActions = {
   onNext: () => void
@@ -25,6 +26,7 @@ type SearchSectionProps = {
   infos: AdditionalInfo
   savedFiltersActions: SavedFiltersActions
   savedFiltersData: SavedFiltersData<Filters>
+  displayOptions: DisplayOptions
   onSearch: (search: SearchWithFilters) => void
 }
 
@@ -33,6 +35,7 @@ const SearchSection = ({
   infos,
   savedFiltersActions,
   savedFiltersData,
+  displayOptions,
   onSearch
 }: SearchSectionProps) => {
   const handleChangeFields = (search: Search) => {
@@ -42,23 +45,27 @@ const SearchSection = ({
 
   return (
     <Grid container justifyContent="space-between">
-      <Grid container item xs={12} sm={6} lg={8}>
-        <OccurrencesSearch search={searchCriterias} onChange={handleChangeFields} infos={infos}/>
-      </Grid>
-      <Grid container item xs={12} sm={5} lg={4} gap={1} justifyContent="flex-end">
-        <Grid container item xs={12} md={5}>
-          <FilterBy
-            infos={infos}
-            filters={searchCriterias.filters as Filters}
-            onSubmit={(newFilters) => onSearch({ filters: newFilters })}
-          />
+      {displayOptions.search && (
+        <Grid container item xs={12} sm={!displayOptions.filters ? 12 : 6} lg={!displayOptions.filters ? 12 : 8}>
+          <OccurrencesSearch search={searchCriterias} onChange={handleChangeFields} infos={infos} />
         </Grid>
-        {savedFiltersData.allFilters && savedFiltersData.allFilters.count > 0 && (
+      )}
+      {displayOptions.filters && (
+        <Grid container item xs={12} sm={5} lg={4} gap={1} justifyContent="flex-end">
           <Grid container item xs={12} md={5}>
-            <SavedFilters infos={infos} {...savedFiltersActions} {...savedFiltersData} />
+            <FilterBy
+              infos={infos}
+              filters={searchCriterias.filters as Filters}
+              onSubmit={(newFilters) => onSearch({ filters: newFilters })}
+            />
           </Grid>
-        )}
-      </Grid>
+          {savedFiltersData.allFilters && savedFiltersData.allFilters.count > 0 && (
+            <Grid container item xs={12} md={5}>
+              <SavedFilters infos={infos} {...savedFiltersActions} {...savedFiltersData} />
+            </Grid>
+          )}
+        </Grid>
+      )}
     </Grid>
   )
 }
