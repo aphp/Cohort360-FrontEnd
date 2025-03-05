@@ -40,7 +40,7 @@ const SamplesList = () => {
       <ResearchesTable columns={columns}>
         {samples.map((cohort) => (
           <TableRow key={cohort.name} sx={{ borderBottom: '1px solid #000', borderRadius: 20, cursor: 'pointer' }}>
-            <TableCellWrapper align="left" accentCell>
+            <TableCellWrapper align="left" accentcell>
               <FavStar favorite={cohort.fav} />
             </TableCellWrapper>
             <TableCellWrapper align="left">{cohort.name} *icônes action*</TableCellWrapper>

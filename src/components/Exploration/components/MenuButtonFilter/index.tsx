@@ -47,7 +47,7 @@ const MenuButtonFilter: React.FC<MenuButtonFilterProps> = ({
 
   return (
     <>
-      <Button startIcon={<DateRangeIcon />} onClick={(e) => setAnchorEl(e.currentTarget)} width="fit-content">
+      <Button startIcon={<DateRangeIcon />} onClick={(e) => setAnchorEl(e.currentTarget)} width="fit-content" small>
         {getLabel(startDate, endDate)}
       </Button>
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)} className={classes.dateFilterMenu}>

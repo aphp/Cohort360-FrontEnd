@@ -12,7 +12,7 @@ import { TableCellWrapper } from './Table/styles'
 
 import Download from 'assets/icones/download.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
-import RequestTree from 'assets/icones/schema.svg?react'
+import FluentNavigation from 'assets/icones/fluent_navigation.svg?react'
 import UpdateIcon from '@mui/icons-material/Update'
 
 import { Cohort, JobStatus, Column } from 'types'
@@ -163,7 +163,7 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
                 <FavStar favorite={cohort.favorite} height={18} color={disabled ? '#CBCFCF' : undefined} />
               </IconButton>
             </TableCellWrapper>
-            <TableCellWrapper align="left" accentCell>
+            <TableCellWrapper align="left" accentcell>
               {cohort.name}
             </TableCellWrapper>
             <TableCellWrapper>
@@ -182,7 +182,7 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
                 /> */}
                 <IconButtonWithTooltip
                   title="Accéder à la version de la requête ayant créé la cohorte"
-                  icon={<RequestTree />}
+                  icon={<FluentNavigation />}
                   onClick={() => navigate(`/cohort/new/${cohort.request?.uuid}/${cohort.request_query_snapshot}`)}
                   disabled={disabled}
                 />

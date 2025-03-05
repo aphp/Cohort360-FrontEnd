@@ -2,7 +2,7 @@ import { useQueries } from '@tanstack/react-query'
 import services from 'services/aphp'
 import { Direction, Order } from 'types/searchCriterias'
 
-const useCounts = (searchInput: string, startDate: string | null, endDate: string | null, paramsReady = false) => {
+const useCounts = (searchInput: string, startDate: string | null, endDate: string | null) => {
   const results = useQueries({
     queries: [
       {
@@ -14,7 +14,7 @@ const useCounts = (searchInput: string, startDate: string | null, endDate: strin
           })
           return res.count ?? 0
         },
-        enabled: !!(searchInput || startDate || endDate) && paramsReady
+        enabled: !!(searchInput || startDate || endDate)
       },
       {
         queryKey: ['requestsCount', searchInput, startDate, endDate],
@@ -22,7 +22,7 @@ const useCounts = (searchInput: string, startDate: string | null, endDate: strin
           const res = await services.projects.fetchRequestsList({ searchInput, startDate, endDate, limit: 0 })
           return res.count ?? 0
         },
-        enabled: !!(searchInput || startDate || endDate) && paramsReady
+        enabled: !!(searchInput || startDate || endDate)
       },
       {
         queryKey: ['cohortsCount', searchInput, startDate, endDate],
@@ -42,7 +42,7 @@ const useCounts = (searchInput: string, startDate: string | null, endDate: strin
           })
           return res.count ?? 0
         },
-        enabled: !!(searchInput || startDate || endDate) && paramsReady
+        enabled: !!(searchInput || startDate || endDate)
       },
       {
         queryKey: ['samplesCount', searchInput, startDate, endDate],
@@ -50,7 +50,7 @@ const useCounts = (searchInput: string, startDate: string | null, endDate: strin
           // TODO: A COMPLETER PLUS TARD
           return 3
         },
-        enabled: !!(searchInput || startDate || endDate) && paramsReady
+        enabled: !!(searchInput || startDate || endDate)
       }
     ]
   })

@@ -24,6 +24,7 @@ const MyResearches = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  const [slideIsActive, setSlideIsActive] = useState(false)
 
   const searchInput = searchParams.get(ExplorationsSearchParams.SEARCH_INPUT) ?? ''
   const startDateParam = searchParams.get(ExplorationsSearchParams.START_DATE) ?? null
@@ -54,41 +55,6 @@ const MyResearches = () => {
   }
   prevDepthRef.current = currentDepth
   //////////////////////////
-
-  const handleSearchTermChange = (newSearchInput: string) => {
-    if (!newSearchInput) {
-      searchParams.delete(ExplorationsSearchParams.SEARCH_INPUT)
-    } else {
-      searchParams.set(ExplorationsSearchParams.SEARCH_INPUT, newSearchInput)
-    }
-    setSearchParams(searchParams)
-    navigate({
-      pathname: `/researches/${selectedTab?.id}`,
-      search: `?${searchParams.toString()}`
-    })
-  }
-
-  const handleDateChange = (date: string | null, key: ExplorationsSearchParams) => {
-    if (!date) {
-      searchParams.delete(key)
-    } else {
-      searchParams.set(key, moment(date).isValid() ? moment(date).format('YYYY-MM-DD') : '')
-    }
-    setSearchParams(searchParams)
-    navigate({
-      pathname: `/researches/${selectedTab?.id}`,
-      search: `?${searchParams.toString()}`
-    })
-  }
-
-  const handleTabChange = (newTab: ExplorationTabs) => {
-    const cleanedSearchParams = cleanSearchParams(searchParams)
-    setSearchParams(cleanedSearchParams)
-    navigate({
-      pathname: `/researches/${newTab.id}`,
-      search: `?${cleanedSearchParams}`
-    })
-  }
 
   const explorationTabs = [
     {
@@ -134,6 +100,43 @@ const MyResearches = () => {
   const selectedTab =
     explorationTabs.find((explorationTab) => explorationTab.id === tab) ??
     explorationTabs.find((explorationTab) => explorationTab.id === 'projects')
+
+  const handleSearchTermChange = (newSearchInput: string) => {
+    if (!newSearchInput) {
+      searchParams.delete(ExplorationsSearchParams.SEARCH_INPUT)
+    } else {
+      searchParams.set(ExplorationsSearchParams.SEARCH_INPUT, newSearchInput)
+    }
+    setSearchParams(searchParams)
+    navigate({
+      pathname: `/researches/${selectedTab?.id}`,
+      search: `?${searchParams.toString()}`
+    })
+  }
+
+  const handleDateChange = (date: string | null, key: ExplorationsSearchParams) => {
+    if (!date) {
+      searchParams.delete(key)
+    } else {
+      searchParams.set(key, moment(date).isValid() ? moment(date).format('YYYY-MM-DD') : '')
+    }
+    setSearchParams(searchParams)
+    navigate({
+      pathname: `/researches/${selectedTab?.id}`,
+      search: `?${searchParams.toString()}`
+    })
+  }
+
+  const handleTabChange = (newTab: ExplorationTabs) => {
+    setSlideIsActive(false)
+    const cleanedSearchParams = cleanSearchParams(searchParams)
+    setSearchParams(cleanedSearchParams)
+    navigate({
+      pathname: `/researches/${newTab.id}`,
+      search: `?${cleanedSearchParams}`
+    })
+    setTimeout(() => setSlideIsActive(true), 5)
+  }
 
   return (
     <Grid
@@ -183,7 +186,7 @@ const MyResearches = () => {
       <Grid container bgcolor={'#FFF'} sx={{ minHeight: `calc(100vh - ${headerHeight}px)` }} justifyContent={'center'}>
         <Grid key={location.pathname} container xs={11} style={{ padding: '20px 0' }} gap={'20px'} direction={'column'}>
           <Breadcrumb />
-          <Slide direction={direction} in={true} mountOnEnter unmountOnExit appear timeout={300}>
+          <Slide direction={direction} in={true} mountOnEnter unmountOnExit appear={slideIsActive} timeout={300}>
             <Grid container key={location.pathname}>
               <Outlet />
             </Grid>

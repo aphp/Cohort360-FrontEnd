@@ -111,7 +111,7 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
                 />
               </TableCellWrapper>
             )}
-            <TableCellWrapper align="left" accentCell>
+            <TableCellWrapper align="left" accentcell>
               {getRequestName(request)}
             </TableCellWrapper>
             <TableCellWrapper>
