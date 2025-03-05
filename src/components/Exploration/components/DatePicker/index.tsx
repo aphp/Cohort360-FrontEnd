@@ -1,6 +1,7 @@
 import React from 'react'
 
-import { Box, TextField, Typography } from '@mui/material'
+import { Box, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
+import ClearIcon from '@mui/icons-material/Clear'
 
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
@@ -22,8 +23,30 @@ const DatePicker: React.FC<DatePickerProps> = ({ buttonLabel, value, onChangeVal
         <DesktopDatePicker
           onChange={(newValue: string | null) => onChangeValue(newValue)}
           value={value}
-          renderInput={(params) => <TextField {...params} className={classes.datePickerInput} />}
-          // TODO: apres maj MUI, remplacer par slotProps et en profiter pour ajouter l'annulation
+          renderInput={(params) => (
+            <div>
+              <TextField
+                {...params}
+                fullWidth
+                className={classes.datePickerInput}
+                InputProps={{
+                  ...params.InputProps,
+                  placeholder: 'jj/mm/aaaa',
+                  endAdornment: (
+                    // TODO: apres maj MUI, remplacer par slotProps le delete custom degueu
+                    <InputAdornment position="end">
+                      {value && (
+                        <IconButton sx={{ marginRight: '-12px', padding: 0 }} onClick={() => onChangeValue(null)}>
+                          <ClearIcon sx={{ color: '#5bc5f2' }} />
+                        </IconButton>
+                      )}
+                      {params.InputProps?.endAdornment}
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </div>
+          )}
         />
       </LocalizationProvider>
     </Box>
