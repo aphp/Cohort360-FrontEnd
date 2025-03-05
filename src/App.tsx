@@ -2,7 +2,7 @@ import React from 'react'
 import CssBaseline from '@mui/material/CssBaseline'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/es/integration/react'
-import MomentUtils from '@date-io/moment'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import moment from 'moment'
 
 import { LocalizationProvider } from '@mui/x-date-pickers'
@@ -17,7 +17,7 @@ import 'moment/dist/locale/fr'
 moment.locale('fr')
 
 const App = () => (
-  <LocalizationProvider dateAdapter={MomentUtils}>
+  <LocalizationProvider dateAdapter={AdapterMoment}>
     <Provider store={store}>
       <WarningDialog />
       <PersistGate loading={null} persistor={persistor}>
