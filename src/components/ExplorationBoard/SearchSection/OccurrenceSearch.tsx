@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Grid } from '@mui/material'
 import DisplayLocked from 'components/ui/Display/DisplayLocked'
 import { Filters, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
@@ -33,7 +33,7 @@ const OccurrencesSearch = ({ search, infos, onChange }: OccurrencesSearchProps) 
   return (
     <Grid container>
       {'searchBy' in search && (
-        <Grid item xs={12} md={4}>
+        <Grid item xs={4}>
           <Controller
             name="searchBy"
             control={control}
@@ -41,7 +41,7 @@ const OccurrencesSearch = ({ search, infos, onChange }: OccurrencesSearchProps) 
               <Select<SearchByTypes | undefined>
                 value={search.searchBy}
                 label="Rechercher dans :"
-                items={infos.searchByList ?? []}
+                options={infos.searchByList ?? []}
                 onchange={field.onChange}
                 radius={5}
               />
@@ -49,7 +49,7 @@ const OccurrencesSearch = ({ search, infos, onChange }: OccurrencesSearchProps) 
           />
         </Grid>
       )}
-      <Grid item xs={12} md={'searchBy' in search ? 8 : 12}>
+      <Grid item xs={'searchBy' in search ? 8 : 12}>
         {
           'searchInput' in search && (
             <Controller

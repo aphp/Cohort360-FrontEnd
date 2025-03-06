@@ -27,6 +27,7 @@ import CheckIcon from 'assets/icones/check.svg?react'
 import CancelIcon from 'assets/icones/times.svg?react'
 import docTypes from 'assets/docTypes.json'
 import {
+  getPatientInfos,
   isBiology,
   isDocuments,
   isImaging,
@@ -39,6 +40,7 @@ import {
 import { formatValueRange } from './biology'
 import { Paragraph } from 'components/ui/Paragraphs'
 import { Buffer } from 'buffer'
+import { Card } from 'types/card'
 
 const mapPatientsToColumns = (deidentified: boolean): Column[] => {
   return [
@@ -140,62 +142,90 @@ const mapDocumentsToColumns = (deidentified: boolean, isPatient: boolean): Colum
   ].filter((elem) => elem) as Column[]
 }
 
+const mapPatientsToInfo = (patients: Patient[], deidentified: boolean, groupId: string[]) => {
+  const infos: Card[] = []
+  patients.forEach((patient) => {
+    const { vitalStatus, surname, lastname, ipp, age, gender } = getPatientInfos(patient, deidentified, groupId)
+    const info: Card = {
+      url: ipp.url,
+      sections: []
+    }
+    info.sections.push({
+      id: 'firstSection',
+      size: 1,
+      lines: [
+        {
+          id: `${patient.id}-gender`,
+          value: gender,
+          type: CellType.GENDER_ICON
+        }
+      ]
+    })
+    info.sections.push({
+      id: 'secondSection',
+      size: 7,
+      lines: [
+        {
+          id: `${patient.id}-name`,
+          value: [{ text: `${surname} ${lastname}` }],
+          type: CellType.PARAGRAPHS
+        },
+        {
+          id: `${patient.id}-infos`,
+          value: [{ text: `${age.age} - ${ipp.label}`, sx: { color: 'grey' } }],
+          type: CellType.PARAGRAPHS
+        }
+      ]
+    })
+    info.sections.push({
+      id: 'thirdSection',
+      size: 3,
+      lines: [
+        {
+          id: `${patient.id}-vitalStatus`,
+          value: vitalStatus,
+          type: CellType.STATUS_CHIP
+        }
+      ]
+    })
+
+    infos.push(info)
+  })
+  return infos
+}
+
 const mapPatientsToRows = (patients: Patient[], deidentified: boolean, groupId: string[]) => {
   const rows: Row[] = []
   patients.forEach((patient) => {
-    const vitalStatus = {
-      label: patient.deceasedBoolean || patient.deceasedDateTime ? VitalStatusLabel.DECEASED : VitalStatusLabel.ALIVE,
-      status: patient.deceasedBoolean || patient.deceasedDateTime ? Status.CANCELLED : Status.VALID
-    }
-    const lastEncounter = patient.extension?.[3]?.valueReference?.display ?? ''
+    const { vitalStatus, lastEncounter, surname, lastname, ipp, age, gender } = getPatientInfos(
+      patient,
+      deidentified,
+      groupId
+    )
     const row: Row = [
       {
         id: `${patient.id}-ipp`,
-        value: {
-          label: deidentified
-            ? patient.id
-            : patient.identifier?.find((identifier) => identifier.type?.coding?.[0].code === 'IPP')?.value ??
-              patient.identifier?.[0].value ??
-              'IPP inconnnu',
-          url: `/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}` /*${_search}*/
-        },
+        value: ipp,
         type: CellType.LINK
       },
       {
         id: `${patient.id}-gender`,
-        value: patient.gender?.toLocaleUpperCase() ?? '',
+        value: gender,
         type: CellType.GENDER_ICON
       },
       {
         id: `${patient.id}-name`,
-        value: deidentified
-          ? 'Prénom'
-          : patient.name?.[0].given?.[0]
-          ? capitalizeFirstLetter(patient.name?.[0].given?.[0])
-          : 'Non renseigné',
+        value: surname,
         type: CellType.TEXT
       },
       {
         id: `${patient.id}-lastname`,
-        value: deidentified
-          ? 'Nom'
-          : patient.name
-              ?.map((e) => {
-                if (e.use === 'official') {
-                  return e.family ?? 'Non renseigné'
-                }
-                if (e.use === 'maiden') {
-                  return `(${patient.gender === 'female' ? 'née' : 'né'} : ${e.family})`
-                }
-              })
-              .join(' ') ?? 'Non renseigné',
+        value: lastname,
         type: CellType.TEXT
       },
       {
         id: `${patient.id}-birthdate`,
-        value: deidentified
-          ? getAge(patient)
-          : `${moment(patient.birthDate).format('DD/MM/YYYY') ?? 'Non renseigné'} (${getAge(patient)})`,
+        value: `${age.birthdate} (${age.age})`,
         type: CellType.TEXT
       },
       {
@@ -214,13 +244,13 @@ const mapPatientsToRows = (patients: Patient[], deidentified: boolean, groupId: 
   return rows
 }
 
-const mapPmsiToRows = (list: CohortPMSI[], type: PMSIResourceTypes,  isPatient: boolean, groupId: string[]) => {
+const mapPmsiToRows = (list: CohortPMSI[], type: PMSIResourceTypes, isPatient: boolean, groupId: string[]) => {
   const rows: Row[] = []
   list.forEach((elem) => {
     const hasDiagnosticType = type === ResourceType.CONDITION
     const date = getPmsiDate(type, elem)
     const codes = getPmsiCodes(type, elem)
-      console.log('test code', codes.display ?? 'Non renseigné')
+    console.log('test code', codes.display ?? 'Non renseigné')
 
     const row: Row = [
       !isPatient && {
@@ -388,12 +418,7 @@ const mapImagingSeries = (series: ImagingStudySeries[]): Table => {
   }
 }
 
-const mapImagingToRows = (
-  list: CohortImaging[],
-  deidentified: boolean,
-  isPatient: boolean,
-  groupId: string[]
-) => {
+const mapImagingToRows = (list: CohortImaging[], deidentified: boolean, isPatient: boolean, groupId: string[]) => {
   const rows: Row[] = []
   list.forEach((elem) => {
     const date = elem.started
@@ -757,7 +782,14 @@ export const mapMedicationToRows = (
   return rows
 }
 
-export const map = (
+export const mapToCards = (data: Data, deidentified: boolean, groupId: string[]) => {
+  const infos: Card[] = []
+  if (isPatientsResponse(data) && data.originalPatients)
+    infos.push(...mapPatientsToInfo(data.originalPatients, deidentified, groupId))
+  return infos
+}
+
+export const mapToTable = (
   data: Data,
   type: ResourceType,
   deidentified: boolean,

@@ -1,4 +1,4 @@
-import { ResourceType } from 'types/requestCriterias'
+import { ResourceType, VitalStatusLabel } from 'types/requestCriterias'
 import {
   BiologyFilters,
   DocumentsFilters,
@@ -11,7 +11,15 @@ import {
   SearchCriterias
 } from 'types/searchCriterias'
 import { removeKeys } from './map'
-import { MedicationRequest, MedicationAdministration, QuestionnaireResponse, ImagingStudy, Observation, DocumentReference } from 'fhir/r4'
+import {
+  MedicationRequest,
+  MedicationAdministration,
+  QuestionnaireResponse,
+  ImagingStudy,
+  Observation,
+  DocumentReference,
+  Patient
+} from 'fhir/r4'
 import {
   ExplorationResults,
   CohortPMSI,
@@ -23,6 +31,10 @@ import {
 } from 'types'
 import { PatientsResponse } from 'types/patient'
 import { Data } from 'components/ExplorationBoard/useData'
+import { Status } from 'components/ui/StatusChip'
+import { capitalizeFirstLetter } from './capitalize'
+import { getAge } from './age'
+import moment from 'moment'
 
 export const getAlertMessages = (type: string, deidentified: boolean) => {
   if (type === ResourceType.IMAGING)
@@ -131,9 +143,7 @@ export const isPmsi = (data: ExplorationResults<any>): data is ExplorationResult
   return type === ResourceType.CONDITION || type === ResourceType.PROCEDURE || type === ResourceType.CLAIM
 }
 
-export const isQuestionnaire = (
-  data: ExplorationResults<any>
-): data is ExplorationResults<QuestionnaireResponse> => {
+export const isQuestionnaire = (data: ExplorationResults<any>): data is ExplorationResults<QuestionnaireResponse> => {
   const type = data.list[0].resourceType
   return type === ResourceType.QUESTIONNAIRE_RESPONSE
 }
@@ -158,4 +168,43 @@ export const isMedication = (
 export const isDocuments = (data: ExplorationResults<any>): data is ExplorationResults<DocumentReference> => {
   const type = data.list[0].resourceType
   return type === ResourceType.DOCUMENTS
+}
+
+export const getPatientInfos = (patient: Patient, deidentified: boolean, groupId: string[]) => {
+  const vitalStatus = {
+    label: patient.deceasedBoolean || patient.deceasedDateTime ? VitalStatusLabel.DECEASED : VitalStatusLabel.ALIVE,
+    status: patient.deceasedBoolean || patient.deceasedDateTime ? Status.CANCELLED : Status.VALID
+  }
+  const lastEncounter = patient.extension?.[3]?.valueReference?.display ?? ''
+  const surname = deidentified
+    ? 'Prénom'
+    : patient.name?.[0].given?.[0]
+    ? capitalizeFirstLetter(patient.name?.[0].given?.[0])
+    : 'Non renseigné'
+  const lastname = deidentified
+    ? 'Nom'
+    : patient.name
+        ?.map((e) => {
+          if (e.use === 'official') {
+            return e.family ?? 'Non renseigné'
+          }
+          if (e.use === 'maiden') {
+            return `(${patient.gender === 'female' ? 'née' : 'né'} : ${e.family})`
+          }
+        })
+        .join(' ') ?? 'Non renseigné'
+  const ipp = {
+    label: deidentified
+      ? patient.id
+      : patient.identifier?.find((identifier) => identifier.type?.coding?.[0].code === 'IPP')?.value ??
+        patient.identifier?.[0].value ??
+        'IPP inconnnu',
+    url: `/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}` /*${_search}*/
+  }
+  const age = {
+    age: getAge(patient) ?? 'Non renseigné',
+    birthdate: deidentified ? 'Non renseigné' : moment(patient.birthDate).format('DD/MM/YYYY') ?? 'Non renseigné'
+  }
+  const gender = patient.gender?.toLocaleUpperCase() ?? ''
+  return { vitalStatus, lastEncounter, surname, lastname, ipp, age, gender }
 }

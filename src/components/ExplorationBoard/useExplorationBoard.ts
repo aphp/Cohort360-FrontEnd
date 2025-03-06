@@ -21,10 +21,13 @@ import {
   Filters,
   FormNames,
   LabelObject,
+  OrderBy,
   SearchBy,
   SearchByTypes,
   SearchCriteriaKeys,
   SearchCriterias,
+  orderByListPatients,
+  orderByListPatientsDeidentified,
   searchByListDocuments,
   searchByListPatients
 } from 'types/searchCriterias'
@@ -36,6 +39,7 @@ import { getValueSetsFromSystems } from 'utils/valueSets'
 
 export type SearchWithFilters = Search & {
   filters?: Filters
+  orderBy?: OrderBy
 }
 
 export type Search = {
@@ -49,6 +53,7 @@ export type AdditionalInfo = {
   references?: Reference[]
   sourceType?: SourceType
   searchByList?: SearchBy[]
+  orderByList?: LabelObject[]
   prescriptionList?: LabelObject[]
   administrationList?: LabelObject[]
   questionnaires?: {
@@ -61,7 +66,6 @@ export type AdditionalInfo = {
 }
 
 const getInit = (type: ResourceType, search?: string) => {
-  console.log("test search", search)
   switch (type) {
     case ResourceType.PATIENT:
       return initPatientsSearchCriterias(search)
@@ -161,11 +165,12 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean, s
     else removeFilter(category as FilterKeys, value)
   }
 
-  const onSaveSearchCriterias = ({ searchBy, searchInput, filters }: SearchWithFilters) => {
-    console.log('testt useSearch', filters)
+  const onSaveSearchCriterias = ({ searchBy, searchInput, filters, orderBy }: SearchWithFilters) => {
+    console.log('test orderBy', orderBy)
     if (searchBy) changeSearchBy(searchBy)
     if (searchInput !== undefined) changeSearchInput(searchInput)
     if (filters) addFilters(filters)
+    if (orderBy) changeOrderBy(orderBy)
   }
 
   const fetchAdditionalInfos = async () => {
@@ -178,6 +183,7 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean, s
       }
     }
     let searchByList = undefined
+    let orderByList = undefined
     let diagnosticTypesList = additionalInfo.diagnosticTypesList
     let encounterStatusList = additionalInfo.encounterStatusList
     let prescriptionList = additionalInfo.prescriptionList
@@ -217,7 +223,10 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean, s
       !encounterStatusList
     )
       encounterStatusList = await fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
-    if (type === ResourceType.PATIENT) searchByList = searchByListPatients
+    if (type === ResourceType.PATIENT) {
+      searchByList = searchByListPatients
+      orderByList = deidentified ? orderByListPatientsDeidentified : orderByListPatients
+    }
     if (type === ResourceType.DOCUMENTS) searchByList = searchByListDocuments
     setAdditionalInfo({
       references,
@@ -230,7 +239,8 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean, s
       modalities,
       type,
       deidentified,
-      searchByList
+      searchByList,
+      orderByList
     })
   }
 

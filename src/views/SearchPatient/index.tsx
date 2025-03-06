@@ -5,6 +5,7 @@ import useStyles from './styles'
 import { ResourceType } from 'types/requestCriterias'
 import ExplorationBoard from 'components/ExplorationBoard'
 import { BlockWrapper } from 'components/ui/Layout'
+import { DATA_DISPLAY } from 'types/exploration'
 
 const SearchPatient = () => {
   const { classes, cx } = useStyles()
@@ -20,7 +21,8 @@ const SearchPatient = () => {
       diagrams: false,
       count: false,
       orderBy: false,
-      saveFilters: false
+      saveFilters: false,
+      display: DATA_DISPLAY.TABLE
     }),
     []
   )

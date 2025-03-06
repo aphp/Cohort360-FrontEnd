@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React from 'react'
 import { Grid } from '@mui/material'
 import FilterBy from './FilterBy'
 import OccurrencesSearch from './OccurrenceSearch'
@@ -6,9 +6,9 @@ import { Filters, SavedFiltersResults, SearchCriterias } from 'types/searchCrite
 import { AdditionalInfo, Search, SearchWithFilters } from '../useExplorationBoard'
 import SavedFilters from './SavedFilters'
 import { SelectedFilter } from 'hooks/filters/useSavedFilters'
-import { DisplayOptions } from '..'
 import { useSizeObserver } from 'hooks/ui/useSizeObserver'
 import OrderBy from './OrderBy'
+import { DisplayOptions } from 'types/exploration'
 
 type SavedFiltersActions = {
   onNext: () => void
@@ -40,7 +40,10 @@ const SearchSection = ({
   displayOptions,
   onSearch
 }: SearchSectionProps) => {
-  const { ref, width } = useSizeObserver()
+  const {
+    ref,
+    sizes: { isXS, isSM }
+  } = useSizeObserver()
 
   const handleChangeFields = (search: Search) => {
     if (search.searchBy !== searchCriterias.searchBy) onSearch({ searchBy: search.searchBy })
@@ -48,32 +51,15 @@ const SearchSection = ({
   }
 
   return (
-    <Grid container justifyContent="space-between" ref={ref}>
+    <Grid container justifyContent="space-between" gap={isXS ? '10px' : 0} ref={ref}>
       {displayOptions.search && (
-        <Grid container item xs={12} sm={!displayOptions.myFilters ? 12 : 6} lg={!displayOptions.myFilters ? 12 : 8}>
+        <Grid container item xs={isXS ? 12 : 8}>
           <OccurrencesSearch search={searchCriterias} onChange={handleChangeFields} infos={infos} />
         </Grid>
       )}
-      <Grid
-        container
-        item
-        xs={12}
-        sm={width < 500 ? 12 : 5}
-        lg={width < 500 ? 12 : 4}
-        gap={1}
-        justifyContent={width < 500 ? 'center' : 'flex-end'}
-      >
-        {displayOptions.orderBy && (
-          <Grid container item xs={12} md={5}>
-            <OrderBy
-              infos={infos}
-              filters={searchCriterias.filters as Filters}
-              onSubmit={(newFilters) => onSearch({ filters: newFilters })}
-            />
-          </Grid>
-        )}
+      <Grid container item xs={isXS ? 12 : 4} gap={isXS ? '10px' : isSM ? 0 : '10px'} justifyContent="flex-end">
         {displayOptions.filterBy && (
-          <Grid container item xs={12} md={5}>
+          <Grid container item xs={isXS ? 12 : isSM ? 6 : 5}>
             <FilterBy
               infos={infos}
               filters={searchCriterias.filters as Filters}
@@ -82,8 +68,13 @@ const SearchSection = ({
           </Grid>
         )}
         {displayOptions.myFilters && savedFiltersData.allFilters && savedFiltersData.allFilters.count > 0 && (
-          <Grid container item xs={12} md={5}>
+          <Grid container item xs={isXS ? 12 : isSM ? 6 : 5}>
             <SavedFilters infos={infos} {...savedFiltersActions} {...savedFiltersData} />
+          </Grid>
+        )}
+        {displayOptions.orderBy && (
+          <Grid container item xs={isXS ? 12 : isSM ? 6 : 5}>
+            <OrderBy infos={infos} orderBy={searchCriterias.orderBy} onSubmit={(orderBy) => onSearch({ orderBy })} />
           </Grid>
         )}
       </Grid>

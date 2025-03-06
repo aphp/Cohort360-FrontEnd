@@ -17,10 +17,12 @@ import Timeline from 'components/Patient/MaternityTimeline'
 import { ExplorationResults } from 'types'
 import { QuestionnaireResponse } from 'fhir/r4'
 import { AdditionalInfo } from '../useExplorationBoard'
-import { DisplayOptions } from '..'
+import InfoCard from 'components/ui/Cards/InfoCard'
+import { DisplayOptions, DATA_DISPLAY } from 'types/exploration'
+import { Card } from 'types/card'
 
 type DataSectionProps = {
-  data: { raw: Data | null; table: Table }
+  data: { raw: Data | null; table: Table; cards: Card[] }
   infos: AdditionalInfo
   isPatient: boolean
   count: ExplorationCount | null
@@ -62,23 +64,27 @@ const DataSection = ({
           </>
         ))()}
       {!(type === ResourceType.QUESTIONNAIRE_RESPONSE && isPatient) && (
-        <Grid container gap={2} alignItems="center">
+        <Grid container alignItems="center">
           {!isLoading && (
             <>
-              {data.table.rows.length < 1 && <Typography variant="button">Aucune donnée à afficher</Typography>}
-              {data.table.rows.length > 0 && displayOptions.count && (
+              {!!!count && (
+                <Grid container justifyContent="center">
+                  <Typography variant="button">Aucune donnée à afficher</Typography>
+                </Grid>
+              )}
+              {count && (
                 <>
-                  {count && type !== ResourceType.PATIENT && (
+                  {count.ressource && type !== ResourceType.PATIENT && (
                     <DisplayDigits
                       nb={count.ressource.results ?? 0}
                       total={count.ressource.total ?? 0}
                       label={'élément(s)'}
                     />
                   )}
-                  {!isPatient && count && type !== ResourceType.PATIENT && (
+                  {!isPatient && count.patients && type !== ResourceType.PATIENT && (
                     <Typography fontSize={15}>concernant</Typography>
                   )}
-                  {!isPatient && count && (
+                  {!isPatient && count.patients && (
                     <DisplayDigits
                       nb={count.patients.results ?? 0}
                       total={count.patients.total ?? 0}
@@ -120,12 +126,15 @@ const DataSection = ({
               <CircularProgress />
             </Grid>
           )}
-          {!isLoading && data.table.rows.length > 0 && (
-            <>
-              <DataTable value={data.table} orderBy={orderBy} onSort={onSort} />
+          {!isLoading && count && (
+            <Grid container>
+              {displayOptions.display === DATA_DISPLAY.INFO &&
+                data.cards.map((card, index) => <InfoCard key={index} value={card} />)}
+              {displayOptions.display === DATA_DISPLAY.TABLE && data.raw?.totalPatients && (
+                <DataTable value={data.table} orderBy={orderBy} onSort={onSort} />
+              )}
               <Grid
                 container
-               // justifyContent="center"
                 sx={{
                   position: 'sticky',
                   bottom: 0,
@@ -133,7 +142,7 @@ const DataSection = ({
                   maxWidth: '100%', // S'assure qu'elle ne dépasse pas le container
                   width: '100%', // Pour occuper toute la largeur du parent
                   zIndex: 10, // Pour s'assurer qu'elle reste au-dessus du reste du contenu
-                  //padding: '8px 10%', // Ajoute un peu d'espace
+                  padding: '0px 0px 10px 0px', // Ajoute un peu d'espace
                   boxShadow: '0px -2px 5px rgba(0, 0, 0, 0.1)' // Ajoute une légère ombre pour la visibilité
                 }}
               >
@@ -142,10 +151,10 @@ const DataSection = ({
                   count={pagination.total}
                   currentPage={pagination.currentPage}
                   onPageChange={onChangePage}
-                 // centered={true}
+                  centered={true}
                 />
               </Grid>
-            </>
+            </Grid>
           )}
         </Grid>
       )}

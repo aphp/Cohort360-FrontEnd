@@ -1,22 +1,30 @@
 import React, { useState } from 'react'
 import Modal from 'components/ui/Modal'
-import { FilterList } from '@mui/icons-material'
-import { Button } from '@mui/material'
+import { SwapVert } from '@mui/icons-material'
+import { Button, Grid } from '@mui/material'
 import { AdditionalInfo } from '../useExplorationBoard'
-import ExplorationFilters from '../Filters'
-import { Filters } from 'types/searchCriterias'
+import { OrderBy as OrderByType, orderDirection } from 'types/searchCriterias'
+import { Controller, useForm } from 'react-hook-form'
+import RadioGroup from 'components/ui/RadioGroup'
+import Select from 'components/ui/Searchbar/Select'
 
 type OrderByProps = {
-  filters: Filters
+  orderBy: OrderByType
   infos: AdditionalInfo
-  onSubmit: (filters: Filters) => void
+  onSubmit: (orderBy: OrderByType) => void
 }
 
-const OrderBy = ({ filters, infos, onSubmit }: OrderByProps) => {
+const OrderBy = ({ orderBy, infos, onSubmit }: OrderByProps) => {
   const [toggleModal, setToggleModal] = useState(false)
-  const [isError, setIsError] = useState(false)
-  const [hasChanged, setHasChanged] = useState(false)
-  const [form, setForm] = useState(filters)
+  const {
+    control,
+    handleSubmit,
+    formState: { isDirty }
+  } = useForm<OrderByType>({
+    defaultValues: orderBy,
+    mode: 'onChange',
+    reValidateMode: 'onChange'
+  })
 
   return (
     <>
@@ -24,32 +32,48 @@ const OrderBy = ({ filters, infos, onSubmit }: OrderByProps) => {
         size="small"
         sx={{ borderRadius: 1 }}
         fullWidth
-        startIcon={<FilterList height="15px" fill="#0288D1" />}
+        startIcon={<SwapVert height="15px" fill="#0288D1" />}
         variant="contained"
         onClick={() => setToggleModal(true)}
         style={{ backgroundColor: '#fff', color: '#303030', height: '30px' }}
       >
-        Filtrer
+        Trier par
       </Button>
       <Modal
-        title="Filtrer par :"
+        title="Tri des patients :"
         open={toggleModal}
-        readonly={!hasChanged}
+        readonly={!isDirty}
         color="secondary"
-        isError={isError}
         onClose={() => setToggleModal(false)}
         onSubmit={() => {
-          onSubmit(form)
+          handleSubmit(onSubmit)()
           setToggleModal(false)
         }}
       >
-        <ExplorationFilters
-          filters={filters}
-          infos={infos}
-          onError={setIsError}
-          onSubmit={setForm}
-          onChange={setHasChanged}
-        />
+        <Grid container justifyContent="space-between" alignItems="center">
+          <Grid item xs={5}>
+            <Controller
+              name="orderBy"
+              control={control}
+              render={({ field }) => (
+                <Select<string | undefined>
+                  {...field}
+                  label="Trier par :"
+                  options={infos.orderByList ?? []}
+                  onchange={field.onChange}
+                  radius={5}
+                />
+              )}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Controller
+              name="orderDirection"
+              control={control}
+              render={({ field }) => <RadioGroup {...field} options={orderDirection} onChange={field.onChange} row />}
+            />
+          </Grid>
+        </Grid>
       </Modal>
     </>
   )

@@ -95,7 +95,7 @@ const EditSavedFilter = ({ open, criteria, infos, onEdit, onClose }: EditSavedFi
               <Select<SearchByTypes | undefined>
                 {...field}
                 label="Rechercher dans"
-                items={infos.searchByList ?? []}
+                options={infos.searchByList ?? []}
                 onchange={field.onChange}
                 radius={5}
               />

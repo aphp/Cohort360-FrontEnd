@@ -79,11 +79,11 @@ const ExplorationFilters = ({ filters, infos, onSubmit, onError, onChange }: Exp
 
   useEffect(() => {
     onError(!isValid)
-  }, [isValid])
+  }, [isValid, onError])
 
   useEffect(() => {
     onChange(isDirty)
-  }, [isDirty])
+  }, [isDirty, onChange])
 
   // const fields: Record<string, React.FC<{ field: ControllerRenderProps }>> = useMemo(
   //   () => ({

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Alert, Divider, Grid, Snackbar } from '@mui/material'
+import { Alert, Grid, Snackbar } from '@mui/material'
 import SearchSection from './SearchSection'
 import CriteriasSection from './CriteriasSection'
 import { useExplorationBoard } from './useExplorationBoard'
@@ -11,17 +11,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { FetchStatus } from 'types'
 import { AlertWrapper } from 'components/ui/Alert'
 import { PatientState } from 'state/patient'
-
-export type DisplayOptions = {
-  myFilters: boolean
-  filterBy: boolean
-  orderBy: boolean
-  saveFilters: boolean
-  criterias: boolean
-  search: boolean
-  diagrams: boolean
-  count: boolean
-}
+import { GAP, DEFAULT_OPTIONS, DisplayOptions } from 'types/exploration'
 
 type ExplorationBoardProps = {
   type: ResourceType
@@ -32,24 +22,13 @@ type ExplorationBoardProps = {
   displayOptions?: DisplayOptions
 }
 
-const defaultOptions: DisplayOptions = {
-  myFilters: true,
-  filterBy: true,
-  orderBy: false,
-  saveFilters: true,
-  criterias: true,
-  search: true,
-  diagrams: true,
-  count: true
-}
-
 const ExplorationBoard = ({
   type,
   deidentified,
   groupId,
   patient,
   messages,
-  displayOptions = defaultOptions
+  displayOptions = DEFAULT_OPTIONS
 }: ExplorationBoardProps) => {
   const [searchParams] = useSearchParams()
   const page = parseInt(searchParams.get('page') || '1', 10)
@@ -70,6 +49,7 @@ const ExplorationBoard = ({
 
   const { count, pagination, data, dataLoading, onChangePage } = useData(
     type,
+    displayOptions.display,
     searchCriterias,
     page,
     deidentified,
@@ -79,8 +59,8 @@ const ExplorationBoard = ({
 
   useEffect(() => {
     //console.log('test searchCriterias', searchCriterias)
-    console.log('testt board', search)
-  }, [searchCriterias.filters])
+    console.log('test card', data)
+  }, [data])
 
   // supprimer multiple dans le type Column
   // Supprimer StartDate et EndDate quand tâche terminée
@@ -97,7 +77,7 @@ const ExplorationBoard = ({
   // Le retour en arrière d'un patient sur la liste des patients ne se fait pas correctement
   // Une recherche se lance (ùmode pseudo) lorsque le selectBy est modifié alors que ce comportement n'est pas souhaité
   return (
-    <Grid item xs={12} container gap="25px" sx={{ backgroundColor: '#fff' }}>
+    <Grid item xs={12} container gap={GAP} sx={{ backgroundColor: '#fff' }}>
       <SearchSection
         searchCriterias={searchCriterias}
         infos={additionalInfo}
@@ -106,7 +86,6 @@ const ExplorationBoard = ({
         savedFiltersData={savedFiltersData}
         displayOptions={displayOptions}
       />
-      <Divider sx={{ width: '100%' }} />
       {displayOptions.criterias && (
         <CriteriasSection
           onDelete={onRemoveCriteria}

@@ -9,7 +9,7 @@ import { selectFiltersAsArray } from 'utils/filters'
 import { cancelPendingRequest } from 'utils/abortController'
 import { getCleanGroupId } from 'utils/paginationUtils'
 import services from 'services/aphp'
-import { CohortPatient, DTTB_ResultsType as ResultsType, LoadingStatus } from 'types'
+import { CohortPatient, LoadingStatus } from 'types'
 
 import {
   Direction,
@@ -43,6 +43,7 @@ import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/search
 import ExplorationBoard from 'components/ExplorationBoard'
 import { ResourceType } from 'types/requestCriterias'
 import { useAppSelector } from 'state'
+import { DATA_DISPLAY } from 'types/exploration'
 
 type PatientSidebarProps = {
   total: number
@@ -142,7 +143,8 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
       diagrams: false,
       count: false,
       orderBy: true,
-      saveFilters: false
+      saveFilters: false,
+      display: DATA_DISPLAY.INFO
     }),
     []
   )
@@ -154,12 +156,14 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
           <ChevronRight color="action" width="20px" />
         </IconButton>
       </div>
-      <ExplorationBoard
-        deidentified={deidentifiedBoolean}
-        type={ResourceType.PATIENT}
-        groupId={patient?.groupId ? [patient?.groupId] : []}
-        displayOptions={displayOptions}
-      />
+      <Grid container padding="10px 10px 0px 10px">
+        <ExplorationBoard
+          deidentified={deidentifiedBoolean}
+          type={ResourceType.PATIENT}
+          groupId={patient?.groupId ? [patient?.groupId] : []}
+          displayOptions={displayOptions}
+        />
+      </Grid>
       {/*<Searchbar wrapped>
           <Typography variant="button" style={{ marginBottom: '8px' }}>
             Rechercher par :

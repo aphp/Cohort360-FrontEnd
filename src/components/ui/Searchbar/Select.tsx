@@ -1,21 +1,22 @@
 import React from 'react'
 import { FormControl, InputLabel, MenuItem, Select as SelectMui } from '@mui/material'
 import { SelectInputWrapper, SelectWrapper } from './styles'
+import { LabelObject } from 'types/searchCriterias'
 
 type SelectProps<T> = {
   value: T
-  label: string
-  items: { id: T; label: string }[]
+  label?: string
+  options: LabelObject[]
   disabled?: boolean
   radius?: number
   onchange?: (value: T) => void
 }
 
-const Select = <T,>({ value, label, items, disabled, radius, onchange }: SelectProps<T>) => {
+const Select = <T,>({ value, label, options, disabled, radius, onchange }: SelectProps<T>) => {
   return (
     <SelectWrapper width="100%">
       <FormControl variant="outlined">
-        <InputLabel>{label}</InputLabel>
+        {label && <InputLabel>{label}</InputLabel>}
         <SelectInputWrapper radius={radius}>
           <SelectMui
             disabled={disabled}
@@ -25,9 +26,9 @@ const Select = <T,>({ value, label, items, disabled, radius, onchange }: SelectP
             label={label}
             sx={{ color: '#303030' }}
           >
-            {items.map((item) => (
-              <MenuItem key={item.id as string} value={item.id as string} sx={{ color: '#303030' }}>
-                {item.label}
+            {options.map((option) => (
+              <MenuItem key={option.id as string} value={option.id as string} sx={{ color: '#303030' }}>
+                {option.label}
               </MenuItem>
             ))}
           </SelectMui>
