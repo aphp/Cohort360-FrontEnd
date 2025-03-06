@@ -61,7 +61,7 @@ const ExplorationBoard = ({
     //console.log('test searchCriterias', searchCriterias)
     console.log('test card', data)
   }, [data])
-
+  // LEs additionnal infos se fetc top
   // supprimer multiple dans le type Column
   // Supprimer StartDate et EndDate quand tâche terminée
   // Label ExecutiveUnits n'est pas en gras

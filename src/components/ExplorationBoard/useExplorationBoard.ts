@@ -65,7 +65,6 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean, s
   }
 
   const onSaveSearchCriterias = ({ searchBy, searchInput, filters, orderBy }: SearchWithFilters) => {
-    console.log('test orderBy', orderBy)
     if (searchBy) changeSearchBy(searchBy)
     if (searchInput !== undefined) changeSearchInput(searchInput)
     if (filters) addFilters(filters)
@@ -144,7 +143,6 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean, s
   }
 
   useEffect(() => {
-    console.log('test search', search)
     removeSearchCriterias()
     fetchAdditionalInfos()
   }, [type, deidentified, search])

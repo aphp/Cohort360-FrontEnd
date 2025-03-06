@@ -38,7 +38,15 @@ import moment from 'moment'
 import { getConfig } from 'config'
 import { getValueSetsFromSystems } from './valueSets'
 import { SourceType } from 'types/scope'
-import { initPatientsSearchCriterias, initDocsSearchCriterias, initBioSearchCriterias, initPmsiSearchCriterias, initMedSearchCriterias, initFormsCriterias, initImagingCriterias } from 'reducers/searchCriteriasReducer'
+import {
+  initPatientsSearchCriterias,
+  initDocsSearchCriterias,
+  initBioSearchCriterias,
+  initPmsiSearchCriterias,
+  initMedSearchCriterias,
+  initFormsCriterias,
+  initImagingCriterias
+} from 'reducers/searchCriteriasReducer'
 
 export const getAlertMessages = (type: string, deidentified: boolean) => {
   if (type === ResourceType.IMAGING)
@@ -215,7 +223,7 @@ export const getPatientInfos = (patient: Patient, deidentified: boolean, groupId
 
 export const getReferences = (type: ResourceType) => {
   const config = getConfig().features
-  const refMap = {
+  const refMap: Partial<Record<ResourceType, string[]>> = {
     [ResourceType.CONDITION]: [config.condition.valueSets.conditionHierarchy.url],
     [ResourceType.PROCEDURE]: [config.procedure.valueSets.procedureHierarchy.url],
     [ResourceType.CLAIM]: [config.claim.valueSets.claimHierarchy.url],
@@ -232,16 +240,16 @@ export const getReferences = (type: ResourceType) => {
 }
 
 export const getSourceType = (type: ResourceType) => {
-  const sourceMap = {
+  const sourceMap: Partial<Record<ResourceType, SourceType>> = {
     [ResourceType.CONDITION]: SourceType.CIM10,
     [ResourceType.PROCEDURE]: SourceType.CCAM,
     [ResourceType.CLAIM]: SourceType.GHM
   }
-  return sourceMap[type]
+  return sourceMap[type] ?? undefined
 }
 
 export const getInitSearchCriterias = (type: ResourceType, search?: string) => {
-  const initMap = {
+  const initMap: Partial<Record<ResourceType, (search?: string) => SearchCriterias<Filters>>> = {
     [ResourceType.PATIENT]: initPatientsSearchCriterias,
     [ResourceType.DOCUMENTS]: initDocsSearchCriterias,
     [ResourceType.OBSERVATION]: initBioSearchCriterias,
@@ -253,5 +261,5 @@ export const getInitSearchCriterias = (type: ResourceType, search?: string) => {
     [ResourceType.QUESTIONNAIRE_RESPONSE]: initFormsCriterias,
     [ResourceType.IMAGING]: initImagingCriterias
   }
-  return (initMap[type] || initPatientsSearchCriterias)(search)
+  return (initMap[type] ?? initPatientsSearchCriterias)(search)
 }
