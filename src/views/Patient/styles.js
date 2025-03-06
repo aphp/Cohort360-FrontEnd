@@ -46,7 +46,22 @@ export default makeStyles()((theme) => ({
     right: 0,
     position: 'fixed'
   },
-  tabs: { marginTop: 20},
+  paper: {
+    width: 400
+  },
+  sidebar: {
+    backgroundColor: '#FFF',
+    width: 30,
+    height: 101,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    boxShadow: '0px 3px 6px #0000000A',
+    borderRadius: '2px 0px 0px 2px',
+    position: 'fixed',
+    marginLeft: -31
+  },
+  tabs: { marginTop: 20 },
   tabTitle: {
     padding: "4px 15px",
     marginRight: 12,

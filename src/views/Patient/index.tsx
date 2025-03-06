@@ -1,11 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom'
-import { IconButton, Grid, Tabs as TabsMui, Tab, CircularProgress } from '@mui/material'
+import { IconButton, Grid, Tabs as TabsMui, Tab, CircularProgress, Drawer } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import PatientNotExist from 'components/ErrorView/PatientNotExist'
 import PatientHeader from 'components/Patient/PatientHeader/PatientHeader'
 import PatientPreview from 'components/Patient/PatientPreview/PatientPreview'
-import PatientSidebar from 'components/Patient/PatientSidebar/PatientSidebar'
 import PatientTimeline from 'components/Patient/PatientTimeline/PatientTimeline'
 import TopBar from 'components/TopBar/TopBar'
 import useStyles from './styles'
@@ -20,6 +19,7 @@ import Tabs from 'components/ui/Tabs'
 import { getMedicationTab, getPMSITab } from 'utils/tabsUtils'
 import { MedicationTab, PmsiTab } from 'types'
 import { PMSILabel } from 'types/patient'
+import { DATA_DISPLAY } from 'types/exploration'
 
 export const PMSITabs: PmsiTab[] = [
   { label: PMSILabel.DIAGNOSTIC, id: ResourceType.CONDITION },
@@ -38,7 +38,6 @@ const Patient = () => {
   const { classes, cx } = useStyles()
   const config = useContext(AppConfig)
   const open = useAppSelector((state) => state.drawer)
-  const cohort = useAppSelector((state) => state.exploredCohort)
   const patient = useAppSelector((state) => state.patient)
   const loading = patient !== null ? patient.loading : false
   const deidentified = patient !== null ? patient.deidentified ?? false : false
@@ -46,17 +45,29 @@ const Patient = () => {
   const ODD_BIOLOGY = config.features.observation.enabled
   const ODD_IMAGING = config.features.imaging.enabled
   const ODD_FORMS = config.features.questionnaires.enabled
-
   const [searchParams] = useSearchParams()
   const groupId = getCleanGroupId(searchParams.get('groupId'))
-
+  const groupIds = useMemo(() => (patient?.groupId ? [patient?.groupId] : []), [patient?.groupId])
   const { patientId, tabName } = useParams<{
     patientId: string
-    tabName: string
+    tabName: ResourceType
   }>()
-
-  const [selectedTab, setSelectedTab] = useState(tabName ?? 'preview')
+  const [selectedTab, setSelectedTab] = useState(tabName ?? ResourceType.PREVIEW)
   const [isSidebarOpened, setIsSidebarOpened] = useState(false)
+  const sidebarOptions = useMemo(
+    () => ({
+      myFilters: false,
+      filterBy: true,
+      criterias: true,
+      search: true,
+      diagrams: false,
+      count: false,
+      orderBy: true,
+      saveFilters: false,
+      display: DATA_DISPLAY.INFO
+    }),
+    []
+  )
 
   useEffect(() => {
     const _fetchPatient = async () => {
@@ -72,14 +83,10 @@ const Patient = () => {
     _fetchPatient()
   }, [patientId, groupId])
 
-  if (patient === null && !loading) {
-    return <PatientNotExist />
-  }
-
-  const handleChangeTabs = (event: React.SyntheticEvent<Element, Event>, newTab: string) => {
-    console.log('test tab', newTab)
+  const handleChangeTabs = (event: React.SyntheticEvent<Element, Event>, newTab: ResourceType) => {
     setSelectedTab(newTab)
   }
+  if (patient === null && !loading) return <PatientNotExist />
 
   return loading ? (
     <CircularProgress className={classes.loading} size={50} />
@@ -99,13 +106,11 @@ const Patient = () => {
         alignItems="center"
         className={cx(isSidebarOpened ? classes.contentShift : null)}
       >
-        {!isSidebarOpened && (
-          <div className={classes.openLeftBar}>
-            <IconButton onClick={() => setIsSidebarOpened(true)}>
-              <ChevronLeftIcon color="action" width="20px" />
-            </IconButton>
-          </div>
-        )}
+        <div className={classes.openLeftBar}>
+          <IconButton onClick={() => setIsSidebarOpened(true)}>
+            <ChevronLeftIcon color="action" width="20px" />
+          </IconButton>
+        </div>
 
         <PatientHeader patient={patient?.patientInfo} deidentifiedBoolean={deidentified} />
 
@@ -115,7 +120,7 @@ const Patient = () => {
               classes={{ selected: classes.selected }}
               className={classes.tabTitle}
               label="Aperçu patient"
-              value="preview"
+              value={ResourceType.PREVIEW}
               component={Link}
               to={`/patients/${patientId}/preview${location.search}`}
             />
@@ -123,7 +128,7 @@ const Patient = () => {
               classes={{ selected: classes.selected }}
               className={classes.tabTitle}
               label="Parcours patient"
-              value="timeline"
+              value={ResourceType.TIMELINE}
               component={Link}
               to={`/patients/${patientId}/timeline${location.search}`}
             />
@@ -210,10 +215,10 @@ const Patient = () => {
               }}
             />
           )}
-          {selectedTab === 'preview' && (
+          {selectedTab === ResourceType.PREVIEW && (
             <PatientPreview patient={patient?.patientInfo} deidentifiedBoolean={deidentified} />
           )}
-          {selectedTab === 'timeline' && (
+          {selectedTab === ResourceType.TIMELINE && (
             <PatientTimeline
               loadingPmsi={(patient?.pmsi?.procedure?.loading || patient?.pmsi?.condition?.loading) ?? false}
               documents={patient?.documents?.list ?? []}
@@ -223,15 +228,7 @@ const Patient = () => {
               deidentified={deidentified}
             />
           )}
-          {(selectedTab === ResourceType.DOCUMENTS ||
-            selectedTab === ResourceType.OBSERVATION ||
-            selectedTab === ResourceType.IMAGING ||
-            selectedTab === ResourceType.CONDITION ||
-            selectedTab === ResourceType.PROCEDURE ||
-            selectedTab === ResourceType.CLAIM ||
-            selectedTab === ResourceType.MEDICATION_ADMINISTRATION ||
-            selectedTab === ResourceType.MEDICATION_REQUEST ||
-            (selectedTab === ResourceType.QUESTIONNAIRE_RESPONSE && !deidentified)) && (
+          {!(selectedTab === ResourceType.PREVIEW || selectedTab === ResourceType.TIMELINE) && (
             <ExplorationBoard
               deidentified={deidentified}
               type={selectedTab}
@@ -240,21 +237,25 @@ const Patient = () => {
               patient={patient}
             />
           )}
-          {/*selectedTab === 'documents' && <PatientDocs />*/}
-          {/*selectedTab === 'pmsi' && <PatientPMSI />*/}
-          {/*ODD_MEDICATION && selectedTab === 'medication' && <PatientMedication />*/}
-          {/*ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology />*/}
-          {/*ODD_IMAGING && selectedTab === 'imaging' && <PatientImaging />*/}
-          {/*ODD_FORMS && selectedTab === 'forms' && !deidentified && <PatientForms />*/}
         </Grid>
 
-        <PatientSidebar
-          openDrawer={isSidebarOpened}
-          patients={cohort.originalPatients}
-          total={cohort.totalPatients ?? 0}
+        <Drawer
+          anchor="right"
+          keepMounted
+          sx={{ width: '400px' }}
+          classes={{ paper: classes.paper }}
+          open={isSidebarOpened}
           onClose={() => setIsSidebarOpened(false)}
-          deidentifiedBoolean={deidentified}
-        />
+        >
+          <Grid container padding="10px 10px 0px 10px">
+            <ExplorationBoard
+              deidentified={deidentified}
+              type={ResourceType.PATIENT}
+              groupId={groupIds}
+              displayOptions={sidebarOptions}
+            />
+          </Grid>
+        </Drawer>
       </Grid>
     </Grid>
   )

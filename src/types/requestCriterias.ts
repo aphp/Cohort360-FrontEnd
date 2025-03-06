@@ -29,6 +29,7 @@ export enum MedicationLabel {
 }
 
 export enum ResourceType {
+  TIMELINE = 'timeline',
   PREVIEW = 'preview',
   UNKNOWN = 'Unknown',
   IPP_LIST = 'IPPList',

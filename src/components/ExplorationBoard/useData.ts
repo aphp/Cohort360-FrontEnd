@@ -102,29 +102,26 @@ export const useData = (
     setPagination({ ...pagination, currentPage: 1 })
   }
 
-  /*useEffect(() => {
+  useEffect(() => {
     console.log('testt change search')
     refetch()
-  }, [searchCriterias.orderBy, searchCriterias.filters, searchCriterias.searchInput])*/
+  }, [searchCriterias.orderBy, searchCriterias.filters, searchCriterias.searchInput])
 
   useEffect(() => {
     console.log('testt change orderBy')
-    refetch()
   }, [searchCriterias.orderBy])
 
   useEffect(() => {
-    console.log('testt change filters', searchCriterias.filters)
-    refetch()
+    console.log('testt change filters')
   }, [searchCriterias.filters])
 
   useEffect(() => {
     console.log('testt change search')
-    refetch()
   }, [searchCriterias.searchInput])
 
   useEffect(() => {
-    console.log('testt search by', !!searchCriterias.searchInput)
-    if (!!searchCriterias.searchInput) refetch()
+    console.log('testt change search by')
+    // if (!!searchCriterias.searchInput) refetch()
   }, [searchCriterias.searchBy])
 
   useEffect(() => {

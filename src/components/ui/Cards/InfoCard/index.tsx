@@ -12,16 +12,17 @@ type InfoCardProps = {
 }
 
 const InfoCard = ({ value }: InfoCardProps) => {
-  console.log('test card', value)
   return (
     <Grid
       container
       sx={{
-        borderBottom: '1px solid #e3e3e3'
+        borderBottom: '1px solid #e3e3e3',
+        cursor: value.url ? 'pointer' : 'default'
       }}
       padding="10px 16px"
       alignItems="center"
       justifyContent="space-between"
+      onClick={() => value.url && window.open(value.url)}
     >
       {value.sections.map((section) => (
         <Grid item xs={section.size} key={section.id} container>

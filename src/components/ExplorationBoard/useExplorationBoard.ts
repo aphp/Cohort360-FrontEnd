@@ -65,36 +65,35 @@ export type AdditionalInfo = {
   deidentified: boolean
 }
 
-const getInit = (type: ResourceType, search?: string) => {
-  switch (type) {
-    case ResourceType.PATIENT:
-      return initPatientsSearchCriterias(search)
-    case ResourceType.DOCUMENTS:
-      return initDocsSearchCriterias(search)
-    case ResourceType.OBSERVATION:
-      return initBioSearchCriterias(search)
-    case ResourceType.CONDITION:
-    case ResourceType.CLAIM:
-    case ResourceType.PROCEDURE:
-      return initPmsiSearchCriterias(search)
-    case ResourceType.MEDICATION_ADMINISTRATION:
-    case ResourceType.MEDICATION_REQUEST:
-      return initMedSearchCriterias(search)
-    case ResourceType.QUESTIONNAIRE_RESPONSE:
-      return initFormsCriterias(search)
-    case ResourceType.IMAGING:
-      return initImagingCriterias()
-    default:
-      return initPatientsSearchCriterias(search)
-  }
-}
-
 export const useExplorationBoard = (type: ResourceType, deidentified: boolean, search?: string) => {
+  const init = useMemo(() => {
+    switch (type) {
+      case ResourceType.PATIENT:
+        return initPatientsSearchCriterias(search)
+      case ResourceType.DOCUMENTS:
+        return initDocsSearchCriterias(search)
+      case ResourceType.OBSERVATION:
+        return initBioSearchCriterias(search)
+      case ResourceType.CONDITION:
+      case ResourceType.CLAIM:
+      case ResourceType.PROCEDURE:
+        return initPmsiSearchCriterias(search)
+      case ResourceType.MEDICATION_ADMINISTRATION:
+      case ResourceType.MEDICATION_REQUEST:
+        return initMedSearchCriterias(search)
+      case ResourceType.QUESTIONNAIRE_RESPONSE:
+        return initFormsCriterias(search)
+      case ResourceType.IMAGING:
+        return initImagingCriterias()
+      default:
+        return initPatientsSearchCriterias(search)
+    }
+  }, [type, search])
   const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>({ type, deidentified })
   const [
     searchCriterias,
     { changeSearchBy, changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias }
-  ] = useSearchCriterias<Filters>(getInit(type, search))
+  ] = useSearchCriterias<Filters>(init)
 
   const {
     allSavedFilters,
