@@ -88,7 +88,6 @@ const TableRow = ({ row, sx }: RowProps) => {
               {cell.type === CellType.MODAL &&
                 (() => {
                   const [open, setOpen] = useState(false)
-                  console.log('test med', cell)
                   return (
                     <>
                       <IconButton onClick={() => setOpen(true)}>

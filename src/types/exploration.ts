@@ -1,6 +1,8 @@
 import { PatientState } from 'state/patient'
 import { ResourceType } from './requestCriterias'
-import { SearchCriterias } from './searchCriterias'
+import { Filters, LabelObject, OrderBy, SearchBy, SearchByTypes, SearchCriterias } from './searchCriterias'
+import { Reference, Questionnaire } from 'fhir/r4'
+import { SourceType } from './scope'
 
 export type ResourceOptions<T> = {
   deidentified: boolean
@@ -48,4 +50,32 @@ export const DEFAULT_OPTIONS: DisplayOptions = {
   diagrams: true,
   count: true,
   display: DATA_DISPLAY.TABLE
+}
+
+export type SearchWithFilters = Search & {
+  filters?: Filters
+  orderBy?: OrderBy
+}
+
+export type Search = {
+  searchInput?: string
+  searchBy?: SearchByTypes
+}
+
+export type AdditionalInfo = {
+  diagnosticTypesList?: LabelObject[]
+  encounterStatusList?: LabelObject[]
+  references?: Reference[]
+  sourceType?: SourceType
+  searchByList?: SearchBy[]
+  orderByList?: LabelObject[]
+  prescriptionList?: LabelObject[]
+  administrationList?: LabelObject[]
+  questionnaires?: {
+    display: LabelObject[]
+    raw: Questionnaire[]
+  }
+  modalities?: LabelObject[]
+  type: ResourceType
+  deidentified: boolean
 }

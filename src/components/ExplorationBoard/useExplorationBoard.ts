@@ -1,29 +1,16 @@
 import { getConfig } from 'config'
-import { Questionnaire } from 'fhir/r4'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { useEffect, useMemo, useState } from 'react'
-import useSearchCriterias, {
-  initDocsSearchCriterias,
-  initBioSearchCriterias,
-  initFormsCriterias,
-  initImagingCriterias,
-  initMedSearchCriterias,
-  initPatientsSearchCriterias,
-  initPmsiSearchCriterias
-} from 'reducers/searchCriteriasReducer'
+import useSearchCriterias from 'reducers/searchCriteriasReducer'
 import services from 'services/aphp'
 import { getCodeList } from 'services/aphp/serviceValueSets'
+import { AdditionalInfo, SearchWithFilters } from 'types/exploration'
 import { ResourceType } from 'types/requestCriterias'
-import { SourceType } from 'types/scope'
 import {
   FilterKeys,
   FilterValue,
   Filters,
   FormNames,
-  LabelObject,
-  OrderBy,
-  SearchBy,
-  SearchByTypes,
   SearchCriteriaKeys,
   SearchCriterias,
   orderByListPatients,
@@ -31,65 +18,13 @@ import {
   searchByListDocuments,
   searchByListPatients
 } from 'types/searchCriterias'
-import { Reference } from 'types/valueSet'
-import { narrowSearchCriterias } from 'utils/exploration'
+import { getInitSearchCriterias, getReferences, getSourceType, narrowSearchCriterias } from 'utils/exploration'
 import { selectFiltersAsArray } from 'utils/filters'
 import { getFormLabel } from 'utils/formUtils'
-import { getValueSetsFromSystems } from 'utils/valueSets'
-
-export type SearchWithFilters = Search & {
-  filters?: Filters
-  orderBy?: OrderBy
-}
-
-export type Search = {
-  searchInput?: string
-  searchBy?: SearchByTypes
-}
-
-export type AdditionalInfo = {
-  diagnosticTypesList?: LabelObject[]
-  encounterStatusList?: LabelObject[]
-  references?: Reference[]
-  sourceType?: SourceType
-  searchByList?: SearchBy[]
-  orderByList?: LabelObject[]
-  prescriptionList?: LabelObject[]
-  administrationList?: LabelObject[]
-  questionnaires?: {
-    display: LabelObject[]
-    raw: Questionnaire[]
-  }
-  modalities?: LabelObject[]
-  type: ResourceType
-  deidentified: boolean
-}
 
 export const useExplorationBoard = (type: ResourceType, deidentified: boolean, search?: string) => {
-  const init = useMemo(() => {
-    switch (type) {
-      case ResourceType.PATIENT:
-        return initPatientsSearchCriterias(search)
-      case ResourceType.DOCUMENTS:
-        return initDocsSearchCriterias(search)
-      case ResourceType.OBSERVATION:
-        return initBioSearchCriterias(search)
-      case ResourceType.CONDITION:
-      case ResourceType.CLAIM:
-      case ResourceType.PROCEDURE:
-        return initPmsiSearchCriterias(search)
-      case ResourceType.MEDICATION_ADMINISTRATION:
-      case ResourceType.MEDICATION_REQUEST:
-        return initMedSearchCriterias(search)
-      case ResourceType.QUESTIONNAIRE_RESPONSE:
-        return initFormsCriterias(search)
-      case ResourceType.IMAGING:
-        return initImagingCriterias()
-      default:
-        return initPatientsSearchCriterias(search)
-    }
-  }, [type, search])
   const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>({ type, deidentified })
+  const init = useMemo(() => getInitSearchCriterias(type, search), [type, search])
   const [
     searchCriterias,
     { changeSearchBy, changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias }
@@ -101,43 +36,8 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean, s
     selectedSavedFilter,
     methods: { next, postSavedFilter, deleteSavedFilters, patchSavedFilter, selectFilter, resetFetchStatus }
   } = useSavedFilters<Filters>(type)
-
-  const references = useMemo(() => {
-    switch (type) {
-      case ResourceType.CONDITION:
-        return getValueSetsFromSystems([getConfig().features.condition.valueSets.conditionHierarchy.url])
-      case ResourceType.PROCEDURE:
-        return getValueSetsFromSystems([getConfig().features.procedure.valueSets.procedureHierarchy.url])
-      case ResourceType.CLAIM:
-        return getValueSetsFromSystems([getConfig().features.claim.valueSets.claimHierarchy.url])
-      case ResourceType.MEDICATION_ADMINISTRATION:
-      case ResourceType.MEDICATION_REQUEST:
-        return getValueSetsFromSystems([
-          getConfig().features.medication.valueSets.medicationAtc.url,
-          getConfig().features.medication.valueSets.medicationUcd.url
-        ])
-      case ResourceType.OBSERVATION:
-        return getValueSetsFromSystems([
-          getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
-          getConfig().features.observation.valueSets.biologyHierarchyLoinc.url
-        ])
-      default:
-        return undefined
-    }
-  }, [type])
-
-  const sourceType = useMemo(() => {
-    switch (type) {
-      case ResourceType.CONDITION:
-        return SourceType.CIM10
-      case ResourceType.PROCEDURE:
-        return SourceType.CCAM
-      case ResourceType.CLAIM:
-        return SourceType.GHM
-      default:
-        return undefined
-    }
-  }, [type])
+  const references = useMemo(() => getReferences(type), [type])
+  const sourceType = useMemo(() => getSourceType(type), [type])
 
   const narrowedSearchCriterias = useMemo(
     () => narrowSearchCriterias(deidentified, searchCriterias, type),
@@ -228,7 +128,7 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean, s
     }
     if (type === ResourceType.DOCUMENTS) searchByList = searchByListDocuments
     setAdditionalInfo({
-      references,
+      references: references,
       sourceType,
       diagnosticTypesList,
       encounterStatusList,
