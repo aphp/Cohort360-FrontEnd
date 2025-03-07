@@ -1,9 +1,7 @@
 /* eslint-disable max-statements */
 import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from 'state'
-import { setMessage } from 'state/message'
-import { setSelectedRequestShare } from 'state/request'
+import { useAppSelector } from 'state'
 
 import { Grid } from '@mui/material'
 import ActionBar from './ActionBar'
@@ -32,7 +30,7 @@ import usePageValidation from '../hooks/usePageValidation'
 import useRequest from '../hooks/useRequest'
 import useSelectionState from '../hooks/useMultipleSelection'
 
-import { Cohort, RequestType, SimpleStatus, ValueSet } from 'types'
+import { Cohort, RequestType, ValueSet } from 'types'
 import { CohortsFilters, FilterKeys, OrderBy } from 'types/searchCriterias'
 import {
   checkSearchParamsErrors,
@@ -55,7 +53,6 @@ type CohortsListProps = {
 }
 
 const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }: CohortsListProps) => {
-  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { projectId, requestId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -63,9 +60,7 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
     getCohortsSearchParams(searchParams)
 
   const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
-  const requestState = useAppSelector((state) => state.request)
 
-  const { selectedRequestShare } = requestState
   const [paramsReady, setParamsReady] = useState(false)
   const [deleteMode, setDeleteMode] = useState(false)
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
@@ -81,6 +76,7 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
   const [cohortToEdit, setCohortToEdit] = useState<Cohort | null>(null)
   const [openCohortEditionModal, setOpenCohortEditionModal] = useState(false)
   const [openParentEditionModal, setOpenParentEditionModal] = useState(false)
+  const [openShareParentModal, setOpenShareParentModal] = useState(false)
   const [openDeletionModal, setOpenDeletionModal] = useState(false)
   const [openFiltersModal, setOpenFiltersModal] = useState(false)
 
@@ -167,10 +163,6 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
     })
   }
 
-  const onShareRequest = () => {
-    dispatch(setSelectedRequestShare({ uuid: requestId ?? '', name: '' }))
-  }
-
   const onClickFav = (cohort: Cohort) => {
     editCohortMutation.mutate({ ...cohort, favorite: !cohort.favorite })
   }
@@ -191,20 +183,6 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
   const onClickDelete = () => {
     setOpenDeletionModal(true)
     setDeleteMode(true)
-  }
-
-  const handleShareStatus = (status: SimpleStatus) => {
-    if (status) {
-      dispatch(
-        setMessage({
-          type: status,
-          content:
-            status === 'error'
-              ? 'Une erreur est survenue lors du partage de la requête'
-              : 'La requête a bien été partagée'
-        })
-      )
-    }
   }
 
   const onSelectAll = () => {
@@ -238,7 +216,7 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
                     disabled={maintenanceIsActive}
                     title="Partager la requête"
                     icon={<ShareIcon />}
-                    onClick={() => onShareRequest()}
+                    onClick={() => setOpenShareParentModal(true)}
                     color={'#5bc5f2'}
                   />
                   <IconButtonWithTooltip
@@ -324,12 +302,11 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
           deleteMode ? getCohortsConfirmDeletionMessage(selectedCohorts.length) : getRequestsConfirmDeletionMessage()
         }
       />
-      {selectedRequestShare !== null && (
-        <ModalShareRequest
-          parentStateSetter={(status) => handleShareStatus(status)}
-          onClose={() => dispatch(setSelectedRequestShare(null))}
-        />
-      )}
+      <ModalShareRequest
+        open={openShareParentModal}
+        requestToShare={parentRequest as RequestType}
+        onClose={() => setOpenShareParentModal(false)}
+      />
 
       <Modal
         title="Filtrer par :"

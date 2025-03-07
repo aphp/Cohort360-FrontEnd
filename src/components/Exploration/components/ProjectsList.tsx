@@ -127,7 +127,7 @@ const ProjectsList = () => {
           disabled={maintenanceIsActive}
           small
         >
-          Ajouter un projet
+          Nouveau projet
         </Button>
       </Grid>
       <Grid container gap="50px">

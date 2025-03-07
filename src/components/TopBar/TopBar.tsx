@@ -1,13 +1,8 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  Button,
   Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   Divider,
   Grid,
   IconButton,
@@ -28,31 +23,32 @@ import CloseIcon from '@mui/icons-material/Close'
 import MoreButton from '@mui/icons-material/MoreVert'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
+import AddOrEditItem from 'components/Exploration/components/Modals/AddOrEditItem'
+import ConfirmDeletion from 'components/Exploration/components/Modals/ConfirmDeletion'
 import { AvatarWrapper } from 'components/ui/Avatar/styles'
-import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 import FavStar from 'components/ui/FavStar'
-import ModalEditCohort from 'components/Requests/Modals/ModalEditCohort/ModalEditCohort'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { favoriteExploredCohort } from 'state/exploredCohort'
-import { deleteCohort, setSelectedCohort } from 'state/cohort'
 
 import services from 'services/aphp'
 
 import displayDigit from 'utils/displayDigit'
+import { getCohortsConfirmDeletionMessage, getCohortsConfirmDeletionTitle } from 'utils/explorationUtils'
 
 import useStyles from './styles'
 import { AppConfig } from 'config'
+import useEditCohort from 'components/Exploration/hooks/useEditCohort'
+import { updateCohort } from 'state/exploredCohort'
 import { Cohort } from 'types'
+import useDeleteCohort from 'components/Exploration/hooks/useDeleteCohort'
 
 type TopBarProps = {
   context: 'patients' | 'cohort' | 'perimeters' | 'patient_info'
   patientsNb?: number
   access?: string
-  afterEdit?: () => void
 }
 
-const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit }) => {
+const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
@@ -61,10 +57,13 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
   const dashboard = useAppSelector((state) => state.exploredCohort)
 
-  const [isExtended, onExtend] = useState(false)
-  const [openModal, setOpenModal] = useState<'' | 'edit' | 'export' | 'delete'>('')
+  const [isExtended, setIsExtended] = useState(false)
+  const [openModal, setOpenModal] = useState<'' | 'edit' | 'delete'>('')
   const [patientsNumber, setPatientsNumber] = useState<number>(patientsNb ?? 0)
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
+
+  const deleteCohortMutation = useDeleteCohort()
+  const editCohortMutation = useEditCohort()
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -75,7 +74,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
     setOpenModal('')
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const abortController = new AbortController()
     const _fetchPatientNumber = async () => {
       const _patientNumber = await services.patients.fetchPatientsCount(abortController.signal)
@@ -149,12 +148,20 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
       break
   }
 
-  const handleFavorite = () => {
-    dispatch(favoriteExploredCohort({ exploredCohort: dashboard }))
+  const handleEdition = (cohort: Cohort) => {
+    editCohortMutation.mutate(cohort, {
+      onSuccess: () => dispatch(updateCohort({ ...dashboard, name: cohort.name, description: cohort.description }))
+    })
   }
 
+  const handleFavorite = () => {
+    editCohortMutation.mutate(
+      { ...dashboard, favorite: !dashboard.favorite },
+      { onSuccess: () => dispatch(updateCohort({ ...dashboard, favorite: !dashboard.favorite })) }
+    )
+  }
   const handleConfirmDeletion = () => {
-    dispatch(deleteCohort({ deletedCohort: dashboard }))
+    deleteCohortMutation.mutate([dashboard])
     navigate('/home')
   }
 
@@ -224,7 +231,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                                 <Chip className={classes.perimetersChip} label={perimeter} />
                               </ListItem>
                             ))}
-                          <IconButton size="small" onClick={() => onExtend(false)}>
+                          <IconButton size="small" onClick={() => setIsExtended(false)}>
                             <CloseIcon />
                           </IconButton>
                         </>
@@ -237,7 +244,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                               </ListItem>
                             ))}
                           {cohort.perimeters && cohort.perimeters.length > 4 && (
-                            <IconButton size="small" onClick={() => onExtend(true)}>
+                            <IconButton size="small" onClick={() => setIsExtended(true)}>
                               <MoreHorizIcon />
                             </IconButton>
                           )}
@@ -288,9 +295,8 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                 </IconButton>
                 <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
                   <MenuItem
-                    onClick={async () => {
+                    onClick={() => {
                       setAnchorEl(null)
-                      await dispatch(setSelectedCohort(dashboard ?? null))
                       setOpenModal('edit')
                     }}
                   >
@@ -323,43 +329,24 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         )}
       </Grid>
 
-      {!!appConfig.features.export.enabled && openModal === 'edit' && (
-        <ModalEditCohort
+      {openModal === 'edit' && (
+        <AddOrEditItem
           open
-          onClose={() => {
-            handleClose()
-            if (afterEdit && typeof afterEdit === 'function') {
-              afterEdit()
-            }
-          }}
-        />
-      )}
-
-      {openModal === 'export' && (
-        <ExportModal
-          cohortId={dashboard?.uuid ? dashboard?.uuid : '0'}
-          open
-          handleClose={() => handleClose()}
-          fhirGroupId={cohort.cohortId ?? ''}
+          selectedItem={dashboard}
+          onUpdate={(cohort) => handleEdition(cohort)}
+          titleEdit="Modifier la cohorte"
+          onClose={handleClose}
         />
       )}
 
       {openModal === 'delete' && (
-        <Dialog fullWidth maxWidth="xs" open onClose={handleClose} aria-labelledby="form-dialog-title">
-          <DialogTitle>Supprimer une cohorte</DialogTitle>
-
-          <DialogContent>
-            <Typography>Êtes-vous sûr(e) de vouloir supprimer cette cohorte ?</Typography>
-          </DialogContent>
-
-          <DialogActions>
-            <Button onClick={handleClose}>Annuler</Button>
-
-            <Button onClick={handleConfirmDeletion} style={{ color: '#dc3545' }}>
-              Supprimer
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <ConfirmDeletion
+          open
+          onClose={handleClose}
+          onSubmit={handleConfirmDeletion}
+          title={getCohortsConfirmDeletionTitle()}
+          message={getCohortsConfirmDeletionMessage()}
+        />
       )}
     </>
   )

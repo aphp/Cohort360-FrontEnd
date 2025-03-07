@@ -758,8 +758,6 @@ export type AccessExpirationsProps = {
   expiring?: boolean
 }
 
-export type SimpleStatus = 'success' | 'error' | null
-
 export type AccessExpiration = {
   leftDays: number
   start_datetime: Date

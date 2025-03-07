@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useAppDispatch } from 'state'
+import { setMessage } from 'state/message'
 
 import {
   Dialog,
@@ -13,9 +14,7 @@ import {
   FormControlLabel
 } from '@mui/material'
 
-import { RequestType, User, SimpleStatus } from 'types'
-
-import { useAppSelector } from 'state'
+import { RequestType, User } from 'types'
 
 import RequestShareForm from './components/RequestShareForm'
 import services from 'services/aphp'
@@ -24,17 +23,13 @@ const ERROR_TITLE = 'error_title'
 const ERROR_USER_SHARE_LIST = 'error_user_share_list'
 
 const ModalShareRequest: React.FC<{
-  requestShare?: RequestType | null
-  parentStateSetter: (val: SimpleStatus) => void
+  open: boolean
+  requestToShare: RequestType
   onClose: () => void
-}> = ({ requestShare, onClose, parentStateSetter }) => {
-  const requestState = useAppSelector((state) => state.request)
-  const navigate = useNavigate()
-  const { selectedRequestShare } = requestState
-
-  const selectedCurrentRequest = selectedRequestShare || requestShare
+}> = ({ open, requestToShare, onClose }) => {
+  const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
-  const [currentRequest, setCurrentRequest] = useState<RequestType | null | undefined>(selectedCurrentRequest)
+  const [currentRequest, setCurrentRequest] = useState<RequestType | null | undefined>(requestToShare)
   const [currentUserToShare, setCurrentUserToShare] = useState<User[] | null>(null)
   const [error, setError] = useState<'error_title' | 'error_user_share_list' | null>(null)
   const [notifyByEmail, setNotifyByEmail] = useState(false)
@@ -72,24 +67,26 @@ const ModalShareRequest: React.FC<{
 
     const shareRequestResponse = await services.projects.shareRequest(currentRequest, notifyByEmail)
     if (shareRequestResponse?.status === 201) {
-      parentStateSetter('success')
+      dispatch(
+        setMessage({
+          type: 'success',
+          content: 'La requête a bien été partagée'
+        })
+      )
     } else {
-      parentStateSetter('error')
+      dispatch(
+        setMessage({
+          type: 'error',
+          content: 'Une erreur est survenue lors du partage de la requête'
+        })
+      )
     }
     onClose()
   }
 
-  const handleClose = () => {
-    if (onClose && typeof onClose === 'function') {
-      onClose()
-    } else {
-      navigate('/home')
-    }
-  }
-
   return (
     <Dialog
-      open
+      open={open}
       onClose={() => onClose && typeof onClose === 'function' && onClose()}
       fullWidth
       maxWidth="md"
@@ -111,7 +108,7 @@ const ModalShareRequest: React.FC<{
         )}
       </DialogContent>
       <DialogActions>
-        <Button color="secondary" onClick={handleClose}>
+        <Button color="secondary" onClick={onClose}>
           Annuler
         </Button>
         <Button onClick={handleConfirm}>Valider</Button>

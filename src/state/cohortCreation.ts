@@ -14,8 +14,7 @@ import {
 import { buildRequest, unbuildRequest, joinRequest, checkNominativeCriteria } from 'utils/cohortCreation'
 
 import { logout, login, impersonate } from './me'
-import { addRequest, deleteRequest } from './request'
-import { deleteProject } from './project'
+import { addRequest } from './request'
 
 import services from 'services/aphp'
 import { SelectedCriteriaType } from 'types/requestCriterias'
@@ -772,9 +771,6 @@ const cohortCreationSlice = createSlice({
       const newRequestName = payload.requestsList ? payload.requestsList[payload.requestsList.length - 1].name : ''
       return { ...state, requestId: newRequestId, requestName: newRequestName, loading: false }
     })
-    // When you delete a request | folder => reset cohort create (if current request is edited state)
-    builder.addCase(deleteRequest.fulfilled, () => defaultInitialState())
-    builder.addCase(deleteProject.fulfilled, () => defaultInitialState())
   }
 })
 

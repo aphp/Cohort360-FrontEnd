@@ -2,8 +2,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from 'state'
-import { setMessage } from 'state/message'
-import { setSelectedRequestShare } from 'state/request'
 import { resetCohortCreation } from 'state/cohortCreation'
 
 import { Grid } from '@mui/material'
@@ -28,7 +26,7 @@ import useProject from '../hooks/useProject'
 import useRequests from '../hooks/useRequests'
 import useSelectionState from '../hooks/useMultipleSelection'
 
-import { ProjectType, RequestType, SimpleStatus } from 'types'
+import { ProjectType, RequestType } from 'types'
 import { ExplorationsSearchParams } from 'types/cohorts'
 import { OrderBy } from 'types/searchCriterias'
 import {
@@ -52,13 +50,12 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
   const [searchParams, setSearchParams] = useSearchParams()
   const { searchInput, startDate, endDate, page, orderBy, orderDirection } = getRequestsSearchParams(searchParams)
   const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
-  const requestState = useAppSelector((state) => state.request)
 
-  const { selectedRequestShare } = requestState
   const [paramsReady, setParamsReady] = useState(false)
   const [deleteMode, setDeleteMode] = useState(false)
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
-  const [requestToEdit, setRequestToEdit] = useState<RequestType | null>(null)
+  const [selectedRequest, setSelectedRequest] = useState<RequestType | null>(null)
+  const [openShareModal, setOpenShareModal] = useState(false)
   const [openEditionModal, setOpenEditionModal] = useState(false)
   const [openParentEditionModal, setOpenParentEditionModal] = useState(false)
   const [openDeletionModal, setOpenDeletionModal] = useState(false)
@@ -75,16 +72,16 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
     rowsPerPage,
     paramsReady
   })
-  const editRequestMutation = useEditRequest()
-  const editProjectMutation = useEditProject()
-  const deleteRequestsMutation = useDeleteRequests()
-  const deleteProjectMutation = useDeleteProject()
   const {
     selected: selectedRequests,
     setSelected: setSelectedRequests,
     toggle,
     clearSelection
   } = useSelectionState<RequestType>()
+  const editRequestMutation = useEditRequest()
+  const editProjectMutation = useEditProject()
+  const deleteRequestsMutation = useDeleteRequests()
+  const deleteProjectMutation = useDeleteProject()
 
   useEffect(() => {
     const { changed, newSearchParams } = checkSearchParamsErrors(searchParams)
@@ -109,11 +106,11 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
   usePageValidation(total, page, rowsPerPage, handlePageChange)
 
   const onShareRequest = (request: RequestType) => {
-    dispatch(setSelectedRequestShare(request))
+    setSelectedRequest(request)
   }
 
   const onClickEdit = (request: RequestType) => {
-    setRequestToEdit(request)
+    setSelectedRequest(request)
     setOpenEditionModal(true)
   }
 
@@ -158,20 +155,6 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
   const handleNewRequest = () => {
     dispatch(resetCohortCreation())
     navigate('/cohort/new')
-  }
-
-  const handleShareStatus = (status: SimpleStatus) => {
-    if (status) {
-      dispatch(
-        setMessage({
-          type: status,
-          content:
-            status === 'error'
-              ? 'Une erreur est survenue lors du partage de la requête'
-              : 'La requête a bien été partagée'
-        })
-      )
-    }
   }
 
   if (projectIsError) {
@@ -244,7 +227,7 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
 
       <AddOrEditItem
         open={openEditionModal}
-        selectedItem={requestToEdit}
+        selectedItem={selectedRequest}
         onUpdate={(request) => editRequestMutation.mutate(request as RequestType)}
         titleEdit="Édition de la requête"
         onClose={onCloseEditionModal}
@@ -276,12 +259,11 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
         }}
         selectedRequests={selectedRequests}
       />
-      {selectedRequestShare !== null && (
-        <ModalShareRequest
-          parentStateSetter={(status) => handleShareStatus(status)}
-          onClose={() => dispatch(setSelectedRequestShare(null))}
-        />
-      )}
+      <ModalShareRequest
+        open={openShareModal}
+        requestToShare={selectedRequest as RequestType}
+        onClose={() => setOpenShareModal(false)}
+      />
     </Grid>
   )
 }

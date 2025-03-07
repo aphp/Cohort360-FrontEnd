@@ -254,20 +254,8 @@ const exploredCohortSlice = createSlice({
       state.originalPatients = originalPatients
       state.excludedPatients = excludedPatients
     },
-    updateCohort: (state: ExploredCohortState, action: PayloadAction<GroupMember[]>) => {
-      return {
-        ...state,
-        cohort:
-          Array.isArray(state.cohort) || !state.cohort
-            ? state.cohort
-            : {
-                ...state.cohort,
-                member: action.payload
-              },
-        importedPatients: [],
-        includedPatients: [],
-        excludedPatients: []
-      }
+    updateCohort: (state: ExploredCohortState, action: PayloadAction<CohortData>) => {
+      return { ...state, ...action.payload }
     }
   },
   extraReducers: (builder) => {
@@ -305,5 +293,11 @@ const exploredCohortSlice = createSlice({
 
 export default exploredCohortSlice.reducer
 export { fetchExploredCohort, favoriteExploredCohort, fetchExploredCohortInBackground }
-export const { addImportedPatients, excludePatients, removeImportedPatients, includePatients, removeExcludedPatients } =
-  exploredCohortSlice.actions
+export const {
+  addImportedPatients,
+  excludePatients,
+  removeImportedPatients,
+  includePatients,
+  removeExcludedPatients,
+  updateCohort
+} = exploredCohortSlice.actions

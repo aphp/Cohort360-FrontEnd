@@ -65,7 +65,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
         )}
         {onAddRequest && (
           <Button width="fit-content" onClick={() => onAddRequest()} endIcon={<AddIcon />} disabled={disabled} small>
-            Ajouter une requête
+            Nouvelle requête
           </Button>
         )}
         {totalSelected > 0 && (

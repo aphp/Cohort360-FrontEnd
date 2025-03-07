@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import moment from 'moment'
 
 import {
@@ -45,7 +45,6 @@ import {
   CurrentSnapshot,
   LoadingStatus,
   RequestType,
-  SimpleStatus,
   Snapshot,
   WSJobStatus
 } from 'types'
@@ -71,13 +70,6 @@ const ControlPanel: React.FC<{
   const [openModal, setOpenModal] = useState<'executeCohortConfirmation' | null>(null)
   const [oldCount, setOldCount] = useState<CohortCreationCounterType | null>(null)
   const [openShareRequestModal, setOpenShareRequestModal] = useState<boolean>(false)
-  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
-  const wrapperSetShareSuccessOrFailMessage = useCallback(
-    (val: SimpleStatus) => {
-      setShareSuccessOrFailMessage(val)
-    },
-    [setShareSuccessOrFailMessage]
-  )
   const [countLoading, setCountLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
   const [reportLoading, setReportLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
   const [reportError, setReportError] = useState(false)
@@ -513,10 +505,10 @@ const ControlPanel: React.FC<{
         />
       )}
 
-      {openShareRequestModal && requestShare !== null && requestShare?.currentSnapshot !== undefined && (
+      {requestShare?.currentSnapshot !== undefined && (
         <ModalShareRequest
-          parentStateSetter={wrapperSetShareSuccessOrFailMessage}
-          requestShare={requestShare}
+          open={openShareRequestModal}
+          requestToShare={requestShare}
           onClose={() => handleCloseSharedModal()}
         />
       )}
@@ -530,32 +522,6 @@ const ControlPanel: React.FC<{
         >
           <Alert severity="error" onClose={() => handleCloseSharedModal()}>
             Votre requête ne possède aucun critère. Elle ne peut donc pas être partagée.
-          </Alert>
-        </Snackbar>
-      )}
-
-      {shareSuccessOrFailMessage === 'success' && (
-        <Snackbar
-          open
-          onClose={() => setShareSuccessOrFailMessage(null)}
-          autoHideDuration={5000}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert severity="success" onClose={() => setShareSuccessOrFailMessage(null)}>
-            Votre requête a été partagée.
-          </Alert>
-        </Snackbar>
-      )}
-
-      {shareSuccessOrFailMessage === 'error' && (
-        <Snackbar
-          open
-          onClose={() => setShareSuccessOrFailMessage(null)}
-          autoHideDuration={5000}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert severity="error" onClose={() => setShareSuccessOrFailMessage(null)}>
-            Une erreur est survenue, votre requête n'a pas pu être partagée.
           </Alert>
         </Snackbar>
       )}

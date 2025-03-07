@@ -10,12 +10,9 @@ import Dashboard from 'views/Dashboard'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 import PageNotFound from 'views/PageNotFound/PageNotFound'
 import CareSiteView from 'views/Scope/CareSiteView'
-import MyCohorts from 'views/MyCohorts'
-import MyRequests from 'views/MyRequests'
 import DownloadPopup from 'views/DownloadPopup/DownloadPopup'
 import Export from 'pages/Export'
 import ExportRequest from 'pages/ExportRequest'
-import FeasibilityReports from 'pages/FeasibilityReports'
 import MyResearches from 'views/MyResearches'
 import ProjectsList from 'components/Exploration/components/ProjectsList'
 import RequestsList from 'components/Exploration/components/RequestsList'
@@ -91,36 +88,6 @@ const configRoutes: configRoute[] = [
     name: 'perimeter',
     isPrivate: true,
     element: <CareSiteView />
-  },
-  /**
-   * Cohort360: Saved Cohorts Page
-   */
-  {
-    exact: true,
-    displaySideBar: true,
-    path: '/my-cohorts/favorites',
-    name: 'my-cohorts/favorites',
-    isPrivate: true,
-    element: <MyCohorts favoriteUrl />
-  },
-  {
-    exact: true,
-    displaySideBar: true,
-    path: '/my-cohorts',
-    name: 'my-cohorts',
-    isPrivate: true,
-    element: <MyCohorts />
-  },
-  /**
-   * Cohort360: My Projects + Cohort List Page
-   */
-  {
-    exact: true,
-    displaySideBar: true,
-    path: '/my-requests',
-    name: 'my-requests',
-    isPrivate: true,
-    element: <MyRequests />
   },
   /**
    * Cohort360: My Researches

@@ -349,26 +349,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               className={cx(classes.nestedList, { [classes.hide]: !open })}
             >
               <List id="research-collapse">
-                {/* <ListItem>
-                  <Link
-                    id="savedResearch-link"
-                    onClick={() => navigate('/my-cohorts')}
-                    underline="hover"
-                    className={classes.nestedTitle}
-                  >
-                    Mes cohortes
-                  </Link>
-                </ListItem>
-                <ListItem>
-                  <Link
-                    id="myProject-link"
-                    onClick={() => navigate('/my-requests')}
-                    underline="hover"
-                    className={classes.nestedTitle}
-                  >
-                    Mes requêtes
-                  </Link>
-                </ListItem> */}
                 {!practitioner?.deidentified && (
                   <ListItem>
                     <Link
@@ -388,7 +368,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     underline="hover"
                     className={classes.nestedTitle}
                   >
-                    Mes rapports de faisabilite
+                    Mes rapports de faisabilité
                   </Link>
                 </ListItem>
                 {/* TODO: refacto ce menu burger parce que là c'est la crise */}
