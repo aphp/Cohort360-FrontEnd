@@ -13,8 +13,8 @@ import {
 
 import { ProjectType, RequestType } from 'types'
 
-import useProjects from 'components/Exploration/hooks/useProjects'
-import useMoveRequest from 'components/Exploration/hooks/useMoveRequest'
+import useProjects from 'hooks/researches/useProjects'
+import useMoveRequest from 'hooks/researches/useMoveRequest'
 
 type MoveRequestProps = {
   open: boolean

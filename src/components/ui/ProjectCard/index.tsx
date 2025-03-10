@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import { Box, Typography } from '@mui/material'
-import ActionMenu from 'components/Exploration/components/ActionMenu'
+import ActionMenu from 'components/Researches/ActionMenu'
 
 import DeleteIcon from 'assets/icones/delete.svg?react'
 import EditIcon from '@mui/icons-material/Edit'

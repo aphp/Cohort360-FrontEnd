@@ -8,23 +8,23 @@ import { Grid } from '@mui/material'
 import ActionBar from './ActionBar'
 import AddOrEditItem from './Modals/AddOrEditItem'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
-import IconButtonWithTooltip from './IconButtonWithTooltip'
+import IconButtonWithTooltip from '../ui/IconButtonWithTooltip'
 import LevelHeader from './LevelHeader'
-import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
+import ModalShareRequest from './Modals/ModalShareRequest'
 import MoveRequest from './Modals/MoveRequest'
 import RequestsTableContent from './RequestsTableContent'
 
 import DeleteIcon from 'assets/icones/delete.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
 
-import useDeleteProject from '../hooks/useDeleteProject'
-import useDeleteRequests from '../hooks/useDeleteRequests'
-import useEditProject from '../hooks/useEditProject'
-import useEditRequest from '../hooks/useEditRequest'
-import usePageValidation from '../hooks/usePageValidation'
-import useProject from '../hooks/useProject'
-import useRequests from '../hooks/useRequests'
-import useSelectionState from '../hooks/useMultipleSelection'
+import useDeleteProject from 'hooks/researches/useDeleteProject'
+import useDeleteRequests from 'hooks/researches/useDeleteRequests'
+import useEditProject from 'hooks/researches/useEditProject'
+import useEditRequest from 'hooks/researches/useEditRequest'
+import usePageValidation from 'hooks/researches/usePageValidation'
+import useProject from 'hooks/researches/useProject'
+import useRequests from 'hooks/researches/useRequests'
+import useSelectionState from 'hooks/researches/useMultipleSelection'
 
 import { ProjectType, RequestType } from 'types'
 import { ExplorationsSearchParams } from 'types/cohorts'
@@ -106,7 +106,11 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
   usePageValidation(total, page, rowsPerPage, handlePageChange)
 
   const onShareRequest = (request: RequestType) => {
-    setSelectedRequest(request)
+    setSelectedRequest({
+      ...request,
+      shared_query_snapshot: request.query_snapshots?.[0].uuid
+    })
+    setOpenShareModal(true)
   }
 
   const onClickEdit = (request: RequestType) => {

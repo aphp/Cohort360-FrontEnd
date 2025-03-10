@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link as RouterLink } from 'react-router-dom'
-import useBreadcrumbs from '../../hooks/useBreadcrumbs'
+import useBreadcrumbs from 'hooks/researches/useBreadcrumbs'
 import { Link, Typography } from '@mui/material'
 import { StyledBreadcrumbs } from './style'
 import ChevronRight from 'assets/icones/chevron-right.svg?react'

@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios'
 import apiBack from '../apiBackend'
 
 import { ProjectType, RequestType, Cohort, User } from 'types'
@@ -78,10 +77,8 @@ export interface IServiceProjects {
    * Argument:
    *   - newProject: Projet de recherche à modifier
    *
-   * Retourne:
-   *   - Projet de recherche modifié
    */
-  editProject: (editedProject: ProjectType) => Promise<ProjectType>
+  editProject: (editedProject: ProjectType) => Promise<void>
 
   /**
    * Cette fonction supprime un projet de recherche existant
@@ -89,10 +86,8 @@ export interface IServiceProjects {
    * Argument:
    *   - newProject: Projet de recherche à supprimer
    *
-   * Retourne:
-   *   - Projet de recherche supprimé
    */
-  deleteProject: (deletedProject: ProjectType) => Promise<ProjectType>
+  deleteProject: (deletedProject: ProjectType) => Promise<void>
 
   fetchRequest: (request_id: string) => Promise<RequestType>
 
@@ -136,52 +131,41 @@ export interface IServiceProjects {
    * Retourne:
    *   - Requete modifiée
    */
-  editRequest: (editedRequest: RequestType) => Promise<RequestType>
+  editRequest: (editedRequest: RequestType) => Promise<void>
 
   /**
    * Cette fonction partage une requete á un autre utilisateur
    *
    * Argument:
    *  - sharedRequest: Requete á partager
-   *
-   * Retourne:
-   *  - Requete partagée
-   */
-  shareRequest: (sharedRequest: RequestType, notify_by_email: boolean) => Promise<AxiosResponse<ProjectType>>
+   **/
+  shareRequest: (sharedRequest: RequestType, notify_by_email: boolean) => Promise<void>
 
   /**
-   * Cette fonction supprime un requete existant
+   * Cette fonction supprime une requete existante
    *
    * Argument:
    *   - deletedRequest: Requete à supprimer
-   *
-   * Retourne:
-   *   - Requete supprimée
    */
-  deleteRequest: (deletedRequest: RequestType) => Promise<RequestType>
+  deleteRequest: (deletedRequest: RequestType) => Promise<void>
 
   /**
-   * Cette fonction déplace des requetes existant vers un autre dossier
+   * Cette fonction déplace des requetes existantes vers un autre dossier
    *
    * Argument:
    *   - selectedRequests: Requetes à déplacer
    *   - parent_folder: destination des requêtes
-   *
-   * Retourne:
-   *   - Requete supprimée
+  
    */
-  moveRequests: (selectedRequests: RequestType[], parent_folder: string) => Promise<RequestType[]>
+  moveRequests: (selectedRequests: RequestType[], parent_folder: string) => Promise<void>
 
   /**
    * Cette fonction supprimer des requetes existantes
    *
    * Argument:
    *   - deletedRequests: Requetes à supprimer
-   *
-   * Retourne:
-   *   - Requete supprimée
    */
-  deleteRequests: (deletedRequests: RequestType[]) => Promise<RequestType>
+  deleteRequests: (deletedRequests: RequestType[]) => Promise<void>
 
   /**
    * Retourne la liste de Cohort d'un practitioner
@@ -226,7 +210,7 @@ export interface IServiceProjects {
    * Retourne:
    *   - Cohorte modifiée
    */
-  editCohort: (editedCohort: Cohort) => Promise<Cohort>
+  editCohort: (editedCohort: Cohort) => Promise<void>
 
   /**
    * Cette fonction supprime une cohorte existant
@@ -237,7 +221,7 @@ export interface IServiceProjects {
    * Retourne:
    *   - Cohorte supprimée
    */
-  deleteCohorts: (deletedCohorts: Cohort[]) => Promise<Cohort>
+  deleteCohorts: (deletedCohorts: Cohort[]) => Promise<void>
 }
 
 const servicesProjects: IServiceProjects = {
@@ -308,7 +292,6 @@ const servicesProjects: IServiceProjects = {
       if (editProjectResponse.status !== 200) {
         throw new Error("Erreur lors de l'édition du projet")
       }
-      return editProjectResponse.data
     } catch (error) {
       console.error(error)
       throw error
@@ -322,7 +305,6 @@ const servicesProjects: IServiceProjects = {
       if (deleteProjectResponse.status !== 204) {
         throw new Error('Erreur lors de la suppression du projet')
       }
-      return deleteProjectResponse.data
     } catch (error) {
       console.error(error)
       throw error
@@ -382,31 +364,32 @@ const servicesProjects: IServiceProjects = {
       if (editProjectResponse.status !== 200) {
         throw new Error("Erreur lors de l'édition de la requête")
       }
-      return editProjectResponse.data
     } catch (error) {
       console.error(error)
       throw error
     }
   },
-  shareRequest: async (sharedRequest, notify_by_email): Promise<AxiosResponse<ProjectType>> => {
-    const usersToShareId = sharedRequest.usersToShare?.map((userToshareId: User) => userToshareId.username)
-    const shared_query_snapshot_id = sharedRequest.shared_query_snapshot
-      ? sharedRequest.shared_query_snapshot
-      : sharedRequest.currentSnapshot?.uuid
-    const shared_query_snapshot_name = sharedRequest.name ? sharedRequest.name : sharedRequest.requestName
-    const shareRequestResponse = (await apiBack.post<ProjectType>(
-      `/cohort/request-query-snapshots/${shared_query_snapshot_id}/share/`,
-      {
-        name: shared_query_snapshot_name,
-        recipients: usersToShareId?.join(),
-        notify_by_email: notify_by_email
+  shareRequest: async (sharedRequest, notify_by_email) => {
+    try {
+      const usersToShareId = sharedRequest.usersToShare?.map((userToshareId: User) => userToshareId.username)
+      const shared_query_snapshot_id = sharedRequest.shared_query_snapshot
+        ? sharedRequest.shared_query_snapshot
+        : sharedRequest.currentSnapshot?.uuid
+      const shared_query_snapshot_name = sharedRequest.name ? sharedRequest.name : sharedRequest.requestName
+      const shareRequestResponse = await apiBack.post<ProjectType>(
+        `/cohort/request-query-snapshots/${shared_query_snapshot_id}/share/`,
+        {
+          name: shared_query_snapshot_name,
+          recipients: usersToShareId?.join(),
+          notify_by_email: notify_by_email
+        }
+      )
+      if (shareRequestResponse.status !== 201) {
+        throw new Error('Erreur lors du partage de la requête')
       }
-    )) ?? { status: 400 }
-    if (shareRequestResponse.status === 201) {
-      return shareRequestResponse.data, shareRequestResponse
-    } else {
-      console.error('Impossible de partager la requête')
-      return shareRequestResponse
+    } catch (error) {
+      console.error(error)
+      throw error
     }
   },
   deleteRequest: async (deletedRequest) => {
@@ -415,7 +398,6 @@ const servicesProjects: IServiceProjects = {
       if (deleteProjectResponse.status !== 204) {
         throw new Error('Erreur lors de la suppression de la requête')
       }
-      return deleteProjectResponse.data
     } catch (error) {
       console.error(error)
       throw error
@@ -434,7 +416,6 @@ const servicesProjects: IServiceProjects = {
       if (moveRequestsResponse.some((response) => response.status !== 200)) {
         throw new Error('Erreur lors du déplacement de requête')
       }
-      return moveRequestsResponse.map((moveRequestResponse) => moveRequestResponse?.data)
     } catch (error) {
       console.error(error)
       throw error
@@ -449,7 +430,6 @@ const servicesProjects: IServiceProjects = {
       if (deleteRequestsResponse.status !== 204) {
         throw new Error('Erreur lors de la suppression de la requête')
       }
-      return deleteRequestsResponse.data
     } catch (error) {
       console.error(error)
       throw error
@@ -523,7 +503,6 @@ const servicesProjects: IServiceProjects = {
       if (editCohortResponse.status !== 200) {
         throw new Error("Erreur lors de l'édition de la cohorte")
       }
-      return editCohortResponse.data
     } catch (error) {
       console.error(error)
       throw error
@@ -537,7 +516,6 @@ const servicesProjects: IServiceProjects = {
       if (deleteCohortResponse.status !== 204) {
         throw new Error('Erreur lors de la suppression de la cohorte')
       }
-      return deleteCohortResponse.data as Cohort
     } catch (error) {
       console.error(error)
       throw error

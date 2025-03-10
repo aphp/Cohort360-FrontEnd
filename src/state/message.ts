@@ -10,7 +10,7 @@ import {
 } from './cohortCreation'
 import { fetchProjects } from './project'
 import { addRequest, fetchRequests } from './request'
-import { favoriteExploredCohort, fetchExploredCohort } from './exploredCohort'
+import { fetchExploredCohort } from './exploredCohort'
 import {
   fetchAllProcedures,
   fetchBiology as fetchBiologyPatient,
@@ -76,10 +76,6 @@ const setMessageSlice = createSlice({
     builder.addCase(fetchExploredCohort.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la récupération de la cohorte'
-    }))
-    builder.addCase(favoriteExploredCohort.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la mise en favori de la cohorte'
     }))
     builder.addCase(fetchPatientInfo.rejected, () => ({
       type: 'error',

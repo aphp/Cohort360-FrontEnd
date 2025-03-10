@@ -391,7 +391,7 @@ export type RequestType = {
   currentSnapshot?: Snapshot
   requestId?: string
   requestName?: string
-  shared_query_snapshot?: string[]
+  shared_query_snapshot?: string
   usersToShare?: User[]
 }
 

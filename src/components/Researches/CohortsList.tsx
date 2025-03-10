@@ -10,25 +10,25 @@ import CohortStatusFilter from 'components/Filters/CohortStatusFilter'
 import CohortsTableContent from './CohortsTableContent'
 import CohortsTypesFilter from 'components/Filters/CohortsTypeFilter'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
-import IconButtonWithTooltip from './IconButtonWithTooltip'
+import IconButtonWithTooltip from '../ui/IconButtonWithTooltip'
 import LevelHeader from './LevelHeader'
 import Modal from 'components/ui/Modal'
-import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
+import ModalShareRequest from './Modals/ModalShareRequest'
 import PatientsNbFilter from 'components/Filters/PatientsNbFilter'
 
 import DeleteIcon from 'assets/icones/delete.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
 import ShareIcon from '@mui/icons-material/Share'
 
-import useCohorts from '../hooks/useCohorts'
-import useCohortsWebSocket from '../hooks/useCohortsWebSocket'
-import useDeleteCohort from '../hooks/useDeleteCohort'
-import useDeleteRequests from '../hooks/useDeleteRequests'
-import useEditCohort from '../hooks/useEditCohort'
-import useEditRequest from '../hooks/useEditRequest'
-import usePageValidation from '../hooks/usePageValidation'
-import useRequest from '../hooks/useRequest'
-import useSelectionState from '../hooks/useMultipleSelection'
+import useCohorts from 'hooks/researches/useCohorts'
+import useCohortsWebSocket from 'hooks/researches/useCohortsWebSocket'
+import useDeleteCohort from 'hooks/researches/useDeleteCohort'
+import useDeleteRequests from 'hooks/researches/useDeleteRequests'
+import useEditCohort from 'hooks/researches/useEditCohort'
+import useEditRequest from 'hooks/researches/useEditRequest'
+import usePageValidation from 'hooks/researches/usePageValidation'
+import useRequest from 'hooks/researches/useRequest'
+import useSelectionState from 'hooks/researches/useMultipleSelection'
 
 import { Cohort, RequestType, ValueSet } from 'types'
 import { CohortsFilters, FilterKeys, OrderBy } from 'types/searchCriterias'
@@ -304,7 +304,12 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
       />
       <ModalShareRequest
         open={openShareParentModal}
-        requestToShare={parentRequest as RequestType}
+        requestToShare={
+          {
+            ...parentRequest,
+            shared_query_snapshot: parentRequest?.query_snapshots?.[0].uuid
+          } as RequestType
+        }
         onClose={() => setOpenShareParentModal(false)}
       />
 

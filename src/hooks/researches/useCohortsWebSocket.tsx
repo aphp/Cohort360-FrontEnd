@@ -16,7 +16,7 @@ const useCohortsWebSocket = () => {
       results: Cohort[]
     }>({ queryKey: ['cohorts'] })
     const updatePromises = queryKeys.map(async ([key, oldData]) => {
-      if (!oldData || !oldData.results) return
+      if (!oldData?.results) return
 
       const updatedCohorts = oldData.results.map((cohort) =>
         cohort.uuid === message.uuid

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAppDispatch } from 'state'
 import { setMessage } from 'state/message'
 
@@ -48,32 +48,36 @@ const ModalShareRequest: React.FC<{
   }
 
   const handleConfirm = async () => {
-    if (loading || currentRequest === null) return
+    try {
+      if (loading || currentRequest === null) return
 
-    setLoading(true)
-    if (
-      (!currentRequest?.name && !currentRequest?.requestName) ||
-      (currentRequest?.name && currentRequest?.name?.length > 255) ||
-      (currentRequest?.requestName && currentRequest?.requestName?.length > 255)
-    ) {
-      setLoading(false)
-      return setError(ERROR_TITLE)
-    }
+      setLoading(true)
+      if (
+        (!currentRequest?.name && !currentRequest?.requestName) ||
+        (currentRequest?.name && currentRequest?.name?.length > 255) ||
+        (currentRequest?.requestName && currentRequest?.requestName?.length > 255)
+      ) {
+        setLoading(false)
+        return setError(ERROR_TITLE)
+      }
 
-    if (!currentUserToShare) {
-      setLoading(false)
-      return setError(ERROR_USER_SHARE_LIST)
-    }
+      if (!currentUserToShare) {
+        setLoading(false)
+        return setError(ERROR_USER_SHARE_LIST)
+      }
 
-    const shareRequestResponse = await services.projects.shareRequest(currentRequest, notifyByEmail)
-    if (shareRequestResponse?.status === 201) {
+      await services.projects.shareRequest(currentRequest, notifyByEmail)
       dispatch(
         setMessage({
           type: 'success',
           content: 'La requête a bien été partagée'
         })
       )
-    } else {
+      setLoading(false)
+      onClose()
+    } catch (error) {
+      setLoading(false)
+      onClose()
       dispatch(
         setMessage({
           type: 'error',
@@ -81,17 +85,14 @@ const ModalShareRequest: React.FC<{
         })
       )
     }
-    onClose()
   }
 
+  useEffect(() => {
+    if (open) setCurrentRequest(requestToShare)
+  }, [open, requestToShare])
+
   return (
-    <Dialog
-      open={open}
-      onClose={() => onClose && typeof onClose === 'function' && onClose()}
-      fullWidth
-      maxWidth="md"
-      aria-labelledby="form-dialog-title"
-    >
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md" aria-labelledby="form-dialog-title">
       <DialogTitle>Partager une requête</DialogTitle>
       <DialogContent>
         {currentRequest === null ? (

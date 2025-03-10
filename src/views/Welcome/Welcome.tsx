@@ -4,13 +4,13 @@ import moment from 'moment'
 
 import { Alert, Container, Grid, Paper, Typography } from '@mui/material'
 
-import CohortsList from 'components/Exploration/components/CohortsList'
+import CohortsList from 'components/Researches/CohortsList'
 import NewsCard from 'components/Welcome/NewsCard/NewsCard'
 import PatientsCard from 'components/Welcome/PatientsCard/PatientsCard'
 import SearchPatientCard from 'components/Welcome/SearchPatientCard/SearchPatientCard'
 import TutorialsCard from 'components/Welcome/TutorialsCard/TutorialsCard'
 import PreviewCard from 'components/ui/Cards/PreviewCard'
-import RequestsList from 'components/Exploration/components/RequestsList'
+import RequestsList from 'components/Researches/RequestsList'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProjects } from 'state/project'

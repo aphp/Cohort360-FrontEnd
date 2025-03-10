@@ -4,13 +4,13 @@ import { useAppSelector } from 'state'
 
 import { Box, Grid, Slide, Typography } from '@mui/material'
 import Badge from 'components/ui/Badge'
-import Breadcrumb from 'components/Exploration/components/Breadcrumbs'
-import MenuButtonFilter from 'components/Exploration/components/MenuButtonFilter'
+import Breadcrumb from 'components/Researches/Breadcrumbs'
+import MenuButtonFilter from 'components/Researches/MenuButtonFilter'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Tabs from 'components/ui/Tabs'
 
-import useCounts from 'components/Exploration/hooks/useCounts'
+import useCounts from 'hooks/researches/useCounts'
 
 import { ExplorationTabs, TabType } from 'types'
 import { ExplorationsSearchParams } from 'types/cohorts'

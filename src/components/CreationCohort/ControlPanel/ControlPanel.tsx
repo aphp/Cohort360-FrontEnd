@@ -26,7 +26,7 @@ import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
 import UpdateSharpIcon from '@mui/icons-material/UpdateSharp'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
-import ModalShareRequest from 'components/Requests/Modals/ModalShareRequest/ModalShareRequest'
+import ModalShareRequest from 'components/Researches/Modals/ModalShareRequest'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import {

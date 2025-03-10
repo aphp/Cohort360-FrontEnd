@@ -2,14 +2,14 @@ import React, { useState } from 'react'
 import {} from 'state'
 
 import { Grid, TableRow, Typography } from '@mui/material'
-import ResearchesTable from './Table'
+import ResearchesTable from './ResearchesTable'
 import { useSearchParams } from 'react-router-dom'
 import { Column } from 'types'
 import { samples } from 'views/MyResearches/data'
 import { formatDate } from 'utils/formatDate'
 import FavStar from 'components/ui/FavStar'
 import displayDigit from 'utils/displayDigit'
-import { TableCellWrapper } from './Table/styles'
+import { TableCellWrapper } from './ResearchesTable/styles'
 
 // TODO: prévoir le tableau en cas de maintenance
 

@@ -23,24 +23,25 @@ import CloseIcon from '@mui/icons-material/Close'
 import MoreButton from '@mui/icons-material/MoreVert'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
-import AddOrEditItem from 'components/Exploration/components/Modals/AddOrEditItem'
-import ConfirmDeletion from 'components/Exploration/components/Modals/ConfirmDeletion'
+import AddOrEditItem from 'components/Researches/Modals/AddOrEditItem'
+import ConfirmDeletion from 'components/Researches/Modals/ConfirmDeletion'
 import { AvatarWrapper } from 'components/ui/Avatar/styles'
 import FavStar from 'components/ui/FavStar'
+
+import useEditCohort from 'hooks/researches/useEditCohort'
+import useDeleteCohort from 'hooks/researches/useDeleteCohort'
 
 import { useAppSelector, useAppDispatch } from 'state'
 
 import services from 'services/aphp'
+import { updateCohort } from 'state/exploredCohort'
 
 import displayDigit from 'utils/displayDigit'
 import { getCohortsConfirmDeletionMessage, getCohortsConfirmDeletionTitle } from 'utils/explorationUtils'
 
 import useStyles from './styles'
 import { AppConfig } from 'config'
-import useEditCohort from 'components/Exploration/hooks/useEditCohort'
-import { updateCohort } from 'state/exploredCohort'
 import { Cohort } from 'types'
-import useDeleteCohort from 'components/Exploration/hooks/useDeleteCohort'
 
 type TopBarProps = {
   context: 'patients' | 'cohort' | 'perimeters' | 'patient_info'
