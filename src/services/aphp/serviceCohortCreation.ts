@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
 import apiBack from '../apiBackend'
-import { Cohort, CountCohort, DatedMeasure, FetchRequest, QuerySnapshotInfo, RequestType, Snapshot } from 'types'
+import { Cohort, CohortCount, DatedMeasure, FetchRequest, QuerySnapshotInfo, RequestType, Snapshot } from 'types'
 import { getConfig } from 'config'
 
 export interface IServiceCohortCreation {
@@ -24,8 +24,9 @@ export interface IServiceCohortCreation {
     requeteurJson?: string,
     snapshotId?: string,
     requestId?: string,
-    uuid?: string
-  ) => Promise<CountCohort | null>
+    uuid?: string,
+    stageDetails?: string | null
+  ) => Promise<CohortCount | null>
   /**
    * Cette fonction permet de créer un état de `snapshot` pour l'historique d'une requête
    */
@@ -66,7 +67,13 @@ const servicesCohortCreation: IServiceCohortCreation = {
     return cohortResult
   },
 
-  countCohort: async (requeteurJson?: string, snapshotId?: string, requestId?: string, uuid?: string) => {
+  countCohort: async (
+    requeteurJson?: string,
+    snapshotId?: string,
+    requestId?: string,
+    uuid?: string,
+    stageDetails?: string | null
+  ) => {
     if (uuid) {
       const measureResult = await apiBack.get<DatedMeasure>(`/cohort/dated-measures/${uuid}/`)
 
@@ -78,14 +85,16 @@ const servicesCohortCreation: IServiceCohortCreation = {
         includePatient: measureResult?.data?.measure,
         byrequest: 0,
         count_outdated: measureResult?.data?.count_outdated,
-        shortCohortLimit: measureResult?.data?.cohort_limit
-      } as CountCohort
+        shortCohortLimit: measureResult?.data?.cohort_limit,
+        extra: measureResult?.data?.extra
+      } as CohortCount
     } else {
       if (!requeteurJson || !snapshotId || !requestId) return null
 
       const measureResult = await apiBack.post<DatedMeasure>('/cohort/dated-measures/', {
         request_query_snapshot_id: snapshotId,
-        request_id: requestId
+        request_id: requestId,
+        stageDetails
       })
 
       return {
@@ -93,8 +102,9 @@ const servicesCohortCreation: IServiceCohortCreation = {
         status: measureResult?.data?.request_job_status ?? 'error',
         uuid: measureResult?.data?.uuid,
         count_outdated: measureResult?.data?.count_outdated,
-        shortCohortLimit: measureResult?.data?.cohort_limit
-      } as CountCohort
+        shortCohortLimit: measureResult?.data?.cohort_limit,
+        extra: measureResult?.data?.extra
+      } as CohortCount
     }
   },
 

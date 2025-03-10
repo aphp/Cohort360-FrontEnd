@@ -19,15 +19,23 @@ import { SelectedCriteriaType } from 'types/requestCriterias'
 import theme from 'theme'
 import criteriaList, { getAllCriteriaItems } from 'components/CreationCohort/DataList_Criteria'
 import { criteriasAsArray } from '../LogicalOperator/components/CriteriaRightPanel/CriteriaForm/mappers'
+import CriteriaCount from '../CriteriaCount'
 
 type CriteriaCardProps = {
   criterion: SelectedCriteriaType
+  criteriaCount?: string
   duplicateCriteria: (criteriaId: number) => void
   deleteCriteria: (criteriaId: number) => void
   editCriteria: (criteria: SelectedCriteriaType) => void
 }
 
-const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriteria }: CriteriaCardProps) => {
+const CriteriaCard = ({
+  criterion,
+  criteriaCount,
+  duplicateCriteria,
+  editCriteria,
+  deleteCriteria
+}: CriteriaCardProps) => {
   const { classes } = useStyles()
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active || false)
@@ -55,6 +63,7 @@ const CriteriaCard = ({ criterion, duplicateCriteria, editCriteria, deleteCriter
       className={classes.criteriaItem}
       style={{ backgroundColor: criterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
     >
+      <CriteriaCount criteriaCount={criteriaCount} extraLeftMargin={3} />
       <Grid
         container
         alignItems="center"

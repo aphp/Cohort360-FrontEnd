@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 import {
-  CohortCreationCounterType,
+  CohortCount,
   CriteriaGroup,
   TemporalConstraintsType,
   TemporalConstraintsKind,
@@ -34,13 +34,14 @@ export type CohortCreationState = {
   currentSnapshot: CurrentSnapshot
   navHistory: CurrentSnapshot[]
   snapshotsHistory: QuerySnapshotInfo[]
-  count: CohortCreationCounterType
+  count: CohortCount
   selectedPopulation: Hierarchy<ScopeElement>[] | null
   executiveUnits: (Hierarchy<ScopeElement> | undefined)[] | null
   allowSearchIpp: boolean
   selectedCriteria: SelectedCriteriaType[]
   isCriteriaNominative: boolean
   criteriaGroup: CriteriaGroup[]
+  idRemap: Record<number, number>
   temporalConstraints: TemporalConstraintsType[]
   nextCriteriaId: number
   nextGroupId: number
@@ -76,6 +77,7 @@ const defaultInitialState: () => CohortCreationState = () => ({
       isInclusive: true
     }
   ],
+  idRemap: {},
   temporalConstraints: [
     {
       idList: ['All'],
@@ -153,7 +155,7 @@ type CountCohortCreationParams = {
 }
 
 const countCohortCreation = createAsyncThunk<
-  { count?: CohortCreationCounterType; snapshotsHistory?: QuerySnapshotInfo[] },
+  { count?: CohortCount; snapshotsHistory?: QuerySnapshotInfo[] },
   CountCohortCreationParams,
   { state: RootState }
 >('cohortCreation/count', async ({ json, snapshotId, requestId, uuid }, { getState }) => {
@@ -162,7 +164,13 @@ const countCohortCreation = createAsyncThunk<
     const { snapshotsHistory } = state.cohortCreation.request
     const newSnapshotsHistory = [...snapshotsHistory].map((item) => ({ ...item }))
 
-    const countResult = await services.cohortCreation.countCohort(json, snapshotId, requestId, uuid)
+    const countResult = await services.cohortCreation.countCohort(
+      json,
+      snapshotId,
+      requestId,
+      uuid,
+      state.preferences.requests.detailedMode
+    )
 
     if (!countResult) return {}
 
@@ -198,6 +206,7 @@ type SaveJsonParams = { newJson: string }
 
 const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootState }>(
   'cohortCreation/saveJson',
+  // eslint-disable-next-line max-statements
   async ({ newJson }, { getState }) => {
     try {
       const state = getState()
@@ -334,6 +343,7 @@ type UnbuildCohortReturn = {
   currentSnapshot: CurrentSnapshot
   selectedPopulation: Hierarchy<ScopeElement, string>[] | null
   selectedCriteria: SelectedCriteriaType[]
+  idRemap: Record<number, number>
   criteriaGroup: CriteriaGroup[]
   nextCriteriaId: number
   nextGroupId: number
@@ -345,7 +355,9 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
   async ({ newCurrentSnapshot }, { dispatch }) => {
     try {
       const { serialized_query, dated_measures } = newCurrentSnapshot
-      const { population, criteria, criteriaGroup, temporalConstraints } = await unbuildRequest(serialized_query)
+      const { population, criteria, criteriaGroup, temporalConstraints, idRemap } = await unbuildRequest(
+        serialized_query
+      )
       let _temporalConstraints
       let isCriteriaNominative = false
 
@@ -396,6 +408,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
         selectedCriteria: criteria,
         isCriteriaNominative: isCriteriaNominative,
         criteriaGroup: criteriaGroup.length > 0 ? criteriaGroup : defaultInitialState().criteriaGroup,
+        idRemap,
         nextCriteriaId: criteria.length + 1,
         nextGroupId: -(criteriaGroup.length + 1)
       }
@@ -428,7 +441,7 @@ const addRequestToCohortCreation = createAsyncThunk<
     const state = getState()
     const newRequestResult = await services.cohortCreation.fetchRequest(selectedRequestId)
 
-    const { json, criteria, criteriaGroup } = await joinRequest(
+    const { json, criteria, criteriaGroup, idRemap } = await joinRequest(
       state?.cohortCreation?.request?.json,
       newRequestResult.json,
       parentId
@@ -448,7 +461,8 @@ const addRequestToCohortCreation = createAsyncThunk<
       selectedCriteria: criteria,
       criteriaGroup: criteriaGroup,
       nextCriteriaId: criteria.length + 1,
-      nextGroupId: -(criteriaGroup.length + 1)
+      nextGroupId: -(criteriaGroup.length + 1),
+      idRemap
     }
   } catch (error) {
     console.error(error)
@@ -701,12 +715,13 @@ const cohortCreationSlice = createSlice({
         status: CohortJobStatus.PENDING
       }
     },
-    updateCount: (state: CohortCreationState, action: PayloadAction<CohortCreationCounterType>) => {
+    updateCount: (state: CohortCreationState, action: PayloadAction<CohortCount>) => {
       state.count = {
         ...state.count,
         status: action.payload.status,
         includePatient: action.payload.includePatient,
-        jobFailMsg: action.payload.jobFailMsg
+        jobFailMsg: action.payload.jobFailMsg,
+        extra: action.payload.extra
       }
     },
     addActionToNavHistory: (state: CohortCreationState, action: PayloadAction<CurrentSnapshot>) => {
