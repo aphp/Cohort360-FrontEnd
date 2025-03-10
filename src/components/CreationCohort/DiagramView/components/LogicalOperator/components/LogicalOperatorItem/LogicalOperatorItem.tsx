@@ -15,12 +15,14 @@ import useStyles from './styles'
 import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
 import { Comparators } from 'types/requestCriterias'
 import { CriteriaGroupType } from 'types'
+import CriteriaCount from '../../../CriteriaCount'
 
 type LogicalOperatorItemProps = {
   itemId: number
+  criteriaCount?: string
 }
 
-const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => {
+const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, criteriaCount }) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
@@ -215,6 +217,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         }}
         onMouseLeave={() => (timeout = setTimeout(() => setIsOpen(false), 800))}
       >
+        <CriteriaCount criteriaCount={itemId !== 0 ? criteriaCount : undefined} />
         {isOpen ? (
           <>
             <Select

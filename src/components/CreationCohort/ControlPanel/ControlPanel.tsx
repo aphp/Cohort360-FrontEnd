@@ -7,10 +7,15 @@ import {
   Button,
   CircularProgress,
   Divider,
+  FormControlLabel,
+  FormControl,
   Grid,
   Link,
   List,
   ListItem,
+  Radio,
+  RadioGroup,
+  Switch,
   Tooltip,
   Typography,
   Snackbar
@@ -39,15 +44,7 @@ import {
   updateCount
 } from 'state/cohortCreation'
 
-import {
-  CohortCreationCounterType,
-  JobStatus,
-  CurrentSnapshot,
-  LoadingStatus,
-  RequestType,
-  Snapshot,
-  WSJobStatus
-} from 'types'
+import { CohortCount, JobStatus, CurrentSnapshot, LoadingStatus, RequestType, Snapshot, WSJobStatus } from 'types'
 
 import useStyle from './styles'
 
@@ -58,6 +55,7 @@ import { JToolComponentEggWrapper } from 'components/Impersonation/JTool'
 import { Egg3 } from 'components/Impersonation/Eggs'
 import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
 import { AppConfig } from 'config'
+import { setRequestDetailedMode } from 'state/preferences'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -68,7 +66,7 @@ const ControlPanel: React.FC<{
   const dispatch = useAppDispatch()
   const appConfig = useContext(AppConfig)
   const [openModal, setOpenModal] = useState<'executeCohortConfirmation' | null>(null)
-  const [oldCount, setOldCount] = useState<CohortCreationCounterType | null>(null)
+  const [oldCount, setOldCount] = useState<CohortCount | null>(null)
   const [openShareRequestModal, setOpenShareRequestModal] = useState<boolean>(false)
   const [countLoading, setCountLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
   const [reportLoading, setReportLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
@@ -91,6 +89,7 @@ const ControlPanel: React.FC<{
     count_outdated,
     snapshotsHistory
   } = useAppSelector((state) => state.cohortCreation.request || {})
+  const { detailedMode } = useAppSelector((state) => state.preferences.requests)
   const { includePatient, status, jobFailMsg } = count
   const [requestShare, setRequestShare] = useState<RequestType | null>({
     currentSnapshot,
@@ -99,6 +98,8 @@ const ControlPanel: React.FC<{
     name: '',
     uuid: ''
   })
+  const [criteriaDetailCalculation, setCriteriaDetailCalculation] = useState<boolean>(detailedMode !== null)
+  const [detailCalculationType, setDetailCalculationType] = useState<'all' | 'ratio'>(detailedMode ?? 'all')
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
@@ -205,6 +206,19 @@ const ControlPanel: React.FC<{
   const webSocketContext = useContext(WebSocketContext)
 
   useEffect(() => {
+    const newModeOptionStageDetails = criteriaDetailCalculation ? detailCalculationType : null
+    if (detailedMode !== newModeOptionStageDetails) {
+      dispatch(setRequestDetailedMode(newModeOptionStageDetails))
+      const countTask = setTimeout(() => {
+        _relaunchCount(true)
+      }, 1500)
+      return () => clearTimeout(countTask)
+    }
+    // I don't want to trigger the effect when the detailedMode is updated or _relaunchCount is updated
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detailCalculationType, criteriaDetailCalculation])
+
+  useEffect(() => {
     if (status && (status === JobStatus.NEW || status === JobStatus.PENDING || status === JobStatus.STARTED)) {
       setCountLoading(LoadingStatus.FETCHING)
       //TODO: refacto the lunch of the count in the app colision with buildCohortCreation and unbuildCohortCreation
@@ -219,6 +233,7 @@ const ControlPanel: React.FC<{
         setCountLoading(LoadingStatus.SUCCESS)
         response = {
           includePatient: message.extra_info?.measure,
+          extra: message.extra_info?.extra,
           status: message.status,
           jobFailMsg: message.extra_info?.request_job_fail_msg
         }
@@ -377,6 +392,40 @@ const ControlPanel: React.FC<{
                   </Tooltip>
                 )}
               </Grid>
+            )}
+          </Grid>
+        </Grid>
+        <Grid className={classes.container}>
+          <Grid container direction="column" style={{ width: '100%', padding: '10px' }}>
+            <Typography className={classes.boldText}>INFORMATIONS SUPPLEMENTAIRES :</Typography>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={criteriaDetailCalculation}
+                  onChange={(e) => {
+                    setCriteriaDetailCalculation(e.target.checked)
+                  }}
+                  color="primary"
+                />
+              }
+              label="Calcul sur la population source"
+              style={{ marginLeft: 0 }}
+            />
+            {criteriaDetailCalculation && (
+              <>
+                <Typography style={{ backgroundColor: '#f5f5f5', padding: '8px', marginTop: '10px' }}>
+                  Sélectionnez le calcul que vous souhaitez activer
+                </Typography>
+                <FormControl component="fieldset" style={{ marginTop: '10px' }}>
+                  <RadioGroup
+                    value={detailCalculationType}
+                    onChange={(e) => setDetailCalculationType(e.target.value as 'all' | 'ratio')}
+                  >
+                    <FormControlLabel value="all" control={<Radio />} label="Chiffres" />
+                    <FormControlLabel value="ratio" control={<Radio />} label="Pourcentages" />
+                  </RadioGroup>
+                </FormControl>
+              </>
             )}
           </Grid>
         </Grid>
