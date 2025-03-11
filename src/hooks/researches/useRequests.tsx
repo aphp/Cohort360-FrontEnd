@@ -28,7 +28,8 @@ const useRequests = ({
 }: UseRequestsProps) => {
   const dispatch = useAppDispatch()
 
-  const fetchRequestsList = async () => {
+  const fetchRequestsList = async ({ queryKey, signal }: { queryKey: any; signal: AbortSignal }) => {
+    const [, , orderBy, searchInput, startDate, endDate, page, parentId] = queryKey
     const offset = (page - 1) * rowsPerPage
     const requestsList = await services.projects.fetchRequestsList({
       orderBy,
@@ -37,13 +38,14 @@ const useRequests = ({
       startDate,
       endDate,
       limit: rowsPerPage,
-      offset
+      offset,
+      signal
     })
     return requestsList
   }
 
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
-    queryKey: ['requests', 'projectsCount', orderBy, searchInput, startDate, endDate, page],
+    queryKey: ['requests', 'projectsCount', orderBy, searchInput, startDate, endDate, page, parentId],
     queryFn: fetchRequestsList,
     refetchOnWindowFocus: false,
     enabled: paramsReady

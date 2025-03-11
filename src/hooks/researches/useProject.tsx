@@ -10,9 +10,10 @@ const useProject = (projectId?: string) => {
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['project', 'projectsCount', projectId],
     enabled: !!projectId, // ça veut dire qu'on fait pas l'appel si pas de projectId
-    queryFn: async () => {
+    queryFn: async ({ queryKey, signal }: { queryKey: any; signal: AbortSignal }) => {
+      const [, , projectId] = queryKey
       if (!projectId) return null
-      const projectData = await services.projects.fetchProject(projectId)
+      const projectData = await services.projects.fetchProject(projectId, signal)
       return projectData
     }
   })

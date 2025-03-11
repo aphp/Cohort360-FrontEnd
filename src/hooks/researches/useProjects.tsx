@@ -15,9 +15,16 @@ type UseProjectsProps = {
 const useProjects = ({ filters, searchInput, orderBy, paramsReady }: UseProjectsProps) => {
   const dispatch = useAppDispatch()
 
-  const fetchProjectsList = async () => {
+  const fetchProjectsList = async ({ queryKey, signal }: { queryKey: any; signal: AbortSignal }) => {
+    const [, searchInput, filters, orderBy] = queryKey
     const limit = 100
-    const projectsList = await services.projects.fetchProjectsList({ filters, searchInput, order: orderBy, limit })
+    const projectsList = await services.projects.fetchProjectsList({
+      filters,
+      searchInput,
+      order: orderBy,
+      limit,
+      signal
+    })
     return projectsList
   }
 

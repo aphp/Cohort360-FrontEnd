@@ -24,7 +24,8 @@ const useCohorts = ({
 }: UseCohortsProps) => {
   const dispatch = useAppDispatch()
 
-  const fetchCohortsList = async () => {
+  const fetchCohortsList = async ({ queryKey, signal }: { queryKey: any; signal: AbortSignal }) => {
+    const [, , searchInput, filters, orderBy, page] = queryKey
     const _filters = {
       status: filters?.status ?? [],
       favorite: filters?.favorite ?? [],
@@ -46,7 +47,8 @@ const useCohorts = ({
       searchInput: !_filters.parentId ? searchInput : '',
       orderBy: { orderBy: orderBy.orderBy, orderDirection: orderBy.orderDirection },
       limit: rowsPerPage,
-      offset
+      offset,
+      signal
     })
     return cohortsList
   }

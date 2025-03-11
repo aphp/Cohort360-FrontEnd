@@ -12,6 +12,7 @@ type FetchProjectsListProps = {
   order?: OrderBy
   limit?: number
   offset?: number
+  signal?: AbortSignal
 }
 
 type FetchRequestsListProps = {
@@ -22,6 +23,7 @@ type FetchRequestsListProps = {
   endDate?: string | null
   limit?: number
   offset?: number
+  signal?: AbortSignal
 }
 
 type FetchCohortsListProps = {
@@ -37,7 +39,7 @@ const optionsReducer = (accumulator: string, currentValue: string) =>
   accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
 
 export interface IServiceProjects {
-  fetchProject: (projectId: string) => Promise<ProjectType>
+  fetchProject: (projectId: string, signal?: AbortSignal) => Promise<ProjectType>
   /**
    * Retourne la liste de projet de recherche d'un practitioner
    *
@@ -89,7 +91,7 @@ export interface IServiceProjects {
    */
   deleteProject: (deletedProject: ProjectType) => Promise<void>
 
-  fetchRequest: (request_id: string) => Promise<RequestType>
+  fetchRequest: (request_id: string, signal?: AbortSignal) => Promise<RequestType>
 
   /**
    * Retourne la liste de requete d'un practitioner
@@ -225,23 +227,23 @@ export interface IServiceProjects {
 }
 
 const servicesProjects: IServiceProjects = {
-  fetchProject: async (projectId) => {
+  fetchProject: async (projectId, signal) => {
     try {
-      return (await apiBack.get(`/cohort/folders/${projectId}/`)).data
+      return (await apiBack.get(`/cohort/folders/${projectId}/`, { signal })).data
     } catch (error) {
       console.error(error)
     }
   },
-  fetchRequest: async (requestId) => {
+  fetchRequest: async (requestId, signal) => {
     try {
-      return (await apiBack.get(`/cohort/requests/${requestId}/`)).data
+      return (await apiBack.get(`/cohort/requests/${requestId}/`, { signal })).data
     } catch (error) {
       console.error(error)
     }
   },
   fetchProjectsList: async (args) => {
     try {
-      const { filters, searchInput, order, limit, offset } = args
+      const { filters, searchInput, order, limit, offset, signal } = args
       const _orderBy = order ?? { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC }
       const orderDirection = _orderBy.orderDirection === Direction.DESC ? '-' : ''
       let options: string[] = []
@@ -257,7 +259,7 @@ const servicesProjects: IServiceProjects = {
         next: string | null
         previous: string | null
         results: ProjectType[]
-      }>(`/cohort/folders/?${options.reduce(optionsReducer)}`)
+      }>(`/cohort/folders/?${options.reduce(optionsReducer)}`, { signal })
 
       return fetchProjectsResponse.data
     } catch (error) {
@@ -313,7 +315,7 @@ const servicesProjects: IServiceProjects = {
 
   fetchRequestsList: async (args) => {
     try {
-      const { orderBy, parentId, searchInput, startDate, endDate, limit, offset } = args
+      const { orderBy, parentId, searchInput, startDate, endDate, limit, offset, signal } = args
       const _orderBy = orderBy ?? { orderBy: Order.UPDATED, orderDirection: Direction.DESC }
       const _sortDirection = _orderBy.orderDirection === Direction.DESC ? '-' : ''
       let options: string[] = []
@@ -330,7 +332,7 @@ const servicesProjects: IServiceProjects = {
         next: string | null
         previous: string | null
         results: RequestType[]
-      }>(`/cohort/requests/?${options.reduce(optionsReducer)}`)
+      }>(`/cohort/requests/?${options.reduce(optionsReducer)}`, { signal })
 
       return fetchRequestsListResponse.data
     } catch (error) {
@@ -463,9 +465,7 @@ const servicesProjects: IServiceProjects = {
         next: string | null
         previous: string | null
         results: Cohort[]
-      }>(`/cohort/cohorts/?${options.reduce(optionsReducer)}`, {
-        signal: signal
-      })
+      }>(`/cohort/cohorts/?${options.reduce(optionsReducer)}`, { signal })
 
       // Récupère les droits
       const cohortList = await servicesCohorts.fetchCohortsRights(cohortListResponse.data.results)

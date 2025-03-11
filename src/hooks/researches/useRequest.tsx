@@ -10,9 +10,10 @@ const useRequest = (requestId?: string) => {
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['request', requestId],
     enabled: !!requestId, // ça veut dire qu'on fait pas l'appel si pas de requestId
-    queryFn: async () => {
+    queryFn: async ({ queryKey, signal }: { queryKey: any; signal: AbortSignal }) => {
+      const [, requestId] = queryKey
       if (!requestId) return null
-      const requestData = await services.projects.fetchRequest(requestId)
+      const requestData = await services.projects.fetchRequest(requestId, signal)
       return requestData
     }
   })
