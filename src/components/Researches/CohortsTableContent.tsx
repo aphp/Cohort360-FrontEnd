@@ -139,7 +139,14 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
           cohort.request_job_status === JobStatus.PENDING
 
         return (
-          <TableRow key={cohort.uuid} onClick={() => onClickRow(cohort)} style={{ cursor: 'pointer' }}>
+          <TableRow
+            key={cohort.uuid}
+            onClick={() => onClickRow(cohort)}
+            sx={{
+              cursor: 'pointer',
+              '&:hover': { backgroundColor: '#f8f9fa' }
+            }}
+          >
             {!simplified && (
               <TableCellWrapper>
                 <Checkbox
@@ -200,7 +207,7 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
             </TableCellWrapper>
             <TableCellWrapper>{displayDigit(cohort.result_size)}</TableCellWrapper>
             <TableCellWrapper>{getGlobalEstimation(cohort)}</TableCellWrapper>
-            <TableCellWrapper>{formatDate(cohort.created_at, true)}</TableCellWrapper>
+            <TableCellWrapper>{formatDate(cohort.created_at)}</TableCellWrapper>
             {/* <TableCellWrapper>
                   <Button
                     endIcon={<ArrowRightAltIcon />}

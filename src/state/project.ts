@@ -74,6 +74,9 @@ const setProjectSlice = createSlice({
     setProjectsList: (state, action) => {
       state.projectsList = action.payload.projectsList
       state.count = action.payload.count
+    },
+    setSelectedProject: (state, action) => {
+      state.selectedProject = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -89,4 +92,4 @@ const setProjectSlice = createSlice({
 
 export default setProjectSlice.reducer
 export { fetchProjects }
-export const { setProjectsList } = setProjectSlice.actions
+export const { setProjectsList, setSelectedProject } = setProjectSlice.actions

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from 'state'
 import { resetCohortCreation } from 'state/cohortCreation'
+import { setSelectedProject } from 'state/project'
 
 import { Grid } from '@mui/material'
 import ActionBar from './ActionBar'
@@ -158,6 +159,9 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
 
   const handleNewRequest = () => {
     dispatch(resetCohortCreation())
+    if (parentProject) {
+      dispatch(setSelectedProject(parentProject))
+    }
     navigate('/cohort/new')
   }
 

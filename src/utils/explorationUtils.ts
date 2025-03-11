@@ -241,6 +241,7 @@ const handleFilteredValues = (
 export const searchParamsMapper: Record<string, (value: string | null, _searchParams: URLSearchParams) => boolean> = {
   startDate: (value, _searchParams) => handleInvalidDate(value, _searchParams, ExplorationsSearchParams.START_DATE),
   endDate: (value, _searchParams) => handleInvalidDate(value, _searchParams, ExplorationsSearchParams.END_DATE),
+  searchInput: () => false,
   status: (value, _searchParams) =>
     handleFilteredValues(
       value,

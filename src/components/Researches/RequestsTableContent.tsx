@@ -96,7 +96,7 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
           <TableRow
             key={request.uuid}
             onClick={() => navigate(`/cohort/new/${request.uuid}`)}
-            style={{ cursor: 'pointer' }}
+            sx={{ cursor: 'pointer', '&:hover': { backgroundColor: '#f8f9fa' } }}
           >
             {!simplified && (
               <TableCellWrapper>
@@ -131,7 +131,7 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
               </Box>
             </TableCellWrapper>
             {!projectId && <TableCellWrapper>{request.parent_folder?.name}</TableCellWrapper>}
-            <TableCellWrapper>{formatDate(request.updated_at, true)}</TableCellWrapper>
+            <TableCellWrapper>{formatDate(request.updated_at)}</TableCellWrapper>
             <TableCellWrapper>
               <Button
                 customVariant="clear"

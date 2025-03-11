@@ -10,8 +10,8 @@ import { RequestType } from 'types'
 import services from 'services/aphp'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { fetchProjects } from 'state/project'
-import { fetchRequests } from 'state/request'
+import { fetchProjects, setSelectedProject } from 'state/project'
+import { fetchRequests, addRequest } from 'state/request'
 import { fetchRequestCohortCreation } from 'state/cohortCreation'
 
 const ERROR_TITLE = 'error_title'
@@ -30,7 +30,7 @@ const ModalCreateNewRequest: React.FC<{
   const dispatch = useAppDispatch()
   const url = window.location.href?.includes('/cohort/new')
   const requestState = useAppSelector((state) => state.request)
-  const _projectsList = useAppSelector((state) => state.project.projectsList)
+  const { projectsList, selectedProject } = useAppSelector((state) => state.project)
 
   const { requestsList, selectedRequest } = requestState
 
@@ -52,20 +52,22 @@ const ModalCreateNewRequest: React.FC<{
   }
 
   const _fetchProject = async () => {
-    let projectsList = []
-    if (_projectsList && _projectsList.length > 0) {
-      projectsList = _projectsList
+    let _projectsList = []
+    if (projectsList && projectsList.length > 0) {
+      _projectsList = projectsList
     } else {
       const myProjects = (await dispatch(fetchProjects()).unwrap()) || []
-      projectsList = myProjects.projectsList
+      _projectsList = myProjects.projectsList
     }
     // Auto select newset project folder
     // + Auto set the new project folder with 'Projet de recherche ...'
-    if (projectsList && projectsList.length > 0) {
-      if (!selectedRequest?.parent_folder) {
-        _onChangeValue('parent_folder', { uuid: projectsList[0].uuid })
+    if (_projectsList && _projectsList.length > 0) {
+      if (selectedProject) {
+        _onChangeValue('parent_folder', selectedProject)
+      } else if (!selectedRequest?.parent_folder) {
+        _onChangeValue('parent_folder', { uuid: _projectsList[0].uuid })
       }
-      setProjectName(`Projet de recherche ${projectsList.length || ''}`)
+      setProjectName(`Projet de recherche ${_projectsList.length || ''}`)
     } else {
       _onChangeValue('parent_folder', NEW_PROJECT_ID)
       setProjectName(`Projet de recherche par défaut`)
@@ -133,6 +135,9 @@ const ModalCreateNewRequest: React.FC<{
       }
       dispatch(fetchProjects())
     }
+
+    dispatch(addRequest({ newRequest: currentRequest }))
+    dispatch(setSelectedProject(null))
   }
 
   const handleConfirmOpen = () => {
@@ -166,11 +171,11 @@ const ModalCreateNewRequest: React.FC<{
             error={error}
             projectName={projectName}
             onChangeProjectName={setProjectName}
-            projectList={_projectsList}
+            projectList={projectsList}
           />
         ) : (
           <RequestList
-            projectList={_projectsList}
+            projectList={projectsList}
             requestsList={requestsList}
             selectedItem={openRequest}
             onSelectedItem={(newOpenRequest: string) =>
