@@ -47,6 +47,7 @@ import {
   initFormsCriterias,
   initImagingCriterias
 } from 'reducers/searchCriteriasReducer'
+import { Reference } from 'types/valueSet'
 
 export const getAlertMessages = (type: string, deidentified: boolean) => {
   if (type === ResourceType.IMAGING)
@@ -77,6 +78,7 @@ export const narrowSearchCriterias = (
   searchCriterias: SearchCriterias<Filters>,
   type: ResourceType
 ): SearchCriterias<Filters> => {
+  console.log('test narrow')
   const mappedOthers = (
     searchCriterias: SearchCriterias<
       PMSIFilters | ImagingFilters | BiologyFilters | MaternityFormFilters | DocumentsFilters
@@ -221,7 +223,7 @@ export const getPatientInfos = (patient: Patient, deidentified: boolean, groupId
   return { vitalStatus, lastEncounter, surname, lastname, ipp, age, gender }
 }
 
-export const getReferences = (type: ResourceType) => {
+export const getReferences = (type: ResourceType): Reference[] => {
   const config = getConfig().features
   const refMap: Partial<Record<ResourceType, string[]>> = {
     [ResourceType.CONDITION]: [config.condition.valueSets.conditionHierarchy.url],
@@ -231,12 +233,16 @@ export const getReferences = (type: ResourceType) => {
       config.medication.valueSets.medicationAtc.url,
       config.medication.valueSets.medicationUcd.url
     ],
+    [ResourceType.MEDICATION_REQUEST]: [
+      config.medication.valueSets.medicationAtc.url,
+      config.medication.valueSets.medicationUcd.url
+    ],
     [ResourceType.OBSERVATION]: [
       config.observation.valueSets.biologyHierarchyAnabio.url,
       config.observation.valueSets.biologyHierarchyLoinc.url
     ]
   }
-  return refMap[type] ? getValueSetsFromSystems(refMap[type]) : undefined
+  return refMap[type] ? getValueSetsFromSystems(refMap[type]) : []
 }
 
 export const getSourceType = (type: ResourceType) => {

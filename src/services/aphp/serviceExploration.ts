@@ -1,15 +1,20 @@
-import { ResourceOptions } from 'types/exploration'
+import { AdditionalInfo, ResourceOptions } from 'types/exploration'
 import {
   BiologyFilters,
   DocumentsFilters,
   Filters,
+  FormNames,
   ImagingFilters,
   MaternityFormFilters,
   MedicationFilters,
   PMSIFilters,
   PatientsFilters,
   SearchByTypes,
-  VitalStatus
+  VitalStatus,
+  orderByListPatients,
+  orderByListPatientsDeidentified,
+  searchByListDocuments,
+  searchByListPatients
 } from 'types/searchCriterias'
 import services from '.'
 import {
@@ -47,7 +52,7 @@ import { getExtension } from 'utils/fhir'
 import { AxiosResponse } from 'axios'
 import { linkToDiagnosticReport } from './serviceImaging'
 import { atLeastOneSearchCriteria } from 'utils/filters'
-import { getFormName } from 'utils/formUtils'
+import { getFormLabel, getFormName } from 'utils/formUtils'
 import { sortByDateKey } from 'utils/formatDate'
 import { mapMedicationToOrderByCode } from 'mappers/medication'
 import { PatientsResponse } from 'types/patient'
@@ -55,6 +60,8 @@ import { substructAgeString } from 'utils/age'
 import moment from 'moment'
 import { getAgeRepartitionMapAphp, getGenderRepartitionMapAphp } from 'utils/graphUtils'
 import { mapToOrderByCode } from 'mappers/pmsi'
+import { getConfig } from 'config'
+import { getCodeList } from './serviceValueSets'
 
 export const getExplorationFetcher = (
   resourceType: ResourceType
@@ -468,7 +475,7 @@ const fetchFormsList = async (
   return results
 }
 
-const fetchPMSIList = async (
+export const fetchPMSIList = async (
   options: ResourceOptions<PMSIFilters>,
   signal?: AbortSignal
 ): Promise<ExplorationResults<CohortPMSI>> => {
@@ -546,7 +553,7 @@ const fetchPMSIList = async (
       ? fetcher({
           size: 0,
           signal: signal,
-          _list: groupId ,
+          _list: groupId,
           uniqueFacet: [type === ResourceType.CLAIM ? 'patient' : 'subject'],
           subject: patient?.patientInfo?.id,
           patient: patient?.patientInfo?.id
@@ -641,4 +648,80 @@ const fetchPatientList = async (
     genderRepartitionMap,
     agePyramidData
   }
+}
+
+const fetchValueSet = async (valueSet: string) => {
+  try {
+    const { results } = await getCodeList(valueSet)
+    return results
+  } catch (e) {
+    return []
+  }
+}
+
+export const fetchAdditionalInfos = async (
+  type: ResourceType,
+  deidentified: boolean,
+  additionalInfo: AdditionalInfo
+): Promise<Partial<AdditionalInfo>> => {
+  const config = getConfig().features
+
+  const fetchersMap: Record<string, () => Promise<any>> = {
+    diagnosticTypesList: () =>
+      type === ResourceType.CONDITION && !additionalInfo.diagnosticTypesList
+        ? fetchValueSet(config.condition.valueSets.conditionStatus.url)
+        : Promise.resolve(undefined),
+    prescriptionList: () =>
+      type === ResourceType.MEDICATION_REQUEST && !additionalInfo.prescriptionList
+        ? getCodeList(config.medication.valueSets.medicationPrescriptionTypes.url).then((res) => res.results)
+        : Promise.resolve(undefined),
+    administrationList: () =>
+      type === ResourceType.MEDICATION_ADMINISTRATION && !additionalInfo.administrationList
+        ? getCodeList(config.medication.valueSets.medicationAdministrations.url).then((res) => res.results)
+        : Promise.resolve(undefined),
+    questionnaires: async () => {
+      if (type === ResourceType.QUESTIONNAIRE_RESPONSE && !additionalInfo.questionnaires) {
+        const resp = await services.patients.fetchQuestionnaires()
+        return {
+          raw: resp,
+          display: resp.map((elem) => ({
+            id: elem.name ?? '',
+            label: getFormLabel(elem.name as FormNames) ?? ''
+          }))
+        }
+      }
+      return undefined
+    },
+    modalities: () =>
+      type === ResourceType.IMAGING && !additionalInfo.modalities
+        ? getCodeList(config.imaging.valueSets.imagingModalities.url, true).then((res) => res.results)
+        : Promise.resolve(undefined),
+    encounterStatusList: () =>
+      [
+        ResourceType.CONDITION,
+        ResourceType.PROCEDURE,
+        ResourceType.CLAIM,
+        ResourceType.MEDICATION_ADMINISTRATION,
+        ResourceType.MEDICATION_REQUEST,
+        ResourceType.QUESTIONNAIRE_RESPONSE,
+        ResourceType.IMAGING,
+        ResourceType.OBSERVATION,
+        ResourceType.DOCUMENTS
+      ].includes(type) && !additionalInfo.encounterStatusList
+        ? fetchValueSet(getConfig().core.valueSets.encounterStatus.url)
+        : Promise.resolve(undefined)
+  }
+  const results = await Promise.all(
+    Object.entries(fetchersMap).map(async ([key, fetchFn]) => ({ key, value: await fetchFn() }))
+  )
+  const updatedInfo: Partial<AdditionalInfo> = results.reduce((acc, { key, value }) => {
+    if (value !== undefined) acc[key as keyof AdditionalInfo] = value
+    return acc
+  }, {} as Partial<AdditionalInfo>)
+  if (type === ResourceType.PATIENT) {
+    updatedInfo.searchByList = searchByListPatients
+    updatedInfo.orderByList = deidentified ? orderByListPatientsDeidentified : orderByListPatients
+  }
+  if (type === ResourceType.DOCUMENTS) updatedInfo.searchByList = searchByListDocuments
+  return updatedInfo
 }

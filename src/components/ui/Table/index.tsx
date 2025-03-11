@@ -32,6 +32,7 @@ const Table = ({ value, orderBy, onSort, sxColumn, sxRow }: TableProps) => {
         <TableBody>
           {value.rows.map((row, index) => (
             <TableRow
+              key={index}
               row={row}
               sx={
                 index % 2 === 0

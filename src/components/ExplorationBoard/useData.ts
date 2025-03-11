@@ -11,16 +11,7 @@ import { mapToTable, mapToCards } from 'mappers/exploration'
 import { useEffect, useState } from 'react'
 import { getExplorationFetcher } from 'services/aphp/serviceExploration'
 import { PatientState } from 'state/patient'
-import {
-  CohortComposition,
-  CohortImaging,
-  CohortMedication,
-  CohortObservation,
-  CohortPMSI,
-  CohortQuestionnaireResponse,
-  ExplorationResults,
-  LoadingStatus
-} from 'types'
+import { CohortPMSI, CohortQuestionnaireResponse, ExplorationResults, LoadingStatus } from 'types'
 import { DATA_DISPLAY } from 'types/exploration'
 import { Card } from 'types/card'
 import { PatientsResponse } from 'types/patient'
@@ -73,6 +64,7 @@ export const useData = (
 
   const fetchData = async (page: number) => {
     try {
+      console.log('test fetching')
       setLoadingStatus(LoadingStatus.FETCHING)
       const fetcher = getExplorationFetcher(type)
       const results = await fetcher({
@@ -84,7 +76,6 @@ export const useData = (
         patient,
         includeFacets: true
       })
-      console.log('test fetching results', results)
       setData(results)
     } catch (error) {
       if (error instanceof CanceledError) {
@@ -103,26 +94,9 @@ export const useData = (
   }
 
   useEffect(() => {
-    console.log('testt change search')
+    console.log('test refetch')
     refetch()
-  }, [searchCriterias.orderBy, searchCriterias.filters, searchCriterias.searchInput])
-
-  useEffect(() => {
-    console.log('testt change orderBy')
-  }, [searchCriterias.orderBy])
-
-  useEffect(() => {
-    console.log('testt change filters')
-  }, [searchCriterias.filters])
-
-  useEffect(() => {
-    console.log('testt change search')
-  }, [searchCriterias.searchInput])
-
-  useEffect(() => {
-    console.log('testt change search by')
-    // if (!!searchCriterias.searchInput) refetch()
-  }, [searchCriterias.searchBy])
+  }, [searchCriterias])
 
   useEffect(() => {
     if (data) {

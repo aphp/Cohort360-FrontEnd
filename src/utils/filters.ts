@@ -108,7 +108,6 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return GenderStatusLabel[value as GenderStatus]
   }
   if (key === FilterKeys.FORM_NAME) {
-    console.log('test criteria', value)
     if (value === FormNames.HOSPIT) {
       return labels.formNames.hospit
     } else if (value === FormNames.PREGNANCY) {

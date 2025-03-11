@@ -6,9 +6,9 @@ import { SearchCriterias, SearchByTypes, Filters } from 'types/searchCriterias'
 import { SelectedFilter } from 'hooks/filters/useSavedFilters'
 import Select from 'components/ui/Searchbar/Select'
 import { Controller, useForm } from 'react-hook-form'
-import { AdditionalInfo } from '../useExplorationBoard'
 import ExplorationFilters from '../Filters'
 import { useAppSelector } from 'state'
+import { AdditionalInfo } from 'types/exploration'
 
 type EditSavedFilterProps = {
   open: boolean

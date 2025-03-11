@@ -4,7 +4,6 @@ import DurationRange from 'components/ui/Inputs/DurationRange'
 import { FilterByDocumentStatus, FilterKeys, Filters, genderOptions, vitalStatusesOptions } from 'types/searchCriterias'
 import { Controller, useForm } from 'react-hook-form'
 import ValueSets from 'components/ui/Inputs/ValueSets'
-import { AdditionalInfo } from '../useExplorationBoard'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import ExecutiveUnits from 'components/ui/Inputs/ExecutiveUnits'
 import { SourceType } from 'types/scope'
@@ -12,6 +11,7 @@ import TextInput from 'components/ui/Inputs/Text'
 import MultiSelect from 'components/ui/Inputs/MultiSelect'
 import allDocTypesList from 'assets/docTypes.json'
 import DocTypes from 'components/ui/Inputs/DocTypes'
+import { AdditionalInfo } from 'types/exploration'
 
 type ExplorationFiltersProps = {
   filters: Filters

@@ -3,12 +3,11 @@ import { Grid } from '@mui/material'
 import FilterBy from './FilterBy'
 import OccurrencesSearch from './OccurrenceSearch'
 import { Filters, SavedFiltersResults, SearchCriterias } from 'types/searchCriterias'
-import { AdditionalInfo, Search, SearchWithFilters } from '../useExplorationBoard'
 import SavedFilters from './SavedFilters'
 import { SelectedFilter } from 'hooks/filters/useSavedFilters'
 import { useSizeObserver } from 'hooks/ui/useSizeObserver'
 import OrderBy from './OrderBy'
-import { DisplayOptions } from 'types/exploration'
+import { DisplayOptions, Search, AdditionalInfo, SearchWithFilters } from 'types/exploration'
 
 type SavedFiltersActions = {
   onNext: () => void

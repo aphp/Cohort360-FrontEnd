@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import Modal from 'components/ui/Modal'
 import { FilterList } from '@mui/icons-material'
 import { Button } from '@mui/material'
-import { AdditionalInfo } from '../useExplorationBoard'
 import ExplorationFilters from '../Filters'
 import { Filters } from 'types/searchCriterias'
+import { AdditionalInfo } from 'types/exploration'
 
 type FilterByProps = {
   filters: Filters

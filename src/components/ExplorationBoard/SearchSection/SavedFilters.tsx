@@ -6,8 +6,8 @@ import { DeleteOutline, SavedSearch, Visibility } from '@mui/icons-material'
 import { SelectedFilter } from 'hooks/filters/useSavedFilters'
 import { Filters, SavedFiltersResults, SearchCriterias } from 'types/searchCriterias'
 import EditSavedFilter from './EditSavedFilter'
-import { AdditionalInfo } from '../useExplorationBoard'
 import { useAppSelector } from 'state'
+import { AdditionalInfo } from 'types/exploration'
 
 type SavedFiltersProps = {
   selectedFilter: SelectedFilter<Filters> | null

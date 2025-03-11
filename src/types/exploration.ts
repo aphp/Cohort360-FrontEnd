@@ -1,8 +1,9 @@
 import { PatientState } from 'state/patient'
 import { ResourceType } from './requestCriterias'
 import { Filters, LabelObject, OrderBy, SearchBy, SearchByTypes, SearchCriterias } from './searchCriterias'
-import { Reference, Questionnaire } from 'fhir/r4'
+import { Questionnaire } from 'fhir/r4'
 import { SourceType } from './scope'
+import { Reference } from './valueSet'
 
 export type ResourceOptions<T> = {
   deidentified: boolean

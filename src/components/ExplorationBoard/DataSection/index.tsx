@@ -16,9 +16,8 @@ import PieChart from 'components/Dashboard/Preview/Charts/PieChart'
 import Timeline from 'components/Patient/MaternityTimeline'
 import { ExplorationResults } from 'types'
 import { QuestionnaireResponse } from 'fhir/r4'
-import { AdditionalInfo } from '../useExplorationBoard'
 import InfoCard from 'components/ui/Cards/InfoCard'
-import { DisplayOptions, DATA_DISPLAY } from 'types/exploration'
+import { DisplayOptions, DATA_DISPLAY, AdditionalInfo } from 'types/exploration'
 import { Card } from 'types/card'
 
 type DataSectionProps = {

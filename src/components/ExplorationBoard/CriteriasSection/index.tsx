@@ -4,8 +4,7 @@ import { FilterKeys, FilterValue, SearchCriteriaKeys } from 'types/searchCriteri
 import SaveFilter from './SaveFilter'
 import Truncated from 'components/ui/Truncated'
 import { useAppSelector } from 'state'
-import { DisplayOptions } from '..'
-import { GAP } from 'types/exploration'
+import { DisplayOptions, GAP } from 'types/exploration'
 
 type Criteria = {
   value: FilterValue

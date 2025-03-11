@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import Modal from 'components/ui/Modal'
 import { SwapVert } from '@mui/icons-material'
 import { Button, Grid } from '@mui/material'
-import { AdditionalInfo } from '../useExplorationBoard'
 import { OrderBy as OrderByType, orderDirection } from 'types/searchCriterias'
 import { Controller, useForm } from 'react-hook-form'
 import RadioGroup from 'components/ui/RadioGroup'
 import Select from 'components/ui/Searchbar/Select'
+import { AdditionalInfo } from 'types/exploration'
 
 type OrderByProps = {
   orderBy: OrderByType

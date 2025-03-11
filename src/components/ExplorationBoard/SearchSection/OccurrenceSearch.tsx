@@ -5,8 +5,8 @@ import { Filters, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
 import Select from 'components/ui/Searchbar/Select'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { Controller, useForm } from 'react-hook-form'
-import { AdditionalInfo, Search } from '../useExplorationBoard'
 import { ResourceType } from 'types/requestCriterias'
+import { AdditionalInfo, Search } from 'types/exploration'
 
 export type SearchType = {
   searchCriterias: SearchCriterias<Filters>

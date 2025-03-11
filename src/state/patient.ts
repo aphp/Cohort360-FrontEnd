@@ -36,14 +36,13 @@ import {
   Procedure,
   QuestionnaireResponse
 } from 'fhir/r4'
-import {
-  Direction,
-  Order
-} from 'types/searchCriterias'
+import { Direction, Order, PMSIFilters } from 'types/searchCriterias'
 import { isCustomError } from 'utils/perimeters'
-import {  ResourceType } from 'types/requestCriterias'
+import { ResourceType } from 'types/requestCriterias'
 import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
+import { fetchPMSIList } from 'services/aphp/serviceExploration'
+import { ResourceOptions } from 'types/exploration'
 
 export type Medication = {
   administration?: IPatientMedication<MedicationAdministration>
@@ -181,77 +180,35 @@ type FetchLastPmsiReturn = {
 
 const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiParams, { state: RootState }>(
   'patient/fetchLastPmsiInfo',
-  async ({ patientId, groupId }, { getState }) => {
+  async ({ groupId }, { getState }) => {
     try {
       const patientState = getState().patient
-
       const hospits = patientState?.hospits?.list ?? []
       const deidentified = !!patientState?.deidentified
-
+      const options: ResourceOptions<PMSIFilters> = {
+        deidentified,
+        page: 0,
+        searchCriterias: {
+          orderBy: {
+            orderBy: Order.DATE,
+            orderDirection: Direction.DESC
+          },
+          searchInput: '',
+          filters: { executiveUnits: [], encounterStatus: [], code: [] }
+        },
+        groupId: groupId ? [groupId] : [],
+        patient: patientState
+      }
       const fetchPatientResponse = await Promise.all([
-        services.patients.fetchPMSI(
-          0,
-          patientId,
-          ResourceType.CONDITION,
-          '',
-          '',
-          '',
-          '',
-          [],
-          Order.DATE,
-          Direction.DESC,
-          null,
-          null,
-          [],
-          groupId
-        ),
-        services.patients.fetchPMSI(
-          0,
-          patientId,
-          ResourceType.PROCEDURE,
-          '',
-          '',
-          '',
-          '',
-          [],
-          Order.DATE,
-          Direction.DESC,
-          null,
-          null,
-          [],
-          groupId
-        ),
-        services.patients.fetchPMSI(
-          0,
-          patientId,
-          ResourceType.CLAIM,
-          '',
-          '',
-          '',
-          '',
-          [],
-          Order.DATE,
-          Direction.DESC,
-          null,
-          null,
-          [],
-          groupId
-        )
+        fetchPMSIList({ ...options, type: ResourceType.CONDITION }),
+        fetchPMSIList({ ...options, type: ResourceType.PROCEDURE }),
+        fetchPMSIList({ ...options, type: ResourceType.CLAIM })
       ])
-
       if (fetchPatientResponse === undefined) return null
 
-      const conditionList = linkElementWithEncounter(
-        fetchPatientResponse[0].pmsiData as Condition[],
-        hospits,
-        deidentified
-      )
-      const procedureList = linkElementWithEncounter(
-        fetchPatientResponse[1].pmsiData as Procedure[],
-        hospits,
-        deidentified
-      )
-      const claimList = linkElementWithEncounter(fetchPatientResponse[2].pmsiData as Claim[], hospits, deidentified)
+      const conditionList = fetchPatientResponse[0].list as Condition[]
+      const procedureList = fetchPatientResponse[1].list as Procedure[]
+      const claimList = fetchPatientResponse[2].list as Claim[]
 
       return {
         patientInfo: {
@@ -266,22 +223,22 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
         pmsi: {
           condition: {
             loading: false,
-            count: fetchPatientResponse[0].pmsiTotal ?? 0,
-            total: fetchPatientResponse[0].pmsiTotal ?? 0,
+            count: fetchPatientResponse[0].total ?? 0,
+            total: fetchPatientResponse[0].total ?? 0,
             list: conditionList,
             page: 1
           },
           procedure: {
             loading: false,
-            count: fetchPatientResponse[1].pmsiTotal ?? 0,
-            total: fetchPatientResponse[1].pmsiTotal ?? 0,
+            count: fetchPatientResponse[1].total ?? 0,
+            total: fetchPatientResponse[1].total ?? 0,
             list: procedureList,
             page: 1
           },
           claim: {
             loading: false,
-            count: fetchPatientResponse[2].pmsiTotal ?? 0,
-            total: fetchPatientResponse[2].pmsiTotal ?? 0,
+            count: fetchPatientResponse[2].total ?? 0,
+            total: fetchPatientResponse[2].total ?? 0,
             list: claimList,
             page: 1
           }
@@ -620,11 +577,7 @@ const patientSlice = createSlice({
 })
 
 export default patientSlice.reducer
-export {
-  fetchPatientInfo,
-  fetchLastPmsiInfo,
-  fetchAllProcedures
-}
+export { fetchPatientInfo, fetchLastPmsiInfo, fetchAllProcedures }
 export const { clearPatient } = patientSlice.actions
 
 export function linkElementWithEncounter<

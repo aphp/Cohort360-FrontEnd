@@ -250,8 +250,6 @@ const mapPmsiToRows = (list: CohortPMSI[], type: PMSIResourceTypes, isPatient: b
     const hasDiagnosticType = type === ResourceType.CONDITION
     const date = getPmsiDate(type, elem)
     const codes = getPmsiCodes(type, elem)
-    console.log('test code', codes.display ?? 'Non renseigné')
-
     const row: Row = [
       !isPatient && {
         id: `${elem.id}-ipp`,
@@ -605,7 +603,6 @@ const mapDocumentsToRows = (
   hasSearch?: boolean
 ) => {
   const rows: Row[] = []
-  console.log('test data', list)
   list.forEach((elem) => {
     const docType = docTypes.docTypes.find(
       ({ code }) => code.toLowerCase() === (elem?.type?.coding?.[0] ? elem.type.coding[0].code : '-')?.toLowerCase()
@@ -684,7 +681,6 @@ export const mapMedicationToRows = (
   groupId: string[]
 ) => {
   const rows: Row[] = []
-  console.log('test data', list)
   list.forEach((elem) => {
     const date = getMedicationDate(type, elem)
     const [codeATC, displayATC, , codeATCSystem] = getCodes(

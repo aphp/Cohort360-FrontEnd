@@ -58,9 +58,8 @@ const ExplorationBoard = ({
   )
 
   useEffect(() => {
-    //console.log('test searchCriterias', searchCriterias)
-    console.log('test card', data)
-  }, [data])
+    console.log('test searchCriterias', searchCriterias)
+  }, [searchCriterias])
   // LEs additionnal infos se fetc top
   // supprimer multiple dans le type Column
   // Supprimer StartDate et EndDate quand tâche terminée
@@ -76,6 +75,7 @@ const ExplorationBoard = ({
   // TOUS LES TYPES des réponses du service et de useData sont mauvais!!
   // Le retour en arrière d'un patient sur la liste des patients ne se fait pas correctement
   // Une recherche se lance (ùmode pseudo) lorsque le selectBy est modifié alors que ce comportement n'est pas souhaité
+  // Erreur fetch last pmsi
   return (
     <Grid item xs={12} container gap={GAP} sx={{ backgroundColor: '#fff' }}>
       <SearchSection
