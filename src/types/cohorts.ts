@@ -1,13 +1,22 @@
 export enum CohortsType {
-  ALL = 'AllCohorts',
-  FAVORITE = 'FavoriteCohorts',
-  LAST = 'LastCohorts',
-  NOT_FAVORITE = 'NotFavoriteCohorts'
+  FAVORITE = 'FAVORITE',
+  NOT_FAVORITE = 'NOT_FAVORITE'
 }
 
 export enum CohortsTypeLabel {
-  ALL = 'Toutes les cohortes',
   FAVORITE = 'Cohortes favorites',
-  LAST = 'Dernières cohortes',
   NOT_FAVORITE = 'Cohortes non favorites'
+}
+
+export enum ExplorationsSearchParams {
+  DIRECTION = 'direction',
+  END_DATE = 'endDate',
+  FAVORITE = 'favorite',
+  MAX_PATIENTS = 'maxPatients',
+  MIN_PATIENTS = 'minPatients',
+  ORDER_BY = 'orderBy',
+  PAGE = 'page',
+  SEARCH_INPUT = 'searchInput',
+  START_DATE = 'startDate',
+  STATUS = 'status'
 }

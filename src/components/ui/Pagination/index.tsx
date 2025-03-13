@@ -75,7 +75,7 @@ export const Pagination = ({
       xs={11}
     >
       <StyledPagination
-        elemColor={color}
+        elemcolor={color}
         role="search"
         shape="circular"
         count={count}
@@ -97,12 +97,12 @@ export const Pagination = ({
       <Box display="flex" justifyContent={smallSize ? 'center' : 'flex-end'} alignItems="center">
         <FormLabel>Aller à la page</FormLabel>
         <PaginationInput
-          elemColor={color}
+          elemcolor={color}
           currentvalue={goToPage}
           onChangeCurrentValue={(newValue) => setGoToPage(newValue)}
           onKeyDown={handleKeyDown}
         />
-        <StyledButton onClick={submitPageChange} elemColor={color}>
+        <StyledButton onClick={submitPageChange} elemcolor={color}>
           <ArrowCircleRightIcon />
         </StyledButton>
       </Box>

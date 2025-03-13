@@ -51,7 +51,7 @@ const DataTable: React.FC<DataTableProps> = ({
     }
   }
   return (
-    <Grid container justifyContent="flex-end" marginBottom={8}>
+    <Grid container justifyContent="flex-end" marginBottom={props.noPagination ? 1 : 8}>
       <TableContainer component={Paper}>
         <Table className={classes.table}>
           <TableHead>

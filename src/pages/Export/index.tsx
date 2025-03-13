@@ -16,7 +16,7 @@ import sideBarTransition from 'styles/sideBarTransition'
 import styles from './styles'
 import { fetchExportsList } from 'services/aphp/serviceExportCohort'
 import { cleanSearchParams, handlePageError, checkIfPageAvailable } from 'utils/paginationUtils'
-import { CohortJobStatus, LoadingStatus } from 'types'
+import { JobStatus, LoadingStatus } from 'types'
 import { cancelPendingRequest } from 'utils/abortController'
 import { Order } from 'types/searchCriterias'
 import useSearchCriterias, { initExportSearchCriterias } from 'reducers/searchCriteriasReducer'
@@ -31,15 +31,15 @@ const exportColumnsTable = [
   { label: 'Statut', key: 'request_job_status', code: Order.STATUS }
 ]
 
-const getStatusChip = (status: CohortJobStatus) => {
+const getStatusChip = (status: JobStatus) => {
   switch (status) {
-    case CohortJobStatus.FINISHED:
+    case JobStatus.FINISHED:
       return <Chip label="Terminé" size="small" style={{ backgroundColor: '#28a745', color: 'white' }} />
-    case CohortJobStatus.NEW:
-    case CohortJobStatus.STARTED:
-    case CohortJobStatus.PENDING:
+    case JobStatus.NEW:
+    case JobStatus.STARTED:
+    case JobStatus.PENDING:
       return <Chip label="En cours" size="small" style={{ backgroundColor: '#ffc107', color: 'black' }} />
-    case CohortJobStatus.FAILED:
+    case JobStatus.FAILED:
       return <Chip label="Erreur" size="small" style={{ backgroundColor: '#dc3545', color: 'black' }} />
     default:
       return <Chip label="Erreur" size="small" style={{ backgroundColor: '#dc3545', color: 'black' }} />

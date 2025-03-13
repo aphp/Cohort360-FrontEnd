@@ -171,7 +171,7 @@ const FormsList = () => {
         </Grid>
 
         <Grid container item xs={12} md={2}>
-          <Button icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleFilterByModal(true)}>
+          <Button startIcon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleFilterByModal(true)}>
             Filtrer
           </Button>
         </Grid>
