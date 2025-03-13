@@ -88,6 +88,7 @@ export type NumberWithComparatorCriteriaItem = BaseCriteriaItem & {
   withInfo?: ReactNode
   floatValues?: boolean
   allowBetween?: boolean
+  defaultValue?: number
 }
 
 export type DurationItem = BaseCriteriaItem & {
