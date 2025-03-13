@@ -59,14 +59,12 @@ const OccurenceInput = ({
     ) {
       return newValue
     }
-    return undefined
+    return ''
   }
 
   const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>, setter: (value: string) => void) => {
     const newValue = checkedValue(e)
-    if (newValue !== undefined) {
-      setter(newValue)
-    }
+    setter(newValue)
   }
 
   const handleMinValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
