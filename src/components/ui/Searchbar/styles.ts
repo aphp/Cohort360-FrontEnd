@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles'
 type CustomProps = {
   wrapped?: boolean
   width?: string
+  radius?: number
   error?: boolean
 }
 
@@ -21,25 +22,25 @@ export const SelectWrapper = styled('div')<CustomProps>(({ width }) => ({
   }
 }))
 
-export const SelectInputWrapper = styled('div')(() => ({
+export const SelectInputWrapper = styled('div')<CustomProps>(({ radius = 25 }) => ({
   width: '100%',
   height: 'inherit',
   '.MuiInputBase-root': {
     width: 'inherit',
     height: 'inherit',
-    borderRadius: 25,
+    borderRadius: radius,
     backgroundColor: '#FFF'
   }
 }))
 
-export const SearchInputWrapper = styled('div')<CustomProps>(({ width, error }) => ({
+export const SearchInputWrapper = styled('div')<CustomProps>(({ width, error, radius = 25 }) => ({
   flex: 1,
   width: width,
   height: 30,
   backgroundColor: '#FFF',
   border: error ? '1px solid #F44336' : '1px solid #D0D7D8',
   boxShadow: '0px 1px 16px #0000000A',
-  borderRadius: 25,
+  borderRadius: radius,
   '.MuiInputBase-root': {
     marginLeft: 10,
     width: '100%'

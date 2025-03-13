@@ -1,21 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'state'
-
 import { Chip, CircularProgress, CssBaseline, Grid, Typography } from '@mui/material'
-
 import useStyles from './styles'
 import { FilterList } from '@mui/icons-material'
-import CohortStatusFilter from 'components/Filters/CohortStatusFilter'
-import CohortsTypesFilter from 'components/Filters/CohortsTypeFilter'
-import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
-import PatientsNbFilter from 'components/Filters/PatientsNbFilter'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import { BlockWrapper } from 'components/ui/Layout'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { LoadingStatus } from 'types'
 import { CohortsType } from 'types/cohorts'
-import { FilterKeys, OrderBy } from 'types/searchCriterias'
+import { OrderBy } from 'types/searchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
 import { CanceledError } from 'axios'
 import useSearchCriterias, { initCohortsSearchCriterias } from 'reducers/searchCriteriasReducer'
@@ -29,21 +23,6 @@ import { Pagination } from 'components/ui/Pagination'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
 
-const statusOptions = [
-  {
-    display: 'Terminé',
-    code: 'finished'
-  },
-  {
-    display: 'En attente',
-    code: 'pending,started'
-  },
-  {
-    display: 'Erreur',
-    code: 'failed'
-  }
-]
-
 type MyCohortsProps = {
   favoriteUrl?: boolean
 }
@@ -51,13 +30,10 @@ type MyCohortsProps = {
 const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
-
   const { classes, cx } = useStyles()
   const openDrawer = useAppSelector((state) => state.drawer)
   const cohortState = useAppSelector((state) => state.cohort)
-
   const dispatch = useAppDispatch()
-
   const cohortList = useCohortList()
   const [toggleModal, setToggleModal] = useState(false)
   const [page, setPage] = useState(getPageParam ? parseInt(getPageParam, 10) : 1)
@@ -73,9 +49,10 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
     { changeOrderBy, changeSearchInput, addFilters, removeFilter }
   ] = useSearchCriterias(initCohortsSearchCriterias)
 
-  const filtersAsArray = useMemo(() => {
-    return selectFiltersAsArray({ status, startDate, endDate, minPatients, maxPatients, favorite })
-  }, [status, startDate, endDate, minPatients, maxPatients, favorite])
+  const filtersAsArray = useMemo(
+    () => selectFiltersAsArray({ status, startDate, endDate, minPatients, maxPatients, favorite }, searchInput),
+    [status, startDate, endDate, minPatients, maxPatients, favorite]
+  )
 
   const controllerRef = useRef<AbortController>(new AbortController())
   const isFirstRender = useRef(true)
@@ -171,7 +148,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
             <Grid item xs={12} md={7}>
               <Searchbar>
                 <SearchInput
-                  value={searchInput}
+                  value={searchInput ?? ''}
                   placeholder={'Rechercher dans les cohortes'}
                   onchange={(newValue) => changeSearchInput(newValue)}
                 />
@@ -191,15 +168,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
               open={toggleModal}
               onClose={() => setToggleModal(false)}
               onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
-            >
-              <CohortStatusFilter value={status} name={FilterKeys.STATUS} allStatus={statusOptions} />
-              <CohortsTypesFilter value={favorite} name={FilterKeys.FAVORITE} />
-              <PatientsNbFilter
-                values={[minPatients, maxPatients]}
-                names={[FilterKeys.MIN_PATIENTS, FilterKeys.MAX_PATIENTS]}
-              />
-              <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
-            </Modal>
+            ></Modal>
           </BlockWrapper>
 
           {filtersAsArray?.length > 0 && (

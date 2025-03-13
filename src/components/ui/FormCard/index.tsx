@@ -12,7 +12,8 @@ import {
   styled
 } from '@mui/material'
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material'
-import FormDetails from '../FormDetails'
+import Lines from '../Lines'
+import { Line } from 'types/table'
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean
@@ -33,10 +34,7 @@ interface FormCardsProps {
   cardColor: string
   title: string
   chipsInfo: string[]
-  formDetails: {
-    name: string
-    value: string
-  }[]
+  formDetails: Line[]
   avatar: React.ReactNode
 }
 
@@ -74,7 +72,7 @@ const FormCards: React.FC<FormCardsProps> = ({ cardColor, title, chipsInfo, form
       />
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent style={{ padding: '8px 0 0' }}>
-          <FormDetails content={formDetails} />
+          <Lines value={formDetails} />
         </CardContent>
       </Collapse>
     </Card>

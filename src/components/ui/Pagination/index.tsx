@@ -65,14 +65,13 @@ export const Pagination = ({
       )
     }
   }
-
   return (
     <Grid
       container
       direction={smallSize ? 'column' : 'row'}
       justifyContent={centered ? 'center' : 'flex-end'}
       alignItems="center"
-      xs={11}
+      xs={12}
     >
       <StyledPagination
         elemColor={color}

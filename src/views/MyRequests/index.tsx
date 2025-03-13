@@ -172,7 +172,6 @@ const MyRequests = () => {
                 <SearchInput
                   value={searchInput}
                   placeholder="Rechercher"
-                  width={'75%'}
                   onchange={(newValue) => setSearchInput(newValue)}
                 />
 
