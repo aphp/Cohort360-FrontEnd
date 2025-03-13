@@ -19,6 +19,7 @@ import { QuestionnaireResponse } from 'fhir/r4'
 import InfoCard from 'components/ui/Cards/InfoCard'
 import { DisplayOptions, DATA_DISPLAY, AdditionalInfo } from 'types/exploration'
 import { Card } from 'types/card'
+import { StickyContainer } from 'components/ui/Pagination/styles'
 
 type DataSectionProps = {
   data: { raw: Data | null; table: Table; cards: Card[] }
@@ -132,19 +133,7 @@ const DataSection = ({
               {displayOptions.display === DATA_DISPLAY.TABLE && data.raw?.totalPatients && (
                 <DataTable value={data.table} orderBy={orderBy} onSort={onSort} />
               )}
-              <Grid
-                container
-                sx={{
-                  position: 'sticky',
-                  bottom: 0,
-                  backgroundColor: '#fff',
-                  maxWidth: '100%', // S'assure qu'elle ne dépasse pas le container
-                  width: '100%', // Pour occuper toute la largeur du parent
-                  zIndex: 10, // Pour s'assurer qu'elle reste au-dessus du reste du contenu
-                  padding: '0px 0px 10px 0px', // Ajoute un peu d'espace
-                  boxShadow: '0px -2px 5px rgba(0, 0, 0, 0.1)' // Ajoute une légère ombre pour la visibilité
-                }}
-              >
+              <StickyContainer>
                 <Pagination
                   color="#303030"
                   count={pagination.total}
@@ -152,7 +141,7 @@ const DataSection = ({
                   onPageChange={onChangePage}
                   centered={true}
                 />
-              </Grid>
+              </StickyContainer>
             </Grid>
           )}
         </Grid>

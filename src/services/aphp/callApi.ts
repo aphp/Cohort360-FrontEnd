@@ -17,7 +17,7 @@ import {
 
 import { ExportList } from 'types/export'
 
-import { AxiosError, AxiosResponse } from 'axios'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 import apiBackend from '../apiBackend'
 import {
   Binary,
@@ -1229,19 +1229,16 @@ type fetchExportListProps = {
 
 export const fetchExportList = async (args: fetchExportListProps) => {
   const { offset, user, search, ordering, signal } = args
-
   let options: string[] = [`output_format=${encodeURIComponent('csv,xlsx')}`]
   if (offset !== undefined) options = [...options, `offset=${offset}`]
   if (user !== undefined) options = [...options, `owner=${user}`]
   if (search && search !== undefined) options = [...options, `search=${encodeURIComponent(search)}`]
   if (ordering !== undefined) options = [...options, `ordering=${ordering}`]
-
   let queryParams = ''
   if (options.length != 0) {
     queryParams = `?${options.reduce(paramsReducer, '')}`
   }
-
-  const response = await apiBackend.get<Back_API_Response<ExportList>>(`/exports/${queryParams}`, { signal: signal })
+  const response = await apiBackend.get<Back_API_Response<ExportList>>(`/exports/${queryParams}`, { signal })
   return response.data
 }
 

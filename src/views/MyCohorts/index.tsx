@@ -3,16 +3,13 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { Chip, CircularProgress, CssBaseline, Grid, Typography } from '@mui/material'
 import useStyles from './styles'
 import { FilterList } from '@mui/icons-material'
-/*import RadioGroupFilter from 'components/Filters/RadioGroupFilter'
-import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
-import PatientsNbFilter from 'components/Filters/PatientsNbFilter'*/
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import { BlockWrapper } from 'components/ui/Layout'
 import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { LoadingStatus } from 'types'
-import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
-import { FilterKeys, OrderBy } from 'types/searchCriterias'
+import { CohortsType } from 'types/cohorts'
+import { OrderBy } from 'types/searchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
 import { CanceledError } from 'axios'
 import useSearchCriterias, { initCohortsSearchCriterias } from 'reducers/searchCriteriasReducer'
@@ -25,27 +22,6 @@ import useCohortList from 'hooks/useCohortList'
 import { Pagination } from 'components/ui/Pagination'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError } from 'utils/paginationUtils'
-//import MultiSelectInput from 'components/Filters/MultiSelectInput'
-
-const statusOptions = [
-  {
-    label: 'Terminé',
-    id: 'finished'
-  },
-  {
-    label: 'En attente',
-    id: 'pending,started'
-  },
-  {
-    label: 'Erreur',
-    id: 'failed'
-  }
-]
-
-const favoriteOptions = [
-  { id: CohortsType.FAVORITE, label: CohortsTypeLabel.FAVORITE },
-  { id: CohortsType.NOT_FAVORITE, label: CohortsTypeLabel.NOT_FAVORITE }
-]
 
 type MyCohortsProps = {
   favoriteUrl?: boolean
@@ -192,25 +168,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
               open={toggleModal}
               onClose={() => setToggleModal(false)}
               onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
-            >
-              {/*<MultiSelectInput
-                value={status}
-                name={FilterKeys.STATUS}
-                options={statusOptions}
-                label="Statut de la cohorte :"
-              />
-              <RadioGroupFilter
-                value={favorite}
-                name={FilterKeys.FAVORITE}
-                label="Favoris :"
-                options={favoriteOptions}
-              />
-              <PatientsNbFilter
-                values={[minPatients, maxPatients]}
-                names={[FilterKeys.MIN_PATIENTS, FilterKeys.MAX_PATIENTS]}
-              />
-              <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />*/}
-            </Modal>
+            ></Modal>
           </BlockWrapper>
 
           {filtersAsArray?.length > 0 && (

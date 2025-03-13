@@ -32,7 +32,7 @@ import {
   SelectedCriteriaType
 } from 'types/requestCriterias'
 import { ExportTableType } from 'components/Dashboard/ExportModal/export_table'
-import { FormNames, SearchByTypes } from 'types/searchCriterias'
+import { SearchByTypes } from 'types/searchCriterias'
 import { PMSILabel } from 'types/patient'
 import { CriteriaForm } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
 
