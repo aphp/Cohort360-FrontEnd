@@ -21,6 +21,7 @@ import scope from './scope'
 import me from './me'
 import warningDialog from './warningDialog'
 import valueSets from './valueSets'
+import preferences from './preferences'
 
 const cohortCreationReducer = combineReducers({
   criteria,
@@ -29,6 +30,7 @@ const cohortCreationReducer = combineReducers({
 
 const rootReducer = combineReducers({
   me,
+  preferences,
   cohortCreation: cohortCreationReducer,
   valueSets,
   exploredCohort,
