@@ -232,17 +232,23 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     )
   },
   numberAndComparator: (props) => {
-    const nonNullValue = props.value ?? { value: 0, comparator: Comparators.GREATER_OR_EQUAL }
+    const nonNullValue = props.value ?? {
+      value: props.definition.defaultValue ?? '',
+      comparator: Comparators.GREATER_OR_EQUAL
+    }
     return (
       <OccurenceInput
         floatValues={props.definition.floatValues}
         allowBetween={props.definition.allowBetween}
         label={props.definition.label}
         value={nonNullValue.value}
+        defaultValue={props.definition.defaultValue}
         comparator={nonNullValue.comparator}
         maxValue={nonNullValue.maxValue}
         onchange={(newCount, newComparator, maxValue) => {
-          props.updateData({ value: newCount, comparator: newComparator, maxValue: maxValue })
+          props.updateData(
+            newCount === null ? null : { value: newCount, comparator: newComparator, maxValue: maxValue }
+          )
         }}
         withHierarchyInfo={props.definition.withHierarchyInfo}
         withInfo={props.definition.info}

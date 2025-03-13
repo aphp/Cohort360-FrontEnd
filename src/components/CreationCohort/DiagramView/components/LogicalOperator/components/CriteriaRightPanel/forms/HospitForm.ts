@@ -34,20 +34,20 @@ export type HospitDataType = CommonCriteriaData &
     obstetricalGestureDuringLabor: string[] | null
     analgesieType: string[] | null
     birthDeliveryDate: NewDurationRangeType | null
-    birthDeliveryWeeks: NumberAndComparatorDataType
-    birthDeliveryDays: NumberAndComparatorDataType
+    birthDeliveryWeeks: NumberAndComparatorDataType | null
+    birthDeliveryDays: NumberAndComparatorDataType | null
     birthDeliveryWay: string[] | null
     instrumentType: string[] | null
     cSectionModality: string[] | null
     presentationAtDelivery: string[] | null
-    birthMensurationsGrams: NumberAndComparatorDataType
-    birthMensurationsPercentil: NumberAndComparatorDataType
-    apgar1: NumberAndComparatorDataType
-    apgar3: NumberAndComparatorDataType
-    apgar5: NumberAndComparatorDataType
-    apgar10: NumberAndComparatorDataType
-    arterialPhCord: NumberAndComparatorDataType
-    arterialCordLactates: NumberAndComparatorDataType
+    birthMensurationsGrams: NumberAndComparatorDataType | null
+    birthMensurationsPercentil: NumberAndComparatorDataType | null
+    apgar1: NumberAndComparatorDataType | null
+    apgar3: NumberAndComparatorDataType | null
+    apgar5: NumberAndComparatorDataType | null
+    apgar10: NumberAndComparatorDataType | null
+    arterialPhCord: NumberAndComparatorDataType | null
+    arterialCordLactates: NumberAndComparatorDataType | null
     birthStatus: string[] | null
     postpartumHemorrhage: string[] | null
     conditionPerineum: string[] | null
@@ -91,20 +91,20 @@ export const form: () => CriteriaForm<HospitDataType> = () => ({
     obstetricalGestureDuringLabor: null,
     analgesieType: null,
     birthDeliveryDate: null,
-    birthDeliveryWeeks: { value: 0, comparator: Comparators.GREATER_OR_EQUAL },
-    birthDeliveryDays: { value: 0, comparator: Comparators.GREATER_OR_EQUAL },
+    birthDeliveryWeeks: null,
+    birthDeliveryDays: null,
     birthDeliveryWay: null,
     instrumentType: null,
     cSectionModality: null,
     presentationAtDelivery: null,
-    birthMensurationsGrams: { value: 0, comparator: Comparators.GREATER_OR_EQUAL },
-    birthMensurationsPercentil: { value: 0, comparator: Comparators.GREATER_OR_EQUAL },
-    apgar1: { value: 0, comparator: Comparators.GREATER_OR_EQUAL },
-    apgar3: { value: 0, comparator: Comparators.GREATER_OR_EQUAL },
-    apgar5: { value: 0, comparator: Comparators.GREATER_OR_EQUAL },
-    apgar10: { value: 0, comparator: Comparators.GREATER_OR_EQUAL },
-    arterialPhCord: { value: 0, comparator: Comparators.GREATER_OR_EQUAL },
-    arterialCordLactates: { value: 0, comparator: Comparators.GREATER_OR_EQUAL },
+    birthMensurationsGrams: null,
+    birthMensurationsPercentil: null,
+    apgar1: null,
+    apgar3: null,
+    apgar5: null,
+    apgar10: null,
+    arterialPhCord: null,
+    arterialCordLactates: null,
     birthStatus: null,
     postpartumHemorrhage: null,
     conditionPerineum: null,
