@@ -1,6 +1,14 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [2.44.3](https://github.com/aphp/Cohort360-FrontEnd/compare/2.44.2..2.44.3) - 2025-03-13
+
+### 🐛 Bug Fixes
+
+- *(occurenceInput)* Allow deleting initial value for non float inputs - ([faea2a9](https://github.com/aphp/Cohort360-FrontEnd/commit/faea2a96cdb9b9a80bc5f2033d521c9ab016acff))
+- *(hospitForm/occurenceInput)* Set default null values + set occurence input default value to empty string - ([d0de062](https://github.com/aphp/Cohort360-FrontEnd/commit/d0de062bae07d88f6c634fc9e5c1ffa0433dcc7a))
+
 ## [2.44.2](https://github.com/aphp/Cohort360-FrontEnd/compare/2.44.1..2.44.2) - 2025-03-04
 
 ### 🐛 Bug Fixes
