@@ -7,7 +7,8 @@ type OccurenceInputProps = {
   value: number
   comparator: Comparators
   maxValue?: number
-  onchange: (value: number, comparator: Comparators, upperRangeValue?: number) => void
+  defaultValue?: number
+  onchange: (value: number | null, comparator: Comparators, upperRangeValue?: number) => void
   enableNegativeValues?: boolean
   floatValues?: boolean
   label?: string
@@ -21,6 +22,7 @@ const OccurenceInput = ({
   value,
   comparator,
   maxValue,
+  defaultValue,
   onchange,
   floatValues = false,
   enableNegativeValues = false,
@@ -36,11 +38,18 @@ const OccurenceInput = ({
   const [error, setError] = useState<string | undefined>()
 
   useEffect(() => {
-    const typedOccurenceValue = parseFloat(occurrenceValue === '' ? '0' : occurrenceValue)
+    const typedOccurenceValue =
+      defaultValue === undefined && occurrenceValue === ''
+        ? null
+        : parseFloat(occurrenceValue === '' ? `${defaultValue}` : occurrenceValue)
     const typedUpperRangeValue = upperRangeValue
       ? parseFloat(upperRangeValue === '' ? '0' : upperRangeValue)
       : undefined
-    if (typedUpperRangeValue !== undefined && typedOccurenceValue > typedUpperRangeValue) {
+    if (
+      typedUpperRangeValue !== undefined &&
+      typedOccurenceValue !== null &&
+      typedOccurenceValue > typedUpperRangeValue
+    ) {
       setError('INCOHERENT_VALUE_ERROR')
     } else if (comparatorValue === Comparators.BETWEEN && typedUpperRangeValue === undefined) {
       setError('MISSING_VALUE_ERROR')
