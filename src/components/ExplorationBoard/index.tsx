@@ -45,7 +45,7 @@ const ExplorationBoard = ({
     onRemoveCriteria,
     onSaveFilter,
     resetFetchStatus
-  } = useExplorationBoard(type, deidentified, search)
+  } = useExplorationBoard(type, deidentified, !!patient, search)
 
   const { count, pagination, data, dataLoading, onChangePage } = useData(
     type,
@@ -63,10 +63,10 @@ const ExplorationBoard = ({
   // searchParams à verifier pour l'url
   // => const _groupId = groupId ? `?groupId=${groupId}` : ''
   // => const _search = search ? `&search=${search}` : ''
+  // => const _page = page ? `&page=${page}` : ''
   // => erreur sur les pmsiTabs / medicationTabs
   // Vérifier qu'on atterie sur le bon onglet ressource et filtres quand URL
   // L'option Documents dont les pdf sont disponibles n'est dispo que en non pseudo
-  // Les champs ipp ne doivent plus apparaitre dans l'exploration d'un patient
   // TOUS LES TYPES des réponses du service et de useData sont mauvais!!
   // Le retour en arrière d'un patient sur la liste des patients ne se fait pas correctement
   // Une recherche se lance (mode pseudo) lorsque le selectBy est modifié alors que ce comportement n'est pas souhaité

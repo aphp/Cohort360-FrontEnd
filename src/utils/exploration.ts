@@ -76,72 +76,30 @@ export const getAlertMessages = (type: string, deidentified: boolean) => {
 export const narrowSearchCriterias = (
   deidentified: boolean,
   searchCriterias: SearchCriterias<Filters>,
-  type: ResourceType
+  type: ResourceType,
+  isPatient: boolean
 ): SearchCriterias<Filters> => {
-  console.log('test narrow')
-  const mappedOthers = (
-    searchCriterias: SearchCriterias<
-      PMSIFilters | ImagingFilters | BiologyFilters | MaternityFormFilters | DocumentsFilters
-    >,
-    deidentified: boolean
-  ): SearchCriterias<Filters> => {
-    const filters = deidentified ? removeKeys(searchCriterias.filters, ['ipp', 'nda']) : searchCriterias.filters
-    const criterias = removeKeys(searchCriterias, ['searchBy'])
-    return { ...criterias, filters }
+  const baseFiltersToRemove = [...(deidentified ? ['ipp', 'nda'] : []), ...(isPatient ? ['ipp'] : [])]
+  const keysToRemove: Partial<Record<ResourceType, string[]>> = {
+    [ResourceType.PROCEDURE]: ['diagnosticTypes'],
+    [ResourceType.CLAIM]: ['source', 'diagnosticTypes'],
+    [ResourceType.MEDICATION_ADMINISTRATION]: ['prescriptionTypes'],
+    [ResourceType.MEDICATION_REQUEST]: ['administrationRoutes']
+  }
+  const shouldKeepSearchInput =
+    type !== ResourceType.QUESTIONNAIRE_RESPONSE && !(deidentified && type === ResourceType.PATIENT)
+  const shouldKeepSearchBy = type === ResourceType.DOCUMENTS || (type === ResourceType.PATIENT && !deidentified)
+
+  const mapFilters = <T extends Filters>(criterias: SearchCriterias<T>): SearchCriterias<T> => {
+    let filters = removeKeys(criterias.filters, baseFiltersToRemove as (keyof T)[])
+    if (keysToRemove[type]) filters = removeKeys(filters, keysToRemove[type] as (keyof T)[])
+    let narrowedCriterias = removeKeys(criterias, ['searchBy', 'searchInput'] as (keyof SearchCriterias<T>)[])
+    if (shouldKeepSearchInput) narrowedCriterias = { ...narrowedCriterias, searchInput: criterias.searchInput }
+    if (shouldKeepSearchBy) narrowedCriterias = { ...narrowedCriterias, searchBy: criterias.searchBy }
+    return { ...narrowedCriterias, filters }
   }
 
-  const mappedPatients = (
-    searchCriterias: SearchCriterias<PatientsFilters>,
-    deidentified: boolean
-  ): SearchCriterias<PatientsFilters> => {
-    return deidentified ? removeKeys(searchCriterias, ['searchInput', 'searchBy']) : searchCriterias
-  }
-
-  const mappedDocs = (
-    searchCriterias: SearchCriterias<DocumentsFilters>,
-    deidentified: boolean
-  ): SearchCriterias<DocumentsFilters> => {
-    return deidentified
-      ? { ...searchCriterias, filters: removeKeys(searchCriterias.filters, ['ipp', 'nda']) }
-      : searchCriterias
-  }
-
-  switch (type) {
-    case ResourceType.PATIENT:
-      return mappedPatients(searchCriterias as SearchCriterias<PatientsFilters>, deidentified)
-    case ResourceType.CONDITION:
-      return mappedOthers(searchCriterias as SearchCriterias<PMSIFilters>, deidentified)
-    case ResourceType.PROCEDURE: {
-      const narrowed = mappedOthers(searchCriterias as SearchCriterias<PMSIFilters>, deidentified)
-      narrowed.filters = removeKeys(narrowed.filters, ['diagnosticTypes'])
-      return narrowed
-    }
-    case ResourceType.CLAIM: {
-      const narrowed = mappedOthers(searchCriterias as SearchCriterias<PMSIFilters>, deidentified)
-      narrowed.filters = removeKeys(narrowed.filters, ['source', 'diagnosticTypes'])
-      return narrowed
-    }
-    case ResourceType.MEDICATION_ADMINISTRATION: {
-      const narrowed = mappedOthers(searchCriterias as SearchCriterias<MedicationFilters>, deidentified)
-      narrowed.filters = removeKeys(narrowed.filters, ['prescriptionTypes'])
-      return narrowed
-    }
-    case ResourceType.MEDICATION_REQUEST: {
-      const narrowed = mappedOthers(searchCriterias as SearchCriterias<MedicationFilters>, deidentified)
-      narrowed.filters = removeKeys(narrowed.filters, ['administrationRoutes'])
-      return narrowed
-    }
-    case ResourceType.IMAGING:
-      return mappedOthers(searchCriterias as SearchCriterias<ImagingFilters>, deidentified)
-    case ResourceType.OBSERVATION:
-      return mappedOthers(searchCriterias as SearchCriterias<BiologyFilters>, deidentified)
-    case ResourceType.QUESTIONNAIRE_RESPONSE:
-      return removeKeys(searchCriterias, ['searchInput', 'searchBy'])
-    case ResourceType.DOCUMENTS:
-      return mappedDocs(searchCriterias as SearchCriterias<DocumentsFilters>, deidentified)
-    default:
-      return searchCriterias
-  }
+  return mapFilters(searchCriterias)
 }
 
 export const isPatientsResponse = (data: Data): data is PatientsResponse => {

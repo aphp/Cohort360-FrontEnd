@@ -8,7 +8,7 @@ import { FilterKeys, FilterValue, Filters, SearchCriteriaKeys, SearchCriterias }
 import { getInitSearchCriterias, getReferences, getSourceType, narrowSearchCriterias } from 'utils/exploration'
 import { selectFiltersAsArray } from 'utils/filters'
 
-export const useExplorationBoard = (type: ResourceType, deidentified: boolean, search?: string) => {
+export const useExplorationBoard = (type: ResourceType, deidentified: boolean, isPatient: boolean, search?: string) => {
   const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>({ type, deidentified })
   const init = useMemo(() => getInitSearchCriterias(type, search), [type, search])
   const [
@@ -26,7 +26,7 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean, s
   const sourceType = useMemo(() => getSourceType(type), [type])
 
   const narrowedSearchCriterias = useMemo(
-    () => narrowSearchCriterias(deidentified, searchCriterias, type),
+    () => narrowSearchCriterias(deidentified, searchCriterias, type, isPatient),
     [searchCriterias]
   )
 
@@ -34,7 +34,7 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean, s
     if (selectedSavedFilter)
       return {
         ...selectedSavedFilter,
-        filterParams: narrowSearchCriterias(deidentified, selectedSavedFilter.filterParams, type)
+        filterParams: narrowSearchCriterias(deidentified, selectedSavedFilter.filterParams, type, isPatient)
       }
     else return null
   }, [selectedSavedFilter])
