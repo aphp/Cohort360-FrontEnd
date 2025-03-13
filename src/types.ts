@@ -74,6 +74,11 @@ export enum LoadingStatus {
   SUCCESS = 'SUCCESS'
 }
 
+export enum FetchStatus {
+  ERROR = 'ERROR',
+  SUCCESS = 'SUCCESS'
+}
+
 export enum TemporalConstraintsKind {
   NONE = 'none',
   SAME_ENCOUNTER = 'sameEncounter',
@@ -209,17 +214,6 @@ export enum Month {
   DECEMBER = 'Décembre'
 }
 
-export type Column =
-  | {
-      label: string | ReactNode
-      code?: string
-      align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
-      multiple?: undefined
-    }
-  | {
-      multiple: Column[]
-    }
-
 export enum ChartCode {
   AGE_PYRAMID = 'facet-extension.ageMonth',
   GENDER_REPARTITION = 'facet-deceased',
@@ -291,6 +285,14 @@ export type CohortResults<T> = {
   totalAllResults: number
   totalPatients: number
   totalAllPatients: number
+  list: T[]
+}
+
+export type ExplorationResults<T> = {
+  total: number | null
+  totalAllResults: number | null
+  totalPatients: number | null
+  totalAllPatients: number | null
   list: T[]
 }
 
@@ -652,6 +654,7 @@ export type CohortQuestionnaireResponse = QuestionnaireResponse & {
   IPP?: string
   hospitDates?: Period
   idPatient?: string
+  formName?: string
 }
 
 export type CohortObservation = Observation & {
@@ -720,11 +723,6 @@ export type MedicationTab = TabType<
   MedicationLabel
 >
 
-export type DTTB_ResultsType = {
-  nb: number
-  total: number
-  label?: string
-}
 export type DTTB_SearchBarType = {
   type: 'simple' | 'patient' | 'document'
   value: string | undefined

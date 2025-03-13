@@ -50,8 +50,7 @@ export const Pagination = ({
         dispatch(
           showDialog({
             isOpen: true,
-            message: `La sélection est limitée à ${config.core.pagination.limit} pages. Merci d'affiner votre recherche à l'aide des filtres à votre disposition.`,
-            status: 'warning'
+            message: `La sélection est limitée à ${config.core.pagination.limit} pages. Merci d'affiner votre recherche à l'aide des filtres à votre disposition.`
           })
         )
       }
@@ -59,20 +58,18 @@ export const Pagination = ({
       dispatch(
         showDialog({
           isOpen: true,
-          message: 'Veuillez entrer un numéro de page valide.',
-          status: 'warning'
+          message: 'Veuillez entrer un numéro de page valide.'
         })
       )
     }
   }
-
   return (
     <Grid
       container
       direction={smallSize ? 'column' : 'row'}
       justifyContent={centered ? 'center' : 'flex-end'}
       alignItems="center"
-      xs={11}
+      xs={12}
     >
       <StyledPagination
         elemColor={color}
