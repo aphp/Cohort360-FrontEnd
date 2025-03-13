@@ -16,7 +16,7 @@ type DurationRangeProps = {
   disabled?: boolean
   unit?: string
   onChange?: (newDuration: DurationRangeType) => void
-  //onError: (isError: boolean) => void
+  onError: (isError: boolean) => void
 }
 const defaultMinDuration: DurationType = {
   year: null,
@@ -35,7 +35,7 @@ const DurationRange = ({
   disabled = false,
   unit = 'Âge',
   onChange,
- // onError
+  onError
 }: DurationRangeProps) => {
   const [minDuration, setMinDuration] = useState<DurationType>(convertStringToDuration(value[0]) || defaultMinDuration)
   const [maxDuration, setMaxDuration] = useState<DurationType>(convertStringToDuration(value[1]) || defaultMaxDuration)
@@ -43,11 +43,11 @@ const DurationRange = ({
 
   useEffect(() => {
     setError({ isError: false, errorMessage: '' })
-   // onError(false)
+    onError(false)
     if (!checkMinMaxValue(minDuration, maxDuration)) {
       setError({ isError: true, errorMessage: 'La date maximale doit être supérieure à la date minimale.' })
       onChange?.([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
-     // onError(true)
+      onError(true)
     } else onChange?.([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
   }, [minDuration, maxDuration])
 

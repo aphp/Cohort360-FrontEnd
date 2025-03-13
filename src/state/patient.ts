@@ -194,7 +194,7 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
             orderDirection: Direction.DESC
           },
           searchInput: '',
-          filters: { executiveUnits: [], encounterStatus: [], code: [] }
+          filters: { executiveUnits: [], encounterStatus: [], code: [], durationRange: [null, null] }
         },
         groupId: groupId ? [groupId] : [],
         patient: patientState

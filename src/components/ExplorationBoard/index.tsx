@@ -60,22 +60,18 @@ const ExplorationBoard = ({
   useEffect(() => {
     console.log('test searchCriterias', searchCriterias)
   }, [searchCriterias])
-  // LEs additionnal infos se fetc top
-  // supprimer multiple dans le type Column
-  // Supprimer StartDate et EndDate quand tâche terminée
-  // Label ExecutiveUnits n'est pas en gras
   // searchParams à verifier pour l'url
   // => const _groupId = groupId ? `?groupId=${groupId}` : ''
   // => const _search = search ? `&search=${search}` : ''
   // => erreur sur les pmsiTabs / medicationTabs
   // Vérifier qu'on atterie sur le bon onglet ressource et filtres quand URL
-  // Vérifier ce qu'on fait pour l'afichage des champs des filtres sauvegardés quand on passe de pseudo à nomi
   // L'option Documents dont les pdf sont disponibles n'est dispo que en non pseudo
   // Les champs ipp ne doivent plus apparaitre dans l'exploration d'un patient
   // TOUS LES TYPES des réponses du service et de useData sont mauvais!!
   // Le retour en arrière d'un patient sur la liste des patients ne se fait pas correctement
-  // Une recherche se lance (ùmode pseudo) lorsque le selectBy est modifié alors que ce comportement n'est pas souhaité
+  // Une recherche se lance (mode pseudo) lorsque le selectBy est modifié alors que ce comportement n'est pas souhaité
   // Erreur fetch last pmsi
+  // Count des Ressources à corriger
   return (
     <Grid item xs={12} container gap={GAP} sx={{ backgroundColor: '#fff' }}>
       <SearchSection

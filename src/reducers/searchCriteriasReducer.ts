@@ -38,8 +38,7 @@ export const initCohortsSearchCriterias: SearchCriterias<CohortsFilters> = {
   searchInput: '',
   filters: {
     status: [],
-    startDate: null,
-    endDate: null,
+    durationRange: [null, null],
     favorite: CohortsType.ALL,
     minPatients: null,
     maxPatients: null

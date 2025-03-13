@@ -54,7 +54,6 @@ export type Column = {
   label: string
   code?: string
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
-  multiple?: Column[]
 }
 
 export type Table = {

@@ -311,9 +311,7 @@ export type Filters =
 
 export type GenericFilter = {
   nda?: string
-  durationRange?: DurationRangeType
-  startDate?: string | null
-  endDate?: string | null
+  durationRange: DurationRangeType
   executiveUnits: Hierarchy<ScopeElement>[]
   encounterStatus: LabelObject[]
 }
@@ -366,8 +364,7 @@ export interface CohortsFilters {
   favorite: CohortsType
   minPatients: null | string
   maxPatients: null | string
-  startDate: null | string
-  endDate: null | string
+  durationRange: DurationRangeType
 }
 
 export interface SearchCriterias<F> {

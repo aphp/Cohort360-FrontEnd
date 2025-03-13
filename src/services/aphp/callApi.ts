@@ -605,7 +605,7 @@ type fetchConditionProps = {
   sortDirection?: Direction
   subject?: string
   code?: string
-  source?: Sources
+  source?: Sources[]
   type?: string[]
   _text?: string
   'min-recorded-date'?: string

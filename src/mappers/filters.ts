@@ -34,7 +34,6 @@ import {
   mapDocumentStatusesFromRequestParam,
   mapGenderCodesToGenderStatus,
   MaternityFormFilters,
-  FilterKeys,
   FormNames
 } from 'types/searchCriterias'
 import allDocTypesList from 'assets/docTypes.json'
@@ -353,11 +352,9 @@ export const mapRequestParamsToSearchCriteria = async (
 }
 
 const mapGenericToRequestParams = (filters: GenericFilter, type: ResourceType) => {
-  const { nda, startDate, endDate, durationRange, executiveUnits, encounterStatus } = filters
+  const { nda, durationRange, executiveUnits, encounterStatus } = filters
   const requestParams: string[] = []
   if (nda) requestParams.push(`${getGenericKeyFromResourceType(type, 'NDA')}=${encodeURIComponent(nda)}`)
-  if (startDate) requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=ge${startDate}`)
-  if (endDate) requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=le${endDate}`)
   if (durationRange && durationRange[0])
     requestParams.push(`${getGenericKeyFromResourceType(type, 'DATE')}=ge${durationRange[0]}`)
   if (durationRange && durationRange[1])
@@ -669,7 +666,7 @@ const mapSearchByAndSearchInputFromRequestParams = (parameters: URLSearchParams)
     SearchByTypes.IDENTIFIER,
     SearchByTypes.DESCRIPTION
   ]
-  let [searchBy, searchInput]: [SearchByTypes | undefined, string] = (keysToCheck
+  const [searchBy, searchInput]: [SearchByTypes | undefined, string] = (keysToCheck
     .map((key) => [key, parameters.getAll(key).join(' ')])
     .find(([, values]) => values) as [SearchByTypes, string]) ?? [SearchByTypes.TEXT, '']
   return [searchBy, searchInput]

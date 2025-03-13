@@ -9,7 +9,7 @@ import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { LoadingStatus } from 'types'
 import { CohortsType } from 'types/cohorts'
-import { OrderBy } from 'types/searchCriterias'
+import { FilterKeys, OrderBy } from 'types/searchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
 import { CanceledError } from 'axios'
 import useSearchCriterias, { initCohortsSearchCriterias } from 'reducers/searchCriteriasReducer'
@@ -44,14 +44,14 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
       orderBy,
       searchInput,
       filters,
-      filters: { status, startDate, endDate, minPatients, maxPatients, favorite }
+      filters: { status, durationRange, minPatients, maxPatients, favorite }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter }
   ] = useSearchCriterias(initCohortsSearchCriterias)
 
   const filtersAsArray = useMemo(
-    () => selectFiltersAsArray({ status, startDate, endDate, minPatients, maxPatients, favorite }, searchInput),
-    [status, startDate, endDate, minPatients, maxPatients, favorite]
+    () => selectFiltersAsArray({ status, durationRange, minPatients, maxPatients, favorite }, searchInput),
+    [status, durationRange, minPatients, maxPatients, favorite]
   )
 
   const controllerRef = useRef<AbortController>(new AbortController())
@@ -91,7 +91,7 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
       setLoadingStatus(LoadingStatus.IDDLE)
       setPage(1)
     }
-  }, [status, startDate, endDate, minPatients, maxPatients, searchInput, orderBy, favorite])
+  }, [status, durationRange, minPatients, maxPatients, searchInput, orderBy, favorite])
 
   useEffect(() => {
     setSearchParams({ page: page.toString() })
@@ -174,7 +174,11 @@ const MyCohorts = ({ favoriteUrl = false }: MyCohortsProps) => {
           {filtersAsArray?.length > 0 && (
             <Grid item xs={12} margin={'0px 0px 10px 0px'}>
               {filtersAsArray.map((filter, index) => (
-                <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
+                <Chip
+                  key={index}
+                  label={filter.label}
+                  onDelete={() => removeFilter(filter.category as FilterKeys, filter.value)}
+                />
               ))}
             </Grid>
           )}
