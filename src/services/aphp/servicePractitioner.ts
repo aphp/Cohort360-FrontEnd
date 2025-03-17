@@ -49,7 +49,7 @@ const servicePractitioner: IServicePractitioner = {
   authenticateWithCode: async (authCode: string): Promise<AxiosResponse<Authentication> | AxiosError> => {
     try {
       return await apiBackend.post<Authentication>(
-        `/auth/oidc/login`,
+        `/auth/login/`,
         {
           auth_code: authCode,
           redirect_uri: getConfig().system.oidc?.redirectUri
