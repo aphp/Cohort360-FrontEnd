@@ -36,7 +36,7 @@ const AppNavigation = () => {
   return (
     <Router>
       <Routes>
-        {configRoutes.map((route, index) => {
+        {configRoutes().map((route, index) => {
           return route.isPrivate ? (
             // TODO: supprimer la props name qui ne sert à rien sauf pour la key (enfin, à vérifier)
             <Route key={index + route.name} element={<PrivateRoute />}>

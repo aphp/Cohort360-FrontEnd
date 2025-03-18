@@ -112,9 +112,7 @@ const DataTablePatientLine: React.FC<{
       onClick={() => window.open(`/patients/${patient.id}${_groupId}${_search}`, '_blank')}
     >
       <TableCellWrapper>
-        {patient.gender && (
-          <GenderIcon gender={patient.gender.toLocaleUpperCase() as GenderStatus} className={classes.genderIcon} />
-        )}
+        {patient.gender && <GenderIcon gender={patient.gender as GenderStatus} className={classes.genderIcon} />}
       </TableCellWrapper>
       <TableCellWrapper align="left">{deidentified ? 'Prénom' : _patientName}</TableCellWrapper>
       <TableCellWrapper align="left">
@@ -160,7 +158,13 @@ const DataTablePatientLine: React.FC<{
         <Typography onClick={(event) => event.stopPropagation()}>
           {deidentified
             ? patient.id
-            : patient.identifier?.find((identifier) => identifier.type?.coding?.[0].code === 'IPP')?.value ??
+            : patient.identifier?.find(
+                (identifier) =>
+                  identifier.type?.coding?.[0].code ===
+                    appConfig.features.patient.patientIdentifierExtensionCode?.code &&
+                  identifier.type?.coding?.[0].system ===
+                    appConfig.features.patient.patientIdentifierExtensionCode?.system
+              )?.value ??
               patient.identifier?.[0].value ??
               'IPP inconnnu'}
         </Typography>

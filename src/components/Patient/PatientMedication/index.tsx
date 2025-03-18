@@ -51,6 +51,7 @@ export const medicationTabs: MedicationTab[] = [
   { id: ResourceType.MEDICATION_ADMINISTRATION, label: MedicationLabel.ADMINISTRATION }
 ]
 
+// eslint-disable-next-line max-statements
 const PatientMedication = () => {
   const { classes } = useStyles()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -109,7 +110,7 @@ const PatientMedication = () => {
       }
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, removeSearchCriterias, addSearchCriterias }
-  ] = useSearchCriterias(initMedSearchCriterias)
+  ] = useSearchCriterias(initMedSearchCriterias(selectedTab.id))
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({
       code,

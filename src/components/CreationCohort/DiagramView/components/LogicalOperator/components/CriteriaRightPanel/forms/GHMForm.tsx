@@ -56,7 +56,7 @@ export const form: () => CriteriaForm<GhmDataType> = () => ({
   ],
   buildInfo: {
     type: { [ResourceType.CLAIM]: CriteriaType.CLAIM },
-    defaultFilter: 'patient.active=true'
+    defaultFilter: getConfig().core.fhir.filterActive ? 'patient.active=true' : ''
   },
   itemSections: [
     {
