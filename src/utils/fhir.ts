@@ -5,7 +5,7 @@ export const getExtension = (
   url?: string,
   ...alternativeUrls: string[]
 ): Extension | undefined => {
-  if (resource && resource.extension && url) {
+  if (resource?.extension && url) {
     return resource.extension.find((item) => item.url === url || alternativeUrls.includes(item.url || ''))
   }
   return undefined
