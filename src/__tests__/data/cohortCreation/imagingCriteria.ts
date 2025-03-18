@@ -3,6 +3,17 @@ import {
   form
 } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/ImagingForm'
 import { Comparators } from 'types/requestCriterias'
+import { updateConfig } from 'config'
+
+updateConfig({
+  features: {
+    imaging: {
+      fhir: {
+        searchParams: ['numberOfSeries']
+      }
+    }
+  }
+})
 
 export const defaultImagingCriteria: ImagingDataType = {
   id: 1,

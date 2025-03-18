@@ -10,14 +10,8 @@ import { EncounterDataType } from 'components/CreationCohort/DiagramView/compone
 import { MedicationDataType } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/MedicationForm'
 import { PregnancyDataType } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/PregnancyForm'
 import { IPPListDataType } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/IPPForm'
-
-export enum QuestionnaireResponseParamsKeys {
-  NAME = 'questionnaire.name',
-  DATE = 'authored',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status',
-  IPP = 'subject.identifier'
-}
+import { onUpdateConfig } from 'config'
+import { hasSearchParam } from 'services/aphp/serviceFhirConfig'
 
 export enum IppParamsKeys {
   IPP_LIST_FHIR = 'identifier.value'
@@ -57,117 +51,127 @@ export enum PatientsParamsKeys {
   DEATHDATE = 'death-date'
 }
 
-export enum EncounterParamsKeys {
-  DURATION = 'length',
-  MIN_BIRTHDATE_DAY = 'start-age-visit',
-  MIN_BIRTHDATE_MONTH = 'start-age-visit-month',
-  ENTRYMODE = 'admission-mode',
-  EXITMODE = 'discharge-disposition-mode',
-  PRISENCHARGETYPE = 'class',
-  TYPEDESEJOUR = 'stay',
-  ADMISSIONMODE = 'reason-code',
-  REASON = 'admission-destination-type',
-  DESTINATION = 'discharge-disposition',
-  PROVENANCE = 'admit-source',
-  ADMISSION = 'admission-type',
-  SERVICE_PROVIDER = 'encounter-care-site',
-  STATUS = 'status',
-  START_DATE = 'period-start',
-  END_DATE = 'period-end'
+const encounterCareSite = 'service-provider'
+
+export const EncounterParamsKeys = {
+  DURATION: 'length',
+  MIN_BIRTHDATE_DAY: 'start-age-visit',
+  MIN_BIRTHDATE_MONTH: 'start-age-visit-month',
+  ENTRYMODE: 'admission-mode',
+  EXITMODE: 'discharge-disposition-mode',
+  PRISENCHARGETYPE: 'class',
+  TYPEDESEJOUR: 'stay',
+  ADMISSIONMODE: 'reason-code',
+  REASON: 'admission-destination-type',
+  DESTINATION: 'discharge-disposition',
+  PROVENANCE: 'admit-source',
+  ADMISSION: 'admission-type',
+  SERVICE_PROVIDER: encounterCareSite,
+  STATUS: 'status',
+  START_DATE: 'period-start',
+  END_DATE: 'period-end'
 }
 
-export enum DocumentsParamsKeys {
-  IPP = 'subject.identifier',
-  DOC_STATUSES = 'docstatus',
-  DOC_TYPES = 'type',
-  ONLY_PDF_AVAILABLE = 'onlyPdfAvailable',
-  NDA = 'encounter.identifier',
-  DATE = 'date',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status'
+export const DocumentsParamsKeys = {
+  IPP: 'subject.identifier',
+  DOC_STATUSES: 'docstatus',
+  DOC_TYPES: 'type',
+  ONLY_PDF_AVAILABLE: 'onlyPdfAvailable',
+  NDA: 'encounter.identifier',
+  DATE: 'date',
+  EXECUTIVE_UNITS: `encounter.${encounterCareSite}`,
+  ENCOUNTER_STATUS: 'encounter.status'
 }
 
-export enum ConditionParamsKeys {
-  NDA = 'encounter.identifier',
-  CODE = 'code',
-  DIAGNOSTIC_TYPES = 'orbis-status',
-  DATE = 'recorded-date',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  SOURCE = '_source',
-  ENCOUNTER_STATUS = 'encounter.status',
-  IPP = 'subject.identifier'
+export const ConditionParamsKeys = {
+  NDA: 'encounter.identifier',
+  CODE: 'code',
+  DIAGNOSTIC_TYPES: 'orbis-status',
+  DATE: 'recorded-date',
+  EXECUTIVE_UNITS: `encounter.${encounterCareSite}`,
+  SOURCE: '_source',
+  ENCOUNTER_STATUS: 'encounter.status',
+  IPP: 'subject.identifier'
 }
 
-export enum ProcedureParamsKeys {
-  NDA = 'encounter.identifier',
-  CODE = 'code',
-  SOURCE = '_source',
-  DATE = 'date',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status',
-  IPP = 'subject.identifier'
+export const ProcedureParamsKeys = {
+  NDA: 'encounter.identifier',
+  CODE: 'code',
+  SOURCE: '_source',
+  DATE: 'date',
+  EXECUTIVE_UNITS: `encounter.${encounterCareSite}`,
+  ENCOUNTER_STATUS: 'encounter.status',
+  IPP: 'subject.identifier'
 }
 
-export enum ClaimParamsKeys {
-  NDA = 'encounter.identifier',
-  CODE = 'diagnosis',
-  DATE = 'created',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status',
-  IPP = 'patient.identifier'
+export const ClaimParamsKeys = {
+  NDA: 'encounter.identifier',
+  CODE: 'diagnosis',
+  DATE: 'created',
+  EXECUTIVE_UNITS: `encounter.${encounterCareSite}`,
+  ENCOUNTER_STATUS: 'encounter.status',
+  IPP: 'patient.identifier'
 }
 
-export enum PrescriptionParamsKeys {
-  NDA = 'encounter.identifier',
-  PRESCRIPTION_TYPES = 'category',
-  IPP = 'subject.identifier',
-  DATE = 'validity-period-start',
-  END_DATE = 'validity-period-end',
-  CODE = 'code',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status',
-  PRESCRIPTION_ROUTES = 'dosage-instruction-route'
+export const PrescriptionParamsKeys = {
+  NDA: 'encounter.identifier',
+  PRESCRIPTION_TYPES: 'category',
+  IPP: 'subject.identifier',
+  DATE: 'validity-period-start',
+  END_DATE: 'validity-period-end',
+  CODE: 'code',
+  EXECUTIVE_UNITS: `encounter.${encounterCareSite}`,
+  ENCOUNTER_STATUS: 'encounter.status',
+  PRESCRIPTION_ROUTES: 'dosage-instruction-route'
 }
 
-export enum AdministrationParamsKeys {
-  NDA = 'context.identifier',
-  IPP = 'subject.identifier',
-  ADMINISTRATION_ROUTES = 'dosage-route',
-  DATE = 'effective-time',
-  CODE = 'code',
-  EXECUTIVE_UNITS = 'context.encounter-care-site',
-  ENCOUNTER_STATUS = 'context.status'
+export const AdministrationParamsKeys = {
+  NDA: 'context.identifier',
+  IPP: 'subject.identifier',
+  ADMINISTRATION_ROUTES: 'dosage-route',
+  DATE: 'effective-time',
+  CODE: 'code',
+  EXECUTIVE_UNITS: `context.${encounterCareSite}`,
+  ENCOUNTER_STATUS: 'context.status'
 }
 
-export enum ObservationParamsKeys {
-  NDA = 'encounter.identifier',
-  VALIDATED_STATUS = 'status',
-  DATE = 'date',
-  VALUE = 'value-quantity',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status',
-  IPP = 'subject.identifier',
-  CODE = 'code'
+export const ObservationParamsKeys = {
+  NDA: 'encounter.identifier',
+  VALIDATED_STATUS: 'status',
+  DATE: 'date',
+  VALUE: 'value-quantity',
+  EXECUTIVE_UNITS: `encounter.${encounterCareSite}`,
+  ENCOUNTER_STATUS: 'encounter.status',
+  IPP: 'subject.identifier',
+  CODE: 'code'
 }
 
-export enum ImagingParamsKeys {
-  IPP = 'patient.identifier',
-  MODALITY = 'modality',
-  NDA = 'encounter.identifier',
-  DATE = 'started',
-  STUDY_DESCRIPTION = 'description',
-  STUDY_PROCEDURE = 'procedureCode',
-  NB_OF_SERIES = 'numberOfSeries',
-  NB_OF_INS = 'numberOfInstances',
-  WITH_DOCUMENT = 'with-document',
-  STUDY_UID = 'identifier',
-  SERIES_DATE = 'series-started',
-  SERIES_DESCRIPTION = 'series-description',
-  SERIES_PROTOCOL = 'series-protocol',
-  SERIES_MODALITIES = 'series-modality',
-  SERIES_UID = 'series',
-  EXECUTIVE_UNITS = 'encounter.encounter-care-site',
-  ENCOUNTER_STATUS = 'encounter.status'
+export const ImagingParamsKeys = {
+  IPP: 'patient.identifier',
+  MODALITY: 'modality',
+  NDA: 'encounter.identifier',
+  DATE: 'started',
+  STUDY_DESCRIPTION: 'description',
+  STUDY_PROCEDURE: 'procedureCode',
+  NB_OF_SERIES: 'numberOfSeries',
+  NB_OF_INS: 'numberOfInstances',
+  WITH_DOCUMENT: 'with-document',
+  STUDY_UID: 'identifier',
+  SERIES_DATE: 'series-started',
+  SERIES_DESCRIPTION: 'series-description',
+  SERIES_PROTOCOL: 'series-protocol',
+  SERIES_MODALITIES: 'series-modality',
+  SERIES_UID: 'series',
+  EXECUTIVE_UNITS: `encounter.${encounterCareSite}`,
+  ENCOUNTER_STATUS: 'encounter.status'
+}
+
+export const QuestionnaireResponseParamsKeys = {
+  NAME: 'questionnaire.name',
+  DATE: 'authored',
+  EXECUTIVE_UNITS: `encounter.${encounterCareSite}`,
+  ENCOUNTER_STATUS: 'encounter.status',
+  IPP: 'subject.identifier'
 }
 
 export enum FormParamsKeys {
@@ -253,3 +257,22 @@ export enum VitalStatusLabel {
   DECEASED = 'Décédé(e)',
   ALL = 'Tous les patients'
 }
+
+// Update the config dynamically
+onUpdateConfig((config) => {
+  const encounterCareSite = hasSearchParam(ResourceType.ENCOUNTER, 'encounter-care-site', config)
+    ? 'encounter-care-site'
+    : 'service-provider'
+  console.log('updated config', config)
+
+  EncounterParamsKeys.SERVICE_PROVIDER = encounterCareSite
+  DocumentsParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
+  ConditionParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
+  ProcedureParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
+  ClaimParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
+  PrescriptionParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
+  AdministrationParamsKeys.EXECUTIVE_UNITS = `context.${encounterCareSite}`
+  ObservationParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
+  ImagingParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
+  QuestionnaireResponseParamsKeys.EXECUTIVE_UNITS = `encounter.${encounterCareSite}`
+})

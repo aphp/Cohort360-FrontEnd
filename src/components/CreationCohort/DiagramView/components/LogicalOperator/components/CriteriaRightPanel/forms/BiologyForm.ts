@@ -24,6 +24,17 @@ export type ObservationDataType = CommonCriteriaData &
     enableSearchByValue: boolean
   }
 
+const getDefaultFilter = () => {
+  const defaultFilters = []
+  defaultFilters.push(getConfig().core.fhir.filterActive ? 'subject.active=true' : '')
+  defaultFilters.push(
+    getConfig().features.observation.useObservationDefaultValidated
+      ? `${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`
+      : ''
+  )
+  return defaultFilters.join('&')
+}
+
 export const form: () => CriteriaForm<ObservationDataType> = () => ({
   label: 'de biologie',
   title: 'Biologie',
@@ -50,7 +61,7 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
   ],
   buildInfo: {
     type: { [ResourceType.OBSERVATION]: CriteriaType.OBSERVATION },
-    defaultFilter: `subject.active=true&${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`
+    defaultFilter: getDefaultFilter()
   },
   itemSections: [
     {
@@ -121,9 +132,11 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
               const typedData = data as ObservationDataType
               return typedData.code?.length !== 1 || !typedData.code[0].isLeaf || !data.enableSearchByValue
             },
-            buildMethodExtraArgs: [{ type: 'string', value: 'le0,ge0' }],
+            buildMethodExtraArgs: getConfig().features.observation.useObservationValueRestriction
+              ? [{ type: 'string', value: 'le0,ge0' }]
+              : [],
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Valeur' }],
-            unbuildIgnoreValues: ['le0,ge0']
+            unbuildIgnoreValues: getConfig().features.observation.useObservationValueRestriction ? ['le0,ge0'] : []
           }
         },
         {

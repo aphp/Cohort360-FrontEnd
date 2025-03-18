@@ -1,9 +1,10 @@
-import React, { createContext, ReactNode } from 'react'
+import React, { createContext, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 import { Root } from 'react-dom/client'
 import * as R from 'ramda'
 import { CONFIG_URL } from 'constants.js'
 import { LabelObject } from 'types/searchCriterias'
 import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
+import { DeepPartial } from 'redux'
 
 type ValueSetConfig = {
   url: string
@@ -11,126 +12,127 @@ type ValueSetConfig = {
   data?: LabelObject[]
 }
 
+type FeatureConfig = {
+  enabled: boolean
+}
+
+export type ResourceFeatureConfig = FeatureConfig & {
+  fhir: {
+    searchParams: string[]
+  }
+}
+
+type ResourceWithValuesetsFeatureConfig<ValueSetEnum> = ResourceFeatureConfig & {
+  valueSets: {
+    [K in keyof ValueSetEnum]: ValueSetConfig
+  }
+}
+
 export type AppConfig = {
   labels: {
     exploration: string
   }
   features: {
-    cohort: {
-      enabled: boolean
+    cohort: FeatureConfig & {
       shortCohortLimit: number
       identifyingFields: string[]
     }
-    diagnosticReport: {
-      enabled: boolean
+    patient: ResourceWithValuesetsFeatureConfig<{ demographicGender: ValueSetConfig }> & {
+      textSearch: boolean
+      useAgeParams: boolean
+      patientIdentifierExtensionCode?: { system: string; code: string }
+    }
+    encounter: ResourceFeatureConfig & {
+      useNDA: boolean
+    }
+    diagnosticReport: FeatureConfig & {
       useStudyParam: boolean
     }
-    export: {
-      enabled: boolean
+    export: FeatureConfig & {
       exportLinesLimit: number
       exportTables: string
     }
-    observation: {
-      enabled: boolean
-      valueSets: {
-        biologyHierarchyAnabio: ValueSetConfig
-        biologyHierarchyLoinc: ValueSetConfig
-      }
-    }
-    medication: {
-      enabled: boolean
-      valueSets: {
-        medicationAdministrations: ValueSetConfig
-        medicationAtc: ValueSetConfig
-        medicationAtcOrbis: ValueSetConfig
-        medicationPrescriptionTypes: ValueSetConfig
-        medicationUcd: ValueSetConfig
-      }
-    }
-    condition: {
-      enabled: boolean
-      valueSets: {
-        conditionHierarchy: ValueSetConfig
-        conditionStatus: ValueSetConfig
-      }
+    observation: ResourceWithValuesetsFeatureConfig<{
+      biologyHierarchyAnabio: ValueSetConfig
+      biologyHierarchyLoinc: ValueSetConfig
+    }> & { useObservationValueRestriction: boolean; useObservationDefaultValidated: boolean }
+    medication: ResourceWithValuesetsFeatureConfig<{
+      medicationAdministrations: ValueSetConfig
+      medicationAtc: ValueSetConfig
+      medicationAtcOrbis: ValueSetConfig
+      medicationPrescriptionTypes: ValueSetConfig
+      medicationUcd: ValueSetConfig
+    }>
+    condition: ResourceWithValuesetsFeatureConfig<{
+      conditionHierarchy: ValueSetConfig
+      conditionStatus: ValueSetConfig
+    }> & {
       extensions: {
         orbisStatus?: string
       }
     }
-    procedure: {
-      enabled: boolean
-      valueSets: {
-        procedureHierarchy: ValueSetConfig
-      }
+    procedure: ResourceWithValuesetsFeatureConfig<{ procedureHierarchy: ValueSetConfig }>
+    documentReference: ResourceFeatureConfig & {
+      useDocStatus: boolean
     }
-    documentReference: {
-      enabled: boolean
-    }
-    claim: {
-      enabled: boolean
-      valueSets: {
-        claimHierarchy: ValueSetConfig
-      }
-    }
-    imaging: {
-      enabled: boolean
-      valueSets: {
-        imagingModalities: ValueSetConfig
-      }
+    claim: ResourceWithValuesetsFeatureConfig<{ claimHierarchy: ValueSetConfig }>
+    imaging: ResourceWithValuesetsFeatureConfig<{ imagingModalities: ValueSetConfig }> & {
       extensions: {
         imagingStudyUidUrl: string
         seriesProtocolUrl?: string
       }
     }
-    questionnaires: {
-      enabled: boolean
+    questionnaires: ResourceWithValuesetsFeatureConfig<{
+      analgesieType: ValueSetConfig
+      birthDeliveryWay: ValueSetConfig
+      cSectionModality: ValueSetConfig
+      childBirthMode: ValueSetConfig
+      hospitReason: ValueSetConfig
+      chirurgicalGesture: ValueSetConfig
+      conditionPerineum: ValueSetConfig
+      exitDiagnostic: ValueSetConfig
+      exitFeedingMode: ValueSetConfig
+      exitPlaceType: ValueSetConfig
+      feedingType: ValueSetConfig
+      imgIndication: ValueSetConfig
+      instrumentType: ValueSetConfig
+      laborOrCesareanEntry: ValueSetConfig
+      maternalRisks: ValueSetConfig
+      maturationModality: ValueSetConfig
+      maturationReason: ValueSetConfig
+      obstetricalGestureDuringLabor: ValueSetConfig
+      pathologyDuringLabor: ValueSetConfig
+      pregnancyMode: ValueSetConfig
+      presentationAtDelivery: ValueSetConfig
+      risksOrComplicationsOfPregnancy: ValueSetConfig
+      risksRelatedToObstetricHistory: ValueSetConfig
+      booleanOpenChoiceFields: ValueSetConfig
+      booleanFields: ValueSetConfig
+      vme: ValueSetConfig
+      birthStatus: ValueSetConfig
+    }> & {
       defaultFilterFormNames?: string[]
-      valueSets: {
-        analgesieType: ValueSetConfig
-        birthDeliveryWay: ValueSetConfig
-        cSectionModality: ValueSetConfig
-        childBirthMode: ValueSetConfig
-        hospitReason: ValueSetConfig
-        chirurgicalGesture: ValueSetConfig
-        conditionPerineum: ValueSetConfig
-        exitDiagnostic: ValueSetConfig
-        exitFeedingMode: ValueSetConfig
-        exitPlaceType: ValueSetConfig
-        feedingType: ValueSetConfig
-        imgIndication: ValueSetConfig
-        instrumentType: ValueSetConfig
-        laborOrCesareanEntry: ValueSetConfig
-        maternalRisks: ValueSetConfig
-        maturationModality: ValueSetConfig
-        maturationReason: ValueSetConfig
-        obstetricalGestureDuringLabor: ValueSetConfig
-        pathologyDuringLabor: ValueSetConfig
-        pregnancyMode: ValueSetConfig
-        presentationAtDelivery: ValueSetConfig
-        risksOrComplicationsOfPregnancy: ValueSetConfig
-        risksRelatedToObstetricHistory: ValueSetConfig
-        booleanOpenChoiceFields: ValueSetConfig
-        booleanFields: ValueSetConfig
-        vme: ValueSetConfig
-        birthStatus: ValueSetConfig
-      }
     }
-    locationMap: {
-      enabled: boolean
+    locationMap: ResourceFeatureConfig & {
       extensions: {
         locationShapeUrl?: string
         locationCount?: string
       }
       minZoom?: number
     }
-    feasibilityReport: {
-      enabled: boolean
-    }
-    contact: {
-      enabled: boolean
-    }
+    feasibilityReport: FeatureConfig
+    contact: FeatureConfig
   }
   core: {
+    fhir: {
+      facetsExtensions: boolean
+      filterActive: boolean
+      useSource: boolean
+      totalCount: boolean
+      selectedCodeOnly: boolean
+      textSearch: boolean
+      valuesetExpansion: boolean
+    }
     pagination: {
       limit: number
     }
@@ -190,6 +192,15 @@ let config: AppConfig = {
     exploration: 'Exploration'
   },
   core: {
+    fhir: {
+      facetsExtensions: true,
+      filterActive: true,
+      totalCount: false,
+      useSource: true,
+      selectedCodeOnly: true,
+      textSearch: true,
+      valuesetExpansion: true
+    },
     pagination: {
       limit: 1000
     },
@@ -230,6 +241,20 @@ let config: AppConfig = {
         'onlyPdfAvailable'
       ]
     },
+    patient: {
+      enabled: true,
+      textSearch: true,
+      useAgeParams: false,
+      fhir: { searchParams: [] },
+      valueSets: { demographicGender: { url: '' } }
+    },
+    encounter: {
+      enabled: true,
+      fhir: {
+        searchParams: []
+      },
+      useNDA: true
+    },
     diagnosticReport: {
       enabled: false,
       useStudyParam: false
@@ -241,6 +266,9 @@ let config: AppConfig = {
     },
     observation: {
       enabled: true,
+      useObservationValueRestriction: true,
+      useObservationDefaultValidated: true,
+      fhir: { searchParams: [] },
       valueSets: {
         biologyHierarchyAnabio: { url: '', title: 'ANABIO' },
         biologyHierarchyLoinc: { url: '', title: 'LOINC' }
@@ -248,6 +276,7 @@ let config: AppConfig = {
     },
     medication: {
       enabled: true,
+      fhir: { searchParams: [] },
       valueSets: {
         medicationAdministrations: { url: '' },
         medicationAtc: { url: '', title: 'ATC' },
@@ -258,6 +287,7 @@ let config: AppConfig = {
     },
     condition: {
       enabled: true,
+      fhir: { searchParams: [] },
       valueSets: {
         conditionHierarchy: { url: '' },
         conditionStatus: { url: '' }
@@ -268,21 +298,26 @@ let config: AppConfig = {
     },
     procedure: {
       enabled: true,
+      fhir: { searchParams: [] },
       valueSets: {
         procedureHierarchy: { url: '' }
       }
     },
     documentReference: {
-      enabled: true
+      enabled: true,
+      fhir: { searchParams: [] },
+      useDocStatus: false
     },
     claim: {
       enabled: true,
+      fhir: { searchParams: [] },
       valueSets: {
         claimHierarchy: { url: '' }
       }
     },
     imaging: {
       enabled: true,
+      fhir: { searchParams: [] },
       valueSets: {
         imagingModalities: { url: '' }
       },
@@ -292,6 +327,7 @@ let config: AppConfig = {
     },
     questionnaires: {
       enabled: false,
+      fhir: { searchParams: [] },
       valueSets: {
         analgesieType: { url: '' },
         birthDeliveryWay: { url: '' },
@@ -336,6 +372,7 @@ let config: AppConfig = {
     },
     locationMap: {
       enabled: false,
+      fhir: { searchParams: [] },
       extensions: {
         locationShapeUrl: 'https://terminology.eds.aphp.fr/fhir/profile/location/extension/shape',
         locationCount: 'https://terminology.eds.aphp.fr/fhir/profile/location/extension/count'
@@ -371,11 +408,29 @@ export const onUpdateConfig = (hook: (newConfig: AppConfig) => void) => {
   updateHooks.push(hook)
 }
 
+export const updateConfig = (newConfig: DeepPartial<AppConfig>) => {
+  config = R.mergeDeepRight(config, newConfig)
+  updateHooks.forEach((hook) => hook(config))
+  return config
+}
+
+const ConfigWrapper = (props: PropsWithChildren<{ config: AppConfig }>) => {
+  const { config, children } = props
+  const [appConfig, setAppConfig] = useState<AppConfig>(config)
+
+  useEffect(() => {
+    onUpdateConfig((newConfig) => {
+      setAppConfig(newConfig)
+    })
+  }, [])
+
+  return <AppConfig.Provider value={appConfig}>{children}</AppConfig.Provider>
+}
+
 export const initConfig = async (root: Root, app: () => ReactNode) => {
   const initApp = (fetchedConfig: AppConfig) => {
-    config = R.mergeDeepRight(config, fetchedConfig)
-    updateHooks.forEach((hook) => hook(config))
-    root.render(<AppConfig.Provider value={config}>{app()}</AppConfig.Provider>)
+    const updatedConfig = updateConfig(fetchedConfig)
+    root.render(<ConfigWrapper config={updatedConfig}>{app()}</ConfigWrapper>)
   }
   try {
     const res = await fetch(CONFIG_URL)

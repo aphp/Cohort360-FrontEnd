@@ -10,6 +10,7 @@ import { DocumentStatuses, FilterByDocumentStatus, SearchByTypes } from 'types/s
 import { getConfig } from 'config'
 import docTypes from 'assets/docTypes.json'
 import { SourceType } from 'types/scope'
+import { hasSearchParam } from 'services/aphp/serviceFhirConfig'
 
 export type DocumentDataType = CommonCriteriaData &
   WithOccurenceCriteriaDataType &
@@ -44,7 +45,8 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   buildInfo: {
     type: { [ResourceType.DOCUMENTS]: CriteriaType.DOCUMENTS },
-    defaultFilter: 'type:not=doc-impor&contenttype=text/plain&subject.active=true'
+    defaultFilter:
+      'type:not=doc-impor&contenttype=text/plain' + (getConfig().core.fhir.filterActive ? '&subject.active=true' : '')
   },
   itemSections: [
     {
@@ -128,6 +130,10 @@ export const form: () => CriteriaForm<DocumentDataType> = () => ({
             }
           ],
           noOptionsText: 'Veuillez entrer un statut de document',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => {
+            return hasSearchParam(ResourceType.DOCUMENTS, DocumentsParamsKeys.DOC_STATUSES)
+          },
           buildInfo: {
             fhirKey: DocumentsParamsKeys.DOC_STATUSES,
             buildMethodExtraArgs: [

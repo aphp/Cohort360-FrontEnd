@@ -19,6 +19,7 @@ import { GenderStatus } from 'types/searchCriterias'
 import { URLS } from 'types/exploration'
 import { ScopeElement } from 'types/scope'
 import { ResourceType } from 'types/requestCriterias'
+import { getConfig } from 'config'
 
 type PatientHeaderProps = {
   loading: boolean
@@ -33,6 +34,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
   deidentifiedBoolean,
   groupId
 }) => {
+  const appConfig = getConfig()
   const navigate = useNavigate()
   const { cohort, cohortId } = useAppSelector((state) => state.exploredCohort)
 
@@ -56,7 +58,6 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
   }
 
   const goBackButtonInfo = goBackToExploredCohort()
-
   const age = getAge(patient as CohortPatient)
   const birthdate = formatDate(patient.birthDate)
   const firstName = patient.name?.[0].given?.[0]
@@ -75,8 +76,11 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
   const ipp = deidentifiedBoolean
     ? `${patient.id ?? '-'}`
     : `${
-        patient.identifier?.find((item) => item.type?.coding?.[0].code === 'IPP')?.value ??
-        patient.identifier?.[0].value
+        patient.identifier?.find(
+          (identifier) =>
+            identifier.type?.coding?.[0].code === appConfig.features.patient.patientIdentifierExtensionCode?.code &&
+            identifier.type?.coding?.[0].system === appConfig.features.patient.patientIdentifierExtensionCode?.system
+        )?.value ?? patient.identifier?.[0].value
       }`
 
   return (

@@ -3,6 +3,7 @@ import React from 'react'
 import useStyles from './styles'
 import { PMSIEntry } from 'types'
 import { Procedure } from 'fhir/r4'
+import { getConfig } from 'config'
 
 /**
  * @usage
@@ -12,6 +13,7 @@ type TimelineItemRightTypes = {
   data: PMSIEntry<Procedure>
 }
 const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
+  const appConfig = getConfig()
   let color = 'red'
   switch (data.status) {
     case 'preparation':
@@ -35,7 +37,7 @@ const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
 
   const { classes } = useStyles({ color: color })
 
-  const codeToDisplay = data.code?.coding?.find((code) => code.userSelected === true)
+  const codeToDisplay = data.code?.coding?.find((code) => !appConfig.core.fhir.selectedCodeOnly || code.userSelected)
 
   return (
     <li className={classes.timelineItem}>

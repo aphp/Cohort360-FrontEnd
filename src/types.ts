@@ -19,6 +19,7 @@ import {
   Period,
   Procedure,
   QuestionnaireResponse,
+  Reference,
   Resource
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
@@ -139,7 +140,7 @@ export type CohortEncounter = Encounter & {
 }
 
 export type CohortPatient = Patient & {
-  lastEncounter?: Encounter
+  lastOrganization?: Reference
   lastProcedure?: Procedure
   mainDiagnosis?: Condition[]
   labResults?: Observation[]

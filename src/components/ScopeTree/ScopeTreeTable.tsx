@@ -20,7 +20,7 @@ import { format } from 'utils/numbers'
 import { CellWrapper, RowContainerWrapper, RowWrapper } from '../Hierarchy/styles'
 import { ScopeElement, SourceType } from 'types/scope'
 import { v4 as uuidv4 } from 'uuid'
-import { isSourceTypeInScopeLevel } from 'utils/perimeters'
+import { isSourceTypeInScopeLevel, perimeterDisplay } from 'utils/perimeters'
 import { sortArray } from 'utils/arrays'
 import { useIsOverflow } from 'hooks/useIsOverflow'
 
@@ -95,7 +95,7 @@ const ScopeTreeRow = ({ item, path, sourceType, mode, loading, onSelect, onExpan
               fontSize={12.5}
               fontWeight={700}
             >
-              {`${source_value} - ${name}`}
+              {perimeterDisplay(source_value, name)}
             </CellWrapper>
           )}
           <CellWrapper item xs={2} textAlign="center" fontSize={11.5}>

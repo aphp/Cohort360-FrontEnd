@@ -5,12 +5,12 @@ import {
   Filters,
   FormNames,
   GenderStatus,
-  GenderStatusLabel,
   LabelObject,
   SearchCriteriaKeys,
   SearchCriterias,
   VitalStatus,
-  VitalStatusLabel
+  VitalStatusLabel,
+  mapGenderStatusToLabel
 } from 'types/searchCriterias'
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
@@ -22,6 +22,7 @@ import { getFullLabelFromCode } from './valueSets'
 import { getDurationRangeLabel } from 'mappers/dates'
 import { ScopeElement } from 'types/scope'
 import { getDurationRangeLabel as getAgeLabel } from './age'
+import { perimeterDisplay } from './perimeters'
 
 export const isChecked = <T>(value: T, arr: T[]): boolean => {
   return arr.includes(value)
@@ -88,7 +89,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   const filterLabelMapper: Partial<Record<FilterKeys, (value: FilterValue) => string>> = {
     [FilterKeys.FAVORITE]: (value) => CohortsTypeLabel[value as CohortsType],
     [FilterKeys.BIRTHDATES]: (value) => getAgeLabel(value as DurationRangeType, 'Âge'),
-    [FilterKeys.GENDERS]: (value) => GenderStatusLabel[value as GenderStatus],
+    [FilterKeys.GENDERS]: (value) => mapGenderStatusToLabel(value as GenderStatus),
     [FilterKeys.FORM_NAME]: (value) => {
       switch (value) {
         case FormNames.HOSPIT:
@@ -107,10 +108,10 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     [FilterKeys.IPP]: (value) => `IPP : ${value}`,
     [FilterKeys.CODE]: (value) => `Code : ${getFullLabelFromCode(value as LabelObject)}`,
     [FilterKeys.SOURCE]: (value) => `Source : ${value}`,
-    [FilterKeys.EXECUTIVE_UNITS]: (value) =>
-      `Unité exécutrice : ${(value as Hierarchy<ScopeElement>).source_value} - ${
-        (value as Hierarchy<ScopeElement>).name
-      }`,
+    [FilterKeys.EXECUTIVE_UNITS]: (value) => {
+      const hierarchy = value as Hierarchy<ScopeElement>
+      return `Unité exécutrice : ${perimeterDisplay(hierarchy.source_value, hierarchy.name)}`
+    },
     [FilterKeys.DOC_STATUSES]: (value) => `Documents : ${(value as LabelObject).label}`,
     [FilterKeys.DOC_TYPES]: (value) => (value as SimpleCodeType).label,
     [FilterKeys.DIAGNOSTIC_TYPES]: (value) => `Type : ${capitalizeFirstLetter((value as LabelObject)?.label ?? '')}`,

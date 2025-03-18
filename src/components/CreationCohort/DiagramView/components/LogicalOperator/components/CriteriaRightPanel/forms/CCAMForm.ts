@@ -41,7 +41,7 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   buildInfo: {
     type: { [ResourceType.PROCEDURE]: CriteriaType.PROCEDURE },
-    defaultFilter: 'subject.active=true'
+    defaultFilter: getConfig().core.fhir.filterActive ? 'subject.active=true' : ''
   },
   itemSections: [
     {

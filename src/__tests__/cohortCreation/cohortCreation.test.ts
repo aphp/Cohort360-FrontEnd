@@ -71,6 +71,17 @@ import { CriteriaItemType } from 'types'
 import { ImagingDataType } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/ImagingForm'
 import { ObservationDataType } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/BiologyForm'
 import { completeClaimCriteria, defaultClaimCriteria } from '__tests__/data/cohortCreation/claimCriteria'
+import { updateConfig } from 'config'
+
+updateConfig({
+  features: {
+    encounter: {
+      fhir: {
+        searchParams: ['encounter-care-site']
+      }
+    }
+  }
+})
 
 let allCriterias: CriteriaItemType[] | undefined = undefined
 

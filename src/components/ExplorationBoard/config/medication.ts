@@ -56,9 +56,12 @@ const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<Add
   return { ...additionalInfo, references, sourceType, ...resolved }
 }
 
-const initSearchCriterias = (search: string): SearchCriterias<MedicationFilters> => ({
+const initSearchCriterias = (
+  search: string,
+  medType: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION
+): SearchCriterias<MedicationFilters> => ({
   orderBy: {
-    orderBy: Order.PERIOD_START,
+    orderBy: medType === ResourceType.MEDICATION_REQUEST ? Order.DATE : Order.EFFECTIVE_TIME,
     orderDirection: Direction.DESC
   },
   searchInput: search,
@@ -280,7 +283,7 @@ export const medicationRequestConfig = (
   type: ResourceType.MEDICATION_REQUEST,
   deidentified,
   displayOptions,
-  initSearchCriterias: () => initSearchCriterias(search),
+  initSearchCriterias: () => initSearchCriterias(search, ResourceType.MEDICATION_REQUEST),
   fetchList: (fetchParams, options, signal) =>
     fetchRequestList(fetchParams, options, patient, deidentified, groupId, signal),
   mapToTable: (data) => mapToTable(data, deidentified, !!patient, groupId, ResourceType.MEDICATION_REQUEST),
@@ -303,7 +306,7 @@ export const medicationAdministrationConfig = (
   type: ResourceType.MEDICATION_ADMINISTRATION,
   deidentified,
   displayOptions,
-  initSearchCriterias: () => initSearchCriterias(search),
+  initSearchCriterias: () => initSearchCriterias(search, ResourceType.MEDICATION_ADMINISTRATION),
   fetchList: (fetchParams, options, signal) =>
     fetchAdministrationList(fetchParams, options, patient, deidentified, groupId, signal),
   mapToTable: (data) => mapToTable(data, deidentified, !!patient, groupId, ResourceType.MEDICATION_ADMINISTRATION),
