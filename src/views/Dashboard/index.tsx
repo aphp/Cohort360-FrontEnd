@@ -56,7 +56,9 @@ const Dashboard: React.FC<{
       case 'patients':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'preview', to: '/my-patients/preview', disabled: false },
+          ...(appConfig.core.fhir.facetsExtensions
+            ? [{ label: 'Aperçu', value: 'preview', to: '/my-patients/preview', disabled: false }]
+            : []),
           { label: 'Patients', value: 'patients', to: '/my-patients/patients', disabled: false },
           ...(ODD_DOCUMENT_REFERENCE
             ? [{ label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false }]

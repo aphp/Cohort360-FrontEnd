@@ -58,7 +58,9 @@ export const form: () => CriteriaForm<PregnancyDataType> = () => ({
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   buildInfo: {
     type: { [ResourceType.QUESTIONNAIRE_RESPONSE]: CriteriaType.PREGNANCY },
-    defaultFilter: `subject.active=true&questionnaire.name=${FormNames.PREGNANCY}&status=in-progress,completed`,
+    defaultFilter:
+      (getConfig().core.fhir.filterActive ? 'subject.active=true&' : '') +
+      `questionnaire.name=${FormNames.PREGNANCY}&status=in-progress,completed`,
     subType: FormNames.PREGNANCY
   },
   itemSections: [

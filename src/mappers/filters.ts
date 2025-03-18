@@ -460,7 +460,10 @@ const mapAdministrationToRequestParams = (filters: MedicationFilters) => {
 
 const mapBiologyToRequestParams = (filters: BiologyFilters) => {
   const { code, validatedStatus, nda, endDate, startDate, executiveUnits, encounterStatus } = filters
-  const requestParams: string[] = ['value-quantity=ge0,le0', 'subject.active=true']
+  const appConfig = getConfig()
+  const requestParams: string[] = []
+  if (appConfig.core.fhir.filterActive) requestParams.push('subject.active=true')
+  if (appConfig.features.observation.useObservationValueRestriction) requestParams.push('value-quantity=ge0,le0')
   if (code.length)
     requestParams.push(
       `${ObservationParamsKeys.CODE}=${encodeURIComponent(code.map((e) => `${e.system}|${e.id}`).join(','))}`
@@ -551,9 +554,13 @@ const getDefaultOrderBy = (type: ResourceType) => {
         orderDirection: Direction.DESC
       }
     case ResourceType.MEDICATION_REQUEST:
+      return {
+        orderBy: Order.DATE,
+        orderDirection: Direction.DESC
+      }
     case ResourceType.MEDICATION_ADMINISTRATION:
       return {
-        orderBy: Order.PERIOD_START,
+        orderBy: Order.EFFECTIVE_TIME,
         orderDirection: Direction.DESC
       }
     case ResourceType.OBSERVATION:
