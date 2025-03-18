@@ -11,20 +11,25 @@ import AppNavigation from './components/Routes/AppNavigation/AppNavigation'
 import WarningDialog from 'components/ui/WarningDialog'
 
 import { store, persistor } from './state/store'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import 'moment/dist/locale/fr'
 
 moment.locale('fr')
 
+const queryClient = new QueryClient()
+
 const App = () => (
   <LocalizationProvider dateAdapter={MomentUtils}>
     <Provider store={store}>
-      <WarningDialog />
-      <PersistGate loading={null} persistor={persistor}>
-        <CssBaseline />
+      <QueryClientProvider client={queryClient}>
+        <WarningDialog />
+        <PersistGate loading={null} persistor={persistor}>
+          <CssBaseline />
 
-        <AppNavigation />
-      </PersistGate>
+          <AppNavigation />
+        </PersistGate>
+      </QueryClientProvider>
     </Provider>
   </LocalizationProvider>
 )

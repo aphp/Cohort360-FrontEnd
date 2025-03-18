@@ -1,15 +1,17 @@
-import { FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material'
+import { Checkbox, FormControlLabel, FormGroup, Typography } from '@mui/material'
 import { InputWrapper } from 'components/ui/Inputs'
 import { FormContext } from 'components/ui/Modal'
 import React, { useContext, useEffect, useState } from 'react'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
+import { isChecked, toggleFilter } from 'utils/filters'
 
 type CohortsTypesFilterProps = {
-  value: CohortsType
+  value: CohortsType[]
   name: string
+  disabled?: boolean
 }
 
-const CohortsTypesFilter = ({ name, value }: CohortsTypesFilterProps) => {
+const CohortsTypesFilter = ({ name, value, disabled = false }: CohortsTypesFilterProps) => {
   const context = useContext(FormContext)
   const [cohortsType, setCohortsType] = useState(value)
 
@@ -20,24 +22,27 @@ const CohortsTypesFilter = ({ name, value }: CohortsTypesFilterProps) => {
   return (
     <InputWrapper>
       <Typography variant="h3">Favoris :</Typography>
-      <RadioGroup
-        name="favorite"
-        value={cohortsType}
-        onChange={(event) => setCohortsType(event.target.value as CohortsType)}
+      <FormGroup
         row={true}
+        onChange={(e) =>
+          setCohortsType(toggleFilter(cohortsType, (e.target as HTMLInputElement).value) as CohortsType[])
+        }
       >
-        <FormControlLabel value={CohortsType.ALL} control={<Radio color="secondary" />} label={CohortsTypeLabel.ALL} />
         <FormControlLabel
+          disabled={disabled}
+          checked={isChecked(CohortsType.FAVORITE, cohortsType)}
           value={CohortsType.FAVORITE}
-          control={<Radio color="secondary" />}
+          control={<Checkbox color="secondary" />}
           label={CohortsTypeLabel.FAVORITE}
         />
         <FormControlLabel
+          disabled={disabled}
+          checked={isChecked(CohortsType.NOT_FAVORITE, cohortsType)}
           value={CohortsType.NOT_FAVORITE}
-          control={<Radio color="secondary" />}
+          control={<Checkbox color="secondary" />}
           label={CohortsTypeLabel.NOT_FAVORITE}
         />
-      </RadioGroup>
+      </FormGroup>
     </InputWrapper>
   )
 }

@@ -1,6 +1,17 @@
 import { Month } from 'types'
 import moment from 'moment/moment'
 
+export const isDateValid = (date?: string | null, format = 'YYYY-MM-DD') => {
+  if (!date) return false
+  return moment(date, format, true).isValid()
+}
+
+const formatDate = (date?: string, withHour?: boolean) => {
+  const _date = moment(date)
+  const format = `DD/MM/YYYY${withHour ? ' - HH:mm:ss' : ''}`
+  return date && _date.isValid() ? _date.format(format) : 'N/A'
+}
+
 const getStringMonth = (monthNumber: number): Month | undefined => {
   switch (monthNumber) {
     case 0:
@@ -69,4 +80,4 @@ const getDaysLeft = (date: Date): number => {
   return moment(date).diff(new Date(), 'days')
 }
 
-export { getStringMonth, getStringMonthAphp, getDaysLeft }
+export { formatDate, getStringMonth, getStringMonthAphp, getDaysLeft }
