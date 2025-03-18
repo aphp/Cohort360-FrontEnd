@@ -23,18 +23,6 @@ import { getFullLabelFromCode } from './valueSets'
 import { getDurationRangeLabel } from 'mappers/dates'
 import { ScopeElement } from 'types/scope'
 
-export const getCohortsTypeLabel = (type: CohortsType): string => {
-  switch (type) {
-    case CohortsType.FAVORITE:
-      return CohortsTypeLabel.FAVORITE
-    case CohortsType.LAST:
-      return CohortsTypeLabel.LAST
-    case CohortsType.NOT_FAVORITE:
-      return CohortsTypeLabel.NOT_FAVORITE
-  }
-  return CohortsTypeLabel.ALL
-}
-
 export const isChecked = <T>(value: T, arr: T[]): boolean => {
   return arr.includes(value)
 }
@@ -71,6 +59,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.FORM_NAME:
       case FilterKeys.ENCOUNTER_STATUS:
       case FilterKeys.SOURCE:
+      case FilterKeys.FAVORITE:
         castedFilters[key] = removeElementInArray(castedFilters[key], value)
         break
       case FilterKeys.NDA:
@@ -87,9 +76,6 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.MAX_PATIENTS:
         castedFilters[key] = null
         break
-      case FilterKeys.FAVORITE:
-        castedFilters[key] = CohortsType.ALL
-        break
       case FilterKeys.ONLY_PDF_AVAILABLE:
         castedFilters[key] = false
         break
@@ -100,7 +86,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
 
 export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.FAVORITE) {
-    return getCohortsTypeLabel(value as CohortsType)
+    return CohortsTypeLabel[value as CohortsType]
   }
   if (key === FilterKeys.BIRTHDATES) {
     return getAgeLabel(value as DurationRangeType, 'Âge')
@@ -211,6 +197,7 @@ export const selectFiltersAsArray = (filters: Filters, searchInput: string | und
         case FilterKeys.FORM_NAME:
         case FilterKeys.ENCOUNTER_STATUS:
         case FilterKeys.SOURCE:
+        case FilterKeys.FAVORITE:
           ;(value as []).forEach((elem) => {
             if (elem) result.push({ category: key, label: getFilterLabel(key, elem), value: elem })
           })
@@ -244,15 +231,6 @@ export const selectFiltersAsArray = (filters: Filters, searchInput: string | und
               value: elem
             })
           )
-          break
-        case FilterKeys.FAVORITE:
-          if (value !== CohortsType.ALL) {
-            result.push({
-              category: key,
-              label: getFilterLabel(key, value),
-              value: value as FilterValue
-            })
-          }
           break
         case FilterKeys.VALIDATED_STATUS:
           result.push({

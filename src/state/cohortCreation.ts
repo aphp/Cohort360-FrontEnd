@@ -7,14 +7,13 @@ import {
   TemporalConstraintsKind,
   QuerySnapshotInfo,
   CurrentSnapshot,
-  CohortJobStatus,
+  JobStatus,
   CriteriaGroupType
 } from 'types'
 import { buildRequest, unbuildRequest, joinRequest, checkNominativeCriteria } from 'utils/cohortCreation'
 
 import { logout, login, impersonate } from './me'
-import { addRequest, deleteRequest } from './request'
-import { deleteProject } from './project'
+import { addRequest } from './request'
 
 import services from 'services/aphp'
 import { SelectedCriteriaType } from 'types/requestCriterias'
@@ -213,11 +212,11 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
             const uuid = newSnapshot.uuid
             const created_at = newSnapshot.created_at
             const title = newSnapshot.title
-            const has_linked_cohorts = newSnapshot.has_linked_cohorts
+            const cohorts_count = newSnapshot.cohorts_count
             const version = newSnapshot.version
 
             currentSnapshot = { ...newSnapshot, navHistoryIndex: navHistory.length }
-            snapshotsHistory = [{ uuid, created_at, title, has_linked_cohorts, version }]
+            snapshotsHistory = [{ uuid, created_at, title, cohorts_count, version }]
             _navHistory.push(currentSnapshot)
           }
         }
@@ -228,11 +227,11 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
           const uuid = newSnapshot.uuid
           const created_at = newSnapshot.created_at
           const title = newSnapshot.title
-          const has_linked_cohorts = newSnapshot.has_linked_cohorts
+          const cohorts_count = newSnapshot.cohorts_count
           const version = newSnapshot.version
 
           currentSnapshot = { ...newSnapshot, navHistoryIndex: navHistory.length }
-          snapshotsHistory = [{ uuid, created_at, title, has_linked_cohorts, version }, ...snapshotsHistory]
+          snapshotsHistory = [{ uuid, created_at, title, cohorts_count, version }, ...snapshotsHistory]
           _navHistory.push(currentSnapshot)
         }
       }
@@ -688,17 +687,17 @@ const cohortCreationSlice = createSlice({
       state.count = {
         ...state.count,
         status:
-          state.count?.status === CohortJobStatus.PENDING ||
-          state.count?.status === CohortJobStatus.NEW ||
-          state.count?.status === CohortJobStatus.SUSPENDED
-            ? CohortJobStatus.SUSPENDED
+          state.count?.status === JobStatus.PENDING ||
+          state.count?.status === JobStatus.NEW ||
+          state.count?.status === JobStatus.SUSPENDED
+            ? JobStatus.SUSPENDED
             : state.count?.status
       }
     },
     unsuspendCount: (state: CohortCreationState) => {
       state.count = {
         ...state.count,
-        status: CohortJobStatus.PENDING
+        status: JobStatus.PENDING
       }
     },
     updateCount: (state: CohortCreationState, action: PayloadAction<CohortCreationCounterType>) => {
@@ -738,13 +737,13 @@ const cohortCreationSlice = createSlice({
     // countCohortCreation
     builder.addCase(countCohortCreation.pending, (state) => ({
       ...state,
-      status: CohortJobStatus.PENDING,
+      status: JobStatus.PENDING,
       countLoading: true
     }))
     builder.addCase(countCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
-      countLoading: payload?.count?.status === CohortJobStatus.PENDING || payload?.count?.status === CohortJobStatus.NEW
+      countLoading: payload?.count?.status === JobStatus.PENDING || payload?.count?.status === JobStatus.NEW
     }))
     builder.addCase(countCohortCreation.rejected, (state) => ({
       ...state,
@@ -772,9 +771,6 @@ const cohortCreationSlice = createSlice({
       const newRequestName = payload.requestsList ? payload.requestsList[payload.requestsList.length - 1].name : ''
       return { ...state, requestId: newRequestId, requestName: newRequestName, loading: false }
     })
-    // When you delete a request | folder => reset cohort create (if current request is edited state)
-    builder.addCase(deleteRequest.fulfilled, () => defaultInitialState())
-    builder.addCase(deleteProject.fulfilled, () => defaultInitialState())
   }
 })
 

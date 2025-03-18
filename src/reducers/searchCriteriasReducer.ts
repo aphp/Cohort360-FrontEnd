@@ -19,7 +19,6 @@ import {
   CohortsFilters,
   MaternityFormFilters
 } from 'types/searchCriterias'
-import { CohortsType } from 'types/cohorts'
 
 export const initExportSearchCriterias: SearchCriterias<null> = {
   orderBy: {
@@ -39,7 +38,7 @@ export const initCohortsSearchCriterias: SearchCriterias<CohortsFilters> = {
   filters: {
     status: [],
     durationRange: [null, null],
-    favorite: CohortsType.ALL,
+    favorite: [],
     minPatients: null,
     maxPatients: null
   }

@@ -156,9 +156,11 @@ export enum Order {
   MODALITY = 'modality',
   MODIFIED = 'modified_at',
   NAME = 'name',
+  PARENT_FOLDER = 'parent_folder',
   PERIOD_START = 'Period-start',
   PRESCRIPTION_TYPES = 'category-name',
   SUBJECT_IDENTIFIER = 'subject-identifier',
+  REQUEST = 'request',
   UPDATED = 'updated_at',
   ADMINISTRATION_MODE = 'route',
   STATUS = 'status',
@@ -361,11 +363,19 @@ export type DocumentsFilters = GenericFilter & {
 }
 
 export interface CohortsFilters {
-  status: LabelObject[]
-  favorite: CohortsType
-  minPatients: null | string
-  maxPatients: null | string
   durationRange: DurationRangeType
+  status?: ValueSet[]
+  favorite: CohortsType[]
+  minPatients?: null | string
+  maxPatients?: null | string
+  startDate?: null | string
+  endDate?: null | string
+  parentId?: string
+}
+
+export type ProjectsFilters = {
+  startDate: null | string
+  endDate: null | string
 }
 
 export interface SearchCriterias<F> {

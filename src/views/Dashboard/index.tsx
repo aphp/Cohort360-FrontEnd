@@ -141,7 +141,6 @@ const Dashboard = ({ context }: DashboardProps) => {
             ? 'Pseudonymisé'
             : 'Nominatif'
         }
-        afterEdit={() => forceReload()}
       />
       <Grid container justifyContent="center">
         <Grid container item xs={11} minHeight={'96px'}>

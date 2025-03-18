@@ -38,6 +38,7 @@ const AppNavigation = () => {
       <Routes>
         {configRoutes.map((route, index) => {
           return route.isPrivate ? (
+            // TODO: supprimer la props name qui ne sert à rien sauf pour la key (enfin, à vérifier)
             <Route key={index + route.name} element={<PrivateRoute />}>
               <Route
                 key={index + route.name}
@@ -47,7 +48,12 @@ const AppNavigation = () => {
                     <Layout displaySideBar={route.displaySideBar}>{route.element}</Layout>
                   </WebSocketProvider>
                 }
-              />
+              >
+                {route.children &&
+                  route.children.map((child, index) => (
+                    <Route key={index + (child.path ?? '')} path={child.path} element={child.element} />
+                  ))}
+              </Route>
             </Route>
           ) : (
             <Route

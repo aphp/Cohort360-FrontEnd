@@ -8,7 +8,9 @@ export enum Status {
   NEW = 'new',
   STARTED = 'started',
   PENDING = 'pending',
-  FAILED = 'failed'
+  FAILED = 'failed',
+  ERROR = 'error',
+  IN_PROGRESS = 'in-progress'
 }
 
 export const StatusColors: Record<Status, string> = {
@@ -18,7 +20,9 @@ export const StatusColors: Record<Status, string> = {
   [Status.NEW]: '#FFD700',
   [Status.STARTED]: '#FF9800',
   [Status.PENDING]: '#FFEB3B',
-  [Status.FAILED]: '#F44336'
+  [Status.IN_PROGRESS]: '#FFEB3B',
+  [Status.FAILED]: '#F44336',
+  [Status.ERROR]: '#F44336'
 }
 
 type StatusChipProps = {

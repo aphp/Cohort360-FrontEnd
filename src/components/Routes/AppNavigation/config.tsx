@@ -10,12 +10,15 @@ import Dashboard from 'views/Dashboard'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 import PageNotFound from 'views/PageNotFound/PageNotFound'
 import CareSiteView from 'views/Scope/CareSiteView'
-import MyCohorts from 'views/MyCohorts'
-import MyRequests from 'views/MyRequests'
 import DownloadPopup from 'views/DownloadPopup/DownloadPopup'
 import Export from 'pages/Export'
 import ExportRequest from 'pages/ExportRequest'
 import { URLS } from 'types/exploration'
+import MyResearches from 'views/MyResearches'
+import ProjectsList from 'components/Researches/ProjectsList'
+import RequestsList from 'components/Researches/RequestsList'
+import CohortsList from 'components/Researches/CohortsList'
+import SamplesList from 'components/Researches/SamplesList'
 
 // import { ODD_CONTACT } from '../../../constants'
 
@@ -88,34 +91,57 @@ const configRoutes: configRoute[] = [
     element: <CareSiteView />
   },
   /**
-   * Cohort360: Saved Cohorts Page
+   * Cohort360: My Researches
    */
   {
     exact: true,
     displaySideBar: true,
-    path: '/my-cohorts/favorites',
-    name: 'my-cohorts/favorites',
+    path: '/researches',
+    name: 'researches',
     isPrivate: true,
-    element: <MyCohorts favoriteUrl />
-  },
-  {
-    exact: true,
-    displaySideBar: true,
-    path: '/my-cohorts',
-    name: 'my-cohorts',
-    isPrivate: true,
-    element: <MyCohorts />
-  },
-  /**
-   * Cohort360: My Projects + Cohort List Page
-   */
-  {
-    exact: true,
-    displaySideBar: true,
-    path: '/my-requests',
-    name: 'my-requests',
-    isPrivate: true,
-    element: <MyRequests />
+    element: <MyResearches />,
+    children: [
+      {
+        path: 'projects',
+        element: <ProjectsList />
+      },
+      {
+        path: 'projects/:projectId',
+        element: <RequestsList />
+      },
+      {
+        path: 'projects/:projectId/:requestId',
+        element: <CohortsList />
+      },
+      {
+        path: 'projects/:projectId/:requestId/:cohortId',
+        element: <SamplesList />
+      },
+
+      {
+        path: 'requests',
+        element: <RequestsList />
+      },
+      {
+        path: 'requests/:requestId',
+        element: <CohortsList />
+      },
+      {
+        path: 'requests/:requestId/:cohortId',
+        element: <SamplesList />
+      },
+
+      {
+        path: 'cohorts',
+        element: <CohortsList />
+      },
+      { path: 'cohorts/:cohortId', element: <SamplesList /> },
+
+      {
+        path: 'samples',
+        element: <SamplesList />
+      }
+    ]
   },
   /**
    * Cohort360: Cohorts Creation Page

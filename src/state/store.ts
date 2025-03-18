@@ -15,7 +15,6 @@ import message from './message'
 import patient from './patient'
 import project from './project'
 import request from './request'
-import cohort from './cohort'
 import drawer from './drawer'
 import scope from './scope'
 import me from './me'
@@ -36,7 +35,6 @@ const rootReducer = combineReducers({
   message,
   project,
   request,
-  cohort,
   scope,
   patient,
   autoLogout,

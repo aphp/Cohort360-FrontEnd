@@ -1,36 +1,40 @@
-import React, { ReactNode } from 'react'
+import React from 'react'
+import { ButtonOwnProps } from '@mui/material'
 
 import { ButtonWrapper } from './style'
 
-type ButtonProps = {
-  children: ReactNode
+type ButtonProps = ButtonOwnProps & {
+  customVariant?: 'clear' | 'pink'
+  onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  small?: boolean
   width?: string
-  icon?: ReactNode
-  color?: 'primary' | 'inherit' | 'secondary' | 'success' | 'error' | 'info' | 'warning'
-  variant?: 'contained' | 'text' | 'outlined'
-  disabled?: boolean
-  onClick: () => void
 }
 
 const Button = ({
   children,
-  icon,
-  width = '100%',
-  disabled = false,
-  color = 'primary',
+  color,
+  disabled,
+  endIcon,
+  small,
+  startIcon,
+  onClick,
+  customVariant,
   variant = 'contained',
-  onClick
+  width = '100%'
 }: ButtonProps) => {
   return (
     <ButtonWrapper
-      id="DTTB_btn"
-      width={width}
-      variant={variant}
+      small={small}
       color={color}
-      disableElevation
-      onClick={onClick}
-      startIcon={icon}
       disabled={disabled}
+      disableElevation
+      endIcon={endIcon}
+      id="DTTB_btn"
+      onClick={onClick}
+      startIcon={startIcon}
+      variant={variant}
+      width={width}
+      customVariant={customVariant}
     >
       {children}
     </ButtonWrapper>

@@ -1,11 +1,11 @@
-import { Cohort, CohortData } from 'types'
+import { CohortData } from 'types'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { impersonate, login, logout } from './me'
 import { RootState } from 'state'
 
 import services from 'services/aphp'
 import servicesPerimeters from '../services/aphp/servicePerimeters'
-import { GroupMember, Patient } from 'fhir/r4'
+import { Patient } from 'fhir/r4'
 import { isCustomError } from 'utils/perimeters'
 import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
@@ -53,20 +53,6 @@ const defaultInitialState = {
   canMakeExport: false,
   deidentifiedBoolean: undefined
 }
-
-const favoriteExploredCohort = createAsyncThunk<CohortData, { exploredCohort: Cohort }, { state: RootState }>(
-  'exploredCohort/favoriteExploredCohort',
-  async ({ exploredCohort }, { getState }) => {
-    const state = getState()
-
-    const favoriteResult = await services.projects.editCohort({ ...exploredCohort, favorite: !exploredCohort.favorite })
-
-    return {
-      ...state.exploredCohort,
-      favorite: favoriteResult.favorite
-    }
-  }
-)
 
 const fetchExploredCohort = createAsyncThunk<
   CohortData,
@@ -255,20 +241,8 @@ const exploredCohortSlice = createSlice({
       state.originalPatients = originalPatients
       state.excludedPatients = excludedPatients
     },
-    updateCohort: (state: ExploredCohortState, action: PayloadAction<GroupMember[]>) => {
-      return {
-        ...state,
-        cohort:
-          Array.isArray(state.cohort) || !state.cohort
-            ? state.cohort
-            : {
-                ...state.cohort,
-                member: action.payload
-              },
-        importedPatients: [],
-        includedPatients: [],
-        excludedPatients: []
-      }
+    updateCohort: (state: ExploredCohortState, action: PayloadAction<CohortData>) => {
+      return { ...state, ...action.payload }
     }
   },
   extraReducers: (builder) => {
@@ -295,16 +269,16 @@ const exploredCohortSlice = createSlice({
       rightToExplore: true
     }))
     builder.addCase(fetchExploredCohortInBackground.rejected, () => ({ ...defaultInitialState, rightToExplore: false }))
-    builder.addCase(favoriteExploredCohort.pending, (state) => ({ ...state }))
-    builder.addCase(favoriteExploredCohort.fulfilled, (state, { payload }) => ({
-      ...state,
-      ...payload
-    }))
-    builder.addCase(favoriteExploredCohort.rejected, () => ({ ...defaultInitialState }))
   }
 })
 
 export default exploredCohortSlice.reducer
-export { fetchExploredCohort, favoriteExploredCohort, fetchExploredCohortInBackground }
-export const { addImportedPatients, excludePatients, removeImportedPatients, includePatients, removeExcludedPatients } =
-  exploredCohortSlice.actions
+export { fetchExploredCohort, fetchExploredCohortInBackground }
+export const {
+  addImportedPatients,
+  excludePatients,
+  removeImportedPatients,
+  includePatients,
+  removeExcludedPatients,
+  updateCohort
+} = exploredCohortSlice.actions

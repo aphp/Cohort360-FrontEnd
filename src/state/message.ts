@@ -8,10 +8,9 @@ import {
   unbuildCohortCreation,
   fetchRequestCohortCreation
 } from './cohortCreation'
-import { addProject, editProject, deleteProject, fetchProjects } from './project'
-import { addRequest, editRequest, deleteRequest, fetchRequests, moveRequests, deleteRequests } from './request'
-import { addCohort, deleteCohort, editCohort, fetchCohorts } from './cohort'
-import { favoriteExploredCohort, fetchExploredCohort } from './exploredCohort'
+import { fetchProjects } from './project'
+import { addRequest, fetchRequests } from './request'
+import { fetchExploredCohort } from './exploredCohort'
 import { fetchAllProcedures, fetchLastPmsiInfo, fetchPatientInfo } from './patient'
 
 export type MessageState = null | {
@@ -53,53 +52,13 @@ const setMessageSlice = createSlice({
       type: 'error',
       content: 'Une erreur est survenue lors de la sauvegarde de la requête'
     }))
-    builder.addCase(addProject.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la création du projet de recherche'
-    }))
-    builder.addCase(editProject.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la modification du projet de recherche'
-    }))
-    builder.addCase(deleteProject.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la suppression de votre projet de recherche'
-    }))
     builder.addCase(addRequest.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la création de la requête'
     }))
-    builder.addCase(editRequest.rejected, () => ({
-      type: 'error',
-      content: "Une erreur est survenue lors de l'édition de la requête"
-    }))
-    builder.addCase(deleteRequest.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la suppression de votre requête'
-    }))
-    builder.addCase(deleteRequests.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la suppression de vos requêtes'
-    }))
     builder.addCase(countCohortCreation.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la sauvegarde de la requête'
-    }))
-    builder.addCase(fetchCohorts.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération des cohortes'
-    }))
-    builder.addCase(addCohort.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la création de la cohorte'
-    }))
-    builder.addCase(editCohort.rejected, () => ({
-      type: 'error',
-      content: "Une erreur est survenue lors de l'édition de la cohorte"
-    }))
-    builder.addCase(deleteCohort.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la suppression de la cohorte'
     }))
     builder.addCase(fetchRequestCohortCreation.rejected, () => ({
       type: 'error',
@@ -108,10 +67,6 @@ const setMessageSlice = createSlice({
     builder.addCase(fetchExploredCohort.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la récupération de la cohorte'
-    }))
-    builder.addCase(favoriteExploredCohort.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la mise en favori de la cohorte'
     }))
     builder.addCase(fetchPatientInfo.rejected, () => ({
       type: 'error',
@@ -132,10 +87,6 @@ const setMessageSlice = createSlice({
     builder.addCase(fetchRequests.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la récupération des requêtes'
-    }))
-    builder.addCase(moveRequests.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la migration de la requête'
     }))
   }
 })
