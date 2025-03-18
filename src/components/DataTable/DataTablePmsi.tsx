@@ -113,10 +113,11 @@ const DataTablePmsiLine: React.FC<{
   const source = pmsi.meta?.source ?? 'Non renseigné'
 
   const type =
-    getExtension(
-      pmsi,
-      appConfig.features.condition.extensions.orbisStatus
-    )?.valueCodeableConcept?.coding?.[0].code?.toUpperCase() ?? '-'
+    pmsi.resourceType === ResourceType.CONDITION
+      ? pmsi?.category
+          ?.find((e) => e?.coding?.find((a) => a.system === appConfig.features.condition.extensions.orbisStatus))
+          ?.coding?.[0].code?.toUpperCase()
+      : '-'
   const serviceProvider = pmsi.serviceProvider ?? 'Non renseigné'
 
   const groupIdSearch = groupId ? `?groupId=${groupId}` : ''
