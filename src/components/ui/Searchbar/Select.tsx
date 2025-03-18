@@ -1,46 +1,34 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React from 'react'
 import { FormControl, InputLabel, MenuItem, Select as SelectMui } from '@mui/material'
 import { SelectInputWrapper, SelectWrapper } from './styles'
-import { FormContext } from '../Modal'
+import { LabelObject } from 'types/searchCriterias'
 
 type SelectProps<T> = {
   value: T
-  label: string
-  items: { id: T; label: string }[]
-  width?: string
+  label?: string
+  options: LabelObject[]
   disabled?: boolean
-  name?: string
+  radius?: number
   onchange?: (value: T) => void
 }
 
-const Select = <T,>({ value, label, items, width = '100%', disabled, name, onchange }: SelectProps<T>) => {
-  const context = useContext(FormContext)
-  const [activeValue, setActiveValue] = useState<T>(value)
-
-  useEffect(() => {
-    if (context?.updateFormData && name) context.updateFormData(name, activeValue)
-    if (onchange) onchange(activeValue)
-  }, [activeValue])
-
-  useEffect(() => {
-    setActiveValue(value)
-  }, [value])
-
+const Select = <T,>({ value, label, options, disabled, radius, onchange }: SelectProps<T>) => {
   return (
-    <SelectWrapper width={width}>
+    <SelectWrapper width="100%">
       <FormControl variant="outlined">
-        <InputLabel>{label}</InputLabel>
-        <SelectInputWrapper>
+        {label && <InputLabel>{label}</InputLabel>}
+        <SelectInputWrapper radius={radius}>
           <SelectMui
             disabled={disabled}
-            value={activeValue}
-            onChange={(event) => setActiveValue(event.target.value as T)}
+            value={value}
+            onChange={(event) => onchange?.(event.target.value as T)}
             variant="outlined"
             label={label}
+            sx={{ color: '#303030' }}
           >
-            {items.map((item) => (
-              <MenuItem key={item.id as string} value={item.id as string}>
-                {item.label}
+            {options.map((option) => (
+              <MenuItem key={option.id as string} value={option.id as string} sx={{ color: '#303030' }}>
+                {option.label}
               </MenuItem>
             ))}
           </SelectMui>

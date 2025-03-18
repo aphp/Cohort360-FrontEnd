@@ -24,12 +24,6 @@ export default makeStyles()((theme) => ({
   contentShift: {
     marginRight: sidebarWidth
   },
-  tabTitle: {
-    minWidth: 0,
-    color: 'rgba(0, 99, 175, 0.4)',
-    borderBottom: '#CFE4FD 2px inset',
-    padding: '6px 12px'
-  },
   tabContainer: {
     paddingTop: theme.spacing(3),
     width: '100%'
@@ -51,5 +45,43 @@ export default makeStyles()((theme) => ({
     top: 72,
     right: 0,
     position: 'fixed'
+  },
+  paper: {
+    width: 400
+  },
+  sidebar: {
+    backgroundColor: '#FFF',
+    width: 30,
+    height: 101,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    boxShadow: '0px 3px 6px #0000000A',
+    borderRadius: '2px 0px 0px 2px',
+    position: 'fixed',
+    marginLeft: -31
+  },
+  tabs: { marginTop: 20 },
+  tabTitle: {
+    padding: "4px 15px",
+    marginRight: 12,
+    minWidth: 0,
+    fontWeight: 900,
+    color: '#0063af',
+    '&:last-child': {
+      marginRight: 0
+    },
+    '&:hover': {
+      textDecoration: 'underline'
+    }
+  },
+  indicator: {
+    height: 0,
+    opacity: 0
+  },
+  selected: {
+    backgroundColor: '#fff',
+    borderRadius: '50px',
+    padding: '0px 25px'
   }
 }))

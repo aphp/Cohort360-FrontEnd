@@ -56,8 +56,7 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, FetchCohortsParams,
         favorite: cohortsType,
         minPatients: null,
         maxPatients: null,
-        startDate: null,
-        endDate: null
+        durationRange: [null, null]
       }
       const limit = options?.limit || 20
       const offset = ((options?.page ?? 1) - 1) * limit

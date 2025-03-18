@@ -20,14 +20,13 @@ export default makeStyles()((theme: Theme) => ({
       duration: theme.transitions.duration.enteringScreen
     })
   },
-  tabs: { margin: '8px 0' },
+  tabs: { margin: '8px 0px 0px 0px' },
   tabTitle: {
+    padding: '4px 15px',
+    marginRight: 12,
     minWidth: 0,
     fontWeight: 900,
-    color: '#5BC5F2',
-    borderRadius: 4,
-    marginRight: 12,
-    padding: '4px 8px',
+    color: '#0063af',
     '&:last-child': {
       marginRight: 0
     },
@@ -40,6 +39,8 @@ export default makeStyles()((theme: Theme) => ({
     opacity: 0
   },
   selected: {
-    color: '#0063AF'
+    backgroundColor: '#fff',
+    borderRadius: '50px',
+    padding: '0px 25px'
   }
 }))

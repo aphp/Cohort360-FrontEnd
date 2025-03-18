@@ -1,0 +1,127 @@
+import React from 'react'
+import { Alert, Grid, Snackbar } from '@mui/material'
+import SearchSection from './SearchSection'
+import CriteriasSection from './CriteriasSection'
+import { useExplorationBoard } from './useExplorationBoard'
+import { useData } from './useData'
+import { ResourceType } from 'types/requestCriterias'
+import { useEffect } from 'react'
+import DataSection from './DataSection'
+import { useParams, useSearchParams } from 'react-router-dom'
+import { FetchStatus } from 'types'
+import { AlertWrapper } from 'components/ui/Alert'
+import { PatientState } from 'state/patient'
+import { GAP, DEFAULT_OPTIONS, DisplayOptions } from 'types/exploration'
+
+type ExplorationBoardProps = {
+  type: ResourceType
+  deidentified: boolean
+  groupId: string[]
+  patient?: PatientState
+  messages?: string[]
+  displayOptions?: DisplayOptions
+}
+
+const ExplorationBoard = ({
+  type,
+  deidentified,
+  groupId,
+  patient,
+  messages,
+  displayOptions = DEFAULT_OPTIONS
+}: ExplorationBoardProps) => {
+  const [searchParams] = useSearchParams()
+  const page = parseInt(searchParams.get('page') || '1', 10)
+  const { search } = useParams<{ search: string }>()
+  const {
+    fetchStatus,
+    additionalInfo,
+    criterias,
+    searchCriterias,
+    savedFiltersActions,
+    savedFiltersData,
+    onSearch,
+    onSort,
+    onRemoveCriteria,
+    onSaveFilter,
+    resetFetchStatus
+  } = useExplorationBoard(type, deidentified, !!patient, search)
+
+  const { count, pagination, data, dataLoading, onChangePage } = useData(
+    type,
+    displayOptions.display,
+    searchCriterias,
+    page,
+    deidentified,
+    groupId,
+    patient
+  )
+
+  useEffect(() => {
+    console.log('test searchCriterias', searchCriterias)
+  }, [searchCriterias])
+  // searchParams à verifier pour l'url
+  // => const _groupId = groupId ? `?groupId=${groupId}` : ''
+  // => const _search = search ? `&search=${search}` : ''
+  // => const _page = page ? `&page=${page}` : ''
+  // => erreur sur les pmsiTabs / medicationTabs
+  // Vérifier qu'on atterie sur le bon onglet ressource et filtres quand URL
+  // L'option Documents dont les pdf sont disponibles n'est dispo que en non pseudo
+  // TOUS LES TYPES des réponses du service et de useData sont mauvais!!
+  // Le retour en arrière d'un patient sur la liste des patients ne se fait pas correctement
+  // Une recherche se lance (mode pseudo) lorsque le selectBy est modifié alors que ce comportement n'est pas souhaité
+  // Erreur fetch last pmsi
+  // Count des Ressources à corriger
+  return (
+    <Grid item xs={12} container gap={GAP} sx={{ backgroundColor: '#fff' }}>
+      <SearchSection
+        searchCriterias={searchCriterias}
+        infos={additionalInfo}
+        onSearch={(searchCriterias) => onSearch(searchCriterias)}
+        savedFiltersActions={savedFiltersActions}
+        savedFiltersData={savedFiltersData}
+        displayOptions={displayOptions}
+      />
+      {displayOptions.criterias && (
+        <CriteriasSection
+          onDelete={onRemoveCriteria}
+          onSaveFilters={onSaveFilter}
+          value={criterias}
+          displayOptions={displayOptions}
+        />
+      )}
+      {messages?.map((msg, index) => (
+        <AlertWrapper key={index} severity="warning" sx={{ color: '#000' }}>
+          {msg}
+        </AlertWrapper>
+      ))}
+      <DataSection
+        isLoading={dataLoading}
+        infos={additionalInfo}
+        data={data}
+        count={count}
+        isPatient={!!patient}
+        orderBy={searchCriterias.orderBy}
+        pagination={pagination}
+        type={type}
+        onChangePage={onChangePage}
+        onSort={onSort}
+        displayOptions={displayOptions}
+      />
+      {fetchStatus && (
+        <Snackbar
+          open={fetchStatus !== null}
+          onClose={() => resetFetchStatus()}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          autoHideDuration={6000}
+        >
+          <Alert severity={fetchStatus?.status === FetchStatus.SUCCESS ? 'success' : 'error'}>
+            {fetchStatus?.message}
+          </Alert>
+        </Snackbar>
+      )}
+    </Grid>
+  )
+}
+
+export default ExplorationBoard

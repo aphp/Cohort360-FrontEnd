@@ -411,8 +411,8 @@ const servicesProjects: IServiceProjects = {
       accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
 
     let options: string[] = []
-    const { status, favorite, minPatients, maxPatients, startDate, endDate } = filters
-    const _status = status.map((stat) => stat.code)
+    const { status, favorite, minPatients, maxPatients, durationRange } = filters
+    const _status = status.map((stat) => stat.id)
 
     if (limit) options = [...options, `limit=${limit}`]
     if (offset) options = [...options, `offset=${offset}`]
@@ -421,8 +421,8 @@ const servicesProjects: IServiceProjects = {
     if (_status.length > 0) options = [...options, `status=${_status.join()}`]
     if (minPatients) options = [...options, `min_result_size=${minPatients}`]
     if (maxPatients) options = [...options, `max_result_size=${maxPatients}`]
-    if (startDate) options = [...options, `min_fhir_datetime=${startDate}`]
-    if (endDate) options = [...options, `max_fhir_datetime=${endDate}`]
+    if (durationRange[0]) options = [...options, `min_fhir_datetime=${durationRange[0]}`]
+    if (durationRange[1]) options = [...options, `max_fhir_datetime=${durationRange[1]}`]
     if (favorite !== CohortsType.ALL)
       options = [...options, `favorite=${favorite === CohortsType.FAVORITE ? 'true' : 'false'}`]
 
