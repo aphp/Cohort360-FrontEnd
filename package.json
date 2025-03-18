@@ -16,7 +16,7 @@
     "@types/redux-state-sync": "^3.1.5",
     "ace-builds": "^1.16.0",
     "antlr4": "^4.13.1-patch-1",
-    "axios": "^1.6.0",
+    "axios": "^1.8.2",
     "buffer": "^6.0.3",
     "canvas": "^2.11.2",
     "client-oauth2": "^4.2.4",
