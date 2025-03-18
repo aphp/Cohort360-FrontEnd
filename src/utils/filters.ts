@@ -12,7 +12,7 @@ import {
 } from 'types/searchCriterias'
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
-import { ScopeElement, SimpleCodeType, ValueSet } from 'types'
+import { ScopeElement, SimpleCodeType } from 'types'
 import { getDurationRangeLabel } from './age'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
 import { Hierarchy } from 'types/hierarchy'
@@ -134,7 +134,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     }`
   }
   if (key === FilterKeys.DOC_STATUSES) {
-    return `Documents : ${value}`
+    return `Documents :  ${(value as LabelObject).label}`
   }
   if (key === FilterKeys.DOC_TYPES) {
     return (value as SimpleCodeType).label
@@ -149,7 +149,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return `Type de prescription : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
   }
   if (key === FilterKeys.STATUS) {
-    return `Statut : ${(value as ValueSet)?.display}`
+    return `Statut : ${(value as LabelObject)?.label}`
   }
   if (key === FilterKeys.MIN_PATIENTS) {
     return `Au moins ${value} patients`
