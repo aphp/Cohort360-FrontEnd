@@ -23,7 +23,6 @@ import { SelectChangeEvent } from '@mui/material/Select'
 import Chip from 'components/ui/Chip'
 
 import apiFhir from 'services/apiFhir'
-import { set } from 'lodash'
 
 /***********************************
  * Types FHIR minimalistes

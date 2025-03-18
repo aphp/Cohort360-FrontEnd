@@ -11,7 +11,8 @@ import {
   SearchCriteriaKeys,
   SearchCriterias,
   VitalStatus,
-  VitalStatusLabel
+  VitalStatusLabel,
+  mapGenderStatusToLabel
 } from 'types/searchCriterias'
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
@@ -23,6 +24,7 @@ import labels from 'labels.json'
 import { getFullLabelFromCode } from './valueSets'
 import { getDurationRangeLabel } from 'mappers/dates'
 import { ScopeElement } from 'types/scope'
+import { perimeterDisplay } from './perimeters'
 
 export const isChecked = <T>(value: T, arr: T[]): boolean => {
   return arr.includes(value)
@@ -94,7 +96,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return getAgeLabel(value as DurationRangeType, 'Âge')
   }
   if (key === FilterKeys.GENDERS) {
-    return GenderStatusLabel[value as GenderStatus]
+    return mapGenderStatusToLabel(value as GenderStatus)
   }
   if (key === FilterKeys.FORM_NAME) {
     if (value === FormNames.HOSPIT) {
@@ -128,9 +130,8 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return `Source : ${value}`
   }
   if (key === FilterKeys.EXECUTIVE_UNITS) {
-    return `Unité exécutrice :  ${(value as Hierarchy<ScopeElement>).source_value} - ${
-      (value as Hierarchy<ScopeElement>).name
-    }`
+    const hierarchy = value as Hierarchy<ScopeElement>
+    return `Unité exécutrice : ${perimeterDisplay(hierarchy.source_value, hierarchy.name)}`
   }
   if (key === FilterKeys.DOC_STATUSES) {
     return `Documents :  ${(value as LabelObject).label}`

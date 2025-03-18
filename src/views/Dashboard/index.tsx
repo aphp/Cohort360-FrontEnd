@@ -33,7 +33,9 @@ const Dashboard = ({ context }: DashboardProps) => {
   const groupId = useMemo(() => getCleanGroupId(searchParams.get('groupId')), [searchParams])
   const { tabName } = useParams<{ tabName?: ResourceType }>()
   const [selectedSubTab, setSelectedSubTab] = useState<ResourceType | null>(null)
-  const [selectedTab, setSelectedTab] = useState(tabName ?? ResourceType.PREVIEW)
+  const [selectedTab, setSelectedTab] = useState(
+    tabName ?? appConfig.core.fhir.facetsExtensions ? ResourceType.PREVIEW : ResourceType.PATIENT
+  )
   const open = useAppSelector((state) => state.drawer)
   const dashboard = useAppSelector((state) => state.exploredCohort)
   const me = useAppSelector((state) => state.me)
@@ -68,12 +70,16 @@ const Dashboard = ({ context }: DashboardProps) => {
         to: `/${URLS.COHORT}/new/${dashboard.requestId}/${dashboard.snapshotId}`,
         show: context === URLS.COHORT
       },
-      {
-        label: 'Aperçu',
-        value: ResourceType.PREVIEW,
-        to: `/${context}/${ResourceType.PREVIEW}`,
-        show: true
-      },
+      ...(appConfig.core.fhir.facetsExtensions
+        ? [
+            {
+              label: 'Aperçu',
+              value: ResourceType.PREVIEW,
+              to: `/${context}/${ResourceType.PREVIEW}`,
+              show: true
+            }
+          ]
+        : []),
       { label: 'Patients', value: ResourceType.PATIENT, to: `/${context}/${ResourceType.PATIENT}`, show: true },
       {
         label: 'Documents',

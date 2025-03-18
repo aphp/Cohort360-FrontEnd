@@ -11,6 +11,7 @@ import { CohortPatient, IPatientDetails } from 'types'
 
 import useStyles from './styles'
 import { getLastDiagnosisLabels } from 'mappers/pmsi'
+import { getConfig } from 'config'
 
 type PatientPreviewProps = {
   patient?: IPatientDetails
@@ -19,6 +20,7 @@ type PatientPreviewProps = {
 const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBoolean }) => {
   const { classes } = useStyles()
   const [searchParams, setSearchParams] = useSearchParams()
+  const appConfig = getConfig()
   const groupId = searchParams.get('groupId') ?? undefined
 
   useEffect(() => {
@@ -61,7 +63,8 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBo
   const lastProcedure = patient.lastProcedure
     ? patient.lastProcedure === 'loading'
       ? 'loading'
-      : patient.lastProcedure?.code?.coding?.find((code) => code.userSelected === true)?.display
+      : patient.lastProcedure?.code?.coding?.find((code) => !appConfig.core.fhir.selectedCodeOnly || code.userSelected)
+          ?.display
     : '-'
   const lastGhm = patient.lastGhm
     ? patient.lastGhm === 'loading'

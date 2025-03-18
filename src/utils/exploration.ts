@@ -14,7 +14,7 @@ import {
   Bundle
 } from 'fhir/r4'
 import { FHIR_Bundle_Promise_Response, FHIR_API_Response } from 'types'
-import { Data, DataType, ExplorationResults, FetchOptions, FetchParams } from 'types/exploration'
+import { ExplorationResults, FetchOptions, FetchParams } from 'types/exploration'
 import { getCodeList } from 'services/aphp/serviceValueSets'
 import { linkElementWithEncounter, PatientState } from 'state/patient'
 import { getApiResponseResources } from './apiHelpers'
