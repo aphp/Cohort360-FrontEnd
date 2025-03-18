@@ -13,7 +13,7 @@ const NEW_PROJECT_ID = 'new'
 
 interface RequestFormProps {
   currentRequest: RequestType
-  onChangeValue: (key: 'name' | 'parent_folder' | 'description', value: string) => void
+  onChangeValue: (key: 'name' | 'parent_folder' | 'description', value: string | { uuid: string }) => void
   error: 'error_title' | 'error_project' | 'error_project_name' | 'error_regex' | null
   projectName: string
   onChangeProjectName: (value: string) => void
@@ -58,8 +58,8 @@ const RequestForm: React.FC<RequestFormProps> = ({
 
         <Select
           id="criteria-occurrenceComparator-select"
-          value={currentRequest.parent_folder}
-          onChange={(event) => onChangeValue('parent_folder', event.target.value as string)}
+          value={currentRequest.parent_folder?.uuid}
+          onChange={(event) => onChangeValue('parent_folder', { uuid: event.target.value })}
           error={error === ERROR_PROJECT}
           style={{ marginTop: 16, marginBottom: 8 }}
         >
@@ -71,7 +71,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
           <MenuItem value={NEW_PROJECT_ID}>Nouveau projet</MenuItem>
         </Select>
 
-        {currentRequest.parent_folder === NEW_PROJECT_ID && (
+        {currentRequest.parent_folder?.uuid === NEW_PROJECT_ID && (
           <TextField
             placeholder="Nom du nouveau projet"
             value={projectName}

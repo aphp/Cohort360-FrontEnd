@@ -115,7 +115,11 @@ const MaternityForm = () => {
       <BlockWrapper item xs={12} margin={'20px 0px 0px'}>
         <Searchbar>
           <Grid container item xs={12} justifyContent="flex-end">
-            <Button width={'10%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
+            <Button
+              width={'10%'}
+              startIcon={<FilterList height="15px" fill="#FFF" />}
+              onClick={() => setToggleModal(true)}
+            >
               Filtrer
             </Button>
             {toggleModal && (

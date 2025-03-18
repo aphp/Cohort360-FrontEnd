@@ -60,14 +60,19 @@ const List = ({
       <Grid container item xs={12} alignItems="center" gap={1}>
         {onDisplay && (
           <Grid item xs={3}>
-            <Button color="info" icon={<Visibility />} onClick={onDisplay} disabled={selectedElements.length !== 1}>
+            <Button
+              color="info"
+              startIcon={<Visibility />}
+              onClick={onDisplay}
+              disabled={selectedElements.length !== 1}
+            >
               Voir
             </Button>
           </Grid>
         )}
         {onEdit && (
           <Grid item xs={4}>
-            <Button color="info" icon={<Edit />} onClick={onEdit} disabled={selectedElements.length !== 1}>
+            <Button color="info" startIcon={<Edit />} onClick={onEdit} disabled={selectedElements.length !== 1}>
               Modifier
             </Button>
           </Grid>

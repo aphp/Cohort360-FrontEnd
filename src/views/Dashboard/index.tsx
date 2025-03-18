@@ -203,7 +203,6 @@ const Dashboard: React.FC<{
             ? 'Pseudonymisé'
             : 'Nominatif'
         }
-        afterEdit={() => forceReload()}
       />
 
       <Grid container justifyContent="center" className={classes.tabs}>

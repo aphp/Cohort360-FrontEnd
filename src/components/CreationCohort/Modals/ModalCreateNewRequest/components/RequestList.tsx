@@ -30,7 +30,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
   const { classes } = useStyles()
   const [open, setOpen] = useState(true)
 
-  const folderRequestsList = requestsList.filter(({ parent_folder }) => parent_folder === project.uuid)
+  const folderRequestsList = requestsList.filter(({ parent_folder }) => parent_folder?.uuid === project.uuid)
 
   return (
     <>
@@ -57,11 +57,10 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
           folderRequestsList.map((request) => {
             return (
               <ListItem key={request.uuid} className={classes.requestItem}>
-                <ListItemText onClick={() => onSelectedItem(request.uuid as string)}>
-                  {request.shared_by?.display_name ? (
+                <ListItemText onClick={() => onSelectedItem(request.uuid)}>
+                  {request.shared_by ? (
                     <Typography noWrap style={{ marginLeft: 8 }}>
-                      {request.name} - Envoyée par : {request.shared_by.firstname}{' '}
-                      {request.shared_by.lastname?.toUpperCase()}
+                      {request.name} - Envoyée par : {request.shared_by}
                     </Typography>
                   ) : (
                     <Typography noWrap style={{ marginLeft: 8 }}>
