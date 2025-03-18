@@ -8,7 +8,8 @@ import {
   GenderStatusLabel,
   LabelObject,
   VitalStatus,
-  VitalStatusLabel
+  VitalStatusLabel,
+  mapGenderStatusToLabel
 } from 'types/searchCriterias'
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
@@ -18,6 +19,7 @@ import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
 import { Hierarchy } from 'types/hierarchy'
 import labels from 'labels.json'
 import { getFullLabelFromCode } from './valueSets'
+import { perimeterDisplay } from './perimeters'
 
 export const isChecked = <T>(value: T, arr: T[]): boolean => {
   return arr.includes(value)
@@ -77,79 +79,43 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
 }
 
 export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
-  if (key === FilterKeys.FAVORITE) {
-    return CohortsTypeLabel[value as CohortsType]
+  const filterLabelFunctions: Partial<Record<FilterKeys, (value: FilterValue) => string>> = {
+    [FilterKeys.FAVORITE]: (value) => CohortsTypeLabel[value as CohortsType],
+    [FilterKeys.BIRTHDATES]: (value) => getDurationRangeLabel(value as DurationRangeType, 'Âge'),
+    [FilterKeys.GENDERS]: (value) => mapGenderStatusToLabel(value as GenderStatus),
+    [FilterKeys.FORM_NAME]: (value) => {
+      if (value === FormNames.HOSPIT) return labels.formNames.hospit
+      if (value === FormNames.PREGNANCY) return labels.formNames.pregnancy
+      return ''
+    },
+    [FilterKeys.VITAL_STATUSES]: (value) => VitalStatusLabel[value as VitalStatus],
+    [FilterKeys.START_DATE]: (value) => `Après le : ${moment(value as string).format('DD/MM/YYYY')}`,
+    [FilterKeys.END_DATE]: (value) => `Avant le : ${moment(value as string).format('DD/MM/YYYY')}`,
+    [FilterKeys.NDA]: (value) => `NDA : ${value}`,
+    [FilterKeys.IPP]: (value) => `IPP : ${value}`,
+    [FilterKeys.CODE]: (value) => `Code : ${getFullLabelFromCode(value as LabelObject)}`,
+    [FilterKeys.SOURCE]: (value) => `Source : ${value}`,
+    [FilterKeys.EXECUTIVE_UNITS]: (value) => {
+      const hierarchy = value as Hierarchy<ScopeElement>
+      return `Unité exécutrice : ${perimeterDisplay(hierarchy.source_value, hierarchy.name)}`
+    },
+    [FilterKeys.DOC_STATUSES]: (value) => `Documents : ${value}`,
+    [FilterKeys.DOC_TYPES]: (value) => (value as SimpleCodeType).label,
+    [FilterKeys.DIAGNOSTIC_TYPES]: (value) =>
+      `Type : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`,
+    [FilterKeys.ADMINISTRATION_ROUTES]: (value) =>
+      `Voie d'administration : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`,
+    [FilterKeys.PRESCRIPTION_TYPES]: (value) =>
+      `Type de prescription : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`,
+    [FilterKeys.STATUS]: (value) => `Statut : ${(value as ValueSet)?.display}`,
+    [FilterKeys.MIN_PATIENTS]: (value) => `Au moins ${value} patients`,
+    [FilterKeys.MAX_PATIENTS]: (value) => `Jusqu'à ${value} patients`,
+    [FilterKeys.MODALITY]: (value) => `Modalités : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`,
+    [FilterKeys.ENCOUNTER_STATUS]: (value) =>
+      `Statut de la visite associée : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
   }
-  if (key === FilterKeys.BIRTHDATES) {
-    return getDurationRangeLabel(value as DurationRangeType, 'Âge')
-  }
-  if (key === FilterKeys.GENDERS) {
-    return GenderStatusLabel[value as GenderStatus]
-  }
-  if (key === FilterKeys.FORM_NAME) {
-    if (value === FormNames.HOSPIT) {
-      return labels.formNames.hospit
-    } else if (value === FormNames.PREGNANCY) {
-      return labels.formNames.pregnancy
-    }
-  }
-  if (key === FilterKeys.VITAL_STATUSES) {
-    return VitalStatusLabel[value as VitalStatus]
-  }
-  if (key === FilterKeys.START_DATE) {
-    return `Après le : ${moment(value as string).format('DD/MM/YYYY')}`
-  }
-  if (key === FilterKeys.END_DATE) {
-    return `Avant le : ${moment(value as string).format('DD/MM/YYYY')}`
-  }
-  if (key === FilterKeys.NDA) {
-    return `NDA : ${value}`
-  }
-  if (key === FilterKeys.IPP) {
-    return `IPP : ${value}`
-  }
-  if (key === FilterKeys.CODE) {
-    return `Code : ${getFullLabelFromCode(value as LabelObject)}`
-  }
-  if (key === FilterKeys.SOURCE) {
-    return `Source : ${value}`
-  }
-  if (key === FilterKeys.EXECUTIVE_UNITS) {
-    return `Unité exécutrice :  ${(value as Hierarchy<ScopeElement>).source_value} - ${
-      (value as Hierarchy<ScopeElement>).name
-    }`
-  }
-  if (key === FilterKeys.DOC_STATUSES) {
-    return `Documents :  ${(value as LabelObject).label}`
-  }
-  if (key === FilterKeys.DOC_TYPES) {
-    return (value as SimpleCodeType).label
-  }
-  if (key === FilterKeys.DIAGNOSTIC_TYPES) {
-    return `Type : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
-  }
-  if (key === FilterKeys.ADMINISTRATION_ROUTES) {
-    return `Voie d'administration : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
-  }
-  if (key === FilterKeys.PRESCRIPTION_TYPES) {
-    return `Type de prescription : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
-  }
-  if (key === FilterKeys.STATUS) {
-    return `Statut : ${(value as ValueSet)?.display}`
-  }
-  if (key === FilterKeys.MIN_PATIENTS) {
-    return `Au moins ${value} patients`
-  }
-  if (key === FilterKeys.MAX_PATIENTS) {
-    return `Jusqu'à ${value} patients`
-  }
-  if (key === FilterKeys.MODALITY) {
-    return `Modalités : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
-  }
-  if (key === FilterKeys.ENCOUNTER_STATUS) {
-    return `Statut de la visite associée : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
-  }
-  return ''
+
+  return filterLabelFunctions[key]?.(value) ?? ''
 }
 
 export const selectFiltersAsArray = (filters: Filters) => {
