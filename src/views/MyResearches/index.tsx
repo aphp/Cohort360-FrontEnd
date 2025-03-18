@@ -30,7 +30,7 @@ const MyResearches = () => {
   const startDateParam = searchParams.get(ExplorationsSearchParams.START_DATE) ?? null
   const endDateParam = searchParams.get(ExplorationsSearchParams.END_DATE) ?? null
 
-  const { projectsCount, requestsCount, cohortsCount, samplesCount } = useCounts(
+  const { projectsCount, requestsCount, cohortsCount /*, samplesCount*/ } = useCounts(
     searchInput,
     startDateParam,
     endDateParam
