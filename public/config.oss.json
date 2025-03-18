@@ -1,0 +1,163 @@
+{
+  "core": {
+      "codeSystems": {
+          "docStatus": "http://hl7.org/fhir/CodeSystem/composition-status"
+      },
+      "extensions": {
+      },
+      "perimeterSourceTypeHierarchy": [
+          "hospital","hospital_depart","hospital_serv"
+      ],
+      "valueSets": {
+          "demographicGender": {
+              "url": "https://terminology.eds.aphp.fr/aphp-orbis-patient-genre"
+          },
+          "encounterAdmission": {
+              "url": "https://terminology.eds.aphp.fr/aphp-orbis-visit-type-admission"
+          },
+          "encounterAdmissionMode": {
+              "url": "https://terminology.eds.aphp.fr/aphp-orbis-visit-motif-admission"
+          },
+          "encounterDestination": {
+              "url": "https://terminology.eds.aphp.fr/aphp-orbis-visit-destination"
+          },
+          "encounterEntryMode": {
+              "url": "https://terminology.eds.aphp.fr/aphp-orbis-visit-mode-entree"
+          },
+          "encounterExitMode": {
+              "url": "https://terminology.eds.aphp.fr/aphp-orbis-visit-mode-sortie"
+          },
+          "encounterExitType": {
+              "url": "https://terminology.eds.aphp.fr/aphp-orbis-visit-type-sortie"
+          },
+          "encounterFileStatus": {
+              "url": "https://terminology.eds.aphp.fr/aphp-orbis-visite-status"
+          },
+          "encounterProvenance": {
+              "url": "https://terminology.eds.aphp.fr/aphp-orbis-visit-provenance"
+          },
+          "encounterSejourType": {
+              "url": "https://terminology.eds.aphp.fr/aphp-orbis-type-sejour"
+          },
+          "encounterStatus": {
+              "url": "http://hl7.org/fhir/CodeSystem/encounter-status"
+          },
+          "encounterVisitType": {
+              "url": "https://terminology.eds.aphp.fr/aphp-orbis-visit-type"
+          }
+      },
+      "fhir": {
+          "valueSetExploration": false,
+          "facetsExtensions": false,
+          "filterActive": false,
+          "totalCount": true,
+          "selectedCodeOnly": false,
+          "extraSearchParams": false,
+          "resourceLists": false,
+          "textSearch": false,
+          "valuesetExpansion": false
+      }
+  },
+  "features": {
+      "claim": {
+          "enabled": false
+      },
+      "cohort": {
+          "enabled": true,
+          "shortCohortLimit": 2000
+      },
+      "condition": {
+          "enabled": true,
+          "valueSets": {
+              "conditionHierarchy": {
+                  "url": "https://smt.esante.gouv.fr/terminologie-cim-10/"
+              },
+              "conditionStatus": {
+                  "url": "https://terminology.eds.aphp.fr/aphp-orbis-condition-status"
+              }
+          }
+      },
+      "contact": {
+          "enabled": false
+      },
+      "export": {
+          "enabled": false,
+          "exportLinesLimit": 300000
+      },
+      "feasabilityReport": {
+          "enabled": false
+      },
+      "imaging": {
+          "enabled": true,
+          "extensions": {},
+          "valueSets": {
+              "imagingModalities": {
+                  "url": "https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_33.html"
+              }
+          }
+      },
+      "locationMap": {
+          "enabled": false
+      },
+      "medication": {
+          "enabled": true,
+          "valueSets": {
+              "medicationAdministrations": {
+                  "url": "https://terminology.eds.aphp.fr/aphp-orbis-medicament-voie-administration"
+              },
+              "medicationAtc": {
+                  "url": "https://terminology.eds.aphp.fr/atc"
+              },
+              "medicationAtcOrbis": {
+                  "url": "https://terminology.eds.aphp.fr/aphp-orbis-medicament-atc-article"
+              },
+              "medicationPrescriptionTypes": {
+                  "url": "https://terminology.eds.aphp.fr/aphp-medicament-type-prescription"
+              },
+              "medicationUcd": {
+                  "url": "https://terminology.eds.aphp.fr/smt-medicament-ucd"
+              }
+          },
+          "useMedicationAtcUcdCodes": false
+      },
+      "observation": {
+          "enabled": true,
+          "valueSets": {
+              "biologyHierarchyAnabio": {
+                  "url": "https://terminology.eds.aphp.fr/aphp-itm-anabio"
+              },
+              "biologyHierarchyLoinc": {
+                  "url": "https://terminology.eds.aphp.fr/aphp-itm-loinc"
+              }
+          },
+          "useObservationValueRestriction": false,
+          "useObservationDefaultValidated": false
+      },
+      "procedure": {
+          "enabled": true,
+          "valueSets": {
+              "procedureHierarchy": {
+                  "url": "https://www.atih.sante.fr/plateformes-de-transmission-et-logiciels/logiciels-espace-de-telechargement/id_lot/3550"
+              }
+          }
+      },
+      "questionnaires": {
+          "enabled": false
+      }
+  },
+  "labels": {
+      "exploration": "Exploration"
+  },
+  "system": {
+      "codeDisplayJWT": "ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,b,a,Enter",
+      "oidc": {
+          "clientId": "cohort360",
+          "issuer": "http://172.28.0.20:8080/realms/cohort/protocol/openid-connect/auth",
+          "redirectUri": "http://localhost:8003",
+          "responseType": "code",
+          "scope": "openid",
+          "state": "mlTPASu3bwdFmFUSK4G4ImecrsKW9pQ7SDdf7uB"
+      },
+      "wsProtocol": "ws://"
+  }
+}

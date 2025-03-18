@@ -1,9 +1,10 @@
-import React, { createContext, ReactNode } from 'react'
+import React, { createContext, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 import { Root } from 'react-dom/client'
 import * as R from 'ramda'
 import { CONFIG_URL } from 'constants.js'
 import { LabelObject } from 'types/searchCriterias'
 import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
+import { DeepPartial } from 'redux'
 
 type ValueSetConfig = {
   url: string
@@ -20,6 +21,13 @@ export type AppConfig = {
       enabled: boolean
       shortCohortLimit: number
     }
+    patient: {
+      enabled: boolean
+      textSearch: boolean
+    }
+    encounter: {
+      enabled: boolean
+    }
     diagnosticReport: {
       enabled: boolean
       useStudyParam: boolean
@@ -31,6 +39,7 @@ export type AppConfig = {
     }
     observation: {
       enabled: boolean
+      useObservationValueRestriction: boolean
       valueSets: {
         biologyHierarchyAnabio: ValueSetConfig
         biologyHierarchyLoinc: ValueSetConfig
@@ -127,6 +136,17 @@ export type AppConfig = {
     }
   }
   core: {
+    fhir: {
+      valueSetExploration: boolean
+      facetsExtensions: boolean
+      filterActive: boolean
+      totalCount: boolean
+      selectedCodeOnly: boolean
+      extraSearchParams: boolean
+      resourceLists: boolean
+      textSearch: boolean
+      valuesetExpansion: boolean
+    }
     pagination: {
       limit: number
     }
@@ -183,6 +203,17 @@ let config: AppConfig = {
     exploration: 'Exploration'
   },
   core: {
+    fhir: {
+      valueSetExploration: true,
+      facetsExtensions: true,
+      filterActive: true,
+      totalCount: false,
+      selectedCodeOnly: true,
+      extraSearchParams: true,
+      resourceLists: true,
+      textSearch: true,
+      valuesetExpansion: true
+    },
     pagination: {
       limit: 1000
     },
@@ -211,6 +242,13 @@ let config: AppConfig = {
       enabled: true,
       shortCohortLimit: 2000
     },
+    patient: {
+      enabled: true,
+      textSearch: true
+    },
+    encounter: {
+      enabled: true
+    },
     diagnosticReport: {
       enabled: false,
       useStudyParam: false
@@ -222,6 +260,7 @@ let config: AppConfig = {
     },
     observation: {
       enabled: true,
+      useObservationValueRestriction: true,
       valueSets: {
         biologyHierarchyAnabio: { url: '', title: 'ANABIO' },
         biologyHierarchyLoinc: { url: '', title: 'LOINC' }
@@ -351,11 +390,29 @@ export const onUpdateConfig = (hook: (newConfig: AppConfig) => void) => {
   updateHooks.push(hook)
 }
 
+export const updateConfig = (newConfig: DeepPartial<AppConfig>) => {
+  config = R.mergeDeepRight(config, newConfig)
+  updateHooks.forEach((hook) => hook(config))
+  return config
+}
+
+const ConfigWrapper = (props: PropsWithChildren<{ config: AppConfig }>) => {
+  const { config, children } = props
+  const [appConfig, setAppConfig] = useState<AppConfig>(config)
+
+  useEffect(() => {
+    onUpdateConfig((newConfig) => {
+      setAppConfig(newConfig)
+    })
+  }, [])
+
+  return <AppConfig.Provider value={appConfig}>{children}</AppConfig.Provider>
+}
+
 export const initConfig = async (root: Root, app: () => ReactNode) => {
   const initApp = (fetchedConfig: AppConfig) => {
-    config = R.mergeDeepRight(config, fetchedConfig)
-    updateHooks.forEach((hook) => hook(config))
-    root.render(<AppConfig.Provider value={config}>{app()}</AppConfig.Provider>)
+    const updatedConfig = updateConfig(fetchedConfig)
+    root.render(<ConfigWrapper config={updatedConfig}>{app()}</ConfigWrapper>)
   }
   try {
     const res = await fetch(CONFIG_URL)

@@ -21,6 +21,7 @@ import { AxiosError, AxiosResponse } from 'axios'
 import apiBackend from '../apiBackend'
 import {
   Binary,
+  CapabilityStatement,
   Claim,
   Condition,
   DiagnosticReport,
@@ -1132,6 +1133,11 @@ export const fetchDiagnosticReport = async (args: fetchDiagnosticReportProps) =>
     signal
   })
 
+  return response
+}
+
+export const fetchFhirMetadata = async () => {
+  const response = await apiFhir.get<CapabilityStatement>('/metadata')
   return response
 }
 
