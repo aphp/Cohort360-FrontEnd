@@ -15,7 +15,6 @@ import MyRequests from 'views/MyRequests'
 import DownloadPopup from 'views/DownloadPopup/DownloadPopup'
 import Export from 'pages/Export'
 import ExportRequest from 'pages/ExportRequest'
-import FeasibilityReports from 'pages/FeasibilityReports'
 import { URLS } from 'types/exploration'
 
 // import { ODD_CONTACT } from '../../../constants'
@@ -151,7 +150,7 @@ const configRoutes: configRoute[] = [
   {
     exact: true,
     displaySideBar: true,
-    path: '/cohort/:tabName',
+    path: `/${URLS.COHORT}/:tabName`,
     name: 'cohort/:tabName',
     isPrivate: true,
     element: <Dashboard context={URLS.COHORT} />
@@ -159,7 +158,7 @@ const configRoutes: configRoute[] = [
   {
     exact: true,
     displaySideBar: true,
-    path: '/cohort',
+    path: `/${URLS.COHORT}`,
     name: 'cohort',
     isPrivate: true,
     element: <Dashboard context={URLS.COHORT} />
@@ -169,7 +168,7 @@ const configRoutes: configRoute[] = [
   //  */
   {
     displaySideBar: true,
-    path: '/perimeters',
+    path: `/${URLS.PERIMETERS}`,
     name: 'perimeters',
     isPrivate: true,
     element: <Dashboard context={URLS.PERIMETERS} />,
@@ -177,7 +176,7 @@ const configRoutes: configRoute[] = [
   },
   {
     displaySideBar: true,
-    path: '/perimeters/:tabName',
+    path: `/${URLS.PERIMETERS}/:tabName`,
     name: 'perimeters/:tabName',
     isPrivate: true,
     element: <Dashboard context={URLS.PERIMETERS} />,
@@ -188,7 +187,7 @@ const configRoutes: configRoute[] = [
   //  */
   {
     displaySideBar: true,
-    path: '/my-patients',
+    path: `/${URLS.PATIENTS}`,
     name: 'my-patients',
     isPrivate: true,
     element: <Dashboard context={URLS.PATIENTS} />,
@@ -196,7 +195,7 @@ const configRoutes: configRoute[] = [
   },
   {
     displaySideBar: true,
-    path: '/my-patients/:tabName',
+    path: `/${URLS.PATIENTS}/:tabName`,
     name: 'my-patients/:tabName',
     isPrivate: true,
     element: <Dashboard context={URLS.PATIENTS} />,

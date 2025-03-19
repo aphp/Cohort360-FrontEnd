@@ -45,10 +45,10 @@ import displayDigit from 'utils/displayDigit'
 
 import useStyles from './styles'
 import { AppConfig } from 'config'
-import { Cohort } from 'types'
+import { URLS } from 'types/exploration'
 
 type TopBarProps = {
-  context: 'patients' | 'cohort' | 'perimeters' | 'patient_info'
+  context: URLS
   patientsNb?: number
   access?: string
   afterEdit?: () => void
@@ -105,7 +105,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
     showActionButton?: boolean
   } = { name: '-', perimeters: [] }
   switch (context) {
-    case 'patients':
+    case URLS.PATIENTS:
       cohort = {
         name: 'Tous mes patients',
         description: '',
@@ -115,7 +115,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         showActionButton: false
       }
       break
-    case 'patient_info':
+    case URLS.PATIENT:
       cohort = {
         name: 'Information patient',
         description: '',
@@ -125,7 +125,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         showActionButton: false
       }
       break
-    case 'cohort':
+    case URLS.COHORT:
       cohort = {
         name: dashboard.name ?? '-',
         description: dashboard.description ?? '',
@@ -135,7 +135,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         showActionButton: true
       }
       break
-    case 'perimeters':
+    case URLS.PERIMETERS:
       cohort = {
         name: 'Exploration de périmètres',
         description: '',
@@ -324,7 +324,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
             )}
           </Grid>
         </Grid>
-        {context !== 'patient_info' && (
+        {context !== URLS.PATIENT && (
           <Divider orientation="horizontal" variant="middle" style={{ width: 'calc(100% - 32px)' }} />
         )}
       </Grid>

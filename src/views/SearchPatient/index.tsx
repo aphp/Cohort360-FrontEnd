@@ -1,14 +1,14 @@
 import React, { useMemo } from 'react'
 import { useAppSelector } from 'state'
-import { Grid, Typography } from '@mui/material'
-import useStyles from './styles'
+import { Grid } from '@mui/material'
 import { ResourceType } from 'types/requestCriterias'
 import ExplorationBoard from 'components/ExplorationBoard'
-import { BlockWrapper } from 'components/ui/Layout'
 import { DATA_DISPLAY } from 'types/exploration'
+import HeaderPage from 'components/ui/HeaderPage'
+import sideBarTransition from 'styles/sideBarTransition'
 
 const SearchPatient = () => {
-  const { classes, cx } = useStyles()
+  const { classes, cx } = sideBarTransition()
   const open = useAppSelector((state) => state.drawer)
   const practitioner = useAppSelector((state) => state.me)
   const nominativeGroupsIds = practitioner?.nominativeGroupsIds ?? []
@@ -29,11 +29,9 @@ const SearchPatient = () => {
   return (
     <Grid container direction="column" className={cx(classes.appBar, { [classes.appBarShift]: open })}>
       <Grid container justifyContent="center" alignItems="center">
-        <BlockWrapper item xs={11} margin={'20px 0px'}>
-          <Typography variant="h1" color="primary" className={classes.title}>
-            Rechercher un patient
-          </Typography>
-        </BlockWrapper>
+        <Grid item xs={11}>
+          <HeaderPage title="Rechercher un patient" id="patient-search" />
+        </Grid>
         <ExplorationBoard
           deidentified={false}
           groupId={nominativeGroupsIds}

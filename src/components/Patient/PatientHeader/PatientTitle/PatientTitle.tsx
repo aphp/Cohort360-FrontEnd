@@ -9,6 +9,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
+import { ResourceType } from 'types/requestCriterias'
+import { URLS } from 'types/exploration'
 
 type PatientTitleProps = {
   firstName: string | undefined
@@ -30,10 +32,10 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
   const goBacktoCohort = () => {
     const path =
       cohort.cohortId && groupId === cohort.cohortId
-        ? `/cohort/patients?groupId=${cohort.cohortId}`
+        ? `/${URLS.COHORT}/${ResourceType.PATIENT}?groupId=${cohort.cohortId}`
         : groupId && groupId !== cohort.cohortId
-        ? `/perimeters/patients?groupId=${groupId}`
-        : `/my-patients/patients`
+        ? `/${URLS.PERIMETERS}/${ResourceType.PATIENT}?groupId=${groupId}`
+        : `/${URLS.PATIENTS}/${ResourceType.PATIENT}`
     navigate(path)
   }
 

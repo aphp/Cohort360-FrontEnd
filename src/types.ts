@@ -716,13 +716,6 @@ export type TabType<T = string, TL = string> = {
   wrapped?: boolean
 }
 
-export type PmsiTab = TabType<PMSIResourceTypes, PMSILabel>
-
-export type MedicationTab = TabType<
-  ResourceType.MEDICATION_ADMINISTRATION | ResourceType.MEDICATION_REQUEST,
-  MedicationLabel
->
-
 export type DTTB_SearchBarType = {
   type: 'simple' | 'patient' | 'document'
   value: string | undefined

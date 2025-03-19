@@ -16,10 +16,10 @@ export type ResourceOptions<T> = {
 }
 
 export enum URLS {
-  PATIENTS = 'patients',
+  PATIENTS = 'my-patients',
   COHORT = 'cohort',
   PERIMETERS = 'perimeters',
-  NEW_COHORT = 'new_cohort'
+  PATIENT = 'patients_info'
 }
 
 export const GAP = '20px'

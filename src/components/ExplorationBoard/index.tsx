@@ -7,7 +7,7 @@ import { useData } from './useData'
 import { ResourceType } from 'types/requestCriterias'
 import { useEffect } from 'react'
 import DataSection from './DataSection'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { FetchStatus } from 'types'
 import { AlertWrapper } from 'components/ui/Alert'
 import { PatientState } from 'state/patient'
@@ -30,8 +30,6 @@ const ExplorationBoard = ({
   messages,
   displayOptions = DEFAULT_OPTIONS
 }: ExplorationBoardProps) => {
-  const [searchParams] = useSearchParams()
-  const page = parseInt(searchParams.get('page') || '1', 10)
   const { search } = useParams<{ search: string }>()
   const {
     fetchStatus,
@@ -51,7 +49,6 @@ const ExplorationBoard = ({
     type,
     displayOptions.display,
     searchCriterias,
-    page,
     deidentified,
     groupId,
     patient
@@ -60,17 +57,11 @@ const ExplorationBoard = ({
   useEffect(() => {
     console.log('test searchCriterias', searchCriterias)
   }, [searchCriterias])
-  // searchParams à verifier pour l'url
-  // => const _groupId = groupId ? `?groupId=${groupId}` : ''
-  // => const _search = search ? `&search=${search}` : ''
   // => const _page = page ? `&page=${page}` : ''
-  // => erreur sur les pmsiTabs / medicationTabs
-  // Vérifier qu'on atterie sur le bon onglet ressource et filtres quand URL
   // L'option Documents dont les pdf sont disponibles n'est dispo que en non pseudo
   // TOUS LES TYPES des réponses du service et de useData sont mauvais!!
-  // Le retour en arrière d'un patient sur la liste des patients ne se fait pas correctement
-  // Une recherche se lance (mode pseudo) lorsque le selectBy est modifié alors que ce comportement n'est pas souhaité
   // Erreur fetch last pmsi
+  // vérifier les fetchCount pour les exports (duplication de code repérée)
   // Count des Ressources à corriger
   return (
     <Grid item xs={12} container gap={GAP} sx={{ backgroundColor: '#fff' }}>
