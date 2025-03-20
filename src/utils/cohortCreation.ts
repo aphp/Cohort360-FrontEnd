@@ -24,7 +24,7 @@ import { getChildrenFromCodes, HIERARCHY_ROOT } from 'services/aphp/serviceValue
 import { createHierarchyRoot } from './hierarchy'
 import { FhirItem } from 'types/valueSet'
 
-const REQUETEUR_VERSION = 'v1.5.1'
+const REQUETEUR_VERSION = 'v1.6.1'
 
 const DEFAULT_GROUP_ERROR: CriteriaGroup = {
   id: 0,
