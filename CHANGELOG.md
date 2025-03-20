@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.44.4](https://github.com/aphp/Cohort360-FrontEnd/compare/2.44.3..2.44.4) - 2025-03-20
+
+### 🚀 Features
+
+- *(requester)* Update json request version - ([01e10d3](https://github.com/aphp/Cohort360-FrontEnd/commit/01e10d316c4bb73240ce250aacc57d1e48a4624a))
+
 ## [2.44.3](https://github.com/aphp/Cohort360-FrontEnd/compare/2.44.2..2.44.3) - 2025-03-13
 
 ### 🐛 Bug Fixes
