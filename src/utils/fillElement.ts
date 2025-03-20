@@ -145,7 +145,7 @@ export const getResourceInfos = async <
     signal: signal
   })
   const _patients = getApiResponseResources(patients) ?? []
-  const _encounters = getApiResponseResources(encounters)?.filter((encounter) => !encounter.partOf) ?? []
+  const _encounters = getApiResponseResources(encounters) ?? []
 
   const filledEntries: U[] = elementEntries.map((entry) => {
     const idPatient = retrievePatientIds([entry])
