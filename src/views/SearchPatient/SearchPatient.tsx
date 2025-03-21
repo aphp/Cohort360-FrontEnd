@@ -32,8 +32,9 @@ const SearchPatient: React.FC<{}> = () => {
 
   const [page, setPage] = useState(1)
 
-  const [{ orderBy, searchBy, searchInput }, { changeOrderBy, changeSearchBy, changeSearchInput }] =
-    useSearchCriterias(initPatientsSearchCriterias)
+  const [{ orderBy, searchBy, searchInput }, { changeOrderBy, changeSearchBy, changeSearchInput }] = useSearchCriterias(
+    initPatientsSearchCriterias()
+  )
 
   const controllerRef = useRef<AbortController | null>(null)
 

@@ -96,7 +96,7 @@ const PatientList = ({ total, deidentified }: PatientListProps) => {
       filters: { genders, birthdatesRanges, vitalStatuses }
     },
     { changeOrderBy, changeSearchBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
-  ] = useSearchCriterias(initPatientsSearchCriterias)
+  ] = useSearchCriterias(initPatientsSearchCriterias())
 
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ genders, vitalStatuses, birthdatesRanges })
