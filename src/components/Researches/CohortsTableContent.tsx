@@ -151,9 +151,9 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
         return (
           <TableRow
             key={cohort.uuid}
-            onClick={() => onClickRow(cohort)}
+            onClick={() => cohort.request_job_status === JobStatus.FINISHED && onClickRow(cohort)}
             sx={{
-              cursor: 'pointer',
+              cursor: cohort.request_job_status === JobStatus.FINISHED ? 'pointer' : 'not-allowed',
               '&:hover': { backgroundColor: '#f8f9fa' }
             }}
           >
@@ -219,20 +219,17 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
             <TableCellWrapper>{getGlobalEstimation(cohort)}</TableCellWrapper>
             <TableCellWrapper>{formatDate(cohort.created_at)}</TableCellWrapper>
             {/* <TableCellWrapper>
-                  <Button
-                    endIcon={<ArrowRightAltIcon />}
-                    customVariant="clear"
-                    onClick={(event) => {
-                      event?.stopPropagation()
+                  <SublevelButton
+                    label="échantillon"
+                    onClick={() => {
                       if (projectId && requestId)
                         navigate(`/researches/projects/${projectId}/${requestId}/${cohort.uuid}${location.search}`)
                       if (!projectId && requestId)
                         navigate(`/researches/requests/${requestId}/${cohort.uuid}${location.search}`)
                       if (!projectId && !requestId) navigate(`/researches/cohorts/${cohort.uuid}${location.search}`)
                     }}
-                  >
-                    0 échantillon
-                  </Button>
+                    total={samplesTotal}
+                  />
                 </TableCellWrapper> */}
           </TableRow>
         )

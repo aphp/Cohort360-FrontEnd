@@ -171,7 +171,6 @@ const MyResearches = () => {
               placeholder="Rechercher dans tous les niveaux"
               value={searchInput}
               onchange={(newInput) => handleSearchTermChange(newInput)}
-              searchOnClick
               width="296px"
             />
           </Searchbar>

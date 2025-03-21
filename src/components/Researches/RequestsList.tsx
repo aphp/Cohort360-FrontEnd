@@ -146,6 +146,7 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
   const onSubmitDeletion = () => {
     deleteRequestsMutation.mutate(selectedRequests, { onSuccess: clearSelection })
     setOpenDeletionModal(false)
+    setDeleteMode(false)
   }
 
   const onSubmitParentProjectDeletion = () => {

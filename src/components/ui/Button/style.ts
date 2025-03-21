@@ -30,7 +30,7 @@ export const ButtonWrapper = styled(Button)<CustomProps>(({ width, customVariant
       border: '1px solid #2B2B2B'
     },
     '&.Mui-disabled': {
-      backgroundColor: '#FFF'
+      backgroundColor: 'transparent'
     }
   })
 }))

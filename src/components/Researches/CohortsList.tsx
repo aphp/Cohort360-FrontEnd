@@ -149,7 +149,7 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
   }
 
   const onSubmitDeletion = () => {
-    deleteCohortMutation.mutate(selectedCohorts)
+    deleteCohortMutation.mutate(selectedCohorts, { onSuccess: clearSelection })
     setOpenDeletionModal(false)
     setDeleteMode(false)
   }
