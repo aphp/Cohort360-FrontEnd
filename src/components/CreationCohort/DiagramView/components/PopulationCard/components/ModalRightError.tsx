@@ -20,7 +20,11 @@ const ModalRightError: React.FC<ModalRightErrorProps> = ({ open, handleClose }) 
   const navigate = useNavigate()
 
   const _handleReturnHome = () => {
-    navigate(`/home`)
+    if (window.history.length > 1) {
+      navigate(-1)
+    } else {
+      navigate('/home')
+    }
   }
 
   return (
