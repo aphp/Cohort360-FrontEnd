@@ -11,7 +11,7 @@ const useEditCohort = () => {
   return useMutation({
     mutationFn: async (newCohortData: Cohort) => await services.projects.editCohort(newCohortData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cohorts'] })
+      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === 'cohorts' })
       queryClient.invalidateQueries({ queryKey: ['cohort'] })
       dispatch(setMessage({ type: 'success', content: "L'édition de la cohorte a été réalisée avec succès" }))
     },

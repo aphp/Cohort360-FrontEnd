@@ -1,12 +1,11 @@
 import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { Box, Checkbox, TableRow, Typography } from '@mui/material'
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt'
-import Button from 'components/ui/Button'
+import { Box, Checkbox, TableRow } from '@mui/material'
 import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
 import IconButtonWithTooltip from '../ui/IconButtonWithTooltip'
 import ResearchesTable from './ResearchesTable'
+import SublevelButton from './SublevelButton'
 import { TableCellWrapper } from './ResearchesTable/styles'
 
 import EditIcon from '@mui/icons-material/Edit'
@@ -74,7 +73,7 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
     { label: '', align: 'left' },
     ...(!projectId ? [{ label: 'projet', code: !simplified ? Order.PARENT_FOLDER : undefined }] : []),
     { label: 'date de modification', code: !simplified ? Order.UPDATED : undefined },
-    { label: 'nb de cohortes' }
+    { label: 'nb de cohortes', align: 'left' }
   ]
 
   return loading ? (
@@ -120,7 +119,7 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
                   title="Partager la requête"
                   icon={<ShareIcon />}
                   onClick={() => onShareRequest(request)}
-                  disabled={disabled}
+                  disabled={disabled || request.query_snapshots?.length === 0}
                 />
                 <IconButtonWithTooltip
                   title="Éditer la requête"
@@ -132,24 +131,18 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
             </TableCellWrapper>
             {!projectId && <TableCellWrapper>{request.parent_folder?.name}</TableCellWrapper>}
             <TableCellWrapper>{formatDate(request.updated_at)}</TableCellWrapper>
-            <TableCellWrapper>
-              <Button
-                customVariant="clear"
-                disabled={cohortTotal < 1}
-                endIcon={<ArrowRightAltIcon />}
-                onClick={(event) => {
-                  event.stopPropagation()
+            <TableCellWrapper align="left">
+              <SublevelButton
+                label="cohorte"
+                onClick={() =>
                   navigate(
                     projectId
                       ? `/researches/projects/${projectId}/${request.uuid}${location.search}`
                       : `/researches/requests/${request.uuid}${location.search}`
                   )
-                }}
-              >
-                <Typography variant="button" noWrap fontSize={'12px'}>
-                  {cohortTotal} cohorte{cohortTotal > 1 && 's'}
-                </Typography>
-              </Button>
+                }
+                total={cohortTotal}
+              />
             </TableCellWrapper>
           </TableRow>
         )
