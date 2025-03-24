@@ -25,7 +25,7 @@ type DataSectionProps = {
   data: { raw: Data | null; table: Table; cards: Card[] }
   infos: AdditionalInfo
   isPatient: boolean
-  count: ExplorationCount | null
+  count: ExplorationCount
   orderBy: OrderBy
   isLoading: boolean
   type: ResourceType
@@ -67,31 +67,35 @@ const DataSection = ({
         <Grid container alignItems="center">
           {!isLoading && (
             <>
-              {!!!count && (
+              {!count.ressource && !count.patients && (
                 <Grid container justifyContent="center">
                   <Typography variant="button">Aucune donnée à afficher</Typography>
                 </Grid>
               )}
-              {count && (
-                <>
-                  {count.ressource && type !== ResourceType.PATIENT && (
+              {(count.ressource || count.patients) && (
+                <Grid container alignItems="center">
+                  {count.ressource && (
                     <DisplayDigits
                       nb={count.ressource.results ?? 0}
                       total={count.ressource.total ?? 0}
-                      label={'élément(s)'}
+                      label={'résultat(s)'}
                     />
                   )}
-                  {!isPatient && count.patients && type !== ResourceType.PATIENT && (
-                    <Typography fontSize={15}>concernant</Typography>
+                  {count.ressource && count.patients && (
+                    <Typography fontSize={15} margin="0px 5px">
+                      concernant
+                    </Typography>
                   )}
-                  {!isPatient && count.patients && (
-                    <DisplayDigits
-                      nb={count.patients.results ?? 0}
-                      total={count.patients.total ?? 0}
-                      label={'patient(s)'}
-                    />
+                  {count.patients && (
+                    <>
+                      <DisplayDigits
+                        nb={count.patients.results ?? 0}
+                        total={count.patients.total ?? 0}
+                        label={'patient(s)'}
+                      />
+                    </>
                   )}
-                </>
+                </Grid>
               )}
             </>
           )}
@@ -126,7 +130,7 @@ const DataSection = ({
               <CircularProgress />
             </Grid>
           )}
-          {!isLoading && count && (
+          {!isLoading && (count.ressource || count.patients) && (
             <Grid container>
               {displayOptions.display === DATA_DISPLAY.INFO &&
                 data.cards.map((card, index) => <InfoCard key={index} value={card} />)}

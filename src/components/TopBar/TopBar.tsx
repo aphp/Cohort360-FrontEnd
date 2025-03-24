@@ -41,7 +41,7 @@ import { deleteCohort, setSelectedCohort } from 'state/cohort'
 
 import services from 'services/aphp'
 
-import displayDigit from 'utils/displayDigit'
+import { format } from 'utils/numbers'
 
 import useStyles from './styles'
 import { AppConfig } from 'config'
@@ -259,7 +259,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                 ) : (
                   <>
                     <Typography id="cohort-patient-number" align="right" noWrap>
-                      Nb de patients : {displayDigit(patientsNumber)}
+                      Nb de patients : {format(patientsNumber)}
                     </Typography>
                     <Typography id="cohort-access-type" align="right" noWrap>
                       Accès : {access}

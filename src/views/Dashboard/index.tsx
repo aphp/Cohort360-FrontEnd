@@ -145,38 +145,42 @@ const Dashboard = ({ context }: DashboardProps) => {
       />
       <Grid container justifyContent="center">
         <Grid container item xs={11} minHeight={'96px'}>
-          <MainTabsWrapper value={selectedTab} onChange={(_, tab) => handleChangeTabs(tab)}>
-            {availableTabs.map((tab) => {
-              const groupIdParam = groupId ? `groupId=${groupId}` : ''
-              const defaultSubTab = tab.subs?.[0]?.value
-              const subtabParam = defaultSubTab ? `&subtab=${defaultSubTab}` : ''
-              return (
-                <Tab
-                  key={tab.value}
-                  label={tab.label}
-                  value={tab.value}
-                  component={Link}
-                  to={`${tab.to}?${groupIdParam}${subtabParam}`}
-                />
-              )
-            })}
-          </MainTabsWrapper>
-          {subTabs && (
-            <Tabs value={selectedSubTab} onChange={(_, newSubTab) => setSelectedSubTab(newSubTab)}>
-              {subTabs.map((subTab) => {
+          <Grid item xs={12}>
+            <MainTabsWrapper id="mainTabs" value={selectedTab} onChange={(_, tab) => handleChangeTabs(tab)}>
+              {availableTabs.map((tab) => {
                 const groupIdParam = groupId ? `groupId=${groupId}` : ''
+                const defaultSubTab = tab.subs?.[0]?.value
+                const subtabParam = defaultSubTab ? `&subtab=${defaultSubTab}` : ''
                 return (
                   <Tab
-                    sx={{ fontSize: 12 }}
-                    key={subTab.value}
-                    label={subTab.label}
-                    value={subTab.value}
+                    key={tab.value}
+                    label={tab.label}
+                    value={tab.value}
                     component={Link}
-                    to={`/${context}/${selectedTab}?${groupIdParam}&subtab=${subTab.value}`}
+                    to={`${tab.to}?${groupIdParam}${subtabParam}`}
                   />
                 )
               })}
-            </Tabs>
+            </MainTabsWrapper>
+          </Grid>
+          {subTabs && (
+            <Grid item xs={12}>
+              <Tabs id="subTabs" value={selectedSubTab} onChange={(_, newSubTab) => setSelectedSubTab(newSubTab)}>
+                {subTabs.map((subTab) => {
+                  const groupIdParam = groupId ? `groupId=${groupId}` : ''
+                  return (
+                    <Tab
+                      sx={{ fontSize: 12 }}
+                      key={subTab.value}
+                      label={subTab.label}
+                      value={subTab.value}
+                      component={Link}
+                      to={`/${context}/${selectedTab}?${groupIdParam}&subtab=${subTab.value}`}
+                    />
+                  )
+                })}
+              </Tabs>
+            </Grid>
           )}
         </Grid>
       </Grid>

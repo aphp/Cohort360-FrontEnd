@@ -26,6 +26,7 @@ const CriteriasSection = ({ value, displayOptions, onDelete, onSaveFilters }: Cr
   const CustomChip = ({ value, category, label, disabled = false }: Criteria) => {
     return (
       <Chip
+        id={`criteria-${category}-${disabled ? 'disabled' : ''}`}
         label={label}
         disabled={disabled}
         onDelete={() => onDelete(category, value)}

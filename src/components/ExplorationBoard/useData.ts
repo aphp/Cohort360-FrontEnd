@@ -63,7 +63,7 @@ export const useData = (
   const [tableData, setTableData] = useState<Table>({ rows: [], columns: [] })
   const [cards, setCards] = useState<Card[]>([])
   const [pagination, setPagination] = useState({ currentPage: 0, total: 0 })
-  const [count, setCount] = useState<ExplorationCount | null>(null)
+  const [count, setCount] = useState<ExplorationCount>({ patients: null, ressource: null })
 
   const fetchData = async (page: number) => {
     try {
@@ -85,7 +85,6 @@ export const useData = (
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
       setData(null)
-      setCount(null)
     }
   }
 
@@ -98,23 +97,21 @@ export const useData = (
       if (display === DATA_DISPLAY.TABLE)
         setTableData(mapToTable(data, type, deidentified, !!patient, groupId, hasSearch))
       if (display === DATA_DISPLAY.INFO) setCards(mapToCards(data, deidentified, groupId))
-      const count: ExplorationCount = {
-        ressource: null,
-        patients: data.totalPatients
-          ? {
-              results: data.totalPatients,
-              total: data.totalAllPatients
-            }
-          : null
-      }
-      if (!isPatientsResponse(data))
-        count.ressource = data.total ? { results: data.total, total: data.totalAllResults } : null
+      const patients =
+        !patient && data.totalPatients ? { results: data.totalPatients, total: data.totalAllPatients } : null
+      const ressource =
+        !isPatientsResponse(data) && data.total ? { results: data.total, total: data.totalAllResults } : null
       setPagination({
         ...pagination,
-        total: Math.ceil((count.ressource?.results ?? count.patients?.results ?? 0) / RESULTS_PER_PAGE)
+        total: Math.ceil((ressource?.results ?? patients?.results ?? 0) / RESULTS_PER_PAGE)
       })
-      setCount(count)
-    } else setTableData({ rows: [], columns: [] })
+      setCount({ patients, ressource })
+    } else {
+      setTableData({ rows: [], columns: [] })
+      setCards([])
+      setCount({ patients: null, ressource: null })
+      setCount({ patients: null, ressource: null })
+    }
     setLoadingStatus(LoadingStatus.SUCCESS)
   }, [data])
 

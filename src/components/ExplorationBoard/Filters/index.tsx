@@ -124,7 +124,11 @@ const ExplorationFilters = ({ filters, infos, onSubmit, onError, onChange }: Exp
       [FilterKeys.CODE]: ({ field }) => <ValueSets {...field} label="Codes :" references={infos.references ?? []} />,
       [FilterKeys.DIAGNOSTIC_TYPES]: ({ field }) =>
         field.value ? (
-          <MultiSelect {...field} options={infos.diagnosticTypesList ?? []} label="Type de diagnostics :" />
+          <MultiSelect
+            {...field}
+            options={infos.diagnosticTypesList?.map((e) => ({ id: e.id, label: `${e.id} - ${e.label}` })) ?? []}
+            label="Type de diagnostics :"
+          />
         ) : null,
       [FilterKeys.SOURCE]: ({ field }) =>
         field.value ? <CheckboxGroup {...field} label="Source :" options={sourceOptions} /> : null,

@@ -205,9 +205,15 @@ export const getReferences = (type: ResourceType): Reference[] => {
 
 export const getSourceType = (type: ResourceType) => {
   const sourceMap: Partial<Record<ResourceType, SourceType>> = {
+    [ResourceType.DOCUMENTS]: SourceType.DOCUMENT,
     [ResourceType.CONDITION]: SourceType.CIM10,
     [ResourceType.PROCEDURE]: SourceType.CCAM,
-    [ResourceType.CLAIM]: SourceType.GHM
+    [ResourceType.CLAIM]: SourceType.GHM,
+    [ResourceType.MEDICATION_ADMINISTRATION]: SourceType.MEDICATION,
+    [ResourceType.MEDICATION_REQUEST]: SourceType.MEDICATION,
+    [ResourceType.OBSERVATION]: SourceType.BIOLOGY,
+    [ResourceType.QUESTIONNAIRE_RESPONSE]: SourceType.FORM_RESPONSE,
+    [ResourceType.IMAGING]: SourceType.IMAGING
   }
   return sourceMap[type] ?? undefined
 }

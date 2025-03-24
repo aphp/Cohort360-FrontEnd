@@ -63,7 +63,7 @@ const TableRow = ({ row, sx }: RowProps) => {
               {cell.type === CellType.LINK && (
                 <div style={{ display: 'flex' }}>
                   {cell.value && <p>{(cell.value as Link).label}</p>}
-                  <IconButton onClick={() => window.open((cell.value as Link).url)}>
+                  <IconButton id="searchButton" onClick={() => window.open((cell.value as Link).url)}>
                     <SearchIcon height="15px" fill="#ED6D91" />
                   </IconButton>
                 </div>
@@ -73,7 +73,11 @@ const TableRow = ({ row, sx }: RowProps) => {
                   const [isOpen, setIsOpen] = React.useState(false)
                   return (
                     <>
-                      <IconButton onClick={() => setIsOpen(true)} disabled={!(cell.value as Document).id}>
+                      <IconButton
+                        onClick={() => setIsOpen(true)}
+                        disabled={!(cell.value as Document).id}
+                        id={`docViewer-${(cell.value as Document).id}`}
+                      >
                         <Visibility height="30px" />
                       </IconButton>
                       <DocumentViewer
@@ -150,8 +154,8 @@ const TableRow = ({ row, sx }: RowProps) => {
         </TableRowMui>
       )}
       {docContentIndex > -1 && (
-        <TableRowMui>
-          <TableCell colSpan={row.length} sx={{ padding: 0 }}>
+        <TableRowMui id={`docContent-${row[docContentIndex].id}`}>
+          <TableCell colSpan={row.length} sx={{ padding: '20px' }}>
             <Typography>{Parse(DOMPurify.sanitize(row[docContentIndex].value as string))}</Typography>
           </TableCell>
         </TableRowMui>

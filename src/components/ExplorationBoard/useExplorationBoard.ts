@@ -59,6 +59,7 @@ export const useExplorationBoard = (type: ResourceType, deidentified: boolean, i
 
   const fetchInfos = async () => {
     const newInfo = await fetchAdditionalInfos(type, deidentified, additionalInfo)
+    console.log('test new info', newInfo)
     setAdditionalInfo((prev) => ({ ...prev, ...newInfo, references, sourceType }))
   }
 

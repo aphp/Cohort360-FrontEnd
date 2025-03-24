@@ -62,7 +62,6 @@ const ExplorationBoard = ({
   // TOUS LES TYPES des réponses du service et de useData sont mauvais!!
   // Erreur fetch last pmsi
   // vérifier les fetchCount pour les exports (duplication de code repérée)
-  // Count des Ressources à corriger
   return (
     <Grid item xs={12} container gap={GAP} sx={{ backgroundColor: '#fff' }}>
       <SearchSection
