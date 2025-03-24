@@ -2,6 +2,7 @@ import { Comparators, CriteriaType, PatientsParamsKeys, ResourceType } from 'typ
 import { CommonCriteriaData, CriteriaForm, NewDurationRangeType } from '../CriteriaForm/types'
 import { VitalStatusOptionsLabel } from 'types/searchCriterias'
 import { getConfig } from 'config'
+import { hasSearchParam } from 'services/aphp/serviceFhirConfig'
 
 export type DemographicDataType = CommonCriteriaData & {
   type: CriteriaType.PATIENT
@@ -34,7 +35,7 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   buildInfo: {
     type: { [ResourceType.PATIENT]: CriteriaType.PATIENT },
-    defaultFilter: 'active=true'
+    defaultFilter: getConfig().core.fhir.filterActive ? 'active=true' : ''
   },
   itemSections: [
     {
@@ -95,6 +96,13 @@ export const form: () => CriteriaForm<DemographicDataType> = () => ({
             return vitalStatus && vitalStatus.length === 1 && vitalStatus.find((status) => status === 'true')
               ? VitalStatusOptionsLabel.deceasedAge
               : VitalStatusOptionsLabel.age
+          },
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => {
+            return (
+              hasSearchParam(ResourceType.PATIENT, PatientsParamsKeys.DATE_IDENTIFIED) &&
+              hasSearchParam(ResourceType.PATIENT, PatientsParamsKeys.DATE_DEIDENTIFIED)
+            )
           },
           disableCondition: (data) => {
             const typedData = data as DemographicDataType
