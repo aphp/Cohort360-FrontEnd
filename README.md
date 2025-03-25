@@ -1,68 +1,119 @@
-<div align="center" style="display:flex;flex-direction:column;">
-  <img src="./public/logo_c360.png" alt="Cohort360 logo" />
-  <h3>A web application to find patients, build cohorts and visualize data.</h3>
-</div>
+<div align="center">
+  <img src="./public/logo_C360.png" alt="Cohort360 logo" width="300" height="114"/>
+  <h2>Lookup patients, build cohorts and visualize data.</h2>
 
-# Cohort360
+<br />
 
 [![Actions Status](https://github.com/aphp/Cohort360-FrontEnd/workflows/cohort360-main-pipeline/badge.svg)](https://github.com/aphp/Cohort360-FrontEnd/actions)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=aphp_Cohort360&metric=alert_status)](https://sonarcloud.io/dashboard?id=aphp_Cohort360)
 
+<br />
+
+<a href="https://github.com/aphp/Cohort360-FrontEnd/issues/new">Report a bug</a>
+·
+<a href="CHANGELOG.md">What's new ?</a>
+</div>
+
+---
 
 
-## Architecture
+<details open="open">
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#overview">Overview</a>
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#project-setup">Project Setup</a>
+      <ul>
+        <li><a href="#get-the-code">Get the code</a></li>
+        <li><a href="#configuration">Configuration</a></li>
+        <li><a href="#run-the-app">Run the app</a></li>
+      </ul>
+    </li>
+    <li><a href="#partners">Partners</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ol>
+</details>
 
-- [ ] Add Architecture schema 
+## Overview
 
-Cohort360 consists of a React front-end and a Django back-end (REST API).
+**Cohort360** is a project that aims to provide health professionals with a set of tools to explore patients data.
 
-This repository hosts the front-end, while the back-end will be available soon.
+### 🔑 Features
+ * Look patients up using a set of criteria
+ * Run search queries on medical texts
+ * Group patients sharing some criteria by creating cohorts
+ * Get insights on cohorts at frst glance
+ * Visualize patient data
+ * Export patient data for extensive analysis
 
-Both the front-end and the back-end depend on a third, possibly custom, party: an endpoint to query medical data and to create cohorts.
-This third endpoint can be a FHIR API for example. This is the case for the first creators of Cohort360.
+<div align="right">
+  ⬆️ <a href="#readme-top">back to top</a>
+</div>
 
-## Installation
+### 🛠️ Built With
 
-### Requirements:
+* React
+* ...
 
-* A running back-end server
-* A running third party endpoint (FHIR API for example)
-* An authentication server
-* Node.js (16 or higher) installed
 
-### Running the front-end
+## 🚀 Project setup
 
-1. First copy the `.env.example` file to `.env` and edit this file to match your configuration.
-2. Run `npm install`
-3. Run `npm audit fix`
-4. Run `npm run build`
+### 1. 💠 Requirements
 
-This will generate files in the `build` directory that can be exposed via a web server like Nginx, or a node server.
+To run Cohort360 locally, you'll need the following applications running:  
+📌 [Cohort360-backend](https://github.com/aphp/Cohort360-Back-end/blob/enrich_repo_files/README.md)  
+📌 A FHIR API to retrieve medical data
 
-An example configuration with Nginx can be found [here](.templates/nginx.conf)
+### 2.  📥 Get the code
 
-## CI
+   ```sh
+   git clone https://github.com/aphp/Cohort360-FrontEnd.git
+   ```
 
-A [gitlab-ci.yml](.templates/.gitlab-ci.yml) is available in the `.templates` folder, alongside
-a [nginx configuration](.templates/nginx.conf) example (useful for deployment).
+### 3.  🔧 Configuration
 
-## Deployment
+> precise what configuration is needed: env vars, extra files to create to hold special configurations
 
-A docker image is available to build via the [Dockerfile](Dockerfile). You only need to update the location of your nginx conf. 
+### 4.  ▶️ Run the app
 
-## Start Contributing
+Start development server
 
-A contributing guide will be published soon.
+```shell
+npm start
+```
 
-## Partners
+All set up 🎉 
 
-* AP-HP Clinical Data Warehouse
-* Arkhn : [arkhn.org](https://arkhn.org/)
-* Akimed : [www.akimed.io](https://www.akimed.io/)
+Check the application running on [http://localhost:3000](http://localhost:3000)
 
-## Contributors
+<div align="right">
+  ⬆️ <a href="#readme-top">back to top</a>
+</div>
 
-Coming soon...
+## 🏢  Partners
 
-## License
-Cohort360 is licensed under Apache License 2.
+  * AP-HP Clinical Data Warehouse
+  * Arkhn : [arkhn.org](https://arkhn.org/)
+  * Akimed : [www.akimed.io](https://www.akimed.io/)
+
+
+## 🤝 Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed process about contributing to this repository.
+
+## 📜 License
+
+**Cohort360** is licensed under the Apache License - see the [LICENSE](LICENSE) file for details.
+
+## 💬 Contact
+
+If you find this project useful, please consider starring the repository and report any encountered bugs or issues.  
+Write to us at: **open-source@cohort360.org**
