@@ -35,7 +35,7 @@ const MoveRequest = ({ open, onClose, selectedRequests }: MoveRequestProps) => {
   return (
     <Dialog open={open} onClose={() => onClose()} fullWidth maxWidth="sm">
       <DialogTitle id="move-request-title">
-        Déplacer {selectedRequests.length === 1 ? 'une requête' : 'des requêtes'}
+        {selectedRequests.length === 1 ? 'Déplacer une requête' : 'Déplacer des requêtes'}
       </DialogTitle>
       <DialogContent id="move-request-description">
         {loading ? (

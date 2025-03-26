@@ -52,7 +52,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   ]
 
   return (
-    <StyledCard onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} onClick={onclick}>
+    <StyledCard id={title} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} onClick={onclick}>
       <Box position={'absolute'} right={8} top={12}>
         <ActionMenu actions={actions} disabled={disabled} />
       </Box>

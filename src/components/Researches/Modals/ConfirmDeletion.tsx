@@ -10,7 +10,7 @@ const ConfirmDeletion: React.FC<{
   message: string
 }> = ({ open, onSubmit, onClose, title, message }) => {
   return (
-    <Dialog fullWidth open={open} onClose={onClose}>
+    <Dialog id="confirm-deletion" fullWidth open={open} onClose={onClose}>
       <DialogTitle>{title}</DialogTitle>
 
       <DialogContent style={{ paddingBottom: 4 }}>
