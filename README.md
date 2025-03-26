@@ -53,11 +53,11 @@
 * Get insights into cohorts at a glance
 * Export cohort data for in-depth analysis
 
-### Based on FHIR
+### 🔥 Based on FHIR
 
 Cohort360 accesses health data through a FHIR server.
 
-FHIR is the world’s most widely used standard for exposing health data via APIs.
+[FHIR](https://www.hl7.org/fhir/) is the world’s most widely used standard for exposing health data via APIs.
 
 ### 🛠️ Built With
 
