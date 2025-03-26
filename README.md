@@ -1,6 +1,6 @@
 <div align="center">
   <img src="./public/logo_C360.png" alt="Cohort360 logo" width="300" height="114"/>
-  <h2>Lookup patients, build cohorts and visualize data.</h2>
+  <h2>Explore patient data 🔍, build cohorts 👥 and export data 📥📊 Works with FHIR 🔥</h2>
 
 <br />
 
