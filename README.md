@@ -24,6 +24,7 @@
       <a href="#overview">Overview</a>
       <ul>
         <li><a href="#features">Features</a></li>
+        <li><a href="#based-on-fhir">Based on FHIR</a></li>
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
@@ -35,7 +36,6 @@
         <li><a href="#run-the-app">Run the app</a></li>
       </ul>
     </li>
-    <li><a href="#partners">Partners</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -44,19 +44,20 @@
 
 ## Overview
 
-**Cohort360** is a project that aims to provide health professionals with a set of tools to explore patients data.
-
 ### 🔑 Features
- * Look patients up using a set of criteria
- * Run search queries on medical texts
- * Group patients sharing some criteria by creating cohorts
- * Get insights on cohorts at frst glance
- * Visualize patient data
- * Export patient data for extensive analysis
 
-<div align="right">
-  ⬆️ <a href="#readme-top">back to top</a>
-</div>
+* Explore, visualize, and search patient data
+* Run advanced search queries on textual documents
+* Create patient cohorts using a dedicated, user-friendly query builder
+* Build queries with data criteria, complexity, and temporal constraints
+* Get insights into cohorts at a glance
+* Export cohort data for in-depth analysis
+
+### Based on FHIR
+
+Cohort360 accesses health data through a FHIR server.
+
+FHIR is the world’s most widely used standard for exposing health data via APIs.
 
 ### 🛠️ Built With
 
@@ -74,13 +75,13 @@ To run Cohort360 locally, you'll need the following applications running:
 
 ### 2.  📥 Get the code
 
-   ```sh
-   git clone https://github.com/aphp/Cohort360-FrontEnd.git
-   ```
+```sh
+git clone https://github.com/aphp/Cohort360-FrontEnd.git
+```
 
 ### 3.  🔧 Configuration
 
-> precise what configuration is needed: env vars, extra files to create to hold special configurations
+> To do : specify what configuration is needed: env vars, extra files to create to hold special configurations
 
 ### 4.  ▶️ Run the app
 
@@ -97,12 +98,6 @@ Check the application running on [http://localhost:3000](http://localhost:3000)
 <div align="right">
   ⬆️ <a href="#readme-top">back to top</a>
 </div>
-
-## 🏢  Partners
-
-  * AP-HP Clinical Data Warehouse
-  * Arkhn : [arkhn.org](https://arkhn.org/)
-  * Akimed : [www.akimed.io](https://www.akimed.io/)
 
 
 ## 🤝 Contributing
