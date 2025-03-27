@@ -2,8 +2,8 @@ import { QuestionnaireResponseItemAnswer } from 'fhir/r4'
 
 export const hospitForm: { [key: string]: { id: string; type: keyof QuestionnaireResponseItemAnswer } } = {
   hospitReason: {
-    id: 'F_MATER_004051',
-    type: 'valueString'
+    id: 'F_MATER_004052',
+    type: 'valueCoding'
   },
   inUteroTransfer: {
     id: 'F_MATER_007001',

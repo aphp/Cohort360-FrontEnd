@@ -159,13 +159,14 @@ export const form: () => CriteriaForm<HospitDataType> = () => ({
       items: [
         {
           valueKey: 'hospitReason',
-          type: 'textWithCheck',
-          placeholder: "Motif(s) d'hospitalisation",
-          errorType: 'SEARCHINPUT_ERROR',
+          type: 'autocomplete',
+          label: "Motif(s) d'hospitalisation",
+          noOptionsText: "Veuillez entrer un motif d'hospitalisation",
+          valueSetId: getConfig().features.questionnaires.valueSets.hospitReason.url,
           buildInfo: {
             fhirKey: {
-              id: 'F_MATER_004051',
-              type: 'valueString'
+              id: 'F_MATER_004052',
+              type: 'valueCoding'
             },
             chipDisplayMethodExtraArgs: [{ type: 'string', value: "Motif(s) d'hospitalisation : " }]
           }
