@@ -1,6 +1,6 @@
 import apiBack from '../apiBackend'
 
-import { ProjectType, RequestType, Cohort, User } from 'types'
+import { ProjectType, RequestType, Cohort, User, JobStatus } from 'types'
 
 import servicesCohorts from './serviceCohorts'
 import { CohortsFilters, Direction, Order, OrderBy, ProjectsFilters } from 'types/searchCriterias'
@@ -445,7 +445,12 @@ const servicesProjects: IServiceProjects = {
 
       let options: string[] = []
       const { status, favorite, minPatients, maxPatients, startDate, endDate, parentId } = filters
-      const _status = status?.map((stat) => (stat.code === 'pending' ? 'pending,started' : stat.code)) ?? []
+      const _status =
+        status?.map((stat) =>
+          stat.code === JobStatus.PENDING
+            ? `${JobStatus.LONG_PENDING},${JobStatus.PENDING},${JobStatus.STARTED}`
+            : stat.code
+        ) ?? []
 
       if (limit || limit === 0) options = [...options, `limit=${limit}`]
       if (offset) options = [...options, `offset=${offset}`]

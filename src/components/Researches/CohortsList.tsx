@@ -64,7 +64,7 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
   const [paramsReady, setParamsReady] = useState(false)
   const [deleteMode, setDeleteMode] = useState(false)
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
-  let filters: CohortsFilters = {
+  const [filters, setFilters] = useState<CohortsFilters>({
     status,
     favorite: favorites ? [CohortsType.FAVORITE] : favorite,
     minPatients,
@@ -72,7 +72,7 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
     startDate,
     endDate,
     parentId: requestId
-  }
+  })
   const [cohortToEdit, setCohortToEdit] = useState<Cohort | null>(null)
   const [openCohortEditionModal, setOpenCohortEditionModal] = useState(false)
   const [openParentEditionModal, setOpenParentEditionModal] = useState(false)
@@ -245,10 +245,16 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
             totalSelected={selectedCohorts.length}
             onDelete={() => onClickDelete()}
             onFilter={() => setOpenFiltersModal(true)}
-            filters={filtersAsArray}
+            filters={
+              requestId
+                ? filtersAsArray.filter(
+                    (item) => item.category !== FilterKeys.START_DATE && item.category !== FilterKeys.END_DATE
+                  )
+                : filtersAsArray
+            }
             onRemoveFilters={(key, value) => {
               removeFromSearchParams(searchParams, setSearchParams, key, value)
-              filters = removeFilter(key, value, filters)
+              setFilters(removeFilter(key, value, filters))
             }}
             disabled={maintenanceIsActive}
           />
@@ -319,7 +325,7 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
         open={openFiltersModal}
         onClose={() => setOpenFiltersModal(false)}
         onSubmit={(newFilters) => {
-          filters = { ...filters, ...newFilters }
+          setFilters({ ...filters, ...newFilters })
           newFilters.status.length > 0 &&
             searchParams.set(
               ExplorationsSearchParams.STATUS,

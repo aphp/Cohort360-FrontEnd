@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import React, { useEffect, useState, useRef } from 'react'
 import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAppSelector } from 'state'
@@ -30,6 +31,8 @@ const MyResearches = () => {
   const startDateParam = searchParams.get(ExplorationsSearchParams.START_DATE) ?? null
   const endDateParam = searchParams.get(ExplorationsSearchParams.END_DATE) ?? null
 
+  const [localSearchInput, setLocalSearchInput] = useState(searchInput)
+
   const { projectsCount, requestsCount, cohortsCount /*, samplesCount*/ } = useCounts(
     searchInput,
     startDateParam,
@@ -37,6 +40,8 @@ const MyResearches = () => {
   )
 
   const headerRef = useRef<HTMLDivElement>(null)
+  const hasMounted = useRef(false)
+  const hasSyncedInitialValue = useRef(false)
   const [headerHeight, setHeaderHeight] = useState(0)
 
   useEffect(() => {
@@ -44,6 +49,13 @@ const MyResearches = () => {
       setHeaderHeight(headerRef.current.clientHeight)
     }
   }, [])
+
+  useEffect(() => {
+    if (!hasSyncedInitialValue.current) {
+      setLocalSearchInput(searchInput)
+      hasSyncedInitialValue.current = true
+    }
+  }, [searchInput])
 
   // Partie pour handle la direction du slider
   const prevDepthRef = useRef<number | null>(null)
@@ -102,6 +114,10 @@ const MyResearches = () => {
     explorationTabs.find((explorationTab) => explorationTab.id === 'projects')
 
   const handleSearchTermChange = (newSearchInput: string) => {
+    if (!hasMounted.current) {
+      hasMounted.current = true
+      return
+    }
     if (!newSearchInput) {
       searchParams.delete(ExplorationsSearchParams.SEARCH_INPUT)
     } else {
@@ -169,8 +185,11 @@ const MyResearches = () => {
           <Searchbar>
             <SearchInput
               placeholder="Rechercher dans tous les niveaux"
-              value={searchInput}
-              onchange={(newInput) => handleSearchTermChange(newInput)}
+              value={localSearchInput}
+              onchange={(newInput) => {
+                setLocalSearchInput(newInput)
+                handleSearchTermChange(newInput)
+              }}
               width="296px"
             />
           </Searchbar>
