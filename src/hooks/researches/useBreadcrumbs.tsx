@@ -1,17 +1,20 @@
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import useProject from './useProject'
 import useRequest from './useRequest'
+import { cleanSearchParams } from 'utils/explorationUtils'
 
 const useBreadCrumbs = () => {
   const { projectId, requestId, cohortId } = useParams()
   const location = useLocation()
+  const [searchParams] = useSearchParams()
 
   const { project } = useProject(projectId)
   const { request } = useRequest(requestId)
+  const cleanedSearchParams = cleanSearchParams(searchParams)
 
   const items = []
   if (location.pathname.includes('/projects')) {
-    items.push({ label: 'Tous mes projets', url: '/researches/projects' })
+    items.push({ label: 'Tous mes projets', url: `/researches/projects?${cleanedSearchParams}` })
 
     if (projectId && project) {
       items.push({
@@ -29,7 +32,7 @@ const useBreadCrumbs = () => {
   }
 
   if (location.pathname.includes('/requests')) {
-    items.push({ label: 'Toutes mes requêtes', url: '/researches/requests' })
+    items.push({ label: 'Toutes mes requêtes', url: `/researches/requests?${cleanedSearchParams}` })
     if (requestId && request) {
       items.push({
         label: `${request.name}`,

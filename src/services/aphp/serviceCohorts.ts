@@ -287,7 +287,7 @@ const servicesCohorts: IServiceCohorts = {
         .map((cohort) => cohort.group_id)
         .filter((id) => id !== undefined || id !== '')
         .filter((i): i is string => i !== '')
-      if (ids.length === 0) return []
+      if (ids.length === 0) return cohorts
       const rightsResponse = await fetchCohortAccesses(ids)
       return cohorts.map((cohort) => {
         return {
