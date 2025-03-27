@@ -144,7 +144,7 @@ const ProjectsList = () => {
               title={project.name}
               creationDate={project.created_at}
               requestNumber={project.requests_count ?? 0}
-              onclick={() => navigate(`/researches/projects/${project.uuid}`)}
+              onclick={() => navigate(`/researches/projects/${project.uuid}${location.search}`)}
               onedit={() => {
                 setSelectedProject(project)
                 setOpenEditionModal(true)

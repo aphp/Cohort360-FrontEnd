@@ -18,6 +18,9 @@ const useCohortsWebSocket = () => {
     const updatePromises = queryKeys.map(async ([key, oldData]) => {
       if (!oldData?.results) return
 
+      const containsUpdatedCohort = oldData.results.some((cohort) => cohort.uuid === message.uuid)
+      if (!containsUpdatedCohort) return
+
       const updatedCohorts = oldData.results.map((cohort) =>
         cohort.uuid === message.uuid
           ? {
