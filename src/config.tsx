@@ -88,6 +88,7 @@ export type AppConfig = {
         birthDeliveryWay: ValueSetConfig
         cSectionModality: ValueSetConfig
         childBirthMode: ValueSetConfig
+        hospitReason: ValueSetConfig
         chirurgicalGesture: ValueSetConfig
         conditionPerineum: ValueSetConfig
         exitDiagnostic: ValueSetConfig
@@ -278,6 +279,7 @@ let config: AppConfig = {
         birthDeliveryWay: { url: '' },
         cSectionModality: { url: '' },
         childBirthMode: { url: '' },
+        hospitReason: { url: '' },
         chirurgicalGesture: { url: '' },
         conditionPerineum: { url: '' },
         exitDiagnostic: { url: '' },
