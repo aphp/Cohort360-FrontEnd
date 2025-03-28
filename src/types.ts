@@ -449,17 +449,7 @@ export type DatedMeasure = {
   measure_max: number | null
   count_task_id: string
   mode: 'Snapshot' | 'Global'
-}
-
-export type CountCohort = {
-  date: string
-  status?: string
-  uuid: string
-  shortCohortLimit: number
-  count_outdated: boolean
-  jobFailMsg?: string
-  includePatient?: number
-  byrequest?: number
+  extra?: Record<string, string>
 }
 
 export type Cohort = {
@@ -488,9 +478,10 @@ export type CohortRights = {
   rights?: GroupRights
 }
 
-export type CohortCreationCounterType = {
+export type CohortCount = {
   uuid?: string
   status?: string
+  shortCohortLimit?: number
   includePatient?: number
   byrequest?: number
   unknownPatient?: number
@@ -498,6 +489,7 @@ export type CohortCreationCounterType = {
   date?: string
   cohort_limit?: number
   count_outdated?: boolean
+  extra?: Record<string, string>
 }
 
 export type FetchRequest = {
@@ -828,6 +820,7 @@ export type WSJobStatus = WebSocketMessage<{
     request_job_fail_msg?: string
     request_job_status: JobStatus
     measure?: number
+    extra?: Record<string, string>
     global?: { measure_min: number; measure_max: number }
   }
 }> & { type: WebSocketMessageType.JOB_STATUS }
