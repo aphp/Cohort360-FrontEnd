@@ -1,25 +1,26 @@
 import { useContext, useEffect } from 'react'
-import servicesCohorts from 'services/aphp/serviceCohorts'
 import { useQueryClient } from '@tanstack/react-query'
 import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
 import { Cohort, JobStatus, WebSocketJobName, WebSocketMessageType, WSJobStatus } from 'types'
+import { fetchCohortAccesses } from 'services/aphp/callApi'
 
 const useCohortsWebSocket = () => {
   const wsContext = useContext(WebSocketContext)
   const queryClient = useQueryClient()
 
   const updateCohorts = async (message: WSJobStatus) => {
+    const newRights = message.extra_info?.group_id
+      ? (await fetchCohortAccesses([message.extra_info?.group_id])).data
+      : []
+
     const queryKeys = queryClient.getQueriesData<{
       count: number
       next: string | null
       previous: string | null
       results: Cohort[]
     }>({ queryKey: ['cohorts'] })
-    const updatePromises = queryKeys.map(async ([key, oldData]) => {
+    queryKeys.forEach(([key, oldData]) => {
       if (!oldData?.results) return
-
-      const containsUpdatedCohort = oldData.results.some((cohort) => cohort.uuid === message.uuid)
-      if (!containsUpdatedCohort) return
 
       const updatedCohorts = oldData.results.map((cohort) =>
         cohort.uuid === message.uuid
@@ -28,17 +29,14 @@ const useCohortsWebSocket = () => {
               measure_min: message.extra_info?.global?.measure_min,
               measure_max: message.extra_info?.global?.measure_max,
               request_job_status: message.status,
-              group_id: message.extra_info?.group_id
+              group_id: message.extra_info?.group_id,
+              rights: newRights.find((right) => right.cohort_id == cohort.group_id)?.rights
             }
           : cohort
       )
 
-      const updatedCohortsWithRights = await servicesCohorts.fetchCohortsRights(updatedCohorts)
-
-      queryClient.setQueryData(key, { ...oldData, results: updatedCohortsWithRights })
+      queryClient.setQueryData(key, { ...oldData, results: updatedCohorts })
     })
-
-    await Promise.all(updatePromises)
   }
 
   useEffect(() => {
