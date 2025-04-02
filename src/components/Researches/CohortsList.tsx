@@ -79,9 +79,11 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
   const [openFiltersModal, setOpenFiltersModal] = useState(false)
 
   useEffect(() => {
-    const { changed, newSearchParams } = checkSearchParamsErrors(searchParams)
-    if (changed) {
-      setSearchParams(newSearchParams)
+    if (!simplified) {
+      const { changed, newSearchParams } = checkSearchParamsErrors(searchParams)
+      if (changed) {
+        setSearchParams(newSearchParams)
+      }
     }
     setParamsReady(true)
   }, [])
@@ -323,16 +325,17 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
         onClose={() => setOpenFiltersModal(false)}
         onSubmit={(newFilters) => {
           setFilters({ ...filters, ...newFilters })
-          console.log('test status setFilters', newFilters)
-          newFilters.status.length > 0 &&
-            searchParams.set(
-              ExplorationsSearchParams.STATUS,
-              newFilters.status.map((status: ValueSet) => status.code).join()
-            )
-          newFilters.favorite.length > 0 && searchParams.set(ExplorationsSearchParams.FAVORITE, newFilters.favorite)
-          newFilters.minPatients && searchParams.set(ExplorationsSearchParams.MIN_PATIENTS, newFilters.minPatients)
-          newFilters.maxPatients && searchParams.set(ExplorationsSearchParams.MAX_PATIENTS, newFilters.maxPatients)
-          setSearchParams(searchParams)
+          if (!simplified) {
+            newFilters.status.length > 0 &&
+              searchParams.set(
+                ExplorationsSearchParams.STATUS,
+                newFilters.status.map((status: ValueSet) => status.code).join()
+              )
+            newFilters.favorite.length > 0 && searchParams.set(ExplorationsSearchParams.FAVORITE, newFilters.favorite)
+            newFilters.minPatients && searchParams.set(ExplorationsSearchParams.MIN_PATIENTS, newFilters.minPatients)
+            newFilters.maxPatients && searchParams.set(ExplorationsSearchParams.MAX_PATIENTS, newFilters.maxPatients)
+            setSearchParams(searchParams)
+          }
         }}
       >
         <CohortStatusFilter value={status} name={FilterKeys.STATUS} allStatus={statusOptions} />
