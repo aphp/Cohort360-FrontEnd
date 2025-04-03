@@ -7,7 +7,7 @@ import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
 import FavStar from 'components/ui/FavStar'
 import IconButtonWithTooltip from '../ui/IconButtonWithTooltip'
 import ResearchesTable from './ResearchesTable'
-import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
+import { ChipStyles } from 'components/ui/StatusChip'
 import { TableCellWrapper } from './ResearchesTable/styles'
 
 import Download from 'assets/icones/download.svg?react'
@@ -22,30 +22,30 @@ import displayDigit from 'utils/displayDigit'
 import { formatDate } from 'utils/formatDate'
 import { getExportTooltip, getGlobalEstimation } from 'utils/explorationUtils'
 import { isChecked } from 'utils/filters'
+import TooltipChip from 'components/ui/TooltipChip'
 
-export const getCohortStatusChip = (status?: JobStatus, jobFailMessage?: string) => {
+const getCohortStatusChip = (status?: JobStatus, jobFailMessage?: string) => {
   if (jobFailMessage) {
-    return (
-      <Tooltip title={jobFailMessage}>
-        <StatusChip label="Erreur" status={ChipStyles.ERROR} />
-      </Tooltip>
-    )
+    return <TooltipChip label="Erreur" status={ChipStyles.ERROR} tooltip={jobFailMessage} />
   }
 
   switch (status) {
     case JobStatus.FINISHED:
-      return <StatusChip label="Terminé" status={ChipStyles.FINISHED} />
+      return <TooltipChip label="Terminé" status={ChipStyles.FINISHED} />
     case JobStatus.PENDING:
     case JobStatus.NEW:
-      return <StatusChip label="En cours" status={ChipStyles.IN_PROGRESS} />
+      return <TooltipChip label="En cours" status={ChipStyles.IN_PROGRESS} />
     case JobStatus.LONG_PENDING:
       return (
-        <Tooltip title="Cohorte volumineuse : sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.">
-          <StatusChip label="En cours" status={ChipStyles.IN_PROGRESS} icon={<UpdateIcon />} />
-        </Tooltip>
+        <TooltipChip
+          label="En cours"
+          status={ChipStyles.IN_PROGRESS}
+          icon={<UpdateIcon />}
+          tooltip="Cohorte volumineuse : sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible."
+        />
       )
     default:
-      return <StatusChip label="Erreur" status={ChipStyles.ERROR} />
+      return <TooltipChip label="Erreur" status={ChipStyles.ERROR} />
   }
 }
 
