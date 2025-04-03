@@ -15,13 +15,16 @@ const AddOrEditItem: React.FC<{
 }> = ({ open, selectedItem, onCreate, onUpdate, titleCreate, titleEdit, onClose }) => {
   const [name, setName] = useState(selectedItem?.name)
   const [description, setDescription] = useState(selectedItem?.description)
-  const [error, setError] = useState(false)
+  const [hasInteracted, setHasInteracted] = useState(false)
 
   const isEdition = selectedItem
+  const nameTooLong = !!(name && name.length > 255)
+  const noName = !name?.trim()
+  const error = nameTooLong || noName
 
   const handleSubmit = () => {
-    if (!name || (name && name.length > 255)) {
-      return setError(true)
+    if (!name || error) {
+      return
     }
 
     const itemData: ProjectType | Omit<ProjectType, 'uuid'> = {
@@ -42,7 +45,7 @@ const AddOrEditItem: React.FC<{
     if (open) {
       setName(selectedItem?.name ?? '')
       setDescription(selectedItem?.description ?? '')
-      setError(false)
+      setHasInteracted(false)
     }
   }, [open, selectedItem])
 
@@ -56,15 +59,18 @@ const AddOrEditItem: React.FC<{
           <TextField
             placeholder="Nom"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value)
+              if (!hasInteracted) setHasInteracted(true)
+            }}
             autoFocus
             id="title"
             margin="normal"
             fullWidth
-            error={error}
+            error={nameTooLong || (noName && hasInteracted)}
             helperText={
-              error
-                ? name?.length === 0
+              nameTooLong || (noName && hasInteracted)
+                ? noName && hasInteracted
                   ? 'Le nom doit comporter au moins un caractère.'
                   : 'Le nom est trop long (255 caractères max.)'
                 : ''
