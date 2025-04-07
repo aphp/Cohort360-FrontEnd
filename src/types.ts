@@ -27,6 +27,7 @@ import { Comparators, CriteriaType, ResourceType, SelectedCriteriaType } from 't
 import { ExportTableType } from 'components/Dashboard/ExportModal/export_table'
 import { CriteriaForm } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
 import { ScopeElement } from 'types/scope'
+import { ReactNode } from 'react'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
@@ -179,6 +180,13 @@ export enum Month {
   OCTOBER = 'Octobre',
   NOVEMBER = 'Novembre',
   DECEMBER = 'Décembre'
+}
+
+export type Column = {
+  label: string | ReactNode
+  code?: string
+  align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
+  multiple?: Column[]
 }
 
 export enum ChartCode {

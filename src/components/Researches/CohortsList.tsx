@@ -13,7 +13,7 @@ import IconButtonWithTooltip from '../ui/IconButtonWithTooltip'
 import LevelHeader from './LevelHeader'
 import Modal from 'components/ui/Modal'
 import ModalShareRequest from './Modals/ModalShareRequest'
-import PatientsNbFilter from 'components/Filters/PatientsNbFilter'
+//import PatientsNbFilter from 'components/Filters/PatientsNbFilter'
 
 import DeleteIcon from 'assets/icones/delete.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
@@ -44,7 +44,7 @@ import {
 } from 'utils/explorationUtils'
 import { removeFilter, selectFiltersAsArray } from 'utils/filters'
 import { CohortsType, ExplorationsSearchParams } from 'types/cohorts'
-import CohortStatusFilter from 'components/Filters/CohortsStatusFilter'
+//import CohortStatusFilter from 'components/Filters/CohortsStatusFilter'
 
 type CohortsListProps = {
   rowsPerPage?: number
@@ -110,15 +110,18 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
   } = useSelectionState<Cohort>()
   const filtersAsArray = useMemo(() => {
     console.log('test status update useMemo', status)
-    return selectFiltersAsArray({
-      status,
-      favorite,
-      minPatients,
-      maxPatients,
-      startDate,
-      endDate
-    })
-  }, [status, favorite, minPatients, maxPatients, startDate, endDate])
+    return selectFiltersAsArray(
+      {
+        status,
+        favorite,
+        minPatients,
+        maxPatients,
+        startDate,
+        endDate
+      },
+      searchInput
+    )
+  }, [status, favorite, minPatients, maxPatients, startDate, endDate, searchInput])
 
   const handlePageChange = (newPage: number) => {
     searchParams.set(ExplorationsSearchParams.PAGE, String(newPage))
@@ -337,12 +340,12 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
           setSearchParams(searchParams)
         }}
       >
-        <CohortStatusFilter value={status} name={FilterKeys.STATUS} allStatus={statusOptions} />
+        {/*<CohortStatusFilter value={status} name={FilterKeys.STATUS} allStatus={statusOptions} />*/}
         <CohortsTypesFilter value={favorite} name={FilterKeys.FAVORITE} />
-        <PatientsNbFilter
+        {/*<PatientsNbFilter
           values={[minPatients, maxPatients]}
           names={[FilterKeys.MIN_PATIENTS, FilterKeys.MAX_PATIENTS]}
-        />
+        />*/}
       </Modal>
     </Grid>
   )

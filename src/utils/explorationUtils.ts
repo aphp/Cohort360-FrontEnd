@@ -1,9 +1,9 @@
 import { Cohort, JobStatus, ProjectType, QuerySnapshotInfo, RequestType, ValueSet } from 'types'
 import { CohortsType, ExplorationsSearchParams } from 'types/cohorts'
 import { Direction, FilterKeys, FilterValue, Order } from 'types/searchCriterias'
-import displayDigit from './displayDigit'
 import { SetURLSearchParams } from 'react-router-dom'
 import { isDateValid } from './formatDate'
+import { format } from './numbers'
 
 export const replaceItem = <T extends ProjectType | RequestType | Cohort>(item: T, itemsList: T[]) => {
   const index = itemsList.findIndex(({ uuid }) => uuid === item.uuid)
@@ -169,7 +169,7 @@ export const getGlobalEstimation = (cohort: Cohort) => {
   if (cohort.measure_min === null || cohort.measure_max === null) {
     return 'N/A'
   } else {
-    return `${displayDigit(cohort.measure_min)} - ${displayDigit(cohort.measure_max)}`
+    return `${format(cohort.measure_min)} - ${format(cohort.measure_max)}`
   }
 }
 

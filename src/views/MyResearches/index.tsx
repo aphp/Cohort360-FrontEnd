@@ -7,13 +7,11 @@ import { Box, Grid, Slide, Typography } from '@mui/material'
 import Badge from 'components/ui/Badge'
 import Breadcrumb from 'components/Researches/Breadcrumbs'
 import MenuButtonFilter from 'components/Researches/MenuButtonFilter'
-import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import Tabs from 'components/ui/Tabs'
 
 import useCounts from 'hooks/researches/useCounts'
 
-import { ExplorationTabs, TabType } from 'types'
+import { TabType } from 'types'
 import { ExplorationsSearchParams } from 'types/cohorts'
 import { cleanSearchParams, getPathDepth } from 'utils/explorationUtils'
 import useStyles from './styles'
@@ -143,7 +141,7 @@ const MyResearches = () => {
     })
   }
 
-  const handleTabChange = (newTab: ExplorationTabs) => {
+  const handleTabChange = (newTab: /*ExplorationTabs*/ any) => {
     setSlideIsActive(false)
     const cleanedSearchParams = cleanSearchParams(searchParams)
     setSearchParams(cleanedSearchParams)
@@ -182,24 +180,22 @@ const MyResearches = () => {
             }
             onChangeEndDate={(newDate: string | null) => handleDateChange(newDate, ExplorationsSearchParams.END_DATE)}
           />
-          <Searchbar>
-            <SearchInput
-              placeholder="Rechercher dans tous les niveaux"
-              value={localSearchInput}
-              onchange={(newInput) => {
-                setLocalSearchInput(newInput)
-                handleSearchTermChange(newInput)
-              }}
-              width="296px"
-            />
-          </Searchbar>
+          <SearchInput
+            placeholder="Rechercher dans tous les niveaux"
+            value={localSearchInput}
+            onChange={(newInput) => {
+              setLocalSearchInput(newInput)
+              handleSearchTermChange(newInput)
+            }}
+            //width="296px"
+          />
         </Box>
-        <Tabs
+        {/*<Tabs
           variant="pill"
           values={explorationTabs}
           active={selectedTab as TabType<string, React.ReactNode>}
           onchange={handleTabChange}
-        />
+        />*/}
       </Grid>
       <Grid container bgcolor={'#FFF'} sx={{ minHeight: `calc(100vh - ${headerHeight}px)` }} justifyContent={'center'}>
         <Grid key={location.pathname} container xs={11} style={{ padding: '20px 0' }} gap={'20px'} direction={'column'}>

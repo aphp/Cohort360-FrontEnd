@@ -2,13 +2,14 @@ import React from 'react'
 
 import { TableRow, Typography } from '@mui/material'
 import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
-import DataTable from 'components/DataTable/DataTable'
+//import DataTable from 'components/DataTable/DataTable'
 import IconButtonWithTooltip from 'components/ui/IconButtonWithTooltip'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import DeleteIcon from '@mui/icons-material/Delete'
 
 import { User } from 'types'
+import Table from 'components/ui/Table'
 
 type UsersTableProps = {
   usersList: User[]
@@ -41,7 +42,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ usersList, loading, usersAssoci
   }
 
   return (
-    <DataTable columns={columns} noPagination>
+    <Table columns={columns} noPagination>
       {loading ? (
         <TableRow>
           <TableCellWrapper colSpan={7}>
@@ -76,7 +77,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ usersList, loading, usersAssoci
           )
         })
       )}
-    </DataTable>
+    </Table>
   )
 }
 

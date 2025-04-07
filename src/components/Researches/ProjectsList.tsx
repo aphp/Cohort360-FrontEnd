@@ -113,8 +113,8 @@ const ProjectsList = () => {
         <Select
           value={`${order.orderDirection}${order.orderBy}`}
           label="Tri par"
-          width={'250px'}
-          items={orderByProjects}
+          // width={'250px'}
+          options={orderByProjects}
           onchange={(newValue) => changeOrderBy(newValue)}
         />
         <Typography fontWeight={'bold'} fontSize={14}>
