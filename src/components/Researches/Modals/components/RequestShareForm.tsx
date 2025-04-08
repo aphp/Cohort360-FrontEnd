@@ -56,7 +56,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
       try {
         setLoadingOnSearch(true)
 
-        const usersResp = await getUsers(orderDefault, 1, debouncedSearchTerm)
+        const usersResp = await getUsers(orderDefault, 1, debouncedSearchTerm, true)
 
         setUsersSearchResults(usersResp.users)
 
