@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAppSelector } from 'state'
 
-import { Grid, Typography } from '@mui/material'
+import { Grid, Typography, Button } from '@mui/material'
 import AddOrEditItem from './Modals/AddOrEditItem'
-import Button from 'components/ui/Button'
 import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
 import ProjectCard from 'components/ui/ProjectCard'
@@ -25,6 +24,7 @@ import {
   getFoldersSearchParams
 } from 'utils/explorationUtils'
 import { ExplorationsSearchParams } from 'types/cohorts'
+import { Box } from '@mui/material'
 
 const ProjectsList = () => {
   const navigate = useNavigate()
@@ -109,34 +109,53 @@ const ProjectsList = () => {
 
   return (
     <Grid container style={{ padding: '20px 0' }} gap="20px">
-      <Grid container justifyContent={'space-between'} alignItems={'center'}>
-        <Select
-          value={`${order.orderDirection}${order.orderBy}`}
-          label="Tri par"
-          // width={'250px'}
-          options={orderByProjects}
-          onchange={(newValue) => changeOrderBy(newValue)}
-        />
-        <Typography fontWeight={'bold'} fontSize={14}>
-          {total} projet{total > 1 ? 's' : ''}
-        </Typography>
-        <Button
-          width="fit-content"
-          onClick={() => setOpenEditionModal(true)}
-          endIcon={<AddIcon />}
-          disabled={maintenanceIsActive}
-          small
-        >
-          Nouveau projet
-        </Button>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={12} sm={2}>
+          <Typography fontWeight="bold" fontSize={14}>
+            {total} projet{total > 1 ? 's' : ''}
+          </Typography>
+        </Grid>
+
+        <Grid item xs={12} sm={10}>
+          <Grid container spacing={{ xs: '15px', sm: '5px' }} justifyContent={{ xs: 'flex-start', sm: 'flex-end' }}>
+            <Grid item width={{ xs: '100%', sm: 'fit-content' }}>
+              <Button
+                sx={{ borderRadius: '25px', height: '30px' }}
+                onClick={() => setOpenEditionModal(true)}
+                endIcon={<AddIcon />}
+                disabled={maintenanceIsActive}
+                variant="contained"
+              >
+                Nouveau projet
+              </Button>
+            </Grid>
+            <Grid item width={{ xs: '100%', sm: 'fit-content' }}>
+              <Select
+                value={`${orderDirection}${order.orderBy}`}
+                label="Tri par"
+                options={orderByProjects}
+                onchange={(newValue) => changeOrderBy(newValue)}
+              />
+            </Grid>
+          </Grid>
+        </Grid>
       </Grid>
-      <Grid container gap="50px" id="projects-list-div">
+
+      <Box
+        id="projects-list-div"
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '30px',
+          width: '100%'
+        }}
+      >
         {loading ? (
           <CenteredCircularProgress />
         ) : projectsList.length === 0 ? (
-          <Grid container justifyContent={'center'} marginTop={'12px'}>
+          <Box display="flex" justifyContent="center" width="100%" mt={2}>
             <Typography>Aucun projet à afficher</Typography>
-          </Grid>
+          </Box>
         ) : (
           projectsList.map((project: ProjectType) => (
             <ProjectCard
@@ -157,7 +176,7 @@ const ProjectsList = () => {
             />
           ))
         )}
-      </Grid>
+      </Box>
 
       <AddOrEditItem
         open={openEditionModal}

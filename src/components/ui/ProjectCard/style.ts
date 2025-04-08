@@ -6,7 +6,7 @@ export const StyledCard = styled(Box)(() => ({
   flexDirection: 'column',
   justifyContent: 'space-around',
   alignItems: 'center',
-  width: 200,
+  width: '100%',
   height: 184,
   padding: 20,
   borderRadius: 12,
