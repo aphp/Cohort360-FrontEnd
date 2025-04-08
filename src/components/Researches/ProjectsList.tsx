@@ -118,9 +118,9 @@ const ProjectsList = () => {
 
         <Grid item xs={12} sm={10}>
           <Grid container spacing={{ xs: '15px', sm: '5px' }} justifyContent={{ xs: 'flex-start', sm: 'flex-end' }}>
-            <Grid item width={{ xs: '100%', sm: 'fit-content' }}>
+            <Grid container item width={{ xs: '100%', sm: '162px' }}>
               <Button
-                sx={{ borderRadius: '25px', height: '30px' }}
+                sx={{ borderRadius: '25px', height: '30px', fontSize: 12, width: '100%' }}
                 onClick={() => setOpenEditionModal(true)}
                 endIcon={<AddIcon />}
                 disabled={maintenanceIsActive}
@@ -129,7 +129,7 @@ const ProjectsList = () => {
                 Nouveau projet
               </Button>
             </Grid>
-            <Grid item width={{ xs: '100%', sm: 'fit-content' }}>
+            <Grid item width={{ xs: '100%', sm: '225px' }}>
               <Select
                 value={`${orderDirection}${order.orderBy}`}
                 label="Tri par"
