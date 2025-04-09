@@ -164,6 +164,17 @@ export const getCohortsSearchParams = (searchParams: URLSearchParams) => {
 export const getPathDepth = (pathname: string) => {
   return pathname.split('/').filter(Boolean).length
 }
+export const isDeeperPath = (prevUrl: string, currentUrl: string) => {
+  const prevDepth = getPathDepth(prevUrl)
+  const currentDepth = getPathDepth(currentUrl)
+  return currentDepth > prevDepth ? true : false
+}
+
+export const isSamePathStart = (prevUrl: string, currentUrl: string, depth = 2) => {
+  const prevSegments = prevUrl.split('/').filter(Boolean).slice(0, depth).join('/')
+  const currentSegments = currentUrl.split('/').filter(Boolean).slice(0, depth).join('/')
+  return prevSegments === currentSegments
+}
 
 export const getGlobalEstimation = (cohort: Cohort) => {
   if (cohort.measure_min === null || cohort.measure_max === null) {

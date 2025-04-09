@@ -2,19 +2,19 @@ import { styled } from '@mui/material/styles'
 import { Tabs } from '@mui/material'
 
 export const MainTabsWrapper = styled(Tabs)(() => ({
+  width: '100%',
   '.MuiTabs-indicator': {
     height: 0,
     opacity: 0
   },
   '& .MuiTab-root': {
+    flex: 1,
     padding: '4px 15px',
-    marginRight: 12,
     minWidth: 0,
     fontWeight: 900,
-    color: '#0063af',
-    '&:last-child': {
-      marginRight: 0
-    },
+    textAlign: 'center',
+    fontFamily: 'Montserrat, sans-serif',
+    color: 'inherit',
     '&:hover': {
       textDecoration: 'underline'
     }
