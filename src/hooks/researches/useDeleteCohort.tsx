@@ -12,6 +12,7 @@ const useDeleteCohort = () => {
     mutationFn: async (cohorts: Cohort[]) => await services.projects.deleteCohorts(cohorts),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cohorts'] })
+      queryClient.invalidateQueries({ queryKey: ['cohortsCount'] })
       dispatch(setMessage({ type: 'success', content: 'La suppression de la cohorte a été réalisée avec succès' }))
     },
     onError: () => {

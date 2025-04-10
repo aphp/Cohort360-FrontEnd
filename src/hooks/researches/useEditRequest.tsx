@@ -15,6 +15,7 @@ const useEditRequest = () => {
     mutationFn: async (newRequestData: RequestType) => await services.projects.editRequest(newRequestData),
     onSuccess: (data, editedRequest) => {
       queryClient.invalidateQueries({ queryKey: ['requests'] })
+      queryClient.invalidateQueries({ queryKey: ['requestsCount'] })
       queryClient.invalidateQueries({ queryKey: ['request'] })
       dispatch(setMessage({ type: 'success', content: "L'édition de la requête a été réalisée avec succès" }))
       // à supprimer si délétion du store request

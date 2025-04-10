@@ -14,6 +14,7 @@ const useCreateProject = () => {
     mutationFn: async (newProjectData: Omit<ProjectType, 'uuid'>) => await services.projects.addProject(newProjectData),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })
+      queryClient.invalidateQueries({ queryKey: ['projectsCount'] })
       // à supprimer après délétion du store project
       dispatch(
         setProjectsList({

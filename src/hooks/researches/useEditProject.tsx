@@ -15,6 +15,7 @@ const useEditProject = () => {
     mutationFn: async (newProjectData: ProjectType) => await services.projects.editProject(newProjectData),
     onSuccess: (data, editedProject) => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })
+      queryClient.invalidateQueries({ queryKey: ['projectsCount'] })
       queryClient.invalidateQueries({ queryKey: ['project'] })
       dispatch(setMessage({ type: 'success', content: "L'édition du projet a été réalisée avec succès" }))
       // à supprimer si délétion du store project
