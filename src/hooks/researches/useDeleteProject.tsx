@@ -17,6 +17,7 @@ const useDeleteProject = () => {
     mutationFn: async (project: ProjectType) => await services.projects.deleteProject(project),
     onSuccess: (data, deletedProject) => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })
+      queryClient.invalidateQueries({ queryKey: ['projectsCount'] })
       dispatch(setMessage({ type: 'success', content: 'La suppression du projet a été réalisée avec succès' }))
       // à supprimer si délétion du store project
       dispatch(

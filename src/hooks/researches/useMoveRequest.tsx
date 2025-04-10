@@ -21,6 +21,7 @@ const useMoveRequest = () => {
       await services.projects.moveRequests(selectedRequests, parent.uuid),
     onSuccess: (data, { selectedRequests, parent }) => {
       queryClient.invalidateQueries({ queryKey: ['requests'] })
+      queryClient.invalidateQueries({ queryKey: ['requestsCount'] })
       queryClient.invalidateQueries({ queryKey: ['request'] })
       dispatch(setMessage({ type: 'success', content: 'La ou les requêtes ont été déplacées avec succès' }))
       // à supprimer si délétion du store request
