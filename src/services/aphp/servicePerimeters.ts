@@ -60,7 +60,7 @@ export interface IServicePerimeters {
    * Retour:
    *   - ScopeTreeTableRow | undefined
    */
-  fetchPopulationForRequeteur: (perimeterId: string[]) => Promise<Hierarchy<ScopeElement>[]>
+  fetchPopulationForRequeteur: (perimeterId: string[] | undefined) => Promise<Hierarchy<ScopeElement>[]>
 
   /**
    * Cette fonction retourne l'ensemble des perimetres auquels un practitioner a le droit
@@ -189,7 +189,7 @@ const servicesPerimeters: IServicePerimeters = {
 
   fetchPopulationForRequeteur: async (cohortIds) => {
     let population: Hierarchy<ScopeElement>[] = []
-    const ids = cohortIds.join(',')
+    const ids = cohortIds?.join(',')
     if (ids) {
       const response = (await servicesPerimeters.getRights({ limit: -1, cohortIds: ids, sourceType: SourceType.ALL }))
         .results

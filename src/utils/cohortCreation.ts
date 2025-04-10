@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import services from 'services/aphp'
 import { CriteriaGroup, TemporalConstraintsType, CriteriaItemType, CriteriaGroupType, ScopeElement } from 'types'
 
@@ -355,7 +354,16 @@ export function buildRequest(
   return JSON.stringify(json)
 }
 
-export async function unbuildRequest(_json: string): Promise<any> {
+type UnbuildRequestReturnType = {
+  population: Hierarchy<ScopeElement, string>[] | null
+  criteria: SelectedCriteriaType[]
+  criteriaGroup: CriteriaGroup[]
+  temporalConstraints?: TemporalConstraintsType[]
+  idRemap: Record<number, number>
+}
+
+// eslint-disable-next-line max-statements
+export async function unbuildRequest(_json: string): Promise<UnbuildRequestReturnType> {
   const criteriaDefinitions = getAllCriteriaItems(criteriaList())
   // TODO: handle potential errors (here or in the caller)
   // so if a single criteria fails, the whole request is not lost
@@ -367,11 +375,12 @@ export async function unbuildRequest(_json: string): Promise<any> {
     return {
       population: null,
       criteria: [],
-      criteriaGroup: []
+      criteriaGroup: [],
+      idRemap: {}
     }
   }
 
-  const json = JSON.parse(_json)
+  const json = JSON.parse(_json) as RequeteurSearchType
   const {
     sourcePopulation: { caresiteCohortList },
     request
@@ -387,16 +396,17 @@ export async function unbuildRequest(_json: string): Promise<any> {
    * Retrieve criteria + groups
    *
    */
-  const exploreRequest = (currentItem: any): void => {
+  const exploreRequest = (currentItem: RequeteurGroupType): void => {
     const { criteria } = currentItem
 
     for (const criterion of criteria) {
       if (criterion._type === 'basicResource') {
         criteriaItems = [...criteriaItems, criterion]
       } else {
-        criteriaGroup = [...criteriaGroup, { ...criterion }]
-        if (criterion && criterion.criteria && criterion.criteria.length > 0) {
-          exploreRequest(criterion)
+        const groupCriteria = criterion as RequeteurGroupType
+        criteriaGroup = [...criteriaGroup, { ...groupCriteria }]
+        if (groupCriteria && groupCriteria.criteria && groupCriteria.criteria.length > 0) {
+          exploreRequest(groupCriteria)
         }
       }
     }
@@ -406,7 +416,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
     criteriaGroup = [...criteriaGroup, { ...request }]
     exploreRequest(request)
   } else {
-    return { population, criteria: [], criteriaGroup: [] }
+    return { population, criteria: [], criteriaGroup: [], idRemap: {} }
   }
 
   const convertJsonObjectsToCriteria = async (
@@ -504,6 +514,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
     }
 
     // Assign new id (current group)
+    idMap[_criteriaGroupItem.id] = newId
     _criteriaGroup[index].id = newId
   }
 
@@ -518,7 +529,8 @@ export async function unbuildRequest(_json: string): Promise<any> {
     population,
     criteria: await convertJsonObjectsToCriteria(criteriaItems),
     criteriaGroup: _criteriaGroup,
-    temporalConstraints: updatedConstraintsIds
+    temporalConstraints: updatedConstraintsIds,
+    idRemap: Object.fromEntries(Object.entries(idMap).map(([k, v]) => [v, Number(k)]))
   }
 }
 
@@ -586,7 +598,18 @@ export const fetchCriteriasCodes = async (
   return updatedCriteriaData
 }
 
-export const joinRequest = async (oldJson: string, newJson: string, parentId: number | null): Promise<any> => {
+type JoinRequestReturnType = {
+  json: string
+  criteria: SelectedCriteriaType[]
+  criteriaGroup: CriteriaGroup[]
+  idRemap: Record<number, number>
+}
+
+export const joinRequest = async (
+  oldJson: string,
+  newJson: string,
+  parentId: number | null
+): Promise<JoinRequestReturnType> => {
   const oldRequest = JSON.parse(oldJson) as RequeteurSearchType
   const newRequest = JSON.parse(newJson) as RequeteurSearchType
 
@@ -645,11 +668,12 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
     request: fillRequestWithNewRequest(oldRequest.request)
   }
 
-  const { population, criteria, criteriaGroup } = await unbuildRequest(JSON.stringify(newJoinedRequest))
+  const { population, criteria, criteriaGroup, idRemap } = await unbuildRequest(JSON.stringify(newJoinedRequest))
 
   return {
     json: buildRequest(population, criteria, criteriaGroup, []),
     criteria,
-    criteriaGroup
+    criteriaGroup,
+    idRemap
   }
 }

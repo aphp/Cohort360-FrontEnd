@@ -26,6 +26,7 @@ import {
 
 import useStyles from './styles'
 import { SelectedCriteriaType } from 'types/requestCriterias'
+import { getStageDetails } from '../CriteriaCount'
 
 type OperatorItemProps = {
   itemId: number
@@ -47,7 +48,8 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   const { classes } = useStyles()
 
   const { request } = useAppSelector((state) => state.cohortCreation || {})
-  const { loading = false, criteriaGroup = [], selectedCriteria = [] } = request
+  const { loading = false, criteriaGroup = [], selectedCriteria = [], count = {}, idRemap } = request
+  const { extra: stageDetails } = count
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
@@ -59,8 +61,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
   return (
     <>
-      <LogicalOperatorItem itemId={itemId} />
-
+      <LogicalOperatorItem itemId={itemId} criteriaCount={getStageDetails(itemId, idRemap, stageDetails)} />
       <Grid
         container
         direction="column"
@@ -93,6 +94,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
             return child?.id > 0 ? (
               <CriteriaCardItem
                 key={child?.id}
+                criteriaCount={getStageDetails(child?.id, idRemap, stageDetails)}
                 criterion={child as SelectedCriteriaType}
                 duplicateCriteria={duplicateCriteria}
                 deleteCriteria={deleteCriteria}
