@@ -17,6 +17,7 @@ const useDeleteRequests = () => {
     mutationFn: async (requests: RequestType[]) => await services.projects.deleteRequests(requests),
     onSuccess: (data, deletedRequests) => {
       queryClient.invalidateQueries({ queryKey: ['requests'] })
+      queryClient.invalidateQueries({ queryKey: ['requestsCount'] })
       dispatch(setMessage({ type: 'success', content: 'La suppression de la requête a été réalisée avec succès' }))
       // à supprimer si délétion du store request
       dispatch(
