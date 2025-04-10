@@ -60,7 +60,6 @@ const OrderBy = ({ orderBy, infos, onSubmit }: OrderByProps) => {
                   {...field}
                   label="Trier par :"
                   options={infos.orderByList ?? []}
-                  onchange={field.onChange}
                   radius={5}
                 />
               )}

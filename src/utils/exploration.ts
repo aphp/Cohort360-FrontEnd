@@ -12,7 +12,7 @@ import {
 } from 'fhir/r4'
 import { ExplorationResults, CohortPMSI, CohortMedication } from 'types'
 import { PatientsResponse } from 'types/patient'
-import { Status } from 'components/ui/StatusChip'
+import { ChipStatus } from 'components/ui/StatusChip'
 import { capitalizeFirstLetter } from './capitalize'
 import { getAge } from './age'
 import moment from 'moment'
@@ -93,7 +93,7 @@ export const isDocuments = (data: ExplorationResults<DataType>): data is Explora
 export const getPatientInfos = (patient: Patient, deidentified: boolean, groupId: string[]) => {
   const vitalStatus = {
     label: patient.deceasedBoolean || patient.deceasedDateTime ? VitalStatusLabel.DECEASED : VitalStatusLabel.ALIVE,
-    status: patient.deceasedBoolean || patient.deceasedDateTime ? Status.CANCELLED : Status.VALID
+    status: patient.deceasedBoolean || patient.deceasedDateTime ? ChipStatus.CANCELLED : ChipStatus.VALID
   }
   const lastEncounter = patient.extension?.[3]?.valueReference?.display ?? ''
   const surname = deidentified

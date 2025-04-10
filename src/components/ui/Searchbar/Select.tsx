@@ -9,10 +9,10 @@ type SelectProps<T> = {
   options: LabelObject[]
   disabled?: boolean
   radius?: number
-  onchange?: (value: T) => void
+  onChange?: (value: T) => void
 }
 
-const Select = <T,>({ value, label, options, disabled, radius, onchange }: SelectProps<T>) => {
+const Select = <T,>({ value, label, options, disabled, radius, onChange }: SelectProps<T>) => {
   return (
     <SelectWrapper width="100%">
       <FormControl variant="outlined">
@@ -21,7 +21,7 @@ const Select = <T,>({ value, label, options, disabled, radius, onchange }: Selec
           <SelectMui
             disabled={disabled}
             value={value}
-            onChange={(event) => onchange?.(event.target.value as T)}
+            onChange={(event) => onChange?.(event.target.value as T)}
             variant="outlined"
             label={label}
             sx={{ color: '#303030' }}

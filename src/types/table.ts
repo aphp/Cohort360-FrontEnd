@@ -1,4 +1,4 @@
-import { Status as StatusType } from 'components/ui/StatusChip'
+import { ChipStatus } from 'components/ui/StatusChip'
 import { Paragraph } from 'components/ui/Paragraphs'
 
 export type Link = {
@@ -8,7 +8,7 @@ export type Link = {
 
 export type Status = {
   label: string
-  status: StatusType
+  status: ChipStatus
   icon?: React.FunctionComponent<
     React.SVGProps<SVGSVGElement> & {
       title?: string | undefined

@@ -17,7 +17,7 @@ import { mapToDate, mapToDateHours } from './dates'
 import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
 import { getCodes, getMedicationDate } from './medication'
-import { Status } from 'components/ui/StatusChip'
+import { ChipStatus } from 'components/ui/StatusChip'
 import { getDocumentStatus } from 'utils/documentsFormatter'
 import CheckIcon from 'assets/icones/check.svg?react'
 import CancelIcon from 'assets/icones/times.svg?react'
@@ -606,7 +606,7 @@ const mapDocumentsToRows = (
     )
     const status = {
       label: getDocumentStatus(elem.docStatus),
-      status: elem.docStatus === DocumentStatuses.FINAL ? Status.VALID : Status.CANCELLED,
+      status: elem.docStatus === DocumentStatuses.FINAL ? ChipStatus.VALID : ChipStatus.CANCELLED,
       icon: elem.docStatus === DocumentStatuses.FINAL ? CheckIcon : CancelIcon
     }
     const findContent = elem?.content?.find((content) => content.attachment?.contentType === 'text/plain')

@@ -7,7 +7,7 @@ import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
 import FavStar from 'components/ui/FavStar'
 import IconButtonWithTooltip from '../ui/IconButtonWithTooltip'
 import ResearchesTable from './ResearchesTable'
-import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
+import StatusChip, { ChipStatus } from 'components/ui/StatusChip'
 import { TableCellWrapper } from './ResearchesTable/styles'
 
 import Download from 'assets/icones/download.svg?react'
@@ -18,34 +18,34 @@ import UpdateIcon from '@mui/icons-material/Update'
 
 import { Cohort, JobStatus, Column } from 'types'
 import { Order, OrderBy } from 'types/searchCriterias'
-import displayDigit from 'utils/displayDigit'
 import { formatDate } from 'utils/formatDate'
 import { getExportTooltip, getGlobalEstimation } from 'utils/explorationUtils'
 import { isChecked } from 'utils/filters'
+import { format } from 'utils/numbers'
 
 export const getCohortStatusChip = (status?: JobStatus, jobFailMessage?: string) => {
   if (jobFailMessage) {
     return (
       <Tooltip title={jobFailMessage}>
-        <StatusChip label="Erreur" status={ChipStyles.ERROR} />
+        <StatusChip label="Erreur" status={ChipStatus.ERROR} />
       </Tooltip>
     )
   }
 
   switch (status) {
     case JobStatus.FINISHED:
-      return <StatusChip label="Terminé" status={ChipStyles.FINISHED} />
+      return <StatusChip label="Terminé" status={ChipStatus.FINISHED} />
     case JobStatus.PENDING:
     case JobStatus.NEW:
-      return <StatusChip label="En cours" status={ChipStyles.IN_PROGRESS} />
+      return <StatusChip label="En cours" status={ChipStatus.IN_PROGRESS} />
     case JobStatus.LONG_PENDING:
       return (
         <Tooltip title="Cohorte volumineuse : sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.">
-          <StatusChip label="En cours" status={ChipStyles.IN_PROGRESS} icon={<UpdateIcon />} />
+          <StatusChip label="En cours" status={ChipStatus.IN_PROGRESS} icon={<UpdateIcon />} />
         </Tooltip>
       )
     default:
-      return <StatusChip label="Erreur" status={ChipStyles.ERROR} />
+      return <StatusChip label="Erreur" status={ChipStatus.ERROR} />
   }
 }
 
@@ -215,7 +215,7 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
             <TableCellWrapper>
               {getCohortStatusChip(cohort.request_job_status, cohort.request_job_fail_msg)}
             </TableCellWrapper>
-            <TableCellWrapper>{displayDigit(cohort.result_size)}</TableCellWrapper>
+            <TableCellWrapper>{format(cohort.result_size)}</TableCellWrapper>
             <TableCellWrapper>{getGlobalEstimation(cohort)}</TableCellWrapper>
             <TableCellWrapper>{formatDate(cohort.created_at)}</TableCellWrapper>
             {/* <TableCellWrapper>

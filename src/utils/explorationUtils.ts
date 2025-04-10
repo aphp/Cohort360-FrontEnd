@@ -1,9 +1,9 @@
 import { Cohort, JobStatus, ProjectType, QuerySnapshotInfo, RequestType, ValueSet } from 'types'
 import { CohortsType, ExplorationsSearchParams } from 'types/cohorts'
 import { Direction, FilterKeys, FilterValue, Order } from 'types/searchCriterias'
-import displayDigit from './displayDigit'
 import { SetURLSearchParams } from 'react-router-dom'
 import { isDateValid } from './formatDate'
+import { format } from './numbers'
 
 export const replaceItem = <T extends ProjectType | RequestType | Cohort>(item: T, itemsList: T[]) => {
   const index = itemsList.findIndex(({ uuid }) => uuid === item.uuid)
@@ -112,20 +112,14 @@ export const parseSearchParamValue = (searchParam: string | null, options: {}) =
   return searchParam.split(',').filter((status) => Object.values(options).includes(status))
 }
 
-export const removeFromSearchParams = (
-  searchParams: URLSearchParams,
-  setSearchParams: SetURLSearchParams,
-  keyToRemove: string,
-  value: FilterValue
-) => {
+export const removeFromSearchParams = (searchParams: URLSearchParams, keyToRemove: string, value: FilterValue) => {
   const targetSearchParam = searchParams.get(keyToRemove)?.split(',')
   const cleanedParam = targetSearchParam
     ?.filter((searchValue) => searchValue !== (keyToRemove === FilterKeys.STATUS ? (value as ValueSet).code : value))
     .join()
 
   cleanedParam ? searchParams.set(keyToRemove, cleanedParam) : searchParams.delete(keyToRemove)
-
-  setSearchParams(searchParams)
+  return searchParams
 }
 
 export const cleanSearchParams = (searchParams: URLSearchParams) => {
@@ -148,16 +142,18 @@ export const cleanSearchParams = (searchParams: URLSearchParams) => {
 export const getCohortsSearchParams = (searchParams: URLSearchParams) => {
   return {
     searchInput: searchParams.get(ExplorationsSearchParams.SEARCH_INPUT) ?? '',
-    startDate: searchParams.get(ExplorationsSearchParams.START_DATE),
-    endDate: searchParams.get(ExplorationsSearchParams.END_DATE),
     page: parseInt(searchParams.get('page') ?? '1', 10),
     orderBy: (searchParams.get(ExplorationsSearchParams.ORDER_BY) as Order) ?? Order.CREATED_AT,
     orderDirection: (searchParams.get(ExplorationsSearchParams.DIRECTION) as Direction) ?? Direction.DESC,
-    status: getStatusParam(searchParams.get(ExplorationsSearchParams.STATUS)) as ValueSet[],
-    favorite: (parseSearchParamValue(searchParams.get(ExplorationsSearchParams.FAVORITE), CohortsType) ??
-      []) as CohortsType[],
-    minPatients: searchParams.get(ExplorationsSearchParams.MIN_PATIENTS),
-    maxPatients: searchParams.get(ExplorationsSearchParams.MAX_PATIENTS)
+    filters: {
+      startDate: searchParams.get(ExplorationsSearchParams.START_DATE),
+      endDate: searchParams.get(ExplorationsSearchParams.END_DATE),
+      status: getStatusParam(searchParams.get(ExplorationsSearchParams.STATUS)) as ValueSet[],
+      favorite: (parseSearchParamValue(searchParams.get(ExplorationsSearchParams.FAVORITE), CohortsType) ??
+        []) as CohortsType[],
+      minPatients: searchParams.get(ExplorationsSearchParams.MIN_PATIENTS),
+      maxPatients: searchParams.get(ExplorationsSearchParams.MAX_PATIENTS)
+    }
   }
 }
 
@@ -169,7 +165,7 @@ export const getGlobalEstimation = (cohort: Cohort) => {
   if (cohort.measure_min === null || cohort.measure_max === null) {
     return 'N/A'
   } else {
-    return `${displayDigit(cohort.measure_min)} - ${displayDigit(cohort.measure_max)}`
+    return `${format(cohort.measure_min)} - ${format(cohort.measure_max)}`
   }
 }
 

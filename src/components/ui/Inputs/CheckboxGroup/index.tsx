@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Checkbox, FormControlLabel, FormGroup, Typography } from '@mui/material'
 import { InputWrapper } from 'components/ui/Inputs/styles'
 import { LabelObject } from 'types/searchCriterias'
@@ -21,8 +21,13 @@ const CheckboxGroup = <T extends string>({
 }: CheckboxGroupProps<T>) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = toggleFilter(value, event.target.value as T)
+    console.log('test checkbox', newValue)
     onChange(newValue)
   }
+
+  useEffect(() => {
+    console.log('test checkbox', value)
+  }, [value])
 
   return (
     <InputWrapper>

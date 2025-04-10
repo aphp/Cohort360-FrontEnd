@@ -96,7 +96,6 @@ const EditSavedFilter = ({ open, criteria, infos, onEdit, onClose }: EditSavedFi
                 {...field}
                 label="Rechercher dans"
                 options={infos.searchByList ?? []}
-                onchange={field.onChange}
                 radius={5}
               />
             )}

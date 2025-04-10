@@ -1,16 +1,15 @@
 import { Order } from 'types/searchCriterias'
 import { CellType, Column, Row, Table } from 'types/table'
 import { mapToDateHours } from './dates'
-import { CohortJobStatus } from 'types'
+import { JobStatus } from 'types'
 import { ExportList } from 'types/export'
 
-const cohortStatusLabel: Partial<Record<CohortJobStatus, string>> = {
-  [CohortJobStatus.CANCELLED]: 'Annulé',
-  [CohortJobStatus.FINISHED]: 'Terminé',
-  [CohortJobStatus.NEW]: 'En cours',
-  [CohortJobStatus.STARTED]: 'En cours',
-  [CohortJobStatus.PENDING]: 'En cours',
-  [CohortJobStatus.FAILED]: 'Erreur'
+const cohortStatusLabel: Partial<Record<JobStatus, string>> = {
+  [JobStatus.FINISHED]: 'Terminé',
+  [JobStatus.NEW]: 'En cours',
+  [JobStatus.STARTED]: 'En cours',
+  [JobStatus.PENDING]: 'En cours',
+  [JobStatus.FAILED]: 'Erreur'
 }
 
 const mapExportsToRows = (list: ExportList[]) => {

@@ -1,4 +1,4 @@
-import { CohortJobStatus } from 'types'
+import { JobStatus } from 'types'
 import { OrderBy } from './searchCriterias'
 
 export type TableSetting = {
@@ -38,7 +38,7 @@ export type ExportList = {
   output_format: 'csv' | 'xlsx' | 'hive' | null
   owner: string | null
   patients_count: number | null
-  request_job_status: CohortJobStatus | null
+  request_job_status: JobStatus | null
   target_datalab: string | null
   target_name: string | null
 }

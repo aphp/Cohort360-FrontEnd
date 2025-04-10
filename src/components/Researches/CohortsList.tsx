@@ -7,13 +7,12 @@ import { Grid } from '@mui/material'
 import ActionBar from './ActionBar'
 import AddOrEditItem from './Modals/AddOrEditItem'
 import CohortsTableContent from './CohortsTableContent'
-import CohortsTypesFilter from 'components/Filters/CohortsTypeFilter'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
 import IconButtonWithTooltip from '../ui/IconButtonWithTooltip'
 import LevelHeader from './LevelHeader'
 import Modal from 'components/ui/Modal'
 import ModalShareRequest from './Modals/ModalShareRequest'
-import PatientsNbFilter from 'components/Filters/PatientsNbFilter'
+import NumberRange from 'components/ui/Inputs/NumberRange'
 
 import DeleteIcon from 'assets/icones/delete.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
@@ -29,7 +28,7 @@ import usePageValidation from 'hooks/researches/usePageValidation'
 import useRequest from 'hooks/researches/useRequest'
 import useSelectionState from 'hooks/researches/useMultipleSelection'
 
-import { Cohort, RequestType, ValueSet } from 'types'
+import { Cohort, RequestType } from 'types'
 import { CohortsFilters, FilterKeys, OrderBy } from 'types/searchCriterias'
 import {
   checkSearchParamsErrors,
@@ -39,40 +38,40 @@ import {
   getRequestName,
   getRequestsConfirmDeletionMessage,
   getRequestsConfirmDeletionTitle,
-  removeFromSearchParams,
-  statusOptions
+  removeFromSearchParams
 } from 'utils/explorationUtils'
 import { removeFilter, selectFiltersAsArray } from 'utils/filters'
-import { CohortsType, ExplorationsSearchParams } from 'types/cohorts'
-import CohortStatusFilter from 'components/Filters/CohortsStatusFilter'
+import { CohortsType, CohortsTypeLabel, ExplorationsSearchParams } from 'types/cohorts'
+import CheckboxGroup from 'components/ui/Inputs/CheckboxGroup'
+//import CohortStatusFilter from 'components/Filters/CohortsStatusFilter'
 
 type CohortsListProps = {
   rowsPerPage?: number
-  favorites?: boolean
   simplified?: boolean
+  favorites?: boolean
 }
 
-const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }: CohortsListProps) => {
+const CohortsList = ({ rowsPerPage = 20, favorites, simplified = false }: CohortsListProps) => {
   const navigate = useNavigate()
   const { projectId, requestId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
-  const { searchInput, startDate, endDate, page, orderBy, orderDirection, status, favorite, minPatients, maxPatients } =
-    getCohortsSearchParams(searchParams)
+  const { searchInput, page, orderBy, orderDirection, filters } = useMemo(() => {
+    const { searchInput, page, orderBy, orderDirection, filters } = getCohortsSearchParams(searchParams)
+    return {
+      searchInput,
+      page,
+      orderBy,
+      orderDirection,
+      filters: { ...filters, favorite: favorites ? [CohortsType.FAVORITE] : filters.favorite }
+    }
+  }, [searchParams, favorites])
 
   const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
 
   const [paramsReady, setParamsReady] = useState(false)
   const [deleteMode, setDeleteMode] = useState(false)
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
-  const [filters, setFilters] = useState<CohortsFilters>({
-    status,
-    favorite: favorites ? [CohortsType.FAVORITE] : favorite,
-    minPatients,
-    maxPatients,
-    startDate,
-    endDate,
-    parentId: requestId
-  })
+  const [form, setForm] = useState<CohortsFilters | null>(null)
   const [cohortToEdit, setCohortToEdit] = useState<Cohort | null>(null)
   const [openCohortEditionModal, setOpenCohortEditionModal] = useState(false)
   const [openParentEditionModal, setOpenParentEditionModal] = useState(false)
@@ -88,11 +87,18 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
     setParamsReady(true)
   }, [])
 
+  useEffect(() => {
+    setForm(filters)
+  }, [filters])
+
   const { request: parentRequest, requestLoading, requestIsError } = useRequest(requestId)
   const { cohortsList, total, loading } = useCohorts({
     orderBy: order,
     searchInput,
-    filters,
+    filters: {
+      ...filters,
+      parentId: requestId
+    },
     page,
     rowsPerPage,
     paramsReady
@@ -109,16 +115,11 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
     clearSelection
   } = useSelectionState<Cohort>()
   const filtersAsArray = useMemo(() => {
-    console.log('test status update useMemo', status)
-    return selectFiltersAsArray({
-      status,
-      favorite,
-      minPatients,
-      maxPatients,
-      startDate,
-      endDate
-    })
-  }, [status, favorite, minPatients, maxPatients, startDate, endDate])
+    const arr = selectFiltersAsArray(filters, undefined)
+    return requestId
+      ? arr.filter((item) => item.category !== FilterKeys.START_DATE && item.category !== FilterKeys.END_DATE)
+      : arr
+  }, [filters, requestId])
 
   const handlePageChange = (newPage: number) => {
     searchParams.set(ExplorationsSearchParams.PAGE, String(newPage))
@@ -244,16 +245,9 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
             totalSelected={selectedCohorts.length}
             onDelete={() => onClickDelete()}
             onFilter={() => setOpenFiltersModal(true)}
-            filters={
-              requestId
-                ? filtersAsArray.filter(
-                    (item) => item.category !== FilterKeys.START_DATE && item.category !== FilterKeys.END_DATE
-                  )
-                : filtersAsArray
-            }
+            filters={filtersAsArray}
             onRemoveFilters={(key, value) => {
-              removeFromSearchParams(searchParams, setSearchParams, key, value)
-              setFilters(removeFilter(key, value, filters))
+              setSearchParams(removeFromSearchParams(searchParams, key as string, value))
             }}
             disabled={maintenanceIsActive}
           />
@@ -318,32 +312,42 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
         onClose={() => setOpenShareParentModal(false)}
       />
 
-      <Modal
-        title="Filtrer par :"
-        width={'600px'}
-        open={openFiltersModal}
-        onClose={() => setOpenFiltersModal(false)}
-        onSubmit={(newFilters) => {
-          setFilters({ ...filters, ...newFilters })
-          console.log('test status setFilters', newFilters)
-          newFilters.status.length > 0 &&
+      {form && (
+        <Modal
+          title="Filtrer par :"
+          width={'600px'}
+          open={openFiltersModal}
+          onClose={() => setOpenFiltersModal(false)}
+          onSubmit={() => {
+            /*newFilters.status.length > 0 &&
             searchParams.set(
               ExplorationsSearchParams.STATUS,
               newFilters.status.map((status: ValueSet) => status.code).join()
-            )
-          newFilters.favorite.length > 0 && searchParams.set(ExplorationsSearchParams.FAVORITE, newFilters.favorite)
-          newFilters.minPatients && searchParams.set(ExplorationsSearchParams.MIN_PATIENTS, newFilters.minPatients)
-          newFilters.maxPatients && searchParams.set(ExplorationsSearchParams.MAX_PATIENTS, newFilters.maxPatients)
-          setSearchParams(searchParams)
-        }}
-      >
-        <CohortStatusFilter value={status} name={FilterKeys.STATUS} allStatus={statusOptions} />
-        <CohortsTypesFilter value={favorite} name={FilterKeys.FAVORITE} />
-        <PatientsNbFilter
-          values={[minPatients, maxPatients]}
-          names={[FilterKeys.MIN_PATIENTS, FilterKeys.MAX_PATIENTS]}
-        />
-      </Modal>
+            )*/
+            form.favorite.length > 0
+              ? searchParams.set(ExplorationsSearchParams.FAVORITE, form.favorite.join())
+              : searchParams.delete(ExplorationsSearchParams.FAVORITE)
+            // newFilters.minPatients && searchParams.set(ExplorationsSearchParams.MIN_PATIENTS, newFilters.minPatients)
+            // newFilters.maxPatients && searchParams.set(ExplorationsSearchParams.MAX_PATIENTS, newFilters.maxPatients)
+            setSearchParams(searchParams)
+            setOpenFiltersModal(false)
+          }}
+        >
+          {/*<CohortStatusFilter value={status} name={FilterKeys.STATUS} allStatus={statusOptions} />*/}
+          <CheckboxGroup
+            value={form.favorite}
+            onChange={(values) => {
+              setForm({ ...form, favorite: values })
+            }}
+            label="Favoris :"
+            options={[
+              { id: CohortsType.FAVORITE, label: CohortsTypeLabel.FAVORITE },
+              { id: CohortsType.NOT_FAVORITE, label: CohortsTypeLabel.NOT_FAVORITE }
+            ]}
+          />
+          {/*<NumberRange values={[minPatients, maxPatients]} names={[FilterKeys.MIN_PATIENTS, FilterKeys.MAX_PATIENTS]} />*/}
+        </Modal>
+      )}
     </Grid>
   )
 }

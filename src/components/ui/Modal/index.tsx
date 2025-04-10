@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { PropsWithChildren, createContext } from 'react'
+import React, { PropsWithChildren } from 'react'
 
 import { Button, Dialog, DialogActions, DialogTitle, Divider, Grid, Typography } from '@mui/material'
 import { DialogContentWrapper } from './styles'
-import { FormContextType } from 'types/form'
-
-export const FormContext = createContext<FormContextType | null>(null)
 
 type ModalProps = {
   open: boolean

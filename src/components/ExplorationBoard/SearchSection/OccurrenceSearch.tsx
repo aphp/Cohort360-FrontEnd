@@ -40,10 +40,10 @@ const OccurrencesSearch = ({ search, infos, onChange }: OccurrencesSearchProps) 
             control={control}
             render={({ field }) => (
               <Select<SearchByTypes | undefined>
+                {...field}
                 value={search.searchBy}
                 label="Rechercher dans :"
                 options={infos.searchByList ?? []}
-                onchange={field.onChange}
                 radius={5}
               />
             )}
