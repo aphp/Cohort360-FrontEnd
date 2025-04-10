@@ -4,7 +4,6 @@ import { Grid } from '@mui/material'
 import { FilterList } from '@mui/icons-material'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
-import MaternityFormFilter from 'components/Filters/MaternityFormFilter'
 import Button from 'components/ui/Button'
 import Chip from 'components/ui/Chip'
 import { BlockWrapper } from 'components/ui/Layout'
@@ -17,15 +16,28 @@ import { cancelPendingRequest } from 'utils/abortController'
 import { selectFiltersAsArray } from 'utils/filters'
 import { Questionnaire } from 'fhir/r4'
 import { LoadingStatus } from 'types'
-import { FilterKeys, LabelObject } from 'types/searchCriterias'
+import { FilterKeys, FormNames, LabelObject } from 'types/searchCriterias'
 import Timeline from './Timeline'
 import services from 'services/aphp'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { useSearchParams } from 'react-router-dom'
 import { getCleanGroupId } from 'utils/paginationUtils'
 import { getCodeList } from 'services/aphp/serviceValueSets'
 import { getConfig } from 'config'
+import MultiSelectInput from 'components/Filters/MultiSelectInput'
+import CheckboxsFilter from 'components/Filters/CheckboxsFilter'
+import labels from 'labels.json'
+
+const formOptions = [
+  {
+    id: FormNames.PREGNANCY,
+    label: labels.formNames.pregnancy
+  },
+  {
+    id: FormNames.HOSPIT,
+    label: labels.formNames.hospit
+  }
+]
 
 const MaternityForm = () => {
   const [toggleModal, setToggleModal] = useState(false)
@@ -130,17 +142,23 @@ const MaternityForm = () => {
                 onClose={() => setToggleModal(false)}
                 onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
               >
-                <MaternityFormFilter name={FilterKeys.FORM_NAME} value={formName} />
+                <CheckboxsFilter
+                  name={FilterKeys.FORM_NAME}
+                  value={formName}
+                  label="Formulaire :"
+                  options={formOptions}
+                />
                 <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
                 <ExecutiveUnitsFilter
                   sourceType={SourceType.FORM_RESPONSE}
                   value={executiveUnits}
                   name={FilterKeys.EXECUTIVE_UNITS}
                 />
-                <EncounterStatusFilter
+                <MultiSelectInput
                   value={encounterStatus}
                   name={FilterKeys.ENCOUNTER_STATUS}
-                  encounterStatusList={encounterStatusList}
+                  options={encounterStatusList}
+                  label="Statut de la visite associée :"
                 />
               </Modal>
             )}

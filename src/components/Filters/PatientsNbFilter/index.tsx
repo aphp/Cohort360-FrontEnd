@@ -1,5 +1,5 @@
 import { FormLabel, Grid, TextField, Typography } from '@mui/material'
-import { InputWrapper } from 'components/ui/Inputs'
+import { InputWrapper } from 'components/ui/Inputs/styles'
 import { ErrorMessage } from 'components/ui/Inputs/Errors'
 import { BlockWrapper } from 'components/ui/Layout'
 import { FormContext } from 'components/ui/Modal'

@@ -87,8 +87,8 @@ const EpisodeConstraints: React.FC<EpisodeConstraintsProps> = ({ constraints, on
         </Grid>
         <RadioGroup
           row
-          selectedValue={radioValues}
-          onchange={(e) => {
+          value={radioValues}
+          onChange={(e) => {
             if (
               radioValues === TemporalConstraintsKind.PARTIAL_EPISODE_CONSTRAINT &&
               constraints.find(
@@ -101,7 +101,7 @@ const EpisodeConstraints: React.FC<EpisodeConstraintsProps> = ({ constraints, on
               onChangeValue(e as TemporalConstraintsKind)
             }
           }}
-          items={episodesTemporalConstraintsTypes}
+          options={episodesTemporalConstraintsTypes}
           style={{ margin: '1em', justifyContent: 'space-around' }}
         />
       </Grid>

@@ -73,6 +73,25 @@ export enum VitalStatusLabel {
   ALL = 'Tous les patients'
 }
 
+export const genderOptions = [
+  {
+    id: GenderStatus.FEMALE,
+    label: GenderStatusLabel.FEMALE
+  },
+  {
+    id: GenderStatus.MALE,
+    label: GenderStatusLabel.MALE
+  },
+  {
+    id: GenderStatus.OTHER,
+    label: GenderStatusLabel.OTHER
+  },
+  {
+    id: GenderStatus.UNKNOWN,
+    label: GenderStatusLabel.UNKNOWN
+  }
+]
+
 export enum VitalStatusOptions {
   birth = 'birth',
   age = 'age',
@@ -91,6 +110,17 @@ export enum VitalStatus {
   ALIVE = 'ALIVE',
   DECEASED = 'DECEASED'
 }
+
+export const vitalStatusesOptions = [
+  {
+    id: VitalStatus.ALIVE,
+    label: VitalStatusLabel.ALIVE
+  },
+  {
+    id: VitalStatus.DECEASED,
+    label: VitalStatusLabel.DECEASED
+  }
+]
 
 export enum Direction {
   ASC = 'asc',
@@ -278,7 +308,7 @@ export type GenericFilter = {
   encounterStatus: LabelObject[]
 }
 
-export interface PatientsFilters {
+export type PatientsFilters = {
   genders: GenderStatus[]
   birthdatesRanges: DurationRangeType
   vitalStatuses: VitalStatus[]
@@ -321,7 +351,7 @@ export type MaternityFormFilters = {
 export type DocumentsFilters = GenericFilter & {
   ipp?: string
   docTypes: SimpleCodeType[]
-  docStatuses: string[]
+  docStatuses: LabelObject[]
   onlyPdfAvailable: boolean
 }
 

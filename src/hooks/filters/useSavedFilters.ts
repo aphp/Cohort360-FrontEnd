@@ -59,7 +59,10 @@ export const useSavedFilters = <T>(type: ResourceType) => {
       setSavedFiltersErrors({ isError: false })
       await getSavedFilters()
     } catch {
-      setSavedFiltersErrors({ isError: true, errorMessage: 'Nom déjà existant.' })
+      setSavedFiltersErrors({
+        isError: true,
+        errorMessage: "Il y a eu une erreur lors de l'enregistrement du filtre. Vérifiez que le nom n'existe pas déjà."
+      })
       throw 'Nom déjà existant'
     }
   }

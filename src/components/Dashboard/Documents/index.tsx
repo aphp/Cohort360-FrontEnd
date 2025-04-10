@@ -29,10 +29,7 @@ import useSearchCriterias, { initAllDocsSearchCriterias } from 'reducers/searchC
 import { AlertWrapper } from 'components/ui/Alert'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import DocTypesFilter from 'components/Filters/DocTypesFilter'
-import DocStatusFilter from 'components/Filters/DocStatusFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
-import IppFilter from 'components/Filters/IppFilter'
-import NdaFilter from 'components/Filters/NdaFilter'
 import { ResourceType } from 'types/requestCriterias'
 import { Save, SavedSearch } from '@mui/icons-material'
 import TextInput from 'components/Filters/TextInput'
@@ -40,7 +37,6 @@ import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import List from 'components/ui/List'
 import { useAppDispatch, useAppSelector } from 'state'
 import Modal from 'components/ui/Modal'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
@@ -49,6 +45,7 @@ import { DocumentReference } from 'fhir/r4'
 import { getCodeList } from 'services/aphp/serviceValueSets'
 import { getConfig } from 'config'
 import { v4 as uuidv4 } from 'uuid'
+import MultiSelectInput from 'components/Filters/MultiSelectInput'
 
 type DocumentsProps = {
   deidentified: boolean
@@ -132,7 +129,10 @@ const Documents: React.FC<DocumentsProps> = ({ deidentified }) => {
   const controllerRef = useRef<AbortController>(new AbortController())
   const isFirstRender = useRef(true)
 
-  const docStatusesList = [FilterByDocumentStatus.VALIDATED, FilterByDocumentStatus.NOT_VALIDATED]
+  const docStatusesList = [
+    { id: FilterByDocumentStatus.VALIDATED, label: FilterByDocumentStatus.VALIDATED },
+    { id: FilterByDocumentStatus.NOT_VALIDATED, label: FilterByDocumentStatus.NOT_VALIDATED }
+  ]
 
   const fetchDocumentsList = async () => {
     try {
@@ -389,9 +389,23 @@ const Documents: React.FC<DocumentsProps> = ({ deidentified }) => {
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
         color="secondary"
       >
-        {!deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
-        {!deidentified && <IppFilter name={FilterKeys.IPP} value={ipp ?? ''} />}
-        <DocStatusFilter docStatusesList={docStatusesList} name={FilterKeys.DOC_STATUSES} value={docStatuses} />
+        {!deidentified && (
+          <TextInput name={FilterKeys.NDA} value={nda} label="NDA :" placeholder="Exemple: 6601289264,141740347" />
+        )}
+        {!deidentified && (
+          <TextInput
+            name={FilterKeys.IPP}
+            value={ipp}
+            label="IPP :"
+            placeholder="'Exemple: 8000000000001,8000000000002'"
+          />
+        )}
+        <MultiSelectInput
+          options={docStatusesList}
+          name={FilterKeys.DOC_STATUSES}
+          value={docStatuses}
+          label="Statut de documents :"
+        />
         <DocTypesFilter allDocTypesList={allDocTypesList.docTypes} value={docTypes} name={FilterKeys.DOC_TYPES} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
@@ -399,10 +413,11 @@ const Documents: React.FC<DocumentsProps> = ({ deidentified }) => {
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
         />
-        <EncounterStatusFilter
+        <MultiSelectInput
           value={encounterStatus}
           name={FilterKeys.ENCOUNTER_STATUS}
-          encounterStatusList={encounterStatusList}
+          options={encounterStatusList}
+          label="Statut de la visite associée :"
         />
       </Modal>
       <Modal
@@ -512,28 +527,33 @@ const Documents: React.FC<DocumentsProps> = ({ deidentified }) => {
 
               <Grid item>
                 {!deidentified && (
-                  <NdaFilter
+                  <TextInput
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.NDA}
                     value={selectedSavedFilter?.filterParams.filters.nda ?? ''}
+                    label="NDA :"
+                    placeholder="Exemple: 6601289264,141740347"
                   />
                 )}
               </Grid>
               <Grid item>
                 {!deidentified && (
-                  <IppFilter
+                  <TextInput
                     disabled={isReadonlyFilterInfoModal}
                     name={FilterKeys.IPP}
                     value={selectedSavedFilter?.filterParams.filters.ipp ?? ''}
+                    label="IPP :"
+                    placeholder="'Exemple: 8000000000001,8000000000002'"
                   />
                 )}
               </Grid>
               <Grid item>
-                <DocStatusFilter
+                <MultiSelectInput
                   disabled={isReadonlyFilterInfoModal}
-                  docStatusesList={docStatusesList}
                   value={selectedSavedFilter?.filterParams.filters.docStatuses ?? []}
+                  options={docStatusesList}
                   name={FilterKeys.DOC_STATUSES}
+                  label="Statut de documents :"
                 />
               </Grid>
               <Grid item>
@@ -563,11 +583,12 @@ const Documents: React.FC<DocumentsProps> = ({ deidentified }) => {
                 />
               </Grid>
               <Grid item>
-                <EncounterStatusFilter
+                <MultiSelectInput
+                  label="Statut de la visite associée :"
                   disabled={isReadonlyFilterInfoModal}
                   value={selectedSavedFilter?.filterParams.filters.encounterStatus ?? []}
                   name={FilterKeys.ENCOUNTER_STATUS}
-                  encounterStatusList={encounterStatusList}
+                  options={encounterStatusList}
                 />
               </Grid>
             </Grid>

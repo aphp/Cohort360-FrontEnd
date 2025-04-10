@@ -120,7 +120,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     }`
   }
   if (key === FilterKeys.DOC_STATUSES) {
-    return `Documents : ${value}`
+    return `Documents :  ${(value as LabelObject).label}`
   }
   if (key === FilterKeys.DOC_TYPES) {
     return (value as SimpleCodeType).label

@@ -18,9 +18,12 @@ import {
   OrderBy,
   OrderByKeys,
   SearchByTypes,
+  genderOptions,
   orderByListPatients,
   orderByListPatientsDeidentified,
-  searchByListPatients
+  orderDirection,
+  searchByListPatients,
+  vitalStatusesOptions
 } from 'types/searchCriterias'
 
 import Button from 'components/ui/Button'
@@ -38,10 +41,9 @@ import ListPatient from 'components/DataTable/ListPatient'
 import DisplayLocked from 'components/ui/Display/DisplayLocked'
 import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/searchCriteriasReducer'
 import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters'
-import GendersFilter from 'components/Filters/GendersFilter'
-import OrderByFilter from 'components/Filters/OrderByFilter'
-import OrderDirectionFilter from 'components/Filters/OrderDirectionFilter'
-import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter'
+import CheckboxsFilter from 'components/Filters/CheckboxsFilter'
+import RadioGroupFilter from 'components/Filters/RadioGroupFilter'
+import SelectFilter from 'components/Filters/SelectFilter'
 
 type PatientSidebarProps = {
   total: number
@@ -177,8 +179,13 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
               onClose={() => setToggleFiltersModal(false)}
               onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
             >
-              <GendersFilter name={FilterKeys.GENDERS} value={genders} />
-              <VitalStatusesFilter name={FilterKeys.VITAL_STATUSES} value={vitalStatuses} />
+              <CheckboxsFilter name={FilterKeys.GENDERS} value={genders} label="Genre :" options={genderOptions} />
+              <CheckboxsFilter
+                name={FilterKeys.VITAL_STATUSES}
+                value={vitalStatuses}
+                label="Statut vital :"
+                options={vitalStatusesOptions}
+              />
               <BirthdatesRangesFilter
                 name={FilterKeys.BIRTHDATES}
                 value={birthdatesRanges}
@@ -200,15 +207,17 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
               width="600px"
               onSubmit={(newOrder: OrderBy) => changeOrderBy(newOrder)}
             >
-              <Grid container direction="row" justifyContent="space-between" alignItems="center">
-                <OrderByFilter
-                  orderByValue={orderBy.orderBy || Order.FAMILY}
+              <Grid container direction="column" justifyContent="space-between" gap="30px">
+                <SelectFilter
+                  value={orderBy.orderBy || Order.FAMILY}
                   name={OrderByKeys.ORDER_BY}
-                  items={deidentifiedBoolean ? orderByListPatientsDeidentified : orderByListPatients}
+                  options={deidentifiedBoolean ? orderByListPatientsDeidentified : orderByListPatients}
                 />
-                <OrderDirectionFilter
-                  orderDirectionValue={orderBy.orderDirection || Direction.ASC}
+                <RadioGroupFilter
+                  options={orderDirection}
+                  value={orderBy.orderDirection || Direction.ASC}
                   name={OrderByKeys.ORDER_DIRECTION}
+                  label="Ordre"
                 />
               </Grid>
             </Modal>

@@ -6,7 +6,6 @@ import { useAppSelector } from 'state'
 import { Grid } from '@mui/material'
 import ActionBar from './ActionBar'
 import AddOrEditItem from './Modals/AddOrEditItem'
-import CohortStatusFilter from 'components/Filters/CohortStatusFilter'
 import CohortsTableContent from './CohortsTableContent'
 import CohortsTypesFilter from 'components/Filters/CohortsTypeFilter'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
@@ -45,6 +44,7 @@ import {
 } from 'utils/explorationUtils'
 import { removeFilter, selectFiltersAsArray } from 'utils/filters'
 import { CohortsType, ExplorationsSearchParams } from 'types/cohorts'
+import CohortStatusFilter from 'components/Filters/CohortsStatusFilter'
 
 type CohortsListProps = {
   rowsPerPage?: number
@@ -108,18 +108,17 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
     toggle,
     clearSelection
   } = useSelectionState<Cohort>()
-  const filtersAsArray = useMemo(
-    () =>
-      selectFiltersAsArray({
-        status,
-        favorite,
-        minPatients,
-        maxPatients,
-        startDate,
-        endDate
-      }),
-    [status, favorite, minPatients, maxPatients, startDate, endDate]
-  )
+  const filtersAsArray = useMemo(() => {
+    console.log('test status update useMemo', status)
+    return selectFiltersAsArray({
+      status,
+      favorite,
+      minPatients,
+      maxPatients,
+      startDate,
+      endDate
+    })
+  }, [status, favorite, minPatients, maxPatients, startDate, endDate])
 
   const handlePageChange = (newPage: number) => {
     searchParams.set(ExplorationsSearchParams.PAGE, String(newPage))
@@ -326,6 +325,7 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
         onClose={() => setOpenFiltersModal(false)}
         onSubmit={(newFilters) => {
           setFilters({ ...filters, ...newFilters })
+          console.log('test status setFilters', newFilters)
           newFilters.status.length > 0 &&
             searchParams.set(
               ExplorationsSearchParams.STATUS,

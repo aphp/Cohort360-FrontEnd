@@ -1,15 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-
 import { Checkbox, CircularProgress, Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
-
 import FilterList from 'assets/icones/filter.svg?react'
-
 import DataTableObservation from 'components/DataTable/DataTableObservation'
-
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchBiology } from 'state/patient'
 import { LoadingStatus } from 'types'
-
 import useStyles from './styles'
 import { cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
@@ -25,13 +20,11 @@ import Chip from 'components/ui/Chip'
 import { AlertWrapper } from 'components/ui/Alert'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter'
-import NdaFilter from 'components/Filters/NdaFilter'
 import { Save, SavedSearch } from '@mui/icons-material'
 import { ResourceType } from 'types/requestCriterias'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import List from 'components/ui/List'
 import TextInput from 'components/Filters/TextInput'
-import EncounterStatusFilter from 'components/Filters/EncounterStatusFilter'
 import { SourceType } from 'types/scope'
 import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, cleanSearchParams, handlePageError } from 'utils/paginationUtils'
@@ -40,6 +33,7 @@ import { getCodeList } from 'services/aphp/serviceValueSets'
 import { getValueSetsFromSystems } from 'utils/valueSets'
 import CodeFilter from 'components/Filters/CodeFilter'
 import { v4 as uuidv4 } from 'uuid'
+import MultiSelectInput from 'components/Filters/MultiSelectInput'
 
 const PatientBiology = () => {
   const { classes } = useStyles()
@@ -274,7 +268,9 @@ const PatientBiology = () => {
         onClose={() => setToggleFilterByModal(false)}
         onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
       >
-        {!searchResults.deidentified && <NdaFilter name={FilterKeys.NDA} value={nda} />}
+        {!searchResults.deidentified && (
+          <TextInput name={FilterKeys.NDA} value={nda} label="NDA :" placeholder="Exemple: 6601289264,141740347" />
+        )}
         <CodeFilter name={FilterKeys.CODE} value={code} references={references} />
         <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />
         <ExecutiveUnitsFilter
@@ -282,10 +278,11 @@ const PatientBiology = () => {
           value={executiveUnits}
           name={FilterKeys.EXECUTIVE_UNITS}
         />
-        <EncounterStatusFilter
+        <MultiSelectInput
           value={encounterStatus}
           name={FilterKeys.ENCOUNTER_STATUS}
-          encounterStatusList={encounterStatusList}
+          options={encounterStatusList}
+          label="Statut de la visite associée :"
         />
       </Modal>
       <Modal
@@ -370,10 +367,12 @@ const PatientBiology = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <NdaFilter
-                    name="nda"
+                  <TextInput
+                    name={FilterKeys.NDA}
                     disabled={isReadonlyFilterInfoModal}
                     value={selectedSavedFilter?.filterParams.filters.nda ?? ''}
+                    label="NDA :"
+                    placeholder="Exemple: 6601289264,141740347"
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -403,11 +402,12 @@ const PatientBiology = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <EncounterStatusFilter
+                  <MultiSelectInput
                     disabled={isReadonlyFilterInfoModal}
                     value={selectedSavedFilter?.filterParams.filters.encounterStatus ?? []}
                     name={FilterKeys.ENCOUNTER_STATUS}
-                    encounterStatusList={encounterStatusList}
+                    options={encounterStatusList}
+                    label="Statut de la visite associée :"
                   />
                 </Grid>
               </Grid>

@@ -23,10 +23,12 @@ import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import {
   Direction,
   FilterKeys,
+  genderOptions,
   Order,
   PatientsFilters,
   searchByListPatients,
-  SearchByTypes
+  SearchByTypes,
+  vitalStatusesOptions
 } from 'types/searchCriterias'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
@@ -36,8 +38,7 @@ import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/search
 import { selectFiltersAsArray } from 'utils/filters'
 import Chip from 'components/ui/Chip'
 import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters'
-import GendersFilter from 'components/Filters/GendersFilter'
-import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter'
+import CheckboxsFilter from 'components/Filters/CheckboxsFilter'
 import TextInput from 'components/Filters/TextInput'
 import { useSavedFilters } from 'hooks/filters/useSavedFilters'
 import { ResourceType } from 'types/requestCriterias'
@@ -97,7 +98,6 @@ const PatientList = ({ total, deidentified }: PatientListProps) => {
     },
     { changeOrderBy, changeSearchBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
   ] = useSearchCriterias(initPatientsSearchCriterias)
-
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ genders, vitalStatuses, birthdatesRanges })
   }, [genders, vitalStatuses, birthdatesRanges])
@@ -295,8 +295,20 @@ const PatientList = ({ total, deidentified }: PatientListProps) => {
         onClose={() => setToggleFilterByModal(false)}
         onSubmit={(newFilters) => addFilters({ genders, birthdatesRanges, vitalStatuses, ...newFilters })}
       >
-        <GendersFilter name={FilterKeys.GENDERS} value={genders} />
-        <VitalStatusesFilter name={FilterKeys.VITAL_STATUSES} value={vitalStatuses} />
+        <CheckboxsFilter
+          name={FilterKeys.GENDERS}
+          value={genders}
+          label="Genre :"
+          options={genderOptions}
+          //onChange={(value) => searchCriteriaForm.changeInput(FilterKeys.GENDERS, value)}
+        />
+        <CheckboxsFilter
+          name={FilterKeys.VITAL_STATUSES}
+          value={vitalStatuses}
+          label="Statut vital :"
+          options={vitalStatusesOptions}
+          //onChange={(value) => searchCriteriaForm.changeInput(FilterKeys.VITAL_STATUSES, value)}
+        />
         <BirthdatesRangesFilter
           name={FilterKeys.BIRTHDATES}
           value={birthdatesRanges}
@@ -385,15 +397,19 @@ const PatientList = ({ total, deidentified }: PatientListProps) => {
                 </Grid>
               )}
               <Grid item>
-                <GendersFilter
+                <CheckboxsFilter
                   disabled={isReadonlyFilterInfoModal}
                   name={FilterKeys.GENDERS}
                   value={selectedSavedFilter?.filterParams.filters.genders ?? []}
+                  label="Genre :"
+                  options={genderOptions}
                 />
-                <VitalStatusesFilter
+                <CheckboxsFilter
                   disabled={isReadonlyFilterInfoModal}
                   name={FilterKeys.VITAL_STATUSES}
                   value={selectedSavedFilter?.filterParams.filters.vitalStatuses ?? []}
+                  label="Statut vital :"
+                  options={vitalStatusesOptions}
                 />
                 <BirthdatesRangesFilter
                   disabled={isReadonlyFilterInfoModal}
