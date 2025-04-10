@@ -44,7 +44,9 @@ const Dashboard: React.FC<{
   const [searchParams] = useSearchParams()
   const groupIds = getCleanGroupId(searchParams.get('groupId'))
 
-  const [selectedTab, setSelectedTab] = useState(tabName ?? 'preview')
+  const [selectedTab, setSelectedTab] = useState(
+    tabName ?? appConfig.core.fhir.facetsExtensions ? 'preview' : 'patients'
+  )
   const [tabs, setTabs] = useState<Tabs[]>([])
 
   const open = useAppSelector((state) => state.drawer)
@@ -56,7 +58,9 @@ const Dashboard: React.FC<{
       case 'patients':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'preview', to: '/my-patients/preview', disabled: false },
+          ...(appConfig.core.fhir.facetsExtensions
+            ? [{ label: 'Aperçu', value: 'preview', to: '/my-patients/preview', disabled: false }]
+            : []),
           { label: 'Patients', value: 'patients', to: '/my-patients/patients', disabled: false },
           ...(ODD_DOCUMENT_REFERENCE
             ? [{ label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false }]
@@ -79,7 +83,9 @@ const Dashboard: React.FC<{
             value: 'creation',
             to: `/cohort/new/${dashboard.requestId}/${dashboard.snapshotId}`
           },
-          { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/preview?groupId=${groupIds}` },
+          ...(appConfig.core.fhir.facetsExtensions
+            ? [{ label: 'Aperçu cohorte', value: 'preview', to: `/cohort/preview?groupId=${groupIds}` }]
+            : []),
           { label: 'Données patient', value: 'patients', to: `/cohort/patients${location.search}` },
           ...(ODD_DOCUMENT_REFERENCE
             ? [
@@ -103,7 +109,9 @@ const Dashboard: React.FC<{
       case 'new_cohort':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/new/preview`, disabled: true },
+          ...(appConfig.core.fhir.facetsExtensions
+            ? [{ label: 'Aperçu cohorte', value: 'preview', to: `/cohort/new/preview`, disabled: true }]
+            : []),
           { label: 'Données patient', value: 'patients', to: `/cohort/new/patients`, disabled: true },
           ...(ODD_DOCUMENT_REFERENCE
             ? [{ label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true }]
@@ -120,7 +128,9 @@ const Dashboard: React.FC<{
       case 'perimeters': {
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'preview', to: `/perimeters/preview?groupId=${groupIds}` },
+          ...(appConfig.core.fhir.facetsExtensions
+            ? [{ label: 'Aperçu', value: 'preview', to: `/perimeters/preview?groupId=${groupIds}` }]
+            : []),
           {
             label: 'Données patient',
             value: 'patients',

@@ -107,7 +107,7 @@ const DataTablePmsiLine: React.FC<{
 
   const filterCode = pmsi.resourceType === ResourceType.CLAIM ? pmsi.diagnosis?.[0]?.packageCode : pmsi.code
 
-  const codeToDisplay = filterCode?.coding?.find((code) => code.userSelected === true)
+  const codeToDisplay = filterCode?.coding?.find((code) => !appConfig.core.fhir.selectedCodeOnly || code.userSelected)
 
   const source = pmsi.meta?.source ?? 'Non renseigné'
 

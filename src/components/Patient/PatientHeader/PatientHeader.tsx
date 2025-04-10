@@ -11,6 +11,7 @@ import { getAge } from 'utils/age'
 
 import useStyles from './styles'
 import { GenderStatus } from 'types/searchCriterias'
+import { getConfig } from 'config'
 
 type PatientHeaderProps = {
   patient?: IPatientDetails
@@ -22,7 +23,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
   deidentifiedBoolean
 }) => {
   const { classes } = useStyles()
-
+  const appConfig = getConfig()
   const age = getAge(patient as CohortPatient)
   const firstName = deidentifiedBoolean ? 'Prénom' : patient.name?.[0].given?.[0]
   const lastName = deidentifiedBoolean
@@ -41,8 +42,11 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
   const ipp = deidentifiedBoolean
     ? `IPP chiffré: ${patient.id ?? '-'}`
     : `IPP: ${
-        patient.identifier?.find((item) => item.type?.coding?.[0].code === 'IPP')?.value ??
-        patient.identifier?.[0].value
+        patient.identifier?.find(
+          (identifier) =>
+            identifier.type?.coding?.[0].code === appConfig.features.patient.patientIdentifierExtensionCode?.code &&
+            identifier.type?.coding?.[0].system === appConfig.features.patient.patientIdentifierExtensionCode?.system
+        )?.value ?? patient.identifier?.[0].value
       }`
 
   return (

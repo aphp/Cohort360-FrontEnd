@@ -17,7 +17,7 @@ const PatientInfo: React.FC<PatientInfoTypes> = ({ gender, age, ipp }) => {
   return (
     <Grid className={classes.root} container direction="column">
       <Grid container item justifyContent="center" alignItems="center" className={classes.whiteCircle}>
-        <GenderIcon gender={gender?.toLocaleUpperCase() as GenderStatus} className={classes.genderIcon} />
+        <GenderIcon gender={gender as GenderStatus} className={classes.genderIcon} />
       </Grid>
       <Typography variant="body1">{age}</Typography>
       <Typography variant="body1">{ipp}</Typography>
