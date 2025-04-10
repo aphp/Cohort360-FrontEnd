@@ -128,7 +128,6 @@ export const getResourceInfos = async <
   const listeEncounterIds = retrieveEncounterIds(elementEntries)
 
   let patients: AxiosResponse<FHIR_API_Response<Bundle<Patient>>> = {} as AxiosResponse
-  let encounters: AxiosResponse<FHIR_API_Response<Bundle<Encounter>>> = {} as AxiosResponse
 
   if (!deidentifiedBoolean) {
     patients = await fetchPatient({
@@ -139,15 +138,12 @@ export const getResourceInfos = async <
     })
   }
 
-  encounters = await fetchEncounter({
+  const encounters = await fetchEncounter({
     _id: listeEncounterIds,
     _list: groupId ? [groupId] : [],
     _elements: ['status', 'serviceProvider', 'identifier', 'partOf'],
     signal: signal
   })
-  if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
-    return []
-  }
   const _patients = getApiResponseResources(patients) ?? []
   const _encounters = getApiResponseResources(encounters)?.filter((encounter) => !encounter.partOf) ?? []
 
