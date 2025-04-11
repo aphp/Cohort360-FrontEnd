@@ -67,17 +67,21 @@ const ModalCohortTitle: React.FC<{
             id="title"
             margin="normal"
             fullWidth
-            error={error !== null}
-            helperText={
-              error === CohortCreationError.ERROR_TITLE
-                ? title.length === 0
-                  ? 'Le nom de la cohorte doit comporter au moins un caractère.'
-                  : 'Le nom est trop long (255 caractères max.)'
-                : error === CohortCreationError.ERROR_REGEX
-                ? "Le nom de la cohorte ne peut pas être composé uniquement d'espaces."
-                : ''
-            }
+            error={error !== null && title.length > 255}
           />
+          {error === CohortCreationError.ERROR_TITLE && title.length === 0 && (
+            <Typography style={{ color: 'black' }}>
+              Le nom de la cohorte doit comporter au moins un caractère.
+            </Typography>
+          )}
+          {error === CohortCreationError.ERROR_TITLE && title.length > 255 && (
+            <Typography style={{ color: 'red' }}>Le nom est trop long (255 caractères max.)</Typography>
+          )}
+          {error === CohortCreationError.ERROR_REGEX && (
+            <Typography style={{ color: 'red' }}>
+              Le nom de la cohorte ne peut pas être composé uniquement d'espaces.
+            </Typography>
+          )}
         </Grid>
 
         <Grid container direction="column" marginBottom={3}>
