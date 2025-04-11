@@ -146,6 +146,17 @@ const useStyles = makeStyles()((theme: Theme) => ({
       color: '#499cbf'
     }
   },
+  documentation: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'fixed',
+    bottom: 65,
+    width: 'inherit',
+    height: 50,
+    backgroundColor: '#232E6A',
+    color: '#FFF'
+  },
   footer: {
     display: 'flex',
     justifyContent: 'center',
