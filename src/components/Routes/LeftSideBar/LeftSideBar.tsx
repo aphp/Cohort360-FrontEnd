@@ -421,6 +421,8 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             <a
               id="documentation-link"
               href="https://id.pages.data.aphp.fr/pfm/portails-et-apis/documentation/"
+              target="_blank"
+              rel="noopener noreferrer"
               className={classes.nestedTitle}
             >
               Documentation de Cohort360
