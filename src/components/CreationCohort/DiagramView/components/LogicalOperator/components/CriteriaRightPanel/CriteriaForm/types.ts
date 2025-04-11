@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { ScopeElement } from 'types'
+import { ScopeElement } from 'types/scope'
 import { Hierarchy } from 'types/hierarchy'
 import { Comparators, CriteriaType, ResourceType } from 'types/requestCriterias'
 import { SourceType } from 'types/scope'

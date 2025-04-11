@@ -110,25 +110,33 @@ const ProjectsList = () => {
   return (
     <Grid container style={{ padding: '20px 0' }} gap="20px">
       <Grid container justifyContent={'space-between'} alignItems={'center'}>
-        <Select
-          value={`${order.orderDirection}${order.orderBy}`}
-          label="Tri par"
-          width={'250px'}
-          items={orderByProjects}
-          onchange={(newValue) => changeOrderBy(newValue)}
-        />
-        <Typography fontWeight={'bold'} fontSize={14}>
-          {total} projet{total > 1 ? 's' : ''}
-        </Typography>
-        <Button
-          width="fit-content"
-          onClick={() => setOpenEditionModal(true)}
-          endIcon={<AddIcon />}
-          disabled={maintenanceIsActive}
-          small
-        >
-          Nouveau projet
-        </Button>
+        <Grid item>
+          {' '}
+          <Select
+            value={`${order.orderDirection}${order.orderBy}`}
+            label="Tri par"
+            options={orderByProjects}
+            onChange={(newValue) => changeOrderBy(newValue)}
+          />
+        </Grid>
+        <Grid item>
+          {' '}
+          <Typography fontWeight={'bold'} fontSize={14}>
+            {total} projet{total > 1 ? 's' : ''}
+          </Typography>
+        </Grid>
+        <Grid item>
+          {' '}
+          <Button
+            width="fit-content"
+            onClick={() => setOpenEditionModal(true)}
+            endIcon={<AddIcon />}
+            disabled={maintenanceIsActive}
+            small
+          >
+            Nouveau projet
+          </Button>
+        </Grid>
       </Grid>
       <Grid container gap="50px" id="projects-list-div">
         {loading ? (

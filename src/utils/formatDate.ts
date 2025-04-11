@@ -12,6 +12,14 @@ const formatDate = (date?: string, withHour?: boolean) => {
   return date && _date.isValid() ? _date.format(format) : 'N/A'
 }
 
+export const sortByDateKey = <T>(array: T[], key: keyof T, order: 'ASC' | 'DESC' = 'DESC') => {
+  return [...array].sort((a, b) => {
+    const dateA = new Date(a[key] as string).getTime()
+    const dateB = new Date(b[key] as string).getTime()
+    return order === 'ASC' ? dateA - dateB : dateB - dateA
+  })
+}
+
 const getStringMonth = (monthNumber: number): Month | undefined => {
   switch (monthNumber) {
     case 0:
