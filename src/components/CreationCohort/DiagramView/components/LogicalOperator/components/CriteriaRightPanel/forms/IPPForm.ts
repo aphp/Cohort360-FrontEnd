@@ -36,6 +36,9 @@ export const form: () => CriteriaForm<IPPListDataType> = () => ({
           type: 'textWithRegex',
           regex: '(?:^|\\D+)?(8\\d{9})(?:$|\\D+)',
           placeholder: "Ajouter une liste d'IPP",
+          extraInfo:
+            "Un IPP est une chaîne de 10 chiffres commençant par un 8. Les IPP peuvent être séparés par n'importe quel symbole ou un retour à la ligne. Ils peuvent être saisis manuellement ou collés depuis une autre source.",
+          extraLabel: () => "Liste d'IPP",
           displayCheckError: false,
           extractValidValues: true,
           displayValueSummary: (value) => {

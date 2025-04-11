@@ -129,6 +129,9 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           valueKey: 'studyDescription',
           type: 'textWithCheck',
           label: 'Rechercher dans les descriptions',
+          extraLabel: () => 'Descriptions',
+          extraInfo:
+            "La description est un texte libre catégorisant l'étude, souvent spécifique à un service ou une machine.",
           placeholder: 'Rechercher dans les descriptions',
           errorType: 'SEARCHINPUT_ERROR',
           buildInfo: {
@@ -140,6 +143,9 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           valueKey: 'studyProcedure',
           type: 'textWithCheck',
           label: 'Rechercher dans les codes procédures',
+          extraLabel: () => 'Code procédure',
+          extraInfo:
+            "Le code procédure est un identifiant associé à un protocole d'acquisition de l'examen. Il est en lien avec le RIS.",
           placeholder: 'Rechercher dans les codes procédures',
           errorType: 'SEARCHINPUT_ERROR',
           buildInfo: {
@@ -159,7 +165,9 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
         {
           valueKey: 'numberOfIns',
           type: 'numberAndComparator',
-          label: "Nombre d'instances",
+          extraLabel: () => "Nombre d'instances",
+          extraInfo:
+            'Une instance correspond à un fichier DICOM. Elle peut contenir un image, un volume ou une vidéo en fonction de la modalité.',
           buildInfo: {
             fhirKey: ImagingParamsKeys.NB_OF_INS,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'instances " }]
