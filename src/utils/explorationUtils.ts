@@ -1,6 +1,6 @@
 import { Cohort, JobStatus, ProjectType, QuerySnapshotInfo, RequestType, ValueSet } from 'types'
 import { CohortsType, ExplorationsSearchParams } from 'types/cohorts'
-import { Direction, FilterKeys, FilterValue, Order } from 'types/searchCriterias'
+import { Direction, FilterKeys, FilterValue, LabelObject, Order } from 'types/searchCriterias'
 import { SetURLSearchParams } from 'react-router-dom'
 import { isDateValid } from './formatDate'
 import { format } from './numbers'
@@ -57,16 +57,16 @@ export const getFoldersConfirmDeletionMessage = () => {
 
 export const statusOptions = [
   {
-    display: 'Terminé',
-    code: 'finished'
+    label: 'Terminé',
+    id: 'finished'
   },
   {
-    display: 'En attente',
-    code: 'pending'
+    label: 'En attente',
+    id: 'pending'
   },
   {
-    display: 'Erreur',
-    code: 'failed'
+    label: 'Erreur',
+    id: 'failed'
   }
 ]
 
@@ -92,15 +92,16 @@ export const getRequestsSearchParams = (searchParams: URLSearchParams) => {
 }
 
 export const getStatusParam = (searchParam: string | null) => {
-  if (searchParam === null) {
-    return []
-  }
-  const statusParam = searchParam.split(',').map((status) => {
-    const statusIndex = statusOptions.findIndex((option) => status === option.code)
-    if (statusIndex > -1) {
-      return statusOptions[statusIndex]
-    }
-  })
+  if (searchParam === null) return []
+  const statusParam = searchParam
+    .split(',')
+    .map((status) => {
+      const statusIndex = statusOptions.findIndex((option) => status === option.id)
+      if (statusIndex > -1) {
+        return statusOptions[statusIndex]
+      }
+    })
+    .filter((status) => status !== undefined)
 
   return statusParam
 }
@@ -115,7 +116,7 @@ export const parseSearchParamValue = (searchParam: string | null, options: {}) =
 export const removeFromSearchParams = (searchParams: URLSearchParams, keyToRemove: string, value: FilterValue) => {
   const targetSearchParam = searchParams.get(keyToRemove)?.split(',')
   const cleanedParam = targetSearchParam
-    ?.filter((searchValue) => searchValue !== (keyToRemove === FilterKeys.STATUS ? (value as ValueSet).code : value))
+    ?.filter((searchValue) => searchValue !== (keyToRemove === FilterKeys.STATUS ? (value as LabelObject).id : value))
     .join()
 
   cleanedParam ? searchParams.set(keyToRemove, cleanedParam) : searchParams.delete(keyToRemove)
@@ -148,7 +149,7 @@ export const getCohortsSearchParams = (searchParams: URLSearchParams) => {
     filters: {
       startDate: searchParams.get(ExplorationsSearchParams.START_DATE),
       endDate: searchParams.get(ExplorationsSearchParams.END_DATE),
-      status: getStatusParam(searchParams.get(ExplorationsSearchParams.STATUS)) as ValueSet[],
+      status: getStatusParam(searchParams.get(ExplorationsSearchParams.STATUS)),
       favorite: (parseSearchParamValue(searchParams.get(ExplorationsSearchParams.FAVORITE), CohortsType) ??
         []) as CohortsType[],
       minPatients: searchParams.get(ExplorationsSearchParams.MIN_PATIENTS),
@@ -243,7 +244,7 @@ export const searchParamsMapper: Record<string, (value: string | null, _searchPa
       value,
       _searchParams,
       ExplorationsSearchParams.STATUS,
-      statusOptions.map((option) => option.code)
+      statusOptions.map((option) => option.id)
     ),
   favorite: (value, _searchParams) =>
     handleFilteredValues(value, _searchParams, ExplorationsSearchParams.FAVORITE, Object.values(CohortsType)),

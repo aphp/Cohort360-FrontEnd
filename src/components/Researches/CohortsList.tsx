@@ -38,12 +38,13 @@ import {
   getRequestName,
   getRequestsConfirmDeletionMessage,
   getRequestsConfirmDeletionTitle,
-  removeFromSearchParams
+  removeFromSearchParams,
+  statusOptions
 } from 'utils/explorationUtils'
-import { removeFilter, selectFiltersAsArray } from 'utils/filters'
+import { selectFiltersAsArray } from 'utils/filters'
 import { CohortsType, CohortsTypeLabel, ExplorationsSearchParams } from 'types/cohorts'
 import CheckboxGroup from 'components/ui/Inputs/CheckboxGroup'
-//import CohortStatusFilter from 'components/Filters/CohortsStatusFilter'
+import MultiSelect from 'components/ui/Inputs/MultiSelect'
 
 type CohortsListProps = {
   rowsPerPage?: number
@@ -78,6 +79,7 @@ const CohortsList = ({ rowsPerPage = 20, favorites, simplified = false }: Cohort
   const [openShareParentModal, setOpenShareParentModal] = useState(false)
   const [openDeletionModal, setOpenDeletionModal] = useState(false)
   const [openFiltersModal, setOpenFiltersModal] = useState(false)
+  const [modalError, setModalError] = useState(false)
 
   useEffect(() => {
     const { changed, newSearchParams } = checkSearchParamsErrors(searchParams)
@@ -191,6 +193,23 @@ const CohortsList = ({ rowsPerPage = 20, favorites, simplified = false }: Cohort
     } else if (selectedCohorts.length <= cohortsList.length) {
       setSelectedCohorts(cohortsList)
     }
+  }
+
+  const handleSubmitModal = (form: CohortsFilters) => {
+    form.status.length > 0
+      ? searchParams.set(ExplorationsSearchParams.STATUS, form.status.map((status) => status.id).join())
+      : searchParams.delete(ExplorationsSearchParams.STATUS)
+    form.favorite.length > 0
+      ? searchParams.set(ExplorationsSearchParams.FAVORITE, form.favorite.join())
+      : searchParams.delete(ExplorationsSearchParams.FAVORITE)
+    !!form.minPatients
+      ? searchParams.set(ExplorationsSearchParams.MIN_PATIENTS, form.minPatients)
+      : searchParams.delete(ExplorationsSearchParams.MIN_PATIENTS)
+    !!form.maxPatients
+      ? searchParams.set(ExplorationsSearchParams.MAX_PATIENTS, form.maxPatients)
+      : searchParams.delete(ExplorationsSearchParams.MAX_PATIENTS)
+    setSearchParams(searchParams)
+    setOpenFiltersModal(false)
   }
 
   if (requestIsError) {
@@ -318,22 +337,15 @@ const CohortsList = ({ rowsPerPage = 20, favorites, simplified = false }: Cohort
           width={'600px'}
           open={openFiltersModal}
           onClose={() => setOpenFiltersModal(false)}
-          onSubmit={() => {
-            /*newFilters.status.length > 0 &&
-            searchParams.set(
-              ExplorationsSearchParams.STATUS,
-              newFilters.status.map((status: ValueSet) => status.code).join()
-            )*/
-            form.favorite.length > 0
-              ? searchParams.set(ExplorationsSearchParams.FAVORITE, form.favorite.join())
-              : searchParams.delete(ExplorationsSearchParams.FAVORITE)
-            // newFilters.minPatients && searchParams.set(ExplorationsSearchParams.MIN_PATIENTS, newFilters.minPatients)
-            // newFilters.maxPatients && searchParams.set(ExplorationsSearchParams.MAX_PATIENTS, newFilters.maxPatients)
-            setSearchParams(searchParams)
-            setOpenFiltersModal(false)
-          }}
+          isError={modalError}
+          onSubmit={() => handleSubmitModal(form)}
         >
-          {/*<CohortStatusFilter value={status} name={FilterKeys.STATUS} allStatus={statusOptions} />*/}
+          <MultiSelect
+            value={form.status ?? []}
+            label="Statut :"
+            options={statusOptions}
+            onChange={(value) => setForm({ ...form, status: value })}
+          />
           <CheckboxGroup
             value={form.favorite}
             onChange={(values) => {
@@ -345,7 +357,15 @@ const CohortsList = ({ rowsPerPage = 20, favorites, simplified = false }: Cohort
               { id: CohortsType.NOT_FAVORITE, label: CohortsTypeLabel.NOT_FAVORITE }
             ]}
           />
-          {/*<NumberRange values={[minPatients, maxPatients]} names={[FilterKeys.MIN_PATIENTS, FilterKeys.MAX_PATIENTS]} />*/}
+          <NumberRange
+            type="patient(s)"
+            values={[form.minPatients, form.maxPatients]}
+            label="Nombre de patients"
+            onChange={(values) => {
+              setForm({ ...form, minPatients: values[0], maxPatients: values[1] })
+            }}
+            onError={setModalError}
+          />
         </Modal>
       )}
     </Grid>

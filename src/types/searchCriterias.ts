@@ -363,7 +363,7 @@ export type DocumentsFilters = GenericFilter & {
 }
 
 export interface CohortsFilters {
-  status?: ValueSet[]
+  status: LabelObject[]
   favorite: CohortsType[]
   minPatients?: null | string
   maxPatients?: null | string
