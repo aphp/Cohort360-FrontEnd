@@ -114,62 +114,79 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
   }
 
   return (
-    <>
-      <div className={classes.root}>
-        <Drawer
-          variant="permanent"
-          classes={{
-            paper: cx(classes.drawer, {
-              [classes.drawerOpen]: open,
-              [classes.drawerClose]: !open
-            })
-          }}
-        >
-          <div className={classes.toolbar}>
-            <Link onClick={() => navigate('/home')} style={{ cursor: 'pointer' }}>
-              <img src={cohortLogo} alt="Cohort360 logo" className={open ? undefined : classes.hide} />
-            </Link>
+    <div className={classes.root}>
+      <Drawer
+        variant="permanent"
+        classes={{
+          paper: cx(classes.drawer, {
+            [classes.drawerOpen]: open,
+            [classes.drawerClose]: !open
+          })
+        }}
+      >
+        <div className={classes.toolbar}>
+          <Link onClick={() => navigate('/home')} style={{ cursor: 'pointer' }}>
+            <img src={cohortLogo} alt="Cohort360 logo" className={open ? undefined : classes.hide} />
+          </Link>
 
-            <IconButton
-              disableRipple
-              disableFocusRipple
-              onClick={() => handleDrawerOpenOrClose(!open)}
-              className={cx({
-                [classes.closeDrawerButton]: open,
-                [classes.menuButton]: !open
-              })}
-            >
-              {open ? <ChevronLeftIcon color="action" width="20px" /> : <MenuIcon width="20px" fill="#FFF" />}
-            </IconButton>
-          </div>
+          <IconButton
+            disableRipple
+            disableFocusRipple
+            onClick={() => handleDrawerOpenOrClose(!open)}
+            className={cx({
+              [classes.closeDrawerButton]: open,
+              [classes.menuButton]: !open
+            })}
+          >
+            {open ? <ChevronLeftIcon color="action" width="20px" /> : <MenuIcon width="20px" fill="#FFF" />}
+          </IconButton>
+        </div>
 
-          <Divider />
+        <Divider />
 
-          <List>
-            <ListItem>
-              <Grid container justifyContent="space-between" alignItems="center" wrap="nowrap">
-                <Grid container wrap="nowrap" xs={10} alignItems="center" item>
-                  <Impersonation
-                    UserInfo={({ practitioner }) => (
-                      <>
-                        <ListItemIcon className={classes.listIcon}>
-                          <div className={classes.avatar}>
-                            {practitioner && `${practitioner.firstname?.[0]}${practitioner.lastname?.[0]}`}
-                          </div>
-                        </ListItemIcon>
-                        <Typography variant="h3" noWrap className={classes.userName}>
-                          {practitioner && `${practitioner.display_name}`}
-                        </Typography>
-                      </>
-                    )}
-                  />
-                </Grid>
-                <Grid container xs={2} item>
-                  <ListItemIcon
-                    className={cx(classes.logoutButton, {
-                      [classes.hide]: !open
-                    })}
+        <List>
+          <ListItem>
+            <Grid container justifyContent="space-between" alignItems="center" wrap="nowrap">
+              <Grid container wrap="nowrap" xs={10} alignItems="center" item>
+                <Impersonation
+                  UserInfo={({ practitioner }) => (
+                    <>
+                      <ListItemIcon className={classes.listIcon}>
+                        <div className={classes.avatar}>
+                          {practitioner && `${practitioner.firstname?.[0]}${practitioner.lastname?.[0]}`}
+                        </div>
+                      </ListItemIcon>
+                      <Typography variant="h3" noWrap className={classes.userName}>
+                        {practitioner && `${practitioner.display_name}`}
+                      </Typography>
+                    </>
+                  )}
+                />
+              </Grid>
+              <Grid container xs={2} item>
+                <ListItemIcon
+                  className={cx(classes.logoutButton, {
+                    [classes.hide]: !open
+                  })}
+                >
+                  <IconButton
+                    onClick={() => {
+                      dispatch(logoutAction())
+                      navigate('/')
+                    }}
                   >
+                    <LogoutIcon className={classes.logoutIcon} />
+                  </IconButton>
+                </ListItemIcon>
+              </Grid>
+            </Grid>
+          </ListItem>
+
+          {!open && (
+            <ListItem>
+              <Grid container item>
+                <ListItemIcon className={classes.logoutButton} style={{ marginLeft: -6 }}>
+                  <Tooltip title="Se déconnecter">
                     <IconButton
                       onClick={() => {
                         dispatch(logoutAction())
@@ -178,190 +195,172 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     >
                       <LogoutIcon className={classes.logoutIcon} />
                     </IconButton>
-                  </ListItemIcon>
-                </Grid>
+                  </Tooltip>
+                </ListItemIcon>
               </Grid>
             </ListItem>
+          )}
 
+          <Divider />
+
+          <ListItem>
             {!open && (
-              <ListItem>
-                <Grid container item>
-                  <ListItemIcon className={classes.logoutButton} style={{ marginLeft: -6 }}>
-                    <Tooltip title="Se déconnecter">
-                      <IconButton
-                        onClick={() => {
-                          dispatch(logoutAction())
-                          navigate('/')
-                        }}
-                      >
-                        <LogoutIcon className={classes.logoutIcon} />
-                      </IconButton>
-                    </Tooltip>
-                  </ListItemIcon>
-                </Grid>
-              </ListItem>
+              <Tooltip title="Nouvelle requête">
+                <JToolEggWrapper Egg={Egg2}>
+                  <IconButton
+                    onClick={handleNewRequest}
+                    className={cx(classes.button, classes.miniButton)}
+                    disabled={maintenanceIsActive}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </JToolEggWrapper>
+              </Tooltip>
             )}
-
-            <Divider />
-
-            <ListItem>
+            {zoomed(
+              <div className={classes.divNewRequest}>
+                <JToolEggWrapper Egg={Egg2}>
+                  <Button
+                    onClick={handleNewRequest}
+                    className={cx(classes.newCohortButton, classes.linkHover, {
+                      [classes.hide]: !open
+                    })}
+                    disabled={maintenanceIsActive}
+                  >
+                    <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
+                      {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
+                    </Typography>
+                  </Button>
+                </JToolEggWrapper>
+              </div>
+            )}
+          </ListItem>
+          {!!cohortCreation?.request?.requestId && (
+            <ListItem style={{ padding: !open ? '0 16px' : undefined }}>
               {!open && (
-                <Tooltip title="Nouvelle requête">
-                  <JToolEggWrapper Egg={Egg2}>
-                    <IconButton
-                      onClick={handleNewRequest}
-                      className={cx(classes.button, classes.miniButton)}
-                      disabled={maintenanceIsActive}
-                    >
-                      <AddIcon />
-                    </IconButton>
-                  </JToolEggWrapper>
+                <Tooltip title="Modifier la requête en cours">
+                  <IconButton
+                    onClick={() => navigate('/cohort/new')}
+                    className={cx(classes.button, classes.miniButton)}
+                    disabled={maintenanceIsActive}
+                  >
+                    <EditIcon />
+                  </IconButton>
                 </Tooltip>
               )}
               {zoomed(
-                <div className={classes.divNewRequest}>
-                  <JToolEggWrapper Egg={Egg2}>
-                    <Button
-                      onClick={handleNewRequest}
-                      className={cx(classes.newCohortButton, classes.linkHover, {
-                        [classes.hide]: !open
-                      })}
-                      disabled={maintenanceIsActive}
-                    >
-                      <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
-                        {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
-                      </Typography>
-                    </Button>
-                  </JToolEggWrapper>
-                </div>
+                <Button
+                  onClick={() => navigate('/cohort/new')}
+                  className={cx(classes.searchButton, classes.editCohortButton, classes.linkHover)}
+                  disabled={maintenanceIsActive}
+                >
+                  <>
+                    <Typography variant="h5">Requête en cours</Typography>
+                    <Typography noWrap style={{ width: 200 }}>
+                      {cohortCreation.request.requestName}
+                    </Typography>
+                  </>
+                </Button>
               )}
             </ListItem>
-            {!!cohortCreation?.request?.requestId && (
-              <ListItem style={{ padding: !open ? '0 16px' : undefined }}>
-                {!open && (
-                  <Tooltip title="Modifier la requête en cours">
-                    <IconButton
-                      onClick={() => navigate('/cohort/new')}
-                      className={cx(classes.button, classes.miniButton)}
-                      disabled={maintenanceIsActive}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                {zoomed(
-                  <Button
-                    onClick={() => navigate('/cohort/new')}
-                    className={cx(classes.searchButton, classes.editCohortButton, classes.linkHover)}
-                    disabled={maintenanceIsActive}
-                  >
-                    <>
-                      <Typography variant="h5">Requête en cours</Typography>
-                      <Typography noWrap style={{ width: 200 }}>
-                        {cohortCreation.request.requestName}
-                      </Typography>
-                    </>
-                  </Button>
-                )}
-              </ListItem>
-            )}
+          )}
 
-            <ListItem id="accueil" className={classes.listItem} button onClick={() => navigate('/home')}>
-              <Tooltip title={!open ? 'Accueil' : ''}>
-                <ListItemIcon className={classes.listIcon}>
-                  <HomeIcon width="20px" fill="#FFF" />
-                </ListItemIcon>
-              </Tooltip>
+          <ListItem id="accueil" className={classes.listItem} button onClick={() => navigate('/home')}>
+            <Tooltip title={!open ? 'Accueil' : ''}>
+              <ListItemIcon className={classes.listIcon}>
+                <HomeIcon width="20px" fill="#FFF" />
+              </ListItemIcon>
+            </Tooltip>
 
-              <ListItemText className={classes.title} primary="Accueil" />
-            </ListItem>
+            <ListItemText className={classes.title} primary="Accueil" />
+          </ListItem>
 
-            <ListItem id="patients" className={classes.listItem} button onClick={handleDisplayPatientList}>
-              <Tooltip title={!open ? 'Mes patients' : ''}>
-                <ListItemIcon className={classes.listIcon}>
-                  <PatientIcon width="20px" fill="#FFF" />
-                </ListItemIcon>
-              </Tooltip>
+          <ListItem id="patients" className={classes.listItem} button onClick={handleDisplayPatientList}>
+            <Tooltip title={!open ? 'Mes patients' : ''}>
+              <ListItemIcon className={classes.listIcon}>
+                <PatientIcon width="20px" fill="#FFF" />
+              </ListItemIcon>
+            </Tooltip>
 
-              <ListItemText className={classes.title} primary="Mes patients" />
-              {displayPatientList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
-            </ListItem>
+            <ListItemText className={classes.title} primary="Mes patients" />
+            {displayPatientList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
+          </ListItem>
 
-            <Collapse
-              className={cx(classes.nestedList, { [classes.hide]: !open })}
-              in={displayPatientList}
-              timeout="auto"
-              unmountOnExit
-            >
-              <List id="patients-collapse">
-                {!practitioner?.deidentified && (
-                  <ListItem>
-                    <Link
-                      id="patientResearch-link"
-                      onClick={() => navigate('/patient-search')}
-                      underline="hover"
-                      className={classes.nestedTitle}
-                    >
-                      Rechercher un patient
-                    </Link>
-                  </ListItem>
-                )}
-                <ListItem>
-                  <JToolEggWrapper Egg={Egg1}>
-                    <Link
-                      id="myPatient-link"
-                      onClick={() => navigate('/my-patients')}
-                      underline="hover"
-                      className={classes.nestedTitle}
-                    >
-                      Tous mes patients
-                    </Link>
-                  </JToolEggWrapper>
-                </ListItem>
+          <Collapse
+            className={cx(classes.nestedList, { [classes.hide]: !open })}
+            in={displayPatientList}
+            timeout="auto"
+            unmountOnExit
+          >
+            <List id="patients-collapse">
+              {!practitioner?.deidentified && (
                 <ListItem>
                   <Link
-                    id="scoopeTree-link"
-                    onClick={() => navigate('/perimeter')}
+                    id="patientResearch-link"
+                    onClick={() => navigate('/patient-search')}
                     underline="hover"
                     className={classes.nestedTitle}
                   >
-                    Explorer un périmètre
+                    Rechercher un patient
                   </Link>
                 </ListItem>
-              </List>
-            </Collapse>
+              )}
+              <ListItem>
+                <JToolEggWrapper Egg={Egg1}>
+                  <Link
+                    id="myPatient-link"
+                    onClick={() => navigate('/my-patients')}
+                    underline="hover"
+                    className={classes.nestedTitle}
+                  >
+                    Tous mes patients
+                  </Link>
+                </JToolEggWrapper>
+              </ListItem>
+              <ListItem>
+                <Link
+                  id="scoopeTree-link"
+                  onClick={() => navigate('/perimeter')}
+                  underline="hover"
+                  className={classes.nestedTitle}
+                >
+                  Explorer un périmètre
+                </Link>
+              </ListItem>
+            </List>
+          </Collapse>
 
-            <ListItem id="research" className={classes.listItem} button onClick={handleDisplaySearchList}>
-              <Tooltip title={!open ? 'Mes recherches' : ''}>
-                <ListItemIcon className={classes.listIcon}>
-                  <ResearchIcon width="20px" fill="#FFF" />
-                </ListItemIcon>
-              </Tooltip>
+          <ListItem id="research" className={classes.listItem} button onClick={handleDisplaySearchList}>
+            <Tooltip title={!open ? 'Mes recherches' : ''}>
+              <ListItemIcon className={classes.listIcon}>
+                <ResearchIcon width="20px" fill="#FFF" />
+              </ListItemIcon>
+            </Tooltip>
 
-              <ListItemText className={classes.title} primary="Mes recherches" />
-              {displaySearchList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
-            </ListItem>
+            <ListItemText className={classes.title} primary="Mes recherches" />
+            {displaySearchList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
+          </ListItem>
 
-            <Collapse
-              in={displaySearchList}
-              timeout="auto"
-              unmountOnExit
-              className={cx(classes.nestedList, { [classes.hide]: !open })}
-            >
-              <List id="research-collapse">
-                {!practitioner?.deidentified && (
-                  <ListItem>
-                    <Link
-                      id="exports-link"
-                      onClick={() => navigate('/exports')}
-                      underline="hover"
-                      className={classes.nestedTitle}
-                    >
-                      Mes exports
-                    </Link>
-                  </ListItem>
-                )}
-                {/* <ListItem>
+          <Collapse
+            in={displaySearchList}
+            timeout="auto"
+            unmountOnExit
+            className={cx(classes.nestedList, { [classes.hide]: !open })}
+          >
+            <List id="research-collapse">
+              {!practitioner?.deidentified && (
+                <ListItem>
+                  <Link
+                    id="exports-link"
+                    onClick={() => navigate('/exports')}
+                    underline="hover"
+                    className={classes.nestedTitle}
+                  >
+                    Mes exports
+                  </Link>
+                </ListItem>
+              )}
+              {/* <ListItem>
                   <Link
                     id="feasibility-reports-link"
                     onClick={() => navigate('/feasibility-reports')}
@@ -372,37 +371,37 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   </Link>
                 </ListItem>
                 {/* TODO: refacto ce menu burger parce que là c'est la crise */}
-                <ListItem>
-                  <Link
-                    id="myProjects-link"
-                    onClick={() => navigate('/researches/projects')}
-                    underline="hover"
-                    className={classes.nestedTitle}
-                  >
-                    Mes projets
-                  </Link>
-                </ListItem>
-                <ListItem>
-                  <Link
-                    id="myRequests-link"
-                    onClick={() => navigate('/researches/requests')}
-                    underline="hover"
-                    className={classes.nestedTitle}
-                  >
-                    Mes requêtes
-                  </Link>
-                </ListItem>
-                <ListItem>
-                  <Link
-                    id="myCohorts-link"
-                    onClick={() => navigate('/researches/cohorts')}
-                    underline="hover"
-                    className={classes.nestedTitle}
-                  >
-                    Mes cohortes
-                  </Link>
-                </ListItem>
-                {/* <ListItem>
+              <ListItem>
+                <Link
+                  id="myProjects-link"
+                  onClick={() => navigate('/researches/projects')}
+                  underline="hover"
+                  className={classes.nestedTitle}
+                >
+                  Mes projets
+                </Link>
+              </ListItem>
+              <ListItem>
+                <Link
+                  id="myRequests-link"
+                  onClick={() => navigate('/researches/requests')}
+                  underline="hover"
+                  className={classes.nestedTitle}
+                >
+                  Mes requêtes
+                </Link>
+              </ListItem>
+              <ListItem>
+                <Link
+                  id="myCohorts-link"
+                  onClick={() => navigate('/researches/cohorts')}
+                  underline="hover"
+                  className={classes.nestedTitle}
+                >
+                  Mes cohortes
+                </Link>
+              </ListItem>
+              {/* <ListItem>
                   <Link
                     id="myProject-link"
                     onClick={() => navigate('/researches/samples')}
@@ -412,41 +411,53 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     Mes échantillons
                   </Link>
                 </ListItem> */}
-              </List>
-            </Collapse>
-          </List>
+            </List>
+          </Collapse>
+        </List>
 
-          {open && versionInfo.version && (
-            <Box className={classes.footer}>
-              <Divider />
-              <Typography variant="caption">{`${versionInfo.version} (${versionInfo.commit})`}</Typography>
-            </Box>
-          )}
+        {open && (
+          <Box className={classes.documentation}>
+            <Divider />
+            <a
+              id="documentation-link"
+              href="https://id.pages.data.aphp.fr/pfm/portails-et-apis/documentation/"
+              className={classes.nestedTitle}
+            >
+              Documentation de Cohort360
+            </a>
+          </Box>
+        )}
 
-          {appConfig.features.contact.enabled &&
-            (open ? (
-              <Button
-                onClick={() => navigate('/contact')}
-                variant="contained"
-                size="small"
-                startIcon={<HelpIcon />}
-                style={{ position: 'fixed', bottom: 0, width: 'inherit' }}
-              >
-                Contactez-nous
-              </Button>
-            ) : (
-              <IconButton
-                onClick={() => {
-                  navigate('/contact')
-                }}
-                style={{ position: 'fixed', bottom: 0 }}
-              >
-                <HelpIcon style={{ color: '#FFF' }} />
-              </IconButton>
-            ))}
-        </Drawer>
-      </div>
-    </>
+        {open && versionInfo.version && (
+          <Box className={classes.footer}>
+            <Divider />
+            <Typography variant="caption">{`${versionInfo.version} (${versionInfo.commit})`}</Typography>
+          </Box>
+        )}
+
+        {appConfig.features.contact.enabled &&
+          (open ? (
+            <Button
+              onClick={() => navigate('/contact')}
+              variant="contained"
+              size="small"
+              startIcon={<HelpIcon />}
+              style={{ position: 'fixed', bottom: 0, width: 'inherit' }}
+            >
+              Contactez-nous
+            </Button>
+          ) : (
+            <IconButton
+              onClick={() => {
+                navigate('/contact')
+              }}
+              style={{ position: 'fixed', bottom: 0 }}
+            >
+              <HelpIcon style={{ color: '#FFF' }} />
+            </IconButton>
+          ))}
+      </Drawer>
+    </div>
   )
 }
 
