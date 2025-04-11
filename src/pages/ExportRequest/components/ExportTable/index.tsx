@@ -152,7 +152,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
   }, [exportTableResourceType, getFilterCount])
 
   return (
-    <Grid container className={classes.exportTableGrid}>
+    <Grid container className={classes.exportTableGrid} id={tableSetting?.tableName}>
       <Grid item container alignItems="center">
         <Grid item container alignItems="center" xs={6}>
           <Typography
@@ -203,6 +203,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
 
         <Grid container item xs={2} justifyContent={'end'}>
           <Checkbox
+            id={tableSetting?.tableName + '_selectTable'}
             disabled={
               oneFile
                 ? !isCompatibleTable(exportTable.name) || exportTable.name === 'person'
@@ -228,7 +229,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
       )}
       <Grid container justifyContent={'space-between'}>
         {checkedPivotMerge === false && (
-          <Grid container xs={6} alignItems={'center'}>
+          <Grid container xs={6} alignItems={'center'} id={tableSetting?.tableName + 'columnsFilters'}>
             <Typography marginRight={'5px'} className={classes.textBody2}>
               Sélectionner les colonnes à exporter :
             </Typography>
@@ -288,7 +289,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
             />
           </Grid>
         )}
-        <Grid container xs={6} alignItems="center">
+        <Grid container xs={6} alignItems="center" id={tableSetting?.tableName + 'ResourceFilters'}>
           {exportTableResourceType !== ResourceType.UNKNOWN && (
             <>
               <Typography marginLeft={'75px'} marginRight={'5px'} className={classes.textBody2}>
