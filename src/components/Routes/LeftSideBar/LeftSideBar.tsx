@@ -415,12 +415,12 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           </Collapse>
         </List>
 
-        {open && (
+        {open && appConfig.system.urlDoc && (
           <Box className={classes.documentation}>
             <Divider />
             <a
               id="documentation-link"
-              href="https://id.pages.data.aphp.fr/pfm/portails-et-apis/documentation/"
+              href={appConfig.system.urlDoc}
               target="_blank"
               rel="noopener noreferrer"
               className={classes.nestedTitle}
