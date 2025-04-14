@@ -176,6 +176,7 @@ export type AppConfig = {
     jToolUsers: string[]
     userTrackingBlacklist: string[]
     mailSupport?: string
+    urlDoc?: string
   }
 }
 
