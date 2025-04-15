@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.45.12](https://github.com/aphp/Cohort360-FrontEnd/compare/2.45.11..v2.45.12) - 2025-04-15
+
+### 🐛 Bug Fixes
+
+- Filter users - ([9890e8e](https://github.com/aphp/Cohort360-FrontEnd/commit/9890e8e360f2300fcc16843ca3b389030abd1f39))
+
 ## [2.45.11](https://github.com/aphp/Cohort360-FrontEnd/compare/2.45.10..2.45.11) - 2025-04-14
 
 ### 🚜 Refactor
