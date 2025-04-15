@@ -110,8 +110,8 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
               addUser(value)
               setSearchInput('')
             }}
-            inputValue={searchInput}
-            onInputChange={() => setSearchInput('')}
+            filterOptions={(options, { inputValue }) => options}
+            onInputChange={(event, value) => setSearchInput(value)}
             getOptionLabel={(option) =>
               `${option.username} - ${option.lastname?.toLocaleUpperCase()} ${option.firstname} ${
                 option.email ? `- ${option.email}` : ''
