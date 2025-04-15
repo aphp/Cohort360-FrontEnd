@@ -9,8 +9,7 @@ import {
   Grid,
   CircularProgress,
   TextField,
-  Autocomplete,
-  Typography
+  Autocomplete
 } from '@mui/material'
 
 import { User } from 'types'
@@ -78,7 +77,6 @@ const ModalImpersonation: React.FC<{
       <DialogTitle>Impersonnifier un utilisateur</DialogTitle>
       <DialogContent>
         <Grid container direction="column">
-          <Typography variant="h3">Utilisateur à impersonnifier:</Typography>
           <div style={{ display: 'flex', flexDirection: 'column', margin: '1em 0 0 0' }}>
             <Autocomplete
               noOptionsText="Rechercher un utilisateur"
@@ -88,8 +86,8 @@ const ModalImpersonation: React.FC<{
               onChange={(e, value) => {
                 setImpersonatedUser(value || undefined)
               }}
-              inputValue={searchInput}
-              onInputChange={() => setSearchInput('')}
+              filterOptions={(options, { inputValue }) => options}
+              onInputChange={(event, value) => setSearchInput(value)}
               getOptionLabel={(option) =>
                 `${option.username} - ${option.lastname?.toLocaleUpperCase()} ${option.firstname} ${
                   option.email ? `- ${option.email}` : ''
@@ -127,7 +125,9 @@ const ModalImpersonation: React.FC<{
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Annuler</Button>
-        <Button onClick={handleConfirm}>Valider</Button>
+        <Button onClick={handleConfirm} disabled={!impersonatedUser}>
+          Valider
+        </Button>
       </DialogActions>
     </Dialog>
   )
