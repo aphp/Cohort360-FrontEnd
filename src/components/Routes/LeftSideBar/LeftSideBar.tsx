@@ -25,6 +25,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import HelpIcon from '@mui/icons-material/Help'
+import MenuBookIcon from '@mui/icons-material/MenuBook'
 
 import cohortLogo from 'assets/images/logo_v3.1_ld.png'
 import HomeIcon from 'assets/icones/home-lg.svg?react'
@@ -43,6 +44,7 @@ import versionInfo from 'data/version.json'
 import Impersonation from 'components/Impersonation'
 import { Egg1, Egg2 } from 'components/Impersonation/Eggs'
 import JToolEggWrapper from 'components/Impersonation/JTool'
+import ShimmerBadge from 'components/ui/ShimmerBadge'
 import { AppConfig } from 'config'
 
 const smallDrawerWidth = 52
@@ -144,7 +146,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
 
         <Divider />
 
-        <List>
+        <List className={classes.list}>
           <ListItem>
             <Grid container justifyContent="space-between" alignItems="center" wrap="nowrap">
               <Grid container wrap="nowrap" xs={10} alignItems="center" item>
@@ -413,51 +415,59 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 </ListItem> */}
             </List>
           </Collapse>
-        </List>
 
-        {open && appConfig.system.urlDoc && (
-          <Box className={classes.documentation}>
-            <Divider />
-            <a
-              id="documentation-link"
+          {appConfig.system.urlDoc && (
+            <ListItem
+              id="documentation"
+              className={classes.listItem}
               href={appConfig.system.urlDoc}
               target="_blank"
               rel="noopener noreferrer"
-              className={classes.nestedTitle}
+              component="a"
             >
-              Documentation de Cohort360
-            </a>
-          </Box>
-        )}
+              <Tooltip title={!open ? 'Documentation' : ''}>
+                <ListItemIcon className={classes.listIcon}>
+                  <MenuBookIcon width="20px" htmlColor="#FFF" />
+                </ListItemIcon>
+              </Tooltip>
 
-        {open && versionInfo.version && (
-          <Box className={classes.footer}>
-            <Divider />
-            <Typography variant="caption">{`${versionInfo.version} (${versionInfo.commit})`}</Typography>
-          </Box>
-        )}
+              <>
+                <ListItemText className={classes.title} primary="Documentation" style={{ flex: 'unset' }} />
+                <ShimmerBadge>Nouveau</ShimmerBadge>
+              </>
+            </ListItem>
+          )}
+        </List>
 
-        {appConfig.features.contact.enabled &&
-          (open ? (
-            <Button
-              onClick={() => navigate('/contact')}
-              variant="contained"
-              size="small"
-              startIcon={<HelpIcon />}
-              style={{ position: 'fixed', bottom: 0, width: 'inherit' }}
-            >
-              Contactez-nous
-            </Button>
-          ) : (
-            <IconButton
-              onClick={() => {
-                navigate('/contact')
-              }}
-              style={{ position: 'fixed', bottom: 0 }}
-            >
-              <HelpIcon style={{ color: '#FFF' }} />
-            </IconButton>
-          ))}
+        <Box className={classes.footer}>
+          {open && versionInfo.version && (
+            <Box className={classes.footerElement}>
+              <Typography variant="caption">{`${versionInfo.version} (${versionInfo.commit})`}</Typography>
+            </Box>
+          )}
+
+          {appConfig.features.contact.enabled &&
+            (open ? (
+              <Button
+                onClick={() => navigate('/contact')}
+                variant="contained"
+                size="small"
+                startIcon={<HelpIcon />}
+                style={{ position: 'fixed', bottom: 0, width: 'inherit' }}
+              >
+                Contactez-nous
+              </Button>
+            ) : (
+              <IconButton
+                onClick={() => {
+                  navigate('/contact')
+                }}
+                style={{ position: 'fixed', bottom: 0 }}
+              >
+                <HelpIcon style={{ color: '#FFF' }} />
+              </IconButton>
+            ))}
+        </Box>
       </Drawer>
     </div>
   )

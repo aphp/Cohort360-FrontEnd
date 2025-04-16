@@ -14,7 +14,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
+    overflowX: 'hidden'
   },
   drawerOpen: {
     backgroundColor: '#232E6A',
@@ -146,27 +147,37 @@ const useStyles = makeStyles()((theme: Theme) => ({
       color: '#499cbf'
     }
   },
-  documentation: {
+  footerElement: {
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center',
-    position: 'fixed',
-    bottom: 65,
     width: 'inherit',
-    height: 50,
-    backgroundColor: '#232E6A',
-    color: '#FFF'
+    height: 32
   },
   footer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'fixed',
-    bottom: 0,
-    width: 'inherit',
-    height: 50,
     backgroundColor: '#232E6A',
-    color: '#FFF'
+    color: '#FFF',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    width: 'inherit'
+  },
+  list: {
+    flexGrow: 1,
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    '&::-webkit-scrollbar': {
+      width: 8
+    },
+    '&::-webkit-scrollbar-track': {
+      backgroundColor: '#232E6A'
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: 'grey',
+      borderRadius: 8,
+      border: '2px solid #232E6A'
+    }
   }
 }))
 

@@ -69,8 +69,6 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
     favorite: favorites ? [CohortsType.FAVORITE] : favorite,
     minPatients,
     maxPatients,
-    startDate,
-    endDate,
     parentId: requestId
   })
   const [cohortToEdit, setCohortToEdit] = useState<Cohort | null>(null)
@@ -92,7 +90,7 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
   const { cohortsList, total, loading } = useCohorts({
     orderBy: order,
     searchInput,
-    filters,
+    filters: { ...filters, startDate, endDate },
     page,
     rowsPerPage,
     paramsReady
