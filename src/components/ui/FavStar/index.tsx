@@ -10,7 +10,11 @@ type FavStarProps = {
 }
 
 const FavStar: React.FC<FavStarProps> = ({ favorite, height = 15, color = '#ED6D91' }) => {
-  return favorite ? <StarFull height={height} fill={color} /> : <Star height={height} fill={color} />
+  return favorite ? (
+    <StarFull className="full-star" height={height} fill={color} />
+  ) : (
+    <Star className="empty-star" height={height} fill={color} />
+  )
 }
 
 export default FavStar
