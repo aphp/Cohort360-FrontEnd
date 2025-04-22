@@ -89,7 +89,6 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
         open={documentDialogOpen}
         handleClose={() => setDocumentDialogOpen(false)}
         documentId={row.id ?? ''}
-        list={groupId ? groupId.split(',') : undefined}
       />
     </>
   )
