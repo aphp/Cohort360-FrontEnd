@@ -90,7 +90,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
   const url = useMemo(() => {
     const apiUrl = getConfig().system.fhirUrl
     return { url: `${apiUrl}/Binary/${documentId}` }
-  }, [])
+  }, [documentId])
 
   const options = useMemo(() => {
     return {
