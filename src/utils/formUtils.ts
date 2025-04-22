@@ -29,7 +29,7 @@ export const getDataFromForm = (
       return (
         itemValue
           ?.map((answer) => {
-            const dateTime = moment.utc(answer.valueDateTime)
+            const dateTime = moment(answer.valueDateTime)
             return dateTime.isValid() ? dateTime.format('DD/MM/YYYY à HH:mm') : ''
           })
           .filter(Boolean)
@@ -91,8 +91,8 @@ export const getBirthDeliveryDate = (
 }
 
 export const formatHospitalisationDates = (start?: string, end?: string) => {
-  const _start = start && moment.utc(start).isValid() ? moment.utc(start).format('DD/MM/YYYY') : undefined
-  const _end = end && moment.utc(end).isValid() ? moment.utc(end).format('DD/MM/YYYY') : undefined
+  const _start = start && moment(start).isValid() ? moment(start).format('DD/MM/YYYY') : undefined
+  const _end = end && moment(end).isValid() ? moment(end).format('DD/MM/YYYY') : undefined
   if (_start && _end) {
     return `Hospitalisation du ${_start} au ${_end}`
   } else if (_start && !_end) {
