@@ -21,26 +21,25 @@ import { DocumentReference } from 'fhir/r4'
 import { getAuthorizationMethod } from 'services/apiFhir'
 import { getConfig } from 'config'
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
+pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
 
 type DocumentViewerProps = {
   deidentified?: boolean
   open: boolean
   handleClose: () => void
   documentId: string
-  list?: string[]
 }
 
 const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, handleClose, documentId }) => {
   const [documentContent, setDocumentContent] = useState<DocumentReference | null>(null)
   const [numPages, setNumPages] = useState(1)
   const [loading, setLoading] = useState(false)
-  const [selectedTab, setSelectedValue] = useState<'pdf' | 'raw'>(!deidentified ? (documentId ? 'pdf' : 'raw') : 'raw')
+  const [selectedTab, setSelectedTab] = useState<'pdf' | 'raw'>(!deidentified ? (documentId ? 'pdf' : 'raw') : 'raw')
   const gridRef: React.RefObject<HTMLDivElement> = useRef(null)
   const [gridWidth, setGridWidth] = useState(0)
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: 'pdf' | 'raw') => {
-    setSelectedValue(newValue)
+    setSelectedTab(newValue)
   }
 
   useEffect(() => {
