@@ -21,7 +21,7 @@ import { DocumentReference } from 'fhir/r4'
 import { getAuthorizationMethod } from 'services/apiFhir'
 import { getConfig } from 'config'
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
 
 type DocumentViewerProps = {
   deidentified?: boolean
