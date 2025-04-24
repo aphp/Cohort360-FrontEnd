@@ -38,9 +38,8 @@ const Dashboard = ({ context }: DashboardProps) => {
     () => buildExplorationConfig(!!dashboard.deidentifiedBoolean, null, groupId ? [groupId] : []),
     [dashboard.deidentifiedBoolean, groupId]
   )
-  const [selectedConfig, setSelectedConfig] = useState<ExplorationConfigFor<ResourceType> | null>(
-    config.get(subtab ?? tabName)
-  )
+
+  const selectedConfig = useMemo(() => config.get(selectedSubTab ?? selectedTab), [config, selectedSubTab, selectedTab])
 
   useEffect(() => {
     setSelectedSubTab(subtab)
@@ -53,12 +52,6 @@ const Dashboard = ({ context }: DashboardProps) => {
   const handleChangeTab = (newTab: ResourceType) => {
     setSelectedTab(newTab)
     setSelectedSubTab(null)
-    setSelectedConfig(config.get(newTab))
-  }
-
-  const handleChangeSubTab = (newTab: ResourceType) => {
-    setSelectedSubTab(newTab)
-    setSelectedConfig(config.get(newTab))
   }
 
   const availableTabs = useMemo(() => {
@@ -173,7 +166,7 @@ const Dashboard = ({ context }: DashboardProps) => {
           </Grid>
           {subTabs && (
             <Grid item xs={12}>
-              <Tabs id="subTabs" value={selectedSubTab} onChange={(_, newSubTab) => handleChangeSubTab(newSubTab)}>
+              <Tabs id="subTabs" value={selectedSubTab} onChange={(_, newSubTab) => setSelectedSubTab(newSubTab)}>
                 {subTabs.map((subTab) => {
                   const groupIdParam = groupId ? `groupId=${groupId}` : ''
                   return (

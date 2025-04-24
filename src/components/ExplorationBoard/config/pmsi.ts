@@ -16,7 +16,6 @@ import { getCategory } from 'utils/fhir'
 import { getValueSetsFromSystems } from 'utils/valueSets'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
-  console.log('test infos', additionalInfo)
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
     diagnosticTypesList: () =>
       !additionalInfo.diagnosticTypesList
@@ -28,7 +27,6 @@ const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<Add
         : Promise.resolve(undefined)
   }
   const resolved = await resolveAdditionalInfos(fetchersMap)
-  console.log('test info fetched', resolved, fetchersMap)
   return { ...additionalInfo, ...resolved }
 }
 

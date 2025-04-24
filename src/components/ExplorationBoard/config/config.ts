@@ -34,7 +34,6 @@ type ResourceFilterMap = {
 export type ExplorationConfigFor<T extends ResourceType> = ExplorationConfig<ResourceFilterMap[T]>
 
 export const buildExplorationConfig = (deidentified: boolean, patient: PatientState | null, groupId: string[]) => {
-  console.log('test deidentified', deidentified)
   const configMap = {
     [ResourceType.PATIENT]: patientsConfig,
     [ResourceType.OBSERVATION]: biologyConfig,
