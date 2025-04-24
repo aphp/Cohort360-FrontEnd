@@ -50,12 +50,13 @@ const Patient = () => {
   const [selectedTab, setSelectedTab] = useState<ResourceType>(tabName ?? ResourceType.PREVIEW)
   const [selectedSubTab, setSelectedSubTab] = useState<ResourceType | null>(null)
   const [isSidebarOpened, setIsSidebarOpened] = useState(false)
-  const [selectedConfig, setSelectedConfig] = useState<ExplorationConfigFor<ResourceType> | null>(null)
   const expConfig = useMemo(
     () => buildExplorationConfig(deidentified, patient, groupIds),
     [deidentified, groupIds, patient]
   )
-
+  const [selectedConfig, setSelectedConfig] = useState<ExplorationConfigFor<ResourceType> | null>(
+    expConfig.get(subtab ?? tabName)
+  )
   const sidebarConfig = useMemo(() => expConfig.get(ResourceType.PATIENT, SIDEBAR_OPTONS), [expConfig])
 
   useEffect(() => {
