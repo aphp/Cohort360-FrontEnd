@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import CheckboxGroup from 'components/ui/Inputs/CheckboxGroup'
 import DurationRange from 'components/ui/Inputs/DurationRange'
 import { FilterByDocumentStatus, FilterKeys, Filters, genderOptions, vitalStatusesOptions } from 'types/searchCriterias'
@@ -13,13 +13,14 @@ import allDocTypesList from 'assets/docTypes.json'
 import DocTypes from 'components/ui/Inputs/DocTypes'
 import { AdditionalInfo } from 'types/exploration'
 import { Typography } from '@mui/material'
+import { isEqual } from 'lodash'
 
 type ExplorationFiltersProps<T> = {
   filters: T
   infos: AdditionalInfo
-  onSubmit: (filters: T) => void
+  onChange: (filters: T) => void
   onError: (isError: boolean) => void
-  onChange: (hasChange: boolean) => void
+  hasChanged: (hasChange: boolean) => void
 }
 
 enum Source {
@@ -59,29 +60,44 @@ const docStatusesList = [
 const ExplorationFilters = <T extends FieldValues>({
   filters,
   infos,
-  onSubmit,
+  onChange,
   onError,
-  onChange
+  hasChanged
 }: ExplorationFiltersProps<T>) => {
   const {
     control,
     handleSubmit,
     reset,
-    formState: { isDirty }
+    getValues,
+    formState: { isSubmitting }
   } = useForm<T>({
     defaultValues: filters,
     mode: 'onChange',
     reValidateMode: 'onChange'
   })
 
+  const lastSubmitted = useRef<T>(filters)
+
+  // Réinitialise les valeurs et soumet dès que filters changent
   useEffect(() => {
     reset(filters)
-  }, [filters, reset])
+    lastSubmitted.current = filters
+    handleSubmit(onChange)()
+  }, [filters, reset, handleSubmit, onChange])
 
+  // Sur chaque changement interne, compare et soumet uniquement si ça a vraiment changé
   useEffect(() => {
-    if (isDirty) handleSubmit(onSubmit)()
-    onChange(isDirty)
-  }, [isDirty, handleSubmit, onSubmit, onChange])
+    const interval = setInterval(() => {
+      const currentValues = getValues()
+      if (!isEqual(currentValues, lastSubmitted.current) && !isSubmitting) {
+        lastSubmitted.current = currentValues
+        handleSubmit(onChange)()
+        hasChanged(true)
+      }
+    }, 300)
+
+    return () => clearInterval(interval)
+  }, [getValues, handleSubmit, onChange, hasChanged, isSubmitting])
 
   const fields: Partial<Record<FilterKeys, React.FC<{ field: ControllerRenderProps }>>> = useMemo(
     () => ({
