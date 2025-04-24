@@ -18,7 +18,7 @@ import { URLS } from 'types/exploration'
 import sideBarTransition from 'styles/sideBarTransition'
 import { MainTabsWrapper } from 'components/ui/Tabs/style'
 import { SidebarButton, SidebarWrapper } from 'components/ui/Sidebar/style'
-import { buildExplorationConfig, ExplorationConfigFor } from 'components/ExplorationBoard/config/config'
+import { buildExplorationConfig } from 'components/ExplorationBoard/config/config'
 
 const SIDEBAR_OPTONS = {
   myFilters: false,
@@ -54,10 +54,12 @@ const Patient = () => {
     () => buildExplorationConfig(deidentified, patient, groupIds),
     [deidentified, groupIds, patient]
   )
-  const [selectedConfig, setSelectedConfig] = useState<ExplorationConfigFor<ResourceType> | null>(
-    expConfig.get(subtab ?? tabName)
-  )
+
   const sidebarConfig = useMemo(() => expConfig.get(ResourceType.PATIENT, SIDEBAR_OPTONS), [expConfig])
+  const selectedConfig = useMemo(
+    () => expConfig.get(selectedSubTab ?? selectedTab),
+    [expConfig, selectedSubTab, selectedTab]
+  )
 
   useEffect(() => {
     setSelectedSubTab(subtab)
@@ -119,12 +121,6 @@ const Patient = () => {
   const handleChangeTab = (newTab: ResourceType) => {
     setSelectedTab(newTab)
     setSelectedSubTab(null)
-    setSelectedConfig(expConfig.get(newTab))
-  }
-
-  const handleChangeSubTab = (newTab: ResourceType) => {
-    setSelectedSubTab(newTab)
-    setSelectedConfig(expConfig.get(newTab))
   }
 
   if (patient === null && !loading) return <PatientNotExist />
@@ -161,7 +157,7 @@ const Patient = () => {
         </Grid>
         <Grid container sm={11}>
           {subTabs && (
-            <Tabs value={selectedSubTab} onChange={(_, newSubTab) => handleChangeSubTab(newSubTab)}>
+            <Tabs value={selectedSubTab} onChange={(_, newSubTab) => setSelectedSubTab(newSubTab)}>
               {subTabs.map((subTab) => {
                 const groupIdParam = groupId ? `groupId=${groupId}` : ''
                 return (

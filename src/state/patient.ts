@@ -208,7 +208,6 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
         fetchClaimList(fetchParams, { filters }, patient, deidentified, groupIds)
       ])
       if (fetchPatientResponse === undefined) return null
-      console.log('test last', fetchPatientResponse)
       const conditionList = fetchPatientResponse[0].list
       const procedureList = fetchPatientResponse[1].list
       const claimList = fetchPatientResponse[2].list
