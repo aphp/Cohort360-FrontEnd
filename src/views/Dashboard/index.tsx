@@ -34,11 +34,14 @@ const Dashboard = ({ context }: DashboardProps) => {
   const open = useAppSelector((state) => state.drawer)
   const dashboard = useAppSelector((state) => state.exploredCohort)
   const me = useAppSelector((state) => state.me)
-  const [selectedConfig, setSelectedConfig] = useState<ExplorationConfigFor<ResourceType> | null>(null)
   const config = useMemo(
     () => buildExplorationConfig(!!dashboard.deidentifiedBoolean, null, groupId ? [groupId] : []),
     [dashboard.deidentifiedBoolean, groupId]
   )
+  const [selectedConfig, setSelectedConfig] = useState<ExplorationConfigFor<ResourceType> | null>(
+    config.get(subtab ?? tabName)
+  )
+
   useEffect(() => {
     setSelectedSubTab(subtab)
   }, [subtab])

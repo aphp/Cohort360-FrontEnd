@@ -141,7 +141,7 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[]): Table
       },
       {
         id: `${patient.id}-birthdate`,
-        value: `${age.birthdate} (${age.age})`,
+        value: deidentified ? `${age.age}` : `${age.birthdate} (${age.age})`,
         type: CellType.TEXT
       },
       {
@@ -161,6 +161,7 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[]): Table
 }
 
 const mapToCards = (data: Data, deidentified: boolean, groupId: string[]) => {
+  console.log('test deidentified table', deidentified)
   const infos: Card[] = []
   ;(data as ExplorationResults<Patient>).list.forEach((patient) => {
     const { vitalStatus, surname, lastname, ipp, age, gender } = getPatientInfos(patient, deidentified, groupId)

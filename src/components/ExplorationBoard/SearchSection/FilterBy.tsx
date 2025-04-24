@@ -47,8 +47,8 @@ const FilterBy = <T,>({ filters, infos, onSubmit }: FilterByProps<T>) => {
           filters={filters}
           infos={infos}
           onError={setIsError}
-          onSubmit={setForm}
-          onChange={setHasChanged}
+          onChange={setForm}
+          hasChanged={setHasChanged}
         />
       </Modal>
     </>
