@@ -161,7 +161,6 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[]): Table
 }
 
 const mapToCards = (data: Data, deidentified: boolean, groupId: string[]) => {
-  console.log('test deidentified table', deidentified)
   const infos: Card[] = []
   ;(data as ExplorationResults<Patient>).list.forEach((patient) => {
     const { vitalStatus, surname, lastname, ipp, age, gender } = getPatientInfos(patient, deidentified, groupId)
