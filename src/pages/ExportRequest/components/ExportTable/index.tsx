@@ -8,7 +8,8 @@ import {
   Autocomplete,
   CircularProgress,
   Alert,
-  ListItemText
+  ListItemText,
+  Button
 } from '@mui/material'
 
 import useStyles from '../../styles'
@@ -22,6 +23,7 @@ import { Cohort } from 'types'
 import { TableInfo, TableSetting } from 'types/export'
 
 import { Error } from '../ExportForm'
+import QuestionForm from 'pages/ExportRequest/components/QuestionChoice'
 
 type ExportTableProps = {
   exportTable: TableInfo
@@ -71,6 +73,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
   const [checkedPivotMerge, setCheckedPivotMerge] = useState<boolean>(tableSetting?.isChecked || false)
   const appConfig = useContext(AppConfig)
   const limit = appConfig.features.export.exportLinesLimit
+  const [isQuestionChoiceOpen, setIsQuestionChoiceOpen] = useState(false)
 
   const getFilterList = useCallback(async () => {
     try {
@@ -151,6 +154,10 @@ const ExportTable: React.FC<ExportTableProps> = ({
     }
   }, [exportTableResourceType, getFilterCount])
 
+  const handleQuestionChoiceOpen = (isOpen: boolean) => {
+    setIsQuestionChoiceOpen(!isOpen)
+  }
+
   return (
     <Grid container className={classes.exportTableGrid} id={tableSetting?.tableName}>
       <Grid item container alignItems="center">
@@ -228,6 +235,18 @@ const ExportTable: React.FC<ExportTableProps> = ({
         </Grid>
       )}
       <Grid container justifyContent={'space-between'}>
+        {exportTable.name === ResourceType.QUESTIONNAIRE_RESPONSE && checkedPivotMerge && (
+          <Grid container xs={6} alignItems={'center'} id={tableSetting?.tableName + 'questionChoice'}>
+            <Typography marginRight={'5px'} className={classes.textBody2}>
+              Sélectionner les questions à exporter :
+            </Typography>
+            <Button onClick={() => setIsQuestionChoiceOpen(!isQuestionChoiceOpen)}>Choix des questions</Button>
+            <QuestionForm
+              isOpen={isQuestionChoiceOpen}
+              handleClose={() => handleQuestionChoiceOpen(isQuestionChoiceOpen)}
+            />
+          </Grid>
+        )}
         {checkedPivotMerge === false && (
           <Grid container xs={6} alignItems={'center'} id={tableSetting?.tableName + 'columnsFilters'}>
             <Typography marginRight={'5px'} className={classes.textBody2}>
