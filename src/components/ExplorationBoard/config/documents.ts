@@ -74,7 +74,7 @@ const fetchList = (
     searchBy: searchBy,
     docStatuses: docStatuses.map((status) => status.id),
     _elements: searchInput ? [] : undefined,
-    highlight_search_results: searchBy === SearchByTypes.TEXT ? true : false,
+    highlight_search_results: searchBy === SearchByTypes.TEXT,
     type: docTypes.map((docType) => docType.code).join(','),
     patient: patient?.patientInfo?.id,
     'encounter-identifier': nda,
