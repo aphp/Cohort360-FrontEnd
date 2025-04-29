@@ -125,18 +125,33 @@ const ExplorationFilters = <T extends FieldValues>({
         <TextInput {...field} label="IPP :" placeholder="Exemple: 8000000000001,8000000000002" />
       ),
       [FilterKeys.DOC_STATUSES]: ({ field }) => (
-        <MultiSelect {...field} options={docStatusesList} label="Statut de documents :" />
+        <MultiSelect
+          {...field}
+          options={docStatusesList}
+          label="Statut de documents :"
+          placeholder="Statut de documents"
+        />
       ),
       [FilterKeys.DOC_TYPES]: ({ field }) => (
         <DocTypes {...field} options={allDocTypesList.docTypes} label="Type de documents :" />
       ),
       [FilterKeys.PRESCRIPTION_TYPES]: ({ field }) =>
         field.value ? (
-          <MultiSelect {...field} options={infos.prescriptionList ?? []} label="Type de prescriptions :" />
+          <MultiSelect
+            {...field}
+            options={infos.prescriptionList ?? []}
+            label="Type de prescriptions :"
+            placeholder="Type de prescriptions"
+          />
         ) : null,
       [FilterKeys.ADMINISTRATION_ROUTES]: ({ field }) =>
         field.value ? (
-          <MultiSelect {...field} options={infos.administrationList ?? []} label="Voie d'administration :" />
+          <MultiSelect
+            {...field}
+            options={infos.administrationList ?? []}
+            label="Voie d'administration :"
+            placeholder="Voie d'administration"
+          />
         ) : null,
       [FilterKeys.CODE]: ({ field }) => <ValueSets {...field} label="Codes :" references={infos.references ?? []} />,
       [FilterKeys.DIAGNOSTIC_TYPES]: ({ field }) =>
@@ -145,6 +160,7 @@ const ExplorationFilters = <T extends FieldValues>({
             {...field}
             options={infos.diagnosticTypesList?.map((e) => ({ id: e.id, label: `${e.id} - ${e.label}` })) ?? []}
             label="Type de diagnostics :"
+            placeholder="Type de diagnostics"
           />
         ) : null,
       [FilterKeys.SOURCE]: ({ field }) =>
@@ -153,7 +169,7 @@ const ExplorationFilters = <T extends FieldValues>({
         <CheckboxGroup {...field} label="Formulaire :" options={infos.questionnaires ?? []} />
       ),
       [FilterKeys.MODALITY]: ({ field }) => (
-        <MultiSelect {...field} options={infos.modalities ?? []} label="Modalités :" />
+        <MultiSelect {...field} options={infos.modalities ?? []} label="Modalités :" placeholder="Modalités" />
       ),
       [FilterKeys.DURATION_RANGE]: ({ field }) => <CalendarRange {...field} label="Date :" onError={onError} />,
       [FilterKeys.EXECUTIVE_UNITS]: ({ field }) => (
@@ -164,7 +180,12 @@ const ExplorationFilters = <T extends FieldValues>({
         />
       ),
       [FilterKeys.ENCOUNTER_STATUS]: ({ field }) => (
-        <MultiSelect {...field} options={infos.encounterStatusList ?? []} label="Statut de la visite associée :" />
+        <MultiSelect
+          {...field}
+          options={infos.encounterStatusList ?? []}
+          label="Statut de la visite associée :"
+          placeholder="Statut de la visite associée"
+        />
       )
     }),
     [infos, onError]
