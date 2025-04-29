@@ -21,6 +21,7 @@ export type ExploredCohortState = {
   cohortId?: string
   canMakeExport?: boolean
   deidentifiedBoolean?: boolean
+  isSample: boolean
 } & CohortData
 
 const defaultInitialState = {
@@ -44,6 +45,7 @@ const defaultInitialState = {
   cohortId: '',
   favorite: false,
   // ExploredCohortState
+  isSample: false,
   importedPatients: [],
   includedPatients: [],
   excludedPatients: [],

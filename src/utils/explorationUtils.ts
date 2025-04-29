@@ -4,6 +4,7 @@ import { Direction, FilterKeys, FilterValue, Order } from 'types/searchCriterias
 import displayDigit from './displayDigit'
 import { SetURLSearchParams } from 'react-router-dom'
 import { isDateValid } from './formatDate'
+import { AppConfig } from 'config'
 
 export const replaceItem = <T extends ProjectType | RequestType | Cohort>(item: T, itemsList: T[]) => {
   const index = itemsList.findIndex(({ uuid }) => uuid === item.uuid)
@@ -26,6 +27,11 @@ export const deleteElements = <T extends ProjectType | RequestType | Cohort>(ite
   return itemsList.filter((item) => !itemsToDelete.some(({ uuid }) => uuid === item.uuid))
 }
 
+export const getSamplesConfirmDeletionTitle = (quantity = 1) => {
+  const correctWording = quantity <= 1 ? 'un échantillon' : 'des échantillons'
+  return `Supprimer ${correctWording}`
+}
+
 export const getCohortsConfirmDeletionTitle = (quantity = 1) => {
   const correctWording = quantity <= 1 ? 'une cohorte' : 'des cohortes'
   return `Supprimer ${correctWording}`
@@ -40,10 +46,14 @@ export const getFoldersConfirmDeletionTitle = () => {
   return `Supprimer un projet`
 }
 
-// TODO: plus tard, ajouter au message de confirmation le warning pour les échantillons
+export const getSamplesConfirmDeletionMessage = (quantity = 1) => {
+  const correctWording = quantity <= 1 ? 'cet échantillon' : 'les échantillons sélectionnés'
+  return `Êtes-vous sûr(e) de vouloir supprimer ${correctWording} ?`
+}
+
 export const getCohortsConfirmDeletionMessage = (quantity = 1) => {
   const correctWording = quantity <= 1 ? 'cette cohorte' : 'les cohortes sélectionnées'
-  return `Êtes-vous sûr(e) de vouloir supprimer ${correctWording} ?`
+  return `Êtes-vous sûr(e) de vouloir supprimer ${correctWording} ? Cette suppression entraînera également celle des échantillons associés.`
 }
 
 export const getRequestsConfirmDeletionMessage = (quantity = 1) => {
@@ -53,6 +63,57 @@ export const getRequestsConfirmDeletionMessage = (quantity = 1) => {
 
 export const getFoldersConfirmDeletionMessage = () => {
   return `Êtes-vous sûr(e) de vouloir supprimer ce projet ? Cette suppression entraînera également celle des requêtes et cohortes associées.`
+}
+
+export const redirectToSamples = (parentCohortId: string, parentRequestId?: string, parentFolderId?: string) => {
+  if (parentFolderId && parentRequestId) {
+    return `/researches/projects/${parentFolderId}/${parentRequestId}/${parentCohortId}${location.search}`
+  } else if (parentRequestId) {
+    return `/researches/requests/${parentRequestId}/${parentCohortId}${location.search}`
+  } else {
+    return `/researches/cohorts/${parentCohortId}${location.search}`
+  }
+}
+
+export const redirectOnParentRequestDeletion = (parentFolderId?: string) => {
+  return parentFolderId
+    ? `/researches/projects/${parentFolderId}${location.search}`
+    : `/researches/requests/${location.search}`
+}
+
+export const redirectOnParentCohortDeletion = (parentRequestId?: string, parentFolderId?: string) => {
+  if (parentFolderId && parentRequestId) {
+    return `/researches/projects/${parentFolderId}/${parentRequestId}${location.search}`
+  } else if (parentRequestId) {
+    return `/researches/requests/${parentRequestId}${location.search}`
+  } else {
+    return `/researches/cohorts${location.search}`
+  }
+}
+
+export const isCohortExportable = (cohort: Cohort, appConfig: AppConfig) => {
+  return appConfig.features.export.enabled ? !!cohort?.rights?.export_csv_nomi : false
+}
+
+export const isExportDisabled = (cohort: Cohort, maintenanceIsActive: boolean, isExportable: boolean) => {
+  return (
+    !isExportable ||
+    !cohort.exportable ||
+    maintenanceIsActive ||
+    cohort.request_job_status === JobStatus.LONG_PENDING ||
+    cohort.request_job_status === JobStatus.FAILED ||
+    cohort.request_job_status === JobStatus.PENDING
+  )
+}
+
+export const getVisibleFilters = (
+  filters: {
+    value: FilterValue
+    category: FilterKeys
+    label: string
+  }[]
+) => {
+  return filters.filter((item) => item.category !== FilterKeys.START_DATE && item.category !== FilterKeys.END_DATE)
 }
 
 export const statusOptions = [
@@ -173,7 +234,8 @@ export const getGlobalEstimation = (cohort: Cohort) => {
   }
 }
 
-export const getExportTooltip = (cohort: Cohort, isExportable: boolean) => {
+export const getExportTooltip = (isExportable: boolean, cohort?: Cohort) => {
+  if (!cohort) return ''
   if (cohort.request_job_status === JobStatus.FAILED) {
     return 'Cette cohorte ne peut pas être exportée car elle a échoué lors de sa création'
   } else if (cohort.request_job_status === JobStatus.PENDING || cohort.request_job_status === JobStatus.LONG_PENDING) {

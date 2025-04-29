@@ -8,23 +8,31 @@ import FavStar from 'components/ui/FavStar'
 import IconButtonWithTooltip from '../ui/IconButtonWithTooltip'
 import ResearchesTable from './ResearchesTable'
 import { ChipStyles } from 'components/ui/StatusChip'
+import SublevelButton from './SublevelButton'
 import { TableCellWrapper } from './ResearchesTable/styles'
+import TooltipChip from 'components/ui/TooltipChip'
 
 import Download from 'assets/icones/download.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
 import FluentNavigation from 'assets/icones/fluent_navigation.svg?react'
 import InfoIcon from '@mui/icons-material/Info'
+import Picker from 'assets/icones/color-picker.svg?react'
 import UpdateIcon from '@mui/icons-material/Update'
 
 import { Cohort, JobStatus, Column } from 'types'
 import { Order, OrderBy } from 'types/searchCriterias'
 import displayDigit from 'utils/displayDigit'
 import { formatDate } from 'utils/formatDate'
-import { getExportTooltip, getGlobalEstimation } from 'utils/explorationUtils'
+import {
+  getExportTooltip,
+  getGlobalEstimation,
+  isCohortExportable,
+  isExportDisabled,
+  redirectToSamples
+} from 'utils/explorationUtils'
 import { isChecked } from 'utils/filters'
-import TooltipChip from 'components/ui/TooltipChip'
 
-const getCohortStatusChip = (status?: JobStatus, jobFailMessage?: string) => {
+export const getCohortStatusChip = (status?: JobStatus, jobFailMessage?: string) => {
   if (jobFailMessage) {
     return <TooltipChip label="Erreur" status={ChipStyles.ERROR} tooltip={jobFailMessage} />
   }
@@ -54,6 +62,7 @@ type CohortCallbacks = {
   onClickFav: (cohort: Cohort) => void
   onClickExport: (cohort: Cohort) => void
   onClickEdit: (cohort: Cohort) => void
+  onClickCreateSample: (cohort: Cohort) => void
   onSelectCohort: (cohort: Cohort) => void
 }
 
@@ -88,8 +97,8 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
 }) => {
   const appConfig = useContext(AppConfig)
   const navigate = useNavigate()
-  const { requestId } = useParams()
-  const { onClickRow, onClickFav, onClickExport, onClickEdit, onSelectCohort } = cohortsCallbacks
+  const { projectId, requestId } = useParams()
+  const { onClickCreateSample, onClickRow, onClickFav, onClickExport, onClickEdit, onSelectCohort } = cohortsCallbacks
 
   const columns: Column[] = [
     ...(!simplified
@@ -122,8 +131,8 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
         </Box>
       )
     },
-    { label: 'date de création', code: !simplified ? Order.CREATED_AT : undefined }
-    // { label: 'échantillons' }
+    { label: 'date de création', code: !simplified ? Order.CREATED_AT : undefined },
+    { label: 'échantillons' }
   ]
 
   return loading ? (
@@ -138,102 +147,85 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
       setOrder={(newOrder) => onChangeOrderBy(newOrder)}
       noPagination={simplified}
     >
-      {cohortsList.map((cohort) => {
-        const isExportable = appConfig.features.export.enabled ? cohort?.rights?.export_csv_nomi : false
-        const disableExport =
-          !isExportable ||
-          !cohort.exportable ||
-          disabled ||
-          cohort.request_job_status === JobStatus.LONG_PENDING ||
-          cohort.request_job_status === JobStatus.FAILED ||
-          cohort.request_job_status === JobStatus.PENDING
-
-        return (
-          <TableRow
-            key={cohort.uuid}
-            onClick={() => cohort.request_job_status === JobStatus.FINISHED && onClickRow(cohort)}
-            sx={{
-              cursor: cohort.request_job_status === JobStatus.FINISHED ? 'pointer' : 'not-allowed',
-              '&:hover': { backgroundColor: '#f8f9fa' }
-            }}
-          >
-            {!simplified && (
-              <TableCellWrapper>
-                <Checkbox
-                  size="small"
-                  checked={isChecked(cohort, selectedCohorts)}
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    onSelectCohort(cohort)
-                  }}
-                />
-              </TableCellWrapper>
-            )}
-            <TableCellWrapper align="left">
-              <IconButton
+      {cohortsList.map((cohort) => (
+        <TableRow
+          key={cohort.uuid}
+          onClick={() => cohort.request_job_status === JobStatus.FINISHED && onClickRow(cohort)}
+          sx={{
+            cursor: cohort.request_job_status === JobStatus.FINISHED ? 'pointer' : 'not-allowed',
+            '&:hover': { backgroundColor: '#f8f9fa' }
+          }}
+        >
+          {!simplified && (
+            <TableCellWrapper>
+              <Checkbox
+                size="small"
+                checked={isChecked(cohort, selectedCohorts)}
                 onClick={(event) => {
                   event.stopPropagation()
-                  onClickFav(cohort)
+                  onSelectCohort(cohort)
                 }}
+              />
+            </TableCellWrapper>
+          )}
+          <TableCellWrapper align="left">
+            <IconButton
+              onClick={(event) => {
+                event.stopPropagation()
+                onClickFav(cohort)
+              }}
+              disabled={disabled}
+            >
+              <FavStar favorite={cohort.favorite} height={18} color={disabled ? '#CBCFCF' : undefined} />
+            </IconButton>
+          </TableCellWrapper>
+          <TableCellWrapper align="left" accentcell>
+            {cohort.name}
+          </TableCellWrapper>
+          <TableCellWrapper>
+            <Box display={'flex'} alignItems={'center'}>
+              <IconButtonWithTooltip
+                title={getExportTooltip(isCohortExportable(cohort, appConfig), cohort) ?? ''}
+                icon={<Download />}
+                onClick={() => onClickExport(cohort)}
+                disabled={isExportDisabled(cohort, disabled, isCohortExportable(cohort, appConfig))}
+              />
+              <IconButtonWithTooltip
+                title="Créer un échantillon à partir de la cohorte"
+                icon={<Picker />}
+                onClick={() => onClickCreateSample(cohort)}
                 disabled={disabled}
-              >
-                <FavStar favorite={cohort.favorite} height={18} color={disabled ? '#CBCFCF' : undefined} />
-              </IconButton>
-            </TableCellWrapper>
-            <TableCellWrapper align="left" accentcell>
-              {cohort.name}
-            </TableCellWrapper>
-            <TableCellWrapper>
-              <Box display={'flex'} alignItems={'center'}>
-                <IconButtonWithTooltip
-                  title={getExportTooltip(cohort, !!isExportable) ?? ''}
-                  icon={<Download />}
-                  onClick={() => onClickExport(cohort)}
-                  disabled={disableExport}
-                />
-                {/* <IconButtonWithTooltip
-                  title="Créer un échantillon à partir de la cohorte"
-                  icon={<Picker />}
-                  onClick={() => console.log('create sample')}
-                  disabled={disabled}
-                /> */}
-                <IconButtonWithTooltip
-                  title="Accéder à la version de la requête ayant créé la cohorte"
-                  icon={<FluentNavigation />}
-                  onClick={() => navigate(`/cohort/new/${cohort.request?.uuid}/${cohort.request_query_snapshot}`)}
-                  disabled={disabled}
-                />
-                <IconButtonWithTooltip
-                  title="Éditer la cohorte"
-                  icon={<EditIcon />}
-                  onClick={() => onClickEdit(cohort)}
-                  disabled={disabled}
-                />
-              </Box>
-            </TableCellWrapper>
-            {!requestId && <TableCellWrapper>{cohort.request?.name}</TableCellWrapper>}
-            <TableCellWrapper>
-              {getCohortStatusChip(cohort.request_job_status, cohort.request_job_fail_msg)}
-            </TableCellWrapper>
-            <TableCellWrapper>{displayDigit(cohort.result_size)}</TableCellWrapper>
-            <TableCellWrapper>{getGlobalEstimation(cohort)}</TableCellWrapper>
-            <TableCellWrapper>{formatDate(cohort.created_at)}</TableCellWrapper>
-            {/* <TableCellWrapper>
-                  <SublevelButton
-                    label="échantillon"
-                    onClick={() => {
-                      if (projectId && requestId)
-                        navigate(`/researches/projects/${projectId}/${requestId}/${cohort.uuid}${location.search}`)
-                      if (!projectId && requestId)
-                        navigate(`/researches/requests/${requestId}/${cohort.uuid}${location.search}`)
-                      if (!projectId && !requestId) navigate(`/researches/cohorts/${cohort.uuid}${location.search}`)
-                    }}
-                    total={samplesTotal}
-                  />
-                </TableCellWrapper> */}
-          </TableRow>
-        )
-      })}
+              />
+              <IconButtonWithTooltip
+                title="Accéder à la version de la requête ayant créé la cohorte"
+                icon={<FluentNavigation />}
+                onClick={() => navigate(`/cohort/new/${cohort.request?.uuid}/${cohort.request_query_snapshot}`)}
+                disabled={disabled}
+              />
+              <IconButtonWithTooltip
+                title="Éditer la cohorte"
+                icon={<EditIcon />}
+                onClick={() => onClickEdit(cohort)}
+                disabled={disabled}
+              />
+            </Box>
+          </TableCellWrapper>
+          {!requestId && <TableCellWrapper>{cohort.request?.name}</TableCellWrapper>}
+          <TableCellWrapper>
+            {getCohortStatusChip(cohort.request_job_status, cohort.request_job_fail_msg)}
+          </TableCellWrapper>
+          <TableCellWrapper>{displayDigit(cohort.result_size)}</TableCellWrapper>
+          <TableCellWrapper>{getGlobalEstimation(cohort)}</TableCellWrapper>
+          <TableCellWrapper>{formatDate(cohort.created_at)}</TableCellWrapper>
+          <TableCellWrapper>
+            <SublevelButton
+              label="échantillon"
+              onClick={() => navigate(redirectToSamples(cohort.uuid as string, requestId, projectId))}
+              total={cohort.sample_cohorts?.length ?? 0}
+            />
+          </TableCellWrapper>
+        </TableRow>
+      ))}
     </ResearchesTable>
   )
 }

@@ -471,6 +471,9 @@ export type Cohort = {
   favorite?: boolean
   extension?: Extension[]
   rights?: GroupRights
+  parent_cohort?: ParentInfo
+  sampling_ratio?: number | null
+  sample_cohorts?: string[]
 }
 
 export type CohortRights = {
@@ -820,6 +823,7 @@ export type WSJobStatus = WebSocketMessage<{
     request_job_fail_msg?: string
     request_job_status: JobStatus
     measure?: number
+    result_size?: number
     extra?: Record<string, string>
     global?: { measure_min: number; measure_max: number }
   }

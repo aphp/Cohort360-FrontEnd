@@ -356,13 +356,12 @@ export type DocumentsFilters = GenericFilter & {
 }
 
 export interface CohortsFilters {
-  status?: ValueSet[]
+  status: ValueSet[]
   favorite: CohortsType[]
   minPatients?: null | string
   maxPatients?: null | string
   startDate?: null | string
   endDate?: null | string
-  parentId?: string
 }
 
 export type ProjectsFilters = {

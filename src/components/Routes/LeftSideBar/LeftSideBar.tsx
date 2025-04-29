@@ -403,16 +403,16 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   Mes cohortes
                 </Link>
               </ListItem>
-              {/* <ListItem>
-                  <Link
-                    id="myProject-link"
-                    onClick={() => navigate('/researches/samples')}
-                    underline="hover"
-                    className={classes.nestedTitle}
-                  >
-                    Mes échantillons
-                  </Link>
-                </ListItem> */}
+              <ListItem>
+                <Link
+                  id="mySamples-link"
+                  onClick={() => navigate('/researches/samples')}
+                  underline="hover"
+                  className={classes.nestedTitle}
+                >
+                  Mes échantillons
+                </Link>
+              </ListItem>
             </List>
           </Collapse>
 

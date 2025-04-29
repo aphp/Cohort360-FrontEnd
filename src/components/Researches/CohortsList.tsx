@@ -1,50 +1,42 @@
-/* eslint-disable max-statements */
-import React, { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { useAppSelector } from 'state'
+import React, { useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 
-import { Grid } from '@mui/material'
-import ActionBar from './ActionBar'
 import AddOrEditItem from './Modals/AddOrEditItem'
 import CohortsTableContent from './CohortsTableContent'
-import CohortsTypesFilter from 'components/Filters/CohortsTypeFilter'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
-import IconButtonWithTooltip from '../ui/IconButtonWithTooltip'
+import CreateSample from './Modals/CreateSample'
+import GenericCohortListView from './GenericListView'
+import IconButtonWithTooltip from 'components/ui/IconButtonWithTooltip'
 import LevelHeader from './LevelHeader'
-import Modal from 'components/ui/Modal'
-import ModalShareRequest from './Modals/ModalShareRequest'
-import PatientsNbFilter from 'components/Filters/PatientsNbFilter'
 
 import DeleteIcon from 'assets/icones/delete.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
+import ModalShareRequest from './Modals/ModalShareRequest'
 import ShareIcon from '@mui/icons-material/Share'
 
 import useCohorts from 'hooks/researches/useCohorts'
+import useCohortItemActions from '../../hooks/researches/useCohortItemActions'
+import useCohortListController from '../../hooks/researches/useCohortListController'
 import useCohortsWebSocket from 'hooks/researches/useCohortsWebSocket'
+import useCreateSample from 'hooks/researches/useCreateSample'
 import useDeleteCohort from 'hooks/researches/useDeleteCohort'
 import useDeleteRequests from 'hooks/researches/useDeleteRequests'
 import useEditCohort from 'hooks/researches/useEditCohort'
 import useEditRequest from 'hooks/researches/useEditRequest'
-import usePageValidation from 'hooks/researches/usePageValidation'
 import useRequest from 'hooks/researches/useRequest'
 import useSelectionState from 'hooks/researches/useMultipleSelection'
 
-import { Cohort, RequestType, ValueSet } from 'types'
-import { CohortsFilters, FilterKeys, OrderBy } from 'types/searchCriterias'
+import { Cohort, RequestType } from 'types'
 import {
-  checkSearchParamsErrors,
   getCohortsConfirmDeletionMessage,
   getCohortsConfirmDeletionTitle,
-  getCohortsSearchParams,
   getRequestName,
   getRequestsConfirmDeletionMessage,
   getRequestsConfirmDeletionTitle,
-  removeFromSearchParams,
-  statusOptions
+  getVisibleFilters,
+  redirectOnParentRequestDeletion,
+  redirectToSamples
 } from 'utils/explorationUtils'
-import { removeFilter, selectFiltersAsArray } from 'utils/filters'
-import { CohortsType, ExplorationsSearchParams } from 'types/cohorts'
-import CohortStatusFilter from 'components/Filters/CohortsStatusFilter'
 
 type CohortsListProps = {
   rowsPerPage?: number
@@ -52,99 +44,70 @@ type CohortsListProps = {
   simplified?: boolean
 }
 
-const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }: CohortsListProps) => {
+const CohortsList: React.FC<CohortsListProps> = ({ rowsPerPage = 20, favorites = false, simplified = false }) => {
+  useCohortsWebSocket()
   const navigate = useNavigate()
   const { projectId, requestId } = useParams()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const { searchInput, startDate, endDate, page, orderBy, orderDirection, status, favorite, minPatients, maxPatients } =
-    getCohortsSearchParams(searchParams)
 
-  const maintenanceIsActive = useAppSelector((state) => state?.me?.maintenance?.active ?? false)
-
-  const [paramsReady, setParamsReady] = useState(false)
-  const [deleteMode, setDeleteMode] = useState(false)
-  const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
-  const [filters, setFilters] = useState<CohortsFilters>({
-    status,
-    favorite: favorites ? [CohortsType.FAVORITE] : favorite,
-    minPatients,
-    maxPatients,
-    parentId: requestId
+  const controller = useCohortListController({
+    useData: (p) => useCohorts({ ...p, parentRequest: requestId }),
+    rowsPerPage,
+    favorites,
+    simplified
   })
+  const { filtersAsArray, list, maintenanceIsActive } = controller
+  const { request: parentRequest, requestLoading } = useRequest(requestId)
+
   const [cohortToEdit, setCohortToEdit] = useState<Cohort | null>(null)
+  const [deleteMode, setDeleteMode] = useState(false)
   const [openCohortEditionModal, setOpenCohortEditionModal] = useState(false)
   const [openParentEditionModal, setOpenParentEditionModal] = useState(false)
   const [openShareParentModal, setOpenShareParentModal] = useState(false)
   const [openDeletionModal, setOpenDeletionModal] = useState(false)
-  const [openFiltersModal, setOpenFiltersModal] = useState(false)
+  const [openCreateSampleModal, setOpenCreateSampleModal] = useState(false)
 
-  useEffect(() => {
-    if (!simplified) {
-      const { changed, newSearchParams } = checkSearchParamsErrors(searchParams)
-      if (changed) {
-        setSearchParams(newSearchParams)
-      }
-    }
-    setParamsReady(true)
-  }, [])
-
-  const { request: parentRequest, requestLoading, requestIsError } = useRequest(requestId)
-  const { cohortsList, total, loading } = useCohorts({
-    orderBy: order,
-    searchInput,
-    filters: { ...filters, startDate, endDate },
-    page,
-    rowsPerPage,
-    paramsReady
-  })
-  useCohortsWebSocket()
-  const editRequestMutation = useEditRequest()
-  const deleteRequestMutation = useDeleteRequests()
-  const editCohortMutation = useEditCohort()
-  const deleteCohortMutation = useDeleteCohort()
   const {
     selected: selectedCohorts,
     setSelected: setSelectedCohorts,
     toggle,
     clearSelection
   } = useSelectionState<Cohort>()
-  const filtersAsArray = useMemo(() => {
-    console.log('test status update useMemo', status)
-    return selectFiltersAsArray({
-      status,
-      favorite,
-      minPatients,
-      maxPatients,
-      startDate,
-      endDate
-    })
-  }, [status, favorite, minPatients, maxPatients, startDate, endDate])
+  const itemActions = useCohortItemActions({
+    navigate,
+    toggleSelection: toggle
+  })
+  const editCohortMutation = useEditCohort()
+  const editRequestMutation = useEditRequest()
+  const deleteCohortMutation = useDeleteCohort()
+  const deleteRequestMutation = useDeleteRequests()
+  const createSampleMutation = useCreateSample()
 
-  const handlePageChange = (newPage: number) => {
-    searchParams.set(ExplorationsSearchParams.PAGE, String(newPage))
-    setSearchParams(searchParams)
+  const onClickCreateSample = (cohort: Cohort) => {
+    setCohortToEdit(cohort)
+    setOpenCreateSampleModal(true)
   }
 
-  usePageValidation(total, page, rowsPerPage, handlePageChange)
-
-  const onClickRow = (cohort: Cohort) => {
-    const searchParams = new URLSearchParams()
-    if (cohort.group_id) {
-      searchParams.set('groupId', cohort.group_id)
-    }
-    navigate(`/cohort?${searchParams.toString()}`)
+  const onClickDelete = () => {
+    setOpenDeletionModal(true)
+    setDeleteMode(true)
   }
 
-  const changeOrderBy = (newOrder: OrderBy) => {
-    setOrder(newOrder)
-    searchParams.set(ExplorationsSearchParams.ORDER_BY, newOrder.orderBy)
-    searchParams.set(ExplorationsSearchParams.DIRECTION, newOrder.orderDirection)
-    setSearchParams(searchParams)
+  const onClickEdit = (cohort: Cohort) => {
+    setCohortToEdit(cohort)
+    setOpenCohortEditionModal(true)
   }
 
   const onCloseEditionModal = () => {
     setOpenCohortEditionModal(false)
     setCohortToEdit(null)
+  }
+
+  const onSelectAll = () => {
+    if (selectedCohorts.length === list.length) {
+      clearSelection()
+    } else if (selectedCohorts.length <= list.length) {
+      setSelectedCohorts(list)
+    }
   }
 
   const onSubmitDeletion = () => {
@@ -157,128 +120,65 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
     deleteRequestMutation.mutate([parentRequest as RequestType], {
       onSuccess: () => {
         setOpenDeletionModal(false)
-        navigate(`/researches/projects/${projectId}/`)
+        navigate(redirectOnParentRequestDeletion(projectId))
       }
     })
   }
 
-  const onClickFav = (cohort: Cohort) => {
-    editCohortMutation.mutate({ ...cohort, favorite: !cohort.favorite })
-  }
-
-  const onClickExport = (cohort: Cohort) => {
-    const searchParams = new URLSearchParams()
-    if (cohort.group_id) {
-      searchParams.set('groupId', cohort.group_id)
-    }
-    navigate(`/exports/new?${searchParams.toString()}`)
-  }
-
-  const onClickEdit = (cohort: Cohort) => {
-    setCohortToEdit(cohort)
-    setOpenCohortEditionModal(true)
-  }
-
-  const onClickDelete = () => {
-    setOpenDeletionModal(true)
-    setDeleteMode(true)
-  }
-
-  const onSelectAll = () => {
-    if (selectedCohorts.length === cohortsList.length) {
-      clearSelection()
-    } else if (selectedCohorts.length <= cohortsList.length) {
-      setSelectedCohorts(cohortsList)
-    }
-  }
-
-  if (requestIsError) {
-    return (
-      <Grid container justifyContent={'center'}>
-        Les détails de cette requête ne sont pas disponibles pour le moment ou n'existent pas.
-      </Grid>
-    )
-  }
+  const headerActions = parentRequest && (
+    <>
+      <IconButtonWithTooltip
+        disabled={maintenanceIsActive}
+        title="Partager la requête"
+        icon={<ShareIcon />}
+        onClick={() => setOpenShareParentModal(true)}
+        color={'#5bc5f2'}
+      />
+      <IconButtonWithTooltip
+        disabled={maintenanceIsActive}
+        title="Éditer la requête"
+        icon={<EditIcon />}
+        onClick={() => setOpenParentEditionModal(true)}
+        color={'#5bc5f2'}
+      />
+      <IconButtonWithTooltip
+        disabled={maintenanceIsActive}
+        title="Supprimer la requête"
+        icon={<DeleteIcon />}
+        onClick={() => setOpenDeletionModal(true)}
+        color={'#ed6d91'}
+      />
+    </>
+  )
 
   return (
-    <Grid container gap="20px">
-      {!simplified && (
-        <>
+    <>
+      <GenericCohortListView
+        itemLabel="cohorte"
+        controller={controller}
+        actionBarProps={{
+          totalSelected: selectedCohorts.length,
+          onDelete: () => onClickDelete(),
+          filters: getVisibleFilters(filtersAsArray)
+        }}
+        header={
           <LevelHeader
             loading={requestLoading}
             name={requestId ? getRequestName(parentRequest) : 'Toutes mes cohortes'}
             description={parentRequest?.description ?? ''}
-            actions={
-              requestId && (
-                <>
-                  <IconButtonWithTooltip
-                    disabled={maintenanceIsActive}
-                    title="Partager la requête"
-                    icon={<ShareIcon />}
-                    onClick={() => setOpenShareParentModal(true)}
-                    color={'#5bc5f2'}
-                  />
-                  <IconButtonWithTooltip
-                    disabled={maintenanceIsActive}
-                    title="Éditer la requête"
-                    icon={<EditIcon />}
-                    onClick={() => setOpenParentEditionModal(true)}
-                    color={'#5bc5f2'}
-                  />
-                  <IconButtonWithTooltip
-                    disabled={maintenanceIsActive}
-                    title="Supprimer la requête"
-                    icon={<DeleteIcon />}
-                    onClick={() => setOpenDeletionModal(true)}
-                    color={'#ed6d91'}
-                  />
-                </>
-              )
-            }
+            actions={headerActions}
           />
-
-          <ActionBar
-            loading={loading}
-            total={total}
-            label="cohorte"
-            totalSelected={selectedCohorts.length}
-            onDelete={() => onClickDelete()}
-            onFilter={() => setOpenFiltersModal(true)}
-            filters={
-              requestId
-                ? filtersAsArray.filter(
-                    (item) => item.category !== FilterKeys.START_DATE && item.category !== FilterKeys.END_DATE
-                  )
-                : filtersAsArray
-            }
-            onRemoveFilters={(key, value) => {
-              removeFromSearchParams(searchParams, setSearchParams, key, value)
-              setFilters(removeFilter(key, value, filters))
-            }}
-            disabled={maintenanceIsActive}
-          />
-        </>
-      )}
-      <CohortsTableContent
-        cohortsList={cohortsList}
-        page={page}
-        setPage={handlePageChange}
-        total={total}
-        order={order}
-        onChangeOrderBy={changeOrderBy}
-        loading={loading}
-        disabled={maintenanceIsActive}
-        selectedCohorts={selectedCohorts}
-        onSelectAll={onSelectAll}
-        cohortsCallbacks={{
-          onClickRow,
-          onClickFav,
-          onClickExport,
-          onClickEdit,
-          onSelectCohort: toggle
+        }
+        TableComponent={CohortsTableContent}
+        tableProps={{
+          cohortsList: list,
+          selectedCohorts,
+          onSelectAll,
+          cohortsCallbacks: { ...itemActions, onClickCreateSample, onClickEdit }
         }}
         simplified={simplified}
       />
+
       <AddOrEditItem
         open={openCohortEditionModal}
         selectedItem={cohortToEdit}
@@ -290,10 +190,21 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
         open={openParentEditionModal}
         selectedItem={parentRequest ?? {}}
         onClose={() => setOpenParentEditionModal(false)}
-        onUpdate={(request) =>
-          editRequestMutation.mutate(request as RequestType, { onSuccess: () => setOpenParentEditionModal(false) })
-        }
+        onUpdate={(request) => editRequestMutation.mutate(request as RequestType)}
         titleEdit="Modifier la requête"
+      />
+      <CreateSample
+        open={openCreateSampleModal}
+        onClose={() => setOpenCreateSampleModal(false)}
+        parentCohort={cohortToEdit as Cohort}
+        onCreate={(sampleData) =>
+          createSampleMutation.mutate(sampleData, {
+            onSuccess: () => {
+              setCohortToEdit(null)
+              navigate(redirectToSamples(sampleData.parentCohort))
+            }
+          })
+        }
       />
       <ConfirmDeletion
         open={openDeletionModal}
@@ -317,35 +228,7 @@ const CohortsList = ({ rowsPerPage = 20, favorites = false, simplified = false }
         }
         onClose={() => setOpenShareParentModal(false)}
       />
-
-      <Modal
-        title="Filtrer par :"
-        width={'600px'}
-        open={openFiltersModal}
-        onClose={() => setOpenFiltersModal(false)}
-        onSubmit={(newFilters) => {
-          setFilters({ ...filters, ...newFilters })
-          if (!simplified) {
-            newFilters.status.length > 0 &&
-              searchParams.set(
-                ExplorationsSearchParams.STATUS,
-                newFilters.status.map((status: ValueSet) => status.code).join()
-              )
-            newFilters.favorite.length > 0 && searchParams.set(ExplorationsSearchParams.FAVORITE, newFilters.favorite)
-            newFilters.minPatients && searchParams.set(ExplorationsSearchParams.MIN_PATIENTS, newFilters.minPatients)
-            newFilters.maxPatients && searchParams.set(ExplorationsSearchParams.MAX_PATIENTS, newFilters.maxPatients)
-            setSearchParams(searchParams)
-          }
-        }}
-      >
-        <CohortStatusFilter value={status} name={FilterKeys.STATUS} allStatus={statusOptions} />
-        <CohortsTypesFilter value={favorite} name={FilterKeys.FAVORITE} />
-        <PatientsNbFilter
-          values={[minPatients, maxPatients]}
-          names={[FilterKeys.MIN_PATIENTS, FilterKeys.MAX_PATIENTS]}
-        />
-      </Modal>
-    </Grid>
+    </>
   )
 }
 

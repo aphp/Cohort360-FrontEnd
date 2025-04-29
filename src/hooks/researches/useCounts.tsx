@@ -36,6 +36,7 @@ const useCounts = (searchInput: string, startDate: string | null, endDate: strin
               minPatients: null,
               maxPatients: null
             },
+            isSample: false,
             searchInput,
             orderBy: { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
             limit: 0
@@ -47,8 +48,21 @@ const useCounts = (searchInput: string, startDate: string | null, endDate: strin
       {
         queryKey: ['samplesCount', searchInput, startDate, endDate],
         queryFn: async () => {
-          // TODO: A COMPLETER PLUS TARD
-          return 3
+          const res = await services.projects.fetchCohortsList({
+            filters: {
+              startDate: startDate ?? null,
+              endDate: endDate ?? null,
+              status: [],
+              favorite: [],
+              minPatients: null,
+              maxPatients: null
+            },
+            isSample: true,
+            searchInput,
+            orderBy: { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC },
+            limit: 0
+          })
+          return res.count ?? 0
         },
         enabled: !!(searchInput || startDate || endDate)
       }

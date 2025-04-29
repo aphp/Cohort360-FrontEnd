@@ -25,11 +25,13 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
 import AddOrEditItem from 'components/Researches/Modals/AddOrEditItem'
 import ConfirmDeletion from 'components/Researches/Modals/ConfirmDeletion'
+import CreateSample from 'components/Researches/Modals/CreateSample'
 import { AvatarWrapper } from 'components/ui/Avatar/styles'
 import FavStar from 'components/ui/FavStar'
 
-import useEditCohort from 'hooks/researches/useEditCohort'
+import useCreateSample from 'hooks/researches/useCreateSample'
 import useDeleteCohort from 'hooks/researches/useDeleteCohort'
+import useEditCohort from 'hooks/researches/useEditCohort'
 
 import { useAppSelector, useAppDispatch } from 'state'
 
@@ -37,7 +39,11 @@ import services from 'services/aphp'
 import { updateCohort } from 'state/exploredCohort'
 
 import displayDigit from 'utils/displayDigit'
-import { getCohortsConfirmDeletionMessage, getCohortsConfirmDeletionTitle } from 'utils/explorationUtils'
+import {
+  getCohortsConfirmDeletionMessage,
+  getCohortsConfirmDeletionTitle,
+  redirectToSamples
+} from 'utils/explorationUtils'
 
 import useStyles from './styles'
 import { AppConfig } from 'config'
@@ -59,12 +65,13 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
   const dashboard = useAppSelector((state) => state.exploredCohort)
 
   const [isExtended, setIsExtended] = useState(false)
-  const [openModal, setOpenModal] = useState<'' | 'edit' | 'delete'>('')
+  const [openModal, setOpenModal] = useState<'' | 'edit' | 'delete' | 'sample'>('')
   const [patientsNumber, setPatientsNumber] = useState<number>(patientsNb ?? 0)
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
 
   const deleteCohortMutation = useDeleteCohort()
   const editCohortMutation = useEditCohort()
+  const createSampleMutation = useCreateSample()
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -303,6 +310,16 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
                   >
                     Modifier
                   </MenuItem>
+                  {!dashboard.isSample && (
+                    <MenuItem
+                      onClick={() => {
+                        setAnchorEl(null)
+                        setOpenModal('sample')
+                      }}
+                    >
+                      Échantillonner
+                    </MenuItem>
+                  )}
                   {!!appConfig.features.export.enabled && dashboard.canMakeExport && (
                     <MenuItem
                       onClick={() => {
@@ -329,6 +346,19 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
           <Divider orientation="horizontal" variant="middle" style={{ width: 'calc(100% - 32px)' }} />
         )}
       </Grid>
+
+      {openModal === 'sample' && (
+        <CreateSample
+          open
+          parentCohort={dashboard}
+          onCreate={(sampleData) =>
+            createSampleMutation.mutate(sampleData, {
+              onSuccess: () => navigate(redirectToSamples(sampleData.parentCohort))
+            })
+          }
+          onClose={handleClose}
+        />
+      )}
 
       {openModal === 'edit' && (
         <AddOrEditItem
