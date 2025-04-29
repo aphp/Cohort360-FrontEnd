@@ -9,10 +9,11 @@ type MultiSelectProps = {
   label?: string
   options: LabelObject[]
   disabled?: boolean
+  placeholder?: string
   onChange: (elems: LabelObject[]) => void
 }
 
-const MultiSelect = ({ value, label, options, disabled = false, onChange }: MultiSelectProps) => {
+const MultiSelect = ({ value, placeholder, label, options, disabled = false, onChange }: MultiSelectProps) => {
   return (
     <InputWrapper>
       {label && <Typography variant="h3">{label}</Typography>}
@@ -27,7 +28,7 @@ const MultiSelect = ({ value, label, options, disabled = false, onChange }: Mult
         disableCloseOnSelect
         getOptionLabel={(elem) => capitalizeFirstLetter(elem.label)}
         renderOption={(props, elem) => <li {...props}>{capitalizeFirstLetter(elem.label)}</li>}
-        renderInput={(params) => <TextField {...params} label="Sélectionner un ou plusieurs éléments" />}
+        renderInput={(params) => <TextField {...params} placeholder={placeholder} />}
       />
     </InputWrapper>
   )

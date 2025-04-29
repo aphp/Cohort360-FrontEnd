@@ -83,6 +83,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
   return { ...castedFilters }
 }
 
+//TODO: Faire un mapper plutot qu'une foret de if.
 export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
   if (key === FilterKeys.FAVORITE) {
     return CohortsTypeLabel[value as CohortsType]
