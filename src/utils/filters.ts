@@ -75,6 +75,9 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.MAX_PATIENTS:
         castedFilters[key] = null
         break
+      case FilterKeys.ONLY_PDF_AVAILABLE:
+        castedFilters[key] = false
+        break
     }
   }
   return { ...castedFilters }
