@@ -91,4 +91,17 @@ export const extractFilterParams = (filterStr: string, options?: ExtractionOptio
   return undefined
 }
 
+export const isFilterIdentifying = (filterStr: string): boolean => {
+  // need to load appConfig
+  const sensitiveKeys = appConfig.features.cohort.identifyingKeys
+  const criteria = filterStr.split('&')
+  for (const c of criteria) {
+    const key = c.split('=')[0]
+    if (sensitiveKeys.includes(key)) {
+      return true
+    }
+  }
+  return false
+}
+
 export default extractFilterParams
