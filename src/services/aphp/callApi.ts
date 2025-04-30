@@ -366,13 +366,15 @@ export const fetchDocumentReferenceContent = async (docId: string): FHIR_API_Pro
 export const postFilters = async (
   fhir_resource: ResourceType,
   name: string,
-  filter: string
+  filter: string,
+  identifying: boolean
 ): Promise<AxiosResponse<SavedFilter>> => {
   const res = await apiBackend.post('/cohort/fhir-filters/', {
     fhir_resource,
     fhir_version: '4.0',
     name,
-    filter
+    filter,
+    identifying
   })
   if (res instanceof AxiosError) throw "Le filtre n'a pas pu être sauvegardé."
   return res
