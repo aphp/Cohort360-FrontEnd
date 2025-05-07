@@ -16,10 +16,12 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Chip,
+  // Chip,
   Stack
 } from '@mui/material'
 import { SelectChangeEvent } from '@mui/material/Select'
+import Chip from 'components/ui/Chip'
+
 import apiFhir from 'services/apiFhir'
 
 /**
@@ -58,9 +60,18 @@ export interface QuestionLeaf {
 interface QuestionSelectorDialogProps {
   open: boolean
   onClose: () => void
-  // bundle: Bundle
-  // onConfirm: (selected: QuestionLeaf[]) => void
+  onConfirm: (selected: QuestionLeaf[]) => void
 }
+
+/**
+ * Mise en minuscules + suppression des accents pour une comparaison
+ * insensible à la casse et aux diacritiques.
+ */
+const normalize = (str: string) =>
+  str
+    .toLocaleLowerCase('fr-FR')
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
 
 const startsWithFMater = (linkId: string) => linkId.startsWith('F_MATER_')
 
@@ -91,17 +102,18 @@ const QuestionRow = memo(
   ({ question, isChecked, toggle }: { question: QuestionLeaf; isChecked: boolean; toggle: (id: string) => void }) => {
     const labelId = `checkbox-list-label-${question.linkId}`
     return (
-      <ListItem button onClick={() => toggle(question.linkId)}>
+      <ListItem disableGutters>
         <Checkbox
           edge="start"
           checked={isChecked}
+          onChange={() => toggle(question.linkId)}
           tabIndex={-1}
           disableRipple
           inputProps={{ 'aria-labelledby': labelId }}
         />
         <ListItemText
           id={labelId}
-          primary={`${question.linkId} — ${question.text} (${question.type})`}
+          primary={`${question.linkId} — ${question.text} — [ ${question.type} ]`}
           secondary={
             <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {question.breadcrumb}
@@ -115,7 +127,7 @@ const QuestionRow = memo(
   (prev, next) => prev.isChecked === next.isChecked && prev.question === next.question
 )
 
-const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({ open, onClose }) => {
+const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({ open, onClose, onConfirm }) => {
   const [bundle, setBundle] = useState<Bundle>({
     entry: []
   })
@@ -128,55 +140,83 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({ open, o
     fetch()
   }, [fetch])
 
-  const onConfirm = (selectedItem: QuestionLeaf[]) => {
-    console.log('manelle selectedItem', selectedItem)
-  }
+  // Extract questionnaires once
   const questionnaires = useMemo(() => bundle.entry.map((e) => e.resource), [bundle])
+
+  // Selections per questionnaire id
+  const [checkedByQuestionnaire, setCheckedByQuestionnaire] = useState<Map<string, Set<string>>>(new Map())
 
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState<string>(questionnaires[0]?.id ?? '')
   const [inputQuery, setInputQuery] = useState('')
   const deferredQuery = useDeferredValue(inputQuery)
-  const [checked, setChecked] = useState<Set<string>>(new Set())
 
   const handleQuestionnaireChange = (event: SelectChangeEvent) => {
     const value = event.target.value as string
     setSelectedQuestionnaireId(value)
     setInputQuery('')
-    setChecked(new Set())
   }
 
+  // Leaves for current questionnaire
   const leaves = useMemo(() => {
     const q = questionnaires.find((qq) => qq.id === selectedQuestionnaireId)
     return q ? collectLeaves(q.item) : []
   }, [questionnaires, selectedQuestionnaireId])
 
+  // Current checked set helper
+  // Memoize current checklist to avoid new Set creation on each render
+  const currentChecked = useMemo<Set<string>>(
+    () => checkedByQuestionnaire.get(selectedQuestionnaireId) ?? new Set<string>(),
+    [checkedByQuestionnaire, selectedQuestionnaireId]
+  )
+
   const filteredLeaves = useMemo(() => {
     if (!deferredQuery) return leaves
-    const lower = deferredQuery.toLowerCase()
-    return leaves.filter(
-      (q) =>
-        q.text.toLowerCase().includes(lower) ||
-        q.linkId.toLowerCase().includes(lower) ||
-        q.breadcrumb.toLowerCase().includes(lower)
-    )
+    const needle = normalize(deferredQuery)
+
+    return leaves.filter((q) => {
+      return (
+        normalize(q.text).includes(needle) ||
+        normalize(q.linkId).includes(needle) ||
+        normalize(q.breadcrumb).includes(needle)
+      )
+    })
   }, [leaves, deferredQuery])
 
   const toggle = (linkId: string) => {
-    setChecked((prev) => {
-      const next = new Set(prev)
-      next.has(linkId) ? next.delete(linkId) : next.add(linkId)
-      return next
+    setCheckedByQuestionnaire((prev) => {
+      const map = new Map(prev)
+      const set = new Set(map.get(selectedQuestionnaireId) ?? [])
+      set.has(linkId) ? set.delete(linkId) : set.add(linkId)
+      map.set(selectedQuestionnaireId, set)
+      return map
     })
   }
 
-  const selectedLeaves = useMemo(() => leaves.filter((l) => checked.has(l.linkId)), [leaves, checked])
+  const handleRemove = (linkId: string) => {
+    setCheckedByQuestionnaire((prev) => {
+      const map = new Map(prev)
+      map.forEach((set) => set.delete(linkId))
+      return map
+    })
+  }
 
-  const handleRemove = (linkId: string) => toggle(linkId)
+  const allSelectedLeaves = useMemo(() => {
+    const all: QuestionLeaf[] = []
+    questionnaires.forEach((q) => {
+      const leavesForQ = collectLeaves(q.item)
+      const ids = checkedByQuestionnaire.get(q.id)
+      if (ids) all.push(...leavesForQ.filter((l) => ids.has(l.linkId)))
+    })
+    return all
+  }, [checkedByQuestionnaire, questionnaires])
 
-  const handleConfirm = () => onConfirm(selectedLeaves)
+  const handleConfirm = () => {
+    console.log('manelle allSelectedLeaves', allSelectedLeaves)
+    // onConfirm(allSelectedLeaves)
+  }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} maxWidth="md" fullWidth>
       <DialogTitle>
         Sélection des questions
         <FormControl sx={{ ml: 2, minWidth: 200 }} size="small">
@@ -206,7 +246,7 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({ open, o
         />
         <List sx={{ maxHeight: 400, overflow: 'auto' }}>
           {filteredLeaves.map((q) => (
-            <QuestionRow key={q.linkId} question={q} isChecked={checked.has(q.linkId)} toggle={toggle} />
+            <QuestionRow key={q.linkId} question={q} isChecked={currentChecked.has(q.linkId)} toggle={toggle} />
           ))}
           {filteredLeaves.length === 0 && (
             <Typography variant="body2" sx={{ p: 2 }}>
@@ -214,15 +254,16 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({ open, o
             </Typography>
           )}
         </List>
-        {selectedLeaves.length > 0 && (
+        {allSelectedLeaves.length > 0 && (
           <Stack direction="row" spacing={1} sx={{ mt: 2, flexWrap: 'wrap' }}>
-            {selectedLeaves.map((l) => (
+            {allSelectedLeaves.map((l) => (
               <Chip
                 key={l.linkId}
                 label={l.text || l.linkId}
                 onDelete={() => handleRemove(l.linkId)}
-                variant="outlined"
-                sx={{ mb: 1 }}
+                // variant="outlined"
+
+                style={{ backgroundColor: '#f7f7f7' }}
               />
             ))}
           </Stack>
@@ -230,8 +271,8 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({ open, o
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Annuler</Button>
-        <Button variant="contained" disabled={selectedLeaves.length === 0} onClick={handleConfirm}>
-          Valider ({selectedLeaves.length})
+        <Button variant="contained" disabled={allSelectedLeaves.length === 0} onClick={handleConfirm}>
+          Valider ({allSelectedLeaves.length})
         </Button>
       </DialogActions>
     </Dialog>

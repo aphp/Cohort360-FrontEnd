@@ -74,6 +74,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
   const appConfig = useContext(AppConfig)
   const limit = appConfig.features.export.exportLinesLimit
   const [isQuestionChoiceOpen, setIsQuestionChoiceOpen] = useState(false)
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([])
 
   const getFilterList = useCallback(async () => {
     try {
@@ -241,7 +242,13 @@ const ExportTable: React.FC<ExportTableProps> = ({
               Sélectionner les questions à exporter :
             </Typography>
             <Button onClick={() => setIsQuestionChoiceOpen(!isQuestionChoiceOpen)}>Choix des questions</Button>
-            <QuestionForm open={isQuestionChoiceOpen} onClose={() => handleQuestionChoiceOpen(isQuestionChoiceOpen)} />
+            <QuestionForm
+              open={isQuestionChoiceOpen}
+              onClose={() => handleQuestionChoiceOpen(isQuestionChoiceOpen)}
+              onConfirm={() => {
+                return
+              }}
+            />
           </Grid>
         )}
         {checkedPivotMerge === false && (
