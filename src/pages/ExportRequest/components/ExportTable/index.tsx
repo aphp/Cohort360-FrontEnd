@@ -241,10 +241,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
               Sélectionner les questions à exporter :
             </Typography>
             <Button onClick={() => setIsQuestionChoiceOpen(!isQuestionChoiceOpen)}>Choix des questions</Button>
-            <QuestionForm
-              isOpen={isQuestionChoiceOpen}
-              handleClose={() => handleQuestionChoiceOpen(isQuestionChoiceOpen)}
-            />
+            <QuestionForm open={isQuestionChoiceOpen} onClose={() => handleQuestionChoiceOpen(isQuestionChoiceOpen)} />
           </Grid>
         )}
         {checkedPivotMerge === false && (
