@@ -51,7 +51,6 @@ export const getDataFromForm = (
 export const getFormName = (form: CohortQuestionnaireResponse, questionnairesList: Questionnaire[]) => {
   const formQuestionnaireId = form.questionnaire?.replace('Questionnaire/', '')
   const formName = questionnairesList.find((questionnaire) => questionnaire.id === formQuestionnaireId)?.name
-
   return formName && Object.values(FormNames).includes(formName as FormNames) ? formName : FormNames.UNKNOWN
 }
 

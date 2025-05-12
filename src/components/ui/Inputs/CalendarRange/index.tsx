@@ -55,7 +55,7 @@ const CalendarRange = ({
     <>
       {isString(label) ? (
         <BlockWrapper item xs={12} margin="0px 0px 10px 0px">
-          <CalendarLabel variant="h3">{label} :</CalendarLabel>
+          <CalendarLabel variant="h3">{label}</CalendarLabel>
         </BlockWrapper>
       ) : (
         label

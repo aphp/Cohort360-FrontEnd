@@ -1,10 +1,10 @@
 import React, { ReactElement } from 'react'
 import { Box, Tooltip } from '@mui/material'
-import StatusChip, { ChipStyles } from '../StatusChip'
+import StatusChip, { ChipStatus } from '../StatusChip'
 
 type TooltipChipProps = {
   label: string
-  status: ChipStyles
+  status: ChipStatus
   tooltip?: string
   icon?: ReactElement
 }

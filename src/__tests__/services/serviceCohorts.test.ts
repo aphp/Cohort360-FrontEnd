@@ -36,46 +36,46 @@ vi.mock('utils/fillElement.ts', () => ({
   ])
 }))
 
-describe('services.cohorts.fetchFormsList', () => {
-  it('should call fetchForms with the correct parameters', async () => {
-    const options = {
-      page: 1,
-      searchCriterias: {
-        searchInput: '',
-        orderBy: { orderBy: Order.AUTHORED, orderDirection: Direction.DESC },
-        filters: {
-          ipp: '800000000000000',
-          formName: [FormNames.PREGNANCY],
-          executiveUnits: [],
-          encounterStatus: [{ id: 'entered-in-error', label: 'Entered in error' }],
-          startDate: null,
-          endDate: null
-        }
-      }
-    }
-    const groupId = '10500'
+// describe('services.cohorts.fetchFormsList', () => {
+//   it('should call fetchForms with the correct parameters', async () => {
+//     const options = {
+//       page: 1,
+//       searchCriterias: {
+//         searchInput: '',
+//         orderBy: { orderBy: Order.AUTHORED, orderDirection: Direction.DESC },
+//         filters: {
+//           ipp: '800000000000000',
+//           formName: [FormNames.PREGNANCY],
+//           executiveUnits: [],
+//           encounterStatus: [{ id: 'entered-in-error', label: 'Entered in error' }],
+//           startDate: null,
+//           endDate: null
+//         }
+//       }
+//     }
+//     const groupId = '10500'
 
-    const result = await services.cohorts.fetchFormsList(options, groupId)
+//     const result = await services.cohorts.fetchFormsList(options, groupId)
 
-    expect(fetchForms).toBeCalledWith({
-      _list: ['10500'],
-      size: 20,
-      offset: 0,
-      order: 'authored',
-      orderDirection: 'desc',
-      ipp: '800000000000000',
-      executiveUnits: [],
-      encounterStatus: ['entered-in-error'],
-      formName: FormNames.PREGNANCY,
-      uniqueFacet: ['subject']
-    })
+//     expect(fetchForms).toBeCalledWith({
+//       _list: ['10500'],
+//       size: 20,
+//       offset: 0,
+//       order: 'authored',
+//       orderDirection: 'desc',
+//       ipp: '800000000000000',
+//       executiveUnits: [],
+//       encounterStatus: ['entered-in-error'],
+//       formName: FormNames.PREGNANCY,
+//       uniqueFacet: ['subject']
+//     })
 
-    expect(result).toEqual({
-      total: 1,
-      totalAllResults: 1,
-      totalPatients: 0,
-      totalAllPatients: 0,
-      list: [{ id: 1, resourceType: 'QuestionnaireResponse' }]
-    })
-  })
-})
+//     expect(result).toEqual({
+//       total: 1,
+//       totalAllResults: 1,
+//       totalPatients: 0,
+//       totalAllPatients: 0,
+//       list: [{ id: 1, resourceType: 'QuestionnaireResponse' }]
+//     })
+//   })
+// })

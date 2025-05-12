@@ -7,7 +7,6 @@ import { Box, Grid, Slide, Typography } from '@mui/material'
 import Badge from 'components/ui/Badge'
 import Breadcrumb from 'components/Researches/Breadcrumbs'
 import MenuButtonFilter from 'components/Researches/MenuButtonFilter'
-import Searchbar from 'components/ui/Searchbar'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Tabs from 'components/ui/Tabs'
 
@@ -182,17 +181,15 @@ const MyResearches = () => {
             }
             onChangeEndDate={(newDate: string | null) => handleDateChange(newDate, ExplorationsSearchParams.END_DATE)}
           />
-          <Searchbar>
-            <SearchInput
-              placeholder="Rechercher dans tous les niveaux"
-              value={localSearchInput}
-              onchange={(newInput) => {
-                setLocalSearchInput(newInput)
-                handleSearchTermChange(newInput)
-              }}
-              width="296px"
-            />
-          </Searchbar>
+          <SearchInput
+            placeholder="Rechercher dans tous les niveaux"
+            value={localSearchInput}
+            onChange={(newInput) => {
+              setLocalSearchInput(newInput)
+              handleSearchTermChange(newInput)
+            }}
+            // width="296px"
+          />
         </Box>
         <Tabs
           variant="pill"

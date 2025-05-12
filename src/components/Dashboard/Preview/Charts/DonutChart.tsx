@@ -5,7 +5,7 @@ import legend from './Legend'
 
 import { SimpleChartDataType } from 'types'
 
-import displayDigit from 'utils/displayDigit'
+import { format } from 'utils/numbers'
 
 type DonutChartProps = {
   data?: SimpleChartDataType[]
@@ -75,7 +75,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 250
       legend({
         color: color,
         columns: '250px',
-        dataValues: data.map((entry) => displayDigit(entry.value))
+        dataValues: data.map((entry) => format(entry.value))
       })
     )
   }, [node, data, height, width, total_value])

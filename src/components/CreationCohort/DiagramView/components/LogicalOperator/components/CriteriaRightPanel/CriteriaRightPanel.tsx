@@ -33,10 +33,7 @@ import CriteriaForm from './CriteriaForm'
 
 type CriteriaTypesWithIcons = Exclude<
   CriteriaType,
-  | CriteriaType.MEDICATION_REQUEST
-  | CriteriaType.MEDICATION_ADMINISTRATION
-  | CriteriaType.QUESTIONNAIRE
-  | CriteriaType.QUESTIONNAIRE_RESPONSE
+  CriteriaType.MEDICATION_REQUEST | CriteriaType.MEDICATION_ADMINISTRATION | CriteriaType.QUESTIONNAIRE_RESPONSE
 >
 
 type CriteriaListItemProps = {

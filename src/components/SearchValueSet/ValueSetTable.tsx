@@ -10,8 +10,8 @@ import {
   TableHead,
   Typography
 } from '@mui/material'
-import { LoadingStatus, SelectedStatus } from 'types'
-import { Hierarchy, HierarchyInfo, SearchMode } from 'types/hierarchy'
+import { LoadingStatus } from 'types'
+import { Hierarchy, HierarchyInfo, SearchMode, SelectedStatus } from 'types/hierarchy'
 import { KeyboardArrowDown, KeyboardArrowRight, IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 import { CellWrapper, RowContainerWrapper, RowWrapper } from '../Hierarchy/styles'
 import { sortArray } from 'utils/arrays'
