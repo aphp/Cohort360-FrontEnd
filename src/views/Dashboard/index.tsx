@@ -15,7 +15,11 @@ import { PMSILabel } from 'types/patient'
 import { URLS } from 'types/exploration'
 import { MainTabsWrapper } from 'components/ui/Tabs/style'
 import sideBarTransition from 'styles/sideBarTransition'
-import { buildExplorationConfig, ExplorationConfigFor } from 'components/ExplorationBoard/config/config'
+import {
+  buildExplorationConfig,
+  ExplorationConfigFor,
+  ExplorationResourceType
+} from 'components/ExplorationBoard/config/config'
 
 type DashboardProps = {
   context: URLS
@@ -39,7 +43,10 @@ const Dashboard = ({ context }: DashboardProps) => {
     [dashboard.deidentifiedBoolean, groupId]
   )
 
-  const selectedConfig = useMemo(() => config.get(selectedSubTab ?? selectedTab), [config, selectedSubTab, selectedTab])
+  const selectedConfig = useMemo(
+    () => config.get((selectedSubTab ?? selectedTab) as ExplorationResourceType),
+    [config, selectedSubTab, selectedTab]
+  )
 
   useEffect(() => {
     setSelectedSubTab(subtab)

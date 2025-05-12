@@ -8,7 +8,7 @@ import FavStar from 'components/ui/FavStar'
 import IconButtonWithTooltip from '../ui/IconButtonWithTooltip'
 import ResearchesTable from './ResearchesTable'
 import SublevelButton from './SublevelButton'
-import StatusChip, { ChipStatus } from 'components/ui/StatusChip'
+import { ChipStatus } from 'components/ui/StatusChip'
 import { TableCellWrapper } from './ResearchesTable/styles'
 
 import Download from 'assets/icones/download.svg?react'
@@ -34,26 +34,26 @@ import { format } from 'utils/numbers'
 
 export const getCohortStatusChip = (status?: JobStatus, jobFailMessage?: string) => {
   if (jobFailMessage) {
-    return <TooltipChip label="Erreur" status={ChipStyles.ERROR} tooltip={jobFailMessage} />
+    return <TooltipChip label="Erreur" status={ChipStatus.ERROR} tooltip={jobFailMessage} />
   }
 
   switch (status) {
     case JobStatus.FINISHED:
-      return <TooltipChip label="Terminé" status={ChipStyles.FINISHED} />
+      return <TooltipChip label="Terminé" status={ChipStatus.FINISHED} />
     case JobStatus.PENDING:
     case JobStatus.NEW:
-      return <TooltipChip label="En cours" status={ChipStyles.IN_PROGRESS} />
+      return <TooltipChip label="En cours" status={ChipStatus.IN_PROGRESS} />
     case JobStatus.LONG_PENDING:
       return (
         <TooltipChip
           label="En cours"
-          status={ChipStyles.IN_PROGRESS}
+          status={ChipStatus.IN_PROGRESS}
           icon={<UpdateIcon />}
           tooltip="Cohorte volumineuse : sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible."
         />
       )
     default:
-      return <TooltipChip label="Erreur" status={ChipStyles.ERROR} />
+      return <TooltipChip label="Erreur" status={ChipStatus.ERROR} />
   }
 }
 

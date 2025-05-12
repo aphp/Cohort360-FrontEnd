@@ -22,23 +22,23 @@ type SavedFiltersData<T> = {
   selectedFilter: SelectedFilter<T> | null
 }
 
-type SearchSectionProps<T> = {
+type SearchSectionProps = {
   searchCriterias: SearchCriterias<Filters>
   infos: AdditionalInfo
   savedFiltersActions: SavedFiltersActions
   savedFiltersData: SavedFiltersData<Filters>
   displayOptions: DisplayOptions
-  onSearch: (search: SearchWithFilters<T>) => void
+  onSearch: (search: SearchWithFilters) => void
 }
 
-const SearchSection = <T,>({
+const SearchSection = ({
   searchCriterias,
   infos,
   savedFiltersActions,
   savedFiltersData,
   displayOptions,
   onSearch
-}: SearchSectionProps<T>) => {
+}: SearchSectionProps) => {
   const {
     ref,
     sizes: { isXS, isSM }

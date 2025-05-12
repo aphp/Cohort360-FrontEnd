@@ -6,13 +6,13 @@ import ExplorationFilters from '../Filters'
 import { Filters } from 'types/searchCriterias'
 import { AdditionalInfo } from 'types/exploration'
 
-type FilterByProps<T> = {
-  filters: T
+type FilterByProps = {
+  filters: Filters
   infos: AdditionalInfo
-  onSubmit: (filters: T) => void
+  onSubmit: (filters: Filters) => void
 }
 
-const FilterBy = <T,>({ filters, infos, onSubmit }: FilterByProps<T>) => {
+const FilterBy = <T,>({ filters, infos, onSubmit }: FilterByProps) => {
   const [toggleModal, setToggleModal] = useState(false)
   const [isError, setIsError] = useState(false)
   const [hasChanged, setHasChanged] = useState(false)

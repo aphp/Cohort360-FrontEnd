@@ -22,10 +22,10 @@ export type SelectedFilter<T> = {
   filterParams: SearchCriterias<T>
 }
 
-export const useSavedFilters = <T>(type: ResourceType) => {
+export const useSavedFilters = (type: ResourceType) => {
   const [allSavedFilters, setAllSavedFilters] = useState<SavedFiltersResults | null>(null)
   const [fetchStatus, setFetchStatus] = useState<FetchResponse | null>(null)
-  const [selectedSavedFilter, setSelectedSavedFilter] = useState<SelectedFilter<T> | null>(null)
+  const [selectedSavedFilter, setSelectedSavedFilter] = useState<SelectedFilter<Filters> | null>(null)
 
   useEffect(() => {
     getSavedFilters()
@@ -91,7 +91,7 @@ export const useSavedFilters = <T>(type: ResourceType) => {
     return {
       filterUuid: selectedItem.uuid,
       filterName: selectedItem.name,
-      filterParams: (await mapRequestParamsToSearchCriteria(selectedItem.filter, type)) as SearchCriterias<T>
+      filterParams: await mapRequestParamsToSearchCriteria(selectedItem.filter, type)
     }
   }
 

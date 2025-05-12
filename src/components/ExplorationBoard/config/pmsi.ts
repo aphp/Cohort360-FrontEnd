@@ -5,7 +5,14 @@ import { getPmsiCodes, getPmsiDate } from 'mappers/pmsi'
 import { fetchClaimList, fetchConditionList, fetchProcedureList } from 'services/aphp/servicePmsi'
 import { PatientState } from 'state/patient'
 import { CohortPMSI } from 'types'
-import { AdditionalInfo, Data, DISPLAY_OPTIONS, ExplorationConfig, ExplorationResults } from 'types/exploration'
+import {
+  AdditionalInfo,
+  Data,
+  DISPLAY_OPTIONS,
+  ExplorationConfig,
+  ExplorationResults,
+  FetchOptions
+} from 'types/exploration'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { SourceType } from 'types/scope'
 import { Direction, Order, PMSIFilters, SearchCriterias } from 'types/searchCriterias'
@@ -14,6 +21,7 @@ import { FhirItem, Reference } from 'types/valueSet'
 import { fetchValueSet, narrowSearchCriterias, resolveAdditionalInfos } from 'utils/exploration'
 import { getCategory } from 'utils/fhir'
 import { getValueSetsFromSystems } from 'utils/valueSets'
+import { P } from 'vitest/dist/chunks/environment.d.Dmw5ulng'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {

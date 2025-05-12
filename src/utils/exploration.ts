@@ -58,7 +58,7 @@ export const resolveAdditionalInfos = async <T extends object>(
   }, {} as Partial<T>)
 }
 
-export const narrowSearchCriterias = <T>(
+export const narrowSearchCriterias = <T extends Filters>(
   deidentified: boolean,
   searchCriterias: SearchCriterias<T>,
   isPatient: boolean,
@@ -92,25 +92,30 @@ export const getCommonParamsAll = (groupId: string[]) => {
   }
 }
 
-export const fetcherWithParams = async <
-  T /*| Patient*/ extends
-    | Condition
-    | Procedure
-    | Claim
-    | Observation
-    | ImagingStudy
-    | QuestionnaireResponse
-    | MedicationRequest
-    | MedicationAdministration
-    | DocumentReference,
-  F extends Filters
->(
+type NonPatientResource =
+  | Condition
+  | Procedure
+  | Claim
+  | Observation
+  | ImagingStudy
+  | QuestionnaireResponse
+  | MedicationRequest
+  | MedicationAdministration
+  | DocumentReference
+
+export const fetcherWithParams = async <T extends Patient | NonPatientResource, F extends Filters>(
   fetchList: () => FHIR_Bundle_Promise_Response<T>,
   fetchAll: () => FHIR_Bundle_Promise_Response<T>,
   params: FetchParams &
-    FetchOptions<F> & { facet?: string; deidentified: boolean; patient?: PatientState; groupId?: string[] }
+    FetchOptions<F> & {
+      facet?: string
+      deidentified: boolean
+      patient?: PatientState
+      groupId?: string[]
+      isPatientData?: boolean
+    }
 ): Promise<ExplorationResults<T>> => {
-  const { filters, searchInput, orderBy, facet, patient, deidentified, groupId } = params
+  const { filters, searchInput, orderBy, facet, patient, deidentified, groupId, isPatientData = false } = params
   const [list, all] = await Promise.all([
     fetchList(),
     atLeastOneSearchCriteria({ searchInput, orderBy, filters }) ? fetchAll() : null
@@ -123,9 +128,15 @@ export const fetcherWithParams = async <
     list: []
   }
   const bundle = getApiResponseResources(list) ?? []
-  results.list = patient
-    ? linkElementWithEncounter(bundle, patient?.hospits?.list ?? [], deidentified)
-    : await getResourceInfos(bundle, deidentified, groupId?.[0])
+  if (isPatientData) {
+    results.list = bundle
+  } else {
+    results.list = (
+      patient
+        ? linkElementWithEncounter(bundle as NonPatientResource[], patient?.hospits?.list ?? [], deidentified)
+        : await getResourceInfos(bundle as NonPatientResource[], deidentified, groupId?.[0])
+    ) as T[]
+  }
   results.total = list?.data?.resourceType === 'Bundle' ? list.data.total ?? 0 : 0
   results.totalAllResults = all && all?.data?.resourceType === 'Bundle' ? all.data.total ?? 0 : results.total
   results.totalPatients = getPatientsCount(list, facet)

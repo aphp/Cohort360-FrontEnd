@@ -133,17 +133,23 @@ const TableRow = ({ row, sx }: RowProps) => {
       </TableRowMui>
       {subitemIndex !== null && row[subitemIndex].type === CellType.SUBARRAY && (
         <TableRowMui>
-          <TableCell colSpan={row.length} sx={{ padding: '0px 30px', backgroundColor: sx?.backgroundColor ?? '#fff' }}>
+          <TableCell
+            colSpan={row.length}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            sx={{ padding: '0px 30px', backgroundColor: (sx as any)?.backgroundColor ?? '#fff' }}
+          >
             <Collapse in={subitemIndex !== null} unmountOnExit>
               <DataTable
                 value={row[subitemIndex].value as TableType}
                 sxColumn={{
-                  backgroundColor: sx?.backgroundColor ?? '#fff',
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  backgroundColor: (sx as any)?.backgroundColor ?? '#fff',
                   color: '153d8a',
                   borderBottom: '1px solid 1px solid rgb(224, 224, 224)',
                   fontSize: 13
                 }}
-                sxRow={{ backgroundColor: sx?.backgroundColor ?? '#fff' }}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                sxRow={{ backgroundColor: (sx as any)?.backgroundColor ?? '#fff' }}
               />
             </Collapse>
           </TableCell>

@@ -8,6 +8,7 @@ import DataSection from './DataSection'
 import { FetchStatus } from 'types'
 import { AlertWrapper } from 'components/ui/Alert'
 import { GAP, ExplorationConfig } from 'types/exploration'
+import { Filters } from 'types/searchCriterias'
 
 type ExplorationBoardProps<T> = {
   config: ExplorationConfig<T>

@@ -8,25 +8,25 @@ import { selectFiltersAsArray } from 'utils/filters'
 export const useExplorationBoard = <T>(config: ExplorationConfig<T>) => {
   const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>({ type: config.type, deidentified: false })
   const [searchCriterias, { changeSearchBy, changeOrderBy, changeSearchInput, addFilters, removeFilter }] =
-    useSearchCriterias<T>(config.initSearchCriterias(), config.type)
+    useSearchCriterias(config.initSearchCriterias(), config.type)
 
   const {
     allSavedFilters,
     fetchStatus,
     selectedSavedFilter,
     methods: { next, postSavedFilter, deleteSavedFilters, patchSavedFilter, selectFilter, resetFetchStatus }
-  } = useSavedFilters<T>(config.type)
+  } = useSavedFilters(config.type)
 
   const narrowSearch = useMemo(() => config.narrowSearchCriterias, [config])
 
-  const narrowedSearchCriterias = useMemo(() => narrowSearch(searchCriterias), [searchCriterias])
+  const narrowedSearchCriterias = useMemo(() => narrowSearch(searchCriterias as SearchCriterias<T>), [searchCriterias])
 
   const narrowedSelectedFilter = useMemo(
     () =>
       selectedSavedFilter
         ? {
             ...selectedSavedFilter,
-            filterParams: narrowSearch(selectedSavedFilter.filterParams)
+            filterParams: narrowSearch(selectedSavedFilter.filterParams as SearchCriterias<T>)
           }
         : null,
     [selectedSavedFilter]
@@ -43,7 +43,7 @@ export const useExplorationBoard = <T>(config: ExplorationConfig<T>) => {
     else removeFilter(category as FilterKeys, value)
   }
 
-  const onSaveSearchCriterias = ({ searchBy, searchInput, filters, orderBy }: SearchWithFilters<T>) => {
+  const onSaveSearchCriterias = ({ searchBy, searchInput, filters, orderBy }: SearchWithFilters) => {
     if (searchBy) changeSearchBy(searchBy)
     if (searchInput !== undefined) changeSearchInput(searchInput)
     if (filters) addFilters(filters)

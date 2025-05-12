@@ -35,6 +35,7 @@ import { getAgeRepartitionMapAphp, getGenderRepartitionMapAphp, getGenderReparti
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { Card } from 'types/card'
 import { PatientState } from 'state/patient'
+import { atLeastOneSearchCriteria } from 'utils/filters'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo, deidentified?: boolean) => {
   additionalInfo.searchByList = searchByListPatients
@@ -256,7 +257,7 @@ const fetchList = (
   return fetcherWithParams(
     () => fetchPatient(params),
     () => fetchPatient(paramsFetchAll),
-    { ...fetchParams, filters, deidentified, groupId }
+    { ...fetchParams, filters, deidentified, groupId, isPatientData: true }
   )
 }
 
