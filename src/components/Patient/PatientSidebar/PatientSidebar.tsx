@@ -72,7 +72,7 @@ const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBool
       filters: { genders, birthdatesRanges, vitalStatuses }
     },
     { changeOrderBy, changeSearchInput, changeSearchBy, addFilters, removeFilter }
-  ] = useSearchCriterias(initPatientsSearchCriterias)
+  ] = useSearchCriterias(initPatientsSearchCriterias())
 
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ genders, vitalStatuses, birthdatesRanges })

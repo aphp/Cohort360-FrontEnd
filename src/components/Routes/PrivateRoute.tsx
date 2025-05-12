@@ -7,6 +7,8 @@ import { ACCESS_TOKEN } from '../../constants'
 
 import { useAppSelector, useAppDispatch } from '../../state'
 import { AppConfig } from 'config'
+import { throttle } from 'lodash'
+import { updateConfigFromFhirMetadata } from 'services/aphp/serviceFhirConfig'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const window: any
@@ -17,6 +19,7 @@ const PrivateRoute: React.FC = () => {
   const appConfig = useContext(AppConfig)
   const location = useLocation()
   const authToken = localStorage.getItem(ACCESS_TOKEN)
+  const [fetchedFhirMetadata, setFetchedFhirMetadata] = useState(false)
 
   const [allowRedirect, setRedirection] = useState(false)
 
@@ -28,6 +31,22 @@ const PrivateRoute: React.FC = () => {
       }
     }
   }, [me, appConfig.system.userTrackingBlacklist, dispatch])
+
+  useEffect(() => {
+    const callFetchFhirMetadata = throttle(async () => {
+      try {
+        updateConfigFromFhirMetadata()
+        setFetchedFhirMetadata(true)
+      } catch (error) {
+        console.error(error)
+      }
+    }, 1000)
+    if (me && authToken) {
+      if (!fetchedFhirMetadata) {
+        callFetchFhirMetadata()
+      }
+    }
+  }, [me, authToken, fetchedFhirMetadata])
 
   if (!me || (!me && !authToken)) {
     if (allowRedirect === true) return <Navigate to="/" replace />

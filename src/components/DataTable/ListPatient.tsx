@@ -14,6 +14,7 @@ import GenderIcon from 'components/ui/GenderIcon'
 import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
 import { VitalStatusLabel } from 'types/requestCriterias'
 import { Pagination } from 'components/ui/Pagination'
+import { getConfig } from 'config'
 
 type ListPatientProps = {
   loading: boolean
@@ -79,6 +80,7 @@ const ListPatientLine: React.FC<{
   onCloseDrawer: () => void
 }> = ({ deidentified, patient, onCloseDrawer }) => {
   const { classes } = useStyles()
+  const appConfig = getConfig()
   const { patientId, tabName } = useParams<{
     patientId: string
     tabName: string
@@ -104,7 +106,13 @@ const ListPatientLine: React.FC<{
   const ipp = deidentified
     ? `IPP chiffré: ${patient.id}`
     : `IPP: ${
-        patient.identifier?.find((identifier) => identifier.type?.coding?.[0].code === 'IPP')?.value ?? 'inconnu'
+        patient.identifier?.find(
+          (identifier) =>
+            identifier.type?.coding?.[0].code === appConfig.features.patient.patientIdentifierExtensionCode?.code &&
+            identifier.type?.coding?.[0].system === appConfig.features.patient.patientIdentifierExtensionCode?.system
+        )?.value ??
+        patient.identifier?.[0].value ??
+        'inconnu'
       }`
   const _tabName = tabName ? `/${tabName}` : ''
 
@@ -119,7 +127,7 @@ const ListPatientLine: React.FC<{
       }}
     >
       <ListItemIcon style={{ minWidth: '32px' }}>
-        <GenderIcon gender={patient.gender?.toLocaleUpperCase() as GenderStatus} className={classes.genderIcon} />
+        <GenderIcon gender={patient.gender as GenderStatus} className={classes.genderIcon} />
       </ListItemIcon>
       <ListItemText primary={`${capitalizeFirstLetter(firstName)} ${lastName}`} secondary={`${age} - ${ipp}`} />
       <StatusChip

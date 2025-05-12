@@ -47,6 +47,7 @@ import { useSearchParams } from 'react-router-dom'
 import { checkIfPageAvailable, handlePageError, cleanSearchParams } from 'utils/paginationUtils'
 import List from 'components/ui/List'
 import { v4 as uuidv4 } from 'uuid'
+import { getConfig } from 'config'
 
 type PatientListProps = {
   total: number
@@ -55,6 +56,7 @@ type PatientListProps = {
 
 const PatientList = ({ total, deidentified }: PatientListProps) => {
   const dispatch = useAppDispatch()
+  const appConfig = getConfig()
   const [searchParams, setSearchParams] = useSearchParams()
   const getPageParam = searchParams.get('page')
   const groupId = searchParams.get('groupId') ?? undefined
@@ -97,7 +99,8 @@ const PatientList = ({ total, deidentified }: PatientListProps) => {
       filters: { genders, birthdatesRanges, vitalStatuses }
     },
     { changeOrderBy, changeSearchBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
-  ] = useSearchCriterias(initPatientsSearchCriterias)
+  ] = useSearchCriterias(initPatientsSearchCriterias())
+
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ genders, vitalStatuses, birthdatesRanges })
   }, [genders, vitalStatuses, birthdatesRanges])
@@ -173,17 +176,19 @@ const PatientList = ({ total, deidentified }: PatientListProps) => {
 
   return (
     <Grid container gap="25px">
-      <Grid item xs={12}>
-        <PatientCharts
-          agePyramid={
-            loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE ? [] : agePyramid
-          }
-          patientData={
-            loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE ? {} : patientData
-          }
-          loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
-        />
-      </Grid>
+      {appConfig.core.fhir.facetsExtensions && (
+        <Grid item xs={12}>
+          <PatientCharts
+            agePyramid={
+              loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE ? [] : agePyramid
+            }
+            patientData={
+              loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE ? {} : patientData
+            }
+            loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
+          />
+        </Grid>
+      )}
       <Grid container justifyContent="flex-end" gap="10px">
         <Grid container item xs={12} md={10} lg={7} xl={5} justifyContent="flex-end" spacing={1}>
           {(filtersAsArray.length > 0 || searchInput) && (

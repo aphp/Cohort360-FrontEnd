@@ -105,13 +105,19 @@ const DataTableObservationLine: React.FC<{
   const nda = observation.NDA
   const date = observation.effectiveDateTime
   const libelleANABIO = observation.code?.coding?.find(
-    (code) => code.system === appConfig.features.observation.valueSets.biologyHierarchyAnabio.url && code.userSelected
+    (code) =>
+      code.system === appConfig.features.observation.valueSets.biologyHierarchyAnabio.url &&
+      (!appConfig.core.fhir.selectedCodeOnly || code.userSelected)
   )?.display
   const codeLOINC = observation.code?.coding?.find(
-    (code) => code.system === appConfig.features.observation.valueSets.biologyHierarchyLoinc.url && code.userSelected
+    (code) =>
+      code.system === appConfig.features.observation.valueSets.biologyHierarchyLoinc.url &&
+      (!appConfig.core.fhir.selectedCodeOnly || code.userSelected)
   )?.code
   const libelleLOINC = observation.code?.coding?.find(
-    (code) => code.system === appConfig.features.observation.valueSets.biologyHierarchyLoinc.url && code.userSelected
+    (code) =>
+      code.system === appConfig.features.observation.valueSets.biologyHierarchyLoinc.url &&
+      (!appConfig.core.fhir.selectedCodeOnly || code.userSelected)
   )?.display
   const result =
     observation.valueQuantity && observation.valueQuantity?.value !== null

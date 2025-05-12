@@ -17,7 +17,7 @@ import useStyles from './styles'
 import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
 import { Order, OrderBy } from 'types/searchCriterias'
 import { ResourceType } from 'types/requestCriterias'
-import { AppConfig } from 'config'
+import { AppConfig, getConfig } from 'config'
 
 type DataTableMedicationProps = {
   loading: boolean
@@ -105,8 +105,9 @@ const getCodes = (
   codeSystem: string,
   altCodeSystemRegex?: string
 ): [string, string, boolean, string | undefined] => {
+  const appConfig = getConfig()
   const standardCoding = medication.medicationCodeableConcept?.coding?.find(
-    (code) => code.userSelected && code.system === codeSystem
+    (code) => (!appConfig.core.fhir.selectedCodeOnly || code.userSelected) && code.system === codeSystem
   )
   const coding =
     standardCoding ||
@@ -137,8 +138,8 @@ const DataTableMedicationLine: React.FC<{
   const nda = medication.NDA
   const date =
     medication.resourceType === 'MedicationRequest'
-      ? medication.dispenseRequest?.validityPeriod?.start
-      : medication.effectivePeriod?.start
+      ? medication.dispenseRequest?.validityPeriod?.start ?? medication.authoredOn
+      : medication.effectivePeriod?.start ?? medication.effectiveDateTime
 
   const [codeATC, displayATC, isATCStandard, codeATCSystem] = getCodes(
     medication,
