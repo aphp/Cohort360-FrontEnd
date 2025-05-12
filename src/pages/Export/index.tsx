@@ -30,7 +30,10 @@ const Export = () => {
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [searchParams, setSearchParams] = useSearchParams()
   const [pagination, setPagination] = useState({ current: 0, total: 0 })
-  const [{ orderBy, searchInput }, { changeOrderBy, changeSearchInput }] = useSearchCriterias(initExportSearchCriterias)
+  const [{ orderBy, searchInput }, { changeOrderBy, changeSearchInput }] = useSearchCriterias(
+    initExportSearchCriterias,
+    0
+  )
 
   const _fetchExportList = async ({ input, orderBy, page }: FetchExportArgs) => {
     let controller = controllerRef.current

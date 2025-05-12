@@ -65,8 +65,8 @@ export const DISPLAY_OPTIONS: DisplayOptions = {
   count: true
 }
 
-export type SearchWithFilters<T> = Search & {
-  filters?: T
+export type SearchWithFilters = Search & {
+  filters?: Filters
   orderBy?: OrderBy
 }
 
@@ -139,11 +139,11 @@ export type Timeline = {
   questionnaires: Questionnaire[]
 }
 
-export type ExplorationConfig<T extends Filters> = {
+export type ExplorationConfig<T> = {
   type: ResourceType
   deidentified: boolean
   displayOptions: DisplayOptions
-  initSearchCriterias: () => SearchCriterias<T>
+  initSearchCriterias: () => SearchCriterias<Filters>
   fetchList: (fetchParams: FetchParams, options: FetchOptions<T>, signal?: AbortSignal) => Promise<Data>
   narrowSearchCriterias: (searchCriterias: SearchCriterias<T>) => SearchCriterias<Filters>
   fetchAdditionalInfos: (additionalInfo: AdditionalInfo) => Promise<AdditionalInfo>

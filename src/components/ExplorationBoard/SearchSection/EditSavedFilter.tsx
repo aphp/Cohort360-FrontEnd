@@ -104,8 +104,8 @@ const EditSavedFilter = ({ open, criteria, infos, onEdit, onClose }: EditSavedFi
         <ExplorationFilters
           infos={infos}
           filters={criteria.filterParams.filters}
-          onSubmit={setForm}
-          onChange={setHasChanged}
+          onChange={setForm}
+          hasChanged={setHasChanged}
           onError={setIsError}
         />
       </Grid>

@@ -18,7 +18,7 @@ import { URLS } from 'types/exploration'
 import sideBarTransition from 'styles/sideBarTransition'
 import { MainTabsWrapper } from 'components/ui/Tabs/style'
 import { SidebarButton, SidebarWrapper } from 'components/ui/Sidebar/style'
-import { buildExplorationConfig } from 'components/ExplorationBoard/config/config'
+import { buildExplorationConfig, ExplorationResourceType } from 'components/ExplorationBoard/config/config'
 
 const SIDEBAR_OPTONS = {
   myFilters: false,
@@ -57,7 +57,7 @@ const Patient = () => {
 
   const sidebarConfig = useMemo(() => expConfig.get(ResourceType.PATIENT, SIDEBAR_OPTONS), [expConfig])
   const selectedConfig = useMemo(
-    () => expConfig.get(selectedSubTab ?? selectedTab),
+    () => expConfig.get((selectedSubTab ?? selectedTab) as ExplorationResourceType),
     [expConfig, selectedSubTab, selectedTab]
   )
 

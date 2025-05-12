@@ -1,4 +1,5 @@
 import {
+  CohortsFilters,
   DurationRangeType,
   FilterKeys,
   FilterValue,

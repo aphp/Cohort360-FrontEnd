@@ -5,7 +5,15 @@ import services from 'services/aphp'
 import { fetchForms } from 'services/aphp/callApi'
 import { PatientState } from 'state/patient'
 import { CohortQuestionnaireResponse } from 'types'
-import { AdditionalInfo, Data, DISPLAY_OPTIONS, ExplorationConfig, ExplorationResults, FetchOptions, FetchParams } from 'types/exploration'
+import {
+  AdditionalInfo,
+  Data,
+  DISPLAY_OPTIONS,
+  ExplorationConfig,
+  ExplorationResults,
+  FetchOptions,
+  FetchParams
+} from 'types/exploration'
 import { ResourceType } from 'types/requestCriterias'
 import { Direction, FormNames, LabelObject, MaternityFormFilters, Order, SearchCriterias } from 'types/searchCriterias'
 import { Table, Row, CellType, Column } from 'types/table'
@@ -166,7 +174,7 @@ export const formsConfig = (
   mapToTimeline: !!patient
     ? async (data: Data) => {
         const questionnaires = await services.patients.fetchQuestionnaires()
-        return { data: data.list ?? [], questionnaires: questionnaires ?? [] }
+        return { data: (data.list ?? []) as CohortQuestionnaireResponse[], questionnaires: questionnaires ?? [] }
       }
     : undefined,
   narrowSearchCriterias: (searchCriterias) =>
