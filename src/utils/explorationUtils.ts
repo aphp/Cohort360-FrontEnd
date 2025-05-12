@@ -1,6 +1,14 @@
 import { Cohort, JobStatus, ProjectType, QuerySnapshotInfo, RequestType, ValueSet } from 'types'
 import { CohortsType, ExplorationsSearchParams } from 'types/cohorts'
-import { Direction, FilterKeys, FilterValue, LabelObject, Order } from 'types/searchCriterias'
+import {
+  CohortsFilters,
+  Direction,
+  FilterKeys,
+  FilterValue,
+  LabelObject,
+  Order,
+  SearchCriterias
+} from 'types/searchCriterias'
 import { SetURLSearchParams } from 'react-router-dom'
 import { isDateValid } from './formatDate'
 import { format } from './numbers'
@@ -91,7 +99,7 @@ export const getRequestsSearchParams = (searchParams: URLSearchParams) => {
   }
 }
 
-export const getStatusParam = (searchParam: string | null) => {
+export const getStatusParam = (searchParam: string | null): LabelObject[] => {
   if (searchParam === null) return []
   const statusParam = searchParam
     .split(',')
@@ -101,7 +109,7 @@ export const getStatusParam = (searchParam: string | null) => {
         return statusOptions[statusIndex]
       }
     })
-    .filter((status) => status !== undefined)
+    .filter((status) => status !== undefined) as LabelObject[]
 
   return statusParam
 }
@@ -140,12 +148,16 @@ export const cleanSearchParams = (searchParams: URLSearchParams) => {
   return newSearchParams
 }
 
-export const getCohortsSearchParams = (searchParams: URLSearchParams) => {
+export const getCohortsSearchParams = (
+  searchParams: URLSearchParams
+): SearchCriterias<CohortsFilters> & { page: number } => {
   return {
     searchInput: searchParams.get(ExplorationsSearchParams.SEARCH_INPUT) ?? '',
     page: parseInt(searchParams.get('page') ?? '1', 10),
-    orderBy: (searchParams.get(ExplorationsSearchParams.ORDER_BY) as Order) ?? Order.CREATED_AT,
-    orderDirection: (searchParams.get(ExplorationsSearchParams.DIRECTION) as Direction) ?? Direction.DESC,
+    orderBy: {
+      orderBy: (searchParams.get(ExplorationsSearchParams.ORDER_BY) as Order) ?? Order.CREATED_AT,
+      orderDirection: (searchParams.get(ExplorationsSearchParams.DIRECTION) as Direction) ?? Direction.DESC
+    },
     filters: {
       startDate: searchParams.get(ExplorationsSearchParams.START_DATE),
       endDate: searchParams.get(ExplorationsSearchParams.END_DATE),

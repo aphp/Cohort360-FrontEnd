@@ -57,12 +57,12 @@ const CohortsList = ({ rowsPerPage = 20, favorites, simplified = false }: Cohort
   const { projectId, requestId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const { searchInput, page, orderBy, orderDirection, filters } = useMemo(() => {
-    const { searchInput, page, orderBy, orderDirection, filters } = getCohortsSearchParams(searchParams)
+    const { searchInput, page, orderBy, filters } = getCohortsSearchParams(searchParams)
     return {
       searchInput,
       page,
-      orderBy,
-      orderDirection,
+      orderBy: orderBy.orderBy,
+      orderDirection: orderBy.orderDirection,
       filters: { ...filters, favorite: favorites ? [CohortsType.FAVORITE] : filters.favorite }
     }
   }, [searchParams, favorites])

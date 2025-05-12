@@ -31,7 +31,9 @@ type ResourceFilterMap = {
   [ResourceType.QUESTIONNAIRE_RESPONSE]: MaternityFormFilters
 }
 
-export type ExplorationConfigFor<T extends ResourceType> = ExplorationConfig<ResourceFilterMap[T]>
+export type ExplorationResourceType = keyof ResourceFilterMap
+
+export type ExplorationConfigFor<T extends keyof ResourceFilterMap> = ExplorationConfig<ResourceFilterMap[T]>
 
 export const buildExplorationConfig = (deidentified: boolean, patient: PatientState | null, groupId: string[]) => {
   const configMap = {
@@ -48,12 +50,12 @@ export const buildExplorationConfig = (deidentified: boolean, patient: PatientSt
   } as const
 
   return {
-    get: <T extends ResourceType>(
+    get: <T extends ExplorationResourceType>(
       type: T,
       displayOptions?: DisplayOptions,
       search?: string
     ): ExplorationConfigFor<T> | null => {
-      const configFn = configMap[type] as (
+      const configFn = configMap[type as keyof typeof configMap] as (
         deidentified: boolean,
         patient: PatientState,
         groupId: string[],

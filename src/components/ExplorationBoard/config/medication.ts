@@ -7,7 +7,15 @@ import { fetchMedicationAdministration, fetchMedicationRequest } from 'services/
 import { getCodeList } from 'services/aphp/serviceValueSets'
 import { PatientState } from 'state/patient'
 import { CohortMedication } from 'types'
-import { AdditionalInfo, Data, DISPLAY_OPTIONS, ExplorationConfig, ExplorationResults, FetchOptions, FetchParams } from 'types/exploration'
+import {
+  AdditionalInfo,
+  Data,
+  DISPLAY_OPTIONS,
+  ExplorationConfig,
+  ExplorationResults,
+  FetchOptions,
+  FetchParams
+} from 'types/exploration'
 import { ResourceType } from 'types/requestCriterias'
 import { SourceType } from 'types/scope'
 import { Direction, MedicationFilters, Order, SearchCriterias } from 'types/searchCriterias'

@@ -7,22 +7,12 @@ import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import { Pagination } from 'components/ui/Pagination'
 import Chart from 'components/ui/Chart'
 import PyramidChart from 'components/Dashboard/Preview/Charts/PyramidChart'
-import { PatientsResponse } from 'types/patient'
-import { ResourceType } from 'types/requestCriterias'
 import BarChart from 'components/Dashboard/Preview/Charts/BarChart'
 import PieChart from 'components/Dashboard/Preview/Charts/PieChart'
 import Timeline from 'components/Patient/MaternityTimeline'
-import { AgeRepartitionType, ExplorationResults, SimpleChartDataType } from 'types'
-import { QuestionnaireResponse } from 'fhir/r4'
+import { AgeRepartitionType, SimpleChartDataType } from 'types'
 import InfoCard from 'components/ui/Cards/InfoCard'
-import {
-  AdditionalInfo,
-  Timeline as TimelineT,
-  CountDisplay,
-  Diagram,
-  DiagramType,
-  DisplayOptions
-} from 'types/exploration'
+import { Timeline as TimelineT, CountDisplay, Diagram, DiagramType, DisplayOptions } from 'types/exploration'
 import { Card } from 'types/card'
 import { StickyContainer } from 'components/ui/Pagination/styles'
 

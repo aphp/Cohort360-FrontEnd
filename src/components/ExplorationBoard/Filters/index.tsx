@@ -15,10 +15,10 @@ import { AdditionalInfo } from 'types/exploration'
 import { Typography } from '@mui/material'
 import { isEqual } from 'lodash'
 
-type ExplorationFiltersProps<T> = {
-  filters: T
+type ExplorationFiltersProps = {
+  filters: Filters
   infos: AdditionalInfo
-  onChange: (filters: T) => void
+  onChange: (filters: Filters) => void
   onError: (isError: boolean) => void
   hasChanged: (hasChange: boolean) => void
 }
@@ -57,26 +57,20 @@ const docStatusesList = [
   { id: FilterByDocumentStatus.NOT_VALIDATED, label: FilterByDocumentStatus.NOT_VALIDATED }
 ]
 
-const ExplorationFilters = <T extends FieldValues>({
-  filters,
-  infos,
-  onChange,
-  onError,
-  hasChanged
-}: ExplorationFiltersProps<T>) => {
+const ExplorationFilters = ({ filters, infos, onChange, onError, hasChanged }: ExplorationFiltersProps) => {
   const {
     control,
     handleSubmit,
     reset,
     getValues,
     formState: { isSubmitting }
-  } = useForm<T>({
+  } = useForm<Filters>({
     defaultValues: filters,
     mode: 'onChange',
     reValidateMode: 'onChange'
   })
 
-  const lastSubmitted = useRef<T>(filters)
+  const lastSubmitted = useRef<Filters>(filters)
 
   // Réinitialise les valeurs et soumet dès que filters changent
   useEffect(() => {
@@ -191,11 +185,15 @@ const ExplorationFilters = <T extends FieldValues>({
     [infos, onError]
   )
 
-  return Object.keys(filters)
-    .filter((key) => key in fields)
-    .map((key) => (
-      <Controller key={key} name={key as keyof Filters} control={control} render={fields[key as keyof Filters]} />
-    ))
+  return (
+    <>
+      {Object.keys(filters)
+        .filter((key) => key in fields)
+        .map((key) => (
+          <Controller key={key} name={key as keyof Filters} control={control} render={fields[key as keyof Filters]} />
+        ))}
+    </>
+  )
 }
 
 export default ExplorationFilters
