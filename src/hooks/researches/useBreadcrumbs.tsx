@@ -1,4 +1,5 @@
 import { useLocation, useParams, useSearchParams } from 'react-router-dom'
+import useCohort from './useCohort'
 import useProject from './useProject'
 import useRequest from './useRequest'
 import { cleanSearchParams } from 'utils/explorationUtils'
@@ -10,6 +11,7 @@ const useBreadCrumbs = () => {
 
   const { project } = useProject(projectId)
   const { request } = useRequest(requestId)
+  const { cohort } = useCohort(cohortId)
   const cleanedSearchParams = cleanSearchParams(searchParams)
 
   const items = []
@@ -27,6 +29,13 @@ const useBreadCrumbs = () => {
           label: `${request.name}`,
           url: `/researches/projects/${projectId}/${requestId}`
         })
+
+        if (cohortId && cohort) {
+          items.push({
+            label: `${cohort?.name}`,
+            url: `/researches/projects/${projectId}/${requestId}/${cohortId}`
+          })
+        }
       }
     }
   }
@@ -36,15 +45,33 @@ const useBreadCrumbs = () => {
     if (requestId && request) {
       items.push({
         label: `${request.name}`,
-        url: `/researches/${requestId}`
+        url: `/researches/requests/${requestId}`
       })
+
+      if (cohortId && cohort) {
+        items.push({
+          label: `${cohort?.name}`,
+          url: `/researches/requests/${requestId}/${cohortId}`
+        })
+      }
     }
   }
 
   if (location.pathname.includes('/cohorts')) {
-    items.push({ label: 'Toutes mes cohortes', url: '/researches/requests' })
-    // TODO: a adapter
+    items.push({ label: 'Toutes mes cohortes', url: `/researches/cohorts?${cleanedSearchParams}` })
+
+    if (cohortId && cohort) {
+      items.push({
+        label: `${cohort?.name}`,
+        url: `/researches/cohorts/${cohortId}`
+      })
+    }
   }
+
+  if (location.pathname.includes('/samples')) {
+    items.push({ label: 'Tous mes échantillons', url: `/researches/samples?${cleanedSearchParams}` })
+  }
+
   return items
 }
 

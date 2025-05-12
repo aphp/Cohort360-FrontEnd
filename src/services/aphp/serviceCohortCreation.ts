@@ -3,7 +3,19 @@ import apiBack from '../apiBackend'
 import { Cohort, CohortCount, DatedMeasure, FetchRequest, QuerySnapshotInfo, RequestType, Snapshot } from 'types'
 import { getConfig } from 'config'
 
+export type CreateSampleProps = {
+  parentCohort: string
+  cohortName: string
+  cohortDescription: string
+  samplingRatio: number
+}
+
 export interface IServiceCohortCreation {
+  /**
+   * Cette fonction permet de créer un échantillon à partir d'une cohorte
+   */
+  createSample: (sampleData: CreateSampleProps) => Promise<void>
+
   /**
    * Cette fonction permet de créer une cohorte à partir d'une requete dans le requeteur
    */
@@ -43,6 +55,24 @@ export interface IServiceCohortCreation {
 }
 
 const servicesCohortCreation: IServiceCohortCreation = {
+  createSample: async (args) => {
+    try {
+      const { parentCohort, cohortName, cohortDescription, samplingRatio } = args
+      const createSample = await apiBack.post<Cohort>('/cohort/cohorts/', {
+        name: cohortName,
+        description: cohortDescription,
+        parent_cohort: parentCohort,
+        sampling_ratio: samplingRatio
+      })
+
+      if (createSample.status !== 201) {
+        throw new Error("Erreur lors de la création de l'échantillon")
+      }
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  },
   createCohort: async (
     requeteurJson,
     datedMeasureId,

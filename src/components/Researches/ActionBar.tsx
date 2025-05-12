@@ -14,7 +14,7 @@ import { FilterKeys, FilterValue } from 'types/searchCriterias'
 type ActionBarProps = {
   loading: boolean
   total: number
-  label: string
+  label: 'requête' | 'cohorte' | 'échantillon'
   totalSelected: number
   onDelete: () => void
   onMove?: () => void
@@ -22,6 +22,7 @@ type ActionBarProps = {
   filters?: { value: FilterValue; category: FilterKeys; label: string }[]
   onRemoveFilters?: (key: FilterKeys, value: FilterValue) => void
   onAddRequest?: () => void
+  onAddSample?: () => void
   disabled?: boolean
 }
 
@@ -36,6 +37,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
   filters,
   onRemoveFilters,
   onAddRequest,
+  onAddSample,
   disabled = false
 }) => {
   return (
@@ -44,7 +46,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
         {totalSelected > 0 && (
           <Typography fontWeight={'bold'} fontSize={13}>
             {totalSelected} {label}
-            {totalSelected > 1 ? 's' : ''} sélectionnée
+            {totalSelected > 1 ? 's' : ''} sélectionné{label !== 'échantillon' && 'e'}
             {totalSelected > 1 ? 's' : ''} /
           </Typography>
         )}
@@ -59,13 +61,18 @@ const ActionBar: React.FC<ActionBarProps> = ({
       </Box>
       <Box display="flex" gap={1}>
         {onFilter && (
-          <Button endIcon={<FilterList />} width={'fit-content'} onClick={onFilter} disabled={disabled} small>
+          <Button endIcon={<FilterList />} width={'fit-content'} onClick={onFilter} small>
             Filtrer
           </Button>
         )}
         {onAddRequest && (
           <Button width="fit-content" onClick={() => onAddRequest()} endIcon={<AddIcon />} disabled={disabled} small>
             Nouvelle requête
+          </Button>
+        )}
+        {onAddSample && (
+          <Button width="fit-content" onClick={() => onAddSample()} endIcon={<AddIcon />} disabled={disabled} small>
+            Nouvel échantillon
           </Button>
         )}
         {totalSelected > 0 && (

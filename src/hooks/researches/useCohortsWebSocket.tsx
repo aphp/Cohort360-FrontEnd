@@ -30,7 +30,8 @@ const useCohortsWebSocket = () => {
               measure_max: message.extra_info?.global?.measure_max,
               request_job_status: message.status,
               group_id: message.extra_info?.group_id,
-              rights: newRights.find((right) => right.cohort_id == cohort.group_id)?.rights
+              rights: newRights.find((right) => right.cohort_id == cohort.group_id)?.rights,
+              result_size: message.extra_info?.result_size
             }
           : cohort
       )

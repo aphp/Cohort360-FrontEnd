@@ -33,6 +33,9 @@ type FetchCohortsListProps = {
   limit?: number
   offset?: number
   signal?: AbortSignal
+  isSample?: boolean
+  parentCohort?: string
+  parentRequest?: string
 }
 
 const optionsReducer = (accumulator: string, currentValue: string) =>
@@ -192,6 +195,8 @@ export interface IServiceProjects {
     results: Cohort[]
   }>
 
+  fetchCohort: (cohort_id: string, signal?: AbortSignal) => Promise<Cohort>
+
   /**
    * Cette fonction ajoute une nouvelle cohorte
    *
@@ -239,6 +244,15 @@ const servicesProjects: IServiceProjects = {
       return (await apiBack.get(`/cohort/requests/${requestId}/`, { signal })).data
     } catch (error) {
       console.error(error)
+    }
+  },
+  fetchCohort: async (cohortId, signal) => {
+    try {
+      const cohortResponse: Cohort = (await apiBack.get(`/cohort/cohorts/${cohortId}/`, { signal })).data
+      return (await servicesCohorts.fetchCohortsRights([cohortResponse]))[0]
+    } catch (error) {
+      console.error(error)
+      return {}
     }
   },
   fetchProjectsList: async (args) => {
@@ -440,11 +454,11 @@ const servicesProjects: IServiceProjects = {
 
   fetchCohortsList: async (args) => {
     try {
-      const { filters, searchInput, orderBy, limit, offset, signal } = args
+      const { filters, searchInput, orderBy, limit, offset, signal, isSample, parentCohort, parentRequest } = args
       const _sortDirection = orderBy.orderDirection === Direction.DESC ? '-' : ''
 
-      let options: string[] = []
-      const { status, favorite, minPatients, maxPatients, startDate, endDate, parentId } = filters
+      let options: string[] = [`is_sample=${isSample}`]
+      const { status, favorite, minPatients, maxPatients, startDate, endDate } = filters
       const _status =
         status?.map((stat) =>
           stat.code === JobStatus.PENDING
@@ -461,7 +475,8 @@ const servicesProjects: IServiceProjects = {
       if (maxPatients) options = [...options, `max_result_size=${maxPatients}`]
       if (startDate) options = [...options, `min_created_at=${startDate}`]
       if (endDate) options = [...options, `max_created_at=${endDate}`]
-      if (parentId) options = [...options, `request_id=${parentId}`]
+      if (parentRequest) options = [...options, `request_id=${parentRequest}`]
+      if (parentCohort) options = [...options, `parent_cohort=${parentCohort}`]
       if (favorite?.length === 1)
         options = [...options, `favorite=${favorite[0] === CohortsType.FAVORITE ? 'true' : 'false'}`]
 

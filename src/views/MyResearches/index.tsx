@@ -33,7 +33,7 @@ const MyResearches = () => {
 
   const [localSearchInput, setLocalSearchInput] = useState(searchInput)
 
-  const { projectsCount, requestsCount, cohortsCount /*, samplesCount*/ } = useCounts(
+  const { projectsCount, requestsCount, cohortsCount, samplesCount } = useCounts(
     searchInput,
     startDateParam,
     endDateParam
@@ -95,16 +95,16 @@ const MyResearches = () => {
           {(searchInput || startDateParam || endDateParam) && <Badge total={cohortsCount} />}
         </Box>
       )
+    },
+    {
+      id: 'samples',
+      label: (
+        <Box display="flex" alignItems="flex-start" gap={1}>
+          Échantillons
+          {(searchInput || startDateParam || endDateParam) && <Badge total={samplesCount} />}
+        </Box>
+      )
     }
-    // {
-    //   id: 'samples',
-    //   label: (
-    //     <Box display="flex" alignItems="flex-start" gap={1}>
-    //       Échantillons
-    //       {(searchInput || startDateParam || endDateParam) && <Badge total={samplesCount} />}
-    //     </Box>
-    //   )
-    // }
   ]
 
   const pathSections = location.pathname.split('/')

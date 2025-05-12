@@ -329,6 +329,7 @@ const servicesCohorts: IServiceCohorts = {
       const encountersResp = fetchCohortsResults[2]
 
       let name = ''
+      let isSample = false
       let description = ''
       let requestId = ''
       let snapshotId = ''
@@ -337,6 +338,7 @@ const servicesCohorts: IServiceCohorts = {
 
       if (cohortInfo.data.results && cohortInfo.data.results.length >= 1) {
         name = cohortInfo.data.results[0].name ?? ''
+        isSample = cohortInfo.data.results[0].parent_cohort !== null
         description = cohortInfo.data.results[0].description ?? ''
         requestId = cohortInfo.data.results[0].request?.uuid ?? ''
         snapshotId = cohortInfo.data.results[0].request_query_snapshot ?? ''
@@ -384,7 +386,8 @@ const servicesCohorts: IServiceCohorts = {
         requestId,
         snapshotId,
         favorite,
-        uuid
+        uuid,
+        isSample
       }
     } catch (error) {
       return {
@@ -400,7 +403,8 @@ const servicesCohorts: IServiceCohorts = {
         requestId: '',
         snapshotId: '',
         favorite: false,
-        uuid: ''
+        uuid: '',
+        isSample: false
       }
     }
   },
