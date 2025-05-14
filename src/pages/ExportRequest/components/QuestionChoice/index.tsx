@@ -16,7 +16,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  // Chip,
   Stack
 } from '@mui/material'
 import { SelectChangeEvent } from '@mui/material/Select'
@@ -60,7 +59,7 @@ export interface QuestionLeaf {
 interface QuestionSelectorDialogProps {
   open: boolean
   onClose: () => void
-  selectedQuestions: QuestionLeaf[]
+  selectedQuestions: QuestionLeaf[] // questions déjà sélectionnées venant du parent
   onConfirm: (selected: QuestionLeaf[]) => void
 }
 
@@ -97,6 +96,34 @@ function collectLeaves(
     if (hasChildren) collectLeaves(item.item, newParents, collector)
   })
   return collector
+}
+
+/**
+ * Construit la Map questionnaireId -> Set<linkId> à partir de la prop selectedQuestions
+ * et du bundle FHIR reçu. Permet de pré‑cocher les questions déjà sélectionnées.
+ *
+ * @param bundle   Bundle FHIR
+ * @param selected Tableau de feuilles sélectionnées en entrée
+ */
+function buildInitialChecked(bundle: Bundle, selected: QuestionLeaf[]): Map<string, Set<string>> {
+  // NEW
+  const map = new Map<string, Set<string>>()
+
+  // Index rapide : linkId -> questionnaireId
+  const linkToQId = new Map<string, string>()
+  bundle.entry.forEach((e) => {
+    collectLeaves(e.resource.item).forEach((leaf) => linkToQId.set(leaf.linkId, e.resource.id))
+  })
+
+  selected.forEach(({ linkId }) => {
+    const qId = linkToQId.get(linkId)
+    if (!qId) return // linkId absent du bundle (obsolète ?)
+    const set = map.get(qId) ?? new Set<string>()
+    set.add(linkId)
+    map.set(qId, set)
+  })
+
+  return map
 }
 
 const QuestionRow = memo(
@@ -138,12 +165,15 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
     entry: []
   })
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState<string>('')
+
+  // NEW ─ Map questionnaireId -> Set<linkId>
   const [checkedByQuestionnaire, setCheckedByQuestionnaire] = useState<Map<string, Set<string>>>(new Map())
+
   const [inputQuery, setInputQuery] = useState('')
   const deferredQuery = useDeferredValue(inputQuery)
 
-  const handleQuestionnaireChange = (event: SelectChangeEvent) => {
-    const value = event.target.value
+  const handleQuestionnaireChange = (event: SelectChangeEvent<string>) => {
+    const value = event.target.value as string
     setSelectedQuestionnaireId(value)
     setInputQuery('')
   }
@@ -180,7 +210,6 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
   }, [questionnaires, selectedQuestionnaireId])
 
   // Current checked set helper
-  // Memoize current checklist to avoid new Set creation on each render
   const currentChecked = useMemo<Set<string>>(
     () => checkedByQuestionnaire.get(selectedQuestionnaireId) ?? new Set<string>(),
     [checkedByQuestionnaire, selectedQuestionnaireId]
@@ -209,17 +238,45 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
     return all
   }, [checkedByQuestionnaire, questionnaires])
 
-  console.log('manelle allSelectedLeaves', allSelectedLeaves)
-  console.log('manelle filteredLeaves', filteredLeaves)
+  // eslint-disable-next-line no-console
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('selected leaves', allSelectedLeaves)
+  }
 
   const fetch = useCallback(async () => {
-    const response = await apiFhir.get('/Questionnaire?status=active')
-    setBundle(response.data)
+    try {
+      const response = await apiFhir.get<Bundle>('/Questionnaire')
+      setBundle(response.data)
+    } catch (e) {
+      // TODO: afficher une notification d'erreur
+      // eslint-disable-next-line no-console
+      console.error(e)
+    }
   }, [])
 
+  // Récupération du bundle au montage
   useEffect(() => {
     fetch()
   }, [fetch])
+
+  /**
+   * Synchronise l'état local avec :
+   *   1. le bundle fraîchement chargé
+   *   2. les questions déjà sélectionnées (prop selectedQuestions)
+   */
+  useEffect(() => {
+    if (bundle.entry.length === 0) return // bundle pas encore chargé
+
+    setCheckedByQuestionnaire(buildInitialChecked(bundle, selectedQuestions)) // NEW
+
+    // NEW – pré‑sélectionne l'onglet du premier questionnaire contenant une question cochée
+    if (!selectedQuestionnaireId && selectedQuestions.length > 0) {
+      const first = selectedQuestions[0]
+      const qId = bundle.entry.find((e) => collectLeaves(e.resource.item).some((l) => l.linkId === first.linkId))
+        ?.resource.id
+      if (qId) setSelectedQuestionnaireId(qId)
+    }
+  }, [bundle, selectedQuestions, selectedQuestionnaireId]) // NEW dépendances
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth>
@@ -267,8 +324,6 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
                 key={l.linkId}
                 label={l.text || l.linkId}
                 onDelete={() => handleRemove(l.linkId)}
-                // variant="outlined"
-
                 style={{ backgroundColor: '#f7f7f7' }}
               />
             ))}
