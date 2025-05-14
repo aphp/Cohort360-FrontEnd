@@ -1,3 +1,4 @@
+import { Tooltip } from '@mui/material'
 import React from 'react'
 
 const displayCount = (criteriaCount: number) => {
@@ -13,32 +14,62 @@ const displayCount = (criteriaCount: number) => {
   return `~${Math.round(criteriaCount / 1000000000000)}T` // Trillions
 }
 
+export type CriteriaCountType = {
+  display: string
+  value?: number
+}
+
 export const getStageDetails = (
   itemId: number,
   idRemap: Record<number, number>,
   stageDetails?: Record<string, string>
-) => {
+): CriteriaCountType | undefined => {
   const id = idRemap[itemId] || itemId
   const countDetail = stageDetails?.[`criteria_count_${id}`]
   const ratioDetail = stageDetails?.[`criteria_ratio_${id}`]
   if (countDetail !== undefined) {
     const criteriaCountValue = parseFloat(countDetail)
-    return displayCount(criteriaCountValue)
+    return { display: displayCount(criteriaCountValue), value: criteriaCountValue }
   }
   if (ratioDetail !== undefined) {
     const criteriaCountValue = parseFloat(ratioDetail)
-    return `${(criteriaCountValue * 100).toFixed(0)}%`
+    return { display: `${(criteriaCountValue * 100).toFixed(0)}%` }
   }
   return undefined
 }
 
 type CriteriaCountProps = {
-  criteriaCount?: string
+  criteriaCount?: CriteriaCountType
   extraLeftMargin?: number
 }
 
 const CriteriaCount = ({ criteriaCount, extraLeftMargin = 0 }: CriteriaCountProps) => {
   if (criteriaCount) {
+    const displayCount = () => {
+      if (criteriaCount?.value) {
+        return (
+          <Tooltip
+            placement="left"
+            title={criteriaCount.value.toString()}
+            slotProps={{
+              popper: {
+                modifiers: [
+                  {
+                    name: 'offset',
+                    options: {
+                      offset: [0, -8]
+                    }
+                  }
+                ]
+              }
+            }}
+          >
+            <div>{criteriaCount.display}</div>
+          </Tooltip>
+        )
+      }
+      return <div>{criteriaCount.display}</div>
+    }
     try {
       return (
         <div
@@ -54,7 +85,7 @@ const CriteriaCount = ({ criteriaCount, extraLeftMargin = 0 }: CriteriaCountProp
             zIndex: 1
           }}
         >
-          {criteriaCount}
+          {displayCount()}
         </div>
       )
     } catch (e) {
