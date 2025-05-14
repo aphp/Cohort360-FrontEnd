@@ -43,7 +43,7 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBo
     ? patient.mainDiagnosis === 'loading'
       ? 'loading'
       : getLastDiagnosisLabels(patient.mainDiagnosis)
-    : 'Pas de diagnostic principal'
+    : '-'
 
   const lastEncounter =
     patient.lastEncounter && lastEncounterStart

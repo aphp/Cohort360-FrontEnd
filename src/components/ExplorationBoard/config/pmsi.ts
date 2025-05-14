@@ -5,14 +5,7 @@ import { getPmsiCodes, getPmsiDate } from 'mappers/pmsi'
 import { fetchClaimList, fetchConditionList, fetchProcedureList } from 'services/aphp/servicePmsi'
 import { PatientState } from 'state/patient'
 import { CohortPMSI } from 'types'
-import {
-  AdditionalInfo,
-  Data,
-  DISPLAY_OPTIONS,
-  ExplorationConfig,
-  ExplorationResults,
-  FetchOptions
-} from 'types/exploration'
+import { AdditionalInfo, Data, DISPLAY_OPTIONS, ExplorationConfig, ExplorationResults } from 'types/exploration'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { SourceType } from 'types/scope'
 import { Direction, Order, PMSIFilters, SearchCriterias } from 'types/searchCriterias'
@@ -21,7 +14,6 @@ import { FhirItem, Reference } from 'types/valueSet'
 import { fetchValueSet, narrowSearchCriterias, resolveAdditionalInfos } from 'utils/exploration'
 import { getCategory } from 'utils/fhir'
 import { getValueSetsFromSystems } from 'utils/valueSets'
-import { P } from 'vitest/dist/chunks/environment.d.Dmw5ulng'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
@@ -35,6 +27,7 @@ const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<Add
         : Promise.resolve(undefined)
   }
   const resolved = await resolveAdditionalInfos(fetchersMap)
+  console.log('test resolved', resolved)
   return { ...additionalInfo, ...resolved }
 }
 
@@ -107,13 +100,13 @@ const mapToTable = (
       },
       {
         id: `${elem.id}-code`,
-        value: codes.code || 'Non renseigné',
+        value: codes.code ?? 'Non renseigné',
         type: CellType.TEXT,
         sx: { fontWeight: 900 }
       },
       {
         id: `${elem.id}-display`,
-        value: codes.display || 'Non renseigné',
+        value: codes.display ?? 'Non renseigné',
         type: CellType.TEXT,
         sx: { fontWeight: 900 }
       },
@@ -158,8 +151,8 @@ export const conditionConfig = (
   getMessages,
   narrowSearchCriterias: (searchCriterias) =>
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, [], ['searchBy']),
-  fetchAdditionalInfos: (infos) => {
-    const _infos = fetchAdditionalInfos(infos)
+  fetchAdditionalInfos: async (infos) => {
+    const _infos = await fetchAdditionalInfos(infos)
     const references: Reference[] = getValueSetsFromSystems([
       getConfig().features.condition.valueSets.conditionHierarchy.url
     ])
@@ -189,8 +182,8 @@ export const procedureConfig = (
   getMessages,
   narrowSearchCriterias: (searchCriterias) =>
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, ['diagnosticTypes'], ['searchBy']),
-  fetchAdditionalInfos: (infos) => {
-    const _infos = fetchAdditionalInfos(infos)
+  fetchAdditionalInfos: async (infos) => {
+    const _infos = await fetchAdditionalInfos(infos)
     const references: Reference[] = getValueSetsFromSystems([
       getConfig().features.procedure.valueSets.procedureHierarchy.url
     ])
@@ -219,8 +212,8 @@ export const claimConfig = (
   mapToTable: (data) => mapToTable(data, deidentified, !!patient, groupId, ResourceType.CLAIM),
   narrowSearchCriterias: (searchCriterias) =>
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, ['diagnosticTypes', 'source'], ['searchBy']),
-  fetchAdditionalInfos: (infos) => {
-    const _infos = fetchAdditionalInfos(infos)
+  fetchAdditionalInfos: async (infos) => {
+    const _infos = await fetchAdditionalInfos(infos)
     const references: Reference[] = getValueSetsFromSystems([getConfig().features.claim.valueSets.claimHierarchy.url])
     const sourceType = SourceType.GHM
     return { ..._infos, references, sourceType }

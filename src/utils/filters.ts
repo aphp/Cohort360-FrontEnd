@@ -60,6 +60,7 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
       case FilterKeys.FORM_NAME:
       case FilterKeys.ENCOUNTER_STATUS:
       case FilterKeys.FAVORITE:
+      case FilterKeys.SOURCE:
         castedFilters[key] = removeElementInArray(castedFilters[key], value)
         break
       case FilterKeys.NDA:
