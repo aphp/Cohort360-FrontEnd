@@ -15,11 +15,7 @@ import { PMSILabel } from 'types/patient'
 import { URLS } from 'types/exploration'
 import { MainTabsWrapper } from 'components/ui/Tabs/style'
 import sideBarTransition from 'styles/sideBarTransition'
-import {
-  buildExplorationConfig,
-  ExplorationConfigFor,
-  ExplorationResourceType
-} from 'components/ExplorationBoard/config/config'
+import { buildExplorationConfig, ExplorationResourceType } from 'components/ExplorationBoard/config/config'
 
 type DashboardProps = {
   context: URLS

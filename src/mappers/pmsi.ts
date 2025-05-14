@@ -4,12 +4,16 @@ import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 
 export const getLastDiagnosisLabels = (mainDiagnosisList: Condition[]) => {
   const mainDiagnosisLabels = mainDiagnosisList.map((diagnosis) => diagnosis.code?.coding?.[0].display)
-  const lastThreeDiagnosisLabels = mainDiagnosisLabels
-    .filter((diagnosis, index) => mainDiagnosisLabels.indexOf(diagnosis) === index)
-    .slice(0, 3)
-    .join(' - ')
+  if (mainDiagnosisLabels.length > 0) {
+    const lastThreeDiagnosisLabels = mainDiagnosisLabels
+      .filter((diagnosis, index) => mainDiagnosisLabels.indexOf(diagnosis) === index)
+      .slice(0, 3)
+      .join(' - ')
 
-  return lastThreeDiagnosisLabels
+    return lastThreeDiagnosisLabels
+  } else {
+    return '-'
+  }
 }
 
 export const getPmsiDate = (tabId: PMSIResourceTypes, pmsiItem: CohortPMSI) => {

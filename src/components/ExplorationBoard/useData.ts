@@ -3,8 +3,7 @@ import { useEffect, useState } from 'react'
 import { LoadingStatus } from 'types'
 import { CountDisplay, Data, Diagram, ExplorationConfig, Timeline } from 'types/exploration'
 import { Card } from 'types/card'
-import { ResourceType } from 'types/requestCriterias'
-import { Filters, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
+import { Filters, SearchCriterias } from 'types/searchCriterias'
 import { Table } from 'types/table'
 
 const RESULTS_PER_PAGE = 20

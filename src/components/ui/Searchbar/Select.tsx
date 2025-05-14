@@ -27,7 +27,7 @@ const Select = <T,>({ value, label, options, disabled, radius, onChange }: Selec
             sx={{ color: '#303030' }}
           >
             {options.map((option) => (
-              <MenuItem key={option.id as string} value={option.id as string} sx={{ color: '#303030' }}>
+              <MenuItem key={option.id} value={option.id} sx={{ color: '#303030' }}>
                 {option.label}
               </MenuItem>
             ))}

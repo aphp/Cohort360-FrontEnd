@@ -35,13 +35,16 @@ const TableHead = ({ columns, orderBy, sx, onSort }: RowProps) => {
             key={col.label}
             align={col.align ?? 'left'}
           >
-            {col.label}
-            {orderBy && col.code && (
+            {orderBy && col.code ? (
               <TableSortLabel
                 active={orderBy.orderBy === col.code}
                 direction={orderBy.orderBy === col.code ? orderBy?.orderDirection : Direction.ASC}
                 onClick={() => handleChangeSort(col.code as Order)}
-              />
+              >
+                {col.label}
+              </TableSortLabel>
+            ) : (
+              col.label
             )}
           </TableCell>
         ))}

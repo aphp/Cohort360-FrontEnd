@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { Grid, Tabs, Tab, CircularProgress } from '@mui/material'
+import { Grid, Tab, CircularProgress } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import PatientNotExist from 'components/ErrorView/PatientNotExist'
 import PatientHeader from 'components/Patient/PatientHeader/PatientHeader'
@@ -19,6 +19,7 @@ import sideBarTransition from 'styles/sideBarTransition'
 import { MainTabsWrapper } from 'components/ui/Tabs/style'
 import { SidebarButton, SidebarWrapper } from 'components/ui/Sidebar/style'
 import { buildExplorationConfig, ExplorationResourceType } from 'components/ExplorationBoard/config/config'
+import SubtabsDisplay from './SubtabsDisplay'
 
 const SIDEBAR_OPTONS = {
   myFilters: false,
@@ -95,7 +96,9 @@ const Patient = () => {
         {
           label: 'Formulaires',
           value: ResourceType.QUESTIONNAIRE_RESPONSE,
-          show: config.features.questionnaires.enabled && !!!deidentified
+          show: config.features.questionnaires.enabled && !deidentified,
+          subs: [{ label: 'Maternité', value: ResourceType.QUESTIONNAIRE_RESPONSE, useSelect: true }],
+          useSelect: true
         }
       ].filter((tab) => tab.show),
     [config, deidentified]
@@ -157,21 +160,14 @@ const Patient = () => {
         </Grid>
         <Grid container sm={11}>
           {subTabs && (
-            <Tabs value={selectedSubTab} onChange={(_, newSubTab) => setSelectedSubTab(newSubTab)}>
-              {subTabs.map((subTab) => {
-                const groupIdParam = groupId ? `groupId=${groupId}` : ''
-                return (
-                  <Tab
-                    sx={{ fontSize: 12 }}
-                    key={subTab.value}
-                    label={subTab.label}
-                    value={subTab.value}
-                    component={Link}
-                    to={`/patients/${patientId}/${selectedTab}?${groupIdParam}&subtab=${subTab.value}`}
-                  />
-                )
-              })}
-            </Tabs>
+            <SubtabsDisplay
+              subTabs={subTabs}
+              selectedSubTab={selectedSubTab as ResourceType}
+              onChange={setSelectedSubTab}
+              asSelect={availableTabs.find((tab) => tab.value === selectedTab)?.useSelect}
+              baseUrl={`/patients/${patientId}/${selectedTab}`}
+              groupId={groupId}
+            />
           )}
           {selectedTab === ResourceType.PREVIEW && (
             <PatientPreview patient={patient?.patientInfo} deidentifiedBoolean={deidentified} />
