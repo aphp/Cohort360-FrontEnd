@@ -19,11 +19,11 @@ import { SelectedCriteriaType } from 'types/requestCriterias'
 import theme from 'theme'
 import criteriaList, { getAllCriteriaItems } from 'components/CreationCohort/DataList_Criteria'
 import { criteriasAsArray } from '../LogicalOperator/components/CriteriaRightPanel/CriteriaForm/mappers'
-import CriteriaCount from '../CriteriaCount'
+import CriteriaCount, { CriteriaCountType } from '../CriteriaCount'
 
 type CriteriaCardProps = {
   criterion: SelectedCriteriaType
-  criteriaCount?: string
+  criteriaCount?: CriteriaCountType
   duplicateCriteria: (criteriaId: number) => void
   deleteCriteria: (criteriaId: number) => void
   editCriteria: (criteria: SelectedCriteriaType) => void
