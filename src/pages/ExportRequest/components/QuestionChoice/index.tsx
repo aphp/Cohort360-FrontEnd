@@ -60,6 +60,7 @@ export interface QuestionLeaf {
 interface QuestionSelectorDialogProps {
   open: boolean
   onClose: () => void
+  selectedQuestions: QuestionLeaf[]
   onConfirm: (selected: QuestionLeaf[]) => void
 }
 
@@ -127,34 +128,50 @@ const QuestionRow = memo(
   (prev, next) => prev.isChecked === next.isChecked && prev.question === next.question
 )
 
-const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({ open, onClose, onConfirm }) => {
+const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
+  open,
+  onClose,
+  selectedQuestions,
+  onConfirm
+}) => {
   const [bundle, setBundle] = useState<Bundle>({
     entry: []
   })
-  const fetch = useCallback(async () => {
-    const response = await apiFhir.get('/Questionnaire?status=active')
-    setBundle(response.data)
-  }, [])
-
-  useEffect(() => {
-    fetch()
-  }, [fetch])
-
-  // Extract questionnaires once
-  const questionnaires = useMemo(() => bundle.entry.map((e) => e.resource), [bundle])
-
-  // Selections per questionnaire id
+  const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState<string>('')
   const [checkedByQuestionnaire, setCheckedByQuestionnaire] = useState<Map<string, Set<string>>>(new Map())
-
-  const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState<string>(questionnaires[0]?.id ?? '')
   const [inputQuery, setInputQuery] = useState('')
   const deferredQuery = useDeferredValue(inputQuery)
 
   const handleQuestionnaireChange = (event: SelectChangeEvent) => {
-    const value = event.target.value as string
+    const value = event.target.value
     setSelectedQuestionnaireId(value)
     setInputQuery('')
   }
+
+  const toggle = (linkId: string) => {
+    setCheckedByQuestionnaire((prev) => {
+      const map = new Map(prev)
+      const set = new Set(map.get(selectedQuestionnaireId) ?? [])
+      set.has(linkId) ? set.delete(linkId) : set.add(linkId)
+      map.set(selectedQuestionnaireId, set)
+      return map
+    })
+  }
+
+  const handleRemove = (linkId: string) => {
+    setCheckedByQuestionnaire((prev) => {
+      const map = new Map(prev)
+      map.forEach((set) => set.delete(linkId))
+      return map
+    })
+  }
+
+  const handleConfirm = () => {
+    onConfirm(allSelectedLeaves)
+    onClose()
+  }
+
+  const questionnaires = useMemo(() => bundle.entry.map((e) => e.resource), [bundle])
 
   // Leaves for current questionnaire
   const leaves = useMemo(() => {
@@ -182,24 +199,6 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({ open, o
     })
   }, [leaves, deferredQuery])
 
-  const toggle = (linkId: string) => {
-    setCheckedByQuestionnaire((prev) => {
-      const map = new Map(prev)
-      const set = new Set(map.get(selectedQuestionnaireId) ?? [])
-      set.has(linkId) ? set.delete(linkId) : set.add(linkId)
-      map.set(selectedQuestionnaireId, set)
-      return map
-    })
-  }
-
-  const handleRemove = (linkId: string) => {
-    setCheckedByQuestionnaire((prev) => {
-      const map = new Map(prev)
-      map.forEach((set) => set.delete(linkId))
-      return map
-    })
-  }
-
   const allSelectedLeaves = useMemo(() => {
     const all: QuestionLeaf[] = []
     questionnaires.forEach((q) => {
@@ -210,10 +209,17 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({ open, o
     return all
   }, [checkedByQuestionnaire, questionnaires])
 
-  const handleConfirm = () => {
-    console.log('manelle allSelectedLeaves', allSelectedLeaves)
-    // onConfirm(allSelectedLeaves)
-  }
+  console.log('manelle allSelectedLeaves', allSelectedLeaves)
+  console.log('manelle filteredLeaves', filteredLeaves)
+
+  const fetch = useCallback(async () => {
+    const response = await apiFhir.get('/Questionnaire?status=active')
+    setBundle(response.data)
+  }, [])
+
+  useEffect(() => {
+    fetch()
+  }, [fetch])
 
   return (
     <Dialog open={open} maxWidth="md" fullWidth>

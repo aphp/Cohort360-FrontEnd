@@ -9,9 +9,12 @@ import {
   CircularProgress,
   Alert,
   ListItemText,
-  Button
+  Button,
+  InputLabel,
+  Stack
 } from '@mui/material'
 
+import Chip from 'components/ui/Chip'
 import useStyles from '../../styles'
 import { getResourceType, getExportTableLabel, fetchResourceCount2 } from 'components/Dashboard/ExportModal/exportUtils'
 import { ResourceType } from 'types/requestCriterias'
@@ -74,7 +77,11 @@ const ExportTable: React.FC<ExportTableProps> = ({
   const appConfig = useContext(AppConfig)
   const limit = appConfig.features.export.exportLinesLimit
   const [isQuestionChoiceOpen, setIsQuestionChoiceOpen] = useState(false)
-  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([])
+  const [selectedQuestions, setSelectedQuestions] = useState<any[]>([])
+
+  const onTest = (arg: any[]) => {
+    setSelectedQuestions(arg)
+  }
 
   const getFilterList = useCallback(async () => {
     try {
@@ -159,6 +166,12 @@ const ExportTable: React.FC<ExportTableProps> = ({
     setIsQuestionChoiceOpen(!isOpen)
   }
 
+  const handleDeleteSelectedQuestions = (newSelectedQuestions: any[]) => {
+    setSelectedQuestions(newSelectedQuestions)
+  }
+
+  console.log('manelle selectedQuestions', selectedQuestions)
+
   return (
     <Grid container className={classes.exportTableGrid} id={tableSetting?.tableName}>
       <Grid item container alignItems="center">
@@ -237,18 +250,38 @@ const ExportTable: React.FC<ExportTableProps> = ({
       )}
       <Grid container justifyContent={'space-between'}>
         {exportTable.name === ResourceType.QUESTIONNAIRE_RESPONSE && checkedPivotMerge && (
-          <Grid container xs={6} alignItems={'center'} id={tableSetting?.tableName + 'questionChoice'}>
-            <Typography marginRight={'5px'} className={classes.textBody2}>
-              Sélectionner les questions à exporter :
-            </Typography>
-            <Button onClick={() => setIsQuestionChoiceOpen(!isQuestionChoiceOpen)}>Choix des questions</Button>
-            <QuestionForm
-              open={isQuestionChoiceOpen}
-              onClose={() => handleQuestionChoiceOpen(isQuestionChoiceOpen)}
-              onConfirm={() => {
-                return
-              }}
-            />
+          <Grid container alignItems={'center'} id={tableSetting?.tableName + 'questionChoice'}>
+            <Grid item xs={3}>
+              <Button variant="contained" onClick={() => setIsQuestionChoiceOpen(!isQuestionChoiceOpen)}>
+                {selectedQuestions.length > 0 ? `Modifier` : `Sélectionner`} les questions à exporter :
+              </Button>
+              <QuestionForm
+                open={isQuestionChoiceOpen}
+                onClose={() => handleQuestionChoiceOpen(isQuestionChoiceOpen)}
+                selectedQuestions={selectedQuestions}
+                onConfirm={onTest}
+              />
+            </Grid>
+            <Grid item xs={9}>
+              <InputLabel id="questionnaire-select-label">
+                {selectedQuestions.length > 0 && (
+                  <Stack direction="row" spacing={1} sx={{ mt: 2, flexWrap: 'wrap' }}>
+                    {selectedQuestions.map((l) => (
+                      <Chip
+                        key={l.linkId}
+                        label={l.text ?? l.linkId}
+                        onDelete={() => {
+                          const newSelectedQuestions = selectedQuestions.filter((q) => q.linkId !== l.linkId)
+                          handleDeleteSelectedQuestions(newSelectedQuestions)
+                          setSelectedQuestions(newSelectedQuestions)
+                        }}
+                        style={{ backgroundColor: '#f7f7f7' }}
+                      />
+                    ))}
+                  </Stack>
+                )}
+              </InputLabel>
+            </Grid>
           </Grid>
         )}
         {checkedPivotMerge === false && (
