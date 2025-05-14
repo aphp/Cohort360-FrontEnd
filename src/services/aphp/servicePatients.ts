@@ -48,7 +48,7 @@ import { Direction, FormNames, Filters, Order, SearchByTypes, SearchCriterias } 
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
 import { mapSearchCriteriasToRequestParams } from 'mappers/filters'
 import { getExtension } from 'utils/fhir'
-import { isFilterIdentifying } from '../../utils/fhirFilterParser'
+import { isIdentifyingFilter } from 'utils/fhirFilterParser'
 
 export interface IServicePatients {
   /*
@@ -903,10 +903,10 @@ export const postFiltersService = async (
   const criteriasString = mapSearchCriteriasToRequestParams(criterias, fhir_resource, deidentified)
   let identifying = false
 
+  // in pseudo mode, users do not get to interact with identifying fields, so not possible to save
+  // an identifying filter. Only check in case of nomi mode
   if (!deidentified) {
-    // in pseudo mode, users do not get to interact with identifying fields, so not possible to save
-    // an identifying filter
-    identifying = isFilterIdentifying(criteriasString)
+    identifying = isIdentifyingFilter(criteriasString)
   }
 
   const response = await postFilters(fhir_resource, name, criteriasString, identifying)

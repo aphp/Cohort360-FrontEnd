@@ -19,7 +19,7 @@ export type AppConfig = {
     cohort: {
       enabled: boolean
       shortCohortLimit: number
-      identifyingKeys: string[]
+      identifyingFields: string[]
     }
     diagnosticReport: {
       enabled: boolean
@@ -213,7 +213,7 @@ let config: AppConfig = {
     cohort: {
       enabled: true,
       shortCohortLimit: 2000,
-      identifyingKeys: [
+      identifyingFields: [
         'family',
         'given',
         'identifier',
