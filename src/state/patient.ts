@@ -310,7 +310,7 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
         gender: patientInfo.gender,
         identifier: patientInfo.identifier,
         lastEncounter: patientInfo.lastEncounter,
-        mainDiagnosis: patientInfo.mainDiagnosis ?? null,
+        mainDiagnosis: patientInfo.mainDiagnosis ?? [],
         name: patientInfo.name
       }
 

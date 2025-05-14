@@ -35,7 +35,7 @@ import { getAgeRepartitionMapAphp, getGenderRepartitionMapAphp, getGenderReparti
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { Card } from 'types/card'
 import { PatientState } from 'state/patient'
-import { atLeastOneSearchCriteria } from 'utils/filters'
+import { getConfig } from 'config'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo, deidentified?: boolean) => {
   additionalInfo.searchByList = searchByListPatients
@@ -58,11 +58,14 @@ const initSearchCriterias = (search: string): SearchCriterias<PatientsFilters> =
 })
 
 const getPatientInfos = (patient: Patient, deidentified: boolean, groupId: string[]) => {
+  const appConfig = getConfig()
+
   const vitalStatus = {
     label: patient.deceasedBoolean || patient.deceasedDateTime ? VitalStatusLabel.DECEASED : VitalStatusLabel.ALIVE,
     status: patient.deceasedBoolean || patient.deceasedDateTime ? ChipStatus.CANCELLED : ChipStatus.VALID
   }
-  const lastEncounter = patient.extension?.[3]?.valueReference?.display ?? ''
+  const lastEncounter =
+    getExtension(patient, appConfig.core.extensions.patientLastEnconterUrl)?.valueReference?.display ?? 'N/A'
   const surname = deidentified
     ? 'Prénom'
     : patient.name?.[0].given?.[0]
@@ -90,7 +93,7 @@ const getPatientInfos = (patient: Patient, deidentified: boolean, groupId: strin
   }
   const age = {
     age: getAge(patient) ?? 'Non renseigné',
-    birthdate: deidentified ? 'Non renseigné' : moment(patient.birthDate).format('DD/MM/YYYY') ?? 'Non renseigné'
+    birthdate: patient.birthDate ? moment(patient.birthDate).format('DD/MM/YYYY') : 'Non renseigné'
   }
   const gender = patient.gender?.toLocaleUpperCase() ?? ''
   return { vitalStatus, lastEncounter, surname, lastname, ipp, age, gender }

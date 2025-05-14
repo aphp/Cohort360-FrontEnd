@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { CircularProgress, Grid, Typography } from '@mui/material'
 import DataTable from 'components/ui/Table'
 import { Table } from 'types/table'
@@ -63,9 +63,7 @@ const DataSection = ({
                   </Typography>
                 )}
                 {count[1].display && (
-                  <>
-                    <DisplayDigits nb={count[1].count.results} total={count[1].count.total} label={count[1].label} />
-                  </>
+                  <DisplayDigits nb={count[1].count.results} total={count[1].count.total} label={count[1].label} />
                 )}
               </Grid>
             )}
