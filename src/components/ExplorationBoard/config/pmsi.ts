@@ -27,7 +27,6 @@ const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<Add
         : Promise.resolve(undefined)
   }
   const resolved = await resolveAdditionalInfos(fetchersMap)
-  console.log('test resolved', resolved)
   return { ...additionalInfo, ...resolved }
 }
 
