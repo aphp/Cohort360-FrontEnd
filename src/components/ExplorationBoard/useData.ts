@@ -1,15 +1,18 @@
 import { CanceledError } from 'axios'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { LoadingStatus } from 'types'
 import { CountDisplay, Data, Diagram, ExplorationConfig, Timeline } from 'types/exploration'
 import { Card } from 'types/card'
 import { Filters, SearchCriterias } from 'types/searchCriterias'
 import { Table } from 'types/table'
+import { cancelPendingRequest } from 'utils/abortController'
 
 const RESULTS_PER_PAGE = 20
 
 export const useData = <T>(config: ExplorationConfig<T>, searchCriterias: SearchCriterias<Filters>) => {
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.IDDLE)
+  const currentType = useRef(config.type)
+  const abortController = useRef(new AbortController())
   const [data, setData] = useState<Data | null>(null)
   const [tableData, setTableData] = useState<Table>({ rows: [], columns: [] })
   const [diagrams, setDiagrams] = useState<Diagram[]>([])
@@ -17,6 +20,14 @@ export const useData = <T>(config: ExplorationConfig<T>, searchCriterias: Search
   const [cards, setCards] = useState<Card[]>([])
   const [pagination, setPagination] = useState({ currentPage: 0, total: 0 })
   const [count, setCount] = useState<CountDisplay | null>(null)
+
+  const clearData = () => {
+    setData(null)
+    setTableData({ rows: [], columns: [] })
+    setDiagrams([])
+    setTimeline(null)
+    setCards([])
+  }
 
   const fetchData = async (page: number) => {
     try {
@@ -29,9 +40,12 @@ export const useData = <T>(config: ExplorationConfig<T>, searchCriterias: Search
           searchInput: searchCriterias.searchInput ?? '',
           orderBy: searchCriterias.orderBy
         },
-        { filters: searchCriterias.filters as T, searchBy: searchCriterias.searchBy }
+        { filters: searchCriterias.filters as T, searchBy: searchCriterias.searchBy },
+        abortController.current.signal
       )
-      setData(results)
+      if (currentType.current == config.type) {
+        setData(results)
+      }
     } catch (error) {
       if (error instanceof CanceledError) setLoadingStatus(LoadingStatus.FETCHING)
       setLoadingStatus(LoadingStatus.SUCCESS)
@@ -67,10 +81,15 @@ export const useData = <T>(config: ExplorationConfig<T>, searchCriterias: Search
   }, [data])
 
   useEffect(() => {
+    if (currentType.current !== config.type) {
+      clearData()
+      abortController.current = cancelPendingRequest(abortController.current)
+    }
+    currentType.current = config.type
     const fetch = async () => await fetchData(1)
     fetch()
     setPagination({ ...pagination, currentPage: 1 })
-  }, [searchCriterias])
+  }, [searchCriterias, config.type])
 
   const handlePage = async (page: number) => {
     await fetchData(page)

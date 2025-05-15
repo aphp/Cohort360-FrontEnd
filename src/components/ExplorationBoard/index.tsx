@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Alert, Grid, Snackbar } from '@mui/material'
 import SearchSection from './SearchSection'
 import CriteriasSection from './CriteriasSection'
