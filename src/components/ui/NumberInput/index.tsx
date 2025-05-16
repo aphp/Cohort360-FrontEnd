@@ -6,7 +6,7 @@ type NumberInputProps = InputBaseProps & {
   onChange: (newValue: string) => void
 }
 
-export const NumberInput = ({ value, onChange }: NumberInputProps) => {
+export const NumberInput = ({ value, onChange, ...otherInputProps }: NumberInputProps) => {
   const [number, setNumber] = useState(value)
 
   useEffect(() => {
@@ -21,5 +21,5 @@ export const NumberInput = ({ value, onChange }: NumberInputProps) => {
     }
   }
 
-  return <InputBase type="text" value={number} onChange={handleNumberChange} />
+  return <InputBase type="text" value={number} onChange={handleNumberChange} {...otherInputProps} />
 }

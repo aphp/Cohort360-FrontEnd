@@ -30,8 +30,8 @@ export const fetchConditionList = (
     code: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(','),
     source: source,
     type: diagnosticTypes?.map((type) => type.id),
-    'min-recorded-date': (durationRange && durationRange[0]) ?? '',
-    'max-recorded-date': (durationRange && durationRange[1]) ?? '',
+    'min-recorded-date': durationRange?.[0] ?? '',
+    'max-recorded-date': durationRange?.[1] ?? '',
     uniqueFacet: ['subject'],
     subject: patient?.patientInfo?.id,
     ...getPMSIFilters(filters, fetchParams, groupId),
@@ -63,8 +63,8 @@ export const fetchProcedureList = (
   const params = {
     code: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(','),
     source: source,
-    minDate: (durationRange && durationRange[0]) ?? '',
-    maxDate: (durationRange && durationRange[1]) ?? '',
+    minDate: durationRange?.[0] ?? '',
+    maxDate: durationRange?.[1] ?? '',
     uniqueFacet: ['subject'],
     subject: patient?.patientInfo?.id,
     ...getPMSIFilters(filters, fetchParams, groupId),
@@ -95,8 +95,8 @@ export const fetchClaimList = (
   const { code, durationRange } = filters
   const params = {
     diagnosis: code.map((e) => encodeURIComponent(`${e.system}|${e.id}`)).join(','),
-    minCreated: (durationRange && durationRange[0]) ?? '',
-    maxCreated: (durationRange && durationRange[1]) ?? '',
+    minCreated: durationRange?.[0] ?? '',
+    maxCreated: durationRange?.[1] ?? '',
     uniqueFacet: ['patient'],
     patient: patient?.patientInfo?.id,
     ...getPMSIFilters(filters, fetchParams, groupId),

@@ -29,18 +29,18 @@ export const getPmsiDate = (tabId: PMSIResourceTypes, pmsiItem: CohortPMSI) => {
 export const getPmsiCodes = (tabId: PMSIResourceTypes, pmsiItem: CohortPMSI) => {
   const dateMapper = {
     [ResourceType.CONDITION]: (pmsiItem as Condition)?.code?.coding?.find((code) => code.userSelected === true) ?? {
-      display: '',
-      code: ''
+      display: null,
+      code: null
     },
     [ResourceType.PROCEDURE]: (pmsiItem as Procedure)?.code?.coding?.find((code) => code.userSelected === true) ?? {
-      display: '',
-      code: ''
+      display: null,
+      code: null
     },
     [ResourceType.CLAIM]: (pmsiItem as Claim)?.diagnosis?.[0].diagnosisCodeableConcept?.coding?.find(
       (code) => code.userSelected === true
     ) ?? {
-      display: '',
-      code: ''
+      display: null,
+      code: null
     }
   }
 
