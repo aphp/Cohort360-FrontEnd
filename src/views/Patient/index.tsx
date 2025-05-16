@@ -20,6 +20,8 @@ import { MainTabsWrapper } from 'components/ui/Tabs/style'
 import { SidebarButton, SidebarWrapper } from 'components/ui/Sidebar/style'
 import { buildExplorationConfig, ExplorationResourceType } from 'components/ExplorationBoard/config/config'
 import SubtabsDisplay from './SubtabsDisplay'
+import { useValidatedSubtab } from 'components/ExplorationBoard/useValidatedSubTab'
+import { useCleanSearchParams } from 'components/ExplorationBoard/useCleanSearchParams'
 
 const SIDEBAR_OPTONS = {
   myFilters: false,
@@ -33,6 +35,7 @@ const SIDEBAR_OPTONS = {
 }
 
 const Patient = () => {
+  useCleanSearchParams()
   const dispatch = useAppDispatch()
   const { classes, cx } = sideBarTransition()
   const config = useContext(AppConfig)
@@ -107,6 +110,11 @@ const Patient = () => {
     () => availableTabs.find((elem) => elem.value === selectedTab)?.subs ?? null,
     [selectedTab, availableTabs]
   )
+  const validatedSubtab = useValidatedSubtab(subTabs)
+
+  useEffect(() => {
+    setSelectedSubTab(validatedSubtab)
+  }, [validatedSubtab])
 
   useEffect(() => {
     const _fetchPatient = async () => {

@@ -16,12 +16,15 @@ import { URLS } from 'types/exploration'
 import { MainTabsWrapper } from 'components/ui/Tabs/style'
 import sideBarTransition from 'styles/sideBarTransition'
 import { buildExplorationConfig, ExplorationResourceType } from 'components/ExplorationBoard/config/config'
+import { useValidatedSubtab } from 'components/ExplorationBoard/useValidatedSubTab'
+import { useCleanSearchParams } from 'components/ExplorationBoard/useCleanSearchParams'
 
 type DashboardProps = {
   context: URLS
 }
 
 const Dashboard = ({ context }: DashboardProps) => {
+  useCleanSearchParams()
   const dispatch = useAppDispatch()
   const { classes, cx } = sideBarTransition()
   const appConfig = useContext(AppConfig)
@@ -62,7 +65,7 @@ const Dashboard = ({ context }: DashboardProps) => {
       {
         label: 'Modifier la requête',
         value: 'creation',
-        to: `/${URLS.COHORT}/new/${(dashboard.requestId as any)?.uuid}/${dashboard.snapshotId}`,
+        to: `/${URLS.COHORT}/new/${dashboard.requestId}/${dashboard.snapshotId}`,
         show: context === URLS.COHORT
       },
       {
@@ -110,7 +113,7 @@ const Dashboard = ({ context }: DashboardProps) => {
         label: 'Formulaires',
         value: ResourceType.QUESTIONNAIRE_RESPONSE,
         to: `/${context}/${ResourceType.QUESTIONNAIRE_RESPONSE}`,
-        show: appConfig.features.questionnaires.enabled && !!!dashboard.deidentifiedBoolean
+        show: appConfig.features.questionnaires.enabled && !dashboard.deidentifiedBoolean
       }
     ]
     return baseTabs.filter((tab) => tab.show)
@@ -120,6 +123,11 @@ const Dashboard = ({ context }: DashboardProps) => {
     () => availableTabs.find((elem) => elem.value === selectedTab)?.subs ?? null,
     [selectedTab, availableTabs]
   )
+  const validatedSubtab = useValidatedSubtab(subTabs)
+
+  useEffect(() => {
+    setSelectedSubTab(validatedSubtab)
+  }, [validatedSubtab])
 
   useEffect(() => {
     dispatch(fetchExploredCohort({ context, id: groupId }))
