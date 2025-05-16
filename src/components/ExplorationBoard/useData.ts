@@ -6,10 +6,21 @@ import { Card } from 'types/card'
 import { Filters, SearchCriterias } from 'types/searchCriterias'
 import { Table } from 'types/table'
 import { cancelPendingRequest } from 'utils/abortController'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useAppDispatch } from 'state'
+import { validatePageNumber } from 'utils/url'
 
 const RESULTS_PER_PAGE = 20
 
-export const useData = <T>(config: ExplorationConfig<T>, searchCriterias: SearchCriterias<Filters>) => {
+export const useData = <T>(
+  config: ExplorationConfig<T>,
+  searchCriterias: SearchCriterias<Filters>,
+  initialPage = 1
+) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const dispatch = useAppDispatch()
+
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.IDDLE)
   const currentType = useRef(config.type)
   const abortController = useRef(new AbortController())
@@ -18,7 +29,7 @@ export const useData = <T>(config: ExplorationConfig<T>, searchCriterias: Search
   const [diagrams, setDiagrams] = useState<Diagram[]>([])
   const [timeline, setTimeline] = useState<Timeline | null>(null)
   const [cards, setCards] = useState<Card[]>([])
-  const [pagination, setPagination] = useState({ currentPage: 0, total: 0 })
+  const [pagination, setPagination] = useState({ currentPage: initialPage, total: 0 })
   const [count, setCount] = useState<CountDisplay | null>(null)
 
   const clearData = () => {
@@ -27,6 +38,12 @@ export const useData = <T>(config: ExplorationConfig<T>, searchCriterias: Search
     setDiagrams([])
     setTimeline(null)
     setCards([])
+  }
+
+  const updateUrlWithPage = (page: number) => {
+    const params = new URLSearchParams(location.search)
+    params.set('page', page.toString())
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true })
   }
 
   const fetchData = async (page: number) => {
@@ -46,6 +63,7 @@ export const useData = <T>(config: ExplorationConfig<T>, searchCriterias: Search
       if (currentType.current == config.type) {
         setData(results)
       }
+      return results
     } catch (error) {
       if (error instanceof CanceledError) setLoadingStatus(LoadingStatus.FETCHING)
       setLoadingStatus(LoadingStatus.SUCCESS)
@@ -86,14 +104,31 @@ export const useData = <T>(config: ExplorationConfig<T>, searchCriterias: Search
       abortController.current = cancelPendingRequest(abortController.current)
     }
     currentType.current = config.type
-    const fetch = async () => await fetchData(1)
+    const fetch = async () => {
+      const result = await fetchData(initialPage)
+      const totalItems = result?.total ?? 0
+      const totalPages = Math.ceil(totalItems / RESULTS_PER_PAGE)
+
+      setPagination({ currentPage: initialPage, total: totalPages })
+
+      validatePageNumber(
+        initialPage,
+        totalPages,
+        (page) => {
+          setPagination((prev) => ({ ...prev, currentPage: page }))
+          updateUrlWithPage(page)
+          fetchData(page)
+        },
+        dispatch
+      )
+    }
     fetch()
-    setPagination({ ...pagination, currentPage: 1 })
   }, [searchCriterias, config.type])
 
   const handlePage = async (page: number) => {
     await fetchData(page)
-    setPagination({ ...pagination, currentPage: page })
+    setPagination((prev) => ({ ...prev, currentPage: page }))
+    updateUrlWithPage(page)
   }
 
   return {
