@@ -26,6 +26,7 @@ import {
 } from 'types'
 import { ResourceType } from 'types/requestCriterias'
 import { getApiResponseResources } from './apiHelpers'
+import { getConfig } from 'config'
 
 type ResourceToFill =
   | DocumentReference
@@ -124,6 +125,7 @@ export const getResourceInfos = async <
   groupId?: string,
   signal?: AbortSignal
 ): Promise<U[]> => {
+  const appConfig = getConfig()
   const listePatientsIds = retrievePatientIds(elementEntries)
   const listeEncounterIds = retrieveEncounterIds(elementEntries)
 
@@ -152,7 +154,9 @@ export const getResourceInfos = async <
     const IPP = deidentifiedBoolean
       ? idPatient
       : getLinkedPatient(_patients, entry)?.identifier?.find(
-          (object: Identifier) => object?.type?.coding?.[0].code === 'IPP'
+          (object: Identifier) =>
+            object?.type?.coding?.[0].code === appConfig.features.patient.patientIdentifierExtensionCode?.code &&
+            object?.type?.coding?.[0].system === appConfig.features.patient.patientIdentifierExtensionCode?.system
         )?.value
 
     const linkedEncounter = getLinkedEncounter(_encounters, entry)

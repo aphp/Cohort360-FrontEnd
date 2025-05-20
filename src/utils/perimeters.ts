@@ -52,3 +52,7 @@ export const scopeLevelsToRequestParam = (sourceType: SourceType) => {
 export const isCustomError = <T>(response: Back_API_Response<T> | CustomError): response is CustomError => {
   return response && !!(response as CustomError).errorType
 }
+
+export const perimeterDisplay = (source_value: string | null, name: string) => {
+  return source_value ? `${source_value} - ${name}` : name
+}
