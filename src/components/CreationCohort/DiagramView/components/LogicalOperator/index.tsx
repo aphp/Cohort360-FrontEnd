@@ -46,7 +46,6 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   editCriteria
 }) => {
   const { classes } = useStyles()
-
   const { request } = useAppSelector((state) => state.cohortCreation || {})
   const { loading = false, criteriaGroup = [], selectedCriteria = [], count = {}, idRemap } = request
   const { extra: stageDetails } = count

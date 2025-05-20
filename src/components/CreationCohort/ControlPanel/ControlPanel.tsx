@@ -56,6 +56,8 @@ import { Egg3 } from 'components/Impersonation/Eggs'
 import { WebSocketContext } from 'components/WebSocket/WebSocketProvider'
 import { AppConfig } from 'config'
 import { setRequestDetailedMode } from 'state/preferences'
+import { hasStageDetails } from '../DiagramView/components/CriteriaCount'
+import { isRequestFinished } from './utils'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -98,8 +100,13 @@ const ControlPanel: React.FC<{
     name: '',
     uuid: ''
   })
-  const [criteriaDetailCalculation, setCriteriaDetailCalculation] = useState<boolean>(detailedMode !== null)
-  const [detailCalculationType, setDetailCalculationType] = useState<'all' | 'ratio'>(detailedMode ?? 'all')
+  const [criteriaDetailCalculation, setCriteriaDetailCalculation] = useState<boolean>(
+    isRequestFinished(count) ? !!hasStageDetails(count.extra) : !!detailedMode
+  )
+  const [detailCalculationType, setDetailCalculationType] = useState<'all' | 'ratio'>(
+    (isRequestFinished(count) ? hasStageDetails(count.extra) : detailedMode) ?? 'all'
+  )
+  const [prevCountDisplay, setPrevCountDisplay] = useState<number | undefined>()
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
@@ -209,10 +216,14 @@ const ControlPanel: React.FC<{
     const newModeOptionStageDetails = criteriaDetailCalculation ? detailCalculationType : null
     if (detailedMode !== newModeOptionStageDetails) {
       dispatch(setRequestDetailedMode(newModeOptionStageDetails))
-      const countTask = setTimeout(() => {
-        _relaunchCount(true)
-      }, 1500)
-      return () => clearTimeout(countTask)
+      const stageDetails = hasStageDetails(count.extra)
+      if (stageDetails !== newModeOptionStageDetails && newModeOptionStageDetails !== null) {
+        setPrevCountDisplay(includePatient)
+        const countTask = setTimeout(() => {
+          _relaunchCount(false)
+        }, 1500)
+        return () => clearTimeout(countTask)
+      }
     }
     // I don't want to trigger the effect when the detailedMode is updated or _relaunchCount is updated
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -238,6 +249,7 @@ const ControlPanel: React.FC<{
           jobFailMsg: message.extra_info?.request_job_fail_msg
         }
         dispatch(updateCount(response))
+        setPrevCountDisplay(undefined)
       }
     }
 
@@ -362,7 +374,7 @@ const ControlPanel: React.FC<{
         <Grid className={classes.container}>
           <Grid container justifyContent="space-between">
             <Typography className={cx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS :</Typography>
-            {isLoading ? (
+            {isLoading && prevCountDisplay === undefined ? (
               <CircularProgress
                 size={12}
                 style={{ marginTop: 14 }}
@@ -371,7 +383,7 @@ const ControlPanel: React.FC<{
             ) : (
               <Grid container alignItems="center" style={{ width: 'fit-content' }}>
                 <Typography className={cx(classes.boldText, classes.patientTypo, classes.blueText)}>
-                  {displayDigit(includePatient)}
+                  {displayDigit(includePatient || prevCountDisplay)}
                   {oldCount !== null && !!oldCount.includePatient
                     ? (includePatient ?? 0) - oldCount.includePatient > 0
                       ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`

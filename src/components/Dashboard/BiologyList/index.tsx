@@ -77,7 +77,6 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
     },
     { changeOrderBy, changeSearchInput, addFilters, removeFilter, addSearchCriterias }
   ] = useSearchCriterias(initBioSearchCriterias)
-  console.log('test filters', filters)
   const filtersAsArray = useMemo(
     () =>
       selectFiltersAsArray({
