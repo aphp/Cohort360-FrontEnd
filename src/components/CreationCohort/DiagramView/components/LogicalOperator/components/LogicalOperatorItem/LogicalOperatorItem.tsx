@@ -15,11 +15,11 @@ import useStyles from './styles'
 import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
 import { Comparators } from 'types/requestCriterias'
 import { CriteriaGroupType } from 'types'
-import CriteriaCount from '../../../CriteriaCount'
+import CriteriaCount, { CriteriaCountType } from '../../../CriteriaCount'
 
 type LogicalOperatorItemProps = {
   itemId: number
-  criteriaCount?: string
+  criteriaCount?: CriteriaCountType
 }
 
 const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, criteriaCount }) => {
