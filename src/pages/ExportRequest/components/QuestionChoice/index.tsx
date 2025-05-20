@@ -187,6 +187,13 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
   /***** DERIVED DATA *****/
   const questionnaires = useMemo(() => bundle.entry.map((e) => e.resource), [bundle])
 
+  // ✅ Sélectionne automatiquement le premier questionnaire si aucun n'est choisi
+  useEffect(() => {
+    if (questionnaires.length > 0 && !selectedQuestionnaireId) {
+      setSelectedQuestionnaireId(questionnaires[0].id)
+    }
+  }, [questionnaires, selectedQuestionnaireId])
+
   const leaves = useMemo(() => {
     const q = questionnaires.find((qq) => qq.id === selectedQuestionnaireId)
     return q ? collectLeaves(q.item) : []
@@ -219,7 +226,8 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
   useEffect(() => {
     if (bundle.entry.length === 0) return
 
-    setCheckedByQuestionnaire(buildInitialChecked(bundle, selectedQuestions))
+    // si le state est déjà rempli, on ne touche plus à rien
+    setCheckedByQuestionnaire((prev) => (prev.size === 0 ? buildInitialChecked(bundle, selectedQuestions) : prev))
 
     if (!selectedQuestionnaireId && selectedQuestions.length > 0) {
       const firstLink = selectedQuestions[0].linkId
@@ -227,7 +235,7 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
         .id
       if (qId) setSelectedQuestionnaireId(qId)
     }
-  }, [bundle, selectedQuestions, selectedQuestionnaireId])
+  }, [bundle, selectedQuestions])
 
   /***** HANDLERS *****/
   const handleQuestionnaireChange = (e: SelectChangeEvent<string>) => {
@@ -326,15 +334,7 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
       </DialogContent>
       {allSelectedLeaves.length > 0 && (
         <Box
-          // container
-          // item
-          // xs={selectedQuestions.length > 0 ? 12 : 3.59}
-          // alignItems={selectedQuestions.length ? 'flex-start' : 'center'}
-          // border="1px solid rgba(0, 0, 0, 0.25)"
-          // borderRadius="4px"
-          // padding="6px 1px 6px 8px"
           padding="12px"
-          // className="ValueSetField"
           style={{
             maxHeight: 200,
             overflowX: 'hidden',
