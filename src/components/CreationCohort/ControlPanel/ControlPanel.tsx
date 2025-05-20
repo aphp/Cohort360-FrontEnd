@@ -101,7 +101,7 @@ const ControlPanel: React.FC<{
     uuid: ''
   })
   const [criteriaDetailCalculation, setCriteriaDetailCalculation] = useState<boolean>(
-    isRequestFinished(count) ? !!hasStageDetails(count.extra) : !!detailedMode
+    isRequestFinished(count) ? !!hasStageDetails(count.extra) : !!detailedMode && !!requestId
   )
   const [detailCalculationType, setDetailCalculationType] = useState<'all' | 'ratio'>(
     (isRequestFinished(count) ? hasStageDetails(count.extra) : detailedMode) ?? 'all'
