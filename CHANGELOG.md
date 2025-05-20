@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.46.1](https://github.com/aphp/Cohort360-FrontEnd/compare/2.46.0..2.46.1) - 2025-05-20
+
+### 🚀 Features
+
+- *(requester)* Add tooltip on detail count (#1124) - ([ce4f40d](https://github.com/aphp/Cohort360-FrontEnd/commit/ce4f40d5330f25d225f6ca9a0e00d66b2ffaa91b))
+
+### 🐛 Bug Fixes
+
+- *(criteriacount)* Adjust position and font size - ([2ea68ad](https://github.com/aphp/Cohort360-FrontEnd/commit/2ea68adeaaf2e0144c70a8d03dc2e7a9b60dcaeb))
+- *(criteriacount)* Add loader for detail and skip unnecessary recount - ([25217e5](https://github.com/aphp/Cohort360-FrontEnd/commit/25217e5e0cdd8891848d7b88ffa389c6af46470e))
+
 ## [2.46.0](https://github.com/aphp/Cohort360-FrontEnd/compare/2.45.20..2.46.0) - 2025-05-12
 
 ### 🚀 Features
