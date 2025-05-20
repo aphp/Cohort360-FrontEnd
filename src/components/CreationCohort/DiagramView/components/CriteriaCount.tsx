@@ -75,12 +75,15 @@ const CriteriaCount = ({ criteriaCount, extraLeftMargin = 0 }: CriteriaCountProp
         <div
           style={{
             position: 'absolute',
-            left: -42 + extraLeftMargin,
+            left: -41 + extraLeftMargin,
             top: '50%',
             transform: 'translateY(-100%)',
             padding: '2px 6px',
-            fontSize: '12px',
+            fontSize: '11px',
             fontWeight: 'bold',
+            display: 'flex',
+            justifyContent: 'center',
+            width: '40px',
             color: 'black',
             zIndex: 1
           }}
