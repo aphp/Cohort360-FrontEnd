@@ -217,7 +217,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
         }}
         onMouseLeave={() => (timeout = setTimeout(() => setIsOpen(false), 800))}
       >
-        <CriteriaCount criteriaCount={itemId !== 0 ? criteriaCount : undefined} />
+        {itemId !== 0 ? <CriteriaCount criteriaCount={criteriaCount} /> : null}
         {isOpen ? (
           <>
             <Select

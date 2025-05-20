@@ -1,5 +1,6 @@
 import { Tooltip } from '@mui/material'
 import React from 'react'
+import { useAppSelector } from 'state'
 
 const displayCount = (criteriaCount: number) => {
   if (criteriaCount < 1000) {
@@ -17,6 +18,19 @@ const displayCount = (criteriaCount: number) => {
 export type CriteriaCountType = {
   display: string
   value?: number
+}
+
+export const hasStageDetails = (extra: Record<string, string> | undefined): 'all' | 'ratio' | null => {
+  if (extra) {
+    const criteriaCountKeys = Object.keys(extra).filter((key) => key.startsWith('criteria_count_'))
+    const criteriaRatioKeys = Object.keys(extra).filter((key) => key.startsWith('criteria_ratio_'))
+    if (criteriaCountKeys.length > 0) {
+      return 'all'
+    } else if (criteriaRatioKeys.length > 0) {
+      return 'ratio'
+    }
+  }
+  return null
 }
 
 export const getStageDetails = (
@@ -44,32 +58,62 @@ type CriteriaCountProps = {
 }
 
 const CriteriaCount = ({ criteriaCount, extraLeftMargin = 0 }: CriteriaCountProps) => {
-  if (criteriaCount) {
-    const displayCount = () => {
-      if (criteriaCount?.value) {
-        return (
-          <Tooltip
-            placement="left"
-            title={criteriaCount.value.toString()}
-            slotProps={{
-              popper: {
-                modifiers: [
-                  {
-                    name: 'offset',
-                    options: {
-                      offset: [0, -8]
-                    }
+  const { detailedMode } = useAppSelector((state) => state.preferences.requests)
+  if (detailedMode) {
+    const displayCount = criteriaCount
+      ? () => {
+          if (criteriaCount?.value) {
+            return (
+              <Tooltip
+                placement="left"
+                title={criteriaCount.value.toString()}
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: 'offset',
+                        options: {
+                          offset: [0, -8]
+                        }
+                      }
+                    ]
                   }
-                ]
-              }
-            }}
-          >
-            <div>{criteriaCount.display}</div>
-          </Tooltip>
-        )
-      }
-      return <div>{criteriaCount.display}</div>
-    }
+                }}
+              >
+                <div>{criteriaCount.display}</div>
+              </Tooltip>
+            )
+          }
+          return <div>{criteriaCount.display}</div>
+        }
+      : () => {
+          return (
+            <>
+              <span
+                className="loader"
+                style={{
+                  margin: '0 auto 4px auto',
+                  width: '16px',
+                  height: '16px',
+                  border: '2px solid #ccc',
+                  borderTop: '2px solid #333',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                  display: 'inline-block'
+                }}
+              />
+
+              <style>
+                {`
+                  @keyframes spin {
+                    0% { transform: rotate(0deg);}
+                    100% { transform: rotate(360deg);}
+                  }
+                `}
+              </style>
+            </>
+          )
+        }
     try {
       return (
         <div
