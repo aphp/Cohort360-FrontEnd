@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 
 import {
@@ -9,10 +10,13 @@ import {
   CircularProgress,
   Alert,
   ListItemText,
-  Button,
-  InputLabel,
-  Stack
+  IconButton,
+  Switch
 } from '@mui/material'
+
+import CloseIcon from '@mui/icons-material/Close'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import SearchOutlined from '@mui/icons-material/SearchOutlined'
 
 import Chip from 'components/ui/Chip'
 import useStyles from '../../styles'
@@ -73,11 +77,22 @@ const ExportTable: React.FC<ExportTableProps> = ({
   const exportTableResourceType = getResourceType(exportTable.name)
   const tableLabel = getExportTableLabel(exportTable.name)
   const [checkedTable, setCheckedTable] = useState<boolean>(tableSetting?.isChecked || false)
-  const [checkedPivotMerge, setCheckedPivotMerge] = useState<boolean>(tableSetting?.isChecked || false)
+  const [checkedPivotMerge, setCheckedPivotMerge] = useState<boolean>(false)
   const appConfig = useContext(AppConfig)
   const limit = appConfig.features.export.exportLinesLimit
   const [isQuestionChoiceOpen, setIsQuestionChoiceOpen] = useState(false)
   const [selectedQuestions, setSelectedQuestions] = useState<any[]>([])
+  const [isExtended, setIsExtended] = useState(false)
+
+  const isCompatibleTable = (tableName: string) => {
+    const table = compatibilitiesTables?.find((table) => table === tableName)
+    return table
+  }
+
+  const handleOpen = () => {
+    setIsQuestionChoiceOpen(true)
+    setIsExtended(false)
+  }
 
   const onTest = (arg: any[]) => {
     setSelectedQuestions(arg)
@@ -111,13 +126,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
     if (tableSetting?.isChecked !== null) {
       setCheckedTable(tableSetting?.isChecked)
     }
-    if (tableSetting?.pivotMerge !== null) {
-      setCheckedPivotMerge(tableSetting?.pivotMerge)
-    }
-    if (tableSetting?.pivotMerge) {
-      onChangeTableSettings(exportTable.name, 'columns', null)
-    }
-  }, [tableSetting?.isChecked, tableSetting?.pivotMerge])
+  }, [tableSetting?.isChecked])
 
   useEffect(() => {
     if (exportTableResourceType !== ResourceType.UNKNOWN) {
@@ -132,8 +141,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
         isChecked: false,
         columns: null,
         fhirFilter: null,
-        respectTableRelationships: true,
-        pivotMerge: false
+        respectTableRelationships: true
       }
       addNewTableSetting(newTableSetting)
     }
@@ -151,11 +159,6 @@ const ExportTable: React.FC<ExportTableProps> = ({
     }
   }, [count, tableSetting?.isChecked])
 
-  const isCompatibleTable = (tableName: string) => {
-    const table = compatibilitiesTables?.find((table) => table === tableName)
-    return table
-  }
-
   useEffect(() => {
     if (ResourceType.UNKNOWN !== exportTableResourceType) {
       getFilterCount()
@@ -170,7 +173,21 @@ const ExportTable: React.FC<ExportTableProps> = ({
     setSelectedQuestions(newSelectedQuestions)
   }
 
-  console.log('manelle selectedQuestions', selectedQuestions)
+  useEffect(() => {
+    if (checkedPivotMerge) {
+      onChangeTableSettings(exportTable.name, 'pivotMergeColumns', [])
+    }
+    if (!checkedPivotMerge) {
+      onChangeTableSettings(exportTable.name, 'pivotMergeColumns', undefined)
+    }
+    if (checkedPivotMerge && selectedQuestions.length > 0) {
+      onChangeTableSettings(
+        exportTable.name,
+        'pivotMergeColumns',
+        selectedQuestions.map((q) => q.linkId)
+      )
+    }
+  }, [checkedPivotMerge, selectedQuestions])
 
   return (
     <Grid container className={classes.exportTableGrid} id={tableSetting?.tableName}>
@@ -243,48 +260,33 @@ const ExportTable: React.FC<ExportTableProps> = ({
           />
         </Grid>
       </Grid>
+
       {exportTypeFile === 'xlsx' && exportTableResourceType === ResourceType.DOCUMENTS && (
         <Grid>
           <AlertLimitXlsx />
         </Grid>
       )}
+
+      {exportTable.name === ResourceType.QUESTIONNAIRE_RESPONSE && (
+        <Grid container alignItems={'center'}>
+          <Switch
+            // style={{ padding: '0, 0, 0, 0' }}
+            color="secondary"
+            disabled={!checkedTable}
+            checked={checkedPivotMerge}
+            onClick={(e) => {
+              e.stopPropagation()
+              setCheckedPivotMerge(!checkedPivotMerge)
+            }}
+          />
+          <Typography color={tableSetting?.isChecked ? 'rgba(0, 0, 0, 0.8)' : '#888'} fontSize={13} fontWeight={600}>
+            Positionner les questions en colonnes "Pivot" (désactive la sélection des colonnes à exporter)
+          </Typography>
+        </Grid>
+      )}
+
       <Grid container justifyContent={'space-between'}>
-        {exportTable.name === ResourceType.QUESTIONNAIRE_RESPONSE && checkedPivotMerge && (
-          <Grid container alignItems={'center'} id={tableSetting?.tableName + 'questionChoice'}>
-            <Grid item xs={3}>
-              <Button variant="contained" onClick={() => setIsQuestionChoiceOpen(!isQuestionChoiceOpen)}>
-                {selectedQuestions.length > 0 ? `Modifier` : `Sélectionner`} les questions à exporter :
-              </Button>
-              <QuestionForm
-                open={isQuestionChoiceOpen}
-                onClose={() => handleQuestionChoiceOpen(isQuestionChoiceOpen)}
-                selectedQuestions={selectedQuestions}
-                onConfirm={onTest}
-              />
-            </Grid>
-            <Grid item xs={9}>
-              <InputLabel id="questionnaire-select-label">
-                {selectedQuestions.length > 0 && (
-                  <Stack direction="row" spacing={1} sx={{ mt: 2, flexWrap: 'wrap' }}>
-                    {selectedQuestions.map((l) => (
-                      <Chip
-                        key={l.linkId}
-                        label={l.text ?? l.linkId}
-                        onDelete={() => {
-                          const newSelectedQuestions = selectedQuestions.filter((q) => q.linkId !== l.linkId)
-                          handleDeleteSelectedQuestions(newSelectedQuestions)
-                          setSelectedQuestions(newSelectedQuestions)
-                        }}
-                        style={{ backgroundColor: '#f7f7f7' }}
-                      />
-                    ))}
-                  </Stack>
-                )}
-              </InputLabel>
-            </Grid>
-          </Grid>
-        )}
-        {checkedPivotMerge === false && (
+        {!checkedPivotMerge && (
           <Grid container xs={6} alignItems={'center'} id={tableSetting?.tableName + 'columnsFilters'}>
             <Typography marginRight={'5px'} className={classes.textBody2}>
               Sélectionner les colonnes à exporter :
@@ -296,7 +298,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
               size="small"
               limitTags={4}
               sx={{ width: '500px' }}
-              disabled={tableSetting?.isChecked === false}
+              disabled={tableSetting?.isChecked === false || checkedPivotMerge}
               disableCloseOnSelect
               options={['Tout sélectionner', ...exportColumns]}
               onChange={(event, newValue) => {
@@ -345,6 +347,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
             />
           </Grid>
         )}
+
         <Grid container xs={6} alignItems="center" id={tableSetting?.tableName + 'ResourceFilters'}>
           {exportTableResourceType !== ResourceType.UNKNOWN && (
             <>
@@ -370,21 +373,77 @@ const ExportTable: React.FC<ExportTableProps> = ({
           )}
         </Grid>
       </Grid>
-      {exportTable.name === ResourceType.QUESTIONNAIRE_RESPONSE && (
-        <Grid container alignItems={'center'}>
-          <Checkbox
-            style={{ padding: '0, 0, 0 ,0' }}
-            color="secondary"
-            disabled={!checkedTable}
-            checked={tableSetting?.pivotMerge || false}
-            onClick={(e) => {
-              e.stopPropagation()
-              onChangeTableSettings(exportTable.name, 'pivotMerge', !tableSetting.pivotMerge)
-            }}
+
+      {exportTable.name === ResourceType.QUESTIONNAIRE_RESPONSE && checkedPivotMerge && (
+        <Grid container alignItems={'center'} id={tableSetting?.tableName + 'questionChoice'}>
+          <QuestionForm
+            open={isQuestionChoiceOpen}
+            onClose={() => handleQuestionChoiceOpen(isQuestionChoiceOpen)}
+            selectedQuestions={selectedQuestions}
+            onConfirm={onTest}
           />
-          <Typography color={tableSetting?.isChecked ? 'rgba(0, 0, 0, 0.8)' : '#888'} fontSize={13} fontWeight={600}>
-            Positionner les questions en colonnes "Pivot" (désactive la sélection des colonnes à exporter)
-          </Typography>
+
+          <Grid item>
+            <Typography marginRight={'5px'} className={classes.textBody2}>
+              {selectedQuestions.length > 0 ? 'Modifier' : 'Sélectionner'} les questions à exporter :
+            </Typography>
+          </Grid>
+
+          <Grid
+            container
+            item
+            xs={selectedQuestions.length > 0 ? 12 : 3.59}
+            alignItems={selectedQuestions.length ? 'flex-start' : 'center'}
+            border="1px solid rgba(0, 0, 0, 0.25)"
+            borderRadius="4px"
+            padding="6px 1px 6px 8px"
+            className="ValueSetField"
+            style={{
+              maxHeight: 200,
+              overflowX: 'hidden',
+              overflowY: 'auto'
+            }}
+          >
+            <Grid
+              container
+              alignItems="center"
+              item
+              xs={selectedQuestions.length > 0 ? 11.4 : 10}
+              tabIndex={0}
+              style={{ cursor: 'pointer' }}
+              onClick={handleOpen}
+            >
+              <div style={{ display: isExtended ? 'block' : 'flex', alignItems: 'center', overflow: 'hidden' }}>
+                {selectedQuestions.map((l) => (
+                  <Chip
+                    key={l.linkId}
+                    label={l.text ?? l.linkId}
+                    onDelete={() => {
+                      const newSelectedQuestions = selectedQuestions.filter((q) => q.linkId !== l.linkId)
+                      handleDeleteSelectedQuestions(newSelectedQuestions)
+                      setSelectedQuestions(newSelectedQuestions)
+                    }}
+                    style={{ backgroundColor: '#f7f7f7', margin: '0 5px 5px 0' }}
+                  />
+                ))}
+              </div>
+            </Grid>
+            <Grid item xs={selectedQuestions.length > 0 ? 0.6 : 2} container justifyContent="flex-end">
+              {isExtended && selectedQuestions.length > 0 && (
+                <IconButton size="small" sx={{ color: '#5BC5F2' }} onClick={() => setIsExtended(false)}>
+                  <CloseIcon />
+                </IconButton>
+              )}
+              {!isExtended && selectedQuestions.length > 0 && (
+                <IconButton size="small" sx={{ color: '#5BC5F2' }} onClick={() => setIsExtended(true)}>
+                  <MoreHorizIcon />
+                </IconButton>
+              )}
+              <IconButton sx={{ color: '#5BC5F2' }} size="small" onClick={handleOpen}>
+                <SearchOutlined />
+              </IconButton>
+            </Grid>
+          </Grid>
         </Grid>
       )}
       {count !== null &&

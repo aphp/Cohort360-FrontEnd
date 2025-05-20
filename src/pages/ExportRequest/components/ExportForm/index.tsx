@@ -62,8 +62,7 @@ const tableSettingsInitialState: TableSetting[] = [
     isChecked: true,
     columns: null,
     fhirFilter: null,
-    respectTableRelationships: true,
-    pivotMerge: false
+    respectTableRelationships: true
   }
 ]
 
@@ -144,6 +143,7 @@ const ExportForm: React.FC = () => {
     }
   }, [])
 
+  console.log('manelle tablesSettings', tablesSettings)
   const _fetchCompatibilitiesTables = useCallback(async () => {
     const tableList = tablesSettings
       .map((tableSetting) => {
@@ -252,6 +252,9 @@ const ExportForm: React.FC = () => {
     }))
     setTablesSettings(newSelectedTables)
   }
+
+  const mater = tablesSettings.filter((tableSetting) => tableSetting.tableName === 'QuestionnaireResponse')
+  console.log('manelle mater', mater)
 
   const handleSubmitPayload = async () => {
     const tableToExport = tablesSettings.filter((tableSetting) => tableSetting.isChecked)
