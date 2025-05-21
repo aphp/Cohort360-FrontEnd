@@ -230,6 +230,16 @@ const ControlPanel: React.FC<{
   }, [detailCalculationType, criteriaDetailCalculation])
 
   useEffect(() => {
+    if (isRequestFinished(count)) {
+      const stageDetails = hasStageDetails(count.extra)
+      if (stageDetails !== detailCalculationType) {
+        setDetailCalculationType(stageDetails ?? 'all')
+        setCriteriaDetailCalculation(!!stageDetails)
+      }
+    }
+  }, [count])
+
+  useEffect(() => {
     if (status && (status === JobStatus.NEW || status === JobStatus.PENDING || status === JobStatus.STARTED)) {
       setCountLoading(LoadingStatus.FETCHING)
       //TODO: refacto the lunch of the count in the app colision with buildCohortCreation and unbuildCohortCreation
