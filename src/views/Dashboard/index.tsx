@@ -69,7 +69,7 @@ const Dashboard = ({ context }: DashboardProps) => {
         show: context === URLS.COHORT
       },
       {
-        label: context === URLS.COHORT ? 'Aperçu cohorte' : 'Aperçu',
+        label: 'Aperçu',
         value: ResourceType.PREVIEW,
         to: `/${context}/${ResourceType.PREVIEW}`,
         show: true

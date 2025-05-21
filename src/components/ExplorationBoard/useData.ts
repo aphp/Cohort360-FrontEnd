@@ -68,6 +68,14 @@ export const useData = <T>(
       if (error instanceof CanceledError) setLoadingStatus(LoadingStatus.FETCHING)
       setLoadingStatus(LoadingStatus.SUCCESS)
       setData(null)
+      setCount(
+        config.getCount
+          ? config.getCount([
+              { results: 0, total: 0 },
+              { results: 0, total: 0 }
+            ])
+          : null
+      )
     }
   }
 
