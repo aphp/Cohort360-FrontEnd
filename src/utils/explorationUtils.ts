@@ -315,7 +315,8 @@ export const searchParamsMapper: Record<string, (value: string | null, _searchPa
     handleFilteredValues(value, _searchParams, ExplorationsSearchParams.FAVORITE, Object.values(CohortsType)),
   minPatients: (value, _searchParams) => handleInvalidDate(value, _searchParams, ExplorationsSearchParams.MIN_PATIENTS),
   maxPatients: (value, _searchParams) =>
-    handleInvalidNumber(value, _searchParams, ExplorationsSearchParams.MAX_PATIENTS)
+    handleInvalidNumber(value, _searchParams, ExplorationsSearchParams.MAX_PATIENTS),
+  page: (value, _searchParams) => handleInvalidNumber(value, _searchParams, ExplorationsSearchParams.PAGE)
 }
 
 export const checkSearchParamsErrors = (

@@ -133,7 +133,7 @@ const CreateSample: React.FC<{
           </Grid>
         </Grid>
       </DialogContent>
-      {parsedPercentage / 100 > cohortLimit && (
+      {parsedPercentage / 100 > cohortLimit && !percentageError && (
         <Alert severity="warning" style={{ alignItems: 'center' }}>
           Cette cohorte contenant plus de {cohortLimit} patients, sa création est plus complexe et nécessite d'être
           placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.
