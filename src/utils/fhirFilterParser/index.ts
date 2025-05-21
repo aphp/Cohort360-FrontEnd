@@ -2,6 +2,7 @@ import { CharStreams, CommonTokenStream } from 'antlr4'
 import FilterLanguageLexer from './lib/FilterLanguageLexer'
 import FilterLanguageParser, { ExpressionContext, ParamExpContext } from './lib/FilterLanguageParser'
 import FilterLanguageVisitor from './lib/FilterLanguageVisitor'
+import { getConfig } from 'config'
 
 export type FhirFilterValue = {
   operator?: string
@@ -89,6 +90,19 @@ export const extractFilterParams = (filterStr: string, options?: ExtractionOptio
     return extractParams(expression, options)
   }
   return undefined
+}
+
+export const isIdentifyingFilter = (filterStr: string): boolean => {
+  // need to load appConfig
+  const identifyingFields = getConfig().features.cohort.identifyingFields
+  const criteria = filterStr.split('&')
+  for (const c of criteria) {
+    const key = c.split('=')[0]
+    if (identifyingFields.includes(key)) {
+      return true
+    }
+  }
+  return false
 }
 
 export default extractFilterParams
