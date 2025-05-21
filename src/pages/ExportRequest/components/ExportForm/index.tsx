@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
 
 import {
   Grid,
@@ -49,12 +49,10 @@ export enum Error {
   NO_ERROR
 }
 
-type ErrorTables = [
-  {
-    tableName: string
-    error: Error
-  }
-]
+type ErrorTables = Array<{
+  tableName: string
+  error?: Error
+}>
 
 const tableSettingsInitialState: TableSetting[] = [
   {
@@ -204,37 +202,46 @@ const ExportForm: React.FC = () => {
     }
   }, [oneFile, _fetchCompatibilitiesTables])
 
-  const addNewTableSetting = (arg: TableSetting) => {
-    setTablesSettings([...tablesSettings, arg])
-  }
+  const addNewTableSetting = useCallback(
+    (arg: TableSetting) => {
+      setTablesSettings([...tablesSettings, arg])
+    },
+    [tablesSettings]
+  )
 
-  const onChangeTableSettings = (tableName: string, key: any, value: any) => {
-    const newTableSettings: TableSetting[] = tablesSettings.map((tableSetting) => {
-      if (tableSetting.tableName === tableName) {
-        return {
-          ...tableSetting,
-          [key]: value
+  const onChangeTableSettings = useCallback(
+    (tableName: string, key: any, value: any) => {
+      const newTableSettings: TableSetting[] = tablesSettings.map((tableSetting) => {
+        if (tableSetting.tableName === tableName) {
+          return {
+            ...tableSetting,
+            [key]: value
+          }
+        } else {
+          return tableSetting
         }
-      } else {
-        return tableSetting
-      }
-    })
-    setTablesSettings(newTableSettings)
-  }
+      })
+      setTablesSettings(newTableSettings)
+    },
+    [tablesSettings]
+  )
 
-  const onChangeError = (tableName: string, errorValue: Error) => {
-    const newErrorTableSettings: any = tablesSettings.map((tableSetting) => {
-      if (tableSetting.tableName === tableName) {
-        return {
-          ...tableSetting,
-          error: errorValue
+  const onChangeError = useCallback(
+    (tableName: string, errorValue: Error) => {
+      const newErrorTableSettings = tablesSettings.map((tableSetting) => {
+        if (tableSetting.tableName === tableName) {
+          return {
+            ...tableSetting,
+            error: errorValue
+          }
+        } else {
+          return tableSetting
         }
-      } else {
-        return tableSetting
-      }
-    })
-    setErrorTables(newErrorTableSettings)
-  }
+      })
+      setErrorTables(newErrorTableSettings)
+    },
+    [tablesSettings]
+  )
 
   const resetSelectedTables = () => {
     const newSelectedTables = tablesSettings.map((tableSetting) => ({
@@ -293,6 +300,33 @@ const ExportForm: React.FC = () => {
       setError(null)
     }
   }
+
+  const tableListView = useMemo(() => {
+    return exportTableList?.map((exportTable, index: number) => (
+      <ExportTable
+        key={exportTable.name + index}
+        exportCohort={exportCohort}
+        exportTable={exportTable}
+        exportTableSettings={tablesSettings}
+        setError={onChangeError}
+        addNewTableSetting={addNewTableSetting}
+        onChangeTableSettings={onChangeTableSettings}
+        compatibilitiesTables={compatibilitiesTables}
+        exportTypeFile={exportTypeFile}
+        oneFile={oneFile}
+      />
+    ))
+  }, [
+    exportTableList,
+    exportCohort,
+    tablesSettings,
+    onChangeError,
+    addNewTableSetting,
+    onChangeTableSettings,
+    compatibilitiesTables,
+    exportTypeFile,
+    oneFile
+  ])
 
   return (
     <Grid container>
@@ -450,22 +484,7 @@ const ExportForm: React.FC = () => {
               <CircularProgress />
             </Grid>
           ) : (
-            <>
-              {exportTableList?.map((exportTable, index: number) => (
-                <ExportTable
-                  key={exportTable.name + index}
-                  exportCohort={exportCohort}
-                  exportTable={exportTable}
-                  exportTableSettings={tablesSettings}
-                  setError={onChangeError}
-                  addNewTableSetting={addNewTableSetting}
-                  onChangeTableSettings={onChangeTableSettings}
-                  compatibilitiesTables={compatibilitiesTables}
-                  exportTypeFile={exportTypeFile}
-                  oneFile={oneFile}
-                />
-              ))}
-            </>
+            tableListView
           )}
 
           <Grid container gap="12px" pb="10px">

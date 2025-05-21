@@ -30,7 +30,7 @@ import { Cohort } from 'types'
 import { TableInfo, TableSetting } from 'types/export'
 
 import { Error } from '../ExportForm'
-import QuestionForm from 'pages/ExportRequest/components/QuestionChoice'
+import QuestionForm, { QuestionLeaf } from 'pages/ExportRequest/components/QuestionChoice'
 
 type ExportTableProps = {
   exportTable: TableInfo
@@ -81,7 +81,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
   const appConfig = useContext(AppConfig)
   const limit = appConfig.features.export.exportLinesLimit
   const [isQuestionChoiceOpen, setIsQuestionChoiceOpen] = useState(false)
-  const [selectedQuestions, setSelectedQuestions] = useState<any[]>([])
+  const [selectedQuestions, setSelectedQuestions] = useState<QuestionLeaf[]>([])
   const [isExtended, setIsExtended] = useState(false)
 
   const isCompatibleTable = (tableName: string) => {
