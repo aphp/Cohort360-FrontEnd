@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.46.2](https://github.com/aphp/Cohort360-FrontEnd/compare/2.46.1..2.46.2) - 2025-05-21
+
+### 🚀 Features
+
+- *(stageCounts)* Initialize new request without detail mode - ([8029d9c](https://github.com/aphp/Cohort360-FrontEnd/commit/8029d9c4c404809438583e6893f4ebe48a69cb45))
+
+### 🐛 Bug Fixes
+
+- Fixed bugs in samples - Ref gestion-de-projet#2785 - ([2088498](https://github.com/aphp/Cohort360-FrontEnd/commit/208849811bd106c90281f7eadef4a42e596149fd))
+- *(detailCount)* Set correct detail mode when navigating request version - ([0dd6c48](https://github.com/aphp/Cohort360-FrontEnd/commit/0dd6c48c1cd97811f0e22c9f248c285f4a5d771a))
+
 ## [2.46.1](https://github.com/aphp/Cohort360-FrontEnd/compare/2.46.0..2.46.1) - 2025-05-20
 
 ### 🚀 Features
