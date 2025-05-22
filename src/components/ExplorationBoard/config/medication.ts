@@ -100,25 +100,23 @@ const mapToTable = (
   ;(data as ExplorationResults<CohortMedication<MedicationRequest | MedicationAdministration>>).list?.forEach(
     (elem) => {
       const date = getMedicationDate(type, elem)
-      const [codeATC, displayATC, , codeATCSystem] = getCodes(
+      const [codeATC, displayATC] = getCodes(
         elem,
         getConfig().features.medication.valueSets.medicationAtc.url,
         getConfig().features.medication.valueSets.medicationAtcOrbis.url
       )
       const atcDisplay: Paragraph[] = [
         { text: `${codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : codeATC ?? ''}` },
-        { text: `${displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}`, sx: { fontWeight: 900 } },
-        { text: `${codeATCSystem ?? 'Non renseigné'}` }
+        { text: `${displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}`, sx: { fontWeight: 900 } }
       ]
-      const [codeUCD, displayUCD, , codeUCDSystem] = getCodes(
+      const [codeUCD, displayUCD] = getCodes(
         elem,
         getConfig().features.medication.valueSets.medicationUcd.url,
         '.*-ucd'
       )
       const ucdDisplay: Paragraph[] = [
         { text: `${codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : codeUCD ?? ''}` },
-        { text: `${displayUCD === 'No matching concept' ? '-' : displayUCD ?? '-'}`, sx: { fontWeight: 900 } },
-        { text: `${codeUCDSystem ?? 'Non renseigné'}` }
+        { text: `${displayUCD === 'No matching concept' ? '-' : displayUCD ?? '-'}`, sx: { fontWeight: 900 } }
       ]
       const prescriptionType = (elem as MedicationRequest).category?.[0].coding?.[0].display ?? '-'
       const administrationRoute =
