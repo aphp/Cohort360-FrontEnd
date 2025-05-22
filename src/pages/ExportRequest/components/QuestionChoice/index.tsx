@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
+import React, { memo, useCallback, useDeferredValue, useEffect, useMemo, useState, useRef } from 'react'
 import {
   Box,
   Button,
@@ -223,23 +223,29 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
   }, [checkedByQuestionnaire, questionnaires])
 
   /***** EFFECT : synchro initiale *****/
+  const wasOpen = useRef(false)
+
   useEffect(() => {
+    const reopened = open && !wasOpen.current
+    wasOpen.current = open // maj la ref pour la prochaine fois
+
+    if (!reopened) return // rien à faire si on tape dans la modale déjà ouverte
     if (bundle.entry.length === 0) return
 
-    // si le state est déjà rempli, on ne touche plus à rien
-    setCheckedByQuestionnaire((prev) => (prev.size === 0 ? buildInitialChecked(bundle, selectedQuestions) : prev))
+    setCheckedByQuestionnaire(buildInitialChecked(bundle, selectedQuestions))
 
-    if (!selectedQuestionnaireId && selectedQuestions.length > 0) {
-      const firstLink = selectedQuestions[0].linkId
-      const qId = bundle.entry.find((e) => collectLeaves(e.resource.item).some((l) => l.linkId === firstLink))?.resource
+    // si besoin, présélectionner le questionnaire qui contient la 1ʳᵉ question
+    if (selectedQuestions.length > 0) {
+      const first = selectedQuestions[0].linkId
+      const hostQ = bundle.entry.find((e) => collectLeaves(e.resource.item).some((l) => l.linkId === first))?.resource
         .id
-      if (qId) setSelectedQuestionnaireId(qId)
+      if (hostQ) setSelectedQuestionnaireId(hostQ)
     }
-  }, [bundle, selectedQuestions])
+  }, [open, bundle, selectedQuestions])
 
   /***** HANDLERS *****/
   const handleQuestionnaireChange = (e: SelectChangeEvent<string>) => {
-    setSelectedQuestionnaireId(e.target.value as string)
+    setSelectedQuestionnaireId(e.target.value)
     setInputQuery('')
   }
 
