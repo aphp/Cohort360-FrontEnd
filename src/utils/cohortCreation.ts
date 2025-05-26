@@ -450,7 +450,15 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
                     : [],
                 isSubGroup: !!groupItem.criteria.length,
                 isInclusive: groupItem.isInclusive,
-                type: groupItem._type
+                type: groupItem._type,
+                ...(groupItem._type === CriteriaGroupType.N_AMONG_M && {
+                  options: {
+                    operator: groupItem.nAmongMOptions.operator,
+                    number: groupItem.nAmongMOptions.n,
+                    timeDelayMin: groupItem.nAmongMOptions.timeDelayMin ?? 0,
+                    timeDelayMax: groupItem.nAmongMOptions.timeDelayMax ?? 0
+                  }
+                })
               } as CriteriaGroup)
           )
           .sort((prev, next) => next.id - prev.id)
