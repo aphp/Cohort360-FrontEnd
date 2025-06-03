@@ -194,7 +194,7 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
                 title="Créer un échantillon à partir de la cohorte"
                 icon={<Picker />}
                 onClick={() => onClickCreateSample(cohort)}
-                disabled={disabled}
+                disabled={disabled || cohort.request_job_status !== JobStatus.FINISHED}
               />
               <IconButtonWithTooltip
                 title="Accéder à la version de la requête ayant créé la cohorte"
