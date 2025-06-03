@@ -31,7 +31,6 @@ import {
   ResourceType,
   SelectedCriteriaType
 } from 'types/requestCriterias'
-import { ExportTableType } from 'components/Dashboard/ExportModal/export_table'
 import { SearchByTypes } from 'types/searchCriterias'
 import { PMSILabel } from 'types/patient'
 import { CriteriaForm } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/types'
@@ -770,19 +769,6 @@ export type UserAccesses = {
 
 export type CustomError = {
   errorType: string
-}
-
-export type ExportCSVForm = {
-  motif: string
-  conditions: boolean
-  tables: ExportCSVTable[]
-}
-
-export type ExportCSVTable = ExportTableType & {
-  checked: boolean
-  fhir_filter: SavedFilter | null
-  respect_table_relationships: boolean
-  count: number
 }
 
 export type SavedFilter = {

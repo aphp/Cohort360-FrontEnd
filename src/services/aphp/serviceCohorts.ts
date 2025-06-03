@@ -9,8 +9,6 @@ import {
   CohortResults,
   CohortImaging,
   CohortComposition,
-  Export,
-  ExportCSVTable,
   FHIR_Bundle_Response,
   CohortPMSI,
   CohortMedication,
@@ -286,22 +284,6 @@ export interface IServiceCohorts {
    *   - La liste de cohortes avec une extension liée au droit d'accès + export
    */
   fetchCohortsRights: (cohorts: Cohort[]) => Promise<Cohort[]>
-
-  /**
-   * Permet de créer une demande d'export d'une cohorte
-   *
-   * Argument:
-   *   - cohortId: Identifiant de la cohorte
-   *   - motivation: Raison de l'export
-   *   - tables: Liste de tables demandées dans l'export
-   */
-  createExport: (args: {
-    cohortId: string
-    motivation: string
-    tables: ExportCSVTable[]
-    outputFormat: 'csv' | 'xlsx'
-    group_tables: boolean
-  }) => Promise<AxiosResponse<Export> | AxiosError>
 }
 
 const servicesCohorts: IServiceCohorts = {
@@ -1126,28 +1108,6 @@ const servicesCohorts: IServiceCohorts = {
     } catch (error) {
       console.error('Error (fetchCohortsRights) :', error)
       return []
-    }
-  },
-
-  createExport: async (args): Promise<AxiosResponse<Export> | AxiosError> => {
-    try {
-      const { cohortId, motivation, tables, outputFormat, group_tables } = args
-
-      return await apiBackend.post<Export>('/exports/', {
-        motivation,
-        export_tables: tables.map((table: ExportCSVTable) => ({
-          table_ids: table.id,
-          cohort_result_source: cohortId,
-          respect_table_relationships: table.respect_table_relationships,
-          ...(table.fhir_filter && { fhir_filter: table.fhir_filter?.uuid })
-        })),
-        nominative: true, // Nominative should always be true when exporting a CSV (see issue #1113)
-        output_format: outputFormat,
-        group_tables: group_tables
-      })
-    } catch (error) {
-      if (isAxiosError(error)) return error
-      else throw error
     }
   }
 }
