@@ -14,7 +14,6 @@ const useCreateSample = () => {
       queryClient.invalidateQueries({ queryKey: ['samples'] })
       queryClient.invalidateQueries({ queryKey: ['samplesCount'] })
       queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === 'cohorts' })
-      dispatch(setMessage({ type: 'success', content: "L'échantillon a été créé avec succès" }))
     },
     onError: () => {
       dispatch(setMessage({ type: 'error', content: "Erreur lors de la création de l'échantillon" }))
