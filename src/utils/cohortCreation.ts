@@ -22,6 +22,7 @@ import criteriaList, { getAllCriteriaItems } from 'components/CreationCohort/Dat
 import { getChildrenFromCodes, HIERARCHY_ROOT } from 'services/aphp/serviceValueSets'
 import { createHierarchyRoot } from './hierarchy'
 import { FhirItem } from 'types/valueSet'
+import { formatAge } from './age'
 
 const REQUETEUR_VERSION = 'v1.6.1'
 
@@ -288,6 +289,17 @@ export function buildRequest(
           isInclusive: item.isInclusive ?? true,
           resourceType: mapCriteriaToResource(item.type),
           filterFhir: constructFhirFilter(item, deidentified, criteriaDefinitions),
+          patientAge:
+            item?.encounterAgeRange?.start || item?.encounterAgeRange?.end
+              ? {
+                  minAge: item?.encounterAgeRange?.start
+                    ? formatAge(item?.encounterAgeRange?.start, 'DD/MM/YY', 'YY-MM-DD')
+                    : undefined,
+                  maxAge: item?.encounterAgeRange?.end
+                    ? formatAge(item?.encounterAgeRange?.end, 'DD/MM/YY', 'YY-MM-DD')
+                    : undefined
+                }
+              : undefined,
           occurrence: !(item.type === CriteriaType.PATIENT || item.type === CriteriaType.IPP_LIST)
             ? {
                 n: item.occurrence.value,
