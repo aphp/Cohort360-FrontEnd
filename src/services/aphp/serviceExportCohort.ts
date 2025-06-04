@@ -1,6 +1,6 @@
 import { fetchExportTableInfo, fetchExportTableRelationInfo, fetchExportList } from 'services/aphp/callApi'
 import { getConfig } from 'config'
-import { AxiosResponse, isAxiosError, AxiosError } from 'axios'
+import { AxiosResponse } from 'axios'
 import { Export, Cohort } from 'types'
 import apiBackend from 'services/apiBackend'
 import { TableSetting } from 'types/export'
@@ -81,7 +81,7 @@ export const postExportCohort = async ({
       respect_table_relationships: table.respectTableRelationships,
       columns: table.columns,
       ...(table.fhirFilter && { fhir_filter: table.fhirFilter?.uuid }),
-      pivot_merge: table.pivotMerge
+      pivot_merge_columns: table.pivotMergeColumns
     })),
     nominative: nominative,
     shift_date: shift_date,

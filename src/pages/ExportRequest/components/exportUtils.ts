@@ -4,8 +4,6 @@ import {
   fetchClaim,
   fetchCondition,
   fetchDocumentReference,
-  fetchEncounter,
-  fetchForms,
   fetchImaging,
   fetchMedicationAdministration,
   fetchMedicationRequest,
@@ -13,7 +11,6 @@ import {
   fetchPatient,
   fetchProcedure
 } from 'services/aphp/callApi'
-import { ExportCSVTable } from 'types'
 import { TableInfo } from 'types/export'
 import { ResourceType } from 'types/requestCriterias'
 import {
@@ -27,29 +24,6 @@ import {
   VitalStatus
 } from 'types/searchCriterias'
 import { substructAgeString } from 'utils/age'
-
-export type Counts = {
-  patientCount?: number
-  conditionCount?: number
-  procedureCount?: number
-  claimCount?: number
-  documentsCount?: number
-  medicationRequestCount?: number
-  medicationAdministrationCount?: number
-  observationCount?: number
-  imagingCount?: number
-}
-
-export type ResourcesWithExportTables =
-  | ResourceType.PATIENT
-  | ResourceType.CONDITION
-  | ResourceType.PROCEDURE
-  | ResourceType.CLAIM
-  | ResourceType.MEDICATION_REQUEST
-  | ResourceType.MEDICATION_ADMINISTRATION
-  | ResourceType.IMAGING
-  | ResourceType.DOCUMENTS
-  | ResourceType.OBSERVATION
 
 const fetchPatientCount = async (cohortId: string, patientsFilters?: SearchCriterias<PatientsFilters>) => {
   try {
@@ -267,28 +241,6 @@ const fetchImagingCount = async (cohortId: string, imagingFilters?: SearchCriter
   }
 }
 
-const fetchEncounterCount = async (cohortId: string, visit?: boolean) => {
-  try {
-    const encounterResponse = await fetchEncounter({ _list: [cohortId], size: 0, visit: visit })
-    const count = encounterResponse.data.resourceType === 'Bundle' ? encounterResponse.data.total : 0
-    return count
-  } catch (error) {
-    console.error('Erreur lors de fetchEncounterCount', error)
-    throw error
-  }
-}
-
-const fetchQuestionnaireCount = async (cohortId: string) => {
-  try {
-    const resourceResponse = await fetchForms({ _list: [cohortId], size: 0 })
-    const count = resourceResponse.data.resourceType === 'Bundle' ? resourceResponse.data.total : 0
-    return count
-  } catch (error) {
-    console.error('Erreur lors de fetchQuestionnaireCount', error)
-    throw error
-  }
-}
-
 const fetchDocumentsCount = async (cohortId: string, documentsFilters?: SearchCriterias<DocumentsFilters>) => {
   try {
     let docResp
@@ -351,101 +303,6 @@ const fetchObservationCount = async (cohortId: string, observationFilters?: Sear
     console.error('Erreur lors de fetchObservationCount', error)
     throw error
   }
-}
-
-export const fetchAllResourcesCount = async (cohortId: string) => {
-  try {
-    const [
-      patientCount,
-      conditionCount,
-      procedureCount,
-      claimCount,
-      documentsCount,
-      medicationRequestCount,
-      medicationAdministrationCount,
-      observationCount,
-      imagingCount,
-      encounterVisitCount,
-      encounterDetailsCounts
-      // questionnaireResponseCount
-    ] = await Promise.all([
-      fetchPatientCount(cohortId),
-      fetchConditionCount(cohortId),
-      fetchProcedureCount(cohortId),
-      fetchClaimCount(cohortId),
-      fetchDocumentsCount(cohortId),
-      fetchMedicationCount(cohortId, ResourceType.MEDICATION_REQUEST),
-      fetchMedicationCount(cohortId, ResourceType.MEDICATION_ADMINISTRATION),
-      fetchObservationCount(cohortId),
-      fetchImagingCount(cohortId),
-      fetchEncounterCount(cohortId, true),
-      fetchEncounterCount(cohortId)
-      // fetchQuestionnaireCount(cohortId)
-    ])
-
-    return {
-      patientCount,
-      conditionCount,
-      procedureCount,
-      claimCount,
-      documentsCount,
-      medicationRequestCount,
-      medicationAdministrationCount,
-      observationCount,
-      imagingCount,
-      encounterVisitCount,
-      encounterDetailsCounts
-      // questionnaireResponseCount
-    }
-  } catch (error) {
-    console.error('Erreur lors de fetchQuestionnaireCount', error)
-    throw error
-  }
-}
-
-export const fetchResourceCount = async (cohortId: string, table: ExportCSVTable) => {
-  const { resourceType, fhir_filter } = table
-  try {
-    const filters = await mapRequestParamsToSearchCriteria(fhir_filter?.filter ?? '', resourceType)
-    const fetchers = {
-      [ResourceType.PATIENT]: fetchPatientCount,
-      [ResourceType.CONDITION]: fetchConditionCount,
-      [ResourceType.PROCEDURE]: fetchProcedureCount,
-      [ResourceType.CLAIM]: fetchClaimCount,
-      [ResourceType.DOCUMENTS]: fetchDocumentsCount,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      [ResourceType.MEDICATION_REQUEST]: (cohortId: string, filters: any) =>
-        fetchMedicationCount(cohortId, ResourceType.MEDICATION_REQUEST, filters),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      [ResourceType.MEDICATION_ADMINISTRATION]: (cohortId: string, filters: any) =>
-        fetchMedicationCount(cohortId, ResourceType.MEDICATION_ADMINISTRATION, filters),
-      [ResourceType.OBSERVATION]: fetchObservationCount,
-      [ResourceType.IMAGING]: fetchImagingCount
-    }
-
-    const fetcher = fetchers[resourceType as keyof typeof fetchers]
-
-    return (await fetcher(cohortId, filters)) ?? 0
-  } catch (error) {
-    console.error('Erreur lors du fetch du count de la ressource', error)
-    throw error
-  }
-}
-
-export const getRightCount = (counts: Counts, tableResourceType: ResourcesWithExportTables) => {
-  const countMapping = {
-    [ResourceType.PATIENT]: counts?.patientCount,
-    [ResourceType.CONDITION]: counts?.conditionCount,
-    [ResourceType.PROCEDURE]: counts?.procedureCount,
-    [ResourceType.CLAIM]: counts?.claimCount,
-    [ResourceType.DOCUMENTS]: counts?.documentsCount,
-    [ResourceType.MEDICATION_REQUEST]: counts?.medicationRequestCount,
-    [ResourceType.MEDICATION_ADMINISTRATION]: counts?.medicationAdministrationCount,
-    [ResourceType.OBSERVATION]: counts?.observationCount,
-    [ResourceType.IMAGING]: counts?.imagingCount
-  }
-
-  return countMapping[tableResourceType] ?? 0
 }
 
 export const fetchResourceCount2 = async (cohortId: string, resourceType: ResourceType, fhirFilter?: any) => {

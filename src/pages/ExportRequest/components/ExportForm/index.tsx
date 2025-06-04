@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
 
 import {
   Grid,
@@ -34,7 +34,7 @@ import {
 import { Cohort } from 'types'
 import { TableSetting, TableInfo } from 'types/export'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { sortTables } from 'components/Dashboard/ExportModal/exportUtils'
+import { sortTables } from 'pages/ExportRequest/components/exportUtils'
 
 import { getConfig } from 'config'
 
@@ -49,12 +49,10 @@ export enum Error {
   NO_ERROR
 }
 
-type ErrorTables = [
-  {
-    tableName: string
-    error: Error
-  }
-]
+type ErrorTables = Array<{
+  tableName: string
+  error?: Error
+}>
 
 const tableSettingsInitialState: TableSetting[] = [
   {
@@ -62,8 +60,7 @@ const tableSettingsInitialState: TableSetting[] = [
     isChecked: true,
     columns: null,
     fhirFilter: null,
-    respectTableRelationships: true,
-    pivotMerge: false
+    respectTableRelationships: true
   }
 ]
 
@@ -85,7 +82,6 @@ const ExportForm: React.FC = () => {
   const [exportCohort, setExportCohort] = useState<Cohort | null>(null)
   const [exportCohortList, setExportCohortList] = useState<Cohort[] | []>([])
   const [exportTableList, setExportTableList] = useState<TableInfo[] | null>(null)
-  const checkedTables = tablesSettings.filter((tableSetting) => tableSetting.isChecked)
   const [compatibilitiesTables, setCompatibilitiesTables] = useState<string[] | null>(null)
   const [conditions, setConditions] = useState<boolean>(false)
   const [motivation, setMotivation] = useState<string | null>(null)
@@ -139,23 +135,19 @@ const ExportForm: React.FC = () => {
       }
       setLoading(false)
     } catch (error) {
+      console.error(error)
       setLoading(false)
       setFetchError(Error.ERROR_FETCH)
     }
   }, [])
 
   const _fetchCompatibilitiesTables = useCallback(async () => {
-    const tableList = tablesSettings
-      .map((tableSetting) => {
-        if (tableSetting.isChecked) {
-          return tableSetting.tableName
-        }
-      })
-      .filter((table) => table !== undefined)
+    const tableList = tablesSettings.filter((t) => t.isChecked).map((t) => t.tableName)
     try {
-      const response = await fetchExportTablesRelationsInfo(tableList as string[])
+      const response = await fetchExportTablesRelationsInfo(tableList)
       setCompatibilitiesTables(response)
     } catch (e) {
+      console.error(e)
       return []
     }
   }, [tablesSettings])
@@ -205,63 +197,108 @@ const ExportForm: React.FC = () => {
     }
   }, [oneFile, _fetchCompatibilitiesTables])
 
-  const addNewTableSetting = (arg: TableSetting) => {
-    setTablesSettings([...tablesSettings, arg])
-  }
+  const addNewTableSetting = useCallback(
+    (newSetting: TableSetting) =>
+      setTablesSettings((prev) => {
+        const index = prev.findIndex((table) => table.tableName === newSetting.tableName)
+        if (index === -1) return [...prev, newSetting]
+        const clone = [...prev]
+        clone[index] = { ...clone[index], ...newSetting }
+        return clone
+      }),
+    []
+  )
 
-  const onChangeTableSettings = (tableName: string, key: any, value: any) => {
-    const newTableSettings: TableSetting[] = tablesSettings.map((tableSetting) => {
-      if (tableSetting.tableName === tableName) {
-        return {
-          ...tableSetting,
-          [key]: value
-        }
-      } else {
-        return tableSetting
-      }
-    })
-    setTablesSettings(newTableSettings)
-  }
+  const removeTableSetting = useCallback(
+    (tableName: string) => {
+      const newTableSettings = tablesSettings.filter((tableSetting) => tableSetting.tableName !== tableName)
+      setTablesSettings(newTableSettings)
+    },
+    [tablesSettings]
+  )
 
-  const onChangeError = (tableName: string, errorValue: Error) => {
-    const newErrorTableSettings: any = tablesSettings.map((tableSetting) => {
-      if (tableSetting.tableName === tableName) {
-        return {
-          ...tableSetting,
-          error: errorValue
+  const onChangeTableSettings = useCallback(
+    (tableName: string, key: any, value: any) => {
+      const newTableSettings: TableSetting[] = tablesSettings.map((tableSetting) => {
+        if (tableSetting.tableName === tableName) {
+          return {
+            ...tableSetting,
+            [key]: value
+          }
+        } else {
+          return tableSetting
         }
-      } else {
-        return tableSetting
+      })
+      setTablesSettings(newTableSettings)
+    },
+    [tablesSettings]
+  )
+
+  const tableSettingData = useCallback(
+    (tableName: string) => {
+      return tablesSettings.find((tableSetting) => tableSetting.tableName === tableName)
+    },
+    [tablesSettings]
+  )
+
+  const onChangeError = useCallback((tableName: string, errorValue: Error) => {
+    setErrorTables((prev) => {
+      const index = prev.findIndex((table) => table.tableName === tableName)
+
+      if (index === -1) {
+        return [...prev, { tableName, error: errorValue }]
       }
+      const newEntry = [...prev]
+      newEntry[index] = { tableName, error: errorValue }
+      return newEntry
     })
-    setErrorTables(newErrorTableSettings)
-  }
+  }, [])
 
   const resetSelectedTables = () => {
-    const newSelectedTables = tablesSettings.map((tableSetting) => ({
-      ...tableSetting,
-      isChecked: tableSetting.tableName === 'person'
-    }))
+    const newSelectedTables = tableSettingsInitialState
     setTablesSettings(newSelectedTables)
   }
 
-  const handleSelectAllTables = () => {
-    const newSelectedTables = tablesSettings.map((tableSetting) => ({
-      ...tableSetting,
-      isChecked: tableSetting.tableName !== 'person' ? tablesSettings.length !== checkedTables.length : true
-    }))
-    setTablesSettings(newSelectedTables)
-  }
+  const handleSelectAllTables = useCallback(
+    (_e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+      if (!exportTableList) return
+
+      if (checked) {
+        const allTables: TableSetting[] = exportTableList.map((exportTable) => {
+          const previous = tablesSettings.find((tableSetting) => tableSetting.tableName === exportTable.name)
+          return previous
+            ? { ...previous, isChecked: true }
+            : {
+                tableName: exportTable.name,
+                isChecked: true,
+                columns: null,
+                fhirFilter: null,
+                respectTableRelationships: true
+              }
+        })
+        setTablesSettings(allTables)
+      } else {
+        setTablesSettings([
+          {
+            tableName: 'person',
+            isChecked: true,
+            columns: null,
+            fhirFilter: null,
+            respectTableRelationships: true
+          }
+        ])
+      }
+    },
+    [exportTableList, tablesSettings]
+  )
 
   const handleSubmitPayload = async () => {
-    const tableToExport = tablesSettings.filter((tableSetting) => tableSetting.isChecked)
-
     const response = await postExportCohort({
       cohortId: exportCohort ?? { uuid: '' },
       motivation: motivation ?? '',
       group_tables: oneFile,
       outputFormat: exportTypeFile,
-      tables: tableToExport
+      tables: tablesSettings
     })
 
     const error = response.status !== 201
@@ -294,6 +331,35 @@ const ExportForm: React.FC = () => {
       setError(null)
     }
   }
+
+  const tableListView = useMemo(() => {
+    return exportTableList?.map((exportTable, index: number) => (
+      <ExportTable
+        key={exportTable.name + index}
+        exportCohort={exportCohort}
+        exportTable={exportTable}
+        exportTableSettings={tableSettingData(exportTable.name)}
+        setError={onChangeError}
+        addNewTableSetting={addNewTableSetting}
+        removeTableSetting={removeTableSetting}
+        onChangeTableSettings={onChangeTableSettings}
+        compatibilitiesTables={compatibilitiesTables}
+        exportTypeFile={exportTypeFile}
+        oneFile={oneFile}
+      />
+    ))
+  }, [
+    exportTableList,
+    exportCohort,
+    onChangeError,
+    addNewTableSetting,
+    removeTableSetting,
+    tableSettingData,
+    onChangeTableSettings,
+    compatibilitiesTables,
+    exportTypeFile,
+    oneFile
+  ])
 
   return (
     <Grid container>
@@ -425,21 +491,24 @@ const ExportForm: React.FC = () => {
                     <Checkbox
                       color="secondary"
                       indeterminate={
-                        tablesSettings.filter((tableSetting) => tableSetting.isChecked).length !==
-                          tablesSettings.length &&
-                        tablesSettings.filter((tableSetting) => tableSetting.isChecked).length > 0
+                        (exportTableList &&
+                          tablesSettings.filter((tableSetting) => tableSetting.isChecked).length !==
+                            exportTableList.length &&
+                          tablesSettings.some((tableSetting) => tableSetting.isChecked)) ??
+                        false
+                      }
+                      checked={
+                        (exportTableList &&
+                          tablesSettings.filter((tableSetting) => tableSetting.isChecked).length ===
+                            exportTableList.length) ??
+                        false
                       }
                       indeterminateIcon={<IndeterminateCheckBoxOutlined style={{ color: 'rgba(0,0,0,0.6)' }} />}
-                      checked={
-                        tablesSettings.filter((tableSetting) => tableSetting.isChecked).length === tablesSettings.length
-                      }
                       onChange={handleSelectAllTables}
                     />
                   }
                   label={
-                    tablesSettings.filter((tableSetting) => tableSetting.isChecked).length === tablesSettings.length
-                      ? 'Tout désélectionner'
-                      : 'Tout sélectionner'
+                    tablesSettings.length === exportTableList?.length ? 'Tout désélectionner' : 'Tout sélectionner'
                   }
                   labelPlacement="start"
                 />
@@ -451,22 +520,7 @@ const ExportForm: React.FC = () => {
               <CircularProgress />
             </Grid>
           ) : (
-            <>
-              {exportTableList?.map((exportTable, index: number) => (
-                <ExportTable
-                  key={exportTable.name + index}
-                  exportCohort={exportCohort}
-                  exportTable={exportTable}
-                  exportTableSettings={tablesSettings}
-                  setError={onChangeError}
-                  addNewTableSetting={addNewTableSetting}
-                  onChangeTableSettings={onChangeTableSettings}
-                  compatibilitiesTables={compatibilitiesTables}
-                  exportTypeFile={exportTypeFile}
-                  oneFile={oneFile}
-                />
-              ))}
-            </>
+            tableListView
           )}
 
           <Grid container gap="12px" pb="10px">
