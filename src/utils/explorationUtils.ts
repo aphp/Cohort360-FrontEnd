@@ -66,12 +66,15 @@ export const getFoldersConfirmDeletionMessage = () => {
 }
 
 export const redirectToSamples = (parentCohortId: string, parentRequestId?: string, parentFolderId?: string) => {
+  const cleanedSearchParams = cleanSearchParams(new URLSearchParams(location.search ?? '')).toString()
+  const cleanedSearch = cleanedSearchParams ? `?${cleanedSearchParams}` : ''
+
   if (parentFolderId && parentRequestId) {
-    return `/researches/projects/${parentFolderId}/${parentRequestId}/${parentCohortId}${location.search}`
+    return `/researches/projects/${parentFolderId}/${parentRequestId}/${parentCohortId}${cleanedSearch}`
   } else if (parentRequestId) {
-    return `/researches/requests/${parentRequestId}/${parentCohortId}${location.search}`
+    return `/researches/requests/${parentRequestId}/${parentCohortId}${cleanedSearch}`
   } else {
-    return `/researches/cohorts/${parentCohortId}${location.search}`
+    return `/researches/cohorts/${parentCohortId}${cleanedSearch}`
   }
 }
 
@@ -211,7 +214,7 @@ export const getCohortsSearchParams = (searchParams: URLSearchParams) => {
     searchInput: searchParams.get(ExplorationsSearchParams.SEARCH_INPUT) ?? '',
     startDate: searchParams.get(ExplorationsSearchParams.START_DATE),
     endDate: searchParams.get(ExplorationsSearchParams.END_DATE),
-    page: parseInt(searchParams.get('page') ?? '1', 10),
+    page: parseInt(searchParams.get(ExplorationsSearchParams.PAGE) ?? '1', 10),
     orderBy: (searchParams.get(ExplorationsSearchParams.ORDER_BY) as Order) ?? Order.CREATED_AT,
     orderDirection: (searchParams.get(ExplorationsSearchParams.DIRECTION) as Direction) ?? Direction.DESC,
     status: getStatusParam(searchParams.get(ExplorationsSearchParams.STATUS)) as ValueSet[],

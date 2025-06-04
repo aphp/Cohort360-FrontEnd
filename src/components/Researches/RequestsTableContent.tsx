@@ -13,7 +13,7 @@ import ShareIcon from '@mui/icons-material/Share'
 
 import { Column, RequestType } from 'types'
 import { Order, OrderBy } from 'types/searchCriterias'
-import { getCohortTotal, getRequestName } from 'utils/explorationUtils'
+import { cleanSearchParams, getCohortTotal, getRequestName } from 'utils/explorationUtils'
 import { formatDate } from 'utils/formatDate'
 import { isChecked } from 'utils/filters'
 
@@ -134,13 +134,15 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
             <TableCellWrapper align="left">
               <SublevelButton
                 label="cohorte"
-                onClick={() =>
+                onClick={() => {
+                  const cleanedSearchParams = cleanSearchParams(new URLSearchParams(location.search)).toString()
+                  const cleanedSearch = cleanedSearchParams ? `?${cleanedSearchParams}` : ''
                   navigate(
                     projectId
-                      ? `/researches/projects/${projectId}/${request.uuid}${location.search}`
-                      : `/researches/requests/${request.uuid}${location.search}`
+                      ? `/researches/projects/${projectId}/${request.uuid}${cleanedSearch}`
+                      : `/researches/requests/${request.uuid}${cleanedSearch}`
                   )
-                }
+                }}
                 total={cohortTotal}
               />
             </TableCellWrapper>
