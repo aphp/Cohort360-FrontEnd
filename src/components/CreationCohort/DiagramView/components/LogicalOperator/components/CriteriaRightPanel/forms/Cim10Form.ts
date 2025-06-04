@@ -32,6 +32,7 @@ export const form: () => CriteriaForm<Cim10DataType> = () => ({
     occurrence: { value: 1, comparator: Comparators.GREATER_OR_EQUAL },
     encounterService: null,
     startOccurrence: null,
+    encounterAgeRange: { start: null, end: null },
     encounterStartDate: null,
     encounterEndDate: null,
     encounterStatus: [],
@@ -134,6 +135,14 @@ export const form: () => CriteriaForm<Cim10DataType> = () => ({
       title: 'Options avancées',
       defaulCollapsed: true,
       items: [
+        {
+          valueKey: 'encounterAgeRange',
+          label: 'Âge au début de la prise en charge',
+          type: 'durationRange',
+          buildInfo: {
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Âge au début de la prise en charge' }]
+          }
+        },
         {
           valueKey: 'encounterService',
           label: 'Unité exécutrice',
