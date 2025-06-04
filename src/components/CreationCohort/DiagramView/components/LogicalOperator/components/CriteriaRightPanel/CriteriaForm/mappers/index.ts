@@ -7,6 +7,7 @@ import { ValueSetStore } from 'state/valueSets'
 import { ReactNode } from 'react'
 import { isArray, isFunction, isString } from 'lodash'
 import { BUILD_MAPPERS, BuilderMethod, UNBUILD_MAPPERS } from './buildMappers'
+import { formatAge } from 'utils/age'
 
 /************************************************************************************/
 /*                        Criteria Form Data Mappers                                */
@@ -253,6 +254,13 @@ export const unbuildCriteriaDataFromDefinition = async <T extends SelectedCriter
     }
   }
 
+  if (element.patientAge && 'encounterAgeRange' in emptyCriterion) {
+    emptyCriterion.encounterAgeRange = {
+      start: element.patientAge.minAge ? formatAge(element.patientAge.minAge, 'YY-MM-DD', 'DD/MM/YY') : null,
+      end: element.patientAge.maxAge ? formatAge(element.patientAge.maxAge, 'YY-MM-DD', 'DD/MM/YY') : null
+    }
+  }
+
   const criteriaItems = criteriaDefinition.itemSections.flatMap((section) => section.items)
   if (element.filterFhir) {
     const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
@@ -328,9 +336,9 @@ export const criteriasAsArray = (
   const chips = criteriaDef.itemSections
     .flatMap((section) => section.items)
     .map((item) => {
-      if (!item.buildInfo || !item.valueKey) return null
+      if (!item.valueKey) return null
       let val = selectedCriteria[item.valueKey as keyof typeof selectedCriteria]
-      if (item.buildInfo.ignoreIf) {
+      if (item.buildInfo && item.buildInfo.ignoreIf) {
         const ignore = isFunction(item.buildInfo.ignoreIf)
           ? item.buildInfo.ignoreIf(selectedCriteria)
           : eval(item.buildInfo.ignoreIf)(selectedCriteria)

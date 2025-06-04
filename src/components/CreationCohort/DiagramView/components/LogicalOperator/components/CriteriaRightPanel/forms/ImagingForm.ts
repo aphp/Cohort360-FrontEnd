@@ -45,6 +45,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
     },
     encounterService: null,
     encounterStatus: [],
+    encounterAgeRange: { start: null, end: null },
     encounterStartDate: null,
     encounterEndDate: null,
     studyDate: null,
@@ -307,6 +308,14 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
       title: 'Options avancées',
       defaulCollapsed: true,
       items: [
+        {
+          valueKey: 'encounterAgeRange',
+          label: 'Âge au début de la prise en charge',
+          type: 'durationRange',
+          buildInfo: {
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Âge au début de la prise en charge' }]
+          }
+        },
         {
           valueKey: 'encounterService',
           label: 'Unité exécutrice',
