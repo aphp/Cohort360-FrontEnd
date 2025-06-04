@@ -26,6 +26,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
     searchInput,
     onChangeMode,
     onDelete,
+    onSort,
     selectedCodes,
     isSelectionDisabled,
     loadingStatus,
@@ -136,6 +137,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
             onSelectAll={selectAll}
             onExpand={expand}
             onChangePage={onChangePage}
+            onSort={onSort}
           />
         </Displayer>
       </Grid>

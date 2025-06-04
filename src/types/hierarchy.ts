@@ -36,6 +36,8 @@ export type Hierarchy<T = {}, S = string> = AbstractTree<
     inferior_levels_ids: string
     system: string
     status?: SelectedStatus
+    statTotal?: number
+    statTotalUnique?: number
   }
 >
 

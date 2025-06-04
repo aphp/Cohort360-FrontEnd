@@ -8,18 +8,25 @@ import {
   TableBody,
   TableContainer,
   TableHead,
-  Typography
+  Typography,
+  IconButton
 } from '@mui/material'
 import { LoadingStatus } from 'types'
 import { Hierarchy, HierarchyInfo, SearchMode, SelectedStatus } from 'types/hierarchy'
-import { KeyboardArrowDown, KeyboardArrowRight, IndeterminateCheckBoxOutlined } from '@mui/icons-material'
+import {
+  KeyboardArrowDown,
+  KeyboardArrowRight,
+  IndeterminateCheckBoxOutlined,
+  ArrowUpward,
+  ArrowDownward
+} from '@mui/icons-material'
 import { CellWrapper, RowContainerWrapper, RowWrapper } from '../Hierarchy/styles'
 import { sortArray } from 'utils/arrays'
 import { v4 as uuidv4 } from 'uuid'
 import { LIMIT_PER_PAGE } from 'hooks/search/useSearchParameters'
 import { Pagination } from 'components/ui/Pagination'
 import { getLabelFromCode, isDisplayedWithCode } from 'utils/valueSets'
-import { FhirItem } from 'types/valueSet'
+import { FhirItem, ValueSetSortField, ValueSetSorting } from 'types/valueSet'
 import TruncatedText from 'components/ui/TruncatedText'
 
 type ValueSetRowProps = {
@@ -79,8 +86,18 @@ const ValueSetRow = ({
               </>
             )}
           </CellWrapper>
-          <CellWrapper item xs={10} cursor onClick={() => (open ? setOpen(false) : handleOpen())}>
+          <CellWrapper item xs={6} cursor onClick={() => (open ? setOpen(false) : handleOpen())}>
             <TruncatedText lineNb={2} text={getLabelFromCode(item)}></TruncatedText>
+          </CellWrapper>
+          <CellWrapper item xs={2} container justifyContent="center">
+            <Typography variant="body2">
+              {item.statTotalUnique !== undefined ? item.statTotalUnique.toLocaleString() : '-'}
+            </Typography>
+          </CellWrapper>
+          <CellWrapper item xs={2} container justifyContent="center">
+            <Typography variant="body2">
+              {item.statTotal !== undefined ? item.statTotal.toLocaleString() : '-'}
+            </Typography>
           </CellWrapper>
           <CellWrapper item xs={1} container>
             <Checkbox
@@ -128,6 +145,7 @@ type ValueSetTableProps = {
   onSelect: (nodes: Hierarchy<FhirItem>[], toAdd: boolean, mode: SearchMode) => void
   onSelectAll: (system: string, toAdd: boolean) => void
   onChangePage: (page: number) => void
+  onSort?: (sorting: ValueSetSorting) => void
 }
 
 const ValueSetTable = ({
@@ -140,13 +158,36 @@ const ValueSetTable = ({
   onSelect,
   onSelectAll,
   onExpand,
-  onChangePage
+  onChangePage,
+  onSort
 }: ValueSetTableProps) => {
+  const [currentSort, setCurrentSort] = useState<ValueSetSorting | null>(null)
+
   const handleSelect = (checked: boolean) => {
     if (mode === SearchMode.RESEARCH) {
       const notDisabled = hierarchy.tree.filter((node) => !isSelectionDisabled(node))
       onSelect(notDisabled, checked, SearchMode.RESEARCH)
     } else onSelectAll(hierarchy.system, checked)
+  }
+
+  const handleSort = (field: ValueSetSortField) => {
+    if (!onSort) return
+
+    let newOrder: 'asc' | 'desc' = 'desc'
+
+    // If clicking the same field, toggle the order
+    if (currentSort?.field === field) {
+      newOrder = currentSort.order === 'desc' ? 'asc' : 'desc'
+    }
+
+    const newSort: ValueSetSorting = { field, order: newOrder }
+    setCurrentSort(newSort)
+    onSort(newSort)
+  }
+
+  const getSortIcon = (field: ValueSetSortField) => {
+    if (currentSort?.field !== field) return null
+    return currentSort.order === 'desc' ? <ArrowDownward fontSize="small" /> : <ArrowUpward fontSize="small" />
   }
 
   return (
@@ -159,10 +200,46 @@ const ValueSetTable = ({
                 <RowContainerWrapper container>
                   <RowWrapper container alignItems="center" justifyContent="space-between" style={{ paddingRight: 10 }}>
                     <CellWrapper item xs={1} />
-                    <CellWrapper item xs={10}>
+                    <CellWrapper item xs={6}>
                       <Typography color={hierarchy.count ? 'primary' : '#4f4f4f'} fontWeight={600}>
                         {hierarchy.count ? `${hierarchy.count} résultat(s)` : `Aucun résultat à afficher`}
                       </Typography>
+                    </CellWrapper>
+                    <CellWrapper item xs={2} container justifyContent="center">
+                      {onSort && mode === SearchMode.RESEARCH ? (
+                        <IconButton
+                          size="small"
+                          onClick={() => handleSort('statTotalUnique')}
+                          style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+                        >
+                          <Typography variant="body2" fontWeight={600} color="#4f4f4f">
+                            Nb Patients
+                          </Typography>
+                          {getSortIcon('statTotalUnique')}
+                        </IconButton>
+                      ) : (
+                        <Typography variant="body2" fontWeight={600} color="#4f4f4f">
+                          Nb Patients
+                        </Typography>
+                      )}
+                    </CellWrapper>
+                    <CellWrapper item xs={2} container justifyContent="center">
+                      {onSort && mode === SearchMode.RESEARCH ? (
+                        <IconButton
+                          size="small"
+                          onClick={() => handleSort('statTotal')}
+                          style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+                        >
+                          <Typography variant="body2" fontWeight={600} color="#4f4f4f">
+                            Fréquence
+                          </Typography>
+                          {getSortIcon('statTotal')}
+                        </IconButton>
+                      ) : (
+                        <Typography variant="body2" fontWeight={600} color="#4f4f4f">
+                          Fréquence
+                        </Typography>
+                      )}
                     </CellWrapper>
                     <CellWrapper item xs={1} container>
                       {hierarchy.count > 0 && (

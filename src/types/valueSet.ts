@@ -35,10 +35,19 @@ export type Reference = {
   filterRoots?: <T>(code: Hierarchy<T>) => boolean
 }
 
+export type ValueSetSortField = 'statTotalUnique' | 'statTotal'
+
+export type ValueSetSorting = {
+  field: ValueSetSortField
+  order: 'asc' | 'desc'
+}
+
 export type FhirItem = {
   id: string
   label: string
   parentIds?: string[]
   childrenIds?: string[]
   system: string
+  statTotal?: number
+  statTotalUnique?: number
 }

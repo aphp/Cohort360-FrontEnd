@@ -11,6 +11,15 @@ export const getExtension = (
   return undefined
 }
 
+export const getExtensionIntegerValue = (
+  resource: FhirElement | undefined,
+  url?: string,
+  ...alternativeUrls: string[]
+): number | undefined => {
+  const extension = getExtension(resource, url, ...alternativeUrls)
+  return extension?.valueInteger
+}
+
 export const getCategory = (resource: Condition | undefined, url?: string): CodeableConcept | undefined => {
   if (resource?.category && url) {
     return resource.category.find((e) => e?.coding?.find((a) => a.system === url))

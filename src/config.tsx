@@ -157,6 +157,8 @@ export type AppConfig = {
       patientLastEnconterUrl?: string
       patientTotalAgeDaysExtensionUrl?: string
       patientTotalAgeMonthsExtensionUrl?: string
+      statTotal?: string
+      statTotalUnique?: string
     }
   }
   system: {
@@ -208,7 +210,10 @@ let config: AppConfig = {
       encounterStatus: { url: '' },
       encounterVisitType: { url: '' }
     },
-    extensions: {}
+    extensions: {
+      statTotal: 'https://terminology.eds.aphp.fr/fhir/StructureDefinition/stat-total',
+      statTotalUnique: 'https://terminology.eds.aphp.fr/fhir/StructureDefinition/stat-total-unique'
+    }
   },
   features: {
     cohort: {
