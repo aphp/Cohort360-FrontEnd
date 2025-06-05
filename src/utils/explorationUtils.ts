@@ -4,6 +4,7 @@ import {
   CohortsFilters,
   Direction,
   FilterKeys,
+  SearchCriteriaKeys,
   FilterValue,
   LabelObject,
   Order,
@@ -12,6 +13,7 @@ import {
 import { isDateValid } from './formatDate'
 import { AppConfig } from 'config'
 import { format } from './numbers'
+import { SetURLSearchParams } from 'react-router-dom'
 
 export const replaceItem = <T extends ProjectType | RequestType | Cohort>(item: T, itemsList: T[]) => {
   const index = itemsList.findIndex(({ uuid }) => uuid === item.uuid)
@@ -119,8 +121,9 @@ export const isExportDisabled = (cohort: Cohort, maintenanceIsActive: boolean, i
 export const getVisibleFilters = (
   filters: {
     value: FilterValue
-    category: FilterKeys
+    category: FilterKeys | SearchCriteriaKeys
     label: string
+    disabled?: boolean
   }[]
 ) => {
   return filters.filter((item) => item.category !== FilterKeys.START_DATE && item.category !== FilterKeys.END_DATE)
@@ -184,14 +187,19 @@ export const parseSearchParamValue = (searchParam: string | null, options: {}) =
   return searchParam.split(',').filter((status) => Object.values(options).includes(status))
 }
 
-export const removeFromSearchParams = (searchParams: URLSearchParams, keyToRemove: string, value: FilterValue) => {
+export const removeFromSearchParams = (
+  searchParams: URLSearchParams,
+  setSearchParams: SetURLSearchParams,
+  keyToRemove: string,
+  value: FilterValue
+) => {
   const targetSearchParam = searchParams.get(keyToRemove)?.split(',')
   const cleanedParam = targetSearchParam
     ?.filter((searchValue) => searchValue !== (keyToRemove === FilterKeys.STATUS ? (value as LabelObject).id : value))
     .join()
 
   cleanedParam ? searchParams.set(keyToRemove, cleanedParam) : searchParams.delete(keyToRemove)
-  return searchParams
+  setSearchParams(searchParams)
 }
 
 export const cleanSearchParams = (searchParams: URLSearchParams) => {

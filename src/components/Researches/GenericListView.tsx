@@ -6,7 +6,7 @@ import CheckboxGroup from 'components/ui/Inputs/CheckboxGroup'
 import Modal from 'components/ui/Modal'
 import MultiSelect from 'components/ui/Inputs/MultiSelect'
 import NumberRange from 'components/ui/Inputs/NumberRange'
-import { FilterKeys, FilterValue } from 'types/searchCriterias'
+import { FilterKeys, FilterValue, SearchCriteriaKeys } from 'types/searchCriterias'
 import { statusOptions } from 'utils/explorationUtils'
 import useCohortListController from '../../hooks/researches/useCohortListController'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
@@ -27,8 +27,9 @@ interface GenericCohortListViewProps<TItem, TTableProps> {
     onAddSample?: () => void
     filters?: {
       value: FilterValue
-      category: FilterKeys
+      category: FilterKeys | SearchCriteriaKeys
       label: string
+      disabled?: boolean
     }[]
   }
   header?: React.ReactNode
