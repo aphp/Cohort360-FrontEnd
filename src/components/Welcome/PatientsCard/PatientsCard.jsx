@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
 import services from 'services/aphp'
 
-import displayDigit from 'utils/displayDigit'
+import { format } from 'utils/numbers'
 import JToolEggWrapper from 'components/Impersonation/JTool'
 import { Egg1 } from 'components/Impersonation/Eggs'
 
@@ -39,7 +39,7 @@ const PatientSearchCard = () => {
     <>
       <div id="patients-card-title">
         <Typography component="h2" variant="h2" color="primary" gutterBottom>
-          {loading ? <CircularProgress size={20} /> : displayDigit(patientNb) + ' patients pris en charge'}
+          {loading ? <CircularProgress size={20} /> : format(patientNb) + ' patients pris en charge'}
         </Typography>
       </div>
       <Divider />

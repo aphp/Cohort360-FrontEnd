@@ -1,3 +1,5 @@
+import { ReadRightPerimeter } from 'types'
+
 export type FetchScopeOptions = {
   ids?: string
   cohortIds?: string
@@ -29,4 +31,19 @@ export enum Rights {
 
 export enum System {
   ScopeTree = 'scope_tree'
+}
+
+export type ScopeElement = {
+  id: string
+  name: string
+  source_value: string
+  type: string
+  parent_id: string
+  above_levels_ids: string
+  inferior_levels_ids: string
+  cohort_id: string
+  cohort_size: string
+  full_path: string
+  rights?: ReadRightPerimeter
+  access?: 'Nominatif' | 'Pseudonymisé'
 }

@@ -1,16 +1,12 @@
 import { makeStyles } from 'tss-react/mui'
 
 const useStyles = makeStyles()(() => ({
-  gridContainer: {
-    marginBottom: 8
-  },
   newExportButton: {
     backgroundColor: '#5BC5F2',
     borderRadius: 25,
     border: 'none',
     color: '#FFF',
-    width: '20%',
-    padding: '2px 8px',
+    padding: '2px 15px',
     '&:hover': {
       backgroundColor: '#499cbf'
     }

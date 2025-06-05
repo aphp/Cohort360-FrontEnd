@@ -1,14 +1,17 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Grid } from '@mui/material'
 
+import isEqual from 'lodash/isEqual'
+
 import ActionBar from './ActionBar'
+import CheckboxGroup from 'components/ui/Inputs/CheckboxGroup'
 import Modal from 'components/ui/Modal'
-import CohortStatusFilter from 'components/Filters/CohortsStatusFilter'
-import CohortsTypesFilter from 'components/Filters/CohortsTypeFilter'
-import PatientsNbFilter from 'components/Filters/PatientsNbFilter'
-import { FilterKeys, FilterValue } from 'types/searchCriterias'
+import MultiSelect from 'components/ui/Inputs/MultiSelect'
+import NumberRange from 'components/ui/Inputs/NumberRange'
+import { FilterKeys, FilterValue, SearchCriteriaKeys } from 'types/searchCriterias'
 import { statusOptions } from 'utils/explorationUtils'
 import useCohortListController from '../../hooks/researches/useCohortListController'
+import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
 
 interface GenericCohortListViewProps<TItem, TTableProps> {
   controller: ReturnType<typeof useCohortListController<TItem>>
@@ -26,8 +29,9 @@ interface GenericCohortListViewProps<TItem, TTableProps> {
     onAddSample?: () => void
     filters?: {
       value: FilterValue
-      category: FilterKeys
+      category: FilterKeys | SearchCriteriaKeys
       label: string
+      disabled?: boolean
     }[]
   }
   header?: React.ReactNode
@@ -48,15 +52,45 @@ const GenericCohortListView = <TItem, TTableProps = any>({
     total,
     loading,
     order,
+    changeOrderBy,
     page,
+    handlePageChange,
     maintenanceIsActive,
     openFiltersModal,
     setOpenFiltersModal,
-    handlePageChange,
-    changeOrderBy,
+    form,
+    setForm,
+    modalError,
+    setModalError,
     removeFilterChip,
     applyFilters
   } = controller
+
+  const handleStatusChange = useCallback(
+    (value: typeof form.status) => {
+      setForm((prev) => (isEqual(prev.status, value) ? prev : { ...prev, status: value }))
+    },
+    [setForm]
+  )
+
+  const handleFavoriteChange = useCallback(
+    (values: typeof form.favorite) => {
+      setForm((prev) => (isEqual(prev.favorite, values) ? prev : { ...prev, favorite: values }))
+    },
+    [setForm]
+  )
+
+  const handlePatientsChange = useCallback(
+    (values: [string | undefined, string | undefined]) => {
+      setForm((prev) => {
+        const [min, max] = values
+        return prev.minPatients === min && prev.maxPatients === max
+          ? prev
+          : { ...prev, minPatients: min, maxPatients: max }
+      })
+    },
+    [setForm]
+  )
 
   return (
     <Grid container gap={2}>
@@ -75,7 +109,7 @@ const GenericCohortListView = <TItem, TTableProps = any>({
             onAddSample={actionBarProps?.onAddSample}
             onFilter={() => setOpenFiltersModal(true)}
             filters={actionBarProps?.filters}
-            onRemoveFilters={(k, v) => removeFilterChip(k, v as string)}
+            onRemoveFilters={(k, v) => removeFilterChip(k as FilterKeys, v as string)}
             disabled={maintenanceIsActive}
           />
         </>
@@ -94,20 +128,43 @@ const GenericCohortListView = <TItem, TTableProps = any>({
         {...(tableProps as any)}
       />
 
+      {/* {form && ( */}
       <Modal
         title="Filtrer par :"
         width="600px"
         open={openFiltersModal}
         onClose={() => setOpenFiltersModal(false)}
-        onSubmit={applyFilters}
+        onSubmit={() => applyFilters(form)}
+        isError={modalError}
       >
-        <CohortStatusFilter name={FilterKeys.STATUS} allStatus={statusOptions} value={controller.filters.status} />
-        <CohortsTypesFilter name={FilterKeys.FAVORITE} value={controller.filters.favorite} />
-        <PatientsNbFilter
-          names={[FilterKeys.MIN_PATIENTS, FilterKeys.MAX_PATIENTS]}
-          values={[controller.filters.minPatients, controller.filters.maxPatients]}
+        <MultiSelect
+          value={form.status ?? []}
+          label="Statut :"
+          options={statusOptions}
+          onChange={(value) => handleStatusChange(value)}
+        />
+        <CheckboxGroup
+          value={form.favorite}
+          onChange={(values) => {
+            handleFavoriteChange(values)
+          }}
+          label="Favoris :"
+          options={[
+            { id: CohortsType.FAVORITE, label: CohortsTypeLabel.FAVORITE },
+            { id: CohortsType.NOT_FAVORITE, label: CohortsTypeLabel.NOT_FAVORITE }
+          ]}
+        />
+        <NumberRange
+          type="patient(s)"
+          values={[form.minPatients, form.maxPatients]}
+          label="Nombre de patients"
+          onChange={(values) => {
+            handlePatientsChange(values as [string | undefined, string | undefined])
+          }}
+          onError={setModalError}
         />
       </Modal>
+      {/* )} */}
     </Grid>
   )
 }

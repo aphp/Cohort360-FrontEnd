@@ -6,7 +6,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import CloseIcon from '@mui/icons-material/Close'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { Hierarchy } from 'types/hierarchy'
-import { ScopeElement } from 'types'
+import { ScopeElement } from 'types/scope'
 import { Rights } from 'types/scope'
 import { v4 as uuidv4 } from 'uuid'
 

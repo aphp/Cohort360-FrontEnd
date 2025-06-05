@@ -15,7 +15,7 @@ type DurationRangeProps = {
   includeDays?: boolean
   disabled?: boolean
   unit?: string
-  onChange: (newDuration: DurationRangeType) => void
+  onChange?: (newDuration: DurationRangeType) => void
   onError: (isError: boolean) => void
 }
 const defaultMinDuration: DurationType = {
@@ -46,9 +46,9 @@ const DurationRange = ({
     onError(false)
     if (!checkMinMaxValue(minDuration, maxDuration)) {
       setError({ isError: true, errorMessage: 'La date maximale doit être supérieure à la date minimale.' })
-      onChange([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
+      onChange?.([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
       onError(true)
-    } else onChange([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
+    } else onChange?.([convertDurationToString(minDuration), convertDurationToString(maxDuration)])
   }, [minDuration, maxDuration])
 
   return (
