@@ -2,13 +2,14 @@ import React from 'react'
 import { Grid } from '@mui/material'
 
 import ActionBar from './ActionBar'
+import CheckboxGroup from 'components/ui/Inputs/CheckboxGroup'
 import Modal from 'components/ui/Modal'
-import CohortStatusFilter from 'components/Filters/CohortsStatusFilter'
-import CohortsTypesFilter from 'components/Filters/CohortsTypeFilter'
-import PatientsNbFilter from 'components/Filters/PatientsNbFilter'
+import MultiSelect from 'components/ui/Inputs/MultiSelect'
+import NumberRange from 'components/ui/Inputs/NumberRange'
 import { FilterKeys, FilterValue } from 'types/searchCriterias'
 import { statusOptions } from 'utils/explorationUtils'
 import useCohortListController from '../../hooks/researches/useCohortListController'
+import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
 
 interface GenericCohortListViewProps<TItem, TTableProps> {
   controller: ReturnType<typeof useCohortListController<TItem>>
@@ -48,12 +49,16 @@ const GenericCohortListView = <TItem, TTableProps = any>({
     total,
     loading,
     order,
+    changeOrderBy,
     page,
+    handlePageChange,
     maintenanceIsActive,
     openFiltersModal,
     setOpenFiltersModal,
-    handlePageChange,
-    changeOrderBy,
+    form,
+    setForm,
+    modalError,
+    setModalError,
     removeFilterChip,
     applyFilters
   } = controller
@@ -75,7 +80,7 @@ const GenericCohortListView = <TItem, TTableProps = any>({
             onAddSample={actionBarProps?.onAddSample}
             onFilter={() => setOpenFiltersModal(true)}
             filters={actionBarProps?.filters}
-            onRemoveFilters={(k, v) => removeFilterChip(k, v as string)}
+            onRemoveFilters={(k, v) => removeFilterChip(k as FilterKeys, v as string)}
             disabled={maintenanceIsActive}
           />
         </>
@@ -94,20 +99,43 @@ const GenericCohortListView = <TItem, TTableProps = any>({
         {...(tableProps as any)}
       />
 
+      {/* {form && ( */}
       <Modal
         title="Filtrer par :"
         width="600px"
         open={openFiltersModal}
         onClose={() => setOpenFiltersModal(false)}
-        onSubmit={applyFilters}
+        onSubmit={() => applyFilters(form)}
+        isError={modalError}
       >
-        <CohortStatusFilter name={FilterKeys.STATUS} allStatus={statusOptions} value={controller.filters.status} />
-        <CohortsTypesFilter name={FilterKeys.FAVORITE} value={controller.filters.favorite} />
-        <PatientsNbFilter
-          names={[FilterKeys.MIN_PATIENTS, FilterKeys.MAX_PATIENTS]}
-          values={[controller.filters.minPatients, controller.filters.maxPatients]}
+        <MultiSelect
+          value={form.status ?? []}
+          label="Statut :"
+          options={statusOptions}
+          onChange={(value) => setForm({ ...form, status: value })}
+        />
+        <CheckboxGroup
+          value={form.favorite}
+          onChange={(values) => {
+            setForm({ ...form, favorite: values })
+          }}
+          label="Favoris :"
+          options={[
+            { id: CohortsType.FAVORITE, label: CohortsTypeLabel.FAVORITE },
+            { id: CohortsType.NOT_FAVORITE, label: CohortsTypeLabel.NOT_FAVORITE }
+          ]}
+        />
+        <NumberRange
+          type="patient(s)"
+          values={[form.minPatients, form.maxPatients]}
+          label="Nombre de patients"
+          onChange={(values) => {
+            setForm({ ...form, minPatients: values[0], maxPatients: values[1] })
+          }}
+          onError={setModalError}
         />
       </Modal>
+      {/* )} */}
     </Grid>
   )
 }

@@ -4,10 +4,9 @@ import { useAppSelector } from 'state'
 import { AppConfig } from 'config'
 
 import { checkSearchParamsErrors, getCohortsSearchParams, removeFromSearchParams } from 'utils/explorationUtils'
-import { removeFilter, selectFiltersAsArray } from 'utils/filters'
+import { selectFiltersAsArray } from 'utils/filters'
 import { CohortsFilters, OrderBy, FilterKeys } from 'types/searchCriterias'
 import { CohortsType, ExplorationsSearchParams } from 'types/cohorts'
-import { ValueSet } from 'types'
 
 type CohortListControllerParams<TItem> = {
   useData: (args: {
@@ -34,18 +33,27 @@ const useCohortListController = <TItem,>({
   const appConfig = useContext(AppConfig)
 
   const [searchParams, setSearchParams] = useSearchParams()
-  const { searchInput, startDate, endDate, page, orderBy, orderDirection, status, favorite, minPatients, maxPatients } =
-    getCohortsSearchParams(searchParams)
+  const { searchInput, page, orderBy, orderDirection, filters } = useMemo(() => {
+    const { searchInput, page, orderBy, filters } = getCohortsSearchParams(searchParams)
+    return {
+      searchInput,
+      page,
+      orderBy: orderBy.orderBy,
+      orderDirection: orderBy.orderDirection,
+      filters: { ...filters, favorite: favorites ? [CohortsType.FAVORITE] : filters.favorite }
+    }
+  }, [searchParams, favorites])
+
+  console.log('test searchInput', searchInput)
+  console.log('test favorites', favorites)
 
   const [paramsReady, setParamsReady] = useState(false)
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
-  const [filters, setFilters] = useState<CohortsFilters>({
-    status,
-    favorite: favorites ? [CohortsType.FAVORITE] : favorite,
-    minPatients,
-    maxPatients
-  })
+  const [form, setForm] = useState<CohortsFilters>(filters)
   const [openFiltersModal, setOpenFiltersModal] = useState(false)
+  const [modalError, setModalError] = useState(false)
+
+  console.log('test filters', filters)
 
   useEffect(() => {
     if (!simplified) {
@@ -57,17 +65,14 @@ const useCohortListController = <TItem,>({
 
   const { list, total, loading } = useData({
     orderBy: order,
-    searchInput,
-    filters: { ...filters, startDate, endDate },
+    searchInput: searchInput ?? '',
+    filters,
     page,
     rowsPerPage,
     paramsReady
   })
 
-  const filtersAsArray = useMemo(
-    () => selectFiltersAsArray({ status, favorite, minPatients, maxPatients, startDate, endDate }),
-    [status, favorite, minPatients, maxPatients, startDate, endDate]
-  )
+  const filtersAsArray = useMemo(() => selectFiltersAsArray(filters, undefined), [filters])
 
   const handlePageChange = (newPage: number) => {
     searchParams.set(ExplorationsSearchParams.PAGE, String(newPage))
@@ -83,18 +88,24 @@ const useCohortListController = <TItem,>({
 
   const removeFilterChip = (key: FilterKeys, value: string) => {
     removeFromSearchParams(searchParams, setSearchParams, key, value)
-    setFilters(removeFilter(key, value, filters))
   }
 
   const applyFilters = (newFilters: CohortsFilters) => {
-    setFilters({ ...filters, ...newFilters })
     if (!simplified) {
-      newFilters.status.length > 0 &&
-        searchParams.set(ExplorationsSearchParams.STATUS, newFilters.status.map((s: ValueSet) => s.code).join())
-      newFilters.favorite.length > 0 && searchParams.set(ExplorationsSearchParams.FAVORITE, newFilters.favorite.join())
-      newFilters.minPatients && searchParams.set(ExplorationsSearchParams.MIN_PATIENTS, newFilters.minPatients)
-      newFilters.maxPatients && searchParams.set(ExplorationsSearchParams.MAX_PATIENTS, newFilters.maxPatients)
+      newFilters.status.length > 0
+        ? searchParams.set(ExplorationsSearchParams.STATUS, newFilters.status.map((status) => status.id).join())
+        : searchParams.delete(ExplorationsSearchParams.STATUS)
+      newFilters.favorite.length > 0
+        ? searchParams.set(ExplorationsSearchParams.FAVORITE, newFilters.favorite.join())
+        : searchParams.delete(ExplorationsSearchParams.FAVORITE)
+      newFilters.minPatients
+        ? searchParams.set(ExplorationsSearchParams.MIN_PATIENTS, newFilters.minPatients)
+        : searchParams.delete(ExplorationsSearchParams.MIN_PATIENTS)
+      newFilters.maxPatients
+        ? searchParams.set(ExplorationsSearchParams.MAX_PATIENTS, newFilters.maxPatients)
+        : searchParams.delete(ExplorationsSearchParams.MAX_PATIENTS)
       setSearchParams(searchParams)
+      setOpenFiltersModal(false)
     }
   }
 
@@ -102,12 +113,15 @@ const useCohortListController = <TItem,>({
     appConfig,
     applyFilters,
     changeOrderBy,
-    filters,
+    form,
+    setForm,
     filtersAsArray,
     handlePageChange,
     list,
     loading,
     maintenanceIsActive,
+    modalError,
+    setModalError,
     navigate,
     openFiltersModal,
     order,
