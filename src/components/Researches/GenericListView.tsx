@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Grid } from '@mui/material'
+
+import isEqual from 'lodash/isEqual'
 
 import ActionBar from './ActionBar'
 import CheckboxGroup from 'components/ui/Inputs/CheckboxGroup'
@@ -64,6 +66,32 @@ const GenericCohortListView = <TItem, TTableProps = any>({
     applyFilters
   } = controller
 
+  const handleStatusChange = useCallback(
+    (value: typeof form.status) => {
+      setForm((prev) => (isEqual(prev.status, value) ? prev : { ...prev, status: value }))
+    },
+    [setForm]
+  )
+
+  const handleFavoriteChange = useCallback(
+    (values: typeof form.favorite) => {
+      setForm((prev) => (isEqual(prev.favorite, values) ? prev : { ...prev, favorite: values }))
+    },
+    [setForm]
+  )
+
+  const handlePatientsChange = useCallback(
+    (values: [string | undefined, string | undefined]) => {
+      setForm((prev) => {
+        const [min, max] = values
+        return prev.minPatients === min && prev.maxPatients === max
+          ? prev
+          : { ...prev, minPatients: min, maxPatients: max }
+      })
+    },
+    [setForm]
+  )
+
   return (
     <Grid container gap={2}>
       {!simplified && (
@@ -113,12 +141,12 @@ const GenericCohortListView = <TItem, TTableProps = any>({
           value={form.status ?? []}
           label="Statut :"
           options={statusOptions}
-          onChange={(value) => setForm({ ...form, status: value })}
+          onChange={(value) => handleStatusChange(value)}
         />
         <CheckboxGroup
           value={form.favorite}
           onChange={(values) => {
-            setForm({ ...form, favorite: values })
+            handleFavoriteChange(values)
           }}
           label="Favoris :"
           options={[
@@ -131,7 +159,7 @@ const GenericCohortListView = <TItem, TTableProps = any>({
           values={[form.minPatients, form.maxPatients]}
           label="Nombre de patients"
           onChange={(values) => {
-            setForm({ ...form, minPatients: values[0], maxPatients: values[1] })
+            handlePatientsChange(values as [string | undefined, string | undefined])
           }}
           onError={setModalError}
         />
