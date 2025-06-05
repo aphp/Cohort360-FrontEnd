@@ -101,46 +101,16 @@ const configRoutes: configRoute[] = [
     isPrivate: true,
     element: <MyResearches />,
     children: [
-      {
-        path: 'projects',
-        element: <ProjectsList />
-      },
-      {
-        path: 'projects/:projectId',
-        element: <RequestsList />
-      },
-      {
-        path: 'projects/:projectId/:requestId',
-        element: <CohortsList />
-      },
-      {
-        path: 'projects/:projectId/:requestId/:cohortId',
-        element: <SamplesList />
-      },
-
-      {
-        path: 'requests',
-        element: <RequestsList />
-      },
-      {
-        path: 'requests/:requestId',
-        element: <CohortsList />
-      },
-      {
-        path: 'requests/:requestId/:cohortId',
-        element: <SamplesList />
-      },
-
-      {
-        path: 'cohorts',
-        element: <CohortsList />
-      },
+      { path: 'projects', element: <ProjectsList /> },
+      { path: 'projects/:projectId', element: <RequestsList /> },
+      { path: 'projects/:projectId/:requestId', element: <CohortsList /> },
+      { path: 'projects/:projectId/:requestId/:cohortId', element: <SamplesList /> },
+      { path: 'requests', element: <RequestsList /> },
+      { path: 'requests/:requestId', element: <CohortsList /> },
+      { path: 'requests/:requestId/:cohortId', element: <SamplesList /> },
+      { path: 'cohorts', element: <CohortsList /> },
       { path: 'cohorts/:cohortId', element: <SamplesList /> },
-
-      {
-        path: 'samples',
-        element: <SamplesList />
-      }
+      { path: 'samples', element: <SamplesList /> }
     ]
   },
   /**
