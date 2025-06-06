@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.46.4](https://github.com/aphp/Cohort360-FrontEnd/compare/2.46.3..2.46.4) - 2025-06-06
+
+### 🐛 Bug Fixes
+
+- Removed filters when going to sublevel - Ref gestion-de-projet#2785 - ([309950a](https://github.com/aphp/Cohort360-FrontEnd/commit/309950abb2572fe69a7eba30a9dff765b0507a2f))
+- *(controlPanel)* Use patient count when equal to 0 - ([763c78c](https://github.com/aphp/Cohort360-FrontEnd/commit/763c78ca90ac93526ae75fdd08818418727c3e87))
+
+
 ## [2.46.3](https://github.com/aphp/Cohort360-FrontEnd/compare/2.46.2..2.46.3) - 2025-06-03
 
 ### 🐛 Bug Fixes
