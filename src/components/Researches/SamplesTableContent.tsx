@@ -15,11 +15,11 @@ import FluentNavigation from 'assets/icones/fluent_navigation.svg?react'
 
 import { Cohort, JobStatus, Column } from 'types'
 import { Order, OrderBy } from 'types/searchCriterias'
-import displayDigit from 'utils/displayDigit'
 import { formatDate } from 'utils/formatDate'
 import { getExportTooltip } from 'utils/explorationUtils'
 import { isChecked } from 'utils/filters'
 import { getCohortStatusChip } from './CohortsTableContent'
+import { format } from 'utils/numbers'
 
 type CohortCallbacks = {
   onClickRow: (cohort: Cohort) => void
@@ -163,7 +163,7 @@ const SamplesTableContent: React.FC<SamplesTableContentProps> = ({
             <TableCellWrapper>
               {getCohortStatusChip(cohort.request_job_status, cohort.request_job_fail_msg)}
             </TableCellWrapper>
-            <TableCellWrapper>{displayDigit(cohort.result_size)}</TableCellWrapper>
+            <TableCellWrapper>{format(cohort.result_size)}</TableCellWrapper>
             <TableCellWrapper>{cohort.sampling_ratio ? cohort.sampling_ratio * 100 : 'N/A'} %</TableCellWrapper>
             <TableCellWrapper>{formatDate(cohort.created_at)}</TableCellWrapper>
           </TableRow>

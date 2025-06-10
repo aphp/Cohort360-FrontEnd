@@ -38,19 +38,20 @@ import { useAppSelector, useAppDispatch } from 'state'
 import services from 'services/aphp'
 import { updateCohort } from 'state/exploredCohort'
 
-import displayDigit from 'utils/displayDigit'
 import {
   getCohortsConfirmDeletionMessage,
   getCohortsConfirmDeletionTitle,
   redirectToSamples
 } from 'utils/explorationUtils'
+import { format } from 'utils/numbers'
 
 import useStyles from './styles'
 import { AppConfig } from 'config'
+import { URLS } from 'types/exploration'
 import { Cohort } from 'types'
 
 type TopBarProps = {
-  context: 'patients' | 'cohort' | 'perimeters' | 'patient_info'
+  context: URLS
   patientsNb?: number
   access?: string
 }
@@ -110,7 +111,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
     showActionButton?: boolean
   } = { name: '-', perimeters: [] }
   switch (context) {
-    case 'patients':
+    case URLS.PATIENTS:
       cohort = {
         name: 'Tous mes patients',
         description: '',
@@ -120,7 +121,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
         showActionButton: false
       }
       break
-    case 'patient_info':
+    case URLS.PATIENT:
       cohort = {
         name: 'Information patient',
         description: '',
@@ -130,7 +131,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
         showActionButton: false
       }
       break
-    case 'cohort':
+    case URLS.COHORT:
       cohort = {
         name: dashboard.name ?? '-',
         description: dashboard.description ?? '',
@@ -140,7 +141,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
         showActionButton: true
       }
       break
-    case 'perimeters':
+    case URLS.PERIMETERS:
       cohort = {
         name: 'Exploration de périmètres',
         description: '',
@@ -183,8 +184,8 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
 
   return (
     <>
-      <Grid xs={12} container>
-        <Grid xs={12} item className={classes.root}>
+      <Grid container>
+        <Grid item xs={12} className={classes.root}>
           <Grid container item style={{ paddingInline: 8 }} justifyContent="space-between">
             <Grid
               id="context-bar"
@@ -272,7 +273,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
                 ) : (
                   <>
                     <Typography id="cohort-patient-number" align="right" noWrap>
-                      Nb de patients : {displayDigit(patientsNumber)}
+                      Nb de patients : {format(patientsNumber)}
                     </Typography>
                     <Typography id="cohort-access-type" align="right" noWrap>
                       Accès : {access}
@@ -342,7 +343,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
             )}
           </Grid>
         </Grid>
-        {context !== 'patient_info' && (
+        {context !== URLS.PATIENT && (
           <Divider orientation="horizontal" variant="middle" style={{ width: 'calc(100% - 32px)' }} />
         )}
       </Grid>

@@ -8,10 +8,10 @@ import CreateSample from './Modals/CreateSample'
 import GenericCohortListView from './GenericListView'
 import IconButtonWithTooltip from 'components/ui/IconButtonWithTooltip'
 import LevelHeader from './LevelHeader'
+import ModalShareRequest from './Modals/ModalShareRequest'
 
 import DeleteIcon from 'assets/icones/delete.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
-import ModalShareRequest from './Modals/ModalShareRequest'
 import ShareIcon from '@mui/icons-material/Share'
 
 import useCohorts from 'hooks/researches/useCohorts'
@@ -40,8 +40,8 @@ import {
 
 type CohortsListProps = {
   rowsPerPage?: number
-  favorites?: boolean
   simplified?: boolean
+  favorites?: boolean
 }
 
 const CohortsList: React.FC<CohortsListProps> = ({ rowsPerPage = 20, favorites = false, simplified = false }) => {

@@ -4,7 +4,7 @@ import { RouteObject } from 'react-router'
 import Login from 'views/Login/Login'
 import HealthCheck from 'views/HealthCheck/HealthCheck'
 import Welcome from 'views/Welcome/Welcome'
-import SearchPatient from 'views/SearchPatient/SearchPatient'
+import SearchPatient from 'views/SearchPatient'
 import Patient from 'views/Patient'
 import Dashboard from 'views/Dashboard'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
@@ -18,6 +18,7 @@ import ProjectsList from 'components/Researches/ProjectsList'
 import RequestsList from 'components/Researches/RequestsList'
 import CohortsList from 'components/Researches/CohortsList'
 import SamplesList from 'components/Researches/SamplesList'
+import { URLS } from 'types/exploration'
 
 // import { ODD_CONTACT } from '../../../constants'
 
@@ -100,46 +101,16 @@ const configRoutes: configRoute[] = [
     isPrivate: true,
     element: <MyResearches />,
     children: [
-      {
-        path: 'projects',
-        element: <ProjectsList />
-      },
-      {
-        path: 'projects/:projectId',
-        element: <RequestsList />
-      },
-      {
-        path: 'projects/:projectId/:requestId',
-        element: <CohortsList />
-      },
-      {
-        path: 'projects/:projectId/:requestId/:cohortId',
-        element: <SamplesList />
-      },
-
-      {
-        path: 'requests',
-        element: <RequestsList />
-      },
-      {
-        path: 'requests/:requestId',
-        element: <CohortsList />
-      },
-      {
-        path: 'requests/:requestId/:cohortId',
-        element: <SamplesList />
-      },
-
-      {
-        path: 'cohorts',
-        element: <CohortsList />
-      },
+      { path: 'projects', element: <ProjectsList /> },
+      { path: 'projects/:projectId', element: <RequestsList /> },
+      { path: 'projects/:projectId/:requestId', element: <CohortsList /> },
+      { path: 'projects/:projectId/:requestId/:cohortId', element: <SamplesList /> },
+      { path: 'requests', element: <RequestsList /> },
+      { path: 'requests/:requestId', element: <CohortsList /> },
+      { path: 'requests/:requestId/:cohortId', element: <SamplesList /> },
+      { path: 'cohorts', element: <CohortsList /> },
       { path: 'cohorts/:cohortId', element: <SamplesList /> },
-
-      {
-        path: 'samples',
-        element: <SamplesList />
-      }
+      { path: 'samples', element: <SamplesList /> }
     ]
   },
   /**
@@ -175,36 +146,36 @@ const configRoutes: configRoute[] = [
   {
     exact: true,
     displaySideBar: true,
-    path: '/cohort/:tabName',
+    path: `/${URLS.COHORT}/:tabName`,
     name: 'cohort/:tabName',
     isPrivate: true,
-    element: <Dashboard context={'cohort'} />
+    element: <Dashboard context={URLS.COHORT} />
   },
   {
     exact: true,
     displaySideBar: true,
-    path: '/cohort',
+    path: `/${URLS.COHORT}`,
     name: 'cohort',
     isPrivate: true,
-    element: <Dashboard context={'cohort'} />
+    element: <Dashboard context={URLS.COHORT} />
   },
   // /**
   //  * Cohort360: Explore Perimeter
   //  */
   {
     displaySideBar: true,
-    path: '/perimeters',
+    path: `/${URLS.PERIMETERS}`,
     name: 'perimeters',
     isPrivate: true,
-    element: <Dashboard context={'perimeters'} />,
+    element: <Dashboard context={URLS.PERIMETERS} />,
     exact: false
   },
   {
     displaySideBar: true,
-    path: '/perimeters/:tabName',
+    path: `/${URLS.PERIMETERS}/:tabName`,
     name: 'perimeters/:tabName',
     isPrivate: true,
-    element: <Dashboard context={'perimeters'} />,
+    element: <Dashboard context={URLS.PERIMETERS} />,
     exact: false
   },
   // /**
@@ -212,18 +183,18 @@ const configRoutes: configRoute[] = [
   //  */
   {
     displaySideBar: true,
-    path: '/my-patients',
+    path: `/${URLS.PATIENTS}`,
     name: 'my-patients',
     isPrivate: true,
-    element: <Dashboard context={'patients'} />,
+    element: <Dashboard context={URLS.PATIENTS} />,
     exact: false
   },
   {
     displaySideBar: true,
-    path: '/my-patients/:tabName',
+    path: `/${URLS.PATIENTS}/:tabName`,
     name: 'my-patients/:tabName',
     isPrivate: true,
-    element: <Dashboard context={'patients'} />,
+    element: <Dashboard context={URLS.PATIENTS} />,
     exact: false
   },
   // /**

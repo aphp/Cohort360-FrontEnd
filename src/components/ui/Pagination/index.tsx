@@ -65,14 +65,13 @@ export const Pagination = ({
       )
     }
   }
-
   return (
     <Grid
       container
       direction={smallSize ? 'column' : 'row'}
       justifyContent={centered ? 'center' : 'flex-end'}
       alignItems="center"
-      xs={11}
+      xs={12}
     >
       <StyledPagination
         elemcolor={color}
@@ -98,8 +97,8 @@ export const Pagination = ({
         <FormLabel>Aller à la page</FormLabel>
         <PaginationInput
           elemcolor={color}
-          currentvalue={goToPage}
-          onChangeCurrentValue={(newValue) => setGoToPage(newValue)}
+          value={goToPage}
+          onChange={(newValue) => setGoToPage(newValue as string)}
           onKeyDown={handleKeyDown}
         />
         <StyledButton onClick={submitPageChange} elemcolor={color}>

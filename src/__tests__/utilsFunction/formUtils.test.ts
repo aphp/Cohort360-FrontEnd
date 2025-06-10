@@ -84,6 +84,9 @@ describe('test of getBirthDeliveryDate', () => {
       ]
     }
 
+    const log = getBirthDeliveryDate(_form, hospitForm)
+    console.log('salut le monde' , log)
+
     expect(getBirthDeliveryDate(_form, hospitForm)).toBe('Accouchement le 12/03/2023 à 08:44')
   })
   it('should return undefined if form item is empty', () => {

@@ -41,7 +41,7 @@ export const getAge = (patient: CohortPatient): string => {
   return 'Âge inconnu'
 }
 
-export const getDurationRangeLabel = (dates: DurationRangeType, keyword: string) => {
+export const getAgeLabel = (dates: DurationRangeType, keyword: string) => {
   const minDate: DurationType = convertStringToDuration(dates[0]) || { year: 0, month: 0, day: 0 }
   const maxDate: DurationType = convertStringToDuration(dates[1]) || { year: 0, month: 0, day: 0 }
 

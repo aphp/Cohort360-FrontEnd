@@ -1,4 +1,4 @@
-import { SelectedStatus } from 'types'
+import { SelectedStatus } from 'types/hierarchy'
 import { Codes, CodesCache, GroupedBySystem, Hierarchy, InfiniteMap, Mode } from 'types/hierarchy'
 import { arrayToMap } from './arrays'
 import { HIERARCHY_ROOT, UNKOWN_HIERARCHY_CHAPTER } from 'services/aphp/serviceValueSets'

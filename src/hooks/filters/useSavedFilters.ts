@@ -1,15 +1,20 @@
-import { Item } from 'components/ui/List/ListItem'
 import { mapRequestParamsToSearchCriteria } from 'mappers/filters'
 import { useEffect, useState } from 'react'
 import {
-  deleteFiltersService,
   getFiltersService,
-  patchFiltersService,
-  postFiltersService
-} from 'services/aphp/servicePatients'
-import { ErrorType } from 'types/error'
+  postFiltersService,
+  deleteFiltersService,
+  deleteFilterService,
+  patchFiltersService
+} from 'services/aphp/serviceFilters'
+import { FetchStatus } from 'types'
 import { ResourceType } from 'types/requestCriterias'
 import { Filters, SavedFilter, SavedFiltersResults, SearchCriterias } from 'types/searchCriterias'
+
+type FetchResponse = {
+  status: FetchStatus
+  message: string
+}
 
 export type SelectedFilter<T> = {
   filterUuid: string
@@ -17,25 +22,14 @@ export type SelectedFilter<T> = {
   filterParams: SearchCriterias<T>
 }
 
-export const useSavedFilters = <T>(type: ResourceType) => {
+export const useSavedFilters = (type: ResourceType) => {
   const [allSavedFilters, setAllSavedFilters] = useState<SavedFiltersResults | null>(null)
-  const [allSavedFiltersAsListItems, setAllSavedFiltersAsListItems] = useState<Item[]>([])
-  const [savedFiltersErrors, setSavedFiltersErrors] = useState<ErrorType>({ isError: false })
-  const [selectedSavedFilter, setSelectedSavedFilter] = useState<SelectedFilter<T> | null>(null)
+  const [fetchStatus, setFetchStatus] = useState<FetchResponse | null>(null)
+  const [selectedSavedFilter, setSelectedSavedFilter] = useState<SelectedFilter<Filters> | null>(null)
 
   useEffect(() => {
     getSavedFilters()
   }, [type])
-
-  useEffect(
-    () =>
-      setAllSavedFiltersAsListItems(
-        allSavedFilters?.results.map((elem) => {
-          return { id: elem.uuid, name: elem.name, checked: false }
-        }) || []
-      ),
-    [allSavedFilters]
-  )
 
   const getSavedFilters = async (next?: string | null) => {
     try {
@@ -48,28 +42,33 @@ export const useSavedFilters = <T>(type: ResourceType) => {
       } else {
         setAllSavedFilters(response)
       }
-    } catch (err) {
+    } catch {
       setAllSavedFilters(null)
+      setFetchStatus({ status: FetchStatus.ERROR, message: 'Erreur lors de la récupération des filtres.' })
     }
   }
 
   const postSavedFilter = async (name: string, searchCriterias: SearchCriterias<Filters>, deidentified: boolean) => {
     try {
       await postFiltersService(type, name, searchCriterias, deidentified)
-      setSavedFiltersErrors({ isError: false })
+      setFetchStatus({ status: FetchStatus.SUCCESS, message: 'Le filtre a bien été enregistré.' })
       await getSavedFilters()
     } catch {
-      setSavedFiltersErrors({
-        isError: true,
-        errorMessage: "Il y a eu une erreur lors de l'enregistrement du filtre. Vérifiez que le nom n'existe pas déjà."
+      setFetchStatus({
+        status: FetchStatus.ERROR,
+        message: "Erreur lors de l'enregistrement du filtre. Vérifiez que le nom n'existe pas déjà."
       })
-      throw 'Nom déjà existant'
     }
   }
 
   const deleteSavedFilters = async (filtersUuids: string[]) => {
-    await deleteFiltersService(filtersUuids)
-    await getSavedFilters()
+    try {
+      if (filtersUuids.length > 1) await deleteFiltersService(filtersUuids)
+      else await deleteFilterService(filtersUuids[0])
+      await getSavedFilters()
+    } catch {
+      setFetchStatus({ status: FetchStatus.ERROR, message: 'Erreur lors de la suppression des filtres.' })
+    }
   }
 
   const patchSavedFilter = async (
@@ -78,8 +77,13 @@ export const useSavedFilters = <T>(type: ResourceType) => {
     deidentified: boolean
   ): Promise<void> => {
     if (selectedSavedFilter) {
-      await patchFiltersService(type, selectedSavedFilter?.filterUuid, name, newSearchCriterias, deidentified)
-      await getSavedFilters()
+      try {
+        await patchFiltersService(type, selectedSavedFilter?.filterUuid, name, newSearchCriterias, deidentified)
+        setFetchStatus({ status: FetchStatus.SUCCESS, message: 'Les modifications ont bien été enregistrées.' })
+        await getSavedFilters()
+      } catch {
+        setFetchStatus({ status: FetchStatus.ERROR, message: 'Erreur lors de la modification du filtre.' })
+      }
     }
   }
 
@@ -87,7 +91,7 @@ export const useSavedFilters = <T>(type: ResourceType) => {
     return {
       filterUuid: selectedItem.uuid,
       filterName: selectedItem.name,
-      filterParams: (await mapRequestParamsToSearchCriteria(selectedItem.filter, type)) as SearchCriterias<T>
+      filterParams: await mapRequestParamsToSearchCriteria(selectedItem.filter, type)
     }
   }
 
@@ -97,22 +101,21 @@ export const useSavedFilters = <T>(type: ResourceType) => {
     else setSelectedSavedFilter(null)
   }
 
-  const resetSavedFilterError = () => {
-    setSavedFiltersErrors({ isError: false })
+  const resetFetchStatus = () => {
+    setFetchStatus(null)
   }
 
   return {
     allSavedFilters,
-    allSavedFiltersAsListItems,
     selectedSavedFilter,
-    savedFiltersErrors,
+    fetchStatus,
     methods: {
-      getSavedFilters,
+      next: () => getSavedFilters(allSavedFilters?.next),
       postSavedFilter,
       deleteSavedFilters,
       patchSavedFilter,
       selectFilter,
-      resetSavedFilterError,
+      resetFetchStatus,
       mapToSelectedFilter
     }
   }

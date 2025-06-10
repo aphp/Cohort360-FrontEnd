@@ -4,7 +4,7 @@ import { SimpleChartDataType } from 'types'
 import * as d3 from 'd3'
 import legend from './Legend'
 
-import displayDigit from 'utils/displayDigit'
+import { format } from 'utils/numbers'
 
 import useStyles from './styles'
 
@@ -74,7 +74,7 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 250, width = 25
       legend({
         color: color,
         columns: '200px',
-        dataValues: data.map((entry) => displayDigit(entry.value))
+        dataValues: data.map((entry) => format(entry.value))
       })
     )
   }, [node, data, height, width, total_value])

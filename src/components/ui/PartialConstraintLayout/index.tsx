@@ -11,7 +11,7 @@ import {
   Typography
 } from '@mui/material'
 import { CriteriaGroup, TemporalConstraintsKind, TemporalConstraintsType } from 'types'
-import Card from '../Card/Card'
+import Card from '../Cards/PartialConstraints/Card'
 import { AvatarWrapper } from '../Avatar/styles'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import DeleteIcon from '@mui/icons-material/Delete'

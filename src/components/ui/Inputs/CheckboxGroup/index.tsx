@@ -1,6 +1,6 @@
+import React, { forwardRef } from 'react'
 import { Checkbox, FormControlLabel, FormGroup, Typography } from '@mui/material'
 import { InputWrapper } from 'components/ui/Inputs/styles'
-import React, { useEffect, useState } from 'react'
 import { LabelObject } from 'types/searchCriterias'
 import { isChecked, toggleFilter } from 'utils/filters'
 
@@ -12,41 +12,34 @@ type CheckboxGroupProps<T> = {
   onChange: (value: T[]) => void
 }
 
-const CheckboxGroup = <T extends string>({
-  value,
-  label,
-  options,
-  onChange,
-  disabled = false
-}: CheckboxGroupProps<T>) => {
-  const [inputs, setInputs] = useState(value)
+const CheckboxGroup = forwardRef(
+  <T extends string>(
+    { value, label, options, disabled = false, onChange }: CheckboxGroupProps<T>,
+    ref: React.Ref<HTMLDivElement>
+  ) => {
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = toggleFilter(value, event.target.value as T)
+      onChange(newValue)
+    }
 
-  useEffect(() => {
-    onChange(inputs)
-  }, [inputs])
-
-  return (
-    <InputWrapper>
-      {label && <Typography variant="h3">{label}</Typography>}
-      <FormGroup
-        row={true}
-        onChange={(e) => setInputs(toggleFilter(inputs, (e.target as HTMLInputElement).value as T))}
-      >
-        <>
+    return (
+      <InputWrapper ref={ref}>
+        {label && <Typography variant="h3">{label}</Typography>}
+        <FormGroup row>
           {options.map((option) => (
             <FormControlLabel
               key={option.id}
               disabled={disabled}
-              checked={isChecked(option.id, inputs)}
+              checked={isChecked(option.id, value)}
               value={option.id}
-              control={<Checkbox color="secondary" />}
+              control={<Checkbox color="secondary" onChange={handleChange} />}
               label={option.label}
             />
           ))}
-        </>
-      </FormGroup>
-    </InputWrapper>
-  )
-}
+        </FormGroup>
+      </InputWrapper>
+    )
+  }
+) as <T extends string>(props: CheckboxGroupProps<T> & { ref?: React.Ref<HTMLDivElement> }) => JSX.Element
 
 export default CheckboxGroup

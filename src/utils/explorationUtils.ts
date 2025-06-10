@@ -1,10 +1,19 @@
-import { Cohort, JobStatus, ProjectType, QuerySnapshotInfo, RequestType, ValueSet } from 'types'
+import { Cohort, JobStatus, ProjectType, QuerySnapshotInfo, RequestType } from 'types'
 import { CohortsType, ExplorationsSearchParams } from 'types/cohorts'
-import { Direction, FilterKeys, FilterValue, Order } from 'types/searchCriterias'
-import displayDigit from './displayDigit'
-import { SetURLSearchParams } from 'react-router-dom'
+import {
+  CohortsFilters,
+  Direction,
+  FilterKeys,
+  SearchCriteriaKeys,
+  FilterValue,
+  LabelObject,
+  Order,
+  SearchCriterias
+} from 'types/searchCriterias'
 import { isDateValid } from './formatDate'
 import { AppConfig } from 'config'
+import { format } from './numbers'
+import { SetURLSearchParams } from 'react-router-dom'
 
 export const replaceItem = <T extends ProjectType | RequestType | Cohort>(item: T, itemsList: T[]) => {
   const index = itemsList.findIndex(({ uuid }) => uuid === item.uuid)
@@ -112,8 +121,9 @@ export const isExportDisabled = (cohort: Cohort, maintenanceIsActive: boolean, i
 export const getVisibleFilters = (
   filters: {
     value: FilterValue
-    category: FilterKeys
+    category: FilterKeys | SearchCriteriaKeys
     label: string
+    disabled?: boolean
   }[]
 ) => {
   return filters.filter((item) => item.category !== FilterKeys.START_DATE && item.category !== FilterKeys.END_DATE)
@@ -121,16 +131,16 @@ export const getVisibleFilters = (
 
 export const statusOptions = [
   {
-    display: 'Terminé',
-    code: 'finished'
+    label: 'Terminé',
+    id: 'finished'
   },
   {
-    display: 'En attente',
-    code: 'pending'
+    label: 'En attente',
+    id: 'pending'
   },
   {
-    display: 'Erreur',
-    code: 'failed'
+    label: 'Erreur',
+    id: 'failed'
   }
 ]
 
@@ -155,16 +165,17 @@ export const getRequestsSearchParams = (searchParams: URLSearchParams) => {
   }
 }
 
-export const getStatusParam = (searchParam: string | null) => {
-  if (searchParam === null) {
-    return []
-  }
-  const statusParam = searchParam.split(',').map((status) => {
-    const statusIndex = statusOptions.findIndex((option) => status === option.code)
-    if (statusIndex > -1) {
-      return statusOptions[statusIndex]
-    }
-  })
+export const getStatusParam = (searchParam: string | null): LabelObject[] => {
+  if (searchParam === null) return []
+  const statusParam = searchParam
+    .split(',')
+    .map((status) => {
+      const statusIndex = statusOptions.findIndex((option) => status === option.id)
+      if (statusIndex > -1) {
+        return statusOptions[statusIndex]
+      }
+    })
+    .filter((status) => status !== undefined) as LabelObject[]
 
   return statusParam
 }
@@ -184,11 +195,10 @@ export const removeFromSearchParams = (
 ) => {
   const targetSearchParam = searchParams.get(keyToRemove)?.split(',')
   const cleanedParam = targetSearchParam
-    ?.filter((searchValue) => searchValue !== (keyToRemove === FilterKeys.STATUS ? (value as ValueSet).code : value))
+    ?.filter((searchValue) => searchValue !== (keyToRemove === FilterKeys.STATUS ? (value as LabelObject).id : value))
     .join()
 
   cleanedParam ? searchParams.set(keyToRemove, cleanedParam) : searchParams.delete(keyToRemove)
-
   setSearchParams(searchParams)
 }
 
@@ -209,19 +219,25 @@ export const cleanSearchParams = (searchParams: URLSearchParams) => {
   return newSearchParams
 }
 
-export const getCohortsSearchParams = (searchParams: URLSearchParams) => {
+export const getCohortsSearchParams = (
+  searchParams: URLSearchParams
+): SearchCriterias<CohortsFilters> & { page: number } => {
   return {
     searchInput: searchParams.get(ExplorationsSearchParams.SEARCH_INPUT) ?? '',
-    startDate: searchParams.get(ExplorationsSearchParams.START_DATE),
-    endDate: searchParams.get(ExplorationsSearchParams.END_DATE),
-    page: parseInt(searchParams.get(ExplorationsSearchParams.PAGE) ?? '1', 10),
-    orderBy: (searchParams.get(ExplorationsSearchParams.ORDER_BY) as Order) ?? Order.CREATED_AT,
-    orderDirection: (searchParams.get(ExplorationsSearchParams.DIRECTION) as Direction) ?? Direction.DESC,
-    status: getStatusParam(searchParams.get(ExplorationsSearchParams.STATUS)) as ValueSet[],
-    favorite: (parseSearchParamValue(searchParams.get(ExplorationsSearchParams.FAVORITE), CohortsType) ??
-      []) as CohortsType[],
-    minPatients: searchParams.get(ExplorationsSearchParams.MIN_PATIENTS),
-    maxPatients: searchParams.get(ExplorationsSearchParams.MAX_PATIENTS)
+    page: parseInt(searchParams.get('page') ?? '1', 10),
+    orderBy: {
+      orderBy: (searchParams.get(ExplorationsSearchParams.ORDER_BY) as Order) ?? Order.CREATED_AT,
+      orderDirection: (searchParams.get(ExplorationsSearchParams.DIRECTION) as Direction) ?? Direction.DESC
+    },
+    filters: {
+      startDate: searchParams.get(ExplorationsSearchParams.START_DATE),
+      endDate: searchParams.get(ExplorationsSearchParams.END_DATE),
+      status: getStatusParam(searchParams.get(ExplorationsSearchParams.STATUS)),
+      favorite: (parseSearchParamValue(searchParams.get(ExplorationsSearchParams.FAVORITE), CohortsType) ??
+        []) as CohortsType[],
+      minPatients: searchParams.get(ExplorationsSearchParams.MIN_PATIENTS),
+      maxPatients: searchParams.get(ExplorationsSearchParams.MAX_PATIENTS)
+    }
   }
 }
 
@@ -233,7 +249,7 @@ export const getGlobalEstimation = (cohort: Cohort) => {
   if (cohort.measure_min === null || cohort.measure_max === null) {
     return 'N/A'
   } else {
-    return `${displayDigit(cohort.measure_min)} - ${displayDigit(cohort.measure_max)}`
+    return `${format(cohort.measure_min)} - ${format(cohort.measure_max)}`
   }
 }
 
@@ -312,7 +328,7 @@ export const searchParamsMapper: Record<string, (value: string | null, _searchPa
       value,
       _searchParams,
       ExplorationsSearchParams.STATUS,
-      statusOptions.map((option) => option.code)
+      statusOptions.map((option) => option.id)
     ),
   favorite: (value, _searchParams) =>
     handleFilteredValues(value, _searchParams, ExplorationsSearchParams.FAVORITE, Object.values(CohortsType)),
