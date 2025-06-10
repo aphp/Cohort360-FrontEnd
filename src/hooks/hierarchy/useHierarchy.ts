@@ -43,6 +43,7 @@ export const useHierarchy = <T>(
     search: LoadingStatus.SUCCESS,
     expand: LoadingStatus.SUCCESS
   })
+  const [hasError, setHasError] = useState(false)
 
   useEffect(() => {
     latestCodes.current = codes
@@ -106,10 +107,13 @@ export const useHierarchy = <T>(
     id?: string
   ) => {
     const { display, count } = await search(fetchSearch)
+    const cleaned = display.filter((e) => e)
+    if (display.length !== cleaned.length) setHasError(true)
+    else setHasError(false)
     if (mode == SearchMode.EXPLORATION && id) {
       const currentHierarchy = hierarchies.get(id) || DEFAULT_HIERARCHY_INFO
-      setHierarchies(replaceInMap(id, { ...currentHierarchy, tree: display, page }, hierarchies))
-    } else setSearchResults({ tree: display, count, page, system: '' })
+      setHierarchies(replaceInMap(id, { ...currentHierarchy, tree: cleaned, page }, hierarchies))
+    } else setSearchResults({ tree: cleaned, count, page, system: '' })
   }
 
   const select = (nodes: Hierarchy<T>[], toAdd: boolean, mode: SearchMode.EXPLORATION | SearchMode.RESEARCH) => {
@@ -167,6 +171,7 @@ export const useHierarchy = <T>(
     searchResults,
     selectedCodes,
     loadingStatus,
+    hasError,
     initTrees,
     select,
     selectAll,
