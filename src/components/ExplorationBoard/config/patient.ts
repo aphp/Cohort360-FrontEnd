@@ -38,6 +38,7 @@ import { PatientState } from 'state/patient'
 import { getConfig } from 'config'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo, deidentified?: boolean) => {
+  additionalInfo.deidentified = deidentified ?? additionalInfo.deidentified
   additionalInfo.searchByList = searchByListPatients
   additionalInfo.orderByList = deidentified ? orderByListPatientsDeidentified : orderByListPatients
   return additionalInfo
@@ -310,7 +311,7 @@ export const patientsConfig = (
       deidentified ? ['searchBy', 'searchInput'] : []
     ),
   mapToDiagram: patient ? undefined : getDiagramData,
-  fetchAdditionalInfos,
+  fetchAdditionalInfos: (additionalInfo) => fetchAdditionalInfos(additionalInfo, deidentified),
   getCount: (counts) => [
     { label: 'patient(s)', display: true, count: counts[0] },
     { label: '', display: false, count: counts[1] }
