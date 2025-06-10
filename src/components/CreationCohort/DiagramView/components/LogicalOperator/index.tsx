@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
 import { ButtonGroup, Button, IconButton, CircularProgress, Grid } from '@mui/material'
 
@@ -27,6 +27,9 @@ import {
 import useStyles from './styles'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 import { getStageDetails } from '../CriteriaCount'
+import List from 'components/ui/DragAndDrop/components/List'
+import { useDragAndDrop } from 'components/ui/DragAndDrop/useDragAndDrop'
+import { DragEndEvent } from '@dnd-kit/core'
 
 type OperatorItemProps = {
   itemId: number
@@ -51,68 +54,97 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   const { extra: stageDetails } = count
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
-
-  const displayingItem = criteriaGroup.filter((_criteriaGroup: CriteriaGroup) => _criteriaGroup.id === itemId)
-
+  const [isExpanded, setIsExpanded] = React.useState(false)
   let timeout: NodeJS.Timeout | null = null
 
-  const [isExpanded, setIsExpanded] = useState(false)
+  // Gestion du drag & drop
+  const onDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    // Implémente ici la logique de mise à jour de l’arbre
+    console.log('Déplacement de', active.id, 'vers', over.id)
+
+    // Idéalement, tu dispatch ici une action Redux ou tu modifies le state
+  }, [])
+
+  const { DragAndDropProvider, nodes, setNodes } = useDragAndDrop()
+
+  const displayingItem = criteriaGroup.filter((_criteriaGroup) => _criteriaGroup.id === itemId)
+
+  console.log('test displayingItems', displayingItem)
 
   return (
     <>
       <LogicalOperatorItem itemId={itemId} criteriaCount={getStageDetails(itemId, idRemap, stageDetails)} />
-      <Grid
-        container
-        direction="column"
-        justifyContent="center"
-        className={classes.operatorChild}
-        style={{ height: 30, marginBottom: -12, paddingLeft: 0 }}
-      >
-        <AvatarWrapper backgroundColor="#FFE2A9" color="#153D8A" marginLeft={'-14px'} bold>
+      <Grid container direction="column" justifyContent="center" className={classes.operatorChild}>
+        <AvatarWrapper backgroundColor="#FFE2A9" color="#153D8A" marginLeft="-14px" bold>
           {Math.abs(itemId) + 1}
         </AvatarWrapper>
       </Grid>
+
       <div className={classes.operatorChild}>
-        {displayingItem?.map(({ criteriaIds }) => {
-          const children: (CriteriaGroup | SelectedCriteriaType | undefined)[] = criteriaIds
-            .map((criteriaId: number) => {
-              let foundItem: CriteriaGroup | SelectedCriteriaType | undefined = criteriaGroup.find(
-                ({ id }) => id === criteriaId
-              )
-              if (!foundItem) {
-                foundItem = selectedCriteria.find(({ id }) => id === criteriaId)
-              }
-              return foundItem
-            })
-            .filter((elem) => elem !== undefined)
-          if (!children) return <></>
-
-          return children.map((child) => {
-            if (!child || child?.id === undefined) return <></>
-
-            return child?.id > 0 ? (
-              <CriteriaCardItem
-                key={child?.id}
-                criteriaCount={getStageDetails(child?.id, idRemap, stageDetails)}
-                criterion={child as SelectedCriteriaType}
-                duplicateCriteria={duplicateCriteria}
-                deleteCriteria={deleteCriteria}
-                editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
-              />
-            ) : (
-              <OperatorItem
-                key={child?.id}
-                itemId={child?.id}
-                addNewCriteria={addNewCriteria}
-                addNewGroup={addNewGroup}
-                duplicateCriteria={duplicateCriteria}
-                deleteCriteria={deleteCriteria}
-                editCriteria={editCriteria}
-              />
+        {displayingItem.map(({ criteriaIds, id }) => {
+          const children = criteriaIds
+            .map(
+              (criteriaId) =>
+                criteriaGroup.find((g) => g.id === criteriaId) || selectedCriteria.find((c) => c.id === criteriaId)
             )
+            .filter(Boolean)
+
+          /*const nodes: DraggableNode[] =*/ return children.map((child) => {
+            //const isGroup = child?.id && child.id < 0
+            return (
+              <>
+                <h1>{child.id}</h1>
+                {child?.id && child.id < 0 ? (
+                  <OperatorItem
+                    itemId={child?.id}
+                    addNewCriteria={addNewCriteria}
+                    addNewGroup={addNewGroup}
+                    deleteCriteria={deleteCriteria}
+                    duplicateCriteria={duplicateCriteria}
+                    editCriteria={editCriteria}
+                  />
+                ) : (
+                  <CriteriaCardItem
+                    criterion={child}
+                    criteriaCount={getStageDetails(child.id, idRemap, stageDetails)}
+                    duplicateCriteria={duplicateCriteria}
+                    deleteCriteria={deleteCriteria}
+                    editCriteria={(item) => editCriteria(item, itemId)}
+                  />
+                )}
+              </>
+            )
+            /*? return {
+              id: child?.id ?? 'unknown',
+              type: isGroup ? 'group' : 'item',
+              content: isGroup ? (
+                <OperatorItem
+                  itemId={child?.id}
+                  addNewCriteria={addNewCriteria}
+                  addNewGroup={addNewGroup}
+                  deleteCriteria={deleteCriteria}
+                  duplicateCriteria={duplicateCriteria}
+                  editCriteria={editCriteria}
+                />
+              ) : (
+                <CriteriaCardItem
+                  criterion={child}
+                  criteriaCount={getStageDetails(child.id, idRemap, stageDetails)}
+                  duplicateCriteria={duplicateCriteria}
+                  deleteCriteria={deleteCriteria}
+                  editCriteria={(item) => editCriteria(item, itemId)}
+                />
+              )
+            }*/
           })
+
+          //  return <List key={id} nodes={nodes} parentId={String(itemId)} />
         })}
       </div>
+
       <div className={classes.operatorChild} style={{ height: 12, marginBottom: -14 }} />
 
       {!isExpanded ? (
@@ -128,53 +160,46 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
           <AddIcon />
         </IconButton>
       ) : (
-        <ButtonGroup
-          disableElevation
-          className={classes.buttonContainer}
-          variant="contained"
-          color="primary"
-          disabled={maintenanceIsActive}
-        >
-          {loading && (
+        <ButtonGroup disableElevation className={classes.buttonContainer} variant="contained" color="primary">
+          {loading ? (
             <Button disabled>
               <CircularProgress />
             </Button>
-          )}
-          {!loading && (
-            <Button
-              color="inherit"
-              onClick={() => {
-                addNewCriteria(itemId)
-                setIsExpanded(false)
-              }}
-              onMouseLeave={() => (timeout = setTimeout(() => setIsExpanded(false), 800))}
-              onMouseEnter={() => {
-                setIsExpanded(true)
-                if (timeout) clearInterval(timeout)
-              }}
-              style={{ borderRadius: '18px 0 0 18px' }}
-              disabled={maintenanceIsActive}
-            >
-              Ajouter un critère
-            </Button>
-          )}
-          {!loading && (
-            <Button
-              color="inherit"
-              onClick={() => {
-                addNewGroup(itemId)
-                setIsExpanded(false)
-              }}
-              onMouseLeave={() => (timeout = setTimeout(() => setIsExpanded(false), 800))}
-              onMouseEnter={() => {
-                setIsExpanded(true)
-                if (timeout) clearInterval(timeout)
-              }}
-              style={{ borderRadius: '0 18px 18px 0' }}
-              disabled={maintenanceIsActive}
-            >
-              Ajouter un opérateur logique
-            </Button>
+          ) : (
+            <>
+              <Button
+                color="inherit"
+                onClick={() => {
+                  addNewCriteria(itemId)
+                  setIsExpanded(false)
+                }}
+                onMouseEnter={() => {
+                  setIsExpanded(true)
+                  if (timeout) clearInterval(timeout)
+                }}
+                onMouseLeave={() => (timeout = setTimeout(() => setIsExpanded(false), 800))}
+                style={{ borderRadius: '18px 0 0 18px' }}
+                disabled={maintenanceIsActive}
+              >
+                Ajouter un critère
+              </Button>
+              <Button
+                color="inherit"
+                onClick={() => {
+                  addNewGroup(itemId)
+                  setIsExpanded(false)
+                }}
+                onMouseEnter={() => {
+                  setIsExpanded(true)
+                  if (timeout) clearInterval(timeout)
+                }}
+                onMouseLeave={() => (timeout = setTimeout(() => setIsExpanded(false), 800))}
+                style={{ borderRadius: '0 18px 18px 0' }}
+                disabled={maintenanceIsActive}
+              >
+                Ajouter un opérateur logique
+              </Button>
+            </>
           )}
         </ButtonGroup>
       )}
