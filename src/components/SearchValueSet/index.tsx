@@ -10,6 +10,8 @@ import { Displayer } from 'components/ui/Displayer/styles'
 import ClearIcon from '@mui/icons-material/Clear'
 import { Hierarchy, SearchMode, SearchModeLabel } from 'types/hierarchy'
 import { cleanNode } from 'utils/hierarchy'
+import { useAppDispatch } from 'state'
+import { setMessage } from 'state/message'
 
 type SearchValueSetProps = {
   references: Reference[]
@@ -18,6 +20,7 @@ type SearchValueSetProps = {
 }
 
 const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetProps) => {
+  const dispatch = useAppDispatch()
   const {
     mode,
     searchInput,
@@ -27,7 +30,7 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
     isSelectionDisabled,
     loadingStatus,
     parameters: { refs, onChangeReferences, onChangeSearchInput, onChangePage },
-    hierarchy: { exploration, research, selectAllStatus, expand, select, selectAll }
+    hierarchy: { exploration, research, selectAllStatus, hasError, expand, select, selectAll }
   } = useSearchValueSet(references, selectedNodes)
 
   const tabs: TabType<SearchMode, SearchModeLabel>[] = [
@@ -38,6 +41,17 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
   useEffect(() => {
     onSelect(selectedCodes.map((e) => cleanNode(e)))
   }, [selectedCodes])
+
+  useEffect(() => {
+    if (hasError)
+      dispatch(
+        setMessage({
+          type: 'error',
+          content: `Tous les codes n'ont pas été récupérés. Votre recherche peut être incomplète. Si l'erreur persiste, merci
+              de contacter l'adresse support : id.recherche.support.dsn@aphp.fr'`
+        })
+      )
+  }, [hasError, research, dispatch])
 
   return (
     <Grid

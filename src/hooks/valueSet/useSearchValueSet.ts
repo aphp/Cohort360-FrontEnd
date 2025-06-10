@@ -41,8 +41,18 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
 
   const codes = useAppSelector((state) => selectValueSetCodes(state, urls))
 
-  const { hierarchies, searchResults, selectedCodes, loadingStatus, initTrees, fetchMore, expand, select, selectAll } =
-    useHierarchy(selectedNodes, codes, handleSaveCodes, fetchChildren)
+  const {
+    hierarchies,
+    searchResults,
+    selectedCodes,
+    loadingStatus,
+    hasError,
+    initTrees,
+    fetchMore,
+    expand,
+    select,
+    selectAll
+  } = useHierarchy(selectedNodes, codes, handleSaveCodes, fetchChildren)
 
   const currentHierarchy = useMemo(() => {
     const ref = explorationParameters.options.references.find((ref) => ref.checked)
@@ -177,6 +187,7 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
       onChangeReferences: handleChangeReferences
     },
     hierarchy: {
+      hasError,
       exploration: currentHierarchy,
       research: searchResults,
       selectAllStatus,
