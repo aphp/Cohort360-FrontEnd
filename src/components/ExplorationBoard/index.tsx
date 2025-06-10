@@ -53,7 +53,7 @@ const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
       )}
       {config.getMessages &&
         config.getMessages().map((msg, index) => (
-          <AlertWrapper key={index} severity="warning" sx={{ color: '#000' }}>
+          <AlertWrapper key={index} severity="warning">
             {msg}
           </AlertWrapper>
         ))}

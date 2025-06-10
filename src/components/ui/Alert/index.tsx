@@ -1,9 +1,12 @@
 import { Alert, styled } from '@mui/material'
 
 export const AlertWrapper = styled(Alert)(() => ({
-  backgroundColor: 'transparent',
+  backgroundColor: '#FFF5EB',
+  width: '100%',
   fontSize: 13,
-  padding: 0,
-  fontWeight: 'bold',
-  color: '#0288d1'
+  padding: '0 16px',
+  fontWeight: 600,
+  color: '#F39634',
+  border: '2px solid #FDDDBF',
+  borderRadius: 16
 }))
