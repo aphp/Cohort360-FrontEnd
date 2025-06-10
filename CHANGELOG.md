@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.46.5](https://github.com/aphp/Cohort360-FrontEnd/compare/2.46.4..2.46.5) - 2025-06-10
+
+### 🐛 Bug Fixes
+
+- *(SearchValueSets)* Add error msg for missing values in 'search' operation#1133 - ([9ca450e](https://github.com/aphp/Cohort360-FrontEnd/commit/9ca450ec04cb043a95b086de33b9253507a3f2d6))
+
 ## [2.46.4](https://github.com/aphp/Cohort360-FrontEnd/compare/2.46.3..2.46.4) - 2025-06-06
 
 ### 🐛 Bug Fixes
