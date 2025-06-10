@@ -18,6 +18,8 @@ import sideBarTransition from 'styles/sideBarTransition'
 import { buildExplorationConfig, ExplorationResourceType } from 'components/ExplorationBoard/config/config'
 import { useValidatedSubtab } from 'components/ExplorationBoard/useValidatedSubTab'
 import { useCleanSearchParams } from 'components/ExplorationBoard/useCleanSearchParams'
+import Header from 'components/ui/Header/test'
+import { AccessLevel } from 'components/ui/AccessBadge'
 
 type DashboardProps = {
   context: URLS
@@ -140,43 +142,73 @@ const Dashboard = ({ context }: DashboardProps) => {
       container
       direction="column"
       alignItems="center"
-      gap="25px"
+      // gap="25px"
       className={cx(classes.appBar, {
         [classes.appBarShift]: open
       })}
+      sx={{ backgroundColor: '#FFF' }}
     >
       <TopBar
         context={context}
-        access={
-          dashboard.deidentifiedBoolean === undefined
-            ? '-'
-            : dashboard.deidentifiedBoolean
-            ? 'Pseudonymisé'
-            : 'Nominatif'
-        }
+        access={dashboard.deidentifiedBoolean ? AccessLevel.DEIDENTIFIED : AccessLevel.NOMINATIVE}
+        // access={
+        //   dashboard.deidentifiedBoolean === undefined
+        //     ? '-'
+        //     : dashboard.deidentifiedBoolean
+        //     ? 'Pseudonymisé'
+        //     : 'Nominatif'
+        // }
       />
       <Grid container justifyContent="center">
-        <Grid container item xs={11} minHeight={'96px'}>
-          <Grid item xs={12}>
-            <MainTabsWrapper id="mainTabs" value={selectedTab} onChange={(_, tab) => handleChangeTab(tab)}>
-              {availableTabs.map((tab) => {
-                const groupIdParam = groupId ? `groupId=${groupId}` : ''
-                const defaultSubTab = tab.subs?.[0]?.value
-                const subtabParam = defaultSubTab ? `&subtab=${defaultSubTab}` : ''
-                return (
-                  <Tab
-                    key={tab.value}
-                    label={tab.label}
-                    value={tab.value}
-                    component={Link}
-                    to={`${tab.to}?${groupIdParam}${subtabParam}`}
-                  />
-                )
-              })}
-            </MainTabsWrapper>
+        {/* <Header
+          type="cohorte"
+          title="Cohorte : Otite étrange"
+          subtitle="Ceci est une description de cohorte décrivant par exemple tous les critères..."
+          infoLines={['Nb de patients 12 859', 'ID cohorte 20021744']}
+          showStar
+          accessType="pseudonymisé"
+          tabs={[
+            'MODIFIER LA REQUÊTE',
+            'APERÇU',
+            'PATIENTS',
+            'DOCUMENTS',
+            'PMSI',
+            'MÉDICAMENTS',
+            'BIOLOGIE',
+            'IMAGERIE',
+            'FORMULAIRES'
+          ]}
+          activeTab="PMSI"
+          onTabChange={(tab) => console.log(tab)}
+        /> */}
+        <Grid
+          container
+          xs={12}
+          justifyContent="center"
+          // minHeight={'96px'}
+        >
+          <Grid container justifyContent={'center'} sx={{ backgroundColor: '#e6f1fd' }}>
+            <Grid item xs={11}>
+              <MainTabsWrapper id="mainTabs" value={selectedTab} onChange={(_, tab) => handleChangeTab(tab)}>
+                {availableTabs.map((tab) => {
+                  const groupIdParam = groupId ? `groupId=${groupId}` : ''
+                  const defaultSubTab = tab.subs?.[0]?.value
+                  const subtabParam = defaultSubTab ? `&subtab=${defaultSubTab}` : ''
+                  return (
+                    <Tab
+                      key={tab.value}
+                      label={tab.label}
+                      value={tab.value}
+                      component={Link}
+                      to={`${tab.to}?${groupIdParam}${subtabParam}`}
+                    />
+                  )
+                })}
+              </MainTabsWrapper>
+            </Grid>
           </Grid>
           {subTabs && (
-            <Grid item xs={12}>
+            <Grid item xs={11}>
               <Tabs id="subTabs" value={selectedSubTab} onChange={(_, newSubTab) => setSelectedSubTab(newSubTab)}>
                 {subTabs.map((subTab) => {
                   const groupIdParam = groupId ? `groupId=${groupId}` : ''
@@ -196,7 +228,7 @@ const Dashboard = ({ context }: DashboardProps) => {
           )}
         </Grid>
       </Grid>
-      <Grid container item xs={11} alignItems="center" direction="column">
+      <Grid container xs={11} alignItems="center" direction="column">
         {selectedTab === ResourceType.PREVIEW ? (
           <CohortPreview
             cohortId={

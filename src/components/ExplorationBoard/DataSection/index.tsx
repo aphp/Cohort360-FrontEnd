@@ -1,5 +1,5 @@
 import React from 'react'
-import { CircularProgress, Grid, Typography } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, CircularProgress, Grid, Typography } from '@mui/material'
 import DataTable from 'components/ui/Table'
 import { Table } from 'types/table'
 import { OrderBy } from 'types/searchCriterias'
@@ -15,6 +15,7 @@ import InfoCard from 'components/ui/Cards/InfoCard'
 import { Timeline as TimelineT, CountDisplay, Diagram, DiagramType, DisplayOptions } from 'types/exploration'
 import { Card } from 'types/card'
 import { StickyContainer } from 'components/ui/Pagination/styles'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 type DataSectionProps = {
   data: { table: Table; cards: Card[]; diagrams: Diagram[]; timeline: TimelineT | null }
@@ -69,24 +70,36 @@ const DataSection = ({
             )}
           </>
         )}
-        <Grid container spacing={3}>
-          {displayOptions.diagrams &&
-            data.diagrams.map((diagram, index) => (
-              <Grid key={index} item xs={12} md={6} lg={4}>
-                <Chart isLoading={isLoading} title="Répartition par genre">
-                  {diagram.type === DiagramType.BAR && (
-                    <BarChart data={diagram.data as SimpleChartDataType[]} width={250} />
-                  )}
-                  {diagram.type === DiagramType.PIE && (
-                    <PieChart data={diagram.data as SimpleChartDataType[]} width={250} />
-                  )}
-                  {diagram.type === DiagramType.PYRAMID && (
-                    <PyramidChart data={diagram.data as AgeRepartitionType} width={250} />
-                  )}
-                </Chart>
+        {displayOptions.diagrams && (
+          <Accordion sx={{ width: '100%' }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography fontWeight={600} fontSize={16} color="#153D8A">
+                Graphiques
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container direction={'column'}>
+                <Grid container>
+                  {data.diagrams.map((diagram, index) => (
+                    <Grid key={index} item xs={12} md={6} lg={4}>
+                      <Chart isLoading={isLoading} title="Répartition par genre">
+                        {diagram.type === DiagramType.BAR && (
+                          <BarChart data={diagram.data as SimpleChartDataType[]} width={250} />
+                        )}
+                        {diagram.type === DiagramType.PIE && (
+                          <PieChart data={diagram.data as SimpleChartDataType[]} width={250} />
+                        )}
+                        {diagram.type === DiagramType.PYRAMID && (
+                          <PyramidChart data={diagram.data as AgeRepartitionType} width={250} />
+                        )}
+                      </Chart>
+                    </Grid>
+                  ))}
+                </Grid>
               </Grid>
-            ))}
-        </Grid>
+            </AccordionDetails>
+          </Accordion>
+        )}
         {data.timeline && (
           <Timeline questionnaireResponses={data.timeline.data} questionnaires={data.timeline.questionnaires} />
         )}

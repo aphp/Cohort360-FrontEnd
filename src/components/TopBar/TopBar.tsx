@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import {
+  Box,
   Chip,
-  Divider,
   Grid,
   IconButton,
   List,
@@ -26,7 +26,6 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import AddOrEditItem from 'components/Researches/Modals/AddOrEditItem'
 import ConfirmDeletion from 'components/Researches/Modals/ConfirmDeletion'
 import CreateSample from 'components/Researches/Modals/CreateSample'
-import { AvatarWrapper } from 'components/ui/Avatar/styles'
 import FavStar from 'components/ui/FavStar'
 
 import useCreateSample from 'hooks/researches/useCreateSample'
@@ -49,11 +48,14 @@ import useStyles from './styles'
 import { AppConfig } from 'config'
 import { URLS } from 'types/exploration'
 import { Cohort } from 'types'
+import AccessBadge, { AccessLevel } from 'components/ui/AccessBadge'
+import IconButtonWithTooltip from 'components/ui/IconButtonWithTooltip'
+import { ChipWrapper } from 'components/ui/Chip/styles'
 
 type TopBarProps = {
   context: URLS
   patientsNb?: number
-  access?: string
+  access: AccessLevel
 }
 
 const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
@@ -184,168 +186,168 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
 
   return (
     <>
-      <Grid container>
-        <Grid item xs={12} className={classes.root}>
-          <Grid container item style={{ paddingInline: 8 }} justifyContent="space-between">
-            <Grid
-              id="context-bar"
-              container
-              item
-              direction="row"
-              style={{
-                paddingLeft: 12,
-                width: cohort.showActionButton && !dashboard.loading ? 'calc(100% - 120px)' : 'calc(100% - 20px)'
-              }}
-            >
-              <Grid item xs={9} direction="row" container style={{ flexWrap: 'nowrap' }}>
-                <Grid container style={{ width: 40 }} alignItems="center">
-                  <AvatarWrapper size={40}>{cohort.icon}</AvatarWrapper>
+      <Grid
+        container
+        direction="column"
+        alignItems={'center'}
+        justifyContent={'center'}
+        sx={{ backgroundColor: '#E6F1FD', padding: '10px 0' }}
+      >
+        <Grid container xs={11} direction="column" justifyContent={'center'}>
+          {dashboard.loading ? (
+            <>
+              <Skeleton width={200} />
+              <Skeleton width={100} />
+            </>
+          ) : (
+            <>
+              {cohort.name && (
+                <Grid container justifyContent="space-between" alignItems="center">
+                  <Box display={'flex'} alignItems="center" gap={1}>
+                    <Typography id="cohort-name" variant="h1">
+                      {cohort.name}
+                    </Typography>
+                    <IconButton onClick={handleFavorite} color="secondary" disabled={maintenanceIsActive}>
+                      <FavStar favorite={dashboard.favorite} height={20} />
+                    </IconButton>
+                  </Box>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <AccessBadge accessLevel={access} loading={dashboard.loading} />
+                    {cohort.showActionButton && !dashboard.loading && (
+                      <>
+                        <IconButtonWithTooltip
+                          aria-controls="cohort-more-menu"
+                          aria-haspopup="true"
+                          onClick={handleClick}
+                          title="Actions"
+                          icon={<MoreButton />}
+                          color="#153D8A"
+                          disabled={maintenanceIsActive}
+                        />
+                        <Menu
+                          id="simple-menu"
+                          anchorEl={anchorEl}
+                          keepMounted
+                          open={Boolean(anchorEl)}
+                          onClose={handleClose}
+                        >
+                          <MenuItem
+                            onClick={() => {
+                              setAnchorEl(null)
+                              setOpenModal('edit')
+                            }}
+                          >
+                            Modifier
+                          </MenuItem>
+                          {!dashboard.isSample && (
+                            <MenuItem
+                              onClick={() => {
+                                setAnchorEl(null)
+                                setOpenModal('sample')
+                              }}
+                            >
+                              Échantillonner
+                            </MenuItem>
+                          )}
+                          {!!appConfig.features.export.enabled && dashboard.canMakeExport && (
+                            <MenuItem
+                              onClick={() => {
+                                goToExportPage(dashboard.cohortId ?? '')
+                              }}
+                            >
+                              Exporter
+                            </MenuItem>
+                          )}
+                          <MenuItem
+                            onClick={() => {
+                              setAnchorEl(null)
+                              setOpenModal('delete')
+                            }}
+                          >
+                            Supprimer
+                          </MenuItem>
+                        </Menu>
+                      </>
+                    )}
+                  </Box>
                 </Grid>
-
-                <Grid
-                  container
-                  style={{ width: 'calc(100% - 40px)', marginLeft: 8 }}
-                  direction="column"
-                  justifyContent="center"
-                >
-                  {dashboard.loading ? (
+              )}
+              {cohort.description && (
+                <Tooltip title={cohort.description}>
+                  <Typography id="cohort-description" noWrap style={{ width: '100%' }} variant="subtitle2">
+                    {cohort.description}
+                  </Typography>
+                </Tooltip>
+              )}
+              {context === 'perimeters' && (
+                <List className={classes.perimetersChipsDiv}>
+                  {isExtended ? (
                     <>
-                      <Skeleton width={100} />
-                      <Skeleton width={100} />
+                      {cohort.perimeters &&
+                        cohort.perimeters.map((perimeter) => (
+                          <ChipWrapper
+                            key={perimeter}
+                            label={perimeter}
+                            colorString="#153d8a"
+                            backgroundColor="#FFF"
+                            style={{ margin: 5, maxWidth: 'calc(100% - 5px)' }}
+                          />
+                          // <ListItem key={perimeter} className={classes.item}>
+                          //   <Chip className={classes.perimetersChip} label={perimeter} />
+                          // </ListItem>
+                        ))}
+                      <IconButton size="small" onClick={() => setIsExtended(false)}>
+                        <CloseIcon />
+                      </IconButton>
                     </>
                   ) : (
                     <>
-                      {cohort.name && (
-                        <Typography id="cohort-name" variant="h5">
-                          {cohort.name}{' '}
-                        </Typography>
-                      )}
-                      {cohort.description && (
-                        <Tooltip title={cohort.description}>
-                          <Typography id="cohort-description" noWrap style={{ width: '100%' }} variant="subtitle2">
-                            {cohort.description}
-                          </Typography>
-                        </Tooltip>
-                      )}
+                      {cohort.perimeters &&
+                        cohort.perimeters.slice(0, 4).map((perimeter) => (
+                          <ChipWrapper
+                            key={perimeter}
+                            label={perimeter}
+                            colorString="#153d8a"
+                            backgroundColor="#FFF"
+                            style={{ margin: 5, maxWidth: 'calc(100% - 5px)' }}
+                          />
+
+                          // <ListItem key={perimeter} className={classes.item}>
+                          //   <Chip className={classes.perimetersChip} label={perimeter} />
+                          // </ListItem>
+                        ))}
+                      <ChipWrapper
+                        label={'...'}
+                        colorString="#153d8a"
+                        backgroundColor="#FFF"
+                        style={{ margin: 5, maxWidth: 'calc(100% - 5px)' }}
+                        onClick={() => setIsExtended(true)}
+                      />
+                      {/* {cohort.perimeters && cohort.perimeters.length > 4 && (
+                        <IconButton size="small" onClick={() => setIsExtended(true)}>
+                          <MoreHorizIcon />
+                        </IconButton>
+                      )} */}
                     </>
                   )}
-
-                  {context === 'perimeters' && (
-                    <List className={classes.perimetersChipsDiv}>
-                      {isExtended ? (
-                        <>
-                          {cohort.perimeters &&
-                            cohort.perimeters.map((perimeter) => (
-                              <ListItem key={perimeter} className={classes.item}>
-                                <Chip className={classes.perimetersChip} label={perimeter} />
-                              </ListItem>
-                            ))}
-                          <IconButton size="small" onClick={() => setIsExtended(false)}>
-                            <CloseIcon />
-                          </IconButton>
-                        </>
-                      ) : (
-                        <>
-                          {cohort.perimeters &&
-                            cohort.perimeters.slice(0, 4).map((perimeter) => (
-                              <ListItem key={perimeter} className={classes.item}>
-                                <Chip className={classes.perimetersChip} label={perimeter} />
-                              </ListItem>
-                            ))}
-                          {cohort.perimeters && cohort.perimeters.length > 4 && (
-                            <IconButton size="small" onClick={() => setIsExtended(true)}>
-                              <MoreHorizIcon />
-                            </IconButton>
-                          )}
-                        </>
-                      )}
-                    </List>
-                  )}
-                </Grid>
-              </Grid>
-
-              <Grid item xs={3} direction="column" container justifyContent="center" alignItems="flex-end">
-                {dashboard.loading ? (
-                  <>
-                    <Skeleton width={100} />
-                    <Skeleton width={100} />
-                  </>
-                ) : (
-                  <>
-                    <Typography id="cohort-patient-number" align="right" noWrap>
-                      Nb de patients : {format(patientsNumber)}
-                    </Typography>
-                    <Typography id="cohort-access-type" align="right" noWrap>
-                      Accès : {access}
-                    </Typography>
-                    {cohort.cohortId && (
-                      <Typography align="right" noWrap>
-                        Identifiant de la cohorte: {cohort.cohortId}
-                      </Typography>
-                    )}
-                  </>
-                )}
-              </Grid>
-            </Grid>
-
-            {cohort.showActionButton && !dashboard.loading && (
-              <Grid container item justifyContent="flex-end" style={{ width: 120 }}>
-                <IconButton onClick={handleFavorite} color="secondary" disabled={maintenanceIsActive}>
-                  <FavStar favorite={dashboard.favorite} height={18} />
-                </IconButton>
-
-                <IconButton
-                  aria-controls="cohort-more-menu"
-                  aria-haspopup="true"
-                  onClick={handleClick}
-                  disabled={maintenanceIsActive}
-                >
-                  <MoreButton />
-                </IconButton>
-                <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
-                  <MenuItem
-                    onClick={() => {
-                      setAnchorEl(null)
-                      setOpenModal('edit')
-                    }}
-                  >
-                    Modifier
-                  </MenuItem>
-                  {!dashboard.isSample && (
-                    <MenuItem
-                      onClick={() => {
-                        setAnchorEl(null)
-                        setOpenModal('sample')
-                      }}
-                    >
-                      Échantillonner
-                    </MenuItem>
-                  )}
-                  {!!appConfig.features.export.enabled && dashboard.canMakeExport && (
-                    <MenuItem
-                      onClick={() => {
-                        goToExportPage(dashboard.cohortId ?? '')
-                      }}
-                    >
-                      Exporter
-                    </MenuItem>
-                  )}
-                  <MenuItem
-                    onClick={() => {
-                      setAnchorEl(null)
-                      setOpenModal('delete')
-                    }}
-                  >
-                    Supprimer
-                  </MenuItem>
-                </Menu>
-              </Grid>
-            )}
-          </Grid>
+                </List>
+              )}
+            </>
+          )}
+          {dashboard.loading ? (
+            <>
+              <Skeleton width={100} />
+              <Skeleton width={100} />
+            </>
+          ) : (
+            <>
+              <Typography id="cohort-patient-number" noWrap>
+                Nb de patients : {format(patientsNumber)}
+              </Typography>
+              {cohort.cohortId && <Typography noWrap>ID cohorte : {cohort.cohortId}</Typography>}
+            </>
+          )}
         </Grid>
-        {context !== URLS.PATIENT && (
-          <Divider orientation="horizontal" variant="middle" style={{ width: 'calc(100% - 32px)' }} />
-        )}
       </Grid>
 
       {openModal === 'sample' && (
