@@ -1,14 +1,10 @@
 import React from 'react'
 
-import { TableRow, Typography } from '@mui/material'
-import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
-import DataTable from 'components/DataTable'
-import IconButtonWithTooltip from 'components/ui/IconButtonWithTooltip'
-import { TableCellWrapper } from 'components/ui/TableCell/styles'
-
-import DeleteIcon from '@mui/icons-material/Delete'
+import DataTable from 'components/ui/Table'
 
 import { User } from 'types'
+import { mapUsersToTable } from 'mappers/users'
+import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
 
 type UsersTableProps = {
   usersList: User[]
@@ -21,14 +17,6 @@ type UsersTableProps = {
 }
 
 const UsersTable: React.FC<UsersTableProps> = ({ usersList, loading, usersAssociated, onChangeUsersAssociated }) => {
-  const columns = [
-    { label: 'Identifiant APH' },
-    { label: 'Nom' },
-    { label: 'Prénom' },
-    { label: 'Email' },
-    { label: 'Suppression' }
-  ]
-
   const deleteItem = (user: User) => {
     const _usersAssociatedCopy = usersAssociated ?? []
 
@@ -40,44 +28,9 @@ const UsersTable: React.FC<UsersTableProps> = ({ usersList, loading, usersAssoci
     onChangeUsersAssociated('usersAssociated', _usersAssociatedCopy)
   }
 
-  return (
-    <DataTable columns={columns} noPagination>
-      {loading ? (
-        <TableRow>
-          <TableCellWrapper colSpan={7}>
-            <CenteredCircularProgress />
-          </TableCellWrapper>
-        </TableRow>
-      ) : !usersList || usersList?.length === 0 ? (
-        <TableRow>
-          <TableCellWrapper colSpan={7}>
-            <Typography align="center">Aucun résultat à afficher</Typography>
-          </TableCellWrapper>
-        </TableRow>
-      ) : (
-        usersList.map((user: User) => {
-          return (
-            user && (
-              <TableRow key={user.username} hover>
-                <TableCellWrapper>{user.username}</TableCellWrapper>
-                <TableCellWrapper>{user.lastname?.toLocaleUpperCase()}</TableCellWrapper>
-                <TableCellWrapper>{user.firstname}</TableCellWrapper>
-                <TableCellWrapper>{user.email ?? '-'}</TableCellWrapper>
-                <TableCellWrapper>
-                  <IconButtonWithTooltip
-                    title="Supprimer l'utilisateur"
-                    icon={<DeleteIcon />}
-                    color="#5bc5f2"
-                    onClick={() => deleteItem(user)}
-                  />
-                </TableCellWrapper>
-              </TableRow>
-            )
-          )
-        })
-      )}
-    </DataTable>
-  )
+  const table = mapUsersToTable(usersList, deleteItem)
+
+  return loading ? <CenteredCircularProgress /> : <DataTable value={table} noMarginBottom />
 }
 
 export default UsersTable

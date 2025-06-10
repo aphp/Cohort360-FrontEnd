@@ -4,28 +4,18 @@ import { useNavigate } from 'react-router-dom'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
+import PageContainer from 'components/ui/PageContainer'
 
 import PersonOffIcon from 'assets/icones/person-off.svg?react'
-
-import { useAppSelector } from 'state'
 
 import useStyles from './styles'
 
 const CohortNoPatient = () => {
-  const { classes, cx } = useStyles()
+  const { classes } = useStyles()
   const navigate = useNavigate()
 
-  const openDrawer = useAppSelector((state) => state.drawer)
-
   return (
-    <Grid
-      container
-      direction="column"
-      justifyContent="center"
-      alignItems="center"
-      spacing={2}
-      className={cx(classes.appBar, { [classes.appBarShift]: openDrawer })}
-    >
+    <PageContainer justifyContent="center" alignItems="center" spacing={2} height="100vh">
       <Grid item className={classes.item}>
         <Grid container direction="column" justifyContent="center" alignItems="center">
           <Grid item style={{ padding: 16 }}>
@@ -44,7 +34,7 @@ const CohortNoPatient = () => {
           Retour à l'accueil
         </Button>
       </Grid>
-    </Grid>
+    </PageContainer>
   )
 }
 

@@ -33,7 +33,6 @@ export const SearchInputWrapper = styled('div')<CustomProps>(({ width, error, ra
   height: 30,
   backgroundColor: '#FFF',
   border: error ? '1px solid #F44336' : '1px solid #D0D7D8',
-  boxShadow: '0px 1px 16px #0000000A',
   borderRadius: radius,
   '.MuiInputBase-root': {
     marginLeft: 10,

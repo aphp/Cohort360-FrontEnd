@@ -18,7 +18,7 @@ export default createTheme({
       primary: '#153D8A'
     },
     background: {
-      default: '#E6F1FD'
+      default: '#fff'
     }
   },
   typography: {

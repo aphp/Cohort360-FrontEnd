@@ -2,15 +2,13 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { CssBaseline, Grid } from '@mui/material'
-import sideBarTransition from 'styles/sideBarTransition'
-import HeaderPage from 'components/ui/HeaderPage'
+import ExportForm from './components/ExportForm'
+import HeaderLayout from 'components/ui/Header'
+import PageContainer from 'components/ui/PageContainer'
 
 import { useAppSelector } from 'state'
-import ExportForm from './components/ExportForm'
 
 const ExportRequest = () => {
-  const { classes, cx } = sideBarTransition()
-  const openDrawer = useAppSelector((state) => state.drawer)
   const navigate = useNavigate()
   const deidentified = useAppSelector((state) => state.me?.deidentified)
 
@@ -21,21 +19,15 @@ const ExportRequest = () => {
   }, [deidentified, navigate])
 
   return (
-    <Grid
-      container
-      flexDirection={'column'}
-      className={cx(classes.appBar, {
-        [classes.appBarShift]: openDrawer
-      })}
-    >
+    <PageContainer>
       <Grid container justifyContent="center" alignItems="center">
         <CssBaseline />
-        <Grid container item xs={11}>
-          <HeaderPage id="export-form-title" title="Demande d'export" />
+        <HeaderLayout id="export-form-title" title="Demande d'export" titleOnly />
+        <Grid container item xs={11} mt={2}>
           <ExportForm />
         </Grid>
       </Grid>
-    </Grid>
+    </PageContainer>
   )
 }
 

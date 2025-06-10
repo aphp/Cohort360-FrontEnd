@@ -16,7 +16,7 @@ const DisplayDigits = ({ nb, total, label, color = '#153D8A' }: DisplayDigitsPro
 
   return (
     <DisplayDigitsWrapper color={color} id={`digit-${label}`}>
-      <Typography fontWeight={800} fontSize={15}>
+      <Typography fontWeight={700} fontSize={14}>
         {[formattedNb, total && `/ ${formattedTotal}`, label].filter(Boolean).join(' ')}
       </Typography>
     </DisplayDigitsWrapper>

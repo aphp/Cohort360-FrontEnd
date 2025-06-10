@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import Modal from 'components/ui/Modal'
 import { FilterList } from '@mui/icons-material'
-import { Button } from '@mui/material'
 import ExplorationFilters from '../Filters'
 import { Filters } from 'types/searchCriterias'
 import { AdditionalInfo } from 'types/exploration'
+import Button from 'components/ui/Button'
 
 type FilterByProps = {
   filters: Filters
@@ -22,12 +22,9 @@ const FilterBy = <T,>({ filters, infos, onSubmit }: FilterByProps) => {
     <>
       <Button
         size="small"
-        sx={{ borderRadius: 1 }}
-        fullWidth
-        startIcon={<FilterList height="15px" fill="#0288D1" />}
-        variant="contained"
+        sx={{ borderRadius: 8 }}
+        startIcon={<FilterList height="15px" />}
         onClick={() => setToggleModal(true)}
-        style={{ backgroundColor: '#fff', color: '#303030', height: '30px' }}
       >
         Filtrer
       </Button>

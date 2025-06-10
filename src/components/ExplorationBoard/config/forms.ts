@@ -167,7 +167,7 @@ export const formsConfig = (
 ): ExplorationConfig<MaternityFormFilters> => ({
   type: ResourceType.QUESTIONNAIRE_RESPONSE,
   deidentified,
-  displayOptions,
+  displayOptions: { ...displayOptions, search: false },
   initSearchCriterias: () => initSearchCriterias(search),
   fetchList: (fetchParams, options, signal) => fetchList(fetchParams, options, patient, deidentified, groupId, signal),
   mapToTable: (data) => mapToTable(data, groupId),
@@ -183,7 +183,7 @@ export const formsConfig = (
   getCount: !!patient
     ? undefined
     : (counts) => [
-        { label: 'résultat(s)', display: true, count: counts[0] },
-        { label: 'patient(s)', display: true, count: counts[1] }
+        { label: `résultat${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
+        { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: true, count: counts[1] }
       ]
 })

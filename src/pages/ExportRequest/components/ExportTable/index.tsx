@@ -8,7 +8,6 @@ import {
   Checkbox,
   Autocomplete,
   CircularProgress,
-  Alert,
   ListItemText,
   IconButton,
   Switch
@@ -19,6 +18,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import SearchOutlined from '@mui/icons-material/SearchOutlined'
 
 import Chip from 'components/ui/Chip'
+import CustomAlert from 'components/ui/Alert'
 import useStyles from '../../styles'
 import { getResourceType, getExportTableLabel, fetchResourceCount2 } from 'pages/ExportRequest/components/exportUtils'
 import { ResourceType } from 'types/requestCriterias'
@@ -50,9 +50,9 @@ const AlertLimitXlsx: React.FC = () => {
     "Attention, le format excel étant limité à 32.000 caractères par cellule, le contenu de certains comptes rendus peut être limité aux 32.000 premiers caractères. Si vous souhaitez tout de même obtenir l'intégralité du texte, vous pouvez choisir le format csv qui n'est pas limité en taille."
 
   return (
-    <Alert severity="warning" style={{ marginBottom: 16 }}>
+    <CustomAlert severity="warning" style={{ marginBottom: 16 }}>
       {message}
-    </Alert>
+    </CustomAlert>
   )
 }
 

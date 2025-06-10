@@ -7,6 +7,7 @@ import AddOrEditItem from './Modals/AddOrEditItem'
 import Button from 'components/ui/Button'
 import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
+import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import ProjectCard from 'components/ui/ProjectCard'
 import Select from 'components/ui/Searchbar/Select'
 import AddIcon from '@mui/icons-material/Add'
@@ -111,7 +112,6 @@ const ProjectsList = () => {
     <Grid container style={{ padding: '20px 0' }} gap="20px">
       <Grid container justifyContent={'space-between'} alignItems={'center'}>
         <Grid item>
-          {' '}
           <Select
             value={`${order.orderDirection}${order.orderBy}`}
             label="Tri par"
@@ -120,13 +120,6 @@ const ProjectsList = () => {
           />
         </Grid>
         <Grid item>
-          {' '}
-          <Typography fontWeight={'bold'} fontSize={14}>
-            {total} projet{total > 1 ? 's' : ''}
-          </Typography>
-        </Grid>
-        <Grid item>
-          {' '}
           <Button
             width="fit-content"
             onClick={() => setOpenEditionModal(true)}
@@ -136,6 +129,9 @@ const ProjectsList = () => {
           >
             Nouveau projet
           </Button>
+        </Grid>
+        <Grid item>
+          <DisplayDigits label={`projet${total > 1 ? 's' : ''}`} nb={total} />
         </Grid>
       </Grid>
       <Grid container gap="50px" id="projects-list-div">

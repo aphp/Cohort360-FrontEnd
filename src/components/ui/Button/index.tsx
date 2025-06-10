@@ -4,7 +4,7 @@ import { ButtonOwnProps } from '@mui/material'
 import { ButtonWrapper } from './style'
 
 type ButtonProps = ButtonOwnProps & {
-  customVariant?: 'clear' | 'pink'
+  customVariant?: 'clear' | 'pink' | 'back' | 'secondary'
   onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   small?: boolean
   width?: string

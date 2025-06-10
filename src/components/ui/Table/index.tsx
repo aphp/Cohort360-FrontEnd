@@ -1,9 +1,18 @@
 import React from 'react'
 import { Table as TableType } from 'types/table'
-import { Table as TableMui, TableBody, TableContainer, SxProps, Theme } from '@mui/material'
+import {
+  Table as TableMui,
+  TableBody,
+  TableContainer,
+  TableRow as TableRowMui,
+  SxProps,
+  Theme,
+  Typography
+} from '@mui/material'
 import TableRow from './TableRow'
 import TableHead from './TableHead'
 import { OrderBy } from 'types/searchCriterias'
+import { TableCellWrapper } from './styles'
 
 type TableProps = {
   value: TableType
@@ -11,34 +20,45 @@ type TableProps = {
   onSort?: (orderBy: OrderBy) => void
   sxColumn?: SxProps<Theme>
   sxRow?: SxProps<Theme>
+  noMarginBottom?: boolean
 }
 
-const Table = ({ value, orderBy, onSort, sxColumn, sxRow }: TableProps) => {
+const Table = ({ value, orderBy, onSort, sxColumn, sxRow, noMarginBottom }: TableProps) => {
   return (
-    <TableContainer>
+    <TableContainer sx={{ borderRadius: 1, marginBottom: noMarginBottom ? 0 : 5 }}>
       <TableMui>
         <TableHead
           columns={value.columns}
           sx={{
             height: 42,
+            fontSize: 11,
+            fontWeight: 700,
             backgroundColor: '#E6F1FD',
             textTransform: 'uppercase',
-            borderBottom: '2px solid',
             ...sxColumn
           }}
           orderBy={orderBy}
           onSort={onSort}
         />
         <TableBody>
+          {value.rows.length === 0 && (
+            <TableRowMui>
+              <TableCellWrapper colSpan={value.columns.length}>
+                <Typography align="center" p={2}>
+                  Aucune donnée à afficher
+                </Typography>
+              </TableCellWrapper>
+            </TableRowMui>
+          )}
           {value.rows.map((row, index) => (
             <TableRow
               key={index}
               row={row}
-              sx={
-                index % 2 === 0
-                  ? { borderBottom: '1px solid grey', height: 42, ...sxRow }
-                  : { backgroundColor: '#f8f8f8', borderBottom: '1px solid grey', height: 42, ...sxRow }
-              }
+              sx={{
+                height: 42,
+                '&:hover': { backgroundColor: '#f8f9fa' },
+                ...sxRow
+              }}
             />
           ))}
         </TableBody>

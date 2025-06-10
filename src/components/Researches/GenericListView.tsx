@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { Grid } from '@mui/material'
+import { Grid, Typography } from '@mui/material'
 
 import isEqual from 'lodash/isEqual'
 
@@ -128,7 +128,6 @@ const GenericCohortListView = <TItem, TTableProps = any>({
         {...(tableProps as any)}
       />
 
-      {/* {form && ( */}
       <Modal
         title="Filtrer par :"
         width="600px"
@@ -164,7 +163,6 @@ const GenericCohortListView = <TItem, TTableProps = any>({
           onError={setModalError}
         />
       </Modal>
-      {/* )} */}
     </Grid>
   )
 }

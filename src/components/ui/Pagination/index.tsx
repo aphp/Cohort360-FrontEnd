@@ -1,28 +1,20 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { Box, FormLabel, Grid, PaginationItem } from '@mui/material'
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight'
-import { PaginationInput, StyledButton, StyledPagination } from './styles'
-import { useAppDispatch } from 'state'
+import { PaginationInput, StickyContainer, StyledButton, StyledPagination } from './styles'
+import { useAppDispatch, useAppSelector } from 'state'
 import { showDialog } from 'state/warningDialog'
 import { AppConfig } from 'config'
+import { drawerWidth } from 'components/Routes/LeftSideBar/styles'
 
 type PaginationProps = {
   currentPage: number
   count: number
   onPageChange: (page: number) => void
-  smallSize?: boolean
-  centered?: boolean
-  color?: string
+  sidebarDisplay?: boolean
 }
 
-export const Pagination = ({
-  currentPage,
-  count,
-  onPageChange,
-  smallSize,
-  centered = false,
-  color = '#5BC5F2'
-}: PaginationProps) => {
+export const Pagination = ({ currentPage, count, onPageChange }: PaginationProps) => {
   const dispatch = useAppDispatch()
   const [goToPage, setGoToPage] = useState('')
   const config = useContext(AppConfig)
@@ -66,15 +58,8 @@ export const Pagination = ({
     }
   }
   return (
-    <Grid
-      container
-      direction={smallSize ? 'column' : 'row'}
-      justifyContent={centered ? 'center' : 'flex-end'}
-      alignItems="center"
-      xs={12}
-    >
+    <Grid container justifyContent={'center'} alignItems="center" xs={12}>
       <StyledPagination
-        elemcolor={color}
         role="search"
         shape="circular"
         count={count}
@@ -93,18 +78,28 @@ export const Pagination = ({
           }
         }}
       />
-      <Box display="flex" justifyContent={smallSize ? 'center' : 'flex-end'} alignItems="center">
+      <Box display="flex" alignItems="center">
         <FormLabel>Aller à la page</FormLabel>
         <PaginationInput
-          elemcolor={color}
           value={goToPage}
           onChange={(newValue) => setGoToPage(newValue as string)}
           onKeyDown={handleKeyDown}
         />
-        <StyledButton onClick={submitPageChange} elemcolor={color}>
+        <StyledButton onClick={submitPageChange}>
           <ArrowCircleRightIcon />
         </StyledButton>
       </Box>
     </Grid>
   )
 }
+
+export const StickyPagination = ({ currentPage, count, onPageChange, sidebarDisplay = false }: PaginationProps) => {
+  const drawerOpen = useAppSelector((state) => state.drawer)
+  return (
+    <StickyContainer leftPadding={drawerOpen ? drawerWidth : 0} sidebarDisplay={sidebarDisplay}>
+      <Pagination currentPage={currentPage} count={count} onPageChange={onPageChange} />
+    </StickyContainer>
+  )
+}
+
+export default Pagination

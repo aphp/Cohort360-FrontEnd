@@ -3,7 +3,8 @@ import { Theme } from '@mui/material/styles'
 
 const useStyles = makeStyles()((theme: Theme) => ({
   root: {
-    backgroundColor: '#E6F1FD'
+    backgroundColor: '#FFF',
+    marginTop: 16
   },
   progressContainer: {
     height: '100%',
@@ -15,7 +16,10 @@ const useStyles = makeStyles()((theme: Theme) => ({
     margin: theme.spacing(1),
     height: 150,
     width: 'calc(100% - 16px)',
-    borderRadius: '8px'
+    borderRadius: '8px',
+    boxShadow: 'unset',
+    border: '1px solid #D1E2F4',
+    overflowY: 'hidden'
   },
   nbPatients: {
     marginTop: '24px'
@@ -23,14 +27,15 @@ const useStyles = makeStyles()((theme: Theme) => ({
   nbPatientsOverlay: {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: '#FFF',
     padding: theme.spacing(2),
     margin: theme.spacing(1),
     height: '148px',
     borderRadius: '8px',
     alignItems: 'center',
     fontSize: '16px',
-    width: 'calc(100% - 16px)'
+    width: 'calc(100% - 16px)',
+    boxShadow: 'unset',
+    border: '1px solid #D1E2F4'
   },
   tableHead: {
     height: '42px'
@@ -41,20 +46,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     color: '#0063AF',
     padding: '0 20px',
     textTransform: 'uppercase'
-  },
-  fixedChartOverlay: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '300px',
-    alignItems: 'center'
-  },
-  chartOverlay: {
-    backgroundColor: '#FFF',
-    padding: theme.spacing(2),
-    margin: theme.spacing(1),
-    borderRadius: '8px',
-    fontSize: '16px',
-    width: 'calc(100% - 16px)'
   },
   chartTitle: {
     borderBottom: '2px inset #E6F1FD',

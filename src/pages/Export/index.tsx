@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
-import { Grid, CssBaseline, Typography, Button, CircularProgress, Tooltip } from '@mui/material'
+import { Grid, CircularProgress, Tooltip, Box } from '@mui/material'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import DataTable from 'components/ui/Table'
-import HeaderPage from 'components/ui/HeaderPage'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import sideBarTransition from 'styles/sideBarTransition'
-import styles from './styles'
 import { fetchExportsList } from 'services/aphp/serviceExportCohort'
 import { cleanSearchParams } from 'utils/paginationUtils'
 import { Back_API_Response, LoadingStatus } from 'types'
@@ -13,21 +10,23 @@ import { cancelPendingRequest } from 'utils/abortController'
 import useSearchCriterias, { initExportSearchCriterias } from 'reducers/searchCriteriasReducer'
 import { mapExportListToTable } from 'mappers/exports'
 import { ExportList, FetchExportArgs } from 'types/export'
-import { Pagination } from 'components/ui/Pagination'
-import { StickyContainer } from 'components/ui/Pagination/styles'
+import { StickyPagination } from 'components/ui/Pagination'
 import { useAppSelector } from 'state'
+import HeaderLayout from 'components/ui/Header'
+import { GAP } from 'types/exploration'
+import Button from 'components/ui/Button'
+import AddIcon from '@mui/icons-material/Add'
+import PageContainer from 'components/ui/PageContainer'
 
 const RESULTS_PER_PAGE = 20
 
 const Export = () => {
-  const { classes, cx } = sideBarTransition()
   const controllerRef = useRef<AbortController>(new AbortController())
   const navigate = useNavigate()
-  const openDrawer = useAppSelector((state) => state.drawer)
   const user = useAppSelector((state) => state.me?.impersonation?.username ?? state.me?.userName) ?? ''
   const deidentified = useAppSelector((state) => state.me?.deidentified)
   const [exportList, setExportList] = useState<Back_API_Response<ExportList> | null>(null)
-  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active)
+  const maintenanceIsActive = true
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [searchParams, setSearchParams] = useSearchParams()
   const [pagination, setPagination] = useState({ current: 0, total: 0 })
@@ -70,75 +69,55 @@ const Export = () => {
   const table = useMemo(() => mapExportListToTable(exportList?.results ?? []), [exportList])
 
   return (
-    <Grid
-      container
-      direction="column"
-      className={cx(classes.appBar, {
-        [classes.appBarShift]: openDrawer
-      })}
-    >
+    <PageContainer>
       <Grid container direction="column" style={{ minHeight: '100vh' }}>
         <Grid container justifyContent="center" alignItems="center">
-          <CssBaseline />
-          <Grid container item xs={11} style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-            <HeaderPage id="export-page-title" title="Mes exports" />
-            <Grid container alignItems="center" gap="20px" style={{ flexGrow: 1 }}>
-              <Grid item container gap={1} justifyContent="space-between">
+          <HeaderLayout id="export-page-title" title="Mes exports" titleOnly />
+          <Grid container xs={11} gap={GAP} style={{ flexGrow: 1 }} mt={2}>
+            <Grid item container gap={1} justifyContent="space-between">
+              <Grid container xs={12} sm={6}>
+                <SearchInput
+                  value={searchInput ?? ''}
+                  placeholder="Rechercher un export"
+                  onChange={(input) => handleSearch({ input })}
+                />
+              </Grid>
+              <Grid container xs={12} sm={5} justifyContent={'flex-end'}>
                 <Tooltip title={maintenanceIsActive ? "Ce bouton est desactivé en raison d'une maintenance." : ''}>
-                  <Grid item xs={12} sm={5}>
-                    <Button className={styles().classes.newExportButton} onClick={() => navigate('/exports/new')}>
+                  <Box>
+                    <Button width="fit-content" onClick={() => navigate('/exports/new')} endIcon={<AddIcon />}>
                       Nouvel export
                     </Button>
-                  </Grid>
+                  </Box>
                 </Tooltip>
-                <Grid container xs={12} sm={6}>
-                  <SearchInput
-                    value={searchInput ?? ''}
-                    placeholder="Rechercher un export"
-                    onChange={(input) => handleSearch({ input })}
-                  />
+              </Grid>
+            </Grid>
+            <Grid item container direction="column" flexGrow={1}>
+              {loadingStatus === LoadingStatus.FETCHING && (
+                <Grid container justifyContent="center" height="50vh">
+                  <CircularProgress />
                 </Grid>
-              </Grid>
-              <Grid item container style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                {loadingStatus === LoadingStatus.FETCHING && (
-                  <Grid container justifyContent="center">
-                    <CircularProgress />
-                  </Grid>
-                )}
-                {loadingStatus === LoadingStatus.SUCCESS && (
-                  <>
-                    {!!exportList?.count && (
-                      <DataTable
-                        value={table}
-                        orderBy={orderBy}
-                        onSort={(orderBy) => handleSearch({ orderBy })}
-                        sxRow={{ backgroundColor: 'white', flexGrow: 1 }}
-                      />
-                    )}
-                    {!!!exportList?.count && (
-                      <Grid container justifyContent="center">
-                        <Typography variant="button">Aucune donnée à afficher</Typography>
-                      </Grid>
-                    )}
-                  </>
-                )}
-              </Grid>
+              )}
+              {loadingStatus === LoadingStatus.SUCCESS && (
+                <DataTable
+                  value={table}
+                  orderBy={orderBy}
+                  onSort={(orderBy) => handleSearch({ orderBy })}
+                  sxRow={{ backgroundColor: 'white', flexGrow: 1 }}
+                />
+              )}
             </Grid>
           </Grid>
         </Grid>
       </Grid>
-      {pagination.total && (
-        <StickyContainer container>
-          <Pagination
-            color="#303030"
-            count={pagination.total}
-            currentPage={pagination.current}
-            onPageChange={(page) => handleSearch({ page })}
-            centered={true}
-          />
-        </StickyContainer>
+      {!!pagination.total && (
+        <StickyPagination
+          count={pagination.total}
+          currentPage={pagination.current}
+          onPageChange={(page) => handleSearch({ page })}
+        />
       )}
-    </Grid>
+    </PageContainer>
   )
 }
 

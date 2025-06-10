@@ -1,5 +1,4 @@
 import {
-  CohortsFilters,
   DurationRangeType,
   FilterKeys,
   FilterValue,
@@ -85,90 +84,52 @@ export const removeFilter = <F>(key: FilterKeys, value: FilterValue, filters: F)
   return { ...castedFilters }
 }
 
-//TODO: Faire un mapper plutot qu'une foret de if.
 export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
-  if (key === FilterKeys.FAVORITE) {
-    return CohortsTypeLabel[value as CohortsType]
+  const filterLabelMapper: Partial<Record<FilterKeys, (value: FilterValue) => string>> = {
+    [FilterKeys.FAVORITE]: (value) => CohortsTypeLabel[value as CohortsType],
+    [FilterKeys.BIRTHDATES]: (value) => getAgeLabel(value as DurationRangeType, 'Âge'),
+    [FilterKeys.GENDERS]: (value) => GenderStatusLabel[value as GenderStatus],
+    [FilterKeys.FORM_NAME]: (value) => {
+      switch (value) {
+        case FormNames.HOSPIT:
+          return labels.formNames.hospit
+        case FormNames.PREGNANCY:
+          return labels.formNames.pregnancy
+        default:
+          return ''
+      }
+    },
+    [FilterKeys.VITAL_STATUSES]: (value) => VitalStatusLabel[value as VitalStatus],
+    [FilterKeys.DURATION_RANGE]: (value) => getDurationRangeLabel(value as DurationRangeType),
+    [FilterKeys.START_DATE]: (value) => `Après le : ${moment(value as string).format('DD/MM/YYYY')}`,
+    [FilterKeys.END_DATE]: (value) => `Avant le : ${moment(value as string).format('DD/MM/YYYY')}`,
+    [FilterKeys.NDA]: (value) => `NDA : ${value}`,
+    [FilterKeys.IPP]: (value) => `IPP : ${value}`,
+    [FilterKeys.CODE]: (value) => `Code : ${getFullLabelFromCode(value as LabelObject)}`,
+    [FilterKeys.SOURCE]: (value) => `Source : ${value}`,
+    [FilterKeys.EXECUTIVE_UNITS]: (value) =>
+      `Unité exécutrice : ${(value as Hierarchy<ScopeElement>).source_value} - ${
+        (value as Hierarchy<ScopeElement>).name
+      }`,
+    [FilterKeys.DOC_STATUSES]: (value) => `Documents : ${(value as LabelObject).label}`,
+    [FilterKeys.DOC_TYPES]: (value) => (value as SimpleCodeType).label,
+    [FilterKeys.DIAGNOSTIC_TYPES]: (value) => `Type : ${capitalizeFirstLetter((value as LabelObject)?.label ?? '')}`,
+    [FilterKeys.ADMINISTRATION_ROUTES]: (value) =>
+      `Voie d'administration : ${capitalizeFirstLetter((value as LabelObject)?.label ?? '')}`,
+    [FilterKeys.PRESCRIPTION_TYPES]: (value) =>
+      `Type de prescription : ${capitalizeFirstLetter((value as LabelObject)?.label ?? '')}`,
+    [FilterKeys.STATUS]: (value) => `Statut : ${(value as LabelObject)?.label}`,
+    [FilterKeys.MIN_PATIENTS]: (value) => `Au moins ${value} patients`,
+    [FilterKeys.MAX_PATIENTS]: (value) => `Jusqu'à ${value} patients`,
+    [FilterKeys.MODALITY]: (value) => `Modalités : ${capitalizeFirstLetter((value as LabelObject)?.label ?? '')}`,
+    [FilterKeys.ENCOUNTER_STATUS]: (value) =>
+      `Statut de la visite associée : ${capitalizeFirstLetter((value as LabelObject)?.label ?? '')}`,
+    [FilterKeys.VALIDATED_STATUS]: () => `Analyses dont les résultats ont été validés`,
+    [FilterKeys.ONLY_PDF_AVAILABLE]: () => `Documents dont les PDF sont disponibles`
   }
-  if (key === FilterKeys.BIRTHDATES) {
-    return getAgeLabel(value as DurationRangeType, 'Âge')
-  }
-  if (key === FilterKeys.GENDERS) {
-    return GenderStatusLabel[value as GenderStatus]
-  }
-  if (key === FilterKeys.FORM_NAME) {
-    if (value === FormNames.HOSPIT) {
-      return labels.formNames.hospit
-    } else if (value === FormNames.PREGNANCY) {
-      return labels.formNames.pregnancy
-    }
-  }
-  if (key === FilterKeys.VITAL_STATUSES) {
-    return VitalStatusLabel[value as VitalStatus]
-  }
-  if (key === FilterKeys.DURATION_RANGE) {
-    return getDurationRangeLabel(value as DurationRangeType)
-  }
-  if (key === FilterKeys.START_DATE) {
-    return `Après le : ${moment(value as string).format('DD/MM/YYYY')}`
-  }
-  if (key === FilterKeys.END_DATE) {
-    return `Avant le : ${moment(value as string).format('DD/MM/YYYY')}`
-  }
-  if (key === FilterKeys.NDA) {
-    return `NDA : ${value}`
-  }
-  if (key === FilterKeys.IPP) {
-    return `IPP : ${value}`
-  }
-  if (key === FilterKeys.CODE) {
-    return `Code : ${getFullLabelFromCode(value as LabelObject)}`
-  }
-  if (key === FilterKeys.SOURCE) {
-    return `Source : ${value}`
-  }
-  if (key === FilterKeys.EXECUTIVE_UNITS) {
-    return `Unité exécutrice :  ${(value as Hierarchy<ScopeElement>).source_value} - ${
-      (value as Hierarchy<ScopeElement>).name
-    }`
-  }
-  if (key === FilterKeys.DOC_STATUSES) {
-    return `Documents :  ${(value as LabelObject).label}`
-  }
-  if (key === FilterKeys.DOC_TYPES) {
-    return (value as SimpleCodeType).label
-  }
-  if (key === FilterKeys.DIAGNOSTIC_TYPES) {
-    return `Type : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
-  }
-  if (key === FilterKeys.ADMINISTRATION_ROUTES) {
-    return `Voie d'administration : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
-  }
-  if (key === FilterKeys.PRESCRIPTION_TYPES) {
-    return `Type de prescription : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
-  }
-  if (key === FilterKeys.STATUS) {
-    return `Statut : ${(value as LabelObject)?.label}`
-  }
-  if (key === FilterKeys.MIN_PATIENTS) {
-    return `Au moins ${value} patients`
-  }
-  if (key === FilterKeys.MAX_PATIENTS) {
-    return `Jusqu'à ${value} patients`
-  }
-  if (key === FilterKeys.MODALITY) {
-    return `Modalités : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
-  }
-  if (key === FilterKeys.ENCOUNTER_STATUS) {
-    return `Statut de la visite associée : ${capitalizeFirstLetter((value as LabelObject)?.label as string)}`
-  }
-  if (key === FilterKeys.VALIDATED_STATUS) {
-    return `Analyses dont les résultats ont été validés`
-  }
-  if (key === FilterKeys.ONLY_PDF_AVAILABLE) {
-    return `Documents dont les PDF sont disponibles`
-  }
-  return ''
+
+  const filterLabel = filterLabelMapper[key]
+  return filterLabel ? filterLabel(value) : ''
 }
 
 export const selectFiltersAsArray = (filters: Filters, searchInput: string | undefined) => {

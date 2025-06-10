@@ -13,14 +13,14 @@ import {
   IconButton,
   Button,
   Autocomplete,
-  CircularProgress,
-  Alert
+  CircularProgress
 } from '@mui/material'
 
 import InfoIcon from '@mui/icons-material/Info'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 import ExportTable from '../ExportTable'
+import CustomAlert from 'components/ui/Alert'
 import { useAppDispatch } from 'state'
 import { showDialog } from 'state/warningDialog'
 
@@ -602,19 +602,23 @@ const ExportForm: React.FC = () => {
           </Grid>
           <Grid container item mb="12px" justifyContent={'flex-end'}>
             {error === Error.ERROR_MOTIF && (
-              <Alert severity="error">
+              <CustomAlert severity="error">
                 Merci d'indiquer le motif de votre demande d'export, ce motif doit contenir au moins 10 caractères.
-              </Alert>
+              </CustomAlert>
             )}
 
             {error === Error.ERROR_CONDITION && (
-              <Alert severity="error">Merci d'accepter toutes les conditions de l'Entrepôt de données de santé.</Alert>
+              <CustomAlert severity="error">
+                Merci d'accepter toutes les conditions de l'Entrepôt de données de santé.
+              </CustomAlert>
             )}
             {error === Error.ERROR_TABLE && (
-              <Alert severity="error">Merci d'indiquer les tables que vous voulez exporter.</Alert>
+              <CustomAlert severity="error">Merci d'indiquer les tables que vous voulez exporter.</CustomAlert>
             )}
             {limitError && (
-              <Alert severity="error">Merci d'indiquer des tables qui respectent la limite de lignes autorisées.</Alert>
+              <CustomAlert severity="error">
+                Merci d'indiquer des tables qui respectent la limite de lignes autorisées.
+              </CustomAlert>
             )}
           </Grid>
         </>

@@ -1,26 +1,24 @@
 /* eslint-disable max-statements */
 import React, { useEffect, useState, useRef } from 'react'
 import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { useAppSelector } from 'state'
 
-import { Box, Grid, Slide, Typography } from '@mui/material'
+import { Box, Grid, Slide, Tab } from '@mui/material'
 import Badge from 'components/ui/Badge'
 import Breadcrumb from 'components/Researches/Breadcrumbs'
+import HeaderLayout from 'components/ui/Header'
+import { TabsWrapper } from 'components/ui/Tabs'
 import MenuButtonFilter from 'components/Researches/MenuButtonFilter'
+import PageContainer from 'components/ui/PageContainer'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
-import Tabs from 'components/ui/Tabs'
 
 import useCounts from 'hooks/researches/useCounts'
 
-import { ExplorationTabs, TabType } from 'types'
+import { ExplorationTabs } from 'types'
 import { ExplorationsSearchParams } from 'types/cohorts'
 import { cleanSearchParams, getPathDepth } from 'utils/explorationUtils'
-import useStyles from './styles'
 import moment from 'moment'
 
 const MyResearches = () => {
-  const { classes, cx } = useStyles()
-  const openDrawer = useAppSelector((state) => state.drawer)
   const location = useLocation()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -153,50 +151,34 @@ const MyResearches = () => {
     setTimeout(() => setSlideIsActive(true), 5)
   }
 
+  const searchArea = (
+    <Box display="flex" alignItems="center" gap="4px" margin="8px 0">
+      <MenuButtonFilter
+        startDate={startDateParam}
+        endDate={endDateParam}
+        onChangeStartDate={(newDate: string | null) => handleDateChange(newDate, ExplorationsSearchParams.START_DATE)}
+        onChangeEndDate={(newDate: string | null) => handleDateChange(newDate, ExplorationsSearchParams.END_DATE)}
+      />
+      <SearchInput
+        placeholder="Rechercher dans tous les niveaux"
+        value={localSearchInput}
+        onChange={(newInput) => {
+          setLocalSearchInput(newInput)
+          handleSearchTermChange(newInput)
+        }}
+      />
+    </Box>
+  )
+
   return (
-    <Grid
-      container
-      direction="column"
-      className={cx(classes.appBar, {
-        [classes.appBarShift]: openDrawer
-      })}
-      bgcolor={'#e6f1fd'}
-      alignItems={'center'}
-    >
-      <Grid
-        container
-        justifyContent={'space-between'}
-        xs={11}
-        style={{ padding: '36px 0 12px' }}
-        gap="40px"
-        ref={headerRef}
-      >
-        <Typography variant="h1">Mes recherches</Typography>
-        <Box display="flex" alignItems="center" gap="4px">
-          <MenuButtonFilter
-            startDate={startDateParam}
-            endDate={endDateParam}
-            onChangeStartDate={(newDate: string | null) =>
-              handleDateChange(newDate, ExplorationsSearchParams.START_DATE)
-            }
-            onChangeEndDate={(newDate: string | null) => handleDateChange(newDate, ExplorationsSearchParams.END_DATE)}
-          />
-          <SearchInput
-            placeholder="Rechercher dans tous les niveaux"
-            value={localSearchInput}
-            onChange={(newInput) => {
-              setLocalSearchInput(newInput)
-              handleSearchTermChange(newInput)
-            }}
-            // width="296px"
-          />
-        </Box>
-        <Tabs
-          variant="pill"
-          values={explorationTabs}
-          active={selectedTab as TabType<string, React.ReactNode>}
-          onchange={handleTabChange}
-        />
+    <PageContainer alignItems={'center'} sx={{ backgroundColor: '#E6F1FD' }}>
+      <HeaderLayout title="Mes recherches" searchArea={searchArea} />
+      <Grid container xs={11}>
+        <TabsWrapper value={selectedTab} onChange={(_, tab) => handleTabChange(tab)}>
+          {explorationTabs.map((tab) => (
+            <Tab key={tab.id} label={tab.label} value={tab} component="div" disableRipple />
+          ))}
+        </TabsWrapper>
       </Grid>
       <Grid container bgcolor={'#FFF'} sx={{ minHeight: `calc(100vh - ${headerHeight}px)` }} justifyContent={'center'}>
         <Grid key={location.pathname} container xs={11} style={{ padding: '20px 0' }} gap={'20px'} direction={'column'}>
@@ -208,7 +190,7 @@ const MyResearches = () => {
           </Slide>
         </Grid>
       </Grid>
-    </Grid>
+    </PageContainer>
   )
 }
 

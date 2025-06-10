@@ -10,7 +10,11 @@ const CohortCreation = () => {
   const open = useSelector((state) => state.drawer)
 
   return (
-    <div position="fixed" className={cx(classes.appBar, { [classes.appBarShift]: open })}>
+    <div
+      position="fixed"
+      className={cx(classes.appBar, { [classes.appBarShift]: open })}
+      style={{ backgroundColor: '#E6F1FD', height: '100vh' }}
+    >
       <div className={classes.mainContainer}>
         <Requeteur />
       </div>

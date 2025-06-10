@@ -70,7 +70,7 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBo
     : '-'
 
   return (
-    <Grid container direction="column" alignItems="center">
+    <Grid container direction="column" alignItems="center" mt={2} height={'fit-content'}>
       <Grid component={Paper} container item sm={11} className={classes.patientTable}>
         <Grid container>
           <PatientField

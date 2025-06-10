@@ -20,30 +20,13 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
       width: 3,
       background: '#43435B',
       height: '100%',
-      zIndex: -1,
+      zIndex: 0,
       transform: 'translateX(-50%)'
     }
   },
   loadingContainer: {
-    display: 'flex',
     width: '50%',
-    alignItems: 'center',
-    justifyContent: 'center',
     marginLeft: '50%'
-  },
-  searchButton: {
-    minWidth: 150,
-    height: 41,
-    backgroundColor: '#5BC5F2',
-    color: '#FFF',
-    borderRadius: 25,
-    marginLeft: 8
-  },
-  chips: {
-    margin: '2px 4px',
-    '&:last-child': {
-      marginRight: 0
-    }
   },
   timeline: {
     display: 'flex',
@@ -77,7 +60,7 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
     display: 'block',
     textAlign: 'center',
     fontWeight: 600,
-    backgroundColor: '#E6F1FD',
+    backgroundColor: '#FFF',
     color: 'black',
     zIndex: 5,
     lineHeight: 1
@@ -86,7 +69,7 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
     position: 'relative',
     display: 'block',
     textAlign: 'center',
-    backgroundColor: '#E6F1FD',
+    backgroundColor: '#FFF',
     color: 'black',
     zIndex: 5
   },
@@ -103,14 +86,14 @@ const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, 
     height: 1,
     width: `${1.5 * marginNextCentralLine}px`,
     background: '#43435B',
-    zIndex: -2
+    zIndex: 0
   },
   timelineElementsLeft: {
     position: 'absolute',
     width: `calc(100% + ${marginNextCentralLine}px)`,
     height: '100%',
     top: 15,
-    zIndex: -1
+    zIndex: 1
   },
   dotLeft: {
     position: 'absolute',

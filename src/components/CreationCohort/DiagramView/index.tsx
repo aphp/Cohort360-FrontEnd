@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Button, Grid } from '@mui/material'
+import { Button, Grid } from '@mui/material'
 
 import LogicalOperator from './components/LogicalOperator'
 import TemporalConstraintCard from './components/TemporalConstraintCard/TemporalConstraintCard'
@@ -14,6 +14,7 @@ import PopulationCard from './components/PopulationCard/PopulationCard'
 import ModalRightError from './components/PopulationCard/components/ModalRightError'
 import { checkNominativeCriteria, cleanNominativeCriterias } from 'utils/cohortCreation'
 import ScopeTree from 'components/ScopeTree'
+import CustomAlert from 'components/ui/Alert'
 
 const DiagramView = () => {
   const dispatch = useAppDispatch()
@@ -63,10 +64,10 @@ const DiagramView = () => {
     >
       <div style={{ minWidth: 500, paddingRight: 24 }}>
         {maintenanceIsActive && (
-          <Alert severity="warning" style={{ marginTop: '-12px', width: '100%', marginBottom: '10px' }}>
+          <CustomAlert severity="warning" style={{ marginTop: '-12px', marginBottom: '10px' }}>
             Une maintenance est en cours. Seules les consultations de cohortes, requêtes et données patients sont
             activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
-          </Alert>
+          </CustomAlert>
         )}
         <CohortCreationBreadcrumbs />
 
