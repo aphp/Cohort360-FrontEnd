@@ -41,7 +41,7 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
   initialData: {
     id: undefined,
     type: CriteriaType.OBSERVATION,
-    title: 'Critères de biologie',
+    title: 'Critère de biologie',
     isInclusive: true,
     occurrence: { value: 1, comparator: Comparators.GREATER_OR_EQUAL },
     encounterService: null,
