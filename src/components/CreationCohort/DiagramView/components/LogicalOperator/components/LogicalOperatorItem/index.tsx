@@ -6,10 +6,10 @@ import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDia
 import { CriteriaGroup, CriteriaGroupType } from 'types'
 import CriteriaCount, { CriteriaCountType } from '../../../CriteriaCount'
 import { useLogicalOperator } from './useLogicalOperator'
-import IncludesIcon from 'assets/icones/includes.svg?react'
-import ExcludesIcon from 'assets/icones/excludes.svg?react'
 import { Comparators } from 'types/requestCriterias'
 import { hasOptions } from './utils'
+import IncludesIcon from 'assets/icones/includes.svg?react'
+import ExcludesIcon from 'assets/icones/excludes.svg?react'
 
 type LogicalOperatorItemProps = {
   itemId: number
@@ -76,8 +76,8 @@ const InclusiveSelector = ({ currentOperator, isInclusive, onChange }: Inclusive
   const { classes } = useStyles()
   return (
     <Select
-      labelId="inclusive-simple-select-label"
       id={`select-inclusive-${currentOperator.id}`}
+      labelId="inclusive-simple-select-label"
       value={String(isInclusive)}
       classes={{ icon: classes.selectIcon }}
       className={classes.inputSelect}

@@ -26,7 +26,7 @@ export const form: () => CriteriaForm<CcamDataType> = () => ({
   title: 'Actes CCAM',
   initialData: {
     type: CriteriaType.PROCEDURE,
-    title: "Critères d'actes CCAM",
+    title: "Critère d'actes CCAM",
     isInclusive: true,
     occurrence: { value: 1, comparator: Comparators.GREATER_OR_EQUAL },
     encounterService: null,
