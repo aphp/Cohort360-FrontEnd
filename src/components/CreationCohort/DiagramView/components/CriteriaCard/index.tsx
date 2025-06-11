@@ -20,13 +20,16 @@ import theme from 'theme'
 import criteriaList, { getAllCriteriaItems } from 'components/CreationCohort/DataList_Criteria'
 import { criteriasAsArray } from '../LogicalOperator/components/CriteriaRightPanel/CriteriaForm/mappers'
 import CriteriaCount, { CriteriaCountType } from '../CriteriaCount'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import clsx from 'clsx'
 
 type CriteriaCardProps = {
   criterion: SelectedCriteriaType
   criteriaCount?: CriteriaCountType
-  duplicateCriteria: (criteriaId: number) => void
-  deleteCriteria: (criteriaId: number) => void
-  editCriteria: (criteria: SelectedCriteriaType) => void
+  duplicateCriteria?: (criteriaId: number) => void
+  deleteCriteria?: (criteriaId: number) => void
+  editCriteria?: (criteria: SelectedCriteriaType) => void
 }
 
 const CriteriaCard = ({
@@ -49,6 +52,17 @@ const CriteriaCard = ({
   const childrenRef = useRef<HTMLDivElement>(null)
   const isXl = useMediaQuery(theme.breakpoints.up('xl'))
 
+  const { setNodeRef, isDragging, attributes, listeners, transform, transition } = useSortable({
+    id: criterion.id,
+    data: { criterion }
+  })
+
+  const style = {
+    transition,
+    transform: CSS.Transform.toString(transform),
+    backgroundColor: criterion.isInclusive ? '#D1E2F4' : '#F2B0B0'
+  }
+
   useEffect(() => {
     const containerHeight = containerRef.current?.clientHeight || 0
     const childrenHeight = childrenRef.current?.clientHeight || 0
@@ -56,12 +70,24 @@ const CriteriaCard = ({
     else setNeedCollapse(false)
   }, [containerRef.current?.clientWidth])
 
+  if (isDragging)
+    return (
+      <Grid
+        ref={setNodeRef}
+        style={style}
+        container
+        alignItems={'center'}
+        className={classes.draggedCriteriaItem}
+      ></Grid>
+    )
+
   return (
     <Grid
+      ref={setNodeRef}
+      style={style}
       container
       alignItems={'center'}
-      className={classes.criteriaItem}
-      style={{ backgroundColor: criterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
+      className={clsx(classes.criteriaItem, { [classes.noBefore]: isDragging })}
     >
       <CriteriaCount criteriaCount={criteriaCount} extraLeftMargin={3} />
       <Grid
@@ -72,6 +98,9 @@ const CriteriaCard = ({
         xl={3}
         padding={'5px'}
         justifyContent={isXl ? 'space-around' : 'flex-start'}
+        style={{ cursor: 'grab', height: '100%' }}
+        {...attributes}
+        {...listeners}
       >
         <Grid container item xs={1} justifyContent={'center'}>
           <AvatarWrapper size={20}>{criterion.id}</AvatarWrapper>
@@ -114,7 +143,7 @@ const CriteriaCard = ({
         {criterion.error && (
           <IconButton
             size="small"
-            onClick={() => editCriteria(criterion)}
+            onClick={() => editCriteria?.(criterion)}
             color="secondary"
             disabled={maintenanceIsActive}
           >
@@ -123,7 +152,7 @@ const CriteriaCard = ({
         )}
         <IconButton
           size="small"
-          onClick={() => duplicateCriteria(criterion.id)}
+          onClick={() => duplicateCriteria?.(criterion.id)}
           style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
           disabled={maintenanceIsActive}
         >
@@ -131,7 +160,7 @@ const CriteriaCard = ({
         </IconButton>
         <IconButton
           size="small"
-          onClick={() => editCriteria(criterion)}
+          onClick={() => editCriteria?.(criterion)}
           style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
           disabled={maintenanceIsActive}
         >
@@ -139,7 +168,7 @@ const CriteriaCard = ({
         </IconButton>
         <IconButton
           size="small"
-          onClick={() => deleteCriteria(criterion.id)}
+          onClick={() => deleteCriteria?.(criterion.id)}
           style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
           disabled={maintenanceIsActive}
         >

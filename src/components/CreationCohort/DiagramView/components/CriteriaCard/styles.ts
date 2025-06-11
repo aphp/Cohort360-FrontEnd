@@ -2,6 +2,12 @@ import { makeStyles } from 'tss-react/mui'
 import { Theme } from '@mui/material/styles'
 
 const useStyles = makeStyles()((theme: Theme) => ({
+  draggedCriteriaItem: {
+    height: 92,
+    opacity: 0.4,
+    border: '1px solid #0063AF',
+    borderRadius: 4
+  },
   criteriaItem: {
     borderRadius: 4,
     padding: 8,
@@ -16,6 +22,11 @@ const useStyles = makeStyles()((theme: Theme) => ({
       position: 'absolute',
       background: '#19235A',
       marginLeft: -46
+    }
+  },
+  noBefore: {
+    '&::before': {
+      display: 'none'
     }
   },
   title: {

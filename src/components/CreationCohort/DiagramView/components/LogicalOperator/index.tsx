@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import { ButtonGroup, Button, IconButton, CircularProgress, Grid } from '@mui/material'
 
@@ -27,9 +27,13 @@ import {
 import useStyles from './styles'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 import { getStageDetails } from '../CriteriaCount'
+import { DndContext, DragOverlay, DragStartEvent } from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { createPortal } from 'react-dom'
 
 type OperatorItemProps = {
   itemId: number
+  criterias: SelectedCriteriaType[]
   addNewCriteria: (parentId: number) => void
   addNewGroup: (parentId: number) => void
   deleteCriteria: (criteriaId: number) => void
@@ -39,6 +43,7 @@ type OperatorItemProps = {
 
 const OperatorItem: React.FC<OperatorItemProps> = ({
   itemId,
+  criterias,
   addNewCriteria,
   addNewGroup,
   deleteCriteria,
@@ -47,7 +52,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 }) => {
   const { classes } = useStyles()
   const { request } = useAppSelector((state) => state.cohortCreation || {})
-  const { loading = false, criteriaGroup = [], selectedCriteria = [], count = {}, idRemap } = request
+  const { loading = false, criteriaGroup = [], count = {}, idRemap } = request
   const { extra: stageDetails } = count
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
@@ -57,7 +62,9 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   let timeout: NodeJS.Timeout | null = null
 
   const [isExpanded, setIsExpanded] = useState(false)
-
+  console.log('test criteriaGroup', criteriaGroup)
+  console.log('test displaying items', displayingItem)
+  console.log('test itemID', itemId)
   return (
     <>
       <LogicalOperatorItem itemId={itemId} criteriaCount={getStageDetails(itemId, idRemap, stageDetails)} />
@@ -80,7 +87,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
                 ({ id }) => id === criteriaId
               )
               if (!foundItem) {
-                foundItem = selectedCriteria.find(({ id }) => id === criteriaId)
+                foundItem = criterias.find(({ id }) => id === criteriaId)
               }
               return foundItem
             })
@@ -101,6 +108,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
               />
             ) : (
               <OperatorItem
+                criterias={criterias}
                 key={child?.id}
                 itemId={child?.id}
                 addNewCriteria={addNewCriteria}
@@ -189,6 +197,10 @@ const LogicalOperator: React.FC = () => {
   const [parentId, setParentId] = useState<number | null>(null)
   const [openDrawer, setOpenDrawer] = useState<'criteria' | null>(null)
   const [selectedCriteria, setSelectedCriteria] = useState<SelectedCriteriaType | null>(null)
+  const { selectedCriteria: _criterias = [] } = request
+  const [criterias, setCriterias] = useState<SelectedCriteriaType[]>(_criterias)
+  const criteriasIds = useMemo(() => criterias.map((criteria) => criteria.id), [criterias])
+  const [draggedCriterion, setDraggedCriterion] = useState<SelectedCriteriaType | null>(null)
 
   const _buildCohortCreation = () => {
     dispatch(buildCohortCreation({ selectedPopulation: null }))
@@ -266,16 +278,32 @@ const LogicalOperator: React.FC = () => {
     _buildCohortCreation()
   }
 
+  const onDragStart = (event: DragStartEvent) => {
+    console.log('test drag', event)
+    setDraggedCriterion(event.active.data.current.criterion)
+  }
+
   return (
     <>
-      <OperatorItem
-        itemId={0}
-        addNewCriteria={_addNewCriteria}
-        addNewGroup={_addNewGroup}
-        duplicateCriteria={_duplicateCriteria}
-        deleteCriteria={_deleteCriteria}
-        editCriteria={_editCriteria}
-      />
+      <DndContext onDragStart={onDragStart}>
+        <SortableContext items={criteriasIds} /*strategy={verticalListSortingStrategy}*/>
+          <OperatorItem
+            criterias={criterias}
+            itemId={0}
+            addNewCriteria={_addNewCriteria}
+            addNewGroup={_addNewGroup}
+            duplicateCriteria={_duplicateCriteria}
+            deleteCriteria={_deleteCriteria}
+            editCriteria={_editCriteria}
+          />
+        </SortableContext>
+        {createPortal(
+          <DragOverlay>
+            {draggedCriterion && <CriteriaCardItem key={draggedCriterion?.id} criterion={draggedCriterion} />}
+          </DragOverlay>,
+          document.body
+        )}
+      </DndContext>
 
       <CriteriaRightPanel
         parentId={parentId}
