@@ -1,19 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import {
-  Box,
-  Chip,
-  Grid,
-  IconButton,
-  List,
-  ListItem,
-  Menu,
-  MenuItem,
-  Skeleton,
-  Tooltip,
-  Typography
-} from '@mui/material'
+import { Box, Grid, IconButton, List, Menu, MenuItem, Skeleton, Tooltip, Typography } from '@mui/material'
 
 import GroupIcon from '@mui/icons-material/Group'
 import BusinessIcon from '@mui/icons-material/Business'
@@ -21,7 +9,6 @@ import ViewListIcon from '@mui/icons-material/ViewList'
 import FaceIcon from '@mui/icons-material/Face'
 import CloseIcon from '@mui/icons-material/Close'
 import MoreButton from '@mui/icons-material/MoreVert'
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
 import AddOrEditItem from 'components/Researches/Modals/AddOrEditItem'
 import ConfirmDeletion from 'components/Researches/Modals/ConfirmDeletion'
@@ -51,6 +38,7 @@ import { Cohort } from 'types'
 import AccessBadge, { AccessLevel } from 'components/ui/AccessBadge'
 import IconButtonWithTooltip from 'components/ui/IconButtonWithTooltip'
 import { ChipWrapper } from 'components/ui/Chip/styles'
+import CohortInfo from 'components/ui/CohortInfo'
 
 type TopBarProps = {
   context: URLS
@@ -191,9 +179,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
         direction="column"
         alignItems={'center'}
         justifyContent={'center'}
-        sx={{ backgroundColor: '#E6F1FD', padding: '10px 0' }}
+        sx={{ backgroundColor: '#E6F1FD', padding: '20px 0' }}
       >
-        <Grid container xs={11} direction="column" justifyContent={'center'}>
+        <Grid container xs={11} direction="column" justifyContent={'center'} gap={1}>
           {dashboard.loading ? (
             <>
               <Skeleton width={200} />
@@ -207,9 +195,11 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
                     <Typography id="cohort-name" variant="h1">
                       {cohort.name}
                     </Typography>
-                    <IconButton onClick={handleFavorite} color="secondary" disabled={maintenanceIsActive}>
-                      <FavStar favorite={dashboard.favorite} height={20} />
-                    </IconButton>
+                    {context === URLS.COHORT && (
+                      <IconButton onClick={handleFavorite} color="secondary" disabled={maintenanceIsActive}>
+                        <FavStar favorite={dashboard.favorite} height={20} />
+                      </IconButton>
+                    )}
                   </Box>
                   <Box display="flex" alignItems="center" gap={1}>
                     <AccessBadge accessLevel={access} loading={dashboard.loading} />
@@ -334,19 +324,15 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
               )}
             </>
           )}
-          {dashboard.loading ? (
-            <>
-              <Skeleton width={100} />
-              <Skeleton width={100} />
-            </>
-          ) : (
-            <>
-              <Typography id="cohort-patient-number" noWrap>
-                Nb de patients : {format(patientsNumber)}
-              </Typography>
-              {cohort.cohortId && <Typography noWrap>ID cohorte : {cohort.cohortId}</Typography>}
-            </>
-          )}
+          <Grid container alignItems={'center'} gap={3}>
+            <CohortInfo
+              id="cohort-patient-number"
+              label={'Nb de patients'}
+              total={format(patientsNumber)}
+              loading={dashboard.loading}
+            />
+            {cohort.cohortId && <CohortInfo label="ID cohorte" total={cohort.cohortId} loading={dashboard.loading} />}
+          </Grid>
         </Grid>
       </Grid>
 

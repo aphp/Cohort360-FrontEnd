@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { Grid, Tabs, Tab } from '@mui/material'
+import { Grid, Tab } from '@mui/material'
 import CohortPreview from 'components/Dashboard/Preview/Preview'
 import TopBar from 'components/TopBar/TopBar'
 import CohortRightOrNotExist from 'components/ErrorView/CohortRightOrNotExist'
@@ -151,36 +151,8 @@ const Dashboard = ({ context }: DashboardProps) => {
       <TopBar
         context={context}
         access={dashboard.deidentifiedBoolean ? AccessLevel.DEIDENTIFIED : AccessLevel.NOMINATIVE}
-        // access={
-        //   dashboard.deidentifiedBoolean === undefined
-        //     ? '-'
-        //     : dashboard.deidentifiedBoolean
-        //     ? 'Pseudonymisé'
-        //     : 'Nominatif'
-        // }
       />
       <Grid container justifyContent="center">
-        {/* <Header
-          type="cohorte"
-          title="Cohorte : Otite étrange"
-          subtitle="Ceci est une description de cohorte décrivant par exemple tous les critères..."
-          infoLines={['Nb de patients 12 859', 'ID cohorte 20021744']}
-          showStar
-          accessType="pseudonymisé"
-          tabs={[
-            'MODIFIER LA REQUÊTE',
-            'APERÇU',
-            'PATIENTS',
-            'DOCUMENTS',
-            'PMSI',
-            'MÉDICAMENTS',
-            'BIOLOGIE',
-            'IMAGERIE',
-            'FORMULAIRES'
-          ]}
-          activeTab="PMSI"
-          onTabChange={(tab) => console.log(tab)}
-        /> */}
         <Grid
           container
           xs={12}
@@ -209,7 +181,12 @@ const Dashboard = ({ context }: DashboardProps) => {
           </Grid>
           {subTabs && (
             <Grid item xs={11}>
-              <Tabs id="subTabs" value={selectedSubTab} onChange={(_, newSubTab) => setSelectedSubTab(newSubTab)}>
+              <MainTabsWrapper
+                id="subTabs"
+                value={selectedSubTab}
+                onChange={(_, newSubTab) => setSelectedSubTab(newSubTab)}
+                _variant="secondary"
+              >
                 {subTabs.map((subTab) => {
                   const groupIdParam = groupId ? `groupId=${groupId}` : ''
                   return (
@@ -223,7 +200,7 @@ const Dashboard = ({ context }: DashboardProps) => {
                     />
                   )
                 })}
-              </Tabs>
+              </MainTabsWrapper>
             </Grid>
           )}
         </Grid>

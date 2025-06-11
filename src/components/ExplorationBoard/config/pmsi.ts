@@ -95,19 +95,19 @@ const mapToTable = (
         id: `${elem.id}-source`,
         value: elem.meta?.source ?? 'Non renseigné',
         type: CellType.TEXT,
-        sx: { fontWeight: 900 }
+        sx: { fontWeight: 700, fontSize: 12 }
       },
       {
         id: `${elem.id}-code`,
         value: codes.code ?? 'Non renseigné',
         type: CellType.TEXT,
-        sx: { fontWeight: 900 }
+        sx: { fontWeight: 700, fontSize: 12 }
       },
       {
         id: `${elem.id}-display`,
         value: codes.display ?? 'Non renseigné',
         type: CellType.TEXT,
-        sx: { fontWeight: 900 }
+        sx: { fontWeight: 700, fontSize: 12 }
       },
       hasDiagnosticType && {
         id: `${elem.id}-type`,

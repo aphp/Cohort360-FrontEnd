@@ -15,15 +15,17 @@ type TableProps = {
 
 const Table = ({ value, orderBy, onSort, sxColumn, sxRow }: TableProps) => {
   return (
-    <TableContainer>
+    <TableContainer sx={{ borderRadius: 1 }}>
       <TableMui>
         <TableHead
           columns={value.columns}
           sx={{
             height: 42,
+            fontSize: 11,
+            fontWeight: 700,
             backgroundColor: '#E6F1FD',
             textTransform: 'uppercase',
-            borderBottom: '2px solid',
+            // borderBottom: '2px solid',
             ...sxColumn
           }}
           orderBy={orderBy}
@@ -36,8 +38,17 @@ const Table = ({ value, orderBy, onSort, sxColumn, sxRow }: TableProps) => {
               row={row}
               sx={
                 index % 2 === 0
-                  ? { borderBottom: '1px solid grey', height: 42, ...sxRow }
-                  : { backgroundColor: '#f8f8f8', borderBottom: '1px solid grey', height: 42, ...sxRow }
+                  ? {
+                      // borderBottom: '1px solid grey',
+                      height: 42,
+                      ...sxRow
+                    }
+                  : {
+                      backgroundColor: '#f8f8f8',
+                      //  borderBottom: '1px solid grey',
+                      height: 42,
+                      ...sxRow
+                    }
               }
             />
           ))}

@@ -51,13 +51,13 @@ const SavedFilters = ({
   return (
     <>
       <Button
-        sx={{ borderRadius: 1 }}
+        sx={{ borderRadius: 16 }}
         size="small"
         variant="contained"
         fullWidth
         startIcon={<SavedSearch height="15px" />}
         onClick={() => setToggleModal(true)}
-        style={{ backgroundColor: '#fff', color: '#303030', height: '30px' }}
+        style={{ backgroundColor: '#0063AF', color: '#FFF', height: '30px', boxShadow: 'none' }}
       >
         Mes filtres
       </Button>
