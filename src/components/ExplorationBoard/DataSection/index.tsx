@@ -1,5 +1,5 @@
 import React from 'react'
-import { Accordion, AccordionDetails, AccordionSummary, CircularProgress, Grid, Typography } from '@mui/material'
+import { AccordionDetails, AccordionSummary, CircularProgress, Grid, Typography } from '@mui/material'
 import DataTable from 'components/ui/Table'
 import { Table } from 'types/table'
 import { OrderBy } from 'types/searchCriterias'
@@ -16,6 +16,7 @@ import { Timeline as TimelineT, CountDisplay, Diagram, DiagramType, DisplayOptio
 import { Card } from 'types/card'
 import { StickyContainer } from 'components/ui/Pagination/styles'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import AccordionWrapper from 'components/ui/Accordion'
 
 type DataSectionProps = {
   data: { table: Table; cards: Card[]; diagrams: Diagram[]; timeline: TimelineT | null }
@@ -46,7 +47,7 @@ const DataSection = ({
     )
   return (
     <Grid container justifyContent="center" item xs={12}>
-      <Grid container alignItems="center" gap="20px">
+      <Grid container alignItems="center" gap={2}>
         {displayOptions.count && count && (
           <>
             {!count[0].count.results && !count[1].count.results ? (
@@ -54,14 +55,9 @@ const DataSection = ({
                 <Typography variant="button">Aucune donnée à afficher</Typography>
               </Grid>
             ) : (
-              <Grid container alignItems="center">
+              <Grid container alignItems="center" gap={2}>
                 {count[0].display && (
                   <DisplayDigits nb={count[0].count.results} total={count[0].count.total} label={count[0].label} />
-                )}
-                {count[1].display && (
-                  <Typography fontSize={15} margin="0px 5px">
-                    concernant
-                  </Typography>
                 )}
                 {count[1].display && (
                   <DisplayDigits nb={count[1].count.results} total={count[1].count.total} label={count[1].label} />
@@ -71,34 +67,32 @@ const DataSection = ({
           </>
         )}
         {displayOptions.diagrams && (
-          <Accordion sx={{ width: '100%' }}>
+          <AccordionWrapper defaultExpanded>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography fontWeight={600} fontSize={16} color="#153D8A">
+              <Typography fontWeight={600} fontSize={16} color="#153D8A" fontFamily={"'Montserrat', sans-serif"}>
                 Graphiques
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Grid container direction={'column'}>
-                <Grid container>
-                  {data.diagrams.map((diagram, index) => (
-                    <Grid key={index} item xs={12} md={6} lg={4}>
-                      <Chart isLoading={isLoading} title="Répartition par genre">
-                        {diagram.type === DiagramType.BAR && (
-                          <BarChart data={diagram.data as SimpleChartDataType[]} width={250} />
-                        )}
-                        {diagram.type === DiagramType.PIE && (
-                          <PieChart data={diagram.data as SimpleChartDataType[]} width={250} />
-                        )}
-                        {diagram.type === DiagramType.PYRAMID && (
-                          <PyramidChart data={diagram.data as AgeRepartitionType} width={250} />
-                        )}
-                      </Chart>
-                    </Grid>
-                  ))}
-                </Grid>
+              <Grid container spacing={3}>
+                {data.diagrams.map((diagram, index) => (
+                  <Grid key={index} item xs={12} md={6} lg={4}>
+                    <Chart isLoading={isLoading} title="Répartition par genre">
+                      {diagram.type === DiagramType.BAR && (
+                        <BarChart data={diagram.data as SimpleChartDataType[]} width={250} />
+                      )}
+                      {diagram.type === DiagramType.PIE && (
+                        <PieChart data={diagram.data as SimpleChartDataType[]} width={250} />
+                      )}
+                      {diagram.type === DiagramType.PYRAMID && (
+                        <PyramidChart data={diagram.data as AgeRepartitionType} width={250} />
+                      )}
+                    </Chart>
+                  </Grid>
+                ))}
               </Grid>
             </AccordionDetails>
-          </Accordion>
+          </AccordionWrapper>
         )}
         {data.timeline && (
           <Timeline questionnaireResponses={data.timeline.data} questionnaires={data.timeline.questionnaires} />

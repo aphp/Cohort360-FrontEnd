@@ -8,5 +8,6 @@ export const AlertWrapper = styled(Alert)(() => ({
   fontWeight: 600,
   color: '#F39634',
   border: '2px solid #FDDDBF',
-  borderRadius: 16
+  borderRadius: 16,
+  alignItems: 'center'
 }))
