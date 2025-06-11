@@ -26,6 +26,7 @@ import me from './me'
 import warningDialog from './warningDialog'
 import valueSets from './valueSets'
 import preferences from './preferences'
+import { temporalConstraintsMiddleware } from './middlewares'
 
 /**
  * Combined reducer for cohort creation functionality.
@@ -36,11 +37,7 @@ const cohortCreationReducer = combineReducers({
   request: cohortCreation
 })
 
-/**
- * Root reducer combining all application state slices.
- * Defines the complete application state structure.
- */
-const rootReducer = combineReducers({
+export const rootReducer = combineReducers({
   me,
   preferences,
   cohortCreation: cohortCreationReducer,
@@ -107,6 +104,7 @@ export const store = configureStore({
       )
       // @ts-ignore
       .concat(logger)
+      .concat(temporalConstraintsMiddleware)
 })
 
 /**
