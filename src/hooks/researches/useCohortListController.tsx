@@ -44,16 +44,11 @@ const useCohortListController = <TItem,>({
     }
   }, [searchParams, favorites])
 
-  console.log('test searchInput', searchInput)
-  console.log('test favorites', favorites)
-
   const [paramsReady, setParamsReady] = useState(false)
   const [order, setOrder] = useState<OrderBy>({ orderBy, orderDirection })
   const [form, setForm] = useState<CohortsFilters>(filters)
   const [openFiltersModal, setOpenFiltersModal] = useState(false)
   const [modalError, setModalError] = useState(false)
-
-  console.log('test filters', filters)
 
   useEffect(() => {
     if (!simplified) {

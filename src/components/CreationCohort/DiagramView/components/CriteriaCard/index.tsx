@@ -70,25 +70,22 @@ const CriteriaCard = ({
     else setNeedCollapse(false)
   }, [containerRef.current?.clientWidth])
 
+  // if (isDragging) return <div style={{ height: 2, background: 'red' }}></div>
   if (isDragging)
     return (
       <Grid
+        // marginBottom={5}
         ref={setNodeRef}
         style={style}
         container
         alignItems={'center'}
         className={classes.draggedCriteriaItem}
+        //className={classes.criteriaItem}
       ></Grid>
     )
 
   return (
-    <Grid
-      ref={setNodeRef}
-      style={style}
-      container
-      alignItems={'center'}
-      className={clsx(classes.criteriaItem, { [classes.noBefore]: isDragging })}
-    >
+    <Grid ref={setNodeRef} style={style} container alignItems={'center'} className={classes.criteriaItem}>
       <CriteriaCount criteriaCount={criteriaCount} extraLeftMargin={3} />
       <Grid
         container

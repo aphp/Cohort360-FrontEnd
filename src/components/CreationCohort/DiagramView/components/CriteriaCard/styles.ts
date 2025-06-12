@@ -14,7 +14,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     marginTop: 12,
     minWidth: 400,
     maxWidth: 930,
-    position: 'relative',
+    position: 'relative' /*,
     '&::before': {
       width: 38,
       height: 4,
@@ -22,7 +22,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
       position: 'absolute',
       background: '#19235A',
       marginLeft: -46
-    }
+    }*/
   },
   noBefore: {
     '&::before': {
