@@ -39,6 +39,7 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
     encounterStartDate: null,
     encounterEndDate: null,
     encounterStatus: [],
+    encounterAgeRange: { start: null, end: null },
     code: null,
     searchByValue: null,
     enableSearchByValue: false
@@ -143,6 +144,14 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
       title: 'Options avancées',
       defaulCollapsed: true,
       items: [
+        {
+          valueKey: 'encounterAgeRange',
+          label: 'Âge au début de la prise en charge',
+          type: 'durationRange',
+          buildInfo: {
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Âge au début de la prise en charge' }]
+          }
+        },
         {
           valueKey: 'encounterService',
           label: 'Unité exécutrice',
