@@ -3,9 +3,10 @@ import { Theme } from '@mui/material/styles'
 
 const useStyles = makeStyles()((theme: Theme) => ({
   draggedCriteriaItem: {
-    height: 92,
-    opacity: 0.4,
-    border: '1px solid #0063AF',
+    height: 5,
+    //opacity: 0.4,
+    // border: '1px solid #0063AF',
+    background: '#0063AF',
     borderRadius: 4
   },
   criteriaItem: {

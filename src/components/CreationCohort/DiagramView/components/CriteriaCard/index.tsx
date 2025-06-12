@@ -22,7 +22,6 @@ import { criteriasAsArray } from '../LogicalOperator/components/CriteriaRightPan
 import CriteriaCount, { CriteriaCountType } from '../CriteriaCount'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import clsx from 'clsx'
 
 type CriteriaCardProps = {
   criterion: SelectedCriteriaType
@@ -52,10 +51,11 @@ const CriteriaCard = ({
   const childrenRef = useRef<HTMLDivElement>(null)
   const isXl = useMediaQuery(theme.breakpoints.up('xl'))
 
-  const { setNodeRef, isDragging, attributes, listeners, transform, transition } = useSortable({
-    id: criterion.id,
-    data: { criterion }
-  })
+  const { setNodeRef, isDragging, attributes, listeners, transform, transition, isOver, overIndex, activeIndex } =
+    useSortable({
+      id: criterion.id,
+      data: { criterion }
+    })
 
   const style = {
     transition,
@@ -70,22 +70,19 @@ const CriteriaCard = ({
     else setNeedCollapse(false)
   }, [containerRef.current?.clientWidth])
 
-  // if (isDragging) return <div style={{ height: 2, background: 'red' }}></div>
-  if (isDragging)
-    return (
-      <Grid
-        // marginBottom={5}
-        ref={setNodeRef}
-        style={style}
-        container
-        alignItems={'center'}
-        className={classes.draggedCriteriaItem}
-        //className={classes.criteriaItem}
-      ></Grid>
-    )
-
   return (
-    <Grid ref={setNodeRef} style={style} container alignItems={'center'} className={classes.criteriaItem}>
+    <Grid
+      ref={setNodeRef}
+      style={style}
+      container
+      alignItems={'center'}
+      className={classes.criteriaItem}
+      sx={{
+        borderBottom: isOver && overIndex !== activeIndex && overIndex > activeIndex ? '2px solid #0063AF' : 'none',
+        borderTop: isOver && overIndex !== activeIndex && activeIndex > overIndex ? '2px solid #0063AF' : 'none',
+        opacity: isDragging ? 0.8 : 1
+      }}
+    >
       <CriteriaCount criteriaCount={criteriaCount} extraLeftMargin={3} />
       <Grid
         container

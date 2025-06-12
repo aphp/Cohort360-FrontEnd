@@ -308,12 +308,12 @@ const LogicalOperator: React.FC = () => {
             editCriteria={_editCriteria}
           />
         </SortableContext>
-        {createPortal(
+        {/*createPortal(
           <DragOverlay>
             {draggedCriterion && <CriteriaCardItem key={draggedCriterion?.id} criterion={draggedCriterion} />}
           </DragOverlay>,
           document.body
-        )}
+        )*/}
       </DndContext>
 
       <CriteriaRightPanel
