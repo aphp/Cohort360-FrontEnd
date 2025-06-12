@@ -107,6 +107,7 @@ export const useHierarchy = <T>(
     id?: string
   ) => {
     const { display, count } = await search(fetchSearch)
+
     const cleaned = display.filter((e) => e)
     if (display.length !== cleaned.length) setHasError(true)
     else setHasError(false)

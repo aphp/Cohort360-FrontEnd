@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { FhirItem, Reference } from 'types/valueSet'
+import { FhirItem, Reference, ValueSetSorting } from 'types/valueSet'
 import { LIMIT_PER_PAGE, SearchParameters, useSearchParameters } from '../search/useSearchParameters'
 import { useHierarchy } from 'hooks/hierarchy/useHierarchy'
 import {
@@ -22,6 +22,7 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
   const [searchInput, setSearchInput] = useState('')
   const [mode, setMode] = useState(SearchMode.EXPLORATION)
   const [initialized, setInitialized] = useState({ exploration: false, research: false })
+  const [currentSorting, setCurrentSorting] = useState<ValueSetSorting | undefined>(undefined)
   const dispatch = useAppDispatch()
   const controllerRef = useRef<AbortController | null>(null)
 
@@ -84,7 +85,7 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
     return [...selectedCodes.values()].flatMap((innerMap) => [...innerMap.values()])
   }, [selectedCodes])
 
-  const fetchSearch = async (searchInput: string, page: number, references: string[]) => {
+  const fetchSearch = async (searchInput: string, page: number, references: string[], sorting?: ValueSetSorting) => {
     if (references.length) {
       if (loadingStatus.search === LoadingStatus.FETCHING)
         controllerRef.current = cancelPendingRequest(controllerRef.current)
@@ -93,6 +94,7 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
         searchInput,
         page * LIMIT_PER_PAGE,
         LIMIT_PER_PAGE,
+        sorting || currentSorting,
         controllerRef.current?.signal
       )
     } else return { results: [], count: 0 }
@@ -101,7 +103,7 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
   const fetchBaseTree = async (ref: Reference) => {
     const fetch = ref.isHierarchy
       ? () => getHierarchyRoots(ref.url, ref.title, ref.filterRoots)
-      : () => searchInValueSets([ref.url], '', 0, LIMIT_PER_PAGE)
+      : () => searchInValueSets([ref.url], '', 0, LIMIT_PER_PAGE, undefined)
     try {
       return await fetch()
     } catch (error) {
@@ -167,6 +169,12 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
     debouncedSearch(newInput)
   }
 
+  const handleSort = (sorting: ValueSetSorting) => {
+    setCurrentSorting(sorting)
+    const refs = researchParameters.options.references.filter((ref) => ref.checked).map((ref) => ref.url)
+    fetchMore(() => fetchSearch(searchInput, 0, refs, sorting), 1, SearchMode.RESEARCH)
+  }
+
   useEffect(() => {
     if (mode === SearchMode.EXPLORATION && !initialized.exploration) initExploration(references)
     if (mode === SearchMode.RESEARCH && !initialized.research) initResearch(references)
@@ -180,6 +188,7 @@ export const useSearchValueSet = (references: Reference[], selectedNodes: Hierar
     searchInput,
     onChangeMode: setMode,
     onDelete: handleDeleteSelectedCodes,
+    onSort: handleSort,
     parameters: {
       refs: getSearchParameter('references') as Reference[],
       onChangeSearchInput: handleChangeSearchInput,
