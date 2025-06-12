@@ -119,6 +119,7 @@ export type AppConfig = {
         locationShapeUrl?: string
         locationCount?: string
       }
+      minZoom?: number
     }
     feasibilityReport: {
       enabled: boolean

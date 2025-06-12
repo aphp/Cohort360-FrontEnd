@@ -32,7 +32,7 @@ const LOCATION_FETCH_BATCH_SIZE = 2000
 const MAX_COUNT_QUANTILE = 0.96
 const ZONE_COLOR_OPACITY = 0.37
 const BORDER_RELATIVE_OPACITY = 1.33
-const MIN_ZOOM = 7
+const MIN_ZOOM = 8
 const DEFAULT_MAP_CENTER: LatLngTuple = [48.8575, 2.3514]
 const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 const MAP_COPYRIGHTS = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -367,6 +367,7 @@ const MapLegend = (props: { maxCount: number; colorPalette: string[] }) => {
 
 const LocationMap = (props: LocationMapProps) => {
   const { cohortId, center = DEFAULT_MAP_CENTER } = props
+  const appConfig = useContext(AppConfig)
 
   return (
     <div style={{ width: '100%', padding: '10px', position: 'relative' }}>
@@ -375,7 +376,7 @@ const LocationMap = (props: LocationMapProps) => {
         renderer={L.canvas()}
         center={center}
         zoom={10}
-        minZoom={MIN_ZOOM}
+        minZoom={appConfig.features.locationMap.minZoom || MIN_ZOOM}
         scrollWheelZoom={true}
         style={{ height: '500px', width: '100%' }}
       >
