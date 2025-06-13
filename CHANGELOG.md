@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.47.2](https://github.com/aphp/Cohort360-FrontEnd/compare/2.47.1..2.47.2) - 2025-06-13
+
+### 🚀 Features
+
+- *(locationMap)* Add configurable min zoom + decrease default to 8 - ([9fc3692](https://github.com/aphp/Cohort360-FrontEnd/commit/9fc369266e5a1a7118a197848dfbcc47c5278b4c))
+- *(questionnaire)* Add form names default filters - ([74772f1](https://github.com/aphp/Cohort360-FrontEnd/commit/74772f1ca7bb6eb98b440a4a36373207edf2f99c))
+- *(valuesets)* Add stats - ([6f76a43](https://github.com/aphp/Cohort360-FrontEnd/commit/6f76a4312d2033fbbe0843ef0c00543029f235b1))
+
 ## [2.47.1](https://github.com/aphp/Cohort360-FrontEnd/compare/2.47.0..2.47.1) - 2025-06-10
 
 ### 🐛 Bug Fixes
