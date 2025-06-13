@@ -83,6 +83,7 @@ export type AppConfig = {
     }
     questionnaires: {
       enabled: boolean
+      defaultFilterFormNames?: string[]
       valueSets: {
         analgesieType: ValueSetConfig
         birthDeliveryWay: ValueSetConfig

@@ -61,6 +61,7 @@ import {
 } from 'types/requestCriterias'
 import { ResourceType } from 'types/requestCriterias'
 import { getConfig } from 'config'
+import { form } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/HospitForm'
 import { none } from 'ramda'
 
 const paramValuesReducer = (accumulator: string, currentValue: string): string =>
@@ -1022,10 +1023,12 @@ export const fetchForms = async (args: fetchFormsProps) => {
   let { uniqueFacet } = args
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   const _orderDirection = orderDirection === Direction.DESC ? '-' : ''
+  const config = getConfig()
+  const formNames = formName || config.features.questionnaires.defaultFilterFormNames?.join(',')
 
   let options: string[] = ['status=in-progress,completed']
   if (patient) options = [...options, `subject=${patient}`]
-  if (formName) options = [...options, `${QuestionnaireResponseParamsKeys.NAME}=${formName}`]
+  if (formNames) options = [...options, `${QuestionnaireResponseParamsKeys.NAME}=${formNames}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer, '')}`]
   if (startDate) options = [...options, `${QuestionnaireResponseParamsKeys.DATE}=ge${startDate}`]
   if (endDate) options = [...options, `${QuestionnaireResponseParamsKeys.DATE}=le${endDate}`]
