@@ -18,7 +18,6 @@ import sideBarTransition from 'styles/sideBarTransition'
 import { buildExplorationConfig, ExplorationResourceType } from 'components/ExplorationBoard/config/config'
 import { useValidatedSubtab } from 'components/ExplorationBoard/useValidatedSubTab'
 import { useCleanSearchParams } from 'components/ExplorationBoard/useCleanSearchParams'
-import Header from 'components/ui/Header/test'
 import { AccessLevel } from 'components/ui/AccessBadge'
 
 type DashboardProps = {
@@ -180,7 +179,7 @@ const Dashboard = ({ context }: DashboardProps) => {
             </Grid>
           </Grid>
           {subTabs && (
-            <Grid item xs={11}>
+            <Grid item xs={11} sx={{ borderBottom: '1px solid #848484' }}>
               <MainTabsWrapper
                 id="subTabs"
                 value={selectedSubTab}
