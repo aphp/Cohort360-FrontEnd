@@ -3,7 +3,7 @@ import { Theme } from '@mui/material/styles'
 
 const useStyles = makeStyles()((theme: Theme) => ({
   root: {
-    backgroundColor: '#E6F1FD'
+    backgroundColor: '#FFF'
   },
   progressContainer: {
     height: '100%',

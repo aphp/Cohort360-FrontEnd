@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react'
 
-import { CircularProgress, Grid, Paper, Typography } from '@mui/material'
+import { CircularProgress, Grid, Typography } from '@mui/material'
 
 type ChartProps = {
   isLoading: boolean
@@ -8,21 +8,25 @@ type ChartProps = {
 }
 const Chart = ({ children, title, isLoading }: PropsWithChildren<ChartProps>) => {
   return (
-    <Paper>
-      <Grid container padding="0.7rem" direction="column" height="300px">
-        {title && (
-          <Grid container item borderBottom="2px inset #E6F1FD" paddingBottom="10px">
-            <Typography variant="h3" color="primary">
-              {title}
-            </Typography>
-          </Grid>
-        )}
-        <Grid container item justifyContent="center" alignItems="center" style={{ flexGrow: 1 }}>
-          {isLoading && <CircularProgress />}
-          {!isLoading && <>{children}</>}
+    <Grid
+      container
+      padding="8px"
+      direction="column"
+      height="300px"
+      style={{ borderRadius: 12, border: '1px solid #D1E2F4' }}
+    >
+      {title && (
+        <Grid container item borderBottom="2px inset #E6F1FD" paddingBottom="10px">
+          <Typography variant="h3" color="primary">
+            {title}
+          </Typography>
         </Grid>
+      )}
+      <Grid container item justifyContent="center" alignItems="center" style={{ flexGrow: 1 }}>
+        {isLoading && <CircularProgress />}
+        {!isLoading && <>{children}</>}
       </Grid>
-    </Paper>
+    </Grid>
   )
 }
 

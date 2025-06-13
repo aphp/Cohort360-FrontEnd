@@ -61,7 +61,7 @@ export const DISPLAY_OPTIONS: DisplayOptions = {
   saveFilters: true,
   criterias: true,
   search: true,
-  diagrams: true,
+  diagrams: false,
   count: true
 }
 
