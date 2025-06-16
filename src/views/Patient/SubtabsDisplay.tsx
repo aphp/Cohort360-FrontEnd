@@ -1,7 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Tab, Tabs } from '@mui/material'
+import { Tab } from '@mui/material'
 import Select from 'components/ui/Searchbar/Select'
+import { TabsWrapper } from 'components/ui/Tabs'
 import { ResourceType } from 'types/requestCriterias'
 
 type SubtabsDisplayProps = {
@@ -40,7 +41,7 @@ const SubtabsDisplay: React.FC<SubtabsDisplayProps> = ({
       radius={25}
     />
   ) : (
-    <Tabs value={selectedSubTab} onChange={(_, newSubTab) => onChange(newSubTab)}>
+    <TabsWrapper customVariant="secondary" value={selectedSubTab} onChange={(_, newSubTab) => onChange(newSubTab)}>
       {subTabs.map((subTab) => {
         return (
           <Tab
@@ -53,7 +54,7 @@ const SubtabsDisplay: React.FC<SubtabsDisplayProps> = ({
           />
         )
       })}
-    </Tabs>
+    </TabsWrapper>
   )
 }
 

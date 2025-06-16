@@ -2,7 +2,6 @@ import React from 'react'
 import GroupIcon from '@mui/icons-material/Group'
 import BusinessIcon from '@mui/icons-material/Business'
 import ViewListIcon from '@mui/icons-material/ViewList'
-import FaceIcon from '@mui/icons-material/Face'
 import { URLS } from 'types/exploration'
 
 type ContextConfig = {
@@ -16,11 +15,6 @@ export const headerContexts: Record<string, ContextConfig> = {
   [URLS.PATIENTS]: {
     title: 'Tous mes patients',
     icon: <GroupIcon />,
-    showActions: false
-  },
-  [URLS.PATIENT]: {
-    title: 'Information patient',
-    icon: <FaceIcon />,
     showActions: false
   },
   [URLS.COHORT]: {

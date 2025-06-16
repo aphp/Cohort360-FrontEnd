@@ -6,7 +6,6 @@ import PatientNotExist from 'components/ErrorView/PatientNotExist'
 import PatientHeader from 'components/Patient/PatientHeader/PatientHeader'
 import PatientPreview from 'components/Patient/PatientPreview/PatientPreview'
 import PatientTimeline from 'components/Patient/PatientTimeline/PatientTimeline'
-import TopBar from 'components/TopBar/TopBar'
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPatientInfo } from 'state/patient'
 import { AppConfig } from 'config'
@@ -16,7 +15,7 @@ import { MedicationLabel, ResourceType } from 'types/requestCriterias'
 import { PMSILabel } from 'types/patient'
 import { URLS } from 'types/exploration'
 import sideBarTransition from 'styles/sideBarTransition'
-import { MainTabsWrapper } from 'components/ui/Tabs/style'
+import { TabsWrapper } from 'components/ui/Tabs'
 import { SidebarButton, SidebarWrapper } from 'components/ui/Sidebar/style'
 import { buildExplorationConfig, ExplorationResourceType } from 'components/ExplorationBoard/config/config'
 import SubtabsDisplay from './SubtabsDisplay'
@@ -141,15 +140,24 @@ const Patient = () => {
       <CircularProgress size={50} />
     </Grid>
   ) : (
-    <Grid container direction="column" className={cx(classes.appBar, { [classes.appBarShift]: open })}>
-      <TopBar context={URLS.PATIENT} access={deidentified ? 'Pseudonymisé' : 'Nominatif'} />
+    <Grid
+      container
+      direction="column"
+      className={cx(classes.appBar, { [classes.appBarShift]: open })}
+      sx={{ backgroundColor: '#FFF' }}
+    >
       <SidebarButton role="button" onClick={() => setIsSidebarOpened(true)}>
         <ChevronLeftIcon color="action" width="20px" />
       </SidebarButton>
-      <Grid container direction="column" alignItems="center" gap="25px">
-        <PatientHeader patient={patient?.patientInfo} deidentifiedBoolean={deidentified} />
-        <Grid container md={11}>
-          <MainTabsWrapper value={selectedTab} onChange={(_, tab) => handleChangeTab(tab)}>
+      <PatientHeader
+        loading={loading}
+        patient={patient?.patientInfo}
+        deidentifiedBoolean={deidentified}
+        groupId={groupId}
+      />
+      <Grid container direction="column" alignItems="center" sx={{ backgroundColor: '#E6F1FD' }}>
+        <Grid container xs={11}>
+          <TabsWrapper value={selectedTab} onChange={(_, tab) => handleChangeTab(tab)}>
             {availableTabs.map((tab) => {
               const groupIdParam = groupId ? `groupId=${groupId}` : ''
               const defaultSubTab = tab.subs?.[0]?.value
@@ -164,9 +172,11 @@ const Patient = () => {
                 />
               )
             })}
-          </MainTabsWrapper>
+          </TabsWrapper>
         </Grid>
-        <Grid container sm={11}>
+      </Grid>
+      <Grid container justifyContent="center">
+        <Grid container xs={11}>
           {subTabs && (
             <SubtabsDisplay
               subTabs={subTabs}
@@ -195,11 +205,11 @@ const Patient = () => {
           )}
         </Grid>
 
-        <SidebarWrapper anchor="right" keepMounted open={isSidebarOpened} onClose={() => setIsSidebarOpened(false)}>
+        {/* <SidebarWrapper anchor="right" keepMounted open={isSidebarOpened} onClose={() => setIsSidebarOpened(false)}>
           <Grid container padding="10px 10px 0px 10px">
             {sidebarConfig && <ExplorationBoard config={sidebarConfig} />}
           </Grid>
-        </SidebarWrapper>
+        </SidebarWrapper> */}
       </Grid>
     </Grid>
   )

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Grid, Typography } from '@mui/material'
+import { Box, Grid, Typography } from '@mui/material'
 
 import useStyles from './styles'
 import { GenderStatus } from 'types/searchCriterias'
@@ -8,20 +8,22 @@ import GenderIcon from 'components/ui/GenderIcon'
 
 type PatientInfoTypes = {
   gender?: GenderStatus
-  age: React.ReactText
+  age: string
   ipp?: string
 }
 const PatientInfo: React.FC<PatientInfoTypes> = ({ gender, age, ipp }) => {
   const { classes } = useStyles()
 
   return (
-    <Grid className={classes.root} container direction="column">
+    <Box display="flex" alignItems="center">
       <Grid container item justifyContent="center" alignItems="center" className={classes.whiteCircle}>
-        <GenderIcon gender={gender?.toLocaleUpperCase() as GenderStatus} className={classes.genderIcon} />
+        <GenderIcon gender={gender?.toLocaleUpperCase() as GenderStatus} size={44} color="#153D8A" />
       </Grid>
-      <Typography variant="body1">{age}</Typography>
-      <Typography variant="body1">{ipp}</Typography>
-    </Grid>
+      <Box display="flex" flexDirection="column" ml={1}>
+        <Typography>{age}</Typography>
+        <Typography>IPP: {ipp}</Typography>
+      </Box>
+    </Box>
   )
 }
 

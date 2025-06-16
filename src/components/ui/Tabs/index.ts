@@ -4,11 +4,11 @@ import { Tabs } from '@mui/material'
 type TabVariant = 'main' | 'secondary'
 
 type TabsCustomProps = {
-  _variant?: TabVariant
+  customVariant?: TabVariant
 }
 
-export const MainTabsWrapper = styled(Tabs)<TabsCustomProps>(({ _variant = 'main' }) => ({
-  ...(_variant === 'main' && {
+export const TabsWrapper = styled(Tabs)<TabsCustomProps>(({ customVariant = 'main' }) => ({
+  ...(customVariant === 'main' && {
     '.MuiTabs-indicator': {
       height: 0,
       opacity: 0
@@ -38,7 +38,7 @@ export const MainTabsWrapper = styled(Tabs)<TabsCustomProps>(({ _variant = 'main
       color: '#FFF'
     }
   }),
-  ...(_variant === 'secondary' && {
+  ...(customVariant === 'secondary' && {
     '& .MuiTab-root': {
       padding: '8px 20px',
       fontWeight: 600,

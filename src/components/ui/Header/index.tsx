@@ -16,12 +16,15 @@ type HeaderLayoutProps = {
   cohortId?: string
   patientsCount?: number
   perimeters?: string[]
-  accessLevel: AccessLevel
+  accessLevel?: AccessLevel
   showActions?: boolean
   isFavorite?: boolean
   loading?: boolean
   onToggleFavorite?: () => void
   actionsMenu?: React.ReactNode
+  searchArea?: React.ReactNode
+  patientCard?: React.ReactNode
+  goBackButton?: React.ReactNode
 }
 
 const HeaderLayout: React.FC<HeaderLayoutProps> = ({
@@ -36,7 +39,10 @@ const HeaderLayout: React.FC<HeaderLayoutProps> = ({
   isFavorite = false,
   loading = false,
   onToggleFavorite,
-  actionsMenu
+  actionsMenu,
+  searchArea,
+  patientCard,
+  goBackButton
 }) => {
   return (
     <Grid
@@ -54,6 +60,7 @@ const HeaderLayout: React.FC<HeaderLayoutProps> = ({
           </>
         ) : (
           <>
+            {goBackButton}
             <Grid container justifyContent="space-between" alignItems="center">
               <Box display="flex" alignItems="center" gap={1}>
                 {icon}
@@ -68,7 +75,7 @@ const HeaderLayout: React.FC<HeaderLayoutProps> = ({
               </Box>
 
               <Box display="flex" alignItems="center" gap={1}>
-                <AccessBadge accessLevel={accessLevel} loading={loading} />
+                {accessLevel && <AccessBadge accessLevel={accessLevel} loading={loading} />}
                 {actionsMenu}
               </Box>
             </Grid>
@@ -91,6 +98,8 @@ const HeaderLayout: React.FC<HeaderLayoutProps> = ({
           )}
           {cohortId && <CohortInfo label="ID cohorte" total={cohortId} loading={loading} />}
         </Grid>
+        {searchArea}
+        {patientCard}
       </Grid>
     </Grid>
   )

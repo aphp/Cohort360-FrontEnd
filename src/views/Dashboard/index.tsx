@@ -13,7 +13,7 @@ import ExplorationBoard from 'components/ExplorationBoard'
 import { MedicationLabel, ResourceType } from 'types/requestCriterias'
 import { PMSILabel } from 'types/patient'
 import { URLS } from 'types/exploration'
-import { MainTabsWrapper } from 'components/ui/Tabs/style'
+import { TabsWrapper } from 'components/ui/Tabs'
 import sideBarTransition from 'styles/sideBarTransition'
 import { buildExplorationConfig, ExplorationResourceType } from 'components/ExplorationBoard/config/config'
 import { useValidatedSubtab } from 'components/ExplorationBoard/useValidatedSubTab'
@@ -152,15 +152,10 @@ const Dashboard = ({ context }: DashboardProps) => {
         access={dashboard.deidentifiedBoolean ? AccessLevel.DEIDENTIFIED : AccessLevel.NOMINATIVE}
       />
       <Grid container justifyContent="center">
-        <Grid
-          container
-          xs={12}
-          justifyContent="center"
-          // minHeight={'96px'}
-        >
+        <Grid container xs={12} justifyContent="center">
           <Grid container justifyContent={'center'} sx={{ backgroundColor: '#e6f1fd' }}>
             <Grid item xs={11}>
-              <MainTabsWrapper id="mainTabs" value={selectedTab} onChange={(_, tab) => handleChangeTab(tab)}>
+              <TabsWrapper id="mainTabs" value={selectedTab} onChange={(_, tab) => handleChangeTab(tab)}>
                 {availableTabs.map((tab) => {
                   const groupIdParam = groupId ? `groupId=${groupId}` : ''
                   const defaultSubTab = tab.subs?.[0]?.value
@@ -175,16 +170,16 @@ const Dashboard = ({ context }: DashboardProps) => {
                     />
                   )
                 })}
-              </MainTabsWrapper>
+              </TabsWrapper>
             </Grid>
           </Grid>
           {subTabs && (
             <Grid item xs={11} sx={{ borderBottom: '1px solid #848484' }}>
-              <MainTabsWrapper
+              <TabsWrapper
                 id="subTabs"
                 value={selectedSubTab}
                 onChange={(_, newSubTab) => setSelectedSubTab(newSubTab)}
-                _variant="secondary"
+                customVariant="secondary"
               >
                 {subTabs.map((subTab) => {
                   const groupIdParam = groupId ? `groupId=${groupId}` : ''
@@ -199,7 +194,7 @@ const Dashboard = ({ context }: DashboardProps) => {
                     />
                   )
                 })}
-              </MainTabsWrapper>
+              </TabsWrapper>
             </Grid>
           )}
         </Grid>
