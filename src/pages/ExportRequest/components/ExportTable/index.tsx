@@ -173,7 +173,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
   }, [checkedPivotMerge, selectedQuestions])
 
   return (
-    <Grid container className={classes.exportTableGrid} id={tableSetting?.tableName}>
+    <Grid container className={classes.exportTableGrid} id={exportTable.name}>
       <Grid item container alignItems="center">
         <Grid item container alignItems="center" xs={6}>
           <Typography
