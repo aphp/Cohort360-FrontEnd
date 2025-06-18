@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Export page component for displaying and managing data exports.
+ * This component provides a paginated interface for viewing export history,
+ * searching exports, and creating new exports.
+ */
+
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { Grid, CircularProgress, Tooltip, Box } from '@mui/material'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
@@ -20,6 +26,18 @@ import PageContainer from 'components/ui/PageContainer'
 
 const RESULTS_PER_PAGE = 20
 
+/**
+ * Export page component that displays a list of data exports with search and pagination functionality.
+ *
+ * Features:
+ * - Displays paginated list of exports
+ * - Search functionality for filtering exports
+ * - Sorting capabilities
+ * - Navigation to create new exports
+ * - Automatic redirect for deidentified users
+ *
+ * @returns {JSX.Element} The Export page component
+ */
 const Export = () => {
   const controllerRef = useRef<AbortController>(new AbortController())
   const navigate = useNavigate()
@@ -35,6 +53,15 @@ const Export = () => {
     0
   )
 
+  /**
+   * Fetches the export list with the specified parameters.
+   * Handles request cancellation and loading states.
+   *
+   * @param {FetchExportArgs} params - The fetch parameters
+   * @param {string} params.input - Search input filter
+   * @param {string} params.orderBy - Sort order parameter
+   * @param {number} params.page - Page number to fetch
+   */
   const _fetchExportList = async ({ input, orderBy, page }: FetchExportArgs) => {
     let controller = controllerRef.current
     if (loadingStatus === LoadingStatus.FETCHING) {
@@ -49,6 +76,12 @@ const Export = () => {
     setLoadingStatus(LoadingStatus.SUCCESS)
   }
 
+  /**
+   * Handles search and pagination actions.
+   * Updates search criteria, pagination state, and URL parameters.
+   *
+   * @param {Partial<FetchExportArgs>} args - Search parameters
+   */
   const handleSearch = (args: Partial<FetchExportArgs>) => {
     const page = args.page ?? 1
     if ('input' in args) changeSearchInput(args.input ?? '')

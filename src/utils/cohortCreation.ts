@@ -1,3 +1,23 @@
+/**
+ * @fileoverview Cohort Creation Utilities
+ *
+ * This module provides comprehensive utilities for building, parsing, and managing cohort creation requests
+ * in the Cohort360 medical data exploration platform. It handles the conversion between UI state and
+ * the underlying "Requeteur" format used for medical data queries, including FHIR filter construction,
+ * criteria validation, and request serialization.
+ *
+ * Key functionalities:
+ * - Building and parsing cohort creation requests (Requeteur format)
+ * - FHIR filter construction for medical criteria
+ * - Nominative criteria validation and cleaning
+ * - Code caching for medical terminologies
+ * - Request joining for complex query composition
+ *
+ * @module cohortCreation
+ * @version 1.6.1
+ * @since 1.0.0
+ */
+
 import services from 'services/aphp'
 import { CriteriaGroup, TemporalConstraintsType, CriteriaItemType, CriteriaGroupType } from 'types'
 
@@ -25,8 +45,10 @@ import { FhirItem } from 'types/valueSet'
 import { ScopeElement } from 'types/scope'
 import { formatAge } from './age'
 
+/** Current version of the Requeteur format used for cohort requests */
 const REQUETEUR_VERSION = 'v1.6.1'
 
+/** Default criteria group used as fallback when group lookup fails */
 const DEFAULT_GROUP_ERROR: CriteriaGroup = {
   id: 0,
   title: '',
@@ -34,44 +56,89 @@ const DEFAULT_GROUP_ERROR: CriteriaGroup = {
   criteriaIds: []
 }
 
+/**
+ * Represents a group of criteria in the Requeteur format.
+ * Supports logical operators (AND/OR) and N-among-M constraints.
+ */
 type RequeteurGroupType =
   | {
-      // GROUP (andGroup | orGroup)
+      /** Group type: AND or OR logical operator */
       _type: CriteriaGroupType.AND_GROUP | CriteriaGroupType.OR_GROUP
+      /** Unique identifier for the group */
       _id: number
+      /** Whether the group should be included (true) or excluded (false) */
       isInclusive: boolean
+      /** Child criteria and nested groups */
       criteria: (RequeteurCriteriaType | RequeteurGroupType)[]
+      /** Optional temporal constraints between criteria */
       temporalConstraints?: TemporalConstraintsType[]
     }
-  // NOT IMPLEMENTED
   | {
-      // GROUP (nAmongM)
+      /** Group type: N-among-M constraint */
       _type: CriteriaGroupType.N_AMONG_M
+      /** Unique identifier for the group */
       _id: number
+      /** Whether the group should be included (true) or excluded (false) */
       isInclusive: boolean
+      /** Child criteria and nested groups */
       criteria: (RequeteurCriteriaType | RequeteurGroupType)[]
+      /** Configuration for N-among-M constraint */
       nAmongMOptions: {
+        /** Number N in "N among M" */
         n: number
+        /** Comparison operator for the constraint */
         operator?: Comparators
+        /** Minimum time delay between occurrences (not implemented) */
         timeDelayMin?: number
+        /** Maximum time delay between occurrences (not implemented) */
         timeDelayMax?: number
       }
-      temporalConstraints?: TemporalConstraintsType[] // NOT IMPLEMENTED
+      /** Temporal constraints (not implemented for N-among-M) */
+      temporalConstraints?: TemporalConstraintsType[]
     }
 
+/**
+ * Complete search request structure in Requeteur format.
+ * This is the top-level object that gets serialized and sent to the backend.
+ */
 type RequeteurSearchType = {
+  /** Version of the Requeteur format */
   version: string
+  /** Type identifier for the request */
   _type: string
+  /** Source population definition */
   sourcePopulation: {
+    /** List of care site cohort IDs to include */
     caresiteCohortList?: string[]
+    /** List of provider cohort IDs to include (not currently used) */
     providerCohortList?: string[]
   }
+  /** Root criteria group defining the search logic */
   request: RequeteurGroupType | undefined
 }
 
+/**
+ * Checks if the selected criteria contain nominative (personally identifiable) information.
+ *
+ * This function identifies criteria that could potentially identify patients, including:
+ * - Patient criteria with birth or death dates
+ * - Encounter/Patient criteria with ages specified in days (more precise than years)
+ * - Sensitive criteria types (IPP lists, pregnancy, hospitalization)
+ *
+ * @param selectedCriteria - Array of criteria to check for nominative information
+ * @returns True if any nominative criteria are found, false otherwise
+ *
+ * @example
+ * ```typescript
+ * const criteria = [{
+ *   type: CriteriaType.PATIENT,
+ *   birthdates: { start: '1990-01-01', end: null }
+ * }];
+ * const isNominative = checkNominativeCriteria(criteria); // returns true
+ * ```
+ */
 export const checkNominativeCriteria = (selectedCriteria: SelectedCriteriaType[]) => {
   const regex = /^[^0/][^/]*\/.*/
-  // matches if the value before the first / isn't 0
 
   const isPatientWithDates = selectedCriteria.some(
     (criterion) =>
@@ -96,6 +163,31 @@ export const checkNominativeCriteria = (selectedCriteria: SelectedCriteriaType[]
   return isPatientWithDates || isEncounterWithAgesInDays || isSensitiveCriteria
 }
 
+/**
+ * Removes nominative information from criteria to comply with privacy requirements.
+ *
+ * This function performs the following cleaning operations:
+ * - Removes sensitive criteria types (IPP lists, pregnancy, hospitalization)
+ * - Clears birth and death dates from patient criteria
+ * - Anonymizes age values by removing day-level precision
+ * - Updates the Redux store with cleaned criteria and groups
+ * - Rebuilds the cohort creation state
+ *
+ * @param selectedCriteria - Array of criteria to clean
+ * @param criteriaGroups - Array of criteria groups to update
+ * @param dispatch - Redux dispatch function for state updates
+ * @param selectedPopulation - Optional population scope to maintain
+ *
+ * @example
+ * ```typescript
+ * cleanNominativeCriterias(
+ *   selectedCriteria,
+ *   criteriaGroups,
+ *   dispatch,
+ *   selectedPopulation
+ * );
+ * ```
+ */
 export const cleanNominativeCriterias = (
   selectedCriteria: SelectedCriteriaType[],
   criteriaGroups: CriteriaGroup[],
@@ -106,7 +198,7 @@ export const cleanNominativeCriterias = (
     if (value === null) {
       return null
     }
-    const regex = /^[^/]*\// // matches everything before the first '/'
+    const regex = /^[^/]*\//
 
     const cleanValue = (value: string | null | undefined) => {
       if (value !== null && value !== undefined) {
@@ -152,7 +244,6 @@ export const cleanNominativeCriterias = (
   const cleanedGroups = criteriaGroups
     .map((group) => {
       const cleanIds = group.criteriaIds.filter((id) => {
-        // id < 0 would be a group, and id > 0 a criteria
         if (id > 0) {
           return cleanedCriteriasIds.includes(id)
         } else {
@@ -177,6 +268,28 @@ export const cleanNominativeCriterias = (
   }
 }
 
+/**
+ * Constructs a FHIR filter string for a given criterion.
+ *
+ * This function takes a UI criterion and converts it into a FHIR-compliant
+ * filter string that can be used in API requests. It uses the criterion's
+ * form definition to determine the appropriate FHIR mapping.
+ *
+ * @param criteria - The criterion to convert to a FHIR filter
+ * @param deidentified - Whether the data should be deidentified
+ * @param allcriterias - Array of all available criteria definitions
+ * @returns FHIR filter string, or empty string if no definition found
+ *
+ * @example
+ * ```typescript
+ * const filter = constructFhirFilter(
+ *   { type: CriteriaType.CONDITION, code: 'I50' },
+ *   false,
+ *   criteriaDefinitions
+ * );
+ * // Returns: "code=I50&_profile=http://..."
+ * ```
+ */
 export const constructFhirFilter = (
   criteria: SelectedCriteriaType,
   deidentified: boolean,
@@ -192,6 +305,15 @@ export const constructFhirFilter = (
   return constructFhirFilterForType(criteria, deidentified, formDefinition)
 }
 
+/**
+ * Maps a criteria type to its corresponding FHIR resource type.
+ *
+ * @param criteriaType - The UI criteria type
+ * @returns The corresponding FHIR resource type
+ * @throws Error if the criteria type is unknown
+ *
+ * @internal
+ */
 const mapCriteriaToResource = (criteriaType: CriteriaType): ResourceType => {
   const mapping: { [key in CriteriaType]?: ResourceType } = {
     [CriteriaType.IPP_LIST]: ResourceType.IPP_LIST,
@@ -214,6 +336,14 @@ const mapCriteriaToResource = (criteriaType: CriteriaType): ResourceType => {
   throw new Error('Unknown criteria type')
 }
 
+/**
+ * Extracts questionnaire name from FHIR filter strings.
+ *
+ * @param filters - Array of FHIR filter strings
+ * @returns The questionnaire name if found, undefined otherwise
+ *
+ * @internal
+ */
 const findQuestionnaireName = (filters: string[]) => {
   const regex = /questionnaire.name=(.*)/
   for (const item of filters) {
@@ -224,6 +354,26 @@ const findQuestionnaireName = (filters: string[]) => {
   }
 }
 
+/**
+ * Converts a Requeteur criteria object back to UI criteria format.
+ *
+ * This function is the inverse of criteria building - it takes a serialized
+ * criterion from a saved request and reconstructs the UI-friendly format
+ * with all necessary metadata for display and editing.
+ *
+ * @param element - The Requeteur criteria to convert
+ * @param critieriaDefinitions - Array of available criteria definitions
+ * @returns Promise resolving to the UI criteria format
+ * @throws Error if criteria definition or subtype is not found
+ *
+ * @example
+ * ```typescript
+ * const uiCriteria = await unbuildCriteriaData(
+ *   requeteurCriteria,
+ *   criteriaDefinitions
+ * );
+ * ```
+ */
 export const unbuildCriteriaData = async (
   element: RequeteurCriteriaType,
   critieriaDefinitions: CriteriaItemType[]
@@ -253,6 +403,37 @@ export const unbuildCriteriaData = async (
   throw new Error('Criteria subtype definition not found')
 }
 
+/**
+ * Builds a complete cohort request in Requeteur format.
+ *
+ * This is the main function that converts the UI state (selected population,
+ * criteria, groups, and constraints) into a serialized JSON string that can
+ * be sent to the backend for execution.
+ *
+ * The function:
+ * - Determines if deidentification is required based on population access
+ * - Recursively processes criteria groups and their nested children
+ * - Constructs FHIR filters for each criterion
+ * - Applies temporal constraints
+ * - Serializes the complete request structure
+ *
+ * @param selectedPopulation - Array of selected population hierarchies
+ * @param selectedCriteria - Array of selected search criteria
+ * @param criteriaGroup - Array of criteria groups defining logical structure
+ * @param temporalConstraints - Array of temporal relationships between criteria
+ * @returns JSON string representation of the complete request
+ *
+ * @example
+ * ```typescript
+ * const requestJson = buildRequest(
+ *   selectedPopulation,
+ *   selectedCriteria,
+ *   criteriaGroups,
+ *   temporalConstraints
+ * );
+ * // Can be sent to backend API
+ * ```
+ */
 export function buildRequest(
   selectedPopulation: (Hierarchy<ScopeElement> | undefined)[] | null,
   selectedCriteria: SelectedCriteriaType[],
@@ -276,7 +457,6 @@ export function buildRequest(
       let child: RequeteurCriteriaType | RequeteurGroupType | null = null
       const isGroup = itemId < 0
       if (!isGroup) {
-        // return RequeteurCriteriaType
         const item: SelectedCriteriaType | undefined = selectedCriteria.find(({ id }) => id === itemId)
         if (!item) {
           console.error('Unknown criteria id', itemId)
@@ -308,7 +488,6 @@ export function buildRequest(
             : undefined
         }
       } else {
-        // return RequeteurGroupType
         const group: CriteriaGroup = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
 
         // DO SPECIAL THING FOR `NamongM`
@@ -366,20 +545,52 @@ export function buildRequest(
   return JSON.stringify(json)
 }
 
+/**
+ * Return type for the unbuildRequest function.
+ * Contains all components needed to reconstruct the UI state from a saved request.
+ */
 type UnbuildRequestReturnType = {
+  /** Reconstructed population hierarchy */
   population: Hierarchy<ScopeElement, string>[] | null
+  /** Array of reconstructed UI criteria */
   criteria: SelectedCriteriaType[]
+  /** Array of reconstructed criteria groups */
   criteriaGroup: CriteriaGroup[]
+  /** Optional temporal constraints */
   temporalConstraints?: TemporalConstraintsType[]
+  /** Mapping from new IDs to original IDs for reference */
   idRemap: Record<number, number>
 }
+
+/**
+ * Parses a serialized cohort request back into UI components.
+ *
+ * This function is the inverse of buildRequest - it takes a JSON string
+ * from a saved cohort request and reconstructs all the UI state needed
+ * to display and edit the request.
+ *
+ * The process involves:
+ * - Parsing the JSON request structure
+ * - Fetching population data from cohort IDs
+ * - Recursively extracting criteria and groups
+ * - Converting Requeteur criteria back to UI format
+ * - Reassigning IDs to avoid conflicts
+ * - Updating temporal constraint references
+ *
+ * @param _json - Serialized JSON string of the cohort request
+ * @returns Promise resolving to all reconstructed request parameters
+ *
+ * @example
+ * ```typescript
+ * const { population, criteria, criteriaGroup, idRemap } =
+ *   await unbuildRequest(savedRequestJson);
+ * // Use these to restore UI state
+ * ```
+ */
 
 // eslint-disable-next-line max-statements
 export async function unbuildRequest(_json: string): Promise<UnbuildRequestReturnType> {
   const criteriaDefinitions = getAllCriteriaItems(criteriaList())
-  // TODO: handle potential errors (here or in the caller)
-  // so if a single criteria fails, the whole request is not lost
-  //  let population: (ScopeTreeRow | undefined)[] | null = null
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
   let temporalConstraints: TemporalConstraintsType[] = []
@@ -401,13 +612,9 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
   const population = await services.perimeters.fetchPopulationForRequeteur(caresiteCohortList)
 
   // retrieve temporal constraints
-  if (request && request.temporalConstraints) {
+  if (request?.temporalConstraints) {
     temporalConstraints = request.temporalConstraints
   }
-  /**
-   * Retrieve criteria + groups
-   *
-   */
   const exploreRequest = (currentItem: RequeteurGroupType): void => {
     const { criteria } = currentItem
 
@@ -417,7 +624,7 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
       } else {
         const groupCriteria = criterion as RequeteurGroupType
         criteriaGroup = [...criteriaGroup, { ...groupCriteria }]
-        if (groupCriteria && groupCriteria.criteria && groupCriteria.criteria.length > 0) {
+        if (groupCriteria?.criteria && groupCriteria.criteria.length > 0) {
           exploreRequest(groupCriteria)
         }
       }
@@ -478,13 +685,12 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
 
   let _criteriaGroup = convertJsonObjectsToCriteriaGroup(criteriaGroup)
   const criteriaGroupSaved = [..._criteriaGroup]
-  const idMap: { [key: number]: number } = {} // Object to hold previous and new IDs mapping
+  const idMap: { [key: number]: number } = {}
 
   // Reset Group criteriaIds
   _criteriaGroup = _criteriaGroup.map((item) => ({ ...item, criteriaIds: [] }))
 
   criteriaItems = criteriaItems.map((_criteria, index) => {
-    // Get the parent of current critria
     const parentGroup = criteriaGroupSaved.find((itemGroup) =>
       itemGroup.criteriaIds.find((criteriaId) => criteriaId === _criteria._id)
     )
@@ -502,12 +708,10 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
     return { ..._criteria, _id: index + 1 }
   })
 
-  // // Re-assign id and criteria to groups
   for (let index = 0; index < _criteriaGroup.length; index++) {
     const _criteriaGroupItem = _criteriaGroup[index]
     const newId = index * -1
 
-    // Search parent
     const parentGroup = criteriaGroupSaved.find((itemGroup) =>
       itemGroup.criteriaIds.find((criteriaId) => criteriaId === _criteriaGroupItem.id)
     )
@@ -522,18 +726,14 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
             ? _criteriaGroup[indexOfParent].criteriaIds
             : criteriaGroupSaved[indexOfParent].criteriaIds
 
-        // Delete old assignment
-        // If ID changes, delete it
         if (newId !== _criteriaGroupItem.id)
           newCriteriaIds = newCriteriaIds.filter((elem) => elem !== _criteriaGroupItem.id)
 
-        // Assign new id and filter doublon (parent group)
         newCriteriaIds = [...newCriteriaIds, newId].filter((item, index, array) => array.indexOf(item) === index)
         _criteriaGroup[indexOfParent].criteriaIds = newCriteriaIds
       }
     }
 
-    // Assign new id (current group)
     idMap[_criteriaGroupItem.id] = newId
     _criteriaGroup[index].id = newId
   }
@@ -554,6 +754,15 @@ export async function unbuildRequest(_json: string): Promise<UnbuildRequestRetur
   }
 }
 
+/**
+ * Fetches hierarchical code data for a given code and value set systems.
+ *
+ * @param code - The code to fetch (or HIERARCHY_ROOT for root level)
+ * @param systems - Array of value set system URLs to search
+ * @returns Promise resolving to hierarchical code data, or undefined if not found
+ *
+ * @internal
+ */
 const getCodesForValueSet = async (code: string, systems: string[]): Promise<Hierarchy<FhirItem>[] | undefined> => {
   if (code === HIERARCHY_ROOT && systems.length) return [createHierarchyRoot(systems[0])]
   for (const system of systems) {
@@ -566,11 +775,32 @@ const getCodesForValueSet = async (code: string, systems: string[]): Promise<Hie
 }
 
 /**
- * Fetches all codes for the criteria within the query
- * @param criteriaList list of criteria definitions
- * @param selectedCriteria list of criteria data
- * @param oldCriteriaCache old cache of criteria codes
- * @returns a newly updated cache of criteria codes
+ * Fetches and caches all medical codes referenced in the selected criteria.
+ *
+ * This function scans through all selected criteria to find code-based searches
+ * (such as ICD-10 diagnoses, procedures, etc.) and ensures that the hierarchical
+ * code data is available in the cache for display and validation purposes.
+ *
+ * The function:
+ * - Iterates through all criteria definitions and selected criteria
+ * - Identifies code search fields in the criteria forms
+ * - Fetches missing codes from their respective value sets
+ * - Updates and returns an enhanced code cache
+ *
+ * @param criteriaList - Array of available criteria definitions
+ * @param selectedCriteria - Array of currently selected criteria
+ * @param oldCriteriaCache - Existing code cache to update
+ * @returns Promise resolving to updated code cache with all referenced codes
+ *
+ * @example
+ * ```typescript
+ * const updatedCache = await fetchCriteriasCodes(
+ *   criteriaDefinitions,
+ *   selectedCriteria,
+ *   currentCache
+ * );
+ * // Cache now contains all codes referenced in the criteria
+ * ```
  */
 export const fetchCriteriasCodes = async (
   criteriaList: readonly CriteriaItemType[],
@@ -603,7 +833,6 @@ export const fetchCriteriasCodes = async (
                       console.warn(`Code ${code.id} not found in system ${codeSystem}`)
                     }
                   } catch (e) {
-                    // fail silently
                     console.error(`Error fetching code ${code.id} from system ${codeSystem}`, e)
                   }
                 }
@@ -618,13 +847,50 @@ export const fetchCriteriasCodes = async (
   return updatedCriteriaData
 }
 
+/**
+ * Return type for the joinRequest function.
+ * Contains the merged request and all reconstructed UI components.
+ */
 type JoinRequestReturnType = {
+  /** Serialized JSON of the joined request */
   json: string
+  /** Array of all criteria from both requests */
   criteria: SelectedCriteriaType[]
+  /** Array of all criteria groups from both requests */
   criteriaGroup: CriteriaGroup[]
+  /** ID mapping for tracking merged elements */
   idRemap: Record<number, number>
 }
 
+/**
+ * Merges two cohort requests into a single combined request.
+ *
+ * This function takes two separate cohort requests and combines them by
+ * adding the new request as a child group under the specified parent in
+ * the old request. It handles ID conflicts by shifting IDs in the new
+ * request and maintains referential integrity.
+ *
+ * The merge process:
+ * - Parses both JSON requests
+ * - Shifts IDs in the new request to avoid conflicts
+ * - Inserts the new request as a child of the specified parent
+ * - Rebuilds the combined request with proper ID mapping
+ *
+ * @param oldJson - JSON string of the existing request
+ * @param newJson - JSON string of the request to merge in
+ * @param parentId - ID of the group where the new request should be added
+ * @returns Promise resolving to the joined request and UI components
+ *
+ * @example
+ * ```typescript
+ * const joined = await joinRequest(
+ *   existingRequestJson,
+ *   newRequestJson,
+ *   parentGroupId
+ * );
+ * // joined.json contains the merged request
+ * ```
+ */
 export const joinRequest = async (
   oldJson: string,
   newJson: string,
@@ -674,10 +940,13 @@ export const joinRequest = async (
 
     if (!criterionGroup.criteria) return criterionGroup
     const { criteria = [] } = criterionGroup
-    for (let criterion of criteria) {
+    for (let i = 0; i < criteria.length; i++) {
+      const criterion = criteria[i]
       if (criterion?._type === CriteriaGroupType.OR_GROUP || criterion?._type === CriteriaGroupType.AND_GROUP) {
-        // @ts-ignore
-        criterion = fillRequestWithNewRequest(criterion)
+        const updatedCriterion = fillRequestWithNewRequest(criterion as RequeteurGroupType)
+        if (updatedCriterion) {
+          criteria[i] = updatedCriterion
+        }
       }
     }
     return criterionGroup

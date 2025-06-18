@@ -1,5 +1,15 @@
+/**
+ * @fileoverview Styles for the ExportRequest page components.
+ * Defines Material-UI styles using tss-react for export form and related UI elements.
+ */
+
 import { makeStyles } from 'tss-react/mui'
 
+/**
+ * Custom hook that returns styled classes for the ExportRequest page components.
+ *
+ * @returns {Object} Object containing CSS classes for export request styling
+ */
 const useStyles = makeStyles()(() => ({
   selectedCohortGrid: {
     marginBottom: '3em'

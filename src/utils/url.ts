@@ -1,7 +1,23 @@
+/**
+ * @fileoverview Utility functions for URL parameter handling and page validation
+ * @module utils/url
+ */
+
 import { AppDispatch } from 'state'
 import { getConfig } from 'config'
 import { showDialog } from 'state/warningDialog'
 
+/**
+ * Converts an array of parameter strings to a URL query string
+ *
+ * @param params - Array of parameter strings (e.g., ['key1=value1', 'key2=value2'])
+ * @returns A formatted URL query string
+ *
+ * @example
+ * ```typescript
+ * mapParamsToNetworkParams(['page=1', 'size=10']) // returns '?page=1&size=10'
+ * ```
+ */
 export const mapParamsToNetworkParams = (params: string[]) => {
   let url = ''
   params.forEach((item, index) => {
@@ -10,6 +26,19 @@ export const mapParamsToNetworkParams = (params: string[]) => {
   return url
 }
 
+/**
+ * Validates a page number and shows appropriate warnings/redirects if invalid
+ *
+ * @param requestedPage - The requested page number
+ * @param totalPages - The total number of available pages
+ * @param onRedirect - Callback function to handle page redirection
+ * @param dispatch - Redux dispatch function for showing dialogs
+ *
+ * @example
+ * ```typescript
+ * validatePageNumber(5, 10, (page) => navigate(`/page/${page}`), dispatch)
+ * ```
+ */
 export const validatePageNumber = (
   requestedPage: number,
   totalPages: number,
