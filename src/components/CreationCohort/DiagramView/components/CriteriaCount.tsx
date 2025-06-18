@@ -117,6 +117,7 @@ const CriteriaCount = ({ criteriaCount, extraLeftMargin = 0 }: CriteriaCountProp
     try {
       return (
         <div
+          className="criteria-count"
           style={{
             position: 'absolute',
             left: -41 + extraLeftMargin,
