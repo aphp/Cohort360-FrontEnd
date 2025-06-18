@@ -1,5 +1,15 @@
+/**
+ * @fileoverview Styles for the Export page component.
+ * Defines Material-UI styles using tss-react for export-related UI elements.
+ */
+
 import { makeStyles } from 'tss-react/mui'
 
+/**
+ * Custom hook that returns styled classes for the Export page.
+ *
+ * @returns {Object} Object containing CSS classes for export page styling
+ */
 const useStyles = makeStyles()(() => ({
   newExportButton: {
     backgroundColor: '#5BC5F2',

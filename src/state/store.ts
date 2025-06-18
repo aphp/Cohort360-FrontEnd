@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Redux store configuration with persistence and middleware setup.
+ * Configures the main application store with persistence, logging, and state synchronization.
+ */
+
 import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync'
 import { combineReducers } from 'redux'
 import { persistReducer, persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist'
@@ -22,11 +27,19 @@ import warningDialog from './warningDialog'
 import valueSets from './valueSets'
 import preferences from './preferences'
 
+/**
+ * Combined reducer for cohort creation functionality.
+ * Merges criteria and request reducers under cohortCreation namespace.
+ */
 const cohortCreationReducer = combineReducers({
   criteria,
   request: cohortCreation
 })
 
+/**
+ * Root reducer combining all application state slices.
+ * Defines the complete application state structure.
+ */
 const rootReducer = combineReducers({
   me,
   preferences,
@@ -43,13 +56,31 @@ const rootReducer = combineReducers({
   warningDialog
 })
 
+/**
+ * Redux persist configuration.
+ * Uses localforage for persistent storage with 'root' key.
+ */
 const persistConfig = {
   key: 'root',
   storage: localforage
 }
 
+/**
+ * Persisted version of the root reducer.
+ * Enables automatic state persistence and rehydration.
+ */
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 
+/**
+ * Main Redux store configuration.
+ *
+ * Features:
+ * - State persistence with redux-persist
+ * - Cross-tab state synchronization
+ * - Redux thunk for async actions
+ * - Development logging with redux-logger
+ * - Custom serialization handling for dialogs
+ */
 export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
@@ -78,5 +109,14 @@ export const store = configureStore({
       .concat(logger)
 })
 
+/**
+ * Initialize state synchronization with previous tab.
+ * Ensures consistent state across multiple browser tabs.
+ */
 initStateWithPrevTab(store)
+
+/**
+ * Redux persist store for managing persistence lifecycle.
+ * Used to control when persistence starts/stops.
+ */
 export const persistor = persistStore(store)
