@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Export table component for configuring individual table export settings.
+ * This component handles table selection, column filtering, FHIR filtering,
+ * and special configurations like pivot mode for questionnaire responses.
+ */
+
 /* eslint-disable max-statements */
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 
@@ -32,6 +38,9 @@ import { TableInfo, TableSetting } from 'types/export'
 import { Error } from '../ExportForm'
 import QuestionForm, { QuestionLeaf } from 'pages/ExportRequest/components/QuestionChoice'
 
+/**
+ * Props interface for the ExportTable component.
+ */
 type ExportTableProps = {
   exportTable: TableInfo
   exportTableSettings: TableSetting | undefined
@@ -45,6 +54,11 @@ type ExportTableProps = {
   oneFile: boolean
 }
 
+/**
+ * Alert component that warns users about Excel format limitations.
+ *
+ * @returns {JSX.Element} Warning alert for Excel format limitations
+ */
 const AlertLimitXlsx: React.FC = () => {
   const message =
     "Attention, le format excel étant limité à 32.000 caractères par cellule, le contenu de certains comptes rendus peut être limité aux 32.000 premiers caractères. Si vous souhaitez tout de même obtenir l'intégralité du texte, vous pouvez choisir le format csv qui n'est pas limité en taille."
@@ -56,6 +70,20 @@ const AlertLimitXlsx: React.FC = () => {
   )
 }
 
+/**
+ * Export table component that provides configuration options for individual tables.
+ *
+ * Features:
+ * - Table selection with checkbox
+ * - Column selection with multi-select
+ * - FHIR resource filtering
+ * - Row count display with validation
+ * - Special pivot mode for questionnaire responses
+ * - Excel format warnings for document tables
+ *
+ * @param {ExportTableProps} props - Component props
+ * @returns {JSX.Element} The ExportTable component
+ */
 const ExportTable: React.FC<ExportTableProps> = ({
   exportTable,
   exportTableSettings,
