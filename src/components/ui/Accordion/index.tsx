@@ -5,7 +5,10 @@ const AccordionWrapper = styled(Accordion)(() => ({
   width: '100%',
   boxShadow: 'none',
   borderRadius: 12,
-  border: '1px solid #D1E2F4'
+  border: '1px solid #D1E2F4',
+  '&:before': {
+    backgroundColor: 'unset'
+  }
 }))
 
 export default AccordionWrapper

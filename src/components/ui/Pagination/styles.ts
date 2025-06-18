@@ -38,9 +38,7 @@ export const StickyContainer = styled(Grid)(() => ({
   bottom: 0,
   right: 0,
   backgroundColor: '#fff',
-  maxWidth: '100%',
   width: '100%',
   zIndex: 10,
-  padding: '0px 0px 10px 0px',
-  boxShadow: '0px -2px 5px rgba(0, 0, 0, 0.1)'
+  padding: 0
 }))

@@ -152,6 +152,7 @@ const fetchExploredCohortInBackground = createAsyncThunk<
         cohort.requestId = ''
         cohort.favorite = false
         cohort.uuid = ''
+        cohort.cohortId = ''
         cohort.canMakeExport = false
         cohort.deidentifiedBoolean = rights.results.some((right) =>
           right.rights ? servicesPerimeters.getAccessFromRights(right.rights) === 'Pseudonymisé' : true
@@ -168,6 +169,7 @@ const fetchExploredCohortInBackground = createAsyncThunk<
           cohort.requestId = ''
           cohort.favorite = false
           cohort.uuid = ''
+          cohort.cohortId = ''
           cohort.canMakeExport = false
           cohort.deidentifiedBoolean =
             cohort.cohort && cohort.cohort && Array.isArray(cohort.cohort)

@@ -49,6 +49,7 @@ const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
         savedFiltersActions={savedFiltersActions}
         savedFiltersData={savedFiltersData}
         displayOptions={config.displayOptions}
+        count={count}
       />
       {config.displayOptions.criterias && (
         <CriteriasSection

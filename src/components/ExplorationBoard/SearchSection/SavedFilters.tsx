@@ -13,7 +13,6 @@ type SavedFiltersProps = {
   selectedFilter: SelectedFilter<Filters> | null
   infos: AdditionalInfo
   allFilters: SavedFiltersResults | null
-  disabled?: boolean
   onNext: () => void
   onSubmit: (criteria: SearchCriterias<Filters>) => void
   onDelete: (ids: string[]) => void
@@ -51,13 +50,12 @@ const SavedFilters = ({
   return (
     <>
       <Button
-        sx={{ borderRadius: 16 }}
         size="small"
         variant="contained"
         fullWidth
         startIcon={<SavedSearch height="15px" />}
         onClick={() => setToggleModal(true)}
-        style={{ backgroundColor: '#0063AF', color: '#FFF', height: '30px', boxShadow: 'none' }}
+        sx={{ backgroundColor: '#0063AF', color: '#FFF', height: '30px', boxShadow: 'none', borderRadius: 12 }}
       >
         Mes filtres
       </Button>
@@ -134,7 +132,7 @@ const SavedFilters = ({
         <EditSavedFilter
           infos={infos}
           open={toggleDisplayModal}
-          criteria={selectedFilter!}
+          criteria={selectedFilter}
           onEdit={(name, filters) => {
             onEdit(name, filters)
             setToggleDisplayModal(false)

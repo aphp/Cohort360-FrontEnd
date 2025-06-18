@@ -1,23 +1,24 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAppSelector } from 'state'
 
 import { CohortPatient, IPatientDetails } from 'types'
 
 import { AccessLevel } from 'components/ui/AccessBadge'
+import Button from 'components/ui/Button'
 import HeaderLayout from 'components/ui/Header'
 import PatientInfo from './PatientInfo/PatientInfo'
 
 import WestIcon from '@mui/icons-material/West'
 
-import { getAge } from 'utils/age'
 import { capitalizeFirstLetter } from 'utils/capitalize'
+import { formatDate } from 'utils/formatDate'
+import { getAge } from 'utils/age'
 
 import { GenderStatus } from 'types/searchCriterias'
-import { useAppSelector } from 'state'
-import Button from 'components/ui/Button'
 import { URLS } from 'types/exploration'
-import { ResourceType } from 'types/requestCriterias'
-import { useNavigate } from 'react-router-dom'
 import { ScopeElement } from 'types/scope'
+import { ResourceType } from 'types/requestCriterias'
 
 type PatientHeaderProps = {
   loading: boolean
@@ -35,7 +36,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
   const navigate = useNavigate()
   const { cohort, cohortId } = useAppSelector((state) => state.exploredCohort)
 
-  const goBackToCohort = () => {
+  const goBackToExploredCohort = () => {
     const returnTo = {
       pathname: '',
       label: ''
@@ -46,7 +47,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
     } else if (cohort && (cohort as ScopeElement[]).length > 0 && !cohortId) {
       returnTo.pathname = `/${URLS.PERIMETERS}/${ResourceType.PATIENT}?groupId=${groupId}`
       returnTo.label = "Retour vers l'exploration de périmètres"
-    } else if (cohort && (cohort as ScopeElement[]).length > 0 && cohortId) {
+    } else if (cohortId) {
       returnTo.pathname = `/${URLS.COHORT}/${ResourceType.PATIENT}?groupId=${groupId}`
       returnTo.label = 'Retour vers la cohorte'
     }
@@ -54,9 +55,10 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
     return returnTo
   }
 
-  const goBackButtonInfo = goBackToCohort()
+  const goBackButtonInfo = goBackToExploredCohort()
 
   const age = getAge(patient as CohortPatient)
+  const birthdate = formatDate(patient.birthDate)
   const firstName = patient.name?.[0].given?.[0]
   const lastName =
     patient.name
@@ -71,8 +73,8 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
       .join(' ') ?? 'Non renseigné'
 
   const ipp = deidentifiedBoolean
-    ? `IPP chiffré: ${patient.id ?? '-'}`
-    : `IPP: ${
+    ? `${patient.id ?? '-'}`
+    : `${
         patient.identifier?.find((item) => item.type?.coding?.[0].code === 'IPP')?.value ??
         patient.identifier?.[0].value
       }`
@@ -82,7 +84,14 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
       title={deidentifiedBoolean ? 'Information Patient' : `${capitalizeFirstLetter(firstName)} ${lastName}`}
       accessLevel={deidentifiedBoolean ? AccessLevel.DEIDENTIFIED : AccessLevel.NOMINATIVE}
       loading={loading}
-      patientCard={<PatientInfo age={age} ipp={ipp} gender={patient.gender as GenderStatus} />}
+      patientCard={
+        <PatientInfo
+          age={deidentifiedBoolean ? age : `${birthdate} (${age})`}
+          ipp={ipp}
+          gender={patient.gender as GenderStatus}
+          deidentified={deidentifiedBoolean}
+        />
+      }
       goBackButton={
         <Button
           startIcon={<WestIcon />}

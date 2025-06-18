@@ -162,12 +162,11 @@ export const formsConfig = (
   deidentified: boolean,
   patient: PatientState,
   groupId: string[],
-  displayOptions = DISPLAY_OPTIONS,
   search = ''
 ): ExplorationConfig<MaternityFormFilters> => ({
   type: ResourceType.QUESTIONNAIRE_RESPONSE,
   deidentified,
-  displayOptions,
+  displayOptions: { ...DISPLAY_OPTIONS, search: false },
   initSearchCriterias: () => initSearchCriterias(search),
   fetchList: (fetchParams, options, signal) => fetchList(fetchParams, options, patient, deidentified, groupId, signal),
   mapToTable: (data) => mapToTable(data, groupId),

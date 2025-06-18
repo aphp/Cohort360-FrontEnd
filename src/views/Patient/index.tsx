@@ -18,7 +18,6 @@ import sideBarTransition from 'styles/sideBarTransition'
 import { TabsWrapper } from 'components/ui/Tabs'
 import { SidebarButton, SidebarWrapper } from 'components/ui/Sidebar/style'
 import { buildExplorationConfig, ExplorationResourceType } from 'components/ExplorationBoard/config/config'
-import SubtabsDisplay from './SubtabsDisplay'
 import { useValidatedSubtab } from 'components/ExplorationBoard/useValidatedSubTab'
 import { useCleanSearchParams } from 'components/ExplorationBoard/useCleanSearchParams'
 
@@ -99,8 +98,7 @@ const Patient = () => {
           label: 'Formulaires',
           value: ResourceType.QUESTIONNAIRE_RESPONSE,
           show: config.features.questionnaires.enabled && !deidentified,
-          subs: [{ label: 'Maternité', value: ResourceType.QUESTIONNAIRE_RESPONSE, useSelect: true }],
-          useSelect: true
+          subs: [{ label: 'Maternité', value: ResourceType.QUESTIONNAIRE_RESPONSE }]
         }
       ].filter((tab) => tab.show),
     [config, deidentified]
@@ -157,7 +155,13 @@ const Patient = () => {
       />
       <Grid container direction="column" alignItems="center" sx={{ backgroundColor: '#E6F1FD' }}>
         <Grid container xs={11}>
-          <TabsWrapper value={selectedTab} onChange={(_, tab) => handleChangeTab(tab)}>
+          <TabsWrapper
+            value={selectedTab}
+            onChange={(_, tab) => handleChangeTab(tab)}
+            id="mainTabs"
+            scrollButtons={'auto'}
+            variant="scrollable"
+          >
             {availableTabs.map((tab) => {
               const groupIdParam = groupId ? `groupId=${groupId}` : ''
               const defaultSubTab = tab.subs?.[0]?.value
@@ -178,14 +182,26 @@ const Patient = () => {
       <Grid container justifyContent="center">
         <Grid container xs={11}>
           {subTabs && (
-            <SubtabsDisplay
-              subTabs={subTabs}
-              selectedSubTab={selectedSubTab as ResourceType}
-              onChange={setSelectedSubTab}
-              asSelect={availableTabs.find((tab) => tab.value === selectedTab)?.useSelect}
-              baseUrl={`/patients/${patientId}/${selectedTab}`}
-              groupId={groupId}
-            />
+            <Grid container sx={{ borderBottom: '1px solid #848484' }}>
+              <TabsWrapper
+                customVariant="secondary"
+                value={selectedSubTab}
+                onChange={(_, newSubTab) => setSelectedSubTab(newSubTab)}
+              >
+                {subTabs.map((subTab) => {
+                  return (
+                    <Tab
+                      sx={{ fontSize: 12 }}
+                      key={subTab.value}
+                      label={subTab.label}
+                      value={subTab.value}
+                      component={Link}
+                      to={`/patients/${patientId}/${selectedTab}?${groupId}&subtab=${subTab.value}`}
+                    />
+                  )
+                })}
+              </TabsWrapper>
+            </Grid>
           )}
           {selectedTab === ResourceType.PREVIEW && (
             <PatientPreview patient={patient?.patientInfo} deidentifiedBoolean={deidentified} />

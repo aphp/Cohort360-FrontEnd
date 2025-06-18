@@ -13,6 +13,9 @@ export const TabsWrapper = styled(Tabs)<TabsCustomProps>(({ customVariant = 'mai
       height: 0,
       opacity: 0
     },
+    '& .MuiTabScrollButton-root.Mui-disabled': {
+      width: 0
+    },
     '& .MuiTab-root': {
       padding: '8px 20px',
       fontWeight: 700,
@@ -28,6 +31,9 @@ export const TabsWrapper = styled(Tabs)<TabsCustomProps>(({ customVariant = 'mai
         borderColor: '#153D8A',
         borderStyle: 'solid',
         color: '#153D8A'
+      },
+      '& .Mui-selected': {
+        color: '#FFF'
       }
     },
     [`&.MuiTabRoot &.Mui-selected &:hover`]: {

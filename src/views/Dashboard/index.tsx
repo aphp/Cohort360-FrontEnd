@@ -155,7 +155,13 @@ const Dashboard = ({ context }: DashboardProps) => {
         <Grid container xs={12} justifyContent="center">
           <Grid container justifyContent={'center'} sx={{ backgroundColor: '#e6f1fd' }}>
             <Grid item xs={11}>
-              <TabsWrapper id="mainTabs" value={selectedTab} onChange={(_, tab) => handleChangeTab(tab)}>
+              <TabsWrapper
+                id="mainTabs"
+                scrollButtons={'auto'}
+                variant="scrollable"
+                value={selectedTab}
+                onChange={(_, tab) => handleChangeTab(tab)}
+              >
                 {availableTabs.map((tab) => {
                   const groupIdParam = groupId ? `groupId=${groupId}` : ''
                   const defaultSubTab = tab.subs?.[0]?.value

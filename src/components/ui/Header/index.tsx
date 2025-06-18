@@ -50,7 +50,7 @@ const HeaderLayout: React.FC<HeaderLayoutProps> = ({
       direction="column"
       alignItems="center"
       justifyContent="center"
-      sx={{ backgroundColor: '#E6F1FD', padding: '20px 0' }}
+      sx={{ backgroundColor: '#E6F1FD', padding: '20px 0 12px' }}
     >
       <Grid container xs={11} direction="column" justifyContent="center" gap={1}>
         {loading ? (
@@ -92,12 +92,14 @@ const HeaderLayout: React.FC<HeaderLayoutProps> = ({
           </>
         )}
 
-        <Grid container alignItems="center" gap={3}>
-          {patientsCount !== undefined && (
-            <CohortInfo label="Nb de patients" total={format(patientsCount)} loading={loading} />
-          )}
-          {cohortId && <CohortInfo label="ID cohorte" total={cohortId} loading={loading} />}
-        </Grid>
+        {(patientsCount !== undefined || cohortId) && (
+          <Grid container alignItems="center" gap={3}>
+            {patientsCount !== undefined && (
+              <CohortInfo label="Nb de patients" total={format(patientsCount)} loading={loading} />
+            )}
+            {cohortId && <CohortInfo label="ID cohorte" total={cohortId} loading={loading} />}
+          </Grid>
+        )}
         {searchArea}
         {patientCard}
       </Grid>

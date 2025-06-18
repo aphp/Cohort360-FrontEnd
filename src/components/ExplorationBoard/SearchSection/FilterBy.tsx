@@ -22,7 +22,7 @@ const FilterBy = <T,>({ filters, infos, onSubmit }: FilterByProps) => {
     <>
       <Button
         size="small"
-        sx={{ borderRadius: 16 }}
+        sx={{ borderRadius: 8 }}
         fullWidth
         startIcon={<FilterList height="15px" />}
         variant="contained"

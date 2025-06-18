@@ -39,8 +39,9 @@ export const ButtonWrapper = styled(Button)<CustomProps>(({ width, customVariant
     fontFamily: "'Open Sans', sans-serif",
     backgroundColor: '#FFF',
     fontSize: 11,
+    height: 24,
     '&:hover': {
-      backgroundColor: '2b2b2b'
+      backgroundColor: '#f6f6f6'
     }
   })
 }))
