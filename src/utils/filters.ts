@@ -1,5 +1,4 @@
 import {
-  CohortsFilters,
   DurationRangeType,
   FilterKeys,
   FilterValue,
@@ -16,7 +15,7 @@ import {
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
 import { SimpleCodeType } from 'types'
-import { getAgeLabel } from './age'
+import { getDurationRangeLabel as getDurationRangeLabelAge } from './age'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
 import { Hierarchy } from 'types/hierarchy'
 import labels from 'labels.json'
@@ -91,7 +90,7 @@ export const getFilterLabel = (key: FilterKeys, value: FilterValue): string => {
     return CohortsTypeLabel[value as CohortsType]
   }
   if (key === FilterKeys.BIRTHDATES) {
-    return getAgeLabel(value as DurationRangeType, 'Âge')
+    return getDurationRangeLabelAge(value as DurationRangeType, 'Âge')
   }
   if (key === FilterKeys.GENDERS) {
     return GenderStatusLabel[value as GenderStatus]
