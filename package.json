@@ -69,7 +69,8 @@
     "coverage": "vitest run --coverage",
     "ui": "vitest --ui",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "docs" :"npx typedoc --entryPoints src/index.tsx --entryPointStrategy expand ./src"
   },
   "browserslist": {
     "production": [
