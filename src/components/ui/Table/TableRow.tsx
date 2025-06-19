@@ -21,8 +21,7 @@ import DataTable from '.'
 import Paragraphs, { Paragraph } from '../Paragraphs'
 import Modal from '../Modal'
 import { TableCellWrapper } from './styles'
-import Parse from 'html-react-parser'
-import DOMPurify from 'dompurify'
+import DocumentContentDisplay from './DocumentContentDisplay'
 
 type RowProps = {
   row: Row
@@ -32,6 +31,10 @@ type RowProps = {
 const TableRow = ({ row, sx }: RowProps) => {
   const [subitemIndex, setSubitemIndex] = useState<number | null>(null)
   const docContentIndex = row.findIndex((cell) => cell.type === CellType.DOCUMENT_CONTENT)
+  const showSubContent =
+    (subitemIndex !== null && row[subitemIndex].type === CellType.SUBARRAY) ||
+    (subitemIndex !== null && row[subitemIndex].type === CellType.LINES) ||
+    docContentIndex > -1
 
   return (
     <>
@@ -45,7 +48,7 @@ const TableRow = ({ row, sx }: RowProps) => {
               last={index === row.length - 1}
               scope="row"
               align={cell.align ?? 'left'}
-              sx={{ ...cell.sx }}
+              sx={{ ...cell.sx, borderBottom: showSubContent ? 'none' : undefined }}
             >
               {cell.type == CellType.GENDER_ICON && (
                 <Grid container>
@@ -131,24 +134,23 @@ const TableRow = ({ row, sx }: RowProps) => {
         })}
       </TableRowMui>
       {subitemIndex !== null && row[subitemIndex].type === CellType.SUBARRAY && (
-        <TableRowMui>
+        <TableRowMui sx={{ backgroundColor: '#f5f9fe' }}>
           <TableCell
             colSpan={row.length}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            sx={{ padding: '0px 30px', backgroundColor: (sx as any)?.backgroundColor ?? '#fff' }}
+            sx={{ padding: '8px 16px 16px ', backgroundColor: (sx as any)?.backgroundColor ?? '#fff' }}
           >
-            <Collapse in={subitemIndex !== null} unmountOnExit>
+            <Collapse in={subitemIndex !== null} unmountOnExit sx={{ border: '1px solid #ebebeb' }}>
               <DataTable
                 value={row[subitemIndex].value as TableType}
                 sxColumn={{
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  backgroundColor: (sx as any)?.backgroundColor ?? '#fff',
+                  backgroundColor: (sx as any)?.backgroundColor ?? '#fafafa',
                   color: '153d8a',
-                  borderBottom: '1px solid 1px solid rgb(224, 224, 224)',
-                  fontSize: 13
+                  fontSize: 10
                 }}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                sxRow={{ backgroundColor: (sx as any)?.backgroundColor ?? '#fff' }}
+                sxRow={{ backgroundColor: (sx as any)?.backgroundColor ?? '#fff', fontSize: 12 }}
               />
             </Collapse>
           </TableCell>
@@ -159,7 +161,9 @@ const TableRow = ({ row, sx }: RowProps) => {
           <TableCell colSpan={row.length} sx={{ padding: 0 }}>
             <Collapse in={subitemIndex !== null} timeout="auto" unmountOnExit>
               {!row[subitemIndex].value || (row[subitemIndex].value as Line[])?.length === 0 ? (
-                'Aucune donnée à afficher'
+                <Typography align="center" p={2}>
+                  Aucune donnée à afficher
+                </Typography>
               ) : (
                 <Lines value={row[subitemIndex].value as Line[]} />
               )}
@@ -168,11 +172,11 @@ const TableRow = ({ row, sx }: RowProps) => {
         </TableRowMui>
       )}
       {docContentIndex > -1 && (
-        <TableRowMui id={`docContent-${row[docContentIndex].id}`}>
-          <TableCell colSpan={row.length} sx={{ padding: '20px' }}>
-            <Typography>{Parse(DOMPurify.sanitize(row[docContentIndex].value as string))}</Typography>
-          </TableCell>
-        </TableRowMui>
+        <DocumentContentDisplay
+          id={`docContent-${row[docContentIndex].id}`}
+          length={row.length}
+          docContent={row[docContentIndex].value as string}
+        />
       )}
     </>
   )

@@ -36,20 +36,11 @@ const Table = ({ value, orderBy, onSort, sxColumn, sxRow }: TableProps) => {
             <TableRow
               key={index}
               row={row}
-              sx={
-                index % 2 === 0
-                  ? {
-                      // borderBottom: '1px solid grey',
-                      height: 42,
-                      ...sxRow
-                    }
-                  : {
-                      backgroundColor: '#f8f8f8',
-                      //  borderBottom: '1px solid grey',
-                      height: 42,
-                      ...sxRow
-                    }
-              }
+              sx={{
+                height: 42,
+                '&:hover': { backgroundColor: '#f8f9fa' },
+                ...sxRow
+              }}
             />
           ))}
         </TableBody>
