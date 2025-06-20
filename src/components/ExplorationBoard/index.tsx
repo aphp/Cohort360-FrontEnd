@@ -31,7 +31,6 @@ const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
     onSaveFilter,
     resetFetchStatus
   } = useExplorationBoard(config)
-
   const { count, pagination, data, dataLoading, onChangePage } = useData(config, searchCriterias, pageFromUrl)
 
   return (

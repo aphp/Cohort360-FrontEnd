@@ -292,11 +292,12 @@ export const patientsConfig = (
   deidentified: boolean,
   patient: PatientState,
   groupId: string[],
+  displayOptions = DISPLAY_OPTIONS,
   search = ''
 ): ExplorationConfig<PatientsFilters> => ({
   type: ResourceType.PATIENT,
   deidentified,
-  displayOptions: { ...DISPLAY_OPTIONS, diagrams: true },
+  displayOptions,
   initSearchCriterias: () => initSearchCriterias(search),
   fetchList: (fetchParams, options, signal) => fetchList(fetchParams, options, deidentified, groupId, signal),
   mapToTable: patient ? undefined : (data) => mapToTable(data, deidentified, groupId),
