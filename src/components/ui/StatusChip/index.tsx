@@ -6,23 +6,23 @@ export enum ChipStatus {
   CANCELLED = 'cancelled',
   ERROR = 'error',
   IN_PROGRESS = 'in-progress',
-  FINISHED = 'finished',
-  NEW = 'new',
-  STARTED = 'started',
-  PENDING = 'pending',
-  FAILED = 'failed'
+  FINISHED = 'finished'
 }
 
 export const ChipStatusColors: Record<ChipStatus, string> = {
   [ChipStatus.VALID]: '#5BC5F2',
   [ChipStatus.CANCELLED]: '#D0D7D8',
   [ChipStatus.FINISHED]: '#DCF4E9',
-  [ChipStatus.NEW]: '#FFD700',
-  [ChipStatus.STARTED]: '#FF9800',
-  [ChipStatus.PENDING]: '#FFEB3B',
   [ChipStatus.IN_PROGRESS]: '#FFF4D1',
-  [ChipStatus.FAILED]: '#F44336',
   [ChipStatus.ERROR]: '#F2B1B7'
+}
+
+export const ChipStatusContentColors: Record<ChipStatus, string> = {
+  [ChipStatus.VALID]: '#FFF',
+  [ChipStatus.CANCELLED]: '#FFF',
+  [ChipStatus.FINISHED]: '#4EAC6A',
+  [ChipStatus.IN_PROGRESS]: '#EEBD2B',
+  [ChipStatus.ERROR]: '#DC3545'
 }
 
 type StatusChipProps = {

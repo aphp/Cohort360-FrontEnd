@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { Grid } from '@mui/material'
-import DisplayLocked from 'components/ui/Display/DisplayLocked'
 import { Filters, SearchByTypes, SearchCriterias } from 'types/searchCriterias'
 import Select from 'components/ui/Searchbar/Select'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
@@ -46,32 +45,28 @@ const OccurrencesSearch = ({ search, infos, onChange }: OccurrencesSearchProps) 
                 value={search.searchBy}
                 label="Rechercher dans :"
                 options={infos.searchByList ?? []}
-                radius={5}
+                radius={16}
               />
             )}
           />
         </Grid>
       )}
       <Grid item xs={'searchBy' in search ? 8 : 12}>
-        {
-          infos.type !== ResourceType.DOCUMENTS && 'searchInput' in search && (
-            <Controller
-              name="searchInput"
-              control={control}
-              render={({ field }) => (
-                <SearchInput {...field} value={field.value ?? ''} radius={5} placeholder="Rechercher" />
-              )}
-            />
-          ) /* : (
-          <DisplayLocked />
-        )*/
-        }
+        {infos.type !== ResourceType.DOCUMENTS && 'searchInput' in search && (
+          <Controller
+            name="searchInput"
+            control={control}
+            render={({ field }) => (
+              <SearchInput {...field} value={field.value ?? ''} radius={16} placeholder="Rechercher" />
+            )}
+          />
+        )}
         {infos.type === ResourceType.DOCUMENTS && 'searchInput' in search && (
           <Controller
             name="searchInput"
             control={control}
             render={({ field }) => (
-              <SearchbarWithCheck {...field} radius={5} value={field.value ?? ''} placeholder="Rechercher" />
+              <SearchbarWithCheck {...field} radius={16} value={field.value ?? ''} placeholder="Rechercher" />
             )}
           />
         )}

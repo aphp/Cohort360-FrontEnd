@@ -31,7 +31,6 @@ const SaveFilter = ({ disabled = false, onSubmit }: SaveFilterProps) => {
       <Button
         sx={{ borderRadius: 1 }}
         size="small"
-        fullWidth
         variant="contained"
         onClick={() => setToggleModal(true)}
         disabled={disabled}
@@ -45,7 +44,7 @@ const SaveFilter = ({ disabled = false, onSubmit }: SaveFilterProps) => {
                 cursor: 'not-allowed',
                 pointerEvents: 'auto'
               }
-            : { backgroundColor: '#fff', color: '#153d8A', height: '30px' }
+            : { backgroundColor: '#5BC5F2', color: '#FFF', height: '30px', boxShadow: 'none', borderRadius: 16 }
         }
       >
         Enregistrer

@@ -11,15 +11,15 @@ type LevelHeaderProps = {
 
 const LevelHeader = ({ loading, name, description, actions }: LevelHeaderProps) => {
   return (
-    <Box display={'flex'} flexDirection={'column'} justifyContent={'center'} width={'100%'} alignItems={'center'}>
+    <Box display={'flex'} flexDirection={'column'} width={'100%'} alignItems={'center'}>
       <Grid container gap="20px">
-        <Box display={'flex'} flexDirection={'column'} justifyContent={'center'} width={'100%'} alignItems={'center'}>
-          <Box width="100%" display={'flex'} justifyContent={'center'} alignItems={'center'} gap={'8px'}>
+        <Box display={'flex'} flexDirection={'column'} width={'100%'}>
+          <Box width="100%" display={'flex'} alignItems={'center'} gap={'8px'}>
             {loading ? (
               <Box
                 display="flex"
                 width={'100%'}
-                justifyContent={'center'}
+                // justifyContent={'center'}
                 flexDirection={'column'}
                 alignItems={'center'}
               >

@@ -22,12 +22,12 @@ const FilterBy = <T,>({ filters, infos, onSubmit }: FilterByProps) => {
     <>
       <Button
         size="small"
-        sx={{ borderRadius: 1 }}
+        sx={{ borderRadius: 8 }}
         fullWidth
-        startIcon={<FilterList height="15px" fill="#0288D1" />}
+        startIcon={<FilterList height="15px" />}
         variant="contained"
         onClick={() => setToggleModal(true)}
-        style={{ backgroundColor: '#fff', color: '#303030', height: '30px' }}
+        style={{ backgroundColor: '#0063AF', color: '#FFF', height: '30px', boxShadow: 'none' }}
       >
         Filtrer
       </Button>
