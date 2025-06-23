@@ -1,5 +1,5 @@
 import React from 'react'
-import { AccordionDetails, AccordionSummary, CircularProgress, Grid, Typography } from '@mui/material'
+import { AccordionDetails, AccordionSummary, Grid, Typography } from '@mui/material'
 import DataTable from 'components/ui/Table'
 import { Table } from 'types/table'
 import { OrderBy } from 'types/searchCriterias'
@@ -16,6 +16,7 @@ import { Card } from 'types/card'
 import { StickyContainer } from 'components/ui/Pagination/styles'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import AccordionWrapper from 'components/ui/Accordion'
+import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
 
 type DataSectionProps = {
   data: { table: Table; cards: Card[]; diagrams: Diagram[]; timeline: TimelineT | null }
@@ -38,12 +39,7 @@ const DataSection = ({
   onChangePage,
   onSort
 }: DataSectionProps) => {
-  if (isLoading)
-    return (
-      <Grid container justifyContent="center" item xs={12}>
-        <CircularProgress />
-      </Grid>
-    )
+  if (isLoading) return <CenteredCircularProgress />
   return (
     <Grid container justifyContent="center" item xs={12}>
       {displayOptions.diagrams && (

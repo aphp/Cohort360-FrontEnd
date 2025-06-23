@@ -32,15 +32,12 @@ export const TabsWrapper = styled(Tabs)<TabsCustomProps>(({ customVariant = 'mai
         borderStyle: 'solid',
         color: '#153D8A'
       },
-      '& .Mui-selected': {
+      '&.Mui-selected': {
+        backgroundColor: '#153D8A',
         color: '#FFF'
       }
     },
     [`&.MuiTabRoot &.Mui-selected &:hover`]: {
-      color: '#FFF'
-    },
-    '& .Mui-selected': {
-      backgroundColor: '#153D8A',
       color: '#FFF'
     }
   }),
@@ -56,13 +53,13 @@ export const TabsWrapper = styled(Tabs)<TabsCustomProps>(({ customVariant = 'mai
         borderColor: '#153D8A',
         borderStyle: 'solid',
         color: '#2b2b2b'
+      },
+      '&.Mui-selected': {
+        color: '#2b2b2b'
       }
     },
     [`&.MuiTabRoot &.Mui-selected &:hover`]: {
       color: '#FFF'
-    },
-    '& .Mui-selected': {
-      color: '#2b2b2b'
     }
   })
 }))

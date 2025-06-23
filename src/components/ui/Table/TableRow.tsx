@@ -1,6 +1,7 @@
-import React, { Fragment, useState } from 'react'
-import { CellType, Row, Link, Document, Table as TableType, Line, Status } from 'types/table'
+import React, { Fragment, ReactElement, useState } from 'react'
+import { CellType, Row, Link, Document, Table as TableType, Line, Status, SubItem, Favorite, Action } from 'types/table'
 import {
+  Checkbox,
   Collapse,
   Grid,
   IconButton,
@@ -12,7 +13,6 @@ import {
 } from '@mui/material'
 import GenderIcon from '../GenderIcon'
 import { GenderStatus } from 'types/searchCriterias'
-import StatusChip from '../StatusChip'
 import SearchIcon from 'assets/icones/search.svg?react'
 import { Comment, KeyboardArrowUp, KeyboardArrowDown, Visibility } from '@mui/icons-material'
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
@@ -22,10 +22,20 @@ import Paragraphs, { Paragraph } from '../Paragraphs'
 import Modal from '../Modal'
 import { TableCellWrapper } from './styles'
 import DocumentContentDisplay from './DocumentContentDisplay'
+import FavStar from '../FavStar'
+import SublevelButton from '../SublevelButton'
+import TooltipChip from '../TooltipChip'
+import IconButtonWithTooltip from '../IconButtonWithTooltip'
 
 type RowProps = {
   row: Row
   sx?: SxProps<Theme>
+}
+
+const renderIcon = (IconComponent: ReactElement | undefined) => {
+  if (!IconComponent || typeof IconComponent !== 'function') return undefined
+  const Component = IconComponent as React.ElementType
+  return <Component style={{ width: 15, height: 15, fill: 'white' }} />
 }
 
 const TableRow = ({ row, sx }: RowProps) => {
@@ -50,6 +60,51 @@ const TableRow = ({ row, sx }: RowProps) => {
               align={cell.align ?? 'left'}
               sx={{ ...cell.sx, borderBottom: showSubContent ? 'none' : undefined }}
             >
+              {cell.type === CellType.ACTIONS &&
+                (cell.value as Action[]).map((action) => {
+                  const IconComponent = action.icon
+                  return (
+                    <IconButtonWithTooltip
+                      key={action.title}
+                      disabled={action.disabled}
+                      icon={<IconComponent />}
+                      onClick={action.onClick}
+                      title={action.title}
+                    />
+                  )
+                })}
+              {cell.type === CellType.CHECKBOX && (
+                <Checkbox
+                  size="small"
+                  // checked={isChecked(cohort, selectedCohorts)}
+                  // onClick={(event) => {
+                  //   event.stopPropagation()
+                  //   onSelectCohort(cohort)
+                  // }}
+                />
+              )}
+              {cell.type === CellType.FAV_ICON && (
+                <IconButton
+                  // onClick={(event) => {
+                  //   event.stopPropagation()
+                  //   onClickFav(cohort)
+                  // }}
+                  disabled={(cell.value as Favorite).disabled}
+                >
+                  <FavStar
+                    favorite={(cell.value as Favorite).isFavorite}
+                    height={18}
+                    color={(cell.value as Favorite).disabled ? '#CBCFCF' : undefined}
+                  />
+                </IconButton>
+              )}
+              {cell.type === CellType.SUB_ITEM && (
+                <SublevelButton
+                  label={(cell.value as SubItem).label}
+                  onClick={(cell.value as SubItem).onClick}
+                  total={(cell.value as SubItem).total}
+                />
+              )}
               {cell.type == CellType.GENDER_ICON && (
                 <Grid container>
                   <GenderIcon key={cell.id} gender={cell.value as GenderStatus} />
@@ -60,14 +115,13 @@ const TableRow = ({ row, sx }: RowProps) => {
               {cell.type == CellType.STATUS_CHIP &&
                 (() => {
                   const IconComponent = (cell.value as Status).icon
-                  const icon = IconComponent ? (
-                    <IconComponent style={{ width: 15, height: 15, fill: 'white' }} />
-                  ) : undefined
+                  const icon = renderIcon(IconComponent as ReactElement | undefined)
                   return (
-                    <StatusChip
+                    <TooltipChip
                       label={(cell.value as Status).label}
                       status={(cell.value as Status).status}
                       icon={icon}
+                      tooltip={(cell.value as Status).tooltip}
                     />
                   )
                 })()}

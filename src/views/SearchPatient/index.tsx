@@ -3,10 +3,10 @@ import { useAppSelector } from 'state'
 import { Grid } from '@mui/material'
 import { ResourceType } from 'types/requestCriterias'
 import ExplorationBoard from 'components/ExplorationBoard'
-import HeaderPage from 'components/ui/HeaderPage'
 import sideBarTransition from 'styles/sideBarTransition'
 import { useParams } from 'react-router-dom'
 import { buildExplorationConfig } from 'components/ExplorationBoard/config/config'
+import HeaderLayout from 'components/ui/Header'
 
 const DISPLAY_OPTIONS = {
   myFilters: false,
@@ -36,12 +36,17 @@ const SearchPatient = () => {
   )
 
   return (
-    <Grid container direction="column" className={cx(classes.appBar, { [classes.appBarShift]: open })}>
-      <Grid container justifyContent="center" alignItems="center">
-        <Grid item xs={11}>
-          <HeaderPage title="Rechercher un patient" id="patient-search" />
+    <Grid
+      container
+      direction="column"
+      className={cx(classes.appBar, { [classes.appBarShift]: open })}
+      sx={{ backgroundColor: '#FFF' }}
+    >
+      <HeaderLayout title="Rechercher un patient" />
+      <Grid container justifyContent="center">
+        <Grid container xs={11}>
+          {config && <ExplorationBoard config={config} />}
         </Grid>
-        {config && <ExplorationBoard config={config} />}
       </Grid>
     </Grid>
   )
