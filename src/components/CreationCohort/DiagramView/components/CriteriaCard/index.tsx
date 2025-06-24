@@ -13,18 +13,17 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import { useAppSelector } from 'state'
 
-import useStyles from './styles'
+import { CriteriaWrapper, ExtendedWrapper } from './styles'
 import { ChipWrapper } from 'components/ui/Chip/styles'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 import theme from 'theme'
 import criteriaList, { getAllCriteriaItems } from 'components/CreationCohort/DataList_Criteria'
 import { criteriasAsArray } from '../LogicalOperator/components/CriteriaRightPanel/CriteriaForm/mappers'
 import CriteriaCount, { CriteriaCountType } from '../CriteriaCount'
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
 
 type CriteriaCardProps = {
   criterion: SelectedCriteriaType
+  disabled?: boolean
   criteriaCount?: CriteriaCountType
   duplicateCriteria?: (criteriaId: number) => void
   deleteCriteria?: (criteriaId: number) => void
@@ -38,8 +37,6 @@ const CriteriaCard = ({
   editCriteria,
   deleteCriteria
 }: CriteriaCardProps) => {
-  const { classes } = useStyles()
-
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active || false)
   const { entities, cache } = useAppSelector((state) => state.valueSets)
   const criteriaDefinitions = getAllCriteriaItems(criteriaList())
@@ -51,18 +48,6 @@ const CriteriaCard = ({
   const childrenRef = useRef<HTMLDivElement>(null)
   const isXl = useMediaQuery(theme.breakpoints.up('xl'))
 
-  const { setNodeRef, isDragging, attributes, listeners, transform, transition, isOver, overIndex, activeIndex } =
-    useSortable({
-      id: criterion.id,
-      data: { criterion }
-    })
-
-  const style = {
-    transition,
-    transform: CSS.Transform.toString(transform),
-    backgroundColor: criterion.isInclusive ? '#D1E2F4' : '#F2B0B0'
-  }
-
   useEffect(() => {
     const containerHeight = containerRef.current?.clientHeight || 0
     const childrenHeight = childrenRef.current?.clientHeight || 0
@@ -71,17 +56,10 @@ const CriteriaCard = ({
   }, [containerRef.current?.clientWidth])
 
   return (
-    <Grid
-      ref={setNodeRef}
-      style={style}
+    <CriteriaWrapper
+      sx={{ backgroundColor: criterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
       container
       alignItems={'center'}
-      className={classes.criteriaItem}
-      sx={{
-        borderBottom: isOver && overIndex !== activeIndex && overIndex > activeIndex ? '2px solid #0063AF' : 'none',
-        borderTop: isOver && overIndex !== activeIndex && activeIndex > overIndex ? '2px solid #0063AF' : 'none',
-        opacity: isDragging ? 0.8 : 1
-      }}
     >
       <CriteriaCount criteriaCount={criteriaCount} extraLeftMargin={3} />
       <Grid
@@ -92,28 +70,17 @@ const CriteriaCard = ({
         xl={3}
         padding={'5px'}
         justifyContent={isXl ? 'space-around' : 'flex-start'}
-        style={{ cursor: 'grab', height: '100%' }}
-        {...attributes}
-        {...listeners}
       >
         <Grid container item xs={1} justifyContent={'center'}>
           <AvatarWrapper size={20}>{criterion.id}</AvatarWrapper>
         </Grid>
         <Grid container item xs={10}>
-          <Typography className={classes.title} fontWeight={700}>
+          <Typography marginLeft="4px" fontWeight={700}>
             {criterion.title} :
           </Typography>
         </Grid>
       </Grid>
-      <Grid
-        container
-        item
-        xs={12}
-        xl={7}
-        ref={containerRef}
-        style={{ height: openCollapse ? '' : 42 }}
-        className={classes.secondItem}
-      >
+      <ExtendedWrapper container item xs={12} xl={7} ref={containerRef} isExtended={openCollapse}>
         <Grid item xs={11} container ref={childrenRef} style={{ overflow: 'hidden' }}>
           {criteriasAsArray(criterion, criteriaDefinitions, { entities, cache }).map((label, index) => (
             <ChipWrapper
@@ -132,7 +99,7 @@ const CriteriaCard = ({
             </IconButton>
           )}
         </Grid>
-      </Grid>
+      </ExtendedWrapper>
       <Grid container xs={5} xl={2} justifyContent="flex-end">
         {criterion.error && (
           <IconButton
@@ -144,32 +111,38 @@ const CriteriaCard = ({
             <WarningIcon />
           </IconButton>
         )}
-        <IconButton
-          size="small"
-          onClick={() => duplicateCriteria?.(criterion.id)}
-          style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
-          disabled={maintenanceIsActive}
-        >
-          <LibraryAddIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={() => editCriteria?.(criterion)}
-          style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
-          disabled={maintenanceIsActive}
-        >
-          <EditIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={() => deleteCriteria?.(criterion.id)}
-          style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
-          disabled={maintenanceIsActive}
-        >
-          <DeleteIcon />
-        </IconButton>
+        {duplicateCriteria && (
+          <IconButton
+            size="small"
+            onClick={() => duplicateCriteria?.(criterion.id)}
+            style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
+            disabled={maintenanceIsActive}
+          >
+            <LibraryAddIcon />
+          </IconButton>
+        )}
+        {editCriteria && (
+          <IconButton
+            size="small"
+            onClick={() => editCriteria?.(criterion)}
+            style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
+            disabled={maintenanceIsActive}
+          >
+            <EditIcon />
+          </IconButton>
+        )}
+        {deleteCriteria && (
+          <IconButton
+            size="small"
+            onClick={() => deleteCriteria?.(criterion.id)}
+            style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
+            disabled={maintenanceIsActive}
+          >
+            <DeleteIcon />
+          </IconButton>
+        )}
       </Grid>
-    </Grid>
+    </CriteriaWrapper>
   )
 }
 

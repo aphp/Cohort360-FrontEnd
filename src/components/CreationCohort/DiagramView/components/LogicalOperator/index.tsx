@@ -18,6 +18,7 @@ import {
   buildCohortCreation,
   deleteSelectedCriteria,
   duplicateSelectedCriteria,
+  editAllCriteriaGroup,
   editCriteriaGroup,
   editSelectedCriteria,
   suspendCount,
@@ -27,9 +28,9 @@ import {
 import useStyles from './styles'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 import { getStageDetails } from '../CriteriaCount'
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core'
-import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { createPortal } from 'react-dom'
+import { Active, DndContext, DragEndEvent, Over } from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import Draggable from 'components/ui/DragAndDrop/Draggable'
 
 type OperatorItemProps = {
   itemId: number
@@ -54,6 +55,10 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   const { request } = useAppSelector((state) => state.cohortCreation || {})
   const { loading = false, selectedCriteria: criterias = [], count = {}, idRemap } = request
   const { extra: stageDetails } = count
+  const [isOver, setIsOver] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const [over, setOver] = useState<Over | null>(null)
+  const [active, setActive] = useState<Active | null>(null)
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
@@ -72,6 +77,10 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
     return toDisplay
   }, [groups, criterias, itemId])
 
+  useEffect(() => {
+    console.log('test criteria', itemId, 'active', active, 'over', over)
+  }, [active, over])
+
   return (
     <>
       <LogicalOperatorItem itemId={itemId} criteriaCount={getStageDetails(itemId, idRemap, stageDetails)} />
@@ -80,23 +89,34 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
         direction="column"
         justifyContent="center"
         className={classes.operatorChild}
-        style={{ height: 30, marginBottom: -12, paddingLeft: 0 }}
+        style={{ height: 30, /*height: isOver && !isDragging ? 150 : 30,*/ marginBottom: -12, paddingLeft: 0 }}
       >
         <AvatarWrapper backgroundColor="#FFE2A9" color="#153D8A" marginLeft={'-14px'} bold>
           {Math.abs(itemId) + 1}
         </AvatarWrapper>
       </Grid>
+
       <div className={classes.operatorChild}>
-        {displayedItems?.map((criteria) => {
-          return criteria?.id > 0 ? (
-            <CriteriaCardItem
-              key={criteria?.id}
-              criteriaCount={getStageDetails(criteria?.id, idRemap, stageDetails)}
-              criterion={criteria as SelectedCriteriaType}
-              duplicateCriteria={duplicateCriteria}
-              deleteCriteria={deleteCriteria}
-              editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
-            />
+        {displayedItems?.map((criteria) =>
+          criteria?.id > 0 ? (
+            <Draggable
+              key={criteria.id}
+              data={{ ...criteria, criteriaId: itemId }}
+              setIsDragging={setIsDragging}
+              setIsOver={setIsOver}
+              onDrag={(active, over) => {
+                setActive(active)
+                setOver(over)
+              }}
+            >
+              <CriteriaCardItem
+                criteriaCount={getStageDetails(criteria?.id, idRemap, stageDetails)}
+                criterion={criteria as SelectedCriteriaType}
+                duplicateCriteria={duplicateCriteria}
+                deleteCriteria={deleteCriteria}
+                editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
+              />
+            </Draggable>
           ) : (
             <OperatorItem
               groups={groups}
@@ -109,8 +129,9 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
               editCriteria={editCriteria}
             />
           )
-        })}
+        )}
       </div>
+
       <div className={classes.operatorChild} style={{ height: 12, marginBottom: -14 }} />
 
       {!isExpanded ? (
@@ -188,9 +209,10 @@ const LogicalOperator: React.FC = () => {
   const [openDrawer, setOpenDrawer] = useState<'criteria' | null>(null)
   const [selectedCriteria, setSelectedCriteria] = useState<SelectedCriteriaType | null>(null)
   const { criteriaGroup = [] } = request
-  const [groups, setGroups] = useState<CriteriaGroup[]>(criteriaGroup)
-  const criteriasIds = useMemo(() => groups.flatMap((group) => group.criteriaIds.filter((id) => id > 0)), [groups])
-  const [draggedCriterion, setDraggedCriterion] = useState<SelectedCriteriaType | null>(null)
+  const criteriasIds = useMemo(
+    () => [0, ...criteriaGroup.flatMap((group) => group.criteriaIds /*.filter((id) => id > 0)*/)],
+    [criteriaGroup]
+  )
 
   const _buildCohortCreation = () => {
     dispatch(buildCohortCreation({ selectedPopulation: null }))
@@ -268,38 +290,39 @@ const LogicalOperator: React.FC = () => {
     _buildCohortCreation()
   }
 
-  const onDragStart = (event: DragStartEvent) => {
-    setDraggedCriterion(event.active.data.current.criterion)
-  }
-
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
-    if (!over) return
-    setGroups((prevGroups) => {
-      const newGroups = prevGroups.map((group) => ({
-        ...group,
-        criteriaIds: [...group.criteriaIds]
-      }))
-      const fromGroupIndex = newGroups.findIndex((group) => group.criteriaIds.includes(active.id))
-      const fromCriteriaIndex = newGroups[fromGroupIndex].criteriaIds.indexOf(active.id)
-      const toGroupIndex = newGroups.findIndex((group) => group.criteriaIds.includes(over.id))
-      const toCriteriaIndex = newGroups[toGroupIndex].criteriaIds.indexOf(over.id)
-      newGroups[fromGroupIndex].criteriaIds.splice(fromCriteriaIndex, 1)
-      newGroups[toGroupIndex].criteriaIds.splice(toCriteriaIndex, 0, active.id)
-      return newGroups
-    })
+    if (!over || active.id === over.id) return
+    const newGroups = criteriaGroup.map((group) => ({
+      ...group,
+      criteriaIds: [...group.criteriaIds]
+    }))
+    const fromGroupIndex = newGroups.findIndex((group) => group.criteriaIds.includes(active.id as number))
+    const fromCriteriaIndex = newGroups[fromGroupIndex].criteriaIds.indexOf(active.id as number)
+    const toGroupIndex =
+      (over.id as number) < 1
+        ? newGroups.findIndex((group) => group.id === over.id)
+        : newGroups.findIndex((group) => group.criteriaIds.includes(over.id as number))
+    const toCriteriaIndex = newGroups[toGroupIndex].criteriaIds.indexOf(over.id as number)
+    newGroups[fromGroupIndex].criteriaIds.splice(fromCriteriaIndex, 1)
+    newGroups[toGroupIndex].criteriaIds.splice(toCriteriaIndex, 0, active.id as number)
+    dispatch(editAllCriteriaGroup(newGroups))
+    _buildCohortCreation()
   }
 
   useEffect(() => {
-    console.log('test ids', criteriasIds)
+    console.log('test update criteriaGroup', criteriaGroup)
+  }, [criteriaGroup])
+  useEffect(() => {
+    console.log('test update criteriasIds', criteriasIds)
   }, [criteriasIds])
 
   return (
     <>
-      <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+      <DndContext onDragEnd={onDragEnd}>
         <SortableContext items={criteriasIds} strategy={verticalListSortingStrategy}>
           <OperatorItem
-            groups={groups}
+            groups={criteriaGroup}
             itemId={0}
             addNewCriteria={_addNewCriteria}
             addNewGroup={_addNewGroup}
@@ -308,12 +331,6 @@ const LogicalOperator: React.FC = () => {
             editCriteria={_editCriteria}
           />
         </SortableContext>
-        {/*createPortal(
-          <DragOverlay>
-            {draggedCriterion && <CriteriaCardItem key={draggedCriterion?.id} criterion={draggedCriterion} />}
-          </DragOverlay>,
-          document.body
-        )*/}
       </DndContext>
 
       <CriteriaRightPanel
