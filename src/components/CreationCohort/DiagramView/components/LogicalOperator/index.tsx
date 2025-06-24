@@ -99,24 +99,25 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
       <div className={classes.operatorChild}>
         {displayedItems?.map((criteria) =>
           criteria?.id > 0 ? (
-            <Draggable
-              key={criteria.id}
-              data={{ ...criteria, criteriaId: itemId }}
-              setIsDragging={setIsDragging}
-              setIsOver={setIsOver}
-              onDrag={(active, over) => {
-                setActive(active)
-                setOver(over)
-              }}
-            >
-              <CriteriaCardItem
-                criteriaCount={getStageDetails(criteria?.id, idRemap, stageDetails)}
-                criterion={criteria as SelectedCriteriaType}
-                duplicateCriteria={duplicateCriteria}
-                deleteCriteria={deleteCriteria}
-                editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
-              />
-            </Draggable>
+            <Grid key={criteria.id} container flexDirection="column" gap={10}>
+              <Draggable
+                data={{ ...criteria, criteriaId: itemId }}
+                setIsDragging={setIsDragging}
+                setIsOver={setIsOver}
+                onDrag={(active, over) => {
+                  setActive(active)
+                  setOver(over)
+                }}
+              >
+                <CriteriaCardItem
+                  criteriaCount={getStageDetails(criteria?.id, idRemap, stageDetails)}
+                  criterion={criteria as SelectedCriteriaType}
+                  duplicateCriteria={duplicateCriteria}
+                  deleteCriteria={deleteCriteria}
+                  editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
+                />
+              </Draggable>
+            </Grid>
           ) : (
             <OperatorItem
               groups={groups}

@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useEffect } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { DraggableWrapper, DropPlaceholder } from './styles'
+import { DraggableWrapper, DroppableWrapper } from './styles'
 import { Active, Over } from '@dnd-kit/core'
 import { createPortal } from 'react-dom'
 
@@ -40,12 +40,12 @@ const Draggable = <T,>({
     if (onDrag) onDrag(active, over)
   }, [active, over])
 
-  const dropPlaceholder = document.getElementById(`drop-placeholder-${index}`)
+  const droppableWrapper = document.getElementById(`droppable-wrapper-${index}`)
 
   return (
     <div style={{ position: 'relative' }}>
-      <div id={`drop-placeholder-${index}`}></div>
-      {isOver && dropPlaceholder && createPortal(<DropPlaceholder>{children}</DropPlaceholder>, dropPlaceholder)}
+      <div id={`droppable-wrapper-${index}`} style={{}}></div>
+      {isOver && droppableWrapper && createPortal(<DroppableWrapper>{children}</DroppableWrapper>, droppableWrapper)}
       <DraggableWrapper
         ref={setNodeRef}
         style={{ transform: CSS.Transform.toString(transform) }}

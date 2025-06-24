@@ -42,10 +42,7 @@ const useStyles = makeStyles()(() => ({
   operatorChild: {
     marginLeft: 23,
     borderLeft: '4px solid #19235a',
-    paddingLeft: 35,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 30
+    paddingLeft: 35
   }
 }))
 
