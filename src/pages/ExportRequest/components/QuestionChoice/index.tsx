@@ -23,6 +23,7 @@ import { SelectChangeEvent } from '@mui/material/Select'
 import Chip from 'components/ui/Chip'
 
 import apiFhir from 'services/apiFhir'
+import { set } from 'lodash'
 
 /***********************************
  * Types FHIR minimalistes
@@ -285,6 +286,8 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
 
   const handleConfirm = () => {
     onConfirm(allSelectedLeaves)
+    setInputQuery('') // reset search input
+    setCheckedByQuestionnaire(new Map()) // reset checked state
     onClose()
   }
 
@@ -292,7 +295,7 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
   return (
     <Dialog open={open} maxWidth="md" fullWidth>
       <DialogTitle>
-        Sélection des questions
+        <span>Sélection des questions</span>
         <FormControl sx={{ ml: 2, minWidth: 200 }} size="small">
           <InputLabel id="questionnaire-select-label">Formulaire</InputLabel>
           <Select
