@@ -28,7 +28,7 @@ import {
 import useStyles from './styles'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 import { getStageDetails } from '../CriteriaCount'
-import { Active, DndContext, DragEndEvent, Over } from '@dnd-kit/core'
+import { Active, DndContext, DragEndEvent, Over, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import Draggable from 'components/ui/DragAndDrop/Draggable'
 
@@ -215,6 +215,14 @@ const LogicalOperator: React.FC = () => {
     [criteriaGroup]
   )
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 1
+      }
+    })
+  )
+
   const _buildCohortCreation = () => {
     dispatch(buildCohortCreation({ selectedPopulation: null }))
   }
@@ -320,7 +328,7 @@ const LogicalOperator: React.FC = () => {
 
   return (
     <>
-      <DndContext onDragEnd={onDragEnd}>
+      <DndContext onDragEnd={onDragEnd} sensors={sensors}>
         <SortableContext items={criteriasIds} strategy={verticalListSortingStrategy}>
           <OperatorItem
             groups={criteriaGroup}
