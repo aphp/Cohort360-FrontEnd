@@ -3,15 +3,18 @@ import { Grid, styled, keyframes } from '@mui/material'
 type DraggableWrapperProps = {
   isActive: boolean
   isDragging: boolean
+  isDisabled: boolean
 }
 
-export const DraggableWrapper = styled(Grid)<DraggableWrapperProps>(({ isActive, isDragging }) => ({
+export const DraggableWrapper = styled(Grid)<DraggableWrapperProps>(({ isActive, isDragging, isDisabled }) => ({
   position: 'relative',
   zIndex: 2,
+  maxHeight: isDisabled ? (isDragging ? '1000px' : '0px') : 'none',
+  opacity: isDisabled ? 0 : 1,
   '& > *': {
-    overflow: isDragging ? 'hidden' : 'visible',
-    cursor: isActive ? 'grabbing' : 'grab',
+    cursor: isDisabled ? 'pointer' : isActive ? 'grabbing' : 'grab',
     opacity: isDragging ? (isActive ? 1 : 0.6) : 1,
+    overflow: isDragging ? 'hidden' : 'visible',
     border: isDragging ? (isActive ? '1px solid #19235a' : '1px solid #00000014') : '',
     transition: 'opacity 0.2s',
     backgroundColor: isDragging && isActive ? 'rgba(255,255,255,0.95)' : undefined
@@ -35,16 +38,16 @@ const pulse = keyframes`
 
 export const DroppableWrapper = styled(Grid)(() => ({
   position: 'absolute',
-  maxWidth: 930,
   top: 0,
   left: 0,
   right: 0,
+  zIndex: 1,
+  maxHeight: 200,
+  transition: 'max-height 0.3s ease',
+  animation: `${pulse} 1.2s infinite ease-in-out`,
   border: '1px dashed #19235a',
-  borderRadius: 3,
   background: '#5bc5f2',
   opacity: 0.3,
-  animation: `${pulse} 1.2s ease-in-out infinite`,
-  zIndex: 1,
   '& > *': {
     opacity: 0
   }

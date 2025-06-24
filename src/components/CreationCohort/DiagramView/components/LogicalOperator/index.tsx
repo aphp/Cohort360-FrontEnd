@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { Fragment, useEffect, useMemo, useState } from 'react'
 
 import { ButtonGroup, Button, IconButton, CircularProgress, Grid } from '@mui/material'
 
@@ -28,7 +28,7 @@ import {
 import useStyles from './styles'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 import { getStageDetails } from '../CriteriaCount'
-import { Active, DndContext, DragEndEvent, Over, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import Draggable from 'components/ui/DragAndDrop/Draggable'
 
@@ -55,10 +55,6 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   const { request } = useAppSelector((state) => state.cohortCreation || {})
   const { loading = false, selectedCriteria: criterias = [], count = {}, idRemap } = request
   const { extra: stageDetails } = count
-  const [isOver, setIsOver] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
-  const [over, setOver] = useState<Over | null>(null)
-  const [active, setActive] = useState<Active | null>(null)
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
@@ -77,10 +73,6 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
     return toDisplay
   }, [groups, criterias, itemId])
 
-  useEffect(() => {
-    console.log('test criteria', itemId, 'active', active, 'over', over)
-  }, [active, over])
-
   return (
     <>
       <LogicalOperatorItem itemId={itemId} criteriaCount={getStageDetails(itemId, idRemap, stageDetails)} />
@@ -89,7 +81,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
         direction="column"
         justifyContent="center"
         className={classes.operatorChild}
-        style={{ height: 30, /*height: isOver && !isDragging ? 150 : 30,*/ marginBottom: -12, paddingLeft: 0 }}
+        style={{ height: 30, marginBottom: -12, paddingLeft: 0 }}
       >
         <AvatarWrapper backgroundColor="#FFE2A9" color="#153D8A" marginLeft={'-14px'} bold>
           {Math.abs(itemId) + 1}
@@ -97,40 +89,38 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
       </Grid>
 
       <div className={classes.operatorChild}>
-        {displayedItems?.map((criteria) =>
-          criteria?.id > 0 ? (
-            <Grid key={criteria.id} container flexDirection="column" gap={10}>
-              <Draggable
-                data={{ ...criteria, criteriaId: itemId }}
-                setIsDragging={setIsDragging}
-                setIsOver={setIsOver}
-                onDrag={(active, over) => {
-                  setActive(active)
-                  setOver(over)
-                }}
-              >
-                <CriteriaCardItem
-                  criteriaCount={getStageDetails(criteria?.id, idRemap, stageDetails)}
-                  criterion={criteria as SelectedCriteriaType}
+        {displayedItems?.map((criteria) => {
+          const showOperatorItem = criteria?.id < 1
+
+          return (
+            <Fragment key={`item-${criteria.id}`}>
+              <Grid marginTop="30px">
+                <Draggable data={{ ...criteria, groupId: itemId }} disabled={showOperatorItem}>
+                  <CriteriaCardItem
+                    criteriaCount={getStageDetails(criteria?.id, idRemap, stageDetails)}
+                    criterion={criteria as SelectedCriteriaType}
+                    duplicateCriteria={duplicateCriteria}
+                    deleteCriteria={deleteCriteria}
+                    editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
+                  />
+                </Draggable>
+              </Grid>
+
+              {showOperatorItem && (
+                <OperatorItem
+                  key={`operator-${criteria.id}`}
+                  groups={groups}
+                  itemId={criteria.id}
+                  addNewCriteria={addNewCriteria}
+                  addNewGroup={addNewGroup}
                   duplicateCriteria={duplicateCriteria}
                   deleteCriteria={deleteCriteria}
-                  editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
+                  editCriteria={editCriteria}
                 />
-              </Draggable>
-            </Grid>
-          ) : (
-            <OperatorItem
-              groups={groups}
-              key={criteria?.id}
-              itemId={criteria?.id}
-              addNewCriteria={addNewCriteria}
-              addNewGroup={addNewGroup}
-              duplicateCriteria={duplicateCriteria}
-              deleteCriteria={deleteCriteria}
-              editCriteria={editCriteria}
-            />
+              )}
+            </Fragment>
           )
-        )}
+        })}
       </div>
 
       <div className={classes.operatorChild} style={{ height: 12, marginBottom: -14 }} />
