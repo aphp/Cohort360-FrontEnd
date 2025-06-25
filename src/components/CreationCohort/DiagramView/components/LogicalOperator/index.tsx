@@ -26,9 +26,9 @@ import {
 } from 'state/cohortCreation'
 
 import useStyles from './styles'
-import { SelectedCriteriaType } from 'types/requestCriterias'
+import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 import { getStageDetails } from '../CriteriaCount'
-import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { DndContext, DragEndEvent, PointerSensor, UniqueIdentifier, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import Draggable from 'components/ui/DragAndDrop/Draggable'
 
@@ -70,7 +70,14 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
       const foundItem = groups.find(({ id }) => id === criteriaId) ?? criterias.find(({ id }) => id === criteriaId)
       if (foundItem) toDisplay.push(foundItem)
     })
-    return toDisplay
+    const filtered = toDisplay.filter((item) => item.id > 0)
+    const end = /*filtered.length ? [{ id: `end-${itemId * -1}`, title: 'test', type: CriteriaType.OBSERVATION }] :*/ []
+    return [
+      { id: `start-${itemId * -1}`, title: 'test', type: CriteriaType.OBSERVATION },
+      ...filtered,
+      ...end,
+      ...toDisplay.filter((item) => item.id < 0)
+    ]
   }, [groups, criterias, itemId])
 
   return (
@@ -90,35 +97,39 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
       <div className={classes.operatorChild}>
         {displayedItems?.map((criteria) => {
-          const showOperatorItem = criteria?.id < 1
+          const showOperatorItem = typeof criteria?.id === 'number' && criteria.id < 1
+          const showEmpty = typeof criteria?.id === 'string'
+
+          if (showOperatorItem)
+            return (
+              <OperatorItem
+                key={`operator-${criteria.id}`}
+                groups={groups}
+                itemId={criteria.id as number}
+                addNewCriteria={addNewCriteria}
+                addNewGroup={addNewGroup}
+                duplicateCriteria={duplicateCriteria}
+                deleteCriteria={deleteCriteria}
+                editCriteria={editCriteria}
+              />
+            )
 
           return (
-            <Fragment key={`item-${criteria.id}`}>
-              <Grid marginTop="30px">
-                <Draggable data={{ ...criteria, groupId: itemId }} disabled={showOperatorItem}>
+            <Grid marginTop="30px" key={`item-${criteria.id}`}>
+              <Draggable data={{ ...criteria, groupId: itemId }} disabled={showEmpty}>
+                {showEmpty ? (
+                  <CriteriaCardItem criterion={criteria as SelectedCriteriaType} />
+                ) : (
                   <CriteriaCardItem
-                    criteriaCount={getStageDetails(criteria?.id, idRemap, stageDetails)}
+                    criteriaCount={getStageDetails(criteria?.id as number, idRemap, stageDetails)}
                     criterion={criteria as SelectedCriteriaType}
                     duplicateCriteria={duplicateCriteria}
                     deleteCriteria={deleteCriteria}
                     editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
                   />
-                </Draggable>
-              </Grid>
-
-              {showOperatorItem && (
-                <OperatorItem
-                  key={`operator-${criteria.id}`}
-                  groups={groups}
-                  itemId={criteria.id}
-                  addNewCriteria={addNewCriteria}
-                  addNewGroup={addNewGroup}
-                  duplicateCriteria={duplicateCriteria}
-                  deleteCriteria={deleteCriteria}
-                  editCriteria={editCriteria}
-                />
-              )}
-            </Fragment>
+                )}
+              </Draggable>
+            </Grid>
           )
         })}
       </div>
@@ -162,7 +173,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
                 setIsExpanded(true)
                 if (timeout) clearInterval(timeout)
               }}
-              style={{ borderRadius: '18px 0 0 18px' }}
+              style={{ borderRadius: '18px 0 0 18px', zIndex: 1000 }}
               disabled={maintenanceIsActive}
             >
               Ajouter un critère
@@ -180,7 +191,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
                 setIsExpanded(true)
                 if (timeout) clearInterval(timeout)
               }}
-              style={{ borderRadius: '0 18px 18px 0' }}
+              style={{ borderRadius: '0 18px 18px 0', zIndex: 1000 }}
               disabled={maintenanceIsActive}
             >
               Ajouter un opérateur logique
@@ -200,8 +211,13 @@ const LogicalOperator: React.FC = () => {
   const [openDrawer, setOpenDrawer] = useState<'criteria' | null>(null)
   const [selectedCriteria, setSelectedCriteria] = useState<SelectedCriteriaType | null>(null)
   const { criteriaGroup = [] } = request
-  const criteriasIds = useMemo(
-    () => [0, ...criteriaGroup.flatMap((group) => group.criteriaIds /*.filter((id) => id > 0)*/)],
+  const criteriasIds: UniqueIdentifier[] = useMemo(
+    () =>
+      criteriaGroup.flatMap((group) => [
+        `start-${group.id * -1}`,
+        ...group.criteriaIds.filter((ids) => ids > 0),
+        `end-${group.id * -1}`
+      ]),
     [criteriaGroup]
   )
 
