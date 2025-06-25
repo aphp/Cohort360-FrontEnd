@@ -4,7 +4,7 @@ import { ButtonGroup, Button, IconButton, CircularProgress, Grid } from '@mui/ma
 
 import AddIcon from '@mui/icons-material/Add'
 
-import LogicalOperatorItem from './components/LogicalOperatorItem/LogicalOperatorItem'
+import LogicalOperatorItem from './components/LogicalOperatorItem'
 import CriteriaRightPanel from './components/CriteriaRightPanel/CriteriaRightPanel'
 import { AvatarWrapper } from 'components/ui/Avatar/styles'
 import CriteriaCardItem from '../CriteriaCard'
