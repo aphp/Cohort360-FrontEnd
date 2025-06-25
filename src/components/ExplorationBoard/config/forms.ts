@@ -183,7 +183,7 @@ export const formsConfig = (
   getCount: !!patient
     ? undefined
     : (counts) => [
-        { label: 'résultat(s)', display: true, count: counts[0] },
-        { label: 'patient(s)', display: true, count: counts[1] }
+        { label: `résultat${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
+        { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: true, count: counts[1] }
       ]
 })

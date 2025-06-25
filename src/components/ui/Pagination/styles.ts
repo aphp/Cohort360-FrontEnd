@@ -1,35 +1,31 @@
 import { Grid, IconButton, Pagination, styled } from '@mui/material'
 import { NumberInput } from '../NumberInput'
 
-type ColorProps = {
-  elemcolor?: string
-}
-
-export const StyledPagination = styled(Pagination)<ColorProps>(({ elemcolor = '#5BC5F2' }) => ({
+export const StyledPagination = styled(Pagination)(() => ({
   margin: '12px 10px',
   float: 'right',
   '& button': {
     backgroundColor: '#fff',
-    color: elemcolor
+    color: '#5BC5F2'
   },
   '& .MuiPaginationItem-page.Mui-selected': {
     color: '#fff',
-    backgroundColor: elemcolor
+    backgroundColor: '#5BC5F2'
   }
 }))
 
-export const PaginationInput = styled(NumberInput)<ColorProps>(({ elemcolor = '#5BC5F2' }) => ({
+export const PaginationInput = styled(NumberInput)(() => ({
   width: 50,
   height: 24,
   margin: '0 4px',
   backgroundColor: '#FFF',
-  border: `1px solid ${elemcolor}`,
+  border: `1px solid #5BC5F2`,
   borderRadius: 10,
   padding: 4
 }))
 
-export const StyledButton = styled(IconButton)<ColorProps>(({ elemcolor = '#5BC5F2' }) => ({
-  color: elemcolor,
+export const StyledButton = styled(IconButton)(() => ({
+  color: '#5BC5F2',
   padding: 0
 }))
 

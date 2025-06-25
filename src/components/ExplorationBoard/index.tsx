@@ -7,7 +7,7 @@ import { useData } from './useData'
 import DataSection from './DataSection'
 import { FetchStatus } from 'types'
 import { AlertWrapper } from 'components/ui/Alert'
-import { GAP, ExplorationConfig } from 'types/exploration'
+import { GAP, ExplorationConfig, DataDisplayType } from 'types/exploration'
 import { useSearchParams } from 'react-router-dom'
 import WarningIcon from 'assets/icones/warning.svg?react'
 
@@ -49,6 +49,7 @@ const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
         savedFiltersData={savedFiltersData}
         displayOptions={config.displayOptions}
         count={count}
+        display={data.cards.length > 0 ? DataDisplayType.SIDEBAR : DataDisplayType.LAYOUT}
       />
       {config.displayOptions.criterias && (
         <CriteriasSection

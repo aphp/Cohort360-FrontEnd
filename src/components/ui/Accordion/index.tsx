@@ -8,6 +8,13 @@ const AccordionWrapper = styled(Accordion)(() => ({
   border: '1px solid #D1E2F4',
   '&:before': {
     backgroundColor: 'unset'
+  },
+  '&.MuiAccordion-root:first-of-type': {
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12
+  },
+  '&.Mui-expanded': {
+    margin: 0
   }
 }))
 

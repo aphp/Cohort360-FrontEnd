@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Button } from '@mui/material'
 import { Save } from '@mui/icons-material'
 import Modal from 'components/ui/Modal'
 import Text from 'components/ui/Inputs/Text'
 import { Controller, useForm } from 'react-hook-form'
+import Button from 'components/ui/Button'
 
 type SaveFilterProps = {
   disabled?: boolean
@@ -29,23 +29,11 @@ const SaveFilter = ({ disabled = false, onSubmit }: SaveFilterProps) => {
   return (
     <>
       <Button
-        sx={{ borderRadius: 1 }}
-        size="small"
-        variant="contained"
+        customVariant="secondary"
         onClick={() => setToggleModal(true)}
         disabled={disabled}
         startIcon={<Save height="15px" fill="#FFF" />}
-        style={
-          disabled
-            ? {
-                backgroundColor: '#E0E0E0',
-                color: '#000',
-                height: '30px',
-                cursor: 'not-allowed',
-                pointerEvents: 'auto'
-              }
-            : { backgroundColor: '#5BC5F2', color: '#FFF', height: '30px', boxShadow: 'none', borderRadius: 16 }
-        }
+        width="fit-content"
       >
         Enregistrer
       </Button>

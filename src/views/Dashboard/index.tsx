@@ -12,7 +12,7 @@ import { getCleanGroupId } from 'utils/paginationUtils'
 import ExplorationBoard from 'components/ExplorationBoard'
 import { MedicationLabel, ResourceType } from 'types/requestCriterias'
 import { PMSILabel } from 'types/patient'
-import { URLS } from 'types/exploration'
+import { DISPLAY_OPTIONS, URLS } from 'types/exploration'
 import { TabsWrapper } from 'components/ui/Tabs'
 import sideBarTransition from 'styles/sideBarTransition'
 import { buildExplorationConfig, ExplorationResourceType } from 'components/ExplorationBoard/config/config'
@@ -44,7 +44,13 @@ const Dashboard = ({ context }: DashboardProps) => {
   )
 
   const selectedConfig = useMemo(
-    () => config.get((selectedSubTab ?? selectedTab) as ExplorationResourceType),
+    () =>
+      config.get(
+        (selectedSubTab ?? selectedTab) as ExplorationResourceType,
+        selectedSubTab === ResourceType.PATIENT || selectedTab === ResourceType.PATIENT
+          ? { ...DISPLAY_OPTIONS, diagrams: true }
+          : undefined
+      ),
     [config, selectedSubTab, selectedTab]
   )
 

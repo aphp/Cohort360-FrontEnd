@@ -13,7 +13,6 @@ import { getCleanGroupId } from 'utils/paginationUtils'
 import ExplorationBoard from 'components/ExplorationBoard'
 import { MedicationLabel, ResourceType } from 'types/requestCriterias'
 import { PMSILabel } from 'types/patient'
-import { URLS } from 'types/exploration'
 import sideBarTransition from 'styles/sideBarTransition'
 import { TabsWrapper } from 'components/ui/Tabs'
 import { SidebarButton, SidebarWrapper } from 'components/ui/Sidebar/style'
@@ -221,11 +220,11 @@ const Patient = () => {
           )}
         </Grid>
 
-        {/* <SidebarWrapper anchor="right" keepMounted open={isSidebarOpened} onClose={() => setIsSidebarOpened(false)}>
+        <SidebarWrapper anchor="right" keepMounted open={isSidebarOpened} onClose={() => setIsSidebarOpened(false)}>
           <Grid container padding="10px 10px 0px 10px">
             {sidebarConfig && <ExplorationBoard config={sidebarConfig} />}
           </Grid>
-        </SidebarWrapper> */}
+        </SidebarWrapper>
       </Grid>
     </Grid>
   )

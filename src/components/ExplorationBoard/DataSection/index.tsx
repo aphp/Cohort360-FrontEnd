@@ -11,7 +11,7 @@ import PieChart from 'components/Dashboard/Preview/Charts/PieChart'
 import Timeline from 'components/Patient/MaternityTimeline'
 import { AgeRepartitionType, SimpleChartDataType } from 'types'
 import InfoCard from 'components/ui/Cards/InfoCard'
-import { Timeline as TimelineT, CountDisplay, Diagram, DiagramType, DisplayOptions } from 'types/exploration'
+import { Timeline as TimelineT, CountDisplay, Diagram, DiagramType, DisplayOptions, GAP } from 'types/exploration'
 import { Card } from 'types/card'
 import { StickyContainer } from 'components/ui/Pagination/styles'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -41,10 +41,10 @@ const DataSection = ({
 }: DataSectionProps) => {
   if (isLoading) return <CenteredCircularProgress />
   return (
-    <Grid container justifyContent="center" item xs={12}>
+    <Grid container justifyContent="center" item xs={12} gap={GAP}>
       {displayOptions.diagrams && (
         <AccordionWrapper defaultExpanded>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon htmlColor="#153D8A" />}>
             <Typography fontWeight={600} fontSize={16} color="#153D8A" fontFamily={"'Montserrat', sans-serif"}>
               Graphiques
             </Typography>
@@ -80,13 +80,7 @@ const DataSection = ({
           ))}
           {data.table && <DataTable value={data.table} orderBy={orderBy} onSort={onSort} />}
           <StickyContainer>
-            <Pagination
-              color="#5BC5F2"
-              count={pagination.total}
-              currentPage={pagination.currentPage}
-              onPageChange={onChangePage}
-              centered={true}
-            />
+            <Pagination count={pagination.total} currentPage={pagination.currentPage} onPageChange={onChangePage} />
           </StickyContainer>
         </Grid>
       )}

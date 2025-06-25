@@ -1,17 +1,26 @@
 import { Button, styled } from '@mui/material'
 
 type CustomProps = {
-  width: string
-  customVariant?: 'clear' | 'pink' | 'back'
+  width?: string
+  customVariant?: 'clear' | 'pink' | 'back' | 'secondary'
   small?: boolean
 }
 
-export const ButtonWrapper = styled(Button)<CustomProps>(({ width, customVariant, small }) => ({
+export const ButtonWrapper = styled(Button)<CustomProps>(({ width = '100%', customVariant, small }) => ({
   width: width,
   height: 30,
+  fontSize: 13,
   borderRadius: 25,
   ...(small && {
     fontSize: 12
+  }),
+  ...(customVariant === 'secondary' && {
+    backgroundColor: '#5BC5F2',
+    boxShadow: 'none',
+    '&.Mui-disabled': {
+      cursor: 'not-allowed',
+      pointerEvents: 'auto'
+    }
   }),
   ...(customVariant === 'pink' && {
     backgroundColor: '#ED6D91',

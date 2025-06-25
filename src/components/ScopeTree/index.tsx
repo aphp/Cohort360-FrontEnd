@@ -71,8 +71,6 @@ const ScopeTree = ({ baseTree, selectedNodes, sourceType, onSelect, sx }: ScopeT
               count={Math.ceil(hierarchy.count / LIMIT_PER_PAGE)}
               currentPage={hierarchy.page}
               onPageChange={onChangePage}
-              color="#0063AF"
-              centered
             />
           </Grid>
         )}

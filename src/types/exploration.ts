@@ -41,7 +41,12 @@ export enum URLS {
   PATIENT = 'patients_info'
 }
 
-export const GAP = '20px'
+export enum DataDisplayType {
+  LAYOUT = 'layout',
+  SIDEBAR = 'sidebar'
+}
+
+export const GAP = '16px'
 
 export type DisplayOptions = {
   myFilters: boolean

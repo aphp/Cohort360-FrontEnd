@@ -7,7 +7,14 @@ import SavedFilters from './SavedFilters'
 import { SelectedFilter } from 'hooks/filters/useSavedFilters'
 import { useSizeObserver } from 'hooks/ui/useSizeObserver'
 import OrderBy from './OrderBy'
-import { DisplayOptions, Search, AdditionalInfo, SearchWithFilters, CountDisplay } from 'types/exploration'
+import {
+  DisplayOptions,
+  Search,
+  AdditionalInfo,
+  SearchWithFilters,
+  CountDisplay,
+  DataDisplayType
+} from 'types/exploration'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 
 type SavedFiltersActions = {
@@ -30,6 +37,7 @@ type SearchSectionProps = {
   savedFiltersData: SavedFiltersData<Filters>
   displayOptions: DisplayOptions
   count: CountDisplay | null
+  display?: DataDisplayType
   onSearch: (search: SearchWithFilters) => void
 }
 
@@ -40,11 +48,12 @@ const SearchSection = ({
   savedFiltersData,
   displayOptions,
   count,
+  display = DataDisplayType.LAYOUT,
   onSearch
 }: SearchSectionProps) => {
   const {
     ref,
-    sizes: { isXS, isSM, isLG, isXL }
+    sizes: { isXS, isLG, isXL }
   } = useSizeObserver()
 
   const handleChangeFields = (search: Search) => {
@@ -54,7 +63,13 @@ const SearchSection = ({
 
   return (
     <Grid container justifyContent={'space-between'} ref={ref}>
-      <Grid container xs={12} lg={8} gap={isXS ? 1 : 0} spacing={isXS ? 0 : 1}>
+      <Grid
+        container
+        xs={12}
+        lg={display === DataDisplayType.SIDEBAR ? 12 : 8}
+        gap={isXS ? 1 : 0}
+        spacing={isXS ? 0 : 1}
+      >
         {displayOptions.search && (
           <Grid container item xs={isXS ? 12 : 8} alignItems={'center'}>
             <OccurrencesSearch search={searchCriterias} onChange={handleChangeFields} infos={infos} />
@@ -64,7 +79,7 @@ const SearchSection = ({
           <Grid container item xs={isXS ? 12 : 2} alignItems={'center'}>
             <FilterBy
               infos={infos}
-              filters={searchCriterias.filters as Filters}
+              filters={searchCriterias.filters}
               onSubmit={(newFilters) => onSearch({ filters: newFilters })}
             />
           </Grid>
@@ -75,21 +90,14 @@ const SearchSection = ({
           </Grid>
         )}
         {displayOptions.orderBy && (
-          // vvv TODO: trouver un cas où ça ss'affiche et checker
-          <Grid container item xs={isXS ? 12 : isSM ? 6 : 5} alignItems={'center'}>
+          <Grid container item xs={isXS ? 12 : 2} alignItems={'center'}>
             <OrderBy infos={infos} orderBy={searchCriterias.orderBy} onSubmit={(orderBy) => onSearch({ orderBy })} />
           </Grid>
         )}
       </Grid>
       <Grid container alignItems="center" xs={12} lg={4}>
         {displayOptions.count && count && (
-          <Grid
-            container
-            alignItems="center"
-            gap={1}
-            justifyContent={isLG || isXL ? 'flex-end' : 'flex-start'}
-            mt={isLG ? 0 : '12px'}
-          >
+          <Grid container alignItems="center" gap={1} justifyContent={isLG || isXL ? 'flex-end' : 'flex-start'}>
             {count[0].display && (
               <DisplayDigits nb={count[0].count.results} total={count[0].count.total} label={count[0].label} />
             )}

@@ -57,13 +57,15 @@ const SamplesTableContent: React.FC<SamplesTableContentProps> = ({
     [list, appConfig, cohortId, disabled]
   )
 
+  const rowsPerPage = 20
+
   return loading ? (
     <CenteredCircularProgress />
   ) : (
     <>
       <DataTable value={table} orderBy={order} onSort={(newOrder) => onChangeOrderBy(newOrder)} />
       <StickyContainer>
-        <Pagination color="#5BC5F2" count={total} currentPage={page} onPageChange={setPage} centered={true} />
+        <Pagination count={Math.ceil((total ?? 0) / rowsPerPage)} currentPage={page} onPageChange={setPage} />
       </StickyContainer>
     </>
   )

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Grid, Tooltip, Typography } from '@mui/material'
+import { Grid, Tooltip, Typography } from '@mui/material'
 import List from 'components/ui/List'
 import Modal from 'components/ui/Modal'
 import { DeleteOutline, SavedSearch, Visibility } from '@mui/icons-material'
@@ -8,6 +8,7 @@ import { Filters, SavedFiltersResults, SearchCriterias } from 'types/searchCrite
 import EditSavedFilter from './EditSavedFilter'
 import { useAppSelector } from 'state'
 import { AdditionalInfo } from 'types/exploration'
+import Button from 'components/ui/Button'
 
 type SavedFiltersProps = {
   selectedFilter: SelectedFilter<Filters> | null
@@ -49,14 +50,7 @@ const SavedFilters = ({
   }, [selectedItems])
   return (
     <>
-      <Button
-        size="small"
-        variant="contained"
-        fullWidth
-        startIcon={<SavedSearch height="15px" />}
-        onClick={() => setToggleModal(true)}
-        sx={{ backgroundColor: '#0063AF', color: '#FFF', height: '30px', boxShadow: 'none', borderRadius: 12 }}
-      >
+      <Button startIcon={<SavedSearch height="15px" />} onClick={() => setToggleModal(true)}>
         Mes filtres
       </Button>
       <Modal

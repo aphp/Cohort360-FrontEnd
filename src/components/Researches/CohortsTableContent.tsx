@@ -85,14 +85,18 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
     [cohortsList, simplified, appConfig, requestId, disabled]
   )
 
+  const rowsPerPage = simplified ? 5 : 20
+
   return loading ? (
     <CenteredCircularProgress />
   ) : (
     <>
       <DataTable value={table} orderBy={order} onSort={(newOrder) => onChangeOrderBy(newOrder)} />
-      <StickyContainer>
-        <Pagination color="#5BC5F2" count={total} currentPage={page} onPageChange={setPage} centered={true} />
-      </StickyContainer>
+      {!simplified && (
+        <StickyContainer>
+          <Pagination currentPage={page} count={Math.ceil((total ?? 0) / rowsPerPage)} onPageChange={setPage} />
+        </StickyContainer>
+      )}
     </>
   )
 }

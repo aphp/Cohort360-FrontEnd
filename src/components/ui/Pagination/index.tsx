@@ -10,19 +10,9 @@ type PaginationProps = {
   currentPage: number
   count: number
   onPageChange: (page: number) => void
-  smallSize?: boolean
-  centered?: boolean
-  color?: string
 }
 
-export const Pagination = ({
-  currentPage,
-  count,
-  onPageChange,
-  smallSize,
-  centered = false,
-  color = '#5BC5F2'
-}: PaginationProps) => {
+export const Pagination = ({ currentPage, count, onPageChange }: PaginationProps) => {
   const dispatch = useAppDispatch()
   const [goToPage, setGoToPage] = useState('')
   const config = useContext(AppConfig)
@@ -66,15 +56,8 @@ export const Pagination = ({
     }
   }
   return (
-    <Grid
-      container
-      direction={smallSize ? 'column' : 'row'}
-      justifyContent={centered ? 'center' : 'flex-end'}
-      alignItems="center"
-      xs={12}
-    >
+    <Grid container justifyContent={'center'} alignItems="center" xs={12}>
       <StyledPagination
-        elemcolor={color}
         role="search"
         shape="circular"
         count={count}
@@ -93,15 +76,14 @@ export const Pagination = ({
           }
         }}
       />
-      <Box display="flex" justifyContent={smallSize ? 'center' : 'flex-end'} alignItems="center">
+      <Box display="flex" alignItems="center">
         <FormLabel>Aller à la page</FormLabel>
         <PaginationInput
-          elemcolor={color}
           value={goToPage}
           onChange={(newValue) => setGoToPage(newValue as string)}
           onKeyDown={handleKeyDown}
         />
-        <StyledButton onClick={submitPageChange} elemcolor={color}>
+        <StyledButton onClick={submitPageChange}>
           <ArrowCircleRightIcon />
         </StyledButton>
       </Box>
