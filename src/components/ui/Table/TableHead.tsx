@@ -1,6 +1,16 @@
 import React from 'react'
 import { Column } from 'types/table'
-import { SxProps, TableCell, TableHead as TableHeadMui, TableRow, TableSortLabel, Theme } from '@mui/material'
+import {
+  Box,
+  SxProps,
+  TableCell,
+  TableHead as TableHeadMui,
+  TableRow,
+  TableSortLabel,
+  Theme,
+  Tooltip
+} from '@mui/material'
+import InfoIcon from '@mui/icons-material/Info'
 import { Direction, Order, OrderBy } from 'types/searchCriterias'
 
 type RowProps = {
@@ -43,6 +53,13 @@ const TableHead = ({ columns, orderBy, sx, onSort }: RowProps) => {
               >
                 {col.label}
               </TableSortLabel>
+            ) : col.tooltip ? (
+              <Box display="flex" alignItems="center" gap={0.2}>
+                {col.label}
+                <Tooltip title={col.tooltip}>
+                  <InfoIcon fontSize="small" htmlColor="#5bc5f4" />
+                </Tooltip>
+              </Box>
             ) : (
               col.label
             )}

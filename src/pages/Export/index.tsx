@@ -127,11 +127,9 @@ const Export = () => {
       {pagination.total && (
         <StickyContainer container>
           <Pagination
-            color="#303030"
             count={pagination.total}
             currentPage={pagination.current}
             onPageChange={(page) => handleSearch({ page })}
-            centered={true}
           />
         </StickyContainer>
       )}

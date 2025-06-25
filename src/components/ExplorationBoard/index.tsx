@@ -7,8 +7,9 @@ import { useData } from './useData'
 import DataSection from './DataSection'
 import { FetchStatus } from 'types'
 import { AlertWrapper } from 'components/ui/Alert'
-import { GAP, ExplorationConfig } from 'types/exploration'
+import { GAP, ExplorationConfig, DataDisplayType } from 'types/exploration'
 import { useSearchParams } from 'react-router-dom'
+import WarningIcon from 'assets/icones/warning.svg?react'
 
 type ExplorationBoardProps<T> = {
   config: ExplorationConfig<T>
@@ -30,11 +31,16 @@ const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
     onSaveFilter,
     resetFetchStatus
   } = useExplorationBoard(config)
-
   const { count, pagination, data, dataLoading, onChangePage } = useData(config, searchCriterias, pageFromUrl)
 
   return (
-    <Grid item xs={12} container gap={GAP} sx={{ backgroundColor: '#fff' }}>
+    <Grid item xs={12} container gap={GAP} margin={'16px 0'} sx={{ backgroundColor: '#fff' }}>
+      {config.getMessages &&
+        config.getMessages().map((msg, index) => (
+          <AlertWrapper key={index} icon={<WarningIcon />}>
+            {msg}
+          </AlertWrapper>
+        ))}
       <SearchSection
         searchCriterias={searchCriterias}
         infos={additionalInfo}
@@ -42,6 +48,8 @@ const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
         savedFiltersActions={savedFiltersActions}
         savedFiltersData={savedFiltersData}
         displayOptions={config.displayOptions}
+        count={count}
+        display={data.cards.length > 0 ? DataDisplayType.SIDEBAR : DataDisplayType.LAYOUT}
       />
       {config.displayOptions.criterias && (
         <CriteriasSection
@@ -51,12 +59,6 @@ const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
           displayOptions={config.displayOptions}
         />
       )}
-      {config.getMessages &&
-        config.getMessages().map((msg, index) => (
-          <AlertWrapper key={index} severity="warning" sx={{ color: '#000' }}>
-            {msg}
-          </AlertWrapper>
-        ))}
       <DataSection
         isLoading={dataLoading}
         data={data}
