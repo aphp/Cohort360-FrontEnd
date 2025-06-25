@@ -13,6 +13,10 @@ const AccordionWrapper = styled(Accordion)(() => ({
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12
   },
+  '&.MuiAccordion-root:last-of-type': {
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12
+  },
   '&.Mui-expanded': {
     margin: 0
   }

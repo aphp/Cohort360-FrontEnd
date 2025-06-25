@@ -48,7 +48,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
   } = useSizeObserver()
 
   return (
-    <Grid container justifyContent={'space-between'} alignItems={'center'}>
+    <Grid container justifyContent={'space-between'} alignItems={'center'} gap={2}>
       <Grid container justifyContent={'space-between'} ref={ref}>
         <Grid container xs={12} lg={8} gap={isXS ? 1 : '4px'} spacing={isXS ? 0 : 1}>
           {onFilter && (

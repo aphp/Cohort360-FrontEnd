@@ -10,17 +10,21 @@ type CohortInfoProps = {
 }
 
 const CohortInfo: React.FC<CohortInfoProps> = ({ id, label, total, loading }) => {
-  return loading ? (
-    <Skeleton width={100} />
-  ) : (
-    <Box id={id} display="flex" alignItems="center" gap={1}>
-      <Typography fontFamily={"'Montserrat', sans-serif"} fontSize={13} color={'#222'}>
-        {label} :
-      </Typography>
-      <Typography fontFamily={"'Montserrat', sans-serif"} fontSize={14} fontWeight={700} color={'#153D8A'}>
-        {total}
-      </Typography>
-    </Box>
+  return (
+    <>
+      {loading ? (
+        <Skeleton width={100} />
+      ) : (
+        <Box id={id} display="flex" alignItems="center" gap={1}>
+          <Typography fontFamily={"'Montserrat', sans-serif"} fontSize={13} color={'#222'}>
+            {label} :
+          </Typography>
+          <Typography fontFamily={"'Montserrat', sans-serif"} fontSize={14} fontWeight={700} color={'#153D8A'}>
+            {total}
+          </Typography>
+        </Box>
+      )}
+    </>
   )
 }
 
