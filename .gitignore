@@ -7,6 +7,9 @@
 /coverage
 /reports
 
+# documentation
+/docs
+
 # production
 /build
 
@@ -35,3 +38,6 @@ public/config.local.json
 public/config.example.json
 public/config.qualif.json
 *storybook.log
+
+# Agent IA
+CLAUDE.md

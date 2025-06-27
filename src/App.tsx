@@ -18,7 +18,13 @@ import 'moment/dist/locale/fr'
 moment.locale('fr')
 
 const queryClient = new QueryClient()
-
+/**
+ * @description The main application component that sets up the
+ * Redux store
+ * React Query client
+ * Localization provider
+ * Routing.
+ */
 const App = () => (
   <LocalizationProvider dateAdapter={MomentUtils}>
     <Provider store={store}>
