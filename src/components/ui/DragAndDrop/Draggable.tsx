@@ -1,7 +1,7 @@
-import React, { PropsWithChildren, useEffect } from 'react'
+import React, { PropsWithChildren, useCallback, useEffect, useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { DraggableWrapper, DroppableWrapper, InvisibleWrapper } from './styles'
+import { DraggableWrapper, DroppableWrapper } from './styles'
 import { createPortal } from 'react-dom'
 
 type DraggableProps<T> = {
@@ -18,37 +18,51 @@ const Draggable = <T,>({ children, data, disabled = false }: PropsWithChildren<D
   const droppableWrapper = document.getElementById(`droppable-wrapper-${index}`)
   const isDragging = activeIndex > -1
   const isActive = activeIndex === index
-  const isInvisible = disabled && data.groupId !== active?.data.current?.groupId && !isOver
-  /*activeIndex < 0 && !isOver &&
-    (!isDragging || (active && active?.data.current?.groupId === over?.data.current?.groupId)) /*&&
-    active?.data.current?.groupId !== over?.data.current?.groupId //disabled /*&& (activeIndex < 0 || active?.data.current?.groupId === over?.data.current?.groupId)*/
-  const isPresent = !disabled || (disabled && data.groupId !== active?.data.current?.groupId)
+  const [prevOver, setPrevOver] = useState(over?.data.current?.groupId ?? null)
+  const [visible, setVisible] = useState(false)
+
+  const handleVisible = useCallback(() => {
+    if (!isDragging || !over || !active) return false
+    if (data.groupId === over.data.current?.groupId && data.groupId !== active.data.current?.groupId) {
+      if (over.data.current?.groupId < prevOver && typeof data.id === 'string' && data.id.includes('start')) {
+        console.log('test start', over.data.current?.groupId, prevOver, data.id)
+        return true
+      } else if (over.data.current?.groupId > prevOver && typeof data.id === 'string' && data.id.includes('end')) {
+        console.log('test end', over.data.current?.groupId, prevOver, data.id)
+        return true
+      }
+    }
+    return false
+  }, [active, data.groupId, data.id, isDragging, over, prevOver])
 
   useEffect(() => {
-    if (over?.data.current.groupId === -1 && active?.data.current.groupId === 0 && isOver)
-      console.log('invisible', isInvisible)
-  }, [over])
+    setVisible(handleVisible())
+    setPrevOver(over?.data.current?.groupId ?? null)
+  }, [over?.data.current?.groupId, handleVisible])
+
+  useEffect(() => {
+    if (visible) console.log('isVisible', data.id, data.groupId)
+  }, [visible])
 
   return (
-    <div style={{ position: 'relative', zIndex: isInvisible ? 1 : 3 }}>
-      <div id={`droppable-wrapper-${index}`}></div>
-      {isOver && droppableWrapper && createPortal(<DroppableWrapper>{children}</DroppableWrapper>, droppableWrapper)}
-      {isPresent && (
-        <DraggableWrapper
-          ref={setNodeRef}
-          style={{
-            transform: CSS.Translate.toString(transform)
-          }}
-          isDragging={isDragging}
-          isActive={isActive}
-          //isPresent={isPresent}
-          isInvisible={isInvisible}
-          {...attributes}
-          {...listeners}
-        >
-          {children}
-        </DraggableWrapper>
-      )}
+    <div style={{ position: 'relative', zIndex: disabled ? 1 : 3 }}>
+      <div id={`droppable-wrapper-${index}`} />
+      {isOver &&
+        (!disabled || (disabled && visible)) &&
+        droppableWrapper &&
+        createPortal(<DroppableWrapper>{children}</DroppableWrapper>, droppableWrapper)}
+      <DraggableWrapper
+        ref={setNodeRef}
+        style={{ transform: CSS.Translate.toString(transform) }}
+        isDragging={isDragging}
+        isActive={isActive}
+        visible={visible}
+        disabled={disabled}
+        {...attributes}
+        {...listeners}
+      >
+        {children}
+      </DraggableWrapper>
     </div>
   )
 }

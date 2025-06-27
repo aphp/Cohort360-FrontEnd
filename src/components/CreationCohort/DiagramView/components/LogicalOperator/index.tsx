@@ -71,7 +71,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
       if (foundItem) toDisplay.push(foundItem)
     })
     const filtered = toDisplay.filter((item) => item.id > 0)
-    const end = /*filtered.length ? [{ id: `end-${itemId * -1}`, title: 'test', type: CriteriaType.OBSERVATION }] :*/ []
+    const end = filtered.length ? [{ id: `end-${itemId * -1}`, title: 'test', type: CriteriaType.OBSERVATION }] : []
     return [
       { id: `start-${itemId * -1}`, title: 'test', type: CriteriaType.OBSERVATION },
       ...filtered,

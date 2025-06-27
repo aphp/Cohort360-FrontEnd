@@ -7,7 +7,6 @@ type ExtendedWrapperProps = {
 export const CriteriaWrapper = styled(Grid)(() => ({
   borderRadius: 4,
   padding: 8,
-  // marginTop: 12,
   minWidth: 400,
   maxWidth: 930,
   position: 'relative',
