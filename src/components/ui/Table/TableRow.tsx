@@ -1,5 +1,17 @@
 import React, { Fragment, ReactElement, useState } from 'react'
-import { CellType, Row, Link, Document, Table as TableType, Line, Status, SubItem, Favorite, Action } from 'types/table'
+import {
+  CellType,
+  Row,
+  Link,
+  Document,
+  Table as TableType,
+  Line,
+  Status,
+  SubItem,
+  Favorite,
+  Action,
+  CheckboxAction
+} from 'types/table'
 import {
   Checkbox,
   Collapse,
@@ -48,7 +60,7 @@ const TableRow = ({ row, sx }: RowProps) => {
 
   return (
     <>
-      <TableRowMui sx={{ ...sx }}>
+      <TableRowMui sx={{ ...sx, cursor: row._onClick ? 'pointer' : 'inherit' }} onClick={row._onClick}>
         {row.map((cell, index) => {
           if (cell.isHidden) return <Fragment key={index} />
           return (
@@ -76,19 +88,19 @@ const TableRow = ({ row, sx }: RowProps) => {
               {cell.type === CellType.CHECKBOX && (
                 <Checkbox
                   size="small"
-                  // checked={isChecked(cohort, selectedCohorts)}
-                  // onClick={(event) => {
-                  //   event.stopPropagation()
-                  //   onSelectCohort(cohort)
-                  // }}
+                  checked={(cell.value as CheckboxAction).isChecked}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    ;(cell.value as CheckboxAction).onClick()
+                  }}
                 />
               )}
               {cell.type === CellType.FAV_ICON && (
                 <IconButton
-                  // onClick={(event) => {
-                  //   event.stopPropagation()
-                  //   onClickFav(cohort)
-                  // }}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    ;(cell.value as Favorite).onClick()
+                  }}
                   disabled={(cell.value as Favorite).disabled}
                 >
                   <FavStar

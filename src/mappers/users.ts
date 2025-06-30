@@ -2,7 +2,7 @@ import { User } from 'types'
 import { Action, CellType, Row, Table } from 'types/table'
 import DeleteIcon from '@mui/icons-material/Delete'
 
-const mapUsersToRows = (list: User[]) => {
+const mapUsersToRows = (list: User[], deleteItem: (user: User) => void) => {
   const rows: Row[] = []
   list.forEach((user) => {
     const row: Row = [
@@ -28,7 +28,7 @@ const mapUsersToRows = (list: User[]) => {
           {
             title: "Supprimer l'utilisateur",
             icon: DeleteIcon,
-            onClick: () => {}
+            onClick: () => deleteItem(user)
           }
         ] as Action[],
         type: CellType.ACTIONS
@@ -52,9 +52,9 @@ const mapUsersToColumns = () => {
   return columns
 }
 
-export const mapUsersToTable = (list: User[]): Table => {
+export const mapUsersToTable = (list: User[], deleteItem: (user: User) => void): Table => {
   const table: Table = { rows: [], columns: [] }
   table.columns = mapUsersToColumns()
-  table.rows = mapUsersToRows(list)
+  table.rows = mapUsersToRows(list, deleteItem)
   return table
 }

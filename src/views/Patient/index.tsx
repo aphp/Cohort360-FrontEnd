@@ -208,7 +208,6 @@ const Patient = () => {
           {selectedTab === ResourceType.TIMELINE && (
             <PatientTimeline
               loadingPmsi={(patient?.pmsi?.procedure?.loading || patient?.pmsi?.condition?.loading) ?? false}
-              documents={patient?.documents?.list ?? []}
               hospits={patient?.hospits?.list ?? []}
               consults={patient?.pmsi?.procedure?.list ?? []}
               diagnostics={patient?.pmsi?.condition?.list ?? []}

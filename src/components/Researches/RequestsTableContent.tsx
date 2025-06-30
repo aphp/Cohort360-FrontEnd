@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
@@ -9,6 +9,7 @@ import { StickyContainer } from 'components/ui/Pagination/styles'
 import { RequestType } from 'types'
 import { OrderBy } from 'types/searchCriterias'
 import { mapRequestsToTable } from 'mappers/requests'
+import { cleanSearchParams } from 'utils/explorationUtils'
 
 type RequestsTableContentProps = {
   requestsList: RequestType[]
@@ -25,6 +26,15 @@ type RequestsTableContentProps = {
   onSelectAll: () => void
   disabled: boolean
   simplified?: boolean
+}
+
+export type RequestsCallbacks = {
+  onSelectRequest: (request: RequestType) => void
+  onShareRequest: (request: RequestType) => void
+  onClickEdit: (request: RequestType) => void
+  onSelectAll: () => void
+  onClickCohorts: (request: RequestType) => void
+  onClickRow: (request: RequestType) => void
 }
 
 const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
@@ -46,9 +56,41 @@ const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
   const navigate = useNavigate()
   const { projectId } = useParams()
 
+  const onClickRow = useCallback(
+    (request: RequestType) => {
+      navigate(`/cohort/new/${request.uuid}`)
+    },
+    [navigate]
+  )
+
+  const onClickCohorts = useCallback(
+    (request: RequestType) => {
+      const cleanedSearchParams = cleanSearchParams(new URLSearchParams(location.search)).toString()
+      const cleanedSearch = cleanedSearchParams ? `?${cleanedSearchParams}` : ''
+      navigate(
+        projectId
+          ? `/researches/projects/${projectId}/${request.uuid}${cleanedSearch}`
+          : `/researches/requests/${request.uuid}${cleanedSearch}`
+      )
+    },
+    [navigate, projectId]
+  )
+
+  const callbacks = useMemo(
+    () => ({
+      onSelectRequest,
+      onShareRequest,
+      onClickEdit,
+      onSelectAll,
+      onClickCohorts,
+      onClickRow
+    }),
+    [onSelectRequest, onShareRequest, onClickEdit, onSelectAll, onClickCohorts, onClickRow]
+  )
+
   const table = useMemo(
-    () => mapRequestsToTable(requestsList, simplified, projectId, disabled),
-    [requestsList, simplified, projectId, disabled]
+    () => mapRequestsToTable(requestsList, simplified, callbacks, selectedRequests, projectId, disabled),
+    [requestsList, simplified, callbacks, selectedRequests, projectId, disabled]
   )
 
   const rowsPerPage = simplified ? 5 : 20

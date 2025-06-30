@@ -6,6 +6,8 @@ import { getCohortTotal, getRequestName } from 'utils/explorationUtils'
 import { formatDate } from 'utils/formatDate'
 import EditIcon from '@mui/icons-material/Edit'
 import ShareIcon from '@mui/icons-material/Share'
+import { RequestsCallbacks } from 'components/Researches/RequestsTableContent'
+import { isChecked } from 'utils/filters'
 
 const getRequestsInfos = (request: RequestType) => {
   const name = getRequestName(request) ?? 'N/A'
@@ -16,21 +18,29 @@ const getRequestsInfos = (request: RequestType) => {
   return { name, parentName, updatedAt, cohorts }
 }
 
-const mapRequestsToRows = (list: RequestType[], simplified: boolean, requestId?: string, disabled = false) => {
+const mapRequestsToRows = (
+  list: RequestType[],
+  simplified: boolean,
+  callbacks: RequestsCallbacks,
+  selectedRequests: RequestType[],
+  requestId?: string,
+  disabled = false
+) => {
   const rows: Row[] = []
   list.forEach((request) => {
     const { name, parentName, updatedAt, cohorts } = getRequestsInfos(request)
+    const { onSelectRequest, onShareRequest, onClickEdit, onClickCohorts, onClickRow } = callbacks
     const actions = [
       {
         title: 'Partager la requête',
         icon: ShareIcon,
-        onClick: () => {},
+        onClick: () => onShareRequest(request),
         disabled: disabled || request.query_snapshots?.length === 0
       },
       {
         title: 'Éditer la requête',
         icon: EditIcon,
-        onClick: () => {},
+        onClick: () => onClickEdit(request),
         disabled: disabled
       }
     ]
@@ -39,7 +49,11 @@ const mapRequestsToRows = (list: RequestType[], simplified: boolean, requestId?:
         ? [
             {
               id: `${request.uuid}-select`,
-              value: '',
+              value: {
+                disabled,
+                onClick: () => onSelectRequest(request),
+                isChecked: isChecked(request, selectedRequests)
+              },
               type: CellType.CHECKBOX
             }
           ]
@@ -67,19 +81,38 @@ const mapRequestsToRows = (list: RequestType[], simplified: boolean, requestId?:
       },
       {
         id: `${request.uuid}-cohorts`,
-        value: { label: SubItemType.COHORTS, total: cohorts, onClick: () => {} } as SubItem,
+        value: { label: SubItemType.COHORTS, total: cohorts, onClick: () => onClickCohorts(request) } as SubItem,
         type: CellType.SUB_ITEM
       }
     ]
+    row._onClick = () => onClickRow(request)
     rows.push(row)
   })
 
   return rows
 }
 
-const mapRequestsToColumns = (simplified: boolean, projectId?: string): Column[] => {
+const mapRequestsToColumns = (
+  simplified: boolean,
+  requestsList: RequestType[],
+  selectedRequests: RequestType[],
+  onSelectAll: () => void,
+  projectId?: string
+): Column[] => {
   const columns: Column[] = [
-    ...(!simplified ? [{ label: '' }] : []),
+    ...(!simplified
+      ? [
+          {
+            label: '',
+            isCheckbox: true,
+            checkboxProps: {
+              isChecked: selectedRequests.length === requestsList.length,
+              isIndeterminate: selectedRequests.length > 0 && selectedRequests.length < requestsList.length,
+              onSelectAll
+            }
+          }
+        ]
+      : []),
     { label: ResearchesTableLabels.REQUEST_NAME, align: 'left', code: !simplified ? Order.NAME : undefined },
     { label: '', align: 'left' },
     ...(!projectId
@@ -95,11 +128,13 @@ const mapRequestsToColumns = (simplified: boolean, projectId?: string): Column[]
 export const mapRequestsToTable = (
   list: RequestType[],
   simplified: boolean,
+  callbacks: RequestsCallbacks,
+  selectedRequests: RequestType[],
   projectId?: string,
   disabled = false
 ): Table => {
   const table: Table = { rows: [], columns: [] }
-  table.columns = mapRequestsToColumns(simplified, projectId)
-  table.rows = mapRequestsToRows(list, simplified, projectId, disabled)
+  table.columns = mapRequestsToColumns(simplified, list, selectedRequests, callbacks.onSelectAll, projectId)
+  table.rows = mapRequestsToRows(list, simplified, callbacks, selectedRequests, projectId, disabled)
   return table
 }

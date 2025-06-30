@@ -17,8 +17,6 @@ type UsersTableProps = {
 }
 
 const UsersTable: React.FC<UsersTableProps> = ({ usersList, loading, usersAssociated, onChangeUsersAssociated }) => {
-  const table = mapUsersToTable(usersList)
-
   const deleteItem = (user: User) => {
     const _usersAssociatedCopy = usersAssociated ?? []
 
@@ -29,6 +27,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ usersList, loading, usersAssoci
 
     onChangeUsersAssociated('usersAssociated', _usersAssociatedCopy)
   }
+
+  const table = mapUsersToTable(usersList, deleteItem)
 
   return loading ? <CenteredCircularProgress /> : <DataTable value={table} />
 }

@@ -2,6 +2,7 @@ import React from 'react'
 import { Column } from 'types/table'
 import {
   Box,
+  Checkbox,
   SxProps,
   TableCell,
   TableHead as TableHeadMui,
@@ -20,15 +21,50 @@ type RowProps = {
   onSort?: (orderBy: OrderBy) => void
 }
 
-const TableHead = ({ columns, orderBy, sx, onSort }: RowProps) => {
-  const handleChangeSort = (property: Order) => {
-    if (onSort)
-      onSort({
-        orderBy: property,
-        orderDirection: orderBy?.orderDirection === Direction.ASC ? Direction.DESC : Direction.ASC
-      })
+export const renderTableHeadCellContent = (col: Column, orderBy?: OrderBy, onSort?: (orderBy: OrderBy) => void) => {
+  if (col.isCheckbox) {
+    return (
+      <Checkbox
+        size="small"
+        checked={col.checkboxProps?.isChecked}
+        indeterminate={col.checkboxProps?.isIndeterminate}
+        onChange={col.checkboxProps?.onSelectAll}
+      />
+    )
   }
 
+  if (orderBy && col.code) {
+    const isActive = orderBy.orderBy === col.code
+    const direction = isActive && orderBy.orderDirection === Direction.DESC ? Direction.DESC : Direction.ASC
+    const handleClick = () => {
+      onSort?.({
+        orderBy: col.code as Order,
+        orderDirection: isActive && direction === Direction.ASC ? Direction.DESC : Direction.ASC
+      })
+    }
+
+    return (
+      <TableSortLabel active={isActive} direction={direction} onClick={handleClick}>
+        {col.label}
+      </TableSortLabel>
+    )
+  }
+
+  if (col.tooltip) {
+    return (
+      <Box display="flex" alignItems="center" gap={0.2}>
+        {col.label}
+        <Tooltip title={col.tooltip}>
+          <InfoIcon fontSize="small" htmlColor="#5bc5f4" />
+        </Tooltip>
+      </Box>
+    )
+  }
+
+  return col.label
+}
+
+const TableHead = ({ columns, orderBy, sx, onSort }: RowProps) => {
   return (
     <TableHeadMui>
       <TableRow sx={{ ...sx }}>
@@ -42,27 +78,10 @@ const TableHead = ({ columns, orderBy, sx, onSort }: RowProps) => {
               ...sx
             }}
             size="small"
-            key={col.label}
+            key={index}
             align={col.align ?? 'left'}
           >
-            {orderBy && col.code ? (
-              <TableSortLabel
-                active={orderBy.orderBy === col.code}
-                direction={orderBy.orderBy === col.code ? orderBy?.orderDirection : Direction.ASC}
-                onClick={() => handleChangeSort(col.code as Order)}
-              >
-                {col.label}
-              </TableSortLabel>
-            ) : col.tooltip ? (
-              <Box display="flex" alignItems="center" gap={0.2}>
-                {col.label}
-                <Tooltip title={col.tooltip}>
-                  <InfoIcon fontSize="small" htmlColor="#5bc5f4" />
-                </Tooltip>
-              </Box>
-            ) : (
-              col.label
-            )}
+            {renderTableHeadCellContent(col, orderBy, onSort)}
           </TableCell>
         ))}
       </TableRow>

@@ -1,5 +1,5 @@
 import { AppConfig } from 'config'
-import { mapCohortStatus } from 'components/Researches/CohortsTableContent'
+import { CohortCallbacks, mapCohortStatus } from 'components/Researches/CohortsTableContent'
 import { Cohort } from 'types'
 import { ResearchesTableLabels } from 'types/cohorts'
 import { Order } from 'types/searchCriterias'
@@ -10,6 +10,7 @@ import { format } from 'utils/numbers'
 import Download from 'assets/icones/download.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
 import FluentNavigation from 'assets/icones/fluent_navigation.svg?react'
+import { isChecked } from 'utils/filters'
 
 const getSamplesInfos = (cohort: Cohort) => {
   const name = cohort.name ?? 'N/A'
@@ -32,39 +33,51 @@ const getSamplesInfos = (cohort: Cohort) => {
   }
 }
 
-const mapSamplesToRows = (list: Cohort[], appConfig: AppConfig, requestId?: string, disabled = false) => {
+const mapSamplesToRows = (
+  list: Cohort[],
+  appConfig: AppConfig,
+  callbacks: CohortCallbacks,
+  selectedCohorts: Cohort[],
+  requestId?: string,
+  disabled = false
+) => {
   const rows: Row[] = []
   list.forEach((cohort) => {
     const { name, parentName, statusChip, total, createdAt, samplingRatio } = getSamplesInfos(cohort)
+    const { onClickRow, onClickFav, onClickExport, onClickEdit, onSelectCohort, onClickCohortVersion } = callbacks
     const actions = [
       {
         title: getExportTooltip(isCohortExportable(cohort, appConfig), cohort) ?? '',
         icon: Download,
-        onClick: () => {},
+        onClick: () => onClickExport(cohort),
         disabled: isExportDisabled(cohort, disabled, isCohortExportable(cohort, appConfig))
       },
       {
         title: 'Accéder à la version de la requête ayant créé la cohorte',
         icon: FluentNavigation,
-        onClick: () => {},
+        onClick: () => onClickCohortVersion(cohort),
         disabled: disabled
       },
       {
         title: 'Éditer la cohorte',
         icon: EditIcon,
-        onClick: () => {},
+        onClick: () => onClickEdit(cohort),
         disabled: disabled
       }
     ]
     const row: Row = [
       {
         id: `${cohort.uuid}-select`,
-        value: '',
+        value: {
+          disabled,
+          onClick: () => onSelectCohort(cohort),
+          isChecked: isChecked(cohort, selectedCohorts)
+        },
         type: CellType.CHECKBOX
       },
       {
         id: `${cohort.uuid}-isFavorite`,
-        value: { isFavorite: cohort.favorite, disabled } as Favorite,
+        value: { isFavorite: cohort.favorite, disabled, onClick: () => onClickFav(cohort) } as Favorite,
         type: CellType.FAV_ICON
       },
       {
@@ -104,15 +117,29 @@ const mapSamplesToRows = (list: Cohort[], appConfig: AppConfig, requestId?: stri
         type: CellType.TEXT
       }
     ]
+    row._onClick = () => onClickRow(cohort)
     rows.push(row)
   })
 
   return rows
 }
 
-const mapSamplesToColumns = (cohortId?: string): Column[] => {
+const mapSamplesToColumns = (
+  samplesList: Cohort[],
+  selectedCohorts: Cohort[],
+  onSelectAll: () => void,
+  cohortId?: string
+): Column[] => {
   const columns: Column[] = [
-    { label: '' },
+    {
+      label: '',
+      isCheckbox: true,
+      checkboxProps: {
+        isChecked: selectedCohorts.length === samplesList.length,
+        isIndeterminate: selectedCohorts.length > 0 && selectedCohorts.length < samplesList.length,
+        onSelectAll
+      }
+    },
     { label: '', code: Order.FAVORITE },
     { label: ResearchesTableLabels.SAMPLE_NAME, code: Order.NAME, align: 'left' },
     { label: '' },
@@ -129,11 +156,13 @@ const mapSamplesToColumns = (cohortId?: string): Column[] => {
 export const mapSamplesToTable = (
   list: Cohort[],
   appConfig: AppConfig,
-  requestId?: string,
+  callbacks: CohortCallbacks,
+  selectedCohorts: Cohort[],
+  cohortId?: string,
   disabled = false
 ): Table => {
   const table: Table = { rows: [], columns: [] }
-  table.columns = mapSamplesToColumns(requestId)
-  table.rows = mapSamplesToRows(list, appConfig, requestId, disabled)
+  table.columns = mapSamplesToColumns(list, selectedCohorts, callbacks.onSelectAll, cohortId)
+  table.rows = mapSamplesToRows(list, appConfig, callbacks, selectedCohorts, cohortId, disabled)
   return table
 }

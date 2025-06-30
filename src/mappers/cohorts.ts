@@ -1,4 +1,4 @@
-import { mapCohortStatus } from 'components/Researches/CohortsTableContent'
+import { CohortCallbacks, mapCohortStatus } from 'components/Researches/CohortsTableContent'
 import { Cohort, JobStatus } from 'types'
 import { ResearchesTableLabels, SubItemType } from 'types/cohorts'
 import { Order } from 'types/searchCriterias'
@@ -11,6 +11,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import FluentNavigation from 'assets/icones/fluent_navigation.svg?react'
 import Picker from 'assets/icones/color-picker.svg?react'
 import { AppConfig } from 'config'
+import { isChecked } from 'utils/filters'
 
 const getCohortInfos = (cohort: Cohort) => {
   const name = cohort.name ?? 'N/A'
@@ -28,35 +29,47 @@ const mapCohortsToRows = (
   list: Cohort[],
   appConfig: AppConfig,
   simplified: boolean,
+  callbacks: CohortCallbacks,
+  selectedCohorts: Cohort[],
   requestId?: string,
   disabled = false
 ) => {
   const rows: Row[] = []
   list.forEach((cohort) => {
     const { name, parentName, statusChip, total, globalTotal, createdAt, samples } = getCohortInfos(cohort)
+    const {
+      onClickCreateSample,
+      onClickRow,
+      onClickFav,
+      onClickExport,
+      onClickEdit,
+      onSelectCohort,
+      onClickCohortVersion,
+      onClickSamples
+    } = callbacks
     const actions = [
       {
         title: getExportTooltip(isCohortExportable(cohort, appConfig), cohort) ?? '',
         icon: Download,
-        onClick: () => {},
+        onClick: () => onClickExport(cohort),
         disabled: isExportDisabled(cohort, disabled, isCohortExportable(cohort, appConfig))
       },
       {
         title: 'Créer un échantillon à partir de la cohorte',
         icon: Picker,
-        onClick: () => {},
+        onClick: () => onClickCreateSample(cohort),
         disabled: disabled || cohort.request_job_status !== JobStatus.FINISHED
       },
       {
         title: 'Accéder à la version de la requête ayant créé la cohorte',
         icon: FluentNavigation,
-        onClick: () => {},
+        onClick: () => onClickCohortVersion(cohort),
         disabled: disabled
       },
       {
         title: 'Éditer la cohorte',
         icon: EditIcon,
-        onClick: () => {},
+        onClick: () => onClickEdit(cohort),
         disabled: disabled
       }
     ]
@@ -65,14 +78,22 @@ const mapCohortsToRows = (
         ? [
             {
               id: `${cohort.uuid}-select`,
-              value: '',
+              value: {
+                disabled,
+                onClick: () => onSelectCohort(cohort),
+                isChecked: isChecked(cohort, selectedCohorts)
+              },
               type: CellType.CHECKBOX
             }
           ]
         : []),
       {
         id: `${cohort.uuid}-isFavorite`,
-        value: { isFavorite: cohort.favorite, disabled } as Favorite,
+        value: {
+          isFavorite: cohort.favorite,
+          disabled,
+          onClick: () => onClickFav(cohort)
+        } as Favorite,
         type: CellType.FAV_ICON
       },
       {
@@ -113,19 +134,38 @@ const mapCohortsToRows = (
       },
       {
         id: `${cohort.uuid}-samples`,
-        value: { label: SubItemType.SAMPLES, total: samples, onClick: () => {} } as SubItem,
+        value: { label: SubItemType.SAMPLES, total: samples, onClick: () => onClickSamples(cohort) } as SubItem,
         type: CellType.SUB_ITEM
       }
     ]
+    row._onClick = () => onClickRow(cohort)
     rows.push(row)
   })
 
   return rows
 }
 
-const mapCohortsToColumns = (simplified: boolean, requestId?: string): Column[] => {
+const mapCohortsToColumns = (
+  simplified: boolean,
+  cohortsList: Cohort[],
+  selectedCohorts: Cohort[],
+  onSelectAll: () => void,
+  requestId?: string
+): Column[] => {
   const columns: Column[] = [
-    ...(!simplified ? [{ label: '' }] : []),
+    ...(!simplified
+      ? [
+          {
+            label: '',
+            isCheckbox: true,
+            checkboxProps: {
+              isChecked: selectedCohorts.length === cohortsList.length,
+              isIndeterminate: selectedCohorts.length > 0 && selectedCohorts.length < cohortsList.length,
+              onSelectAll
+            }
+          }
+        ]
+      : []),
     { label: '', code: !simplified ? Order.FAVORITE : undefined },
     { label: ResearchesTableLabels.COHORT_NAME, code: !simplified ? Order.NAME : undefined, align: 'left' },
     { label: '' },
@@ -150,11 +190,13 @@ export const mapCohortsToTable = (
   list: Cohort[],
   simplified: boolean,
   appConfig: AppConfig,
+  callbacks: CohortCallbacks,
+  selectedCohorts: Cohort[],
   requestId?: string,
   disabled = false
 ): Table => {
   const table: Table = { rows: [], columns: [] }
-  table.columns = mapCohortsToColumns(simplified, requestId)
-  table.rows = mapCohortsToRows(list, appConfig, simplified, requestId, disabled)
+  table.columns = mapCohortsToColumns(simplified, list, selectedCohorts, callbacks.onSelectAll, requestId)
+  table.rows = mapCohortsToRows(list, appConfig, simplified, callbacks, selectedCohorts, requestId, disabled)
   return table
 }

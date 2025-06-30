@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useCallback, useContext, useMemo } from 'react'
 import { AppConfig } from 'config'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -10,15 +10,7 @@ import { mapSamplesToTable } from 'mappers/samples'
 import DataTable from 'components/ui/Table'
 import { StickyContainer } from 'components/ui/Pagination/styles'
 import { Pagination } from 'components/ui/Pagination'
-
-type CohortCallbacks = {
-  onClickRow: (cohort: Cohort) => void
-  onClickFav: (cohort: Cohort) => void
-  onClickExport: (cohort: Cohort) => void
-  onClickEdit: (cohort: Cohort) => void
-  onClickCreateSample: (cohort: Cohort) => void
-  onSelectCohort: (cohort: Cohort) => void
-}
+import { CohortCallbacks } from './CohortsTableContent'
 
 type SamplesTableContentProps = {
   list: Cohort[]
@@ -50,11 +42,26 @@ const SamplesTableContent: React.FC<SamplesTableContentProps> = ({
   const appConfig = useContext(AppConfig)
   const navigate = useNavigate()
   const { cohortId } = useParams()
-  const { onClickRow, onClickFav, onClickExport, onClickEdit, onSelectCohort } = cohortsCallbacks
+
+  const onClickCohortVersion = useCallback(
+    (cohort: Cohort) => {
+      navigate(`/cohort/new/${cohort.request?.uuid}/${cohort.request_query_snapshot}`)
+    },
+    [navigate]
+  )
+
+  const _cohortsCallbacks = useMemo(
+    () => ({
+      ...cohortsCallbacks,
+      onClickCohortVersion,
+      onSelectAll
+    }),
+    [cohortsCallbacks, onClickCohortVersion, onSelectAll]
+  )
 
   const table = useMemo(
-    () => mapSamplesToTable(list, appConfig, cohortId, disabled),
-    [list, appConfig, cohortId, disabled]
+    () => mapSamplesToTable(list, appConfig, _cohortsCallbacks, selectedCohorts, cohortId, disabled),
+    [list, appConfig, _cohortsCallbacks, selectedCohorts, cohortId, disabled]
   )
 
   const rowsPerPage = 20

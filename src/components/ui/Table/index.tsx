@@ -25,7 +25,6 @@ const Table = ({ value, orderBy, onSort, sxColumn, sxRow }: TableProps) => {
             fontWeight: 700,
             backgroundColor: '#E6F1FD',
             textTransform: 'uppercase',
-            // borderBottom: '2px solid',
             ...sxColumn
           }}
           orderBy={orderBy}

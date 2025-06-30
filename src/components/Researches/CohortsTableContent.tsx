@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useCallback, useContext, useMemo } from 'react'
 import { AppConfig } from 'config'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -12,6 +12,7 @@ import DataTable from 'components/ui/Table'
 import { mapCohortsToTable } from 'mappers/cohorts'
 import { StickyContainer } from 'components/ui/Pagination/styles'
 import { Pagination } from 'components/ui/Pagination'
+import { redirectToSamples } from 'utils/explorationUtils'
 
 export const mapCohortStatus = (status?: JobStatus, jobFailMessage?: string) => {
   if (jobFailMessage) {
@@ -37,13 +38,16 @@ export const mapCohortStatus = (status?: JobStatus, jobFailMessage?: string) => 
   }
 }
 
-type CohortCallbacks = {
+export type CohortCallbacks = {
   onClickRow: (cohort: Cohort) => void
   onClickFav: (cohort: Cohort) => void
   onClickExport: (cohort: Cohort) => void
   onClickEdit: (cohort: Cohort) => void
   onClickCreateSample: (cohort: Cohort) => void
   onSelectCohort: (cohort: Cohort) => void
+  onClickCohortVersion: (cohort: Cohort) => void
+  onClickSamples: (cohort: Cohort) => void
+  onSelectAll: () => void
 }
 
 type CohortsTableContentProps = {
@@ -78,11 +82,35 @@ const CohortsTableContent: React.FC<CohortsTableContentProps> = ({
   const appConfig = useContext(AppConfig)
   const navigate = useNavigate()
   const { projectId, requestId } = useParams()
-  const { onClickCreateSample, onClickRow, onClickFav, onClickExport, onClickEdit, onSelectCohort } = cohortsCallbacks
+
+  const onClickCohortVersion = useCallback(
+    (cohort: Cohort) => {
+      navigate(`/cohort/new/${cohort.request?.uuid}/${cohort.request_query_snapshot}`)
+    },
+    [navigate]
+  )
+
+  const onClickSamples = useCallback(
+    (cohort: Cohort) => {
+      navigate(redirectToSamples(cohort.uuid as string, requestId, projectId))
+    },
+    [navigate, requestId, projectId]
+  )
+
+  const _cohortsCallbacks = useMemo(
+    () => ({
+      ...cohortsCallbacks,
+      onClickCohortVersion,
+      onClickSamples,
+      onSelectAll
+    }),
+    [cohortsCallbacks, onClickCohortVersion, onClickSamples, onSelectAll]
+  )
 
   const table = useMemo(
-    () => mapCohortsToTable(cohortsList, simplified, appConfig, requestId, disabled),
-    [cohortsList, simplified, appConfig, requestId, disabled]
+    () =>
+      mapCohortsToTable(cohortsList, simplified, appConfig, _cohortsCallbacks, selectedCohorts, requestId, disabled),
+    [cohortsList, simplified, appConfig, _cohortsCallbacks, selectedCohorts, requestId, disabled]
   )
 
   const rowsPerPage = simplified ? 5 : 20

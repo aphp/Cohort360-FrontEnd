@@ -1,3 +1,4 @@
+import React from 'react'
 import { ChipStatus } from 'components/ui/StatusChip'
 import { Paragraph } from 'components/ui/Paragraphs'
 import { SubItemType } from './cohorts'
@@ -15,8 +16,15 @@ export type Link = {
 }
 
 export type Favorite = {
+  onClick: () => void
   isFavorite: boolean
   disabled: boolean
+}
+
+export type CheckboxAction = {
+  onClick: () => void
+  isChecked: boolean
+  disabled?: boolean
 }
 
 export type SubItem = {
@@ -61,20 +69,36 @@ export enum CellType {
 
 export type Cell = {
   id: string
-  value: string | Link | Document | Table | Line[] | Paragraph[] | Status | Favorite | SubItem | Element | Action[]
+  value:
+    | string
+    | Link
+    | Document
+    | Table
+    | Line[]
+    | Paragraph[]
+    | Status
+    | Favorite
+    | SubItem
+    | Element
+    | Action[]
+    | CheckboxAction
   type: CellType
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
   sx?: React.CSSProperties
   isHidden?: boolean
 }
 
-export type Row = Cell[]
+export type Row = Cell[] & {
+  _onClick?: () => void
+}
 
 export type Column = {
-  label: string
+  label: React.ReactNode
   code?: string
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
   tooltip?: string
+  isCheckbox?: boolean
+  checkboxProps?: { isChecked: boolean; isIndeterminate: boolean; onSelectAll: () => void }
 }
 
 export type Table = {
