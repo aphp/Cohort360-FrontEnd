@@ -1,3 +1,5 @@
+import { Cohort, RequestType } from 'types'
+
 export enum CohortsType {
   FAVORITE = 'FAVORITE',
   NOT_FAVORITE = 'NOT_FAVORITE'
@@ -41,4 +43,28 @@ export enum ExplorationsSearchParams {
   SEARCH_INPUT = 'searchInput',
   START_DATE = 'startDate',
   STATUS = 'status'
+}
+
+export type BaseCohortCallbacks = {
+  onClickRow: (cohort: Cohort) => void
+  onClickFav: (cohort: Cohort) => void
+  onClickExport: (cohort: Cohort) => void
+  onClickEdit: (cohort: Cohort) => void
+  onClickCreateSample: (cohort: Cohort) => void
+  onSelectCohort: (cohort: Cohort) => void
+}
+
+export type CohortCallbacks = BaseCohortCallbacks & {
+  onSelectAll: () => void
+  onClickCohortVersion: (cohort: Cohort) => void
+  onClickSamples: (cohort: Cohort) => void
+}
+
+export type RequestsCallbacks = {
+  onSelectRequest: (request: RequestType) => void
+  onShareRequest: (request: RequestType) => void
+  onClickEdit: (request: RequestType) => void
+  onSelectAll: () => void
+  onClickCohorts: (request: RequestType) => void
+  onClickRow: (request: RequestType) => void
 }

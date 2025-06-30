@@ -121,7 +121,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
           </Grid>
         </Grid>
       </Grid>
-      {filters && (
+      {filters && onRemoveFilters && (
         <CriteriasSection
           value={filters}
           displayOptions={{
@@ -134,9 +134,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
             diagrams: false,
             count: false
           }}
-          onDelete={() => {
-            onRemoveFilters && onRemoveFilters(filter.category, filter.value)
-          }}
+          onDelete={onRemoveFilters}
         />
       )}
     </Grid>

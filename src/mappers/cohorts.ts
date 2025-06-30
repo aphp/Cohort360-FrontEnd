@@ -1,6 +1,6 @@
-import { CohortCallbacks, mapCohortStatus } from 'components/Researches/CohortsTableContent'
+import { mapCohortStatus } from 'components/Researches/CohortsTableContent'
 import { Cohort, JobStatus } from 'types'
-import { ResearchesTableLabels, SubItemType } from 'types/cohorts'
+import { CohortCallbacks, ResearchesTableLabels, SubItemType } from 'types/cohorts'
 import { Order } from 'types/searchCriterias'
 import { Action, CellType, Column, Favorite, Row, SubItem, Table } from 'types/table'
 import { getExportTooltip, getGlobalEstimation, isCohortExportable, isExportDisabled } from 'utils/explorationUtils'

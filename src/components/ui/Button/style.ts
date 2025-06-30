@@ -11,16 +11,16 @@ export const ButtonWrapper = styled(Button)<CustomProps>(({ width = '100%', cust
   height: 30,
   fontSize: 13,
   borderRadius: 25,
+  '&.Mui-disabled': {
+    cursor: 'not-allowed',
+    pointerEvents: 'auto'
+  },
   ...(small && {
     fontSize: 12
   }),
   ...(customVariant === 'secondary' && {
     backgroundColor: '#5BC5F2',
-    boxShadow: 'none',
-    '&.Mui-disabled': {
-      cursor: 'not-allowed',
-      pointerEvents: 'auto'
-    }
+    boxShadow: 'none'
   }),
   ...(customVariant === 'pink' && {
     backgroundColor: '#ED6D91',

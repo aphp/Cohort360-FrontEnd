@@ -1,7 +1,7 @@
 import { AppConfig } from 'config'
-import { CohortCallbacks, mapCohortStatus } from 'components/Researches/CohortsTableContent'
+import { mapCohortStatus } from 'components/Researches/CohortsTableContent'
 import { Cohort } from 'types'
-import { ResearchesTableLabels } from 'types/cohorts'
+import { CohortCallbacks, ResearchesTableLabels } from 'types/cohorts'
 import { Order } from 'types/searchCriterias'
 import { Action, CellType, Column, Favorite, Row, Table } from 'types/table'
 import { getExportTooltip, getGlobalEstimation, isCohortExportable, isExportDisabled } from 'utils/explorationUtils'
@@ -36,7 +36,7 @@ const getSamplesInfos = (cohort: Cohort) => {
 const mapSamplesToRows = (
   list: Cohort[],
   appConfig: AppConfig,
-  callbacks: CohortCallbacks,
+  callbacks: Omit<CohortCallbacks, 'onClickSamples'>,
   selectedCohorts: Cohort[],
   requestId?: string,
   disabled = false
@@ -156,7 +156,7 @@ const mapSamplesToColumns = (
 export const mapSamplesToTable = (
   list: Cohort[],
   appConfig: AppConfig,
-  callbacks: CohortCallbacks,
+  callbacks: Omit<CohortCallbacks, 'onClickSamples'>,
   selectedCohorts: Cohort[],
   cohortId?: string,
   disabled = false

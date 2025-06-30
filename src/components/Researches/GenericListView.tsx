@@ -128,7 +128,6 @@ const GenericCohortListView = <TItem, TTableProps = any>({
         {...(tableProps as any)}
       />
 
-      {/* {form && ( */}
       <Modal
         title="Filtrer par :"
         width="600px"
@@ -164,7 +163,6 @@ const GenericCohortListView = <TItem, TTableProps = any>({
           onError={setModalError}
         />
       </Modal>
-      {/* )} */}
     </Grid>
   )
 }

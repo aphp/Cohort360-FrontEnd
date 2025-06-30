@@ -1,12 +1,11 @@
 import { RequestType } from 'types'
-import { ResearchesTableLabels, SubItemType } from 'types/cohorts'
+import { RequestsCallbacks, ResearchesTableLabels, SubItemType } from 'types/cohorts'
 import { Order } from 'types/searchCriterias'
 import { Action, CellType, Column, Row, SubItem, Table } from 'types/table'
 import { getCohortTotal, getRequestName } from 'utils/explorationUtils'
 import { formatDate } from 'utils/formatDate'
 import EditIcon from '@mui/icons-material/Edit'
 import ShareIcon from '@mui/icons-material/Share'
-import { RequestsCallbacks } from 'components/Researches/RequestsTableContent'
 import { isChecked } from 'utils/filters'
 
 const getRequestsInfos = (request: RequestType) => {

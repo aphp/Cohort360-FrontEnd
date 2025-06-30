@@ -28,15 +28,6 @@ type RequestsTableContentProps = {
   simplified?: boolean
 }
 
-export type RequestsCallbacks = {
-  onSelectRequest: (request: RequestType) => void
-  onShareRequest: (request: RequestType) => void
-  onClickEdit: (request: RequestType) => void
-  onSelectAll: () => void
-  onClickCohorts: (request: RequestType) => void
-  onClickRow: (request: RequestType) => void
-}
-
 const RequestsTableContent: React.FC<RequestsTableContentProps> = ({
   requestsList,
   selectedRequests,

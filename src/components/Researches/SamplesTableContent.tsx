@@ -3,14 +3,14 @@ import { AppConfig } from 'config'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
+import DataTable from 'components/ui/Table'
+import { Pagination } from 'components/ui/Pagination'
+import { StickyContainer } from 'components/ui/Pagination/styles'
 
 import { Cohort } from 'types'
 import { OrderBy } from 'types/searchCriterias'
 import { mapSamplesToTable } from 'mappers/samples'
-import DataTable from 'components/ui/Table'
-import { StickyContainer } from 'components/ui/Pagination/styles'
-import { Pagination } from 'components/ui/Pagination'
-import { CohortCallbacks } from './CohortsTableContent'
+import { BaseCohortCallbacks } from 'types/cohorts'
 
 type SamplesTableContentProps = {
   list: Cohort[]
@@ -23,7 +23,7 @@ type SamplesTableContentProps = {
   disabled: boolean
   onChangeOrderBy: (newOrder: OrderBy) => void
   onSelectAll: () => void
-  cohortsCallbacks: CohortCallbacks
+  cohortsCallbacks: BaseCohortCallbacks
 }
 
 const SamplesTableContent: React.FC<SamplesTableContentProps> = ({

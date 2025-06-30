@@ -69,10 +69,7 @@ const SavedFilters = ({
         <Grid container item xs={12} alignItems="center" gap={1}>
           <Grid item xs={3}>
             <Button
-              sx={{ borderRadius: 25 }}
               fullWidth
-              size="small"
-              variant="contained"
               color="info"
               startIcon={<Visibility />}
               onClick={() => setToggleDisplayModal(true)}
@@ -85,13 +82,6 @@ const SavedFilters = ({
             <Grid item xs={1}>
               <Button
                 color="warning"
-                size="small"
-                variant="contained"
-                style={
-                  maintenanceIsActive
-                    ? { borderRadius: 25, cursor: 'not-allowed', pointerEvents: 'auto' }
-                    : { borderRadius: 25 }
-                }
                 onClick={() => setToggleDeleteModal(true)}
                 disabled={!selectedItems.length || maintenanceIsActive}
               >

@@ -4,15 +4,16 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
 import { ChipStatus } from 'components/ui/StatusChip'
+import DataTable from 'components/ui/Table'
+import { Pagination } from 'components/ui/Pagination'
+import { StickyContainer } from 'components/ui/Pagination/styles'
 import UpdateIcon from '@mui/icons-material/Update'
 
 import { Cohort, JobStatus } from 'types'
 import { OrderBy } from 'types/searchCriterias'
-import DataTable from 'components/ui/Table'
 import { mapCohortsToTable } from 'mappers/cohorts'
-import { StickyContainer } from 'components/ui/Pagination/styles'
-import { Pagination } from 'components/ui/Pagination'
 import { redirectToSamples } from 'utils/explorationUtils'
+import { BaseCohortCallbacks } from 'types/cohorts'
 
 export const mapCohortStatus = (status?: JobStatus, jobFailMessage?: string) => {
   if (jobFailMessage) {
@@ -38,18 +39,6 @@ export const mapCohortStatus = (status?: JobStatus, jobFailMessage?: string) => 
   }
 }
 
-export type CohortCallbacks = {
-  onClickRow: (cohort: Cohort) => void
-  onClickFav: (cohort: Cohort) => void
-  onClickExport: (cohort: Cohort) => void
-  onClickEdit: (cohort: Cohort) => void
-  onClickCreateSample: (cohort: Cohort) => void
-  onSelectCohort: (cohort: Cohort) => void
-  onClickCohortVersion: (cohort: Cohort) => void
-  onClickSamples: (cohort: Cohort) => void
-  onSelectAll: () => void
-}
-
 type CohortsTableContentProps = {
   cohortsList: Cohort[]
   selectedCohorts: Cohort[]
@@ -61,7 +50,7 @@ type CohortsTableContentProps = {
   disabled: boolean
   onChangeOrderBy: (newOrder: OrderBy) => void
   onSelectAll: () => void
-  cohortsCallbacks: CohortCallbacks
+  cohortsCallbacks: BaseCohortCallbacks
   simplified?: boolean
 }
 
