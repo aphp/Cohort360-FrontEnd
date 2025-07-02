@@ -9,8 +9,7 @@ type DraggableWrapperProps = {
 
 export const DraggableWrapper = styled(Grid)<DraggableWrapperProps>(({ isActive, isDragging, visible, disabled }) => ({
   position: disabled && !visible ? 'absolute' : 'relative',
-  //background: disabled && !visible ? '' : disabled && visible ? 'green' : 'transparent',
-  zIndex: 3,
+  zIndex: isActive ? 3 : 2,
   '& > *': {
     cursor: disabled ? 'auto' : isActive ? 'grabbing' : 'grab',
     opacity: disabled ? 0 : isDragging ? (isActive ? 1 : 0.6) : 1,

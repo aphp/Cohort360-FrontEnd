@@ -3,6 +3,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { DraggableWrapper, DroppableWrapper } from './styles'
 import { createPortal } from 'react-dom'
+import { Over } from '@dnd-kit/core'
 
 type DraggableProps<T> = {
   data: T & { id: string | number; groupId: string | number }
@@ -18,34 +19,36 @@ const Draggable = <T,>({ children, data, disabled = false }: PropsWithChildren<D
   const droppableWrapper = document.getElementById(`droppable-wrapper-${index}`)
   const isDragging = activeIndex > -1
   const isActive = activeIndex === index
-  const [prevOver, setPrevOver] = useState(over?.data.current?.groupId ?? null)
+  const [prevOver, setPrevOver] = useState(over ?? null)
   const [visible, setVisible] = useState(false)
 
-  const handleVisible = useCallback(() => {
-    if (!isDragging || !over || !active) return false
-    if (data.groupId === over.data.current?.groupId && data.groupId !== active.data.current?.groupId) {
-      if (over.data.current?.groupId < prevOver && typeof data.id === 'string' && data.id.includes('start')) {
-        console.log('test start', over.data.current?.groupId, prevOver, data.id)
-        return true
-      } else if (over.data.current?.groupId > prevOver && typeof data.id === 'string' && data.id.includes('end')) {
-        console.log('test end', over.data.current?.groupId, prevOver, data.id)
-        return true
-      }
-    }
-    return false
-  }, [active, data.groupId, data.id, isDragging, over, prevOver])
+  const handleVisible = useCallback(
+    (prev: Over | null) => {
+      if (!isDragging || !over || !active || !prev) return false
+
+      const currentGroupId = over.data.current?.groupId
+      const prevGroupId = prev.data.current?.groupId
+      const isSameGroup = data.groupId === active.data.current?.groupId
+
+      if (isSameGroup || currentGroupId !== data.groupId) return false
+
+      const isBefore = currentGroupId < prevGroupId
+      const isStart = typeof data.id === 'string' && data.id.includes('start')
+      const isAfter = currentGroupId > prevGroupId
+      const isEnd = typeof data.id === 'string' && data.id.includes('end')
+
+      return (isBefore && isStart) || (isAfter && isEnd)
+    },
+    [active, data.groupId, data.id, isDragging, over]
+  )
 
   useEffect(() => {
-    setVisible(handleVisible())
-    setPrevOver(over?.data.current?.groupId ?? null)
-  }, [over?.data.current?.groupId, handleVisible])
-
-  useEffect(() => {
-    if (visible) console.log('isVisible', data.id, data.groupId)
-  }, [visible])
+    setVisible(handleVisible(prevOver))
+    setPrevOver(over)
+  }, [over?.data.current?.groupId])
 
   return (
-    <div style={{ position: 'relative', zIndex: disabled ? 1 : 3 }}>
+    <div style={{ position: 'relative' }}>
       <div id={`droppable-wrapper-${index}`} />
       {isOver &&
         (!disabled || (disabled && visible)) &&
