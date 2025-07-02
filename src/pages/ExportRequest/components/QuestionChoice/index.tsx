@@ -23,7 +23,6 @@ import { SelectChangeEvent } from '@mui/material/Select'
 import Chip from 'components/ui/Chip'
 
 import apiFhir from 'services/apiFhir'
-import { set } from 'lodash'
 
 /***********************************
  * Types FHIR minimalistes
@@ -62,7 +61,8 @@ interface QuestionSelectorDialogProps {
   open: boolean
   onClose: () => void
   selectedQuestions: QuestionLeaf[]
-  onConfirm: (selected: QuestionLeaf[]) => void
+  onDefaultQuestionnaireIds: (questionnaireIds: string[]) => void
+  onConfirm: (selected: QuestionLeaf[], selectedQuestionnaireIds: string[]) => void
 }
 
 /***********************************
@@ -86,7 +86,7 @@ function collectLeaves(
     const newParents = [...parents, item.text ?? item.linkId]
     const hasChildren = Array.isArray(item.item) && item.item.length > 0
 
-    if (!hasChildren && startsWithFMater(item.linkId)) {
+    if (item.type !== 'group' && startsWithFMater(item.linkId)) {
       collector.push({
         linkId: item.linkId,
         text: item.text ?? '',
@@ -161,6 +161,7 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
   open,
   onClose,
   selectedQuestions,
+  onDefaultQuestionnaireIds,
   onConfirm
 }) => {
   /***** STATE *****/
@@ -186,7 +187,19 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
   }, [fetch])
 
   /***** DERIVED DATA *****/
-  const questionnaires = useMemo(() => bundle.entry.map((e) => e.resource), [bundle])
+  const questionnaires = useMemo(
+    () =>
+      bundle.entry
+        .filter(
+          (e) =>
+            e.resource.name === 'APHPEDSQuestionnaireFicheHospitalisation' ||
+            e.resource.name === 'APHPEDSQuestionnaireFicheGrossesse'
+        )
+        .map((e) => e.resource),
+    [bundle]
+  )
+
+  const questionnairesIds = questionnaires.map((q) => q.id)
 
   // ✅ Sélectionne automatiquement le premier questionnaire si aucun n'est choisi
   useEffect(() => {
@@ -225,6 +238,10 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
 
   /***** EFFECT : synchro initiale *****/
   const wasOpen = useRef(false)
+
+  useEffect(() => {
+    onDefaultQuestionnaireIds(questionnairesIds)
+  }, [bundle])
 
   useEffect(() => {
     const reopened = open && !wasOpen.current
@@ -284,8 +301,25 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
     })
   }
 
+  const getQuestionnaireIdBySelectedLeaves = () => {
+    const questionnaireIds = new Set<string>()
+    checkedByQuestionnaire.forEach((set, qId) => {
+      if (set.size > 0) {
+        questionnaireIds.add(qId)
+      }
+    })
+    return Array.from(questionnaireIds)
+  }
+
   const handleConfirm = () => {
-    onConfirm(allSelectedLeaves)
+    const pivotQuestionnaireIds = getQuestionnaireIdBySelectedLeaves()
+    onConfirm(allSelectedLeaves, pivotQuestionnaireIds)
+    setInputQuery('') // reset search input
+    setCheckedByQuestionnaire(new Map()) // reset checked state
+    onClose()
+  }
+
+  const handleClose = () => {
     setInputQuery('') // reset search input
     setCheckedByQuestionnaire(new Map()) // reset checked state
     onClose()
@@ -362,7 +396,7 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
         </Box>
       )}
       <DialogActions>
-        <Button onClick={onClose}>Annuler</Button>
+        <Button onClick={handleClose}>Annuler</Button>
         <Button variant="contained" onClick={handleConfirm}>
           Valider ({allSelectedLeaves.length})
         </Button>

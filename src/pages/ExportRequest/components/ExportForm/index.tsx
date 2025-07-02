@@ -212,27 +212,33 @@ const ExportForm: React.FC = () => {
   const removeTableSetting = useCallback(
     (tableName: string) => {
       const newTableSettings = tablesSettings.filter((tableSetting) => tableSetting.tableName !== tableName)
+      const newErrorTables = errorTables.filter((errorTable) => errorTable.tableName !== tableName)
+      setErrorTables(newErrorTables)
       setTablesSettings(newTableSettings)
     },
-    [tablesSettings]
+    [tablesSettings, errorTables]
   )
 
-  const onChangeTableSettings = useCallback(
-    (tableName: string, key: any, value: any) => {
-      const newTableSettings: TableSetting[] = tablesSettings.map((tableSetting) => {
-        if (tableSetting.tableName === tableName) {
-          return {
-            ...tableSetting,
-            [key]: value
+  const onChangeTableSettings = useCallback((changes: { tableName: string; key: any; value: any }[]) => {
+    setTablesSettings((prevTableSettings) => {
+      let newTableSettings = [...prevTableSettings]
+
+      changes.forEach(({ tableName, key, value }) => {
+        newTableSettings = newTableSettings.map((tableSetting) => {
+          if (tableSetting.tableName === tableName) {
+            return {
+              ...tableSetting,
+              [key]: value
+            }
+          } else {
+            return tableSetting
           }
-        } else {
-          return tableSetting
-        }
+        })
       })
-      setTablesSettings(newTableSettings)
-    },
-    [tablesSettings]
-  )
+
+      return newTableSettings
+    })
+  }, [])
 
   const tableSettingData = useCallback(
     (tableName: string) => {
@@ -287,6 +293,7 @@ const ExportForm: React.FC = () => {
             respectTableRelationships: true
           }
         ])
+        setErrorTables(errorTablesInitialState)
       }
     },
     [exportTableList, tablesSettings]
