@@ -94,7 +94,9 @@ export const postExportCohort = async ({
       respect_table_relationships: table.respectTableRelationships,
       columns: table.columns,
       ...(table.fhirFilter && { fhir_filter: table.fhirFilter?.uuid }),
-      pivot_merge_columns: table.pivotMergeColumns
+      pivot_merge_columns: table.pivotMergeColumns,
+      //pivot_split_columns : table.pivotSplitColumns,
+      pivot_merge_ids: table.pivotMergeIds
     })),
     nominative: nominative,
     shift_date: shift_date,

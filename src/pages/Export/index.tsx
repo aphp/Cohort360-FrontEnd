@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
-import { Grid, CssBaseline, Typography, Button, CircularProgress } from '@mui/material'
+import { Grid, CssBaseline, Typography, Button, CircularProgress, Tooltip } from '@mui/material'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import DataTable from 'components/ui/Table'
 import HeaderPage from 'components/ui/HeaderPage'
@@ -27,6 +27,7 @@ const Export = () => {
   const user = useAppSelector((state) => state.me?.impersonation?.username ?? state.me?.userName) ?? ''
   const deidentified = useAppSelector((state) => state.me?.deidentified)
   const [exportList, setExportList] = useState<Back_API_Response<ExportList> | null>(null)
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [searchParams, setSearchParams] = useSearchParams()
   const [pagination, setPagination] = useState({ current: 0, total: 0 })
@@ -83,11 +84,13 @@ const Export = () => {
             <HeaderPage id="export-page-title" title="Mes exports" />
             <Grid container alignItems="center" gap="20px" style={{ flexGrow: 1 }}>
               <Grid item container gap={1} justifyContent="space-between">
-                <Grid item xs={12} sm={5}>
-                  <Button className={styles().classes.newExportButton} onClick={() => navigate('/exports/new')}>
-                    Nouvel export
-                  </Button>
-                </Grid>
+                <Tooltip title={maintenanceIsActive ? "Ce bouton est desactivé en raison d'une maintenance." : ''}>
+                  <Grid item xs={12} sm={5}>
+                    <Button className={styles().classes.newExportButton} onClick={() => navigate('/exports/new')}>
+                      Nouvel export
+                    </Button>
+                  </Grid>
+                </Tooltip>
                 <Grid container xs={12} sm={6}>
                   <SearchInput
                     value={searchInput ?? ''}
