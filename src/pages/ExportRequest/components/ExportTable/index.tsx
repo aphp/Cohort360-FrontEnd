@@ -39,7 +39,7 @@ type ExportTableProps = {
   setError: (tableName: string, errorValue: Error) => void
   addNewTableSetting: (newTableSetting: TableSetting) => void
   removeTableSetting: (tableName: string) => void
-  onChangeTableSettings: (tableName: string, key: string, value: any) => void
+  onChangeTableSettings: ([{ tableName, key, value }]: { tableName: string; key: any; value: any }[]) => void
   compatibilitiesTables: string[] | null
   exportTypeFile: 'xlsx' | 'csv'
   oneFile: boolean
@@ -82,9 +82,10 @@ const ExportTable: React.FC<ExportTableProps> = ({
   const [checkedPivotMerge, setCheckedPivotMerge] = useState<boolean>(false)
   const appConfig = useContext(AppConfig)
   const limit = appConfig.features.export.exportLinesLimit
-  const [isQuestionChoiceOpen, setIsQuestionChoiceOpen] = useState(false)
+  const [isQuestionChoiceOpen, setIsQuestionChoiceOpen] = useState<boolean>(false)
   const [selectedQuestions, setSelectedQuestions] = useState<QuestionLeaf[]>([])
-  const [isExtended, setIsExtended] = useState(false)
+  const [selectedQuestionnaireIds, setSelectedQuestionnaireIds] = useState<string[]>([])
+  const [isExtended, setIsExtended] = useState<boolean>(false)
 
   const isCompatibleTable = (tableName: string) => {
     const table = compatibilitiesTables?.find((table) => table === tableName)
@@ -96,8 +97,9 @@ const ExportTable: React.FC<ExportTableProps> = ({
     setIsExtended(false)
   }
 
-  const onTest = (arg: any[]) => {
-    setSelectedQuestions(arg)
+  const onSelectedQuestionsChange = (questions: QuestionLeaf[], questionnaireId: string[]) => {
+    setSelectedQuestions(questions)
+    setSelectedQuestionnaireIds(questionnaireId)
   }
 
   const getFilterList = useCallback(async () => {
@@ -143,32 +145,39 @@ const ExportTable: React.FC<ExportTableProps> = ({
   }, [count, tableSetting?.isChecked])
 
   useEffect(() => {
-    if (ResourceType.UNKNOWN !== exportTableResourceType) {
+    if (ResourceType.UNKNOWN !== exportTableResourceType && cohortId) {
       getFilterCount()
     }
-  }, [exportTableResourceType, getFilterCount])
+  }, [exportTableResourceType, getFilterCount, cohortId])
 
   const handleQuestionChoiceOpen = (isOpen: boolean) => {
     setIsQuestionChoiceOpen(!isOpen)
   }
 
-  const handleDeleteSelectedQuestions = (newSelectedQuestions: any[]) => {
+  const handleDeleteSelectedQuestions = (newSelectedQuestions: QuestionLeaf[]) => {
     setSelectedQuestions(newSelectedQuestions)
   }
 
   useEffect(() => {
-    if (checkedPivotMerge) {
-      onChangeTableSettings(exportTable.name, 'pivotMergeColumns', [])
-    }
-    if (!checkedPivotMerge) {
-      onChangeTableSettings(exportTable.name, 'pivotMergeColumns', undefined)
-    }
-    if (checkedPivotMerge && selectedQuestions.length > 0) {
-      onChangeTableSettings(
-        exportTable.name,
-        'pivotMergeColumns',
-        selectedQuestions.map((q) => q.linkId)
-      )
+    if (exportTable.fhirResourceName === ResourceType.QUESTIONNAIRE_RESPONSE) {
+      if (checkedPivotMerge) {
+        onChangeTableSettings([
+          { tableName: exportTable.name, key: 'pivotMergeColumns', value: [] },
+          { tableName: exportTable.name, key: 'pivotMergeIds', value: [] }
+        ])
+      }
+      if (!checkedPivotMerge) {
+        onChangeTableSettings([
+          { tableName: exportTable.name, key: 'pivotMergeColumns', value: undefined },
+          { tableName: exportTable.name, key: 'pivotMergeIds', value: undefined }
+        ])
+      }
+      if (checkedPivotMerge && selectedQuestions.length > 0) {
+        onChangeTableSettings([
+          { tableName: exportTable.name, key: 'pivotMergeColumns', value: selectedQuestions.map((q) => q.linkId) },
+          { tableName: exportTable.name, key: 'pivotMergeIds', value: selectedQuestionnaireIds }
+        ])
+      }
     }
   }, [checkedPivotMerge, selectedQuestions])
 
@@ -293,16 +302,18 @@ const ExportTable: React.FC<ExportTableProps> = ({
               onChange={(event, newValue) => {
                 if (newValue.includes('Tout sélectionner')) {
                   if (tableSetting?.columns?.length === exportColumns.length) {
-                    onChangeTableSettings(exportTable.name, 'columns', null)
+                    onChangeTableSettings([{ tableName: exportTable.name, key: 'columns', value: null }])
                   } else {
-                    onChangeTableSettings(exportTable.name, 'columns', exportColumns)
+                    onChangeTableSettings([{ tableName: exportTable.name, key: 'columns', value: exportColumns }])
                   }
                 } else {
-                  onChangeTableSettings(
-                    exportTable.name,
-                    'columns',
-                    newValue.filter((e) => e !== 'Tout sélectionner')
-                  )
+                  onChangeTableSettings([
+                    {
+                      tableName: exportTable.name,
+                      key: 'columns',
+                      value: newValue.filter((e) => e !== 'Tout sélectionner')
+                    }
+                  ])
                 }
               }}
               noOptionsText="Aucune colonne disponible"
@@ -355,7 +366,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
                 renderInput={(params) => <TextField {...params} label="Sélectionnez un filtre" />}
                 value={tableSetting?.fhirFilter}
                 onChange={(_, value) => {
-                  onChangeTableSettings(exportTable.name, 'fhirFilter', value)
+                  onChangeTableSettings([{ tableName: exportTable.name, key: 'fhirFilter', value }])
                 }}
               />
             </>
@@ -369,7 +380,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
             open={isQuestionChoiceOpen}
             onClose={() => handleQuestionChoiceOpen(isQuestionChoiceOpen)}
             selectedQuestions={selectedQuestions}
-            onConfirm={onTest}
+            onConfirm={onSelectedQuestionsChange}
           />
 
           <Grid item>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 
-import { Grid, CssBaseline, Typography, Button, TableRow, CircularProgress, Chip } from '@mui/material'
+import { Grid, CssBaseline, Typography, Button, TableRow, CircularProgress, Chip, Tooltip } from '@mui/material'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Searchbar from 'components/ui/Searchbar'
@@ -111,6 +111,7 @@ const Export: React.FC = () => {
   const openDrawer = useAppSelector((state) => state.drawer)
   const user = useAppSelector((state) => state.me?.userName) ?? ''
   const deidentified = useAppSelector((state) => state.me?.deidentified)
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active)
   const [exportList, setExportList] = useState<any>(null)
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -176,20 +177,24 @@ const Export: React.FC = () => {
         <Grid container item xs={11}>
           <HeaderPage id="export-page-title" title="Mes exports" />
           <Grid container alignItems={'center'} className={styles().classes.gridContainer}>
-            <Grid item xs={6}>
-              <Button
-                className={styles().classes.newExportButton}
-                onClick={() => {
-                  navigate('/exports/new')
-                }}
-              >
-                Nouvel export
-              </Button>
-            </Grid>
+            <Tooltip title={maintenanceIsActive ? "Ce bouton est desactivé en raison d'une maintenance." : ''}>
+              <Grid item xs={6}>
+                <Button
+                  className={styles().classes.newExportButton}
+                  disabled={maintenanceIsActive}
+                  onClick={() => {
+                    navigate('/exports/new')
+                  }}
+                >
+                  Nouvel export
+                </Button>
+              </Grid>
+            </Tooltip>
+
             <Grid container item xs={6} justifyContent={'flex-end'}>
               <Searchbar>
                 <SearchInput
-                  value={search || ''}
+                  value={search ?? ''}
                   placeholder="Rechercher un export"
                   onchange={(value) => {
                     setSearch(value)

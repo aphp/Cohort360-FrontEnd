@@ -62,7 +62,7 @@ interface QuestionSelectorDialogProps {
   open: boolean
   onClose: () => void
   selectedQuestions: QuestionLeaf[]
-  onConfirm: (selected: QuestionLeaf[]) => void
+  onConfirm: (selected: QuestionLeaf[], selectedQuestionnaireIds: string[]) => void
 }
 
 /***********************************
@@ -186,7 +186,17 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
   }, [fetch])
 
   /***** DERIVED DATA *****/
-  const questionnaires = useMemo(() => bundle.entry.map((e) => e.resource), [bundle])
+  const questionnaires = useMemo(
+    () =>
+      bundle.entry
+        .filter(
+          (e) =>
+            e.resource.name === 'APHPEDSQuestionnaireFicheHospitalisation' ||
+            e.resource.name === 'APHPEDSQuestionnaireFicheGrossesse'
+        )
+        .map((e) => e.resource),
+    [bundle]
+  )
 
   // ✅ Sélectionne automatiquement le premier questionnaire si aucun n'est choisi
   useEffect(() => {
@@ -284,8 +294,26 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
     })
   }
 
+  const getQuestionnaireIdBySelectedLeaves = () => {
+    const questionnaireIds = new Set<string>()
+    checkedByQuestionnaire.forEach((set, qId) => {
+      if (set.size > 0) {
+        console.log('manelle set', set)
+        questionnaireIds.add(qId)
+      }
+    })
+    return Array.from(questionnaireIds)
+  }
+
   const handleConfirm = () => {
-    onConfirm(allSelectedLeaves)
+    const pivotQuestionnaireIds = getQuestionnaireIdBySelectedLeaves()
+    onConfirm(allSelectedLeaves, pivotQuestionnaireIds)
+    setInputQuery('') // reset search input
+    setCheckedByQuestionnaire(new Map()) // reset checked state
+    onClose()
+  }
+
+  const handleClose = () => {
     setInputQuery('') // reset search input
     setCheckedByQuestionnaire(new Map()) // reset checked state
     onClose()
@@ -362,7 +390,7 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
         </Box>
       )}
       <DialogActions>
-        <Button onClick={onClose}>Annuler</Button>
+        <Button onClick={handleClose}>Annuler</Button>
         <Button variant="contained" onClick={handleConfirm}>
           Valider ({allSelectedLeaves.length})
         </Button>

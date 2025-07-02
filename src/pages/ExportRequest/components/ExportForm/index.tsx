@@ -94,6 +94,7 @@ const ExportForm: React.FC = () => {
   const displayForm = cohortID !== null
 
   const limitError = errorTables.some((errorTable) => errorTable.error === Error.ERROR_TABLE_LIMIT)
+  console.log('manelle errorTables', errorTables)
   const fetchCountError = errorTables.some((errorTable) => errorTable.error === Error.ERROR_FETCH)
 
   const _checkExportableCohortID = useCallback(async () => {
@@ -212,27 +213,36 @@ const ExportForm: React.FC = () => {
   const removeTableSetting = useCallback(
     (tableName: string) => {
       const newTableSettings = tablesSettings.filter((tableSetting) => tableSetting.tableName !== tableName)
+      const newErrorTables = errorTables.filter((errorTable) => errorTable.tableName !== tableName)
+      setErrorTables(newErrorTables)
       setTablesSettings(newTableSettings)
     },
-    [tablesSettings]
+    [tablesSettings, errorTables]
   )
 
-  const onChangeTableSettings = useCallback(
-    (tableName: string, key: any, value: any) => {
-      const newTableSettings: TableSetting[] = tablesSettings.map((tableSetting) => {
-        if (tableSetting.tableName === tableName) {
-          return {
-            ...tableSetting,
-            [key]: value
+  const onChangeTableSettings = useCallback((changes: { tableName: string; key: any; value: any }[]) => {
+    console.log('manelle changes', changes)
+    setTablesSettings((prevTableSettings) => {
+      let newTableSettings = [...prevTableSettings]
+
+      changes.forEach(({ tableName, key, value }) => {
+        newTableSettings = newTableSettings.map((tableSetting) => {
+          if (tableSetting.tableName === tableName) {
+            return {
+              ...tableSetting,
+              [key]: value
+            }
+          } else {
+            return tableSetting
           }
-        } else {
-          return tableSetting
-        }
+        })
       })
-      setTablesSettings(newTableSettings)
-    },
-    [tablesSettings]
-  )
+
+      return newTableSettings
+    })
+  }, [])
+
+  console.log('manelle tablesSettings', tablesSettings)
 
   const tableSettingData = useCallback(
     (tableName: string) => {

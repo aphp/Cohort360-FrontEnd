@@ -20,6 +20,7 @@ export type TableSetting = {
   } | null
   respectTableRelationships: boolean
   pivotMergeColumns?: string[]
+  pivotMergeIds?: string[]
 }
 
 export type TableInfo = {
