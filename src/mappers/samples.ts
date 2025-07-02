@@ -110,12 +110,14 @@ const mapSamplesToRows = (
       {
         id: `${cohort.uuid}-samplingRatio`,
         value: samplingRatio,
-        type: CellType.TEXT
+        type: CellType.TEXT,
+        sx: { width: 200 }
       },
       {
         id: `${cohort.uuid}-createdAt`,
         value: createdAt,
-        type: CellType.TEXT
+        type: CellType.TEXT,
+        sx: { width: 160 }
       }
     ]
     row._onClick = () => onClickRow(cohort)

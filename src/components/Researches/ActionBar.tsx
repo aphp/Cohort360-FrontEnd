@@ -48,20 +48,18 @@ const ActionBar: React.FC<ActionBarProps> = ({
   } = useSizeObserver()
 
   return (
-    <Grid container justifyContent={'space-between'} alignItems={'center'} gap={2}>
+    <Grid container justifyContent={'space-between'} alignItems={'center'} gap={2} mt={1}>
       <Grid container justifyContent={'space-between'} ref={ref}>
         <Grid container xs={12} lg={8} gap={isXS ? 1 : '4px'} spacing={isXS ? 0 : 1}>
           {onFilter && (
-            <Grid container item xs={isXS ? 12 : 2} alignItems={'center'}>
-              <Button
-                onClick={onFilter}
-                disabled={disabled}
-                startIcon={<FilterList height="15px" fill="#FFF" />}
-                width="fit-content"
-              >
-                Filtrer
-              </Button>
-            </Grid>
+            <Button
+              onClick={onFilter}
+              disabled={disabled}
+              startIcon={<FilterList height="15px" fill="#FFF" />}
+              width="fit-content"
+            >
+              Filtrer
+            </Button>
           )}
           {onAddRequest && (
             <Button width="fit-content" onClick={() => onAddRequest()} endIcon={<AddIcon />} disabled={disabled}>
