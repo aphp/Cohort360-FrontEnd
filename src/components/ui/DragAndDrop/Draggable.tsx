@@ -1,9 +1,8 @@
-import React, { PropsWithChildren, useCallback, useEffect, useState } from 'react'
+import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { DraggableWrapper, DroppableWrapper } from './styles'
 import { createPortal } from 'react-dom'
-import { Over } from '@dnd-kit/core'
 
 type DraggableProps<T> = {
   data: T & { id: string | number; groupId: string | number }
@@ -11,61 +10,58 @@ type DraggableProps<T> = {
 }
 
 const Draggable = <T,>({ children, data, disabled = false }: PropsWithChildren<DraggableProps<T>>) => {
-  const { setNodeRef, attributes, listeners, transform, isOver, index, activeIndex, active, over } = useSortable({
+  const { setNodeRef, attributes, listeners, transform, isOver, index, activeIndex, active, items } = useSortable({
     id: data.id,
-    data,
-    disabled
+    data
+    //  disabled
   })
   const droppableWrapper = document.getElementById(`droppable-wrapper-${index}`)
   const isDragging = activeIndex > -1
   const isActive = activeIndex === index
-  const [prevOver, setPrevOver] = useState(over ?? null)
-  const [visible, setVisible] = useState(false)
 
-  const handleVisible = useCallback(
-    (prev: Over | null) => {
-      if (!isDragging || !over || !active || !prev) return false
-
-      const currentGroupId = over.data.current?.groupId
-      const prevGroupId = prev.data.current?.groupId
-      const isSameGroup = data.groupId === active.data.current?.groupId
-
-      if (isSameGroup || currentGroupId !== data.groupId) return false
-
-      const isBefore = currentGroupId < prevGroupId
-      const isStart = typeof data.id === 'string' && data.id.includes('start')
-      const isAfter = currentGroupId > prevGroupId
-      const isEnd = typeof data.id === 'string' && data.id.includes('end')
-
-      return (isBefore && isStart) || (isAfter && isEnd)
-    },
-    [active, data.groupId, data.id, isDragging, over]
-  )
+  const placeholders = useMemo(() => {
+    console.log('test items', items)
+    if (!isDragging) return []
+    const targetId = active?.data.current?.groupId * -1
+    return items.filter((item) => {
+      if (typeof item !== 'string') return true
+      const match = item.match(/^(start|end)-(-?\d+)$/)
+      if (!match) return true
+      const [, type, groupIdStr] = match
+      const groupId = Number(groupIdStr)
+      if (
+        (type === 'start' && (groupId === targetId || groupId < targetId)) ||
+        (type === 'end' && (groupId === targetId || groupId > targetId))
+      )
+        return false
+      return true
+    })
+  }, [items, isDragging, active])
 
   useEffect(() => {
-    setVisible(handleVisible(prevOver))
-    setPrevOver(over)
-  }, [over?.data.current?.groupId])
+    console.log('test placeholder', placeholders)
+  }, [placeholders])
 
   return (
     <div style={{ position: 'relative' }}>
       <div id={`droppable-wrapper-${index}`} />
-      {isOver &&
-        (!disabled || (disabled && visible)) &&
+      {placeholders.includes(data.id) &&
         droppableWrapper &&
-        createPortal(<DroppableWrapper>{children}</DroppableWrapper>, droppableWrapper)}
-      <DraggableWrapper
-        ref={setNodeRef}
-        style={{ transform: CSS.Translate.toString(transform) }}
-        isDragging={isDragging}
-        isActive={isActive}
-        visible={visible}
-        disabled={disabled}
-        {...attributes}
-        {...listeners}
-      >
-        {children}
-      </DraggableWrapper>
+        createPortal(<DroppableWrapper isActive={isOver}>{children}</DroppableWrapper>, droppableWrapper)}
+      {(!disabled || placeholders.includes(data.id)) && (
+        <DraggableWrapper
+          ref={setNodeRef}
+          style={{ transform: CSS.Translate.toString(transform) }}
+          isDragging={isDragging}
+          isActive={isActive}
+          visible={!disabled}
+          disabled={disabled}
+          {...attributes}
+          {...listeners}
+        >
+          {children}
+        </DraggableWrapper>
+      )}
     </div>
   )
 }

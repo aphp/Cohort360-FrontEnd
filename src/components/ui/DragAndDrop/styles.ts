@@ -7,8 +7,12 @@ type DraggableWrapperProps = {
   disabled: boolean
 }
 
-export const DraggableWrapper = styled(Grid)<DraggableWrapperProps>(({ isActive, isDragging, visible, disabled }) => ({
-  position: disabled && !visible ? 'absolute' : 'relative',
+type DroppableWrapperProps = {
+  isActive: boolean
+}
+
+export const DraggableWrapper = styled(Grid)<DraggableWrapperProps>(({ isActive, isDragging, disabled }) => ({
+  position: isDragging || !disabled ? 'relative' : 'absolute',
   zIndex: isActive ? 3 : 2,
   '& > *': {
     cursor: disabled ? 'auto' : isActive ? 'grabbing' : 'grab',
@@ -20,21 +24,27 @@ export const DraggableWrapper = styled(Grid)<DraggableWrapperProps>(({ isActive,
   }
 }))
 
-const pulse = keyframes`
+const attract = keyframes`
   0% {
-     box-shadow: 0 0 0 0 rgba(25, 35, 90, 0.2);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 0 3px 3px rgba(25, 35, 90, 0);
-    transform: scale(1.015);
+    background-position: 100% 0%;
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(25, 35, 90, 0);
-    transform: scale(1);
+    background-position: 100% 0%;
   }
 `
-export const DroppableWrapper = styled(Grid)(() => ({
+
+const glow = keyframes`
+  0% {
+    box-shadow: 0 0 5px rgba(91, 197, 242, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(91, 197, 242, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(91, 197, 242, 0.4);
+  }
+`
+export const DroppableWrapper = styled(Grid)<DroppableWrapperProps>(({ isActive }) => ({
   position: 'absolute',
   top: 0,
   left: 0,
@@ -43,11 +53,14 @@ export const DroppableWrapper = styled(Grid)(() => ({
   maxWidth: 930,
   zIndex: 1,
   overflow: 'hidden',
-  maxHeight: 200,
-  animation: `${pulse} 1.2s infinite ease-in-out`,
-  border: '1px dashed #19235a',
-  background: '#5bc5f2',
-  opacity: 0.3,
+  border: isActive ? '1px solid #5bc5f2' : '2px dashed #fff)',
+  opacity: 0.5,
+  borderRadius: 4,
+  background: isActive ? 'linear-gradient(90deg, #5bc5f2, #5bc5f2, #fff)' : '#fff',
+  backgroundSize: isActive ? '300% 100%' : '100% 100%',
+  backgroundRepeat: 'no-repeat',
+  animation: isActive ? `${attract} 1s ease-in-out forwards, ${glow} 1.5s infinite ease-in-out` : `none`,
+  transition: 'background 300ms ease-in-out',
   '& > *': {
     opacity: 0
   }

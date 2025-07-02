@@ -71,26 +71,16 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
     const toDisplay = currentCriteriaGroup.criteriaIds
       .map((criteriaId) => groups.find((g) => g.id === criteriaId) ?? criterias.find((c) => c.id === criteriaId))
       .filter((item): item is SelectedCriteriaType | CriteriaGroup => item !== undefined)
-    const criteriaList = toDisplay.filter((item) => item.id > 0)
+    // const criteriaList = toDisplay.filter((item) => item.id > 0)
     const operatorGroup = toDisplay.find((item) => item.id < 0) ?? null
-    const startPlaceholder = { id: `start-${-itemId}`, disabled: true }
-    const endPlaceholder = criteriaList.length > 0 ? { id: `end-${-itemId}`, disabled: true } : {}
+    //   const startPlaceholder = { id: `start-${-itemId}`, disabled: true }
+    //   const endPlaceholder = criteriaList.length > 0 ? { id: `end-${-itemId}`, disabled: true } : {}
 
     return {
-      list: [startPlaceholder, ...criteriaList, endPlaceholder && endPlaceholder],
+      list: toDisplay, //[startPlaceholder, ...criteriaList, endPlaceholder && endPlaceholder],
       operator: operatorGroup
     }
   }, [groups, criterias, itemId])
-
-  const onCreateCriteria = (criteria: SelectedCriteriaType, disabled: boolean) => (
-    <CriteriaCardItem
-      criteriaCount={getStageDetails(criteria?.id as number, idRemap, stageDetails)}
-      criterion={criteria as SelectedCriteriaType}
-      duplicateCriteria={disabled ? undefined : duplicateCriteria}
-      deleteCriteria={disabled ? undefined : deleteCriteria}
-      editCriteria={disabled ? undefined : (item: SelectedCriteriaType) => editCriteria(item, itemId)}
-    />
-  )
 
   return (
     <>
@@ -108,19 +98,22 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
       </Grid>
 
       <div className={classes.operatorChild}>
-        {list.map((item) => (
-          <Grid marginTop="30px" key={`${itemId}-${item.id}`}>
-            <Draggable data={{ ...item, groupId: itemId }} disabled={item.disabled}>
-              <CriteriaCardItem
-                criteriaCount={getStageDetails(item?.id as number, idRemap, stageDetails)}
-                criterion={item as SelectedCriteriaType}
-                duplicateCriteria={item.disabled ? undefined : duplicateCriteria}
-                deleteCriteria={item.disabled ? undefined : deleteCriteria}
-                editCriteria={item.disabled ? undefined : (item: SelectedCriteriaType) => editCriteria(item, itemId)}
-              />
-            </Draggable>
-          </Grid>
-        ))}
+        {list.map((item) => {
+          const disabled = item.id < 0
+          return (
+            <Grid marginTop="30px" key={`${itemId}-${item.id}`}>
+              <Draggable data={{ ...item, groupId: itemId }} disabled={disabled}>
+                <CriteriaCardItem
+                  criteriaCount={getStageDetails(item?.id as number, idRemap, stageDetails)}
+                  criterion={item as SelectedCriteriaType}
+                  duplicateCriteria={disabled ? undefined : duplicateCriteria}
+                  deleteCriteria={disabled ? undefined : deleteCriteria}
+                  editCriteria={disabled ? undefined : (item: SelectedCriteriaType) => editCriteria(item, itemId)}
+                />
+              </Draggable>
+            </Grid>
+          )
+        })}
         {/*<List spacing="30px" groupId={itemId} items={list} onCreateChild={onCreateCriteria} />*/}
         {operator && (
           <OperatorItem
@@ -215,9 +208,9 @@ const LogicalOperator: React.FC = () => {
   const criteriasIds: UniqueIdentifier[] = useMemo(
     () =>
       criteriaGroup.flatMap((group) => [
-        `start-${group.id * -1}`,
-        ...group.criteriaIds.filter((ids) => ids > 0),
-        `end-${group.id * -1}`
+        /* `start-${group.id * -1}`,*/
+        ...group.criteriaIds /*.filter((ids) => ids > 0),
+        `end-${group.id * -1}`*/
       ]),
     [criteriaGroup]
   )
