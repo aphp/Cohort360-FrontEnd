@@ -390,7 +390,6 @@ const Login = () => {
           <Link href="https://eds.aphp.fr">
             <img src={logoAPHP} alt="Footer" />
           </Link>
-          {/* </Grid> */}
         </Grid>
       </Grid>
 

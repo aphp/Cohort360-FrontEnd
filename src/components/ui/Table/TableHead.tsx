@@ -73,8 +73,7 @@ const TableHead = ({ columns, orderBy, sx, onSort }: RowProps) => {
             sx={{
               fontSize: 12,
               fontWeight: 600,
-              padding: index === 0 ? '6px 5px 6px 20px' : index === columns.length - 1 ? '6px 20px 6px 6px' : '6px 5px',
-              whiteSpace: 'nowrap',
+              padding: index === 0 ? '4px 8px 4px 12px' : index === columns.length - 1 ? '4px 12px 4px 8px' : '4px 8px',
               ...sx
             }}
             size="small"

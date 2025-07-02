@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
-import { Grid, CssBaseline, Typography, Button, CircularProgress } from '@mui/material'
+import { Grid, Typography, CircularProgress } from '@mui/material'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import DataTable from 'components/ui/Table'
-import HeaderPage from 'components/ui/HeaderPage'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import sideBarTransition from 'styles/sideBarTransition'
-import styles from './styles'
 import { fetchExportsList } from 'services/aphp/serviceExportCohort'
 import { cleanSearchParams } from 'utils/paginationUtils'
 import { Back_API_Response, LoadingStatus } from 'types'
@@ -16,6 +14,9 @@ import { ExportList, FetchExportArgs } from 'types/export'
 import { Pagination } from 'components/ui/Pagination'
 import { StickyContainer } from 'components/ui/Pagination/styles'
 import { useAppSelector } from 'state'
+import HeaderLayout from 'components/ui/Header'
+import { GAP } from 'types/exploration'
+import Button from 'components/ui/Button'
 
 const RESULTS_PER_PAGE = 20
 
@@ -75,56 +76,54 @@ const Export = () => {
       className={cx(classes.appBar, {
         [classes.appBarShift]: openDrawer
       })}
+      sx={{ backgroundColor: '#FFF' }}
     >
       <Grid container direction="column" style={{ minHeight: '100vh' }}>
         <Grid container justifyContent="center" alignItems="center">
-          <CssBaseline />
-          <Grid container item xs={11} style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-            <HeaderPage id="export-page-title" title="Mes exports" />
-            <Grid container alignItems="center" gap="20px" style={{ flexGrow: 1 }}>
-              <Grid item container gap={1} justifyContent="space-between">
-                <Grid item xs={12} sm={5}>
-                  <Button className={styles().classes.newExportButton} onClick={() => navigate('/exports/new')}>
-                    Nouvel export
-                  </Button>
-                </Grid>
-                <Grid container xs={12} sm={6}>
-                  <SearchInput
-                    value={searchInput ?? ''}
-                    placeholder="Rechercher un export"
-                    onChange={(input) => handleSearch({ input })}
-                  />
-                </Grid>
+          <HeaderLayout id="export-page-title" title="Mes exports" />
+          <Grid container xs={11} gap={GAP} style={{ flexGrow: 1 }}>
+            <Grid item container gap={1} justifyContent="space-between">
+              <Grid container sm={6}>
+                <SearchInput
+                  value={searchInput ?? ''}
+                  placeholder="Rechercher un export"
+                  onChange={(input) => handleSearch({ input })}
+                />
               </Grid>
-              <Grid item container style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                {loadingStatus === LoadingStatus.FETCHING && (
-                  <Grid container justifyContent="center">
-                    <CircularProgress />
-                  </Grid>
-                )}
-                {loadingStatus === LoadingStatus.SUCCESS && (
-                  <>
-                    {!!exportList?.count && (
-                      <DataTable
-                        value={table}
-                        orderBy={orderBy}
-                        onSort={(orderBy) => handleSearch({ orderBy })}
-                        sxRow={{ backgroundColor: 'white', flexGrow: 1 }}
-                      />
-                    )}
-                    {!!!exportList?.count && (
-                      <Grid container justifyContent="center">
-                        <Typography variant="button">Aucune donnée à afficher</Typography>
-                      </Grid>
-                    )}
-                  </>
-                )}
+              <Grid container sm={5} justifyContent={'flex-end'}>
+                <Button width="fit-content" onClick={() => navigate('/exports/new')}>
+                  Nouvel export
+                </Button>
               </Grid>
+            </Grid>
+            <Grid item container direction="column" flexGrow={1}>
+              {loadingStatus === LoadingStatus.FETCHING && (
+                <Grid container justifyContent="center">
+                  <CircularProgress />
+                </Grid>
+              )}
+              {loadingStatus === LoadingStatus.SUCCESS && (
+                <>
+                  {!!exportList?.count && (
+                    <DataTable
+                      value={table}
+                      orderBy={orderBy}
+                      onSort={(orderBy) => handleSearch({ orderBy })}
+                      sxRow={{ backgroundColor: 'white', flexGrow: 1 }}
+                    />
+                  )}
+                  {!!!exportList?.count && (
+                    <Grid container justifyContent="center">
+                      <Typography variant="button">Aucune donnée à afficher</Typography>
+                    </Grid>
+                  )}
+                </>
+              )}
             </Grid>
           </Grid>
         </Grid>
       </Grid>
-      {pagination.total && (
+      {!!pagination.total && (
         <StickyContainer container>
           <Pagination
             count={pagination.total}

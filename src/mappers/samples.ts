@@ -1,5 +1,4 @@
 import { AppConfig } from 'config'
-import { mapCohortStatus } from 'components/Researches/CohortsTableContent'
 import { Cohort } from 'types'
 import { CohortCallbacks, ResearchesTableLabels } from 'types/cohorts'
 import { Order } from 'types/searchCriterias'
@@ -11,11 +10,12 @@ import Download from 'assets/icones/download.svg?react'
 import EditIcon from '@mui/icons-material/Edit'
 import FluentNavigation from 'assets/icones/fluent_navigation.svg?react'
 import { isChecked } from 'utils/filters'
+import { mapJobStatus } from 'utils/status'
 
 const getSamplesInfos = (cohort: Cohort) => {
   const name = cohort.name ?? 'N/A'
   const parentName = cohort.parent_cohort?.name ?? 'N/A'
-  const statusChip = mapCohortStatus(cohort.request_job_status, cohort.request_job_fail_msg)
+  const statusChip = mapJobStatus(cohort.request_job_status, cohort.request_job_fail_msg)
   const total = format(cohort.result_size)
   const globalTotal = getGlobalEstimation(cohort)
   const createdAt = formatDate(cohort.created_at)
@@ -104,7 +104,8 @@ const mapSamplesToRows = (
       {
         id: `${cohort.uuid}-total`,
         value: total,
-        type: CellType.TEXT
+        type: CellType.TEXT,
+        sx: { width: 150 }
       },
       {
         id: `${cohort.uuid}-samplingRatio`,

@@ -169,6 +169,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
   return (
     <>
       <HeaderLayout
+        id="cohort-name"
         icon={contextConfig?.icon}
         title={cohortName}
         description={cohortDescription}

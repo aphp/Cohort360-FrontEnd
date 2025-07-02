@@ -1,4 +1,3 @@
-import { mapCohortStatus } from 'components/Researches/CohortsTableContent'
 import { Cohort, JobStatus } from 'types'
 import { CohortCallbacks, ResearchesTableLabels, SubItemType } from 'types/cohorts'
 import { Order } from 'types/searchCriterias'
@@ -12,11 +11,12 @@ import FluentNavigation from 'assets/icones/fluent_navigation.svg?react'
 import Picker from 'assets/icones/color-picker.svg?react'
 import { AppConfig } from 'config'
 import { isChecked } from 'utils/filters'
+import { mapJobStatus } from 'utils/status'
 
 const getCohortInfos = (cohort: Cohort) => {
   const name = cohort.name ?? 'N/A'
   const parentName = cohort.request?.name ?? 'N/A'
-  const statusChip = mapCohortStatus(cohort.request_job_status, cohort.request_job_fail_msg)
+  const statusChip = mapJobStatus(cohort.request_job_status, cohort.request_job_fail_msg)
   const total = format(cohort.result_size)
   const globalTotal = getGlobalEstimation(cohort)
   const createdAt = formatDate(cohort.created_at)
@@ -100,15 +100,31 @@ const mapCohortsToRows = (
         id: `${cohort.uuid}-name`,
         value: name,
         type: CellType.TEXT,
-        sx: { fontWeight: 900 }
+        sx: {
+          fontWeight: 900,
+          width: simplified ? '240px' : '400px',
+          maxWidth: simplified ? '240px' : '400px',
+          whiteSpace: 'wrap'
+        }
       },
-      { id: `${cohort.uuid}-actions`, value: actions as Action[], type: CellType.ACTIONS },
+      {
+        id: `${cohort.uuid}-actions`,
+        value: actions as Action[],
+        type: CellType.ACTIONS,
+        sx: { width: 'fit-content' }
+      },
       ...(!requestId
         ? [
             {
               id: `${cohort.uuid}-parentName`,
               value: parentName,
-              type: CellType.TEXT
+              type: CellType.TEXT,
+              sx: {
+                fontWeight: 900,
+                width: simplified ? '240px' : 'inherit',
+                maxWidth: simplified ? '240px' : 'inherit',
+                whiteSpace: 'wrap'
+              }
             }
           ]
         : []),
@@ -120,17 +136,20 @@ const mapCohortsToRows = (
       {
         id: `${cohort.uuid}-total`,
         value: total,
-        type: CellType.TEXT
+        type: CellType.TEXT,
+        sx: { width: 150 }
       },
       {
         id: `${cohort.uuid}-globalTotal`,
         value: globalTotal,
-        type: CellType.TEXT
+        type: CellType.TEXT,
+        sx: { width: 160 }
       },
       {
         id: `${cohort.uuid}-createdAt`,
         value: createdAt,
-        type: CellType.TEXT
+        type: CellType.TEXT,
+        sx: { width: 200 }
       },
       {
         id: `${cohort.uuid}-samples`,

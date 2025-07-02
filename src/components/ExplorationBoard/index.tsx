@@ -35,12 +35,11 @@ const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
 
   return (
     <Grid item xs={12} container gap={GAP} margin={'16px 0'} sx={{ backgroundColor: '#fff' }}>
-      {config.getMessages &&
-        config.getMessages().map((msg, index) => (
-          <AlertWrapper key={index} icon={<WarningIcon />}>
-            {msg}
-          </AlertWrapper>
-        ))}
+      {config.getMessages?.().map((msg, index) => (
+        <AlertWrapper key={index} icon={<WarningIcon />}>
+          {msg}
+        </AlertWrapper>
+      ))}
       <SearchSection
         searchCriterias={searchCriterias}
         infos={additionalInfo}
@@ -73,7 +72,7 @@ const ExplorationBoard = <T,>({ config }: ExplorationBoardProps<T>) => {
         <Snackbar
           open={fetchStatus !== null}
           onClose={() => resetFetchStatus()}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           autoHideDuration={6000}
         >
           <Alert severity={fetchStatus?.status === FetchStatus.SUCCESS ? 'success' : 'error'}>

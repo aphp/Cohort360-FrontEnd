@@ -70,7 +70,11 @@ const TableRow = ({ row, sx }: RowProps) => {
               last={index === row.length - 1}
               scope="row"
               align={cell.align ?? 'left'}
-              sx={{ ...cell.sx, borderBottom: showSubContent ? 'none' : undefined }}
+              sx={{
+                ...cell.sx,
+                whiteSpace: cell.type === CellType.TEXT || cell.type === CellType.PARAGRAPHS ? 'wrap' : 'nowrap',
+                borderBottom: showSubContent ? 'none' : undefined
+              }}
             >
               {cell.type === CellType.ACTIONS &&
                 (cell.value as Action[]).map((action) => {

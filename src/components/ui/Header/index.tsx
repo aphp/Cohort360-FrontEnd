@@ -10,6 +10,7 @@ import ExpandableChipsLine from 'components/ui/ExpandableChips'
 import { format } from 'utils/numbers'
 
 type HeaderLayoutProps = {
+  id?: string
   icon?: React.ReactElement
   title: string
   description?: string
@@ -28,6 +29,7 @@ type HeaderLayoutProps = {
 }
 
 const HeaderLayout: React.FC<HeaderLayoutProps> = ({
+  id,
   icon,
   title,
   description,
@@ -64,7 +66,7 @@ const HeaderLayout: React.FC<HeaderLayoutProps> = ({
             <Grid container justifyContent="space-between" alignItems="center">
               <Box display="flex" alignItems="center" gap={1}>
                 {icon}
-                <Typography id="cohort-name" variant="h1">
+                <Typography id={id ?? title} variant="h1">
                   {title}
                 </Typography>
                 {showActions && onToggleFavorite && (

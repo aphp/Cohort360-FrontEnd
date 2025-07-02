@@ -3,41 +3,15 @@ import { AppConfig } from 'config'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
-import { ChipStatus } from 'components/ui/StatusChip'
 import DataTable from 'components/ui/Table'
 import { Pagination } from 'components/ui/Pagination'
 import { StickyContainer } from 'components/ui/Pagination/styles'
-import UpdateIcon from '@mui/icons-material/Update'
 
-import { Cohort, JobStatus } from 'types'
+import { Cohort } from 'types'
 import { OrderBy } from 'types/searchCriterias'
 import { mapCohortsToTable } from 'mappers/cohorts'
 import { redirectToSamples } from 'utils/explorationUtils'
 import { BaseCohortCallbacks } from 'types/cohorts'
-
-export const mapCohortStatus = (status?: JobStatus, jobFailMessage?: string) => {
-  if (jobFailMessage) {
-    return { label: 'Erreur', status: ChipStatus.ERROR, tooltip: jobFailMessage }
-  }
-
-  switch (status) {
-    case JobStatus.FINISHED:
-      return { label: 'Terminé', status: ChipStatus.FINISHED }
-    case JobStatus.PENDING:
-    case JobStatus.NEW:
-      return { label: 'En cours', status: ChipStatus.IN_PROGRESS }
-    case JobStatus.LONG_PENDING:
-      return {
-        label: 'En cours',
-        status: ChipStatus.IN_PROGRESS,
-        icon: UpdateIcon,
-        tooltip:
-          "Cohorte volumineuse : sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible."
-      }
-    default:
-      return { label: 'Erreur', status: ChipStatus.ERROR }
-  }
-}
 
 type CohortsTableContentProps = {
   cohortsList: Cohort[]
