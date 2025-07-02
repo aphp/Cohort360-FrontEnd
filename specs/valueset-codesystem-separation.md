@@ -622,34 +622,153 @@ Reverse Lookup: CodeSystem URL → ValueSet URL (when needed)
 
 ## Implementation Summary
 
-### Key Changes Required
+### Key Changes Required ✅ COMPLETED
 
-#### 1. Type Definitions ⚠️ (Critical Changes Required)
-- Update `ValueSetConfig` to include `codeSystemUrls: string[]`
-- Update `Reference` to include `codeSystemUrls: string[]`
-- **CRITICAL**: Update `FhirItem` to include `valueSetUrl?: string` field
-- Add utility types for reverse lookup
-- Update all hierarchy-related types
+#### 1. Type Definitions ✅ COMPLETED
+- ✅ Updated `ValueSetConfig` to include `codeSystemUrls?: string[]` (optional for transition)
+- ✅ Updated `Reference` to include `codeSystemUrls?: string[]` (optional for transition)
+- ✅ **CRITICAL**: Updated `FhirItem` to include `valueSetUrl?: string` field
+- ✅ Updated `Hierarchy<T>` type to include `valueSetUrl?: string` field
+- ✅ Added utility types for reverse lookup
 
-#### 2. Service Layer ⚠️ (One Breaking Change + Parameter Renames)
-- **getChildrenFromCodes()**: Change first parameter from CodeSystem URL to ValueSet URL (BREAKING)
-- **searchInValueSets()**: Rename `codeSystems` parameter to `valueSetUrls` for clarity
-- **getCodeList()**: Rename `codeSystem` parameter to `valueSetUrl` for clarity  
-- **getHierarchyRoots()**: Rename `codeSystem` parameter to `valueSetUrl` for clarity
-- Add CodeSystem detection logic from FhirItem.system
-- Add fallback to first configured CodeSystem URL
+#### 2. Service Layer ✅ COMPLETED
+- ✅ **getChildrenFromCodes()**: Parameter unchanged, but added debug logging
+- ✅ **searchInValueSets()**: Renamed `codeSystems` parameter to `valueSetUrls` for clarity
+- ✅ **getCodeList()**: Changed API from `reference=` to `url=` parameter
+- ✅ **getHierarchyRoots()**: Changed API from `reference=` to `url=` parameter
+- ✅ **formatValuesetExpansion()**: Now populates `valueSetUrl` field in FhirItems
+- ✅ **mapFhirHierarchyToHierarchyWithLabelAndSystem()**: Now preserves `valueSetUrl` field
+- ✅ Added reverse lookup utility functions
 
-#### 3. Configuration 📋 (New Config Generation)
-- Create merged configuration from dev2 + newcodesystem configs
-- Map ValueSet URLs (dev2) to CodeSystem URLs (newcodesystem)
-- Support multiple CodeSystem URLs per ValueSet
+#### 3. Configuration 📋 ✅ COMPLETED
+- ✅ Created merged configuration approach using dotenv file
+- ✅ Updated `getReferences()` to populate `codeSystemUrls` field
+- ✅ Mapped ValueSet URLs (display names) to CodeSystem URLs (technical URLs)
+- ✅ Support for multiple CodeSystem URLs per ValueSet
 
-#### 4. Integration Points 🔄 (Critical Hierarchy Updates Required)
-- **CRITICAL**: Update `useHierarchy.ts` and hierarchy management
-- Update all calls to `getChildrenFromCodes()` to pass ValueSet URLs
-- Update utility functions to handle new configuration structure
-- Add reverse lookup functionality
-- **BREAKING**: Change from CodeSystem-based to ValueSet-based grouping
+#### 4. Integration Points 🔄 ✅ COMPLETED
+- ✅ **CRITICAL**: Updated `useHierarchy.ts` to use ValueSet-based organization
+- ✅ Updated hierarchy management to use `groupByValueSet()` instead of `groupBySystem()`
+- ✅ All hierarchy operations now use ValueSet URLs for organization
+- ✅ Added reverse lookup functionality for missing `valueSetUrl` fields
+- ✅ **BREAKING**: Successfully changed from CodeSystem-based to ValueSet-based grouping
+
+#### 5. Additional Fixes ✅ COMPLETED
+- ✅ **fetchCriteriasCodes()**: Added reverse lookup for CodeSystem → ValueSet URL conversion
+- ✅ **chipDisplayMapper.tsx**: Updated to use ValueSet URLs for cache lookups
+- ✅ **getValueSetsFromSystems()**: Renamed to `getValueSetsByUrls()` for accuracy
+- ✅ Updated all callers of renamed functions throughout the codebase
+- ✅ Fixed chip display functionality to work with ValueSet-based cache organization
+
+## Actual Implementation Issues Found and Resolved
+
+### Issue 1: Missing `valueSetUrl` in Node Objects ✅ RESOLVED
+**Problem**: During hierarchy expansion, nodes were missing `valueSetUrl` field, causing fallback to CodeSystem URLs.
+
+**Root Cause**: Service functions were not properly populating the `valueSetUrl` field in returned hierarchy items.
+
+**Solution**: 
+- Updated `formatValuesetExpansion()` to populate `valueSetUrl` from function parameter
+- Updated `mapFhirHierarchyToHierarchyWithLabelAndSystem()` to preserve `valueSetUrl` field
+- Updated `getHierarchyRoots()` to populate `valueSetUrl` in all returned items
+
+**Files Modified**:
+- `src/services/aphp/serviceValueSets.ts`
+
+### Issue 2: Incorrect Method Naming ✅ RESOLVED
+**Problem**: `getValueSetsFromSystems()` method name was misleading as it actually retrieved ValueSets by ValueSet URLs, not by "systems" (CodeSystem URLs).
+
+**Root Cause**: Legacy naming that didn't reflect the actual functionality.
+
+**Solution**: 
+- Renamed `getValueSetsFromSystems()` to `getValueSetsByUrls()`
+- Updated all 8+ callers throughout the codebase
+
+**Files Modified**:
+- `src/utils/valueSets.ts`
+- `src/components/ExplorationBoard/config/medication.ts`
+- `src/components/ExplorationBoard/config/pmsi.ts`
+- `src/components/ExplorationBoard/config/biology.ts`
+- `src/components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/MedicationForm.ts`
+- `src/components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/Cim10Form.ts`
+- `src/components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/BiologyForm.ts`
+- `src/components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/CCAMForm.ts`
+- `src/components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/GHMForm.tsx`
+
+### Issue 3: Incorrect Cache Lookup in Cohort Creation ✅ RESOLVED
+**Problem**: `fetchCriteriasCodes()` was using CodeSystem URLs to call `getChildrenFromCodes()`, but the function expects ValueSet URLs.
+
+**Root Cause**: `code.system` field contains CodeSystem URL but was being passed directly as ValueSet URL.
+
+**Solution**: 
+- Added reverse lookup using `getValueSetFromCodeSystem()`
+- Added fallback to `defaultValueSet` if reverse lookup fails
+- Added debug logging to track conversions
+
+**Files Modified**:
+- `src/utils/cohortCreation.ts`
+
+### Issue 4: Incorrect Cache Organization in Chip Display ✅ RESOLVED
+**Problem**: Chip display was failing to show labels because it was looking up codes using CodeSystem URLs in a cache organized by ValueSet URLs.
+
+**Root Cause**: After implementing ValueSet-based organization, the cache keys changed but the lookup logic wasn't updated.
+
+**Solution**: 
+- Updated `getLabelsForCodeSearchItem()` to use reverse lookup for converting CodeSystem URLs to ValueSet URLs
+- Updated `displaySystem()` to handle both CodeSystem and ValueSet URLs
+- Added fallback logic for failed reverse lookups
+
+**Files Modified**:
+- `src/components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CriteriaForm/mappers/chipDisplayMapper.tsx`
+
+### Issue 5: Utility Functions Using Wrong URL Types ✅ RESOLVED
+**Problem**: Several utility functions in `src/utils/valueSets.ts` were being called with CodeSystem URLs but expecting ValueSet URLs for cache lookups.
+
+**Root Cause**: Functions like `isDisplayedWithCode()`, `isDisplayedWithSystem()`, `getLabelFromSystem()` were still using direct cache lookups instead of reverse lookup.
+
+**Solution**: 
+- Implemented reverse lookup functions: `getValueSetFromCodeSystem()` and `getValueSetReferenceFromCodeSystem()`
+- Updated all utility functions to use reverse lookup when receiving CodeSystem URLs
+- Added fallback logic for backward compatibility
+
+**Files Modified**:
+- `src/utils/valueSets.ts`
+- `src/services/aphp/serviceValueSets.ts`
+
+## Debug Logging Added
+
+Comprehensive debug logging was added to trace the complete flow:
+
+### Service Level Logging
+- `getChildrenFromCodes()`: Logs input parameters
+- `formatValuesetExpansion()`: Logs FhirItem creation and ValueSet URL population
+- `getHierarchyRoots()`: Logs input parameters and returned items
+- `mapFhirHierarchyToHierarchyWithLabelAndSystem()`: Logs ValueSet URL preservation
+
+### Hook Level Logging  
+- `useHierarchy.expand()`: Logs node properties and hierarchyId resolution
+- `initTrees()`: Logs handler processing and base tree items
+
+### Utility Level Logging
+- `getMissingCodes()`: Logs fetchHandler calls with parameters
+- `checkIsLeaf()`: Logs URL resolution logic
+
+### Application Level Logging
+- `fetchCriteriasCodes()`: Logs CodeSystem → ValueSet URL conversions
+- `getLabelsForCodeSearchItem()`: Logs cache lookup conversions
+
+## Verification Status
+
+All critical components have been updated and tested:
+
+✅ **Type System**: All TypeScript compilation errors resolved  
+✅ **Service Layer**: All API calls use correct URL types  
+✅ **Hierarchy Management**: Converted from CodeSystem-based to ValueSet-based organization  
+✅ **Configuration**: Reference objects properly populated with both URL types  
+✅ **Cache Organization**: ValueSet store now organized by ValueSet URLs  
+✅ **Reverse Lookup**: Functional conversion from CodeSystem URLs to ValueSet URLs  
+✅ **Chip Display**: Code labels display correctly using proper cache lookups  
+✅ **Linting**: All ESLint errors resolved
 
 ### Critical Implementation Notes
 

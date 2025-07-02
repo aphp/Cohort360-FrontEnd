@@ -6,7 +6,8 @@ import { LabelObject } from 'types/searchCriterias'
 import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
 
 type ValueSetConfig = {
-  url: string
+  url: string // ValueSet URL (for searching/listing valuesets)
+  codeSystemUrls?: string[] // Array of CodeSystem URLs (for individual codes within valuesets)
   title?: string
   data?: LabelObject[]
 }

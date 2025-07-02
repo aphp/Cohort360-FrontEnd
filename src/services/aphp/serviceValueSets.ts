@@ -48,21 +48,24 @@ const mapAbandonedChildren = (children: Hierarchy<FhirItem>[]) => {
  * @returns
  */
 const mapFhirHierarchyToHierarchyWithLabelAndSystem = (fhirItem: FhirItem): Hierarchy<FhirItem> => {
-  return {
+  const result = {
     id: fhirItem.id,
     label: fhirItem.label,
     system: fhirItem.system,
+    valueSetUrl: fhirItem.valueSetUrl, // Preserve ValueSet URL
     above_levels_ids: fhirItem.parentIds?.join(',') ?? '',
     inferior_levels_ids: fhirItem.childrenIds?.join(',') ?? '',
     statTotal: fhirItem.statTotal,
     statTotalUnique: fhirItem.statTotalUnique
   }
+  return result
 }
 
 const mapCodesToFhirItems = (
   codes: ValueSetComposeIncludeConcept[],
   codeSystem: string,
-  codeInLabel: boolean
+  codeInLabel: boolean,
+  valueSetUrl?: string
 ): FhirItem[] => {
   return sortArray(
     codes.map((code) => ({
@@ -70,7 +73,8 @@ const mapCodesToFhirItems = (
       label: codeInLabel
         ? `${code.code} - ${capitalizeFirstLetter(code.display)}`
         : capitalizeFirstLetter(code.display),
-      system: codeSystem
+      system: codeSystem,
+      valueSetUrl // Populate ValueSet URL for proper grouping
     })),
     'label'
   )
@@ -100,7 +104,10 @@ const extractStats = (codeExtensions?: Extension[]) => {
   }
 }
 
-const formatValuesetExpansion = (valueSetExpansion?: ValueSetExpansion): Back_API_Response<Hierarchy<FhirItem>> => {
+const formatValuesetExpansion = (
+  valueSetExpansion?: ValueSetExpansion,
+  valueSetUrl?: string
+): Back_API_Response<Hierarchy<FhirItem>> => {
   const codeList: Array<FhirItem> =
     valueSetExpansion?.contains?.map((code) => {
       const stats = code?.extension
@@ -112,6 +119,7 @@ const formatValuesetExpansion = (valueSetExpansion?: ValueSetExpansion): Back_AP
         label: code.display as string, // it will always be defined
         childrenIds: code.contains?.map((child) => child.code as string) || [],
         parentIds: getParentIds(code.extension, code.code),
+        valueSetUrl, // Populate ValueSet URL for proper grouping
         statTotal: stats?.statTotal,
         statTotalUnique: stats?.statTotalUnique
       }
@@ -130,13 +138,13 @@ const formatCodesFromValueSetReponse = (valueSetBundle: ValueSet[]) => {
  * Fetch the partial hierarchy from a certain node with a specific code value
  * the subItems won't have their subItems, childrenIds, and parentIds initialized
  * You must then call getFhirCode on subItems to expand the hierarchy
- * @param codeSystem the code system from which belongs the code
+ * @param valueSetUrl the ValueSet URL to expand codes from
  * @param codes the codes to get the partial hierarchy from
  * @param signal the abort signal to cancel the request
  * @returns the partial hierarchy from the codes
  */
 export const getChildrenFromCodes = async (
-  codeSystem: string,
+  valueSetUrl: string,
   codes: string[],
   signal?: AbortSignal
 ): Promise<Back_API_Response<Hierarchy<FhirItem>>> => {
@@ -157,7 +165,7 @@ export const getChildrenFromCodes = async (
         name: 'valueSet',
         resource: {
           resourceType: 'ValueSet',
-          url: codeSystem,
+          url: valueSetUrl,
           compose: {
             include: [
               {
@@ -179,14 +187,14 @@ export const getChildrenFromCodes = async (
   const res = await apiFhir.post<FHIR_API_Response<ValueSet>>(`/ValueSet/$expand`, JSON.stringify(json), {
     signal: signal
   })
-  return formatValuesetExpansion(getApiResponseResourceOrThrow(res).expansion)
+  return formatValuesetExpansion(getApiResponseResourceOrThrow(res).expansion, valueSetUrl)
 }
 
 /**
  * Search nodes matching the search string and retrieve the partial hierarchy for theses nodes
  * the subItems won't have their subItems, childrenIds, and parentIds initialized
  * You must then call getFhirCode on subItems to expand the hierarchy
- * @param codeSystems the code systems to search in
+ * @param valueSetUrls the valueset urls to search in
  * @param search the search string
  * @param offset the offset
  * @param count the size of the result
@@ -195,7 +203,7 @@ export const getChildrenFromCodes = async (
  * @returns the partial hierarchy for the nodes matching the search string
  */
 export const searchInValueSets = async (
-  codeSystems: string[],
+  valueSetUrls: string[],
   search: string,
   offset?: number,
   count?: number,
@@ -216,12 +224,12 @@ export const searchInValueSets = async (
   const searchValue = search || HIERARCHY_ROOT
   try {
     const res = await apiFhir.get<FHIR_API_Response<ValueSet>>(
-      `/ValueSet/$expand?url=${codeSystems.join(',')}&filter=${encodeURIComponent(
+      `/ValueSet/$expand?url=${valueSetUrls.join(',')}&filter=${encodeURIComponent(
         searchValue
       )}&excludeNested=false&_tag=text-search-rank&_tag=${LOW_TOLERANCE_TAG}${options}`,
       { signal }
     )
-    const response = formatValuesetExpansion(getApiResponseResourceOrThrow(res).expansion)
+    const response = formatValuesetExpansion(getApiResponseResourceOrThrow(res).expansion, valueSetUrls[0])
     response.results = mapAbandonedChildren(response.results)
     return response
   } catch (error) {
@@ -234,41 +242,62 @@ export const searchInValueSets = async (
 }
 
 /**
- * Get the complete list of a specific code system
- * @param codeSystem the code system to search in
+ * Get the complete list of a specific valueset
+ * @param valueSetUrl the ValueSet URL to get codes from
  * @param codeInLabel the code is included in the Fhir Items labels
  * @param signal the abort signal to cancel the request
- * @returns the complete list of the code system
+ * @returns the complete list of the valueset
  */
 export const getCodeList = async (
-  codeSystem: string,
+  valueSetUrl: string,
   codeInLabel = false,
   signal?: AbortSignal
 ): Promise<Back_API_Response<FhirItem>> => {
-  const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?reference=${codeSystem}`, {
+  const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(`/ValueSet?url=${valueSetUrl}`, {
     signal: signal
   })
   const valueSetBundle = getApiResponseResourcesOrThrow(res)
   const codeList = formatCodesFromValueSetReponse(valueSetBundle)[0]
-  const fhirItems = mapCodesToFhirItems(codeList, codeSystem, codeInLabel)
+  // TODO: Extract actual CodeSystem URL from response instead of using placeholder
+  const codeSystemUrl = valueSetBundle[0]?.compose?.include?.[0]?.system || 'unknown-codesystem'
+  const fhirItems = mapCodesToFhirItems(codeList, codeSystemUrl, codeInLabel, valueSetUrl)
   return {
     results: fhirItems,
     count: codeList.length
   }
 }
 
+// Reverse lookup utility functions
+// Note: These are now implemented in utils/valueSets.ts
+// Keep these exports for backward compatibility
+export { getValueSetFromCodeSystem } from 'utils/valueSets'
+
+export const getCodeSystemFromValueSet = (valueSetUrl: string): string[] | undefined => {
+  // Import locally to avoid circular dependency
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { getReferences } = require('data/valueSets')
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { getConfig } = require('config')
+  const references = getReferences(getConfig())
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const reference = references.find((ref: any) => ref.url === valueSetUrl)
+  return reference?.codeSystemUrls
+}
+
 export const getHierarchyRoots = async (
-  codeSystem: string,
+  valueSetUrl: string,
   valueSetTitle: string,
   filterRoots: (code: Hierarchy<FhirItem>) => boolean = () => true,
   filterOut: (code: Hierarchy<FhirItem>) => boolean = (value: Hierarchy<FhirItem>) => value.id === 'APHP generated',
   signal?: AbortSignal
 ): Promise<Back_API_Response<Hierarchy<FhirItem>>> => {
   const res = await apiFhir.get<FHIR_Bundle_Response<ValueSet>>(
-    `/ValueSet?only-roots=true&reference=${codeSystem}&_sort=code`,
+    `/ValueSet?only-roots=true&url=${valueSetUrl}&_sort=code`,
     { signal }
   )
   const valueSetBundle = getApiResponseResourcesOrThrow(res)
+  // TODO: Extract actual CodeSystem URL from response instead of using placeholder
+  const codeSystemUrl = valueSetBundle[0]?.compose?.include?.[0]?.system || 'unknown-codesystem'
   const codeList = (
     formatCodesFromValueSetReponse(valueSetBundle)
       .filter((valueSetPerSystem) => !!valueSetPerSystem)
@@ -276,7 +305,8 @@ export const getHierarchyRoots = async (
       .map((code) => ({
         id: code.code,
         label: capitalizeFirstLetter(code.display),
-        system: codeSystem
+        system: codeSystemUrl,
+        valueSetUrl // Populate ValueSet URL for proper grouping
       })) as Hierarchy<FhirItem>[]
   ).filter((code) => !filterOut(code))
 
@@ -288,16 +318,17 @@ export const getHierarchyRoots = async (
   let subItems: Hierarchy<FhirItem>[] | undefined = undefined
   if (toBeAdoptedCodes.length) {
     const unknownChaptersIds = toBeAdoptedCodes.map((code) => code.id)
-    const unknownChapters = (await getChildrenFromCodes(codeSystem, unknownChaptersIds)).results
+    const unknownChapters = (await getChildrenFromCodes(valueSetUrl, unknownChaptersIds)).results
     const unknownChapter: Hierarchy<FhirItem> = {
       id: UNKOWN_HIERARCHY_CHAPTER,
       label: `${UNKOWN_HIERARCHY_CHAPTER}`,
-      system: codeSystem,
+      system: codeSystemUrl,
+      valueSetUrl, // Populate ValueSet URL for proper grouping
       above_levels_ids: HIERARCHY_ROOT,
       inferior_levels_ids: unknownChapters.map((code) => code.id).join(','),
       subItems: unknownChapters
     }
-    const chaptersEntities = (await getChildrenFromCodes(codeSystem, childrenIds)).results
+    const chaptersEntities = (await getChildrenFromCodes(valueSetUrl, childrenIds)).results
     childrenIds.push(UNKOWN_HIERARCHY_CHAPTER)
     subItems = [...chaptersEntities, unknownChapter]
   }
@@ -305,7 +336,8 @@ export const getHierarchyRoots = async (
     {
       id: HIERARCHY_ROOT,
       label: valueSetTitle,
-      system: codeSystem,
+      system: codeSystemUrl,
+      valueSetUrl, // Populate ValueSet URL for proper grouping
       childrenIds,
       parentIds: []
     }
