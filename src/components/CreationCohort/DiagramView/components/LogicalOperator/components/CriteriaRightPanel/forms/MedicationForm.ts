@@ -15,7 +15,7 @@ import {
 } from '../CriteriaForm/types'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
-import { getValueSetsFromSystems } from 'utils/valueSets'
+import { getValueSetsByUrls } from 'utils/valueSets'
 import { Hierarchy } from 'types/hierarchy'
 import { FhirItem } from 'types/valueSet'
 import { hasSearchParam } from 'services/aphp/serviceFhirConfig'
@@ -94,14 +94,17 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
           type: 'codeSearch',
           label: 'Sélectionner les codes',
           noOptionsText: 'Veuillez entrer un code de médicament',
-          valueSetsInfo: getValueSetsFromSystems([
+          valueSetsInfo: getValueSetsByUrls([
             getConfig().features.medication.valueSets.medicationAtc.url,
             getConfig().features.medication.valueSets.medicationUcd.url
           ]),
           buildInfo: {
             fhirKey: PrescriptionParamsKeys.CODE,
             buildMethodExtraArgs: [
-              { type: 'string', value: getConfig().features.medication.valueSets.medicationAtc.url },
+              {
+                type: 'string',
+                value: getConfig().features.medication.valueSets.medicationAtc.codeSystemUrls?.at(0) || ''
+              },
               { type: 'boolean', value: true }
             ],
             chipDisplayMethodExtraArgs: [

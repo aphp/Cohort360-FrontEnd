@@ -27,7 +27,7 @@ import {
   narrowSearchCriterias,
   resolveAdditionalInfos
 } from 'utils/exploration'
-import { getValueSetsFromSystems } from 'utils/valueSets'
+import { getValueSetsByUrls } from 'utils/valueSets'
 
 const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<AdditionalInfo> => {
   const fetchersMap: Record<string, () => Promise<FhirItem[] | undefined>> = {
@@ -37,7 +37,7 @@ const fetchAdditionalInfos = async (additionalInfo: AdditionalInfo): Promise<Add
         : Promise.resolve(undefined)
   }
   const resolved = await resolveAdditionalInfos(fetchersMap)
-  const references: Reference[] = getValueSetsFromSystems([
+  const references: Reference[] = getValueSetsByUrls([
     getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
     getConfig().features.observation.valueSets.biologyHierarchyLoinc.url
   ])

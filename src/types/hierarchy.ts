@@ -35,6 +35,7 @@ export type Hierarchy<T = {}, S = string> = AbstractTree<
     above_levels_ids: string
     inferior_levels_ids: string
     system: string
+    valueSetUrl?: string // ValueSet URL (for grouping and API calls)
     status?: SelectedStatus
     statTotal?: number
     statTotalUnique?: number

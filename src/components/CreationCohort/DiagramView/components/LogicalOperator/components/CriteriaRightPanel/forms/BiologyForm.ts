@@ -10,7 +10,7 @@ import {
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
 import { BiologyStatus } from 'types'
-import { getValueSetsFromSystems } from 'utils/valueSets'
+import { getValueSetsByUrls } from 'utils/valueSets'
 import { FhirItem } from 'types/valueSet'
 import { Hierarchy } from 'types/hierarchy'
 
@@ -80,7 +80,7 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
           type: 'codeSearch',
           label: 'Sélectionner les codes',
           checkIsLeaf: true,
-          valueSetsInfo: getValueSetsFromSystems([
+          valueSetsInfo: getValueSetsByUrls([
             getConfig().features.observation.valueSets.biologyHierarchyAnabio.url,
             getConfig().features.observation.valueSets.biologyHierarchyLoinc.url
           ]),
@@ -88,7 +88,10 @@ export const form: () => CriteriaForm<ObservationDataType> = () => ({
           buildInfo: {
             fhirKey: ObservationParamsKeys.CODE,
             buildMethodExtraArgs: [
-              { type: 'string', value: getConfig().features.observation.valueSets.biologyHierarchyAnabio.url },
+              {
+                type: 'string',
+                value: getConfig().features.observation.valueSets.biologyHierarchyAnabio.codeSystemUrls?.at(0) || ''
+              },
               { type: 'boolean', value: true }
             ]
           }
