@@ -19,7 +19,6 @@ import { Direction, Order, PMSIFilters, SearchCriterias } from 'types/searchCrit
 import { CellType, Column, Row, Table } from 'types/table'
 import { FhirItem, Reference } from 'types/valueSet'
 import { fetchValueSet, narrowSearchCriterias, resolveAdditionalInfos } from 'utils/exploration'
-
 import { getCategory, getExtensionStringValue } from 'utils/fhir'
 import { getValueSetsByUrls } from 'utils/valueSets'
 

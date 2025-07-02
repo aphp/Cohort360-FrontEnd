@@ -50,7 +50,7 @@ const mapAbandonedChildren = (children: Hierarchy<FhirItem>[]) => {
  * @returns
  */
 const mapFhirHierarchyToHierarchyWithLabelAndSystem = (fhirItem: FhirItem): Hierarchy<FhirItem> => {
-  return {
+  const result = {
     id: fhirItem.id,
     label: fhirItem.label,
     system: fhirItem.system,
@@ -60,6 +60,7 @@ const mapFhirHierarchyToHierarchyWithLabelAndSystem = (fhirItem: FhirItem): Hier
     statTotal: fhirItem.statTotal,
     statTotalUnique: fhirItem.statTotalUnique
   }
+  return result
 }
 
 const mapCodesToFhirItems = (
