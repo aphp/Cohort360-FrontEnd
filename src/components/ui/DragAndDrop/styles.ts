@@ -3,26 +3,27 @@ import { Grid, styled, keyframes } from '@mui/material'
 type DraggableWrapperProps = {
   isActive: boolean
   isDragging: boolean
-  visible: boolean
-  disabled: boolean
+  isDropZone: boolean
+  isDisabled: boolean
 }
 
 type DroppableWrapperProps = {
   isActive: boolean
 }
 
-export const DraggableWrapper = styled(Grid)<DraggableWrapperProps>(({ isActive, isDragging, disabled }) => ({
-  position: isDragging || !disabled ? 'relative' : 'absolute',
-  zIndex: isActive ? 3 : 2,
-  '& > *': {
-    cursor: disabled ? 'auto' : isActive ? 'grabbing' : 'grab',
-    opacity: disabled ? 0 : isDragging ? (isActive ? 1 : 0.6) : 1,
-    overflow: isDragging ? 'hidden' : 'visible',
-    border: isDragging ? (isActive ? '1px solid #19235a' : '1px solid #00000014') : '',
-    transition: 'opacity 0.2s',
-    backgroundColor: isDragging && isActive ? 'rgba(255,255,255,0.95)' : undefined
-  }
-}))
+export const DraggableWrapper = styled(Grid)<DraggableWrapperProps>(
+  ({ isActive, isDragging, isDropZone, isDisabled }) => ({
+    position: isDragging || !isDropZone ? 'relative' : 'absolute',
+    zIndex: isActive ? 3 : 2,
+    '& > *': {
+      cursor: isDisabled || isDropZone ? 'auto' : isActive ? 'grabbing' : 'grab',
+      opacity: isDropZone ? 0 : isDragging ? (isActive ? 1 : 0.6) : 1,
+      overflow: isDisabled ? 'visible' : isDragging ? 'hidden' : 'visible',
+      border: isDragging ? (isActive ? '1px solid #19235a' : '1px solid #00000014') : '',
+      backgroundColor: isDragging && isActive ? 'rgba(255,255,255,0.95)' : undefined
+    }
+  })
+)
 
 const attract = keyframes`
   0% {
