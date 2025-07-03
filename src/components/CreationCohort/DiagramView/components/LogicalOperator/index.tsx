@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import { ButtonGroup, Button, IconButton, CircularProgress, Grid } from '@mui/material'
 
@@ -18,6 +18,7 @@ import {
   buildCohortCreation,
   deleteSelectedCriteria,
   duplicateSelectedCriteria,
+  editAllCriteriaGroup,
   editCriteriaGroup,
   editSelectedCriteria,
   suspendCount,
@@ -27,9 +28,14 @@ import {
 import useStyles from './styles'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 import { getStageDetails } from '../CriteriaCount'
+import { DndContext, DragEndEvent, PointerSensor, UniqueIdentifier, useSensor, useSensors } from '@dnd-kit/core'
+import { SortableContext } from '@dnd-kit/sortable'
+import Draggable from 'components/ui/DragAndDrop/Draggable'
+import { cloneDeep } from 'lodash'
 
 type OperatorItemProps = {
   itemId: number
+  groups: CriteriaGroup[]
   addNewCriteria: (parentId: number) => void
   addNewGroup: (parentId: number) => void
   deleteCriteria: (criteriaId: number) => void
@@ -39,6 +45,7 @@ type OperatorItemProps = {
 
 const OperatorItem: React.FC<OperatorItemProps> = ({
   itemId,
+  groups,
   addNewCriteria,
   addNewGroup,
   deleteCriteria,
@@ -47,20 +54,41 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 }) => {
   const { classes } = useStyles()
   const { request } = useAppSelector((state) => state.cohortCreation || {})
-  const { loading = false, criteriaGroup = [], selectedCriteria = [], count = {}, idRemap } = request
+  const { loading = false, selectedCriteria: criterias = [], count = {}, idRemap } = request
   const { extra: stageDetails } = count
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
-
-  const displayingItem = criteriaGroup.filter((_criteriaGroup: CriteriaGroup) => _criteriaGroup.id === itemId)
 
   let timeout: NodeJS.Timeout | null = null
 
   const [isExpanded, setIsExpanded] = useState(false)
 
+  const { list, operator } = useMemo(() => {
+    const currentGroup = groups.find((group) => group.id === itemId)
+    if (!currentGroup) return { list: [], operator: null }
+
+    const toDisplay = currentGroup.criteriaIds
+      .map((id) => groups.find((g) => g.id === id) ?? criterias.find((c) => c.id === id))
+      .filter((item): item is SelectedCriteriaType | CriteriaGroup => !!item)
+
+    const criteriaList = toDisplay.filter((item) => item.id > 0) as SelectedCriteriaType[]
+    const operatorGroup = toDisplay.find((item) => item.id < 0) as CriteriaGroup | null
+    const listWithPlaceholders: (SelectedCriteriaType | { id: string; disabled: true })[] =
+      criteriaList.length > 0
+        ? [{ id: `start-${itemId}`, disabled: true }, ...criteriaList, { id: `end-${itemId}`, disabled: true }]
+        : []
+
+    return {
+      list: listWithPlaceholders,
+      operator: operatorGroup
+    }
+  }, [groups, criterias, itemId])
+
   return (
     <>
-      <LogicalOperatorItem itemId={itemId} criteriaCount={getStageDetails(itemId, idRemap, stageDetails)} />
+      <Draggable data={{ id: `operator-${itemId}`, groupId: itemId }} disabled>
+        <LogicalOperatorItem itemId={itemId} criteriaCount={getStageDetails(itemId, idRemap, stageDetails)} />
+      </Draggable>
       <Grid
         container
         direction="column"
@@ -72,48 +100,38 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
           {Math.abs(itemId) + 1}
         </AvatarWrapper>
       </Grid>
+
       <div className={classes.operatorChild}>
-        {displayingItem?.map(({ criteriaIds }) => {
-          const children: (CriteriaGroup | SelectedCriteriaType | undefined)[] = criteriaIds
-            .map((criteriaId: number) => {
-              let foundItem: CriteriaGroup | SelectedCriteriaType | undefined = criteriaGroup.find(
-                ({ id }) => id === criteriaId
-              )
-              if (!foundItem) {
-                foundItem = selectedCriteria.find(({ id }) => id === criteriaId)
-              }
-              return foundItem
-            })
-            .filter((elem) => elem !== undefined)
-          if (!children) return <></>
-
-          return children.map((child) => {
-            if (!child || child?.id === undefined) return <></>
-
-            return child?.id > 0 ? (
-              <CriteriaCardItem
-                key={child?.id}
-                criteriaCount={getStageDetails(child?.id, idRemap, stageDetails)}
-                criterion={child as SelectedCriteriaType}
-                duplicateCriteria={duplicateCriteria}
-                deleteCriteria={deleteCriteria}
-                editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
-              />
-            ) : (
-              <OperatorItem
-                key={child?.id}
-                itemId={child?.id}
-                addNewCriteria={addNewCriteria}
-                addNewGroup={addNewGroup}
-                duplicateCriteria={duplicateCriteria}
-                deleteCriteria={deleteCriteria}
-                editCriteria={editCriteria}
-              />
-            )
-          })
+        {list.map((item) => {
+          const dropZone = typeof item.id === 'string'
+          return (
+            <Grid marginTop="30px" key={`${itemId}-${item.id}`}>
+              <Draggable data={{ ...item, groupId: itemId }} dropZone={dropZone}>
+                <CriteriaCardItem
+                  criteriaCount={getStageDetails(item?.id as number, idRemap, stageDetails)}
+                  criterion={item as SelectedCriteriaType}
+                  duplicateCriteria={dropZone ? undefined : duplicateCriteria}
+                  deleteCriteria={dropZone ? undefined : deleteCriteria}
+                  editCriteria={dropZone ? undefined : (item: SelectedCriteriaType) => editCriteria(item, itemId)}
+                />
+              </Draggable>
+            </Grid>
+          )
         })}
+        {operator && (
+          <OperatorItem
+            itemId={operator.id as number}
+            groups={groups}
+            addNewCriteria={addNewCriteria}
+            addNewGroup={addNewGroup}
+            duplicateCriteria={duplicateCriteria}
+            deleteCriteria={deleteCriteria}
+            editCriteria={editCriteria}
+          />
+        )}
       </div>
-      <div className={classes.operatorChild} style={{ height: 12, marginBottom: -14 }} />
+
+      <div className={classes.operatorChild} style={{ height: 12, marginBottom: -14 }}></div>
 
       {!isExpanded ? (
         <IconButton
@@ -152,7 +170,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
                 setIsExpanded(true)
                 if (timeout) clearInterval(timeout)
               }}
-              style={{ borderRadius: '18px 0 0 18px' }}
+              style={{ borderRadius: '18px 0 0 18px', zIndex: 1000 }}
               disabled={maintenanceIsActive}
             >
               Ajouter un critère
@@ -170,7 +188,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
                 setIsExpanded(true)
                 if (timeout) clearInterval(timeout)
               }}
-              style={{ borderRadius: '0 18px 18px 0' }}
+              style={{ borderRadius: '0 18px 18px 0', zIndex: 1000 }}
               disabled={maintenanceIsActive}
             >
               Ajouter un opérateur logique
@@ -189,6 +207,25 @@ const LogicalOperator: React.FC = () => {
   const [parentId, setParentId] = useState<number | null>(null)
   const [openDrawer, setOpenDrawer] = useState<'criteria' | null>(null)
   const [selectedCriteria, setSelectedCriteria] = useState<SelectedCriteriaType | null>(null)
+  const { criteriaGroup = [] } = request
+  const criteriasIds: UniqueIdentifier[] = useMemo(
+    () =>
+      criteriaGroup.flatMap((group) => [
+        `start-${group.id}`,
+        ...group.criteriaIds.filter((id) => id > 0),
+        `end-${group.id}`,
+        ...group.criteriaIds.filter((id) => id < 0).map((id) => `operator-${id}`)
+      ]),
+    [criteriaGroup]
+  )
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 1
+      }
+    })
+  )
 
   const _buildCohortCreation = () => {
     dispatch(buildCohortCreation({ selectedPopulation: null }))
@@ -266,16 +303,72 @@ const LogicalOperator: React.FC = () => {
     _buildCohortCreation()
   }
 
+  const onDragEnd = (event: DragEndEvent, ids: UniqueIdentifier[]) => {
+    const { active, over } = event
+    console.log('test move', active.id, over.id, ids)
+    if (!over || active.id === over.id) return
+    const activeIndex = ids.indexOf(active.id)
+    const overIndex = ids.indexOf(over.id)
+    if (activeIndex < overIndex) {
+      ids.splice(overIndex + 1, 0, active.id)
+    } else {
+      ids.splice(overIndex, 0, active.id)
+    }
+    ids.splice(activeIndex, 1)
+    const newGroups = criteriaGroup.map((group) => {
+      const startIndex = ids.findIndex((id) => id === `start-${group.id}`)
+      const endIndex = ids.findIndex((id) => id === `end-${group.id}`)
+      return { ...group, criteriaIds: ids.slice(startIndex + 1, endIndex) }
+    })
+    dispatch(editAllCriteriaGroup(newGroups))
+    _buildCohortCreation()
+    // const newIds = ids.filter((id) => id !== active.id)
+
+    /*const newGroups = cloneDeep(criteriaGroup)
+    //console.log('test move', ids, active.id, over.id)
+    const findIndexPred = (ids: UniqueIdentifier[]) => {
+      const overIndex = ids.indexOf(over.id)
+      return typeof over.id === 'string' && over.id.includes('end') ? overIndex : overIndex + 1
+    }
+    const newIds = ids.filter((id) => id !== active.id)
+    newIds.splice(
+      findIndexPred(newIds),
+      0,
+      active.id as number
+    ) const toCriteriaIndex = newGroups[toGroupIndex].criteriaIds.indexOf(over.id as number)*/
+    console.log('test move', ids)
+    /*const fromGroupIndex = newGroups.findIndex((group) => group.id === active.data.current?.groupId)
+    const fromCriteriaIndex = newGroups[fromGroupIndex].criteriaIds.indexOf(active.id as number)
+    const toGroupIndex = newGroups.findIndex((group) => group.id === over.data.current?.groupId)
+    const toCriteriaIndex = (() => {
+      if (typeof over.id === 'string' && over.id.startsWith('start-')) return 0
+      if (typeof over.id === 'string' && over.id.startsWith('end-'))
+        return newGroups[toGroupIndex].criteriaIds.filter((id) => id > -1).length
+      return newGroups[toGroupIndex].criteriaIds.indexOf(over.id as number)
+    })()
+    console.log('test indexes', over.id, 'groups', fromGroupIndex, fromCriteriaIndex, toGroupIndex, toCriteriaIndex)
+    
+    newGroups[fromGroupIndex].criteriaIds.splice(fromCriteriaIndex, 1)
+    newGroups[toGroupIndex].criteriaIds.splice(toCriteriaIndex, 0, active.id as number)
+    dispatch(editAllCriteriaGroup(newGroups))
+    _buildCohortCreation()*/
+  }
+
   return (
     <>
-      <OperatorItem
-        itemId={0}
-        addNewCriteria={_addNewCriteria}
-        addNewGroup={_addNewGroup}
-        duplicateCriteria={_duplicateCriteria}
-        deleteCriteria={_deleteCriteria}
-        editCriteria={_editCriteria}
-      />
+      <DndContext onDragEnd={(event) => onDragEnd(event, criteriasIds)} sensors={sensors}>
+        <SortableContext items={criteriasIds} /*strategy={verticalListSortingStrategy}*/>
+          <OperatorItem
+            groups={criteriaGroup}
+            itemId={0}
+            addNewCriteria={_addNewCriteria}
+            addNewGroup={_addNewGroup}
+            duplicateCriteria={_duplicateCriteria}
+            deleteCriteria={_deleteCriteria}
+            editCriteria={_editCriteria}
+          />
+        </SortableContext>
+      </DndContext>
 
       <CriteriaRightPanel
         parentId={parentId}
