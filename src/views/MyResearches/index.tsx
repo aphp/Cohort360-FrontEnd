@@ -1,7 +1,6 @@
 /* eslint-disable max-statements */
 import React, { useEffect, useState, useRef } from 'react'
 import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { useAppSelector } from 'state'
 
 import { Box, Grid, Slide, Tab } from '@mui/material'
 import Badge from 'components/ui/Badge'
@@ -9,6 +8,7 @@ import Breadcrumb from 'components/Researches/Breadcrumbs'
 import HeaderLayout from 'components/ui/Header'
 import { TabsWrapper } from 'components/ui/Tabs'
 import MenuButtonFilter from 'components/Researches/MenuButtonFilter'
+import PageContainer from 'components/ui/PageContainer'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 
 import useCounts from 'hooks/researches/useCounts'
@@ -16,12 +16,9 @@ import useCounts from 'hooks/researches/useCounts'
 import { ExplorationTabs } from 'types'
 import { ExplorationsSearchParams } from 'types/cohorts'
 import { cleanSearchParams, getPathDepth } from 'utils/explorationUtils'
-import useStyles from './styles'
 import moment from 'moment'
 
 const MyResearches = () => {
-  const { classes, cx } = useStyles()
-  const openDrawer = useAppSelector((state) => state.drawer)
   const location = useLocation()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -169,21 +166,12 @@ const MyResearches = () => {
           setLocalSearchInput(newInput)
           handleSearchTermChange(newInput)
         }}
-        // width="296px"
       />
     </Box>
   )
 
   return (
-    <Grid
-      container
-      direction="column"
-      className={cx(classes.appBar, {
-        [classes.appBarShift]: openDrawer
-      })}
-      bgcolor={'#e6f1fd'}
-      alignItems={'center'}
-    >
+    <PageContainer alignItems={'center'} bgColor="#E6F1FD">
       <HeaderLayout title="Mes recherches" searchArea={searchArea} />
       <Grid container xs={11}>
         <TabsWrapper value={selectedTab} onChange={(_, tab) => handleTabChange(tab)}>
@@ -202,7 +190,7 @@ const MyResearches = () => {
           </Slide>
         </Grid>
       </Grid>
-    </Grid>
+    </PageContainer>
   )
 }
 

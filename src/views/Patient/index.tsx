@@ -13,12 +13,12 @@ import { getCleanGroupId } from 'utils/paginationUtils'
 import ExplorationBoard from 'components/ExplorationBoard'
 import { MedicationLabel, ResourceType } from 'types/requestCriterias'
 import { PMSILabel } from 'types/patient'
-import sideBarTransition from 'styles/sideBarTransition'
 import { TabsWrapper } from 'components/ui/Tabs'
 import { SidebarButton, SidebarWrapper } from 'components/ui/Sidebar/style'
 import { buildExplorationConfig, ExplorationResourceType } from 'components/ExplorationBoard/config/config'
 import { useValidatedSubtab } from 'components/ExplorationBoard/useValidatedSubTab'
 import { useCleanSearchParams } from 'components/ExplorationBoard/useCleanSearchParams'
+import PageContainer from 'components/ui/PageContainer'
 
 const SIDEBAR_OPTONS = {
   myFilters: false,
@@ -34,9 +34,7 @@ const SIDEBAR_OPTONS = {
 const Patient = () => {
   useCleanSearchParams()
   const dispatch = useAppDispatch()
-  const { classes, cx } = sideBarTransition()
   const config = useContext(AppConfig)
-  const open = useAppSelector((state) => state.drawer)
   const patient = useAppSelector((state) => state.patient)
   const loading = patient !== null ? patient.loading : false
   const deidentified = patient !== null ? patient.deidentified ?? false : false
@@ -137,12 +135,7 @@ const Patient = () => {
       <CircularProgress size={50} />
     </Grid>
   ) : (
-    <Grid
-      container
-      direction="column"
-      className={cx(classes.appBar, { [classes.appBarShift]: open })}
-      sx={{ backgroundColor: '#FFF' }}
-    >
+    <PageContainer>
       <SidebarButton role="button" onClick={() => setIsSidebarOpened(true)}>
         <ChevronLeftIcon color="action" width="20px" />
       </SidebarButton>
@@ -225,7 +218,7 @@ const Patient = () => {
           </Grid>
         </SidebarWrapper>
       </Grid>
-    </Grid>
+    </PageContainer>
   )
 }
 

@@ -14,11 +14,11 @@ import { MedicationLabel, ResourceType } from 'types/requestCriterias'
 import { PMSILabel } from 'types/patient'
 import { DISPLAY_OPTIONS, URLS } from 'types/exploration'
 import { TabsWrapper } from 'components/ui/Tabs'
-import sideBarTransition from 'styles/sideBarTransition'
 import { buildExplorationConfig, ExplorationResourceType } from 'components/ExplorationBoard/config/config'
 import { useValidatedSubtab } from 'components/ExplorationBoard/useValidatedSubTab'
 import { useCleanSearchParams } from 'components/ExplorationBoard/useCleanSearchParams'
 import { AccessLevel } from 'components/ui/AccessBadge'
+import PageContainer from 'components/ui/PageContainer'
 
 type DashboardProps = {
   context: URLS
@@ -27,7 +27,6 @@ type DashboardProps = {
 const Dashboard = ({ context }: DashboardProps) => {
   useCleanSearchParams()
   const dispatch = useAppDispatch()
-  const { classes, cx } = sideBarTransition()
   const appConfig = useContext(AppConfig)
   const [searchParams] = useSearchParams()
   const subtab = searchParams.get('subtab') as ResourceType
@@ -35,7 +34,6 @@ const Dashboard = ({ context }: DashboardProps) => {
   const { tabName } = useParams<{ tabName?: ResourceType }>()
   const [selectedSubTab, setSelectedSubTab] = useState<ResourceType | null>(null)
   const [selectedTab, setSelectedTab] = useState(tabName ?? ResourceType.PREVIEW)
-  const open = useAppSelector((state) => state.drawer)
   const dashboard = useAppSelector((state) => state.exploredCohort)
   const me = useAppSelector((state) => state.me)
   const config = useMemo(
@@ -143,16 +141,7 @@ const Dashboard = ({ context }: DashboardProps) => {
   if (dashboard.loading === false && dashboard.rightToExplore === false) return <CohortRightOrNotExist />
   else if (dashboard.loading === false && dashboard.totalPatients === 0) return <CohortNoPatient />
   return (
-    <Grid
-      container
-      direction="column"
-      alignItems="center"
-      // gap="25px"
-      className={cx(classes.appBar, {
-        [classes.appBarShift]: open
-      })}
-      sx={{ backgroundColor: '#FFF' }}
-    >
+    <PageContainer alignItems="center">
       <TopBar
         context={context}
         access={dashboard.deidentifiedBoolean ? AccessLevel.DEIDENTIFIED : AccessLevel.NOMINATIVE}
@@ -232,7 +221,7 @@ const Dashboard = ({ context }: DashboardProps) => {
           <>{selectedConfig && <ExplorationBoard config={selectedConfig} />}</>
         )}
       </Grid>
-    </Grid>
+    </PageContainer>
   )
 }
 

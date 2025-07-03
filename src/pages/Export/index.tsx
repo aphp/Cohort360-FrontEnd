@@ -3,7 +3,6 @@ import { Grid, Typography, CircularProgress } from '@mui/material'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import DataTable from 'components/ui/Table'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import sideBarTransition from 'styles/sideBarTransition'
 import { fetchExportsList } from 'services/aphp/serviceExportCohort'
 import { cleanSearchParams } from 'utils/paginationUtils'
 import { Back_API_Response, LoadingStatus } from 'types'
@@ -17,14 +16,14 @@ import { useAppSelector } from 'state'
 import HeaderLayout from 'components/ui/Header'
 import { GAP } from 'types/exploration'
 import Button from 'components/ui/Button'
+import AddIcon from '@mui/icons-material/Add'
+import PageContainer from 'components/ui/PageContainer'
 
 const RESULTS_PER_PAGE = 20
 
 const Export = () => {
-  const { classes, cx } = sideBarTransition()
   const controllerRef = useRef<AbortController>(new AbortController())
   const navigate = useNavigate()
-  const openDrawer = useAppSelector((state) => state.drawer)
   const user = useAppSelector((state) => state.me?.impersonation?.username ?? state.me?.userName) ?? ''
   const deidentified = useAppSelector((state) => state.me?.deidentified)
   const [exportList, setExportList] = useState<Back_API_Response<ExportList> | null>(null)
@@ -70,28 +69,21 @@ const Export = () => {
   const table = useMemo(() => mapExportListToTable(exportList?.results ?? []), [exportList])
 
   return (
-    <Grid
-      container
-      direction="column"
-      className={cx(classes.appBar, {
-        [classes.appBarShift]: openDrawer
-      })}
-      sx={{ backgroundColor: '#FFF' }}
-    >
+    <PageContainer>
       <Grid container direction="column" style={{ minHeight: '100vh' }}>
         <Grid container justifyContent="center" alignItems="center">
           <HeaderLayout id="export-page-title" title="Mes exports" />
           <Grid container xs={11} gap={GAP} style={{ flexGrow: 1 }}>
             <Grid item container gap={1} justifyContent="space-between">
-              <Grid container sm={6}>
+              <Grid container xs={12} sm={6}>
                 <SearchInput
                   value={searchInput ?? ''}
                   placeholder="Rechercher un export"
                   onChange={(input) => handleSearch({ input })}
                 />
               </Grid>
-              <Grid container sm={5} justifyContent={'flex-end'}>
-                <Button width="fit-content" onClick={() => navigate('/exports/new')}>
+              <Grid container xs={12} sm={5} justifyContent={'flex-end'}>
+                <Button width="fit-content" onClick={() => navigate('/exports/new')} endIcon={<AddIcon />}>
                   Nouvel export
                 </Button>
               </Grid>
@@ -132,7 +124,7 @@ const Export = () => {
           />
         </StickyContainer>
       )}
-    </Grid>
+    </PageContainer>
   )
 }
 
