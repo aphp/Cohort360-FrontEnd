@@ -53,7 +53,7 @@ const initSearchCriterias = (search: string): SearchCriterias<BiologyFilters> =>
   searchInput: search,
   searchBy: SearchByTypes.TEXT,
   filters: {
-    validatedStatus: true,
+    validatedStatus: getConfig().features.observation.useObservationDefaultValidated,
     ipp: '',
     nda: '',
     code: [],
@@ -64,6 +64,7 @@ const initSearchCriterias = (search: string): SearchCriterias<BiologyFilters> =>
 })
 
 const mapToTable = (data: Data, deidentified: boolean, groupId: string[], isPatient: boolean): Table => {
+  const appConfig = getConfig()
   const rows: Row[] = []
   const columns: Column[] = [
     !isPatient && { label: `IPP${deidentified ? ' chiffré' : ''}` },
@@ -78,15 +79,18 @@ const mapToTable = (data: Data, deidentified: boolean, groupId: string[], isPati
   ;(data as ExplorationResults<CohortObservation>).list.forEach((elem) => {
     const anabio = elem.code?.coding?.find(
       (code) =>
-        code.system === getConfig().features.observation.valueSets.biologyHierarchyAnabio.url && code.userSelected
+        code.system === getConfig().features.observation.valueSets.biologyHierarchyAnabio.url &&
+        (!appConfig.core.fhir.selectedCodeOnly || code.userSelected)
     )?.display
     const codeLOINC = elem.code?.coding?.find(
       (code) =>
-        code.system === getConfig().features.observation.valueSets.biologyHierarchyLoinc.url && code.userSelected
+        code.system === getConfig().features.observation.valueSets.biologyHierarchyLoinc.url &&
+        (!appConfig.core.fhir.selectedCodeOnly || code.userSelected)
     )?.code
     const libelleLOINC = elem.code?.coding?.find(
       (code) =>
-        code.system === getConfig().features.observation.valueSets.biologyHierarchyLoinc.url && code.userSelected
+        code.system === getConfig().features.observation.valueSets.biologyHierarchyLoinc.url &&
+        (!appConfig.core.fhir.selectedCodeOnly || code.userSelected)
     )?.display
     const result =
       elem.valueQuantity && elem.valueQuantity?.value !== null

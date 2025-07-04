@@ -1,4 +1,4 @@
-import { Extension, ValueSet, ValueSetComposeIncludeConcept, ValueSetExpansion } from 'fhir/r4'
+import { CodeSystem, Extension, ValueSet, ValueSetComposeIncludeConcept, ValueSetExpansion } from 'fhir/r4'
 import apiFhir from 'services/apiFhir'
 import { Back_API_Response, FHIR_API_Response, FHIR_Bundle_Response } from 'types'
 import { Hierarchy } from 'types/hierarchy'
@@ -127,6 +127,26 @@ const formatCodesFromValueSetReponse = (valueSetBundle: ValueSet[]) => {
 }
 
 /**
+ * Fetch the list of all codes in a codesystem
+ * @param codeSystem codesystem from which to fetch codes
+ * @param signal the abort signal to cancel the request
+ * @returns the list of codes from the codesystem
+ */
+export const fetchCodeSystem = async (codeSystem: string, signal?: AbortSignal): Promise<FhirItem[]> => {
+  const res = await apiFhir.get<FHIR_Bundle_Response<CodeSystem>>(`/CodeSystem?system=${codeSystem}`, {
+    signal: signal
+  })
+  const codeSystemBundle = getApiResponseResourcesOrThrow(res)
+  return (
+    codeSystemBundle.at(0)?.concept?.map((concept) => ({
+      id: concept.code as string,
+      label: concept.display as string,
+      system: codeSystem
+    })) ?? []
+  )
+}
+
+/**
  * Fetch the partial hierarchy from a certain node with a specific code value
  * the subItems won't have their subItems, childrenIds, and parentIds initialized
  * You must then call getFhirCode on subItems to expand the hierarchy
@@ -249,6 +269,16 @@ export const getCodeList = async (
     signal: signal
   })
   const valueSetBundle = getApiResponseResourcesOrThrow(res)
+  if (
+    valueSetBundle.at(0)?.compose?.include[0].concept === undefined &&
+    !!valueSetBundle.at(0)?.compose?.include[0].system
+  ) {
+    const codeSystemItems = await fetchCodeSystem(valueSetBundle.at(0)?.compose?.include[0].system as string, signal)
+    return {
+      results: codeSystemItems,
+      count: codeSystemItems.length
+    }
+  }
   const codeList = formatCodesFromValueSetReponse(valueSetBundle)[0]
   const fhirItems = mapCodesToFhirItems(codeList, codeSystem, codeInLabel)
   return {
