@@ -1,25 +1,13 @@
 import { Order } from 'types/searchCriterias'
 import { CellType, Column, Row, Table } from 'types/table'
 import { mapToDateHours } from './dates'
-import { JobStatus } from 'types'
 import { ExportList } from 'types/export'
-
-const cohortStatusLabel: Partial<Record<JobStatus, string>> = {
-  [JobStatus.FINISHED]: 'Terminé',
-  [JobStatus.NEW]: 'En cours',
-  [JobStatus.STARTED]: 'En cours',
-  [JobStatus.PENDING]: 'En cours',
-  [JobStatus.FAILED]: 'Erreur'
-}
+import { mapJobStatus } from 'utils/status'
 
 const mapExportsToRows = (list: ExportList[]) => {
   const rows: Row[] = []
   const unknown = 'N/A'
   list.forEach((elem) => {
-    const status = {
-      label: elem.request_job_status ? cohortStatusLabel[elem.request_job_status] : unknown,
-      status: elem.request_job_status ?? unknown
-    }
     const row: Row = [
       {
         id: `${elem.cohort_id}-number`,
@@ -53,7 +41,7 @@ const mapExportsToRows = (list: ExportList[]) => {
       },
       {
         id: `${elem.cohort_id}-request_job_status`,
-        value: status,
+        value: mapJobStatus(elem.request_job_status ?? undefined),
         type: CellType.STATUS_CHIP
       }
     ].filter((elem) => elem) as Row

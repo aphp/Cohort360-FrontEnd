@@ -8,10 +8,9 @@ import {
   Table,
   TableBody,
   TableContainer,
-  Typography,
-  IconButton,
-  Tooltip
+  Typography
 } from '@mui/material'
+import Chart from 'components/ui/Chart'
 import { TableCellWrapper } from 'components/ui/TableCell/styles'
 
 import PieChart from './Charts/PieChart'
@@ -19,11 +18,8 @@ import BarChart from './Charts/BarChart'
 import GroupedBarChart from './Charts/GroupedBarChart'
 import DonutChart from './Charts/DonutChart'
 import PyramidChart from './Charts/PyramidChart'
-import InfoIcon from '@mui/icons-material/Info'
-import WarningIcon from '@mui/icons-material/Warning'
 
 import useStyles from './styles'
-import clsx from 'clsx'
 
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import { format } from 'utils/numbers'
@@ -152,96 +148,34 @@ const Preview: React.FC<PreviewProps> = ({
 
       <Grid container>
         <Grid container item xs={12} sm={6} lg={4} justifyContent="center">
-          <Paper id="vital-repartition-card" className={clsx(classes.chartOverlay, classes.fixedChartOverlay)}>
-            <Grid container item className={classes.chartTitle}>
-              <Typography id="vital-repartition-card-title" variant="h3" color="primary">
-                Répartition par statut vital
-              </Typography>
-            </Grid>
-
-            {loading || !vitalStatusData ? (
-              <Grid className={classes.progressContainer}>
-                <CircularProgress />
-              </Grid>
-            ) : (
-              <PieChart data={vitalStatusData ?? []} />
-            )}
-          </Paper>
+          <Chart id="vital-repartition-card" isLoading={loading} title="Répartition par statut vital">
+            <PieChart data={vitalStatusData ?? []} />
+          </Chart>
         </Grid>
 
         <Grid container item xs={12} sm={6} lg={4} justifyContent="center">
-          <Paper id="visit-type-repartition-card" className={clsx(classes.chartOverlay, classes.fixedChartOverlay)}>
-            <Grid container item className={classes.chartTitle}>
-              <Typography id="visit-type-repartition-card-title" variant="h3" color="primary">
-                Répartition par type de visite
-              </Typography>
-            </Grid>
-
-            {loading ? (
-              <Grid className={classes.progressContainer}>
-                <CircularProgress />
-              </Grid>
-            ) : (
-              <DonutChart data={visitTypeRepartitionData} />
-            )}
-          </Paper>
+          <Chart id="visit-type-repartition-card" isLoading={loading} title="Répartition par type de visite">
+            <DonutChart data={visitTypeRepartitionData} />
+          </Chart>
         </Grid>
 
         <Grid container item xs={12} sm={12} lg={4} justifyContent="center">
-          <Paper id="gender-repartition-card" className={clsx(classes.chartOverlay, classes.fixedChartOverlay)}>
-            <Grid container item className={classes.chartTitle}>
-              <Typography id="gender-repartition-card-title" variant="h3" color="primary">
-                Répartition par genre
-              </Typography>
-            </Grid>
+          <Chart id="gender-repartition-card" isLoading={loading} title="Répartition par genre">
+            <BarChart data={genderData} />
+          </Chart>
+        </Grid>
 
-            {loading ? (
-              <Grid className={classes.progressContainer}>
-                <CircularProgress />
-              </Grid>
-            ) : (
-              <BarChart data={genderData} />
-            )}
-          </Paper>
+        <Grid container item md={12} lg={6} justifyContent="center">
+          <Chart id="age-structure-card" isLoading={loading} title="Pyramide des âges">
+            <PyramidChart data={agePyramidData} />
+          </Chart>
         </Grid>
 
         <Grid container item md={12} lg={6} justifyContent="center">
           <Grid container item justifyContent="center">
-            <Paper id="age-structure-card" className={clsx(classes.chartOverlay, classes.fixedChartOverlay)}>
-              <Grid container item className={classes.chartTitle}>
-                <Typography id="age-structure-card-title" variant="h3" color="primary">
-                  Pyramide des âges
-                </Typography>
-              </Grid>
-
-              {loading ? (
-                <Grid className={classes.progressContainer}>
-                  <CircularProgress />
-                </Grid>
-              ) : (
-                <PyramidChart data={agePyramidData} />
-              )}
-            </Paper>
-          </Grid>
-        </Grid>
-
-        <Grid container item md={12} lg={6} justifyContent="center">
-          <Grid container item justifyContent="center">
-            <Paper id="month-repartition-visit-card" className={clsx(classes.chartOverlay, classes.fixedChartOverlay)}>
-              <Grid container item className={classes.chartTitle}>
-                <Typography id="month-repartition-visit-card-title" variant="h3" color="primary">
-                  Répartition des visites par mois
-                </Typography>
-              </Grid>
-
-              {loading ? (
-                <Grid className={classes.progressContainer}>
-                  <CircularProgress />
-                </Grid>
-              ) : (
-                <GroupedBarChart data={monthlyVisitData} />
-              )}
-            </Paper>
+            <Chart id="month-repartition-visit-card" isLoading={loading} title="Répartition des visites par mois">
+              <GroupedBarChart data={monthlyVisitData} />
+            </Chart>
           </Grid>
         </Grid>
       </Grid>
@@ -249,29 +183,20 @@ const Preview: React.FC<PreviewProps> = ({
       {appConfig.features.locationMap.enabled && cohortId && (
         <Grid container item justifyContent="space-between" alignItems="center">
           <Grid item xs={12} sm={12} md={12} justifyContent="center">
-            <Paper id="location-map" className={classes.chartOverlay}>
-              <Grid container item className={classes.chartTitle}>
-                <Typography id="location-map-card-title" variant="h3" color="primary">
-                  Répartition spatiale par zone IRIS
-                  <Tooltip title="Les localisations des patients sont affichées uniquement si leur adresse est disponible (certains patients n'ayant pas d'adresse associée).">
-                    <IconButton style={{ padding: '0 0 0 4px', marginTop: '-2.5px', position: 'absolute' }}>
-                      <InfoIcon style={{ height: 22 }} />
-                    </IconButton>
-                  </Tooltip>
-                  {total && total > MAP_WARNING_PERSON_COUNT_THRESHOLD && (
-                    <Tooltip title="Le nombre de patients de ce périmètre est très large, la carte peut être lente à charger.">
-                      <IconButton
-                        style={{ padding: '0 0 0 4px', marginTop: '-2.5px', marginLeft: '25px', position: 'absolute' }}
-                      >
-                        <WarningIcon color="warning" style={{ height: 22 }} />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </Typography>
-              </Grid>
-
+            <Chart
+              id="location-map"
+              isLoading={loading}
+              title="Répartition spatiale par zone IRIS"
+              tooltip="Les localisations des patients sont affichées uniquement si leur adresse est disponible (certains patients n'ayant pas d'adresse associée)."
+              warningTooltip={
+                total && total > MAP_WARNING_PERSON_COUNT_THRESHOLD
+                  ? 'Le nombre de patients de ce périmètre est très large, la carte peut être lente à charger.'
+                  : undefined
+              }
+              height={'fit-content'}
+            >
               <LocationMap cohortId={cohortId} />
-            </Paper>
+            </Chart>
           </Grid>
         </Grid>
       )}

@@ -311,7 +311,7 @@ export const medicationAdministrationConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, ['prescriptionTypes'], ['searchBy']),
   fetchAdditionalInfos,
   getCount: (counts) => [
-    { label: 'administration(s)', display: true, count: counts[0] },
-    { label: 'patient(s)', display: !!!patient, count: counts[1] }
+    { label: `administration${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
+    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
   ]
 })

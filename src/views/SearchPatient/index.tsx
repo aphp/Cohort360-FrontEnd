@@ -3,10 +3,10 @@ import { useAppSelector } from 'state'
 import { Grid } from '@mui/material'
 import { ResourceType } from 'types/requestCriterias'
 import ExplorationBoard from 'components/ExplorationBoard'
-import HeaderPage from 'components/ui/HeaderPage'
-import sideBarTransition from 'styles/sideBarTransition'
 import { useParams } from 'react-router-dom'
 import { buildExplorationConfig } from 'components/ExplorationBoard/config/config'
+import HeaderLayout from 'components/ui/Header'
+import PageContainer from 'components/ui/PageContainer'
 
 const DISPLAY_OPTIONS = {
   myFilters: false,
@@ -20,8 +20,6 @@ const DISPLAY_OPTIONS = {
 }
 
 const SearchPatient = () => {
-  const { classes, cx } = sideBarTransition()
-  const open = useAppSelector((state) => state.drawer)
   const practitioner = useAppSelector((state) => state.me)
   const { search } = useParams<{ search: string }>()
 
@@ -36,14 +34,14 @@ const SearchPatient = () => {
   )
 
   return (
-    <Grid container direction="column" className={cx(classes.appBar, { [classes.appBarShift]: open })}>
-      <Grid container justifyContent="center" alignItems="center">
-        <Grid item xs={11}>
-          <HeaderPage title="Rechercher un patient" id="patient-search" />
+    <PageContainer>
+      <HeaderLayout title="Rechercher un patient" />
+      <Grid container justifyContent="center">
+        <Grid container xs={11} mt={1}>
+          {config && <ExplorationBoard config={config} />}
         </Grid>
-        {config && <ExplorationBoard config={config} />}
       </Grid>
-    </Grid>
+    </PageContainer>
   )
 }
 

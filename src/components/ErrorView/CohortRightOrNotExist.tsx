@@ -4,30 +4,18 @@ import { useNavigate } from 'react-router-dom'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
+import PageContainer from 'components/ui/PageContainer'
 
 import WarningIcon from '@mui/icons-material/Report'
 
-import { useAppSelector } from 'state'
-
-import useStyles from './styles'
 import { AppConfig } from 'config'
 
 const CohortRightOrNotExist = () => {
-  const { classes, cx } = useStyles()
   const navigate = useNavigate()
   const appConfig = useContext(AppConfig)
 
-  const { openDrawer } = useAppSelector((state) => ({ openDrawer: state.drawer }))
-
   return (
-    <Grid
-      container
-      direction="column"
-      justifyContent="center"
-      alignItems="center"
-      spacing={2}
-      className={cx(classes.appBar, { [classes.appBarShift]: openDrawer })}
-    >
+    <PageContainer justifyContent="center" alignItems="center" spacing={2} height="100vh">
       <Grid container item>
         <Grid container direction="column" justifyContent="center" alignItems="center">
           <Grid item style={{ padding: 16 }}>
@@ -50,7 +38,7 @@ const CohortRightOrNotExist = () => {
           Retour à l'accueil
         </Button>
       </Grid>
-    </Grid>
+    </PageContainer>
   )
 }
 

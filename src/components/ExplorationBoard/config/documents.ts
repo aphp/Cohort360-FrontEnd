@@ -228,8 +228,8 @@ export const documentsConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, deidentified ? ['onlyPdfAvailable'] : [], []),
   fetchAdditionalInfos,
   getCount: (counts) => [
-    { label: 'document(s)', display: true, count: counts[0] },
-    { label: 'patient(s)', display: !!!patient, count: counts[1] }
+    { label: `document${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
+    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
   ],
   hasSearchDisplay: (input, searchBy) => !!input && searchBy === SearchByTypes.TEXT
 })

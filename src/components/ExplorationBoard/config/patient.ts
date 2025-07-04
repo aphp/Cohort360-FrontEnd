@@ -313,7 +313,7 @@ export const patientsConfig = (
   mapToDiagram: patient ? undefined : getDiagramData,
   fetchAdditionalInfos: (additionalInfo) => fetchAdditionalInfos(additionalInfo, deidentified),
   getCount: (counts) => [
-    { label: 'patient(s)', display: true, count: counts[0] },
+    { label: `patient${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
     { label: '', display: false, count: counts[1] }
   ]
 })

@@ -311,6 +311,12 @@ export type Filters =
   | CohortsFilters
   | ImagingFilters
   | MaternityFormFilters
+  | TimelineFilter
+
+export type TimelineFilter = {
+  diagnosticTypes: LabelObject[]
+  encounterStatus: LabelObject[]
+}
 
 export type GenericFilter = {
   nda?: string

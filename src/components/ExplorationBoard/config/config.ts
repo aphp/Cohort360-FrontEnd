@@ -55,15 +55,8 @@ export const buildExplorationConfig = (deidentified: boolean, patient: PatientSt
       displayOptions?: DisplayOptions,
       search?: string
     ): ExplorationConfigFor<T> | null => {
-      const configFn = configMap[type as keyof typeof configMap] as (
-        deidentified: boolean,
-        patient: PatientState,
-        groupId: string[],
-        displayOptions?: DisplayOptions,
-        search?: string
-      ) => ExplorationConfig<any>
-
-      return configFn?.(deidentified, patient, groupId, displayOptions, search) ?? null
+      const configFn = configMap[type as keyof typeof configMap]
+      return (configFn?.(deidentified, patient, groupId, displayOptions, search) as ExplorationConfigFor<T>) ?? null
     }
   }
 }

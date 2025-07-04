@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Grid, Tooltip, Typography } from '@mui/material'
+import { Grid, Tooltip, Typography } from '@mui/material'
 import List from 'components/ui/List'
 import Modal from 'components/ui/Modal'
 import { DeleteOutline, SavedSearch, Visibility } from '@mui/icons-material'
@@ -8,12 +8,12 @@ import { Filters, SavedFiltersResults, SearchCriterias } from 'types/searchCrite
 import EditSavedFilter from './EditSavedFilter'
 import { useAppSelector } from 'state'
 import { AdditionalInfo } from 'types/exploration'
+import Button from 'components/ui/Button'
 
 type SavedFiltersProps = {
   selectedFilter: SelectedFilter<Filters> | null
   infos: AdditionalInfo
   allFilters: SavedFiltersResults | null
-  disabled?: boolean
   onNext: () => void
   onSubmit: (criteria: SearchCriterias<Filters>) => void
   onDelete: (ids: string[]) => void
@@ -50,15 +50,7 @@ const SavedFilters = ({
   }, [selectedItems])
   return (
     <>
-      <Button
-        sx={{ borderRadius: 1 }}
-        size="small"
-        variant="contained"
-        fullWidth
-        startIcon={<SavedSearch height="15px" />}
-        onClick={() => setToggleModal(true)}
-        style={{ backgroundColor: '#fff', color: '#303030', height: '30px' }}
-      >
+      <Button startIcon={<SavedSearch height="15px" />} onClick={() => setToggleModal(true)}>
         Mes filtres
       </Button>
       <Modal
@@ -77,10 +69,7 @@ const SavedFilters = ({
         <Grid container item xs={12} alignItems="center" gap={1}>
           <Grid item xs={3}>
             <Button
-              sx={{ borderRadius: 25 }}
               fullWidth
-              size="small"
-              variant="contained"
               color="info"
               startIcon={<Visibility />}
               onClick={() => setToggleDisplayModal(true)}
@@ -93,13 +82,6 @@ const SavedFilters = ({
             <Grid item xs={1}>
               <Button
                 color="warning"
-                size="small"
-                variant="contained"
-                style={
-                  maintenanceIsActive
-                    ? { borderRadius: 25, cursor: 'not-allowed', pointerEvents: 'auto' }
-                    : { borderRadius: 25 }
-                }
                 onClick={() => setToggleDeleteModal(true)}
                 disabled={!selectedItems.length || maintenanceIsActive}
               >
@@ -134,7 +116,7 @@ const SavedFilters = ({
         <EditSavedFilter
           infos={infos}
           open={toggleDisplayModal}
-          criteria={selectedFilter!}
+          criteria={selectedFilter}
           onEdit={(name, filters) => {
             onEdit(name, filters)
             setToggleDisplayModal(false)

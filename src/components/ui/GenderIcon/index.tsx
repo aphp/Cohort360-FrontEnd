@@ -5,19 +5,20 @@ import { GenderStatus } from 'types/searchCriterias'
 
 type GenderIconProps = {
   gender?: GenderStatus
-  className?: string
+  color?: string
+  size?: number
 }
 
-const GenderIcon = ({ gender, className }: GenderIconProps) => {
+const GenderIcon = ({ gender, color = 'inherit', size = 24 }: GenderIconProps) => {
   switch (gender) {
     case GenderStatus.MALE:
-      return <Male className={className} />
+      return <Male htmlColor={color} sx={{ fontSize: size }} />
 
     case GenderStatus.FEMALE:
-      return <Female className={className} />
+      return <Female htmlColor={color} sx={{ fontSize: size }} />
 
     default:
-      return <UnknownIcon className={className} />
+      return <UnknownIcon style={{ fill: color, height: size, width: size }} />
   }
 }
 

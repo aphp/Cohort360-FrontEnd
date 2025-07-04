@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useAppSelector } from 'state'
 
 import {
   Alert,
@@ -13,6 +12,7 @@ import {
   TextField,
   Typography
 } from '@mui/material'
+import PageContainer from 'components/ui/PageContainer'
 
 import services from 'services/aphp'
 
@@ -47,10 +47,7 @@ const ERROR_OBJECT = 'error_object'
 const ERROR_MESSAGE = 'error_message'
 
 const Contact: React.FC = () => {
-  const { classes, cx } = useStyles()
-  const { open } = useAppSelector((state) => ({
-    open: state.drawer
-  }))
+  const { classes } = useStyles()
 
   const [contactRequest, setContactRequest] = useState(defaultContactRequest)
   const [loading, setLoading] = useState(false)
@@ -119,7 +116,7 @@ const Contact: React.FC = () => {
 
   return (
     <>
-      <Grid container direction="column" className={cx(classes.appBar, { [classes.appBarShift]: open })}>
+      <PageContainer>
         <Grid container direction="column" alignItems="center">
           <CssBaseline />
           <Grid container item direction="column" xs={11}>
@@ -227,7 +224,7 @@ const Contact: React.FC = () => {
             )}
           </Grid>
         </Grid>
-      </Grid>
+      </PageContainer>
 
       {createIssueSuccess && (
         <Snackbar

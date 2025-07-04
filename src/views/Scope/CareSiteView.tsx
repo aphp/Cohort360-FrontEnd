@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Grid, Typography } from '@mui/material'
-import useStyles from './styles'
+import { Grid } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from 'state'
 import { closeAllOpenedPopulation } from 'state/scope'
 import ScopeTree from 'components/ScopeTree'
 import { Hierarchy } from 'types/hierarchy'
 import { ScopeElement, SourceType } from 'types/scope'
+import HeaderLayout from 'components/ui/Header'
+import Button from 'components/ui/Button'
+import PageContainer from 'components/ui/PageContainer'
 
 const CareSiteView = () => {
-  const { classes, cx } = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const population = useAppSelector((state) => state.scope.rights)
   const [selectedCodes, setSelectedCodes] = useState<Hierarchy<ScopeElement>[]>([])
-  const open = useAppSelector((state) => state.drawer)
 
   const handleNavigation = () => {
     const perimetresIds = selectedCodes.map((code) => code.cohort_id ?? null).filter(Boolean)
@@ -27,43 +27,34 @@ const CareSiteView = () => {
   }, [])
 
   return (
-    <Grid
-      container
-      className={cx(classes.appBar, {
-        [classes.appBarShift]: open
-      })}
-      justifyContent={'center'}
-    >
-      <Grid container xs={11} alignItems="center" height={'calc(100vh - 175px)'}>
-        <Typography variant="h1" color="primary" className={classes.title}>
-          Explorer un périmètre
-        </Typography>
+    <PageContainer direction="row" justifyContent={'center'} height="100vh">
+      <HeaderLayout title="Explorer un périmètre" />
+      <Grid container xs={11} alignItems="center" flexGrow={1} height={'calc(100vh - 175px)'}>
         <ScopeTree
           selectedNodes={[]}
           baseTree={population}
           onSelect={(items) => setSelectedCodes(items)}
           sourceType={SourceType.ALL}
-          sx={{ backgroundColor: '#E6F1FD' }}
+          sx={{ backgroundColor: '#FFF' }}
         />
         <Grid
           container
           justifyContent="center"
-          style={{ position: 'fixed', bottom: 0, right: 0, backgroundColor: '#E6F1FD' }}
+          style={{ position: 'fixed', bottom: 20, right: 0, backgroundColor: '#FFF' }}
         >
           <Grid container justifyContent={'flex-end'} xs={11}>
             <Button
-              variant="contained"
-              disableElevation
+              customVariant="secondary"
               disabled={!selectedCodes.length}
               onClick={handleNavigation}
-              className={classes.validateButton}
+              width="fit-content"
             >
               Valider
             </Button>
           </Grid>
         </Grid>
       </Grid>
-    </Grid>
+    </PageContainer>
   )
 }
 

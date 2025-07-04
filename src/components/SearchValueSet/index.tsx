@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Grid, Paper, Collapse, Typography, Input, IconButton, Tabs, Tab } from '@mui/material'
+import { Grid, Paper, Collapse, Typography, Input, IconButton, Tab } from '@mui/material'
 import { LoadingStatus, TabType } from 'types'
 import ReferencesParameters, { Type } from './References'
 import ValueSetTable from './ValueSetTable'
@@ -12,6 +12,7 @@ import { Hierarchy, SearchMode, SearchModeLabel } from 'types/hierarchy'
 import { cleanNode } from 'utils/hierarchy'
 import { useAppDispatch } from 'state'
 import { setMessage } from 'state/message'
+import { TabsWrapper } from 'components/ui/Tabs'
 
 type SearchValueSetProps = {
   references: Reference[]
@@ -65,11 +66,16 @@ const SearchValueSet = ({ references, selectedNodes, onSelect }: SearchValueSetP
     >
       <Grid container padding="30px 30px 8px 30px">
         <Grid item xs={12} marginBottom={'20px'}>
-          <Tabs value={mode} onChange={(_, elem) => onChangeMode(elem)}>
+          <TabsWrapper
+            customVariant="secondary"
+            variant="fullWidth"
+            value={mode}
+            onChange={(_, elem) => onChangeMode(elem)}
+          >
             {tabs.map((tab) => (
               <Tab sx={{ fontSize: 12 }} key={tab.id} label={tab.label} value={tab.id} />
             ))}
-          </Tabs>
+          </TabsWrapper>
         </Grid>
         <Grid item xs={12}>
           <Paper sx={{ padding: '20px' }}>
