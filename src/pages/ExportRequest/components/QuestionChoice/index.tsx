@@ -86,7 +86,7 @@ function collectLeaves(
     const newParents = [...parents, item.text ?? item.linkId]
     const hasChildren = Array.isArray(item.item) && item.item.length > 0
 
-    if (!hasChildren && startsWithFMater(item.linkId)) {
+    if (item.type !== 'group' && startsWithFMater(item.linkId)) {
       collector.push({
         linkId: item.linkId,
         text: item.text ?? '',
