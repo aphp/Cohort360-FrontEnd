@@ -73,7 +73,7 @@ const Export = () => {
       <Grid container direction="column" style={{ minHeight: '100vh' }}>
         <Grid container justifyContent="center" alignItems="center">
           <HeaderLayout id="export-page-title" title="Mes exports" />
-          <Grid container xs={11} gap={GAP} style={{ flexGrow: 1 }}>
+          <Grid container xs={11} gap={GAP} style={{ flexGrow: 1 }} mt={2}>
             <Grid item container gap={1} justifyContent="space-between">
               <Grid container xs={12} sm={6}>
                 <SearchInput
@@ -90,7 +90,7 @@ const Export = () => {
             </Grid>
             <Grid item container direction="column" flexGrow={1}>
               {loadingStatus === LoadingStatus.FETCHING && (
-                <Grid container justifyContent="center">
+                <Grid container justifyContent="center" height="50vh">
                   <CircularProgress />
                 </Grid>
               )}

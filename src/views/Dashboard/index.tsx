@@ -68,12 +68,6 @@ const Dashboard = ({ context }: DashboardProps) => {
   const availableTabs = useMemo(() => {
     const baseTabs = [
       {
-        label: 'Modifier la requête',
-        value: 'creation',
-        to: `/${URLS.COHORT}/new/${dashboard.requestId}/${dashboard.snapshotId}`,
-        show: context === URLS.COHORT
-      },
-      {
         label: 'Aperçu',
         value: ResourceType.PREVIEW,
         to: `/${context}/${ResourceType.PREVIEW}`,

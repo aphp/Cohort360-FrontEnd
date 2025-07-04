@@ -16,13 +16,7 @@ const LevelHeader = ({ loading, name, description, actions }: LevelHeaderProps) 
         <Box display={'flex'} flexDirection={'column'} width={'100%'}>
           <Box width="100%" display={'flex'} alignItems={'center'} gap={'8px'}>
             {loading ? (
-              <Box
-                display="flex"
-                width={'100%'}
-                // justifyContent={'center'}
-                flexDirection={'column'}
-                alignItems={'center'}
-              >
+              <Box display="flex" width={'100%'} flexDirection={'column'}>
                 <Skeleton variant="text" sx={{ fontSize: '2rem' }} width={'25%'} />
                 <Skeleton variant="text" sx={{ fontSize: '2rem' }} width={'80%'} />
               </Box>
@@ -35,15 +29,17 @@ const LevelHeader = ({ loading, name, description, actions }: LevelHeaderProps) 
               </>
             )}
           </Box>
-          <Typography
-            fontStyle={'italic'}
-            fontSize={'15px'}
-            fontFamily={"'Montserrat', sans-serif"}
-            paddingTop={'8px'}
-            color="#7b7b7b"
-          >
-            {description}
-          </Typography>
+          {description && (
+            <Typography
+              fontStyle={'italic'}
+              fontSize={'15px'}
+              fontFamily={"'Montserrat', sans-serif"}
+              paddingTop={'8px'}
+              color="#7b7b7b"
+            >
+              {description}
+            </Typography>
+          )}
         </Box>
       </Grid>
     </Box>

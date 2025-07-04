@@ -39,9 +39,14 @@ const DataSection = ({
   onChangePage,
   onSort
 }: DataSectionProps) => {
-  if (isLoading) return <CenteredCircularProgress />
+  if (isLoading)
+    return (
+      <Grid container justifyContent="center" alignItems="center" height="50vh">
+        <CenteredCircularProgress />
+      </Grid>
+    )
   return (
-    <Grid container justifyContent="center" item xs={12} gap={GAP}>
+    <Grid container justifyContent="center" item xs={12} gap={GAP} sx={{ flexGrow: 1, flexDirection: 'column' }}>
       {displayOptions.diagrams && (
         <AccordionWrapper defaultExpanded>
           <AccordionSummary expandIcon={<ExpandMoreIcon htmlColor="#153D8A" />}>
@@ -73,15 +78,19 @@ const DataSection = ({
       {data.timeline && (
         <Timeline questionnaireResponses={data.timeline.data} questionnaires={data.timeline.questionnaires} />
       )}
-      {!!count && count[0].count.results > 0 && (
+      {!!count && count[0].count.results > 0 ? (
         <Grid container id="list">
           {data.cards.map((card, index) => (
             <InfoCard key={index} value={card} />
           ))}
           {data.table && <DataTable value={data.table} orderBy={orderBy} onSort={onSort} />}
-          <StickyContainer>
+          <StickyContainer pb={data.cards.length > 0 ? 8 : 0}>
             <Pagination count={pagination.total} currentPage={pagination.currentPage} onPageChange={onChangePage} />
           </StickyContainer>
+        </Grid>
+      ) : (
+        <Grid container justifyContent="center">
+          <Typography variant="button">Aucune donnée à afficher</Typography>
         </Grid>
       )}
     </Grid>

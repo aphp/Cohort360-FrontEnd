@@ -1,8 +1,7 @@
 import React from 'react'
 
-import { Box, Grid, IconButton, Skeleton, Tooltip, Typography } from '@mui/material'
+import { Box, Grid, Skeleton, Tooltip, Typography } from '@mui/material'
 
-import FavStar from 'components/ui/FavStar'
 import AccessBadge, { AccessLevel } from 'components/ui/AccessBadge'
 import CohortInfo from 'components/ui/CohortInfo'
 import ExpandableChipsLine from 'components/ui/ExpandableChips'
@@ -13,15 +12,14 @@ type HeaderLayoutProps = {
   id?: string
   icon?: React.ReactElement
   title: string
+  titleOnly?: boolean
   description?: string
   cohortId?: string
   patientsCount?: number
   perimeters?: string[]
   accessLevel?: AccessLevel
-  showActions?: boolean
-  isFavorite?: boolean
   loading?: boolean
-  onToggleFavorite?: () => void
+  titleActions?: React.ReactNode
   actionsMenu?: React.ReactNode
   searchArea?: React.ReactNode
   patientCard?: React.ReactNode
@@ -32,15 +30,14 @@ const HeaderLayout: React.FC<HeaderLayoutProps> = ({
   id,
   icon,
   title,
+  titleActions,
+  titleOnly = false,
   description,
   cohortId,
   patientsCount,
   perimeters = [],
   accessLevel,
-  showActions = false,
-  isFavorite = false,
   loading = false,
-  onToggleFavorite,
   actionsMenu,
   searchArea,
   patientCard,
@@ -52,9 +49,9 @@ const HeaderLayout: React.FC<HeaderLayoutProps> = ({
       direction="column"
       alignItems="center"
       justifyContent="center"
-      sx={{ backgroundColor: '#E6F1FD', padding: '20px 0 12px' }}
+      sx={{ backgroundColor: '#E6F1FD', padding: '20px 0 16px' }}
     >
-      <Grid container xs={11} direction="column" justifyContent="center" gap={1}>
+      <Grid container xs={11} direction="column" justifyContent="center" gap={2}>
         {loading ? (
           <>
             <Skeleton width={200} />
@@ -64,16 +61,12 @@ const HeaderLayout: React.FC<HeaderLayoutProps> = ({
           <>
             {goBackButton}
             <Grid container justifyContent="space-between" alignItems="center">
-              <Box display="flex" alignItems="center" gap={1}>
+              <Box display="flex" alignItems="center" gap={1} padding={titleOnly ? '16px 0 32px' : 0}>
                 {icon}
                 <Typography id={id ?? title} variant="h1">
                   {title}
                 </Typography>
-                {showActions && onToggleFavorite && (
-                  <IconButton onClick={onToggleFavorite} color="secondary">
-                    <FavStar favorite={isFavorite} height={20} />
-                  </IconButton>
-                )}
+                {titleActions}
               </Box>
 
               <Box display="flex" alignItems="center" gap={1}>

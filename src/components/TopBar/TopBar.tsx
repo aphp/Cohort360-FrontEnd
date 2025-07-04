@@ -1,14 +1,16 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { Menu, MenuItem } from '@mui/material'
+import { IconButton, Menu, MenuItem } from '@mui/material'
 
+import FluentNavigation from 'assets/icones/fluent_navigation.svg?react'
 import MoreButton from '@mui/icons-material/MoreVert'
 
 import { AccessLevel } from 'components/ui/AccessBadge'
 import AddOrEditItem from 'components/Researches/Modals/AddOrEditItem'
 import ConfirmDeletion from 'components/Researches/Modals/ConfirmDeletion'
 import CreateSample from 'components/Researches/Modals/CreateSample'
+import FavStar from 'components/ui/FavStar'
 import HeaderLayout from 'components/ui/Header'
 import IconButtonWithTooltip from 'components/ui/IconButtonWithTooltip'
 
@@ -113,8 +115,21 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
     navigate(`/exports/new?${searchParams}`)
   }
 
-  // Actions Menu
-  const actionsMenu = context === URLS.COHORT && contextConfig.showActions && !dashboard.loading && (
+  const titleActions = context === URLS.COHORT && !dashboard.loading && (
+    <>
+      <IconButton onClick={handleFavorite} color="secondary">
+        <FavStar favorite={dashboard.favorite} height={20} />
+      </IconButton>
+      <IconButtonWithTooltip
+        onClick={() => navigate(`/${URLS.COHORT}/new/${dashboard.requestId}/${dashboard.snapshotId}`)}
+        icon={<FluentNavigation />}
+        title="Accéder à la version de la requête ayant créé la cohorte"
+        color="#5bc5f2"
+      />
+    </>
+  )
+
+  const actionsMenu = context === URLS.COHORT && !dashboard.loading && (
     <>
       <IconButtonWithTooltip
         aria-controls="cohort-more-menu"
@@ -178,9 +193,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access }) => {
         perimeters={perimeters}
         accessLevel={access}
         loading={dashboard.loading}
-        showActions={contextConfig?.showActions}
-        isFavorite={dashboard.favorite}
-        onToggleFavorite={handleFavorite}
+        titleActions={titleActions}
         actionsMenu={actionsMenu}
       />
 

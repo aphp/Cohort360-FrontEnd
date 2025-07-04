@@ -44,13 +44,13 @@ const ActionBar: React.FC<ActionBarProps> = ({
 }) => {
   const {
     ref,
-    sizes: { isLG, isXL }
+    sizes: { isMD, isLG, isXL }
   } = useSizeObserver()
 
   return (
     <Grid container justifyContent={'space-between'} alignItems={'center'} gap={2} mt={1}>
       <Grid container justifyContent={'space-between'} ref={ref}>
-        <Grid container xs={12} lg={8} gap="4px">
+        <Grid container xs={12} md={8} gap="4px">
           {onFilter && (
             <Button
               onClick={onFilter}
@@ -100,8 +100,8 @@ const ActionBar: React.FC<ActionBarProps> = ({
             container
             alignItems="center"
             gap={1}
-            justifyContent={isLG || isXL ? 'flex-end' : 'center'}
-            mt={isLG ? 0 : '12px'}
+            justifyContent={isMD || isLG || isXL ? 'flex-end' : 'center'}
+            mt={isMD || isLG || isXL ? 0 : '12px'}
           >
             {totalSelected > 0 && (
               <DisplayDigits

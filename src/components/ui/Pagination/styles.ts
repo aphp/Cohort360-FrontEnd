@@ -11,6 +11,9 @@ export const StyledPagination = styled(Pagination)(() => ({
   '& .MuiPaginationItem-page.Mui-selected': {
     color: '#fff',
     backgroundColor: '#5BC5F2'
+  },
+  '& .MuiPagination-ul': {
+    flexWrap: 'nowrap'
   }
 }))
 

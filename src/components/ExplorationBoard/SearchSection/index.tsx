@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid } from '@mui/material'
+import { CircularProgress, Grid } from '@mui/material'
 import FilterBy from './FilterBy'
 import OccurrencesSearch from './OccurrenceSearch'
 import { Filters, SavedFiltersResults, SearchCriterias } from 'types/searchCriterias'
@@ -38,6 +38,7 @@ type SearchSectionProps = {
   displayOptions: DisplayOptions
   count: CountDisplay | null
   display?: DataDisplayType
+  loading?: boolean
   onSearch: (search: SearchWithFilters) => void
 }
 
@@ -49,11 +50,12 @@ const SearchSection = ({
   displayOptions,
   count,
   display = DataDisplayType.LAYOUT,
+  loading = false,
   onSearch
 }: SearchSectionProps) => {
   const {
     ref,
-    sizes: { isXS, isLG, isXL }
+    sizes: { isXS, isMD, isLG, isXL }
   } = useSizeObserver()
 
   const handleChangeFields = (search: Search) => {
@@ -62,7 +64,7 @@ const SearchSection = ({
   }
 
   return (
-    <Grid container justifyContent={'space-between'} ref={ref}>
+    <Grid container justifyContent={'space-between'} mt={0.5} ref={ref}>
       <Grid
         container
         xs={12}
@@ -97,12 +99,24 @@ const SearchSection = ({
       </Grid>
       <Grid container alignItems="center" xs={12} lg={4}>
         {displayOptions.count && count && (
-          <Grid container alignItems="center" gap={1} justifyContent={isLG || isXL ? 'flex-end' : 'flex-start'}>
-            {count[0].display && (
-              <DisplayDigits nb={count[0].count.results} total={count[0].count.total} label={count[0].label} />
-            )}
-            {count[1].display && (
-              <DisplayDigits nb={count[1].count.results} total={count[1].count.total} label={count[1].label} />
+          <Grid
+            container
+            alignItems="center"
+            gap={1}
+            justifyContent={isMD || isLG || isXL ? 'flex-end' : 'center'}
+            mt={isLG || isXL ? 0 : '12px'}
+          >
+            {loading ? (
+              <CircularProgress size={20} />
+            ) : (
+              <>
+                {count[0].display && (
+                  <DisplayDigits nb={count[0].count.results} total={count[0].count.total} label={count[0].label} />
+                )}
+                {count[1].display && (
+                  <DisplayDigits nb={count[1].count.results} total={count[1].count.total} label={count[1].label} />
+                )}
+              </>
             )}
           </Grid>
         )}

@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { Grid } from '@mui/material'
+import { Grid, Typography } from '@mui/material'
 
 import isEqual from 'lodash/isEqual'
 
@@ -115,18 +115,24 @@ const GenericCohortListView = <TItem, TTableProps = any>({
         </>
       )}
 
-      <TableComponent
-        list={list}
-        total={total}
-        loading={loading}
-        page={page}
-        setPage={handlePageChange}
-        order={order}
-        onChangeOrderBy={changeOrderBy}
-        disabled={maintenanceIsActive}
-        simplified={simplified}
-        {...(tableProps as any)}
-      />
+      {total > 0 ? (
+        <TableComponent
+          list={list}
+          total={total}
+          loading={loading}
+          page={page}
+          setPage={handlePageChange}
+          order={order}
+          onChangeOrderBy={changeOrderBy}
+          disabled={maintenanceIsActive}
+          simplified={simplified}
+          {...(tableProps as any)}
+        />
+      ) : (
+        <Grid container justifyContent="center">
+          <Typography variant="button">Aucune donnée à afficher</Typography>
+        </Grid>
+      )}
 
       <Modal
         title="Filtrer par :"

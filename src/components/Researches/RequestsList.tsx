@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { resetCohortCreation } from 'state/cohortCreation'
 import { setSelectedProject } from 'state/project'
 
-import { Grid } from '@mui/material'
+import { Grid, Typography } from '@mui/material'
 import ActionBar from './ActionBar'
 import AddOrEditItem from './Modals/AddOrEditItem'
 import ConfirmDeletion from './Modals/ConfirmDeletion'
@@ -217,22 +217,28 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
         </>
       )}
 
-      <RequestsTableContent
-        requestsList={requestsList}
-        selectedRequests={selectedRequests}
-        total={total}
-        page={page}
-        setPage={handlePageChange}
-        loading={loading}
-        order={order}
-        onChangeOrderBy={changeOrderBy}
-        onSelectRequest={toggle}
-        onShareRequest={onShareRequest}
-        onClickEdit={onClickEdit}
-        onSelectAll={onSelectAll}
-        disabled={maintenanceIsActive}
-        simplified={simplified}
-      />
+      {total > 0 ? (
+        <RequestsTableContent
+          requestsList={requestsList}
+          selectedRequests={selectedRequests}
+          total={total}
+          page={page}
+          setPage={handlePageChange}
+          loading={loading}
+          order={order}
+          onChangeOrderBy={changeOrderBy}
+          onSelectRequest={toggle}
+          onShareRequest={onShareRequest}
+          onClickEdit={onClickEdit}
+          onSelectAll={onSelectAll}
+          disabled={maintenanceIsActive}
+          simplified={simplified}
+        />
+      ) : (
+        <Grid container justifyContent="center">
+          <Typography variant="button">Aucune donnée à afficher</Typography>
+        </Grid>
+      )}
 
       <AddOrEditItem
         open={openEditionModal}

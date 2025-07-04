@@ -11,6 +11,7 @@ export const ButtonWrapper = styled(Button)<CustomProps>(({ width = '100%', cust
   height: 30,
   fontSize: 13,
   borderRadius: 25,
+  whiteSpace: 'nowrap',
   '&.Mui-disabled': {
     cursor: 'not-allowed',
     pointerEvents: 'auto'
