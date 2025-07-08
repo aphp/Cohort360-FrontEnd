@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import { ButtonGroup, Button, IconButton, CircularProgress, Grid } from '@mui/material'
 
@@ -205,7 +205,7 @@ const LogicalOperator: React.FC = () => {
   const [parentId, setParentId] = useState<number | null>(null)
   const [openDrawer, setOpenDrawer] = useState<'criteria' | null>(null)
   const [selectedCriteria, setSelectedCriteria] = useState<SelectedCriteriaType | null>(null)
-  const { criteriaGroup = [] } = request
+  const { criteriaGroup = [], temporalConstraints } = request
   const criteriasIds: UniqueIdentifier[] = useMemo(
     () =>
       criteriaGroup.flatMap((group) => [
@@ -300,6 +300,14 @@ const LogicalOperator: React.FC = () => {
     _buildCohortCreation()
   }
 
+  useEffect(() => {
+    console.log('test temporal constraints', temporalConstraints)
+  }, [temporalConstraints])
+
+  const checkTemporalConstraints = () => {
+    console.log('test temporal constraints', temporalConstraints)
+  }
+
   const onDragEnd = (event: DragEndEvent, ids: UniqueIdentifier[]) => {
     const { active, over } = event
     if (!over || active.id === over.id) return
@@ -307,15 +315,47 @@ const LogicalOperator: React.FC = () => {
     const overIndex = ids.indexOf(over.id)
     ids.splice(activeIndex, 1)
     ids.splice(overIndex, 0, active.id)
-    const newGroups: CriteriaGroup[] = criteriaGroup.map((group) => {
+    /* const newGroups: CriteriaGroup[] = criteriaGroup.map((group) => {
       const startIndex = ids.findIndex((id) => id === `start-${group.id}`)
       const endIndex = ids.findIndex((id) => id === `end-${group.id}`)
       const newIds = ids.slice(startIndex + 1, endIndex) as number[]
       const previousIds = group.criteriaIds.filter((id) => id < 0)
       return { ...group, criteriaIds: [...newIds, ...previousIds] }
-    })
-    dispatch(editAllCriteriaGroup(newGroups))
-    _buildCohortCreation()
+    })*/
+    //dispatch(editAllCriteriaGroup(newGroups))
+    //_buildCohortCreation()
+    //
+    const currentParent = request.criteriaGroup
+      ? request.criteriaGroup.find(({ id }) => id === over.data.current?.groupId)
+      : null
+    if (currentParent) {
+      const startIndex = ids.findIndex((id) => id === `start-${currentParent.id}`)
+      const endIndex = ids.findIndex((id) => id === `end-${currentParent.id}`)
+      const newIds = ids.slice(startIndex + 1, endIndex) as number[]
+      const previousIds = currentParent.criteriaIds.filter((id) => id < 0)
+      const item = { ...active.data.current, id: active.id }
+      delete item['sortable']
+      delete item['groupId']
+      console.log('test move newIds', currentParent.id, [...newIds, ...previousIds])
+      dispatch(deleteSelectedCriteria(active.id as number))
+      dispatch(addNewSelectedCriteria(item as SelectedCriteriaType))
+      dispatch(
+        editCriteriaGroup({
+          ...currentParent,
+          criteriaIds: [...newIds, ...previousIds]
+        })
+      )
+      _buildCohortCreation()
+
+      /* dispatch(
+        editCriteriaGroup({
+          ...currentParent,
+          criteriaIds: [...newIds, ...previousIds]
+        })
+      )*/
+      //_onConfirmAddOrEditCriteria({ ...(active.data.current as SelectedCriteriaType), id: undefined })
+      //_buildCohortCreation()
+    }
   }
 
   return (

@@ -283,13 +283,15 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
         state.cohortCreation.request.criteriaGroup && state.cohortCreation.request.criteriaGroup.length > 0
           ? state.cohortCreation.request.criteriaGroup
           : defaultInitialState().criteriaGroup
+      console.log('test move', _criteriaGroup)
+      console.log('test move selectedCriterias', _selectedCriteria)
       const _temporalConstraints =
         state.cohortCreation.request.temporalConstraints ?? defaultInitialState().temporalConstraints
 
       const json = buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
       if (json !== state?.cohortCreation?.request?.json) {
         const saveJsonResponse = await dispatch(saveJson({ newJson: json })).unwrap()
-
+        console.log('test move newjson', json)
         await dispatch(
           countCohortCreation({
             json: json,

@@ -193,9 +193,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
       const constraintsInAndGroup = !(constraint.idList as number[]).some((criteriaId: number) =>
         currentLogicalOperatorCriteriaIds.includes(criteriaId)
       )
-
       const noGlobalConstraints = itemId !== 0 || !constraint.idList.includes('All' as never)
-
       return constraintsInAndGroup && noGlobalConstraints
     })
 
