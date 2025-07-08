@@ -30,8 +30,11 @@ yarn-error.log*
 .env*
 !.env.example
 .mp4
-public/config.dev.json
-public/config.local.json
-public/config.example.json
-public/config.qualif.json
+public/config.*.json
 *storybook.log
+
+# AI Tooling
+CLAUDE.md
+specs/*
+
+
