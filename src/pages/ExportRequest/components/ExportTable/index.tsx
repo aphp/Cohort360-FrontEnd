@@ -164,7 +164,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
       onChangeTableSettings([{ tableName: exportTable.name, key: 'pivotMergeColumns', value: [] }])
     }
     if (checkedPivotMerge && defaultQuestionnaireIds.length > 0) {
-      onChangeTableSettings([{ tableName: exportTable.name, key: 'pivotMergeIds', value: test }])
+      onChangeTableSettings([{ tableName: exportTable.name, key: 'pivotMergeIds', value: defaultQuestionnaireIds }])
     }
     if (!checkedPivotMerge) {
       onChangeTableSettings([
