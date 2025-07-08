@@ -26,7 +26,7 @@ const Export = () => {
   const user = useAppSelector((state) => state.me?.impersonation?.username ?? state.me?.userName) ?? ''
   const deidentified = useAppSelector((state) => state.me?.deidentified)
   const [exportList, setExportList] = useState<Back_API_Response<ExportList> | null>(null)
-  const maintenanceIsActive = true
+  const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active) ?? false
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [searchParams, setSearchParams] = useSearchParams()
   const [pagination, setPagination] = useState({ current: 0, total: 0 })
@@ -85,7 +85,12 @@ const Export = () => {
               <Grid container xs={12} sm={5} justifyContent={'flex-end'}>
                 <Tooltip title={maintenanceIsActive ? "Ce bouton est desactivé en raison d'une maintenance." : ''}>
                   <Box>
-                    <Button width="fit-content" onClick={() => navigate('/exports/new')} endIcon={<AddIcon />}>
+                    <Button
+                      width="fit-content"
+                      onClick={() => navigate('/exports/new')}
+                      endIcon={<AddIcon />}
+                      disabled={maintenanceIsActive}
+                    >
                       Nouvel export
                     </Button>
                   </Box>
