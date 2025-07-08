@@ -2,10 +2,13 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import moment from 'moment'
 
-import { Alert, Container, Grid, Paper, Typography } from '@mui/material'
+import { Grid, Paper } from '@mui/material'
 
+import CustomAlert from 'components/ui/Alert'
 import CohortsList from 'components/Researches/CohortsList'
+import HeaderLayout from 'components/ui/Header'
 import NewsCard from 'components/Welcome/NewsCard/NewsCard'
+import PageContainer from 'components/ui/PageContainer'
 import PatientsCard from 'components/Welcome/PatientsCard/PatientsCard'
 import SearchPatientCard from 'components/Welcome/SearchPatientCard/SearchPatientCard'
 import TutorialsCard from 'components/Welcome/TutorialsCard/TutorialsCard'
@@ -23,11 +26,10 @@ import Markdown from 'react-markdown'
 import { getBannerMessageLevel, sortContent } from 'data/infoMessage'
 
 const Welcome = () => {
-  const { classes, cx } = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const practitioner = useAppSelector((state) => state.me)
-  const open = useAppSelector((state) => state.drawer)
   const meState = useAppSelector((state) => state.me)
   const [bannerMessages, setBannerMessages] = useState<WebContent[]>([])
 
@@ -50,78 +52,38 @@ const Welcome = () => {
   }, [])
 
   return practitioner ? (
-    <Grid
-      container
-      className={cx(classes.root, classes.appBar, {
-        [classes.appBarShift]: open
-      })}
-    >
-      <Container
-        maxWidth="lg"
-        className={classes.container}
-        style={{ minHeight: 'calc(100vh - 70px)', marginBottom: 8 }}
-      >
-        <Grid item xs={12}>
-          <Grid item>
-            <Typography
-              id="homePage-title"
-              component="h1"
-              variant="h1"
-              color="inherit"
-              noWrap
-              className={classes.title}
-            >
-              {`Bienvenue ${
-                practitioner.impersonation
-                  ? practitioner.impersonation.firstname + ' ' + practitioner.impersonation.lastname
-                  : practitioner.displayName
-              }`}
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Typography
-              id="last-connection"
-              component="h6"
-              variant="h6"
-              color="inherit"
-              noWrap
-              className={classes.subtitle}
-            >
-              {lastConnection}
-            </Typography>
-          </Grid>
-          <Grid item>
-            {sortContent(bannerMessages).map((infoMessage) => (
-              <Alert
-                key={'alertMessage' + infoMessage.id}
-                severity={getBannerMessageLevel(infoMessage)}
-                className={classes.alert}
-              >
-                <Markdown components={{ p: 'span' }}>{infoMessage.content}</Markdown>
-              </Alert>
+    <PageContainer alignItems={'center'}>
+      <HeaderLayout
+        title={`Bienvenue ${
+          practitioner.impersonation
+            ? practitioner.impersonation.firstname + ' ' + practitioner.impersonation.lastname
+            : practitioner.displayName
+        }`}
+        lastConnexion={lastConnection}
+      />
+      <Grid container xs={11} mt={1.5} mb={2}>
+        <Grid container gap={0.5}>
+          {sortContent(bannerMessages).map((infoMessage) => (
+            <CustomAlert key={'alertMessage' + infoMessage.id} severity={getBannerMessageLevel(infoMessage)}>
+              <Markdown components={{ p: 'span' }}>{infoMessage.content}</Markdown>
+            </CustomAlert>
+          ))}
+          {maintenanceIsActive && (
+            <CustomAlert severity="warning">
+              Une maintenance est en cours. Seules les consultations de cohortes, requêtes et données patients sont
+              activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
+            </CustomAlert>
+          )}
+          {accessExpirations
+            .filter((item) => item.leftDays && !Number.isNaN(item.leftDays) && item.leftDays <= 30)
+            .map((item: AccessExpiration) => (
+              <CustomAlert key={item.perimeter + '-' + item.leftDays && item.leftDays} severity="warning">
+                Attention, votre accès au périmètre suivant: {item.perimeter}, arrivera à expiration dans{' '}
+                {item.leftDays} jour{item.leftDays > 1 ? 's' : ''}. Veuillez vous rapprocher de votre référent EDS pour
+                faire renouveler vos accès à l'application.
+              </CustomAlert>
             ))}
-            {maintenanceIsActive && (
-              <Alert severity="warning" className={classes.alert}>
-                Une maintenance est en cours. Seules les consultations de cohortes, requêtes et données patients sont
-                activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
-              </Alert>
-            )}
-            {accessExpirations
-              .filter((item) => item.leftDays && !Number.isNaN(item.leftDays) && item.leftDays <= 30)
-              .map((item: AccessExpiration) => (
-                <Alert
-                  key={item.perimeter + '-' + item.leftDays && item.leftDays}
-                  severity="warning"
-                  className={classes.alert}
-                >
-                  Attention, votre accès au périmètre suivant: {item.perimeter}, arrivera à expiration dans{' '}
-                  {item.leftDays} jour{item.leftDays > 1 ? 's' : ''}. Veuillez vous rapprocher de votre référent EDS
-                  pour faire renouveler vos accès à l'application.
-                </Alert>
-              ))}
-          </Grid>
         </Grid>
-
         <Grid container spacing={1}>
           <Grid container className={classes.newsGrid} item xs={12} md={6}>
             <Grid item className={classes.pt3}>
@@ -203,8 +165,8 @@ const Welcome = () => {
             </Paper>
           </Grid>
         </Grid>
-      </Container>
-    </Grid>
+      </Grid>
+    </PageContainer>
   ) : null
 }
 

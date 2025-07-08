@@ -22,7 +22,7 @@ const PreviewCard = ({ children, title, linkLabel, onClickLink }: PropsWithChild
           <LinkWrapper onClick={onClickLink}>{linkLabel}</LinkWrapper>
         </Grid>
       </Grid>
-      <Grid item xs={12} margin="16px 0px 0px 0px">
+      <Grid item margin="16px 0px 0px">
         {children}
       </Grid>
     </>

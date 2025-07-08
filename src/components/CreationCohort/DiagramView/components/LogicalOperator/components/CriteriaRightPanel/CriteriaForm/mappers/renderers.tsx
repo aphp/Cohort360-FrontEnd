@@ -31,6 +31,7 @@ import { checkIsLeaf } from 'utils/valueSets'
 import { selectValueSetCodes } from 'state/valueSets'
 import SearchbarWithCheck from 'components/ui/Searchbar/SearchbarWithChecks'
 import { SearchbarWithCheckWrapper } from 'components/ui/Searchbar/styles'
+import CustomAlert from 'components/ui/Alert'
 
 /************************************************************************************/
 /*                        Criteria Form Item Renderer                               */
@@ -41,7 +42,7 @@ This file contains the list of functions used to render the React view form for 
 
 const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<key> } = {
   info: (props) => {
-    return <Alert severity={props.definition.contentType}>{props.definition.content}</Alert>
+    return <CustomAlert severity={props.definition.contentType}>{props.definition.content}</CustomAlert>
   },
   text: (props) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks

@@ -2,31 +2,18 @@ import React from 'react'
 
 import { Grid, CssBaseline } from '@mui/material'
 
-import HeaderPage from 'components/ui/HeaderPage'
-
-import { useAppSelector } from 'state'
-
-import sideBarTransition from 'styles/sideBarTransition'
+import PageContainer from 'components/ui/PageContainer'
+import HeaderLayout from 'components/ui/Header'
 
 const FeasibilityReports: React.FC = () => {
-  const { classes, cx } = sideBarTransition()
-  const openDrawer = useAppSelector((state) => state.drawer)
-
   return (
-    <Grid
-      container
-      direction="column"
-      className={cx(classes.appBar, {
-        [classes.appBarShift]: openDrawer
-      })}
-    >
+    <PageContainer>
       <Grid container justifyContent="center" alignItems="center">
         <CssBaseline />
-        <Grid container item xs={11}>
-          <HeaderPage id="feasibility-reports-page-title" title="Mes rapports de faisabilite" />
-        </Grid>
+        <HeaderLayout id="feasibility-reports-page-title" title="Mes rapports de faisabilité" titleOnly />
+        <Grid container item xs={11}></Grid>
       </Grid>
-    </Grid>
+    </PageContainer>
   )
 }
 

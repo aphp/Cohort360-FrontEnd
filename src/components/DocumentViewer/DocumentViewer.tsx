@@ -8,6 +8,7 @@ import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import Grid from '@mui/material/Grid'
+import { TabsWrapper } from 'components/ui/Tabs'
 import Typography from '@mui/material/Typography'
 
 import { Document, Page, pdfjs } from 'react-pdf'
@@ -15,7 +16,7 @@ import 'react-pdf/dist/Page/TextLayer.css'
 import services from 'services/aphp'
 import { ACCESS_TOKEN } from '../../constants'
 
-import { Tab, Tabs } from '@mui/material'
+import { Tab } from '@mui/material'
 import Watermark from 'assets/images/watermark_pseudo.svg?react'
 import { DocumentReference } from 'fhir/r4'
 import { getAuthorizationMethod } from 'services/apiFhir'
@@ -120,10 +121,10 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
           </DialogContent>
         ) : (
           <>
-            <Tabs value={selectedTab} onChange={handleTabChange}>
+            <TabsWrapper value={selectedTab} onChange={handleTabChange} customVariant={'secondary'}>
               {!deidentified && <Tab label="PDF" value="pdf" />}
               <Tab label="Texte brut pseudonymisé" value="raw" />
-            </Tabs>
+            </TabsWrapper>
             <>
               {selectedTab === 'raw' && (
                 <div style={{ backgroundImage: `url(${Watermark})` }}>

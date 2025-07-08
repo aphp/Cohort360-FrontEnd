@@ -41,7 +41,7 @@ export enum URLS {
   PATIENT = 'patients_info'
 }
 
-export const GAP = '20px'
+export const GAP = '16px'
 
 export type DisplayOptions = {
   myFilters: boolean
@@ -52,6 +52,7 @@ export type DisplayOptions = {
   search: boolean
   diagrams: boolean
   count: boolean
+  sidebar: boolean
 }
 
 export const DISPLAY_OPTIONS: DisplayOptions = {
@@ -61,8 +62,9 @@ export const DISPLAY_OPTIONS: DisplayOptions = {
   saveFilters: true,
   criterias: true,
   search: true,
-  diagrams: true,
-  count: true
+  diagrams: false,
+  count: true,
+  sidebar: false
 }
 
 export type SearchWithFilters = Search & {

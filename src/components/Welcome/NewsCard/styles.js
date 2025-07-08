@@ -5,6 +5,7 @@ const useStyles = makeStyles()(() => ({
     marginBottom: '15px'
   },
   markdown: {
+    color: '#303030',
     '& ul': {
       margin: 0,
       padding: '0 0 0 16px',

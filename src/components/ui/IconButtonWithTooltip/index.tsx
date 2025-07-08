@@ -4,7 +4,7 @@ import { Tooltip, IconButton } from '@mui/material'
 type IconButtonWithTooltipProps = {
   title: string
   icon: React.ReactElement
-  onClick: () => void
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void
   disabled?: boolean
   color?: string
 }
@@ -23,7 +23,7 @@ const IconButtonWithTooltip: React.FC<IconButtonWithTooltipProps> = ({
           size="small"
           onClick={(e) => {
             e.stopPropagation()
-            onClick()
+            onClick(e)
           }}
           disabled={disabled}
           sx={{

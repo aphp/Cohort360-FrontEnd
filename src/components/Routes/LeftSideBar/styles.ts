@@ -2,7 +2,7 @@ import { makeStyles } from 'tss-react/mui'
 import { Theme } from '@mui/material/styles'
 import { CSSProperties } from 'react'
 
-const drawerWidth = 260
+export const drawerWidth = 260
 
 const useStyles = makeStyles()((theme: Theme) => ({
   root: {

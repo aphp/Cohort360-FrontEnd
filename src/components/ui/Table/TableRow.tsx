@@ -1,6 +1,19 @@
-import React, { Fragment, useState } from 'react'
-import { CellType, Row, Link, Document, Table as TableType, Line, Status } from 'types/table'
+import React, { Fragment, ReactElement, useState } from 'react'
 import {
+  CellType,
+  Row,
+  Link,
+  Document,
+  Table as TableType,
+  Line,
+  Status,
+  SubItem,
+  Favorite,
+  Action,
+  CheckboxAction
+} from 'types/table'
+import {
+  Checkbox,
   Collapse,
   Grid,
   IconButton,
@@ -12,31 +25,42 @@ import {
 } from '@mui/material'
 import GenderIcon from '../GenderIcon'
 import { GenderStatus } from 'types/searchCriterias'
-import StatusChip from '../StatusChip'
 import SearchIcon from 'assets/icones/search.svg?react'
-import { Visibility, KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material'
+import { Comment, KeyboardArrowUp, KeyboardArrowDown, Visibility } from '@mui/icons-material'
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 import Lines from '../Lines'
 import DataTable from '.'
 import Paragraphs, { Paragraph } from '../Paragraphs'
 import Modal from '../Modal'
-import { Comment } from '@mui/icons-material'
 import { TableCellWrapper } from './styles'
-import Parse from 'html-react-parser'
-import DOMPurify from 'dompurify'
+import DocumentContentDisplay from './DocumentContentDisplay'
+import FavStar from '../FavStar'
+import SublevelButton from '../SublevelButton'
+import TooltipChip from '../TooltipChip'
+import IconButtonWithTooltip from '../IconButtonWithTooltip'
 
 type RowProps = {
   row: Row
   sx?: SxProps<Theme>
 }
 
+const renderIcon = (IconComponent: ReactElement | undefined) => {
+  if (!IconComponent || typeof IconComponent !== 'function') return undefined
+  const Component = IconComponent as React.ElementType
+  return <Component style={{ width: 15, height: 15, fill: 'white' }} />
+}
+
 const TableRow = ({ row, sx }: RowProps) => {
   const [subitemIndex, setSubitemIndex] = useState<number | null>(null)
   const docContentIndex = row.findIndex((cell) => cell.type === CellType.DOCUMENT_CONTENT)
+  const showSubContent =
+    (subitemIndex !== null && row[subitemIndex].type === CellType.SUBARRAY) ||
+    (subitemIndex !== null && row[subitemIndex].type === CellType.LINES) ||
+    docContentIndex > -1
 
   return (
     <>
-      <TableRowMui sx={{ ...sx }}>
+      <TableRowMui sx={{ ...sx, cursor: row._onClick ? 'pointer' : 'inherit' }} onClick={row._onClick}>
         {row.map((cell, index) => {
           if (cell.isHidden) return <Fragment key={index} />
           return (
@@ -46,8 +70,57 @@ const TableRow = ({ row, sx }: RowProps) => {
               last={index === row.length - 1}
               scope="row"
               align={cell.align ?? 'left'}
-              sx={{ ...cell.sx }}
+              sx={{
+                ...cell.sx,
+                whiteSpace: cell.type === CellType.TEXT || cell.type === CellType.PARAGRAPHS ? 'wrap' : 'nowrap',
+                borderBottom: showSubContent ? 'none' : undefined
+              }}
             >
+              {cell.type === CellType.ACTIONS &&
+                (cell.value as Action[]).map((action) => {
+                  const IconComponent = action.icon
+                  return (
+                    <IconButtonWithTooltip
+                      key={action.title}
+                      disabled={action.disabled}
+                      icon={<IconComponent />}
+                      onClick={action.onClick}
+                      title={action.title}
+                    />
+                  )
+                })}
+              {cell.type === CellType.CHECKBOX && (
+                <Checkbox
+                  size="small"
+                  checked={(cell.value as CheckboxAction).isChecked}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    ;(cell.value as CheckboxAction).onClick()
+                  }}
+                />
+              )}
+              {cell.type === CellType.FAV_ICON && (
+                <IconButton
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    ;(cell.value as Favorite).onClick()
+                  }}
+                  disabled={(cell.value as Favorite).disabled}
+                >
+                  <FavStar
+                    favorite={(cell.value as Favorite).isFavorite}
+                    height={18}
+                    color={(cell.value as Favorite).disabled ? '#CBCFCF' : undefined}
+                  />
+                </IconButton>
+              )}
+              {cell.type === CellType.SUB_ITEM && (
+                <SublevelButton
+                  label={(cell.value as SubItem).label}
+                  onClick={(cell.value as SubItem).onClick}
+                  total={(cell.value as SubItem).total}
+                />
+              )}
               {cell.type == CellType.GENDER_ICON && (
                 <Grid container>
                   <GenderIcon key={cell.id} gender={cell.value as GenderStatus} />
@@ -58,14 +131,13 @@ const TableRow = ({ row, sx }: RowProps) => {
               {cell.type == CellType.STATUS_CHIP &&
                 (() => {
                   const IconComponent = (cell.value as Status).icon
-                  const icon = IconComponent ? (
-                    <IconComponent style={{ width: 15, height: 15, fill: 'white' }} />
-                  ) : undefined
+                  const icon = renderIcon(IconComponent as ReactElement | undefined)
                   return (
-                    <StatusChip
+                    <TooltipChip
                       label={(cell.value as Status).label}
                       status={(cell.value as Status).status}
                       icon={icon}
+                      tooltip={(cell.value as Status).tooltip}
                     />
                   )
                 })()}
@@ -132,24 +204,23 @@ const TableRow = ({ row, sx }: RowProps) => {
         })}
       </TableRowMui>
       {subitemIndex !== null && row[subitemIndex].type === CellType.SUBARRAY && (
-        <TableRowMui>
+        <TableRowMui sx={{ backgroundColor: '#f5f9fe' }}>
           <TableCell
             colSpan={row.length}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            sx={{ padding: '0px 30px', backgroundColor: (sx as any)?.backgroundColor ?? '#fff' }}
+            sx={{ padding: '8px 16px 16px ', backgroundColor: (sx as any)?.backgroundColor ?? '#fff' }}
           >
-            <Collapse in={subitemIndex !== null} unmountOnExit>
+            <Collapse in={subitemIndex !== null} unmountOnExit sx={{ border: '1px solid #ebebeb' }}>
               <DataTable
+                noMarginBottom
                 value={row[subitemIndex].value as TableType}
                 sxColumn={{
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  backgroundColor: (sx as any)?.backgroundColor ?? '#fff',
-                  color: '153d8a',
-                  borderBottom: '1px solid 1px solid rgb(224, 224, 224)',
-                  fontSize: 13
+                  backgroundColor: (sx as any)?.backgroundColor ?? '#fafafa',
+                  fontSize: 10
                 }}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                sxRow={{ backgroundColor: (sx as any)?.backgroundColor ?? '#fff' }}
+                sxRow={{ backgroundColor: (sx as any)?.backgroundColor ?? '#fff', fontSize: 12 }}
               />
             </Collapse>
           </TableCell>
@@ -160,7 +231,9 @@ const TableRow = ({ row, sx }: RowProps) => {
           <TableCell colSpan={row.length} sx={{ padding: 0 }}>
             <Collapse in={subitemIndex !== null} timeout="auto" unmountOnExit>
               {!row[subitemIndex].value || (row[subitemIndex].value as Line[])?.length === 0 ? (
-                'Aucune donnée à afficher'
+                <Typography align="center" p={2}>
+                  Aucune donnée à afficher
+                </Typography>
               ) : (
                 <Lines value={row[subitemIndex].value as Line[]} />
               )}
@@ -169,11 +242,11 @@ const TableRow = ({ row, sx }: RowProps) => {
         </TableRowMui>
       )}
       {docContentIndex > -1 && (
-        <TableRowMui id={`docContent-${row[docContentIndex].id}`}>
-          <TableCell colSpan={row.length} sx={{ padding: '20px' }}>
-            <Typography>{Parse(DOMPurify.sanitize(row[docContentIndex].value as string))}</Typography>
-          </TableCell>
-        </TableRowMui>
+        <DocumentContentDisplay
+          id={`docContent-${row[docContentIndex].id}`}
+          length={row.length}
+          docContent={row[docContentIndex].value as string}
+        />
       )}
     </>
   )

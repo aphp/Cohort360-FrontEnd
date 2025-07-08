@@ -7,9 +7,9 @@ export const useSizeObserver = () => {
   const sizes = useMemo(
     () => ({
       isXS: containerWidth < 600,
-      isSM: containerWidth < 900,
-      isMD: containerWidth < 1200,
-      isLG: containerWidth < 1535,
+      isSM: containerWidth >= 600 && containerWidth < 900,
+      isMD: containerWidth >= 900 && containerWidth < 1200,
+      isLG: containerWidth >= 1200 && containerWidth < 1535,
       isXL: containerWidth >= 1535
     }),
     [containerWidth]

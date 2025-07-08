@@ -14,50 +14,47 @@ import {
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import useStyles from './styles'
-import { LabelObject } from 'types/searchCriterias'
+import { LabelObject, TimelineFilter } from 'types/searchCriterias'
 
 type FilterTimelineDialogProps = {
   open: boolean
   onClose: () => void
   diagnosticTypesList: LabelObject[]
   selectedDiagnosticTypes: LabelObject[]
-  onChangeSelectedDiagnosticTypes: (selectedDiagnosticTypes: LabelObject[]) => void
+  onChangeFilters: (newFilters: TimelineFilter) => void
   encounterStatusList: LabelObject[]
-  encounterStatus: LabelObject[]
-  onChangeEncounterStatus: (encounterStatus: LabelObject[]) => void
+  selectedEncounterStatus: LabelObject[]
 }
 const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
   open,
   onClose,
   diagnosticTypesList,
   selectedDiagnosticTypes,
-  onChangeSelectedDiagnosticTypes,
   encounterStatusList,
-  encounterStatus,
-  onChangeEncounterStatus
+  selectedEncounterStatus,
+  onChangeFilters
 }) => {
   const { classes } = useStyles()
 
-  const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<LabelObject[]>(selectedDiagnosticTypes)
-  const [_encounterStatus, setEncounterStatus] = useState<LabelObject[]>(encounterStatus)
+  const [diagnosticTypes, setDiagnosticTypes] = useState<LabelObject[]>(selectedDiagnosticTypes)
+  const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>(selectedEncounterStatus)
 
   const _onChangeSelectedDiagnosticTypes = (event: React.ChangeEvent<{}>, value: LabelObject[]) => {
-    setSelectedDiagnosticTypes(value)
+    setDiagnosticTypes(value)
   }
 
   const _onSubmit = () => {
-    onChangeSelectedDiagnosticTypes(_selectedDiagnosticTypes)
-    onChangeEncounterStatus(_encounterStatus)
+    onChangeFilters({ diagnosticTypes: diagnosticTypes, encounterStatus: encounterStatus })
     onClose()
   }
 
   useEffect(() => {
-    setSelectedDiagnosticTypes(selectedDiagnosticTypes)
-    setEncounterStatus(encounterStatus)
+    setDiagnosticTypes(selectedDiagnosticTypes)
+    setEncounterStatus(selectedEncounterStatus)
   }, [open]) // eslint-disable-line
 
   const currentSelectedTypes = diagnosticTypesList.filter((item) =>
-    _selectedDiagnosticTypes.find((selectedDiagCode) => selectedDiagCode.id === item.id)
+    diagnosticTypes.find((selectedDiagCode) => selectedDiagCode.id === item.id)
   )
 
   return (
@@ -85,11 +82,9 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
           </Typography>
           <Autocomplete
             multiple
-            onChange={(event, value) => {
-              setEncounterStatus(value)
-            }}
+            onChange={(event, value) => setEncounterStatus(value)}
             options={encounterStatusList}
-            value={_encounterStatus}
+            value={selectedEncounterStatus}
             disableCloseOnSelect
             getOptionLabel={(encounterStatus: LabelObject) => encounterStatus.label}
             renderOption={(props, encounterStatus: LabelObject) => <li {...props}>{encounterStatus.label}</li>}

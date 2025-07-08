@@ -216,7 +216,7 @@ export const biologyConfig = (
     "Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondants aux analyses les plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020."
   ],
   getCount: (counts) => [
-    { label: 'résultat(s)', display: true, count: counts[0] },
-    { label: 'patient(s)', display: !!!patient, count: counts[1] }
+    { label: `résultat${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
+    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
   ]
 })

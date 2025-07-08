@@ -31,7 +31,7 @@ const TutorialsCard = () => {
         {_news?.map((entry, index) => (
           <div key={index}>
             <Divider className={classes.divider} style={{ marginTop: 8, marginBottom: 16 }} />
-            <Typography color="textSecondary" style={{ paddingBottom: 16 }}>
+            <Typography color="textSecondary" style={{ paddingBottom: 8, color: '#303030' }}>
               <b>{entry.title}</b>
             </Typography>
             <Typography color="textSecondary" className={classes.markdown}>

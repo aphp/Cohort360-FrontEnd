@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react'
+/* eslint-disable max-statements */
+import React, { useState, useEffect, useMemo } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import moment from 'moment'
 
-import Chip from 'components/ui/Chip'
-import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
+import CenteredCircularProgress from 'components/ui/CenteredCircularProgress'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
+import Button from 'components/ui/Button'
+import CriteriasSection from 'components/ExplorationBoard/CriteriasSection'
 import TimelineItemRightProcedure from './TimelineItemRightProcedure'
 import TimelineItemRightCondition from './TimelineItemRightCondition'
 import TimelineItemLeft from './TimelineItemLeft'
@@ -19,18 +20,18 @@ import FilterList from 'assets/icones/filter.svg?react'
 
 import { CohortComposition, CohortEncounter, PMSIEntry } from 'types'
 
-import { capitalizeFirstLetter } from 'utils/capitalize'
-
 import { useAppDispatch } from 'state'
 import { fetchAllProcedures } from 'state/patient'
 
 import useStyles from './styles'
-import { Condition, DocumentReference, Encounter, Period, Procedure } from 'fhir/r4'
-import { FilterKeys, LabelObject } from 'types/searchCriterias'
+import { Condition, Encounter, Period, Procedure } from 'fhir/r4'
+import { FilterKeys, FilterValue, LabelObject, SearchCriteriaKeys, TimelineFilter } from 'types/searchCriterias'
 import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
 import { getCleanGroupId } from 'utils/paginationUtils'
 import { getCodeList } from 'services/aphp/serviceValueSets'
+import { GAP } from 'types/exploration'
+import { removeElementInArray, selectFiltersAsArray } from 'utils/filters'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -146,7 +147,6 @@ const generateTimelineFormattedData = (
 type PatientTimelineTypes = {
   loadingPmsi: boolean
   deidentified: boolean
-  documents?: (CohortComposition | DocumentReference)[]
   hospits?: CohortEncounter[]
   consults?: Procedure[]
   diagnostics?: Condition[]
@@ -166,11 +166,12 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   const [dialogDocuments, setDialogDocuments] = useState<CohortComposition[] | undefined>([])
   const [openFilter, setOpenFilter] = useState(false)
 
-  const [selectedTypes, setSelectedTypes] = useState<LabelObject[]>([])
-  const [encounterStatus, setEncounterStatus] = useState<LabelObject[]>([])
   const [diagnosticTypesList, setDiagnosticTypesList] = useState<LabelObject[]>([])
   const [encounterStatusList, setEncounterStatusList] = useState<LabelObject[]>([])
-
+  const [filters, setFilters] = useState<TimelineFilter>({
+    diagnosticTypes: [],
+    encounterStatus: []
+  })
   const [loading, setLoading] = useState(false)
   const yearComponentSize: { [year: number]: number } = {}
 
@@ -201,7 +202,9 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
       setEncounterStatusList(encounterStatus.results)
       // Find main diagnosis
       const foundItem = diagnosticTypes.results.find((diagnosticTypes) => diagnosticTypes.id === 'dp')
-      foundItem && setSelectedTypes([foundItem])
+      // foundItem && setSelectedTypes([foundItem])
+      const foundItemAsLabelObject = foundItem ? [{ id: foundItem.id, label: foundItem.label }] : []
+      setFilters({ ...filters, diagnosticTypes: foundItemAsLabelObject })
       setDiagnosticTypesList(diagnosticTypes.results)
     }
 
@@ -209,16 +212,16 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   }, [])
 
   useEffect(() => {
-    const encounterStatusIds = encounterStatus.map(({ id }) => id)
+    const encounterStatusIds = filters.encounterStatus.map(({ id }) => id)
     const _timelineData = generateTimelineFormattedData(
       encounterStatusIds,
       hospits,
       consults,
       diagnostics,
-      selectedTypes
+      filters.diagnosticTypes
     )
     setTimelineData(_timelineData)
-  }, [hospits, consults, diagnostics, selectedTypes, encounterStatus])
+  }, [hospits, consults, diagnostics, filters])
 
   let yearList: number[] = timelineData
     ? Object.keys(timelineData)
@@ -340,18 +343,24 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
     </React.Fragment>
   )
 
-  const handleDeleteChip = (key: FilterKeys, value: LabelObject) => {
+  const handleDeleteChip = (key: FilterKeys | SearchCriteriaKeys, value: FilterValue) => {
     switch (key) {
-      case FilterKeys.DIAGNOSTIC_TYPES:
-        value && setSelectedTypes(selectedTypes.filter((item) => item.id !== value.id))
+      case FilterKeys.DIAGNOSTIC_TYPES: {
+        const selectedDiagnosticTypes = removeElementInArray(filters.diagnosticTypes, value as LabelObject)
+        setFilters({ ...filters, diagnosticTypes: selectedDiagnosticTypes })
         break
-      case FilterKeys.ENCOUNTER_STATUS:
-        value && setEncounterStatus(encounterStatus.filter((item) => item.id !== value.id))
+      }
+      case FilterKeys.ENCOUNTER_STATUS: {
+        const selectedEncounterStatus = removeElementInArray(filters.encounterStatus, value as LabelObject)
+        setFilters({ ...filters, encounterStatus: selectedEncounterStatus })
         break
+      }
       default:
         break
     }
   }
+
+  const filtersAsArray = useMemo(() => selectFiltersAsArray(filters, undefined), [filters])
 
   return (
     <>
@@ -371,77 +380,72 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
 
           <FilterTimelineDialog
             diagnosticTypesList={diagnosticTypesList}
-            selectedDiagnosticTypes={selectedTypes}
-            onChangeSelectedDiagnosticTypes={(newSelectedTypes) => setSelectedTypes(newSelectedTypes)}
+            selectedDiagnosticTypes={filters.diagnosticTypes}
+            onChangeFilters={(newFilters: TimelineFilter) => setFilters(newFilters)}
             open={openFilter}
             onClose={() => setOpenFilter(false)}
             encounterStatusList={encounterStatusList}
-            encounterStatus={encounterStatus}
-            onChangeEncounterStatus={setEncounterStatus}
+            selectedEncounterStatus={filters.encounterStatus}
           />
 
-          <Grid container alignItems="center" justifyContent="flex-end" style={{ margin: 'auto' }}>
+          <Grid container gap={GAP} margin={'16px 0'}>
             <Button
-              variant="contained"
-              disableElevation
               onClick={() => setOpenFilter(true)}
               startIcon={<FilterList height="15px" fill="#FFF" />}
-              className={classes.searchButton}
+              width="fit-content"
             >
               Filtrer
             </Button>
-          </Grid>
 
-          <Grid container alignItems="center" justifyContent="flex-end" style={{ margin: '10px auto' }}>
-            {selectedTypes.length > 0 &&
-              selectedTypes.map((diagnosticType) => (
-                <Chip
-                  key={diagnosticType.id}
-                  label={capitalizeFirstLetter(diagnosticType.label)}
-                  onDelete={() => handleDeleteChip(FilterKeys.DIAGNOSTIC_TYPES, diagnosticType)}
-                />
-              ))}
-            {encounterStatus.length > 0 &&
-              encounterStatus.map((status) => (
-                <Chip
-                  key={status.id}
-                  label={capitalizeFirstLetter(status.label)}
-                  onDelete={() => handleDeleteChip(FilterKeys.ENCOUNTER_STATUS, status)}
-                />
-              ))}
-          </Grid>
-          {loadingPmsi && (
-            <div className={classes.loadingContainer}>
-              <CircularProgress size={25} />
-            </div>
-          )}
+            <CriteriasSection
+              value={filtersAsArray}
+              displayOptions={{
+                myFilters: false,
+                filterBy: true,
+                orderBy: false,
+                saveFilters: false,
+                criterias: true,
+                search: false,
+                diagrams: false,
+                count: false,
+                sidebar: false
+              }}
+              onDelete={handleDeleteChip}
+            />
 
-          <div className={classes.centeredTimeline}>
-            <div className={classes.verticalBar} />
-            {yearList.map((year) => (
-              <div
-                key={'generalTimelineDiv' + year}
-                ref={(el) => {
-                  if (!el) return
-                  const sizeValue = el.getBoundingClientRect().height
-                  if (yearComponentSize[year] === sizeValue) return
-
-                  yearComponentSize[year] = sizeValue
-                }}
-              >
-                {isActivityInYear(year) || year === timelinePeriod.end
-                  ? getYearComponent(year)
-                  : isActivityInYear(year - 1) && (
-                      <>
-                        <span className={classes.collapsedYear}>
-                          <MoreVertIcon />
-                        </span>
-                        <span className={classes.timelabel}>{year}</span>
-                      </>
-                    )}
+            {loadingPmsi && (
+              <div className={classes.loadingContainer}>
+                <CenteredCircularProgress size={25} />
               </div>
-            ))}
-          </div>
+            )}
+
+            <div className={classes.centeredTimeline}>
+              <div className={classes.verticalBar} />
+              {yearList.map((year) => (
+                <div
+                  key={'generalTimelineDiv' + year}
+                  ref={(el) => {
+                    if (!el) return
+                    const sizeValue = el.getBoundingClientRect().height
+                    if (yearComponentSize[year] === sizeValue) return
+
+                    yearComponentSize[year] = sizeValue
+                  }}
+                >
+                  {isActivityInYear(year) || year === timelinePeriod.end
+                    ? getYearComponent(year)
+                    : isActivityInYear(year - 1) && (
+                        <>
+                          <span className={classes.collapsedYear}>
+                            <MoreVertIcon />
+                          </span>
+                          <span className={classes.timelabel}>{year}</span>
+                        </>
+                      )}
+                </div>
+              ))}
+            </div>
+          </Grid>
         </>
       )}
     </>

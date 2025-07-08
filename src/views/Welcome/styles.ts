@@ -1,43 +1,15 @@
 import { makeStyles } from 'tss-react/mui'
 import { Theme } from '@mui/material/styles'
-import { smallDrawerWidth, largeDrawerWidth } from 'components/Routes/LeftSideBar/LeftSideBar'
 
 const useStyles = makeStyles()((theme: Theme) => ({
-  root: {
-    minHeight: 'calc(100vh + 20px)'
-  },
-  appBar: {
-    marginLeft: smallDrawerWidth,
-    width: `calc(100% - ${smallDrawerWidth}px)`,
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
-  },
-  appBarShift: {
-    marginLeft: largeDrawerWidth,
-    width: `calc(100% - ${largeDrawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
-  },
-  title: {
-    flexGrow: 1
-  },
-  subtitle: {
-    flexGrow: 1,
-    borderBottom: '1px solid #ccc'
-  },
-  container: {
-    paddingTop: theme.spacing(4)
-  },
   paper: {
     padding: theme.spacing(2),
     display: 'flex',
     overflow: 'auto',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    borderRadius: 8,
+    boxShadow: 'unset',
+    border: '1px solid #D1E2F4'
   },
   pt3: {
     paddingTop: theme.spacing(1.5)
@@ -47,8 +19,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     [theme.breakpoints.down('md')]: {
       flexDirection: 'column-reverse'
     }
-  },
-  alert: { marginTop: '5px', width: '100%' }
+  }
 }))
 
 export default useStyles
