@@ -1,13 +1,6 @@
 import { makeStyles } from 'tss-react/mui'
 
 const useStyles = makeStyles()(() => ({
-  backDrop: {
-    height: '100vh',
-    width: '100vw',
-    position: 'absolute',
-    top: 0,
-    left: 0
-  },
   mainLogicalOperator: {
     background: '#19235A',
     boxSizing: 'border-box',
@@ -47,18 +40,18 @@ const useStyles = makeStyles()(() => ({
       left: -38
     }
   },
-  textOperator: {
-    lineHeight: '30px',
-    margin: 'auto',
-    padding: '0 4px',
-    fontSize: 13
-  },
   descriptionText: {
     margin: 'auto',
     padding: '0 4px',
     fontSize: 13,
     marginTop: 5,
     fontWeight: 100
+  },
+  textOperator: {
+    lineHeight: '30px',
+    margin: 'auto',
+    padding: '0 4px',
+    fontSize: 13
   },
   input: {
     width: 50,
