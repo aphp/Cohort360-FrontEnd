@@ -329,7 +329,7 @@ const Login = () => {
             <Typography color="primary" className={classes.bienvenue}>
               Bienvenue ! Connectez-vous.
             </Typography>
-            {display_jwt_form && (
+            {(appConfig.system.displayJwtLogin || display_jwt_form) && (
               <Grid container direction="column" alignItems="center" justifyContent="center">
                 <TextField
                   margin="normal"
@@ -369,17 +369,19 @@ const Login = () => {
               </Grid>
             )}
 
-            <Button
-              type="submit"
-              onClick={oidcLogin}
-              variant="contained"
-              className={cx(classes.submit, classes.oidcButton)}
-              style={{ marginBottom: 40 }}
-              id="oidc-login"
-              startIcon={<Keycloak height="25px" />}
-            >
-              Connexion via OIDC
-            </Button>
+            {appConfig.system.displayOidcLogin && (
+              <Button
+                type="submit"
+                onClick={oidcLogin}
+                variant="contained"
+                className={cx(classes.submit, classes.oidcButton)}
+                style={{ marginBottom: 40 }}
+                id="oidc-login"
+                startIcon={<Keycloak height="25px" />}
+              >
+                Connexion via OIDC
+              </Button>
+            )}
 
             <Typography align="center">
               <Link href="#" onClick={() => setOpen(true)} underline="hover">

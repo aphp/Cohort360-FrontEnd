@@ -177,6 +177,8 @@ export type AppConfig = {
       responseType: string
       state: string
     }
+    displayJwtLogin: boolean
+    displayOidcLogin: boolean
     codeDisplayJWT: string
     sessionTimeout: number
     refreshTokenInterval: number
@@ -392,6 +394,8 @@ let config: AppConfig = {
     datamodelUrl: '/api/datamodel',
     sessionTimeout: 780000,
     refreshTokenInterval: 180000,
+    displayJwtLogin: false,
+    displayOidcLogin: true,
     codeDisplayJWT: 'ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,b,a,Enter',
     jToolUsers: [],
     userTrackingBlacklist: []
