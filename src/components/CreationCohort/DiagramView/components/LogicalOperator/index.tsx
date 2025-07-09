@@ -224,6 +224,12 @@ const LogicalOperator: React.FC = () => {
     })
   )
 
+  useEffect(() => {
+    console.log('test request selectedCriterias', request.selectedCriteria)
+    console.log('test request group', request.criteriaGroup)
+    console.log('test request json', request.json)
+  }, [request.selectedCriteria, request.criteriaGroup, request.json])
+
   const _buildCohortCreation = () => {
     dispatch(buildCohortCreation({ selectedPopulation: null }))
   }
@@ -329,22 +335,16 @@ const LogicalOperator: React.FC = () => {
       ? request.criteriaGroup.find(({ id }) => id === over.data.current?.groupId)
       : null
     if (currentParent) {
+      dispatch(deleteSelectedCriteria(active.id as number))
       const startIndex = ids.findIndex((id) => id === `start-${currentParent.id}`)
       const endIndex = ids.findIndex((id) => id === `end-${currentParent.id}`)
       const newIds = ids.slice(startIndex + 1, endIndex) as number[]
       const previousIds = currentParent.criteriaIds.filter((id) => id < 0)
-      const item = { ...active.data.current, id: active.id }
-      delete item['sortable']
-      delete item['groupId']
+      const criteriaIds = [...newIds.map((id) => (id === active.id ? request.nextCriteriaId : id)), ...previousIds]
+      const item = { ...active.data.current, id: request.nextCriteriaId }
       console.log('test move newIds', currentParent.id, [...newIds, ...previousIds])
-      dispatch(deleteSelectedCriteria(active.id as number))
       dispatch(addNewSelectedCriteria(item as SelectedCriteriaType))
-      dispatch(
-        editCriteriaGroup({
-          ...currentParent,
-          criteriaIds: [...newIds, ...previousIds]
-        })
-      )
+      dispatch(editCriteriaGroup({ ...currentParent, criteriaIds }))
       _buildCohortCreation()
 
       /* dispatch(
@@ -360,7 +360,7 @@ const LogicalOperator: React.FC = () => {
 
   return (
     <>
-      <DndContext onDragEnd={(event) => onDragEnd(event, criteriasIds)} sensors={sensors}>
+      <DndContext onDragEnd={(event: DragEndEvent) => onDragEnd(event, criteriasIds)} sensors={sensors}>
         <SortableContext items={criteriasIds}>
           <OperatorItem
             groups={criteriaGroup}

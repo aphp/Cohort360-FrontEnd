@@ -283,15 +283,15 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
         state.cohortCreation.request.criteriaGroup && state.cohortCreation.request.criteriaGroup.length > 0
           ? state.cohortCreation.request.criteriaGroup
           : defaultInitialState().criteriaGroup
-      console.log('test move', _criteriaGroup)
-      console.log('test move selectedCriterias', _selectedCriteria)
+      //   console.log('test move', _criteriaGroup)
+      //   console.log('test move selectedCriterias', _selectedCriteria)
       const _temporalConstraints =
         state.cohortCreation.request.temporalConstraints ?? defaultInitialState().temporalConstraints
 
       const json = buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
       if (json !== state?.cohortCreation?.request?.json) {
         const saveJsonResponse = await dispatch(saveJson({ newJson: json })).unwrap()
-        console.log('test move newjson', json)
+        //  console.log('test move newjson', json)
         await dispatch(
           countCohortCreation({
             json: json,
@@ -639,13 +639,11 @@ const cohortCreationSlice = createSlice({
       state.isCriteriaNominative = false
     },
     editSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
-      const foundItem = state.selectedCriteria.find(({ id }) => id === action.payload.id)
-      const index = foundItem ? state.selectedCriteria.indexOf(foundItem) : -1
+      const index = state.selectedCriteria.findIndex(({ id }) => id === action.payload.id)
       if (index !== -1) state.selectedCriteria[index] = action.payload
     },
     editCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroup>) => {
-      const foundItem = state.criteriaGroup.find(({ id }) => id === action.payload.id)
-      const index = foundItem ? state.criteriaGroup.indexOf(foundItem) : -1
+      const index = state.criteriaGroup.findIndex(({ id }) => id === action.payload.id)
       if (index !== -1) state.criteriaGroup[index] = action.payload
     },
     duplicateSelectedCriteria: (state: CohortCreationState, action: PayloadAction<number>) => {
