@@ -38,12 +38,20 @@ type LogicalOperatorDisplayProps = {
 
 const LogicalOperatorDisplay = ({ value }: LogicalOperatorDisplayProps) => {
   const { classes } = useStyles()
-  if (!value) return <Fragment />
+  if (!value) return null
   const { type, isInclusive } = value
   if (hasOptions(value)) {
     return (
       <Box display="flex" alignItems="center" gap={1}>
-        {isInclusive ? <IncludesIcon /> : <ExcludesIcon />}
+        {isInclusive ? (
+          <Typography variant="h5" className={classes.textOperator}>
+            OU
+          </Typography>
+        ) : (
+          <Typography variant="h5" className={classes.textOperator}>
+            NON OU
+          </Typography>
+        )}
         {value.options.operator} {value.options.number}
       </Box>
     )
