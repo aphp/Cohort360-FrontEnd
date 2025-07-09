@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.46.6](https://github.com/aphp/Cohort360-FrontEnd/compare/2.46.5..2.46.6) - 2025-07-09
+
+### 🐛 Bug Fixes
+
+- *(auth)* Prevent aborting refresh token on me state changes (on maintenance) - ([57b90c0](https://github.com/aphp/Cohort360-FrontEnd/commit/57b90c06e2c3819f59afaa702c0de65afcec3507))
+
 ## [2.46.5](https://github.com/aphp/Cohort360-FrontEnd/compare/2.46.4..2.46.5) - 2025-06-10
 
 ### 🐛 Bug Fixes
