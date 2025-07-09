@@ -21,6 +21,7 @@ import {
   editAllCriteriaGroup,
   editCriteriaGroup,
   editSelectedCriteria,
+  moveCriteria,
   suspendCount,
   unsuspendCount
 } from 'state/cohortCreation'
@@ -316,7 +317,13 @@ const LogicalOperator: React.FC = () => {
 
   const onDragEnd = (event: DragEndEvent, ids: UniqueIdentifier[]) => {
     const { active, over } = event
+    console.log('test move', active, over)
     if (!over || active.id === over.id) return
+    const _active = { id: active.id as number, groupId: active.data.current?.groupId as number }
+    const overId = typeof over.id === 'string' ? null : over.id
+    const _over = { id: overId as number | null, groupId: over.data.current?.groupId as number }
+    dispatch(moveCriteria({ active: _active, over: _over }))
+    return
     const activeIndex = ids.indexOf(active.id)
     const overIndex = ids.indexOf(over.id)
     ids.splice(activeIndex, 1)
