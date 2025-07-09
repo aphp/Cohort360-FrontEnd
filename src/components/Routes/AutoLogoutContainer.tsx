@@ -95,7 +95,7 @@ const AutoLogoutContainer = () => {
       clearInterval(interval)
       pause()
     }
-  }, [me, appConfig.system.refreshTokenInterval])
+  }, [me?.id, appConfig.system.refreshTokenInterval])
 
   if (!me) return <></>
 
