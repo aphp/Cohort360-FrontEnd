@@ -565,6 +565,42 @@ const getNextCriteriaId = (selectedCriteria: { id: number }[], criteriaGroup: { 
   return maxId + 1
 }
 
+type MoveCriteriaPayload = {
+  active: { id: number; groupId: number }
+  over: { id: number | null; groupId: number }
+}
+
+const moveCriterionInGroups = (snapshot: CriteriaGroup[], { active, over }: MoveCriteriaPayload) => {
+  return snapshot.map((group) => {
+    const { id: groupId, criteriaIds: originalIds } = group
+    const isTargetGroup = groupId === over.groupId
+
+    const placeholderIds = originalIds.filter((id) => id < 0)
+    const criteriaIds = originalIds.filter((id) => id > 0 && id !== active.id)
+
+    if (isTargetGroup) {
+      let insertionIndex: number
+
+      if (over.id !== null) {
+        const overIndex = originalIds.indexOf(over.id)
+        const activeIndex = originalIds.indexOf(active.id)
+        const shouldInsertAfter =
+          active.groupId > over.groupId || (active.groupId === over.groupId && activeIndex < overIndex)
+        insertionIndex = shouldInsertAfter ? overIndex + 1 : overIndex
+      } else {
+        insertionIndex = active.groupId > over.groupId ? 0 : criteriaIds.length
+      }
+
+      criteriaIds.splice(insertionIndex, 0, active.id)
+    }
+
+    return {
+      ...group,
+      criteriaIds: [...criteriaIds, ...placeholderIds]
+    }
+  })
+}
+
 const cohortCreationSlice = createSlice({
   name: 'cohortCreation',
   initialState: defaultInitialState(),
@@ -602,76 +638,15 @@ const cohortCreationSlice = createSlice({
       state.temporalConstraints = deleteTemporalConstraints(state.temporalConstraints, criteriaId, idMap)
       state.nextCriteriaId = getNextCriteriaId(state.selectedCriteria, state.criteriaGroup)
     },
-    moveCriteria: (
-      state,
-      action: PayloadAction<{
-        active: { id: number; groupId: number }
-        over: { id: number | null; groupId: number }
-      }>
-    ) => {
+    moveCriteria: (state, action: PayloadAction<MoveCriteriaPayload>) => {
       const { active, over } = action.payload
-      const snapshot = [...state.criteriaGroup]
-
-      // Étape 1 — Construire la map des critères
-      // const criterionGroupMap = buildCriterionGroupMap(snapshot)
-
-      // Étape 2 — Supprimer l’élément de selectedCriteria
-      //const criterionToMove = state.selectedCriteria.find((c) => c.id === active.id)
-      //if (!criterionToMove) return
-
-      //const filteredSelected = state.selectedCriteria.filter((c) => c.id !== active.id)
-
-      // Étape 3 — Insérer l’élément à la bonne position dans le groupe cible
-      const updatedGroups = snapshot.map((group) => {
-        const { id: groupId, criteriaIds: originalIds } = group
-        const isTargetGroup = groupId === over.groupId
-
-        const placeholderIds = originalIds.filter((id) => id < 0)
-        const criteriaIds = originalIds.filter((id) => id > 0 && id !== active.id)
-
-        if (isTargetGroup) {
-          let insertionIndex: number
-
-          if (over.id !== null) {
-            const overIndex = originalIds.indexOf(over.id)
-            const activeIndex = originalIds.indexOf(active.id)
-            const shouldInsertAfter =
-              active.groupId > over.groupId || (active.groupId === over.groupId && activeIndex < overIndex)
-            insertionIndex = shouldInsertAfter ? overIndex + 1 : overIndex
-          } else insertionIndex = active.groupId > over.groupId ? 0 : criteriaIds.length
-
-          criteriaIds.splice(insertionIndex, 0, active.id)
-        }
-
-        return {
-          ...group,
-          criteriaIds: [...criteriaIds, ...placeholderIds]
-        }
-      })
-
-      console.log('test move updated group', updatedGroups)
-
-      // Étape 4 — Remapper les IDs
-      /*const { newSelected, newGroups, idMap } = remapSelectedCriteriaAndAssignToGroups(
-        [...filteredSelected, criterionToMove],
-        buildCriterionGroupMap(updatedGroups),
-        active.id,
-        updatedGroups
-      )*/
-
-      // Étape 5 — Réassigner les IDs négatifs depuis le snapshot
-      // const finalGroups = reassignNegativeCriteriaIdsFromSnapshot(newGroups, snapshot)
-
-      // Étape 6 — Mettre à jour les contraintes temporelles
-      //const updatedConstraints = deleteTemporalConstraints(state.temporalConstraints, active.id, idMap)
-
-      // Étape 7 — Recalculer nextCriteriaId
+      const updatedGroups = moveCriterionInGroups(state.criteriaGroup, { active, over })
+      const idMap = Object.fromEntries(state.selectedCriteria.map((c) => [c.id, c.id]))
+      const updatedConstraints = deleteTemporalConstraints(state.temporalConstraints, active.id, idMap)
       const nextId = getNextCriteriaId(state.selectedCriteria, updatedGroups)
 
-      // Mise à jour du state
-      //  state.selectedCriteria = newSelected
       state.criteriaGroup = updatedGroups
-      // state.temporalConstraints = updatedConstraints
+      state.temporalConstraints = updatedConstraints
       state.nextCriteriaId = nextId
     },
     deleteCriteriaGroup: (state: CohortCreationState, action: PayloadAction<number>) => {

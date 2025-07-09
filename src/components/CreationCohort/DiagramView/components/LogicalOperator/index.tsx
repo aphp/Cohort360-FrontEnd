@@ -315,7 +315,7 @@ const LogicalOperator: React.FC = () => {
     console.log('test temporal constraints', temporalConstraints)
   }
 
-  const onDragEnd = (event: DragEndEvent, ids: UniqueIdentifier[]) => {
+  const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
     console.log('test move', active, over)
     if (!over || active.id === over.id) return
@@ -323,51 +323,12 @@ const LogicalOperator: React.FC = () => {
     const overId = typeof over.id === 'string' ? null : over.id
     const _over = { id: overId as number | null, groupId: over.data.current?.groupId as number }
     dispatch(moveCriteria({ active: _active, over: _over }))
-    return
-    const activeIndex = ids.indexOf(active.id)
-    const overIndex = ids.indexOf(over.id)
-    ids.splice(activeIndex, 1)
-    ids.splice(overIndex, 0, active.id)
-    /* const newGroups: CriteriaGroup[] = criteriaGroup.map((group) => {
-      const startIndex = ids.findIndex((id) => id === `start-${group.id}`)
-      const endIndex = ids.findIndex((id) => id === `end-${group.id}`)
-      const newIds = ids.slice(startIndex + 1, endIndex) as number[]
-      const previousIds = group.criteriaIds.filter((id) => id < 0)
-      return { ...group, criteriaIds: [...newIds, ...previousIds] }
-    })*/
-    //dispatch(editAllCriteriaGroup(newGroups))
-    //_buildCohortCreation()
-    //
-    const currentParent = request.criteriaGroup
-      ? request.criteriaGroup.find(({ id }) => id === over.data.current?.groupId)
-      : null
-    if (currentParent) {
-      dispatch(deleteSelectedCriteria(active.id as number))
-      const startIndex = ids.findIndex((id) => id === `start-${currentParent.id}`)
-      const endIndex = ids.findIndex((id) => id === `end-${currentParent.id}`)
-      const newIds = ids.slice(startIndex + 1, endIndex) as number[]
-      const previousIds = currentParent.criteriaIds.filter((id) => id < 0)
-      const criteriaIds = [...newIds.map((id) => (id === active.id ? request.nextCriteriaId : id)), ...previousIds]
-      const item = { ...active.data.current, id: request.nextCriteriaId }
-      console.log('test move newIds', currentParent.id, [...newIds, ...previousIds])
-      dispatch(addNewSelectedCriteria(item as SelectedCriteriaType))
-      dispatch(editCriteriaGroup({ ...currentParent, criteriaIds }))
-      _buildCohortCreation()
-
-      /* dispatch(
-        editCriteriaGroup({
-          ...currentParent,
-          criteriaIds: [...newIds, ...previousIds]
-        })
-      )*/
-      //_onConfirmAddOrEditCriteria({ ...(active.data.current as SelectedCriteriaType), id: undefined })
-      //_buildCohortCreation()
-    }
+    _buildCohortCreation()
   }
 
   return (
     <>
-      <DndContext onDragEnd={(event: DragEndEvent) => onDragEnd(event, criteriasIds)} sensors={sensors}>
+      <DndContext onDragEnd={onDragEnd} sensors={sensors}>
         <SortableContext items={criteriasIds}>
           <OperatorItem
             groups={criteriaGroup}
