@@ -41,7 +41,32 @@ export const getAge = (patient: CohortPatient): string => {
   return 'Âge inconnu'
 }
 
-export const getAgeLabel = (dates: DurationRangeType, keyword: string) => {
+export const formatAge = (input: string, fromFormat: string, toFormat: string): string => {
+  const getSeparator = (format: string): string => {
+    const match = format.match(/[^A-Z]/i)
+    return match ? match[0] : ''
+  }
+
+  const fromSep = getSeparator(fromFormat)
+  const toSep = getSeparator(toFormat) || fromSep
+
+  const fromParts = fromFormat.split(fromSep)
+  const toParts = toFormat.split(toSep)
+  const values = input.split(fromSep)
+
+  if (fromParts.length !== 3 || toParts.length !== 3 || values.length !== 3) {
+    throw new Error('Invalid date format or input')
+  }
+
+  const map: Record<string, string> = {}
+  fromParts.forEach((part, i) => {
+    map[part] = values[i]
+  })
+
+  return toParts.map((part) => map[part]).join(toSep)
+}
+
+export const getDurationRangeLabel = (dates: DurationRangeType, keyword: string) => {
   const minDate: DurationType = convertStringToDuration(dates[0]) || { year: 0, month: 0, day: 0 }
   const maxDate: DurationType = convertStringToDuration(dates[1]) || { year: 0, month: 0, day: 0 }
 

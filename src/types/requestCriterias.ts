@@ -217,6 +217,11 @@ export type SelectedCriteriaType =
   | MedicationDataType
   | PregnancyDataType
 
+export type PatientAge = {
+  minAge?: string // with the format {year}-{month}-{day}, eg. for someone of 21 years old this would be 21-0-0
+  maxAge?: string // with the format {year}-{month}-{day}, eg. for someone of 21 years old this would be 21-0-0
+}
+
 export type RequeteurCriteriaType = {
   // CRITERIA
   _type: string
@@ -225,6 +230,7 @@ export type RequeteurCriteriaType = {
   isInclusive: boolean
   resourceType: ResourceType
   filterFhir: string
+  patientAge?: PatientAge
   occurrence?: {
     n?: number | null
     operator?: Comparators

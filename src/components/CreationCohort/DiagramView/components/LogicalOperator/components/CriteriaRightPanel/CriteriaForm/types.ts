@@ -236,10 +236,12 @@ export type CommonCriteriaData = {
   title: string
   isInclusive: boolean
   encounterService: Hierarchy<ScopeElement>[] | null
+  encounterAgeRange?: NewDurationRangeType | null
   error?: boolean
 }
 
 // helpers
+
 export type WithOccurenceCriteriaDataType = {
   occurrence: NumberAndComparatorDataType
   startOccurrence: NewDurationRangeType | null

@@ -15,13 +15,13 @@ import {
 import moment from 'moment'
 import { capitalizeFirstLetter } from './capitalize'
 import { SimpleCodeType } from 'types'
-import { getAgeLabel } from './age'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
 import { Hierarchy } from 'types/hierarchy'
 import labels from 'labels.json'
 import { getFullLabelFromCode } from './valueSets'
 import { getDurationRangeLabel } from 'mappers/dates'
 import { ScopeElement } from 'types/scope'
+import { getDurationRangeLabel as getAgeLabel } from './age'
 
 export const isChecked = <T>(value: T, arr: T[]): boolean => {
   return arr.includes(value)
