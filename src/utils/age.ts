@@ -38,6 +38,17 @@ export const getAge = (patient: CohortPatient): string => {
   } else if (totalMonths) {
     return getAgeAphp(totalMonths.valueInteger, 'months')
   }
+  if (patient.birthDate) {
+    const birthDate = moment(patient.birthDate)
+    const endDate = patient.deceasedDateTime ? moment(patient.deceasedDateTime) : moment()
+    if (patient.deceasedBoolean && !patient.deceasedDateTime) return 'Âge inconnu'
+    const age = endDate.diff(birthDate, 'years')
+    if (age > 0) return `${age} an(s)`
+    const ageMonth = endDate.diff(birthDate, 'months')
+    if (ageMonth > 0) return `${ageMonth} mois`
+    const ageDay = endDate.diff(birthDate, 'days')
+    return `${ageDay} jour(s)`
+  }
   return 'Âge inconnu'
 }
 

@@ -9,6 +9,7 @@ import {
 } from '../CriteriaForm/types'
 import { SourceType } from 'types/scope'
 import { getConfig } from 'config'
+import { hasSearchParam } from 'services/aphp/serviceFhirConfig'
 
 export type EncounterDataType = CommonCriteriaData &
   WithOccurenceCriteriaDataType &
@@ -59,7 +60,7 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
   ],
   buildInfo: {
     type: { [ResourceType.ENCOUNTER]: CriteriaType.ENCOUNTER },
-    defaultFilter: 'subject.active=true'
+    defaultFilter: getConfig().core.fhir.filterActive ? 'subject.active=true' : ''
   },
   itemSections: [
     {
@@ -86,6 +87,10 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           type: 'durationRange',
           extraLabel: () => 'Âge au début de la prise en charge',
           extraInfo: "La valeur par défaut sera prise en compte si le sélecteur d'âge n'a pas été modifié.",
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => {
+            return hasSearchParam(ResourceType.ENCOUNTER, EncounterParamsKeys.MIN_BIRTHDATE_DAY)
+          },
           buildInfo: {
             fhirKey: {
               main: EncounterParamsKeys.MIN_BIRTHDATE_DAY,
@@ -113,6 +118,10 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           labelAltStyle: true,
           withOptionIncludeNull: true,
           errorType: 'INCOHERENT_VALUE_ERROR',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => {
+            return hasSearchParam(ResourceType.ENCOUNTER, EncounterParamsKeys.START_DATE)
+          },
           buildInfo: {
             fhirKey: EncounterParamsKeys.START_DATE,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Date de début de prise en charge' }]
@@ -126,6 +135,10 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           labelAltStyle: true,
           withOptionIncludeNull: true,
           errorType: 'INCOHERENT_VALUE_ERROR',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => {
+            return hasSearchParam(ResourceType.ENCOUNTER, EncounterParamsKeys.END_DATE)
+          },
           buildInfo: {
             fhirKey: EncounterParamsKeys.END_DATE,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Date de fin de prise en charge' }]
@@ -190,6 +203,10 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           label: 'Type Admission',
           valueSetId: getConfig().core.valueSets.encounterAdmission.url,
           noOptionsText: "Veuillez entrer un type d'admission",
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => {
+            return hasSearchParam(ResourceType.ENCOUNTER, EncounterParamsKeys.ADMISSION)
+          },
           buildInfo: {
             fhirKey: EncounterParamsKeys.ADMISSION
           }
@@ -206,6 +223,10 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           label: 'Mode entrée',
           valueSetId: getConfig().core.valueSets.encounterEntryMode.url,
           noOptionsText: "Veuillez entrer un mode d'entrée",
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => {
+            return hasSearchParam(ResourceType.ENCOUNTER, EncounterParamsKeys.ENTRYMODE)
+          },
           buildInfo: {
             fhirKey: EncounterParamsKeys.ENTRYMODE
           }
@@ -216,6 +237,10 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           label: 'Mode sortie',
           valueSetId: getConfig().core.valueSets.encounterExitMode.url,
           noOptionsText: 'Veuillez entrer un mode de sortie',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => {
+            return hasSearchParam(ResourceType.ENCOUNTER, EncounterParamsKeys.EXITMODE)
+          },
           buildInfo: {
             fhirKey: EncounterParamsKeys.EXITMODE
           }
@@ -226,6 +251,10 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           label: 'Type sortie',
           valueSetId: getConfig().core.valueSets.encounterExitType.url,
           noOptionsText: 'Veuillez entrer un type de sortie',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => {
+            return hasSearchParam(ResourceType.ENCOUNTER, EncounterParamsKeys.REASON)
+          },
           buildInfo: {
             fhirKey: EncounterParamsKeys.REASON
           }
@@ -242,6 +271,10 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           label: 'Destination',
           valueSetId: getConfig().core.valueSets.encounterDestination.url,
           noOptionsText: 'Veuillez entrer une destination',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => {
+            return hasSearchParam(ResourceType.ENCOUNTER, EncounterParamsKeys.DESTINATION)
+          },
           buildInfo: {
             fhirKey: EncounterParamsKeys.DESTINATION
           }
@@ -252,6 +285,10 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
           label: 'Provenance',
           valueSetId: getConfig().core.valueSets.encounterProvenance.url,
           noOptionsText: 'Veuillez entrer une provenance',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => {
+            return hasSearchParam(ResourceType.ENCOUNTER, EncounterParamsKeys.PROVENANCE)
+          },
           buildInfo: {
             fhirKey: EncounterParamsKeys.PROVENANCE
           }

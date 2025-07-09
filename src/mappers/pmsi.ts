@@ -1,3 +1,4 @@
+import { getConfig } from 'config'
 import { Claim, Condition, Procedure } from 'fhir/r4'
 import { CohortPMSI } from 'types'
 import { PMSIResourceTypes, ResourceType } from 'types/requestCriterias'
@@ -27,17 +28,22 @@ export const getPmsiDate = (tabId: PMSIResourceTypes, pmsiItem: CohortPMSI) => {
 }
 
 export const getPmsiCodes = (tabId: PMSIResourceTypes, pmsiItem: CohortPMSI) => {
+  const appConfig = getConfig()
   const dateMapper = {
-    [ResourceType.CONDITION]: (pmsiItem as Condition)?.code?.coding?.find((code) => code.userSelected === true) ?? {
+    [ResourceType.CONDITION]: (pmsiItem as Condition)?.code?.coding?.find(
+      (code) => !appConfig.core.fhir.selectedCodeOnly || code.userSelected
+    ) ?? {
       display: null,
       code: null
     },
-    [ResourceType.PROCEDURE]: (pmsiItem as Procedure)?.code?.coding?.find((code) => code.userSelected === true) ?? {
+    [ResourceType.PROCEDURE]: (pmsiItem as Procedure)?.code?.coding?.find(
+      (code) => !appConfig.core.fhir.selectedCodeOnly || code.userSelected
+    ) ?? {
       display: null,
       code: null
     },
     [ResourceType.CLAIM]: (pmsiItem as Claim)?.diagnosis?.[0].diagnosisCodeableConcept?.coding?.find(
-      (code) => code.userSelected === true
+      (code) => !appConfig.core.fhir.selectedCodeOnly || code.userSelected
     ) ?? {
       display: null,
       code: null

@@ -13,11 +13,11 @@ export enum FormNames {
 }
 
 export enum GenderStatus {
-  MALE = 'MALE',
-  FEMALE = 'FEMALE',
-  OTHER = 'OTHER',
-  UNKNOWN = 'UNKNOWN',
-  OTHER_UNKNOWN = 'OTHER_UNKNOWN'
+  MALE = 'male',
+  FEMALE = 'female',
+  OTHER = 'other',
+  UNKNOWN = 'unknown',
+  OTHER_UNKNOWN = 'other_unknown'
 }
 export enum GenderCodes {
   MALE = 'm',
@@ -58,6 +58,21 @@ export function mapGenderCodesToGenderStatus(code: GenderCodes): GenderStatus {
     case GenderCodes.NOT_SPECIFIED:
     default:
       return GenderStatus.OTHER_UNKNOWN
+  }
+}
+
+export function mapGenderStatusToLabel(status: GenderStatus): GenderStatusLabel {
+  switch (status) {
+    case GenderStatus.FEMALE:
+      return GenderStatusLabel.FEMALE
+    case GenderStatus.MALE:
+      return GenderStatusLabel.MALE
+    case GenderStatus.OTHER:
+      return GenderStatusLabel.OTHER
+    case GenderStatus.OTHER_UNKNOWN:
+      return GenderStatusLabel.OTHER_UNKNOWN
+    case GenderStatus.UNKNOWN:
+      return GenderStatusLabel.UNKNOWN
   }
 }
 

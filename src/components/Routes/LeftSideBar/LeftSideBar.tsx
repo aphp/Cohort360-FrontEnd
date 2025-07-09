@@ -350,7 +350,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             className={cx(classes.nestedList, { [classes.hide]: !open })}
           >
             <List id="research-collapse">
-              {!practitioner?.deidentified && (
+              {!practitioner?.deidentified && appConfig.features.export.enabled && (
                 <ListItem>
                   <Link
                     id="exports-link"

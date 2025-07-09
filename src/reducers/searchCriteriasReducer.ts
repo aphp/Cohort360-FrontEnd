@@ -11,6 +11,8 @@ import {
   FilterKeys,
   FilterValue
 } from 'types/searchCriterias'
+import { ResourceType } from 'types/requestCriterias'
+import { getConfig } from 'config'
 
 export const initExportSearchCriterias: SearchCriterias<null> = {
   orderBy: {

@@ -43,7 +43,7 @@ export const form: () => CriteriaForm<Cim10DataType> = () => ({
   infoAlert: ['Tous les éléments des champs multiples sont liés par une contrainte OU'],
   buildInfo: {
     type: { [ResourceType.CONDITION]: CriteriaType.CONDITION },
-    defaultFilter: 'subject.active=true'
+    defaultFilter: getConfig().core.fhir.filterActive ? 'subject.active=true' : ''
   },
   itemSections: [
     {

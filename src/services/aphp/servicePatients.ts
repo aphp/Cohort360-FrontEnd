@@ -199,7 +199,7 @@ const servicesPatients: IServicePatients = {
       fetchPatient({ _id: patientId, _list: groupId ? [groupId] : [] }),
       fetchEncounter({
         patient: patientId,
-        _sort: 'period-start',
+        _sort: 'date',
         sortDirection: Direction.DESC,
         _list: groupId ? [groupId] : [],
         size: 1000

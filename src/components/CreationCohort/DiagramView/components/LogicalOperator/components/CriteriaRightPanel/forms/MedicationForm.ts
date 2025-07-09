@@ -18,6 +18,7 @@ import { getConfig } from 'config'
 import { getValueSetsFromSystems } from 'utils/valueSets'
 import { Hierarchy } from 'types/hierarchy'
 import { FhirItem } from 'types/valueSet'
+import { hasSearchParam } from 'services/aphp/serviceFhirConfig'
 
 export type MedicationDataType = CommonCriteriaData &
   WithOccurenceCriteriaDataType &
@@ -55,7 +56,7 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
       [ResourceType.MEDICATION_ADMINISTRATION]: CriteriaType.MEDICATION_ADMINISTRATION,
       [ResourceType.MEDICATION_REQUEST]: CriteriaType.MEDICATION_REQUEST
     },
-    defaultFilter: 'subject.active=true'
+    defaultFilter: getConfig().core.fhir.filterActive ? 'subject.active=true' : ''
   },
   itemSections: [
     {
@@ -127,6 +128,10 @@ export const form: () => CriteriaForm<MedicationDataType> = () => ({
           label: "Voie d'administration",
           valueSetId: getConfig().features.medication.valueSets.medicationAdministrations.url,
           noOptionsText: "Veuillez entrer une voie d'administration",
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) =>
+            hasSearchParam(ResourceType.MEDICATION_ADMINISTRATION, AdministrationParamsKeys.ADMINISTRATION_ROUTES) ||
+            hasSearchParam(ResourceType.MEDICATION_REQUEST, PrescriptionParamsKeys.PRESCRIPTION_ROUTES),
           buildInfo: {
             fhirKey: {
               main: PrescriptionParamsKeys.PRESCRIPTION_ROUTES,

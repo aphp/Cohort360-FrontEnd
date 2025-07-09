@@ -10,6 +10,7 @@ import {
 import { DocumentAttachmentMethod, DocumentAttachmentMethodLabel } from 'types/searchCriterias'
 import { getConfig } from 'config'
 import { SourceType } from 'types/scope'
+import { hasSearchParam } from 'services/aphp/serviceFhirConfig'
 
 export type ImagingDataType = CommonCriteriaData &
   WithEncounterDateDataType &
@@ -20,8 +21,8 @@ export type ImagingDataType = CommonCriteriaData &
     studyModalities: string[] | null
     studyDescription: string
     studyProcedure: string
-    numberOfSeries: NumberAndComparatorDataType
-    numberOfIns: NumberAndComparatorDataType
+    numberOfSeries: NumberAndComparatorDataType | null
+    numberOfIns: NumberAndComparatorDataType | null
     withDocument: string
     daysOfDelay: string | null
     studyUid: string
@@ -52,8 +53,12 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
     studyModalities: [],
     studyDescription: '',
     studyProcedure: '',
-    numberOfSeries: { value: 1, comparator: Comparators.GREATER_OR_EQUAL },
-    numberOfIns: { value: 1, comparator: Comparators.GREATER_OR_EQUAL },
+    numberOfSeries: hasSearchParam(ResourceType.IMAGING, ImagingParamsKeys.NB_OF_SERIES)
+      ? { value: 1, comparator: Comparators.GREATER_OR_EQUAL }
+      : null,
+    numberOfIns: hasSearchParam(ResourceType.IMAGING, ImagingParamsKeys.NB_OF_INS)
+      ? { value: 1, comparator: Comparators.GREATER_OR_EQUAL }
+      : null,
     withDocument: DocumentAttachmentMethod.NONE,
     daysOfDelay: null,
     studyUid: '',
@@ -70,7 +75,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
   ],
   buildInfo: {
     type: { [ResourceType.IMAGING]: CriteriaType.IMAGING },
-    defaultFilter: 'patient.active=true'
+    defaultFilter: getConfig().core.fhir.filterActive ? 'patient.active=true' : ''
   },
   itemSections: [
     {
@@ -135,6 +140,9 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
             "La description est un texte libre catégorisant l'étude, souvent spécifique à un service ou une machine.",
           placeholder: 'Rechercher dans les descriptions',
           errorType: 'SEARCHINPUT_ERROR',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) =>
+            hasSearchParam(ResourceType.IMAGING, ImagingParamsKeys.STUDY_DESCRIPTION),
           buildInfo: {
             fhirKey: ImagingParamsKeys.STUDY_DESCRIPTION,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: "Description de l'étude : " }]
@@ -158,6 +166,8 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           valueKey: 'numberOfSeries',
           type: 'numberAndComparator',
           label: 'Nombre de séries',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => hasSearchParam(ResourceType.IMAGING, ImagingParamsKeys.NB_OF_SERIES),
           buildInfo: {
             fhirKey: ImagingParamsKeys.NB_OF_SERIES,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Nombre de séries ' }]
@@ -169,6 +179,8 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           extraLabel: () => "Nombre d'instances",
           extraInfo:
             'Une instance correspond à un fichier DICOM. Elle peut contenir un image, un volume ou une vidéo en fonction de la modalité.',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => hasSearchParam(ResourceType.IMAGING, ImagingParamsKeys.NB_OF_INS),
           buildInfo: {
             fhirKey: ImagingParamsKeys.NB_OF_INS,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: "Nombre d'instances " }]
@@ -192,6 +204,8 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
               label: DocumentAttachmentMethodLabel.INFERENCE_TEMPOREL
             }
           ],
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => hasSearchParam(ResourceType.IMAGING, ImagingParamsKeys.WITH_DOCUMENT),
           buildInfo: {
             fhirKey: ImagingParamsKeys.WITH_DOCUMENT,
             buildMethod: 'buildWithDocument',
@@ -245,6 +259,8 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           type: 'calendarRange',
           extraLabel: () => 'Date de la série',
           errorType: 'INCOHERENT_AGE_ERROR',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => hasSearchParam(ResourceType.IMAGING, ImagingParamsKeys.SERIES_DATE),
           buildInfo: {
             fhirKey: ImagingParamsKeys.SERIES_DATE,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Date de la série : ' }]
@@ -256,6 +272,9 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           label: 'Rechercher dans les descriptions',
           placeholder: 'Rechercher dans les descriptions',
           errorType: 'SEARCHINPUT_ERROR',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) =>
+            hasSearchParam(ResourceType.IMAGING, ImagingParamsKeys.SERIES_DESCRIPTION),
           buildInfo: {
             fhirKey: ImagingParamsKeys.SERIES_DESCRIPTION,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Description de la série : ' }]
@@ -267,6 +286,8 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           label: 'Rechercher dans les protocoles',
           placeholder: 'Rechercher dans les protocoles',
           errorType: 'SEARCHINPUT_ERROR',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => hasSearchParam(ResourceType.IMAGING, ImagingParamsKeys.SERIES_PROTOCOL),
           buildInfo: {
             fhirKey: ImagingParamsKeys.SERIES_PROTOCOL,
             chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Protocole de la série : ' }]
@@ -279,6 +300,9 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           valueSetId: getConfig().features.imaging.valueSets.imagingModalities.url,
           prependCode: true,
           noOptionsText: 'Veuillez entrer des modalités',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) =>
+            hasSearchParam(ResourceType.IMAGING, ImagingParamsKeys.SERIES_MODALITIES),
           buildInfo: {
             fhirKey: ImagingParamsKeys.SERIES_MODALITIES,
             chipDisplayMethodExtraArgs: [
@@ -296,6 +320,8 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           checkErrorMessage: 'Seuls les chiffres, points, ou les virgules sont autorisés.',
           placeholder: "Ajouter une liste d'uid séparés par des virgules",
           multiline: true,
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          displayCondition: (data, context) => hasSearchParam(ResourceType.IMAGING, ImagingParamsKeys.SERIES_UID),
           buildInfo: {
             fhirKey: ImagingParamsKeys.SERIES_UID,
             chipDisplayMethod: 'idListLabel',

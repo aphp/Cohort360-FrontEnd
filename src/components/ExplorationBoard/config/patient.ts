@@ -50,7 +50,7 @@ const initSearchCriterias = (search: string): SearchCriterias<PatientsFilters> =
     orderDirection: Direction.ASC
   },
   searchInput: search,
-  searchBy: SearchByTypes.TEXT,
+  searchBy: getConfig().core.fhir.textSearch ? SearchByTypes.TEXT : SearchByTypes.FAMILY,
   filters: {
     genders: [],
     vitalStatuses: [],
@@ -87,9 +87,13 @@ const getPatientInfos = (patient: Patient, deidentified: boolean, groupId: strin
   const ipp = {
     label: deidentified
       ? patient.id
-      : patient.identifier?.find((identifier) => identifier.type?.coding?.[0].code === 'IPP')?.value ??
+      : patient.identifier?.find(
+          (identifier) =>
+            identifier.type?.coding?.[0].code === appConfig.features.patient.patientIdentifierExtensionCode?.code &&
+            identifier.type?.coding?.[0].system === appConfig.features.patient.patientIdentifierExtensionCode?.system
+        )?.value ??
         patient.identifier?.[0].value ??
-        'IPP inconnnu',
+        'inconnu',
     url: `/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}` /*${_search}*/
   }
   const age = {
@@ -294,26 +298,29 @@ export const patientsConfig = (
   groupId: string[],
   displayOptions = DISPLAY_OPTIONS,
   search = ''
-): ExplorationConfig<PatientsFilters> => ({
-  type: ResourceType.PATIENT,
-  deidentified,
-  displayOptions,
-  initSearchCriterias: () => initSearchCriterias(search),
-  fetchList: (fetchParams, options, signal) => fetchList(fetchParams, options, deidentified, groupId, signal),
-  mapToTable: patient ? undefined : (data) => mapToTable(data, deidentified, groupId),
-  mapToCards: patient ? (data) => mapToCards(data, deidentified, groupId) : undefined,
-  narrowSearchCriterias: (searchCriterias) =>
-    narrowSearchCriterias(
-      deidentified,
-      searchCriterias,
-      !!patient,
-      [],
-      deidentified ? ['searchBy', 'searchInput'] : []
-    ),
-  mapToDiagram: patient ? undefined : getDiagramData,
-  fetchAdditionalInfos: (additionalInfo) => fetchAdditionalInfos(additionalInfo, deidentified),
-  getCount: (counts) => [
-    { label: `patient${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
-    { label: '', display: false, count: counts[1] }
-  ]
-})
+): ExplorationConfig<PatientsFilters> => {
+  const appConfig = getConfig()
+  return {
+    type: ResourceType.PATIENT,
+    deidentified,
+    displayOptions,
+    initSearchCriterias: () => initSearchCriterias(search),
+    fetchList: (fetchParams, options, signal) => fetchList(fetchParams, options, deidentified, groupId, signal),
+    mapToTable: patient ? undefined : (data) => mapToTable(data, deidentified, groupId),
+    mapToCards: patient ? (data) => mapToCards(data, deidentified, groupId) : undefined,
+    narrowSearchCriterias: (searchCriterias) =>
+      narrowSearchCriterias(
+        deidentified,
+        searchCriterias,
+        !!patient,
+        [],
+        deidentified ? ['searchBy', 'searchInput'] : []
+      ),
+    mapToDiagram: patient && appConfig.core.fhir.facetsExtensions ? undefined : getDiagramData,
+    fetchAdditionalInfos: (additionalInfo) => fetchAdditionalInfos(additionalInfo, deidentified),
+    getCount: (counts) => [
+      { label: `patient${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
+      { label: '', display: false, count: counts[1] }
+    ]
+  }
+}
