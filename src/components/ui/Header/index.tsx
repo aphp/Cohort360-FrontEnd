@@ -97,9 +97,9 @@ const HeaderLayout: React.FC<HeaderLayoutProps> = ({
         {(patientsCount !== undefined || cohortId) && (
           <Grid container alignItems="center" gap={3}>
             {patientsCount !== undefined && (
-              <CohortInfo label="Nb de patients" total={format(patientsCount)} loading={loading} />
+              <CohortInfo id="patients-total" label="Nb de patients" total={format(patientsCount)} loading={loading} />
             )}
-            {cohortId && <CohortInfo label="ID cohorte" total={cohortId} loading={loading} />}
+            {cohortId && <CohortInfo id="cohort-id" label="ID cohorte" total={cohortId} loading={loading} />}
           </Grid>
         )}
         {searchArea}
