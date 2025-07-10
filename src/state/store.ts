@@ -21,6 +21,7 @@ import me from './me'
 import warningDialog from './warningDialog'
 import valueSets from './valueSets'
 import preferences from './preferences'
+import { temporalConstraintsMiddleware } from './middlewares'
 
 const cohortCreationReducer = combineReducers({
   criteria,
@@ -76,6 +77,7 @@ export const store = configureStore({
       )
       // @ts-ignore
       .concat(logger)
+      .concat(temporalConstraintsMiddleware)
 })
 
 initStateWithPrevTab(store)

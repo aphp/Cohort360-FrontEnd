@@ -18,7 +18,6 @@ import {
   buildCohortCreation,
   deleteSelectedCriteria,
   duplicateSelectedCriteria,
-  editAllCriteriaGroup,
   editCriteriaGroup,
   editSelectedCriteria,
   moveCriteria,
@@ -104,7 +103,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
         {list.map((item) => {
           const dropZone = typeof item.id === 'string'
           return (
-            <Grid marginTop="30px" key={`${itemId}-${item.id}`}>
+            <Grid marginTop={/*dropZone ? 0 :*/ '30px'} key={`${itemId}-${item.id}`}>
               <Draggable data={{ ...item, groupId: itemId }} dropZone={dropZone}>
                 <CriteriaCardItem
                   criteriaCount={getStageDetails(item?.id as number, idRemap, stageDetails)}
@@ -226,10 +225,8 @@ const LogicalOperator: React.FC = () => {
   )
 
   useEffect(() => {
-    console.log('test request selectedCriterias', request.selectedCriteria)
-    console.log('test request group', request.criteriaGroup)
-    console.log('test request json', request.json)
-  }, [request.selectedCriteria, request.criteriaGroup, request.json])
+    console.log('test constraint', request.temporalConstraints)
+  }, [request.temporalConstraints])
 
   const _buildCohortCreation = () => {
     dispatch(buildCohortCreation({ selectedPopulation: null }))
@@ -311,13 +308,8 @@ const LogicalOperator: React.FC = () => {
     console.log('test temporal constraints', temporalConstraints)
   }, [temporalConstraints])
 
-  const checkTemporalConstraints = () => {
-    console.log('test temporal constraints', temporalConstraints)
-  }
-
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
-    console.log('test move', active, over)
     if (!over || active.id === over.id) return
     const _active = { id: active.id as number, groupId: active.data.current?.groupId as number }
     const overId = typeof over.id === 'string' ? null : over.id
