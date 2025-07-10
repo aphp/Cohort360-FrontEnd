@@ -428,6 +428,7 @@ const ControlPanel: React.FC<{
                     setCriteriaDetailCalculation(e.target.checked)
                   }}
                   color="primary"
+                  disabled={maintenanceIsActive}
                 />
               }
               label="Calcul sur la population source"
@@ -443,8 +444,12 @@ const ControlPanel: React.FC<{
                     value={detailCalculationType}
                     onChange={(e) => setDetailCalculationType(e.target.value as 'all' | 'ratio')}
                   >
-                    <FormControlLabel value="all" control={<Radio />} label="Chiffres" />
-                    <FormControlLabel value="ratio" control={<Radio />} label="Pourcentages" />
+                    <FormControlLabel value="all" control={<Radio disabled={maintenanceIsActive} />} label="Chiffres" />
+                    <FormControlLabel
+                      value="ratio"
+                      control={<Radio disabled={maintenanceIsActive} />}
+                      label="Pourcentages"
+                    />
                   </RadioGroup>
                 </FormControl>
               </>
