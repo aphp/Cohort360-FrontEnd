@@ -7,7 +7,8 @@ import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeDat
 import { DeepPartial } from 'redux'
 
 type ValueSetConfig = {
-  url: string
+  url: string // ValueSet URL (for searching/listing valuesets)
+  codeSystemUrls?: string[] // Array of CodeSystem URLs (for individual codes within valuesets)
   title?: string
   data?: LabelObject[]
 }
