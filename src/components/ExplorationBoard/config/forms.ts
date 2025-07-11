@@ -1,4 +1,5 @@
 import { getConfig } from 'config'
+import { plural } from 'utils/string'
 import { QuestionnaireResponse } from 'fhir/r4'
 import { mapToDate } from 'mappers/dates'
 import services from 'services/aphp'
@@ -183,7 +184,7 @@ export const formsConfig = (
   getCount: !!patient
     ? undefined
     : (counts) => [
-        { label: `résultat${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
-        { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: true, count: counts[1] }
+        { label: `résultat${plural(counts[0].total)}`, display: true, count: counts[0] },
+        { label: `patient${plural(counts[1].total)}`, display: true, count: counts[1] }
       ]
 })

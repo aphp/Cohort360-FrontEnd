@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { PropsWithChildren } from 'react'
 
-import { Button, Dialog, DialogActions, DialogTitle, Divider, Grid, Typography } from '@mui/material'
+import { Breakpoint, Button, Dialog, DialogActions, DialogTitle, Divider, Grid, Typography } from '@mui/material'
 import { DialogContentWrapper } from './styles'
 
 type ModalProps = {
@@ -13,6 +13,9 @@ type ModalProps = {
   submitText?: string
   cancelText?: string
   isError?: boolean
+  disabled?: boolean
+  maxWidth?: Breakpoint
+  fullWidth?: boolean
   onSubmit?: (value: any) => void
   onClose?: () => void
 }
@@ -27,11 +30,14 @@ const Modal = ({
   submitText = 'Valider',
   cancelText = 'Annuler',
   isError = false,
+  disabled = false,
+  maxWidth = 'sm',
+  fullWidth = false,
   onSubmit,
   onClose
 }: PropsWithChildren<ModalProps>) => {
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} maxWidth={maxWidth} fullWidth={fullWidth}>
       {title && (
         <>
           <DialogTitle sx={{ padding: '25px 30px' }}>
@@ -65,7 +71,7 @@ const Modal = ({
       )}
       {readonly && (
         <DialogActions style={{ backgroundColor: '#00000011', padding: '10px 30px' }}>
-          <Button color="info" onClick={onClose}>
+          <Button color="info" onClick={onClose} disabled={disabled}>
             <Typography fontSize="15px" fontWeight="600" color="#5B5E63">
               {cancelText}
             </Typography>

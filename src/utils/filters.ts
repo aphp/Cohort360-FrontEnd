@@ -13,7 +13,7 @@ import {
   mapGenderStatusToLabel
 } from 'types/searchCriterias'
 import moment from 'moment'
-import { capitalizeFirstLetter } from './capitalize'
+import { capitalizeFirstLetter } from './string'
 import { SimpleCodeType } from 'types'
 import { CohortsType, CohortsTypeLabel } from 'types/cohorts'
 import { Hierarchy } from 'types/hierarchy'

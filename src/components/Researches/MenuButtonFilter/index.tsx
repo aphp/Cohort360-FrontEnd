@@ -6,7 +6,7 @@ import DatePicker from '../DatePicker'
 import DateRangeIcon from '@mui/icons-material/DateRange'
 
 import useStyles from './styles'
-import { formatDate } from 'utils/formatDate'
+import { formatDate } from 'utils/dates'
 
 type MenuButtonFilterProps = {
   startDate: string | null

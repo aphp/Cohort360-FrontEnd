@@ -1,4 +1,5 @@
 import { Paragraph } from 'components/ui/Paragraphs'
+import { plural } from 'utils/string'
 import { getConfig } from 'config'
 import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
 import { mapToDate } from 'mappers/dates'
@@ -288,8 +289,8 @@ export const medicationRequestConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, ['administrationRoutes'], ['searchBy']),
   fetchAdditionalInfos,
   getCount: (counts) => [
-    { label: `prescription${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
-    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
+    { label: `prescription${plural(counts[0].total)}`, display: true, count: counts[0] },
+    { label: `patient${plural(counts[1].total)}`, display: !!!patient, count: counts[1] }
   ]
 })
 
@@ -311,7 +312,7 @@ export const medicationAdministrationConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, ['prescriptionTypes'], ['searchBy']),
   fetchAdditionalInfos,
   getCount: (counts) => [
-    { label: `administration${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
-    { label: `patient${counts[1].total > 1 ? 's' : ''}`, display: !!!patient, count: counts[1] }
+    { label: `administration${plural(counts[0].total)}`, display: true, count: counts[0] },
+    { label: `patient${plural(counts[1].total)}`, display: !!!patient, count: counts[1] }
   ]
 })

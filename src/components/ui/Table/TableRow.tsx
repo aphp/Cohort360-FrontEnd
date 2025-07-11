@@ -10,7 +10,8 @@ import {
   SubItem,
   Favorite,
   Action,
-  CheckboxAction
+  CheckboxAction,
+  Icon
 } from 'types/table'
 import {
   Checkbox,
@@ -20,7 +21,9 @@ import {
   SxProps,
   TableCell,
   TableRow as TableRowMui,
+  TextField,
   Theme,
+  Tooltip,
   Typography
 } from '@mui/material'
 import GenderIcon from '../GenderIcon'
@@ -86,6 +89,7 @@ const TableRow = ({ row, sx }: RowProps) => {
                       icon={<IconComponent />}
                       onClick={action.onClick}
                       title={action.title}
+                      color={action.color ?? 'inherit'}
                     />
                   )
                 })}
@@ -127,6 +131,24 @@ const TableRow = ({ row, sx }: RowProps) => {
                 </Grid>
               )}
               {cell.type == CellType.TEXT && <p>{cell.value as string}</p>}
+              {cell.type === CellType.TEXT_EDITION &&
+                (() => {
+                  const { title, color, disabled, onClick } = cell.value as Action
+                  return (
+                    <TextField
+                      value={title}
+                      onChange={(e) => onClick(e.target.value)}
+                      fullWidth
+                      size="small"
+                      disabled={disabled}
+                      sx={{
+                        '& .MuiInputBase-input': {
+                          color: color
+                        }
+                      }}
+                    />
+                  )
+                })()}
               {cell.type == CellType.PARAGRAPHS && <Paragraphs value={cell.value as Paragraph[]} />}
               {cell.type == CellType.STATUS_CHIP &&
                 (() => {
@@ -140,6 +162,12 @@ const TableRow = ({ row, sx }: RowProps) => {
                       tooltip={(cell.value as Status).tooltip}
                     />
                   )
+                })()}
+              {cell.type === CellType.ICON &&
+                (() => {
+                  const { icon: IconComponent, style, tooltip } = cell.value as Icon
+                  const iconElement = <IconComponent sx={style} />
+                  return tooltip ? <Tooltip title={tooltip}>{iconElement}</Tooltip> : iconElement
                 })()}
               {cell.type === CellType.LINK && (
                 <div style={{ display: 'flex' }}>

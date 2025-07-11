@@ -10,7 +10,6 @@ import {
   FormControlLabel,
   FormControl,
   Grid,
-  Link,
   List,
   ListItem,
   Radio,
@@ -25,10 +24,11 @@ import DescriptionIcon from '@mui/icons-material/Description'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import InfoIcon from '@mui/icons-material/Info'
 import ShareIcon from '@mui/icons-material/Share'
-import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 import ModalShareRequest from 'components/Researches/Modals/ModalShareRequest'
+import VersionsDialog from './Versions/VersionsDialog'
+import VersionsSection from './Versions'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import {
@@ -37,10 +37,20 @@ import {
   buildCohortCreation,
   unbuildCohortCreation,
   addActionToNavHistory,
-  updateCount
+  updateCount,
+  editSnapshotHistory
 } from 'state/cohortCreation'
 
-import { CohortCount, JobStatus, CurrentSnapshot, LoadingStatus, RequestType, Snapshot, WSJobStatus } from 'types'
+import {
+  CohortCount,
+  JobStatus,
+  CurrentSnapshot,
+  LoadingStatus,
+  RequestType,
+  Snapshot,
+  WSJobStatus,
+  QuerySnapshotInfo
+} from 'types'
 
 import useStyle from './styles'
 
@@ -68,6 +78,7 @@ const ControlPanel: React.FC<{
   const [reportLoading, setReportLoading] = useState<LoadingStatus>(LoadingStatus.IDDLE)
   const [reportError, setReportError] = useState(false)
   const [openReportConfirmation, setOpenReportConfirmation] = useState<boolean>(false)
+  const [openVersionsDialog, setOpenVersionsDialog] = useState<boolean>(false)
 
   const {
     loading = false,
@@ -157,6 +168,10 @@ const ControlPanel: React.FC<{
   const handleCloseSharedModal = () => {
     setRequestShare(null)
     setOpenShareRequestModal(false)
+  }
+
+  const handleVersionUpdate = (updatedVersion: QuerySnapshotInfo) => {
+    dispatch(editSnapshotHistory(updatedVersion))
   }
 
   const getNewNavHistoryIndex = (navHistory: CurrentSnapshot[], previousSnapshot: CurrentSnapshot) => {
@@ -250,10 +265,21 @@ const ControlPanel: React.FC<{
           includePatient: message.extra_info?.measure,
           extra: message.extra_info?.extra,
           status: message.status,
-          jobFailMsg: message.extra_info?.request_job_fail_msg
+          jobFailMsg: message.extra_info?.request_job_fail_msg,
+          snapshotId: message.extra_info?.snapshot_id
         }
         dispatch(updateCount(response))
         setPrevCountDisplay(undefined)
+      }
+      if (message.status === JobStatus.FINISHED) {
+        const versionToUpdate = snapshotsHistory.find((v) => v.uuid === message.extra_info?.snapshot_id)
+        if (versionToUpdate) {
+          const updatedVersion: QuerySnapshotInfo = {
+            ...versionToUpdate,
+            patients_count: message.extra_info?.measure
+          }
+          dispatch(editSnapshotHistory(updatedVersion))
+        }
       }
     }
 
@@ -488,42 +514,13 @@ const ControlPanel: React.FC<{
             </Button>
           </Alert>
         )}
-        <Grid className={classes.container} style={{ maxHeight: 400, overflow: 'hidden scroll' }}>
-          <Grid container justifyContent="space-between" style={{ margin: 10 }}>
-            <Typography className={classes.boldText} sx={{ margin: '0px 10px' }}>
-              VERSIONS DE LA REQUÊTE :
-            </Typography>
-            <Typography sx={{ margin: '0 10px 10px 10px', fontSize: 11, color: 'grey' }}>
-              Cliquez sur une des versions pour la consulter.
-            </Typography>
-            <Grid container justifyContent={'space-around'} style={{ marginLeft: '0.5em' }}>
-              {snapshotsHistory.map((snapshot, count) => (
-                <Grid container key={count} alignItems="center">
-                  <Link
-                    onClick={() => handleSnapshotChange(snapshot.uuid)}
-                    underline={currentSnapshot.uuid === snapshot.uuid ? 'none' : 'hover'}
-                    style={{
-                      display: 'flex',
-                      cursor: currentSnapshot.uuid === snapshot.uuid ? 'default' : 'pointer',
-                      fontWeight: currentSnapshot.uuid === snapshot.uuid ? 'bold' : ''
-                    }}
-                  >
-                    <div style={{ width: 80, textAlign: 'center' }}>Version {snapshot.version}</div>
-                    <div style={{ width: 8 }}> - </div>
-                    <div style={{ width: 135 }}>{moment(snapshot.created_at).format('DD/MM/YYYY - HH:mm:ss')}</div>
-                  </Link>
-                  <Grid container alignItems="center" style={{ width: 24, margin: '0 4px' }}>
-                    {snapshot.cohorts_count > 0 && (
-                      <Tooltip title="Une ou plusieurs cohortes ont été créées à partir de cette version.">
-                        <SupervisedUserCircleIcon fontSize="small" color="action" sx={{ color: '#f7a600b3' }} />
-                      </Tooltip>
-                    )}
-                  </Grid>
-                </Grid>
-              ))}
-            </Grid>
-          </Grid>
-        </Grid>
+        <VersionsSection
+          snapshotsHistory={snapshotsHistory}
+          currentSnapshot={currentSnapshot}
+          onSnapshotChange={handleSnapshotChange}
+          onOpenVersionsDialog={() => setOpenVersionsDialog(true)}
+          classes={classes}
+        />
       </Grid>
 
       {openModal === 'executeCohortConfirmation' && (
@@ -566,6 +563,15 @@ const ControlPanel: React.FC<{
             Votre requête ne possède aucun critère. Elle ne peut donc pas être partagée.
           </Alert>
         </Snackbar>
+      )}
+
+      {openVersionsDialog && (
+        <VersionsDialog
+          open={openVersionsDialog}
+          onClose={() => setOpenVersionsDialog(false)}
+          versions={snapshotsHistory}
+          onVersionUpdate={handleVersionUpdate}
+        />
       )}
     </>
   )
