@@ -30,8 +30,8 @@ import UpdateSharpIcon from '@mui/icons-material/UpdateSharp'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 import ModalShareRequest from 'components/Researches/Modals/ModalShareRequest'
-import VersionsDialog from './VersionsDialog'
-import VersionsSection from './VersionsSection'
+import VersionsDialog from './Versions/VersionsDialog'
+import VersionsSection from './Versions/VersionsSection'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import {

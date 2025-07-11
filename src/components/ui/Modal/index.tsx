@@ -13,6 +13,7 @@ type ModalProps = {
   submitText?: string
   cancelText?: string
   isError?: boolean
+  disabled?: boolean
   onSubmit?: (value: any) => void
   onClose?: () => void
 }
@@ -27,6 +28,7 @@ const Modal = ({
   submitText = 'Valider',
   cancelText = 'Annuler',
   isError = false,
+  disabled = false,
   onSubmit,
   onClose
 }: PropsWithChildren<ModalProps>) => {
@@ -65,7 +67,7 @@ const Modal = ({
       )}
       {readonly && (
         <DialogActions style={{ backgroundColor: '#00000011', padding: '10px 30px' }}>
-          <Button color="info" onClick={onClose}>
+          <Button color="info" onClick={onClose} disabled={disabled}>
             <Typography fontSize="15px" fontWeight="600" color="#5B5E63">
               {cancelText}
             </Typography>

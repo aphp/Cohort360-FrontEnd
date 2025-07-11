@@ -20,6 +20,7 @@ import {
   SxProps,
   TableCell,
   TableRow as TableRowMui,
+  TextField,
   Theme,
   Tooltip,
   Typography
@@ -88,6 +89,7 @@ const TableRow = ({ row, sx }: RowProps) => {
                       icon={<IconComponent />}
                       onClick={action.onClick}
                       title={action.title}
+                      color={action.color ?? 'inherit'}
                     />
                   )
                 })}
@@ -129,6 +131,24 @@ const TableRow = ({ row, sx }: RowProps) => {
                 </Grid>
               )}
               {cell.type == CellType.TEXT && <p>{cell.value as string}</p>}
+              {cell.type === CellType.TEXT_EDITION &&
+                (() => {
+                  const { title, disabled, onClick } = cell.value as Action
+                  return (
+                    <TextField
+                      value={title}
+                      onChange={(e) => onClick(e.target.value)}
+                      fullWidth
+                      size="small"
+                      disabled={disabled}
+                      sx={{
+                        '& .MuiInputBase-input': {
+                          color: '#303030'
+                        }
+                      }}
+                    />
+                  )
+                })()}
               {cell.type == CellType.PARAGRAPHS && <Paragraphs value={cell.value as Paragraph[]} />}
               {cell.type == CellType.STATUS_CHIP &&
                 (() => {

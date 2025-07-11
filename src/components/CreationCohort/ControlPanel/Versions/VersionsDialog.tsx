@@ -1,20 +1,22 @@
 import React, { useState } from 'react'
+import services from 'services/aphp'
+import { setMessage } from 'state/message'
+import { useAppDispatch } from 'state'
 
-import { TextField } from '@mui/material'
 import Modal from 'components/ui/Modal'
 import Table from 'components/ui/Table'
 
 import EditIcon from '@mui/icons-material/Edit'
-import CheckIcon from '@mui/icons-material/Check'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
 
 import { QuerySnapshotInfo } from 'types'
 import { CellType, Row, Table as TableType, Action } from 'types/table'
 import { format } from 'utils/numbers'
 import { formatDate } from 'utils/formatDate'
-import services from 'services/aphp'
+import { getVersionName } from 'utils/versions'
 
-interface VersionsDialogProps {
+type VersionsDialogProps = {
   open: boolean
   onClose: () => void
   versions: QuerySnapshotInfo[]
@@ -25,10 +27,11 @@ const VersionsDialog: React.FC<VersionsDialogProps> = ({ open, onClose, versions
   const [editingVersionId, setEditingVersionId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState<string>('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const dispatch = useAppDispatch()
 
   const handleStartEdit = (version: QuerySnapshotInfo) => {
     setEditingVersionId(version.uuid)
-    setEditingName(version.name ?? `Version ${version.version}`)
+    setEditingName(getVersionName(version))
   }
 
   const handleCancelEdit = () => {
@@ -54,9 +57,10 @@ const VersionsDialog: React.FC<VersionsDialogProps> = ({ open, onClose, versions
 
       setEditingVersionId(null)
       setEditingName('')
+      dispatch(setMessage({ type: 'success', content: 'Le nom de la version a correctement été mis à jour' }))
     } catch (error) {
       console.error('Erreur lors de la mise à jour du nom de la version:', error)
-      // TODO: Ajouter une gestion d'erreur utilisateur (toast, etc.)
+      dispatch(setMessage({ type: 'error', content: "Erreur lors de l'édition du nom de la version" }))
     } finally {
       setIsLoading(false)
     }
@@ -76,15 +80,17 @@ const VersionsDialog: React.FC<VersionsDialogProps> = ({ open, onClose, versions
       const editActions: Action[] = isEditing
         ? [
             {
-              title: 'Valider',
-              icon: CheckIcon,
-              onClick: () => handleSaveEdit(version.uuid),
+              title: 'Annuler',
+              icon: CancelIcon,
+              color: '#ED6D91',
+              onClick: handleCancelEdit,
               disabled: isLoading
             },
             {
-              title: 'Annuler',
-              icon: CancelIcon,
-              onClick: handleCancelEdit,
+              title: 'Valider',
+              icon: CheckCircleIcon,
+              color: '#1ca717',
+              onClick: () => handleSaveEdit(version.uuid),
               disabled: isLoading
             }
           ]
@@ -108,32 +114,14 @@ const VersionsDialog: React.FC<VersionsDialogProps> = ({ open, onClose, versions
         },
         {
           id: `name-${version.uuid}`,
-          type: CellType.TEXT,
-          value: isEditing ? (
-            <TextField
-              value={editingName}
-              onChange={(e) => setEditingName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleSaveEdit(version.uuid)
-                } else if (e.key === 'Escape') {
-                  handleCancelEdit()
-                }
-              }}
-              autoFocus
-              fullWidth
-              size="small"
-              variant="outlined"
-              disabled={isLoading}
-              sx={{
-                '& .MuiInputBase-root': {
-                  fontSize: '14px'
-                }
-              }}
-            />
-          ) : (
-            version.name ?? `Version ${version.version}`
-          ),
+          type: isEditing ? CellType.TEXT_EDITION : CellType.TEXT,
+          value: isEditing
+            ? ({
+                title: editingName,
+                disabled: isLoading,
+                onClick: (newName: string) => setEditingName(newName)
+              } as Action)
+            : getVersionName(version),
           sx: {
             width: '300px',
             maxWidth: '300px',
@@ -182,8 +170,9 @@ const VersionsDialog: React.FC<VersionsDialogProps> = ({ open, onClose, versions
       width="100%"
       readonly
       cancelText="Fermer"
+      disabled={isLoading}
     >
-      <Table value={tableData} />
+      <Table value={tableData} noMarginBottom />
     </Modal>
   )
 }
