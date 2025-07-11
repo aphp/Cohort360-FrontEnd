@@ -64,7 +64,8 @@ export enum CellType {
   SUBARRAY,
   PARAGRAPHS,
   DOCUMENT_CONTENT,
-  CHECKBOX
+  CHECKBOX,
+  HAS_COHORTS
 }
 
 export type Cell = {
@@ -82,6 +83,7 @@ export type Cell = {
     | Element
     | Action[]
     | CheckboxAction
+    | number
   type: CellType
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
   sx?: React.CSSProperties

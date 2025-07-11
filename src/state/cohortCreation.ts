@@ -220,12 +220,12 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
           if (newSnapshot) {
             const uuid = newSnapshot.uuid
             const created_at = newSnapshot.created_at
-            const title = newSnapshot.title
             const cohorts_count = newSnapshot.cohorts_count
+            const patients_count = newSnapshot.patients_count
             const version = newSnapshot.version
 
             currentSnapshot = { ...newSnapshot, navHistoryIndex: navHistory.length }
-            snapshotsHistory = [{ uuid, created_at, title, cohorts_count, version }]
+            snapshotsHistory = [{ uuid, created_at, cohorts_count, patients_count, version }]
             _navHistory.push(currentSnapshot)
           }
         }
@@ -235,12 +235,12 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
         if (newSnapshot) {
           const uuid = newSnapshot.uuid
           const created_at = newSnapshot.created_at
-          const title = newSnapshot.title
           const cohorts_count = newSnapshot.cohorts_count
+          const patients_count = newSnapshot.patients_count
           const version = newSnapshot.version
 
           currentSnapshot = { ...newSnapshot, navHistoryIndex: navHistory.length }
-          snapshotsHistory = [{ uuid, created_at, title, cohorts_count, version }, ...snapshotsHistory]
+          snapshotsHistory = [{ uuid, created_at, cohorts_count, patients_count, version }, ...snapshotsHistory]
           _navHistory.push(currentSnapshot)
         }
       }
@@ -473,6 +473,16 @@ const cohortCreationSlice = createSlice({
   name: 'cohortCreation',
   initialState: defaultInitialState(),
   reducers: {
+    editSnapshotHistory: (state: CohortCreationState, action: PayloadAction<QuerySnapshotInfo>) => {
+      const updatedVersion = action.payload
+      const updatedVersions = [...state.snapshotsHistory].map((version) =>
+        version.uuid === updatedVersion.uuid ? updatedVersion : version
+      )
+      state.snapshotsHistory = updatedVersions
+      if (state.currentSnapshot.uuid === action.payload.uuid) {
+        state.currentSnapshot = { ...state.currentSnapshot, name: action.payload.name }
+      }
+    },
     resetCohortCreation: () => defaultInitialState(),
     setCohortName: (state: CohortCreationState, action: PayloadAction<string>) => {
       state.cohortName = action.payload
@@ -799,6 +809,7 @@ export {
   addRequestToCohortCreation
 }
 export const {
+  editSnapshotHistory,
   resetCohortCreation,
   setCohortName,
   setPopulationSource,

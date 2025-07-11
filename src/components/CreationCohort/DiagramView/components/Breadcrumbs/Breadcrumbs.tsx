@@ -39,7 +39,7 @@ const CohortCreationBreadcrumbs: React.FC = () => {
       <Breadcrumbs separator=">" aria-label="breadcrumb">
         <Typography>{projectName}</Typography>
         <Typography>{requestName}</Typography>
-        {currentSnapshot && <Typography>Version {currentSnapshot.version}</Typography>}
+        {currentSnapshot && <Typography>{currentSnapshot.name ?? `Version ${currentSnapshot.version}`}</Typography>}
       </Breadcrumbs>
     </Grid>
   )

@@ -21,9 +21,11 @@ import {
   TableCell,
   TableRow as TableRowMui,
   Theme,
+  Tooltip,
   Typography
 } from '@mui/material'
 import GenderIcon from '../GenderIcon'
+import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
 import { GenderStatus } from 'types/searchCriterias'
 import SearchIcon from 'assets/icones/search.svg?react'
 import { Comment, KeyboardArrowUp, KeyboardArrowDown, Visibility } from '@mui/icons-material'
@@ -141,6 +143,15 @@ const TableRow = ({ row, sx }: RowProps) => {
                     />
                   )
                 })()}
+              {cell.type === CellType.HAS_COHORTS && (cell.value as number) > 1 && (
+                <Tooltip
+                  title={`${cell.value} cohorte${
+                    (cell.value as number) > 1 ? 's' : ''
+                  } ont été créées à partir de cette version.`}
+                >
+                  <SupervisedUserCircleIcon fontSize="small" sx={{ color: '#f7a600b3' }} />
+                </Tooltip>
+              )}
               {cell.type === CellType.LINK && (
                 <div style={{ display: 'flex' }}>
                   {cell.value && <p>{(cell.value as Link).label}</p>}
