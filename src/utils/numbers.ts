@@ -21,3 +21,22 @@ export const format = (nb: number | null | undefined) => {
   if (nb === null || nb === undefined) return '-'
   return nb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 }
+
+export const displayCount = (criteriaCount: number, bigIntAllowed = false) => {
+  if (criteriaCount < (!bigIntAllowed ? 1000 : 100000)) {
+    return criteriaCount.toString() // Normal values (less than 1,000)
+  } else if (criteriaCount < 1000000) {
+    return `~${Math.round(criteriaCount / 1000)}k` // Thousands
+  } else if (criteriaCount < 1000000000) {
+    return `~${Math.round(criteriaCount / 1000000)}M` // Millions
+  } else if (criteriaCount < 1000000000000) {
+    return `~${Math.round(criteriaCount / 1000000000)}B` // Billions
+  }
+  return `~${Math.round(criteriaCount / 1000000000000)}T` // Trillions
+}
+
+export const displayVersionsCount = (criteriaCount?: number | null) => {
+  return criteriaCount !== undefined && criteriaCount !== null
+    ? `${displayCount(criteriaCount, true)} patient${criteriaCount > 1 ? 's' : ''}`
+    : '-'
+}

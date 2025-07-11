@@ -20,10 +20,13 @@ import {
   SxProps,
   TableCell,
   TableRow as TableRowMui,
+  TextField,
   Theme,
+  Tooltip,
   Typography
 } from '@mui/material'
 import GenderIcon from '../GenderIcon'
+import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
 import { GenderStatus } from 'types/searchCriterias'
 import SearchIcon from 'assets/icones/search.svg?react'
 import { Comment, KeyboardArrowUp, KeyboardArrowDown, Visibility } from '@mui/icons-material'
@@ -86,6 +89,7 @@ const TableRow = ({ row, sx }: RowProps) => {
                       icon={<IconComponent />}
                       onClick={action.onClick}
                       title={action.title}
+                      color={action.color ?? 'inherit'}
                     />
                   )
                 })}
@@ -127,6 +131,24 @@ const TableRow = ({ row, sx }: RowProps) => {
                 </Grid>
               )}
               {cell.type == CellType.TEXT && <p>{cell.value as string}</p>}
+              {cell.type === CellType.TEXT_EDITION &&
+                (() => {
+                  const { title, disabled, onClick } = cell.value as Action
+                  return (
+                    <TextField
+                      value={title}
+                      onChange={(e) => onClick(e.target.value)}
+                      fullWidth
+                      size="small"
+                      disabled={disabled}
+                      sx={{
+                        '& .MuiInputBase-input': {
+                          color: '#303030'
+                        }
+                      }}
+                    />
+                  )
+                })()}
               {cell.type == CellType.PARAGRAPHS && <Paragraphs value={cell.value as Paragraph[]} />}
               {cell.type == CellType.STATUS_CHIP &&
                 (() => {
@@ -141,6 +163,15 @@ const TableRow = ({ row, sx }: RowProps) => {
                     />
                   )
                 })()}
+              {cell.type === CellType.HAS_COHORTS && (cell.value as number) > 1 && (
+                <Tooltip
+                  title={`${cell.value} cohorte${
+                    (cell.value as number) > 1 ? 's' : ''
+                  } ont été créées à partir de cette version.`}
+                >
+                  <SupervisedUserCircleIcon fontSize="small" sx={{ color: '#f7a600b3' }} />
+                </Tooltip>
+              )}
               {cell.type === CellType.LINK && (
                 <div style={{ display: 'flex' }}>
                   {cell.value && <p>{(cell.value as Link).label}</p>}

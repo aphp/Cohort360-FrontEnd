@@ -6,7 +6,8 @@ import { SubItemType } from './cohorts'
 export type Action = {
   title: string
   icon: React.ElementType
-  onClick: () => void
+  onClick: (newItem?: unknown) => void | Promise<void>
+  color?: string
   disabled?: boolean
 }
 
@@ -53,6 +54,7 @@ export type Document = {
 export enum CellType {
   ACTIONS,
   TEXT,
+  TEXT_EDITION,
   GENDER_ICON,
   FAV_ICON,
   SUB_ITEM,
@@ -64,7 +66,8 @@ export enum CellType {
   SUBARRAY,
   PARAGRAPHS,
   DOCUMENT_CONTENT,
-  CHECKBOX
+  CHECKBOX,
+  HAS_COHORTS
 }
 
 export type Cell = {
@@ -80,8 +83,10 @@ export type Cell = {
     | Favorite
     | SubItem
     | Element
+    | Action
     | Action[]
     | CheckboxAction
+    | number
   type: CellType
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify'
   sx?: React.CSSProperties
