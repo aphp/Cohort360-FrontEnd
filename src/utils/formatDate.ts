@@ -40,7 +40,7 @@ export const isDateValid = (date?: string | null, format = 'YYYY-MM-DD') => {
  */
 const formatDate = (date?: string, withHour?: boolean) => {
   const _date = moment(date)
-  const format = `DD/MM/YYYY${withHour ? ' - HH:mm:ss' : ''}`
+  const format = `DD/MM/YYYY${withHour ? ' - HH:mm' : ''}`
   return date && _date.isValid() ? _date.format(format) : 'N/A'
 }
 

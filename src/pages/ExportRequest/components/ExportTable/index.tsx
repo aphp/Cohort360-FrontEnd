@@ -33,6 +33,7 @@ import {
   fetchQuestionnaireResponseCountDetails
 } from 'pages/ExportRequest/components/exportUtils'
 import { ResourceType } from 'types/requestCriterias'
+import { plural } from 'utils/plural'
 import { getProviderFilters } from 'services/aphp/serviceFilters'
 import { useAppSelector, useAppDispatch } from 'state'
 import { showDialog, hideDialog } from 'state/warningDialog'
