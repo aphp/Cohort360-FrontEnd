@@ -363,8 +363,9 @@ export type RequestType = {
 
 export type QuerySnapshotInfo = {
   uuid: string
+  name?: string
   created_at: string
-  title: string
+  patients_count: number
   cohorts_count: number
   version: number
 }
