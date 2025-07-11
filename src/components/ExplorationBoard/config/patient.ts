@@ -32,7 +32,7 @@ import { getAge, substructAgeString } from 'utils/age'
 import { fetcherWithParams, getCommonParamsAll, getCommonParamsList, narrowSearchCriterias } from 'utils/exploration'
 import { getExtension } from 'utils/fhir'
 import { getAgeRepartitionMapAphp, getGenderRepartitionMapAphp, getGenderRepartitionSimpleData } from 'utils/graphUtils'
-import { capitalizeFirstLetter } from 'utils/capitalize'
+import { capitalizeFirstLetter, plural } from 'utils/string'
 import { Card } from 'types/card'
 import { PatientState } from 'state/patient'
 import { getConfig } from 'config'
@@ -319,7 +319,7 @@ export const patientsConfig = (
     mapToDiagram: patient && appConfig.core.fhir.facetsExtensions ? undefined : getDiagramData,
     fetchAdditionalInfos: (additionalInfo) => fetchAdditionalInfos(additionalInfo, deidentified),
     getCount: (counts) => [
-      { label: `patient${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
+      { label: `patient${plural(counts[0].total)}`, display: true, count: counts[0] },
       { label: '', display: false, count: counts[1] }
     ]
   }
