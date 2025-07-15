@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Redux reducer and custom hook for managing search criteria state
+ * @module reducers/searchCriteriasReducer
+ */
+
 import { removeFilter } from 'utils/filters'
 import { useReducer, useEffect } from 'react'
 import {
@@ -11,9 +16,16 @@ import {
   FilterKeys,
   FilterValue
 } from 'types/searchCriterias'
-import { ResourceType } from 'types/requestCriterias'
-import { getConfig } from 'config'
 
+/**
+ * Initial state for export search criteria with default ordering and no filters
+ *
+ * @example
+ * ```typescript
+ * const exportCriteria = initExportSearchCriterias
+ * // { orderBy: { orderBy: Order.CREATED_AT, orderDirection: Direction.DESC }, searchInput: '', filters: null }
+ * ```
+ */
 export const initExportSearchCriterias: SearchCriterias<null> = {
   orderBy: {
     orderBy: Order.CREATED_AT,
@@ -23,6 +35,22 @@ export const initExportSearchCriterias: SearchCriterias<null> = {
   filters: null
 }
 
+/**
+ * Creates a reducer function for managing search criteria state
+ *
+ * @template F - The type of the filters object
+ * @param initState - Function that returns the initial state
+ * @returns A reducer function that handles search criteria actions
+ *
+ * @example
+ * ```typescript
+ * const reducer = searchCriteriasReducer(() => ({
+ *   orderBy: { orderBy: Order.NAME, orderDirection: Direction.ASC },
+ *   searchInput: '',
+ *   filters: { status: [] }
+ * }))
+ * ```
+ */
 const searchCriteriasReducer = <F>(
   initState: () => SearchCriterias<F>
 ): ((state: SearchCriterias<F> | undefined, action: ActionFilters<F>) => SearchCriterias<F>) => {
@@ -48,15 +76,50 @@ const searchCriteriasReducer = <F>(
   }
 }
 
+/**
+ * Type definition for dispatch actions available in the useSearchCriterias hook
+ *
+ * @template F - The type of the filters object
+ */
 type DispatchActions<F> = {
+  /** Changes the ordering criteria */
   changeOrderBy: (orderBy: OrderBy) => void
+  /** Updates the search input text */
   changeSearchInput: (searchInput: string) => void
+  /** Changes the search type (e.g., by name, by code) */
   changeSearchBy: (searchBy: SearchByTypes) => void
+  /** Adds or updates filters */
   addFilters: (filters: F) => void
+  /** Removes a specific filter */
   removeFilter: (key: FilterKeys, value: FilterValue) => void
+  /** Replaces all search criteria */
   addSearchCriterias: (searchCriterias: SearchCriterias<F>) => void
 }
 
+/**
+ * Custom React hook for managing search criteria state with reducer pattern
+ *
+ * @template F - The type of the filters object
+ * @param initState - The initial state for search criteria
+ * @param resetKey - A key that triggers state reset when changed
+ * @returns A tuple containing the current state and dispatch actions
+ *
+ * @example
+ * ```typescript
+ * const [searchCriteria, actions] = useSearchCriterias(
+ *   {
+ *     orderBy: { orderBy: Order.NAME, orderDirection: Direction.ASC },
+ *     searchInput: '',
+ *     filters: { status: [] }
+ *   },
+ *   'resetKey'
+ * )
+ *
+ * // Use the actions to update state
+ * actions.changeSearchInput('new search term')
+ * actions.addFilters({ status: ['active'] })
+ * ```
+ */
 const useSearchCriterias = <F>(
   initState: SearchCriterias<F>,
   resetKey: string | number
@@ -87,4 +150,8 @@ const useSearchCriterias = <F>(
   ]
 }
 
+/**
+ * @default useSearchCriterias
+ * @see {@link useSearchCriterias}
+ */
 export default useSearchCriterias
