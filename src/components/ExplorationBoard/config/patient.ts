@@ -100,7 +100,7 @@ const getPatientInfos = (patient: Patient, deidentified: boolean, groupId: strin
     age: getAge(patient) ?? 'Non renseigné',
     birthdate: patient.birthDate ? moment(patient.birthDate).format('DD/MM/YYYY') : 'Non renseigné'
   }
-  const gender = patient.gender?.toLocaleUpperCase() ?? ''
+  const gender = patient.gender ?? ''
   return { vitalStatus, lastEncounter, surname, lastname, ipp, age, gender }
 }
 
