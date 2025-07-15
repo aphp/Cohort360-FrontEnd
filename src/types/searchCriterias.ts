@@ -228,7 +228,7 @@ export enum FilterKeys {
   START_DATE = 'startDate',
   END_DATE = 'endDate',
   ONLY_PDF_AVAILABLE = 'onlyPdfAvailable',
-  SOURCE = 'source',
+  SOURCE = '_source',
   EXECUTIVE_UNITS = 'executiveUnits',
   DOC_TYPES = 'docTypes',
   DOC_STATUSES = 'docStatuses',
