@@ -11,20 +11,38 @@ import { getExtension } from 'utils/fhir'
 import { getConfig } from 'config'
 import { URLS } from 'types/exploration'
 
+/**
+ * State interface for explored cohort management.
+ * Extends CohortData with additional exploration-specific properties.
+ */
 export type ExploredCohortState = {
+  /** Patients imported for exploration */
   importedPatients: Patient[]
+  /** Patients included in the exploration */
   includedPatients: Patient[]
+  /** Patients excluded from the exploration */
   excludedPatients: Patient[]
+  /** Loading state indicator */
   loading: boolean
+  /** Whether user has rights to explore this cohort */
   rightToExplore: boolean | undefined
+  /** Request identifier */
   requestId?: string
+  /** Snapshot identifier */
   snapshotId?: string
+  /** Cohort identifier */
   cohortId?: string
+  /** Whether user can export data */
   canMakeExport?: boolean
+  /** Whether data is deidentified */
   deidentifiedBoolean?: boolean
+  /** Whether this is a sample dataset */
   isSample: boolean
 } & CohortData
 
+/**
+ * Default initial state for explored cohort
+ */
 const defaultInitialState = {
   // CohortData
   name: '',
@@ -56,6 +74,15 @@ const defaultInitialState = {
   deidentifiedBoolean: undefined
 }
 
+/**
+ * Fetches explored cohort data based on context (cohort, perimeters, or patients).
+ * Implements caching logic to avoid unnecessary API calls.
+ *
+ * @param context - The exploration context (COHORT, PERIMETERS, or PATIENTS)
+ * @param id - Optional identifier for the cohort or perimeter
+ * @param forceReload - Force reload even if data exists
+ * @returns Promise resolving to CohortData
+ */
 const fetchExploredCohort = createAsyncThunk<
   CohortData,
   { context: URLS; id?: string; forceReload?: boolean },
@@ -102,6 +129,14 @@ const fetchExploredCohort = createAsyncThunk<
   return state.exploredCohort
 })
 
+/**
+ * Fetches explored cohort data in background without caching logic.
+ * Always performs the API call regardless of current state.
+ *
+ * @param context - The exploration context (COHORT, PERIMETERS, or PATIENTS)
+ * @param id - Optional identifier for the cohort or perimeter
+ * @returns Promise resolving to CohortData
+ */
 const fetchExploredCohortInBackground = createAsyncThunk<
   CohortData,
   { context: URLS; id?: string },
@@ -188,10 +223,20 @@ const fetchExploredCohortInBackground = createAsyncThunk<
   return cohort ?? state.exploredCohort
 })
 
+/**
+ * Redux slice for explored cohort state management
+ */
 const exploredCohortSlice = createSlice({
   name: 'exploredCohort',
   initialState: defaultInitialState as ExploredCohortState,
   reducers: {
+    /**
+     * Adds patients to the imported patients list.
+     * Filters out duplicates and patients already in original or excluded lists.
+     *
+     * @param state - Current state
+     * @param action - Action containing Patient array to add
+     */
     addImportedPatients: (state: ExploredCohortState, action: PayloadAction<Patient[]>) => {
       const importedPatients = [...state.importedPatients, ...action.payload]
       state.importedPatients = importedPatients.filter(
@@ -201,10 +246,22 @@ const exploredCohortSlice = createSlice({
           !state.excludedPatients.map((p) => p.id).includes(patient.id)
       )
     },
+    /**
+     * Removes patients from the imported patients list.
+     *
+     * @param state - Current state
+     * @param action - Action containing Patient array to remove
+     */
     removeImportedPatients: (state: ExploredCohortState, action: PayloadAction<Patient[]>) => {
       const listId = action.payload.map((patient) => patient.id)
       state.importedPatients = state.importedPatients.filter((patient) => !listId.includes(patient.id))
     },
+    /**
+     * Moves patients from imported to included list.
+     *
+     * @param state - Current state
+     * @param action - Action containing Patient array to include
+     */
     includePatients: (state: ExploredCohortState, action: PayloadAction<Patient[]>) => {
       const includedPatients = [...state.includedPatients, ...action.payload]
       state.importedPatients = state.importedPatients.filter(
@@ -212,6 +269,14 @@ const exploredCohortSlice = createSlice({
       )
       state.includedPatients = includedPatients
     },
+    /**
+     * Excludes patients from the cohort.
+     * Moves patients from original/included lists to excluded list.
+     * Some patients may be moved back to imported list.
+     *
+     * @param state - Current state
+     * @param action - Action containing Patient array to exclude
+     */
     excludePatients: (state: ExploredCohortState, action: PayloadAction<Patient[]>) => {
       const toExcluded = state.originalPatients?.filter((patient) =>
         action.payload.map((p) => p.id).includes(patient.id)
@@ -235,8 +300,14 @@ const exploredCohortSlice = createSlice({
         importedPatients: allImportedPatients
       }
     },
+    /**
+     * Removes patients from excluded list and moves them back to original patients.
+     *
+     * @param state - Current state
+     * @param action - Action containing Patient array to remove from excluded
+     */
     removeExcludedPatients: (state: ExploredCohortState, action: PayloadAction<Patient[]>) => {
-      if (!action || !action.payload) return
+      if (!action?.payload) return
       const statePatient = state.originalPatients || []
       const originalPatients = [...statePatient, ...action.payload]
       const excludedPatients = state.excludedPatients.filter(
@@ -245,6 +316,12 @@ const exploredCohortSlice = createSlice({
       state.originalPatients = originalPatients
       state.excludedPatients = excludedPatients
     },
+    /**
+     * Updates the cohort data with new information.
+     *
+     * @param state - Current state
+     * @param action - Action containing CohortData to merge
+     */
     updateCohort: (state: ExploredCohortState, action: PayloadAction<CohortData>) => {
       return { ...state, ...action.payload }
     }
@@ -276,8 +353,13 @@ const exploredCohortSlice = createSlice({
   }
 })
 
+/** Default export: the explored cohort reducer */
 export default exploredCohortSlice.reducer
+
+/** Async thunk actions for fetching cohort data */
 export { fetchExploredCohort, fetchExploredCohortInBackground }
+
+/** Action creators for cohort exploration operations */
 export const {
   addImportedPatients,
   excludePatients,
