@@ -5,28 +5,29 @@ import { DurationRangeType } from 'types/searchCriterias'
 import { getExtension } from './fhir'
 import { getConfig } from 'config'
 
-export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'months'): string => {
-  if (ageValue === 0 && momentUnit === 'months') return '< 1 mois'
-  if (ageValue === undefined) return 'Âge inconnu'
-  let ageUnit: 'year' | 'month' | 'day' = 'year'
-  let ageUnitDisplay = ''
-  const momentAge = moment().subtract(ageValue, momentUnit)
-  const today = moment()
-
-  if (today.diff(momentAge, 'year') > 0) {
-    ageUnit = 'year'
-    ageUnitDisplay = today.diff(momentAge, 'year') <= 1 ? 'an' : 'ans'
-  } else if (today.diff(momentAge, 'month') > 0) {
-    ageUnit = 'month'
-    ageUnitDisplay = 'mois'
-  } else if (today.diff(momentAge, 'day') >= 0) {
-    ageUnit = 'day'
-    ageUnitDisplay = today.diff(momentAge, 'day') <= 1 ? 'jour' : 'jours'
+const formatAgeFromDiff = (years: number, months: number, days: number): string => {
+  if (years > 0) {
+    return `${years} ${years <= 1 ? 'an' : 'ans'}`
+  } else if (months > 0) {
+    return `${months} mois`
+  } else if (days >= 0) {
+    return `${days} ${days <= 1 ? 'jour' : 'jours'}`
   } else {
     return 'Âge inconnu'
   }
+}
 
-  return `${today.diff(momentAge, ageUnit)} ${ageUnitDisplay}`
+export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'months'): string => {
+  if (ageValue === 0 && momentUnit === 'months') return '< 1 mois'
+  if (ageValue === undefined) return 'Âge inconnu'
+  const momentAge = moment().subtract(ageValue, momentUnit)
+  const today = moment()
+
+  const years = today.diff(momentAge, 'year')
+  const months = today.diff(momentAge, 'month')
+  const days = today.diff(momentAge, 'day')
+
+  return formatAgeFromDiff(years, months, days)
 }
 
 export const getAge = (patient: CohortPatient): string => {
@@ -42,12 +43,11 @@ export const getAge = (patient: CohortPatient): string => {
     const birthDate = moment(patient.birthDate)
     const endDate = patient.deceasedDateTime ? moment(patient.deceasedDateTime) : moment()
     if (patient.deceasedBoolean && !patient.deceasedDateTime) return 'Âge inconnu'
-    const age = endDate.diff(birthDate, 'years')
-    if (age > 0) return `${age} an(s)`
-    const ageMonth = endDate.diff(birthDate, 'months')
-    if (ageMonth > 0) return `${ageMonth} mois`
-    const ageDay = endDate.diff(birthDate, 'days')
-    return `${ageDay} jour(s)`
+    const years = endDate.diff(birthDate, 'years')
+    const months = endDate.diff(birthDate, 'months')
+    const days = endDate.diff(birthDate, 'days')
+
+    return formatAgeFromDiff(years, months, days)
   }
   return 'Âge inconnu'
 }
