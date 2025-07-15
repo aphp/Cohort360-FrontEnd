@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Export form component for configuring data export requests.
+ * This component provides a comprehensive form interface for selecting cohorts,
+ * configuring export settings, selecting tables and columns, and submitting export requests.
+ */
+
 /* eslint-disable max-statements */
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 
@@ -40,6 +46,9 @@ import { getConfig } from 'config'
 
 import useStyles from '../../styles'
 
+/**
+ * Enumeration of possible error states in the export form.
+ */
 export enum Error {
   ERROR_MOTIF,
   ERROR_CONDITION,
@@ -49,11 +58,17 @@ export enum Error {
   NO_ERROR
 }
 
+/**
+ * Type definition for table-specific error tracking.
+ */
 type ErrorTables = Array<{
+  /** Name of the table */
   tableName: string
+  /** Associated error state */
   error?: Error
 }>
 
+/** Initial state for table settings with person table pre-selected */
 const tableSettingsInitialState: TableSetting[] = [
   {
     tableName: 'person',
@@ -64,6 +79,7 @@ const tableSettingsInitialState: TableSetting[] = [
   }
 ]
 
+/** Initial state for error tracking with person table having no errors */
 const errorTablesInitialState: ErrorTables = [
   {
     tableName: 'person',
@@ -71,6 +87,20 @@ const errorTablesInitialState: ErrorTables = [
   }
 ]
 
+/**
+ * Export form component that handles the complete export request workflow.
+ *
+ * Features:
+ * - Cohort selection (from URL parameter or dropdown)
+ * - Export motivation input with validation
+ * - File format selection (CSV/Excel)
+ * - Table selection with column filtering
+ * - FHIR resource filtering
+ * - Export conditions acceptance
+ * - Form validation and submission
+ *
+ * @returns {JSX.Element} The ExportForm component
+ */
 const ExportForm: React.FC = () => {
   const { classes } = useStyles()
   const [error, setError] = useState<Error | null>(null)

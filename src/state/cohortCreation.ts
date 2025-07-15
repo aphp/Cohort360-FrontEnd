@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Cohort creation state slice.
+ * Manages the complex state for building, editing, and managing cohort creation requests.
+ * This is the core slice for the cohort creation workflow.
+ */
+
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 import {
@@ -21,33 +27,67 @@ import { Hierarchy } from 'types/hierarchy'
 import { getConfig } from 'config'
 import { ScopeElement } from 'types/scope'
 
+/**
+ * State interface for cohort creation functionality.
+ * Contains all data needed for building and managing cohort requests.
+ */
 export type CohortCreationState = {
+  /** General loading state for cohort operations */
   loading: boolean
+  /** Loading state specifically for save operations */
   saveLoading: boolean
+  /** Loading state specifically for count operations */
   countLoading: boolean
+  /** Whether the current count is outdated */
   count_outdated: boolean
+  /** Limit for short cohort processing */
   shortCohortLimit: number
+  /** Current request identifier */
   requestId: string
+  /** Name of the cohort being created */
   cohortName: string
+  /** Serialized JSON representation of the request */
   json: string
+  /** Current snapshot data */
   currentSnapshot: CurrentSnapshot
+  /** Navigation history for undo/redo functionality */
   navHistory: CurrentSnapshot[]
+  /** History of saved snapshots */
   snapshotsHistory: QuerySnapshotInfo[]
+  /** Current cohort count and status */
   count: CohortCount
+  /** Selected population/scope for the cohort */
   selectedPopulation: Hierarchy<ScopeElement>[] | null
+  /** Executive units for the cohort */
   executiveUnits: (Hierarchy<ScopeElement> | undefined)[] | null
+  /** Whether IPP search is allowed */
   allowSearchIpp: boolean
+  /** Array of selected criteria */
   selectedCriteria: SelectedCriteriaType[]
+  /** Whether criteria contain nominative data */
   isCriteriaNominative: boolean
+  /** Groups organizing the criteria */
   criteriaGroup: CriteriaGroup[]
+  /** Mapping of old IDs to new IDs for criteria */
   idRemap: Record<number, number>
+  /** Temporal constraints between criteria */
   temporalConstraints: TemporalConstraintsType[]
+  /** Next available criteria ID */
   nextCriteriaId: number
+  /** Next available group ID (negative) */
   nextGroupId: number
+  /** Optional project name */
   projectName?: string
+  /** Optional request name */
   requestName?: string
 }
 
+/**
+ * Factory function that returns the default initial state for cohort creation.
+ * Used to reset state and ensure fresh state on login/logout.
+ *
+ * @returns {CohortCreationState} Fresh initial state
+ */
 const defaultInitialState: () => CohortCreationState = () => ({
   loading: false,
   saveLoading: false,
@@ -88,21 +128,39 @@ const defaultInitialState: () => CohortCreationState = () => ({
 })
 
 /**
- * fetchRequestCohortCreation
- *
+ * Parameters for fetching a cohort creation request.
  */
 type FetchRequestCohortCreationParams = {
+  /** ID of the request to fetch */
   requestId: string
+  /** Optional snapshot ID to load specific version */
   snapshotId?: string
 }
+
+/**
+ * Return type for fetchRequestCohortCreation async thunk.
+ */
 type FetchRequestCohortCreationReturn = {
+  /** Name of the fetched request */
   requestName?: string
+  /** ID of the fetched request */
   requestId?: string
+  /** History of snapshots for this request */
   snapshotsHistory?: QuerySnapshotInfo[]
+  /** Current snapshot data */
   currentSnapshot?: CurrentSnapshot
+  /** Serialized JSON of the request */
   json?: string
 }
 
+/**
+ * Async thunk to fetch a cohort creation request from the backend.
+ * Loads the request data and initializes the cohort creation state.
+ *
+ * @param {FetchRequestCohortCreationParams} params - Request parameters
+ * @param {Object} thunkAPI - Redux thunk API
+ * @returns {Promise<FetchRequestCohortCreationReturn>} Request data
+ */
 const fetchRequestCohortCreation = createAsyncThunk<
   FetchRequestCohortCreationReturn,
   FetchRequestCohortCreationParams,
@@ -143,16 +201,27 @@ const fetchRequestCohortCreation = createAsyncThunk<
 })
 
 /**
- * countCohortCreation
- *
+ * Parameters for counting cohort creation results.
  */
 type CountCohortCreationParams = {
+  /** JSON query to count */
   json?: string
+  /** Snapshot ID for the count */
   snapshotId?: string
+  /** Request ID for the count */
   requestId?: string
+  /** UUID for existing count job */
   uuid?: string
 }
 
+/**
+ * Async thunk to count patients in a cohort creation request.
+ * Initiates or retrieves count job results from the backend.
+ *
+ * @param {CountCohortCreationParams} params - Count parameters
+ * @param {Object} thunkAPI - Redux thunk API
+ * @returns {Promise<Object>} Count results and updated snapshots
+ */
 const countCohortCreation = createAsyncThunk<
   { count?: CohortCount; snapshotsHistory?: QuerySnapshotInfo[] },
   CountCohortCreationParams,
@@ -192,17 +261,33 @@ const countCohortCreation = createAsyncThunk<
 })
 
 /**
- * saveJson
- *
- *
+ * Return type for saveJson async thunk.
  */
 export type SaveJsonReturn = {
+  /** ID of the request */
   requestId: string
+  /** Updated snapshots history */
   snapshotsHistory: QuerySnapshotInfo[]
+  /** Current snapshot after save */
   currentSnapshot: CurrentSnapshot
 }
-type SaveJsonParams = { newJson: string }
 
+/**
+ * Parameters for saving JSON query.
+ */
+type SaveJsonParams = {
+  /** New JSON query to save */
+  newJson: string
+}
+
+/**
+ * Async thunk to save a JSON query as a new snapshot.
+ * Creates a new snapshot or updates existing snapshots history.
+ *
+ * @param {SaveJsonParams} params - Save parameters
+ * @param {Object} thunkAPI - Redux thunk API
+ * @returns {Promise<SaveJsonReturn>} Save results
+ */
 const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootState }>(
   'cohortCreation/saveJson',
   // eslint-disable-next-line max-statements
@@ -259,25 +344,36 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
 )
 
 /**
- * buildCohortCreation()
- *
- *
+ * Return type for buildCohortCreation async thunk.
  */
 type BuildCohortReturn = {
+  /** Built JSON query */
   json: string
+  /** Selected population for the cohort */
   selectedPopulation: Hierarchy<ScopeElement, string>[] | null
 }
+
+/**
+ * Parameters for building cohort creation.
+ */
 type BuildCohortParams = {
+  /** Population to use for building */
   selectedPopulation: Hierarchy<ScopeElement, string>[] | null
 }
+/**
+ * Async thunk to build a cohort creation request from current state.
+ * Constructs the JSON query from criteria, groups, and constraints.
+ *
+ * @param {BuildCohortParams} params - Build parameters
+ * @param {Object} thunkAPI - Redux thunk API
+ * @returns {Promise<BuildCohortReturn>} Built cohort data
+ */
 const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParams, { state: RootState }>(
   'cohortCreation/build',
   async ({ selectedPopulation }, { getState, dispatch }) => {
     try {
       const state = getState()
-      const _selectedPopulation = selectedPopulation
-        ? selectedPopulation
-        : state.cohortCreation.request.selectedPopulation
+      const _selectedPopulation = selectedPopulation ?? state.cohortCreation.request.selectedPopulation
       const _selectedCriteria = state.cohortCreation.request.selectedCriteria
       const _criteriaGroup: CriteriaGroup[] =
         state.cohortCreation.request.criteriaGroup && state.cohortCreation.request.criteriaGroup.length > 0
@@ -333,22 +429,44 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
   }
 )
 
-/** unbuildCohortCreation
- *
- *
+/**
+ * Return type for unbuildCohortCreation async thunk.
  */
 type UnbuildCohortReturn = {
+  /** Original JSON query */
   json: string
+  /** Current snapshot data */
   currentSnapshot: CurrentSnapshot
+  /** Extracted population */
   selectedPopulation: Hierarchy<ScopeElement, string>[] | null
+  /** Extracted criteria */
   selectedCriteria: SelectedCriteriaType[]
+  /** ID remapping for criteria */
   idRemap: Record<number, number>
+  /** Extracted criteria groups */
   criteriaGroup: CriteriaGroup[]
+  /** Next criteria ID to use */
   nextCriteriaId: number
+  /** Next group ID to use */
   nextGroupId: number
 }
-type UnbuildParams = { newCurrentSnapshot: CurrentSnapshot }
 
+/**
+ * Parameters for unbuilding cohort creation.
+ */
+type UnbuildParams = {
+  /** Snapshot to unbuild */
+  newCurrentSnapshot: CurrentSnapshot
+}
+
+/**
+ * Async thunk to unbuild a cohort creation request from JSON.
+ * Parses the JSON query back into criteria, groups, and constraints.
+ *
+ * @param {UnbuildParams} params - Unbuild parameters
+ * @param {Object} thunkAPI - Redux thunk API
+ * @returns {Promise<UnbuildCohortReturn>} Unbuilt cohort data
+ */
 const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParams, { state: RootState }>(
   'cohortCreation/unbuild',
   async ({ newCurrentSnapshot }, { dispatch }) => {
@@ -380,7 +498,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
         isCriteriaNominative = true
       }
 
-      const countId = dated_measures && dated_measures[0] ? dated_measures[0].uuid : null
+      const countId = dated_measures?.[0] ? dated_measures[0].uuid : null
 
       if (countId) {
         dispatch(
@@ -418,19 +536,40 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
   }
 )
 
-/** addRequestToCohortCreation
- *
- *
+/**
+ * Return type for addRequestToCohortCreation async thunk.
  */
 type AddRequestToCohortReturn = {
+  /** Merged JSON query */
   json: string
+  /** Merged criteria */
   selectedCriteria: SelectedCriteriaType[]
+  /** Merged criteria groups */
   criteriaGroup: CriteriaGroup[]
+  /** Next criteria ID */
   nextCriteriaId: number
+  /** Next group ID */
   nextGroupId: number
 }
-type AddRequestToCohortParams = { selectedRequestId: string; parentId: number | null }
 
+/**
+ * Parameters for adding request to cohort creation.
+ */
+type AddRequestToCohortParams = {
+  /** ID of request to add */
+  selectedRequestId: string
+  /** Parent group ID to add to */
+  parentId: number | null
+}
+
+/**
+ * Async thunk to add an existing request to the current cohort creation.
+ * Merges the selected request with the current cohort being built.
+ *
+ * @param {AddRequestToCohortParams} params - Add request parameters
+ * @param {Object} thunkAPI - Redux thunk API
+ * @returns {Promise<AddRequestToCohortReturn>} Merged cohort data
+ */
 const addRequestToCohortCreation = createAsyncThunk<
   AddRequestToCohortReturn,
   AddRequestToCohortParams,
@@ -469,25 +608,90 @@ const addRequestToCohortCreation = createAsyncThunk<
   }
 })
 
+/**
+ * Cohort creation slice managing the complete cohort building workflow.
+ *
+ * This slice handles:
+ * - Criteria management (add, edit, delete, duplicate)
+ * - Group management and organization
+ * - Temporal constraints between criteria
+ * - Population and scope selection
+ * - Navigation history for undo/redo
+ * - Count management and status
+ *
+ * Actions:
+ * - resetCohortCreation: Resets to initial state
+ * - setCohortName: Sets the cohort name
+ * - setPopulationSource: Sets the selected population
+ * - setSelectedCriteria: Sets the complete criteria array
+ * - deleteSelectedCriteria: Removes a criteria and updates dependencies
+ * - deleteCriteriaGroup: Removes a criteria group
+ * - addNewSelectedCriteria: Adds a new criteria
+ * - addNewCriteriaGroup: Adds a new criteria group
+ * - editAllCriteria: Replaces all criteria
+ * - editAllCriteriaGroup: Replaces all criteria groups
+ * - pseudonimizeCriteria: Marks criteria as non-nominative
+ * - editSelectedCriteria: Updates a specific criteria
+ * - editCriteriaGroup: Updates a specific criteria group
+ * - duplicateSelectedCriteria: Duplicates an existing criteria
+ * - deleteTemporalConstraint: Removes a temporal constraint
+ * - updateTemporalConstraints: Updates all temporal constraints
+ * - suspendCount: Suspends count job
+ * - unsuspendCount: Resumes count job
+ * - updateCount: Updates count results
+ * - addActionToNavHistory: Adds action to navigation history
+ *
+ * Extra Reducers:
+ * - Handles async thunk states for build, unbuild, save, count, fetch operations
+ * - Resets state on login/logout/impersonate
+ */
 const cohortCreationSlice = createSlice({
   name: 'cohortCreation',
   initialState: defaultInitialState(),
   reducers: {
+    /**
+     * Resets the cohort creation state to initial values.
+     */
     resetCohortCreation: () => defaultInitialState(),
+    /**
+     * Sets the name of the cohort being created.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the new cohort name
+     */
     setCohortName: (state: CohortCreationState, action: PayloadAction<string>) => {
       state.cohortName = action.payload
     },
     //
+    /**
+     * Sets the population source/scope for the cohort.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the selected population
+     */
     setPopulationSource: (
       state: CohortCreationState,
       action: PayloadAction<Hierarchy<ScopeElement, string>[] | null>
     ) => {
       state.selectedPopulation = action.payload
     },
+    /**
+     * Sets the complete array of selected criteria.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the new criteria array
+     */
     setSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType[]>) => {
       state.selectedCriteria = action.payload
     },
     //
+    /**
+     * Deletes a selected criteria and updates all dependent structures.
+     * Handles ID remapping, group assignments, and temporal constraints cleanup.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the criteria ID to delete
+     */
     deleteSelectedCriteria: (state: CohortCreationState, action: PayloadAction<number>) => {
       const criteriaId = action.payload
       const criteriaGroupSaved = [...state.criteriaGroup]
@@ -559,6 +763,13 @@ const cohortCreationSlice = createSlice({
 
       state.temporalConstraints = remainingConstraints
     },
+    /**
+     * Deletes a criteria group and reorganizes remaining groups.
+     * Also cleans up temporal constraints involving the deleted group.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the group ID to delete
+     */
     deleteCriteriaGroup: (state: CohortCreationState, action: PayloadAction<number>) => {
       const groupId = action.payload
       const criteriaGroupSaved = [...state.criteriaGroup]
@@ -619,33 +830,80 @@ const cohortCreationSlice = createSlice({
       }
       state.nextGroupId = -(state.criteriaGroup.length + 1)
     },
+    /**
+     * Adds a new criteria to the selection and increments the next criteria ID.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the new criteria to add
+     */
     addNewSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
       state.selectedCriteria = [...state.selectedCriteria, action.payload]
       state.nextCriteriaId++
     },
+    /**
+     * Adds a new criteria group and decrements the next group ID.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the new criteria group to add
+     */
     addNewCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroup>) => {
       state.criteriaGroup = [...state.criteriaGroup, action.payload]
       state.nextGroupId--
     },
+    /**
+     * Replaces all criteria with a new array.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the new criteria array
+     */
     editAllCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType[]>) => {
       state.selectedCriteria = action.payload
     },
+    /**
+     * Replaces all criteria groups with a new array.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the new criteria groups array
+     */
     editAllCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroup[]>) => {
       state.criteriaGroup = action.payload
     },
+    /**
+     * Marks criteria as non-nominative (pseudonymized).
+     *
+     * @param state - Current cohort creation state
+     */
     pseudonimizeCriteria: (state: CohortCreationState) => {
       state.isCriteriaNominative = false
     },
+    /**
+     * Updates a specific criteria by ID.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the updated criteria
+     */
     editSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
       const foundItem = state.selectedCriteria.find(({ id }) => id === action.payload.id)
       const index = foundItem ? state.selectedCriteria.indexOf(foundItem) : -1
       if (index !== -1) state.selectedCriteria[index] = action.payload
     },
+    /**
+     * Updates a specific criteria group by ID.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the updated criteria group
+     */
     editCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroup>) => {
       const foundItem = state.criteriaGroup.find(({ id }) => id === action.payload.id)
       const index = foundItem ? state.criteriaGroup.indexOf(foundItem) : -1
       if (index !== -1) state.criteriaGroup[index] = action.payload
     },
+    /**
+     * Duplicates an existing criteria and reassigns all IDs.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the criteria ID to duplicate
+     */
     duplicateSelectedCriteria: (state: CohortCreationState, action: PayloadAction<number>) => {
       const criteriaId = action.payload
 
@@ -691,12 +949,29 @@ const cohortCreationSlice = createSlice({
       })
       state.nextCriteriaId += 1
     },
+    /**
+     * Removes a temporal constraint from the list.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the temporal constraint to remove
+     */
     deleteTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
       state.temporalConstraints = state.temporalConstraints.filter((constraint) => constraint !== action.payload)
     },
+    /**
+     * Updates the complete array of temporal constraints.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the new temporal constraints array
+     */
     updateTemporalConstraints: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType[]>) => {
       state.temporalConstraints = action.payload
     },
+    /**
+     * Suspends the current count job if it's in a suspendable state.
+     *
+     * @param state - Current cohort creation state
+     */
     suspendCount: (state: CohortCreationState) => {
       state.count = {
         ...state.count,
@@ -708,12 +983,23 @@ const cohortCreationSlice = createSlice({
             : state.count?.status
       }
     },
+    /**
+     * Resumes a suspended count job by setting status to pending.
+     *
+     * @param state - Current cohort creation state
+     */
     unsuspendCount: (state: CohortCreationState) => {
       state.count = {
         ...state.count,
         status: JobStatus.PENDING
       }
     },
+    /**
+     * Updates the count results with new data from the backend.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the updated count data
+     */
     updateCount: (state: CohortCreationState, action: PayloadAction<CohortCount>) => {
       state.count = {
         ...state.count,
@@ -723,6 +1009,12 @@ const cohortCreationSlice = createSlice({
         extra: action.payload.extra
       }
     },
+    /**
+     * Adds a new action to the navigation history for undo/redo functionality.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the snapshot to add to history
+     */
     addActionToNavHistory: (state: CohortCreationState, action: PayloadAction<CurrentSnapshot>) => {
       let navHistory = state.navHistory
       const newSnapshot = action.payload

@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Question selector dialog component for FHIR questionnaire responses.
+ * This component provides a dialog interface for selecting specific questions
+ * from FHIR questionnaires for export in pivot format.
+ */
+
 import React, { memo, useCallback, useDeferredValue, useEffect, useMemo, useState, useRef } from 'react'
 import {
   Box,
@@ -25,8 +31,12 @@ import Chip from 'components/ui/Chip'
 import apiFhir from 'services/apiFhir'
 
 /***********************************
- * Types FHIR minimalistes
+ * FHIR Types (minimal definitions)
  ***********************************/
+
+/**
+ * Minimal FHIR item interface representing questionnaire items.
+ */
 interface FhirItem {
   linkId: string
   text: string
@@ -34,6 +44,9 @@ interface FhirItem {
   item?: FhirItem[]
 }
 
+/**
+ * Minimal FHIR questionnaire resource interface.
+ */
 interface QuestionnaireResource {
   id: string
   title?: string
@@ -41,14 +54,24 @@ interface QuestionnaireResource {
   item?: FhirItem[]
 }
 
+/**
+ * FHIR bundle entry interface.
+ */
 interface BundleEntry {
   resource: QuestionnaireResource
 }
 
+/**
+ * FHIR bundle interface containing questionnaire entries.
+ */
 interface Bundle {
   entry: BundleEntry[]
 }
 
+/**
+ * Interface representing a leaf question in the questionnaire hierarchy.
+ * This is used for the flattened question structure in the selector.
+ */
 export interface QuestionLeaf {
   linkId: string
   text: string
@@ -57,6 +80,9 @@ export interface QuestionLeaf {
   breadcrumb: string
 }
 
+/**
+ * Props interface for the QuestionSelectorDialog component.
+ */
 interface QuestionSelectorDialogProps {
   open: boolean
   onClose: () => void
@@ -66,16 +92,38 @@ interface QuestionSelectorDialogProps {
 }
 
 /***********************************
- * Utils
+ * Utility Functions
  ***********************************/
+
+/**
+ * Normalizes a string for search by converting to lowercase and removing diacritics.
+ *
+ * @param {string} str - String to normalize
+ * @returns {string} Normalized string
+ */
 const normalize = (str: string) =>
   str
     .toLocaleLowerCase('fr-FR')
     .normalize('NFD')
     .replace(/\p{Diacritic}/gu, '')
 
+/**
+ * Checks if a linkId starts with the F_MATER_ prefix.
+ *
+ * @param {string} linkId - Link ID to check
+ * @returns {boolean} True if linkId starts with F_MATER_
+ */
 const startsWithFMater = (linkId: string) => linkId.startsWith('F_MATER_')
 
+/**
+ * Recursively collects leaf questions from a FHIR questionnaire item hierarchy.
+ * Only includes items that start with F_MATER_ and have no children.
+ *
+ * @param {FhirItem[] | undefined} items - Array of FHIR items to process
+ * @param {string[]} parents - Breadcrumb trail of parent item names
+ * @param {QuestionLeaf[]} collector - Array to collect leaf questions
+ * @returns {QuestionLeaf[]} Array of leaf questions
+ */
 function collectLeaves(
   items: FhirItem[] | undefined,
   parents: string[] = [],
@@ -101,6 +149,14 @@ function collectLeaves(
   return collector
 }
 
+/**
+ * Builds initial checked state map from selected questions.
+ * Maps questionnaire IDs to sets of selected question link IDs.
+ *
+ * @param {Bundle} bundle - FHIR bundle containing questionnaires
+ * @param {QuestionLeaf[]} selected - Array of previously selected questions
+ * @returns {Map<string, Set<string>>} Map of questionnaire ID to selected question IDs
+ */
 function buildInitialChecked(bundle: Bundle, selected: QuestionLeaf[]): Map<string, Set<string>> {
   const map = new Map<string, Set<string>>()
 
@@ -122,8 +178,18 @@ function buildInitialChecked(bundle: Bundle, selected: QuestionLeaf[]): Map<stri
 }
 
 /***********************************
- * Child row (mémoïsé)
+ * Memoized Question Row Component
  ***********************************/
+
+/**
+ * Memoized component for rendering individual question rows in the selector.
+ *
+ * @param {Object} props - Component props
+ * @param {QuestionLeaf} props.question - Question data to display
+ * @param {boolean} props.isChecked - Whether the question is selected
+ * @param {Function} props.toggle - Function to toggle question selection
+ * @returns {JSX.Element} Question row component
+ */
 const QuestionRow = memo(
   ({ question, isChecked, toggle }: { question: QuestionLeaf; isChecked: boolean; toggle: (id: string) => void }) => {
     const labelId = `checkbox-list-label-${question.linkId}`
@@ -155,8 +221,23 @@ const QuestionRow = memo(
 )
 
 /***********************************
- * Main component
+ * Main Dialog Component
  ***********************************/
+
+/**
+ * Dialog component for selecting questions from FHIR questionnaires.
+ *
+ * Features:
+ * - Fetches active questionnaires from FHIR API
+ * - Displays hierarchical question structure
+ * - Provides search functionality with deferred queries
+ * - Supports bulk selection/deselection
+ * - Shows selected questions as removable chips
+ * - Maintains selection state across questionnaires
+ *
+ * @param {QuestionSelectorDialogProps} props - Component props
+ * @returns {JSX.Element} The question selector dialog
+ */
 const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
   open,
   onClose,
@@ -164,20 +245,17 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
   onDefaultQuestionnaireIds,
   onConfirm
 }) => {
-  /***** STATE *****/
   const [bundle, setBundle] = useState<Bundle>({ entry: [] })
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState<string>('')
   const [checkedByQuestionnaire, setCheckedByQuestionnaire] = useState<Map<string, Set<string>>>(new Map())
   const [inputQuery, setInputQuery] = useState('')
   const deferredQuery = useDeferredValue(inputQuery)
 
-  /***** FETCH *****/
   const fetch = useCallback(async () => {
     try {
       const { data } = await apiFhir.get<Bundle>('/Questionnaire?status=active')
       setBundle(data)
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.error(e)
     }
   }, [])
@@ -201,7 +279,6 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
 
   const questionnairesIds = questionnaires.map((q) => q.id)
 
-  // ✅ Sélectionne automatiquement le premier questionnaire si aucun n'est choisi
   useEffect(() => {
     if (questionnaires.length > 0 && !selectedQuestionnaireId) {
       setSelectedQuestionnaireId(questionnaires[0].id)
@@ -236,7 +313,6 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
     return all
   }, [checkedByQuestionnaire, questionnaires])
 
-  /***** EFFECT : synchro initiale *****/
   const wasOpen = useRef(false)
 
   useEffect(() => {
@@ -245,14 +321,14 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
 
   useEffect(() => {
     const reopened = open && !wasOpen.current
-    wasOpen.current = open // maj la ref pour la prochaine fois
+    wasOpen.current = open
 
-    if (!reopened) return // rien à faire si on tape dans la modale déjà ouverte
+    if (!reopened) return
     if (bundle.entry.length === 0) return
 
     setCheckedByQuestionnaire(buildInitialChecked(bundle, selectedQuestions))
 
-    // si besoin, présélectionner le questionnaire qui contient la 1ʳᵉ question
+    // si besoin, présélectionner le questionnaire qui contient la premiere question
     if (selectedQuestions.length > 0) {
       const first = selectedQuestions[0].linkId
       const hostQ = bundle.entry.find((e) => collectLeaves(e.resource.item).some((l) => l.linkId === first))?.resource
@@ -261,7 +337,6 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
     }
   }, [open, bundle, selectedQuestions])
 
-  /***** HANDLERS *****/
   const handleQuestionnaireChange = (e: SelectChangeEvent<string>) => {
     setSelectedQuestionnaireId(e.target.value)
     setInputQuery('')
@@ -325,7 +400,6 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
     onClose()
   }
 
-  /***** RENDER *****/
   return (
     <Dialog open={open} maxWidth="md" fullWidth>
       <DialogTitle>
@@ -356,14 +430,12 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
           onChange={(e) => setInputQuery(e.target.value)}
         />
 
-        {/* Toggle all */}
         <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1 }}>
           <Button size="small" disabled={filteredLeaves.length === 0} onClick={handleToggleAll}>
             {allFilteredSelected ? 'Tout désélectionner' : 'Tout sélectionner'}
           </Button>
         </Stack>
 
-        {/* Liste des questions */}
         <List sx={{ maxHeight: 400, overflow: 'auto' }}>
           {filteredLeaves.map((q) => (
             <QuestionRow key={q.linkId} question={q} isChecked={currentChecked.has(q.linkId)} toggle={toggle} />

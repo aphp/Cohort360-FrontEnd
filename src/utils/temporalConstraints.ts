@@ -1,7 +1,28 @@
+/**
+ * @fileoverview Utility functions for temporal constraints and criteria group selection
+ * @module utils/temporalConstraints
+ */
+
 import { CriteriaGroup, CriteriaGroupType } from 'types'
 import { CriteriaType, SelectedCriteriaType } from 'types/requestCriterias'
 
-// function used to get AND groups that contain AT LEAST 2 criteria that are not of type IPP or Patient
+/**
+ * Filters criteria groups to get AND groups that contain at least 2 criteria that are not of type IPP or Patient
+ *
+ * @param selectedCriteria - Array of selected criteria to filter
+ * @param criteriaGroups - Array of criteria groups to process
+ * @param isEpisode - Whether to filter for episode-specific criteria (pregnancy/hospit)
+ * @returns Array of criteria groups that meet the selectable criteria requirements
+ *
+ * @example
+ * ```typescript
+ * const selectableGroups = getSelectableGroups(
+ *   selectedCriteria,
+ *   criteriaGroups,
+ *   false
+ * );
+ * ```
+ */
 export const getSelectableGroups = (
   selectedCriteria: SelectedCriteriaType[],
   criteriaGroups: CriteriaGroup[],

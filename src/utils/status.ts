@@ -1,7 +1,28 @@
+/**
+ * @fileoverview Utility functions for mapping job status to UI components
+ * @module utils/status
+ */
+
 import UpdateIcon from '@mui/icons-material/Update'
 import { ChipStatus } from 'components/ui/StatusChip'
 import { JobStatus } from 'types'
 
+/**
+ * Maps a job status to its corresponding UI representation with label, status, and optional tooltip
+ *
+ * @param status - The job status to map
+ * @param jobFailMessage - Optional failure message for error states
+ * @returns Object containing label, status, and optional icon/tooltip for UI display
+ *
+ * @example
+ * ```typescript
+ * mapJobStatus(JobStatus.FINISHED)
+ * // returns { label: 'Terminé', status: ChipStatus.FINISHED }
+ *
+ * mapJobStatus(JobStatus.FAILED, 'Network error')
+ * // returns { label: 'Erreur', status: ChipStatus.ERROR, tooltip: 'Network error' }
+ * ```
+ */
 export const mapJobStatus = (status?: JobStatus, jobFailMessage?: string) => {
   if (jobFailMessage) {
     return { label: 'Erreur', status: ChipStatus.ERROR, tooltip: jobFailMessage }

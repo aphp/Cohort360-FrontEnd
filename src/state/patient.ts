@@ -39,12 +39,9 @@ import {
 import { Direction, Order, PMSIFilters } from 'types/searchCriterias'
 import { isCustomError } from 'utils/perimeters'
 import { ResourceType } from 'types/requestCriterias'
-import { getCategory, getExtension } from 'utils/fhir'
+import { getCategory } from 'utils/fhir'
 import { getConfig } from 'config'
 import { fetchClaimList, fetchConditionList, fetchProcedureList } from 'services/aphp/servicePmsi'
-import { fetchClaim } from 'services/aphp/callApi'
-//import { fetchPMSIList } from 'services/aphp/serviceExploration'
-//import { ResourceOptions } from 'types/exploration'
 
 export type Medication = {
   administration?: IPatientMedication<MedicationAdministration>
@@ -118,7 +115,7 @@ const fetchAllProcedures = createAsyncThunk<FetchAllProceduresReturn, FetchAllPr
       ])
 
       let procedureList: Procedure[] = procedureResponses
-        ? linkElementWithEncounter(procedureResponses as Procedure[], hospits, deidentified)
+        ? linkElementWithEncounter(procedureResponses, hospits, deidentified)
         : []
 
       procedureList = patientState?.pmsi?.procedure?.list
@@ -128,7 +125,7 @@ const fetchAllProcedures = createAsyncThunk<FetchAllProceduresReturn, FetchAllPr
       procedureCount = procedureList.length
 
       let conditionList: Condition[] = conditionResponses
-        ? linkElementWithEncounter(conditionResponses as Condition[], hospits, deidentified)
+        ? linkElementWithEncounter(conditionResponses, hospits, deidentified)
         : []
       conditionList = patientState?.pmsi?.condition?.list
         ? // eslint-disable-next-line no-unsafe-optional-chaining
@@ -214,8 +211,8 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
 
       return {
         patientInfo: {
-          lastGhm: claimList ? (claimList[0] as Claim) : undefined,
-          lastProcedure: procedureList ? (procedureList[0] as Procedure) : undefined,
+          lastGhm: claimList ? claimList[0] : undefined,
+          lastProcedure: procedureList ? procedureList[0] : undefined,
           mainDiagnosis: conditionList.filter(
             (condition) =>
               getCategory(condition, getConfig().features.condition.valueSets.conditionStatus.url)?.coding?.[0].code ===
@@ -356,11 +353,9 @@ const patientSlice = createSlice({
         : {
             ...state,
             loading: true,
-            patientInfo: state.patientInfo
-              ? state.patientInfo
-              : {
-                  resourceType: ResourceType.PATIENT
-                }
+            patientInfo: state.patientInfo ?? {
+              resourceType: ResourceType.PATIENT
+            }
           }
     )
     builder.addCase(fetchPatientInfo.fulfilled, (state, action) =>
@@ -593,7 +588,7 @@ export function linkElementWithEncounter<
     let encounterId = ''
     switch (entry.resourceType) {
       case ResourceType.CLAIM:
-        encounterId = (entry as Claim).item?.[0].encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
+        encounterId = entry.item?.[0].encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
         break
       case ResourceType.PROCEDURE:
       case ResourceType.CONDITION:
@@ -604,16 +599,16 @@ export function linkElementWithEncounter<
         encounterId = entry.encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
       case ResourceType.DOCUMENTS:
-        encounterId = (entry as DocumentReference).context?.encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
+        encounterId = entry.context?.encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
         break
       case ResourceType.MEDICATION_ADMINISTRATION:
-        encounterId = (entry as MedicationAdministration).context?.reference?.replace(/^Encounter\//, '') ?? ''
+        encounterId = entry.context?.reference?.replace(/^Encounter\//, '') ?? ''
         break
     }
 
-    const foundEncounter = encounterList.find(({ id }) => id === encounterId) || null
+    const foundEncounter = encounterList.find(({ id }) => id === encounterId) ?? null
     const foundEncounterWithDetails =
-      encounterList.find(({ details }) => details?.find(({ id }) => id === encounterId)) || null
+      encounterList.find(({ details }) => details?.find(({ id }) => id === encounterId)) ?? null
 
     newElement = fillElementInformation(
       deidentifiedBoolean,

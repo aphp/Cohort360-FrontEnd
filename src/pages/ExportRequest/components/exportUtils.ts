@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Utility functions for export operations.
+ * This module contains helper functions for fetching resource counts,
+ * mapping table names to resource types, and sorting export tables.
+ */
+
 import { mapRequestParamsToSearchCriteria } from 'mappers/filters'
 import moment from 'moment'
 import {
@@ -25,6 +31,13 @@ import {
 } from 'types/searchCriterias'
 import { substructAgeString } from 'utils/age'
 
+/**
+ * Fetches the count of patients in a cohort with optional filtering.
+ *
+ * @param {string} cohortId - The cohort identifier
+ * @param {SearchCriterias<PatientsFilters>} [patientsFilters] - Optional patient filters
+ * @returns {Promise<number>} Number of matching patients
+ */
 const fetchPatientCount = async (cohortId: string, patientsFilters?: SearchCriterias<PatientsFilters>) => {
   try {
     let patientsResp
@@ -296,6 +309,15 @@ const fetchObservationCount = async (cohortId: string, observationFilters?: Sear
   }
 }
 
+/**
+ * Fetches the count of resources for a specific resource type in a cohort.
+ * Maps the resource type to the appropriate fetch function and applies filters.
+ *
+ * @param {string} cohortId - The cohort identifier
+ * @param {ResourceType} resourceType - Type of FHIR resource to count
+ * @param {any} [fhirFilter] - Optional FHIR filters to apply
+ * @returns {Promise<number>} Number of matching resources
+ */
 export const fetchResourceCount2 = async (cohortId: string, resourceType: ResourceType, fhirFilter?: any) => {
   try {
     const filters = await mapRequestParamsToSearchCriteria(fhirFilter?.filter ?? '', resourceType)
@@ -324,6 +346,12 @@ export const fetchResourceCount2 = async (cohortId: string, resourceType: Resour
   }
 }
 
+/**
+ * Maps a table name to its corresponding FHIR resource type.
+ *
+ * @param {string} tableName - Name of the database table
+ * @returns {ResourceType} Corresponding FHIR resource type
+ */
 export const getResourceType = (tableName: string): ResourceType => {
   const resourceType = {
     imaging_study: ResourceType.IMAGING,
@@ -347,6 +375,12 @@ export const getResourceType = (tableName: string): ResourceType => {
   return resourceType ?? ResourceType.UNKNOWN
 }
 
+/**
+ * Gets the human-readable label for a table name.
+ *
+ * @param {string} tableName - Name of the database table
+ * @returns {string} Functionnal-readable table label
+ */
 export const getExportTableLabel = (tableName: string) => {
   const tableLabel = {
     imaging_study: 'Fait - Imagerie - Étude',
@@ -369,6 +403,12 @@ export const getExportTableLabel = (tableName: string) => {
   return tableLabel ?? '-'
 }
 
+/**
+ * Sorts an array of table information, placing the 'person' table first.
+ *
+ * @param {TableInfo[]} tables - Array of table information objects
+ * @returns {TableInfo[]} Sorted array with 'person' table first
+ */
 export const sortTables = (tables: TableInfo[]): TableInfo[] => {
   return tables.sort((a, b) => {
     if (a.name === 'person') return -1
