@@ -6,6 +6,7 @@ import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
 
 import { QuerySnapshotInfo, CurrentSnapshot, JobStatus } from 'types'
 import { displayVersionsCount } from 'utils/numbers'
+import { plural } from 'utils/plural'
 import { getVersionName } from 'utils/versions'
 import useStyles from './styles'
 
@@ -55,9 +56,9 @@ const VersionItem: React.FC<VersionItemProps> = ({ version, currentSnapshot, onS
 
       {hasCohorts && (
         <Tooltip
-          title={`${version.cohorts_count} cohorte${
-            version.cohorts_count > 1 ? 's' : ''
-          } ont été créées à partir de cette version.`}
+          title={`${version.cohorts_count} cohorte${plural(
+            version.cohorts_count
+          )} ont été créées à partir de cette version.`}
         >
           <SupervisedUserCircleIcon className={classes.cohortIcon} />
         </Tooltip>

@@ -28,6 +28,7 @@ import {
 import GenderIcon from '../GenderIcon'
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
 import { GenderStatus } from 'types/searchCriterias'
+import { plural } from 'utils/plural'
 import SearchIcon from 'assets/icones/search.svg?react'
 import { Comment, KeyboardArrowUp, KeyboardArrowDown, Visibility } from '@mui/icons-material'
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
@@ -165,9 +166,9 @@ const TableRow = ({ row, sx }: RowProps) => {
                 })()}
               {cell.type === CellType.HAS_COHORTS && (cell.value as number) > 1 && (
                 <Tooltip
-                  title={`${cell.value} cohorte${
-                    (cell.value as number) > 1 ? 's' : ''
-                  } ont été créées à partir de cette version.`}
+                  title={`${cell.value} cohorte${plural(
+                    cell.value as number
+                  )} ont été créées à partir de cette version.`}
                 >
                   <SupervisedUserCircleIcon fontSize="small" sx={{ color: '#f7a600b3' }} />
                 </Tooltip>

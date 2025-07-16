@@ -9,6 +9,7 @@ import FolderIcon from 'assets/icones/folder.svg?react'
 import OpenedFolderIcon from 'assets/icones/openedfolder.svg?react'
 
 import { formatDate } from 'utils/formatDate'
+import { plural } from 'utils/plural'
 import { ProjectTitle, StyledCard } from './style'
 
 type ProjectCardProps = {
@@ -67,7 +68,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         <Typography variant="h3" align="center" fontWeight={600}>
           {requestNumber}
         </Typography>
-        <Typography color={'#6d6d6d'}>requête{requestNumber > 1 ? 's' : ''}</Typography>
+        <Typography color={'#6d6d6d'}>requête{plural(requestNumber)}</Typography>
       </Box>
     </StyledCard>
   )

@@ -3,6 +3,8 @@
  * @module utils/numbers
  */
 
+import { plural } from './plural'
+
 /**
  * Formats a number with space as thousand separator, or returns '-' for null/undefined values
  *
@@ -37,6 +39,6 @@ export const displayCount = (criteriaCount: number, bigIntAllowed = false) => {
 
 export const displayVersionsCount = (criteriaCount?: number | null) => {
   return criteriaCount !== undefined && criteriaCount !== null
-    ? `${displayCount(criteriaCount, true)} patient${criteriaCount > 1 ? 's' : ''}`
+    ? `${displayCount(criteriaCount, true)} patient${plural(criteriaCount)}`
     : '-'
 }
