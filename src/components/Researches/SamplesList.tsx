@@ -133,7 +133,7 @@ const SamplesList = () => {
                     )}
                     title={
                       getExportTooltip(
-                        !!(appConfig.features.export.enabled ? parentCohort?.rights?.export_csv_nomi : false),
+                        !!(appConfig.features.export.enabled ? parentCohort?.rights?.export_csv_xlsx_nomi : false),
                         parentCohort as Cohort
                       ) ?? ''
                     }

@@ -727,10 +727,7 @@ export type ReadRightPerimeter = {
 }
 
 export type GroupRights = {
-  export_csv_nomi?: boolean
-  export_csv_pseudo?: boolean
-  export_jupyter_nomi?: boolean
-  export_jupyter_pseudo?: boolean
+  export_csv_xlsx_nomi?: boolean
   read_patient_nomi?: boolean
   read_patient_pseudo?: boolean
 }
@@ -739,12 +736,6 @@ export type DataRights = {
   user_id: string
   perimeter_id: number
   right_read_patient_nominative: boolean
-  right_read_patient_pseudonymized: boolean
-  right_export_csv_nominative: boolean
-  right_export_csv_pseudonymized: boolean
-  right_export_jupyter_nominative: boolean
-  right_export_jupyter_pseudonymized: boolean
-  right_search_opposed_patients: boolean
   right_search_patients_by_ipp: boolean
 }
 
