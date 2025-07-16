@@ -161,7 +161,7 @@ const fetchExploredCohortInBackground = createAsyncThunk<
               throw new Error("You don't have any rights on this cohort")
             } else {
               cohort.canMakeExport = !!appConfig.features.export.enabled
-                ? cohortRights?.[0]?.rights?.export_csv_nomi
+                ? cohortRights?.[0]?.rights?.export_csv_xlsx_nomi
                 : false
 
               cohort.deidentifiedBoolean = cohortRights?.[0]?.rights?.read_patient_pseudo

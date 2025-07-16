@@ -104,7 +104,7 @@ export const redirectOnParentCohortDeletion = (parentRequestId?: string, parentF
 }
 
 export const isCohortExportable = (cohort: Cohort, appConfig: AppConfig) => {
-  return appConfig.features.export.enabled ? !!cohort?.rights?.export_csv_nomi : false
+  return appConfig.features.export.enabled ? !!cohort?.rights?.export_csv_xlsx_nomi : false
 }
 
 export const isExportDisabled = (cohort: Cohort, maintenanceIsActive: boolean, isExportable: boolean) => {
