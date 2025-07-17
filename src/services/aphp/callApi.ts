@@ -387,7 +387,7 @@ export const postFilters = async (
     filter,
     identifying
   })
-  if (res instanceof AxiosError) throw "Le filtre n'a pas pu être sauvegardé."
+  if (res instanceof AxiosError) throw { status: res.status }
   return res
 }
 
@@ -430,7 +430,7 @@ export const patchFilters = async (
     name,
     filter
   })
-  if (res instanceof AxiosError) throw "Le filtre n'a pas pu être modifié."
+  if (res instanceof AxiosError) throw { status: res.status }
   return res
 }
 
@@ -749,7 +749,8 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (minDate) options = [...options, `${ObservationParamsKeys.DATE}=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `${ObservationParamsKeys.DATE}=le${maxDate}`] // eslint-disable-line
-  if (appConfig.features.observation.useObservationDefaultValidated && rowStatus) options = [...options, `${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`] // eslint-disable-line
+  if (appConfig.features.observation.useObservationDefaultValidated && rowStatus)
+    options = [...options, `${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `${ObservationParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
   if (encounterStatus && encounterStatus.length > 0)
