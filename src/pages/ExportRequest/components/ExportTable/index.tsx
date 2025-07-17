@@ -28,6 +28,7 @@ import CustomAlert from 'components/ui/Alert'
 import useStyles from '../../styles'
 import { getResourceType, getExportTableLabel, fetchResourceCount2 } from 'pages/ExportRequest/components/exportUtils'
 import { ResourceType } from 'types/requestCriterias'
+import { plural } from 'utils/plural'
 import { getProviderFilters } from 'services/aphp/serviceFilters'
 import { useAppSelector } from 'state'
 import { AppConfig } from 'config'
@@ -256,7 +257,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
                   fontSize={12}
                   color={tableSetting?.isChecked ? '#153D8A' : '#888'}
                 >
-                  {count} ligne{count && count > 1 ? 's' : ''}
+                  {count} ligne{count && plural(count)}
                 </Typography>
               )}
             </>
