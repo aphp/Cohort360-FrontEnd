@@ -620,6 +620,7 @@ const addRequestToCohortCreation = createAsyncThunk<
  * - Count management and status
  *
  * Actions:
+ * - editSnapshotHistory: Updates a specific snapshot in the snapshots history
  * - resetCohortCreation: Resets to initial state
  * - setCohortName: Sets the cohort name
  * - setPopulationSource: Sets the selected population
@@ -649,6 +650,12 @@ const cohortCreationSlice = createSlice({
   name: 'cohortCreation',
   initialState: defaultInitialState(),
   reducers: {
+    /**
+     * Updates a specific snapshot in the snapshots history.
+     *
+     * @param state - Current cohort creation state
+     * @param action - Action containing the updated snapshot information
+     */
     editSnapshotHistory: (state: CohortCreationState, action: PayloadAction<QuerySnapshotInfo>) => {
       const updatedVersion = action.payload
       const updatedVersions = [...state.snapshotsHistory].map((version) =>
@@ -672,7 +679,6 @@ const cohortCreationSlice = createSlice({
     setCohortName: (state: CohortCreationState, action: PayloadAction<string>) => {
       state.cohortName = action.payload
     },
-    //
     /**
      * Sets the population source/scope for the cohort.
      *
@@ -694,7 +700,6 @@ const cohortCreationSlice = createSlice({
     setSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType[]>) => {
       state.selectedCriteria = action.payload
     },
-    //
     /**
      * Deletes a selected criteria and updates all dependent structures.
      * Handles ID remapping, group assignments, and temporal constraints cleanup.
