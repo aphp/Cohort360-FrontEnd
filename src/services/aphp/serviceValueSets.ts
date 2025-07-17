@@ -150,6 +150,8 @@ export const fetchCodeSystem = async (codeSystem: string, signal?: AbortSignal):
  * Fetch the partial hierarchy from a certain node with a specific code value
  * the subItems won't have their subItems, childrenIds, and parentIds initialized
  * You must then call getFhirCode on subItems to expand the hierarchy
+ * For large code arrays (> config.core.maxParallelCodeSearchExpandCount), calls are batched
+ * to prevent API limits and improve performance
  * @param codeSystem the code system from which belongs the code
  * @param codes the codes to get the partial hierarchy from
  * @param signal the abort signal to cancel the request
@@ -166,6 +168,46 @@ export const getChildrenFromCodes = async (
       count: 0
     }
   }
+
+  const maxBatchSize = getConfig().core.maxParallelCodeSearchExpandCount
+
+  if (codes.length <= maxBatchSize) {
+    return await getChildrenFromCodesBatch(codeSystem, codes, signal)
+  }
+
+  const batches: string[][] = []
+  for (let i = 0; i < codes.length; i += maxBatchSize) {
+    batches.push(codes.slice(i, i + maxBatchSize))
+  }
+
+  const batchPromises = batches.map((batch) => getChildrenFromCodesBatch(codeSystem, batch, signal))
+
+  const batchResults = await Promise.all(batchPromises)
+
+  const combinedResults = batchResults.reduce(
+    (acc, batch) => {
+      acc.results.push(...batch.results)
+      acc.count += batch.count
+      return acc
+    },
+    { results: [] as Hierarchy<FhirItem>[], count: 0 }
+  )
+
+  return combinedResults
+}
+
+/**
+ * Internal helper function to process a batch of codes for hierarchy expansion
+ * @param codeSystem the code system from which belongs the code
+ * @param codes the codes to get the partial hierarchy from (should be <= maxParallelCodeSearchExpandCount)
+ * @param signal the abort signal to cancel the request
+ * @returns the partial hierarchy from the code batch
+ */
+const getChildrenFromCodesBatch = async (
+  codeSystem: string,
+  codes: string[],
+  signal?: AbortSignal
+): Promise<Back_API_Response<Hierarchy<FhirItem>>> => {
   const json = {
     resourceType: 'Parameters',
     parameter: [
