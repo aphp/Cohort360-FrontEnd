@@ -137,6 +137,7 @@ export type AppConfig = {
     codeSystems: {
       docStatus: string
     }
+    maxParallelCodeSearchExpandCount: number
     valueSets: {
       demographicGender: ValueSetConfig
       encounterAdmission: ValueSetConfig
@@ -194,6 +195,7 @@ let config: AppConfig = {
     codeSystems: {
       docStatus: 'http://hl7.org/fhir/CodeSystem/composition-status'
     },
+    maxParallelCodeSearchExpandCount: 200,
     valueSets: {
       demographicGender: { url: '' },
       encounterAdmission: { url: '' },
