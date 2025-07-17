@@ -1,3 +1,4 @@
+import { getConfig } from 'config'
 import { mapRequestParamsToSearchCriteria } from 'mappers/filters'
 import { useEffect, useState } from 'react'
 import {
@@ -53,10 +54,16 @@ export const useSavedFilters = (type: ResourceType) => {
       await postFiltersService(type, name, searchCriterias, deidentified)
       setFetchStatus({ status: FetchStatus.SUCCESS, message: 'Le filtre a bien été enregistré.' })
       await getSavedFilters()
-    } catch {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       setFetchStatus({
         status: FetchStatus.ERROR,
-        message: "Erreur lors de l'enregistrement du filtre. Vérifiez que le nom n'existe pas déjà."
+        message:
+          error.status === 400
+            ? "Erreur lors de l'enregistrement du filtre. Le nom doit être unique."
+            : `L'enregistrement du filtre a echoué. Veuillez réessayer ultérieurement. Si le problème persiste, veuillez contacter le support: ${
+                getConfig().system.mailSupport
+              }.`
       })
     }
   }

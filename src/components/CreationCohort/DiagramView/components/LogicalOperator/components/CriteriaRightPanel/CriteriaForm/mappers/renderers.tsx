@@ -3,7 +3,6 @@ import { CriteriaFormItemView, CriteriaFormItemType } from '../types'
 import { renderLabel } from '../components'
 import CalendarRange from 'components/ui/Inputs/CalendarRange'
 import {
-  Alert,
   Autocomplete,
   Checkbox,
   FormControlLabel,

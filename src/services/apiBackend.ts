@@ -35,10 +35,7 @@ apiBackend.interceptors.response.use(
   },
   function (error) {
     if (error.response) {
-      if (
-        (error.response.status === 401 || error.response.status === 400 || error.response.status === 403) &&
-        window.location.pathname !== '/'
-      ) {
+      if ((error.response.status === 401 || error.response.status === 403) && window.location.pathname !== '/') {
         localStorage.clear()
         window.location.assign('/')
       }
