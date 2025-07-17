@@ -671,7 +671,7 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
     options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer, '')}`]
 
   if (!subject && _list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer, '')}`] // eslint-disable-line
-  if (hasSearchParam(ResourceType.PROCEDURE, ConditionParamsKeys.DIAGNOSTIC_TYPES) && type && type.length > 0) {
+  if (hasSearchParam(ResourceType.CONDITION, ConditionParamsKeys.DIAGNOSTIC_TYPES) && type && type.length > 0) {
     const diagnosticTypesUrl = appConfig.features.condition.valueSets.conditionStatus.url + '|'
     const urlString = type.map((id) => diagnosticTypesUrl + id).join(',')
     options = [...options, `${ConditionParamsKeys.DIAGNOSTIC_TYPES}=${encodeURIComponent(urlString)}`]
@@ -749,7 +749,8 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (minDate) options = [...options, `${ObservationParamsKeys.DATE}=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `${ObservationParamsKeys.DATE}=le${maxDate}`] // eslint-disable-line
-  if (appConfig.features.observation.useObservationDefaultValidated && rowStatus) options = [...options, `${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`] // eslint-disable-line
+  if (appConfig.features.observation.useObservationDefaultValidated && rowStatus)
+    options = [...options, `${ObservationParamsKeys.VALIDATED_STATUS}=${BiologyStatus.VALIDATED}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0)
     options = [...options, `${ObservationParamsKeys.EXECUTIVE_UNITS}=${executiveUnits}`]
   if (encounterStatus && encounterStatus.length > 0)
