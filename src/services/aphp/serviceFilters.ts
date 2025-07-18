@@ -32,9 +32,7 @@ export const postFiltersService = async (
 
   // in pseudo mode, users do not get to interact with identifying fields, so not possible to save
   // an identifying filter. Only check in case of nomi mode
-  if (!deidentified) {
-    identifying = isIdentifyingFilter(criteriasString)
-  }
+  if (!deidentified) identifying = isIdentifyingFilter(criteriasString)
 
   const response = await postFilters(fhir_resource, name, criteriasString, identifying)
   if (response.status < 200 || response.status >= 300) throw new Error()
