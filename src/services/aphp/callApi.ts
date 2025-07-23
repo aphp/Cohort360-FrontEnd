@@ -57,12 +57,10 @@ import {
   PatientsParamsKeys,
   PrescriptionParamsKeys,
   ProcedureParamsKeys,
-  QuestionnaireResponseParamsKeys
+  QuestionnaireResponseParamsKeys,
+  ResourceType
 } from 'types/requestCriterias'
-import { ResourceType } from 'types/requestCriterias'
 import { getConfig } from 'config'
-import { form } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/HospitForm'
-import { none } from 'ramda'
 
 const paramValuesReducer = (accumulator: string, currentValue: string): string =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -1026,7 +1024,7 @@ export const fetchForms = async (args: fetchFormsProps) => {
   const config = getConfig()
   const formNames = formName || config.features.questionnaires.defaultFilterFormNames?.join(',')
 
-  let options: string[] = ['status=in-progress,completed']
+  let options: string[] = ['subject.active=true&status=in-progress,completed']
   if (patient) options = [...options, `subject=${patient}`]
   if (formNames) options = [...options, `${QuestionnaireResponseParamsKeys.NAME}=${formNames}`]
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer, '')}`]

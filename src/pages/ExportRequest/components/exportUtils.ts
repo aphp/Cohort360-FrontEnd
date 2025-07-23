@@ -1,3 +1,4 @@
+import { getConfig } from 'config'
 import { mapRequestParamsToSearchCriteria } from 'mappers/filters'
 import moment from 'moment'
 import {
@@ -9,7 +10,8 @@ import {
   fetchMedicationRequest,
   fetchObservation,
   fetchPatient,
-  fetchProcedure
+  fetchProcedure,
+  fetchForms
 } from 'services/aphp/callApi'
 import { TableInfo } from 'types/export'
 import { ResourceType } from 'types/requestCriterias'
@@ -24,6 +26,7 @@ import {
   VitalStatus
 } from 'types/searchCriterias'
 import { substructAgeString } from 'utils/age'
+import { getApiResponseResourceOrThrow } from 'utils/apiHelpers'
 
 const fetchPatientCount = async (cohortId: string, patientsFilters?: SearchCriterias<PatientsFilters>) => {
   try {
@@ -305,6 +308,31 @@ const fetchObservationCount = async (cohortId: string, observationFilters?: Sear
   }
 }
 
+const fetchQuestionnaireResponseCount = async (cohortId: string) => {
+  try {
+    const res = await fetchForms({ size: 0, _list: [cohortId] })
+    return getApiResponseResourceOrThrow(res).total
+  } catch (error) {
+    console.error('Erreur lors de fetchQuestionnaireResponseCount', error)
+    throw error
+  }
+}
+
+export const fetchQuestionnaireResponseCountDetails = async (cohortId: string) => {
+  try {
+    const count = await Promise.all(
+      (getConfig().features.questionnaires.defaultFilterFormNames ?? []).map(async (formName) => {
+        const res = await fetchForms({ size: 0, _list: [cohortId], formName })
+        return getApiResponseResourceOrThrow(res).total
+      })
+    )
+    return count
+  } catch (error) {
+    console.error('Erreur lors de fetchQuestionnaireResponseCount', error)
+    throw error
+  }
+}
+
 export const fetchResourceCount2 = async (cohortId: string, resourceType: ResourceType, fhirFilter?: any) => {
   try {
     const filters = await mapRequestParamsToSearchCriteria(fhirFilter?.filter ?? '', resourceType)
@@ -321,7 +349,8 @@ export const fetchResourceCount2 = async (cohortId: string, resourceType: Resour
       [ResourceType.MEDICATION_ADMINISTRATION]: (cohortId: string, filters: any) =>
         fetchMedicationCount(cohortId, ResourceType.MEDICATION_ADMINISTRATION, filters),
       [ResourceType.OBSERVATION]: fetchObservationCount,
-      [ResourceType.IMAGING]: fetchImagingCount
+      [ResourceType.IMAGING]: fetchImagingCount,
+      [ResourceType.QUESTIONNAIRE_RESPONSE]: fetchQuestionnaireResponseCount
     }
 
     const fetcher = fetchers[resourceType as keyof typeof fetchers]
@@ -351,7 +380,7 @@ export const getResourceType = (tableName: string): ResourceType => {
     cost: ResourceType.CLAIM,
     procedure_occurrence: ResourceType.PROCEDURE,
     drug_exposure_prescription: ResourceType.MEDICATION_REQUEST,
-    questionnaireresponse: ResourceType.UNKNOWN
+    QuestionnaireResponse: ResourceType.QUESTIONNAIRE_RESPONSE
   }[tableName]
 
   return resourceType ?? ResourceType.UNKNOWN

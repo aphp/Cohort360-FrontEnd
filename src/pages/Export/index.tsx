@@ -141,14 +141,6 @@ const Export: React.FC = () => {
   }, [search])
 
   useEffect(() => {
-    if (deidentified) {
-      navigate('/home')
-    } else {
-      _fetchExportList()
-    }
-  }, [_fetchExportList, orderBy, deidentified, navigate])
-
-  useEffect(() => {
     setSearchParams(cleanSearchParams({ page: page.toString() }))
     handlePageError(page, setPage, dispatch, setLoadingStatus)
   }, [page, dispatch, setSearchParams])
@@ -156,11 +148,10 @@ const Export: React.FC = () => {
   useEffect(() => {
     if (deidentified) {
       navigate('/home')
-    } else {
-      if (loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) {
-        controllerRef.current = cancelPendingRequest(controllerRef.current)
-        _fetchExportList()
-      }
+    }
+    if (loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) {
+      controllerRef.current = cancelPendingRequest(controllerRef.current)
+      _fetchExportList()
     }
   }, [_fetchExportList, loadingStatus, orderBy, deidentified, navigate])
 
