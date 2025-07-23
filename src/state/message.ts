@@ -26,7 +26,7 @@ const setMessageSlice = createSlice({
       return null
     },
     setMessage: (state: MessageState, action: PayloadAction<MessageState>) => {
-      if (!action || !action?.payload) return null
+      if (!action?.payload) return null
       return {
         type: action.payload.type ?? state?.type ?? 'info',
         content: action.payload.content ?? ''

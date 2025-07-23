@@ -59,11 +59,10 @@ import {
   PatientsParamsKeys,
   PrescriptionParamsKeys,
   ProcedureParamsKeys,
-  QuestionnaireResponseParamsKeys
+  QuestionnaireResponseParamsKeys,
+  ResourceType
 } from 'types/requestCriterias'
-import { ResourceType } from 'types/requestCriterias'
 import { getConfig } from 'config'
-import { form } from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/forms/HospitForm'
 import { hasSearchParam } from './serviceFhirConfig'
 
 const paramValuesReducer = (accumulator: string, currentValue: string): string =>
@@ -1060,7 +1059,7 @@ export const fetchForms = async (args: fetchFormsProps) => {
   const config = getConfig()
   const formNames = formName || config.features.questionnaires.defaultFilterFormNames?.join(',')
 
-  let options: string[] = ['status=in-progress,completed']
+  let options: string[] = ['subject.active=true&status=in-progress,completed']
   if (appConfig.core.fhir.totalCount) options = [...options, '_total=accurate']
   if (patient) options = [...options, `subject=${patient}`]
   if (formNames) options = [...options, `${QuestionnaireResponseParamsKeys.NAME}=${formNames}`]

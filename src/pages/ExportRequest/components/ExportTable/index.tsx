@@ -26,10 +26,16 @@ import SearchOutlined from '@mui/icons-material/SearchOutlined'
 import Chip from 'components/ui/Chip'
 import CustomAlert from 'components/ui/Alert'
 import useStyles from '../../styles'
-import { getResourceType, getExportTableLabel, fetchResourceCount2 } from 'pages/ExportRequest/components/exportUtils'
+import {
+  getResourceType,
+  getExportTableLabel,
+  fetchResourceCount2,
+  fetchQuestionnaireResponseCountDetails
+} from 'pages/ExportRequest/components/exportUtils'
 import { ResourceType } from 'types/requestCriterias'
 import { getProviderFilters } from 'services/aphp/serviceFilters'
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
+import { showDialog, hideDialog } from 'state/warningDialog'
 import { AppConfig } from 'config'
 
 import { Cohort } from 'types'
@@ -96,11 +102,13 @@ const ExportTable: React.FC<ExportTableProps> = ({
   exportTypeFile,
   oneFile
 }) => {
+  const dispatch = useAppDispatch()
   const userId = useAppSelector((state) => state.me?.id)
   const { classes } = useStyles()
   const [filters, setFilters] = useState<any[]>([])
   const [count, setCount] = useState<number | null>(null)
   const [countLoading, setCountLoading] = useState<boolean>(false)
+  const [countDetail, setCountDetail] = useState<(number | undefined)[]>([])
   const cohortId = exportCohort?.group_id
   const exportColumns = exportTable.columns || []
   const tableSetting = exportTableSettings
@@ -121,14 +129,28 @@ const ExportTable: React.FC<ExportTableProps> = ({
     return table
   }
 
+  const onSelectedQuestionsChange = (questions: QuestionLeaf[], questionnaireId: string[]) => {
+    setSelectedQuestions(questions)
+    setSelectedQuestionnaireIds(questionnaireId)
+  }
+
+  const onDisableSelectedTable = () => {
+    if (exportTable.name === 'person') return true
+    if (count === 0) return true
+    if (oneFile && !isCompatibleTable(exportTable.name)) return true
+    return false
+  }
+
   const handleOpen = () => {
     setIsQuestionChoiceOpen(true)
     setIsExtended(false)
   }
+  const handleQuestionChoiceOpen = (isOpen: boolean) => {
+    setIsQuestionChoiceOpen(!isOpen)
+  }
 
-  const onSelectedQuestionsChange = (questions: QuestionLeaf[], questionnaireId: string[]) => {
-    setSelectedQuestions(questions)
-    setSelectedQuestionnaireIds(questionnaireId)
+  const handleDeleteSelectedQuestions = (newSelectedQuestions: QuestionLeaf[]) => {
+    setSelectedQuestions(newSelectedQuestions)
   }
 
   const getFilterList = useCallback(async () => {
@@ -155,6 +177,15 @@ const ExportTable: React.FC<ExportTableProps> = ({
     }
   }, [cohortId, exportTableResourceType, tableSetting?.fhirFilter])
 
+  const getQuestionnaireResponseCountDetails = useCallback(async () => {
+    try {
+      const countDetail = (await fetchQuestionnaireResponseCountDetails(cohortId ?? '')) ?? []
+      setCountDetail(countDetail)
+    } catch (error) {
+      console.error('Erreur lors de la récupération du nombre de réponses aux questionnaires', error)
+    }
+  }, [cohortId])
+
   useEffect(() => {
     if (exportTableResourceType !== ResourceType.UNKNOWN) {
       getFilterList()
@@ -176,16 +207,9 @@ const ExportTable: React.FC<ExportTableProps> = ({
   useEffect(() => {
     if (ResourceType.UNKNOWN !== exportTableResourceType && cohortId) {
       getFilterCount()
+      getQuestionnaireResponseCountDetails()
     }
-  }, [exportTableResourceType, getFilterCount, cohortId])
-
-  const handleQuestionChoiceOpen = (isOpen: boolean) => {
-    setIsQuestionChoiceOpen(!isOpen)
-  }
-
-  const handleDeleteSelectedQuestions = (newSelectedQuestions: QuestionLeaf[]) => {
-    setSelectedQuestions(newSelectedQuestions)
-  }
+  }, [exportTableResourceType, getFilterCount, getQuestionnaireResponseCountDetails, cohortId])
 
   useEffect(() => {
     if (checkedPivotMerge) {
@@ -212,6 +236,26 @@ const ExportTable: React.FC<ExportTableProps> = ({
     selectedQuestions,
     defaultQuestionnaireIds
   ])
+
+  useEffect(() => {
+    if (oneFile && exportTable.name === ResourceType.QUESTIONNAIRE_RESPONSE && checkedTable === true) {
+      dispatch(
+        showDialog({
+          isOpen: true,
+          message:
+            "Il n'est pas possible de réunir les tables en un seul fichier car l'un des formulaire est vide. Veuillez exporter les tables séparément. Si vous souhaitez tout de même exporter des tables en un seul fichier, veuillez choisir d'autres tables.",
+          status: 'warning',
+          onConfirm: () => {
+            removeTableSetting(exportTable.name)
+            setSelectedQuestions([])
+            setCheckedPivotMerge(false)
+            // oneFileSetter(false)
+            dispatch(hideDialog())
+          }
+        })
+      )
+    }
+  }, [exportTableResourceType === ResourceType.QUESTIONNAIRE_RESPONSE && checkedTable === true && oneFile])
 
   return (
     <Grid container className={classes.exportTableGrid} id={exportTable.name}>
@@ -256,7 +300,9 @@ const ExportTable: React.FC<ExportTableProps> = ({
                   fontSize={12}
                   color={tableSetting?.isChecked ? '#153D8A' : '#888'}
                 >
-                  {count} ligne{count && count > 1 ? 's' : ''}
+                  {`${count} ${
+                    exportTableResourceType !== ResourceType.QUESTIONNAIRE_RESPONSE ? 'ligne' : 'Formulaire'
+                  }${count && count > 1 ? 's' : ''}`}
                 </Typography>
               )}
             </>
@@ -266,11 +312,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
         <Grid container item xs={2} justifyContent={'end'}>
           <Checkbox
             id={tableSetting?.tableName + '_selectTable'}
-            disabled={
-              oneFile
-                ? !isCompatibleTable(exportTable.name) || exportTable.name === 'person'
-                : exportTable.name === 'person'
-            }
+            disabled={onDisableSelectedTable()}
             color="secondary"
             checked={checkedTable}
             onChange={(_, val) => {
@@ -382,28 +424,29 @@ const ExportTable: React.FC<ExportTableProps> = ({
         )}
 
         <Grid container xs={6} alignItems="center" id={tableSetting?.tableName + 'ResourceFilters'}>
-          {exportTableResourceType !== ResourceType.UNKNOWN && (
-            <>
-              <Typography marginLeft={'75px'} marginRight={'5px'} className={classes.textBody2}>
-                Filtrer cette table :
-              </Typography>
-              <Autocomplete
-                className={classes.autocomplete}
-                size="small"
-                disabled={checkedTable === false}
-                options={filters}
-                noOptionsText="Aucun filtre disponible"
-                getOptionLabel={(option) => {
-                  return `${option.name}`
-                }}
-                renderInput={(params) => <TextField {...params} label="Sélectionnez un filtre" />}
-                value={tableSetting?.fhirFilter}
-                onChange={(_, value) => {
-                  onChangeTableSettings([{ tableName: exportTable.name, key: 'fhirFilter', value }])
-                }}
-              />
-            </>
-          )}
+          {exportTableResourceType !== ResourceType.UNKNOWN &&
+            exportTableResourceType !== ResourceType.QUESTIONNAIRE_RESPONSE && (
+              <>
+                <Typography marginLeft={'75px'} marginRight={'5px'} className={classes.textBody2}>
+                  Filtrer cette table :
+                </Typography>
+                <Autocomplete
+                  className={classes.autocomplete}
+                  size="small"
+                  disabled={checkedTable === false}
+                  options={filters}
+                  noOptionsText="Aucun filtre disponible"
+                  getOptionLabel={(option) => {
+                    return `${option.name}`
+                  }}
+                  renderInput={(params) => <TextField {...params} label="Sélectionnez un filtre" />}
+                  value={tableSetting?.fhirFilter}
+                  onChange={(_, value) => {
+                    onChangeTableSettings([{ tableName: exportTable.name, key: 'fhirFilter', value }])
+                  }}
+                />
+              </>
+            )}
         </Grid>
       </Grid>
 
