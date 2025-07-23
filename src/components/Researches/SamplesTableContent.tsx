@@ -95,7 +95,7 @@ const SamplesTableContent: React.FC<SamplesTableContentProps> = ({
       setOrder={(newOrder) => onChangeOrderBy(newOrder)}
     >
       {list.map((cohort) => {
-        const isExportable = appConfig.features.export.enabled ? cohort?.rights?.export_csv_nomi : false
+        const isExportable = appConfig.features.export.enabled ? cohort?.rights?.export_csv_xlsx_nomi : false
         const disableExport =
           !isExportable ||
           !cohort.exportable ||
