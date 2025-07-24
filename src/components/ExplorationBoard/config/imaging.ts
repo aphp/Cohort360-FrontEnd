@@ -282,7 +282,7 @@ export const imagingConfig = (
     narrowSearchCriterias(deidentified, searchCriterias, !!patient, [], ['searchBy']),
   fetchAdditionalInfos,
   getMessages: () => [
-    "Seuls les examens d'imagerie présents dans le PACS central et rattachés à un patient qui possède une identité Orbis et au moins une visite sont actuellement disponibles dans Cohort360. Le flux alimentant les métadonnées associées aux séries et aux examens est suspendu depuis le 01/02/2023 suite à la migration du PACS AP-HP. Aucun examen produit après cette date n'est disponible via Cohort360."
+    "Seuls les examens d'imagerie présents dans le PACS central et rattachés à un patient qui possède une identité Orbis et au moins une visite sont actuellement disponibles dans Cohort360."
   ],
   getCount: (counts) => [
     { label: `résultat${counts[0].total > 1 ? 's' : ''}`, display: true, count: counts[0] },
