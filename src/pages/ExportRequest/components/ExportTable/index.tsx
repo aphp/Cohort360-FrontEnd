@@ -207,6 +207,8 @@ const ExportTable: React.FC<ExportTableProps> = ({
   useEffect(() => {
     if (ResourceType.UNKNOWN !== exportTableResourceType && cohortId) {
       getFilterCount()
+    }
+    if (ResourceType.QUESTIONNAIRE_RESPONSE === exportTableResourceType && cohortId) {
       getQuestionnaireResponseCountDetails()
     }
   }, [exportTableResourceType, getFilterCount, getQuestionnaireResponseCountDetails, cohortId])
@@ -238,7 +240,12 @@ const ExportTable: React.FC<ExportTableProps> = ({
   ])
 
   useEffect(() => {
-    if (oneFile && exportTable.name === ResourceType.QUESTIONNAIRE_RESPONSE && checkedTable === true) {
+    if (
+      oneFile &&
+      exportTable.name === ResourceType.QUESTIONNAIRE_RESPONSE &&
+      checkedTable === true &&
+      countDetail.some((count) => count === 0)
+    ) {
       dispatch(
         showDialog({
           isOpen: true,
@@ -249,7 +256,6 @@ const ExportTable: React.FC<ExportTableProps> = ({
             removeTableSetting(exportTable.name)
             setSelectedQuestions([])
             setCheckedPivotMerge(false)
-            // oneFileSetter(false)
             dispatch(hideDialog())
           }
         })
