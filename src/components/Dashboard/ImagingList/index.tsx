@@ -193,9 +193,7 @@ const ImagingList = ({ deidentified }: ImagingListProps) => {
       <BlockWrapper item xs={12}>
         <AlertWrapper severity="warning">
           Seuls les examens d'imagerie présents dans le PACS central et rattachés à un patient qui possède une identité
-          Orbis et au moins une visite sont actuellement disponibles dans Cohort360. Le flux alimentant les métadonnées
-          associées aux séries et aux examens est suspendu depuis le 01/02/2023 suite à la migration du PACS AP-HP.
-          Aucun examen produit après cette date n'est disponible via Cohort360.
+          Orbis et au moins une visite sont actuellement disponibles dans Cohort360.
         </AlertWrapper>
       </BlockWrapper>
       <Grid container justifyContent="flex-end">
