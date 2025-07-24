@@ -338,7 +338,7 @@ export const form: () => CriteriaForm<ImagingDataType> = () => ({
           label: 'Âge au début de la prise en charge',
           type: 'durationRange',
           buildInfo: {
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Âge au début de la prise en charge' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Âge :' }]
           }
         },
         {

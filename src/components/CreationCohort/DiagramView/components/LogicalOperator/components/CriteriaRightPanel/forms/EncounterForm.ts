@@ -96,7 +96,7 @@ export const form: () => CriteriaForm<EncounterDataType> = () => ({
               main: EncounterParamsKeys.MIN_BIRTHDATE_DAY,
               deid: EncounterParamsKeys.MIN_BIRTHDATE_MONTH
             },
-            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Âge : ' }]
+            chipDisplayMethodExtraArgs: [{ type: 'string', value: 'Âge :' }]
           }
         },
         {
