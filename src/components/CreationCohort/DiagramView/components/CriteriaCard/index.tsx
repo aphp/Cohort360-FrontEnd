@@ -13,7 +13,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import { useAppSelector } from 'state'
 
-import useStyles from './styles'
+import { CriteriaWrapper, ExtendedWrapper } from './styles'
 import { ChipWrapper } from 'components/ui/Chip/styles'
 import { SelectedCriteriaType } from 'types/requestCriterias'
 import theme from 'theme'
@@ -24,9 +24,9 @@ import CriteriaCount, { CriteriaCountType } from '../CriteriaCount'
 type CriteriaCardProps = {
   criterion: SelectedCriteriaType
   criteriaCount?: CriteriaCountType
-  duplicateCriteria: (criteriaId: number) => void
-  deleteCriteria: (criteriaId: number) => void
-  editCriteria: (criteria: SelectedCriteriaType) => void
+  duplicateCriteria?: (criteriaId: number) => void
+  deleteCriteria?: (criteriaId: number) => void
+  editCriteria?: (criteria: SelectedCriteriaType) => void
 }
 
 const CriteriaCard = ({
@@ -36,8 +36,6 @@ const CriteriaCard = ({
   editCriteria,
   deleteCriteria
 }: CriteriaCardProps) => {
-  const { classes } = useStyles()
-
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active || false)
   const { entities, cache } = useAppSelector((state) => state.valueSets)
   const criteriaDefinitions = getAllCriteriaItems(criteriaList())
@@ -57,11 +55,10 @@ const CriteriaCard = ({
   }, [containerRef.current?.clientWidth])
 
   return (
-    <Grid
+    <CriteriaWrapper
+      sx={{ backgroundColor: criterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
       container
       alignItems={'center'}
-      className={classes.criteriaItem}
-      style={{ backgroundColor: criterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
     >
       <CriteriaCount criteriaCount={criteriaCount} extraLeftMargin={3} />
       <Grid
@@ -77,20 +74,12 @@ const CriteriaCard = ({
           <AvatarWrapper size={20}>{criterion.id}</AvatarWrapper>
         </Grid>
         <Grid container item xs={10}>
-          <Typography className={classes.title} fontWeight={700}>
+          <Typography marginLeft="4px" fontWeight={700}>
             {criterion.title} :
           </Typography>
         </Grid>
       </Grid>
-      <Grid
-        container
-        item
-        xs={12}
-        xl={7}
-        ref={containerRef}
-        style={{ height: openCollapse ? '' : 42 }}
-        className={classes.secondItem}
-      >
+      <ExtendedWrapper container item xs={12} xl={7} ref={containerRef} isExtended={openCollapse}>
         <Grid item xs={11} container ref={childrenRef} style={{ overflow: 'hidden' }}>
           {criteriasAsArray(criterion, criteriaDefinitions, { entities, cache }).map((label, index) => (
             <ChipWrapper
@@ -109,44 +98,50 @@ const CriteriaCard = ({
             </IconButton>
           )}
         </Grid>
-      </Grid>
+      </ExtendedWrapper>
       <Grid container xs={5} xl={2} justifyContent="flex-end">
         {criterion.error && (
           <IconButton
             size="small"
-            onClick={() => editCriteria(criterion)}
+            onClick={() => editCriteria?.(criterion)}
             color="secondary"
             disabled={maintenanceIsActive}
           >
             <WarningIcon />
           </IconButton>
         )}
-        <IconButton
-          size="small"
-          onClick={() => duplicateCriteria(criterion.id)}
-          style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
-          disabled={maintenanceIsActive}
-        >
-          <LibraryAddIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={() => editCriteria(criterion)}
-          style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
-          disabled={maintenanceIsActive}
-        >
-          <EditIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={() => deleteCriteria(criterion.id)}
-          style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
-          disabled={maintenanceIsActive}
-        >
-          <DeleteIcon />
-        </IconButton>
+        {duplicateCriteria && (
+          <IconButton
+            size="small"
+            onClick={() => duplicateCriteria?.(criterion.id)}
+            style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
+            disabled={maintenanceIsActive}
+          >
+            <LibraryAddIcon />
+          </IconButton>
+        )}
+        {editCriteria && (
+          <IconButton
+            size="small"
+            onClick={() => editCriteria?.(criterion)}
+            style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
+            disabled={maintenanceIsActive}
+          >
+            <EditIcon />
+          </IconButton>
+        )}
+        {deleteCriteria && (
+          <IconButton
+            size="small"
+            onClick={() => deleteCriteria?.(criterion.id)}
+            style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
+            disabled={maintenanceIsActive}
+          >
+            <DeleteIcon />
+          </IconButton>
+        )}
       </Grid>
-    </Grid>
+    </CriteriaWrapper>
   )
 }
 
