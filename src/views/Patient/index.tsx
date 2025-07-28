@@ -93,7 +93,7 @@ const Patient = () => {
         { label: 'Biologie', value: ResourceType.OBSERVATION, show: config.features.observation.enabled },
         { label: 'Imagerie', value: ResourceType.IMAGING, show: config.features.imaging.enabled },
         {
-          label: 'Formulaires',
+          label: 'Dossiers de Spécialité',
           value: ResourceType.QUESTIONNAIRE_RESPONSE,
           show: config.features.questionnaires.enabled && !deidentified,
           subs: [{ label: 'Maternité', value: ResourceType.QUESTIONNAIRE_RESPONSE }]

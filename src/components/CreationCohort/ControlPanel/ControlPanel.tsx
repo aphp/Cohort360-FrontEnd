@@ -61,9 +61,7 @@ import { isRequestFinished } from './utils'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
-  onUndo?: () => void
-  onRedo?: () => void
-}> = ({ onExecute, onUndo, onRedo }) => {
+}> = ({ onExecute }) => {
   const { classes, cx } = useStyle()
   const dispatch = useAppDispatch()
   const appConfig = useContext(AppConfig)
@@ -309,34 +307,6 @@ const ControlPanel: React.FC<{
               )}
             </Button>
           )}
-          <Button
-            className={classes.actionButton}
-            onClick={onUndo}
-            disabled={typeof onUndo !== 'function' || maintenanceIsActive}
-            startIcon={<ArrowBackIcon color="action" className={classes.iconBorder} />}
-          >
-            <Typography className={classes.boldText}>Annuler</Typography>
-          </Button>
-
-          <Button
-            className={classes.actionButton}
-            onClick={onRedo}
-            disabled={typeof onRedo !== 'function' || maintenanceIsActive}
-            startIcon={<ArrowForwardIcon color="action" className={classes.iconBorder} />}
-          >
-            <Typography className={classes.boldText}>Rétablir</Typography>
-          </Button>
-
-          <Button
-            onClick={() => {
-              dispatch(resetCohortCreation())
-            }}
-            className={classes.actionButton}
-            startIcon={<UpdateSharpIcon color="action" className={classes.iconBorder} />}
-            disabled={maintenanceIsActive}
-          >
-            <Typography className={classes.boldText}>Réinitialiser</Typography>
-          </Button>
 
           <Button
             onClick={() => {

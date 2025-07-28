@@ -79,7 +79,7 @@ export interface IServicePatients {
    ** Cette fonction permet de récupérer les ids des formulaires
    **
    ** Retour:
-   **   - questionnairesList: liste des ids des formulaires
+   **   - questionnairesList: liste des ids des Dossiers de Spécialité
    */
   fetchQuestionnaires: () => Promise<Questionnaire[]>
 

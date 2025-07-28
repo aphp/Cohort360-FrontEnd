@@ -116,7 +116,7 @@ const Dashboard = ({ context }: DashboardProps) => {
         show: appConfig.features.imaging.enabled
       },
       {
-        label: 'Formulaires',
+        label: 'Dossiers de Spécialité',
         value: ResourceType.QUESTIONNAIRE_RESPONSE,
         to: `/${context}/${ResourceType.QUESTIONNAIRE_RESPONSE}`,
         show: appConfig.features.questionnaires.enabled && !dashboard.deidentifiedBoolean

@@ -68,7 +68,9 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
         className={classes.operatorChild}
         style={{ height: 30, marginBottom: -12, paddingLeft: 0 }}
       >
-        <AvatarWrapper backgroundColor="#FFE2A9" color="#153D8A" marginLeft={'-14px'} bold>
+        <AvatarWrapper
+          style={{ backgroundColor: '#FFE2A9', color: '#153D8A', marginLeft: '-14px', fontWeight: 'bold' }}
+        >
           {Math.abs(itemId) + 1}
         </AvatarWrapper>
       </Grid>
