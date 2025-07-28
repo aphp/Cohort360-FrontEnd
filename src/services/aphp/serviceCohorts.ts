@@ -230,7 +230,7 @@ export interface IServiceCohorts {
   ) => Promise<CohortResults<CohortObservation>>
 
   /**
-   * Retourne la liste de formulaires liés à une cohorte
+   * Retourne la liste de Dossiers de Spécialité liés à une cohorte
    */
   fetchFormsList: (
     options: {

@@ -41,7 +41,7 @@ const DataTableForms: React.FC<DataTableFormsProps> = ({
   const { classes } = useStyles()
 
   const columns: Column[] = [
-    { label: 'Type de formulaire', align: 'left' },
+    { label: 'Type de dossiers de spécialité', align: 'left' },
     { label: "Date d'écriture", code: Order.AUTHORED },
     { label: `IPP` },
     { label: 'Unité exécutrice' },
@@ -61,7 +61,7 @@ const DataTableForms: React.FC<DataTableFormsProps> = ({
         <TableRow className={classes.emptyTableRow}>
           <TableCellWrapper colSpan={columns.length} align="left">
             <Grid container justifyContent="center">
-              <Typography variant="button">Aucun formulaire à afficher</Typography>
+              <Typography variant="button">Aucun dossiers de spécialité à afficher</Typography>
             </Grid>
           </TableCellWrapper>
         </TableRow>

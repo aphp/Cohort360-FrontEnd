@@ -155,7 +155,7 @@ const Patient = () => {
             {config.features.questionnaires.enabled && !deidentified && (
               <Tab
                 className={classes.tabTitle}
-                label="Formulaires"
+                label="Dossiers de Spécialité"
                 value="forms"
                 component={Link}
                 to={`/patients/${patientId}/forms${location.search}`}

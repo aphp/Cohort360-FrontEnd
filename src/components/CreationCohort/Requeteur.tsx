@@ -29,7 +29,6 @@ const Requeteur = () => {
     loading = false,
     requestId = '',
     currentSnapshot = {} as CurrentSnapshot,
-    navHistory,
     selectedCriteria = [],
     isCriteriaNominative = false,
     criteriaGroup = [],
@@ -158,24 +157,6 @@ const Requeteur = () => {
     _createCohort()
   }
 
-  const _onUndo = async () => {
-    const newCurrentSnapshot = navHistory[currentSnapshot.navHistoryIndex - 1]
-    await _unbuildRequest(newCurrentSnapshot)
-  }
-
-  const _onRedo = async () => {
-    const newCurrentSnapshot = navHistory[currentSnapshot.navHistoryIndex + 1]
-    await _unbuildRequest(newCurrentSnapshot)
-  }
-
-  const _canUndo: () => boolean = () => {
-    return !!navHistory[currentSnapshot.navHistoryIndex - 1]
-  }
-
-  const _canRedo: () => boolean = () => {
-    return !!navHistory[currentSnapshot.navHistoryIndex + 1]
-  }
-
   const _canExecute: () => boolean = () => {
     if (
       !json ||
@@ -231,11 +212,7 @@ const Requeteur = () => {
     <>
       {(requestId || requestIdFromUrl) && <DiagramView />}
 
-      <ControlPanel
-        onExecute={_canExecute() ? _onExecute : undefined}
-        onUndo={_canUndo() ? _onUndo : undefined}
-        onRedo={_canRedo() ? _onRedo : undefined}
-      />
+      <ControlPanel onExecute={_canExecute() ? _onExecute : undefined} />
 
       {!requestIdFromUrl && !requestId && (
         <ModalCreateNewRequest

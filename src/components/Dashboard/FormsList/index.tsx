@@ -109,7 +109,7 @@ const FormsList = () => {
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
     } catch (error) {
-      console.error('Erreur lors de la récupération des formulaires', error)
+      console.error('Erreur lors de la récupération des dossiers de spécialités', error)
       if (error instanceof CanceledError) {
         setLoadingStatus(LoadingStatus.FETCHING)
       } else {
@@ -224,7 +224,12 @@ const FormsList = () => {
           label="IPP :"
           placeholder="'Exemple: 8000000000001,8000000000002'"
         />
-        <CheckboxsFilter name={FilterKeys.FORM_NAME} value={formName} label="Formulaire :" options={formOptions} />
+        <CheckboxsFilter
+          name={FilterKeys.FORM_NAME}
+          value={formName}
+          label="Dossiers de Spécialité :"
+          options={formOptions}
+        />
         <ExecutiveUnitsFilter
           sourceType={SourceType.FORM_RESPONSE}
           value={executiveUnits}

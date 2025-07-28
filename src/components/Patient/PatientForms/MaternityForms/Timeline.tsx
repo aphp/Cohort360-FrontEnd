@@ -38,7 +38,7 @@ const Timeline: React.FC<TimelineProps> = ({ loading, questionnaireResponses, qu
       <>
         {questionnaireResponses.length === 0 ? (
           <Grid container justifyContent="center">
-            <Typography variant="button">Aucun formulaire à afficher</Typography>
+            <Typography variant="button">Aucun dossier de spécialité à afficher</Typography>
           </Grid>
         ) : (
           <div style={{ flexGrow: 1, marginLeft: '1em' }}>

@@ -145,7 +145,7 @@ const MaternityForm = () => {
                 <CheckboxsFilter
                   name={FilterKeys.FORM_NAME}
                   value={formName}
-                  label="Formulaire :"
+                  label="Dossiers de Spécialité :"
                   options={formOptions}
                 />
                 <DatesRangeFilter values={[startDate, endDate]} names={[FilterKeys.START_DATE, FilterKeys.END_DATE]} />

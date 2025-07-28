@@ -68,7 +68,7 @@ const Dashboard: React.FC<{
             ? [{ label: 'Imagerie', value: 'imaging', to: '/my-patients/imaging', disabled: false }]
             : []),
           ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/my-patients/forms`, disabled: false }]
+            ? [{ label: 'Dossiers de Spécialité', value: 'forms', to: `/my-patients/forms`, disabled: false }]
             : [])
         ])
         break
@@ -96,7 +96,7 @@ const Dashboard: React.FC<{
           { label: 'Biologie', value: 'biology', to: `/cohort/biology${location.search}` },
           ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/imaging${location.search}` }] : []),
           ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/cohort/forms${location.search}` }]
+            ? [{ label: 'Dossiers de Spécialité', value: 'forms', to: `/cohort/forms${location.search}` }]
             : [])
         ])
         break
@@ -113,7 +113,7 @@ const Dashboard: React.FC<{
           { label: 'Biologie', value: 'biology', to: `/cohort/new/biology` },
           ...(ODD_IMAGING ? [{ label: 'Imagerie', value: 'imaging', to: `/cohort/new/imaging`, disabled: true }] : []),
           ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/cohort/new/forms` }]
+            ? [{ label: 'Dossiers de Spécialité', value: 'forms', to: `/cohort/new/forms` }]
             : [])
         ])
         break
@@ -147,7 +147,7 @@ const Dashboard: React.FC<{
             ? [{ label: 'Imagerie', value: 'imaging', to: `/perimeters/imaging${location.search}` }]
             : []),
           ...(ODD_QUESTIONNAIRES && !dashboard.deidentifiedBoolean
-            ? [{ label: 'Formulaires', value: 'forms', to: `/perimeters/forms${location.search}` }]
+            ? [{ label: 'Dossiers de Spécialité', value: 'forms', to: `/perimeters/forms${location.search}` }]
             : [])
         ])
         break

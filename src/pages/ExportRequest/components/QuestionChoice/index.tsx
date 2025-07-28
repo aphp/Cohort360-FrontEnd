@@ -331,11 +331,11 @@ const QuestionSelectorDialog: React.FC<QuestionSelectorDialogProps> = ({
       <DialogTitle>
         <span>Sélection des questions</span>
         <FormControl sx={{ ml: 2, minWidth: 200 }} size="small">
-          <InputLabel id="questionnaire-select-label">Formulaire</InputLabel>
+          <InputLabel id="questionnaire-select-label">Dossiers de Spécialité</InputLabel>
           <Select
             labelId="questionnaire-select-label"
             value={selectedQuestionnaireId}
-            label="Formulaire"
+            label="Dossiers de Spécialité"
             onChange={handleQuestionnaireChange}
           >
             {questionnaires.map((q) => (

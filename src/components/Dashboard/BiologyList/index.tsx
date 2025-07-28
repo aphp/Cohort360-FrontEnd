@@ -219,9 +219,9 @@ const BiologyList = ({ deidentified }: BiologyListProps) => {
     <Grid container justifyContent="flex-end" gap="20px">
       <BlockWrapper item xs={12}>
         <AlertWrapper severity="warning">
-          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondants aux analyses les
-          plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses
-          quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020.
+          Les mesures de biologies correspondent aux codes dont l'utilisation à l'AP-HP est supérieure à 3 analyses
+          biologiques. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS,
+          qui ont été validées et mises à jour depuis mars 2020.
         </AlertWrapper>
       </BlockWrapper>
       <Grid container item xs={12} md={10} lg={7} xl={5} justifyContent="flex-end" spacing={1}>

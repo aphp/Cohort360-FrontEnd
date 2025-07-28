@@ -272,19 +272,19 @@ export interface IServicePatients {
   }>
 
   /*
-   ** Cette fonction permet de récupérer les formulaires liés à un patient
+   ** Cette fonction permet de récupérer les Dossiers de Spécialité liés à un patient
    **
    ** Arguments:
    **   - patientId: identifiant technique d'un patient
-   **   - formName: permet de requêter le bon type de formulaire
+   **   - formName: permet de requêter le bon type de dossier de spécialité
    **   - groupId: (optionnel) périmètre auquel le patient est lié
-   **   - episodeOfCare: (optionnel) permet de requêter les formulaires liés à un certain épisode de soin
+   **   - episodeOfCare: (optionnel) permet de requêter les Dossiers de Spécialité liés à un certain épisode de soin
    **   - startDate: (optionnel) permet le filtre par date
    **   - endDate: (optionnel) permet le filtre par date
    **   - executiveUnits: (optionnel) permet de filtrer par unité exécutrice
    **
    ** Retour:
-   **   - formsList: liste des formulaires liés à un patient
+   **   - formsList: liste des Dossiers de Spécialité liés à un patient
    */
   fetchMaternityForms: (
     patientId: string,
@@ -297,10 +297,10 @@ export interface IServicePatients {
   ) => Promise<QuestionnaireResponse[]>
 
   /*
-   ** Cette fonction permet de récupérer les ids des formulaires
+   ** Cette fonction permet de récupérer les ids des Dossiers de Spécialité
    **
    ** Retour:
-   **   - questionnairesList: liste des ids des formulaires
+   **   - questionnairesList: liste des ids des Dossiers de Spécialité
    */
   fetchQuestionnaires: () => Promise<Questionnaire[]>
 
