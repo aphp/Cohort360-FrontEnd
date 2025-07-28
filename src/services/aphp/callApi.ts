@@ -386,7 +386,7 @@ export const postFilters = async (
     filter,
     identifying
   })
-  if (res instanceof AxiosError) throw "Le filtre n'a pas pu être sauvegardé."
+  if (res instanceof AxiosError) throw { status: res.status }
   return res
 }
 
