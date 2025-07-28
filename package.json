@@ -1,6 +1,6 @@
 {
   "name": "cohort360",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -70,7 +70,7 @@
     "ui": "vitest --ui",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "docs" :"npx typedoc --entryPoints src/index.tsx --entryPointStrategy expand ./src"
+    "docs": "npx typedoc --entryPoints src/index.tsx --entryPointStrategy expand ./src"
   },
   "browserslist": {
     "production": [
