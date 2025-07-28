@@ -140,7 +140,7 @@ export const fetcherWithParams = async <T extends Patient | NonPatientResource, 
   results.total = list?.data?.resourceType === 'Bundle' ? list.data.total ?? 0 : 0
   results.totalAllResults = all && all?.data?.resourceType === 'Bundle' ? all.data.total ?? 0 : results.total
   results.totalPatients = getPatientsCount(list, facet)
-  results.totalAllPatients = all ? getPatientsCount(all) : results.totalPatients
+  results.totalAllPatients = all ? getPatientsCount(all, facet) : results.totalPatients
   results.meta = list.data.meta
   return results
 }

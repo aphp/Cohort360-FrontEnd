@@ -66,7 +66,7 @@ export const initSearchCriterias = (search: string): SearchCriterias<MaternityFo
 const mapToTable = (data: Data, groupId: string[]): Table => {
   const rows: Row[] = []
   const columns: Column[] = [
-    { label: 'Type de formulaire' },
+    { label: 'Type de dossier de spécialité' },
     { label: "Date d'écriture", code: Order.AUTHORED },
     { label: `IPP` },
     { label: 'Unité exécutrice' },

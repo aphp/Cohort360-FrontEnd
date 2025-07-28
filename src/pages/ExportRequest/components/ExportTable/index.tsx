@@ -250,7 +250,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
         showDialog({
           isOpen: true,
           message:
-            "Il n'est pas possible de réunir les tables en un seul fichier car l'un des formulaire est vide. Veuillez exporter les tables séparément. Si vous souhaitez tout de même exporter des tables en un seul fichier, veuillez choisir d'autres tables.",
+            "Il n'est pas possible de réunir les tables en un seul fichier car l'un des dossiers de spécialités est vide. Veuillez exporter les tables séparément. Si vous souhaitez tout de même exporter des tables en un seul fichier, veuillez choisir d'autres tables.",
           status: 'warning',
           onConfirm: () => {
             removeTableSetting(exportTable.name)
@@ -307,7 +307,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
                   color={tableSetting?.isChecked ? '#153D8A' : '#888'}
                 >
                   {`${count} ${
-                    exportTableResourceType !== ResourceType.QUESTIONNAIRE_RESPONSE ? 'ligne' : 'Formulaire'
+                    exportTableResourceType !== ResourceType.QUESTIONNAIRE_RESPONSE ? 'ligne' : 'Dossiers de Spécialité'
                   }${count && count > 1 ? 's' : ''}`}
                 </Typography>
               )}

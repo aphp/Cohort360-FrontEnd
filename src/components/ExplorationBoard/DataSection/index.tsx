@@ -55,7 +55,7 @@ const DataSection = ({
             <Grid container spacing={3}>
               {data.diagrams.map((diagram, index) => (
                 <Grid key={index} item xs={12} md={6} lg={4}>
-                  <Chart isLoading={isLoading} title="Répartition par genre">
+                  <Chart isLoading={isLoading} title={diagram.title}>
                     {diagram.type === DiagramType.BAR && (
                       <BarChart data={diagram.data as SimpleChartDataType[]} width={250} />
                     )}
@@ -76,7 +76,7 @@ const DataSection = ({
         <Timeline questionnaireResponses={data.timeline.data} questionnaires={data.timeline.questionnaires} />
       )}
       <Grid container id="list">
-        {!displayOptions.sidebar && data.cards.map((card, index) => <InfoCard key={index} value={card} />)}
+        {displayOptions.sidebar && data.cards.map((card, index) => <InfoCard key={index} value={card} />)}
         {!displayOptions.sidebar && data.table && <DataTable value={data.table} orderBy={orderBy} onSort={onSort} />}
         <StickyPagination
           count={pagination.total}

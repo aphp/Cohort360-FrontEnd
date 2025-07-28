@@ -429,7 +429,7 @@ export const getExportTableLabel = (tableName: string) => {
     cost: 'Fait - PMSI - GHM',
     procedure_occurrence: 'Fait - PMSI - Actes',
     drug_exposure_prescription: 'Fait - Médicaments - Prescription',
-    QuestionnaireResponse: 'Formulaires'
+    QuestionnaireResponse: 'Dossier de Spécialité'
   }[tableName]
   return tableLabel ?? '-'
 }

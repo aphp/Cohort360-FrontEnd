@@ -8,6 +8,7 @@ import { BlockWrapper } from 'components/ui/Layout'
 import DurationInput from './DurationInput'
 import { ErrorMessage } from '../Errors'
 import { DurationLabel } from './styles'
+import { SxProps, Theme } from '@mui/material'
 
 type DurationRangeProps = {
   value: DurationRangeType
@@ -17,6 +18,7 @@ type DurationRangeProps = {
   unit?: string
   onChange?: (newDuration: DurationRangeType) => void
   onError: (isError: boolean) => void
+  sx?: SxProps<Theme>
 }
 const defaultMinDuration: DurationType = {
   year: null,
@@ -35,7 +37,8 @@ const DurationRange = ({
   disabled = false,
   unit = 'Âge',
   onChange,
-  onError
+  onError,
+  sx
 }: DurationRangeProps) => {
   const [minDuration, setMinDuration] = useState<DurationType>(convertStringToDuration(value[0]) || defaultMinDuration)
   const [maxDuration, setMaxDuration] = useState<DurationType>(convertStringToDuration(value[1]) || defaultMaxDuration)
@@ -55,7 +58,9 @@ const DurationRange = ({
     <BlockWrapper>
       {label && (
         <BlockWrapper margin="0px 0px 10px 0px">
-          <DurationLabel variant="h3">{label}</DurationLabel>
+          <DurationLabel sx={sx} variant="h3">
+            {label}
+          </DurationLabel>
         </BlockWrapper>
       )}
       <BlockWrapper margin="0px 0px 10px 0px">

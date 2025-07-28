@@ -742,13 +742,17 @@ const cohortCreationSlice = createSlice({
             !(
               constraint.idList.includes(criteriaId as never) &&
               (constraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING ||
-                (constraint.constraintType === TemporalConstraintsKind.SAME_ENCOUNTER && constraint.idList.length <= 2))
+                (constraint.constraintType === TemporalConstraintsKind.SAME_ENCOUNTER &&
+                  constraint.idList.length <= 2) ||
+                (constraint.constraintType === TemporalConstraintsKind.SAME_EPISODE_OF_CARE &&
+                  constraint.idList.length <= 2))
             )
         )
         .map((constraint) => {
           if (
             constraint.idList.includes(criteriaId as never) &&
-            constraint.constraintType === TemporalConstraintsKind.SAME_ENCOUNTER
+            (constraint.constraintType === TemporalConstraintsKind.SAME_ENCOUNTER ||
+              constraint.constraintType === TemporalConstraintsKind.SAME_EPISODE_OF_CARE)
           ) {
             const findIndex = constraint.idList.findIndex((id) => id === criteriaId)
             constraint.idList.splice(findIndex, 1)

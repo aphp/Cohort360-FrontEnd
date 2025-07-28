@@ -29,6 +29,9 @@ import { getLabelFromCode, isDisplayedWithCode } from 'utils/valueSets'
 import { FhirItem, ValueSetSortField, ValueSetSorting } from 'types/valueSet'
 import TruncatedText from 'components/ui/TruncatedText'
 
+const HEADER_NB_PATIENTS = 'Nb Patients'
+const HEADER_FREQUENCY = 'Fréquence'
+
 type ValueSetRowProps = {
   item: Hierarchy<FhirItem>
   loading: { expand: LoadingStatus; list: LoadingStatus }
@@ -38,6 +41,7 @@ type ValueSetRowProps = {
   isHierarchy: boolean
   onExpand: (node: Hierarchy<FhirItem>) => void
   onSelect: (nodes: Hierarchy<FhirItem>[], toAdd: boolean, mode: SearchMode) => void
+  isHeader?: boolean
 }
 
 const ValueSetRow = ({
@@ -48,7 +52,8 @@ const ValueSetRow = ({
   mode,
   isHierarchy,
   onSelect,
-  onExpand
+  onExpand,
+  isHeader = false
 }: ValueSetRowProps) => {
   const [open, setOpen] = useState(false)
   const [internalLoading, setInternalLoading] = useState(false)
@@ -63,6 +68,17 @@ const ValueSetRow = ({
   useEffect(() => {
     if (loading.expand === LoadingStatus.SUCCESS) setInternalLoading(false)
   }, [loading.expand])
+
+  const displayStat = (stat: number | undefined, headerName: string) => {
+    if (isHierarchy && isHeader) {
+      return (
+        <Typography variant="body2" fontWeight={600} color="#4f4f4f">
+          {headerName}
+        </Typography>
+      )
+    }
+    return stat !== undefined ? stat.toLocaleString() : '-'
+  }
 
   return (
     <>
@@ -90,14 +106,10 @@ const ValueSetRow = ({
             <TruncatedText lineNb={2} text={getLabelFromCode(item)}></TruncatedText>
           </CellWrapper>
           <CellWrapper item xs={2} container justifyContent="center">
-            <Typography variant="body2">
-              {item.statTotalUnique !== undefined ? item.statTotalUnique.toLocaleString() : '-'}
-            </Typography>
+            <Typography variant="body2">{displayStat(item.statTotalUnique, HEADER_NB_PATIENTS)}</Typography>
           </CellWrapper>
           <CellWrapper item xs={2} container justifyContent="center">
-            <Typography variant="body2">
-              {item.statTotal !== undefined ? item.statTotal.toLocaleString() : '-'}
-            </Typography>
+            <Typography variant="body2">{displayStat(item.statTotal, HEADER_FREQUENCY)}</Typography>
           </CellWrapper>
           <CellWrapper item xs={1} container>
             <Checkbox
@@ -213,13 +225,13 @@ const ValueSetTable = ({
                           style={{ display: 'flex', alignItems: 'center', gap: 4 }}
                         >
                           <Typography variant="body2" fontWeight={600} color="#4f4f4f">
-                            Nb Patients
+                            {HEADER_NB_PATIENTS}
                           </Typography>
                           {getSortIcon('statTotalUnique')}
                         </IconButton>
                       ) : (
                         <Typography variant="body2" fontWeight={600} color="#4f4f4f">
-                          Nb Patients
+                          {HEADER_NB_PATIENTS}
                         </Typography>
                       )}
                     </CellWrapper>
@@ -231,13 +243,13 @@ const ValueSetTable = ({
                           style={{ display: 'flex', alignItems: 'center', gap: 4 }}
                         >
                           <Typography variant="body2" fontWeight={600} color="#4f4f4f">
-                            Fréquence
+                            {HEADER_FREQUENCY}
                           </Typography>
                           {getSortIcon('statTotal')}
                         </IconButton>
                       ) : (
                         <Typography variant="body2" fontWeight={600} color="#4f4f4f">
-                          Fréquence
+                          {HEADER_FREQUENCY}
                         </Typography>
                       )}
                     </CellWrapper>
@@ -263,7 +275,7 @@ const ValueSetTable = ({
             {loading.list === LoadingStatus.SUCCESS && (
               <TableBody>
                 <div style={{ maxHeight: '20vh' }}>
-                  {hierarchy.tree.map((item) =>
+                  {hierarchy.tree.map((item, index) =>
                     item ? (
                       <ValueSetRow
                         mode={mode}
@@ -275,6 +287,7 @@ const ValueSetTable = ({
                         isSelectionDisabled={isSelectionDisabled}
                         onExpand={onExpand}
                         onSelect={onSelect}
+                        isHeader={isHierarchy && index === 0}
                       />
                     ) : (
                       <h1 key={uuidv4()}>Missing</h1>
