@@ -76,7 +76,7 @@ const DataSection = ({
         <Timeline questionnaireResponses={data.timeline.data} questionnaires={data.timeline.questionnaires} />
       )}
       <Grid container id="list">
-        {!displayOptions.sidebar && data.cards.map((card, index) => <InfoCard key={index} value={card} />)}
+        {displayOptions.sidebar && data.cards.map((card, index) => <InfoCard key={index} value={card} />)}
         {!displayOptions.sidebar && data.table && <DataTable value={data.table} orderBy={orderBy} onSort={onSort} />}
         <StickyPagination
           count={pagination.total}
