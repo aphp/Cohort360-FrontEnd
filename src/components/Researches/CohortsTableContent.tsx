@@ -40,6 +40,7 @@ export const getCohortStatusChip = (status?: JobStatus, jobFailMessage?: string)
   switch (status) {
     case JobStatus.FINISHED:
       return <TooltipChip label="Terminé" status={ChipStyles.FINISHED} />
+    case JobStatus.STARTED:
     case JobStatus.PENDING:
     case JobStatus.NEW:
       return <TooltipChip label="En cours" status={ChipStyles.IN_PROGRESS} />
