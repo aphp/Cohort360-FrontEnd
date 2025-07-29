@@ -1,17 +1,18 @@
-/**
- * @fileoverview Redux store configuration with persistence and middleware setup.
- * Configures the main application store with persistence, logging, and state synchronization.
- */
-
+import { configureStore, combineReducers } from '@reduxjs/toolkit'
+import { 
+  persistReducer, 
+  persistStore, 
+  FLUSH, 
+  REHYDRATE, 
+  PAUSE, 
+  PERSIST, 
+  PURGE, 
+  REGISTER 
+} from 'redux-persist'
 import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync'
-import { combineReducers } from 'redux'
-import { persistReducer, persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist'
-import thunkMiddleware from 'redux-thunk'
-import { configureStore } from '@reduxjs/toolkit'
-import logger from 'redux-logger'
+import * as localforage from 'localforage'
 
-import localforage from 'localforage'
-
+// Import reducers
 import cohortCreation from './cohortCreation'
 import exploredCohort from './exploredCohort'
 import autoLogout from './autoLogout'
@@ -27,23 +28,14 @@ import warningDialog from './warningDialog'
 import valueSets from './valueSets'
 import preferences from './preferences'
 
-/**
- * Combined reducer for cohort creation functionality.
- * Merges criteria and request reducers under cohortCreation namespace.
- */
-const cohortCreationReducer = combineReducers({
-  criteria,
-  request: cohortCreation
-})
-
-/**
- * Root reducer combining all application state slices.
- * Defines the complete application state structure.
- */
+// Combine reducers
 const rootReducer = combineReducers({
   me,
   preferences,
-  cohortCreation: cohortCreationReducer,
+  cohortCreation: combineReducers({
+    criteria,
+    request: cohortCreation
+  }),
   valueSets,
   exploredCohort,
   drawer,
@@ -56,13 +48,12 @@ const rootReducer = combineReducers({
   warningDialog
 })
 
-/**
- * Redux persist configuration.
- * Uses localforage for persistent storage with 'root' key.
- */
+// Persist configuration
 const persistConfig = {
   key: 'root',
-  storage: localforage
+  storage: localforage,
+  // Optionally blacklist certain reducers from persistence
+  // blacklist: ['message', 'drawer']
 }
 
 /**
@@ -71,20 +62,17 @@ const persistConfig = {
  */
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 
-/**
- * Main Redux store configuration.
- *
- * Features:
- * - State persistence with redux-persist
- * - Cross-tab state synchronization
- * - Redux thunk for async actions
- * - Development logging with redux-logger
- * - Custom serialization handling for dialogs
- */
+// Redux-state-sync middleware
+const stateSyncMiddleware = createStateSyncMiddleware({
+  predicate: (action) => 
+    action.type === 'autoLogout/open' || action.type === 'autoLogout/close'
+})
+
+// Configure store
 export const store = configureStore({
   reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
+  middleware: (getDefaultMiddleware) => {
+    const middleware = getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [
           FLUSH,
@@ -96,27 +84,37 @@ export const store = configureStore({
           'warningDialog/showDialog',
           'warningDialog/onConfirm'
         ],
-        ignoredPaths: ['warningDialog.showDialog', 'warningDialog.onConfirm']
+        ignoredPaths: [
+          'warningDialog.showDialog', 
+          'warningDialog.onConfirm'
+        ]
       }
     })
-      .prepend(
-        thunkMiddleware,
-        createStateSyncMiddleware({
-          predicate: (action) => action.type == 'autoLogout/open' || action.type == 'autoLogout/close'
-        })
-      )
-      // @ts-ignore
-      .concat(logger)
+
+    // Add custom middleware
+    middleware.prepend(stateSyncMiddleware)
+
+    // Add logger in development
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        const { logger } = require('redux-logger')
+        middleware.concat(logger)
+      } catch (error) {
+        console.warn('Redux logger not available:', error)
+      }
+    }
+
+    return middleware
+  },
+  devTools: process.env.NODE_ENV !== 'production'
 })
 
-/**
- * Initialize state synchronization with previous tab.
- * Ensures consistent state across multiple browser tabs.
- */
+// Initialize state sync
 initStateWithPrevTab(store)
 
-/**
- * Redux persist store for managing persistence lifecycle.
- * Used to control when persistence starts/stops.
- */
+// Create persistor
 export const persistor = persistStore(store)
+
+// Infer types
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
