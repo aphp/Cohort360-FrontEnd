@@ -85,7 +85,6 @@ const ControlPanel: React.FC<{
     requestId,
     requestName,
     json,
-    shortCohortLimit,
     count_outdated,
     snapshotsHistory
   } = useAppSelector((state) => state.cohortCreation.request || {})
@@ -108,7 +107,7 @@ const ControlPanel: React.FC<{
 
   const maintenanceIsActive = useAppSelector((state) => state.me?.maintenance?.active ?? false)
 
-  const cohortLimit = shortCohortLimit ?? appConfig.features.cohort.shortCohortLimit
+  const cohortLimit = appConfig.features.cohort.shortCohortLimit
 
   const accessIsPseudonymize: boolean | null =
     selectedPopulation === null
