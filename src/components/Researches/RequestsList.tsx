@@ -175,12 +175,12 @@ const RequestsList = ({ simplified = false, rowsPerPage = 20 }: RequestsListProp
   }
 
   return (
-    <Grid container gap="20px">
+    <Grid container size={12} gap="20px">
       {!simplified && (
         <>
           <LevelHeader
             loading={projectLoading}
-            name={projectId ? parentProject?.name ?? '' : 'Toutes mes requêtes'}
+            name={projectId ? (parentProject?.name ?? '') : 'Toutes mes requêtes'}
             description={parentProject?.description ?? ''}
             actions={
               projectId && (

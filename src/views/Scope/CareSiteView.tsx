@@ -29,7 +29,7 @@ const CareSiteView = () => {
   return (
     <PageContainer direction="row" justifyContent={'center'} height="100vh">
       <HeaderLayout title="Explorer un périmètre" />
-      <Grid container xs={11} alignItems="center" flexGrow={1} height={'calc(100vh - 175px)'}>
+      <Grid size={11} sx={{ alignItems: 'center', height: 'calc(100vh - 175px)' }}>
         <ScopeTree
           selectedNodes={[]}
           baseTree={population}
@@ -39,10 +39,16 @@ const CareSiteView = () => {
         />
         <Grid
           container
-          justifyContent="center"
-          style={{ position: 'fixed', bottom: 20, right: 0, backgroundColor: '#FFF' }}
+          size={12}
+          sx={{
+            justifyContent: 'center',
+            position: 'fixed',
+            bottom: 20,
+            right: 0,
+            backgroundColor: '#FFF'
+          }}
         >
-          <Grid container justifyContent={'flex-end'} xs={11}>
+          <Grid container size={{ xs: 11 }} sx={{ justifyContent: 'flex-end' }}>
             <Button
               customVariant="secondary"
               disabled={!selectedCodes.length}

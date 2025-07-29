@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { Box, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
-import ClearIcon from '@mui/icons-material/Clear'
+import { Box, Typography } from '@mui/material'
 
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import { frFR } from '@mui/x-date-pickers/locales'
 import useStyles from '../DatePicker/styles'
 
 type DatePickerProps = {
@@ -19,34 +19,21 @@ const DatePicker: React.FC<DatePickerProps> = ({ buttonLabel, value, onChangeVal
   return (
     <Box display="flex" width="180px" padding={'8px 12px'} flexDirection={'column'}>
       <Typography fontWeight={600}>{buttonLabel}</Typography>
-      <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+      <LocalizationProvider
+        dateAdapter={AdapterMoment}
+        adapterLocale={'fr'}
+        localeText={frFR.components.MuiLocalizationProvider.defaultProps.localeText}
+      >
         <DesktopDatePicker
-          onChange={(newValue: string | null) => onChangeValue(newValue)}
-          value={value}
-          renderInput={(params) => (
-            <div>
-              <TextField
-                {...params}
-                fullWidth
-                className={classes.datePickerInput}
-                InputProps={{
-                  ...params.InputProps,
-                  placeholder: 'jj/mm/aaaa',
-                  endAdornment: (
-                    // TODO: apres maj MUI, remplacer par slotProps le delete custom degueu
-                    <InputAdornment position="end">
-                      {value && (
-                        <IconButton sx={{ marginRight: '-12px', padding: 0 }} onClick={() => onChangeValue(null)}>
-                          <ClearIcon sx={{ color: '#5bc5f2' }} />
-                        </IconButton>
-                      )}
-                      {params.InputProps?.endAdornment}
-                    </InputAdornment>
-                  )
-                }}
-              />
-            </div>
-          )}
+          onChange={(newValue) => onChangeValue(newValue as string | null)}
+          value={value as any}
+          slotProps={{
+            textField: {
+              fullWidth: true,
+              className: classes.datePickerInput
+            },
+            field: { clearable: true, onClear: () => onChangeValue(null) }
+          }}
         />
       </LocalizationProvider>
     </Box>

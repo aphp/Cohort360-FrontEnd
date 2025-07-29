@@ -132,7 +132,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     const valueWithLabels = (arrayPropValue ?? []).map(
       (code) => codeSystem.find((c) => c.id === code) ?? { id: code, label: code }
     )
-    const value = props.definition.singleChoice ? valueWithLabels?.at(0) ?? null : valueWithLabels ?? []
+    const value = props.definition.singleChoice ? (valueWithLabels?.at(0) ?? null) : (valueWithLabels ?? [])
     return (
       <Autocomplete
         multiple={!props.definition.singleChoice}
@@ -164,7 +164,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
 
                 return (
                   <React.Fragment>
-                    <Grid container direction="row" alignItems="center">
+                    <Grid container sx={{ flexDirection: "row", alignItems: "center" }}>
                       <Checkbox
                         indeterminate={
                           groupChildren.length !== selectedWithinGroup.length && selectedWithinGroup.length > 0
@@ -225,9 +225,11 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         placeholder={props.definition.label}
         disabled={props.disabled}
         fullWidth
-        InputProps={{
-          inputProps: {
-            min: props.definition.min
+        slotProps={{
+          input: {
+            inputProps: {
+              min: props.definition.min
+            }
           }
         }}
       />
@@ -261,7 +263,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
   boolean: (props) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     return (
-      <BlockWrapper container alignItems="center">
+      <BlockWrapper container sx={{ alignItems: "center" }}>
         <CriteriaLabel
           label={props.definition.label ?? ''}
           infoIcon={props.definition.extraInfo}

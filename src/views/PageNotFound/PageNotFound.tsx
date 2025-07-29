@@ -19,8 +19,8 @@ const PageNotFound: React.FC = () => {
       <Link onClick={() => navigate('/home')} className={classes.logo}>
         <img src={cohortLogo} alt="Cohort360 logo" style={{ height: 50 }} />
       </Link>
-      <Grid container direction="column" className={classes.megaContainer} alignItems="center">
-        <Grid container direction="column" xs={5} alignItems="center" style={{ marginTop: '16em' }}>
+      <Grid container className={classes.megaContainer} sx={{ flexDirection: 'column', alignItems: 'center' }}>
+        <Grid container size={5} sx={{ flexDirection: 'column', alignItems: 'center' }} style={{ marginTop: '16em' }}>
           <Typography variant="h1" className={classes.oups}>
             Oups !
           </Typography>

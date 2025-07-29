@@ -17,16 +17,18 @@ const Card: React.FC<CardProps> = ({ title, children, actions, wrap, width }) =>
     <CardMui className={classes.card} style={{ ...(width && { width: width }) }}>
       <CardHeader
         title={title}
-        titleTypographyProps={{
-          variant: 'h3',
-          align: 'center',
-          color: '#0063AF',
-          padding: '0 20px',
-          textTransform: 'uppercase',
-          fontSize: 11,
-          fontWeight: 'bold'
-        }}
         className={classes.cardHeader}
+        slotProps={{
+          title: {
+            variant: 'h3',
+            align: 'center',
+            color: '#0063AF',
+            padding: '0 20px',
+            textTransform: 'uppercase',
+            fontSize: 11,
+            fontWeight: 'bold'
+          }
+        }}
       />
       <CardContent
         style={{

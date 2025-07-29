@@ -7,8 +7,9 @@ const useStyles = makeStyles()(() => ({
     marginTop: 8,
     maxHeight: 650,
     minHeight: 300,
-    overflow: 'auto',
-    padding: '4px 8px'
+    maxWidth: '100%',
+    padding: '4px 8px',
+    overflowY: 'auto'
   },
   requestItem: {
     borderBottom: `1px solid #cccccccc`,

@@ -16,12 +16,12 @@ const CohortRightOrNotExist = () => {
 
   return (
     <PageContainer justifyContent="center" alignItems="center" spacing={2} height="100vh">
-      <Grid container item>
-        <Grid container direction="column" justifyContent="center" alignItems="center">
-          <Grid item style={{ padding: 16 }}>
+      <Grid container>
+        <Grid container sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+          <Grid style={{ padding: 16 }}>
             <WarningIcon style={{ fontSize: 60 }} />
           </Grid>
-          <Grid item style={{ padding: '8px 32px' }}>
+          <Grid style={{ padding: '8px 32px' }}>
             <Typography style={{ marginBottom: 16 }} variant="h5" align="center">
               Vous tentez d'accéder à des données qui n'existent pas, ou vous ne disposez pas de droits suffisants
             </Typography>
@@ -33,7 +33,7 @@ const CohortRightOrNotExist = () => {
         </Grid>
       </Grid>
 
-      <Grid item>
+      <Grid>
         <Button variant="outlined" style={{ borderColor: 'currentColor' }} onClick={() => navigate('/home')}>
           Retour à l'accueil
         </Button>

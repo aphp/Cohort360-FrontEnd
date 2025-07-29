@@ -2,10 +2,11 @@ import React from 'react'
 import CssBaseline from '@mui/material/CssBaseline'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/es/integration/react'
-import MomentUtils from '@date-io/moment'
+
 import moment from 'moment'
 
 import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 
 import AppNavigation from './components/Routes/AppNavigation/AppNavigation'
 import WarningDialog from 'components/ui/WarningDialog'
@@ -26,7 +27,7 @@ const queryClient = new QueryClient()
  * Routing.
  */
 const App = () => (
-  <LocalizationProvider dateAdapter={MomentUtils}>
+  <LocalizationProvider dateAdapter={AdapterMoment}>
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <WarningDialog />

@@ -40,6 +40,6 @@ const CheckboxGroup = forwardRef(
       </InputWrapper>
     )
   }
-) as <T extends string>(props: CheckboxGroupProps<T> & { ref?: React.Ref<HTMLDivElement> }) => JSX.Element
+) as <T extends string>(props: CheckboxGroupProps<T> & { ref?: React.Ref<HTMLDivElement> }) => React.JSX.Element
 
 export default CheckboxGroup

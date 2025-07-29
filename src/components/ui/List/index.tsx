@@ -34,10 +34,10 @@ const List = ({ values, count, onSelect, fetchPaginateData }: PropsWithChildren<
   }, [selectedElements])
 
   return (
-    <Grid container gap={4} marginTop={2}>
+    <Grid container sx={{ gap: 4, marginTop: 2 }}>
       <Grid container>
         {Boolean(allElements.length) ? (
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <FormControlLabel
               labelPlacement="end"
               color="warning"
@@ -70,7 +70,7 @@ const List = ({ values, count, onSelect, fetchPaginateData }: PropsWithChildren<
             />
           </Grid>
         ) : (
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography fontWeight="700" align="center" sx={{ padding: '8px' }}>
               Aucun élément.
             </Typography>

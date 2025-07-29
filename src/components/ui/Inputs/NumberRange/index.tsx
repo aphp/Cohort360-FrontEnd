@@ -32,30 +32,34 @@ const PatientsNbFilter = ({ label, values, type, onError, onChange }: PatientsNb
   return (
     <InputWrapper>
       {label && <Typography variant="h3">{label}</Typography>}
-      <Grid container justifyContent="space-between">
-        <Grid container item xs={5} alignItems="baseline" justifyContent="space-between">
+      <Grid container sx={{ justifyContent: "space-between" }}>
+        <Grid container size={{ xs: 5 }} sx={{ alignItems: "baseline", justifyContent: "space-between" }}>
           <FormLabel component="legend">Au moins :</FormLabel>
           <TextField
             type="number"
             value={range[0]}
             onChange={(event) => setRange([event.target.value, range[1]])}
-            inputProps={{ min: 0 }}
             variant="standard"
             size="small"
             style={{ width: '30%' }}
+            slotProps={{
+              htmlInput: { min: 0 }
+            }}
           />
           <FormLabel component="legend">patient(s).</FormLabel>
         </Grid>
-        <Grid container item xs={5} alignItems="baseline" justifyContent="space-between">
+        <Grid container size={{ xs: 5 }} sx={{ alignItems: "baseline", justifyContent: "space-between" }}>
           <FormLabel component="legend">Jusqu'à :</FormLabel>
           <TextField
             type="number"
             value={range[1]}
             onChange={(event) => setRange([range[0], event.target.value])}
-            inputProps={{ min: 0 }}
             variant="standard"
             size="small"
             style={{ width: '30%' }}
+            slotProps={{
+              htmlInput: { min: 0 }
+            }}
           />
           <FormLabel component="legend">{type}.</FormLabel>
         </Grid>

@@ -1,22 +1,13 @@
 import React, { useState } from 'react'
 
-import {
-  Collapse,
-  IconButton,
-  Grid,
-  List,
-  ListItem,
-  ListItemSecondaryAction,
-  ListItemText,
-  Typography,
-  Radio
-} from '@mui/material'
+import { Collapse, IconButton, Grid, List, ListItem, ListItemText, Typography, Radio } from '@mui/material'
 
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import { RequestType, ProjectType } from 'types'
 
+import { getRequestName } from 'utils/explorationUtils'
 import useStyles from '../styles'
 
 interface ProjectRowProps {
@@ -34,14 +25,10 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
 
   return (
     <>
-      <ListItem className={classes.requestItem}>
-        <ListItemText>
-          <Typography noWrap style={{ fontWeight: 'bold' }}>
-            {project.name}
-          </Typography>
-        </ListItemText>
-        <ListItemSecondaryAction>
-          {!open ? (
+      <ListItem
+        className={classes.requestItem}
+        secondaryAction={
+          !open ? (
             <IconButton onClick={() => setOpen(!open)}>
               <ExpandMoreIcon />
             </IconButton>
@@ -49,33 +36,35 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
             <IconButton onClick={() => setOpen(!open)}>
               <ExpandLessIcon />
             </IconButton>
-          )}
-        </ListItemSecondaryAction>
+          )
+        }
+      >
+        <ListItemText>
+          <Typography noWrap style={{ fontWeight: 'bold' }}>
+            {project.name}
+          </Typography>
+        </ListItemText>
       </ListItem>
       <Collapse in={open}>
         {folderRequestsList.length > 0 ? (
           folderRequestsList.map((request) => {
             return (
-              <ListItem key={request.uuid} className={classes.requestItem}>
-                <ListItemText onClick={() => onSelectedItem(request.uuid)}>
-                  {request.shared_by ? (
-                    <Typography noWrap style={{ marginLeft: 8 }}>
-                      {request.name} - Envoyée par : {request.shared_by}
-                    </Typography>
-                  ) : (
-                    <Typography noWrap style={{ marginLeft: 8 }}>
-                      {request.name}
-                    </Typography>
-                  )}
-                </ListItemText>
-
-                <ListItemSecondaryAction>
+              <ListItem
+                key={request.uuid}
+                className={classes.requestItem}
+                secondaryAction={
                   <Radio
                     checked={selectedItem === request.uuid}
-                    onChange={() => onSelectedItem(request.uuid as string)}
+                    onChange={() => onSelectedItem(request.uuid)}
                     color="secondary"
                   />
-                </ListItemSecondaryAction>
+                }
+              >
+                <ListItemText onClick={() => onSelectedItem(request.uuid)}>
+                  <Typography noWrap style={{ padding: '0 8px' }}>
+                    {getRequestName(request)}
+                  </Typography>
+                </ListItemText>
               </ListItem>
             )
           })
@@ -98,25 +87,23 @@ const RequestList: React.FC<RequestListProps> = ({ projectList, requestsList, se
   const { classes } = useStyles()
 
   return (
-    <>
-      <Grid container direction="column" marginBottom={3}>
-        <List className={classes.requestList}>
-          {projectList.length > 0 ? (
-            projectList.map((project) => (
-              <ProjectRow
-                key={project.uuid}
-                project={project}
-                requestsList={requestsList}
-                selectedItem={selectedItem}
-                onSelectedItem={onSelectedItem}
-              />
-            ))
-          ) : (
-            <ListItem>Aucune projet de recherche</ListItem>
-          )}
-        </List>
-      </Grid>
-    </>
+    <Grid container sx={{ flexDirection: 'column', marginBottom: 3 }}>
+      <List className={classes.requestList}>
+        {projectList.length > 0 ? (
+          projectList.map((project) => (
+            <ProjectRow
+              key={project.uuid}
+              project={project}
+              requestsList={requestsList}
+              selectedItem={selectedItem}
+              onSelectedItem={onSelectedItem}
+            />
+          ))
+        ) : (
+          <ListItem>Aucune projet de recherche</ListItem>
+        )}
+      </List>
+    </Grid>
   )
 }
 

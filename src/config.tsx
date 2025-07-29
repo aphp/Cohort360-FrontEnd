@@ -4,7 +4,9 @@ import * as R from 'ramda'
 import { CONFIG_URL } from 'constants.js'
 import { LabelObject } from 'types/searchCriterias'
 import { birthStatusData, booleanFieldsData, booleanOpenChoiceFieldsData, vmeData } from 'data/questionnaire_data'
-import { DeepPartial } from 'redux'
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
+}
 
 type ValueSetConfig = {
   url: string
@@ -415,7 +417,7 @@ export const onUpdateConfig = (hook: (newConfig: AppConfig) => void) => {
 }
 
 export const updateConfig = (newConfig: DeepPartial<AppConfig>) => {
-  config = R.mergeDeepRight(config, newConfig)
+  config = R.mergeDeepRight(config, newConfig) as AppConfig
   updateHooks.forEach((hook) => hook(config))
   return config
 }

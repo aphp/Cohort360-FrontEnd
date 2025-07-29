@@ -75,8 +75,8 @@ const CreateSample: React.FC<{
       <DialogTitle>Échantillonnage de la cohorte</DialogTitle>
 
       <DialogContent>
-        <Grid container direction="column" gap={1}>
-          <Grid item>
+        <Grid container sx={{ flexDirection: 'column', gap: 1 }}>
+          <Grid>
             <Typography variant="h3">Nom :</Typography>
             <TextField
               placeholder="Nom"
@@ -100,7 +100,7 @@ const CreateSample: React.FC<{
             />
           </Grid>
 
-          <Grid item>
+          <Grid>
             <Typography variant="h3">Pourcentage du total à extraire (%) :</Typography>
             <TextField
               fullWidth
@@ -117,7 +117,7 @@ const CreateSample: React.FC<{
             />
           </Grid>
 
-          <Grid item>
+          <Grid>
             <Typography variant="h3">Description :</Typography>
             <TextField
               placeholder="Description"

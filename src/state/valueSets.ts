@@ -3,7 +3,6 @@ import {
   createEntityAdapter,
   createAsyncThunk,
   PayloadAction,
-  Dictionary,
   createSelector
 } from '@reduxjs/toolkit'
 import { CriteriaItemType } from 'types'
@@ -20,7 +19,7 @@ const valueSetsAdapter = createEntityAdapter<CodesCache<FhirItem>>()
 
 export type CodeCache = { [system: string]: Hierarchy<FhirItem>[] }
 
-export type ValueSetStore = { entities: Dictionary<CodesCache<FhirItem>>; cache: CodeCache }
+export type ValueSetStore = { entities: { [id: string]: CodesCache<FhirItem> | undefined }; cache: CodeCache }
 
 export const prefetchSmallValueSets = async (
   criteriaTree: CriteriaItemType[]

@@ -60,7 +60,7 @@ const ExpandableChipsLine: React.FC<ExpandableChipsLineProps> = ({
             colorString={colorString}
             backgroundColor={backgroundColor}
             style={{ margin: 0 }}
-            ref={(el) => (chipRefs.current[index] = el)}
+            ref={(el) => { chipRefs.current[index] = el; }}
           />
         ))}
 

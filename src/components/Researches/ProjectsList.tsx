@@ -109,9 +109,9 @@ const ProjectsList = () => {
   }
 
   return (
-    <Grid container style={{ padding: '20px 0' }} gap="20px">
-      <Grid container justifyContent={'space-between'} alignItems={'center'}>
-        <Grid item>
+    <Grid container size={12} style={{ padding: '20px 0' }} sx={{ gap: '20px' }}>
+      <Grid container size={12} sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+        <Grid>
           <Select
             value={`${order.orderDirection}${order.orderBy}`}
             label="Tri par"
@@ -119,7 +119,7 @@ const ProjectsList = () => {
             onChange={(newValue) => changeOrderBy(newValue)}
           />
         </Grid>
-        <Grid item>
+        <Grid>
           <Button
             width="fit-content"
             onClick={() => setOpenEditionModal(true)}
@@ -130,15 +130,15 @@ const ProjectsList = () => {
             Nouveau projet
           </Button>
         </Grid>
-        <Grid item>
+        <Grid>
           <DisplayDigits label={`projet${total > 1 ? 's' : ''}`} nb={total} />
         </Grid>
       </Grid>
-      <Grid container gap="50px" id="projects-list-div">
+      <Grid container size={12} sx={{ gap: '50px' }} id="projects-list-div">
         {loading ? (
           <CenteredCircularProgress />
         ) : projectsList.length === 0 ? (
-          <Grid container justifyContent={'center'} marginTop={'12px'}>
+          <Grid container sx={{ justifyContent: 'center' }} marginTop={'12px'}>
             <Typography>Aucun projet à afficher</Typography>
           </Grid>
         ) : (

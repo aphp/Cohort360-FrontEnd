@@ -34,7 +34,7 @@ const Dashboard = ({ context }: DashboardProps) => {
   const { tabName } = useParams<{ tabName?: ResourceType }>()
   const [selectedSubTab, setSelectedSubTab] = useState<ResourceType | null>(null)
   const [selectedTab, setSelectedTab] = useState(
-    tabName ?? appConfig.core.fhir.facetsExtensions ? ResourceType.PREVIEW : ResourceType.PATIENT
+    (tabName ?? appConfig.core.fhir.facetsExtensions) ? ResourceType.PREVIEW : ResourceType.PATIENT
   )
   const open = useAppSelector((state) => state.drawer)
   const dashboard = useAppSelector((state) => state.exploredCohort)
@@ -147,10 +147,10 @@ const Dashboard = ({ context }: DashboardProps) => {
         context={context}
         access={dashboard.deidentifiedBoolean ? AccessLevel.DEIDENTIFIED : AccessLevel.NOMINATIVE}
       />
-      <Grid container justifyContent="center">
-        <Grid container xs={12} justifyContent="center">
-          <Grid container justifyContent={'center'} sx={{ backgroundColor: '#e6f1fd' }}>
-            <Grid item xs={11}>
+      <Grid container size={12} display="flex" sx={{ justifyContent: 'center' }}>
+        <Grid container size={12} display="flex" sx={{ justifyContent: 'center' }}>
+          <Grid container display="flex" size={12} sx={{ justifyContent: 'center', backgroundColor: '#e6f1fd' }}>
+            <Grid size={11}>
               <TabsWrapper
                 id="mainTabs"
                 scrollButtons={'auto'}
@@ -176,7 +176,7 @@ const Dashboard = ({ context }: DashboardProps) => {
             </Grid>
           </Grid>
           {subTabs && (
-            <Grid item xs={11} sx={{ borderBottom: '1px solid #848484' }}>
+            <Grid size={11} sx={{ borderBottom: '1px solid #848484' }}>
               <TabsWrapper
                 id="subTabs"
                 value={selectedSubTab}
@@ -201,15 +201,15 @@ const Dashboard = ({ context }: DashboardProps) => {
           )}
         </Grid>
       </Grid>
-      <Grid container xs={11} alignItems="center" direction="column">
+      <Grid container size={11} sx={{ alignItems: 'center', flexDirection: 'column' }}>
         {selectedTab === ResourceType.PREVIEW ? (
           <CohortPreview
             cohortId={
               context === URLS.COHORT || context === URLS.PERIMETERS
                 ? groupId
                 : context === URLS.PATIENTS
-                ? me?.topLevelCareSites?.join(',')
-                : undefined
+                  ? me?.topLevelCareSites?.join(',')
+                  : undefined
             }
             total={dashboard.totalPatients}
             agePyramidData={dashboard.agePyramidData}

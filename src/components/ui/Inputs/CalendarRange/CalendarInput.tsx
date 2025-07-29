@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { FormLabel, Grid, IconButton, InputAdornment, TextField } from '@mui/material'
+import { FormLabel, Grid, IconButton } from '@mui/material'
 
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
@@ -9,6 +9,7 @@ import { DatePickerWrapper, DateWrapper } from './styles'
 import { BlockWrapper } from 'components/ui/Layout'
 import { ErrorType } from 'types/error'
 import { ErrorMessage } from '../Errors'
+import { frFR } from '@mui/x-date-pickers/locales'
 
 interface CalendarInputProps {
   value: string | null
@@ -33,25 +34,29 @@ const CalendarInput = ({ value, label, disabled = false, onChange }: CalendarInp
 
   return (
     <>
-      <DateWrapper item xs={12}>
+      <DateWrapper size={12}>
         <FormLabel component="legend">{label} :</FormLabel>
-        <Grid container alignItems="center">
-          <Grid container item xs={date ? 11 : 12} justifyContent="space-between">
-            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+        <Grid container sx={{ alignItems: 'center' }}>
+          <Grid container size={date ? 11 : 12} sx={{ justifyContent: 'space-between' }}>
+            <LocalizationProvider
+              dateAdapter={AdapterMoment}
+              adapterLocale={'fr'}
+              localeText={frFR.components.MuiLocalizationProvider.defaultProps.localeText}
+            >
               <DatePickerWrapper
                 disabled={disabled}
                 onChange={(newValue: unknown) => setDate(newValue as string)}
-                value={date}
-                renderInput={(params) => <TextField {...params} variant="standard" />}
-              >
-                <InputAdornment position="start">
-                  <ClearIcon color="primary" onClick={() => setDate(null)} />{' '}
-                </InputAdornment>
-              </DatePickerWrapper>
+                value={date as any}
+                slotProps={{
+                  textField: {
+                    variant: 'standard'
+                  }
+                }}
+              />
             </LocalizationProvider>
           </Grid>
           {date !== null && (
-            <Grid item xs={1}>
+            <Grid size={1}>
               <IconButton color="primary" size="small" onClick={() => setDate(null)} disabled={disabled}>
                 <ClearIcon style={{ fontSize: 17 }} />
               </IconButton>

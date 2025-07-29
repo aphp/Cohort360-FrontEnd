@@ -82,7 +82,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
 
   return (
     <>
-      <Grid container direction="column" marginBottom={3}>
+      <Grid container sx={{ flexDirection: "column", marginBottom: 3 }}>
         <Typography variant="h3">Nom de la requête à partager:</Typography>
         <TextField
           placeholder="Nom de la requête"
@@ -98,7 +98,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
         />
       </Grid>
 
-      <Grid container direction="column">
+      <Grid container sx={{ flexDirection: "column" }}>
         <Typography variant="h3">Utilisateur à qui partager la requête:</Typography>
         <div style={{ display: 'flex', flexDirection: 'column', margin: '1em 0 0 0' }}>
           <Autocomplete
@@ -125,16 +125,18 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
                 label="Rechercher un utilisateur"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <Fragment>
-                      {loadingOnSearch ? <CircularProgress color="inherit" size={20} /> : null}
-                      {params.InputProps.endAdornment}
-                    </Fragment>
-                  )
-                }}
                 style={{ marginBottom: '1em' }}
+                slotProps={{
+                  input: {
+                    ...params.InputProps,
+                    endAdornment: (
+                      <Fragment>
+                        {loadingOnSearch ? <CircularProgress color="inherit" size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </Fragment>
+                    )
+                  }
+                }}
               />
             )}
           />
@@ -142,7 +144,7 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
           <UsersTable usersList={usersToShare} onChangeUsersAssociated={onChangeValue} usersAssociated={usersToShare} />
         </div>
       </Grid>
-      <Grid container direction="column">
+      <Grid container sx={{ flexDirection: "column" }}>
         {children}
       </Grid>
     </>

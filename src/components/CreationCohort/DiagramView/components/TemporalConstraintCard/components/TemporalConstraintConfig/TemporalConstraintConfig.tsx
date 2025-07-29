@@ -219,10 +219,10 @@ const TemporalConstraintConfig: React.FC<{
         </FormControl>
       </Grid>
       <Grid container alignItems="center" justifyContent="center">
-        <Grid container xs={6} justifyContent="flex-end">
+        <Grid container size={6} sx={{ justifyContent: 'flex-end' }}>
           <Typography style={{ fontWeight: 700 }}>dans un intervalle </Typography>
         </Grid>
-        <Grid container xs={6} alignItems="center">
+        <Grid container size={6} sx={{ alignItems: 'center' }}>
           <Checkbox
             checked={isFirstTimeValueChecked}
             onChange={() => setIsFirstTimeValueChecked(!isFirstTimeValueChecked)}
@@ -257,7 +257,7 @@ const TemporalConstraintConfig: React.FC<{
         </Grid>
       </Grid>
       <Grid container alignItems="center" justifyContent="flex-end">
-        <Grid container xs={6} alignItems="center">
+        <Grid container size={6} sx={{ alignItems: 'center' }}>
           <Checkbox
             checked={isSecondTimeValueChecked}
             onChange={() => setIsSecondTimeValueChecked(!isSecondTimeValueChecked)}

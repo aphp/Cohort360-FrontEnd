@@ -76,7 +76,7 @@ const ModalImpersonation: React.FC<{
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md" aria-labelledby="form-dialog-title">
       <DialogTitle>Impersonnifier un utilisateur</DialogTitle>
       <DialogContent>
-        <Grid container direction="column">
+        <Grid container sx={{ flexDirection: "column" }}>
           <div style={{ display: 'flex', flexDirection: 'column', margin: '1em 0 0 0' }}>
             <Autocomplete
               noOptionsText="Rechercher un utilisateur"
@@ -106,16 +106,18 @@ const ModalImpersonation: React.FC<{
                     label="Rechercher un utilisateur"
                     value={value}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <Fragment>
-                          {loadingOnSearch ? <CircularProgress color="inherit" size={20} /> : null}
-                          {params.InputProps.endAdornment}
-                        </Fragment>
-                      )
-                    }}
                     style={{ marginBottom: '1em' }}
+                    slotProps={{
+                      input: {
+                        ...params.InputProps,
+                        endAdornment: (
+                          <Fragment>
+                            {loadingOnSearch ? <CircularProgress color="inherit" size={20} /> : null}
+                            {params.InputProps.endAdornment}
+                          </Fragment>
+                        )
+                      }
+                    }}
                   />
                 )
               }}

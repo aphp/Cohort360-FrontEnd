@@ -47,7 +47,7 @@ const ExecutiveUnits = ({ value, sourceType, disabled = false, onChange, label }
 
   return (
     <InputWrapper>
-      <Grid item container alignContent="center" alignItems={'center'}>
+      <Grid container sx={{ alignContent: "center", alignItems: 'center' }}>
         {label || <CriteriaLabel style={{ padding: 0 }} label="Unité exécutrice" />}
         <Tooltip
           title={
@@ -64,16 +64,18 @@ const ExecutiveUnits = ({ value, sourceType, disabled = false, onChange, label }
       </Grid>
       <Grid
         container
-        alignItems={value.length ? 'flex-start' : 'center'}
-        border="1px solid rgba(0, 0, 0, 0.25)"
-        borderRadius="4px"
-        padding="9px 3px 9px 12px"
+        sx={{
+          alignItems: value.length ? 'flex-start' : 'center',
+          border: "1px solid rgba(0, 0, 0, 0.25)",
+          borderRadius: "4px",
+          padding: "9px 3px 9px 12px"
+        }}
       >
-        <Grid container alignItems="center" item xs={10}>
+        <Grid container size={{ xs: 10 }} sx={{ alignItems: "center" }}>
           {!value.length && <FormLabel component="legend">Sélectionner une unité exécutrice</FormLabel>}
           <CodesWithSystems disabled={disabled} codes={value} isExtended={isExtended} onDelete={handleDelete} />
         </Grid>
-        <Grid item xs={2} container justifyContent="flex-end">
+        <Grid size={{ xs: 2 }} container sx={{ justifyContent: "flex-end" }}>
           {value.length > 0 && isExtended && (
             <IconButton size="small" sx={{ color: '#5BC5F2' }} onClick={() => setIsExtended(false)}>
               <CloseIcon />

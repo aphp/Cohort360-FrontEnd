@@ -4,7 +4,7 @@ import { makeStyles } from 'tss-react/mui'
 const useStyles = makeStyles()(() => ({
   datePickerInput: {
     marginTop: 4,
-    '& input': {
+    '& .MuiPickersSectionList-root': {
       padding: 8
     },
     '> div': {

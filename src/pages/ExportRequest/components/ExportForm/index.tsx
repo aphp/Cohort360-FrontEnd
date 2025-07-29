@@ -400,10 +400,10 @@ const ExportForm: React.FC = () => {
 
   return (
     <Grid container>
-      <Grid container item className={classes.selectedCohortGrid}>
+      <Grid container className={classes.selectedCohortGrid}>
         <>
           {displayForm ? (
-            <Grid container alignItems={'center'}>
+            <Grid container sx={{ alignItems: 'center' }}>
               <Typography variant="h2">Cohorte sélectionnée :&nbsp;</Typography>
               <Typography variant="h3" color="#544d4d">
                 {exportCohort?.name}
@@ -462,7 +462,7 @@ const ExportForm: React.FC = () => {
             Le motif doit comporter au moins 10 caractères
           </Typography>
 
-          <Grid container className={classes.oneFileGrid} alignItems="center">
+          <Grid container size={12} className={classes.oneFileGrid} sx={{ alignItems: 'center' }}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -487,8 +487,8 @@ const ExportForm: React.FC = () => {
             </Tooltip>
           </Grid>
 
-          <Grid item container alignItems="center" flexWrap="nowrap">
-            <Grid item container xs={3}>
+          <Grid container size={12} sx={{ alignItems: 'center', flexWrap: 'nowrap' }}>
+            <Grid container size={{ xs: 3 }}>
               <Typography className={classes.dialogHeader} variant="h5">
                 Tables exportées
               </Typography>
@@ -506,7 +506,7 @@ const ExportForm: React.FC = () => {
               </IconButton>
             </Grid>
 
-            <Grid container className={classes.fileTypeGrid} xs={5}>
+            <Grid container className={classes.fileTypeGrid} size={{ xs: 5 }}>
               <Typography variant="h3">Type de fichier : </Typography>
               <Select
                 className={classes.fileTypeSelect}
@@ -521,7 +521,7 @@ const ExportForm: React.FC = () => {
             </Grid>
 
             {oneFile !== true && (
-              <Grid item xs={4} container className={classes.selectAllTablesGrid}>
+              <Grid size={{ xs: 4 }} container className={classes.selectAllTablesGrid}>
                 <FormControlLabel
                   className={classes.selectAllTablesFormControl}
                   control={
@@ -553,7 +553,7 @@ const ExportForm: React.FC = () => {
             )}
           </Grid>
           {loading ? (
-            <Grid container className={classes.exportTableGrid} justifyContent={'center'}>
+            <Grid container className={classes.exportTableGrid} sx={{ justifyContent: 'center' }}>
               <CircularProgress />
             </Grid>
           ) : (
@@ -565,14 +565,14 @@ const ExportForm: React.FC = () => {
               Conditions de l'EDS
             </Typography>
 
-            <Grid item container gap="8px" justifyContent={'space-between'}>
+            <Grid container sx={{ gap: '8px', justifyContent: 'space-between' }}>
               <Typography variant="caption" className={classes.textBody2}>
                 Le niveau d’habilitation dont vous disposez dans Cohort360 vous autorise à exporter des données à
                 caractère personnel conformément à la réglementation et aux règles institutionnelles d’utilisation des
                 données du Système d’Information clinique de l’AP-HP. Vous êtes garant des données exportées et vous
                 vous engagez à :
               </Typography>
-              <Grid item container>
+              <Grid container>
                 <Typography variant="caption" className={classes.conditionItem}>
                   N’exporter, parmi les catégories de données accessibles, que les données strictement nécessaires et
                   pertinentes au regard des objectifs de la recherche
@@ -636,7 +636,7 @@ const ExportForm: React.FC = () => {
               </Button>
             </Grid>
           </Grid>
-          <Grid container item mb="12px" justifyContent={'flex-end'}>
+          <Grid container sx={{ mb: '12px', justifyContent: 'flex-end' }}>
             {error === Error.ERROR_MOTIF && (
               <CustomAlert severity="error">
                 Merci d'indiquer le motif de votre demande d'export, ce motif doit contenir au moins 10 caractères.
