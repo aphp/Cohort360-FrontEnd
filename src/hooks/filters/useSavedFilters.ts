@@ -88,8 +88,17 @@ export const useSavedFilters = (type: ResourceType) => {
         await patchFiltersService(type, selectedSavedFilter?.filterUuid, name, newSearchCriterias, deidentified)
         setFetchStatus({ status: FetchStatus.SUCCESS, message: 'Les modifications ont bien été enregistrées.' })
         await getSavedFilters()
-      } catch {
-        setFetchStatus({ status: FetchStatus.ERROR, message: 'Erreur lors de la modification du filtre.' })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        setFetchStatus({
+          status: FetchStatus.ERROR,
+          message:
+            error.status === 400
+              ? "Erreur lors de l'enregistrement du filtre. Le nom doit être unique."
+              : `L'enregistrement du filtre a echoué. Veuillez réessayer ultérieurement. Si le problème persiste, veuillez contacter le support: ${
+                  getConfig().system.mailSupport
+                }.`
+        })
       }
     }
   }

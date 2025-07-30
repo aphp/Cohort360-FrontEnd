@@ -429,7 +429,7 @@ export const patchFilters = async (
     name,
     filter
   })
-  if (res instanceof AxiosError) throw "Le filtre n'a pas pu être modifié."
+  if (res instanceof AxiosError) throw { status: res.status }
   return res
 }
 
