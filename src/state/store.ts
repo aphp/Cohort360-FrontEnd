@@ -1,16 +1,9 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit'
-import { 
-  persistReducer, 
-  persistStore, 
-  FLUSH, 
-  REHYDRATE, 
-  PAUSE, 
-  PERSIST, 
-  PURGE, 
-  REGISTER 
-} from 'redux-persist'
+import { persistReducer, persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist'
 import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync'
 import * as localforage from 'localforage'
+
+import logger from 'redux-logger'
 
 // Import reducers
 import cohortCreation from './cohortCreation'
@@ -51,9 +44,7 @@ const rootReducer = combineReducers({
 // Persist configuration
 const persistConfig = {
   key: 'root',
-  storage: localforage,
-  // Optionally blacklist certain reducers from persistence
-  // blacklist: ['message', 'drawer']
+  storage: localforage
 }
 
 /**
@@ -64,8 +55,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 // Redux-state-sync middleware
 const stateSyncMiddleware = createStateSyncMiddleware({
-  predicate: (action) => 
-    action.type === 'autoLogout/open' || action.type === 'autoLogout/close'
+  predicate: (action) => action.type === 'autoLogout/open' || action.type === 'autoLogout/close'
 })
 
 // Configure store
@@ -84,29 +74,25 @@ export const store = configureStore({
           'warningDialog/showDialog',
           'warningDialog/onConfirm'
         ],
-        ignoredPaths: [
-          'warningDialog.showDialog', 
-          'warningDialog.onConfirm'
-        ]
+        ignoredPaths: ['warningDialog.showDialog', 'warningDialog.onConfirm']
       }
     })
 
     // Add custom middleware
-    middleware.prepend(stateSyncMiddleware)
-
+    middleware.prepend(stateSyncMiddleware).concat(logger)
+    console.log('manelle process.env.NODE_ENV', process.env.NODE_ENV)
     // Add logger in development
-    if (process.env.NODE_ENV === 'development') {
-      try {
-        const { logger } = require('redux-logger')
-        middleware.concat(logger)
-      } catch (error) {
-        console.warn('Redux logger not available:', error)
-      }
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   try {
+    //     middleware.concat(logger)
+    //   } catch (error) {
+    //     console.warn('Redux logger not available:', error)
+    //   }
+    // }
 
     return middleware
   },
-  devTools: process.env.NODE_ENV !== 'production'
+  devTools: true
 })
 
 // Initialize state sync
