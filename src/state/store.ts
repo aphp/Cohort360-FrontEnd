@@ -3,7 +3,7 @@ import { persistReducer, persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, 
 import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync'
 import * as localforage from 'localforage'
 
-import logger from 'redux-logger'
+import { createLogger } from 'redux-logger'
 
 // Import reducers
 import cohortCreation from './cohortCreation'
@@ -79,16 +79,30 @@ export const store = configureStore({
     })
 
     // Add custom middleware
-    middleware.prepend(stateSyncMiddleware).concat(logger)
-    console.log('manelle process.env.NODE_ENV', process.env.NODE_ENV)
+    middleware.prepend(stateSyncMiddleware)
+
     // Add logger in development
-    // if (process.env.NODE_ENV === 'development') {
-    //   try {
-    //     middleware.concat(logger)
-    //   } catch (error) {
-    //     console.warn('Redux logger not available:', error)
-    //   }
-    // }
+    if (process.env.NODE_ENV === 'development') {
+      const logger = createLogger({
+        predicate: (getState, action) => {
+          // Filter out noisy actions
+          const ignoredActions = [
+            'persist/PERSIST',
+            'persist/REHYDRATE',
+            'persist/FLUSH',
+            'persist/PAUSE',
+            'persist/PURGE',
+            'persist/REGISTER'
+          ]
+          return !ignoredActions.includes(action.type)
+        },
+        collapsed: false,
+        duration: true,
+        timestamp: true,
+        level: 'log'
+      })
+      return middleware.concat(logger)
+    }
 
     return middleware
   },
