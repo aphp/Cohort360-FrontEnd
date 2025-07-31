@@ -300,7 +300,7 @@ const Login = () => {
   if (noRights) return <NoRights oidcCode={oidcCode} />
 
   return oidcCode ? (
-    <Grid className={classes.oidcConnexionProgress}>
+    <Grid container className={classes.oidcConnexionProgress}>
       <Typography variant="h2" color="primary">
         Connexion...
       </Typography>
@@ -310,27 +310,41 @@ const Login = () => {
   ) : (
     <>
       <Grid container component="main" className={classes.root}>
-        <Grid item xs={false} sm={6} md={6} className={classes.image} />
+        <Grid size={{ xs: false, sm: 6, md: 6 }} className={classes.image} />
 
         <Grid
           container
-          item
-          xs={12}
-          sm={6}
-          md={6}
-          direction="column"
-          justifyContent="center"
-          alignItems="center"
+          size={{ xs: 12, sm: 6, md: 6 }}
+          sx={{
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
           className={classes.rightPanel}
         >
-          <Grid container xs={8} lg={6} item direction="column" alignItems="center" justifyContent="center">
+          <Grid
+            container
+            size={{ xs: 8, lg: 6 }}
+            sx={{
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
             <img className={classes.logo} src={logo} alt="Logo Cohort360" />
 
             <Typography color="primary" className={classes.bienvenue}>
               Bienvenue ! Connectez-vous.
             </Typography>
             {(appConfig.system.displayJwtLogin || display_jwt_form) && (
-              <Grid container direction="column" alignItems="center" justifyContent="center">
+              <Grid
+                container
+                sx={{
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
                 <TextField
                   margin="normal"
                   required

@@ -79,7 +79,7 @@ const EpisodeConstraints: React.FC<EpisodeConstraintsProps> = ({ constraints, on
   return (
     <>
       <Grid>
-        <Grid item container direction="row" alignItems="center">
+        <Grid container sx={{ flexDirection: 'row', alignItems: 'center' }}>
           <Typography variant="h3">Contraintes sur les épisodes</Typography>
           <Tooltip title="Les contraintes sur les épisodes ne s'appliquent qu'aux critères de dossiers de spécialité de type: Maternité">
             <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />

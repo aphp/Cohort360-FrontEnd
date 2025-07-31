@@ -89,7 +89,7 @@ const ValueSetRow = ({
           marginLeft={path.length > 1 ? path.length * 20 - 20 + 'px' : '0'}
           style={{ paddingRight: 10 }}
         >
-          <CellWrapper item xs={1} cursor>
+          <CellWrapper size={1} cursor>
             {mode === SearchMode.EXPLORATION && isHierarchy && (
               <>
                 {internalLoading && <CircularProgress size={'15px'} color="info" />}
@@ -102,16 +102,16 @@ const ValueSetRow = ({
               </>
             )}
           </CellWrapper>
-          <CellWrapper item xs={6} cursor onClick={() => (open ? setOpen(false) : handleOpen())}>
+          <CellWrapper size={6} cursor onClick={() => (open ? setOpen(false) : handleOpen())}>
             <TruncatedText lineNb={2} text={getLabelFromCode(item)}></TruncatedText>
           </CellWrapper>
-          <CellWrapper item xs={2} container justifyContent="center">
+          <CellWrapper size={2} container sx={{ justifyContent: 'center' }}>
             <Typography variant="body2">{displayStat(item.statTotalUnique, HEADER_NB_PATIENTS)}</Typography>
           </CellWrapper>
-          <CellWrapper item xs={2} container justifyContent="center">
+          <CellWrapper size={2} container sx={{ justifyContent: 'center' }}>
             <Typography variant="body2">{displayStat(item.statTotal, HEADER_FREQUENCY)}</Typography>
           </CellWrapper>
-          <CellWrapper item xs={1} container>
+          <CellWrapper size={1} container>
             <Checkbox
               disabled={isSelectionDisabled(item)}
               checked={status === SelectedStatus.SELECTED}
@@ -203,21 +203,21 @@ const ValueSetTable = ({
   }
 
   return (
-    <Grid container direction="column" justifyContent="space-between" height="100%" className="ValueSetTable">
-      <Grid container item flexGrow={1}>
+    <Grid container sx={{ flexDirection: 'column', justifyContent: 'space-between' }} height="100%" className="ValueSetTable">
+      <Grid container flexGrow={1}>
         <TableContainer style={{ background: 'white' }}>
           <Table>
             <TableHead>
               {loading.list === LoadingStatus.SUCCESS && !isHierarchy && (
                 <RowContainerWrapper container>
-                  <RowWrapper container alignItems="center" justifyContent="space-between" style={{ paddingRight: 10 }}>
-                    <CellWrapper item xs={1} />
-                    <CellWrapper item xs={6}>
+                  <RowWrapper container sx={{ alignItems: 'center', justifyContent: 'space-between' }} style={{ paddingRight: 10 }}>
+                    <CellWrapper size={1} />
+                    <CellWrapper size={6}>
                       <Typography color={hierarchy.count ? 'primary' : '#4f4f4f'} fontWeight={600}>
                         {hierarchy.count ? `${hierarchy.count} résultat(s)` : `Aucun résultat à afficher`}
                       </Typography>
                     </CellWrapper>
-                    <CellWrapper item xs={2} container justifyContent="center">
+                    <CellWrapper size={2} container sx={{ justifyContent: 'center' }}>
                       {onSort && mode === SearchMode.RESEARCH ? (
                         <IconButton
                           size="small"
@@ -235,7 +235,7 @@ const ValueSetTable = ({
                         </Typography>
                       )}
                     </CellWrapper>
-                    <CellWrapper item xs={2} container justifyContent="center">
+                    <CellWrapper size={2} container sx={{ justifyContent: 'center' }}>
                       {onSort && mode === SearchMode.RESEARCH ? (
                         <IconButton
                           size="small"
@@ -253,7 +253,7 @@ const ValueSetTable = ({
                         </Typography>
                       )}
                     </CellWrapper>
-                    <CellWrapper item xs={1} container>
+                    <CellWrapper size={1} container>
                       {hierarchy.count > 0 && (
                         <Checkbox
                           disabled={
@@ -298,13 +298,13 @@ const ValueSetTable = ({
             )}
           </Table>
           {loading.list === LoadingStatus.FETCHING && (
-            <Grid container justifyContent="center" alignContent="center" height={500}>
+            <Grid container sx={{ justifyContent: 'center', alignContent: 'center' }} height={500}>
               <CircularProgress />
             </Grid>
           )}
         </TableContainer>
       </Grid>
-      <Grid container item>
+      <Grid container>
         {!isHierarchy && loading.list === LoadingStatus.SUCCESS && Math.ceil(hierarchy.count / LIMIT_PER_PAGE) > 1 && (
           <Pagination
             count={Math.ceil(hierarchy.count / LIMIT_PER_PAGE)}

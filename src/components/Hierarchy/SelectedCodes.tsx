@@ -24,10 +24,9 @@ const SelectedCodes = <T,>({ values, onDelete, sx = { backgroundColor: '#D1E2F4'
       {values.length > 0 && (
         <Collapse in={openSelectedCodesDrawer} style={{ width: '100%' }}>
           <Grid
-            item
             container
-            xs={12}
-            justifyContent="space-between"
+            size={12}
+            sx={{ justifyContent: 'space-between' }}
             style={{
               maxHeight: 200,
               overflowX: 'hidden',
@@ -39,11 +38,11 @@ const SelectedCodes = <T,>({ values, onDelete, sx = { backgroundColor: '#D1E2F4'
           </Grid>
         </Collapse>
       )}
-      <Grid item xs={12} container alignItems="center" justifyContent="space-between" height={24}>
+      <Grid size={12} container sx={{ alignItems: 'center', justifyContent: 'space-between', height: 24 }}>
         <Typography textAlign="center" fontWeight={900} color="#0063AF">
           {values.length} sélectionné(s)
         </Typography>
-        <Grid item xs={1} container justifyContent="flex-end">
+        <Grid size={1} container sx={{ justifyContent: 'flex-end' }}>
           {values.length > 0 && (
             <>
               {openSelectedCodesDrawer ? (

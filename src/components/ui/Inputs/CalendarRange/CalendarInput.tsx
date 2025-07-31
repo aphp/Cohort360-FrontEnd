@@ -33,25 +33,36 @@ const CalendarInput = ({ value, label, disabled = false, onChange }: CalendarInp
 
   return (
     <>
-      <DateWrapper item xs={12}>
+      <DateWrapper size={12}>
         <FormLabel component="legend">{label} :</FormLabel>
-        <Grid container alignItems="center">
-          <Grid container item xs={date ? 11 : 12} justifyContent="space-between">
+        <Grid container sx={{ alignItems: 'center' }}>
+          <Grid container size={date ? 11 : 12} sx={{ justifyContent: 'space-between' }}>
             <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
               <DatePickerWrapper
                 disabled={disabled}
                 onChange={(newValue: unknown) => setDate(newValue as string)}
-                value={date}
-                renderInput={(params) => <TextField {...params} variant="standard" />}
-              >
-                <InputAdornment position="start">
-                  <ClearIcon color="primary" onClick={() => setDate(null)} />{' '}
-                </InputAdornment>
-              </DatePickerWrapper>
+                value={date as any}
+                slots={{
+                  textField: (params: any) => (
+                    <TextField
+                      {...params}
+                      variant="standard"
+                      InputProps={{
+                        ...params.InputProps,
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <ClearIcon color="primary" onClick={() => setDate(null)} />
+                          </InputAdornment>
+                        )
+                      }}
+                    />
+                  )
+                }}
+              />
             </LocalizationProvider>
           </Grid>
           {date !== null && (
-            <Grid item xs={1}>
+            <Grid size={1}>
               <IconButton color="primary" size="small" onClick={() => setDate(null)} disabled={disabled}>
                 <ClearIcon style={{ fontSize: 17 }} />
               </IconButton>

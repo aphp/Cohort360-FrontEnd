@@ -58,7 +58,7 @@ export const Pagination = ({ currentPage, count, onPageChange }: PaginationProps
     }
   }
   return (
-    <Grid container justifyContent={'center'} alignItems="center" xs={12}>
+    <Grid container size={{ xs: 12 }} sx={{ justifyContent: 'center', alignItems: "center" }}>
       <StyledPagination
         role="search"
         shape="circular"

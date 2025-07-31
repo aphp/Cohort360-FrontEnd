@@ -62,7 +62,7 @@ const TemporalConstraint: React.FC<{
           <StayConstraints constraints={stayConstraints} onChangeConstraints={setStayConstraints} />
           {criteriaGroup[0].type !== CriteriaGroupType.OR_GROUP && (
             <Grid>
-              <Grid item container direction="row" alignItems="center">
+              <Grid container sx={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Typography variant="h3">Séquence d'évènements entre deux critères</Typography>
                 <Tooltip title="Les contraintes temporelles ne peuvent être ajoutées que sur le groupe ET principal.">
                   <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />

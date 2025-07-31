@@ -35,7 +35,7 @@ const OccurrencesSearch = ({ search, infos, onChange }: OccurrencesSearchProps) 
   return (
     <Grid container>
       {'searchBy' in search && (
-        <Grid item xs={4}>
+        <Grid size={4}>
           <Controller
             name="searchBy"
             control={control}
@@ -51,7 +51,7 @@ const OccurrencesSearch = ({ search, infos, onChange }: OccurrencesSearchProps) 
           />
         </Grid>
       )}
-      <Grid item xs={'searchBy' in search ? 8 : 12}>
+      <Grid size={'searchBy' in search ? 8 : 12}>
         {infos.type !== ResourceType.DOCUMENTS && 'searchInput' in search && (
           <Controller
             name="searchInput"
