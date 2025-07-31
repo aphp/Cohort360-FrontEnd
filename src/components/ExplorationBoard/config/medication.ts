@@ -61,7 +61,7 @@ const initSearchCriterias = (
   medType: ResourceType.MEDICATION_REQUEST | ResourceType.MEDICATION_ADMINISTRATION
 ): SearchCriterias<MedicationFilters> => ({
   orderBy: {
-    orderBy: medType === ResourceType.MEDICATION_REQUEST ? Order.DATE : Order.EFFECTIVE_TIME,
+    orderBy: Order.PERIOD_START,
     orderDirection: Direction.DESC
   },
   searchInput: search,
