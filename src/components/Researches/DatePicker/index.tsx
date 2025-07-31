@@ -21,12 +21,14 @@ const DatePicker: React.FC<DatePickerProps> = ({ buttonLabel, value, onChangeVal
       <Typography fontWeight={600}>{buttonLabel}</Typography>
       <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
         <DesktopDatePicker
-          onChange={(newValue: string | null) => onChangeValue(newValue)}
-          value={value}
-          renderInput={(params) => (
+          onChange={(newValue) => onChangeValue(newValue as string | null)}
+          value={value as any}
+          slots={{
+            textField: ({ inputProps, ...params }: any) => (
             <div>
               <TextField
                 {...params}
+                {...inputProps}
                 fullWidth
                 className={classes.datePickerInput}
                 slotProps={{
@@ -48,7 +50,8 @@ const DatePicker: React.FC<DatePickerProps> = ({ buttonLabel, value, onChangeVal
                 }}
               />
             </div>
-          )}
+            )
+          }}
         />
       </LocalizationProvider>
     </Box>

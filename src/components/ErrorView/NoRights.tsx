@@ -20,13 +20,13 @@ const NoRights: React.FC<NoRightsProps> = ({ oidcCode }) => {
   const appConfig = useContext(AppConfig)
 
   return (
-    <Grid container direction="column" justifyContent="center" alignItems="center" spacing={2} height="100vh">
-      <Grid item className={classes.item}>
-        <Grid container direction="column" justifyContent="center" alignItems="center">
-          <Grid item style={{ padding: 16 }}>
+    <Grid container sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 2, height: '100vh' }}>
+      <Grid className={classes.item}>
+        <Grid container sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+          <Grid style={{ padding: 16 }}>
             <WarningIcon style={{ fontSize: 60 }} />
           </Grid>
-          <Grid item container justifyContent="center" style={{ padding: '8px 32px' }}>
+          <Grid container sx={{ justifyContent: 'center' }} style={{ padding: '8px 32px' }}>
             <Typography style={{ marginBottom: 16 }} variant="h5" align="center">
               Vous n'avez pas accès à l'application Cohort360. Merci de vous rapprocher de votre coordinateur pour
               demander la création de votre compte Cohort360 ainsi qu'un créneau de formation obligatoire pour utiliser
@@ -49,7 +49,7 @@ const NoRights: React.FC<NoRightsProps> = ({ oidcCode }) => {
         </Grid>
       </Grid>
 
-      <Grid item>
+      <Grid>
         <Button
           variant="outlined"
           style={{ borderColor: 'currentColor' }}

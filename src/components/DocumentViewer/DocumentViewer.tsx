@@ -36,7 +36,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
   const [numPages, setNumPages] = useState(1)
   const [loading, setLoading] = useState(false)
   const [selectedTab, setSelectedTab] = useState<'pdf' | 'raw'>(!deidentified ? (documentId ? 'pdf' : 'raw') : 'raw')
-  const gridRef: React.RefObject<HTMLDivElement> = useRef(null)
+  const gridRef: React.RefObject<HTMLDivElement | null> = useRef(null)
   const [gridWidth, setGridWidth] = useState(0)
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: 'pdf' | 'raw') => {

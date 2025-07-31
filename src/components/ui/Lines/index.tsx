@@ -13,16 +13,16 @@ const Lines = ({ value }: LinesProps) => {
         <Grid
           container
           key={index}
-          alignItems={'center'}
-          style={{
+          sx={{
+            alignItems: 'center',
             padding: '4px 16px',
             background: index % 2 === 0 ? '#f6fafe' : 'transparent'
           }}
         >
-          <Grid container item xs={6}>
+          <Grid container size={{ xs: 6 }}>
             <Typography variant="h6">{row.name}</Typography>
           </Grid>
-          <Grid container item xs={6}>
+          <Grid container size={{ xs: 6 }}>
             <Typography>{row.value}</Typography>
           </Grid>
         </Grid>

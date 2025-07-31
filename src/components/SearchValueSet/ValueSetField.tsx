@@ -39,7 +39,7 @@ const ValueSetField = ({ value, references, placeholder, disabled = false, onSel
     <>
       <Grid
         container
-        alignItems={value.length ? 'flex-start' : 'center'}
+        sx={{ alignItems: value.length ? 'flex-start' : 'center' }}
         border="1px solid rgba(0, 0, 0, 0.25)"
         borderRadius="4px"
         padding="9px 3px 9px 12px"
@@ -47,9 +47,8 @@ const ValueSetField = ({ value, references, placeholder, disabled = false, onSel
       >
         <Grid
           container
-          alignItems="center"
-          item
-          xs={10}
+          size={10}
+          sx={{ alignItems: 'center' }}
           role="button"
           tabIndex={0}
           style={{ cursor: 'pointer' }}
@@ -58,7 +57,7 @@ const ValueSetField = ({ value, references, placeholder, disabled = false, onSel
           <CodesWithSystems disabled={disabled} codes={value} isExtended={isExtended} onDelete={handleDelete} />
           {!value.length && <FormLabel component="legend">{placeholder}</FormLabel>}
         </Grid>
-        <Grid item xs={2} container justifyContent="flex-end">
+        <Grid size={2} container sx={{ justifyContent: 'flex-end' }}>
           {isExtended && value.length > 0 && (
             <IconButton size="small" sx={{ color: '#5BC5F2' }} onClick={() => setIsExtended(false)}>
               <CloseIcon />

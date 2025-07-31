@@ -16,12 +16,12 @@ const PatientNotExist = () => {
 
   return (
     <PageContainer justifyContent="center" alignItems="center" spacing={2} height={'100vh'}>
-      <Grid item className={classes.item}>
-        <Grid container direction="column" justifyContent="center" alignItems="center">
-          <Grid item style={{ padding: 16 }}>
+      <Grid className={classes.item}>
+        <Grid container sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+          <Grid style={{ padding: 16 }}>
             <PersonOffIcon style={{ fontSize: 60 }} />
           </Grid>
-          <Grid item style={{ padding: '8px 32px' }}>
+          <Grid style={{ padding: '8px 32px' }}>
             <Typography style={{ marginBottom: 16 }} variant="h5" align="center">
               Vous tentez d'accéder aux informations d'un patient qui ne sont pas disponibles
             </Typography>
@@ -29,7 +29,7 @@ const PatientNotExist = () => {
         </Grid>
       </Grid>
 
-      <Grid item>
+      <Grid>
         <Button variant="outlined" style={{ borderColor: 'currentColor' }} onClick={() => navigate('/home')}>
           Retour à l'accueil
         </Button>

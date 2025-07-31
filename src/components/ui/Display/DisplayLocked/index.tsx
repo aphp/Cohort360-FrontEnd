@@ -9,7 +9,7 @@ type DisplayLockedProps = {
 
 const DisplayLocked = ({ label = 'Fonctionnalité désactivée en mode pseudonymisé.' }: DisplayLockedProps) => {
   return (
-    <Grid container justifyContent={'center'}>
+    <Grid container sx={{ justifyContent: 'center' }}>
       <LockIconWrapper />
       <Typography variant="h6" align="center">
         {label}

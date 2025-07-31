@@ -149,8 +149,8 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
 
         <List className={classes.list}>
           <ListItem>
-            <Grid container justifyContent="space-between" alignItems="center" wrap="nowrap">
-              <Grid container wrap="nowrap" xs={10} alignItems="center" item>
+            <Grid container sx={{ justifyContent: "space-between", alignItems: "center" }} wrap="nowrap">
+              <Grid container wrap="nowrap" size={{ xs: 10 }} sx={{ alignItems: "center" }}>
                 <Impersonation
                   UserInfo={({ practitioner }) => (
                     <>
@@ -166,7 +166,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   )}
                 />
               </Grid>
-              <Grid container xs={2} item>
+              <Grid container size={{ xs: 2 }}>
                 <ListItemIcon
                   className={cx(classes.logoutButton, {
                     [classes.hide]: !open
@@ -187,7 +187,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
 
           {!open && (
             <ListItem>
-              <Grid container item>
+              <Grid container>
                 <ListItemIcon className={classes.logoutButton} style={{ marginLeft: -6 }}>
                   <Tooltip title="Se déconnecter">
                     <IconButton

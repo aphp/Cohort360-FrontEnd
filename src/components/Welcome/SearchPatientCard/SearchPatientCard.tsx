@@ -24,11 +24,11 @@ const SearchPatientCard = () => {
         </Typography>
       </div>
       <Divider sx={{ marginBottom: 1 }} />
-      <Grid container sx={{ flexGrow: 1 }} alignItems="center">
+      <Grid container sx={{ flexGrow: 1, alignItems: 'center' }}>
         {deidentifiedBoolean ? (
           <DisplayLocked />
         ) : (
-          <Grid container direction="column" justifyContent="flex-end" height={30} marginTop="4px">
+          <Grid container sx={{ flexDirection: 'column', justifyContent: 'flex-end' }} height={30} marginTop="4px">
             <SearchInput
               value={searchInput}
               searchOnClick
