@@ -26,9 +26,11 @@ const Panel = ({
     <Drawer
       anchor={anchor}
       open={open}
-      PaperProps={{ style: { width: size } }}
       onClose={onClose}
       sx={{ zIndex: 1300, overflowY: 'unset' }}
+      slotProps={{
+        paper: { style: { width: size } }
+      }}
     >
       <Grid container direction="column" maxWidth={size} height="100%" flexWrap="nowrap">
         <Grid item container flexDirection="column" flexWrap="nowrap" overflow="auto">

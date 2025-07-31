@@ -106,16 +106,18 @@ const ModalImpersonation: React.FC<{
                     label="Rechercher un utilisateur"
                     value={value}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <Fragment>
-                          {loadingOnSearch ? <CircularProgress color="inherit" size={20} /> : null}
-                          {params.InputProps.endAdornment}
-                        </Fragment>
-                      )
-                    }}
                     style={{ marginBottom: '1em' }}
+                    slotProps={{
+                      input: {
+                        ...params.InputProps,
+                        endAdornment: (
+                          <Fragment>
+                            {loadingOnSearch ? <CircularProgress color="inherit" size={20} /> : null}
+                            {params.InputProps.endAdornment}
+                          </Fragment>
+                        )
+                      }
+                    }}
                   />
                 )
               }}

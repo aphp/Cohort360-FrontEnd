@@ -132,7 +132,7 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
     const valueWithLabels = (arrayPropValue ?? []).map(
       (code) => codeSystem.find((c) => c.id === code) ?? { id: code, label: code }
     )
-    const value = props.definition.singleChoice ? valueWithLabels?.at(0) ?? null : valueWithLabels ?? []
+    const value = props.definition.singleChoice ? (valueWithLabels?.at(0) ?? null) : (valueWithLabels ?? [])
     return (
       <Autocomplete
         multiple={!props.definition.singleChoice}
@@ -224,9 +224,11 @@ const FORM_ITEM_RENDERER: { [key in CriteriaFormItemType]: CriteriaFormItemView<
         placeholder={props.definition.label}
         disabled={props.disabled}
         fullWidth
-        InputProps={{
-          inputProps: {
-            min: props.definition.min
+        slotProps={{
+          input: {
+            inputProps: {
+              min: props.definition.min
+            }
           }
         }}
       />

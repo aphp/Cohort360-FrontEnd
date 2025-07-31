@@ -1,16 +1,6 @@
 import React, { useState } from 'react'
 
-import {
-  Collapse,
-  IconButton,
-  Grid,
-  List,
-  ListItem,
-  ListItemSecondaryAction,
-  ListItemText,
-  Typography,
-  Radio
-} from '@mui/material'
+import { Collapse, IconButton, Grid, List, ListItem, ListItemText, Typography, Radio } from '@mui/material'
 
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -34,14 +24,10 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
 
   return (
     <>
-      <ListItem className={classes.requestItem}>
-        <ListItemText>
-          <Typography noWrap style={{ fontWeight: 'bold' }}>
-            {project.name}
-          </Typography>
-        </ListItemText>
-        <ListItemSecondaryAction>
-          {!open ? (
+      <ListItem
+        className={classes.requestItem}
+        secondaryAction={
+          !open ? (
             <IconButton onClick={() => setOpen(!open)}>
               <ExpandMoreIcon />
             </IconButton>
@@ -49,14 +35,30 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
             <IconButton onClick={() => setOpen(!open)}>
               <ExpandLessIcon />
             </IconButton>
-          )}
-        </ListItemSecondaryAction>
+          )
+        }
+      >
+        <ListItemText>
+          <Typography noWrap style={{ fontWeight: 'bold' }}>
+            {project.name}
+          </Typography>
+        </ListItemText>
       </ListItem>
       <Collapse in={open}>
         {folderRequestsList.length > 0 ? (
           folderRequestsList.map((request) => {
             return (
-              <ListItem key={request.uuid} className={classes.requestItem}>
+              <ListItem
+                key={request.uuid}
+                className={classes.requestItem}
+                secondaryAction={
+                  <Radio
+                    checked={selectedItem === request.uuid}
+                    onChange={() => onSelectedItem(request.uuid as string)}
+                    color="secondary"
+                  />
+                }
+              >
                 <ListItemText onClick={() => onSelectedItem(request.uuid)}>
                   {request.shared_by ? (
                     <Typography noWrap style={{ marginLeft: 8 }}>
@@ -68,14 +70,6 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
                     </Typography>
                   )}
                 </ListItemText>
-
-                <ListItemSecondaryAction>
-                  <Radio
-                    checked={selectedItem === request.uuid}
-                    onChange={() => onSelectedItem(request.uuid as string)}
-                    color="secondary"
-                  />
-                </ListItemSecondaryAction>
               </ListItem>
             )
           })
