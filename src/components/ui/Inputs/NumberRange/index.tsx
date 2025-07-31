@@ -39,10 +39,12 @@ const PatientsNbFilter = ({ label, values, type, onError, onChange }: PatientsNb
             type="number"
             value={range[0]}
             onChange={(event) => setRange([event.target.value, range[1]])}
-            inputProps={{ min: 0 }}
             variant="standard"
             size="small"
             style={{ width: '30%' }}
+            slotProps={{
+              htmlInput: { min: 0 }
+            }}
           />
           <FormLabel component="legend">patient(s).</FormLabel>
         </Grid>
@@ -52,10 +54,12 @@ const PatientsNbFilter = ({ label, values, type, onError, onChange }: PatientsNb
             type="number"
             value={range[1]}
             onChange={(event) => setRange([range[0], event.target.value])}
-            inputProps={{ min: 0 }}
             variant="standard"
             size="small"
             style={{ width: '30%' }}
+            slotProps={{
+              htmlInput: { min: 0 }
+            }}
           />
           <FormLabel component="legend">{type}.</FormLabel>
         </Grid>

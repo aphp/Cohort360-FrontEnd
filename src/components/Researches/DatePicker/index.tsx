@@ -29,20 +29,22 @@ const DatePicker: React.FC<DatePickerProps> = ({ buttonLabel, value, onChangeVal
                 {...params}
                 fullWidth
                 className={classes.datePickerInput}
-                InputProps={{
-                  ...params.InputProps,
-                  placeholder: 'jj/mm/aaaa',
-                  endAdornment: (
-                    // TODO: apres maj MUI, remplacer par slotProps le delete custom degueu
-                    <InputAdornment position="end">
-                      {value && (
-                        <IconButton sx={{ marginRight: '-12px', padding: 0 }} onClick={() => onChangeValue(null)}>
-                          <ClearIcon sx={{ color: '#5bc5f2' }} />
-                        </IconButton>
-                      )}
-                      {params.InputProps?.endAdornment}
-                    </InputAdornment>
-                  )
+                slotProps={{
+                  input: {
+                    ...params.InputProps,
+                    placeholder: 'jj/mm/aaaa',
+                    endAdornment: (
+                      // TODO: apres maj MUI, remplacer par slotProps le delete custom degueu
+                      <InputAdornment position="end">
+                        {value && (
+                          <IconButton sx={{ marginRight: '-12px', padding: 0 }} onClick={() => onChangeValue(null)}>
+                            <ClearIcon sx={{ color: '#5bc5f2' }} />
+                          </IconButton>
+                        )}
+                        {params.InputProps?.endAdornment}
+                      </InputAdornment>
+                    )
+                  }
                 }}
               />
             </div>

@@ -125,16 +125,18 @@ const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
                 label="Rechercher un utilisateur"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <Fragment>
-                      {loadingOnSearch ? <CircularProgress color="inherit" size={20} /> : null}
-                      {params.InputProps.endAdornment}
-                    </Fragment>
-                  )
-                }}
                 style={{ marginBottom: '1em' }}
+                slotProps={{
+                  input: {
+                    ...params.InputProps,
+                    endAdornment: (
+                      <Fragment>
+                        {loadingOnSearch ? <CircularProgress color="inherit" size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </Fragment>
+                    )
+                  }
+                }}
               />
             )}
           />
