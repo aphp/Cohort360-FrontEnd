@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Box, IconButton, MenuItem, Select, Typography } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import useStyles from './styles'
@@ -28,6 +28,7 @@ type NumberSelectorProps = {
 }
 
 type InclusiveSelectorProps = {
+  currentOperator: CriteriaGroup
   isInclusive: boolean
   onChange: (value: boolean) => void
 }
@@ -41,17 +42,24 @@ const LogicalOperatorDisplay = ({ value }: LogicalOperatorDisplayProps) => {
   if (!value) return null
   const { type, isInclusive } = value
   if (hasOptions(value)) {
+    if (type === CriteriaGroupType.OR_GROUP) {
+      return (
+        <Box display="flex" alignItems="center" gap={1}>
+          {isInclusive ? (
+            <Typography variant="h5" className={classes.textOperator}>
+              OU
+            </Typography>
+          ) : (
+            <Typography variant="h5" className={classes.textOperator}>
+              NON OU
+            </Typography>
+          )}
+        </Box>
+      )
+    }
     return (
       <Box display="flex" alignItems="center" gap={1}>
-        {isInclusive ? (
-          <Typography variant="h5" className={classes.textOperator}>
-            OU
-          </Typography>
-        ) : (
-          <Typography variant="h5" className={classes.textOperator}>
-            NON OU
-          </Typography>
-        )}
+        {isInclusive ? <IncludesIcon /> : <ExcludesIcon />}
         {value.options.operator} {value.options.number}
       </Box>
     )
@@ -64,12 +72,12 @@ const LogicalOperatorDisplay = ({ value }: LogicalOperatorDisplayProps) => {
   )
 }
 
-const InclusiveSelector = ({ isInclusive, onChange }: InclusiveSelectorProps) => {
+const InclusiveSelector = ({ currentOperator, isInclusive, onChange }: InclusiveSelectorProps) => {
   const { classes } = useStyles()
   return (
     <Select
       labelId="inclusive-simple-select-label"
-      id="inclusive-select"
+      id={`select-inclusive-${currentOperator.id}`}
       value={String(isInclusive)}
       classes={{ icon: classes.selectIcon }}
       className={classes.inputSelect}
@@ -89,7 +97,7 @@ const NumberSelector = ({ currentOperator, onChange }: NumberSelectorProps) => {
   return (
     <Select
       labelId="select-criteria-number"
-      id="select-criteria-number"
+      id={`select-value-${currentOperator.id}`}
       value={currentOperator.options.number ?? 0}
       type="number"
       classes={{ icon: classes.selectIcon }}
@@ -137,7 +145,7 @@ const OperatorSelector = ({ currentOperator, onChange, onConfirm }: OperatorSele
   return (
     <Select
       labelId="inclusive-simple-select-label"
-      id="inclusive-select"
+      id={`select-operator-${currentOperator.id}`}
       value={getDisplayType(currentOperator)}
       classes={{ icon: classes.selectIcon }}
       className={classes.inputSelect}
@@ -180,6 +188,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
     <>
       <Box
         className={isMainOperator ? classes.mainLogicalOperator : classes.logicalOperator}
+        id={`logical-operator-${itemId}`}
         style={{
           background: !currentOperator.isInclusive ? '#F2B0B0' : '#19235A',
           color: !currentOperator.isInclusive ? '#19235a' : 'white',
@@ -195,7 +204,11 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId, crite
         {itemId !== 0 ? <CriteriaCount criteriaCount={criteriaCount} /> : null}
         {isOpen && (
           <>
-            <InclusiveSelector isInclusive={currentOperator.isInclusive ?? true} onChange={handleChangeInclusive} />
+            <InclusiveSelector
+              currentOperator={currentOperator}
+              isInclusive={currentOperator.isInclusive ?? true}
+              onChange={handleChangeInclusive}
+            />
             <Typography variant="h5" className={classes.descriptionText}>
               les patients validant
             </Typography>
