@@ -335,8 +335,8 @@ const ControlPanel: React.FC<{
             </>
           )}
         </Grid>
-        <Grid className={classes.container}>
-          <Grid container justifyContent="space-between">
+        <Grid container className={classes.container}>
+          <Grid container size={12} justifyContent="space-between">
             <Typography className={cx(classes.boldText, classes.patientTypo)}>ACCÈS :</Typography>
             <Typography className={cx(classes.blueText, classes.boldText, classes.patientTypo)}>
               {accessIsPseudonymize === null ? '-' : accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
@@ -350,8 +350,8 @@ const ControlPanel: React.FC<{
           )}
         </JToolComponentEggWrapper>
 
-        <Grid className={classes.container}>
-          <Grid container justifyContent="space-between">
+        <Grid container className={classes.container}>
+          <Grid container size={12} justifyContent="space-between">
             <Typography className={cx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS :</Typography>
             {isLoading && prevCountDisplay === undefined ? (
               <CircularProgress

@@ -12,7 +12,7 @@ type LevelHeaderProps = {
 const LevelHeader = ({ loading, name, description, actions }: LevelHeaderProps) => {
   return (
     <Box display={'flex'} flexDirection={'column'} width={'100%'} alignItems={'center'}>
-      <Grid container gap="20px">
+      <Grid container size={12} gap="20px">
         <Box display={'flex'} flexDirection={'column'} width={'100%'}>
           <Box width="100%" display={'flex'} alignItems={'center'} gap={'8px'}>
             {loading ? (

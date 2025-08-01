@@ -109,8 +109,8 @@ const ProjectsList = () => {
   }
 
   return (
-    <Grid container style={{ padding: '20px 0' }} sx={{ gap: '20px' }}>
-      <Grid container sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+    <Grid container size={12} style={{ padding: '20px 0' }} sx={{ gap: '20px' }}>
+      <Grid container size={12} sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
         <Grid>
           <Select
             value={`${order.orderDirection}${order.orderBy}`}
@@ -134,7 +134,7 @@ const ProjectsList = () => {
           <DisplayDigits label={`projet${total > 1 ? 's' : ''}`} nb={total} />
         </Grid>
       </Grid>
-      <Grid container sx={{ gap: '50px' }} id="projects-list-div">
+      <Grid container size={12} sx={{ gap: '50px' }} id="projects-list-div">
         {loading ? (
           <CenteredCircularProgress />
         ) : projectsList.length === 0 ? (

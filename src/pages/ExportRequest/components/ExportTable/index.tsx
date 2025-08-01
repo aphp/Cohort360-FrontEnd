@@ -264,8 +264,8 @@ const ExportTable: React.FC<ExportTableProps> = ({
   }, [exportTableResourceType === ResourceType.QUESTIONNAIRE_RESPONSE && checkedTable === true && oneFile])
 
   return (
-    <Grid container className={classes.exportTableGrid} id={exportTable.name}>
-      <Grid container alignItems="center">
+    <Grid container size={12} className={classes.exportTableGrid} id={exportTable.name}>
+      <Grid container size={12} alignItems="center">
         <Grid container alignItems="center" size={6}>
           <Typography
             variant="subtitle2"
@@ -347,9 +347,8 @@ const ExportTable: React.FC<ExportTableProps> = ({
       )}
 
       {exportTable.name === ResourceType.QUESTIONNAIRE_RESPONSE && (
-        <Grid container sx={{ alignItems: 'center' }}>
+        <Grid container size={12} sx={{ alignItems: 'center' }}>
           <Switch
-            // style={{ padding: '0, 0, 0, 0' }}
             color="secondary"
             disabled={!checkedTable}
             checked={checkedPivotMerge}
@@ -364,7 +363,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
         </Grid>
       )}
 
-      <Grid container sx={{ justifyContent: 'space-between' }}>
+      <Grid container size={12} sx={{ justifyContent: 'space-between' }}>
         {!checkedPivotMerge && (
           <Grid container size={6} sx={{ alignItems: 'center' }} id={tableSetting?.tableName + 'columnsFilters'}>
             <Typography marginRight={'5px'} className={classes.textBody2}>
@@ -457,7 +456,7 @@ const ExportTable: React.FC<ExportTableProps> = ({
       </Grid>
 
       {exportTable.name === ResourceType.QUESTIONNAIRE_RESPONSE && checkedPivotMerge && (
-        <Grid container sx={{ alignItems: 'center' }} id={tableSetting?.tableName + 'questionChoice'}>
+        <Grid container size={12} sx={{ alignItems: 'center' }} id={tableSetting?.tableName + 'questionChoice'}>
           <QuestionForm
             open={isQuestionChoiceOpen}
             onClose={() => handleQuestionChoiceOpen(isQuestionChoiceOpen)}

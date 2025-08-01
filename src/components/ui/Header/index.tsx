@@ -48,15 +48,20 @@ const HeaderLayout: React.FC<HeaderLayoutProps> = ({
   return (
     <Grid
       container
+      size={12}
       sx={{
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor: '#E6F1FD',
         padding: '20px 0 16px'
       }}
     >
-      <Grid container size={{ xs: 11 }} sx={{ flexDirection: "column", justifyContent: "center", gap: lastConnexion ? '4px' : 2 }}>
+      <Grid
+        container
+        size={{ xs: 11 }}
+        sx={{ flexDirection: 'column', justifyContent: 'center', gap: lastConnexion ? '4px' : 2 }}
+      >
         {loading ? (
           <>
             <Skeleton width={200} />
@@ -65,7 +70,7 @@ const HeaderLayout: React.FC<HeaderLayoutProps> = ({
         ) : (
           <>
             {goBackButton}
-            <Grid container sx={{ justifyContent: "space-between", alignItems: "center" }}>
+            <Grid container sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box display="flex" alignItems="center" gap={1} padding={titleOnly ? '16px 0 32px' : 0}>
                 <Typography id={id ?? title} variant="h1">
                   {title}
@@ -98,7 +103,7 @@ const HeaderLayout: React.FC<HeaderLayoutProps> = ({
         )}
 
         {(patientsCount !== undefined || cohortId) && (
-          <Grid container sx={{ alignItems: "center", gap: 3 }}>
+          <Grid container display="flex" sx={{ alignItems: 'center', gap: 3 }}>
             {patientsCount !== undefined && (
               <CohortInfo id="patients-total" label="Nb de patients" total={format(patientsCount)} loading={loading} />
             )}

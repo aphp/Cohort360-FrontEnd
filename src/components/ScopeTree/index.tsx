@@ -34,6 +34,7 @@ const ScopeTree = ({ baseTree, selectedNodes, sourceType, onSelect, sx }: ScopeT
   return (
     <Grid
       container
+      size={12}
       sx={{ flexDirection: 'column', flexWrap: 'nowrap', justifyContent: 'space-between' }}
       height={'calc(100% - 20px)'}
       overflow="hidden"
@@ -41,7 +42,13 @@ const ScopeTree = ({ baseTree, selectedNodes, sourceType, onSelect, sx }: ScopeT
       <Grid container padding={'24px 20px'}>
         <SearchInput value={searchInput} placeholder={'Rechercher'} onChange={onChangeSearchInput} />
       </Grid>
-      <Grid container sx={{ flexDirection: 'column', flexWrap: 'wrap' }} height="100vh" overflow="auto" padding={'0px 20px'}>
+      <Grid
+        container
+        sx={{ flexDirection: 'column', flexWrap: 'wrap' }}
+        height="100vh"
+        overflow="auto"
+        padding={'0px 20px'}
+      >
         <Grid
           container
           sx={{ flexDirection: 'column', justifyContent: 'space-between', flexWrap: 'nowrap' }}
