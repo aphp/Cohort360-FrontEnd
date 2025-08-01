@@ -28,7 +28,13 @@ const SearchPatientCard = () => {
         {deidentifiedBoolean ? (
           <DisplayLocked />
         ) : (
-          <Grid container sx={{ flexDirection: 'column', justifyContent: 'flex-end' }} height={30} marginTop="4px">
+          <Grid
+            size={12}
+            container
+            sx={{ flexDirection: 'column', justifyContent: 'flex-end' }}
+            height={30}
+            marginTop="4px"
+          >
             <SearchInput
               value={searchInput}
               searchOnClick

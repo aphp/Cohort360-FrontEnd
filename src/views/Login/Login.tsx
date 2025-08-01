@@ -220,7 +220,7 @@ const Login = () => {
     } else {
       if (!username || !password) {
         setLoading(false)
-        return setError(true), setErrorMessage("L'un des champs nom d'utilisateur ou mot de passe est vide.")
+        return (setError(true), setErrorMessage("L'un des champs nom d'utilisateur ou mot de passe est vide."))
       }
       if (username && password) {
         localStorage.setItem('oidcAuth', 'false')
@@ -249,7 +249,7 @@ const Login = () => {
       loadBootstrapData(practitioner, lastConnection)
     } else {
       setLoading(false)
-      return setError(true), setErrorMessage("Votre nom d'utilisateur ou mot de passe est incorrect.")
+      return (setError(true), setErrorMessage("Votre nom d'utilisateur ou mot de passe est incorrect."))
     }
   }
 
@@ -348,7 +348,6 @@ const Login = () => {
                 <TextField
                   margin="normal"
                   required
-                  style={{ width: '50%' }}
                   id="identifiant"
                   label="Identifiant"
                   name="Identifiant"
@@ -361,7 +360,6 @@ const Login = () => {
                 <TextField
                   margin="normal"
                   required
-                  style={{ width: '50%' }}
                   name="Votre mot de passe"
                   label="Votre mot de passe"
                   type="password"

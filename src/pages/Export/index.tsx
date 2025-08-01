@@ -103,11 +103,11 @@ const Export = () => {
 
   return (
     <PageContainer>
-      <Grid container sx={{ flexDirection: "column" }} style={{ minHeight: '100vh' }}>
-        <Grid container sx={{ justifyContent: "center", alignItems: "center" }}>
+      <Grid container size={12} sx={{ flexDirection: 'column' }} style={{ minHeight: '100vh' }}>
+        <Grid container size={12} sx={{ justifyContent: 'center', alignItems: 'center' }}>
           <HeaderLayout id="export-page-title" title="Mes exports" titleOnly />
-          <Grid container size={11} sx={{ gap: GAP }} style={{ flexGrow: 1 }} mt={2}>
-            <Grid container sx={{ gap: 1, justifyContent: "space-between" }}>
+          <Grid container size={11} sx={{ gap: GAP }} mt={2}>
+            <Grid container size={12} sx={{ gap: 1, justifyContent: 'space-between' }}>
               <Grid container size={{ xs: 12, sm: 6 }}>
                 <SearchInput
                   value={searchInput ?? ''}
@@ -130,9 +130,9 @@ const Export = () => {
                 </Tooltip>
               </Grid>
             </Grid>
-            <Grid container sx={{ flexDirection: "column", flexGrow: 1 }}>
+            <Grid container size={12} sx={{ flexDirection: 'column', flexGrow: 1 }}>
               {loadingStatus === LoadingStatus.FETCHING && (
-                <Grid container sx={{ justifyContent: "center" }} height="50vh">
+                <Grid container sx={{ justifyContent: 'center' }} height="50vh">
                   <CircularProgress />
                 </Grid>
               )}

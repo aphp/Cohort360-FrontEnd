@@ -42,7 +42,7 @@ const CriteriasSection = ({ value, displayOptions, onDelete, onSaveFilters }: Cr
       {value.length > 0 && (
         <AccordionWrapper defaultExpanded>
           <AccordionSummary expandIcon={<ExpandMoreIcon htmlColor="#153D8A" />}>
-            <Grid container sx={{ justifyContent: 'space-between', alignItems: 'center', mr: 2 }}>
+            <Grid container size={12} sx={{ justifyContent: 'space-between', alignItems: 'center', mr: 2 }}>
               <Typography fontWeight={600} fontSize={16} color="#153D8A" fontFamily={"'Montserrat', sans-serif"}>
                 Filtres sélectionnés ({value.length})
               </Typography>
@@ -56,7 +56,10 @@ const CriteriasSection = ({ value, displayOptions, onDelete, onSaveFilters }: Cr
             </Grid>
           </AccordionSummary>
           <AccordionDetails>
-            <Grid container sx={{ flexDirection: 'column', justifyContent: 'flex-end', gap: displayOptions.saveFilters ? GAP : 0 }}>
+            <Grid
+              container
+              sx={{ flexDirection: 'column', justifyContent: 'flex-end', gap: displayOptions.saveFilters ? GAP : 0 }}
+            >
               {displayOptions.criterias && (
                 <Grid size={12} container>
                   <Truncated values={value} component={CustomChip} gap="5px" maxHeight={220} />

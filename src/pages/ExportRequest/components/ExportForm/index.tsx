@@ -462,7 +462,7 @@ const ExportForm: React.FC = () => {
             Le motif doit comporter au moins 10 caractères
           </Typography>
 
-          <Grid container className={classes.oneFileGrid} sx={{ alignItems: "center" }}>
+          <Grid container size={12} className={classes.oneFileGrid} sx={{ alignItems: 'center' }}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -487,7 +487,7 @@ const ExportForm: React.FC = () => {
             </Tooltip>
           </Grid>
 
-          <Grid container sx={{ alignItems: "center", flexWrap: "nowrap" }}>
+          <Grid container size={12} sx={{ alignItems: 'center', flexWrap: 'nowrap' }}>
             <Grid container size={{ xs: 3 }}>
               <Typography className={classes.dialogHeader} variant="h5">
                 Tables exportées
@@ -565,7 +565,7 @@ const ExportForm: React.FC = () => {
               Conditions de l'EDS
             </Typography>
 
-            <Grid container sx={{ gap: "8px", justifyContent: 'space-between' }}>
+            <Grid container sx={{ gap: '8px', justifyContent: 'space-between' }}>
               <Typography variant="caption" className={classes.textBody2}>
                 Le niveau d’habilitation dont vous disposez dans Cohort360 vous autorise à exporter des données à
                 caractère personnel conformément à la réglementation et aux règles institutionnelles d’utilisation des
@@ -630,7 +630,7 @@ const ExportForm: React.FC = () => {
               </Button>
             </Grid>
           </Grid>
-          <Grid container sx={{ mb: "12px", justifyContent: 'flex-end' }}>
+          <Grid container sx={{ mb: '12px', justifyContent: 'flex-end' }}>
             {error === Error.ERROR_MOTIF && (
               <CustomAlert severity="error">
                 Merci d'indiquer le motif de votre demande d'export, ce motif doit contenir au moins 10 caractères.

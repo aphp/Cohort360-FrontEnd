@@ -17,12 +17,13 @@ const InfoCard = ({ value }: InfoCardProps) => {
   return (
     <Grid
       container
+      size={12}
       sx={{
         borderBottom: '1px solid #e3e3e3',
         cursor: value.url ? 'pointer' : 'default',
-        padding: "10px 16px",
-        alignItems: "center",
-        justifyContent: "space-between"
+        padding: '10px 16px',
+        alignItems: 'center',
+        justifyContent: 'space-between'
       }}
       onClick={() => value.url && navigate(value.url)}
       id="card"

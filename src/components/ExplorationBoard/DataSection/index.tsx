@@ -38,7 +38,7 @@ const DataSection = ({
 }: DataSectionProps) => {
   if (isLoading)
     return (
-      <Grid container sx={{ justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+      <Grid container size={12} sx={{ justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
         <CenteredCircularProgress />
       </Grid>
     )

@@ -121,10 +121,10 @@ const Preview: React.FC<PreviewProps> = ({
 
   return (
     <Grid container sx={{ flexDirection: 'column', alignItems: 'center' }} className={classes.root}>
-      <Grid container sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+      <Grid container size={12} sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
         <Grid container size={{ xs: 12, sm: 6, md: 4 }} sx={{ justifyContent: 'center' }}>
           <Paper id="patient-number-card" className={classes.nbPatientsOverlay}>
-            <Grid container className={classes.chartTitle}>
+            <Grid container size={12} className={classes.chartTitle}>
               <Typography id="patient-number-card-title" variant="h3" color="primary">
                 Nombre de patients
               </Typography>
@@ -165,23 +165,21 @@ const Preview: React.FC<PreviewProps> = ({
           </Chart>
         </Grid>
 
-        <Grid container size={{ md: 12, lg: 6 }} sx={{ justifyContent: 'center' }}>
+        <Grid container size={{ md: 12, sm: 12, lg: 6 }} sx={{ justifyContent: 'center' }}>
           <Chart id="age-structure-card" isLoading={loading} title="Pyramide des âges">
             <PyramidChart data={agePyramidData} />
           </Chart>
         </Grid>
 
-        <Grid container size={{ md: 12, lg: 6 }} sx={{ justifyContent: 'center' }}>
-          <Grid container sx={{ justifyContent: 'center' }}>
-            <Chart id="month-repartition-visit-card" isLoading={loading} title="Répartition des visites par mois">
-              <GroupedBarChart data={monthlyVisitData} />
-            </Chart>
-          </Grid>
+        <Grid container size={{ md: 12, sm: 12, lg: 6 }} sx={{ justifyContent: 'center' }}>
+          <Chart id="month-repartition-visit-card" isLoading={loading} title="Répartition des visites par mois">
+            <GroupedBarChart data={monthlyVisitData} />
+          </Chart>
         </Grid>
       </Grid>
 
       {appConfig.features.locationMap.enabled && cohortId && (
-        <Grid container sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+        <Grid size={12} container sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
           <Grid size={{ xs: 12, sm: 12, md: 12 }} sx={{ justifyContent: 'center' }}>
             <Chart
               id="location-map"
