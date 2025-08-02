@@ -55,7 +55,7 @@ const DataSection = ({
             <Grid container spacing={3}>
               {data.diagrams.map((diagram, index) => (
                 <Grid key={index} item xs={12} md={6} lg={4}>
-                  <Chart isLoading={isLoading} title="Répartition par genre">
+                  <Chart isLoading={isLoading} title={diagram.title}>
                     {diagram.type === DiagramType.BAR && (
                       <BarChart data={diagram.data as SimpleChartDataType[]} width={250} />
                     )}
