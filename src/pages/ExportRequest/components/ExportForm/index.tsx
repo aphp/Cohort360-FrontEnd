@@ -605,6 +605,12 @@ const ExportForm: React.FC = () => {
                   À ne pas croiser les données avec tout autre jeu de données, sans autorisation auprès de la CNIL
                 </Typography>
               </Grid>
+              <Typography variant="caption" className={classes.textBody2}>
+                Les publications relatives à des études réalisées à partir des données de l’EDS de l’AP-HP y font
+                référence sous la forme de « l’Entrepôt de Données de Santé de l’Assistance Publique – Hôpitaux de Paris
+                (AP-HP) » ou « AP-HP Clinical Data Warehouse » ou « Clinical Data Warehouse of Greater Paris University
+                Hospitals ».
+              </Typography>
 
               <FormControlLabel
                 control={
