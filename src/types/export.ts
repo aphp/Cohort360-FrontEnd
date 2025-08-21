@@ -33,6 +33,7 @@ export type TableInfo = {
 }
 
 export type ExportList = {
+  uuid: string
   cohort_id: string | null
   cohort_name: string | null
   created_at: string | null
@@ -48,4 +49,8 @@ export type FetchExportArgs = {
   input: string
   orderBy: OrderBy
   page: number
+}
+
+export type ExportCallbacks = {
+  onDownload: (id: string) => void
 }

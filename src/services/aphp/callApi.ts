@@ -1294,6 +1294,17 @@ export const fetchExportList = async (args: fetchExportListProps) => {
   return response.data
 }
 
+type downloadExportProps = {
+  id: string
+  signal?: AbortSignal
+}
+
+export const downloadExport = async (args: downloadExportProps) => {
+  const { id, signal } = args
+  const response = await apiBackend.get<Back_API_Response<ExportList>>(`/exports/${id}/download/`, { signal })
+  return response.data
+}
+
 export type WebContent = {
   id: number
   created_at: string
